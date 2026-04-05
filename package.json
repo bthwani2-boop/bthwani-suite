@@ -1,0 +1,9 @@
+{
+  "name": "bthwani-suite",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Bootstrap workspace shell for the bthwani-suite clean build line",
+  "scripts": {
+    "phase:review": "echo Review phase evidence under kdt/volatile/registry/runs"
+  }
+}

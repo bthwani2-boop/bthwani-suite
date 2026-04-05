@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Package manager
+.pnpm-store/
+
+# Build and cache output
+dist/
+build/
+coverage/
+.nx/
+.cache/
+tmp/
+temp/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.*
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

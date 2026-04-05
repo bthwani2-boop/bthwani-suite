@@ -1,0 +1,7 @@
+{
+  "name": "ui-kit",
+  "root": "packages/ui-kit",
+  "sourceRoot": "packages/ui-kit/src",
+  "projectType": "library",
+  "targets": {}
+}

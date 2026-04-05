@@ -1,0 +1,42 @@
+SESSION_ID: f0b4b460-01e3-46fb-b37f-19737d6a04d9
+PHASE: 00
+DATE: 2026-04-06
+PRIMARY_REPO: bthwani-suite
+LEGACY_REPO: bthfinal
+
+Observed root state before Phase 00 artifact creation:
+- .git/
+- .github/
+- docs/
+
+Observed bootstrap shell status before Phase 00 artifact creation:
+- .gitignore: missing
+- README.md: missing
+- package.json: missing
+- pnpm-workspace.yaml: missing
+- nx.json: missing
+- tsconfig.base.json: missing
+- tsconfig.json: missing
+
+Observed implementation status:
+- apps/: not present
+- services/: not present
+- packages/: not present
+- contracts/: not present
+- governance/: not present
+- tools/: not present
+- runtime/: not present
+- feature implementation code: not observed
+
+Observed donor carryover status:
+- copied donor app tree: not observed
+- copied donor service tree: not observed
+- copied donor package tree: not observed
+
+Phase 00 artifact set created in this session:
+- .gitignore
+- README.md
+- docs/00_REPO_RESET_DECISION.md
+- docs/01_DONOR_REPO_POLICY.md
+- kdt/volatile/registry/runs/f0b4b460-01e3-46fb-b37f-19737d6a04d9/phase-00/root-state.txt
+- kdt/volatile/registry/runs/f0b4b460-01e3-46fb-b37f-19737d6a04d9/phase-00/decision-review.md

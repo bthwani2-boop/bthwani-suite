@@ -1,0 +1,8 @@
+surface,classification,primary_actor,dsh_role,source_status,notes
+app-client,REQUIRED,customer,"entry, cart, checkout, order tracking",observed,"matches donor APP_USER with clean normalization"
+app-partner,REQUIRED,partner,"partner store and order handling",observed,"matches donor APP_PARTNER"
+app-captain,REQUIRED,captain,"offer, job acceptance, delivery execution, proof",observed,"matches donor APP_CAPTAIN"
+app-field,OPTIONAL,field,"activation and visit support, not required for every DSH journey",observed,"matches donor APP_FIELD and governance app-field rule"
+control-panel,REQUIRED,ops,"operational oversight, governance, peak mode, exception handling",observed,"matches donor MCPW with clean normalization"
+webapp,OUT,customer,"not part of current DSH first-service foundation",inferred,"no current evidence that webapp is core to DSH bootstrap journey"
+website,OUT,customer,"not part of current DSH first-service foundation",inferred,"no current evidence that website is core to DSH bootstrap journey"
