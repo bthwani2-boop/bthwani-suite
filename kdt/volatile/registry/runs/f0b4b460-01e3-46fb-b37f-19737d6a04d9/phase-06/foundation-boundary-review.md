@@ -11,8 +11,8 @@
 ## Boundary Verdict
 
 - `FOUNDATION_SCOPE.md` explicitly defines in-scope and out-of-scope items -> PASS
-- no cards, filters, tracking, inbox, or dashboard pattern folders were created -> PASS
-- ui-kit remains bootstrap-foundation only -> PASS
+- no service-specific pattern folders were created by this hardening pass -> PASS
+- generic `components/` and `patterns/` folders already exist, so the package is not pure bootstrap-minimal anymore -> REVIEW
 
 ## Service Leakage Check
 
@@ -26,14 +26,14 @@
 
 ## Export Cleanliness Check
 
-- package root exports only the seven approved foundation domains -> PASS
-- no preview registry, route catalog, or screen component export exists under `packages/ui-kit/` -> PASS
+- package root now exports foundation, primitives, states, generic components, patterns, and adapters -> REVIEW
+- no preview registry, route catalog, or service-bound screen export was introduced by this hardening pass -> PASS
 
 ## Readiness Notes For Later Compatibility Gate
 
-- the package is clean enough for later compatibility review because its exports are foundation-only and phase-bounded
-- later screen-driven expansion must still prove demand from retained real screens and may not reuse this phase as blanket permission
+- the strengthened foundation is clean enough for later compatibility review because semantic roles, direction, and state families are now explicit
+- screen-driven adoption is still blocked until later retained-screen phases prove demand and clean up provisional shared shells
 
 ## Final Phase 06 Verdict
 
-Phase 06 is ready for gate review.
+Phase 06 foundation hardening is complete, but pilot validation and screen-driven shared-shell adoption remain blocked pending later phase review.

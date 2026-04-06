@@ -2,10 +2,17 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
+    "moduleResolution": "Bundler",
     "strict": true,
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
+      "@bthwani/ui-kit": [
+        "packages/ui-kit/src/index.ts"
+      ],
+      "@bthwani/ui-kit/*": [
+        "packages/ui-kit/src/*"
+      ],
       "@bthwani/surfaces": [
         "packages/surfaces/src/index.ts"
       ],
@@ -13,7 +20,7 @@
         "packages/surfaces/src/*"
       ]
     },
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

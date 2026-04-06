@@ -12,21 +12,31 @@ export type BthBadgeProps = {
 
 export function BthBadge({ label, tone = 'default', style }: BthBadgeProps) {
   const { theme } = useTheme();
-  const backgroundColor = {
-    default: theme.backgroundAlt,
-    brand: theme.brand,
-    success: theme.successSurface,
-    warning: theme.warningSurface,
-    danger: theme.dangerSurface,
-    info: theme.infoSurface
+  const palette = {
+    default: { backgroundColor: theme.surfaceInset, textColor: theme.textMuted, borderColor: theme.line },
+    brand: { backgroundColor: theme.brandSurface, textColor: theme.brand, borderColor: theme.brandSurface },
+    success: { backgroundColor: theme.successSurface, textColor: theme.successText, borderColor: theme.successSurface },
+    warning: { backgroundColor: theme.warningSurface, textColor: theme.warningText, borderColor: theme.warningSurface },
+    danger: { backgroundColor: theme.dangerSurface, textColor: theme.dangerText, borderColor: theme.dangerSurface },
+    info: { backgroundColor: theme.infoSurface, textColor: theme.infoText, borderColor: theme.infoSurface }
   }[tone];
 
-  const textTone = tone === 'brand' ? 'default' : tone;
-  const textColor = tone === 'brand' ? theme.brandContrast : undefined;
-
   return (
-    <View style={[{ alignSelf: 'flex-start', paddingHorizontal: spacing[3], paddingVertical: spacing[1], borderRadius: radius.pill, backgroundColor }, style]}>
-      <BthText role="label" tone={textTone as never} style={textColor ? { color: textColor } : undefined}>{label}</BthText>
+    <View
+      style={[
+        {
+          alignSelf: 'flex-start',
+          paddingHorizontal: spacing[3],
+          paddingVertical: spacing[1],
+          borderRadius: radius.pill,
+          borderWidth: 1,
+          borderColor: palette.borderColor,
+          backgroundColor: palette.backgroundColor
+        },
+        style
+      ]}
+    >
+      <BthText role="label" style={{ color: palette.textColor }}>{label}</BthText>
     </View>
   );
 }

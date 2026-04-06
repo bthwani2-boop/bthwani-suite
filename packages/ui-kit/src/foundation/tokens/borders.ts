@@ -3,3 +3,5 @@ export const borders = {
   hairline: 1,
   strong: 2
 } as const;
+
+export type BorderToken = keyof typeof borders;

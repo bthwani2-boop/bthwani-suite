@@ -1,7 +1,8 @@
 import React from 'react';
 import { TextInput, View, type TextInputProps } from 'react-native';
 import { useDirection, useTheme } from '../../hooks';
-import { radius, spacing, sizes } from '../../foundation/tokens';
+import { borders, radius, spacing, sizes } from '../../foundation/tokens';
+import { resolveLogicalPadding, resolveTextAlign } from '../../foundation/direction';
 import { BthText } from '../../primitives';
 
 export type BthTextFieldProps = TextInputProps & {
@@ -13,23 +14,24 @@ export type BthTextFieldProps = TextInputProps & {
 export function BthTextField({ label, hint, error, style, ...rest }: BthTextFieldProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
-  const toneColor = error ? theme.danger : theme.text;
+  const isDisabled = rest.editable === false;
 
   return (
     <View style={{ gap: spacing[2] }}>
       {label ? <BthText role="label">{label}</BthText> : null}
       <TextInput
+        editable={rest.editable}
         placeholderTextColor={theme.textSoft}
         style={[
           {
             minHeight: sizes.controlLg,
-            borderWidth: 1,
-            borderColor: error ? theme.danger : theme.line,
+            borderWidth: borders.hairline,
+            borderColor: error ? theme.danger : theme.fieldBorder,
             borderRadius: radius.lg,
-            backgroundColor: theme.surface,
-            color: theme.text,
-            paddingHorizontal: spacing[4],
-            textAlign: direction === 'rtl' ? 'right' : 'left',
+            backgroundColor: isDisabled ? theme.disabledSurface : theme.fieldBackground,
+            color: isDisabled ? theme.disabledText : theme.text,
+            ...resolveLogicalPadding(direction, spacing[4], spacing[4]),
+            textAlign: resolveTextAlign(direction, 'start'),
             writingDirection: direction
           },
           style

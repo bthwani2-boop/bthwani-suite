@@ -10,13 +10,13 @@
 
 ## Pass Condition Review
 
-- ui-kit exists as foundation only -> PASS
-- tokens, primitives, direction, and state shells are scaffolded -> PASS
-- foundation files contain real values and rules -> PASS
-- no service-specific patterns exist yet -> PASS
-- no screen-driven patterns exist yet -> PASS
+- semantic tokens, themes, direction helpers, primitives, and state shells are now explicit -> PASS
+- foundation files contain real values and real behavioral rules rather than thin placeholders -> PASS
+- no service-specific widgets or business logic were introduced by this hardening pass -> PASS
+- root API still exposes generic components and `patterns/`, so the package is not strictly `foundation only` anymore -> REVIEW
 
 ## Scope Notes
 
-- current foundation exports remain limited to tokens, typography, spacing, colors, direction, primitives, and shared state names
-- no queue, tracking, inbox, filter, dashboard, or route-aware family has entered the package
+- current hardening pass strengthened semantic theme roles, logical direction behavior, and a centralized state family catalog
+- no queue, tracking, inbox, filter, service dashboard widget, or route-aware family was added in this pass
+- existing generic screen-shell files remain deferred and must not be treated as Phase 06 blanket permission

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Pressable, View, type PressableProps } from 'react-native';
+import { Pressable, View, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
+import { resolveRowDirection } from '../../foundation/direction';
 import { spacing } from '../../foundation/tokens';
 import { BthBadge } from './BthBadge';
 import { BthText } from '../../primitives';
-import { useTheme } from '../../hooks';
+import { useDirection, useTheme } from '../../hooks';
 
 export type BthListItemProps = PressableProps & {
   title: string;
@@ -13,22 +14,27 @@ export type BthListItemProps = PressableProps & {
 };
 
 export function BthListItem({ title, subtitle, meta, badgeLabel, style, ...rest }: BthListItemProps) {
+  const { direction } = useDirection();
   const { theme } = useTheme();
+  const resolveStyle = ({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> => [
+    {
+      width: '100%',
+      borderWidth: 1,
+      borderColor: theme.line,
+      borderRadius: 18,
+      backgroundColor: pressed ? theme.surfaceInset : theme.surfaceRaised,
+      padding: spacing[4],
+      gap: spacing[2]
+    },
+    typeof style === 'function' ? style({ pressed }) : style
+  ];
+
   return (
     <Pressable
-      style={({ pressed }) => [{
-        width: '100%',
-        borderWidth: 1,
-        borderColor: theme.line,
-        borderRadius: 18,
-        backgroundColor: theme.surface,
-        padding: spacing[4],
-        gap: spacing[2],
-        opacity: pressed ? 0.95 : 1
-      }, style as never]}
+      style={resolveStyle}
       {...rest}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing[3] }}>
+      <View style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between', gap: spacing[3] }}>
         <View style={{ flex: 1, gap: spacing[1] }}>
           <BthText role="bodyStrong">{title}</BthText>
           {subtitle ? <BthText role="bodySm" tone="muted">{subtitle}</BthText> : null}

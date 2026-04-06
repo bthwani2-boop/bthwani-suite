@@ -8,9 +8,9 @@ This package centrally owns:
 - direction rules
 - logical spacing behavior
 - reusable UI primitives
-- shared foundational components
+- shared state families
+- shared foundational components that remain service-clean
 - common state shells
-- reusable screen shells
 
 ## Forbidden local patterns
 Screens must not own:
@@ -21,6 +21,11 @@ Screens must not own:
 - repeated raw spacing systems
 - repeated button or field families
 - repeated empty/loading/error shells
+
+## Phase boundary
+- screen-family shells are not automatically lawful just because files already exist under `patterns/`
+- pilot validation routes or screen previews stay blocked until later retained-screen phases
+- any future `patterns/` promotion must prove cross-screen demand and avoid duplicate family growth
 
 ## Allowed local responsibility
 Screens may own:

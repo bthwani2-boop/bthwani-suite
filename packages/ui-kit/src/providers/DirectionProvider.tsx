@@ -1,23 +1,38 @@
 import React, { createContext, useContext, useMemo } from 'react';
-import { directionConfig, type Direction } from '../foundation/direction';
+import { directionConfig, resolveDirectionFromLanguage, type BthLanguage, type Direction } from '../foundation/direction';
 
 type DirectionContextValue = {
   direction: Direction;
+  language: BthLanguage;
   isRtl: boolean;
+  usesLogicalStartEnd: boolean;
 };
 
 const DirectionContext = createContext<DirectionContextValue>({
   direction: directionConfig.defaultDirection,
-  isRtl: directionConfig.defaultDirection === 'rtl'
+  language: directionConfig.defaultLanguage,
+  isRtl: directionConfig.defaultDirection === 'rtl',
+  usesLogicalStartEnd: directionConfig.useLogicalStartEnd
 });
 
 export type DirectionProviderProps = {
   direction?: Direction;
+  language?: BthLanguage;
   children: React.ReactNode;
 };
 
-export function DirectionProvider({ direction = directionConfig.defaultDirection, children }: DirectionProviderProps) {
-  const value = useMemo<DirectionContextValue>(() => ({ direction, isRtl: direction === 'rtl' }), [direction]);
+export function DirectionProvider({ direction, language = directionConfig.defaultLanguage, children }: DirectionProviderProps) {
+  const resolvedDirection = direction ?? resolveDirectionFromLanguage(language);
+  const value = useMemo<DirectionContextValue>(
+    () => ({
+      direction: resolvedDirection,
+      language,
+      isRtl: resolvedDirection === 'rtl',
+      usesLogicalStartEnd: directionConfig.useLogicalStartEnd
+    }),
+    [language, resolvedDirection]
+  );
+
   return <DirectionContext.Provider value={value}>{children}</DirectionContext.Provider>;
 }
 

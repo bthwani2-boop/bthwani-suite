@@ -1,84 +1,115 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, type PressableProps, View } from 'react-native';
-import { useTheme } from '../../hooks';
-import { radius, spacing, sizes } from '../../foundation/tokens';
+import {
+  ActivityIndicator,
+  Pressable,
+  type PressableProps,
+  type PressableStateCallbackType,
+  type StyleProp,
+  type ViewStyle,
+  View
+} from 'react-native';
+import { useDirection, useTheme } from '../../hooks';
+import { opacities, radius, spacing, sizes } from '../../foundation/tokens';
+import { resolveRowDirection } from '../../foundation/direction';
 import { BthText } from '../../primitives';
+
+export type BthButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
 
 export type BthButtonProps = PressableProps & {
   label: string;
-  tone?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  tone?: BthButtonTone;
+  size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   fullWidth?: boolean;
+  leadingAccessory?: React.ReactNode;
+  trailingAccessory?: React.ReactNode;
 };
 
 export function BthButton({
   label,
   tone = 'primary',
+  size = 'md',
   loading = false,
   disabled,
   fullWidth = true,
+  leadingAccessory,
+  trailingAccessory,
   style,
   ...rest
 }: BthButtonProps) {
+  const { direction } = useDirection();
   const { theme } = useTheme();
 
-  const scheme = {
+  const schemeByTone: Record<BthButtonTone, { backgroundColor: string; borderColor: string; labelColor: string }> = {
     primary: {
       backgroundColor: theme.brand,
       borderColor: theme.brand,
-      labelTone: 'default' as const,
       labelColor: theme.brandContrast
     },
     secondary: {
       backgroundColor: theme.surface,
-      borderColor: theme.line,
-      labelTone: 'default' as const,
+      borderColor: theme.lineStrong,
       labelColor: theme.text
     },
     ghost: {
       backgroundColor: 'transparent',
       borderColor: 'transparent',
-      labelTone: 'brand' as const,
       labelColor: theme.brand
     },
     danger: {
       backgroundColor: theme.danger,
       borderColor: theme.danger,
-      labelTone: 'default' as const,
+      labelColor: '#FFFFFF'
+    },
+    success: {
+      backgroundColor: theme.success,
+      borderColor: theme.success,
       labelColor: '#FFFFFF'
     }
-  }[tone];
+  };
+
+  const sizeConfig = {
+    sm: { minHeight: sizes.controlSm, paddingHorizontal: spacing[3], textRole: 'label' as const },
+    md: { minHeight: sizes.controlMd, paddingHorizontal: spacing[4], textRole: 'bodyStrong' as const },
+    lg: { minHeight: sizes.controlLg, paddingHorizontal: spacing[5], textRole: 'bodyStrong' as const }
+  }[size];
+
+  const scheme = schemeByTone[tone];
+  const resolvedDisabled = disabled || loading;
+  const resolveStyle = ({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> => [
+    {
+      minHeight: sizeConfig.minHeight,
+      width: fullWidth ? '100%' : undefined,
+      paddingHorizontal: sizeConfig.paddingHorizontal,
+      borderRadius: radius.pill,
+      borderWidth: tone === 'ghost' ? 0 : 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: resolveRowDirection(direction),
+      gap: spacing[2],
+      backgroundColor: resolvedDisabled ? theme.disabledSurface : scheme.backgroundColor,
+      borderColor: resolvedDisabled ? theme.disabledSurface : scheme.borderColor,
+      opacity: resolvedDisabled ? opacities.disabled : pressed ? opacities.pressed : 1
+    },
+    typeof style === 'function' ? style({ pressed }) : style
+  ];
 
   return (
     <Pressable
       accessibilityRole="button"
-      disabled={disabled || loading}
-      style={({ pressed }) => [
-        {
-          minHeight: sizes.controlMd,
-          width: fullWidth ? '100%' : undefined,
-          paddingHorizontal: spacing[4],
-          borderRadius: radius.pill,
-          borderWidth: tone === 'ghost' ? 0 : 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'row',
-          gap: spacing[2],
-          backgroundColor: scheme.backgroundColor,
-          borderColor: scheme.borderColor,
-          opacity: disabled ? 0.5 : pressed ? 0.9 : 1
-        },
-        style as never
-      ]}
+      disabled={resolvedDisabled}
+      style={resolveStyle}
       {...rest}
     >
       {loading ? (
         <ActivityIndicator color={scheme.labelColor} />
       ) : (
-        <View>
-          <BthText role="bodyStrong" style={{ color: scheme.labelColor }} align="center">
+        <View style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[2] }}>
+          {leadingAccessory}
+          <BthText role={sizeConfig.textRole} style={{ color: resolvedDisabled ? theme.disabledText : scheme.labelColor }} align="center">
             {label}
           </BthText>
+          {trailingAccessory}
         </View>
       )}
     </Pressable>

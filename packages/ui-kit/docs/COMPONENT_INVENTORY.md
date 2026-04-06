@@ -1,6 +1,8 @@
 # Component Inventory
 
-## Foundations
+## Phase 06 Authoritative Layers
+
+### Foundations
 - tokens/colors
 - tokens/spacing
 - tokens/radius
@@ -14,35 +16,35 @@
 - direction
 - themes
 
-## Primitives
+### Foundation State Layer
+- states/catalog
+- BthStateView
+- BthEmptyState
+
+### Primitives
 - BthBox
 - BthText
 - BthSurface
 - BthDivider
 
-## Action & Form
+### Service-Clean Shared Building Blocks
 - BthButton
 - BthTextField
 - BthSearchField
 - BthChip
-
-## Display
 - BthBadge
 - BthCard
 - BthStatCard
 - BthListItem
-
-## Navigation
 - BthScreenHeader
 - BthSectionHeader
-
-## Feedback & Overlays
-- BthStateView
-- BthEmptyState
 - BthSheetFrame
 
-## Patterns
+## Deferred For Later Screen-Proven Review
+
 - BthListScreenShell
 - BthFormScreenShell
 - BthDetailScreenShell
 - BthDashboardShell
+
+These screen-family shells remain in the package, but they are not treated as lawful shared authority until later retained-screen evidence validates them.

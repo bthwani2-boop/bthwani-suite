@@ -35,7 +35,7 @@ export function BthListScreenShell({
       ) : (
         <BthSurface>
           <BthStateView
-            kind={state === 'ready' ? 'empty' : state}
+            kind={state}
             title={stateTitle ?? title}
             description={stateDescription}
           />

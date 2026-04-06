@@ -15,12 +15,16 @@
 ## In Scope
 
 - token core
+- semantic theme contract
 - typography scale
 - spacing scale
 - color palette
 - shared direction rules
+- logical layout helpers
 - primitive set definition
 - foundation state names
+- shared state catalog
+- base form and action building blocks that remain service-clean
 
 ## Out Of Scope
 
@@ -31,6 +35,13 @@
 - filter systems
 - screen-family patterns
 - route-aware components
+- pilot validation screens inside app surfaces
+
+## Phase 06 Reality Note
+
+- the package currently contains generic `components/` and `patterns/` directories from earlier growth
+- this hardening pass does not treat those directories as blanket permission for screen-driven expansion
+- shared screen shells remain provisional until a later Phase 15 review proves retained-screen demand and duplicate-family cleanup
 
 ## Why Service-Specific UI Is Out
 
@@ -48,3 +59,4 @@
 
 This package exists only as shared UI foundation at this phase.
 It must not absorb service truth or screen-specific component families yet.
+Foundation hardening may strengthen semantic roles, logical direction behavior, shared state families, and service-clean building blocks, but it may not use this phase as permission for pilot surfaces or screen-proven pattern expansion.
