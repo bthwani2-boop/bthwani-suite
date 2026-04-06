@@ -33,6 +33,18 @@ The current official service catalog for bootstrap is:
 - selected first service: `dsh`
 - deferred services: `amn`, `arb`, `esf`, `exchangeprice`, `hr`, `knz`, `kwd`, `mrf`, `snd`, `wlt`
 
+## Naming Notes
+
+- service slugs are lower-case internal identifiers and must remain stable across governance, contracts, and service packs
+- these slugs are governance names, not visible UI labels
+- donor naming may appear in source trace only and must not replace the approved service slug set here
+
+## Forbidden Ambiguity
+
+- do not invent alias slugs for an approved service
+- do not use donor folder names as canonical service names when they differ from the approved slug set
+- do not treat deferred services as active merely because they are listed in the catalog
+
 ## Rule
 
 These slugs are the official current service identifiers for bootstrap governance.

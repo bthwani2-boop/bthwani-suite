@@ -16,6 +16,10 @@
 
 OpenAPI is not the first source of truth during bootstrap.
 
+Canonical contract location for the clean repo:
+
+- `contracts/master/`
+
 The canonical contract becomes authoritative only after:
 
 - service truth is defined
@@ -28,6 +32,12 @@ The canonical contract becomes authoritative only after:
 - donor contracts may be consulted as evidence
 - donor contracts may not override clean target sovereignty automatically
 - no full master contract detail may be built during bootstrap phases 00-07
+
+## Rogue Contract Truth Prohibition
+
+- no app shell may define private canonical contract truth outside `contracts/master/`
+- no package may become an alternate source of API sovereignty
+- donor contract files remain evidence inputs only until the clean repo reaches the lawful contract phases
 
 ## Explicit Rejections
 

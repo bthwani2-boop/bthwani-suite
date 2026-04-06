@@ -31,6 +31,12 @@
 - move-don't-delete rule is explicit -> PASS
 - no broad implementation work has started -> PASS
 
+## Validation Schema Checks
+
+- contradiction check across governance files -> PASS
+- missing-file check for the required governance core -> PASS
+- placeholder-only check across the required governance files -> PASS
+
 ## Consistency Review
 
 - repo boundary and donor policy are aligned -> PASS

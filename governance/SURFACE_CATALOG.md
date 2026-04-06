@@ -32,3 +32,9 @@
 - `control-panel` is the primary web operational shell
 - `webapp` and `website` remain official surfaces, but their per-service responsibility is not locked globally here
 - `app-field` is official and must be classified explicitly per service as `REQUIRED`, `OPTIONAL`, or `OUT`
+
+## Internal Name vs Visible Label Reminder
+
+- internal names are the canonical filesystem and code identifiers used in governance, paths, and contracts
+- visible labels are user-facing text and must not replace internal names in canonical repo artifacts
+- IA domains or business groupings do not replace internal surface names
