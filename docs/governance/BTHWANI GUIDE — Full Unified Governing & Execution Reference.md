@@ -1,215 +1,134 @@
 # BTHWANI GUIDE — Full Unified Governing & Execution Reference
 
-## 1. Executive Verdict
+## 1. Canonical Status And Authority
 
-### Source status
+### 1.1 Purpose
 
-This guide is derived from an external planning transcript, but that transcript is not itself a canonical execution plan.
-The transcript is treated as background reference material rather than an in-repo governing artifact because it mixes:
+This file is the constitutional guide for work inside `bthwani-suite`.
 
-- direct answers
-- repeated expansions
-- teaching blocks for a beginner
-- multiple rephrasings of the same sequence
-- side branches
-- temporary local conclusions
+It defines:
 
-### Final verdict
+- repo sovereignty
+- naming law
+- ownership law
+- boundary law
+- lifecycle order
+- evidence and adoption law
+- donor consultation law
+- companion-document precedence
 
-The correct action is not to treat the transcript as the live governing artifact.
-The correct action is to preserve it as reference material and maintain this file as the canonical governing plan for this repository.
+It does not replace runbooks, gates, or phase manuals.
+It governs them.
 
-## 2. Forensic Analysis Of The Source File
+### 1.2 Authority Resolution
 
-### 2.1 What the source file really is
+Resolve authority in this order:
 
-The source material is a planning transcript for rebuilding the platform from absolute zero.
-This guide retains the following adopted objectives from that planning work:
+1. current verified repo reality
+2. repo-local approved governance artifacts
+3. this guide for long-term law, ownership, naming, and phase legality
+4. `docs/bootstrap/BTHWANI GUIDE — Phase Bootstrap Runbook.md` for literal bootstrap execution order in Phases `00` through `07`
+5. `docs/bootstrap/BTHWANI GUIDE — Bootstrap Gate Checklists.md` for bootstrap gates in Phases `00` through `07`
+6. `docs/execution/BTHWANI GUIDE — Generic Screen Execution Runbook.md` for literal execution across Phases `08` through `18`
+7. `docs/execution/BTHWANI GUIDE — Binding And Runtime Execution Runbook.md` for literal execution across Phases `19` through `24`
+8. `docs/execution/BTHWANI GUIDE — Post-Bootstrap Gate Pack.md` for gates across Phases `08` through `24`
+9. `docs/execution/phases/PHASE_00_REPO_RESET_DECISION.md` through `docs/execution/phases/PHASE_27_NEXT_SERVICE_REPEAT.md` for exact phase manuals
+10. donor material from `bthfinal` as evidence only
 
-- create a new clean repository
-- treat the legacy donor repository as a donor/reference source only
-- rebuild service-by-service
-- design screens and flows before contracts and binding
-- update contracts only after UX needs are known
-- bind only after contracts are verified
-- run production-like verification only near closure
-- seal every service with evidence
+If a companion document violates naming law, ownership law, boundary law, or phase law, this guide wins.
 
-### 2.2 What is stable and should be preserved
+### 1.3 Current Verified Repo Reality
 
-The following ideas are adopted in this rewrite as canonical:
+Current verified repo realities include:
 
-1. Do not repair entropy by copying entropy into a new repository.
-2. The old repository should become a donor/reference repo, not the new build line.
-3. The build order is not API-first and not binding-first.
-4. The correct order is governance -> service truth -> screens/flows -> screen/api matrix -> gap map -> openapi -> generate/verify -> binding -> runtime -> evidence/seal.
-5. UI Kit must be founded early, expanded from real screens, then stabilized before wide binding.
-6. Work must proceed service-by-service, not by rebuilding the whole platform at once.
-7. Extraction from the donor repo must be selective, evidence-based, and mostly `REBUILD_CLEAN` rather than `COPY_AS_IS`.
+- root workspace shell files already exist: `package.json`, `pnpm-workspace.yaml`, `nx.json`, `tsconfig.base.json`, and `tsconfig.json`
+- approved app shells already exist under `apps/mobile/` and `apps/web/`
+- `packages/ui-kit/` already exists
+- `packages/surfaces/` already exists and currently serves preview-stage work
+- `contracts/master/` already exists
+- `runtime/` does not exist yet
+- the current first governed service is `dsh`
+- `docs/services/dsh/` already contains first-service foundation artifacts
+- `kdt/factory/dsh/` already contains detailed packs through the current screen-purpose band
 
-### 2.3 Structural defects in the source file itself
+### 1.4 Interpretation Rule
 
-The source file has these internal defects as a document:
+Historical statements such as "do not create yet" remain phase-timing law.
+They are not rollback instructions.
 
-1. It is conversational, not canonical.
-2. The same phase sequence is restated many times with different wording.
-3. It mixes strategic law, tactical advice, examples, and persuasion in the same stream.
-4. It moves across multiple abstraction layers without stable section boundaries.
-5. It contains unresolved branches such as:
-   - full master vs minimal master
-   - UI Kit before screens vs UI Kit with screens
-   - old repo reuse vs new repo rebuild
-6. It includes several beginner-oriented re-explanations that add teaching value but also add noise.
-7. It uses Arabic and English terms interchangeably without a fixed glossary.
+Rules:
 
-### 2.4 Contradictions or ambiguities that must be resolved
+- do not force the repo backward because an earlier phase described a smaller shell
+- existing lawful post-bootstrap artifacts do not retroactively invalidate bootstrap law
+- revise companions when repo reality advances materially so future readers are not asked to decode stale future-tense guidance
 
-This rewrite resolves the major ambiguities as follows:
+## 2. Repo Sovereignty And Core Strategy
 
-#### A. Master timing
+### 2.1 Repo Sovereignty Law
 
-Resolved rule:
+`bthwani-suite` is the active clean build line.
 
-- build `Master Foundation Minimal` first
-- do not build `Master Full` first
-
-#### B. UI Kit timing
-
-Resolved rule:
-
-- UI Kit Foundation is built before screens
-- UI Kit Expansion happens during screens
-- UI Kit Stabilization happens before wide binding
-
-There is no contradiction once foundation, expansion, and stabilization are separated.
-
-#### C. OpenAPI source of truth
-
-Resolved rule:
-
-- old contracts may be referenced
-- new canonical contract truth comes only after `Screen/API Matrix` and `Gap Map`
-- therefore old OpenAPI is donor evidence, not new sovereignty by default
-
-#### D. Role of the apps in the new repository
-
-Resolved rule:
-
-- apps are delivery surfaces
-- services own service logic
-- packages own shared reusable primitives and patterns
-- contracts own API law
-- apps should stay thin and surface-oriented
-
-### 2.5 Terminology worth preserving
-
-The following terms are retained as canonical terminology in this guide:
-
-- Master Foundation Minimal
-- Reality Intake
-- Value Lock
-- Actor/Context Lock
-- Operation Lock
-- Surface Responsibility Lock
-- Journey Lock
-- Screen Inventory
-- Screen Rationalization
-- Screen Purpose Lock
-- Flow Compression
-- Screen/API Matrix
-- Gap Map
-- Binding Chain
-- Runtime Truth
-- Minimal Necessary Runtime
-- Evidence Pack
-- Legacy Quarantine
-
-## 3. Canonical Strategic Decision
-
-The project should be rebuilt using this model:
-
-- new repo = clean build line
-- legacy donor repo = reference only
-- transfer = selective and classified
-- default migration decision = `REBUILD_CLEAN`
+`bthfinal` is a frozen donor and reference source.
 
 This means:
 
-- no bulk copy of apps
-- no bulk copy of services
-- no bulk copy of packages
-- no blind salvage of UI Kit
-- no API-first rebuild
-- no binding-first rebuild
-- no full-stack-first rebuild
+- the target repo owns current naming truth
+- the target repo owns current ownership truth
+- the target repo owns current structure truth
+- the donor repo may be inspected, traced, compared, and selectively extracted from
+- the donor repo may not define the clean repo by force
 
-## 4. Repo Role Model
+### 2.2 Clean Build-Line Decision
 
-### 4.1 Donor repo
+The canonical migration decision model is:
 
-The legacy donor repository is treated as:
+- new repo = clean build line
+- donor repo = reference only
+- transfer = selective and classified
+- default adoption decision = `REBUILD_CLEAN`
 
-- donor evidence
-- reference archive
-- extraction source
-- anti-pattern source
-- naming history source
-- flow knowledge source
+Do not:
 
-The donor repo is not treated as:
+- copy donor apps or services blindly
+- copy donor packages blindly
+- let donor naming leak into clean targets
+- treat donor structure as the default clean structure
 
-- the new build line
-- the new source of truth
-- a place for broad future development
-- a place for bulk migration from folder to folder
+### 2.3 Canonical Lifecycle Order
 
-### 4.2 Clean repo
+The canonical lifecycle order is:
 
-The new repository is treated as:
+1. repo law and ownership
+2. service truth
+3. surface responsibility and journey truth
+4. screen inventory and screen purpose
+5. screen-driven UI Kit expansion and state coverage
+6. Screen/API Matrix and Gap Map
+7. contract update
+8. generation and verification
+9. binding
+10. runtime truth and production-like proof
+11. evidence seal and next-service unlock
 
-- the real build line
-- the real ownership line
-- the real canonical source of truth after adoption
-- the clean product tree where no historical residue is allowed inside live structure
-- the place where new structure is enforced
+### 2.4 Hard Prohibitions
 
-### 4.3 Clean Tree Exclusions
+Do not:
 
-The clean repo must not contain historical or ambiguous tree roots inside the live product structure.
+- rebuild by copying donor entropy into the target repo
+- start multiple deep service tracks before the current service is sealed
+- start with API-first rebuild
+- start with binding-first rebuild
+- start with runtime-first rebuild
+- let app shells own service truth
+- let fixtures or static assets act as canonical runtime truth
+- bypass the canonical ownership and binding chain on lawful operation paths
+- claim proof levels that the current phase has not actually earned
 
-Forbidden inside the new tree:
+## 3. Naming And Surface Law
 
-- reference folders
-- archive folders
-- quarantine folders as product tree roots
-- imported old structure copied for convenience
-- `misc/`, `common/`, or `helpers/` roots without explicit ownership
+### 3.1 Approved Surface Registry
 
-Rule:
-
-- historical material may be tracked by evidence, notes, or detached archival references
-- historical material must not live inside `apps/`, `services/`, `packages/`, `contracts/`, or `runtime/` as a legacy holding area
-
-### 4.4 Target repo identity
-
-The canonical target repository for this guide is:
-
-- repo name: `bthwani-suite`
-- role: clean build line
-- default expectation: all new governed implementation work lands here, not in the donor repo
-
-This guide assumes clean build line first, external reference second.
-
-The target repo is also locked to these truths:
-
-- internal surface set: `app-client`, `app-partner`, `app-captain`, `app-field`, `control-panel`, `webapp`, `website`
-- final web operational shell: `control-panel`
-- final control-plane IA is defined in this guide, not inherited from donor structure
-- ownership split: services own service logic, packages own shared reusable patterns, contracts own API law, apps deliver surfaces, runtime owns runtime truth execution
-
-### 4.5 Approved clean surface naming
-
-Use these names in the clean repo:
+The approved internal surface set is:
 
 - `app-client`
 - `app-partner`
@@ -219,29 +138,42 @@ Use these names in the clean repo:
 - `webapp`
 - `website`
 
-Legacy donor naming may appear only in reference or evidence context.
+No additional internal surface becomes canonical unless repo-local governance explicitly approves it.
 
-### 4.6 Internal Name vs Visible Label
+### 3.2 Current First-Service Lock
 
-Internal names, visible labels, and architectural descriptions must be kept distinct.
+The current governed first service is:
 
-Canonical examples:
+- `dsh`
 
-- internal web app name = `control-panel`
+Rules:
+
+- all other services remain deferred until `dsh` is sealed with evidence
+- service-order decisions remain formal artifacts, not chat assumptions
+
+### 3.3 Internal Name vs Visible Label vs IA Domain
+
+Keep these layers distinct:
+
+- internal name = code and filesystem identity
+- visible label = user-facing label
+- IA domain = architectural or navigation grouping
+
+Canonical example:
+
+- internal name = `control-panel`
 - visible label = `Control Panel`
-- architectural description = `task-first control plane`
-- internal mobile name = `app-client`
-- visible label = `Client App`
+- IA domain = `Operations`
 
-Rule:
+Rules:
 
 - code, paths, contracts, ownership, and package references use internal names
-- navigation, UI copy, and business-facing labels use visible labels
-- visible labels must not replace internal names in architecture or filesystem decisions
+- UI copy and navigation labels use visible labels
+- IA domains do not replace internal names in filesystem or architecture
 
-### 4.7 Control Panel Primary IA
+### 3.4 Control-Panel IA Law
 
-The primary top-level IA for `control-panel` is:
+The top-level IA for `control-panel` is:
 
 - Dashboard
 - Operations
@@ -254,28 +186,27 @@ The primary top-level IA for `control-panel` is:
 
 Rules:
 
-- `control-panel` is one web app, not a cluster of separate admin apps
-- the sections above are IA domains, not separate application roots
-- `Control` is a lower-weight administrative zone for general system control and settings
-- `Control` is not equal in day-to-day operational weight to `Operations`, `Finance`, `Catalogs`, or `Support`
+- `control-panel` is one web app, not a cluster of admin apps
+- the IA items above are domains, not application roots
+- `Control` is an administrative zone, not a competing daily-ops surface equal to `Operations`, `Finance`, `Catalogs`, or `Support`
 
-### 4.8 Finance vs WLT Separation Rule
+### 3.5 Finance vs WLT Separation
 
-Finance and WLT must remain distinct in role.
+Keep these roles distinct:
 
-- `Finance` = the visible financial workspace inside `control-panel`
-- `WLT` = the backend financial service and money-moving runtime path
+- `Finance` = visible financial workspace inside `control-panel`
+- `WLT` = backend financial service and money-moving runtime path
 
 Rules:
 
-- `WLT` is not a primary daily navigation section presented as a separate control-panel work area
+- `WLT` is not a primary navigation section inside `control-panel`
 - `Finance` may expose views, approvals, monitoring, and operator actions
-- all money-moving behavior, settlements, ledger changes, payouts, refunds, and financial side effects route through `WLT` only
-- other services must not duplicate `WLT` logic internally
+- money-moving behavior routes through `WLT` only
+- other services may not duplicate `WLT` logic internally
 
-### 4.9 Operational Ownership of Product, Partner, and Promotion
+### 3.6 Catalogs vs Partners vs Marketing Separation
 
-Ownership must be split clearly:
+Keep these ownership zones distinct:
 
 - `Catalogs` = product truth
 - `Partners` = owner or store truth
@@ -283,1212 +214,467 @@ Ownership must be split clearly:
 
 This means:
 
-- core product attributes and primary product imagery belong to `Catalogs`
-- store ownership, partner relationship, onboarding, and partner-side entity truth belong to `Partners`
-- featured placement, offers, banners, campaigns, and promotional emphasis belong to `Marketing`
+- core product attributes and core product imagery belong to `Catalogs`
+- store ownership, onboarding, and partner truth belong to `Partners`
+- offers, banners, campaigns, and promotional emphasis belong to `Marketing`
 
-### 4.10 app-field Classification Rule
+### 3.7 app-field Classification Law
 
-`app-field` is an official surface.
+`app-field` is an approved official surface.
 It may be `REQUIRED`, `OPTIONAL`, or `OUT` per service, but it may not be ignored.
 
 Rules:
 
-- every service must classify `app-field` explicitly during Surface Responsibility Lock
-- silence is invalid
+- every service must classify `app-field` explicitly during Phase `10`
 - if `app-field` is `REQUIRED` or `OPTIONAL`, downstream journey, screen, API, and runtime work must account for it
 - if `app-field` is `OUT`, the reason must be recorded explicitly
 
-### 4.11 Target Repo Structure
+### 3.8 Donor Name Normalization Law
 
-Long-term target structure:
+When donor artifacts use old internal names, normalize them in clean outputs as follows:
 
-```text
-bthwani-suite/
-   apps/
-      mobile/
-         app-client/
-         app-partner/
-         app-captain/
-         app-field/
-      web/
-         control-panel/
-         webapp/
-         website/
-   services/
-      <service>/
-   packages/
-      ui-kit/
-      surfaces/
-      api-types/
-      api-clients/
-   contracts/
-      master/
-   runtime/
-      local/
-         seed/
-   docs/
-   governance/
-   tools/
-   kdt/
-      volatile/
-         registry/
-            runs/
-```
+- `mcpw` -> `control-panel`
+- `app-user` -> `app-client`
 
-### 4.12 Bootstrap Repo Structure
+Preserve donor names only in source trace when accuracy requires it.
 
-Bootstrap structure for the current initial execution window:
+## 4. Ownership, Boundaries, And Workspace Law
 
-```text
-bthwani-suite/
-   package.json
-   pnpm-workspace.yaml
-   nx.json
-   tsconfig.base.json
-   tsconfig.json
-   apps/
-      mobile/
-      web/
-   services/
-   packages/
-      ui-kit/
-   contracts/
-      master/
-   docs/
-      reality-intake/
-      platform/
-      services/
-   governance/
-   tools/
-   kdt/
-      volatile/
-         registry/
-            runs/
-```
+### 4.1 Ownership Model
+
+Ownership is explicit by decision right and artifact boundary.
+
+Use these ownership roles:
+
+- repo governance owner: phase legality, evidence law, companion precedence, repo boundary law
+- UI Kit owner: tokens, spacing, typography, direction, primitives, shared state shells
+- contract owner: canonical contract law inside `contracts/master/`
+- service owner: actors, operations, states, surface participation, service non-goals
+- surface delivery owner: thin app-shell delivery only
+- runtime owner: runtime truth wiring, mode policy, seed boundaries, availability behavior
+
+### 4.2 Conflict Resolution Order
+
+If ownership conflicts arise, resolve them in this order:
+
+1. repo governance owner for phase legality
+2. service owner for service truth
+3. contract owner for contract law
+4. UI Kit owner for shared design-system law
+5. runtime owner for runtime truth behavior
+6. surface delivery owner for thin delivery implementation
+
+### 4.3 Boundary Law
+
+Use these boundaries strictly:
+
+- services own service truth
+- apps deliver surfaces and remain thin
+- packages own shared reusable patterns and utilities
+- contracts own API law
+- runtime owns runtime-truth execution behavior
+- screen truth belongs to the owning service, not the app shell
 
 Rules:
 
-- this is the bootstrap shell that should be reached by the end of Phase 07
-- it is intentionally smaller than the long-term target structure
-- individual surface app folders are not required during bootstrap
-- `packages/surfaces/` is a target structure element, not a bootstrap requirement
-- `runtime/` is not part of the mandatory bootstrap shell for Phases 00-07
-- `runtime/` is introduced only when later runtime seed or local stack work is actually justified by post-bootstrap phases
+- `control-panel` may not become a convenience catch-all for unowned service behavior
+- app shells may not redefine service truth
+- packages may not silently absorb service-specific truth as if it were shared law
+- cross-service work must be classified into `_shared` or `_cross-service`
 
-### 4.13 Monorepo Tooling Decision
+### 4.4 Clean Tree Exclusions
 
-This guide is not tooling-neutral for bootstrap.
+Forbidden inside the live clean tree:
 
-Official decision:
+- `reference/`
+- `archive/`
+- `quarantine/` as live product roots
+- copied donor subtrees kept for convenience
+- `misc/`, `common/`, or `helpers/` roots without explicit ownership
 
-- bootstrap monorepo shell = `pnpm + Nx + TypeScript`
+Historical material may exist in evidence or detached archival references, but not as live product-tree content.
 
-This means:
+### 4.5 Workspace And Tooling Law
 
-- `package.json`, `pnpm-workspace.yaml`, `nx.json`, `tsconfig.base.json`, and `tsconfig.json` are canonical bootstrap shell files
-- `project.json` is introduced when a concrete package, app, or service shell is created
-- `tools/` is allowed for cross-workspace tooling only, not as a miscellaneous dump root
+The official workspace tooling stack is:
 
-## 5. Bootstrap Operational Boundary
+- `pnpm`
+- `Nx`
+- `TypeScript`
 
-### 5.1 Boundary
+Rules:
 
-This guide is the long-term governing reference for the full rebuild lifecycle.
+- run workspace tasks with `pnpm nx ...`
+- use `project.json` only for real apps, packages, or services
+- keep TypeScript strictness enabled unless governance explicitly changes it
+- use `tools/` for governed workspace tooling only
+- path aliases do not replace ownership or package-boundary discipline
 
-The current initial execution window is narrower:
+### 4.6 Service Artifact Layer Split
 
-- this main guide = full governing framework
-- bootstrap runbook = exact initial creation order
-- bootstrap gate checklists = exit conditions for Phases 00-07 only
+Use two service artifact layers on purpose.
 
-Rule:
+`docs/services/<service>/` owns:
 
-- Phases 00-07 are the active operational boundary for initial repo creation
-- later phases remain governed by this guide, but are not unlocked by bootstrap scaffolding alone
-- if a practical execution conflict appears during Phases 00-07, the bootstrap runbook and bootstrap gate checklists take precedence for execution timing and scope, while this guide remains the long-term governing frame
+- stable service-foundation summaries
+- actor, operation, and surface baseline truth
+- readable service reference material
 
-### 5.2 Controlled Parallelism Rule
+`kdt/factory/<service>/` owns:
 
-Allowed parallelism is limited to:
+- requests
+- working packs
+- exports
+- evidence
+- phase indexes
+- later execution truth after bootstrap foundation
 
-- the current primary service under execution
-- UI Kit growth directly demanded by that current service
-- shared packages or shared services only when they unblock that current service
+## 5. Companion Document System
 
-Forbidden parallelism:
+### 5.1 Main Guide Role
 
-- deep execution of multiple consumer services at the same time
-- multiple binding tracks at the same time
-- multiple runtime stacks at the same time
-- parallel service waves before the first current service is sealed with evidence
+This guide owns:
 
-### 5.3 Gate Quality Rule
+- law
+- naming
+- ownership
+- phase legality
+- boundary rules
+- adoption rules
 
-Gate review must verify more than file existence.
+It should remain concise, stable, and referential.
 
-Every gate review must confirm:
+### 5.2 Bootstrap Companion Set
 
-- artifact existence
-- non-empty content
-- non-placeholder content
-- sufficient initial depth for the phase
-- cross-file consistency
-- no contradiction with adjacent governance files
+Bootstrap execution is split across:
 
-A gate does not pass merely because the named file exists.
+- `docs/bootstrap/BTHWANI GUIDE — Phase Bootstrap Runbook.md`
+- `docs/bootstrap/BTHWANI GUIDE — Bootstrap Gate Checklists.md`
+- `docs/execution/phases/PHASE_00_REPO_RESET_DECISION.md`
+- `docs/execution/phases/PHASE_01_GOVERNANCE_FREEZE.md`
+- `docs/execution/phases/PHASE_02_REALITY_INTAKE.md`
+- `docs/execution/phases/PHASE_03_PLATFORM_VALUE_LOCK.md`
+- `docs/execution/phases/PHASE_04_SERVICE_ORDER.md`
+- `docs/execution/phases/PHASE_05_MASTER_FOUNDATION_MINIMAL.md`
+- `docs/execution/phases/PHASE_06_UI_KIT_FOUNDATION.md`
+- `docs/execution/phases/PHASE_07_FIRST_SERVICE_FOUNDATION.md`
 
-### 5.4 Bootstrap Exit Boundary
+### 5.3 Post-Bootstrap Companion Set
 
-After gates for Phases 00-07 pass, the repo may proceed to:
+Post-bootstrap execution is split across:
 
-- Actor/Context deepening
-- Operation Lock refinement
-- Surface Responsibility Lock
-- Journey Lock
-- Screen Inventory
+- `docs/execution/BTHWANI GUIDE — Generic Screen Execution Runbook.md`
+- `docs/execution/BTHWANI GUIDE — Binding And Runtime Execution Runbook.md`
+- `docs/execution/BTHWANI GUIDE — Post-Bootstrap Gate Pack.md`
+- `docs/execution/phases/PHASE_08_ACTOR_CONTEXT_LOCK.md`
+- continuing through `docs/execution/phases/PHASE_27_NEXT_SERVICE_REPEAT.md`
 
-After bootstrap, the repo may not yet proceed to:
+### 5.4 Companion Precedence
 
-- binding
-- runtime stack implementation
-- generated layers
-- master detail build
+Use this split deliberately:
 
-## 6. Canonical Build Order
+- main guide = constitutional law
+- runbooks = cross-phase execution grammar
+- gate documents = pass or fail thresholds
+- phase manuals = literal phase-by-phase execution order
 
-This is the stable ordered plan extracted from the transcript.
+### 5.5 How To Use The Stack
 
-### Phase 00 - Repo Reset Decision
+For any serious work:
 
-#### Goal
+1. confirm the lawful phase in this guide
+2. open the companion runbook for the current band
+3. open the matching phase manual
+4. execute the matching gate before claiming completion
+5. update `docs/services/<service>/` and `kdt/factory/<service>/` in the correct layer
 
-Fix the strategic decision before any build activity.
+## 6. Lifecycle Bands And Phase Ladder
 
-#### Actions
+### 6.1 Bootstrap Band: Phases 00 Through 07
 
-- declare the new repo as the build line
-- declare the old repo as donor/reference only
-- prohibit blind copy
-- prohibit big-bang rebuild
-- prohibit simultaneous multi-service execution at start
+- Phase `00`: lock the clean build-line decision
+- Phase `01`: freeze governance before structural growth
+- Phase `02`: capture current repo and donor reality
+- Phase `03`: lock platform value and non-goals
+- Phase `04`: select exactly one first service
+- Phase `05`: lock minimal master naming and contract governance
+- Phase `06`: build UI Kit foundation only
+- Phase `07`: lock the first-service foundation only
 
-#### Outputs
+Execution authority:
 
-- repo reset decision note
-- donor policy note
+- bootstrap runbook
+- bootstrap gate checklist
+- phase manuals `PHASE_00` through `PHASE_07`
 
-### Phase 01 - Governance Freeze
+### 6.2 Service-Truth And Screen-Law Band: Phases 08 Through 14
 
-#### Goal
+- Phase `08`: lock actors and visibility contexts
+- Phase `09`: lock canonical operations before screens
+- Phase `10`: lock surface responsibility and activation waves
+- Phase `11`: lock journeys before candidate screens
+- Phase `12`: inventory and rationalize candidate screens
+- Phase `13`: lock family, purpose, CTA, entry, exit, and required states
+- Phase `14`: compress routes, steps, and decision noise
 
-Freeze the minimum laws that prevent early chaos.
+Execution authority:
 
-#### Actions
+- generic screen execution runbook
+- post-bootstrap gate pack
+- phase manuals `PHASE_08` through `PHASE_14`
 
-- define ownership law
-- define scope law
-- define repo boundary law
-- define execution law
-- define evidence law
-- define change-entry rules
-- define move-don't-delete rule
+### 6.3 Screen-Driven Expansion And Contract-Demand Band: Phases 15 Through 18
 
-#### Outputs
+- Phase `15`: grow UI Kit only from real retained screens
+- Phase `16`: complete state coverage
+- Phase `17`: map screen-proven API demand
+- Phase `18`: convert API demand into explicit contract gaps
 
-- governance core
-- scope lock
-- evidence root rule
-- change entry point law
+Execution authority:
 
-#### Canonical evidence root
+- generic screen execution runbook
+- post-bootstrap gate pack
+- phase manuals `PHASE_15` through `PHASE_18`
+
+### 6.4 Contract-To-Bound-Chain Band: Phases 19 Through 21
+
+- Phase `19`: update the canonical contract only after screen proof exists
+- Phase `20`: generate and verify derived layers
+- Phase `21`: bind screens through the canonical chain
+
+Execution authority:
+
+- binding and runtime execution runbook
+- post-bootstrap gate pack
+- phase manuals `PHASE_19` through `PHASE_21`
+
+### 6.5 Runtime Proof And Closure Band: Phases 22 Through 27
+
+- Phase `22`: lock runtime truth sources and boundaries
+- Phase `23`: lock runtime mode policy and proof language
+- Phase `24`: run production-like verification
+- Phase `25`: gather final evidence and guards
+- Phase `26`: quarantine legacy leftovers safely
+- Phase `27`: unlock the next service only after seal proof exists
+
+Execution authority:
+
+- binding and runtime execution runbook for Phases `22` through `24`
+- post-bootstrap gate pack for Phases `22` through `24`
+- phase manuals `PHASE_22` through `PHASE_27`
+
+## 7. Artifact, Evidence, And Adoption Law
+
+### 7.1 Mandatory Working Header
+
+Every serious task, pack, review, extraction, or audit should state:
+
+- `WorkMode`
+- `CurrentPhase`
+- `TargetService`
+- `RequestType`
+- `PrimaryRepo`
+- `LegacyRepo`
+- `PackStatus`
+- `BlockingGaps`
+- `NextAllowed`
+
+If a value is unknown, mark it `TBD` and explain why.
+
+### 7.2 Request Classification
+
+Every serious request must declare one primary request type.
+
+Approved classifications are:
+
+- `bootstrap_law_work`
+- `bootstrap_artifact_work`
+- `service_operations_extract`
+- `service_screen_logic_extract`
+- `service_surface_map_extract`
+- `service_flow_extract`
+- `screen_api_matrix_extract`
+- `binding_chain_extract`
+- `runtime_truth_extract`
+- `contract_extract`
+- `ui_pattern_extract`
+- `violation_audit`
+- `anti_pattern_pack`
+- `prevention_guidance_pack`
+- `cross_service_pack`
+- `target_fit_review`
+- `source_to_target_pack`
+
+### 7.3 Evidence Markers
+
+Serious artifacts must distinguish between:
+
+- `confirmed fact`
+- `inferred conclusion`
+- `tentative interpretation`
+- `[TBD]`
+- `rejected carryover`
+- `blocked`
+
+### 7.4 Target-Fit Law
+
+No output is implant-ready until it is checked against:
+
+- correct target path
+- naming alignment
+- ownership alignment
+- duplication risk
+- phase legality
+- package or service boundary fit
+
+### 7.5 Implant Decision Matrix
+
+Every serious extracted or adapted candidate must be classified as one of:
+
+- `COPY_AS_IS`
+- `EXTRACT_PARTIAL`
+- `REBUILD_CLEAN`
+- `REFERENCE_ONLY`
+- `REJECT`
+
+Default to `REBUILD_CLEAN` unless the carryover is small, isolated, low-risk, naming-clean, and target-fit.
+
+### 7.6 Pack Roots
+
+Service-scoped pack material belongs under:
+
+- `kdt/factory/<service>/requests/`
+- `kdt/factory/<service>/packs/`
+- `kdt/factory/<service>/exports/`
+- `kdt/factory/<service>/evidence/`
+- `kdt/factory/<service>/index/`
+
+Shared roots are:
+
+- `kdt/factory/_shared/`
+- `kdt/factory/_cross-service/`
+
+### 7.7 Evidence Root And Gate Quality
 
 Use this evidence root pattern for governed proof artifacts:
 
 - `kdt/volatile/registry/runs/{SESSION_ID}/`
 
-### Phase 02 - Reality Intake
+No phase passes on file existence alone.
+Gate review must confirm:
 
-#### Goal
+- artifact existence
+- non-placeholder content
+- sufficient phase depth
+- adjacent artifact coherence
+- target-fit where required
+- absence of forbidden early work
 
-Understand the donor repo as it is, not as desired.
+## 8. Preview, Binding, Runtime, And Proof Law
 
-#### Actions
+### 8.1 Candidate vs Bound Screen
 
-- census current services
-- census current surfaces
-- census current screens
-- census routes
-- census current contracts
-- census generated layers
-- census package structure
-- census service structure
-- identify duplication
-- identify drift
-- identify noise
-- identify legacy
-- identify runtime truth sources
+Keep these states distinct:
 
-#### Outputs
+- candidate screen = inventory, preview, rationalization, and purpose-lock stage
+- bound screen = connected to the canonical generated and runtime-backed chain
 
-- reality report
-- repo census
-- current services map
-- current surfaces map
-- current screens inventory
-- noise/duplication/drift report
-- runtime truth observations
+Candidate screens may begin only after Journey Lock.
+Bound screens may begin only in Phase `21`.
 
-#### Reality Intake Completion Rule
+### 8.2 Preview Mode Ladder
 
-Reality Intake is not complete merely because scaffolding files exist.
-
-Phase 02 exits only when there is actual initial content for:
-
-- current services map
-- current surfaces map
-- current screens inventory
-- noise and drift findings
-- runtime truth observations
-
-Scaffolding without content is not completion.
-
-### Phase 03 - Platform Value Lock
-
-#### Goal
-
-Define what is actually worth rebuilding now.
-
-#### Actions
-
-- define core platform value
-- define non-goals
-- define excluded first-release scope
-- define what must remain simple
-- define what must complete in 1-2 taps where relevant
-
-#### Outputs
-
-- platform value lock
-- service priority rationale and candidate ranking
-- non-goals register
-
-#### Boundary note
-
-Phase 03 documents service priority reasoning.
-It does not finalize the first service.
-The final first-service selection is made in Phase 04.
-
-### Phase 04 - Service Order
-
-#### Goal
-
-Prevent parallel chaos.
-
-#### Actions
-
-- pick the first service only
-- justify why it is first
-- refuse to start multiple services together
-
-#### Selection criteria
-
-- architectural leverage
-- cross-surface significance
-- ability to expose real UI Kit needs
-- ability to expose real contract needs
-
-#### Outputs
-
-- service build order
-- selected first-service identifier and justification
-
-### Phase 05 - Master Foundation Minimal
-
-#### Goal
-
-Establish law before implementation.
-
-#### Actions
-
-- define structure and ownership
-- define service catalog
-- define operation catalog skeleton
-- define surface catalog
-- define direction/lang ownership
-- define OpenAPI sovereignty rule
-
-#### Outputs
-
-- ownership map
-- service catalog
-- operation catalog skeleton
-- surface catalog
-- direction/i18n ownership rule
-- openapi sovereignty rule
-
-#### Explicit restriction
-
-Do not expand into full master detail yet.
-
-### Phase 06 - UI Kit Foundation
-
-#### Goal
-
-Create the minimum reusable design system base before screen work.
-
-#### Build now
-
-- tokens
-- color system
-- typography system
-- spacing scale
-- radius
-- elevation/shadows
-- icon policy
-- motion basics
-- state shells
-- RTL/LTR rules
-- direction/lang ownership hooks or rules
-- base primitives
-- layout laws
-- basic form patterns
-- feedback/status shells
-
-#### Do not fully build yet
-
-- every card type
-- every list type
-- every sheet type
-- every service-specific pattern
-- every advanced variant
-
-#### Outputs
-
-- UI Kit Foundation
-- primitive components
-- state shells
-- design token core
-
-### Phase 07 - First Service Foundation
-
-#### Goal
-
-Start one service only with strict scope.
-
-#### Actions
-
-- define service profile
-- define primary job
-- define secondary jobs
-- define non-goals
-- define actors
-- define surfaces
-- define operations
-- define shared dependencies
-
-#### Outputs
-
-- service foundation pack
-
-### Phase 08 - Actor/Context Lock
-
-#### Goal
-
-Lock who sees what and where.
-
-#### Actions
-
-- define primary actor
-- define secondary actor
-- define who must not see the service
-- define proper surface per actor
-- define visibility rules
-
-#### Outputs
-
-- actor context matrix
-
-### Phase 09 - Operation Lock
-
-#### Goal
-
-Lock official operations before screens.
-
-#### Actions
-
-- define operation name
-- define operation purpose
-- define primary actor
-- define secondary actor if needed
-- define state effect
-- verify correct service ownership
-- verify whether the operation spans more than one surface
-
-#### Outputs
-
-- operations catalog
-- status lifecycle
-
-### Phase 10 - Surface Responsibility Lock
-
-#### Goal
-
-Define where each operation lives.
-
-#### Actions
-
-- mark each surface as `REQUIRED`, `OPTIONAL`, or `OUT`
-- define entry point
-- define ownership
-- define why it exists
-- define which operation it serves
-
-#### Outputs
-
-- surface matrix
-- operation surface coverage
-
-### Phase 11 - Journey Lock
-
-#### Goal
-
-Design the journey before the screen.
-
-#### Actions
-
-- define happy path
-- define fast path
-- define returning user path if relevant
-- define staff path
-- define failure path
-- define recovery path
-- define unavailable/disabled path
-
-#### Outputs
-
-- primary flow map
-- staff flow map
-- failure/recovery flow map
-
-### Phase 12 - Screen Inventory And Rationalization
-
-#### Goal
-
-Stop screen inflation early.
-
-#### Actions
-
-- inventory all candidate screens
-- classify each item as `Keep`, `Merge`, `Convert`, `Internal`, or `Move to Legacy`
-- determine whether each item is really a screen, sheet, modal, section, inline step, or state
-
-#### Service-Level Completeness Rule
-
-- Phase 12 inventory must be complete for the current service, not a partial sample
-- every candidate implied by Phase 10 surface responsibility and Phase 11 journey maps must be cataloged or explicitly classified out
-- coverage must include mainline, fast path, returning-user path if relevant, staff/internal paths, failure/recovery paths, unavailable/disabled paths, and optional support branches when the service includes them
-- every candidate must state whether it is a screen, sheet, modal, section, inline step, or state-only item
-- Phase 12 does not pass if any in-scope surface-owned candidate remains undocumented
-
-#### Outputs
-
-- screen catalog
-- screen rationalization report
-
-### Phase 13 - Canonical Families And Screen Purpose Lock
-
-#### Goal
-
-Make every screen lawful and obvious.
-
-#### Actions
-
-- assign family
-- assign purpose
-- assign primary CTA
-- assign secondary actions
-- define entry and exit
-- define required states
-
-#### Typical families
-
-- Entry
-- List
-- Detail
-- Form
-- Review/Confirm
-- Tracking
-- Search/Filter
-- Picker
-- Settings
-- Sheet/Modal Companion
-
-#### Outputs
-
-- screen family map
-- screen purpose lock
-
-### Phase 14 - Flow Compression
-
-#### Goal
-
-Reduce routes, steps, and decision points.
-
-#### Actions
-
-- merge excess screens
-- convert minor steps into sheets
-- hide advanced content
-- reduce branching noise
-
-#### Outputs
-
-- flow compression report
-- click budget
-
-### Phase 15 - UI Kit Expansion From Real Screens
-
-#### Goal
-
-Let real screens drive reusable patterns.
-
-#### Add only what real screens prove necessary
-
-- card families
-- list patterns
-- filter/search patterns
-- sheet patterns
-- review blocks
-- tracking patterns
-- CTA bars
-- header patterns
-- section shells
-- task-first control-plane patterns
-- service reusable patterns
-
-#### Output
-
-- UI Kit Expansion v1
-
-### Phase 16 - State Lock
-
-#### Goal
-
-Complete state coverage before API design.
-
-#### Required state review
-
-- loading
-- empty
-- filtered empty
-- offline
-- disabled
-- unauthorized
-- forbidden
-- not found
-- upstream error
-- validation error
-- duplicate submit
-- success
-- stale data
-- archived
-
-#### Output
-
-- state coverage matrix
-
-### Phase 17 - Screen/API Matrix
-
-#### Goal
-
-Allow screens to define API need.
-
-#### Actions
-
-For each screen determine:
-
-- required data
-- required actions
-- request count
-- whether requests are excessive
-- whether summary endpoints are needed
-- whether action endpoints are needed
-- whether aggregation endpoints are needed
-
-#### Outputs
-
-- screen/api matrix
-
-### Phase 18 - Gap Map
-
-#### Goal
-
-Expose what the current contract cannot serve.
-
-#### Questions
-
-- what does the current contract fail to serve?
-- where is there overfetch?
-- where is there underfit?
-- where is a new shape required?
-- where is a new operation required?
-- where is there drift?
-
-#### Outputs
-
-- gap map
-
-### Phase 19 - Master OpenAPI Update
-
-#### Goal
-
-Update the official contract only after UX demand is known.
-
-#### Actions
-
-- add official operations
-- tune schemas
-- prevent rogue endpoints
-- prevent raw fetch patterns
-- unify error shapes
-
-#### Outputs
-
-- openapi change set
-- updated master openapi
-
-### Phase 20 - Generate / Verify
-
-#### Goal
-
-Turn the contract into verified generated layers.
-
-#### Actions
-
-- generate api types
-- generate api clients
-- verify parity
-- verify drift
-- verify implementation fit
-- verify error shapes
-
-#### Outputs
-
-- generated layers
-- verify report
-- contract parity report
-
-### Phase 21 - Binding Lock
-
-#### Goal
-
-Start real implementation only now.
-
-#### Canonical chain
-
-Screen -> ViewModel/Hook -> API Client -> Proxy if needed -> Controller -> Service -> Repository -> Runtime Truth -> Audit/Trace
-
-#### Law
-
-One operation = one chain.
-
-#### Outputs
-
-- binding chain map
-- proxy route map
-- viewmodel normalization
-
-### Phase 22 - Runtime Truth Lock
-
-#### Goal
-
-Prevent fake truth.
-
-#### Actions
-
-- define real live truth source
-- define allowed seed/demo data
-- define forbidden mock/fixture truth for canonical operation paths
-- define behavior when runtime is unavailable
-- define provider control-plane ownership
-
-#### Outputs
-
-- truth source register
-- truth source classification
-- runtime availability lock
-
-### Phase 23 - Runtime Mode Policy
-
-#### Goal
-
-Use only the runtime level needed by the phase.
-
-#### Runtime modes that must remain distinct
+Keep these levels distinct:
 
 - visual-only preview
 - limited-api preview
-- canonical local stack activation
-- production-like proof mode
-
-#### Exact rule
-
-- use the runtime and server matrix in Section 10.3
-- no phase may activate more runtime than its matrix allows
-- visual preview is not proof
-- limited-api preview is not proof
-- production-like mode is reserved for closure proof only
-
-#### Core principle
-
-Minimal Necessary Runtime
-
-#### Outputs
-
-- runtime mode policy per phase
-- preview and simulation policy
-
-### Phase 24 - Production-Like Verification
-
-#### Goal
-
-Prove the first service works end-to-end.
-
-#### Verify
-
-- happy path
-- failure path
-- recovery path
-- staff path
-- all participating surfaces in the target flow
-- persistence
-- real-time propagation where the operation requires it
-- local media and storage behavior where relevant
-- local domains where relevant
-- postgres/redis/minio or equivalent canonical runtime stack if actually required
-- provider switching readiness from the backend/control plane only when relevant
-- no stale compose assumptions
-- no runtime fixture truth
-
-#### Outputs
-
+- canonical local truth
 - production-like proof
-- e2e reports
-- runtime health report
-- persistence verify
-- propagation verify where required
-- media or storage verify where required
 
-### Phase 25 - Evidence / Guards / Final Sign-Off
+Expo Go and browser preview are preview tools, not proof instruments by themselves.
 
-#### Goal
+### 8.3 Runtime Truth Classification
 
-Seal the service with proof.
+Every preview or runtime path should be classified as one of:
 
-#### Gather
+- `fixture`
+- `simulated response`
+- `runtime seed`
+- `limited-api preview`
+- `canonical local truth`
+- `production-like proof`
 
-- evidence pack
-- guards report
-- parity proof
-- UI snapshots where appropriate
-- click budget before/after if meaningful
-- no duplicate endpoints proof
-- no fallback proof
-- binding proof
-- final sign-off
+### 8.4 Proof Claim Restriction Rule
 
-#### Outputs
+Do not claim:
 
-- final evidence index
-- guards report
-- service seal status
+- `end-to-end working` from fixture preview alone
+- `runtime verified` from simulated responses alone
+- `production-like` when a critical participating surface is absent
+- `bound` when raw fetch remains on the canonical path
 
-### Phase 26 - Legacy Quarantine
+## 9. Donor Extraction And Quarantine Protocol
 
-#### Goal
+### 9.1 Donor Consultation Order
 
-Retire leftovers safely.
+Use this order:
 
-#### Actions
+1. define what the target repo needs
+2. locate a specific donor candidate for that need
+3. trace dependencies and ownership
+4. classify the candidate
+5. normalize naming and remove donor noise
+6. run target-fit review
+7. package, rebuild, reference, or reject
 
-- classify old material
-- move it, do not delete it blindly
-- keep quarantine outside the live clean product tree
-- scan for live imports/references
-- prevent live references to quarantined material
-- document what was isolated
+### 9.2 Carryover Eligibility Test
 
-#### Outputs
+Direct carryover is eligible only when the candidate is:
 
-- legacy quarantine map
-- detached archive reference if needed
-- live reference scan
-- post-move verify
+- small
+- isolated
+- clearly understood
+- low-dependency
+- naming-normalized
+- ownership-clear
+- free of hidden runtime assumptions
+- able to pass target-fit review
 
-### Phase 27 - Repeat For Next Service
+If these conditions fail, prefer `EXTRACT_PARTIAL`, `REFERENCE_ONLY`, or `REBUILD_CLEAN`.
 
-#### Goal
+### 9.3 Quarantine Law
 
-Scale correctly.
+When old material must be retired:
 
-#### Rule
+- move it instead of deleting blindly
+- keep quarantine outside the live clean tree
+- scan for live references
+- verify no active path still imports or depends on the quarantined material
 
-Repeat the same cycle for the next service.
-Do not switch to rebuilding whole surfaces in one wave.
-Build operation-by-operation across required surfaces only.
+### 9.4 Final Operating Rule
 
-## 7. Hard Prohibitions
+Build the new repository from clean law and real service truth.
+Use the donor repo as a quarry of evidence, not as the source of authority.
 
-The source file is strongest and most stable on the following prohibitions.
-These are preserved here as hard law.
+## 10. Canonical Glossary
 
-Do not:
+Use these terms consistently:
 
-- start with `Master Full`
-- start with `Screens Only`
-- start with APIs first
-- start with binding first
-- start with runtime first
-- start with full stack every day
-- start multiple services together
-- move large legacy code blindly
-- delete legacy code directly without quarantine
-- inflate UI Kit before demand is proven
-- design screens before operations are locked
-- update OpenAPI before Screen/API Matrix and Gap Map
-- bind screens before purpose, flow, and states are clear
-- create `reference/`, `archive/`, or `quarantine/` roots inside the clean product tree
-- create `misc/`, `common/`, or `helpers/` roots without explicit ownership
-- treat `app-field` as ignorable or leave it unclassified
-- let fixtures, seeds, or static assets become runtime truth
-- run multiple deep service tracks, binding tracks, or runtime stacks in parallel
-
-## 8. Canonical UI Kit Timing Rule
-
-The source transcript repeats UI Kit timing often.
-This is the final cleaned rule:
-
-### Stage A - Foundation
-
-Before screens:
-
-- tokens
-- typography
-- spacing
-- colors
-- primitives
-- state shells
-- direction rules
-
-### Stage B - Expansion
-
-During screens:
-
-- cards
-- lists
-- filters
-- sheets
-- review blocks
-- tracking patterns
-- control-plane task patterns
-
-### Stage C - Stabilization
-
-Before wide binding:
-
-- cleanup
-- canonicalization
-- de-duplication
-- locking critical patterns
-
-## 9. Canonical Contract Timing Rule
-
-The donor repo may inform contract thinking, but it does not define new sovereignty automatically.
-
-Final rule:
-
-1. Screens and flows mature first.
-2. Screen/API Matrix exposes demand.
-3. Gap Map exposes missing contract behavior.
-4. Only then is Master OpenAPI updated.
-5. Only then are generated layers created.
-6. Only then does binding start.
-
-## 10. Runtime, Preview, And Asset Rules
-
-### 10.1 Design Assets, Fixtures, and Runtime Seed Rule
-
-Static images, design assets, and fixtures are allowed during design and early screen work.
-They are not allowed to become operational truth.
-
-Use this separation:
-
-- visual assets = images, icons, and static media for presentation only
-- fixtures = visual-only or test-only example data for screens and flows
-- runtime seed = controlled local initialization data for runtime services
-- runtime truth = the actual operational data path used by the live bound chain
-
-Hard law:
-
-- fixtures may support visual review, UX review, and test scenarios
-- runtime seed may initialize local services
-- neither fixtures nor static assets may become canonical truth for bound operations
-- seed data is not a substitute for runtime truth
-- runtime truth is established only in Phases 22-24
-
-### 10.2 Canonical Asset and Fixture Locations
-
-Use these locations:
-
-- `apps/*/src/assets/` = visual-only static media
-- `packages/surfaces/src/<service>/<surface>/<flow>/fixtures/` = visual-only or test-only example data
-- `runtime/local/seed/` = runtime-only local initialization data
-
-Rules:
-
-- `apps/*/src/assets/` must not store business truth
-- `packages/surfaces/src/<service>/<surface>/<flow>/fixtures/` must not be imported as canonical runtime data sources
-- `runtime/local/seed/` may initialize local services, but it is still not the same as live runtime truth
-- `runtime/local/seed/` is a canonical location only once runtime work actually begins after bootstrap
-- `packages/surfaces/` is a target structure location, not a bootstrap requirement
-
-### 10.3 Runtime and Server Requirements by Phase
-
-#### Phases 00-05
-
-- documents, governance, and workspace shell only
-- browser or static review only if needed
-- no api-host
-- no proxy
-- no postgres, redis, or minio
-- no local domains
-- no real-time propagation
-- no `app-field` runtime activation
-
-#### Phases 06-11
-
-- surface-only preview is allowed
-- Expo Go is allowed for mobile visual review
-- browser preview is allowed for `control-panel`, `webapp`, and `website`
-- fixtures are allowed for visual or test use only
-- no canonical api-host by default
-- no postgres, redis, or minio
-- no local domains unless a surface shell absolutely requires them
-- `app-field` may be visually explored, but not treated as bound runtime truth
-
-#### Phases 12-14
-
-- visual preview and journey validation remain primary
-- limited api-host preview is allowed only when needed to validate screen or API assumptions
-- proxy or local domains are allowed only when required to validate real routing or auth seams
-- no full canonical local stack
-- no production-like proof
-- real-time remains out unless the journey cannot be reviewed without it
-
-#### Phases 15-18
-
-- screen-driven UI Kit growth continues
-- limited-api preview is allowed
-- targeted runtime seed is allowed for local verification
-- no full production-like stack
-- no generated layers yet
-- `app-field` enters only if the service matrix classified it as `REQUIRED` or `OPTIONAL`
-
-#### Phases 19-20
-
-- api-host and generation verification are allowed
-- generated layers may be created and checked
-- targeted postgres, redis, minio, or equivalent services are allowed only if contract verification actually requires them
-- proxy or local domains may be activated if the contract path requires them
-- full end-to-end proof is still not the goal
-
-#### Phase 21
-
-- binding begins
-- canonical local api-host and the real bound chain may run
-- proxy and local domains may run if they are part of the real chain
-- `app-field` may enter real implementation only if already classified and justified
-- real-time propagation may be enabled only for operations that truly require it
-
-#### Phases 22-24
-
-- runtime truth is locked
-- the canonical local stack may run in full where required
-- postgres, redis, minio, local media or storage behavior, and persistence are verified where relevant
-- all participating surfaces in the target flow must be exercised together
-- provider switching readiness is checked from the backend or control plane only
-- this is proof mode, not the default mode for every earlier phase
-
-### 10.4 Surface Preview and Simulation Rule
-
-Use preview modes deliberately:
-
-- Expo Go = early mobile visual preview and interaction smoke for Phases 06-18
-- browser = enough for most `control-panel`, `webapp`, and `website` visual review, and for many flow reviews before binding
-- visual-only preview = layout, content hierarchy, CTA clarity, and state presentation only
-- limited-api preview = targeted contract or screen/API validation only
-- production-like preview = reserved for Phase 24 proof with required surfaces, persistence, propagation, and canonical runtime behavior
-
-Preview law:
-
-- visual preview is not runtime proof
-- limited-api preview is not production-like proof
-- production-like proof cannot be claimed from Expo Go or browser-only shells alone
-
-### 10.5 App Shell, Expo Go Routes, and Fixtures Entry Rule
-
-This subsection makes the mobile preview entry policy explicit.
-
-#### A. When to create the app shell
-
-- do not create individual surface app folders during bootstrap Phases 00-07
-- create a thin mobile app shell only after bootstrap gates pass
-- the default earliest point for `apps/mobile/<surface>/` shell creation is Phase 10, after Surface Responsibility Lock classifies that surface as `REQUIRED` or `OPTIONAL` for the current service
-- if a surface is still unclassified or marked `OUT`, do not create its app shell
-
-Allowed contents of the first app shell:
-
-- app root
-- navigation container
-- theme and direction wiring
-- safe-area and layout shell
-- asset loading
-- preview route placeholders
-
-Forbidden contents of the first app shell:
-
-- bound service logic
-- generated API client wiring
-- canonical runtime-truth data access
-- production claims
-
-#### B. When to add routes and screens for Expo Go
-
-- do not add real preview routes or candidate screens before Journey Lock
-- the default earliest point for Expo Go route and screen entry is Phase 12, after Phase 11 Journey Lock has defined the happy path, failure path, and recovery path
-- Phase 12 is the first lawful point to add candidate screens for browsing, rationalization, and flow review inside Expo Go
-- candidate screen work in Phase 12 must come from a full current-service inventory, not from a subset chosen for convenience
-- Phase 13 is the first stabilization point where those screens should gain clear family, purpose, primary CTA, and required states
-- during Phases 12-14, Expo Go use is for visual preview, CTA clarity, route sanity, and journey validation only
-- during Phases 15-18, Expo Go screens may expand to cover real state presentation and UI Kit growth, but they still do not count as bound implementation
-
-#### C. When fixtures-only must be used
-
-- for mobile preview screens in Phases 12-14, the default and expected source is fixtures only
-- fixtures-only means visual assets and example data may drive layout, navigation, CTA review, and state presentation, but not canonical business truth
-- in Phases 15-18, fixtures remain valid for visual states, state coverage, and interaction smoke, but a screen may move to limited-api preview only when there is a concrete screen/API validation need
-- from Phase 19 onward, fixtures may still support isolated preview states and tests, but they may not act as the primary source for a canonical operation path
-- from Phase 21 onward, fixtures may support edge-state preview only; the canonical bound chain must use the real generated and bound path
-
-#### D. One-line execution rule
-
-- app shell after Phase 07 exit and after surface justification
-- Expo Go routes and candidate screens from Phase 12
-- fixtures-only by default for preview screens until limited-api validation is explicitly justified
-
-#### E. Arabic quick reference
-
-- إنشاء app shell: بعد الخروج من bootstrap فقط، وبعد أن يتم تصنيف السطح على أنه `REQUIRED` أو `OPTIONAL` في `Surface Responsibility Lock`. نقطة البداية الافتراضية هي `Phase 10`. راجع هذا القسم، بند `When to create the app shell`.
-- إضافة routes/screens للـ Expo Go: لا تبدأ قبل `Journey Lock`، ونقطة البداية الافتراضية هي `Phase 12`. هذا هو أول موضع قانوني لتصفح الشاشات المرشحة داخل Expo Go، بينما `Phase 13` هي أول نقطة استقرار لها من حيث `purpose` و`CTA` والحالات. راجع هذا القسم، بند `When to add routes and screens for Expo Go`.
-- استخدام fixtures فقط: هو الوضع الافتراضي والمتوقع لشاشات المعاينة في `Phases 12-14`. في `Phases 15-18` تبقى `fixtures` صالحة للمعاينة والحالات، لكن يمكن الانتقال إلى `limited-api` فقط عند وجود حاجة تحقق واضحة. ومن `Phase 21` لا يجوز أن تبقى `fixtures` هي المصدر الأساسي لمسار تشغيلي قانوني. راجع هذا القسم، بند `When fixtures-only must be used`.
-
-## 11. DSH Example In Clean Form
-
-This section is illustrative only.
-It demonstrates method and ordering.
-It does not select `DSH` as the first bootstrap service.
-The actual first-service decision is made in Phase 04 and recorded in `docs/services/00_SERVICE_BUILD_ORDER.md`.
-
-### DSH primary job
-
-Client places order -> partner accepts and prepares -> captain receives and fulfills -> all relevant surfaces track the status clearly.
-
-### Possible DSH surface classification
-
-- `app-client` = REQUIRED
-- `app-partner` = REQUIRED
-- `app-captain` = REQUIRED
-- `control-panel` = REQUIRED
-- `app-field` = OPTIONAL or REQUIRED if field rollout or onboarding support is part of actual service truth
-- `webapp` or `website` = OPTIONAL or OUT depending on actual service truth
-
-### DSH actors
-
-- app-client user
-- app-partner operator
-- app-captain driver
-- control-panel operator
-
-### DSH high-level rebuild order
-
-1. define DSH service profile
-2. define DSH operations
-3. define DSH actor or surface responsibilities
-4. draw DSH journeys
-5. inventory and rationalize DSH screens
-6. lock DSH screen families and CTAs
-7. expand UI Kit only for DSH screen needs
-8. complete state coverage
-9. build DSH screen or api matrix
-10. build DSH gap map
-11. update master openapi for DSH
-12. generate and verify layers
-13. bind DSH screens to canonical chain
-14. lock DSH runtime truth
-15. prove DSH with production-like verification
-16. seal DSH with evidence
-
-## 12. Exact New File Purpose
-
-This file serves as the canonical long-term planning artifact for new repo creation in this repository.
-Any external planning transcript remains reference material only.
-
-## 13. Final Operational Rule
-
-When donor consultation is needed, the need in the new repo must drive the search in the donor repo.
-
-Correct flow:
-
-1. define what the new repo needs
-2. search the donor repo for a specific useful candidate only
-3. classify the candidate
-4. rebuild clean or extract partially
-5. validate in the new repo
-
-Incorrect flow:
-
-1. browse the donor repo randomly
-2. gather interesting files
-3. move them into the new repo
-4. try to make them fit later
-
-## 14. Final One-Line Rule
-
-Build the new repository from clean law and real service truth, and use the old repository only as a donor quarry that must never be copied blindly into the new system.
-
-## 15. Companion Execution Artifacts
-
-Use these companion documents with this guide:
-
-- `BTHWANI GUIDE — Phase Bootstrap Runbook.md`
-- `BTHWANI GUIDE — Bootstrap Gate Checklists.md`
-
-This guide remains the governing reference.
-The bootstrap runbook defines exact first file and folder creation order.
-The bootstrap gate checklists define evidence-backed exit conditions for bootstrap phases.
-The two companion artifacts are operational tools for Phases 00-07 only.
-During Phases 00-07, they override any broader interpretation in this guide that would cause premature expansion.
-
-## 16. Appendix A - Donor Extraction Decision Matrix
-
-This appendix is intentionally minimal.
-It is secondary guidance, not the center of the clean build line.
-
-### 16.1 Minimal donor rules
-
-- consult the donor repo only after a concrete new-repo need is defined
-- default donor decision = `REBUILD_CLEAN`
-- direct carryover is limited to isolated, clearly understood assets or verified schema fragments
-- large flows, apps, services, and UI patterns remain reference-only unless explicitly proven otherwise
-- detailed extraction logic belongs in donor-specific working packs, not in the main governing guide
+- `Reality Intake` = governed census of actual donor and target truth
+- `Value Lock` = explicit statement of what is worth rebuilding now and what is not
+- `Actor/Context Lock` = explicit actor visibility and surface participation model
+- `Operation Lock` = official service operation set before screen growth
+- `Surface Responsibility Lock` = explicit mapping of operations to surfaces and waves
+- `Journey Lock` = explicit happy, failure, recovery, and support journeys before candidate screens
+- `Screen Inventory` = complete catalog of candidate screens and related units
+- `Screen Rationalization` = keep, merge, convert, internal, or move-to-legacy classification of candidates
+- `Screen Purpose Lock` = family, purpose, CTA, entry, exit, and required-state definition per retained candidate
+- `Flow Compression` = removal of unnecessary steps, routes, or decision points
+- `Screen/API Matrix` = screen-proven API demand register
+- `Gap Map` = register of contract underfit, overfetch, missing operations, or drift
+- `Binding Chain` = canonical path from screen through API, service, repository, and runtime truth
+- `Preview Registry` = phase-correct registry of preview routes and fixture locations before binding
+- `Runtime Truth` = the real operational truth source used by lawful bound paths
+- `Minimal Necessary Runtime` = the lowest runtime mode sufficient for the current phase
+- `Evidence Pack` = proof set that supports phase completion or service seal
+- `Legacy Quarantine` = detached retirement zone for old material kept outside the live clean tree

@@ -5,6 +5,14 @@
     "strict": true,
     "noEmit": true,
     "baseUrl": ".",
+    "paths": {
+      "@bthwani/surfaces": [
+        "packages/surfaces/src/index.ts"
+      ],
+      "@bthwani/surfaces/*": [
+        "packages/surfaces/src/*"
+      ]
+    },
     "ignoreDeprecations": "6.0",
     "resolveJsonModule": true,
     "esModuleInterop": true,

@@ -3,5 +3,8 @@
   "name": "@bthwani/app-client",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@bthwani/surfaces": "workspace:*"
+  }
 }

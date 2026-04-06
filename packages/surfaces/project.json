@@ -1,0 +1,7 @@
+{
+  "name": "surfaces",
+  "root": "packages/surfaces",
+  "sourceRoot": "packages/surfaces/src",
+  "projectType": "library",
+  "targets": {}
+}

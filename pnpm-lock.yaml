@@ -1,0 +1,47 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .: {}
+
+  apps/mobile/app-captain:
+    dependencies:
+      '@bthwani/surfaces':
+        specifier: workspace:*
+        version: link:../../../packages/surfaces
+
+  apps/mobile/app-client:
+    dependencies:
+      '@bthwani/surfaces':
+        specifier: workspace:*
+        version: link:../../../packages/surfaces
+
+  apps/mobile/app-field:
+    dependencies:
+      '@bthwani/surfaces':
+        specifier: workspace:*
+        version: link:../../../packages/surfaces
+
+  apps/mobile/app-partner:
+    dependencies:
+      '@bthwani/surfaces':
+        specifier: workspace:*
+        version: link:../../../packages/surfaces
+
+  apps/web/control-panel:
+    dependencies:
+      '@bthwani/surfaces':
+        specifier: workspace:*
+        version: link:../../../packages/surfaces
+
+  apps/web/webapp: {}
+
+  apps/web/website: {}
+
+  packages/surfaces: {}
+
+  packages/ui-kit: {}
