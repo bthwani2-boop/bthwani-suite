@@ -783,6 +783,14 @@ Stop screen inflation early.
 - classify each item as `Keep`, `Merge`, `Convert`, `Internal`, or `Move to Legacy`
 - determine whether each item is really a screen, sheet, modal, section, inline step, or state
 
+#### Service-Level Completeness Rule
+
+- Phase 12 inventory must be complete for the current service, not a partial sample
+- every candidate implied by Phase 10 surface responsibility and Phase 11 journey maps must be cataloged or explicitly classified out
+- coverage must include mainline, fast path, returning-user path if relevant, staff/internal paths, failure/recovery paths, unavailable/disabled paths, and optional support branches when the service includes them
+- every candidate must state whether it is a screen, sheet, modal, section, inline step, or state-only item
+- Phase 12 does not pass if any in-scope surface-owned candidate remains undocumented
+
 #### Outputs
 
 - screen catalog
@@ -1327,6 +1335,63 @@ Preview law:
 - visual preview is not runtime proof
 - limited-api preview is not production-like proof
 - production-like proof cannot be claimed from Expo Go or browser-only shells alone
+
+### 10.5 App Shell, Expo Go Routes, and Fixtures Entry Rule
+
+This subsection makes the mobile preview entry policy explicit.
+
+#### A. When to create the app shell
+
+- do not create individual surface app folders during bootstrap Phases 00-07
+- create a thin mobile app shell only after bootstrap gates pass
+- the default earliest point for `apps/mobile/<surface>/` shell creation is Phase 10, after Surface Responsibility Lock classifies that surface as `REQUIRED` or `OPTIONAL` for the current service
+- if a surface is still unclassified or marked `OUT`, do not create its app shell
+
+Allowed contents of the first app shell:
+
+- app root
+- navigation container
+- theme and direction wiring
+- safe-area and layout shell
+- asset loading
+- preview route placeholders
+
+Forbidden contents of the first app shell:
+
+- bound service logic
+- generated API client wiring
+- canonical runtime-truth data access
+- production claims
+
+#### B. When to add routes and screens for Expo Go
+
+- do not add real preview routes or candidate screens before Journey Lock
+- the default earliest point for Expo Go route and screen entry is Phase 12, after Phase 11 Journey Lock has defined the happy path, failure path, and recovery path
+- Phase 12 is the first lawful point to add candidate screens for browsing, rationalization, and flow review inside Expo Go
+- candidate screen work in Phase 12 must come from a full current-service inventory, not from a subset chosen for convenience
+- Phase 13 is the first stabilization point where those screens should gain clear family, purpose, primary CTA, and required states
+- during Phases 12-14, Expo Go use is for visual preview, CTA clarity, route sanity, and journey validation only
+- during Phases 15-18, Expo Go screens may expand to cover real state presentation and UI Kit growth, but they still do not count as bound implementation
+
+#### C. When fixtures-only must be used
+
+- for mobile preview screens in Phases 12-14, the default and expected source is fixtures only
+- fixtures-only means visual assets and example data may drive layout, navigation, CTA review, and state presentation, but not canonical business truth
+- in Phases 15-18, fixtures remain valid for visual states, state coverage, and interaction smoke, but a screen may move to limited-api preview only when there is a concrete screen/API validation need
+- from Phase 19 onward, fixtures may still support isolated preview states and tests, but they may not act as the primary source for a canonical operation path
+- from Phase 21 onward, fixtures may support edge-state preview only; the canonical bound chain must use the real generated and bound path
+
+#### D. One-line execution rule
+
+- app shell after Phase 07 exit and after surface justification
+- Expo Go routes and candidate screens from Phase 12
+- fixtures-only by default for preview screens until limited-api validation is explicitly justified
+
+#### E. Arabic quick reference
+
+- إنشاء app shell: بعد الخروج من bootstrap فقط، وبعد أن يتم تصنيف السطح على أنه `REQUIRED` أو `OPTIONAL` في `Surface Responsibility Lock`. نقطة البداية الافتراضية هي `Phase 10`. راجع هذا القسم، بند `When to create the app shell`.
+- إضافة routes/screens للـ Expo Go: لا تبدأ قبل `Journey Lock`، ونقطة البداية الافتراضية هي `Phase 12`. هذا هو أول موضع قانوني لتصفح الشاشات المرشحة داخل Expo Go، بينما `Phase 13` هي أول نقطة استقرار لها من حيث `purpose` و`CTA` والحالات. راجع هذا القسم، بند `When to add routes and screens for Expo Go`.
+- استخدام fixtures فقط: هو الوضع الافتراضي والمتوقع لشاشات المعاينة في `Phases 12-14`. في `Phases 15-18` تبقى `fixtures` صالحة للمعاينة والحالات، لكن يمكن الانتقال إلى `limited-api` فقط عند وجود حاجة تحقق واضحة. ومن `Phase 21` لا يجوز أن تبقى `fixtures` هي المصدر الأساسي لمسار تشغيلي قانوني. راجع هذا القسم، بند `When fixtures-only must be used`.
 
 ## 11. DSH Example In Clean Form
 

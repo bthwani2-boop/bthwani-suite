@@ -8,9 +8,9 @@
 - RequestType: `source_to_target_pack`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `partially ready`
-- BlockingGaps: `Surface responsibility lock and journey lock remain ahead`
-- NextAllowed: `Use this pack as the input to Phase 10 only`
+- PackStatus: `ready to package`
+- BlockingGaps: `No blocker inside this phase; Surface Responsibility Lock remains next`
+- NextAllowed: `Use this pack as the input to Phase 10 - Surface Responsibility Lock`
 
 ## Request Classification
 

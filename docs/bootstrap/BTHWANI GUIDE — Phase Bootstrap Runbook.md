@@ -394,3 +394,28 @@ Bootstrap is complete only when:
 5. no service implementation code or binding has started
 
 At that point the repo is ready to enter actor/context, operation, surface, and journey work for the first service.
+
+## 10. Post-Bootstrap Mobile Preview Handoff
+
+This runbook stops at Phase 07.
+The following note clarifies the earliest lawful entry points immediately after bootstrap exit.
+
+### App shell timing
+
+- do not create individual mobile surface app shells during bootstrap
+- after bootstrap exit, create a thin `apps/mobile/<surface>/` shell only after `Surface Responsibility Lock` classifies that surface as `REQUIRED` or `OPTIONAL`
+- the default earliest point for mobile app shell creation is `Phase 10`
+
+### Expo Go routes and screens timing
+
+- do not add real preview routes or candidate screens for Expo Go before `Journey Lock`
+- the default earliest point for Expo Go route and screen entry is `Phase 12`
+- `Phase 13` is the first stabilization point where those screens should have clear purpose, CTA, and required states
+
+### Fixtures-only timing
+
+- `fixtures-only` is the default and expected mode for preview screens in `Phases 12-14`
+- in `Phases 15-18`, fixtures remain valid for preview and state coverage, and `limited-api` preview is allowed only when there is a concrete validation need
+- from `Phase 21` onward, fixtures may support edge-state preview only and may not remain the primary source for a lawful operational path
+
+For the governing version of this rule set, see `docs/governance/BTHWANI GUIDE — Full Unified Governing & Execution Reference.md`, Section `10.5 App Shell, Expo Go Routes, and Fixtures Entry Rule`.

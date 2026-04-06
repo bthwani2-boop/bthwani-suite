@@ -1,0 +1,7 @@
+{
+  "name": "app-captain",
+  "root": "apps/mobile/app-captain",
+  "sourceRoot": "apps/mobile/app-captain/src",
+  "projectType": "application",
+  "targets": {}
+}

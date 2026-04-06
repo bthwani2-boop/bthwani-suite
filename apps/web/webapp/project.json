@@ -1,0 +1,7 @@
+{
+  "name": "webapp",
+  "root": "apps/web/webapp",
+  "sourceRoot": "apps/web/webapp/src",
+  "projectType": "application",
+  "targets": {}
+}

@@ -8,9 +8,9 @@
 - RequestType: `source_to_target_pack`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `in progress`
-- BlockingGaps: `Journey lock remains after this phase`
-- NextAllowed: `Use this pack to drive Journey Lock only`
+- PackStatus: `accepted from Phase 09 baseline`
+- BlockingGaps: `Journey Lock remains the next downstream phase`
+- NextAllowed: `Phase 11 - Journey Lock`
 
 ## Request Classification
 

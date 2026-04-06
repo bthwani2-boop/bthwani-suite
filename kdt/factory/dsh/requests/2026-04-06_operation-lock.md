@@ -8,9 +8,9 @@
 - RequestType: `source_to_target_pack`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `in progress`
-- BlockingGaps: `Journey Lock and screen inventory have not started yet`
-- NextAllowed: `Define canonical operations and lifecycle for dsh only`
+- PackStatus: `accepted from Phase 08 baseline`
+- BlockingGaps: `Surface Responsibility Lock remains the next downstream phase`
+- NextAllowed: `Phase 10 - Surface Responsibility Lock`
 
 ## Exact Scope
 

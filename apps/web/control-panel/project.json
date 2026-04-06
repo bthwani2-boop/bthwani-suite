@@ -1,0 +1,7 @@
+{
+  "name": "control-panel",
+  "root": "apps/web/control-panel",
+  "sourceRoot": "apps/web/control-panel/src",
+  "projectType": "application",
+  "targets": {}
+}

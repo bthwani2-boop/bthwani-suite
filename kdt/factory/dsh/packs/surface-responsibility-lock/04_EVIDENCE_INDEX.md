@@ -5,6 +5,7 @@
 - `kdt/factory/dsh/exports/surface-responsibility-lock/SURFACE_MATRIX.csv`
 - `kdt/factory/dsh/exports/surface-responsibility-lock/OPERATION_SURFACE_COVERAGE.csv`
 - `kdt/factory/dsh/evidence/surface-responsibility-lock/01_SOURCE_OBSERVATIONS.md`
+- `kdt/factory/dsh/evidence/surface-responsibility-lock/02_REENTRY_REVIEW.md`
 
 ## Upstream Inputs
 

@@ -9,6 +9,7 @@
 - `packs/operation-lock/03_TARGET_FIT_SUMMARY.md`
 - `exports/operation-lock/OPERATIONS_CATALOG.csv`
 - `evidence/operation-lock/01_SOURCE_OBSERVATIONS.md`
+- `evidence/operation-lock/02_REENTRY_REVIEW.md`
 
 ## Core Evidence Sources
 

@@ -1,0 +1,7 @@
+{
+  "$schema": "../../../tools/schemas/package.schema.json",
+  "name": "@bthwani/website",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module"
+}

@@ -9,6 +9,7 @@
 - `packs/actor-context-lock/03_TARGET_FIT_SUMMARY.md`
 - `exports/actor-context-lock/ACTOR_CONTEXT_MATRIX.csv`
 - `evidence/actor-context-lock/01_SOURCE_OBSERVATIONS.md`
+- `evidence/actor-context-lock/02_REENTRY_REVIEW.md`
 
 ## Core Evidence Sources
 

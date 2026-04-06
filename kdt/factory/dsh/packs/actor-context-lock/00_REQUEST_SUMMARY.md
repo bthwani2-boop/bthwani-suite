@@ -8,9 +8,9 @@
 - RequestType: `source_to_target_pack`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `partially ready`
-- BlockingGaps: `Operation-level actor refinement remains for Phase 09`
-- NextAllowed: `Use this pack to drive Operation Lock only`
+- PackStatus: `ready to package`
+- BlockingGaps: `No blocker inside this phase; Operation Lock remains next`
+- NextAllowed: `Use this pack to drive Phase 09 - Operation Lock`
 
 ## Request Classification
 

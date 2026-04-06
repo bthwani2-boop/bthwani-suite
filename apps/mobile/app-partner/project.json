@@ -1,0 +1,7 @@
+{
+  "name": "app-partner",
+  "root": "apps/mobile/app-partner",
+  "sourceRoot": "apps/mobile/app-partner/src",
+  "projectType": "application",
+  "targets": {}
+}

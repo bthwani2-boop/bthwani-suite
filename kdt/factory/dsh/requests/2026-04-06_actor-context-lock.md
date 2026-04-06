@@ -8,9 +8,9 @@
 - RequestType: `source_to_target_pack`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `in progress`
-- BlockingGaps: `Operation lock and journey lock have not started yet`
-- NextAllowed: `Create actor/context lock pack for dsh only`
+- PackStatus: `accepted from Phase 07 baseline`
+- BlockingGaps: `Operation Lock remains the next lawful downstream phase`
+- NextAllowed: `Phase 09 - Operation Lock`
 
 ## Exact Scope
 

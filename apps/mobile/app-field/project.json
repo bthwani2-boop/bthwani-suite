@@ -1,0 +1,7 @@
+{
+  "name": "app-field",
+  "root": "apps/mobile/app-field",
+  "sourceRoot": "apps/mobile/app-field/src",
+  "projectType": "application",
+  "targets": {}
+}

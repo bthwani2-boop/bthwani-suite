@@ -1,0 +1,7 @@
+{
+  "name": "app-client",
+  "root": "apps/mobile/app-client",
+  "sourceRoot": "apps/mobile/app-client/src",
+  "projectType": "application",
+  "targets": {}
+}
