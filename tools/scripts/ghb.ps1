@@ -96,6 +96,45 @@ function Get-BranchSlug {
     return $value
 }
 
+function Get-NextGhbSequenceNumber {
+    $max = 0
+    $branchLines = @(git branch -a 2>$null)
+    $ghbNames = New-Object System.Collections.Generic.HashSet[string]
+
+    foreach ($line in $branchLines) {
+        $name = $line.Trim()
+
+        if ($name.StartsWith('*')) {
+            $name = $name.Substring(1).Trim()
+        }
+
+        if ($name -match '^remotes/[^/]+/(.+)$') {
+            $name = $Matches[1]
+        }
+
+        if ($name -match '^ghb/') {
+            [void]$ghbNames.Add($name)
+        }
+
+        if ($name -match '^ghb/\((\d+)\)-') {
+            $number = [int]$Matches[1]
+            if ($number -gt $max) {
+                $max = $number
+            }
+        }
+    }
+
+    if ($max -gt 0) {
+        return ($max + 1)
+    }
+
+    if ($ghbNames.Count -gt 0) {
+        return ($ghbNames.Count + 1)
+    }
+
+    return ($max + 1)
+}
+
 $repoRoot = (& git rev-parse --show-toplevel 2>$null | Select-Object -First 1)
 if ([string]::IsNullOrWhiteSpace($repoRoot)) {
     throw 'Not inside a git repository.'
@@ -122,8 +161,9 @@ if ([string]::IsNullOrWhiteSpace($Message)) {
 $Message = $Message.Trim()
 
 if ([string]::IsNullOrWhiteSpace($BranchName)) {
+    $sequence = Get-NextGhbSequenceNumber
     $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-    $BranchName = "ghb/$stamp-$(Get-BranchSlug -Text $Message)"
+    $BranchName = "ghb/($sequence)-$stamp-$(Get-BranchSlug -Text $Message)"
 }
 
 Invoke-Git -Arguments @('add', '-A')

@@ -25,11 +25,12 @@ ${input:args}
    - `--allow-empty`
 2. Treat the remaining free text as the commit message.
 3. If no message is provided, infer a short message from the current changes. Avoid a generic one-word message unless the repo is clean and `--allow-empty` was requested.
-4. Execute the script with PowerShell from the repo root:
+4. If `--branch` was not provided, let the script generate the default branch name in this format: `ghb/(x)-yyyyMMdd-HHmmss-slug`, where `x` is the next sequential number across local and remote ghb branches.
+5. Execute the script with PowerShell from the repo root:
 
    ```powershell
    pwsh -NoProfile -ExecutionPolicy Bypass -File ".\\tools\\scripts\\ghb.ps1" [-Message "..."] [-BranchName "..."] [-NoPush] [-AllowEmpty]
    ```
 
-5. Summarize the result in chat with the commit message, the branch that was checkpointed, and the new branch that was created.
-6. Do not tell the user to switch to the terminal.
+6. Summarize the result in chat with the commit message, the branch that was checkpointed, and the new branch that was created.
+7. Do not tell the user to switch to the terminal.
