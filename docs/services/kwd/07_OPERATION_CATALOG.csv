@@ -1,0 +1,6 @@
+operation_id,canonical_name,owner,actors,surfaces,operation_type,trigger,state_effect,classification,source_trace
+kwd_jobs_list,kwd_jobs_list,services/kwd,client,app-client,READ,query_or_screen_load,read_only,kwd_catalog:read,services/kwd/governance/KWD_OPERATION_CATALOG.csv
+kwd_job_apply,kwd_job_apply,services/kwd,client,app-client,MUTATION,primary_cta_or_workflow_step,state_mutation,kwd_catalog:mutation,services/kwd/governance/KWD_OPERATION_CATALOG.csv
+kwd_my_applications_list,kwd_my_applications_list,services/kwd,client,app-client,READ,query_or_screen_load,read_only,kwd_catalog:read,services/kwd/governance/KWD_OPERATION_CATALOG.csv
+kwd_listing_report,kwd_listing_report,services/kwd,client,app-client,MUTATION,primary_cta_or_workflow_step,state_mutation,kwd_catalog:mutation,services/kwd/governance/KWD_OPERATION_CATALOG.csv
+kwd_sync_catalog,kwd_sync_catalog,services/kwd,ops|catalog,control-panel,MUTATION,primary_cta_or_workflow_step,state_mutation,kwd_catalog:mutation,docs/services/kwd/06_SURFACE_CLASSIFICATION.md

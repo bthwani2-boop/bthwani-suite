@@ -1,0 +1,11 @@
+screen_id,loading_state,empty_state,filtered_empty_state,disabled_state,offline_state,validation_error_state,upstream_failure_state,retry_state,stale_state,partial_state,success_state,notes
+SCR_1,required,required,required,required,required,required,required,required,required,required,required,state shell alignment required with packages/ui-kit state shells
+SCR_2,required,required,required,required,required,required,required,required,required,required,required,state shell alignment required with packages/ui-kit state shells
+SCR_3,required,required,required,required,required,required,required,required,required,required,required,state shell alignment required with packages/ui-kit state shells
+SCR_4,required,required,required,required,required,required,required,required,required,required,required,state shell alignment required with packages/ui-kit state shells
+SCR_5,required,required,required,required,required,required,required,required,required,required,required,state shell alignment required with packages/ui-kit state shells
+SCR_6,required,required,required,required,required,required,required,required,required,required,required,state shell alignment required with packages/ui-kit state shells
+SCR_7,required,required,required,required,required,required,required,required,required,required,required,state shell alignment required with packages/ui-kit state shells
+SCR_8,required,required,required,required,required,required,required,required,required,required,required,state shell alignment required with packages/ui-kit state shells
+SCR_9,required,required,required,required,required,required,required,required,required,required,required,state shell alignment required with packages/ui-kit state shells
+SCR_10,required,required,required,required,required,required,required,required,required,required,required,state shell alignment required with packages/ui-kit state shells

@@ -1,0 +1,8 @@
+"screen_id","surface","old_canonical_name","new_canonical_name","collision_group","donor_trace"
+"SCR_87","app-client","dsh_categories_list","dsh_categories_list","dsh_categories_list","packages/surfaces/src/dsh/app-client/mobile/auto_dsh_categories_list.tsx"
+"SCR_151","shared","dsh_categories_list","dsh_categories_list_shared","dsh_categories_list","packages/surfaces/src/dsh/DshCategoriesList.tsx"
+"SCR_67","app-partner","dsh_partner_orders_list","dsh_partner_orders_list","dsh_partner_orders_list","packages/surfaces/src/dsh/app-partner/mobile/auto_dsh_partner_orders_list.tsx"
+"SCR_157","shared","dsh_partner_orders_list","dsh_partner_orders_list_shared","dsh_partner_orders_list","packages/surfaces/src/dsh/DshPartnerOrdersList.tsx"
+"SCR_138","app-client","dsh_store_items_list","dsh_store_items_list","dsh_store_items_list","packages/surfaces/src/dsh/app-client/mobile/auto_dsh_store_items_list.tsx"
+"SCR_148","shared","dsh_store_items_list","dsh_store_items_list_shared","dsh_store_items_list","packages/surfaces/src/dsh/components/DshStoreItemsList.tsx"
+

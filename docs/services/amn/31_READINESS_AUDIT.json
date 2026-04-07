@@ -1,0 +1,323 @@
+{
+  "service": "amn",
+  "session_id": "20260407_amn_bootstrap_v1",
+  "generated_at_utc": "2026-04-07T21:19:10.0246167Z",
+  "overall_pass": true,
+  "totals": {
+    "checks": 61,
+    "failed": 0,
+    "screen_registry_rows": 26,
+    "queue_rows": 26,
+    "group_matrix_rows": 26,
+    "screen_contract_files": 26,
+    "wave_files": 4,
+    "marker_hits": 0
+  },
+  "checks": [
+    {
+      "check": "docs_exists:00_README.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\00_README.md"
+    },
+    {
+      "check": "docs_exists:01_SERVICE_EXECUTION_CHARTER.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\01_SERVICE_EXECUTION_CHARTER.md"
+    },
+    {
+      "check": "docs_exists:02_IMPLEMENTATION_SCOPE.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\02_IMPLEMENTATION_SCOPE.md"
+    },
+    {
+      "check": "docs_exists:03_REPO_TARGET_OWNERSHIP.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\03_REPO_TARGET_OWNERSHIP.md"
+    },
+    {
+      "check": "docs_exists:04_EXTRACTION_TO_IMPLEMENTATION_MAP.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\04_EXTRACTION_TO_IMPLEMENTATION_MAP.csv"
+    },
+    {
+      "check": "docs_exists:05_SERVICE_CANONICAL_MODEL.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\05_SERVICE_CANONICAL_MODEL.md"
+    },
+    {
+      "check": "docs_exists:06_SURFACE_CLASSIFICATION.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\06_SURFACE_CLASSIFICATION.md"
+    },
+    {
+      "check": "docs_exists:07_OPERATION_CATALOG.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\07_OPERATION_CATALOG.csv"
+    },
+    {
+      "check": "docs_exists:08_JOURNEY_CATALOG.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\08_JOURNEY_CATALOG.csv"
+    },
+    {
+      "check": "docs_exists:09_SCREEN_REGISTRY.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\09_SCREEN_REGISTRY.csv"
+    },
+    {
+      "check": "docs_exists:10_SCREEN_WAVES.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\10_SCREEN_WAVES.md"
+    },
+    {
+      "check": "docs_exists:11_FIRST_SCREEN_RULE.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\11_FIRST_SCREEN_RULE.md"
+    },
+    {
+      "check": "docs_exists:12_BUILD_SEQUENCE.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\12_BUILD_SEQUENCE.md"
+    },
+    {
+      "check": "docs_exists:13_BUILD_QUEUE.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\13_BUILD_QUEUE.csv"
+    },
+    {
+      "check": "docs_exists:14_UI_KIT_REQUIREMENTS.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\14_UI_KIT_REQUIREMENTS.csv"
+    },
+    {
+      "check": "docs_exists:15_ROUTE_AND_NAV_TARGETS.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\15_ROUTE_AND_NAV_TARGETS.csv"
+    },
+    {
+      "check": "docs_exists:16_COMPONENT_TARGETS.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\16_COMPONENT_TARGETS.csv"
+    },
+    {
+      "check": "docs_exists:17_VIEWMODEL_AND_CLIENT_TARGETS.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\17_VIEWMODEL_AND_CLIENT_TARGETS.csv"
+    },
+    {
+      "check": "docs_exists:18_SERVICE_METHOD_TARGETS.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\18_SERVICE_METHOD_TARGETS.csv"
+    },
+    {
+      "check": "docs_exists:19_CONTRACT_DELTAS.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\19_CONTRACT_DELTAS.md"
+    },
+    {
+      "check": "docs_exists:20_BINDING_TARGETS.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\20_BINDING_TARGETS.csv"
+    },
+    {
+      "check": "docs_exists:21_RUNTIME_TARGETS.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\21_RUNTIME_TARGETS.csv"
+    },
+    {
+      "check": "docs_exists:22_STATE_AND_EDGE_CASE_MATRIX.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\22_STATE_AND_EDGE_CASE_MATRIX.csv"
+    },
+    {
+      "check": "docs_exists:23_ACCEPTANCE_GATES.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\23_ACCEPTANCE_GATES.md"
+    },
+    {
+      "check": "docs_exists:24_TEST_AND_PROOF_PLAN.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\24_TEST_AND_PROOF_PLAN.md"
+    },
+    {
+      "check": "docs_exists:25_BLOCKERS_AND_DEFERRED.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\25_BLOCKERS_AND_DEFERRED.md"
+    },
+    {
+      "check": "docs_exists:26_HANDOFF_FROM_KDT.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\26_HANDOFF_FROM_KDT.md"
+    },
+    {
+      "check": "docs_exists:27_SCREEN_CLASSIFICATION_MODEL.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\27_SCREEN_CLASSIFICATION_MODEL.md"
+    },
+    {
+      "check": "docs_exists:28_SCREEN_GROUP_MATRIX.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\28_SCREEN_GROUP_MATRIX.csv"
+    },
+    {
+      "check": "docs_exists:29_OPERATION_EXECUTION_LOGIC.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\29_OPERATION_EXECUTION_LOGIC.csv"
+    },
+    {
+      "check": "docs_exists:30_CANONICAL_COLLISION_RESOLUTION.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\docs\\services\\amn\\30_CANONICAL_COLLISION_RESOLUTION.csv"
+    },
+    {
+      "check": "kdt_exists:00_SERVICE_EXTRACTION_SCOPE.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\00_SERVICE_EXTRACTION_SCOPE.md"
+    },
+    {
+      "check": "kdt_exists:01_DONOR_SOURCE_INDEX.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\01_DONOR_SOURCE_INDEX.md"
+    },
+    {
+      "check": "kdt_exists:02_DONOR_EXHAUSTIVE_CENSUS.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\02_DONOR_EXHAUSTIVE_CENSUS.csv"
+    },
+    {
+      "check": "kdt_exists:03_ACTOR_CONTEXT_MASTER.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\03_ACTOR_CONTEXT_MASTER.csv"
+    },
+    {
+      "check": "kdt_exists:04_MASTER_OPERATION_REGISTRY.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\04_MASTER_OPERATION_REGISTRY.csv"
+    },
+    {
+      "check": "kdt_exists:05_SURFACE_COVERAGE_MATRIX.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\05_SURFACE_COVERAGE_MATRIX.csv"
+    },
+    {
+      "check": "kdt_exists:06_JOURNEY_MASTER.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\06_JOURNEY_MASTER.csv"
+    },
+    {
+      "check": "kdt_exists:07_MASTER_SCREEN_REGISTRY.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\07_MASTER_SCREEN_REGISTRY.csv"
+    },
+    {
+      "check": "kdt_exists:08_SCREEN_STATE_MATRIX.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\08_SCREEN_STATE_MATRIX.csv"
+    },
+    {
+      "check": "kdt_exists:09_BINDING_AND_RUNTIME_NOTES.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\09_BINDING_AND_RUNTIME_NOTES.md"
+    },
+    {
+      "check": "kdt_exists:10_DISPOSITION_MATRIX.csv",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\10_DISPOSITION_MATRIX.csv"
+    },
+    {
+      "check": "kdt_exists:11_DONOR_DRIFT_DUPLICATION_REPORT.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\11_DONOR_DRIFT_DUPLICATION_REPORT.md"
+    },
+    {
+      "check": "kdt_exists:12_EXTRACTION_COUNTS.json",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\12_EXTRACTION_COUNTS.json"
+    },
+    {
+      "check": "kdt_exists:13_BLOCKERS.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\13_BLOCKERS.md"
+    },
+    {
+      "check": "kdt_exists:14_EVIDENCE_INDEX.md",
+      "pass": true,
+      "detail": "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite\\kdt\\volatile\\registry\\runs\\20260407_amn_bootstrap_v1\\services\\amn\\14_EVIDENCE_INDEX.md"
+    },
+    {
+      "check": "counts:screens_files_equals_registry",
+      "pass": true,
+      "detail": "files=26, registry=26"
+    },
+    {
+      "check": "counts:queue_equals_registry",
+      "pass": true,
+      "detail": "queue=26, registry=26"
+    },
+    {
+      "check": "counts:group_matrix_equals_registry",
+      "pass": true,
+      "detail": "group=26, registry=26"
+    },
+    {
+      "check": "counts:ops_docs_equals_ops_kdt",
+      "pass": true,
+      "detail": "docs_ops=22, kdt_ops=22"
+    },
+    {
+      "check": "quality:no_duplicate_operation_ids",
+      "pass": true,
+      "detail": "dup_operation_groups=0"
+    },
+    {
+      "check": "coverage:all_operations_linked_to_screens",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "consistency:no_registry_ids_missing_in_queue",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "consistency:no_queue_ids_missing_in_registry",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "consistency:all_queue_waves_have_wave_file",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "coverage:docs_operation_count_matches_donor_folders",
+      "pass": true,
+      "detail": "docs_ops=22, donor_op_folders=22"
+    },
+    {
+      "check": "coverage:control_panel_sections_have_hub_screens",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "quality:no_empty_wave",
+      "pass": true,
+      "detail": "empty_waves="
+    },
+    {
+      "check": "quality:no_weak_primary_cta",
+      "pass": true,
+      "detail": "weak_cta_count=0"
+    },
+    {
+      "check": "quality:no_duplicate_canonical_names",
+      "pass": true,
+      "detail": "dup_groups=0"
+    },
+    {
+      "check": "quality:no_forbidden_markers",
+      "pass": true,
+      "detail": "marker_hits=0"
+    }
+  ]
+}

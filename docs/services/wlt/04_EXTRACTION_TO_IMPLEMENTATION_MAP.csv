@@ -1,0 +1,10 @@
+entity_id,entity_type,canonical_name,disposition,owner_layer,target_repo_path,target_wave
+SCR_1,screen,wlt_app_client_hub,REBUILD_CLEAN,packages/surfaces,packages/surfaces/src/wlt,W01_CLIENT_FOUNDATION
+SCR_2,screen,wlt_app_partner_hub,REBUILD_CLEAN,packages/surfaces,packages/surfaces/src/wlt,W02_PARTNER_CAPTAIN_FIELD
+SCR_3,screen,wlt_app_captain_hub,REBUILD_CLEAN,packages/surfaces,packages/surfaces/src/wlt,W02_PARTNER_CAPTAIN_FIELD
+SCR_4,screen,wlt_app_field_hub,REBUILD_CLEAN,packages/surfaces,packages/surfaces/src/wlt,W02_PARTNER_CAPTAIN_FIELD
+SCR_5,screen,wlt_control_finance_hub,REBUILD_CLEAN,packages/surfaces,packages/surfaces/src/wlt,W03_CONTROL_FINANCE
+OP_1,operation,wlt_sync_dsh,EXTRACT_PARTIAL,services/wlt,services/wlt/src,W03_CONTROL_FINANCE
+OP_2,operation,wlt_sync_amn,EXTRACT_PARTIAL,services/wlt,services/wlt/src,W03_CONTROL_FINANCE
+OP_3,operation,wlt_sync_arb,EXTRACT_PARTIAL,services/wlt,services/wlt/src,W03_CONTROL_FINANCE
+OP_4,operation,wlt_sync_knz,EXTRACT_PARTIAL,services/wlt,services/wlt/src,W03_CONTROL_FINANCE

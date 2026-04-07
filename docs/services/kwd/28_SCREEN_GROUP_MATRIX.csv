@@ -1,0 +1,7 @@
+screen_id,canonical_name,surface,actor,group_name,mapped_wave,related_operations
+SCR_1,kwd_app_client_hub,app-client,client,kwd_client_catalog_flow,W01_APP_CLIENT,kwd_jobs_list|kwd_job_apply|kwd_my_applications_list|kwd_listing_report
+SCR_2,kwd_control_catalog_hub,control-panel,ops|catalog,kwd_control_catalog_ops,W03_CONTROL_CATALOG,kwd_sync_catalog
+SCR_3,kwd_jobs_list,app-client,client,kwd_client_catalog_flow,W01_APP_CLIENT,kwd_jobs_list
+SCR_4,kwd_job_apply,app-client,client,kwd_client_catalog_flow,W01_APP_CLIENT,kwd_job_apply
+SCR_5,kwd_my_applications_list,app-client,client,kwd_client_catalog_flow,W01_APP_CLIENT,kwd_my_applications_list
+SCR_6,kwd_listing_report,app-client,client,kwd_client_catalog_flow,W01_APP_CLIENT,kwd_listing_report

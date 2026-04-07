@@ -1,0 +1,7 @@
+screen_id,canonical_name,surface,canonical_route,target_shell_path,nav_owner,status,source_trace
+SCR_1,wlt_app_client_hub,app-client,/wlt/home,apps/mobile/app-client,packages/surfaces routing contracts,seeded_locked,docs/services/wlt/09_SCREEN_REGISTRY.csv
+SCR_2,wlt_app_partner_hub,app-partner,/partner/wlt/home,apps/mobile/app-partner,packages/surfaces routing contracts,seeded_locked,docs/services/wlt/09_SCREEN_REGISTRY.csv
+SCR_3,wlt_app_captain_hub,app-captain,/captain/wlt/home,apps/mobile/app-captain,packages/surfaces routing contracts,seeded_locked,docs/services/wlt/09_SCREEN_REGISTRY.csv
+SCR_4,wlt_app_field_hub,app-field,/field/wlt/home,apps/mobile/app-field,packages/surfaces routing contracts,seeded_locked,docs/services/wlt/09_SCREEN_REGISTRY.csv
+SCR_5,wlt_control_finance_hub,control-panel,/finance/wlt,apps/web/control-panel,packages/surfaces routing contracts,seeded_locked,docs/services/wlt/09_SCREEN_REGISTRY.csv
+SCR_10,wlt_finance_review,control-panel,/finance/wlt/review,apps/web/control-panel,packages/surfaces routing contracts,seeded_locked,docs/services/wlt/09_SCREEN_REGISTRY.csv

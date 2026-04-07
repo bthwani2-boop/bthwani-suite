@@ -1,0 +1,7 @@
+operation_id,canonical_name,owner,actors,surfaces,operation_type,trigger,state_effect,classification,source_trace
+mrf_reports_list,mrf_reports_list,services/mrf,client,app-client,READ,query_or_screen_load,read_only,mrf_catalog:read,services/mrf/governance/MRF_OPERATION_CATALOG.csv
+mrf_reports_search,mrf_reports_search,services/mrf,client,app-client,READ,query_or_screen_load,read_only,mrf_catalog:read,services/mrf/governance/MRF_OPERATION_CATALOG.csv
+mrf_report_create,mrf_report_create,services/mrf,client,app-client,MUTATION,primary_cta_or_workflow_step,state_mutation,mrf_catalog:mutation,services/mrf/governance/MRF_OPERATION_CATALOG.csv
+mrf_claim_get,mrf_claim_get,services/mrf,client,app-client,READ,query_or_screen_load,read_only,mrf_catalog:read,services/mrf/governance/MRF_OPERATION_CATALOG.csv
+mrf_match_respond,mrf_match_respond,services/mrf,client,app-client,MUTATION,primary_cta_or_workflow_step,state_mutation,mrf_catalog:mutation,services/mrf/governance/MRF_OPERATION_CATALOG.csv
+mrf_sync_catalog,mrf_sync_catalog,services/mrf,ops|catalog,control-panel,MUTATION,primary_cta_or_workflow_step,state_mutation,mrf_catalog:mutation,docs/services/mrf/06_SURFACE_CLASSIFICATION.md
