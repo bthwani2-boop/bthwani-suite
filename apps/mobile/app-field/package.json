@@ -4,7 +4,13 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "main": "./index.js",
   "dependencies": {
-    "@bthwani/surfaces": "workspace:*"
+    "@bthwani/surface-browser": "workspace:*",
+    "@bthwani/surface-mobile": "workspace:*",
+    "@bthwani/surfaces": "workspace:*",
+    "expo": "~55.0.11",
+    "react": "19.2.0",
+    "react-native": "0.83.4"
   }
 }

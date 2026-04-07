@@ -8,6 +8,7 @@
 - the current governed first service is `dsh`
 - approved app shells already exist under `apps/mobile/` and `apps/web/`
 - `packages/ui-kit/` exists as shared foundation and `packages/surfaces/` exists as a preview-stage package
+- the current approved architecture lock is recorded in `governance/ARCHITECTURE_LOCK.md`
 - `runtime/` does not exist yet
 - the current execution band is the service-truth and screen-law band, with Phase `13` complete and Phase `14` next allowed
 
@@ -25,6 +26,10 @@
 - do not start multiple deep service tracks before the current service is sealed with evidence
 - do not create runtime truth, generated layers, or binding before their lawful later phases
 - proceed only by phase order with evidence under `kdt/volatile/registry/runs/{SESSION_ID}/` and governed packs under `kdt/factory/`
+
+## Architecture Lock
+
+- use `governance/ARCHITECTURE_LOCK.md` as the current repo-local architecture lock for workspace foundation, canonical surfaces, canonical clean service set, ownership split, contract direction, runtime phase-gating, and `wlt`-owned rates capability isolation
 
 ## Next Planned Step
 

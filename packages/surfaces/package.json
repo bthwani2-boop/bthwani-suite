@@ -3,5 +3,13 @@
   "name": "@bthwani/surfaces",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "src",
+    "docs"
+  ]
 }

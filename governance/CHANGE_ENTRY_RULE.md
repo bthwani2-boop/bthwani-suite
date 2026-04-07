@@ -36,6 +36,22 @@ This means:
 - major changes outside the current phase are not allowed
 - if a cross-phase change becomes necessary, it must first be classified as correction, not silent expansion
 
+## Operating Model Trigger Rule
+
+If a serious change touches platform finance, mutable operating policy, service-to-surface attachment, or typed actor-account gates, the change entry must also record:
+
+- whether `governance/PLATFORM_OPERATING_MODEL.md` is preserved or amended
+- whether the change keeps platform financial effect inside `WLT` only
+- whether mutable policy is implemented through `VAR_*` rather than hardcoded execution logic
+- whether surface attachment or typed-account gates changed
+- whether audit, preview, or rollback expectations changed
+
+No silent change may introduce:
+
+- a side-money path or alternate financial write path
+- hardcoded mutable policy that should be governed through `VAR_*`
+- a new governed surface attachment or typed actor gate without explicit governance change first
+
 ## No Silent Drift Rule
 
 Do not make untracked structural changes that are not explained by the current phase.

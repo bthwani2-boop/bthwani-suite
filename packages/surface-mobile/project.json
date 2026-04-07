@@ -1,0 +1,7 @@
+{
+  "name": "surface-mobile",
+  "root": "packages/surface-mobile",
+  "sourceRoot": "packages/surface-mobile/src",
+  "projectType": "library",
+  "targets": {}
+}

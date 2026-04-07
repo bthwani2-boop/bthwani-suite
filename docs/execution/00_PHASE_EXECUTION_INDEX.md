@@ -9,6 +9,7 @@ Use it when you need:
 - exact phase order
 - exact artifact expectations
 - exact handoff rules
+- explicit shell-readiness and preview-entry timing
 - exact gate companions
 - a clear split between constitutional law and execution grammar
 
@@ -29,10 +30,11 @@ If the main guide is intentionally abstract about exact action order inside a la
 1. confirm the current lawful phase in the main guide
 2. open the runbook for the current lifecycle band
 3. open the matching phase manual
-4. execute entry checks before writing artifacts
-5. update the correct service layer: `docs/services/<service>/` or `kdt/factory/<service>/`
-6. run the matching gate before claiming completion
-7. deposit evidence before opening the next phase
+4. confirm shell-readiness and preview-entry legality before opening any browseable surface
+5. execute entry checks before writing artifacts
+6. update the correct service layer: `docs/services/<service>/` or `kdt/factory/<service>/`
+7. run the matching gate before claiming completion
+8. deposit evidence before opening the next phase
 
 ## Companion Files In This Directory
 

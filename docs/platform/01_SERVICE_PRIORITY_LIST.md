@@ -63,6 +63,11 @@ Evidence basis:
 - donor `services/wlt/governance/WLT_SERVICE_SCOPE.md`
 - governing rule `Finance vs WLT Separation`
 
+Normalization note:
+
+- donor `exchangeprice` is not carried forward as an independent clean service candidate
+- clean target architecture treats exchange-rate behavior as a low-privilege `wlt`-owned rates capability instead
+
 ### Rank 3 - `snd`
 
 Priority status: `small-scope fallback candidate`
@@ -77,7 +82,7 @@ Evidence basis:
 
 - donor `services/snd/governance/SND_SERVICE_SCOPE.md`
 
-### Deferred Bucket - `amn`, `arb`, `esf`, `exchangeprice`, `hr`, `knz`, `kwd`, `mrf`
+### Deferred Bucket - `amn`, `arb`, `esf`, `hr`, `knz`, `kwd`, `mrf`
 
 Priority status: `deferred due insufficient current evidence`
 

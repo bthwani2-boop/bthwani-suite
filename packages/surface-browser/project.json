@@ -1,0 +1,7 @@
+{
+  "name": "surface-browser",
+  "root": "packages/surface-browser",
+  "sourceRoot": "packages/surface-browser/src",
+  "projectType": "library",
+  "targets": {}
+}

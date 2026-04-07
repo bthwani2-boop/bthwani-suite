@@ -20,7 +20,6 @@ The current official service catalog for bootstrap is:
 - `arb`
 - `dsh`
 - `esf`
-- `exchangeprice`
 - `hr`
 - `knz`
 - `kwd`
@@ -31,7 +30,14 @@ The current official service catalog for bootstrap is:
 ## Current Bootstrap Status
 
 - selected first service: `dsh`
-- deferred services: `amn`, `arb`, `esf`, `exchangeprice`, `hr`, `knz`, `kwd`, `mrf`, `snd`, `wlt`
+- deferred services: `amn`, `arb`, `esf`, `hr`, `knz`, `kwd`, `mrf`, `snd`, `wlt`
+- cross-service operating law may be recorded globally, but deferred services remain deferred for implementation packs, contracts, and runtime work until separately unlocked
+
+## Architectural Ownership Clarification
+
+- donor `exchangeprice` is not carried forward as an independent clean service slug
+- clean target architecture adopts exchange-rate behavior as a `wlt`-owned capability under the rates split defined by `governance/ARCHITECTURE_LOCK.md`
+- `exchangeprice` may still appear in donor trace or historical evidence, but it does not become a second financial owner or a parallel clean service track
 
 ## Naming Notes
 
@@ -43,6 +49,7 @@ The current official service catalog for bootstrap is:
 
 - do not invent alias slugs for an approved service
 - do not use donor folder names as canonical service names when they differ from the approved slug set
+- do not reopen `exchangeprice` as an independent clean service without an explicit governance change that replaces the current `wlt`-owned capability model
 - do not treat deferred services as active merely because they are listed in the catalog
 
 ## Rule

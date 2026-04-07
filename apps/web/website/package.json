@@ -3,5 +3,8 @@
   "name": "@bthwani/website",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@bthwani/surface-browser": "workspace:*"
+  }
 }

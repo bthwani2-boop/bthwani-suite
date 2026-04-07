@@ -20,7 +20,7 @@ The current rebuild value of `bthwani-suite` is:
 - one clean ownership model
 - thin delivery surfaces over service truth
 - high-frequency operational journeys that remain simple for each actor
-- finance and money movement isolated through `WLT` only when required
+- any platform financial effect routes through `WLT` only
 
 ## What The Platform Must Do Now
 
@@ -29,6 +29,7 @@ At the current rebuild stage, the platform must prove that it can support:
 - a clean multi-surface operating model across approved surfaces
 - one high-leverage service journey before broad expansion
 - service-owned truth rather than app-owned truth
+- mutable operational policy through `VAR_*` rather than hardcoded execution policy
 - reusable UI Kit growth from real service needs
 - contract change only after UX and service demand are known
 
@@ -49,7 +50,7 @@ The platform must remain simple in these ways:
 
 - one primary service in focus at a time
 - one primary path per actor where possible
-- no duplicate financial ownership outside `WLT`
+- no duplicate or side-money ownership outside `WLT`
 - no donor structure carryover as a shortcut
 - no early runtime, generated layers, or binding during bootstrap
 

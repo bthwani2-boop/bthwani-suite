@@ -51,6 +51,28 @@ Before the first service is sealed with evidence:
 - no runtime stack during bootstrap phases 00-07
 - no production-like proof before the later runtime and verification phases
 
+## Workspace Tooling And Install Law
+
+- root `package.json` and root `pnpm-lock.yaml` are the canonical home for workspace toolchain truth
+- the governed workspace toolchain versions are `node`, `pnpm`, `nx`, and `typescript`
+- installs that change the workspace dependency graph must start from the repo root only
+- app roots and package roots are not canonical install roots for workspace graph changes
+- local `node_modules/` folders under apps or packages are workspace install artifacts, not separate ownership truth
+- no app or package may silently redefine the canonical workspace toolchain version policy
+
+## Mobile Toolchain Ownership Law
+
+- the current mobile app roots are shell packages, not standalone Expo ownership roots
+- no app root may become the canonical install or run root for Expo or React Native by convenience
+- Expo Go legality in screen phases governs preview timing only; it does not grant app-local ownership of installs or runtime tooling
+- until a lawful mobile runtime phase explicitly opens, do not add ad hoc Expo install or run workflows under app roots as if they were canonical
+- when lawful mobile execution opens later, the canonical run entrypoints must be repo-root owned commands, targets, or governed scripts first
+- during bootstrap and shell-first phases, `react`, `react-native`, and `expo` may appear as support dependencies in leaf apps or packages where technically required, but no leaf app or leaf package may define or redefine the canonical workspace version policy for them
+- no app or package may act as an independent authority for `react`, `react-native`, or `expo`
+- no app-local upgrade, downgrade, or SDK transition is allowed as a sovereignty decision
+- canonical version truth for `react`, `react-native`, and `expo` must remain workspace-governed and approval-driven
+- app-level divergence is forbidden unless an explicit approved exception is recorded in repo governance
+
 ## Phase Gate Law
 
 No phase passes on file existence alone.

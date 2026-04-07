@@ -35,6 +35,8 @@ Resolve authority in this order:
 9. `docs/execution/phases/PHASE_00_REPO_RESET_DECISION.md` through `docs/execution/phases/PHASE_27_NEXT_SERVICE_REPEAT.md` for exact phase manuals
 10. donor material from `bthfinal` as evidence only
 
+Current architecture-lock questions resolve first through `governance/ARCHITECTURE_LOCK.md` as a repo-local approved governance artifact.
+
 If a companion document violates naming law, ownership law, boundary law, or phase law, this guide wins.
 
 ### 1.3 Current Verified Repo Reality
@@ -46,6 +48,7 @@ Current verified repo realities include:
 - `packages/ui-kit/` already exists
 - `packages/surfaces/` already exists and currently serves preview-stage work
 - `contracts/master/` already exists
+- `governance/ARCHITECTURE_LOCK.md` now records the current approved architecture lock for workspace foundation, canonical surface set, canonical clean service set, ownership split, and `wlt`-owned rates capability isolation
 - `runtime/` does not exist yet
 - the current first governed service is `dsh`
 - `docs/services/dsh/` already contains first-service foundation artifacts
@@ -197,14 +200,100 @@ Keep these roles distinct:
 - `Finance` = visible financial workspace inside `control-panel`
 - `WLT` = backend financial service and money-moving runtime path
 
+Financial effect includes:
+
+- collections
+- fees
+- commissions
+- deposits
+- refunds
+- settlements
+- disbursements
+- ledger entries
+- closing
+- reconciliation
+
 Rules:
 
 - `WLT` is not a primary navigation section inside `control-panel`
 - `Finance` may expose views, approvals, monitoring, and operator actions
 - money-moving behavior routes through `WLT` only
 - other services may not duplicate `WLT` logic internally
+- no side-money path, direct financial write path, or alternate financial runtime path may exist outside `WLT`
+- companion operating-law details live in `governance/PLATFORM_OPERATING_MODEL.md`
 
-### 3.6 Catalogs vs Partners vs Marketing Separation
+### 3.6 Mutable Policy Through `VAR_*`
+
+All mutable operating policy must be governed through `VAR_*` rather than hardcoded into execution logic.
+
+This includes:
+
+- limits
+- fees
+- timing windows
+- providers
+- retries and reattempt rules
+- notifications
+- distribution policies
+- OTP policies
+- business and operational policies
+
+Required capabilities:
+
+- enable or disable
+- audit trail
+- preview
+- rollback
+
+Override precedence from highest to lowest:
+
+1. Store
+2. Subcategory
+3. Category
+4. Zone
+5. City
+6. Region
+7. Global
+
+Rules:
+
+- mutable operating policy may not be buried inside executable code
+- override precedence is part of platform law, not an implementation preference
+- if a policy needs to change without a code redeploy, it belongs in `VAR_*`
+
+### 3.7 Cross-Surface Service Attachment Law
+
+Platform-wide service-to-surface attachment is governed centrally.
+
+Rules:
+
+- `app-client` and `webapp` are one functional client surface with different shells
+- `website` is marketing or informational by default, not a primary operating surface unless governed evidence proves otherwise
+- `dsh` is a multi-surface service spanning `app-client`, `app-partner`, `app-captain`, `app-field`, `webapp`, and `control-panel`
+- `knz` does not gain delivery or captain surfaces
+- `amn` attaches to client, captain, web, and control-panel operation only
+- `arb` attaches to client, partner, field, web, and control-panel operation only
+- `wlt` is the only platform financial path and may be administered from `control-panel` without creating a second money-moving runtime
+- deferred services may inherit this law without gaining implementation authorization from it alone
+- the canonical operating matrix lives in `governance/PLATFORM_OPERATING_MODEL.md`
+
+### 3.8 Typed App Account Gate Law
+
+Typed actor apps must remain explicitly gated by approved type fields.
+
+Current approved gates:
+
+- `app-partner` -> `partner_type` -> `DSH` or `ARB`
+- `app-field` -> `field_type` -> `DSH` or `ARB`
+- `app-captain` -> `captain_type` -> `DSH` or `AMN`
+
+Rules:
+
+- a typed account may not operate in multiple governed service types at the same time unless governance is amended first
+- entitlements, activation, and route access must stay consistent with the approved type field and `control-panel` activation rules
+- if a new typed actor gate is needed later, it must enter governance before it enters implementation
+
+### 3.9 Catalogs vs Partners vs Marketing Separation
 
 Keep these ownership zones distinct:
 
@@ -218,7 +307,7 @@ This means:
 - store ownership, onboarding, and partner truth belong to `Partners`
 - offers, banners, campaigns, and promotional emphasis belong to `Marketing`
 
-### 3.7 app-field Classification Law
+### 3.10 app-field Classification Law
 
 `app-field` is an approved official surface.
 It may be `REQUIRED`, `OPTIONAL`, or `OUT` per service, but it may not be ignored.
@@ -226,10 +315,11 @@ It may be `REQUIRED`, `OPTIONAL`, or `OUT` per service, but it may not be ignore
 Rules:
 
 - every service must classify `app-field` explicitly during Phase `10`
+- if platform operating law already records `app-field` participation for a service, downstream service packs must remain consistent with that law unless governance is amended first
 - if `app-field` is `REQUIRED` or `OPTIONAL`, downstream journey, screen, API, and runtime work must account for it
 - if `app-field` is `OUT`, the reason must be recorded explicitly
 
-### 3.8 Donor Name Normalization Law
+### 3.11 Donor Name Normalization Law
 
 When donor artifacts use old internal names, normalize them in clean outputs as follows:
 
@@ -304,11 +394,54 @@ The official workspace tooling stack is:
 
 Rules:
 
+- root `package.json` and root `pnpm-lock.yaml` are the canonical home for workspace toolchain truth
+- the currently governed workspace toolchain versions are `node`, `pnpm`, `nx`, and `typescript`
 - run workspace tasks with `pnpm nx ...`
+- installs that change the workspace dependency graph must start from the repo root only
+- app roots and package roots are not canonical install roots for workspace graph changes
+- local `node_modules/` folders under apps or packages are install artifacts of the workspace, not separate ownership truth
+- do not treat package-local `node_modules/` as permission to manage a second dependency graph from that subtree
 - use `project.json` only for real apps, packages, or services
 - keep TypeScript strictness enabled unless governance explicitly changes it
 - use `tools/` for governed workspace tooling only
 - path aliases do not replace ownership or package-boundary discipline
+
+Toolchain ownership rules:
+
+- no app or package may silently redefine the canonical `node`, `pnpm`, `nx`, or `typescript` version for the workspace
+- if a workspace infrastructure version changes, update the root toolchain truth first instead of normalizing drift through a leaf package
+- package-local support dependencies do not become workspace toolchain truth just because they currently exist in one package
+
+Mobile workspace execution rules:
+
+- the current mobile app roots are shell packages, not standalone Expo ownership roots
+- no app root may become the canonical install or run root for Expo or React Native by convenience
+- Expo Go legality in screen phases governs preview timing only; it does not grant app-local ownership of installs or runtime tooling
+- until a lawful mobile runtime phase explicitly opens, do not add ad hoc Expo install or run workflows under app roots as if they were canonical
+- when lawful mobile execution is introduced later, the canonical run entrypoints must be repo-root owned commands, targets, or governed scripts first; app-local wrappers are secondary only if they do not redefine toolchain truth
+
+Surface shell and preview execution rules:
+
+- web and mobile surfaces follow the same shell-readiness law once a surface is classified as `REQUIRED` or `OPTIONAL`
+- shell readiness may prepare boot, navigation, theme, direction, and repo-root owned serve or build entrypoints before candidate screens exist
+- shell browseability or smoke-build success proves shell integrity only; it does not prove screen readiness, binding, runtime truth, or production-like behavior
+- web and mobile shell entrypoints must remain repo-root owned commands, targets, or governed scripts rather than app-root sovereignty
+
+EAS Build future ownership rule:
+
+- `EAS Build`, if adopted later, is a mobile packaging or distribution path only
+- `EAS Build` is not a prerequisite for shell readiness, Journey Lock, or Phase `12` preview
+- `EAS Build` does not by itself raise proof level to binding, runtime truth, or production-like verification
+- when adopted later, `EAS Build` must be invoked through workspace-governed commands, Nx targets, or scripts first; app-local wrappers are secondary only
+
+React / React Native / Expo central future ownership rule:
+
+- during bootstrap and shell-first phases, `react`, `react-native`, and `expo` may appear as support dependencies in leaf apps or packages where technically required, but no leaf app or leaf package may define or redefine the canonical workspace version policy for them
+- no app or package may act as an independent authority for `react`, `react-native`, or `expo`
+- no app-local upgrade, downgrade, or SDK transition is allowed as a sovereignty decision
+- canonical version truth for these packages must remain workspace-governed and approval-driven
+- when lawful mobile runtime ownership opens, version policy, upgrade policy, and SDK policy for these packages must be defined from the workspace governance path first
+- app-level divergence is forbidden unless an explicit approved exception is recorded in repo governance
 
 ### 4.6 Service Artifact Layer Split
 
@@ -582,16 +715,23 @@ Keep these states distinct:
 Candidate screens may begin only after Journey Lock.
 Bound screens may begin only in Phase `21`.
 
-### 8.2 Preview Mode Ladder
+### 8.2 Shell, Preview, And Packaging Distinction
 
-Keep these levels distinct:
+Keep these states distinct:
 
-- visual-only preview
-- limited-api preview
-- canonical local truth
-- production-like proof
+- `shell readiness`
+- `visual-only preview`
+- `limited-api preview`
+- `canonical local truth`
+- `production-like proof`
+- `packaging build`
 
-Expo Go and browser preview are preview tools, not proof instruments by themselves.
+Rules:
+
+- `shell readiness` means the target web or mobile shell can boot and host lawful preview entrypoints; it does not mean screen truth is ready
+- `packaging build` means a web or mobile artifact can be produced for integrity or distribution review; it does not upgrade proof level by itself
+- Expo Go and browser preview are preview tools, not proof instruments by themselves
+- `EAS Build` is a packaging or distribution tool, not a proof instrument by itself
 
 ### 8.3 Runtime Truth Classification
 

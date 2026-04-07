@@ -142,6 +142,39 @@ May not decide:
 - screen purpose
 - contract ownership
 
+## Workspace Boundary Clarification
+
+Use the current workspace roots with explicit owner intent.
+
+- `apps/mobile/*` and `apps/web/*` own thin surface-shell delivery only
+- `packages/surfaces/` owns shared surface registries and shared surface-facing exports
+- `packages/ui-kit/` owns shared UI foundation and its public reusable contract
+- `services/*` own service and backend truth only
+- `contracts/master/` owns canonical contract truth only
+
+This means:
+
+- app shells may contain navigation, route registration, provider wiring, preview-route placeholders, and other surface-local delivery code only
+- app shells may not absorb reusable surface logic, service truth, contract truth, generated truth, or runtime truth locally
+- `packages/surfaces/` may not import from `apps/*` or become a hidden runtime or contract owner
+- `packages/ui-kit/` must remain service-clean and may not absorb service truth, screen truth, or route-aware behavior as shared law
+- `services/*` must remain UI-free and may not import from app shells, `packages/surfaces/`, or `packages/ui-kit/`
+- `contracts/master/` may not be redefined by app-local files, package-local side contracts, or service-local canonical API copies
+
+If one file mixes shell delivery, shared surface logic, service truth, or contract truth, split it by owner instead of keeping mixed ownership.
+
+## Shared Package Consumption Rule
+
+Consumers must use shared packages through their approved public contract.
+
+Rules:
+
+- code outside `packages/ui-kit/` must consume UI Kit through `@bthwani/ui-kit`, not internal subpaths
+- code outside `packages/surfaces/` must consume surfaces through `@bthwani/surfaces`, not internal subpaths
+- package-local relative imports inside the owning package remain allowed
+- if a consumer needs a symbol that is not public yet, promote it through the package root first instead of reaching into internals
+- thin app shells must consume shared package exports without redefining or bypassing their package-level ownership boundary
+
 ## Conflict Resolution Rule
 
 If ownership conflicts arise, resolve them in this order:

@@ -39,6 +39,27 @@ The canonical contract becomes authoritative only after:
 - no package may become an alternate source of API sovereignty
 - donor contract files remain evidence inputs only until the clean repo reaches the lawful contract phases
 
+## Generated And Binding Truth Rule
+
+When generated layers are introduced later, they remain derived truth only.
+
+Rules:
+
+- generated outputs must be produced from canonical contract truth under `contracts/master/`
+- generated outputs may not become the canonical API source of truth
+- generated outputs may not be hand-maintained as if they were source truth
+- if generated output needs to change, update canonical contract truth first and regenerate from it
+
+## Canonical Access Chain Rule
+
+Apps, packages, and services may not invent side-contract truth or hidden client truth outside the lawful chain.
+
+Rules:
+
+- no app or package may introduce a private endpoint map, side contract, or alternate operation identity as if it were canonical truth
+- once canonical binding begins in later phases, raw fetch and hidden endpoint literals are not lawful substitutes for the canonical client and binding chain
+- convenience adapters may wrap lawful generated or bound outputs, but they may not redefine contract truth or operation identity
+
 ## Explicit Rejections
 
 - reject API-first rebuild

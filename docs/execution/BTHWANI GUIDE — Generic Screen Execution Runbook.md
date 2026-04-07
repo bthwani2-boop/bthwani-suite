@@ -10,8 +10,9 @@ It answers these questions generically for any service:
 - how surfaces are sequenced
 - how screen groups are sequenced
 - when `packages/surfaces/` begins
-- when preview and Expo Go begin
+- when shell preparation, web preview, and mobile preview begin
 - how UI Kit is tested before screen ingestion
+- how shell builds stay distinct from runtime proof
 - how a team moves from one surface or wave to the next
 
 ## 2. Scope And Authority
@@ -136,11 +137,13 @@ If the service has no true discovery step, start with the first `core-task` scre
 
 ## 8. App-Shell Creation Rule
 
-An app shell is lawfully used only when:
+An app shell is lawfully prepared and used only when:
 
 - bootstrap is complete
 - the relevant surface is `REQUIRED` or `OPTIONAL`
 - Phase `10` has classified the surface explicitly
+
+This rule applies equally to web and mobile surfaces.
 
 Allowed app-shell contents during Phases `08` through `18`:
 
@@ -150,12 +153,20 @@ Allowed app-shell contents during Phases `08` through `18`:
 - preview route placeholders
 - fixtures-only preview consumption
 
+Allowed shell-readiness work during Phases `08` through `18`:
+
+- repo-root owned serve or build target wiring for the surface shell
+- shell navigation or route containers with no service truth
+- web or mobile bootstrapping needed to host later lawful preview entrypoints
+- smoke-build integrity checks that do not claim preview or runtime proof
+
 Forbidden app-shell contents during Phases `08` through `18`:
 
 - canonical bound business logic
 - generated client use on canonical paths
 - runtime truth access
 - production-like claims
+- app-root owned toolchain or packaging authority
 
 ## 9. UI Kit Foundation Compatibility Gate
 
@@ -211,6 +222,8 @@ The first lawful ingress is always:
 - no bound logic
 - no runtime truth
 
+Browseability follows shell readiness, but browseability does not by itself prove screen law, binding, or runtime truth.
+
 ## 12. Screen Group Directory Pattern
 
 Inside `packages/surfaces/`, group work by service, then by surface, then by screen group.
@@ -258,11 +271,20 @@ Fixtures are not allowed to act as:
 - runtime truth
 - proof of end-to-end correctness
 
-## 14. Expo Go Activation Rule
+## 14. Web And Mobile Preview Activation Rule
 
-Do not start Expo Go preview just because a mobile shell exists.
+Do not start preview browsing just because a shell exists.
 
-Expo Go preview becomes lawful only when:
+Web preview becomes lawful only when:
+
+- the service is selected
+- the surface is classified as `REQUIRED` or `OPTIONAL`
+- Journey Lock is complete for the active branch
+- candidate screens are identified for the current wave
+- UI Kit Foundation Compatibility Review is `PASS` or bounded `PARTIAL`
+- the thin web shell exists
+
+Mobile preview becomes lawful only when:
 
 - the service is selected
 - the surface is classified as `REQUIRED` or `OPTIONAL`
@@ -271,17 +293,29 @@ Expo Go preview becomes lawful only when:
 - UI Kit Foundation Compatibility Review is `PASS` or bounded `PARTIAL`
 - the thin mobile shell exists
 
-Open in Expo Go first:
+If the current mobile surface is still browser-served, it follows the same preview class as web.
+If Expo Go is introduced for a mobile surface later, it remains preview-only under the same phase gate.
+
+Open first on either surface type:
 
 - preview routes
 - fixtures-only candidate screens
 - state-preview paths
 
-Do not open as Expo Go proof:
+Do not open as preview proof:
 
 - bound operation paths
 - runtime-truth paths
 - production-like claims
+- packaging or store-readiness claims
+
+Shell build or browseability does not by itself raise the proof level.
+
+If `EAS Build` is introduced later, treat it as mobile packaging or distribution only:
+
+- it is not a prerequisite for Phase `12` preview
+- it is not binding proof, runtime truth, or production-like verification
+- it must remain workspace-owned through repo-root commands, Nx targets, or governed scripts
 
 ## 15. Transition Rule: Screen Group To Screen Group
 

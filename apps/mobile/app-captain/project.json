@@ -3,5 +3,33 @@
   "root": "apps/mobile/app-captain",
   "sourceRoot": "apps/mobile/app-captain/src",
   "projectType": "application",
-  "targets": {}
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm exec vite --config apps/mobile/app-captain/vite.config.ts"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/dist/apps/mobile/app-captain"
+      ],
+      "options": {
+        "command": "pnpm exec vite build --config apps/mobile/app-captain/vite.config.ts"
+      }
+    },
+    "expo": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pwsh -File tools/scripts/start-mobile-preview.ps1 -App app-captain -Mode lan -Clear"
+      }
+    },
+    "expo-tunnel": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pwsh -File tools/scripts/start-mobile-preview.ps1 -App app-captain -Mode tunnel -Clear"
+      }
+    }
+  }
 }

@@ -27,6 +27,7 @@ This phase prevents catch-all surfaces, hidden ownership drift, and uncontrolled
 - map operations to surfaces
 - declare the current surface activation order and wave model
 - justify thin app-shell eligibility for participating surfaces
+- declare whether shell readiness is needed on the active web or mobile surfaces
 
 ## 6. Forbidden Work
 
@@ -43,7 +44,8 @@ This phase prevents catch-all surfaces, hidden ownership drift, and uncontrolled
 4. map each operation to the surfaces that lawfully participate
 5. define the current surface activation order and wave sequence
 6. define which surface opens first and why
-7. write the pack, export the key matrices, and stop before Journey Lock
+7. declare shell-readiness expectations for any participating web or mobile surface that may need later preview navigation
+8. write the pack, export the key matrices, and stop before Journey Lock
 
 ## 8. Required Decisions
 
@@ -52,6 +54,7 @@ This phase prevents catch-all surfaces, hidden ownership drift, and uncontrolled
 - which surface receives the next lifecycle handoff
 - when `control-panel` opens
 - when optional surfaces may open
+- which participating surfaces need thin shell readiness before preview
 
 ## 9. Required Artifacts
 
@@ -102,7 +105,7 @@ This phase prevents catch-all surfaces, hidden ownership drift, and uncontrolled
 ## 11. Cross-File Updates
 
 - align `docs/services/<service>/03_SURFACE_MATRIX.csv` with the stronger phase output when needed
-- if a surface becomes `REQUIRED` or `OPTIONAL`, its thin app shell may be verified for later preview, but no preview routes start yet
+- if a surface becomes `REQUIRED` or `OPTIONAL`, its thin web or mobile app shell may be prepared and verified for later preview through repo-root targets or governed scripts, but no preview routes or browsing start yet
 
 ## 12. Surface Impact
 
@@ -128,11 +131,12 @@ This phase prevents catch-all surfaces, hidden ownership drift, and uncontrolled
 - every approved surface is classified explicitly
 - `app-field` is explicit
 - current surface activation order is explicit
+- shell-readiness need is explicit for any participating surface that will require preview navigation
 - `control-panel` has a lawful reason rather than a convenience reason
 
 ## 17. Exit Criteria
 
-- the service is ready to lock journeys on a known surface wave model
+- the service is ready to lock journeys on a known surface wave model and with explicit shell-readiness boundaries
 
 ## 18. Failure Modes / Common Mistakes
 

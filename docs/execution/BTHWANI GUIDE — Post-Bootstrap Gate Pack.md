@@ -64,17 +64,19 @@ Every gate review must confirm:
 - `control-panel` is being used as a catch-all for unresolved ownership
 - surface activation waves are still implicit
 
-### GATE_FIRST_SURFACE_READINESS
+### GATE_FIRST_SURFACE_AND_SHELL_READINESS
 
 #### Required artifacts
 
 - surface activation plan
 - journey lock for the active branch
-- target thin app shell if preview navigation is required
+- target thin app shell or explicit no-preview note for the active surface
 
 #### Pass conditions
 
 - the first surface is the one that starts the primary job
+- shell readiness is explicit for the active web or mobile surface when preview navigation is required
+- web or mobile shell entrypoints remain thin and root-owned
 - its screen-group entry order is explicit
 - no downstream surface is being opened because it is easier to mock
 
@@ -82,6 +84,7 @@ Every gate review must confirm:
 
 - the first opened surface is a reporting or control surface with no primary-job justification
 - the first surface still lacks clear entry conditions
+- shell code is carrying service truth or runtime assumptions before preview is lawful
 
 ## 5. Screen-Layer Gates
 
@@ -120,18 +123,20 @@ Every gate review must confirm:
 - screen group plan
 - candidate catalog for the current group
 - preview registry notes
+- active preview entrypoint note when preview is needed
 
 #### Pass conditions
 
 - the first group is `entry-discovery` or the first lawful `core-task` group when no discovery exists
 - fixtures-only preview scope is explicit
 - preview routes are separated from real bound routes
+- the active web or mobile preview entrypoint is explicit
 - current group blockers are explicit
 
 #### Fail conditions
 
 - `secondary-optional` opens before the primary path is defined
-- Expo Go is being used as proof instead of preview
+- browser or Expo preview is being used as proof instead of preview
 
 ### GATE_NEXT_SURFACE_UNLOCK
 

@@ -9,7 +9,7 @@
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
 - PackStatus: `Phase 05 active`
-- BlockingGaps: `Surface responsibility per service is not locked yet`
+- BlockingGaps: `Service implementation remains dsh-first even though cross-service surface law is now governed separately`
 - NextAllowed: `Use these as official surface identifiers only`
 
 ## Official Surface Set
@@ -30,8 +30,9 @@
 ## Surface Role Notes
 
 - `control-panel` is the primary web operational shell
-- `webapp` and `website` remain official surfaces, but their per-service responsibility is not locked globally here
-- `app-field` is official and must be classified explicitly per service as `REQUIRED`, `OPTIONAL`, or `OUT`
+- `webapp` and `website` remain official surfaces; platform-wide per-service responsibility is governed in `governance/PLATFORM_OPERATING_MODEL.md`
+- `app-field` is official, and any service-specific classification must remain consistent with `governance/PLATFORM_OPERATING_MODEL.md`
+- per-service surface attachment does not by itself authorize implementation for deferred services
 
 ## Internal Name vs Visible Label Reminder
 

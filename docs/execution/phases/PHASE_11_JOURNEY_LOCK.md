@@ -90,6 +90,7 @@ Each flow-map file must include at least:
 
 - align `docs/services/<service>/04_PRIMARY_FLOW_NOTES.md` with the stable high-level journey summary
 - do not open preview work in app shells yet
+- thin web or mobile shell preparation may continue, but no browseable preview route, registry, or device preview may open yet
 
 ## 12. Surface Impact
 

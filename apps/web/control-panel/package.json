@@ -5,6 +5,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@bthwani/surface-browser": "workspace:*",
     "@bthwani/surfaces": "workspace:*"
   }
 }

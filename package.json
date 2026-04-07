@@ -4,7 +4,30 @@
   "private": true,
   "description": "Bootstrap workspace shell for the bthwani-suite clean build line",
   "scripts": {
-    "phase:review": "echo Review phase evidence under kdt/volatile/registry/runs"
+    "phase:review": "echo Review phase evidence under kdt/volatile/registry/runs",
+    "serve:surfaces": "pnpm nx run-many --target=serve --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7",
+    "build:surfaces": "pnpm nx run-many --target=build --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7"
   },
-  "packageManager": "pnpm@8.15.0+sha512.ea45517d5285d123eac02c3793505fa1fd6da90a2fc60d1e8d9e0c1e9292886ecfaff513f062b9d1cc8021bb8615033b1ac5bea3b2ee3fc165a6d7034bbe6b03"
+  "packageManager": "pnpm@8.15.0+sha512.ea45517d5285d123eac02c3793505fa1fd6da90a2fc60d1e8d9e0c1e9292886ecfaff513f062b9d1cc8021bb8615033b1ac5bea3b2ee3fc165a6d7034bbe6b03",
+  "pnpm": {
+    "overrides": {
+      "expo": "~55.0.11",
+      "react": "19.2.0",
+      "react-dom": "19.2.0",
+      "react-native": "0.83.4"
+    }
+  },
+  "devDependencies": {
+    "@expo/ngrok": "^4.1.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.1.0",
+    "expo": "~55.0.11",
+    "nx": "22.3.3",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-native": "0.83.4",
+    "typescript": "5.9.3",
+    "vite": "^7.1.11"
+  }
 }

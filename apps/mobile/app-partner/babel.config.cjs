@@ -1,0 +1,1 @@
+module.exports = require('../../../tools/expo/babel.config.cjs');
