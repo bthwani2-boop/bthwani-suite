@@ -8,6 +8,12 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
+      "@bthwani/api-clients": [
+        "packages/api-clients/src/index.ts"
+      ],
+      "@bthwani/api-types": [
+        "packages/api-types/src/index.ts"
+      ],
       "@bthwani/ui-kit": [
         "packages/ui-kit/src/index.ts"
       ],
