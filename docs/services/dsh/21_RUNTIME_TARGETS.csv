@@ -1,0 +1,8 @@
+runtime_scope,target_class,target_path,source_basis,allowed_after,proof_required,status,notes
+preview_fixtures,DshPreviewFixtures,packages/surfaces/src/dsh/fixtures,target preview shell,W00,visual_proof,active,"current lawful runtime class is fixtures-only"
+client_runtime_boundary,DshClientRuntimeBoundary,services/dsh/runtime/client-runtime-boundary.ts,KDT 09 + client screens,W09,runtime_ready,planned,"single client-facing runtime boundary after binding opens"
+partner_runtime_boundary,DshPartnerRuntimeBoundary,services/dsh/runtime/partner-runtime-boundary.ts,KDT 09 + partner screens,W09,runtime_ready,planned,"partner runtime kept separate from control-panel"
+captain_runtime_boundary,DshCaptainRuntimeBoundary,services/dsh/runtime/captain-runtime-boundary.ts,KDT 09 + captain screens,W09,runtime_ready,planned,"captain runtime kept separate from customer tracking"
+ops_runtime_boundary,DshOpsRuntimeBoundary,services/dsh/runtime/ops-runtime-boundary.ts,KDT 09 + ops screens,W09,runtime_ready,planned,"governance runtime only"
+proxy_runtime_profile,DshProxyRuntimeProfile,services/dsh/runtime/proxy-runtime-profile.ts,runtime/vars/dsh/shein-proxy.yaml,W09,runtime_ready,planned,"first explicit runtime profile to carry donor var evidence"
+field_runtime_boundary,DshFieldRuntimeBoundary,services/dsh/runtime/field-runtime-boundary.ts,KDT 09 + optional field branch,W09,runtime_ready,conditional,"opened only if field branch survives review"

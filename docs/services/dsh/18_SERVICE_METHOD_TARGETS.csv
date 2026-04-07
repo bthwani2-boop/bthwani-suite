@@ -1,0 +1,14 @@
+operation_family,target_method,service_path,required_contract_shape,ingress_surfaces,defer_until,status
+dsh_store_discovery,getDiscoveryContext,services/dsh/src/application/discovery/get-discovery-context.ts,DiscoveryContextDto,app-client,W08,planned
+dsh_cart_checkout_gate,getCheckoutGateAndCart,services/dsh/src/application/checkout/get-checkout-gate-and-cart.ts,CheckoutGateDto,app-client,W08,planned
+dsh_order_submit,submitOrder,services/dsh/src/application/orders/submit-order.ts,SubmitOrderCommand,app-client,W08,planned
+dsh_customer_order_tracking,getActiveOrderTracking,services/dsh/src/application/orders/get-active-order-tracking.ts,ActiveOrderTrackingDto,app-client,W08,planned
+dsh_customer_order_chat,sendOrderChatMessage,services/dsh/src/application/orders/send-order-chat-message.ts,OrderChatCommand,app-client|app-partner|app-captain,W08,planned
+dsh_partner_order_handling,applyPartnerOrderAction,services/dsh/src/application/partner/apply-partner-order-action.ts,PartnerOrderActionCommand,app-partner,W08,planned
+dsh_partner_store_maintenance,applyPartnerStoreMaintenanceChange,services/dsh/src/application/partner/apply-partner-store-maintenance-change.ts,PartnerStoreMaintenanceCommand,app-partner,W08,planned
+dsh_captain_offer_and_acceptance,acceptCaptainOffer,services/dsh/src/application/captain/accept-captain-offer.ts,CaptainOfferAcceptanceCommand,app-captain,W08,planned
+dsh_captain_delivery_execution,applyCaptainDeliveryStep,services/dsh/src/application/captain/apply-captain-delivery-step.ts,CaptainDeliveryStepCommand,app-captain,W08,planned
+dsh_delivery_proof_and_verification,submitDeliveryProof,services/dsh/src/application/captain/submit-delivery-proof.ts,DeliveryProofCommand,app-captain,W08,planned
+dsh_proxy_request_flow,applyProxyCaseDecision,services/dsh/src/application/proxy/apply-proxy-case-decision.ts,ProxyCaseCommand,app-client|control-panel,W08,planned
+dsh_ops_governance_controls,applyOpsGovernanceAction,services/dsh/src/application/ops/apply-ops-governance-action.ts,OpsGovernanceCommand,control-panel,W08,planned
+dsh_field_activation_support,recordFieldSupportAction,services/dsh/src/application/field/record-field-support-action.ts,FieldSupportCommand,app-field,W08,planned

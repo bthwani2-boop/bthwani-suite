@@ -1,6 +1,0 @@
-operation_id,path,method,scope_note,dsl_related,wrappers_usage,master_present,deprecated
-entity_favorite_toggle,api/entities/favorites/toggle,POST,Out of 92; covers dsh_favorites_list,DSH; KNZ,yes (DshFavoriteToggle/DshFavoritesList),yes,false
-entity_list,api/entities,GET,Out of 92; dsh_orders_list/captain_orders_list/partner_orders_list call it,DSH; AMN; ARB; etc.,dsh_orders_list; dsh_captain_orders_list; dsh_partner_orders_list,yes,false
-entity_accept,api/entities/{entityId}/accept,POST,Out of 92; captain/partner order accept call it,DSH; AMN; ARB; etc.,dsh_captain_order_accept; dsh_partner_order_accept,yes,false
-entity_get,api/entities/{entityId},GET,Out of 92; order/get flows call it,DSH; AMN; ARB; etc.,dsh_captain_order_get; dsh_partner_order_get; dsh_order_get; dsh_external_order_get,yes,false
-captain_availability_update,api/captain/availability,POST,Out of 92; AMN/DSH/KNZ captain availability,AMN; DSH; KNZ,AMN captain; DSH captain if used,yes,false

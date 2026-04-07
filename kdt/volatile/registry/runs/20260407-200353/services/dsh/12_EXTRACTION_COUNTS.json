@@ -1,0 +1,52 @@
+{
+  "session_id": "20260407-200353",
+  "service_id": "dsh",
+  "inherited_inputs": {
+    "source_index": 1,
+    "exhaustive_census": 1
+  },
+  "donor": {
+    "census_rows": 1292,
+    "source_index_roots": 40,
+    "operation_catalog_rows": 98,
+    "operation_dossier_directories": 96,
+    "service_scope_claimed_operations": 92,
+    "surface_screen_auto_rows": 129,
+    "web_route_shell_rows": 19
+  },
+  "canonical": {
+    "actors": 7,
+    "operation_families": 13,
+    "journeys": 7,
+    "retained_screens": 20,
+    "optional_screens": 1,
+    "excluded_public_surfaces": 2
+  },
+  "status_counts": {
+    "observed": 1248,
+    "observed_auxiliary": 2,
+    "observed_reference_only": 35,
+    "observed_shadow": 7
+  },
+  "surface_counts": {
+    "analysis": 35,
+    "app_client": 75,
+    "app_partner": 40,
+    "app_captain": 23,
+    "app_field": 5,
+    "control_panel": 38,
+    "dsh_shared": 81,
+    "binding": 9,
+    "contracts": 2,
+    "runtime": 1,
+    "service": 979,
+    "state": 1,
+    "domain": 1,
+    "auxiliary": 2
+  },
+  "contradictions": {
+    "operation_count_drift": true,
+    "service_level_shadow_copy": true,
+    "control_panel_boundary_risk": true
+  }
+}
