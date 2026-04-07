@@ -32,6 +32,8 @@
 - actors, operations, and surfaces are explicit -> PASS
 - `app-field` is classified explicitly -> PASS
 - bootstrap handoff to post-bootstrap execution is clear -> PASS
+- required Phase 07 markdown keys and CSV schema columns are explicitly present -> PASS
+- files `00` through `05` keep foundation depth and do not claim downstream phase completion -> PASS
 
 ## Historical Gate Interpretation
 
@@ -40,4 +42,4 @@
 
 ## Final Phase 07 Verdict
 
-Phase 07 passes the service-foundation gate and is accepted as the bootstrap first-service foundation baseline.
+Phase 07 passes the service-foundation gate and is accepted as the active bootstrap first-service foundation baseline.

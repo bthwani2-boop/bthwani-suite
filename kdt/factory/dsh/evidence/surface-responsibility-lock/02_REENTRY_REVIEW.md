@@ -31,7 +31,7 @@
 - operation surface coverage remains a lawful refinement of the accepted Phase 09 operation lock -> PASS
 - surface activation order is explicit and opens `app-client` first -> PASS
 - thin shell readiness is explicit for participating surfaces without authorizing preview -> PASS
-- clean surface ownership remains narrowed and does not reintroduce donor blanket MCPW mirroring -> PASS
+- clean surface ownership remains narrowed and does not reintroduce donor blanket CONTROL_PANEL mirroring -> PASS
 - `control-panel` does not open first and remains governance-only -> PASS
 - `app-field` remains explicitly classified and not ignored -> PASS
 - `webapp` and `website` remain outside current DSH ownership -> PASS

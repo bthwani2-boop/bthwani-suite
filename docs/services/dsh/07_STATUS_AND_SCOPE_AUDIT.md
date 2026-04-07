@@ -3,32 +3,34 @@
 ## Mandatory Header
 
 - WorkMode: `VIOLATION AUDIT MODE`
-- CurrentPhase: `Phase 13 complete; Phase 14 next`
+- CurrentPhase: `Phase 09 complete; Phase 10 next`
 - TargetService: `dsh`
 - RequestType: `target_fit_review`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `audit completed for current docs/services/dsh uplift`
-- BlockingGaps: `Phase 14 flow compression is still not executed`
-- NextAllowed: `Use this audit as a guard before Phase 14 starts`
+- PackStatus: `phase 07-09 rerun audited, stale phase framing removed, and donor counts corrected`
+- BlockingGaps: `Phase 10 surface responsibility lock is still not executed in this pass`
+- NextAllowed: `Use this audit as a guard before Phase 10 starts`
 
 ## Executive Verdict
 
-`docs/services/dsh` was previously incomplete because it stopped at the old Phase 07 service-foundation layer.
-The deeper DSH truth already existed under `kdt/factory/dsh`, but it had not been lifted into the stable service dossier.
-This audit refresh closes that structural gap.
+`docs/services/dsh` was previously mixing a deeper donor appendix set with stale `Phase 13` framing and simplified donor counts.
+The deeper DSH truth already existed under `kdt/factory/dsh`, but the stable dossier was overstating its current lawful phase and flattening donor contradictions.
+This rerun realigns the stable dossier to the lawful Phase `07` through Phase `09` baseline while retaining downstream reference appendices for completeness.
 
 ## Confirmed Numeric Facts
 
-- donor in-scope operations: `92`
-- donor operation dossiers: `92`
-- donor unified wrapper operations outside the `92`: `5`
+- donor service-scope claim: `92`
+- donor catalog rows captured locally: `98`
+- donor operation dossier directories physically present: `96`
+- donor route-binding rows captured locally: `94`
+- donor unified wrapper operations outside the claimed `92`: `5`
 - current normalized actor rows: `7`
 - current normalized operation families: `13`
 - current normalized surface rows: `7`
 - current normalized operation/surface coverage rows: `17`
-- current DSH screen candidates reviewed: `43`
-- current canonical screens accepted: `20`
+- downstream reference screen candidates retained: `43`
+- downstream reference canonical screens retained: `20`
 
 ## Confirmed Donor Contradiction
 
@@ -60,19 +62,22 @@ It did not contain:
 - donor master reference guidance
 - donor implementation contradiction audit
 
+It also continued to state `Phase 13` as the current completed position even though this rerun was explicitly reopening only Phase `07` through Phase `09`.
+
 ## Target Repo Fit Summary
 
 - naming alignment: `PASS`
 - surface normalization alignment: `PASS`
-- donor `APP_USER` -> `app-client`: `PASS`
-- donor `MCPW` -> `control-panel`: `PASS`
+- customer surface normalization to `app-client`: `PASS`
+- internal ops surface normalization to `control-panel`: `PASS`
+- phase alignment after rerun: `PASS`
 - webapp and website exclusion from current DSH first-service truth: `PASS`
 - duplication risk after this refresh: `LOW`
-- remaining lawful next step: `Phase 14 - Flow Compression`
+- remaining lawful next step: `Phase 10 - Surface Responsibility Lock`
 
 ## Clean Adoption Verdict
 
 - donor DSH governance is rich enough to support current DSH truth extraction
 - donor route and screen sprawl must not be copied as-is
 - current target normalized packs are cleaner than the donor screen tree and should remain the primary adoption model
-- this refreshed directory is now suitable as the stable DSH service dossier for the current phase band
+- this refreshed directory is now suitable as the stable DSH service dossier for the current Phase `07` through Phase `09` band, while downstream appendices remain explicitly reference-only

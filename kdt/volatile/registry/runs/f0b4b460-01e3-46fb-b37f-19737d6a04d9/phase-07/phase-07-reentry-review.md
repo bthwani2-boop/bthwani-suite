@@ -10,7 +10,7 @@
 - LegacyRepo: `bthfinal`
 - PackStatus: `re-entry accepted`
 - BlockingGaps: `Actor/Context Lock and later post-bootstrap deepening remain outside the current baseline`
-- NextAllowed: `Phase 08 - Actor/Context Lock`
+- NextAllowed: `Phase 08 - Actor Context Exhaustive Extraction`
 
 ## Re-Entry Decision
 
@@ -35,7 +35,7 @@ Phase 07 is re-accepted as a valid active baseline for `dsh`.
 ## Current Interpretation
 
 - `dsh` remains the first governed service foundation
-- `dsh` Phase 07 still records only service truth and service boundaries
+- `dsh` Phase 07 now records only service truth, service boundaries, and bootstrap handoff notes
 - later post-bootstrap packs may exist in the repo, but they are not required to accept the Phase 07 baseline
 - later post-bootstrap packs are retained as non-destructive forward work and are not treated as contradictions to the Phase 07 foundation
 
@@ -44,7 +44,7 @@ Phase 07 is re-accepted as a valid active baseline for `dsh`.
 - use Phase 07 as the current baseline for resumed execution
 - do not delete later packs unless explicitly requested
 - do not treat later packs as mandatory to pass Phase 07
-- if execution resumes from this baseline, the next lawful step is `Actor/Context Lock`
+- if execution resumes from this baseline, the next lawful step is `Actor Context Exhaustive Extraction`
 
 ## Final Re-Entry Verdict
 

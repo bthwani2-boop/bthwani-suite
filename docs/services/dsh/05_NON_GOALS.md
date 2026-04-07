@@ -2,26 +2,27 @@
 
 ## Mandatory Header
 
-- WorkMode: `TARGET-FIT MODE`
-- CurrentPhase: `Phase 13 complete; Phase 14 next`
+- WorkMode: `BOOTSTRAP MODE`
+- CurrentPhase: `Phase 07 - First Service Foundation`
 - TargetService: `dsh`
-- RequestType: `source_to_target_pack`
+- RequestType: `bootstrap_artifact_work`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `non-goals refreshed from screen rationalization and current phase law`
-- BlockingGaps: `Current lawful next step is flow compression, not contract or runtime execution`
-- NextAllowed: `Use these non-goals to block donor drift while Phase 14 begins`
+- PackStatus: `Phase 07 active`
+- BlockingGaps: `Phase 08 exhaustive actor recovery and all later screen, contract, binding, and runtime phases remain downstream`
+- NextAllowed: `Use these non-goals to hold the Phase 07 boundary while Phase 08 begins`
 
 ## Current DSH Non-Goals
 
-- not a blind copy of the donor `92`-operation structure into current target implementation
-- not a donor route-by-route mirror of customer, partner, captain, or ops screens
-- not a screen implementation pack
+- not a blind copy of the donor operation catalog or donor route tree into current target truth
+- not exhaustive donor recovery; that begins in Phase 08
+- not a screen inventory or preview-registry pack
+- not a screen-spec pack
 - not a contract implementation pack
 - not a binding pack
 - not a runtime proof or production-like verification pack
 - not a wallet, ledger, settlement, payout, or general finance ownership pack
-- not a website-first or webapp-first DSH strategy in the current first-service model
+- not a `webapp`-first or `website`-first DSH strategy in the current first-service model
 
 ## Screen Clusters Explicitly Kept Out Of Current DSH Truth
 
@@ -41,6 +42,6 @@
 
 ## Explicit Scope Guard
 
-This dossier is allowed to document donor contracts, donor masters, and donor implementation evidence.
-It does not authorize target-repo implementation under `services/`, `apps/`, or future binding/runtime layers beyond the current lawful phase.
-Current lawful next work remains Phase 14 flow compression over the accepted canonical screen set.
+This foundation is allowed to define service role, actor participation, operation families, surface participation, primary flow shape, and explicit exclusions.
+It does not authorize target-repo implementation under `services/`, `apps/`, or future binding and runtime layers beyond the current lawful phase.
+Current lawful next work resumes at Phase 08 actor context exhaustive extraction.

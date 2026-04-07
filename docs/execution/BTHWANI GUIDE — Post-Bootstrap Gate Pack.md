@@ -4,11 +4,12 @@
 
 This file defines the pass or fail thresholds for Phases `08` through `24`.
 
-It exists because bootstrap gates are intentionally limited to Phases `00` through `07`.
-Post-bootstrap work needs its own gate discipline for:
+Post-bootstrap work needs gate discipline for:
 
-- surface activation
-- screen grouping
+- donor-exhaustive recovery
+- master-registry completeness
+- wave and grouping legality
+- screen-spec completeness
 - UI Kit readiness
 - preview and Expo Go boundaries
 - contract readiness
@@ -29,168 +30,179 @@ For any phase from `08` through `24`:
 ## 3. Gate Quality Rule
 
 No gate passes on file existence alone.
+
 Every gate review must confirm:
 
 - artifact existence
 - non-placeholder content
+- exact required schema fields
 - usable execution depth
 - coherence with adjacent artifacts
-- lawful phase boundaries
-- explicit blockers where partial readiness is allowed
+- donor-coverage proof where required
+- completeness counts, duplicate checks, orphan checks, unmapped checks, contradiction checks, and handoff-integrity checks
 
-## 4. Service-Truth Gates
+## 4. Recovery And Registry Gates
 
-### GATE_PHASE_08_10_SERVICE_TRUTH
+### GATE_PHASE_08_ACTOR_CONTEXT_EXHAUSTIVE_EXTRACTION
 
 #### Required artifacts
 
-- actor/context pack for the current service
-- operations pack for the current service
-- surface-responsibility pack for the current service
+- `DONOR_EXHAUSTIVE_CENSUS`
+- `ACTOR_CONTEXT_MASTER`
+- entitlement and visibility rules
+- evidence index
 
 #### Pass conditions
 
 - participating actors are explicit
 - excluded actors are explicit
-- every critical operation has one owner
-- every approved surface is classified explicitly
-- `app-field` is explicitly `REQUIRED`, `OPTIONAL`, or `OUT`
-- the current surface activation order is explicit
+- every approved surface has explicit actor legality
+- actor/context rows trace back to donor or target evidence
+- unresolved actor contradictions are marked `BLOCKED` rather than hidden
 
 #### Fail conditions
 
 - actor visibility is inferred from donor habit only
-- operations overlap or duplicate under multiple names
+- any approved surface lacks actor coverage
+- donor actor references remain unmapped or unnamed
+
+### GATE_PHASE_09_OPERATION_MASTER_EXTRACTION
+
+#### Required artifacts
+
+- updated `DONOR_EXHAUSTIVE_CENSUS`
+- `MASTER_OPERATION_REGISTRY`
+- operation duplicate and alias report
+- evidence index
+
+#### Pass conditions
+
+- every donor operation row is mapped, rejected, or explicitly deferred
+- every canonical operation has one owner
+- every canonical operation has one classification and one naming decision
+- duplicate canonical names are eliminated
+- entry triggers and state effects are explicit enough for surface mapping
+
+#### Fail conditions
+
+- donor operations remain unmapped silently
+- duplicate or overlapping canonical operations remain
+- operations lack owners, classifications, or source traces
+
+### GATE_PHASE_10_SURFACE_COVERAGE_AND_WAVE_MATRIX
+
+#### Required artifacts
+
+- `SURFACE_COVERAGE_MATRIX`
+- `SCREEN_WAVE_MATRIX`
+- `OPERATION_TO_SURFACE_CHAIN`
+- surface wave decisions
+
+#### Pass conditions
+
+- every approved surface is classified explicitly
+- every canonical operation has a lawful surface chain
+- `app-field` is explicitly `REQUIRED`, `OPTIONAL`, or `OUT`
+- wave order is explicit
+- shell-readiness expectations are explicit for any surface that may need preview
+
+#### Fail conditions
+
+- surfaces remain implicit
+- wave order is still implied rather than written
 - `control-panel` is being used as a catch-all for unresolved ownership
-- surface activation waves are still implicit
 
-### GATE_FIRST_SURFACE_AND_SHELL_READINESS
-
-#### Required artifacts
-
-- surface activation plan
-- journey lock for the active branch
-- target thin app shell or explicit no-preview note for the active surface
-
-#### Pass conditions
-
-- the first surface is the one that starts the primary job
-- shell readiness is explicit for the active web or mobile surface when preview navigation is required
-- web or mobile shell entrypoints remain thin and root-owned
-- its screen-group entry order is explicit
-- no downstream surface is being opened because it is easier to mock
-
-#### Fail conditions
-
-- the first opened surface is a reporting or control surface with no primary-job justification
-- the first surface still lacks clear entry conditions
-- shell code is carrying service truth or runtime assumptions before preview is lawful
-
-## 5. Screen-Layer Gates
-
-### GATE_PHASE_11_14_SCREEN_ENTRY
+### GATE_PHASE_11_JOURNEY_CHAIN_MASTER
 
 #### Required artifacts
 
-- journey pack
-- UI Kit foundation compatibility review
-- screen group plan
-- screen catalog
-- screen purpose lock when Phase `13` is in scope
-- flow compression artifacts when Phase `14` is in scope
+- `JOURNEY_MASTER`
+- route entrypoint and transition matrix
+- journey risks and blockers
 
 #### Pass conditions
 
-- happy path, failure path, and recovery path are documented
-- UI Kit Foundation Compatibility Review is `PASS` or bounded `PARTIAL`
-- current-wave candidate coverage is complete enough for the active scope
-- screen groups are explicit
-- every candidate is classified
-- route minimization decisions are explicit once compression begins
+- happy path is explicit
+- failure path is explicit
+- recovery path is explicit
+- support or staff intervention is explicit when relevant
+- every canonical operation belongs to at least one journey or explicit no-journey note
 
 #### Fail conditions
 
-- preview begins before Journey Lock
-- candidate screens exist without grouping or rationalization
-- UI Kit readiness is assumed rather than reviewed
-- preview registry contains bound logic or runtime truth
+- a primary journey branch is still inferred rather than written
+- failure or recovery is missing on a critical path
+- operations are orphaned outside the journey set
 
-### GATE_FIRST_SCREEN_GROUP_READINESS
+### GATE_PHASE_12_SCREEN_MASTER_CENSUS_AND_NORMALIZATION
 
 #### Required artifacts
 
-- current surface wave declaration
-- screen group plan
-- candidate catalog for the current group
-- preview registry notes
-- active preview entrypoint note when preview is needed
+- updated `DONOR_EXHAUSTIVE_CENSUS`
+- `MASTER_SCREEN_REGISTRY`
+- unit classification and normalization report
+- duplicate or orphan screen report
 
 #### Pass conditions
 
-- the first group is `entry-discovery` or the first lawful `core-task` group when no discovery exists
-- fixtures-only preview scope is explicit
-- preview routes are separated from real bound routes
-- the active web or mobile preview entrypoint is explicit
-- current group blockers are explicit
+- donor UI recovery is exhaustive for the active service scope
+- every retained screen has a canonical name and a unit type
+- every donor screen or unit is mapped, converted, moved to legacy, or rejected explicitly
+- no unnamed retained screen remains
+- no orphan screen remains without an operation or journey relation
 
 #### Fail conditions
 
-- `secondary-optional` opens before the primary path is defined
-- browser or Expo preview is being used as proof instead of preview
+- screen census is selective or reactive only
+- donor screen or unit counts are missing or contradictory with no blocker note
+- retained screens still lack canonical naming or unit typing
 
-### GATE_NEXT_SURFACE_UNLOCK
+### GATE_PHASE_13_SCREEN_SPEC_AND_PURPOSE_SYSTEM
 
 #### Required artifacts
 
-- current-surface purpose lock
-- state coverage minimum for the current surface
-- UI Kit blocker log or explicit no-blocker result
+- `SCREEN_SPEC_PACKS`
+- `SCREEN_SPEC_INDEX`
+- `OPERATION_TO_SCREEN_CHAIN`
+- spec gaps and blockers report
 
 #### Pass conditions
 
-- the current surface has clear primary flow and purpose
-- minimum state coverage is defined
-- unresolved ambiguity is not being pushed downstream
+- every retained screen has one spec file
+- every retained screen has one primary purpose and one primary CTA or explicit no-primary-CTA reason
+- required states, data blocks, interaction rules, validation rules, and acceptance rules are explicit
+- every retained screen maps back to the operation and journey chain cleanly
 
 #### Fail conditions
 
-- teams are opening the next surface to avoid unresolved work on the current one
+- retained screens exist without specs
+- screens still carry two competing primary jobs
+- state requirements remain vague or absent
 
-### GATE_CONTROL_PANEL_WAVE_UNLOCK
+### GATE_PHASE_14_GROUPING_AND_BUILD_ORDER
 
 #### Required artifacts
 
-- current wave packs for initiating and execution surfaces
-- ops-facing journey notes or staff flow
-- control-panel scope note
+- `SCREEN_GROUPING_PLAN`
+- `BUILD_ORDER_PLAN`
+- dependency lane map
+- conversion and compression decisions
+- manual execution order
 
 #### Pass conditions
 
-- `control-panel` opens for oversight, intervention, or governance only
-- control-panel screens are not standing in for missing upstream task screens
+- every retained screen belongs to exactly one group and one build step
+- dependency lanes are explicit
+- preview, implementation, validation, and seal order are explicit
+- conversion and compression decisions are written after registry and spec completion
 
 #### Fail conditions
 
-- control-panel is opened first because it is easier to demo
-- control-panel mirrors service execution instead of governing it
+- build order is implied instead of written
+- retained screens are missing from grouping or build order
+- dependency cycles remain unresolved
 
-### GATE_OPTIONAL_SURFACE_UNLOCK
-
-#### Required artifacts
-
-- surface classification showing `OPTIONAL`
-- upstream wave packs showing primary path stability
-- explicit reason to open the optional surface now
-
-#### Pass conditions
-
-- the optional surface adds real value without replacing unresolved core lifecycle work
-
-#### Fail conditions
-
-- optional surfaces are opened while core waves remain ambiguous
-
-## 6. UI Kit Gates
+## 5. UI Kit Gates
 
 ### GATE_UI_KIT_FOUNDATION_READINESS
 
@@ -201,7 +213,7 @@ Every gate review must confirm:
 
 #### Pass conditions
 
-- tokens, spacing, typography, direction, primitives, and state shells are covered enough for the next screen group
+- tokens, spacing, typography, direction, primitives, and state shells are covered enough for the next retained screen group
 - no service-specific leakage exists in `packages/ui-kit/`
 
 #### Fail conditions
@@ -214,7 +226,8 @@ Every gate review must confirm:
 #### Required artifacts
 
 - UI Kit Expansion Review
-- current screen-group notes
+- current screen-spec evidence
+- current build-order evidence
 
 #### Pass conditions
 
@@ -226,6 +239,90 @@ Every gate review must confirm:
 
 - speculative shared patterns are added
 - temporary hacks were promoted into shared law
+
+## 6. Screen Expansion And Contract-Demand Gates
+
+### GATE_PHASE_15_UI_KIT_EXPANSION
+
+#### Required artifacts
+
+- `UI_KIT_EXPANSION_REVIEW`
+- `SHARED_PATTERN_DEMAND_MATRIX`
+- `NEW_SHARED_PATTERNS`
+- duplicate family check
+
+#### Pass conditions
+
+- every shared addition traces back to retained screens and explicit build-order demand
+- duplicate family count is `0`
+- service-specific widgets did not enter `packages/ui-kit/`
+- unresolved expansion blockers are explicit rather than hidden in prose
+
+#### Fail conditions
+
+- speculative shared patterns are added with no retained-screen trace
+- a local workaround is promoted into shared law without multi-screen proof
+- shared additions outrun grouping or build-order truth
+
+### GATE_PHASE_16_STATE_LOCK
+
+#### Required artifacts
+
+- `STATE_COVERAGE_MATRIX`
+- `SCREEN_STATE_ANATOMY`
+- state handling notes
+
+#### Pass conditions
+
+- every in-scope retained screen has explicit required-state coverage
+- critical state behavior is explicit for loading, empty, error, authorization, stale, and success conditions when relevant
+- retry, fallback, and no-fallback rules are explicit where they matter
+
+#### Fail conditions
+
+- state names exist without behavior rules
+- critical states are skipped because they are inconvenient
+- retained screens are missing state anatomy rows
+
+### GATE_PHASE_17_SCREEN_API_MATRIX
+
+#### Required artifacts
+
+- `SCREEN_API_MATRIX`
+- aggregation and overfetch notes
+- limited-api preview boundary note when any bounded preview is justified
+
+#### Pass conditions
+
+- every in-scope retained screen has explicit read, write, summary, or aggregation demand rows
+- every demand row maps back to retained screens and lawful operation chains
+- any limited-api preview remains explicitly bounded and non-proof-bearing
+
+#### Fail conditions
+
+- screen demand stays vague or generic
+- limited-api preview is implied rather than bounded in writing
+- demand rows exist without retained-screen linkage
+
+### GATE_PHASE_18_GAP_MAP
+
+#### Required artifacts
+
+- `GAP_MAP`
+- contract pressure notes
+- contract readiness decision
+
+#### Pass conditions
+
+- every gap is tied to a concrete screen, flow, or state pressure
+- severity and required change are explicit
+- contract blockers are explicit enough to judge Phase `19` readiness
+
+#### Fail conditions
+
+- the gap set contains vague complaints instead of actionable rows
+- contract edits are implied before the gap set is complete
+- unresolved unnamed gaps remain
 
 ## 7. Contract And Binding Gates
 

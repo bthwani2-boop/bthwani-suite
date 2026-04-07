@@ -8,9 +8,9 @@
 - RequestType: `bootstrap_artifact_work`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `Phase 04 active`
-- BlockingGaps: `Phase 05-07 artifacts for the selected service are not created yet`
-- NextAllowed: `Use this decision to drive Phase 05-07 only`
+- PackStatus: `Phase 04 locked`
+- BlockingGaps: `Phase 08 and all later service-deepening phases remain unopened until the accepted Phase 07 baseline is used`
+- NextAllowed: `Use this decision as the authority for dsh-first handoff into Phase 08 only`
 
 ## Final First-Service Selection
 

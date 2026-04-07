@@ -6,7 +6,7 @@
 - donor traceability confirms some DSH operations map to verified backend/controller or surface paths while many others remain planned-only in donor evidence
 - donor UX flow confirms the customer path from discovery to checkout to order confirmation and the captain execution path with minimal click targets
 - donor UX flow confirms a simple visible order lifecycle of `pending`, `accepted`, `in_delivery`, `completed`, and `cancelled`
-- donor MCPW section map confirms internal DSH work clusters under operational MCPW routes, normalized to `control-panel`
+- donor internal ops section map confirms internal DSH work clusters under operational oversight routes, normalized to `control-panel`
 
 ## Controlled Interpretation
 

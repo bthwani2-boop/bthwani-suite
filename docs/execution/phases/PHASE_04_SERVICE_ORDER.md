@@ -64,7 +64,7 @@ This phase prevents the repo from fragmenting into multiple partial service trac
 
 - evidence used
 - rejected alternatives
-- any remaining `[TBD]` risks
+- any remaining `BLOCKED`, `GAP`, or `UNPROVEN` risks
 
 ## 11. Cross-File Updates
 

@@ -35,4 +35,4 @@
 
 - donor click-count language is treated as directional UX evidence, not as a hard screen contract at this phase
 - donor endpoint-level route structure is not imported into the clean target journey model
-- donor blanket MCPW visibility is not treated as a primary journey path for normal customer orders
+- donor blanket CONTROL_PANEL visibility is not treated as a primary journey path for normal customer orders

@@ -2,31 +2,29 @@
 
 ## 1. Purpose
 
-This runbook converts the governing law into literal execution grammar for Phases `08` through `18`.
+This runbook converts governing law into literal execution grammar for Phases `08` through `18`.
 
-It answers these questions generically for any service:
+It answers these questions for any service:
 
-- what opens first after bootstrap
-- how surfaces are sequenced
-- how screen groups are sequenced
-- when `packages/surfaces/` begins
-- when shell preparation, web preview, and mobile preview begin
-- how UI Kit is tested before screen ingestion
-- how shell builds stay distinct from runtime proof
-- how a team moves from one surface or wave to the next
+- what must be recovered exhaustively from the donor before screen work begins
+- which master registries are mandatory before UI work grows
+- how surfaces, waves, groups, bundles, and lanes are sequenced
+- when `packages/surfaces/` may host registry-only preview work
+- when UI Kit may grow from retained screen proof
+- how proof is measured without fake completeness
 
 ## 2. Scope And Authority
 
 This runbook governs:
 
-- Phase `08` Actor/Context Lock
-- Phase `09` Operation Lock
-- Phase `10` Surface Responsibility Lock
-- Phase `11` Journey Lock
-- Phase `12` Screen Inventory And Rationalization
-- Phase `13` Screen Purpose Lock
-- Phase `14` Flow Compression
-- Phase `15` UI Kit Expansion From Real Screens
+- Phase `08` Actor Context Exhaustive Extraction
+- Phase `09` Operation Master Extraction
+- Phase `10` Surface Coverage And Wave Matrix
+- Phase `11` Journey Chain Master
+- Phase `12` Screen Master Census And Normalization
+- Phase `13` Screen Spec And Purpose System
+- Phase `14` Grouping And Build Order
+- Phase `15` UI Kit Expansion From Screen Proof
 - Phase `16` State Lock
 - Phase `17` Screen/API Matrix
 - Phase `18` Gap Map
@@ -43,58 +41,79 @@ When this runbook and a phase manual overlap:
 - this runbook owns the cross-phase execution grammar
 - the phase manual owns the literal order inside the current phase
 
-## 3. Preconditions Before Screen Work Exists
+## 3. Non-Negotiable Rules
 
-Do not start candidate-screen work until all of the following are true:
+For Phases `08` through `14`:
+
+- donor recovery is exhaustive for the active service
+- the current execution package is untrusted until donor coverage, registry completeness, and handoff integrity are proven
+- no phase passes on file existence alone
+- no screen may be retained without a traceable operation or journey reason
+- no operation may survive without an owner, a classification, and a surface chain
+- no preview claim may stand in for completion proof
+
+Use only these unresolved-status labels in this band:
+
+- `BLOCKED`
+- `GAP`
+- `UNPROVEN`
+
+Do not use `[TBD]` anywhere in this band.
+
+Mark any claim that is not digitally or documentarily proven as `BLOCKED`, `GAP`, or `UNPROVEN`.
+
+## 4. Mandatory Master Artifacts
+
+Before Phase `15` begins, the active service must produce and maintain all of the following:
+
+- `DONOR_EXHAUSTIVE_CENSUS`
+- `MASTER_OPERATION_REGISTRY`
+- `SURFACE_COVERAGE_MATRIX`
+- `SCREEN_WAVE_MATRIX`
+- `JOURNEY_MASTER`
+- `MASTER_SCREEN_REGISTRY`
+- `SCREEN_SPEC_PACKS`
+- `OPERATION_TO_SCREEN_CHAIN`
+- `SCREEN_GROUPING_PLAN`
+- `BUILD_ORDER_PLAN`
+
+If any artifact is missing, stale, or structurally incomplete, the band remains incomplete.
+
+## 5. Exact Entry Rule Before Screen Work Exists
+
+Do not start screen census rows, preview route stubs, preview registries, or screen component work until all of the following are true:
 
 - the first service is formally selected
-- actor participation is explicit enough to support operation design
-- operation ownership is explicit
-- surface classification is explicit for the current operation wave
-- the relevant journey branch is locked
-- the current surface wave is declared
-- the UI Kit foundation can be reviewed for compatibility
+- actor/context recovery is complete enough to produce `ACTOR_CONTEXT_MASTER`
+- operation recovery is complete enough to produce `MASTER_OPERATION_REGISTRY`
+- surface classification is complete enough to produce `SURFACE_COVERAGE_MATRIX` and `SCREEN_WAVE_MATRIX`
+- the journey chain is complete enough to produce `JOURNEY_MASTER`
+- the donor source root is available for the active service
 
-No candidate screens, preview routes, preview registries, or Expo Go routes may begin before Journey Lock.
+No screen-registry rows, preview route stubs, preview registries, or Expo Go routes may begin before Journey Chain Master.
 
-## 4. Generic Service Wave Model
+## 6. Service Wave Model
 
-Use this wave model across services unless a governed exception is recorded.
+Use this wave model unless an explicit exception is recorded:
 
-- `Wave 0` = service truth, actors, operations, surfaces, and journeys
+- `Wave 0` = service truth recovery only
 - `Wave 1` = the surface that starts the primary job
-- `Wave 2` = the surface that receives the direct next lifecycle handoff
+- `Wave 2` = the surface that receives the immediate lifecycle handoff
 - `Wave 3` = the surface that continues execution or fulfillment
-- `Wave 4` = `control-panel` oversight, intervention, and governance views
-- `Wave 5` = tracking, reflection, and status surfaces
+- `Wave 4` = `control-panel` oversight, intervention, and governance
+- `Wave 5` = tracking and status reflection surfaces
 - `Wave 6` = issue, support, and recovery surfaces
-- `Wave 7` = optional, secondary, or administrative surfaces
+- `Wave 7` = optional or administrative surfaces
 
 Rules:
 
 - do not open all waves together
-- do not start a downstream wave while the upstream wave still lacks purpose clarity
-- treat `Wave 0` as prerequisite truth, not as a visual wave
+- do not start a downstream wave while an upstream wave still has unresolved blockers on the primary path
+- `Wave 0` is truth recovery only; it is not a visual preview wave
 
-## 5. Surface Activation Order
+## 7. Screen Group Model
 
-The default activation order is:
-
-1. the surface that starts the primary job
-2. the surface that receives the immediate next lifecycle handoff
-3. the surface that continues execution or fulfillment
-4. `control-panel` for monitoring, intervention, and governance
-5. optional surfaces such as `app-field`, `webapp`, or `website` only after the core lifecycle surfaces are no longer blocked by undefined purpose
-
-Rules:
-
-- do not start with `control-panel` merely because it is easier to mock
-- do not open optional surfaces while the core lifecycle surfaces still lack minimum clarity
-- do not hide unresolved lifecycle ownership by opening every surface at once
-
-## 6. Generic Screen Group Model
-
-Use the same generic screen-group system across services unless a governed exception is recorded.
+Use these canonical screen groups unless a governed exception is recorded:
 
 - `entry-discovery`
 - `core-task`
@@ -104,73 +123,74 @@ Use the same generic screen-group system across services unless a governed excep
 - `staff-control`
 - `secondary-optional`
 
-These mean:
+Rules:
 
-- `entry-discovery` = entry, chooser, search, discovery, and first-intent screens
-- `core-task` = create, edit, form, detail, action, review, and confirm screens tied to the primary job
-- `queue-inbox` = boards, queues, inboxes, and worklists
-- `tracking-status` = progress, timeline, reflection, and terminal-state screens
-- `issue-recovery` = retry, recovery, support, and exception paths
-- `staff-control` = monitoring, intervention, assignment, and internal control screens
-- `secondary-optional` = settings, low-priority secondary paths, and optional supporting surfaces
+- every active surface must explicitly record which groups exist and which are absent
+- do not begin `secondary-optional` before `entry-discovery` or `core-task` is stable
+- do not let donor route names define the group model
+
+## 8. Dependency Lane Model
+
+Each retained screen group must belong to one dependency lane:
+
+- `entry-lane`
+- `transaction-lane`
+- `execution-lane`
+- `oversight-lane`
+- `recovery-lane`
+- `optional-lane`
 
 Rules:
 
-- not every service must use every group
-- if a group is absent, record it explicitly
-- do not begin with `secondary-optional` while `entry-discovery` or `core-task` is undefined
+- a screen may appear in one lane only
+- the lane must match the owning operation and journey role
+- dependency cycles must be broken before build order is approved
 
-## 7. Screen Implementation Ladder Inside A Surface
+## 9. App-Shell And Preview Rule
 
-Build screen groups in this general order:
-
-1. entry or discovery screens
-2. list, queue, or inbox screens
-3. detail, form, or action workspace screens
-4. review or confirm screens
-5. lightweight completion or terminal-reflection screens
-6. tracking or status screens
-7. issue or recovery screens
-8. internal or staff support screens
-
-If the service has no true discovery step, start with the first `core-task` screens.
-
-## 8. App-Shell Creation Rule
-
-An app shell is lawfully prepared and used only when:
+An app shell may be prepared only when:
 
 - bootstrap is complete
-- the relevant surface is `REQUIRED` or `OPTIONAL`
+- the surface is classified as `REQUIRED` or `OPTIONAL`
 - Phase `10` has classified the surface explicitly
 
-This rule applies equally to web and mobile surfaces.
-
-Allowed app-shell contents during Phases `08` through `18`:
+Allowed shell contents during Phases `08` through `18`:
 
 - app root
 - navigation container
 - theme and direction wiring
-- preview route placeholders
+- preview route stubs explicitly marked as preview-only and unbound
 - fixtures-only preview consumption
 
-Allowed shell-readiness work during Phases `08` through `18`:
+Forbidden shell contents during Phases `08` through `18`:
 
-- repo-root owned serve or build target wiring for the surface shell
-- shell navigation or route containers with no service truth
-- web or mobile bootstrapping needed to host later lawful preview entrypoints
-- smoke-build integrity checks that do not claim preview or runtime proof
-
-Forbidden app-shell contents during Phases `08` through `18`:
-
-- canonical bound business logic
+- bound business logic on canonical paths
 - generated client use on canonical paths
 - runtime truth access
 - production-like claims
-- app-root owned toolchain or packaging authority
 
-## 9. UI Kit Foundation Compatibility Gate
+Browseability does not upgrade proof level.
 
-Before the first screen enters `packages/surfaces/`, run a UI Kit Foundation Compatibility Review.
+## 10. packages/surfaces Entry Rule
+
+Do not ingest current-service screen material into `packages/surfaces/` until all of the following are true:
+
+- Journey Chain Master is complete for the active branch
+- the active surface wave is explicit in `SCREEN_WAVE_MATRIX`
+- the donor screen census is complete enough to populate `MASTER_SCREEN_REGISTRY`
+- UI Kit Foundation Compatibility Review is `PASS` or bounded `PARTIAL`
+- the thin app shell exists when preview navigation is needed
+
+The first lawful ingress is always:
+
+- registry-first
+- fixtures-first
+- preview-only
+- unbound
+
+## 11. UI Kit Rules
+
+Before the first retained screen enters `packages/surfaces/`, run a UI Kit Foundation Compatibility Review.
 
 Check at least:
 
@@ -185,220 +205,86 @@ Check at least:
 - absence of service-specific widgets
 - absence of business logic in UI Kit
 
-Decision meanings:
+After Phase `14`, UI Kit may grow only from retained screen proof and approved build order.
 
-- `PASS` = screen ingestion may begin
-- `PARTIAL` = screen ingestion may begin only with explicit limits and blockers recorded
-- `FAIL` = screen ingestion may not begin
+## 12. Transition Rules
 
-## 10. UI Kit Expansion Review Rule
+### Group To Group
 
-After each meaningful screen-group expansion, rerun UI Kit review.
+Do not move to the next screen group until the current group has:
 
-The review must confirm:
+- complete donor coverage for the current wave
+- complete retained-screen specs for the current group
+- required states identified
+- blockers recorded explicitly
 
-- shared patterns were added because real screens proved demand
-- no duplicate primitive family was introduced
-- no service-specific leakage entered `packages/ui-kit/`
-- no temporary preview workaround was promoted into shared law
-- direction handling remained correct after expansion
+### Surface To Surface
 
-## 11. packages/surfaces Entry Rule
+Do not move to the next surface until the current surface has:
 
-Do not begin real screen ingestion into `packages/surfaces/` until all of the following are true:
+- explicit journey coverage
+- complete retained-screen census for the active scope
+- no unresolved primary-path blocker being pushed downstream
 
-- the current service is formally selected
-- the target surface is `REQUIRED` or `OPTIONAL`
-- Journey Lock is complete for the branch being opened
-- current candidate screens are identified for the active surface wave
-- UI Kit Foundation Compatibility Review is `PASS` or bounded `PARTIAL`
-- the thin app shell exists if preview navigation is required on that surface
+### Wave To Wave
 
-The first lawful ingress is always:
+Do not unlock the next wave until the current wave has:
 
-- candidate screens first
-- preview routes first
-- fixtures-only first
-- no bound logic
-- no runtime truth
+- explicit grouping and build order
+- no unresolved blocker on the primary path
+- no control or tracking screen standing in for undefined upstream task screens
+- gate approval in the post-bootstrap gate pack
 
-Browseability follows shell readiness, but browseability does not by itself prove screen law, binding, or runtime truth.
-
-## 12. Screen Group Directory Pattern
-
-Inside `packages/surfaces/`, group work by service, then by surface, then by screen group.
-
-Canonical pattern:
-
-```text
-packages/surfaces/src/<service>/<surface>/
-  entry-discovery/
-  core-task/
-  queue-inbox/
-  tracking-status/
-  issue-recovery/
-  staff-control/
-  secondary-optional/
-```
-
-Concrete screens should then live below the group root with local fixture support when needed.
-
-Rules:
-
-- do not mirror donor route trees blindly
-- do not flatten all screens under one surface root once the screen count grows beyond trivial preview scope
-- do not let random route names define the first organizational layer
-
-## 13. Preview Registry And Fixture Rule
-
-For preview-stage work in Phases `12` through `18`:
-
-- register candidate screens before building broad component trees
-- create preview routes before adding binding
-- keep the default truth source as fixtures only
-
-Fixtures are allowed to support:
-
-- layout review
-- CTA review
-- state presentation
-- navigation review
-- screen-family rationalization
-
-Fixtures are not allowed to act as:
-
-- canonical business truth
-- runtime truth
-- proof of end-to-end correctness
-
-## 14. Web And Mobile Preview Activation Rule
-
-Do not start preview browsing just because a shell exists.
-
-Web preview becomes lawful only when:
-
-- the service is selected
-- the surface is classified as `REQUIRED` or `OPTIONAL`
-- Journey Lock is complete for the active branch
-- candidate screens are identified for the current wave
-- UI Kit Foundation Compatibility Review is `PASS` or bounded `PARTIAL`
-- the thin web shell exists
-
-Mobile preview becomes lawful only when:
-
-- the service is selected
-- the surface is classified as `REQUIRED` or `OPTIONAL`
-- Journey Lock is complete for the active branch
-- candidate screens are identified for the current wave
-- UI Kit Foundation Compatibility Review is `PASS` or bounded `PARTIAL`
-- the thin mobile shell exists
-
-If the current mobile surface is still browser-served, it follows the same preview class as web.
-If Expo Go is introduced for a mobile surface later, it remains preview-only under the same phase gate.
-
-Open first on either surface type:
-
-- preview routes
-- fixtures-only candidate screens
-- state-preview paths
-
-Do not open as preview proof:
-
-- bound operation paths
-- runtime-truth paths
-- production-like claims
-- packaging or store-readiness claims
-
-Shell build or browseability does not by itself raise the proof level.
-
-If `EAS Build` is introduced later, treat it as mobile packaging or distribution only:
-
-- it is not a prerequisite for Phase `12` preview
-- it is not binding proof, runtime truth, or production-like verification
-- it must remain workspace-owned through repo-root commands, Nx targets, or governed scripts
-
-## 15. Transition Rule: Screen Group To Screen Group
-
-Do not move to the next screen group until all of the following are true for the current group:
-
-- candidate list is complete enough for the current surface wave
-- the current group has rationalization decisions
-- purpose and CTA ambiguity are reduced enough to continue
-- required state shells are at least known
-- any UI Kit blocker discovered by the current group is recorded
-
-If these are not true, remain on the current group rather than opening the next group prematurely.
-
-## 16. Transition Rule: Surface To Surface
-
-Do not move to the next surface in the current operation wave until all of the following are true for the current surface:
-
-- primary flow is clear
-- candidate screens are identified
-- minimum state coverage is defined
-- shared UI Kit gaps are documented
-- screen purpose is not blocked by unresolved ambiguity
-
-If these are not true, stay on the current surface.
-
-## 17. Transition Rule: Wave To Wave
-
-Do not unlock the next wave until:
-
-- the current wave has explicit screen-group order
-- the current wave has no unresolved blocker on the primary path
-- required control or tracking screens are not standing in for undefined upstream task screens
-- the post-bootstrap gate pack says the next wave is lawful
-
-## 18. Transition Rule: Preview To Limited-API Preview
+### Preview To Limited-API Preview
 
 Limited-API preview is optional and never the default.
 
 It is allowed only when:
 
-- fixtures cannot adequately test a screen-level aggregation or interaction risk
-- the Screen/API Matrix has begun to expose a concrete contract pressure
-- the preview scope is explicitly bounded
+- fixtures cannot adequately test a concrete aggregation or interaction risk
+- the Screen/API Matrix exposes a concrete contract pressure
+- the preview scope is bounded explicitly
 - no one is claiming binding or runtime proof from the preview
 
-If those conditions do not exist, remain fixtures-only.
+## 13. Phase Emphasis
 
-## 19. Transition Rule: Limited-API Preview To Binding Handoff
+Use these emphases while executing the band:
 
-Do not treat limited-api preview as permission to bind.
+- Phase `08`: recover actors, contexts, entitlements, visibility scopes, and exclusions exhaustively
+- Phase `09`: recover and normalize the full operation universe into `MASTER_OPERATION_REGISTRY`
+- Phase `10`: map all canonical operations to surfaces and waves; do not guess the wave order later
+- Phase `11`: write the full journey chain before opening screen census work
+- Phase `12`: complete the master screen census and normalize every unit before spec work begins
+- Phase `13`: write one executable screen spec per retained screen and complete `OPERATION_TO_SCREEN_CHAIN`
+- Phase `14`: produce the exact grouping, bundle, build, validation, and seal order before UI Kit expansion
+- Phase `15`: grow UI Kit only from retained screen evidence
+- Phase `16`: complete state coverage from real screen specs and build order
+- Phase `17`: let retained screens define API demand
+- Phase `18`: convert API demand into explicit contract gaps
 
-Binding handoff becomes lawful only after:
+## 14. Proof Standard
 
-- Gap Map exists
-- contract demand is explicit
-- contract work is ready to begin in Phase `19`
-- the post-bootstrap gate pack marks contract readiness as passed
+Every phase in this band must record and verify:
 
-## 20. Phase-Specific Execution Emphasis
+- completeness counts
+- duplicate checks
+- orphan checks
+- unmapped checks
+- contradiction checks
+- donor-coverage checks
+- handoff-integrity checks
 
-Use these emphases while executing the current band:
+If a phase cannot prove those checks, it does not pass.
 
-- Phase `08`: actor visibility and exclusions must become explicit
-- Phase `09`: operations must stabilize before screen growth
-- Phase `10`: surface classification and wave order must stabilize before Journey Lock
-- Phase `11`: journey branches must stabilize before preview work
-- Phase `12`: candidate-screen inventory, grouping, and UI Kit compatibility gate open the lawful preview layer
-- Phase `13`: purpose, CTA, entry, exit, and required states turn retained candidates into governed screens
-- Phase `14`: route compression removes donor sprawl before expansion
-- Phase `15`: UI Kit grows only from retained screen evidence
-- Phase `16`: state coverage becomes complete enough for contract pressure analysis
-- Phase `17`: screens define API demand
-- Phase `18`: gaps become explicit contract work inputs
-
-## 21. Required Outputs Across Phases 08 Through 18
+## 15. Required Outputs Across Phases 08 Through 18
 
 At minimum, the execution stack across this band must produce:
 
 - updated service packs under `kdt/factory/<service>/`
-- exports when the phase uses CSV or machine-readable structure
+- exports for every master registry or matrix
 - updated phase indexes
 - explicit target-fit notes
-- evidence references for any gate claim
+- evidence references for every gate claim
 
-Existing early DSH packs may use thinner file sets.
-When revisiting them, extend in place rather than renaming blindly unless a deliberate migration is being executed.
+Existing early packs built on the weaker model are migration inputs only.
+Do not treat them as current completion proof until they are rebuilt or re-accepted under the new rules.

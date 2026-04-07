@@ -254,7 +254,9 @@ These gates do not validate file existence only.
 - multiple service foundations are active
 - service foundation is placeholder-only
 - `app-field` is missing
-- preview work has already started before Journey Lock
+- preview work has already started before Journey Chain Master
+
+Preview work here includes screen-census rows, preview route stubs, preview registries, and Expo Go route exposure.
 
 ## 5. Bootstrap Exit Handoff
 

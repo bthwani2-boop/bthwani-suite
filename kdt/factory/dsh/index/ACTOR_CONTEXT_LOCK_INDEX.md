@@ -12,7 +12,7 @@ Ready to package.
 
 ## Source Trace Summary
 
-The pack is based on current target DSH bootstrap files plus reviewed donor DSH governance files for scope, UX, coverage, RBAC, and MCPW section routing.
+The pack is based on current target DSH bootstrap files plus reviewed donor DSH governance files for scope, UX, coverage, RBAC, and internal ops section routing normalized locally to `control-panel`.
 The pack has also been re-accepted against the current Phase 07 baseline without requiring deletion of later downstream packs.
 
 ## Target Repo Fit Summary

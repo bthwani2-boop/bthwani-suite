@@ -28,12 +28,14 @@
 - no preview registry or candidate-screen truth is required to accept Phase 07 -> PASS
 - no service-specific contract detail is required to accept Phase 07 -> PASS
 - no runtime implementation is required to accept Phase 07 -> PASS
+- the service profile and flow notes now stop at foundation depth instead of claiming downstream completion -> PASS
 
 ## Current Baseline Note
 
 - later post-bootstrap packs exist and are retained as lawful forward work -> PASS
 - later lawful shells and preview-stage artifacts do not invalidate the original bootstrap service-foundation acceptance -> PASS
 - resumed execution still treats Phase 07 as the stable baseline for `dsh` -> PASS
+- files `06` through `24` remain reference appendices and are not required to pass the gate -> PASS
 
 ## Final Consistency Verdict
 

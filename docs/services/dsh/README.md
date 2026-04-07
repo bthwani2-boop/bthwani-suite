@@ -2,15 +2,15 @@
 
 ## Mandatory Header
 
-- WorkMode: `TARGET-FIT MODE`
-- CurrentPhase: `Phase 13 complete; Phase 14 next`
+- WorkMode: `BOOTSTRAP GATE REVIEW MODE`
+- CurrentPhase: `Phase 07 sealed baseline with downstream reference appendices retained`
 - TargetService: `dsh`
-- RequestType: `source_to_target_pack`
+- RequestType: `bootstrap_artifact_work`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `stable docs layer refreshed from donor evidence and current normalized packs`
-- BlockingGaps: `Phase 14 flow compression remains open; contract, binding, runtime, and closure phases remain downstream`
-- NextAllowed: `Use this dossier to drive Phase 14 - Flow Compression only`
+- PackStatus: `files 00-05 now carry the active Phase 07 foundation; files 06-24 remain reference appendices only`
+- BlockingGaps: `Phase 08 and all later post-bootstrap phases remain downstream`
+- NextAllowed: `Use files 00-05 for Phase 07 handoff and consult files 06-24 only when their lawful phases open`
 
 ## Purpose
 
@@ -18,29 +18,35 @@ This directory is the stable DSH dossier for the active target repo.
 
 It now consolidates:
 
+- the active Phase 07 service-foundation baseline in files `00` through `05`
 - donor service evidence from `bthfinal`
 - current normalized DSH truth from `kdt/factory/dsh/`
-- the current lawful phase position in `bthwani-suite`
 - explicit drift and contradiction notes instead of hiding them
 
 ## Current Snapshot
 
-- donor DSH service scope: `92` `dsh_*` operations
-- donor DSH operation dossiers: `92`
-- donor unified wrapper operations tied to DSH but outside the `92`: `5`
+- donor service-scope claim: `92` in-scope `dsh_*` operations
+- donor catalog rows captured in the local appendix: `98`
+- donor operation dossier directories physically present: `96`
+- donor route-binding rows captured: `94`
+- donor unified wrapper operations tied to DSH but outside the claimed `92`: `5`
 - current normalized operation families in target repo: `13`
-- current normalized screen candidates in target repo: `43`
-- current canonical screens in target repo: `20`
+- downstream reference screen candidates retained in the dossier: `43`
+- downstream reference canonical screens retained in the dossier: `20`
 - current normalized operation/surface coverage rows: `17`
+
+Files `09` through `24` are retained as downstream reference appendices.
+Files `00` through `05` are the active Phase 07 baseline.
+Files `06` through `24` remain available for later-phase reference, but they do not count as bootstrap completion proof.
 
 ## File Map
 
-1. `00_SERVICE_PROFILE.md` - current DSH identity, boundaries, counts, and phase status
-2. `01_ACTOR_CONTEXT_MATRIX.csv` - normalized actor and context truth
-3. `02_OPERATIONS_CATALOG.csv` - normalized DSH operation families
-4. `03_SURFACE_MATRIX.csv` - normalized surface ownership truth
-5. `04_PRIMARY_FLOW_NOTES.md` - service flow summary and route rules
-6. `05_NON_GOALS.md` - current DSH exclusions and deferred areas
+1. `00_SERVICE_PROFILE.md` - Phase 07 service identity, role, dependencies, risks, and boundary lock
+2. `01_ACTOR_CONTEXT_MATRIX.csv` - Phase 07 actor and context foundation
+3. `02_OPERATIONS_CATALOG.csv` - Phase 07 DSH operation families at foundation depth
+4. `03_SURFACE_MATRIX.csv` - Phase 07 surface participation and classification
+5. `04_PRIMARY_FLOW_NOTES.md` - Phase 07 primary flow and bootstrap handoff notes
+6. `05_NON_GOALS.md` - Phase 07 exclusions and phase-boundary guardrails
 7. `06_SOURCE_EVIDENCE_INDEX.md` - exact donor and target evidence set used here
 8. `07_STATUS_AND_SCOPE_AUDIT.md` - numeric audit, contradictions, and readiness summary
 9. `08_OPERATION_SURFACE_COVERAGE.csv` - normalized family-to-surface mapping
@@ -50,8 +56,8 @@ It now consolidates:
 13. `12_PRIMARY_FLOW_MAP.csv` - normalized happy path and fast path map
 14. `13_STAFF_FLOW_MAP.csv` - partner, captain, ops, and field flow map
 15. `14_FAILURE_RECOVERY_FLOW_MAP.csv` - failure and recovery map
-16. `15_DONOR_OPERATION_INVENTORY.csv` - donor `92`-operation appendix
-17. `16_DONOR_UNIFIED_OPERATIONS_REFERENCE.csv` - donor wrapper-operation appendix
+16. `15_DONOR_OPERATION_INVENTORY.csv` - donor `98`-row catalog appendix with the scope contradiction preserved
+17. `16_DONOR_UNIFIED_OPERATIONS_REFERENCE.csv` - donor wrapper-operation appendix outside the claimed `92`
 18. `17_DONOR_MASTER_REFERENCES.md` - DSH-related donor master files and how to use them safely
 19. `18_DONOR_IMPLEMENTATION_AND_DRIFT_AUDIT.md` - donor implementation facts, contradictions, and anti-patterns
 20. `19_DONOR_REPO_DSH_FILE_CENSUS.csv` - exhaustive donor file census for all direct DSH-related files

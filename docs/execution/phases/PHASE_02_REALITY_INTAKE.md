@@ -53,7 +53,7 @@ This phase prevents the clean repo from inheriting donor structure, route clutte
 
 - what counts as observed target reality
 - what counts as observed donor reality
-- what is still `[TBD]`
+- what remains `BLOCKED`, `GAP`, or `UNPROVEN`
 - what runtime truth sources currently exist or do not exist
 
 ## 9. Required Artifacts

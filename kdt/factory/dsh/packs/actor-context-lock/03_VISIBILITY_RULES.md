@@ -31,5 +31,5 @@
 ## Boundary Rules
 
 - actor visibility is service-owned, not app-owned
-- normalized target names must be used in the target repo even when donor source uses `APP_USER` or `MCPW`
+- normalized target names must be used in the target repo even when local donor aliases are rendered as `app-client` or `control-panel`
 - actor contexts defined here are sufficient for Operation Lock input, but not yet a substitute for operation-by-operation surface coverage

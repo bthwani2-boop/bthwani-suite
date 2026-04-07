@@ -15,11 +15,11 @@
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_UX_FLOW.md`
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_COVERAGE_MATRIX.csv`
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_RBAC_MATRIX.csv`
-- `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_MCPW_SECTION_MAP.csv`
+- `services/dsh/governance/internal ops section map`, normalized locally as `DSH_CONTROL_PANEL_SECTION_MAP.csv`
 
 ## Confirmed Facts
 
-- donor DSH contains rich raw operation coverage across customer, partner, captain, field, and MCPW/internal ops
+- donor DSH contains rich raw operation coverage across customer, partner, captain, field, and internal ops
 - donor DSH UX explicitly locks a simple visible order status set: `pending`, `accepted`, `in_delivery`, `completed`, `cancelled`
 - donor DSH includes customer checkout, partner order handling, captain execution, field support, and internal control-plane actions
 - current target DSH actor lock already excludes `webapp` and `website` from first-service DSH ownership

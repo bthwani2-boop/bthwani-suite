@@ -3,14 +3,14 @@
 ## Mandatory Header
 
 - WorkMode: `REFERENCE-ONLY MODE`
-- CurrentPhase: `Phase 13 complete; Phase 14 next`
+- CurrentPhase: `Phase 09 complete; Phase 10 next`
 - TargetService: `dsh`
 - RequestType: `source_to_target_pack`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `donor master support references indexed and usage rules recorded`
-- BlockingGaps: `Master files are broad support evidence and must still be filtered through target normalization`
-- NextAllowed: `Use these files as support evidence only while Phase 14 proceeds`
+- PackStatus: `downstream donor master reference appendix retained for completeness; it is not phase completion proof in this rerun`
+- BlockingGaps: `Master files remain broad support evidence and Phase 10+ work is still downstream`
+- NextAllowed: `Use these files as support evidence only when Phase 10+ work is reopened lawfully`
 
 ## Master Files That Materially Touch DSH
 

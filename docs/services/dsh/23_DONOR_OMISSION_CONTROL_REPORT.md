@@ -3,19 +3,20 @@
 ## Mandatory Header
 
 - WorkMode: `SOURCE-TO-TARGET MODE`
-- CurrentPhase: `Phase 13 complete; Phase 14 next`
+- CurrentPhase: `Phase 09 complete; Phase 10 next`
 - TargetService: `dsh`
 - RequestType: `source_to_target_pack`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `exhaustive donor census and row audit generated`
-- BlockingGaps: `Current target repo still remains pre-Phase-14 compression and later phases remain unopened`
-- NextAllowed: `Use these generated artifacts to review omissions before Phase 14`
+- PackStatus: `exhaustive donor census and row audit retained as a downstream reference appendix`
+- BlockingGaps: `The current rerun stops at Phase 09; surface, screen, and flow phases remain unopened in this pass`
+- NextAllowed: `Use these generated artifacts as reference only after Phase 10 begins`
 
 ## Executive Verdict
 
 This report does not claim a false perfect donor truth.
 It does claim that the donor DSH census here was generated systematically from the filesystem plus DSH operation dossiers plus current target comparison tables, so omission risk is materially reduced and explicitly reviewable.
+It is retained here as a downstream completeness appendix, not as proof that post-Phase-09 work is complete in the current rerun.
 
 ## Exhaustive Census Counts
 
@@ -49,20 +50,20 @@ It does claim that the donor DSH census here was generated systematically from t
 - `generated_artifact`: `1283`
 - `governance_script`: `1`
 - `local_prod_dsh_helper`: `2`
-- `mcpw_surface_component`: `25`
+- `control_panel_surface_component`: `25`
 - `operation_acceptance`: `94`
 - `operation_actions_catalog`: `94`
 - `operation_api_map`: `94`
 - `operation_evidence_index`: `94`
 - `operation_gaps`: `94`
-- `operation_mcpw_map`: `94`
+- `operation_control_panel_map`: `94`
 - `operation_rbac_abac`: `96`
 - `operation_runtime_vars`: `94`
 - `operation_screens_map`: `94`
 - `operation_spec`: `96`
 - `other`: `23`
 - `service_coverage_matrix`: `2`
-- `service_mcpw_section_map`: `2`
+- `service_control_panel_section_map`: `2`
 - `service_operation_catalog`: `2`
 - `service_package_or_config`: `4`
 - `service_rbac_matrix`: `2`

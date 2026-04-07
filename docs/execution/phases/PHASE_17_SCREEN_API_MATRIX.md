@@ -2,70 +2,65 @@
 
 ## 1. Purpose
 
-Let screens define API demand rather than guessing contract shape from backend preference.
+Let retained screens define exact API demand rather than guessing contract shape from backend preference or donor nostalgia.
 
-## 2. Why This Phase Exists
+## 2. Exact Inputs
 
-This phase prevents contract growth that mirrors donor endpoints or local implementation convenience instead of actual screen need.
+- `kdt/factory/<service>/exports/screen-spec-and-purpose-system/SCREEN_SPEC_INDEX.csv`
+- `kdt/factory/<service>/exports/screen-spec-and-purpose-system/OPERATION_TO_SCREEN_CHAIN.csv`
+- `kdt/factory/<service>/exports/state-lock/STATE_COVERAGE_MATRIX.csv`
+- `kdt/factory/<service>/exports/grouping-and-build-order/SCREEN_GROUPING_PLAN.csv`
+- `kdt/factory/<service>/exports/grouping-and-build-order/BUILD_ORDER_PLAN.csv`
+- `kdt/factory/<service>/exports/operation-master-extraction/MASTER_OPERATION_REGISTRY.csv`
+- `docs/execution/BTHWANI GUIDE — Generic Screen Execution Runbook.md`
 
-## 3. Preconditions / Entry Conditions
+## 3. Exact Source-Of-Truth Inputs
 
-- retained screens are purpose-locked
-- state coverage exists for the active scope
+- retained screen spec files from Phase `13`
+- state coverage outputs from Phase `16`
+- operation-to-screen chain outputs from Phase `13`
+- current contract observation only as comparison evidence, not as editing authority
+- limited-api preview evidence only when fixtures cannot test a concrete bounded risk
 
-## 4. Inputs
+If screen specs, chain outputs, or state coverage are incomplete, the phase is `BLOCKED`.
 
-- screen-purpose lock pack
-- state-lock pack
-- current preview and flow artifacts
+## 4. Exhaustive Extraction Scope
 
-## 5. Allowed Work
+Define all of the following for every in-scope retained screen:
 
-- list required reads, writes, summaries, and aggregations per screen
-- estimate request-count pressure
-- identify overfetch and underfit risk
-- note auth concerns
+- required reads
+- required writes
+- required summaries
+- required aggregations
+- request-count pressure
+- overfetch risk
+- underfit risk
+- auth or trust concerns
+- bounded limited-api preview need when truly necessary
 
-## 6. Forbidden Work
+No in-scope retained screen may remain with vague demand language.
 
-- direct contract changes
-- inventing APIs without screen evidence
-- treating one-off layout convenience as lawful aggregation demand
-
-## 7. Exact Execution Order
-
-1. open the `screen-api-matrix` request
-2. review each retained in-scope screen
-3. record reads, writes, summaries, and aggregations needed by that screen
-4. estimate request-count pressure and note overfetch or underfit risks
-5. flag auth or trust concerns when the screen needs them
-6. write the matrix and supporting notes
-7. stop before Gap Map if demand is still ambiguous
-
-## 8. Required Decisions
-
-- which screens are in scope for current API demand mapping
-- where summaries are truly needed
-- where aggregations are truly needed
-- where current shape risks overfetch or underfit
-
-## 9. Required Artifacts
+## 5. Mandatory Output Artifacts
 
 - `kdt/factory/<service>/requests/YYYY-MM-DD_screen-api-matrix.md`
 - `kdt/factory/<service>/packs/screen-api-matrix/00_REQUEST_SUMMARY.md`
 - `kdt/factory/<service>/packs/screen-api-matrix/01_SOURCE_TRACE.md`
 - `kdt/factory/<service>/packs/screen-api-matrix/02_SCREEN_API_MATRIX.csv`
 - `kdt/factory/<service>/packs/screen-api-matrix/03_AGGREGATION_AND_OVERFETCH_NOTES.md`
-- `kdt/factory/<service>/packs/screen-api-matrix/04_TARGET_FIT_SUMMARY.md`
-- `kdt/factory/<service>/packs/screen-api-matrix/05_EVIDENCE_INDEX.md`
+- `kdt/factory/<service>/packs/screen-api-matrix/04_LIMITED_API_PREVIEW_BOUNDARY.md`
+- `kdt/factory/<service>/packs/screen-api-matrix/05_GAPS_AND_BLOCKERS.md`
+- `kdt/factory/<service>/packs/screen-api-matrix/06_TARGET_FIT_SUMMARY.md`
+- `kdt/factory/<service>/packs/screen-api-matrix/07_EVIDENCE_INDEX.md`
 - `kdt/factory/<service>/exports/screen-api-matrix/SCREEN_API_MATRIX.csv`
 - `kdt/factory/<service>/index/SCREEN_API_MATRIX_INDEX.md`
 
-## 10. Artifact Schema Expectations
+## 6. Required File Formats And Schemas
 
 `02_SCREEN_API_MATRIX.csv` must include at least:
 
 - `screen_id`
+- `operation_id`
+- `journey_id`
 - `required_reads`
 - `required_writes`
 - `required_summaries`
@@ -74,62 +69,75 @@ This phase prevents contract growth that mirrors donor endpoints or local implem
 - `overfetch_risk`
 - `underfit_risk`
 - `auth_concern`
+- `limited_api_preview_need`
 - `notes`
 
-`03_AGGREGATION_AND_OVERFETCH_NOTES.md` must define:
+`03_AGGREGATION_AND_OVERFETCH_NOTES.md` must include at least:
 
 - where client stitching would be noisy or fragile
 - where current shape would overfetch
-- where current shape underfits the screen
+- where current shape would underfit the retained screen
+- which demand pressures are blockers rather than observations
 
-## 11. Cross-File Updates
+`04_LIMITED_API_PREVIEW_BOUNDARY.md` must include at least:
 
-- align preview assumptions if some screens were previously treated as simple but actually need lawful aggregation or write behavior
+- `preview_needed`
+- `why_fixtures_are_insufficient`
+- `bounded_scope`
+- `forbidden_proof_claims`
+- `decision_status`
 
-## 12. Surface Impact
+## 7. Manual Work Procedure
 
-- API demand must still follow the active waves rather than reopening all surfaces at once
+1. open the request file and confirm the in-scope build rows from `BUILD_ORDER_PLAN`
+2. review retained-screen specs, chain rows, and state coverage for each in-scope screen
+3. write one API-demand row per retained screen before making any contract recommendation
+4. record aggregation and overfetch notes with screen-specific reasons
+5. write `LIMITED_API_PREVIEW_BOUNDARY.md` as `not_needed` unless a bounded preview is truly required
+6. run missing-demand, orphan-demand, and vague-demand checks
+7. stop if any retained screen still uses generic phrases such as "needs data"
 
-## 13. UI Kit Impact
+## 8. Grouping / Wave Logic
 
-- no direct UI Kit impact beyond confirming which state or layout patterns remain necessary
+Rules:
 
-## 14. Contract Impact
+- API demand mapping follows approved build scope; it may not reopen all surfaces at once
+- downstream waves may not force demand work before upstream retained screens are explicit
+- limited-api preview, if any, must stay within the current approved scope
 
-- this phase is the direct precursor to Gap Map and later contract work
-- no contract edits are allowed yet
+## 9. Decision Rules
 
-## 15. Runtime Impact
+- screen demand first, contract preference never first
+- one-off layout convenience does not justify a canonical aggregation by itself
+- limited-api preview is exceptional, bounded, and non-proof-bearing
+- unresolved demand ambiguity must be marked `BLOCKED`, `GAP`, or `UNPROVEN`
 
-- limited-api preview may be noted only when explicitly bounded and necessary
-- runtime truth remains out of scope
+## 10. Hard Stop Gates
 
-## 16. Validation Checklist
+Stop the phase immediately if any of the following remain:
 
-- each in-scope screen has explicit demand entries
-- overfetch and underfit risks are explicit
-- auth concerns are explicit when relevant
+- an in-scope retained screen has no API-demand row
+- a demand row has no retained-screen or operation linkage
+- aggregation need is asserted without screen evidence
+- limited-api preview is implied rather than bounded explicitly
 
-## 17. Exit Criteria
+## 11. Completion Proof
 
-- screen-proven API demand is explicit enough to turn into a concrete Gap Map
+The phase passes only when all of the following are recorded explicitly:
 
-## 18. Failure Modes / Common Mistakes
+- in-scope retained-screen count
+- screens with API-demand rows = `100%`
+- orphan demand rows = `0`
+- unresolved aggregation contradictions = `0` or explicitly `BLOCKED`
+- bounded limited-api preview decisions are explicit for every row that needs them
 
-- treating a screen as simple when it really requires aggregation
-- using vague phrases like "needs data" without structure
-- jumping from one screen to a full contract proposal directly
-
-## 19. Anti-Patterns
-
-- "the backend already has endpoints, so the screen demand does not matter"
-- "one layout quirk justifies a new endpoint"
-
-## 20. Handoff To Next Phase
+## 12. Exact Handoff To Next Phase
 
 Deliver:
 
-- explicit screen-proven API demand
-- explicit overfetch and underfit notes
+- `SCREEN_API_MATRIX`
+- aggregation and overfetch notes
+- limited-api preview boundary decision
+- blocker list for any unresolved screen-demand ambiguity
 
 Next lawful file: `PHASE_18_GAP_MAP.md`

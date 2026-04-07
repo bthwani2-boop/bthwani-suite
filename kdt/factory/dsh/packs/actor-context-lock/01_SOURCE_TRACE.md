@@ -16,13 +16,13 @@
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_UX_FLOW.md`
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_COVERAGE_MATRIX.csv`
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_RBAC_MATRIX.csv`
-- `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_MCPW_SECTION_MAP.csv`
+- `services/dsh/governance/internal ops section map`, normalized locally as `DSH_CONTROL_PANEL_SECTION_MAP.csv`
 
 ## Confirmed Facts
 
-- donor DSH explicitly spans APP_USER, APP_CAPTAIN, APP_PARTNER, APP_FIELD, and MCPW
-- donor coverage data shows customer, captain, partner, field, and MCPW participation across real DSH operations
-- donor MCPW mappings place DSH internal handling primarily under operational MCPW routes, which normalize to `control-panel`
+- the local normalized donor readout spans `app-client`, `app-captain`, `app-partner`, `app-field`, and `control-panel`
+- donor coverage data shows customer, captain, partner, field, and internal ops participation across real DSH operations
+- donor internal-ops mappings place DSH handling primarily under operational oversight routes, which normalize to `control-panel`
 - current target bootstrap surface matrix already locks `app-client`, `app-partner`, `app-captain`, and `control-panel` as `REQUIRED` and `app-field` as `OPTIONAL`
 - current target bootstrap flow places customer entry in `app-client`, partner work in `app-partner`, captain execution in `app-captain`, optional support in `app-field`, and internal oversight in `control-panel`
 

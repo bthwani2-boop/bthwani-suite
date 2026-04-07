@@ -3,23 +3,23 @@
 ## Mandatory Header
 
 - WorkMode: `REFERENCE-ONLY MODE`
-- CurrentPhase: `Phase 13 complete; Phase 14 next`
+- CurrentPhase: `Phase 09 complete; Phase 10 next`
 - TargetService: `dsh`
 - RequestType: `source_to_target_pack`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `source evidence indexed and split into donor truth, donor support, and target normalization`
-- BlockingGaps: `Some donor master files remain broad support evidence rather than clean service truth`
-- NextAllowed: `Use this index while refining Phase 14 inputs`
+- PackStatus: `source evidence indexed and normalized for the phase 07-09 rerun`
+- BlockingGaps: `Some donor master files remain broad support evidence and later screen-flow appendices remain downstream references only`
+- NextAllowed: `Use this index while preparing Phase 10 - Surface Responsibility Lock`
 
 ## Evidence Tiers
 
 ## Tier 1 - Primary Donor DSH Service Evidence
 
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_SERVICE_SCOPE.md` - donor service boundary, actor, and surface statement
-- `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_OPERATION_CATALOG.csv` - donor `92`-operation inventory
+- `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_OPERATION_CATALOG.csv` - donor service catalog; service-scope files claim `92` while the captured local appendix currently carries `98` rows
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_COVERAGE_MATRIX.csv` - donor operation-to-surface coverage
-- `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_MCPW_SECTION_MAP.csv` - donor MCPW section mapping used only as evidence for `control-panel` normalization
+- `services/dsh/governance/internal ops section map` - donor internal ops section map, normalized locally as `DSH_CONTROL_PANEL_SECTION_MAP.csv` for dossier consistency
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_RBAC_MATRIX.csv` - donor role and access evidence
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_UX_FLOW.md` - donor journey compression intent
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_TRACEABILITY.csv` - donor traceability appendix and implementation evidence
@@ -57,3 +57,4 @@
 - Tier 3 files are the active normalized truth for the target repo
 - when Tier 1 and Tier 2 conflict, donor conflict is recorded and not hidden
 - when Tier 1 conflicts with Tier 3 because of clean normalization, Tier 3 wins for target-repo adoption
+- local dossier aliases normalize the donor customer surface to `app-client` and the donor internal ops surface to `control-panel`; the frozen donor repo remains the source of exact historical basenames

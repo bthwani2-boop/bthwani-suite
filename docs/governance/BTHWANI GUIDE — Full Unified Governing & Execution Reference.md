@@ -20,6 +20,12 @@ It defines:
 It does not replace runbooks, gates, or phase manuals.
 It governs them.
 
+Hard override:
+
+- treat the current execution package, companion packs, and service execution artifacts as `UNTRUSTED` until the active phase and gate prove donor coverage, registry completeness, handoff integrity, and non-placeholder execution depth
+- file existence, polished wording, preview browseability, or partial overlap with the required artifact list do not restore trust
+- any unproven completion claim must be marked `BLOCKED`, `GAP`, or `UNPROVEN`
+
 ### 1.2 Authority Resolution
 
 Resolve authority in this order:
@@ -52,7 +58,7 @@ Current verified repo realities include:
 - `runtime/` does not exist yet
 - the current first governed service is `dsh`
 - `docs/services/dsh/` already contains first-service foundation artifacts
-- `kdt/factory/dsh/` already contains detailed packs through the current screen-purpose band
+- `kdt/factory/dsh/` contains mixed-depth post-bootstrap packs from the pre-reset execution model and must be re-reviewed before reuse as completion proof
 
 ### 1.4 Interpretation Rule
 
@@ -78,7 +84,7 @@ This means:
 - the target repo owns current naming truth
 - the target repo owns current ownership truth
 - the target repo owns current structure truth
-- the donor repo may be inspected, traced, compared, and selectively extracted from
+- the donor repo may be inspected, traced, compared, and mined exhaustively during Phases `08` through `14` before any selective adoption decision is made
 - the donor repo may not define the clean repo by force
 
 ### 2.2 Clean Build-Line Decision
@@ -87,7 +93,8 @@ The canonical migration decision model is:
 
 - new repo = clean build line
 - donor repo = reference only
-- transfer = selective and classified
+- recovery = exhaustive first, classified second
+- adoption = selective and classified only after exhaustive recovery produces the required master registries and proof
 - default adoption decision = `REBUILD_CLEAN`
 
 Do not:
@@ -102,16 +109,21 @@ Do not:
 The canonical lifecycle order is:
 
 1. repo law and ownership
-2. service truth
-3. surface responsibility and journey truth
-4. screen inventory and screen purpose
-5. screen-driven UI Kit expansion and state coverage
-6. Screen/API Matrix and Gap Map
-7. contract update
-8. generation and verification
-9. binding
-10. runtime truth and production-like proof
-11. evidence seal and next-service unlock
+2. service foundation
+3. actor/context exhaustive recovery
+4. operation master extraction
+5. surface coverage and wave matrix
+6. journey chain master
+7. screen master census and normalization
+8. screen spec and purpose system
+9. grouping and build order
+10. screen-driven UI Kit expansion and state coverage
+11. Screen/API Matrix and Gap Map
+12. contract update
+13. generation and verification
+14. binding
+15. runtime truth and production-like proof
+16. evidence seal and next-service unlock
 
 ### 2.4 Hard Prohibitions
 
@@ -423,14 +435,14 @@ Mobile workspace execution rules:
 Surface shell and preview execution rules:
 
 - web and mobile surfaces follow the same shell-readiness law once a surface is classified as `REQUIRED` or `OPTIONAL`
-- shell readiness may prepare boot, navigation, theme, direction, and repo-root owned serve or build entrypoints before candidate screens exist
+- shell readiness may prepare boot, navigation, theme, direction, and repo-root owned serve or build entrypoints before screen census and registry rows exist
 - shell browseability or smoke-build success proves shell integrity only; it does not prove screen readiness, binding, runtime truth, or production-like behavior
 - web and mobile shell entrypoints must remain repo-root owned commands, targets, or governed scripts rather than app-root sovereignty
 
 EAS Build future ownership rule:
 
 - `EAS Build`, if adopted later, is a mobile packaging or distribution path only
-- `EAS Build` is not a prerequisite for shell readiness, Journey Lock, or Phase `12` preview
+- `EAS Build` is not a prerequisite for shell readiness, Journey Chain Master, or Phase `12` preview
 - `EAS Build` does not by itself raise proof level to binding, runtime truth, or production-like verification
 - when adopted later, `EAS Build` must be invoked through workspace-governed commands, Nx targets, or scripts first; app-local wrappers are secondary only
 
@@ -499,7 +511,7 @@ Post-bootstrap execution is split across:
 - `docs/execution/BTHWANI GUIDE — Generic Screen Execution Runbook.md`
 - `docs/execution/BTHWANI GUIDE — Binding And Runtime Execution Runbook.md`
 - `docs/execution/BTHWANI GUIDE — Post-Bootstrap Gate Pack.md`
-- `docs/execution/phases/PHASE_08_ACTOR_CONTEXT_LOCK.md`
+- `docs/execution/phases/PHASE_08_ACTOR_CONTEXT_EXHAUSTIVE_EXTRACTION.md`
 - continuing through `docs/execution/phases/PHASE_27_NEXT_SERVICE_REPEAT.md`
 
 ### 5.4 Companion Precedence
@@ -542,13 +554,13 @@ Execution authority:
 
 ### 6.2 Service-Truth And Screen-Law Band: Phases 08 Through 14
 
-- Phase `08`: lock actors and visibility contexts
-- Phase `09`: lock canonical operations before screens
-- Phase `10`: lock surface responsibility and activation waves
-- Phase `11`: lock journeys before candidate screens
-- Phase `12`: inventory and rationalize candidate screens
-- Phase `13`: lock family, purpose, CTA, entry, exit, and required states
-- Phase `14`: compress routes, steps, and decision noise
+- Phase `08`: recover actors, contexts, entitlements, and visibility scopes exhaustively
+- Phase `09`: recover and normalize the full operation universe into `MASTER_OPERATION_REGISTRY`
+- Phase `10`: map canonical operations to surfaces and waves through explicit matrices
+- Phase `11`: write the journey chain master before any screen census begins
+- Phase `12`: extract and normalize the full screen and unit census into `MASTER_SCREEN_REGISTRY`
+- Phase `13`: write one screen spec per retained screen and complete `OPERATION_TO_SCREEN_CHAIN`
+- Phase `14`: write grouping, dependency lanes, build order, validation order, and seal order
 
 Execution authority:
 
@@ -705,14 +717,14 @@ Gate review must confirm:
 
 ## 8. Preview, Binding, Runtime, And Proof Law
 
-### 8.1 Candidate vs Bound Screen
+### 8.1 Registry vs Bound Screen
 
 Keep these states distinct:
 
-- candidate screen = inventory, preview, rationalization, and purpose-lock stage
+- registry screen = census, normalization, preview-stub, and spec-preparation stage
 - bound screen = connected to the canonical generated and runtime-backed chain
 
-Candidate screens may begin only after Journey Lock.
+Registry screens may begin only after Journey Chain Master.
 Bound screens may begin only in Phase `21`.
 
 ### 8.2 Shell, Preview, And Packaging Distinction
@@ -759,10 +771,10 @@ Do not claim:
 
 Use this order:
 
-1. define what the target repo needs
-2. locate a specific donor candidate for that need
+1. during Phases `08` through `14`, mine the active service in the donor exhaustively rather than reactively
+2. build or update the phase-required master registry before reducing scope
 3. trace dependencies and ownership
-4. classify the candidate
+4. classify each donor item as adopted, rebuilt, deferred, reference-only, or rejected
 5. normalize naming and remove donor noise
 6. run target-fit review
 7. package, rebuild, reference, or reject
@@ -802,14 +814,14 @@ Use these terms consistently:
 
 - `Reality Intake` = governed census of actual donor and target truth
 - `Value Lock` = explicit statement of what is worth rebuilding now and what is not
-- `Actor/Context Lock` = explicit actor visibility and surface participation model
-- `Operation Lock` = official service operation set before screen growth
-- `Surface Responsibility Lock` = explicit mapping of operations to surfaces and waves
-- `Journey Lock` = explicit happy, failure, recovery, and support journeys before candidate screens
-- `Screen Inventory` = complete catalog of candidate screens and related units
-- `Screen Rationalization` = keep, merge, convert, internal, or move-to-legacy classification of candidates
-- `Screen Purpose Lock` = family, purpose, CTA, entry, exit, and required-state definition per retained candidate
-- `Flow Compression` = removal of unnecessary steps, routes, or decision points
+- `Actor Context Exhaustive Extraction` = explicit actor, context, entitlement, exclusion, and surface-visibility recovery for the active service
+- `Operation Master Extraction` = complete donor-to-target operation recovery and normalization into `MASTER_OPERATION_REGISTRY`
+- `Surface Coverage And Wave Matrix` = explicit mapping of canonical operations to surfaces, coverage classes, and wave order
+- `Journey Chain Master` = explicit entry, happy, failure, recovery, and support journeys before screen census begins
+- `Screen Inventory` = complete catalog of screen-registry rows and related units
+- `Screen Rationalization` = keep, merge, convert, internal, or move-to-legacy classification of retained or rejected registry units
+- `Screen Spec And Purpose System` = exact per-screen spec contract including purpose, CTA, state, interaction, and acceptance rules
+- `Grouping And Build Order` = explicit groups, dependency lanes, build order, preview order, validation order, and seal order
 - `Screen/API Matrix` = screen-proven API demand register
 - `Gap Map` = register of contract underfit, overfetch, missing operations, or drift
 - `Binding Chain` = canonical path from screen through API, service, repository, and runtime truth

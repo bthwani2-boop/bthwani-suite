@@ -21,6 +21,6 @@
 - donor `DSH_UX_FLOW.md`
 - donor `DSH_COVERAGE_MATRIX.csv`
 - donor `DSH_RBAC_MATRIX.csv`
-- donor `DSH_MCPW_SECTION_MAP.csv`
+- donor internal ops section map, normalized locally as `DSH_CONTROL_PANEL_SECTION_MAP.csv`
 - target actor/context lock export
 - target DSH bootstrap service profile and flow notes

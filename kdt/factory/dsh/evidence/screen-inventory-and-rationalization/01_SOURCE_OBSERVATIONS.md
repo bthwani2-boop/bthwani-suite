@@ -4,7 +4,7 @@
 
 - accepted DSH journey lock now supplies the full lawful source for mainline, staff, failure, recovery, and optional support candidate discovery
 - donor DSH surface folders expose a much wider screen set than the current clean DSH service truth actually requires
-- donor app-user includes discovery, cart, checkout, order, chat, proxy, loyalty, subscription, rating, receipt, profile, and preference clusters
+- donor app-client includes discovery, cart, checkout, order, chat, proxy, loyalty, subscription, rating, receipt, profile, and preference clusters
 - donor app-partner includes order, store maintenance, chat, onboarding, analytics, and subscription clusters
 - donor app-captain includes offer, execution, proof, chat, finance, and tier clusters
 - donor app-field includes activation, geo pin, and visit log support items

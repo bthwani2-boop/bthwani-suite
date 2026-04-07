@@ -21,8 +21,8 @@ It owns:
 
 It does not own:
 
-- candidate-screen execution
-- preview registry execution after Journey Lock
+- screen census and registry execution
+- preview registry execution after Journey Chain Master
 - contract updates
 - binding
 - runtime truth or production-like proof
@@ -49,7 +49,7 @@ It does not require rollback of later lawful artifacts already present in the re
 3. Do not create generated layers during bootstrap.
 4. Do not create API clients during bootstrap.
 5. Do not create runtime shells during bootstrap.
-6. Do not create candidate screens, preview routes, preview registries, or Expo Go routes before Journey Lock.
+6. Do not create screen-census rows, preview route stubs, preview registries, or Expo Go routes before Journey Chain Master.
 7. Do not treat UI Kit foundation work as permission to ingest screens.
 8. Every phase must deposit evidence under `kdt/volatile/registry/runs/{SESSION_ID}/`.
 
@@ -201,7 +201,7 @@ After Phase `07`, literal execution moves to:
 - `docs/execution/BTHWANI GUIDE — Generic Screen Execution Runbook.md` for Phases `08` through `18`
 - `docs/execution/BTHWANI GUIDE — Binding And Runtime Execution Runbook.md` for Phases `19` through `24`
 - `docs/execution/BTHWANI GUIDE — Post-Bootstrap Gate Pack.md` for post-bootstrap gates
-- `docs/execution/phases/PHASE_08_ACTOR_CONTEXT_LOCK.md` onward for exact phase manuals
+- `docs/execution/phases/PHASE_08_ACTOR_CONTEXT_EXHAUSTIVE_EXTRACTION.md` onward for exact phase manuals
 
 Bootstrap does not authorize early preview.
-No candidate screens, Expo Go routes, or preview registry work may begin before Journey Lock.
+No screen-census rows, Expo Go routes, or preview registry work may begin before Journey Chain Master.

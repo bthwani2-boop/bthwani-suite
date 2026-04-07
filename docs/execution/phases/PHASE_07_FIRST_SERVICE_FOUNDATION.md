@@ -2,67 +2,48 @@
 
 ## 1. Purpose
 
-Establish one service foundation only and stop before detailed execution begins.
+Establish one exact first-service foundation and stop before exhaustive donor recovery begins.
 
-## 2. Why This Phase Exists
+## 2. Exact Inputs
 
-This phase prevents the repo from entering screen, contract, or runtime work before the service has a stable profile, actor model, operation set, and surface participation map.
+- `docs/services/00_SERVICE_BUILD_ORDER.md`
+- `governance/APPROVED_SURFACE_NAMING.md`
+- `governance/SERVICE_CATALOG.md`
+- `governance/SURFACE_CATALOG.md`
+- `docs/platform/00_PLATFORM_VALUE_LOCK.md`
+- `docs/platform/01_SERVICE_PRIORITY_LIST.md`
+- `docs/platform/02_NON_GOALS_REGISTER.md`
+- `docs/reality-intake/02_CURRENT_SERVICES_MAP.md`
+- `docs/reality-intake/03_CURRENT_SURFACES_MAP.md`
+- `docs/reality-intake/04_CURRENT_SCREENS_INVENTORY.md`
+- `packages/ui-kit/docs/FOUNDATION_SCOPE.md`
 
-## 3. Preconditions / Entry Conditions
+## 3. Exact Source-Of-Truth Inputs
 
-- the first service is selected
-- UI Kit foundation exists
-- service naming and surface naming are canonical
+- repo-local service order law
+- repo-local naming and ownership law
+- observed target repo reality from Phase `02`
+- donor service-scope evidence only at foundation depth when needed to avoid naming or actor drift
 
-## 4. Inputs
+This phase is not the exhaustive donor-recovery phase.
+If first-service selection, naming, or surface legality is ambiguous, the phase is `BLOCKED`.
 
-- service build order
-- naming law
-- approved surface naming
-- UI Kit foundation scope
-- observed target and donor reality
+## 4. Exhaustive Extraction Scope
 
-## 5. Allowed Work
+Extract and lock exactly these foundation truths for the first service:
 
-- define the service profile
-- define actor context
-- define operations at the foundation level
-- define participating surfaces
-- define non-goals
-- prepare the service root under `docs/services/<service>/`
-
-## 6. Forbidden Work
-
-- multiple active service foundations
-- screen implementation
-- preview registry work
-- Expo Go routes
-- contract detail work
-- binding or runtime work
-
-## 7. Exact Execution Order
-
-1. create or verify `docs/services/<service>/`
-2. write `00_SERVICE_PROFILE.md`
-3. write `01_ACTOR_CONTEXT_MATRIX.csv`
-4. write `02_OPERATIONS_CATALOG.csv`
-5. write `03_SURFACE_MATRIX.csv`
-6. write `04_PRIMARY_FLOW_NOTES.md`
-7. write `05_NON_GOALS.md`
-8. explicitly classify `app-field`
-9. review the foundation for contradictions between actors, operations, and surfaces
-10. prepare the service to enter Phase `08`, but do not open execution packs yet unless the service is actually moving beyond bootstrap now
-
-## 8. Required Decisions
-
-- the service slug and business role
-- primary actors and excluded actors
-- primary operations
+- service slug and service role
+- primary job and bounded secondary jobs
+- primary actors and excluded actors at foundation depth
+- primary operation families at foundation depth
 - participating surfaces
-- explicit non-goals for the service
 - explicit `app-field` classification
+- explicit non-goals
+- major dependencies and boundary risks
 
-## 9. Required Artifacts
+Do not claim donor completeness, screen completeness, or operation completeness in this phase.
+
+## 5. Mandatory Output Artifacts
 
 - `docs/services/<service>/00_SERVICE_PROFILE.md`
 - `docs/services/<service>/01_ACTOR_CONTEXT_MATRIX.csv`
@@ -73,102 +54,109 @@ This phase prevents the repo from entering screen, contract, or runtime work bef
 - `kdt/volatile/registry/runs/{SESSION_ID}/phase-07/service-foundation-review.md`
 - `kdt/volatile/registry/runs/{SESSION_ID}/phase-07/first-service-consistency-check.md`
 
-## 10. Artifact Schema Expectations
+## 6. Required File Formats And Schemas
 
-`00_SERVICE_PROFILE.md` must include:
+`00_SERVICE_PROFILE.md` must include at least:
 
-- service slug
-- primary job
-- secondary jobs when relevant
-- major dependencies
-- failure modes
-- `[TBD]` gaps
+- `service_slug`
+- `service_role`
+- `primary_job`
+- `secondary_jobs`
+- `major_dependencies`
+- `failure_modes`
+- `boundary_risks`
+- `decision_status`
 
 `01_ACTOR_CONTEXT_MATRIX.csv` must include at least:
 
-- actor id
-- actor label
-- normalized surface
-- context role
-- primary jobs
-- source status
-- notes
+- `actor_id`
+- `actor_label`
+- `normalized_surface`
+- `context_role`
+- `primary_jobs`
+- `source_status`
+- `decision_status`
+- `notes`
 
 `02_OPERATIONS_CATALOG.csv` must include at least:
 
-- operation key
-- operation family
-- primary actor
-- primary surfaces
-- service purpose
-- source status
-- source trace
+- `operation_key`
+- `operation_family`
+- `primary_actor`
+- `primary_surfaces`
+- `service_purpose`
+- `source_status`
+- `source_trace`
+- `decision_status`
 
 `03_SURFACE_MATRIX.csv` must include at least:
 
-- surface
-- classification
-- primary actor
-- service role on that surface
-- source status
-- notes
+- `surface`
+- `classification`
+- `primary_actor`
+- `service_role_on_surface`
+- `source_status`
+- `decision_status`
+- `notes`
 
-## 11. Cross-File Updates
+Use only `BLOCKED`, `GAP`, or `UNPROVEN` for unresolved status.
 
-- ensure service profile and surface matrix agree with `docs/services/00_SERVICE_BUILD_ORDER.md`
-- if the repo is moving directly into Phase `08`, prepare the service factory root under `kdt/factory/<service>/` without starting detailed packs prematurely
+## 7. Manual Work Procedure
 
-## 12. Surface Impact
+1. confirm the first service from `docs/services/00_SERVICE_BUILD_ORDER.md`
+2. create or verify `docs/services/<service>/`
+3. write the service profile with exact service role, job, boundary, and dependency language
+4. write the actor context matrix at foundation depth without pretending it is exhaustive
+5. write the operations catalog at family depth only
+6. write the surface matrix and classify `app-field` explicitly
+7. write primary flow notes and non-goals
+8. run contradiction checks across actors, operations, surfaces, and non-goals
+9. stop if the foundation still depends on unnamed actors, ambiguous surfaces, or implied non-goals
 
-- surfaces are classified at the foundation level only
-- no candidate screens or preview routes are allowed yet
+## 8. Grouping / Wave Logic
 
-## 13. UI Kit Impact
+This phase does not open waves, screen groups, build bundles, preview routes, or screen-registry rows.
 
-- UI Kit foundation may be referenced as a dependency boundary
-- UI Kit expansion remains forbidden until later phases
+Rules:
 
-## 14. Contract Impact
+- surface participation is foundation truth only here
+- no screen sequencing or preview sequencing is lawful here
 
-- service implications for future contract work may be noted
-- service-specific contract detail remains forbidden
+## 9. Decision Rules
 
-## 15. Runtime Impact
+- foundation depth only; no detailed donor recovery claims
+- `app-field` must be `REQUIRED`, `OPTIONAL`, or `OUT`
+- non-goals must be explicit rather than implied from silence
+- service boundary ambiguity must be marked `BLOCKED`, `GAP`, or `UNPROVEN`
 
-- runtime expectations may be noted only as future concerns
-- no runtime implementation is allowed
+## 10. Hard Stop Gates
 
-## 16. Validation Checklist
+Stop the phase immediately if any of the following remain:
 
-- one service foundation exists
-- all foundation files contain real content
-- actor, operation, and surface files do not contradict each other
-- `app-field` is explicit
-- no preview or screen work has begun
+- the first service is not explicit
+- the service slug or surface naming is ambiguous
+- `app-field` is still implicit
+- actors, operations, and surfaces contradict each other
+- preview, screen, contract, binding, or runtime work has started
 
-## 17. Exit Criteria
+## 11. Completion Proof
 
-- the first service is stable enough to enter detailed execution in Phase `08`
-- bootstrap is complete
+The phase passes only when all of the following are recorded explicitly:
 
-## 18. Failure Modes / Common Mistakes
+- first-service count = `1`
+- service foundation file count matches the required set = `100%`
+- cross-file contradictions = `0`
+- unnamed participating surfaces = `0`
+- unresolved `app-field` classifications = `0`
+- unresolved foundation blockers = `0` or explicitly `BLOCKED`
 
-- writing service profile text with no actor or operation clarity
-- leaving `app-field` implicit
-- letting service foundation slip into screen-level detail or preview work
-
-## 19. Anti-Patterns
-
-- "we can start screens while the service foundation is still fuzzy"
-- "app-field can be ignored until later"
-- "service foundation files are optional because later packs are more detailed"
-
-## 20. Handoff To Next Phase
+## 12. Exact Handoff To Next Phase
 
 Deliver:
 
-- one stable service foundation
+- one stable first-service foundation
 - explicit `app-field` classification
-- bootstrap completion readiness
+- exact service-root files for the active service
+- blocker list for any unresolved foundation ambiguity
 
-Next lawful file: `PHASE_08_ACTOR_CONTEXT_LOCK.md`
+Next lawful file: `PHASE_08_ACTOR_CONTEXT_EXHAUSTIVE_EXTRACTION.md`

@@ -14,7 +14,7 @@
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_SERVICE_SCOPE.md`
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_COVERAGE_MATRIX.csv`
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_RBAC_MATRIX.csv`
-- `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_MCPW_SECTION_MAP.csv`
+- `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_CONTROL_PANEL_SECTION_MAP.csv`
 
 ## Confirmed Facts
 
@@ -22,7 +22,7 @@
 - current target `dsh` lock keeps `app-field` optional and keeps `webapp` and `website` out
 - current canonical operation lock exports 13 DSH operation families rather than the full donor operation list
 - donor RBAC still ties real action invocation to concrete app surfaces rather than to a generic mirrored admin layer
-- donor MCPW routing shows a broad internal route umbrella for many DSH operations, but that route cluster does not by itself prove clean internal ownership for every family
+- donor CONTROL_PANEL routing shows a broad internal route umbrella for many DSH operations, but that route cluster does not by itself prove clean internal ownership for every family
 
 ## Controlled Conclusions
 
@@ -33,6 +33,6 @@
 
 ## Rejected Carryover
 
-- blanket donor MCPW mirroring for nearly all DSH operations is rejected for the clean target model
+- blanket donor CONTROL_PANEL mirroring for nearly all DSH operations is rejected for the clean target model
 - donor per-endpoint sprawl is not re-expanded after Phase 09 compaction into canonical families
-- donor naming such as `APP_USER` and `MCPW` does not leak into target outputs beyond source trace
+- donor naming such as `APP_CLIENT` and `CONTROL_PANEL` does not leak into target outputs beyond source trace

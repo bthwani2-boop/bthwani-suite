@@ -34,7 +34,7 @@
 - `kdt/factory/dsh/exports/actor-context-lock/ACTOR_CONTEXT_MATRIX.csv`
 - `kdt/factory/dsh/exports/operation-lock/OPERATIONS_CATALOG.csv`
 - `docs/services/dsh/03_SURFACE_MATRIX.csv`
-- donor DSH coverage, RBAC, MCPW section, and service-scope evidence
+- donor DSH coverage, RBAC, CONTROL_PANEL section, and service-scope evidence
 
 ## Required Outputs
 

@@ -14,12 +14,12 @@
 ## Confirmed Donor Inputs
 
 - `C:\Users\b\Documents\GitHub\bthfinal\services\dsh\governance\DSH_TRACEABILITY.csv`
-- `C:\Users\b\Documents\GitHub\bthfinal\packages\surfaces\src\dsh\app-user\mobile\*`
+- `C:\Users\b\Documents\GitHub\bthfinal\packages\surfaces\src\dsh\app-client\mobile\*`
 - `C:\Users\b\Documents\GitHub\bthfinal\packages\surfaces\src\dsh\app-partner\mobile\*`
 - `C:\Users\b\Documents\GitHub\bthfinal\packages\surfaces\src\dsh\app-captain\mobile\*`
 - `C:\Users\b\Documents\GitHub\bthfinal\packages\surfaces\src\dsh\app-field\mobile\*`
-- `C:\Users\b\Documents\GitHub\bthfinal\packages\surfaces\src\web\mcpw\operations\dsh\*`
-- `C:\Users\b\Documents\GitHub\bthfinal\packages\surfaces\src\web\mcpw\operations\dsh\shein-proxy\*`
+- `C:\Users\b\Documents\GitHub\bthfinal\packages\surfaces\src\web\control-panel\operations\dsh\*`
+- `C:\Users\b\Documents\GitHub\bthfinal\packages\surfaces\src\web\control-panel\operations\dsh\shein-proxy\*`
 
 ## Confirmed Facts
 
@@ -37,5 +37,5 @@
 ## Rejected Carryover
 
 - do not treat every donor auto-generated route file as a required clean target screen
-- do not let donor MCPW sprawl override the current control-panel ownership narrowing
+- do not let donor CONTROL_PANEL sprawl override the current control-panel ownership narrowing
 - do not skip secondary or exception candidates simply because the happy path is simpler

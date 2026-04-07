@@ -2,54 +2,38 @@
 
 ## 1. Purpose
 
-Open the next service only after the current service is sealed and the repo is ready to repeat the same governed cycle.
+Unlock the next service only after the current service is sealed, donor residue is quarantined, and re-entry conditions are explicit.
 
-## 2. Why This Phase Exists
+## 2. Exact Inputs
 
-This phase prevents the next service from opening while the previous one is still unresolved, weakly sealed, or still leaking donor residue.
-
-## 3. Preconditions / Entry Conditions
-
-- current service seal status is explicit
-- legacy quarantine work is complete enough
-- service build order still exists or is ready to be updated
-
-## 4. Inputs
-
-- service seal pack
-- legacy quarantine pack
+- `kdt/factory/<service>/packs/evidence-and-sign-off/**`
+- `kdt/factory/<service>/packs/legacy-quarantine/**`
 - `docs/services/00_SERVICE_BUILD_ORDER.md`
+- `docs/governance/BTHWANI GUIDE — Full Unified Governing & Execution Reference.md`
+
+## 3. Exact Source-Of-Truth Inputs
+
+- current service seal evidence from Phase `25`
+- legacy quarantine evidence from Phase `26`
+- current governed service order
 - current repo readiness observation
 
-## 5. Allowed Work
+If current service seal or legacy quarantine status is ambiguous, the phase is `BLOCKED`.
 
-- confirm current service seal
-- confirm the repo is ready for the next deep service track
-- update the service build order if needed
-- open the next service request
+## 4. Exhaustive Extraction Scope
 
-## 6. Forbidden Work
+Confirm all of the following before opening the next service:
 
-- opening the next service while the current one is unsealed or ambiguously blocked
-- pretending the next service cycle can skip governance and service-foundation discipline
+- current service seal verdict
+- current service blocker status
+- legacy residue and quarantine status
+- whether service order changed lawfully
+- whether the next service already has a valid foundation layer
+- exact re-entry phase for the next service
 
-## 7. Exact Execution Order
+No next-service unlock may rely on momentum, habit, or assumption.
 
-1. open the `next-service-unlock` request
-2. confirm the current service seal status explicitly
-3. confirm that legacy quarantine blockers are closed or explicitly bounded
-4. review `docs/services/00_SERVICE_BUILD_ORDER.md`
-5. update the build order only if a governed change is required
-6. write the next-service unlock note
-7. name the next starting point for the next service cycle
-
-## 8. Required Decisions
-
-- whether the current service is sealed enough to unlock the next one
-- whether the next service already has a foundation or must start there
-- whether the service order changed lawfully
-
-## 9. Required Artifacts
+## 5. Mandatory Output Artifacts
 
 - `kdt/factory/<service>/requests/YYYY-MM-DD_next-service-unlock.md`
 - `kdt/factory/<service>/packs/next-service-unlock/00_REQUEST_SUMMARY.md`
@@ -57,79 +41,94 @@ This phase prevents the next service from opening while the previous one is stil
 - `kdt/factory/<service>/packs/next-service-unlock/02_SERVICE_SEAL_CONFIRMATION.md`
 - `kdt/factory/<service>/packs/next-service-unlock/03_NEXT_SERVICE_UNLOCK_NOTE.md`
 - `kdt/factory/<service>/packs/next-service-unlock/04_UPDATED_SERVICE_ORDER.md`
-- `kdt/factory/<service>/packs/next-service-unlock/05_TARGET_FIT_SUMMARY.md`
-- `kdt/factory/<service>/packs/next-service-unlock/06_EVIDENCE_INDEX.md`
+- `kdt/factory/<service>/packs/next-service-unlock/05_REENTRY_DECISION.md`
+- `kdt/factory/<service>/packs/next-service-unlock/06_TARGET_FIT_SUMMARY.md`
+- `kdt/factory/<service>/packs/next-service-unlock/07_EVIDENCE_INDEX.md`
 - `kdt/factory/<service>/index/NEXT_SERVICE_UNLOCK_INDEX.md`
 
-## 10. Artifact Schema Expectations
+## 6. Required File Formats And Schemas
 
-`02_SERVICE_SEAL_CONFIRMATION.md` must include:
+`02_SERVICE_SEAL_CONFIRMATION.md` must include at least:
 
-- current service verdict
-- blocker status
-- evidence references
+- `current_service_verdict`
+- `blocker_status`
+- `evidence_references`
 
-`03_NEXT_SERVICE_UNLOCK_NOTE.md` must include:
+`03_NEXT_SERVICE_UNLOCK_NOTE.md` must include at least:
 
-- next service slug
-- why it may now open
-- which phase it re-enters at
+- `next_service_slug`
+- `why_it_may_open`
+- `reentry_phase`
+- `forbidden_shortcuts`
 
-`04_UPDATED_SERVICE_ORDER.md` must include:
+`04_UPDATED_SERVICE_ORDER.md` must include at least:
 
 - whether the order changed
 - why it changed or why it remained stable
 
-## 11. Cross-File Updates
+`05_REENTRY_DECISION.md` must include at least:
 
-- update `docs/services/00_SERVICE_BUILD_ORDER.md` only if the governed order truly changed
-- prepare the next service root cleanly instead of reusing donor residue
+- `next_service_foundation_status`
+- `required_reentry_phase`
+- `blocking_conditions`
+- `decision_status`
 
-## 12. Surface Impact
+## 7. Manual Work Procedure
 
-- the next service must not inherit current-service surface assumptions automatically
+1. open the request file and confirm the current service scope being sealed
+2. confirm the current service seal status from Phase `25` evidence
+3. confirm that legacy quarantine blockers are closed or explicitly bounded from Phase `26`
+4. review `docs/services/00_SERVICE_BUILD_ORDER.md`
+5. update service order only if a governed change is truly required
+6. determine whether the next service must re-enter at Phase `07` or Phase `08`
+7. write the unlock note and re-entry decision explicitly
+8. stop if next-service readiness still depends on inherited assumptions from the previous service
 
-## 13. UI Kit Impact
+## 8. Grouping / Wave Logic
 
-- the next service may reuse shared UI lawfully, but it must not assume service-specific carryover is shared law
+This phase does not open a new service wave automatically.
 
-## 14. Contract Impact
+Rules:
 
-- the next service begins with service truth first, not inherited contract-first behavior
+- the next service starts its own governed cycle
+- current-service wave, screen, or runtime assumptions do not carry forward by default
 
-## 15. Runtime Impact
+## 9. Decision Rules
 
-- runtime proof from one service does not automatically grant runtime proof for the next service
+- no next service unlock without current-service seal proof
+- no next service unlock while donor residue still leaks into the clean tree
+- Phase `07` is the default re-entry unless the next service foundation already exists and passes review
+- unresolved readiness ambiguity must be marked `BLOCKED`, `GAP`, or `UNPROVEN`
 
-## 16. Validation Checklist
+## 10. Hard Stop Gates
 
-- current service seal is explicit
-- legacy quarantine does not leave active residue
-- next service unlock rationale is explicit
+Stop the phase immediately if any of the following remain:
 
-## 17. Exit Criteria
+- the current service is not sealed explicitly
+- legacy quarantine still leaves active residue on the canonical path
+- next-service re-entry phase is implied rather than written
+- the next service is being opened on the assumption that one sealed service lowers the standard for the next
 
-- the repo can begin the next service cycle without lowering standards
+## 11. Completion Proof
 
-## 18. Failure Modes / Common Mistakes
+The phase passes only when all of the following are recorded explicitly:
 
-- opening the next service because momentum feels good
-- treating one sealed service as permission to skip foundation work on the next
+- current service seal verdict exists
+- legacy quarantine blocker count = `0` or explicitly bounded
+- next-service slug count = `1`
+- next-service re-entry decision count = `1`
+- unresolved unlock contradictions = `0` or explicitly `BLOCKED`
 
-## 19. Anti-Patterns
-
-- "the repo is warm now, so we can skip the early phases"
-- "the next service can inherit the last service's surface model by default"
-
-## 20. Handoff To Next Phase
+## 12. Exact Handoff To Next Phase
 
 Deliver:
 
 - next-service unlock note
 - updated service order when needed
-- explicit re-entry point for the next service
+- exact re-entry phase for the next service
+- blocker list for any unresolved unlock condition
 
 Next lawful starting point for the next service:
 
-- `PHASE_07_FIRST_SERVICE_FOUNDATION.md` if the next service still lacks its service-foundation layer
-- `PHASE_08_ACTOR_CONTEXT_LOCK.md` if the next service foundation already exists and is still valid
+- `PHASE_07_FIRST_SERVICE_FOUNDATION.md` if the next service lacks a valid service-foundation layer
+- `PHASE_08_ACTOR_CONTEXT_EXHAUSTIVE_EXTRACTION.md` if the next service foundation already exists and is still valid

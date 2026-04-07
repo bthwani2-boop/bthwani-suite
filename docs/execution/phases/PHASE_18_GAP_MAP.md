@@ -2,66 +2,56 @@
 
 ## 1. Purpose
 
-Translate screen-proven API demand into explicit contract pressure and ranked gaps.
+Translate exact screen-proven API demand into explicit contract pressure, ranked gaps, and a formal contract-readiness decision.
 
-## 2. Why This Phase Exists
+## 2. Exact Inputs
 
-This phase prevents vague complaints about the contract and turns screen pressure into actionable, ranked change inputs.
+- `kdt/factory/<service>/exports/screen-api-matrix/SCREEN_API_MATRIX.csv`
+- `kdt/factory/<service>/exports/state-lock/STATE_COVERAGE_MATRIX.csv`
+- `kdt/factory/<service>/exports/grouping-and-build-order/BUILD_ORDER_PLAN.csv`
+- current canonical contract observation under `contracts/master/**`
+- `docs/execution/BTHWANI GUIDE — Generic Screen Execution Runbook.md`
+- `docs/execution/BTHWANI GUIDE — Binding And Runtime Execution Runbook.md`
 
-## 3. Preconditions / Entry Conditions
+## 3. Exact Source-Of-Truth Inputs
 
-- Screen/API Matrix exists for the active scope
-- state and flow work are stable enough to explain what the contract is failing to serve
+- `SCREEN_API_MATRIX`
+- retained-screen state coverage from Phase `16`
+- current canonical contract files only as observation inputs
+- error, auth, and lifecycle pressure proven by retained-screen specs and chain rows
 
-## 4. Inputs
+If `SCREEN_API_MATRIX` is incomplete or current contract observation is unavailable, the phase is `BLOCKED`.
 
-- Screen/API Matrix
-- state-lock pack
-- flow-compression pack
-- current contract observation when relevant
+## 4. Exhaustive Extraction Scope
 
-## 5. Allowed Work
+Define all of the following for every real contract pressure found in the active scope:
 
-- record underfit, overfetch, missing operations, missing shapes, and drift
-- rank gaps by severity
-- tie every gap to a screen or flow need
-- prepare clear input for contract readiness
+- underfit gaps
+- overfetch gaps
+- missing read or write operations
+- missing error shapes
+- missing auth or trust semantics
+- missing lifecycle or state-support shapes
+- naming drift
+- severity and required change
 
-## 6. Forbidden Work
+No vague contract complaint is allowed.
 
-- editing the canonical contract
-- vague gap statements with no affected screen or flow
-- ranking gaps without rationale
-
-## 7. Exact Execution Order
-
-1. open the `gap-map` request
-2. review the Screen/API Matrix row by row
-3. convert each contract pressure into a specific gap record
-4. classify the gap type and severity
-5. tie each gap to the affected screen or flow
-6. write contract-pressure notes and target-fit summary
-7. stop before contract work begins
-
-## 8. Required Decisions
-
-- which gaps are real and not merely nice-to-have improvements
-- severity of each gap
-- whether a donor reference is useful for evidence only
-
-## 9. Required Artifacts
+## 5. Mandatory Output Artifacts
 
 - `kdt/factory/<service>/requests/YYYY-MM-DD_gap-map.md`
 - `kdt/factory/<service>/packs/gap-map/00_REQUEST_SUMMARY.md`
 - `kdt/factory/<service>/packs/gap-map/01_SOURCE_TRACE.md`
 - `kdt/factory/<service>/packs/gap-map/02_GAP_MAP.csv`
 - `kdt/factory/<service>/packs/gap-map/03_CONTRACT_PRESSURE_NOTES.md`
-- `kdt/factory/<service>/packs/gap-map/04_TARGET_FIT_SUMMARY.md`
-- `kdt/factory/<service>/packs/gap-map/05_EVIDENCE_INDEX.md`
+- `kdt/factory/<service>/packs/gap-map/04_CONTRACT_READINESS_DECISION.md`
+- `kdt/factory/<service>/packs/gap-map/05_GAPS_AND_BLOCKERS.md`
+- `kdt/factory/<service>/packs/gap-map/06_TARGET_FIT_SUMMARY.md`
+- `kdt/factory/<service>/packs/gap-map/07_EVIDENCE_INDEX.md`
 - `kdt/factory/<service>/exports/gap-map/GAP_MAP.csv`
 - `kdt/factory/<service>/index/GAP_MAP_INDEX.md`
 
-## 10. Artifact Schema Expectations
+## 6. Required File Formats And Schemas
 
 `02_GAP_MAP.csv` must include at least:
 
@@ -71,63 +61,77 @@ This phase prevents vague complaints about the contract and turns screen pressur
 - `gap_type`
 - `severity`
 - `required_change`
+- `auth_or_error_impact`
 - `donor_reference`
 - `decision_status`
 - `notes`
 
-`03_CONTRACT_PRESSURE_NOTES.md` must define:
+`03_CONTRACT_PRESSURE_NOTES.md` must include at least:
 
 - the major pressure themes
 - which pressures are blockers for lawful contract work
-- which pressures remain `[TBD]`
+- which pressures remain `BLOCKED`, `GAP`, or `UNPROVEN`
 
-## 11. Cross-File Updates
+`04_CONTRACT_READINESS_DECISION.md` must include at least:
 
-- open or prepare the contract-update request only after the gap set is stable enough to support Phase `19`
+- `reviewed_scope`
+- `blocking_gap_count`
+- `non_blocking_gap_count`
+- `contract_readiness_verdict`
+- `why`
 
-## 12. Surface Impact
+## 7. Manual Work Procedure
 
-- the gap map must still respect current-wave scope rather than becoming an excuse to analyze every surface at once
+1. open the request file and confirm the active scope from `BUILD_ORDER_PLAN`
+2. review `SCREEN_API_MATRIX` row by row against current contract observation
+3. convert each real pressure into a specific gap row with severity and required change
+4. record no-gap conclusions in the pressure notes where relevant so silence cannot hide skipped review
+5. write `CONTRACT_READINESS_DECISION.md` only after the gap set is stable
+6. run vague-gap, unnamed-gap, and orphan-pressure checks
+7. stop before Phase `19` if contract pressure is still ambiguous
 
-## 13. UI Kit Impact
+## 8. Grouping / Wave Logic
 
-- no direct UI Kit changes occur here
+Rules:
 
-## 14. Contract Impact
+- gap mapping must respect active build scope rather than reopening all surfaces at once
+- downstream or optional bundles may not distort the blocking status of current-scope gaps
+- gap severity must follow real flow impact, not team preference
 
-- this phase is the final lawful input layer before contract work begins
+## 9. Decision Rules
 
-## 15. Runtime Impact
+- no gap without a concrete screen or flow reason
+- no severity without rationale
+- no donor reference may act as contract authority; it is evidence only
+- unresolved gap ambiguity must be marked `BLOCKED`, `GAP`, or `UNPROVEN`
 
-- runtime work remains out of scope
+## 10. Hard Stop Gates
 
-## 16. Validation Checklist
+Stop the phase immediately if any of the following remain:
 
-- each gap is specific
-- each gap is tied to a screen or flow
-- severity exists
-- required change exists
+- a gap row has no affected screen or flow
+- a gap row has no severity or required change
+- contract pressure notes stay generic instead of actionable
+- contract readiness is implied before the gap set is explicit
 
-## 17. Exit Criteria
+## 11. Completion Proof
 
-- contract readiness can now be judged from explicit screen-proven pressure
+The phase passes only when all of the following are recorded explicitly:
 
-## 18. Failure Modes / Common Mistakes
+- reviewed active-scope screen count
+- total gap row count
+- unnamed gaps = `0`
+- gaps missing severity = `0`
+- gaps missing required change = `0`
+- unresolved contract-readiness contradictions = `0` or explicitly `BLOCKED`
 
-- writing generic complaints such as "API is weak"
-- ranking by personal preference rather than flow impact
-- jumping into contract edits before the map is stable
-
-## 19. Anti-Patterns
-
-- "the gap is obvious and does not need a record"
-- "we can fix contract drift directly and write the gap later"
-
-## 20. Handoff To Next Phase
+## 12. Exact Handoff To Next Phase
 
 Deliver:
 
-- explicit contract pressure map
-- ranked, screen-proven gaps
+- `GAP_MAP`
+- contract pressure notes
+- exact contract-readiness decision
+- blocker list for any unresolved pressure that still prevents lawful Phase `19` work
 
 Next lawful file: `PHASE_19_MASTER_CONTRACT_UPDATE.md`

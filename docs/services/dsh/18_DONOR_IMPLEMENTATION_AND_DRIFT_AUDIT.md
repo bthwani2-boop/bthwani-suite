@@ -3,14 +3,14 @@
 ## Mandatory Header
 
 - WorkMode: `ANTI-PATTERN MODE`
-- CurrentPhase: `Phase 13 complete; Phase 14 next`
+- CurrentPhase: `Phase 09 complete; Phase 10 next`
 - TargetService: `dsh`
 - RequestType: `violation_audit`
 - PrimaryRepo: `bthwani-suite`
 - LegacyRepo: `bthfinal`
-- PackStatus: `donor implementation and drift audit completed`
+- PackStatus: `downstream donor implementation audit retained as a prevention appendix for the phase 07-09 rerun`
 - BlockingGaps: `Later implementation phases are still downstream in the target repo`
-- NextAllowed: `Use this audit to prevent donor drift while continuing with Phase 14`
+- NextAllowed: `Use this audit to prevent donor drift while Phase 10+ work is reopened lawfully`
 
 ## Confirmed Donor Implementation Facts
 
@@ -45,7 +45,7 @@ The current target model correctly merges these back into canonical workspaces.
 
 ### Drift 2 - Control-Panel Overreach
 
-Donor MCPW material spills into partner, captain, store-item, zone, and miscellaneous action space.
+Donor internal ops surface material spills into partner, captain, store-item, zone, and miscellaneous action space.
 The current target model correctly narrows `control-panel` to governance, proxy review, and explicit operational controls.
 
 ### Drift 3 - Customer-Side Marketing And Loyalty Noise

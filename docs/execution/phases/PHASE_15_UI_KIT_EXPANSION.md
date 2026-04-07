@@ -2,133 +2,141 @@
 
 ## 1. Purpose
 
-Grow UI Kit only from real retained screens rather than speculation.
+Grow UI Kit only from retained-screen demand already proven by screen specs and build order.
 
-## 2. Why This Phase Exists
+## 2. Exact Inputs
 
-This phase prevents shared design-system entropy and keeps service-specific work out of the shared layer.
+- `kdt/factory/<service>/exports/screen-spec-and-purpose-system/SCREEN_SPEC_INDEX.csv`
+- `kdt/factory/<service>/exports/screen-spec-and-purpose-system/OPERATION_TO_SCREEN_CHAIN.csv`
+- `kdt/factory/<service>/exports/grouping-and-build-order/SCREEN_GROUPING_PLAN.csv`
+- `kdt/factory/<service>/exports/grouping-and-build-order/BUILD_ORDER_PLAN.csv`
+- `packages/ui-kit/docs/FOUNDATION_SCOPE.md`
+- `docs/execution/BTHWANI GUIDE — Generic Screen Execution Runbook.md`
 
-## 3. Preconditions / Entry Conditions
+## 3. Exact Source-Of-Truth Inputs
 
-- route compression is complete enough for the active screen groups
-- retained screens now represent real reusable demand
+- retained screen spec files from Phase `13`
+- grouping and build-order outputs from Phase `14`
+- current UI Kit primitives, tokens, and state shells
+- current build-scope screens only; not future speculative bundles
 
-## 4. Inputs
+If grouping, build order, or retained-screen specs are incomplete, the phase is `BLOCKED`.
 
-- flow-compression pack
-- screen-purpose lock pack
-- UI Kit foundation scope
-- generic screen execution runbook
+## 4. Exhaustive Extraction Scope
 
-## 5. Allowed Work
+Extract and decide all of the following for the active service and current build scope:
 
-- add shared patterns proven by retained screens
-- refine primitives when real screens reveal gaps
-- rerun UI Kit Expansion Review after meaningful screen-group growth
+- every shared primitive gap demanded by retained screens
+- every repeated interaction pattern that truly crosses screens or groups
+- state-shell gaps demanded by the current bundle
+- duplicate families already present in UI Kit
+- service leakage risks
+- extension-vs-new-primitive decisions
 
-## 6. Forbidden Work
+No speculative shared-pattern discovery is allowed.
 
-- speculative shared patterns
-- service widgets promoted into UI Kit
-- duplicate component families
-- business logic in shared UI
-
-## 7. Exact Execution Order
-
-1. open the `ui-kit-expansion` request
-2. review retained screens and identify shared demand only
-3. add or refine the minimum shared patterns needed
-4. rerun the UI Kit Expansion Review
-5. record duplicate-family checks and cleanup actions
-6. stop before state lock if UI Kit blockers remain unresolved
-
-## 8. Required Decisions
-
-- which new shared patterns are justified
-- which candidate patterns remain local to the service
-- whether any existing primitive should be extended rather than duplicated
-
-## 9. Required Artifacts
+## 5. Mandatory Output Artifacts
 
 - `kdt/factory/<service>/requests/YYYY-MM-DD_ui-kit-expansion.md`
 - `kdt/factory/<service>/packs/ui-kit-expansion/00_REQUEST_SUMMARY.md`
 - `kdt/factory/<service>/packs/ui-kit-expansion/01_SOURCE_TRACE.md`
 - `kdt/factory/<service>/packs/ui-kit-expansion/02_UI_KIT_EXPANSION_REVIEW.md`
-- `kdt/factory/<service>/packs/ui-kit-expansion/03_NEW_SHARED_PATTERNS.md`
-- `kdt/factory/<service>/packs/ui-kit-expansion/04_DUPLICATE_FAMILY_CHECK.md`
-- `kdt/factory/<service>/packs/ui-kit-expansion/05_TARGET_FIT_SUMMARY.md`
-- `kdt/factory/<service>/packs/ui-kit-expansion/06_EVIDENCE_INDEX.md`
+- `kdt/factory/<service>/packs/ui-kit-expansion/03_SHARED_PATTERN_DEMAND_MATRIX.csv`
+- `kdt/factory/<service>/packs/ui-kit-expansion/04_NEW_SHARED_PATTERNS.md`
+- `kdt/factory/<service>/packs/ui-kit-expansion/05_DUPLICATE_FAMILY_CHECK.md`
+- `kdt/factory/<service>/packs/ui-kit-expansion/06_GAPS_AND_BLOCKERS.md`
+- `kdt/factory/<service>/packs/ui-kit-expansion/07_TARGET_FIT_SUMMARY.md`
+- `kdt/factory/<service>/packs/ui-kit-expansion/08_EVIDENCE_INDEX.md`
+- `kdt/factory/<service>/exports/ui-kit-expansion/SHARED_PATTERN_DEMAND_MATRIX.csv`
 - `kdt/factory/<service>/index/UI_KIT_EXPANSION_INDEX.md`
 
-## 10. Artifact Schema Expectations
+## 6. Required File Formats And Schemas
 
-`02_UI_KIT_EXPANSION_REVIEW.md` must include:
+`02_UI_KIT_EXPANSION_REVIEW.md` must include at least:
 
-- current service
-- current surface wave
-- current screen group
-- new shared patterns introduced
-- primitives touched
-- duplicate-family check
-- service-leakage check
-- cleanup required
-- decision status
+- `current_service`
+- `current_wave`
+- `current_groups`
+- `reviewed_screen_count`
+- `primitives_touched`
+- `duplicate_family_count`
+- `service_leakage_check`
+- `cleanup_required`
+- `decision_status`
 
-`03_NEW_SHARED_PATTERNS.md` must define:
+`03_SHARED_PATTERN_DEMAND_MATRIX.csv` must include at least:
+
+- `pattern_id`
+- `source_screen_ids`
+- `source_group_ids`
+- `current_primitive`
+- `decision`
+- `shared_reason`
+- `local_if_rejected`
+- `blocker_status`
+- `notes`
+
+`04_NEW_SHARED_PATTERNS.md` must include at least:
 
 - pattern name
 - source screens that proved demand
+- source groups that proved demand
 - why the pattern belongs in UI Kit
 - what remains local to the service
 
-## 11. Cross-File Updates
+## 7. Manual Work Procedure
 
-- update `packages/ui-kit/docs/FOUNDATION_SCOPE.md` only when shared scope meaningfully changes
-- do not move local preview concerns into UI Kit docs as if they were shared law
+1. open the request file and confirm the active build scope from `BUILD_ORDER_PLAN`
+2. review retained screen specs and group assignments for the current wave only
+3. write `SHARED_PATTERN_DEMAND_MATRIX.csv` before editing shared primitives
+4. extend existing primitives before creating new ones when the current primitive can lawfully absorb the demand
+5. record every new or extended shared pattern with source-screen proof
+6. run duplicate-family and service-leakage checks
+7. update `FOUNDATION_SCOPE.md` only when shared scope meaningfully changes
+8. stop if any unresolved shared blocker would force local hacks into canonical shared UI
 
-## 12. Surface Impact
+## 8. Grouping / Wave Logic
 
-- the current wave may continue only after shared blockers are handled or bounded explicitly
+Rules:
 
-## 13. UI Kit Impact
+- only the current approved bundle or group may drive shared growth
+- downstream waves may not open shared UI demand early
+- support or optional groups may not force shared expansion ahead of the core path
 
-- this is the first phase where real UI Kit growth is lawful
-- every change must remain screen-proven and service-clean
+## 9. Decision Rules
 
-## 14. Contract Impact
+- extend before duplicate
+- local remains local until retained-screen repetition proves otherwise
+- shared UI may not carry service policy, service logic, or donor-specific residue
+- unresolved shared scope ambiguity must be marked `BLOCKED`, `GAP`, or `UNPROVEN`
 
-- contract work remains forbidden
+## 10. Hard Stop Gates
 
-## 15. Runtime Impact
+Stop the phase immediately if any of the following remain:
 
-- runtime work remains out of scope
+- a shared addition has no retained-screen trace
+- duplicate families remain unresolved
+- service-specific widgets entered `packages/ui-kit/`
+- shared expansion outran grouping or build-order truth
 
-## 16. Validation Checklist
+## 11. Completion Proof
 
-- each new shared pattern traces back to retained screens
-- no duplicate family exists
-- no service-specific leakage exists
+The phase passes only when all of the following are recorded explicitly:
 
-## 17. Exit Criteria
+- reviewed retained-screen count
+- shared-pattern demand row count
+- shared additions traced to retained screens = `100%`
+- duplicate family count = `0`
+- service leakage count = `0`
+- unresolved shared blockers = `0` or explicitly `BLOCKED`
 
-- shared UI is ready to support full state definition and API demand mapping
-
-## 18. Failure Modes / Common Mistakes
-
-- calling a local workaround reusable before it is proven
-- duplicating an existing primitive under a new name
-- moving service policy into UI Kit for convenience
-
-## 19. Anti-Patterns
-
-- "we may need this pattern later"
-- "it is in many screens in one service, so it must be shared"
-
-## 20. Handoff To Next Phase
+## 12. Exact Handoff To Next Phase
 
 Deliver:
 
-- screen-proven UI Kit growth
-- updated UI Kit review
+- `UI_KIT_EXPANSION_REVIEW`
+- `SHARED_PATTERN_DEMAND_MATRIX`
+- exact shared-pattern decisions
+- blocker list for any unresolved shared primitive gap
 
 Next lawful file: `PHASE_16_STATE_LOCK.md`
