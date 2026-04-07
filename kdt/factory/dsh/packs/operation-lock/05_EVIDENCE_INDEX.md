@@ -1,13 +1,16 @@
-# 04_EVIDENCE_INDEX
+# 05_EVIDENCE_INDEX
 
 ## Pack Files
 
 - `requests/2026-04-06_operation-lock.md`
 - `packs/operation-lock/00_REQUEST_SUMMARY.md`
 - `packs/operation-lock/01_SOURCE_TRACE.md`
-- `packs/operation-lock/02_STATUS_LIFECYCLE.md`
-- `packs/operation-lock/03_TARGET_FIT_SUMMARY.md`
+- `packs/operation-lock/02_OPERATIONS_CATALOG.csv`
+- `packs/operation-lock/03_STATUS_LIFECYCLE.md`
+- `packs/operation-lock/04_TARGET_FIT_SUMMARY.md`
+- `packs/operation-lock/05_EVIDENCE_INDEX.md`
 - `exports/operation-lock/OPERATIONS_CATALOG.csv`
+- `index/OPERATION_LOCK_INDEX.md`
 - `evidence/operation-lock/01_SOURCE_OBSERVATIONS.md`
 - `evidence/operation-lock/02_REENTRY_REVIEW.md`
 

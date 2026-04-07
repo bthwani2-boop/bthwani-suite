@@ -23,6 +23,8 @@
 
 - lock where each canonical DSH operation family lives
 - mark each clean surface as `REQUIRED`, `OPTIONAL`, or `OUT` per operation
+- define the current surface activation order and current wave model explicitly
+- declare thin shell readiness expectations without opening preview yet
 - preserve only evidence-backed multi-surface coverage
 - reject donor blanket control-panel mirroring where no distinct internal operation exists
 - keep `webapp` and `website` outside current `dsh` first-service ownership
@@ -37,6 +39,7 @@
 ## Required Outputs
 
 - clean surface matrix
+- surface activation plan
 - operation surface coverage matrix
 - source trace summary
 - target-fit summary

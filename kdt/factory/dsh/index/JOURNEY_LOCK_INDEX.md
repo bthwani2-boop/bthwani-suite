@@ -18,6 +18,7 @@ The pack has also been re-accepted against the current Phase 10 baseline without
 ## Target Repo Fit Summary
 
 The pack is aligned with current `dsh` ownership, approved clean surfaces, and the target service pack structure under `kdt/factory/dsh/`.
+The canonical Phase 11 artifact set is present under `kdt/factory/dsh/packs/journey-lock/` with the exact filenames required by the phase manual.
 
 ## Implant Packaging Decision
 

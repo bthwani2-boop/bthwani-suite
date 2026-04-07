@@ -8,6 +8,8 @@
 - duplication risk: low, because the journey definitions are exported once under `exports/journey-lock/`
 - recommended target location: retain all journey-lock artifacts under `kdt/factory/dsh/`
 - output matches current target reality: yes
+- canonical Phase 11 artifact naming status: aligned with the current phase manual
+- flow-map schema status: explicit entry conditions, preconditions, branch logic, and completion signals are now present
 
 ## Fit Notes
 

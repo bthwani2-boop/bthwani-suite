@@ -1,4 +1,4 @@
-# 03_TARGET_FIT_SUMMARY
+# 04_TARGET_FIT_SUMMARY
 
 ## Target Repo Fit Summary
 
@@ -8,6 +8,7 @@
 - duplication risk: low, because the refined actor/context matrix is exported once under `kdt/factory/dsh/exports/actor-context-lock/`
 - recommended target location: keep post-bootstrap service packs under `kdt/factory/dsh/`
 - output matches current target reality: yes
+- canonical Phase 08 artifact naming status: aligned with the current phase manual
 
 ## Fit Notes
 

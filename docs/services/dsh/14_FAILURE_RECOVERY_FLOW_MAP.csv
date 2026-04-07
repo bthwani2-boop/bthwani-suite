@@ -1,0 +1,12 @@
+flow_variant,step_order,actor,surface,operation_key,lifecycle_stage,purpose,enter_from,exit_to,recovery_rule,notes
+checkout_block,1,customer,app-client,dsh_cart_checkout_gate,pre_submit,encounter checkout block,cart,resolve_or_abort,stay in app-client until gate clears,no surface switch for a checkout failure
+checkout_block,2,customer,app-client,dsh_cart_checkout_gate,pre_submit,resolve blocking condition,checkout_block,order_submit_or_exit,retry only after the same gate is cleared,keeps the failure local to the entry surface
+partner_block,1,partner,app-partner,dsh_partner_order_handling,pending,detect store-side blocker,order_submit,store_maintenance_or_ops,use partner maintenance first,ops is not first resort if partner can recover locally
+partner_block,2,partner,app-partner,dsh_partner_store_maintenance,pending,repair store readiness,partner_block,partner_order_handling,return to partner handling after repair,loops inside app-partner
+partner_block,3,ops,control-panel,dsh_ops_governance_controls,exception,intervene only if local recovery fails,partner_block,partner_handling_or_cancel,ops enters for governance or exception only,clean escalation path
+captain_block,1,captain,app-captain,dsh_captain_offer_and_acceptance,assignment,reject or fail to accept,partner_handling,reassignment_or_cancel,stay inside DSH assignment logic,no new surface is invented
+captain_block,2,captain,app-captain,dsh_captain_delivery_execution,in_delivery,delivery cannot complete,offer_and_acceptance,ops_or_cancel,return to lawful exception handling only if needed,customer still tracks from app-client
+proxy_exception,1,customer,app-client,dsh_proxy_request_flow,proxy_request,initiate proxy case,entry,ops_review_or_exit,customer never enters internal ops surface,dual-surface exception family
+proxy_exception,2,ops,control-panel,dsh_proxy_request_flow,proxy_governance,review and decide proxy case,proxy_request,customer_reflection,reflect outcome back to customer,approval path is internal only
+field_unavailable,1,field,app-field,dsh_field_activation_support,unavailable,field support not enabled or not needed,entry,exit,omit the branch entirely rather than relocating it,the mainline journey continues without app-field
+terminal_cancelled,1,customer,app-client,dsh_customer_order_tracking,cancelled,observe final cancelled state,any_failure,exit,terminal state is visible from the customer surface,keeps visibility and ownership separate

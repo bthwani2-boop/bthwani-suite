@@ -1,0 +1,10 @@
+flow_variant,step_order,actor,surface,operation_key,lifecycle_stage,purpose,enter_from,exit_to,notes
+partner_path,1,partner,app-partner,dsh_partner_order_handling,pending,review and progress store-side work,entry,store_maintenance_or_handoff,partner owns this path
+partner_path,2,partner,app-partner,dsh_partner_store_maintenance,pending,repair store readiness when needed,partner_order_handling,partner_order_handling,loops only when a store-side blocker exists
+partner_path,3,partner,app-partner,dsh_partner_order_handling,pending_or_ready,return to active order handling,store_maintenance_or_entry,handoff,restores the mainline partner path
+captain_path,1,captain,app-captain,dsh_captain_offer_and_acceptance,accepted,claim the job,entry,delivery_execution,captain entry starts here
+captain_path,2,captain,app-captain,dsh_captain_delivery_execution,in_delivery,perform the delivery,offer_and_acceptance,proof_or_terminal,captain remains in one execution surface
+captain_path,3,captain,app-captain,dsh_delivery_proof_and_verification,completion_gate,finish proof or verification,delivery_execution,exit_or_tracking,proof completes the captain side when needed
+ops_path,1,ops,control-panel,dsh_ops_governance_controls,oversight,monitor and govern active DSH operations,entry,proxy_or_exit,ops is not on the customer happy path
+ops_path,2,ops,control-panel,dsh_proxy_request_flow,exception_governance,approve reject or schedule proxy cases,ops_governance_controls,exit,kept narrow to explicit proxy handling
+field_path,1,field,app-field,dsh_field_activation_support,support,perform activation or visit work when required,entry,exit,optional support branch only

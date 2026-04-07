@@ -18,6 +18,7 @@ The pack has also been re-accepted against the current Phase 07 baseline without
 ## Target Repo Fit Summary
 
 The pack is aligned with approved clean names, current `dsh` selection, and the post-bootstrap service pack structure under `kdt/factory/dsh/`.
+The canonical Phase 08 artifact set is present under `kdt/factory/dsh/packs/actor-context-lock/` with the exact filenames required by the phase manual.
 
 ## Implant Packaging Decision
 

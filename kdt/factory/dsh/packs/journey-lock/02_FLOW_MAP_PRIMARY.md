@@ -1,5 +1,15 @@
 # 02_FLOW_MAP_PRIMARY
 
+## Entry Condition
+
+- customer has entered the current DSH wave through `app-client`
+
+## Preconditions
+
+- current service truth, actor lock, operation lock, and surface wave order are already accepted
+- `app-client` is the first lawful customer entry surface
+- no preview or candidate-screen work is opened yet
+
 ## Primary Happy Path
 
 1. Customer enters DSH intent in `app-client` through `dsh_store_discovery`.
@@ -22,6 +32,18 @@
 ## Returning User Path
 
 Returning-user handling is relevant for DSH because a customer may come back with an existing store preference, cart context, or order history. The clean path remains the same as the happy path, but it skips rediscovery overhead and goes directly to checkout or tracking depending on current intent.
+
+## Likely Failure Points Or Branch Logic
+
+- checkout may block before `dsh_order_submit`
+- partner handling may stall before captain handoff
+- captain assignment or completion may fail and require exception handling
+- proxy request remains a side branch rather than a primary-path branch
+
+## Completion Signal
+
+- customer observes a terminal successful result through `dsh_customer_order_tracking`, ending in `completed`
+- if the mainline path fails irrecoverably, completion shifts to a terminal `cancelled` outcome rather than a new surface-owned path
 
 ## Primary Path Rules
 

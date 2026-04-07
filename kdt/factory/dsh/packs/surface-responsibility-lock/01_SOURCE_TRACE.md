@@ -7,7 +7,7 @@
 - `docs/services/dsh/03_SURFACE_MATRIX.csv`
 - `kdt/factory/dsh/exports/actor-context-lock/ACTOR_CONTEXT_MATRIX.csv`
 - `kdt/factory/dsh/exports/operation-lock/OPERATIONS_CATALOG.csv`
-- `kdt/factory/dsh/packs/operation-lock/02_STATUS_LIFECYCLE.md`
+- `kdt/factory/dsh/packs/operation-lock/03_STATUS_LIFECYCLE.md`
 
 ### Donor repo inputs
 

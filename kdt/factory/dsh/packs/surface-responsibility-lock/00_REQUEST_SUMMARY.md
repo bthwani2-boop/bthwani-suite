@@ -23,13 +23,15 @@
 
 - decide where each canonical DSH operation family lives
 - define entry and primary responsibility per surface
+- define the current wave order and first-open surface explicitly
+- record thin shell readiness expectations without authorizing preview
 - keep mirrored visibility separate from operation ownership
 - narrow control-panel use to real internal governance and explicit proxy flows
 
 ## Desired Outputs
 
 - clean surface matrix
+- surface activation plan
 - operation surface coverage
-- surface decision rules
 - source trace summary
 - target-fit summary

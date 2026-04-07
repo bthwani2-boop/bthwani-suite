@@ -1,13 +1,16 @@
-# 04_EVIDENCE_INDEX
+# 05_EVIDENCE_INDEX
 
 ## Pack Files
 
 - `requests/2026-04-06_actor-context-lock.md`
 - `packs/actor-context-lock/00_REQUEST_SUMMARY.md`
 - `packs/actor-context-lock/01_SOURCE_TRACE.md`
-- `packs/actor-context-lock/02_VISIBILITY_RULES.md`
-- `packs/actor-context-lock/03_TARGET_FIT_SUMMARY.md`
+- `packs/actor-context-lock/02_ACTOR_CONTEXT_MATRIX.csv`
+- `packs/actor-context-lock/03_VISIBILITY_RULES.md`
+- `packs/actor-context-lock/04_TARGET_FIT_SUMMARY.md`
+- `packs/actor-context-lock/05_EVIDENCE_INDEX.md`
 - `exports/actor-context-lock/ACTOR_CONTEXT_MATRIX.csv`
+- `index/ACTOR_CONTEXT_LOCK_INDEX.md`
 - `evidence/actor-context-lock/01_SOURCE_OBSERVATIONS.md`
 - `evidence/actor-context-lock/02_REENTRY_REVIEW.md`
 

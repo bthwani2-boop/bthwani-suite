@@ -1,5 +1,15 @@
 # 03_FLOW_MAP_STAFF
 
+## Entry Condition
+
+- a non-customer actor enters only through the surface they already own in the accepted surface lock
+
+## Preconditions
+
+- actor ownership and surface ownership are already explicit
+- `control-panel` remains narrowed to governance, intervention, and proxy-only internal work
+- field participation stays optional and evidence-backed only
+
 ## Partner Path
 
 1. Partner enters active DSH work in `app-partner`.
@@ -29,6 +39,20 @@
 1. Field enters DSH support work in `app-field` only when activation or visit support is required.
 2. Field performs `dsh_field_activation_support`.
 3. Field exits after store activation or visit support evidence is recorded.
+
+## Likely Failure Points Or Branch Logic
+
+- partner blockers may require store maintenance before handoff can continue
+- captain rejection or inability to complete may return the flow to reassignment or intervention
+- ops enters only when governance, exception, or proxy review is actually required
+- field remains absent unless activation or visit support is truly part of the current branch
+
+## Completion Signal
+
+- partner exits once handoff readiness is achieved or the branch is terminated
+- captain exits once delivery reaches a terminal customer-visible state
+- ops exits once the governance or exception condition is cleared
+- field exits once support evidence is recorded and no further field action is required
 
 ## Staff Path Rules
 

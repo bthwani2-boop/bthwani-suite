@@ -1,5 +1,15 @@
 # 04_FLOW_MAP_FAILURE_RECOVERY
 
+## Entry Condition
+
+- the mainline journey has encountered a blocking condition, exception, or optional side-path trigger
+
+## Preconditions
+
+- the happy path and staff paths are already defined
+- recovery must stay inside lawful owned surfaces whenever possible
+- no preview or screen-level branching is introduced here
+
 ## Failure Path - Checkout Does Not Pass
 
 1. Customer reaches `dsh_cart_checkout_gate`.
@@ -40,3 +50,16 @@
 - if field support is not enabled, `app-field` stays absent from the journey with no fallback surface pretending to own field work
 - if proxy flow is not relevant, the mainline order path proceeds without `control-panel`
 - if a payment method or financial check is unavailable, the journey blocks before submit and does not import wallet ownership into DSH
+
+## Likely Failure Points Or Branch Logic
+
+- checkout gating can block before order creation
+- partner-side blockers can force temporary maintenance or ops intervention
+- captain rejection or execution failure can force reassignment, delay, or cancellation
+- proxy cases create a governed side path instead of widening the mainline path
+- optional field absence must not trigger a fake fallback surface
+
+## Completion Signal
+
+- recovery succeeds when the actor returns to the same lawful surface and resumes the current operation family
+- failure reaches a terminal end only when the journey resolves to `cancelled` or another already-locked terminal outcome

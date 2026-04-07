@@ -19,11 +19,20 @@
 - `docs/services/dsh/03_SURFACE_MATRIX.csv` reviewed -> PASS
 - `kdt/factory/dsh/exports/actor-context-lock/ACTOR_CONTEXT_MATRIX.csv` reviewed -> PASS
 - `docs/services/dsh/00_SERVICE_PROFILE.md` reviewed -> PASS
+- `kdt/factory/dsh/packs/surface-responsibility-lock/02_SURFACE_MATRIX.csv` reviewed -> PASS
+- `kdt/factory/dsh/packs/surface-responsibility-lock/03_SURFACE_ACTIVATION_PLAN.csv` reviewed -> PASS
+- `kdt/factory/dsh/packs/surface-responsibility-lock/04_OPERATION_SURFACE_COVERAGE.csv` reviewed -> PASS
+- `kdt/factory/dsh/packs/surface-responsibility-lock/05_TARGET_FIT_SUMMARY.md` reviewed -> PASS
+- `kdt/factory/dsh/packs/surface-responsibility-lock/06_EVIDENCE_INDEX.md` reviewed -> PASS
+- `kdt/factory/dsh/exports/surface-responsibility-lock/SURFACE_ACTIVATION_PLAN.csv` reviewed -> PASS
 
 ## Consistency Review
 
 - operation surface coverage remains a lawful refinement of the accepted Phase 09 operation lock -> PASS
+- surface activation order is explicit and opens `app-client` first -> PASS
+- thin shell readiness is explicit for participating surfaces without authorizing preview -> PASS
 - clean surface ownership remains narrowed and does not reintroduce donor blanket MCPW mirroring -> PASS
+- `control-panel` does not open first and remains governance-only -> PASS
 - `app-field` remains explicitly classified and not ignored -> PASS
 - `webapp` and `website` remain outside current DSH ownership -> PASS
 
@@ -36,6 +45,7 @@
 ## Re-Entry Interpretation
 
 - Phase 10 is accepted as the current resumed step after the accepted Phase 09 baseline
+- canonical Phase 10 artifact filenames are now aligned with the current phase manual -> PASS
 - later downstream packs may exist, but they are not required to accept this phase
 - the surface responsibility lock remains a valid upstream input to Journey Lock
 
