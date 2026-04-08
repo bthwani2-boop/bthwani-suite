@@ -1,22 +1,16 @@
 {
   "name": "webapp",
-  "root": "apps/web/webapp",
-  "sourceRoot": "apps/web/webapp/src",
-  "projectType": "application",
   "targets": {
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm exec vite --config apps/web/webapp/vite.config.ts"
+        "command": "pnpm --dir apps/web/webapp dev"
       }
     },
     "build": {
       "executor": "nx:run-commands",
-      "outputs": [
-        "{workspaceRoot}/dist/apps/web/webapp"
-      ],
       "options": {
-        "command": "pnpm exec vite build --config apps/web/webapp/vite.config.ts"
+        "command": "pnpm --dir apps/web/webapp build"
       }
     }
   }

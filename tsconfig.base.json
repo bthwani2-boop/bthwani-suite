@@ -20,9 +20,6 @@
       "@bthwani/ui-kit/*": [
         "packages/ui-kit/src/*"
       ],
-      "@bthwani/surface-browser": [
-        "packages/surface-browser/src/index.ts"
-      ],
       "@bthwani/surface-mobile": [
         "packages/surface-mobile/src/index.tsx"
       ],
@@ -33,7 +30,6 @@
         "packages/surfaces/src/*"
       ]
     },
-    "ignoreDeprecations": "6.0",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

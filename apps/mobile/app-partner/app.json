@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "app-partner",
+    "slug": "app-partner",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+    , "sdkVersion": "54.0.0"
+  }
+}

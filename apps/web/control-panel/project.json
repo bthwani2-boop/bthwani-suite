@@ -1,22 +1,16 @@
 {
   "name": "control-panel",
-  "root": "apps/web/control-panel",
-  "sourceRoot": "apps/web/control-panel/src",
-  "projectType": "application",
   "targets": {
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm exec vite --config apps/web/control-panel/vite.config.ts"
+        "command": "pnpm --dir apps/web/control-panel dev"
       }
     },
     "build": {
       "executor": "nx:run-commands",
-      "outputs": [
-        "{workspaceRoot}/dist/apps/web/control-panel"
-      ],
       "options": {
-        "command": "pnpm exec vite build --config apps/web/control-panel/vite.config.ts"
+        "command": "pnpm --dir apps/web/control-panel build"
       }
     }
   }

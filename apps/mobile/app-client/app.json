@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "app-client",
+    "slug": "app-client",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "sdkVersion": "54.0.0"
+  }
+}

@@ -6,10 +6,9 @@
   "type": "module",
   "main": "./index.js",
   "dependencies": {
-    "@bthwani/surface-browser": "workspace:*",
     "@bthwani/surfaces": "workspace:*",
-    "expo": "~55.0.11",
-    "react": "19.2.0",
-    "react-native": "0.83.4"
+    "expo": "^54.0.0",
+    "react": "19.1.0",
+    "react-native": "0.81.0"
   }
 }

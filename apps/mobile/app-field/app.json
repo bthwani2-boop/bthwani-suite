@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "app-field",
+    "slug": "app-field",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+    },
+    "sdkVersion": "54.0.0"
+}

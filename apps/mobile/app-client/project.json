@@ -1,34 +1,16 @@
 {
   "name": "app-client",
-  "root": "apps/mobile/app-client",
-  "sourceRoot": "apps/mobile/app-client/src",
-  "projectType": "application",
   "targets": {
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm exec vite --config apps/mobile/app-client/vite.config.ts"
+        "command": "pnpm --dir apps/mobile/app-client exec expo start --go --clear"
       }
     },
     "build": {
       "executor": "nx:run-commands",
-      "outputs": [
-        "{workspaceRoot}/dist/apps/mobile/app-client"
-      ],
       "options": {
-        "command": "pnpm exec vite build --config apps/mobile/app-client/vite.config.ts"
-      }
-    },
-    "expo": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "pwsh -File tools/scripts/start-mobile-preview.ps1 -App app-client -Mode lan -Clear"
-      }
-    },
-    "expo-tunnel": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "pwsh -File tools/scripts/start-mobile-preview.ps1 -App app-client -Mode tunnel -Clear"
+        "command": "pnpm --dir apps/mobile/app-client exec expo export --platform android"
       }
     }
   }

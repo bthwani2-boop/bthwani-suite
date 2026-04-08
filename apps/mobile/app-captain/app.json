@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "app-captain",
+    "slug": "app-captain",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+    },
+    "sdkVersion": "54.0.0"
+}

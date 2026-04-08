@@ -1,34 +1,16 @@
 {
   "name": "app-captain",
-  "root": "apps/mobile/app-captain",
-  "sourceRoot": "apps/mobile/app-captain/src",
-  "projectType": "application",
   "targets": {
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm exec vite --config apps/mobile/app-captain/vite.config.ts"
+        "command": "pnpm --dir apps/mobile/app-captain exec expo start --go --clear"
       }
     },
     "build": {
       "executor": "nx:run-commands",
-      "outputs": [
-        "{workspaceRoot}/dist/apps/mobile/app-captain"
-      ],
       "options": {
-        "command": "pnpm exec vite build --config apps/mobile/app-captain/vite.config.ts"
-      }
-    },
-    "expo": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "pwsh -File tools/scripts/start-mobile-preview.ps1 -App app-captain -Mode lan -Clear"
-      }
-    },
-    "expo-tunnel": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "pwsh -File tools/scripts/start-mobile-preview.ps1 -App app-captain -Mode tunnel -Clear"
+        "command": "pnpm --dir apps/mobile/app-captain exec expo export --platform android"
       }
     }
   }

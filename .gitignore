@@ -9,6 +9,7 @@ dist/
 build/
 coverage/
 .nx/
+.next/
 .cache/
 tmp/
 temp/
@@ -23,6 +24,7 @@ yarn-error.log*
 # Environment files
 .env
 .env.*
+.expo/
 
 # OS/editor noise
 .DS_Store
