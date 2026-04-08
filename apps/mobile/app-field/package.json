@@ -7,7 +7,6 @@
   "main": "./index.js",
   "dependencies": {
     "@bthwani/surface-browser": "workspace:*",
-    "@bthwani/surface-mobile": "workspace:*",
     "@bthwani/surfaces": "workspace:*",
     "expo": "~55.0.11",
     "react": "19.2.0",
