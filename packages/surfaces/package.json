@@ -11,5 +11,12 @@
   "files": [
     "src",
     "docs"
-  ]
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./platform/field/mobile-entry": "./src/platform/field/mobile-entry.tsx",
+    "./platform/client/mobile-entry": "./src/platform/client/mobile-entry.tsx",
+    "./platform/captain/mobile-entry": "./src/platform/captain/mobile-entry.tsx",
+    "./platform/partner/mobile-entry": "./src/platform/partner/mobile-entry.tsx"
+  }
 }

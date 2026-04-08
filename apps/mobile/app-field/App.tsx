@@ -1,1 +1,1 @@
-export { default } from '@bthwani/surfaces/src/platform/field/mobile-entry';
+export { default } from '@bthwani/surfaces/platform/field/mobile-entry';

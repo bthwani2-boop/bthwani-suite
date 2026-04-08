@@ -1,13 +1,13 @@
 import React from 'react';
-import * as ScreenModule from '../../dsh/app-partner/orders-inbox/screens/PartnerOrdersInboxScreen';
+import * as ScreenModule from '../../dsh/app-partner/entry/screens/DshEntryScreen';
 
 const ResolvedScreen =
   (ScreenModule as any).default ??
-  (ScreenModule as any).PartnerOrdersInboxScreen;
+  (ScreenModule as any).DshEntryScreen;
 
 if (!ResolvedScreen) {
-  throw new Error('No usable export found in ../../dsh/app-partner/orders-inbox/screens/PartnerOrdersInboxScreen');
+  throw new Error('No usable export found in ../../dsh/app-partner/entry/screens/DshEntryScreen');
 }
 
 export default ResolvedScreen;
-export * from '../../dsh/app-partner/orders-inbox/screens/PartnerOrdersInboxScreen';
+export * from '../../dsh/app-partner/entry/screens/DshEntryScreen';
