@@ -1,6 +1,14 @@
 import React from 'react';
 import { SafeAreaView, ScrollView, View } from 'react-native';
 import { BthBox, BthButton, BthScreenHeader, BthSurface, BthText, UiKitProvider } from '@bthwani/ui-kit';
+import {
+  CaptainDeliveryConfirmSheet,
+  CaptainPickupConfirmSheet,
+  CaptainTaskDetailScreen,
+  CaptainTaskDetailSummary,
+  CaptainTasksInboxScreen,
+  CaptainTasksInboxScreenState,
+} from '../../dsh/app-captain';
 
 const primaryAreas = [
   'المهام',
@@ -14,7 +22,111 @@ const shortcuts = [
   'تبديل الحالة'
 ] as const;
 
+type CaptainRoute = 'home' | 'inbox' | 'detail';
+
+const defaultDetailByTaskId: Record<string, CaptainTaskDetailSummary> = {
+  'captain-task-9021': {
+    taskId: 'captain-task-9021',
+    pickupLabel: 'Burger Lab - Hittin branch',
+    dropoffLabel: 'Olaya District, King Fahad Road',
+    etaLabel: 'ETA to pickup: 8 min',
+    currentStageLabel: 'Heading to pickup',
+    nextActionLabel: 'Confirm pickup once package is collected',
+  },
+  'captain-task-9024': {
+    taskId: 'captain-task-9024',
+    pickupLabel: 'Green Bowl - Yasmin branch',
+    dropoffLabel: 'King Fahad Road, North district',
+    etaLabel: 'ETA to pickup: 15 min',
+    currentStageLabel: 'Queued for dispatch',
+    nextActionLabel: 'Start route and confirm pickup on arrival',
+  },
+};
+
 export function CaptainHomeShell() {
+  const [route, setRoute] = React.useState<CaptainRoute>('home');
+  const [inboxState, setInboxState] = React.useState<CaptainTasksInboxScreenState>('active');
+  const [activeTaskId, setActiveTaskId] = React.useState<string>('captain-task-9021');
+  const [isPickupSheetVisible, setIsPickupSheetVisible] = React.useState(false);
+  const [isDeliverySheetVisible, setIsDeliverySheetVisible] = React.useState(false);
+
+  const activeSummary = defaultDetailByTaskId[activeTaskId] ?? defaultDetailByTaskId['captain-task-9021'];
+
+  const openTaskDetail = (taskId: string) => {
+    setActiveTaskId(taskId);
+    setRoute('detail');
+  };
+
+  const renderCaptainFlow = () => {
+    if (route === 'inbox') {
+      return (
+        <CaptainTasksInboxScreen
+          state={inboxState}
+          onRetry={() => setInboxState('active')}
+          onOpenTask={openTaskDetail}
+          onOpenNextTask={openTaskDetail}
+        />
+      );
+    }
+
+    if (route === 'detail') {
+      return (
+        <>
+          <CaptainTaskDetailScreen
+            summary={activeSummary}
+            onConfirmPickup={() => setIsPickupSheetVisible(true)}
+            onConfirmDelivery={() => setIsDeliverySheetVisible(true)}
+            onOpenNextTask={() => setRoute('inbox')}
+            onBackToInbox={() => setRoute('inbox')}
+            onRetry={() => setRoute('detail')}
+          />
+
+          <CaptainPickupConfirmSheet
+            visible={isPickupSheetVisible}
+            taskTitle={activeSummary.taskId}
+            onConfirm={() => setIsPickupSheetVisible(false)}
+            onCancel={() => setIsPickupSheetVisible(false)}
+          />
+
+          <CaptainDeliveryConfirmSheet
+            visible={isDeliverySheetVisible}
+            taskTitle={activeSummary.taskId}
+            onConfirm={() => {
+              setIsDeliverySheetVisible(false);
+              setInboxState('delivered');
+              setRoute('inbox');
+            }}
+            onCancel={() => setIsDeliverySheetVisible(false)}
+          />
+        </>
+      );
+    }
+
+    return null;
+  };
+
+  if (route !== 'home') {
+    return (
+      <UiKitProvider direction="rtl" language="ar">
+        <SafeAreaView style={{ flex: 1 }}>
+          <BthBox padding={4} gap={3}>
+            <BthButton label="العودة للرئيسية" tone="secondary" onPress={() => setRoute('home')} />
+            <BthSurface tone="inset" padding={3} gap={2} radiusToken="lg">
+              <BthText role="label">حالة تشغيل الاختبار</BthText>
+              <View style={{ gap: 8 }}>
+                <BthButton label="Active" tone="secondary" onPress={() => setInboxState('active')} />
+                <BthButton label="No tasks" tone="secondary" onPress={() => setInboxState('noTasks')} />
+                <BthButton label="Delivered" tone="secondary" onPress={() => setInboxState('delivered')} />
+                <BthButton label="Error" tone="secondary" onPress={() => setInboxState('error')} />
+              </View>
+            </BthSurface>
+          </BthBox>
+          {renderCaptainFlow()}
+        </SafeAreaView>
+      </UiKitProvider>
+    );
+  }
+
   return (
     <UiKitProvider direction="rtl" language="ar">
       <SafeAreaView style={{ flex: 1 }}>
@@ -24,7 +136,7 @@ export function CaptainHomeShell() {
               title="مهام الكابتن"
               subtitle="هذه هي نقطة البداية الحقيقية لتطبيق الكابتن."
               actionLabel="ابدأ الاستلام"
-              onActionPress={() => {}}
+              onActionPress={() => setRoute('inbox')}
             />
 
             <BthSurface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
@@ -46,8 +158,27 @@ export function CaptainHomeShell() {
             <BthSurface tone="default" padding={5} gap={4} radiusToken="xl">
               <BthText role="label">اختصارات البداية</BthText>
               <View style={{ gap: 12 }}>
-                {shortcuts.map((item) => (
-                  <BthButton key={item} label={item} tone="secondary" onPress={() => {}} />
+                {shortcuts.map((item, index) => (
+                  <BthButton
+                    key={item}
+                    label={item}
+                    tone="secondary"
+                    onPress={() => {
+                      if (index === 0) {
+                        setRoute('inbox');
+                        return;
+                      }
+
+                      if (index === 1) {
+                        setInboxState('delivered');
+                        setRoute('inbox');
+                        return;
+                      }
+
+                      setInboxState('noTasks');
+                      setRoute('inbox');
+                    }}
+                  />
                 ))}
               </View>
             </BthSurface>
@@ -57,7 +188,7 @@ export function CaptainHomeShell() {
               <BthText role="bodySm" tone="muted">البدء من home shell يمنع خلط feature preview مع التشغيل الفعلي للتطبيق.</BthText>
             </BthSurface>
 
-            <BthButton label="ابدأ الاستلام" onPress={() => {}} />
+            <BthButton label="ابدأ الاستلام" onPress={() => setRoute('inbox')} />
           </BthBox>
         </ScrollView>
       </SafeAreaView>

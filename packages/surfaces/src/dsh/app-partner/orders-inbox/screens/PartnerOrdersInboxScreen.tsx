@@ -12,6 +12,8 @@ import {
 
 export type PartnerOrdersInboxScreenState = 'ready' | 'loading' | 'empty' | 'error';
 
+export const PARTNER_ORDERS_INBOX_FILTERS_DECISION = 'deferred';
+
 export type PartnerOrdersInboxListItem = {
   id: string;
   title: string;
@@ -125,7 +127,7 @@ export function PartnerOrdersInboxScreen({
       <BthBox gap={2}>
         <BthText role="titleLg">Partner orders inbox</BthText>
         <BthText role="bodySm" tone="muted">
-          Task-first queue for the next operational decision. Filters are deferred in this wave to keep the next order obvious.
+          Task-first queue for the next operational decision. Filters are {PARTNER_ORDERS_INBOX_FILTERS_DECISION} in this wave to keep the next order obvious.
         </BthText>
       </BthBox>
 
