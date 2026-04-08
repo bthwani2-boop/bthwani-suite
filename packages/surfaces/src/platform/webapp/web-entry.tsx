@@ -1,2 +1,2 @@
-// Entry point for webapp surface
-export * from '../../../web/webapp';
+export { WebAppShell as default } from './WebAppShell';
+export * from './WebAppShell';

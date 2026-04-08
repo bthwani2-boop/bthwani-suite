@@ -1,2 +1,3 @@
-// Index for website platform surface
-export * from './web-entry';
+export { WebsiteShell } from './WebsiteShell';
+export type { WebsiteShellProps } from './WebsiteShell';
+export { default } from './web-entry';

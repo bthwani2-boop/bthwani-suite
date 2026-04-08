@@ -1,2 +1,2 @@
-// Entry point for website surface
-export * from '../../../web/website';
+export { WebsiteShell as default } from './WebsiteShell';
+export * from './WebsiteShell';

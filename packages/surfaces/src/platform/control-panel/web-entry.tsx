@@ -1,2 +1,2 @@
-// Entry point for control-panel surface
-export * from '../../../web/control-panel';
+export { ControlPanelWebShell as default } from './ControlPanelWebShell';
+export * from './ControlPanelWebShell';
