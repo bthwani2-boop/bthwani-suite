@@ -1,0 +1,2 @@
+status,legal_gate,closed_at,service,prereq_source,notes
+CLOSED,PRE_SCREEN,2026-04-08,dsh,14_UI_KIT_REQUIREMENTS.csv,UI kit prerequisites are locked for first-screen gate
