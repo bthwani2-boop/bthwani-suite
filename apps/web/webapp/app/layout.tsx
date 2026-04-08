@@ -1,23 +1,15 @@
-
 export const metadata = {
   title: 'BThwani WebApp',
   description: 'Unified Next.js web surface',
 };
 
-import { UiKitProvider, ThemeProvider, DirectionProvider } from 'packages/ui-kit/src/providers';
+import type { ReactNode } from 'react';
+import { BthWebRootLayout } from '@bthwani/ui-kit';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ar" dir="rtl">
-      <body style={{ margin: 0, fontFamily: 'Inter, system-ui, sans-serif', background: '#0B1220', color: '#FFFFFF' }}>
-        <UiKitProvider>
-          <ThemeProvider>
-            <DirectionProvider>
-              {children}
-            </DirectionProvider>
-          </ThemeProvider>
-        </UiKitProvider>
-      </body>
-    </html>
+    <BthWebRootLayout appName="webapp" language="ar" direction="rtl" themeMode="light">
+      {children}
+    </BthWebRootLayout>
   );
 }

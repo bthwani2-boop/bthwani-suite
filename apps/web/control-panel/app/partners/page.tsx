@@ -1,8 +1,5 @@
+import ControlPanelWebShell from '@bthwani/surfaces/platform/control-panel/web-entry';
+
 export default function PartnersPage() {
-  return (
-    <main>
-      <h1>Partners</h1>
-      <p>Control-panel partners section.</p>
-    </main>
-  );
+  return <ControlPanelWebShell section="partners" />;
 }

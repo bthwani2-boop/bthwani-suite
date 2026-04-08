@@ -1,8 +1,5 @@
+import ControlPanelWebShell from '@bthwani/surfaces/platform/control-panel/web-entry';
+
 export default function ControlPlatformPage() {
-  return (
-    <main>
-      <h1>Control / Platform</h1>
-      <p>Platform subsection inside Control domain.</p>
-    </main>
-  );
+  return <ControlPanelWebShell section="control" subsection="platform" />;
 }

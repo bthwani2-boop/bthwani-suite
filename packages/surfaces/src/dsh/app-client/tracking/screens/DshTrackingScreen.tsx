@@ -1,9 +1,9 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
 import {
   BthBox,
   BthButton,
   BthChip,
+  BthMobileScrollView,
   BthSectionHeader,
   BthStateView,
   BthSurface,
@@ -81,7 +81,7 @@ export function DshTrackingScreen({
   }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+    <BthMobileScrollView padding={4} gap={3}>
       <BthSurface tone="brand" gap={3}>
         <BthSectionHeader
           title="Current status"
@@ -110,6 +110,6 @@ export function DshTrackingScreen({
           <BthButton label="Continue" onPress={onNextAction} />
         </BthBox>
       </BthSurface>
-    </ScrollView>
+    </BthMobileScrollView>
   );
 }

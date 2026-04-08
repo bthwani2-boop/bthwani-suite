@@ -3,12 +3,13 @@ export const metadata = {
   description: 'Unified Next.js web surface',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import type { ReactNode } from 'react';
+import { BthWebRootLayout } from '@bthwani/ui-kit';
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ar" dir="rtl">
-      <body style={{ margin: 0, fontFamily: 'Inter, system-ui, sans-serif', background: '#0B1220', color: '#FFFFFF' }}>
-        {children}
-      </body>
-    </html>
+    <BthWebRootLayout appName="control-panel" language="ar" direction="rtl" themeMode="light">
+      {children}
+    </BthWebRootLayout>
   );
 }

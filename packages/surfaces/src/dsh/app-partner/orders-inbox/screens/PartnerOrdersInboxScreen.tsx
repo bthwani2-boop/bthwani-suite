@@ -1,9 +1,9 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
 import {
   BthBox,
   BthButton,
   BthListItem,
+  BthMobileScrollView,
   BthSectionHeader,
   BthStateView,
   BthSurface,
@@ -123,7 +123,7 @@ export function PartnerOrdersInboxScreen({
   };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+    <BthMobileScrollView padding={4} gap={3}>
       <BthBox gap={2}>
         <BthText role="titleLg">Partner orders inbox</BthText>
         <BthText role="bodySm" tone="muted">
@@ -166,7 +166,7 @@ export function PartnerOrdersInboxScreen({
           ))}
         </BthBox>
       </BthSurface>
-    </ScrollView>
+    </BthMobileScrollView>
   );
 }
 

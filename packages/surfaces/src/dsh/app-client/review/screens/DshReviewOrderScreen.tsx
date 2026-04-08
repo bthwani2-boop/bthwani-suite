@@ -1,8 +1,8 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
 import {
   BthBox,
   BthButton,
+  BthMobileScrollView,
   BthSectionHeader,
   BthStateView,
   BthSurface,
@@ -52,7 +52,7 @@ export function DshReviewOrderScreen({ state = 'ready', blocks, onSubmit, onEdit
   }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+    <BthMobileScrollView padding={4} gap={3}>
       <BthBox gap={2}>
         <BthText role="titleLg">Review order</BthText>
         <BthText role="bodySm" tone="muted">
@@ -73,6 +73,6 @@ export function DshReviewOrderScreen({ state = 'ready', blocks, onSubmit, onEdit
           <BthButton label="Submit order" onPress={onSubmit} />
         </BthBox>
       </BthSurface>
-    </ScrollView>
+    </BthMobileScrollView>
   );
 }

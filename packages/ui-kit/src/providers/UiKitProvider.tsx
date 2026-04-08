@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import type { BthLanguage, Direction } from '../foundation/direction';
 import type { ThemeMode } from '../foundation/themes';

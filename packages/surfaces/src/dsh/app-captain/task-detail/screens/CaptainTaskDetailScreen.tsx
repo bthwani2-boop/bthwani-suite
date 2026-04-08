@@ -1,8 +1,8 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
 import {
   BthBox,
   BthButton,
+  BthMobileScrollView,
   BthSectionHeader,
   BthStateView,
   BthSurface,
@@ -63,7 +63,7 @@ function renderEmptyState(onBackToInbox?: () => void) {
 
 function renderErrorState(onRetry?: () => void, onBackToInbox?: () => void) {
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+    <BthMobileScrollView padding={4} gap={3}>
       <BthStateView
         stateId="recoverableError"
         title="Task detail is unavailable"
@@ -72,7 +72,7 @@ function renderErrorState(onRetry?: () => void, onBackToInbox?: () => void) {
         onActionPress={onRetry}
       />
       {onBackToInbox ? <BthButton label="Back to inbox" tone="secondary" onPress={onBackToInbox} /> : null}
-    </ScrollView>
+    </BthMobileScrollView>
   );
 }
 
@@ -98,7 +98,7 @@ export function CaptainTaskDetailScreen({
   }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+    <BthMobileScrollView padding={4} gap={3}>
       <BthBox gap={2}>
         <BthText role="titleLg">Task detail</BthText>
         <BthText role="bodySm" tone="muted">
@@ -137,7 +137,7 @@ export function CaptainTaskDetailScreen({
 
       <BthButton label="Open next task" tone="secondary" onPress={onOpenNextTask} />
       <BthButton label="Back to inbox" tone="ghost" onPress={onBackToInbox} />
-    </ScrollView>
+    </BthMobileScrollView>
   );
 }
 

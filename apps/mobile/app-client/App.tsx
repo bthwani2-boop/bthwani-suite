@@ -1,1 +1,10 @@
-export { default } from '@bthwani/surfaces/platform/client/mobile-entry';
+import { BthMobileRoot } from '@bthwani/ui-kit';
+import ClientHomeShell from '@bthwani/surfaces/platform/client/mobile-entry';
+
+export default function App() {
+	return (
+		<BthMobileRoot direction="rtl" language="ar" themeMode="light">
+			<ClientHomeShell />
+		</BthMobileRoot>
+	);
+}

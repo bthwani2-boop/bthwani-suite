@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useContext, useMemo } from 'react';
 import { directionConfig, resolveDirectionFromLanguage, type BthLanguage, type Direction } from '../foundation/direction';
 

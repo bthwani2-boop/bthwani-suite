@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useContext, useMemo } from 'react';
 import { darkTheme, lightTheme, type SemanticTheme, type ThemeMode } from '../foundation/themes';
 

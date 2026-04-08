@@ -1,8 +1,5 @@
+import ControlPanelWebShell from '@bthwani/surfaces/platform/control-panel/web-entry';
+
 export default function OperationsPage() {
-  return (
-    <main>
-      <h1>Operations</h1>
-      <p>Control-panel operations section.</p>
-    </main>
-  );
+  return <ControlPanelWebShell section="operations" />;
 }

@@ -1,8 +1,5 @@
+import ControlPanelWebShell from '@bthwani/surfaces/platform/control-panel/web-entry';
+
 export default function ControlGovernancePage() {
-  return (
-    <main>
-      <h1>Control / Governance</h1>
-      <p>Governance subsection inside Control domain.</p>
-    </main>
-  );
+  return <ControlPanelWebShell section="control" subsection="governance" />;
 }

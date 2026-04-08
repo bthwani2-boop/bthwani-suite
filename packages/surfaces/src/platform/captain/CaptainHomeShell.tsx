@@ -1,6 +1,5 @@
 import React from 'react';
-import { SafeAreaView, ScrollView, View } from 'react-native';
-import { BthBox, BthButton, BthScreenHeader, BthSurface, BthText, UiKitProvider } from '@bthwani/ui-kit';
+import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthSurface, BthText } from '@bthwani/ui-kit';
 import {
   CaptainDeliveryConfirmSheet,
   CaptainPickupConfirmSheet,
@@ -107,92 +106,84 @@ export function CaptainHomeShell() {
 
   if (route !== 'home') {
     return (
-      <UiKitProvider direction="rtl" language="ar">
-        <SafeAreaView style={{ flex: 1 }}>
-          <BthBox padding={4} gap={3}>
-            <BthButton label="العودة للرئيسية" tone="secondary" onPress={() => setRoute('home')} />
-            <BthSurface tone="inset" padding={3} gap={2} radiusToken="lg">
-              <BthText role="label">حالة تشغيل الاختبار</BthText>
-              <View style={{ gap: 8 }}>
-                <BthButton label="Active" tone="secondary" onPress={() => setInboxState('active')} />
-                <BthButton label="No tasks" tone="secondary" onPress={() => setInboxState('noTasks')} />
-                <BthButton label="Delivered" tone="secondary" onPress={() => setInboxState('delivered')} />
-                <BthButton label="Error" tone="secondary" onPress={() => setInboxState('error')} />
-              </View>
-            </BthSurface>
-          </BthBox>
-          {renderCaptainFlow()}
-        </SafeAreaView>
-      </UiKitProvider>
+      <>
+        <BthBox padding={4} gap={3}>
+          <BthButton label="العودة للرئيسية" tone="secondary" onPress={() => setRoute('home')} />
+          <BthSurface tone="inset" padding={3} gap={2} radiusToken="lg">
+            <BthText role="label">حالة تشغيل الاختبار</BthText>
+            <BthBox gap={2}>
+              <BthButton label="Active" tone="secondary" onPress={() => setInboxState('active')} />
+              <BthButton label="No tasks" tone="secondary" onPress={() => setInboxState('noTasks')} />
+              <BthButton label="Delivered" tone="secondary" onPress={() => setInboxState('delivered')} />
+              <BthButton label="Error" tone="secondary" onPress={() => setInboxState('error')} />
+            </BthBox>
+          </BthSurface>
+        </BthBox>
+        {renderCaptainFlow()}
+      </>
     );
   }
 
   return (
-    <UiKitProvider direction="rtl" language="ar">
-      <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
-          <BthBox padding={5} gap={5} style={{ flexGrow: 1 }}>
-            <BthScreenHeader
-              title="مهام الكابتن"
-              subtitle="هذه هي نقطة البداية الحقيقية لتطبيق الكابتن."
-              actionLabel="ابدأ الاستلام"
-              onActionPress={() => setRoute('inbox')}
+    <BthMobileScrollView fill padding={5} gap={5}>
+      <BthScreenHeader
+        title="مهام الكابتن"
+        subtitle="هذه هي نقطة البداية الحقيقية لتطبيق الكابتن."
+        actionLabel="ابدأ الاستلام"
+        onActionPress={() => setRoute('inbox')}
+      />
+
+      <BthSurface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
+        <BthText role="label" tone="inverse">نقطة البداية الرسمية</BthText>
+        <BthText role="titleLg" tone="inverse">بداية تشغيلية حقيقية للكابتن</BthText>
+        <BthText role="bodyMd" tone="inverse">تطبيق الكابتن يجب أن يبدأ من shell تُظهر المهام والحالة والاختصارات، لا من preview service entry.</BthText>
+      </BthSurface>
+
+      <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
+        <BthText role="label">المساحات الأساسية</BthText>
+        {primaryAreas.map((item) => (
+          <BthSurface key={item} tone="default" padding={4} gap={2} radiusToken="lg">
+            <BthText role="bodyStrong">{item}</BthText>
+            <BthText role="bodySm" tone="muted">هذه مساحة رئيسية داخل التطبيق الحقيقي وليست preview route.</BthText>
+          </BthSurface>
+        ))}
+      </BthSurface>
+
+      <BthSurface tone="default" padding={5} gap={4} radiusToken="xl">
+        <BthText role="label">اختصارات البداية</BthText>
+        <BthBox gap={3}>
+          {shortcuts.map((item, index) => (
+            <BthButton
+              key={item}
+              label={item}
+              tone="secondary"
+              onPress={() => {
+                if (index === 0) {
+                  setRoute('inbox');
+                  return;
+                }
+
+                if (index === 1) {
+                  setInboxState('delivered');
+                  setRoute('inbox');
+                  return;
+                }
+
+                setInboxState('noTasks');
+                setRoute('inbox');
+              }}
             />
+          ))}
+        </BthBox>
+      </BthSurface>
 
-            <BthSurface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
-              <BthText role="label" tone="inverse">نقطة البداية الرسمية</BthText>
-              <BthText role="titleLg" tone="inverse">بداية تشغيلية حقيقية للكابتن</BthText>
-              <BthText role="bodyMd" tone="inverse">تطبيق الكابتن يجب أن يبدأ من shell تُظهر المهام والحالة والاختصارات، لا من preview service entry.</BthText>
-            </BthSurface>
+      <BthSurface tone="inset" padding={4} gap={2} radiusToken="lg">
+        <BthText role="label">حكم معماري</BthText>
+        <BthText role="bodySm" tone="muted">البدء من home shell يمنع خلط feature preview مع التشغيل الفعلي للتطبيق.</BthText>
+      </BthSurface>
 
-            <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
-              <BthText role="label">المساحات الأساسية</BthText>
-              {primaryAreas.map((item) => (
-                <BthSurface key={item} tone="default" padding={4} gap={2} radiusToken="lg">
-                  <BthText role="bodyStrong">{item}</BthText>
-                  <BthText role="bodySm" tone="muted">هذه مساحة رئيسية داخل التطبيق الحقيقي وليست preview route.</BthText>
-                </BthSurface>
-              ))}
-            </BthSurface>
-
-            <BthSurface tone="default" padding={5} gap={4} radiusToken="xl">
-              <BthText role="label">اختصارات البداية</BthText>
-              <View style={{ gap: 12 }}>
-                {shortcuts.map((item, index) => (
-                  <BthButton
-                    key={item}
-                    label={item}
-                    tone="secondary"
-                    onPress={() => {
-                      if (index === 0) {
-                        setRoute('inbox');
-                        return;
-                      }
-
-                      if (index === 1) {
-                        setInboxState('delivered');
-                        setRoute('inbox');
-                        return;
-                      }
-
-                      setInboxState('noTasks');
-                      setRoute('inbox');
-                    }}
-                  />
-                ))}
-              </View>
-            </BthSurface>
-
-            <BthSurface tone="inset" padding={4} gap={2} radiusToken="lg">
-              <BthText role="label">حكم معماري</BthText>
-              <BthText role="bodySm" tone="muted">البدء من home shell يمنع خلط feature preview مع التشغيل الفعلي للتطبيق.</BthText>
-            </BthSurface>
-
-            <BthButton label="ابدأ الاستلام" onPress={() => setRoute('inbox')} />
-          </BthBox>
-        </ScrollView>
-      </SafeAreaView>
-    </UiKitProvider>
+      <BthButton label="ابدأ الاستلام" onPress={() => setRoute('inbox')} />
+    </BthMobileScrollView>
   );
 }
 

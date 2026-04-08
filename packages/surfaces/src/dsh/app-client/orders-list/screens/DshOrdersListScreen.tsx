@@ -1,8 +1,8 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
 import {
   BthBox,
   BthListItem,
+  BthMobileScrollView,
   BthSearchField,
   BthSectionHeader,
   BthStateView,
@@ -48,7 +48,7 @@ export function DshOrdersListScreen({
   }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+    <BthMobileScrollView padding={4} gap={3}>
       <BthBox gap={2}>
         <BthText role="titleLg">Orders list</BthText>
         <BthText role="bodySm" tone="muted">
@@ -83,6 +83,6 @@ export function DshOrdersListScreen({
           ))}
         </BthBox>
       </BthSurface>
-    </ScrollView>
+    </BthMobileScrollView>
   );
 }

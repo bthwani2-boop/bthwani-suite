@@ -1,8 +1,5 @@
+import ControlPanelWebShell from '@bthwani/surfaces/platform/control-panel/web-entry';
+
 export default function MarketingPage() {
-  return (
-    <main>
-      <h1>Marketing</h1>
-      <p>Control-panel marketing section.</p>
-    </main>
-  );
+  return <ControlPanelWebShell section="marketing" />;
 }

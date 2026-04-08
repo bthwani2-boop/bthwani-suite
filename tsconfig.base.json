@@ -1,4 +1,5 @@
 {
+  "$schema": "./tools/schemas/tsconfig.schema.json",
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -16,9 +17,6 @@
       ],
       "@bthwani/ui-kit": [
         "packages/ui-kit/src/index.ts"
-      ],
-      "@bthwani/ui-kit/*": [
-        "packages/ui-kit/src/*"
       ],
       "@bthwani/surface-mobile": [
         "packages/surface-mobile/src/index.tsx"
