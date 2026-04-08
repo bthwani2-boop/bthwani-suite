@@ -3,7 +3,6 @@
   "name": "@bthwani/app-captain",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
   "main": "./index.js",
   "dependencies": {
     "@bthwani/surfaces": "workspace:*",
