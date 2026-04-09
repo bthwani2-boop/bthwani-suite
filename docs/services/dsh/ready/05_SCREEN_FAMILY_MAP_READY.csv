@@ -1,0 +1,2 @@
+screen_id,screen_type,family,placement_decision,status_label
+SCR_82,screen,app-client operation screen,packages/surfaces/src/dsh/app-client/cart-get/screens,READY_UI_UX_FLOW

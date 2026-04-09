@@ -1,0 +1,3 @@
+screen_id,canonical_name,surface,status_label,phase_scope,source_trace
+SCR_W1_001,dsh_entry_screen,app-client,READY_UI_UX_FLOW,UI_UX_FLOW_ONLY,docs/services/dsh/08_FIRST_SCREEN_DECISION.md
+SCR_82,dsh_cart_get,app-client,READY_UI_UX_FLOW,UI_UX_FLOW_ONLY,docs/services/dsh/11_FIRST_SCREEN_RULE.md

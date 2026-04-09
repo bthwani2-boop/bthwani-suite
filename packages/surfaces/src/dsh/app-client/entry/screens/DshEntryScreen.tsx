@@ -8,16 +8,29 @@ import {
   BthText,
 } from '@bthwani/ui-kit';
 
-export type DshEntryScreenState = 'ready' | 'loading' | 'empty';
+export type DshEntryScreenState =
+  | 'ready'
+  | 'loading'
+  | 'empty'
+  | 'offline'
+  | 'error'
+  | 'disabled';
 
 export type DshEntryScreenProps = {
   state?: DshEntryScreenState;
-  onStartPress?: () => void;
-  onBrowsePress?: () => void;
-  onTrackOrdersPress?: () => void;
+  title?: string;
+  subtitle?: string;
+  onStartDelivery?: () => void;
+  onBrowseStores?: () => void;
+  onOpenOrders?: () => void;
+  onRetry?: () => void;
 };
 
-function renderHero(state: DshEntryScreenState, onStartPress?: () => void) {
+function renderNonReadyState(
+  state: DshEntryScreenState,
+  onStartDelivery?: () => void,
+  onRetry?: () => void
+) {
   if (state === 'loading') {
     return <BthStateView stateId="loading" />;
   }
@@ -27,47 +40,75 @@ function renderHero(state: DshEntryScreenState, onStartPress?: () => void) {
       <BthStateView
         stateId="empty"
         actionLabel="Start delivery"
-        onActionPress={onStartPress}
+        onActionPress={onStartDelivery}
+      />
+    );
+  }
+
+  if (state === 'offline') {
+    return <BthStateView stateId="offline" onActionPress={onRetry} />;
+  }
+
+  if (state === 'disabled') {
+    return (
+      <BthStateView
+        stateId="warning"
+        title="Delivery entry is temporarily paused"
+        description="This route is currently restricted. Keep retry and fallback visible."
+        actionLabel="Retry"
+        onActionPress={onRetry}
       />
     );
   }
 
   return (
-    <BthCard
-      title="Deliver anything fast"
-      subtitle="Start from one focused entry point for discovery, action, and review."
-      footer={<BthButton label="Start delivery" onPress={onStartPress} />}
+    <BthStateView
+      stateId="recoverableError"
+      title="Entry is unavailable"
+      description="Retry first. If the issue persists, use the orders path as fallback."
+      actionLabel="Retry"
+      onActionPress={onRetry}
     />
   );
 }
 
-function renderDiscoverySection(onBrowsePress?: () => void) {
+function renderHero(onStartDelivery?: () => void) {
+  return (
+    <BthCard
+      title="Deliver with confidence"
+      subtitle="One clean starting point for discovery, cart review, and next action."
+      footer={<BthButton label="Start delivery" onPress={onStartDelivery} />}
+    />
+  );
+}
+
+function renderDiscoverySection(onBrowseStores?: () => void) {
   return (
     <BthBox gap={3}>
       <BthCard
         title="Discover nearby stores"
-        subtitle="Browse categories and featured offers with a consistent list card pattern."
-        footer={<BthButton label="Browse stores" tone="secondary" onPress={onBrowsePress} />}
+        subtitle="Keep discovery lightweight and focused before cart expansion."
+        footer={<BthButton label="Browse stores" tone="secondary" onPress={onBrowseStores} />}
       />
       <BthCard
-        title="Quick reorder"
-        subtitle="Jump back into your common items without a full platform home flow."
+        title="Continue from cart"
+        subtitle="Return to the first executable flow without extra navigation branches."
       />
     </BthBox>
   );
 }
 
-function renderReviewSection(onTrackOrdersPress?: () => void) {
+function renderReviewSection(onOpenOrders?: () => void) {
   return (
     <BthBox gap={3}>
       <BthCard
-        title="Review before checkout"
-        subtitle="Keep action CTA and review state visible before final confirmation."
+        title="Review before confirmation"
+        subtitle="Keep one dominant CTA and one clear fallback path."
       />
       <BthCard
-        title="Track active orders"
-        subtitle="Open the orders list and move to tracking from a single known pattern."
-        footer={<BthButton label="Open orders" tone="ghost" onPress={onTrackOrdersPress} />}
+        title="Open active orders"
+        subtitle="Tracking remains available as a confidence and recovery destination."
+        footer={<BthButton label="Open orders" tone="ghost" onPress={onOpenOrders} />}
       />
     </BthBox>
   );
@@ -75,43 +116,45 @@ function renderReviewSection(onTrackOrdersPress?: () => void) {
 
 export function DshEntryScreen({
   state = 'ready',
-  onStartPress,
-  onBrowsePress,
-  onTrackOrdersPress,
+  title = 'Delivery entry',
+  subtitle = 'First visual service entry slice for app-client delivery journeys.',
+  onStartDelivery,
+  onBrowseStores,
+  onOpenOrders,
+  onRetry,
 }: DshEntryScreenProps) {
+  if (state !== 'ready') {
+    return renderNonReadyState(state, onStartDelivery, onRetry);
+  }
+
   return (
     <BthDashboardShell
-      title="Delivery Entry"
-      subtitle="Single-purpose entry for app-client delivery discovery and first action."
-      hero={renderHero(state, onStartPress)}
-      sections={
-        state === 'ready'
-          ? [
-              {
-                title: 'Discovery',
-                subtitle: 'Entry cards and content discovery pattern.',
-                content: renderDiscoverySection(onBrowsePress),
-              },
-              {
-                title: 'Review and Tracking',
-                subtitle: 'Review pattern, success handoff, and orders list/track pattern.',
-                content: renderReviewSection(onTrackOrdersPress),
-              },
-            ]
-          : [
-              {
-                title: 'Entry State',
-                subtitle: 'The screen keeps one clear purpose while handling base states.',
-                content: (
-                  <BthBox>
-                    <BthText role="bodyMd" tone="muted">
-                      Entry state is active. No business logic or network requests are executed here.
-                    </BthText>
-                  </BthBox>
-                ),
-              },
-            ]
-      }
+      title={title}
+      subtitle={subtitle}
+      hero={renderHero(onStartDelivery)}
+      sections={[
+        {
+          title: 'Discovery',
+          subtitle: 'Keep options compact and avoid decision noise.',
+          content: renderDiscoverySection(onBrowseStores),
+        },
+        {
+          title: 'Review and tracking',
+          subtitle: 'Preserve closure confidence and fallback continuity.',
+          content: renderReviewSection(onOpenOrders),
+        },
+        {
+          title: 'Flow guardrails',
+          subtitle: 'This slice is UI/UX/Flow only in the current phase.',
+          content: (
+            <BthBox>
+              <BthText role="bodySm" tone="muted">
+                No API, binding, integration, runtime, or contract work is executed in this screen.
+              </BthText>
+            </BthBox>
+          ),
+        },
+      ]}
     />
   );
 }

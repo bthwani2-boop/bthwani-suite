@@ -1,6 +1,7 @@
 export * from './foundation/tokens';
 export * from './foundation/themes';
 export * from './foundation/direction';
+export * from './foundation/i18n';
 export * from './hooks';
 export * from './providers';
 export * from './primitives';

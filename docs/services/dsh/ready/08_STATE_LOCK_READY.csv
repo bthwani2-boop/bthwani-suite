@@ -1,0 +1,2 @@
+screen_id,required_states,state_lock,status_label
+SCR_82,loading|empty|error|offline|disabled|ready,mandatory_and_explicit,READY_UI_UX_FLOW

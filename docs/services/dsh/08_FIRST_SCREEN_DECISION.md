@@ -1,4 +1,8 @@
+
 # DSH First Screen Decision
+
+> **ملاحظة توثيقية (2026-04-09):**
+> هذه الشاشة baseline فقط وليست أول شاشة تنفيذية. المصدر الوحيد لحقيقة أول شاشة تنفيذية هو [11_FIRST_SCREEN_RULE.md](11_FIRST_SCREEN_RULE.md). تم توحيد القرار لمنع التضارب وضمان التسلسل الحوكمي الصارم.
 
 Status: CLOSED
 Legal Gate: PRE_SCREEN

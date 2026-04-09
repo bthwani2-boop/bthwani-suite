@@ -1,0 +1,2 @@
+screen_id,screen_purpose,non_purpose,status_label
+SCR_82,execute primary cart-get task with clear next action,no api/binding/runtime execution,READY_UI_UX_FLOW

@@ -1,5 +1,7 @@
 import React from 'react';
-import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthSectionHeader, BthServiceTileCard, BthSurface, BthText } from '@bthwani/ui-kit';
+import { ScrollView, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { BthBox, BthButton, BthMobileTopBar, BthNewsTickerBar, BthSectionHeader, BthServiceTileCard, BthStateView, BthSurface, getBthUiText } from '@bthwani/ui-kit';
 import { amn, arb, dsh, esf, knz, kwd, mrf, snd, wlt } from '@bthwani/surfaces';
 
 const { AmnEntryScreen } = amn.amnAppClient;
@@ -38,10 +40,12 @@ type ClientRoute =
 
 type ServiceEntry = {
   id: string;
-  label: string;
+  title: string;
   route: ClientRoute;
-  subtitle: string;
+  iconName: React.ComponentProps<typeof Ionicons>['name'];
 };
+
+const uiText = getBthUiText('ar');
 
 type CreateOrderValues = {
   pickupAddress: string;
@@ -76,28 +80,16 @@ const initialOrders = [
   },
 ];
 
-const primaryAreas = [
-  'الخدمات',
-  'الطلبات',
-  'العناوين'
-] as const;
-
-const shortcuts = [
-  'عرض الخدمات',
-  'الطلبات الجارية',
-  'إدارة العناوين'
-] as const;
-
 const serviceEntries: ServiceEntry[] = [
-  { id: 'dsh', label: 'DSH', route: 'dsh-entry', subtitle: 'Delivery flow entry and order actions.' },
-  { id: 'amn', label: 'AMN', route: 'amn-entry', subtitle: 'Account management client workspace.' },
-  { id: 'arb', label: 'ARB', route: 'arb-entry', subtitle: 'Arbitration and case handling entry.' },
-  { id: 'esf', label: 'ESF', route: 'esf-entry', subtitle: 'Escalation support first action path.' },
-  { id: 'knz', label: 'KNZ', route: 'knz-entry', subtitle: 'Knowledge zone discovery and review.' },
-  { id: 'kwd', label: 'KWD', route: 'kwd-entry', subtitle: 'Keyword operation start workspace.' },
-  { id: 'mrf', label: 'MRF', route: 'mrf-entry', subtitle: 'Merchant referrals and status flow.' },
-  { id: 'snd', label: 'SND', route: 'snd-entry', subtitle: 'Send operation entry and tracking.' },
-  { id: 'wlt', label: 'WLT', route: 'wlt-entry', subtitle: 'Wallet operation and activity path.' },
+  { id: 'dsh', title: uiText.serviceNames.dsh, route: 'dsh-entry', iconName: 'bicycle-outline' },
+  { id: 'knz', title: uiText.serviceNames.knz, route: 'knz-entry', iconName: 'book-outline' },
+  { id: 'amn', title: uiText.serviceNames.amn, route: 'amn-entry', iconName: 'shield-checkmark-outline' },
+  { id: 'arb', title: uiText.serviceNames.arb, route: 'arb-entry', iconName: 'document-text-outline' },
+  { id: 'wlt', title: uiText.serviceNames.wlt, route: 'wlt-entry', iconName: 'wallet-outline' },
+  { id: 'esf', title: uiText.serviceNames.esf, route: 'esf-entry', iconName: 'medkit-outline' },
+  { id: 'kwd', title: uiText.serviceNames.kwd, route: 'kwd-entry', iconName: 'construct-outline' },
+  { id: 'mrf', title: uiText.serviceNames.mrf, route: 'mrf-entry', iconName: 'ribbon-outline' },
+  { id: 'snd', title: uiText.serviceNames.snd, route: 'snd-entry', iconName: 'document-attach-outline' },
 ];
 
 export function ClientSurfaceHost() {
@@ -149,6 +141,10 @@ export function ClientSurfaceHost() {
     setCreateOrderValues((current) => ({ ...current, [field]: value }));
   }, []);
 
+  const filteredServices = React.useMemo(() => serviceEntries, []);
+
+  const visibleServices = React.useMemo(() => filteredServices, [filteredServices]);
+
   const renderDshFlow = () => {
     if (route === 'amn-entry') {
       return (
@@ -173,9 +169,10 @@ export function ClientSurfaceHost() {
     if (route === 'dsh-entry') {
       return (
         <DshEntryScreen
-          onStartPress={() => setRoute('dsh-create')}
-          onBrowsePress={() => setRoute('dsh-create')}
-          onTrackOrdersPress={() => setRoute('dsh-orders')}
+          onStartDelivery={() => setRoute('dsh-create')}
+          onBrowseStores={() => setRoute('dsh-create')}
+          onOpenOrders={() => setRoute('dsh-orders')}
+          onRetry={() => setRoute('dsh-entry')}
         />
       );
     }
@@ -306,84 +303,86 @@ export function ClientSurfaceHost() {
   }
 
   return (
-    <BthMobileScrollView fill padding={5} gap={5}>
-      <BthScreenHeader
-        title="الرئيسية"
-        subtitle="هذه هي نقطة البداية الحقيقية لتطبيق العميل."
-        actionLabel="ابدأ طلبك الآن"
-        onActionPress={() => setRoute('dsh-entry')}
-      />
-
-      <BthSurface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
-        <BthText role="label" tone="inverse">نقطة البداية الرسمية</BthText>
-        <BthText role="titleLg" tone="inverse">تجربة عميل فعلية من أول شاشة</BthText>
-        <BthText role="bodyMd" tone="inverse">تم قطع الدخول المباشر إلى DSH preview. هذه الشاشة هي shell البداية الرسمية، وDSH يبقى feature flow داخليًا.</BthText>
-      </BthSurface>
-
-      <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
-        <BthText role="label">المساحات الأساسية</BthText>
-        {primaryAreas.map((item) => (
-          <BthSurface key={item} tone="default" padding={4} gap={2} radiusToken="lg">
-            <BthText role="bodyStrong">{item}</BthText>
-            <BthText role="bodySm" tone="muted">هذه مساحة رئيسية داخل التطبيق الحقيقي وليست preview route.</BthText>
-          </BthSurface>
-        ))}
-      </BthSurface>
-
-      <BthSurface tone="default" padding={5} gap={4} radiusToken="xl">
-        <BthText role="label">اختصارات البداية</BthText>
-        <BthBox gap={3}>
-          {shortcuts.map((item, index) => (
-            <BthButton
-              key={item}
-              label={item}
-              tone="secondary"
-              onPress={() => {
-                if (index === 0) {
-                  setRoute('dsh-entry');
-                  return;
-                }
-
-                if (index === 1) {
-                  setRoute('dsh-orders');
-                  return;
-                }
-
-                setRoute('dsh-create');
-              }}
-            />
-          ))}
-        </BthBox>
-      </BthSurface>
-
-      <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
-        <BthSectionHeader
-          title="خدمات الدخول الموحدة"
-          subtitle="قائمة خدمات موحدة بنمط بطاقات ثابت"
-          count={serviceEntries.length}
+    <BthBox style={{ flex: 1 }} background="background">
+      <BthBox
+        background="brand"
+        paddingX={4}
+        paddingY={2}
+        gap={1}
+        style={{
+          borderBottomLeftRadius: 28,
+          borderBottomRightRadius: 28,
+        }}
+      >
+        <BthMobileTopBar
+          title="بثواني"
+          subtitle="تحقق الأماني"
+          locationLabel="صنعاء، الجيل الجديد"
+          locationIcon={<Ionicons name="location-outline" size={14} color="#FFFFFF" />}
+          accountBadgeCount={5}
+          accountIcon={<Ionicons name="person-outline" size={21} color="#FFFFFF" />}
+          notificationsIcon={<Ionicons name="notifications-outline" size={21} color="#FFFFFF" />}
+          cartIcon={<Ionicons name="cart-outline" size={21} color="#FFFFFF" />}
+          searchIcon={<Ionicons name="search-outline" size={21} color="#FFFFFF" />}
+          onPressAccount={() => setRoute('amn-entry')}
+          onPressNotifications={() => setRoute('dsh-orders')}
+          onPressCart={() => setRoute('dsh-orders')}
+          onPressSearch={() => setRoute('dsh-entry')}
         />
-        <BthBox layoutDirection="row" style={{ flexWrap: 'wrap' }} gap={3}>
-          {serviceEntries.map((service) => (
-            <BthBox key={service.id} style={{ width: '48%' }}>
-              <BthServiceTileCard
-                title={service.label}
-                subtitle={service.subtitle}
-                description="Tap to open"
-                badgeLabel="Entry"
-                onPress={() => setRoute(service.route)}
-              />
-            </BthBox>
-          ))}
+
+        <BthNewsTickerBar
+          statusLabel={uiText.serviceHub.newsStatus}
+          message={uiText.serviceHub.newsPlaceholder}
+          onPress={() => setRoute('dsh-entry')}
+        />
+      </BthBox>
+
+      <BthSurface
+        tone="raised"
+        padding={0}
+        gap={0}
+        radiusToken="none"
+        border={false}
+        style={{
+          flex: 1,
+          marginTop: -2,
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
+          overflow: 'hidden',
+        }}
+      >
+        <BthBox padding={4} gap={2} style={{ flex: 1 }}>
+          <BthSectionHeader
+            title={uiText.serviceHub.availableServices}
+            subtitle={uiText.serviceHub.chooseService}
+            count={filteredServices.length}
+          />
+          {filteredServices.length === 0 ? (
+            <BthStateView stateId="empty" />
+          ) : (
+            <ScrollView
+              style={{ flex: 1 }}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 20 }}
+            >
+              <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                {visibleServices.map((service) => (
+                  <View key={service.id} style={{ width: '48.5%', marginBottom: 10 }}>
+                    <BthServiceTileCard
+                      title={service.title}
+                      icon={<Ionicons name={service.iconName} size={16} color="#F97316" />}
+                      titleOnly
+                      minHeight={118}
+                      onPress={() => setRoute(service.route)}
+                    />
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          )}
         </BthBox>
       </BthSurface>
-
-      <BthSurface tone="inset" padding={4} gap={2} radiusToken="lg">
-        <BthText role="label">حكم معماري</BthText>
-        <BthText role="bodySm" tone="muted">تطبيق العميل يجب أن يبدأ من Home Shell حقيقية، وليس من service entry تجريبية.</BthText>
-      </BthSurface>
-
-      <BthButton label="ابدأ طلبك الآن" onPress={() => setRoute('dsh-entry')} />
-    </BthMobileScrollView>
+    </BthBox>
   );
 }
 
