@@ -10,4 +10,22 @@ export const dshAppFieldFixtureLocations: Phase12FixtureLocation[] = [
     location: 'packages/surfaces/src/dsh/app-field/dsh_field_activation_workspace/fixtures',
     status: 'declared',
   },
+  {
+    candidateId: 'dsh_field_store_geo_pin',
+    canonicalTarget: 'dsh_field_store_geo_pin',
+    surface: 'app-field',
+    phase: 'Phase 12',
+    mode: 'fixtures-only',
+    location: 'packages/surfaces/src/dsh/app-field/dsh_field_store_geo_pin/fixtures',
+    status: 'declared',
+  },
+  {
+    candidateId: 'dsh_field_store_visit_log',
+    canonicalTarget: 'dsh_field_store_visit_log',
+    surface: 'app-field',
+    phase: 'Phase 12',
+    mode: 'fixtures-only',
+    location: 'packages/surfaces/src/dsh/app-field/dsh_field_store_visit_log/fixtures',
+    status: 'declared',
+  },
 ];
