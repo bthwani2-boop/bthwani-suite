@@ -1,5 +1,11 @@
 import React from 'react';
-import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthSurface, BthText } from '@bthwani/ui-kit';
+import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthSectionHeader, BthServiceTileCard, BthSurface, BthText } from '@bthwani/ui-kit';
+import {
+  AmnEntryScreen,
+} from '../../amn/app-client/entry/screens/AmnEntryScreen';
+import {
+  ArbEntryScreen,
+} from '../../arb/app-client/entry/screens/ArbEntryScreen';
 import {
   DshCreateOrderScreen,
   DshEntryScreen,
@@ -8,15 +14,48 @@ import {
   DshReviewOrderScreen,
   DshTrackingScreen,
 } from '../../dsh/app-client';
+import {
+  EsfEntryScreen,
+} from '../../esf/app-client/entry/screens/EsfEntryScreen';
+import {
+  KnzEntryScreen,
+} from '../../knz/app-client/entry/screens/KnzEntryScreen';
+import {
+  KwdEntryScreen,
+} from '../../kwd/app-client/entry/screens/KwdEntryScreen';
+import {
+  MrfEntryScreen,
+} from '../../mrf/app-client/entry/screens/MrfEntryScreen';
+import {
+  SndEntryScreen,
+} from '../../snd/app-client/entry/screens/SndEntryScreen';
+import {
+  WltEntryScreen,
+} from '../../wlt/app-client/entry/screens/WltEntryScreen';
 
 type ClientRoute =
   | 'home'
+  | 'amn-entry'
+  | 'arb-entry'
   | 'dsh-entry'
   | 'dsh-create'
   | 'dsh-review'
   | 'dsh-success'
   | 'dsh-orders'
-  | 'dsh-tracking';
+  | 'dsh-tracking'
+  | 'esf-entry'
+  | 'knz-entry'
+  | 'kwd-entry'
+  | 'mrf-entry'
+  | 'snd-entry'
+  | 'wlt-entry';
+
+type ServiceEntry = {
+  id: string;
+  label: string;
+  route: ClientRoute;
+  subtitle: string;
+};
 
 type CreateOrderValues = {
   pickupAddress: string;
@@ -62,6 +101,18 @@ const shortcuts = [
   'الطلبات الجارية',
   'إدارة العناوين'
 ] as const;
+
+const serviceEntries: ServiceEntry[] = [
+  { id: 'dsh', label: 'DSH', route: 'dsh-entry', subtitle: 'Delivery flow entry and order actions.' },
+  { id: 'amn', label: 'AMN', route: 'amn-entry', subtitle: 'Account management client workspace.' },
+  { id: 'arb', label: 'ARB', route: 'arb-entry', subtitle: 'Arbitration and case handling entry.' },
+  { id: 'esf', label: 'ESF', route: 'esf-entry', subtitle: 'Escalation support first action path.' },
+  { id: 'knz', label: 'KNZ', route: 'knz-entry', subtitle: 'Knowledge zone discovery and review.' },
+  { id: 'kwd', label: 'KWD', route: 'kwd-entry', subtitle: 'Keyword operation start workspace.' },
+  { id: 'mrf', label: 'MRF', route: 'mrf-entry', subtitle: 'Merchant referrals and status flow.' },
+  { id: 'snd', label: 'SND', route: 'snd-entry', subtitle: 'Send operation entry and tracking.' },
+  { id: 'wlt', label: 'WLT', route: 'wlt-entry', subtitle: 'Wallet operation and activity path.' },
+];
 
 export function ClientHomeShell() {
   const [route, setRoute] = React.useState<ClientRoute>('home');
@@ -113,6 +164,26 @@ export function ClientHomeShell() {
   }, []);
 
   const renderDshFlow = () => {
+    if (route === 'amn-entry') {
+      return (
+        <AmnEntryScreen
+          onStartPress={() => setRoute('home')}
+          onBrowsePress={() => setRoute('home')}
+          onTrackOrdersPress={() => setRoute('home')}
+        />
+      );
+    }
+
+    if (route === 'arb-entry') {
+      return (
+        <ArbEntryScreen
+          onStartPress={() => setRoute('home')}
+          onBrowsePress={() => setRoute('home')}
+          onTrackOrdersPress={() => setRoute('home')}
+        />
+      );
+    }
+
     if (route === 'dsh-entry') {
       return (
         <DshEntryScreen
@@ -170,6 +241,66 @@ export function ClientHomeShell() {
           onSupport={() => setRoute('dsh-orders')}
           onRetry={() => setRoute('dsh-tracking')}
           onNextAction={() => setRoute('dsh-orders')}
+        />
+      );
+    }
+
+    if (route === 'esf-entry') {
+      return (
+        <EsfEntryScreen
+          onStartPress={() => setRoute('home')}
+          onBrowsePress={() => setRoute('home')}
+          onTrackOrdersPress={() => setRoute('home')}
+        />
+      );
+    }
+
+    if (route === 'knz-entry') {
+      return (
+        <KnzEntryScreen
+          onStartPress={() => setRoute('home')}
+          onBrowsePress={() => setRoute('home')}
+          onTrackOrdersPress={() => setRoute('home')}
+        />
+      );
+    }
+
+    if (route === 'kwd-entry') {
+      return (
+        <KwdEntryScreen
+          onStartPress={() => setRoute('home')}
+          onBrowsePress={() => setRoute('home')}
+          onTrackOrdersPress={() => setRoute('home')}
+        />
+      );
+    }
+
+    if (route === 'mrf-entry') {
+      return (
+        <MrfEntryScreen
+          onStartPress={() => setRoute('home')}
+          onBrowsePress={() => setRoute('home')}
+          onTrackOrdersPress={() => setRoute('home')}
+        />
+      );
+    }
+
+    if (route === 'snd-entry') {
+      return (
+        <SndEntryScreen
+          onStartPress={() => setRoute('home')}
+          onBrowsePress={() => setRoute('home')}
+          onTrackOrdersPress={() => setRoute('home')}
+        />
+      );
+    }
+
+    if (route === 'wlt-entry') {
+      return (
+        <WltEntryScreen
+          onStartPress={() => setRoute('home')}
+          onBrowsePress={() => setRoute('home')}
+          onTrackOrdersPress={() => setRoute('home')}
         />
       );
     }
@@ -235,6 +366,27 @@ export function ClientHomeShell() {
                 setRoute('dsh-create');
               }}
             />
+          ))}
+        </BthBox>
+      </BthSurface>
+
+      <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
+        <BthSectionHeader
+          title="خدمات الدخول الموحدة"
+          subtitle="قائمة خدمات موحدة بنمط بطاقات ثابت"
+          count={serviceEntries.length}
+        />
+        <BthBox layoutDirection="row" style={{ flexWrap: 'wrap' }} gap={3}>
+          {serviceEntries.map((service) => (
+            <BthBox key={service.id} style={{ width: '48%' }}>
+              <BthServiceTileCard
+                title={service.label}
+                subtitle={service.subtitle}
+                description="Tap to open"
+                badgeLabel="Entry"
+                onPress={() => setRoute(service.route)}
+              />
+            </BthBox>
           ))}
         </BthBox>
       </BthSurface>
