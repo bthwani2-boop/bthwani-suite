@@ -93,7 +93,7 @@ test.describe('ui-kit hosted preview', () => {
   });
 
   test('accessibility proof stays governed', async ({ page }) => {
-    await page.goto('/ui-kit?theme=light&section=proof&language=ar&direction=rtl');
+    await page.goto('/ui-kit?theme=light&section=proof&language=ar');
 
     const previewSurface = page.getByTestId('ui-kit-preview-surface');
     await expect(previewSurface).toBeVisible();
@@ -125,7 +125,7 @@ test.describe('ui-kit hosted preview', () => {
 
   for (const theme of ['light', 'dark', 'high-contrast'] as const) {
     test(`visual proof remains stable for ${theme}`, async ({ page }) => {
-      await page.goto(`/ui-kit?theme=${theme}&section=lab&language=ar&direction=rtl`);
+      await page.goto(`/ui-kit?theme=${theme}&section=lab&language=ar`);
 
       const previewSurface = page.getByTestId('ui-kit-preview-surface');
       await expect(previewSurface).toBeVisible();

@@ -1,7 +1,20 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BthBox, BthButton, BthMobileTopBar, BthNewsTickerBar, BthSectionHeader, BthServiceTileCard, BthStateView, BthSurface, getBthUiText } from '@bthwani/ui-kit';
+import {
+  BthBox,
+  BthButton,
+  BthMobileTopBar,
+  BthNewsTickerBar,
+  BthSectionHeader,
+  BthServiceTileCard,
+  BthSheetFrame,
+  BthStateView,
+  BthSurface,
+  BthText,
+  useDirection,
+  useUiText,
+} from '@bthwani/ui-kit';
 import { amn, arb, dsh, esf, knz, kwd, mrf, snd, wlt } from '@bthwani/surfaces';
 
 const { AmnEntryScreen } = amn.amnAppClient;
@@ -38,14 +51,14 @@ type ClientRoute =
   | 'snd-entry'
   | 'wlt-entry';
 
+type AccountSheetTab = 'menu' | 'settings';
+
 type ServiceEntry = {
   id: string;
   title: string;
   route: ClientRoute;
   iconName: React.ComponentProps<typeof Ionicons>['name'];
 };
-
-const uiText = getBthUiText('ar');
 
 type CreateOrderValues = {
   pickupAddress: string;
@@ -80,22 +93,29 @@ const initialOrders = [
   },
 ];
 
-const serviceEntries: ServiceEntry[] = [
-  { id: 'dsh', title: uiText.serviceNames.dsh, route: 'dsh-entry', iconName: 'bicycle-outline' },
-  { id: 'knz', title: uiText.serviceNames.knz, route: 'knz-entry', iconName: 'book-outline' },
-  { id: 'amn', title: uiText.serviceNames.amn, route: 'amn-entry', iconName: 'shield-checkmark-outline' },
-  { id: 'arb', title: uiText.serviceNames.arb, route: 'arb-entry', iconName: 'document-text-outline' },
-  { id: 'wlt', title: uiText.serviceNames.wlt, route: 'wlt-entry', iconName: 'wallet-outline' },
-  { id: 'esf', title: uiText.serviceNames.esf, route: 'esf-entry', iconName: 'medkit-outline' },
-  { id: 'kwd', title: uiText.serviceNames.kwd, route: 'kwd-entry', iconName: 'construct-outline' },
-  { id: 'mrf', title: uiText.serviceNames.mrf, route: 'mrf-entry', iconName: 'ribbon-outline' },
-  { id: 'snd', title: uiText.serviceNames.snd, route: 'snd-entry', iconName: 'document-attach-outline' },
-];
-
 export function ClientSurfaceHost() {
   const [route, setRoute] = React.useState<ClientRoute>('home');
+  const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
+  const [accountSheetTab, setAccountSheetTab] = React.useState<AccountSheetTab>('menu');
   const [createOrderValues, setCreateOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
   const [ordersQuery, setOrdersQuery] = React.useState('');
+  const { direction, language, setLanguage } = useDirection();
+  const uiText = useUiText();
+
+  const serviceEntries = React.useMemo<ServiceEntry[]>(
+    () => [
+      { id: 'dsh', title: uiText.serviceNames.dsh, route: 'dsh-entry', iconName: 'bicycle-outline' },
+      { id: 'knz', title: uiText.serviceNames.knz, route: 'knz-entry', iconName: 'book-outline' },
+      { id: 'amn', title: uiText.serviceNames.amn, route: 'amn-entry', iconName: 'shield-checkmark-outline' },
+      { id: 'arb', title: uiText.serviceNames.arb, route: 'arb-entry', iconName: 'document-text-outline' },
+      { id: 'wlt', title: uiText.serviceNames.wlt, route: 'wlt-entry', iconName: 'wallet-outline' },
+      { id: 'esf', title: uiText.serviceNames.esf, route: 'esf-entry', iconName: 'medkit-outline' },
+      { id: 'kwd', title: uiText.serviceNames.kwd, route: 'kwd-entry', iconName: 'construct-outline' },
+      { id: 'mrf', title: uiText.serviceNames.mrf, route: 'mrf-entry', iconName: 'ribbon-outline' },
+      { id: 'snd', title: uiText.serviceNames.snd, route: 'snd-entry', iconName: 'document-attach-outline' },
+    ],
+    [uiText],
+  );
 
   const filteredOrders = React.useMemo(() => {
     const query = ordersQuery.trim().toLowerCase();
@@ -141,9 +161,10 @@ export function ClientSurfaceHost() {
     setCreateOrderValues((current) => ({ ...current, [field]: value }));
   }, []);
 
-  const filteredServices = React.useMemo(() => serviceEntries, []);
-
-  const visibleServices = React.useMemo(() => filteredServices, [filteredServices]);
+  const closeAccountSheet = React.useCallback(() => {
+    setAccountSheetVisible(false);
+    setAccountSheetTab('menu');
+  }, []);
 
   const renderDshFlow = () => {
     if (route === 'amn-entry') {
@@ -295,7 +316,7 @@ export function ClientSurfaceHost() {
     return (
       <>
         <BthBox padding={4} gap={3}>
-          <BthButton label="العودة للرئيسية" tone="secondary" onPress={() => setRoute('home')} />
+          <BthButton label={uiText.common.backHome} tone="secondary" onPress={() => setRoute('home')} />
         </BthBox>
         {renderDshFlow()}
       </>
@@ -315,16 +336,19 @@ export function ClientSurfaceHost() {
         }}
       >
         <BthMobileTopBar
-          title="بثواني"
-          subtitle="تحقق الأماني"
-          locationLabel="صنعاء، الجيل الجديد"
+          title={uiText.topBar.brandName}
+          subtitle={uiText.topBar.brandTagline}
+          locationLabel={uiText.topBar.location}
           locationIcon={<Ionicons name="location-outline" size={14} color="#FFFFFF" />}
           accountBadgeCount={5}
           accountIcon={<Ionicons name="person-outline" size={21} color="#FFFFFF" />}
           notificationsIcon={<Ionicons name="notifications-outline" size={21} color="#FFFFFF" />}
           cartIcon={<Ionicons name="cart-outline" size={21} color="#FFFFFF" />}
           searchIcon={<Ionicons name="search-outline" size={21} color="#FFFFFF" />}
-          onPressAccount={() => setRoute('amn-entry')}
+          onPressAccount={() => {
+            setAccountSheetTab('menu');
+            setAccountSheetVisible(true);
+          }}
           onPressNotifications={() => setRoute('dsh-orders')}
           onPressCart={() => setRoute('dsh-orders')}
           onPressSearch={() => setRoute('dsh-entry')}
@@ -355,9 +379,9 @@ export function ClientSurfaceHost() {
           <BthSectionHeader
             title={uiText.serviceHub.availableServices}
             subtitle={uiText.serviceHub.chooseService}
-            count={filteredServices.length}
+            count={serviceEntries.length}
           />
-          {filteredServices.length === 0 ? (
+          {serviceEntries.length === 0 ? (
             <BthStateView stateId="empty" />
           ) : (
             <ScrollView
@@ -365,8 +389,8 @@ export function ClientSurfaceHost() {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingBottom: 20 }}
             >
-              <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                {visibleServices.map((service) => (
+              <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                {serviceEntries.map((service) => (
                   <View key={service.id} style={{ width: '48.5%', marginBottom: 10 }}>
                     <BthServiceTileCard
                       title={service.title}
@@ -382,6 +406,63 @@ export function ClientSurfaceHost() {
           )}
         </BthBox>
       </BthSurface>
+
+      <BthSheetFrame
+        visible={accountSheetVisible}
+        title={accountSheetTab === 'settings' ? uiText.accountSheet.languageTitle : uiText.accountSheet.title}
+        onClose={closeAccountSheet}
+      >
+        {accountSheetTab === 'menu' ? (
+          <>
+            <BthButton
+              label={uiText.accountSheet.tabs.profile}
+              tone="secondary"
+              onPress={() => {
+                closeAccountSheet();
+                setRoute('amn-entry');
+              }}
+            />
+            <BthButton
+              label={uiText.accountSheet.tabs.notifications}
+              tone="secondary"
+              onPress={() => {
+                closeAccountSheet();
+                setRoute('dsh-orders');
+              }}
+            />
+            <BthButton
+              label={uiText.accountSheet.tabs.settings}
+              tone="primary"
+              onPress={() => setAccountSheetTab('settings')}
+            />
+          </>
+        ) : (
+          <>
+            <BthText role="bodySm" tone="muted">{uiText.accountSheet.languagePrompt}</BthText>
+            <BthBox layoutDirection="row" gap={2}>
+              <BthButton
+                label={uiText.accountSheet.languageArabic}
+                tone={language === 'ar' ? 'primary' : 'secondary'}
+                fullWidth={false}
+                style={{ flex: 1 }}
+                onPress={() => {
+                  setLanguage('ar');
+                }}
+              />
+              <BthButton
+                label={uiText.accountSheet.languageEnglish}
+                tone={language === 'en' ? 'primary' : 'secondary'}
+                fullWidth={false}
+                style={{ flex: 1 }}
+                onPress={() => {
+                  setLanguage('en');
+                }}
+              />
+            </BthBox>
+            <BthButton label={uiText.accountSheet.back} tone="ghost" onPress={() => setAccountSheetTab('menu')} />
+          </>
+        )}
+      </BthSheetFrame>
     </BthBox>
   );
 }

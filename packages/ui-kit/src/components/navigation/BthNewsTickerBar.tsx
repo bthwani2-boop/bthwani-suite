@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { spacing } from '../../foundation/tokens';
-import { useTheme } from '../../hooks';
+import { useDirection, useTheme } from '../../hooks';
 import { BthText } from '../../primitives';
 
 export type BthNewsTickerBarProps = {
@@ -11,7 +11,9 @@ export type BthNewsTickerBarProps = {
 };
 
 export function BthNewsTickerBar({ statusLabel, message, onPress }: BthNewsTickerBarProps) {
+  const { direction } = useDirection();
   const { theme } = useTheme();
+  const barDirection = direction === 'rtl' ? 'row' : 'row-reverse';
 
   return (
     <Pressable
@@ -29,7 +31,14 @@ export function BthNewsTickerBar({ statusLabel, message, onPress }: BthNewsTicke
         opacity: pressed ? 0.92 : 1,
       })}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing[2] }}>
+      <View
+        style={{
+          flexDirection: barDirection,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: spacing[2],
+        }}
+      >
         <View
           style={{
             minWidth: 70,

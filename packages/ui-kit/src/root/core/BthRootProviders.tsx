@@ -8,10 +8,9 @@ export interface BthRootProvidersProps extends BthRootConfig {
   children: ReactNode;
 }
 
-export function BthRootProviders({ children, direction, language, themeMode }: BthRootProvidersProps) {
+export function BthRootProviders({ children, language, themeMode }: BthRootProvidersProps) {
   return (
     <UiKitProvider
-      direction={direction ?? BTH_ROOT_DEFAULTS.direction}
       language={language ?? BTH_ROOT_DEFAULTS.language}
       themeMode={themeMode ?? BTH_ROOT_DEFAULTS.themeMode}
     >

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { spacing } from '../../foundation/tokens';
-import { useTheme } from '../../hooks';
+import { resolveRowDirection } from '../../foundation/direction';
+import { useDirection, useTheme } from '../../hooks';
 import { BthText } from '../../primitives';
 
 export type BthMobileTopBarProps = {
@@ -83,10 +84,12 @@ export function BthMobileTopBar({
   onPressCart,
   onPressSearch,
 }: BthMobileTopBarProps) {
+  const { direction } = useDirection();
+
   return (
     <View style={{ width: '100%', gap: 2, paddingTop: spacing[2] }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <View style={{ flexDirection: 'row', gap: spacing[1] }}>
+      <View style={{ flexDirection: resolveRowDirection(direction, true), justifyContent: 'space-between', alignItems: 'center' }}>
+        <View style={{ flexDirection: direction === 'rtl' ? 'row' : 'row-reverse', gap: spacing[1] }}>
           <IconButton icon={accountIcon} label="Account" onPress={onPressAccount} />
           <IconButton
             icon={notificationsIcon}
@@ -98,14 +101,14 @@ export function BthMobileTopBar({
           <IconButton icon={searchIcon} label="Search" onPress={onPressSearch} />
         </View>
 
-        <View style={{ flex: 1, alignItems: 'flex-end', marginStart: spacing[1] }}>
-          <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', gap: spacing[1] }}>
+        <View style={{ flex: 1, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start', marginStart: spacing[1], marginEnd: spacing[1] }}>
+          <View style={{ flexDirection: resolveRowDirection(direction), alignItems: 'baseline', gap: spacing[1] }}>
             <BthText role="titleMd" tone="inverse">{title}</BthText>
             {subtitle ? <BthText role="caption" tone="inverse" style={{ opacity: 0.92 }}>{subtitle}</BthText> : null}
           </View>
 
           {locationLabel ? (
-            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 4, marginTop: 1 }}>
+            <View style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 4, marginTop: 1 }}>
               {locationIcon ?? <BthText role="caption" tone="inverse">•</BthText>}
               <BthText role="caption" tone="inverse" style={{ opacity: 0.9 }}>{locationLabel}</BthText>
             </View>

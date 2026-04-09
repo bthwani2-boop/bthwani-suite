@@ -18,13 +18,11 @@ import styles from './ui-kit-preview.module.css';
 type PreviewTheme = 'light' | 'dark' | 'high-contrast';
 type PreviewSection = 'lab' | 'states' | 'proof';
 type PreviewLanguage = 'ar' | 'en';
-type PreviewDirection = 'rtl' | 'ltr';
 
 export type UiKitPreviewPageProps = {
   initialTheme?: string;
   initialSection?: string;
   initialLanguage?: string;
-  initialDirection?: string;
 };
 
 function resolveTheme(value?: string): PreviewTheme {
@@ -39,20 +37,15 @@ function resolveLanguage(value?: string): PreviewLanguage {
   return value === 'en' ? 'en' : 'ar';
 }
 
-function resolveDirection(value?: string): PreviewDirection {
-  return value === 'ltr' ? 'ltr' : 'rtl';
-}
-
 export function UiKitPreviewPage({
   initialTheme,
   initialSection,
   initialLanguage,
-  initialDirection,
 }: UiKitPreviewPageProps) {
   const [theme, setTheme] = useState<PreviewTheme>(resolveTheme(initialTheme));
   const [section, setSection] = useState<PreviewSection>(resolveSection(initialSection));
   const [language, setLanguage] = useState<PreviewLanguage>(resolveLanguage(initialLanguage));
-  const [direction, setDirection] = useState<PreviewDirection>(resolveDirection(initialDirection));
+  const direction = language === 'ar' ? 'rtl' : 'ltr';
 
   const proofSummary = useMemo(
     () => [
@@ -75,15 +68,15 @@ export function UiKitPreviewPage({
   );
 
   const previewChips = [
-    	heme: ,
-    section: ,
-    language: ,
-    direction: ,
+    `theme: ${theme}`,
+    `section: ${section}`,
+    `language: ${language}`,
+    `direction: ${direction}`,
     'route: /ui-kit',
   ];
 
   return (
-    <UiKitProvider direction={direction} language={language} themeMode={theme}>
+    <UiKitProvider language={language} themeMode={theme}>
       <div className={styles.shell}>
         <div className={styles.metaRow}>
           {previewChips.map((chip) => (
@@ -126,14 +119,6 @@ export function UiKitPreviewPage({
                 options={[
                   { value: 'ar', label: 'Arabic' },
                   { value: 'en', label: 'English' },
-                ]}
-              />
-              <BthSegmentedControl
-                value={direction}
-                onValueChange={(nextValue) => setDirection(nextValue as PreviewDirection)}
-                options={[
-                  { value: 'rtl', label: 'RTL' },
-                  { value: 'ltr', label: 'LTR' },
                 ]}
               />
             </div>

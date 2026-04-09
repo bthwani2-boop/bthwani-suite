@@ -5,7 +5,6 @@ type SearchParams = Promise<{
   theme?: string;
   section?: string;
   language?: string;
-  direction?: string;
 }>;
 
 export default async function UiKitHostedPreviewPage({ searchParams }: { searchParams: SearchParams }) {
@@ -23,7 +22,6 @@ export default async function UiKitHostedPreviewPage({ searchParams }: { searchP
         description="The hosted preview exists to prove that the system does not merely style screens; it governs clarity, behavior, proof, and identity from one place."
       >
         <UiKitPreviewEntry
-          initialDirection={resolvedSearchParams.direction}
           initialLanguage={resolvedSearchParams.language}
           initialSection={resolvedSearchParams.section}
           initialTheme={resolvedSearchParams.theme}

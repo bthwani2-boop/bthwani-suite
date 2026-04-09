@@ -1,0 +1,41 @@
+{
+  "common": {
+    "backHome": "العودة للرئيسية"
+  },
+  "topBar": {
+    "brandName": "بثواني",
+    "brandTagline": "تحقق الأماني",
+    "location": "صنعاء، الجيل الجديد"
+  },
+  "serviceHub": {
+    "availableServices": "الخدمات المتاحة",
+    "chooseService": "اختر الخدمة المناسبة وابدأ مباشرة",
+    "more": "المزيد",
+    "newsStatus": "مغلق",
+    "newsPlaceholder": "المساحة مخصصة للشريط الإخباري"
+  },
+  "accountSheet": {
+    "title": "الحساب",
+    "tabs": {
+      "profile": "الملف الشخصي",
+      "notifications": "الإشعارات",
+      "settings": "الإعدادات"
+    },
+    "languageTitle": "تغيير اللغة",
+    "languagePrompt": "اختر اللغة المناسبة للتطبيق",
+    "languageArabic": "عربي",
+    "languageEnglish": "English",
+    "back": "رجوع"
+  },
+  "serviceNames": {
+    "dsh": "توصيل",
+    "knz": "كنز",
+    "amn": "اماني",
+    "arb": "عربون",
+    "wlt": "محفظة",
+    "esf": "اسعفني",
+    "kwd": "كوادر",
+    "mrf": "معروف",
+    "snd": "سند"
+  }
+}

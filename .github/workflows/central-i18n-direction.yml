@@ -1,0 +1,36 @@
+name: Central i18n and Direction (Mobile + Control Panel)
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  central-governance-mobile-control-panel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Central guard before build (mobile + control-panel)
+        run: pnpm run guard:i18n-direction:mobile-control-panel
+
+      - name: Build mobile apps + control-panel after guard
+        run: pnpm run build:mobile-control-panel

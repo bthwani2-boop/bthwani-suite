@@ -8,7 +8,7 @@ import { BthWebRootLayout } from '@bthwani/ui-kit/web';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <BthWebRootLayout appName="webapp" language="ar" direction="rtl" themeMode="light">
+    <BthWebRootLayout appName="webapp" language="ar" themeMode="light">
       {children}
     </BthWebRootLayout>
   );

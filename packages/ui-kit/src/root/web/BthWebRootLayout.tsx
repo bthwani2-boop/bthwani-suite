@@ -1,5 +1,6 @@
 // Web root layout: wraps app with all root providers and html/body logic
 import { ReactNode } from 'react';
+import { resolveDirectionFromLanguage } from '../../foundation/direction';
 import { BthRootProviders, BthRootProvidersProps } from '../core/BthRootProviders';
 import { BthWebDocumentShell } from './BthWebDocumentShell';
 import { BthWebRootBody } from './BthWebRootBody';
@@ -14,7 +15,7 @@ export function BthWebRootLayout({ children, appName, ...rootProps }: BthWebRoot
   const webRootMetadata = buildWebRootMetadata({
     appName,
     lang: rootProps.language,
-    dir: rootProps.direction,
+    dir: resolveDirectionFromLanguage(rootProps.language),
   });
 
   return (

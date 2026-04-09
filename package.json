@@ -6,7 +6,10 @@
   "scripts": {
     "phase:review": "echo Review phase evidence under kdt/volatile/registry/runs",
     "serve:surfaces": "pnpm nx run-many --target=serve --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7",
-    "build:surfaces": "pnpm nx run-many --target=build --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7"
+    "build:surfaces": "pnpm nx run-many --target=build --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7",
+    "build:mobile-control-panel": "pnpm nx run-many --target=build --projects=control-panel,app-client,app-partner,app-captain,app-field --parallel=5",
+    "guard:i18n-direction": "node tools/scripts/guard-central-i18n-direction.mjs",
+    "guard:i18n-direction:mobile-control-panel": "node tools/scripts/guard-central-i18n-direction.mjs apps/mobile apps/web/control-panel packages"
   },
   "packageManager": "pnpm@8.15.0+sha512.ea45517d5285d123eac02c3793505fa1fd6da90a2fc60d1e8d9e0c1e9292886ecfaff513f062b9d1cc8021bb8615033b1ac5bea3b2ee3fc165a6d7034bbe6b03",
   "pnpm": {

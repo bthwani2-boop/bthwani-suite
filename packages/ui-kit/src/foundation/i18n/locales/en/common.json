@@ -1,0 +1,41 @@
+{
+  "common": {
+    "backHome": "Back to Home"
+  },
+  "topBar": {
+    "brandName": "Bthawani",
+    "brandTagline": "Make Wishes Happen",
+    "location": "Sanaa, New Generation"
+  },
+  "serviceHub": {
+    "availableServices": "Available Services",
+    "chooseService": "Choose the right service and start now",
+    "more": "More",
+    "newsStatus": "Closed",
+    "newsPlaceholder": "Reserved for the news ticker"
+  },
+  "accountSheet": {
+    "title": "Account",
+    "tabs": {
+      "profile": "Profile",
+      "notifications": "Notifications",
+      "settings": "Settings"
+    },
+    "languageTitle": "Change Language",
+    "languagePrompt": "Choose your preferred language",
+    "languageArabic": "Arabic",
+    "languageEnglish": "English",
+    "back": "Back"
+  },
+  "serviceNames": {
+    "dsh": "Delivery",
+    "knz": "Kanz",
+    "amn": "Amani",
+    "arb": "Arboon",
+    "wlt": "Wallet",
+    "esf": "Esafni",
+    "kwd": "Kawader",
+    "mrf": "Maarof",
+    "snd": "Sanad"
+  }
+}
