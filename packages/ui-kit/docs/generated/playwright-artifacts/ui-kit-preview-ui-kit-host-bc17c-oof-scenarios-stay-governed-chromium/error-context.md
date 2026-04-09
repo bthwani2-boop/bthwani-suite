@@ -1,0 +1,198 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - paragraph [ref=e4]: BTH UI Kit
+      - generic [ref=e5]:
+        - heading "UI Kit Hosted Preview" [level=1] [ref=e6]
+        - paragraph [ref=e7]: This hosted shell renders the same governed ui-kit runtime that future screens must inherit, and it is the route used by visual and interaction proof.
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - heading "Sovereign quality rule" [level=2] [ref=e10]
+          - paragraph [ref=e11]: The hosted preview exists to prove that the system does not merely style screens; it governs clarity, behavior, proof, and identity from one place.
+        - generic [ref=e12]:
+          - generic [ref=e13]:
+            - generic [ref=e16] [cursor=pointer]: "theme: light"
+            - generic [ref=e20] [cursor=pointer]: "section: lab"
+            - generic [ref=e24] [cursor=pointer]: "language: ar"
+            - generic [ref=e28] [cursor=pointer]: "direction: rtl"
+            - generic [ref=e32] [cursor=pointer]: "route: /ui-kit"
+          - generic [ref=e34]:
+            - generic [ref=e36]:
+              - generic [ref=e37]: Hosted controls
+              - generic [ref=e38]: This route is the governed preview and proof surface for ui-kit. It proves that new screens inherit one family, one quality bar, and one approval path.
+              - generic [ref=e39]:
+                - tab "Lab" [ref=e40] [cursor=pointer]:
+                  - generic [ref=e41]: Lab
+                - tab "States" [ref=e42] [cursor=pointer]:
+                  - generic [ref=e43]: States
+                - tab "Proof" [ref=e44] [cursor=pointer]:
+                  - generic [ref=e45]: Proof
+              - generic [ref=e46]:
+                - button "Light" [ref=e47] [cursor=pointer]:
+                  - generic [ref=e48]: Light
+                - button "Dark" [ref=e49] [cursor=pointer]:
+                  - generic [ref=e50]: Dark
+                - button "High contrast" [ref=e51] [cursor=pointer]:
+                  - generic [ref=e52]: High contrast
+              - generic [ref=e53]:
+                - button "Arabic" [ref=e54] [cursor=pointer]:
+                  - generic [ref=e55]: Arabic
+                - button "English" [ref=e56] [cursor=pointer]:
+                  - generic [ref=e57]: English
+              - generic [ref=e58]:
+                - button "RTL" [ref=e59] [cursor=pointer]:
+                  - generic [ref=e60]: RTL
+                - button "LTR" [ref=e61] [cursor=pointer]:
+                  - generic [ref=e62]: LTR
+            - generic [ref=e65]:
+              - generic [ref=e66]: Approval law
+              - generic [ref=e67]: The UI Kit must not merely enable good screens; it must make weak screens difficult to produce and impossible to approve.
+              - generic [ref=e68]: A polished surface is still invalid if it hides the primary task, overloads the user, breaks state recovery, or drifts from the governed family.
+              - button "Jump to proof summary" [ref=e69] [cursor=pointer]:
+                - generic [ref=e71]: Jump to proof summary
+          - generic [ref=e75]:
+            - generic [ref=e76]:
+              - generic [ref=e77]: BTH Component Lab
+              - generic [ref=e78]: Live review surface for the shared system, built on the same runtime exports consumed by real surfaces.
+              - generic [ref=e79]:
+                - generic [ref=e81] [cursor=pointer]: "mode: light"
+                - generic [ref=e83] [cursor=pointer]: "direction: rtl"
+                - generic [ref=e85] [cursor=pointer]: "language: ar"
+            - generic [ref=e86]:
+              - generic [ref=e87]: Outputs Snapshot
+              - generic [ref=e88]: 32 semantic colors • 12 spacing tokens • 6 breakpoints
+              - generic [ref=e89]: "brand #F97316 • background #F8FAFC • focus ring rgba(249, 115, 22, 0.32)"
+            - generic [ref=e91]:
+              - generic [ref=e92]: Token and Theme Outputs
+              - generic [ref=e93]: Validates the current mode, direction, and output-backed theme surface contract.
+              - generic [ref=e94]: token outputs • theme outputs • web css variables • native theme snapshot
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - generic [ref=e97]: Actions and Fields
+                - generic [ref=e98]: Covers the primary action hierarchy and input baseline.
+                - generic [ref=e99]: BthButton • BthTextField • BthSearchField • BthSelectField
+              - generic [ref=e100]:
+                - generic [ref=e101]:
+                  - button "Primary" [ref=e102] [cursor=pointer]:
+                    - generic [ref=e104]: Primary
+                  - button "Secondary" [ref=e105] [cursor=pointer]:
+                    - generic [ref=e107]: Secondary
+                  - button "Ghost" [ref=e108] [cursor=pointer]:
+                    - generic [ref=e110]: Ghost
+                - generic [ref=e111]:
+                  - generic [ref=e112]: Display name
+                  - textbox [ref=e113]
+                  - generic [ref=e114]: Shared input baseline
+                - generic [ref=e115]:
+                  - generic [ref=e116]: Search
+                  - textbox "ابحث" [ref=e117]
+                - generic [ref=e118]:
+                  - generic [ref=e119]: Delivery priority
+                  - button "Express ▼" [ref=e120] [cursor=pointer]:
+                    - generic [ref=e122]: Express
+                    - generic [ref=e123]: ▼
+            - generic [ref=e124]:
+              - generic [ref=e125]:
+                - generic [ref=e126]: Selector Families
+                - generic [ref=e127]: Covers the shared selection grammar and directional behavior.
+                - generic [ref=e128]: BthChip • BthCheckbox • BthRadio • BthSwitch • BthSegmentedControl
+              - generic [ref=e129]:
+                - generic [ref=e130]:
+                  - generic [ref=e132] [cursor=pointer]: Shared chip
+                  - generic [ref=e134] [cursor=pointer]: Static
+                - checkbox "✓ Enable central sync The selector family keeps semantics and layout centralized." [ref=e135] [cursor=pointer]:
+                  - generic [ref=e137]: ✓
+                  - generic [ref=e138]:
+                    - generic [ref=e139]: Enable central sync
+                    - generic [ref=e140]: The selector family keeps semantics and layout centralized.
+                - radio "Alpha track Useful for single-choice selections." [ref=e141] [cursor=pointer]:
+                  - generic [ref=e144]:
+                    - generic [ref=e145]: Alpha track
+                    - generic [ref=e146]: Useful for single-choice selections.
+                - radio "Beta track Mirrors the same shared family in a second option." [ref=e147] [cursor=pointer]:
+                  - generic [ref=e149]:
+                    - generic [ref=e150]: Beta track
+                    - generic [ref=e151]: Mirrors the same shared family in a second option.
+                - switch "Realtime updates Uses the shared switch contract." [ref=e152] [cursor=pointer]:
+                  - generic [ref=e153]:
+                    - generic [ref=e154]: Realtime updates
+                    - generic [ref=e155]: Uses the shared switch contract.
+                  - switch [checked] [ref=e159]
+                - generic [ref=e160]:
+                  - button "Delivery" [ref=e161] [cursor=pointer]:
+                    - generic [ref=e162]: Delivery
+                  - button "Pickup" [ref=e163] [cursor=pointer]:
+                    - generic [ref=e164]: Pickup
+            - generic [ref=e165]:
+              - generic [ref=e166]:
+                - generic [ref=e167]: Navigation Families
+                - generic [ref=e168]: Covers shared movement across sections, routes, and review surfaces.
+                - generic [ref=e169]: BthScreenHeader • BthSectionHeader • BthTabs
+              - generic [ref=e170]:
+                - generic [ref=e171]:
+                  - tab "Overview" [ref=e172] [cursor=pointer]:
+                    - generic [ref=e173]: Overview
+                  - tab "Operations 3" [ref=e174] [cursor=pointer]:
+                    - generic [ref=e175]: Operations
+                    - generic [ref=e177]: "3"
+                  - tab "Proof" [ref=e178] [cursor=pointer]:
+                    - generic [ref=e179]: Proof
+                - generic [ref=e180]: "Active navigation branch: overview"
+            - generic [ref=e181]:
+              - generic [ref=e182]:
+                - generic [ref=e183]: Overlay Families
+                - generic [ref=e184]: Covers shared confirmation and transient feedback surfaces.
+                - generic [ref=e185]: BthSheetFrame • BthDialog • BthToast
+              - generic [ref=e186]:
+                - button "Open dialog" [ref=e187] [cursor=pointer]:
+                  - generic [ref=e189]: Open dialog
+                - button "Show toast" [ref=e190] [cursor=pointer]:
+                  - generic [ref=e192]: Show toast
+            - generic [ref=e193]:
+              - generic [ref=e194]:
+                - generic [ref=e195]: Data Display Families
+                - generic [ref=e196]: Covers reusable cards, summaries, lists, and structured tables.
+                - generic [ref=e197]: BthCard • BthStatCard • BthListItem • BthKeyValueList • BthDataTable
+              - generic [ref=e198]:
+                - generic [ref=e199]:
+                  - generic [ref=e201]:
+                    - generic [ref=e202]: Order ID
+                    - generic [ref=e204]: BTH-42017
+                  - generic [ref=e207]:
+                    - generic [ref=e208]: Coverage
+                    - generic [ref=e210]: Riyadh North Cluster
+                  - generic [ref=e213]:
+                    - generic [ref=e214]: Driver
+                    - generic [ref=e215]:
+                      - generic [ref=e216]: Maha Al-Qahtani
+                      - generic [ref=e217]: Shift handoff completed
+                - generic [ref=e218]:
+                  - generic [ref=e220]: Dispatch proof sample
+                  - generic [ref=e221]:
+                    - generic [ref=e223]: Run
+                    - generic [ref=e225]: Owner
+                    - generic [ref=e227]: Status
+                  - generic [ref=e228]:
+                    - generic [ref=e229]:
+                      - generic [ref=e231]: Dispatch Alpha
+                      - generic [ref=e233]: Noura
+                      - generic [ref=e236] [cursor=pointer]: Ready
+                    - generic [ref=e237]:
+                      - generic [ref=e239]: Dispatch Beta
+                      - generic [ref=e241]: Saad
+                      - generic [ref=e244] [cursor=pointer]: Blocked
+                    - generic [ref=e245]:
+                      - generic [ref=e247]: Dispatch Gamma
+                      - generic [ref=e249]: Yousef
+                      - generic [ref=e252] [cursor=pointer]: In review
+            - generic [ref=e254]:
+              - generic [ref=e255]:
+                - generic [ref=e256]: State Families
+                - generic [ref=e257]: Delegates to the shared state gallery for complete state-system review.
+                - generic [ref=e258]: BthStateView • BthEmptyState • BthStateGallery
+              - generic [ref=e259]: "Render the dedicated `BthStateGallery` export to review the complete state catalog side by side."
+  - alert [ref=e262]
+```

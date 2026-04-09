@@ -1,0 +1,146 @@
+{
+  "authority": {
+    "blueprint": "packages/ui-kit/docs/BTH_UI_KIT_SUPREME_BLUEPRINT_2026_AR.md",
+    "executionPlan": "packages/ui-kit/docs/BTH_UI_KIT_SUPREME_EXECUTION_PLAN_2026_AR.md",
+    "ownership": "packages/ui-kit/docs/OWNERSHIP_AND_RULES.md"
+  },
+  "hostedPreview": {
+    "app": "website",
+    "route": "/ui-kit"
+  },
+  "tokenSource": {
+    "authorityPackage": "@bthwani/ui-kit",
+    "authorityFile": "src/foundation/tokens/source.ts",
+    "format": "bth-token-source.v1",
+    "version": "2026.04.09",
+    "stage": "phase-b-bootstrap"
+  },
+  "themeModes": [
+    "light",
+    "dark",
+    "high-contrast"
+  ],
+  "labThemeModes": [
+    "light",
+    "dark",
+    "high-contrast"
+  ],
+  "componentLabSections": [
+    {
+      "id": "outputs",
+      "title": "Token and Theme Outputs",
+      "description": "Validates the current mode, direction, and output-backed theme surface contract.",
+      "families": [
+        "token outputs",
+        "theme outputs",
+        "web css variables",
+        "native theme snapshot"
+      ]
+    },
+    {
+      "id": "actions-fields",
+      "title": "Actions and Fields",
+      "description": "Covers the primary action hierarchy and input baseline.",
+      "families": [
+        "BthButton",
+        "BthTextField",
+        "BthSearchField",
+        "BthSelectField"
+      ]
+    },
+    {
+      "id": "selectors",
+      "title": "Selector Families",
+      "description": "Covers the shared selection grammar and directional behavior.",
+      "families": [
+        "BthChip",
+        "BthCheckbox",
+        "BthRadio",
+        "BthSwitch",
+        "BthSegmentedControl"
+      ]
+    },
+    {
+      "id": "navigation",
+      "title": "Navigation Families",
+      "description": "Covers shared movement across sections, routes, and review surfaces.",
+      "families": [
+        "BthScreenHeader",
+        "BthSectionHeader",
+        "BthTabs"
+      ]
+    },
+    {
+      "id": "overlays",
+      "title": "Overlay Families",
+      "description": "Covers shared confirmation and transient feedback surfaces.",
+      "families": [
+        "BthSheetFrame",
+        "BthDialog",
+        "BthToast"
+      ]
+    },
+    {
+      "id": "display",
+      "title": "Data Display Families",
+      "description": "Covers reusable cards, summaries, lists, and structured tables.",
+      "families": [
+        "BthCard",
+        "BthStatCard",
+        "BthListItem",
+        "BthKeyValueList",
+        "BthDataTable"
+      ]
+    },
+    {
+      "id": "states",
+      "title": "State Families",
+      "description": "Delegates to the shared state gallery for complete state-system review.",
+      "families": [
+        "BthStateView",
+        "BthEmptyState",
+        "BthStateGallery"
+      ]
+    }
+  ],
+  "stateGallery": {
+    "languages": [
+      "ar",
+      "en"
+    ],
+    "stateIds": [
+      "loading",
+      "empty",
+      "noResults",
+      "success",
+      "warning",
+      "recoverableError",
+      "blockingError",
+      "offline",
+      "unauthorized",
+      "notFound"
+    ]
+  },
+  "generatedArtifacts": [
+    "packages/ui-kit/docs/generated/token-output.css",
+    "packages/ui-kit/docs/generated/theme-output.css",
+    "packages/ui-kit/docs/generated/native-tokens.json",
+    "packages/ui-kit/docs/generated/native-themes.json",
+    "packages/ui-kit/docs/generated/proof-manifest.json",
+    "packages/ui-kit/docs/generated/proof-manifest.md",
+    "packages/ui-kit/docs/generated/component-lab.md",
+    "packages/ui-kit/docs/generated/state-gallery.md",
+    "packages/ui-kit/docs/generated/accessibility-report.json",
+    "packages/ui-kit/docs/generated/accessibility-report.md",
+    "packages/ui-kit/docs/generated/visual-regression/ui-kit-preview-light.png",
+    "packages/ui-kit/docs/generated/visual-regression/ui-kit-preview-dark.png",
+    "packages/ui-kit/docs/generated/visual-regression/ui-kit-preview-high-contrast.png",
+    "packages/ui-kit/docs/generated/playwright-report/index.html"
+  ],
+  "verificationTargets": [
+    "ui-kit:typecheck",
+    "ui-kit:build-outputs",
+    "ui-kit:proof-visual",
+    "ui-kit:proof"
+  ]
+}

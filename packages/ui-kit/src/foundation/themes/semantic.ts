@@ -1,6 +1,6 @@
 import { colorPalette, withAlpha } from '../tokens';
 
-export type ThemeMode = 'light' | 'dark';
+export type ThemeMode = 'light' | 'dark' | 'high-contrast';
 
 export type SemanticTheme = {
   mode: ThemeMode;
@@ -118,3 +118,52 @@ export const darkTheme: SemanticTheme = {
   fieldBorderActive: '#FB923C',
   fieldPlaceholder: '#64748B'
 };
+
+export const highContrastTheme: SemanticTheme = {
+  mode: 'high-contrast',
+  background: '#000000',
+  backgroundAlt: '#000000',
+  surface: '#000000',
+  surfaceRaised: '#0A0A0A',
+  surfaceInset: '#000000',
+  line: '#FFFFFF',
+  lineStrong: '#FFFFFF',
+  text: '#FFFFFF',
+  textMuted: '#FFFFFF',
+  textSoft: '#E5E7EB',
+  textInverse: '#000000',
+  brand: '#FFD60A',
+  brandContrast: '#000000',
+  brandSurface: '#FFD60A',
+  success: '#7CFC00',
+  successSurface: '#0F2F00',
+  successText: '#FFFFFF',
+  warning: '#FFD60A',
+  warningSurface: '#3D2F00',
+  warningText: '#FFFFFF',
+  danger: '#FF453A',
+  dangerSurface: '#3B0600',
+  dangerText: '#FFFFFF',
+  info: '#59C3FF',
+  infoSurface: '#002A3D',
+  infoText: '#FFFFFF',
+  focusRing: '#FFFFFF',
+  overlay: withAlpha('#000000', 0.88),
+  overlaySoft: withAlpha('#000000', 0.72),
+  disabledSurface: '#1A1A1A',
+  disabledText: '#B3B3B3',
+  fieldBackground: '#000000',
+  fieldBorder: '#FFFFFF',
+  fieldBorderActive: '#FFD60A',
+  fieldPlaceholder: '#D1D5DB'
+};
+
+export const semanticThemeByMode: Record<ThemeMode, SemanticTheme> = {
+  light: lightTheme,
+  dark: darkTheme,
+  'high-contrast': highContrastTheme
+};
+
+export function resolveSemanticTheme(mode: ThemeMode) {
+  return semanticThemeByMode[mode];
+}

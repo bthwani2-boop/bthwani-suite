@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useMemo } from 'react';
-import { darkTheme, lightTheme, type SemanticTheme, type ThemeMode } from '../foundation/themes';
+import { lightTheme, resolveSemanticTheme, type SemanticTheme, type ThemeMode } from '../foundation/themes';
 
 type ThemeContextValue = {
   mode: ThemeMode;
@@ -19,7 +19,7 @@ export type ThemeProviderProps = {
 };
 
 export function ThemeProvider({ mode = 'light', children }: ThemeProviderProps) {
-  const value = useMemo<ThemeContextValue>(() => ({ mode, theme: mode === 'dark' ? darkTheme : lightTheme }), [mode]);
+  const value = useMemo<ThemeContextValue>(() => ({ mode, theme: resolveSemanticTheme(mode) }), [mode]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 

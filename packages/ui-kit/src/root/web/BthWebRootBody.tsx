@@ -16,6 +16,7 @@ export function BthWebRootBody({
     <body
       className={styles.body}
       data-bth-app={appName}
+      data-bth-root="true"
       data-bth-theme={themeMode}
     >
       {children}

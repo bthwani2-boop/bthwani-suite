@@ -21,5 +21,8 @@
     "./platform/client/mobile-entry": "./src/platform/client/mobile-entry.tsx",
     "./platform/captain/mobile-entry": "./src/platform/captain/mobile-entry.tsx",
     "./platform/partner/mobile-entry": "./src/platform/partner/mobile-entry.tsx"
+  },
+  "dependencies": {
+    "@bthwani/ui-kit": "workspace:*"
   }
 }

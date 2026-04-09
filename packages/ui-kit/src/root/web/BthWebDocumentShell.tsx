@@ -1,5 +1,6 @@
 // Web document shell for html/body, lang, dir, etc.
 import { ReactNode } from 'react';
+import { BthWebThemeStyle } from './BthWebThemeStyle';
 
 export function BthWebDocumentShell({
   children,
@@ -12,6 +13,9 @@ export function BthWebDocumentShell({
 }) {
   return (
     <html lang={lang} dir={dir}>
+      <head>
+        <BthWebThemeStyle />
+      </head>
       {children}
     </html>
   );

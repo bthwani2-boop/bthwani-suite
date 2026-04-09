@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthWebPageFrame, BthWebSectionCard } from '@bthwani/ui-kit';
+import { BthWebPageFrame, BthWebSectionCard } from '@bthwani/ui-kit/web';
 import styles from '../shared-web-shell.module.css';
 
 export type WebsiteShellProps = Record<string, never>;

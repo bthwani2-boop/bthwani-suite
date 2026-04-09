@@ -1,11 +1,5 @@
-export const radius = {
-  none: 0,
-  xs: 6,
-  sm: 10,
-  md: 14,
-  lg: 18,
-  xl: 24,
-  pill: 999
-} as const;
+import { rawRadiusScale } from './source';
+
+export const radius = rawRadiusScale;
 
 export type RadiusToken = keyof typeof radius;
