@@ -1,0 +1,66 @@
+export { auto_dsh_home_get } from './auto_dsh_home_get';
+export { auto_dsh_cart_get } from './auto_dsh_cart_get';
+export { auto_dsh_cart_init } from './auto_dsh_cart_init';
+export { auto_dsh_cart_item_add } from './auto_dsh_cart_item_add';
+export { auto_dsh_cart_item_remove } from './auto_dsh_cart_item_remove';
+export { auto_dsh_cart_item_update } from './auto_dsh_cart_item_update';
+export { auto_dsh_categories_list } from './auto_dsh_categories_list';
+export { auto_dsh_category_get } from './auto_dsh_category_get';
+export {
+  auto_dsh_checkout_gate,
+  type DshPaymentMethodType,
+} from './auto_dsh_checkout_gate';
+export { auto_dsh_delivery_attempt_create } from './auto_dsh_delivery_attempt_create';
+export { auto_dsh_delivery_attempts_list } from './auto_dsh_delivery_attempts_list';
+export { auto_dsh_delivery_close } from './auto_dsh_delivery_close';
+export { auto_dsh_delivery_eta_get } from './auto_dsh_delivery_eta_get';
+export { auto_dsh_delivery_get } from './auto_dsh_delivery_get';
+export { auto_dsh_delivery_reassign } from './auto_dsh_delivery_reassign';
+export { auto_dsh_delivery_track_get } from './auto_dsh_delivery_track_get';
+export { auto_dsh_entitlements_get } from './auto_dsh_entitlements_get';
+export { auto_dsh_favorite_toggle } from './auto_dsh_favorite_toggle';
+export { auto_dsh_favorites_list } from './auto_dsh_favorites_list';
+export { auto_dsh_order_accept } from './auto_dsh_order_accept';
+export { auto_dsh_order_complete } from './auto_dsh_order_complete';
+export { auto_dsh_order_cancel } from './auto_dsh_order_cancel';
+export { auto_dsh_order_create } from './auto_dsh_order_create';
+export { auto_dsh_order_get } from './auto_dsh_order_get';
+export { auto_dsh_order_issue_flag } from './auto_dsh_order_issue_flag';
+export { auto_dsh_order_proof_code_generate } from './auto_dsh_order_proof_code_generate';
+export { auto_dsh_order_proof_verify } from './auto_dsh_order_proof_verify';
+export { auto_dsh_order_rate } from './auto_dsh_order_rate';
+export { auto_dsh_order_receipt_get } from './auto_dsh_order_receipt_get';
+export { auto_dsh_order_status_get } from './auto_dsh_order_status_get';
+export { auto_dsh_orders_list } from './auto_dsh_orders_list';
+export { auto_dsh_pricing_preview } from './auto_dsh_pricing_preview';
+export { auto_dsh_pricing_snapshot_get } from './auto_dsh_pricing_snapshot_get';
+export { auto_dsh_review_create } from './auto_dsh_review_create';
+export { auto_dsh_reviews_list } from './auto_dsh_reviews_list';
+export { auto_dsh_search } from './auto_dsh_search';
+export { auto_dsh_service_modes_resolve } from './auto_dsh_service_modes_resolve';
+export { auto_dsh_store_get } from './auto_dsh_store_get';
+export { auto_dsh_store_items_list } from './auto_dsh_store_items_list';
+export { auto_dsh_stores_list } from './auto_dsh_stores_list';
+export { auto_dsh_subscription_sync } from './auto_dsh_subscription_sync';
+export { auto_dsh_zone_set } from './auto_dsh_zone_set';
+// Catalog parity — DSH app-client mobile (Master_SCREENS_CATALOG primary_operations)
+export { auto_dsh_booking_create } from './auto_dsh_booking_create';
+export { auto_dsh_chat_read_ack } from './auto_dsh_chat_read_ack';
+export { auto_dsh_chat_send } from './auto_dsh_chat_send';
+export { auto_dsh_estimate_create } from './auto_dsh_estimate_create';
+export { auto_dsh_estimate_get } from './auto_dsh_estimate_get';
+export { default as auto_dsh_external_order_create } from './auto_dsh_external_order_create';
+export { auto_dsh_listing_status_update } from './auto_dsh_listing_status_update';
+export { auto_dsh_loyalty_points_redeem } from './auto_dsh_loyalty_points_redeem';
+export { auto_dsh_loyalty_points_user_balance } from './auto_dsh_loyalty_points_user_balance';
+export { auto_dsh_loyalty_points_user_history } from './auto_dsh_loyalty_points_user_history';
+export { auto_dsh_order_escrow_hold } from './auto_dsh_order_escrow_hold';
+export { auto_dsh_order_escrow_release } from './auto_dsh_order_escrow_release';
+export { auto_dsh_order_status_update } from './auto_dsh_order_status_update';
+export { auto_dsh_subscription_family_get } from './auto_dsh_subscription_family_get';
+export { auto_dsh_subscription_family_members_get } from './auto_dsh_subscription_family_members_get';
+export { auto_dsh_subscription_family_members_post } from './auto_dsh_subscription_family_members_post';
+export { auto_dsh_subscription_tier_get } from './auto_dsh_subscription_tier_get';
+export { auto_dsh_subscription_upgrade_post } from './auto_dsh_subscription_upgrade_post';
+export { auto_dsh_subscription_pro_catalog } from './auto_dsh_subscription_pro_catalog';
+

@@ -56,3 +56,6 @@ Phase 06 authorizes foundation hardening, primitives, direction, and shared stat
 ## Adoption intent
 
 This package should eliminate local visual drift by making theme, typography, direction, state framing, and baseline building blocks flow from a single shared owner instead of being recreated per surface.
+
+- hosted preview boundary: `packages/ui-kit/docs/HOSTED_PREVIEW_BOUNDARY_DECISION.md`
+

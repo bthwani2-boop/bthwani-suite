@@ -75,28 +75,26 @@ export function UiKitPreviewPage({
   );
 
   const previewChips = [
-    `theme: ${theme}`,
-    `section: ${section}`,
-    `language: ${language}`,
-    `direction: ${direction}`,
+    	heme: ,
+    section: ,
+    language: ,
+    direction: ,
     'route: /ui-kit',
   ];
 
   return (
-    <div className={styles.shell}>
-      <div className={styles.metaRow}>
-        {previewChips.map((chip) => (
-          <div key={chip} data-bth-root="true" data-bth-theme={theme} className={styles.inlineChip}>
-            <UiKitProvider direction={direction} language={language} themeMode={theme}>
+    <UiKitProvider direction={direction} language={language} themeMode={theme}>
+      <div className={styles.shell}>
+        <div className={styles.metaRow}>
+          {previewChips.map((chip) => (
+            <div key={chip} data-bth-root="true" data-bth-theme={theme} className={styles.inlineChip}>
               <BthChip label={chip} selected tone="brand" />
-            </UiKitProvider>
-          </div>
-        ))}
-      </div>
+            </div>
+          ))}
+        </div>
 
-      <div className={styles.controlGrid}>
-        <div data-bth-root="true" data-bth-theme={theme} className={styles.controlCard}>
-          <UiKitProvider direction={direction} language={language} themeMode={theme}>
+        <div className={styles.controlGrid}>
+          <div data-bth-root="true" data-bth-theme={theme} className={styles.controlCard}>
             <div className={styles.controlStack}>
               <BthText role="titleSm">Hosted controls</BthText>
               <BthText role="bodySm" tone="muted">
@@ -139,11 +137,9 @@ export function UiKitPreviewPage({
                 ]}
               />
             </div>
-          </UiKitProvider>
-        </div>
+          </div>
 
-        <div data-bth-root="true" data-bth-theme={theme} className={styles.controlCard}>
-          <UiKitProvider direction={direction} language={language} themeMode={theme}>
+          <div data-bth-root="true" data-bth-theme={theme} className={styles.controlCard}>
             <div className={styles.controlStack}>
               <BthText role="titleSm">Approval law</BthText>
               <BthText role="bodyMd">
@@ -158,20 +154,18 @@ export function UiKitPreviewPage({
                 onPress={() => setSection('proof')}
               />
             </div>
-          </UiKitProvider>
+          </div>
         </div>
-      </div>
 
-      <div
-        data-bth-root="true"
-        data-bth-theme={theme}
-        data-preview-direction={direction}
-        data-preview-language={language}
-        data-preview-section={section}
-        data-testid="ui-kit-preview-surface"
-        className={styles.previewSurface}
-      >
-        <UiKitProvider direction={direction} language={language} themeMode={theme}>
+        <div
+          data-bth-root="true"
+          data-bth-theme={theme}
+          data-preview-direction={direction}
+          data-preview-language={language}
+          data-preview-section={section}
+          data-testid="ui-kit-preview-surface"
+          className={styles.previewSurface}
+        >
           {section === 'lab' ? (
             <BthComponentLab />
           ) : section === 'states' ? (
@@ -194,8 +188,8 @@ export function UiKitPreviewPage({
               />
             </div>
           )}
-        </UiKitProvider>
+        </div>
       </div>
-    </div>
+    </UiKitProvider>
   );
 }
