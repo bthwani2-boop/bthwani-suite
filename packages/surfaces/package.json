@@ -13,14 +13,7 @@
     "docs"
   ],
   "exports": {
-    ".": "./src/index.ts",
-    "./platform/website/web-entry": "./src/platform/website/web-entry.tsx",
-    "./platform/webapp/web-entry": "./src/platform/webapp/web-entry.tsx",
-    "./platform/control-panel/web-entry": "./src/platform/control-panel/web-entry.tsx",
-    "./platform/field/mobile-entry": "./src/platform/field/mobile-entry.tsx",
-    "./platform/client/mobile-entry": "./src/platform/client/mobile-entry.tsx",
-    "./platform/captain/mobile-entry": "./src/platform/captain/mobile-entry.tsx",
-    "./platform/partner/mobile-entry": "./src/platform/partner/mobile-entry.tsx"
+    ".": "./src/index.ts"
   },
   "dependencies": {
     "@bthwani/ui-kit": "workspace:*"

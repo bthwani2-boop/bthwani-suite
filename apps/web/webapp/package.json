@@ -7,9 +7,12 @@
     "start": "next start -p 3001"
   },
   "dependencies": {
+    "@bthwani/app-shells": "workspace:*",
+    "@bthwani/ui-kit": "workspace:*",
     "next": "16.2.2",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-native-web": "0.21.2"
   },
   "devDependencies": {
     "typescript": "5.9.3",

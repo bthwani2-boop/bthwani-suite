@@ -17,6 +17,12 @@
       "@bthwani/ui-kit": [
         "./packages/ui-kit/src/index.ts"
       ],
+      "@bthwani/app-shells": [
+        "./packages/app-shells/index.ts"
+      ],
+      "@bthwani/app-shells/*": [
+        "./packages/app-shells/*"
+      ],
       "@bthwani/surface-mobile": [
         "./packages/surface-mobile/src/index.tsx"
       ],

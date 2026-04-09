@@ -1,5 +1,5 @@
-import WebsiteShell from '@bthwani/surfaces/platform/website/web-entry';
+import WebsiteSurfaceHost from '@bthwani/app-shells/web/website/web-entry';
 
 export default function Page() {
-  return <WebsiteShell />;
+  return <WebsiteSurfaceHost />;
 }

@@ -1,10 +1,10 @@
 import { BthMobileRoot } from '@bthwani/ui-kit';
-import ClientHomeShell from '@bthwani/surfaces/platform/client/mobile-entry';
+import ClientSurfaceHost from '@bthwani/app-shells/mobile/client/mobile-entry';
 
 export default function App() {
 	return (
 		<BthMobileRoot direction="rtl" language="ar" themeMode="light">
-			<ClientHomeShell />
+			<ClientSurfaceHost />
 		</BthMobileRoot>
 	);
 }

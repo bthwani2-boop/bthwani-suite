@@ -47,9 +47,9 @@ importers:
 
   apps/mobile/app-captain:
     dependencies:
-      '@bthwani/surfaces':
+      '@bthwani/app-shells':
         specifier: workspace:*
-        version: link:../../../packages/surfaces
+        version: link:../../../packages/app-shells
       '@bthwani/ui-kit':
         specifier: workspace:*
         version: link:../../../packages/ui-kit
@@ -65,9 +65,9 @@ importers:
 
   apps/mobile/app-client:
     dependencies:
-      '@bthwani/surfaces':
+      '@bthwani/app-shells':
         specifier: workspace:*
-        version: link:../../../packages/surfaces
+        version: link:../../../packages/app-shells
       '@bthwani/ui-kit':
         specifier: workspace:*
         version: link:../../../packages/ui-kit
@@ -83,9 +83,9 @@ importers:
 
   apps/mobile/app-field:
     dependencies:
-      '@bthwani/surfaces':
+      '@bthwani/app-shells':
         specifier: workspace:*
-        version: link:../../../packages/surfaces
+        version: link:../../../packages/app-shells
       '@bthwani/ui-kit':
         specifier: workspace:*
         version: link:../../../packages/ui-kit
@@ -101,9 +101,9 @@ importers:
 
   apps/mobile/app-partner:
     dependencies:
-      '@bthwani/surfaces':
+      '@bthwani/app-shells':
         specifier: workspace:*
-        version: link:../../../packages/surfaces
+        version: link:../../../packages/app-shells
       '@bthwani/ui-kit':
         specifier: workspace:*
         version: link:../../../packages/ui-kit
@@ -119,6 +119,12 @@ importers:
 
   apps/web/control-panel:
     dependencies:
+      '@bthwani/app-shells':
+        specifier: workspace:*
+        version: link:../../../packages/app-shells
+      '@bthwani/ui-kit':
+        specifier: workspace:*
+        version: link:../../../packages/ui-kit
       next:
         specifier: 16.2.2
         version: 16.2.2(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.1.0)(react@19.1.0)
@@ -128,6 +134,9 @@ importers:
       react-dom:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
+      react-native-web:
+        specifier: 0.21.2
+        version: 0.21.2(react-dom@19.1.0)(react@19.1.0)
     devDependencies:
       '@types/react':
         specifier: ^19.2.2
@@ -141,6 +150,12 @@ importers:
 
   apps/web/webapp:
     dependencies:
+      '@bthwani/app-shells':
+        specifier: workspace:*
+        version: link:../../../packages/app-shells
+      '@bthwani/ui-kit':
+        specifier: workspace:*
+        version: link:../../../packages/ui-kit
       next:
         specifier: 16.2.2
         version: 16.2.2(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.1.0)(react@19.1.0)
@@ -150,6 +165,9 @@ importers:
       react-dom:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
+      react-native-web:
+        specifier: 0.21.2
+        version: 0.21.2(react-dom@19.1.0)(react@19.1.0)
     devDependencies:
       '@types/react':
         specifier: ^19.2.2
@@ -163,9 +181,9 @@ importers:
 
   apps/web/website:
     dependencies:
-      '@bthwani/surfaces':
+      '@bthwani/app-shells':
         specifier: workspace:*
-        version: link:../../../packages/surfaces
+        version: link:../../../packages/app-shells
       '@bthwani/ui-kit':
         specifier: workspace:*
         version: link:../../../packages/ui-kit
@@ -216,6 +234,15 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+
+  packages/app-shells:
+    dependencies:
+      '@bthwani/surfaces':
+        specifier: workspace:*
+        version: link:../surfaces
+      '@bthwani/ui-kit':
+        specifier: workspace:*
+        version: link:../ui-kit
 
   packages/surfaces:
     dependencies:

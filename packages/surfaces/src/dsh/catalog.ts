@@ -1,13 +1,3 @@
-import { dshAppCaptainFixtureLocations } from './app-captain/index';
-import { dshAppClientFixtureLocations } from './app-client/index';
-import { dshAppFieldFixtureLocations } from './app-field/index';
-import { dshAppPartnerFixtureLocations } from './app-partner/index';
-import { dshControlPanelFixtureLocations } from './control-panel/index';
+import type { Phase12FixtureLocation } from './types';
 
-export const dshPhase12FixtureLocations = [
-  ...dshAppClientFixtureLocations,
-  ...dshAppPartnerFixtureLocations,
-  ...dshAppCaptainFixtureLocations,
-  ...dshAppFieldFixtureLocations,
-  ...dshControlPanelFixtureLocations,
-];
+export const dshPhase12FixtureLocations: Phase12FixtureLocation[] = [];

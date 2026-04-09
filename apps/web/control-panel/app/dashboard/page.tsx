@@ -1,5 +1,5 @@
-import ControlPanelWebShell from '@bthwani/surfaces/platform/control-panel/web-entry';
+import ControlPanelSurfaceHost from '@bthwani/app-shells/web/control-panel/web-entry';
 
 export default function DashboardPage() {
-  return <ControlPanelWebShell section="dashboard" />;
+  return <ControlPanelSurfaceHost section="dashboard" />;
 }

@@ -1,4 +1,5 @@
-export * from './fixture-locations';
+export * from './surface.meta';
+export * from './surface.catalog';
 export * from './entry/screens';
 export * from './create-order/screens';
 export * from './review/screens';

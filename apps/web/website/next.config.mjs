@@ -1,22 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ['@bthwani/ui-kit', '@bthwani/surfaces'],
-  webpack(config) {
-    config.resolve.alias = {
-      ...(config.resolve.alias ?? {}),
-      'react-native$': 'react-native-web',
-    };
-
-    config.resolve.extensions = [
+  transpilePackages: ['@bthwani/app-shells', '@bthwani/ui-kit', '@bthwani/surfaces'],
+  turbopack: {
+    resolveAlias: {
+      'react-native': 'react-native-web',
+    },
+    resolveExtensions: [
       '.web.tsx',
       '.web.ts',
       '.web.jsx',
       '.web.js',
-      ...(config.resolve.extensions ?? []),
-    ];
-
-    return config;
+      '.tsx',
+      '.ts',
+      '.jsx',
+      '.js',
+      '.mjs',
+      '.json',
+    ],
   },
 };
 

@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {
+      "name": "bthwani-suite",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.git": true,
+      "**/.nx/cache": true,
+      "**/dist": true,
+      "**/tmp": true
+    }
+  }
+}

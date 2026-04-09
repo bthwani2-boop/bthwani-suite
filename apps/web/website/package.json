@@ -9,7 +9,7 @@
     "proof:ui-kit:update": "playwright test --config playwright.config.ts --update-snapshots"
   },
   "dependencies": {
-    "@bthwani/surfaces": "workspace:*",
+    "@bthwani/app-shells": "workspace:*",
     "@bthwani/ui-kit": "workspace:*",
     "next": "16.2.2",
     "react": "19.1.0",
