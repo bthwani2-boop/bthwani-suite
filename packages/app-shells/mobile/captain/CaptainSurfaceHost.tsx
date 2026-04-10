@@ -1,6 +1,8 @@
 import React from 'react';
-import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthSurface, BthText } from '@bthwani/ui-kit';
+import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthStateView, BthSurface, BthText } from '@bthwani/ui-kit';
 import { dsh } from '@bthwani/surfaces';
+import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
+import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
 const {
   CaptainDeliveryConfirmSheet,
@@ -25,6 +27,12 @@ const shortcuts = [
 ] as const;
 
 type CaptainRoute = 'home' | 'inbox' | 'detail';
+type CaptainServiceType = 'dsh' | 'amn';
+
+const captainTypeOptions: readonly MobileAccountTypeOption[] = [
+  { id: 'dsh', label: 'DSH', description: 'تشغيل الطلبات والمهام اليومية' },
+  { id: 'amn', label: 'AMN', description: 'تشغيل الأمان والمراقبة' },
+];
 
 const defaultDetailByTaskId: Record<string, CaptainTaskDetailSummary> = {
   'captain-task-9021': {
@@ -46,11 +54,13 @@ const defaultDetailByTaskId: Record<string, CaptainTaskDetailSummary> = {
 };
 
 export function CaptainSurfaceHost() {
+  const [activeServiceType, setActiveServiceType] = React.useState<CaptainServiceType>('dsh');
   const [route, setRoute] = React.useState<CaptainRoute>('home');
   const [inboxState, setInboxState] = React.useState<CaptainTasksInboxScreenState>('active');
   const [activeTaskId, setActiveTaskId] = React.useState<string>('captain-task-9021');
   const [isPickupSheetVisible, setIsPickupSheetVisible] = React.useState(false);
   const [isDeliverySheetVisible, setIsDeliverySheetVisible] = React.useState(false);
+  const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
 
   const activeSummary = defaultDetailByTaskId[activeTaskId] ?? defaultDetailByTaskId['captain-task-9021'];
 
@@ -62,6 +72,16 @@ export function CaptainSurfaceHost() {
     setActiveTaskId(taskId);
     setRoute('detail');
   };
+
+  const handleSelectServiceType = React.useCallback((typeId: string) => {
+    const nextType: CaptainServiceType = typeId === 'amn' ? 'amn' : 'dsh';
+    setActiveServiceType(nextType);
+    setRoute('home');
+    setInboxState('active');
+    setActiveTaskId('captain-task-9021');
+    setIsPickupSheetVisible(false);
+    setIsDeliverySheetVisible(false);
+  }, []);
 
   const renderCaptainFlow = () => {
     if (route === 'inbox') {
@@ -111,9 +131,89 @@ export function CaptainSurfaceHost() {
     return null;
   };
 
+  const topBar = (
+    <UnifiedMobileTopBar
+      title="بثواني"
+      subtitle="تطبيق الكابتن"
+      locationLabel="الرياض، خط التشغيل الشمالي"
+      actions={[
+        {
+          id: 'profile',
+          iconName: 'person-outline',
+          accessibilityLabel: 'الحساب',
+          onPress: () => setAccountSheetVisible(true),
+        },
+        { id: 'notifications', iconName: 'notifications-outline', badgeCount: 2, accessibilityLabel: 'الإشعارات' },
+        {
+          id: 'tasks',
+          iconName: 'bicycle-outline',
+          accessibilityLabel: 'المهام',
+          onPress: () => {
+            if (activeServiceType === 'dsh') {
+              setRoute('inbox');
+            }
+          },
+        },
+        { id: 'search', iconName: 'search-outline', accessibilityLabel: 'بحث' },
+      ]}
+      ticker={{
+        statusLabel: activeServiceType === 'dsh' ? 'مباشر' : 'وضع AMN',
+        message:
+          activeServiceType === 'dsh'
+            ? 'أولوية اليوم: مهمة الاستلام الأولى خلال 8 دقائق'
+            : 'تم تفعيل وضع AMN. سيتم تحميل مسارات الأمان فور اكتمال ربط الشاشات.',
+        onPress: () => {
+          if (activeServiceType === 'dsh') {
+            setRoute('inbox');
+          }
+        },
+      }}
+    />
+  );
+
+  const accountSheet = (
+    <MobileAccountSheet
+      visible={accountSheetVisible}
+      onClose={() => setAccountSheetVisible(false)}
+      onOpenProfile={() => setRoute('home')}
+      typeOptions={captainTypeOptions}
+      activeTypeId={activeServiceType}
+      onSelectType={handleSelectServiceType}
+      typeSwitchTitle="تغيير نوع تشغيل الكابتن"
+      typeSwitchPrompt="اختر نوع التشغيل للكابتن. عند التبديل يتم إعادة ضبط المسار وتحديث التطبيق بالكامل بحسب النوع الجديد."
+    />
+  );
+
+  if (activeServiceType === 'amn') {
+    return (
+      <BthBox style={{ flex: 1 }} background="background">
+        {topBar}
+        <BthSurface
+          tone="raised"
+          padding={5}
+          gap={4}
+          radiusToken="none"
+          border={false}
+          style={{
+            flex: 1,
+            marginTop: -2,
+            borderTopLeftRadius: 28,
+            borderTopRightRadius: 28,
+            overflow: 'hidden',
+          }}
+        >
+          <BthStateView stateId="loading" title="تم تفعيل وضع AMN" description="التطبيق الآن في سياق AMN بالكامل. يجري تجهيز الشاشات التنفيذية الخاصة بهذا النوع." />
+          <BthButton label="العودة للرئيسية" tone="secondary" onPress={() => setRoute('home')} />
+        </BthSurface>
+        {accountSheet}
+      </BthBox>
+    );
+  }
+
   if (route !== 'home') {
     return (
-      <>
+      <BthBox style={{ flex: 1 }} background="background">
+        {topBar}
         <BthBox padding={4} gap={3}>
           <BthButton label="العودة للرئيسية" tone="secondary" onPress={() => setRoute('home')} />
           <BthSurface tone="inset" padding={3} gap={2} radiusToken="lg">
@@ -126,71 +226,106 @@ export function CaptainSurfaceHost() {
             </BthBox>
           </BthSurface>
         </BthBox>
-        {renderCaptainFlow()}
-      </>
+        <BthSurface
+          tone="raised"
+          padding={0}
+          gap={0}
+          radiusToken="none"
+          border={false}
+          style={{
+            flex: 1,
+            marginTop: -2,
+            borderTopLeftRadius: 28,
+            borderTopRightRadius: 28,
+            overflow: 'hidden',
+          }}
+        >
+          {renderCaptainFlow()}
+        </BthSurface>
+        {accountSheet}
+      </BthBox>
     );
   }
 
   return (
-    <BthMobileScrollView fill padding={5} gap={5}>
-      <BthScreenHeader
-        title="مهام الكابتن"
-        subtitle="هذه هي نقطة البداية الحقيقية لتطبيق الكابتن."
-        actionLabel="ابدأ الاستلام"
-        onActionPress={() => setRoute('inbox')}
-      />
+    <BthBox style={{ flex: 1 }} background="background">
+      {topBar}
+      <BthSurface
+        tone="raised"
+        padding={0}
+        gap={0}
+        radiusToken="none"
+        border={false}
+        style={{
+          flex: 1,
+          marginTop: -2,
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
+          overflow: 'hidden',
+        }}
+      >
+        <BthMobileScrollView fill padding={5} gap={5}>
+          <BthScreenHeader
+            title="مهام الكابتن"
+            subtitle="هذه هي نقطة البداية الحقيقية لتطبيق الكابتن."
+            actionLabel="ابدأ الاستلام"
+            onActionPress={() => setRoute('inbox')}
+          />
 
-      <BthSurface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
-        <BthText role="label" tone="inverse">نقطة البداية الرسمية</BthText>
-        <BthText role="titleLg" tone="inverse">بداية تشغيلية حقيقية للكابتن</BthText>
-        <BthText role="bodyMd" tone="inverse">تطبيق الكابتن يجب أن يبدأ من shell تُظهر المهام والحالة والاختصارات، لا من preview service entry.</BthText>
-      </BthSurface>
-
-      <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
-        <BthText role="label">المساحات الأساسية</BthText>
-        {primaryAreas.map((item) => (
-          <BthSurface key={item} tone="default" padding={4} gap={2} radiusToken="lg">
-            <BthText role="bodyStrong">{item}</BthText>
-            <BthText role="bodySm" tone="muted">هذه مساحة رئيسية داخل التطبيق الحقيقي وليست preview route.</BthText>
+          <BthSurface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
+            <BthText role="label" tone="inverse">نقطة البداية الرسمية</BthText>
+            <BthText role="titleLg" tone="inverse">بداية تشغيلية حقيقية للكابتن</BthText>
+            <BthText role="bodyMd" tone="inverse">تطبيق الكابتن يجب أن يبدأ من shell تُظهر المهام والحالة والاختصارات، لا من preview service entry.</BthText>
           </BthSurface>
-        ))}
+
+          <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
+            <BthText role="label">المساحات الأساسية</BthText>
+            {primaryAreas.map((item) => (
+              <BthSurface key={item} tone="default" padding={4} gap={2} radiusToken="lg">
+                <BthText role="bodyStrong">{item}</BthText>
+                <BthText role="bodySm" tone="muted">هذه مساحة رئيسية داخل التطبيق الحقيقي وليست preview route.</BthText>
+              </BthSurface>
+            ))}
+          </BthSurface>
+
+          <BthSurface tone="default" padding={5} gap={4} radiusToken="xl">
+            <BthText role="label">اختصارات البداية</BthText>
+            <BthBox gap={3}>
+              {shortcuts.map((item, index) => (
+                <BthButton
+                  key={item}
+                  label={item}
+                  tone="secondary"
+                  onPress={() => {
+                    if (index === 0) {
+                      setRoute('inbox');
+                      return;
+                    }
+
+                    if (index === 1) {
+                      setInboxState('delivered');
+                      setRoute('inbox');
+                      return;
+                    }
+
+                    setInboxState('noTasks');
+                    setRoute('inbox');
+                  }}
+                />
+              ))}
+            </BthBox>
+          </BthSurface>
+
+          <BthSurface tone="inset" padding={4} gap={2} radiusToken="lg">
+            <BthText role="label">حكم معماري</BthText>
+            <BthText role="bodySm" tone="muted">البدء من home shell يمنع خلط feature preview مع التشغيل الفعلي للتطبيق.</BthText>
+          </BthSurface>
+
+          <BthButton label="ابدأ الاستلام" onPress={() => setRoute('inbox')} />
+        </BthMobileScrollView>
       </BthSurface>
-
-      <BthSurface tone="default" padding={5} gap={4} radiusToken="xl">
-        <BthText role="label">اختصارات البداية</BthText>
-        <BthBox gap={3}>
-          {shortcuts.map((item, index) => (
-            <BthButton
-              key={item}
-              label={item}
-              tone="secondary"
-              onPress={() => {
-                if (index === 0) {
-                  setRoute('inbox');
-                  return;
-                }
-
-                if (index === 1) {
-                  setInboxState('delivered');
-                  setRoute('inbox');
-                  return;
-                }
-
-                setInboxState('noTasks');
-                setRoute('inbox');
-              }}
-            />
-          ))}
-        </BthBox>
-      </BthSurface>
-
-      <BthSurface tone="inset" padding={4} gap={2} radiusToken="lg">
-        <BthText role="label">حكم معماري</BthText>
-        <BthText role="bodySm" tone="muted">البدء من home shell يمنع خلط feature preview مع التشغيل الفعلي للتطبيق.</BthText>
-      </BthSurface>
-
-      <BthButton label="ابدأ الاستلام" onPress={() => setRoute('inbox')} />
-    </BthMobileScrollView>
+      {accountSheet}
+    </BthBox>
   );
 }
 
