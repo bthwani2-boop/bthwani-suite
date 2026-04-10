@@ -1,23 +1,31 @@
+"use client";
+
 import React from 'react';
-import { BthWebPageFrame, BthWebSectionCard } from '@bthwani/ui-kit/web';
-import styles from '../shared/shared-web-shell.module.css';
+import {
+  BthWebCommandCenterFrame,
+  BthWebMissionHeroCard,
+  BthWebRailServiceList,
+  BthWebSignalCard,
+} from '@bthwani/ui-kit/web';
+import { global as surfacesGlobal } from '@bthwani/surfaces';
+import styles from './control-panel-shell.module.css';
 
 const primarySections = [
-  { href: '/dashboard', label: 'Dashboard', description: 'System-wide operating overview and decision visibility.' },
-  { href: '/operations', label: 'Operations', description: 'Execution flow, operational throughput, and incident routing.' },
-  { href: '/finance', label: 'Finance', description: 'Financial monitoring, controls, and reconciliation surfaces.' },
-  { href: '/catalogs', label: 'Catalogs', description: 'Service, product, and structural catalog governance.' },
-  { href: '/support', label: 'Support', description: 'Support queues, issue handling, and customer recovery paths.' },
-  { href: '/partners', label: 'Partners', description: 'Partner-facing coordination, health, and operating readiness.' },
-  { href: '/marketing', label: 'Marketing', description: 'Campaign and growth operations under the shared shell system.' },
-  { href: '/control', label: 'Control', description: 'Platform control functions and internal governance surfaces.' },
+  { href: '/dashboard', label: 'النظرة العامة', description: 'فهم الحالة خلال ثوانٍ وبدء أفضل إجراء بنفس روح بقية اللوحات.' },
+  { href: '/operations', label: 'العمليات', description: 'تنفيذ، مرور تشغيلي، وإدارة الاختناقات من مسار واضح.' },
+  { href: '/finance', label: 'المالية', description: 'مراقبة مالية، تسويات، وتحكم تشغيلي موحد.' },
+  { href: '/catalogs', label: 'الكتالوجات', description: 'حوكمة الخدمات والمنتجات والبنية التشغيلية.' },
+  { href: '/support', label: 'الدعم', description: 'طوابير الدعم، التصعيدات، واستعادة تجربة العميل.' },
+  { href: '/partners', label: 'الشركاء', description: 'جاهزية الشركاء والتنسيق التشغيلي عبر المسارات.' },
+  { href: '/marketing', label: 'التسويق', description: 'إدارة حملات النمو دون كسر هيكل التشغيل المركزي.' },
+  { href: '/control', label: 'لوحة التحكم', description: 'حوكمة المنصة، الإدارة، وإطار التحكم الداخلي.' },
 ] as const;
 
 const controlSubSections = [
-  { href: '/control/platform', label: 'Platform', description: 'Platform controls, tooling, and technical operating baselines.' },
-  { href: '/control/administration', label: 'Administration', description: 'Administrative controls and internal operating workflows.' },
-  { href: '/control/governance', label: 'Governance', description: 'Governance evidence, policy surfaces, and execution discipline.' },
-  { href: '/control/hr', label: 'HR', description: 'People operations, staffing context, and workforce controls.' },
+  { href: '/control/platform', label: 'المنصة', description: 'ضبط الأدوات وحدود التشغيل التقني.' },
+  { href: '/control/administration', label: 'الإدارة', description: 'مسارات الإدارة الداخلية وقرارات التشغيل.' },
+  { href: '/control/governance', label: 'الحوكمة', description: 'الأدلة والسياسات وحراس الامتثال.' },
+  { href: '/control/hr', label: 'الموارد البشرية', description: 'تشغيل الأشخاص والجاهزية التنظيمية.' },
 ] as const;
 
 type ControlPanelSectionId = 'dashboard' | 'operations' | 'finance' | 'catalogs' | 'support' | 'partners' | 'marketing' | 'control';
@@ -28,35 +36,11 @@ export type ControlPanelSurfaceHostProps = {
   subsection?: ControlPanelSubSectionId;
 };
 
-function renderLinks(
-  items: ReadonlyArray<{ href: string; label: string; description: string }>,
-  activeHref?: string,
-) {
-  return (
-    <div className={styles.linkGrid}>
-      {items.map((item) => {
-        const isActive = item.href === activeHref;
-
-        return (
-          <a
-            key={item.href}
-            href={item.href}
-            className={[styles.navLink, isActive ? styles.navLinkActive : ''].filter(Boolean).join(' ')}
-          >
-            <strong className={styles.navLabel}>{item.label}</strong>
-            <span className={styles.navDescription}>{item.description}</span>
-          </a>
-        );
-      })}
-    </div>
-  );
-}
-
 function resolveShellCopy(section?: ControlPanelSectionId, subsection?: ControlPanelSubSectionId) {
   if (!section) {
     return {
-      title: 'BThwani Control Panel',
-      description: 'A governed control surface with centralized web framing, shared baseline styling, and route-level composition only.',
+      title: 'النظرة العامة',
+      description: 'افهم الحالة خلال ثوانٍ، وابدأ من أفضل إجراء مقترح بنفس روح بقية لوحات MCPW.',
       activeHref: undefined,
     };
   }
@@ -65,16 +49,16 @@ function resolveShellCopy(section?: ControlPanelSectionId, subsection?: ControlP
     const activeSection = primarySections.find((item) => item.href === `/${section}`);
 
     return {
-      title: activeSection?.label ?? 'BThwani Control Panel',
-      description: activeSection?.description ?? 'Control-panel section shell.',
+      title: activeSection?.label ?? 'لوحة التحكم',
+      description: activeSection?.description ?? 'واجهة تحكم مركزية.',
       activeHref: activeSection?.href,
     };
   }
 
   if (!subsection) {
     return {
-      title: 'Control',
-      description: 'Internal control domain for platform-level oversight, administration, governance, and people operations.',
+      title: 'لوحة التحكم',
+      description: 'مجال التحكم الداخلي للمنصة والإدارة والحوكمة والأشخاص.',
       activeHref: '/control',
     };
   }
@@ -82,36 +66,293 @@ function resolveShellCopy(section?: ControlPanelSectionId, subsection?: ControlP
   const activeSubSection = controlSubSections.find((item) => item.href === `/control/${subsection}`);
 
   return {
-    title: `Control / ${activeSubSection?.label ?? subsection}`,
-    description: activeSubSection?.description ?? 'Control subsection shell.',
+    title: `${activeSubSection?.label ?? subsection}`,
+    description: activeSubSection?.description ?? 'قسم فرعي ضمن لوحة التحكم.',
     activeHref: activeSubSection?.href,
   };
 }
 
+const topFilterItems = [
+  { id: 'period-today', label: 'اليوم' },
+  { id: 'state-all', label: 'All' },
+  { id: 'mode-kpi', label: 'K%' },
+] as const;
+
+type TopFilterId = (typeof topFilterItems)[number]['id'];
+type PrimarySectionHref = (typeof primarySections)[number]['href'];
+const runtimeData = surfacesGlobal.globalControlPanel.controlPanelRuntimeData;
+const railServiceItems = runtimeData.services.map((service) => ({
+  id: service.id,
+  label: service.label,
+  status: service.status,
+})) as ReadonlyArray<{ id: string; label: string; status: string }>;
+
+const overviewSignals = [
+  {
+    id: 'best-path',
+    tone: 'best' as const,
+    title: 'أفضل مسار',
+    value: 'المالية',
+    description: 'ابدأ من مدفوعات متأخرة تحتاج اعتماد قبل التفرع إلى بقية المسارات.',
+  },
+  {
+    id: 'pressure',
+    tone: 'danger' as const,
+    title: 'الضغط الحالي',
+    value: '1',
+    description: 'عناصر تحتاج قرارًا فوريًا من أعلى الصفحة.',
+  },
+  {
+    id: 'live-refresh',
+    tone: 'neutral' as const,
+    title: 'آخر تحديث',
+    value: 'بدون تحديث حي',
+    description: 'آخر مزامنة مرئية لهذه الواجهة دون مغادرة السطح.',
+  },
+  {
+    id: 'mode',
+    tone: 'neutral' as const,
+    title: 'نمط القراءة',
+    value: 'مرجعي',
+    description: 'المؤشرات تركّز الانتباه بالزمن لمستوى الجاهزية الفعلي.',
+  },
+] as const;
+
+type MissionCardView = {
+  missionTitle: string;
+  missionDescription: string;
+  owner: string;
+  dueLabel: string;
+  countLabel: string;
+};
+
+function resolveRailItems(activeHref?: string) {
+  return primarySections.map((item) => ({
+    id: item.href,
+    label: item.label,
+    description: item.description,
+    active: item.href === activeHref,
+    badge: item.href === '/dashboard' ? 'فتح مساحة الخدمة' : undefined,
+  }));
+}
+
+function resolveFallbackMission(activeSectionLabel: string): MissionCardView {
+  return {
+    missionTitle: `مهمة ${activeSectionLabel}`,
+    missionDescription: `لا يوجد flow.meta مرتبط مباشرة بهذا القسم حتى الآن.`,
+    owner: activeSectionLabel,
+    dueLabel: 'غير معرف في flow.meta',
+    countLabel: '1',
+  };
+}
+
 export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSurfaceHostProps) {
+  const [activeTopFilterId, setActiveTopFilterId] = React.useState<TopFilterId>('period-today');
+  const [languageChip, setLanguageChip] = React.useState<'EN' | 'AR'>('EN');
+  const [alertCount, setAlertCount] = React.useState(1);
+  const [serviceQuery, setServiceQuery] = React.useState('');
+  const [selectedServiceId, setSelectedServiceId] = React.useState<string>(railServiceItems[0]?.id ?? '');
+  const [activeSectionHref, setActiveSectionHref] = React.useState<PrimarySectionHref>(() => {
+    if (section) {
+      return `/${section}` as PrimarySectionHref;
+    }
+    return '/dashboard';
+  });
   const shellCopy = resolveShellCopy(section, subsection);
+  const railItems = resolveRailItems(activeSectionHref);
+  const topFilters = topFilterItems.map((item) => ({
+    ...item,
+    active: item.id === activeTopFilterId,
+  }));
+  const activeControlHref = section === 'control' && subsection ? `/control/${subsection}` : undefined;
+  const isAllFilterActive = activeTopFilterId === 'state-all';
+  const selectedServiceMeta = runtimeData.services.find((service) => service.id === selectedServiceId) ?? runtimeData.services[0];
+  const serviceSections = selectedServiceMeta?.sections ?? [];
+  const sectionIdFromHref = activeSectionHref.replace('/', '');
+  const selectedSectionMeta = runtimeData.sections.find((sectionEntry) => sectionEntry.id === sectionIdFromHref);
+  const selectedSectionMission = runtimeData.missions.find((mission) => mission.sectionId === sectionIdFromHref);
+  const sectionServiceIds = selectedSectionMeta?.serviceIds ?? [];
+  const sectionServiceNames = sectionServiceIds
+    .map((serviceId) => runtimeData.services.find((service) => service.id === serviceId)?.label)
+    .filter(Boolean) as string[];
+  const serviceLeadMission = serviceSections
+    .map((serviceSectionId) => runtimeData.missions.find((mission) => mission.sectionId === serviceSectionId))
+    .find(Boolean);
+  const activeSectionLabel = selectedSectionMeta?.label ?? sectionIdFromHref;
+  const activeMission = isAllFilterActive
+    ? serviceLeadMission
+      ? {
+          missionTitle: serviceLeadMission.title,
+          missionDescription: serviceLeadMission.description,
+          owner: serviceLeadMission.owner,
+          dueLabel: serviceLeadMission.due,
+          countLabel: String(serviceSections.length || 1),
+        }
+      : resolveFallbackMission(selectedServiceMeta?.label ?? 'الخدمة')
+    : selectedSectionMission
+      ? {
+          missionTitle: selectedSectionMission.title,
+          missionDescription: selectedSectionMission.description,
+          owner: selectedSectionMission.owner,
+          dueLabel: selectedSectionMission.due,
+          countLabel: String(sectionServiceIds.length || 1),
+        }
+      : resolveFallbackMission(activeSectionLabel);
+  const handleBrandClick = React.useCallback(() => {
+    setActiveSectionHref('/dashboard');
+    setActiveTopFilterId('period-today');
+  }, []);
+
+  const handleSearchClick = React.useCallback(() => {
+    setActiveTopFilterId('state-all');
+  }, []);
+
+  const handleRefreshClick = React.useCallback(() => {
+    setAlertCount((prev) => (prev > 0 ? prev - 1 : 0));
+  }, []);
+
+  const handleLanguageClick = React.useCallback(() => {
+    setLanguageChip((prev) => (prev === 'EN' ? 'AR' : 'EN'));
+  }, []);
+
+  const handleAlertClick = React.useCallback(() => {
+    setActiveTopFilterId('state-all');
+    setAlertCount(0);
+  }, []);
 
   return (
-    <BthWebPageFrame
-      eyebrow="BThwani Control Panel"
-      title={shellCopy.title}
-      description={shellCopy.description}
-      maxWidth={1040}
+    <BthWebCommandCenterFrame
+      brandLabel="لوحة التحكم"
+      surfaceTitle={shellCopy.title}
+      surfaceSubtitle={shellCopy.description}
+      topFilters={topFilters}
+      onTopFilterSelect={(filterId) => {
+        const matchedFilter = topFilterItems.find((item) => item.id === filterId);
+        if (matchedFilter) {
+          setActiveTopFilterId(matchedFilter.id);
+        }
+      }}
+      onRailItemSelect={(itemId) => {
+        const matchedSection = primarySections.find((item) => item.href === itemId);
+        if (matchedSection) {
+          setActiveSectionHref(matchedSection.href);
+          setActiveTopFilterId('period-today');
+        }
+      }}
+      onBrandClick={handleBrandClick}
+      onSearchClick={handleSearchClick}
+      onRefreshClick={handleRefreshClick}
+      onLanguageClick={handleLanguageClick}
+      onAlertClick={handleAlertClick}
+      railTitle="لوحة التحكم"
+      railStatusLabel={isAllFilterActive ? 'All' : 'Filtered'}
+      railItems={railItems}
+      railSupplementary={
+        isAllFilterActive ? (
+          <BthWebRailServiceList
+            title="قائمة الخدمات"
+            searchPlaceholder="بحث سريع..."
+            searchValue={serviceQuery}
+            onSearchChange={setServiceQuery}
+            selectedServiceId={selectedServiceId}
+            onServiceSelect={(serviceId) => setSelectedServiceId(serviceId)}
+            items={railServiceItems}
+          />
+        ) : null
+      }
+      languageLabel={languageChip}
+      alertCountLabel={String(alertCount)}
+      refreshLabel="تحديث"
+      searchPlaceholder="بحث عن أمر سريع"
     >
-      <BthWebSectionCard
-        title="Primary sections"
-        description="Control-panel navigation now flows through a centralized web shell instead of local page-specific DOM scaffolding."
-      >
-        {renderLinks(primarySections, shellCopy.activeHref)}
-      </BthWebSectionCard>
+      <div className={styles.stageStack}>
+        <section className={styles.priorityPanel}>
+          <BthWebMissionHeroCard
+            badges={[
+              `الفترة: ${activeTopFilterId === 'period-today' ? 'اليوم' : activeTopFilterId === 'state-all' ? 'All' : 'K%'}`,
+              isAllFilterActive ? `الخدمة: ${selectedServiceMeta?.label ?? 'N/A'}` : `القسم: ${activeSectionHref.replace('/', '')}`,
+              'آخر تحديث: مباشر',
+            ]}
+            eyebrow="المهمة الموصى بها الآن"
+            title={activeMission.missionTitle}
+            description={activeMission.missionDescription}
+            metaItems={[
+              `المالك: ${activeMission.owner}`,
+              activeMission.dueLabel,
+              `عدد العناصر: ${activeMission.countLabel}`,
+            ]}
+            secondaryAction={{ label: 'افتح العمليات', href: '/operations' }}
+            primaryAction={{ label: 'معالجة عاجل (1)', href: '/finance' }}
+          />
 
-      <BthWebSectionCard
-        title="Control subsections"
-        description="Nested control routes stay thin while subsection framing remains consistent across the control domain."
-      >
-        {renderLinks(controlSubSections, shellCopy.activeHref)}
-      </BthWebSectionCard>
-    </BthWebPageFrame>
+          <div className={styles.signalGrid}>
+            {overviewSignals.map((signal) => {
+              const dynamicValue =
+                signal.id === 'best-path'
+                  ? isAllFilterActive
+                    ? selectedServiceMeta?.label ?? 'N/A'
+                    : activeSectionLabel
+                  : signal.id === 'pressure'
+                    ? isAllFilterActive
+                      ? String(serviceSections.length || 1)
+                      : String(sectionServiceIds.length || 1)
+                    : signal.value;
+
+              return (
+              <BthWebSignalCard
+                key={signal.id}
+                title={signal.title}
+                value={dynamicValue}
+                description={signal.description}
+                tone={signal.tone}
+              />
+              );
+            })}
+          </div>
+
+          <section className={styles.contextPanel}>
+            <h4 className={styles.contextTitle}>
+              {isAllFilterActive ? 'الأقسام المرتبطة بالخدمة' : 'الخدمات المرتبطة بالقسم'}
+            </h4>
+            <div className={styles.contextList}>
+              {(isAllFilterActive ? serviceSections : sectionServiceNames).map((item) => (
+                <span key={item} className={styles.contextChip}>
+                  {item}
+                </span>
+              ))}
+              {(isAllFilterActive ? serviceSections : sectionServiceNames).length === 0 ? (
+                <span className={styles.contextChipMuted}>لا توجد عناصر مرتبطة حاليًا.</span>
+              ) : null}
+            </div>
+          </section>
+        </section>
+
+        <section className={styles.subsectionPanel}>
+          <div className={styles.subsectionHeader}>
+            <h3 className={styles.subsectionTitle}>أقسام لوحة التحكم</h3>
+            <p className={styles.subsectionDescription}>الأقسام الفرعية محفوظة ضمن shell مركزي مع نفس الهوية البصرية.</p>
+          </div>
+          <div className={styles.subsectionGrid}>
+            {controlSubSections.map((item) => {
+              const isActive = item.href === activeControlHref;
+
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className={[styles.subsectionLink, isActive ? styles.subsectionLinkActive : '']
+                    .filter(Boolean)
+                    .join(' ')}
+                >
+                  <strong className={styles.subsectionLinkLabel}>{item.label}</strong>
+                  <span className={styles.subsectionLinkDescription}>{item.description}</span>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      </div>
+    </BthWebCommandCenterFrame>
   );
 }
 

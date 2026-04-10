@@ -1,0 +1,39 @@
+.card {
+  border-radius: 16px;
+  border: 1px solid var(--bth-line);
+  background: var(--bth-surface-raised);
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.cardBest {
+  border-color: #fdba74;
+}
+
+.cardDanger {
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+
+.title {
+  margin: 0;
+  color: var(--bth-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.value {
+  margin: 0;
+  color: var(--bth-text);
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.description {
+  margin: 0;
+  color: var(--bth-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}

@@ -1,0 +1,132 @@
+.stageStack {
+  display: grid;
+  gap: 14px;
+}
+
+.priorityPanel {
+  display: grid;
+  gap: 12px;
+}
+
+.signalGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.contextPanel {
+  border: 1px solid var(--bth-line);
+  border-radius: 16px;
+  padding: 12px;
+  background: var(--bth-surface-raised);
+  display: grid;
+  gap: 8px;
+}
+
+.contextTitle {
+  margin: 0;
+  color: var(--bth-text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.contextList {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.contextChip,
+.contextChipMuted {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--bth-line);
+  padding: 4px 9px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--bth-surface);
+}
+
+.contextChip {
+  color: var(--bth-text);
+}
+
+.contextChipMuted {
+  color: var(--bth-text-muted);
+}
+
+.subsectionPanel {
+  border-radius: 20px;
+  border: 1px solid var(--bth-line);
+  background: var(--bth-surface);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.subsectionHeader {
+  display: grid;
+  gap: 4px;
+}
+
+.subsectionTitle {
+  margin: 0;
+  color: var(--bth-text);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.subsectionDescription {
+  margin: 0;
+  color: var(--bth-text-muted);
+  font-size: 13px;
+}
+
+.subsectionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.subsectionLink {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-radius: 14px;
+  border: 1px solid var(--bth-line);
+  text-decoration: none;
+  padding: 12px;
+  background: var(--bth-surface-raised);
+}
+
+.subsectionLinkActive {
+  border-color: #fb923c;
+  background: var(--bth-brand-surface);
+}
+
+.subsectionLinkLabel {
+  color: var(--bth-text);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.subsectionLinkDescription {
+  color: var(--bth-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 980px) {
+  .signalGrid,
+  .subsectionGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .subsectionPanel {
+    padding: 13px;
+  }
+}

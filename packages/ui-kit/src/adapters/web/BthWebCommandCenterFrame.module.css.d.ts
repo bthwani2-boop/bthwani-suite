@@ -1,0 +1,36 @@
+declare const styles: {
+  readonly root: string;
+  readonly topBar: string;
+  readonly topRowPrimary: string;
+  readonly topRowSecondary: string;
+  readonly identityCluster: string;
+  readonly brandPill: string;
+  readonly alertPill: string;
+  readonly languagePill: string;
+  readonly searchCluster: string;
+  readonly searchIcon: string;
+  readonly searchPlaceholder: string;
+  readonly refreshButton: string;
+  readonly filterRow: string;
+  readonly filterChip: string;
+  readonly filterChipActive: string;
+  readonly hero: string;
+  readonly heroEyebrow: string;
+  readonly heroTitle: string;
+  readonly heroSubtitle: string;
+  readonly workspace: string;
+  readonly stage: string;
+  readonly rail: string;
+  readonly railHeader: string;
+  readonly railTitle: string;
+  readonly railStatus: string;
+  readonly railNav: string;
+  readonly railSupplementary: string;
+  readonly railLink: string;
+  readonly railLinkActive: string;
+  readonly railLinkTitle: string;
+  readonly railLinkDescription: string;
+  readonly railBadge: string;
+};
+
+export default styles;
