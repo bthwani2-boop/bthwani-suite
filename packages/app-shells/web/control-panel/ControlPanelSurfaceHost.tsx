@@ -1,13 +1,14 @@
 "use client";
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   BthWebCommandCenterFrame,
   BthWebMissionHeroCard,
   BthWebRailServiceList,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
-import { global as surfacesGlobal } from '@bthwani/surfaces';
+import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 
 const primarySections = [
@@ -80,8 +81,17 @@ const topFilterItems = [
 
 type TopFilterId = (typeof topFilterItems)[number]['id'];
 type PrimarySectionHref = (typeof primarySections)[number]['href'];
-const runtimeData = surfacesGlobal.globalControlPanel.controlPanelRuntimeData;
-const railServiceItems = runtimeData.services.map((service) => ({
+const sectionRouteMap: Record<ControlPanelSectionId, PrimarySectionHref> = {
+  dashboard: '/dashboard',
+  operations: '/operations',
+  finance: '/finance',
+  catalogs: '/catalogs',
+  support: '/support',
+  partners: '/partners',
+  marketing: '/marketing',
+  control: '/control',
+};
+const railServiceItems = controlPanelRuntimeData.services.map((service) => ({
   id: service.id,
   label: service.label,
   status: service.status,
@@ -147,6 +157,7 @@ function resolveFallbackMission(activeSectionLabel: string): MissionCardView {
 }
 
 export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSurfaceHostProps) {
+  const router = useRouter();
   const [activeTopFilterId, setActiveTopFilterId] = React.useState<TopFilterId>('period-today');
   const [languageChip, setLanguageChip] = React.useState<'EN' | 'AR'>('EN');
   const [alertCount, setAlertCount] = React.useState(1);
@@ -166,17 +177,17 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
   }));
   const activeControlHref = section === 'control' && subsection ? `/control/${subsection}` : undefined;
   const isAllFilterActive = activeTopFilterId === 'state-all';
-  const selectedServiceMeta = runtimeData.services.find((service) => service.id === selectedServiceId) ?? runtimeData.services[0];
+  const selectedServiceMeta = controlPanelRuntimeData.services.find((service) => service.id === selectedServiceId) ?? controlPanelRuntimeData.services[0];
   const serviceSections = selectedServiceMeta?.sections ?? [];
   const sectionIdFromHref = activeSectionHref.replace('/', '');
-  const selectedSectionMeta = runtimeData.sections.find((sectionEntry) => sectionEntry.id === sectionIdFromHref);
-  const selectedSectionMission = runtimeData.missions.find((mission) => mission.sectionId === sectionIdFromHref);
+  const selectedSectionMeta = controlPanelRuntimeData.sections.find((sectionEntry) => sectionEntry.id === sectionIdFromHref);
+  const selectedSectionMission = controlPanelRuntimeData.missions.find((mission) => mission.sectionId === sectionIdFromHref);
   const sectionServiceIds = selectedSectionMeta?.serviceIds ?? [];
   const sectionServiceNames = sectionServiceIds
-    .map((serviceId) => runtimeData.services.find((service) => service.id === serviceId)?.label)
+    .map((serviceId) => controlPanelRuntimeData.services.find((service) => service.id === serviceId)?.label)
     .filter(Boolean) as string[];
   const serviceLeadMission = serviceSections
-    .map((serviceSectionId) => runtimeData.missions.find((mission) => mission.sectionId === serviceSectionId))
+    .map((serviceSectionId) => controlPanelRuntimeData.missions.find((mission) => mission.sectionId === serviceSectionId))
     .find(Boolean);
   const activeSectionLabel = selectedSectionMeta?.label ?? sectionIdFromHref;
   const activeMission = isAllFilterActive
@@ -198,10 +209,17 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
           countLabel: String(sectionServiceIds.length || 1),
         }
       : resolveFallbackMission(activeSectionLabel);
+  const heroPrimaryAction = section === 'operations'
+    ? { label: 'افتح DSH hub', href: '/operations/dsh' }
+    : { label: 'معالجة عاجل (1)', href: '/finance' };
+  const heroSecondaryAction = section === 'operations'
+    ? { label: 'لوحة التحكم', href: '/dashboard' }
+    : { label: 'افتح العمليات', href: '/operations' };
   const handleBrandClick = React.useCallback(() => {
     setActiveSectionHref('/dashboard');
     setActiveTopFilterId('period-today');
-  }, []);
+    router.push('/dashboard');
+  }, [router]);
 
   const handleSearchClick = React.useCallback(() => {
     setActiveTopFilterId('state-all');
@@ -237,6 +255,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
         if (matchedSection) {
           setActiveSectionHref(matchedSection.href);
           setActiveTopFilterId('period-today');
+          router.push(sectionRouteMap[matchedSection.href.replace('/', '') as ControlPanelSectionId]);
         }
       }}
       onBrandClick={handleBrandClick}
@@ -281,8 +300,8 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
               activeMission.dueLabel,
               `عدد العناصر: ${activeMission.countLabel}`,
             ]}
-            secondaryAction={{ label: 'افتح العمليات', href: '/operations' }}
-            primaryAction={{ label: 'معالجة عاجل (1)', href: '/finance' }}
+            secondaryAction={heroSecondaryAction}
+            primaryAction={heroPrimaryAction}
           />
 
           <div className={styles.signalGrid}>

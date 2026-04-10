@@ -1,27 +1,25 @@
-import { serviceMeta as amnServiceMeta } from '../../amn/service.meta';
-import { serviceMeta as arbServiceMeta } from '../../arb/service.meta';
-import { serviceMeta as dshServiceMeta } from '../../dsh/service.meta';
-import { serviceMeta as esfServiceMeta } from '../../esf/service.meta';
-import { serviceMeta as knzServiceMeta } from '../../knz/service.meta';
-import { serviceMeta as kwdServiceMeta } from '../../kwd/service.meta';
-import { serviceMeta as mrfServiceMeta } from '../../mrf/service.meta';
-import { serviceMeta as sndServiceMeta } from '../../snd/service.meta';
-import { serviceMeta as wltServiceMeta } from '../../wlt/service.meta';
-import { flowMeta as amnOperationsFlowMeta } from '../../amn/control-panel/operations/_flow-id_/flow.meta';
-import { flowMeta as arbOperationsFlowMeta } from '../../arb/control-panel/operations/_flow-id_/flow.meta';
-import { flowMeta as arbPartnersFlowMeta } from '../../arb/control-panel/partners/_flow-id_/flow.meta';
-import { flowMeta as arbSupportFlowMeta } from '../../arb/control-panel/support/_flow-id_/flow.meta';
-import { flowMeta as dshOperationsFlowMeta } from '../../dsh/control-panel/operations/_flow-id_/flow.meta';
-import { flowMeta as dshPartnersFlowMeta } from '../../dsh/control-panel/partners/_flow-id_/flow.meta';
-import { flowMeta as dshSupportFlowMeta } from '../../dsh/control-panel/support/_flow-id_/flow.meta';
-import { flowMeta as esfCatalogsFlowMeta } from '../../esf/control-panel/catalogs/_flow-id_/flow.meta';
-import { flowMeta as globalSupportNotificationsFlowMeta } from './support/notifications/flow.meta';
-import { flowMeta as globalSettingsProfileFlowMeta } from './settings/profile/flow.meta';
-import { flowMeta as knzCatalogsFlowMeta } from '../../knz/control-panel/catalogs/_flow-id_/flow.meta';
-import { flowMeta as kwdCatalogsFlowMeta } from '../../kwd/control-panel/catalogs/_flow-id_/flow.meta';
-import { flowMeta as mrfCatalogsFlowMeta } from '../../mrf/control-panel/catalogs/_flow-id_/flow.meta';
-import { flowMeta as sndCatalogsFlowMeta } from '../../snd/control-panel/catalogs/_flow-id_/flow.meta';
-import { flowMeta as wltFinanceFlowMeta } from '../../wlt/control-panel/finance/_flow-id_/flow.meta';
+import { serviceMeta as amnServiceMeta } from '@bthwani/surfaces/amn/service.meta';
+import { serviceMeta as arbServiceMeta } from '@bthwani/surfaces/arb/service.meta';
+import { serviceMeta as dshServiceMeta } from '@bthwani/surfaces/dsh/service.meta';
+import { serviceMeta as esfServiceMeta } from '@bthwani/surfaces/esf/service.meta';
+import { serviceMeta as knzServiceMeta } from '@bthwani/surfaces/knz/service.meta';
+import { serviceMeta as kwdServiceMeta } from '@bthwani/surfaces/kwd/service.meta';
+import { serviceMeta as mrfServiceMeta } from '@bthwani/surfaces/mrf/service.meta';
+import { serviceMeta as sndServiceMeta } from '@bthwani/surfaces/snd/service.meta';
+import { serviceMeta as wltServiceMeta } from '@bthwani/surfaces/wlt/service.meta';
+import { flowMeta as amnOperationsFlowMeta } from '@bthwani/surfaces/amn/control-panel/operations/_flow-id_/flow.meta';
+import { flowMeta as arbOperationsFlowMeta } from '@bthwani/surfaces/arb/control-panel/operations/_flow-id_/flow.meta';
+import { flowMeta as arbPartnersFlowMeta } from '@bthwani/surfaces/arb/control-panel/partners/_flow-id_/flow.meta';
+import { flowMeta as arbSupportFlowMeta } from '@bthwani/surfaces/arb/control-panel/support/_flow-id_/flow.meta';
+import { flowMeta as dshOperationsFlowMeta } from '@bthwani/surfaces/dsh/control-panel/operations/_flow-id_/flow.meta';
+import { flowMeta as dshPartnersFlowMeta } from '@bthwani/surfaces/dsh/control-panel/partners/_flow-id_/flow.meta';
+import { flowMeta as dshSupportFlowMeta } from '@bthwani/surfaces/dsh/control-panel/support/_flow-id_/flow.meta';
+import { flowMeta as esfCatalogsFlowMeta } from '@bthwani/surfaces/esf/control-panel/catalogs/_flow-id_/flow.meta';
+import { flowMeta as knzCatalogsFlowMeta } from '@bthwani/surfaces/knz/control-panel/catalogs/_flow-id_/flow.meta';
+import { flowMeta as kwdCatalogsFlowMeta } from '@bthwani/surfaces/kwd/control-panel/catalogs/_flow-id_/flow.meta';
+import { flowMeta as mrfCatalogsFlowMeta } from '@bthwani/surfaces/mrf/control-panel/catalogs/_flow-id_/flow.meta';
+import { flowMeta as sndCatalogsFlowMeta } from '@bthwani/surfaces/snd/control-panel/catalogs/_flow-id_/flow.meta';
+import { flowMeta as wltFinanceFlowMeta } from '@bthwani/surfaces/wlt/control-panel/finance/_flow-id_/flow.meta';
 
 const allServiceMetas = [
   amnServiceMeta,
@@ -98,8 +96,6 @@ const allFlowMetas = [
   dshPartnersFlowMeta,
   dshSupportFlowMeta,
   esfCatalogsFlowMeta,
-  globalSupportNotificationsFlowMeta,
-  globalSettingsProfileFlowMeta,
   knzCatalogsFlowMeta,
   kwdCatalogsFlowMeta,
   mrfCatalogsFlowMeta,

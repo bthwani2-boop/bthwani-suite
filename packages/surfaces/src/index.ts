@@ -1,4 +1,3 @@
-export * as global from './global';
 export * as dsh from './dsh';
 export * as knz from './knz';
 export * as amn from './amn';
