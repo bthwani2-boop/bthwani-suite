@@ -33,6 +33,15 @@ export function DirectionProvider({ language = directionConfig.defaultLanguage, 
 
   const resolvedDirection = resolveDirectionFromLanguage(activeLanguage);
 
+  useEffect(() => {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.documentElement.lang = activeLanguage;
+    document.documentElement.dir = resolvedDirection;
+  }, [activeLanguage, resolvedDirection]);
+
   const setLanguage = useCallback((nextLanguage: BthLanguage) => {
     setActiveLanguage(nextLanguage);
   }, []);

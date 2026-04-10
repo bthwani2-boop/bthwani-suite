@@ -37,5 +37,103 @@
     "kwd": "Kawader",
     "mrf": "Maarof",
     "snd": "Sanad"
+  },
+  "controlPanel": {
+    "brandLabel": "Control Panel",
+    "surfaceTitles": {
+      "dashboard": "Overview",
+      "operations": "Operations",
+      "finance": "Finance",
+      "catalogs": "Catalogs",
+      "support": "Support",
+      "partners": "Partners",
+      "marketing": "Marketing",
+      "control": "Control Panel"
+    },
+    "surfaceDescriptions": {
+      "dashboard": "Understand the state in seconds and start the best recommended action with the same spirit as other panels.",
+      "operations": "Execution, operational flow, and bottleneck management from a clear path.",
+      "finance": "Financial monitoring, settlements, and unified operational control.",
+      "catalogs": "Governance of services, products, and operational structure.",
+      "support": "Support queues, escalations, and customer experience recovery.",
+      "partners": "Partner readiness and operational coordination across paths.",
+      "marketing": "Managing growth campaigns without breaking the centralized operational structure.",
+      "control": "Platform governance, administration, and internal control framework."
+    },
+    "descriptions": {
+      "default": "Understand the state in seconds, and start with the best recommended action in the same spirit as other MCPW panels.",
+      "fallback": "Centralized control interface.",
+      "controlDefault": "Internal control domain for the platform, management, governance, and people.",
+      "subsectionFallback": "Subsection within the control panel."
+    },
+    "subSections": {
+      "platform": "Platform",
+      "administration": "Administration",
+      "governance": "Governance",
+      "hr": "Human Resources"
+    },
+    "subSectionDescriptions": {
+      "platform": "Adjust tools and technical operational boundaries.",
+      "administration": "Internal administration paths and operational decisions.",
+      "governance": "Evidence, policies, and compliance guards.",
+      "hr": "People operations and organizational readiness."
+    },
+    "ui": {
+      "defaultTitle": "Overview",
+      "searchPlaceholder": "Search for quick command",
+      "refreshLabel": "Refresh",
+      "languageLabel": "AR",
+      "alertCountLabel": "1",
+      "missionEyebrow": "Recommended Mission Now",
+      "serviceLabel": "Service",
+      "missionDockAll": "Comprehensive view of services within",
+      "missionDockActive": "Active Service:",
+      "serviceBadge": "Service:",
+      "sectionBadge": "Section:",
+      "sectionsBadge": "Sections:",
+      "lastUpdate": "Last Update: Live",
+      "contextTitleSection": "Services linked to the section",
+      "contextTitleService": "Sections linked to the service",
+      "noItems": "No related items currently.",
+      "subsectionTitle": "Control Panel Sections",
+      "subsectionDescription": "Subsections are preserved within a centralized shell with the same visual identity.",
+      "fallbackMissionTitle": "Mission",
+      "fallbackMissionDescription": "No flow.meta directly linked to this section yet.",
+      "fallbackDueLabel": "Not defined in flow.meta",
+      "definedDueLabel": "Defined in flow.meta",
+      "openServiceSpace": "Open Service Space",
+      "bestPath": "Best Path",
+      "pressure": "Current Pressure",
+      "liveRefresh": "Last Update",
+      "mode": "Reading Mode",
+      "contextTitle": "Services Related to Section",
+      "primaryAction": "Urgent Processing (1)",
+      "secondaryAction": "Open Operations",
+      "secondaryActionOps": "Open DSH Hub",
+      "secondaryActionDefault": "Control Panel"
+    },
+    "filters": {
+      "allServices": "All",
+      "allServicesMeta": "All workspaces",
+      "reference": "Reference"
+    },
+    "signals": {
+      "bestPath": {
+        "title": "Best Path",
+        "description": "Start with overdue payments that need approval before branching to other paths."
+      },
+      "pressure": {
+        "title": "Current Pressure",
+        "description": "Items requiring immediate decision from the top of the page."
+      },
+      "liveRefresh": {
+        "title": "Last Update",
+        "description": "Last visible sync of this interface without leaving the surface."
+      },
+      "mode": {
+        "title": "Reading Mode",
+        "description": "Indicators focus attention with time for actual readiness level."
+      }
+    }
   }
 }

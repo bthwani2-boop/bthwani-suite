@@ -13,6 +13,9 @@ declare const styles: {
   readonly filterRow: string;
   readonly filterChip: string;
   readonly filterChipActive: string;
+  readonly filterChipIcon: string;
+  readonly filterChipLabel: string;
+  readonly filterChipMeta: string;
 };
 
 export default styles;

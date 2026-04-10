@@ -59,14 +59,16 @@ const dshWorkbenches = [
     label: 'إعادة التوزيع',
     description: 'تحويل الطلبات بين الموارد المتاحة بدون كسر المسار الحالي.',
     routeHint: '/operations/dsh/reassign',
-    statusLabel: 'قيد الربط',
+    statusLabel: 'حي',
+    liveHref: '/operations/dsh/reassign',
   },
   {
     id: 'peak-mode',
     label: 'وضع الذروة',
     description: 'تشغيل مرن عندما ترتفع الحركة وتحتاج سعة إضافية.',
     routeHint: '/operations/dsh/peak-mode',
-    statusLabel: 'قيد الربط',
+    statusLabel: 'حي',
+    liveHref: '/operations/dsh/peak-mode',
   },
   {
     id: 'zone-set',
@@ -87,7 +89,8 @@ const dshWorkbenches = [
     label: 'جرس الوصول',
     description: 'إعدادات الوصول والتنبيهات الحية عند الاقتراب من التسليم.',
     routeHint: '/operations/dsh/arrival-bell',
-    statusLabel: 'قيد الربط',
+    statusLabel: 'حي',
+    liveHref: '/operations/dsh/arrival-bell',
   },
 ] as const satisfies ReadonlyArray<DshWorkbench>;
 
@@ -106,6 +109,18 @@ function resolveTopFilterWorkbench(filterId: TopFilterId): DshWorkbenchId {
 function resolveWorkbenchLiveHref(workbenchId: DshWorkbenchId) {
   if (workbenchId === 'orders') {
     return '/operations/dsh/orders';
+  }
+
+  if (workbenchId === 'reassign') {
+    return '/operations/dsh/reassign';
+  }
+
+  if (workbenchId === 'peak-mode') {
+    return '/operations/dsh/peak-mode';
+  }
+
+  if (workbenchId === 'arrival-bell') {
+    return '/operations/dsh/arrival-bell';
   }
 
   return undefined;
@@ -210,7 +225,7 @@ export function ControlPanelDshOperationsScreen({
     label: item.label,
     description: item.description,
     active: item.id === activeWorkbenchId,
-    badge: item.id === 'overview' ? 'حي' : item.id === 'orders' ? 'مباشر' : 'مخطط',
+    badge: item.id === 'overview' ? 'حي' : item.id === 'orders' || item.id === 'arrival-bell' || item.id === 'reassign' || item.id === 'peak-mode' ? 'مباشر' : 'مخطط',
   }));
   const readyForSelection = state === 'ready';
 
@@ -346,13 +361,24 @@ export function ControlPanelDshOperationsScreen({
               <BthText role="caption" tone="soft">
                 {workbench.description}
               </BthText>
-              {workbench.id === 'orders' ? (
+              {workbench.id === 'orders' || workbench.id === 'arrival-bell' || workbench.id === 'reassign' || workbench.id === 'peak-mode' ? (
                 <BthButton
-                  label="افتح الطلبات"
+                  label={workbench.id === 'orders' ? 'افتح الطلبات' : workbench.id === 'arrival-bell' ? 'افتح جرس الوصول' : workbench.id === 'reassign' ? 'افتح إعادة التوزيع' : 'افتح وضع الذروة'}
                   tone="primary"
                   size="sm"
                   fullWidth={false}
-                  onPress={() => router.push(resolveWorkbenchLiveHref(workbench.id) ?? '/operations/dsh/orders')}
+                  onPress={() =>
+                    router.push(
+                      resolveWorkbenchLiveHref(workbench.id) ??
+                        (workbench.id === 'arrival-bell'
+                          ? '/operations/dsh/arrival-bell'
+                          : workbench.id === 'reassign'
+                            ? '/operations/dsh/reassign'
+                            : workbench.id === 'peak-mode'
+                              ? '/operations/dsh/peak-mode'
+                            : '/operations/dsh/orders'),
+                    )
+                  }
                 />
               ) : null}
             </BthBox>

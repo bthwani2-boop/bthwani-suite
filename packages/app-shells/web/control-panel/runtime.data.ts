@@ -33,35 +33,24 @@ const allServiceMetas = [
   wltServiceMeta,
 ] as const;
 
-const sectionLabelMap: Record<string, string> = {
-  operations: 'العمليات',
-  finance: 'المالية',
-  catalogs: 'الكتالوجات',
-  support: 'الدعم',
-  partners: 'الشركاء',
-};
-
 export type ControlPanelRuntimeService = {
   id: string;
   label: string;
-  status: string;
+  statusKind: 'live' | 'reference';
   sections: string[];
   placeholder: boolean;
 };
 
 export type ControlPanelRuntimeSection = {
   id: string;
-  label: string;
   serviceIds: string[];
 };
 
 export type ControlPanelRuntimeMission = {
   sectionId: string;
   flowId: string;
-  title: string;
-  description: string;
-  owner: string;
-  due: string;
+  ownerSectionId: string;
+  dueKind: 'defined' | 'missing';
   placeholder: boolean;
 };
 
@@ -69,8 +58,8 @@ const controlPanelServices: ControlPanelRuntimeService[] = allServiceMetas
   .filter((meta) => meta.surfaceOwnership.includes('control-panel'))
   .map((meta) => ({
     id: meta.id,
-    label: meta.id.toUpperCase(),
-    status: meta.placeholder ? 'تشغيل مرجعي' : 'مفعل',
+    label: meta.id,
+    statusKind: meta.placeholder ? 'reference' : 'live',
     sections: [...meta.controlPanelSections],
     placeholder: meta.placeholder,
   }));
@@ -81,7 +70,6 @@ const sectionIds = Array.from(
 
 const controlPanelSections: ControlPanelRuntimeSection[] = sectionIds.map((sectionId) => ({
   id: sectionId,
-  label: sectionLabelMap[sectionId] ?? sectionId,
   serviceIds: controlPanelServices
     .filter((service) => service.sections.includes(sectionId))
     .map((service) => service.id),
@@ -103,22 +91,6 @@ const allFlowMetas = [
   wltFinanceFlowMeta,
 ] as const;
 
-function resolveMissionTitle(sectionLabel: string, flowId: string) {
-  if (flowId === '_flow-id_') {
-    return `مهمة ${sectionLabel}`;
-  }
-
-  return `مهمة ${sectionLabel} - ${flowId}`;
-}
-
-function resolveMissionDescription(sectionLabel: string, flowId: string, owner: string) {
-  if (flowId === '_flow-id_') {
-    return `هذا القسم مرتبط بتدفق placeholder مملوك لـ ${owner} ضمن ${sectionLabel}.`;
-  }
-
-  return `هذا القسم يعمل عبر التدفق ${flowId} المملوك لـ ${owner}.`;
-}
-
 function pickFlowMetaForSection(sectionId: string) {
   const matchingFlowMetas = allFlowMetas.filter((flowMeta) => flowMeta.owner === sectionId);
 
@@ -133,10 +105,8 @@ const controlPanelMissions: ControlPanelRuntimeMission[] = controlPanelSections.
     return {
       sectionId: sectionEntry.id,
       flowId: 'unmapped',
-      title: `مهمة ${sectionEntry.label}`,
-      description: `لا يوجد flow.meta مرتبط مباشرة بهذا القسم حتى الآن.`,
-      owner: sectionEntry.id,
-      due: 'غير معرف في flow.meta',
+      ownerSectionId: sectionEntry.id,
+      dueKind: 'missing',
       placeholder: true,
     };
   }
@@ -144,10 +114,8 @@ const controlPanelMissions: ControlPanelRuntimeMission[] = controlPanelSections.
   return {
     sectionId: sectionEntry.id,
     flowId: flowMeta.id,
-    title: resolveMissionTitle(sectionEntry.label, flowMeta.id),
-    description: resolveMissionDescription(sectionEntry.label, flowMeta.id, flowMeta.owner),
-    owner: flowMeta.owner,
-    due: flowMeta.placeholder ? 'غير معرف في flow.meta' : 'معرف في flow.meta',
+    ownerSectionId: flowMeta.owner,
+    dueKind: flowMeta.placeholder ? 'missing' : 'defined',
     placeholder: flowMeta.placeholder,
   };
 });

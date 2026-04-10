@@ -54,6 +54,7 @@ export function BthPortalHost({ children }: { children?: ReactNode }) {
               position: 'fixed',
               inset: 0,
               zIndex: 2147483000,
+              pointerEvents: 'none',
               display: 'flex',
               flexDirection: 'column'
             }

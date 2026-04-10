@@ -68,6 +68,8 @@ export type ControlPanelDshOrderDetailScreenProps = {
   ordersHref?: string;
   hubHref?: string;
   supportHref?: string;
+  arrivalBellHref?: string;
+  reassignHref?: string;
 };
 
 export function ControlPanelDshOrderDetailScreen({
@@ -76,6 +78,8 @@ export function ControlPanelDshOrderDetailScreen({
   ordersHref = '/operations/dsh/orders',
   hubHref = '/operations/dsh',
   supportHref = '/support',
+  arrivalBellHref = '/operations/dsh/arrival-bell',
+  reassignHref = '/operations/dsh/reassign',
 }: ControlPanelDshOrderDetailScreenProps) {
   const router = useRouter();
   const order = getSampleDshOrder(orderId);
@@ -180,6 +184,12 @@ export function ControlPanelDshOrderDetailScreen({
               <BthText role="bodySm" tone="muted">{arrivalTimeline?.cooldownLabel ?? 'غير متاح'}</BthText>
               <BthText role="bodySm" tone="muted">{arrivalTimeline?.blockReason ?? 'لا يوجد منع حالي'}</BthText>
             </BthBox>
+            <BthButton
+              label="افتح workspace جرس الوصول"
+              tone="secondary"
+              fullWidth={false}
+              onPress={() => router.push(arrivalBellHref)}
+            />
           </BthBox>
         </BthWebSectionCard>
 
@@ -203,6 +213,12 @@ export function ControlPanelDshOrderDetailScreen({
               <BthText role="bodySm">{actionPlan.supportLabel}</BthText>
               <BthText role="bodySm" tone="muted">{actionPlan.supportDescription}</BthText>
             </BthBox>
+            <BthButton
+              label="افتح workspace إعادة التوزيع"
+              tone="secondary"
+              fullWidth={false}
+              onPress={() => router.push(reassignHref)}
+            />
           </BthBox>
         </BthWebSectionCard>
 

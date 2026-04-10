@@ -7,6 +7,8 @@ import { BthWebCommandStrip } from './BthWebCommandStrip';
 export type BthWebCommandCenterFilter = {
   id: string;
   label: string;
+  icon?: string;
+  metaLabel?: string;
   active?: boolean;
 };
 
@@ -23,6 +25,7 @@ export type BthWebCommandCenterFrameProps = {
   brandLabel: string;
   surfaceTitle: string;
   surfaceSubtitle?: string;
+  showHero?: boolean;
   searchPlaceholder?: string;
   languageLabel?: string;
   alertCountLabel?: string;
@@ -48,18 +51,37 @@ function renderRailItems(
 ) {
   return (
     <nav className={styles.railNav} aria-label="Control panel sections">
-      {items.map((item) => (
-        <button
-          key={item.id}
-          type="button"
-          onClick={() => onRailItemSelect?.(item.id)}
-          className={[styles.railLink, item.active ? styles.railLinkActive : ''].filter(Boolean).join(' ')}
-        >
-          <span className={styles.railLinkTitle}>{item.label}</span>
-          {item.description ? <span className={styles.railLinkDescription}>{item.description}</span> : null}
-          {item.badge ? <span className={styles.railBadge}>{item.badge}</span> : null}
-        </button>
-      ))}
+      {items.map((item) => {
+        const className = [styles.railLink, item.active ? styles.railLinkActive : ''].filter(Boolean).join(' ');
+
+        if (item.href) {
+          return (
+            <a
+              key={item.id}
+              href={item.href}
+              onClick={() => onRailItemSelect?.(item.id)}
+              className={className}
+            >
+              <span className={styles.railLinkTitle}>{item.label}</span>
+              {item.description ? <span className={styles.railLinkDescription}>{item.description}</span> : null}
+              {item.badge ? <span className={styles.railBadge}>{item.badge}</span> : null}
+            </a>
+          );
+        }
+
+        return (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onRailItemSelect?.(item.id)}
+            className={className}
+          >
+            <span className={styles.railLinkTitle}>{item.label}</span>
+            {item.description ? <span className={styles.railLinkDescription}>{item.description}</span> : null}
+            {item.badge ? <span className={styles.railBadge}>{item.badge}</span> : null}
+          </button>
+        );
+      })}
     </nav>
   );
 }
@@ -68,6 +90,7 @@ export function BthWebCommandCenterFrame({
   brandLabel,
   surfaceTitle,
   surfaceSubtitle,
+  showHero = true,
   searchPlaceholder = 'ابحث عن مهمة أو أمر سريع',
   languageLabel = 'AR',
   alertCountLabel = '1',
@@ -103,11 +126,13 @@ export function BthWebCommandCenterFrame({
         onAlertClick={onAlertClick}
       />
 
-      <section className={styles.hero}>
-        <p className={styles.heroEyebrow}>{brandLabel}</p>
-        <h1 className={styles.heroTitle}>{surfaceTitle}</h1>
-        {surfaceSubtitle ? <p className={styles.heroSubtitle}>{surfaceSubtitle}</p> : null}
-      </section>
+      {showHero ? (
+        <section className={styles.hero}>
+          <p className={styles.heroEyebrow}>{brandLabel}</p>
+          <h1 className={styles.heroTitle}>{surfaceTitle}</h1>
+          {surfaceSubtitle ? <p className={styles.heroSubtitle}>{surfaceSubtitle}</p> : null}
+        </section>
+      ) : null}
 
       <div className={styles.workspace}>
         <section className={styles.stage}>{children}</section>

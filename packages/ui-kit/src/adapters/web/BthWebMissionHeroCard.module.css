@@ -11,6 +11,40 @@
   gap: 10px;
 }
 
+.cardDense {
+  padding: 12px;
+  gap: 6px;
+}
+
+.cardDense .title {
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+.cardDense .description {
+  font-size: 14px;
+}
+
+.cardDense .eyebrow {
+  font-size: 11px;
+}
+
+.cardDense .badge {
+  padding: 4px 8px;
+  font-size: 10px;
+}
+
+.cardDense .metaChip {
+  padding: 5px 8px;
+  font-size: 11px;
+}
+
+.cardDense .primaryCta,
+.cardDense .secondaryCta {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
 .badgeRow {
   display: flex;
   align-items: center;

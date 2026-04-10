@@ -5,6 +5,7 @@ export type BthWebMissionHeroCardProps = {
   eyebrow?: string;
   title: string;
   description?: string;
+  dense?: boolean;
   badges?: ReadonlyArray<string>;
   metaItems?: ReadonlyArray<string>;
   primaryAction?: { label: string; href: string };
@@ -15,13 +16,14 @@ export function BthWebMissionHeroCard({
   eyebrow,
   title,
   description,
+  dense = false,
   badges = [],
   metaItems = [],
   primaryAction,
   secondaryAction,
 }: BthWebMissionHeroCardProps) {
   return (
-    <article className={styles.card}>
+    <article className={[styles.card, dense ? styles.cardDense : ''].filter(Boolean).join(' ')}>
       {badges.length > 0 ? (
         <div className={styles.badgeRow}>
           {badges.map((badge) => (

@@ -6,6 +6,8 @@ import styles from './BthWebCommandStrip.module.css';
 export type BthWebCommandStripFilter = {
   id: string;
   label: string;
+  icon?: string;
+  metaLabel?: string;
   active?: boolean;
 };
 
@@ -35,11 +37,14 @@ function renderFilters(
           key={filter.id}
           type="button"
           onClick={() => onFilterSelect?.(filter.id)}
+          aria-pressed={Boolean(filter.active)}
           className={[styles.filterChip, filter.active ? styles.filterChipActive : '']
             .filter(Boolean)
             .join(' ')}
         >
-          {filter.label}
+          {filter.icon ? <span className={styles.filterChipIcon}>{filter.icon}</span> : null}
+          <span className={styles.filterChipLabel}>{filter.label}</span>
+          {filter.metaLabel ? <span className={styles.filterChipMeta}>{filter.metaLabel}</span> : null}
         </button>
       ))}
     </div>

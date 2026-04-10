@@ -1,5 +1,6 @@
 declare const styles: {
   readonly card: string;
+  readonly cardDense: string;
   readonly badgeRow: string;
   readonly badge: string;
   readonly eyebrow: string;

@@ -1,6 +1,44 @@
 .stageStack {
   display: grid;
-  gap: 14px;
+  gap: 12px;
+}
+
+.missionDockHeader {
+  border-radius: 16px;
+  border: 1px solid #fed7aa;
+  background:
+    linear-gradient(135deg, #fff7ed 0%, #ffffff 82%);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.missionDockEyebrow {
+  margin: 0;
+  color: var(--bth-brand);
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid #fed7aa;
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: #fff7ed;
+}
+
+.missionDockTitle {
+  margin: 0;
+  color: var(--bth-text);
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.missionDockSubtitle {
+  margin: 0;
+  color: var(--bth-text-muted);
+  font-size: 12px;
+  margin-inline-start: auto;
 }
 
 .priorityPanel {
@@ -126,6 +164,15 @@
 }
 
 @media (max-width: 640px) {
+  .missionDockTitle {
+    font-size: 18px;
+  }
+
+  .missionDockSubtitle {
+    margin-inline-start: 0;
+    width: 100%;
+  }
+
   .subsectionPanel {
     padding: 13px;
   }
