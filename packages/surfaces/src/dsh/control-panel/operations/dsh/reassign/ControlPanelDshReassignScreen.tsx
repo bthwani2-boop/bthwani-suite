@@ -63,6 +63,8 @@ export type ControlPanelDshReassignScreenProps = {
   hubHref?: string;
   ordersHref?: string;
   supportHref?: string;
+  embedded?: boolean;
+  showHeader?: boolean;
 };
 
 export function ControlPanelDshReassignScreen({
@@ -70,6 +72,8 @@ export function ControlPanelDshReassignScreen({
   hubHref = '/operations/dsh',
   ordersHref = '/operations/dsh/orders',
   supportHref = '/support',
+  embedded = false,
+  showHeader = true,
 }: ControlPanelDshReassignScreenProps) {
   const router = useRouter();
 
@@ -82,6 +86,8 @@ export function ControlPanelDshReassignScreen({
         title="إعادة التوزيع"
         description="المسار يبقى واضحًا حتى لو غابت الحالات أو توقفت البيانات."
         maxWidth={1120}
+        embedded={embedded}
+        showHeader={showHeader}
       >
         <BthStateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
       </BthWebPageFrame>
@@ -94,6 +100,8 @@ export function ControlPanelDshReassignScreen({
       title="إعادة التوزيع"
       description="أول route حي لهذا القرار. يوضح الحالات المرشحة والأسباب والبدائل بدون إدخال submit تشغيلي كاذب."
       maxWidth={1120}
+      embedded={embedded}
+      showHeader={showHeader}
     >
       <BthBox gap={4}>
         <BthWebMissionHeroCard
@@ -161,16 +169,18 @@ export function ControlPanelDshReassignScreen({
           </BthBox>
         </BthWebSectionCard>
 
-        <BthWebSectionCard
-          title="الإجراءات التالية"
-          description="السطح يثبت القرار والتنقل فقط، ولا يقدّم submit زائف لإعادة التوزيع قبل slice التنفيذ الحقيقي."
-        >
-          <BthBox gap={2}>
-            <BthButton label="افتح مساحة العمليات" onPress={() => router.push(hubHref)} />
-            <BthButton label="افتح الطلبات" tone="secondary" onPress={() => router.push(ordersHref)} />
-            <BthButton label="فتح الدعم" tone="secondary" onPress={() => router.push(supportHref)} />
-          </BthBox>
-        </BthWebSectionCard>
+        {!embedded ? (
+          <BthWebSectionCard
+            title="الإجراءات التالية"
+            description="السطح يثبت القرار والتنقل فقط، ولا يقدّم submit زائف لإعادة التوزيع قبل slice التنفيذ الحقيقي."
+          >
+            <BthBox gap={2}>
+              <BthButton label="افتح مساحة العمليات" onPress={() => router.push(hubHref)} />
+              <BthButton label="افتح الطلبات" tone="secondary" onPress={() => router.push(ordersHref)} />
+              <BthButton label="فتح الدعم" tone="secondary" onPress={() => router.push(supportHref)} />
+            </BthBox>
+          </BthWebSectionCard>
+        ) : null}
       </BthBox>
     </BthWebPageFrame>
   );

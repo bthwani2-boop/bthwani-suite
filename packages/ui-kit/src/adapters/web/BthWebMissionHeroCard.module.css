@@ -9,6 +9,7 @@
   padding: 18px;
   display: grid;
   gap: 10px;
+  text-align: start;
 }
 
 .cardDense {
@@ -48,6 +49,7 @@
 .badgeRow {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
   flex-wrap: wrap;
 }
@@ -88,6 +90,7 @@
 .metaRow {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
   flex-wrap: wrap;
 }
@@ -110,6 +113,12 @@
   justify-content: flex-start;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+:global(html[dir='rtl']) .badgeRow,
+:global(html[dir='rtl']) .metaRow,
+:global(html[dir='rtl']) .ctaRow {
+  flex-direction: row-reverse;
 }
 
 .primaryCta,

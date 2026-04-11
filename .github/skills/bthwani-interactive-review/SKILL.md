@@ -132,6 +132,8 @@ After a visual review pause, invite the user to evaluate satisfaction in terms o
 - Arabic/RTL elegance
 - emotional confidence
 - overall taste fit
+- perceived ease for a first-time user
+- whether the main task feels one-click or at worst two-click
 
 Treat user dissatisfaction as design truth that must be integrated before expansion continues.
 
@@ -221,6 +223,8 @@ Suggested axes:
 - هل الكثافة مريحة أم مزدحمة؟
 - هل الـ RTL طبيعي وأنيق؟
 - هل التدفق يبدو ذكيًا أم معقدًا؟
+- هل المهمة الأساسية تنجز بنقرة واحدة أو بنقرتين كحد أقصى؟
+- هل التفاصيل الثانوية مخفية بذكاء ولا تظهر إلا عند الحاجة؟
 - هل تريد الاستمرار على هذا الاتجاه أم تعديله؟
 
 Avoid vague questions like:

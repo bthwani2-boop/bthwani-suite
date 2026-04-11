@@ -88,6 +88,8 @@ export type ControlPanelDshArrivalBellScreenProps = {
   hubHref?: string;
   ordersHref?: string;
   supportHref?: string;
+  embedded?: boolean;
+  showHeader?: boolean;
 };
 
 export function ControlPanelDshArrivalBellScreen({
@@ -95,6 +97,8 @@ export function ControlPanelDshArrivalBellScreen({
   hubHref = '/operations/dsh',
   ordersHref = '/operations/dsh/orders',
   supportHref = '/support',
+  embedded = false,
+  showHeader = true,
 }: ControlPanelDshArrivalBellScreenProps) {
   const router = useRouter();
 
@@ -107,6 +111,8 @@ export function ControlPanelDshArrivalBellScreen({
         title="جرس الوصول"
         description="المسار يظل واضحًا حتى عندما لا تكون البيانات جاهزة أو متاحة."
         maxWidth={1120}
+        embedded={embedded}
+        showHeader={showHeader}
       >
         <BthStateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
       </BthWebPageFrame>
@@ -119,6 +125,8 @@ export function ControlPanelDshArrivalBellScreen({
       title="جرس الوصول"
       description="أول surface حي لهذا المسار. يوضح صف الوصول من جهة الكابتن ومن جهة العميل مع footer صريح للقرار التالي."
       maxWidth={1120}
+      embedded={embedded}
+      showHeader={showHeader}
     >
       <BthBox gap={4}>
         <BthWebMissionHeroCard
@@ -154,16 +162,18 @@ export function ControlPanelDshArrivalBellScreen({
           dshArrivalBellCustomerLane,
         )}
 
-        <BthWebSectionCard
-          title="الإجراءات التالية"
-          description="العقد هنا واضح: الإجراء الرئيسي هو فتح workspace العمليات، مع إبقاء الطلبات والدعم كمسارات ثانوية صريحة."
-        >
-          <BthBox gap={2}>
-            <BthButton label="افتح مساحة العمليات" onPress={() => router.push(hubHref)} />
-            <BthButton label="افتح الطلبات" tone="secondary" onPress={() => router.push(ordersHref)} />
-            <BthButton label="فتح الدعم" tone="secondary" onPress={() => router.push(supportHref)} />
-          </BthBox>
-        </BthWebSectionCard>
+        {!embedded ? (
+          <BthWebSectionCard
+            title="الإجراءات التالية"
+            description="العقد هنا واضح: الإجراء الرئيسي هو فتح workspace العمليات، مع إبقاء الطلبات والدعم كمسارات ثانوية صريحة."
+          >
+            <BthBox gap={2}>
+              <BthButton label="افتح مساحة العمليات" onPress={() => router.push(hubHref)} />
+              <BthButton label="افتح الطلبات" tone="secondary" onPress={() => router.push(ordersHref)} />
+              <BthButton label="فتح الدعم" tone="secondary" onPress={() => router.push(supportHref)} />
+            </BthBox>
+          </BthWebSectionCard>
+        ) : null}
       </BthBox>
     </BthWebPageFrame>
   );

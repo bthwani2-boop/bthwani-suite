@@ -67,6 +67,8 @@ export type ControlPanelDshPeakModeScreenProps = {
   hubHref?: string;
   ordersHref?: string;
   supportHref?: string;
+  embedded?: boolean;
+  showHeader?: boolean;
 };
 
 export function ControlPanelDshPeakModeScreen({
@@ -74,6 +76,8 @@ export function ControlPanelDshPeakModeScreen({
   hubHref = '/operations/dsh',
   ordersHref = '/operations/dsh/orders',
   supportHref = '/support',
+  embedded = false,
+  showHeader = true,
 }: ControlPanelDshPeakModeScreenProps) {
   const router = useRouter();
 
@@ -86,6 +90,8 @@ export function ControlPanelDshPeakModeScreen({
         title="وضع الذروة"
         description="السطح يحافظ على مسار قرار واضح حتى عند غياب البيانات أو توقفها."
         maxWidth={1120}
+        embedded={embedded}
+        showHeader={showHeader}
       >
         <BthStateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
       </BthWebPageFrame>
@@ -98,6 +104,8 @@ export function ControlPanelDshPeakModeScreen({
       title="وضع الذروة"
       description="أول route حي لهذا المسار. يوضح مناطق الضغط وسياسات السعة والتوصية التشغيلية بدون toggle runtime كاذب."
       maxWidth={1120}
+      embedded={embedded}
+      showHeader={showHeader}
     >
       <BthBox gap={4}>
         <BthWebMissionHeroCard
@@ -157,16 +165,18 @@ export function ControlPanelDshPeakModeScreen({
           </BthBox>
         </BthWebSectionCard>
 
-        <BthWebSectionCard
-          title="الإجراءات التالية"
-          description="الإجراء الرئيسي هنا هو العودة إلى workspace العمليات، ثم الطلبات أو الدعم عند الحاجة، لا تبديل runtime state مباشرة."
-        >
-          <BthBox gap={2}>
-            <BthButton label="افتح مساحة العمليات" onPress={() => router.push(hubHref)} />
-            <BthButton label="افتح الطلبات" tone="secondary" onPress={() => router.push(ordersHref)} />
-            <BthButton label="فتح الدعم" tone="secondary" onPress={() => router.push(supportHref)} />
-          </BthBox>
-        </BthWebSectionCard>
+        {!embedded ? (
+          <BthWebSectionCard
+            title="الإجراءات التالية"
+            description="الإجراء الرئيسي هنا هو العودة إلى workspace العمليات، ثم الطلبات أو الدعم عند الحاجة، لا تبديل runtime state مباشرة."
+          >
+            <BthBox gap={2}>
+              <BthButton label="افتح مساحة العمليات" onPress={() => router.push(hubHref)} />
+              <BthButton label="افتح الطلبات" tone="secondary" onPress={() => router.push(ordersHref)} />
+              <BthButton label="فتح الدعم" tone="secondary" onPress={() => router.push(supportHref)} />
+            </BthBox>
+          </BthWebSectionCard>
+        ) : null}
       </BthBox>
     </BthWebPageFrame>
   );

@@ -5,43 +5,43 @@ import { useRouter } from 'next/navigation';
 import {
   BthWebCommandCenterFrame,
   BthWebMissionHeroCard,
+  BthWebSegmentedTabs,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDirection, useUiText } from '@bthwani/ui-kit';
 import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 
-const sectionConfig = [
-  { href: '/dashboard', id: 'dashboard' },
-  { href: '/operations', id: 'operations' },
-  { href: '/finance', id: 'finance' },
-  { href: '/catalogs', id: 'catalogs' },
-  { href: '/support', id: 'support' },
-  { href: '/partners', id: 'partners' },
-  { href: '/marketing', id: 'marketing' },
-  { href: '/control', id: 'control' },
-] as const;
+const primarySectionIds = ['dashboard', 'operations', 'finance', 'catalogs', 'support', 'partners', 'marketing', 'control'] as const;
+const controlSubSectionIds = ['platform', 'administration', 'governance', 'hr'] as const;
 
-const controlSubSectionConfig = [
-  { href: '/control/platform', id: 'platform' },
-  { href: '/control/administration', id: 'administration' },
-  { href: '/control/governance', id: 'governance' },
-  { href: '/control/hr', id: 'hr' },
-] as const;
-
-type ControlPanelSectionId = 'dashboard' | 'operations' | 'finance' | 'catalogs' | 'support' | 'partners' | 'marketing' | 'control';
-type ControlPanelSubSectionId = 'platform' | 'administration' | 'governance' | 'hr';
+type ControlPanelSectionId = (typeof primarySectionIds)[number];
+type ControlPanelSubSectionId = (typeof controlSubSectionIds)[number];
+type PrimarySectionHref = `/${ControlPanelSectionId}`;
+type ControlPanelText = ReturnType<typeof useUiText>['controlPanel'];
+type ControlPanelSignalId = 'best-path' | 'pressure' | 'live-refresh' | 'mode';
 
 export type ControlPanelSurfaceHostProps = {
   section?: ControlPanelSectionId;
   subsection?: ControlPanelSubSectionId;
 };
 
-function resolveSectionHref(section: ControlPanelSectionId) {
-  return `/${section}` as const;
-}
+type MissionCardView = {
+  missionTitle: string;
+  missionDescription: string;
+  owner: string;
+  dueLabel: string;
+  countLabel: string;
+};
 
-type PrimarySectionHref = (typeof sectionConfig)[number]['href'];
+type SignalView = {
+  id: ControlPanelSignalId;
+  tone: 'best' | 'danger' | 'neutral';
+  title: string;
+  description: string;
+  value: string;
+};
+
 const allServiceTabId = 'all-services';
 const serviceIconMap: Record<string, string> = {
   dsh: '◈',
@@ -54,6 +54,7 @@ const serviceIconMap: Record<string, string> = {
   mrf: '◰',
   snd: '◔',
 };
+
 const sectionRouteMap: Record<ControlPanelSectionId, PrimarySectionHref> = {
   dashboard: '/dashboard',
   operations: '/operations',
@@ -64,327 +65,245 @@ const sectionRouteMap: Record<ControlPanelSectionId, PrimarySectionHref> = {
   marketing: '/marketing',
   control: '/control',
 };
-const railServiceItems = controlPanelRuntimeData.services.map((service) => ({
-  id: service.id,
-  label: service.label,
-  statusKind: service.statusKind,
-})) as ReadonlyArray<{ id: string; label: string; statusKind: string }>;
 
-const overviewSignals = [
-  {
-    id: 'best-path',
-    tone: 'best' as const,
-    title: 'أفضل مسار',
-    value: 'المالية',
-    description: 'ابدأ من مدفوعات متأخرة تحتاج اعتماد قبل التفرع إلى بقية المسارات.',
-  },
-  {
-    id: 'pressure',
-    tone: 'danger' as const,
-    title: 'الضغط الحالي',
-    value: '1',
-    description: 'عناصر تحتاج قرارًا فوريًا من أعلى الصفحة.',
-  },
-  {
-    id: 'live-refresh',
-    tone: 'neutral' as const,
-    title: 'آخر تحديث',
-    value: 'بدون تحديث حي',
-    description: 'آخر مزامنة مرئية لهذه الواجهة دون مغادرة السطح.',
-  },
-  {
-    id: 'mode',
-    tone: 'neutral' as const,
-    title: 'نمط القراءة',
-    value: 'مرجعي',
-    description: 'المؤشرات تركّز الانتباه بالزمن لمستوى الجاهزية الفعلي.',
-  },
-] as const;
+function getServiceLabel(uiText: ReturnType<typeof useUiText>, serviceId: string) {
+  return uiText.serviceNames[serviceId as keyof typeof uiText.serviceNames] ?? serviceId.toUpperCase();
+}
 
-type MissionCardView = {
-  missionTitle: string;
-  missionDescription: string;
-  owner: string;
-  dueLabel: string;
-  countLabel: string;
-};
-
-function resolveRailItems(
-  activeHref: string,
-  sectionNames: Record<ControlPanelSectionId, string>,
-  sectionDescriptions: Record<ControlPanelSectionId, string>,
-  dashboardBadge: string,
+function resolveShellCopy(
+  panelText: ControlPanelText,
+  section: ControlPanelSectionId,
+  subsection?: ControlPanelSubSectionId,
 ) {
-  return sectionConfig.map((item) => ({
-    id: item.href,
-    href: item.href,
-    label: sectionNames[item.id],
-    description: sectionDescriptions[item.id],
-    active: item.href === activeHref,
-    badge: item.href === '/dashboard' ? dashboardBadge : undefined,
-  }));
-}
-
-function resolveFallbackMission(activeSectionLabel: string): MissionCardView {
-  return {
-    missionTitle: `مهمة ${activeSectionLabel}`,
-    missionDescription: `لا يوجد flow.meta مرتبط مباشرة بهذا القسم حتى الآن.`,
-    owner: activeSectionLabel,
-    dueLabel: 'غير معرف في flow.meta',
-    countLabel: '1',
-  };
-}
-
-function resolveShellCopy(section?: ControlPanelSectionId, subsection?: ControlPanelSubSectionId) {
-  if (!section) {
-    return {
-      title: 'BThwani Control Panel',
-      description:
-        'A governed control surface with centralized web framing, shared baseline styling, and route-level composition only.',
-      activeHref: undefined,
-    };
-  }
-
   if (section !== 'control') {
-    switch (section) {
-      case 'dashboard':
-        return {
-          title: 'Overview',
-          description: 'Understand the state in seconds and start the best recommended action.',
-          activeHref: '/dashboard',
-        };
-      case 'operations':
-        return {
-          title: 'Operations',
-          description: 'Execution, operational flow, and bottleneck management from a clear path.',
-          activeHref: '/operations',
-        };
-      case 'finance':
-        return {
-          title: 'Finance',
-          description: 'Financial monitoring, settlements, and unified operational control.',
-          activeHref: '/finance',
-        };
-      case 'catalogs':
-        return {
-          title: 'Catalogs',
-          description: 'Governance of services, products, and operational structure.',
-          activeHref: '/catalogs',
-        };
-      case 'support':
-        return {
-          title: 'Support',
-          description: 'Support queues, escalations, and customer experience recovery.',
-          activeHref: '/support',
-        };
-      case 'partners':
-        return {
-          title: 'Partners',
-          description: 'Partner readiness and operational coordination across paths.',
-          activeHref: '/partners',
-        };
-      case 'marketing':
-        return {
-          title: 'Marketing',
-          description: 'Managing growth campaigns without breaking the centralized operational structure.',
-          activeHref: '/marketing',
-        };
-      default:
-        return {
-          title: 'Control Panel',
-          description: 'Platform governance, administration, and internal control framework.',
-          activeHref: '/control',
-        };
-    }
+    return {
+      title: panelText.surfaceTitles[section],
+      description: panelText.surfaceDescriptions[section],
+    };
   }
 
   if (!subsection) {
     return {
-      title: 'Control',
-      description:
-        'Internal control domain for platform-level oversight, administration, governance, and people operations.',
-      activeHref: '/control',
+      title: panelText.surfaceTitles.control,
+      description: panelText.descriptions.controlDefault,
     };
   }
 
-  switch (subsection) {
-    case 'platform':
+  return {
+    title: panelText.subSections[subsection],
+    description: panelText.subSectionDescriptions[subsection],
+  };
+}
+
+function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPanelText) {
+  return primarySectionIds
+    .map((sectionId) => {
+      const href = `/${sectionId}` as PrimarySectionHref;
+
       return {
-        title: 'Control / Platform',
-        description: 'Adjust tools and technical operational boundaries.',
-        activeHref: '/control/platform',
+        id: href,
+        href,
+        label: panelText.surfaceTitles[sectionId],
+        description: panelText.surfaceDescriptions[sectionId],
+        active: href === activeHref,
+        badge: href === '/dashboard' ? panelText.ui.openServiceSpace : undefined,
       };
-    case 'administration':
-      return {
-        title: 'Control / Administration',
-        description: 'Internal administration paths and operational decisions.',
-        activeHref: '/control/administration',
-      };
-    case 'governance':
-      return {
-        title: 'Control / Governance',
-        description: 'Evidence, policies, and compliance guards.',
-        activeHref: '/control/governance',
-      };
-    case 'hr':
-      return {
-        title: 'Control / Human Resources',
-        description: 'People operations and organizational readiness.',
-        activeHref: '/control/hr',
-      };
-    default:
-      return {
-        title: 'Control',
-        description: 'Control subsection shell.',
-        activeHref: '/control',
-      };
+    });
+}
+
+function resolveSignals(panelText: ControlPanelText): ReadonlyArray<SignalView> {
+  return [
+    {
+      id: 'best-path',
+      tone: 'best',
+      title: panelText.signals.bestPath.title,
+      description: panelText.signals.bestPath.description,
+      value: panelText.ui.defaultTitle,
+    },
+    {
+      id: 'pressure',
+      tone: 'danger',
+      title: panelText.signals.pressure.title,
+      description: panelText.signals.pressure.description,
+      value: '1',
+    },
+    {
+      id: 'live-refresh',
+      tone: 'neutral',
+      title: panelText.signals.liveRefresh.title,
+      description: panelText.signals.liveRefresh.description,
+      value: panelText.ui.liveRefreshValue,
+    },
+    {
+      id: 'mode',
+      tone: 'neutral',
+      title: panelText.signals.mode.title,
+      description: panelText.signals.mode.description,
+      value: panelText.ui.readingModeValue,
+    },
+  ];
+}
+
+function resolveFallbackMission(activeSectionLabel: string, panelText: ControlPanelText): MissionCardView {
+  return {
+    missionTitle: `${panelText.ui.fallbackMissionTitle} ${activeSectionLabel}`,
+    missionDescription: panelText.ui.fallbackMissionDescription,
+    owner: activeSectionLabel,
+    dueLabel: panelText.ui.fallbackDueLabel,
+    countLabel: '1',
+  };
+}
+
+function resolvePrimaryAction(activeSectionId: ControlPanelSectionId, panelText: ControlPanelText) {
+  if (activeSectionId === 'operations') {
+    return { label: panelText.ui.secondaryActionOps, href: '/operations' };
   }
+
+  return { label: panelText.ui.primaryAction, href: '/finance' };
+}
+
+function resolveSecondaryAction(activeSectionId: ControlPanelSectionId, panelText: ControlPanelText) {
+  if (activeSectionId === 'operations') {
+    return { label: panelText.ui.secondaryActionDefault, href: '/dashboard' };
+  }
+
+  return { label: panelText.ui.secondaryAction, href: '/operations' };
 }
 
 export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSurfaceHostProps) {
   const router = useRouter();
-  const [languageChip, setLanguageChip] = React.useState<'EN' | 'AR'>('EN');
+  const uiText = useUiText();
+  const { language, setLanguage } = useDirection();
+  const panelText = uiText.controlPanel;
   const [alertCount, setAlertCount] = React.useState(1);
-  const [lastRailSelection, setLastRailSelection] = React.useState<string>('');
   const [selectedServiceId, setSelectedServiceId] = React.useState<string>(allServiceTabId);
-  const [activeSectionHref, setActiveSectionHref] = React.useState<PrimarySectionHref>(() => {
-    if (section) {
-      return `/${section}` as PrimarySectionHref;
-    }
-    return '/dashboard';
-  });
-  const activeSectionFromRail = activeSectionHref.replace('/', '') as ControlPanelSectionId;
-  const shellCopy = resolveShellCopy(activeSectionFromRail, activeSectionFromRail === 'control' ? subsection : undefined);
-  const railItems = resolveRailItems(activeSectionHref).filter((item) => item.id !== activeSectionHref);
-  const topFilters = [
-    {
-      id: allServiceTabId,
-      label: 'All',
-      metaLabel: 'كل مساحات العمل',
-      icon: '▦',
-      active: selectedServiceId === allServiceTabId,
-    },
-    ...controlPanelRuntimeData.services.map((service) => ({
-      id: service.id,
-      label: service.label,
-      metaLabel: service.placeholder ? 'مرجعي' : `${service.sections.length}`,
-      icon: serviceIconMap[service.id] ?? '◦',
-      active: selectedServiceId === service.id,
-    })),
-  ];
-  const activeControlHref = section === 'control' && subsection ? `/control/${subsection}` : undefined;
+  const [activeSectionHref, setActiveSectionHref] = React.useState<PrimarySectionHref>(() => (
+    section ? (`/${section}` as PrimarySectionHref) : '/dashboard'
+  ));
+
+  React.useEffect(() => {
+    setActiveSectionHref(section ? (`/${section}` as PrimarySectionHref) : '/dashboard');
+  }, [section]);
+
+  const activeSectionId = activeSectionHref.slice(1) as ControlPanelSectionId;
+  const isControlSection = activeSectionId === 'control';
+  const shellCopy = resolveShellCopy(panelText, activeSectionId, isControlSection ? subsection : undefined);
+  const railItems = resolveRailItems(activeSectionHref, panelText);
   const isAllFilterActive = selectedServiceId === allServiceTabId;
   const selectedServiceMeta = isAllFilterActive
     ? undefined
     : controlPanelRuntimeData.services.find((service) => service.id === selectedServiceId);
+  const selectedServiceLabel = selectedServiceMeta ? getServiceLabel(uiText, selectedServiceMeta.id) : panelText.filters.allServices;
   const serviceSections = selectedServiceMeta?.sections ?? [];
-  const serviceSectionLabels = serviceSections.map((sectionId) => (
-    controlPanelRuntimeData.sections.find((sectionEntry) => sectionEntry.id === sectionId)?.label ?? sectionId
-  ));
-  const sectionIdFromHref = activeSectionHref.replace('/', '');
-  const selectedSectionMeta = controlPanelRuntimeData.sections.find((sectionEntry) => sectionEntry.id === sectionIdFromHref);
-  const selectedSectionMission = controlPanelRuntimeData.missions.find((mission) => mission.sectionId === sectionIdFromHref);
+  const serviceSectionLabels = serviceSections.map((sectionId) => panelText.surfaceTitles[sectionId as ControlPanelSectionId] ?? sectionId);
+  const selectedSectionMeta = controlPanelRuntimeData.sections.find((sectionEntry) => sectionEntry.id === activeSectionId);
+  const selectedSectionMission = controlPanelRuntimeData.missions.find((mission) => mission.sectionId === activeSectionId);
   const sectionServiceIds = selectedSectionMeta?.serviceIds ?? [];
-  const sectionServiceNames = sectionServiceIds
-    .map((serviceId) => controlPanelRuntimeData.services.find((service) => service.id === serviceId)?.label)
-    .filter(Boolean) as string[];
+  const sectionServiceNames = sectionServiceIds.map((serviceId) => getServiceLabel(uiText, serviceId));
   const serviceLeadMission = serviceSections
     .map((serviceSectionId) => controlPanelRuntimeData.missions.find((mission) => mission.sectionId === serviceSectionId))
     .find(Boolean);
-  const activeSectionLabel = selectedSectionMeta?.label ?? sectionIdFromHref;
+  const activeSectionLabel = panelText.surfaceTitles[activeSectionId] ?? activeSectionId;
   const activeMission = isAllFilterActive
     ? selectedSectionMission
       ? {
-          missionTitle: selectedSectionMission.title,
-          missionDescription: selectedSectionMission.description,
-          owner: selectedSectionMission.owner,
-          dueLabel: selectedSectionMission.due,
+          missionTitle: `${panelText.ui.fallbackMissionTitle} ${activeSectionLabel}`,
+          missionDescription: `${panelText.ui.missionDockAll} ${shellCopy.title}`,
+          owner: activeSectionLabel,
+          dueLabel: selectedSectionMission.dueKind === 'missing' ? panelText.ui.fallbackDueLabel : panelText.ui.definedDueLabel,
           countLabel: String(sectionServiceIds.length || 1),
         }
-      : resolveFallbackMission(activeSectionLabel)
+      : resolveFallbackMission(activeSectionLabel, panelText)
     : serviceLeadMission
       ? {
-          missionTitle: serviceLeadMission.title,
-          missionDescription: serviceLeadMission.description,
-          owner: serviceLeadMission.owner,
-          dueLabel: serviceLeadMission.due,
+          missionTitle: `${panelText.ui.fallbackMissionTitle} ${selectedServiceLabel}`,
+          missionDescription: `${panelText.ui.missionDockActive} ${selectedServiceLabel}`,
+          owner: selectedServiceLabel,
+          dueLabel: serviceLeadMission.dueKind === 'missing' ? panelText.ui.fallbackDueLabel : panelText.ui.definedDueLabel,
           countLabel: String(serviceSectionLabels.length || 1),
         }
-      : resolveFallbackMission(selectedServiceMeta?.label ?? 'الخدمة');
-  const heroPrimaryAction = section === 'operations'
-    ? { label: 'افتح DSH hub', href: '/operations/dsh' }
-    : { label: 'معالجة عاجل (1)', href: '/finance' };
-  const heroSecondaryAction = section === 'operations'
-    ? { label: 'لوحة التحكم', href: '/dashboard' }
-    : { label: 'افتح العمليات', href: '/operations' };
+      : resolveFallbackMission(selectedServiceLabel, panelText);
+  const topFilters = [
+    {
+      id: allServiceTabId,
+      label: panelText.filters.allServices,
+      metaLabel: panelText.filters.allServicesMeta,
+      icon: '▦',
+      active: isAllFilterActive,
+    },
+    ...controlPanelRuntimeData.services.map((service) => ({
+      id: service.id,
+      label: getServiceLabel(uiText, service.id),
+      metaLabel: service.placeholder ? panelText.filters.reference : `${service.sections.length}`,
+      icon: serviceIconMap[service.id] ?? '◦',
+      active: selectedServiceId === service.id,
+    })),
+  ];
+  const heroPrimaryAction = resolvePrimaryAction(activeSectionId, panelText);
+  const heroSecondaryAction = resolveSecondaryAction(activeSectionId, panelText);
+  const signalCards = resolveSignals(panelText);
+  const activeControlHref = isControlSection && subsection ? `/control/${subsection}` : undefined;
+  const contextItems = isAllFilterActive ? sectionServiceNames : serviceSectionLabels;
+
   const handleBrandClick = React.useCallback(() => {
-    setActiveSectionHref('/dashboard');
     setSelectedServiceId(allServiceTabId);
+    setActiveSectionHref('/dashboard');
     router.push('/dashboard');
   }, [router]);
 
-  const handleSearchClick = React.useCallback(() => {
-    setSelectedServiceId(allServiceTabId);
-  }, []);
+  const handleSearchClick = React.useCallback(() => undefined, []);
 
   const handleRefreshClick = React.useCallback(() => {
-    setAlertCount((prev) => (prev > 0 ? prev - 1 : 0));
+    setAlertCount((currentCount) => (currentCount > 0 ? currentCount - 1 : 0));
   }, []);
 
   const handleLanguageClick = React.useCallback(() => {
-    setLanguageChip((prev) => (prev === 'EN' ? 'AR' : 'EN'));
-  }, []);
+    setLanguage(language === 'en' ? 'ar' : 'en');
+  }, [language, setLanguage]);
 
   const handleAlertClick = React.useCallback(() => {
     setSelectedServiceId(allServiceTabId);
     setAlertCount(0);
   }, []);
 
-  React.useEffect(() => {
-    const nextHref: PrimarySectionHref = section ? (`/${section}` as PrimarySectionHref) : '/dashboard';
-    setActiveSectionHref(nextHref);
-  }, [section]);
-
   return (
     <BthWebCommandCenterFrame
-      brandLabel="لوحة التحكم"
+      brandLabel={panelText.brandLabel}
       surfaceTitle={shellCopy.title}
       surfaceSubtitle={shellCopy.description}
       showHero={false}
       topFilters={topFilters}
-      onTopFilterSelect={(filterId) => {
-        setSelectedServiceId(filterId);
-      }}
+      onTopFilterSelect={setSelectedServiceId}
       onRailItemSelect={(itemId) => {
-        const matchedSection = primarySections.find((item) => item.href === itemId);
-        if (matchedSection) {
-          setActiveSectionHref(matchedSection.href);
-          setLastRailSelection(matchedSection.label);
-          router.push(sectionRouteMap[matchedSection.href.replace('/', '') as ControlPanelSectionId]);
+        const matchedSection = primarySectionIds.find((sectionId) => `/${sectionId}` === itemId);
+
+        if (!matchedSection) {
+          return;
         }
+
+        const nextHref = `/${matchedSection}` as PrimarySectionHref;
+        setActiveSectionHref(nextHref);
+        router.push(sectionRouteMap[matchedSection]);
       }}
       onBrandClick={handleBrandClick}
       onSearchClick={handleSearchClick}
       onRefreshClick={handleRefreshClick}
       onLanguageClick={handleLanguageClick}
       onAlertClick={handleAlertClick}
-      railTitle="لوحة التحكم"
-      railStatusLabel={isAllFilterActive ? `All${lastRailSelection ? ` · ${lastRailSelection}` : ''}` : `${selectedServiceMeta?.label ?? 'SERVICE'} · خدمة`}
+      railTitle={panelText.brandLabel}
+      railStatusLabel={isAllFilterActive ? panelText.filters.allServices : selectedServiceLabel}
       railItems={railItems}
       railSupplementary={null}
-      languageLabel={languageChip}
       alertCountLabel={String(alertCount)}
-      refreshLabel="تحديث"
-      searchPlaceholder="بحث عن أمر سريع"
     >
       <div className={styles.stageStack}>
         <section className={styles.missionDockHeader}>
-          <p className={styles.missionDockEyebrow}>لوحة التحكم</p>
+          <p className={styles.missionDockEyebrow}>{panelText.brandLabel}</p>
           <h1 className={styles.missionDockTitle}>{shellCopy.title}</h1>
           <p className={styles.missionDockSubtitle}>
             {isAllFilterActive
-              ? `عرض شامل للخدمات ضمن ${shellCopy.title}`
-              : `الخدمة النشطة: ${selectedServiceMeta?.label ?? 'N/A'}`}
+              ? `${panelText.ui.missionDockAll} ${shellCopy.title}`
+              : `${panelText.ui.missionDockActive} ${selectedServiceLabel}`}
           </p>
         </section>
 
@@ -392,29 +311,31 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
           <BthWebMissionHeroCard
             dense
             badges={[
-              `الخدمة: ${isAllFilterActive ? 'All' : selectedServiceMeta?.label ?? 'N/A'}`,
-              isAllFilterActive ? `القسم: ${activeSectionHref.replace('/', '')}` : `الأقسام: ${serviceSectionLabels.length}`,
-              'آخر تحديث: مباشر',
+              `${panelText.ui.serviceBadge} ${isAllFilterActive ? panelText.filters.allServices : selectedServiceLabel}`,
+              isAllFilterActive
+                ? `${panelText.ui.sectionBadge} ${activeSectionLabel}`
+                : `${panelText.ui.sectionsBadge} ${serviceSectionLabels.length}`,
+              panelText.ui.lastUpdate,
             ]}
-            eyebrow={`${shellCopy.title} · المهمة الموصى بها الآن`}
+            eyebrow={`${shellCopy.title} · ${panelText.ui.missionEyebrow}`}
             title={activeMission.missionTitle}
             description={activeMission.missionDescription}
             metaItems={[
-              `المالك: ${activeMission.owner}`,
+              `${panelText.ui.serviceLabel}: ${activeMission.owner}`,
               activeMission.dueLabel,
-              `عدد العناصر: ${activeMission.countLabel}`,
+              `${panelText.ui.sectionsBadge} ${activeMission.countLabel}`,
             ]}
-            secondaryAction={heroSecondaryAction}
             primaryAction={heroPrimaryAction}
+            secondaryAction={heroSecondaryAction}
           />
 
           <div className={styles.signalGrid}>
-            {overviewSignals.map((signal) => {
+            {signalCards.map((signal) => {
               const dynamicValue =
                 signal.id === 'best-path'
                   ? isAllFilterActive
                     ? activeSectionLabel
-                    : selectedServiceMeta?.label ?? 'N/A'
+                    : selectedServiceLabel
                   : signal.id === 'pressure'
                     ? isAllFilterActive
                       ? String(sectionServiceIds.length || 1)
@@ -422,58 +343,76 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
                     : signal.value;
 
               return (
-              <BthWebSignalCard
-                key={signal.id}
-                title={signal.title}
-                value={dynamicValue}
-                description={signal.description}
-                tone={signal.tone}
-              />
+                <BthWebSignalCard
+                  key={signal.id}
+                  title={signal.title}
+                  value={dynamicValue}
+                  description={signal.description}
+                  tone={signal.tone}
+                />
               );
             })}
           </div>
 
           <section className={styles.contextPanel}>
             <h4 className={styles.contextTitle}>
-              {isAllFilterActive ? 'الخدمات المرتبطة بالقسم' : 'الأقسام المرتبطة بالخدمة'}
+              {isAllFilterActive ? panelText.ui.contextTitleSection : panelText.ui.contextTitleService}
             </h4>
             <div className={styles.contextList}>
-              {(isAllFilterActive ? sectionServiceNames : serviceSectionLabels).map((item) => (
+              {contextItems.map((item) => (
                 <span key={item} className={styles.contextChip}>
                   {item}
                 </span>
               ))}
-              {(isAllFilterActive ? sectionServiceNames : serviceSectionLabels).length === 0 ? (
-                <span className={styles.contextChipMuted}>لا توجد عناصر مرتبطة حاليًا.</span>
+              {contextItems.length === 0 ? (
+                <span className={styles.contextChipMuted}>{panelText.ui.noItems}</span>
               ) : null}
             </div>
           </section>
         </section>
 
-        <section className={styles.subsectionPanel}>
-          <div className={styles.subsectionHeader}>
-            <h3 className={styles.subsectionTitle}>أقسام لوحة التحكم</h3>
-            <p className={styles.subsectionDescription}>الأقسام الفرعية محفوظة ضمن shell مركزي مع نفس الهوية البصرية.</p>
-          </div>
-          <div className={styles.subsectionGrid}>
-            {controlSubSections.map((item) => {
-              const isActive = item.href === activeControlHref;
+        {isControlSection ? (
+          <section className={styles.subsectionPanel}>
+            <div className={styles.subsectionHeader}>
+              <h3 className={styles.subsectionTitle}>{panelText.ui.subsectionTitle}</h3>
+              <p className={styles.subsectionDescription}>{panelText.ui.subsectionDescription}</p>
+            </div>
+            <BthWebSegmentedTabs
+              ariaLabel={panelText.ui.subsectionTitle}
+              items={controlSubSectionIds.map((subsectionId) => ({
+                id: subsectionId,
+                label: panelText.subSections[subsectionId],
+                active: subsection === subsectionId,
+              }))}
+              onSelect={(subsectionId) => {
+                router.push(`/control/${subsectionId}`);
+              }}
+            />
+            <div className={styles.subsectionGrid}>
+              {controlSubSectionIds.map((subsectionId) => {
+                const href = `/control/${subsectionId}`;
+                const isActive = href === activeControlHref;
 
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className={[styles.subsectionLink, isActive ? styles.subsectionLinkActive : '']
-                    .filter(Boolean)
-                    .join(' ')}
-                >
-                  <strong className={styles.subsectionLinkLabel}>{item.label}</strong>
-                  <span className={styles.subsectionLinkDescription}>{item.description}</span>
-                </a>
-              );
-            })}
-          </div>
-        </section>
+                return (
+                  <a
+                    key={href}
+                    href={href}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      router.push(href);
+                    }}
+                    className={[styles.subsectionLink, isActive ? styles.subsectionLinkActive : '']
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
+                    <strong className={styles.subsectionLinkLabel}>{panelText.subSections[subsectionId]}</strong>
+                    <span className={styles.subsectionLinkDescription}>{panelText.subSectionDescriptions[subsectionId]}</span>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
       </div>
     </BthWebCommandCenterFrame>
   );

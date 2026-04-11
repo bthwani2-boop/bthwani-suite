@@ -7,6 +7,8 @@ export type BthWebPageFrameProps = {
   eyebrow?: string;
   centered?: boolean;
   maxWidth?: number;
+  embedded?: boolean;
+  showHeader?: boolean;
   children?: ReactNode;
 };
 
@@ -16,6 +18,8 @@ export function BthWebPageFrame({
   eyebrow,
   centered = false,
   maxWidth = 960,
+  embedded = false,
+  showHeader = true,
   children,
 }: BthWebPageFrameProps) {
   const contentClassName = [
@@ -30,19 +34,24 @@ export function BthWebPageFrame({
     .join(' ');
 
   return (
-    <main className={[styles.main, centered ? styles.mainCentered : ''].filter(Boolean).join(' ')}>
+    <div className={[
+      embedded ? styles.mainEmbedded : styles.main,
+      centered ? styles.mainCentered : '',
+    ].filter(Boolean).join(' ')}>
       <div className={contentClassName}>
-        {eyebrow ? (
+        {showHeader && eyebrow ? (
           <p className={styles.eyebrow}>{eyebrow}</p>
         ) : null}
-        <div className={styles.titleBlock}>
-          <h1 className={styles.title}>{title}</h1>
-          {description ? (
-            <p className={styles.description}>{description}</p>
-          ) : null}
-        </div>
+        {showHeader ? (
+          <div className={styles.titleBlock}>
+            <h1 className={styles.title}>{title}</h1>
+            {description ? (
+              <p className={styles.description}>{description}</p>
+            ) : null}
+          </div>
+        ) : null}
         {children}
       </div>
-    </main>
+    </div>
   );
 }

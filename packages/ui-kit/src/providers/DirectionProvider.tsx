@@ -3,6 +3,40 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { directionConfig, resolveDirectionFromLanguage, type BthLanguage, type Direction } from '../foundation/direction';
 
+function readStoredLanguage() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const storedLanguage = window.localStorage.getItem(directionConfig.languageStorageKey);
+    return storedLanguage === 'ar' || storedLanguage === 'en' ? storedLanguage : null;
+  } catch {
+    return null;
+  }
+}
+
+function syncDocumentLanguage(language: BthLanguage, direction: Direction) {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  document.documentElement.lang = language;
+  document.documentElement.dir = direction;
+
+  try {
+    window.localStorage.setItem(directionConfig.languageStorageKey, language);
+  } catch {
+    // Ignore storage failures and keep the in-memory language active.
+  }
+
+  try {
+    document.cookie = `${directionConfig.languageStorageKey}=${language}; path=/; max-age=31536000; SameSite=Lax`;
+  } catch {
+    // Ignore cookie failures in non-standard runtimes.
+  }
+}
+
 type DirectionContextValue = {
   direction: Direction;
   language: BthLanguage;
@@ -25,21 +59,23 @@ export type DirectionProviderProps = {
 };
 
 export function DirectionProvider({ language = directionConfig.defaultLanguage, children }: DirectionProviderProps) {
-  const [activeLanguage, setActiveLanguage] = useState<BthLanguage>(language);
+  const [activeLanguage, setActiveLanguage] = useState<BthLanguage>(() => readStoredLanguage() ?? language);
 
   useEffect(() => {
-    setActiveLanguage(language);
+    const storedLanguage = readStoredLanguage();
+
+    if (storedLanguage) {
+      setActiveLanguage((currentLanguage) => (currentLanguage === storedLanguage ? currentLanguage : storedLanguage));
+      return;
+    }
+
+    setActiveLanguage((currentLanguage) => (currentLanguage === language ? currentLanguage : language));
   }, [language]);
 
   const resolvedDirection = resolveDirectionFromLanguage(activeLanguage);
 
   useEffect(() => {
-    if (typeof document === 'undefined') {
-      return;
-    }
-
-    document.documentElement.lang = activeLanguage;
-    document.documentElement.dir = resolvedDirection;
+    syncDocumentLanguage(activeLanguage, resolvedDirection);
   }, [activeLanguage, resolvedDirection]);
 
   const setLanguage = useCallback((nextLanguage: BthLanguage) => {

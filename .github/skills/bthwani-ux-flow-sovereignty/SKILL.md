@@ -161,6 +161,47 @@ Whenever safe and appropriate:
 
 Do not force explicit user work where intelligent defaults are possible.
 
+## One-Click / Two-Click Law
+
+For every primary task inside the approved slice:
+
+- target one click to completion where realistically possible
+- allow two clicks only when the second click is clearly justified by confirmation, scope selection, or irreversible risk
+- reject flows that normalize three or more clicks for a core action without hard necessity
+- compress route hops, modal hops, and branch decisions until the click budget is defensible
+
+## Total Journey Coverage Law
+
+Do not design only the visible happy-path screen.
+
+Every accepted flow must cover, within the scoped journey:
+
+- entry state
+- default path
+- alternate path
+- empty and loading states
+- validation, system, and permission failures
+- recovery path
+- completion path
+- relevant sheets, drawers, modals, and inline expansions
+- handoff or return behavior when the user exits, cancels, or comes back later
+
+No serious flow is accepted if meaningful movement, branch, or state coverage is left implicit.
+
+## Measurable Ease Proof Law
+
+Ease-of-use must be evidenced, not asserted.
+
+For every serious slice, provide when possible:
+
+- flow map
+- state map
+- component reuse map
+- click-count table for primary tasks
+- before / after click delta when replacing an existing flow or donor baseline
+
+If the evidence shows the core task exceeds the allowed click budget without necessity, redesign is mandatory.
+
 ## Error Recovery Law
 
 Do not design only the happy path.

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { type ReactNode } from 'react';
+import { useUiText } from '../../hooks';
 import styles from './BthWebCommandCenterFrame.module.css';
 import { BthWebCommandStrip } from './BthWebCommandStrip';
 
@@ -39,6 +40,7 @@ export type BthWebCommandCenterFrameProps = {
   onAlertClick?: () => void;
   onRailItemSelect?: (itemId: string) => void;
   railTitle: string;
+  railNavigationLabel?: string;
   railStatusLabel?: string;
   railItems: ReadonlyArray<BthWebCommandCenterNavItem>;
   railSupplementary?: ReactNode;
@@ -47,10 +49,11 @@ export type BthWebCommandCenterFrameProps = {
 
 function renderRailItems(
   items: ReadonlyArray<BthWebCommandCenterNavItem>,
+  railNavigationLabel: string,
   onRailItemSelect?: (itemId: string) => void,
 ) {
   return (
-    <nav className={styles.railNav} aria-label="Control panel sections">
+    <nav className={styles.railNav} aria-label={railNavigationLabel}>
       {items.map((item) => {
         const className = [styles.railLink, item.active ? styles.railLinkActive : ''].filter(Boolean).join(' ');
 
@@ -59,7 +62,13 @@ function renderRailItems(
             <a
               key={item.id}
               href={item.href}
-              onClick={() => onRailItemSelect?.(item.id)}
+              onClick={(event) => {
+                if (onRailItemSelect) {
+                  event.preventDefault();
+                }
+
+                onRailItemSelect?.(item.id);
+              }}
               className={className}
             >
               <span className={styles.railLinkTitle}>{item.label}</span>
@@ -91,10 +100,10 @@ export function BthWebCommandCenterFrame({
   surfaceTitle,
   surfaceSubtitle,
   showHero = true,
-  searchPlaceholder = 'ابحث عن مهمة أو أمر سريع',
-  languageLabel = 'AR',
+  searchPlaceholder,
+  languageLabel,
   alertCountLabel = '1',
-  refreshLabel = 'تحديث',
+  refreshLabel,
   topFilters = [],
   onTopFilterSelect,
   onBrandClick,
@@ -104,19 +113,27 @@ export function BthWebCommandCenterFrame({
   onAlertClick,
   onRailItemSelect,
   railTitle,
+  railNavigationLabel,
   railStatusLabel,
   railItems,
   railSupplementary,
   children,
 }: BthWebCommandCenterFrameProps) {
+  const uiText = useUiText();
+  const panelText = uiText.controlPanel;
+  const resolvedSearchPlaceholder = searchPlaceholder ?? panelText.ui.searchPlaceholder;
+  const resolvedLanguageLabel = languageLabel ?? panelText.ui.languageLabel;
+  const resolvedRefreshLabel = refreshLabel ?? panelText.ui.refreshLabel;
+  const resolvedRailNavigationLabel = railNavigationLabel ?? panelText.ui.railNavigationLabel;
+
   return (
     <main className={styles.root}>
       <BthWebCommandStrip
         brandLabel={brandLabel}
-        searchPlaceholder={searchPlaceholder}
-        languageLabel={languageLabel}
+        searchPlaceholder={resolvedSearchPlaceholder}
+        languageLabel={resolvedLanguageLabel}
         alertCountLabel={alertCountLabel}
-        refreshLabel={refreshLabel}
+        refreshLabel={resolvedRefreshLabel}
         filters={topFilters}
         onFilterSelect={onTopFilterSelect}
         onBrandClick={onBrandClick}
@@ -142,7 +159,7 @@ export function BthWebCommandCenterFrame({
             <h2 className={styles.railTitle}>{railTitle}</h2>
             {railStatusLabel ? <span className={styles.railStatus}>{railStatusLabel}</span> : null}
           </div>
-          {renderRailItems(railItems, onRailItemSelect)}
+          {renderRailItems(railItems, resolvedRailNavigationLabel, onRailItemSelect)}
           {railSupplementary ? <div className={styles.railSupplementary}>{railSupplementary}</div> : null}
         </aside>
       </div>

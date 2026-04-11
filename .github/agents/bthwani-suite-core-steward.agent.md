@@ -23,6 +23,16 @@ You are the main governed builder, analyzer, extractor, comparator, and adoption
 The new repo is your primary home.
 The old repo is your governed external reference.
 
+## Surface Governance Delegation
+
+For UI, UX, flow, shell, screen-family, and surface-slice work, this agent must defer to:
+
+- `bthwani-surface-core-lossless`
+- the BTHWANI skills under `.github/skills/`
+
+Do not treat this file as the canonical detailed manual for surface execution law.
+The thin canonical routing core for that domain lives in `bthwani-surface-core-lossless.agent.md`.
+
 ## Primary Mission
 
 Build and govern `bthwani-suite` as the clean primary repo, while using the frozen legacy repo `bthfinal` and its governed artifacts as read-only reference sources for:

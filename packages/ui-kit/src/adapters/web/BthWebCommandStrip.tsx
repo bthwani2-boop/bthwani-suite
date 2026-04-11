@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { useUiText } from '../../hooks';
 import styles from './BthWebCommandStrip.module.css';
 
 export type BthWebCommandStripFilter = {
@@ -37,7 +38,6 @@ function renderFilters(
           key={filter.id}
           type="button"
           onClick={() => onFilterSelect?.(filter.id)}
-          aria-pressed={Boolean(filter.active)}
           className={[styles.filterChip, filter.active ? styles.filterChipActive : '']
             .filter(Boolean)
             .join(' ')}
@@ -53,10 +53,10 @@ function renderFilters(
 
 export function BthWebCommandStrip({
   brandLabel,
-  searchPlaceholder = 'ابحث عن مهمة أو أمر سريع',
-  languageLabel = 'AR',
+  searchPlaceholder,
+  languageLabel,
   alertCountLabel = '1',
-  refreshLabel = 'تحديث',
+  refreshLabel,
   filters = [],
   onFilterSelect,
   onBrandClick,
@@ -65,6 +65,12 @@ export function BthWebCommandStrip({
   onLanguageClick,
   onAlertClick,
 }: BthWebCommandStripProps) {
+  const uiText = useUiText();
+  const panelText = uiText.controlPanel;
+  const resolvedSearchPlaceholder = searchPlaceholder ?? panelText.ui.searchPlaceholder;
+  const resolvedLanguageLabel = languageLabel ?? panelText.ui.languageLabel;
+  const resolvedRefreshLabel = refreshLabel ?? panelText.ui.refreshLabel;
+
   return (
     <header className={styles.topBar}>
       <div className={styles.topRowPrimary}>
@@ -76,19 +82,19 @@ export function BthWebCommandStrip({
             {alertCountLabel}
           </button>
           <button type="button" className={styles.languagePill} onClick={onLanguageClick}>
-            {languageLabel}
+            {resolvedLanguageLabel}
           </button>
         </div>
 
         <button type="button" className={styles.searchCluster} onClick={onSearchClick}>
           <span className={styles.searchIcon}>⌕</span>
-          <span className={styles.searchPlaceholder}>{searchPlaceholder}</span>
+          <span className={styles.searchPlaceholder}>{resolvedSearchPlaceholder}</span>
         </button>
       </div>
 
       <div className={styles.topRowSecondary}>
         <button type="button" className={styles.refreshButton} onClick={onRefreshClick}>
-          {refreshLabel}
+          {resolvedRefreshLabel}
         </button>
         {filters.length > 0 ? renderFilters(filters, onFilterSelect) : null}
       </div>

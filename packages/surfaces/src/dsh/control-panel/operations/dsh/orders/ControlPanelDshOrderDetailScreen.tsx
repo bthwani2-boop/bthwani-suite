@@ -70,6 +70,8 @@ export type ControlPanelDshOrderDetailScreenProps = {
   supportHref?: string;
   arrivalBellHref?: string;
   reassignHref?: string;
+  embedded?: boolean;
+  showHeader?: boolean;
 };
 
 export function ControlPanelDshOrderDetailScreen({
@@ -80,6 +82,8 @@ export function ControlPanelDshOrderDetailScreen({
   supportHref = '/support',
   arrivalBellHref = '/operations/dsh/arrival-bell',
   reassignHref = '/operations/dsh/reassign',
+  embedded = false,
+  showHeader = true,
 }: ControlPanelDshOrderDetailScreenProps) {
   const router = useRouter();
   const order = getSampleDshOrder(orderId);
@@ -94,6 +98,8 @@ export function ControlPanelDshOrderDetailScreen({
         title="تفاصيل طلب DSH"
         description="السطح يحتفظ بخروج واضح إلى قائمة الطلبات حتى عند غياب البيانات أو توقفها."
         maxWidth={1120}
+        embedded={embedded}
+        showHeader={showHeader}
       >
         <BthStateView
           {...stateCopy}
@@ -119,6 +125,8 @@ export function ControlPanelDshOrderDetailScreen({
       title={`تفاصيل ${resolvedOrder.id}`}
       description="أول detail route حي داخل DSH. يعرض هوية الطلب وحالته ومسار الرجوع السريع إلى القائمة أو hub."
       maxWidth={1120}
+      embedded={embedded}
+      showHeader={showHeader}
     >
       <BthBox gap={4}>
         <BthWebMissionHeroCard
@@ -222,16 +230,18 @@ export function ControlPanelDshOrderDetailScreen({
           </BthBox>
         </BthWebSectionCard>
 
-        <BthWebSectionCard
-          title="الإجراءات التالية"
-          description="العقد يطلب أن يكون فتح مساحة العمليات هو الإجراء الرئيسي، مع بقاء الرجوع والدعم كمسارات ثانوية واضحة."
-        >
-          <BthBox gap={2}>
-            <BthButton label={actionPlan.primaryLabel} onPress={() => router.push(hubHref)} />
-            <BthButton label="العودة إلى قائمة الطلبات" tone="secondary" onPress={() => router.push(ordersHref)} />
-            <BthButton label={actionPlan.supportLabel} tone="secondary" onPress={() => router.push(supportHref)} />
-          </BthBox>
-        </BthWebSectionCard>
+        {!embedded ? (
+          <BthWebSectionCard
+            title="الإجراءات التالية"
+            description="العقد يطلب أن يكون فتح مساحة العمليات هو الإجراء الرئيسي، مع بقاء الرجوع والدعم كمسارات ثانوية واضحة."
+          >
+            <BthBox gap={2}>
+              <BthButton label={actionPlan.primaryLabel} onPress={() => router.push(hubHref)} />
+              <BthButton label="العودة إلى قائمة الطلبات" tone="secondary" onPress={() => router.push(ordersHref)} />
+              <BthButton label={actionPlan.supportLabel} tone="secondary" onPress={() => router.push(supportHref)} />
+            </BthBox>
+          </BthWebSectionCard>
+        ) : null}
       </BthBox>
     </BthWebPageFrame>
   );

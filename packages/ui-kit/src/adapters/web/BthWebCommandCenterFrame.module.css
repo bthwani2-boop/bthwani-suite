@@ -1,14 +1,14 @@
 .root {
   min-height: 100vh;
-  padding: 20px;
+  padding: 16px;
   background:
-    radial-gradient(circle at 8% 4%, rgba(251, 146, 60, 0.09), transparent 42%),
-    linear-gradient(180deg, var(--bth-surface-raised) 0%, var(--bth-background) 58%);
+    radial-gradient(circle at 8% 4%, rgba(251, 146, 60, 0.11), transparent 34%),
+    radial-gradient(circle at 92% 0%, rgba(15, 23, 42, 0.05), transparent 28%),
+    linear-gradient(180deg, #fff8f1 0%, var(--bth-background) 56%);
   color: var(--bth-text);
-  direction: rtl;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   overflow: visible;
   position: relative;
   z-index: 0;
@@ -50,7 +50,7 @@
 
 .workspace {
   display: grid;
-  gap: 18px;
+  gap: 14px;
   align-items: start;
   position: relative;
   z-index: 2;
@@ -60,10 +60,10 @@
 .stage {
   border: 1px solid var(--bth-line);
   border-radius: 24px;
-  padding: 18px;
-  background: #ffffff;
-  box-shadow: 0 8px 26px rgba(15, 23, 42, 0.08);
-  min-height: 420px;
+  padding: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #fffdfa 100%);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  min-height: 320px;
   position: relative;
   z-index: 1;
   overflow: hidden;
@@ -73,13 +73,13 @@
 .rail {
   border: 1px solid #fdba74;
   border-radius: 24px;
-  padding: 14px;
+  padding: 12px;
   background:
     linear-gradient(180deg, #fff7ed 0%, var(--bth-surface) 44%),
     var(--bth-surface);
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
   position: sticky;
-  top: 18px;
+  top: 12px;
   z-index: 3;
   pointer-events: auto;
   animation: bthFadeLift 260ms ease-out 90ms both;
@@ -113,7 +113,7 @@
 
 .railTitle {
   margin: 0;
-  font-size: 30px;
+  font-size: 26px;
   line-height: 1.15;
   font-weight: 800;
   color: var(--bth-text);
@@ -146,7 +146,7 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
-  padding: 12px 13px;
+  padding: 10px 12px;
   border-radius: 14px;
   border: 1px solid var(--bth-line);
   text-decoration: none;
@@ -169,15 +169,15 @@
 
 .railLinkTitle {
   color: var(--bth-text);
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.25;
   font-weight: 800;
 }
 
 .railLinkDescription {
   color: var(--bth-text-muted);
-  font-size: 14px;
-  line-height: 1.55;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .railBadge {

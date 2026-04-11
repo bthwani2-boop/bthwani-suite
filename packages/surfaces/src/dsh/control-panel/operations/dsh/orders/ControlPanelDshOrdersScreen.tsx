@@ -62,12 +62,16 @@ export type ControlPanelDshOrdersScreenProps = {
   state?: ControlPanelDshOrdersScreenState;
   hubHref?: string;
   operationsHref?: string;
+  embedded?: boolean;
+  showHeader?: boolean;
 };
 
 export function ControlPanelDshOrdersScreen({
   state = 'ready',
   hubHref = '/operations/dsh',
   operationsHref = '/operations',
+  embedded = false,
+  showHeader = true,
 }: ControlPanelDshOrdersScreenProps) {
   const router = useRouter();
   const readyForSelection = state === 'ready';
@@ -84,6 +88,8 @@ export function ControlPanelDshOrdersScreen({
         title="إدارة طلبات DSH"
         description="السطح يبقى متاحًا حتى في الحالات غير الجاهزة، مع خروج آمن واضح إلى hub."
         maxWidth={1120}
+        embedded={embedded}
+        showHeader={showHeader}
       >
         <BthStateView
           {...stateCopy}
@@ -101,6 +107,8 @@ export function ControlPanelDshOrdersScreen({
       title="إدارة طلبات DSH"
       description="أول child route حي داخل DSH للوحة التحكم. يعرض queue تشغيلية واضحة، ويُبقي العودة إلى hub خطوة واحدة فقط."
       maxWidth={1120}
+      embedded={embedded}
+      showHeader={showHeader}
     >
       <BthBox gap={4}>
         <BthWebMissionHeroCard
@@ -169,15 +177,17 @@ export function ControlPanelDshOrdersScreen({
           </BthBox>
         </BthWebSectionCard>
 
-        <BthWebSectionCard
-          title="الخطوة التالية"
-          description="العودة إلى hub تبقى أسرع مسار، بينما الصفحة الحالية تظل مرجع queue مباشر."
-        >
-          <BthBox gap={2}>
-            <BthButton label="العودة إلى DSH hub" onPress={() => router.push(hubHref)} />
-            <BthButton label="العودة إلى العمليات" tone="secondary" onPress={() => router.push(operationsHref)} />
-          </BthBox>
-        </BthWebSectionCard>
+        {!embedded ? (
+          <BthWebSectionCard
+            title="الخطوة التالية"
+            description="العودة إلى hub تبقى أسرع مسار، بينما الصفحة الحالية تظل مرجع queue مباشر."
+          >
+            <BthBox gap={2}>
+              <BthButton label="العودة إلى DSH hub" onPress={() => router.push(hubHref)} />
+              <BthButton label="العودة إلى العمليات" tone="secondary" onPress={() => router.push(operationsHref)} />
+            </BthBox>
+          </BthWebSectionCard>
+        ) : null}
       </BthBox>
     </BthWebPageFrame>
   );

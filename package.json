@@ -8,6 +8,7 @@
     "serve:surfaces": "pnpm nx run-many --target=serve --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7",
     "build:surfaces": "pnpm nx run-many --target=build --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7",
     "build:mobile-control-panel": "pnpm nx run-many --target=build --projects=control-panel,app-client,app-partner,app-captain,app-field --parallel=5",
+    "guard:agent-governance": "node tools/scripts/validate-agent-governance.mjs",
     "guard:i18n-direction": "node tools/scripts/guard-central-i18n-direction.mjs",
     "guard:i18n-direction:mobile-control-panel": "node tools/scripts/guard-central-i18n-direction.mjs apps/mobile apps/web/control-panel packages"
   },

@@ -70,6 +70,17 @@ Every accepted screen must prove:
 - premium rhythm in spacing, grouping, and hierarchy
 - visible user confidence in the next action
 
+## Calm Premium Comfort Law
+
+Every accepted visual direction must also prove:
+
+- modern, calm, elegant presentation rather than loud complexity
+- immediate comfort for a first-time user
+- visual quietness around the main action
+- high attractiveness without decorative excess
+- consistency across desktop, tablet, and mobile breakpoints
+- reusable visual decisions that can scale without drift or duplication
+
 ## Luxury Visual Law
 
 Every accepted screen must prove:

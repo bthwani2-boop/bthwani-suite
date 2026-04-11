@@ -55,8 +55,9 @@ For every serious implementation slice, always output:
 10. Implant / build decision
 11. Design review
 12. UX / Flow review
-13. Unified experience verdict
-14. Final readiness verdict
+13. Proof of ease summary
+14. Unified experience verdict
+15. Final readiness verdict
 
 ## Unified Experience Verdict Scale
 
@@ -101,6 +102,8 @@ After any slice implementation, report:
 - [TBD] gaps
 - design score summary
 - UX/flow score summary
+- click-budget summary
+- flow/state/component proof artifacts
 - next recommended slice
 
 ## Final Adoption Law
@@ -155,8 +158,9 @@ When operating in analysis-only first-pass mode, return only:
 4. Why this is the correct first slice
 5. Donor candidates relevant to this slice
 6. UiKitPressure for this slice
-7. What is forbidden at this stage
-8. Stop
+7. Expected click-budget target
+8. What is forbidden at this stage
+9. Stop
 
 Do not widen the response beyond this contract unless the user explicitly asks for broader output.
 
@@ -178,7 +182,7 @@ When using the first-pass return contract, prefer a first slice that maximizes:
 
 Use the correct contract based on stage:
 
-- analysis-only first pass: use the eight-item first-slice return contract
+- analysis-only first pass: use the nine-item first-slice return contract
 - serious slice review or post-implementation report: use the mandatory unified experience review
 
 If the stage is ambiguous, classify it first before answering.
@@ -191,3 +195,15 @@ Use this skill to keep both stages strict:
 
 - narrow and disciplined during first-slice analysis
 - comprehensive and verdict-driven during final slice review
+
+## Governance Update Review Contract
+
+When the work includes updating agent or skill files themselves, require all of the following in addition to the normal review discipline:
+
+- explicit statement of the operational gap being fixed
+- confirmation that the update is not speculative policy noise
+- validation against `docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md`
+- logging in `docs/governance/AGENT_CHANGE_LEDGER.md`
+- honest statement of any residual ambiguity or rollback condition
+
+Do not accept governance-file changes as complete if they are unlogged or unvalidated.
