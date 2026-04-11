@@ -5,3 +5,4 @@ export * from './arrival-bell';
 export * from './orders';
 export * from './peak-mode';
 export * from './reassign';
+export * from './sheinproxy';

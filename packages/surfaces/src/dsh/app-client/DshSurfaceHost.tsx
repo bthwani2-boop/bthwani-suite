@@ -1,19 +1,15 @@
 import React from 'react';
-import { dsh } from '@bthwani/surfaces';
-
-const {
-  DshCartGetScreen,
-  DshCreateOrderScreen,
-  DshEntryScreen,
-  DshHomeScreen,
-  DshOrderSuccessState,
-  DshOrdersListScreen,
-  DshReviewOrderScreen,
-  DshStoreDetailScreen,
-  DshStoreItemsScreen,
-  DshStoresListScreen,
-  DshTrackingScreen,
-} = dsh.dshAppClient;
+import { DshCartGetScreen } from './cart-get/screens';
+import { DshCreateOrderScreen } from './create-order/screens';
+import { DshEntryScreen } from './entry/screens';
+import { DshHomeScreen } from './home/screens';
+import { DshOrderSuccessState } from './success/states';
+import { DshOrdersListScreen } from './orders-list/screens';
+import { DshReviewOrderScreen } from './review/screens';
+import { DshStoreDetailScreen } from './store-detail/screens';
+import { DshStoreItemsScreen } from './store-items/screens';
+import { DshStoresListScreen } from './stores-list/screens';
+import { DshTrackingScreen } from './tracking/screens';
 
 export type DshRoute =
   | 'home'

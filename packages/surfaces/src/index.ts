@@ -7,3 +7,7 @@ export * as esf from './esf';
 export * as mrf from './mrf';
 export * as snd from './snd';
 export * as kwd from './kwd';
+export { ControlPanelDshSheinProxyScreen } from './dsh/control-panel/operations/dsh/sheinproxy';
+export type { ControlPanelDshSheinProxyScreenProps } from './dsh/control-panel/operations/dsh/sheinproxy';
+export { ControlPanelDshSheinProxyRequestScreen } from './dsh/control-panel/operations/dsh/sheinproxy';
+export type { ControlPanelDshSheinProxyRequestScreenProps } from './dsh/control-panel/operations/dsh/sheinproxy';

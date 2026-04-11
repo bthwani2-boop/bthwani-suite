@@ -1,5 +1,5 @@
 export const sectionMeta = {
-  id: 'partners',
+  id: 'settings',
   surface: 'control-panel',
   placeholder: true,
 } as const;

@@ -11,3 +11,5 @@ export * from './review/screens';
 export * from './success/states';
 export * from './tracking/screens';
 export * from './orders-list/screens';
+export { DshSurfaceHost } from './DshSurfaceHost';
+export type { DshCommandTarget, DshRoute } from './DshSurfaceHost';

@@ -136,6 +136,10 @@ function resolveWorkbenchLiveHref(workbenchId: DshWorkbenchId) {
     return '/operations/dsh/arrival-bell';
   }
 
+  if (workbenchId === 'sheinproxy') {
+    return '/operations/dsh/sheinproxy';
+  }
+
   return undefined;
 }
 
@@ -380,6 +384,8 @@ export function ControlPanelDshOperationsScreen({
                     label={
                       workbench.id === 'orders'
                         ? dshText.hub.actions.openOrders
+                        : workbench.id === 'sheinproxy'
+                          ? dshText.hub.actions.openSheinProxy
                         : workbench.id === 'arrival-bell'
                           ? dshText.hub.actions.openArrivalBell
                           : workbench.id === 'reassign'
