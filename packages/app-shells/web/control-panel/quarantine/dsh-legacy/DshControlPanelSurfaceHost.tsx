@@ -325,7 +325,6 @@ export function DshControlPanelSurfaceHost({ section, subsection, workspace = 'o
       onBrandClick={handleBrandClick}
       onSearchClick={handleSearchClick}
       onRefreshClick={handleRefreshClick}
-      onLanguageClick={handleLanguageClick}
       onAlertClick={handleAlertClick}
       railTitle={panelText.brandLabel}
       railStatusLabel={isAllFilterActive ? panelText.filters.allServices : selectedServiceLabel}

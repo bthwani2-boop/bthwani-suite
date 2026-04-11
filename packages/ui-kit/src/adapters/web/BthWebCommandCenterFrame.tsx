@@ -36,7 +36,6 @@ export type BthWebCommandCenterFrameProps = {
   onBrandClick?: () => void;
   onSearchClick?: () => void;
   onRefreshClick?: () => void;
-  onLanguageClick?: () => void;
   onAlertClick?: () => void;
   onRailItemSelect?: (itemId: string) => void;
   railTitle: string;
@@ -109,7 +108,6 @@ export function BthWebCommandCenterFrame({
   onBrandClick,
   onSearchClick,
   onRefreshClick,
-  onLanguageClick,
   onAlertClick,
   onRailItemSelect,
   railTitle,
@@ -140,7 +138,6 @@ export function BthWebCommandCenterFrame({
         onBrandClick={onBrandClick}
         onSearchClick={onSearchClick}
         onRefreshClick={onRefreshClick}
-        onLanguageClick={onLanguageClick}
         onAlertClick={onAlertClick}
       />
 

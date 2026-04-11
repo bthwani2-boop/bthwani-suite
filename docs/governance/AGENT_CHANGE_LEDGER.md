@@ -103,6 +103,49 @@ Copy this block for every accepted update.
 - Safe rollback path: restore the previous canonical agent body and remove the new skill files and validation script as one governance batch.
 - When rollback should be considered: if future usage shows the routing core became too thin to discover the correct skill set reliably.
 
+### AGENT-2026-04-11-003
+
+- Date: 2026-04-11
+- Author: GitHub Copilot
+- Files changed: `.github/agents/bthwani-surface-core-lossless.agent.md`, `.github/agents/AGENT_ROUTING_INDEX.md`, `.github/agents/base-profiles/PROFILE_ANALYZE_FIRST_PASS.md`, `.github/agents/base-profiles/PROFILE_BUILD_SLICE.md`, `.github/agents/base-profiles/PROFILE_DONOR_TRACE_RECONSTRUCT.md`, `.github/agents/base-profiles/PROFILE_READY_PACK.md`, `.github/agents/base-profiles/PROFILE_INFRA_WORKSPACE_LINK.md`, `.github/agents/overlays/OVERLAY_DESIGN_REVIEW.md`, `.github/agents/overlays/OVERLAY_UX_FLOW_REVIEW.md`, `.github/agents/overlays/OVERLAY_USER_REVIEW_GATES.md`, `.github/agents/overlays/OVERLAY_VIOLATION_AUDIT.md`, `tools/scripts/validate-agent-governance.mjs`, `docs/governance/AGENT_CHANGE_LEDGER.md`
+- Change type: `clarification`
+
+#### AGENT-2026-04-11-003 Rationale
+
+- Trigger: A stronger external manual showed a cleaner routing architecture based on one base profile plus optional overlays.
+- Observed problem: The thin core already removed most domain detail, but it still listed skills as a flat set instead of encoding explicit routing layers and isolation rules.
+- Why existing rules were insufficient: They preserved brevity, but did not yet formalize the minimal-load decision tree that keeps token usage consistently low across task types.
+
+#### AGENT-2026-04-11-003 Change Summary
+
+- Added: agent routing index, base profile files, overlay files, and validator coverage for those routing assets.
+- Updated: canonical surface kernel to route through one base profile plus minimal overlays.
+- Removed: flat always-visible skill routing list from the canonical kernel.
+
+#### AGENT-2026-04-11-003 Safety Checks
+
+- Duplicate-rule check: `PASS`
+- Contradiction check: `PASS`
+- Scope expansion check: `PASS`
+- Noise check: `PASS`
+- Minimal-patch check: `PASS`
+
+#### AGENT-2026-04-11-003 Expected Effect
+
+- What failure or ambiguity this change should prevent: overloading the kernel with too many simultaneously visible routing options, mixing infra linking with design governance, and loading expensive review logic when the task does not justify it.
+- What behavior becomes stricter or clearer: routing now starts from a single base intent, then adds overlays only when proven necessary.
+
+#### AGENT-2026-04-11-003 Verification
+
+- Validation method: file diagnostics plus `pnpm guard:agent-governance` after adding routing assets and validator checks.
+- Result: `PASS`
+- Residual risk or [TBD]: live use will still be the final test for whether the chosen base-profile taxonomy is sufficiently exhaustive.
+
+#### AGENT-2026-04-11-003 Rollback
+
+- Safe rollback path: remove the added routing assets and restore the previous flat skill-routing section in the canonical kernel.
+- When rollback should be considered: if base-profile routing proves harder to maintain than the value it saves in token usage.
+
 ### AGENT-2026-04-11-001
 
 - Date: 2026-04-11
