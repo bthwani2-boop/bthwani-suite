@@ -33,7 +33,6 @@ export const dshAppClientRouteFamilyCatalog = {
   'category-get': 'categories',
   'favorite-toggle': 'favorites',
   'favorites-list': 'favorites',
-  'home-get': 'home',
   search: 'discovery',
   'store-get': 'stores',
   'create-order': 'checkout',

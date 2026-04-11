@@ -1,6 +1,6 @@
 import React from 'react';
 import { BthBox, BthKeyValueList, BthListItem, BthStatCard, BthSurface } from '@bthwani/ui-kit';
-import { DshOperationScreen, type DshOperationScreenState } from '../../../_shared/screens';
+import { DshOperationScreen, type DshOperationScreenState } from '../../../patterns/screens/DshOperationScreen';
 import { clientSupportDefinitions, type ClientSupportScreenId } from '../../support/screens/DshClientGeneratedSupportScreens';
 
 type DeliveryManagementScreenId = 'delivery-attempt-create' | 'delivery-attempts-list' | 'delivery-close' | 'delivery-reassign';

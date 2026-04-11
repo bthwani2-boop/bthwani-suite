@@ -1,6 +1,6 @@
 import React from 'react';
 import { BthBox, BthCard, BthListItem, BthSectionHeader, BthStateView, BthSurface, BthText } from '@bthwani/ui-kit';
-import { DshOperationScreen } from '../../../_shared/screens';
+import { DshOperationScreen } from '../../../patterns/screens/DshOperationScreen';
 
 export type DshCategoryGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';

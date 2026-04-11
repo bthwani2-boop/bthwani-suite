@@ -2,7 +2,7 @@ import React from 'react';
 import { DshSearchScreen } from './families/discovery/screens';
 import { DshEntryScreen } from './families/entry/screens';
 import { DshAwnakOrderCreateScreen } from './families/awnak/screens';
-import { DshHomeGetScreen, DshHomeScreen, type DshHomeGetPromo, type DshHomeGetStore } from './families/home/screens';
+import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './families/home/screens';
 import { DshBenefitsHubScreen } from './families/loyalty/screens';
 import { DshOrdersListScreen } from './families/orders/screens';
 import { DshSheinInfoScreen } from './families/shein/screens';
@@ -16,8 +16,8 @@ import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type Clie
 import {
   dshHomeGetFixturePromos,
   dshHomeGetFixtureStores,
-} from './home-get/fixtures/dshHomeGetFixtures';
-import { DshOrderSuccessState } from './success/states';
+} from './families/home/fixtures/dshHomeGetFixtures';
+import { DshOrderSuccessState } from './families/orders/screens';
 import { dshCategoryListFixtures, getDshCategoryFixture } from './families/categories/fixtures/dshCategoriesFixtures';
 
 export type DshRoute =
@@ -37,7 +37,6 @@ export type DshRoute =
   | 'category-get'
   | 'favorite-toggle'
   | 'favorites-list'
-  | 'home-get'
   | 'search'
   | 'store-get'
   | 'create-order'
@@ -799,24 +798,6 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     );
   }
 
-  if (route === 'home-get') {
-    return (
-      <DshHomeGetScreen
-        promos={dshHomeGetFixturePromos as DshHomeGetPromo[]}
-        stores={dshHomeGetFixtureStores as DshHomeGetStore[]}
-        onBack={onExit}
-        onOpenList={() => setRoute('stores-list')}
-        onOpenFavorites={() => setRoute('favorites-list')}
-        onOpenSearch={() => setRoute('search')}
-        onOpenStore={(storeId) => {
-          setActiveStoreId(storeId);
-          setRoute('store-detail');
-        }}
-        onRetry={() => setRoute('home-get')}
-      />
-    );
-  }
-
   if (route === 'search') {
     return (
       <DshSearchScreen
@@ -829,7 +810,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
           setActiveStoreId(resultId);
           setRoute('store-get');
         }}
-        onBack={() => setRoute('home-get')}
+        onBack={() => setRoute('home')}
         onRetry={() => setRoute('search')}
       />
     );
@@ -890,7 +871,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     return (
       <DshBenefitsHubScreen
         screenId={selectedSupportScreen as 'subscription-family-get' | 'subscription-family-members-get' | 'subscription-family-members-post' | 'subscription-pro-catalog' | 'subscription-sync' | 'subscription-tier-get' | 'subscription-upgrade-post' | 'loyalty-points-redeem' | 'loyalty-points-user-balance' | 'loyalty-points-user-history' | 'entitlements-get'}
-        onPrimaryAction={() => setRoute('home-get')}
+        onPrimaryAction={() => setRoute('home')}
         onSecondaryAction={openSupportDirectory}
         onRetry={() => setRoute('benefits')}
       />
@@ -954,7 +935,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   if (route === 'listing-status-update') {
     return (
       <DshListingStatusUpdateScreen
-        onPrimaryAction={() => setRoute('home-get')}
+        onPrimaryAction={() => setRoute('home')}
         onSecondaryAction={openSupportDirectory}
         onRetry={() => setRoute('listing-status-update')}
       />
@@ -974,7 +955,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   if (route === 'zone-set') {
     return (
       <DshZoneSetScreen
-        onPrimaryAction={() => setRoute('home-get')}
+        onPrimaryAction={() => setRoute('home')}
         onSecondaryAction={openSupportDirectory}
         onRetry={() => setRoute('zone-set')}
       />
@@ -985,7 +966,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     return (
       <DshServiceSettingsHubScreen
         screenId={selectedSupportScreen as 'listing-status-update' | 'service-modes-resolve' | 'zone-set' | 'shein-info'}
-        onPrimaryAction={() => setRoute(selectedSupportScreen === 'shein-info' ? 'stores-list' : 'home-get')}
+        onPrimaryAction={() => setRoute(selectedSupportScreen === 'shein-info' ? 'stores-list' : 'home')}
         onSecondaryAction={openSupportDirectory}
         onRetry={() => setRoute('service-settings')}
       />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from '../../../home-get/screens';
+import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './DshHomeGetScreen';
 import { dshCategoryFixtures } from '../../categories/fixtures/dshCategoriesFixtures';
 
 export type DshHomeScreenState =

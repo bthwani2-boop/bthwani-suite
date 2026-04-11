@@ -1,6 +1,6 @@
 import React from 'react';
 import { BthBox, BthButton, BthCard, BthListItem, BthMobileScrollView, BthSearchField, BthSectionHeader, BthSurface, BthText } from '@bthwani/ui-kit';
-import { DshOperationScreen } from '../../../_shared/screens';
+import { DshOperationScreen } from '../../../patterns/screens/DshOperationScreen';
 
 export type DshSearchResult = { id: string; title: string; subtitle: string; meta?: string };
 export type DshSearchScreenProps = {

@@ -14,7 +14,6 @@ export const surfaceCatalog = [
   'category-get',
   'favorite-toggle',
   'favorites-list',
-  'home-get',
   'search',
   'store-get',
   'create-order',
@@ -77,6 +76,5 @@ export const surfaceCatalog = [
   'zone-set',
   'tracking',
   'orders-list',
-  'success',
-  '_flow-id_'
+  'success'
 ] as const;

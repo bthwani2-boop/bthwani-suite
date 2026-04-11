@@ -177,7 +177,7 @@ export function HomeBannerCarousel({
       });
 
       return (
-        <View style={[styles.itemWrap, { width: snapInterval, height }]}> 
+        <View style={[styles.itemWrap, { width: snapInterval, height }]}>
           <Pressable
             style={{ width: centerCardWidth }}
             onPress={() => {
@@ -208,7 +208,7 @@ export function HomeBannerCarousel({
         </View>
       );
     },
-    [centerCardWidth, height, onBannerPress, pauseAutoplay, scrollX, snapInterval]
+    [centerCardWidth, height, onBannerPress, pauseAutoplay, scrollX, snapInterval, styles]
   );
 
   if (!count) {
@@ -216,7 +216,7 @@ export function HomeBannerCarousel({
   }
 
   return (
-    <View style={[styles.root, { width, height: height + 8 }]}> 
+    <View style={[styles.root, { width, height: height + 8 }]}>
       <Animated.FlatList
         ref={listRef}
         horizontal

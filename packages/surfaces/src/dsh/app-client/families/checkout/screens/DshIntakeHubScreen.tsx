@@ -1,6 +1,6 @@
 import React from 'react';
 import { BthBox, BthKeyValueList, BthListItem, BthStatCard, BthSurface, BthTextField } from '@bthwani/ui-kit';
-import { DshOperationScreen, type DshOperationScreenState } from '../../../_shared/screens';
+import { DshOperationScreen, type DshOperationScreenState } from '../../../patterns/screens/DshOperationScreen';
 import { clientSupportDefinitions, type ClientSupportScreenId } from '../../support/screens/DshClientGeneratedSupportScreens';
 
 type IntakeScreenId = 'booking-create' | 'estimate-create' | 'external-order-create' | 'gas-refill-order-create';

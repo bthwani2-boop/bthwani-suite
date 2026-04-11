@@ -1,6 +1,6 @@
 import React from 'react';
 import { BthBox, BthCard, BthListItem, BthSectionHeader, BthSurface, BthText } from '@bthwani/ui-kit';
-import { DshOperationScreen } from '../../../_shared/screens';
+import { DshOperationScreen } from '../../../patterns/screens/DshOperationScreen';
 
 export type DshCategoriesListItem = { id: string; label: string; subtitle: string; countLabel?: string; };
 export type DshCategoriesListScreenProps = {

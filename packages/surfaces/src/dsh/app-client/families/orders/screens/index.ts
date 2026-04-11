@@ -1,2 +1,2 @@
 export * from './DshOrdersListScreen';
-export * from '../../../success/states';
+export * from './DshOrderSuccessState';

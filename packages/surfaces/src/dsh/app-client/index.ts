@@ -16,6 +16,5 @@ export * from './families/shein/screens';
 export * from './families/stores/screens';
 export * from './families/support/screens';
 export * from './families/tracking/screens';
-export * from './success/states';
 export { DshSurfaceHost } from './DshSurfaceHost';
 export type { DshCommandTarget, DshRoute } from './DshSurfaceHost';
