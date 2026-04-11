@@ -222,7 +222,7 @@ export function ControlPanelDshOperationsScreen({
   const router = useRouter();
   const uiText = useUiText();
   const dshText = useDshControlPanelText();
-  const { language } = useDirection();
+  const { direction, language } = useDirection();
   const languageChip = language === 'en' ? dshText.common.enChip : dshText.common.arChip;
   const topFilterItems = React.useMemo(() => buildTopFilterItems(dshText), [dshText]);
   const dshWorkbenches = React.useMemo(() => buildDshWorkbenches(dshText), [dshText]);
@@ -363,12 +363,12 @@ export function ControlPanelDshOperationsScreen({
                 radiusToken="xl"
                 background="surfaceRaised"
               >
-                <BthBox layoutDirection="row" justify="space-between" align="center">
+                <div className={styles.workbenchHeader} dir={direction}>
                   <BthText role="bodyStrong">{workbench.label}</BthText>
                   <BthText role="caption" tone={workbench.liveHref ? 'success' : 'brand'}>
                     {workbench.liveHref ? dshText.common.live : workbench.statusLabel}
                   </BthText>
-                </BthBox>
+                </div>
                 <BthText role="bodySm" tone="muted">
                   {workbench.description}
                 </BthText>

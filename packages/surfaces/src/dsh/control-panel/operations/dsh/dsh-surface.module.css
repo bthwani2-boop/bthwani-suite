@@ -19,6 +19,14 @@
   min-height: 100%;
 }
 
+.workbenchHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
 .actionRow {
   display: flex;
   flex-wrap: wrap;
