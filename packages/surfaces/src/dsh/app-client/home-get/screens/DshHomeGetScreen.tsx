@@ -37,7 +37,7 @@ export type DshHomeGetScreenProps = {
   onRetry?: () => void;
 };
 
-type DiscoveryFilter = 'all' | 'favorites' | 'nearest' | 'new';
+type DiscoveryFilter = 'all' | 'favorites' | 'nearest' | 'new' | 'offers';
 
 export type DshHomeGetPromo = {
   id: string;
@@ -52,6 +52,8 @@ export type DshHomeGetStore = {
   id: string;
   name: string;
   address: string;
+  imageUri?: string;
+  rating?: number;
   statusLabel: string;
   statusTone: 'open' | 'closed';
   distanceLabel: string;
@@ -59,6 +61,7 @@ export type DshHomeGetStore = {
   serviceLabel: string;
   followerCount: number;
   multiplierLabel: string;
+  subscriptionPackageChips?: string[];
   offerLabel?: string;
   isFavorite: boolean;
   isFollowing: boolean;
@@ -162,6 +165,10 @@ export function DshHomeGetScreen({
 
       if (activeFilter === 'new') {
         return Boolean(store.hasOffer);
+      }
+
+      if (activeFilter === 'offers') {
+        return Boolean(store.hasOffer || store.offerLabel);
       }
 
       return true;

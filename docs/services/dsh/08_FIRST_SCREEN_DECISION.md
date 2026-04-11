@@ -13,7 +13,7 @@ Closed At: 2026-04-08
 
 - first_screen_id: SCR_W1_001
 - first_screen_name: dsh_entry_screen
-- implementation_file: packages/surfaces/src/dsh/app-client/entry/screens/DshEntryScreen.tsx
+- implementation_file: packages/surfaces/src/dsh/app-client/families/entry/screens/DshEntryScreen.tsx
 - primary_cta: Start delivery
 - source: WAVE 1 app-client gate decision (2026-04-08)
 

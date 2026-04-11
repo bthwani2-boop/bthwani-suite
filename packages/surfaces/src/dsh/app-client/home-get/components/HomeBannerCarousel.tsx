@@ -11,7 +11,7 @@ import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from 'react-native';
-import { BTHWANI_COLORS } from '@bthwani/ui-kit';
+import { useTheme } from '@bthwani/ui-kit';
 
 export type HomeBannerCarouselItem = {
   id: string;
@@ -46,6 +46,7 @@ export function HomeBannerCarousel({
   resumeAfterMs = DEFAULT_RESUME_AFTER_MS,
   onBannerPress,
 }: Props) {
+  const { theme } = useTheme();
   const { width: windowWidth } = useWindowDimensions();
   const width = widthProp ?? windowWidth;
   const count = banners.length;
@@ -57,6 +58,7 @@ export function HomeBannerCarousel({
   const resumeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const centerCardWidth = Math.max(0, width - 44);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const itemGap = 14;
   const snapInterval = centerCardWidth + itemGap;
   const horizontalPadding = Math.max(0, width / 2 - snapInterval / 2);
@@ -253,7 +255,7 @@ export function HomeBannerCarousel({
                   styles.progressTrack,
                   active && {
                     width: 18,
-                    backgroundColor: item.accentColor ?? BTHWANI_COLORS.accent,
+                    backgroundColor: item.accentColor ?? theme.accent,
                   },
                 ]}
               />
@@ -265,54 +267,56 @@ export function HomeBannerCarousel({
   );
 }
 
-const styles = StyleSheet.create({
-  root: {
-    overflow: 'visible',
-    backgroundColor: '#ffffff',
-    direction: 'ltr',
-  },
-  itemWrap: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-    backgroundColor: '#ffffff',
-    paddingTop: 2,
-  },
-  card: {
-    borderRadius: 24,
-    overflow: 'hidden',
-    backgroundColor: '#ffffff',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 18,
-    elevation: 3,
-  },
-  image: {
-    ...StyleSheet.absoluteFillObject,
-    width: '100%',
-    height: '100%',
-  },
-  imageFallback: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#ffffff',
-  },
-  progressRow: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 8,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 6,
-  },
-  progressRowRtl: {
-    flexDirection: 'row-reverse',
-  },
-  progressTrack: {
-    width: 7,
-    height: 3,
-    borderRadius: 999,
-    backgroundColor: BTHWANI_COLORS.overlay20,
-  },
-});
+function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
+  return StyleSheet.create({
+    root: {
+      overflow: 'visible',
+      backgroundColor: theme.surface,
+      direction: 'ltr',
+    },
+    itemWrap: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'hidden',
+      backgroundColor: theme.surface,
+      paddingTop: 2,
+    },
+    card: {
+      borderRadius: 24,
+      overflow: 'hidden',
+      backgroundColor: theme.surface,
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 8 },
+      shadowRadius: 18,
+      elevation: 3,
+    },
+    image: {
+      ...StyleSheet.absoluteFillObject,
+      width: '100%',
+      height: '100%',
+    },
+    imageFallback: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: theme.surfaceRaised,
+    },
+    progressRow: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 8,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 6,
+    },
+    progressRowRtl: {
+      flexDirection: 'row-reverse',
+    },
+    progressTrack: {
+      width: 7,
+      height: 3,
+      borderRadius: 999,
+      backgroundColor: theme.surfaceInset,
+    },
+  });
+}

@@ -1,47 +1,24 @@
 import React from 'react';
-import { DshCategoriesListScreen } from './categories-list/screens';
-import { DshCategoryGetScreen } from './category-get/screens';
-import {
-  DshCartGetScreen,
-  DshCartInitScreen,
-  DshCartItemAddScreen,
-  DshCartItemRemoveScreen,
-  DshCartItemUpdateScreen,
-} from './families/cart';
-import { DshCreateOrderScreen } from './create-order/screens';
-import { DshEntryScreen } from './entry/screens';
-import { DshFavoriteToggleScreen } from './favorite-toggle/screens';
-import { DshFavoritesListScreen } from './favorites-list/screens';
-import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './home-get/screens';
+import { DshSearchScreen } from './families/discovery/screens';
+import { DshEntryScreen } from './families/entry/screens';
+import { DshAwnakOrderCreateScreen } from './families/awnak/screens';
+import { DshHomeGetScreen, DshHomeScreen, type DshHomeGetPromo, type DshHomeGetStore } from './families/home/screens';
+import { DshBenefitsHubScreen } from './families/loyalty/screens';
+import { DshOrdersListScreen } from './families/orders/screens';
+import { DshSheinInfoScreen } from './families/shein/screens';
+import { DshStoresListScreen, DshStoreGetScreen, DshStoreDetailScreen, DshStoreItemsScreen, DshStoreItemsListScreen } from './families/stores/screens';
+import { DshCategoriesListScreen, DshCategoryGetScreen } from './families/categories/screens';
+import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './families/favorites/screens';
+import { DshCartGetScreen, DshCartInitScreen, DshCartItemAddScreen, DshCartItemRemoveScreen, DshCartItemUpdateScreen } from './families/cart/screens';
+import { DshCheckoutHubScreen, DshReviewOrderScreen, DshCreateOrderScreen, DshIntakeHubScreen } from './families/checkout/screens';
+import { DshTrackingScreen, DshDeliveryManagementHubScreen } from './families/tracking/screens';
+import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshTrustHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './families/support/screens';
 import {
   dshHomeGetFixturePromos,
   dshHomeGetFixtureStores,
 } from './home-get/fixtures/dshHomeGetFixtures';
 import { DshOrderSuccessState } from './success/states';
-import { DshOrdersListScreen } from './orders-list/screens';
-import { DshSearchScreen } from './search/screens';
-import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId } from './support/screens';
-import { DshBenefitsHubScreen } from './benefits/screens';
-import { DshCheckoutHubScreen } from './checkout-workspace/screens';
-import { DshConversationHubScreen } from './conversation-workspace/screens';
-import { DshDeliveryManagementHubScreen } from './delivery-management-workspace/screens';
-import { DshIntakeHubScreen } from './intake-workspace/screens';
-import { DshListingStatusUpdateScreen } from './listing-status-update/screens';
-import { DshOrderIssueHubScreen } from './order-issue-workspace/screens';
-import { DshProxyHubScreen } from './proxy-workspace/screens';
-import { DshServiceSettingsHubScreen } from './service-settings/screens';
-import { DshSheinInfoScreen } from './shein-info/screens';
-import { DshTrustHubScreen } from './trust-workspace/screens';
-import { DshZoneSetScreen } from './zone-set/screens';
-import { DshStoreGetScreen } from './store-get/screens';
-import { DshReviewOrderScreen } from './review/screens';
-import { DshStoreDetailScreen } from './store-detail/screens';
-import { DshStoreItemsScreen } from './store-items/screens';
-import { DshStoreItemsListScreen } from './store-items-list/screens';
-import { DshAwnakOrderCreateScreen } from './awnak-order-create/screens';
-import { DshStoresListScreen } from './stores-list/screens';
-import { DshTrackingScreen } from './tracking/screens';
-import { dshCategoryListFixtures, getDshCategoryFixture } from './fixtures/dshCategoriesFixtures';
+import { dshCategoryListFixtures, getDshCategoryFixture } from './families/categories/fixtures/dshCategoriesFixtures';
 
 export type DshRoute =
   | 'home'
@@ -277,12 +254,17 @@ function supportScreenToRoute(screenId: ClientSupportScreenId): DshRoute {
   const proxyTargets: ClientSupportScreenId[] = ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review', 'proxy-request-reject', 'proxy-request-tracking'];
   const settingsTargets: ClientSupportScreenId[] = ['service-modes-resolve'];
   const listingTargets: ClientSupportScreenId[] = ['listing-status-update'];
+  const externalTargets: ClientSupportScreenId[] = ['gas-refill-order-create'];
   const sheinTargets: ClientSupportScreenId[] = ['shein-info'];
   const zoneTargets: ClientSupportScreenId[] = ['zone-set'];
   const issueTargets: ClientSupportScreenId[] = ['order-issue-flag'];
   const trustTargets: ClientSupportScreenId[] = ['order-proof-code-generate', 'order-proof-verify', 'order-escrow-hold', 'order-escrow-release'];
 
   if (intakeTargets.includes(screenId)) {
+    return 'intake-workspace';
+  }
+
+  if (externalTargets.includes(screenId)) {
     return 'intake-workspace';
   }
 
@@ -658,7 +640,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   if (route === 'cart-get') {
     return (
-      <DshCartGetScreen
+      <DshCartGetFamilyScreen
         store={{
           id: activeStore.id,
           name: activeStore.name,
@@ -687,7 +669,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   if (route === 'cart-init') {
     return (
-      <DshCartInitScreen
+      <DshCartInitFamilyScreen
         state="success"
         cartId={`${activeStore.id}-cart`}
         storeName={activeStore.name}
@@ -703,7 +685,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   if (route === 'cart-item-add') {
     return (
-      <DshCartItemAddScreen
+      <DshCartItemAddFamilyScreen
         cartId={`${activeStore.id}-cart`}
         storeName={activeStore.name}
         suggestedItemName={selectedItem?.name ?? 'Royal Gala Apples'}
@@ -720,7 +702,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   if (route === 'cart-item-remove') {
     return (
-      <DshCartItemRemoveScreen
+      <DshCartItemRemoveFamilyScreen
         cartId={`${activeStore.id}-cart`}
         storeName={activeStore.name}
         suggestedCartItemId={selectedItem?.id ?? 'item-apple-1'}
@@ -736,7 +718,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   if (route === 'cart-item-update') {
     return (
-      <DshCartItemUpdateScreen
+      <DshCartItemUpdateFamilyScreen
         cartId={`${activeStore.id}-cart`}
         suggestedCartItemId={selectedItem?.id ?? 'item-apple-1'}
         suggestedQuantity={2}

@@ -1,1 +1,1 @@
-export * from '../../../entry/screens/DshEntryScreen';
+export * from './DshEntryScreen';

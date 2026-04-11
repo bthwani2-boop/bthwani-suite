@@ -1,5 +1,5 @@
 "screen_id","canonical_name","surface","canonical_route","target_shell_path","nav_owner","status","source_trace"
-"SCR_W1_001","dsh_entry_screen","app-client","/dsh/entry","apps/mobile/app-client/src/shell/routes.ts","packages/surfaces routing contracts","wave1_locked","packages/surfaces/src/dsh/app-client/entry/screens/DshEntryScreen.tsx"
+"SCR_W1_001","dsh_entry_screen","app-client","/dsh/entry","apps/mobile/app-client/src/shell/routes.ts","packages/surfaces routing contracts","wave1_locked","packages/surfaces/src/dsh/app-client/families/entry/screens/DshEntryScreen.tsx"
 "SCR_10","dsh_finance_dsh","control-panel","/finance/dsh","apps/web/control-panel","packages/surfaces routing contracts","seeded_locked","apps/web/control-panel/app/finance/dsh/page.tsx"
 "SCR_11","dsh_operations_dsh_arrival-bell","control-panel","/operations/dsh/arrival-bell","apps/web/control-panel","packages/surfaces routing contracts","seeded_locked","apps/web/control-panel/app/operations/dsh/arrival-bell/page.tsx"
 "SCR_12","dsh_operations_dsh_orders_[id]","control-panel","/operations/dsh/orders/[id]","apps/web/control-panel","packages/surfaces routing contracts","seeded_locked","apps/web/control-panel/app/operations/dsh/orders/[id]/page.tsx"

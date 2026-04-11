@@ -1,3 +1,2 @@
-export * from '../../../orders-list/screens/DshOrdersListScreen';
-export * from '../../../tracking/screens/DshTrackingScreen';
-export * from '../../../success/states/DshOrderSuccessState';
+export * from './DshOrdersListScreen';
+export * from '../../../success/states';
