@@ -1,5 +1,3 @@
-import type { DshControlPanelText } from '@bthwani/ui-kit';
-
 export type DshPeakModePressureLane = {
   zoneLabel: string;
   loadLabel: string;
@@ -23,14 +21,32 @@ export type DshPeakModeSummary = {
   protectedQueues: number;
 };
 
-export function getDshPeakModeSummary(text: DshControlPanelText): DshPeakModeSummary {
+type DshPeakModeTextSource = {
+  fixtures: {
+    peakMode: {
+      summary: DshPeakModeSummary;
+      policies: ReadonlyArray<DshPeakModePolicy>;
+      lanes: ReadonlyArray<{
+        zoneLabel: string;
+        loadLabel: string;
+        captainCapacityLabel: string;
+        queueLabel: string;
+        recommendationLabel: string;
+        note: string;
+        tone: string;
+      }>;
+    };
+  };
+};
+
+export function getDshPeakModeSummary(text: DshPeakModeTextSource): DshPeakModeSummary {
   return text.fixtures.peakMode.summary;
 }
 
-export function getDshPeakModePolicies(text: DshControlPanelText): ReadonlyArray<DshPeakModePolicy> {
+export function getDshPeakModePolicies(text: DshPeakModeTextSource): ReadonlyArray<DshPeakModePolicy> {
   return text.fixtures.peakMode.policies;
 }
 
-export function getDshPeakModePressureLanes(text: DshControlPanelText): ReadonlyArray<DshPeakModePressureLane> {
-  return text.fixtures.peakMode.lanes;
+export function getDshPeakModePressureLanes(text: DshPeakModeTextSource): ReadonlyArray<DshPeakModePressureLane> {
+  return text.fixtures.peakMode.lanes as ReadonlyArray<DshPeakModePressureLane>;
 }

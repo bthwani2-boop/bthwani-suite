@@ -1,5 +1,3 @@
-import type { DshControlPanelText } from '@bthwani/ui-kit';
-
 export type DshArrivalBellLane = {
   orderId: string;
   actorLabel: string;
@@ -17,14 +15,40 @@ export type DshArrivalBellSummary = {
   resolvedToday: number;
 };
 
-export function getDshArrivalBellSummary(text: DshControlPanelText): DshArrivalBellSummary {
+type DshArrivalBellTextSource = {
+  fixtures: {
+    arrivalBell: {
+      summary: DshArrivalBellSummary;
+      captainLane: ReadonlyArray<{
+        orderId: string;
+        actorLabel: string;
+        statusLabel: string;
+        etaLabel: string;
+        ringLabel: string;
+        actionHint: string;
+        tone: string;
+      }>;
+      customerLane: ReadonlyArray<{
+        orderId: string;
+        actorLabel: string;
+        statusLabel: string;
+        etaLabel: string;
+        ringLabel: string;
+        actionHint: string;
+        tone: string;
+      }>;
+    };
+  };
+};
+
+export function getDshArrivalBellSummary(text: DshArrivalBellTextSource): DshArrivalBellSummary {
   return text.fixtures.arrivalBell.summary;
 }
 
-export function getDshArrivalBellCaptainLane(text: DshControlPanelText): ReadonlyArray<DshArrivalBellLane> {
-  return text.fixtures.arrivalBell.captainLane;
+export function getDshArrivalBellCaptainLane(text: DshArrivalBellTextSource): ReadonlyArray<DshArrivalBellLane> {
+  return text.fixtures.arrivalBell.captainLane as ReadonlyArray<DshArrivalBellLane>;
 }
 
-export function getDshArrivalBellCustomerLane(text: DshControlPanelText): ReadonlyArray<DshArrivalBellLane> {
-  return text.fixtures.arrivalBell.customerLane;
+export function getDshArrivalBellCustomerLane(text: DshArrivalBellTextSource): ReadonlyArray<DshArrivalBellLane> {
+  return text.fixtures.arrivalBell.customerLane as ReadonlyArray<DshArrivalBellLane>;
 }

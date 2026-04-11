@@ -10,10 +10,42 @@ const {
   CaptainPickupConfirmSheet,
   CaptainTaskDetailScreen,
   CaptainTasksInboxScreen,
+  DshCaptainSupportDirectoryScreen,
+  DshCaptainChatReadAckScreen,
+  DshCaptainChatSendScreen,
+  DshCaptainCodBalanceScreen,
+  DshCaptainJobRejectScreen,
+  DshCaptainOrderAcceptScreen,
+  DshCaptainOrderDeliverScreen,
+  DshCaptainOrderDetailsScreen,
+  DshCaptainOrderGetScreen,
+  DshCaptainOrderPickupScreen,
+  DshCaptainOrdersListScreen,
+  DshCaptainOrdersOffersListScreen,
+  DshCaptainProfileGetScreen,
+  DshCaptainProofUploadScreen,
+  DshCaptainTierEvaluateScreen,
+  DshCaptainTierInfoScreen,
 } = dsh.dshAppCaptain;
 
 type CaptainTaskDetailSummary = React.ComponentProps<typeof CaptainTaskDetailScreen>['summary'];
 type CaptainTasksInboxScreenState = React.ComponentProps<typeof CaptainTasksInboxScreen>['state'];
+type CaptainSupportRoute =
+  | 'chat-read-ack'
+  | 'chat-send'
+  | 'cod-balance'
+  | 'job-reject'
+  | 'order-accept'
+  | 'order-deliver'
+  | 'order-details'
+  | 'order-get'
+  | 'order-pickup'
+  | 'orders-list'
+  | 'orders-offers-list'
+  | 'profile-get'
+  | 'proof-upload'
+  | 'tier-evaluate'
+  | 'tier-info';
 
 const primaryAreas = [
   'المهام',
@@ -27,7 +59,7 @@ const shortcuts = [
   'تبديل الحالة'
 ] as const;
 
-type CaptainRoute = 'home' | 'entry' | 'inbox' | 'detail';
+type CaptainRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'support-directory' | 'support-screen';
 type CaptainServiceType = 'dsh' | 'amn';
 
 const captainTypeOptions: readonly MobileAccountTypeOption[] = [
@@ -59,6 +91,7 @@ export function CaptainSurfaceHost() {
   const [route, setRoute] = React.useState<CaptainRoute>('home');
   const [inboxState, setInboxState] = React.useState<CaptainTasksInboxScreenState>('active');
   const [activeTaskId, setActiveTaskId] = React.useState<string>('captain-task-9021');
+  const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<CaptainSupportRoute>('orders-list');
   const [isPickupSheetVisible, setIsPickupSheetVisible] = React.useState(false);
   const [isDeliverySheetVisible, setIsDeliverySheetVisible] = React.useState(false);
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
@@ -76,6 +109,15 @@ export function CaptainSurfaceHost() {
 
   const openCaptainEntry = () => {
     setRoute('entry');
+  };
+
+  const openSupportDirectory = () => {
+    setRoute('support-directory');
+  };
+
+  const openCaptainSupportScreen = (screenId: CaptainSupportRoute) => {
+    setSelectedSupportScreen(screenId);
+    setRoute('support-screen');
   };
 
   const handleSelectServiceType = React.useCallback((typeId: string) => {
@@ -176,7 +218,7 @@ export function CaptainSurfaceHost() {
             }
           },
         },
-        { id: 'search', iconName: 'search-outline', accessibilityLabel: 'بحث' },
+        { id: 'search', iconName: 'search-outline', accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
       ]}
       ticker={{
         statusLabel: activeServiceType === 'dsh' ? 'مباشر' : 'وضع AMN',
@@ -233,6 +275,34 @@ export function CaptainSurfaceHost() {
   }
 
   if (route !== 'home') {
+    const supportScreens: Record<CaptainSupportRoute, React.ReactNode> = {
+      'chat-read-ack': <DshCaptainChatReadAckScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'chat-send': <DshCaptainChatSendScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'cod-balance': <DshCaptainCodBalanceScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'job-reject': <DshCaptainJobRejectScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'order-accept': <DshCaptainOrderAcceptScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('order-get')} />,
+      'order-deliver': <DshCaptainOrderDeliverScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('proof-upload')} />,
+      'order-details': <DshCaptainOrderDetailsScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'order-get': <DshCaptainOrderGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'order-pickup': <DshCaptainOrderPickupScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('order-deliver')} />,
+      'orders-list': <DshCaptainOrdersListScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('orders-offers-list')} />,
+      'orders-offers-list': <DshCaptainOrdersOffersListScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('order-accept')} />,
+      'profile-get': <DshCaptainProfileGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'proof-upload': <DshCaptainProofUploadScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'tier-evaluate': <DshCaptainTierEvaluateScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('tier-info')} />,
+      'tier-info': <DshCaptainTierInfoScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+    };
+
+    let content: React.ReactNode = renderCaptainFlow();
+
+    if (route === 'support-directory') {
+      content = <DshCaptainSupportDirectoryScreen onOpenScreen={(screenId) => openCaptainSupportScreen(screenId as CaptainSupportRoute)} />;
+    }
+
+    if (route === 'support-screen') {
+      content = supportScreens[selectedSupportScreen];
+    }
+
     return (
       <BthBox style={{ flex: 1 }} background="background">
         {topBar}
@@ -262,7 +332,7 @@ export function CaptainSurfaceHost() {
             overflow: 'hidden',
           }}
         >
-          {renderCaptainFlow()}
+          {content}
         </BthSurface>
         {accountSheet}
       </BthBox>
@@ -313,29 +383,34 @@ export function CaptainSurfaceHost() {
           <BthSurface tone="default" padding={5} gap={4} radiusToken="xl">
             <BthText role="label">اختصارات البداية</BthText>
             <BthBox gap={3}>
-                  setRoute('entry');
+              {shortcuts.map((item, index) => (
                 <BthButton
                   key={item}
                   label={item}
                   tone="secondary"
                   onPress={() => {
                     if (index === 0) {
+                      setInboxState('active');
                       setRoute('entry');
                       return;
                     }
 
                     if (index === 1) {
-                      setInboxState('delivered');
-                      setRoute('detail');
+                      openCaptainSupportScreen('cod-balance');
                       return;
                     }
 
-                    setInboxState('noTasks');
-                    setRoute('entry');
+                    openCaptainSupportScreen('profile-get');
                   }}
                 />
               ))}
             </BthBox>
+          </BthSurface>
+
+          <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
+            <BthText role="label">أدلة الدعم التنفيذية</BthText>
+            <BthText role="bodySm" tone="muted">كل شاشات DSH المتبقية للكابتن أصبحت مجمعة في دليل دعم مركزي داخل نفس shell.</BthText>
+            <BthButton label="فتح دليل دعم الكابتن" tone="secondary" onPress={openSupportDirectory} />
           </BthSurface>
 
           <BthSurface tone="inset" padding={4} gap={2} radiusToken="lg">

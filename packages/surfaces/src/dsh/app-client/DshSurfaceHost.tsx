@@ -10,15 +10,18 @@ import { DshCreateOrderScreen } from './create-order/screens';
 import { DshEntryScreen } from './entry/screens';
 import { DshFavoriteToggleScreen } from './favorite-toggle/screens';
 import { DshFavoritesListScreen } from './favorites-list/screens';
-import { DshHomeGetScreen } from './home-get/screens';
+import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './home-get/screens';
 import { DshHomeScreen } from './home/screens';
 import { DshOrderSuccessState } from './success/states';
 import { DshOrdersListScreen } from './orders-list/screens';
 import { DshSearchScreen } from './search/screens';
+import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId } from './support/screens';
 import { DshStoreGetScreen } from './store-get/screens';
 import { DshReviewOrderScreen } from './review/screens';
 import { DshStoreDetailScreen } from './store-detail/screens';
 import { DshStoreItemsScreen } from './store-items/screens';
+import { DshStoreItemsListScreen } from './store-items-list/screens';
+import { DshAwnakOrderCreateScreen } from './awnak-order-create/screens';
 import { DshStoresListScreen } from './stores-list/screens';
 import { DshTrackingScreen } from './tracking/screens';
 
@@ -28,6 +31,8 @@ export type DshRoute =
   | 'stores-list'
   | 'store-detail'
   | 'store-items'
+  | 'store-items-list'
+  | 'awnak-order-create'
   | 'cart-get'
   | 'cart-init'
   | 'cart-item-add'
@@ -42,6 +47,8 @@ export type DshRoute =
   | 'store-get'
   | 'create'
   | 'review'
+  | 'support-directory'
+  | 'support-screen'
   | 'success'
   | 'orders'
   | 'tracking';
@@ -132,6 +139,64 @@ const dshDiscoveryStores = [
     isFavorite: false,
   },
 ];
+
+const dshHomeGetPromos: DshHomeGetPromo[] = [
+  { id: 'promo-1', title: 'تخفيضات', subtitle: 'خصم 30% على أول طلب', icon: '🔥' },
+  { id: 'promo-2', title: 'تتبّع مباشر', subtitle: 'افتح الطلب النشط دون ضياع المسار', icon: '📍' },
+  { id: 'promo-3', title: 'الفئات المختارة', subtitle: 'فئات قصيرة ومباشرة من نفس الواجهة', icon: '✨' },
+];
+
+const dshHomeGetStores: DshHomeGetStore[] = [
+  {
+    id: 'store-1001',
+    name: 'مطعم القلعة',
+    address: 'شارع التحرير، صنعاء',
+    statusLabel: 'مفتوح',
+    statusTone: 'open',
+    distanceLabel: '2.1 كم',
+    deliveryLabel: 'توصيل مجاني',
+    serviceLabel: 'بثواني برو',
+    followerCount: 11000,
+    multiplierLabel: 'x2',
+    offerLabel: 'خصم 20%',
+    isFavorite: true,
+    isFollowing: false,
+    hasOffer: true,
+  },
+  {
+    id: 'store-1002',
+    name: 'مطاعم الأرض الخضراء',
+    address: 'شارع حدة، جوار البنك',
+    statusLabel: 'مفتوح',
+    statusTone: 'open',
+    distanceLabel: '1.8 كم',
+    deliveryLabel: 'كوبون',
+    serviceLabel: 'استلم بنفسك',
+    followerCount: 9000,
+    multiplierLabel: 'x1',
+    isFavorite: false,
+    isFollowing: false,
+    hasOffer: false,
+  },
+  {
+    id: 'store-1003',
+    name: 'مؤسسة الشيباني للمطاعم',
+    address: 'شارع الزبيري، أمام الجامعة',
+    statusLabel: 'مغلق',
+    statusTone: 'closed',
+    distanceLabel: '3.5 كم',
+    deliveryLabel: 'توصيل سريع',
+    serviceLabel: 'بثواني برو',
+    followerCount: 9000,
+    multiplierLabel: 'x3',
+    offerLabel: 'خصم 15%',
+    isFavorite: true,
+    isFollowing: false,
+    hasOffer: true,
+  },
+];
+
+const dshHomeGetTickerMessage = 'المساحة مخصصة للشريط الإخباري • اطلب إلى المنزل أو افتح الطلب النشط خلال خطوة واحدة';
 
 const storeItemsByStoreId: Record<string, StoreItem[]> = {
   'store-1001': [
@@ -239,6 +304,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
   const [itemsCategory, setItemsCategory] = React.useState('all');
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
   const [selectedItemId, setSelectedItemId] = React.useState<string>('');
+  const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<ClientSupportScreenId>('checkout-gate');
 
   React.useEffect(() => {
     setRoute(commandTargetToRoute(command.target));
@@ -255,6 +321,18 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
       return haystack.includes(query);
     });
   }, [ordersQuery]);
+
+  const filteredSearchStores = React.useMemo(() => {
+    const query = storesQuery.trim().toLowerCase();
+    if (!query) {
+      return dshDiscoveryStores;
+    }
+
+    return dshDiscoveryStores.filter((store) => {
+      const haystack = `${store.name} ${store.subtitle} ${store.statusLabel} ${store.meta}`.toLowerCase();
+      return haystack.includes(query);
+    });
+  }, [storesQuery]);
 
   const reviewBlocks = React.useMemo(
     () => ({
@@ -286,6 +364,97 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
 
   const handleCreateOrderChange = React.useCallback((field: keyof CreateOrderValues, value: string) => {
     setCreateOrderValues((current) => ({ ...current, [field]: value }));
+  }, []);
+
+  const openSupportDirectory = React.useCallback(() => {
+    setRoute('support-directory');
+  }, []);
+
+  const openSupportScreen = React.useCallback((screenId: ClientSupportScreenId) => {
+    setSelectedSupportScreen(screenId);
+    setRoute('support-screen');
+  }, []);
+
+  const handleSupportPrimaryAction = React.useCallback((screenId: ClientSupportScreenId) => {
+    const awnakTargets: ClientSupportScreenId[] = ['awnak-order-create'];
+    const createTargets: ClientSupportScreenId[] = ['booking-create', 'estimate-create', 'external-order-create', 'gas-refill-order-create', 'order-create'];
+    const deliveryTargets: ClientSupportScreenId[] = ['delivery-attempt-create', 'delivery-attempts-list', 'delivery-close', 'delivery-eta-get', 'delivery-get', 'delivery-reassign', 'delivery-track-get', 'order-status-get', 'order-status-update'];
+    const checkoutTargets: ClientSupportScreenId[] = ['checkout-gate', 'estimate-get', 'pricing-preview', 'pricing-snapshot-get', 'promo-apply'];
+    const orderTargets: ClientSupportScreenId[] = ['order-accept', 'order-cancel', 'order-complete', 'order-get', 'order-issue-flag', 'order-proof-code-generate', 'order-proof-verify', 'order-receipt-get'];
+    const reviewTargets: ClientSupportScreenId[] = ['order-rate', 'review-create'];
+    const reviewHistoryTargets: ClientSupportScreenId[] = ['reviews-list'];
+    const subscriptionTargets: ClientSupportScreenId[] = ['subscription-family-get', 'subscription-family-members-get', 'subscription-family-members-post', 'subscription-pro-catalog', 'subscription-sync', 'subscription-tier-get', 'subscription-upgrade-post'];
+    const loyaltyTargets: ClientSupportScreenId[] = ['loyalty-points-redeem', 'loyalty-points-user-balance', 'loyalty-points-user-history'];
+    const proxyRequestTargets: ClientSupportScreenId[] = ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review'];
+    const proxyRejectTargets: ClientSupportScreenId[] = ['proxy-request-reject'];
+    const proxyTrackingTargets: ClientSupportScreenId[] = ['proxy-request-tracking'];
+
+    if (awnakTargets.includes(screenId)) {
+      setRoute('awnak-order-create');
+      return;
+    }
+
+    if (createTargets.includes(screenId)) {
+      setRoute('create');
+      return;
+    }
+
+    if (checkoutTargets.includes(screenId)) {
+      setRoute('review');
+      return;
+    }
+
+    if (deliveryTargets.includes(screenId)) {
+      setRoute('tracking');
+      return;
+    }
+
+    if (orderTargets.includes(screenId)) {
+      setRoute('orders');
+      return;
+    }
+
+    if (reviewTargets.includes(screenId)) {
+      setRoute('review');
+      return;
+    }
+
+    if (reviewHistoryTargets.includes(screenId)) {
+      setRoute('orders');
+      return;
+    }
+
+    if (subscriptionTargets.includes(screenId) || loyaltyTargets.includes(screenId)) {
+      setRoute('home-get');
+      return;
+    }
+
+    if (screenId === 'chat-read-ack' || screenId === 'chat-send') {
+      setRoute('orders');
+      return;
+    }
+
+    if (proxyRequestTargets.includes(screenId)) {
+      setRoute('review');
+      return;
+    }
+
+    if (proxyRejectTargets.includes(screenId)) {
+      setRoute('orders');
+      return;
+    }
+
+    if (proxyTrackingTargets.includes(screenId)) {
+      setRoute('tracking');
+      return;
+    }
+
+    if (screenId === 'listing-status-update' || screenId === 'service-modes-resolve' || screenId === 'zone-set' || screenId === 'entitlements-get' || screenId === 'shein-info') {
+      setRoute('home');
+      return;
+    }
+
+    setRoute('orders');
   }, []);
 
   const activeStore = React.useMemo(
@@ -345,8 +514,8 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
             'Strong packaging and on-time readiness',
           ],
         }}
-        onOpenMenu={() => setRoute('store-items')}
-        onStartDelivery={() => setRoute('store-items')}
+        onOpenMenu={() => setRoute('store-items-list')}
+        onStartDelivery={() => setRoute('store-items-list')}
         onOpenTracking={() => setRoute('tracking')}
         onRetry={() => setRoute('store-detail')}
       />
@@ -367,7 +536,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         onOpenItems={() => setRoute('store-detail')}
         onBack={() => setRoute('stores-list')}
         onRetry={() => setRoute('store-get')}
-        onSupport={() => setRoute('orders')}
+        onSupport={openSupportDirectory}
       />
     );
   }
@@ -388,6 +557,26 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         onOpenCart={() => setRoute('cart-get')}
         onBack={() => setRoute('store-detail')}
         onRetry={() => setRoute('store-items')}
+      />
+    );
+  }
+
+  if (route === 'store-items-list') {
+    return (
+      <DshStoreItemsListScreen
+        storeName={activeStore.name}
+        items={activeStoreItems}
+        query={itemsQuery}
+        activeCategory={itemsCategory}
+        onQueryChange={setItemsQuery}
+        onCategoryChange={setItemsCategory}
+        onOpenItem={(itemId) => {
+          setSelectedItemId(itemId);
+          setRoute('cart-get');
+        }}
+        onOpenCart={() => setRoute('cart-get')}
+        onBack={() => setRoute('store-detail')}
+        onRetry={() => setRoute('store-items-list')}
       />
     );
   }
@@ -432,7 +621,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         onOpenCart={() => setRoute('cart-item-add')}
         onBack={() => setRoute('cart-get')}
         onRetry={() => setRoute('cart-init')}
-        onSupport={() => setRoute('orders')}
+        onSupport={openSupportDirectory}
       />
     );
   }
@@ -449,7 +638,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         onOpenCart={() => setRoute('cart-item-remove')}
         onBack={() => setRoute('cart-init')}
         onRetry={() => setRoute('cart-item-add')}
-        onSupport={() => setRoute('orders')}
+        onSupport={openSupportDirectory}
       />
     );
   }
@@ -465,7 +654,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         onOpenCart={() => setRoute('cart-item-update')}
         onBack={() => setRoute('cart-item-add')}
         onRetry={() => setRoute('cart-item-remove')}
-        onSupport={() => setRoute('orders')}
+        onSupport={openSupportDirectory}
       />
     );
   }
@@ -481,7 +670,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         onOpenCart={() => setRoute('categories-list')}
         onBack={() => setRoute('cart-item-remove')}
         onRetry={() => setRoute('cart-item-update')}
-        onSupport={() => setRoute('orders')}
+        onSupport={openSupportDirectory}
       />
     );
   }
@@ -501,7 +690,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         onOpenFavorites={() => setRoute('favorites-list')}
         onBack={() => setRoute('cart-item-update')}
         onRetry={() => setRoute('categories-list')}
-        onSupport={() => setRoute('orders')}
+        onSupport={openSupportDirectory}
       />
     );
   }
@@ -519,7 +708,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         onOpenList={() => setRoute('store-items')}
         onBack={() => setRoute('categories-list')}
         onRetry={() => setRoute('category-get')}
-        onSupport={() => setRoute('orders')}
+        onSupport={openSupportDirectory}
       />
     );
   }
@@ -533,7 +722,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         onOpenFavorites={() => setRoute('favorites-list')}
         onBack={() => setRoute('category-get')}
         onRetry={() => setRoute('favorite-toggle')}
-        onSupport={() => setRoute('orders')}
+        onSupport={openSupportDirectory}
       />
     );
   }
@@ -548,7 +737,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         onOpenItem={() => setRoute('favorite-toggle')}
         onBack={() => setRoute('categories-list')}
         onRetry={() => setRoute('favorites-list')}
-        onSupport={() => setRoute('orders')}
+        onSupport={openSupportDirectory}
       />
     );
   }
@@ -556,9 +745,17 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
   if (route === 'home-get') {
     return (
       <DshHomeGetScreen
+        tickerMessage={dshHomeGetTickerMessage}
+        promos={dshHomeGetPromos}
+        stores={dshHomeGetStores}
         onOpenList={() => setRoute('stores-list')}
         onOpenFavorites={() => setRoute('favorites-list')}
         onOpenSearch={() => setRoute('search')}
+        onOpenStore={(storeId) => {
+          setActiveStoreId(storeId);
+          setRoute('store-get');
+        }}
+        onReturnHome={() => setRoute('home')}
         onRetry={() => setRoute('home-get')}
       />
     );
@@ -568,7 +765,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
     return (
       <DshSearchScreen
         query={storesQuery}
-        results={dshDiscoveryStores.map((store) => ({ id: store.id, title: store.name, subtitle: store.subtitle, meta: store.meta }))}
+        results={filteredSearchStores.map((store) => ({ id: store.id, title: store.name, subtitle: store.subtitle, meta: store.meta }))}
         onQueryChange={setStoresQuery}
         onOpenCategories={() => setRoute('categories-list')}
         onOpenFavorites={() => setRoute('favorites-list')}
@@ -592,6 +789,15 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
     );
   }
 
+  if (route === 'awnak-order-create') {
+    return (
+      <DshAwnakOrderCreateScreen
+        onBack={openSupportDirectory}
+        onContinue={() => setRoute('review')}
+      />
+    );
+  }
+
   if (route === 'review') {
     return (
       <DshReviewOrderScreen
@@ -604,6 +810,22 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
 
   if (route === 'success') {
     return <DshOrderSuccessState onNext={() => setRoute('tracking')} />;
+  }
+
+  if (route === 'support-directory') {
+    return <DshClientSupportDirectoryScreen onOpenScreen={openSupportScreen} />;
+  }
+
+  if (route === 'support-screen') {
+    const SelectedSupportScreen = clientSupportScreenRegistry[selectedSupportScreen];
+
+    return (
+      <SelectedSupportScreen
+        onPrimaryAction={() => handleSupportPrimaryAction(selectedSupportScreen)}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('support-screen')}
+      />
+    );
   }
 
   if (route === 'orders') {
@@ -622,7 +844,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
       <DshTrackingScreen
         currentStatusLabel="On route"
         timeline={trackingTimeline}
-        onSupport={() => setRoute('orders')}
+        onSupport={openSupportDirectory}
         onRetry={() => setRoute('tracking')}
         onNextAction={() => setRoute('orders')}
       />

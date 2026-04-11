@@ -12,7 +12,7 @@ import {
 
 export type PartnerOrdersInboxScreenState = 'ready' | 'loading' | 'empty' | 'error';
 
-export const PARTNER_ORDERS_INBOX_FILTERS_DECISION = 'deferred';
+export const PARTNER_ORDERS_INBOX_FILTERS_DECISION = 'not needed';
 
 export type PartnerOrdersInboxListItem = {
   id: string;
@@ -73,7 +73,7 @@ function renderEmptyState(onRetry?: () => void) {
     <BthStateView
       stateId="empty"
       title="No partner orders waiting"
-      description="New work lands here. Filters are deferred until operators have a real queue to triage."
+      description="New work lands here. Keep the queue compact and move straight to the next order when it appears."
       actionLabel={onRetry ? 'Refresh inbox' : undefined}
       onActionPress={onRetry}
     />
@@ -127,7 +127,7 @@ export function PartnerOrdersInboxScreen({
       <BthBox gap={2}>
         <BthText role="titleLg">Partner orders inbox</BthText>
         <BthText role="bodySm" tone="muted">
-          Task-first queue for the next operational decision. Filters are {PARTNER_ORDERS_INBOX_FILTERS_DECISION} in this wave to keep the next order obvious.
+          Task-first queue for the next operational decision. The next order stays obvious without extra filters in this wave.
         </BthText>
       </BthBox>
 

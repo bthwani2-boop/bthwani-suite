@@ -141,7 +141,7 @@
         "zoneSetLabel": "Zone set",
         "zoneSetDescription": "Planned guardrails for the next DSH delivery scope.",
         "sheinProxyLabel": "SheinProxy",
-        "sheinProxyDescription": "A planned proxy lane kept for the next expansion.",
+        "sheinProxyDescription": "A live proxy lane for DSH request mediation and next-step decisions.",
         "openHubAction": "Open DSH hub",
         "openRouteAction": "Open route",
         "openOrdersAction": "Open orders",

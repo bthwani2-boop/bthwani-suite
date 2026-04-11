@@ -1,5 +1,3 @@
-import type { DshControlPanelText } from '@bthwani/ui-kit';
-
 export type DshZoneSetLane = {
   zoneLabel: string;
   feeLabel: string;
@@ -23,14 +21,32 @@ export type DshZoneSetSummary = {
   reviewZones: number;
 };
 
-export function getDshZoneSetSummary(text: DshControlPanelText): DshZoneSetSummary {
+type DshZoneSetTextSource = {
+  fixtures: {
+    zoneSet: {
+      summary: DshZoneSetSummary;
+      policies: ReadonlyArray<DshZoneSetPolicy>;
+      lanes: ReadonlyArray<{
+        zoneLabel: string;
+        feeLabel: string;
+        etaLabel: string;
+        statusLabel: string;
+        recommendationLabel: string;
+        note: string;
+        tone: string;
+      }>;
+    };
+  };
+};
+
+export function getDshZoneSetSummary(text: DshZoneSetTextSource): DshZoneSetSummary {
   return text.fixtures.zoneSet.summary;
 }
 
-export function getDshZoneSetPolicies(text: DshControlPanelText): ReadonlyArray<DshZoneSetPolicy> {
+export function getDshZoneSetPolicies(text: DshZoneSetTextSource): ReadonlyArray<DshZoneSetPolicy> {
   return text.fixtures.zoneSet.policies;
 }
 
-export function getDshZoneSetLanes(text: DshControlPanelText): ReadonlyArray<DshZoneSetLane> {
-  return text.fixtures.zoneSet.lanes;
+export function getDshZoneSetLanes(text: DshZoneSetTextSource): ReadonlyArray<DshZoneSetLane> {
+  return text.fixtures.zoneSet.lanes as ReadonlyArray<DshZoneSetLane>;
 }

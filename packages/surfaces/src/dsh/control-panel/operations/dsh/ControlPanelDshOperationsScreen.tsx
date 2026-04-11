@@ -42,26 +42,6 @@ type DshWorkbench = {
   liveHref?: string;
 };
 
-function getWorkbenchText(text: ReturnType<typeof useDshControlPanelText>, workbenchId: DshWorkbenchId) {
-  if (workbenchId === 'peak-mode') {
-    return text.hub.workbenches.peakMode;
-  }
-
-  if (workbenchId === 'zone-set') {
-    return text.hub.workbenches.zoneSet;
-  }
-
-  if (workbenchId === 'arrival-bell') {
-    return text.hub.workbenches.arrivalBell;
-  }
-
-  if (workbenchId === 'sheinproxy') {
-    return text.hub.workbenches.sheinProxy;
-  }
-
-  return text.hub.workbenches[workbenchId];
-}
-
 function buildTopFilterItems(text: ReturnType<typeof useDshControlPanelText>) {
   return [
     { id: 'today', label: text.hub.topFilters.today },
@@ -195,8 +175,24 @@ function resolveWorkbenchTitle(text: ReturnType<typeof useDshControlPanelText>, 
   return workbench.id === 'overview' ? text.hub.rootTitle : workbench.label;
 }
 
-function resolveWorkbenchSubtitle(text: ReturnType<typeof useDshControlPanelText>, workbench: DshWorkbench, filterLabel: string) {
-  return formatDshWorkbenchSubtitle(text, workbench.description, filterLabel);
+function resolveWorkbenchSubtitle(workbench: DshWorkbench, filterLabel: string, locale: 'ar' | 'en') {
+  return formatDshWorkbenchSubtitle(workbench.description, filterLabel, locale);
+}
+
+function resolveWorkbenchActionLabel(text: ReturnType<typeof useDshControlPanelText>, workbenchId: DshWorkbenchId) {
+  if (workbenchId === 'orders') {
+    return text.hub.actions.openOrders;
+  }
+
+  if (workbenchId === 'arrival-bell') {
+    return text.hub.actions.openArrivalBell;
+  }
+
+  if (workbenchId === 'reassign') {
+    return text.hub.actions.openReassign;
+  }
+
+  return text.hub.actions.openPeakMode;
 }
 
 function renderStateView(
@@ -238,6 +234,7 @@ export function ControlPanelDshOperationsScreen({
   const activeWorkbench = dshWorkbenches.find((item) => item.id === activeWorkbenchId) ?? dshWorkbenches[0];
   const activeFilter = topFilterItems.find((item) => item.id === activeFilterId) ?? topFilterItems[0];
   const plannedWorkbenchCount = dshWorkbenches.filter((item) => !item.liveHref && item.id !== 'overview').length;
+  const liveWorkbenchActions = dshWorkbenches.filter((item) => Boolean(item.liveHref));
   const topFilters = topFilterItems.map((item) => ({
     ...item,
     active: item.id === activeFilterId,
@@ -252,10 +249,7 @@ export function ControlPanelDshOperationsScreen({
   const readyForSelection = state === 'ready';
 
   const heroTitle = resolveWorkbenchTitle(dshText, activeWorkbench);
-  const heroSubtitle = resolveWorkbenchSubtitle(dshText, activeWorkbench, activeFilter.label);
-  const sheinProxyActionLabel = 'openSheinProxy' in dshText.common
-    ? dshText.common.openSheinProxy
-    : dshText.hub.actions.openPeakMode;
+  const heroSubtitle = resolveWorkbenchSubtitle(activeWorkbench, activeFilter.label, language as 'ar' | 'en');
 
   const handleTopFilterSelect = (filterId: string) => {
     const matchedFilter = topFilterItems.find((item) => item.id === filterId);
@@ -357,6 +351,24 @@ export function ControlPanelDshOperationsScreen({
       </div>
 
       <BthWebSectionCard
+        title={dshText.hub.quickActionsTitle}
+        description={dshText.hub.quickActionsDescription}
+      >
+        <div className={styles.actionRow} dir={direction}>
+          {liveWorkbenchActions.map((workbench) => (
+            <BthButton
+              key={workbench.id}
+              label={resolveWorkbenchActionLabel(dshText, workbench.id)}
+              tone={workbench.id === 'orders' ? 'primary' : 'secondary'}
+              size="sm"
+              fullWidth={false}
+              onPress={() => router.push(workbench.liveHref!)}
+            />
+          ))}
+        </div>
+      </BthWebSectionCard>
+
+      <BthWebSectionCard
         title={dshText.hub.workbenchesTitle}
         description={dshText.hub.workbenchesDescription}
       >
@@ -384,17 +396,7 @@ export function ControlPanelDshOperationsScreen({
                 </BthText>
                 {workbench.liveHref ? (
                   <BthButton
-                    label={
-                      workbench.id === 'orders'
-                        ? dshText.hub.actions.openOrders
-                        : workbench.id === 'sheinproxy'
-                          ? sheinProxyActionLabel
-                        : workbench.id === 'arrival-bell'
-                          ? dshText.hub.actions.openArrivalBell
-                          : workbench.id === 'reassign'
-                            ? dshText.hub.actions.openReassign
-                            : dshText.hub.actions.openPeakMode
-                    }
+                    label={resolveWorkbenchActionLabel(dshText, workbench.id)}
                     tone="primary"
                     size="sm"
                     fullWidth={false}

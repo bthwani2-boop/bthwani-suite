@@ -361,13 +361,13 @@ export function DshHomeScreen({
           subtitle="Expose one dominant next action with one fallback path."
         />
         <BthBox layoutDirection="row" gap={2}>
-          <BthButton label="Open discovery" tone="ghost" onPress={onOpenDiscovery} />
+          <BthButton label="توصيل DSH" tone="ghost" onPress={onOpenDiscovery} />
           <BthButton label="Continue order" tone="secondary" onPress={onContinueOrder} />
           <BthButton label="Track active order" onPress={onOpenTracking} />
         </BthBox>
         <BthButton label="Search" tone="ghost" onPress={onOpenSearch} />
         <BthText role="caption" tone="muted">
-          This home is UI/UX/Flow only. API, binding, and runtime wiring remain deferred.
+          This home keeps the flow focused on discovery and routing. API and binding live outside this surface.
         </BthText>
       </BthSurface>
     </BthMobileScrollView>

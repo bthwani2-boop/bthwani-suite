@@ -1,803 +1,5 @@
 import type { BthLocale } from './BthUiTextCatalog';
 
-const arDshControlPanelText = {
-  common: {
-    live: 'حي',
-    liveNow: 'مباشر',
-    planned: 'مخطط',
-    controlPanel: 'لوحة التحكم',
-    operations: 'العمليات',
-    operationsWorkspace: 'مساحة العمليات',
-    openOperationsWorkspace: 'افتح مساحة العمليات',
-    openGeneralOperations: 'افتح العمليات العامة',
-    backToHub: 'العودة إلى مركز DSH',
-    openOrders: 'افتح الطلبات',
-    openSupport: 'فتح الدعم',
-    safePath: 'المسار الآمن',
-    visibleUpdate: 'آخر تحديث مرئي',
-    openSheinProxy: 'افتح وسيط شي إن',
-    language: 'اللغة',
-    period: 'الفترة',
-    activeAlerts: 'التنبيهات النشطة',
-    currentPath: 'المسار الحالي',
-    safeExit: 'الخروج الآمن',
-    routeGuard: 'حارس المسار',
-    routeGuardDescription: 'لا يُفتح أي مسار فرعي قبل تثبيته، لذلك يبقى الخروج الحي الوحيد واضحًا وآمنًا.',
-    arChip: 'AR',
-    enChip: 'EN'
-  },
-  hub: {
-    topFilters: {
-      today: 'اليوم',
-      queue: 'الطابور',
-      peak: 'الذروة'
-    },
-    rootEyebrow: 'الهبوط الرئيسي',
-    rootTitle: 'مركز تشغيل DSH',
-    unavailableTitle: 'السطح غير جاهز بعد لكن مسار الرجوع الآمن يبقى واضحًا.',
-    workbenchesTitle: 'مساحات DSH',
-    workbenchesDescription: 'المسارات الحية تفتح مباشرة، أما المسارات المخططة فتظل مرئية فقط حتى لا يظهر أي وعد ناقص في العربية أو الإنجليزية.',
-    selectedScopeTitle: 'المجال المختار',
-    selectedScopeDescription: 'التبديل داخل هذا المركز يغيّر القراءة فقط أو ينقلك إلى المسار الحي عندما يكون متاحًا.',
-    plannedRoutesTitle: 'المسارات المخططة',
-    plannedRoutesDescription: 'تبقى مرئية حتى لا يضيع الامتداد القادم، لكنها لا تتصرف كروابط حية قبل الجاهزية.',
-    safeTransitionTitle: 'الانتقال الآمن',
-    safeTransitionDescription: 'الرجوع إلى العمليات العامة يبقى الخروج الحي الثابت من هذا السطح.',
-    activeAlertsDescription: 'مؤشر مرئي بسيط يحافظ على تغذية راجعة واضحة دون حالة تشغيل محلية أو موازية.',
-    railTitle: 'DSH',
-    railStatusReady: 'المرحلة الأولى',
-    heroDescriptionOverview: 'لقطة أولى للحالة والانتقالات الآمنة قبل الدخول في أي مسار فرعي.',
-    heroDescriptionOrders: 'الطابور المركزي للطلبات والتفاصيل المرتبطة بها.',
-    heroDescriptionReassign: 'تحويل الطلبات بين الموارد المتاحة بدون كسر المسار الحالي.',
-    heroDescriptionPeakMode: 'تشغيل مرن عندما ترتفع الحركة وتحتاج سعة إضافية.',
-    heroDescriptionZoneSet: 'تقييد النطاقات وتشغيلها بوضوح تشغيلي أعلى.',
-    heroDescriptionSheinProxy: 'مسار الوساطة والطلبات الخاصة بعرض وسيط DSH.',
-    heroDescriptionArrivalBell: 'إعدادات الوصول والتنبيهات الحية عند الاقتراب من التسليم.',
-    stateLoadingTitle: 'جار تجهيز سطح DSH',
-    stateLoadingDescription: 'الهيكل مرئي الآن، وسيبقى المسار محفوظًا حتى تكتمل البيانات أو الروابط التالية.',
-    stateEmptyTitle: 'لا توجد عناصر مفعلة بعد',
-    stateEmptyDescription: 'هذا المسار ما يزال في الوضع الأساسي، ويمكنك الرجوع إلى العمليات العامة أو إعادة البناء في خطوة لاحقة.',
-    stateOfflineTitle: 'الاتصال غير متاح مؤقتًا',
-    stateOfflineDescription: 'السطح يبقى واضحًا، لكن تفعيل المسارات الفرعية مؤجل حتى تعود الشبكة أو يكتمل الربط.',
-    stateDisabledTitle: 'المسار غير مفعّل بعد',
-    stateDisabledDescription: 'هذا الهبوط محفوظ كجزء من الخطة المرحلية لكنه لا يفتح المسارات الفرعية قبل خطوة الربط التالية.',
-    stateErrorTitle: 'تعذر تحميل سطح DSH',
-    stateErrorDescription: 'يمكنك العودة إلى المسار الآمن أو إعادة المحاولة بعد تثبيت البيئة الحالية.',
-    workbenches: {
-      overview: {
-        label: 'نظرة عامة على DSH',
-        description: 'لقطة أولى للحالة والانتقالات الآمنة قبل الدخول في أي مسار فرعي.',
-        routeHint: '/operations/dsh',
-    newDescription: 'طلبات دخلت الطابور وتحتاج قرارًا أوليًا سريعًا.',
-    reviewTitle: 'تحت المراجعة',
-    reviewDescription: 'طلبات تحتاج قراءة أعمق قبل أي تحويل أو تصعيد.',
-    listTitle: 'قائمة الطلبات',
-    listDescription: 'كل صف يلخص الطلب، وجهته، حالته، والوقت المقدر للتنفيذ. الضغط عليه يفتح صفحة التفاصيل الحية.',
-    openDetail: 'افتح التفاصيل',
-    etaPrefix: 'المتوقع:'
-  },
-  sheinProxy: {
-    pageEyebrow: 'DSH / العمليات / وسيط شي إن',
-    pageTitle: 'وسيط شي إن',
-    pageDescription: 'طابور مضغوط لمراجعة الطلبات الوسيطة والتسعير والخطوة التالية بدون وعد تنفيذي مخفي.',
-    unavailableDescription: 'المسار يبقى واضحًا حتى عندما تكون الطلبات متوقفة أو غير جاهزة.',
-    heroEyebrow: 'طابور وساطة',
-    heroTitle: 'طلبات وسيط شي إن',
-    heroDescription: 'هذا السطح يجعل الطلبات الوسيطة مقروءة ويقترح الخطوة التشغيلية التالية بدون التظاهر بتعديل الحالة مباشرة.',
-    stateLoadingTitle: 'جار تجهيز طابور الوساطة',
-    stateLoadingDescription: 'المسار حي، وتظهر قائمة الطلبات بعد اكتمال تحميل هذه الحزمة من البيانات.',
-    stateEmptyTitle: 'لا توجد طلبات وسيط الآن',
-    stateEmptyDescription: 'الطابور جاهز، لكن لا توجد طلبات نشطة تحتاج مراجعة في هذه اللحظة.',
-    stateOfflineTitle: 'الاتصال غير متاح',
-    stateOfflineDescription: 'الطابور يعود عند استعادة الاتصال بينما يظل المسار الحالي واضحًا.',
-    stateDisabledTitle: 'طابور الوساطة غير مفعّل بعد',
-    stateDisabledDescription: 'هذا السطح جاهز بصريًا، لكن عمليات الوساطة الأعمق مؤجلة إلى خطوة لاحقة.',
-    stateErrorTitle: 'تعذر تحميل طابور الوساطة',
-    stateErrorDescription: 'يمكنك العودة إلى المركز أو إعادة المحاولة من نفس المسار.',
-    signals: {
-      pending: 'قيد المراجعة',
-      pendingDescription: 'طلبات تنتظر قرارًا أوليًا.',
-      estimated: 'مقدّرة',
-      estimatedDescription: 'طلبات جاهزة بتقدير سعري مرئي.',
-      offered: 'تم إرسال العرض',
-      offeredDescription: 'طلبات تنتظر رد العميل على العرض.',
-      protectedZonesDescription: 'المناطق التي تحتاج قرار حدودي أو مراقبة أقرب.',
-      freeDeliveryZones: 'مناطق التسليم الحر',
-      freeDeliveryZonesDescription: 'مساحة تسليم ظاهرة يمكنها استيعاب النشاط عند الحاجة.'
-    },
-    policiesTitle: 'سياسات ضبط المناطق',
-    policiesDescription: 'هذه القواعد تحدد أين يتوقف هذا السطح: قراءة وسياسة فقط، من دون أي تعديل مخفي.',
-    lanesTitle: 'مناطق الحدود',
-    lanesDescription: 'كل بطاقة تمنح قراءة سريعة للحمل والسعة والتوصية من دون الادعاء بوجود تفعيل مباشر هنا.'
-  },
-  sheinProxyRequest: {
-    pageEyebrow: 'DSH / العمليات / وسيط شي إن / الطلب',
-    pageTitlePrefix: 'تفاصيل الطلب',
-    pageDescription: 'عرض مضغوط للطلب الوسيط الحالي مع مسار واضح نحو التقدير والعرض والجدولة.',
-    unavailableDescription: 'المسار يبقى واضحًا حتى عندما تكون تفاصيل الطلب غير جاهزة.',
-    heroEyebrow: 'طلب وسيط',
-    identityTitle: 'هوية الطلب',
-    identityDescription: 'البيانات الأساسية التي تثبت الطلب الحالي قبل الانتقال إلى الخطوة التالية.',
-    pricingDescription: 'تفصيل القيمة والشحن والرسوم مع الإجمالي المرئي في مكان واحد.',
-    timelineDescription: 'الخط الزمني يوضح أين يقف الطلب الآن وما الخطوة القادمة الأقرب.',
-    nextStepTitle: 'الخطوة التالية',
-    nextStepDescription: 'السطح يقترح الإجراء التالي بناءً على مرحلة الطلب الحالية.',
-    stateLoadingTitle: 'جار تحميل تفاصيل الطلب',
-    stateLoadingDescription: 'المسار حي، وتظهر تفاصيل الطلب بعد اكتمال تحميل هذه القطعة من البيانات.',
-    stateEmptyTitle: 'الطلب غير موجود',
-    stateEmptyDescription: 'المعرف المطلوب لا يطابق أي طلب حاضر في هذا الطابور.',
-    stateOfflineTitle: 'الاتصال غير متاح',
-    stateOfflineDescription: 'تفاصيل الطلب ستعود عند استعادة الاتصال مع بقاء المسار الحالي واضحًا.',
-    stateDisabledTitle: 'تفاصيل الطلب غير مفعلة بعد',
-    stateDisabledDescription: 'هذا السطح جاهز بصريًا، لكن تفعيل الخطوات الأعمق مؤجل إلى مرحلة لاحقة.',
-    stateErrorTitle: 'تعذر تحميل تفاصيل الطلب',
-    stateErrorDescription: 'يمكنك العودة إلى الطابور أو إعادة المحاولة من نفس المسار.',
-    stageLabels: {
-      detail: 'التفاصيل',
-      estimate: 'التقدير',
-      offer: 'العرض',
-      schedule: 'الجدولة'
-    },
-    stageDescriptions: {
-      detail: 'مراجعة هوية الطلب ومحتواه الأساسي.',
-      estimate: 'فحص التقدير قبل إرسال العرض.',
-      offer: 'العرض أُرسل وينتظر القرار.',
-      schedule: 'تثبيت نافذة الاستلام أو التسليم.'
-    },
-    statusLabels: {
-      underReview: 'قيد المراجعة',
-      estimated: 'مقدّرة',
-      offered: 'تم إرسال العرض',
-      scheduled: 'مجدولة',
-      approved: 'معتمدة',
-      cancelled: 'ملغاة'
-    },
-    nextActionLabels: {
-      underReview: 'افتح التقدير',
-      estimated: 'أرسل العرض',
-      offered: 'انتظر رد العميل',
-      scheduled: 'تحقق من نافذة الاستلام',
-      approved: 'جهّز التسليم',
-      cancelled: 'راجع الإلغاء'
-    },
-    requestLabel: 'الطلب',
-    customerLabel: 'العميل',
-    productLabel: 'المنتج',
-    quantityLabel: 'الكمية',
-    statusLabel: 'الحالة',
-    amountLabel: 'القيمة',
-    shippingLabel: 'الشحن',
-    serviceFeeLabel: 'رسوم الخدمة',
-    totalLabel: 'الإجمالي',
-    updatedLabel: 'آخر تحديث',
-    nextActionLabel: 'الخطوة التالية',
-    pricingTitle: 'تفصيل التسعير',
-    noteLabel: 'ملاحظة تشغيلية',
-    retryLabel: 'إعادة المحاولة',
-    backToList: 'العودة إلى القائمة',
-    openHub: 'العودة إلى المركز',
-    openOperations: 'افتح العمليات',
-    openSupport: 'افتح الدعم',
-    openDetail: 'افتح التفاصيل',
-    openEstimate: 'افتح التقدير',
-    openOffer: 'افتح العرض',
-    openSchedule: 'افتح الجدولة'
-  },  orderDetail: {
-    pageEyebrow: 'DSH / العمليات / الطلبات / التفاصيل',
-    pageTitlePrefix: 'تفاصيل',
-    pageDescription: 'هوية الطلب، التسلسل التشغيلي، وقرار الإجراء التالي ضمن بنية أكثر ضغطًا وأقل تكرارًا.',
-    unavailableDescription: 'السطح يحتفظ بخروج واضح إلى قائمة الطلبات حتى عند غياب البيانات أو توقفها.',
-    heroEyebrow: 'تفاصيل تشغيلية',
-    backToOrders: 'العودة إلى الطلبات',
-    stateLoadingTitlePrefix: 'جار تحميل الطلب',
-    stateLoadingDescription: 'المسار حي، وتبقى تفاصيل الطلب مرئية بمجرد اكتمال التحميل أو إعادة المحاولة.',
-    stateEmptyTitlePrefix: 'الطلب',
-    stateEmptyTitleSuffix: 'غير موجود',
-    stateEmptyDescription: 'المعرف المطلوب غير موجود ضمن الطابور الحالي، ويمكن العودة إلى قائمة الطلبات بدون فقدان الاتجاه.',
-    stateOfflineTitle: 'الاتصال غير متاح',
-    stateOfflineDescription: 'تفاصيل الطلب ستعود بعد استعادة الاتصال، مع بقاء المسار الحالي معروفًا وآمنًا.',
-    stateDisabledTitle: 'التفاصيل غير مفعلة بعد',
-    stateDisabledDescription: 'هذا السطح جاهز بصريًا لكن بعض إجراءات التنفيذ التفصيلية مؤجلة إلى خطوة لاحقة.',
-    stateErrorTitle: 'تعذر تحميل تفاصيل الطلب',
-    stateErrorDescription: 'يمكنك الرجوع إلى قائمة الطلبات أو إعادة المحاولة من نفس المسار.',
-    signals: {
-      status: 'الحالة',
-      statusDescription: 'الوضع الحالي لهذا الطلب داخل الطابور التشغيلي.',
-      destination: 'الوجهة',
-      destinationDescription: 'نقطة التسليم المرجعية لهذا الطلب.',
-      eta: 'الوقت المتوقع',
-      etaDescription: 'الوقت التقديري الحالي حتى إتمام التسليم أو المعالجة.',
-      amount: 'القيمة',
-      amountDescription: 'القيمة الحالية كما تظهر في هذا العرض البصري.'
-    },
-    identityTitle: 'هوية الطلب',
-    identityDescription: 'ملخص ثابت وواضح للمعرف والمسار والملاحظات التشغيلية الأساسية.',
-    routeLabel: 'المسار',
-    finalDestinationLabel: 'الوجهة النهائية',
-    noteLabel: 'ملاحظة تشغيلية',
-    arrivalTitle: 'تسلسل الوصول',
-    arrivalDescription: 'يوضح الوصول، الرن، الإقرار، وسبب المنع الحالي إن وجد.',
-    arrivedLabel: 'الوصول',
-    ringLogLabel: 'سجل الرن',
-    acknowledgementLabel: 'إقرار العميل',
-    cooldownLabel: 'التبريد وسبب المنع',
-    noArrivalData: 'لا توجد بيانات وصول بعد',
-    noRingsYet: 'لا توجد محاولات حتى الآن',
-    noAcknowledgementYet: 'لم يصل أي إقرار بعد',
-    unavailable: 'غير متاح',
-    noCurrentBlock: 'لا يوجد منع حالي',
-    ringAttempts: 'محاولات',
-    openArrivalBellWorkspace: 'افتح مساحة جرس الوصول',
-    decisionTitle: 'قرار التشغيل',
-    decisionDescription: 'ما هو الإجراء الأساسي الآن، وما البدائل المقبولة داخل هذا المسار.',
-    primaryActionLabel: 'الإجراء الأساسي',
-    secondaryActionLabel: 'الإجراء الثانوي',
-    supportPathLabel: 'مسار الدعم',
-    openReassignWorkspace: 'افتح مساحة إعادة التوزيع'
-  },
-  sheinProxyRequestLegacy: {
-    pageEyebrow: 'DSH / operations / sheinproxy / request',
-    pageTitlePrefix: 'Request details',
-    pageDescription: 'A compact view of the current proxy request with a clear path to estimate, offer, and schedule.',
-    unavailableDescription: 'The route stays explicit even when request details are not ready.',
-    heroEyebrow: 'Proxy request',
-    identityTitle: 'Request identity',
-    identityDescription: 'The core data that anchors the current request before moving to the next step.',
-    pricingDescription: 'A single place for amount, shipping, fee, and the visible total.',
-    timelineDescription: 'The timeline shows where the request is now and what the closest next step is.',
-    nextStepTitle: 'Next step',
-    nextStepDescription: 'The surface suggests the next action based on the request stage.',
-    stateLoadingTitle: 'Loading request details',
-    stateLoadingDescription: 'The route is live, and the request details appear once this data slice loads.',
-    stateEmptyTitle: 'Request not found',
-    stateEmptyDescription: 'The requested id does not match a request currently in this queue.',
-    stateOfflineTitle: 'Connection unavailable',
-    stateOfflineDescription: 'Request details will return when connectivity is restored while the path remains explicit.',
-    stateDisabledTitle: 'Request details are not enabled yet',
-    stateDisabledDescription: 'This surface is visually ready, but deeper request actions are deferred to a later slice.',
-    stateErrorTitle: 'Unable to load request details',
-    stateErrorDescription: 'You can return to the queue or retry from the same path.',
-    stageLabels: {
-      detail: 'Detail',
-      estimate: 'Estimate',
-      offer: 'Offer',
-      schedule: 'Schedule'
-    },
-    stageDescriptions: {
-      detail: 'Review the request identity and core details.',
-      estimate: 'Check the estimate before sending the offer.',
-      offer: 'The offer is out and waiting for a decision.',
-      schedule: 'Lock the pickup or delivery window.'
-    },
-    statusLabels: {
-      underReview: 'Under review',
-      estimated: 'Estimated',
-      offered: 'Offer sent',
-      scheduled: 'Scheduled',
-      approved: 'Approved',
-      cancelled: 'Cancelled'
-    },
-    nextActionLabels: {
-      underReview: 'Open estimate',
-      estimated: 'Send offer',
-      offered: 'Await customer response',
-      scheduled: 'Check pickup window',
-      approved: 'Prepare handoff',
-      cancelled: 'Review cancellation'
-    },
-    requestLabel: 'Request',
-    customerLabel: 'Customer',
-    productLabel: 'Product',
-    quantityLabel: 'Quantity',
-    statusLabel: 'Status',
-    amountLabel: 'Amount',
-    shippingLabel: 'Shipping',
-    serviceFeeLabel: 'Service fee',
-    totalLabel: 'Total',
-    updatedLabel: 'Updated',
-    nextActionLabel: 'Next action',
-    pricingTitle: 'Pricing breakdown',
-    noteLabel: 'Operational note',
-    retryLabel: 'Retry',
-    backToList: 'Back to list',
-    openHub: 'Back to hub',
-    openOperations: 'Open operations',
-    openSupport: 'Open support',
-    openDetail: 'Open detail',
-    openEstimate: 'Open estimate',
-    openOffer: 'Open offer',
-    openSchedule: 'Open schedule'
-  },  reassign: {
-    pageEyebrow: 'DSH / العمليات / إعادة التوزيع',
-    pageTitle: 'إعادة التوزيع',
-    pageDescription: 'قراءة قرار النقل بشكل مضغوط وواضح بدون إدخال إجراء إرسال تشغيلي كاذب.',
-    unavailableDescription: 'المسار يبقى واضحًا حتى لو غابت الحالات أو توقفت البيانات.',
-    heroEyebrow: 'قرار تشغيلي',
-    heroTitle: 'مساحة إعادة التوزيع',
-    heroDescription: 'هذا السطح يرفع وضوح القرار: من يحتاج نقلًا، ولماذا، وما البديل المقترح، مع إبقاء التنفيذ الفعلي خارج هذا العرض.',
-    stateLoadingTitle: 'جار تجهيز سطح إعادة التوزيع',
-    stateLoadingDescription: 'المسار حي، وسيظهر القرار والمرشحون بمجرد اكتمال هذه المرحلة.',
-    stateEmptyTitle: 'لا توجد حالات لإعادة التوزيع',
-    stateEmptyDescription: 'الطابور الحالي لا يحتوي على قرارات نقل نشطة في هذه اللحظة.',
-    stateOfflineTitle: 'الاتصال غير متاح',
-    stateOfflineDescription: 'المسار محفوظ، لكن حالات إعادة التوزيع لن تتحدّث حتى يعود الاتصال.',
-    stateDisabledTitle: 'إعادة التوزيع غير مفعلة بالكامل',
-    stateDisabledDescription: 'هذا العرض يثبّت القراءة والقرار فقط، بينما التنفيذ الفعلي مؤجل إلى خطوة لاحقة.',
-    stateErrorTitle: 'تعذر تحميل سطح إعادة التوزيع',
-    stateErrorDescription: 'يمكنك الرجوع إلى المركز أو إعادة المحاولة من نفس المسار.',
-    signals: {
-      active: 'الحالات النشطة',
-      activeDescription: 'طلبات لديها ضغط تشغيلي أو مرشح نقل واضح.',
-      urgent: 'الحالات العاجلة',
-      urgentDescription: 'تحتاج قرارًا سريعًا قبل أن تتحول إلى تأخر أو تصعيد.',
-      blocked: 'الحالات المحجوبة',
-      blockedDescription: 'تحتاج مساحة تشغيل أوسع أو دعمًا قبل أي خطوة أخرى.',
-      fallbacks: 'بدائل جاهزة',
-      fallbacksDescription: 'كباتن أو مسارات احتياطية متاحة بصريًا في هذا العرض.'
-    },
-    candidatesTitle: 'المرشحون لإعادة التوزيع',
-    candidatesDescription: 'كل بطاقة تعرض رقم التسليم والطلب المرتبط والسبب والأولوية والبديل المقترح بدون التظاهر بوجود تنفيذ تشغيلي فعلي.',
-    currentCaptainLabel: 'الحالي',
-    fallbackCaptainLabel: 'البديل',
-    decisionTitle: 'منطق القرار',
-    decisionDescription: 'الهدف هنا ليس التنفيذ، بل ترتيب القرار: متى تعود إلى مساحة العمليات، ومتى تراجع الطلب، ومتى تصعّد الحالة.',
-    primaryDecisionTitle: 'الإجراء الأساسي',
-    primaryDecisionLabel: 'افتح مساحة العمليات',
-    primaryDecisionDescription: 'العقد يطلب بوضوح أن يكون فتح مساحة العمليات هو الخروج الرئيسي بعد قراءة القرار.',
-    secondaryDecisionTitle: 'الإجراء الثانوي',
-    secondaryDecisionLabel: 'ارجع إلى الطلبات',
-    secondaryDecisionDescription: 'الرجوع إلى الطابور مناسب عندما تريد مقارنة أكثر من حالة قبل اعتماد أي نقل.',
-    supportDecisionTitle: 'مسار الدعم',
-    supportDecisionLabel: 'صعّد المحجوب فقط',
-    supportDecisionDescription: 'التصعيد يبقى للحالات المعطلة أو غير القابلة للحسم من هذا السطح.'
-  },
-  peakMode: {
-    pageEyebrow: 'DSH / العمليات / وضع الذروة',
-    pageTitle: 'وضع الذروة',
-    pageDescription: 'مناطق الضغط والسياسات مع بنية أكثر ضغطًا وبدون زر تشغيل كاذب.',
-    unavailableDescription: 'السطح يحافظ على مسار قرار واضح حتى عند غياب البيانات أو توقفها.',
-    heroEyebrow: 'سعة تشغيلية',
-    heroTitle: 'مساحة وضع الذروة',
-    heroDescription: 'هذا السطح يعرض أين يكون توسيع السعة منطقيًا وأين يجب منعه، مع الحفاظ على فتح مساحة العمليات كقرار رئيسي وفق العقد.',
-    stateLoadingTitle: 'جار تجهيز وضع الذروة',
-    stateLoadingDescription: 'المسار حي، وستظهر سياسات السعة ومناطق الضغط بعد اكتمال هذه المرحلة.',
-    stateEmptyTitle: 'لا توجد ضغوط تتطلب وضع الذروة الآن',
-    stateEmptyDescription: 'الوضع مستقر حاليًا ولا توجد مناطق مرشحة لتوسيع السعة في هذه اللحظة.',
-    stateOfflineTitle: 'الاتصال غير متاح',
-    stateOfflineDescription: 'يبقى المسار محفوظًا لكن قراءات الضغط والسعة لن تتحدّث حتى يعود الاتصال.',
-    stateDisabledTitle: 'وضع الذروة غير مفعّل بالكامل',
-    stateDisabledDescription: 'هذا العرض يثبت القراءة والسياسة فقط، بينما التنفيذ الفعلي خارج النطاق الحالي.',
-    stateErrorTitle: 'تعذر تحميل وضع الذروة',
-    stateErrorDescription: 'يمكنك الرجوع إلى المركز أو إعادة المحاولة من نفس المسار.',
-    signals: {
-      activeZones: 'المناطق النشطة',
-      activeZonesDescription: 'المناطق التي تُقاس ضمن هذا العرض.',
-      pressureZones: 'مناطق الضغط',
-      pressureZonesDescription: 'مناطق تحتاج قرارًا حول السعة أو مراقبة أقرب.',
-      flexCaptains: 'كباتن مرنون',
-      flexCaptainsDescription: 'احتياطي مرئي يمكنه امتصاص جزء من الضغط عند الحاجة.',
-      protectedQueues: 'طوابير محمية',
-      protectedQueuesDescription: 'حالات يجب ألّا يغطيها وضع الذروة بدل معالجة أصل المشكلة.'
-    },
-    policiesTitle: 'سياسات وضع الذروة',
-    policiesDescription: 'هذه القواعد توضح أين ينتهي هذا السطح: قراءة وسياسة، بلا تفعيل مباشر ولا تعديل مخفي.',
-    lanesTitle: 'مناطق الضغط',
-    lanesDescription: 'كل بطاقة تعطي قراءة سريعة للحمل والسعة والتوصية، بدون التظاهر بإمكانية التفعيل المباشر من هنا.'
-  },
-  arrivalBell: {
-    pageEyebrow: 'DSH / العمليات / جرس الوصول',
-    pageTitle: 'جرس الوصول',
-    pageDescription: 'حالات الوصول والرن ضمن قراءة أوضح وأكثر ضغطًا دون أي اتجاه محلي.',
-    unavailableDescription: 'المسار يظل واضحًا حتى عندما لا تكون البيانات جاهزة أو متاحة.',
-    heroEyebrow: 'مساحة تشغيلية',
-    heroTitle: 'مساحة جرس الوصول',
-    heroDescription: 'هذا السطح لا ينفذ إجراءات تشغيل مباشرة، لكنه يثبت القراءة التشغيلية الصحيحة ويعطي مسارًا حقيقيًا من مركز DSH إلى حالات الوصول والرن.',
-    stateLoadingTitle: 'جار تجهيز مساحة جرس الوصول',
-    stateLoadingDescription: 'الهيكل حاضر، وسيظهر صف الكابتن والعميل بوضوح بعد اكتمال هذه الخطوة.',
-    stateEmptyTitle: 'لا توجد حالات لجرس الوصول الآن',
-    stateEmptyDescription: 'المسار حي، لكن لا توجد حالات وصول أو رن تحتاج متابعة في هذه اللحظة.',
-    stateOfflineTitle: 'الاتصال غير متاح',
-    stateOfflineDescription: 'يبقى المسار واضحًا، لكن حالات الوصول والرن لا تُحدّث حتى يعود الاتصال.',
-    stateDisabledTitle: 'مسار جرس الوصول غير مفعّل بالكامل',
-    stateDisabledDescription: 'هذا العرض يثبّت القراءة والتنقل فقط، أما التنفيذ التفصيلي فيأتي لاحقًا.',
-    stateErrorTitle: 'تعذر تحميل جرس الوصول',
-    stateErrorDescription: 'يمكنك الرجوع إلى المركز أو إعادة المحاولة من نفس المسار بدون فقدان الاتجاه.',
-    signals: {
-      activeArrivals: 'الوصولات النشطة',
-      activeArrivalsDescription: 'حالات لديها حضور فعلي داخل مسار الوصول.',
-      awaitingAcknowledgement: 'بانتظار الإقرار',
-      awaitingAcknowledgementDescription: 'طلبات وصل فيها الكابتن لكن العميل لم يؤكد بعد.',
-      blockedRings: 'الرنات المحجوبة',
-      blockedRingsDescription: 'حالات تحت تبريد أو منع تشغيلي ولا يجب تحويلها إلى إجراء زائف.',
-      resolvedToday: 'مغلق اليوم',
-      resolvedTodayDescription: 'مؤشر مرئي فقط على الإغلاق اليومي داخل هذا العرض.'
-    },
-    captainLaneTitle: 'مسار الكابتن',
-    captainLaneDescription: 'يوضح من وصل، ومن رن، وما الحالات التي تتطلب قرار عمليات أوسع بدل تكرار المحاولة محليًا.',
-    customerLaneTitle: 'مسار العميل',
-    customerLaneDescription: 'يعرض الإقرار، وغياب الرد، والحالات التي يجب أن تعود إلى مساحة العمليات بدل دفع المستخدم إلى تفاصيل غير موجودة.'
-  },
-  fixtures: {
-    orders: {
-      rows: [
-        {
-          id: 'ORD-24018',
-          customer: 'عميل مباشر',
-          route: 'المخزن المركزي → حي النخيل',
-          amount: '62.00 SAR',
-          eta: '14 دقيقة',
-          statusLabel: 'جديد',
-          statusTone: 'brand',
-          createdLabel: '10:14 صباحًا',
-          destinationLabel: 'حي النخيل - شارع 4',
-          captainLabel: 'لم يعيّن بعد',
-          notes: 'طلب يحتاج فتح تعيين سريع من الطابور الأساسي.'
-        },
-        {
-          id: 'ORD-24019',
-          customer: 'عميل تجريبي',
-          route: 'المخزن الشرقي → شارع 12',
-          amount: '48.50 SAR',
-          eta: '22 دقيقة',
-          statusLabel: 'مؤكد',
-          statusTone: 'success',
-          createdLabel: '10:26 صباحًا',
-          destinationLabel: 'شارع 12 - برج الماسة',
-          captainLabel: 'كابتن سامر',
-          notes: 'الطلب مؤكد ويتحرك ضمن ETA طبيعي.'
-        },
-        {
-          id: 'ORD-24020',
-          customer: 'عميل استرداد',
-          route: 'المخزن الغربي → المنطقة الصناعية',
-          amount: '91.75 SAR',
-          eta: '31 دقيقة',
-          statusLabel: 'بحاجة مراجعة',
-          statusTone: 'warning',
-          createdLabel: '10:41 صباحًا',
-          destinationLabel: 'المنطقة الصناعية - بوابة 3',
-          captainLabel: 'قيد الفحص',
-          notes: 'العنوان واضح لكن الطلب يتطلب تأكيد قدرة الكابتن قبل الإسناد.'
-        },
-        {
-          id: 'ORD-24021',
-          customer: 'عميل VIP',
-          route: 'المركز الرئيس → الطريق الساحلي',
-          amount: '124.00 SAR',
-          eta: '41 دقيقة',
-          statusLabel: 'معلق',
-          statusTone: 'danger',
-          createdLabel: '10:55 صباحًا',
-          destinationLabel: 'الطريق الساحلي - بوابة المرسى',
-          captainLabel: 'تم إيقاف الإسناد',
-          notes: 'الطلب موقوف حتى مراجعة سبب التعليق والتصعيد التشغيلي.'
-        }
-      ],
-      arrivalTimelines: {
-        'ORD-24018': {
-          arrived: false,
-          arrivedLabel: 'لم يصل بعد',
-          ringCount: 0,
-          lastRingLabel: 'لا توجد رنة',
-          acknowledged: false,
-          acknowledgedLabel: 'لم يؤكد العميل بعد',
-          cooldownLabel: 'متاح الآن',
-          blockReason: 'لا يوجد منع حالي'
-        },
-        'ORD-24019': {
-          arrived: true,
-          arrivedLabel: 'وصل 10:42 صباحًا',
-          ringCount: 1,
-          lastRingLabel: 'آخر رنة 10:43 صباحًا',
-          acknowledged: true,
-          acknowledgedLabel: 'العميل أكد الوصول 10:44 صباحًا',
-          cooldownLabel: 'انتهى التبريد',
-          blockReason: 'لا يوجد منع حالي'
-        },
-        'ORD-24020': {
-          arrived: true,
-          arrivedLabel: 'وصل 10:58 صباحًا',
-          ringCount: 2,
-          lastRingLabel: 'آخر رنة 11:01 صباحًا',
-          acknowledged: false,
-          acknowledgedLabel: 'لا يوجد إقرار من العميل',
-          cooldownLabel: 'تبريد حتى 11:04 صباحًا',
-          blockReason: 'بانتظار مراجعة التشغيل قبل إعادة الرن'
-        },
-        'ORD-24021': {
-          arrived: false,
-          arrivedLabel: 'الوصول متوقف',
-          ringCount: 0,
-          lastRingLabel: 'معلّق',
-          acknowledged: false,
-          acknowledgedLabel: 'لا يوجد إقرار',
-          cooldownLabel: 'غير متاح',
-          blockReason: 'الطلب معلق ويتطلب تصعيدًا تشغيليًا قبل أي محاولة جديدة'
-        }
-      },
-      actionPlans: {
-        brand: {
-          primaryLabel: 'افتح مساحة العمليات',
-          primaryDescription: 'الطلب جديد ويحتاج دخولًا سريعًا إلى مساحة العمليات قبل تنفيذ أي إجراء أعمق.',
-          secondaryLabel: 'راجع طابور الطلبات',
-          secondaryDescription: 'الرجوع إلى القائمة مفيد لمقارنة هذا الطلب مع بقية الحالات المفتوحة.',
-          supportLabel: 'صعّد إلى الدعم',
-          supportDescription: 'يبقى الدعم مسارًا احتياطيًا إذا تعطل القرار أو تغيّرت المعطيات.'
-        },
-        warning: {
-          primaryLabel: 'افتح مساحة العمليات',
-          primaryDescription: 'هذه الحالة تحتاج قرار تشغيل واضح قبل إعادة الرن أو الاستمرار في الإسناد.',
-          secondaryLabel: 'ارجع إلى الطلبات للمقارنة',
-          secondaryDescription: 'يساعدك الرجوع إلى الطابور على قياس أولوية هذه المراجعة مقابل بقية الطلبات.',
-          supportLabel: 'حوّل إلى الدعم',
-          supportDescription: 'الدعم مناسب عندما تصبح المراجعة غير قابلة للحسم من داخل هذا السطح.'
-        },
-        danger: {
-          primaryLabel: 'افتح مساحة العمليات',
-          primaryDescription: 'الطلب معلق، وأفضل إجراء أولي هو العودة إلى مساحة العمليات الكاملة لقرار تشغيلي أوسع.',
-          secondaryLabel: 'افتح طابور الطلبات',
-          secondaryDescription: 'يوفر الرجوع إلى القائمة رؤية أشمل على الحالات الحرجة المجاورة.',
-          supportLabel: 'افتح الدعم فورًا',
-          supportDescription: 'التصعيد مناسب هنا لأنه يختصر الطريق عند استمرار التعليق أو غياب حل مباشر.'
-        },
-        defaultPlan: {
-          primaryLabel: 'افتح مساحة العمليات',
-          primaryDescription: 'الطلب مستقر نسبيًا، لكن السطح الحالي يوجهك إلى مساحة العمليات كإجراء رئيسي متوافق مع العقد.',
-          secondaryLabel: 'ارجع إلى قائمة الطلبات',
-          secondaryDescription: 'الرجوع إلى القائمة يسهّل متابعة الطابور والانتقال إلى طلب آخر عند الحاجة.',
-          supportLabel: 'افتح الدعم',
-          supportDescription: 'الدعم يبقى مسارًا ثانويًا عند وجود احتياج بشري أو تشغيلي خاص.'
-        }
-      }
-    },
-    peakMode: {
-      summary: {
-        activeZones: 5,
-        pressureZones: 2,
-        flexCaptains: 11,
-        protectedQueues: 3
-      },
-      policies: [
-        {
-          label: 'تعدد الطلبات',
-          statusLabel: 'مقترح فقط',
-          description: 'السطح الحالي يوضح أين يكون تفعيل السعة المنطقية مناسبًا، لكنه لا يبدّل حالة تشغيل فعلية.'
-        },
-        {
-          label: 'حماية الطوابير الحساسة',
-          statusLabel: 'محمي',
-          description: 'الطلبات الحرجة أو المحجوبة تبقى خارج أي توسيع سعة حتى لا يتحول وضع الذروة إلى إخفاء للمشكلة.'
-        },
-        {
-          label: 'العودة إلى مساحة العمليات',
-          statusLabel: 'إجباري',
-          description: 'العقد يفرض أن يكون فتح مساحة العمليات هو المخرج الرئيسي بعد قراءة القرار.'
-        }
-      ],
-      lanes: [
-        {
-          zoneLabel: 'حي النخيل',
-          loadLabel: 'ضغط مرتفع',
-          captainCapacityLabel: '4 كباتن مرنون',
-          queueLabel: '12 طلبًا مفتوحًا',
-          recommendationLabel: 'مرشح لتوسيع السعة',
-          note: 'هذه المنطقة تناسب وضع الذروة لأن البدائل جاهزة والضغط مؤقت لا هيكلي.',
-          tone: 'warning'
-        },
-        {
-          zoneLabel: 'الطريق الساحلي',
-          loadLabel: 'ضغط حرج',
-          captainCapacityLabel: 'بديل محدود',
-          queueLabel: '7 طلبات مع تعثرات',
-          recommendationLabel: 'لا تفعّل قبل مراجعة أعمق',
-          note: 'الضغط هنا قد يخفي مشكلة تشغيلية أعمق، لذلك لا يجب تقديم تفعيل مباشر من هذا السطح.',
-          tone: 'danger'
-        },
-        {
-          zoneLabel: 'شارع 12',
-          loadLabel: 'ضغط قابل للإدارة',
-          captainCapacityLabel: '3 كباتن مرنون',
-          queueLabel: '5 طلبات نشطة',
-          recommendationLabel: 'مراقبة فقط',
-          note: 'تكفي المراقبة حاليًا دون توسيع سعة أو تصعيد.',
-          tone: 'brand'
-        },
-        {
-          zoneLabel: 'المنطقة الصناعية',
-          loadLabel: 'مستقر',
-          captainCapacityLabel: 'احتياطي متاح',
-          queueLabel: '3 طلبات',
-          recommendationLabel: 'جاهز عند الحاجة',
-          note: 'هذه المنطقة تحمل سعة احتياطية لكنها لا تحتاج تفعيلًا فوريًا.',
-          tone: 'success'
-        }
-      ]
-    },
-    reassign: {
-      summary: {
-        activeCases: 6,
-        urgentCases: 2,
-        blockedCases: 1,
-        readyFallbacks: 4
-      },
-      candidates: [
-        {
-          deliveryId: 'DEL-8102',
-          orderId: 'ORD-24020',
-          currentCaptain: 'كابتن ميداني',
-          fallbackCaptain: 'كابتن نواف',
-          reasonLabel: 'ازدحام مروري',
-          priorityLabel: 'عاجلة',
-          statusLabel: 'يحتاج قرار الآن',
-          note: 'الأقرب أن ينتقل القرار إلى fallback جاهز خلال نافذة قصيرة.',
-          tone: 'warning'
-        },
-        {
-          deliveryId: 'DEL-8103',
-          orderId: 'ORD-24021',
-          currentCaptain: 'إسناد موقوف',
-          fallbackCaptain: 'غير محدد',
-          reasonLabel: 'تعليق تشغيلي',
-          priorityLabel: 'عاجلة',
-          statusLabel: 'محجوب',
-          note: 'هذه الحالة تحتاج مساحة تشغيل أوسع أو دعمًا قبل أي نقل فعلي.',
-          tone: 'danger'
-        },
-        {
-          deliveryId: 'DEL-8104',
-          orderId: 'ORD-24019',
-          currentCaptain: 'كابتن سامر',
-          fallbackCaptain: 'كابتن راشد',
-          reasonLabel: 'طلب العميل',
-          priorityLabel: 'عادية',
-          statusLabel: 'بديل جاهز',
-          note: 'القرار واضح ويمكن تتبعه من مساحة العمليات بدون إدخال تشغيل مباشر الآن.',
-          tone: 'success'
-        },
-        {
-          deliveryId: 'DEL-8105',
-          orderId: 'ORD-24018',
-          currentCaptain: 'لم يعيّن بعد',
-          fallbackCaptain: 'كابتن سريع',
-          reasonLabel: 'عدم توفر كابتن',
-          priorityLabel: 'عادية',
-          statusLabel: 'مرشح',
-          note: 'هذه الحالة مناسبة كقرار مبكر في الطابور قبل أن تتحول إلى تعثر.',
-          tone: 'brand'
-        }
-      ]
-    },
-    arrivalBell: {
-      summary: {
-        activeArrivals: 7,
-        awaitingAcknowledgement: 3,
-        blockedRings: 2,
-        resolvedToday: 18
-      },
-      captainLane: [
-        {
-          orderId: 'ORD-24019',
-          actorLabel: 'كابتن سامر',
-          statusLabel: 'وصل وسجل الوصول',
-          etaLabel: 'منذ 2 د',
-          ringLabel: 'رنة واحدة',
-          actionHint: 'بانتظار إقرار العميل أو متابعة مساحة العمليات.',
-          tone: 'success'
-        },
-        {
-          orderId: 'ORD-24020',
-          actorLabel: 'كابتن ميداني',
-          statusLabel: 'وصل لكن الرن مقيّد',
-          etaLabel: 'منذ 5 د',
-          ringLabel: '2 رنات',
-          actionHint: 'يوجد تبريد نشط ويتطلب قرار عمليات قبل إعادة الرن.',
-          tone: 'warning'
-        },
-        {
-          orderId: 'ORD-24021',
-          actorLabel: 'إسناد موقوف',
-          statusLabel: 'الوصول متعثر',
-          etaLabel: 'غير متاح',
-          ringLabel: 'لا توجد محاولات',
-          actionHint: 'هذه حالة تصعيد ولا يجب تحويلها إلى إجراء تشغيلي كاذب.',
-          tone: 'danger'
-        }
-      ],
-      customerLane: [
-        {
-          orderId: 'ORD-24019',
-          actorLabel: 'العميل أكد الوصول',
-          statusLabel: 'أنا قادم',
-          etaLabel: '10:44 صباحًا',
-          ringLabel: 'تم الإقرار',
-          actionHint: 'يمكن متابعة بقية الطابور مع بقاء الحالة مرئية.',
-          tone: 'success'
-        },
-        {
-          orderId: 'ORD-24018',
-          actorLabel: 'لم يصل إشعار بعد',
-          statusLabel: 'بانتظار أول رنة',
-          etaLabel: '14 دقيقة',
-          ringLabel: '0 رنات',
-          actionHint: 'الحالة مبكرة ولا تحتاج دعمًا أو تصعيدًا بعد.',
-          tone: 'brand'
-        },
-        {
-          orderId: 'ORD-24020',
-          actorLabel: 'لا يوجد إقرار',
-          statusLabel: 'يحتاج متابعة',
-          etaLabel: '11:04 صباحًا',
-          ringLabel: '2 رنات',
-          actionHint: 'هذه الحالة تستدعي الرجوع إلى مساحة العمليات الكاملة لتقرير الخطوة التالية.',
-          tone: 'warning'
-        }
-      ]
-    },
-    zoneSet: {
-      summary: {
-        configuredZones: 5,
-        protectedZones: 2,
-        freeDeliveryZones: 4,
-        reviewZones: 3
-      },
-      policies: [
-        {
-          label: 'القراءة أولًا',
-          statusLabel: 'منضبط',
-          description: 'يوضح هذا السطح أين تنتهي القراءة وأين يبدأ القرار التشغيلي الأوسع.'
-        },
-        {
-          label: 'حماية المناطق الحساسة',
-          statusLabel: 'محمي',
-          description: 'المناطق التي تحتاج حماية لا تتحول إلى تبديل زائف أو تسهيل غير مبرر.'
-        },
-        {
-          label: 'مساحة التسليم الحرة',
-          statusLabel: 'متاح',
-          description: 'المناطق الحرة تبقى مرئية كقدرة استيعاب عند الحاجة.'
-        }
-      ],
-      lanes: [
-        {
-          zoneLabel: 'حي النخيل',
-          feeLabel: 'رسوم مرئية',
-          etaLabel: '14 دقيقة',
-          statusLabel: 'مناسب للمراجعة',
-          recommendationLabel: 'مرشح أولي',
-          note: 'هذه المنطقة تحتاج قراءة واضحة قبل أي توسع.',
-          tone: 'warning'
-        },
-        {
-          zoneLabel: 'الطريق الساحلي',
-          feeLabel: 'رسوم أعلى',
-          etaLabel: '31 دقيقة',
-          statusLabel: 'محمي',
-          recommendationLabel: 'لا يفتح الآن',
-          note: 'هذا المسار يحتاج قرار حدودي أوسع بدل فتح مباشر.',
-          tone: 'danger'
-        },
-        {
-          zoneLabel: 'شارع 12',
-          feeLabel: 'رسوم مستقرة',
-          etaLabel: '22 دقيقة',
-          statusLabel: 'جاهز',
-          recommendationLabel: 'مراقبة فقط',
-          note: 'الوضع هنا متوازن ولا يحتاج أي حركة إضافية.',
-          tone: 'success'
-        },
-        {
-          zoneLabel: 'المنطقة الصناعية',
-          feeLabel: 'رسوم مرنة',
-          etaLabel: '19 دقيقة',
-          statusLabel: 'قابل للتوسعة',
-          recommendationLabel: 'متاح عند الحاجة',
-          note: 'يوفر هذا المسار سعة جاهزة عند ارتفاع الضغط.',
-          tone: 'brand'
-        }
-      ]
-    },
-} as const;
-
 const enDshControlPanelText = {
   common: {
     live: 'Live',
@@ -814,6 +16,7 @@ const enDshControlPanelText = {
     openSupport: 'Open support',
     safePath: 'Safe path',
     visibleUpdate: 'Visible refresh',
+    openSheinProxy: 'Open Shein proxy',
     language: 'Language',
     period: 'Period',
     activeAlerts: 'Active alerts',
@@ -842,6 +45,8 @@ const enDshControlPanelText = {
     safeTransitionTitle: 'Safe transition',
     safeTransitionDescription: 'Returning to general operations remains the stable live exit from this surface.',
     activeAlertsDescription: 'A small visual indicator that keeps feedback clear without introducing local runtime state.',
+    quickActionsTitle: 'Quick access',
+    quickActionsDescription: 'Open the live DSH routes directly when you already know the next step.',
     railTitle: 'DSH',
     railStatusReady: 'Phase one',
     heroDescriptionOverview: 'A first read of the state and the safe transitions before entering any child route.',
@@ -975,78 +180,79 @@ const enDshControlPanelText = {
     lanesDescription: 'Each card gives a fast read of load, capacity, and recommendation without pretending direct enablement exists here.'
   },
   sheinProxyRequestLegacy: {
-    pageEyebrow: 'DSH / العمليات / وسيط شي إن / الطلب',
-    pageTitlePrefix: 'تفاصيل الطلب',
-    pageDescription: 'عرض مضغوط للطلب الوسيط الحالي مع مسار واضح نحو التقدير والعرض والجدولة.',
-    unavailableDescription: 'المسار يبقى واضحًا حتى عندما تكون تفاصيل الطلب غير جاهزة.',
-    heroEyebrow: 'طلب وسيط',
-    identityTitle: 'هوية الطلب',
-    identityDescription: 'البيانات الأساسية التي تثبت الطلب الحالي قبل الانتقال إلى الخطوة التالية.',
-    pricingDescription: 'تفصيل القيمة والشحن والرسوم مع الإجمالي المرئي في مكان واحد.',
-    timelineDescription: 'الخط الزمني يوضح أين يقف الطلب الآن وما الخطوة القادمة الأقرب.',
-    nextStepTitle: 'الخطوة التالية',
-    nextStepDescription: 'السطح يقترح الإجراء التالي بناءً على مرحلة الطلب الحالية.',
-    stateLoadingTitle: 'جار تحميل تفاصيل الطلب',
-    stateLoadingDescription: 'المسار حي، وتظهر تفاصيل الطلب بعد اكتمال تحميل هذه القطعة من البيانات.',
-    stateEmptyTitle: 'الطلب غير موجود',
-    stateEmptyDescription: 'المعرف المطلوب لا يطابق أي طلب حاضر في هذا الطابور.',
-    stateOfflineTitle: 'الاتصال غير متاح',
-    stateOfflineDescription: 'تفاصيل الطلب ستعود عند استعادة الاتصال مع بقاء المسار الحالي واضحًا.',
-    stateDisabledTitle: 'تفاصيل الطلب غير مفعلة بعد',
-    stateDisabledDescription: 'هذا السطح جاهز بصريًا، لكن تفعيل الخطوات الأعمق مؤجل إلى مرحلة لاحقة.',
-    stateErrorTitle: 'تعذر تحميل تفاصيل الطلب',
-    stateErrorDescription: 'يمكنك العودة إلى الطابور أو إعادة المحاولة من نفس المسار.',
+    pageEyebrow: 'DSH / operations / sheinproxy / request',
+    pageTitlePrefix: 'Request details',
+    pageDescription: 'A compact view of the current proxy request with a clear path to estimate, offer, and schedule.',
+    unavailableDescription: 'The route stays explicit even when request details are not ready.',
+    heroEyebrow: 'Proxy request',
+    identityTitle: 'Request identity',
+    identityDescription: 'The core data that anchors the current request before moving to the next step.',
+    pricingDescription: 'A single place for amount, shipping, fee, and the visible total.',
+    timelineDescription: 'The timeline shows where the request is now and what the closest next step is.',
+    nextStepTitle: 'Next step',
+    nextStepDescription: 'The surface suggests the next action based on the request stage.',
+    stateLoadingTitle: 'Loading request details',
+    stateLoadingDescription: 'The route is live, and the request details appear once this data slice loads.',
+    stateEmptyTitle: 'Request not found',
+    stateEmptyDescription: 'The requested id does not match a request currently in this queue.',
+    stateOfflineTitle: 'Connection unavailable',
+    stateOfflineDescription: 'Request details will return when connectivity is restored while the path remains explicit.',
+    stateDisabledTitle: 'Request details are not enabled yet',
+    stateDisabledDescription: 'This surface is visually ready, but deeper request actions are deferred to a later slice.',
+    stateErrorTitle: 'Unable to load request details',
+    stateErrorDescription: 'You can return to the queue or retry from the same path.',
     stageLabels: {
-      detail: 'التفاصيل',
-      estimate: 'التقدير',
-      offer: 'العرض',
-      schedule: 'الجدولة'
+      detail: 'Detail',
+      estimate: 'Estimate',
+      offer: 'Offer',
+      schedule: 'Schedule'
     },
     stageDescriptions: {
-      detail: 'مراجعة هوية الطلب ومحتواه الأساسي.',
-      estimate: 'فحص التقدير قبل إرسال العرض.',
-      offer: 'العرض أُرسل وينتظر القرار.',
-      schedule: 'تثبيت نافذة الاستلام أو التسليم.'
+      detail: 'Review the request identity and core details.',
+      estimate: 'Check the estimate before sending the offer.',
+      offer: 'The offer is out and waiting for a decision.',
+      schedule: 'Lock the pickup or delivery window.'
     },
     statusLabels: {
-      underReview: 'قيد المراجعة',
-      estimated: 'مقدّرة',
-      offered: 'تم إرسال العرض',
-      scheduled: 'مجدولة',
-      approved: 'معتمدة',
-      cancelled: 'ملغاة'
+      underReview: 'Under review',
+      estimated: 'Estimated',
+      offered: 'Offer sent',
+      scheduled: 'Scheduled',
+      approved: 'Approved',
+      cancelled: 'Cancelled'
     },
     nextActionLabels: {
-      underReview: 'افتح التقدير',
-      estimated: 'أرسل العرض',
-      offered: 'انتظر رد العميل',
-      scheduled: 'تحقق من نافذة الاستلام',
-      approved: 'جهّز التسليم',
-      cancelled: 'راجع الإلغاء'
+      underReview: 'Open estimate',
+      estimated: 'Send offer',
+      offered: 'Await customer response',
+      scheduled: 'Check pickup window',
+      approved: 'Prepare handoff',
+      cancelled: 'Review cancellation'
     },
-    requestLabel: 'الطلب',
-    customerLabel: 'العميل',
-    productLabel: 'المنتج',
-    quantityLabel: 'الكمية',
-    statusLabel: 'الحالة',
-    amountLabel: 'القيمة',
-    shippingLabel: 'الشحن',
-    serviceFeeLabel: 'رسوم الخدمة',
-    totalLabel: 'الإجمالي',
-    updatedLabel: 'آخر تحديث',
-    nextActionLabel: 'الخطوة التالية',
-    pricingTitle: 'تفصيل التسعير',
-    noteLabel: 'ملاحظة تشغيلية',
-    retryLabel: 'إعادة المحاولة',
-    backToList: 'العودة إلى القائمة',
-    openHub: 'العودة إلى المركز',
-    openOperations: 'افتح العمليات',
-    openSupport: 'افتح الدعم',
-    openDetail: 'افتح التفاصيل',
-    openEstimate: 'افتح التقدير',
-    openOffer: 'افتح العرض',
-    openSchedule: 'افتح الجدولة'
-  },  orderDetail: {
+    requestLabel: 'Request',
+    customerLabel: 'Customer',
+    productLabel: 'Product',
+    quantityLabel: 'Quantity',
+    statusLabel: 'Status',
+    amountLabel: 'Amount',
+    shippingLabel: 'Shipping',
+    serviceFeeLabel: 'Service fee',
+    totalLabel: 'Total',
+    updatedLabel: 'Updated',
+    nextActionLabel: 'Next action',
+    pricingTitle: 'Pricing breakdown',
+    noteLabel: 'Operational note',
+    retryLabel: 'Retry',
+    backToList: 'Back to list',
+    openHub: 'Back to hub',
+    openOperations: 'Open operations',
+    openSupport: 'Open support',
+    openDetail: 'Open detail',
+    openEstimate: 'Open estimate',
+    openOffer: 'Open offer',
+    openSchedule: 'Open schedule'
+  },
+  orderDetail: {
     pageEyebrow: 'DSH / operations / orders / detail',
     pageTitlePrefix: 'Order',
     pageDescription: 'Order identity, arrival sequence, and next action in a denser layout with less repetition.',
@@ -1239,7 +445,8 @@ const enDshControlPanelText = {
     openEstimate: 'Open estimate',
     openOffer: 'Open offer',
     openSchedule: 'Open schedule'
-  },  reassign: {
+  },
+  reassign: {
     pageEyebrow: 'DSH / operations / reassign',
     pageTitle: 'Reassign',
     pageDescription: 'A denser reading of transfer decisions without introducing a fake operational submit path.',
@@ -1728,25 +935,966 @@ const enDshControlPanelText = {
         }
       ]
     }
-} as const;
+  }
+};
 
-export type DshControlPanelText = typeof arDshControlPanelText | typeof enDshControlPanelText;
+export type DshControlPanelText = typeof enDshControlPanelText;
+
+const arDshControlPanelText = {
+  common: {
+    live: 'حي',
+    liveNow: 'مباشر',
+    planned: 'مخطط',
+    controlPanel: 'لوحة التحكم',
+    operations: 'العمليات',
+    operationsWorkspace: 'مساحة العمليات',
+    openOperationsWorkspace: 'افتح مساحة العمليات',
+    openGeneralOperations: 'افتح العمليات العامة',
+    backToHub: 'العودة إلى مركز DSH',
+    backToOrders: 'العودة إلى الطلبات',
+    openOrders: 'افتح الطلبات',
+    openSupport: 'افتح الدعم',
+    safePath: 'المسار الآمن',
+    visibleUpdate: 'آخر تحديث مرئي',
+    openSheinProxy: 'افتح وسيط شي إن',
+    language: 'اللغة',
+    period: 'الفترة',
+    activeAlerts: 'التنبيهات النشطة',
+    currentPath: 'المسار الحالي',
+    safeExit: 'الخروج الآمن',
+    routeGuard: 'حارس المسار',
+    routeGuardDescription: 'لا يُفتح أي مسار فرعي قبل تثبيته، لذلك يبقى الخروج الحي الوحيد واضحًا وآمنًا.',
+    arChip: 'AR',
+    enChip: 'EN'
+  },
+  hub: {
+    topFilters: {
+      today: 'اليوم',
+      queue: 'الطابور',
+      peak: 'الذروة'
+    },
+    rootEyebrow: 'الهبوط الرئيسي',
+    rootTitle: 'مركز تشغيل DSH',
+    unavailableTitle: 'السطح غير جاهز بعد لكن مسار الرجوع الآمن يبقى واضحًا.',
+    workbenchesTitle: 'مساحات DSH',
+    workbenchesDescription: 'المسارات الحية تفتح مباشرة، أما المسارات المخططة فتظل مرئية فقط حتى لا يظهر أي وعد ناقص في العربية أو الإنجليزية.',
+    selectedScopeTitle: 'المجال المختار',
+    selectedScopeDescription: 'التبديل داخل هذا المركز يغيّر القراءة فقط أو ينقلك إلى المسار الحي عندما يكون متاحًا.',
+    plannedRoutesTitle: 'المسارات المخططة',
+    plannedRoutesDescription: 'تبقى مرئية حتى لا يضيع الامتداد القادم، لكنها لا تتصرف كروابط حية قبل الجاهزية.',
+    safeTransitionTitle: 'الانتقال الآمن',
+    safeTransitionDescription: 'الرجوع إلى العمليات العامة يبقى الخروج الحي الثابت من هذا السطح.',
+    activeAlertsDescription: 'مؤشر مرئي بسيط يحافظ على تغذية راجعة واضحة دون حالة تشغيل محلية أو موازية.',
+    quickActionsTitle: 'وصول سريع',
+    quickActionsDescription: 'افتح مسارات DSH الحية مباشرة عندما تكون الخطوة التالية معروفة بالفعل.',
+    railTitle: 'DSH',
+    railStatusReady: 'المرحلة الأولى',
+    heroDescriptionOverview: 'لقطة أولى للحالة والانتقالات الآمنة قبل الدخول في أي مسار فرعي.',
+    heroDescriptionOrders: 'الطابور المركزي للطلبات والتفاصيل المرتبطة بها.',
+    heroDescriptionReassign: 'تحويل الطلبات بين الموارد المتاحة بدون كسر المسار الحالي.',
+    heroDescriptionPeakMode: 'تشغيل مرن عندما ترتفع الحركة وتحتاج سعة إضافية.',
+    heroDescriptionZoneSet: 'تقييد النطاقات وتشغيلها بوضوح تشغيلي أعلى.',
+    heroDescriptionSheinProxy: 'مسار الوساطة والطلبات الخاصة بعرض وسيط DSH.',
+    heroDescriptionArrivalBell: 'إعدادات الوصول والتنبيهات الحية عند الاقتراب من التسليم.',
+    stateLoadingTitle: 'جار تجهيز سطح DSH',
+    stateLoadingDescription: 'الهيكل مرئي الآن، وسيبقى المسار محفوظًا حتى تكتمل البيانات أو الروابط التالية.',
+    stateEmptyTitle: 'لا توجد عناصر مفعلة بعد',
+    stateEmptyDescription: 'هذا المسار ما يزال في الوضع الأساسي، ويمكنك الرجوع إلى العمليات العامة أو إعادة البناء في خطوة لاحقة.',
+    stateOfflineTitle: 'الاتصال غير متاح مؤقتًا',
+    stateOfflineDescription: 'السطح يبقى واضحًا، لكن تفعيل المسارات الفرعية مؤجل حتى تعود الشبكة أو يكتمل الربط.',
+    stateDisabledTitle: 'المسار غير مفعّل بعد',
+    stateDisabledDescription: 'هذا الهبوط محفوظ كجزء من الخطة المرحلية لكنه لا يفتح المسارات الفرعية قبل خطوة الربط التالية.',
+    stateErrorTitle: 'تعذر تحميل سطح DSH',
+    stateErrorDescription: 'يمكنك العودة إلى المسار الآمن أو إعادة المحاولة بعد تثبيت البيئة الحالية.',
+    workbenches: {
+      overview: {
+        label: 'نظرة عامة على DSH',
+        description: 'لقطة أولى للحالة والانتقالات الآمنة قبل الدخول في أي مسار فرعي.',
+        routeHint: '/operations/dsh',
+        statusLabel: 'حي'
+      },
+      orders: {
+        label: 'الطلبات',
+        description: 'الطابور المركزي للطلبات والتفاصيل المرتبطة بها.',
+        routeHint: '/operations/dsh/orders',
+        statusLabel: 'حي'
+      },
+      reassign: {
+        label: 'إعادة التوزيع',
+        description: 'تحويل الطلبات بين الموارد المتاحة بدون كسر المسار الحالي.',
+        routeHint: '/operations/dsh/reassign',
+        statusLabel: 'حي'
+      },
+      peakMode: {
+        label: 'وضع الذروة',
+        description: 'تشغيل مرن عندما ترتفع الحركة وتحتاج سعة إضافية.',
+        routeHint: '/operations/dsh/peak-mode',
+        statusLabel: 'حي'
+      },
+      zoneSet: {
+        label: 'ضبط المناطق',
+        description: 'تقييد النطاقات وتشغيلها بوضوح تشغيلي أعلى.',
+        routeHint: '/operations/dsh/zone-set',
+        statusLabel: 'قيد الربط'
+      },
+      sheinProxy: {
+        label: 'وسيط شي إن',
+        description: 'مسار الوساطة والطلبات الخاصة بعرض وسيط DSH.',
+        routeHint: '/operations/dsh/sheinproxy',
+        statusLabel: 'قيد الربط'
+      },
+      arrivalBell: {
+        label: 'جرس الوصول',
+        description: 'إعدادات الوصول والتنبيهات الحية عند الاقتراب من التسليم.',
+        routeHint: '/operations/dsh/arrival-bell',
+        statusLabel: 'حي'
+      }
+    },
+    actions: {
+      openOrders: 'افتح الطلبات',
+      openArrivalBell: 'افتح جرس الوصول',
+      openReassign: 'افتح إعادة التوزيع',
+      openPeakMode: 'افتح وضع الذروة'
+    }
+  },
+  orders: {
+    pageEyebrow: 'DSH / العمليات / الطلبات',
+    pageTitle: 'طلبات DSH',
+    pageDescription: 'طابور تشغيلي أكثر ضغطًا مع مسار رجوع مباشر إلى المركز أو إلى سطح العمليات الأوسع.',
+    heroEyebrow: 'الطابور التشغيلي',
+    heroTitle: 'الطلبات المفتوحة في DSH',
+    heroDescription: 'هذه الصفحة تمنحك طابورًا تشغيليًا مباشرًا، مع مسار واضح للعودة إلى المركز ومسار آمن للعودة إلى العمليات.',
+    stateLoadingTitle: 'جار تحميل قائمة الطلبات',
+    stateLoadingDescription: 'السطح حي، وتبقى حالة الطلبات مرئية حتى يكتمل التزامن أو يعود المصدر.',
+    stateEmptyTitle: 'لا توجد طلبات مفتوحة الآن',
+    stateEmptyDescription: 'المسار جاهز، لكن الطابور الحالي فارغ مؤقتًا ويمكنك العودة إلى المركز بأمان لاحقًا.',
+    stateOfflineTitle: 'الاتصال غير متاح',
+    stateOfflineDescription: 'ستعود قائمة الطلبات عند استعادة الاتصال، مع بقاء المسار الحالي واضحًا.',
+    stateDisabledTitle: 'قائمة الطلبات غير مفعّلة بعد',
+    stateDisabledDescription: 'هذه الصفحة حية بصريًا، لكن التفاعل الأعمق مؤجل إلى شريحة ربط لاحقة.',
+    stateErrorTitle: 'تعذر تحميل الطلبات',
+    stateErrorDescription: 'يمكنك العودة إلى المركز أو إعادة المحاولة بعد تثبيت الحالة الحالية.',
+    badgesLabel: 'الطلبات',
+    assignedTitle: 'المعيّنة',
+    assignedDescription: 'طلبات لديها ملكية واضحة ويمكن الانتقال منها مباشرة إلى التفاصيل.',
+    newTitle: 'جديدة',
+    newDescription: 'طلبات دخلت الطابور وتحتاج قرارًا أوليًا سريعًا.',
+    reviewTitle: 'تحت المراجعة',
+    reviewDescription: 'طلبات تحتاج قراءة أعمق قبل أي تحويل أو تصعيد.',
+    listTitle: 'قائمة الطلبات',
+    listDescription: 'كل صف يلخص الطلب، وجهته، حالته، والوقت المقدر للتنفيذ. الضغط عليه يفتح صفحة التفاصيل الحية.',
+    openDetail: 'افتح التفاصيل',
+    etaPrefix: 'المتوقع:'
+  },
+  zoneSet: {
+    pageEyebrow: 'DSH / العمليات / ضبط المناطق',
+    pageTitle: 'ضبط المناطق',
+    pageDescription: 'حدود التسليم وسياسات المناطق ضمن بنية أكثر ضغطًا، وبدون تبديل تشغيلي كاذب.',
+    unavailableDescription: 'السطح يحافظ على مسار قرار واضح حتى عند غياب البيانات أو توقفها.',
+    heroEyebrow: 'حدود تشغيلية',
+    heroTitle: 'مساحة ضبط المناطق',
+    heroDescription: 'هذا السطح يوضح أين تكون حدود التسليم منطقية وأين يجب أن تبقى محجوبة، مع الحفاظ على مساحة العمليات كعقد أساسي.',
+    stateLoadingTitle: 'جار تجهيز ضبط المناطق',
+    stateLoadingDescription: 'المسار حي، وتظهر حدود التسليم وسياسات المناطق بعد اكتمال هذه المرحلة.',
+    stateEmptyTitle: 'لا يوجد ضغط حدودي يتطلب ضبط المناطق الآن',
+    stateEmptyDescription: 'الوضع مستقر حاليًا ولا توجد منطقة تحتاج تعديل حدود في هذه اللحظة.',
+    stateOfflineTitle: 'الاتصال غير متاح',
+    stateOfflineDescription: 'يبقى المسار محفوظًا، لكن قراءات الحدود والمناطق لن تتحدث حتى يعود الاتصال.',
+    stateDisabledTitle: 'ضبط المناطق غير مفعّل بالكامل',
+    stateDisabledDescription: 'هذه الشريحة تثبّت القراءة والسياسة فقط، بينما يبقى التنفيذ الفعلي خارج النطاق.',
+    stateErrorTitle: 'تعذر تحميل ضبط المناطق',
+    stateErrorDescription: 'يمكنك العودة إلى المركز أو إعادة المحاولة من نفس المسار.',
+    signals: {
+      reviewZones: 'مناطق المراجعة',
+      reviewZonesDescription: 'حالات يجب ألا يخفيها ضبط المناطق بدل معالجة مشكلتها الفعلية.',
+      configuredZones: 'المناطق المضبوطة',
+      configuredZonesDescription: 'المناطق المقاسة حاليًا داخل هذه الشريحة.',
+      protectedZones: 'المناطق المحمية',
+      protectedZonesDescription: 'مناطق تحتاج قرار حدودي أو مراقبة أقرب.',
+      freeDeliveryZones: 'مناطق التسليم الحر',
+      freeDeliveryZonesDescription: 'مساحة تسليم ظاهرة يمكنها استيعاب النشاط عند الحاجة.'
+    },
+    policiesTitle: 'سياسات ضبط المناطق',
+    policiesDescription: 'هذه القواعد تحدد أين يتوقف هذا السطح: قراءة وسياسة فقط، من دون أي تعديل مخفي.',
+    lanesTitle: 'مناطق الحدود',
+    lanesDescription: 'كل بطاقة تمنح قراءة سريعة للحمل والسعة والتوصية من دون الادعاء بوجود تفعيل مباشر هنا.'
+  },
+  sheinProxyRequestLegacy: {
+    pageEyebrow: 'DSH / العمليات / وسيط شي إن / الطلب',
+    pageTitlePrefix: 'تفاصيل الطلب',
+    pageDescription: 'عرض مضغوط للطلب الوسيط الحالي مع مسار واضح نحو التقدير والعرض والجدولة.',
+    unavailableDescription: 'المسار يبقى واضحًا حتى عندما تكون تفاصيل الطلب غير جاهزة.',
+    heroEyebrow: 'طلب وسيط',
+    identityTitle: 'هوية الطلب',
+    identityDescription: 'البيانات الأساسية التي تثبت الطلب الحالي قبل الانتقال إلى الخطوة التالية.',
+    pricingDescription: 'تفصيل القيمة والشحن والرسوم مع الإجمالي المرئي في مكان واحد.',
+    timelineDescription: 'الخط الزمني يوضح أين يقف الطلب الآن وما الخطوة القادمة الأقرب.',
+    nextStepTitle: 'الخطوة التالية',
+    nextStepDescription: 'السطح يقترح الإجراء التالي بناءً على مرحلة الطلب الحالية.',
+    stateLoadingTitle: 'جار تحميل تفاصيل الطلب',
+    stateLoadingDescription: 'المسار حي، وتظهر تفاصيل الطلب بعد اكتمال تحميل هذه القطعة من البيانات.',
+    stateEmptyTitle: 'الطلب غير موجود',
+    stateEmptyDescription: 'المعرف المطلوب لا يطابق أي طلب حاضر في هذا الطابور.',
+    stateOfflineTitle: 'الاتصال غير متاح',
+    stateOfflineDescription: 'تفاصيل الطلب ستعود عند استعادة الاتصال مع بقاء المسار الحالي واضحًا.',
+    stateDisabledTitle: 'تفاصيل الطلب غير مفعلة بعد',
+    stateDisabledDescription: 'هذا السطح جاهز بصريًا، لكن تفعيل الخطوات الأعمق مؤجل إلى مرحلة لاحقة.',
+    stateErrorTitle: 'تعذر تحميل تفاصيل الطلب',
+    stateErrorDescription: 'يمكنك العودة إلى الطابور أو إعادة المحاولة من نفس المسار.',
+    stageLabels: {
+      detail: 'التفاصيل',
+      estimate: 'التقدير',
+      offer: 'العرض',
+      schedule: 'الجدولة'
+    },
+    stageDescriptions: {
+      detail: 'مراجعة هوية الطلب ومحتواه الأساسي.',
+      estimate: 'فحص التقدير قبل إرسال العرض.',
+      offer: 'العرض أُرسل وينتظر القرار.',
+      schedule: 'تثبيت نافذة الاستلام أو التسليم.'
+    },
+    statusLabels: {
+      underReview: 'قيد المراجعة',
+      estimated: 'مقدّرة',
+      offered: 'تم إرسال العرض',
+      scheduled: 'مجدولة',
+      approved: 'معتمدة',
+      cancelled: 'ملغاة'
+    },
+    nextActionLabels: {
+      underReview: 'افتح التقدير',
+      estimated: 'أرسل العرض',
+      offered: 'انتظر رد العميل',
+      scheduled: 'تحقق من نافذة الاستلام',
+      approved: 'جهّز التسليم',
+      cancelled: 'راجع الإلغاء'
+    },
+    requestLabel: 'الطلب',
+    customerLabel: 'العميل',
+    productLabel: 'المنتج',
+    quantityLabel: 'الكمية',
+    statusLabel: 'الحالة',
+    amountLabel: 'القيمة',
+    shippingLabel: 'الشحن',
+    serviceFeeLabel: 'رسوم الخدمة',
+    totalLabel: 'الإجمالي',
+    updatedLabel: 'آخر تحديث',
+    nextActionLabel: 'الخطوة التالية',
+    pricingTitle: 'تفصيل التسعير',
+    noteLabel: 'ملاحظة تشغيلية',
+    retryLabel: 'إعادة المحاولة',
+    backToList: 'العودة إلى القائمة',
+    openHub: 'العودة إلى المركز',
+    openOperations: 'افتح العمليات',
+    openSupport: 'افتح الدعم',
+    openDetail: 'افتح التفاصيل',
+    openEstimate: 'افتح التقدير',
+    openOffer: 'افتح العرض',
+    openSchedule: 'افتح الجدولة'
+  },
+  orderDetail: {
+    pageEyebrow: 'DSH / العمليات / الطلبات / التفاصيل',
+    pageTitlePrefix: 'تفاصيل',
+    pageDescription: 'هوية الطلب، التسلسل التشغيلي، وقرار الإجراء التالي ضمن بنية أكثر ضغطًا وأقل تكرارًا.',
+    unavailableDescription: 'السطح يحتفظ بخروج واضح إلى قائمة الطلبات حتى عند غياب البيانات أو توقفها.',
+    heroEyebrow: 'تفاصيل تشغيلية',
+    backToOrders: 'العودة إلى الطلبات',
+    stateLoadingTitlePrefix: 'جار تحميل الطلب',
+    stateLoadingDescription: 'المسار حي، وتبقى تفاصيل الطلب مرئية بمجرد اكتمال التحميل أو إعادة المحاولة.',
+    stateEmptyTitlePrefix: 'الطلب',
+    stateEmptyTitleSuffix: 'غير موجود',
+    stateEmptyDescription: 'المعرف المطلوب غير موجود ضمن الطابور الحالي، ويمكن العودة إلى قائمة الطلبات بدون فقدان الاتجاه.',
+    stateOfflineTitle: 'الاتصال غير متاح',
+    stateOfflineDescription: 'تفاصيل الطلب ستعود بعد استعادة الاتصال، مع بقاء المسار الحالي معروفًا وآمنًا.',
+    stateDisabledTitle: 'التفاصيل غير مفعلة بعد',
+    stateDisabledDescription: 'هذا السطح جاهز بصريًا لكن بعض إجراءات التنفيذ التفصيلية مؤجلة إلى خطوة لاحقة.',
+    stateErrorTitle: 'تعذر تحميل تفاصيل الطلب',
+    stateErrorDescription: 'يمكنك الرجوع إلى قائمة الطلبات أو إعادة المحاولة من نفس المسار.',
+    signals: {
+      status: 'الحالة',
+      statusDescription: 'الوضع الحالي لهذا الطلب داخل الطابور التشغيلي.',
+      destination: 'الوجهة',
+      destinationDescription: 'نقطة التسليم المرجعية لهذا الطلب.',
+      eta: 'الوقت المتوقع',
+      etaDescription: 'الوقت التقديري الحالي حتى إتمام التسليم أو المعالجة.',
+      amount: 'القيمة',
+      amountDescription: 'القيمة الحالية كما تظهر في هذا العرض البصري.'
+    },
+    identityTitle: 'هوية الطلب',
+    identityDescription: 'ملخص ثابت وواضح للمعرف والمسار والملاحظات التشغيلية الأساسية.',
+    routeLabel: 'المسار',
+    finalDestinationLabel: 'الوجهة النهائية',
+    noteLabel: 'ملاحظة تشغيلية',
+    arrivalTitle: 'تسلسل الوصول',
+    arrivalDescription: 'يوضح الوصول، الرن، الإقرار، وسبب المنع الحالي إن وجد.',
+    arrivedLabel: 'الوصول',
+    ringLogLabel: 'سجل الرن',
+    acknowledgementLabel: 'إقرار العميل',
+    cooldownLabel: 'التبريد وسبب المنع',
+    noArrivalData: 'لا توجد بيانات وصول بعد',
+    noRingsYet: 'لا توجد محاولات حتى الآن',
+    noAcknowledgementYet: 'لم يصل أي إقرار بعد',
+    unavailable: 'غير متاح',
+    noCurrentBlock: 'لا يوجد منع حالي',
+    ringAttempts: 'محاولات',
+    openArrivalBellWorkspace: 'افتح مساحة جرس الوصول',
+    decisionTitle: 'قرار التشغيل',
+    decisionDescription: 'ما هو الإجراء الأساسي الآن، وما البدائل المقبولة داخل هذا المسار.',
+    primaryActionLabel: 'الإجراء الأساسي',
+    secondaryActionLabel: 'الإجراء الثانوي',
+    supportPathLabel: 'مسار الدعم',
+    openReassignWorkspace: 'افتح مساحة إعادة التوزيع'
+  },
+  sheinProxy: {
+    pageEyebrow: 'DSH / العمليات / وسيط شي إن',
+    pageTitle: 'طلبات وسيط شي إن',
+    pageDescription: 'طابور مضغوط لمراجعة الطلبات الوسيطة والتسعير والخطوة التالية بدون وعد تنفيذي مخفي.',
+    unavailableDescription: 'المسار يبقى واضحًا حتى عندما تكون الطلبات متوقفة أو غير جاهزة.',
+    heroEyebrow: 'طابور وساطة',
+    heroTitle: 'طلبات وسيط شي إن',
+    heroDescription: 'هذا السطح يجعل الطلبات الوسيطة مقروءة ويقترح الخطوة التشغيلية التالية بدون التظاهر بتعديل الحالة مباشرة.',
+    stateLoadingTitle: 'جار تجهيز طابور الوساطة',
+    stateLoadingDescription: 'المسار حي، وتظهر قائمة الطلبات بعد اكتمال تحميل هذه الحزمة من البيانات.',
+    stateEmptyTitle: 'لا توجد طلبات تطابق هذا الفلتر',
+    stateEmptyDescription: 'جرّب قسمًا آخر من الطابور أو ارجع إلى القائمة الكاملة.',
+    stateOfflineTitle: 'الاتصال غير متاح',
+    stateOfflineDescription: 'الطابور يعود عند استعادة الاتصال بينما يظل المسار الحالي واضحًا.',
+    stateDisabledTitle: 'طابور الوساطة غير مفعّل بعد',
+    stateDisabledDescription: 'هذا السطح جاهز بصريًا، لكن عمليات الوساطة الأعمق مؤجلة إلى خطوة لاحقة.',
+    stateErrorTitle: 'تعذر تحميل طابور الوساطة',
+    stateErrorDescription: 'يمكنك العودة إلى المركز أو إعادة المحاولة من نفس المسار.',
+    signals: {
+      pending: 'قيد المراجعة',
+      pendingDescription: 'طلبات تنتظر قرارًا أوليًا.',
+      estimated: 'مقدّرة',
+      estimatedDescription: 'طلبات جاهزة بتقدير سعري مرئي.',
+      offered: 'تم إرسال العرض',
+      offeredDescription: 'طلبات تنتظر رد العميل على العرض.',
+      scheduled: 'مجدولة',
+      scheduledDescription: 'طلبات حُددت لها نافذة استلام بالفعل.'
+    },
+    statusLabels: {
+      underReview: 'قيد المراجعة',
+      estimated: 'مقدّرة',
+      offered: 'تم إرسال العرض',
+      scheduled: 'مجدولة',
+      approved: 'معتمدة',
+      cancelled: 'ملغاة'
+    },
+    nextActionLabels: {
+      underReview: 'افتح التقدير',
+      estimated: 'أرسل العرض',
+      offered: 'انتظر رد العميل',
+      scheduled: 'تحقق من نافذة الاستلام',
+      approved: 'جهّز التسليم',
+      cancelled: 'راجع الإلغاء'
+    },
+    tableTitle: 'طلبات الوساطة',
+    tableDescription: 'كل صف يوضح الطلب، وحالة التسعير، والخطوة التالية المرشحة.',
+    allRequestsLabel: 'كل الطلبات',
+    tableEmptyTitle: 'لا توجد طلبات تطابق هذا الفلتر',
+    tableEmptyDescription: 'جرّب قسمًا آخر من الطابور أو ارجع إلى القائمة الكاملة.',
+    selectedTitle: 'الطلب المختار',
+    selectedDescription: 'تفصيل مضغوط للطلب الذي عليه التركيز حاليًا.',
+    requestLabel: 'الطلب',
+    customerLabel: 'العميل',
+    productLabel: 'المنتج',
+    quantityLabel: 'الكمية',
+    statusLabel: 'الحالة',
+    amountLabel: 'القيمة',
+    shippingLabel: 'الشحن',
+    serviceFeeLabel: 'رسوم الخدمة',
+    totalLabel: 'الإجمالي',
+    updatedLabel: 'آخر تحديث',
+    nextActionLabel: 'الخطوة التالية',
+    pricingTitle: 'تفصيل التسعير',
+    notesLabel: 'ملاحظة تشغيلية',
+    inspectRequest: 'افحص الطلب',
+    retryLabel: 'إعادة المحاولة',
+    backToHub: 'العودة إلى المركز'
+  },
+  sheinProxyRequest: {
+    pageEyebrow: 'DSH / العمليات / وسيط شي إن / الطلب',
+    pageTitlePrefix: 'تفاصيل الطلب',
+    pageDescription: 'عرض مضغوط للطلب الوسيط الحالي مع مسار واضح نحو التقدير والعرض والجدولة.',
+    unavailableDescription: 'المسار يبقى واضحًا حتى عندما تكون تفاصيل الطلب غير جاهزة.',
+    heroEyebrow: 'طلب وسيط',
+    identityTitle: 'هوية الطلب',
+    identityDescription: 'البيانات الأساسية التي تثبت الطلب الحالي قبل الانتقال إلى الخطوة التالية.',
+    pricingDescription: 'تفصيل القيمة والشحن والرسوم مع الإجمالي المرئي في مكان واحد.',
+    timelineDescription: 'الخط الزمني يوضح أين يقف الطلب الآن وما الخطوة القادمة الأقرب.',
+    nextStepTitle: 'الخطوة التالية',
+    nextStepDescription: 'السطح يقترح الإجراء التالي بناءً على مرحلة الطلب الحالية.',
+    stateLoadingTitle: 'جار تحميل تفاصيل الطلب',
+    stateLoadingDescription: 'المسار حي، وتظهر تفاصيل الطلب بعد اكتمال تحميل هذه القطعة من البيانات.',
+    stateEmptyTitle: 'الطلب غير موجود',
+    stateEmptyDescription: 'المعرف المطلوب لا يطابق أي طلب حاضر في هذا الطابور.',
+    stateOfflineTitle: 'الاتصال غير متاح',
+    stateOfflineDescription: 'تفاصيل الطلب ستعود عند استعادة الاتصال مع بقاء المسار الحالي واضحًا.',
+    stateDisabledTitle: 'تفاصيل الطلب غير مفعلة بعد',
+    stateDisabledDescription: 'هذا السطح جاهز بصريًا، لكن تفعيل الخطوات الأعمق مؤجل إلى مرحلة لاحقة.',
+    stateErrorTitle: 'تعذر تحميل تفاصيل الطلب',
+    stateErrorDescription: 'يمكنك العودة إلى الطابور أو إعادة المحاولة من نفس المسار.',
+    stageLabels: {
+      detail: 'التفاصيل',
+      estimate: 'التقدير',
+      offer: 'العرض',
+      schedule: 'الجدولة'
+    },
+    stageDescriptions: {
+      detail: 'مراجعة هوية الطلب ومحتواه الأساسي.',
+      estimate: 'فحص التقدير قبل إرسال العرض.',
+      offer: 'العرض أُرسل وينتظر القرار.',
+      schedule: 'تثبيت نافذة الاستلام أو التسليم.'
+    },
+    statusLabels: {
+      underReview: 'قيد المراجعة',
+      estimated: 'مقدّرة',
+      offered: 'تم إرسال العرض',
+      scheduled: 'مجدولة',
+      approved: 'معتمدة',
+      cancelled: 'ملغاة'
+    },
+    nextActionLabels: {
+      underReview: 'افتح التقدير',
+      estimated: 'أرسل العرض',
+      offered: 'انتظر رد العميل',
+      scheduled: 'تحقق من نافذة الاستلام',
+      approved: 'جهّز التسليم',
+      cancelled: 'راجع الإلغاء'
+    },
+    requestLabel: 'الطلب',
+    customerLabel: 'العميل',
+    productLabel: 'المنتج',
+    quantityLabel: 'الكمية',
+    statusLabel: 'الحالة',
+    amountLabel: 'القيمة',
+    shippingLabel: 'الشحن',
+    serviceFeeLabel: 'رسوم الخدمة',
+    totalLabel: 'الإجمالي',
+    updatedLabel: 'آخر تحديث',
+    nextActionLabel: 'الخطوة التالية',
+    pricingTitle: 'تفصيل التسعير',
+    noteLabel: 'ملاحظة تشغيلية',
+    retryLabel: 'إعادة المحاولة',
+    backToList: 'العودة إلى القائمة',
+    openHub: 'العودة إلى المركز',
+    openOperations: 'افتح العمليات',
+    openSupport: 'افتح الدعم',
+    openDetail: 'افتح التفاصيل',
+    openEstimate: 'افتح التقدير',
+    openOffer: 'افتح العرض',
+    openSchedule: 'افتح الجدولة'
+  },
+  reassign: {
+    pageEyebrow: 'DSH / العمليات / إعادة التوزيع',
+    pageTitle: 'إعادة التوزيع',
+    pageDescription: 'قراءة قرار النقل بشكل مضغوط وواضح بدون إدخال إجراء إرسال تشغيلي كاذب.',
+    unavailableDescription: 'المسار يبقى واضحًا حتى لو غابت الحالات أو توقفت البيانات.',
+    heroEyebrow: 'قرار تشغيلي',
+    heroTitle: 'مساحة إعادة التوزيع',
+    heroDescription: 'هذا السطح يرفع وضوح القرار: من يحتاج نقلًا، ولماذا، وما البديل المقترح، مع إبقاء التنفيذ الفعلي خارج هذا العرض.',
+    stateLoadingTitle: 'جار تجهيز سطح إعادة التوزيع',
+    stateLoadingDescription: 'المسار حي، وسيظهر القرار والمرشحون بمجرد اكتمال هذه المرحلة.',
+    stateEmptyTitle: 'لا توجد حالات لإعادة التوزيع',
+    stateEmptyDescription: 'الطابور الحالي لا يحتوي على قرارات نقل نشطة في هذه اللحظة.',
+    stateOfflineTitle: 'الاتصال غير متاح',
+    stateOfflineDescription: 'المسار محفوظ، لكن حالات إعادة التوزيع لن تتحدّث حتى يعود الاتصال.',
+    stateDisabledTitle: 'إعادة التوزيع غير مفعلة بالكامل',
+    stateDisabledDescription: 'هذا العرض يثبّت القراءة والقرار فقط، بينما التنفيذ الفعلي مؤجل إلى خطوة لاحقة.',
+    stateErrorTitle: 'تعذر تحميل سطح إعادة التوزيع',
+    stateErrorDescription: 'يمكنك الرجوع إلى المركز أو إعادة المحاولة من نفس المسار.',
+    signals: {
+      active: 'الحالات النشطة',
+      activeDescription: 'طلبات لديها ضغط تشغيلي أو مرشح نقل واضح.',
+      urgent: 'الحالات العاجلة',
+      urgentDescription: 'تحتاج قرارًا سريعًا قبل أن تتحول إلى تأخر أو تصعيد.',
+      blocked: 'الحالات المحجوبة',
+      blockedDescription: 'تحتاج مساحة تشغيل أوسع أو دعمًا قبل أي خطوة أخرى.',
+      fallbacks: 'بدائل جاهزة',
+      fallbacksDescription: 'كباتن أو مسارات احتياطية متاحة بصريًا في هذا العرض.'
+    },
+    candidatesTitle: 'المرشحون لإعادة التوزيع',
+    candidatesDescription: 'كل بطاقة تعرض رقم التسليم والطلب المرتبط والسبب والأولوية والبديل المقترح بدون التظاهر بوجود تنفيذ تشغيلي فعلي.',
+    currentCaptainLabel: 'الحالي',
+    fallbackCaptainLabel: 'البديل',
+    decisionTitle: 'منطق القرار',
+    decisionDescription: 'الهدف هنا ليس التنفيذ، بل ترتيب القرار: متى تعود إلى مساحة العمليات، ومتى تراجع الطلب، ومتى تصعّد الحالة.',
+    primaryDecisionTitle: 'الإجراء الأساسي',
+    primaryDecisionLabel: 'افتح مساحة العمليات',
+    primaryDecisionDescription: 'العقد يطلب بوضوح أن يكون فتح مساحة العمليات هو الخروج الرئيسي بعد قراءة القرار.',
+    secondaryDecisionTitle: 'الإجراء الثانوي',
+    secondaryDecisionLabel: 'ارجع إلى الطلبات',
+    secondaryDecisionDescription: 'الرجوع إلى الطابور مناسب عندما تريد مقارنة أكثر من حالة قبل اعتماد أي نقل.',
+    supportDecisionTitle: 'مسار الدعم',
+    supportDecisionLabel: 'صعّد المحجوب فقط',
+    supportDecisionDescription: 'التصعيد يبقى للحالات المعطلة أو غير القابلة للحسم من هذا السطح.'
+  },
+  peakMode: {
+    pageEyebrow: 'DSH / العمليات / وضع الذروة',
+    pageTitle: 'وضع الذروة',
+    pageDescription: 'مناطق الضغط والسياسات مع بنية أكثر ضغطًا وبدون زر تشغيل كاذب.',
+    unavailableDescription: 'السطح يحافظ على مسار قرار واضح حتى عند غياب البيانات أو توقفها.',
+    heroEyebrow: 'سعة تشغيلية',
+    heroTitle: 'مساحة وضع الذروة',
+    heroDescription: 'هذا السطح يعرض أين يكون توسيع السعة منطقيًا وأين يجب منعه، مع الحفاظ على فتح مساحة العمليات كقرار رئيسي وفق العقد.',
+    stateLoadingTitle: 'جار تجهيز وضع الذروة',
+    stateLoadingDescription: 'المسار حي، وستظهر سياسات السعة ومناطق الضغط بعد اكتمال هذه المرحلة.',
+    stateEmptyTitle: 'لا توجد ضغوط تتطلب وضع الذروة الآن',
+    stateEmptyDescription: 'الوضع مستقر حاليًا ولا توجد مناطق مرشحة لتوسيع السعة في هذه اللحظة.',
+    stateOfflineTitle: 'الاتصال غير متاح',
+    stateOfflineDescription: 'يبقى المسار محفوظًا لكن قراءات الضغط والسعة لن تتحدّث حتى يعود الاتصال.',
+    stateDisabledTitle: 'وضع الذروة غير مفعّل بالكامل',
+    stateDisabledDescription: 'هذا العرض يثبت القراءة والسياسة فقط، بينما التنفيذ الفعلي خارج النطاق الحالي.',
+    stateErrorTitle: 'تعذر تحميل وضع الذروة',
+    stateErrorDescription: 'يمكنك الرجوع إلى المركز أو إعادة المحاولة من نفس المسار.',
+    signals: {
+      activeZones: 'المناطق النشطة',
+      activeZonesDescription: 'المناطق التي تُقاس ضمن هذا العرض.',
+      pressureZones: 'مناطق الضغط',
+      pressureZonesDescription: 'مناطق تحتاج قرارًا حول السعة أو مراقبة أقرب.',
+      flexCaptains: 'كباتن مرنون',
+      flexCaptainsDescription: 'احتياطي مرئي يمكنه امتصاص جزء من الضغط عند الحاجة.',
+      protectedQueues: 'طوابير محمية',
+      protectedQueuesDescription: 'حالات يجب ألّا يغطيها وضع الذروة بدل معالجة أصل المشكلة.'
+    },
+    policiesTitle: 'سياسات وضع الذروة',
+    policiesDescription: 'هذه القواعد توضح أين ينتهي هذا السطح: قراءة وسياسة، بلا تفعيل مباشر ولا تعديل مخفي.',
+    lanesTitle: 'مناطق الضغط',
+    lanesDescription: 'كل بطاقة تعطي قراءة سريعة للحمل والسعة والتوصية، بدون التظاهر بإمكانية التفعيل المباشر من هنا.'
+  },
+  arrivalBell: {
+    pageEyebrow: 'DSH / العمليات / جرس الوصول',
+    pageTitle: 'جرس الوصول',
+    pageDescription: 'حالات الوصول والرن ضمن قراءة أوضح وأكثر ضغطًا دون أي اتجاه محلي.',
+    unavailableDescription: 'المسار يظل واضحًا حتى عندما لا تكون البيانات جاهزة أو متاحة.',
+    heroEyebrow: 'مساحة تشغيلية',
+    heroTitle: 'مساحة جرس الوصول',
+    heroDescription: 'هذا السطح لا ينفذ إجراءات تشغيل مباشرة، لكنه يثبت القراءة التشغيلية الصحيحة ويعطي مسارًا حقيقيًا من مركز DSH إلى حالات الوصول والرن.',
+    stateLoadingTitle: 'جار تجهيز مساحة جرس الوصول',
+    stateLoadingDescription: 'الهيكل حاضر، وسيظهر صف الكابتن والعميل بوضوح بعد اكتمال هذه الخطوة.',
+    stateEmptyTitle: 'لا توجد حالات لجرس الوصول الآن',
+    stateEmptyDescription: 'المسار حي، لكن لا توجد حالات وصول أو رن تحتاج متابعة في هذه اللحظة.',
+    stateOfflineTitle: 'الاتصال غير متاح',
+    stateOfflineDescription: 'يبقى المسار واضحًا، لكن حالات الوصول والرن لا تُحدّث حتى يعود الاتصال.',
+    stateDisabledTitle: 'مسار جرس الوصول غير مفعّل بالكامل',
+    stateDisabledDescription: 'هذا العرض يثبّت القراءة والتنقل فقط، أما التنفيذ التفصيلي فيأتي لاحقًا.',
+    stateErrorTitle: 'تعذر تحميل جرس الوصول',
+    stateErrorDescription: 'يمكنك الرجوع إلى المركز أو إعادة المحاولة من نفس المسار بدون فقدان الاتجاه.',
+    signals: {
+      activeArrivals: 'الوصولات النشطة',
+      activeArrivalsDescription: 'حالات لديها حضور فعلي داخل مسار الوصول.',
+      awaitingAcknowledgement: 'بانتظار الإقرار',
+      awaitingAcknowledgementDescription: 'طلبات وصل فيها الكابتن لكن العميل لم يؤكد بعد.',
+      blockedRings: 'الرنات المحجوبة',
+      blockedRingsDescription: 'حالات تحت تبريد أو منع تشغيلي ولا يجب تحويلها إلى إجراء زائف.',
+      resolvedToday: 'مغلق اليوم',
+      resolvedTodayDescription: 'مؤشر مرئي فقط على الإغلاق اليومي داخل هذا العرض.'
+    },
+    captainLaneTitle: 'مسار الكابتن',
+    captainLaneDescription: 'يوضح من وصل، ومن رن، وما الحالات التي تتطلب قرار عمليات أوسع بدل تكرار المحاولة محليًا.',
+    customerLaneTitle: 'مسار العميل',
+    customerLaneDescription: 'يعرض الإقرار، وغياب الرد، والحالات التي يجب أن تعود إلى مساحة العمليات بدل دفع المستخدم إلى تفاصيل غير موجودة.'
+  },
+  fixtures: {
+    orders: {
+      rows: [
+        {
+          id: 'ORD-24018',
+          customer: 'عميل مباشر',
+          route: 'المخزن المركزي → حي النخيل',
+          amount: '62.00 SAR',
+          eta: '14 دقيقة',
+          statusLabel: 'جديد',
+          statusTone: 'brand',
+          createdLabel: '10:14 صباحًا',
+          destinationLabel: 'حي النخيل - شارع 4',
+          captainLabel: 'لم يعيّن بعد',
+          notes: 'طلب يحتاج فتح تعيين سريع من الطابور الأساسي.'
+        },
+        {
+          id: 'ORD-24019',
+          customer: 'عميل تجريبي',
+          route: 'المخزن الشرقي → شارع 12',
+          amount: '48.50 SAR',
+          eta: '22 دقيقة',
+          statusLabel: 'مؤكد',
+          statusTone: 'success',
+          createdLabel: '10:26 صباحًا',
+          destinationLabel: 'شارع 12 - برج الماسة',
+          captainLabel: 'كابتن سامر',
+          notes: 'الطلب مؤكد ويتحرك ضمن ETA طبيعي.'
+        },
+        {
+          id: 'ORD-24020',
+          customer: 'عميل استرداد',
+          route: 'المخزن الغربي → المنطقة الصناعية',
+          amount: '91.75 SAR',
+          eta: '31 دقيقة',
+          statusLabel: 'بحاجة مراجعة',
+          statusTone: 'warning',
+          createdLabel: '10:41 صباحًا',
+          destinationLabel: 'المنطقة الصناعية - بوابة 3',
+          captainLabel: 'قيد الفحص',
+          notes: 'العنوان واضح لكن الطلب يتطلب تأكيد قدرة الكابتن قبل الإسناد.'
+        },
+        {
+          id: 'ORD-24021',
+          customer: 'عميل VIP',
+          route: 'المركز الرئيس → الطريق الساحلي',
+          amount: '124.00 SAR',
+          eta: '41 دقيقة',
+          statusLabel: 'معلق',
+          statusTone: 'danger',
+          createdLabel: '10:55 صباحًا',
+          destinationLabel: 'الطريق الساحلي - بوابة المرسى',
+          captainLabel: 'تم إيقاف الإسناد',
+          notes: 'الطلب موقوف حتى مراجعة سبب التعليق والتصعيد التشغيلي.'
+        }
+      ],
+      arrivalTimelines: {
+        'ORD-24018': {
+          arrived: false,
+          arrivedLabel: 'لم يصل بعد',
+          ringCount: 0,
+          lastRingLabel: 'لا توجد رنة',
+          acknowledged: false,
+          acknowledgedLabel: 'لم يؤكد العميل بعد',
+          cooldownLabel: 'متاح الآن',
+          blockReason: 'لا يوجد منع حالي'
+        },
+        'ORD-24019': {
+          arrived: true,
+          arrivedLabel: 'وصل 10:42 صباحًا',
+          ringCount: 1,
+          lastRingLabel: 'آخر رنة 10:43 صباحًا',
+          acknowledged: true,
+          acknowledgedLabel: 'العميل أكد الوصول 10:44 صباحًا',
+          cooldownLabel: 'انتهى التبريد',
+          blockReason: 'لا يوجد منع حالي'
+        },
+        'ORD-24020': {
+          arrived: true,
+          arrivedLabel: 'وصل 10:58 صباحًا',
+          ringCount: 2,
+          lastRingLabel: 'آخر رنة 11:01 صباحًا',
+          acknowledged: false,
+          acknowledgedLabel: 'لا يوجد إقرار من العميل',
+          cooldownLabel: 'تبريد حتى 11:04 صباحًا',
+          blockReason: 'بانتظار مراجعة التشغيل قبل إعادة الرن'
+        },
+        'ORD-24021': {
+          arrived: false,
+          arrivedLabel: 'الوصول متوقف',
+          ringCount: 0,
+          lastRingLabel: 'معلّق',
+          acknowledged: false,
+          acknowledgedLabel: 'لا يوجد إقرار',
+          cooldownLabel: 'غير متاح',
+          blockReason: 'الطلب معلق ويتطلب تصعيدًا تشغيليًا قبل أي محاولة جديدة'
+        }
+      },
+      actionPlans: {
+        brand: {
+          primaryLabel: 'افتح مساحة العمليات',
+          primaryDescription: 'الطلب جديد ويحتاج دخولًا سريعًا إلى مساحة العمليات قبل تنفيذ أي إجراء أعمق.',
+          secondaryLabel: 'راجع طابور الطلبات',
+          secondaryDescription: 'الرجوع إلى القائمة مفيد لمقارنة هذا الطلب مع بقية الحالات المفتوحة.',
+          supportLabel: 'صعّد إلى الدعم',
+          supportDescription: 'يبقى الدعم مسارًا احتياطيًا إذا تعطل القرار أو تغيّرت المعطيات.'
+        },
+        warning: {
+          primaryLabel: 'افتح مساحة العمليات',
+          primaryDescription: 'هذه الحالة تحتاج قرار تشغيل واضح قبل إعادة الرن أو الاستمرار في الإسناد.',
+          secondaryLabel: 'ارجع إلى الطلبات للمقارنة',
+          secondaryDescription: 'يساعدك الرجوع إلى الطابور على قياس أولوية هذه المراجعة مقابل بقية الطلبات.',
+          supportLabel: 'حوّل إلى الدعم',
+          supportDescription: 'الدعم مناسب عندما تصبح المراجعة غير قابلة للحسم من داخل هذا السطح.'
+        },
+        danger: {
+          primaryLabel: 'افتح مساحة العمليات',
+          primaryDescription: 'الطلب معلق، وأفضل إجراء أولي هو العودة إلى مساحة العمليات الكاملة لقرار تشغيلي أوسع.',
+          secondaryLabel: 'افتح طابور الطلبات',
+          secondaryDescription: 'يوفر الرجوع إلى القائمة رؤية أشمل على الحالات الحرجة المجاورة.',
+          supportLabel: 'افتح الدعم فورًا',
+          supportDescription: 'التصعيد مناسب هنا لأنه يختصر الطريق عند استمرار التعليق أو غياب حل مباشر.'
+        },
+        defaultPlan: {
+          primaryLabel: 'افتح مساحة العمليات',
+          primaryDescription: 'الطلب مستقر نسبيًا، لكن السطح الحالي يوجهك إلى مساحة العمليات كإجراء رئيسي متوافق مع العقد.',
+          secondaryLabel: 'ارجع إلى قائمة الطلبات',
+          secondaryDescription: 'الرجوع إلى القائمة يسهّل متابعة الطابور والانتقال إلى طلب آخر عند الحاجة.',
+          supportLabel: 'افتح الدعم',
+          supportDescription: 'الدعم يبقى مسارًا ثانويًا عند وجود احتياج بشري أو تشغيلي خاص.'
+        }
+      }
+    },
+    peakMode: {
+      summary: {
+        activeZones: 5,
+        pressureZones: 2,
+        flexCaptains: 11,
+        protectedQueues: 3
+      },
+      policies: [
+        {
+          label: 'تعدد الطلبات',
+          statusLabel: 'مقترح فقط',
+          description: 'السطح الحالي يوضح أين يكون تفعيل السعة المنطقية مناسبًا، لكنه لا يبدّل حالة تشغيل فعلية.'
+        },
+        {
+          label: 'حماية الطوابير الحساسة',
+          statusLabel: 'محمي',
+          description: 'الطلبات الحرجة أو المحجوبة تبقى خارج أي توسيع سعة حتى لا يتحول وضع الذروة إلى إخفاء للمشكلة.'
+        },
+        {
+          label: 'العودة إلى مساحة العمليات',
+          statusLabel: 'إجباري',
+          description: 'العقد يفرض أن يكون فتح مساحة العمليات هو المخرج الرئيسي بعد قراءة القرار.'
+        }
+      ],
+      lanes: [
+        {
+          zoneLabel: 'حي النخيل',
+          loadLabel: 'ضغط مرتفع',
+          captainCapacityLabel: '4 كباتن مرنون',
+          queueLabel: '12 طلبًا مفتوحًا',
+          recommendationLabel: 'مرشح لتوسيع السعة',
+          note: 'هذه المنطقة تناسب وضع الذروة لأن البدائل جاهزة والضغط مؤقت لا هيكلي.',
+          tone: 'warning'
+        },
+        {
+          zoneLabel: 'الطريق الساحلي',
+          loadLabel: 'ضغط حرج',
+          captainCapacityLabel: 'بديل محدود',
+          queueLabel: '7 طلبات مع تعثرات',
+          recommendationLabel: 'لا تفعّل قبل مراجعة أعمق',
+          note: 'الضغط هنا قد يخفي مشكلة تشغيلية أعمق، لذلك لا يجب تقديم تفعيل مباشر من هذا السطح.',
+          tone: 'danger'
+        },
+        {
+          zoneLabel: 'شارع 12',
+          loadLabel: 'ضغط قابل للإدارة',
+          captainCapacityLabel: '3 كباتن مرنون',
+          queueLabel: '5 طلبات نشطة',
+          recommendationLabel: 'مراقبة فقط',
+          note: 'تكفي المراقبة حاليًا دون توسيع سعة أو تصعيد.',
+          tone: 'brand'
+        },
+        {
+          zoneLabel: 'المنطقة الصناعية',
+          loadLabel: 'مستقر',
+          captainCapacityLabel: 'احتياطي متاح',
+          queueLabel: '3 طلبات',
+          recommendationLabel: 'جاهز عند الحاجة',
+          note: 'هذه المنطقة تحمل سعة احتياطية لكنها لا تحتاج تفعيلًا فوريًا.',
+          tone: 'success'
+        }
+      ]
+    },
+    reassign: {
+      summary: {
+        activeCases: 6,
+        urgentCases: 2,
+        blockedCases: 1,
+        readyFallbacks: 4
+      },
+      candidates: [
+        {
+          deliveryId: 'DEL-8102',
+          orderId: 'ORD-24020',
+          currentCaptain: 'كابتن ميداني',
+          fallbackCaptain: 'كابتن نواف',
+          reasonLabel: 'ازدحام مروري',
+          priorityLabel: 'عاجلة',
+          statusLabel: 'يحتاج قرار الآن',
+          note: 'الأقرب أن ينتقل القرار إلى fallback جاهز خلال نافذة قصيرة.',
+          tone: 'warning'
+        },
+        {
+          deliveryId: 'DEL-8103',
+          orderId: 'ORD-24021',
+          currentCaptain: 'إسناد موقوف',
+          fallbackCaptain: 'غير محدد',
+          reasonLabel: 'تعليق تشغيلي',
+          priorityLabel: 'عاجلة',
+          statusLabel: 'محجوب',
+          note: 'هذه الحالة تحتاج مساحة تشغيل أوسع أو دعمًا قبل أي نقل فعلي.',
+          tone: 'danger'
+        },
+        {
+          deliveryId: 'DEL-8104',
+          orderId: 'ORD-24019',
+          currentCaptain: 'كابتن سامر',
+          fallbackCaptain: 'كابتن راشد',
+          reasonLabel: 'طلب العميل',
+          priorityLabel: 'عادية',
+          statusLabel: 'بديل جاهز',
+          note: 'القرار واضح ويمكن تتبعه من مساحة العمليات بدون إدخال تشغيل مباشر الآن.',
+          tone: 'success'
+        },
+        {
+          deliveryId: 'DEL-8105',
+          orderId: 'ORD-24018',
+          currentCaptain: 'لم يعيّن بعد',
+          fallbackCaptain: 'كابتن سريع',
+          reasonLabel: 'عدم توفر كابتن',
+          priorityLabel: 'عادية',
+          statusLabel: 'مرشح',
+          note: 'هذه الحالة مناسبة كقرار مبكر في الطابور قبل أن تتحول إلى تعثر.',
+          tone: 'brand'
+        }
+      ]
+    },
+    arrivalBell: {
+      summary: {
+        activeArrivals: 7,
+        awaitingAcknowledgement: 3,
+        blockedRings: 2,
+        resolvedToday: 18
+      },
+      captainLane: [
+        {
+          orderId: 'ORD-24019',
+          actorLabel: 'كابتن سامر',
+          statusLabel: 'وصل وسجل الوصول',
+          etaLabel: 'منذ 2 د',
+          ringLabel: 'رنة واحدة',
+          actionHint: 'بانتظار إقرار العميل أو متابعة مساحة العمليات.',
+          tone: 'success'
+        },
+        {
+          orderId: 'ORD-24020',
+          actorLabel: 'كابتن ميداني',
+          statusLabel: 'وصل لكن الرن مقيّد',
+          etaLabel: 'منذ 5 د',
+          ringLabel: '2 رنات',
+          actionHint: 'يوجد تبريد نشط ويتطلب قرار عمليات قبل إعادة الرن.',
+          tone: 'warning'
+        },
+        {
+          orderId: 'ORD-24021',
+          actorLabel: 'إسناد موقوف',
+          statusLabel: 'الوصول متعثر',
+          etaLabel: 'غير متاح',
+          ringLabel: 'لا توجد محاولات',
+          actionHint: 'هذه حالة تصعيد ولا يجب تحويلها إلى إجراء تشغيلي كاذب.',
+          tone: 'danger'
+        }
+      ],
+      customerLane: [
+        {
+          orderId: 'ORD-24019',
+          actorLabel: 'العميل أكد الوصول',
+          statusLabel: 'أنا قادم',
+          etaLabel: '10:44 صباحًا',
+          ringLabel: 'تم الإقرار',
+          actionHint: 'يمكن متابعة بقية الطابور مع بقاء الحالة مرئية.',
+          tone: 'success'
+        },
+        {
+          orderId: 'ORD-24018',
+          actorLabel: 'لم يصل إشعار بعد',
+          statusLabel: 'بانتظار أول رنة',
+          etaLabel: '14 دقيقة',
+          ringLabel: '0 رنات',
+          actionHint: 'الحالة مبكرة ولا تحتاج دعمًا أو تصعيدًا بعد.',
+          tone: 'brand'
+        },
+        {
+          orderId: 'ORD-24020',
+          actorLabel: 'لا يوجد إقرار',
+          statusLabel: 'يحتاج متابعة',
+          etaLabel: '11:04 صباحًا',
+          ringLabel: '2 رنات',
+          actionHint: 'هذه الحالة تستدعي الرجوع إلى مساحة العمليات الكاملة لتقرير الخطوة التالية.',
+          tone: 'warning'
+        }
+      ]
+    },
+    zoneSet: {
+      summary: {
+        configuredZones: 5,
+        protectedZones: 2,
+        freeDeliveryZones: 4,
+        reviewZones: 3
+      },
+      policies: [
+        {
+          label: 'القراءة أولًا',
+          statusLabel: 'منضبط',
+          description: 'يوضح هذا السطح أين تنتهي القراءة وأين يبدأ القرار التشغيلي الأوسع.'
+        },
+        {
+          label: 'حماية المناطق الحساسة',
+          statusLabel: 'محمي',
+          description: 'المناطق التي تحتاج حماية لا تتحول إلى تبديل زائف أو تسهيل غير مبرر.'
+        },
+        {
+          label: 'مساحة التسليم الحرة',
+          statusLabel: 'متاح',
+          description: 'المناطق الحرة تبقى مرئية كقدرة استيعاب عند الحاجة.'
+        }
+      ],
+      lanes: [
+        {
+          zoneLabel: 'حي النخيل',
+          feeLabel: 'رسوم مرئية',
+          etaLabel: '14 دقيقة',
+          statusLabel: 'مناسب للمراجعة',
+          recommendationLabel: 'مرشح أولي',
+          note: 'هذه المنطقة تحتاج قراءة واضحة قبل أي توسع.',
+          tone: 'warning'
+        },
+        {
+          zoneLabel: 'الطريق الساحلي',
+          feeLabel: 'رسوم أعلى',
+          etaLabel: '31 دقيقة',
+          statusLabel: 'محمي',
+          recommendationLabel: 'لا يفتح الآن',
+          note: 'هذا المسار يحتاج قرار حدودي أوسع بدل فتح مباشر.',
+          tone: 'danger'
+        },
+        {
+          zoneLabel: 'شارع 12',
+          feeLabel: 'رسوم مستقرة',
+          etaLabel: '22 دقيقة',
+          statusLabel: 'جاهز',
+          recommendationLabel: 'مراقبة فقط',
+          note: 'الوضع هنا متوازن ولا يحتاج أي حركة إضافية.',
+          tone: 'success'
+        },
+        {
+          zoneLabel: 'المنطقة الصناعية',
+          feeLabel: 'رسوم مرنة',
+          etaLabel: '19 دقيقة',
+          statusLabel: 'قابل للتوسعة',
+          recommendationLabel: 'متاح عند الحاجة',
+          note: 'يوفر هذا المسار سعة جاهزة عند ارتفاع الضغط.',
+          tone: 'brand'
+        }
+      ]
+    },
+  }
+};
 
 const dshControlPanelTextCatalog = {
   ar: arDshControlPanelText,
   en: enDshControlPanelText,
-} as const satisfies Record<BthLocale, DshControlPanelText>;
+} as const;
 
 export function getDshControlPanelText(locale: BthLocale = 'ar') {
   return dshControlPanelTextCatalog[locale];
 }
 
 export function formatDshWorkbenchSubtitle(
-  text: DshControlPanelText,
   workbenchDescription: string,
   filterLabel: string,
+  locale: BthLocale = 'ar',
 ) {
-  if (text === enDshControlPanelText) {
+  const resolvedLocale = locale;
+
+  if (resolvedLocale === 'en') {
     return `${workbenchDescription} The current slice stays honest: ${filterLabel} is the active context, and only the safe routes are live now.`;
   }
 

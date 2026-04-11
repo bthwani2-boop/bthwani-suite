@@ -1,5 +1,3 @@
-import type { DshControlPanelText } from '@bthwani/ui-kit';
-
 export type DshOrderRow = {
   id: string;
   customer: string;
@@ -34,19 +32,46 @@ export type DshOrderActionPlan = {
   supportDescription: string;
 };
 
-export function getSampleDshOrders(text: DshControlPanelText): ReadonlyArray<DshOrderRow> {
-  return text.fixtures.orders.rows;
+type DshOrdersTextSource = {
+  fixtures: {
+    orders: {
+      rows: ReadonlyArray<{
+        id: string;
+        customer: string;
+        route: string;
+        amount: string;
+        eta: string;
+        statusLabel: string;
+        statusTone: string;
+        createdLabel: string;
+        destinationLabel: string;
+        captainLabel: string;
+        notes: string;
+      }>;
+      arrivalTimelines: Record<string, DshOrderArrivalTimeline>;
+      actionPlans: {
+        brand: DshOrderActionPlan;
+        warning: DshOrderActionPlan;
+        danger: DshOrderActionPlan;
+        defaultPlan: DshOrderActionPlan;
+      };
+    };
+  };
+};
+
+export function getSampleDshOrders(text: DshOrdersTextSource): ReadonlyArray<DshOrderRow> {
+  return text.fixtures.orders.rows as ReadonlyArray<DshOrderRow>;
 }
 
-export function getSampleDshOrder(text: DshControlPanelText, orderId: string) {
+export function getSampleDshOrder(text: DshOrdersTextSource, orderId: string) {
   return getSampleDshOrders(text).find((order) => order.id === orderId);
 }
 
-export function getSampleDshOrderArrivalTimeline(text: DshControlPanelText, orderId: string) {
-  return text.fixtures.orders.arrivalTimelines[orderId as keyof typeof text.fixtures.orders.arrivalTimelines];
+export function getSampleDshOrderArrivalTimeline(text: DshOrdersTextSource, orderId: string) {
+  return text.fixtures.orders.arrivalTimelines[orderId as keyof typeof text.fixtures.orders.arrivalTimelines] as DshOrderArrivalTimeline | undefined;
 }
 
-export function getSampleDshOrderActionPlan(text: DshControlPanelText, orderId: string): DshOrderActionPlan {
+export function getSampleDshOrderActionPlan(text: DshOrdersTextSource, orderId: string): DshOrderActionPlan {
   const order = getSampleDshOrder(text, orderId);
 
   if (order?.statusTone === 'brand') {

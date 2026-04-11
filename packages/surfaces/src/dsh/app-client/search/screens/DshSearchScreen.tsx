@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthBox, BthButton, BthCard, BthMobileScrollView, BthSearchField, BthSectionHeader, BthStateView, BthSurface, BthText, BthListItem } from '@bthwani/ui-kit';
+import { BthBox, BthButton, BthCard, BthListItem, BthMobileScrollView, BthSearchField, BthSectionHeader, BthSurface, BthText } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../_shared/screens';
 
 export type DshSearchResult = { id: string; title: string; subtitle: string; meta?: string };
@@ -20,6 +20,8 @@ export function DshSearchScreen({ state = 'ready', query = '', results, onQueryC
     return <DshOperationScreen state={state} title="Search" subtitle="Find stores, categories, or saved items quickly." onRetry={onRetry} />;
   }
 
+  const hasQuery = query.trim().length > 0;
+
   return (
     <DshOperationScreen
       state="ready"
@@ -28,6 +30,11 @@ export function DshSearchScreen({ state = 'ready', query = '', results, onQueryC
       content={
         <BthSurface tone="inset" gap={3}>
           <BthSearchField label="Search" value={query} onChangeText={onQueryChange} hint="Use a store name, category, or item term." />
+          <BthSectionHeader
+            title={hasQuery ? 'Matching stores' : 'Browse stores'}
+            subtitle={hasQuery ? 'The list narrows as you type.' : 'Start typing to narrow the current discovery set.'}
+            count={results.length}
+          />
           <BthBox layoutDirection="row" gap={2}>
             <BthButton label="Categories" tone="secondary" onPress={onOpenCategories} />
             <BthButton label="Favorites" tone="secondary" onPress={onOpenFavorites} />
@@ -39,8 +46,16 @@ export function DshSearchScreen({ state = 'ready', query = '', results, onQueryC
               ))}
             </BthBox>
           ) : (
-            <BthCard title="No results yet" subtitle="Adjust the query or go back to discovery." />
+            <BthCard title="No results yet" subtitle="Adjust the query or jump back to discovery.">
+              <BthBox layoutDirection="row" gap={2}>
+                <BthButton label="Categories" tone="secondary" onPress={onOpenCategories} />
+                <BthButton label="Favorites" tone="secondary" onPress={onOpenFavorites} />
+              </BthBox>
+            </BthCard>
           )}
+          <BthText role="caption" tone="muted">
+            Search stays within the current discovery set so you can move to a store in one step.
+          </BthText>
         </BthSurface>
       }
       primaryActionLabel="Back"

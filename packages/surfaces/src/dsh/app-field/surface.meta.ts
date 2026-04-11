@@ -1,5 +1,5 @@
 export const surfaceMeta = {
   id: 'app-field',
   owner: 'dsh',
-  placeholder: true,
+  placeholder: false,
 } as const;

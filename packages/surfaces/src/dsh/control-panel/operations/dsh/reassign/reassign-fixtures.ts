@@ -1,5 +1,3 @@
-import type { DshControlPanelText } from '@bthwani/ui-kit';
-
 export type DshReassignCandidate = {
   deliveryId: string;
   orderId: string;
@@ -19,10 +17,29 @@ export type DshReassignSummary = {
   readyFallbacks: number;
 };
 
-export function getDshReassignSummary(text: DshControlPanelText): DshReassignSummary {
+type DshReassignTextSource = {
+  fixtures: {
+    reassign: {
+      summary: DshReassignSummary;
+      candidates: ReadonlyArray<{
+        deliveryId: string;
+        orderId: string;
+        currentCaptain: string;
+        fallbackCaptain: string;
+        reasonLabel: string;
+        priorityLabel: string;
+        statusLabel: string;
+        note: string;
+        tone: string;
+      }>;
+    };
+  };
+};
+
+export function getDshReassignSummary(text: DshReassignTextSource): DshReassignSummary {
   return text.fixtures.reassign.summary;
 }
 
-export function getDshReassignCandidates(text: DshControlPanelText): ReadonlyArray<DshReassignCandidate> {
-  return text.fixtures.reassign.candidates;
+export function getDshReassignCandidates(text: DshReassignTextSource): ReadonlyArray<DshReassignCandidate> {
+  return text.fixtures.reassign.candidates as ReadonlyArray<DshReassignCandidate>;
 }

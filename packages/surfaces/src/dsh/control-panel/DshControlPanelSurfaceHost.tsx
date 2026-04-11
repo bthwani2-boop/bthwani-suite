@@ -19,13 +19,12 @@ import { ControlPanelDshZoneSetScreen } from './operations/dsh/zone-set';
 const liveRouteHrefs = {
   overview: '/operations',
   orders: '/operations/dsh/orders',
+  sheinProxy: '/operations/dsh/sheinproxy',
   reassign: '/operations/dsh/reassign',
   peakMode: '/operations/dsh/peak-mode',
   arrivalBell: '/operations/dsh/arrival-bell',
   zoneSet: '/operations/dsh/zone-set',
 } as const;
-
-const plannedRouteItems = ['sheinProxy'] as const;
 
 type DshWorkspaceId = 'overview' | 'orders' | 'order-detail' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'arrival-bell' | 'zone-set';
 
@@ -87,18 +86,13 @@ function ControlPanelDshOperationsDock() {
   const liveRouteItems: ReadonlyArray<DshDockRouteItem> = [
     { href: liveRouteHrefs.overview, label: dshText.overviewLabel, description: dshText.overviewDescription, statusLabel: dshText.liveBadge },
     { href: liveRouteHrefs.orders, label: dshText.ordersLabel, description: dshText.ordersDescription, statusLabel: dshText.liveBadge },
+    { href: liveRouteHrefs.sheinProxy, label: dshText.sheinProxyLabel, description: dshText.sheinProxyDescription, statusLabel: dshText.liveBadge },
     { href: liveRouteHrefs.reassign, label: dshText.reassignLabel, description: dshText.reassignDescription, statusLabel: dshText.liveBadge },
     { href: liveRouteHrefs.peakMode, label: dshText.peakModeLabel, description: dshText.peakModeDescription, statusLabel: dshText.liveBadge },
     { href: liveRouteHrefs.arrivalBell, label: dshText.arrivalBellLabel, description: dshText.arrivalBellDescription, statusLabel: dshText.liveBadge },
     { href: liveRouteHrefs.zoneSet, label: dshText.zoneSetLabel, description: dshText.zoneSetDescription, statusLabel: dshText.liveBadge },
   ];
-
-  const plannedRouteItemsView: ReadonlyArray<DshDockRouteItem> = plannedRouteItems.map((plannedRouteItem) => ({
-    href: plannedRouteItem === 'sheinProxy' ? '/operations/dsh/sheinproxy' : undefined,
-    label: dshText.sheinProxyLabel,
-    description: dshText.sheinProxyDescription,
-    statusLabel: dshText.plannedBadge,
-  }));
+  const plannedRoutesCount = 0;
 
   return (
     <BthBox gap={4}>
@@ -109,7 +103,7 @@ function ControlPanelDshOperationsDock() {
         description={dshText.dockDescription}
         metaItems={[
           `${dshText.liveRoutesTitle}: ${liveRouteItems.length}`,
-          `${dshText.plannedRoutesTitle}: ${plannedRouteItemsView.length}`,
+          `${dshText.plannedRoutesTitle}: ${plannedRoutesCount}`,
           dshText.openHubAction,
         ]}
         primaryAction={{ label: dshText.openOrdersAction, href: liveRouteHrefs.orders }}
@@ -118,7 +112,7 @@ function ControlPanelDshOperationsDock() {
 
       <BthBox gap={2}>
         <BthWebSignalCard title={dshText.liveSignalTitle} value={String(liveRouteItems.length)} description={dshText.liveSignalDescription} tone="best" />
-        <BthWebSignalCard title={dshText.plannedSignalTitle} value={String(plannedRouteItemsView.length)} description={dshText.plannedSignalDescription} />
+        <BthWebSignalCard title={dshText.plannedSignalTitle} value={String(plannedRoutesCount)} description={dshText.plannedSignalDescription} />
         <BthWebSignalCard title={dshText.entrySignalTitle} value="3" description={dshText.entrySignalDescription} />
       </BthBox>
 
@@ -129,34 +123,6 @@ function ControlPanelDshOperationsDock() {
               <BthBox layoutDirection="row" justify="space-between" align="center">
                 <BthText role="bodyStrong">{item.label}</BthText>
                 <BthText role="caption" tone="success">
-                  {item.statusLabel}
-                </BthText>
-              </BthBox>
-              <BthText role="bodySm" tone="muted">
-                {item.description}
-              </BthText>
-              <BthButton
-                label={dshText.openRouteAction}
-                tone="secondary"
-                fullWidth={false}
-                onPress={() => {
-                  if (item.href) {
-                    router.push(item.href);
-                  }
-                }}
-              />
-            </BthBox>
-          ))}
-        </BthBox>
-      </BthWebSectionCard>
-
-      <BthWebSectionCard title={dshText.plannedRoutesTitle} description={dshText.plannedRoutesDescription}>
-        <BthBox gap={2}>
-          {plannedRouteItemsView.map((item) => (
-            <BthBox key={item.label} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthBox layoutDirection="row" justify="space-between" align="center">
-                <BthText role="bodyStrong">{item.label}</BthText>
-                <BthText role="caption" tone="soft">
                   {item.statusLabel}
                 </BthText>
               </BthBox>

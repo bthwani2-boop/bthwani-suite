@@ -93,7 +93,7 @@ export function DshCreateOrderScreen({
       <BthBox gap={3}>
         <BthSectionHeader
           title="Optional note"
-          subtitle="Advanced options are deferred to later waves."
+          subtitle="Keep this slice focused on the note that matters now."
         />
         <BthTextField
           label="Order note"

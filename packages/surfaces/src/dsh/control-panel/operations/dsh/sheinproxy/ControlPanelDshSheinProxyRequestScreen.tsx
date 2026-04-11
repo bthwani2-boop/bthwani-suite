@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { BthBox, BthButton, BthCard, BthKeyValueList, BthStateView, BthText, useDshControlPanelText, useUiText, type DshControlPanelText } from '@bthwani/ui-kit';
+import { BthBox, BthButton, BthCard, BthKeyValueList, BthStateView, BthText, useDshControlPanelText, useUiText } from '@bthwani/ui-kit';
 import {
   BthWebMissionHeroCard,
   BthWebPageFrame,
@@ -38,7 +38,7 @@ function resolveStatusTone(status: SheinProxyRequestStatus) {
   return 'neutral' as const;
 }
 
-function resolveStatusLabel(text: DshControlPanelText, status: SheinProxyRequestStatus) {
+function resolveStatusLabel(text: ReturnType<typeof useDshControlPanelText>, status: SheinProxyRequestStatus) {
   return text.sheinProxyRequest.statusLabels[
     status === 'under-review'
       ? 'underReview'
@@ -55,7 +55,7 @@ function resolveStatusLabel(text: DshControlPanelText, status: SheinProxyRequest
 }
 
 function resolveStateCopy(
-  text: DshControlPanelText,
+  text: ReturnType<typeof useDshControlPanelText>,
   state: Exclude<SheinProxyRequestScreenState, 'ready'>,
 ) {
   if (state === 'loading') {
@@ -102,7 +102,7 @@ function resolveStateCopy(
   };
 }
 
-function resolveStageMeta(text: DshControlPanelText, stage: SheinProxyRequestStage) {
+function resolveStageMeta(text: ReturnType<typeof useDshControlPanelText>, stage: SheinProxyRequestStage) {
   return {
     label: text.sheinProxyRequest.stageLabels[stage],
     description: text.sheinProxyRequest.stageDescriptions[stage],

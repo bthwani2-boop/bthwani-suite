@@ -141,7 +141,7 @@
         "zoneSetLabel": "نطاق التوصيل",
         "zoneSetDescription": "حواجز النطاق المخططة لمسار DSH التالي.",
         "sheinProxyLabel": "SheinProxy",
-        "sheinProxyDescription": "مسار proxy مخطط يُحفظ للامتداد القادم.",
+        "sheinProxyDescription": "مسار proxy حي لوساطة طلبات DSH وقرارات الخطوة التالية.",
         "openHubAction": "افتح DSH hub",
         "openRouteAction": "افتح المسار",
         "openOrdersAction": "افتح الطلبات",
