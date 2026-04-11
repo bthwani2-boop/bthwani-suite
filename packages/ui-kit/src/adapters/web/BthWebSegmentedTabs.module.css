@@ -44,11 +44,6 @@
   color: var(--bth-brand);
 }
 
-:global(html[dir='rtl']) .root {
-  flex-direction: row-reverse;
-  justify-content: flex-start;
-}
-
 @media (max-width: 760px) {
   .root {
     gap: 6px;

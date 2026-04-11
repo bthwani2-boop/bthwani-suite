@@ -1,5 +1,7 @@
 declare const styles: {
   readonly root: string;
+  readonly rtl: string;
+  readonly ltr: string;
   readonly topBar: string;
   readonly topRowPrimary: string;
   readonly topRowSecondary: string;

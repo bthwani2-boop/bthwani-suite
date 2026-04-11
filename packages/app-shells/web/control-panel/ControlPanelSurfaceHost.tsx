@@ -8,7 +8,7 @@ import {
   BthWebSegmentedTabs,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
-import { useUiLanguage, useUiText } from '@bthwani/ui-kit';
+import { useDirection, useUiText } from '@bthwani/ui-kit';
 import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 
@@ -172,8 +172,8 @@ function resolveSecondaryAction(activeSectionId: ControlPanelSectionId, panelTex
 
 export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSurfaceHostProps) {
   const router = useRouter();
+  const { direction } = useDirection();
   const uiText = useUiText();
-  const { toggleLanguage } = useUiLanguage();
   const panelText = uiText.controlPanel;
   const [alertCount, setAlertCount] = React.useState(1);
   const [selectedServiceId, setSelectedServiceId] = React.useState<string>(allServiceTabId);
@@ -257,10 +257,6 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
     setAlertCount((currentCount) => (currentCount > 0 ? currentCount - 1 : 0));
   }, []);
 
-  const handleLanguageClick = React.useCallback(() => {
-    toggleLanguage();
-  }, [toggleLanguage]);
-
   const handleAlertClick = React.useCallback(() => {
     setSelectedServiceId(allServiceTabId);
     setAlertCount(0);
@@ -288,7 +284,6 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
       onBrandClick={handleBrandClick}
       onSearchClick={handleSearchClick}
       onRefreshClick={handleRefreshClick}
-      onLanguageClick={handleLanguageClick}
       onAlertClick={handleAlertClick}
       railTitle={panelText.brandLabel}
       railStatusLabel={isAllFilterActive ? panelText.filters.allServices : selectedServiceLabel}
@@ -296,7 +291,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
       railSupplementary={null}
       alertCountLabel={String(alertCount)}
     >
-      <div className={styles.stageStack}>
+      <div className={styles.stageStack} dir={direction}>
         <section className={styles.missionDockHeader}>
           <p className={styles.missionDockEyebrow}>{panelText.brandLabel}</p>
           <h1 className={styles.missionDockTitle}>{shellCopy.title}</h1>

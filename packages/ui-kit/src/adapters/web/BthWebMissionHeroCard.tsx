@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDirection } from '../../hooks';
 import styles from './BthWebMissionHeroCard.module.css';
 
 export type BthWebMissionHeroCardProps = {
@@ -22,8 +23,10 @@ export function BthWebMissionHeroCard({
   primaryAction,
   secondaryAction,
 }: BthWebMissionHeroCardProps) {
+  const { direction } = useDirection();
+
   return (
-    <article className={[styles.card, dense ? styles.cardDense : ''].filter(Boolean).join(' ')}>
+    <article className={[styles.card, dense ? styles.cardDense : ''].filter(Boolean).join(' ')} dir={direction}>
       {badges.length > 0 ? (
         <div className={styles.badgeRow}>
           {badges.map((badge) => (

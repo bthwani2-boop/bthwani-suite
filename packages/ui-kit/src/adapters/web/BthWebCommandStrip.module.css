@@ -23,11 +23,6 @@
   flex-wrap: wrap;
 }
 
-.topBar[dir='rtl'] .topRowPrimary,
-.topBar[dir='rtl'] .topRowSecondary {
-  flex-direction: row-reverse;
-}
-
 .identityCluster {
   display: inline-flex;
   align-items: center;
@@ -92,12 +87,6 @@
 .searchCluster:hover {
   border-color: #f59e0b;
   box-shadow: 0 8px 20px rgba(245, 158, 11, 0.14);
-}
-
-.topBar[dir='rtl'] .searchCluster,
-.topBar[dir='rtl'] .filterRow,
-.topBar[dir='rtl'] .identityCluster {
-  flex-direction: row-reverse;
 }
 
 .searchIcon {

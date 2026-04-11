@@ -85,12 +85,7 @@
   animation: bthFadeLift 260ms ease-out 90ms both;
 }
 
-.root[dir='rtl'] .workspace {
-  grid-template-columns: minmax(0, 1fr) 320px;
-  grid-template-areas: 'stage rail';
-}
-
-.root[dir='ltr'] .workspace {
+.workspace {
   grid-template-columns: 320px minmax(0, 1fr);
   grid-template-areas: 'rail stage';
 }

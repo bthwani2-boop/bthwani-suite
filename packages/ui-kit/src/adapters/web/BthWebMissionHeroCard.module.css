@@ -115,12 +115,6 @@
   flex-wrap: wrap;
 }
 
-:global(html[dir='rtl']) .badgeRow,
-:global(html[dir='rtl']) .metaRow,
-:global(html[dir='rtl']) .ctaRow {
-  flex-direction: row-reverse;
-}
-
 .primaryCta,
 .secondaryCta {
   display: inline-flex;

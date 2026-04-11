@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDirection } from '../../hooks';
 import styles from './BthWebSegmentedTabs.module.css';
 
 export type BthWebSegmentedTabItem = {
@@ -15,8 +16,10 @@ export type BthWebSegmentedTabsProps = {
 };
 
 export function BthWebSegmentedTabs({ items, ariaLabel, onSelect }: BthWebSegmentedTabsProps) {
+  const { direction } = useDirection();
+
   return (
-    <div className={styles.root} aria-label={ariaLabel}>
+    <div className={styles.root} aria-label={ariaLabel} dir={direction}>
       {items.map((item) => (
         <button
           key={item.id}
