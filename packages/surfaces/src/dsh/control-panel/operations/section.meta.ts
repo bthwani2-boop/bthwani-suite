@@ -1,5 +1,5 @@
 export const sectionMeta = {
   id: 'operations',
   surface: 'control-panel',
-  placeholder: true,
+  placeholder: false,
 } as const;

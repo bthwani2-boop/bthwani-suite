@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { BthBox, BthButton, BthStateView, BthText } from '@bthwani/ui-kit';
+import { BthBox, BthStateView, BthText, useDshControlPanelText } from '@bthwani/ui-kit';
 import {
   BthWebMissionHeroCard,
   BthWebPageFrame,
@@ -10,55 +10,56 @@ import {
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
 import {
-  dshPeakModePolicies,
-  dshPeakModePressureLanes,
-  dshPeakModeSummary,
+  getDshPeakModePolicies,
+  getDshPeakModePressureLanes,
+  getDshPeakModeSummary,
 } from './peak-mode-fixtures';
+import styles from '../dsh-surface.module.css';
 
 type ControlPanelDshPeakModeScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
-function resolveStateCopy(state: Exclude<ControlPanelDshPeakModeScreenState, 'ready'>) {
+function resolveStateCopy(text: ReturnType<typeof useDshControlPanelText>, state: Exclude<ControlPanelDshPeakModeScreenState, 'ready'>) {
   if (state === 'loading') {
     return {
       stateId: 'loading' as const,
-      title: 'جار تجهيز وضع الذروة',
-      description: 'المسار حي، وستظهر سياسات السعة ومناطق الضغط بعد اكتمال هذه المرحلة.',
-      actionLabel: 'العودة إلى DSH',
+      title: text.peakMode.stateLoadingTitle,
+      description: text.peakMode.stateLoadingDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   if (state === 'empty') {
     return {
       stateId: 'empty' as const,
-      title: 'لا توجد ضغوط تتطلب peak mode الآن',
-      description: 'الوضع مستقر حاليًا ولا توجد مناطق مرشحة لتوسيع السعة في هذه اللحظة.',
-      actionLabel: 'العودة إلى DSH',
+      title: text.peakMode.stateEmptyTitle,
+      description: text.peakMode.stateEmptyDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   if (state === 'offline') {
     return {
       stateId: 'offline' as const,
-      title: 'الاتصال غير متاح',
-      description: 'يبقى المسار محفوظًا لكن قراءات الضغط والسعة لن تتحدّث حتى يعود الاتصال.',
-      actionLabel: 'العودة إلى DSH',
+      title: text.peakMode.stateOfflineTitle,
+      description: text.peakMode.stateOfflineDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   if (state === 'disabled') {
     return {
       kind: 'warning' as const,
-      title: 'وضع الذروة غير مفعّل بالكامل',
-      description: 'هذا slice يثبت القراءة والسياسة فقط، بينما التنفيذ الفعلي خارج النطاق الحالي.',
-      actionLabel: 'العودة إلى DSH',
+      title: text.peakMode.stateDisabledTitle,
+      description: text.peakMode.stateDisabledDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   return {
     stateId: 'recoverableError' as const,
-    title: 'تعذر تحميل وضع الذروة',
-    description: 'يمكنك الرجوع إلى hub أو إعادة المحاولة من نفس المسار.',
-    actionLabel: 'إعادة المحاولة',
+    title: text.peakMode.stateErrorTitle,
+    description: text.peakMode.stateErrorDescription,
+    actionLabel: text.common.backToHub,
   };
 }
 
@@ -80,15 +81,19 @@ export function ControlPanelDshPeakModeScreen({
   showHeader = true,
 }: ControlPanelDshPeakModeScreenProps) {
   const router = useRouter();
+  const dshText = useDshControlPanelText();
+  const summary = React.useMemo(() => getDshPeakModeSummary(dshText), [dshText]);
+  const policies = React.useMemo(() => getDshPeakModePolicies(dshText), [dshText]);
+  const lanes = React.useMemo(() => getDshPeakModePressureLanes(dshText), [dshText]);
 
   if (state !== 'ready') {
-    const stateCopy = resolveStateCopy(state);
+    const stateCopy = resolveStateCopy(dshText, state);
 
     return (
       <BthWebPageFrame
-        eyebrow="DSH / operations / peak-mode"
-        title="وضع الذروة"
-        description="السطح يحافظ على مسار قرار واضح حتى عند غياب البيانات أو توقفها."
+        eyebrow={dshText.peakMode.pageEyebrow}
+        title={dshText.peakMode.pageTitle}
+        description={dshText.peakMode.unavailableDescription}
         maxWidth={1120}
         embedded={embedded}
         showHeader={showHeader}
@@ -100,41 +105,38 @@ export function ControlPanelDshPeakModeScreen({
 
   return (
     <BthWebPageFrame
-      eyebrow="DSH / operations / peak-mode"
-      title="وضع الذروة"
-      description="أول route حي لهذا المسار. يوضح مناطق الضغط وسياسات السعة والتوصية التشغيلية بدون toggle runtime كاذب."
+      eyebrow={dshText.peakMode.pageEyebrow}
+      title={dshText.peakMode.pageTitle}
+      description={dshText.peakMode.pageDescription}
       maxWidth={1120}
       embedded={embedded}
       showHeader={showHeader}
     >
-      <BthBox gap={4}>
+      <div className={styles.stack}>
         <BthWebMissionHeroCard
-          badges={['/operations/dsh/peak-mode', 'حي', `مناطق الضغط: ${dshPeakModeSummary.pressureZones}`]}
-          eyebrow="سعة تشغيلية"
-          title="Peak Mode Workspace"
-          description="هذا السطح يعرض أين يكون توسيع السعة منطقيًا وأين يجب منعه، مع الحفاظ على open operations workspace كقرار رئيسي وفق العقد."
+          badges={['/operations/dsh/peak-mode', dshText.common.live, `${dshText.peakMode.signals.pressureZones}: ${summary.pressureZones}`]}
+          eyebrow={dshText.peakMode.heroEyebrow}
+          title={dshText.peakMode.heroTitle}
+          description={dshText.peakMode.heroDescription}
           metaItems={[
-            `المناطق النشطة: ${dshPeakModeSummary.activeZones}`,
-            `الكباتن المرنون: ${dshPeakModeSummary.flexCaptains}`,
-            `الطوابير المحمية: ${dshPeakModeSummary.protectedQueues}`,
+            `${dshText.peakMode.signals.activeZones}: ${summary.activeZones}`,
+            `${dshText.peakMode.signals.flexCaptains}: ${summary.flexCaptains}`,
+            `${dshText.peakMode.signals.protectedQueues}: ${summary.protectedQueues}`,
           ]}
-          primaryAction={{ label: 'افتح مساحة العمليات', href: hubHref }}
-          secondaryAction={{ label: 'الطلبات', href: ordersHref }}
+          primaryAction={{ label: dshText.common.openOperationsWorkspace, href: hubHref }}
+          secondaryAction={{ label: dshText.common.openOrders, href: ordersHref }}
         />
 
-        <BthBox gap={2}>
-          <BthWebSignalCard title="المناطق النشطة" value={String(dshPeakModeSummary.activeZones)} description="المناطق التي تُقاس ضمن هذا slice." tone="best" />
-          <BthWebSignalCard title="مناطق الضغط" value={String(dshPeakModeSummary.pressureZones)} description="مناطق تحتاج قرارًا حول السعة أو مراقبة أقرب." />
-          <BthWebSignalCard title="كباتن مرنون" value={String(dshPeakModeSummary.flexCaptains)} description="احتياطي مرئي يمكنه امتصاص جزء من الضغط عند الحاجة." />
-          <BthWebSignalCard title="طوابير محمية" value={String(dshPeakModeSummary.protectedQueues)} description="حالات يجب ألّا يغطيها peak mode بدل معالجة أصل المشكلة." />
-        </BthBox>
+        <div className={styles.signalGrid}>
+          <BthWebSignalCard title={dshText.peakMode.signals.activeZones} value={String(summary.activeZones)} description={dshText.peakMode.signals.activeZonesDescription} tone="best" />
+          <BthWebSignalCard title={dshText.peakMode.signals.pressureZones} value={String(summary.pressureZones)} description={dshText.peakMode.signals.pressureZonesDescription} />
+          <BthWebSignalCard title={dshText.peakMode.signals.flexCaptains} value={String(summary.flexCaptains)} description={dshText.peakMode.signals.flexCaptainsDescription} />
+          <BthWebSignalCard title={dshText.peakMode.signals.protectedQueues} value={String(summary.protectedQueues)} description={dshText.peakMode.signals.protectedQueuesDescription} />
+        </div>
 
-        <BthWebSectionCard
-          title="سياسات peak mode"
-          description="هذه القواعد توضح أين ينتهي هذا السطح: قراءة وسياسة، لا toggle فعلي ولا mutation مخفي."
-        >
-          <BthBox gap={2}>
-            {dshPeakModePolicies.map((policy) => (
+        <BthWebSectionCard title={dshText.peakMode.policiesTitle} description={dshText.peakMode.policiesDescription}>
+          <div className={styles.cardGrid}>
+            {policies.map((policy) => (
               <BthBox key={policy.label} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
                 <BthBox layoutDirection="row" justify="space-between" align="center">
                   <BthText role="bodyStrong">{policy.label}</BthText>
@@ -143,15 +145,12 @@ export function ControlPanelDshPeakModeScreen({
                 <BthText role="bodySm" tone="muted">{policy.description}</BthText>
               </BthBox>
             ))}
-          </BthBox>
+          </div>
         </BthWebSectionCard>
 
-        <BthWebSectionCard
-          title="مناطق الضغط"
-          description="كل بطاقة تعطي قراءة سريعة للحمل والسعة والتوصية، بدون التظاهر بإمكانية التفعيل المباشر من هنا."
-        >
-          <BthBox gap={2}>
-            {dshPeakModePressureLanes.map((lane) => (
+        <BthWebSectionCard title={dshText.peakMode.lanesTitle} description={dshText.peakMode.lanesDescription}>
+          <div className={styles.cardGrid}>
+            {lanes.map((lane) => (
               <BthBox key={lane.zoneLabel} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
                 <BthBox layoutDirection="row" justify="space-between" align="center">
                   <BthText role="bodyStrong">{lane.zoneLabel}</BthText>
@@ -162,22 +161,9 @@ export function ControlPanelDshPeakModeScreen({
                 <BthText role="bodySm" tone="muted">{lane.note}</BthText>
               </BthBox>
             ))}
-          </BthBox>
+          </div>
         </BthWebSectionCard>
-
-        {!embedded ? (
-          <BthWebSectionCard
-            title="الإجراءات التالية"
-            description="الإجراء الرئيسي هنا هو العودة إلى workspace العمليات، ثم الطلبات أو الدعم عند الحاجة، لا تبديل runtime state مباشرة."
-          >
-            <BthBox gap={2}>
-              <BthButton label="افتح مساحة العمليات" onPress={() => router.push(hubHref)} />
-              <BthButton label="افتح الطلبات" tone="secondary" onPress={() => router.push(ordersHref)} />
-              <BthButton label="فتح الدعم" tone="secondary" onPress={() => router.push(supportHref)} />
-            </BthBox>
-          </BthWebSectionCard>
-        ) : null}
-      </BthBox>
+      </div>
     </BthWebPageFrame>
   );
 }

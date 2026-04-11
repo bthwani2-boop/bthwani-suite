@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { BthBox, BthButton, BthStateView, BthText } from '@bthwani/ui-kit';
+import { BthBox, BthStateView, BthText, useDshControlPanelText } from '@bthwani/ui-kit';
 import {
   BthWebMissionHeroCard,
   BthWebPageFrame,
@@ -10,63 +10,64 @@ import {
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
 import {
-  dshArrivalBellCaptainLane,
-  dshArrivalBellCustomerLane,
-  dshArrivalBellSummary,
+  getDshArrivalBellCaptainLane,
+  getDshArrivalBellCustomerLane,
+  getDshArrivalBellSummary,
   type DshArrivalBellLane,
 } from './arrival-bell-fixtures';
+import styles from '../dsh-surface.module.css';
 
 type ControlPanelDshArrivalBellScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
-function resolveStateCopy(state: Exclude<ControlPanelDshArrivalBellScreenState, 'ready'>) {
+function resolveStateCopy(text: ReturnType<typeof useDshControlPanelText>, state: Exclude<ControlPanelDshArrivalBellScreenState, 'ready'>) {
   if (state === 'loading') {
     return {
       stateId: 'loading' as const,
-      title: 'جار تجهيز arrival bell workspace',
-      description: 'الهيكل حاضر، وسيظهر صف الكابتن والعميل بوضوح بعد اكتمال هذا slice.',
-      actionLabel: 'العودة إلى DSH',
+      title: text.arrivalBell.stateLoadingTitle,
+      description: text.arrivalBell.stateLoadingDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   if (state === 'empty') {
     return {
       stateId: 'empty' as const,
-      title: 'لا توجد حالات arrival bell الآن',
-      description: 'المسار حي، لكن لا توجد حالات وصول أو رن تحتاج متابعة في هذه اللحظة.',
-      actionLabel: 'العودة إلى DSH',
+      title: text.arrivalBell.stateEmptyTitle,
+      description: text.arrivalBell.stateEmptyDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   if (state === 'offline') {
     return {
       stateId: 'offline' as const,
-      title: 'الاتصال غير متاح',
-      description: 'يبقى المسار واضحًا، لكن حالات الوصول والرن لا تُحدّث حتى يعود الاتصال.',
-      actionLabel: 'العودة إلى DSH',
+      title: text.arrivalBell.stateOfflineTitle,
+      description: text.arrivalBell.stateOfflineDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   if (state === 'disabled') {
     return {
       kind: 'warning' as const,
-      title: 'مسار arrival bell غير مفعّل بالكامل',
-      description: 'هذا slice يثبّت القراءة والتنقل فقط، أما التنفيذ التفصيلي فيأتي لاحقًا.',
-      actionLabel: 'العودة إلى DSH',
+      title: text.arrivalBell.stateDisabledTitle,
+      description: text.arrivalBell.stateDisabledDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   return {
     stateId: 'recoverableError' as const,
-    title: 'تعذر تحميل arrival bell',
-    description: 'يمكنك الرجوع إلى hub أو إعادة المحاولة من نفس المسار بدون فقدان الاتجاه.',
-    actionLabel: 'إعادة المحاولة',
+    title: text.arrivalBell.stateErrorTitle,
+    description: text.arrivalBell.stateErrorDescription,
+    actionLabel: text.common.backToHub,
   };
 }
 
 function renderLaneBlock(title: string, description: string, lanes: ReadonlyArray<DshArrivalBellLane>) {
   return (
     <BthWebSectionCard title={title} description={description}>
-      <BthBox gap={2}>
+      <div className={styles.laneGrid}>
         {lanes.map((lane) => (
           <BthBox key={`${title}-${lane.orderId}`} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
             <BthBox layoutDirection="row" justify="space-between" align="center">
@@ -78,7 +79,7 @@ function renderLaneBlock(title: string, description: string, lanes: ReadonlyArra
             <BthText role="bodySm" tone="muted">{lane.actionHint}</BthText>
           </BthBox>
         ))}
-      </BthBox>
+      </div>
     </BthWebSectionCard>
   );
 }
@@ -101,15 +102,19 @@ export function ControlPanelDshArrivalBellScreen({
   showHeader = true,
 }: ControlPanelDshArrivalBellScreenProps) {
   const router = useRouter();
+  const dshText = useDshControlPanelText();
+  const summary = React.useMemo(() => getDshArrivalBellSummary(dshText), [dshText]);
+  const captainLane = React.useMemo(() => getDshArrivalBellCaptainLane(dshText), [dshText]);
+  const customerLane = React.useMemo(() => getDshArrivalBellCustomerLane(dshText), [dshText]);
 
   if (state !== 'ready') {
-    const stateCopy = resolveStateCopy(state);
+    const stateCopy = resolveStateCopy(dshText, state);
 
     return (
       <BthWebPageFrame
-        eyebrow="DSH / operations / arrival-bell"
-        title="جرس الوصول"
-        description="المسار يظل واضحًا حتى عندما لا تكون البيانات جاهزة أو متاحة."
+        eyebrow={dshText.arrivalBell.pageEyebrow}
+        title={dshText.arrivalBell.pageTitle}
+        description={dshText.arrivalBell.unavailableDescription}
         maxWidth={1120}
         embedded={embedded}
         showHeader={showHeader}
@@ -121,60 +126,38 @@ export function ControlPanelDshArrivalBellScreen({
 
   return (
     <BthWebPageFrame
-      eyebrow="DSH / operations / arrival-bell"
-      title="جرس الوصول"
-      description="أول surface حي لهذا المسار. يوضح صف الوصول من جهة الكابتن ومن جهة العميل مع footer صريح للقرار التالي."
+      eyebrow={dshText.arrivalBell.pageEyebrow}
+      title={dshText.arrivalBell.pageTitle}
+      description={dshText.arrivalBell.pageDescription}
       maxWidth={1120}
       embedded={embedded}
       showHeader={showHeader}
     >
-      <BthBox gap={4}>
+      <div className={styles.stack}>
         <BthWebMissionHeroCard
-          badges={['/operations/dsh/arrival-bell', 'حي', `نشط: ${dshArrivalBellSummary.activeArrivals}`]}
-          eyebrow="workspace تشغيلية"
-          title="Arrival Bell Workspace"
-          description="هذا السطح لا ينفذ runtime actions، لكنه يثبت القراءة التشغيلية الصحيحة ويعطي مسارًا حقيقيًا من hub إلى حالات الوصول والرن."
+          badges={['/operations/dsh/arrival-bell', dshText.common.live, `${dshText.arrivalBell.signals.activeArrivals}: ${summary.activeArrivals}`]}
+          eyebrow={dshText.arrivalBell.heroEyebrow}
+          title={dshText.arrivalBell.heroTitle}
+          description={dshText.arrivalBell.heroDescription}
           metaItems={[
-            `بانتظار إقرار: ${dshArrivalBellSummary.awaitingAcknowledgement}`,
-            `رنات محجوبة: ${dshArrivalBellSummary.blockedRings}`,
-            `حالات منتهية اليوم: ${dshArrivalBellSummary.resolvedToday}`,
+            `${dshText.arrivalBell.signals.awaitingAcknowledgement}: ${summary.awaitingAcknowledgement}`,
+            `${dshText.arrivalBell.signals.blockedRings}: ${summary.blockedRings}`,
+            `${dshText.arrivalBell.signals.resolvedToday}: ${summary.resolvedToday}`,
           ]}
-          primaryAction={{ label: 'افتح مساحة العمليات', href: hubHref }}
-          secondaryAction={{ label: 'الطلبات', href: ordersHref }}
+          primaryAction={{ label: dshText.common.openOperationsWorkspace, href: hubHref }}
+          secondaryAction={{ label: dshText.common.openOrders, href: ordersHref }}
         />
 
-        <BthBox gap={2}>
-          <BthWebSignalCard title="الوصولات النشطة" value={String(dshArrivalBellSummary.activeArrivals)} description="حالات لديها حضور فعلي داخل arrival workflow." tone="best" />
-          <BthWebSignalCard title="بانتظار الإقرار" value={String(dshArrivalBellSummary.awaitingAcknowledgement)} description="طلبات وصل فيها الكابتن لكن العميل لم يؤكد بعد." />
-          <BthWebSignalCard title="الرنات المحجوبة" value={String(dshArrivalBellSummary.blockedRings)} description="حالات تحت cooldown أو منع تشغيلي ولا يجب تحويلها إلى CTA زائف." />
-          <BthWebSignalCard title="مغلق اليوم" value={String(dshArrivalBellSummary.resolvedToday)} description="مؤشر مرئي فقط على الإغلاق اليومي داخل هذا slice." />
-        </BthBox>
+        <div className={styles.signalGrid}>
+          <BthWebSignalCard title={dshText.arrivalBell.signals.activeArrivals} value={String(summary.activeArrivals)} description={dshText.arrivalBell.signals.activeArrivalsDescription} tone="best" />
+          <BthWebSignalCard title={dshText.arrivalBell.signals.awaitingAcknowledgement} value={String(summary.awaitingAcknowledgement)} description={dshText.arrivalBell.signals.awaitingAcknowledgementDescription} />
+          <BthWebSignalCard title={dshText.arrivalBell.signals.blockedRings} value={String(summary.blockedRings)} description={dshText.arrivalBell.signals.blockedRingsDescription} />
+          <BthWebSignalCard title={dshText.arrivalBell.signals.resolvedToday} value={String(summary.resolvedToday)} description={dshText.arrivalBell.signals.resolvedTodayDescription} />
+        </div>
 
-        {renderLaneBlock(
-          'مسار الكابتن',
-          'يوضح من وصل، من رن، وما الحالات التي تتطلب قرار ops أوسع بدل تكرار المحاولة محليًا.',
-          dshArrivalBellCaptainLane,
-        )}
-
-        {renderLaneBlock(
-          'مسار العميل',
-          'يعرض الإقرار، غياب الرد، والحالات التي يجب أن تعود إلى workspace بدل دفع المستخدم إلى تفاصيل غير موجودة.',
-          dshArrivalBellCustomerLane,
-        )}
-
-        {!embedded ? (
-          <BthWebSectionCard
-            title="الإجراءات التالية"
-            description="العقد هنا واضح: الإجراء الرئيسي هو فتح workspace العمليات، مع إبقاء الطلبات والدعم كمسارات ثانوية صريحة."
-          >
-            <BthBox gap={2}>
-              <BthButton label="افتح مساحة العمليات" onPress={() => router.push(hubHref)} />
-              <BthButton label="افتح الطلبات" tone="secondary" onPress={() => router.push(ordersHref)} />
-              <BthButton label="فتح الدعم" tone="secondary" onPress={() => router.push(supportHref)} />
-            </BthBox>
-          </BthWebSectionCard>
-        ) : null}
-      </BthBox>
+        {renderLaneBlock(dshText.arrivalBell.captainLaneTitle, dshText.arrivalBell.captainLaneDescription, captainLane)}
+        {renderLaneBlock(dshText.arrivalBell.customerLaneTitle, dshText.arrivalBell.customerLaneDescription, customerLane)}
+      </div>
     </BthWebPageFrame>
   );
 }

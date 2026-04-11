@@ -1,6 +1,6 @@
 export const flowMeta = {
-  id: '_flow-id_',
+  id: 'dsh',
   owner: 'operations',
   ownerKind: 'section',
-  placeholder: true,
+  placeholder: false,
 } as const;

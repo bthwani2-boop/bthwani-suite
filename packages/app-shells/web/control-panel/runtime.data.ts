@@ -11,9 +11,7 @@ import { flowMeta as amnOperationsFlowMeta } from '@bthwani/surfaces/amn/control
 import { flowMeta as arbOperationsFlowMeta } from '@bthwani/surfaces/arb/control-panel/operations/_flow-id_/flow.meta';
 import { flowMeta as arbPartnersFlowMeta } from '@bthwani/surfaces/arb/control-panel/partners/_flow-id_/flow.meta';
 import { flowMeta as arbSupportFlowMeta } from '@bthwani/surfaces/arb/control-panel/support/_flow-id_/flow.meta';
-import { flowMeta as dshOperationsFlowMeta } from '@bthwani/surfaces/dsh/control-panel/operations/_flow-id_/flow.meta';
-import { flowMeta as dshPartnersFlowMeta } from '@bthwani/surfaces/dsh/control-panel/partners/_flow-id_/flow.meta';
-import { flowMeta as dshSupportFlowMeta } from '@bthwani/surfaces/dsh/control-panel/support/_flow-id_/flow.meta';
+import { flowMeta as dshOperationsFlowMeta } from '@bthwani/surfaces/dsh/control-panel/operations/dsh/flow.meta';
 import { flowMeta as esfCatalogsFlowMeta } from '@bthwani/surfaces/esf/control-panel/catalogs/_flow-id_/flow.meta';
 import { flowMeta as knzCatalogsFlowMeta } from '@bthwani/surfaces/knz/control-panel/catalogs/_flow-id_/flow.meta';
 import { flowMeta as kwdCatalogsFlowMeta } from '@bthwani/surfaces/kwd/control-panel/catalogs/_flow-id_/flow.meta';
@@ -81,8 +79,6 @@ const allFlowMetas = [
   arbPartnersFlowMeta,
   arbSupportFlowMeta,
   dshOperationsFlowMeta,
-  dshPartnersFlowMeta,
-  dshSupportFlowMeta,
   esfCatalogsFlowMeta,
   knzCatalogsFlowMeta,
   kwdCatalogsFlowMeta,

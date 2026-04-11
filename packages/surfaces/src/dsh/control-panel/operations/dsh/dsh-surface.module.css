@@ -1,0 +1,54 @@
+.stack {
+  display: grid;
+  gap: 16px;
+}
+
+.signalGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.compactCard {
+  min-height: 100%;
+}
+
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.actionRowSpaced {
+  margin-top: 12px;
+}
+
+.laneGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.inlineMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 760px) {
+  .stack {
+    gap: 14px;
+  }
+
+  .signalGrid,
+  .cardGrid,
+  .laneGrid {
+    grid-template-columns: 1fr;
+  }
+}

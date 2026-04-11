@@ -1,7 +1,7 @@
 "use client";
 
 import React, { type ReactNode } from 'react';
-import { useUiText } from '../../hooks';
+import { useDirection, useUiText } from '../../hooks';
 import styles from './BthWebCommandCenterFrame.module.css';
 import { BthWebCommandStrip } from './BthWebCommandStrip';
 
@@ -119,6 +119,7 @@ export function BthWebCommandCenterFrame({
   railSupplementary,
   children,
 }: BthWebCommandCenterFrameProps) {
+  const { direction } = useDirection();
   const uiText = useUiText();
   const panelText = uiText.controlPanel;
   const resolvedSearchPlaceholder = searchPlaceholder ?? panelText.ui.searchPlaceholder;
@@ -127,7 +128,7 @@ export function BthWebCommandCenterFrame({
   const resolvedRailNavigationLabel = railNavigationLabel ?? panelText.ui.railNavigationLabel;
 
   return (
-    <main className={styles.root}>
+    <main className={styles.root} dir={direction}>
       <BthWebCommandStrip
         brandLabel={brandLabel}
         searchPlaceholder={resolvedSearchPlaceholder}

@@ -8,7 +8,7 @@ import {
   BthWebSegmentedTabs,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
-import { useDirection, useUiText } from '@bthwani/ui-kit';
+import { useUiLanguage, useUiText } from '@bthwani/ui-kit';
 import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 
@@ -156,7 +156,7 @@ function resolveFallbackMission(activeSectionLabel: string, panelText: ControlPa
 
 function resolvePrimaryAction(activeSectionId: ControlPanelSectionId, panelText: ControlPanelText) {
   if (activeSectionId === 'operations') {
-    return { label: panelText.ui.secondaryActionOps, href: '/operations' };
+    return { label: panelText.ui.secondaryActionOps, href: '/operations/dsh' };
   }
 
   return { label: panelText.ui.primaryAction, href: '/finance' };
@@ -173,7 +173,7 @@ function resolveSecondaryAction(activeSectionId: ControlPanelSectionId, panelTex
 export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSurfaceHostProps) {
   const router = useRouter();
   const uiText = useUiText();
-  const { language, setLanguage } = useDirection();
+  const { toggleLanguage } = useUiLanguage();
   const panelText = uiText.controlPanel;
   const [alertCount, setAlertCount] = React.useState(1);
   const [selectedServiceId, setSelectedServiceId] = React.useState<string>(allServiceTabId);
@@ -258,8 +258,8 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
   }, []);
 
   const handleLanguageClick = React.useCallback(() => {
-    setLanguage(language === 'en' ? 'ar' : 'en');
-  }, [language, setLanguage]);
+    toggleLanguage();
+  }, [toggleLanguage]);
 
   const handleAlertClick = React.useCallback(() => {
     setSelectedServiceId(allServiceTabId);

@@ -23,6 +23,11 @@
   flex-wrap: wrap;
 }
 
+.topBar[dir='rtl'] .topRowPrimary,
+.topBar[dir='rtl'] .topRowSecondary {
+  flex-direction: row-reverse;
+}
+
 .identityCluster {
   display: inline-flex;
   align-items: center;
@@ -89,9 +94,9 @@
   box-shadow: 0 8px 20px rgba(245, 158, 11, 0.14);
 }
 
-:global(html[dir='rtl']) .searchCluster,
-:global(html[dir='rtl']) .filterRow,
-:global(html[dir='rtl']) .identityCluster {
+.topBar[dir='rtl'] .searchCluster,
+.topBar[dir='rtl'] .filterRow,
+.topBar[dir='rtl'] .identityCluster {
   flex-direction: row-reverse;
 }
 

@@ -1,4 +1,4 @@
-import { DshControlPanelSurfaceHost } from '@bthwani/app-shells/web/control-panel';
+import { ControlPanelDshOrderDetailScreen } from '@bthwani/surfaces/dsh/control-panel/operations/dsh/orders';
 
 type DshOrderDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -7,5 +7,5 @@ type DshOrderDetailPageProps = {
 export default async function DshOrderDetailPage({ params }: DshOrderDetailPageProps) {
   const { id } = await params;
 
-  return <DshControlPanelSurfaceHost section="operations" workspace="order-detail" orderId={id} />;
+  return <ControlPanelDshOrderDetailScreen orderId={id} />;
 }

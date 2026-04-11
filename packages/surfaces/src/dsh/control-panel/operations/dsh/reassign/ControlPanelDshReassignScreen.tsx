@@ -2,59 +2,60 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { BthBox, BthButton, BthStateView, BthText } from '@bthwani/ui-kit';
+import { BthBox, BthStateView, BthText, useDshControlPanelText } from '@bthwani/ui-kit';
 import {
   BthWebMissionHeroCard,
   BthWebPageFrame,
   BthWebSectionCard,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
-import { dshReassignCandidates, dshReassignSummary } from './reassign-fixtures';
+import { getDshReassignCandidates, getDshReassignSummary } from './reassign-fixtures';
+import styles from '../dsh-surface.module.css';
 
 type ControlPanelDshReassignScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
-function resolveStateCopy(state: Exclude<ControlPanelDshReassignScreenState, 'ready'>) {
+function resolveStateCopy(text: ReturnType<typeof useDshControlPanelText>, state: Exclude<ControlPanelDshReassignScreenState, 'ready'>) {
   if (state === 'loading') {
     return {
       stateId: 'loading' as const,
-      title: 'جار تجهيز surface إعادة التوزيع',
-      description: 'المسار حي، وسيظهر القرار والمرشحون بمجرد اكتمال هذه المرحلة.',
-      actionLabel: 'العودة إلى DSH',
+      title: text.reassign.stateLoadingTitle,
+      description: text.reassign.stateLoadingDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   if (state === 'empty') {
     return {
       stateId: 'empty' as const,
-      title: 'لا توجد حالات لإعادة التوزيع',
-      description: 'الطابور الحالي لا يحتوي على قرارات نقل نشطة في هذه اللحظة.',
-      actionLabel: 'العودة إلى DSH',
+      title: text.reassign.stateEmptyTitle,
+      description: text.reassign.stateEmptyDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   if (state === 'offline') {
     return {
       stateId: 'offline' as const,
-      title: 'الاتصال غير متاح',
-      description: 'المسار محفوظ، لكن حالات إعادة التوزيع لن تتحدّث حتى يعود الاتصال.',
-      actionLabel: 'العودة إلى DSH',
+      title: text.reassign.stateOfflineTitle,
+      description: text.reassign.stateOfflineDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   if (state === 'disabled') {
     return {
       kind: 'warning' as const,
-      title: 'إعادة التوزيع غير مفعلة بالكامل',
-      description: 'هذا slice يثبت القراءة والقرار فقط، بينما التنفيذ الفعلي مؤجل إلى خطوة لاحقة.',
-      actionLabel: 'العودة إلى DSH',
+      title: text.reassign.stateDisabledTitle,
+      description: text.reassign.stateDisabledDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   return {
     stateId: 'recoverableError' as const,
-    title: 'تعذر تحميل surface إعادة التوزيع',
-    description: 'يمكنك الرجوع إلى hub أو إعادة المحاولة من نفس المسار.',
-    actionLabel: 'إعادة المحاولة',
+    title: text.reassign.stateErrorTitle,
+    description: text.reassign.stateErrorDescription,
+    actionLabel: text.common.backToHub,
   };
 }
 
@@ -76,15 +77,18 @@ export function ControlPanelDshReassignScreen({
   showHeader = true,
 }: ControlPanelDshReassignScreenProps) {
   const router = useRouter();
+  const dshText = useDshControlPanelText();
+  const summary = React.useMemo(() => getDshReassignSummary(dshText), [dshText]);
+  const candidates = React.useMemo(() => getDshReassignCandidates(dshText), [dshText]);
 
   if (state !== 'ready') {
-    const stateCopy = resolveStateCopy(state);
+    const stateCopy = resolveStateCopy(dshText, state);
 
     return (
       <BthWebPageFrame
-        eyebrow="DSH / operations / reassign"
-        title="إعادة التوزيع"
-        description="المسار يبقى واضحًا حتى لو غابت الحالات أو توقفت البيانات."
+        eyebrow={dshText.reassign.pageEyebrow}
+        title={dshText.reassign.pageTitle}
+        description={dshText.reassign.unavailableDescription}
         maxWidth={1120}
         embedded={embedded}
         showHeader={showHeader}
@@ -96,41 +100,38 @@ export function ControlPanelDshReassignScreen({
 
   return (
     <BthWebPageFrame
-      eyebrow="DSH / operations / reassign"
-      title="إعادة التوزيع"
-      description="أول route حي لهذا القرار. يوضح الحالات المرشحة والأسباب والبدائل بدون إدخال submit تشغيلي كاذب."
+      eyebrow={dshText.reassign.pageEyebrow}
+      title={dshText.reassign.pageTitle}
+      description={dshText.reassign.pageDescription}
       maxWidth={1120}
       embedded={embedded}
       showHeader={showHeader}
     >
-      <BthBox gap={4}>
+      <div className={styles.stack}>
         <BthWebMissionHeroCard
-          badges={['/operations/dsh/reassign', 'حي', `حالات نشطة: ${dshReassignSummary.activeCases}`]}
-          eyebrow="قرار تشغيلي"
-          title="Reassign Workspace"
-          description="هذا السطح يرفع وضوح القرار: من يحتاج نقلًا، لماذا، وما fallback المقترح، مع إبقاء التنفيذ الفعلي خارج هذا slice."
+          badges={['/operations/dsh/reassign', dshText.common.live, `${dshText.reassign.signals.active}: ${summary.activeCases}`]}
+          eyebrow={dshText.reassign.heroEyebrow}
+          title={dshText.reassign.heroTitle}
+          description={dshText.reassign.heroDescription}
           metaItems={[
-            `عاجلة: ${dshReassignSummary.urgentCases}`,
-            `محجوبة: ${dshReassignSummary.blockedCases}`,
-            `fallback جاهز: ${dshReassignSummary.readyFallbacks}`,
+            `${dshText.reassign.signals.urgent}: ${summary.urgentCases}`,
+            `${dshText.reassign.signals.blocked}: ${summary.blockedCases}`,
+            `${dshText.reassign.signals.fallbacks}: ${summary.readyFallbacks}`,
           ]}
-          primaryAction={{ label: 'افتح مساحة العمليات', href: hubHref }}
-          secondaryAction={{ label: 'الطلبات', href: ordersHref }}
+          primaryAction={{ label: dshText.common.openOperationsWorkspace, href: hubHref }}
+          secondaryAction={{ label: dshText.common.openOrders, href: ordersHref }}
         />
 
-        <BthBox gap={2}>
-          <BthWebSignalCard title="الحالات النشطة" value={String(dshReassignSummary.activeCases)} description="طلبات لديها ضغط تشغيلي أو مرشح نقل واضح." tone="best" />
-          <BthWebSignalCard title="الحالات العاجلة" value={String(dshReassignSummary.urgentCases)} description="تحتاج قرارًا سريعًا قبل أن تتحول إلى تأخر أو تصعيد." />
-          <BthWebSignalCard title="الحالات المحجوبة" value={String(dshReassignSummary.blockedCases)} description="تحتاج workspace أوسع أو دعمًا قبل أي خطوة أخرى." />
-          <BthWebSignalCard title="بدائل جاهزة" value={String(dshReassignSummary.readyFallbacks)} description="كباتن أو مسارات احتياطية متاحة بصريًا في هذا slice." />
-        </BthBox>
+        <div className={styles.signalGrid}>
+          <BthWebSignalCard title={dshText.reassign.signals.active} value={String(summary.activeCases)} description={dshText.reassign.signals.activeDescription} tone="best" />
+          <BthWebSignalCard title={dshText.reassign.signals.urgent} value={String(summary.urgentCases)} description={dshText.reassign.signals.urgentDescription} />
+          <BthWebSignalCard title={dshText.reassign.signals.blocked} value={String(summary.blockedCases)} description={dshText.reassign.signals.blockedDescription} />
+          <BthWebSignalCard title={dshText.reassign.signals.fallbacks} value={String(summary.readyFallbacks)} description={dshText.reassign.signals.fallbacksDescription} />
+        </div>
 
-        <BthWebSectionCard
-          title="المرشحون لإعادة التوزيع"
-          description="كل بطاقة تعرض delivery والطلب المرتبط والسبب والأولوية والبديل المقترح بدون التظاهر بوجود تنفيذ runtime فعلي."
-        >
-          <BthBox gap={2}>
-            {dshReassignCandidates.map((candidate) => (
+        <BthWebSectionCard title={dshText.reassign.candidatesTitle} description={dshText.reassign.candidatesDescription}>
+          <div className={styles.cardGrid}>
+            {candidates.map((candidate) => (
               <BthBox key={candidate.deliveryId} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
                 <BthBox layoutDirection="row" justify="space-between" align="center">
                   <BthText role="bodyStrong">{candidate.deliveryId}</BthText>
@@ -138,50 +139,34 @@ export function ControlPanelDshReassignScreen({
                 </BthBox>
                 <BthText role="bodySm">{candidate.orderId}</BthText>
                 <BthText role="caption" tone="soft">{candidate.reasonLabel} · {candidate.priorityLabel}</BthText>
-                <BthText role="bodySm" tone="muted">الحالي: {candidate.currentCaptain}</BthText>
-                <BthText role="bodySm" tone="muted">البديل: {candidate.fallbackCaptain}</BthText>
+                <BthText role="bodySm" tone="muted">{dshText.reassign.currentCaptainLabel}: {candidate.currentCaptain}</BthText>
+                <BthText role="bodySm" tone="muted">{dshText.reassign.fallbackCaptainLabel}: {candidate.fallbackCaptain}</BthText>
                 <BthText role="bodySm" tone="muted">{candidate.note}</BthText>
               </BthBox>
             ))}
-          </BthBox>
+          </div>
         </BthWebSectionCard>
 
-        <BthWebSectionCard
-          title="منطق القرار"
-          description="الهدف هنا ليس التنفيذ، بل ترتيب القرار: متى تعود إلى workspace، ومتى تراجع الطلب، ومتى تصعّد الحالة."
-        >
-          <BthBox gap={2}>
+        <BthWebSectionCard title={dshText.reassign.decisionTitle} description={dshText.reassign.decisionDescription}>
+          <div className={styles.cardGrid}>
             <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">الإجراء الأساسي</BthText>
-              <BthText role="bodySm">افتح مساحة العمليات</BthText>
-              <BthText role="bodySm" tone="muted">العقد يطلب بوضوح أن يكون open operations workspace هو الخروج الرئيسي بعد قراءة القرار.</BthText>
+              <BthText role="bodyStrong">{dshText.reassign.primaryDecisionTitle}</BthText>
+              <BthText role="bodySm">{dshText.reassign.primaryDecisionLabel}</BthText>
+              <BthText role="bodySm" tone="muted">{dshText.reassign.primaryDecisionDescription}</BthText>
             </BthBox>
             <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">الإجراء الثانوي</BthText>
-              <BthText role="bodySm">ارجع إلى الطلبات</BthText>
-              <BthText role="bodySm" tone="muted">الرجوع إلى queue مناسب عندما تريد مقارنة أكثر من حالة قبل اعتماد أي نقل.</BthText>
+              <BthText role="bodyStrong">{dshText.reassign.secondaryDecisionTitle}</BthText>
+              <BthText role="bodySm">{dshText.reassign.secondaryDecisionLabel}</BthText>
+              <BthText role="bodySm" tone="muted">{dshText.reassign.secondaryDecisionDescription}</BthText>
             </BthBox>
             <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">مسار الدعم</BthText>
-              <BthText role="bodySm">صعّد المحجوب فقط</BthText>
-              <BthText role="bodySm" tone="muted">التصعيد يبقى للحالات المعطلة أو غير القابلة للحسم من هذا السطح.</BthText>
+              <BthText role="bodyStrong">{dshText.reassign.supportDecisionTitle}</BthText>
+              <BthText role="bodySm">{dshText.reassign.supportDecisionLabel}</BthText>
+              <BthText role="bodySm" tone="muted">{dshText.reassign.supportDecisionDescription}</BthText>
             </BthBox>
-          </BthBox>
+          </div>
         </BthWebSectionCard>
-
-        {!embedded ? (
-          <BthWebSectionCard
-            title="الإجراءات التالية"
-            description="السطح يثبت القرار والتنقل فقط، ولا يقدّم submit زائف لإعادة التوزيع قبل slice التنفيذ الحقيقي."
-          >
-            <BthBox gap={2}>
-              <BthButton label="افتح مساحة العمليات" onPress={() => router.push(hubHref)} />
-              <BthButton label="افتح الطلبات" tone="secondary" onPress={() => router.push(ordersHref)} />
-              <BthButton label="فتح الدعم" tone="secondary" onPress={() => router.push(supportHref)} />
-            </BthBox>
-          </BthWebSectionCard>
-        ) : null}
-      </BthBox>
+      </div>
     </BthWebPageFrame>
   );
 }

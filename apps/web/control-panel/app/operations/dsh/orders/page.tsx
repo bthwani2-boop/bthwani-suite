@@ -1,5 +1,5 @@
-import { DshControlPanelSurfaceHost } from '@bthwani/app-shells/web/control-panel';
+import { ControlPanelDshOrdersScreen } from '@bthwani/surfaces/dsh/control-panel/operations/dsh/orders';
 
 export default function DshOrdersPage() {
-  return <DshControlPanelSurfaceHost section="operations" workspace="orders" />;
+  return <ControlPanelDshOrdersScreen />;
 }

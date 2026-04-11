@@ -1,5 +1,5 @@
-import { DshControlPanelSurfaceHost } from '@bthwani/app-shells/web/control-panel';
+import { ControlPanelDshReassignScreen } from '@bthwani/surfaces/dsh/control-panel/operations/dsh/reassign';
 
 export default function DshReassignPage() {
-  return <DshControlPanelSurfaceHost section="operations" workspace="reassign" />;
+  return <ControlPanelDshReassignScreen />;
 }

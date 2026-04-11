@@ -1,5 +1,5 @@
-import { DshControlPanelSurfaceHost } from '@bthwani/app-shells/web/control-panel';
+import { ControlPanelSurfaceHost } from '@bthwani/app-shells/web/control-panel';
 
 export default function OperationsPage() {
-  return <DshControlPanelSurfaceHost section="operations" />;
+  return <ControlPanelSurfaceHost section="operations" />;
 }

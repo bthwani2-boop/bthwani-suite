@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
+import { ControlPanelDshOperationsScreen } from '@bthwani/surfaces/dsh/control-panel/operations/dsh';
 
 export default function DshOperationsPage() {
-  redirect('/operations');
+  return <ControlPanelDshOperationsScreen />;
 }

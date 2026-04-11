@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { useUiText } from '../../hooks';
+import { useDirection, useUiLanguage, useUiText } from '../../hooks';
 import styles from './BthWebCommandStrip.module.css';
 
 export type BthWebCommandStripFilter = {
@@ -65,14 +65,17 @@ export function BthWebCommandStrip({
   onLanguageClick,
   onAlertClick,
 }: BthWebCommandStripProps) {
+  const { direction } = useDirection();
+  const { toggleLanguage } = useUiLanguage();
   const uiText = useUiText();
   const panelText = uiText.controlPanel;
   const resolvedSearchPlaceholder = searchPlaceholder ?? panelText.ui.searchPlaceholder;
   const resolvedLanguageLabel = languageLabel ?? panelText.ui.languageLabel;
   const resolvedRefreshLabel = refreshLabel ?? panelText.ui.refreshLabel;
+  const resolvedLanguageClick = onLanguageClick ?? toggleLanguage;
 
   return (
-    <header className={styles.topBar}>
+    <header className={styles.topBar} dir={direction}>
       <div className={styles.topRowPrimary}>
         <div className={styles.identityCluster}>
           <button type="button" className={styles.brandPill} onClick={onBrandClick}>
@@ -81,7 +84,7 @@ export function BthWebCommandStrip({
           <button type="button" className={styles.alertPill} onClick={onAlertClick}>
             {alertCountLabel}
           </button>
-          <button type="button" className={styles.languagePill} onClick={onLanguageClick}>
+          <button type="button" className={styles.languagePill} onClick={resolvedLanguageClick}>
             {resolvedLanguageLabel}
           </button>
         </div>

@@ -2,59 +2,60 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { BthBox, BthButton, BthStateView, BthText } from '@bthwani/ui-kit';
+import { BthBox, BthButton, BthStateView, BthText, useDshControlPanelText } from '@bthwani/ui-kit';
 import {
   BthWebMissionHeroCard,
   BthWebPageFrame,
   BthWebSectionCard,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
-import { sampleDshOrders } from './order-fixtures';
+import { getSampleDshOrders } from './order-fixtures';
+import styles from '../dsh-surface.module.css';
 
 type ControlPanelDshOrdersScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
-function resolveStateCopy(state: Exclude<ControlPanelDshOrdersScreenState, 'ready'>) {
+function resolveStateCopy(text: ReturnType<typeof useDshControlPanelText>, state: Exclude<ControlPanelDshOrdersScreenState, 'ready'>) {
   if (state === 'loading') {
     return {
       stateId: 'loading' as const,
-      title: 'جار تحميل قائمة الطلبات',
-      description: 'السطح حي، وتبقى حالة الطلبات غير مقفلة حتى تكتمل المزامنة أو يعود المصدر.',
-      actionLabel: 'العودة إلى hub',
+      title: text.orders.stateLoadingTitle,
+      description: text.orders.stateLoadingDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   if (state === 'empty') {
     return {
       stateId: 'empty' as const,
-      title: 'لا توجد طلبات مفتوحة الآن',
-      description: 'المسار جاهز، لكن queue الحالية فارغة مؤقتًا ويمكن العودة إلى hub أو تحديث الحالة لاحقًا.',
-      actionLabel: 'العودة إلى hub',
+      title: text.orders.stateEmptyTitle,
+      description: text.orders.stateEmptyDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   if (state === 'offline') {
     return {
       stateId: 'offline' as const,
-      title: 'الاتصال غير متاح',
-      description: 'قائمة الطلبات ستعود عند استعادة الاتصال، مع بقاء المسار الحالي واضحًا وآمنًا.',
-      actionLabel: 'العودة إلى hub',
+      title: text.orders.stateOfflineTitle,
+      description: text.orders.stateOfflineDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   if (state === 'disabled') {
     return {
       kind: 'warning' as const,
-      title: 'قائمة الطلبات غير مفعلة بعد',
-      description: 'هذه الصفحة حية بصريًا، لكن التفاعل المعقد مؤجل إلى slice لاحق حتى يكتمل الربط.',
-      actionLabel: 'العودة إلى hub',
+      title: text.orders.stateDisabledTitle,
+      description: text.orders.stateDisabledDescription,
+      actionLabel: text.common.backToHub,
     };
   }
 
   return {
     stateId: 'recoverableError' as const,
-    title: 'تعذر تحميل الطلبات',
-    description: 'يمكنك العودة إلى hub أو إعادة المحاولة بعد تثبيت الحالة الحالية.',
-    actionLabel: 'إعادة المحاولة',
+    title: text.orders.stateErrorTitle,
+    description: text.orders.stateErrorDescription,
+    actionLabel: text.common.backToHub,
   };
 }
 
@@ -74,121 +75,90 @@ export function ControlPanelDshOrdersScreen({
   showHeader = true,
 }: ControlPanelDshOrdersScreenProps) {
   const router = useRouter();
-  const readyForSelection = state === 'ready';
-  const assignedCount = sampleDshOrders.filter((order) => order.statusTone === 'success').length;
-  const openCount = sampleDshOrders.filter((order) => order.statusTone === 'brand').length;
-  const reviewCount = sampleDshOrders.filter((order) => order.statusTone === 'warning').length;
+  const dshText = useDshControlPanelText();
+  const orders = React.useMemo(() => getSampleDshOrders(dshText), [dshText]);
+  const assignedCount = orders.filter((order) => order.statusTone === 'success').length;
+  const openCount = orders.filter((order) => order.statusTone === 'brand').length;
+  const reviewCount = orders.filter((order) => order.statusTone === 'warning').length;
 
-  if (!readyForSelection) {
-    const stateCopy = resolveStateCopy(state);
+  if (state !== 'ready') {
+    const stateCopy = resolveStateCopy(dshText, state);
 
     return (
       <BthWebPageFrame
-        eyebrow="DSH / operations / orders"
-        title="إدارة طلبات DSH"
-        description="السطح يبقى متاحًا حتى في الحالات غير الجاهزة، مع خروج آمن واضح إلى hub."
+        eyebrow={dshText.orders.pageEyebrow}
+        title={dshText.orders.pageTitle}
+        description={dshText.orders.pageDescription}
         maxWidth={1120}
         embedded={embedded}
         showHeader={showHeader}
       >
-        <BthStateView
-          {...stateCopy}
-          onActionPress={() => {
-            router.push(hubHref);
-          }}
-        />
+        <BthStateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
       </BthWebPageFrame>
     );
   }
 
   return (
     <BthWebPageFrame
-      eyebrow="DSH / operations / orders"
-      title="إدارة طلبات DSH"
-      description="أول child route حي داخل DSH للوحة التحكم. يعرض queue تشغيلية واضحة، ويُبقي العودة إلى hub خطوة واحدة فقط."
+      eyebrow={dshText.orders.pageEyebrow}
+      title={dshText.orders.pageTitle}
+      description={dshText.orders.pageDescription}
       maxWidth={1120}
       embedded={embedded}
       showHeader={showHeader}
     >
-      <BthBox gap={4}>
+      <div className={styles.stack}>
         <BthWebMissionHeroCard
-          badges={['/operations/dsh/orders', 'child route حي', `الطلبات: ${sampleDshOrders.length}`]}
-          eyebrow="الطابور التشغيلي"
-          title="طلبات DSH المفتوحة"
-          description="هذه الصفحة تعرض قائمة تشغيلية مباشرة، مع مسار رجوع واضح إلى hub ومسار عام آمن إلى العمليات."
+          badges={['/operations/dsh/orders', dshText.common.live, `${dshText.orders.badgesLabel}: ${orders.length}`]}
+          eyebrow={dshText.orders.heroEyebrow}
+          title={dshText.orders.heroTitle}
+          description={dshText.orders.heroDescription}
           metaItems={[
-            `المعيّنة: ${assignedCount}`,
-            `الجديدة: ${openCount}`,
-            `تحت المراجعة: ${reviewCount}`,
+            `${dshText.orders.assignedTitle}: ${assignedCount}`,
+            `${dshText.orders.newTitle}: ${openCount}`,
+            `${dshText.orders.reviewTitle}: ${reviewCount}`,
           ]}
-          primaryAction={{ label: 'العودة إلى hub', href: hubHref }}
-          secondaryAction={{ label: 'لوحة العمليات', href: operationsHref }}
+          primaryAction={{ label: dshText.common.backToHub, href: hubHref }}
+          secondaryAction={{ label: dshText.common.operations, href: operationsHref }}
         />
 
-        <BthWebSignalCard
-          title="الحالة الحية"
-          value="جاهز"
-          description="الصفحة حية بالفعل، لكن التكامل مع الـ API أو التفاصيل المتفرعة مؤجل عمداً حتى لا ندخل binding مبكر."
-          tone="best"
-        />
+        <div className={styles.signalGrid}>
+          <BthWebSignalCard title={dshText.orders.assignedTitle} value={String(assignedCount)} description={dshText.orders.assignedDescription} tone="best" />
+          <BthWebSignalCard title={dshText.orders.newTitle} value={String(openCount)} description={dshText.orders.newDescription} />
+          <BthWebSignalCard title={dshText.orders.reviewTitle} value={String(reviewCount)} description={dshText.orders.reviewDescription} />
+        </div>
 
-        <BthWebSectionCard
-          title="قائمة الطلبات"
-          description="كل صف يلخص الطلب، وجهته، حالته، والوقت المقدر للتنفيذ. الضغط عليه يفتح صفحة التفاصيل الحية."
-        >
-          <BthBox gap={2}>
-            {sampleDshOrders.map((order) => (
-              <BthBox
-                key={order.id}
-                padding={3}
-                gap={1}
-                border
-                radiusToken="xl"
-                background="surfaceRaised"
-              >
+        <BthWebSectionCard title={dshText.orders.listTitle} description={dshText.orders.listDescription}>
+          <div className={styles.cardGrid}>
+            {orders.map((order) => (
+              <BthBox key={order.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
                 <BthBox layoutDirection="row" justify="space-between" align="center">
                   <BthText role="bodyStrong">{order.id}</BthText>
                   <BthText role="caption" tone={order.statusTone}>
                     {order.statusLabel}
                   </BthText>
                 </BthBox>
-                <BthText role="bodySm" tone="muted">
-                  {order.customer}
-                </BthText>
-                <BthText role="bodySm" tone="muted">
-                  {order.route}
-                </BthText>
+                <BthText role="bodySm" tone="muted">{order.customer}</BthText>
+                <BthText role="bodySm" tone="muted">{order.route}</BthText>
                 <BthBox layoutDirection="row" justify="space-between" align="center">
                   <BthText role="caption" tone="soft">
-                    ETA {order.eta}
+                    {dshText.orders.etaPrefix} {order.eta}
                   </BthText>
-                  <BthText role="caption" tone="soft">
-                    {order.amount}
-                  </BthText>
+                  <BthText role="caption" tone="soft">{order.amount}</BthText>
                 </BthBox>
-                <BthButton
-                  label="افتح التفاصيل"
-                  size="sm"
-                  fullWidth={false}
-                  onPress={() => router.push(`/operations/dsh/orders/${order.id}`)}
-                />
+                <BthText role="caption" tone="soft">{order.destinationLabel}</BthText>
+                <BthBox>
+                  <BthButton
+                    label={dshText.orders.openDetail}
+                    tone="ghost"
+                    onPress={() => router.push(`/operations/dsh/orders/${order.id}`)}
+                  />
+                </BthBox>
               </BthBox>
             ))}
-          </BthBox>
+          </div>
         </BthWebSectionCard>
-
-        {!embedded ? (
-          <BthWebSectionCard
-            title="الخطوة التالية"
-            description="العودة إلى hub تبقى أسرع مسار، بينما الصفحة الحالية تظل مرجع queue مباشر."
-          >
-            <BthBox gap={2}>
-              <BthButton label="العودة إلى DSH hub" onPress={() => router.push(hubHref)} />
-              <BthButton label="العودة إلى العمليات" tone="secondary" onPress={() => router.push(operationsHref)} />
-            </BthBox>
-          </BthWebSectionCard>
-        ) : null}
-      </BthBox>
+      </div>
     </BthWebPageFrame>
   );
 }

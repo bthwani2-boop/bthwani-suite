@@ -2,13 +2,23 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { BthBox, BthButton, BthStateView, BthText } from '@bthwani/ui-kit';
+import {
+  BthBox,
+  BthButton,
+  BthStateView,
+  BthText,
+  formatDshWorkbenchSubtitle,
+  useDshControlPanelText,
+  useDirection,
+  useUiText,
+} from '@bthwani/ui-kit';
 import {
   BthWebCommandCenterFrame,
   BthWebMissionHeroCard,
   BthWebSectionCard,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
+import styles from './dsh-surface.module.css';
 
 type ControlPanelDshOperationsScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
@@ -32,67 +42,70 @@ type DshWorkbench = {
   liveHref?: string;
 };
 
-const topFilterItems = [
-  { id: 'today', label: 'اليوم' },
-  { id: 'queue', label: 'الطابور' },
-  { id: 'peak', label: 'الذروة' },
-] as const;
+function getWorkbenchText(text: ReturnType<typeof useDshControlPanelText>, workbenchId: DshWorkbenchId) {
+  if (workbenchId === 'peak-mode') {
+    return text.hub.workbenches.peakMode;
+  }
 
-const dshWorkbenches = [
-  {
-    id: 'overview',
-    label: 'نظرة DSH',
-    description: 'لقطة أولى للحالة والانتقالات الآمنة قبل الدخول في أي route فرعي.',
-    routeHint: '/operations/dsh',
-    statusLabel: 'حي',
-  },
-  {
-    id: 'orders',
-    label: 'إدارة الطلبات',
-    description: 'الطابور المركزي للطلبات والتفاصيل المرتبطة بها.',
-    routeHint: '/operations/dsh/orders',
-    statusLabel: 'حي',
-    liveHref: '/operations/dsh/orders',
-  },
-  {
-    id: 'reassign',
-    label: 'إعادة التوزيع',
-    description: 'تحويل الطلبات بين الموارد المتاحة بدون كسر المسار الحالي.',
-    routeHint: '/operations/dsh/reassign',
-    statusLabel: 'حي',
-    liveHref: '/operations/dsh/reassign',
-  },
-  {
-    id: 'peak-mode',
-    label: 'وضع الذروة',
-    description: 'تشغيل مرن عندما ترتفع الحركة وتحتاج سعة إضافية.',
-    routeHint: '/operations/dsh/peak-mode',
-    statusLabel: 'حي',
-    liveHref: '/operations/dsh/peak-mode',
-  },
-  {
-    id: 'zone-set',
-    label: 'نطاق التوصيل',
-    description: 'تقييد النطاقات وتشغيلها بوضوح تشغيلي أعلى.',
-    routeHint: '/operations/dsh/zone-set',
-    statusLabel: 'قيد الربط',
-  },
-  {
-    id: 'sheinproxy',
-    label: 'SheinProxy',
-    description: 'مسار الوساطة والطلبات الخاصة بعرض proxy DSH.',
-    routeHint: '/operations/dsh/sheinproxy',
-    statusLabel: 'قيد الربط',
-  },
-  {
-    id: 'arrival-bell',
-    label: 'جرس الوصول',
-    description: 'إعدادات الوصول والتنبيهات الحية عند الاقتراب من التسليم.',
-    routeHint: '/operations/dsh/arrival-bell',
-    statusLabel: 'حي',
-    liveHref: '/operations/dsh/arrival-bell',
-  },
-] as const satisfies ReadonlyArray<DshWorkbench>;
+  if (workbenchId === 'zone-set') {
+    return text.hub.workbenches.zoneSet;
+  }
+
+  if (workbenchId === 'arrival-bell') {
+    return text.hub.workbenches.arrivalBell;
+  }
+
+  if (workbenchId === 'sheinproxy') {
+    return text.hub.workbenches.sheinProxy;
+  }
+
+  return text.hub.workbenches[workbenchId];
+}
+
+function buildTopFilterItems(text: ReturnType<typeof useDshControlPanelText>) {
+  return [
+    { id: 'today', label: text.hub.topFilters.today },
+    { id: 'queue', label: text.hub.topFilters.queue },
+    { id: 'peak', label: text.hub.topFilters.peak },
+  ] as const;
+}
+
+function buildDshWorkbenches(text: ReturnType<typeof useDshControlPanelText>): ReadonlyArray<DshWorkbench> {
+  return [
+    {
+      id: 'overview',
+      ...text.hub.workbenches.overview,
+    },
+    {
+      id: 'orders',
+      ...text.hub.workbenches.orders,
+      liveHref: '/operations/dsh/orders',
+    },
+    {
+      id: 'reassign',
+      ...text.hub.workbenches.reassign,
+      liveHref: '/operations/dsh/reassign',
+    },
+    {
+      id: 'peak-mode',
+      ...text.hub.workbenches.peakMode,
+      liveHref: '/operations/dsh/peak-mode',
+    },
+    {
+      id: 'zone-set',
+      ...text.hub.workbenches.zoneSet,
+    },
+    {
+      id: 'sheinproxy',
+      ...text.hub.workbenches.sheinProxy,
+    },
+    {
+      id: 'arrival-bell',
+      ...text.hub.workbenches.arrivalBell,
+      liveHref: '/operations/dsh/arrival-bell',
+    },
+  ] as const;
+}
 
 function resolveTopFilterWorkbench(filterId: TopFilterId): DshWorkbenchId {
   if (filterId === 'queue') {
@@ -126,68 +139,68 @@ function resolveWorkbenchLiveHref(workbenchId: DshWorkbenchId) {
   return undefined;
 }
 
-function resolveStateCopy(state: Exclude<ControlPanelDshOperationsScreenState, 'ready'>) {
+function resolveStateCopy(
+  text: ReturnType<typeof useDshControlPanelText>,
+  state: Exclude<ControlPanelDshOperationsScreenState, 'ready'>,
+) {
   if (state === 'loading') {
     return {
       stateId: 'loading' as const,
-      title: 'جار تجهيز سطح DSH',
-      description: 'الهيكل مرئي الآن، وسيبقى المسار محفوظًا حتى تكتمل البيانات أو الروابط التالية.',
-      actionLabel: 'العودة إلى العمليات',
+      title: text.hub.stateLoadingTitle,
+      description: text.hub.stateLoadingDescription,
+      actionLabel: text.common.openGeneralOperations,
     };
   }
 
   if (state === 'empty') {
     return {
       stateId: 'empty' as const,
-      title: 'لا توجد عناصر مفعلة بعد',
-      description: 'هذا slice ما يزال في وضع baseline، ويمكنك الرجوع إلى العمليات العامة أو إعادة البناء في slice لاحق.',
-      actionLabel: 'العودة إلى العمليات',
+      title: text.hub.stateEmptyTitle,
+      description: text.hub.stateEmptyDescription,
+      actionLabel: text.common.openGeneralOperations,
     };
   }
 
   if (state === 'offline') {
     return {
       stateId: 'offline' as const,
-      title: 'الاتصال غير متاح مؤقتًا',
-      description: 'السطح يبقى واضحًا، لكن تفعيل child routes مؤجل حتى تعود الشبكة أو يكتمل الربط.',
-      actionLabel: 'العودة إلى العمليات',
+      title: text.hub.stateOfflineTitle,
+      description: text.hub.stateOfflineDescription,
+      actionLabel: text.common.openGeneralOperations,
     };
   }
 
   if (state === 'disabled') {
     return {
       kind: 'warning' as const,
-      title: 'المسار غير مفعّل بعد',
-      description: 'هذا الهبوط محفوظ كجزء من خطة wave لكنه لا يفتح child routes قبل slice الربط التالي.',
-      actionLabel: 'العودة إلى العمليات',
+      title: text.hub.stateDisabledTitle,
+      description: text.hub.stateDisabledDescription,
+      actionLabel: text.common.openGeneralOperations,
     };
   }
 
   return {
     stateId: 'recoverableError' as const,
-    title: 'تعذر تحميل سطح DSH',
-    description: 'يمكنك العودة إلى المسار الآمن أو إعادة المحاولة بعد تثبيت البيئة الحالية.',
-    actionLabel: 'إعادة المحاولة',
+    title: text.hub.stateErrorTitle,
+    description: text.hub.stateErrorDescription,
+    actionLabel: text.common.openGeneralOperations,
   };
 }
 
-function resolveWorkbenchTitle(workbench: DshWorkbench) {
-  return workbench.id === 'overview' ? 'مركز تشغيل DSH' : `${workbench.label} DSH`;
+function resolveWorkbenchTitle(text: ReturnType<typeof useDshControlPanelText>, workbench: DshWorkbench) {
+  return workbench.id === 'overview' ? text.hub.rootTitle : workbench.label;
 }
 
-function resolveWorkbenchSubtitle(workbench: DshWorkbench, filterLabel: string, languageChip: 'AR' | 'EN') {
-  if (languageChip === 'EN') {
-    return `${workbench.description} The current slice stays honest: only the safe routes are live for now.`;
-  }
-
-  return `${workbench.description} هذا slice يبقى صريحًا: ${filterLabel} هو السياق الحالي، والمسارات الآمنة فقط هي المفعلة الآن ضمن واجهة القيادة.`;
+function resolveWorkbenchSubtitle(text: ReturnType<typeof useDshControlPanelText>, workbench: DshWorkbench, filterLabel: string) {
+  return formatDshWorkbenchSubtitle(text, workbench.description, filterLabel);
 }
 
 function renderStateView(
+  text: ReturnType<typeof useDshControlPanelText>,
   state: Exclude<ControlPanelDshOperationsScreenState, 'ready'>,
   onActionPress: () => void,
 ) {
-  const stateCopy = resolveStateCopy(state);
+  const stateCopy = resolveStateCopy(text, state);
 
   return (
     <BthStateView
@@ -207,15 +220,20 @@ export function ControlPanelDshOperationsScreen({
   fallbackHref = '/operations',
 }: ControlPanelDshOperationsScreenProps) {
   const router = useRouter();
+  const uiText = useUiText();
+  const dshText = useDshControlPanelText();
+  const { language } = useDirection();
+  const languageChip = language === 'en' ? dshText.common.enChip : dshText.common.arChip;
+  const topFilterItems = React.useMemo(() => buildTopFilterItems(dshText), [dshText]);
+  const dshWorkbenches = React.useMemo(() => buildDshWorkbenches(dshText), [dshText]);
   const [activeFilterId, setActiveFilterId] = React.useState<TopFilterId>('today');
   const [activeWorkbenchId, setActiveWorkbenchId] = React.useState<DshWorkbenchId>('overview');
-  const [languageChip, setLanguageChip] = React.useState<'AR' | 'EN'>('AR');
   const [refreshCount, setRefreshCount] = React.useState(1);
   const [alertCount, setAlertCount] = React.useState(1);
 
   const activeWorkbench = dshWorkbenches.find((item) => item.id === activeWorkbenchId) ?? dshWorkbenches[0];
   const activeFilter = topFilterItems.find((item) => item.id === activeFilterId) ?? topFilterItems[0];
-  const plannedWorkbenches = dshWorkbenches.filter((item) => item.id !== 'overview');
+  const plannedWorkbenchCount = dshWorkbenches.filter((item) => !item.liveHref && item.id !== 'overview').length;
   const topFilters = topFilterItems.map((item) => ({
     ...item,
     active: item.id === activeFilterId,
@@ -225,12 +243,12 @@ export function ControlPanelDshOperationsScreen({
     label: item.label,
     description: item.description,
     active: item.id === activeWorkbenchId,
-    badge: item.id === 'overview' ? 'حي' : item.id === 'orders' || item.id === 'arrival-bell' || item.id === 'reassign' || item.id === 'peak-mode' ? 'مباشر' : 'مخطط',
+    badge: item.id === 'overview' ? dshText.common.live : item.liveHref ? dshText.common.liveNow : dshText.common.planned,
   }));
   const readyForSelection = state === 'ready';
 
-  const heroTitle = resolveWorkbenchTitle(activeWorkbench);
-  const heroSubtitle = resolveWorkbenchSubtitle(activeWorkbench, activeFilter.label, languageChip);
+  const heroTitle = resolveWorkbenchTitle(dshText, activeWorkbench);
+  const heroSubtitle = resolveWorkbenchSubtitle(dshText, activeWorkbench, activeFilter.label);
 
   const handleTopFilterSelect = (filterId: string) => {
     const matchedFilter = topFilterItems.find((item) => item.id === filterId);
@@ -281,191 +299,140 @@ export function ControlPanelDshOperationsScreen({
     setRefreshCount((previousValue) => previousValue + 1);
   };
 
-  const handleLanguageClick = () => {
-    setLanguageChip((previousValue) => (previousValue === 'AR' ? 'EN' : 'AR'));
-  };
-
   const handleAlertClick = () => {
     setAlertCount(0);
     setActiveFilterId('queue');
-    setActiveWorkbenchId('sheinproxy');
+    setActiveWorkbenchId('orders');
   };
 
   const stageContent = readyForSelection ? (
-    <BthBox gap={4}>
+    <div className={styles.stack}>
       <BthWebMissionHeroCard
         badges={[
           `/operations/dsh`,
-          `الفترة: ${activeFilter.label}`,
-          `اللغة: ${languageChip}`,
+          `${dshText.common.period}: ${activeFilter.label}`,
+          `${dshText.common.language}: ${languageChip}`,
         ]}
-        eyebrow="الهبوط الرئيسي"
+        eyebrow={dshText.hub.rootEyebrow}
         title={heroTitle}
         description={heroSubtitle}
         metaItems={[
-          `المسار الآمن: ${fallbackHref}`,
-          `المسارات المخططة: ${plannedWorkbenches.length}`,
-          `آخر تحديث مرئي: ${refreshCount}`,
+          `${dshText.common.safePath}: ${fallbackHref}`,
+          `${dshText.hub.plannedRoutesTitle}: ${plannedWorkbenchCount}`,
+          `${dshText.common.visibleUpdate}: ${refreshCount}`,
         ]}
-        primaryAction={{ label: 'افتح العمليات العامة', href: fallbackHref }}
-        secondaryAction={{ label: 'لوحة التحكم', href: '/dashboard' }}
+        primaryAction={{ label: dshText.common.openGeneralOperations, href: fallbackHref }}
+        secondaryAction={{ label: dshText.common.controlPanel, href: '/dashboard' }}
       />
 
-      <BthBox gap={2}>
+      <div className={styles.signalGrid}>
         <BthWebSignalCard
-          title="المجال المختار"
+          title={dshText.hub.selectedScopeTitle}
           value={activeWorkbench.label}
-          description="التبديل داخل هذا hub يبقى محليًا حتى تكتمل روابط child routes لاحقًا."
+          description={dshText.hub.selectedScopeDescription}
           tone="best"
         />
         <BthWebSignalCard
-          title="المسارات المخططة"
-          value={String(plannedWorkbenches.length)}
-          description="هذه الروابط موثقة الآن لكنها ليست مفعلة بعد لتجنب أي navigation كاذب."
+          title={dshText.hub.plannedRoutesTitle}
+          value={String(plannedWorkbenchCount)}
+          description={dshText.hub.plannedRoutesDescription}
         />
         <BthWebSignalCard
-          title="الانتقال الآمن"
+          title={dshText.hub.safeTransitionTitle}
           value={fallbackHref}
-          description="الرجوع إلى العمليات العامة هو الخروج الوحيد الحي في هذا slice."
+          description={dshText.hub.safeTransitionDescription}
         />
         <BthWebSignalCard
-          title="التنبيهات النشطة"
+          title={dshText.common.activeAlerts}
           value={String(alertCount)}
-          description="مؤشر مرئي بسيط يحافظ على وجود feedback واضح دون إدخال state runtime مبكر."
+          description={dshText.hub.activeAlertsDescription}
         />
-      </BthBox>
+      </div>
 
       <BthWebSectionCard
-        title="المسارات المخططة"
-        description="كل عنصر هنا يعرّف route لاحقًا، لكنه يبقى غير قابل للنقر حتى لا يتحول هذا slice إلى وعد غير مكتمل."
+        title={dshText.hub.workbenchesTitle}
+        description={dshText.hub.workbenchesDescription}
       >
-        <BthBox gap={2}>
-          {plannedWorkbenches.map((workbench) => (
-            <BthBox
-              key={workbench.id}
-              padding={3}
-              gap={1}
-              border
-              radiusToken="xl"
-              background="surfaceRaised"
-            >
-              <BthBox layoutDirection="row" justify="space-between" align="center">
-                <BthText role="bodyStrong">{workbench.label}</BthText>
-                <BthText role="caption" tone="brand">
-                  {workbench.statusLabel}
+        <div className={styles.cardGrid}>
+          {dshWorkbenches.filter((workbench) => workbench.id !== 'overview').map((workbench) => (
+            <div key={workbench.id} className={styles.compactCard}>
+              <BthBox
+                padding={3}
+                gap={1}
+                border
+                radiusToken="xl"
+                background="surfaceRaised"
+              >
+                <BthBox layoutDirection="row" justify="space-between" align="center">
+                  <BthText role="bodyStrong">{workbench.label}</BthText>
+                  <BthText role="caption" tone={workbench.liveHref ? 'success' : 'brand'}>
+                    {workbench.liveHref ? dshText.common.live : workbench.statusLabel}
+                  </BthText>
+                </BthBox>
+                <BthText role="bodySm" tone="muted">
+                  {workbench.description}
                 </BthText>
-              </BthBox>
-              <BthText role="bodySm" tone="muted">
-                {workbench.routeHint}
-              </BthText>
-              <BthText role="caption" tone="soft">
-                {workbench.description}
-              </BthText>
-              {workbench.id === 'orders' || workbench.id === 'arrival-bell' || workbench.id === 'reassign' || workbench.id === 'peak-mode' ? (
-                <BthButton
-                  label={workbench.id === 'orders' ? 'افتح الطلبات' : workbench.id === 'arrival-bell' ? 'افتح جرس الوصول' : workbench.id === 'reassign' ? 'افتح إعادة التوزيع' : 'افتح وضع الذروة'}
-                  tone="primary"
-                  size="sm"
-                  fullWidth={false}
-                  onPress={() =>
-                    router.push(
-                      resolveWorkbenchLiveHref(workbench.id) ??
-                        (workbench.id === 'arrival-bell'
-                          ? '/operations/dsh/arrival-bell'
+                <BthText role="caption" tone="soft">
+                  {workbench.routeHint}
+                </BthText>
+                {workbench.liveHref ? (
+                  <BthButton
+                    label={
+                      workbench.id === 'orders'
+                        ? dshText.hub.actions.openOrders
+                        : workbench.id === 'arrival-bell'
+                          ? dshText.hub.actions.openArrivalBell
                           : workbench.id === 'reassign'
-                            ? '/operations/dsh/reassign'
-                            : workbench.id === 'peak-mode'
-                              ? '/operations/dsh/peak-mode'
-                            : '/operations/dsh/orders'),
-                    )
-                  }
-                />
-              ) : null}
-            </BthBox>
+                            ? dshText.hub.actions.openReassign
+                            : dshText.hub.actions.openPeakMode
+                    }
+                    tone="primary"
+                    size="sm"
+                    fullWidth={false}
+                    onPress={() => router.push(workbench.liveHref!)}
+                  />
+                ) : null}
+              </BthBox>
+            </div>
           ))}
-        </BthBox>
+        </div>
       </BthWebSectionCard>
-
-      <BthWebSectionCard
-        title="حراسة الانتقال"
-        description="السطح الحالي صريح: لا يوجد child navigation مكسور، ولا روابط نصف جاهزة، ولا انتقالات runtime مخفية."
-      >
-        <BthBox gap={2}>
-          <BthBox
-            padding={3}
-            gap={1}
-            border
-            radiusToken="xl"
-            background="surfaceRaised"
-          >
-            <BthText role="bodyStrong">المسار الحالي</BthText>
-            <BthText role="bodySm" tone="muted">
-              /operations/dsh
-            </BthText>
-          </BthBox>
-          <BthBox
-            padding={3}
-            gap={1}
-            border
-            radiusToken="xl"
-            background="surfaceRaised"
-          >
-            <BthText role="bodyStrong">الرجوع الآمن</BthText>
-            <BthText role="bodySm" tone="muted">
-              {fallbackHref}
-            </BthText>
-          </BthBox>
-          <BthBox
-            padding={3}
-            gap={1}
-            border
-            radiusToken="xl"
-            background="surfaceRaised"
-          >
-            <BthText role="bodyStrong">القياس المرئي</BthText>
-            <BthText role="bodySm" tone="muted">
-              تحديثات {refreshCount} · تنبيهات {alertCount} · لغة {languageChip}
-            </BthText>
-          </BthBox>
-        </BthBox>
-      </BthWebSectionCard>
-    </BthBox>
+    </div>
   ) : (
-    renderStateView(state, () => {
+    renderStateView(dshText, state, () => {
       router.push(fallbackHref);
     })
   );
 
   return (
     <BthWebCommandCenterFrame
-      brandLabel="لوحة التحكم"
-      surfaceTitle={readyForSelection ? heroTitle : 'مركز تشغيل DSH'}
-      surfaceSubtitle={readyForSelection ? heroSubtitle : 'السطح غير جاهز بعد لكن مسار الرجوع الآمن يبقى واضحًا.'}
+      brandLabel={uiText.controlPanel.brandLabel}
+      surfaceTitle={readyForSelection ? heroTitle : dshText.hub.rootTitle}
+      surfaceSubtitle={readyForSelection ? heroSubtitle : dshText.hub.unavailableTitle}
       topFilters={topFilters}
       onTopFilterSelect={readyForSelection ? handleTopFilterSelect : undefined}
       onBrandClick={handleBrandClick}
       onSearchClick={readyForSelection ? handleSearchClick : undefined}
       onRefreshClick={readyForSelection ? handleRefreshClick : undefined}
-      onLanguageClick={readyForSelection ? handleLanguageClick : undefined}
       onAlertClick={readyForSelection ? handleAlertClick : undefined}
-      railTitle="DSH"
-      railStatusLabel={readyForSelection ? 'مرحلة أولى' : state}
+      railTitle={dshText.hub.railTitle}
+      railStatusLabel={readyForSelection ? dshText.hub.railStatusReady : state}
       railItems={railItems}
       onRailItemSelect={readyForSelection ? handleRailSelect : undefined}
       railSupplementary={
         <BthWebSectionCard
-          title="حارس المسار"
-          description="السطح لا يفتح child routes قبل تثبيتها، لذلك يبقى الخروج الوحيد الحي واضحًا وآمنًا."
+          title={dshText.common.routeGuard}
+          description={dshText.common.routeGuardDescription}
         >
           <BthBox gap={2}>
             <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">المسار الحالي</BthText>
+              <BthText role="bodyStrong">{dshText.common.currentPath}</BthText>
               <BthText role="bodySm" tone="muted">
                 /operations/dsh
               </BthText>
             </BthBox>
             <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">الخروج الآمن</BthText>
+              <BthText role="bodyStrong">{dshText.common.safeExit}</BthText>
               <BthText role="bodySm" tone="muted">
                 {fallbackHref}
               </BthText>
