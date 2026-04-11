@@ -253,6 +253,9 @@ export function ControlPanelDshOperationsScreen({
 
   const heroTitle = resolveWorkbenchTitle(dshText, activeWorkbench);
   const heroSubtitle = resolveWorkbenchSubtitle(dshText, activeWorkbench, activeFilter.label);
+  const sheinProxyActionLabel = 'openSheinProxy' in dshText.common
+    ? dshText.common.openSheinProxy
+    : dshText.hub.actions.openPeakMode;
 
   const handleTopFilterSelect = (filterId: string) => {
     const matchedFilter = topFilterItems.find((item) => item.id === filterId);
@@ -385,7 +388,7 @@ export function ControlPanelDshOperationsScreen({
                       workbench.id === 'orders'
                         ? dshText.hub.actions.openOrders
                         : workbench.id === 'sheinproxy'
-                          ? dshText.hub.actions.openSheinProxy
+                          ? sheinProxyActionLabel
                         : workbench.id === 'arrival-bell'
                           ? dshText.hub.actions.openArrivalBell
                           : workbench.id === 'reassign'

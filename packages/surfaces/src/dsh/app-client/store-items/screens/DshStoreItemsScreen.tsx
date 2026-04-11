@@ -145,6 +145,9 @@ export function DshStoreItemsScreen({
           subtitle="Select an item to continue smoothly toward cart context."
           count={visibleItems.length}
         />
+        <BthText role="caption" tone="muted">
+          Tapping an item should stay the shortest path into cart review or add flow.
+        </BthText>
         <BthBox gap={2}>
           {visibleItems.map((item) => (
             <BthListItem

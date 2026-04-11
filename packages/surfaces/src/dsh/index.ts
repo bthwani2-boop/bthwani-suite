@@ -1,5 +1,6 @@
 export * from './service.meta';
 export * from './service.catalog';
+export * from './DshCartPrice';
 export * as dshAppClient from './app-client';
 export * as dshAppPartner from './app-partner';
 export * as dshAppCaptain from './app-captain';

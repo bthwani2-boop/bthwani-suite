@@ -179,6 +179,9 @@ export function ControlPanelDshSheinProxyRequestScreen({
   const dshText = useDshControlPanelText();
   const requestText = dshText.sheinProxyRequest;
   const request = getSheinProxyRequestById(requestId);
+    const openSupportLabel = 'openSupport' in dshText
+      ? String(dshText.openSupport)
+      : String(dshText.common.openSupport);
   const resolvedState = state === 'ready' && !request ? 'empty' : state;
   const stageMeta = resolveStageMeta(dshText, stage);
 
@@ -296,7 +299,7 @@ export function ControlPanelDshSheinProxyRequestScreen({
               <BthButton label={requestText[stageActions.quaternaryLabelKey]} tone="ghost" fullWidth={false} onPress={() => router.push(stageActions.quaternaryHref)} />
               <BthButton label={requestText.backToList} tone="secondary" fullWidth={false} onPress={() => router.push(listHref)} />
               <BthButton label={requestText.openOperations} tone="secondary" fullWidth={false} onPress={() => router.push(operationsHref)} />
-              <BthButton label={dshText.openSupport} tone="secondary" fullWidth={false} onPress={() => router.push(supportHref)} />
+                <BthButton label={openSupportLabel} tone="secondary" fullWidth={false} onPress={() => router.push(supportHref)} />
             </BthBox>
           </BthBox>
         </BthWebSectionCard>

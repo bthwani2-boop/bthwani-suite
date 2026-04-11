@@ -5,6 +5,7 @@ import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
 const {
+  DshEntryScreen,
   CaptainDeliveryConfirmSheet,
   CaptainPickupConfirmSheet,
   CaptainTaskDetailScreen,
@@ -26,7 +27,7 @@ const shortcuts = [
   'تبديل الحالة'
 ] as const;
 
-type CaptainRoute = 'home' | 'inbox' | 'detail';
+type CaptainRoute = 'home' | 'entry' | 'inbox' | 'detail';
 type CaptainServiceType = 'dsh' | 'amn';
 
 const captainTypeOptions: readonly MobileAccountTypeOption[] = [
@@ -73,6 +74,10 @@ export function CaptainSurfaceHost() {
     setRoute('detail');
   };
 
+  const openCaptainEntry = () => {
+    setRoute('entry');
+  };
+
   const handleSelectServiceType = React.useCallback((typeId: string) => {
     const nextType: CaptainServiceType = typeId === 'amn' ? 'amn' : 'dsh';
     setActiveServiceType(nextType);
@@ -83,7 +88,24 @@ export function CaptainSurfaceHost() {
     setIsDeliverySheetVisible(false);
   }, []);
 
+  const captainEntryState = inboxState === 'loading' ? 'loading' : inboxState === 'noTasks' ? 'empty' : 'ready';
+
   const renderCaptainFlow = () => {
+    if (route === 'entry') {
+      return (
+        <DshEntryScreen
+          state={captainEntryState}
+          onOpenOffersPress={() => setRoute('inbox')}
+          onOpenExecutionPress={() => setRoute('detail')}
+          onOpenProofCapturePress={() => {
+            setActiveTaskId('captain-task-9021');
+            setIsDeliverySheetVisible(true);
+            setRoute('detail');
+          }}
+        />
+      );
+    }
+
     if (route === 'inbox') {
       return (
         <CaptainTasksInboxScreen
@@ -150,7 +172,7 @@ export function CaptainSurfaceHost() {
           accessibilityLabel: 'المهام',
           onPress: () => {
             if (activeServiceType === 'dsh') {
-              setRoute('inbox');
+              setRoute('entry');
             }
           },
         },
@@ -164,7 +186,7 @@ export function CaptainSurfaceHost() {
             : 'تم تفعيل وضع AMN. سيتم تحميل مسارات الأمان فور اكتمال ربط الشاشات.',
         onPress: () => {
           if (activeServiceType === 'dsh') {
-            setRoute('inbox');
+            setRoute('entry');
           }
         },
       }}
@@ -268,8 +290,8 @@ export function CaptainSurfaceHost() {
           <BthScreenHeader
             title="مهام الكابتن"
             subtitle="هذه هي نقطة البداية الحقيقية لتطبيق الكابتن."
-            actionLabel="ابدأ الاستلام"
-            onActionPress={() => setRoute('inbox')}
+            actionLabel="ابدأ من entry"
+            onActionPress={openCaptainEntry}
           />
 
           <BthSurface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
@@ -291,25 +313,25 @@ export function CaptainSurfaceHost() {
           <BthSurface tone="default" padding={5} gap={4} radiusToken="xl">
             <BthText role="label">اختصارات البداية</BthText>
             <BthBox gap={3}>
-              {shortcuts.map((item, index) => (
+                  setRoute('entry');
                 <BthButton
                   key={item}
                   label={item}
                   tone="secondary"
                   onPress={() => {
                     if (index === 0) {
-                      setRoute('inbox');
+                      setRoute('entry');
                       return;
                     }
 
                     if (index === 1) {
                       setInboxState('delivered');
-                      setRoute('inbox');
+                      setRoute('detail');
                       return;
                     }
 
                     setInboxState('noTasks');
-                    setRoute('inbox');
+                    setRoute('entry');
                   }}
                 />
               ))}
@@ -321,7 +343,7 @@ export function CaptainSurfaceHost() {
             <BthText role="bodySm" tone="muted">البدء من home shell يمنع خلط feature preview مع التشغيل الفعلي للتطبيق.</BthText>
           </BthSurface>
 
-          <BthButton label="ابدأ الاستلام" onPress={() => setRoute('inbox')} />
+          <BthButton label="ابدأ من entry" onPress={openCaptainEntry} />
         </BthMobileScrollView>
       </BthSurface>
       {accountSheet}

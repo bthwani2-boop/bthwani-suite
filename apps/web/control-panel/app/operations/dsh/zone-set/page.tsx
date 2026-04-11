@@ -1,5 +1,5 @@
-import { ControlPanelDshZoneSetScreen } from '@bthwani/surfaces/dsh/control-panel/operations/dsh/zone-set';
+import { DshControlPanelSurfaceHost } from '@bthwani/surfaces/dsh/control-panel';
 
 export default function DshZoneSetPage() {
-  return <ControlPanelDshZoneSetScreen />;
+  return <DshControlPanelSurfaceHost workspace="zone-set" />;
 }

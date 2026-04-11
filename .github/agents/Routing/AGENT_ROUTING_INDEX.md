@@ -1,5 +1,7 @@
 # Agent Routing Index
 
+This index is an annex under `.github/agents/bthwani-surface-core-lossless.agent.md` and is governed by that agent file.
+
 ## Base Profile First
 
 Choose one base profile based on the primary intent of the task.

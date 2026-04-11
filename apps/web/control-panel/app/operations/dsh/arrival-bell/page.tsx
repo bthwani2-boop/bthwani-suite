@@ -1,5 +1,5 @@
-import { ControlPanelDshArrivalBellScreen } from '@bthwani/surfaces/dsh/control-panel/operations/dsh/arrival-bell';
+import { DshControlPanelSurfaceHost } from '@bthwani/surfaces/dsh/control-panel';
 
 export default function DshArrivalBellPage() {
-  return <ControlPanelDshArrivalBellScreen />;
+  return <DshControlPanelSurfaceHost workspace="arrival-bell" />;
 }

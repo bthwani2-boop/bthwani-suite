@@ -51,6 +51,8 @@ export type DshHomeScreenProps = {
   promos?: DshHomePromo[];
   onStartDelivery?: () => void;
   onContinueOrder?: () => void;
+  onOpenDiscovery?: () => void;
+  onOpenSearch?: () => void;
   onOpenOrders?: () => void;
   onOpenTracking?: () => void;
   onOpenCategory?: (categoryId: string) => void;
@@ -152,6 +154,8 @@ export function DshHomeScreen({
   promos = defaultPromos,
   onStartDelivery,
   onContinueOrder,
+  onOpenDiscovery,
+  onOpenSearch,
   onOpenOrders,
   onOpenTracking,
   onOpenCategory,
@@ -357,9 +361,11 @@ export function DshHomeScreen({
           subtitle="Expose one dominant next action with one fallback path."
         />
         <BthBox layoutDirection="row" gap={2}>
+          <BthButton label="Open discovery" tone="ghost" onPress={onOpenDiscovery} />
           <BthButton label="Continue order" tone="secondary" onPress={onContinueOrder} />
           <BthButton label="Track active order" onPress={onOpenTracking} />
         </BthBox>
+        <BthButton label="Search" tone="ghost" onPress={onOpenSearch} />
         <BthText role="caption" tone="muted">
           This home is UI/UX/Flow only. API, binding, and runtime wiring remain deferred.
         </BthText>

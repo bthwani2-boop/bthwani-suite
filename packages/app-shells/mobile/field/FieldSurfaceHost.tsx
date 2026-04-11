@@ -124,7 +124,7 @@ function toVisitLogState(state: FieldPreviewState): DshFieldStoreVisitLogState {
 
 export function FieldSurfaceHost() {
   const [activeServiceType, setActiveServiceType] = React.useState<FieldServiceType>('dsh');
-  const [route, setRoute] = React.useState<FieldRoute>('home');
+  const [route, setRoute] = React.useState<FieldRoute>('entry');
   const [previewState, setPreviewState] = React.useState<FieldPreviewState>('ready');
   const [homeSearchQuery, setHomeSearchQuery] = React.useState('');
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);

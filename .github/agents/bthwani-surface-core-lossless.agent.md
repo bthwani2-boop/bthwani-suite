@@ -1,4 +1,4 @@
----
+هل اص---
 name: bthwani-surface-core-lossless
 description: 'Thin sovereign routing kernel for bthwani-suite surface work. Use one base profile plus only the minimum overlays needed for the current task.'
 ---
@@ -63,6 +63,31 @@ Choose exactly one base profile first.
 Add overlays only when the task proves the need.
 Do not flatten the whole skill set into one always-on policy surface.
 
+## Governance Hierarchy
+
+This agent file is the primary governing surface.
+
+The following paths are part of this agent's managed routing system and operate under its authority:
+
+- `.github/agents/Routing/AGENT_ROUTING_INDEX.md`
+- `.github/agents/base-profiles/**`
+- `.github/agents/overlays/**`
+- `.github/skills/bthwani-central-ui-kit-compliance`
+- `.github/skills/bthwani-design-sovereignty`
+- `.github/skills/bthwani-donor-decomposition`
+- `.github/skills/bthwani-donor-escalation`
+- `.github/skills/bthwani-interactive-review`
+- `.github/skills/bthwani-ready-pack`
+- `.github/skills/bthwani-slice-orchestration`
+- `.github/skills/bthwani-task-contracts`
+- `.github/skills/bthwani-unified-experience-review`
+- `.github/skills/bthwani-ux-flow-sovereignty`
+- `.github/skills/bthwani-violation-audit`
+- `.github/skills/bthwani-workspace-boundaries`
+- `.github/skills/link-workspace-packages`
+
+The routing index is not a peer policy surface. It is an annex under this agent and is used to route subordinate base profiles, overlays, and skills.
+
 ### Base Profiles
 
 - `analyze.first-pass` -> `.github/agents/base-profiles/PROFILE_ANALYZE_FIRST_PASS.md`
@@ -78,7 +103,7 @@ Do not flatten the whole skill set into one always-on policy surface.
 - `overlay.user-review-gates` -> `.github/agents/overlays/OVERLAY_USER_REVIEW_GATES.md`
 - `overlay.violation-audit` -> `.github/agents/overlays/OVERLAY_VIOLATION_AUDIT.md`
 
-Refer to `.github/agents/AGENT_ROUTING_INDEX.md` for routing tie-breaks and isolation rules.
+Refer to `.github/agents/Routing/AGENT_ROUTING_INDEX.md` for routing tie-breaks and isolation rules.
 
 If uncertain, start with `analyze.first-pass`.
 

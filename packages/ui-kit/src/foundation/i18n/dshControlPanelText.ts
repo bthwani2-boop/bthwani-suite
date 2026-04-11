@@ -68,73 +68,6 @@ const arDshControlPanelText = {
         label: 'نظرة عامة على DSH',
         description: 'لقطة أولى للحالة والانتقالات الآمنة قبل الدخول في أي مسار فرعي.',
         routeHint: '/operations/dsh',
-        statusLabel: 'حي'
-      },
-      orders: {
-        label: 'إدارة الطلبات',
-        description: 'الطابور المركزي للطلبات والتفاصيل المرتبطة بها.',
-        routeHint: '/operations/dsh/orders',
-        statusLabel: 'حي'
-      },
-      reassign: {
-        label: 'إعادة التوزيع',
-        description: 'تحويل الطلبات بين الموارد المتاحة بدون كسر المسار الحالي.',
-        routeHint: '/operations/dsh/reassign',
-        statusLabel: 'حي'
-      },
-      peakMode: {
-        label: 'وضع الذروة',
-        description: 'تشغيل مرن عندما ترتفع الحركة وتحتاج سعة إضافية.',
-        routeHint: '/operations/dsh/peak-mode',
-        statusLabel: 'حي'
-      },
-      zoneSet: {
-        label: 'نطاق التوصيل',
-        description: 'تقييد النطاقات وتشغيلها بوضوح تشغيلي أعلى.',
-        routeHint: '/operations/dsh/zone-set',
-        statusLabel: 'قيد الربط'
-      },
-      sheinProxy: {
-        label: 'وسيط شي إن',
-        description: 'مسار الوساطة والطلبات الخاصة بعرض وسيط DSH.',
-        routeHint: '/operations/dsh/sheinproxy',
-        statusLabel: 'قيد الربط'
-      },
-      arrivalBell: {
-        label: 'جرس الوصول',
-        description: 'إعدادات الوصول والتنبيهات الحية عند الاقتراب من التسليم.',
-        routeHint: '/operations/dsh/arrival-bell',
-        statusLabel: 'حي'
-      }
-    },
-    actions: {
-      openOrders: 'افتح الطلبات',
-      openArrivalBell: 'افتح جرس الوصول',
-      openReassign: 'افتح إعادة التوزيع',
-      openPeakMode: 'افتح وضع الذروة'
-    }
-  },
-  orders: {
-    pageEyebrow: 'DSH / العمليات / الطلبات',
-    pageTitle: 'إدارة طلبات DSH',
-    pageDescription: 'طابور تشغيلي مضغوط وواضح، مع بقاء الرجوع إلى مركز DSH أو إلى العمليات على بعد خطوة واحدة فقط.',
-    heroEyebrow: 'الطابور التشغيلي',
-    heroTitle: 'طلبات DSH المفتوحة',
-    heroDescription: 'هذه الصفحة تعرض طابورًا تشغيليًا مباشرًا، مع مسار رجوع واضح إلى مركز DSH ومسار عام آمن إلى العمليات.',
-    stateLoadingTitle: 'جار تحميل قائمة الطلبات',
-    stateLoadingDescription: 'السطح حي، وتبقى حالة الطلبات غير مقفلة حتى تكتمل المزامنة أو يعود المصدر.',
-    stateEmptyTitle: 'لا توجد طلبات مفتوحة الآن',
-    stateEmptyDescription: 'المسار جاهز، لكن الطابور الحالي فارغ مؤقتًا ويمكن العودة إلى المركز أو تحديث الحالة لاحقًا.',
-    stateOfflineTitle: 'الاتصال غير متاح',
-    stateOfflineDescription: 'قائمة الطلبات ستعود عند استعادة الاتصال، مع بقاء المسار الحالي واضحًا وآمنًا.',
-    stateDisabledTitle: 'قائمة الطلبات غير مفعلة بعد',
-    stateDisabledDescription: 'هذه الصفحة حية بصريًا، لكن التفاعل الأعمق مؤجل إلى خطوة لاحقة حتى يكتمل الربط.',
-    stateErrorTitle: 'تعذر تحميل الطلبات',
-    stateErrorDescription: 'يمكنك العودة إلى المركز أو إعادة المحاولة بعد تثبيت الحالة الحالية.',
-    badgesLabel: 'الطلبات',
-    assignedTitle: 'المعيّنة',
-    assignedDescription: 'طلبات لديها إسناد واضح ويمكن التقدم منها مباشرة إلى التفاصيل.',
-    newTitle: 'الجديدة',
     newDescription: 'طلبات دخلت الطابور وتحتاج قرارًا أوليًا سريعًا.',
     reviewTitle: 'تحت المراجعة',
     reviewDescription: 'طلبات تحتاج قراءة أعمق قبل أي تحويل أو تصعيد.',
@@ -168,48 +101,14 @@ const arDshControlPanelText = {
       estimatedDescription: 'طلبات جاهزة بتقدير سعري مرئي.',
       offered: 'تم إرسال العرض',
       offeredDescription: 'طلبات تنتظر رد العميل على العرض.',
-      scheduled: 'مجدولة',
-      scheduledDescription: 'طلبات لديها نافذة استلام محددة.'
+      protectedZonesDescription: 'المناطق التي تحتاج قرار حدودي أو مراقبة أقرب.',
+      freeDeliveryZones: 'مناطق التسليم الحر',
+      freeDeliveryZonesDescription: 'مساحة تسليم ظاهرة يمكنها استيعاب النشاط عند الحاجة.'
     },
-    statusLabels: {
-      underReview: 'قيد المراجعة',
-      estimated: 'مقدّرة',
-      offered: 'تم إرسال العرض',
-      scheduled: 'مجدولة',
-      approved: 'معتمدة',
-      cancelled: 'ملغاة'
-    },
-    nextActionLabels: {
-      underReview: 'افتح التقدير',
-      estimated: 'أرسل العرض',
-      offered: 'انتظر رد العميل',
-      scheduled: 'تحقق من نافذة الاستلام',
-      approved: 'جهّز التسليم',
-      cancelled: 'راجع الإلغاء'
-    },
-    tableTitle: 'طلبات الوساطة',
-    tableDescription: 'كل صف يوضح الطلب والحالة والتسعير والخطوة التالية المرشحة.',
-    allRequestsLabel: 'كل الطلبات',
-    tableEmptyTitle: 'لا توجد طلبات تطابق هذا الفلتر',
-    tableEmptyDescription: 'جرّب نطاقًا آخر أو عد إلى القائمة الكاملة.',
-    selectedTitle: 'الطلب المختار',
-    selectedDescription: 'ملخص مضغوط للطلب المحدد حاليًا داخل الطابور.',
-    requestLabel: 'الطلب',
-    customerLabel: 'العميل',
-    productLabel: 'المنتج',
-    quantityLabel: 'الكمية',
-    statusLabel: 'الحالة',
-    amountLabel: 'القيمة',
-    shippingLabel: 'الشحن',
-    serviceFeeLabel: 'رسوم الخدمة',
-    totalLabel: 'الإجمالي',
-    updatedLabel: 'آخر تحديث',
-    nextActionLabel: 'الخطوة التالية',
-    pricingTitle: 'تفصيل التسعير',
-    notesLabel: 'ملاحظة تشغيلية',
-    inspectRequest: 'افحص الطلب',
-    retryLabel: 'إعادة المحاولة',
-    backToHub: 'العودة إلى المركز'
+    policiesTitle: 'سياسات ضبط المناطق',
+    policiesDescription: 'هذه القواعد تحدد أين يتوقف هذا السطح: قراءة وسياسة فقط، من دون أي تعديل مخفي.',
+    lanesTitle: 'مناطق الحدود',
+    lanesDescription: 'كل بطاقة تمنح قراءة سريعة للحمل والسعة والتوصية من دون الادعاء بوجود تفعيل مباشر هنا.'
   },
   sheinProxyRequest: {
     pageEyebrow: 'DSH / العمليات / وسيط شي إن / الطلب',
@@ -336,7 +235,7 @@ const arDshControlPanelText = {
     supportPathLabel: 'مسار الدعم',
     openReassignWorkspace: 'افتح مساحة إعادة التوزيع'
   },
-  sheinProxyRequest: {
+  sheinProxyRequestLegacy: {
     pageEyebrow: 'DSH / operations / sheinproxy / request',
     pageTitlePrefix: 'Request details',
     pageDescription: 'A compact view of the current proxy request with a clear path to estimate, offer, and schedule.',
@@ -833,8 +732,70 @@ const arDshControlPanelText = {
           tone: 'warning'
         }
       ]
-    }
-  }
+    },
+    zoneSet: {
+      summary: {
+        configuredZones: 5,
+        protectedZones: 2,
+        freeDeliveryZones: 4,
+        reviewZones: 3
+      },
+      policies: [
+        {
+          label: 'القراءة أولًا',
+          statusLabel: 'منضبط',
+          description: 'يوضح هذا السطح أين تنتهي القراءة وأين يبدأ القرار التشغيلي الأوسع.'
+        },
+        {
+          label: 'حماية المناطق الحساسة',
+          statusLabel: 'محمي',
+          description: 'المناطق التي تحتاج حماية لا تتحول إلى تبديل زائف أو تسهيل غير مبرر.'
+        },
+        {
+          label: 'مساحة التسليم الحرة',
+          statusLabel: 'متاح',
+          description: 'المناطق الحرة تبقى مرئية كقدرة استيعاب عند الحاجة.'
+        }
+      ],
+      lanes: [
+        {
+          zoneLabel: 'حي النخيل',
+          feeLabel: 'رسوم مرئية',
+          etaLabel: '14 دقيقة',
+          statusLabel: 'مناسب للمراجعة',
+          recommendationLabel: 'مرشح أولي',
+          note: 'هذه المنطقة تحتاج قراءة واضحة قبل أي توسع.',
+          tone: 'warning'
+        },
+        {
+          zoneLabel: 'الطريق الساحلي',
+          feeLabel: 'رسوم أعلى',
+          etaLabel: '31 دقيقة',
+          statusLabel: 'محمي',
+          recommendationLabel: 'لا يفتح الآن',
+          note: 'هذا المسار يحتاج قرار حدودي أوسع بدل فتح مباشر.',
+          tone: 'danger'
+        },
+        {
+          zoneLabel: 'شارع 12',
+          feeLabel: 'رسوم مستقرة',
+          etaLabel: '22 دقيقة',
+          statusLabel: 'جاهز',
+          recommendationLabel: 'مراقبة فقط',
+          note: 'الوضع هنا متوازن ولا يحتاج أي حركة إضافية.',
+          tone: 'success'
+        },
+        {
+          zoneLabel: 'المنطقة الصناعية',
+          feeLabel: 'رسوم مرنة',
+          etaLabel: '19 دقيقة',
+          statusLabel: 'قابل للتوسعة',
+          recommendationLabel: 'متاح عند الحاجة',
+          note: 'يوفر هذا المسار سعة جاهزة عند ارتفاع الضغط.',
+          tone: 'brand'
+        }
+      ]
+    },
 } as const;
 
 const enDshControlPanelText = {
@@ -980,7 +941,40 @@ const enDshControlPanelText = {
     openDetail: 'Open details',
     etaPrefix: 'ETA'
   },
-  sheinProxyRequest: {
+  zoneSet: {
+    pageEyebrow: 'DSH / operations / zone-set',
+    pageTitle: 'Zone set',
+    pageDescription: 'Delivery boundaries and zone policies in a denser structure, without a fake runtime toggle.',
+    unavailableDescription: 'The surface keeps a clear decision path even when data is missing or paused.',
+    heroEyebrow: 'Operational boundaries',
+    heroTitle: 'Zone set workspace',
+    heroDescription: 'This surface shows where delivery boundaries make sense and where they should stay blocked, while keeping operations workspace as the primary contract.',
+    stateLoadingTitle: 'Preparing zone set',
+    stateLoadingDescription: 'The route is live, and delivery boundaries and zone policies appear once this phase completes.',
+    stateEmptyTitle: 'No boundary pressure currently requires zone set',
+    stateEmptyDescription: 'The situation is stable right now and no area needs boundary changes at this moment.',
+    stateOfflineTitle: 'Connection unavailable',
+    stateOfflineDescription: 'The route stays preserved, but boundary and zone readings will not update until connectivity returns.',
+    stateDisabledTitle: 'Zone set is not fully enabled',
+    stateDisabledDescription: 'This slice stabilizes reading and policy only, while actual execution stays out of scope.',
+    stateErrorTitle: 'Unable to load zone set',
+    stateErrorDescription: 'You can return to the hub or retry from the same path.',
+    signals: {
+      reviewZones: 'Review zones',
+      reviewZonesDescription: 'Cases that zone set must not hide instead of solving their real issue.',
+      configuredZones: 'Configured zones',
+      configuredZonesDescription: 'Zones currently measured in this slice.',
+      protectedZones: 'Protected zones',
+      protectedZonesDescription: 'Zones that need a boundary decision or closer observation.',
+      freeDeliveryZones: 'Free delivery zones',
+      freeDeliveryZonesDescription: 'Visible delivery space that can absorb activity when needed.'
+    },
+    policiesTitle: 'Zone set policies',
+    policiesDescription: 'These rules define where this surface stops: reading and policy only, no hidden mutation.',
+    lanesTitle: 'Boundary zones',
+    lanesDescription: 'Each card gives a fast read of load, capacity, and recommendation without pretending direct enablement exists here.'
+  },
+  sheinProxyRequestLegacy: {
     pageEyebrow: 'DSH / العمليات / وسيط شي إن / الطلب',
     pageTitlePrefix: 'تفاصيل الطلب',
     pageDescription: 'عرض مضغوط للطلب الوسيط الحالي مع مسار واضح نحو التقدير والعرض والجدولة.',
@@ -1670,8 +1664,70 @@ const enDshControlPanelText = {
           tone: 'warning'
         }
       ]
+    },
+    zoneSet: {
+      summary: {
+        configuredZones: 5,
+        protectedZones: 2,
+        freeDeliveryZones: 4,
+        reviewZones: 3
+      },
+      policies: [
+        {
+          label: 'Read first',
+          statusLabel: 'Disciplined',
+          description: 'This surface shows where reading ends and broader operational decision-making begins.'
+        },
+        {
+          label: 'Protect sensitive zones',
+          statusLabel: 'Protected',
+          description: 'Sensitive zones stay protected instead of turning into a fake toggle or shortcut.'
+        },
+        {
+          label: 'Free delivery space',
+          statusLabel: 'Available',
+          description: 'Free zones stay visible as absorbable capacity when demand rises.'
+        }
+      ],
+      lanes: [
+        {
+          zoneLabel: 'Nakheel district',
+          feeLabel: 'Visible fee',
+          etaLabel: '14 min',
+          statusLabel: 'Good for review',
+          recommendationLabel: 'Initial candidate',
+          note: 'This zone needs a clear read before any expansion.',
+          tone: 'warning'
+        },
+        {
+          zoneLabel: 'Coastal road',
+          feeLabel: 'Higher fee',
+          etaLabel: '31 min',
+          statusLabel: 'Protected',
+          recommendationLabel: 'Do not open now',
+          note: 'This lane needs a wider boundary decision instead of a direct open.',
+          tone: 'danger'
+        },
+        {
+          zoneLabel: 'Street 12',
+          feeLabel: 'Stable fee',
+          etaLabel: '22 min',
+          statusLabel: 'Ready',
+          recommendationLabel: 'Monitor only',
+          note: 'The zone is balanced and does not need extra movement right now.',
+          tone: 'success'
+        },
+        {
+          zoneLabel: 'Industrial zone',
+          feeLabel: 'Flexible fee',
+          etaLabel: '19 min',
+          statusLabel: 'Expandable',
+          recommendationLabel: 'Available when needed',
+          note: 'This lane keeps spare capacity ready when pressure rises.',
+          tone: 'brand'
+        }
+      ]
     }
-  }
 } as const;
 
 export type DshControlPanelText = typeof arDshControlPanelText | typeof enDshControlPanelText;

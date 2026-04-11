@@ -13,8 +13,7 @@ import {
   useDirection,
   useUiText,
 } from '@bthwani/ui-kit';
-import { amn, arb, esf, knz, kwd, mrf, snd, wlt } from '@bthwani/surfaces';
-import { DshSurfaceHost, type DshCommandTarget } from './DshSurfaceHost';
+import { amn, arb, dsh, esf, knz, kwd, mrf, snd, wlt } from '@bthwani/surfaces';
 import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
 
 const { AmnEntryScreen } = amn.amnAppClient;
@@ -25,6 +24,8 @@ const { KwdEntryScreen } = kwd.kwdAppClient;
 const { MrfEntryScreen } = mrf.mrfAppClient;
 const { SndEntryScreen } = snd.sndAppClient;
 const { WltEntryScreen } = wlt.wltAppClient;
+const { DshSurfaceHost } = dsh.dshAppClient;
+type DshCommandTarget = React.ComponentProps<typeof DshSurfaceHost>['command']['target'];
 
 type ClientRoute =
   | 'home'
@@ -110,7 +111,7 @@ export function ClientSurfaceHost() {
             id: 'cart',
             iconName: 'cart-outline',
             accessibilityLabel: uiText.serviceHub.availableServices,
-            onPress: () => openDsh('orders'),
+            onPress: () => openDsh('cart-get'),
           },
           {
             id: 'search',

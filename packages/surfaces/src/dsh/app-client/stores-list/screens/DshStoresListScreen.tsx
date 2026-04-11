@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   BthBox,
+  BthButton,
   BthListItem,
   BthMobileScrollView,
   BthSearchField,
@@ -30,6 +31,7 @@ export type DshStoresListScreenProps = {
   onQueryChange?: (query: string) => void;
   onFilterChange?: (filter: 'all' | 'nearest' | 'offers' | 'favorites') => void;
   onOpenStore?: (storeId: string) => void;
+  onOpenFavorites?: () => void;
   onRetry?: () => void;
 };
 
@@ -67,6 +69,7 @@ export function DshStoresListScreen({
   onQueryChange,
   onFilterChange,
   onOpenStore,
+  onOpenFavorites,
   onRetry,
 }: DshStoresListScreenProps) {
   const filteredByMode = React.useMemo(() => {
@@ -134,6 +137,7 @@ export function DshStoresListScreen({
           onValueChange={(next) => onFilterChange?.(next)}
           variant="pill"
         />
+        <BthButton label="Open favorites" tone="ghost" onPress={onOpenFavorites} />
       </BthSurface>
 
       <BthSurface tone="raised" gap={3}>

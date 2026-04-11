@@ -1,10 +1,21 @@
 import React from 'react';
+import { DshCategoriesListScreen } from './categories-list/screens';
+import { DshCategoryGetScreen } from './category-get/screens';
 import { DshCartGetScreen } from './cart-get/screens';
+import { DshCartInitScreen } from './cart-init/screens';
+import { DshCartItemAddScreen } from './cart-item-add/screens';
+import { DshCartItemRemoveScreen } from './cart-item-remove/screens';
+import { DshCartItemUpdateScreen } from './cart-item-update/screens';
 import { DshCreateOrderScreen } from './create-order/screens';
 import { DshEntryScreen } from './entry/screens';
+import { DshFavoriteToggleScreen } from './favorite-toggle/screens';
+import { DshFavoritesListScreen } from './favorites-list/screens';
+import { DshHomeGetScreen } from './home-get/screens';
 import { DshHomeScreen } from './home/screens';
 import { DshOrderSuccessState } from './success/states';
 import { DshOrdersListScreen } from './orders-list/screens';
+import { DshSearchScreen } from './search/screens';
+import { DshStoreGetScreen } from './store-get/screens';
 import { DshReviewOrderScreen } from './review/screens';
 import { DshStoreDetailScreen } from './store-detail/screens';
 import { DshStoreItemsScreen } from './store-items/screens';
@@ -18,13 +29,24 @@ export type DshRoute =
   | 'store-detail'
   | 'store-items'
   | 'cart-get'
+  | 'cart-init'
+  | 'cart-item-add'
+  | 'cart-item-remove'
+  | 'cart-item-update'
+  | 'categories-list'
+  | 'category-get'
+  | 'favorite-toggle'
+  | 'favorites-list'
+  | 'home-get'
+  | 'search'
+  | 'store-get'
   | 'create'
   | 'review'
   | 'success'
   | 'orders'
   | 'tracking';
 
-export type DshCommandTarget = 'home' | 'stores-list' | 'orders' | 'tracking' | 'create';
+export type DshCommandTarget = 'home' | 'stores-list' | 'orders' | 'tracking' | 'create' | 'cart-get' | 'cart-init';
 
 type DshNavigationCommand = {
   token: number;
@@ -180,6 +202,14 @@ const storeItemsByStoreId: Record<string, StoreItem[]> = {
 };
 
 function commandTargetToRoute(target: DshCommandTarget): DshRoute {
+  if (target === 'cart-get') {
+    return 'cart-get';
+  }
+
+  if (target === 'cart-init') {
+    return 'cart-init';
+  }
+
   if (target === 'stores-list') {
     return 'stores-list';
   }
@@ -273,7 +303,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
   if (route === 'entry') {
     return (
       <DshEntryScreen
-        onStartDelivery={() => setRoute('create')}
+        onStartDelivery={() => setRoute('cart-get')}
         onBrowseStores={() => setRoute('stores-list')}
         onOpenOrders={() => setRoute('orders')}
         onRetry={() => setRoute('entry')}
@@ -289,9 +319,10 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         activeFilter={storesFilter}
         onQueryChange={setStoresQuery}
         onFilterChange={setStoresFilter}
+        onOpenFavorites={() => setRoute('favorites-list')}
         onOpenStore={(storeId) => {
           setActiveStoreId(storeId);
-          setRoute('store-detail');
+          setRoute('store-get');
         }}
         onRetry={() => setRoute('stores-list')}
       />
@@ -318,6 +349,25 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         onStartDelivery={() => setRoute('store-items')}
         onOpenTracking={() => setRoute('tracking')}
         onRetry={() => setRoute('store-detail')}
+      />
+    );
+  }
+
+  if (route === 'store-get') {
+    return (
+      <DshStoreGetScreen
+        store={{
+          id: activeStore.id,
+          name: activeStore.name,
+          subtitle: activeStore.subtitle,
+          statusLabel: activeStore.statusLabel,
+          etaLabel: activeStore.meta,
+          deliveryFeeLabel: 'Delivery fee 12 SAR',
+        }}
+        onOpenItems={() => setRoute('store-detail')}
+        onBack={() => setRoute('stores-list')}
+        onRetry={() => setRoute('store-get')}
+        onSupport={() => setRoute('orders')}
       />
     );
   }
@@ -362,11 +412,172 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
           statusLabel: 'Ready',
         }}
         statusTitle="Cart context confirmed"
-        statusDescription="Proceed to create order with clear next action and recoverable fallback."
+        statusDescription="Initialize the cart session before moving into the checkout route."
         onOpenStore={() => setRoute('store-detail')}
         onOpenOrder={() => setRoute('review')}
-        onContinue={() => setRoute('create')}
+        onContinue={() => setRoute('cart-init')}
         onRetry={() => setRoute('cart-get')}
+      />
+    );
+  }
+
+  if (route === 'cart-init') {
+    return (
+      <DshCartInitScreen
+        state="success"
+        cartId={`${activeStore.id}-cart`}
+        storeName={activeStore.name}
+        summaryLabel={selectedItem ? `Prepared with ${selectedItem.name}` : 'Prepared without a selected item'}
+        summaryDescription={selectedItem ? `${selectedItem.subtitle} · ${selectedItem.priceLabel}` : 'Context is ready for the next checkout step.'}
+        onOpenCart={() => setRoute('cart-item-add')}
+        onBack={() => setRoute('cart-get')}
+        onRetry={() => setRoute('cart-init')}
+        onSupport={() => setRoute('orders')}
+      />
+    );
+  }
+
+  if (route === 'cart-item-add') {
+    return (
+      <DshCartItemAddScreen
+        cartId={`${activeStore.id}-cart`}
+        storeName={activeStore.name}
+        suggestedItemName={selectedItem?.name ?? 'Royal Gala Apples'}
+        suggestedQuantity={1}
+        suggestedInstructions={selectedItem ? `Add ${selectedItem.subtitle}` : 'Handle with care'}
+        onExecuteAdd={() => undefined}
+        onOpenCart={() => setRoute('cart-item-remove')}
+        onBack={() => setRoute('cart-init')}
+        onRetry={() => setRoute('cart-item-add')}
+        onSupport={() => setRoute('orders')}
+      />
+    );
+  }
+
+  if (route === 'cart-item-remove') {
+    return (
+      <DshCartItemRemoveScreen
+        cartId={`${activeStore.id}-cart`}
+        storeName={activeStore.name}
+        suggestedCartItemId={selectedItem?.id ?? 'item-apple-1'}
+        suggestedItemLabel={selectedItem ? selectedItem.name : 'Selected cart item'}
+        onExecuteRemove={() => undefined}
+        onOpenCart={() => setRoute('cart-item-update')}
+        onBack={() => setRoute('cart-item-add')}
+        onRetry={() => setRoute('cart-item-remove')}
+        onSupport={() => setRoute('orders')}
+      />
+    );
+  }
+
+  if (route === 'cart-item-update') {
+    return (
+      <DshCartItemUpdateScreen
+        cartId={`${activeStore.id}-cart`}
+        suggestedCartItemId={selectedItem?.id ?? 'item-apple-1'}
+        suggestedQuantity={2}
+        suggestedNotes={selectedItem ? `Update ${selectedItem.name}` : 'Adjust quantity as needed'}
+        onExecuteUpdate={() => undefined}
+        onOpenCart={() => setRoute('categories-list')}
+        onBack={() => setRoute('cart-item-remove')}
+        onRetry={() => setRoute('cart-item-update')}
+        onSupport={() => setRoute('orders')}
+      />
+    );
+  }
+
+  if (route === 'categories-list') {
+    return (
+      <DshCategoriesListScreen
+        items={[
+          { id: 'fresh', label: 'Fresh', subtitle: 'Produce and chilled essentials', countLabel: '12 items' },
+          { id: 'bakery', label: 'Bakery', subtitle: 'Bread and pastry selection', countLabel: '8 items' },
+          { id: 'meals', label: 'Meals', subtitle: 'Prepared ready-to-order items', countLabel: '10 items' },
+        ]}
+        onOpenCategory={(categoryId) => {
+          setItemsCategory(categoryId);
+          setRoute('category-get');
+        }}
+        onOpenFavorites={() => setRoute('favorites-list')}
+        onBack={() => setRoute('cart-item-update')}
+        onRetry={() => setRoute('categories-list')}
+        onSupport={() => setRoute('orders')}
+      />
+    );
+  }
+
+  if (route === 'category-get') {
+    return (
+      <DshCategoryGetScreen
+        category={{
+          id: itemsCategory,
+          label: itemsCategory === 'all' ? 'All categories' : itemsCategory,
+          subtitle: 'Compact category detail for the current discovery context.',
+          summary: 'Open the list view to continue with the selected category.',
+          itemCountLabel: 'Category detail ready',
+        }}
+        onOpenList={() => setRoute('store-items')}
+        onBack={() => setRoute('categories-list')}
+        onRetry={() => setRoute('category-get')}
+        onSupport={() => setRoute('orders')}
+      />
+    );
+  }
+
+  if (route === 'favorite-toggle') {
+    return (
+      <DshFavoriteToggleScreen
+        itemLabel={selectedItem?.name ?? 'Saved item'}
+        currentFavorite={Boolean(activeStore.isOffer)}
+        onToggleFavorite={() => undefined}
+        onOpenFavorites={() => setRoute('favorites-list')}
+        onBack={() => setRoute('category-get')}
+        onRetry={() => setRoute('favorite-toggle')}
+        onSupport={() => setRoute('orders')}
+      />
+    );
+  }
+
+  if (route === 'favorites-list') {
+    return (
+      <DshFavoritesListScreen
+        items={[
+          { id: 'store-1001', name: 'Olaya Fresh Market', subtitle: 'Groceries and daily essentials', meta: 'Favorite store' },
+          { id: 'item-apple-1', name: 'Royal Gala Apples', subtitle: 'Fresh box, 1 kg', meta: 'Saved item' },
+        ]}
+        onOpenItem={() => setRoute('favorite-toggle')}
+        onBack={() => setRoute('categories-list')}
+        onRetry={() => setRoute('favorites-list')}
+        onSupport={() => setRoute('orders')}
+      />
+    );
+  }
+
+  if (route === 'home-get') {
+    return (
+      <DshHomeGetScreen
+        onOpenList={() => setRoute('stores-list')}
+        onOpenFavorites={() => setRoute('favorites-list')}
+        onOpenSearch={() => setRoute('search')}
+        onRetry={() => setRoute('home-get')}
+      />
+    );
+  }
+
+  if (route === 'search') {
+    return (
+      <DshSearchScreen
+        query={storesQuery}
+        results={dshDiscoveryStores.map((store) => ({ id: store.id, title: store.name, subtitle: store.subtitle, meta: store.meta }))}
+        onQueryChange={setStoresQuery}
+        onOpenCategories={() => setRoute('categories-list')}
+        onOpenFavorites={() => setRoute('favorites-list')}
+        onOpenResult={(resultId) => {
+          setActiveStoreId(resultId);
+          setRoute('store-get');
+        }}
+        onBack={() => setRoute('home-get')}
+        onRetry={() => setRoute('search')}
       />
     );
   }
@@ -420,26 +631,28 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
 
   return (
     <DshHomeScreen
-      onStartDelivery={() => setRoute('create')}
+      onStartDelivery={() => setRoute('cart-get')}
       onContinueOrder={() => setRoute('review')}
+      onOpenDiscovery={() => setRoute('home-get')}
+      onOpenSearch={() => setRoute('search')}
       onOpenOrders={() => setRoute('orders')}
       onOpenTracking={() => setRoute('tracking')}
       onOpenCategory={(categoryId) => {
         if (categoryId === 'all') {
           setStoresFilter('all');
-          setRoute('stores-list');
+          setRoute('categories-list');
           return;
         }
 
         if (categoryId === 'offers') {
           setStoresFilter('offers');
-          setRoute('stores-list');
+          setRoute('categories-list');
           return;
         }
 
         if (categoryId === 'favorites') {
           setStoresFilter('favorites');
-          setRoute('stores-list');
+          setRoute('favorites-list');
           return;
         }
 
@@ -456,7 +669,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         setItemsQuery('');
         setItemsCategory('all');
         setSelectedItemId('');
-        setRoute('store-detail');
+        setRoute('store-get');
       }}
       onRetry={() => setRoute('home')}
     />

@@ -1,5 +1,5 @@
-import { ControlPanelDshPeakModeScreen } from '@bthwani/surfaces/dsh/control-panel/operations/dsh/peak-mode';
+import { DshControlPanelSurfaceHost } from '@bthwani/surfaces/dsh/control-panel';
 
 export default function DshPeakModePage() {
-  return <ControlPanelDshPeakModeScreen />;
+  return <DshControlPanelSurfaceHost workspace="peak-mode" />;
 }

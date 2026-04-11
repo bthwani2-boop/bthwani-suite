@@ -1,5 +1,5 @@
-import { ControlPanelDshSheinProxyScreen } from '@bthwani/surfaces';
+import { DshControlPanelSurfaceHost } from '@bthwani/surfaces/dsh/control-panel';
 
 export default function SheinProxyPage() {
-  return <ControlPanelDshSheinProxyScreen />;
+  return <DshControlPanelSurfaceHost workspace="sheinproxy" />;
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { DshCartPrice } from '../../../DshCartPrice';
 import {
   BthBox,
   BthButton,
@@ -190,7 +191,21 @@ export function DshCartGetScreen({
     <BthMobileScrollView padding={4} gap={3}>
       {renderStoreSection(store, onOpenStore)}
       {renderOrderSection(activeOrder, onOpenOrder)}
-      {renderStatusSection(statusTitle, statusDescription, onContinue)}
+      <DshCartPrice
+        title="Price snapshot"
+        subtitle="Review the current cost context before opening the cart."
+        priceLines={[
+          { id: 'item', label: 'Item value', value: activeOrder.meta },
+          { id: 'store', label: 'Store', value: store.name },
+          { id: 'delivery', label: 'Delivery status', value: store.statusLabel ?? 'Ready' },
+        ]}
+        totalLabel={statusTitle}
+        totalValue={statusDescription}
+        footnote="Open cart to continue the sequential checkout flow."
+        onOpenCart={onContinue}
+        onBack={onOpenStore ? () => onOpenStore(store.id) : undefined}
+        onSupport={onOpenOrder ? () => onOpenOrder(activeOrder.id) : undefined}
+      />
     </BthMobileScrollView>
   );
 }
