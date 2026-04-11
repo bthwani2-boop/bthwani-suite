@@ -12,15 +12,15 @@ export function DshClientSupportDirectoryScreen({ onOpenScreen }: DshClientSuppo
   return (
     <BthMobileScrollView padding={4} gap={4}>
       <BthBox gap={2}>
-        <BthText role="titleLg">Client support directory</BthText>
+        <BthText role="titleLg">DSH client capability library</BthText>
         <BthText role="bodyMd" tone="muted">
-          Central directory for the remaining DSH client support and operation surfaces, now grouped by real customer flow instead of a flat residual bucket.
+          Internal capability library for residual DSH client flows, grouped by customer journey instead of a flat fallback bucket.
         </BthText>
       </BthBox>
 
       <BthSurface tone="brand" gap={3}>
-        <BthStatCard label="Covered support surfaces" value={String(supportScreenCount)} deltaLabel="Documented client support matrix" tone="info" />
-        <BthStatCard label="Navigation model" value="Grouped" deltaLabel="Create, delivery, benefits, proxy" tone="success" />
+        <BthStatCard label="Covered capabilities" value={String(supportScreenCount)} deltaLabel="Documented internal client matrix" tone="info" />
+        <BthStatCard label="Navigation model" value="Grouped" deltaLabel="Intake, checkout, delivery, benefits, proxy" tone="success" />
       </BthSurface>
 
       {clientSupportDirectoryGroups.map((group) => (

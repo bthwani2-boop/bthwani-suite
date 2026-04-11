@@ -1,21 +1,38 @@
 import React from 'react';
 import { DshCategoriesListScreen } from './categories-list/screens';
 import { DshCategoryGetScreen } from './category-get/screens';
-import { DshCartGetScreen } from './cart-get/screens';
-import { DshCartInitScreen } from './cart-init/screens';
-import { DshCartItemAddScreen } from './cart-item-add/screens';
-import { DshCartItemRemoveScreen } from './cart-item-remove/screens';
-import { DshCartItemUpdateScreen } from './cart-item-update/screens';
+import {
+  DshCartGetScreen,
+  DshCartInitScreen,
+  DshCartItemAddScreen,
+  DshCartItemRemoveScreen,
+  DshCartItemUpdateScreen,
+} from './families/cart';
 import { DshCreateOrderScreen } from './create-order/screens';
 import { DshEntryScreen } from './entry/screens';
 import { DshFavoriteToggleScreen } from './favorite-toggle/screens';
 import { DshFavoritesListScreen } from './favorites-list/screens';
 import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './home-get/screens';
-import { DshHomeScreen } from './home/screens';
+import {
+  dshHomeGetFixturePromos,
+  dshHomeGetFixtureStores,
+} from './home-get/fixtures/dshHomeGetFixtures';
 import { DshOrderSuccessState } from './success/states';
 import { DshOrdersListScreen } from './orders-list/screens';
 import { DshSearchScreen } from './search/screens';
 import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId } from './support/screens';
+import { DshBenefitsHubScreen } from './benefits/screens';
+import { DshCheckoutHubScreen } from './checkout-workspace/screens';
+import { DshConversationHubScreen } from './conversation-workspace/screens';
+import { DshDeliveryManagementHubScreen } from './delivery-management-workspace/screens';
+import { DshIntakeHubScreen } from './intake-workspace/screens';
+import { DshListingStatusUpdateScreen } from './listing-status-update/screens';
+import { DshOrderIssueHubScreen } from './order-issue-workspace/screens';
+import { DshProxyHubScreen } from './proxy-workspace/screens';
+import { DshServiceSettingsHubScreen } from './service-settings/screens';
+import { DshSheinInfoScreen } from './shein-info/screens';
+import { DshTrustHubScreen } from './trust-workspace/screens';
+import { DshZoneSetScreen } from './zone-set/screens';
 import { DshStoreGetScreen } from './store-get/screens';
 import { DshReviewOrderScreen } from './review/screens';
 import { DshStoreDetailScreen } from './store-detail/screens';
@@ -24,6 +41,7 @@ import { DshStoreItemsListScreen } from './store-items-list/screens';
 import { DshAwnakOrderCreateScreen } from './awnak-order-create/screens';
 import { DshStoresListScreen } from './stores-list/screens';
 import { DshTrackingScreen } from './tracking/screens';
+import { dshCategoryListFixtures, getDshCategoryFixture } from './fixtures/dshCategoriesFixtures';
 
 export type DshRoute =
   | 'home'
@@ -45,15 +63,27 @@ export type DshRoute =
   | 'home-get'
   | 'search'
   | 'store-get'
-  | 'create'
+  | 'create-order'
   | 'review'
+  | 'checkout-workspace'
+  | 'benefits'
+  | 'conversation-workspace'
+  | 'delivery-management-workspace'
+  | 'intake-workspace'
+  | 'listing-status-update'
+  | 'order-issue-workspace'
+  | 'proxy-workspace'
+  | 'shein-info'
+  | 'service-settings'
+  | 'trust-workspace'
+  | 'zone-set'
   | 'support-directory'
   | 'support-screen'
   | 'success'
-  | 'orders'
+  | 'orders-list'
   | 'tracking';
 
-export type DshCommandTarget = 'home' | 'stores-list' | 'orders' | 'tracking' | 'create' | 'cart-get' | 'cart-init';
+export type DshCommandTarget = 'home' | 'stores-list' | 'orders-list' | 'tracking' | 'create-order' | 'cart-get' | 'cart-init';
 
 type DshNavigationCommand = {
   token: number;
@@ -62,6 +92,7 @@ type DshNavigationCommand = {
 
 type DshSurfaceHostProps = {
   command: DshNavigationCommand;
+  onExit?: () => void;
 };
 
 type CreateOrderValues = {
@@ -139,64 +170,6 @@ const dshDiscoveryStores = [
     isFavorite: false,
   },
 ];
-
-const dshHomeGetPromos: DshHomeGetPromo[] = [
-  { id: 'promo-1', title: 'تخفيضات', subtitle: 'خصم 30% على أول طلب', icon: '🔥' },
-  { id: 'promo-2', title: 'تتبّع مباشر', subtitle: 'افتح الطلب النشط دون ضياع المسار', icon: '📍' },
-  { id: 'promo-3', title: 'الفئات المختارة', subtitle: 'فئات قصيرة ومباشرة من نفس الواجهة', icon: '✨' },
-];
-
-const dshHomeGetStores: DshHomeGetStore[] = [
-  {
-    id: 'store-1001',
-    name: 'مطعم القلعة',
-    address: 'شارع التحرير، صنعاء',
-    statusLabel: 'مفتوح',
-    statusTone: 'open',
-    distanceLabel: '2.1 كم',
-    deliveryLabel: 'توصيل مجاني',
-    serviceLabel: 'بثواني برو',
-    followerCount: 11000,
-    multiplierLabel: 'x2',
-    offerLabel: 'خصم 20%',
-    isFavorite: true,
-    isFollowing: false,
-    hasOffer: true,
-  },
-  {
-    id: 'store-1002',
-    name: 'مطاعم الأرض الخضراء',
-    address: 'شارع حدة، جوار البنك',
-    statusLabel: 'مفتوح',
-    statusTone: 'open',
-    distanceLabel: '1.8 كم',
-    deliveryLabel: 'كوبون',
-    serviceLabel: 'استلم بنفسك',
-    followerCount: 9000,
-    multiplierLabel: 'x1',
-    isFavorite: false,
-    isFollowing: false,
-    hasOffer: false,
-  },
-  {
-    id: 'store-1003',
-    name: 'مؤسسة الشيباني للمطاعم',
-    address: 'شارع الزبيري، أمام الجامعة',
-    statusLabel: 'مغلق',
-    statusTone: 'closed',
-    distanceLabel: '3.5 كم',
-    deliveryLabel: 'توصيل سريع',
-    serviceLabel: 'بثواني برو',
-    followerCount: 9000,
-    multiplierLabel: 'x3',
-    offerLabel: 'خصم 15%',
-    isFavorite: true,
-    isFollowing: false,
-    hasOffer: true,
-  },
-];
-
-const dshHomeGetTickerMessage = 'المساحة مخصصة للشريط الإخباري • اطلب إلى المنزل أو افتح الطلب النشط خلال خطوة واحدة';
 
 const storeItemsByStoreId: Record<string, StoreItem[]> = {
   'store-1001': [
@@ -279,22 +252,88 @@ function commandTargetToRoute(target: DshCommandTarget): DshRoute {
     return 'stores-list';
   }
 
-  if (target === 'orders') {
-    return 'orders';
+  if (target === 'orders-list') {
+    return 'orders-list';
   }
 
   if (target === 'tracking') {
     return 'tracking';
   }
 
-  if (target === 'create') {
-    return 'create';
+  if (target === 'create-order') {
+    return 'create-order';
   }
 
   return 'home';
 }
 
-export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
+function supportScreenToRoute(screenId: ClientSupportScreenId): DshRoute {
+  const intakeTargets: ClientSupportScreenId[] = ['booking-create', 'estimate-create', 'external-order-create', 'gas-refill-order-create'];
+  const checkoutTargets: ClientSupportScreenId[] = ['checkout-gate', 'estimate-get', 'pricing-preview', 'pricing-snapshot-get', 'promo-apply'];
+  const conversationTargets: ClientSupportScreenId[] = ['chat-read-ack', 'chat-send'];
+  const deliveryManagementTargets: ClientSupportScreenId[] = ['delivery-attempt-create', 'delivery-attempts-list', 'delivery-close', 'delivery-reassign'];
+  const subscriptionTargets: ClientSupportScreenId[] = ['subscription-family-get', 'subscription-family-members-get', 'subscription-family-members-post', 'subscription-pro-catalog', 'subscription-sync', 'subscription-tier-get', 'subscription-upgrade-post'];
+  const loyaltyTargets: ClientSupportScreenId[] = ['loyalty-points-redeem', 'loyalty-points-user-balance', 'loyalty-points-user-history', 'entitlements-get'];
+  const proxyTargets: ClientSupportScreenId[] = ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review', 'proxy-request-reject', 'proxy-request-tracking'];
+  const settingsTargets: ClientSupportScreenId[] = ['service-modes-resolve'];
+  const listingTargets: ClientSupportScreenId[] = ['listing-status-update'];
+  const sheinTargets: ClientSupportScreenId[] = ['shein-info'];
+  const zoneTargets: ClientSupportScreenId[] = ['zone-set'];
+  const issueTargets: ClientSupportScreenId[] = ['order-issue-flag'];
+  const trustTargets: ClientSupportScreenId[] = ['order-proof-code-generate', 'order-proof-verify', 'order-escrow-hold', 'order-escrow-release'];
+
+  if (intakeTargets.includes(screenId)) {
+    return 'intake-workspace';
+  }
+
+  if (checkoutTargets.includes(screenId)) {
+    return 'checkout-workspace';
+  }
+
+  if (conversationTargets.includes(screenId)) {
+    return 'conversation-workspace';
+  }
+
+  if (deliveryManagementTargets.includes(screenId)) {
+    return 'delivery-management-workspace';
+  }
+
+  if (subscriptionTargets.includes(screenId) || loyaltyTargets.includes(screenId)) {
+    return 'benefits';
+  }
+
+  if (proxyTargets.includes(screenId)) {
+    return 'proxy-workspace';
+  }
+
+  if (settingsTargets.includes(screenId)) {
+    return 'service-settings';
+  }
+
+  if (listingTargets.includes(screenId)) {
+    return 'listing-status-update';
+  }
+
+  if (sheinTargets.includes(screenId)) {
+    return 'shein-info';
+  }
+
+  if (zoneTargets.includes(screenId)) {
+    return 'zone-set';
+  }
+
+  if (issueTargets.includes(screenId)) {
+    return 'order-issue-workspace';
+  }
+
+  if (trustTargets.includes(screenId)) {
+    return 'trust-workspace';
+  }
+
+  return 'support-screen';
+}
+
+export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   const [route, setRoute] = React.useState<DshRoute>('home');
   const [createOrderValues, setCreateOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
   const [ordersQuery, setOrdersQuery] = React.useState('');
@@ -372,7 +411,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
 
   const openSupportScreen = React.useCallback((screenId: ClientSupportScreenId) => {
     setSelectedSupportScreen(screenId);
-    setRoute('support-screen');
+    setRoute(supportScreenToRoute(screenId));
   }, []);
 
   const handleSupportPrimaryAction = React.useCallback((screenId: ClientSupportScreenId) => {
@@ -380,7 +419,9 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
     const createTargets: ClientSupportScreenId[] = ['booking-create', 'estimate-create', 'external-order-create', 'gas-refill-order-create', 'order-create'];
     const deliveryTargets: ClientSupportScreenId[] = ['delivery-attempt-create', 'delivery-attempts-list', 'delivery-close', 'delivery-eta-get', 'delivery-get', 'delivery-reassign', 'delivery-track-get', 'order-status-get', 'order-status-update'];
     const checkoutTargets: ClientSupportScreenId[] = ['checkout-gate', 'estimate-get', 'pricing-preview', 'pricing-snapshot-get', 'promo-apply'];
-    const orderTargets: ClientSupportScreenId[] = ['order-accept', 'order-cancel', 'order-complete', 'order-get', 'order-issue-flag', 'order-proof-code-generate', 'order-proof-verify', 'order-receipt-get'];
+    const orderTargets: ClientSupportScreenId[] = ['order-accept', 'order-cancel', 'order-complete', 'order-get', 'order-receipt-get'];
+    const issueTargets: ClientSupportScreenId[] = ['order-issue-flag'];
+    const trustTargets: ClientSupportScreenId[] = ['order-proof-code-generate', 'order-proof-verify', 'order-escrow-hold', 'order-escrow-release'];
     const reviewTargets: ClientSupportScreenId[] = ['order-rate', 'review-create'];
     const reviewHistoryTargets: ClientSupportScreenId[] = ['reviews-list'];
     const subscriptionTargets: ClientSupportScreenId[] = ['subscription-family-get', 'subscription-family-members-get', 'subscription-family-members-post', 'subscription-pro-catalog', 'subscription-sync', 'subscription-tier-get', 'subscription-upgrade-post'];
@@ -395,7 +436,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
     }
 
     if (createTargets.includes(screenId)) {
-      setRoute('create');
+      setRoute(screenId === 'order-create' ? 'create-order' : 'intake-workspace');
       return;
     }
 
@@ -405,12 +446,26 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
     }
 
     if (deliveryTargets.includes(screenId)) {
-      setRoute('tracking');
+      setRoute(
+        screenId === 'delivery-attempt-create' || screenId === 'delivery-attempts-list' || screenId === 'delivery-close' || screenId === 'delivery-reassign'
+          ? 'delivery-management-workspace'
+          : 'tracking',
+      );
       return;
     }
 
     if (orderTargets.includes(screenId)) {
-      setRoute('orders');
+      setRoute('orders-list');
+      return;
+    }
+
+    if (issueTargets.includes(screenId)) {
+      setRoute('order-issue-workspace');
+      return;
+    }
+
+    if (trustTargets.includes(screenId)) {
+      setRoute('trust-workspace');
       return;
     }
 
@@ -420,41 +475,61 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
     }
 
     if (reviewHistoryTargets.includes(screenId)) {
-      setRoute('orders');
+      setRoute('orders-list');
       return;
     }
 
     if (subscriptionTargets.includes(screenId) || loyaltyTargets.includes(screenId)) {
-      setRoute('home-get');
+      setRoute('benefits');
       return;
     }
 
     if (screenId === 'chat-read-ack' || screenId === 'chat-send') {
-      setRoute('orders');
+      setRoute('conversation-workspace');
       return;
     }
 
     if (proxyRequestTargets.includes(screenId)) {
-      setRoute('review');
+      setRoute('proxy-workspace');
       return;
     }
 
     if (proxyRejectTargets.includes(screenId)) {
-      setRoute('orders');
+      setRoute('proxy-workspace');
       return;
     }
 
     if (proxyTrackingTargets.includes(screenId)) {
-      setRoute('tracking');
+      setRoute('proxy-workspace');
       return;
     }
 
     if (screenId === 'listing-status-update' || screenId === 'service-modes-resolve' || screenId === 'zone-set' || screenId === 'entitlements-get' || screenId === 'shein-info') {
-      setRoute('home');
+      if (screenId === 'entitlements-get') {
+        setRoute('benefits');
+        return;
+      }
+
+      if (screenId === 'listing-status-update') {
+        setRoute('listing-status-update');
+        return;
+      }
+
+      if (screenId === 'zone-set') {
+        setRoute('zone-set');
+        return;
+      }
+
+      if (screenId === 'shein-info') {
+        setRoute('shein-info');
+        return;
+      }
+
+      setRoute('service-settings');
       return;
     }
 
-    setRoute('orders');
+    setRoute('orders-list');
   }, []);
 
   const activeStore = React.useMemo(
@@ -474,7 +549,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
       <DshEntryScreen
         onStartDelivery={() => setRoute('cart-get')}
         onBrowseStores={() => setRoute('stores-list')}
-        onOpenOrders={() => setRoute('orders')}
+        onOpenOrders={() => setRoute('orders-list')}
         onRetry={() => setRoute('entry')}
       />
     );
@@ -491,7 +566,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         onOpenFavorites={() => setRoute('favorites-list')}
         onOpenStore={(storeId) => {
           setActiveStoreId(storeId);
-          setRoute('store-get');
+          setRoute('store-detail');
         }}
         onRetry={() => setRoute('stores-list')}
       />
@@ -678,11 +753,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
   if (route === 'categories-list') {
     return (
       <DshCategoriesListScreen
-        items={[
-          { id: 'fresh', label: 'Fresh', subtitle: 'Produce and chilled essentials', countLabel: '12 items' },
-          { id: 'bakery', label: 'Bakery', subtitle: 'Bread and pastry selection', countLabel: '8 items' },
-          { id: 'meals', label: 'Meals', subtitle: 'Prepared ready-to-order items', countLabel: '10 items' },
-        ]}
+        items={dshCategoryListFixtures}
         onOpenCategory={(categoryId) => {
           setItemsCategory(categoryId);
           setRoute('category-get');
@@ -696,14 +767,18 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
   }
 
   if (route === 'category-get') {
+    const category = getDshCategoryFixture(itemsCategory);
     return (
       <DshCategoryGetScreen
         category={{
-          id: itemsCategory,
-          label: itemsCategory === 'all' ? 'All categories' : itemsCategory,
-          subtitle: 'Compact category detail for the current discovery context.',
-          summary: 'Open the list view to continue with the selected category.',
-          itemCountLabel: 'Category detail ready',
+          id: category?.id ?? itemsCategory,
+          label: category?.label ?? (itemsCategory === 'all' ? 'All categories' : itemsCategory),
+          subtitle: category?.subtitle ?? 'Compact category detail for the current discovery context.',
+          summary: category?.subcategories.length
+            ? `Main category with ${category.subcategories.length} subcategories ready for discovery.`
+            : 'Open the list view to continue with the selected category.',
+          itemCountLabel: category?.subcategories.length ? `${category.subcategories.length} subcategories` : 'Category detail ready',
+          subcategories: category?.subcategories,
         }}
         onOpenList={() => setRoute('store-items')}
         onBack={() => setRoute('categories-list')}
@@ -745,17 +820,16 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
   if (route === 'home-get') {
     return (
       <DshHomeGetScreen
-        tickerMessage={dshHomeGetTickerMessage}
-        promos={dshHomeGetPromos}
-        stores={dshHomeGetStores}
+        promos={dshHomeGetFixturePromos as DshHomeGetPromo[]}
+        stores={dshHomeGetFixtureStores as DshHomeGetStore[]}
+        onBack={onExit}
         onOpenList={() => setRoute('stores-list')}
         onOpenFavorites={() => setRoute('favorites-list')}
         onOpenSearch={() => setRoute('search')}
         onOpenStore={(storeId) => {
           setActiveStoreId(storeId);
-          setRoute('store-get');
+          setRoute('store-detail');
         }}
-        onReturnHome={() => setRoute('home')}
         onRetry={() => setRoute('home-get')}
       />
     );
@@ -779,7 +853,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
     );
   }
 
-  if (route === 'create') {
+  if (route === 'create-order') {
     return (
       <DshCreateOrderScreen
         values={createOrderValues}
@@ -802,8 +876,136 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
     return (
       <DshReviewOrderScreen
         blocks={reviewBlocks}
-        onEdit={() => setRoute('create')}
+        onEdit={() => setRoute('create-order')}
         onSubmit={() => setRoute('success')}
+      />
+    );
+  }
+
+  if (route === 'checkout-workspace') {
+    return (
+      <DshCheckoutHubScreen
+        screenId={selectedSupportScreen as 'checkout-gate' | 'estimate-get' | 'pricing-preview' | 'pricing-snapshot-get' | 'promo-apply'}
+        onPrimaryAction={() => setRoute('review')}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('checkout-workspace')}
+      />
+    );
+  }
+
+  if (route === 'intake-workspace') {
+    return (
+      <DshIntakeHubScreen
+        screenId={selectedSupportScreen as 'booking-create' | 'estimate-create' | 'external-order-create' | 'gas-refill-order-create'}
+        onPrimaryAction={() => setRoute(selectedSupportScreen === 'estimate-create' ? 'checkout-workspace' : 'create-order')}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('intake-workspace')}
+      />
+    );
+  }
+
+  if (route === 'benefits') {
+    return (
+      <DshBenefitsHubScreen
+        screenId={selectedSupportScreen as 'subscription-family-get' | 'subscription-family-members-get' | 'subscription-family-members-post' | 'subscription-pro-catalog' | 'subscription-sync' | 'subscription-tier-get' | 'subscription-upgrade-post' | 'loyalty-points-redeem' | 'loyalty-points-user-balance' | 'loyalty-points-user-history' | 'entitlements-get'}
+        onPrimaryAction={() => setRoute('home-get')}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('benefits')}
+      />
+    );
+  }
+
+  if (route === 'conversation-workspace') {
+    return (
+      <DshConversationHubScreen
+        screenId={selectedSupportScreen as 'chat-read-ack' | 'chat-send'}
+        onPrimaryAction={() => setRoute('orders-list')}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('conversation-workspace')}
+      />
+    );
+  }
+
+  if (route === 'delivery-management-workspace') {
+    return (
+      <DshDeliveryManagementHubScreen
+        screenId={selectedSupportScreen as 'delivery-attempt-create' | 'delivery-attempts-list' | 'delivery-close' | 'delivery-reassign'}
+        onPrimaryAction={() => setRoute('tracking')}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('delivery-management-workspace')}
+      />
+    );
+  }
+
+  if (route === 'order-issue-workspace') {
+    return (
+      <DshOrderIssueHubScreen
+        onPrimaryAction={() => setRoute('orders-list')}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('order-issue-workspace')}
+      />
+    );
+  }
+
+  if (route === 'proxy-workspace') {
+    return (
+      <DshProxyHubScreen
+        screenId={selectedSupportScreen as 'proxy-request-create' | 'proxy-request-approve' | 'proxy-request-review' | 'proxy-request-reject' | 'proxy-request-tracking'}
+        onPrimaryAction={() => setRoute(selectedSupportScreen === 'proxy-request-tracking' ? 'tracking' : 'orders-list')}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('proxy-workspace')}
+      />
+    );
+  }
+
+  if (route === 'trust-workspace') {
+    return (
+      <DshTrustHubScreen
+        screenId={selectedSupportScreen as 'order-proof-code-generate' | 'order-proof-verify' | 'order-escrow-hold' | 'order-escrow-release'}
+        onPrimaryAction={() => setRoute('orders-list')}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('trust-workspace')}
+      />
+    );
+  }
+
+  if (route === 'listing-status-update') {
+    return (
+      <DshListingStatusUpdateScreen
+        onPrimaryAction={() => setRoute('home-get')}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('listing-status-update')}
+      />
+    );
+  }
+
+  if (route === 'shein-info') {
+    return (
+      <DshSheinInfoScreen
+        onPrimaryAction={() => setRoute('stores-list')}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('shein-info')}
+      />
+    );
+  }
+
+  if (route === 'zone-set') {
+    return (
+      <DshZoneSetScreen
+        onPrimaryAction={() => setRoute('home-get')}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('zone-set')}
+      />
+    );
+  }
+
+  if (route === 'service-settings') {
+    return (
+      <DshServiceSettingsHubScreen
+        screenId={selectedSupportScreen as 'listing-status-update' | 'service-modes-resolve' | 'zone-set' | 'shein-info'}
+        onPrimaryAction={() => setRoute(selectedSupportScreen === 'shein-info' ? 'stores-list' : 'home-get')}
+        onSecondaryAction={openSupportDirectory}
+        onRetry={() => setRoute('service-settings')}
       />
     );
   }
@@ -828,7 +1030,7 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
     );
   }
 
-  if (route === 'orders') {
+  if (route === 'orders-list') {
     return (
       <DshOrdersListScreen
         items={filteredOrders}
@@ -846,52 +1048,25 @@ export function DshSurfaceHost({ command }: DshSurfaceHostProps) {
         timeline={trackingTimeline}
         onSupport={openSupportDirectory}
         onRetry={() => setRoute('tracking')}
-        onNextAction={() => setRoute('orders')}
+        onNextAction={() => setRoute('orders-list')}
       />
     );
   }
 
   return (
-    <DshHomeScreen
-      onStartDelivery={() => setRoute('cart-get')}
-      onContinueOrder={() => setRoute('review')}
-      onOpenDiscovery={() => setRoute('home-get')}
+    <DshHomeGetScreen
+      promos={dshHomeGetFixturePromos as DshHomeGetPromo[]}
+      stores={dshHomeGetFixtureStores as DshHomeGetStore[]}
+      onBack={onExit}
+      onOpenList={() => setRoute('categories-list')}
+      onOpenFavorites={() => setRoute('favorites-list')}
       onOpenSearch={() => setRoute('search')}
-      onOpenOrders={() => setRoute('orders')}
-      onOpenTracking={() => setRoute('tracking')}
-      onOpenCategory={(categoryId) => {
-        if (categoryId === 'all') {
-          setStoresFilter('all');
-          setRoute('categories-list');
-          return;
-        }
-
-        if (categoryId === 'offers') {
-          setStoresFilter('offers');
-          setRoute('categories-list');
-          return;
-        }
-
-        if (categoryId === 'favorites') {
-          setStoresFilter('favorites');
-          setRoute('favorites-list');
-          return;
-        }
-
-        if (categoryId === 'nearest') {
-          setStoresFilter('nearest');
-          setRoute('stores-list');
-          return;
-        }
-
-        setRoute('stores-list');
-      }}
       onOpenStore={(storeId) => {
         setActiveStoreId(storeId);
         setItemsQuery('');
         setItemsCategory('all');
         setSelectedItemId('');
-        setRoute('store-get');
+        setRoute('store-detail');
       }}
       onRetry={() => setRoute('home')}
     />

@@ -75,9 +75,9 @@ function renderNonReadyState(
 function renderHero(onStartDelivery?: () => void) {
   return (
     <BthCard
-      title="Deliver with confidence"
-      subtitle="One clean starting point for discovery, cart review, and next action."
-      footer={<BthButton label="Start delivery" onPress={onStartDelivery} />}
+      title="ابدأ توصيل DSH"
+      subtitle="مدخل واضح وسريع لاكتشاف المتاجر، مراجعة السلة، أو متابعة الطلبات دون تشتت."
+      footer={<BthButton label="ابدأ التوصيل" onPress={onStartDelivery} />}
     />
   );
 }
@@ -86,13 +86,13 @@ function renderDiscoverySection(onBrowseStores?: () => void) {
   return (
     <BthBox gap={3}>
       <BthCard
-        title="Discover nearby stores"
-        subtitle="Keep discovery lightweight and focused before cart expansion."
-        footer={<BthButton label="Browse stores" tone="secondary" onPress={onBrowseStores} />}
+        title="استكشف المتاجر القريبة"
+        subtitle="ابدأ من مسار اكتشاف سريع قبل التوسع في السلة أو الدفع."
+        footer={<BthButton label="تصفح المتاجر" tone="secondary" onPress={onBrowseStores} />}
       />
       <BthCard
-        title="Continue from cart"
-        subtitle="Return to the first executable flow without extra navigation branches."
+        title="أكمل من السلة"
+        subtitle="ارجع إلى أول خطوة قابلة للتنفيذ دون فروع إضافية أو ضياع المسار."
       />
     </BthBox>
   );
@@ -102,13 +102,13 @@ function renderReviewSection(onOpenOrders?: () => void) {
   return (
     <BthBox gap={3}>
       <BthCard
-        title="Review before confirmation"
-        subtitle="Keep one dominant CTA and one clear fallback path."
+        title="راجع قبل التأكيد"
+        subtitle="إجراء رئيسي واحد مع مسار رجوع واضح وآمن."
       />
       <BthCard
-        title="Open active orders"
-        subtitle="Tracking remains available as a confidence and recovery destination."
-        footer={<BthButton label="Open orders" tone="ghost" onPress={onOpenOrders} />}
+        title="افتح الطلبات النشطة"
+        subtitle="يبقى التتبع والطلبات متاحين دائمًا كمسار ثقة واسترجاع."
+        footer={<BthButton label="عرض الطلبات" tone="ghost" onPress={onOpenOrders} />}
       />
     </BthBox>
   );
@@ -117,7 +117,7 @@ function renderReviewSection(onOpenOrders?: () => void) {
 export function DshEntryScreen({
   state = 'ready',
   title = 'Delivery entry',
-  subtitle = 'First visual service entry slice for app-client delivery journeys.',
+  subtitle = 'المدخل الأساسي لخدمة DSH داخل تطبيق العميل.',
   onStartDelivery,
   onBrowseStores,
   onOpenOrders,
@@ -134,22 +134,22 @@ export function DshEntryScreen({
       hero={renderHero(onStartDelivery)}
       sections={[
         {
-          title: 'Discovery',
-          subtitle: 'Keep options compact and avoid decision noise.',
+          title: 'الاكتشاف',
+          subtitle: 'خيارات قصيرة ومباشرة دون ضجيج قرار.',
           content: renderDiscoverySection(onBrowseStores),
         },
         {
-          title: 'Review and tracking',
-          subtitle: 'Preserve closure confidence and fallback continuity.',
+          title: 'المراجعة والتتبع',
+          subtitle: 'حافظ على وضوح الإغلاق واستمرارية مسار الرجوع.',
           content: renderReviewSection(onOpenOrders),
         },
         {
-          title: 'Flow guardrails',
-          subtitle: 'This slice is UI/UX/Flow only in the current phase.',
+          title: 'ضوابط التدفق',
+          subtitle: 'هذه الشريحة مخصصة حاليًا للواجهة والتجربة والتدفق فقط.',
           content: (
             <BthBox>
               <BthText role="bodySm" tone="muted">
-                No API, binding, integration, runtime, or contract work is executed in this screen.
+                لا يحتوي هذا المسار على ربط API أو تكامل أو منطق runtime في هذه المرحلة.
               </BthText>
             </BthBox>
           ),

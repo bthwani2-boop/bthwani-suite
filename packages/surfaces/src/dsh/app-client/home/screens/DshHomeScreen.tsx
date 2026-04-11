@@ -1,19 +1,6 @@
 import React from 'react';
-import {
-  BthBox,
-  BthButton,
-  BthCard,
-  BthChip,
-  BthListItem,
-  BthMobileScrollView,
-  BthNewsTickerBar,
-  BthSectionHeader,
-  BthSegmentedControl,
-  BthStateView,
-  BthSurface,
-  BthTabs,
-  BthText,
-} from '@bthwani/ui-kit';
+import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from '../../home-get/screens';
+import { dshCategoryFixtures } from '../../fixtures/dshCategoriesFixtures';
 
 export type DshHomeScreenState =
   | 'ready'
@@ -61,10 +48,10 @@ export type DshHomeScreenProps = {
 };
 
 const defaultCategories: DshHomeCategory[] = [
-  { id: 'all', label: 'All' },
-  { id: 'nearest', label: 'Nearby' },
-  { id: 'offers', label: 'Offers' },
-  { id: 'favorites', label: 'Favorites' },
+  { id: dshCategoryFixtures[0]?.id ?? 'restaurants', label: dshCategoryFixtures[0]?.label ?? 'Restaurants' },
+  { id: dshCategoryFixtures[1]?.id ?? 'grocery', label: dshCategoryFixtures[1]?.label ?? 'Grocery' },
+  { id: dshCategoryFixtures[2]?.id ?? 'sweets_juices', label: dshCategoryFixtures[2]?.label ?? 'Sweets & Juices' },
+  { id: dshCategoryFixtures[3]?.id ?? 'anaqati', label: dshCategoryFixtures[3]?.label ?? 'Anaqati' },
 ];
 
 const defaultPromos: DshHomePromo[] = [
@@ -113,38 +100,37 @@ const defaultStores: DshHomeStore[] = [
   },
 ];
 
-type DshHomeFeedMode = 'stores' | 'orders' | 'tracking';
+function toDiscoveryPromos(promos: DshHomePromo[]): DshHomeGetPromo[] {
+  return promos.map((promo, index) => ({
+    id: promo.id,
+    title: index === 0 ? 'تخفيضات' : index === 1 ? 'تتبّع مباشر' : promo.title,
+    subtitle:
+      index === 0
+        ? 'خصم 30% على أول طلب'
+        : index === 1
+          ? 'خطوة واحدة إلى الطلب النشط'
+          : promo.subtitle,
+    icon: index === 0 ? '🔥' : index === 1 ? '📍' : '✨',
+  }));
+}
 
-function renderNonReadyState(state: DshHomeScreenState, onRetry?: () => void) {
-  if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
-  }
-
-  if (state === 'empty') {
-    return (
-      <BthStateView
-        stateId="empty"
-        title="No discovery data yet"
-        description="Retry to restore categories and nearby stores."
-        actionLabel="Retry"
-        onActionPress={onRetry}
-      />
-    );
-  }
-
-  if (state === 'offline') {
-    return <BthStateView stateId="offline" onActionPress={onRetry} />;
-  }
-
-  return (
-    <BthStateView
-      stateId="recoverableError"
-      title="Home is unavailable"
-      description="Retry first, then continue from orders if needed."
-      actionLabel="Retry"
-      onActionPress={onRetry}
-    />
-  );
+function toDiscoveryStores(featuredStores: DshHomeStore[]): DshHomeGetStore[] {
+  return featuredStores.map((store, index) => ({
+    id: store.id,
+    name: store.name,
+    address: store.subtitle,
+    statusLabel: store.statusLabel === 'Open' ? 'مفتوح' : store.statusLabel === 'Busy' ? 'مشغول' : store.statusLabel,
+    statusTone: store.statusLabel === 'Open' ? 'open' : 'closed',
+    distanceLabel: index === 0 ? '2.1 كم' : index === 1 ? '1.8 كم' : '3.5 كم',
+    deliveryLabel: index === 1 ? 'كوبون' : index === 2 ? 'توصيل سريع' : 'توصيل مجاني',
+    serviceLabel: index === 1 ? 'استلم بنفسك' : 'بثواني برو',
+    followerCount: index === 0 ? 11000 : 9000,
+    multiplierLabel: index === 0 ? 'x2' : index === 1 ? 'x1' : 'x3',
+    offerLabel: store.hasOffer ? (index === 2 ? 'خصم 15%' : 'خصم 20%') : undefined,
+    isFavorite: Boolean(store.isFavorite),
+    isFollowing: false,
+    hasOffer: store.hasOffer,
+  }));
 }
 
 export function DshHomeScreen({
@@ -162,214 +148,16 @@ export function DshHomeScreen({
   onOpenStore,
   onRetry,
 }: DshHomeScreenProps) {
-  const [activeCategory, setActiveCategory] = React.useState<string>(
-    categories[0]?.id ?? 'all'
-  );
-  const [activeFeedMode, setActiveFeedMode] =
-    React.useState<DshHomeFeedMode>('stores');
-  const [activePromoIndex, setActivePromoIndex] = React.useState(0);
-
-  React.useEffect(() => {
-    if (!categories.length) {
-      return;
-    }
-
-    const exists = categories.some((category) => category.id === activeCategory);
-    if (!exists) {
-      setActiveCategory(categories[0].id);
-    }
-  }, [activeCategory, categories]);
-
-  React.useEffect(() => {
-    if (promos.length <= 1) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setActivePromoIndex((current) => (current + 1) % promos.length);
-    }, 3800);
-
-    return () => clearInterval(interval);
-  }, [promos]);
-
-  const promo = promos[activePromoIndex % Math.max(promos.length, 1)];
-
-  const filteredStores = React.useMemo(() => {
-    return featuredStores.filter((store) => {
-      if (activeCategory === 'nearest') {
-        return store.etaMinutes <= 22;
-      }
-
-      if (activeCategory === 'offers') {
-        return Boolean(store.hasOffer);
-      }
-
-      if (activeCategory === 'favorites') {
-        return Boolean(store.isFavorite);
-      }
-
-      return true;
-    });
-  }, [activeCategory, featuredStores]);
-
-  const categoryTabs = React.useMemo(
-    () =>
-      categories.map((category) => ({
-        value: category.id,
-        label: category.label,
-      })),
-    [categories]
-  );
-
-  if (state !== 'ready') {
-    return renderNonReadyState(state, onRetry);
-  }
-
   return (
-    <BthMobileScrollView padding={4} gap={3}>
-      <BthSurface tone="brand" gap={3}>
-        <BthSectionHeader
-          title="Delivery home"
-          subtitle="One confidence-first home for discovery, order continuation, and tracking clarity."
-        />
-        <BthBox layoutDirection="row" gap={2}>
-          <BthButton label="Start delivery" onPress={onStartDelivery} />
-          <BthButton label="Open orders" tone="secondary" onPress={onOpenOrders} />
-        </BthBox>
-      </BthSurface>
-
-      <BthNewsTickerBar
-        statusLabel="Live"
-        message="Keep one clear next action, one fallback, and zero route noise."
-        onPress={onOpenOrders}
-      />
-
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
-          title="Journey mode"
-          subtitle="Switch context without leaving the home surface."
-        />
-        <BthSegmentedControl
-          options={[
-            { value: 'stores', label: 'Stores' },
-            { value: 'orders', label: 'Orders' },
-            { value: 'tracking', label: 'Tracking' },
-          ]}
-          value={activeFeedMode}
-          onValueChange={(mode) => setActiveFeedMode(mode)}
-        />
-      </BthSurface>
-
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
-          title="Discovery filters"
-          subtitle="Keep filter options compact and confidence-oriented."
-        />
-        <BthBox layoutDirection="row" gap={2}>
-          {activeCategory !== 'all' ? (
-            <BthChip
-              label={`Filter: ${categories.find((x) => x.id === activeCategory)?.label ?? activeCategory}`}
-              selected
-              onPress={() => {
-                setActiveCategory('all');
-                onOpenCategory?.('all');
-              }}
-            />
-          ) : null}
-        </BthBox>
-        <BthTabs
-          items={categoryTabs}
-          value={activeCategory}
-          onValueChange={(nextCategory) => {
-            setActiveCategory(nextCategory);
-            onOpenCategory?.(nextCategory);
-          }}
-          variant="pill"
-        />
-      </BthSurface>
-
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
-          title="Active promotion"
-          subtitle="Use one active promo card at a time to reduce visual noise."
-        />
-        <BthBox gap={3}>
-          {promo ? (
-            <BthCard
-              key={promo.id}
-              title={promo.title}
-              subtitle={promo.subtitle}
-              footer={<BthButton label="Open offer" tone="ghost" onPress={onStartDelivery} />}
-            />
-          ) : null}
-          <BthBox layoutDirection="row" gap={2}>
-            {promos.map((promoItem, index) => (
-              <BthChip
-                key={promoItem.id}
-                label={String(index + 1)}
-                selected={index === activePromoIndex}
-                onPress={() => setActivePromoIndex(index)}
-              />
-            ))}
-          </BthBox>
-        </BthBox>
-      </BthSurface>
-
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
-          title={activeFeedMode === 'stores' ? 'Nearby stores' : activeFeedMode === 'orders' ? 'Order continuity' : 'Tracking continuity'}
-          subtitle={
-            activeFeedMode === 'stores'
-              ? 'Store open action must stay one tap away.'
-              : activeFeedMode === 'orders'
-                ? 'Resume current order flow with minimal branching.'
-                : 'Keep tracking and support actions visible.'
-          }
-          count={filteredStores.length}
-        />
-        {activeFeedMode === 'stores' ? (
-          <BthBox gap={2}>
-            {filteredStores.map((store) => (
-              <BthListItem
-                key={store.id}
-                title={store.name}
-                subtitle={store.subtitle}
-                badgeLabel={store.statusLabel}
-                meta={store.meta}
-                onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
-              />
-            ))}
-          </BthBox>
-        ) : activeFeedMode === 'orders' ? (
-          <BthCard
-            title="Continue from your latest cart"
-            subtitle="Return to review with one clear action and one fallback path."
-            footer={<BthButton label="Continue order" onPress={onContinueOrder} />}
-          />
-        ) : (
-          <BthCard
-            title="Tracking remains open"
-            subtitle="Delay and support actions remain reachable without extra route hops."
-            footer={<BthButton label="Track active order" onPress={onOpenTracking} />}
-          />
-        )}
-      </BthSurface>
-
-      <BthSurface tone="inset" gap={3}>
-        <BthSectionHeader
-          title="Journey continuity"
-          subtitle="Expose one dominant next action with one fallback path."
-        />
-        <BthBox layoutDirection="row" gap={2}>
-          <BthButton label="توصيل DSH" tone="ghost" onPress={onOpenDiscovery} />
-          <BthButton label="Continue order" tone="secondary" onPress={onContinueOrder} />
-          <BthButton label="Track active order" onPress={onOpenTracking} />
-        </BthBox>
-        <BthButton label="Search" tone="ghost" onPress={onOpenSearch} />
-        <BthText role="caption" tone="muted">
-          This home keeps the flow focused on discovery and routing. API and binding live outside this surface.
-        </BthText>
-      </BthSurface>
-    </BthMobileScrollView>
+    <DshHomeGetScreen
+      state={state}
+      promos={toDiscoveryPromos(promos)}
+      stores={toDiscoveryStores(featuredStores)}
+      onOpenList={() => onOpenCategory?.(categories[0]?.id ?? 'all')}
+      onOpenFavorites={() => onOpenCategory?.('favorites')}
+      onOpenSearch={onOpenSearch}
+      onOpenStore={onOpenStore}
+      onRetry={onRetry}
+    />
   );
 }

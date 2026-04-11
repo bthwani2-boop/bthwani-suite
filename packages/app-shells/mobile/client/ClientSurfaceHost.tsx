@@ -105,7 +105,7 @@ export function ClientSurfaceHost() {
             iconName: 'notifications-outline',
             badgeCount: 5,
             accessibilityLabel: uiText.accountSheet.tabs.notifications,
-            onPress: () => openDsh('orders'),
+            onPress: () => openDsh('orders-list'),
           },
           {
             id: 'cart',
@@ -131,7 +131,7 @@ export function ClientSurfaceHost() {
 
   const renderSubSurface = () => {
     if (route === 'dsh') {
-      return <DshSurfaceHost command={dshCommand} />;
+      return <DshSurfaceHost command={dshCommand} onExit={() => setRoute('home')} />;
     }
 
     if (route === 'amn-entry') {
@@ -221,9 +221,6 @@ export function ClientSurfaceHost() {
     return (
       <BthBox style={{ flex: 1 }} background="background">
         {renderUnifiedTopBar()}
-        <BthBox padding={4} gap={3}>
-          <BthButton label={uiText.common.backHome} tone="secondary" onPress={() => setRoute('home')} />
-        </BthBox>
         <BthSurface
           tone="raised"
           padding={0}

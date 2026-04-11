@@ -1,25 +1,39 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   BthBox,
   BthMobileScrollView,
-  BthNewsTickerBar,
   BthStateView,
   BthText,
+  radius,
+  sizes,
+  spacing,
+  useDirection,
+  useTheme,
 } from '@bthwani/ui-kit';
+import {
+  dshHomeGetFixturePromos,
+  dshHomeGetFixtureStores,
+} from '../fixtures/dshHomeGetFixtures';
+import {
+  StoreCardPremium,
+  type DshStoreCompactCardData,
+} from '../components/StoreCardPremium';
+import {
+  HomeBannerCarousel,
+  type HomeBannerCarouselItem,
+} from '../components/HomeBannerCarousel';
 
 export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
-  summaryTitle?: string;
-  summarySubtitle?: string;
-  tickerMessage?: string;
   promos?: DshHomeGetPromo[];
   stores?: DshHomeGetStore[];
+  onBack?: () => void;
   onOpenList?: () => void;
   onOpenFavorites?: () => void;
   onOpenSearch?: () => void;
   onOpenStore?: (storeId: string) => void;
-  onReturnHome?: () => void;
   onRetry?: () => void;
 };
 
@@ -30,6 +44,8 @@ export type DshHomeGetPromo = {
   title: string;
   subtitle: string;
   icon: string;
+  imageUrl?: string;
+  accentColor?: string;
 };
 
 export type DshHomeGetStore = {
@@ -49,67 +65,12 @@ export type DshHomeGetStore = {
   hasOffer?: boolean;
 };
 
-const defaultDiscoveryPromos: DshHomeGetPromo[] = [
-  { id: 'promo-1', title: 'تخفيضات', subtitle: 'خصم 30% على أول طلب', icon: '🔥' },
-  { id: 'promo-2', title: 'تتبّع مباشر', subtitle: 'خطوة واحدة إلى الطلب النشط', icon: '📍' },
-  { id: 'promo-3', title: 'الفئات المختارة', subtitle: 'تصفح مختصر بدون ضوضاء', icon: '✨' },
-];
-
-const defaultDiscoveryStores: DshHomeGetStore[] = [
-  {
-    id: 'store-1001',
-    name: 'مطعم القلعة',
-    address: 'شارع التحرير، صنعاء',
-    statusLabel: 'مفتوح',
-    statusTone: 'open',
-    distanceLabel: '2.1 كم',
-    deliveryLabel: 'توصيل مجاني',
-    serviceLabel: 'بثواني برو',
-    followerCount: 11000,
-    multiplierLabel: 'x2',
-    offerLabel: 'خصم 20%',
-    isFavorite: true,
-    isFollowing: false,
-    hasOffer: true,
-  },
-  {
-    id: 'store-1002',
-    name: 'مطاعم الأرض الخضراء',
-    address: 'شارع حدة، جوار البنك',
-    statusLabel: 'مفتوح',
-    statusTone: 'open',
-    distanceLabel: '1.8 كم',
-    deliveryLabel: 'كوبون',
-    serviceLabel: 'استلم بنفسك',
-    followerCount: 9000,
-    multiplierLabel: 'x1',
-    isFavorite: false,
-    isFollowing: false,
-    hasOffer: false,
-  },
-  {
-    id: 'store-1003',
-    name: 'مؤسسة الشيباني للمطاعم',
-    address: 'شارع الزبيري، أمام الجامعة',
-    statusLabel: 'مغلق',
-    statusTone: 'closed',
-    distanceLabel: '3.5 كم',
-    deliveryLabel: 'توصيل سريع',
-    serviceLabel: 'بثواني برو',
-    followerCount: 9000,
-    multiplierLabel: 'x3',
-    offerLabel: 'خصم 15%',
-    isFavorite: true,
-    isFollowing: false,
-    hasOffer: true,
-  },
-];
-
-const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; icon: string }> = [
-  { value: 'all', label: 'الكل', icon: '☰' },
-  { value: 'favorites', label: 'المفضلة', icon: '♡' },
-  { value: 'nearest', label: 'الأقرب', icon: '⌖' },
-  { value: 'new', label: 'الجديدة', icon: '✦' },
+const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; iconName: React.ComponentProps<typeof Ionicons>['name'] }> = [
+  { value: 'all', label: 'الكل', iconName: 'reorder-three-outline' },
+  { value: 'favorites', label: 'المفضلة', iconName: 'heart-outline' },
+  { value: 'nearest', label: 'الأقرب', iconName: 'locate-outline' },
+  { value: 'new', label: 'الجديدة', iconName: 'sparkles-outline' },
+  { value: 'offers', label: 'العروض', iconName: 'pricetag-outline' },
 ];
 
 function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>, 'ready'>, onRetry?: () => void) {
@@ -158,18 +119,17 @@ function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>,
 
 export function DshHomeGetScreen({
   state = 'ready',
-  summaryTitle = 'توصيل DSH',
-  summarySubtitle = 'تخطيط بصري مطابق لمسار الاكتشاف: بانر علوي، عرض نشط، شرائح حالة، وبطاقات متاجر غنية.',
-  tickerMessage = 'المساحة مخصصة للشريط الإخباري • اطلب إلى المنزل أو افتح الطلب النشط خلال خطوة واحدة',
-  promos = defaultDiscoveryPromos,
-  stores = defaultDiscoveryStores,
+  promos = dshHomeGetFixturePromos,
+  stores = dshHomeGetFixtureStores,
+  onBack,
   onOpenList,
   onOpenFavorites,
   onOpenSearch,
   onOpenStore,
-  onReturnHome,
   onRetry,
 }: DshHomeGetScreenProps) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
   const [activeFilter, setActiveFilter] = React.useState<DiscoveryFilter>('all');
   const [activePromoIndex, setActivePromoIndex] = React.useState(0);
   const [favoriteToggles, setFavoriteToggles] = React.useState<Record<string, boolean>>({});
@@ -212,42 +172,42 @@ export function DshHomeGetScreen({
     return renderState(state, onRetry);
   }
 
-  const activePromo = promos[activePromoIndex % promos.length] ?? defaultDiscoveryPromos[0];
+  const activePromo = promos[activePromoIndex % promos.length] ?? dshHomeGetFixturePromos[0];
+  const promoDiscount = activePromo.subtitle.match(/\d+%/)?.[0] ?? '30%';
+  const promoTail = activePromo.subtitle.replace(promoDiscount, '').trim();
+  const bannerItems: HomeBannerCarouselItem[] = promos.map((promo) => ({
+    id: promo.id,
+    imageUrl: promo.imageUrl,
+    accentColor: promo.accentColor,
+    onPress: onOpenSearch ?? onOpenList,
+  }));
 
   return (
     <BthMobileScrollView padding={4} gap={4}>
-      <BthNewsTickerBar statusLabel="مباشر" message={tickerMessage} onPress={onOpenSearch} />
-
       <View style={styles.carouselViewport}>
-        <View style={styles.carouselStage} />
-        <View style={styles.carouselDotsRow}>
-          {promos.map((promo, index) => (
-            <View
-              key={promo.id}
-              style={[styles.carouselDot, index === activePromoIndex && styles.carouselDotActive]}
-            />
-          ))}
-        </View>
+        <HomeBannerCarousel banners={bannerItems} rtl={direction === 'rtl'} />
       </View>
 
       <View style={styles.heroRow}>
         <Pressable style={styles.heroPromoCard} onPress={onOpenSearch ?? onOpenList}>
           <View style={styles.heroPromoContent}>
-            <View style={styles.heroPromoTextWrap}>
-              <BthText role="bodySm" style={styles.heroTag}>
-                {activePromo.title}
-              </BthText>
-              <BthText role="titleLg" style={styles.heroHeadline}>
-                {activePromo.subtitle.replace('على أول طلب', '').trim()}
-              </BthText>
-              <BthText role="titleSm" style={styles.heroSubline}>
-                على أول طلب
+            <View style={styles.heroPromoIconWrap}>
+              <BthText role="titleLg" style={styles.heroIcon}>
+                {activePromo.icon}
               </BthText>
             </View>
 
-            <View style={styles.heroIconWrap}>
-              <BthText role="titleLg" style={styles.heroIcon}>
-                {activePromo.icon}
+            <View style={styles.heroPromoTextWrap}>
+              <View style={styles.heroPromoBadge}>
+                <BthText role="bodySm" style={styles.heroPromoBadgeText}>
+                  {activePromo.title}
+                </BthText>
+              </View>
+              <BthText role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
+                {promoDiscount}
+              </BthText>
+              <BthText role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
+                {promoTail || 'على أول طلب'}
               </BthText>
             </View>
           </View>
@@ -257,135 +217,119 @@ export function DshHomeGetScreen({
           </View>
         </Pressable>
 
-        <View style={styles.quickActionsColumn}>
-          <Pressable style={styles.quickActionPrimary} onPress={onOpenSearch}>
-            <BthText role="titleLg" style={styles.quickActionArrow}>◀</BthText>
-          </Pressable>
-
+        <View style={styles.quickActionsCluster}>
           <View style={styles.quickActionBottomRow}>
             <Pressable style={styles.quickActionSecondary} onPress={onOpenList}>
-              <BthText role="bodySm" style={styles.quickActionLabel}>الفئات</BthText>
+              <View style={styles.quickActionChipContent}>
+                <Ionicons name="menu-outline" size={16} color="#ffffff" />
+                <BthText role="bodySm" style={styles.quickActionLabel}>الفئات</BthText>
+              </View>
             </Pressable>
             <Pressable style={styles.quickActionTertiary} onPress={onOpenSearch}>
-              <BthText role="bodySm" style={styles.quickActionLabel}>فيديو</BthText>
+              <View style={styles.quickActionChipContent}>
+                <Ionicons name="videocam-outline" size={15} color="#ffffff" />
+                <BthText role="bodySm" style={styles.quickActionLabel}>فيديو</BthText>
+              </View>
             </Pressable>
           </View>
         </View>
       </View>
 
-      <Pressable style={styles.returnHomePill} onPress={onReturnHome}>
-        <BthText role="bodySm" style={styles.returnHomeText}>العودة للرئيسية</BthText>
-      </Pressable>
-
-      <View style={styles.filtersRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.filtersRow,
+          direction === 'rtl' && styles.filtersRowRtl,
+        ]}
+      >
         {discoveryFilters.map((filter) => {
           const isActive = filter.value === activeFilter;
           return (
             <Pressable
               key={filter.value}
-              style={[styles.filterChip, isActive && styles.filterChipActive]}
+              style={[
+                styles.filterChip,
+                {
+                  backgroundColor: isActive ? theme.brand : theme.surfaceRaised,
+                  borderColor: isActive ? theme.brand : 'transparent',
+                },
+              ]}
               onPress={() => setActiveFilter(filter.value)}
             >
-              <BthText role="bodySm" style={[styles.filterChipLabel, isActive && styles.filterChipLabelActive]}>
-                {filter.icon} {filter.label}
-              </BthText>
+              <View style={styles.filterChipContent}>
+                <Ionicons
+                  name={filter.iconName}
+                  size={16}
+                  color={isActive ? theme.textInverse : theme.textMuted}
+                />
+                <BthText
+                  role="bodySm"
+                  style={[
+                    styles.filterChipLabel,
+                    { color: isActive ? theme.textInverse : theme.textMuted },
+                  ]}
+                >
+                  {filter.label}
+                </BthText>
+              </View>
             </Pressable>
           );
         })}
-      </View>
+      </ScrollView>
 
       <BthBox gap={3}>
-        {visibleStores.map((store) => (
-          <Pressable key={store.id} style={styles.storeCard} onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}>
-            <View style={styles.storeCardTopRow}>
-              <View style={[styles.statusChip, store.statusTone === 'closed' && styles.statusChipClosed]}>
-                <BthText role="bodySm" style={[styles.statusChipText, store.statusTone === 'closed' && styles.statusChipTextClosed]}>
-                  {store.statusLabel}
-                </BthText>
-              </View>
-              <View style={styles.storeImageStub}>
-                {store.offerLabel ? (
-                  <View style={styles.storeOfferRibbon}>
-                    <BthText role="bodySm" style={styles.storeOfferRibbonText}>{store.offerLabel}</BthText>
-                  </View>
-                ) : null}
-              </View>
-            </View>
+        {visibleStores.map((store, index) => {
+          const card: DshStoreCompactCardData = {
+            id: store.id,
+            name: store.name,
+            subtitle: store.address,
+            image: { uri: store.imageUri ?? '' },
+            rating: store.rating ?? (store.hasOffer ? 5 : 4.8),
+            distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
+            isOpen: store.statusTone === 'open',
+            supportsPickup: true,
+            supportsPartnerDelivery: true,
+            serviceTokens: [
+              { label: store.deliveryLabel },
+              { label: store.serviceLabel },
+            ],
+            isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
+            isFollowing: followToggles[store.id] ?? store.isFollowing,
+            followersCount: followCounts[store.id] ?? store.followerCount,
+            hasBthwaniPro: store.hasOffer !== false,
+            subscriptionPackageChips: store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel],
+            hasNewProducts: store.hasOffer === true,
+            hasOffer: store.hasOffer,
+            offerText: store.offerLabel,
+            pointsMultiplier: Number.parseInt(store.multiplierLabel.replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
+            hasCouponAvailable: store.hasOffer === false,
+          };
 
-            <View style={styles.storeBodyRow}>
-              <View style={styles.favoriteColumn}>
-                <Pressable
-                  hitSlop={10}
-                  onPress={() => {
-                    setFavoriteToggles((current) => ({
-                      ...current,
-                      [store.id]: !(current[store.id] ?? store.isFavorite),
-                    }));
-                  }}
-                >
-                  <BthText
-                    role="titleLg"
-                    style={[
-                      styles.favoriteHeart,
-                      !(favoriteToggles[store.id] ?? store.isFavorite) && styles.favoriteHeartInactive,
-                    ]}
-                  >
-                    ♥
-                  </BthText>
-                </Pressable>
-              </View>
-
-              <View style={styles.storeContentColumn}>
-                <BthText role="titleLg" style={styles.storeTitle}>{store.name}</BthText>
-                <BthText role="bodySm" style={styles.storeAddress}>{store.address}</BthText>
-                <BthText role="bodyMd" style={styles.storeDistanceLine}>
-                  {store.distanceLabel} · استلم بنفسك · توصيل المتجر
-                </BthText>
-
-                <View style={styles.storeMetaChipRow}>
-                  <View style={styles.metaChip}>
-                    <BthText role="bodySm" style={styles.metaChipText}>{store.deliveryLabel}</BthText>
-                  </View>
-                  <View style={[styles.metaChip, styles.metaChipBlue]}>
-                    <BthText role="bodySm" style={styles.metaChipBlueText}>⚡ {store.serviceLabel}</BthText>
-                  </View>
-                  <View style={styles.metaChip}>
-                    <BthText role="bodySm" style={styles.metaChipText}>أولوية</BthText>
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.storeFooterRow}>
-              <View style={styles.storeScorePill}>
-                <BthText role="bodySm" style={styles.storeScoreText}>★</BthText>
-              </View>
-              <View style={styles.storeMultiplierPill}>
-                <BthText role="bodySm" style={styles.storeMultiplierText}>{store.multiplierLabel}</BthText>
-              </View>
-              <BthText role="bodySm" style={styles.storeFollowersText}>
-                {Math.round((followCounts[store.id] ?? store.followerCount) / 1000)} ألف
-              </BthText>
-              <Pressable
-                hitSlop={8}
-                style={[styles.storeFollowAdd, (followToggles[store.id] ?? store.isFollowing) && styles.storeFollowAdded]}
-                onPress={() => {
-                  const isFollowing = followToggles[store.id] ?? store.isFollowing;
-                  const baseCount = followCounts[store.id] ?? store.followerCount;
-                  setFollowToggles((current) => ({ ...current, [store.id]: !isFollowing }));
-                  setFollowCounts((current) => ({
-                    ...current,
-                    [store.id]: isFollowing ? Math.max(0, baseCount - 1) : baseCount + 1,
-                  }));
-                }}
-              >
-                <BthText role="bodySm" style={styles.storeFollowAddText}>
-                  {(followToggles[store.id] ?? store.isFollowing) ? '✓' : '＋'}
-                </BthText>
-              </Pressable>
-            </View>
-          </Pressable>
-        ))}
+          return (
+            <StoreCardPremium
+              key={store.id}
+              item={card}
+              onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
+              onToggleFavorite={(id) => {
+                setFavoriteToggles((current) => ({
+                  ...current,
+                  [id]: !(current[id] ?? store.isFavorite),
+                }));
+              }}
+              onToggleFollow={(id) => {
+                const isFollowing = followToggles[id] ?? store.isFollowing;
+                const baseCount = followCounts[id] ?? store.followerCount;
+                setFollowToggles((current) => ({ ...current, [id]: !isFollowing }));
+                setFollowCounts((current) => ({
+                  ...current,
+                  [id]: isFollowing ? Math.max(0, baseCount - 1) : baseCount + 1,
+                }));
+              }}
+              onPressSubscriptionChip={onOpenSearch}
+            />
+          );
+        })}
       </BthBox>
     </BthMobileScrollView>
   );
@@ -394,79 +338,102 @@ export function DshHomeGetScreen({
 const styles = StyleSheet.create({
   carouselViewport: {
     gap: 14,
+    marginTop: -2,
   },
   carouselStage: {
-    height: 170,
-    borderRadius: 22,
+    height: 238,
+    borderRadius: 30,
     backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e6eaf1',
+    shadowColor: '#0f172a',
+    shadowOpacity: 0.05,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
   },
   carouselDotsRow: {
     flexDirection: 'row',
     alignSelf: 'center',
-    gap: 10,
+    gap: 9,
   },
   carouselDot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    width: 13,
+    height: 13,
+    borderRadius: 6.5,
     backgroundColor: '#d5d8df',
   },
   carouselDotActive: {
-    width: 40,
+    width: 34,
     backgroundColor: '#ff6a00',
   },
   heroRow: {
-    flexDirection: 'row-reverse',
     flexDirection: 'row',
     alignItems: 'stretch',
     gap: 12,
   },
   heroPromoCard: {
     flex: 1,
-    minHeight: 130,
-    borderRadius: 26,
+    minWidth: 200,
+    height: 76,
+    borderRadius: 18,
     backgroundColor: '#f54747',
-    paddingHorizontal: 22,
-    paddingVertical: 18,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     justifyContent: 'space-between',
     shadowColor: '#000',
-    shadowOpacity: 0.16,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 10,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   heroPromoContent: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: 14,
+    gap: 10,
+  },
+  heroPromoIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
   heroPromoTextWrap: {
     flex: 1,
     alignItems: 'flex-end',
-    gap: 2,
+    gap: 3,
   },
-  heroTag: {
-    color: '#fff',
-    fontWeight: '700',
+  heroPromoBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.14)',
   },
-  heroHeadline: {
+  heroPromoBadgeText: {
     color: '#fff',
     fontWeight: '800',
+    fontSize: 10,
   },
-  heroSubline: {
-    color: '#ffd3d3',
+  heroPromoTitle: {
+    color: '#fff',
     fontWeight: '700',
+    fontSize: 14,
+    lineHeight: 16,
   },
-  heroIconWrap: {
-    width: 78,
-    height: 78,
-    borderRadius: 39,
-    backgroundColor: 'rgba(255,255,255,0.14)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  heroPromoSubtitle: {
+    color: '#ffd3d3',
+    fontWeight: '500',
+    textAlign: 'right',
+    fontSize: 11,
+    lineHeight: 13,
   },
   heroIcon: {
     color: '#fff',
+    fontSize: 26,
+    lineHeight: 24,
   },
   heroPagerRow: {
     alignItems: 'center',
@@ -478,96 +445,78 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: '#fff',
   },
-  quickActionsColumn: {
-    width: 118,
-    gap: 12,
-  },
-  quickActionPrimary: {
-    minHeight: 86,
-    borderRadius: 22,
-    backgroundColor: '#ff6a00',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.14,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 8,
-  },
-  quickActionArrow: {
-    color: '#fff',
-    fontWeight: '800',
+  quickActionsCluster: {
+    width: 124,
+    flexShrink: 0,
   },
   quickActionBottomRow: {
     flexDirection: 'row-reverse',
+    alignItems: 'stretch',
     gap: 8,
   },
   quickActionSecondary: {
-    flex: 1,
+    flex: 1.05,
     minHeight: 42,
-    borderRadius: 20,
+    borderRadius: 21,
     backgroundColor: '#0d2f67',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   quickActionTertiary: {
-    flex: 1,
+    flex: 0.95,
     minHeight: 42,
-    borderRadius: 20,
+    borderRadius: 21,
     backgroundColor: '#ff6a00',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  quickActionChipContent: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 6,
   },
   quickActionLabel: {
     color: '#fff',
     fontWeight: '700',
-  },
-  returnHomePill: {
-    alignSelf: 'center',
-    minWidth: 292,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: '#dde2ea',
-    backgroundColor: '#ffffff',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-  },
-  returnHomeText: {
-    color: '#5a6472',
-    fontWeight: '700',
+    fontSize: 11,
   },
   filtersRow: {
-    flexDirection: 'row-reverse',
-    flexWrap: 'wrap',
-    gap: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[2],
+    paddingVertical: spacing[1],
+    paddingHorizontal: spacing[2],
+  },
+  filtersRowRtl: {
+    direction: 'rtl',
   },
   filterChip: {
-    minHeight: 46,
-    borderRadius: 23,
-    backgroundColor: '#f1f3f7',
-    paddingHorizontal: 18,
+    minHeight: sizes.controlSm,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[2],
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
-  filterChipActive: {
-    backgroundColor: '#ff6a00',
+  filterChipContent: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 6,
   },
   filterChipLabel: {
-    color: '#4b5665',
+    fontSize: 13,
     fontWeight: '700',
-  },
-  filterChipLabelActive: {
-    color: '#fff',
   },
   storeCard: {
     borderWidth: 1.5,
     borderColor: '#d8dce4',
     borderRadius: 28,
     backgroundColor: '#fff',
-    padding: 16,
+    padding: 14,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 12,
@@ -578,15 +527,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   statusChip: {
-    minHeight: 34,
-    borderRadius: 18,
+    minHeight: 30,
+    borderRadius: 15,
     backgroundColor: '#eafff6',
-    borderWidth: 1.5,
+    borderWidth: 1.2,
     borderColor: '#45d2a0',
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -602,68 +551,109 @@ const styles = StyleSheet.create({
     color: '#d33939',
   },
   storeImageStub: {
-    width: 94,
-    height: 94,
+    width: 96,
+    height: 96,
     borderRadius: 18,
-    backgroundColor: '#edf1f6',
-    justifyContent: 'flex-end',
+    backgroundColor: '#eef2f7',
+    justifyContent: 'space-between',
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#e2e7ee',
+  },
+  storeImageOverlayRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 4,
+    paddingTop: 4,
+    gap: 4,
+    zIndex: 2,
+  },
+  storeImageCore: {
+    flex: 1,
+    marginHorizontal: 8,
+    marginBottom: 6,
+    borderRadius: 14,
+    backgroundColor: '#e8edf3',
+    opacity: 0.92,
+    overflow: 'hidden',
+  },
+  storeImageCoreGlow: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.35)',
+  },
+  storeBadgeHot: {
+    minHeight: 20,
+    borderRadius: 10,
+    backgroundColor: '#ff6a00',
+    paddingHorizontal: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  storeBadgeText: {
+    color: '#fff',
+    fontWeight: '800',
+    fontSize: 11,
   },
   storeOfferRibbon: {
     backgroundColor: '#ff5b41',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingVertical: 3,
+    paddingHorizontal: 7,
+    borderRadius: 9,
     alignItems: 'center',
   },
   storeOfferRibbonText: {
     color: '#fff',
     fontWeight: '700',
+    fontSize: 11,
   },
   storeBodyRow: {
     flexDirection: 'row-reverse',
-    gap: 14,
+    gap: 12,
+    alignItems: 'flex-start',
   },
   favoriteColumn: {
-    width: 46,
+    width: 42,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  favoriteHeart: {
-    color: '#e22a2a',
-  },
-  favoriteHeartInactive: {
-    color: '#c9cdd6',
+    justifyContent: 'flex-start',
+    paddingTop: 10,
   },
   storeContentColumn: {
     flex: 1,
     alignItems: 'flex-end',
-    gap: 5,
+    gap: 4,
   },
   storeTitle: {
     color: '#1c2330',
     fontWeight: '800',
     textAlign: 'right',
+    fontSize: 18,
+    lineHeight: 22,
   },
   storeAddress: {
     color: '#6d7584',
     textAlign: 'right',
+    fontSize: 13,
+    lineHeight: 16,
   },
   storeDistanceLine: {
     color: '#5b6372',
     textAlign: 'right',
+    fontSize: 13,
+    lineHeight: 16,
   },
   storeMetaChipRow: {
     flexDirection: 'row-reverse',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 6,
     justifyContent: 'flex-end',
-    marginTop: 4,
+    marginTop: 2,
   },
   metaChip: {
-    minHeight: 30,
-    borderRadius: 15,
+    minHeight: 28,
+    borderRadius: 14,
     backgroundColor: '#eef1f6',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -682,25 +672,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: 6,
-    marginTop: 12,
+    gap: 5,
+    marginTop: 10,
   },
   storeScorePill: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: '#fff1cc',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  storeScoreText: {
-    color: '#d88a00',
-  },
   storeMultiplierPill: {
-    minHeight: 30,
-    borderRadius: 15,
+    minHeight: 28,
+    borderRadius: 14,
     backgroundColor: '#f8b12b',
-    paddingHorizontal: 9,
+    paddingHorizontal: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -711,11 +698,12 @@ const styles = StyleSheet.create({
   storeFollowersText: {
     color: '#454f5c',
     fontWeight: '700',
+    fontSize: 12,
   },
   storeFollowAdd: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: '#ff6a00',
     alignItems: 'center',
     justifyContent: 'center',
@@ -723,6 +711,7 @@ const styles = StyleSheet.create({
   storeFollowAddText: {
     color: '#fff',
     fontWeight: '800',
+    fontSize: 11,
   },
   storeFollowAdded: {
     backgroundColor: '#0d9b65',
