@@ -1,9 +1,12 @@
+﻿import {
+  useDshControlPanelText } from '../shared/dshControlPanelText';
 'use client';
 
 import React from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'next/navigation';
-import { useDirection } from '@bthwani/ui-kit';
+import { useDirection
+} from '@bthwani/ui-kit';
 import {
   BthBadge,
   BthBox,
@@ -16,8 +19,7 @@ import {
   BthText,
   BthWebCommandCenterFrame,
   BthWebSectionCard,
-  useDshControlPanelText,
-  useUiText,
+  useUiText
 } from '@bthwani/ui-kit';
 import { getSheinProxyRequests, type SheinProxyRequest, type SheinProxyRequestStatus } from './sheinproxy-fixtures';
 

@@ -1,14 +1,20 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { BthBox, BthButton, BthStateView, BthText, useDshControlPanelText } from '@bthwani/ui-kit';
+import {
+  useRouter } from 'next/navigation';
+import { BthBox,
+  BthButton,
+  BthStateView,
+  BthText
+} from '@bthwani/ui-kit';
 import {
   BthWebMissionHeroCard,
   BthWebPageFrame,
   BthWebSectionCard,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
+import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import {
   getSampleDshOrder,
   getSampleDshOrderActionPlan,

@@ -1,16 +1,15 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import {
+  useRouter } from 'next/navigation';
 import {
   BthBox,
   BthButton,
   BthStateView,
   BthText,
-  formatDshWorkbenchSubtitle,
-  useDshControlPanelText,
   useDirection,
-  useUiText,
+  useUiText
 } from '@bthwani/ui-kit';
 import {
   BthWebCommandCenterFrame,
@@ -18,6 +17,7 @@ import {
   BthWebSectionCard,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
+import { formatDshWorkbenchSubtitle, useDshControlPanelText } from './shared/dshControlPanelText';
 import styles from './dsh-surface.module.css';
 
 type ControlPanelDshOperationsScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';

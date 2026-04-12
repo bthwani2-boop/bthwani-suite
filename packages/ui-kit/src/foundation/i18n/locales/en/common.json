@@ -46,6 +46,7 @@
       "finance": "Finance",
       "catalogs": "Catalogs",
       "support": "Support",
+      "community-services": "Community Services",
       "partners": "Partners",
       "marketing": "Marketing",
       "control": "Control Panel"
@@ -56,6 +57,7 @@
       "finance": "Financial monitoring, settlements, and unified operational control.",
       "catalogs": "Governance of services, products, and operational structure.",
       "support": "Support queues, escalations, and customer experience recovery.",
+      "community-services": "Community-facing services, intake, and support pathways.",
       "partners": "Partner readiness and operational coordination across paths.",
       "marketing": "Managing growth campaigns without breaking the centralized operational structure.",
       "control": "Platform governance, administration, and internal control framework."

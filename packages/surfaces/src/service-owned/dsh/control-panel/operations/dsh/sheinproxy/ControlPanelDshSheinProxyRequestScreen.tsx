@@ -1,14 +1,23 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { BthBox, BthButton, BthCard, BthKeyValueList, BthStateView, BthText, useDshControlPanelText, useUiText } from '@bthwani/ui-kit';
+import {
+  useRouter } from 'next/navigation';
+import { BthBox,
+  BthButton,
+  BthCard,
+  BthKeyValueList,
+  BthStateView,
+  BthText,
+  useUiText
+} from '@bthwani/ui-kit';
 import {
   BthWebMissionHeroCard,
   BthWebPageFrame,
   BthWebSectionCard,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
+import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import { getSheinProxyRequestById, type SheinProxyRequestStatus } from './sheinproxy-fixtures';
 
 type SheinProxyRequestStage = 'detail' | 'estimate' | 'offer' | 'schedule';

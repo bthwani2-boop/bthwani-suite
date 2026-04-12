@@ -12,7 +12,7 @@ import { useDirection, useUiText } from '@bthwani/ui-kit';
 import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 
-const primarySectionIds = ['dashboard', 'operations', 'finance', 'catalogs', 'support', 'partners', 'marketing', 'control'] as const;
+const primarySectionIds = ['dashboard', 'operations', 'finance', 'catalogs', 'support', 'community-services', 'partners', 'marketing', 'control'] as const;
 const controlSubSectionIds = ['platform', 'administration', 'governance', 'hr'] as const;
 
 type ControlPanelSectionId = (typeof primarySectionIds)[number];
@@ -61,6 +61,7 @@ const sectionRouteMap: Record<ControlPanelSectionId, PrimarySectionHref> = {
   finance: '/finance',
   catalogs: '/catalogs',
   support: '/support',
+  'community-services': '/community-services',
   partners: '/partners',
   marketing: '/marketing',
   control: '/control',

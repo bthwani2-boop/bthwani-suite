@@ -1,4 +1,6 @@
-import type { BthLocale } from './BthUiTextCatalog';
+﻿import { useDirection } from '@bthwani/ui-kit';
+
+type DshLocale = 'ar' | 'en';
 
 const enDshControlPanelText = {
   common: {
@@ -1883,14 +1885,14 @@ const dshControlPanelTextCatalog = {
   en: enDshControlPanelText,
 } as const;
 
-export function getDshControlPanelText(locale: BthLocale = 'ar') {
+export function getDshControlPanelText(locale: DshLocale = 'ar') {
   return dshControlPanelTextCatalog[locale];
 }
 
 export function formatDshWorkbenchSubtitle(
   workbenchDescription: string,
   filterLabel: string,
-  locale: BthLocale = 'ar',
+  locale: DshLocale = 'ar',
 ) {
   const resolvedLocale = locale;
 
@@ -1899,4 +1901,10 @@ export function formatDshWorkbenchSubtitle(
   }
 
   return `${workbenchDescription} يبقى هذا العرض صريحًا: ${filterLabel} هو السياق الحالي، والمسارات الآمنة فقط هي المفعلة الآن.`;
+}
+
+
+export function useDshControlPanelText() {
+  const { language } = useDirection();
+  return getDshControlPanelText(language === 'en' ? 'en' : 'ar');
 }
