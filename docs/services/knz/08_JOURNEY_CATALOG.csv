@@ -1,5 +1,0 @@
-"journey_id","actor","entry","steps","exit","related_operations","failure_modes","recovery","source_trace"
-"knz_market_discovery","user","home_or_listings","listings_list->auction_get->listing_report","listing_selected","knz_listings_list|knz_auction_get|knz_listing_report","empty_results|upstream_failure","retry_or_adjust_filters","services/knz/governance/KNZ_OPERATION_CATALOG.csv"
-"knz_listing_lifecycle","user|control_panel_op","listing_create","listing_create->auction_create_or_deal_create->listing_status_update->moderation_action","listing_active_or_closed","knz_listing_create|knz_auction_create|knz_deal_create|knz_listing_status_update|knz_moderation_action","validation_error|policy_denied|moderation_reject","fix_input_or_resubmit","services/knz/governance/KNZ_OPERATION_CATALOG.csv"
-"knz_engagement_and_feedback","user","listing_selected","chat_thread_list->chat_message_send->listing_report","engagement_recorded","knz_chat_thread_list|knz_chat_message_send|knz_listing_report","thread_not_found|submit_failed","retry_or_report","services/knz/governance/KNZ_OPERATION_CATALOG.csv"
-

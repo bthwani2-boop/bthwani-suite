@@ -9,6 +9,7 @@ import {
   BthWebSegmentedTabs,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
+import { useDshControlPanelText } from './operations/dsh/shared/dshControlPanelText';
 import { ControlPanelDshArrivalBellScreen } from './operations/dsh/arrival-bell';
 import { ControlPanelDshOrderDetailScreen, ControlPanelDshOrdersScreen } from './operations/dsh/orders';
 import { ControlPanelDshPeakModeScreen } from './operations/dsh/peak-mode';
@@ -78,45 +79,122 @@ type DshDockRouteItem = {
   statusLabel: string;
 };
 
+const dshDockText: DshDockText = {
+  dockEyebrow: 'DSH operations dock',
+  dockTitle: 'DSH operations hub',
+  dockDescription: 'Live routes open directly, while the next workbenches remain visible without pretending to be ready.',
+  liveSignalTitle: 'Live',
+  liveSignalDescription: 'Active workbenches that can open immediately.',
+  plannedSignalTitle: 'Planned',
+  plannedSignalDescription: 'Visible next-step routes that are preserved without early wiring.',
+  entrySignalTitle: 'Quick access',
+  entrySignalDescription: 'Open the live DSH routes directly when the next step is already known.',
+  liveRoutesTitle: 'Live routes',
+  liveRoutesDescription: 'Each live route keeps its own safe entry and still shows the route context clearly.',
+  plannedRoutesTitle: 'Planned routes',
+  plannedRoutesDescription: 'These routes stay visible so the next extension remains legible, but they do not behave like live links early.',
+  overviewLabel: 'DSH overview',
+  overviewDescription: 'A first read of the state and the safe transitions before entering any child route.',
+  ordersLabel: 'Orders',
+  ordersDescription: 'The central orders queue and its related detail surfaces.',
+  reassignLabel: 'Reassign',
+  reassignDescription: 'Re-route orders between available resources without breaking the active path.',
+  peakModeLabel: 'Peak mode',
+  peakModeDescription: 'A flexible capacity mode when traffic rises and extra room is needed.',
+  arrivalBellLabel: 'Arrival bell',
+  arrivalBellDescription: 'Arrival and live notification settings near handoff.',
+  zoneSetLabel: 'Zone set',
+  zoneSetDescription: 'Guard the delivery scope with clearer operational boundaries.',
+  sheinProxyLabel: 'Shein Proxy',
+  sheinProxyDescription: 'A mediation lane for the DSH proxy workload.',
+  openHubAction: 'Open operations workspace',
+  openRouteAction: 'Open route',
+  openOrdersAction: 'Open orders',
+  openReassignAction: 'Open reassign',
+  openPeakModeAction: 'Open peak mode',
+  openArrivalBellAction: 'Open arrival bell',
+  liveBadge: 'Live',
+  plannedBadge: 'Planned',
+} as const;
+
 function ControlPanelDshOperationsDock() {
   const router = useRouter();
   const uiText = useUiText();
-  const dshText = (uiText.controlPanel.ui as typeof uiText.controlPanel.ui & { dsh: DshDockText }).dsh;
+  const dshText = useDshControlPanelText();
+  const marketingTitle = uiText.controlPanel.surfaceTitles.marketing;
+  const marketingDescription = uiText.controlPanel.surfaceDescriptions.marketing;
+
+  const dockText: DshDockText = {
+    ...dshDockText,
+    dockEyebrow: dshText.hub.rootEyebrow,
+    dockTitle: dshText.hub.rootTitle,
+    dockDescription: dshText.hub.workbenchesDescription,
+    liveSignalDescription: dshText.hub.quickActionsDescription,
+    plannedSignalDescription: dshText.hub.plannedRoutesDescription,
+    entrySignalTitle: dshText.hub.quickActionsTitle,
+    entrySignalDescription: dshText.hub.quickActionsDescription,
+    liveRoutesTitle: dshText.hub.workbenchesTitle,
+    liveRoutesDescription: dshText.hub.workbenchesDescription,
+    plannedRoutesTitle: dshText.hub.plannedRoutesTitle,
+    plannedRoutesDescription: dshText.hub.plannedRoutesDescription,
+    overviewLabel: dshText.hub.workbenches.overview.label,
+    overviewDescription: dshText.hub.workbenches.overview.description,
+    ordersLabel: dshText.hub.workbenches.orders.label,
+    ordersDescription: dshText.hub.workbenches.orders.description,
+    reassignLabel: dshText.hub.workbenches.reassign.label,
+    reassignDescription: dshText.hub.workbenches.reassign.description,
+    peakModeLabel: dshText.hub.workbenches.peakMode.label,
+    peakModeDescription: dshText.hub.workbenches.peakMode.description,
+    arrivalBellLabel: dshText.hub.workbenches.arrivalBell.label,
+    arrivalBellDescription: dshText.hub.workbenches.arrivalBell.description,
+    zoneSetLabel: dshText.hub.workbenches.zoneSet.label,
+    zoneSetDescription: dshText.hub.workbenches.zoneSet.description,
+    sheinProxyLabel: dshText.hub.workbenches.sheinProxy.label,
+    sheinProxyDescription: dshText.hub.workbenches.sheinProxy.description,
+    openHubAction: dshText.common.openGeneralOperations,
+    openRouteAction: dshText.common.openOperationsWorkspace,
+    openOrdersAction: dshText.hub.actions.openOrders,
+    openReassignAction: dshText.hub.actions.openReassign,
+    openPeakModeAction: dshText.hub.actions.openPeakMode,
+    openArrivalBellAction: dshText.hub.actions.openArrivalBell,
+    liveBadge: dshText.common.live,
+    plannedBadge: dshText.common.planned,
+  };
 
   const liveRouteItems: ReadonlyArray<DshDockRouteItem> = [
-    { href: liveRouteHrefs.overview, label: dshText.overviewLabel, description: dshText.overviewDescription, statusLabel: dshText.liveBadge },
-    { href: liveRouteHrefs.orders, label: dshText.ordersLabel, description: dshText.ordersDescription, statusLabel: dshText.liveBadge },
-    { href: liveRouteHrefs.sheinProxy, label: dshText.sheinProxyLabel, description: dshText.sheinProxyDescription, statusLabel: dshText.liveBadge },
-    { href: liveRouteHrefs.reassign, label: dshText.reassignLabel, description: dshText.reassignDescription, statusLabel: dshText.liveBadge },
-    { href: liveRouteHrefs.peakMode, label: dshText.peakModeLabel, description: dshText.peakModeDescription, statusLabel: dshText.liveBadge },
-    { href: liveRouteHrefs.arrivalBell, label: dshText.arrivalBellLabel, description: dshText.arrivalBellDescription, statusLabel: dshText.liveBadge },
-    { href: liveRouteHrefs.zoneSet, label: dshText.zoneSetLabel, description: dshText.zoneSetDescription, statusLabel: dshText.liveBadge },
+    { href: liveRouteHrefs.overview, label: dockText.overviewLabel, description: dockText.overviewDescription, statusLabel: dockText.liveBadge },
+    { href: liveRouteHrefs.orders, label: dockText.ordersLabel, description: dockText.ordersDescription, statusLabel: dockText.liveBadge },
+    { href: liveRouteHrefs.sheinProxy, label: dockText.sheinProxyLabel, description: dockText.sheinProxyDescription, statusLabel: dockText.liveBadge },
+    { href: liveRouteHrefs.reassign, label: dockText.reassignLabel, description: dockText.reassignDescription, statusLabel: dockText.liveBadge },
+    { href: liveRouteHrefs.peakMode, label: dockText.peakModeLabel, description: dockText.peakModeDescription, statusLabel: dockText.liveBadge },
+    { href: liveRouteHrefs.arrivalBell, label: dockText.arrivalBellLabel, description: dockText.arrivalBellDescription, statusLabel: dockText.liveBadge },
+    { href: liveRouteHrefs.zoneSet, label: dockText.zoneSetLabel, description: dockText.zoneSetDescription, statusLabel: dockText.liveBadge },
   ];
   const plannedRoutesCount = 0;
 
   return (
     <BthBox gap={4}>
       <BthWebMissionHeroCard
-        badges={[dshText.liveBadge, dshText.plannedBadge, 'DSH']}
-        eyebrow={dshText.dockEyebrow}
-        title={dshText.dockTitle}
-        description={dshText.dockDescription}
+        badges={[dockText.liveBadge, dockText.plannedBadge, 'DSH']}
+        eyebrow={dockText.dockEyebrow}
+        title={dockText.dockTitle}
+        description={dockText.dockDescription}
         metaItems={[
-          `${dshText.liveRoutesTitle}: ${liveRouteItems.length}`,
-          `${dshText.plannedRoutesTitle}: ${plannedRoutesCount}`,
-          dshText.openHubAction,
+          `${dockText.liveRoutesTitle}: ${liveRouteItems.length}`,
+          `${dockText.plannedRoutesTitle}: ${plannedRoutesCount}`,
+          dockText.openHubAction,
         ]}
-        primaryAction={{ label: dshText.openOrdersAction, href: liveRouteHrefs.orders }}
-        secondaryAction={{ label: dshText.openReassignAction, href: liveRouteHrefs.reassign }}
+        primaryAction={{ label: dockText.openOrdersAction, href: liveRouteHrefs.orders }}
+        secondaryAction={{ label: dockText.openReassignAction, href: liveRouteHrefs.reassign }}
       />
 
       <BthBox gap={2}>
-        <BthWebSignalCard title={dshText.liveSignalTitle} value={String(liveRouteItems.length)} description={dshText.liveSignalDescription} tone="best" />
-        <BthWebSignalCard title={dshText.plannedSignalTitle} value={String(plannedRoutesCount)} description={dshText.plannedSignalDescription} />
-        <BthWebSignalCard title={dshText.entrySignalTitle} value="3" description={dshText.entrySignalDescription} />
+        <BthWebSignalCard title={dockText.liveSignalTitle} value={String(liveRouteItems.length)} description={dockText.liveSignalDescription} tone="best" />
+        <BthWebSignalCard title={dockText.plannedSignalTitle} value={String(plannedRoutesCount)} description={dockText.plannedSignalDescription} />
+        <BthWebSignalCard title={dockText.entrySignalTitle} value="3" description={dockText.entrySignalDescription} />
       </BthBox>
 
-      <BthWebSectionCard title={dshText.liveRoutesTitle} description={dshText.liveRoutesDescription}>
+      <BthWebSectionCard title={dockText.liveRoutesTitle} description={dockText.liveRoutesDescription}>
         <BthBox gap={2}>
           {liveRouteItems.map((item) => (
             <BthBox key={item.label} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
@@ -130,7 +208,7 @@ function ControlPanelDshOperationsDock() {
                 {item.description}
               </BthText>
               <BthButton
-                label={dshText.openRouteAction}
+                label={dockText.openRouteAction}
                 tone="secondary"
                 fullWidth={false}
                 onPress={() => {
@@ -144,12 +222,25 @@ function ControlPanelDshOperationsDock() {
         </BthBox>
       </BthWebSectionCard>
 
-      <BthWebSectionCard title={dshText.entrySignalTitle} description={dshText.entrySignalDescription}>
+      <BthWebSectionCard title={dockText.entrySignalTitle} description={dockText.entrySignalDescription}>
         <BthBox gap={2}>
-          <BthButton label={dshText.openOrdersAction} onPress={() => router.push(liveRouteHrefs.orders)} />
-          <BthButton label={dshText.openReassignAction} tone="secondary" onPress={() => router.push(liveRouteHrefs.reassign)} />
-          <BthButton label={dshText.openPeakModeAction} tone="secondary" onPress={() => router.push(liveRouteHrefs.peakMode)} />
-          <BthButton label={dshText.openArrivalBellAction} tone="secondary" onPress={() => router.push(liveRouteHrefs.arrivalBell)} />
+          <BthButton label={dockText.openOrdersAction} onPress={() => router.push(liveRouteHrefs.orders)} />
+          <BthButton label={dockText.openReassignAction} tone="secondary" onPress={() => router.push(liveRouteHrefs.reassign)} />
+          <BthButton label={dockText.openPeakModeAction} tone="secondary" onPress={() => router.push(liveRouteHrefs.peakMode)} />
+          <BthButton label={dockText.openArrivalBellAction} tone="secondary" onPress={() => router.push(liveRouteHrefs.arrivalBell)} />
+        </BthBox>
+      </BthWebSectionCard>
+
+      <BthWebSectionCard title={marketingTitle} description={marketingDescription}>
+        <BthBox gap={2}>
+          <BthText role="bodySm" tone="muted">
+            {marketingDescription}
+          </BthText>
+          <BthButton
+            label={marketingTitle}
+            tone="secondary"
+            onPress={() => router.push('/marketing')}
+          />
         </BthBox>
       </BthWebSectionCard>
     </BthBox>
@@ -159,26 +250,18 @@ function ControlPanelDshOperationsDock() {
 export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: DshControlPanelSurfaceHostProps) {
   const router = useRouter();
   const uiText = useUiText();
-  const dshText = (uiText.controlPanel.ui as typeof uiText.controlPanel.ui & { dsh: {
-    overviewLabel: string;
-    ordersLabel: string;
-    sheinProxyLabel: string;
-    reassignLabel: string;
-    peakModeLabel: string;
-    arrivalBellLabel: string;
-    zoneSetLabel: string;
-  } }).dsh;
+  const dshText = useDshControlPanelText();
 
   const normalizedWorkspace = workspace === 'order-detail' ? 'orders' : workspace;
 
   const tabs = [
-    { id: 'overview', label: dshText.overviewLabel, active: normalizedWorkspace === 'overview' },
-    { id: 'orders', label: dshText.ordersLabel, active: normalizedWorkspace === 'orders' },
-    { id: 'sheinproxy', label: dshText.sheinProxyLabel, active: normalizedWorkspace === 'sheinproxy' },
-    { id: 'reassign', label: dshText.reassignLabel, active: normalizedWorkspace === 'reassign' },
-    { id: 'peak-mode', label: dshText.peakModeLabel, active: normalizedWorkspace === 'peak-mode' },
-    { id: 'arrival-bell', label: dshText.arrivalBellLabel, active: normalizedWorkspace === 'arrival-bell' },
-    { id: 'zone-set', label: dshText.zoneSetLabel, active: normalizedWorkspace === 'zone-set' },
+    { id: 'overview', label: dshText.hub.workbenches.overview.label, active: normalizedWorkspace === 'overview' },
+    { id: 'orders', label: dshText.hub.workbenches.orders.label, active: normalizedWorkspace === 'orders' },
+    { id: 'sheinproxy', label: dshText.hub.workbenches.sheinProxy.label, active: normalizedWorkspace === 'sheinproxy' },
+    { id: 'reassign', label: dshText.hub.workbenches.reassign.label, active: normalizedWorkspace === 'reassign' },
+    { id: 'peak-mode', label: dshText.hub.workbenches.peakMode.label, active: normalizedWorkspace === 'peak-mode' },
+    { id: 'arrival-bell', label: dshText.hub.workbenches.arrivalBell.label, active: normalizedWorkspace === 'arrival-bell' },
+    { id: 'zone-set', label: dshText.hub.workbenches.zoneSet.label, active: normalizedWorkspace === 'zone-set' },
   ] as const;
 
   return (

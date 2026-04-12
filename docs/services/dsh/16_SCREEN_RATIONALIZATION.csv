@@ -1,2 +1,0 @@
-decision_id,screen_id,canonical_name,decision_type,verdict,rationale,next_cta,status,updated_at
-RAT_W1_001,SCR_W1_004,dsh_order_success_state,state_vs_screen,STATE_ONLY,"Keep success lightweight; avoid full route inflation until proven necessary.",tracking_or_orders_list,locked,2026-04-08

@@ -1,4 +1,0 @@
-journey_id,actor,entry,steps,exit,related_operations,failure_modes,recovery,source_trace
-wlt_client_wallet_flow,client,wallet_open,wallet_view->topup->pay,settled,wlt_wallet_get|wlt_payment_create,payment_failed,retry_or_support,docs/services/wlt/07_OPERATION_CATALOG.csv
-wlt_partner_captain_field_settlement,partner|captain|field,earning_event,earnings_view->payout_request->finance_review,settled,wlt_partner_settlement_get|wlt_partner_payout_request|wlt_captain_earnings_get|wlt_captain_payout_request|wlt_field_collection_get|wlt_field_settlement_submit|wlt_finance_review,settlement_delay,finance_followup,docs/services/wlt/07_OPERATION_CATALOG.csv
-wlt_control_finance_ops,ops|finance,finance_queue,review->approve->reconcile,closed,wlt_finance_review|wlt_finance_approve,mismatch,manual_reconcile,docs/services/wlt/07_OPERATION_CATALOG.csv

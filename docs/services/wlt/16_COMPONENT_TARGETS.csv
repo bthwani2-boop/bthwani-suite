@@ -1,7 +1,0 @@
-screen_id,component_name,target_component_path,shared_or_local,depends_on_ui_kit,owner,status
-SCR_1,wlt_app_client_hub,packages/surfaces/src/wlt,shared_first,yes,packages/surfaces,seeded_locked
-SCR_2,wlt_app_partner_hub,packages/surfaces/src/wlt,shared_first,yes,packages/surfaces,seeded_locked
-SCR_3,wlt_app_captain_hub,packages/surfaces/src/wlt,shared_first,yes,packages/surfaces,seeded_locked
-SCR_4,wlt_app_field_hub,packages/surfaces/src/wlt,shared_first,yes,packages/surfaces,seeded_locked
-SCR_5,wlt_control_finance_hub,packages/surfaces/src/wlt,shared_first,yes,packages/surfaces,seeded_locked
-SCR_10,wlt_finance_review,packages/surfaces/src/wlt,shared_first,yes,packages/surfaces,seeded_locked

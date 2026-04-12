@@ -1,7 +1,0 @@
-status,legal_gate,closed_at,service,screen_id,screen_name,loading_state,disabled_state,validation_error_state,empty_state,offline_state,retry_state,success_state,notes
-CLOSED,PRE_SCREEN,2026-04-08,dsh,SCR_W1_001,dsh_entry_screen,required,optional,not_applicable,required,optional,optional,not_applicable,entry covers base loading and empty states only
-CLOSED,PRE_SCREEN,2026-04-08,dsh,SCR_W1_002,dsh_create_order_screen,required,required,required,not_applicable,optional,optional,not_applicable,form validation state and disabled/submit lock are mandatory
-CLOSED,PRE_SCREEN,2026-04-08,dsh,SCR_W1_003,dsh_review_order_screen,required,optional,not_applicable,required,optional,optional,not_applicable,compact review blocks with submit and edit actions
-CLOSED,PRE_SCREEN,2026-04-08,dsh,SCR_W1_004,dsh_order_success_state,not_applicable,optional,not_applicable,not_applicable,not_applicable,not_applicable,required,success remains lightweight state not heavy route
-CLOSED,PRE_SCREEN,2026-04-08,dsh,SCR_W1_005,dsh_tracking_screen,required,optional,not_applicable,not_applicable,optional,required,not_applicable,delayed no-captain error retry and support paths are required
-CLOSED,PRE_SCREEN,2026-04-08,dsh,SCR_W1_006,dsh_orders_list_screen,required,optional,not_applicable,required,optional,optional,not_applicable,new user empty state and returning list pattern

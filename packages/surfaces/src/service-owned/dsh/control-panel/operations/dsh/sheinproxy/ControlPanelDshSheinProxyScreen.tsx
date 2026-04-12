@@ -1,12 +1,11 @@
-﻿import {
-  useDshControlPanelText } from '../shared/dshControlPanelText';
-'use client';
+﻿'use client';
+
+import { useDshControlPanelText } from '../shared/dshControlPanelText';
 
 import React from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'next/navigation';
-import { useDirection
-} from '@bthwani/ui-kit';
+import { useDirection } from '@bthwani/ui-kit';
 import {
   BthBadge,
   BthBox,

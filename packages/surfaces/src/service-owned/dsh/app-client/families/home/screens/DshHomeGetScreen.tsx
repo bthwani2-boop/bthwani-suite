@@ -24,17 +24,25 @@ import {
   HomeBannerCarousel,
   type HomeBannerCarouselItem,
 } from '../components/HomeBannerCarousel';
+import { dshCategoryFixtures } from '../../categories/fixtures/dshCategoriesFixtures';
 
 export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
+  categories?: DshHomeCategory[];
   promos?: DshHomeGetPromo[];
   stores?: DshHomeGetStore[];
   onBack?: () => void;
   onOpenList?: () => void;
+  onOpenCategory?: (categoryId: string) => void;
   onOpenFavorites?: () => void;
   onOpenSearch?: () => void;
   onOpenStore?: (storeId: string) => void;
   onRetry?: () => void;
+};
+
+export type DshHomeCategory = {
+  id: string;
+  label: string;
 };
 
 type DiscoveryFilter = 'all' | 'favorites' | 'nearest' | 'new' | 'offers';
@@ -75,6 +83,21 @@ const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; iconName:
   { value: 'new', label: 'الجديدة', iconName: 'sparkles-outline' },
   { value: 'offers', label: 'العروض', iconName: 'pricetag-outline' },
 ];
+
+const categoryIconMap: Record<string, string> = {
+  restaurants: '🍽️',
+  grocery: '🛒',
+  sweets_juices: '🍨',
+  anaqati: '✨',
+  bthwani_store: '🏪',
+  home_projects: '🏠',
+  awnak: '🧭',
+  gas_refill: '⛽',
+  shein: '🛍️',
+  spare_parts: '🔧',
+  honey_dates: '🍯',
+  electronics: '📱',
+};
 
 function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>, 'ready'>, onRetry?: () => void) {
   if (state === 'loading') {
@@ -122,10 +145,12 @@ function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>,
 
 export function DshHomeGetScreen({
   state = 'ready',
+  categories,
   promos = dshHomeGetFixturePromos,
   stores = dshHomeGetFixtureStores,
   onBack,
   onOpenList,
+  onOpenCategory,
   onOpenFavorites,
   onOpenSearch,
   onOpenStore,
@@ -134,10 +159,21 @@ export function DshHomeGetScreen({
   const { direction } = useDirection();
   const { theme } = useTheme();
   const [activeFilter, setActiveFilter] = React.useState<DiscoveryFilter>('all');
+  const [activeCategoryId, setActiveCategoryId] = React.useState<string>('restaurants');
   const [activePromoIndex, setActivePromoIndex] = React.useState(0);
   const [favoriteToggles, setFavoriteToggles] = React.useState<Record<string, boolean>>({});
   const [followToggles, setFollowToggles] = React.useState<Record<string, boolean>>({});
   const [followCounts, setFollowCounts] = React.useState<Record<string, number>>({});
+  const categoryItems = React.useMemo(() => {
+    if (categories?.length) {
+      return categories;
+    }
+
+    return dshCategoryFixtures.slice(0, 6).map((category) => ({
+      id: category.id,
+      label: category.label,
+    }));
+  }, [categories]);
 
   React.useEffect(() => {
     if (promos.length <= 1) {
@@ -241,6 +277,51 @@ export function DshHomeGetScreen({
           </View>
         </View>
       </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.categoryRail,
+          direction === 'rtl' && styles.categoryRailRtl,
+        ]}
+      >
+        {categoryItems.map((category) => {
+          const isActive = category.id === activeCategoryId;
+          const icon = categoryIconMap[category.id] ?? '📂';
+
+          return (
+            <Pressable
+              key={category.id}
+              style={[
+                styles.categoryRailItem,
+                isActive && styles.categoryRailItemActive,
+              ]}
+              onPress={() => {
+                setActiveCategoryId(category.id);
+                if (onOpenCategory) {
+                  onOpenCategory(category.id);
+                  return;
+                }
+
+                onOpenList?.();
+              }}
+            >
+              <Text style={styles.categoryRailIcon}>{icon}</Text>
+              <BthText
+                role="bodySm"
+                style={[
+                  styles.categoryRailLabel,
+                  isActive && styles.categoryRailLabelActive,
+                ]}
+                numberOfLines={1}
+              >
+                {category.label}
+              </BthText>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
 
       <ScrollView
         horizontal
@@ -441,6 +522,44 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 26,
     lineHeight: 24,
+  },
+  categoryRail: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: spacing[2],
+    paddingTop: spacing[1],
+    paddingBottom: spacing[1],
+  },
+  categoryRailRtl: {
+    direction: 'rtl',
+  },
+  categoryRailItem: {
+    minHeight: 42,
+    borderRadius: radius.pill,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#E6EAF1',
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[1],
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 6,
+  },
+  categoryRailItemActive: {
+    backgroundColor: '#FFF4E9',
+    borderColor: '#FF6A00',
+  },
+  categoryRailIcon: {
+    fontSize: 14,
+  },
+  categoryRailLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#4B5563',
+  },
+  categoryRailLabelActive: {
+    color: '#C2410C',
   },
   heroPagerRow: {
     alignItems: 'center',

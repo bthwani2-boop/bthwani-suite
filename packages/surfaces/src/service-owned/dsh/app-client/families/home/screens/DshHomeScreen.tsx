@@ -1,5 +1,5 @@
 import React from 'react';
-import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './DshHomeGetScreen';
+import { DshHomeGetScreen, type DshHomeCategory, type DshHomeGetPromo, type DshHomeGetStore } from './DshHomeGetScreen';
 import { dshCategoryFixtures } from '../../categories/fixtures/dshCategoriesFixtures';
 
 export type DshHomeScreenState =
@@ -8,11 +8,6 @@ export type DshHomeScreenState =
   | 'empty'
   | 'offline'
   | 'error';
-
-export type DshHomeCategory = {
-  id: string;
-  label: string;
-};
 
 export type DshHomeStore = {
   id: string;
@@ -150,10 +145,11 @@ export function DshHomeScreen({
 }: DshHomeScreenProps) {
   return (
     <DshHomeGetScreen
+      categories={categories}
       state={state}
       promos={toDiscoveryPromos(promos)}
       stores={toDiscoveryStores(featuredStores)}
-      onOpenList={() => onOpenCategory?.(categories[0]?.id ?? 'all')}
+      onOpenCategory={onOpenCategory}
       onOpenFavorites={() => onOpenCategory?.('favorites')}
       onOpenSearch={onOpenSearch}
       onOpenStore={onOpenStore}

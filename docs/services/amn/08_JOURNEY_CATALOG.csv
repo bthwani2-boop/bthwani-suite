@@ -1,4 +1,0 @@
-"journey_id","actor","entry","steps","exit","related_operations","failure_modes","recovery","source_trace"
-"AMN_passenger_create_trip","passenger","trip create","estimate->quote->trip_create->trip_assign->trip_activate","in_progress","amn_estimate_create|amn_trip_quote_create|amn_trip_create|amn_trip_assign|amn_trip_activate","captain_unavailable","retry_with_new_search","services/amn/governance/AMN_OPERATION_CATALOG.csv"
-"AMN_captain_execute_trip","captain","assigned_trip","trip_verify->trip_status_update->trip_complete","completed","amn_trip_verify|amn_trip_status_update|amn_trip_complete","verification_failed","reverify_and_resume","services/amn/governance/operations/*"
-"AMN_post_trip_quality","passenger|ops","trip_completed","trip_receipt_get->trip_rate->trip_report","quality_logged","amn_trip_receipt_get|amn_trip_rate|amn_trip_report","late_report","support_followup","services/amn/governance/AMN_COVERAGE_MATRIX.csv"

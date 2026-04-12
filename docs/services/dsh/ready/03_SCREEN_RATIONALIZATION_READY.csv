@@ -1,3 +1,0 @@
-screen_id,decision,reason,status_label,phase_scope
-SCR_W1_001,baseline_only,entry baseline and not first executable,READY_UI_UX_FLOW,UI_UX_FLOW_ONLY
-SCR_82,first_executable,deterministic queue and highest current-phase leverage,READY_UI_UX_FLOW,UI_UX_FLOW_ONLY

@@ -1,7 +1,0 @@
-screen_id,viewmodel_id,hook_or_controller_name,target_package_or_app,api_client_needed,read_models,write_actions,error_normalization_required,status
-SCR_1,vm_wlt_app_client_hub,use_wlt_app_client_hub,packages/surfaces,yes,wlt read models,operation-bound actions,yes,seeded_locked
-SCR_2,vm_wlt_app_partner_hub,use_wlt_app_partner_hub,packages/surfaces,yes,wlt read models,operation-bound actions,yes,seeded_locked
-SCR_3,vm_wlt_app_captain_hub,use_wlt_app_captain_hub,packages/surfaces,yes,wlt read models,operation-bound actions,yes,seeded_locked
-SCR_4,vm_wlt_app_field_hub,use_wlt_app_field_hub,packages/surfaces,yes,wlt read models,operation-bound actions,yes,seeded_locked
-SCR_5,vm_wlt_control_finance_hub,use_wlt_control_finance_hub,packages/surfaces,yes,wlt read models,operation-bound actions,yes,seeded_locked
-SCR_10,vm_wlt_finance_review,use_wlt_finance_review,packages/surfaces,yes,wlt read models,operation-bound actions,yes,seeded_locked

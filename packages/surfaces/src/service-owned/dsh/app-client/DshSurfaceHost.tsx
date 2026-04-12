@@ -1022,6 +1022,10 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
       stores={dshHomeGetFixtureStores as DshHomeGetStore[]}
       onBack={onExit}
       onOpenList={() => setRoute('categories-list')}
+      onOpenCategory={(categoryId) => {
+        setItemsCategory(categoryId);
+        setRoute('category-get');
+      }}
       onOpenFavorites={() => setRoute('favorites-list')}
       onOpenSearch={() => setRoute('search')}
       onOpenStore={(storeId) => {

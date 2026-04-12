@@ -1,5 +1,0 @@
-"journey_id","actor","entry","steps","exit","related_operations","failure_modes","recovery","source_trace"
-"arb_client_booking_flow","client","booking_create","booking_create->booking_list->booking_update","pending_partner_action","arb_booking_create|arb_booking_list|arb_booking_update","invalid_booking_input","correct_and_resubmit","services/arb/governance/ARB_OPERATION_CATALOG.csv"
-"arb_partner_booking_execution","partner","booking_assign","booking_assign->booking_accept->booking_activate->booking_approve->booking_verify->booking_complete","completed","arb_booking_assign|arb_booking_accept|arb_booking_activate|arb_booking_approve|arb_booking_verify|arb_booking_complete","verification_failed","reverify_and_resume","services/arb/governance/operations/*"
-"arb_support_quality_cycle","client|ops|support|finance","booking_complete_or_dispute","booking_rate->amendment_create->support_review","closed_or_escalated","arb_booking_rate|arb_amendment_create","late_dispute","support_followup","services/arb/governance/ARB_CONTROL_PANEL_SECTION_MAP.csv"
-

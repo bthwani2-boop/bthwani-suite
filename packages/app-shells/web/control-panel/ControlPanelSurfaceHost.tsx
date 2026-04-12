@@ -68,7 +68,7 @@ const sectionRouteMap: Record<ControlPanelSectionId, PrimarySectionHref> = {
 };
 
 function getServiceLabel(uiText: ReturnType<typeof useUiText>, serviceId: string) {
-  const serviceNames = uiText?.serviceNames ?? {};
+  const serviceNames = (uiText as unknown as { serviceNames?: Record<string, string> }).serviceNames ?? {};
   return serviceNames[serviceId as keyof typeof serviceNames] ?? serviceId.toUpperCase();
 }
 
@@ -158,7 +158,7 @@ function resolveFallbackMission(activeSectionLabel: string, panelText: ControlPa
 
 function resolvePrimaryAction(activeSectionId: ControlPanelSectionId, panelText: ControlPanelText) {
   if (activeSectionId === 'operations') {
-    return { label: panelText.ui.secondaryActionOps, href: '/operations/dsh' };
+    return { label: panelText.ui.primaryAction, href: '/operations/dsh' };
   }
 
   return { label: panelText.ui.primaryAction, href: '/finance' };

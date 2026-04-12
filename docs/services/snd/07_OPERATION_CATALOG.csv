@@ -1,5 +1,0 @@
-operation_id,canonical_name,owner,actors,surfaces,operation_type,trigger,state_effect,classification,source_trace
-snd_requests_list,snd_requests_list,services/snd,client,app-client,READ,query_or_screen_load,read_only,snd_catalog:read,services/snd/governance/SND_OPERATION_CATALOG.csv
-snd_request_create,snd_request_create,services/snd,client,app-client,MUTATION,primary_cta_or_workflow_step,state_mutation,snd_catalog:mutation,services/snd/governance/SND_OPERATION_CATALOG.csv
-snd_request_status_update,snd_request_status_update,services/snd,client,app-client,MUTATION,primary_cta_or_workflow_step,state_mutation,snd_catalog:mutation,services/snd/governance/SND_OPERATION_CATALOG.csv
-snd_sync_catalog,snd_sync_catalog,services/snd,ops|catalog,control-panel,MUTATION,primary_cta_or_workflow_step,state_mutation,snd_catalog:mutation,docs/services/snd/06_SURFACE_CLASSIFICATION.md

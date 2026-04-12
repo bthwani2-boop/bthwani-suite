@@ -1,5 +1,0 @@
-"screen_or_wave_id","required_token_group","required_layout_primitives","required_cards","required_inputs","required_feedback_patterns","required_navigation_patterns","required_sheet_modal_patterns","required_state_shells","missing_now","must_build_before_screen","status"
-"W01_FIRST_ACTIVE_BUNDLE","spacing|color|type","stack|row|grid","info|status|action","text|select|otp","toast|banner|inline_error","tabs|stack_nav","sheet|confirm_modal","loading|empty|error|offline","","true","ready"
-"W02_CLIENT_TRIP_FLOW","spacing|color|type","stack|row|grid","info|status|action","text|select|otp","toast|banner|inline_error","tabs|stack_nav","sheet|confirm_modal","loading|empty|error|offline","","true","ready"
-"W03_CONTROL_PANEL_CORE","spacing|color|type","stack|row|grid","info|status|action","text|select|otp","toast|banner|inline_error","tabs|stack_nav","sheet|confirm_modal","loading|empty|error|offline","","true","ready"
-"W04_SUPPORT_AND_MODERATION","spacing|color|type","stack|row|grid","info|status|action","text|select|otp","toast|banner|inline_error","tabs|stack_nav","sheet|confirm_modal","loading|empty|error|offline","","true","ready"

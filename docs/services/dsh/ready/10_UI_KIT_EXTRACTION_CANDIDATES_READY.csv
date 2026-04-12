@@ -1,3 +1,0 @@
-candidate_id,source_screen_or_family,candidate_type,why,status_label,next_phase_consumer
-UIKIT_DSH_CARD_SUMMARY,dsh_cart_get + app-client operation screens,pattern,shared card summary law expected across wave screens,READY_UI_UX_FLOW,ui-kit refinement phase
-UIKIT_DSH_STATE_COPY,dsh_cart_get,state-content,consistent state microcopy and hierarchy for dsh,READY_UI_UX_FLOW,ui-kit/state quality phase

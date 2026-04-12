@@ -1,2 +1,0 @@
-status,legal_gate,closed_at,service,queue_source,first_item,notes
-CLOSED,PRE_SCREEN,2026-04-08,dsh,13_BUILD_QUEUE.csv,dsh_entry_screen,Build queue locked for wave 1 first-screen start
