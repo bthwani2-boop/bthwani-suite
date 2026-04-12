@@ -1,3 +1,4 @@
+export * from './surface-owned';
 export * as dsh from './service-owned/dsh';
 export * as knz from './service-owned/knz';
 export * as amn from './service-owned/amn';

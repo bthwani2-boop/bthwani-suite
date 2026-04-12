@@ -1,5 +1,11 @@
 export * from './surface-meta';
 export * from './surface-catalog';
+export { familyMeta as ClientEntryMeta } from './client-entry/family.meta';
+export { familyMeta as ClientHubMeta } from './client-hub/family.meta';
+export { familyMeta as ClientAccountMeta } from './client-account/family.meta';
+export { familyMeta as ClientSettingsMeta } from './client-settings/family.meta';
+export { familyMeta as ClientNotificationsMeta } from './client-notifications/family.meta';
+export { familyMeta as ClientSupportMeta } from './client-support/family.meta';
 export * as ClientEntry from './client-entry';
 export * as ClientHub from './client-hub';
 export * as ClientAccount from './client-account';
