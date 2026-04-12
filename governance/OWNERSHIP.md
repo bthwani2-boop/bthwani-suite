@@ -17,6 +17,39 @@
 Ownership is explicit by domain and decision right.
 Until a human maintainer roster is recorded, the repo uses single-role ownership by artifact boundary.
 
+## Surface Owned vs Service Owned Rule
+
+The default home for reusable app-wide truth is `surface-owned`.
+A `service-owned` counterpart is allowed only when the item carries service-specific data, rules, permissions, states, flows, or behavior that cannot be generalized without duplication, noise, or ownership breakage.
+
+### Use `surface-owned` when
+
+- the item is valid across more than one service as-is
+- the item does not depend on service-specific data
+- the item does not enforce service-specific rules
+- the item does not change behavior by service
+- the item acts as an app shell, app entry, global hub, global account, global notifications, global settings, or global support surface
+
+### Use `service-owned` when
+
+- the item is tied to one or more services in a specific way
+- the item reads or writes service data
+- the item applies service-specific rules or permissions
+- the item has service-specific operational states
+- the item includes a flow, behavior, or interface that has no meaning outside that service
+- the item's shape, logic, or states differ from one service to another
+
+### Fast decision test
+
+- If every service were removed, would this item still have a meaningful app-wide purpose? If yes, keep it in `surface-owned`.
+- Does the item change materially by service? If yes, place it in `service-owned`.
+- Does the item own service data, rules, or states? If yes, place it in `service-owned`.
+
+### Global boundary rule
+
+`surface-owned` may host a global entry point, global aggregation, badge/count, or navigation handoff toward a service-specific feature.
+It may not own the service screen itself, its data, its flow, or its service-specific behavior.
+
 ## Canonical Ownership Boundaries
 
 - `governance/` owner: repo governance owner

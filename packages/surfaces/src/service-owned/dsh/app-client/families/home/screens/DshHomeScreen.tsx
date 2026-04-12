@@ -1,5 +1,5 @@
 import React from 'react';
-import { DshHomeGetScreen, type DshHomeCategory, type DshHomeGetPromo, type DshHomeGetStore } from './DshHomeGetScreen';
+import { DshHomeGetScreen, type DshHomeCategory, type DshHomeGetPromo, type DshHomeGetStore, type DshHomeRecentOrder } from './DshHomeGetScreen';
 import { dshCategoryFixtures } from '../../categories/fixtures/dshCategoriesFixtures';
 
 export type DshHomeScreenState =
@@ -105,6 +105,17 @@ const defaultStores: DshHomeStore[] = [
   },
 ];
 
+function toRecentOrders(featuredStores: DshHomeStore[]): DshHomeRecentOrder[] {
+  return featuredStores.slice(0, 3).map((store, index) => ({
+    id: `recent-${store.id}`,
+    storeId: store.id,
+    title: index === 0 ? 'آخر طلب مكتمل' : 'إعادة الطلب بسرعة',
+    subtitle: store.name,
+    meta: `${store.meta} · ${store.etaMinutes} دقيقة`,
+    statusLabel: store.hasOffer ? 'متاح الآن' : 'جاهز للطلب',
+  }));
+}
+
 function toDiscoveryPromos(promos: DshHomePromo[]): DshHomeGetPromo[] {
   return promos.map((promo, index) => ({
     id: promo.id,
@@ -167,6 +178,7 @@ export function DshHomeScreen({
       state={state}
       promos={toDiscoveryPromos(promos)}
       stores={toDiscoveryStores(featuredStores)}
+      recentOrders={toRecentOrders(featuredStores)}
       onOpenCategory={onOpenCategory}
       onOpenStoresList={onOpenStoresList ?? onOpenDiscovery}
       onOpenStoreCategory={onOpenStoreCategory}

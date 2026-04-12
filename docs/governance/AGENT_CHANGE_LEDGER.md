@@ -60,6 +60,49 @@ Copy this block for every accepted update.
 
 ## Active Entries
 
+### AGENT-2026-04-12-001
+
+- Date: 2026-04-12
+- Author: GitHub Copilot
+- Files changed: `governance/OWNERSHIP.md`, `docs/governance/AGENT_CHANGE_LEDGER.md`
+- Change type: `scope-tightening`
+
+#### AGENT-2026-04-12-001 Rationale
+
+- Trigger: The repo needed one explicit governing rule to resolve `surface-owned` versus `service-owned` placement without repeated interpretation.
+- Observed problem: The ownership docs already named the boundaries, but they did not yet include a concise decision matrix for app-wide versus service-specific artifacts.
+- Why existing rules were insufficient: The current ownership language described who owns which area, but not the exact test for classifying shared app surfaces versus service-owned surfaces.
+
+#### AGENT-2026-04-12-001 Change Summary
+
+- Added: a dedicated `surface-owned` vs `service-owned` rule, a fast decision test, and a global boundary rule inside `governance/OWNERSHIP.md`.
+- Updated: the governance ledger to record the rule addition.
+- Removed: nothing.
+
+#### AGENT-2026-04-12-001 Safety Checks
+
+- Duplicate-rule check: `PASS`
+- Contradiction check: `PASS`
+- Scope expansion check: `PASS`
+- Noise check: `PASS`
+- Minimal-patch check: `PASS`
+
+#### AGENT-2026-04-12-001 Expected Effect
+
+- What failure or ambiguity this change should prevent: repeated debates about whether app-wide account, notifications, settings, support, or shell behavior belongs in `surface-owned` or `service-owned`.
+- What behavior becomes stricter or clearer: reusable app-wide truth now defaults to `surface-owned`, while service-specific truth must justify a separate `service-owned` home.
+
+#### AGENT-2026-04-12-001 Verification
+
+- Validation method: manual governance review of the updated markdown structure and rule placement.
+- Result: `PASS`
+- Residual risk or [TBD]: future rules may still need matching updates in other governance files if a new exception surface is formally introduced.
+
+#### AGENT-2026-04-12-001 Rollback
+
+- Safe rollback path: remove the new section from `governance/OWNERSHIP.md` and delete this ledger entry.
+- When rollback should be considered: if the rule is later duplicated in a stronger canonical location or if a contradiction emerges with a future ownership policy.
+
 ### AGENT-2026-04-11-002
 
 - Date: 2026-04-11

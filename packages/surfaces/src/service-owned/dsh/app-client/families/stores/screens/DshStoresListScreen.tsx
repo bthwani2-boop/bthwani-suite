@@ -9,7 +9,10 @@ import {
   BthSurface,
   BthTabs,
   BthText,
+  useDirection,
 } from '@bthwani/ui-kit';
+import { Ionicons } from '@expo/vector-icons';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { StoreCardPremium, type DshStoreCompactCardData } from '../../home/components/StoreCardPremium';
 
 export type DshStoreListItem = {
@@ -87,9 +90,11 @@ export function DshStoresListScreen({
   onOpenFavorites,
   onRetry,
 }: DshStoresListScreenProps) {
+  const { direction } = useDirection();
   const [favoriteToggles, setFavoriteToggles] = React.useState<Record<string, boolean>>({});
   const [followToggles, setFollowToggles] = React.useState<Record<string, boolean>>({});
   const [followCounts, setFollowCounts] = React.useState<Record<string, number>>({});
+  const [bannerSearchVisible, setBannerSearchVisible] = React.useState(false);
 
   const filteredByMode = React.useMemo(() => {
     return items.filter((item) => {
@@ -161,20 +166,60 @@ export function DshStoresListScreen({
 
   return (
     <BthMobileScrollView padding={4} gap={3}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">Stores discovery</BthText>
-        <BthText role="bodySm" tone="muted">
-          Keep store selection compact and one-tap to details.
-        </BthText>
-      </BthBox>
+      <View style={styles.discoveryHeaderCard}>
+        <View style={[styles.discoveryHeaderRow, direction === 'rtl' && styles.rowReverse]}>
+          <View style={[styles.discoveryHeaderActions, direction === 'rtl' && styles.rowReverse]}>
+            <Pressable style={styles.discoveryHeaderIconButton} onPress={() => setBannerSearchVisible((current) => !current)}>
+              <Ionicons name="search-outline" size={18} color="#ffffff" />
+            </Pressable>
+            <Pressable style={styles.discoveryHeaderIconButton} onPress={onOpenFavorites}>
+              <Ionicons name="heart-outline" size={18} color="#ffffff" />
+            </Pressable>
+            <Pressable style={styles.discoveryHeaderIconButton}>
+              <Ionicons name="notifications-outline" size={18} color="#ffffff" />
+            </Pressable>
+            <Pressable style={styles.discoveryHeaderIconButton}>
+              <Ionicons name="time-outline" size={18} color="#ffffff" />
+            </Pressable>
+          </View>
+
+          <View style={[styles.discoveryHeaderTextWrap, direction === 'rtl' && styles.discoveryHeaderTextWrapRtl]}>
+            <BthText role="titleSm" style={styles.discoveryHeaderTitle}>بواني تحقق الأماني</BthText>
+            <BthText role="bodySm" style={styles.discoveryHeaderSubtitle}>المساحة مخصصة للشريط الإخباري</BthText>
+          </View>
+        </View>
+
+        <View style={[styles.discoveryHeaderChipsRow, direction === 'rtl' && styles.rowReverse]}>
+          <View style={styles.discoveryHeaderChipPrimary}>
+            <BthText role="bodySm" style={styles.discoveryHeaderChipPrimaryText} numberOfLines={1}>
+              مطعم القمة · توصيل مجاني
+            </BthText>
+          </View>
+          <View style={styles.discoveryHeaderChipAccent}>
+            <BthText role="bodySm" style={styles.discoveryHeaderChipAccentText} numberOfLines={1}>
+              قائمة المتاجر · %30
+            </BthText>
+          </View>
+          <View style={styles.discoveryHeaderChipMuted}>
+            <BthText role="bodySm" style={styles.discoveryHeaderChipMutedText} numberOfLines={1}>
+              توصيل برو
+            </BthText>
+          </View>
+        </View>
+      </View>
+
+      {bannerSearchVisible ? (
+        <BthSurface tone="inset" gap={3}>
+          <BthSearchField
+            label="Find store"
+            value={query}
+            onChangeText={onQueryChange}
+            hint="Search by store name or category subtitle."
+          />
+        </BthSurface>
+      ) : null}
 
       <BthSurface tone="inset" gap={3}>
-        <BthSearchField
-          label="Find store"
-          value={query}
-          onChangeText={onQueryChange}
-          hint="Search by store name or category subtitle."
-        />
         <BthTabs
           items={[
             { value: 'all', label: 'All' },
@@ -228,3 +273,108 @@ export function DshStoresListScreen({
     </BthMobileScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  rowReverse: {
+    flexDirection: 'row-reverse',
+  },
+  discoveryHeaderCard: {
+    backgroundColor: '#ff6a00',
+    borderRadius: 28,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    gap: 10,
+    shadowColor: '#000000',
+    shadowOpacity: 0.16,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
+  },
+  discoveryHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  discoveryHeaderActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  discoveryHeaderIconButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  discoveryHeaderTextWrap: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  discoveryHeaderTextWrapRtl: {
+    alignItems: 'flex-start',
+  },
+  discoveryHeaderTitle: {
+    color: '#ffffff',
+    fontWeight: '800',
+    fontSize: 13,
+    lineHeight: 16,
+  },
+  discoveryHeaderSubtitle: {
+    color: 'rgba(255,255,255,0.88)',
+    fontSize: 11,
+    lineHeight: 14,
+    marginTop: 2,
+  },
+  discoveryHeaderChipsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  discoveryHeaderChipPrimary: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#ffffff',
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  discoveryHeaderChipPrimaryText: {
+    color: '#ff6a00',
+    fontSize: 11,
+    fontWeight: '800',
+    textAlign: 'right',
+  },
+  discoveryHeaderChipAccent: {
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    minWidth: 94,
+  },
+  discoveryHeaderChipAccentText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  discoveryHeaderChipMuted: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.16)',
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  discoveryHeaderChipMutedText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+});

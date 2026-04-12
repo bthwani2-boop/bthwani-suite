@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   BthBox,
   BthMobileScrollView,
@@ -31,6 +31,7 @@ export type DshHomeGetScreenProps = {
   categories?: DshHomeCategory[];
   promos?: DshHomeGetPromo[];
   stores?: DshHomeGetStore[];
+  recentOrders?: DshHomeRecentOrder[];
   onBack?: () => void;
   onOpenList?: () => void;
   onOpenCategory?: (categoryId: string) => void;
@@ -44,6 +45,13 @@ export type DshHomeGetScreenProps = {
   onOpenTracking?: () => void;
   onOpenStore?: (storeId: string) => void;
   onRetry?: () => void;
+};
+
+type HomeShortItem = {
+  id: string;
+  title: string;
+  subtitle: string;
+  tone: 'promo' | 'store' | 'tracking';
 };
 
 export type DshHomeCategory = {
@@ -85,6 +93,15 @@ export type DshHomeGetStore = {
   isFavorite: boolean;
   isFollowing: boolean;
   hasOffer?: boolean;
+};
+
+export type DshHomeRecentOrder = {
+  id: string;
+  storeId: string;
+  title: string;
+  subtitle: string;
+  meta: string;
+  statusLabel: string;
 };
 
 const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; iconName: React.ComponentProps<typeof Ionicons>['name'] }> = [
@@ -159,6 +176,7 @@ export function DshHomeGetScreen({
   categories,
   promos = dshHomeGetFixturePromos,
   stores = dshHomeGetFixtureStores,
+  recentOrders = [],
   onBack,
   onOpenList,
   onOpenCategory,
@@ -181,6 +199,7 @@ export function DshHomeGetScreen({
   const [favoriteToggles, setFavoriteToggles] = React.useState<Record<string, boolean>>({});
   const [followToggles, setFollowToggles] = React.useState<Record<string, boolean>>({});
   const [followCounts, setFollowCounts] = React.useState<Record<string, number>>({});
+  const [shortsVisible, setShortsVisible] = React.useState(false);
   const categoryItems = React.useMemo(() => {
     if (categories?.length) {
       return categories;
@@ -318,13 +337,30 @@ export function DshHomeGetScreen({
   const promoDiscount = activePromo.subtitle.match(/\d+%/)?.[0] ?? '30%';
   const promoTail = activePromo.subtitle.replace(promoDiscount, '').trim();
   const primaryStore = stores[0] ?? null;
-  const tickerFacts = React.useMemo(
+  const homeShorts = React.useMemo<HomeShortItem[]>(
     () => [
-      primaryStore ? `${primaryStore.name} · ${primaryStore.deliveryLabel}` : 'أقرب متجر متاح الآن',
-      activePromo.title ? `${activePromo.title} · ${promoDiscount}` : promoDiscount,
-      primaryStore ? `${primaryStore.serviceLabel} · ${primaryStore.distanceLabel}` : 'توصيل سريع',
-    ],
-    [activePromo.title, primaryStore, promoDiscount]
+      {
+        id: 'short-promo',
+        title: activePromo.title,
+        subtitle: activePromo.subtitle,
+        tone: 'promo',
+      },
+      primaryStore
+        ? {
+            id: 'short-store',
+            title: primaryStore.name,
+            subtitle: `${primaryStore.deliveryLabel} · ${primaryStore.serviceLabel}`,
+            tone: 'store',
+          }
+        : null,
+      {
+        id: 'short-tracking',
+        title: 'تتبع الطلب',
+        subtitle: 'انتقل إلى الطلب النشط أو الطلبات الأخيرة',
+        tone: 'tracking',
+      },
+    ].filter(Boolean) as HomeShortItem[],
+    [activePromo.subtitle, activePromo.title, primaryStore]
   );
   const bannerItems: HomeBannerCarouselItem[] = promos.map((promo) => ({
     id: promo.id,
@@ -337,51 +373,6 @@ export function DshHomeGetScreen({
 
   return (
     <BthMobileScrollView padding={4} gap={4}>
-      <View style={styles.homeTopBar}>
-        <View style={[styles.homeTopBarRow, direction === 'rtl' && styles.homeTopBarRowRtl]}>
-          <View style={[styles.homeTopBarActions, direction === 'rtl' && styles.homeTopBarActionsRtl]}>
-            <Pressable style={styles.homeTopIconButton} onPress={onOpenSearch}>
-              <Ionicons name="search-outline" size={18} color={theme.textInverse} />
-            </Pressable>
-            <Pressable style={styles.homeTopIconButton} onPress={onOpenFavorites}>
-              <Ionicons name="heart-outline" size={18} color={theme.textInverse} />
-            </Pressable>
-            <Pressable style={styles.homeTopIconButton} onPress={onOpenOrders}>
-              <Ionicons name="notifications-outline" size={18} color={theme.textInverse} />
-            </Pressable>
-            <Pressable style={styles.homeTopIconButton} onPress={onOpenTracking}>
-              <Ionicons name="time-outline" size={18} color={theme.textInverse} />
-            </Pressable>
-          </View>
-
-          <View style={[styles.homeTopTitleWrap, direction === 'rtl' && styles.homeTopTitleWrapRtl]}>
-            <BthText role="titleSm" style={styles.homeTopTitle}>بواني تحقق الأماني</BthText>
-            <BthText role="bodySm" style={styles.homeTopSubtitle}>المساحة مخصصة للشريط الإخباري</BthText>
-          </View>
-        </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[styles.homeTickerRow, direction === 'rtl' && styles.homeTickerRowRtl]}
-        >
-          {tickerFacts.map((fact, index) => (
-            <Pressable
-              key={`${fact}-${index}`}
-              style={[
-                styles.homeTickerChip,
-                index === 0 && styles.homeTickerChipAccent,
-              ]}
-              onPress={index === 0 && primaryStore && onOpenStore ? () => onOpenStore(primaryStore.id) : index === 2 ? onOpenTracking : undefined}
-            >
-              <BthText role="bodySm" style={[styles.homeTickerChipText, index === 0 && styles.homeTickerChipTextAccent]} numberOfLines={1}>
-                {fact}
-              </BthText>
-            </Pressable>
-          ))}
-        </ScrollView>
-      </View>
-
       <View style={styles.carouselViewport}>
         <HomeBannerCarousel banners={bannerItems} rtl={direction === 'rtl'} />
       </View>
@@ -423,7 +414,7 @@ export function DshHomeGetScreen({
                 <BthText role="bodySm" style={styles.quickActionLabel}>الفئات</BthText>
               </View>
             </Pressable>
-            <Pressable style={styles.quickActionTertiary} onPress={onOpenSearch}>
+            <Pressable style={styles.quickActionTertiary} onPress={() => setShortsVisible(true)}>
               <View style={styles.quickActionChipContent}>
                 <Ionicons name="videocam-outline" size={15} color="#ffffff" />
                 <BthText role="bodySm" style={styles.quickActionLabel}>فيديو</BthText>
@@ -576,94 +567,341 @@ export function DshHomeGetScreen({
           );
         })}
       </BthBox>
+
+      <Modal visible={shortsVisible} transparent animationType="fade" onRequestClose={() => setShortsVisible(false)}>
+        <Pressable style={styles.shortsOverlay} onPress={() => setShortsVisible(false)}>
+          <Pressable style={styles.shortsPanel} onPress={(event) => event.stopPropagation()}>
+            <View style={styles.shortsHandle} />
+            <View style={styles.shortsHeader}>
+              <BthText role="titleSm" style={styles.shortsTitle}>Shorts DSH</BthText>
+              <Pressable style={styles.shortsCloseButton} onPress={() => setShortsVisible(false)}>
+                <Ionicons name="close" size={18} color="#1f2937" />
+              </Pressable>
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.shortsList}>
+              {homeShorts.map((item) => (
+                <Pressable key={item.id} style={[styles.shortsCard, item.tone === 'promo' && styles.shortsCardPromo, item.tone === 'store' && styles.shortsCardStore, item.tone === 'tracking' && styles.shortsCardTracking]}>
+                  <View style={styles.shortsCardTopRow}>
+                    <View style={styles.shortsPlayBadge}>
+                      <Ionicons name="play" size={14} color="#ffffff" />
+                    </View>
+                    <View style={styles.shortsCardTextWrap}>
+                      <BthText role="bodyMd" style={styles.shortsCardTitle} numberOfLines={1}>{item.title}</BthText>
+                      <BthText role="bodySm" style={styles.shortsCardSubtitle} numberOfLines={2}>{item.subtitle}</BthText>
+                    </View>
+                  </View>
+                  <View style={styles.shortsCardFooter}>
+                    <BthText role="caption" style={styles.shortsCardFooterText}>مشاهدة سريعة</BthText>
+                    <Ionicons name="chevron-forward" size={16} color="#ff6a00" />
+                  </View>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </BthMobileScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  homeTopBar: {
-    backgroundColor: '#ff6a00',
-    borderRadius: 28,
+  activeOrderCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
     paddingHorizontal: 14,
     paddingVertical: 12,
-    gap: 10,
-    shadowColor: '#000000',
-    shadowOpacity: 0.16,
+    gap: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
+    elevation: 2,
   },
-  homeTopBarRow: {
+  activeOrderHeader: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 8,
+  },
+  activeOrderHeaderRtl: {
+    flexDirection: 'row',
+  },
+  activeOrderStatusPill: {
+    backgroundColor: '#eafff6',
+    borderWidth: 1,
+    borderColor: '#45d2a0',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  activeOrderStatusText: {
+    color: '#0f9d66',
+    fontWeight: '800',
+    fontSize: 11,
+  },
+  activeOrderTitle: {
+    color: '#111827',
+    fontWeight: '800',
+    fontSize: 14,
+    flex: 1,
+  },
+  activeOrderMetaRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  activeOrderMetaText: {
+    color: '#6b7280',
+    fontSize: 12,
+    flex: 1,
+    textAlign: 'right',
+  },
+  activeOrderEtaText: {
+    color: '#ff6a00',
+    fontWeight: '800',
+    fontSize: 12,
+  },
+  activeOrderFooterRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  activeOrderAction: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#fff4e9',
+    borderWidth: 1,
+    borderColor: '#ffc38f',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  activeOrderActionText: {
+    color: '#ff6a00',
+    fontWeight: '800',
+    fontSize: 12,
+  },
+  activeOrderStatusLabel: {
+    color: '#6b7280',
+    fontSize: 11,
+  },
+  recentOrdersSection: {
+    gap: 10,
+  },
+  recentOrdersHeader: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  recentOrdersTitle: {
+    color: '#111827',
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  recentOrdersSubtitle: {
+    color: '#6b7280',
+    fontSize: 11,
+    marginTop: 2,
+  },
+  recentOrdersHeaderAction: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: '#f3f4f6',
+  },
+  recentOrdersHeaderActionText: {
+    color: '#374151',
+    fontWeight: '700',
+    fontSize: 11,
+  },
+  recentOrdersRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  recentOrdersRowRtl: {
+    flexDirection: 'row-reverse',
+  },
+  recentOrderCard: {
+    width: 212,
+    backgroundColor: '#ffffff',
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    padding: 14,
+    gap: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
+  },
+  recentOrderCardTop: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  recentOrderBadge: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#fff4e9',
+    borderWidth: 1,
+    borderColor: '#ffc38f',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  recentOrderBadgeText: {
+    color: '#ff6a00',
+    fontWeight: '800',
+    fontSize: 11,
+  },
+  recentOrderTitle: {
+    color: '#111827',
+    fontWeight: '800',
+    fontSize: 13,
+    flex: 1,
+    textAlign: 'right',
+  },
+  recentOrderSubtitle: {
+    color: '#374151',
+    fontWeight: '700',
+    fontSize: 13,
+    textAlign: 'right',
+  },
+  recentOrderMeta: {
+    color: '#6b7280',
+    fontSize: 11,
+    textAlign: 'right',
+  },
+  recentOrderFooter: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  recentOrderStatusPill: {
+    backgroundColor: '#eef2ff',
+    borderWidth: 1,
+    borderColor: '#c7d2fe',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  recentOrderStatusText: {
+    color: '#4f46e5',
+    fontWeight: '700',
+  },
+  recentOrderCTA: {
+    color: '#ff6a00',
+    fontWeight: '800',
+    fontSize: 12,
+  },
+  shortsOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.48)',
+    justifyContent: 'flex-end',
+  },
+  shortsPanel: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 14,
+    paddingTop: 8,
+    paddingBottom: 18,
+    maxHeight: '72%',
+  },
+  shortsHandle: {
+    alignSelf: 'center',
+    width: 44,
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: '#d1d5db',
+    marginBottom: 10,
+  },
+  shortsHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 10,
+    marginBottom: 10,
   },
-  homeTopBarRowRtl: {
-    flexDirection: 'row-reverse',
+  shortsTitle: {
+    color: '#111827',
+    fontWeight: '800',
   },
-  homeTopBarActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  homeTopBarActionsRtl: {
-    flexDirection: 'row-reverse',
-  },
-  homeTopIconButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.16)',
+  shortsCloseButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f3f4f6',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  homeTopTitleWrap: {
+  shortsList: {
+    gap: 10,
+    paddingBottom: 10,
+  },
+  shortsCard: {
+    borderRadius: 20,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    backgroundColor: '#f8fafc',
+    gap: 10,
+  },
+  shortsCardPromo: {
+    backgroundColor: '#fff4e9',
+    borderColor: '#ffc38f',
+  },
+  shortsCardStore: {
+    backgroundColor: '#f1f5ff',
+    borderColor: '#c7d2fe',
+  },
+  shortsCardTracking: {
+    backgroundColor: '#f0fdf4',
+    borderColor: '#bbf7d0',
+  },
+  shortsCardTopRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  shortsPlayBadge: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: '#ff6a00',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
+  },
+  shortsCardTextWrap: {
     flex: 1,
     alignItems: 'flex-end',
   },
-  homeTopTitleWrapRtl: {
-    alignItems: 'flex-start',
-  },
-  homeTopTitle: {
-    color: '#ffffff',
+  shortsCardTitle: {
+    color: '#111827',
     fontWeight: '800',
-    fontSize: 13,
-    lineHeight: 16,
+    fontSize: 14,
   },
-  homeTopSubtitle: {
-    color: 'rgba(255,255,255,0.88)',
-    fontSize: 11,
-    lineHeight: 14,
-    marginTop: 2,
+  shortsCardSubtitle: {
+    color: '#6b7280',
+    marginTop: 4,
+    fontSize: 12,
+    lineHeight: 17,
+    textAlign: 'right',
   },
-  homeTickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  homeTickerRowRtl: {
+  shortsCardFooter: {
     flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  homeTickerChip: {
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.24)',
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  homeTickerChipAccent: {
-    backgroundColor: '#ffffff',
-    borderColor: '#ffffff',
-  },
-  homeTickerChipText: {
-    color: '#ffffff',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  homeTickerChipTextAccent: {
+  shortsCardFooterText: {
     color: '#ff6a00',
+    fontWeight: '700',
   },
   carouselViewport: {
     gap: 14,
