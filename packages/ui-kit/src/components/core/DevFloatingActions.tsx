@@ -24,10 +24,6 @@ export const DevFloatingActions: React.FC = () => {
   const rowDirection = resolveRowDirection(direction);
   const pan = useRef(new Animated.ValueXY()).current;
 
-  if (!__DEV__) {
-    return null;
-  }
-
   const nextLanguage = getNextLanguage(language);
   const nextLanguageLabel = nextLanguage === 'en' ? 'AR -> EN' : 'EN -> AR';
 
@@ -77,60 +73,60 @@ export const DevFloatingActions: React.FC = () => {
     requestReload();
   };
 
-  return (
-    <BthPortalLayer>
-      <Animated.View
-        style={[styles.shell, { transform: pan.getTranslateTransform() }]}
-        {...panResponder.panHandlers}
-      >
-        <View style={styles.card}>
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => setOpen((current) => !current)}
-            style={[styles.handle, { flexDirection: rowDirection }]}
-          >
-            <View style={styles.handleGrip}>
-              <View style={styles.gripDot} />
-              <View style={styles.gripDot} />
-              <View style={styles.gripDot} />
+  const content = (
+    <Animated.View
+      style={[styles.shell, { transform: pan.getTranslateTransform() }]}
+      {...panResponder.panHandlers}
+    >
+      <View style={styles.card}>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={() => setOpen((current) => !current)}
+          style={[styles.handle, { flexDirection: rowDirection }]}
+        >
+          <View style={styles.handleGrip}>
+            <View style={styles.gripDot} />
+            <View style={styles.gripDot} />
+            <View style={styles.gripDot} />
+          </View>
+          <View style={styles.copyBlock}>
+            <View style={[styles.badgeRow, { flexDirection: rowDirection }]}>
+              <Text style={styles.devBadge}>DEV ONLY</Text>
+              <Text style={styles.tempBadge}>TEMP</Text>
             </View>
-            <View style={styles.copyBlock}>
-              <View style={[styles.badgeRow, { flexDirection: rowDirection }]}>
-                <Text style={styles.devBadge}>DEV ONLY</Text>
-                <Text style={styles.tempBadge}>TEMP</Text>
-              </View>
-              <Text style={styles.title}>{open ? 'Development Tools' : 'DEV'}</Text>
-              <Text style={styles.subtitle}>Drag to move</Text>
-            </View>
-          </TouchableOpacity>
+            <Text style={styles.title}>{open ? 'Development Tools' : 'DEV'}</Text>
+            <Text style={styles.subtitle}>Drag to move</Text>
+          </View>
+        </TouchableOpacity>
 
-          {open ? (
-            <View style={styles.actions}>
-              <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={requestReload}
-                style={styles.primaryAction}
-              >
-                <Text style={styles.primaryActionLabel}>Reload App</Text>
-                <Text style={styles.primaryActionHint}>R</Text>
-              </TouchableOpacity>
+        {open ? (
+          <View style={styles.actions}>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={requestReload}
+              style={styles.primaryAction}
+            >
+              <Text style={styles.primaryActionLabel}>Reload App</Text>
+              <Text style={styles.primaryActionHint}>R</Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={() => {
-                  void handleLanguageToggle();
-                }}
-                style={styles.secondaryAction}
-              >
-                <Text style={styles.secondaryActionLabel}>{nextLanguageLabel}</Text>
-                <Text style={styles.secondaryActionHint}>Language</Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
-        </View>
-      </Animated.View>
-    </BthPortalLayer>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => {
+                void handleLanguageToggle();
+              }}
+              style={styles.secondaryAction}
+            >
+              <Text style={styles.secondaryActionLabel}>{nextLanguageLabel}</Text>
+              <Text style={styles.secondaryActionHint}>Language</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
+      </View>
+    </Animated.View>
   );
+
+  return <BthPortalLayer fallback={content}>{content}</BthPortalLayer>;
 };
 
 const styles = StyleSheet.create({
@@ -138,6 +134,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 12,
     bottom: 96,
+    zIndex: 9999,
+    elevation: 9999,
   },
   card: {
     minWidth: 156,
