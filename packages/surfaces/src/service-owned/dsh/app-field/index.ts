@@ -1,5 +1,5 @@
-export * from './surface.meta';
-export * from './surface.catalog';
+export * from './surface-meta';
+export * from './surface-catalog';
 export * from './entry/screens';
 export * from './store-activation/screens';
 export * from './geo-pin/screens';
@@ -7,3 +7,4 @@ export * from './visit-log/screens';
 export * from './dsh_field_activation_workspace/fixtures';
 export * from './dsh_field_store_geo_pin/fixtures';
 export * from './dsh_field_store_visit_log/fixtures';
+

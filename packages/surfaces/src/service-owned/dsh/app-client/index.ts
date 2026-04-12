@@ -1,5 +1,5 @@
-export * from './surface.meta';
-export * from './surface.catalog';
+export * from './surface-meta';
+export * from './surface-catalog';
 export * from './families/family.catalog';
 export * from './families/awnak/screens';
 export * from './families/categories/screens';
@@ -18,3 +18,4 @@ export * from './families/support/screens';
 export * from './families/tracking/screens';
 export { DshSurfaceHost } from './DshSurfaceHost';
 export type { DshCommandTarget, DshRoute } from './DshSurfaceHost';
+

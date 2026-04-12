@@ -1,5 +1,5 @@
-export * from './surface.meta';
-export * from './surface.catalog';
+export * from './surface-meta';
+export * from './surface-catalog';
 export * from './entry/screens';
 export * from './orders-inbox/screens';
 export * from './order-detail/screens';
@@ -9,3 +9,4 @@ export * from './store-hours/screens';
 export * from './zone-set/screens';
 export * from './support/screens';
 export * from './order-detail/sheets';
+

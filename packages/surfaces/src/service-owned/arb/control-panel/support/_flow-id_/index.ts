@@ -1,1 +1,2 @@
-export * from './flow.meta';
+export * from './flow-meta';
+

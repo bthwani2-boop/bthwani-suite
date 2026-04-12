@@ -68,7 +68,8 @@ const sectionRouteMap: Record<ControlPanelSectionId, PrimarySectionHref> = {
 };
 
 function getServiceLabel(uiText: ReturnType<typeof useUiText>, serviceId: string) {
-  return uiText.serviceNames[serviceId as keyof typeof uiText.serviceNames] ?? serviceId.toUpperCase();
+  const serviceNames = uiText?.serviceNames ?? {};
+  return serviceNames[serviceId as keyof typeof serviceNames] ?? serviceId.toUpperCase();
 }
 
 function resolveShellCopy(

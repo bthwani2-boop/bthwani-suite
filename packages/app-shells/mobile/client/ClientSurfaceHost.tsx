@@ -1,3 +1,4 @@
+﻿import { useBthServiceLabels } from '../../shared/BthServiceLabels';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -58,18 +59,19 @@ export function ClientSurfaceHost() {
   });
   const { direction, language, setLanguage } = useDirection();
   const uiText = useUiText();
+  const serviceLabels = useBthServiceLabels();
 
   const serviceEntries = React.useMemo<ServiceEntry[]>(
     () => [
-      { id: 'dsh', title: uiText.serviceNames.dsh, route: 'dsh', iconName: 'bicycle-outline' },
-      { id: 'knz', title: uiText.serviceNames.knz, route: 'knz-entry', iconName: 'book-outline' },
-      { id: 'amn', title: uiText.serviceNames.amn, route: 'amn-entry', iconName: 'shield-checkmark-outline' },
-      { id: 'arb', title: uiText.serviceNames.arb, route: 'arb-entry', iconName: 'document-text-outline' },
-      { id: 'wlt', title: uiText.serviceNames.wlt, route: 'wlt-entry', iconName: 'wallet-outline' },
-      { id: 'esf', title: uiText.serviceNames.esf, route: 'esf-entry', iconName: 'medkit-outline' },
-      { id: 'kwd', title: uiText.serviceNames.kwd, route: 'kwd-entry', iconName: 'construct-outline' },
-      { id: 'mrf', title: uiText.serviceNames.mrf, route: 'mrf-entry', iconName: 'ribbon-outline' },
-      { id: 'snd', title: uiText.serviceNames.snd, route: 'snd-entry', iconName: 'document-attach-outline' },
+      { id: 'dsh', title: serviceLabels.dsh, route: 'dsh', iconName: 'bicycle-outline' },
+      { id: 'knz', title: serviceLabels.knz, route: 'knz-entry', iconName: 'book-outline' },
+      { id: 'amn', title: serviceLabels.amn, route: 'amn-entry', iconName: 'shield-checkmark-outline' },
+      { id: 'arb', title: serviceLabels.arb, route: 'arb-entry', iconName: 'document-text-outline' },
+      { id: 'wlt', title: serviceLabels.wlt, route: 'wlt-entry', iconName: 'wallet-outline' },
+      { id: 'esf', title: serviceLabels.esf, route: 'esf-entry', iconName: 'medkit-outline' },
+      { id: 'kwd', title: serviceLabels.kwd, route: 'kwd-entry', iconName: 'construct-outline' },
+      { id: 'mrf', title: serviceLabels.mrf, route: 'mrf-entry', iconName: 'ribbon-outline' },
+      { id: 'snd', title: serviceLabels.snd, route: 'snd-entry', iconName: 'document-attach-outline' },
     ],
     [uiText],
   );

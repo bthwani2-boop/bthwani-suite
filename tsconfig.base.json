@@ -30,7 +30,16 @@
         "./packages/surfaces/src/index.ts"
       ],
       "@bthwani/surfaces/*": [
-        "./packages/surfaces/src/*"
+        "./packages/surfaces/src/service-owned/*"
+      ],
+      "@bthwani/surfaces/service-owned/*": [
+        "./packages/surfaces/src/service-owned/*"
+      ],
+      "@bthwani/surfaces/surface-owned/*": [
+        "./packages/surfaces/src/surface-owned/*"
+      ],
+      "@bthwani/surfaces/composition/*": [
+        "./packages/surfaces/src/composition/*"
       ]
     },
     "resolveJsonModule": true,

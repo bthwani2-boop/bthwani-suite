@@ -1,10 +1,11 @@
 // Web document shell for html/body, lang, dir, etc.
+import Script from 'next/script';
 import { ReactNode } from 'react';
 import { directionConfig, resolveDirectionFromLanguage } from '../../foundation/direction';
 import { BthWebThemeStyle } from './BthWebThemeStyle';
 
 function buildStoredLanguageBootstrapScript() {
-  return `(function(){try{var key='${directionConfig.languageStorageKey}';var stored=window.localStorage?window.localStorage.getItem(key):null;if(stored!=='ar'&&stored!=='en'){return;}document.documentElement.lang=stored;document.documentElement.dir=stored==='ar'?'rtl':'ltr';}catch(error){}})();`;
+  return (function(){try{var key='${directionConfig.languageStorageKey}';var stored=window.localStorage?window.localStorage.getItem(key):null;if(stored!=='ar'&&stored!=='en'){return;}document.documentElement.lang=stored;document.documentElement.dir=stored==='ar'?'rtl':'ltr';}catch(error){}})();;
 }
 
 export function BthWebDocumentShell({
@@ -19,7 +20,11 @@ export function BthWebDocumentShell({
   return (
     <html suppressHydrationWarning lang={lang} dir={dir}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: buildStoredLanguageBootstrapScript() }} />
+        <Script
+          id="bth-language-bootstrap"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: buildStoredLanguageBootstrapScript() }}
+        />
         <BthWebThemeStyle />
       </head>
       {children}
