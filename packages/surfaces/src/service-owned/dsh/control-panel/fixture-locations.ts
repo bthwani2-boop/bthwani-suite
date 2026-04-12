@@ -7,7 +7,7 @@ export const dshControlPanelFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'control-panel',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    location: 'packages/surfaces/src/dsh/control-panel/dsh_ops_orders_board/fixtures',
+    location: 'packages/surfaces/src/service-owned/dsh/control-panel/dsh_ops_orders_board/fixtures',
     status: 'declared',
   },
   {
@@ -16,7 +16,7 @@ export const dshControlPanelFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'control-panel',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    location: 'packages/surfaces/src/dsh/control-panel/dsh_ops_order_detail_exception_workspace/fixtures',
+    location: 'packages/surfaces/src/service-owned/dsh/control-panel/dsh_ops_order_detail_exception_workspace/fixtures',
     status: 'declared',
   },
   {
@@ -25,7 +25,7 @@ export const dshControlPanelFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'control-panel',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    location: 'packages/surfaces/src/dsh/control-panel/dsh_ops_peak_mode_control/fixtures',
+    location: 'packages/surfaces/src/service-owned/dsh/control-panel/dsh_ops_peak_mode_control/fixtures',
     status: 'declared',
   },
   {
@@ -34,7 +34,7 @@ export const dshControlPanelFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'control-panel',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    location: 'packages/surfaces/src/dsh/control-panel/dsh_proxy_requests_list/fixtures',
+    location: 'packages/surfaces/src/service-owned/dsh/control-panel/dsh_proxy_requests_list/fixtures',
     status: 'declared',
   },
   {
@@ -43,7 +43,7 @@ export const dshControlPanelFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'control-panel',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    location: 'packages/surfaces/src/dsh/control-panel/dsh_proxy_request_review_workspace/fixtures',
+    location: 'packages/surfaces/src/service-owned/dsh/control-panel/dsh_proxy_request_review_workspace/fixtures',
     status: 'declared',
   },
 ];

@@ -54,7 +54,7 @@ export function DshCartItemUpdateScreen({
     }
   }, [cartItemId, notes, onExecuteUpdate, quantity]);
 
-  if (state !== 'ready' && state !== 'success') {
+  if (state !== 'ready') {
     return <DshOperationScreen state={state} title="Update cart item" subtitle="Adjust quantity or note, then continue to cart review." onRetry={onRetry} />;
   }
 

@@ -7,7 +7,7 @@ export const dshAppFieldFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'app-field',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    location: 'packages/surfaces/src/dsh/app-field/dsh_field_activation_workspace/fixtures',
+    location: 'packages/surfaces/src/service-owned/dsh/app-field/dsh_field_activation_workspace/fixtures',
     status: 'declared',
   },
   {
@@ -16,7 +16,7 @@ export const dshAppFieldFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'app-field',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    location: 'packages/surfaces/src/dsh/app-field/dsh_field_store_geo_pin/fixtures',
+    location: 'packages/surfaces/src/service-owned/dsh/app-field/dsh_field_store_geo_pin/fixtures',
     status: 'declared',
   },
   {
@@ -25,7 +25,7 @@ export const dshAppFieldFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'app-field',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    location: 'packages/surfaces/src/dsh/app-field/dsh_field_store_visit_log/fixtures',
+    location: 'packages/surfaces/src/service-owned/dsh/app-field/dsh_field_store_visit_log/fixtures',
     status: 'declared',
   },
 ];

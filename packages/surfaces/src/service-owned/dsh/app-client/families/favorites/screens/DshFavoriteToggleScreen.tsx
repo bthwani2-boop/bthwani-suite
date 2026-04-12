@@ -28,7 +28,7 @@ export function DshFavoriteToggleScreen({ state = 'ready', itemLabel = 'Selected
     }
   }, [onToggleFavorite]);
 
-  if (state !== 'ready' && state !== 'success') {
+  if (state !== 'ready') {
     return <DshOperationScreen state={state} title="Favorite toggle" subtitle="Mark or unmark a favorite without losing context." onRetry={onRetry} />;
   }
 

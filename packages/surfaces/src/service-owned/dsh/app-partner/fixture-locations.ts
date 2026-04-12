@@ -7,7 +7,7 @@ export const dshAppPartnerFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'app-partner',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    location: 'packages/surfaces/src/dsh/app-partner/dsh_partner_orders_board/fixtures',
+    location: 'packages/surfaces/src/service-owned/dsh/app-partner/dsh_partner_orders_board/fixtures',
     status: 'declared',
   },
   {
@@ -16,7 +16,7 @@ export const dshAppPartnerFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'app-partner',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    location: 'packages/surfaces/src/dsh/app-partner/dsh_partner_order_workspace/fixtures',
+    location: 'packages/surfaces/src/service-owned/dsh/app-partner/dsh_partner_order_workspace/fixtures',
     status: 'declared',
   },
   {
@@ -25,7 +25,7 @@ export const dshAppPartnerFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'app-partner',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    location: 'packages/surfaces/src/dsh/app-partner/dsh_partner_store_maintenance_workspace/fixtures',
+    location: 'packages/surfaces/src/service-owned/dsh/app-partner/dsh_partner_store_maintenance_workspace/fixtures',
     status: 'declared',
   },
   {
@@ -34,7 +34,7 @@ export const dshAppPartnerFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'app-partner',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    location: 'packages/surfaces/src/dsh/app-partner/dsh_partner_order_issue_queue/fixtures',
+    location: 'packages/surfaces/src/service-owned/dsh/app-partner/dsh_partner_order_issue_queue/fixtures',
     status: 'declared',
   },
 ];

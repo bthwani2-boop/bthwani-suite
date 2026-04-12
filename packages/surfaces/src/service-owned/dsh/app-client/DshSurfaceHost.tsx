@@ -639,7 +639,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   if (route === 'cart-get') {
     return (
-      <DshCartGetFamilyScreen
+      <DshCartGetScreen
         store={{
           id: activeStore.id,
           name: activeStore.name,
@@ -668,7 +668,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   if (route === 'cart-init') {
     return (
-      <DshCartInitFamilyScreen
+      <DshCartInitScreen
         state="success"
         cartId={`${activeStore.id}-cart`}
         storeName={activeStore.name}
@@ -684,7 +684,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   if (route === 'cart-item-add') {
     return (
-      <DshCartItemAddFamilyScreen
+      <DshCartItemAddScreen
         cartId={`${activeStore.id}-cart`}
         storeName={activeStore.name}
         suggestedItemName={selectedItem?.name ?? 'Royal Gala Apples'}
@@ -701,7 +701,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   if (route === 'cart-item-remove') {
     return (
-      <DshCartItemRemoveFamilyScreen
+      <DshCartItemRemoveScreen
         cartId={`${activeStore.id}-cart`}
         storeName={activeStore.name}
         suggestedCartItemId={selectedItem?.id ?? 'item-apple-1'}
@@ -717,7 +717,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   if (route === 'cart-item-update') {
     return (
-      <DshCartItemUpdateFamilyScreen
+      <DshCartItemUpdateScreen
         cartId={`${activeStore.id}-cart`}
         suggestedCartItemId={selectedItem?.id ?? 'item-apple-1'}
         suggestedQuantity={2}

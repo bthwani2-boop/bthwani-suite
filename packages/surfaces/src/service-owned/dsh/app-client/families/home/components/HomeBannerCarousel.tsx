@@ -255,7 +255,7 @@ export function HomeBannerCarousel({
                   styles.progressTrack,
                   active && {
                     width: 18,
-                    backgroundColor: item.accentColor ?? theme.accent,
+                    backgroundColor: item.accentColor ?? theme.brand,
                   },
                 ]}
               />
