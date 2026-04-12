@@ -24,6 +24,10 @@ export type DshHomePromo = {
   id: string;
   title: string;
   subtitle: string;
+  actionType?: 'main_category' | 'sub_category' | 'store' | 'external' | 'store_category' | 'product' | 'subscription';
+  actionTarget?: string;
+  actionExtra?: string;
+  accentColor?: string;
 };
 
 export type DshHomeScreenProps = {
@@ -34,6 +38,10 @@ export type DshHomeScreenProps = {
   onStartDelivery?: () => void;
   onContinueOrder?: () => void;
   onOpenDiscovery?: () => void;
+  onOpenStoresList?: () => void;
+  onOpenStoreCategory?: (storeId: string, categoryId: string) => void;
+  onOpenProduct?: (storeId: string, itemId: string) => void;
+  onOpenBenefits?: () => void;
   onOpenSearch?: () => void;
   onOpenOrders?: () => void;
   onOpenTracking?: () => void;
@@ -54,11 +62,13 @@ const defaultPromos: DshHomePromo[] = [
     id: 'promo-fast-delivery',
     title: 'Fast delivery window',
     subtitle: 'Start from one store and keep the flow compact.',
+    accentColor: '#FF6A00',
   },
   {
     id: 'promo-confidence',
     title: 'Confidence-first tracking',
     subtitle: 'Open orders quickly whenever confidence is needed.',
+    accentColor: '#0D2F67',
   },
 ];
 
@@ -106,6 +116,10 @@ function toDiscoveryPromos(promos: DshHomePromo[]): DshHomeGetPromo[] {
           ? 'خطوة واحدة إلى الطلب النشط'
           : promo.subtitle,
     icon: index === 0 ? '🔥' : index === 1 ? '📍' : '✨',
+    actionType: promo.actionType,
+    actionTarget: promo.actionTarget,
+    actionExtra: promo.actionExtra,
+    accentColor: promo.accentColor ?? (index === 0 ? '#FF6A00' : index === 1 ? '#0D2F67' : '#15A26B'),
   }));
 }
 
@@ -136,6 +150,10 @@ export function DshHomeScreen({
   onStartDelivery,
   onContinueOrder,
   onOpenDiscovery,
+  onOpenStoresList,
+  onOpenStoreCategory,
+  onOpenProduct,
+  onOpenBenefits,
   onOpenSearch,
   onOpenOrders,
   onOpenTracking,
@@ -150,8 +168,14 @@ export function DshHomeScreen({
       promos={toDiscoveryPromos(promos)}
       stores={toDiscoveryStores(featuredStores)}
       onOpenCategory={onOpenCategory}
+      onOpenStoresList={onOpenStoresList ?? onOpenDiscovery}
+      onOpenStoreCategory={onOpenStoreCategory}
+      onOpenProduct={onOpenProduct}
+      onOpenBenefits={onOpenBenefits}
       onOpenFavorites={() => onOpenCategory?.('favorites')}
       onOpenSearch={onOpenSearch}
+      onOpenOrders={onOpenOrders}
+      onOpenTracking={onOpenTracking}
       onOpenStore={onOpenStore}
       onRetry={onRetry}
     />

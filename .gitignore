@@ -32,3 +32,6 @@ Thumbs.db
 
 .claude/worktrees
 .claude/settings.local.json
+
+# Local-only donor/service intelligence outputs
+docs/services/surfaces-legacy-trash/

@@ -15,6 +15,8 @@ import { useTheme } from '@bthwani/ui-kit';
 
 export type HomeBannerCarouselItem = {
   id: string;
+  title?: string;
+  subtitle?: string;
   imageUrl?: string;
   accentColor?: string;
   onPress?: () => void;
@@ -195,13 +197,29 @@ export function HomeBannerCarousel({
                   opacity,
                   shadowOpacity,
                   transform: [{ translateX }, { scale }],
+                  backgroundColor: item.imageUrl ? theme.surface : item.accentColor ?? theme.brand,
                 },
               ]}
             >
               {item.imageUrl ? (
-                <Image source={{ uri: item.imageUrl }} style={styles.image} resizeMode="cover" />
+                <>
+                  <Image source={{ uri: item.imageUrl }} style={styles.image} resizeMode="cover" />
+                  {(item.title || item.subtitle) ? (
+                    <View style={styles.overlay}>
+                      {item.title ? <View><Animated.Text style={styles.overlayTitle}>{item.title}</Animated.Text></View> : null}
+                      {item.subtitle ? <View><Animated.Text style={styles.overlaySubtitle}>{item.subtitle}</Animated.Text></View> : null}
+                    </View>
+                  ) : null}
+                </>
               ) : (
-                <View style={styles.imageFallback} />
+                <View style={[styles.imageFallback, { backgroundColor: item.accentColor ?? theme.brand }]}>
+                  {(item.title || item.subtitle) ? (
+                    <View style={styles.fallbackContent}>
+                      {item.title ? <Animated.Text style={styles.fallbackTitle}>{item.title}</Animated.Text> : null}
+                      {item.subtitle ? <Animated.Text style={styles.fallbackSubtitle}>{item.subtitle}</Animated.Text> : null}
+                    </View>
+                  ) : null}
+                </View>
               )}
             </Animated.View>
           </Pressable>
@@ -298,6 +316,43 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     imageFallback: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: theme.surfaceRaised,
+      padding: 18,
+      justifyContent: 'flex-end',
+    },
+    fallbackContent: {
+      gap: 8,
+      alignItems: 'flex-start',
+    },
+    fallbackTitle: {
+      color: '#ffffff',
+      fontSize: 24,
+      fontWeight: '800',
+      lineHeight: 28,
+    },
+    fallbackSubtitle: {
+      color: 'rgba(255,255,255,0.92)',
+      fontSize: 14,
+      fontWeight: '600',
+      lineHeight: 18,
+    },
+    overlay: {
+      ...StyleSheet.absoluteFillObject,
+      justifyContent: 'flex-end',
+      padding: 18,
+      backgroundColor: 'rgba(0,0,0,0.16)',
+      gap: 8,
+    },
+    overlayTitle: {
+      color: '#ffffff',
+      fontSize: 22,
+      fontWeight: '800',
+      lineHeight: 26,
+    },
+    overlaySubtitle: {
+      color: 'rgba(255,255,255,0.92)',
+      fontSize: 13,
+      fontWeight: '600',
+      lineHeight: 17,
     },
     progressRow: {
       position: 'absolute',

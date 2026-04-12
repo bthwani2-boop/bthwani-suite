@@ -34,8 +34,14 @@ export type DshHomeGetScreenProps = {
   onBack?: () => void;
   onOpenList?: () => void;
   onOpenCategory?: (categoryId: string) => void;
+  onOpenStoresList?: () => void;
+  onOpenStoreCategory?: (storeId: string, categoryId: string) => void;
+  onOpenProduct?: (storeId: string, itemId: string) => void;
+  onOpenBenefits?: () => void;
   onOpenFavorites?: () => void;
   onOpenSearch?: () => void;
+  onOpenOrders?: () => void;
+  onOpenTracking?: () => void;
   onOpenStore?: (storeId: string) => void;
   onRetry?: () => void;
 };
@@ -45,6 +51,8 @@ export type DshHomeCategory = {
   label: string;
 };
 
+export type DshHomeBannerActionType = 'main_category' | 'sub_category' | 'store' | 'external' | 'store_category' | 'product' | 'subscription';
+
 type DiscoveryFilter = 'all' | 'favorites' | 'nearest' | 'new' | 'offers';
 
 export type DshHomeGetPromo = {
@@ -52,6 +60,9 @@ export type DshHomeGetPromo = {
   title: string;
   subtitle: string;
   icon: string;
+  actionType?: DshHomeBannerActionType;
+  actionTarget?: string;
+  actionExtra?: string;
   imageUrl?: string;
   accentColor?: string;
 };
@@ -151,8 +162,14 @@ export function DshHomeGetScreen({
   onBack,
   onOpenList,
   onOpenCategory,
+  onOpenStoresList,
+  onOpenStoreCategory,
+  onOpenProduct,
+  onOpenBenefits,
   onOpenFavorites,
   onOpenSearch,
+  onOpenOrders,
+  onOpenTracking,
   onOpenStore,
   onRetry,
 }: DshHomeGetScreenProps) {
@@ -215,18 +232,156 @@ export function DshHomeGetScreen({
     return renderState(state, onRetry);
   }
 
+  const resolveBannerPress = React.useCallback(
+    (promo: DshHomeGetPromo) => () => {
+      if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
+        if (promo.actionTarget && onOpenCategory) {
+          onOpenCategory(promo.actionTarget);
+          return;
+        }
+
+        onOpenList?.();
+        return;
+      }
+
+      if (promo.actionType === 'store') {
+        if (promo.actionTarget && onOpenStore) {
+          onOpenStore(promo.actionTarget);
+          return;
+        }
+
+        if (onOpenStoresList) {
+          onOpenStoresList();
+          return;
+        }
+
+        onOpenSearch?.();
+        return;
+      }
+
+      if (promo.actionType === 'store_category') {
+        if (promo.actionTarget && promo.actionExtra && onOpenStoreCategory) {
+          onOpenStoreCategory(promo.actionTarget, promo.actionExtra);
+          return;
+        }
+
+        if (promo.actionTarget && onOpenStore) {
+          onOpenStore(promo.actionTarget);
+          return;
+        }
+
+        if (onOpenStoresList) {
+          onOpenStoresList();
+          return;
+        }
+
+        onOpenList?.();
+        return;
+      }
+
+      if (promo.actionType === 'product') {
+        if (promo.actionExtra && promo.actionTarget && onOpenProduct) {
+          onOpenProduct(promo.actionExtra, promo.actionTarget);
+          return;
+        }
+
+        if (promo.actionExtra && onOpenStore) {
+          onOpenStore(promo.actionExtra);
+          return;
+        }
+
+        onOpenSearch?.();
+        return;
+      }
+
+      if (promo.actionType === 'subscription') {
+        if (onOpenBenefits) {
+          onOpenBenefits();
+          return;
+        }
+
+        onOpenSearch?.();
+        return;
+      }
+
+      if (onOpenStoresList) {
+        onOpenStoresList();
+        return;
+      }
+
+      onOpenSearch?.();
+    },
+    [onOpenBenefits, onOpenCategory, onOpenList, onOpenProduct, onOpenSearch, onOpenStore, onOpenStoreCategory, onOpenStoresList]
+  );
+
   const activePromo = promos[activePromoIndex % promos.length] ?? dshHomeGetFixturePromos[0];
   const promoDiscount = activePromo.subtitle.match(/\d+%/)?.[0] ?? '30%';
   const promoTail = activePromo.subtitle.replace(promoDiscount, '').trim();
+  const primaryStore = stores[0] ?? null;
+  const tickerFacts = React.useMemo(
+    () => [
+      primaryStore ? `${primaryStore.name} · ${primaryStore.deliveryLabel}` : 'أقرب متجر متاح الآن',
+      activePromo.title ? `${activePromo.title} · ${promoDiscount}` : promoDiscount,
+      primaryStore ? `${primaryStore.serviceLabel} · ${primaryStore.distanceLabel}` : 'توصيل سريع',
+    ],
+    [activePromo.title, primaryStore, promoDiscount]
+  );
   const bannerItems: HomeBannerCarouselItem[] = promos.map((promo) => ({
     id: promo.id,
+    title: promo.title,
+    subtitle: promo.subtitle,
     imageUrl: promo.imageUrl,
     accentColor: promo.accentColor,
-    onPress: onOpenSearch ?? onOpenList,
+    onPress: resolveBannerPress(promo),
   }));
 
   return (
     <BthMobileScrollView padding={4} gap={4}>
+      <View style={styles.homeTopBar}>
+        <View style={[styles.homeTopBarRow, direction === 'rtl' && styles.homeTopBarRowRtl]}>
+          <View style={[styles.homeTopBarActions, direction === 'rtl' && styles.homeTopBarActionsRtl]}>
+            <Pressable style={styles.homeTopIconButton} onPress={onOpenSearch}>
+              <Ionicons name="search-outline" size={18} color={theme.textInverse} />
+            </Pressable>
+            <Pressable style={styles.homeTopIconButton} onPress={onOpenFavorites}>
+              <Ionicons name="heart-outline" size={18} color={theme.textInverse} />
+            </Pressable>
+            <Pressable style={styles.homeTopIconButton} onPress={onOpenOrders}>
+              <Ionicons name="notifications-outline" size={18} color={theme.textInverse} />
+            </Pressable>
+            <Pressable style={styles.homeTopIconButton} onPress={onOpenTracking}>
+              <Ionicons name="time-outline" size={18} color={theme.textInverse} />
+            </Pressable>
+          </View>
+
+          <View style={[styles.homeTopTitleWrap, direction === 'rtl' && styles.homeTopTitleWrapRtl]}>
+            <BthText role="titleSm" style={styles.homeTopTitle}>بواني تحقق الأماني</BthText>
+            <BthText role="bodySm" style={styles.homeTopSubtitle}>المساحة مخصصة للشريط الإخباري</BthText>
+          </View>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={[styles.homeTickerRow, direction === 'rtl' && styles.homeTickerRowRtl]}
+        >
+          {tickerFacts.map((fact, index) => (
+            <Pressable
+              key={`${fact}-${index}`}
+              style={[
+                styles.homeTickerChip,
+                index === 0 && styles.homeTickerChipAccent,
+              ]}
+              onPress={index === 0 && primaryStore && onOpenStore ? () => onOpenStore(primaryStore.id) : index === 2 ? onOpenTracking : undefined}
+            >
+              <BthText role="bodySm" style={[styles.homeTickerChipText, index === 0 && styles.homeTickerChipTextAccent]} numberOfLines={1}>
+                {fact}
+              </BthText>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
+
       <View style={styles.carouselViewport}>
         <HomeBannerCarousel banners={bannerItems} rtl={direction === 'rtl'} />
       </View>
@@ -307,7 +462,9 @@ export function DshHomeGetScreen({
                 onOpenList?.();
               }}
             >
-              <Text style={styles.categoryRailIcon}>{icon}</Text>
+              <BthText role="bodySm" style={styles.categoryRailIcon}>
+                {icon}
+              </BthText>
               <BthText
                 role="bodySm"
                 style={[
@@ -424,6 +581,90 @@ export function DshHomeGetScreen({
 }
 
 const styles = StyleSheet.create({
+  homeTopBar: {
+    backgroundColor: '#ff6a00',
+    borderRadius: 28,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    gap: 10,
+    shadowColor: '#000000',
+    shadowOpacity: 0.16,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
+  },
+  homeTopBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  homeTopBarRowRtl: {
+    flexDirection: 'row-reverse',
+  },
+  homeTopBarActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  homeTopBarActionsRtl: {
+    flexDirection: 'row-reverse',
+  },
+  homeTopIconButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  homeTopTitleWrap: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  homeTopTitleWrapRtl: {
+    alignItems: 'flex-start',
+  },
+  homeTopTitle: {
+    color: '#ffffff',
+    fontWeight: '800',
+    fontSize: 13,
+    lineHeight: 16,
+  },
+  homeTopSubtitle: {
+    color: 'rgba(255,255,255,0.88)',
+    fontSize: 11,
+    lineHeight: 14,
+    marginTop: 2,
+  },
+  homeTickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  homeTickerRowRtl: {
+    flexDirection: 'row-reverse',
+  },
+  homeTickerChip: {
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  homeTickerChipAccent: {
+    backgroundColor: '#ffffff',
+    borderColor: '#ffffff',
+  },
+  homeTickerChipText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  homeTickerChipTextAccent: {
+    color: '#ff6a00',
+  },
   carouselViewport: {
     gap: 14,
     marginTop: -2,

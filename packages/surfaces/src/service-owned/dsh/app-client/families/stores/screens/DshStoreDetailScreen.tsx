@@ -19,6 +19,11 @@ export type DshStoreDetailData = {
   etaLabel: string;
   deliveryFeeLabel: string;
   highlights: string[];
+  categories?: Array<{ id: string; label: string; itemCount: number; isPopular?: boolean }>;
+  deliveryModes?: Array<{ id: 'delivery' | 'pickup'; name: string; isAvailable: boolean; estimatedTime?: string; fee?: number }>;
+  tags?: string[];
+  followersLabel?: string;
+  priceMatchLabel?: string;
 };
 
 export type DshStoreDetailScreenProps = {
@@ -79,8 +84,51 @@ export function DshStoreDetailScreen({
         <BthBox layoutDirection="row" gap={2}>
           <BthChip label={store.etaLabel} selected />
           <BthChip label={store.deliveryFeeLabel} />
+          {store.followersLabel ? <BthChip label={store.followersLabel} /> : null}
+          {store.priceMatchLabel ? <BthChip label={store.priceMatchLabel} /> : null}
         </BthBox>
       </BthSurface>
+
+      {store.tags?.length ? (
+        <BthSurface tone="inset" gap={2}>
+          <BthSectionHeader title="Store tags" subtitle="Legacy truth carried forward as compact chips." />
+          <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+            {store.tags.map((tag) => (
+              <BthChip key={`${store.id}-${tag}`} label={tag} />
+            ))}
+          </BthBox>
+        </BthSurface>
+      ) : null}
+
+      {store.categories?.length ? (
+        <BthSurface tone="raised" gap={2}>
+          <BthSectionHeader title="Store categories" subtitle="Keep the same category drill-down density as the legacy store screen." count={store.categories.length} />
+          <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+            {store.categories.map((category) => (
+              <BthChip
+                key={category.id}
+                label={`${category.label} (${category.itemCount})`}
+                selected={Boolean(category.isPopular)}
+              />
+            ))}
+          </BthBox>
+        </BthSurface>
+      ) : null}
+
+      {store.deliveryModes?.length ? (
+        <BthSurface tone="raised" gap={2}>
+          <BthSectionHeader title="Delivery modes" subtitle="Expose the available handoff paths instead of hiding them behind the CTA." count={store.deliveryModes.length} />
+          <BthBox gap={2}>
+            {store.deliveryModes.map((mode) => (
+              <BthCard
+                key={mode.id}
+                title={mode.name}
+                subtitle={`${mode.isAvailable ? 'Available' : 'Unavailable'}${mode.estimatedTime ? ` · ${mode.estimatedTime}` : ''}${mode.fee != null ? ` · ${mode.fee} SAR` : ''}`}
+              />
+            ))}
+          </BthBox>
+        </BthSurface>
+      ) : null}
 
       <BthSurface tone="raised" gap={3}>
         <BthSectionHeader

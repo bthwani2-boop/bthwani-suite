@@ -87,6 +87,9 @@ type StoreItem = {
   categoryId: string;
   categoryLabel: string;
   statusLabel?: string;
+  isAvailable?: boolean;
+  hasOptions?: boolean;
+  preparationTime?: string;
 };
 
 const initialCreateOrderValues: CreateOrderValues = {
@@ -122,8 +125,23 @@ const dshDiscoveryStores = [
     statusLabel: 'Open',
     meta: 'ETA 18 min',
     etaMinutes: 18,
+    distanceKm: 2.1,
+    rating: 5,
     isOffer: true,
     isFavorite: true,
+    isFollowing: false,
+    imageUri: '',
+    deliveryLabel: 'توصيل مجاني',
+    serviceLabel: 'توصيل برو',
+    followerCount: 11000,
+    multiplierLabel: 'x2',
+    subscriptionPackageChips: ['توصيل مجاني', 'أولوية'],
+    offerLabel: 'خصم 20%',
+    hasBthwaniPro: true,
+    hasNewProducts: true,
+    hasCouponAvailable: false,
+    supportsPickup: true,
+    supportsPartnerDelivery: true,
   },
   {
     id: 'store-1002',
@@ -132,8 +150,22 @@ const dshDiscoveryStores = [
     statusLabel: 'Open',
     meta: 'ETA 25 min',
     etaMinutes: 25,
+    distanceKm: 1.8,
+    rating: 4.8,
     isOffer: false,
     isFavorite: false,
+    isFollowing: false,
+    imageUri: '',
+    deliveryLabel: 'كوبون',
+    serviceLabel: 'توصيل برو',
+    followerCount: 9000,
+    multiplierLabel: 'x1',
+    subscriptionPackageChips: ['كوبون', 'توصيل مجاني'],
+    hasBthwaniPro: true,
+    hasNewProducts: false,
+    hasCouponAvailable: true,
+    supportsPickup: true,
+    supportsPartnerDelivery: true,
   },
   {
     id: 'store-1003',
@@ -142,8 +174,23 @@ const dshDiscoveryStores = [
     statusLabel: 'Busy',
     meta: 'ETA 32 min',
     etaMinutes: 32,
+    distanceKm: 3.5,
+    rating: 4.9,
     isOffer: true,
     isFavorite: false,
+    isFollowing: false,
+    imageUri: '',
+    deliveryLabel: 'توصيل سريع',
+    serviceLabel: 'توصيل برو',
+    followerCount: 23400,
+    multiplierLabel: 'x3',
+    subscriptionPackageChips: ['توصيل سريع', 'أولوية'],
+    offerLabel: 'خصم 15%',
+    hasBthwaniPro: true,
+    hasNewProducts: true,
+    hasCouponAvailable: false,
+    supportsPickup: true,
+    supportsPartnerDelivery: true,
   },
 ];
 
@@ -157,6 +204,9 @@ const storeItemsByStoreId: Record<string, StoreItem[]> = {
       categoryId: 'fresh',
       categoryLabel: 'Fresh',
       statusLabel: 'Popular',
+      isAvailable: true,
+      hasOptions: false,
+      preparationTime: '10-15 min',
     },
     {
       id: 'item-milk-1',
@@ -165,6 +215,9 @@ const storeItemsByStoreId: Record<string, StoreItem[]> = {
       priceLabel: '11 SAR',
       categoryId: 'dairy',
       categoryLabel: 'Dairy',
+      isAvailable: true,
+      hasOptions: false,
+      preparationTime: '5-10 min',
     },
     {
       id: 'item-bread-1',
@@ -173,6 +226,9 @@ const storeItemsByStoreId: Record<string, StoreItem[]> = {
       priceLabel: '7 SAR',
       categoryId: 'bakery',
       categoryLabel: 'Bakery',
+      isAvailable: true,
+      hasOptions: false,
+      preparationTime: '10-20 min',
     },
   ],
   'store-1002': [
@@ -184,6 +240,9 @@ const storeItemsByStoreId: Record<string, StoreItem[]> = {
       categoryId: 'bakery',
       categoryLabel: 'Bakery',
       statusLabel: 'Best seller',
+      isAvailable: true,
+      hasOptions: false,
+      preparationTime: '8-12 min',
     },
     {
       id: 'item-cake-1',
@@ -192,6 +251,9 @@ const storeItemsByStoreId: Record<string, StoreItem[]> = {
       priceLabel: '14 SAR',
       categoryId: 'sweets',
       categoryLabel: 'Sweets',
+      isAvailable: true,
+      hasOptions: true,
+      preparationTime: '12-18 min',
     },
   ],
   'store-1003': [
@@ -203,6 +265,9 @@ const storeItemsByStoreId: Record<string, StoreItem[]> = {
       categoryId: 'meals',
       categoryLabel: 'Meals',
       statusLabel: 'Chef pick',
+      isAvailable: true,
+      hasOptions: true,
+      preparationTime: '20-25 min',
     },
     {
       id: 'item-salad-1',
@@ -211,6 +276,9 @@ const storeItemsByStoreId: Record<string, StoreItem[]> = {
       priceLabel: '21 SAR',
       categoryId: 'healthy',
       categoryLabel: 'Healthy',
+      isAvailable: true,
+      hasOptions: false,
+      preparationTime: '10-15 min',
     },
   ],
 };
@@ -520,6 +588,45 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   const activeStoreItems = React.useMemo(() => storeItemsByStoreId[activeStore.id] ?? [], [activeStore.id]);
 
+  const activeStoreCategories = React.useMemo(() => {
+    const uniqueCategories = Array.from(new Map(activeStoreItems.map((item) => [item.categoryId, item.categoryLabel])).entries());
+    return uniqueCategories.map(([id, label], index) => ({
+      id,
+      label,
+      itemCount: activeStoreItems.filter((item) => item.categoryId === id).length,
+      isPopular: index === 0,
+    }));
+  }, [activeStoreItems]);
+
+  const activeStoreDeliveryModes = React.useMemo(() => ([
+    {
+      id: 'delivery' as const,
+      name: 'Delivery',
+      isAvailable: true,
+      estimatedTime: activeStore.meta,
+      fee: 12,
+    },
+    {
+      id: 'pickup' as const,
+      name: 'Pickup',
+      isAvailable: true,
+      estimatedTime: '15 min',
+      fee: 0,
+    },
+  ]), [activeStore.meta]);
+
+  const activeStoreTags = React.useMemo(() => {
+    const tags = [
+      activeStore.hasBthwaniPro ? 'Bthwani Pro' : null,
+      activeStore.isOffer ? 'Offer live' : null,
+      activeStore.distanceKm != null ? `${activeStore.distanceKm} km` : null,
+      activeStore.supportsPickup ? 'Pickup' : null,
+      activeStore.supportsPartnerDelivery ? 'Partner delivery' : null,
+    ].filter(Boolean) as string[];
+
+    return tags;
+  }, [activeStore.distanceKm, activeStore.hasBthwaniPro, activeStore.isOffer, activeStore.supportsPartnerDelivery, activeStore.supportsPickup]);
+
   const selectedItem = React.useMemo(
     () => activeStoreItems.find((item) => item.id === selectedItemId) ?? activeStoreItems[0],
     [activeStoreItems, selectedItemId],
@@ -547,7 +654,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
         onOpenFavorites={() => setRoute('favorites-list')}
         onOpenStore={(storeId) => {
           setActiveStoreId(storeId);
-          setRoute('store-detail');
+          setRoute('store-get');
         }}
         onRetry={() => setRoute('stores-list')}
       />
@@ -564,6 +671,11 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
           statusLabel: activeStore.statusLabel,
           etaLabel: activeStore.meta,
           deliveryFeeLabel: 'Delivery fee 12 SAR',
+          followersLabel: `${activeStore.followerCount.toLocaleString()} followers`,
+          priceMatchLabel: activeStore.isOffer ? 'Price match live' : 'Standard pricing',
+          tags: activeStoreTags,
+          categories: activeStoreCategories,
+          deliveryModes: activeStoreDeliveryModes,
           highlights: [
             'High confidence fulfillment history',
             'Stable handoff quality for first-time orders',
@@ -588,8 +700,14 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
           statusLabel: activeStore.statusLabel,
           etaLabel: activeStore.meta,
           deliveryFeeLabel: 'Delivery fee 12 SAR',
+          followersLabel: `${activeStore.followerCount.toLocaleString()} followers`,
+          priceMatchLabel: activeStore.isOffer ? 'Price match live' : 'Standard pricing',
+          tags: activeStoreTags,
+          categories: activeStoreCategories,
+          deliveryModes: activeStoreDeliveryModes,
         }}
-        onOpenItems={() => setRoute('store-detail')}
+        menuItems={activeStoreItems}
+        onOpenItems={() => setRoute('store-items-list')}
         onBack={() => setRoute('stores-list')}
         onRetry={() => setRoute('store-get')}
         onSupport={openSupportDirectory}
@@ -658,7 +776,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
         }}
         statusTitle="Cart context confirmed"
         statusDescription="Initialize the cart session before moving into the checkout route."
-        onOpenStore={() => setRoute('store-detail')}
+        onOpenStore={() => setRoute('store-get')}
         onOpenOrder={() => setRoute('review')}
         onContinue={() => setRoute('cart-init')}
         onRetry={() => setRoute('cart-get')}
@@ -1026,6 +1144,18 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
         setItemsCategory(categoryId);
         setRoute('category-get');
       }}
+      onOpenStoresList={() => setRoute('stores-list')}
+      onOpenStoreCategory={(storeId, categoryId) => {
+        setActiveStoreId(storeId);
+        setItemsCategory(categoryId);
+        setRoute('store-items-list');
+      }}
+      onOpenProduct={(storeId, itemId) => {
+        setActiveStoreId(storeId);
+        setSelectedItemId(itemId);
+        setRoute('cart-get');
+      }}
+      onOpenBenefits={() => setRoute('benefits')}
       onOpenFavorites={() => setRoute('favorites-list')}
       onOpenSearch={() => setRoute('search')}
       onOpenStore={(storeId) => {
@@ -1033,7 +1163,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
         setItemsQuery('');
         setItemsCategory('all');
         setSelectedItemId('');
-        setRoute('store-detail');
+        setRoute('store-get');
       }}
       onRetry={() => setRoute('home')}
     />

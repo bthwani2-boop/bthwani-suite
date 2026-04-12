@@ -3,6 +3,9 @@ export type DshHomeGetFixturePromo = {
   title: string;
   subtitle: string;
   icon: string;
+  actionType?: 'main_category' | 'sub_category' | 'store' | 'external' | 'store_category' | 'product' | 'subscription';
+  actionTarget?: string;
+  actionExtra?: string;
   imageUrl?: string;
   accentColor?: string;
 };
@@ -72,6 +75,8 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     icon: '🔥',
     imageUrl: bannerImages[0],
     accentColor: '#ff9b33',
+    actionType: 'main_category',
+    actionTarget: 'restaurants',
   },
   {
     id: 'promo-2',
@@ -80,6 +85,8 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     icon: '📍',
     imageUrl: bannerImages[1],
     accentColor: '#2557c9',
+    actionType: 'store',
+    actionTarget: 'store-1001',
   },
   {
     id: 'promo-3',
@@ -88,6 +95,49 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     icon: '✨',
     imageUrl: bannerImages[2],
     accentColor: '#ff6a6a',
+    actionType: 'sub_category',
+    actionTarget: 'grocery',
+    actionExtra: 'grocery_vegetables_fruits',
+  },
+  {
+    id: 'promo-4',
+    title: 'متجر مباشر',
+    subtitle: 'افتح المتجر ثم تابع إلى القائمة',
+    icon: '🏪',
+    imageUrl: createBannerDataUrl('#0d2f67', '#2557c9', 'متجر مباشر', 'افتح واجهة المتجر'),
+    accentColor: '#0d2f67',
+    actionType: 'store',
+    actionTarget: 'store-1002',
+  },
+  {
+    id: 'promo-5',
+    title: 'منتج مباشر',
+    subtitle: 'افتح المنتج الجاهز للتفاعل',
+    icon: '📦',
+    imageUrl: createBannerDataUrl('#f54747', '#ff6a6a', 'منتج مباشر', 'انتقال مباشر إلى الطلب'),
+    accentColor: '#f54747',
+    actionType: 'product',
+    actionTarget: 'item-apple-1',
+    actionExtra: 'store-1001',
+  },
+  {
+    id: 'promo-6',
+    title: 'قائمة المتاجر',
+    subtitle: 'واجهة تجمع كل المتاجر القريبة',
+    icon: '🛍️',
+    imageUrl: createBannerDataUrl('#15a26b', '#30c98a', 'قائمة المتاجر', 'انتقل إلى استكشاف المتاجر'),
+    accentColor: '#15a26b',
+    actionType: 'external',
+    actionTarget: 'DshStoresList',
+  },
+  {
+    id: 'promo-7',
+    title: 'اشتراك مميز',
+    subtitle: 'اعرض فوائد الاشتراك مباشرة',
+    icon: '⭐',
+    imageUrl: createBannerDataUrl('#7a4fff', '#9d7cff', 'اشتراك مميز', 'افتح باقة الفوائد'),
+    accentColor: '#7a4fff',
+    actionType: 'subscription',
   },
 ];
 

@@ -2,7 +2,6 @@ import React from 'react';
 import {
   BthBox,
   BthButton,
-  BthListItem,
   BthMobileScrollView,
   BthSearchField,
   BthSectionHeader,
@@ -11,6 +10,7 @@ import {
   BthTabs,
   BthText,
 } from '@bthwani/ui-kit';
+import { StoreCardPremium, type DshStoreCompactCardData } from '../../home/components/StoreCardPremium';
 
 export type DshStoreListItem = {
   id: string;
@@ -20,7 +20,22 @@ export type DshStoreListItem = {
   meta: string;
   isOffer?: boolean;
   isFavorite?: boolean;
+  isFollowing?: boolean;
   etaMinutes?: number;
+  distanceKm?: number;
+  rating?: number;
+  imageUri?: string;
+  deliveryLabel?: string;
+  serviceLabel?: string;
+  followerCount?: number;
+  multiplierLabel?: string;
+  subscriptionPackageChips?: string[];
+  offerLabel?: string;
+  hasBthwaniPro?: boolean;
+  hasNewProducts?: boolean;
+  hasCouponAvailable?: boolean;
+  supportsPickup?: boolean;
+  supportsPartnerDelivery?: boolean;
 };
 
 export type DshStoresListScreenProps = {
@@ -72,6 +87,10 @@ export function DshStoresListScreen({
   onOpenFavorites,
   onRetry,
 }: DshStoresListScreenProps) {
+  const [favoriteToggles, setFavoriteToggles] = React.useState<Record<string, boolean>>({});
+  const [followToggles, setFollowToggles] = React.useState<Record<string, boolean>>({});
+  const [followCounts, setFollowCounts] = React.useState<Record<string, number>>({});
+
   const filteredByMode = React.useMemo(() => {
     return items.filter((item) => {
       if (activeFilter === 'nearest') {
@@ -110,6 +129,36 @@ export function DshStoresListScreen({
     return renderNonReadyState('empty', onRetry);
   }
 
+  const buildCardItem = React.useCallback((item: DshStoreListItem): DshStoreCompactCardData => {
+    const isFavorite = favoriteToggles[item.id] ?? item.isFavorite ?? false;
+    const isFollowing = followToggles[item.id] ?? item.isFollowing ?? false;
+
+    return {
+      id: item.id,
+      name: item.name,
+      subtitle: item.subtitle,
+      image: { uri: item.imageUri ?? '' },
+      rating: item.rating ?? (item.isOffer ? 5 : 4.8),
+      distanceKm: item.distanceKm ?? (item.etaMinutes != null ? Number((item.etaMinutes / 10).toFixed(1)) : null),
+      isOpen: item.statusLabel.toLowerCase() !== 'closed' && item.statusLabel.toLowerCase() !== 'مغلق',
+      supportsPickup: item.supportsPickup ?? true,
+      supportsPartnerDelivery: item.supportsPartnerDelivery ?? true,
+      serviceTokens: item.deliveryLabel || item.serviceLabel
+        ? [{ label: item.deliveryLabel ?? 'توصيل سريع' }, { label: item.serviceLabel ?? 'توصيل برو' }]
+        : undefined,
+      isFavorite,
+      isFollowing,
+      followersCount: followCounts[item.id] ?? item.followerCount ?? 0,
+      hasBthwaniPro: item.hasBthwaniPro ?? true,
+      subscriptionPackageChips: item.subscriptionPackageChips,
+      hasNewProducts: item.hasNewProducts ?? Boolean(item.isOffer),
+      hasOffer: item.isOffer ?? Boolean(item.offerLabel),
+      offerText: item.offerLabel ?? (item.isOffer ? 'عرض مباشر' : undefined),
+      pointsMultiplier: item.multiplierLabel ? Number.parseInt(item.multiplierLabel.replace(/[^\d]/g, ''), 10) || undefined : undefined,
+      hasCouponAvailable: item.hasCouponAvailable ?? !Boolean(item.isOffer),
+    };
+  }, [favoriteToggles, followCounts, followToggles]);
+
   return (
     <BthMobileScrollView padding={4} gap={3}>
       <BthBox gap={2}>
@@ -146,15 +195,32 @@ export function DshStoresListScreen({
           subtitle="Open store details to continue the delivery journey."
           count={filteredItems.length}
         />
+        <BthText role="caption" tone="muted">
+          Premium cards keep rating, follow, favorite, and offer state visible in one glance.
+        </BthText>
         <BthBox gap={2}>
           {filteredItems.map((item) => (
-            <BthListItem
+            <StoreCardPremium
               key={item.id}
-              title={item.name}
-              subtitle={item.subtitle}
-              badgeLabel={item.statusLabel}
-              meta={item.meta}
-              onPress={() => onOpenStore?.(item.id)}
+              item={buildCardItem(item)}
+              onPress={onOpenStore}
+              onPressSubscriptionChip={onOpenStore ? () => onOpenStore(item.id) : undefined}
+              onToggleFavorite={(storeId) => {
+                setFavoriteToggles((current) => ({
+                  ...current,
+                  [storeId]: !(current[storeId] ?? item.isFavorite ?? false),
+                }));
+              }}
+              onToggleFollow={(storeId) => {
+                const currentFollow = followToggles[storeId] ?? item.isFollowing ?? false;
+                const baseCount = followCounts[storeId] ?? item.followerCount ?? 0;
+
+                setFollowToggles((current) => ({ ...current, [storeId]: !currentFollow }));
+                setFollowCounts((current) => ({
+                  ...current,
+                  [storeId]: currentFollow ? Math.max(0, baseCount - 1) : baseCount + 1,
+                }));
+              }}
             />
           ))}
         </BthBox>

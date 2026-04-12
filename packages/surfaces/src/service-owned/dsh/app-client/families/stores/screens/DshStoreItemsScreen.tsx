@@ -2,6 +2,8 @@ import React from 'react';
 import {
   BthBox,
   BthButton,
+  BthChip,
+  BthCard,
   BthListItem,
   BthMobileScrollView,
   BthSearchField,
@@ -20,6 +22,9 @@ export type DshStoreItem = {
   categoryId: string;
   categoryLabel: string;
   statusLabel?: string;
+  isAvailable?: boolean;
+  hasOptions?: boolean;
+  preparationTime?: string;
 };
 
 export type DshStoreItemsScreenProps = {
@@ -150,12 +155,20 @@ export function DshStoreItemsScreen({
         </BthText>
         <BthBox gap={2}>
           {visibleItems.map((item) => (
-            <BthListItem
+            <BthCard
               key={item.id}
               title={item.name}
               subtitle={item.subtitle}
-              badgeLabel={item.statusLabel ?? item.categoryLabel}
-              meta={item.priceLabel}
+              footer={
+                <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                  <BthChip label={item.priceLabel} selected />
+                  <BthChip label={item.categoryLabel} />
+                  {item.statusLabel ? <BthChip label={item.statusLabel} /> : null}
+                  {item.preparationTime ? <BthChip label={item.preparationTime} /> : null}
+                  {item.hasOptions ? <BthChip label="Options" /> : null}
+                  {item.isAvailable === false ? <BthChip label="Unavailable" /> : null}
+                </BthBox>
+              }
               onPress={() => onOpenItem?.(item.id)}
             />
           ))}
