@@ -1,17 +1,35 @@
 {
-  "name": "app-client",
-  "targets": {
-    "serve": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "pnpm --dir apps/mobile/app-client exec expo start --go --clear"
-      }
-    },
-    "build": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "pnpm --dir apps/mobile/app-client exec expo export --platform android"
-      }
-    }
-  }
+    "name":  "app-client",
+    "targets":  {
+                    "serve":  {
+                                  "executor":  "nx:run-commands",
+                                  "options":  {
+                                                  "command":  "pnpm --dir apps/mobile/app-client exec expo start --dev-client --clear"
+                                              }
+                              },
+                    "build":  {
+                                  "executor":  "nx:run-commands",
+                                  "options":  {
+                                                  "command":  "pnpm --dir apps/mobile/app-client exec expo export --platform android"
+                                              }
+                              },
+                    "serve-go":  {
+                                     "executor":  "nx:run-commands",
+                                     "options":  {
+                                                     "command":  "pnpm --dir apps/mobile/app-client exec expo start --go --clear"
+                                                 }
+                                 },
+                    "android":  {
+                                    "executor":  "nx:run-commands",
+                                    "options":  {
+                                                    "command":  "pnpm --dir apps/mobile/app-client exec expo run:android --no-bundler"
+                                                }
+                                },
+                    "config":  {
+                                   "executor":  "nx:run-commands",
+                                   "options":  {
+                                                   "command":  "pnpm --dir apps/mobile/app-client exec expo config --json"
+                                               }
+                               }
+                }
 }

@@ -4,13 +4,31 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm --dir apps/mobile/app-field exec expo start --go --clear"
+        "command": "pnpm --dir apps/mobile/app-field exec expo start --dev-client --clear"
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm --dir apps/mobile/app-field exec expo export --platform android"
+      }
+    },
+    "serve-go": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir apps/mobile/app-field exec expo start --go --clear"
+      }
+    },
+    "android": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir apps/mobile/app-field exec expo run:android"
+      }
+    },
+    "config": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir apps/mobile/app-field exec expo config --json"
       }
     }
   }

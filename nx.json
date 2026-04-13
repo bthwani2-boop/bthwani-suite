@@ -14,5 +14,6 @@
       "!{projectRoot}/**/test-results/**"
     ]
   },
-  "targetDefaults": {}
+  "targetDefaults": {},
+  "analytics": true
 }

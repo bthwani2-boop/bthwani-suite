@@ -1,4 +1,5 @@
 import React from 'react';
+import { BackHandler, Platform } from 'react-native';
 import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthSurface, BthText } from '@bthwani/ui-kit';
 import { dsh } from '@bthwani/surfaces';
 import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
@@ -166,6 +167,8 @@ export function PartnerSurfaceHost() {
   const [storeHours, setStoreHours] = React.useState(defaultStoreHours.map((day) => ({ ...day })));
   const [selectedZoneId, setSelectedZoneId] = React.useState('yasmin');
   const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<PartnerSupportRoute>('order-issue-queue');
+  const routeHistoryRef = React.useRef<PartnerRoute[]>(['entry']);
+  const routeTransitionFromBackRef = React.useRef(false);
 
   const activePrimaryAreas =
     activeServiceType === 'dsh'
@@ -287,6 +290,43 @@ export function PartnerSurfaceHost() {
   );
 
   const partnerEntryState = 'ready' as const;
+
+  React.useEffect(() => {
+    const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1];
+
+    if (route !== previousRoute) {
+      if (routeTransitionFromBackRef.current) {
+        routeTransitionFromBackRef.current = false;
+      } else {
+        routeHistoryRef.current.push(route);
+      }
+    }
+  }, [route]);
+
+  React.useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return undefined;
+    }
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (accountSheetVisible) {
+        setAccountSheetVisible(false);
+        return true;
+      }
+
+      if (routeHistoryRef.current.length > 1) {
+        routeTransitionFromBackRef.current = true;
+        routeHistoryRef.current.pop();
+        const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'entry';
+        setRoute(previousRoute);
+        return true;
+      }
+
+      return false;
+    });
+
+    return () => subscription.remove();
+  }, [accountSheetVisible]);
 
   const openOrdersBoard = () => {
     setRoute('inbox');

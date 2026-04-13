@@ -1,6 +1,6 @@
 ﻿import { useBthServiceLabels } from '../../shared/BthServiceLabels';
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { BackHandler, Platform, ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   BthBox,
@@ -60,6 +60,33 @@ export function ClientSurfaceHost() {
   const { direction, language, setLanguage } = useDirection();
   const uiText = useUiText();
   const serviceLabels = useBthServiceLabels();
+
+  React.useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return undefined;
+    }
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (accountSheetVisible) {
+        closeAccountSheet();
+        return true;
+      }
+
+      if (route === 'dsh') {
+        return false;
+      }
+
+      if (route !== 'home') {
+        setRoute('home');
+        return true;
+      }
+
+      BackHandler.exitApp();
+      return true;
+    });
+
+    return () => subscription.remove();
+  }, [accountSheetVisible, closeAccountSheet, route]);
 
   const serviceEntries = React.useMemo<ServiceEntry[]>(
     () => [

@@ -33,7 +33,25 @@ export type DshHomeGetFixtureStore = {
   hasNewProducts?: boolean;
 };
 
-export const dshHomeGetFixtureTickerMessage = 'المساحة مخصصة للشريط الإخباري • اطلب إلى المنزل أو افتح الطلب النشط خلال خطوة واحدة';
+export type DshHomeGetFixtureTickerBanner = {
+  id: string;
+  openHour: number;
+  closeHour: number;
+  openStatusLabel: string;
+  closedStatusLabel: string;
+  openMessage: string;
+  closedMessage: string;
+};
+
+export const dshHomeGetFixtureTickerBanner: DshHomeGetFixtureTickerBanner = {
+  id: 'dsh-home-ticker-banner',
+  openHour: 8,
+  closeHour: 23,
+  openStatusLabel: 'مباشر',
+  closedStatusLabel: 'مغلق',
+  openMessage: 'المساحة مخصصة للشريط الإخباري • اطلب إلى المنزل أو افتح الطلب النشط خلال خطوة واحدة',
+  closedMessage: 'خارج الدوام تظهر المساحة مغلقة مع بقاء المسارات محفوظة للعودة لاحقًا',
+};
 
 function createBannerDataUrl(background: string, accent: string, title: string, subtitle: string): string {
   const svg = `

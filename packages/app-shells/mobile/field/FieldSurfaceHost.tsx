@@ -1,4 +1,5 @@
 import React from 'react';
+import { BackHandler, Platform } from 'react-native';
 import {
   BthBadge,
   BthBox,
@@ -131,6 +132,8 @@ export function FieldSurfaceHost() {
   const [activationValues, setActivationValues] = React.useState<DshFieldStoreActivationRequestValues>(dshFieldActivationWorkspaceFixtureValues);
   const [geoPinValues, setGeoPinValues] = React.useState<DshFieldStoreGeoPinValues>(dshFieldStoreGeoPinFixtureValues);
   const [visitLogValues, setVisitLogValues] = React.useState<DshFieldStoreVisitLogValues>(dshFieldStoreVisitLogFixtureValues);
+  const routeHistoryRef = React.useRef<FieldRoute[]>(['entry']);
+  const routeTransitionFromBackRef = React.useRef(false);
 
   const filteredFieldVisits = React.useMemo(() => {
     const query = homeSearchQuery.trim().toLowerCase();
@@ -144,6 +147,43 @@ export function FieldSurfaceHost() {
       return haystack.includes(query);
     });
   }, [homeSearchQuery]);
+
+  React.useEffect(() => {
+    const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1];
+
+    if (route !== previousRoute) {
+      if (routeTransitionFromBackRef.current) {
+        routeTransitionFromBackRef.current = false;
+      } else {
+        routeHistoryRef.current.push(route);
+      }
+    }
+  }, [route]);
+
+  React.useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return undefined;
+    }
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (accountSheetVisible) {
+        setAccountSheetVisible(false);
+        return true;
+      }
+
+      if (routeHistoryRef.current.length > 1) {
+        routeTransitionFromBackRef.current = true;
+        routeHistoryRef.current.pop();
+        const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'entry';
+        setRoute(previousRoute);
+        return true;
+      }
+
+      return false;
+    });
+
+    return () => subscription.remove();
+  }, [accountSheetVisible]);
 
   const handleBackHome = () => {
     setRoute('home');

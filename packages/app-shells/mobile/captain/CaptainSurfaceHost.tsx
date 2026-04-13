@@ -1,4 +1,5 @@
 import React from 'react';
+import { BackHandler, Platform } from 'react-native';
 import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthStateView, BthSurface, BthText } from '@bthwani/ui-kit';
 import { dsh } from '@bthwani/surfaces';
 import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
@@ -95,12 +96,51 @@ export function CaptainSurfaceHost() {
   const [isPickupSheetVisible, setIsPickupSheetVisible] = React.useState(false);
   const [isDeliverySheetVisible, setIsDeliverySheetVisible] = React.useState(false);
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
+  const routeHistoryRef = React.useRef<CaptainRoute[]>(['home']);
+  const routeTransitionFromBackRef = React.useRef(false);
 
   const activeSummary = defaultDetailByTaskId[activeTaskId] ?? defaultDetailByTaskId['captain-task-9021'];
 
   if (!activeSummary) {
     return null;
   }
+
+  React.useEffect(() => {
+    const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1];
+
+    if (route !== previousRoute) {
+      if (routeTransitionFromBackRef.current) {
+        routeTransitionFromBackRef.current = false;
+      } else {
+        routeHistoryRef.current.push(route);
+      }
+    }
+  }, [route]);
+
+  React.useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return undefined;
+    }
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (accountSheetVisible) {
+        setAccountSheetVisible(false);
+        return true;
+      }
+
+      if (routeHistoryRef.current.length > 1) {
+        routeTransitionFromBackRef.current = true;
+        routeHistoryRef.current.pop();
+        const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'home';
+        setRoute(previousRoute);
+        return true;
+      }
+
+      return false;
+    });
+
+    return () => subscription.remove();
+  }, [accountSheetVisible]);
 
   const openTaskDetail = (taskId: string) => {
     setActiveTaskId(taskId);

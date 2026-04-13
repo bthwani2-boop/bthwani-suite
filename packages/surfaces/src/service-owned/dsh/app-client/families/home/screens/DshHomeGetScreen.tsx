@@ -4,6 +4,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   BthBox,
   BthMobileScrollView,
+  BthNewsTickerBar,
   BthStateView,
   BthText,
   radius,
@@ -15,6 +16,7 @@ import {
 import {
   dshHomeGetFixturePromos,
   dshHomeGetFixtureStores,
+  dshHomeGetFixtureTickerBanner,
 } from '../fixtures/dshHomeGetFixtures';
 import {
   StoreCardPremium,
@@ -33,6 +35,8 @@ export type DshHomeGetScreenProps = {
   stores?: DshHomeGetStore[];
   recentOrders?: DshHomeRecentOrder[];
   onBack?: () => void;
+  onOpenEntry?: () => void;
+  onOpenCart?: () => void;
   onOpenList?: () => void;
   onOpenCategory?: (categoryId: string) => void;
   onOpenStoresList?: () => void;
@@ -127,6 +131,32 @@ const categoryIconMap: Record<string, string> = {
   electronics: '📱',
 };
 
+function isWithinOperatingHours(now: Date, openHour: number, closeHour: number) {
+  const currentHour = now.getHours();
+
+  if (openHour === closeHour) {
+    return true;
+  }
+
+  if (openHour < closeHour) {
+    return currentHour >= openHour && currentHour < closeHour;
+  }
+
+  return currentHour >= openHour || currentHour < closeHour;
+}
+
+function resolveTickerBanner(now: Date) {
+  const fixture = dshHomeGetFixtureTickerBanner;
+  const isOpen = isWithinOperatingHours(now, fixture.openHour, fixture.closeHour);
+
+  return {
+    fixture,
+    isOpen,
+    statusLabel: isOpen ? fixture.openStatusLabel : fixture.closedStatusLabel,
+    message: isOpen ? fixture.openMessage : fixture.closedMessage,
+  };
+}
+
 function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>, 'ready'>, onRetry?: () => void) {
   if (state === 'loading') {
     return <BthStateView stateId="loading" />;
@@ -200,6 +230,7 @@ export function DshHomeGetScreen({
   const [followToggles, setFollowToggles] = React.useState<Record<string, boolean>>({});
   const [followCounts, setFollowCounts] = React.useState<Record<string, number>>({});
   const [shortsVisible, setShortsVisible] = React.useState(false);
+  const [currentTime, setCurrentTime] = React.useState(() => new Date());
   const categoryItems = React.useMemo(() => {
     if (categories?.length) {
       return categories;
@@ -222,6 +253,14 @@ export function DshHomeGetScreen({
 
     return () => clearInterval(interval);
   }, [promos]);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const visibleStores = React.useMemo(() => {
     return stores.filter((store) => {
@@ -370,237 +409,305 @@ export function DshHomeGetScreen({
     accentColor: promo.accentColor,
     onPress: resolveBannerPress(promo),
   }));
+  const tickerState = React.useMemo(() => resolveTickerBanner(currentTime), [currentTime]);
+  const tickerAction = onOpenOrders ?? onOpenTracking ?? onOpenSearch;
 
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <View style={styles.carouselViewport}>
-        <HomeBannerCarousel banners={bannerItems} rtl={direction === 'rtl'} />
-      </View>
-
-      <View style={styles.heroRow}>
-        <Pressable style={styles.heroPromoCard} onPress={onOpenSearch ?? onOpenList}>
-          <View style={styles.heroPromoContent}>
-            <View style={styles.heroPromoIconWrap}>
-              <BthText role="titleLg" style={styles.heroIcon}>
-                {activePromo.icon}
-              </BthText>
-            </View>
-
-            <View style={styles.heroPromoTextWrap}>
-              <View style={styles.heroPromoBadge}>
-                <BthText role="bodySm" style={styles.heroPromoBadgeText}>
-                  {activePromo.title}
-                </BthText>
-              </View>
-              <BthText role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
-                {promoDiscount}
-              </BthText>
-              <BthText role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
-                {promoTail || 'على أول طلب'}
+    <View style={styles.screenRoot}>
+      <View style={styles.dshHeader}>
+        <View style={styles.dshHeaderTopRow}>
+          <View style={styles.dshHeaderTextBlock}>
+            <BthText role="titleMd" style={styles.dshHeaderTitle} numberOfLines={1}>
+              تحقق الاماني بثواني
+            </BthText>
+            <View style={styles.dshHeaderLocationRow}>
+              <Ionicons name="location-outline" size={14} color="#fff4eb" />
+              <BthText role="bodySm" style={styles.dshHeaderLocationText} numberOfLines={1}>
+                صنعاء، الجيل الجديد
               </BthText>
             </View>
           </View>
 
-          <View style={styles.heroPagerRow}>
-            <View style={styles.heroPagerActive} />
+          <View style={styles.dshHeaderActionsRow}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Open entry"
+              style={styles.dshHeaderIconButton}
+              onPress={onOpenEntry}
+            >
+              <Ionicons name="person-outline" size={24} color="#ffffff" />
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Open orders"
+              style={styles.dshHeaderIconButton}
+              onPress={onOpenOrders}
+            >
+              <View style={styles.dshBellBadge}>
+                <BthText role="caption" style={styles.dshBellBadgeText}>5</BthText>
+              </View>
+              <Ionicons name="notifications-outline" size={24} color="#ffffff" />
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Open cart"
+              style={styles.dshHeaderIconButton}
+              onPress={onOpenCart}
+            >
+              <Ionicons name="cart-outline" size={24} color="#ffffff" />
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Open search"
+              style={styles.dshHeaderIconButton}
+              onPress={onOpenSearch}
+            >
+              <Ionicons name="search-outline" size={24} color="#ffffff" />
+            </Pressable>
           </View>
-        </Pressable>
+        </View>
 
-        <View style={styles.quickActionsCluster}>
-          <View style={styles.quickActionBottomRow}>
-            <Pressable style={styles.quickActionSecondary} onPress={onOpenList}>
-              <View style={styles.quickActionChipContent}>
-                <Ionicons name="menu-outline" size={16} color="#ffffff" />
-                <BthText role="bodySm" style={styles.quickActionLabel}>الفئات</BthText>
-              </View>
-            </Pressable>
-            <Pressable style={styles.quickActionTertiary} onPress={() => setShortsVisible(true)}>
-              <View style={styles.quickActionChipContent}>
-                <Ionicons name="videocam-outline" size={15} color="#ffffff" />
-                <BthText role="bodySm" style={styles.quickActionLabel}>فيديو</BthText>
-              </View>
-            </Pressable>
+        <View style={styles.tickerSection}>
+          <View style={styles.tickerFrame}>
+            <BthNewsTickerBar
+              statusLabel={tickerState.statusLabel}
+              message={tickerState.message}
+              onPress={tickerAction}
+            />
           </View>
         </View>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.categoryRail,
-          direction === 'rtl' && styles.categoryRailRtl,
-        ]}
-      >
-        {categoryItems.map((category) => {
-          const isActive = category.id === activeCategoryId;
-          const icon = categoryIconMap[category.id] ?? '📂';
+      <BthMobileScrollView padding={4} gap={4}>
+        <View style={styles.carouselViewport}>
+          <HomeBannerCarousel banners={bannerItems} rtl={direction === 'rtl'} />
+        </View>
 
-          return (
-            <Pressable
-              key={category.id}
-              style={[
-                styles.categoryRailItem,
-                isActive && styles.categoryRailItemActive,
-              ]}
-              onPress={() => {
-                setActiveCategoryId(category.id);
-                if (onOpenCategory) {
-                  onOpenCategory(category.id);
-                  return;
-                }
+        <View style={styles.heroRow}>
+          <Pressable style={styles.heroPromoCard} onPress={onOpenSearch ?? onOpenList}>
+            <View style={styles.heroPromoContent}>
+              <View style={styles.heroPromoIconWrap}>
+                <BthText role="titleLg" style={styles.heroIcon}>
+                  {activePromo.icon}
+                </BthText>
+              </View>
 
-                onOpenList?.();
-              }}
-            >
-              <BthText role="bodySm" style={styles.categoryRailIcon}>
-                {icon}
-              </BthText>
-              <BthText
-                role="bodySm"
+              <View style={styles.heroPromoTextWrap}>
+                <View style={styles.heroPromoBadge}>
+                  <BthText role="bodySm" style={styles.heroPromoBadgeText}>
+                    {activePromo.title}
+                  </BthText>
+                </View>
+                <BthText role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
+                  {promoDiscount}
+                </BthText>
+                <BthText role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
+                  {promoTail || 'على أول طلب'}
+                </BthText>
+              </View>
+            </View>
+
+            <View style={styles.heroPagerRow}>
+              <View style={styles.heroPagerActive} />
+            </View>
+          </Pressable>
+
+          <View style={styles.quickActionsCluster}>
+            <View style={styles.quickActionBottomRow}>
+              <Pressable style={styles.quickActionSecondary} onPress={onOpenList}>
+                <View style={styles.quickActionChipContent}>
+                  <Ionicons name="menu-outline" size={16} color="#ffffff" />
+                  <BthText role="bodySm" style={styles.quickActionLabel}>الفئات</BthText>
+                </View>
+              </Pressable>
+              <Pressable style={styles.quickActionTertiary} onPress={() => setShortsVisible(true)}>
+                <View style={styles.quickActionChipContent}>
+                  <Ionicons name="videocam-outline" size={15} color="#ffffff" />
+                  <BthText role="bodySm" style={styles.quickActionLabel}>فيديو</BthText>
+                </View>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.categoryRail,
+            direction === 'rtl' && styles.categoryRailRtl,
+          ]}
+        >
+          {categoryItems.map((category) => {
+            const isActive = category.id === activeCategoryId;
+            const icon = categoryIconMap[category.id] ?? '📂';
+
+            return (
+              <Pressable
+                key={category.id}
                 style={[
-                  styles.categoryRailLabel,
-                  isActive && styles.categoryRailLabelActive,
+                  styles.categoryRailItem,
+                  isActive && styles.categoryRailItemActive,
                 ]}
-                numberOfLines={1}
-              >
-                {category.label}
-              </BthText>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+                onPress={() => {
+                  setActiveCategoryId(category.id);
+                  if (onOpenCategory) {
+                    onOpenCategory(category.id);
+                    return;
+                  }
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.filtersRow,
-          direction === 'rtl' && styles.filtersRowRtl,
-        ]}
-      >
-        {discoveryFilters.map((filter) => {
-          const isActive = filter.value === activeFilter;
-          return (
-            <Pressable
-              key={filter.value}
-              style={[
-                styles.filterChip,
-                {
-                  backgroundColor: isActive ? theme.brand : theme.surfaceRaised,
-                  borderColor: isActive ? theme.brand : 'transparent',
-                },
-              ]}
-              onPress={() => setActiveFilter(filter.value)}
-            >
-              <View style={styles.filterChipContent}>
-                <Ionicons
-                  name={filter.iconName}
-                  size={16}
-                  color={isActive ? theme.textInverse : theme.textMuted}
-                />
+                  onOpenList?.();
+                }}
+              >
+                <BthText role="bodySm" style={styles.categoryRailIcon}>
+                  {icon}
+                </BthText>
                 <BthText
                   role="bodySm"
                   style={[
-                    styles.filterChipLabel,
-                    { color: isActive ? theme.textInverse : theme.textMuted },
+                    styles.categoryRailLabel,
+                    isActive && styles.categoryRailLabelActive,
                   ]}
+                  numberOfLines={1}
                 >
-                  {filter.label}
+                  {category.label}
                 </BthText>
-              </View>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-
-      <BthBox gap={3}>
-        {visibleStores.map((store, index) => {
-          const card: DshStoreCompactCardData = {
-            id: store.id,
-            name: store.name,
-            subtitle: store.address,
-            image: { uri: store.imageUri ?? '' },
-            rating: store.rating ?? (store.hasOffer ? 5 : 4.8),
-            distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
-            isOpen: store.statusTone === 'open',
-            supportsPickup: true,
-            supportsPartnerDelivery: true,
-            serviceTokens: [
-              { label: store.deliveryLabel },
-              { label: store.serviceLabel },
-            ],
-            isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
-            isFollowing: followToggles[store.id] ?? store.isFollowing,
-            followersCount: followCounts[store.id] ?? store.followerCount,
-            hasBthwaniPro: store.hasOffer !== false,
-            subscriptionPackageChips: store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel],
-            hasNewProducts: store.hasOffer === true,
-            hasOffer: store.hasOffer,
-            offerText: store.offerLabel,
-            pointsMultiplier: Number.parseInt(store.multiplierLabel.replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
-            hasCouponAvailable: store.hasOffer === false,
-          };
-
-          return (
-            <StoreCardPremium
-              key={store.id}
-              item={card}
-              onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
-              onToggleFavorite={(id) => {
-                setFavoriteToggles((current) => ({
-                  ...current,
-                  [id]: !(current[id] ?? store.isFavorite),
-                }));
-              }}
-              onToggleFollow={(id) => {
-                const isFollowing = followToggles[id] ?? store.isFollowing;
-                const baseCount = followCounts[id] ?? store.followerCount;
-                setFollowToggles((current) => ({ ...current, [id]: !isFollowing }));
-                setFollowCounts((current) => ({
-                  ...current,
-                  [id]: isFollowing ? Math.max(0, baseCount - 1) : baseCount + 1,
-                }));
-              }}
-              onPressSubscriptionChip={onOpenSearch}
-            />
-          );
-        })}
-      </BthBox>
-
-      <Modal visible={shortsVisible} transparent animationType="fade" onRequestClose={() => setShortsVisible(false)}>
-        <Pressable style={styles.shortsOverlay} onPress={() => setShortsVisible(false)}>
-          <Pressable style={styles.shortsPanel} onPress={(event) => event.stopPropagation()}>
-            <View style={styles.shortsHandle} />
-            <View style={styles.shortsHeader}>
-              <BthText role="titleSm" style={styles.shortsTitle}>Shorts DSH</BthText>
-              <Pressable style={styles.shortsCloseButton} onPress={() => setShortsVisible(false)}>
-                <Ionicons name="close" size={18} color="#1f2937" />
               </Pressable>
-            </View>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.shortsList}>
-              {homeShorts.map((item) => (
-                <Pressable key={item.id} style={[styles.shortsCard, item.tone === 'promo' && styles.shortsCardPromo, item.tone === 'store' && styles.shortsCardStore, item.tone === 'tracking' && styles.shortsCardTracking]}>
-                  <View style={styles.shortsCardTopRow}>
-                    <View style={styles.shortsPlayBadge}>
-                      <Ionicons name="play" size={14} color="#ffffff" />
-                    </View>
-                    <View style={styles.shortsCardTextWrap}>
-                      <BthText role="bodyMd" style={styles.shortsCardTitle} numberOfLines={1}>{item.title}</BthText>
-                      <BthText role="bodySm" style={styles.shortsCardSubtitle} numberOfLines={2}>{item.subtitle}</BthText>
-                    </View>
-                  </View>
-                  <View style={styles.shortsCardFooter}>
-                    <BthText role="caption" style={styles.shortsCardFooterText}>مشاهدة سريعة</BthText>
-                    <Ionicons name="chevron-forward" size={16} color="#ff6a00" />
-                  </View>
+            );
+          })}
+        </ScrollView>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.filtersRow,
+            direction === 'rtl' && styles.filtersRowRtl,
+          ]}
+        >
+          {discoveryFilters.map((filter) => {
+            const isActive = filter.value === activeFilter;
+            return (
+              <Pressable
+                key={filter.value}
+                style={[
+                  styles.filterChip,
+                  {
+                    backgroundColor: isActive ? theme.brand : theme.surfaceRaised,
+                    borderColor: isActive ? theme.brand : 'transparent',
+                  },
+                ]}
+                onPress={() => setActiveFilter(filter.value)}
+              >
+                <View style={styles.filterChipContent}>
+                  <Ionicons
+                    name={filter.iconName}
+                    size={16}
+                    color={isActive ? theme.textInverse : theme.textMuted}
+                  />
+                  <BthText
+                    role="bodySm"
+                    style={[
+                      styles.filterChipLabel,
+                      { color: isActive ? theme.textInverse : theme.textMuted },
+                    ]}
+                  >
+                    {filter.label}
+                  </BthText>
+                </View>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+
+        <BthBox gap={3}>
+          {visibleStores.map((store, index) => {
+            const card: DshStoreCompactCardData = {
+              id: store.id,
+              name: store.name,
+              subtitle: store.address,
+              image: { uri: store.imageUri ?? '' },
+              rating: store.rating ?? (store.hasOffer ? 5 : 4.8),
+              distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
+              isOpen: store.statusTone === 'open',
+              supportsPickup: true,
+              supportsPartnerDelivery: true,
+              serviceTokens: [
+                { label: store.deliveryLabel },
+                { label: store.serviceLabel },
+              ],
+              isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
+              isFollowing: followToggles[store.id] ?? store.isFollowing,
+              followersCount: followCounts[store.id] ?? store.followerCount,
+              hasBthwaniPro: store.hasOffer !== false,
+              subscriptionPackageChips: store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel],
+              hasNewProducts: store.hasOffer === true,
+              hasOffer: store.hasOffer,
+              offerText: store.offerLabel,
+              pointsMultiplier: Number.parseInt(store.multiplierLabel.replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
+              hasCouponAvailable: store.hasOffer === false,
+            };
+
+            return (
+              <StoreCardPremium
+                key={store.id}
+                item={card}
+                onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
+                onToggleFavorite={(id) => {
+                  setFavoriteToggles((current) => ({
+                    ...current,
+                    [id]: !(current[id] ?? store.isFavorite),
+                  }));
+                }}
+                onToggleFollow={(id) => {
+                  const isFollowing = followToggles[id] ?? store.isFollowing;
+                  const baseCount = followCounts[id] ?? store.followerCount;
+                  setFollowToggles((current) => ({ ...current, [id]: !isFollowing }));
+                  setFollowCounts((current) => ({
+                    ...current,
+                    [id]: isFollowing ? Math.max(0, baseCount - 1) : baseCount + 1,
+                  }));
+                }}
+                onPressSubscriptionChip={onOpenSearch}
+              />
+            );
+          })}
+        </BthBox>
+
+        <Modal visible={shortsVisible} transparent animationType="fade" onRequestClose={() => setShortsVisible(false)}>
+          <Pressable style={styles.shortsOverlay} onPress={() => setShortsVisible(false)}>
+            <Pressable style={styles.shortsPanel} onPress={(event) => event.stopPropagation()}>
+              <View style={styles.shortsHandle} />
+              <View style={styles.shortsHeader}>
+                <BthText role="titleSm" style={styles.shortsTitle}>Shorts DSH</BthText>
+                <Pressable style={styles.shortsCloseButton} onPress={() => setShortsVisible(false)}>
+                  <Ionicons name="close" size={18} color="#1f2937" />
                 </Pressable>
-              ))}
-            </ScrollView>
+              </View>
+              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.shortsList}>
+                {homeShorts.map((item) => (
+                  <Pressable key={item.id} style={[styles.shortsCard, item.tone === 'promo' && styles.shortsCardPromo, item.tone === 'store' && styles.shortsCardStore, item.tone === 'tracking' && styles.shortsCardTracking]}>
+                    <View style={styles.shortsCardTopRow}>
+                      <View style={styles.shortsPlayBadge}>
+                        <Ionicons name="play" size={14} color="#ffffff" />
+                      </View>
+                      <View style={styles.shortsCardTextWrap}>
+                        <BthText role="bodyMd" style={styles.shortsCardTitle} numberOfLines={1}>{item.title}</BthText>
+                        <BthText role="bodySm" style={styles.shortsCardSubtitle} numberOfLines={2}>{item.subtitle}</BthText>
+                      </View>
+                    </View>
+                    <View style={styles.shortsCardFooter}>
+                      <BthText role="caption" style={styles.shortsCardFooterText}>مشاهدة سريعة</BthText>
+                      <Ionicons name="chevron-forward" size={16} color="#ff6a00" />
+                    </View>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </Pressable>
           </Pressable>
-        </Pressable>
-      </Modal>
-    </BthMobileScrollView>
+        </Modal>
+      </BthMobileScrollView>
+    </View>
   );
 }
 
@@ -683,6 +790,83 @@ const styles = StyleSheet.create({
     color: '#ff6a00',
     fontWeight: '800',
     fontSize: 12,
+  },
+  screenRoot: {
+    flex: 1,
+  },
+  dshHeader: {
+    backgroundColor: '#ff7a00',
+    paddingTop: 14,
+    paddingBottom: 12,
+    paddingHorizontal: 14,
+    gap: 10,
+  },
+  dshHeaderTopRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  dshHeaderTextBlock: {
+    flex: 1,
+    alignItems: 'flex-end',
+    gap: 4,
+  },
+  dshHeaderTitle: {
+    color: '#ffffff',
+    fontWeight: '800',
+    fontSize: 18,
+    textAlign: 'right',
+  },
+  dshHeaderLocationRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 4,
+  },
+  dshHeaderLocationText: {
+    color: '#fff4eb',
+    fontWeight: '600',
+    textAlign: 'right',
+  },
+  dshHeaderActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  dshHeaderIconButton: {
+    width: 30,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dshBellBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#fbbf24',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  dshBellBadgeText: {
+    color: '#ffffff',
+    fontWeight: '800',
+    fontSize: 10,
+    lineHeight: 10,
+  },
+  tickerSection: {
+    borderWidth: 4,
+    borderColor: '#000000',
+    borderRadius: 20,
+    padding: 4,
+    backgroundColor: '#ff8b29',
+  },
+  tickerFrame: {
+    borderRadius: 16,
+    overflow: 'hidden',
   },
   activeOrderStatusLabel: {
     color: '#6b7280',

@@ -38,6 +38,8 @@ export type DshHomeScreenProps = {
   onStartDelivery?: () => void;
   onContinueOrder?: () => void;
   onOpenDiscovery?: () => void;
+  onOpenEntry?: () => void;
+  onOpenCart?: () => void;
   onOpenStoresList?: () => void;
   onOpenStoreCategory?: (storeId: string, categoryId: string) => void;
   onOpenProduct?: (storeId: string, itemId: string) => void;
@@ -162,6 +164,8 @@ export function DshHomeScreen({
   onContinueOrder,
   onOpenDiscovery,
   onOpenStoresList,
+  onOpenEntry,
+  onOpenCart,
   onOpenStoreCategory,
   onOpenProduct,
   onOpenBenefits,
@@ -181,6 +185,8 @@ export function DshHomeScreen({
       recentOrders={toRecentOrders(featuredStores)}
       onOpenCategory={onOpenCategory}
       onOpenStoresList={onOpenStoresList ?? onOpenDiscovery}
+      onOpenEntry={onOpenEntry}
+      onOpenCart={onOpenCart}
       onOpenStoreCategory={onOpenStoreCategory}
       onOpenProduct={onOpenProduct}
       onOpenBenefits={onOpenBenefits}

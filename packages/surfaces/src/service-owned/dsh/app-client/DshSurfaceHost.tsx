@@ -1,4 +1,5 @@
 import React from 'react';
+import { BackHandler, Platform } from 'react-native';
 import { DshSearchScreen } from './families/discovery/screens';
 import { DshEntryScreen } from './families/entry/screens';
 import { DshAwnakOrderCreateScreen } from './families/awnak/screens';
@@ -393,10 +394,49 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
   const [selectedItemId, setSelectedItemId] = React.useState<string>('');
   const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<ClientSupportScreenId>('checkout-gate');
+  const routeHistoryRef = React.useRef<DshRoute[]>(['home']);
+  const routeTransitionFromBackRef = React.useRef(false);
 
   React.useEffect(() => {
     setRoute(commandTargetToRoute(command.target));
   }, [command]);
+
+  React.useEffect(() => {
+    const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1];
+
+    if (route !== previousRoute) {
+      if (routeTransitionFromBackRef.current) {
+        routeTransitionFromBackRef.current = false;
+      } else {
+        routeHistoryRef.current.push(route);
+      }
+    }
+  }, [route]);
+
+  React.useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return undefined;
+    }
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (routeHistoryRef.current.length > 1) {
+        routeTransitionFromBackRef.current = true;
+        routeHistoryRef.current.pop();
+        const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'home';
+        setRoute(previousRoute);
+        return true;
+      }
+
+      if (onExit) {
+        onExit();
+        return true;
+      }
+
+      return false;
+    });
+
+    return () => subscription.remove();
+  }, [onExit]);
 
   const filteredOrders = React.useMemo(() => {
     const query = ordersQuery.trim().toLowerCase();
@@ -1139,6 +1179,8 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
       promos={dshHomeGetFixturePromos as DshHomeGetPromo[]}
       stores={dshHomeGetFixtureStores as DshHomeGetStore[]}
       onBack={onExit}
+      onOpenEntry={() => setRoute('entry')}
+      onOpenCart={() => setRoute('cart-get')}
       onOpenList={() => setRoute('categories-list')}
       onOpenCategory={(categoryId) => {
         setItemsCategory(categoryId);
