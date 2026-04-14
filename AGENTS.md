@@ -20,12 +20,5 @@
 - DON'T USE for: basic generator syntax (`nx g @nx/react:app`), standard commands, things you already know
 - The `nx-generate` skill handles generator discovery internally - don't call nx_docs just to look up generator syntax
 
-## Repo Chat Shortcuts
-
-- If the user says `ghb`, `غب`, or asks for checkpoint commit + push + new branch from chat, use `tools/scripts/ghb.ps1`.
-- Prefer the repo-local script over ad hoc git command sequences.
-- If the user did not provide a message, infer a short context-appropriate message from the current changes.
-- Do not ask the user to switch to the terminal for this workflow.
-
 
 <!-- nx configuration end-->
