@@ -9,7 +9,8 @@ export const serviceMeta = {
     'control-panel'
   ],
   controlPanelSections: [
-    'operations'
+    'operations',
+    'marketing'
   ],
   relatedServices: [],
   placeholder: false,

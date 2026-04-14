@@ -1178,6 +1178,24 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     <DshHomeGetScreen
       promos={dshHomeGetFixturePromos as DshHomeGetPromo[]}
       stores={dshHomeGetFixtureStores as DshHomeGetStore[]}
+      recentOrders={[
+        {
+          id: 'home-recent-order-1',
+          storeId: dshHomeGetFixtureStores[0]?.id ?? 'store-1001',
+          title: 'الطلب النشط',
+          subtitle: dshHomeGetFixtureStores[0]?.name ?? 'مطعم القلعة',
+          meta: `${dshHomeGetFixtureStores[0]?.distanceLabel ?? '2.1 كم'} · ${dshHomeGetFixtureStores[0]?.deliveryLabel ?? 'توصيل مجاني'}`,
+          statusLabel: dshHomeGetFixtureStores[0]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
+        },
+        {
+          id: 'home-recent-order-2',
+          storeId: dshHomeGetFixtureStores[1]?.id ?? 'store-1002',
+          title: 'آخر طلب',
+          subtitle: dshHomeGetFixtureStores[1]?.name ?? 'مطاعم الأرض الخضراء',
+          meta: `${dshHomeGetFixtureStores[1]?.distanceLabel ?? '1.8 كم'} · ${dshHomeGetFixtureStores[1]?.serviceLabel ?? 'توصيل برو'}`,
+          statusLabel: dshHomeGetFixtureStores[1]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
+        },
+      ]}
       onBack={onExit}
       onOpenEntry={() => setRoute('entry')}
       onOpenCart={() => setRoute('cart-get')}
@@ -1200,6 +1218,8 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
       onOpenBenefits={() => setRoute('benefits')}
       onOpenFavorites={() => setRoute('favorites-list')}
       onOpenSearch={() => setRoute('search')}
+      onOpenOrders={() => setRoute('orders-list')}
+      onOpenTracking={() => setRoute('tracking')}
       onOpenStore={(storeId) => {
         setActiveStoreId(storeId);
         setItemsQuery('');

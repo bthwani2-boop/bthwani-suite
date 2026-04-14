@@ -16,6 +16,7 @@ import { ControlPanelDshPeakModeScreen } from './operations/dsh/peak-mode';
 import { ControlPanelDshReassignScreen } from './operations/dsh/reassign';
 import { ControlPanelDshSheinProxyScreen } from './operations/dsh/sheinproxy';
 import { ControlPanelDshZoneSetScreen } from './operations/dsh/zone-set';
+import { ControlPanelDshMarketingScreen } from './marketing/dsh';
 
 const liveRouteHrefs = {
   overview: '/operations',
@@ -27,7 +28,7 @@ const liveRouteHrefs = {
   zoneSet: '/operations/dsh/zone-set',
 } as const;
 
-type DshWorkspaceId = 'overview' | 'orders' | 'order-detail' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'arrival-bell' | 'zone-set';
+type DshWorkspaceId = 'overview' | 'orders' | 'order-detail' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'arrival-bell' | 'zone-set' | 'marketing';
 
 type DshDockText = {
   dockEyebrow: string;
@@ -164,6 +165,7 @@ function ControlPanelDshOperationsDock() {
   const liveRouteItems: ReadonlyArray<DshDockRouteItem> = [
     { href: liveRouteHrefs.overview, label: dockText.overviewLabel, description: dockText.overviewDescription, statusLabel: dockText.liveBadge },
     { href: liveRouteHrefs.orders, label: dockText.ordersLabel, description: dockText.ordersDescription, statusLabel: dockText.liveBadge },
+    { href: '/operations/dsh/marketing', label: marketingTitle, description: marketingDescription, statusLabel: dockText.liveBadge },
     { href: liveRouteHrefs.sheinProxy, label: dockText.sheinProxyLabel, description: dockText.sheinProxyDescription, statusLabel: dockText.liveBadge },
     { href: liveRouteHrefs.reassign, label: dockText.reassignLabel, description: dockText.reassignDescription, statusLabel: dockText.liveBadge },
     { href: liveRouteHrefs.peakMode, label: dockText.peakModeLabel, description: dockText.peakModeDescription, statusLabel: dockText.liveBadge },
@@ -239,7 +241,7 @@ function ControlPanelDshOperationsDock() {
           <BthButton
             label={marketingTitle}
             tone="secondary"
-            onPress={() => router.push('/marketing')}
+            onPress={() => router.push('/operations/dsh/marketing')}
           />
         </BthBox>
       </BthWebSectionCard>
@@ -257,6 +259,7 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
   const tabs = [
     { id: 'overview', label: dshText.hub.workbenches.overview.label, active: normalizedWorkspace === 'overview' },
     { id: 'orders', label: dshText.hub.workbenches.orders.label, active: normalizedWorkspace === 'orders' },
+    { id: 'marketing', label: uiText.controlPanel.surfaceTitles.marketing, active: normalizedWorkspace === 'marketing' },
     { id: 'sheinproxy', label: dshText.hub.workbenches.sheinProxy.label, active: normalizedWorkspace === 'sheinproxy' },
     { id: 'reassign', label: dshText.hub.workbenches.reassign.label, active: normalizedWorkspace === 'reassign' },
     { id: 'peak-mode', label: dshText.hub.workbenches.peakMode.label, active: normalizedWorkspace === 'peak-mode' },
@@ -267,6 +270,7 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
   return (
     <BthBox gap={4}>
       {workspace === 'overview' ? <ControlPanelDshOperationsDock /> : null}
+      {workspace === 'marketing' ? <ControlPanelDshMarketingScreen hubHref="/operations/dsh" operationsHref="/operations" /> : null}
 
       {workspace !== 'overview' ? (
         <BthWebSegmentedTabs

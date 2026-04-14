@@ -149,15 +149,37 @@ function isWithinOperatingHours(now: Date, openHour: number, closeHour: number) 
   return currentHour >= openHour || currentHour < closeHour;
 }
 
-function resolveTickerBanner(now: Date) {
+function resolveTickerBanner(
+  now: Date,
+  recentOrders: DshHomeRecentOrder[],
+  locationLabel: string,
+  currentLanguage: string,
+) {
   const fixture = dshHomeGetFixtureTickerBanner;
   const isOpen = isWithinOperatingHours(now, fixture.openHour, fixture.closeHour);
+  const tickerLines: string[] = [];
+
+  if (locationLabel.trim()) {
+    tickerLines.push(
+      currentLanguage === 'en'
+        ? `Delivering to ${locationLabel.trim()}`
+        : `التوصيل إلى ${locationLabel.trim()}`,
+    );
+  }
+
+  recentOrders.slice(0, 2).forEach((order, index) => {
+    tickerLines.push(
+      currentLanguage === 'en'
+        ? `${index === 0 ? 'Active order' : 'Recent order'}: ${order.subtitle} · ${order.meta}`
+        : `${index === 0 ? 'الطلب النشط' : 'طلب سابق'}: ${order.subtitle} · ${order.meta}`,
+    );
+  });
 
   return {
     fixture,
     isOpen,
     statusLabel: isOpen ? fixture.openStatusLabel : fixture.closedStatusLabel,
-    message: isOpen ? fixture.openMessage : fixture.closedMessage,
+    message: tickerLines.length ? tickerLines.join('   •   ') : isOpen ? fixture.openMessage : fixture.closedMessage,
   };
 }
 
@@ -227,7 +249,7 @@ export function DshHomeGetScreen({
   onRetry,
   onOpenEntry,
 }: DshHomeGetScreenProps) {
-  const { direction } = useDirection();
+  const { direction, language: currentLanguage } = useDirection();
   const { theme } = useTheme();
   const uiText = useUiText();
   const styles = React.useMemo(() => createStyles(direction), [direction]);
@@ -417,7 +439,10 @@ export function DshHomeGetScreen({
     accentColor: promo.accentColor,
     onPress: resolveBannerPress(promo),
   }));
-  const tickerState = React.useMemo(() => resolveTickerBanner(currentTime), [currentTime]);
+  const tickerState = React.useMemo(
+    () => resolveTickerBanner(currentTime, recentOrders, uiText.topBar.location, currentLanguage),
+    [currentLanguage, currentTime, recentOrders, uiText.topBar.location]
+  );
   const tickerAction = onOpenOrders ?? onOpenTracking ?? onOpenSearch;
 
   return (

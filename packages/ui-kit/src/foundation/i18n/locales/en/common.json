@@ -48,8 +48,23 @@
       "support": "Support queues, escalations, and customer experience recovery.",
       "community-services": "Community-facing services, intake, and support pathways.",
       "partners": "Partner readiness and operational coordination across paths.",
-      "marketing": "Managing growth campaigns without breaking the centralized operational structure.",
+      "marketing": "Managing growth campaigns and the news ticker without breaking the centralized operational structure.",
       "control": "Platform governance, administration, and internal control framework."
+    },
+    "marketing": {
+      "heroEyebrow": "Marketing workspace",
+      "heroTitle": "News ticker and campaigns",
+      "heroDescription": "Manage ticker copy, publish windows, and routing links from one place.",
+      "tickerTitle": "News ticker",
+      "tickerDescription": "The top-line message shown in the client app and kept aligned with the home surface.",
+      "scheduleTitle": "Publish window",
+      "scheduleDescription": "Define display hours and fallback copy when the surface closes.",
+      "assetsTitle": "Published assets",
+      "assetsDescription": "Messages, links, and state stay ready for review before launch.",
+      "previewTitle": "Live preview",
+      "previewDescription": "Review the final shape before rollout.",
+      "openOperations": "Open operations",
+      "openDashboard": "Open overview"
     },
     "descriptions": {
       "default": "Understand the state in seconds, and start with the best recommended action in the same spirit as other MCPW panels.",

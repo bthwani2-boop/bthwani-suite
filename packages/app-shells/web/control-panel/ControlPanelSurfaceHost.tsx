@@ -3,12 +3,19 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  BthBox,
+  BthButton,
+  BthText,
+  useDirection,
+  useUiText,
+} from '@bthwani/ui-kit';
+import {
   BthWebCommandCenterFrame,
   BthWebMissionHeroCard,
+  BthWebSectionCard,
   BthWebSegmentedTabs,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
-import { useDirection, useUiText } from '@bthwani/ui-kit';
 import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 
@@ -177,6 +184,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
   const { direction } = useDirection();
   const uiText = useUiText();
   const panelText = uiText.controlPanel;
+  const marketingCopy = panelText.marketing;
   const [alertCount, setAlertCount] = React.useState(1);
   const [selectedServiceId, setSelectedServiceId] = React.useState<string>(allServiceTabId);
   const [activeSectionHref, setActiveSectionHref] = React.useState<PrimarySectionHref>(() => (
@@ -244,6 +252,36 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
   const heroPrimaryAction = resolvePrimaryAction(activeSectionId, panelText);
   const heroSecondaryAction = resolveSecondaryAction(activeSectionId, panelText);
   const signalCards = resolveSignals(panelText);
+  const marketingSignals = [
+    {
+      id: 'ticker',
+      title: marketingCopy.tickerTitle,
+      description: marketingCopy.tickerDescription,
+      value: '1',
+      tone: 'best' as const,
+    },
+    {
+      id: 'preview',
+      title: marketingCopy.previewTitle,
+      description: marketingCopy.previewDescription,
+      value: '1',
+      tone: 'neutral' as const,
+    },
+    {
+      id: 'schedule',
+      title: marketingCopy.scheduleTitle,
+      description: marketingCopy.scheduleDescription,
+      value: '2',
+      tone: 'neutral' as const,
+    },
+    {
+      id: 'assets',
+      title: marketingCopy.assetsTitle,
+      description: marketingCopy.assetsDescription,
+      value: '4',
+      tone: 'neutral' as const,
+    },
+  ] as const;
   const activeControlHref = isControlSection && subsection ? `/control/${subsection}` : undefined;
   const contextItems = isAllFilterActive ? sectionServiceNames : serviceSectionLabels;
 
@@ -367,6 +405,54 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
             </div>
           </section>
         </section>
+
+        {activeSectionId === 'marketing' ? (
+          <section className={styles.subsectionPanel}>
+            <div className={styles.subsectionHeader}>
+              <h3 className={styles.subsectionTitle}>{marketingCopy.heroTitle}</h3>
+              <p className={styles.subsectionDescription}>{marketingCopy.heroDescription}</p>
+            </div>
+
+            <BthWebMissionHeroCard
+              dense
+              badges={[panelText.surfaceTitles.marketing, marketingCopy.tickerTitle, marketingCopy.previewTitle]}
+              eyebrow={marketingCopy.heroEyebrow}
+              title={marketingCopy.heroTitle}
+              description={marketingCopy.heroDescription}
+              metaItems={[
+                marketingCopy.tickerTitle,
+                marketingCopy.scheduleTitle,
+                marketingCopy.assetsTitle,
+              ]}
+              primaryAction={{ label: marketingCopy.openOperations, href: '/operations' }}
+              secondaryAction={{ label: marketingCopy.openDashboard, href: '/dashboard' }}
+            />
+
+            <div className={styles.signalGrid}>
+              {marketingSignals.map((signal) => (
+                <BthWebSignalCard
+                  key={signal.id}
+                  title={signal.title}
+                  value={signal.value}
+                  description={signal.description}
+                  tone={signal.tone}
+                />
+              ))}
+            </div>
+
+            <BthWebSectionCard title={marketingCopy.tickerTitle} description={marketingCopy.tickerDescription}>
+              <BthBox gap={2}>
+                <BthText role="bodySm" tone="muted">
+                  {marketingCopy.heroDescription}
+                </BthText>
+                <BthBox gap={2}>
+                  <BthButton label={marketingCopy.openOperations} onPress={() => router.push('/operations')} />
+                  <BthButton label={marketingCopy.openDashboard} tone="secondary" onPress={() => router.push('/dashboard')} />
+                </BthBox>
+              </BthBox>
+            </BthWebSectionCard>
+          </section>
+        ) : null}
 
         {isControlSection ? (
           <section className={styles.subsectionPanel}>
