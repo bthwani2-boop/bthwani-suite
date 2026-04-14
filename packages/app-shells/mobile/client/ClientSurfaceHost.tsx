@@ -1,4 +1,4 @@
-﻿import { useBthServiceLabels } from '../../shared/BthServiceLabels';
+import { useBthServiceLabels } from '../../shared/BthServiceLabels';
 import React from 'react';
 import { BackHandler, Platform, ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -60,6 +60,11 @@ export function ClientSurfaceHost() {
   const { direction, language, setLanguage } = useDirection();
   const uiText = useUiText();
   const serviceLabels = useBthServiceLabels();
+  const routeOwnsTopBar = route === 'dsh';
+  const closeAccountSheet = React.useCallback(() => {
+    setAccountSheetVisible(false);
+    setAccountSheetTab('menu');
+  }, []);
 
   React.useEffect(() => {
     if (Platform.OS !== 'android') {
@@ -108,11 +113,6 @@ export function ClientSurfaceHost() {
     setRoute('dsh');
   }, []);
 
-  const closeAccountSheet = React.useCallback(() => {
-    setAccountSheetVisible(false);
-    setAccountSheetTab('menu');
-  }, []);
-
   const renderUnifiedTopBar = React.useCallback(() => {
     return (
       <UnifiedMobileTopBar
@@ -157,6 +157,9 @@ export function ClientSurfaceHost() {
       />
     );
   }, [openDsh, uiText]);
+
+  const showUnifiedTopBar = route !== 'dsh';
+
 
   const renderSubSurface = () => {
     if (route === 'dsh') {
@@ -249,23 +252,27 @@ export function ClientSurfaceHost() {
   if (route !== 'home') {
     return (
       <BthBox style={{ flex: 1 }} background="background">
-        {renderUnifiedTopBar()}
-        <BthSurface
-          tone="raised"
-          padding={0}
-          gap={0}
-          radiusToken="none"
-          border={false}
-          style={{
-            flex: 1,
-            marginTop: -2,
-            borderTopLeftRadius: 28,
-            borderTopRightRadius: 28,
-            overflow: 'hidden',
-          }}
-        >
-          {renderSubSurface()}
-        </BthSurface>
+        {!routeOwnsTopBar ? renderUnifiedTopBar() : null}
+        {routeOwnsTopBar ? (
+          renderSubSurface()
+        ) : (
+          <BthSurface
+            tone="raised"
+            padding={0}
+            gap={0}
+            radiusToken="none"
+            border={false}
+            style={{
+              flex: 1,
+              marginTop: showUnifiedTopBar ? -2 : 0,
+              borderTopLeftRadius: 28,
+              borderTopRightRadius: 28,
+              overflow: 'hidden',
+            }}
+          >
+            {renderSubSurface()}
+          </BthSurface>
+        )}
 
         <BthSheetFrame
           visible={accountSheetVisible}
@@ -287,7 +294,7 @@ export function ClientSurfaceHost() {
                 tone="secondary"
                 onPress={() => {
                   closeAccountSheet();
-                  openDsh('orders');
+                  openDsh('orders-list');
                 }}
               />
               <BthButton
@@ -329,7 +336,7 @@ export function ClientSurfaceHost() {
 
   return (
     <BthBox style={{ flex: 1 }} background="background">
-      {renderUnifiedTopBar()}
+      {showUnifiedTopBar ? renderUnifiedTopBar() : null}
 
       <BthSurface
         tone="raised"
@@ -339,7 +346,7 @@ export function ClientSurfaceHost() {
         border={false}
         style={{
           flex: 1,
-          marginTop: -2,
+          marginTop: showUnifiedTopBar ? -2 : 0,
           borderTopLeftRadius: 28,
           borderTopRightRadius: 28,
           overflow: 'hidden',
@@ -397,7 +404,7 @@ export function ClientSurfaceHost() {
               tone="secondary"
               onPress={() => {
                 closeAccountSheet();
-                openDsh('orders');
+                openDsh('orders-list');
               }}
             />
             <BthButton

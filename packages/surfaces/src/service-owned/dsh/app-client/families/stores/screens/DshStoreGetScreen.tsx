@@ -2,12 +2,10 @@ import React from 'react';
 import {
   Pressable,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BthChip, BthStateView, BthText, useDirection } from '@bthwani/ui-kit';
@@ -275,7 +273,6 @@ export function DshStoreGetScreen({
 
   return (
     <View style={styles.screen}>
-      <StatusBar barStyle="dark-content" backgroundColor={stylesTokens.orange} />
 
       <ScrollView
         style={styles.scroll}
@@ -507,7 +504,7 @@ const styles = StyleSheet.create({
 
   topChrome: {
     backgroundColor: stylesTokens.orange,
-    paddingTop: Platform.OS === 'android' ? 12 : 8,
+    paddingTop: 8,
     paddingHorizontal: 12,
     paddingBottom: 10,
     borderBottomLeftRadius: 26,

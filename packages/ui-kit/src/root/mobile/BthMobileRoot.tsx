@@ -2,7 +2,6 @@
 import { ReactNode } from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
 import { useTheme } from '../../hooks';
-import { DevFloatingActions } from '../../components';
 import { BthRootProviders, BthRootProvidersProps } from '../core/BthRootProviders';
 import { BthMobileProviders } from './BthMobileProviders';
 
@@ -22,7 +21,6 @@ function BthMobileRootFrame({ children }: { children: ReactNode }) {
       />
       <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
         {children}
-        <DevFloatingActions />
       </SafeAreaView>
     </>
   );

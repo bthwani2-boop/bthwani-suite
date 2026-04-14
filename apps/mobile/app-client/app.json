@@ -6,6 +6,14 @@
       "ios",
       "android"
     ],
-    "sdkVersion": "54.0.0"
+    "sdkVersion": "54.0.0",
+    "newArchEnabled": false,
+    "extra": {
+      "appKey": "app-client",
+      "appVariant": "development",
+      "eas": {
+        "projectId": "4adf3184-fc07-4186-b49e-0dc821a5ab73"
+      }
+    }
   }
 }

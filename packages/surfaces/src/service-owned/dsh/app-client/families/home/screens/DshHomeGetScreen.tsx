@@ -2,16 +2,20 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
+  BthUnifiedMobileTopBar,
   BthBox,
   BthMobileScrollView,
-  BthNewsTickerBar,
   BthStateView,
   BthText,
   radius,
+  resolveRowDirection,
+  resolveTextAlign,
   sizes,
   spacing,
+  type Direction,
   useDirection,
   useTheme,
+  useUiText,
 } from '@bthwani/ui-kit';
 import {
   dshHomeGetFixturePromos,
@@ -216,6 +220,7 @@ export function DshHomeGetScreen({
   onOpenBenefits,
   onOpenFavorites,
   onOpenSearch,
+  onOpenCart,
   onOpenOrders,
   onOpenTracking,
   onOpenStore,
@@ -224,6 +229,8 @@ export function DshHomeGetScreen({
 }: DshHomeGetScreenProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
+  const uiText = useUiText();
+  const styles = React.useMemo(() => createStyles(direction), [direction]);
   const [activeFilter, setActiveFilter] = React.useState<DiscoveryFilter>('all');
   const [activeCategoryId, setActiveCategoryId] = React.useState<string>('restaurants');
   const [activePromoIndex, setActivePromoIndex] = React.useState(0);
@@ -415,73 +422,48 @@ export function DshHomeGetScreen({
 
   return (
     <View style={styles.screenRoot}>
-      <View style={styles.dshHeader}>
-        <View style={styles.dshHeaderTopRow}>
-          <View style={styles.dshHeaderTextBlock}>
-            <BthText role="titleMd" style={styles.dshHeaderTitle} numberOfLines={1}>
-              تحقق الاماني بثواني
-            </BthText>
-            <View style={styles.dshHeaderLocationRow}>
-              <Ionicons name="location-outline" size={14} color="#fff4eb" />
-              <BthText role="bodySm" style={styles.dshHeaderLocationText} numberOfLines={1}>
-                صنعاء، الجيل الجديد
-              </BthText>
-            </View>
-          </View>
-
-          <View style={styles.dshHeaderActionsRow}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Open entry"
-              style={styles.dshHeaderIconButton}
-              onPress={() => onOpenEntry?.()}
-            >
-              <Ionicons name="person-outline" size={24} color="#ffffff" />
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Open orders"
-              style={styles.dshHeaderIconButton}
-              onPress={onOpenOrders}
-            >
-              <View style={styles.dshBellBadge}>
-                <BthText role="caption" style={styles.dshBellBadgeText}>5</BthText>
-              </View>
-              <Ionicons name="notifications-outline" size={24} color="#ffffff" />
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Open cart"
-              style={styles.dshHeaderIconButton}
-              onPress={onOpenCart}
-            >
-              <Ionicons name="cart-outline" size={24} color="#ffffff" />
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Open search"
-              style={styles.dshHeaderIconButton}
-              onPress={onOpenSearch}
-            >
-              <Ionicons name="search-outline" size={24} color="#ffffff" />
-            </Pressable>
-          </View>
-        </View>
-
-        <View style={styles.tickerSection}>
-          <View style={styles.tickerFrame}>
-            <BthNewsTickerBar
-              statusLabel={tickerState.statusLabel}
-              message={tickerState.message}
-              onPress={tickerAction}
-            />
-          </View>
-        </View>
-      </View>
+      <BthUnifiedMobileTopBar
+        title={uiText.topBar.brandName}
+        subtitle={uiText.topBar.brandTagline}
+        locationLabel={uiText.topBar.location}
+        locationIcon={<Ionicons name="location-outline" size={14} color="#FFFFFF" />}
+        actions={[
+          {
+            id: 'account',
+            icon: <Ionicons name="person-outline" size={21} color="#FFFFFF" />,
+            accessibilityLabel: uiText.accountSheet.title,
+            onPress: () => onOpenEntry?.(),
+          },
+          {
+            id: 'notifications',
+            icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />,
+            badgeCount: 5,
+            accessibilityLabel: uiText.accountSheet.tabs.notifications,
+            onPress: onOpenOrders,
+          },
+          {
+            id: 'cart',
+            icon: <Ionicons name="cart-outline" size={21} color="#FFFFFF" />,
+            accessibilityLabel: uiText.serviceHub.availableServices,
+            onPress: onOpenCart,
+          },
+          {
+            id: 'search',
+            icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />,
+            accessibilityLabel: 'Search',
+            onPress: onOpenSearch,
+          },
+        ]}
+        ticker={{
+          statusLabel: tickerState.statusLabel,
+          message: tickerState.message,
+          onPress: tickerAction,
+        }}
+      />
 
       <BthMobileScrollView padding={4} gap={4}>
         <View style={styles.carouselViewport}>
-          <HomeBannerCarousel banners={bannerItems} rtl={direction === 'rtl'} />
+          <HomeBannerCarousel banners={bannerItems} />
         </View>
 
         <View style={styles.heroRow}>
@@ -534,10 +516,7 @@ export function DshHomeGetScreen({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.categoryRail,
-            direction === 'rtl' && styles.categoryRailRtl,
-          ]}
+          contentContainerStyle={styles.categoryRail}
         >
           {categoryItems.map((category) => {
             const isActive = category.id === activeCategoryId;
@@ -581,10 +560,7 @@ export function DshHomeGetScreen({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.filtersRow,
-            direction === 'rtl' && styles.filtersRowRtl,
-          ]}
+          contentContainerStyle={styles.filtersRow}
         >
           {discoveryFilters.map((filter) => {
             const isActive = filter.value === activeFilter;
@@ -712,7 +688,11 @@ export function DshHomeGetScreen({
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(direction: Direction) {
+  const rowDirection = resolveRowDirection(direction);
+  const textAlign = resolveTextAlign(direction);
+
+  return StyleSheet.create({
   activeOrderCard: {
     backgroundColor: '#ffffff',
     borderRadius: 22,
@@ -728,12 +708,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   activeOrderHeader: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     gap: 8,
-  },
-  activeOrderHeaderRtl: {
-    flexDirection: 'row',
   },
   activeOrderStatusPill: {
     backgroundColor: '#eafff6',
@@ -755,7 +732,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   activeOrderMetaRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 8,
@@ -764,7 +741,7 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     fontSize: 12,
     flex: 1,
-    textAlign: 'right',
+    textAlign,
   },
   activeOrderEtaText: {
     color: '#ff6a00',
@@ -772,12 +749,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   activeOrderFooterRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   activeOrderAction: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#fff4e9',
@@ -795,80 +772,6 @@ const styles = StyleSheet.create({
   screenRoot: {
     flex: 1,
   },
-  dshHeader: {
-    backgroundColor: '#ff7a00',
-    paddingTop: 14,
-    paddingBottom: 12,
-    paddingHorizontal: 14,
-    gap: 10,
-  },
-  dshHeaderTopRow: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  dshHeaderTextBlock: {
-    flex: 1,
-    alignItems: 'flex-end',
-    gap: 4,
-  },
-  dshHeaderTitle: {
-    color: '#ffffff',
-    fontWeight: '800',
-    fontSize: 18,
-    textAlign: 'right',
-  },
-  dshHeaderLocationRow: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 4,
-  },
-  dshHeaderLocationText: {
-    color: '#fff4eb',
-    fontWeight: '600',
-    textAlign: 'right',
-  },
-  dshHeaderActionsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  dshHeaderIconButton: {
-    width: 30,
-    height: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dshBellBadge: {
-    position: 'absolute',
-    top: -6,
-    right: -6,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: '#fbbf24',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 4,
-  },
-  dshBellBadgeText: {
-    color: '#ffffff',
-    fontWeight: '800',
-    fontSize: 10,
-    lineHeight: 10,
-  },
-  tickerSection: {
-    borderWidth: 4,
-    borderColor: '#000000',
-    borderRadius: 20,
-    padding: 4,
-    backgroundColor: '#ff8b29',
-  },
-  tickerFrame: {
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
   activeOrderStatusLabel: {
     color: '#6b7280',
     fontSize: 11,
@@ -877,7 +780,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   recentOrdersHeader: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -903,11 +806,8 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   recentOrdersRow: {
-    flexDirection: 'row',
+    flexDirection: rowDirection,
     gap: 10,
-  },
-  recentOrdersRowRtl: {
-    flexDirection: 'row-reverse',
   },
   recentOrderCard: {
     width: 212,
@@ -924,13 +824,13 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   recentOrderCardTop: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 8,
   },
   recentOrderBadge: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     gap: 4,
     backgroundColor: '#fff4e9',
@@ -950,21 +850,21 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     fontSize: 13,
     flex: 1,
-    textAlign: 'right',
+    textAlign,
   },
   recentOrderSubtitle: {
     color: '#374151',
     fontWeight: '700',
     fontSize: 13,
-    textAlign: 'right',
+    textAlign,
   },
   recentOrderMeta: {
     color: '#6b7280',
     fontSize: 11,
-    textAlign: 'right',
+    textAlign,
   },
   recentOrderFooter: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -1008,7 +908,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   shortsHeader: {
-    flexDirection: 'row',
+    flexDirection: rowDirection,
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 10,
@@ -1050,7 +950,7 @@ const styles = StyleSheet.create({
     borderColor: '#bbf7d0',
   },
   shortsCardTopRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'flex-start',
     gap: 10,
   },
@@ -1077,10 +977,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 12,
     lineHeight: 17,
-    textAlign: 'right',
+    textAlign,
   },
   shortsCardFooter: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -1105,7 +1005,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   carouselDotsRow: {
-    flexDirection: 'row',
+    flexDirection: rowDirection,
     alignSelf: 'center',
     gap: 9,
   },
@@ -1120,7 +1020,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff6a00',
   },
   heroRow: {
-    flexDirection: 'row',
+    flexDirection: rowDirection,
     alignItems: 'stretch',
     gap: 12,
   },
@@ -1140,7 +1040,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   heroPromoContent: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     gap: 10,
   },
@@ -1178,7 +1078,7 @@ const styles = StyleSheet.create({
   heroPromoSubtitle: {
     color: '#ffd3d3',
     fontWeight: '500',
-    textAlign: 'right',
+    textAlign,
     fontSize: 11,
     lineHeight: 13,
   },
@@ -1188,15 +1088,12 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   categoryRail: {
-    flexDirection: 'row',
+    flexDirection: rowDirection,
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: spacing[2],
     paddingTop: spacing[1],
     paddingBottom: spacing[1],
-  },
-  categoryRailRtl: {
-    direction: 'rtl',
   },
   categoryRailItem: {
     minHeight: 42,
@@ -1206,7 +1103,7 @@ const styles = StyleSheet.create({
     borderColor: '#E6EAF1',
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[1],
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     gap: 6,
   },
@@ -1240,7 +1137,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   quickActionBottomRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'stretch',
     gap: 8,
   },
@@ -1263,7 +1160,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   quickActionChipContent: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     gap: 6,
   },
@@ -1273,27 +1170,24 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   filtersRow: {
-    flexDirection: 'row',
+    flexDirection: rowDirection,
     alignItems: 'center',
     gap: spacing[2],
     paddingVertical: spacing[1],
     paddingHorizontal: spacing[2],
-  },
-  filtersRowRtl: {
-    direction: 'rtl',
   },
   filterChip: {
     minHeight: sizes.controlSm,
     borderRadius: radius.pill,
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[2],
-    flexDirection: 'row',
+    flexDirection: rowDirection,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
   filterChipContent: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     gap: 6,
   },
@@ -1314,7 +1208,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   storeCardTopRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 8,
@@ -1351,7 +1245,7 @@ const styles = StyleSheet.create({
     borderColor: '#e2e7ee',
   },
   storeImageOverlayRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 4,
@@ -1398,7 +1292,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   storeBodyRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     gap: 12,
     alignItems: 'flex-start',
   },
@@ -1416,24 +1310,24 @@ const styles = StyleSheet.create({
   storeTitle: {
     color: '#1c2330',
     fontWeight: '800',
-    textAlign: 'right',
+    textAlign,
     fontSize: 18,
     lineHeight: 22,
   },
   storeAddress: {
     color: '#6d7584',
-    textAlign: 'right',
+    textAlign,
     fontSize: 13,
     lineHeight: 16,
   },
   storeDistanceLine: {
     color: '#5b6372',
-    textAlign: 'right',
+    textAlign,
     fontSize: 13,
     lineHeight: 16,
   },
   storeMetaChipRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     flexWrap: 'wrap',
     gap: 6,
     justifyContent: 'flex-end',
@@ -1459,7 +1353,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   storeFooterRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: rowDirection,
     alignItems: 'center',
     justifyContent: 'flex-start',
     gap: 5,
@@ -1506,6 +1400,7 @@ const styles = StyleSheet.create({
   storeFollowAdded: {
     backgroundColor: '#0d9b65',
   },
-});
+  });
+}
 
 export default DshHomeGetScreen;

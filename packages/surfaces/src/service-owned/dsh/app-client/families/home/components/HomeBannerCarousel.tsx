@@ -11,7 +11,7 @@ import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from 'react-native';
-import { useTheme } from '@bthwani/ui-kit';
+import { resolveRowDirection, useDirection, useTheme } from '@bthwani/ui-kit';
 
 export type HomeBannerCarouselItem = {
   id: string;
@@ -26,7 +26,6 @@ type Props = {
   banners: HomeBannerCarouselItem[];
   width?: number;
   height?: number;
-  rtl?: boolean;
   autoPlayInterval?: number;
   resumeAfterMs?: number;
   onBannerPress?: (item: HomeBannerCarouselItem) => void;
@@ -43,14 +42,15 @@ export function HomeBannerCarousel({
   banners,
   width: widthProp,
   height = 172,
-  rtl = true,
   autoPlayInterval = DEFAULT_AUTO_PLAY_INTERVAL_MS,
   resumeAfterMs = DEFAULT_RESUME_AFTER_MS,
   onBannerPress,
 }: Props) {
+  const { direction } = useDirection();
   const { theme } = useTheme();
   const { width: windowWidth } = useWindowDimensions();
   const width = widthProp ?? windowWidth;
+  const isRtl = direction === 'rtl';
   const count = banners.length;
   const listRef = React.useRef<FlatList<HomeBannerCarouselItem>>(null);
   const scrollX = React.useRef(new Animated.Value(0)).current;
@@ -92,13 +92,13 @@ export function HomeBannerCarousel({
 
     autoplayTimerRef.current = setInterval(() => {
       const current = activeIndexRef.current;
-      const next = rtl ? (current - 1 + count) % count : (current + 1) % count;
+      const next = isRtl ? (current - 1 + count) % count : (current + 1) % count;
       activeIndexRef.current = next;
       setActiveIndex(next);
       const offset = snapOffsets[next] ?? next * snapInterval;
       listRef.current?.scrollToOffset({ offset, animated: true });
     }, autoPlayInterval);
-  }, [autoPlayInterval, count, rtl, snapInterval, snapOffsets, stopAutoplay]);
+  }, [autoPlayInterval, count, isRtl, snapInterval, snapOffsets, stopAutoplay]);
 
   React.useEffect(() => {
     startAutoplay();
@@ -259,11 +259,11 @@ export function HomeBannerCarousel({
         onScrollBeginDrag={pauseAutoplay}
         onTouchStart={pauseAutoplay}
         onTouchEnd={pauseAutoplay}
-        inverted={rtl && Platform.OS !== 'web'}
+        inverted={isRtl && Platform.OS !== 'web'}
       />
 
       {count > 1 && (
-        <View style={[styles.progressRow, rtl && styles.progressRowRtl]}>
+          <View style={[styles.progressRow, { flexDirection: resolveRowDirection(direction) }]}>
           {banners.map((item, index) => {
             const active = index === activeIndex;
             return (
@@ -290,7 +290,6 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     root: {
       overflow: 'visible',
       backgroundColor: theme.surface,
-      direction: 'ltr',
     },
     itemWrap: {
       justifyContent: 'center',
@@ -363,9 +362,6 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
       justifyContent: 'center',
       alignItems: 'center',
       gap: 6,
-    },
-    progressRowRtl: {
-      flexDirection: 'row-reverse',
     },
     progressTrack: {
       width: 7,

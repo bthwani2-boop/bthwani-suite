@@ -1,7 +1,7 @@
 import React, { memo, useMemo } from 'react';
 import { Image, Pressable, StyleSheet, Text, View, type ImageSourcePropType, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@bthwani/ui-kit';
+import { resolveTextAlign, useDirection, useTheme } from '@bthwani/ui-kit';
 
 export type ServiceToken = {
   label: string;
@@ -91,8 +91,9 @@ export const StoreCardPremium = memo(function StoreCardPremium({
   style,
   testID,
 }: StoreCardPremiumProps) {
+  const { direction } = useDirection();
   const { theme } = useTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useMemo(() => createStyles(theme, resolveTextAlign(direction)), [direction, theme]);
   const serviceTokens = item.serviceTokens ?? buildServiceTokens(item.supportsPickup, item.supportsPartnerDelivery);
   const followersLabel = formatFollowers(item.followersCount);
   const ratingValue = item.rating == null || Number.isNaN(item.rating) ? 5 : item.rating;
@@ -228,7 +229,7 @@ export const StoreCardPremium = memo(function StoreCardPremium({
   );
 });
 
-function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
+function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'left' | 'right' | 'center') {
   return StyleSheet.create({
     card: {
       height: CARD_HEIGHT,
@@ -429,7 +430,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
       lineHeight: 18,
       fontWeight: '700',
       color: theme.text,
-      textAlign: 'right',
+      textAlign,
     },
     subtitle: {
       marginTop: 0,
@@ -437,7 +438,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
       lineHeight: 14,
       fontWeight: '400',
       color: theme.textMuted,
-      textAlign: 'right',
+      textAlign,
     },
     serviceRow: {
       flexDirection: 'row',
