@@ -1,1 +1,1 @@
-export * from './NewsTicker';
+export * from './SmartSignalLayer';
