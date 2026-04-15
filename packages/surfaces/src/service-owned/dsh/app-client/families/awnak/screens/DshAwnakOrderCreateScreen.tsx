@@ -1,10 +1,13 @@
 import React from 'react';
-import { BthBox, BthButton, BthFormScreenShell, BthKeyValueList, BthSectionHeader, BthStateView, BthSurface, BthTabs, BthText, BthTextField } from '@bthwani/ui-kit';
+import { Modal, Pressable } from 'react-native';
+import { BthBox, BthButton, BthFormScreenShell, BthSectionHeader, BthStateView, BthSurface, BthTabs, BthText, BthTextField } from '@bthwani/ui-kit';
 
 export type DshAwnakOrderCreateScreenState = 'ready' | 'loading' | 'disabled';
 
 export type DshAwnakOrderCreateScreenProps = {
   state?: DshAwnakOrderCreateScreenState;
+  embedded?: boolean;
+  onClose?: () => void;
   onBack?: () => void;
   onContinue?: () => void;
 };
@@ -35,21 +38,18 @@ function calculateEstimate(orderType: AwnakOrderType): PricingEstimate {
   };
 }
 
-export function DshAwnakOrderCreateScreen({ state = 'ready', onBack, onContinue }: DshAwnakOrderCreateScreenProps) {
+export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, onClose, onBack, onContinue }: DshAwnakOrderCreateScreenProps) {
   const isDisabled = state === 'disabled';
   const [pickupAddress, setPickupAddress] = React.useState('Riyadh Park, Gate 2');
   const [dropoffAddress, setDropoffAddress] = React.useState('Olaya, King Fahad Road');
-  const [contactName, setContactName] = React.useState('Ahmad');
-  const [contactPhone, setContactPhone] = React.useState('0501234567');
   const [orderType, setOrderType] = React.useState<AwnakOrderType>('PERSONAL_ITEMS');
   const [timeMode, setTimeMode] = React.useState<AwnakTimeMode>('now');
   const [scheduledDate, setScheduledDate] = React.useState('');
   const [scheduledTime, setScheduledTime] = React.useState('');
   const [notes, setNotes] = React.useState('');
-  const [estimate, setEstimate] = React.useState<PricingEstimate | null>(null);
   const [validationError, setValidationError] = React.useState<string | null>(null);
 
-  const submitLabel = estimate ? 'Continue to review' : 'Show estimate';
+  const submitLabel = 'عرض الفاتورة';
 
   if (state === 'loading') {
     return <BthStateView stateId="loading" />;
@@ -58,16 +58,14 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', onBack, onContinue 
   const validate = () => {
     const normalizedPickup = pickupAddress.trim();
     const normalizedDropoff = dropoffAddress.trim();
-    const normalizedContactName = contactName.trim();
-    const normalizedContactPhone = contactPhone.trim();
 
-    if (!normalizedPickup || !normalizedDropoff || !normalizedContactName || !normalizedContactPhone) {
-      setValidationError('Pickup, dropoff, contact name, and contact phone are required.');
+    if (!normalizedPickup || !normalizedDropoff) {
+      setValidationError('حدد موقع البداية وموقع الوصول أولًا.');
       return false;
     }
 
     if (timeMode === 'scheduled' && (!scheduledDate.trim() || !scheduledTime.trim())) {
-      setValidationError('Scheduled deliveries need both a date and a time.');
+      setValidationError('اختر التاريخ والوقت عند تحديد تنفيذ لاحق.');
       return false;
     }
 
@@ -80,45 +78,53 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', onBack, onContinue 
       return;
     }
 
-    if (!estimate) {
-      setEstimate(calculateEstimate(orderType));
-      return;
-    }
-
     onContinue?.();
   };
 
-  return (
-    <BthFormScreenShell
-      title="Awnak order create"
-      subtitle="Single vertical form for manual requests. Keep the route tight, the schedule explicit, and the estimate visible before continue."
-      submitLabel={submitLabel}
-      onSubmit={handleSubmit}
-      submitDisabled={isDisabled}
-    >
-      <BthBox gap={3}>
-        <BthSectionHeader title="Route" subtitle="Keep the pickup and dropoff path explicit." />
-        <BthTextField label="Pickup address" value={pickupAddress} onChangeText={setPickupAddress} editable={!isDisabled} />
-        <BthTextField label="Dropoff address" value={dropoffAddress} onChangeText={setDropoffAddress} editable={!isDisabled} />
+  const formFields = (
+    <BthBox gap={3}>
+      <BthBox gap={2}>
+        <BthSectionHeader title="المسار" subtitle="اختر من أين وإلى أين، ثم أكمل بقية التفاصيل." />
+        <BthBox gap={2} layoutDirection="row" style={{ alignItems: 'center' }}>
+          <BthBox style={{ flex: 1 }}>
+            <Pressable onPress={() => undefined} disabled={isDisabled}>
+              <BthSurface tone="raised" gap={2}>
+                <BthText role="bodySm" tone="muted">من عنوان</BthText>
+                <BthText role="bodyStrong">حدد الموقع</BthText>
+              </BthSurface>
+            </Pressable>
+            <BthTextField value={pickupAddress} onChangeText={setPickupAddress} editable={!isDisabled} placeholder="حدد الموقع" />
+          </BthBox>
+
+          <BthBox style={{ width: 42, alignItems: 'center', justifyContent: 'center' }}>
+            <BthSurface tone="raised" gap={0}>
+              <BthText role="titleSm">⇄</BthText>
+            </BthSurface>
+          </BthBox>
+
+          <BthBox style={{ flex: 1 }}>
+            <Pressable onPress={() => undefined} disabled={isDisabled}>
+              <BthSurface tone="raised" gap={2}>
+                <BthText role="bodySm" tone="muted">إلى عنوان</BthText>
+                <BthText role="bodyStrong">حدد الموقع</BthText>
+              </BthSurface>
+            </Pressable>
+            <BthTextField value={dropoffAddress} onChangeText={setDropoffAddress} editable={!isDisabled} placeholder="حدد الموقع" />
+          </BthBox>
+        </BthBox>
       </BthBox>
 
       <BthBox gap={3}>
-        <BthSectionHeader title="Contact" subtitle="One reachable contact is enough for this step." />
-        <BthTextField label="Contact name" value={contactName} onChangeText={setContactName} editable={!isDisabled} />
-        <BthTextField label="Contact phone" value={contactPhone} onChangeText={setContactPhone} editable={!isDisabled} keyboardType="phone-pad" />
-      </BthBox>
-
-      <BthBox gap={3}>
-        <BthSectionHeader title="Order type" subtitle="Keep the category visible before estimate generation." />
+        <BthSectionHeader title="نوع الطلب" subtitle="اختر التصنيف المناسب لهذا الطلب." />
         <BthTabs
           items={[
-            { value: 'PERSONAL_ITEMS', label: 'Personal items' },
-            { value: 'FOOD', label: 'Food' },
-            { value: 'HEAVY_WEIGHT', label: 'Heavy weight' },
-            { value: 'LARGE_SIZE', label: 'Large size' },
-            { value: 'CAKE', label: 'Cake' },
-            { value: 'FRAGILE', label: 'Fragile' },
-            { value: 'OTHER', label: 'Other' },
+            { value: 'PERSONAL_ITEMS', label: 'أغراض شخصية' },
+            { value: 'FOOD', label: 'طعام' },
+            { value: 'HEAVY_WEIGHT', label: 'وزن ثقيل' },
+            { value: 'LARGE_SIZE', label: 'حجم كبير' },
+            { value: 'CAKE', label: 'قابل للكسر' },
+            { value: 'FRAGILE', label: 'تورته' },
+            { value: 'OTHER', label: 'أشياء أخرى' },
           ]}
           value={orderType}
           onValueChange={(value) => setOrderType(value as AwnakOrderType)}
@@ -127,54 +133,96 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', onBack, onContinue 
       </BthBox>
 
       <BthBox gap={3}>
-        <BthSectionHeader title="Schedule" subtitle="Choose now or reserve a slot." />
+        <BthSectionHeader title="وقت تنفيذ الطلب" subtitle="اختر التنفيذ الآن أو لاحقًا." />
         <BthTabs
           items={[
-            { value: 'now', label: 'Now' },
-            { value: 'scheduled', label: 'Scheduled' },
+            { value: 'now', label: 'الآن' },
+            { value: 'scheduled', label: 'لاحقًا' },
           ]}
           value={timeMode}
           onValueChange={(value) => setTimeMode(value as AwnakTimeMode)}
           variant="pill"
         />
-
         {timeMode === 'scheduled' ? (
-          <BthBox gap={2}>
-            <BthTextField label="Date" value={scheduledDate} onChangeText={setScheduledDate} editable={!isDisabled} placeholder="YYYY-MM-DD" />
-            <BthTextField label="Time" value={scheduledTime} onChangeText={setScheduledTime} editable={!isDisabled} placeholder="HH:MM" />
+          <BthBox gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
+            <BthBox style={{ flex: 1, minWidth: 150 }}>
+              <BthTextField label="Date" value={scheduledDate} onChangeText={setScheduledDate} editable={!isDisabled} placeholder="YYYY-MM-DD" />
+            </BthBox>
+            <BthBox style={{ flex: 1, minWidth: 150 }}>
+              <BthTextField label="Time" value={scheduledTime} onChangeText={setScheduledTime} editable={!isDisabled} placeholder="HH:MM" />
+            </BthBox>
           </BthBox>
         ) : null}
       </BthBox>
 
       <BthBox gap={3}>
-        <BthSectionHeader title="Notes" subtitle="Keep the note practical and short." />
-        <BthTextField label="Order note" value={notes} onChangeText={setNotes} editable={!isDisabled} hint="Examples: handle with care, call on arrival, leave at lobby."
-        />
+        <BthSectionHeader title="ملاحظات الطلب" subtitle="اكتب ملاحظاتك بشكل مختصر وواضح." />
+        <BthTextField label="Order note" value={notes} onChangeText={setNotes} editable={!isDisabled} placeholder="اكتب ملاحظاتك هنا" />
       </BthBox>
 
+      {validationError ? <BthText role="bodySm" tone="muted">{validationError}</BthText> : null}
+    </BthBox>
+  );
+
+  if (embedded) {
+    return (
+      <Modal visible transparent animationType="slide" onRequestClose={onClose}>
+        <Pressable style={{ flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.42)', justifyContent: 'flex-end' }} onPress={onClose}>
+          <Pressable
+            onPress={(event) => event.stopPropagation()}
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderTopLeftRadius: 28,
+              borderTopRightRadius: 28,
+              paddingHorizontal: 18,
+              paddingTop: 14,
+              paddingBottom: 18,
+              maxHeight: '88%',
+              shadowColor: '#000',
+              shadowOpacity: 0.16,
+              shadowRadius: 24,
+              shadowOffset: { width: 0, height: -6 },
+              elevation: 18,
+            }}
+          >
+            <BthBox gap={2}>
+              <BthBox style={{ alignSelf: 'center', width: 54, height: 5, borderRadius: 999, backgroundColor: '#D6DDE8' }} />
+              <BthBox gap={1}>
+                <BthText role="titleSm">طلب عونك</BthText>
+                <BthText role="bodySm" tone="muted">
+                  نفس أسلوب SHEIN: داخل نفس الصفحة ولوح سفلي خفيف.
+                </BthText>
+              </BthBox>
+            </BthBox>
+
+            <BthBox gap={2}>
+              <BthSurface tone="brand" gap={2}>
+                <BthText role="bodyStrong">DSH</BthText>
+                <BthText role="bodySm" tone="muted">طلب يدوي مباشر بدون تغيير الصفحة.</BthText>
+                <BthText role="bodySm" tone="muted">المطلوب واضح: المسار، نوع الطلب، وقت التنفيذ، والملاحظات.</BthText>
+              </BthSurface>
+
+              {formFields}
+
+              <BthButton label={submitLabel} tone="primary" onPress={handleSubmit} disabled={isDisabled} />
+            </BthBox>
+          </Pressable>
+        </Pressable>
+      </Modal>
+    );
+  }
+
+  return (
+    <BthFormScreenShell
+      title="طلب عونك"
+      subtitle="اطلب سائق لتوصيل أي غرض من مكان إلى مكان مع تحديد نوع الطلب ووقت التنفيذ."
+      submitLabel={submitLabel}
+      onSubmit={handleSubmit}
+      submitDisabled={isDisabled}
+    >
       <BthBox gap={3}>
-        <BthSectionHeader title="Estimate" subtitle="Show the amount before continuing." />
-        {estimate ? (
-          <BthSurface tone="brand" gap={3}>
-            <BthKeyValueList
-              items={[
-                { label: 'Pickup', value: pickupAddress || 'Pending' },
-                { label: 'Dropoff', value: dropoffAddress || 'Pending' },
-                { label: 'Order type', value: orderType.replace(/_/g, ' ').toLowerCase() },
-                { label: 'Estimate', value: `${estimate.priceEstimate} ${estimate.currency}`, tone: 'brand' },
-              ]}
-            />
-          </BthSurface>
-        ) : (
-          <BthSurface tone="raised" gap={2}>
-            <BthText role="bodySm" tone="muted">Submit once to calculate the estimate, then continue to review.</BthText>
-          </BthSurface>
-        )}
-      </BthBox>
-
-      <BthBox gap={2}>
-        {validationError ? <BthText role="bodySm" tone="muted">{validationError}</BthText> : null}
-        <BthButton label="Back to support" tone="secondary" onPress={onBack} />
+        {formFields}
+        <BthButton label={submitLabel} tone="primary" onPress={handleSubmit} disabled={isDisabled} />
       </BthBox>
     </BthFormScreenShell>
   );

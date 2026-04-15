@@ -34,6 +34,8 @@ import {
   DSH_CATEGORY_ICONS,
 } from '../../categories/fixtures/dshCategoriesFixtures';
 import { getDshCategoryFixture } from '../../categories/fixtures/dshCategoriesFixtures';
+import { DshSheinOrderCreateScreen } from '../../shein/screens';
+import { DshAwnakOrderCreateScreen } from '../../awnak/screens';
 import CategoryClockDial, {
   type CategoryDialItem,
   type DialAnchorLayout,
@@ -60,6 +62,11 @@ export type DshHomeGetScreenProps = {
   onOpenOrders?: () => void;
   onOpenTracking?: () => void;
   onOpenStore?: (storeId: string) => void;
+  onOpenSheinInfo?: () => void;
+  sheinInlineVisible?: boolean;
+  onCloseSheinInline?: () => void;
+  awnakInlineVisible?: boolean;
+  onCloseAwnakInline?: () => void;
   onRetry?: () => void;
 };
 
@@ -95,6 +102,7 @@ export type DshHomeGetStore = {
   id: string;
   name: string;
   address: string;
+  categoryId?: string;
   imageUri?: string;
   rating?: number;
   statusLabel: string;
@@ -297,6 +305,11 @@ export function DshHomeGetScreen({
   onOpenOrders,
   onOpenTracking,
   onOpenStore,
+  onOpenSheinInfo,
+  sheinInlineVisible = false,
+  onCloseSheinInline,
+  awnakInlineVisible = false,
+  onCloseAwnakInline,
   onRetry,
   onOpenEntry,
 }: DshHomeGetScreenProps) {
@@ -309,7 +322,7 @@ export function DshHomeGetScreen({
   const [categoriesSheetVisible, setCategoriesSheetVisible] = React.useState(false);
   const [categoriesDialLayout, setCategoriesDialLayout] = React.useState<DialAnchorLayout | null>(null);
   const [activeFilter, setActiveFilter] = React.useState<DiscoveryFilter>('all');
-  const [activeCategoryId, setActiveCategoryId] = React.useState<string>('grocery');
+  const [activeCategoryId, setActiveCategoryId] = React.useState<string>('restaurants');
   const [activeSubcategoryId, setActiveSubcategoryId] = React.useState<string | null>(null);
   const [activePromoIndex, setActivePromoIndex] = React.useState(0);
   const [favoriteToggles, setFavoriteToggles] = React.useState<Record<string, boolean>>({});
@@ -318,7 +331,7 @@ export function DshHomeGetScreen({
   const [shortsVisible, setShortsVisible] = React.useState(false);
   const [currentTime, setCurrentTime] = React.useState(() => new Date());
   const categoryItems = React.useMemo(() => {
-    if (categories?.length) {
+    if (categories) {
       return categories;
     }
 
@@ -327,23 +340,44 @@ export function DshHomeGetScreen({
       label: category.label,
     }));
   }, [categories]);
+  const visibleCategoryFixtures = React.useMemo(
+    () => {
+      if (categories) {
+        return categories
+          .map((category) => getDshCategoryFixture(category.id))
+          .filter((fixture): fixture is NonNullable<ReturnType<typeof getDshCategoryFixture>> => Boolean(fixture));
+      }
+
+      return dshCategoryFixtures;
+    },
+    [categories],
+  );
   const selectedCategoryFixture = React.useMemo(
-    () => getDshCategoryFixture(activeCategoryId) ?? dshCategoryFixtures[1] ?? null,
-    [activeCategoryId]
+    () => visibleCategoryFixtures.find((category) => category.id === activeCategoryId) ?? visibleCategoryFixtures[0] ?? null,
+    [activeCategoryId, visibleCategoryFixtures]
   );
   const selectedCategoryLabel =
     selectedCategoryFixture?.label ??
     categoryItems.find((category) => category.id === activeCategoryId)?.label ??
     'الفئات';
   const selectedSubcategories = selectedCategoryFixture?.subcategories ?? [];
+  React.useEffect(() => {
+    if (!visibleCategoryFixtures.length) {
+      return;
+    }
+
+    if (!visibleCategoryFixtures.some((category) => category.id === activeCategoryId)) {
+      setActiveCategoryId(visibleCategoryFixtures[0].id);
+      setActiveSubcategoryId(null);
+    }
+  }, [activeCategoryId, visibleCategoryFixtures]);
   const categoryRailItems = React.useMemo(
     () =>
-      categoryItems.map((category) => ({
+      visibleCategoryFixtures.map((category) => ({
         ...category,
-        fixture: getDshCategoryFixture(category.id),
         icon: categoryIconMap[category.id] ?? '📂',
       })),
-    [categoryItems]
+    [visibleCategoryFixtures]
   );
 
   React.useEffect(() => {
@@ -367,7 +401,9 @@ export function DshHomeGetScreen({
   }, []);
 
   const visibleStores = React.useMemo(() => {
-    return stores.filter((store) => {
+    const categoryScopedStores = stores.filter((store) => store.categoryId ? store.categoryId === activeCategoryId : true);
+
+    return categoryScopedStores.filter((store) => {
       const isFavorite = favoriteToggles[store.id] ?? store.isFavorite;
 
       if (activeFilter === 'favorites') {
@@ -388,7 +424,7 @@ export function DshHomeGetScreen({
 
       return true;
     });
-  }, [activeFilter, favoriteToggles, stores]);
+  }, [activeCategoryId, activeFilter, favoriteToggles, stores]);
 
   if (state !== 'ready') {
     return renderState(state, onRetry);
@@ -397,6 +433,11 @@ export function DshHomeGetScreen({
   const resolveBannerPress = React.useCallback(
     (promo: DshHomeGetPromo) => () => {
       if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
+        if (promo.actionTarget === 'shein' && onOpenSheinInfo) {
+          onOpenSheinInfo();
+          return;
+        }
+
         if (promo.actionTarget && onOpenCategory) {
           onOpenCategory(promo.actionTarget);
           return;
@@ -473,7 +514,7 @@ export function DshHomeGetScreen({
 
       onOpenSearch?.();
     },
-    [onOpenBenefits, onOpenCategory, onOpenList, onOpenProduct, onOpenSearch, onOpenStore, onOpenStoreCategory, onOpenStoresList]
+    [onOpenBenefits, onOpenCategory, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onOpenStoresList]
   );
 
   const activePromo = promos[activePromoIndex % promos.length] ?? dshHomeGetFixturePromos[0];
@@ -519,14 +560,17 @@ export function DshHomeGetScreen({
   );
   const tickerAction = onOpenOrders ?? onOpenTracking ?? onOpenSearch;
   const categoriesDialItems = React.useMemo<CategoryDialItem[]>(() => {
-    return dshCategoryFixtures.map((category) => ({
+    return visibleCategoryFixtures.map((category) => ({
       id: category.id,
       key: category.id,
       title: category.label,
       iconUrl: getDshCategoryIconUrl(category.id),
       emojiFallback: DSH_CATEGORY_ICONS[category.id] ?? '📂',
     }));
-  }, []);
+  }, [visibleCategoryFixtures]);
+
+  const showSheinInline = sheinInlineVisible;
+  const showAwnakInline = awnakInlineVisible;
 
   const activeCategoryDialItem = React.useMemo<CategoryDialItem | null>(() => {
     if (!selectedCategoryFixture) {
@@ -610,6 +654,18 @@ export function DshHomeGetScreen({
           <HomeBannerCarousel banners={bannerItems} />
         </View>
 
+        {showSheinInline ? (
+          <BthBox gap={3}>
+            <DshSheinOrderCreateScreen embedded onClose={onCloseSheinInline} />
+          </BthBox>
+        ) : null}
+
+        {showAwnakInline ? (
+          <BthBox gap={3}>
+            <DshAwnakOrderCreateScreen embedded onClose={onCloseAwnakInline} />
+          </BthBox>
+        ) : null}
+
         <View style={styles.categoriesSelectorSection}>
           <View style={styles.categoriesSelectorRow}>
             <View style={styles.fixedIconsContainer}>
@@ -660,7 +716,14 @@ export function DshHomeGetScreen({
                       onPress={() => {
                         setActiveCategoryId(category.id);
                         setActiveSubcategoryId(null);
-                        onOpenCategory?.(category.id);
+                        if (category.id === 'awnak') {
+                          onOpenCategory?.('awnak');
+                          return;
+                        }
+
+                        if (category.id === 'shein') {
+                          onOpenSheinInfo?.();
+                        }
                       }}
                       activeOpacity={0.8}
                     >
@@ -837,7 +900,16 @@ export function DshHomeGetScreen({
           onClose={() => setCategoriesSheetVisible(false)}
           onSelect={(item) => {
             setActiveCategoryId(item.key);
-            onOpenCategory?.(item.key);
+            setActiveSubcategoryId(null);
+            setCategoriesSheetVisible(false);
+            if (item.key === 'awnak') {
+              onOpenCategory?.('awnak');
+              return;
+            }
+
+            if (item.key === 'shein') {
+              onOpenSheinInfo?.();
+            }
           }}
         />
 

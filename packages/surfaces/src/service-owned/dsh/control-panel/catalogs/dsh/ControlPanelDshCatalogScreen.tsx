@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { BthBox, BthButton, BthText } from '@bthwani/ui-kit';
 import { BthWebMissionHeroCard, BthWebSectionCard, BthWebSignalCard } from '@bthwani/ui-kit/web';
 import { dshCatalogMetrics, dshCatalogNodes, dshCatalogPipeline } from './catalog';
+import { ControlPanelDshCatalogCategoriesScreen } from './categories';
 
 export type ControlPanelDshCatalogScreenProps = {
   hubHref?: string;
@@ -79,6 +80,8 @@ export function ControlPanelDshCatalogScreen({
           ))}
         </BthBox>
       </BthWebSectionCard>
+
+      <ControlPanelDshCatalogCategoriesScreen />
 
       <BthWebSectionCard title="رحلة النشر" description="كل بطاقة تمر عبر نفس السلسلة: إدخال، شراكات، تسويق، ثم نشر نهائي.">
         <BthBox gap={2}>

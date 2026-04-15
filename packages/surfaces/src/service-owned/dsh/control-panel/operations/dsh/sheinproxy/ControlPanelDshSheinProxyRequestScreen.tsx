@@ -1,15 +1,16 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  useRouter } from 'next/navigation';
-import { BthBox,
+  BthBox,
   BthButton,
   BthCard,
   BthKeyValueList,
   BthStateView,
+  BthTabs,
   BthText,
-  useUiText
+  BthTextField,
 } from '@bthwani/ui-kit';
 import {
   BthWebMissionHeroCard,
@@ -18,15 +19,16 @@ import {
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
-import { getSheinProxyRequestById, type SheinProxyRequestStatus } from './sheinproxy-fixtures';
 
-type SheinProxyRequestStage = 'detail' | 'estimate' | 'offer' | 'schedule';
-type SheinProxyRequestScreenState = 'ready' | 'loading' | 'empty' | 'offline' | 'disabled' | 'error';
+type AssignmentFamily = 'shein' | 'awnak' | 'generic';
+type AssignmentMode = 'now' | 'scheduled';
+type AssignmentStage = 'detail' | 'estimate' | 'offer' | 'schedule';
+type ManualAssignmentScreenState = 'ready' | 'loading' | 'empty' | 'offline' | 'disabled' | 'error';
 
 export type ControlPanelDshSheinProxyRequestScreenProps = {
   requestId: string;
-  stage: SheinProxyRequestStage;
-  state?: SheinProxyRequestScreenState;
+  stage: AssignmentStage;
+  state?: ManualAssignmentScreenState;
   listHref?: string;
   hubHref?: string;
   operationsHref?: string;
@@ -35,141 +37,79 @@ export type ControlPanelDshSheinProxyRequestScreenProps = {
   showHeader?: boolean;
 };
 
-function resolveStatusTone(status: SheinProxyRequestStatus) {
-  if (status === 'cancelled') {
-    return 'danger' as const;
-  }
+const familyOptions: Array<{ value: AssignmentFamily; label: string; description: string }> = [
+  { value: 'shein', label: 'SHEIN', description: 'منصة شراء وتجميع تابعة للمنصة نفسها.' },
+  { value: 'awnak', label: 'عونك', description: 'توصيل يدوي عام من العمليات.' },
+  { value: 'generic', label: 'أخرى', description: 'قالب عام لأي فئة جديدة لاحقًا.' },
+];
 
-  if (status === 'approved' || status === 'scheduled') {
-    return 'best' as const;
-  }
-
-  return 'neutral' as const;
-}
-
-function resolveStatusLabel(text: ReturnType<typeof useDshControlPanelText>, status: SheinProxyRequestStatus) {
-  return text.sheinProxyRequest.statusLabels[
-    status === 'under-review'
-      ? 'underReview'
-      : status === 'estimated'
-        ? 'estimated'
-        : status === 'offered'
-          ? 'offered'
-          : status === 'scheduled'
-            ? 'scheduled'
-            : status === 'approved'
-              ? 'approved'
-              : 'cancelled'
-  ];
-}
+const modeOptions: Array<{ value: AssignmentMode; label: string }> = [
+  { value: 'now', label: 'الآن' },
+  { value: 'scheduled', label: 'لاحقًا' },
+];
 
 function resolveStateCopy(
   text: ReturnType<typeof useDshControlPanelText>,
-  state: Exclude<SheinProxyRequestScreenState, 'ready'>,
+  state: Exclude<ManualAssignmentScreenState, 'ready'>,
 ) {
   if (state === 'loading') {
     return {
       stateId: 'loading' as const,
-      title: text.sheinProxyRequest.stateLoadingTitle,
-      description: text.sheinProxyRequest.stateLoadingDescription,
-      actionLabel: text.sheinProxyRequest.retryLabel,
+      title: 'Preparing manual assignment',
+      description: 'The general assignment form is loading and keeps the safe exit visible.',
+      actionLabel: text.sheinProxy.retryLabel,
     };
   }
 
   if (state === 'empty') {
     return {
-      stateId: 'notFound' as const,
-      title: text.sheinProxyRequest.stateEmptyTitle,
-      description: text.sheinProxyRequest.stateEmptyDescription,
-      actionLabel: text.sheinProxyRequest.backToList,
+      stateId: 'empty' as const,
+      title: 'No assignment selected',
+      description: 'Pick a preset or return to the operations queue.',
+      actionLabel: text.sheinProxy.backToHub,
     };
   }
 
   if (state === 'offline') {
     return {
       stateId: 'offline' as const,
-      title: text.sheinProxyRequest.stateOfflineTitle,
-      description: text.sheinProxyRequest.stateOfflineDescription,
-      actionLabel: text.sheinProxyRequest.retryLabel,
+      title: 'Connection unavailable',
+      description: 'The form stays explicit even when the route is paused.',
+      actionLabel: text.sheinProxy.retryLabel,
     };
   }
 
   if (state === 'disabled') {
     return {
       kind: 'warning' as const,
-      title: text.sheinProxyRequest.stateDisabledTitle,
-      description: text.sheinProxyRequest.stateDisabledDescription,
-      actionLabel: text.sheinProxyRequest.backToList,
+      title: 'Manual assignment is not enabled yet',
+      description: 'This slice is ready for the general form but execution stays out of scope.',
+      actionLabel: text.sheinProxy.backToHub,
     };
   }
 
   return {
     stateId: 'recoverableError' as const,
-    title: text.sheinProxyRequest.stateErrorTitle,
-    description: text.sheinProxyRequest.stateErrorDescription,
-    actionLabel: text.sheinProxyRequest.retryLabel,
+    title: 'Unable to load manual assignment',
+    description: 'Try again or return to the list without leaving the operations lane.',
+    actionLabel: text.sheinProxy.retryLabel,
   };
 }
 
-function resolveStageMeta(text: ReturnType<typeof useDshControlPanelText>, stage: SheinProxyRequestStage) {
-  return {
-    label: text.sheinProxyRequest.stageLabels[stage],
-    description: text.sheinProxyRequest.stageDescriptions[stage],
-  };
-}
-
-function resolveStageActions(requestId: string, stage: SheinProxyRequestStage, listHref: string, hubHref: string) {
-  const baseHref = `/operations/dsh/sheinproxy/${requestId}`;
-
+function resolveStageMeta(stage: AssignmentStage) {
   if (stage === 'estimate') {
-    return {
-      primaryHref: `${baseHref}/offer`,
-      primaryLabelKey: 'openOffer' as const,
-      secondaryHref: baseHref,
-      secondaryLabelKey: 'openDetail' as const,
-      tertiaryHref: listHref,
-      tertiaryLabelKey: 'backToList' as const,
-      quaternaryHref: hubHref,
-      quaternaryLabelKey: 'openHub' as const,
-    };
+    return { label: 'Estimate', description: 'Review the cost assumptions before assignment.' };
   }
 
   if (stage === 'offer') {
-    return {
-      primaryHref: `${baseHref}/schedule`,
-      primaryLabelKey: 'openSchedule' as const,
-      secondaryHref: baseHref,
-      secondaryLabelKey: 'openDetail' as const,
-      tertiaryHref: listHref,
-      tertiaryLabelKey: 'backToList' as const,
-      quaternaryHref: hubHref,
-      quaternaryLabelKey: 'openHub' as const,
-    };
+    return { label: 'Offer', description: 'The batch is ready for confirmation or review.' };
   }
 
   if (stage === 'schedule') {
-    return {
-      primaryHref: baseHref,
-      primaryLabelKey: 'openDetail' as const,
-      secondaryHref: listHref,
-      secondaryLabelKey: 'backToList' as const,
-      tertiaryHref: hubHref,
-      tertiaryLabelKey: 'openHub' as const,
-      quaternaryHref: `${baseHref}/estimate`,
-      quaternaryLabelKey: 'openEstimate' as const,
-    };
+    return { label: 'Schedule', description: 'Lock the pickup or delivery window.' };
   }
 
-  return {
-    primaryHref: `${baseHref}/estimate`,
-    primaryLabelKey: 'openEstimate' as const,
-    secondaryHref: listHref,
-    secondaryLabelKey: 'backToList' as const,
-    tertiaryHref: hubHref,
-    tertiaryLabelKey: 'openHub' as const,
-    quaternaryHref: `${baseHref}/offer`,
-    quaternaryLabelKey: 'openOffer' as const,
-  };
+  return { label: 'Detail', description: 'Review the assignment payload and route scope.' };
 }
 
 export function ControlPanelDshSheinProxyRequestScreen({
@@ -184,30 +124,94 @@ export function ControlPanelDshSheinProxyRequestScreen({
   showHeader = true,
 }: ControlPanelDshSheinProxyRequestScreenProps) {
   const router = useRouter();
-  const uiText = useUiText();
   const dshText = useDshControlPanelText();
-  const requestText = dshText.sheinProxyRequest;
-  const request = getSheinProxyRequestById(requestId);
-    const openSupportLabel = 'openSupport' in dshText
-      ? String(dshText.openSupport)
-      : String(dshText.common.openSupport);
-  const resolvedState = state === 'ready' && !request ? 'empty' : state;
-  const stageMeta = resolveStageMeta(dshText, stage);
+  const [family, setFamily] = React.useState<AssignmentFamily>('shein');
+  const [assignmentReference, setAssignmentReference] = React.useState(requestId);
+  const [pickupNode, setPickupNode] = React.useState('Operations intake');
+  const [dropoffNode, setDropoffNode] = React.useState('Customer delivery route');
+  const [customerCount, setCustomerCount] = React.useState('1');
+  const [captainCount, setCaptainCount] = React.useState('1');
+  const [mode, setMode] = React.useState<AssignmentMode>(stage === 'schedule' ? 'scheduled' : 'now');
+  const [scheduleDate, setScheduleDate] = React.useState('');
+  const [scheduleTime, setScheduleTime] = React.useState('');
+  const [notes, setNotes] = React.useState('');
+  const [draftSaved, setDraftSaved] = React.useState(false);
+  const [submitted, setSubmitted] = React.useState(false);
+  const [validationError, setValidationError] = React.useState<string | null>(null);
+
+  const stageMeta = resolveStageMeta(stage);
+  const resolvedState = state;
+
+  const validate = () => {
+    const normalizedReference = assignmentReference.trim();
+    const normalizedPickup = pickupNode.trim();
+    const normalizedDropoff = dropoffNode.trim();
+    const parsedCustomers = Number(customerCount.trim());
+    const parsedCaptains = Number(captainCount.trim());
+
+    if (!normalizedReference || !normalizedPickup || !normalizedDropoff) {
+      setValidationError('املأ المرجع ونقطة الاستلام ونقطة التسليم أولًا.');
+      return false;
+    }
+
+    if (Number.isNaN(parsedCustomers) || parsedCustomers < 1) {
+      setValidationError('عدد العملاء يجب أن يكون رقمًا يبدأ من 1.');
+      return false;
+    }
+
+    if (Number.isNaN(parsedCaptains) || parsedCaptains < 1) {
+      setValidationError('عدد الكباتن يجب أن يكون رقمًا يبدأ من 1.');
+      return false;
+    }
+
+    if (mode === 'scheduled' && (!scheduleDate.trim() || !scheduleTime.trim())) {
+      setValidationError('اختر التاريخ والوقت عند التنفيذ لاحقًا.');
+      return false;
+    }
+
+    setValidationError(null);
+    return true;
+  };
+
+  const handleSaveDraft = () => {
+    if (!assignmentReference.trim()) {
+      setValidationError('أضف مرجعًا للاستمارة قبل الحفظ.');
+      return;
+    }
+
+    setValidationError(null);
+    setDraftSaved(true);
+  };
+
+  const handleSubmit = () => {
+    if (!validate()) {
+      return;
+    }
+
+    setSubmitted(true);
+  };
+
+  const summaryItems = [
+    { label: 'Family', value: family.toUpperCase() },
+    { label: 'Reference', value: assignmentReference || 'Pending' },
+    { label: 'Customers', value: customerCount },
+    { label: 'Captains', value: captainCount },
+    { label: 'Mode', value: mode === 'now' ? 'Now' : 'Scheduled' },
+    { label: 'Step', value: stageMeta.label },
+  ];
 
   if (resolvedState !== 'ready') {
-    const stateCopy = resolveStateCopy(dshText, resolvedState);
-
     return (
       <BthWebPageFrame
-        eyebrow={requestText.pageEyebrow}
-        title={`${requestText.pageTitlePrefix} ${requestId}`}
-        description={requestText.unavailableDescription}
+        eyebrow='DSH / operations / assignment'
+        title='Manual assignment'
+        description='A general operations form for SHEIN, Awnak, or any other platform-owned delivery family.'
         maxWidth={1120}
         embedded={embedded}
         showHeader={showHeader}
       >
         <BthStateView
-          {...stateCopy}
+          {...resolveStateCopy(dshText, resolvedState)}
           onActionPress={() => {
             if (resolvedState === 'loading' || resolvedState === 'offline' || resolvedState === 'error') {
               router.refresh();
@@ -221,101 +225,125 @@ export function ControlPanelDshSheinProxyRequestScreen({
     );
   }
 
-  if (!request) {
-    return null;
-  }
-
-  const stageActions = resolveStageActions(request.id, stage, listHref, hubHref);
-  const statusLabel = resolveStatusLabel(dshText, request.status);
-  const statusTone = resolveStatusTone(request.status);
-
   return (
     <BthWebPageFrame
-      eyebrow={requestText.pageEyebrow}
-      title={`${requestText.pageTitlePrefix} ${request.id}`}
-      description={`${requestText.pageDescription} · ${stageMeta.label}`}
+      eyebrow='DSH / operations / assignment'
+      title='Manual assignment'
+      description='General form for platform-owned families such as SHEIN and Awnak, with no partner dependency.'
       maxWidth={1120}
       embedded={embedded}
       showHeader={showHeader}
     >
       <BthBox gap={4}>
         <BthWebMissionHeroCard
-          badges={[request.id, statusLabel, stageMeta.label]}
-          eyebrow={requestText.heroEyebrow}
-          title={request.customer}
-          description={`${request.product} · ${stageMeta.description}`}
+          badges={['DSH', family.toUpperCase(), stageMeta.label]}
+          eyebrow='Assignment workspace'
+          title='General manual assignment'
+          description='One reusable ops form for intake, batching, and captain allocation.'
           metaItems={[
-            `${requestText.amountLabel}: ${request.total}`,
-            `${requestText.updatedLabel}: ${request.updated}`,
-            `${requestText.quantityLabel}: ${request.quantity}`,
+            'No partner lane is required for this family.',
+            `Mode: ${mode === 'now' ? 'Now' : 'Scheduled'}`,
+            `Step: ${stageMeta.description}`,
           ]}
-          primaryAction={{ label: requestText[stageActions.primaryLabelKey], href: stageActions.primaryHref }}
-          secondaryAction={{ label: requestText[stageActions.secondaryLabelKey], href: stageActions.secondaryHref }}
+          primaryAction={{ label: 'Back to queue', href: listHref }}
+          secondaryAction={{ label: 'Open operations', href: operationsHref }}
         />
 
-        <BthBox layoutDirection="row" gap={2}>
-          <BthWebSignalCard title={requestText.statusLabel} value={statusLabel} description={requestText.stageDescriptions[stage]} tone={statusTone} />
-          <BthWebSignalCard title={requestText.amountLabel} value={request.amount} description={requestText.pricingDescription} />
-          <BthWebSignalCard title={requestText.totalLabel} value={request.total} description={requestText.timelineDescription} tone="best" />
-          <BthWebSignalCard title={requestText.nextActionLabel} value={stageMeta.label} description={stageMeta.description} />
+        <BthBox layoutDirection='row' gap={2}>
+          <BthWebSignalCard title='Families' value='3' description='SHEIN, Awnak, and generic presets.' tone='brand' />
+          <BthWebSignalCard title='Customers' value={customerCount || '1'} description='Customer count in this batch.' tone='best' />
+          <BthWebSignalCard title='Captains' value={captainCount || '1'} description='Captain allocation for the route.' />
+          <BthWebSignalCard title='Step' value={stageMeta.label} description={stageMeta.description} />
         </BthBox>
 
-        <BthWebSectionCard title={requestText.identityTitle} description={requestText.identityDescription}>
-          <BthBox gap={2}>
-            <BthCard>
-              <BthKeyValueList
-                items={[
-                  { label: requestText.requestLabel, value: request.id },
-                  { label: requestText.customerLabel, value: request.customer },
-                  { label: requestText.productLabel, value: request.product },
-                  { label: requestText.quantityLabel, value: String(request.quantity) },
-                  { label: requestText.updatedLabel, value: request.updated },
-                ]}
-              />
-            </BthCard>
-          </BthBox>
-        </BthWebSectionCard>
+        <BthWebSectionCard title='Assignment identity' description='Pick the family preset and give this batch a stable reference.'>
+          <BthBox gap={3}>
+            <BthTabs<AssignmentFamily>
+              items={familyOptions}
+              value={family}
+              onValueChange={(value) => setFamily(value)}
+              variant='pill'
+            />
 
-        <BthWebSectionCard title={requestText.pricingTitle} description={requestText.pricingDescription}>
-          <BthBox gap={2}>
-            <BthCard>
-              <BthKeyValueList
-                items={[
-                  { label: requestText.amountLabel, value: request.amount },
-                  { label: requestText.shippingLabel, value: request.shipping },
-                  { label: requestText.serviceFeeLabel, value: request.fee },
-                  { label: requestText.totalLabel, value: request.total, tone: 'success' },
-                  { label: requestText.noteLabel, value: request.note },
-                ]}
-              />
-            </BthCard>
-          </BthBox>
-        </BthWebSectionCard>
-
-        <BthWebSectionCard title={requestText.nextStepTitle} description={requestText.nextStepDescription}>
-          <BthBox gap={2}>
-            <BthCard>
-              <BthBox gap={2}>
-                <BthText role="bodyStrong">{stageMeta.label}</BthText>
-                <BthText role="bodySm" tone="muted">{stageMeta.description}</BthText>
-                <BthText role="bodySm">{request.note}</BthText>
+            <BthBox gap={2} layoutDirection='row' style={{ flexWrap: 'wrap' }}>
+              <BthBox style={{ flex: 1, minWidth: 240 }}>
+                <BthTextField label='Assignment reference' value={assignmentReference} onChangeText={setAssignmentReference} placeholder='DSH-ASSIGN-0001' />
               </BthBox>
-            </BthCard>
-            <BthBox layoutDirection="row" gap={2}>
-              <BthButton label={requestText[stageActions.primaryLabelKey]} tone="primary" fullWidth={false} onPress={() => router.push(stageActions.primaryHref)} />
-              <BthButton label={requestText[stageActions.secondaryLabelKey]} tone="secondary" fullWidth={false} onPress={() => router.push(stageActions.secondaryHref)} />
-              <BthButton label={requestText[stageActions.tertiaryLabelKey]} tone="secondary" fullWidth={false} onPress={() => router.push(stageActions.tertiaryHref)} />
-              <BthButton label={requestText[stageActions.quaternaryLabelKey]} tone="ghost" fullWidth={false} onPress={() => router.push(stageActions.quaternaryHref)} />
-              <BthButton label={requestText.backToList} tone="secondary" fullWidth={false} onPress={() => router.push(listHref)} />
-              <BthButton label={requestText.openOperations} tone="secondary" fullWidth={false} onPress={() => router.push(operationsHref)} />
-                <BthButton label={openSupportLabel} tone="secondary" fullWidth={false} onPress={() => router.push(supportHref)} />
+              <BthBox style={{ flex: 1, minWidth: 240 }}>
+                <BthTextField label='Source' value={pickupNode} onChangeText={setPickupNode} placeholder='Operations intake / hub' />
+              </BthBox>
+              <BthBox style={{ flex: 1, minWidth: 240 }}>
+                <BthTextField label='Destination' value={dropoffNode} onChangeText={setDropoffNode} placeholder='Customer delivery route' />
+              </BthBox>
             </BthBox>
           </BthBox>
         </BthWebSectionCard>
+
+        <BthWebSectionCard title='Batch planning' description='Plan the customer grouping and captain allocation before sending the assignment.'>
+          <BthBox gap={3}>
+            <BthBox layoutDirection='row' gap={2}>
+              <BthBox style={{ flex: 1, minWidth: 180 }}>
+                <BthTextField label='Customers in batch' value={customerCount} onChangeText={setCustomerCount} keyboardType='number-pad' placeholder='1' />
+              </BthBox>
+              <BthBox style={{ flex: 1, minWidth: 180 }}>
+                <BthTextField label='Captains needed' value={captainCount} onChangeText={setCaptainCount} keyboardType='number-pad' placeholder='1' />
+              </BthBox>
+            </BthBox>
+
+            <BthTabs<AssignmentMode>
+              items={modeOptions}
+              value={mode}
+              onValueChange={(value) => setMode(value)}
+              variant='pill'
+            />
+
+            {mode === 'scheduled' ? (
+              <BthBox layoutDirection='row' gap={2} style={{ flexWrap: 'wrap' }}>
+                <BthBox style={{ flex: 1, minWidth: 180 }}>
+                  <BthTextField label='Date' value={scheduleDate} onChangeText={setScheduleDate} placeholder='YYYY-MM-DD' />
+                </BthBox>
+                <BthBox style={{ flex: 1, minWidth: 180 }}>
+                  <BthTextField label='Time' value={scheduleTime} onChangeText={setScheduleTime} placeholder='HH:MM' />
+                </BthBox>
+              </BthBox>
+            ) : null}
+          </BthBox>
+        </BthWebSectionCard>
+
+        <BthWebSectionCard title='Operational notes' description='Use the notes field for sorting, packaging, route, or special handling instructions.'>
+          <BthBox gap={2}>
+            <BthTextField label='Notes' value={notes} onChangeText={setNotes} placeholder='Sorting, packaging, route, or handoff instructions' />
+            {validationError ? <BthText role='bodySm' tone='muted'>{validationError}</BthText> : null}
+            {draftSaved ? <BthText role='bodySm'>Draft saved locally for this manual assignment.</BthText> : null}
+            {submitted ? <BthText role='bodySm'>Assignment is ready for the next operations step.</BthText> : null}
+          </BthBox>
+        </BthWebSectionCard>
+
+        <BthWebSectionCard title='Assignment preview' description='The preview keeps the most important operational facts visible without duplicating the entire form.'>
+          <BthBox gap={2}>
+            <BthCard>
+              <BthKeyValueList items={summaryItems} />
+            </BthCard>
+            <BthCard>
+              <BthBox gap={2}>
+                <BthText role='bodyStrong'>No partner lane</BthText>
+                <BthText role='bodySm' tone='muted'>Platform-owned families are purchased, sorted, and delivered by the platform itself.</BthText>
+                <BthText role='bodySm' tone='muted'>The captain will later see a batch route, not a partner identity.</BthText>
+              </BthBox>
+            </BthCard>
+          </BthBox>
+        </BthWebSectionCard>
+
+        <BthBox layoutDirection='row' gap={2} style={{ flexWrap: 'wrap' }}>
+          <BthButton label='Save draft' tone='secondary' fullWidth={false} onPress={handleSaveDraft} />
+          <BthButton label='Assign now' tone='primary' fullWidth={false} onPress={handleSubmit} />
+          <BthButton label='Back to list' tone='secondary' fullWidth={false} onPress={() => router.push(listHref)} />
+          <BthButton label='Open hub' tone='ghost' fullWidth={false} onPress={() => router.push(hubHref)} />
+          <BthButton label='Open support' tone='ghost' fullWidth={false} onPress={() => router.push(supportHref)} />
+        </BthBox>
       </BthBox>
     </BthWebPageFrame>
   );
 }
 
 export default ControlPanelDshSheinProxyRequestScreen;
-

@@ -49,7 +49,6 @@ export type ClientSupportScreenId =
 	| 'review-create'
 	| 'reviews-list'
 	| 'service-modes-resolve'
-	| 'shein-info'
 	| 'subscription-family-get'
 	| 'subscription-family-members-get'
 	| 'subscription-family-members-post'
@@ -223,12 +222,12 @@ export const clientSupportDefinitions: Record<ClientSupportScreenId, ClientSuppo
 	},
 	'external-order-create': {
 		title: 'External order create',
-		subtitle: 'Captures orders sourced from outside the core browse path while keeping the main flow intact.',
+		subtitle: 'Compact manual intake for SHEIN and other external catalog requests while keeping the main flow intact.',
 		badgeLabel: 'Create',
 		kind: 'create',
 		group: 'create-checkout',
 		stageLabel: 'External intake',
-		primaryOutcome: 'External demand enters the same controlled order lifecycle.',
+		primaryOutcome: 'External demand enters the same controlled order lifecycle with minimal friction.',
 	},
 	'gas-refill-order-create': {
 		title: 'Gas refill order create',
@@ -500,15 +499,6 @@ export const clientSupportDefinitions: Record<ClientSupportScreenId, ClientSuppo
 		stageLabel: 'Mode selection',
 		primaryOutcome: 'The correct service mode is visible before the journey branches further.',
 	},
-	'shein-info': {
-		title: 'Shein info',
-		subtitle: 'Keeps Shein proxy context readable when the customer needs policy or request detail.',
-		badgeLabel: 'Proxy',
-		kind: 'proxy',
-		group: 'proxy-controls',
-		stageLabel: 'External proxy info',
-		primaryOutcome: 'External proxy detail is visible without breaking the main order frame.',
-	},
 	'subscription-family-get': {
 		title: 'Subscription family get',
 		subtitle: 'Reads the customer family subscription context in one consolidated surface.',
@@ -661,7 +651,7 @@ export const clientSupportDirectoryGroups: Array<{
 		id: 'proxy-controls',
 		title: 'Proxy and service controls',
 		subtitle: 'Proxy requests, external context, and service-control surfaces that should stay out of the main shopping lane.',
-		itemIds: ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review', 'proxy-request-reject', 'proxy-request-tracking', 'shein-info', 'service-modes-resolve', 'listing-status-update', 'zone-set'],
+		itemIds: ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review', 'proxy-request-reject', 'proxy-request-tracking', 'service-modes-resolve', 'listing-status-update', 'zone-set'],
 	},
 ];
 
@@ -885,7 +875,6 @@ export const clientSupportScreenRegistry: Record<ClientSupportScreenId, React.Co
 	'review-create': createClientSupportScreen('review-create'),
 	'reviews-list': createClientSupportScreen('reviews-list'),
 	'service-modes-resolve': createClientSupportScreen('service-modes-resolve'),
-	'shein-info': createClientSupportScreen('shein-info'),
 	'subscription-family-get': createClientSupportScreen('subscription-family-get'),
 	'subscription-family-members-get': createClientSupportScreen('subscription-family-members-get'),
 	'subscription-family-members-post': createClientSupportScreen('subscription-family-members-post'),

@@ -6,7 +6,7 @@ import { DshAwnakOrderCreateScreen } from './families/awnak/screens';
 import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './families/home/screens';
 import { DshBenefitsHubScreen } from './families/loyalty/screens';
 import { DshOrdersListScreen } from './families/orders/screens';
-import { DshSheinInfoScreen } from './families/shein/screens';
+import { DshSheinOrderCreateScreen } from './families/shein/screens';
 import { DshStoresListScreen, DshStoreGetScreen, DshStoreDetailScreen, DshStoreItemsScreen, DshStoreItemsListScreen } from './families/stores/screens';
 import { DshCategoriesListScreen, DshCategoryGetScreen } from './families/categories/screens';
 import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './families/favorites/screens';
@@ -19,7 +19,7 @@ import {
   dshHomeGetFixtureStores,
 } from './families/home/fixtures/dshHomeGetFixtures';
 import { DshOrderSuccessState } from './families/orders/screens';
-import { dshCategoryFixtures, getDshCategoryFixture } from './families/categories/fixtures/dshCategoriesFixtures';
+import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './families/categories/fixtures/dshCategoriesFixtures';
 import { dshPartnerIntakeItems } from '../control-panel/partners/dsh/workflow';
 
 export type DshRoute =
@@ -51,7 +51,7 @@ export type DshRoute =
   | 'listing-status-update'
   | 'order-issue-workspace'
   | 'proxy-workspace'
-  | 'shein-info'
+  | 'shein-order-create'
   | 'service-settings'
   | 'trust-workspace'
   | 'zone-set'
@@ -110,24 +110,22 @@ const publishedCategoryIds = new Set(
 
 const publishedCategoryFixtures = dshCategoryFixtures.filter((category) => publishedCategoryIds.has(category.id));
 
-const publishedCategoryListFixtures: PublishedCategoryItem[] = publishedCategoryFixtures.map((category) => {
-  const publishedCount = dshPartnerIntakeItems.filter(
-    (item) => item.stage === 'published' && item.categoryLabel === category.label,
-  ).length;
-
-  return {
-    id: category.id,
-    label: category.label,
-    subtitle: category.subtitle,
-    countLabel: publishedCount > 0 ? `${publishedCount} منتج منشور` : 'فئة رئيسية',
-  };
-});
+const publishedCategoryListFixtures: PublishedCategoryItem[] = dshCategoryListFixtures;
 
 const publishedPromoCategoryIds = new Set(publishedCategoryFixtures.map((category) => category.id));
+const publishedProductIds = new Set(
+  dshPartnerIntakeItems
+    .filter((item) => item.stage === 'published')
+    .map((item) => item.id),
+);
 
 const publishedHomePromos = dshHomeGetFixturePromos.filter((promo) => {
   if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
     return promo.actionTarget ? publishedPromoCategoryIds.has(promo.actionTarget) : false;
+  }
+
+  if (promo.actionType === 'product') {
+    return promo.actionTarget ? publishedProductIds.has(promo.actionTarget) : false;
   }
 
   return true;
@@ -363,7 +361,6 @@ function supportScreenToRoute(screenId: ClientSupportScreenId): DshRoute {
   const settingsTargets: ClientSupportScreenId[] = ['service-modes-resolve'];
   const listingTargets: ClientSupportScreenId[] = ['listing-status-update'];
   const externalTargets: ClientSupportScreenId[] = ['gas-refill-order-create'];
-  const sheinTargets: ClientSupportScreenId[] = ['shein-info'];
   const zoneTargets: ClientSupportScreenId[] = ['zone-set'];
   const issueTargets: ClientSupportScreenId[] = ['order-issue-flag'];
   const trustTargets: ClientSupportScreenId[] = ['order-proof-code-generate', 'order-proof-verify', 'order-escrow-hold', 'order-escrow-release'];
@@ -404,8 +401,8 @@ function supportScreenToRoute(screenId: ClientSupportScreenId): DshRoute {
     return 'listing-status-update';
   }
 
-  if (sheinTargets.includes(screenId)) {
-    return 'shein-info';
+  if (externalTargets.includes(screenId)) {
+    return 'intake-workspace';
   }
 
   if (zoneTargets.includes(screenId)) {
@@ -425,6 +422,8 @@ function supportScreenToRoute(screenId: ClientSupportScreenId): DshRoute {
 
 export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   const [route, setRoute] = React.useState<DshRoute>('home');
+  const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
+  const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
   const [createOrderValues, setCreateOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
   const [ordersQuery, setOrdersQuery] = React.useState('');
   const [storesQuery, setStoresQuery] = React.useState('');
@@ -633,7 +632,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
       return;
     }
 
-    if (screenId === 'listing-status-update' || screenId === 'service-modes-resolve' || screenId === 'zone-set' || screenId === 'entitlements-get' || screenId === 'shein-info') {
+    if (screenId === 'listing-status-update' || screenId === 'service-modes-resolve' || screenId === 'zone-set' || screenId === 'entitlements-get') {
       if (screenId === 'entitlements-get') {
         setRoute('benefits');
         return;
@@ -646,11 +645,6 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
       if (screenId === 'zone-set') {
         setRoute('zone-set');
-        return;
-      }
-
-      if (screenId === 'shein-info') {
-        setRoute('shein-info');
         return;
       }
 
@@ -935,7 +929,13 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
         items={publishedCategoryListFixtures}
         onOpenCategory={(categoryId) => {
           setItemsCategory(categoryId);
-          setRoute('category-get');
+          if (categoryId === 'shein') {
+            setSheinInlineOpen(true);
+            setRoute('home');
+            return;
+          }
+
+          setRoute(categoryId === 'awnak' ? 'awnak-order-create' : 'category-get');
         }}
         onOpenFavorites={() => setRoute('favorites-list')}
         onBack={() => setRoute('cart-item-update')}
@@ -1029,6 +1029,14 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
       <DshAwnakOrderCreateScreen
         onBack={openSupportDirectory}
         onContinue={() => setRoute('review')}
+      />
+    );
+  }
+
+  if (route === 'shein-order-create') {
+    return (
+      <DshSheinOrderCreateScreen
+        onBack={() => setRoute('categories-list')}
       />
     );
   }
@@ -1140,16 +1148,6 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     );
   }
 
-  if (route === 'shein-info') {
-    return (
-      <DshSheinInfoScreen
-        onPrimaryAction={() => setRoute('stores-list')}
-        onSecondaryAction={openSupportDirectory}
-        onRetry={() => setRoute('shein-info')}
-      />
-    );
-  }
-
   if (route === 'zone-set') {
     return (
       <DshZoneSetScreen
@@ -1163,8 +1161,10 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   if (route === 'service-settings') {
     return (
       <DshServiceSettingsHubScreen
-        screenId={selectedSupportScreen as 'listing-status-update' | 'service-modes-resolve' | 'zone-set' | 'shein-info'}
-        onPrimaryAction={() => setRoute(selectedSupportScreen === 'shein-info' ? 'stores-list' : 'home')}
+        screenId={selectedSupportScreen as 'listing-status-update' | 'service-modes-resolve' | 'zone-set'}
+        onPrimaryAction={() => {
+          setRoute('home');
+        }}
         onSecondaryAction={openSupportDirectory}
         onRetry={() => setRoute('service-settings')}
       />
@@ -1216,7 +1216,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   return (
     <DshHomeGetScreen
-      categories={publishedCategoryListFixtures}
+      categories={dshCategoryListFixtures}
       promos={publishedHomePromos as DshHomeGetPromo[]}
       stores={dshHomeGetFixtureStores as DshHomeGetStore[]}
       recentOrders={[
@@ -1243,6 +1243,18 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
       onOpenList={() => setRoute('categories-list')}
       onOpenCategory={(categoryId) => {
         setItemsCategory(categoryId);
+        if (categoryId === 'shein') {
+          setSheinInlineOpen(true);
+          setRoute('home');
+          return;
+        }
+
+        if (categoryId === 'awnak') {
+          setAwnakInlineOpen(true);
+          setRoute('home');
+          return;
+        }
+
         setRoute('category-get');
       }}
       onOpenStoresList={() => setRoute('stores-list')}
@@ -1261,6 +1273,10 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
       onOpenSearch={() => setRoute('search')}
       onOpenOrders={() => setRoute('orders-list')}
       onOpenTracking={() => setRoute('tracking')}
+      onOpenSheinInfo={() => {
+        setSheinInlineOpen(true);
+        setRoute('home');
+      }}
       onOpenStore={(storeId) => {
         setActiveStoreId(storeId);
         setItemsQuery('');
@@ -1268,6 +1284,10 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
         setSelectedItemId('');
         setRoute('store-get');
       }}
+      sheinInlineVisible={sheinInlineOpen}
+      onCloseSheinInline={() => setSheinInlineOpen(false)}
+      awnakInlineVisible={awnakInlineOpen}
+      onCloseAwnakInline={() => setAwnakInlineOpen(false)}
       onRetry={() => setRoute('home')}
     />
   );

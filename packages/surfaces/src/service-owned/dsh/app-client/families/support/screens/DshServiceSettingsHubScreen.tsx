@@ -3,7 +3,7 @@ import { BthBox, BthKeyValueList, BthListItem, BthStatCard, BthSurface } from '@
 import { DshOperationScreen, type DshOperationScreenState } from '../../../patterns/screens/DshOperationScreen';
 import { clientSupportDefinitions, type ClientSupportScreenId } from './DshClientGeneratedSupportScreens';
 
-type ServiceSettingsScreenId = 'listing-status-update' | 'service-modes-resolve' | 'zone-set' | 'shein-info';
+type ServiceSettingsScreenId = 'listing-status-update' | 'service-modes-resolve' | 'zone-set';
 
 export type DshServiceSettingsHubScreenProps = {
   screenId: ServiceSettingsScreenId;
@@ -27,7 +27,7 @@ export function DshServiceSettingsHubScreen({
       state={state}
       title={definition.title}
       subtitle={definition.subtitle}
-      primaryActionLabel={screenId === 'shein-info' ? 'Open store flow' : 'Confirm settings'}
+      primaryActionLabel="Confirm settings"
       secondaryActionLabel="Back to support"
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
@@ -44,7 +44,7 @@ export function DshServiceSettingsHubScreen({
               items={[
                 { label: 'Surface', value: definition.title },
                 { label: 'Purpose', value: definition.primaryOutcome, tone: 'brand' },
-                { label: 'Current behavior', value: screenId === 'shein-info' ? 'External info presented inside DSH client flow' : 'Settings remain explicit before order creation' },
+                { label: 'Current behavior', value: 'Settings remain explicit before order creation' },
               ]}
             />
           </BthSurface>

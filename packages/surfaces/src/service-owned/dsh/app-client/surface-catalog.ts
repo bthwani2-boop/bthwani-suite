@@ -65,7 +65,7 @@ export const surfaceCatalog = [
   'review-create',
   'reviews-list',
   'service-modes-resolve',
-  'shein-info',
+  'shein-order-create',
   'subscription-family-get',
   'subscription-family-members-get',
   'subscription-family-members-post',

@@ -30,6 +30,11 @@ export type DshHomeScreenProps = {
   onOpenOrders?: () => void;
   onOpenTracking?: () => void;
   onOpenCategory?: (categoryId: string) => void;
+  onOpenSheinInfo?: () => void;
+  sheinInlineVisible?: boolean;
+  onCloseSheinInline?: () => void;
+  awnakInlineVisible?: boolean;
+  onCloseAwnakInline?: () => void;
   onOpenStore?: (storeId: string) => void;
   onRetry?: () => void;
 };
@@ -53,6 +58,11 @@ export function DshHomeScreen({
   onOpenOrders,
   onOpenTracking,
   onOpenCategory,
+  onOpenSheinInfo,
+  sheinInlineVisible,
+  onCloseSheinInline,
+  awnakInlineVisible,
+  onCloseAwnakInline,
   onOpenStore,
   onRetry,
 }: DshHomeScreenProps) {
@@ -78,6 +88,11 @@ export function DshHomeScreen({
       onOpenOrders={onOpenOrders}
       onOpenTracking={onOpenTracking}
       onOpenStore={onOpenStore}
+      onOpenSheinInfo={onOpenSheinInfo}
+      sheinInlineVisible={sheinInlineVisible}
+      onCloseSheinInline={onCloseSheinInline}
+      awnakInlineVisible={awnakInlineVisible}
+      onCloseAwnakInline={onCloseAwnakInline}
       onRetry={onRetry}
     />
   );
