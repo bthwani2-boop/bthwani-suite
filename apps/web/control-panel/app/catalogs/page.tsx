@@ -1,5 +1,5 @@
-import { EsfControlPanelSurfaceHost } from '@bthwani/surfaces/esf/control-panel';
+import ControlPanelSurfaceHost from '@bthwani/app-shells/web/control-panel/web-entry';
 
 export default function CatalogsPage() {
-  return <EsfControlPanelSurfaceHost />;
+  return <ControlPanelSurfaceHost section="catalogs" />;
 }

@@ -19,7 +19,8 @@ import {
   dshHomeGetFixtureStores,
 } from './families/home/fixtures/dshHomeGetFixtures';
 import { DshOrderSuccessState } from './families/orders/screens';
-import { dshCategoryListFixtures, getDshCategoryFixture } from './families/categories/fixtures/dshCategoriesFixtures';
+import { dshCategoryFixtures, getDshCategoryFixture } from './families/categories/fixtures/dshCategoriesFixtures';
+import { dshPartnerIntakeItems } from '../control-panel/partners/dsh/workflow';
 
 export type DshRoute =
   | 'home'
@@ -92,6 +93,45 @@ type StoreItem = {
   hasOptions?: boolean;
   preparationTime?: string;
 };
+
+type PublishedCategoryItem = {
+  id: string;
+  label: string;
+  subtitle: string;
+  countLabel: string;
+};
+
+const publishedCategoryIds = new Set(
+  dshPartnerIntakeItems
+    .filter((item) => item.stage === 'published')
+    .map((item) => dshCategoryFixtures.find((category) => category.label === item.categoryLabel)?.id)
+    .filter((categoryId): categoryId is string => Boolean(categoryId)),
+);
+
+const publishedCategoryFixtures = dshCategoryFixtures.filter((category) => publishedCategoryIds.has(category.id));
+
+const publishedCategoryListFixtures: PublishedCategoryItem[] = publishedCategoryFixtures.map((category) => {
+  const publishedCount = dshPartnerIntakeItems.filter(
+    (item) => item.stage === 'published' && item.categoryLabel === category.label,
+  ).length;
+
+  return {
+    id: category.id,
+    label: category.label,
+    subtitle: category.subtitle,
+    countLabel: publishedCount > 0 ? `${publishedCount} منتج منشور` : 'فئة رئيسية',
+  };
+});
+
+const publishedPromoCategoryIds = new Set(publishedCategoryFixtures.map((category) => category.id));
+
+const publishedHomePromos = dshHomeGetFixturePromos.filter((promo) => {
+  if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
+    return promo.actionTarget ? publishedPromoCategoryIds.has(promo.actionTarget) : false;
+  }
+
+  return true;
+});
 
 const initialCreateOrderValues: CreateOrderValues = {
   pickupAddress: 'Riyadh Park, Gate 2',
@@ -892,7 +932,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   if (route === 'categories-list') {
     return (
       <DshCategoriesListScreen
-        items={dshCategoryListFixtures}
+        items={publishedCategoryListFixtures}
         onOpenCategory={(categoryId) => {
           setItemsCategory(categoryId);
           setRoute('category-get');
@@ -1176,7 +1216,8 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   return (
     <DshHomeGetScreen
-      promos={dshHomeGetFixturePromos as DshHomeGetPromo[]}
+      categories={publishedCategoryListFixtures}
+      promos={publishedHomePromos as DshHomeGetPromo[]}
       stores={dshHomeGetFixtureStores as DshHomeGetStore[]}
       recentOrders={[
         {

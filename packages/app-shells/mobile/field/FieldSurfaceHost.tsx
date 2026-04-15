@@ -22,6 +22,7 @@ import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/Mobi
 const {
   DshEntryScreen,
   DshFieldStoreActivationRequestScreen,
+  DshInventoryManagementScreen,
   DshFieldStoreGeoPinScreen,
   DshFieldStoreVisitLogScreen,
   dshFieldActivationWorkspaceFixtureValues,
@@ -38,7 +39,7 @@ type DshFieldStoreGeoPinValues = React.ComponentProps<typeof DshFieldStoreGeoPin
 type DshFieldStoreVisitLogState = React.ComponentProps<typeof DshFieldStoreVisitLogScreen>['state'];
 type DshFieldStoreVisitLogValues = React.ComponentProps<typeof DshFieldStoreVisitLogScreen>['values'];
 
-type FieldRoute = 'home' | 'entry' | 'activation' | 'geo-pin' | 'visit-log';
+type FieldRoute = 'home' | 'entry' | 'activation' | 'geo-pin' | 'visit-log' | 'inventory-management';
 type FieldPreviewState = 'ready' | 'loading' | 'empty' | 'error' | 'success' | 'offline' | 'disabled';
 type FieldServiceType = 'dsh' | 'arb';
 
@@ -56,7 +57,8 @@ const primaryAreas = [
 const shortcuts = [
   'بدء التفعيل',
   'تأكيد الموقع',
-  'سجل الزيارة'
+  'سجل الزيارة',
+  'إدخال منتج'
 ] as const;
 
 const fieldOperationsSnapshot = [
@@ -226,6 +228,10 @@ export function FieldSurfaceHost() {
     setPreviewState('ready');
   };
 
+  const handleInventoryManagementBack = () => {
+    setRoute('home');
+  };
+
   const renderFieldFlow = () => {
     if (route === 'entry') {
       return (
@@ -283,6 +289,10 @@ export function FieldSurfaceHost() {
           onRetry={handleVisitLogRetryOrNext}
         />
       );
+    }
+
+    if (route === 'inventory-management') {
+      return <DshInventoryManagementScreen onBack={handleInventoryManagementBack} />;
     }
 
     return null;
@@ -598,7 +608,12 @@ export function FieldSurfaceHost() {
                       return;
                     }
 
-                    setRoute('visit-log');
+                    if (index === 2) {
+                      setRoute('visit-log');
+                      return;
+                    }
+
+                    setRoute('inventory-management');
                   }}
                 />
               ))}

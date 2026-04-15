@@ -16,6 +16,8 @@ import {
   BthWebSegmentedTabs,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
+import { ControlPanelDshCatalogScreen } from '@bthwani/surfaces/dsh/control-panel/catalogs/dsh';
+import { ControlPanelDshPartnerApprovalsScreen } from '@bthwani/surfaces/dsh/control-panel/partners/dsh';
 import { ControlPanelDshMarketingScreen } from '@bthwani/surfaces/dsh/control-panel/marketing/dsh';
 import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
@@ -384,6 +386,26 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
               <p className={styles.subsectionDescription}>{marketingCopy.heroDescription}</p>
             </div>
             <ControlPanelDshMarketingScreen hubHref="/marketing" operationsHref="/operations" />
+          </section>
+        ) : null}
+
+        {activeSectionId === 'catalogs' ? (
+          <section className={styles.subsectionPanel}>
+            <div className={styles.subsectionHeader}>
+              <h3 className={styles.subsectionTitle}>{panelText.surfaceTitles.catalogs}</h3>
+              <p className={styles.subsectionDescription}>{panelText.surfaceDescriptions.catalogs}</p>
+            </div>
+            <ControlPanelDshCatalogScreen hubHref="/catalogs" operationsHref="/operations/dsh/catalogs" />
+          </section>
+        ) : null}
+
+        {activeSectionId === 'partners' ? (
+          <section className={styles.subsectionPanel}>
+            <div className={styles.subsectionHeader}>
+              <h3 className={styles.subsectionTitle}>{panelText.surfaceTitles.partners}</h3>
+              <p className={styles.subsectionDescription}>{panelText.surfaceDescriptions.partners}</p>
+            </div>
+            <ControlPanelDshPartnerApprovalsScreen hubHref="/partners" operationsHref="/operations/dsh/partners" />
           </section>
         ) : null}
 

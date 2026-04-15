@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   BthUnifiedMobileTopBar,
   BthBox,
@@ -33,6 +33,7 @@ import {
   dshCategoryFixtures,
   DSH_CATEGORY_ICONS,
 } from '../../categories/fixtures/dshCategoriesFixtures';
+import { getDshCategoryFixture } from '../../categories/fixtures/dshCategoriesFixtures';
 import CategoryClockDial, {
   type CategoryDialItem,
   type DialAnchorLayout,
@@ -141,6 +142,48 @@ const categoryIconMap: Record<string, string> = {
   honey_dates: '🍯',
   electronics: '📱',
 };
+
+const subcategoryIconMap: Record<string, string> = {
+  grocery_vegetables_fruits: '🥬',
+  grocery_meat_fish_chicken: '🥩',
+  grocery_roasted_spices: '🌰',
+  grocery_bakeries: '🍞',
+  grocery_deals_bundle: '🎁',
+  sweets_juices_fresh: '🧃',
+  sweets_juices_sweets: '🍰',
+  sweets_juices_icecream: '🍦',
+  anaqati_perfumes: '🌸',
+  anaqati_accessories_beauty: '💄',
+  anaqati_clothing: '👕',
+  gas_refill_refill: '🧯',
+  gas_refill_repair: '🛠️',
+  gas_refill_buy: '🧰',
+};
+
+function CategoryIconImage({
+  uri,
+  emojiFallback,
+  style,
+}: {
+  uri: string | null;
+  emojiFallback: string;
+  style: object;
+}) {
+  const [failed, setFailed] = React.useState(false);
+
+  if (!uri || failed) {
+    return <BthText role="titleLg" style={style}>{emojiFallback}</BthText>;
+  }
+
+  return (
+    <Image
+      source={{ uri }}
+      style={style}
+      resizeMode="cover"
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 function isWithinOperatingHours(now: Date, openHour: number, closeHour: number) {
   const currentHour = now.getHours();
@@ -266,7 +309,8 @@ export function DshHomeGetScreen({
   const [categoriesSheetVisible, setCategoriesSheetVisible] = React.useState(false);
   const [categoriesDialLayout, setCategoriesDialLayout] = React.useState<DialAnchorLayout | null>(null);
   const [activeFilter, setActiveFilter] = React.useState<DiscoveryFilter>('all');
-  const [activeCategoryId, setActiveCategoryId] = React.useState<string>('restaurants');
+  const [activeCategoryId, setActiveCategoryId] = React.useState<string>('grocery');
+  const [activeSubcategoryId, setActiveSubcategoryId] = React.useState<string | null>(null);
   const [activePromoIndex, setActivePromoIndex] = React.useState(0);
   const [favoriteToggles, setFavoriteToggles] = React.useState<Record<string, boolean>>({});
   const [followToggles, setFollowToggles] = React.useState<Record<string, boolean>>({});
@@ -283,6 +327,24 @@ export function DshHomeGetScreen({
       label: category.label,
     }));
   }, [categories]);
+  const selectedCategoryFixture = React.useMemo(
+    () => getDshCategoryFixture(activeCategoryId) ?? dshCategoryFixtures[1] ?? null,
+    [activeCategoryId]
+  );
+  const selectedCategoryLabel =
+    selectedCategoryFixture?.label ??
+    categoryItems.find((category) => category.id === activeCategoryId)?.label ??
+    'الفئات';
+  const selectedSubcategories = selectedCategoryFixture?.subcategories ?? [];
+  const categoryRailItems = React.useMemo(
+    () =>
+      categoryItems.map((category) => ({
+        ...category,
+        fixture: getDshCategoryFixture(category.id),
+        icon: categoryIconMap[category.id] ?? '📂',
+      })),
+    [categoryItems]
+  );
 
   React.useEffect(() => {
     if (promos.length <= 1) {
@@ -466,6 +528,31 @@ export function DshHomeGetScreen({
     }));
   }, []);
 
+  const activeCategoryDialItem = React.useMemo<CategoryDialItem | null>(() => {
+    if (!selectedCategoryFixture) {
+      return null;
+    }
+
+    return {
+      id: selectedCategoryFixture.id,
+      key: selectedCategoryFixture.id,
+      title: selectedCategoryLabel,
+      iconUrl: getDshCategoryIconUrl(selectedCategoryFixture.id),
+      emojiFallback: DSH_CATEGORY_ICONS[selectedCategoryFixture.id] ?? '📂',
+    };
+  }, [selectedCategoryFixture, selectedCategoryLabel]);
+
+  const selectedSubcategoryCards = React.useMemo(
+    () =>
+      selectedSubcategories.map((subcategory) => ({
+        id: subcategory.id,
+        title: subcategory.label,
+        subtitle: subcategory.subtitle,
+        emoji: subcategoryIconMap[subcategory.id] ?? '📌',
+      })),
+    [selectedSubcategories]
+  );
+
   const openCategoriesDial = React.useCallback(() => {
     categoriesAnchorRef.current?.measureInWindow((x, y, width, height) => {
       setCategoriesDialLayout({ x, y, width, height });
@@ -523,98 +610,131 @@ export function DshHomeGetScreen({
           <HomeBannerCarousel banners={bannerItems} />
         </View>
 
-        <View style={styles.heroRow}>
-          <View style={styles.quickActionsCluster}>
-            <View style={styles.quickActionBottomRow}>
-              <Pressable style={styles.quickActionTertiary} onPress={() => setShortsVisible(true)}>
-                <View style={styles.quickActionChipContent}>
-                  <Ionicons name="videocam-outline" size={15} color="#ffffff" />
-                  <BthText role="bodySm" style={styles.quickActionLabel}>فيديو</BthText>
+        <View style={styles.categoriesSelectorSection}>
+          <View style={styles.categoriesSelectorRow}>
+            <View style={styles.fixedIconsContainer}>
+              <Pressable style={styles.categorySelectorCard} onPress={() => setShortsVisible(true)}>
+                <View style={styles.videoIconContainer}>
+                  <View style={styles.videoPlayIcon}>
+                    <View style={styles.videoPlayTriangle} />
+                  </View>
+                </View>
+                <View style={[styles.categoryNameContainer, styles.videoNameContainer]}>
+                  <BthText role="bodySm" style={styles.categoryName} numberOfLines={1}>فيديو</BthText>
                 </View>
               </Pressable>
+
               <View ref={categoriesAnchorRef} collapsable={false}>
-                <Pressable style={styles.quickActionSecondary} onPress={openCategoriesDial}>
-                  <View style={styles.quickActionChipContent}>
-                    <Ionicons name="menu-outline" size={16} color="#ffffff" />
-                    <BthText role="bodySm" style={styles.quickActionLabel}>الفئات</BthText>
+                <Pressable style={styles.categorySelectorCard} onPress={openCategoriesDial}>
+                  <View style={styles.categoryIconContainer}>
+                    <CategoryIconImage
+                      uri={null}
+                      emojiFallback={'📂'}
+                      style={styles.categoryIconImage}
+                    />
+                  </View>
+                  <View style={styles.categoryNameContainer}>
+                    <BthText role="bodySm" style={styles.categoryName} numberOfLines={1}>الفئات</BthText>
                   </View>
                 </Pressable>
               </View>
             </View>
-          </View>
 
-          <Pressable style={styles.heroPromoCard} onPress={onOpenSearch ?? onOpenList}>
-            <View style={styles.heroPromoContent}>
-              <View style={styles.heroPromoIconWrap}>
-                <BthText role="titleLg" style={styles.heroIcon}>
-                  {activePromo.icon}
-                </BthText>
-              </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.categoriesSelectorScrollContent}
+              style={styles.categoriesSelectorScroll}
+            >
+              {categoryRailItems.map((category) => {
+                const isActive = category.id === activeCategoryId;
+                const subcategoryCards = isActive ? selectedSubcategoryCards : [];
 
-              <View style={styles.heroPromoTextWrap}>
-                <View style={styles.heroPromoBadge}>
-                  <BthText role="bodySm" style={styles.heroPromoBadgeText}>
-                    {activePromo.title}
-                  </BthText>
+                return (
+                  <React.Fragment key={category.id}>
+                    <Pressable
+                      style={[
+                        styles.categorySelectorCard,
+                        isActive && styles.categorySelectorCardActive,
+                      ]}
+                      onPress={() => {
+                        setActiveCategoryId(category.id);
+                        setActiveSubcategoryId(null);
+                        onOpenCategory?.(category.id);
+                      }}
+                      activeOpacity={0.8}
+                    >
+                      <View style={styles.categoryIconContainer}>
+                        <CategoryIconImage
+                          uri={null}
+                          emojiFallback={category.icon}
+                          style={styles.categoryIconImage}
+                        />
+                      </View>
+                      <View style={[
+                        styles.categoryNameContainer,
+                        isActive && styles.categoryNameContainerSelected,
+                      ]}>
+                        <BthText role="bodySm" style={styles.categoryName} numberOfLines={1}>
+                          {category.label}
+                        </BthText>
+                      </View>
+                    </Pressable>
+
+                    {subcategoryCards.map((subcategory) => (
+                      <Pressable
+                        key={subcategory.id}
+                        style={[
+                          styles.subcategorySelectorCard,
+                          activeSubcategoryId === subcategory.id && styles.subcategorySelectorCardActive,
+                        ]}
+                        onPress={() => setActiveSubcategoryId(subcategory.id)}
+                        activeOpacity={0.8}
+                      >
+                        <View style={styles.subcategoryIconContainer}>
+                          <BthText role="titleSm" style={styles.subcategoryEmoji}>
+                            {subcategory.emoji}
+                          </BthText>
+                        </View>
+                        <BthText role="bodySm" style={[styles.subcategoryName, activeSubcategoryId === subcategory.id && styles.subcategoryNameActive]} numberOfLines={1}>
+                          {subcategory.title}
+                        </BthText>
+                      </Pressable>
+                    ))}
+                  </React.Fragment>
+                );
+              })}
+
+              <Pressable style={[styles.heroPromoCard, styles.heroPromoCardInline]} onPress={onOpenSearch ?? onOpenList}>
+                <View style={styles.heroPromoContent}>
+                  <View style={styles.heroPromoIconWrap}>
+                    <BthText role="titleLg" style={styles.heroIcon}>
+                      {activePromo.icon}
+                    </BthText>
+                  </View>
+
+                  <View style={styles.heroPromoTextWrap}>
+                    <View style={styles.heroPromoBadge}>
+                      <BthText role="bodySm" style={styles.heroPromoBadgeText}>
+                        {activePromo.title}
+                      </BthText>
+                    </View>
+                    <BthText role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
+                      {promoDiscount}
+                    </BthText>
+                    <BthText role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
+                      {promoTail || 'على أول طلب'}
+                    </BthText>
+                  </View>
                 </View>
-                <BthText role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
-                  {promoDiscount}
-                </BthText>
-                <BthText role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
-                  {promoTail || 'على أول طلب'}
-                </BthText>
-              </View>
-            </View>
 
-            <View style={styles.heroPagerRow}>
-              <View style={styles.heroPagerActive} />
-            </View>
-          </Pressable>
-        </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoryRail}
-        >
-          {categoryItems.map((category) => {
-            const isActive = category.id === activeCategoryId;
-            const icon = categoryIconMap[category.id] ?? '📂';
-
-            return (
-              <Pressable
-                key={category.id}
-                style={[
-                  styles.categoryRailItem,
-                  isActive && styles.categoryRailItemActive,
-                ]}
-                onPress={() => {
-                  setActiveCategoryId(category.id);
-                  if (onOpenCategory) {
-                    onOpenCategory(category.id);
-                    return;
-                  }
-
-                  onOpenList?.();
-                }}
-              >
-                <BthText role="bodySm" style={styles.categoryRailIcon}>
-                  {icon}
-                </BthText>
-                <BthText
-                  role="bodySm"
-                  style={[
-                    styles.categoryRailLabel,
-                    isActive && styles.categoryRailLabelActive,
-                  ]}
-                  numberOfLines={1}
-                >
-                  {category.label}
-                </BthText>
+                <View style={styles.heroPagerRow}>
+                  <View style={styles.heroPagerActive} />
+                </View>
               </Pressable>
-            );
-          })}
-        </ScrollView>
+            </ScrollView>
+          </View>
+        </View>
 
         <ScrollView
           horizontal
@@ -1097,6 +1217,146 @@ function createStyles(direction: Direction) {
     alignItems: 'stretch',
     gap: 12,
   },
+  categoriesSelectorSection: {
+    marginTop: 2,
+    marginBottom: spacing[1],
+  },
+  categoriesSelectorRow: {
+    flexDirection: rowDirection,
+    alignItems: 'center',
+    gap: 8,
+  },
+  categoriesSelectorScroll: {
+    flex: 1,
+  },
+  categoriesSelectorScrollContent: {
+    flexDirection: rowDirection,
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: spacing[1],
+  },
+  fixedIconsContainer: {
+    flexDirection: rowDirection,
+    alignItems: 'stretch',
+    gap: 8,
+    flexShrink: 0,
+  },
+  categorySelectorCard: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 2,
+  },
+  categorySelectorCardActive: {
+    transform: [{ translateY: -1 }],
+  },
+  videoIconContainer: {
+    width: 52,
+    height: 52,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+  videoPlayIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: '#FF6A00',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#FF6A00',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  videoPlayTriangle: {
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 14,
+    borderRightWidth: 0,
+    borderBottomWidth: 9,
+    borderTopWidth: 9,
+    borderLeftColor: '#FFFFFF',
+    borderRightColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderTopColor: 'transparent',
+    marginStart: 3,
+  },
+  videoNameContainer: {
+    backgroundColor: '#FF6A00',
+  },
+  categoryIconContainer: {
+    width: 52,
+    height: 52,
+    borderRadius: 12,
+    backgroundColor: '#F4F7FB',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  categoryNameContainer: {
+    alignItems: 'center',
+    minHeight: 20,
+  },
+  categoryNameContainerSelected: {
+    backgroundColor: '#FF6A00',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  categoryName: {
+    color: '#1F2937',
+    fontWeight: '700',
+    fontSize: 11,
+    textAlign: 'center',
+  },
+  subcategorySelectorCard: {
+    flexDirection: rowDirection,
+    alignItems: 'center',
+    backgroundColor: '#F4F7FB',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  subcategorySelectorCardActive: {
+    backgroundColor: '#0D2F67',
+  },
+  subcategoryIconContainer: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  subcategoryEmoji: {
+    fontSize: 16,
+  },
+  subcategoryName: {
+    color: '#111827',
+    fontWeight: '600',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  subcategoryNameActive: {
+    color: '#FFFFFF',
+  },
+  selectorRail: {
+    flexDirection: rowDirection,
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: spacing[2],
+    paddingVertical: spacing[1],
+    justifyContent: 'flex-start',
+  },
   heroPromoCard: {
     flex: 1,
     minWidth: 200,
@@ -1111,6 +1371,10 @@ function createStyles(direction: Direction) {
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
+  },
+  heroPromoCardInline: {
+    flex: 0,
+    width: 212,
   },
   heroPromoContent: {
     flexDirection: rowDirection,

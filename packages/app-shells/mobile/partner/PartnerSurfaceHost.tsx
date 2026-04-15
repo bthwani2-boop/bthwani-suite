@@ -23,7 +23,8 @@ const {
   DshPartnerIdentitySubmitScreen,
   DshPartnerIntakeStartScreen,
   DshPartnerInventoryAdjustScreen,
-  DshPartnerInventoryUpdateScreen,
+    DshInventoryManagementScreen,
+    DshPartnerInventoryUpdateScreen,
   DshPartnerItemsUpsertScreen,
   DshPartnerListingStatusUpdateScreen,
   DshPartnerManagerInviteScreen,
@@ -49,6 +50,7 @@ const {
 } = dsh.dshAppPartner;
 
 type PartnerRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'operations' | 'maintenance' | 'hours' | 'zones' | 'support-directory' | 'support-screen';
+type PartnerRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'operations' | 'maintenance' | 'hours' | 'zones' | 'support-directory' | 'support-screen' | 'inventory-management';
 type PartnerSupportRoute =
   | 'auction-status-update'
   | 'audience-insights'
@@ -351,6 +353,9 @@ export function PartnerSurfaceHost() {
 
   const openSupportDirectory = () => {
     setRoute('support-directory');
+  };
+  const openInventoryManagement = () => {
+    setRoute('inventory-management');
   };
 
   const openSupportScreen = (screenId: PartnerSupportRoute) => {
@@ -746,10 +751,19 @@ export function PartnerSurfaceHost() {
                     }
 
                     if (index === 1) {
-                      setActiveOrderId('partner-order-1048');
-                      setRoute('detail');
+                      openInventoryManagement();
                       return;
                     }
+    return (
+      <BthBox style={{ flex: 1 }} background="background">
+        {topBar}
+        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+          <DshInventoryManagementScreen />
+        </BthSurface>
+        {accountSheet}
+      </BthBox>
+    );
+  }
 
                     setActiveOrderId('partner-order-1051');
                     setRoute('inbox');

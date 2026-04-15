@@ -39,6 +39,7 @@ import {
 	type MarketingNewsTickerSource,
 	type MarketingNewsTickerStatus,
 } from './news-ticker-store';
+import { dshPartnerIntakeItems } from '../../../partners/dsh/workflow';
 
 export type ControlPanelDshMarketingScreenProps = {
 	hubHref?: string;
@@ -130,6 +131,13 @@ type SmartCopy = {
 type PillTone = 'surfaceInset' | 'surfaceRaised' | 'infoSurface' | 'successSurface' | 'warningSurface' | 'dangerSurface' | 'brandSurface';
 
 type ItemActionTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
+
+type MarketingCategoryLane = {
+	categoryLabel: string;
+	pendingCount: number;
+	publishedCount: number;
+	items: ReadonlyArray<(typeof dshPartnerIntakeItems)[number]>;
+};
 
 const copyByLocale: Record<MarketingNewsTickerLocale, SmartCopy> = {
 	ar: {
@@ -374,6 +382,25 @@ function laneLabel(item: MarketingNewsTickerItem, locale: MarketingNewsTickerLoc
 	return `${resolveMarketingTickerSourceLabel(locale, item.source)} · ${resolveMarketingTickerAudienceLabel(locale, item.audience)} · ${resolveMarketingTickerPriorityLabel(locale, item.priority)} · ${resolveMarketingTickerDeliveryLabel(locale, item.deliveryMode)}`;
 }
 
+function resolveMarketingCategoryLanes(): ReadonlyArray<MarketingCategoryLane> {
+	const grouped = new Map<string, Array<(typeof dshPartnerIntakeItems)[number]>>();
+
+	dshPartnerIntakeItems
+		.filter((item) => item.stage === 'pending-marketing' || item.stage === 'published')
+		.forEach((item) => {
+			const currentItems = grouped.get(item.categoryLabel) ?? [];
+			currentItems.push(item);
+			grouped.set(item.categoryLabel, currentItems);
+		});
+
+	return [...grouped.entries()].map(([categoryLabel, items]) => ({
+		categoryLabel,
+	pendingCount: items.filter((item) => item.stage === 'pending-marketing').length,
+		publishedCount: items.filter((item) => item.stage === 'published').length,
+		items,
+	}));
+}
+
 export function ControlPanelDshMarketingScreen({
 	hubHref = '/operations/dsh',
 	operationsHref = '/operations',
@@ -388,6 +415,7 @@ export function ControlPanelDshMarketingScreen({
 	const [tickers, setTickers] = React.useState<ReadonlyArray<MarketingNewsTickerItem>>(() => getMarketingTickerItems());
 	const [selectedTickerId, setSelectedTickerId] = React.useState<string | null>(() => getMarketingTickerItems()[0]?.id ?? null);
 	const [audienceFocus, setAudienceFocus] = React.useState<MarketingNewsTickerAudience>('client');
+	const marketingCategoryLanes = React.useMemo(() => resolveMarketingCategoryLanes(), []);
 	const [draft, setDraft] = React.useState<MarketingTickerDraft>(() => {
 		const initialTicker = getMarketingTickerItems()[0];
 		return initialTicker ? buildDraftFromTicker(initialTicker) : createEmptyDraft(locale);
@@ -594,6 +622,56 @@ export function ControlPanelDshMarketingScreen({
 						<Pill label={`${copy.suppressedLabel}: ${counts.suppressed}`} tone="warningSurface" />
 						<Pill label={`${copy.pinnedLabel}: ${counts.pinned}`} tone="brandSurface" />
 					</BthBox>
+				</BthBox>
+			</BthWebSectionCard>
+
+			<BthWebSectionCard
+				title={locale === 'en' ? 'Category handoff lane' : 'مسار الفئات للتسويق'}
+				description={locale === 'en' ? 'Approved partner items appear here before the catalog or client app.' : 'العناصر التي قبلها الشركاء تظهر هنا قبل الكتالوج أو تطبيق العميل.'}
+			>
+				<BthBox gap={3}>
+					{marketingCategoryLanes.length > 0 ? marketingCategoryLanes.map((lane) => (
+						<BthBox key={lane.categoryLabel} padding={3} gap={2} border radiusToken="xl" background="surfaceRaised" borderTone="line">
+							<BthBox layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
+								<BthBox gap={1} style={{ flexGrow: 1, minWidth: 0 }}>
+									<BthText role="bodyStrong">{lane.categoryLabel}</BthText>
+									<BthText role="bodySm" tone="muted">
+										{locale === 'en'
+											? `Ready for marketing: ${lane.pendingCount} · Published: ${lane.publishedCount}`
+											: `جاهز للتسويق: ${lane.pendingCount} · منشور: ${lane.publishedCount}`}
+									</BthText>
+								</BthBox>
+								<BthBox layoutDirection="row" gap={1} style={{ flexWrap: 'wrap' }}>
+									<Pill label={locale === 'en' ? 'Partner approved' : 'مقبول من الشركاء'} tone="successSurface" />
+									<Pill label={locale === 'en' ? 'Before client app' : 'قبل تطبيق العميل'} tone="brandSurface" />
+								</BthBox>
+							</BthBox>
+							<BthBox gap={2}>
+								{lane.items.map((item) => (
+									<BthBox key={item.id} padding={3} gap={1} border radiusToken="lg" background="surfaceInset">
+										<BthBox layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
+											<BthText role="bodyStrong">{item.productName}</BthText>
+											<BthText role="caption" tone={item.stage === 'published' ? 'success' : 'warning'}>
+												{item.stage === 'published'
+													? (locale === 'en' ? 'Published' : 'منشور')
+													: (locale === 'en' ? 'Marketing review' : 'مراجعة تسويقية')}
+											</BthText>
+										</BthBox>
+										<BthText role="bodySm" tone="muted">
+											{item.categoryLabel} · {item.ownerLabel} · {item.submittedAt}
+										</BthText>
+										<BthText role="bodySm" tone="muted">
+											{item.note}
+										</BthText>
+									</BthBox>
+								))}
+							</BthBox>
+						</BthBox>
+					)) : (
+						<BthText role="bodySm" tone="muted">
+							{locale === 'en' ? 'No partner-approved categories yet.' : 'لا توجد فئات مقبولة من الشركاء حتى الآن.'}
+						</BthText>
+					)}
 				</BthBox>
 			</BthWebSectionCard>
 

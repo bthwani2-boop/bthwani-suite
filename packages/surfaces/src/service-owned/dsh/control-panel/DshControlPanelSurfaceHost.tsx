@@ -11,8 +11,10 @@ import {
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from './operations/dsh/shared/dshControlPanelText';
 import { ControlPanelDshArrivalBellScreen } from './operations/dsh/arrival-bell';
+import { ControlPanelDshCatalogScreen } from './catalogs/dsh';
 import { ControlPanelDshOrderDetailScreen, ControlPanelDshOrdersScreen } from './operations/dsh/orders';
 import { ControlPanelDshPeakModeScreen } from './operations/dsh/peak-mode';
+import { ControlPanelDshPartnerApprovalsScreen } from './partners/dsh';
 import { ControlPanelDshReassignScreen } from './operations/dsh/reassign';
 import { ControlPanelDshSheinProxyScreen } from './operations/dsh/sheinproxy';
 import { ControlPanelDshZoneSetScreen } from './operations/dsh/zone-set';
@@ -21,6 +23,8 @@ import { ControlPanelDshMarketingScreen } from './marketing/dsh';
 const liveRouteHrefs = {
   overview: '/operations',
   orders: '/operations/dsh/orders',
+  partners: '/operations/dsh/partners',
+  catalogs: '/operations/dsh/catalogs',
   sheinProxy: '/operations/dsh/sheinproxy',
   reassign: '/operations/dsh/reassign',
   peakMode: '/operations/dsh/peak-mode',
@@ -28,7 +32,7 @@ const liveRouteHrefs = {
   zoneSet: '/operations/dsh/zone-set',
 } as const;
 
-type DshWorkspaceId = 'overview' | 'orders' | 'order-detail' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'arrival-bell' | 'zone-set' | 'marketing';
+type DshWorkspaceId = 'overview' | 'orders' | 'order-detail' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'arrival-bell' | 'zone-set' | 'marketing' | 'catalogs' | 'partners';
 
 type DshDockText = {
   dockEyebrow: string;
@@ -165,6 +169,8 @@ function ControlPanelDshOperationsDock() {
   const liveRouteItems: ReadonlyArray<DshDockRouteItem> = [
     { href: liveRouteHrefs.overview, label: dockText.overviewLabel, description: dockText.overviewDescription, statusLabel: dockText.liveBadge },
     { href: liveRouteHrefs.orders, label: dockText.ordersLabel, description: dockText.ordersDescription, statusLabel: dockText.liveBadge },
+    { href: liveRouteHrefs.partners, label: 'Partners approvals', description: 'Initial product review queue before marketing.', statusLabel: dockText.liveBadge },
+    { href: liveRouteHrefs.catalogs, label: 'Catalog governance', description: 'The sovereign catalog for main and sub categories.', statusLabel: dockText.liveBadge },
     { href: '/operations/dsh/marketing', label: marketingTitle, description: marketingDescription, statusLabel: dockText.liveBadge },
     { href: liveRouteHrefs.sheinProxy, label: dockText.sheinProxyLabel, description: dockText.sheinProxyDescription, statusLabel: dockText.liveBadge },
     { href: liveRouteHrefs.reassign, label: dockText.reassignLabel, description: dockText.reassignDescription, statusLabel: dockText.liveBadge },
@@ -259,6 +265,8 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
   const tabs = [
     { id: 'overview', label: dshText.hub.workbenches.overview.label, active: normalizedWorkspace === 'overview' },
     { id: 'orders', label: dshText.hub.workbenches.orders.label, active: normalizedWorkspace === 'orders' },
+    { id: 'partners', label: 'Partners', active: normalizedWorkspace === 'partners' },
+    { id: 'catalogs', label: 'Catalogs', active: normalizedWorkspace === 'catalogs' },
     { id: 'marketing', label: uiText.controlPanel.surfaceTitles.marketing, active: normalizedWorkspace === 'marketing' },
     { id: 'sheinproxy', label: dshText.hub.workbenches.sheinProxy.label, active: normalizedWorkspace === 'sheinproxy' },
     { id: 'reassign', label: dshText.hub.workbenches.reassign.label, active: normalizedWorkspace === 'reassign' },
@@ -270,6 +278,8 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
   return (
     <BthBox gap={4}>
       {workspace === 'overview' ? <ControlPanelDshOperationsDock /> : null}
+      {workspace === 'catalogs' ? <ControlPanelDshCatalogScreen hubHref="/operations/dsh" operationsHref="/operations" partnersHref="/operations/dsh/partners" marketingHref="/operations/dsh/marketing" /> : null}
+      {workspace === 'partners' ? <ControlPanelDshPartnerApprovalsScreen hubHref="/operations/dsh" operationsHref="/operations" catalogHref="/operations/dsh/catalogs" marketingHref="/operations/dsh/marketing" /> : null}
       {workspace === 'marketing' ? <ControlPanelDshMarketingScreen hubHref="/operations/dsh" operationsHref="/operations" /> : null}
 
       {workspace !== 'overview' ? (
