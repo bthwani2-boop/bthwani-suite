@@ -50,9 +50,9 @@ export type PartnerSupportScreenId =
   | 'subscription';
 
 type SupportMetric = {
-  label: string;
+    subtitle: 'Review subscription state, benefits, loyalty value, and upgrade path for the branch.',
   value: string;
-  deltaLabel: string;
+    heroDescription: 'Subscription visibility helps the branch understand limits, coupon readiness, and upgrade decisions without leaving DSH operations.',
   tone?: 'default' | 'success' | 'warning' | 'danger' | 'info';
 };
 
@@ -60,6 +60,16 @@ type SupportListItem = {
   title: string;
   subtitle: string;
   meta: string;
+    keyValues: [
+      { label: 'Points preview', value: '2,840 pts' },
+      { label: 'Coupon lane', value: 'Visible in checkout' },
+      { label: 'Entitlement sync', value: 'subscription-sync' },
+    ],
+    listItems: [
+      { title: 'Family members', subtitle: 'Member changes stay attached to the active subscription state.', meta: 'Family', badgeLabel: 'Share' },
+      { title: 'Coupon visibility', subtitle: 'Discount readiness remains visible while the branch reviews the plan.', meta: 'Promo', badgeLabel: 'Ready' },
+      { title: 'Points multiplier', subtitle: 'Keep the commercial earning rules readable before the next action.', meta: 'Loyalty', badgeLabel: 'x2/x3' },
+    ],
   badgeLabel?: string;
 };
 

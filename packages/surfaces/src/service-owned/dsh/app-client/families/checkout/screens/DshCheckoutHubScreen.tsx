@@ -2,6 +2,7 @@ import React from 'react';
 import { BthBox, BthKeyValueList, BthListItem, BthStatCard, BthSurface, BthTextField } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../../../patterns/screens/DshOperationScreen';
 import { clientSupportDefinitions, type ClientSupportScreenId } from '../../support/screens/DshClientGeneratedSupportScreens';
+import { loyaltyCheckoutItems, loyaltyCheckoutKeyValues } from '../loyaltyCheckoutDeck';
 
 type CheckoutScreenId = 'checkout-gate' | 'estimate-get' | 'pricing-preview' | 'pricing-snapshot-get' | 'promo-apply';
 
@@ -40,6 +41,7 @@ export function DshCheckoutHubScreen({
           <BthSurface tone="brand" gap={3}>
             <BthStatCard label="Estimated total" value="78 SAR" deltaLabel={definition.stageLabel} tone="info" />
             <BthStatCard label="ETA confidence" value="25 min" deltaLabel="Stable before submit" tone="success" />
+            <BthStatCard label="Points earn" value="+184 pts" deltaLabel="Visible before checkout" tone="warning" />
           </BthSurface>
 
           <BthSurface tone="raised" gap={3}>
@@ -48,6 +50,7 @@ export function DshCheckoutHubScreen({
                 { label: 'Items subtotal', value: '56 SAR' },
                 { label: 'Delivery fee', value: '22 SAR' },
                 { label: 'Applied discount', value: screenId === 'promo-apply' ? '12 SAR' : '0 SAR', tone: 'brand' },
+                ...loyaltyCheckoutKeyValues,
               ]}
             />
           </BthSurface>
@@ -62,10 +65,9 @@ export function DshCheckoutHubScreen({
           </BthSurface>
 
           <BthSurface tone="raised" gap={2}>
-            {[
+            {[...loyaltyCheckoutItems,
               { title: 'Checkout gate', subtitle: 'Keep final blockers visible before submit.', meta: 'Gate', badgeLabel: 'Ready' },
               { title: 'Estimate snapshot', subtitle: 'Read pricing confidence before commit.', meta: 'Estimate', badgeLabel: 'Cost' },
-              { title: 'Promo application', subtitle: 'Apply visible savings without leaving the current step.', meta: 'Promo', badgeLabel: 'Discount' },
             ].map((item) => (
               <BthListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
             ))}

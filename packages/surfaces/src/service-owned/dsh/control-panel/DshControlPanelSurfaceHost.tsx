@@ -16,7 +16,7 @@ import { ControlPanelDshOrderDetailScreen, ControlPanelDshOrdersScreen } from '.
 import { ControlPanelDshPeakModeScreen } from './operations/dsh/peak-mode';
 import { ControlPanelDshPartnerApprovalsScreen } from './partners/dsh';
 import { ControlPanelDshReassignScreen } from './operations/dsh/reassign';
-import { ControlPanelDshSheinProxyScreen } from './operations/dsh/sheinproxy';
+import { ControlPanelDshManualAssignmentScreen } from './operations/dsh/sheinproxy';
 import { ControlPanelDshZoneSetScreen } from './operations/dsh/zone-set';
 import { ControlPanelDshMarketingScreen } from './marketing/dsh';
 
@@ -110,8 +110,8 @@ const dshDockText: DshDockText = {
   arrivalBellDescription: 'Arrival and live notification settings near handoff.',
   zoneSetLabel: 'Zone set',
   zoneSetDescription: 'Guard the delivery scope with clearer operational boundaries.',
-  sheinProxyLabel: 'Shein Proxy',
-  sheinProxyDescription: 'A mediation lane for the DSH proxy workload.',
+  sheinProxyLabel: 'Manual assignment',
+  sheinProxyDescription: 'A reusable manual assignment lane for platform-owned batches.',
   openHubAction: 'Open operations workspace',
   openRouteAction: 'Open route',
   openOrdersAction: 'Open orders',
@@ -299,7 +299,7 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
 
       {workspace === 'orders' ? <ControlPanelDshOrdersScreen embedded showHeader={false} hubHref="/operations" operationsHref="/operations" /> : null}
       {workspace === 'order-detail' && orderId ? <ControlPanelDshOrderDetailScreen embedded showHeader={false} orderId={orderId} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
-      {workspace === 'sheinproxy' ? <ControlPanelDshSheinProxyScreen hubHref="/operations" operationsHref="/operations" supportHref="/support" /> : null}
+      {workspace === 'sheinproxy' ? <ControlPanelDshManualAssignmentScreen hubHref="/operations" operationsHref="/operations" supportHref="/support" /> : null}
       {workspace === 'reassign' ? <ControlPanelDshReassignScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
       {workspace === 'peak-mode' ? <ControlPanelDshPeakModeScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
       {workspace === 'arrival-bell' ? <ControlPanelDshArrivalBellScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}

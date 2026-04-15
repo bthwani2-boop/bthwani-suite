@@ -32,7 +32,7 @@ const SHEIN_PROXY_REQUESTS: readonly SheinProxyRequest[] = [
     fee: 'SAR 110',
     total: 'SAR 1,486',
     updated: '10 min ago',
-    note: 'Awaiting the first estimate review from the proxy desk.'
+    note: 'Awaiting the first estimate review from the assignment desk.'
   },
   {
     id: 'SPX-2051',
@@ -84,7 +84,7 @@ const SHEIN_PROXY_REQUESTS: readonly SheinProxyRequest[] = [
     fee: 'SAR 77',
     total: 'SAR 812',
     updated: '2 hours ago',
-    note: 'Request is approved and ready for handoff.'
+    note: 'Assignment is approved and ready for handoff.'
   },
   {
     id: 'SPX-2083',
@@ -97,7 +97,7 @@ const SHEIN_PROXY_REQUESTS: readonly SheinProxyRequest[] = [
     fee: 'SAR 58',
     total: 'SAR 659',
     updated: '3 hours ago',
-    note: 'Request was cancelled after a pricing mismatch.'
+    note: 'Assignment was cancelled after a pricing mismatch.'
   }
 ] as const;
 

@@ -16,6 +16,7 @@ import {
   BthWebSegmentedTabs,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
+import { useDshControlPanelText } from '@bthwani/surfaces/dsh/control-panel/operations/dsh/shared/dshControlPanelText';
 import { ControlPanelDshCatalogScreen } from '@bthwani/surfaces/dsh/control-panel/catalogs/dsh';
 import { ControlPanelDshPartnerApprovalsScreen } from '@bthwani/surfaces/dsh/control-panel/partners/dsh';
 import { ControlPanelDshMarketingScreen } from '@bthwani/surfaces/dsh/control-panel/marketing/dsh';
@@ -168,7 +169,7 @@ function resolveFallbackMission(activeSectionLabel: string, panelText: ControlPa
 
 function resolvePrimaryAction(activeSectionId: ControlPanelSectionId, panelText: ControlPanelText) {
   if (activeSectionId === 'operations') {
-    return { label: panelText.ui.primaryAction, href: '/operations/dsh' };
+    return { label: panelText.ui.primaryAction, href: '/operations/dsh/sheinproxy' };
   }
 
   return { label: panelText.ui.primaryAction, href: '/finance' };
@@ -187,6 +188,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
   const { direction } = useDirection();
   const uiText = useUiText();
   const panelText = uiText.controlPanel;
+  const dshText = useDshControlPanelText();
   const marketingCopy = panelText.marketing;
   const [alertCount, setAlertCount] = React.useState(1);
   const [selectedServiceId, setSelectedServiceId] = React.useState<string>(allServiceTabId);
@@ -386,6 +388,30 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
               <p className={styles.subsectionDescription}>{marketingCopy.heroDescription}</p>
             </div>
             <ControlPanelDshMarketingScreen hubHref="/marketing" operationsHref="/operations" />
+          </section>
+        ) : null}
+
+        {activeSectionId === 'operations' ? (
+          <section className={styles.subsectionPanel}>
+            <div className={styles.subsectionHeader}>
+              <h3 className={styles.subsectionTitle}>{dshText.hub.workbenches.sheinProxy.label}</h3>
+              <p className={styles.subsectionDescription}>{dshText.hub.workbenches.sheinProxy.description}</p>
+            </div>
+            <BthWebSectionCard
+              title={dshText.hub.workbenches.sheinProxy.label}
+              description={dshText.hub.workbenches.sheinProxy.description}
+            >
+              <BthBox gap={2}>
+                <BthText role="bodySm" tone="muted">
+                  {dshText.hub.workbenches.sheinProxy.routeHint}
+                </BthText>
+                <BthButton
+                  label={panelText.openSheinProxy}
+                  tone="primary"
+                  onPress={() => router.push('/operations/dsh/sheinproxy')}
+                />
+              </BthBox>
+            </BthWebSectionCard>
           </section>
         ) : null}
 

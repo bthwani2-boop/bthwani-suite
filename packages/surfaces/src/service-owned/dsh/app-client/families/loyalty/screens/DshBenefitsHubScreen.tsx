@@ -2,6 +2,7 @@ import React from 'react';
 import { BthBox, BthKeyValueList, BthListItem, BthStatCard, BthSurface } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../../../patterns/screens/DshOperationScreen';
 import { clientSupportDefinitions, type ClientSupportScreenId } from '../../support/screens/DshClientGeneratedSupportScreens';
+import { loyaltyBenefitKeyValues, loyaltyBenefitSurfaceItems, type LoyaltyBenefitMode } from '../loyaltyCommercialDeck';
 
 type BenefitsScreenId =
   | 'subscription-family-get'
@@ -26,6 +27,12 @@ export type DshBenefitsHubScreenProps = {
 
 function isSubscriptionScreen(screenId: BenefitsScreenId) {
   return screenId.startsWith('subscription-');
+}
+
+function getBenefitMode(screenId: BenefitsScreenId): LoyaltyBenefitMode {
+  return screenId === 'loyalty-points-redeem' || screenId === 'loyalty-points-user-balance' || screenId === 'loyalty-points-user-history'
+    ? 'loyalty'
+    : 'subscription';
 }
 
 function getPrimaryLabel(screenId: BenefitsScreenId) {
@@ -53,6 +60,9 @@ export function DshBenefitsHubScreen({
 }: DshBenefitsHubScreenProps) {
   const definition = clientSupportDefinitions[screenId as ClientSupportScreenId];
   const subscriptionMode = isSubscriptionScreen(screenId);
+  const benefitMode = getBenefitMode(screenId);
+  const surfaceItems = loyaltyBenefitSurfaceItems[benefitMode];
+  const surfaceKeyValues = loyaltyBenefitKeyValues[benefitMode];
 
   return (
     <DshOperationScreen
@@ -79,6 +89,12 @@ export function DshBenefitsHubScreen({
               deltaLabel={subscriptionMode ? 'Auto-sync enabled' : 'Visible before checkout'}
               tone="success"
             />
+            <BthStatCard
+              label={subscriptionMode ? 'Coupon lane' : 'Coupon state'}
+              value={subscriptionMode ? 'Promo-ready' : 'Redeem-ready'}
+              deltaLabel={subscriptionMode ? 'Keep plan offers visible' : 'Promos stay in checkout'}
+              tone="warning"
+            />
           </BthSurface>
 
           <BthSurface tone="raised" gap={3}>
@@ -91,23 +107,13 @@ export function DshBenefitsHubScreen({
                   value: subscriptionMode ? 'Priority delivery, family sharing, boosted points' : 'Redeem, inspect balance, and review history',
                   tone: 'brand',
                 },
+                ...surfaceKeyValues,
               ]}
             />
           </BthSurface>
 
           <BthSurface tone="raised" gap={2}>
-            {(subscriptionMode
-              ? [
-                  { title: 'Pro catalog', subtitle: 'Compare plans with one clear upgrade path.', meta: 'Catalog', badgeLabel: 'Plan' },
-                  { title: 'Family members', subtitle: 'Keep member management close to the active subscription state.', meta: 'Family', badgeLabel: 'Share' },
-                  { title: 'Sync state', subtitle: 'Refresh benefits before the next paid action.', meta: 'Sync', badgeLabel: 'Live' },
-                ]
-              : [
-                  { title: 'Points balance', subtitle: 'Show current value before redemption.', meta: 'Balance', badgeLabel: 'Value' },
-                  { title: 'Redeem points', subtitle: 'Convert points into visible order savings.', meta: 'Redeem', badgeLabel: 'Action' },
-                  { title: 'History', subtitle: 'Explain accrual and redemption without support friction.', meta: 'History', badgeLabel: 'Audit' },
-                ]
-            ).map((item) => (
+            {surfaceItems.map((item) => (
               <BthListItem
                 key={item.title}
                 title={item.title}

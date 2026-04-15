@@ -4,6 +4,7 @@ import { Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-nat
 import {
   BthUnifiedMobileTopBar,
   BthBox,
+  BthStatCard,
   BthStateView,
   BthText,
   radius,
@@ -559,6 +560,11 @@ export function DshHomeGetScreen({
     [currentLanguage, currentTime, recentOrders, uiText.topBar.location]
   );
   const tickerAction = onOpenOrders ?? onOpenTracking ?? onOpenSearch;
+  const loyaltyPreviewItems = [
+    { title: 'فتح الولاء', subtitle: 'عرض subscription, points, and coupon truth', meta: 'Benefits', badgeLabel: 'Open', onPress: onOpenBenefits },
+    { title: 'مراجعة الدفع', subtitle: 'البقاء داخل pricing lane عند تطبيق promo', meta: 'Checkout', badgeLabel: 'Apply', onPress: onOpenCart ?? onOpenSearch },
+    { title: 'إشارات الاشتراك', subtitle: 'عرض الخطة النشطة والـ sync state قبل القرار', meta: 'Plan', badgeLabel: 'Live', onPress: onOpenSearch },
+  ];
   const categoriesDialItems = React.useMemo<CategoryDialItem[]>(() => {
     return visibleCategoryFixtures.map((category) => ({
       id: category.id,
@@ -665,6 +671,27 @@ export function DshHomeGetScreen({
             <DshAwnakOrderCreateScreen embedded onClose={onCloseAwnakInline} />
           </BthBox>
         ) : null}
+
+        <BthSurface tone="brand" gap={3}>
+          <BthText role="titleSm">الولاء والاشتراكات</BthText>
+          <BthBox gap={2}>
+            <BthStatCard label="الاشتراك" value="Pro Plus" deltaLabel="Visible plan" tone="info" />
+            <BthStatCard label="النقاط" value="2,840 pts" deltaLabel="Redeemable before checkout" tone="success" />
+            <BthStatCard label="الكوبونات" value="مرئية" deltaLabel="Promo lane stays in flow" tone="warning" />
+          </BthBox>
+          <BthBox gap={2}>
+            {loyaltyPreviewItems.map((item) => (
+              <BthListItem
+                key={item.title}
+                title={item.title}
+                subtitle={item.subtitle}
+                meta={item.meta}
+                badgeLabel={item.badgeLabel}
+                onPress={item.onPress}
+              />
+            ))}
+          </BthBox>
+        </BthSurface>
 
         <View style={styles.categoriesSelectorSection}>
           <View style={styles.categoriesSelectorRow}>
