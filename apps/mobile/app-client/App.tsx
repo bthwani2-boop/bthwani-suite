@@ -1,4 +1,4 @@
-import { BthMobileRoot } from '@bthwani/ui-kit';
+import { BthMobileRoot } from '@bthwani/ui-kit/mobile';
 import ClientSurfaceHost from '@bthwani/app-shells/mobile/client/mobile-entry';
 
 export default function App() {

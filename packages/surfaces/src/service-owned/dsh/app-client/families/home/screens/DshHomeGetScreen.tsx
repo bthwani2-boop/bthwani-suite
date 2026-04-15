@@ -4,7 +4,6 @@ import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   BthUnifiedMobileTopBar,
   BthBox,
-  BthMobileScrollView,
   BthStateView,
   BthText,
   radius,
@@ -158,10 +157,11 @@ function resolveTickerBanner(
   const fixture = dshHomeGetFixtureTickerBanner;
   const isOpen = isWithinOperatingHours(now, fixture.openHour, fixture.closeHour);
   const tickerLines: string[] = [];
+  const isEnglish = languageCode === 'en';
 
   if (locationLabel.trim()) {
     tickerLines.push(
-      currentLanguage === 'en'
+      isEnglish
         ? `Delivering to ${locationLabel.trim()}`
         : `التوصيل إلى ${locationLabel.trim()}`,
     );
@@ -169,7 +169,7 @@ function resolveTickerBanner(
 
   recentOrders.slice(0, 2).forEach((order, index) => {
     tickerLines.push(
-      currentLanguage === 'en'
+      isEnglish
         ? `${index === 0 ? 'Active order' : 'Recent order'}: ${order.subtitle} · ${order.meta}`
         : `${index === 0 ? 'الطلب النشط' : 'طلب سابق'}: ${order.subtitle} · ${order.meta}`,
     );
@@ -250,6 +250,7 @@ export function DshHomeGetScreen({
   onOpenEntry,
 }: DshHomeGetScreenProps) {
   const { direction, language: resolvedLanguage } = useDirection();
+  const currentLanguage = resolvedLanguage ?? 'ar';
   const { theme } = useTheme();
   const uiText = useUiText();
   const styles = React.useMemo(() => createStyles(direction), [direction]);
@@ -440,8 +441,8 @@ export function DshHomeGetScreen({
     onPress: resolveBannerPress(promo),
   }));
   const tickerState = React.useMemo(
-    () => resolveTickerBanner(currentTime, recentOrders, uiText.topBar.location, languageCode),
-    [languageCode, currentTime, recentOrders, uiText.topBar.location]
+    () => resolveTickerBanner(currentTime, recentOrders, uiText.topBar.location, currentLanguage),
+    [currentLanguage, currentTime, recentOrders, uiText.topBar.location]
   );
   const tickerAction = onOpenOrders ?? onOpenTracking ?? onOpenSearch;
 
@@ -486,7 +487,11 @@ export function DshHomeGetScreen({
         }}
       />
 
-      <BthMobileScrollView padding={4} gap={4}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ padding: spacing[4], gap: spacing[4], flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.carouselViewport}>
           <HomeBannerCarousel banners={bannerItems} />
         </View>
@@ -708,7 +713,7 @@ export function DshHomeGetScreen({
             </Pressable>
           </Pressable>
         </Modal>
-      </BthMobileScrollView>
+      </ScrollView>
     </View>
   );
 }
