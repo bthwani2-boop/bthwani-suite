@@ -53,18 +53,5 @@ export const bthComponentLabSections = Object.freeze<BthComponentLabSection[]>([
 export const bthLabThemeModes = Object.freeze(['light', 'dark', 'high-contrast'] as const);
 
 export const bthProofArtifactFiles = Object.freeze([
-  'packages/ui-kit/docs/generated/token-output.css',
-  'packages/ui-kit/docs/generated/theme-output.css',
-  'packages/ui-kit/docs/generated/native-tokens.json',
-  'packages/ui-kit/docs/generated/native-themes.json',
-  'packages/ui-kit/docs/generated/proof-manifest.json',
-  'packages/ui-kit/docs/generated/proof-manifest.md',
-  'packages/ui-kit/docs/generated/component-lab.md',
-  'packages/ui-kit/docs/generated/state-gallery.md',
-  'packages/ui-kit/docs/generated/accessibility-report.json',
-  'packages/ui-kit/docs/generated/accessibility-report.md',
-  'packages/ui-kit/docs/generated/visual-regression/ui-kit-preview-light.png',
-  'packages/ui-kit/docs/generated/visual-regression/ui-kit-preview-dark.png',
-  'packages/ui-kit/docs/generated/visual-regression/ui-kit-preview-high-contrast.png',
-  'packages/ui-kit/docs/generated/playwright-report/index.html'
+
 ] as const);

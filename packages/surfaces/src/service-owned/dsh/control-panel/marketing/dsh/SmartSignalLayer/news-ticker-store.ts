@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 export type MarketingNewsTickerLocale = 'ar' | 'en';
 
 export type MarketingNewsTickerKind = 'platform' | 'order' | 'promo';

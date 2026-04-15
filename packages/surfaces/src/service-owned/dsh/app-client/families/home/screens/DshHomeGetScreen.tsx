@@ -153,7 +153,7 @@ function resolveTickerBanner(
   now: Date,
   recentOrders: DshHomeRecentOrder[],
   locationLabel: string,
-  currentLanguage: string,
+  languageCode: string,
 ) {
   const fixture = dshHomeGetFixtureTickerBanner;
   const isOpen = isWithinOperatingHours(now, fixture.openHour, fixture.closeHour);
@@ -249,7 +249,7 @@ export function DshHomeGetScreen({
   onRetry,
   onOpenEntry,
 }: DshHomeGetScreenProps) {
-  const { direction, language: currentLanguage } = useDirection();
+  const { direction, language: resolvedLanguage } = useDirection();
   const { theme } = useTheme();
   const uiText = useUiText();
   const styles = React.useMemo(() => createStyles(direction), [direction]);
@@ -440,8 +440,8 @@ export function DshHomeGetScreen({
     onPress: resolveBannerPress(promo),
   }));
   const tickerState = React.useMemo(
-    () => resolveTickerBanner(currentTime, recentOrders, uiText.topBar.location, currentLanguage),
-    [currentLanguage, currentTime, recentOrders, uiText.topBar.location]
+    () => resolveTickerBanner(currentTime, recentOrders, uiText.topBar.location, languageCode),
+    [languageCode, currentTime, recentOrders, uiText.topBar.location]
   );
   const tickerAction = onOpenOrders ?? onOpenTracking ?? onOpenSearch;
 

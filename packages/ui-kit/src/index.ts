@@ -1,4 +1,4 @@
-﻿export * from './foundation/tokens';
+export * from './foundation/tokens';
 export * from './foundation/themes';
 export * from './foundation/direction';
 export * from './foundation/i18n';
@@ -8,5 +8,3 @@ export * from './primitives';
 export * from './states';
 export * from './components';
 export * from './patterns';
-export * from './adapters';
-export * from './root';

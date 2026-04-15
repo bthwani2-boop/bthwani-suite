@@ -40,7 +40,7 @@
 - token output APIs now live under `foundation/tokens/outputs`
 - theme output APIs now live under `foundation/themes/outputs`
 - web root CSS variables are generated from the same theme source consumed by native modes
-- generated proof artifacts are written to [docs/generated/proof-manifest.md](./docs/generated/proof-manifest.md) and adjacent output files via `pnpm nx run ui-kit:build-outputs`
+- generated proof artifacts are not claimed in this snapshot unless the files physically exist under `packages/ui-kit/docs/generated`
 
 ## Proof stack
 

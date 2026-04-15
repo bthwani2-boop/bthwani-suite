@@ -1,4 +1,4 @@
 export const surfaceCatalog = [
   'operations',
-    'marketing'
+  'marketing',
 ] as const;
