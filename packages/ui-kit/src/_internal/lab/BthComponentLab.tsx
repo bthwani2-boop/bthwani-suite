@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { BthMobileScrollView } from '../adapters';
 import {
   BthButton,
   BthCheckbox,
@@ -16,10 +15,10 @@ import {
   BthTabs,
   BthTextField,
   BthToast
-} from '../components';
-import { bthNativeTokenOutput } from '../foundation/tokens';
-import { useDirection, useTheme } from '../hooks';
-import { BthBox, BthSurface, BthText } from '../primitives';
+} from '../../components';
+import { bthNativeTokenOutput } from '../../foundation/tokens';
+import { useDirection, useTheme } from '../../hooks';
+import { BthBox, BthMobileScrollView, BthSurface, BthText } from '../../primitives';
 import { bthComponentLabSections } from './catalog';
 
 export function BthComponentLab() {

@@ -1,7 +1,7 @@
-import { bthThemeModes } from '../foundation/themes';
-import { tokenSourceMetadata } from '../foundation/tokens';
+import { bthThemeModes } from '../../foundation/themes';
+import { tokenSourceMetadata } from '../../foundation/tokens';
 import { bthComponentLabSections, bthLabThemeModes, bthProofArtifactFiles } from '../lab/catalog';
-import { bthStateIds } from '../states';
+import { bthStateIds } from '../../states';
 
 export const bthUiKitProofManifest = {
   authority: {

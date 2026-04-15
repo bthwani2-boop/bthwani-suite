@@ -114,3 +114,17 @@ export const dshCategoryListFixtures = dshCategoryFixtures.map((category) => ({
 export function getDshCategoryFixture(categoryId: string) {
   return dshCategoryFixtures.find((category) => category.id === categoryId) ?? null;
 }
+export const DSH_CATEGORY_ICONS: Record<string, string> = {
+  restaurants: '🍽️',
+  grocery: '🛒',
+  sweets_juices: '🧃',
+  anaqati: '✨',
+  bthwani_store: '🏥',
+  home_projects: '🏠',
+  awnak: '🧰',
+  gas_refill: '🧯',
+  shein: '🛍️',
+  spare_parts: '🧩',
+  honey_dates: '🍯',
+  electronics: '💻',
+};

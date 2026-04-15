@@ -1,1 +1,2 @@
-// Dev-only exports removed from production core lane.
+// Production core lane intentionally exports nothing.
+export {};

@@ -4,7 +4,7 @@ export const metadata = {
 };
 
 import type { ReactNode } from 'react';
-import { BthWebRootLayout } from '@bthwani/ui-kit/web';
+import { BthWebRootLayout } from '@bthwani/ui-kit/next';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

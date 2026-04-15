@@ -1,4 +1,4 @@
-import { BthMobileRoot } from '@bthwani/ui-kit';
+import { BthMobileRoot } from '@bthwani/ui-kit/mobile';
 import CaptainSurfaceHost from '@bthwani/app-shells/mobile/captain/mobile-entry';
 
 export default function App() {

@@ -1,8 +1,7 @@
 import React from 'react';
-import { bthStateIds } from '../states';
-import { BthMobileScrollView } from '../adapters';
-import { BthStateView } from '../components';
-import { BthBox, BthText } from '../primitives';
+import { bthStateIds } from '../../states';
+import { BthStateView } from '../../components';
+import { BthBox, BthMobileScrollView, BthText } from '../../primitives';
 
 export type BthStateGalleryProps = {
   language?: string;

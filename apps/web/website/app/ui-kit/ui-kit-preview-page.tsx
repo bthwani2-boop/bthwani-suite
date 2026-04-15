@@ -3,15 +3,14 @@
 import {
   BthButton,
   BthChip,
-  BthComponentLab,
   BthDataTable,
   BthKeyValueList,
   BthSegmentedControl,
-  BthStateGallery,
   BthTabs,
   BthText,
   UiKitProvider,
 } from '@bthwani/ui-kit';
+import { BthComponentLab, BthStateGallery } from '@bthwani/ui-kit/preview';
 import { useMemo, useState } from 'react';
 import styles from './ui-kit-preview.module.css';
 
