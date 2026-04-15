@@ -35,23 +35,23 @@ export type DshHomePromo = {
 };
 
 export const defaultCategories: DshHomeCategory[] = [
-  { id: dshCategoryFixtures[0]?.id ?? 'restaurants', label: dshCategoryFixtures[0]?.label ?? 'Restaurants' },
-  { id: dshCategoryFixtures[1]?.id ?? 'grocery', label: dshCategoryFixtures[1]?.label ?? 'Grocery' },
-  { id: dshCategoryFixtures[2]?.id ?? 'sweets_juices', label: dshCategoryFixtures[2]?.label ?? 'Sweets & Juices' },
-  { id: dshCategoryFixtures[3]?.id ?? 'anaqati', label: dshCategoryFixtures[3]?.label ?? 'Anaqati' },
+  ...dshCategoryFixtures.map((category) => ({
+    id: category.id,
+    label: category.label,
+  })),
 ];
 
 export const defaultPromos: DshHomePromo[] = [
   {
     id: 'promo-fast-delivery',
-    title: 'Fast delivery window',
-    subtitle: 'Start from one store and keep the flow compact.',
+    title: 'نافذة توصيل سريعة',
+    subtitle: 'ابدأ من متجر واحد وابقِ المسار مختصرًا.',
     accentColor: '#FF6A00',
   },
   {
     id: 'promo-confidence',
-    title: 'Confidence-first tracking',
-    subtitle: 'Open orders quickly whenever confidence is needed.',
+    title: 'تتبّع يسبق الثقة',
+    subtitle: 'افتح الطلبات بسرعة عندما تحتاج إلى وضوح فوري.',
     accentColor: '#0D2F67',
   },
 ];
@@ -59,30 +59,30 @@ export const defaultPromos: DshHomePromo[] = [
 export const defaultStores: DshHomeStore[] = [
   {
     id: 'store-1001',
-    name: 'Olaya Fresh Market',
-    subtitle: 'Groceries and daily essentials',
-    statusLabel: 'Open',
-    meta: 'ETA 18 min',
+    name: 'سوق العليا الطازج',
+    subtitle: 'بقالة واحتياجات يومية',
+    statusLabel: 'مفتوح',
+    meta: 'متوقع 18 دقيقة',
     etaMinutes: 18,
     hasOffer: true,
     isFavorite: true,
   },
   {
     id: 'store-1002',
-    name: 'Hittin Bakery',
-    subtitle: 'Bread and pastries',
-    statusLabel: 'Open',
-    meta: 'ETA 25 min',
+    name: 'مخبز حطين',
+    subtitle: 'خبز ومعجنات',
+    statusLabel: 'مفتوح',
+    meta: 'متوقع 25 دقيقة',
     etaMinutes: 25,
     hasOffer: false,
     isFavorite: false,
   },
   {
     id: 'store-1003',
-    name: 'Malqa Kitchen',
-    subtitle: 'Prepared meals',
-    statusLabel: 'Busy',
-    meta: 'ETA 32 min',
+    name: 'مطبخ الملقا',
+    subtitle: 'وجبات جاهزة',
+    statusLabel: 'مشغول',
+    meta: 'متوقع 32 دقيقة',
     etaMinutes: 32,
     hasOffer: true,
     isFavorite: false,

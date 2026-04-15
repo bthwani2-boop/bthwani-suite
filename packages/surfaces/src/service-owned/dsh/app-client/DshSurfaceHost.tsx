@@ -911,12 +911,12 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
       <DshCategoryGetScreen
         category={{
           id: category?.id ?? itemsCategory,
-          label: category?.label ?? (itemsCategory === 'all' ? 'All categories' : itemsCategory),
-          subtitle: category?.subtitle ?? 'Compact category detail for the current discovery context.',
+          label: category?.label ?? (itemsCategory === 'all' ? 'جميع الفئات' : itemsCategory),
+          subtitle: category?.subtitle ?? 'تفاصيل مختصرة للفئة الحالية داخل مسار الاستكشاف.',
           summary: category?.subcategories.length
-            ? `Main category with ${category.subcategories.length} subcategories ready for discovery.`
-            : 'Open the list view to continue with the selected category.',
-          itemCountLabel: category?.subcategories.length ? `${category.subcategories.length} subcategories` : 'Category detail ready',
+            ? `فئة رئيسية تحتوي على ${category.subcategories.length} فئات فرعية جاهزة للاستكشاف.`
+            : 'افتح قائمة الفئات للمتابعة مع هذه الفئة.',
+          itemCountLabel: category?.subcategories.length ? `${category.subcategories.length} فئات فرعية` : 'تفاصيل الفئة جاهزة',
           subcategories: category?.subcategories,
         }}
         onOpenList={() => setRoute('store-items')}

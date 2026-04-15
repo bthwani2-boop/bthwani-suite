@@ -29,7 +29,15 @@ import {
   HomeBannerCarousel,
   type HomeBannerCarouselItem,
 } from '../components/HomeBannerCarousel';
-import { dshCategoryFixtures } from '../../categories/fixtures/dshCategoriesFixtures';
+import {
+  dshCategoryFixtures,
+  DSH_CATEGORY_ICONS,
+} from '../../categories/fixtures/dshCategoriesFixtures';
+import CategoryClockDial, {
+  type CategoryDialItem,
+  type DialAnchorLayout,
+} from '../components/CategoryClockDial';
+import { getDshCategoryIconUrl } from '../../categories/utils/getDshCategoryIconUrl';
 
 export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
@@ -122,11 +130,11 @@ const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; iconName:
 const categoryIconMap: Record<string, string> = {
   restaurants: '🍽️',
   grocery: '🛒',
-  sweets_juices: '🍨',
-  anaqati: '✨',
+  sweets_juices: '🧃',
+  anaqati: '👗',
   bthwani_store: '🏪',
   home_projects: '🏠',
-  awnak: '🧭',
+  awnak: '🤝',
   gas_refill: '⛽',
   shein: '🛍️',
   spare_parts: '🔧',
@@ -254,6 +262,9 @@ export function DshHomeGetScreen({
   const { theme } = useTheme();
   const uiText = useUiText();
   const styles = React.useMemo(() => createStyles(direction), [direction]);
+  const categoriesAnchorRef = React.useRef<View>(null);
+  const [categoriesSheetVisible, setCategoriesSheetVisible] = React.useState(false);
+  const [categoriesDialLayout, setCategoriesDialLayout] = React.useState<DialAnchorLayout | null>(null);
   const [activeFilter, setActiveFilter] = React.useState<DiscoveryFilter>('all');
   const [activeCategoryId, setActiveCategoryId] = React.useState<string>('restaurants');
   const [activePromoIndex, setActivePromoIndex] = React.useState(0);
@@ -267,7 +278,7 @@ export function DshHomeGetScreen({
       return categories;
     }
 
-    return dshCategoryFixtures.slice(0, 6).map((category) => ({
+    return dshCategoryFixtures.map((category) => ({
       id: category.id,
       label: category.label,
     }));
@@ -445,6 +456,22 @@ export function DshHomeGetScreen({
     [currentLanguage, currentTime, recentOrders, uiText.topBar.location]
   );
   const tickerAction = onOpenOrders ?? onOpenTracking ?? onOpenSearch;
+  const categoriesDialItems = React.useMemo<CategoryDialItem[]>(() => {
+    return dshCategoryFixtures.map((category) => ({
+      id: category.id,
+      key: category.id,
+      title: category.label,
+      iconUrl: getDshCategoryIconUrl(category.id),
+      emojiFallback: DSH_CATEGORY_ICONS[category.id] ?? '📂',
+    }));
+  }, []);
+
+  const openCategoriesDial = React.useCallback(() => {
+    categoriesAnchorRef.current?.measureInWindow((x, y, width, height) => {
+      setCategoriesDialLayout({ x, y, width, height });
+      setCategoriesSheetVisible(true);
+    });
+  }, []);
 
   return (
     <View style={styles.screenRoot}>
@@ -476,7 +503,7 @@ export function DshHomeGetScreen({
           {
             id: 'search',
             icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />,
-            accessibilityLabel: 'Search',
+            accessibilityLabel: 'بحث',
             onPress: onOpenSearch,
           },
         ]}
@@ -497,6 +524,25 @@ export function DshHomeGetScreen({
         </View>
 
         <View style={styles.heroRow}>
+          <View style={styles.quickActionsCluster}>
+            <View style={styles.quickActionBottomRow}>
+              <Pressable style={styles.quickActionTertiary} onPress={() => setShortsVisible(true)}>
+                <View style={styles.quickActionChipContent}>
+                  <Ionicons name="videocam-outline" size={15} color="#ffffff" />
+                  <BthText role="bodySm" style={styles.quickActionLabel}>فيديو</BthText>
+                </View>
+              </Pressable>
+              <View ref={categoriesAnchorRef} collapsable={false}>
+                <Pressable style={styles.quickActionSecondary} onPress={openCategoriesDial}>
+                  <View style={styles.quickActionChipContent}>
+                    <Ionicons name="menu-outline" size={16} color="#ffffff" />
+                    <BthText role="bodySm" style={styles.quickActionLabel}>الفئات</BthText>
+                  </View>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+
           <Pressable style={styles.heroPromoCard} onPress={onOpenSearch ?? onOpenList}>
             <View style={styles.heroPromoContent}>
               <View style={styles.heroPromoIconWrap}>
@@ -524,23 +570,6 @@ export function DshHomeGetScreen({
               <View style={styles.heroPagerActive} />
             </View>
           </Pressable>
-
-          <View style={styles.quickActionsCluster}>
-            <View style={styles.quickActionBottomRow}>
-              <Pressable style={styles.quickActionSecondary} onPress={onOpenList}>
-                <View style={styles.quickActionChipContent}>
-                  <Ionicons name="menu-outline" size={16} color="#ffffff" />
-                  <BthText role="bodySm" style={styles.quickActionLabel}>الفئات</BthText>
-                </View>
-              </Pressable>
-              <Pressable style={styles.quickActionTertiary} onPress={() => setShortsVisible(true)}>
-                <View style={styles.quickActionChipContent}>
-                  <Ionicons name="videocam-outline" size={15} color="#ffffff" />
-                  <BthText role="bodySm" style={styles.quickActionLabel}>فيديو</BthText>
-                </View>
-              </Pressable>
-            </View>
-          </View>
         </View>
 
         <ScrollView
@@ -681,12 +710,23 @@ export function DshHomeGetScreen({
           })}
         </BthBox>
 
+        <CategoryClockDial
+          visible={categoriesSheetVisible}
+          anchorLayout={categoriesDialLayout}
+          items={categoriesDialItems}
+          onClose={() => setCategoriesSheetVisible(false)}
+          onSelect={(item) => {
+            setActiveCategoryId(item.key);
+            onOpenCategory?.(item.key);
+          }}
+        />
+
         <Modal visible={shortsVisible} transparent animationType="fade" onRequestClose={() => setShortsVisible(false)}>
           <Pressable style={styles.shortsOverlay} onPress={() => setShortsVisible(false)}>
             <Pressable style={styles.shortsPanel} onPress={(event) => event.stopPropagation()}>
               <View style={styles.shortsHandle} />
               <View style={styles.shortsHeader}>
-                <BthText role="titleSm" style={styles.shortsTitle}>Shorts DSH</BthText>
+                <BthText role="titleSm" style={styles.shortsTitle}>لقطات DSH</BthText>
                 <Pressable style={styles.shortsCloseButton} onPress={() => setShortsVisible(false)}>
                   <Ionicons name="close" size={18} color="#1f2937" />
                 </Pressable>
@@ -946,6 +986,8 @@ function createStyles(direction: Direction) {
   shortsTitle: {
     color: '#111827',
     fontWeight: '800',
+    flex: 1,
+    textAlign: 'center',
   },
   shortsCloseButton: {
     width: 32,
@@ -995,12 +1037,13 @@ function createStyles(direction: Direction) {
   },
   shortsCardTextWrap: {
     flex: 1,
-    alignItems: 'flex-end',
+    alignItems: 'center',
   },
   shortsCardTitle: {
     color: '#111827',
     fontWeight: '800',
     fontSize: 14,
+    textAlign,
   },
   shortsCardSubtitle: {
     color: '#6b7280',
@@ -1085,7 +1128,7 @@ function createStyles(direction: Direction) {
   },
   heroPromoTextWrap: {
     flex: 1,
-    alignItems: 'flex-end',
+    alignItems: 'center',
     gap: 3,
   },
   heroPromoBadge: {
@@ -1093,22 +1136,25 @@ function createStyles(direction: Direction) {
     paddingVertical: 3,
     borderRadius: 8,
     backgroundColor: 'rgba(255, 255, 255, 0.14)',
+    alignSelf: 'center',
   },
   heroPromoBadgeText: {
     color: '#fff',
     fontWeight: '800',
     fontSize: 10,
+    textAlign: 'center',
   },
   heroPromoTitle: {
     color: '#fff',
     fontWeight: '700',
     fontSize: 14,
     lineHeight: 16,
+    textAlign: 'center',
   },
   heroPromoSubtitle: {
     color: '#ffd3d3',
     fontWeight: '500',
-    textAlign,
+    textAlign: 'center',
     fontSize: 11,
     lineHeight: 13,
   },
@@ -1124,6 +1170,7 @@ function createStyles(direction: Direction) {
     paddingHorizontal: spacing[2],
     paddingTop: spacing[1],
     paddingBottom: spacing[1],
+    justifyContent: 'center',
   },
   categoryRailItem: {
     minHeight: 42,
@@ -1148,6 +1195,7 @@ function createStyles(direction: Direction) {
     fontSize: 12,
     fontWeight: '700',
     color: '#4B5563',
+    textAlign: 'center',
   },
   categoryRailLabelActive: {
     color: '#C2410C',
@@ -1205,6 +1253,7 @@ function createStyles(direction: Direction) {
     gap: spacing[2],
     paddingVertical: spacing[1],
     paddingHorizontal: spacing[2],
+    justifyContent: 'center',
   },
   filterChip: {
     minHeight: sizes.controlSm,
@@ -1224,6 +1273,7 @@ function createStyles(direction: Direction) {
   filterChipLabel: {
     fontSize: 13,
     fontWeight: '700',
+    textAlign: 'center',
   },
   storeCard: {
     borderWidth: 1.5,
