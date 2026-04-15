@@ -95,7 +95,7 @@ const shortcuts = [
   'تحديث التوفر'
 ] as const;
 
-const defaultStoreHours = [
+const defaultStoreHours: readonly PartnerStoreHoursDay[] = [
   { id: 'sun', label: 'Sunday', isOpen: true, openTime: '09:00', closeTime: '23:00' },
   { id: 'mon', label: 'Monday', isOpen: true, openTime: '09:00', closeTime: '23:00' },
   { id: 'tue', label: 'Tuesday', isOpen: true, openTime: '09:00', closeTime: '23:00' },
@@ -132,6 +132,14 @@ const defaultZones = [
 
 type PartnerServiceType = 'dsh' | 'arb';
 
+type PartnerStoreHoursDay = {
+  id: string;
+  label: string;
+  isOpen: boolean;
+  openTime: string;
+  closeTime: string;
+};
+
 const partnerTypeOptions: readonly MobileAccountTypeOption[] = [
   { id: 'dsh', label: 'DSH', description: 'تشغيل الطلبات والتسليم' },
   { id: 'arb', label: 'ARB', description: 'تشغيل عرب الشركاء والمسارات' },
@@ -164,7 +172,7 @@ export function PartnerSurfaceHost() {
       enabled: false,
     },
   ]);
-  const [storeHours, setStoreHours] = React.useState(defaultStoreHours.map((day) => ({ ...day })));
+  const [storeHours, setStoreHours] = React.useState<PartnerStoreHoursDay[]>(defaultStoreHours.map((day) => ({ ...day })));
   const [selectedZoneId, setSelectedZoneId] = React.useState('yasmin');
   const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<PartnerSupportRoute>('order-issue-queue');
   const routeHistoryRef = React.useRef<PartnerRoute[]>(['entry']);
