@@ -18,12 +18,53 @@ export type DshCatalogPipelineStep = {
   statusLabel: string;
 };
 
+export type DshCatalogMeasurementKind = 'piece' | 'weight' | 'portion';
+
+export type DshCatalogMeasurementPolicy = {
+  kind: DshCatalogMeasurementKind;
+  label: string;
+  options: ReadonlyArray<string>;
+};
+
 export const dshCatalogMetrics = {
   mainCategories: 6,
   subCategories: 14,
   approvedProducts: 28,
   pendingPartnerReviews: 4,
   pendingMarketingReviews: 2,
+} as const;
+
+export const dshCategoryMeasurementPolicies: Readonly<Record<string, DshCatalogMeasurementPolicy>> = {
+  fresh: {
+    kind: 'weight',
+    label: 'يباع بالوزن',
+    options: ['250 جرام', '500 جرام', '1 كجم'],
+  },
+  dairy: {
+    kind: 'piece',
+    label: 'يباع بالحبة',
+    options: ['حبة', '2 حبة', '4 حبات'],
+  },
+  bakery: {
+    kind: 'piece',
+    label: 'يباع بالحبة',
+    options: ['حبة', '2 حبة', '6 حبات'],
+  },
+  meals: {
+    kind: 'portion',
+    label: 'يباع بالنفر',
+    options: ['ربع نفر', 'نصف نفر', 'نفر'],
+  },
+  healthy: {
+    kind: 'portion',
+    label: 'يباع بالنفر',
+    options: ['ربع نفر', 'نصف نفر', 'نفر'],
+  },
+  sweets: {
+    kind: 'piece',
+    label: 'يباع بالحبة',
+    options: ['حبة', '2 حبة', '4 حبات'],
+  },
 } as const;
 
 export const dshCatalogNodes: ReadonlyArray<DshCatalogNode> = [

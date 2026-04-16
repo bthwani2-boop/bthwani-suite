@@ -26,8 +26,8 @@ export function BthChip({ label, selected = false, tone = 'default', onPress }: 
       accent: theme.brand,
       surface: theme.surface,
       label: theme.brand,
-      selectedSurface: theme.brandSurface,
-      selectedLabel: theme.brand
+      selectedSurface: theme.brand,
+      selectedLabel: theme.brandContrast
     },
     success: {
       accent: theme.success,

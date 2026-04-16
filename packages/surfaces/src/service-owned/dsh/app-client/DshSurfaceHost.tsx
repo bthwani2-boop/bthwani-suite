@@ -20,6 +20,13 @@ import {
   dshHomeGetFixturePromos,
   dshHomeGetFixtureStores,
 } from './families/home/fixtures/dshHomeGetFixtures';
+import {
+  buildStoreCategories,
+  buildStoreDeliveryModes,
+  buildStoreTags,
+  dshDiscoveryStores,
+  storeItemsByStoreId,
+} from './families/stores/fixtures';
 import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../control-panel/marketing/dsh/banner-store';
 import { getLiveMarketingGrowthItems } from '../control-panel/marketing/dsh/growth-store';
 import { DshOrderSuccessState } from './families/orders/screens';
@@ -85,19 +92,6 @@ type CreateOrderValues = {
   contactName: string;
   contactPhone: string;
   note: string;
-};
-
-type StoreItem = {
-  id: string;
-  name: string;
-  subtitle: string;
-  priceLabel: string;
-  categoryId: string;
-  categoryLabel: string;
-  statusLabel?: string;
-  isAvailable?: boolean;
-  hasOptions?: boolean;
-  preparationTime?: string;
 };
 
 type PublishedCategoryItem = {
@@ -171,171 +165,6 @@ const initialOrders = [
   },
 ];
 
-const dshDiscoveryStores = [
-  {
-    id: 'store-1001',
-    name: 'Olaya Fresh Market',
-    subtitle: 'Groceries and daily essentials',
-    statusLabel: 'Open',
-    meta: 'ETA 18 min',
-    etaMinutes: 18,
-    distanceKm: 2.1,
-    rating: 5,
-    isOffer: true,
-    isFavorite: true,
-    isFollowing: false,
-    imageUri: '',
-    deliveryLabel: 'توصيل مجاني',
-    serviceLabel: 'توصيل برو',
-    followerCount: 11000,
-    multiplierLabel: 'x2',
-    subscriptionPackageChips: ['توصيل مجاني', 'أولوية'],
-    offerLabel: 'خصم 20%',
-    hasBthwaniPro: true,
-    hasNewProducts: true,
-    hasCouponAvailable: false,
-    supportsPickup: true,
-    supportsPartnerDelivery: true,
-  },
-  {
-    id: 'store-1002',
-    name: 'Hittin Bakery',
-    subtitle: 'Bread and pastries',
-    statusLabel: 'Open',
-    meta: 'ETA 25 min',
-    etaMinutes: 25,
-    distanceKm: 1.8,
-    rating: 4.8,
-    isOffer: false,
-    isFavorite: false,
-    isFollowing: false,
-    imageUri: '',
-    deliveryLabel: 'كوبون',
-    serviceLabel: 'توصيل برو',
-    followerCount: 9000,
-    multiplierLabel: 'x1',
-    subscriptionPackageChips: ['كوبون', 'توصيل مجاني'],
-    hasBthwaniPro: true,
-    hasNewProducts: false,
-    hasCouponAvailable: true,
-    supportsPickup: true,
-    supportsPartnerDelivery: true,
-  },
-  {
-    id: 'store-1003',
-    name: 'Malqa Kitchen',
-    subtitle: 'Prepared meals',
-    statusLabel: 'Busy',
-    meta: 'ETA 32 min',
-    etaMinutes: 32,
-    distanceKm: 3.5,
-    rating: 4.9,
-    isOffer: true,
-    isFavorite: false,
-    isFollowing: false,
-    imageUri: '',
-    deliveryLabel: 'توصيل سريع',
-    serviceLabel: 'توصيل برو',
-    followerCount: 23400,
-    multiplierLabel: 'x3',
-    subscriptionPackageChips: ['توصيل سريع', 'أولوية'],
-    offerLabel: 'خصم 15%',
-    hasBthwaniPro: true,
-    hasNewProducts: true,
-    hasCouponAvailable: false,
-    supportsPickup: true,
-    supportsPartnerDelivery: true,
-  },
-];
-
-const storeItemsByStoreId: Record<string, StoreItem[]> = {
-  'store-1001': [
-    {
-      id: 'item-apple-1',
-      name: 'Royal Gala Apples',
-      subtitle: 'Fresh box, 1 kg',
-      priceLabel: '18 SAR',
-      categoryId: 'fresh',
-      categoryLabel: 'Fresh',
-      statusLabel: 'Popular',
-      isAvailable: true,
-      hasOptions: false,
-      preparationTime: '10-15 min',
-    },
-    {
-      id: 'item-milk-1',
-      name: 'Organic Milk',
-      subtitle: '1.5L chilled bottle',
-      priceLabel: '11 SAR',
-      categoryId: 'dairy',
-      categoryLabel: 'Dairy',
-      isAvailable: true,
-      hasOptions: false,
-      preparationTime: '5-10 min',
-    },
-    {
-      id: 'item-bread-1',
-      name: 'Whole Wheat Bread',
-      subtitle: 'Daily fresh bakery',
-      priceLabel: '7 SAR',
-      categoryId: 'bakery',
-      categoryLabel: 'Bakery',
-      isAvailable: true,
-      hasOptions: false,
-      preparationTime: '10-20 min',
-    },
-  ],
-  'store-1002': [
-    {
-      id: 'item-croissant-1',
-      name: 'Butter Croissant',
-      subtitle: 'Baked every morning',
-      priceLabel: '9 SAR',
-      categoryId: 'bakery',
-      categoryLabel: 'Bakery',
-      statusLabel: 'Best seller',
-      isAvailable: true,
-      hasOptions: false,
-      preparationTime: '8-12 min',
-    },
-    {
-      id: 'item-cake-1',
-      name: 'Chocolate Slice',
-      subtitle: 'Single serving',
-      priceLabel: '14 SAR',
-      categoryId: 'sweets',
-      categoryLabel: 'Sweets',
-      isAvailable: true,
-      hasOptions: true,
-      preparationTime: '12-18 min',
-    },
-  ],
-  'store-1003': [
-    {
-      id: 'item-pasta-1',
-      name: 'Creamy Pasta Box',
-      subtitle: 'Prepared meal ready to dispatch',
-      priceLabel: '29 SAR',
-      categoryId: 'meals',
-      categoryLabel: 'Meals',
-      statusLabel: 'Chef pick',
-      isAvailable: true,
-      hasOptions: true,
-      preparationTime: '20-25 min',
-    },
-    {
-      id: 'item-salad-1',
-      name: 'Garden Salad',
-      subtitle: 'Light and fresh bowl',
-      priceLabel: '21 SAR',
-      categoryId: 'healthy',
-      categoryLabel: 'Healthy',
-      isAvailable: true,
-      hasOptions: false,
-      preparationTime: '10-15 min',
-    },
-  ],
-};
 
 function commandTargetToRoute(target: DshCommandTarget): DshRoute {
   if (target === 'cart-get') {
@@ -677,44 +506,11 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   const activeStoreItems = React.useMemo(() => storeItemsByStoreId[activeStore.id] ?? [], [activeStore.id]);
 
-  const activeStoreCategories = React.useMemo(() => {
-    const uniqueCategories = Array.from(new Map(activeStoreItems.map((item) => [item.categoryId, item.categoryLabel])).entries());
-    return uniqueCategories.map(([id, label], index) => ({
-      id,
-      label,
-      itemCount: activeStoreItems.filter((item) => item.categoryId === id).length,
-      isPopular: index === 0,
-    }));
-  }, [activeStoreItems]);
+  const activeStoreCategories = React.useMemo(() => buildStoreCategories(activeStoreItems), [activeStoreItems]);
 
-  const activeStoreDeliveryModes = React.useMemo(() => ([
-    {
-      id: 'delivery' as const,
-      name: 'توصيل بثواني',
-      isAvailable: true,
-      estimatedTime: activeStore.meta,
-      fee: 12,
-    },
-    {
-      id: 'pickup' as const,
-      name: 'استلم بنفسك',
-      isAvailable: true,
-      estimatedTime: '15 دقيقة',
-      fee: 0,
-    },
-  ]), [activeStore.meta]);
+  const activeStoreDeliveryModes = React.useMemo(() => buildStoreDeliveryModes(activeStore.meta), [activeStore.meta]);
 
-  const activeStoreTags = React.useMemo(() => {
-    const tags = [
-      activeStore.hasBthwaniPro ? 'بثواني برو' : null,
-      activeStore.isOffer ? 'عرض مباشر' : null,
-      activeStore.distanceKm != null ? `${activeStore.distanceKm} كم` : null,
-      activeStore.supportsPickup ? 'استلم بنفسك' : null,
-      activeStore.supportsPartnerDelivery ? 'توصيل المتجر' : null,
-    ].filter(Boolean) as string[];
-
-    return tags;
-  }, [activeStore.distanceKm, activeStore.hasBthwaniPro, activeStore.isOffer, activeStore.supportsPartnerDelivery, activeStore.supportsPickup]);
+  const activeStoreTags = React.useMemo(() => buildStoreTags(activeStore), [activeStore]);
 
   const selectedItem = React.useMemo(
     () => activeStoreItems.find((item) => item.id === selectedItemId) ?? activeStoreItems[0],
@@ -887,12 +683,22 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
           deliveryFeeLabel: 'رسوم التوصيل 12 ر.س',
           followersLabel: `${activeStore.followerCount.toLocaleString()} متابع`,
           priceMatchLabel: 'الأسعار مطابقة للمطعم',
+          imageUri: activeStore.imageUri,
+          deliveryLabel: activeStore.deliveryLabel,
+          serviceLabel: activeStore.serviceLabel,
+          subscriptionPackageChips: activeStore.subscriptionPackageChips,
+          hasBthwaniPro: activeStore.hasBthwaniPro,
           tags: activeStoreTags,
           categories: activeStoreCategories,
           deliveryModes: activeStoreDeliveryModes,
         }}
         menuItems={activeStoreItems}
         onOpenItems={() => setRoute('store-items-list')}
+        onOpenSearch={() => {
+          setItemsQuery('');
+          setRoute('store-items-list');
+        }}
+        onOpenCart={() => setRoute('cart-get')}
         onBack={() => setRoute('stores-list')}
         onRetry={() => setRoute('store-get')}
         onSupport={openSupportDirectory}
@@ -990,7 +796,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
       <DshCartItemAddScreen
         cartId={`${activeStore.id}-cart`}
         storeName={activeStore.name}
-        suggestedItemName={selectedItem?.name ?? 'Royal Gala Apples'}
+        suggestedItemName={selectedItem?.name ?? 'تفاح رويال غالا'}
         suggestedQuantity={1}
         suggestedInstructions={selectedItem ? `Add ${selectedItem.subtitle}` : 'Handle with care'}
         onExecuteAdd={() => undefined}
@@ -1096,8 +902,8 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     return (
       <DshFavoritesListScreen
         items={[
-          { id: 'store-1001', name: 'Olaya Fresh Market', subtitle: 'Groceries and daily essentials', meta: 'Favorite store' },
-          { id: 'item-apple-1', name: 'Royal Gala Apples', subtitle: 'Fresh box, 1 kg', meta: 'Saved item' },
+          { id: 'store-1001', name: 'أسواق العليا الطازجة', subtitle: 'مقاضي يومية ومنتجات طازجة', meta: 'متجر مفضل' },
+          { id: 'item-apple-1', name: 'تفاح رويال غالا', subtitle: 'صندوق طازج 1 كجم', meta: 'عنصر محفوظ' },
         ]}
         onOpenItem={() => setRoute('favorite-toggle')}
         onBack={() => setRoute('categories-list')}

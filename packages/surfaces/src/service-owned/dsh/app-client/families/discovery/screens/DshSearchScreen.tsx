@@ -17,7 +17,7 @@ export type DshSearchScreenProps = {
 
 export function DshSearchScreen({ state = 'ready', query = '', results, onQueryChange, onOpenResult, onOpenCategories, onOpenFavorites, onBack, onRetry }: DshSearchScreenProps) {
   if (state !== 'ready') {
-    return <DshOperationScreen state={state} title="Search" subtitle="Find stores, categories, or saved items quickly." onRetry={onRetry} />;
+    return <DshOperationScreen state={state} title="البحث العام" subtitle="مدخل سريع للوصول إلى المتاجر والفئات والعناصر المحفوظة." onRetry={onRetry} />;
   }
 
   const hasQuery = query.trim().length > 0;
@@ -25,19 +25,19 @@ export function DshSearchScreen({ state = 'ready', query = '', results, onQueryC
   return (
     <DshOperationScreen
       state="ready"
-      title="Search"
-      subtitle="Find stores, categories, or saved items quickly."
+      title="البحث العام"
+      subtitle="مدخل موحد وسريع داخل تطبيق العميل للوصول إلى المتاجر والمسارات المشتركة."
       content={
         <BthSurface tone="inset" gap={3}>
-          <BthSearchField label="Search" value={query} onChangeText={onQueryChange} hint="Use a store name, category, or item term." />
+          <BthSearchField label="بحث" value={query} onChangeText={onQueryChange} hint="جرّب اسم متجر أو فئة أو عنصر محفوظ." />
           <BthSectionHeader
-            title={hasQuery ? 'Matching stores' : 'Browse stores'}
-            subtitle={hasQuery ? 'The list narrows as you type.' : 'Start typing to narrow the current discovery set.'}
+            title={hasQuery ? 'نتائج مطابقة' : 'استعراض المتاجر'}
+            subtitle={hasQuery ? 'يتم تضييق النتائج مباشرة أثناء الكتابة.' : 'ابدأ بالكتابة لتصفية مجموعة الاكتشاف الحالية.'}
             count={results.length}
           />
           <BthBox layoutDirection="row" gap={2}>
-            <BthButton label="Categories" tone="secondary" onPress={onOpenCategories} />
-            <BthButton label="Favorites" tone="secondary" onPress={onOpenFavorites} />
+            <BthButton label="الفئات" tone="secondary" onPress={onOpenCategories} />
+            <BthButton label="المفضلة" tone="secondary" onPress={onOpenFavorites} />
           </BthBox>
           {results.length ? (
             <BthBox gap={2}>
@@ -46,19 +46,19 @@ export function DshSearchScreen({ state = 'ready', query = '', results, onQueryC
               ))}
             </BthBox>
           ) : (
-            <BthCard title="No results yet" subtitle="Adjust the query or jump back to discovery.">
+            <BthCard title="لا توجد نتائج بعد" subtitle="جرّب تعديل عبارة البحث أو الانتقال إلى قسم آخر.">
               <BthBox layoutDirection="row" gap={2}>
-                <BthButton label="Categories" tone="secondary" onPress={onOpenCategories} />
-                <BthButton label="Favorites" tone="secondary" onPress={onOpenFavorites} />
+                <BthButton label="الفئات" tone="secondary" onPress={onOpenCategories} />
+                <BthButton label="المفضلة" tone="secondary" onPress={onOpenFavorites} />
               </BthBox>
             </BthCard>
           )}
           <BthText role="caption" tone="muted">
-            Search stays within the current discovery set so you can move to a store in one step.
+            هذا المسار يمثل البحث العام المرتبط بزر البحث الرئيسي في تطبيق العميل، وليس بحثًا خاصًا بخدمة واحدة.
           </BthText>
         </BthSurface>
       }
-      primaryActionLabel="Back"
+      primaryActionLabel="العودة"
       onPrimaryAction={onBack}
       onRetry={onRetry}
     />

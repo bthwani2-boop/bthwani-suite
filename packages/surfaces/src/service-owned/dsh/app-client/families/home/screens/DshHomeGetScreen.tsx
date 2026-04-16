@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import {
   BthUnifiedMobileTopBar,
   BthBox,
@@ -445,6 +445,8 @@ export function DshHomeGetScreen({
   const [followCounts, setFollowCounts] = React.useState<Record<string, number>>({});
   const [shortsVisible, setShortsVisible] = React.useState(false);
   const [currentTime, setCurrentTime] = React.useState(() => new Date());
+  const [inlineSearchVisible, setInlineSearchVisible] = React.useState(false);
+  const [inlineSearchQuery, setInlineSearchQuery] = React.useState('');
   const categoryItems = React.useMemo(() => {
     if (categories) {
       return categories;
@@ -527,7 +529,7 @@ export function DshHomeGetScreen({
         ? stores.filter((store) => (store.categoryId ? store.categoryId === activeCategoryId : true))
         : stores;
 
-    return categoryScopedStores.filter((store) => {
+    const filteredByMode = categoryScopedStores.filter((store) => {
       const isFavorite = favoriteToggles[store.id] ?? store.isFavorite;
 
       if (activeFilter === 'favorites') {
@@ -548,7 +550,26 @@ export function DshHomeGetScreen({
 
       return true;
     });
-  }, [activeCategoryId, activeFilter, favoriteToggles, stores]);
+
+    const normalizedQuery = inlineSearchQuery.trim().toLowerCase();
+    if (!normalizedQuery) {
+      return filteredByMode;
+    }
+
+    return filteredByMode.filter((store) => {
+      const haystack = [
+        store.name,
+        store.address,
+        store.deliveryLabel,
+        store.serviceLabel,
+        store.offerLabel ?? '',
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      return haystack.includes(normalizedQuery);
+    });
+  }, [activeCategoryId, activeFilter, favoriteToggles, inlineSearchQuery, stores]);
 
   if (state !== 'ready') {
     return renderState(state, onRetry);
@@ -582,7 +603,7 @@ export function DshHomeGetScreen({
           return;
         }
 
-        onOpenSearch?.();
+        setInlineSearchVisible(true);
         return;
       }
 
@@ -617,7 +638,7 @@ export function DshHomeGetScreen({
           return;
         }
 
-        onOpenSearch?.();
+        setInlineSearchVisible(true);
         return;
       }
 
@@ -627,7 +648,7 @@ export function DshHomeGetScreen({
           return;
         }
 
-        onOpenSearch?.();
+        setInlineSearchVisible(true);
         return;
       }
 
@@ -636,7 +657,7 @@ export function DshHomeGetScreen({
         return;
       }
 
-      onOpenSearch?.();
+      setInlineSearchVisible(true);
     },
     [onOpenBenefits, onOpenCategory, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onOpenStoresList]
   );
@@ -683,7 +704,16 @@ export function DshHomeGetScreen({
     () => resolveTickerBanner(currentTime, recentOrders, uiText.topBar.location, currentLanguage),
     [currentLanguage, currentTime, recentOrders, uiText.topBar.location]
   );
-  const tickerAction = onOpenOrders ?? onOpenTracking ?? onOpenSearch;
+  const openInlineSearch = React.useCallback(() => {
+    setInlineSearchVisible(true);
+  }, []);
+
+  const closeInlineSearch = React.useCallback(() => {
+    setInlineSearchVisible(false);
+    setInlineSearchQuery('');
+  }, []);
+
+  const tickerAction = onOpenOrders ?? onOpenTracking ?? openInlineSearch;
   const categoriesDialItems = React.useMemo<CategoryDialItem[]>(() => {
     return visibleCategoryFixtures.map((category) => ({
       id: category.id,
@@ -731,60 +761,96 @@ export function DshHomeGetScreen({
 
   return (
     <View style={styles.screenRoot}>
-      <BthUnifiedMobileTopBar
-        title={uiText.topBar.brandName}
-        subtitle={uiText.topBar.brandTagline}
-        locationLabel={uiText.topBar.location}
-        locationIcon={<Ionicons name="location-outline" size={14} color="#FFFFFF" />}
-        actions={[
-          {
-            id: 'my-space',
-            icon: <MySpaceIcon />,
-            accessibilityLabel: 'مساحتي',
-            onPress: () => {
-              if (onOpenMySpace) {
-                onOpenMySpace();
-                return;
-              }
+      {inlineSearchVisible ? (
+        <View style={styles.inlineSearchHeader}>
+          <View style={[styles.inlineSearchHeaderRow, direction === 'rtl' && { flexDirection: 'row-reverse' }]}>
+            <Pressable style={styles.inlineSearchCloseButton} onPress={closeInlineSearch}>
+              <Ionicons name="close-outline" size={20} color="#111827" />
+            </Pressable>
+            <View style={styles.inlineSearchInputWrap}>
+              <Ionicons name="search-outline" size={18} color="#ff6a00" />
+              <TextInput
+                value={inlineSearchQuery}
+                onChangeText={setInlineSearchQuery}
+                placeholder="ابحث عن متجر أو فئة داخل DSH"
+                placeholderTextColor="#94a3b8"
+                style={styles.inlineSearchInput}
+                textAlign={direction === 'rtl' ? 'right' : 'left'}
+                autoFocus
+              />
+            </View>
+          </View>
+          <BthText role="caption" style={styles.inlineSearchHint}>
+            بحث عام سريع داخل تجربة DSH الحالية للوصول إلى المتاجر والمسارات بدون مغادرة الصفحة.
+          </BthText>
+        </View>
+      ) : (
+        <BthUnifiedMobileTopBar
+          title={uiText.topBar.brandName}
+          subtitle={uiText.topBar.brandTagline}
+          locationLabel={uiText.topBar.location}
+          locationIcon={<Ionicons name="location-outline" size={14} color="#FFFFFF" />}
+          actions={[
+            {
+              id: 'my-space',
+              icon: <MySpaceIcon />,
+              accessibilityLabel: 'مساحتي',
+              onPress: () => {
+                if (onOpenMySpace) {
+                  onOpenMySpace();
+                  return;
+                }
 
-              onOpenEntry?.();
+                onOpenEntry?.();
+              },
             },
-          },
-          {
-            id: 'notifications',
-            icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />,
-            badgeCount: 5,
-            accessibilityLabel: 'الإشعارات',
-            onPress: onOpenNotifications,
-          },
-          {
-            id: 'cart',
-            icon: <Ionicons name="cart-outline" size={21} color="#FFFFFF" />,
-            accessibilityLabel: 'السلة',
-            onPress: onOpenCart,
-          },
-          {
-            id: 'search',
-            icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />,
-            accessibilityLabel: 'بحث',
-            onPress: onOpenSearch,
-          },
-        ]}
-        ticker={{
-          statusLabel: tickerState.statusLabel,
-          message: tickerState.message,
-          onPress: tickerAction,
-        }}
-      />
+            {
+              id: 'notifications',
+              icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />,
+              badgeCount: 5,
+              accessibilityLabel: 'الإشعارات',
+              onPress: onOpenNotifications,
+            },
+            {
+              id: 'cart',
+              icon: <Ionicons name="cart-outline" size={21} color="#FFFFFF" />,
+              accessibilityLabel: 'السلة',
+              onPress: onOpenCart,
+            },
+            {
+              id: 'search',
+              icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />,
+              accessibilityLabel: 'بحث',
+              onPress: openInlineSearch,
+            },
+          ]}
+          ticker={{
+            statusLabel: tickerState.statusLabel,
+            message: tickerState.message,
+            onPress: tickerAction,
+          }}
+        />
+      )}
 
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ padding: spacing[3], gap: spacing[2], flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.carouselViewport}>
-          <HomeBannerCarousel banners={bannerItems} />
-        </View>
+        {inlineSearchVisible ? (
+          <BthSurface tone="raised" padding={3} gap={2}>
+            <BthText role="titleSm">نتائج البحث داخل DSH</BthText>
+            <BthText role="bodySm" tone="muted">
+              {inlineSearchQuery.trim()
+                ? `يتم الآن تصفية المتاجر والمسارات المتاحة حسب: ${inlineSearchQuery}`
+                : 'ابدأ بكتابة اسم متجر أو خدمة أو فئة، وستظهر النتائج مباشرة في نفس الصفحة.'}
+            </BthText>
+          </BthSurface>
+        ) : (
+          <View style={styles.carouselViewport}>
+            <HomeBannerCarousel banners={bannerItems} />
+          </View>
+        )}
 
         {showSheinInline ? (
           <BthBox gap={3}>
@@ -844,7 +910,7 @@ export function DshHomeGetScreen({
               ) : null}
             </View>
 
-            <Pressable style={[styles.heroPromoCard, styles.heroPromoCardInline]} onPress={onOpenSearch ?? onOpenList}>
+            <Pressable style={[styles.heroPromoCard, styles.heroPromoCardInline]} onPress={openInlineSearch}>
               <View style={styles.heroPromoContent}>
                 <View style={styles.heroPromoIconWrap}>
                   <BthText role="titleLg" style={styles.heroIcon}>
@@ -1079,7 +1145,7 @@ export function DshHomeGetScreen({
                     [id]: isFollowing ? Math.max(0, baseCount - 1) : baseCount + 1,
                   }));
                 }}
-                onPressSubscriptionChip={onOpenSearch}
+                onPressSubscriptionChip={openInlineSearch}
               />
             );
           })}
@@ -1225,6 +1291,51 @@ function createStyles(direction: Direction) {
   },
   screenRoot: {
     flex: 1,
+  },
+  inlineSearchHeader: {
+    backgroundColor: '#ff6a00',
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 12,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+    gap: 8,
+  },
+  inlineSearchHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  inlineSearchInputWrap: {
+    flex: 1,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#ffd3ad',
+    paddingHorizontal: 12,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 8,
+  },
+  inlineSearchInput: {
+    flex: 1,
+    color: '#111827',
+    fontSize: 14,
+    fontWeight: '700',
+    paddingVertical: 0,
+  },
+  inlineSearchCloseButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#ffffff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inlineSearchHint: {
+    color: '#fff7ed',
+    lineHeight: 16,
   },
   activeOrderStatusLabel: {
     color: '#6b7280',
