@@ -1,5 +1,7 @@
-import ControlPanelSurfaceHost from '@bthwani/app-shells/web/control-panel/web-entry';
+'use client';
+
+import { ControlPanelDshMarketingScreen } from '@bthwani/surfaces/dsh/control-panel/marketing/dsh';
 
 export default function MarketingPage() {
-  return <ControlPanelSurfaceHost section="marketing" />;
+  return <ControlPanelDshMarketingScreen hubHref="/marketing" operationsHref="/operationsarketing" operationsHref="/operations" />;
 }

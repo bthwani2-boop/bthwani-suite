@@ -690,27 +690,27 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   const activeStoreDeliveryModes = React.useMemo(() => ([
     {
       id: 'delivery' as const,
-      name: 'Delivery',
+      name: 'توصيل بثواني',
       isAvailable: true,
       estimatedTime: activeStore.meta,
       fee: 12,
     },
     {
       id: 'pickup' as const,
-      name: 'Pickup',
+      name: 'استلم بنفسك',
       isAvailable: true,
-      estimatedTime: '15 min',
+      estimatedTime: '15 دقيقة',
       fee: 0,
     },
   ]), [activeStore.meta]);
 
   const activeStoreTags = React.useMemo(() => {
     const tags = [
-      activeStore.hasBthwaniPro ? 'Bthwani Pro' : null,
-      activeStore.isOffer ? 'Offer live' : null,
-      activeStore.distanceKm != null ? `${activeStore.distanceKm} km` : null,
-      activeStore.supportsPickup ? 'Pickup' : null,
-      activeStore.supportsPartnerDelivery ? 'Partner delivery' : null,
+      activeStore.hasBthwaniPro ? 'بثواني برو' : null,
+      activeStore.isOffer ? 'عرض مباشر' : null,
+      activeStore.distanceKm != null ? `${activeStore.distanceKm} كم` : null,
+      activeStore.supportsPickup ? 'استلم بنفسك' : null,
+      activeStore.supportsPartnerDelivery ? 'توصيل المتجر' : null,
     ].filter(Boolean) as string[];
 
     return tags;
@@ -855,16 +855,16 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
           subtitle: activeStore.subtitle,
           statusLabel: activeStore.statusLabel,
           etaLabel: activeStore.meta,
-          deliveryFeeLabel: 'Delivery fee 12 SAR',
-          followersLabel: `${activeStore.followerCount.toLocaleString()} followers`,
-          priceMatchLabel: activeStore.isOffer ? 'Price match live' : 'Standard pricing',
+          deliveryFeeLabel: 'رسوم التوصيل 12 ر.س',
+          followersLabel: `${activeStore.followerCount.toLocaleString()} متابع`,
+          priceMatchLabel: 'الأسعار مطابقة للمطعم',
           tags: activeStoreTags,
           categories: activeStoreCategories,
           deliveryModes: activeStoreDeliveryModes,
           highlights: [
-            'High confidence fulfillment history',
-            'Stable handoff quality for first-time orders',
-            'Strong packaging and on-time readiness',
+            'جاهزية عالية وتجهيز موثوق للطلبات',
+            'تغليف واضح وتسليم أكثر اتساقًا',
+            'تجربة مناسبة للطلب الأول وإعادة الطلب',
           ],
         }}
         onOpenMenu={() => setRoute('store-items-list')}
@@ -884,9 +884,9 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
           subtitle: activeStore.subtitle,
           statusLabel: activeStore.statusLabel,
           etaLabel: activeStore.meta,
-          deliveryFeeLabel: 'Delivery fee 12 SAR',
-          followersLabel: `${activeStore.followerCount.toLocaleString()} followers`,
-          priceMatchLabel: activeStore.isOffer ? 'Price match live' : 'Standard pricing',
+          deliveryFeeLabel: 'رسوم التوصيل 12 ر.س',
+          followersLabel: `${activeStore.followerCount.toLocaleString()} متابع`,
+          priceMatchLabel: 'الأسعار مطابقة للمطعم',
           tags: activeStoreTags,
           categories: activeStoreCategories,
           deliveryModes: activeStoreDeliveryModes,

@@ -35,35 +35,40 @@ const marketingViewMeta: Record<MarketingControlView, { title: string; descripti
 export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingScreenProps) {
 	const [activeView, setActiveView] = React.useState<MarketingControlView>('growth');
 	const activeMeta = marketingViewMeta[activeView];
+	const showOverviewShell = activeView === 'growth' || activeView === 'banners';
 
 	return (
 		<BthBox gap={4}>
-			<BthWebMissionHeroCard
-				dense
-				badges={['التسويق', 'تحكم حي', 'تجربة بريميم']}
-				eyebrow="غرفة قيادة التسويق"
-				title="تسويق حديث وفاخر يقدّم تحكمًا حقيقيًا"
-				description="تمت إعادة تشكيل قسم التسويق ليكون واضحًا، تفاعليًا، وقابلًا للإدارة الفورية بدل الأسطح الضعيفة أو النصوص التطويرية غير المفيدة."
-				metaItems={[
-					'4 مسارات تشغيل مملوكة',
-					`المسار الحالي: ${activeMeta.title}`,
-					'نشر وتعديل ومراجعة من نفس المساحة',
-				]}
-				primaryAction={{ label: 'فتح العمليات', href: props.hubHref ?? '/operations/dsh' }}
-				secondaryAction={{ label: 'العودة للوحة', href: props.operationsHref ?? '/operations' }}
-			/>
+			{showOverviewShell ? (
+				<>
+					<BthWebMissionHeroCard
+						dense
+						badges={['التسويق', 'تحكم حي', 'تجربة بريميم']}
+						eyebrow="غرفة قيادة التسويق"
+						title="تسويق حديث وفاخر يقدّم تحكمًا حقيقيًا"
+						description="تمت إعادة تشكيل قسم التسويق ليكون واضحًا، تفاعليًا، وقابلًا للإدارة الفورية بدل الأسطح الضعيفة أو النصوص التطويرية غير المفيدة."
+						metaItems={[
+							'4 مسارات تشغيل مملوكة',
+							`المسار الحالي: ${activeMeta.title}`,
+							'نشر وتعديل ومراجعة من نفس المساحة',
+						]}
+						primaryAction={{ label: 'فتح العمليات', href: props.hubHref ?? '/operations/dsh' }}
+						secondaryAction={{ label: 'العودة للوحة', href: props.operationsHref ?? '/operations' }}
+					/>
 
-			<BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-				<BthWebSignalCard title="العروض والنمو" value="موحد" description="الحملات والاشتراكات والبرومو من غرفة واحدة" tone="best" />
-				<BthWebSignalCard title="البنرات" value="مباشر" description="إنشاء ونشر وقياس من نفس السطح" />
-				<BthWebSignalCard title="الولاء" value="مملوك" description="اشتراك ونقاط وكوبونات تحت تحكم أوضح" />
-				<BthWebSignalCard title="الإشارات" value="ذكي" description="توقيت وأولوية وجمهور دون ازدحام بصري" />
-			</BthBox>
+					<BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+						<BthWebSignalCard title="العروض والنمو" value="موحد" description="الحملات والاشتراكات والبرومو من غرفة واحدة" tone="best" />
+						<BthWebSignalCard title="البنرات" value="مباشر" description="إنشاء ونشر وقياس من نفس السطح" />
+						<BthWebSignalCard title="الولاء" value="مملوك" description="اشتراك ونقاط وكوبونات تحت تحكم أوضح" />
+						<BthWebSignalCard title="الإشارات" value="ذكي" description="توقيت وأولوية وجمهور دون ازدحام بصري" />
+					</BthBox>
 
-			<BthSurface tone="inset" padding={4} gap={1}>
-				<BthText role="titleSm">{activeMeta.title}</BthText>
-				<BthText role="bodySm" tone="muted">{activeMeta.description}</BthText>
-			</BthSurface>
+					<BthSurface tone="inset" padding={4} gap={1}>
+						<BthText role="titleSm">{activeMeta.title}</BthText>
+						<BthText role="bodySm" tone="muted">{activeMeta.description}</BthText>
+					</BthSurface>
+				</>
+			) : null}
 
 			<BthWebSegmentedTabs
 				ariaLabel="DSH marketing control view"

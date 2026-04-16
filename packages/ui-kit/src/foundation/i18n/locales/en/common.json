@@ -145,5 +145,77 @@
         "description": "Indicators focus attention with time for actual readiness level."
       }
     }
+  },
+  "storeScreen": {
+    "states": {
+      "listEmptyTitle": "No matching stores",
+      "listEmptyDescription": "Try another filter or adjust the search term.",
+      "listErrorTitle": "Unable to load the store list",
+      "listErrorDescription": "Retry to restore discovery without losing context.",
+      "itemsEmptyTitle": "No matching items",
+      "itemsEmptyDescription": "Try another category or search with different words.",
+      "itemsErrorTitle": "Unable to load store items",
+      "itemsErrorDescription": "Retry to continue browsing before cart review.",
+      "storeEmptyTitle": "The menu is currently empty",
+      "storeEmptyDescription": "No products are visible in this store right now.",
+      "storeErrorTitle": "Unable to open the store page",
+      "storeErrorDescription": "Retry to restore store details and products.",
+      "contextMissingTitle": "Store data is incomplete",
+      "contextMissingDescription": "Store information is required before this screen can render.",
+      "retry": "Retry"
+    },
+    "filters": {
+      "all": "All",
+      "nearest": "Nearest",
+      "offers": "Offers",
+      "favorites": "Favorites"
+    },
+    "list": {
+      "headerTitle": "Bthawani",
+      "headerSubtitle": "Choose the right store and start quickly",
+      "headerChipPrimary": "Top offers today",
+      "headerChipAccent": "Discounts up to 30%",
+      "headerChipMuted": "Bthawani Pro",
+      "searchLabel": "Find a store",
+      "searchHint": "Search by name, cuisine, or short description.",
+      "favoritesCta": "Open favorites",
+      "sectionTitle": "Available stores",
+      "sectionSubtitle": "Open the right store and continue the order with fewer steps.",
+      "sectionHint": "Cleaner cards keep status, rating, and service options visible at a glance."
+    },
+    "items": {
+      "browseSubtitle": "Pick an item quickly, then move straight to the cart.",
+      "backToStore": "Back to store",
+      "openCart": "Open cart",
+      "searchLabel": "Find an item",
+      "searchHint": "Search by product name, category, or short description.",
+      "sectionTitle": "Store items",
+      "sectionSubtitle": "Choose the right item to continue smoothly.",
+      "sectionHint": "This path stays short: browse, select, then add to cart.",
+      "options": "Options",
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "runtimeNote": "This screen focuses on fast in-store selection and movement."
+    },
+    "get": {
+      "storeDelivery": "Store delivery",
+      "pickup": "Pick up yourself",
+      "platformDelivery": "Bthawani delivery",
+      "availableCategories": "Available categories",
+      "subscriptionsTitle": "Available subscriptions",
+      "favoritesChip": "Favorites",
+      "popularChip": "Most ordered",
+      "allCategories": "All categories",
+      "fullMenu": "View full menu",
+      "itemSuffix": "items",
+      "priceMatch": "Prices match the restaurant",
+      "followersSuffix": "followers",
+      "deliveryTimeLabel": "Delivery time",
+      "ratingValue": "5.0",
+      "reviewsLabel": "rating",
+      "emptyCategoryTitle": "No items in this category",
+      "emptyCategoryDescription": "Choose another category or go back to all categories.",
+      "menuNote": "A cleaner store view focused on products with less visual noise."
+    }
   }
 }

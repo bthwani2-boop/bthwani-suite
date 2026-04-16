@@ -12,6 +12,7 @@ import {
   BthSurface,
   BthTabs,
   BthText,
+  useUiText,
 } from '@bthwani/ui-kit';
 
 export type DshStoreItem = {
@@ -41,7 +42,11 @@ export type DshStoreItemsScreenProps = {
   onRetry?: () => void;
 };
 
-function renderNonReadyState(state: 'loading' | 'empty' | 'error', onRetry?: () => void) {
+function renderNonReadyState(
+  state: 'loading' | 'empty' | 'error',
+  storeText: ReturnType<typeof useUiText>['storeScreen'],
+  onRetry?: () => void,
+) {
   if (state === 'loading') {
     return <BthStateView stateId="loading" />;
   }
@@ -50,8 +55,8 @@ function renderNonReadyState(state: 'loading' | 'empty' | 'error', onRetry?: () 
     return (
       <BthStateView
         stateId="empty"
-        title="No items found"
-        description="Try another category or search term."
+        title={storeText.states.itemsEmptyTitle}
+        description={storeText.states.itemsEmptyDescription}
       />
     );
   }
@@ -59,9 +64,9 @@ function renderNonReadyState(state: 'loading' | 'empty' | 'error', onRetry?: () 
   return (
     <BthStateView
       stateId="recoverableError"
-      title="Store items are unavailable"
-      description="Retry to restore item discovery before cart review."
-      actionLabel="Retry"
+      title={storeText.states.itemsErrorTitle}
+      description={storeText.states.itemsErrorDescription}
+      actionLabel={storeText.states.retry}
       onActionPress={onRetry}
     />
   );
@@ -80,13 +85,16 @@ export function DshStoreItemsScreen({
   onBack,
   onRetry,
 }: DshStoreItemsScreenProps) {
+  const uiText = useUiText();
+  const storeText = uiText.storeScreen;
+
   const categoryTabs = React.useMemo(() => {
     const uniqueCategories = Array.from(new Map(items.map((item) => [item.categoryId, item.categoryLabel])).entries());
     return [
-      { value: 'all', label: 'All' },
+      { value: 'all', label: storeText.filters.all },
       ...uniqueCategories.map(([value, label]) => ({ value, label })),
     ];
-  }, [items]);
+  }, [items, storeText.filters.all]);
 
   const categoryFiltered = React.useMemo(() => {
     if (activeCategory === 'all') {
@@ -109,11 +117,11 @@ export function DshStoreItemsScreen({
   }, [categoryFiltered, query]);
 
   if (state !== 'ready') {
-    return renderNonReadyState(state, onRetry);
+    return renderNonReadyState(state, storeText, onRetry);
   }
 
   if (visibleItems.length === 0) {
-    return renderNonReadyState('empty', onRetry);
+    return renderNonReadyState('empty', storeText, onRetry);
   }
 
   return (
@@ -121,20 +129,20 @@ export function DshStoreItemsScreen({
       <BthSurface tone="brand" gap={3}>
         <BthSectionHeader
           title={storeName}
-          subtitle="Browse items, keep one next action, then move to cart review."
+          subtitle={storeText.items.browseSubtitle}
         />
         <BthBox layoutDirection="row" gap={2}>
-          <BthButton label="Back to store" tone="secondary" onPress={onBack} />
-          <BthButton label="Open cart" onPress={onOpenCart} />
+          <BthButton label={storeText.items.backToStore} tone="secondary" onPress={onBack} />
+          <BthButton label={storeText.items.openCart} onPress={onOpenCart} />
         </BthBox>
       </BthSurface>
 
       <BthSurface tone="inset" gap={3}>
         <BthSearchField
-          label="Find item"
+          label={storeText.items.searchLabel}
           value={query}
           onChangeText={onQueryChange}
-          hint="Search by product name, category, or short description."
+          hint={storeText.items.searchHint}
         />
         <BthTabs
           items={categoryTabs}
@@ -146,12 +154,12 @@ export function DshStoreItemsScreen({
 
       <BthSurface tone="raised" gap={3}>
         <BthSectionHeader
-          title="Store items"
-          subtitle="Select an item to continue smoothly toward cart context."
+          title={storeText.items.sectionTitle}
+          subtitle={storeText.items.sectionSubtitle}
           count={visibleItems.length}
         />
         <BthText role="caption" tone="muted">
-          Tapping an item should stay the shortest path into cart review or add flow.
+          {storeText.items.sectionHint}
         </BthText>
         <BthBox gap={2}>
           {visibleItems.map((item) => (
@@ -165,8 +173,8 @@ export function DshStoreItemsScreen({
                   <BthChip label={item.categoryLabel} />
                   {item.statusLabel ? <BthChip label={item.statusLabel} /> : null}
                   {item.preparationTime ? <BthChip label={item.preparationTime} /> : null}
-                  {item.hasOptions ? <BthChip label="Options" /> : null}
-                  {item.isAvailable === false ? <BthChip label="Unavailable" /> : null}
+                  {item.hasOptions ? <BthChip label={storeText.items.options} /> : null}
+                  {item.isAvailable === false ? <BthChip label={storeText.items.unavailable} /> : null}
                 </BthBox>
               }
               onPress={() => onOpenItem?.(item.id)}
@@ -176,7 +184,7 @@ export function DshStoreItemsScreen({
       </BthSurface>
 
       <BthText role="caption" tone="muted">
-        UI/UX/Flow slice only: item selection and cart handoff are intentionally runtime-agnostic.
+        {storeText.items.runtimeNote}
       </BthText>
     </BthMobileScrollView>
   );

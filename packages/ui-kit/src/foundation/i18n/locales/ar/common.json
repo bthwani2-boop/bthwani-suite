@@ -145,5 +145,77 @@
         "description": "المؤشرات تركّز الانتباه بالزمن لمستوى الجاهزية الفعلي."
       }
     }
+  },
+  "storeScreen": {
+    "states": {
+      "listEmptyTitle": "لا توجد متاجر مطابقة",
+      "listEmptyDescription": "جرّب فلترًا آخر أو عدّل عبارة البحث.",
+      "listErrorTitle": "تعذر تحميل قائمة المتاجر",
+      "listErrorDescription": "أعد المحاولة لاستعادة الاستكشاف دون فقدان السياق.",
+      "itemsEmptyTitle": "لا توجد عناصر مطابقة",
+      "itemsEmptyDescription": "جرّب قسمًا آخر أو ابحث بكلمات مختلفة.",
+      "itemsErrorTitle": "تعذر تحميل عناصر المتجر",
+      "itemsErrorDescription": "أعد المحاولة لاستكمال التصفح قبل السلة.",
+      "storeEmptyTitle": "القائمة فارغة حالياً",
+      "storeEmptyDescription": "لا توجد منتجات ظاهرة الآن داخل هذا المتجر.",
+      "storeErrorTitle": "تعذر فتح صفحة المتجر",
+      "storeErrorDescription": "أعد المحاولة لاستعادة معلومات المتجر والمنتجات.",
+      "contextMissingTitle": "بيانات المتجر غير مكتملة",
+      "contextMissingDescription": "يلزم تمرير معلومات المتجر قبل عرض هذه الشاشة.",
+      "retry": "إعادة المحاولة"
+    },
+    "filters": {
+      "all": "الكل",
+      "nearest": "الأقرب",
+      "offers": "العروض",
+      "favorites": "المفضلة"
+    },
+    "list": {
+      "headerTitle": "بثواني",
+      "headerSubtitle": "اختر المتجر المناسب وابدأ الطلب بسرعة",
+      "headerChipPrimary": "أفضل العروض اليوم",
+      "headerChipAccent": "خصومات حتى %30",
+      "headerChipMuted": "بثواني برو",
+      "searchLabel": "ابحث عن متجر",
+      "searchHint": "ابحث بالاسم أو نوع المطبخ أو الوصف.",
+      "favoritesCta": "فتح المفضلة",
+      "sectionTitle": "المتاجر المتاحة",
+      "sectionSubtitle": "افتح المتجر المناسب واستكمل الطلب بخطوات أقل.",
+      "sectionHint": "بطاقات أوضح تعرض الحالة والتقييم وخيارات الخدمة من أول نظرة."
+    },
+    "items": {
+      "browseSubtitle": "اختر صنفك بسرعة ثم انتقل مباشرة إلى السلة.",
+      "backToStore": "العودة للمتجر",
+      "openCart": "فتح السلة",
+      "searchLabel": "ابحث عن صنف",
+      "searchHint": "ابحث باسم المنتج أو القسم أو الوصف المختصر.",
+      "sectionTitle": "عناصر المتجر",
+      "sectionSubtitle": "اختر الصنف المناسب لمتابعة الطلب بسهولة.",
+      "sectionHint": "المسار هنا مختصر: تصفح، اختيار، ثم إضافة للسلة.",
+      "options": "خيارات",
+      "available": "متاح",
+      "unavailable": "غير متاح",
+      "runtimeNote": "هذه الشاشة تركز على تجربة الاختيار والتنقل السريع داخل المتجر."
+    },
+    "get": {
+      "storeDelivery": "توصيل المتجر",
+      "pickup": "استلم بنفسك",
+      "platformDelivery": "توصيل بثواني",
+      "availableCategories": "الأقسام المتوفرة",
+      "subscriptionsTitle": "الاشتراكات المتوفرة",
+      "favoritesChip": "المفضلة",
+      "popularChip": "الأكثر طلبًا",
+      "allCategories": "جميع الأقسام",
+      "fullMenu": "عرض القائمة الكاملة",
+      "itemSuffix": "عنصر",
+      "priceMatch": "الأسعار مطابقة للمطعم",
+      "followersSuffix": "متابع",
+      "deliveryTimeLabel": "وقت التوصيل",
+      "ratingValue": "5.0",
+      "reviewsLabel": "تقييم",
+      "emptyCategoryTitle": "لا توجد عناصر ضمن هذا القسم",
+      "emptyCategoryDescription": "اختر قسمًا آخر أو عد إلى جميع الأقسام.",
+      "menuNote": "واجهة أوضح تركز على المتجر ومنتجاته دون ضجيج بصري."
+    }
   }
 }

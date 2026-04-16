@@ -9,6 +9,7 @@ import {
   BthStateView,
   BthSurface,
   BthText,
+  useUiText,
 } from '@bthwani/ui-kit';
 
 export type DshStoreDetailData = {
@@ -35,7 +36,11 @@ export type DshStoreDetailScreenProps = {
   onRetry?: () => void;
 };
 
-function renderNonReadyState(state: 'loading' | 'error', onRetry?: () => void) {
+function renderNonReadyState(
+  state: 'loading' | 'error',
+  storeText: ReturnType<typeof useUiText>['storeScreen'],
+  onRetry?: () => void,
+) {
   if (state === 'loading') {
     return <BthStateView stateId="loading" />;
   }
@@ -43,9 +48,9 @@ function renderNonReadyState(state: 'loading' | 'error', onRetry?: () => void) {
   return (
     <BthStateView
       stateId="recoverableError"
-      title="Store detail is unavailable"
-      description="Retry to restore store context before creating the order."
-      actionLabel="Retry"
+      title={storeText.states.storeErrorTitle}
+      description={storeText.states.storeErrorDescription}
+      actionLabel={storeText.states.retry}
       onActionPress={onRetry}
     />
   );
@@ -59,16 +64,19 @@ export function DshStoreDetailScreen({
   onOpenTracking,
   onRetry,
 }: DshStoreDetailScreenProps) {
+  const uiText = useUiText();
+  const storeText = uiText.storeScreen;
+
   if (state !== 'ready') {
-    return renderNonReadyState(state, onRetry);
+    return renderNonReadyState(state, storeText, onRetry);
   }
 
   if (!store) {
     return (
       <BthStateView
         stateId="blockingError"
-        title="Store context is missing"
-        description="Provide store detail data before rendering this screen."
+        title={storeText.states.contextMissingTitle}
+        description={storeText.states.contextMissingDescription}
       />
     );
   }
@@ -91,7 +99,7 @@ export function DshStoreDetailScreen({
 
       {store.tags?.length ? (
         <BthSurface tone="inset" gap={2}>
-          <BthSectionHeader title="Store tags" subtitle="Legacy truth carried forward as compact chips." />
+          <BthSectionHeader title={storeText.get.subscriptionsTitle} subtitle="تظهر كشرائح مضغوطة وسريعة القراءة." />
           <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
             {store.tags.map((tag) => (
               <BthChip key={`${store.id}-${tag}`} label={tag} />
@@ -102,7 +110,7 @@ export function DshStoreDetailScreen({
 
       {store.categories?.length ? (
         <BthSurface tone="raised" gap={2}>
-          <BthSectionHeader title="Store categories" subtitle="Keep the same category drill-down density as the legacy store screen." count={store.categories.length} />
+          <BthSectionHeader title={storeText.get.availableCategories} subtitle="الأقسام الأساسية تبقى ظاهرة قبل الدخول في التفاصيل." count={store.categories.length} />
           <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
             {store.categories.map((category) => (
               <BthChip
@@ -117,13 +125,13 @@ export function DshStoreDetailScreen({
 
       {store.deliveryModes?.length ? (
         <BthSurface tone="raised" gap={2}>
-          <BthSectionHeader title="Delivery modes" subtitle="Expose the available handoff paths instead of hiding them behind the CTA." count={store.deliveryModes.length} />
+          <BthSectionHeader title="أوضاع التوصيل" subtitle="الخيارات المتاحة يجب أن تبقى واضحة قبل إتمام الطلب." count={store.deliveryModes.length} />
           <BthBox gap={2}>
             {store.deliveryModes.map((mode) => (
               <BthCard
                 key={mode.id}
                 title={mode.name}
-                subtitle={`${mode.isAvailable ? 'Available' : 'Unavailable'}${mode.estimatedTime ? ` · ${mode.estimatedTime}` : ''}${mode.fee != null ? ` · ${mode.fee} SAR` : ''}`}
+                subtitle={`${mode.isAvailable ? 'متاح' : 'غير متاح'}${mode.estimatedTime ? ` · ${mode.estimatedTime}` : ''}${mode.fee != null ? ` · ${mode.fee} ر.س` : ''}`}
               />
             ))}
           </BthBox>
@@ -132,15 +140,15 @@ export function DshStoreDetailScreen({
 
       <BthSurface tone="raised" gap={3}>
         <BthSectionHeader
-          title="Store highlights"
-          subtitle="Keep details concise and confidence-building."
+          title="مزايا المتجر"
+          subtitle="تفاصيل قصيرة تبني الثقة وتوضح نقاط القوة بسرعة."
         />
         <BthBox gap={2}>
           {store.highlights.map((highlight, index) => (
             <BthCard
               key={`${store.id}-highlight-${index}`}
               title={highlight}
-              subtitle="This highlight supports first-order confidence."
+              subtitle="تفصيلة داعمة لقرار الطلب السريع." 
             />
           ))}
         </BthBox>
@@ -148,27 +156,27 @@ export function DshStoreDetailScreen({
 
       <BthSurface tone="inset" gap={3}>
         <BthSectionHeader
-          title="Next action"
-          subtitle="One dominant CTA, one safe fallback path."
+          title="الإجراء التالي"
+          subtitle="زر رئيسي واضح ومسار بديل آمن بدون تشتيت."
         />
         <BthBox layoutDirection="row" gap={2}>
           <BthButton
-            label="Open menu"
+            label={storeText.get.fullMenu}
             tone="secondary"
             onPress={() => onOpenMenu?.(store.id)}
           />
           <BthButton
-            label="Start delivery"
+            label={storeText.get.platformDelivery}
             onPress={() => onStartDelivery?.(store.id)}
           />
         </BthBox>
         <BthButton
-          label="Open tracking"
+          label="فتح التتبع"
           tone="ghost"
           onPress={onOpenTracking}
         />
         <BthText role="caption" tone="muted">
-          This screen is UI/UX/Flow only and intentionally excludes API runtime logic.
+          هذه الشاشة تركز على التجربة والتنقل فقط دون منطق تشغيلي مباشر.
         </BthText>
       </BthSurface>
     </BthMobileScrollView>

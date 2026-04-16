@@ -10,6 +10,7 @@ import {
   BthTabs,
   BthText,
   useDirection,
+  useUiText,
 } from '@bthwani/ui-kit';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -55,7 +56,11 @@ export type DshStoresListScreenProps = {
   onRetry?: () => void;
 };
 
-function renderNonReadyState(state: 'loading' | 'empty' | 'error', onRetry?: () => void) {
+function renderNonReadyState(
+  state: 'loading' | 'empty' | 'error',
+  storeText: ReturnType<typeof useUiText>['storeScreen'],
+  onRetry?: () => void,
+) {
   if (state === 'loading') {
     return <BthStateView stateId="loading" />;
   }
@@ -64,8 +69,8 @@ function renderNonReadyState(state: 'loading' | 'empty' | 'error', onRetry?: () 
     return (
       <BthStateView
         stateId="empty"
-        title="No stores found"
-        description="Try another filter or search term."
+        title={storeText.states.listEmptyTitle}
+        description={storeText.states.listEmptyDescription}
       />
     );
   }
@@ -73,9 +78,9 @@ function renderNonReadyState(state: 'loading' | 'empty' | 'error', onRetry?: () 
   return (
     <BthStateView
       stateId="recoverableError"
-      title="Stores list is unavailable"
-      description="Retry to restore discovery continuity."
-      actionLabel="Retry"
+      title={storeText.states.listErrorTitle}
+      description={storeText.states.listErrorDescription}
+      actionLabel={storeText.states.retry}
       onActionPress={onRetry}
     />
   );
@@ -94,6 +99,8 @@ export function DshStoresListScreen({
   onRetry,
 }: DshStoresListScreenProps) {
   const { direction } = useDirection();
+  const uiText = useUiText();
+  const storeText = uiText.storeScreen;
   const [favoriteToggles, setFavoriteToggles] = React.useState<Record<string, boolean>>({});
   const [followToggles, setFollowToggles] = React.useState<Record<string, boolean>>({});
   const [followCounts, setFollowCounts] = React.useState<Record<string, number>>({});
@@ -130,11 +137,11 @@ export function DshStoresListScreen({
   }, [filteredByMode, query]);
 
   if (state !== 'ready') {
-    return renderNonReadyState(state, onRetry);
+    return renderNonReadyState(state, storeText, onRetry);
   }
 
   if (filteredItems.length === 0) {
-    return renderNonReadyState('empty', onRetry);
+    return renderNonReadyState('empty', storeText, onRetry);
   }
 
   const buildCardItem = React.useCallback((item: DshStoreListItem): DshStoreCompactCardData => {
@@ -187,25 +194,25 @@ export function DshStoresListScreen({
           </View>
 
           <View style={[styles.discoveryHeaderTextWrap, direction === 'rtl' && styles.discoveryHeaderTextWrapRtl]}>
-            <BthText role="titleSm" style={styles.discoveryHeaderTitle}>بواني تحقق الأماني</BthText>
-            <BthText role="bodySm" style={styles.discoveryHeaderSubtitle}>المساحة مخصصة للشريط الإخباري</BthText>
+            <BthText role="titleSm" style={styles.discoveryHeaderTitle}>{uiText.topBar.brandName}</BthText>
+            <BthText role="bodySm" style={styles.discoveryHeaderSubtitle}>{storeText.list.headerSubtitle}</BthText>
           </View>
         </View>
 
         <View style={[styles.discoveryHeaderChipsRow, direction === 'rtl' && styles.rowReverse]}>
           <View style={styles.discoveryHeaderChipPrimary}>
             <BthText role="bodySm" style={styles.discoveryHeaderChipPrimaryText} numberOfLines={1}>
-              مطعم القمة · توصيل مجاني
+              {storeText.list.headerChipPrimary}
             </BthText>
           </View>
           <View style={styles.discoveryHeaderChipAccent}>
             <BthText role="bodySm" style={styles.discoveryHeaderChipAccentText} numberOfLines={1}>
-              قائمة المتاجر · %30
+              {storeText.list.headerChipAccent}
             </BthText>
           </View>
           <View style={styles.discoveryHeaderChipMuted}>
             <BthText role="bodySm" style={styles.discoveryHeaderChipMutedText} numberOfLines={1}>
-              توصيل برو
+              {storeText.list.headerChipMuted}
             </BthText>
           </View>
         </View>
@@ -220,10 +227,10 @@ export function DshStoresListScreen({
       {bannerSearchVisible ? (
         <BthSurface tone="inset" gap={3}>
           <BthSearchField
-            label="Find store"
+            label={storeText.list.searchLabel}
             value={query}
             onChangeText={onQueryChange}
-            hint="Search by store name or category subtitle."
+            hint={storeText.list.searchHint}
           />
         </BthSurface>
       ) : null}
@@ -231,26 +238,26 @@ export function DshStoresListScreen({
       <BthSurface tone="inset" gap={3}>
         <BthTabs
           items={[
-            { value: 'all', label: 'All' },
-            { value: 'nearest', label: 'Nearest' },
-            { value: 'offers', label: 'Offers' },
-            { value: 'favorites', label: 'Favorites' },
+            { value: 'all', label: storeText.filters.all },
+            { value: 'nearest', label: storeText.filters.nearest },
+            { value: 'offers', label: storeText.filters.offers },
+            { value: 'favorites', label: storeText.filters.favorites },
           ]}
           value={activeFilter}
           onValueChange={(next) => onFilterChange?.(next)}
           variant="pill"
         />
-        <BthButton label="Open favorites" tone="ghost" onPress={onOpenFavorites} />
+        <BthButton label={storeText.list.favoritesCta} tone="ghost" onPress={onOpenFavorites} />
       </BthSurface>
 
       <BthSurface tone="raised" gap={3}>
         <BthSectionHeader
-          title="Available stores"
-          subtitle="Open store details to continue the delivery journey."
+          title={storeText.list.sectionTitle}
+          subtitle={storeText.list.sectionSubtitle}
           count={filteredItems.length}
         />
         <BthText role="caption" tone="muted">
-          Premium cards keep rating, follow, favorite, and offer state visible in one glance.
+          {storeText.list.sectionHint}
         </BthText>
         <BthBox gap={2}>
           {filteredItems.map((item) => (

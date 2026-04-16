@@ -197,6 +197,65 @@ function CategoryIconImage({
   );
 }
 
+function CategoryHubIcon() {
+  return (
+    <View
+      style={{
+        width: 46,
+        height: 46,
+        borderRadius: 14,
+        backgroundColor: '#FF8A00',
+        borderWidth: 1,
+        borderColor: '#FFB35C',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#FF8A00',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.26,
+        shadowRadius: 8,
+        elevation: 5,
+        overflow: 'hidden',
+      }}
+    >
+      <View style={{ position: 'absolute', left: 7, top: 12 }}>
+        <View style={{ width: 20, height: 7, borderRadius: 999, backgroundColor: '#FFFFFF', marginBottom: 4 }} />
+        <View style={{ width: 22, height: 7, borderRadius: 999, backgroundColor: '#FFFFFF', marginBottom: 4 }} />
+        <View
+          style={{
+            width: 19,
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: '#FFFFFF',
+            transform: [{ skewX: '-24deg' }],
+          }}
+        />
+      </View>
+
+      <View style={{ position: 'absolute', top: 4, right: 11, alignItems: 'center', gap: 2 }}>
+        <View style={{ width: 2, height: 7, borderRadius: 999, backgroundColor: '#FFF7E9' }} />
+        <View style={{ flexDirection: 'row', gap: 4 }}>
+          <View style={{ width: 2, height: 6, borderRadius: 999, backgroundColor: '#FFF7E9', transform: [{ rotate: '-30deg' }] }} />
+          <View style={{ width: 2, height: 6, borderRadius: 999, backgroundColor: '#FFF7E9', transform: [{ rotate: '30deg' }] }} />
+        </View>
+      </View>
+
+      <BthText
+        role="titleLg"
+        style={{
+          position: 'absolute',
+          right: 0,
+          bottom: -1,
+          fontSize: 28,
+          lineHeight: 30,
+          transform: [{ rotate: '-2deg' }],
+        }}
+      >
+        ☝️
+      </BthText>
+    </View>
+  );
+}
+
 function MySpaceIcon() {
   return (
     <View
@@ -755,12 +814,8 @@ export function DshHomeGetScreen({
 
               <View ref={categoriesAnchorRef} collapsable={false}>
                 <Pressable style={styles.categorySelectorCard} onPress={openCategoriesDial}>
-                  <View style={styles.categoryIconContainer}>
-                    <CategoryIconImage
-                      uri={null}
-                      emojiFallback={'📂'}
-                      style={styles.categoryIconImage}
-                    />
+                  <View style={[styles.categoryIconContainer, styles.categoryHubIconContainer]}>
+                    <CategoryHubIcon />
                   </View>
                   <View style={styles.categoryNameContainer}>
                     <BthText role="bodySm" style={styles.categoryName} numberOfLines={1}>الفئات</BthText>
@@ -772,12 +827,11 @@ export function DshHomeGetScreen({
                 <Pressable
                   style={styles.categorySelectorCard}
                   onPress={() => setActiveSubcategoryId(null)}
-                  activeOpacity={0.8}
                 >
                   <View style={styles.categoryIconContainer}>
                     <CategoryIconImage
                       uri={null}
-                      emojiFallback={selectedCategoryFixture.icon}
+                      emojiFallback={categoryIconMap[selectedCategoryFixture.id] ?? '📂'}
                       style={styles.categoryIconImage}
                     />
                   </View>
@@ -833,7 +887,6 @@ export function DshHomeGetScreen({
                       activeSubcategoryId === subcategory.id && styles.subcategorySelectorCardActive,
                     ]}
                     onPress={() => setActiveSubcategoryId(subcategory.id)}
-                    activeOpacity={0.8}
                   >
                     <View style={styles.subcategoryIconContainer}>
                       <BthText role="titleSm" style={styles.subcategoryEmoji}>
@@ -1508,6 +1561,11 @@ function createStyles(direction: Direction) {
     overflow: 'hidden',
     marginBottom: 2,
   },
+  categoryHubIconContainer: {
+    backgroundColor: '#FFF4E8',
+    borderWidth: 1,
+    borderColor: '#FFD6B0',
+  },
   categoryIconImage: {
     width: 42,
     height: 42,
@@ -1765,6 +1823,18 @@ function createStyles(direction: Direction) {
     flexDirection: rowDirection,
     alignItems: 'center',
     gap: 6,
+  },
+  filterChipIconWrap: {
+    width: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterChipIcon: {
+    width: 16,
+    height: 16,
+    fontSize: 14,
+    lineHeight: 16,
   },
   filterChipLabel: {
     fontSize: 13,
