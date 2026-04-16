@@ -358,6 +358,7 @@ export function DshHomeGetScreen({
   onOpenCart,
   onOpenOrders,
   onOpenTracking,
+  onOpenMySpace,
   onOpenNotifications,
   onOpenStore,
   onOpenSheinInfo,
@@ -377,7 +378,7 @@ export function DshHomeGetScreen({
   const [categoriesSheetVisible, setCategoriesSheetVisible] = React.useState(false);
   const [categoriesDialLayout, setCategoriesDialLayout] = React.useState<DialAnchorLayout | null>(null);
   const [activeFilter, setActiveFilter] = React.useState<DiscoveryFilter>('all');
-  const [activeCategoryId, setActiveCategoryId] = React.useState<string>('restaurants');
+  const [activeCategoryId, setActiveCategoryId] = React.useState<string | null>(null);
   const [activeSubcategoryId, setActiveSubcategoryId] = React.useState<string | null>(null);
   const [activePromoIndex, setActivePromoIndex] = React.useState(0);
   const [favoriteToggles, setFavoriteToggles] = React.useState<Record<string, boolean>>({});
@@ -408,16 +409,22 @@ export function DshHomeGetScreen({
     [categories],
   );
   const selectedCategoryFixture = React.useMemo(
-    () => visibleCategoryFixtures.find((category) => category.id === activeCategoryId) ?? visibleCategoryFixtures[0] ?? null,
+    () =>
+      activeCategoryId && activeCategoryId !== 'all'
+        ? visibleCategoryFixtures.find((category) => category.id === activeCategoryId) ?? null
+        : null,
     [activeCategoryId, visibleCategoryFixtures]
   );
   const selectedCategoryLabel =
     selectedCategoryFixture?.label ??
-    categoryItems.find((category) => category.id === activeCategoryId)?.label ??
     'الفئات';
   const selectedSubcategories = selectedCategoryFixture?.subcategories ?? [];
   React.useEffect(() => {
     if (!visibleCategoryFixtures.length) {
+      return;
+    }
+
+    if (!activeCategoryId || activeCategoryId === 'all') {
       return;
     }
 
@@ -426,7 +433,7 @@ export function DshHomeGetScreen({
       setActiveSubcategoryId(null);
     }
   }, [activeCategoryId, visibleCategoryFixtures]);
-  const categoryRailItems = React.useMemo(
+  const allCategoryRailItems = React.useMemo(
     () =>
       visibleCategoryFixtures.map((category) => ({
         ...category,
@@ -456,7 +463,10 @@ export function DshHomeGetScreen({
   }, []);
 
   const visibleStores = React.useMemo(() => {
-    const categoryScopedStores = stores.filter((store) => store.categoryId ? store.categoryId === activeCategoryId : true);
+    const categoryScopedStores =
+      activeCategoryId && activeCategoryId !== 'all'
+        ? stores.filter((store) => (store.categoryId ? store.categoryId === activeCategoryId : true))
+        : stores;
 
     return categoryScopedStores.filter((store) => {
       const isFavorite = favoriteToggles[store.id] ?? store.isFavorite;
@@ -601,6 +611,7 @@ export function DshHomeGetScreen({
     ].filter(Boolean) as HomeShortItem[],
     [activePromo.subtitle, activePromo.title, primaryStore]
   );
+  // Marketing-driven banner carousel items: promos are the single source of truth for banner content and routing.
   const bannerItems: HomeBannerCarouselItem[] = promos.map((promo) => ({
     id: promo.id,
     title: promo.title,
@@ -709,7 +720,7 @@ export function DshHomeGetScreen({
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ padding: spacing[4], gap: spacing[4], flexGrow: 1 }}
+        contentContainerStyle={{ padding: spacing[3], gap: spacing[2], flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.carouselViewport}>
@@ -756,117 +767,132 @@ export function DshHomeGetScreen({
                   </View>
                 </Pressable>
               </View>
+
+              {selectedCategoryFixture ? (
+                <Pressable
+                  style={styles.categorySelectorCard}
+                  onPress={() => setActiveSubcategoryId(null)}
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.categoryIconContainer}>
+                    <CategoryIconImage
+                      uri={null}
+                      emojiFallback={selectedCategoryFixture.icon}
+                      style={styles.categoryIconImage}
+                    />
+                  </View>
+                  <View style={[styles.categoryNameContainer, styles.categoryNameContainerSelected]}>
+                    <BthText role="bodySm" style={styles.categoryName} numberOfLines={1}>
+                      {selectedCategoryLabel}
+                    </BthText>
+                  </View>
+                </Pressable>
+              ) : null}
             </View>
 
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.categoriesSelectorScrollContent}
-              style={styles.categoriesSelectorScroll}
-            >
-              {categoryRailItems.map((category) => {
-                const isActive = category.id === activeCategoryId;
-                const subcategoryCards = isActive ? selectedSubcategoryCards : [];
+            <Pressable style={[styles.heroPromoCard, styles.heroPromoCardInline]} onPress={onOpenSearch ?? onOpenList}>
+              <View style={styles.heroPromoContent}>
+                <View style={styles.heroPromoIconWrap}>
+                  <BthText role="titleLg" style={styles.heroIcon}>
+                    {activePromo.icon}
+                  </BthText>
+                </View>
 
-                return (
-                  <React.Fragment key={category.id}>
-                    <Pressable
-                      style={[
-                        styles.categorySelectorCard,
-                        isActive && styles.categorySelectorCardActive,
-                      ]}
-                      onPress={() => {
-                        setActiveCategoryId(category.id);
-                        setActiveSubcategoryId(null);
-                        if (category.id === 'awnak') {
-                          onOpenCategory?.('awnak');
-                          return;
-                        }
-
-                        if (category.id === 'shein') {
-                          onOpenSheinInfo?.();
-                        }
-                      }}
-                      activeOpacity={0.8}
-                    >
-                      <View style={styles.categoryIconContainer}>
-                        <CategoryIconImage
-                          uri={null}
-                          emojiFallback={category.icon}
-                          style={styles.categoryIconImage}
-                        />
-                      </View>
-                      <View style={[
-                        styles.categoryNameContainer,
-                        isActive && styles.categoryNameContainerSelected,
-                      ]}>
-                        <BthText role="bodySm" style={styles.categoryName} numberOfLines={1}>
-                          {category.label}
-                        </BthText>
-                      </View>
-                    </Pressable>
-
-                    {subcategoryCards.map((subcategory) => (
-                      <Pressable
-                        key={subcategory.id}
-                        style={[
-                          styles.subcategorySelectorCard,
-                          activeSubcategoryId === subcategory.id && styles.subcategorySelectorCardActive,
-                        ]}
-                        onPress={() => setActiveSubcategoryId(subcategory.id)}
-                        activeOpacity={0.8}
-                      >
-                        <View style={styles.subcategoryIconContainer}>
-                          <BthText role="titleSm" style={styles.subcategoryEmoji}>
-                            {subcategory.emoji}
-                          </BthText>
-                        </View>
-                        <BthText role="bodySm" style={[styles.subcategoryName, activeSubcategoryId === subcategory.id && styles.subcategoryNameActive]} numberOfLines={1}>
-                          {subcategory.title}
-                        </BthText>
-                      </Pressable>
-                    ))}
-                  </React.Fragment>
-                );
-              })}
-
-              <Pressable style={[styles.heroPromoCard, styles.heroPromoCardInline]} onPress={onOpenSearch ?? onOpenList}>
-                <View style={styles.heroPromoContent}>
-                  <View style={styles.heroPromoIconWrap}>
-                    <BthText role="titleLg" style={styles.heroIcon}>
-                      {activePromo.icon}
+                <View style={styles.heroPromoTextWrap}>
+                  <View style={styles.heroPromoBadge}>
+                    <BthText role="bodySm" style={styles.heroPromoBadgeText}>
+                      {activePromo.title}
                     </BthText>
                   </View>
+                  <BthText role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
+                    {promoDiscount}
+                  </BthText>
+                  <BthText role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
+                    {promoTail || 'على أول طلب'}
+                  </BthText>
+                </View>
+              </View>
 
-                  <View style={styles.heroPromoTextWrap}>
-                    <View style={styles.heroPromoBadge}>
-                      <BthText role="bodySm" style={styles.heroPromoBadgeText}>
-                        {activePromo.title}
+              <View style={styles.heroPagerRow}>
+                <View style={styles.heroPagerActive} />
+              </View>
+            </Pressable>
+
+            {selectedSubcategoryCards.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.categoriesSelectorScrollContent}
+                style={styles.categoriesSelectorScroll}
+              >
+                {selectedSubcategoryCards.map((subcategory) => (
+                  <Pressable
+                    key={subcategory.id}
+                    style={[
+                      styles.subcategorySelectorCard,
+                      activeSubcategoryId === subcategory.id && styles.subcategorySelectorCardActive,
+                    ]}
+                    onPress={() => setActiveSubcategoryId(subcategory.id)}
+                    activeOpacity={0.8}
+                  >
+                    <View style={styles.subcategoryIconContainer}>
+                      <BthText role="titleSm" style={styles.subcategoryEmoji}>
+                        {subcategory.emoji}
                       </BthText>
                     </View>
-                    <BthText role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
-                      {promoDiscount}
+                    <BthText role="bodySm" style={[styles.subcategoryName, activeSubcategoryId === subcategory.id && styles.subcategoryNameActive]} numberOfLines={1}>
+                      {subcategory.title}
                     </BthText>
-                    <BthText role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
-                      {promoTail || 'على أول طلب'}
-                    </BthText>
-                  </View>
-                </View>
-
-                <View style={styles.heroPagerRow}>
-                  <View style={styles.heroPagerActive} />
-                </View>
-              </Pressable>
-            </ScrollView>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            ) : null}
           </View>
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filtersRow}
-        >
-          {discoveryFilters.map((filter) => {
+        <View style={styles.filtersRow}>
+          <Pressable
+            style={[
+              styles.filterChip,
+              styles.filterChipCategory,
+              {
+                backgroundColor: activeCategoryId === 'all' ? theme.brand : theme.surfaceRaised,
+                borderColor: activeCategoryId === 'all' ? theme.brand : 'transparent',
+              },
+            ]}
+            onPress={() => {
+              setActiveCategoryId('all');
+              setActiveSubcategoryId(null);
+            }}
+          >
+            <View style={styles.filterChipContent}>
+              <View style={styles.filterChipIconWrap}>
+                <Ionicons
+                  name="menu-outline"
+                  size={16}
+                  color={activeCategoryId === 'all' ? theme.textInverse : theme.textMuted}
+                />
+              </View>
+              <BthText
+                role="bodySm"
+                style={[
+                  styles.filterChipLabel,
+                  { color: activeCategoryId === 'all' ? theme.textInverse : theme.textMuted },
+                ]}
+                numberOfLines={1}
+              >
+                الكل
+              </BthText>
+            </View>
+          </Pressable>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filtersRowScrollContent}
+            style={styles.filtersRowScroll}
+          >
+            {discoveryFilters.filter((filter) => filter.value !== 'all').map((filter) => {
             const isActive = filter.value === activeFilter;
             return (
               <Pressable
@@ -899,7 +925,58 @@ export function DshHomeGetScreen({
               </Pressable>
             );
           })}
-        </ScrollView>
+
+            {allCategoryRailItems.filter((category) => category.id !== 'all').map((category) => {
+            const isActive = category.id === activeCategoryId;
+
+            return (
+              <Pressable
+                key={category.id}
+                style={[
+                  styles.filterChip,
+                  styles.filterChipCategory,
+                  {
+                    backgroundColor: isActive ? theme.brand : theme.surfaceRaised,
+                    borderColor: isActive ? theme.brand : 'transparent',
+                  },
+                ]}
+                onPress={() => {
+                  setActiveCategoryId(category.id);
+                  setActiveSubcategoryId(null);
+                  if (category.id === 'awnak') {
+                    onOpenCategory?.('awnak');
+                    return;
+                  }
+
+                  if (category.id === 'shein') {
+                    onOpenSheinInfo?.();
+                  }
+                }}
+              >
+                <View style={styles.filterChipContent}>
+                  <View style={styles.filterChipIconWrap}>
+                    <CategoryIconImage
+                      uri={null}
+                      emojiFallback={category.icon}
+                      style={styles.filterChipIcon}
+                    />
+                  </View>
+                  <BthText
+                    role="bodySm"
+                    style={[
+                      styles.filterChipLabel,
+                      { color: isActive ? theme.textInverse : theme.textMuted },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {category.label}
+                  </BthText>
+                </View>
+              </Pressable>
+            );
+          })}
+          </ScrollView>
+        </View>
 
         <BthBox gap={3}>
           {visibleStores.map((store, index) => {
@@ -1316,8 +1393,8 @@ function createStyles(direction: Direction) {
     fontWeight: '700',
   },
   carouselViewport: {
-    gap: 14,
-    marginTop: -2,
+    gap: 4,
+    marginTop: 0,
   },
   carouselStage: {
     height: 238,
@@ -1349,16 +1426,16 @@ function createStyles(direction: Direction) {
   heroRow: {
     flexDirection: rowDirection,
     alignItems: 'stretch',
-    gap: 12,
+    gap: 8,
   },
   categoriesSelectorSection: {
-    marginTop: 2,
-    marginBottom: spacing[1],
+    marginTop: 0,
+    marginBottom: 0,
   },
   categoriesSelectorRow: {
     flexDirection: rowDirection,
     alignItems: 'center',
-    gap: 8,
+    gap: 4,
   },
   categoriesSelectorScroll: {
     flex: 1,
@@ -1366,19 +1443,19 @@ function createStyles(direction: Direction) {
   categoriesSelectorScrollContent: {
     flexDirection: rowDirection,
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: spacing[1],
+    gap: 6,
+    paddingHorizontal: 0,
   },
   fixedIconsContainer: {
     flexDirection: rowDirection,
     alignItems: 'stretch',
-    gap: 8,
+    gap: 4,
     flexShrink: 0,
   },
   categorySelectorCard: {
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 2,
+    paddingVertical: 0,
   },
   categorySelectorCardActive: {
     transform: [{ translateY: -1 }],
@@ -1422,13 +1499,20 @@ function createStyles(direction: Direction) {
     backgroundColor: '#FF6A00',
   },
   categoryIconContainer: {
-    width: 52,
-    height: 52,
+    width: 60,
+    height: 60,
     borderRadius: 12,
     backgroundColor: '#F4F7FB',
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    marginBottom: 2,
+  },
+  categoryIconImage: {
+    width: 42,
+    height: 42,
+    fontSize: 32,
+    lineHeight: 32,
   },
   categoryNameContainer: {
     alignItems: 'center',
@@ -1507,8 +1591,8 @@ function createStyles(direction: Direction) {
     elevation: 3,
   },
   heroPromoCardInline: {
-    flex: 0,
-    width: 212,
+    flex: 1,
+    minWidth: 280,
   },
   heroPromoContent: {
     flexDirection: rowDirection,
@@ -1564,11 +1648,11 @@ function createStyles(direction: Direction) {
   categoryRail: {
     flexDirection: rowDirection,
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: spacing[2],
-    paddingTop: spacing[1],
-    paddingBottom: spacing[1],
-    justifyContent: 'center',
+    gap: 6,
+    paddingHorizontal: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
+    justifyContent: 'flex-start',
   },
   categoryRailItem: {
     minHeight: 42,
@@ -1648,10 +1732,18 @@ function createStyles(direction: Direction) {
   filtersRow: {
     flexDirection: rowDirection,
     alignItems: 'center',
-    gap: spacing[2],
-    paddingVertical: spacing[1],
-    paddingHorizontal: spacing[2],
-    justifyContent: 'center',
+    gap: spacing[1],
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    justifyContent: 'flex-start',
+  },
+  filtersRowScroll: {
+    flex: 1,
+  },
+  filtersRowScrollContent: {
+    flexDirection: rowDirection,
+    alignItems: 'center',
+    gap: spacing[1],
   },
   filterChip: {
     minHeight: sizes.controlSm,
@@ -1661,6 +1753,12 @@ function createStyles(direction: Direction) {
     flexDirection: rowDirection,
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
+  },
+  filterChipCategory: {
+    flexShrink: 0,
+  },
+  filterChipFixed: {
     flexShrink: 0,
   },
   filterChipContent: {

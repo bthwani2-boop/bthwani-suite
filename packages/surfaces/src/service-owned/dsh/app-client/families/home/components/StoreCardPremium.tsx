@@ -1,7 +1,7 @@
 import React, { memo, useMemo } from 'react';
 import { Image, Pressable, StyleSheet, Text, View, type ImageSourcePropType, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { resolveTextAlign, useDirection, useTheme } from '@bthwani/ui-kit';
+import { resolveRowDirection, resolveTextAlign, useDirection, useTheme } from '@bthwani/ui-kit';
 
 export type ServiceToken = {
   label: string;
@@ -93,7 +93,8 @@ export const StoreCardPremium = memo(function StoreCardPremium({
 }: StoreCardPremiumProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
-  const styles = useMemo(() => createStyles(theme, resolveTextAlign(direction)), [direction, theme]);
+  const rowDirection = resolveRowDirection(direction);
+  const styles = useMemo(() => createStyles(theme, rowDirection, resolveTextAlign(direction)), [direction, theme]);
   const serviceTokens = item.serviceTokens ?? buildServiceTokens(item.supportsPickup, item.supportsPartnerDelivery);
   const followersLabel = formatFollowers(item.followersCount);
   const ratingValue = item.rating == null || Number.isNaN(item.rating) ? 5 : item.rating;
@@ -229,7 +230,9 @@ export const StoreCardPremium = memo(function StoreCardPremium({
   );
 });
 
-function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'left' | 'right' | 'center') {
+function createStyles(theme: ReturnType<typeof useTheme>['theme'], rowDirection: 'row' | 'row-reverse', textAlign: 'left' | 'right' | 'center') {
+  const alignItemsDirection = textAlign === 'right' ? 'flex-end' : 'flex-start';
+
   return StyleSheet.create({
     card: {
       height: CARD_HEIGHT,
@@ -239,7 +242,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'l
       borderColor: theme.line,
       paddingVertical: 8,
       paddingHorizontal: 10,
-      flexDirection: 'row',
+      flexDirection: rowDirection,
       alignItems: 'stretch',
       shadowColor: '#000',
       shadowOpacity: 0.04,
@@ -251,13 +254,13 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'l
     cardPressed: { opacity: 0.98 },
     detailsBlock: {
       flex: 1,
-      flexDirection: 'row',
+      flexDirection: rowDirection,
       minWidth: 0,
       alignItems: 'stretch',
     },
     leftCol: {
       width: LEFT_COL_WIDTH,
-      marginEnd: 6,
+      marginStart: 6,
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingVertical: 2,
@@ -266,7 +269,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'l
       height: STATUS_HEIGHT,
       paddingHorizontal: 6,
       borderRadius: STATUS_HEIGHT / 2,
-      flexDirection: 'row',
+      flexDirection: rowDirection,
       alignItems: 'center',
       justifyContent: 'center',
       gap: 3,
@@ -327,7 +330,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'l
       bottom: 0,
       start: 0,
       end: 0,
-      flexDirection: 'row',
+      flexDirection: rowDirection,
       justifyContent: 'center',
       alignItems: 'center',
       gap: 2,
@@ -358,7 +361,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'l
       height: METRICS_BAR_HEIGHT,
       width: '100%',
       maxWidth: IMAGE_SIZE + 4,
-      flexDirection: 'row',
+      flexDirection: rowDirection,
       alignItems: 'center',
       justifyContent: 'flex-start',
       gap: 0,
@@ -366,7 +369,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'l
       paddingHorizontal: 0,
     },
     ratingSection: {
-      flexDirection: 'row',
+      flexDirection: rowDirection,
       alignItems: 'center',
       gap: 3,
     },
@@ -396,7 +399,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'l
       color: theme.text,
     },
     followersWrap: {
-      flexDirection: 'row',
+      flexDirection: rowDirection,
       alignItems: 'center',
       gap: 2,
     },
@@ -422,7 +425,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'l
       flex: 1,
       minWidth: 0,
       justifyContent: 'space-between',
-      alignItems: 'flex-start',
+      alignItems: alignItemsDirection,
       marginEnd: 4,
     },
     name: {
@@ -441,7 +444,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'l
       textAlign,
     },
     serviceRow: {
-      flexDirection: 'row',
+      flexDirection: rowDirection,
       alignItems: 'center',
       justifyContent: 'flex-start',
       flexWrap: 'wrap',
@@ -457,7 +460,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'l
       color: theme.textSoft,
     },
     subscriptionRow: {
-      flexDirection: 'row',
+      flexDirection: rowDirection,
       alignItems: 'center',
       justifyContent: 'flex-start',
       gap: 4,
@@ -470,7 +473,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'l
       backgroundColor: theme.infoSurface,
       borderWidth: 1,
       borderColor: theme.info,
-      flexDirection: 'row',
+      flexDirection: rowDirection,
       alignItems: 'center',
       gap: 3,
     },
@@ -507,7 +510,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], textAlign: 'l
       justifyContent: 'center',
     },
     couponChipStandalone: {
-      flexDirection: 'row',
+      flexDirection: rowDirection,
       alignItems: 'center',
       gap: 4,
       backgroundColor: theme.infoSurface,

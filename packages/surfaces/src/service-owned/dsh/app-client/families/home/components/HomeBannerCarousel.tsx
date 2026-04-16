@@ -247,7 +247,7 @@ export function HomeBannerCarousel({
         snapToOffsets={snapOffsets}
         snapToAlignment="center"
         disableIntervalMomentum
-        contentContainerStyle={{ paddingHorizontal: horizontalPadding }}
+        contentContainerStyle={{ paddingHorizontal: horizontalPadding, flexDirection: 'row' }}
         getItemLayout={(_: unknown, index: number) => ({
           length: snapInterval,
           offset: index * snapInterval,
@@ -259,7 +259,6 @@ export function HomeBannerCarousel({
         onScrollBeginDrag={pauseAutoplay}
         onTouchStart={pauseAutoplay}
         onTouchEnd={pauseAutoplay}
-        inverted={isRtl && Platform.OS !== 'web'}
       />
 
       {count > 1 && (
@@ -290,6 +289,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     root: {
       overflow: 'visible',
       backgroundColor: theme.surface,
+      alignSelf: 'center',
     },
     itemWrap: {
       justifyContent: 'center',

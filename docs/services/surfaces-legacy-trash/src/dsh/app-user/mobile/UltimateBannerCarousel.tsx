@@ -75,7 +75,7 @@ export default function UltimateBannerCarousel({
     [count, snapInterval]
   );
 
-  const inverted = rtl && Platform.OS !== 'web';
+  const inverted = false;
 
   useEffect(() => {
     if (count <= 1 || autoPlayInterval <= 0) return;
@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     direction: 'ltr',
     backgroundColor: '#ffffff',
+    alignSelf: 'center',
   },
 
   itemWrap: {
