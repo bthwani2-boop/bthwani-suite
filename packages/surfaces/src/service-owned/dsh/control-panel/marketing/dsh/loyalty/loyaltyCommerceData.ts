@@ -1,10 +1,12 @@
 export type LoyaltyCommercialSignal = {
+  lane: 'subscription' | 'loyalty' | 'coupon';
   title: string;
   value: string;
   description: string;
 };
 
 export type LoyaltyCommercialLaneItem = {
+  lane: 'subscription' | 'loyalty' | 'coupon' | 'all';
   title: string;
   subtitle: string;
   meta: string;
@@ -13,58 +15,66 @@ export type LoyaltyCommercialLaneItem = {
 
 export const loyaltyCommercialSignals: LoyaltyCommercialSignal[] = [
   {
-    title: 'Subscription tier',
-    value: 'subscription-family-get',
-    description: 'The real subscription family route is the entry point for plan, family, and sync actions.',
+    lane: 'subscription',
+    title: 'اشتراك الأسرة',
+    value: 'الخطة الأسرية',
+    description: 'إدارة الخطة والترقية والمزامنة من نفس المسار التجاري الحقيقي.',
   },
   {
-    title: 'Points balance',
-    value: 'loyalty-points-user-balance',
-    description: 'The balance screen is the source of truth before redemption or checkout.',
+    lane: 'loyalty',
+    title: 'رصيد النقاط',
+    value: 'ميزان الولاء',
+    description: 'الرصيد والاستبدال والسجل يظهرون كقيمة تشغيلية واضحة قبل الدفع.',
   },
   {
-    title: 'Coupon lane',
-    value: 'promo-apply',
-    description: 'Coupons stay inside the live pricing path rather than becoming a display-only state.',
+    lane: 'coupon',
+    title: 'تطبيق الكوبون',
+    value: 'قيمة فورية',
+    description: 'الكوبونات تبقى جزءًا من مسار التسعير الحقيقي لا عنصرًا بصريًا منفصلًا.',
   },
 ];
 
 export const loyaltyCommercialLaneItems: LoyaltyCommercialLaneItem[] = [
   {
-    title: 'Subscription family',
-    subtitle: 'Open the actual family, upgrade, and sync routes instead of a sample summary.',
-    meta: 'Subscription',
-    badgeLabel: 'Route',
+    lane: 'subscription',
+    title: 'إدارة أفراد الاشتراك',
+    subtitle: 'تعديل الخطة وإضافة أفراد الأسرة ومراجعة الترقيات من نفس السطح.',
+    meta: 'اشتراك حي',
+    badgeLabel: 'تشغيل',
   },
   {
-    title: 'Points redemption',
-    subtitle: 'Open the live balance, redeem, and history routes before checkout.',
-    meta: 'Loyalty',
-    badgeLabel: 'Route',
+    lane: 'loyalty',
+    title: 'الاستبدال ورصيد النقاط',
+    subtitle: 'عرض الرصيد والاسترداد والسجل بطريقة واضحة ومباشرة للفريق التجاري.',
+    meta: 'ولاء حي',
+    badgeLabel: 'قيمة',
   },
   {
-    title: 'Coupon application',
-    subtitle: 'Keep promo application in checkout and pricing where the live lane already exists.',
-    meta: 'Coupon',
-    badgeLabel: 'Route',
+    lane: 'coupon',
+    title: 'تطبيق الكوبون والعرض',
+    subtitle: 'الخصومات تبقى ضمن تجربة السعر والدفع مع وضوح أعلى في التحكم.',
+    meta: 'سعر وعرض',
+    badgeLabel: 'حملة',
   },
   {
-    title: 'Entitlements',
-    subtitle: 'Use the entitlement route as the actual source of loyalty visibility.',
-    meta: 'Points',
-    badgeLabel: 'Route',
+    lane: 'all',
+    title: 'الاستحقاقات والمزايا',
+    subtitle: 'إظهار الحقوق والمزايا الفعلية للعميل دون نصوص تقنية أو حالات مبهمة.',
+    meta: 'استحقاقات',
+    badgeLabel: 'وضوح',
   },
   {
-    title: 'Sync and audit',
-    subtitle: 'Refresh subscription state from the live route and keep history readable.',
-    meta: 'Sync',
-    badgeLabel: 'Route',
+    lane: 'all',
+    title: 'التدقيق والمزامنة',
+    subtitle: 'متابعة التغييرات والنشر والمراجعة من نفس غرفة القيادة.',
+    meta: 'حوكمة',
+    badgeLabel: 'حماية',
   },
 ];
 
 export const loyaltyCommercialKeyValues = [
-  { label: 'Current plan route', value: 'subscription-family-get' },
-  { label: 'Coupon lane', value: 'promo-apply' },
-  { label: 'Points balance route', value: 'loyalty-points-user-balance' },
-  { label: 'Entitlement lane', value: 'entitlements-get' },
+  { label: 'المسار الأساسي', value: 'الخطة الأسرية' },
+  { label: 'قناة الخصومات', value: 'العروض والدفع' },
+  { label: 'رؤية النقاط', value: 'ميزان الولاء' },
+  { label: 'الاستحقاقات', value: 'المزايا الفعلية' },
 ] as const;

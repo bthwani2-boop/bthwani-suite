@@ -202,6 +202,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
 
   const activeSectionId = activeSectionHref.slice(1) as ControlPanelSectionId;
   const isControlSection = activeSectionId === 'control';
+  const isMarketingSection = activeSectionId === 'marketing';
   const shellCopy = resolveShellCopy(panelText, activeSectionId, isControlSection ? subsection : undefined);
   const railItems = resolveRailItems(activeSectionHref, panelText);
   const isAllFilterActive = selectedServiceId === allServiceTabId;
@@ -307,86 +308,86 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
       alertCountLabel={String(alertCount)}
     >
       <div className={styles.stageStack} dir={direction}>
-        <section className={styles.missionDockHeader}>
-          <p className={styles.missionDockEyebrow}>{panelText.brandLabel}</p>
-          <h1 className={styles.missionDockTitle}>{shellCopy.title}</h1>
-          <p className={styles.missionDockSubtitle}>
-            {isAllFilterActive
-              ? `${panelText.ui.missionDockAll} ${shellCopy.title}`
-              : `${panelText.ui.missionDockActive} ${selectedServiceLabel}`}
-          </p>
-        </section>
+        {!isMarketingSection ? (
+          <>
+            <section className={styles.missionDockHeader}>
+              <p className={styles.missionDockEyebrow}>{panelText.brandLabel}</p>
+              <h1 className={styles.missionDockTitle}>{shellCopy.title}</h1>
+              <p className={styles.missionDockSubtitle}>
+                {isAllFilterActive
+                  ? `${panelText.ui.missionDockAll} ${shellCopy.title}`
+                  : `${panelText.ui.missionDockActive} ${selectedServiceLabel}`}
+              </p>
+            </section>
 
-        <section className={styles.priorityPanel}>
-          <BthWebMissionHeroCard
-            dense
-            badges={[
-              `${panelText.ui.serviceBadge} ${isAllFilterActive ? panelText.filters.allServices : selectedServiceLabel}`,
-              isAllFilterActive
-                ? `${panelText.ui.sectionBadge} ${activeSectionLabel}`
-                : `${panelText.ui.sectionsBadge} ${serviceSectionLabels.length}`,
-              panelText.ui.lastUpdate,
-            ]}
-            eyebrow={`${shellCopy.title} · ${panelText.ui.missionEyebrow}`}
-            title={activeMission.missionTitle}
-            description={activeMission.missionDescription}
-            metaItems={[
-              `${panelText.ui.serviceLabel}: ${activeMission.owner}`,
-              activeMission.dueLabel,
-              `${panelText.ui.sectionsBadge} ${activeMission.countLabel}`,
-            ]}
-            primaryAction={heroPrimaryAction}
-            secondaryAction={heroSecondaryAction}
-          />
+            <section className={styles.priorityPanel}>
+              <BthWebMissionHeroCard
+                dense
+                badges={[
+                  `${panelText.ui.serviceBadge} ${isAllFilterActive ? panelText.filters.allServices : selectedServiceLabel}`,
+                  isAllFilterActive
+                    ? `${panelText.ui.sectionBadge} ${activeSectionLabel}`
+                    : `${panelText.ui.sectionsBadge} ${serviceSectionLabels.length}`,
+                  panelText.ui.lastUpdate,
+                ]}
+                eyebrow={`${shellCopy.title} · ${panelText.ui.missionEyebrow}`}
+                title={activeMission.missionTitle}
+                description={activeMission.missionDescription}
+                metaItems={[
+                  `${panelText.ui.serviceLabel}: ${activeMission.owner}`,
+                  activeMission.dueLabel,
+                  `${panelText.ui.sectionsBadge} ${activeMission.countLabel}`,
+                ]}
+                primaryAction={heroPrimaryAction}
+                secondaryAction={heroSecondaryAction}
+              />
 
-          <div className={styles.signalGrid}>
-            {signalCards.map((signal) => {
-              const dynamicValue =
-                signal.id === 'best-path'
-                  ? isAllFilterActive
-                    ? activeSectionLabel
-                    : selectedServiceLabel
-                  : signal.id === 'pressure'
-                    ? isAllFilterActive
-                      ? String(sectionServiceIds.length || 1)
-                      : String(serviceSectionLabels.length || 1)
-                    : signal.value;
+              <div className={styles.signalGrid}>
+                {signalCards.map((signal) => {
+                  const dynamicValue =
+                    signal.id === 'best-path'
+                      ? isAllFilterActive
+                        ? activeSectionLabel
+                        : selectedServiceLabel
+                      : signal.id === 'pressure'
+                        ? isAllFilterActive
+                          ? String(sectionServiceIds.length || 1)
+                          : String(serviceSectionLabels.length || 1)
+                        : signal.value;
 
-              return (
-                <BthWebSignalCard
-                  key={signal.id}
-                  title={signal.title}
-                  value={dynamicValue}
-                  description={signal.description}
-                  tone={signal.tone}
-                />
-              );
-            })}
-          </div>
+                  return (
+                    <BthWebSignalCard
+                      key={signal.id}
+                      title={signal.title}
+                      value={dynamicValue}
+                      description={signal.description}
+                      tone={signal.tone}
+                    />
+                  );
+                })}
+              </div>
 
-          <section className={styles.contextPanel}>
-            <h4 className={styles.contextTitle}>
-              {isAllFilterActive ? panelText.ui.contextTitleSection : panelText.ui.contextTitleService}
-            </h4>
-            <div className={styles.contextList}>
-              {contextItems.map((item) => (
-                <span key={item} className={styles.contextChip}>
-                  {item}
-                </span>
-              ))}
-              {contextItems.length === 0 ? (
-                <span className={styles.contextChipMuted}>{panelText.ui.noItems}</span>
-              ) : null}
-            </div>
-          </section>
-        </section>
+              <section className={styles.contextPanel}>
+                <h4 className={styles.contextTitle}>
+                  {isAllFilterActive ? panelText.ui.contextTitleSection : panelText.ui.contextTitleService}
+                </h4>
+                <div className={styles.contextList}>
+                  {contextItems.map((item) => (
+                    <span key={item} className={styles.contextChip}>
+                      {item}
+                    </span>
+                  ))}
+                  {contextItems.length === 0 ? (
+                    <span className={styles.contextChipMuted}>{panelText.ui.noItems}</span>
+                  ) : null}
+                </div>
+              </section>
+            </section>
+          </>
+        ) : null}
 
         {activeSectionId === 'marketing' ? (
           <section className={styles.subsectionPanel}>
-            <div className={styles.subsectionHeader}>
-              <h3 className={styles.subsectionTitle}>{marketingCopy.heroTitle}</h3>
-              <p className={styles.subsectionDescription}>{marketingCopy.heroDescription}</p>
-            </div>
             <ControlPanelDshMarketingScreen hubHref="/marketing" operationsHref="/operations" />
           </section>
         ) : null}

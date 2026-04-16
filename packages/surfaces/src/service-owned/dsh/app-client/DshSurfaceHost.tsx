@@ -20,6 +20,8 @@ import {
   dshHomeGetFixturePromos,
   dshHomeGetFixtureStores,
 } from './families/home/fixtures/dshHomeGetFixtures';
+import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../control-panel/marketing/dsh/banner-store';
+import { getLiveMarketingGrowthItems } from '../control-panel/marketing/dsh/growth-store';
 import { DshOrderSuccessState } from './families/orders/screens';
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './families/categories/fixtures/dshCategoriesFixtures';
 import { dshPartnerIntakeItems } from '../control-panel/partners/dsh/workflow';
@@ -123,17 +125,26 @@ const publishedProductIds = new Set(
     .map((item) => item.id),
 );
 
-const publishedHomePromos = dshHomeGetFixturePromos.filter((promo) => {
-  if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
-    return promo.actionTarget ? publishedPromoCategoryIds.has(promo.actionTarget) : false;
+function resolvePublishedHomePromos() {
+  const applyPublishingRules = (promos: DshHomeGetPromo[]) => promos.filter((promo) => {
+    if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
+      return promo.actionTarget ? publishedPromoCategoryIds.has(promo.actionTarget) : false;
+    }
+
+    if (promo.actionType === 'product') {
+      return promo.actionTarget ? publishedProductIds.has(promo.actionTarget) : false;
+    }
+
+    return true;
+  });
+
+  const marketingPromos = applyPublishingRules(getPublishedMarketingHomePromos('all') as DshHomeGetPromo[]);
+  if (marketingPromos.length > 0) {
+    return marketingPromos;
   }
 
-  if (promo.actionType === 'product') {
-    return promo.actionTarget ? publishedProductIds.has(promo.actionTarget) : false;
-  }
-
-  return true;
-});
+  return applyPublishingRules(dshHomeGetFixturePromos as DshHomeGetPromo[]);
+}
 
 const initialCreateOrderValues: CreateOrderValues = {
   pickupAddress: 'Riyadh Park, Gate 2',
@@ -710,6 +721,11 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     [activeStoreItems, selectedItemId],
   );
 
+  const liveMarketingPrograms = getLiveMarketingGrowthItems('client');
+  const subscriptionMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'subscription');
+  const promoMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'promotion');
+  const campaignMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'campaign');
+
   if (route === 'entry') {
     return (
       <DshEntryScreen
@@ -724,13 +740,38 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   if (route === 'my-space') {
     return (
       <DshMySpaceScreen
-        onOpenBenefits={() => setRoute('benefits')}
-        onOpenSubscriptions={() => setRoute('benefits')}
-        onOpenPreferences={() => setRoute('service-settings')}
+        subscriptionLabel={subscriptionMarketingProgram ? `${subscriptionMarketingProgram.title} · ${subscriptionMarketingProgram.highlight}` : undefined}
+        offersLabel={campaignMarketingProgram ? `${campaignMarketingProgram.title} · ${campaignMarketingProgram.highlight}` : undefined}
+        discountsLabel={promoMarketingProgram ? `${promoMarketingProgram.title} · ${promoMarketingProgram.routeTarget}` : undefined}
+        marketingPrograms={liveMarketingPrograms.map((item) => ({
+          id: item.id,
+          title: item.title,
+          subtitle: item.subtitle,
+          meta: item.routeTarget,
+          badgeLabel: item.family === 'subscription' ? 'اشتراك' : item.family === 'promotion' ? 'برومو' : item.family === 'shorts' ? 'شورتات' : 'حملة',
+        }))}
+        onOpenBenefits={() => {
+          setSelectedSupportScreen('entitlements-get');
+          setRoute('benefits');
+        }}
+        onOpenSubscriptions={() => {
+          setSelectedSupportScreen('subscription-family-get');
+          setRoute('benefits');
+        }}
+        onOpenPreferences={() => {
+          setSelectedSupportScreen('service-modes-resolve');
+          setRoute('service-settings');
+        }}
         onOpenOffers={() => setRoute('stores-list')}
-        onOpenDiscounts={() => setRoute('categories-list')}
+        onOpenDiscounts={() => {
+          setSelectedSupportScreen('promo-apply');
+          setRoute('checkout-workspace');
+        }}
         onOpenOrders={() => setRoute('orders-list')}
-        onChangeAddress={() => setRoute('service-settings')}
+        onChangeAddress={() => {
+          setSelectedSupportScreen('zone-set');
+          setRoute('service-settings');
+        }}
         onBack={() => setRoute('home')}
         onRetry={() => setRoute('my-space')}
       />
@@ -753,6 +794,44 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     return (
       <DshStoresListScreen
         items={dshDiscoveryStores}
+        banners={resolvePublishedHomePromos().map((promo) => ({
+          id: promo.id,
+          title: promo.title,
+          subtitle: promo.subtitle,
+          imageUrl: promo.imageUrl,
+          accentColor: promo.accentColor,
+          onPress: () => {
+            recordMarketingBannerClick(promo.id);
+
+            if (promo.actionType === 'store' && promo.actionTarget) {
+              setActiveStoreId(promo.actionTarget);
+              setRoute('store-get');
+              return;
+            }
+
+            if (promo.actionType === 'subscription' || promo.actionTarget === 'subscription-family-get') {
+              setSelectedSupportScreen('subscription-family-get');
+              setRoute('benefits');
+              return;
+            }
+
+            if (promo.actionTarget === 'promo-apply') {
+              setSelectedSupportScreen('promo-apply');
+              setRoute('checkout-workspace');
+              return;
+            }
+
+            if (promo.actionTarget === 'entitlements-get') {
+              setSelectedSupportScreen('entitlements-get');
+              setRoute('benefits');
+              return;
+            }
+
+            if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
+              setRoute('categories-list');
+            }
+          },
+        }))}
         query={storesQuery}
         activeFilter={storesFilter}
         onQueryChange={setStoresQuery}
@@ -1249,7 +1328,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   return (
     <DshHomeGetScreen
       categories={dshCategoryListFixtures}
-      promos={publishedHomePromos as DshHomeGetPromo[]}
+      promos={resolvePublishedHomePromos() as DshHomeGetPromo[]}
       stores={dshHomeGetFixtureStores as DshHomeGetStore[]}
       recentOrders={[
         {
@@ -1302,7 +1381,10 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
         setSelectedItemId(itemId);
         setRoute('cart-get');
       }}
-      onOpenBenefits={() => setRoute('benefits')}
+      onOpenBenefits={() => {
+        setSelectedSupportScreen('entitlements-get');
+        setRoute('benefits');
+      }}
       onOpenFavorites={() => setRoute('favorites-list')}
       onOpenSearch={() => setRoute('search')}
       onOpenOrders={() => setRoute('orders-list')}

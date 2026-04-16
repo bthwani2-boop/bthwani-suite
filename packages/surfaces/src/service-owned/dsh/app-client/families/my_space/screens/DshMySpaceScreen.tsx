@@ -20,6 +20,7 @@ export type DshMySpaceScreenProps = {
   ordersLabel?: string;
   offersLabel?: string;
   discountsLabel?: string;
+  marketingPrograms?: DshMySpaceItem[];
   onOpenBenefits?: () => void;
   onOpenSubscriptions?: () => void;
   onOpenPreferences?: () => void;
@@ -106,7 +107,7 @@ function renderTabChips(activeTab: MySpaceTab, setActiveTab: (tab: MySpaceTab) =
   );
 }
 
-function renderLoyaltyTab(name: string, onOpenBenefits?: () => void, onOpenSubscriptions?: () => void) {
+function renderLoyaltyTab(name: string, onOpenBenefits?: () => void, onOpenSubscriptions?: () => void, onOpenOffers?: () => void) {
   return (
     <BthSurface tone="brand" padding={4} gap={3}>
       <BthBox gap={1} style={{ alignItems: 'flex-end' }}>
@@ -174,7 +175,14 @@ function renderPreferencesTab(preferenceLabel: string, onOpenPreferences?: () =>
   );
 }
 
-function renderOffersTab(offersLabel: string, discountsLabel: string, onOpenOffers?: () => void, onOpenDiscounts?: () => void) {
+function renderOffersTab(
+  offersLabel: string,
+  discountsLabel: string,
+  marketingPrograms: DshMySpaceItem[] = [],
+  onOpenOffers?: () => void,
+  onOpenDiscounts?: () => void,
+  onOpenSubscriptions?: () => void,
+) {
   return (
     <BthBox gap={3}>
       <BthSurface tone="raised" padding={4} gap={3}>
@@ -183,7 +191,17 @@ function renderOffersTab(offersLabel: string, discountsLabel: string, onOpenOffe
         <BthListItem title="الخصومات النشطة" subtitle={discountsLabel} meta="Discount lane" badgeLabel="Deal" onPress={onOpenDiscounts} />
       </BthSurface>
       <BthSurface tone="inset" padding={4} gap={3}>
-        <BthSectionHeader title="العرض الأقرب" subtitle="عرض DSH المخصص للحظتك الحالية" />
+        <BthSectionHeader title="ما يديره التسويق الآن" subtitle="هذه العناصر مرتبطة مباشرة بملكية التسويق داخل لوحة التحكم" />
+        {marketingPrograms.length ? marketingPrograms.map((item) => (
+          <BthListItem
+            key={item.id}
+            title={item.title}
+            subtitle={item.subtitle}
+            meta={item.meta}
+            badgeLabel={item.badgeLabel}
+            onPress={item.id.includes('subscription') ? onOpenSubscriptions ?? onOpenOffers : item.id.includes('promo') ? onOpenDiscounts ?? onOpenOffers : onOpenOffers}
+          />
+        )) : null}
         <BthButton label="فتح العروض" tone="secondary" onPress={onOpenOffers} />
       </BthSurface>
     </BthBox>
@@ -220,6 +238,7 @@ export function DshMySpaceScreen({
   ordersLabel = 'يفتح orders-list أو tracking بحسب الحالة الحقيقية',
   offersLabel = 'يفتح stores-list أو categories-list كمسارات عرض فعلية',
   discountsLabel = 'يفتح checkout و promo-apply عبر المسار الفعلي',
+  marketingPrograms = [],
   onOpenBenefits,
   onOpenSubscriptions,
   onOpenPreferences,
@@ -249,10 +268,10 @@ export function DshMySpaceScreen({
         {renderTabChips(activeTab, setActiveTab)}
       </BthSurface>
 
-      {activeTab === 'loyalty' ? renderLoyaltyTab(name, onOpenBenefits, onOpenSubscriptions) : null}
+      {activeTab === 'loyalty' ? renderLoyaltyTab(name, onOpenBenefits, onOpenSubscriptions, onOpenOffers) : null}
       {activeTab === 'subscriptions' ? renderSubscriptionsTab(subscriptionLabel, onOpenSubscriptions) : null}
       {activeTab === 'preferences' ? renderPreferencesTab(preferenceLabel, onOpenPreferences) : null}
-      {activeTab === 'offers' ? renderOffersTab(offersLabel, discountsLabel, onOpenOffers, onOpenDiscounts) : null}
+      {activeTab === 'offers' ? renderOffersTab(offersLabel, discountsLabel, marketingPrograms, onOpenOffers, onOpenDiscounts, onOpenSubscriptions) : null}
       {activeTab === 'orders' ? renderOrdersTab(ordersLabel, onOpenOrders) : null}
       {activeTab === 'address' ? renderAddressTab(addressLabel, onChangeAddress) : null}
     </BthMobileScrollView>

@@ -250,7 +250,7 @@ export function ControlPanelDshSheinProxyRequestScreen({
         />
 
         <BthBox layoutDirection='row' gap={2}>
-          <BthWebSignalCard title='Families' value='3' description='SHEIN, Awnak, and generic presets.' tone='brand' />
+          <BthWebSignalCard title='Families' value='3' description='SHEIN, Awnak, and generic presets.' tone='neutral' />
           <BthWebSignalCard title='Customers' value={customerCount || '1'} description='Customer count in this batch.' tone='best' />
           <BthWebSignalCard title='Captains' value={captainCount || '1'} description='Captain allocation for the route.' />
           <BthWebSignalCard title='Step' value={stageMeta.label} description={stageMeta.description} />

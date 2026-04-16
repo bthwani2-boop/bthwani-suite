@@ -13,6 +13,7 @@ import {
 } from '@bthwani/ui-kit';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { HomeBannerCarousel, type HomeBannerCarouselItem } from '../../home/components/HomeBannerCarousel';
 import { StoreCardPremium, type DshStoreCompactCardData } from '../../home/components/StoreCardPremium';
 
 export type DshStoreListItem = {
@@ -44,6 +45,7 @@ export type DshStoreListItem = {
 export type DshStoresListScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error';
   items: DshStoreListItem[];
+  banners?: HomeBannerCarouselItem[];
   query?: string;
   activeFilter?: 'all' | 'nearest' | 'offers' | 'favorites';
   onQueryChange?: (query: string) => void;
@@ -82,6 +84,7 @@ function renderNonReadyState(state: 'loading' | 'empty' | 'error', onRetry?: () 
 export function DshStoresListScreen({
   state = 'ready',
   items,
+  banners = [],
   query = '',
   activeFilter = 'all',
   onQueryChange,
@@ -208,6 +211,12 @@ export function DshStoresListScreen({
         </View>
       </View>
 
+      {banners.length > 0 ? (
+        <View style={styles.bannerViewport}>
+          <HomeBannerCarousel banners={banners} height={154} />
+        </View>
+      ) : null}
+
       {bannerSearchVisible ? (
         <BthSurface tone="inset" gap={3}>
           <BthSearchField
@@ -277,6 +286,9 @@ export function DshStoresListScreen({
 const styles = StyleSheet.create({
   rowReverse: {
     flexDirection: 'row-reverse',
+  },
+  bannerViewport: {
+    marginTop: -2,
   },
   discoveryHeaderCard: {
     backgroundColor: '#ff6a00',

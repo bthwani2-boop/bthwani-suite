@@ -299,7 +299,15 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
 
       {workspace === 'orders' ? <ControlPanelDshOrdersScreen embedded showHeader={false} hubHref="/operations" operationsHref="/operations" /> : null}
       {workspace === 'order-detail' && orderId ? <ControlPanelDshOrderDetailScreen embedded showHeader={false} orderId={orderId} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
-      {workspace === 'sheinproxy' ? <ControlPanelDshManualAssignmentScreen hubHref="/operations" operationsHref="/operations" supportHref="/support" /> : null}
+      {workspace === 'sheinproxy' ? (
+        <ControlPanelDshManualAssignmentScreen
+          requestId={orderId ?? 'shein-proxy-001'}
+          stage="detail"
+          hubHref="/operations"
+          operationsHref="/operations"
+          supportHref="/support"
+        />
+      ) : null}
       {workspace === 'reassign' ? <ControlPanelDshReassignScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
       {workspace === 'peak-mode' ? <ControlPanelDshPeakModeScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
       {workspace === 'arrival-bell' ? <ControlPanelDshArrivalBellScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}

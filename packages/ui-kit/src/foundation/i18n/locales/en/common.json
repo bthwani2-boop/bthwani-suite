@@ -66,6 +66,7 @@
       "openOperations": "Open operations",
       "openDashboard": "Open overview"
     },
+    "openSheinProxy": "Open SHEIN proxy",
     "descriptions": {
       "default": "Understand the state in seconds, and start with the best recommended action in the same spirit as other MCPW panels.",
       "fallback": "Centralized control interface.",
@@ -118,7 +119,8 @@
       "railNavigationLabel": "Control panel sections",
       "primaryAction": "Urgent Processing (1)",
       "secondaryAction": "Open Operations",
-      "secondaryActionDefault": "Control Panel"
+      "secondaryActionDefault": "Control Panel",
+      "openSheinProxy": "Open SHEIN proxy"
     },
     "filters": {
       "allServices": "All",
