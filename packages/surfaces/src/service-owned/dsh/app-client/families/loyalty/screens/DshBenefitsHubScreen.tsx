@@ -78,21 +78,21 @@ export function DshBenefitsHubScreen({
         <BthBox gap={3}>
           <BthSurface tone="brand" gap={3}>
             <BthStatCard
-              label={subscriptionMode ? 'Active tier' : 'Available balance'}
-              value={subscriptionMode ? 'Pro Plus' : '2,840 pts'}
+              label="Screen"
+              value={definition.title}
               deltaLabel={definition.stageLabel}
               tone="info"
             />
             <BthStatCard
-              label={subscriptionMode ? 'Renewal' : 'Redeemable value'}
-              value={subscriptionMode ? '26 Apr' : '18 SAR'}
-              deltaLabel={subscriptionMode ? 'Auto-sync enabled' : 'Visible before checkout'}
+              label="Mode"
+              value={benefitMode}
+              deltaLabel={subscriptionMode ? 'Subscription routes' : 'Loyalty routes'}
               tone="success"
             />
             <BthStatCard
-              label={subscriptionMode ? 'Coupon lane' : 'Coupon state'}
-              value={subscriptionMode ? 'Promo-ready' : 'Redeem-ready'}
-              deltaLabel={subscriptionMode ? 'Keep plan offers visible' : 'Promos stay in checkout'}
+              label="Live lanes"
+              value={String(surfaceItems.length)}
+              deltaLabel="Actual route-backed items"
               tone="warning"
             />
           </BthSurface>
@@ -103,10 +103,11 @@ export function DshBenefitsHubScreen({
                 { label: 'Surface', value: definition.title },
                 { label: 'Stage', value: definition.stageLabel },
                 {
-                  label: subscriptionMode ? 'Current plan' : 'Customer value',
-                  value: subscriptionMode ? 'Priority delivery, family sharing, boosted points' : 'Redeem, inspect balance, and review history',
+                  label: 'Family',
+                  value: subscriptionMode ? 'subscription' : 'loyalty',
                   tone: 'brand',
                 },
+                { label: 'Route count', value: String(surfaceKeyValues.length) },
                 ...surfaceKeyValues,
               ]}
             />

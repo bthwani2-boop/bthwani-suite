@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { BthButton, BthDashboardShell, BthKeyValueList, BthSurface, BthText, spacing } from '@bthwani/ui-kit';
+import { BthBadge, BthButton, BthSurface, BthText, spacing, useTheme } from '@bthwani/ui-kit';
 
 export type ClientEntrySurfaceProps = {
   appName?: string;
@@ -8,6 +8,7 @@ export type ClientEntrySurfaceProps = {
   primaryServiceLabel?: string;
   secondaryServiceLabel?: string;
   onEnterApp?: () => void;
+  onOpenLogin?: () => void;
   onOpenAccount?: () => void;
   onOpenNotifications?: () => void;
   onOpenSupport?: () => void;
@@ -16,49 +17,65 @@ export type ClientEntrySurfaceProps = {
 export function ClientEntrySurface({
   appName = 'بوابة التطبيق',
   userLabel = 'المستخدم العام',
-  primaryServiceLabel = 'الخدمة الأولى',
-  secondaryServiceLabel = 'الخدمة الثانية',
+  primaryServiceLabel = 'دخول أنيق وسريع',
+  secondaryServiceLabel = 'حساب موحد وتجربة مشتركة',
   onEnterApp,
+  onOpenLogin,
   onOpenAccount,
   onOpenNotifications,
   onOpenSupport,
 }: ClientEntrySurfaceProps) {
+  const loginAction = onOpenLogin ?? onOpenAccount;
+  const { theme } = useTheme();
+
   return (
-    <BthDashboardShell
-      title={appName}
-      subtitle="نقطة دخول عامة للحساب والتجربة المشتركة بين الخدمات"
-      hero={
-        <BthSurface tone="brand" padding={5} gap={3}>
-          <BthText role="titleSm" tone="inverse">مرحبًا {userLabel}</BthText>
-          <BthText role="bodyMd" tone="inverse">
-            هذا السطح يجمع الدخول العام ويوجهك إلى الحساب أو الإشعارات أو الدعم دون أي خصوصية خدمية.
+    <View style={{ flex: 1, paddingHorizontal: spacing[5], paddingVertical: spacing[6], justifyContent: 'space-between', backgroundColor: theme.background }}>
+      <View style={{ gap: spacing[5], marginTop: spacing[6] }}>
+        <BthBadge label={`2026 · ${appName}`} tone="brand" />
+
+        <View style={{ gap: spacing[2] }}>
+          <BthText role="titleLg" style={{ fontSize: 42, lineHeight: 52 }}>
+            دخول أنيق يبدأ من هنا
           </BthText>
-          <View style={{ gap: spacing[3] }}>
-            <BthKeyValueList
-              items={[
-                { label: 'المسار الأول', value: primaryServiceLabel },
-                { label: 'المسار الثاني', value: secondaryServiceLabel },
-              ]}
-              dividers={false}
-            />
-          </View>
-        </BthSurface>
-      }
-      sections={[
-        {
-          title: 'الاختصارات العامة',
-          subtitle: 'تنقل إلى أقسام عامة لا تعتمد على خدمة بعينها',
-          content: (
-            <View style={{ gap: spacing[3] }}>
-              <BthButton label="الدخول إلى التطبيق" onPress={onEnterApp} />
-              <BthButton label="الحساب العام" onPress={onOpenAccount} tone="secondary" />
-              <BthButton label="الإشعارات" onPress={onOpenNotifications} tone="secondary" />
-              <BthButton label="الدعم" onPress={onOpenSupport} tone="ghost" fullWidth={false} />
-            </View>
-          ),
-        },
-      ]}
-    />
+          <BthText role="titleSm" tone="muted" style={{ lineHeight: 34 }}>
+            تجربة أولى هادئة ومصقولة تقودك مباشرة إلى الحساب، الإعدادات، والمسارات العامة دون أي ضوضاء.
+          </BthText>
+        </View>
+
+        <View style={{ gap: spacing[1] }}>
+          <BthText role="bodyStrong">{primaryServiceLabel}</BthText>
+          <BthText role="bodySm" tone="muted">{secondaryServiceLabel}</BthText>
+        </View>
+      </View>
+
+      <BthSurface
+        tone="default"
+        padding={5}
+        gap={4}
+        border={false}
+        style={{
+          borderRadius: 32,
+          backgroundColor: '#151823',
+          shadowColor: '#000000',
+          shadowOpacity: 0.18,
+          shadowRadius: 24,
+          shadowOffset: { width: 0, height: 10 },
+          elevation: 8,
+        }}
+      >
+        <View style={{ gap: spacing[2] }}>
+          <BthText role="titleSm" tone="inverse">جاهز للدخول</BthText>
+          <BthText role="bodyMd" tone="inverse" style={{ opacity: 0.92 }}>
+            شاشة افتتاحية أنظف، قرار أوضح، وبداية تليق بالمنتج.
+          </BthText>
+        </View>
+
+        <View style={{ gap: spacing[2] }}>
+          <BthButton label="تسجيل الدخول" onPress={loginAction} size="lg" />
+          <BthButton label="استكشف بدون تسجيل" onPress={onEnterApp} tone="secondary" size="md" />
+        </View>
+      </BthSurface>
+    </View>
   );
 }
 

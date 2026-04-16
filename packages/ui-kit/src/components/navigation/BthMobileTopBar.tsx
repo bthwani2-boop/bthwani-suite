@@ -37,10 +37,11 @@ function IconButton({ icon, label, badgeCount, onPress }: IconButtonProps) {
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
+      hitSlop={10}
       style={({ pressed }) => ({
-        width: 30,
-        height: 30,
-        borderRadius: 15,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: pressed ? theme.overlaySoft : 'transparent',

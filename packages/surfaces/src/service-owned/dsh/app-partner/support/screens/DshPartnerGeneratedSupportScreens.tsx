@@ -61,14 +61,14 @@ type SupportListItem = {
   subtitle: string;
   meta: string;
     keyValues: [
-      { label: 'Points preview', value: '2,840 pts' },
-      { label: 'Coupon lane', value: 'Visible in checkout' },
+      { label: 'Points balance route', value: 'loyalty-points-user-balance' },
+      { label: 'Coupon lane', value: 'promo-apply' },
       { label: 'Entitlement sync', value: 'subscription-sync' },
     ],
     listItems: [
-      { title: 'Family members', subtitle: 'Member changes stay attached to the active subscription state.', meta: 'Family', badgeLabel: 'Share' },
-      { title: 'Coupon visibility', subtitle: 'Discount readiness remains visible while the branch reviews the plan.', meta: 'Promo', badgeLabel: 'Ready' },
-      { title: 'Points multiplier', subtitle: 'Keep the commercial earning rules readable before the next action.', meta: 'Loyalty', badgeLabel: 'x2/x3' },
+      { title: 'Family members', subtitle: 'Member changes stay attached to the live subscription routes.', meta: 'Family', badgeLabel: 'Route' },
+      { title: 'Coupon visibility', subtitle: 'Discount readiness stays tied to the live checkout lane.', meta: 'Promo', badgeLabel: 'Route' },
+      { title: 'Entitlements', subtitle: 'Keep the commercial visibility linked to the entitlement route.', meta: 'Loyalty', badgeLabel: 'Route' },
     ],
   badgeLabel?: string;
 };

@@ -22,7 +22,7 @@ export function DshCheckoutHubScreen({
   onRetry,
 }: DshCheckoutHubScreenProps) {
   const definition = clientSupportDefinitions[screenId as ClientSupportScreenId];
-  const [promoCode, setPromoCode] = React.useState('BTH20');
+  const [promoCode, setPromoCode] = React.useState('');
 
   return (
     <DshOperationScreen
@@ -39,17 +39,17 @@ export function DshCheckoutHubScreen({
       content={
         <BthBox gap={3}>
           <BthSurface tone="brand" gap={3}>
-            <BthStatCard label="Estimated total" value="78 SAR" deltaLabel={definition.stageLabel} tone="info" />
-            <BthStatCard label="ETA confidence" value="25 min" deltaLabel="Stable before submit" tone="success" />
-            <BthStatCard label="Points earn" value="+184 pts" deltaLabel="Visible before checkout" tone="warning" />
+            <BthStatCard label="Checkout route" value={screenId} deltaLabel={definition.stageLabel} tone="info" />
+            <BthStatCard label="Promo lane" value={screenId === 'promo-apply' ? 'Open' : 'Read only'} deltaLabel="Live pricing flow" tone="success" />
+            <BthStatCard label="Live items" value={String(loyaltyCheckoutItems.length)} deltaLabel="Route-backed checkpoints" tone="warning" />
           </BthSurface>
 
           <BthSurface tone="raised" gap={3}>
             <BthKeyValueList
               items={[
-                { label: 'Items subtotal', value: '56 SAR' },
-                { label: 'Delivery fee', value: '22 SAR' },
-                { label: 'Applied discount', value: screenId === 'promo-apply' ? '12 SAR' : '0 SAR', tone: 'brand' },
+                { label: 'Items subtotal lane', value: 'pricing-preview' },
+                { label: 'Delivery fee lane', value: 'delivery-eta-get' },
+                { label: 'Applied discount lane', value: screenId === 'promo-apply' ? 'promo-apply' : 'checkout-gate', tone: 'brand' },
                 ...loyaltyCheckoutKeyValues,
               ]}
             />
@@ -66,8 +66,8 @@ export function DshCheckoutHubScreen({
 
           <BthSurface tone="raised" gap={2}>
             {[...loyaltyCheckoutItems,
-              { title: 'Checkout gate', subtitle: 'Keep final blockers visible before submit.', meta: 'Gate', badgeLabel: 'Ready' },
-              { title: 'Estimate snapshot', subtitle: 'Read pricing confidence before commit.', meta: 'Estimate', badgeLabel: 'Cost' },
+              { title: 'Checkout gate', subtitle: 'Open the real checkout gate before submit.', meta: 'Gate', badgeLabel: 'Route' },
+              { title: 'Estimate snapshot', subtitle: 'Open the real estimate route before commit.', meta: 'Estimate', badgeLabel: 'Route' },
             ].map((item) => (
               <BthListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
             ))}

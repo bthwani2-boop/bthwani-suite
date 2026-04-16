@@ -35,18 +35,18 @@ export function ClientAccountSurface({
 }: ClientAccountSurfaceProps) {
   return (
     <BthFormScreenShell
-      title="الحساب العام"
-      subtitle="تفضيلات وهوية مشتركة بين كل الخدمات"
+      title="الهوية العامة"
+      subtitle="ملف وهوية وتفضيلات مشتركة للتطبيق كله"
       submitLabel="تحديث الحساب"
       onSubmit={onEditProfile}
       submitDisabled={!onEditProfile}
     >
-      <BthSurface tone="raised" padding={4} gap={3}>
-        <BthText role="titleSm">بيانات أساسية</BthText>
+      <BthSurface tone="brand" padding={4} gap={3}>
+        <BthText role="titleSm" tone="inverse">ملخص الهوية</BthText>
         <BthKeyValueList
           items={[
             { label: 'الاسم', value: snapshot.displayName },
-            { label: 'الهاتف', value: snapshot.phoneLabel },
+            { label: 'وسيلة الاتصال', value: snapshot.phoneLabel },
             { label: 'البريد', value: snapshot.emailLabel },
             { label: 'اللغة', value: snapshot.languageLabel },
             { label: 'الحماية', value: snapshot.securityLabel },
@@ -55,34 +55,34 @@ export function ClientAccountSurface({
       </BthSurface>
 
       <BthSurface tone="raised" padding={4} gap={3}>
-        <BthText role="titleSm">إجراءات الحساب</BthText>
+        <BthText role="titleSm">إجراءات عامة</BthText>
         <View style={{ gap: spacing[3] }}>
-          <BthListItem title="تعديل الملف الشخصي" subtitle="الاسم والصورة والعرض العام" meta="عام" onPress={onEditProfile} />
-          <BthListItem title="رقم الهاتف" subtitle="معلومات التواصل المشتركة" meta={snapshot.phoneLabel} onPress={onEditPhone} />
-          <BthListItem title="اللغة" subtitle="لغة الواجهة العامة" meta={snapshot.languageLabel} onPress={onEditLanguage} />
-          <BthListItem title="الأمان" subtitle="قفل أو تحقق إضافي عام" meta={snapshot.securityLabel} onPress={onEditSecurity} />
+          <BthListItem title="تعديل الملف الشخصي" subtitle="الاسم والصورة والعرض العام" meta="عام" badgeLabel="عام" onPress={onEditProfile} />
+          <BthListItem title="وسيلة الاتصال" subtitle="معلومات تواصل مشتركة" meta={snapshot.phoneLabel} badgeLabel="عام" onPress={onEditPhone} />
+          <BthListItem title="اللغة" subtitle="لغة الواجهة العامة" meta={snapshot.languageLabel} badgeLabel="عام" onPress={onEditLanguage} />
+          <BthListItem title="الأمان" subtitle="قفل أو تحقق إضافي عام" meta={snapshot.securityLabel} badgeLabel="عام" onPress={onEditSecurity} />
         </View>
       </BthSurface>
 
       <BthSurface tone="inset" padding={4} gap={3}>
-        <BthText role="titleSm">مفاتيح مرتبطة بالحساب</BthText>
+        <BthText role="titleSm">مفاتيح تشغيل عامة</BthText>
         <View style={{ gap: spacing[3] }}>
           <BthSwitch
-            label="إشعارات الحساب"
-            description="تفعيل التنبيهات العامة المرتبطة بالحساب"
+            label="إشعارات عامة"
+            description="تفعيل التنبيهات المشتركة على مستوى التطبيق"
             value={notificationsEnabled}
             onValueChange={onToggleNotifications}
           />
           <BthSwitch
-            label="ملف مضغوط"
-            description="عرض الحساب بكثافة أقل"
+            label="عرض مضغوط"
+            description="تقليل الكثافة في العرض العام"
             value={compactProfileEnabled}
             onValueChange={onToggleCompactProfile}
           />
         </View>
       </BthSurface>
 
-      <BthButton label="إدارة الحساب" onPress={onEditProfile} disabled={!onEditProfile} />
+      <BthButton label="إدارة الهوية العامة" onPress={onEditProfile} disabled={!onEditProfile} />
     </BthFormScreenShell>
   );
 }

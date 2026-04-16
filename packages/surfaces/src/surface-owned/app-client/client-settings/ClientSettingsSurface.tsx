@@ -70,14 +70,14 @@ export function ClientSettingsSurface({
 }: ClientSettingsSurfaceProps) {
   return (
     <BthFormScreenShell
-      title="إعدادات التطبيق"
-      subtitle="هذه الصفحة مخصصة للتفضيلات العامة المشتركة بين كل الخدمات"
+      title="التفضيلات العامة"
+      subtitle="هذه الصفحة مخصصة للتفضيلات المشتركة في التطبيق كله"
       submitLabel="إعادة الضبط"
       onSubmit={onResetPreferences}
       submitDisabled={!onResetPreferences}
     >
-      <BthSurface tone="raised" padding={4} gap={3}>
-        <BthText role="titleSm">ملخص سريع</BthText>
+      <BthSurface tone="brand" padding={4} gap={3}>
+        <BthText role="titleSm" tone="inverse">ملخص سريع</BthText>
         <BthKeyValueList
           items={[
             { label: 'اللغة الحالية', value: snapshot.languageLabel },
@@ -123,7 +123,7 @@ export function ClientSettingsSurface({
       </BthSurface>
 
       <BthSurface tone="raised" padding={4} gap={3}>
-        <BthText role="titleSm">مفاتيح تشغيل</BthText>
+        <BthText role="titleSm">مفاتيح تشغيل عامة</BthText>
         <View style={{ gap: spacing[3] }}>
           <BthSwitch
             label="الإشعارات العامة"
@@ -153,9 +153,9 @@ export function ClientSettingsSurface({
       </BthSurface>
 
       <BthSurface tone="inset" padding={4} gap={2}>
-        <BthText role="titleSm">نطاق هذا السطح</BthText>
+        <BthText role="titleSm">نطاق السطح</BthText>
         <BthText role="bodySm" tone="muted">
-          هذه الإعدادات عامة ومشتركة بين الخدمات. أي إعداد خاص بخدمة بعينها يجب أن يبقى داخل service-owned فقط.
+          هذه الإعدادات عامة ومشتركة بين كل أجزاء التطبيق. أي إعداد محلي لجزء محدد يجب أن يبقى في مساره الخاص.
         </BthText>
         <View style={{ gap: spacing[2], marginTop: spacing[2] }}>
           {settingsSummary.map((item) => (
@@ -163,7 +163,7 @@ export function ClientSettingsSurface({
               key={item.label}
               title={item.label}
               subtitle={item.helperText}
-              badgeLabel="surface-owned"
+              badgeLabel="عام"
             />
           ))}
         </View>

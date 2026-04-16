@@ -14,7 +14,7 @@ import {
   useDirection,
   useUiText,
 } from '@bthwani/ui-kit';
-import { amn, arb, dsh, esf, knz, kwd, mrf, snd, wlt } from '@bthwani/surfaces';
+import { amn, arb, appClientSurfaceOwned, dsh, esf, knz, kwd, mrf, snd, wlt } from '@bthwani/surfaces';
 import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
 
 const { AmnEntryScreen } = amn.amnAppClient;
@@ -26,10 +26,24 @@ const { MrfEntryScreen } = mrf.mrfAppClient;
 const { SndEntryScreen } = snd.sndAppClient;
 const { WltEntryScreen } = wlt.wltAppClient;
 const { DshSurfaceHost } = dsh.dshAppClient;
+const { ClientEntrySurface } = appClientSurfaceOwned.ClientEntry;
+const { ClientLoginSurface } = appClientSurfaceOwned.ClientLogin;
+const { ClientSearchSurface } = appClientSurfaceOwned.ClientSearch;
+const { ClientAccountSurface } = appClientSurfaceOwned.ClientAccount;
+const { ClientNotificationsSurface } = appClientSurfaceOwned.ClientNotifications;
+const { ClientSupportSurface } = appClientSurfaceOwned.ClientSupport;
+const { ClientSettingsSurface } = appClientSurfaceOwned.ClientSettings;
 type DshCommandTarget = React.ComponentProps<typeof DshSurfaceHost>['command']['target'];
 
 type ClientRoute =
+  | 'entry'
+  | 'login'
+  | 'search'
   | 'home'
+  | 'account'
+  | 'notifications'
+  | 'support'
+  | 'settings'
   | 'dsh'
   | 'amn-entry'
   | 'arb-entry'
@@ -50,9 +64,34 @@ type ServiceEntry = {
 };
 
 export function ClientSurfaceHost() {
-  const [route, setRoute] = React.useState<ClientRoute>('home');
+  const [route, setRoute] = React.useState<ClientRoute>('entry');
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
   const [accountSheetTab, setAccountSheetTab] = React.useState<AccountSheetTab>('menu');
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [isDeveloperMode, setIsDeveloperMode] = React.useState(false);
+  const [loginIdentity, setLoginIdentity] = React.useState('');
+  const [loginVerificationCode, setLoginVerificationCode] = React.useState('');
+  const [globalSearchQuery, setGlobalSearchQuery] = React.useState('');
+  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+  const [compactProfileEnabled, setCompactProfileEnabled] = React.useState(false);
+  const [privacyModeEnabled, setPrivacyModeEnabled] = React.useState(false);
+  const [accessibilityModeEnabled, setAccessibilityModeEnabled] = React.useState(false);
+  const [notificationItems, setNotificationItems] = React.useState([
+    {
+      id: 'notif-1',
+      title: 'تحديث عام',
+      subtitle: 'تم تجهيز التطبيق للدخول الأولي والانتقال بين الأقسام العامة.',
+      meta: 'الآن',
+      badgeLabel: 'جديد',
+    },
+    {
+      id: 'notif-2',
+      title: 'تنبيه الحساب',
+      subtitle: 'يمكنك مراجعة الهوية العامة والإعدادات من نفس المسار.',
+      meta: 'اليوم',
+      badgeLabel: 'عام',
+    },
+  ]);
   const [dshCommand, setDshCommand] = React.useState<{ token: number; target: DshCommandTarget }>({
     token: 0,
     target: 'home',
@@ -81,12 +120,17 @@ export function ClientSurfaceHost() {
         return false;
       }
 
-      if (route !== 'home') {
-        setRoute('home');
+      if (route === 'entry' || route === 'home') {
+        BackHandler.exitApp();
         return true;
       }
 
-      BackHandler.exitApp();
+      if (route === 'login') {
+        setRoute('entry');
+        return true;
+      }
+
+      setRoute('home');
       return true;
     });
 
@@ -107,6 +151,61 @@ export function ClientSurfaceHost() {
     ],
     [uiText],
   );
+
+  const globalSearchResults = React.useMemo(() => {
+    const searchEntries = [
+      ...serviceEntries.map((service) => ({
+        id: `service-${service.id}`,
+        title: service.title,
+        subtitle: 'خدمة عامة متاحة من الصفحة الرئيسية',
+        badgeLabel: 'خدمة',
+        keywords: service.title,
+        onPress: () => setRoute(service.route),
+      })),
+      {
+        id: 'global-account',
+        title: 'الحساب',
+        subtitle: 'الوصول إلى الهوية العامة وخيارات الحساب',
+        badgeLabel: 'عام',
+        keywords: 'الحساب الهوية profile account',
+        onPress: () => setRoute(isAuthenticated ? 'account' : 'login'),
+      },
+      {
+        id: 'global-notifications',
+        title: 'الإشعارات',
+        subtitle: 'عرض التنبيهات العامة والتنقل إلى صندوق الإشعارات',
+        badgeLabel: 'عام',
+        keywords: 'الإشعارات التنبيهات notifications',
+        onPress: () => setRoute('notifications'),
+      },
+      {
+        id: 'global-settings',
+        title: 'الإعدادات',
+        subtitle: 'تفضيلات اللغة والخصوصية والوضع المختصر',
+        badgeLabel: 'عام',
+        keywords: 'الإعدادات اللغة الخصوصية settings',
+        onPress: () => setRoute('settings'),
+      },
+      {
+        id: 'global-support',
+        title: 'الدعم',
+        subtitle: 'أسئلة شائعة ومسار التواصل العام',
+        badgeLabel: 'عام',
+        keywords: 'الدعم المساعدة support help',
+        onPress: () => setRoute('support'),
+      },
+    ];
+
+    const query = globalSearchQuery.trim().toLowerCase();
+    if (!query) {
+      return searchEntries;
+    }
+
+    return searchEntries.filter((entry) => {
+      const haystack = `${entry.title} ${entry.subtitle} ${entry.keywords}`.toLowerCase();
+      return haystack.includes(query);
+    });
+  }, [globalSearchQuery, isAuthenticated, serviceEntries]);
 
   const openDsh = React.useCallback((target: DshCommandTarget) => {
     setDshCommand((current) => ({ token: current.token + 1, target }));
@@ -132,21 +231,15 @@ export function ClientSurfaceHost() {
           {
             id: 'notifications',
             iconName: 'notifications-outline',
-            badgeCount: 5,
+            badgeCount: notificationItems.length,
             accessibilityLabel: uiText.accountSheet.tabs.notifications,
-            onPress: () => openDsh('orders-list'),
-          },
-          {
-            id: 'cart',
-            iconName: 'cart-outline',
-            accessibilityLabel: uiText.serviceHub.availableServices,
-            onPress: () => openDsh('cart-get'),
+            onPress: () => setRoute('notifications'),
           },
           {
             id: 'search',
             iconName: 'search-outline',
-            accessibilityLabel: 'Search',
-            onPress: () => openDsh('stores-list'),
+            accessibilityLabel: 'البحث',
+            onPress: () => setRoute('search'),
           },
         ]}
         ticker={{
@@ -156,12 +249,155 @@ export function ClientSurfaceHost() {
         }}
       />
     );
-  }, [openDsh, uiText]);
+  }, [notificationItems.length, openDsh, uiText]);
 
-  const showUnifiedTopBar = route !== 'dsh';
+  const showUnifiedTopBar = route !== 'dsh' && route !== 'entry' && route !== 'login';
 
 
   const renderSubSurface = () => {
+    if (route === 'entry') {
+      return (
+        <ClientEntrySurface
+          appName={uiText.topBar.brandName}
+          userLabel="أهلًا بك"
+          primaryServiceLabel="دخول أنيق وسريع"
+          secondaryServiceLabel="خدمات مشتركة في مكان واحد"
+          onEnterApp={() => setRoute('home')}
+          onOpenLogin={() => setRoute('login')}
+          onOpenAccount={() => setRoute(isAuthenticated ? 'account' : 'login')}
+          onOpenNotifications={() => setRoute('notifications')}
+          onOpenSupport={() => setRoute('support')}
+        />
+      );
+    }
+
+    if (route === 'login') {
+      return (
+        <ClientLoginSurface
+          identityValue={loginIdentity}
+          verificationCodeValue={loginVerificationCode}
+          onChangeIdentity={setLoginIdentity}
+          onChangeVerificationCode={setLoginVerificationCode}
+          onRequestCode={() => {
+            if (!loginVerificationCode) {
+              setLoginVerificationCode('2026');
+            }
+          }}
+          onSubmit={() => {
+            if (loginIdentity.trim().length === 0) {
+              return;
+            }
+
+            setIsDeveloperMode(false);
+            setIsAuthenticated(true);
+            setRoute('home');
+          }}
+          onDeveloperLogin={() => {
+            setLoginIdentity('developer@bthwani.app');
+            setLoginVerificationCode('2026');
+            setIsDeveloperMode(true);
+            setIsAuthenticated(true);
+            setRoute('home');
+          }}
+          onBack={() => setRoute('entry')}
+          submitDisabled={loginIdentity.trim().length === 0}
+        />
+      );
+    }
+
+    if (route === 'account') {
+      return (
+        <ClientAccountSurface
+          snapshot={{
+            displayName: isDeveloperMode ? 'وضع المطور' : uiText.topBar.brandName,
+            phoneLabel: 'غير مضاف',
+            languageLabel: language === 'ar' ? 'العربية' : 'English',
+            securityLabel: isDeveloperMode ? 'مطور محلي' : 'قياسي',
+            emailLabel: isDeveloperMode ? 'developer@bthwani.app' : 'general@bthwani.app',
+          }}
+          notificationsEnabled={notificationsEnabled}
+          compactProfileEnabled={compactProfileEnabled}
+          onEditProfile={() => setRoute('settings')}
+          onEditPhone={() => setRoute('settings')}
+          onEditLanguage={() => setRoute('settings')}
+          onEditSecurity={() => setRoute('settings')}
+          onToggleNotifications={setNotificationsEnabled}
+          onToggleCompactProfile={setCompactProfileEnabled}
+        />
+      );
+    }
+
+    if (route === 'search') {
+      return (
+        <ClientSearchSurface
+          queryValue={globalSearchQuery}
+          onChangeQuery={setGlobalSearchQuery}
+          results={globalSearchResults}
+          onBack={() => setRoute('home')}
+          onClearQuery={() => setGlobalSearchQuery('')}
+        />
+      );
+    }
+
+    if (route === 'settings') {
+      return (
+        <ClientSettingsSurface
+          snapshot={{
+            languageLabel: language === 'ar' ? 'العربية' : 'English',
+            themeLabel: 'فاتح',
+            notificationsEnabled,
+            compactModeEnabled: compactProfileEnabled,
+            privacyModeEnabled,
+            accessibilityModeEnabled,
+          }}
+          onOpenLanguage={() => {
+            setAccountSheetTab('settings');
+            setAccountSheetVisible(true);
+          }}
+          onOpenTheme={() => {
+            setAccountSheetTab('settings');
+            setAccountSheetVisible(true);
+          }}
+          onOpenPrivacy={() => setPrivacyModeEnabled((current) => !current)}
+          onOpenAccessibility={() => setAccessibilityModeEnabled((current) => !current)}
+          onToggleNotifications={setNotificationsEnabled}
+          onToggleCompactMode={setCompactProfileEnabled}
+          onTogglePrivacyMode={setPrivacyModeEnabled}
+          onToggleAccessibilityMode={setAccessibilityModeEnabled}
+          onResetPreferences={() => {
+            setNotificationsEnabled(true);
+            setCompactProfileEnabled(false);
+            setPrivacyModeEnabled(false);
+            setAccessibilityModeEnabled(false);
+          }}
+        />
+      );
+    }
+
+    if (route === 'notifications') {
+      return (
+        <ClientNotificationsSurface
+          unreadCount={notificationItems.length}
+          items={notificationItems}
+          onOpenInbox={() => openDsh('orders-list')}
+          onClearAll={() => setNotificationItems([])}
+        />
+      );
+    }
+
+    if (route === 'support') {
+      return (
+        <ClientSupportSurface
+          faqCount={8}
+          ticketCount={notificationItems.length}
+          onOpenFaq={() => openDsh('home')}
+          onOpenTickets={() => openDsh('orders-list')}
+          onContactSupport={() => openDsh('home')}
+          onSendFeedback={() => setRoute('support')}
+        />
+      );
+    }
+
     if (route === 'dsh') {
       return <DshSurfaceHost command={dshCommand} onExit={() => setRoute('home')} />;
     }
@@ -249,6 +485,14 @@ export function ClientSurfaceHost() {
     return null;
   };
 
+  if (route === 'entry' || route === 'login') {
+    return (
+      <BthBox style={{ flex: 1 }} background="background">
+        {renderSubSurface()}
+      </BthBox>
+    );
+  }
+
   if (route !== 'home') {
     return (
       <BthBox style={{ flex: 1 }} background="background">
@@ -282,25 +526,28 @@ export function ClientSurfaceHost() {
           {accountSheetTab === 'menu' ? (
             <>
               <BthButton
-                label={uiText.accountSheet.tabs.profile}
+                label={isAuthenticated ? 'الحساب' : 'تسجيل الدخول'}
                 tone="secondary"
                 onPress={() => {
                   closeAccountSheet();
-                  setRoute('amn-entry');
+                  setRoute(isAuthenticated ? 'account' : 'login');
                 }}
               />
               <BthButton
-                label={uiText.accountSheet.tabs.notifications}
+                label="الدعم"
                 tone="secondary"
                 onPress={() => {
                   closeAccountSheet();
-                  openDsh('orders-list');
+                  setRoute('support');
                 }}
               />
               <BthButton
-                label={uiText.accountSheet.tabs.settings}
+                label="الإعدادات"
                 tone="primary"
-                onPress={() => setAccountSheetTab('settings')}
+                onPress={() => {
+                  closeAccountSheet();
+                  setRoute('settings');
+                }}
               />
             </>
           ) : (
@@ -392,25 +639,28 @@ export function ClientSurfaceHost() {
         {accountSheetTab === 'menu' ? (
           <>
             <BthButton
-              label={uiText.accountSheet.tabs.profile}
+              label={isAuthenticated ? 'الحساب' : 'تسجيل الدخول'}
               tone="secondary"
               onPress={() => {
                 closeAccountSheet();
-                setRoute('amn-entry');
+                setRoute(isAuthenticated ? 'account' : 'login');
               }}
             />
             <BthButton
-              label={uiText.accountSheet.tabs.notifications}
+              label="الدعم"
               tone="secondary"
               onPress={() => {
                 closeAccountSheet();
-                openDsh('orders-list');
+                setRoute('support');
               }}
             />
             <BthButton
-              label={uiText.accountSheet.tabs.settings}
+              label="الإعدادات"
               tone="primary"
-              onPress={() => setAccountSheetTab('settings')}
+              onPress={() => {
+                closeAccountSheet();
+                setRoute('settings');
+              }}
             />
           </>
         ) : (

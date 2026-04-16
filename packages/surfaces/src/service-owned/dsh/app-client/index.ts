@@ -10,6 +10,8 @@ export * from './families/entry/screens';
 export * from './families/favorites/screens';
 export * from './families/gas/screens';
 export * from './families/home/screens';
+export * from './families/my_space/screens';
+export * from './families/notifications/screens';
 export * from './families/loyalty/screens';
 export * from './families/orders/screens';
 export * from './families/shein/screens';

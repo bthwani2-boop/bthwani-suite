@@ -4,6 +4,8 @@ import { DshSearchScreen } from './families/discovery/screens';
 import { DshEntryScreen } from './families/entry/screens';
 import { DshAwnakOrderCreateScreen } from './families/awnak/screens';
 import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './families/home/screens';
+import { DshMySpaceScreen } from './families/my_space/screens';
+import { DshNotificationsScreen } from './families/notifications/screens';
 import { DshBenefitsHubScreen } from './families/loyalty/screens';
 import { DshOrdersListScreen } from './families/orders/screens';
 import { DshSheinOrderCreateScreen } from './families/shein/screens';
@@ -25,6 +27,8 @@ import { dshPartnerIntakeItems } from '../control-panel/partners/dsh/workflow';
 export type DshRoute =
   | 'home'
   | 'entry'
+  | 'my-space'
+  | 'notifications'
   | 'stores-list'
   | 'store-detail'
   | 'store-items'
@@ -717,6 +721,34 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     );
   }
 
+  if (route === 'my-space') {
+    return (
+      <DshMySpaceScreen
+        onOpenBenefits={() => setRoute('benefits')}
+        onOpenSubscriptions={() => setRoute('benefits')}
+        onOpenPreferences={() => setRoute('service-settings')}
+        onOpenOffers={() => setRoute('stores-list')}
+        onOpenDiscounts={() => setRoute('categories-list')}
+        onOpenOrders={() => setRoute('orders-list')}
+        onChangeAddress={() => setRoute('service-settings')}
+        onBack={() => setRoute('home')}
+        onRetry={() => setRoute('my-space')}
+      />
+    );
+  }
+
+  if (route === 'notifications') {
+    return (
+      <DshNotificationsScreen
+        onOpenMySpace={() => setRoute('my-space')}
+        onOpenOrders={() => setRoute('orders-list')}
+        onOpenSearch={() => setRoute('search')}
+        onBack={() => setRoute('home')}
+        onRetry={() => setRoute('notifications')}
+      />
+    );
+  }
+
   if (route === 'stores-list') {
     return (
       <DshStoresListScreen
@@ -1239,6 +1271,8 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
       ]}
       onBack={onExit}
       onOpenEntry={() => setRoute('entry')}
+      onOpenMySpace={() => setRoute('my-space')}
+      onOpenNotifications={() => setRoute('notifications')}
       onOpenCart={() => setRoute('cart-get')}
       onOpenList={() => setRoute('categories-list')}
       onOpenCategory={(categoryId) => {

@@ -9,16 +9,16 @@ export type LoyaltyBenefitItem = {
 
 export const loyaltyBenefitSurfaceItems: Record<LoyaltyBenefitMode, LoyaltyBenefitItem[]> = {
   subscription: [
-    { title: 'Pro catalog', subtitle: 'Compare plans with one clear upgrade path.', meta: 'Catalog', badgeLabel: 'Plan' },
-    { title: 'Family members', subtitle: 'Keep member management close to the active subscription state.', meta: 'Family', badgeLabel: 'Share' },
-    { title: 'Sync state', subtitle: 'Refresh benefits before the next paid action.', meta: 'Sync', badgeLabel: 'Live' },
-    { title: 'Coupon lane', subtitle: 'Keep promos visible without breaking the subscription flow.', meta: 'Promo', badgeLabel: 'Ready' },
+    { title: 'subscription-family-get', subtitle: 'Open the live subscription family route.', meta: 'Catalog', badgeLabel: 'Route' },
+    { title: 'subscription-family-members-get', subtitle: 'Inspect the current family members via the live route.', meta: 'Family', badgeLabel: 'Route' },
+    { title: 'subscription-sync', subtitle: 'Refresh the subscription state from the real lane.', meta: 'Sync', badgeLabel: 'Route' },
+    { title: 'subscription-upgrade-post', subtitle: 'Continue into the actual upgrade flow.', meta: 'Upgrade', badgeLabel: 'Route' },
   ],
   loyalty: [
-    { title: 'Points balance', subtitle: 'Show current value before redemption.', meta: 'Balance', badgeLabel: 'Value' },
-    { title: 'Redeem points', subtitle: 'Convert points into visible order savings.', meta: 'Redeem', badgeLabel: 'Action' },
-    { title: 'History', subtitle: 'Explain accrual and redemption without support friction.', meta: 'History', badgeLabel: 'Audit' },
-    { title: 'Coupon visibility', subtitle: 'Mirror the checkout discount lane so the value stays obvious.', meta: 'Coupon', badgeLabel: 'Promo' },
+    { title: 'loyalty-points-user-balance', subtitle: 'Open the live points balance route.', meta: 'Balance', badgeLabel: 'Route' },
+    { title: 'loyalty-points-redeem', subtitle: 'Open the real redemption route.', meta: 'Redeem', badgeLabel: 'Route' },
+    { title: 'loyalty-points-user-history', subtitle: 'Inspect the live accrual and redemption history.', meta: 'History', badgeLabel: 'Route' },
+    { title: 'entitlements-get', subtitle: 'Verify the entitlement lane that powers loyalty visibility.', meta: 'Entitlements', badgeLabel: 'Route' },
   ],
 };
 

@@ -21,25 +21,25 @@ export function ClientSupportSurface({
 }: ClientSupportSurfaceProps) {
   return (
     <BthFormScreenShell
-      title="الدعم العام"
+      title="مركز الدعم العام"
       subtitle="مركز مساعدة موحد للتطبيق كله"
       submitLabel="تواصل الآن"
       onSubmit={onContactSupport}
       submitDisabled={!onContactSupport}
     >
-      <BthSurface tone="raised" padding={4} gap={3}>
-        <BthText role="titleSm">ملخص الدعم</BthText>
+      <BthSurface tone="brand" padding={4} gap={3}>
+        <BthText role="titleSm" tone="inverse">ملخص الدعم</BthText>
         <View style={{ gap: spacing[3] }}>
-          <BthListItem title="الأسئلة الشائعة" subtitle="إجابات عامة على مستوى التطبيق" meta={`${faqCount} عنصر`} onPress={onOpenFaq} />
-          <BthListItem title="التذاكر" subtitle="متابعة الحالات العامة المفتوحة" meta={`${ticketCount} حالة`} onPress={onOpenTickets} />
-          <BthListItem title="إرسال ملاحظة" subtitle="Feedback أو اقتراحات عامة" meta="عام" onPress={onSendFeedback} />
+          <BthListItem title="الأسئلة الشائعة" subtitle="إجابات عامة على مستوى التطبيق" meta={`${faqCount} عنصر`} badgeLabel="عام" onPress={onOpenFaq} />
+          <BthListItem title="التذاكر" subtitle="متابعة الحالات العامة المفتوحة" meta={`${ticketCount} حالة`} badgeLabel="عام" onPress={onOpenTickets} />
+          <BthListItem title="إرسال ملاحظة" subtitle="ملاحظات أو اقتراحات عامة" meta="عام" badgeLabel="عام" onPress={onSendFeedback} />
         </View>
       </BthSurface>
 
       <BthSurface tone="inset" padding={4} gap={2}>
-        <BthText role="titleSm">مبادئ الدعم هنا</BthText>
+        <BthText role="titleSm">مبادئ الدعم العام</BthText>
         <BthText role="bodySm" tone="muted">
-          هذا السطح يخدم التطبيق كله. أي مساعدة أو سياسة أو ticket خاص بخدمة بعينها يجب أن ينتقل إلى service-owned.
+          هذا السطح يخدم التطبيق كله. أي مساعدة أو سياسة أو طلب محلي يجب أن ينتقل إلى مساره الخاص.
         </BthText>
       </BthSurface>
 

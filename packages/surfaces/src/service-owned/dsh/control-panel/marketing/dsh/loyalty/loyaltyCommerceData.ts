@@ -14,57 +14,57 @@ export type LoyaltyCommercialLaneItem = {
 export const loyaltyCommercialSignals: LoyaltyCommercialSignal[] = [
   {
     title: 'Subscription tier',
-    value: 'Pro Plus',
-    description: 'One visible plan with family, upgrade, and sync lanes attached to it.',
+    value: 'subscription-family-get',
+    description: 'The real subscription family route is the entry point for plan, family, and sync actions.',
   },
   {
     title: 'Points balance',
-    value: '2,840 pts',
-    description: 'Redeemable value stays visible before the customer commits to checkout.',
+    value: 'loyalty-points-user-balance',
+    description: 'The balance screen is the source of truth before redemption or checkout.',
   },
   {
     title: 'Coupon lane',
-    value: 'Ready',
-    description: 'Promos remain in the pricing path instead of becoming a dead-end support step.',
+    value: 'promo-apply',
+    description: 'Coupons stay inside the live pricing path rather than becoming a display-only state.',
   },
 ];
 
 export const loyaltyCommercialLaneItems: LoyaltyCommercialLaneItem[] = [
   {
     title: 'Subscription family',
-    subtitle: 'Keep family membership, plan changes, and entitlement visibility in one lane.',
+    subtitle: 'Open the actual family, upgrade, and sync routes instead of a sample summary.',
     meta: 'Subscription',
-    badgeLabel: 'Share',
+    badgeLabel: 'Route',
   },
   {
     title: 'Points redemption',
-    subtitle: 'Convert points into visible order savings before the review step.',
+    subtitle: 'Open the live balance, redeem, and history routes before checkout.',
     meta: 'Loyalty',
-    badgeLabel: 'Redeem',
+    badgeLabel: 'Route',
   },
   {
     title: 'Coupon application',
-    subtitle: 'Keep promo application inside checkout and pricing instead of branching away.',
+    subtitle: 'Keep promo application in checkout and pricing where the live lane already exists.',
     meta: 'Coupon',
-    badgeLabel: 'Promo',
+    badgeLabel: 'Route',
   },
   {
-    title: 'Multiplier preview',
-    subtitle: 'Surface x2 and x3 earning behavior where the shopper is already deciding.',
+    title: 'Entitlements',
+    subtitle: 'Use the entitlement route as the actual source of loyalty visibility.',
     meta: 'Points',
-    badgeLabel: 'Earn',
+    badgeLabel: 'Route',
   },
   {
     title: 'Sync and audit',
-    subtitle: 'Refresh subscription state before the next paid action and keep history readable.',
+    subtitle: 'Refresh subscription state from the live route and keep history readable.',
     meta: 'Sync',
-    badgeLabel: 'Live',
+    badgeLabel: 'Route',
   },
 ];
 
 export const loyaltyCommercialKeyValues = [
-  { label: 'Current plan', value: 'Pro Plus' },
-  { label: 'Coupon availability', value: 'Visible before checkout' },
-  { label: 'Points preview', value: '2,840 pts' },
-  { label: 'Entitlement lane', value: 'subscription-sync' },
+  { label: 'Current plan route', value: 'subscription-family-get' },
+  { label: 'Coupon lane', value: 'promo-apply' },
+  { label: 'Points balance route', value: 'loyalty-points-user-balance' },
+  { label: 'Entitlement lane', value: 'entitlements-get' },
 ] as const;

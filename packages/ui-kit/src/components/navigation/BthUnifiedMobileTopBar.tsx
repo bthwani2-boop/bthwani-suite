@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { Platform, Pressable, StatusBar, View } from 'react-native';
 import { resolveRowDirection } from '../../foundation/direction';
 import { useDirection, useTheme } from '../../hooks';
 import { BthBox, BthText } from '../../primitives';
@@ -33,9 +33,10 @@ function HeaderAction({ action, badgeSide }: { action: BthUnifiedMobileTopBarAct
       accessibilityRole="button"
       accessibilityLabel={action.accessibilityLabel ?? action.id}
       onPress={action.onPress}
+      hitSlop={10}
       style={({ pressed }) => ({
-        width: 32,
-        height: 32,
+        width: 44,
+        height: 44,
         borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
@@ -77,6 +78,7 @@ export function BthUnifiedMobileTopBar({
   const rowDirection = resolveRowDirection(direction, true);
   const alignItems = direction === 'rtl' ? 'flex-end' : 'flex-start';
   const badgeSide = direction === 'rtl' ? { left: -2 } : { right: -2 };
+  const topInset = Platform.OS === 'android' ? Math.max(StatusBar.currentHeight ?? 0, 12) : 6;
 
   return (
     <BthBox
@@ -85,6 +87,7 @@ export function BthUnifiedMobileTopBar({
       paddingY={2}
       gap={1}
       style={{
+        paddingTop: topInset,
         borderBottomLeftRadius: 28,
         borderBottomRightRadius: 28,
       }}
@@ -94,7 +97,6 @@ export function BthUnifiedMobileTopBar({
           flexDirection: rowDirection,
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingTop: 6,
         }}
       >
         <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }}>

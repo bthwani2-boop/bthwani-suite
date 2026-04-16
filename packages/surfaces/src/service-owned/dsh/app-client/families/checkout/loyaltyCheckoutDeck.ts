@@ -1,25 +1,25 @@
 export const loyaltyCheckoutKeyValues = [
-  { label: 'Applied discount', value: '12 SAR' },
-  { label: 'Redeemable points', value: '2,840 pts' },
-  { label: 'Subscription lane', value: 'Promo-ready' },
+  { label: 'Applied discount lane', value: 'promo-apply' },
+  { label: 'Redeemable points route', value: 'loyalty-points-redeem' },
+  { label: 'Subscription lane', value: 'subscription-upgrade-post' },
 ] as const;
 
 export const loyaltyCheckoutItems = [
   {
     title: 'Promo application',
-    subtitle: 'Apply savings inside pricing without leaving checkout.',
+    subtitle: 'Apply savings inside the live pricing route without leaving checkout.',
     meta: 'Coupon',
     badgeLabel: 'Apply',
   },
   {
     title: 'Points preview',
-    subtitle: 'Show the points benefit before the order is submitted.',
+    subtitle: 'Open the real points route before the order is submitted.',
     meta: 'Loyalty',
     badgeLabel: 'Earn',
   },
   {
     title: 'Subscription handoff',
-    subtitle: 'Keep the customer in the same lane if the offer changes the tier.',
+    subtitle: 'Keep the customer in the live subscription lane when the offer changes the tier.',
     meta: 'Subscription',
     badgeLabel: 'Plan',
   },

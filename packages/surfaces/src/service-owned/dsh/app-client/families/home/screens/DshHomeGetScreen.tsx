@@ -4,8 +4,9 @@ import { Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-nat
 import {
   BthUnifiedMobileTopBar,
   BthBox,
-  BthStatCard,
+  BthListItem,
   BthStateView,
+  BthSurface,
   BthText,
   radius,
   resolveRowDirection,
@@ -51,6 +52,8 @@ export type DshHomeGetScreenProps = {
   recentOrders?: DshHomeRecentOrder[];
   onBack?: () => void;
   onOpenEntry?: () => void;
+  onOpenMySpace?: () => void;
+  onOpenNotifications?: () => void;
   onOpenCart?: () => void;
   onOpenList?: () => void;
   onOpenCategory?: (categoryId: string) => void;
@@ -194,6 +197,56 @@ function CategoryIconImage({
   );
 }
 
+function MySpaceIcon() {
+  return (
+    <View
+      style={{
+        width: 26,
+        height: 26,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <View
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: 13,
+          borderWidth: 1.5,
+          borderColor: 'rgba(255,255,255,0.95)',
+          backgroundColor: 'rgba(255,255,255,0.10)',
+        }}
+      />
+      <View
+        style={{
+          width: 15,
+          height: 15,
+          borderRadius: 8,
+          borderWidth: 1.5,
+          borderColor: 'rgba(255,255,255,0.96)',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(255,255,255,0.06)',
+        }}
+      >
+        <Ionicons name="person" size={10} color="#FFFFFF" />
+      </View>
+      <Ionicons
+        name="sparkles"
+        size={7}
+        color="#FFF8DE"
+        style={{ position: 'absolute', top: 1, right: 0, transform: [{ rotate: '14deg' }] }}
+      />
+      <Ionicons
+        name="sparkles"
+        size={6}
+        color="#FFF8DE"
+        style={{ position: 'absolute', top: 4, left: 1, transform: [{ rotate: '-12deg' }] }}
+      />
+    </View>
+  );
+}
+
 function isWithinOperatingHours(now: Date, openHour: number, closeHour: number) {
   const currentHour = now.getHours();
 
@@ -305,6 +358,7 @@ export function DshHomeGetScreen({
   onOpenCart,
   onOpenOrders,
   onOpenTracking,
+  onOpenNotifications,
   onOpenStore,
   onOpenSheinInfo,
   sheinInlineVisible = false,
@@ -560,11 +614,6 @@ export function DshHomeGetScreen({
     [currentLanguage, currentTime, recentOrders, uiText.topBar.location]
   );
   const tickerAction = onOpenOrders ?? onOpenTracking ?? onOpenSearch;
-  const loyaltyPreviewItems = [
-    { title: 'فتح الولاء', subtitle: 'عرض subscription, points, and coupon truth', meta: 'Benefits', badgeLabel: 'Open', onPress: onOpenBenefits },
-    { title: 'مراجعة الدفع', subtitle: 'البقاء داخل pricing lane عند تطبيق promo', meta: 'Checkout', badgeLabel: 'Apply', onPress: onOpenCart ?? onOpenSearch },
-    { title: 'إشارات الاشتراك', subtitle: 'عرض الخطة النشطة والـ sync state قبل القرار', meta: 'Plan', badgeLabel: 'Live', onPress: onOpenSearch },
-  ];
   const categoriesDialItems = React.useMemo<CategoryDialItem[]>(() => {
     return visibleCategoryFixtures.map((category) => ({
       id: category.id,
@@ -619,22 +668,29 @@ export function DshHomeGetScreen({
         locationIcon={<Ionicons name="location-outline" size={14} color="#FFFFFF" />}
         actions={[
           {
-            id: 'account',
-            icon: <Ionicons name="person-outline" size={21} color="#FFFFFF" />,
-            accessibilityLabel: uiText.accountSheet.title,
-            onPress: () => onOpenEntry?.(),
+            id: 'my-space',
+            icon: <MySpaceIcon />,
+            accessibilityLabel: 'مساحتي',
+            onPress: () => {
+              if (onOpenMySpace) {
+                onOpenMySpace();
+                return;
+              }
+
+              onOpenEntry?.();
+            },
           },
           {
             id: 'notifications',
             icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />,
             badgeCount: 5,
-            accessibilityLabel: uiText.accountSheet.tabs.notifications,
-            onPress: onOpenOrders,
+            accessibilityLabel: 'الإشعارات',
+            onPress: onOpenNotifications,
           },
           {
             id: 'cart',
             icon: <Ionicons name="cart-outline" size={21} color="#FFFFFF" />,
-            accessibilityLabel: uiText.serviceHub.availableServices,
+            accessibilityLabel: 'السلة',
             onPress: onOpenCart,
           },
           {
@@ -671,27 +727,6 @@ export function DshHomeGetScreen({
             <DshAwnakOrderCreateScreen embedded onClose={onCloseAwnakInline} />
           </BthBox>
         ) : null}
-
-        <BthSurface tone="brand" gap={3}>
-          <BthText role="titleSm">الولاء والاشتراكات</BthText>
-          <BthBox gap={2}>
-            <BthStatCard label="الاشتراك" value="Pro Plus" deltaLabel="Visible plan" tone="info" />
-            <BthStatCard label="النقاط" value="2,840 pts" deltaLabel="Redeemable before checkout" tone="success" />
-            <BthStatCard label="الكوبونات" value="مرئية" deltaLabel="Promo lane stays in flow" tone="warning" />
-          </BthBox>
-          <BthBox gap={2}>
-            {loyaltyPreviewItems.map((item) => (
-              <BthListItem
-                key={item.title}
-                title={item.title}
-                subtitle={item.subtitle}
-                meta={item.meta}
-                badgeLabel={item.badgeLabel}
-                onPress={item.onPress}
-              />
-            ))}
-          </BthBox>
-        </BthSurface>
 
         <View style={styles.categoriesSelectorSection}>
           <View style={styles.categoriesSelectorRow}>

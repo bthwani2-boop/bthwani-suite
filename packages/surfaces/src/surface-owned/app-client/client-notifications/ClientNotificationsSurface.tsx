@@ -26,18 +26,18 @@ export function ClientNotificationsSurface({
 }: ClientNotificationsSurfaceProps) {
   return (
     <BthDashboardShell
-      title="الإشعارات العامة"
-      subtitle="مركز واحد للتنبيهات المشتركة بين الخدمات"
+      title="مركز الإشعارات العامة"
+      subtitle="مركز واحد للتنبيهات المشتركة داخل التطبيق كله"
       hero={
-        <BthSurface tone="info" padding={5} gap={3}>
-          <BthText role="titleSm">عداد الإشعارات</BthText>
-          <BthText role="titleLg" tone="info">{unreadCount}</BthText>
-          <BthText role="bodySm" tone="muted">تنبيهات عامة لا ترتبط بخدمة بعينها</BthText>
+        <BthSurface tone="brand" padding={5} gap={3}>
+          <BthText role="titleSm" tone="inverse">عداد التنبيهات</BthText>
+          <BthText role="titleLg" tone="inverse">{unreadCount}</BthText>
+          <BthText role="bodySm" tone="inverse">تنبيهات عامة لا ترتبط بمسار محدد</BthText>
         </BthSurface>
       }
       sections={[
         {
-          title: 'صندوق الوارد',
+          title: 'الوارد العام',
           subtitle: 'عناصر عامة قابلة للفتح أو المسح',
           content: (
             <View style={{ gap: spacing[3] }}>
@@ -47,7 +47,7 @@ export function ClientNotificationsSurface({
                   title={item.title}
                   subtitle={item.subtitle}
                   meta={item.meta}
-                  badgeLabel={item.badgeLabel}
+                  badgeLabel={item.badgeLabel ?? 'عام'}
                   onPress={item.onPress}
                 />
               )) : (
@@ -58,7 +58,7 @@ export function ClientNotificationsSurface({
         },
         {
           title: 'الإجراءات العامة',
-          subtitle: 'Handoff مباشر دون منطق خدمة',
+          subtitle: 'تحكم مباشر دون منطق خدمة',
           content: (
             <View style={{ gap: spacing[3] }}>
               <BthButton label="فتح الصندوق" onPress={onOpenInbox} />
