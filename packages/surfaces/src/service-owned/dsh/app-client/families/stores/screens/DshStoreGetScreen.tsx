@@ -1,9 +1,15 @@
 import React from 'react';
 import {
+  Animated,
+  Easing,
   Image,
   Modal,
   Pressable,
+  PanResponder,
   ScrollView,
+  FlatList,
+  Vibration,
+  Dimensions,
   Platform,
   Share,
   StyleSheet,
@@ -14,7 +20,7 @@ import {
   type GestureResponderEvent,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BthChip, BthHighlightsRail, BthStateView, BthText, colorPalette, useDirection, useUiText } from '@bthwani/ui-kit';
+import { BthButton, BthChip, BthHighlightsRail, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../../../control-panel/catalogs/dsh/catalog';
 
 export type DshStoreGetMenuItem = {
@@ -90,6 +96,9 @@ const CATEGORY_EMOJI: Record<string, string> = {
 const CATEGORY_ICON: Record<string, string> = {
   all: '📋',
   popular: '🔥',
+  favorites: '❤️',
+  new: '🆕',
+  offers: '💸',
   fresh: '🥦',
   dairy: '🥛',
   bakery: '🥐',
@@ -232,6 +241,34 @@ function resolveMeasurementMultiplier(option: string) {
   return 1;
 }
 
+function pickSampleBackgroundColor(name: string) {
+  const n = (name || '').toLowerCase();
+  if (n.includes('تفاح') || n.includes('apple') || n.includes('gala')) return '#eaf9e6';
+  if (n.includes('حليب') || n.includes('milk')) return '#eaf4ff';
+  if (n.includes('خبز') || n.includes('bread')) return '#fff6e8';
+  return '#f3f4f6';
+}
+
+function hexToRgba(hex: string, alpha = 0.9) {
+  const clean = (hex || '#ffffff').replace('#', '').trim();
+  const short = clean.length === 3;
+  const r = parseInt(short ? clean[0] + clean[0] : clean.slice(0, 2), 16);
+  const g = parseInt(short ? clean[1] + clean[1] : clean.slice(2, 4), 16);
+  const b = parseInt(short ? clean[2] + clean[2] : clean.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function getOverlayColor(name: string, alpha = 0.88) {
+  return hexToRgba(pickSampleBackgroundColor(name), alpha);
+}
+
+function sampleProductDataUri(name: string) {
+  const label = (name || 'منتج').replace(/&/g, '&amp;').slice(0, 18).toUpperCase();
+  const bg = pickSampleBackgroundColor(name);
+  const svg = `<?xml version='1.0' encoding='UTF-8'?>\n<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'>\n  <rect width='100%' height='100%' rx='36' fill='${bg}' />\n  <text x='50%' y='56%' font-family='Inter, Arial, Helvetica, sans-serif' font-size='88' font-weight='800' fill='#21313a' text-anchor='middle'>${label}</text>\n</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 function formatCurrencyValue(value: number) {
   const normalized = value % 1 === 0 ? String(value) : value.toFixed(1).replace(/\.0$/, '');
   return `${normalized} ر.س`;
@@ -322,12 +359,18 @@ function MenuItemCard({
   labels,
   partnerImageUri,
   onAddPress,
+  onImagePress,
+  onFavoritePress,
+  isFavorited,
 }: {
   item: DshStoreGetMenuItem;
   isRTL: boolean;
   labels: { available: string; options: string; unavailable: string };
   partnerImageUri?: string;
   onAddPress?: (anchor: { x: number; y: number }) => void;
+  onImagePress?: (item: DshStoreGetMenuItem) => void;
+  onFavoritePress?: () => void;
+  isFavorited?: boolean;
 }) {
   const normalizedName = normalizeDisplayText(item.name);
   const normalizedSubtitle = normalizeDisplayText(item.subtitle);
@@ -350,9 +393,18 @@ function MenuItemCard({
             )}
           </View>
           <Text style={styles.menuEmoji}>{getItemEmoji(item)}</Text>
-          {item.imageUri ? <Image source={{ uri: item.imageUri }} style={styles.menuImage} /> : null}
-          <TouchableOpacity style={styles.favoriteButton} activeOpacity={0.85}>
-            <Ionicons name="heart" size={18} color={stylesTokens.orange} />
+          {
+            (() => {
+              const imageUri = item.imageUri ?? sampleProductDataUri(normalizedName);
+              return (
+                <Pressable onPress={() => onImagePress?.(item)} style={styles.menuImagePressable} accessibilityRole="imagebutton">
+                  <Image source={{ uri: imageUri }} style={styles.menuImage} />
+                </Pressable>
+              );
+            })()
+          }
+          <TouchableOpacity style={styles.favoriteButton} activeOpacity={0.85} onPress={onFavoritePress} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <Ionicons name={isFavorited ? 'heart' : 'heart-outline'} size={18} color={stylesTokens.orange} />
           </TouchableOpacity>
         </View>
       </View>
@@ -450,6 +502,24 @@ export function DshStoreGetScreen({
   const [pickerAnchor, setPickerAnchor] = React.useState({ x: 32, y: 360 });
   const [headerSearchVisible, setHeaderSearchVisible] = React.useState(false);
   const [headerSearchQuery, setHeaderSearchQuery] = React.useState('');
+  const [cartToastVisible, setCartToastVisible] = React.useState(false);
+  const [cartDecisionVisible, setCartDecisionVisible] = React.useState(false);
+  const [addedItemLabel, setAddedItemLabel] = React.useState('');
+  const [previewItem, setPreviewItem] = React.useState<(DshStoreGetMenuItem & { partnerImageUri?: string }) | null>(null);
+
+  const [favoriteIds, setFavoriteIds] = React.useState<Set<string>>(new Set());
+
+  const handleToggleFavorite = React.useCallback((id: string) => {
+    setFavoriteIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const openImagePreview = React.useCallback((item: DshStoreGetMenuItem, partnerImageUri?: string) => setPreviewItem({ ...item, partnerImageUri }), []);
+  const closeImagePreview = React.useCallback(() => setPreviewItem(null), []);
 
   const deliveryModes = React.useMemo(() => getDeliveryModes(storeText), [storeText]);
   const itemLabels = React.useMemo(
@@ -466,6 +536,31 @@ export function DshStoreGetScreen({
     [menuItems],
   );
 
+  const isOfferItem = React.useCallback((item: DshStoreGetMenuItem) => {
+    if ((item as any).isOffer) return true;
+    if (item.discountLabel) return true;
+    if (item.oldPriceLabel && item.priceLabel) return true;
+    const d = normalizeDisplayText(item.discountLabel ?? '').toLowerCase();
+    if (d.includes('%') || /\d+%/.test(d)) return true;
+    return false;
+  }, []);
+
+  const isNewItem = React.useCallback((item: DshStoreGetMenuItem) => {
+    if ((item as any).isNew) return true;
+    const s = normalizeDisplayText(item.statusLabel ?? '').toLowerCase();
+    if (s.includes('وصل') || s.includes('جديد') || s.includes('حديث')) return true;
+    return false;
+  }, []);
+
+  const isFavoriteItem = React.useCallback((item: DshStoreGetMenuItem) => {
+    if ((item as any).isFavorite || (item as any).isFavorited) return true;
+    const s = normalizeDisplayText(item.statusLabel ?? '').toLowerCase();
+    if (s.includes('مفضل') || s.includes('مفضلة')) return true;
+    // fallback: check tags or category label
+    if (normalizeDisplayText(item.categoryLabel ?? '').toLowerCase().includes('مفضل')) return true;
+    return false;
+  }, []);
+
   const categories = React.useMemo(() => {
     const storeCategories = (store?.categories ?? []).filter((category) =>
       customerVisibleItems.some((item) => item.categoryId === category.id),
@@ -475,20 +570,56 @@ export function DshStoreGetScreen({
       return status.includes('الأكثر') || status.includes('اختيار') || Boolean(item.hasOptions);
     }).length;
 
+    const favoritesCount = customerVisibleItems.filter((item) => isFavoriteItem(item) || favoriteIds.has(item.id)).length;
+    const newCount = customerVisibleItems.filter(isNewItem).length;
+    const offersCount = customerVisibleItems.filter(isOfferItem).length;
+
     return [
       { id: 'all', label: 'جميع الأقسام', itemCount: customerVisibleItems.length, isPopular: true },
       { id: 'popular', label: 'الأكثر طلبًا', itemCount: popularCount || Math.min(customerVisibleItems.length, 4), isPopular: true },
+      { id: 'favorites', label: 'المفضلة', itemCount: favoritesCount },
+      { id: 'new', label: 'الجديدة', itemCount: newCount },
+      { id: 'offers', label: 'العروض', itemCount: offersCount },
       ...storeCategories,
     ];
-  }, [customerVisibleItems, store?.categories]);
+  }, [customerVisibleItems, store?.categories, isFavoriteItem, isNewItem, isOfferItem, favoriteIds]);
 
-  const visibleItems = React.useMemo(() => {
+  const CARD_HEIGHT = 126;
+  const CARD_GAP = 10;
+  const SNAP_INTERVAL = CARD_HEIGHT + CARD_GAP;
+
+  const listRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
+  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const transitionAnim = React.useRef(new Animated.Value(1)).current;
+  const previewDrag = React.useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+  const previewScale = React.useRef(new Animated.Value(1)).current;
+  const previewRotate = React.useRef(new Animated.Value(0)).current; // degrees-ish proxy
+  // tighter rotation range for a premium subtle feel
+  const previewRotateDeg = previewRotate.interpolate({ inputRange: [-200, 200], outputRange: ['-6deg', '6deg'], extrapolate: 'clamp' });
+
+  const chipsScrollRef = React.useRef<ScrollView | null>(null);
+  const chipLayoutsRef = React.useRef<Record<string, { x: number; width: number }>>({});
+  const [chipsContainerWidth, setChipsContainerWidth] = React.useState(0);
+
+  const scrollChipIntoView = React.useCallback((categoryId: string) => {
+    const layout = chipLayoutsRef.current[categoryId];
+    if (!layout || !chipsContainerWidth || !chipsScrollRef.current) return;
+    const centerOffset = chipsContainerWidth / 2 - layout.width / 2;
+    const targetX = Math.max(0, layout.x - centerOffset);
+    try {
+      chipsScrollRef.current.scrollTo({ x: targetX, animated: true });
+    } catch {
+      // ignore
+    }
+  }, [chipsContainerWidth]);
+
+  const resolveItemsForCategory = React.useCallback((categoryId: string) => {
     const scopedItems = (() => {
-      if (selectedCategory === 'all') {
+      if (categoryId === 'all') {
         return customerVisibleItems;
       }
 
-      if (selectedCategory === 'popular') {
+      if (categoryId === 'popular') {
         const popularItems = customerVisibleItems.filter((item) => {
           const status = normalizeDisplayText(item.statusLabel ?? '');
           return status.includes('الأكثر') || status.includes('اختيار') || Boolean(item.hasOptions);
@@ -497,7 +628,19 @@ export function DshStoreGetScreen({
         return popularItems.length ? popularItems : customerVisibleItems.slice(0, Math.min(4, customerVisibleItems.length));
       }
 
-      return customerVisibleItems.filter((item) => item.categoryId === selectedCategory);
+      if (categoryId === 'favorites') {
+        return customerVisibleItems.filter((item) => isFavoriteItem(item) || favoriteIds.has(item.id));
+      }
+
+      if (categoryId === 'new') {
+        return customerVisibleItems.filter((item) => isNewItem(item));
+      }
+
+      if (categoryId === 'offers') {
+        return customerVisibleItems.filter((item) => isOfferItem(item));
+      }
+
+      return customerVisibleItems.filter((item) => item.categoryId === categoryId);
     })();
 
     const normalizedQuery = headerSearchQuery.trim().toLowerCase();
@@ -516,7 +659,209 @@ export function DshStoreGetScreen({
 
       return searchableText.includes(normalizedQuery);
     });
-  }, [customerVisibleItems, selectedCategory, headerSearchQuery]);
+  }, [customerVisibleItems, headerSearchQuery, isFavoriteItem, isNewItem, isOfferItem, favoriteIds]);
+
+  const changeCategory = React.useCallback((newId: string) => {
+    if (newId === selectedCategory) return;
+    Animated.sequence([
+      Animated.timing(transitionAnim, { toValue: 0.96, duration: 120, useNativeDriver: true }),
+    ]).start(() => {
+      setSelectedCategory(newId);
+      // ensure list resets to top of new section
+      try { listRef.current?.scrollToOffset({ offset: 0, animated: false }); } catch {}
+      Animated.timing(transitionAnim, { toValue: 1, duration: 260, useNativeDriver: true }).start();
+      // subtle haptic
+      try { Vibration.vibrate(8); } catch {}
+      scrollChipIntoView(newId);
+    });
+  }, [selectedCategory, transitionAnim, scrollChipIntoView]);
+
+  const panResponder = React.useMemo(() =>
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_evt, gestureState) => {
+        const { dx, dy } = gestureState;
+        return Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 12;
+      },
+      onPanResponderRelease: (_evt, gestureState) => {
+        const { dx } = gestureState;
+        const threshold = Math.max(60, Dimensions.get('window').width * 0.08);
+        const currentIndex = categories.findIndex((c) => c.id === selectedCategory);
+        if (currentIndex === -1) return;
+        const nextIndex = Math.min(currentIndex + 1, categories.length - 1);
+        const prevIndex = Math.max(currentIndex - 1, 0);
+
+        if (isRTL) {
+          if (dx < -threshold && prevIndex !== currentIndex) {
+            changeCategory(categories[prevIndex].id);
+          } else if (dx > threshold && nextIndex !== currentIndex) {
+            changeCategory(categories[nextIndex].id);
+          }
+        } else {
+          if (dx < -threshold && nextIndex !== currentIndex) {
+            changeCategory(categories[nextIndex].id);
+          } else if (dx > threshold && prevIndex !== currentIndex) {
+            changeCategory(categories[prevIndex].id);
+          }
+        }
+      },
+    }),
+    [categories, selectedCategory, isRTL, changeCategory]
+  );
+
+  React.useEffect(() => {
+    previewDrag.setValue({ x: 0, y: 0 });
+  }, [previewDrag, previewItem?.id]);
+
+  const visibleItems = React.useMemo(() => resolveItemsForCategory(selectedCategory), [resolveItemsForCategory, selectedCategory]);
+  const previewItems = visibleItems;
+  const previewCurrentIndex = React.useMemo(() => {
+    if (!previewItem) return -1;
+    return previewItems.findIndex((item) => item.id === previewItem.id);
+  }, [previewItem, previewItems]);
+
+  const movePreviewByItemOffset = React.useCallback((offset: number) => {
+    if (!previewItem || previewCurrentIndex === -1 || !previewItems.length) {
+      return;
+    }
+
+    const nextIndex = Math.max(0, Math.min(previewItems.length - 1, previewCurrentIndex + offset));
+    if (nextIndex === previewCurrentIndex) {
+      return;
+    }
+
+    const nextItem = previewItems[nextIndex];
+    setPreviewItem({ ...nextItem, partnerImageUri: store?.imageUri });
+  }, [previewCurrentIndex, previewItem, previewItems, store?.imageUri]);
+
+  const movePreviewByCategoryOffset = React.useCallback((offset: number) => {
+    if (!categories.length) {
+      return;
+    }
+
+    const currentIndex = categories.findIndex((category) => category.id === selectedCategory);
+    if (currentIndex === -1) {
+      return;
+    }
+
+    const nextIndex = Math.max(0, Math.min(categories.length - 1, currentIndex + offset));
+    if (nextIndex === currentIndex) {
+      return;
+    }
+
+    const nextCategoryId = categories[nextIndex].id;
+    changeCategory(nextCategoryId);
+
+    const nextCategoryItems = resolveItemsForCategory(nextCategoryId);
+    if (nextCategoryItems.length) {
+      setPreviewItem({ ...nextCategoryItems[0], partnerImageUri: store?.imageUri });
+    }
+  }, [categories, changeCategory, resolveItemsForCategory, selectedCategory, store?.imageUri]);
+
+  const previewPanResponder = React.useMemo(() =>
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponderCapture: () => true,
+      onMoveShouldSetPanResponder: (_evt, gestureState) => {
+        const { dx, dy } = gestureState;
+        return Math.abs(dx) > 6 || Math.abs(dy) > 6;
+      },
+      onMoveShouldSetPanResponderCapture: (_evt, gestureState) => {
+        const { dx, dy } = gestureState;
+        return Math.abs(dx) > 6 || Math.abs(dy) > 6;
+      },
+      onPanResponderGrant: () => {
+        previewDrag.stopAnimation();
+        // subtle lift when grabbing
+        Animated.spring(previewScale, { toValue: 1.04, useNativeDriver: true, friction: 6, tension: 100 }).start();
+        previewRotate.setValue(0);
+      },
+      onPanResponderMove: (_evt, gestureState) => {
+        // more responsive movement multiplier for quicker feedback
+        previewDrag.setValue({ x: gestureState.dx * 0.36, y: gestureState.dy * 0.36 });
+        // smaller, smoother rotation mapping
+        previewRotate.setValue(gestureState.dx * 0.045);
+      },
+      onPanResponderRelease: (_evt, gestureState) => {
+        const { dx, dy, vx, vy } = gestureState;
+        const absDx = Math.abs(dx);
+        const absDy = Math.abs(dy);
+        // lower distance threshold and lower velocity threshold for snappier reactions
+        const threshold = Math.max(36, Dimensions.get('window').width * 0.06);
+        const velocityThreshold = 0.55; // quick flick sensitivity (easier to trigger)
+        const isHorizontal = absDx >= absDy;
+
+        const performCategorySwipe = (dirOffset: number, offX: number) => {
+          // adapt animation duration to flick velocity for faster, smoother feel
+          const base = 320;
+          const speedAdj = Math.min(260, Math.abs(vx) * 300);
+          const outDuration = Math.max(120, Math.floor(base - speedAdj));
+
+          Animated.timing(previewDrag.x, { toValue: offX, duration: outDuration, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start(() => {
+            try { movePreviewByCategoryOffset(dirOffset); } catch {}
+            // place new card off-screen on opposite side and slide in quickly
+            previewDrag.setValue({ x: -offX, y: 0 });
+            Animated.parallel([
+              Animated.timing(previewDrag.x, { toValue: 0, duration: Math.max(180, Math.floor(280 - speedAdj / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+              Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 6, tension: 90 }),
+              Animated.timing(previewRotate, { toValue: 0, duration: 180, useNativeDriver: true }),
+            ]).start();
+            try { Vibration.vibrate(8); } catch {}
+          });
+        };
+
+        const performItemSwipe = (dirOffset: number, offY: number) => {
+          const base = 260;
+          const speedAdjY = Math.min(220, Math.abs(vy) * 300);
+          const outDurationY = Math.max(120, Math.floor(base - speedAdjY));
+
+          Animated.timing(previewDrag.y, { toValue: offY, duration: outDurationY, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start(() => {
+            movePreviewByItemOffset(dirOffset);
+            previewDrag.setValue({ x: 0, y: -offY });
+            Animated.parallel([
+              Animated.timing(previewDrag.y, { toValue: 0, duration: Math.max(160, Math.floor(240 - speedAdjY / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+              Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 6, tension: 90 }),
+              Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
+            ]).start();
+            try { Vibration.vibrate(6); } catch {}
+          });
+        };
+
+        if (isHorizontal && (absDx > threshold || Math.abs(vx) > velocityThreshold)) {
+          // horizontal swipe: detect logical category offset mapping
+          const toLeft = dx < 0;
+          const offX = (toLeft ? -1 : 1) * (Dimensions.get('window').width + 220);
+          // map to movePreviewByCategoryOffset same as before
+          if (isRTL) {
+            // RTL mapping preserves earlier logic
+            performCategorySwipe(toLeft ? -1 : 1, offX);
+          } else {
+            performCategorySwipe(toLeft ? 1 : -1, offX);
+          }
+        } else if (!isHorizontal && (absDy > threshold || Math.abs(vy) > velocityThreshold)) {
+          const toUp = dy < 0;
+          const offY = (toUp ? -1 : 1) * (Dimensions.get('window').height * 0.6);
+          performItemSwipe(toUp ? 1 : -1, offY);
+        } else {
+          // gentle return to center
+          Animated.parallel([
+            Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: true, friction: 7, tension: 90 }),
+            Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 8, tension: 90 }),
+            Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
+          ]).start();
+        }
+      },
+      onPanResponderTerminate: () => {
+        Animated.parallel([
+          Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: true, friction: 7, tension: 90 }),
+          Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 8, tension: 90 }),
+          Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
+        ]).start();
+      },
+      onShouldBlockNativeResponder: () => true,
+    }),
+    [isRTL, movePreviewByCategoryOffset, movePreviewByItemOffset, previewDrag]
+  );
 
   const activeMeasurementOptions = React.useMemo(
     () => (pickerItem ? resolveMeasurementOptions(pickerItem) : []),
@@ -528,7 +873,7 @@ export function DshStoreGetScreen({
       return 0;
     }
 
-    return resolveMeasurementUnitPrice(pickerItem, selectedMeasureOption);
+    return resolveMeasurementUnitPrice(pickerItem!, selectedMeasureOption);
   }, [pickerItem, selectedMeasureOption]);
 
   const selectedMeasureTotalPrice = React.useMemo(
@@ -549,6 +894,15 @@ export function DshStoreGetScreen({
     setSelectedMeasureOption(options[0] ?? null);
   }, []);
 
+  const handlePreviewAddToCart = React.useCallback(() => {
+    if (!previewItem) {
+      return;
+    }
+
+    openMeasurementPicker(previewItem, { x: 200, y: 420 });
+    closeImagePreview();
+  }, [previewItem, openMeasurementPicker, closeImagePreview]);
+
   const closeMeasurementPicker = React.useCallback(() => {
     setPickerItem(null);
     setSelectedMeasureOption(null);
@@ -562,6 +916,27 @@ export function DshStoreGetScreen({
   const closeInlineSearch = React.useCallback(() => {
     setHeaderSearchVisible(false);
     setHeaderSearchQuery('');
+  }, []);
+
+  const handleAddToCart = React.useCallback(() => {
+    if (!pickerItem) {
+      return;
+    }
+
+    setAddedItemLabel(normalizeDisplayText(pickerItem!.name));
+    closeMeasurementPicker();
+    setCartToastVisible(true);
+    setCartDecisionVisible(true);
+  }, [pickerItem, closeMeasurementPicker]);
+
+  const handleGoToCart = React.useCallback(() => {
+    setCartDecisionVisible(false);
+    setCartToastVisible(false);
+    onOpenCart?.();
+  }, [onOpenCart]);
+
+  const handleContinueShopping = React.useCallback(() => {
+    setCartDecisionVisible(false);
   }, []);
 
   if (state !== 'ready') {
@@ -659,11 +1034,6 @@ export function DshStoreGetScreen({
 
   return (
     <View style={styles.screen}>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
         <View style={styles.topChrome}>
           {headerSearchVisible ? (
             <View style={styles.inlineSearchShell}>
@@ -818,62 +1188,193 @@ export function DshStoreGetScreen({
         <View style={styles.sectionBlock}>
           <ScrollView
             horizontal
+            ref={(r) => { chipsScrollRef.current = r; }}
+            onLayout={(e) => setChipsContainerWidth(e.nativeEvent.layout.width)}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={[styles.categoryRow, isRTL && styles.rowReverse]}
           >
             {categories.map((category) => {
               const selected = selectedCategory === category.id;
               return (
-                <BthChip
+                <View
                   key={category.id}
-                  label={`${normalizeDisplayText(category.label)} ${CATEGORY_ICON[category.id] ?? '•'}`}
-                  selected={selected}
-                  tone="brand"
-                  onPress={() => setSelectedCategory(category.id)}
-                />
+                  onLayout={(e) => {
+                    chipLayoutsRef.current[category.id] = {
+                      x: e.nativeEvent.layout.x,
+                      width: e.nativeEvent.layout.width,
+                    };
+                  }}
+                >
+                  <BthChip
+                    label={`${normalizeDisplayText(category.label)} ${CATEGORY_ICON[category.id] ?? '•'}`}
+                    selected={selected}
+                    tone="brand"
+                    onPress={() => changeCategory(category.id)}
+                  />
+                </View>
               );
             })}
           </ScrollView>
         </View>
 
         <View style={styles.feedSection}>
-          <View style={styles.feedList}>
-            {visibleItems.length > 0 ? (
-              visibleItems.map((item) => (
-                <MenuItemCard
-                  key={item.id}
-                  item={item}
-                  isRTL={isRTL}
-                  labels={itemLabels}
-                  partnerImageUri={store.imageUri}
-                  onAddPress={(anchor) => openMeasurementPicker(item, anchor)}
-                />
-              ))
-            ) : (
-              <View style={styles.emptyFeed}>
-                <Text style={styles.emptyFeedEmoji}>{headerSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
-                <Text style={styles.emptyFeedTitle}>
-                  {headerSearchQuery.trim() ? 'لا توجد نتائج داخل هذا المتجر' : storeText.get.emptyCategoryTitle}
-                </Text>
-                <Text style={styles.emptyFeedText}>
-                  {headerSearchQuery.trim()
-                    ? `جرّب البحث باسم منتج أو قسم آخر داخل ${normalizedStoreName}.`
-                    : storeText.get.emptyCategoryDescription}
-                </Text>
-              </View>
-            )}
-          </View>
+          <Animated.View style={[styles.feedList, { opacity: transitionAnim, transform: [{ scale: transitionAnim }] }]} {...panResponder.panHandlers}>
+            <Animated.FlatList
+              ref={(r) => { listRef.current = r as unknown as FlatList<DshStoreGetMenuItem> | null; }}
+              data={visibleItems as DshStoreGetMenuItem[]}
+              keyExtractor={(item) => (item as DshStoreGetMenuItem).id}
+              renderItem={({ item, index }) => {
+                const inputRange = [(index - 1) * SNAP_INTERVAL, index * SNAP_INTERVAL, (index + 1) * SNAP_INTERVAL];
+                const scale = scrollY.interpolate({ inputRange, outputRange: [0.986, 1, 0.986], extrapolate: 'clamp' });
+                const translateY = scrollY.interpolate({ inputRange, outputRange: [8, 0, 8], extrapolate: 'clamp' });
+                const opacity = scrollY.interpolate({ inputRange, outputRange: [0.9, 1, 0.9], extrapolate: 'clamp' });
+
+                return (
+                  <Animated.View style={[{ transform: [{ scale }, { translateY }], opacity, marginBottom: CARD_GAP }]}
+                    pointerEvents="box-none"
+                  >
+                    <MenuItemCard
+                      key={item.id}
+                      item={item}
+                      isRTL={isRTL}
+                      labels={itemLabels}
+                      partnerImageUri={store.imageUri}
+                      onAddPress={(anchor) => openMeasurementPicker(item, anchor)}
+                      onImagePress={(it) => openImagePreview(it, store?.imageUri)}
+                      isFavorited={favoriteIds.has(item.id)}
+                      onFavoritePress={() => handleToggleFavorite(item.id)}
+                    />
+                  </Animated.View>
+                );
+              }}
+              showsVerticalScrollIndicator={false}
+              snapToInterval={SNAP_INTERVAL}
+              decelerationRate="fast"
+              onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
+              scrollEventThrottle={16}
+              contentContainerStyle={{ paddingBottom: 28 }}
+              ListEmptyComponent={
+                <View style={styles.emptyFeed}>
+                  <Text style={styles.emptyFeedEmoji}>{headerSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
+                  <Text style={styles.emptyFeedTitle}>
+                    {headerSearchQuery.trim() ? 'لا توجد نتائج داخل هذا المتجر' : storeText.get.emptyCategoryTitle}
+                  </Text>
+                  <Text style={styles.emptyFeedText}>
+                    {headerSearchQuery.trim()
+                      ? `جرّب البحث باسم منتج أو قسم آخر داخل ${normalizedStoreName}.`
+                      : storeText.get.emptyCategoryDescription}
+                  </Text>
+                </View>
+              }
+            />
+          </Animated.View>
         </View>
 
+      <BthToast
+        visible={cartToastVisible}
+        title="تمت الإضافة إلى السلة"
+        description={addedItemLabel ? `${addedItemLabel} أضيفت بنجاح.` : 'تمت الإضافة إلى السلة.'}
+        tone="success"
+        actionLabel="عرض السلة"
+        onActionPress={handleGoToCart}
+        onDismiss={() => setCartToastVisible(false)}
+      />
 
-      </ScrollView>
+      <Modal visible={cartDecisionVisible} transparent animationType="fade" onRequestClose={handleContinueShopping}>
+        <Pressable style={styles.cartDecisionOverlay} onPress={handleContinueShopping}>
+          <View style={styles.cartDecisionCard} pointerEvents="box-none">
+            <Text style={styles.cartDecisionTitle}>تمت الإضافة للسلة</Text>
+            <Text style={styles.cartDecisionSubtitle}>{addedItemLabel ? `${addedItemLabel} أضيفت بنجاح إلى السلة.` : 'تمت الإضافة إلى السلة بنجاح.'}</Text>
+            <View style={styles.cartDecisionActions}>
+              <BthButton label="انتقال للسلة" tone="primary" fullWidth onPress={handleGoToCart} />
+              <BthButton label="متابعة التسوق" tone="secondary" fullWidth onPress={handleContinueShopping} />
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
+      <Modal visible={Boolean(previewItem)} transparent animationType="fade" onRequestClose={closeImagePreview}>
+        <View style={styles.previewOverlay}>
+          <Pressable style={styles.previewBackdrop} onPress={closeImagePreview} />
+          <View style={styles.previewWrap} pointerEvents="box-none">
+            {previewItem ? (
+              <Animated.View
+                style={[
+                  styles.previewCard,
+                  {
+                    transform: [
+                      { translateX: previewDrag.x },
+                      { translateY: previewDrag.y },
+                      { rotate: previewRotateDeg },
+                      { scale: previewScale },
+                    ],
+                  },
+                ]}
+                collapsable={false}
+              >
+                <View style={styles.previewSwipeLayer} {...previewPanResponder.panHandlers} />
+                <View style={styles.previewImageWrap} pointerEvents="box-none">
+                  <View style={styles.previewPartnerTile} pointerEvents="box-none">
+                    {previewItem!.partnerImageUri ? (
+                      <Image source={{ uri: previewItem!.partnerImageUri }} style={styles.previewPartnerImage} />
+                    ) : (
+                      <Ionicons name="storefront-outline" size={20} color={stylesTokens.orange} />
+                    )}
+                  </View>
+
+                  <Text style={styles.previewEmoji}>{getItemEmoji(previewItem!)}</Text>
+
+                  <Image
+                    source={{ uri: previewItem!.imageUri ?? sampleProductDataUri(normalizeDisplayText(previewItem!.name)) }}
+                    style={styles.previewImage}
+                  />
+
+                  {
+                    (() => {
+                      const overlayColor = getOverlayColor(normalizeDisplayText(previewItem!.name), 0.86);
+                      return (
+                        <View style={[styles.previewDetailsBox, { backgroundColor: overlayColor, flexDirection: isRTL ? 'row-reverse' : 'row' }]}> 
+                          <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]}>
+                            {store ? <Text style={[styles.previewStoreName, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizedStoreName}</Text> : null}
+                            <Text style={[styles.previewDetailsTitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.name)}</Text>
+                            {previewItem!.subtitle ? <Text style={[styles.previewDetailsSubtitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.subtitle)}</Text> : null}
+
+                            <View style={[styles.previewDetailsMetaRow, isRTL ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }]}>
+                              {previewItem!.priceLabel ? <Text style={[styles.previewDetailsPrice, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.priceLabel)}</Text> : null}
+                              {previewItem!.discountLabel ? <Text style={[styles.previewDetailsDiscount, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.discountLabel)}</Text> : null}
+                            </View>
+                          </View>
+
+                          <TouchableOpacity style={styles.previewDetailsFavoriteButton} activeOpacity={0.9} onPress={() => handleToggleFavorite(previewItem!.id)}>
+                            <Ionicons name={favoriteIds.has(previewItem!.id) ? 'heart' : 'heart-outline'} size={18} color={stylesTokens.orange} />
+                          </TouchableOpacity>
+
+                          <TouchableOpacity
+                            style={[styles.menuActionBadge, styles.previewActionButton]}
+                            activeOpacity={0.85}
+                            onPress={() => handlePreviewAddToCart()}
+                          >
+                            <Ionicons name="cart-outline" size={18} color={stylesTokens.white} />
+                            <View style={styles.menuActionPlusBadge}>
+                              <Ionicons name="add" size={10} color={stylesTokens.orange} />
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                      );
+                    })()
+                  }
+                </View>
+              </Animated.View>
+            ) : null}
+          </View>
+        </View>
+      </Modal>
 
       <Modal visible={Boolean(pickerItem)} transparent animationType="fade" onRequestClose={closeMeasurementPicker}>
         <Pressable style={styles.measureOverlay} onPress={closeMeasurementPicker}>
           <View style={[styles.measurePopoverWrap, { top: measurePopoverTop }]} pointerEvents="box-none">
             <View style={styles.measurePopoverDock}>
               <View style={styles.measureOriginBubble}>
-                <Ionicons name="cart-outline" size={22} color={stylesTokens.white} />
+                <Ionicons name="cart-outline" size={18} color={stylesTokens.white} />
                 <View style={styles.measureOriginPlusBadge}>
                   <Ionicons name="add" size={10} color={stylesTokens.orange} />
                 </View>
@@ -883,14 +1384,13 @@ export function DshStoreGetScreen({
                 {pickerItem ? (
                   <>
                     <View style={styles.measurePopoverHeader}>
-                      <Text style={styles.measureSheetTitle}>{normalizeDisplayText(pickerItem.name)}</Text>
-                      <Text style={styles.measureSheetSubtitle}>{resolveMeasurementLabel(pickerItem)}</Text>
+                      <Text style={styles.measureSheetTitle}>{normalizeDisplayText(pickerItem!.name)}</Text>
                     </View>
 
                     <View style={styles.measureOptionsGrid}>
                       {activeMeasurementOptions.map((option) => {
                         const selected = selectedMeasureOption === option;
-                        const optionPrice = formatCurrencyValue(resolveMeasurementUnitPrice(pickerItem, option));
+                        const optionPrice = formatCurrencyValue(resolveMeasurementUnitPrice(pickerItem!, option));
                         return (
                           <TouchableOpacity
                             key={option}
@@ -911,7 +1411,7 @@ export function DshStoreGetScreen({
                         activeOpacity={0.85}
                         onPress={() => setSelectedMeasureQty((current) => Math.max(1, current - 1))}
                       >
-                        <Ionicons name="remove" size={22} color="#8a94a6" />
+                        <Ionicons name="remove" size={18} color="#8a94a6" />
                       </TouchableOpacity>
 
                       <View style={styles.measureQtyValuePill}>
@@ -923,16 +1423,11 @@ export function DshStoreGetScreen({
                         activeOpacity={0.9}
                         onPress={() => setSelectedMeasureQty((current) => current + 1)}
                       >
-                        <Ionicons name="add" size={22} color={stylesTokens.white} />
+                        <Ionicons name="add" size={18} color={stylesTokens.white} />
                       </TouchableOpacity>
                     </View>
 
                     <View style={styles.measureFooterBar}>
-                      <TouchableOpacity style={styles.measureContinueButton} activeOpacity={0.85} onPress={closeMeasurementPicker}>
-                        <Ionicons name="bag-handle-outline" size={18} color="#6b7280" />
-                        <Text style={styles.measureContinueText}>متابعة التسوق</Text>
-                      </TouchableOpacity>
-
                       <View style={styles.measurePriceValueBox}>
                         <Text style={styles.measurePriceValueText}>{formatCurrencyValue(selectedMeasureTotalPrice || selectedMeasureUnitPrice)}</Text>
                       </View>
@@ -940,13 +1435,10 @@ export function DshStoreGetScreen({
                       <TouchableOpacity
                         style={styles.measureConfirmButton}
                         activeOpacity={0.9}
-                        onPress={() => {
-                          closeMeasurementPicker();
-                          onOpenCart?.();
-                        }}
+                        onPress={handleAddToCart}
                       >
                         <Text style={styles.measureConfirmText}>أضف للسلة</Text>
-                        <Ionicons name="cart-outline" size={18} color={stylesTokens.white} />
+                        <Ionicons name="cart-outline" size={16} color={stylesTokens.white} />
                       </TouchableOpacity>
                     </View>
                   </>
@@ -1538,10 +2030,13 @@ const styles = StyleSheet.create({
   },
 
   feedSection: {
+    flex: 1,
+    minHeight: 0,
     marginTop: 12,
     paddingHorizontal: 12,
   },
   feedList: {
+    flex: 1,
     gap: 10,
   },
 
@@ -1606,6 +2101,174 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(15, 23, 42, 0.06)',
   },
+  previewOverlay: {
+    flex: 1,
+    position: 'relative',
+    backgroundColor: 'rgba(15, 23, 42, 0.54)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 18,
+  },
+  previewBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 0,
+  },
+  previewWrap: {
+    width: '100%',
+    alignItems: 'center',
+    position: 'relative',
+    zIndex: 1,
+  },
+  previewCard: {
+    width: '100%',
+    maxWidth: 760,
+    borderRadius: 16,
+    position: 'relative',
+    zIndex: 2,
+    overflow: 'hidden',
+    backgroundColor: stylesTokens.white,
+  },
+  previewSwipeLayer: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1,
+  },
+  previewImageWrap: {
+    width: '100%',
+    height: 420,
+    backgroundColor: stylesTokens.light,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  previewImage: {
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  previewPartnerTile: {
+    position: 'absolute',
+    top: 18,
+    left: 18,
+    width: 56,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.96)',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    zIndex: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  previewPartnerImage: {
+    width: '100%',
+    height: '100%',
+  },
+  previewEmoji: {
+    position: 'absolute',
+    top: 36,
+    right: 36,
+    fontSize: 72,
+    zIndex: 2,
+    opacity: 0.18,
+  },
+  previewFavoriteButton: {
+    position: 'absolute',
+    bottom: 18,
+    right: 18,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: stylesTokens.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#fed7aa',
+    zIndex: 5,
+  },
+  previewDetailsBox: {
+    position: 'absolute',
+    left: 18,
+    right: 18,
+    bottom: 18,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    minHeight: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    zIndex: 6,
+  },
+  previewDetailsContent: {
+    flex: 1,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  previewDetailsContentRTL: {
+    alignItems: 'flex-end',
+  },
+  previewDetailsTitle: {
+    color: stylesTokens.dark,
+    fontSize: 14,
+    fontWeight: '900',
+    marginBottom: 2,
+  },
+  previewStoreName: {
+    color: stylesTokens.orange,
+    fontSize: 11,
+    fontWeight: '900',
+    marginBottom: 2,
+  },
+  previewDetailsSubtitle: {
+    color: stylesTokens.muted,
+    fontSize: 11,
+    marginBottom: 0,
+  },
+  previewDetailsDiscount: {
+    color: stylesTokens.red,
+    fontSize: 12,
+    fontWeight: '900',
+    marginTop: 6,
+  },
+  previewDetailsPrice: {
+    color: stylesTokens.dark,
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  previewDetailsCartButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: stylesTokens.orange,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  previewDetailsFavoriteButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: stylesTokens.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#fed7aa',
+    zIndex: 3,
+    elevation: 3,
+  },
+  previewActionButton: {
+    zIndex: 3,
+    elevation: 3,
+  },
+  previewDetailsMetaRow: {
+    marginTop: 4,
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
   measurePopoverWrap: {
     position: 'absolute',
     left: 10,
@@ -1617,9 +2280,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   measureOriginBubble: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: stylesTokens.orange,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1631,9 +2294,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -2,
     left: -2,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
     backgroundColor: stylesTokens.white,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1642,12 +2305,13 @@ const styles = StyleSheet.create({
   },
   measurePopoverCard: {
     flex: 1,
+    maxWidth: 280,
     backgroundColor: stylesTokens.white,
-    borderRadius: 24,
-    padding: 14,
+    borderRadius: 16,
+    padding: 8,
     borderWidth: 1,
     borderColor: '#d9e0ea',
-    gap: 12,
+    gap: 6,
     ...Platform.select({
       ios: {
         shadowColor: '#0f172a',
@@ -1662,37 +2326,37 @@ const styles = StyleSheet.create({
   },
   measurePopoverHeader: {
     alignItems: 'flex-end',
-    gap: 2,
+    gap: 1,
   },
   measureSheetTitle: {
     color: stylesTokens.dark,
-    fontSize: 16,
-    fontWeight: '900',
+    fontSize: 15,
+    fontWeight: '800',
     textAlign: 'right',
   },
   measureSheetSubtitle: {
     color: stylesTokens.muted,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     textAlign: 'right',
   },
   measureOptionsGrid: {
     flexDirection: 'row-reverse',
-    gap: 10,
+    gap: 4,
     justifyContent: 'space-between',
   },
   measureOptionChip: {
     flex: 1,
-    minHeight: 72,
+    minHeight: 48,
     backgroundColor: stylesTokens.white,
     borderWidth: 1,
     borderColor: '#d9e0ea',
-    borderRadius: 22,
+    borderRadius: 18,
     paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingVertical: 6,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
+    gap: 4,
   },
   measureOptionChipActive: {
     backgroundColor: stylesTokens.orange,
@@ -1700,8 +2364,8 @@ const styles = StyleSheet.create({
   },
   measureOptionText: {
     color: stylesTokens.dark,
-    fontSize: 12.5,
-    fontWeight: '900',
+    fontSize: 12,
+    fontWeight: '800',
   },
   measureOptionTextActive: {
     color: stylesTokens.white,
@@ -1718,13 +2382,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 16,
-    marginTop: 2,
+    gap: 8,
+    marginTop: 4,
   },
   measureQtyGhostButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: '#f8fafc',
     borderWidth: 1,
     borderColor: '#d9e0ea',
@@ -1732,9 +2396,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   measureQtyPrimaryButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: stylesTokens.orange,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1742,71 +2406,101 @@ const styles = StyleSheet.create({
     borderColor: '#ffb35c',
   },
   measureQtyValuePill: {
-    minWidth: 90,
-    height: 64,
-    borderRadius: 22,
+    minWidth: 56,
+    height: 38,
+    borderRadius: 16,
     backgroundColor: '#fffaf5',
     borderWidth: 1,
     borderColor: '#fed7aa',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 18,
+    paddingHorizontal: 10,
   },
   measureQtyValueText: {
     color: stylesTokens.dark,
-    fontSize: 22,
+    fontSize: 15,
     fontWeight: '900',
   },
   measureFooterBar: {
     flexDirection: 'row-reverse',
-    alignItems: 'stretch',
+    alignItems: 'center',
     overflow: 'hidden',
-    borderRadius: 10,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: '#d9e0ea',
     marginTop: 4,
   },
-  measureContinueButton: {
-    flex: 1.1,
-    backgroundColor: '#f8fafc',
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    paddingHorizontal: 10,
-  },
-  measureContinueText: {
-    color: stylesTokens.dark,
-    fontSize: 13,
-    fontWeight: '800',
-  },
   measurePriceValueBox: {
-    minWidth: 112,
+    minWidth: 72,
     backgroundColor: stylesTokens.white,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
   },
   measurePriceValueText: {
     color: stylesTokens.dark,
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '900',
   },
   measureConfirmButton: {
-    flex: 1.3,
+    flex: 1,
     backgroundColor: stylesTokens.orange,
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
+    gap: 6,
+    paddingVertical: 9,
+    paddingHorizontal: 10,
   },
   measureConfirmText: {
     color: stylesTokens.white,
-    fontSize: 14,
+    fontSize: 13.5,
     fontWeight: '900',
+  },
+  cartDecisionOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.42)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  cartDecisionCard: {
+    width: '100%',
+    maxWidth: 380,
+    backgroundColor: stylesTokens.white,
+    borderRadius: 24,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#d9e0ea',
+    gap: 14,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0f172a',
+        shadowOpacity: 0.06,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 6 },
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+  cartDecisionTitle: {
+    color: stylesTokens.dark,
+    fontSize: 17,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
+  cartDecisionSubtitle: {
+    color: stylesTokens.muted,
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  cartDecisionActions: {
+    gap: 10,
   },
   menuBody: {
     flex: 1,
@@ -1965,7 +2659,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#e5e7eb',
-    zIndex: 1,
+    zIndex: 6,
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
@@ -1989,6 +2683,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#fed7aa',
+    zIndex: 3,
+  },
+
+  menuImagePressable: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
 
   emptyFeed: {
