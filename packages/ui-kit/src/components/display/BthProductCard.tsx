@@ -17,6 +17,10 @@ export type BthProductCardProps = {
   title: string;
   subtitle?: string;
   imageUri?: string;
+  // When false the card shows the colored/text placeholder instead of the
+  // partner-supplied image. Default is `true` to preserve existing behavior
+  // for callers that expect images to show.
+  showImage?: boolean;
   price?: ProductCardPrice;
   oldPrice?: ProductCardPrice;
   discountLabel?: string;
@@ -32,6 +36,7 @@ export function BthProductCard({
   title,
   subtitle,
   imageUri,
+  showImage = true,
   price,
   oldPrice,
   discountLabel,
@@ -75,7 +80,7 @@ export function BthProductCard({
         </View>
       </View>
 
-      {imageUri ? (
+      {showImage && imageUri ? (
         <Image
           source={{ uri: imageUri }}
           style={{ width: imageSize, height: imageSize, borderRadius: radius.md }}

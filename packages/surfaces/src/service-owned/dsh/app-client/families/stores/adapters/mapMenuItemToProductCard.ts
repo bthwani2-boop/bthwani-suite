@@ -14,7 +14,12 @@ export function mapMenuItemToProductCard(item: DshStoreFixtureItem): BthProductC
     id: item.id,
     title: item.name ?? '',
     subtitle: item.subtitle,
+    // Keep the image URI available but explicitly opt-out of showing it here
+    // so the product-card renders the original colored/text placeholder.
+    // This makes it easy to re-enable the images later (either by changing
+    // this flag or reverting the commit).
     imageUri: item.imageUri,
+    showImage: false,
     price: item.priceLabel ? { label: item.priceLabel, value: item.priceValue ?? extractPriceValue(item.priceLabel) } : undefined,
     oldPrice: item.oldPriceLabel ? { label: item.oldPriceLabel, value: item.oldPriceValue ?? extractPriceValue(item.oldPriceLabel) } : undefined,
     discountLabel: item.discountLabel,
