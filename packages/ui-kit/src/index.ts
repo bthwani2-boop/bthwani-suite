@@ -8,3 +8,4 @@ export * from './primitives';
 export * from './states';
 export * from './components';
 export * from './patterns';
+export * from './utils/amountToArabicText';

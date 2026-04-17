@@ -24,7 +24,7 @@ const { KnzEntryScreen } = knz.knzAppClient;
 const { KwdEntryScreen } = kwd.kwdAppClient;
 const { MrfEntryScreen } = mrf.mrfAppClient;
 const { SndEntryScreen } = snd.sndAppClient;
-const { WltEntryScreen } = wlt.wltAppClient;
+const { WltHomeGetScreen, WltTopupScreen } = wlt.wltAppClient;
 const { DshSurfaceHost } = dsh.dshAppClient;
 const { ClientEntrySurface } = appClientSurfaceOwned.ClientEntry;
 const { ClientLoginSurface } = appClientSurfaceOwned.ClientLogin;
@@ -52,7 +52,8 @@ type ClientRoute =
   | 'kwd-entry'
   | 'mrf-entry'
   | 'snd-entry'
-  | 'wlt-entry';
+  | 'wlt-entry'
+  | 'wlt-home';
 
 type AccountSheetTab = 'menu' | 'settings';
 
@@ -474,11 +475,13 @@ export function ClientSurfaceHost() {
 
     if (route === 'wlt-entry') {
       return (
-        <WltEntryScreen
-          onStartPress={() => setRoute('home')}
-          onBrowsePress={() => setRoute('home')}
-          onTrackOrdersPress={() => setRoute('home')}
-        />
+        <WltHomeGetScreen />
+      );
+    }
+
+    if (route === 'wlt-home') {
+      return (
+        <WltHomeGetScreen />
       );
     }
 

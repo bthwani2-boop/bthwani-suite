@@ -6,3 +6,4 @@ export * from './display';
 export * from './navigation';
 export * from './selectors';
 export * from './overlays';
+export * from './payment';

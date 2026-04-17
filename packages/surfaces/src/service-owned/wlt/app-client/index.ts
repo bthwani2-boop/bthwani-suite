@@ -1,5 +1,5 @@
 export * from './surface-meta';
 export * from './surface-catalog';
-export * from './entry/screens';
+export * from './families/screens';
 
 

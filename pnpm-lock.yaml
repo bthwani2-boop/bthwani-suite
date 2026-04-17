@@ -267,6 +267,10 @@ importers:
         version: link:../ui-kit
 
   packages/ui-kit:
+    dependencies:
+      next:
+        specifier: 16.2.2
+        version: 16.2.2(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.1.0)(react@19.1.0)
     devDependencies:
       '@types/react':
         specifier: ^19.2.2

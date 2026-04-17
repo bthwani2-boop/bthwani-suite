@@ -1322,14 +1322,16 @@ export function DshStoreGetScreen({
                   >
                     {
                       (() => {
-                        const productProps = mapMenuItemToProductCard(item);
                         return (
-                          <BthProductCard
+                          <MenuItemCard
                             key={item.id}
-                            {...productProps}
-                            onAdd={(anchor) => openMeasurementPicker(item, anchor ?? { x: 32, y: 360 })}
-                            onFavorite={() => handleToggleFavorite(item.id)}
-                            onPress={() => openImagePreview(item, store?.imageUri)}
+                            item={item}
+                            isRTL={isRTL}
+                            labels={itemLabels}
+                            partnerImageUri={store?.imageUri}
+                            onAddPress={(anchor) => openMeasurementPicker(item, anchor ?? { x: 32, y: 360 })}
+                            onImagePress={(it) => openImagePreview(it, store?.imageUri)}
+                            onFavoritePress={() => handleToggleFavorite(item.id)}
                             isFavorited={favoriteIds.has(item.id)}
                           />
                         );
