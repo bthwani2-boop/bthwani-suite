@@ -1,5 +1,6 @@
 export * from './BthBadge';
 export * from './BthCard';
+export * from './BthProductCard';
 export * from './BthStatCard';
 export * from './BthListItem';
 export * from './BthKeyValueList';

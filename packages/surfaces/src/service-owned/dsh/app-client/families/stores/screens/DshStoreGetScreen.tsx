@@ -20,26 +20,12 @@ import {
   type GestureResponderEvent,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BthButton, BthChip, BthHighlightsRail, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText } from '@bthwani/ui-kit';
+import { BthButton, BthChip, BthHighlightsRail, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText, BthProductCard } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../../../control-panel/catalogs/dsh/catalog';
+import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../fixtures';
+import { mapMenuItemToProductCard } from '../adapters/mapMenuItemToProductCard';
 
-export type DshStoreGetMenuItem = {
-  id: string;
-  name: string;
-  subtitle: string;
-  priceLabel: string;
-  oldPriceLabel?: string;
-  discountLabel?: string;
-  measurementType?: 'piece' | 'weight' | 'portion';
-  measurementOptions?: string[];
-  categoryId: string;
-  categoryLabel: string;
-  statusLabel?: string;
-  isAvailable?: boolean;
-  hasOptions?: boolean;
-  preparationTime?: string;
-  imageUri?: string;
-};
+// Menu item type is imported from fixtures for consistency across surfaces
 
 export type DshStoreGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
@@ -597,6 +583,58 @@ export function DshStoreGetScreen({
   // tighter rotation range for a premium subtle feel
   const previewRotateDeg = previewRotate.interpolate({ inputRange: [-200, 200], outputRange: ['-6deg', '6deg'], extrapolate: 'clamp' });
 
+  // Staging preview (next card) shown while user drags
+  const [stagingPreviewItem, setStagingPreviewItem] = React.useState<(DshStoreGetMenuItem & { partnerImageUri?: string }) | null>(null);
+  const [stagingType, setStagingType] = React.useState<'category' | 'item' | null>(null);
+  const [stagingSign, setStagingSign] = React.useState<number>(1);
+
+  const STAGE_OFFSET_X = Dimensions.get('window').width + 220;
+  const stageOffsetPosX = React.useRef(new Animated.Value(STAGE_OFFSET_X)).current;
+  const stageOffsetNegX = React.useRef(new Animated.Value(-STAGE_OFFSET_X)).current;
+
+  const STAGE_OFFSET_Y = Dimensions.get('window').height * 0.6;
+  const stageOffsetPosY = React.useRef(new Animated.Value(STAGE_OFFSET_Y)).current;
+  const stageOffsetNegY = React.useRef(new Animated.Value(-STAGE_OFFSET_Y)).current;
+
+  // Throttle & prefetch helpers to avoid heavy work on every move event
+  const lastStagingUpdateRef = React.useRef<number>(0);
+  const STAGING_THROTTLE_MS = 90; // ms between staging updates
+  const prefetchedUrisRef = React.useRef<Record<string, boolean>>({});
+  const stagingIdRef = React.useRef<string | null>(null);
+
+  const trySetStaging = React.useCallback((nextPreview: (DshStoreGetMenuItem & { partnerImageUri?: string }) | null, type: 'category' | 'item' | null, sign: number) => {
+    const now = Date.now();
+    if (!nextPreview) {
+      stagingIdRef.current = null;
+      try { setStagingPreviewItem(null); setStagingType(null); setStagingSign(1); } catch {}
+      return;
+    }
+
+    if (stagingIdRef.current === nextPreview.id && stagingType === type) {
+      return; // already staged
+    }
+
+    if (now - lastStagingUpdateRef.current < STAGING_THROTTLE_MS) {
+      return; // throttle frequent moves
+    }
+
+    lastStagingUpdateRef.current = now;
+
+    const uri = nextPreview.imageUri;
+    if (uri && !prefetchedUrisRef.current[uri]) {
+      // mark as prefetched to avoid repeating
+      prefetchedUrisRef.current[uri] = true;
+      // prefetch asynchronously then set staging (don't await on main thread)
+      Image.prefetch(uri).finally(() => {
+        stagingIdRef.current = nextPreview.id;
+        try { setStagingPreviewItem(nextPreview); setStagingType(type); setStagingSign(sign); } catch {}
+      });
+    } else {
+      stagingIdRef.current = nextPreview.id;
+      try { setStagingPreviewItem(nextPreview); setStagingType(type); setStagingSign(sign); } catch {}
+    }
+  }, [stagingType]);
+
   const chipsScrollRef = React.useRef<ScrollView | null>(null);
   const chipLayoutsRef = React.useRef<Record<string, { x: number; width: number }>>({});
   const [chipsContainerWidth, setChipsContainerWidth] = React.useState(0);
@@ -778,9 +816,58 @@ export function DshStoreGetScreen({
       },
       onPanResponderMove: (_evt, gestureState) => {
         // more responsive movement multiplier for quicker feedback
-        previewDrag.setValue({ x: gestureState.dx * 0.36, y: gestureState.dy * 0.36 });
+        const dampX = gestureState.dx * 0.36;
+        const dampY = gestureState.dy * 0.36;
+        previewDrag.setValue({ x: dampX, y: dampY });
         // smaller, smoother rotation mapping
         previewRotate.setValue(gestureState.dx * 0.045);
+
+        // staging logic: reveal next card immediately while dragging
+        const { dx, dy } = gestureState;
+        const absDx = Math.abs(dx);
+        const absDy = Math.abs(dy);
+
+        // horizontal staging
+        if (absDx >= absDy && absDx > 8) {
+          const toLeft = dx < 0;
+          const currentCatIndex = categories.findIndex((c) => c.id === selectedCategory);
+          let candidateCatIndex = currentCatIndex;
+          if (isRTL) {
+            candidateCatIndex = dx < 0 ? Math.max(currentCatIndex - 1, 0) : Math.min(currentCatIndex + 1, categories.length - 1);
+          } else {
+            candidateCatIndex = dx < 0 ? Math.min(currentCatIndex + 1, categories.length - 1) : Math.max(currentCatIndex - 1, 0);
+          }
+
+          if (candidateCatIndex !== currentCatIndex) {
+            const nextCategoryItems = resolveItemsForCategory(categories[candidateCatIndex].id);
+              if (nextCategoryItems.length) {
+              const nextPreview = { ...nextCategoryItems[0], partnerImageUri: store?.imageUri } as (DshStoreGetMenuItem & { partnerImageUri?: string });
+              trySetStaging(nextPreview, 'category', toLeft ? 1 : -1);
+            } else {
+              // clear staging if no candidate
+              trySetStaging(null, null, 1);
+            }
+          } else if (stagingPreviewItem) {
+            setStagingPreviewItem(null);
+            setStagingType(null);
+          }
+
+        // vertical staging
+        } else if (absDy > absDx && absDy > 8) {
+          if (previewCurrentIndex !== -1) {
+            const toUp = dy < 0;
+            const candidateItemIndex = Math.max(0, Math.min(previewItems.length - 1, previewCurrentIndex + (toUp ? 1 : -1)));
+            if (candidateItemIndex !== previewCurrentIndex) {
+              const nextPreview = { ...previewItems[candidateItemIndex], partnerImageUri: store?.imageUri } as (DshStoreGetMenuItem & { partnerImageUri?: string });
+              trySetStaging(nextPreview, 'item', toUp ? 1 : -1);
+            } else {
+              trySetStaging(null, null, 1);
+            }
+          }
+        } else {
+          // clear if movement is not directional enough
+          trySetStaging(null, null, 1);
+        }
       },
       onPanResponderRelease: (_evt, gestureState) => {
         const { dx, dy, vx, vy } = gestureState;
@@ -805,7 +892,7 @@ export function DshStoreGetScreen({
               Animated.timing(previewDrag.x, { toValue: 0, duration: Math.max(180, Math.floor(280 - speedAdj / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: true }),
               Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 6, tension: 90 }),
               Animated.timing(previewRotate, { toValue: 0, duration: 180, useNativeDriver: true }),
-            ]).start();
+            ]).start(() => { stagingIdRef.current = null; try { setStagingPreviewItem(null); setStagingType(null); } catch {} });
             try { Vibration.vibrate(8); } catch {}
           });
         };
@@ -822,7 +909,7 @@ export function DshStoreGetScreen({
               Animated.timing(previewDrag.y, { toValue: 0, duration: Math.max(160, Math.floor(240 - speedAdjY / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: true }),
               Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 6, tension: 90 }),
               Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
-            ]).start();
+            ]).start(() => { stagingIdRef.current = null; try { setStagingPreviewItem(null); setStagingType(null); } catch {} });
             try { Vibration.vibrate(6); } catch {}
           });
         };
@@ -848,7 +935,7 @@ export function DshStoreGetScreen({
             Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: true, friction: 7, tension: 90 }),
             Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 8, tension: 90 }),
             Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
-          ]).start();
+          ]).start(() => { stagingIdRef.current = null; try { setStagingPreviewItem(null); setStagingType(null); } catch {} });
         }
       },
       onPanResponderTerminate: () => {
@@ -856,11 +943,11 @@ export function DshStoreGetScreen({
           Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: true, friction: 7, tension: 90 }),
           Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 8, tension: 90 }),
           Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
-        ]).start();
+        ]).start(() => { stagingIdRef.current = null; try { setStagingPreviewItem(null); setStagingType(null); } catch {} });
       },
       onShouldBlockNativeResponder: () => true,
     }),
-    [isRTL, movePreviewByCategoryOffset, movePreviewByItemOffset, previewDrag]
+    [isRTL, movePreviewByCategoryOffset, movePreviewByItemOffset, previewDrag, categories, selectedCategory, previewItems, previewCurrentIndex, store?.imageUri, stagingPreviewItem, stagingType]
   );
 
   const activeMeasurementOptions = React.useMemo(
@@ -1233,17 +1320,21 @@ export function DshStoreGetScreen({
                   <Animated.View style={[{ transform: [{ scale }, { translateY }], opacity, marginBottom: CARD_GAP }]}
                     pointerEvents="box-none"
                   >
-                    <MenuItemCard
-                      key={item.id}
-                      item={item}
-                      isRTL={isRTL}
-                      labels={itemLabels}
-                      partnerImageUri={store.imageUri}
-                      onAddPress={(anchor) => openMeasurementPicker(item, anchor)}
-                      onImagePress={(it) => openImagePreview(it, store?.imageUri)}
-                      isFavorited={favoriteIds.has(item.id)}
-                      onFavoritePress={() => handleToggleFavorite(item.id)}
-                    />
+                    {
+                      (() => {
+                        const productProps = mapMenuItemToProductCard(item);
+                        return (
+                          <BthProductCard
+                            key={item.id}
+                            {...productProps}
+                            onAdd={(anchor) => openMeasurementPicker(item, anchor ?? { x: 32, y: 360 })}
+                            onFavorite={() => handleToggleFavorite(item.id)}
+                            onPress={() => openImagePreview(item, store?.imageUri)}
+                            isFavorited={favoriteIds.has(item.id)}
+                          />
+                        );
+                      })()
+                    }
                   </Animated.View>
                 );
               }}
@@ -1296,6 +1387,71 @@ export function DshStoreGetScreen({
         <View style={styles.previewOverlay}>
           <Pressable style={styles.previewBackdrop} onPress={closeImagePreview} />
           <View style={styles.previewWrap} pointerEvents="box-none">
+            {stagingPreviewItem ? (
+              (() => {
+                // choose appropriate offset node for staging transform
+                const stageX = stagingSign === 1 ? stageOffsetPosX : stageOffsetNegX;
+                const stageY = stagingSign === 1 ? stageOffsetPosY : stageOffsetNegY;
+                const stageTranslateX = Animated.add(previewDrag.x, stageX);
+                const stageTranslateY = Animated.add(previewDrag.y, stageY);
+                const stageOpacity = stagingType === 'category'
+                  ? previewDrag.x.interpolate({ inputRange: stagingSign === 1 ? [-24, 0] : [0, 24], outputRange: [1, 0], extrapolate: 'clamp' })
+                  : previewDrag.y.interpolate({ inputRange: stagingSign === 1 ? [-24, 0] : [0, 24], outputRange: [1, 0], extrapolate: 'clamp' });
+
+                return (
+                  <Animated.View
+                    pointerEvents="none"
+                    collapsable={false}
+                    style={[
+                      styles.previewCard,
+                      { position: 'absolute', left: 0, right: 0, zIndex: 1, opacity: stageOpacity, transform: stagingType === 'category' ? [{ translateX: stageTranslateX }] : [{ translateY: stageTranslateY }] },
+                    ]}
+                  >
+                    <View style={styles.previewImageWrap} pointerEvents="box-none">
+                      <View style={styles.previewPartnerTile} pointerEvents="box-none">
+                        {stagingPreviewItem.partnerImageUri ? (
+                          <Image source={{ uri: stagingPreviewItem.partnerImageUri }} style={styles.previewPartnerImage} />
+                        ) : (
+                          <Ionicons name="storefront-outline" size={20} color={stylesTokens.orange} />
+                        )}
+                      </View>
+
+                      <Text style={styles.previewEmoji}>{getItemEmoji(stagingPreviewItem)}</Text>
+
+                      <Image
+                        source={{ uri: stagingPreviewItem.imageUri ?? sampleProductDataUri(normalizeDisplayText(stagingPreviewItem.name)) }}
+                        style={styles.previewImage}
+                      />
+
+                      {
+                        (() => {
+                          const overlayColor = getOverlayColor(normalizeDisplayText(stagingPreviewItem.name), 0.86);
+                          return (
+                            <View style={[styles.previewDetailsBox, { backgroundColor: overlayColor, flexDirection: isRTL ? 'row-reverse' : 'row' }]}> 
+                              <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]}>
+                                {store ? <Text style={[styles.previewStoreName, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizedStoreName}</Text> : null}
+                                <Text style={[styles.previewDetailsTitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(stagingPreviewItem.name)}</Text>
+                                {stagingPreviewItem.subtitle ? <Text style={[styles.previewDetailsSubtitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(stagingPreviewItem.subtitle)}</Text> : null}
+
+                                <View style={[styles.previewDetailsMetaRow, isRTL ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }]}>
+                                  {stagingPreviewItem.priceLabel ? <Text style={[styles.previewDetailsPrice, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(stagingPreviewItem.priceLabel)}</Text> : null}
+                                  {stagingPreviewItem.discountLabel ? <Text style={[styles.previewDetailsDiscount, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(stagingPreviewItem.discountLabel)}</Text> : null}
+                                </View>
+                              </View>
+
+                              <View style={[styles.previewDetailsFavoriteButton, { opacity: 0.95 }]}>
+                                <Ionicons name={favoriteIds.has(stagingPreviewItem.id) ? 'heart' : 'heart-outline'} size={18} color={stylesTokens.orange} />
+                              </View>
+                            </View>
+                          );
+                        })()
+                      }
+                    </View>
+                  </Animated.View>
+                );
+              })()
+            ) : null}
+
             {previewItem ? (
               <Animated.View
                 style={[
@@ -1307,11 +1463,12 @@ export function DshStoreGetScreen({
                       { rotate: previewRotateDeg },
                       { scale: previewScale },
                     ],
+                    zIndex: 2,
                   },
                 ]}
                 collapsable={false}
               >
-                <View style={styles.previewSwipeLayer} {...previewPanResponder.panHandlers} />
+                <View style={styles.previewSwipeLayer} pointerEvents="auto" {...previewPanResponder.panHandlers} />
                 <View style={styles.previewImageWrap} pointerEvents="box-none">
                   <View style={styles.previewPartnerTile} pointerEvents="box-none">
                     {previewItem!.partnerImageUri ? (
@@ -2130,7 +2287,8 @@ const styles = StyleSheet.create({
   },
   previewSwipeLayer: {
     ...StyleSheet.absoluteFillObject,
-    zIndex: 1,
+    zIndex: 999,
+    backgroundColor: 'transparent',
   },
   previewImageWrap: {
     width: '100%',
