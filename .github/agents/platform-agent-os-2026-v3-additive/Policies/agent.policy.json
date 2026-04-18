@@ -1,0 +1,105 @@
+{
+  "policy_id": "BTHWANI_AGENT_OS_2026_V3_ADD_ONLY_POLICY",
+  "acceptance_threshold": 100,
+  "reject_below": 100,
+  "mode": "add_only_fail_closed",
+  "active_repo_preferred": "C:\\bthwani-suite",
+  "canonical_repo_candidates": [
+    "C:\\bthwani-suite",
+    "C:\\Users\\b\\Documents\\GitHub\\bthwani-suite"
+  ],
+  "fallback_sources": [
+    {
+      "path": "C:\\bthwani-suite\\docs\\services\\surfaces-legacy-trash",
+      "mode": "read_only"
+    },
+    {
+      "path": "C:\\Users\\b\\Documents\\GitHub\\bthfinal",
+      "mode": "read_only"
+    }
+  ],
+  "canonical_roots": [
+    "apps",
+    "services",
+    "packages/ui-kit",
+    "packages/app-shells",
+    "packages/surfaces",
+    "packages/api-types",
+    "packages/api-clients",
+    "contracts",
+    "runtime",
+    "docs",
+    "governance",
+    "tools"
+  ],
+  "forbidden_roots": [
+    "/app/frontend",
+    "/app/backend",
+    "/app/memory",
+    "surfaces/",
+    "packages/app-user-surfaces"
+  ],
+  "surfaces": [
+    "app-client",
+    "app-partner",
+    "app-captain",
+    "app-field",
+    "control-panel",
+    "webapp",
+    "website"
+  ],
+  "services": [
+    "dsh",
+    "wlt",
+    "knz",
+    "arb",
+    "amn",
+    "esf",
+    "mrf",
+    "snd",
+    "kwd"
+  ],
+  "paid_services": [
+    "dsh",
+    "amn",
+    "arb",
+    "wlt"
+  ],
+  "free_services": [
+    "esf",
+    "kwd",
+    "mrf",
+    "snd"
+  ],
+  "knz_rule": "No platform C2C item payment, no platform delivery, no KNZ captain. Any platform-side financial effect through WLT only.",
+  "financial_path": {
+    "owner": "wlt",
+    "rule": "all financial effects through WLT contracts and guards only"
+  },
+  "brand_identity": {
+    "primary": [
+      "white",
+      "orange",
+      "dark_navy_blue"
+    ],
+    "support": [
+      "green_success",
+      "red_error",
+      "gray_secondary"
+    ],
+    "hex": "TBD unless proven"
+  },
+  "ui_kit_owner": "packages/ui-kit",
+  "phase_order": [
+    "forensics",
+    "analysis",
+    "design_decision",
+    "ui_kit_impact",
+    "plan",
+    "apply",
+    "verify",
+    "evidence_report",
+    "next_unlock"
+  ],
+  "human_escalation": "after current repo/docs/surfaces-legacy-trash/bthfinal fail or conflict"
+}

@@ -1,0 +1,12 @@
+name: bthwani-agent-os-2026-v3-guard
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  agent-os-v3-guard:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify BThwani Agent OS V3
+        shell: pwsh
+        run: .\tools\scripts\BTHWANI_AGENT_OS_2026_V3_FULL_GATE.ps1

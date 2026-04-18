@@ -1,0 +1,42 @@
+{
+  "required": [
+    "task_summary",
+    "intent",
+    "scope",
+    "allowed_changes",
+    "forbidden_changes"
+  ],
+  "properties": {
+    "intent": [
+      "forensics",
+      "design",
+      "build",
+      "fix",
+      "review",
+      "verify",
+      "release",
+      "docs",
+      "unknown"
+    ],
+    "surfaces": [
+      "app-client",
+      "app-partner",
+      "app-captain",
+      "app-field",
+      "control-panel",
+      "webapp",
+      "website"
+    ],
+    "services": [
+      "dsh",
+      "wlt",
+      "knz",
+      "arb",
+      "amn",
+      "esf",
+      "mrf",
+      "snd",
+      "kwd"
+    ]
+  }
+}

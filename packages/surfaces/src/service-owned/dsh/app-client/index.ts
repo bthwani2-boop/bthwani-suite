@@ -13,7 +13,7 @@ export * from './families/home/screens';
 export * from './families/my_space/screens';
 export * from './families/notifications/screens';
 export * from './families/loyalty/screens';
-export * from './families/orders/screens';
+// orders folder consolidated into checkout/screens to avoid duplication
 export * from './families/shein/screens';
 export * from './families/stores/screens';
 export * from './families/support/screens';

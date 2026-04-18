@@ -7,7 +7,7 @@ import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './
 import { DshMySpaceScreen } from './families/my_space/screens';
 import { DshNotificationsScreen } from './families/notifications/screens';
 import { DshBenefitsHubScreen } from './families/loyalty/screens';
-import { DshOrdersListScreen } from './families/orders/screens';
+import { DshOrdersListScreen } from './families/checkout/screens';
 import { DshSheinOrderCreateScreen } from './families/shein/screens';
 import { DshStoresListScreen, DshStoreGetScreen, DshStoreDetailScreen, DshStoreItemsScreen, DshStoreItemsListScreen } from './families/stores/screens';
 import { DshCategoriesListScreen, DshCategoryGetScreen } from './families/categories/screens';
@@ -29,7 +29,7 @@ import {
 } from './families/stores/fixtures';
 import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../control-panel/marketing/dsh/banner-store';
 import { getLiveMarketingGrowthItems } from '../control-panel/marketing/dsh/growth-store';
-import { DshOrderSuccessState } from './families/orders/screens';
+import { DshOrderSuccessState } from './families/checkout/screens';
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './families/categories/fixtures/dshCategoriesFixtures';
 import { dshPartnerIntakeItems } from '../control-panel/partners/dsh/workflow';
 

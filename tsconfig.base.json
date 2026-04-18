@@ -15,7 +15,7 @@
         "./packages/api-types/src/index.ts"
       ],
       "@bthwani/ui-kit": [
-        "./packages/ui-kit/src/index.ts"
+        "./packages/ui-kit/src/index.ts" ], "@bthwani/ui-kit/*": [ "./packages/ui-kit/src/*.ts"
       ],
       "@bthwani/app-shells": [
         "./packages/app-shells/index.ts"
