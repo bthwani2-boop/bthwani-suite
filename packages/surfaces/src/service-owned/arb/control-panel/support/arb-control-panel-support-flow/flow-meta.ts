@@ -1,5 +1,5 @@
 export const flowMeta = {
-  id: '_flow-id_',
+  id: 'amn-control-panel-operations-flow',
   owner: 'support',
   ownerKind: 'section',
   placeholder: true,

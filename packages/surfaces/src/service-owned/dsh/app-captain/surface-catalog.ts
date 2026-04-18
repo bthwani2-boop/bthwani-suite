@@ -18,5 +18,5 @@ export const surfaceCatalog = [
   'proof-upload',
   'tier-evaluate',
   'tier-info',
-  '_flow-id_'
+  'amn-control-panel-operations-flow'
 ] as const;

@@ -6,5 +6,5 @@ export const surfaceCatalog = [
   'store-activation',
   'geo-pin',
   'visit-log',
-  '_flow-id_'
+  'amn-control-panel-operations-flow'
 ] as const;

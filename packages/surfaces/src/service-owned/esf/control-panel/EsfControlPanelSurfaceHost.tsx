@@ -6,7 +6,7 @@ import { BthBox, BthButton, BthText } from '@bthwani/ui-kit';
 import { BthWebMissionHeroCard, BthWebSectionCard } from '@bthwani/ui-kit/web';
 import { sectionCatalog } from './catalogs';
 import { sectionMeta } from './catalogs/section-meta';
-import { flowMeta } from './catalogs/_flow-id_/flow-meta';
+import { flowMeta } from './catalogs/esf-control-panel-catalogs-flow/flow-meta';
 
 export type EsfControlPanelSurfaceHostProps = {
   hubHref?: string;

@@ -1,3 +1,3 @@
 export const sectionCatalog = [
-  '_flow-id_'
+  'amn-control-panel-operations-flow'
 ] as const;

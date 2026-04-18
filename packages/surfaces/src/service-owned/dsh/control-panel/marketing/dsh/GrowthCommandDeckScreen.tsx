@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { BthBox, BthButton, BthSurface, BthTabs, BthText, BthTextField, useDirection } from '@bthwani/ui-kit';

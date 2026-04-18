@@ -42,5 +42,5 @@ export const surfaceCatalog = [
   'store-status-update',
   'store-update',
   'subscription',
-  '_flow-id_'
+  'amn-control-panel-operations-flow'
 ] as const;

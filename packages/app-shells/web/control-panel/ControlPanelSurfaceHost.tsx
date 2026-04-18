@@ -1,6 +1,6 @@
-import { useDshControlPanelText, ControlPanelDshCatalogScreen, ControlPanelDshPartnerApprovalsScreen, ControlPanelDshMarketingScreen } from '@bthwani/surfaces/control-panel';
 "use client";
 
+import { useDshControlPanelText, ControlPanelDshCatalogScreen, ControlPanelDshPartnerApprovalsScreen, ControlPanelDshMarketingScreen } from '@bthwani/surfaces/control-panel';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
