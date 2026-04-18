@@ -274,34 +274,17 @@ export function ClientSurfaceHost() {
 
     if (route === 'login') {
       return (
-        <ClientLoginSurface
-          identityValue={loginIdentity}
-          verificationCodeValue={loginVerificationCode}
-          onChangeIdentity={setLoginIdentity}
-          onChangeVerificationCode={setLoginVerificationCode}
-          onRequestCode={() => {
-            if (!loginVerificationCode) {
-              setLoginVerificationCode('2026');
-            }
-          }}
-          onSubmit={() => {
-            if (loginIdentity.trim().length === 0) {
-              return;
-            }
-
-            setIsDeveloperMode(false);
-            setIsAuthenticated(true);
-            setRoute('home');
-          }}
-          onDeveloperLogin={() => {
-            setLoginIdentity('developer@bthwani.app');
-            setLoginVerificationCode('2026');
-            setIsDeveloperMode(true);
-            setIsAuthenticated(true);
-            setRoute('home');
-          }}
-          onBack={() => setRoute('entry')}
-          submitDisabled={loginIdentity.trim().length === 0}
+        <ClientEntrySurface
+          appName={uiText.topBar.brandName}
+          userLabel="أهلًا بك"
+          primaryServiceLabel="دخول أنيق وسريع"
+          secondaryServiceLabel="خدمات مشتركة في مكان واحد"
+          onEnterApp={() => setRoute('home')}
+          onOpenLogin={() => setRoute('login')}
+          onOpenAccount={() => setRoute(isAuthenticated ? 'account' : 'login')}
+          onOpenNotifications={() => setRoute('notifications')}
+          onOpenSupport={() => setRoute('support')}
+          openLogin={true}
         />
       );
     }

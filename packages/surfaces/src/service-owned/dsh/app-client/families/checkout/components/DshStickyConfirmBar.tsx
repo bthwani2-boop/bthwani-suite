@@ -23,17 +23,27 @@ export default function DshStickyConfirmBar({
   return (
     <BthSurface tone="inset" gap={3}>
       <BthBox gap={2}>
-        <BthBox layoutDirection="row" gap={2}>
+        <BthBox layoutDirection="row" justify="flex-end">
           <BthBox>
             <BthText role="caption" tone="muted">{totalLabel}</BthText>
             <BthText role="titleLg">{totalValue}</BthText>
           </BthBox>
-          <BthBox>
-            <BthButton label={processing ? 'جارٍ المعالجة…' : primaryLabel} onPress={onPrimary} />
-          </BthBox>
         </BthBox>
+
+        <BthBox align="center">
+          <BthButton
+            label={processing ? 'جارٍ المعالجة…' : primaryLabel}
+            onPress={onPrimary}
+            size="lg"
+            fullWidth={false}
+            style={{ width: '78%' }}
+          />
+        </BthBox>
+
         {onSecondary ? (
-          <BthButton label={secondaryLabel} tone="secondary" onPress={onSecondary} />
+          <BthBox>
+            <BthButton label={secondaryLabel} tone="secondary" onPress={onSecondary} />
+          </BthBox>
         ) : null}
       </BthBox>
     </BthSurface>

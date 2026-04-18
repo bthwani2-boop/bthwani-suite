@@ -19,6 +19,10 @@ import DshWalletButton from '../components/DshWalletButton';
 import DshStickyConfirmBar from '../components/DshStickyConfirmBar';
 import DshCombinedReviewBlock from '../components/DshCombinedReviewBlock';
 import * as walletAdapter from '../adapters/DshWalletAdapter';
+import useWlt from '../../../../../wlt/app-client/dsh/hooks/useWlt';
+import DshWltPaymentOptionsRow from '../../../../../wlt/app-client/dsh/DshWltPaymentOptionsRow';
+import DshWltBalance from '../../../../../wlt/app-client/dsh/DshWltBalance';
+import DshWltConnector from '../../../../../wlt/app-client/dsh/DshWltConnector';
 
 // Small unified screen that consolidates the create → review → checkout flows
 // Exports wrapper components that match the original file-level APIs so host
@@ -132,9 +136,6 @@ export function DshOrderHubScreen({
   const [captainRating, setCaptainRating] = React.useState<number | null>(null);
   const [ratingComment, setRatingComment] = React.useState('');
   const captainSuggestedRef = React.useRef<boolean>(false);
-  // wallet state
-  const [walletLinked, setWalletLinked] = React.useState(false);
-  const [walletBalance, setWalletBalance] = React.useState<number | null>(null);
 
   React.useEffect(() => {
     return () => {
@@ -144,20 +145,9 @@ export function DshOrderHubScreen({
     };
   }, []);
 
-  React.useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const l = await walletAdapter.isWalletLinked();
-      if (!mounted) return;
-      setWalletLinked(l);
-      if (l) {
-        const bal = await walletAdapter.getWalletBalance();
-        if (!mounted) return;
-        setWalletBalance(bal);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  
+  // wallet state via shared WLT hook
+  const { linked: walletLinked, balance: walletBalance, requestPayment: requestWltPayment, getBalance: wltGetBalance } = useWlt();
 
   const handleSubmit = React.useCallback(() => {
     if (onSubmit) {
@@ -176,25 +166,25 @@ export function DshOrderHubScreen({
       try {
         if (paymentMethod === 'bthwallet') {
           // full wallet payment
-          const resp = await walletAdapter.requestWalletPayment(totalHalalas);
+          const resp = await requestWltPayment(totalHalalas);
           if (!resp.success) {
             // if insufficient, try partial from wallet then COD
-            const bal = await walletAdapter.getWalletBalance();
+            const bal = await wltGetBalance();
             if (bal > 0) {
               // charge what we can
               const partial = Math.min(bal, totalHalalas);
-              const pResp = await walletAdapter.requestWalletPayment(partial);
+              const pResp = await requestWltPayment(partial);
               // ignore pResp.success failure and continue as mixed/COD
             } else {
               // no wallet funds — fallback to COD flow
             }
           }
         } else if (paymentMethod === 'mixed') {
-          const bal = await walletAdapter.getWalletBalance();
+          const bal = await wltGetBalance();
           const use = Math.min(bal, totalHalalas);
           if (use > 0) {
             // attempt partial wallet charge
-            await walletAdapter.requestWalletPayment(use);
+            await requestWltPayment(use);
           }
           // remaining will be COD
         } else {
@@ -212,11 +202,11 @@ export function DshOrderHubScreen({
         setOrderId(oid);
         setOrderStage('created');
         setTimelineSteps([
-          { id: 'created', title: 'Order created', detail: 'Your request was confirmed.', done: true },
-          { id: 'assigned', title: 'Captain assigned', detail: 'A captain accepted your order.', done: false },
-          { id: 'pickup', title: 'Pickup in progress', detail: 'Captain is heading to pickup location.', done: false },
-          { id: 'in_transit', title: 'On the way to dropoff', detail: 'Live tracking will appear here.', done: false },
-          { id: 'delivered', title: 'Delivered', detail: 'Order was delivered to customer.', done: false },
+          { id: 'created', title: 'تم إنشاء الطلب', detail: 'تم تأكيد طلبك.', done: true },
+          { id: 'assigned', title: 'تم تعيين السائق', detail: 'تم قبول الطلب من قبل السائق.', done: false },
+          { id: 'pickup', title: 'جارٍ الاستلام', detail: 'السائق في طريقه لاستلام الطلب.', done: false },
+          { id: 'in_transit', title: 'في الطريق للتسليم', detail: 'سيظهر التتبع هنا.', done: false },
+          { id: 'delivered', title: 'تم التسليم', detail: 'تم تسليم الطلب.', done: false },
         ]);
 
         // switch to tracking view
@@ -251,9 +241,6 @@ export function DshOrderHubScreen({
     };
 
     void perform();
-    };
-
-    void perform();
   }, [onSubmit, onPrimaryAction, paymentMethod, blocks, onRetry]);
 
   const handleSetOrderRating = React.useCallback((n: number) => {
@@ -281,8 +268,8 @@ export function DshOrderHubScreen({
     onPrimaryAction?.();
   }, [onPrimaryAction]);
 
-  // Show focused full-screen smart confirm when requested from the review flow
-  if (showSmartConfirm && localMode === 'review') {
+  // Show focused full-screen smart confirm when requested
+  if (showSmartConfirm) {
     return (
       <DshSmartConfirm
         pickupAddress={values?.pickupAddress ?? blocks?.route?.[0]?.value}
@@ -299,105 +286,177 @@ export function DshOrderHubScreen({
         onEdit={() => {
           setShowSmartConfirm(false);
           onEdit?.();
-          setLocalMode('create');
         }}
         onCancel={() => setShowSmartConfirm(false)}
       />
     );
   }
 
-  if (localMode === 'create') {
-    const isDisabled = processing || state === 'loading';
-
-    return (
-      <BthFormScreenShell
-        title="Create order"
-        subtitle="Capture only the essential fields before review."
-        submitLabel="Continue to review"
-        onSubmit={() => {
-          onContinue?.();
-          // If the host doesn't navigate, advance local mode.
-          setLocalMode('review');
-        }}
-        submitDisabled={isDisabled}
-      >
-        {state === 'loading' ? <BthStateView stateId="loading" /> : null}
-
-        <BthBox gap={3}>
-          <BthSectionHeader title="Delivery details" subtitle="Keep the route context simple and focused." />
-          <BthTextField label="Pickup address" value={values?.pickupAddress ?? ''} onChangeText={(v) => onChange?.('pickupAddress', v)} editable={!isDisabled} error={errors?.pickupAddress} />
-          <BthTextField label="Dropoff address" value={values?.dropoffAddress ?? ''} onChangeText={(v) => onChange?.('dropoffAddress', v)} editable={!isDisabled} error={errors?.dropoffAddress} />
-        </BthBox>
-
-        <BthBox gap={3}>
-          <BthSectionHeader title="Contact" subtitle="One reachable contact is enough." />
-          <BthTextField label="Contact name" value={values?.contactName ?? ''} onChangeText={(v) => onChange?.('contactName', v)} editable={!isDisabled} error={errors?.contactName} />
-          <BthTextField label="Contact phone" value={values?.contactPhone ?? ''} onChangeText={(v) => onChange?.('contactPhone', v)} editable={!isDisabled} keyboardType="phone-pad" error={errors?.contactPhone} />
-        </BthBox>
-
-        <BthBox gap={3}>
-          <BthSectionHeader title="Optional note" subtitle="Keep this slice focused." />
-          <BthTextField label="Order note" value={values?.note ?? ''} onChangeText={(v) => onChange?.('note', v)} editable={!isDisabled} hint="Keep this short and practical." error={errors?.note} />
-        </BthBox>
-
-        <BthText role="caption" tone="muted">Validation: required fields keep continue blocked.</BthText>
-      </BthFormScreenShell>
-    );
-  }
-
-  if (localMode === 'review') {
-    if (state === 'loading') {
+  // tracking / completed keep their existing full-screen behaviors
+  if (localMode === 'tracking') {
+    if (!orderStage) {
       return <BthStateView stateId="loading" />;
-    }
-
-    if (state === 'empty') {
-      return <BthStateView stateId="empty" actionLabel="Back to create" onActionPress={() => { onEdit?.(); setLocalMode('create'); }} />;
     }
 
     return (
       <BthMobileScrollView padding={4} gap={3}>
-        <BthBox gap={2}>
-          <BthText role="titleLg">Review order</BthText>
-          <BthText role="bodySm" tone="muted">Compact review only. Keep decision blocks short before submit.</BthText>
-        </BthBox>
-
-        {blocks ? (
-          <DshCombinedReviewBlock
-            blocks={blocks}
-            onEdit={() => {
-              onEdit?.();
-              setLocalMode('create');
-            }}
-          />
-        ) : null}
+        <BthSurface tone="brand" gap={3}>
+          <BthSectionHeader title="متابعة الطلب" subtitle={orderId ? `طلب ${orderId}` : 'جاري التتبع'} trailing={<BthChip label={orderStage ?? 'غير معروف'} selected />} />
+        </BthSurface>
 
         <BthSurface tone="raised" gap={3}>
-          <BthSectionHeader title="Payment" subtitle="Choose a payment method for this order." />
-          <BthBox gap={2}>
-            <BthListItem title="Card" subtitle="Pay with saved card" meta={paymentMethod === 'card' ? 'Selected' : undefined} onPress={() => setPaymentMethod('card')} />
-            <BthListItem title="Apple/Google Pay" subtitle="Quick native pay" meta={paymentMethod === 'wallet' ? 'Selected' : undefined} onPress={() => setPaymentMethod('wallet')} />
-            <BthListItem title="محفظة بثواني" subtitle={walletLinked ? `متصلة — ${(walletBalance ?? 0) / 100} SAR` : 'ربط ودفع سريع'} meta={paymentMethod === 'bthwallet' ? 'Selected' : undefined} onPress={() => setPaymentMethod('bthwallet')} />
-            <BthListItem title="Cash on delivery" subtitle="Pay when received" meta={paymentMethod === 'cod' ? 'Selected' : undefined} onPress={() => setPaymentMethod('cod')} />
+          <BthSectionHeader title="الجدول الزمني" subtitle="تابع تقدم الطلب." />
+          <BthBox gap={3}>
+            {timelineSteps.map((step) => (
+              <BthBox key={step.id} gap={1}>
+                <BthText role="bodyStrong">{step.title}</BthText>
+                {step.detail ? <BthText role="bodySm" tone="muted">{step.detail}</BthText> : null}
+                <BthChip label={step.done ? 'مكتمل' : 'قيد الانتظار'} selected={Boolean(step.done)} />
+              </BthBox>
+            ))}
           </BthBox>
         </BthSurface>
 
-        <DshStickyConfirmBar
-          totalLabel="المبلغ النهائي"
-          totalValue={blocks?.pricing?.[blocks.pricing.length - 1]?.value}
-          primaryLabel={processing ? 'جارٍ المعالجة…' : 'تأكيد ودفع'}
-          secondaryLabel="تعديل التفاصيل"
-          processing={processing}
-          onPrimary={() => setShowSmartConfirm(true)}
-          onSecondary={() => { onEdit?.(); setLocalMode('create'); }}
-        />
+        {orderStage !== 'delivered' ? (
+          <BthSurface tone="inset" gap={3}>
+            <BthSectionHeader title="الدعم" subtitle="إذا احتجت مساعدة، تواصل مع الدعم." />
+            <BthBox layoutDirection="row" gap={2}>
+                <BthButton label="تواصل مع الدعم" tone="secondary" onPress={() => onSecondaryAction?.()} />
+                <BthButton label="الطلبات" onPress={() => onPrimaryAction?.()} />
+              </BthBox>
+          </BthSurface>
+        ) : (
+          <BthSurface tone="raised" gap={3}>
+            <BthSectionHeader title="تم التسليم" subtitle="يرجى التأكيد وتقييم تجربتك." />
+            <BthBox gap={2}>
+              <BthText role="bodySm" tone="muted">التقييم مشترك: قيّم الطلب والكابتن. الاقتراح ذكي بناءً على تقييمك للطلب.</BthText>
 
-        
+              <BthBox gap={2}>
+                <BthText role="caption" tone="muted">قيم الطلب</BthText>
+                <BthBox layoutDirection="row" gap={1}>
+                  {[1,2,3,4,5].map((n) => (
+                    <BthButton key={n} label={orderRating && orderRating >= n ? '★' : '☆'} onPress={() => handleSetOrderRating(n)} />
+                  ))}
+                </BthBox>
+              </BthBox>
 
-        {processing ? <BthStateView stateId="loading" /> : null}
-        {success ? <BthStateView stateId="success" title="Order submitted" description="Your order is confirmed and ready for tracking." /> : null}
+              <BthBox gap={2}>
+                <BthText role="caption" tone="muted">تقييم مقترح للسائق</BthText>
+                <BthBox layoutDirection="row" gap={1}>
+                  {[1,2,3,4,5].map((n) => (
+                    <BthButton key={n} label={captainRating && captainRating >= n ? '★' : '☆'} onPress={() => handleSetCaptainRating(n)} />
+                  ))}
+                </BthBox>
+              </BthBox>
+
+              <BthTextField label="تعليق (اختياري)" value={ratingComment} onChangeText={setRatingComment} />
+
+              <BthBox layoutDirection="row" gap={2}>
+                <BthButton label="إرسال التقييم" onPress={handleSubmitRating} />
+                <BthButton label="تخطي" tone="secondary" onPress={() => { setOrderStage('completed'); setLocalMode('completed'); onPrimaryAction?.(); }} />
+              </BthBox>
+            </BthBox>
+          </BthSurface>
+        )}
       </BthMobileScrollView>
     );
   }
+
+  if (localMode === 'completed') {
+    return (
+      <BthMobileScrollView padding={4} gap={3}>
+        <BthSurface tone="brand" gap={3}>
+          <BthSectionHeader title="Thank you" subtitle="Order complete" />
+        </BthSurface>
+
+        <BthSurface tone="raised" gap={3}>
+          <BthBox gap={2}>
+            <BthText role="titleMd">Order completed</BthText>
+            <BthText role="bodySm" tone="muted">شكراً لتقييمك — يساعدنا ذلك في تحسين التجربة.</BthText>
+            <BthBox layoutDirection="row" gap={2}>
+              <BthButton label="Open orders" onPress={() => onPrimaryAction?.()} />
+              <BthButton label="Home" tone="secondary" onPress={() => onRetry?.()} />
+            </BthBox>
+          </BthBox>
+        </BthSurface>
+      </BthMobileScrollView>
+    );
+  }
+
+  // Merged single-screen view: show form, compact review, payment, and confirm in one continuous page
+  const isDisabled = processing || state === 'loading';
+
+  return (
+    <BthMobileScrollView padding={4} gap={3}>
+      <BthBox gap={2}>
+        <BthText role="titleLg">إنشاء الطلب</BthText>
+        <BthText role="bodyMd" tone="muted">أدخل الحقول الأساسية فقط للمراجعة.</BthText>
+      </BthBox>
+
+      <BthSurface gap={3}>
+        <BthSectionHeader title="تفاصيل التوصيل" subtitle="اجعل سياق المسار بسيطًا ومركّزًا." />
+        <BthTextField label="عنوان الاستلام" value={values?.pickupAddress ?? ''} onChangeText={(v) => onChange?.('pickupAddress', v)} editable={!isDisabled} error={errors?.pickupAddress} />
+        <BthTextField label="عنوان التسليم" value={values?.dropoffAddress ?? ''} onChangeText={(v) => onChange?.('dropoffAddress', v)} editable={!isDisabled} error={errors?.dropoffAddress} />
+      </BthSurface>
+
+      <BthSurface gap={3}>
+        <BthSectionHeader title="جهة الاتصال" subtitle="جهة اتصال واحدة كافية." />
+        <BthTextField label="اسم جهة الاتصال" value={values?.contactName ?? ''} onChangeText={(v) => onChange?.('contactName', v)} editable={!isDisabled} error={errors?.contactName} />
+        <BthTextField label="هاتف جهة الاتصال" value={values?.contactPhone ?? ''} onChangeText={(v) => onChange?.('contactPhone', v)} editable={!isDisabled} keyboardType="phone-pad" error={errors?.contactPhone} />
+      </BthSurface>
+
+      <BthSurface gap={3}>
+        <BthSectionHeader title="ملاحظة (اختياري)" subtitle="اجعل هذه الجزئية مركّزة." />
+        <BthTextField label="ملاحظة الطلب" value={values?.note ?? ''} onChangeText={(v) => onChange?.('note', v)} editable={!isDisabled} hint="اجعلها قصيرة وعملية." error={errors?.note} />
+      </BthSurface>
+
+      {blocks ? (
+        <BthSurface tone="raised" gap={3}>
+          <BthSectionHeader title="مراجعة" subtitle="مراجعة موجزة فقط. احتفظ بكتل القرار قصيرة قبل الإرسال." />
+          <DshCombinedReviewBlock
+            blocks={blocks}
+            values={{
+              pickupAddress: values?.pickupAddress,
+              dropoffAddress: values?.dropoffAddress,
+              contactName: values?.contactName,
+              contactPhone: values?.contactPhone,
+            }}
+            onEdit={() => {
+              onEdit?.();
+            }}
+          />
+        </BthSurface>
+      ) : null}
+
+      <BthSurface tone="raised" gap={3}>
+        <BthSectionHeader title="الدفع" subtitle="اختر طريقة الدفع لهذا الطلب." trailing={<DshWltBalance balance={walletBalance} />} />
+        <BthBox gap={2}>
+          <DshWltPaymentOptionsRow
+            options={[
+              { id: 'cod', label: 'كاش عند الوصول', subtitle: 'الدفع عند الاستلام' },
+              { id: 'bthwallet', label: 'محفظة بثواني', subtitle: `الرصيد ${(walletBalance ?? 0) / 100} ر.س.`, meta: <BthText role="caption" tone="muted">سيتم خصم قيمة الطلب من رصيد المحفظة عند التأكيد</BthText> },
+              { id: 'mixed', label: 'محفظة + كاش', subtitle: 'استخدم المحفظة أولاً، والباقي كاش عند الوصول' }
+            ]}
+            selectedId={paymentMethod}
+            onSelect={(id) => setPaymentMethod(id as 'bthwallet' | 'mixed' | 'cod')}
+          />
+        </BthBox>
+      </BthSurface>
+
+      <DshStickyConfirmBar
+        totalLabel="المبلغ النهائي"
+        totalValue={blocks?.pricing?.[blocks.pricing.length - 1]?.value}
+        primaryLabel={processing ? 'جارٍ المعالجة…' : 'تأكيد ودفع'}
+        secondaryLabel="تعديل التفاصيل"
+        processing={processing}
+        onPrimary={() => setShowSmartConfirm(true)}
+        onSecondary={() => { onEdit?.(); }}
+      />
+
+      {processing ? <BthStateView stateId="loading" /> : null}
+      {success ? <BthStateView stateId="success" title="تم إرسال الطلب" description="تم تأكيد طلبك وهو جاهز للتتبع." /> : null}
+    </BthMobileScrollView>
+  );
 
   if (localMode === 'tracking') {
     if (!orderStage) {
@@ -493,16 +552,16 @@ export function DshOrderHubScreen({
   return (
     <BthMobileScrollView padding={4} gap={3}>
       <BthSurface tone="brand" gap={3}>
-        <BthSectionHeader title={screenId ? String(screenId) : 'Checkout'} subtitle="Quick checkout hub" />
+        <BthSectionHeader title={screenId ? String(screenId) : 'الدفع السريع'} subtitle="مركز الدفع السريع" />
       </BthSurface>
 
       <BthSurface tone="raised" gap={3}>
-        <BthListItem title="Open review" subtitle="Proceed to order review" onPress={() => { onPrimaryAction?.(); setLocalMode('review'); }} />
-        <BthListItem title="Support directory" subtitle="Open support options" onPress={() => onSecondaryAction?.()} />
+        <BthListItem title="افتح المراجعة" subtitle="انتقل إلى مراجعة الطلب" onPress={() => { onPrimaryAction?.(); setLocalMode('review'); }} />
+        <BthListItem title="دليل الدعم" subtitle="افتح خيارات الدعم" onPress={() => onSecondaryAction?.()} />
       </BthSurface>
 
       <BthSurface tone="inset" gap={3}>
-        <BthButton label="Retry" tone="secondary" onPress={() => onRetry?.()} />
+        <BthButton label="إعادة المحاولة" tone="secondary" onPress={() => onRetry?.()} />
       </BthSurface>
     </BthMobileScrollView>
   );
@@ -511,14 +570,6 @@ export function DshOrderHubScreen({
 // Export legacy named components as thin wrappers so imports keep working.
 export function DshCreateOrderScreen(props: any) {
   return <DshOrderHubScreen {...props} mode={props.mode ?? 'create'} />;
-}
-
-export function DshReviewOrderScreen(props: any) {
-  return <DshOrderHubScreen {...props} mode={props.mode ?? 'review'} />;
-}
-
-export function DshCheckoutHubScreen(props: any) {
-  return <DshOrderHubScreen {...props} mode={props.mode ?? 'checkout'} />;
 }
 
 export function DshIntakeHubScreen(props: any) {

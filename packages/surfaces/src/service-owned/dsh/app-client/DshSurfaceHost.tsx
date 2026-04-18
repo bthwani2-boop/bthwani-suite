@@ -13,7 +13,7 @@ import { DshStoresListScreen, DshStoreGetScreen, DshStoreDetailScreen, DshStoreI
 import { DshCategoriesListScreen, DshCategoryGetScreen } from './families/categories/screens';
 import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './families/favorites/screens';
 import { DshCartGetScreen } from './families/cart/screens';
-import { DshCheckoutHubScreen, DshReviewOrderScreen, DshCreateOrderScreen, DshIntakeHubScreen } from './families/checkout/screens';
+import { DshCreateOrderScreen, DshIntakeHubScreen } from './families/checkout/screens';
 import { DshTrackingScreen, DshDeliveryManagementHubScreen } from './families/tracking/screens';
 import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshTrustHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './families/support/screens';
 import {
@@ -51,7 +51,6 @@ export type DshRoute =
   | 'search'
   | 'store-get'
   | 'create-order'
-  | 'review'
   | 'checkout-workspace'
   | 'benefits'
   | 'conversation-workspace'
@@ -403,7 +402,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     }
 
     if (checkoutTargets.includes(screenId)) {
-      setRoute('review');
+      setRoute('create-order');
       return;
     }
 
@@ -432,7 +431,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     }
 
     if (reviewTargets.includes(screenId)) {
-      setRoute('review');
+      setRoute('create-order');
       return;
     }
 
@@ -776,8 +775,8 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
         statusTitle="Cart context confirmed"
         statusDescription="Initialize the cart session before moving into the checkout route."
         onOpenStore={() => setRoute('store-get')}
-        onOpenOrder={() => setRoute('review')}
-        onContinue={() => setRoute('review')}
+        onOpenOrder={() => setRoute('create-order')}
+        onContinue={() => setRoute('create-order')}
         onRetry={() => setRoute('cart-get')}
       />
       );
@@ -879,7 +878,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
       <DshCreateOrderScreen
         values={createOrderValues}
         onChange={handleCreateOrderChange}
-        onContinue={() => setRoute('review')}
+        onContinue={() => setRoute('create-order')}
       />
     );
   }
@@ -888,7 +887,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     return (
       <DshAwnakOrderCreateScreen
         onBack={openSupportDirectory}
-        onContinue={() => setRoute('review')}
+        onContinue={() => setRoute('create-order')}
       />
     );
   }
@@ -901,21 +900,14 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     );
   }
 
-  if (route === 'review') {
-    return (
-      <DshReviewOrderScreen
-        blocks={reviewBlocks}
-        onEdit={() => setRoute('create-order')}
-        onSubmit={() => setRoute('success')}
-      />
-    );
-  }
+  /* 'review' route removed — review is shown inline inside the create-order flow. */
 
   if (route === 'checkout-workspace') {
+    // Render the create-order screen inline instead of a separate checkout wrapper
     return (
-      <DshCheckoutHubScreen
+      <DshCreateOrderScreen
         screenId={selectedSupportScreen as 'checkout-gate' | 'estimate-get' | 'pricing-preview' | 'pricing-snapshot-get' | 'promo-apply'}
-        onPrimaryAction={() => setRoute('review')}
+        onPrimaryAction={() => setRoute('create-order')}
         onSecondaryAction={openSupportDirectory}
         onRetry={() => setRoute('checkout-workspace')}
       />
