@@ -1,5 +1,5 @@
 import React from 'react';
-import { BackHandler, Platform } from 'react-native';
+import { BackHandler, Platform, View, Text } from 'react-native';
 import { DshSearchScreen } from './families/discovery/screens';
 import { DshEntryScreen } from './families/entry/screens';
 import { DshAwnakOrderCreateScreen } from './families/awnak/screens';
@@ -7,14 +7,12 @@ import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './
 import { DshMySpaceScreen } from './families/my_space/screens';
 import { DshNotificationsScreen } from './families/notifications/screens';
 import { DshBenefitsHubScreen } from './families/loyalty/screens';
-import { DshOrdersListScreen } from './families/checkout/screens';
+import { DshOrdersListScreen, DshCreateOrderScreen, DshIntakeHubScreen, DshOrderSuccessState, DshTrackingScreen, DshDeliveryManagementHubScreen } from './families/placeholders/checkoutTracking';
 import { DshSheinOrderCreateScreen } from './families/shein/screens';
 import { DshStoresListScreen, DshStoreGetScreen, DshStoreDetailScreen, DshStoreItemsScreen, DshStoreItemsListScreen } from './families/stores/screens';
 import { DshCategoriesListScreen, DshCategoryGetScreen } from './families/categories/screens';
 import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './families/favorites/screens';
 import { DshCartGetScreen } from './families/cart/screens';
-import { DshCreateOrderScreen, DshIntakeHubScreen } from './families/checkout/screens';
-import { DshTrackingScreen, DshDeliveryManagementHubScreen } from './families/tracking/screens';
 import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshTrustHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './families/support/screens';
 import {
   dshHomeGetFixturePromos,
@@ -29,7 +27,7 @@ import {
 } from './families/stores/fixtures';
 import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../control-panel/marketing/dsh/banner-store';
 import { getLiveMarketingGrowthItems } from '../control-panel/marketing/dsh/growth-store';
-import { DshOrderSuccessState } from './families/checkout/screens';
+// checkout/tracking screens consolidated into placeholders/checkoutTracking
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './families/categories/fixtures/dshCategoriesFixtures';
 import { dshPartnerIntakeItems } from '../control-panel/partners/dsh/workflow';
 
@@ -510,6 +508,52 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   const subscriptionMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'subscription');
   const promoMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'promotion');
   const campaignMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'campaign');
+
+  // Sanity check: if any imported screen component is undefined, show a clear error
+  const importedScreens = [
+    ['DshSearchScreen', (DshSearchScreen as unknown) as any],
+    ['DshEntryScreen', (DshEntryScreen as unknown) as any],
+    ['DshAwnakOrderCreateScreen', (DshAwnakOrderCreateScreen as unknown) as any],
+    ['DshHomeGetScreen', (DshHomeGetScreen as unknown) as any],
+    ['DshMySpaceScreen', (DshMySpaceScreen as unknown) as any],
+    ['DshNotificationsScreen', (DshNotificationsScreen as unknown) as any],
+    ['DshBenefitsHubScreen', (DshBenefitsHubScreen as unknown) as any],
+    ['DshOrdersListScreen', (DshOrdersListScreen as unknown) as any],
+    ['DshCreateOrderScreen', (DshCreateOrderScreen as unknown) as any],
+    ['DshIntakeHubScreen', (DshIntakeHubScreen as unknown) as any],
+    ['DshOrderSuccessState', (DshOrderSuccessState as unknown) as any],
+    ['DshTrackingScreen', (DshTrackingScreen as unknown) as any],
+    ['DshDeliveryManagementHubScreen', (DshDeliveryManagementHubScreen as unknown) as any],
+    ['DshSheinOrderCreateScreen', (DshSheinOrderCreateScreen as unknown) as any],
+    ['DshStoresListScreen', (DshStoresListScreen as unknown) as any],
+    ['DshStoreGetScreen', (DshStoreGetScreen as unknown) as any],
+    ['DshStoreDetailScreen', (DshStoreDetailScreen as unknown) as any],
+    ['DshStoreItemsScreen', (DshStoreItemsScreen as unknown) as any],
+    ['DshStoreItemsListScreen', (DshStoreItemsListScreen as unknown) as any],
+    ['DshCategoriesListScreen', (DshCategoriesListScreen as unknown) as any],
+    ['DshCategoryGetScreen', (DshCategoryGetScreen as unknown) as any],
+    ['DshFavoriteToggleScreen', (DshFavoriteToggleScreen as unknown) as any],
+    ['DshFavoritesListScreen', (DshFavoritesListScreen as unknown) as any],
+    ['DshCartGetScreen', (DshCartGetScreen as unknown) as any],
+    ['DshConversationHubScreen', (DshConversationHubScreen as unknown) as any],
+    ['DshOrderIssueHubScreen', (DshOrderIssueHubScreen as unknown) as any],
+    ['DshProxyHubScreen', (DshProxyHubScreen as unknown) as any],
+    ['DshServiceSettingsHubScreen', (DshServiceSettingsHubScreen as unknown) as any],
+    ['DshTrustHubScreen', (DshTrustHubScreen as unknown) as any],
+    ['DshZoneSetScreen', (DshZoneSetScreen as unknown) as any],
+    ['DshListingStatusUpdateScreen', (DshListingStatusUpdateScreen as unknown) as any],
+  ];
+
+  const missing = importedScreens.filter(([, v]) => typeof v === 'undefined').map(([n]) => String(n));
+  if (missing.length > 0) {
+    console.error('DshSurfaceHost missing imports:', missing);
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 12 }}>Missing components</Text>
+        <Text style={{ color: 'white' }}>{missing.join(', ')}</Text>
+      </View>
+    );
+  }
 
   if (route === 'entry') {
     return (

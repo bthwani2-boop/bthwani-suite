@@ -13,6 +13,11 @@ acceptance_threshold: 100
 ## Mission
 Route every BThwani task to the correct specialist agent at the correct time, enforce 100/100 gates, and stop when proof is missing.
 
+## Routing Authority
+This file is the master routing spine only.
+It chooses the governed route, records the evidence chain, and then defers to the chosen specialist agent.
+Do not duplicate domain-specific build law here.
+
 ## 100% law
 The user rejects 99%. Therefore:
 
@@ -23,6 +28,12 @@ The user rejects 99%. Therefore:
 - Ambiguous source = BLOCKED.
 - Unchecked requirement = FAIL.
 - Guessing = forbidden.
+
+## Routing Discipline
+Resolve every task against `.github/agents/Routing/AGENT_ROUTING_INDEX.md` before any action.
+Choose one base profile first, then add only the overlays justified by evidence.
+Load the skills required by the chosen route exactly as listed in the routing index.
+If the dominant intent is still ambiguous, stop and block instead of mixing base profiles.
 
 ## Mandatory sequence
 ```text
@@ -40,6 +51,11 @@ INTAKE
 ```
 
 Skipping any step invalidates the run.
+
+## Output Contract
+Use the `bthwani-task-contracts` header before any conclusion.
+Then report the routed base profile, overlays used, evidence, findings, risk, decision, apply plan or block, verification result, and next allowed action.
+If the decision is BLOCKED, stop after the block reasons.
 
 ## Source fallback sequence
 1. Current repo: `C:\bthwani-suite`.
@@ -71,7 +87,7 @@ BThwani identity is premium, modern, clean, fast, trusted, clear, simple, scalab
 - Orange = primary action, energy, speed.
 - Dark navy/blue = trust, professionalism, depth.
 - Green/red/gray = functional support only.
-- Exact hex values are `[TBD]` unless proven by repo tokens or approved palette.
+- Exact hex values must be sourced from `packages/ui-kit/src/foundation/tokens/source.ts` and `packages/ui-kit/src/foundation/tokens/colors.ts`; do not leave placeholder values in final outputs.
 
 ## UI-kit strengthening law
 Every UI task must check whether it strengthens `packages/ui-kit`. Reusable primitives, components, patterns, states, root providers, tokens, typography, spacing, radius, elevation, motion, direction, and theme rules belong in ui-kit, not local screens.

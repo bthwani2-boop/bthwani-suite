@@ -30,7 +30,7 @@ export function BthSurface({
   borderTone,
   style
 }: BthSurfaceProps) {
-  const toneConfig = {
+  const toneMap = {
     default: { background: 'surface' as const, borderTone: 'line' as const, elevationToken: 'flat' as const },
     raised: { background: 'surfaceRaised' as const, borderTone: 'lineStrong' as const, elevationToken: 'raised' as const },
     inset: { background: 'surfaceInset' as const, borderTone: 'line' as const, elevationToken: 'flat' as const },
@@ -39,7 +39,13 @@ export function BthSurface({
     warning: { background: 'warningSurface' as const, borderTone: 'warning' as const, elevationToken: 'flat' as const },
     danger: { background: 'dangerSurface' as const, borderTone: 'danger' as const, elevationToken: 'flat' as const },
     info: { background: 'infoSurface' as const, borderTone: 'info' as const, elevationToken: 'flat' as const }
-  }[tone];
+  } as const;
+
+  const toneConfig = (toneMap as any)[tone] ?? toneMap.default;
+  if ((process.env.NODE_ENV ?? '') !== 'production' && !(tone in toneMap)) {
+    // eslint-disable-next-line no-console
+    console.warn(`BthSurface: unknown tone \"${String(tone)}\" — falling back to 'default'`);
+  }
 
   return (
     <BthBox

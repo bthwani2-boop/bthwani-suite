@@ -4,7 +4,6 @@ export * from './families/family.catalog';
 export * from './families/awnak/screens';
 export * from './families/categories/screens';
 export * from './families/cart/screens';
-export * from './families/checkout/screens';
 export * from './families/discovery/screens';
 export * from './families/entry/screens';
 export * from './families/favorites/screens';
@@ -17,7 +16,7 @@ export * from './families/loyalty/screens';
 export * from './families/shein/screens';
 export * from './families/stores/screens';
 export * from './families/support/screens';
-export * from './families/tracking/screens';
+// 'tracking' and 'checkout' families were consolidated; explicit exports removed.
 export { DshSurfaceHost } from './DshSurfaceHost';
 export type { DshCommandTarget, DshRoute } from './DshSurfaceHost';
 

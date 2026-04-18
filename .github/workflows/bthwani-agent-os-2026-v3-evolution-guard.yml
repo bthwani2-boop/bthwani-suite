@@ -1,0 +1,13 @@
+name: bthwani-agent-os-2026-v3-evolution-guard
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+jobs:
+  guard:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run BThwani Agent Evolution Full Gate
+        shell: pwsh
+        run: .\tools\scripts\BTHWANI_AGENT_OS_2026_V3_EVOLUTION_FULL_GATE.ps1

@@ -8,3 +8,4 @@ export * from './BthDataTable';
 export * from './BthServiceTileCard';
 export * from './CartSummary';
 export * from './CartDetails';
+export * from './BthOptionRow';

@@ -60,6 +60,49 @@ Copy this block for every accepted update.
 
 ## Active Entries
 
+### AGENT-2026-04-18-001
+
+- Date: 2026-04-18
+- Author: GitHub Copilot
+- Files changed: `.github/agents/bthwani-platform-master-orchestrator-2026-v3-additive.agent.md`, `docs/governance/AGENT_CHANGE_LEDGER.md`
+- Change type: `guard`
+
+#### AGENT-2026-04-18-001 Rationale
+
+- Trigger: The master orchestrator needed an explicit routing anchor, a mandatory output contract, and a non-placeholder source of truth for brand hex values.
+- Observed problem: The agent file stated the 100/100 law and source precedence, but it did not yet force the route decision to resolve against the routing index or require a fixed report shape.
+- Why existing rules were insufficient: The prior wording allowed the same high-level intent to be interpreted without a precise base profile, output contract, or ui-kit source reference.
+
+#### AGENT-2026-04-18-001 Change Summary
+
+- Added: routing authority, routing discipline, and output contract sections in `.github/agents/bthwani-platform-master-orchestrator-2026-v3-additive.agent.md`.
+- Updated: the brand identity law to require exact hex values from ui-kit token source files.
+- Removed: the `[TBD]` placeholder wording from the brand identity law.
+
+#### AGENT-2026-04-18-001 Safety Checks
+
+- Duplicate-rule check: `PASS`
+- Contradiction check: `PASS`
+- Scope expansion check: `PASS`
+- Noise check: `PASS`
+- Minimal-patch check: `PASS`
+
+#### AGENT-2026-04-18-001 Expected Effect
+
+- What failure or ambiguity this change should prevent: unanchored routing decisions, inconsistent final output shape, and placeholder brand values in a master governance agent.
+- What behavior becomes stricter or clearer: the orchestrator must resolve against the routing index first, then report the chosen route, evidence, and decision in a stable structure.
+
+#### AGENT-2026-04-18-001 Verification
+
+- Validation method: markdown review of the updated agent file and syntax/error check on the edited file.
+- Result: `PASS`
+- Residual risk or [TBD]: future routing additions may still need a dedicated expansion to keep the routing index and agent body synchronized.
+
+#### AGENT-2026-04-18-001 Rollback
+
+- Safe rollback path: remove the three added sections and restore the previous brand identity wording in the agent file, then delete this ledger entry.
+- When rollback should be considered: if the routing index later changes shape or if the output contract must be re-harmonized with another canonical governance file.
+
 ### AGENT-2026-04-12-001
 
 - Date: 2026-04-12
