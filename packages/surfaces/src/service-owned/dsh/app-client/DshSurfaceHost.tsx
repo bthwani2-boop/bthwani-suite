@@ -25,11 +25,11 @@ import {
   dshDiscoveryStores,
   storeItemsByStoreId,
 } from './families/stores/fixtures';
-import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../control-panel/marketing/dsh/banner-store';
-import { getLiveMarketingGrowthItems } from '../control-panel/marketing/dsh/growth-store';
+import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../shared/marketing/banner-store';
+import { getLiveMarketingGrowthItems } from '../shared/marketing/growth-store';
 // checkout/tracking screens consolidated into placeholders/checkoutTracking
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './families/categories/fixtures/dshCategoriesFixtures';
-import { dshPartnerIntakeItems } from '../control-panel/partners/dsh/workflow';
+import { dshPartnerIntakeItems } from '../shared/partners/workflow';
 
 export type DshRoute =
   | 'home'

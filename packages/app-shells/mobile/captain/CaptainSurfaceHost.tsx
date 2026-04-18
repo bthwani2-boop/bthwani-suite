@@ -1,7 +1,7 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
 import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthStateView, BthSurface, BthText } from '@bthwani/ui-kit';
-import { dsh } from '@bthwani/surfaces';
+import { dshCaptain } from '@bthwani/surfaces/app-captain';
 import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
@@ -27,7 +27,7 @@ const {
   DshCaptainProofUploadScreen,
   DshCaptainTierEvaluateScreen,
   DshCaptainTierInfoScreen,
-} = dsh.dshAppCaptain;
+} = dshCaptain;
 
 type CaptainTaskDetailSummary = React.ComponentProps<typeof CaptainTaskDetailScreen>['summary'];
 type CaptainTasksInboxScreenState = React.ComponentProps<typeof CaptainTasksInboxScreen>['state'];

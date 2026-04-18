@@ -1,4 +1,4 @@
-import { DshControlPanelSurfaceHost } from '@bthwani/surfaces/dsh/control-panel';
+import { DshControlPanelSurfaceHost } from '@bthwani/app-shells/web/control-panel';
 
 type DshOrderDetailPageProps = {
   params: Promise<{ id: string }>;

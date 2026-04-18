@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenWrapper, BthCard, BthText, AmountInput, PaymentMethodList, BthButton, amountToArabicText, useI18n } from '@bthwani/ui-kit';
-import { financeProviders } from '../../../../control-panel/finance/providers';
+import { financeProviders } from '../../../../shared/finance/providers';
 
 export const WltHomeGetScreen: React.FC = () => {
   const { t } = useI18n();

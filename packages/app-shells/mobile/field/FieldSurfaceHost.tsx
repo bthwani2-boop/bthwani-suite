@@ -15,7 +15,7 @@ import {
   BthSurface,
   BthText,
 } from '@bthwani/ui-kit';
-import { dsh } from '@bthwani/surfaces';
+import { dshField } from '@bthwani/surfaces/app-field';
 import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
@@ -29,7 +29,7 @@ const {
   dshFieldStoreGeoPinFixtureValues,
   dshFieldStoreVisitLogFixtureEvidence,
   dshFieldStoreVisitLogFixtureValues,
-} = dsh.dshAppField;
+} = dshField;
 
 type DshEntryScreenState = React.ComponentProps<typeof DshEntryScreen>['state'];
 type DshFieldStoreActivationRequestState = React.ComponentProps<typeof DshFieldStoreActivationRequestScreen>['state'];

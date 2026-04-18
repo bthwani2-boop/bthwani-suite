@@ -21,7 +21,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BthButton, BthChip, BthHighlightsRail, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText, BthProductCard } from '@bthwani/ui-kit';
-import { dshCategoryMeasurementPolicies } from '../../../../control-panel/catalogs/dsh/catalog';
+import { dshCategoryMeasurementPolicies } from '../../../../shared/catalog/catalog';
 import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../fixtures';
 import { mapMenuItemToProductCard } from '../adapters/mapMenuItemToProductCard';
 

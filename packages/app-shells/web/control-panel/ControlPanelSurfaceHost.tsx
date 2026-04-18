@@ -1,3 +1,4 @@
+import { useDshControlPanelText, ControlPanelDshCatalogScreen, ControlPanelDshPartnerApprovalsScreen, ControlPanelDshMarketingScreen } from '@bthwani/surfaces/control-panel';
 "use client";
 
 import React from 'react';
@@ -16,10 +17,6 @@ import {
   BthWebSegmentedTabs,
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
-import { useDshControlPanelText } from '@bthwani/surfaces/dsh/control-panel/operations/dsh/shared/dshControlPanelText';
-import { ControlPanelDshCatalogScreen } from '@bthwani/surfaces/dsh/control-panel/catalogs/dsh';
-import { ControlPanelDshPartnerApprovalsScreen } from '@bthwani/surfaces/dsh/control-panel/partners/dsh';
-import { ControlPanelDshMarketingScreen } from '@bthwani/surfaces/dsh/control-panel/marketing/dsh';
 import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 

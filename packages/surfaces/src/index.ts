@@ -1,14 +1,1 @@
-export * from './surface-owned';
-export * as dsh from './service-owned/dsh';
-export * as knz from './service-owned/knz';
-export * as amn from './service-owned/amn';
-export * as arb from './service-owned/arb';
-export * as wlt from './service-owned/wlt';
-export * as esf from './service-owned/esf';
-export * as mrf from './service-owned/mrf';
-export * as snd from './service-owned/snd';
-export * as kwd from './service-owned/kwd';
-export { ControlPanelDshSheinProxyScreen } from './service-owned/dsh/control-panel/operations/dsh/sheinproxy';
-export type { ControlPanelDshSheinProxyScreenProps } from './service-owned/dsh/control-panel/operations/dsh/sheinproxy';
-export { ControlPanelDshSheinProxyRequestScreen } from './service-owned/dsh/control-panel/operations/dsh/sheinproxy';
-export type { ControlPanelDshSheinProxyRequestScreenProps } from './service-owned/dsh/control-panel/operations/dsh/sheinproxy';
+export {};

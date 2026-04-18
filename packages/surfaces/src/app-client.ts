@@ -1,11 +1,1 @@
-export { appClientSurfaceOwned } from './surface-owned';
-export { AmnEntryScreen } from './service-owned/amn/app-client';
-export { ArbEntryScreen } from './service-owned/arb/app-client';
-export { DshSurfaceHost } from './service-owned/dsh/app-client';
-export type { DshCommandTarget, DshRoute } from './service-owned/dsh/app-client';
-export { EsfEntryScreen } from './service-owned/esf/app-client';
-export { KnzEntryScreen } from './service-owned/knz/app-client';
-export { KwdEntryScreen } from './service-owned/kwd/app-client';
-export { MrfEntryScreen } from './service-owned/mrf/app-client';
-export { SndEntryScreen } from './service-owned/snd/app-client';
-export { WltHomeGetScreen, WltTopupScreen } from './service-owned/wlt/app-client';
+export * from './public/app-client';

@@ -1,4 +1,4 @@
-import { ControlPanelDshSheinProxyRequestScreen } from '@bthwani/surfaces/dsh/control-panel/operations/dsh/sheinproxy';
+import { ControlPanelDshSheinProxyRequestScreen } from '@bthwani/app-shells/web/control-panel';
 
 type DshSheinProxySchedulePageProps = {
   params: Promise<{ id: string }>;

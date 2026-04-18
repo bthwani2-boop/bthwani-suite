@@ -1,24 +1,4 @@
-import { serviceMeta as amnServiceMeta } from '@bthwani/surfaces/amn/service-meta';
-import { serviceMeta as arbServiceMeta } from '@bthwani/surfaces/arb/service-meta';
-import { serviceMeta as dshServiceMeta } from '@bthwani/surfaces/dsh/service-meta';
-import { serviceMeta as esfServiceMeta } from '@bthwani/surfaces/esf/service-meta';
-import { serviceMeta as knzServiceMeta } from '@bthwani/surfaces/knz/service-meta';
-import { serviceMeta as kwdServiceMeta } from '@bthwani/surfaces/kwd/service-meta';
-import { serviceMeta as mrfServiceMeta } from '@bthwani/surfaces/mrf/service-meta';
-import { serviceMeta as sndServiceMeta } from '@bthwani/surfaces/snd/service-meta';
-import { serviceMeta as wltServiceMeta } from '@bthwani/surfaces/wlt/service-meta';
-import { flowMeta as amnOperationsFlowMeta } from '@bthwani/surfaces/amn/control-panel/operations/_flow-id_/flow-meta';
-import { flowMeta as arbOperationsFlowMeta } from '@bthwani/surfaces/arb/control-panel/operations/_flow-id_/flow-meta';
-import { flowMeta as arbPartnersFlowMeta } from '@bthwani/surfaces/arb/control-panel/partners/_flow-id_/flow-meta';
-import { flowMeta as arbSupportFlowMeta } from '@bthwani/surfaces/arb/control-panel/support/_flow-id_/flow-meta';
-import { flowMeta as dshOperationsFlowMeta } from '@bthwani/surfaces/dsh/control-panel/operations/dsh/flow-meta';
-import { flowMeta as esfCatalogsFlowMeta } from '@bthwani/surfaces/esf/control-panel/catalogs/_flow-id_/flow-meta';
-import { flowMeta as knzCatalogsFlowMeta } from '@bthwani/surfaces/knz/control-panel/catalogs/_flow-id_/flow-meta';
-import { flowMeta as kwdCatalogsFlowMeta } from '@bthwani/surfaces/kwd/control-panel/catalogs/_flow-id_/flow-meta';
-import { flowMeta as mrfCatalogsFlowMeta } from '@bthwani/surfaces/mrf/control-panel/catalogs/_flow-id_/flow-meta';
-import { flowMeta as sndCatalogsFlowMeta } from '@bthwani/surfaces/snd/control-panel/catalogs/_flow-id_/flow-meta';
-import { flowMeta as wltFinanceFlowMeta } from '@bthwani/surfaces/wlt/control-panel/finance/_flow-id_/flow-meta';
-
+import { amnOperationsFlowMeta, amnServiceMeta, arbOperationsFlowMeta, arbPartnersFlowMeta, arbServiceMeta, arbSupportFlowMeta, dshOperationsFlowMeta, dshServiceMeta, esfCatalogsFlowMeta, esfServiceMeta, knzCatalogsFlowMeta, knzServiceMeta, kwdCatalogsFlowMeta, kwdServiceMeta, mrfCatalogsFlowMeta, mrfServiceMeta, sndCatalogsFlowMeta, sndServiceMeta, wltFinanceFlowMeta, wltServiceMeta } from '@bthwani/surfaces/control-panel';
 const allServiceMetas = [
   amnServiceMeta,
   arbServiceMeta,

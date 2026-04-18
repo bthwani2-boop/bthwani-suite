@@ -1,7 +1,7 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
 import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthSurface, BthText } from '@bthwani/ui-kit';
-import { dsh } from '@bthwani/surfaces';
+import { dshPartner } from '@bthwani/surfaces/app-partner';
 import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
@@ -47,7 +47,7 @@ const {
   DshPartnerStoreStatusUpdateScreen,
   DshPartnerStoreUpdateScreen,
   DshPartnerSubscriptionScreen,
-} = dsh.dshAppPartner;
+} = dshPartner;
 
 type PartnerRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'operations' | 'maintenance' | 'hours' | 'zones' | 'support-directory' | 'support-screen';
 type PartnerRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'operations' | 'maintenance' | 'hours' | 'zones' | 'support-directory' | 'support-screen' | 'inventory-management';

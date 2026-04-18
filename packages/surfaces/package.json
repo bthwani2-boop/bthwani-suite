@@ -12,14 +12,53 @@
     "src",
     "docs"
   ],
-  "exports": {
-    ".": "./src/index.ts",
-    "./app-client": {
-      "types": "./src/app-client.ts",
-      "default": "./src/app-client.ts"
-    }
-  },
   "dependencies": {
     "@bthwani/ui-kit": "workspace:*"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/public/index.ts",
+      "import": "./src/public/index.ts",
+      "default": "./src/public/index.ts"
+    },
+    "./app-client": {
+      "react-native": "./src/public/app-client.ts",
+      "types": "./src/public/app-client.ts",
+      "import": "./src/public/app-client.ts",
+      "default": "./src/public/app-client.ts"
+    },
+    "./app-captain": {
+      "react-native": "./src/public/app-captain.ts",
+      "types": "./src/public/app-captain.ts",
+      "import": "./src/public/app-captain.ts",
+      "default": "./src/public/app-captain.ts"
+    },
+    "./app-partner": {
+      "react-native": "./src/public/app-partner.ts",
+      "types": "./src/public/app-partner.ts",
+      "import": "./src/public/app-partner.ts",
+      "default": "./src/public/app-partner.ts"
+    },
+    "./app-field": {
+      "react-native": "./src/public/app-field.ts",
+      "types": "./src/public/app-field.ts",
+      "import": "./src/public/app-field.ts",
+      "default": "./src/public/app-field.ts"
+    },
+    "./control-panel": {
+      "types": "./src/public/control-panel.ts",
+      "import": "./src/public/control-panel.ts",
+      "default": "./src/public/control-panel.ts"
+    },
+    "./webapp": {
+      "types": "./src/public/webapp.ts",
+      "import": "./src/public/webapp.ts",
+      "default": "./src/public/webapp.ts"
+    },
+    "./website": {
+      "types": "./src/public/website.ts",
+      "import": "./src/public/website.ts",
+      "default": "./src/public/website.ts"
+    }
   }
 }
