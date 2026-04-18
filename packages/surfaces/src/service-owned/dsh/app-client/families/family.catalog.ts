@@ -19,10 +19,7 @@ export const dshAppClientFamilyOrder = [
 export const dshAppClientRouteFamilyCatalog = {
   home: 'home',
   entry: 'entry',
-  'stores-list': 'stores',
-  'store-detail': 'stores',
   'store-items': 'stores',
-  'store-items-list': 'stores',
   'awnak-order-create': 'awnak',
   'cart-get': 'cart',
   // deprecated cart mutation routes removed

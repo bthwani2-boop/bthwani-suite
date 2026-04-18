@@ -57,7 +57,7 @@ export type DshHomeGetScreenProps = {
   onOpenCart?: () => void;
   onOpenList?: () => void;
   onOpenCategory?: (categoryId: string) => void;
-  onOpenStoresList?: () => void;
+  onOpenDiscovery?: () => void;
   onOpenStoreCategory?: (storeId: string, categoryId: string) => void;
   onOpenProduct?: (storeId: string, itemId: string) => void;
   onOpenBenefits?: () => void;
@@ -408,7 +408,7 @@ export function DshHomeGetScreen({
   onBack,
   onOpenList,
   onOpenCategory,
-  onOpenStoresList,
+  onOpenDiscovery,
   onOpenStoreCategory,
   onOpenProduct,
   onOpenBenefits,
@@ -598,8 +598,8 @@ export function DshHomeGetScreen({
           return;
         }
 
-        if (onOpenStoresList) {
-          onOpenStoresList();
+        if (onOpenDiscovery) {
+          onOpenDiscovery();
           return;
         }
 
@@ -618,8 +618,8 @@ export function DshHomeGetScreen({
           return;
         }
 
-        if (onOpenStoresList) {
-          onOpenStoresList();
+        if (onOpenDiscovery) {
+          onOpenDiscovery();
           return;
         }
 
@@ -652,14 +652,14 @@ export function DshHomeGetScreen({
         return;
       }
 
-      if (onOpenStoresList) {
-        onOpenStoresList();
+      if (onOpenDiscovery) {
+        onOpenDiscovery();
         return;
       }
 
       setInlineSearchVisible(true);
     },
-    [onOpenBenefits, onOpenCategory, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onOpenStoresList]
+    [onOpenBenefits, onOpenCategory, onOpenDiscovery, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory]
   );
 
   const activePromo = promos[activePromoIndex % promos.length] ?? dshHomeGetFixturePromos[0];

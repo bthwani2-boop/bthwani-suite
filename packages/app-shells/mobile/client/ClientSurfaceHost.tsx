@@ -14,18 +14,21 @@ import {
   useDirection,
   useUiText,
 } from '@bthwani/ui-kit';
-import { amn, arb, appClientSurfaceOwned, dsh, esf, knz, kwd, mrf, snd, wlt } from '@bthwani/surfaces';
+import {
+  AmnEntryScreen,
+  ArbEntryScreen,
+  DshSurfaceHost,
+  EsfEntryScreen,
+  KnzEntryScreen,
+  KwdEntryScreen,
+  MrfEntryScreen,
+  SndEntryScreen,
+  WltHomeGetScreen,
+  WltTopupScreen,
+  appClientSurfaceOwned,
+} from '@bthwani/surfaces/app-client';
 import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
 
-const { AmnEntryScreen } = amn.amnAppClient;
-const { ArbEntryScreen } = arb.arbAppClient;
-const { EsfEntryScreen } = esf.esfAppClient;
-const { KnzEntryScreen } = knz.knzAppClient;
-const { KwdEntryScreen } = kwd.kwdAppClient;
-const { MrfEntryScreen } = mrf.mrfAppClient;
-const { SndEntryScreen } = snd.sndAppClient;
-const { WltHomeGetScreen, WltTopupScreen } = wlt.wltAppClient;
-const { DshSurfaceHost } = dsh.dshAppClient;
 const { ClientEntrySurface } = appClientSurfaceOwned.ClientEntry;
 const { ClientLoginSurface } = appClientSurfaceOwned.ClientLogin;
 const { ClientSearchSurface } = appClientSurfaceOwned.ClientSearch;

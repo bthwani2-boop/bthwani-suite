@@ -1,8 +1,6 @@
 import React from 'react';
-import { View, type StyleProp, type ViewStyle } from 'react-native';
-import { spacing } from '../../foundation/tokens';
-import { BthText } from '../../primitives';
-import { BthSurface } from '../../primitives';
+import { type StyleProp, type ViewStyle } from 'react-native';
+import { BthBox, BthSurface, BthText } from '../../primitives';
 import { BthButton } from '../actions/BthButton';
 
 export type BthOptionRowProps = {
@@ -15,15 +13,21 @@ export type BthOptionRowProps = {
 
 export function BthOptionRow({ title, subtitle, actionLabel, onAction, style }: BthOptionRowProps) {
   return (
-    <BthSurface tone="inset" gap={2} style={style}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' as const }}>
-        <View style={{ flex: 1, gap: spacing[1] }}>
-          <BthText role="bodyStrong">{title}</BthText>
-          {subtitle ? <BthText role="bodySm" tone="muted">{subtitle}</BthText> : null}
-        </View>
+    <BthSurface tone="inset" padding={2} gap={0} style={style}>
+      <BthBox layoutDirection="row" justify="space-between" align="center" gap={2}>
+        <BthBox gap={1} style={{ flex: 1 }}>
+          <BthText role="bodyStrong" numberOfLines={1}>
+            {title}
+          </BthText>
+          {subtitle ? (
+            <BthText role="bodySm" tone="muted" numberOfLines={2}>
+              {subtitle}
+            </BthText>
+          ) : null}
+        </BthBox>
 
-        {actionLabel ? <BthButton label={actionLabel} onPress={onAction} /> : null}
-      </View>
+        {actionLabel ? <BthButton label={actionLabel} size="sm" tone="secondary" fullWidth={false} onPress={onAction} /> : null}
+      </BthBox>
     </BthSurface>
   );
 }

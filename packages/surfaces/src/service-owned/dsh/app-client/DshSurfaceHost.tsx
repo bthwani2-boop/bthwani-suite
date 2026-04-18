@@ -9,7 +9,7 @@ import { DshNotificationsScreen } from './families/notifications/screens';
 import { DshBenefitsHubScreen } from './families/loyalty/screens';
 import { DshOrdersListScreen, DshCreateOrderScreen, DshIntakeHubScreen, DshOrderSuccessState, DshTrackingScreen, DshDeliveryManagementHubScreen } from './families/placeholders/checkoutTracking';
 import { DshSheinOrderCreateScreen } from './families/shein/screens';
-import { DshStoresListScreen, DshStoreGetScreen, DshStoreDetailScreen, DshStoreItemsScreen, DshStoreItemsListScreen } from './families/stores/screens';
+import { DshStoreGetScreen, DshStoreItemsScreen } from './families/stores/screens';
 import { DshCategoriesListScreen, DshCategoryGetScreen } from './families/categories/screens';
 import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './families/favorites/screens';
 import { DshCartGetScreen } from './families/cart/screens';
@@ -36,10 +36,7 @@ export type DshRoute =
   | 'entry'
   | 'my-space'
   | 'notifications'
-  | 'stores-list'
-  | 'store-detail'
   | 'store-items'
-  | 'store-items-list'
   | 'awnak-order-create'
   | 'cart-get'
   | 'categories-list'
@@ -67,7 +64,7 @@ export type DshRoute =
   | 'orders-list'
   | 'tracking';
 
-export type DshCommandTarget = 'home' | 'stores-list' | 'orders-list' | 'tracking' | 'create-order' | 'cart-get';
+export type DshCommandTarget = 'home' | 'orders-list' | 'tracking' | 'create-order' | 'cart-get';
 
 type DshNavigationCommand = {
   token: number;
@@ -258,11 +255,11 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   const [createOrderValues, setCreateOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
   const [ordersQuery, setOrdersQuery] = React.useState('');
   const [storesQuery, setStoresQuery] = React.useState('');
-  const [storesFilter, setStoresFilter] = React.useState<'all' | 'nearest' | 'offers' | 'favorites'>('all');
   const [itemsQuery, setItemsQuery] = React.useState('');
   const [itemsCategory, setItemsCategory] = React.useState('all');
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
   const [selectedItemId, setSelectedItemId] = React.useState<string>('');
+  const [storeItemsEntryOrigin, setStoreItemsEntryOrigin] = React.useState<'home' | 'store-get'>('home');
   const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<ClientSupportScreenId>('checkout-gate');
   const routeHistoryRef = React.useRef<DshRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
@@ -525,11 +522,8 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     ['DshTrackingScreen', (DshTrackingScreen as unknown) as any],
     ['DshDeliveryManagementHubScreen', (DshDeliveryManagementHubScreen as unknown) as any],
     ['DshSheinOrderCreateScreen', (DshSheinOrderCreateScreen as unknown) as any],
-    ['DshStoresListScreen', (DshStoresListScreen as unknown) as any],
     ['DshStoreGetScreen', (DshStoreGetScreen as unknown) as any],
-    ['DshStoreDetailScreen', (DshStoreDetailScreen as unknown) as any],
     ['DshStoreItemsScreen', (DshStoreItemsScreen as unknown) as any],
-    ['DshStoreItemsListScreen', (DshStoreItemsListScreen as unknown) as any],
     ['DshCategoriesListScreen', (DshCategoriesListScreen as unknown) as any],
     ['DshCategoryGetScreen', (DshCategoryGetScreen as unknown) as any],
     ['DshFavoriteToggleScreen', (DshFavoriteToggleScreen as unknown) as any],
@@ -559,7 +553,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     return (
       <DshEntryScreen
         onStartDelivery={() => setRoute('cart-get')}
-        onBrowseStores={() => setRoute('stores-list')}
+        onBrowseStores={() => setRoute('home')}
         onOpenOrders={() => setRoute('orders-list')}
         onRetry={() => setRoute('entry')}
       />
@@ -591,7 +585,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
           setSelectedSupportScreen('service-modes-resolve');
           setRoute('service-settings');
         }}
-        onOpenOffers={() => setRoute('stores-list')}
+        onOpenOffers={() => setRoute('home')}
         onOpenDiscounts={() => {
           setSelectedSupportScreen('promo-apply');
           setRoute('checkout-workspace');
@@ -619,91 +613,6 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     );
   }
 
-  if (route === 'stores-list') {
-    return (
-      <DshStoresListScreen
-        items={dshDiscoveryStores}
-        banners={resolvePublishedHomePromos().map((promo) => ({
-          id: promo.id,
-          title: promo.title,
-          subtitle: promo.subtitle,
-          imageUrl: promo.imageUrl,
-          accentColor: promo.accentColor,
-          onPress: () => {
-            recordMarketingBannerClick(promo.id);
-
-            if (promo.actionType === 'store' && promo.actionTarget) {
-              setActiveStoreId(promo.actionTarget);
-              setRoute('store-get');
-              return;
-            }
-
-            if (promo.actionType === 'subscription' || promo.actionTarget === 'subscription-family-get') {
-              setSelectedSupportScreen('subscription-family-get');
-              setRoute('benefits');
-              return;
-            }
-
-            if (promo.actionTarget === 'promo-apply') {
-              setSelectedSupportScreen('promo-apply');
-              setRoute('checkout-workspace');
-              return;
-            }
-
-            if (promo.actionTarget === 'entitlements-get') {
-              setSelectedSupportScreen('entitlements-get');
-              setRoute('benefits');
-              return;
-            }
-
-            if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
-              setRoute('categories-list');
-            }
-          },
-        }))}
-        query={storesQuery}
-        activeFilter={storesFilter}
-        onQueryChange={setStoresQuery}
-        onFilterChange={setStoresFilter}
-        onOpenFavorites={() => setRoute('favorites-list')}
-        onOpenStore={(storeId) => {
-          setActiveStoreId(storeId);
-          setRoute('store-get');
-        }}
-        onRetry={() => setRoute('stores-list')}
-      />
-    );
-  }
-
-  if (route === 'store-detail') {
-    return (
-      <DshStoreDetailScreen
-        store={{
-          id: activeStore.id,
-          name: activeStore.name,
-          subtitle: activeStore.subtitle,
-          statusLabel: activeStore.statusLabel,
-          etaLabel: activeStore.meta,
-          deliveryFeeLabel: 'رسوم التوصيل 12 ر.س',
-          followersLabel: `${activeStore.followerCount.toLocaleString()} متابع`,
-          priceMatchLabel: 'الأسعار مطابقة للمطعم',
-          tags: activeStoreTags,
-          categories: activeStoreCategories,
-          deliveryModes: activeStoreDeliveryModes,
-          highlights: [
-            'جاهزية عالية وتجهيز موثوق للطلبات',
-            'تغليف واضح وتسليم أكثر اتساقًا',
-            'تجربة مناسبة للطلب الأول وإعادة الطلب',
-          ],
-        }}
-        onOpenMenu={() => setRoute('store-items-list')}
-        onStartDelivery={() => setRoute('store-items-list')}
-        onOpenTracking={() => setRoute('tracking')}
-        onRetry={() => setRoute('store-detail')}
-      />
-    );
-  }
-
   if (route === 'store-get') {
     return (
       <DshStoreGetScreen
@@ -726,13 +635,17 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
           deliveryModes: activeStoreDeliveryModes,
         }}
         menuItems={activeStoreItems}
-        onOpenItems={() => setRoute('store-items-list')}
+        onOpenItems={() => {
+          setStoreItemsEntryOrigin('store-get');
+          setRoute('store-items');
+        }}
         onOpenSearch={() => {
           setItemsQuery('');
-          setRoute('store-items-list');
+          setStoreItemsEntryOrigin('store-get');
+          setRoute('store-items');
         }}
         onOpenCart={() => setRoute('cart-get')}
-        onBack={() => setRoute('stores-list')}
+        onBack={() => setRoute('home')}
         onRetry={() => setRoute('store-get')}
         onSupport={openSupportDirectory}
       />
@@ -753,28 +666,8 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
           setRoute('cart-get');
         }}
         onOpenCart={() => setRoute('cart-get')}
-        onBack={() => setRoute('store-detail')}
+        onBack={() => setRoute(storeItemsEntryOrigin === 'store-get' ? 'store-get' : 'home')}
         onRetry={() => setRoute('store-items')}
-      />
-    );
-  }
-
-  if (route === 'store-items-list') {
-    return (
-      <DshStoreItemsListScreen
-        storeName={activeStore.name}
-        items={activeStoreItems}
-        query={itemsQuery}
-        activeCategory={itemsCategory}
-        onQueryChange={setItemsQuery}
-        onCategoryChange={setItemsCategory}
-        onOpenItem={(itemId) => {
-          setSelectedItemId(itemId);
-          setRoute('cart-get');
-        }}
-        onOpenCart={() => setRoute('cart-get')}
-        onBack={() => setRoute('store-detail')}
-        onRetry={() => setRoute('store-items-list')}
       />
     );
   }
@@ -1155,11 +1048,12 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
         setRoute('category-get');
       }}
-      onOpenStoresList={() => setRoute('stores-list')}
+      onOpenDiscovery={() => setRoute('home')}
       onOpenStoreCategory={(storeId, categoryId) => {
         setActiveStoreId(storeId);
         setItemsCategory(categoryId);
-        setRoute('store-items-list');
+        setStoreItemsEntryOrigin('home');
+        setRoute('store-items');
       }}
       onOpenProduct={(storeId, itemId) => {
         setActiveStoreId(storeId);

@@ -1,7 +1,7 @@
 export type MarketingGrowthFamily = 'campaign' | 'promotion' | 'subscription' | 'shorts';
 export type MarketingGrowthStatus = 'draft' | 'published' | 'paused';
 export type MarketingGrowthAudience = 'all' | 'client' | 'operations';
-export type MarketingGrowthRouteTarget = 'stores-list' | 'categories-list' | 'promo-apply' | 'subscription-family-get' | 'entitlements-get';
+export type MarketingGrowthRouteTarget = 'home' | 'categories-list' | 'promo-apply' | 'subscription-family-get' | 'entitlements-get';
 
 export type MarketingGrowthRecord = {
   id: string;
@@ -29,7 +29,7 @@ const seededGrowthItems: MarketingGrowthRecord[] = [
     family: 'campaign',
     status: 'published',
     audience: 'client',
-    routeTarget: 'stores-list',
+    routeTarget: 'home',
     ctaLabel: 'استكشف العروض',
     highlight: 'ظهور في الرئيسية + قائمة المتاجر',
     metricValue: '١٢٥ ألف مشاهدة',
@@ -151,7 +151,7 @@ export function upsertMarketingGrowthItem(item: Partial<MarketingGrowthRecord>) 
     family: item.family ?? existing?.family ?? 'campaign',
     status: item.status ?? existing?.status ?? 'draft',
     audience: item.audience ?? existing?.audience ?? 'client',
-    routeTarget: item.routeTarget ?? existing?.routeTarget ?? 'stores-list',
+    routeTarget: item.routeTarget ?? existing?.routeTarget ?? 'home',
     ctaLabel: item.ctaLabel?.trim() || existing?.ctaLabel || 'فتح الآن',
     highlight: item.highlight?.trim() || existing?.highlight || 'مهيأ للنشر',
     metricValue: item.metricValue?.trim() || existing?.metricValue || 'بدون بيانات',

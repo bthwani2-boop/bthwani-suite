@@ -13,7 +13,11 @@
     "docs"
   ],
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./app-client": {
+      "types": "./src/app-client.ts",
+      "default": "./src/app-client.ts"
+    }
   },
   "dependencies": {
     "@bthwani/ui-kit": "workspace:*"

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Pressable } from 'react-native';
-import { BthBox, BthButton, BthListItem, BthMobileScrollView, BthSectionHeader, BthSurface, BthTabs, BthText } from '@bthwani/ui-kit';
+import { BthBox, BthMobileScrollView, BthOptionRow, BthSegmentedControl, BthSurface, BthTabs, BthText } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../../patterns/screens/DshOperationScreen';
 
 export type DshMySpaceItem = {
@@ -55,6 +54,12 @@ type PrimaryTabConfig = {
   defaultDetail: MySpaceDetailTab;
 };
 
+type DetailRowConfig = {
+  id: MySpaceDetailTab;
+  label: string;
+  summary: string;
+};
+
 const primaryTabs: PrimaryTabConfig[] = [
   { id: 'loyalty', label: 'الولاء', summary: 'إدارة النقاط والمكافآت', defaultDetail: 'loyalty-balance' },
   { id: 'subscriptions', label: 'الاشتراكات', summary: 'الباقات والمزامنة', defaultDetail: 'subscriptions-overview' },
@@ -64,30 +69,30 @@ const primaryTabs: PrimaryTabConfig[] = [
   { id: 'address', label: 'العنوان', summary: 'العنوان الحالي والتغيير', defaultDetail: 'address-current' },
 ];
 
-const detailTabsByPrimary: Record<MySpacePrimaryTab, Array<{ id: MySpaceDetailTab; label: string }>> = {
+const detailRowsByPrimary: Record<MySpacePrimaryTab, DetailRowConfig[]> = {
   loyalty: [
-    { id: 'loyalty-balance', label: 'الرصيد' },
-    { id: 'loyalty-redeem', label: 'المكافآت' },
+    { id: 'loyalty-balance', label: 'الرصيد', summary: 'عرض النقاط الحالية والمكافآت' },
+    { id: 'loyalty-redeem', label: 'المكافآت', summary: 'استبدال النقاط والعروض المرتبطة' },
   ],
   subscriptions: [
-    { id: 'subscriptions-overview', label: 'النظرة العامة' },
-    { id: 'subscriptions-sync', label: 'المزامنة' },
+    { id: 'subscriptions-overview', label: 'ملخص', summary: 'نظرة سريعة على الاشتراك' },
+    { id: 'subscriptions-sync', label: 'مزامنة', summary: 'تحديث الحالة والربط' },
   ],
   preferences: [
-    { id: 'preferences-profile', label: 'الملف' },
-    { id: 'preferences-density', label: 'العرض' },
+    { id: 'preferences-profile', label: 'الملف', summary: 'التفضيل الحالي والتجربة' },
+    { id: 'preferences-density', label: 'العرض', summary: 'اللغة والكثافة' },
   ],
   offers: [
-    { id: 'offers-personal', label: 'العروض الشخصية' },
-    { id: 'offers-discounts', label: 'الخصومات' },
+    { id: 'offers-personal', label: 'شخصية', summary: 'العروض الأقرب لك' },
+    { id: 'offers-discounts', label: 'الخصومات', summary: 'الخصومات والحملات النشطة' },
   ],
   orders: [
-    { id: 'orders-recent', label: 'الحديثة' },
-    { id: 'orders-history', label: 'السجل' },
+    { id: 'orders-recent', label: 'حديثة', summary: 'آخر الطلبات الحالية' },
+    { id: 'orders-history', label: 'السجل', summary: 'الطلبات السابقة' },
   ],
   address: [
-    { id: 'address-current', label: 'العنوان الحالي' },
-    { id: 'address-change', label: 'تغيير العنوان' },
+    { id: 'address-current', label: 'الحالي', summary: 'العنوان المعتمد الآن' },
+    { id: 'address-change', label: 'تغيير', summary: 'تحديث نقطة الخدمة' },
   ],
 };
 
@@ -104,58 +109,39 @@ function getPrimaryTabLabel(primaryTab: MySpacePrimaryTab) {
   return primaryTabs.find((tab) => tab.id === primaryTab)?.label ?? 'مساحتي';
 }
 
-function renderDetailRail(
-  primaryTab: MySpacePrimaryTab,
+function renderDetailStack(
+  detailRows: DetailRowConfig[],
   activeDetailTab: MySpaceDetailTab,
   onChange: (tab: MySpaceDetailTab) => void,
+  renderBody: (tab: MySpaceDetailTab) => React.ReactNode,
 ) {
-  return (
-    <BthTabs<MySpaceDetailTab>
-      value={activeDetailTab}
-      onValueChange={onChange}
-      variant="line"
-      stretch
-      items={detailTabsByPrimary[primaryTab]}
-    />
-  );
-}
+  const activeDetailRow = detailRows.find((row) => row.id === activeDetailTab) ?? detailRows[0];
 
-function renderSectionShell(
-  section: PrimaryTabConfig,
-  expanded: boolean,
-  onToggle: () => void,
-  children?: React.ReactNode,
-) {
   return (
-    <BthSurface
-      tone={expanded ? 'raised' : 'default'}
-      padding={expanded ? 2 : 2}
-      gap={expanded ? 1 : 1}
-      style={{
-        borderWidth: 1,
-        borderColor: expanded ? 'rgba(255, 106, 0, 0.35)' : 'rgba(15, 23, 42, 0.08)',
-      }}
-    >
-      <Pressable accessibilityRole="button" accessibilityState={{ expanded }} onPress={onToggle}>
-        <BthBox layoutDirection="row" justify="space-between" align="center" gap={2}>
-          <BthBox gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
-            <BthText role="bodyStrong">{section.label}</BthText>
-            <BthText role="bodySm" tone="muted">
-              {section.summary}
-            </BthText>
-          </BthBox>
-          <BthBox gap={1} style={{ alignItems: 'flex-start' }}>
-            <BthText role="caption" tone={expanded ? 'brand' : 'soft'}>
-              {expanded ? 'مفتوح' : 'افتح'}
-            </BthText>
-            <BthText role="bodyStrong" tone={expanded ? 'brand' : 'muted'}>
-              {expanded ? '▾' : '▸'}
-            </BthText>
-          </BthBox>
+    <BthSurface tone="inset" padding={2} gap={2}>
+      <BthBox gap={1}>
+        <BthText role="caption" tone="soft">
+          صفوف مختصرة داخل الصفحة نفسها
+        </BthText>
+        <BthSegmentedControl
+          value={activeDetailTab}
+          onValueChange={onChange}
+          options={detailRows.map((row) => ({ value: row.id, label: row.label }))}
+          size="sm"
+        />
+      </BthBox>
+
+      <BthBox gap={1}>
+        {activeDetailRow ? (
+          <BthText role="bodySm" tone="muted">
+            {activeDetailRow.summary}
+          </BthText>
+        ) : null}
+
+        <BthBox gap={1}>
+          {renderBody(activeDetailTab)}
         </BthBox>
-      </Pressable>
-
-      {expanded ? children : null}
+      </BthBox>
     </BthSurface>
   );
 }
@@ -168,26 +154,67 @@ function renderLoyaltyContent(
   onOpenOffers?: () => void,
 ) {
   return (
-    <BthBox gap={3}>
-      {renderDetailRail('loyalty', activeDetailTab, onChangeDetailTab)}
-      <BthSurface tone="inset" padding={1} gap={1}>
-        {activeDetailTab === 'loyalty-balance' ? (
+    renderDetailStack(detailRowsByPrimary.loyalty, activeDetailTab, onChangeDetailTab, (tab) => {
+      if (tab === 'loyalty-balance') {
+        return (
           <>
-              <BthOptionRow title="رصيد الولاء" subtitle="اطلع على رصيد نقاطك" actionLabel="فتح" onAction={onOpenBenefits} />
-              <BthOptionRow title="المكافآت" subtitle="انتقل إلى تبويب الاستبدال داخل نفس الصفحة" actionLabel="عرض" onAction={() => onChangeDetailTab('loyalty-redeem')} />
+            <BthOptionRow title="رصيد الولاء" subtitle="اطلع على رصيدك الحالي" actionLabel="فتح" onAction={onOpenBenefits} />
+            <BthOptionRow title="المكافآت" subtitle="انتقل إلى الاستبدال داخل نفس الصفحة" actionLabel="عرض" onAction={() => onChangeDetailTab('loyalty-redeem')} />
           </>
-        ) : null}
+        );
+      }
 
-        {activeDetailTab === 'loyalty-redeem' ? (
-          <>
-              <BthOptionRow title="استبدال النقاط" subtitle="استخدم نقاطك بالمكافآت المتاحة" actionLabel="فتح" onAction={onOpenBenefits} />
-              <BthOptionRow title="العروض" subtitle="اذهب إلى العروض داخل نفس الشاشة" actionLabel="عرض" onAction={onOpenOffers} />
-              <BthOptionRow title="الاشتراكات" subtitle="واصل إلى بطاقة الاشتراكات أسفل الصفحة" actionLabel="فتح" onAction={onOpenSubscriptions} />
-          </>
-        ) : null}
-      </BthSurface>
-    </BthBox>
+      return (
+        <>
+          <BthOptionRow title="استبدال النقاط" subtitle="استخدم نقاطك بالمكافآت المتاحة" actionLabel="فتح" onAction={onOpenBenefits} />
+          <BthOptionRow title="العروض" subtitle="اذهب إلى العروض داخل هذه الصفحة" actionLabel="عرض" onAction={onOpenOffers} />
+          <BthOptionRow title="الاشتراكات" subtitle="واصل إلى بطاقة الاشتراكات أسفل الصفحة" actionLabel="فتح" onAction={onOpenSubscriptions} />
+        </>
+      );
+    })
   );
+}
+
+function renderPrimarySectionContent(
+  section: MySpacePrimaryTab,
+  activeDetailTab: MySpaceDetailTab,
+  onChangeDetailTab: (tab: MySpaceDetailTab) => void,
+  subscriptionLabel: string,
+  preferenceLabel: string,
+  addressLabel: string,
+  ordersLabel: string,
+  offersLabel: string,
+  discountsLabel: string,
+  marketingPrograms: DshMySpaceItem[],
+  onOpenBenefits?: () => void,
+  onOpenSubscriptions?: () => void,
+  onOpenPreferences?: () => void,
+  onOpenOffers?: () => void,
+  onOpenDiscounts?: () => void,
+  onOpenOrders?: () => void,
+  onChangeAddress?: () => void,
+) {
+  if (section === 'loyalty') {
+    return renderLoyaltyContent(activeDetailTab, onChangeDetailTab, onOpenBenefits, onOpenSubscriptions, onOpenOffers);
+  }
+
+  if (section === 'subscriptions') {
+    return renderSubscriptionsContent(subscriptionLabel, activeDetailTab, onChangeDetailTab, onOpenSubscriptions);
+  }
+
+  if (section === 'preferences') {
+    return renderPreferencesContent(preferenceLabel, activeDetailTab, onChangeDetailTab, onOpenPreferences);
+  }
+
+  if (section === 'offers') {
+    return renderOffersContent(offersLabel, discountsLabel, marketingPrograms, activeDetailTab, onChangeDetailTab, onOpenOffers, onOpenDiscounts, onOpenSubscriptions);
+  }
+
+  if (section === 'orders') {
+    return renderOrdersContent(ordersLabel, activeDetailTab, onChangeDetailTab, onOpenOrders);
+  }
+
+  return renderAddressContent(addressLabel, activeDetailTab, onChangeDetailTab, onChangeAddress);
 }
 
 function renderSubscriptionsContent(
@@ -197,24 +224,23 @@ function renderSubscriptionsContent(
   onOpenSubscriptions?: () => void,
 ) {
   return (
-    <BthBox gap={3}>
-      {renderDetailRail('subscriptions', activeDetailTab, onChangeDetailTab)}
-      <BthSurface tone="inset" padding={1} gap={1}>
-        {activeDetailTab === 'subscriptions-overview' ? (
+    renderDetailStack(detailRowsByPrimary.subscriptions, activeDetailTab, onChangeDetailTab, (tab) => {
+      if (tab === 'subscriptions-overview') {
+        return (
           <>
-              <BthOptionRow title="الحالة الحالية" subtitle={subscriptionLabel} actionLabel="فتح" onAction={onOpenSubscriptions} />
-              <BthOptionRow title="الباقة النشطة" subtitle="استعراض مختصر للباقات والامتيازات المرتبطة" actionLabel="عرض" onAction={onOpenSubscriptions} />
+            <BthOptionRow title="الحالة الحالية" subtitle={subscriptionLabel} actionLabel="فتح" onAction={onOpenSubscriptions} />
+            <BthOptionRow title="الباقة النشطة" subtitle="استعراض مختصر للباقات والامتيازات المرتبطة" actionLabel="عرض" onAction={onOpenSubscriptions} />
           </>
-        ) : null}
+        );
+      }
 
-        {activeDetailTab === 'subscriptions-sync' ? (
-          <>
-              <BthOptionRow title="مزامنة الاشتراك" subtitle="يفتح المزامنة كمسار فعلي داخل هذه الصفحة" actionLabel="تحديث" onAction={onOpenSubscriptions} />
-              <BthOptionRow title="إعادة الفحص" subtitle="تحديث مباشر للحالة والبيانات المرتبطة" actionLabel="فحص" onAction={onOpenSubscriptions} />
-          </>
-        ) : null}
-      </BthSurface>
-    </BthBox>
+      return (
+        <>
+          <BthOptionRow title="مزامنة الاشتراك" subtitle="تحديث الحالة والربط الحالي" actionLabel="تحديث" onAction={onOpenSubscriptions} />
+          <BthOptionRow title="إعادة الفحص" subtitle="فحص مباشر للبيانات المرتبطة" actionLabel="فحص" onAction={onOpenSubscriptions} />
+        </>
+      );
+    })
   );
 }
 
@@ -225,24 +251,23 @@ function renderPreferencesContent(
   onOpenPreferences?: () => void,
 ) {
   return (
-    <BthBox gap={3}>
-      {renderDetailRail('preferences', activeDetailTab, onChangeDetailTab)}
-      <BthSurface tone="inset" padding={1} gap={1}>
-        {activeDetailTab === 'preferences-profile' ? (
+    renderDetailStack(detailRowsByPrimary.preferences, activeDetailTab, onChangeDetailTab, (tab) => {
+      if (tab === 'preferences-profile') {
+        return (
           <>
-              <BthOptionRow title="التفضيل الحالي" subtitle={preferenceLabel} actionLabel="فتح" onAction={onOpenPreferences} />
-              <BthOptionRow title="لغة وتجربة" subtitle="إعداد مختصر للسلوك العام للمساحة الشخصية" actionLabel="ضبط" onAction={onOpenPreferences} />
+            <BthOptionRow title="التفضيل الحالي" subtitle={preferenceLabel} actionLabel="فتح" onAction={onOpenPreferences} />
+            <BthOptionRow title="لغة وتجربة" subtitle="إعداد مختصر للسلوك العام للمساحة الشخصية" actionLabel="ضبط" onAction={onOpenPreferences} />
           </>
-        ) : null}
+        );
+      }
 
-        {activeDetailTab === 'preferences-density' ? (
-          <>
-              <BthOptionRow title="العرض المختصر" subtitle="تقليل الكثافة مع الحفاظ على وضوح المسارات" actionLabel="ضبط" onAction={onOpenPreferences} />
-              <BthOptionRow title="اللغة" subtitle="تبديل اللغة حسب الحاجة من نفس الصفحة" actionLabel="لغة" onAction={onOpenPreferences} />
-          </>
-        ) : null}
-      </BthSurface>
-    </BthBox>
+      return (
+        <>
+          <BthOptionRow title="العرض المختصر" subtitle="تقليل الكثافة مع الحفاظ على وضوح المسارات" actionLabel="ضبط" onAction={onOpenPreferences} />
+          <BthOptionRow title="اللغة" subtitle="تبديل اللغة من نفس الصفحة" actionLabel="لغة" onAction={onOpenPreferences} />
+        </>
+      );
+    })
   );
 }
 
@@ -257,37 +282,36 @@ function renderOffersContent(
   onOpenSubscriptions?: () => void,
 ) {
   return (
-    <BthBox gap={3}>
-      {renderDetailRail('offers', activeDetailTab, onChangeDetailTab)}
-      <BthSurface tone="inset" padding={1} gap={1}>
-        {activeDetailTab === 'offers-personal' ? (
+    renderDetailStack(detailRowsByPrimary.offers, activeDetailTab, onChangeDetailTab, (tab) => {
+      if (tab === 'offers-personal') {
+        return (
           <>
-              <BthOptionRow title="العروض الشخصية" subtitle={offersLabel} actionLabel="فتح" onAction={onOpenOffers} />
-              <BthOptionRow title="حزمة الواجهة" subtitle="عرض خفيف للأشياء الأكثر صلة بالمستخدم" actionLabel="عرض" onAction={onOpenOffers} />
+            <BthOptionRow title="العروض الشخصية" subtitle={offersLabel} actionLabel="فتح" onAction={onOpenOffers} />
+            <BthOptionRow title="حزمة الواجهة" subtitle="عرض خفيف للأشياء الأكثر صلة بالمستخدم" actionLabel="عرض" onAction={onOpenOffers} />
           </>
-        ) : null}
+        );
+      }
 
-        {activeDetailTab === 'offers-discounts' ? (
-          <>
-              <BthOptionRow title="الخصومات النشطة" subtitle={discountsLabel} actionLabel="فتح" onAction={onOpenDiscounts} />
-            {marketingPrograms.length ? marketingPrograms.map((item) => (
-                <BthOptionRow
-                key={item.id}
-                title={item.title}
-                subtitle={item.subtitle}
-                  actionLabel={item.badgeLabel}
-                  onAction={item.id.includes('subscription') ? onOpenSubscriptions ?? onOpenOffers : item.id.includes('promo') ? onOpenDiscounts ?? onOpenOffers : onOpenOffers}
-              />
-            )) : (
-              <BthText role="bodySm" tone="muted">
-                لا توجد حملات مباشرة مفعلة الآن. افتح العروض أو الخصومات للوصول إلى المسارات الحية.
-              </BthText>
-            )}
-              <BthOptionRow title="فتح الخصومات" subtitle="انتقل مباشرة إلى مسار الخصومات داخل نفس الشاشة" actionLabel="فتح" onAction={onOpenDiscounts} />
-          </>
-        ) : null}
-      </BthSurface>
-    </BthBox>
+      return (
+        <>
+          <BthOptionRow title="الخصومات النشطة" subtitle={discountsLabel} actionLabel="فتح" onAction={onOpenDiscounts} />
+          {marketingPrograms.length ? marketingPrograms.map((item) => (
+            <BthOptionRow
+              key={item.id}
+              title={item.title}
+              subtitle={item.subtitle}
+              actionLabel={item.badgeLabel}
+              onAction={item.id.includes('subscription') ? onOpenSubscriptions ?? onOpenOffers : item.id.includes('promo') ? onOpenDiscounts ?? onOpenOffers : onOpenOffers}
+            />
+          )) : (
+            <BthText role="bodySm" tone="muted">
+              لا توجد حملات مباشرة مفعلة الآن. افتح العروض أو الخصومات للوصول إلى المسارات الحية.
+            </BthText>
+          )}
+          <BthOptionRow title="فتح الخصومات" subtitle="انتقل مباشرة إلى مسار الخصومات داخل نفس الشاشة" actionLabel="فتح" onAction={onOpenDiscounts} />
+        </>
+      );
+    })
   );
 }
 
@@ -298,24 +322,23 @@ function renderOrdersContent(
   onOpenOrders?: () => void,
 ) {
   return (
-    <BthBox gap={3}>
-      {renderDetailRail('orders', activeDetailTab, onChangeDetailTab)}
-      <BthSurface tone="inset" padding={1} gap={1}>
-        {activeDetailTab === 'orders-recent' ? (
+    renderDetailStack(detailRowsByPrimary.orders, activeDetailTab, onChangeDetailTab, (tab) => {
+      if (tab === 'orders-recent') {
+        return (
           <>
-              <BthOptionRow title="الطلبات الحديثة" subtitle={ordersLabel} actionLabel="فتح" onAction={onOpenOrders} />
-              <BthOptionRow title="الطلب النشط" subtitle="اختصار واضح إلى آخر حالة تحتاجها الآن" actionLabel="تتبع" onAction={onOpenOrders} />
+            <BthOptionRow title="الطلبات الحديثة" subtitle={ordersLabel} actionLabel="فتح" onAction={onOpenOrders} />
+            <BthOptionRow title="الطلب النشط" subtitle="اختصار واضح إلى آخر حالة تحتاجها الآن" actionLabel="تتبع" onAction={onOpenOrders} />
           </>
-        ) : null}
+        );
+      }
 
-        {activeDetailTab === 'orders-history' ? (
-          <>
-              <BthOptionRow title="سجل الطلبات" subtitle="استعراض الطلبات السابقة بسرعة" actionLabel="فتح" onAction={onOpenOrders} />
-              <BthOptionRow title="التتبع" subtitle="الانتقال إلى الحالة الحالية إذا كانت الطلبات المفتوحة مهمة" actionLabel="تتبع" onAction={onOpenOrders} />
-          </>
-        ) : null}
-      </BthSurface>
-    </BthBox>
+      return (
+        <>
+          <BthOptionRow title="سجل الطلبات" subtitle="استعراض الطلبات السابقة بسرعة" actionLabel="فتح" onAction={onOpenOrders} />
+          <BthOptionRow title="التتبع" subtitle="الانتقال إلى الحالة الحالية عند الحاجة" actionLabel="تتبع" onAction={onOpenOrders} />
+        </>
+      );
+    })
   );
 }
 
@@ -326,24 +349,23 @@ function renderAddressContent(
   onChangeAddress?: () => void,
 ) {
   return (
-    <BthBox gap={3}>
-      {renderDetailRail('address', activeDetailTab, onChangeDetailTab)}
-      <BthSurface tone="inset" padding={1} gap={1}>
-        {activeDetailTab === 'address-current' ? (
+    renderDetailStack(detailRowsByPrimary.address, activeDetailTab, onChangeDetailTab, (tab) => {
+      if (tab === 'address-current') {
+        return (
           <>
-              <BthOptionRow title="العنوان الحالي" subtitle={addressLabel} actionLabel="فتح" onAction={onChangeAddress} />
-              <BthOptionRow title="نقطة الخدمة" subtitle="عرض واضح للعقدة الحالية التي يعتمدها المسار" actionLabel="عرض" onAction={onChangeAddress} />
+            <BthOptionRow title="العنوان الحالي" subtitle={addressLabel} actionLabel="فتح" onAction={onChangeAddress} />
+            <BthOptionRow title="نقطة الخدمة" subtitle="عرض واضح للعقدة الحالية التي يعتمدها المسار" actionLabel="عرض" onAction={onChangeAddress} />
           </>
-        ) : null}
+        );
+      }
 
-        {activeDetailTab === 'address-change' ? (
-          <>
-              <BthOptionRow title="تغيير العنوان" subtitle="انتقل إلى zone-set أو المسار المكافئ لتحديث نقطة الخدمة" actionLabel="بدء" onAction={onChangeAddress} />
-              <BthOptionRow title="خطوة مؤكدة" subtitle="عملية تغيير منطقية وواضحة مع مسار رجوع آمن" actionLabel="مراجعة" onAction={onChangeAddress} />
-          </>
-        ) : null}
-      </BthSurface>
-    </BthBox>
+      return (
+        <>
+          <BthOptionRow title="تغيير العنوان" subtitle="انتقل إلى zone-set أو المسار المكافئ" actionLabel="بدء" onAction={onChangeAddress} />
+          <BthOptionRow title="خطوة مؤكدة" subtitle="عملية تغيير واضحة مع مسار رجوع آمن" actionLabel="مراجعة" onAction={onChangeAddress} />
+        </>
+      );
+    })
   );
 }
 
@@ -354,7 +376,7 @@ export function DshMySpaceScreen({
   preferenceLabel = 'يفتح service-settings كمسار التفضيلات الحقيقي',
   addressLabel = 'يفتح zone-set أو المسار المكافئ لتغيير العنوان',
   ordersLabel = 'يفتح orders-list أو tracking بحسب الحالة الحقيقية',
-  offersLabel = 'يفتح stores-list أو categories-list كمسارات عرض فعلية',
+  offersLabel = 'يفتح الصفحة الرئيسية أو categories-list كمسارات عرض فعلية',
   discountsLabel = 'يفتح checkout و promo-apply عبر المسار الفعلي',
   marketingPrograms = [],
   onOpenBenefits,
@@ -379,7 +401,8 @@ export function DshMySpaceScreen({
   }
 
   const activePrimaryLabel = getPrimaryTabLabel(activePrimaryTab);
-  const activeDetailLabel = detailTabsByPrimary[activePrimaryTab].find((tab) => tab.id === activeDetailTab)?.label ?? '';
+  const activePrimarySection = primaryTabs.find((tab) => tab.id === activePrimaryTab) ?? primaryTabs[0];
+  const activeDetailLabel = detailRowsByPrimary[activePrimaryTab].find((tab) => tab.id === activeDetailTab)?.label ?? '';
 
   const handlePrimaryChange = (nextTab: MySpacePrimaryTab) => {
     setActivePrimaryTab(nextTab);
@@ -408,30 +431,52 @@ export function DshMySpaceScreen({
         </BthSurface>
       </BthSurface>
 
-      <BthBox gap={1}>
-        {primaryTabs.map((section) => {
-          const expanded = section.id === activePrimaryTab;
+      <BthBox gap={2}>
+        <BthSurface tone="inset" padding={2} gap={1}>
+          <BthTabs<MySpacePrimaryTab>
+            value={activePrimaryTab}
+            onValueChange={handlePrimaryChange}
+            variant="pill"
+            scrollable
+            items={primaryTabs.map((section) => ({
+              value: section.id,
+              label: section.label,
+            }))}
+          />
 
-          return (
-            <React.Fragment key={section.id}>
-              {renderSectionShell(
-                section,
-                expanded,
-                () => handlePrimaryChange(section.id),
-                expanded ? (
-                  <>
-                    {section.id === 'loyalty' ? renderLoyaltyContent(activeDetailTab, handleDetailChange, onOpenBenefits, onOpenSubscriptions, onOpenOffers) : null}
-                    {section.id === 'subscriptions' ? renderSubscriptionsContent(subscriptionLabel, activeDetailTab, handleDetailChange, onOpenSubscriptions) : null}
-                    {section.id === 'preferences' ? renderPreferencesContent(preferenceLabel, activeDetailTab, handleDetailChange, onOpenPreferences) : null}
-                    {section.id === 'offers' ? renderOffersContent(offersLabel, discountsLabel, marketingPrograms, activeDetailTab, handleDetailChange, onOpenOffers, onOpenDiscounts, onOpenSubscriptions) : null}
-                    {section.id === 'orders' ? renderOrdersContent(ordersLabel, activeDetailTab, handleDetailChange, onOpenOrders) : null}
-                    {section.id === 'address' ? renderAddressContent(addressLabel, activeDetailTab, handleDetailChange, onChangeAddress) : null}
-                  </>
-                ) : null,
-              )}
-            </React.Fragment>
-          );
-        })}
+          <BthText role="bodySm" tone="muted">
+            {activePrimarySection.summary}
+          </BthText>
+        </BthSurface>
+
+        <BthSurface tone="raised" padding={3} gap={2}>
+          <BthBox gap={0} style={{ alignItems: 'flex-end' }}>
+            <BthText role="titleSm">{activePrimarySection.label}</BthText>
+            <BthText role="bodySm" tone="muted">
+              صفحة واحدة لكل ما يتعلق بهذا القسم، مع تفاصيله داخل الصفحة نفسها.
+            </BthText>
+          </BthBox>
+
+          {renderPrimarySectionContent(
+            activePrimaryTab,
+            activeDetailTab,
+            handleDetailChange,
+            subscriptionLabel,
+            preferenceLabel,
+            addressLabel,
+            ordersLabel,
+            offersLabel,
+            discountsLabel,
+            marketingPrograms,
+            onOpenBenefits,
+            onOpenSubscriptions,
+            onOpenPreferences,
+            onOpenOffers,
+            onOpenDiscounts,
+            onOpenOrders,
+            onChangeAddress,
+          )}
+        </BthSurface>
       </BthBox>
     </BthMobileScrollView>
   );

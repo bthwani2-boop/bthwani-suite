@@ -43,7 +43,7 @@ function createDraft(item?: MarketingGrowthRecord | null): GrowthDraft {
     family: item?.family ?? 'campaign',
     status: item?.status ?? 'draft',
     audience: item?.audience ?? 'client',
-    routeTarget: item?.routeTarget ?? 'stores-list',
+    routeTarget: item?.routeTarget ?? 'home',
     ctaLabel: item?.ctaLabel ?? 'فتح الآن',
     highlight: item?.highlight ?? '',
     metricValue: item?.metricValue ?? '',
@@ -71,11 +71,12 @@ function audienceLabel(audience: MarketingGrowthAudience) {
 }
 
 function routeTargetLabel(target: MarketingGrowthRouteTarget) {
+  if (target === 'home') return 'الرئيسية';
   if (target === 'promo-apply') return 'تطبيق العروض';
   if (target === 'subscription-family-get') return 'إدارة الاشتراك';
   if (target === 'entitlements-get') return 'الاستحقاقات والمزايا';
   if (target === 'categories-list') return 'التصنيفات';
-  return 'قائمة المتاجر';
+  return 'الرئيسية';
 }
 
 export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
@@ -255,7 +256,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
 
             <BthTabs<MarketingGrowthRouteTarget>
               items={[
-                { value: 'stores-list', label: 'المتاجر' },
+                { value: 'home', label: 'الرئيسية' },
                 { value: 'categories-list', label: 'التصنيفات' },
                 { value: 'promo-apply', label: 'العروض' },
                 { value: 'subscription-family-get', label: 'الاشتراك' },

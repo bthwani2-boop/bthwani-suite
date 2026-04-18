@@ -9,3 +9,4 @@ export * from './BthServiceTileCard';
 export * from './CartSummary';
 export * from './CartDetails';
 export * from './BthOptionRow';
+export * from './BthDisclosureRow';
