@@ -1,24 +1,23 @@
-import React from 'react';
-import { DshCartPrice } from '../../../../DshCartPrice';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { View } from 'react-native';
 import {
   BthBox,
   BthButton,
   BthCard,
-  BthListItem,
   BthMobileScrollView,
   BthSectionHeader,
   BthStateView,
   BthSurface,
   BthText,
+  StickyActionBar,
+  CartDetails,
+  BthTextField,
+  spacing,
+  sizes,
+  safeArea,
 } from '@bthwani/ui-kit';
 
-export type DshCartGetScreenState =
-  | 'ready'
-  | 'loading'
-  | 'empty'
-  | 'error'
-  | 'offline'
-  | 'disabled';
+export type DshCartGetScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
 export type DshCartStoreSummary = {
   id: string;
@@ -31,15 +30,16 @@ export type DshCartStoreSummary = {
 export type DshCartOrderSummary = {
   id: string;
   title: string;
-  subtitle: string;
-  meta: string;
-  statusLabel: string;
+  subtitle?: string;
+  meta?: string;
+  statusLabel?: string;
 };
 
 export type DshCartGetScreenProps = {
   state?: DshCartGetScreenState;
   store?: DshCartStoreSummary;
   activeOrder?: DshCartOrderSummary;
+  items?: Array<{ id: string; title: string; subtitle?: string; priceValue?: number; qty?: number }>;
   statusTitle?: string;
   statusDescription?: string;
   onOpenStore?: (storeId: string) => void;
@@ -48,11 +48,7 @@ export type DshCartGetScreenProps = {
   onContinue?: () => void;
 };
 
-function renderNonReadyState(
-  state: DshCartGetScreenState,
-  onRetry?: () => void,
-  onContinue?: () => void
-) {
+function renderNonReadyState(state: DshCartGetScreenState, onRetry?: () => void, onContinue?: () => void) {
   if (state === 'loading') {
     return <BthStateView stateId="loading" />;
   }
@@ -96,76 +92,11 @@ function renderNonReadyState(
   );
 }
 
-function renderStoreSection(store: DshCartStoreSummary, onOpenStore?: (storeId: string) => void) {
-  return (
-    <BthSurface tone="raised" gap={3}>
-      <BthSectionHeader
-        title="Store"
-        subtitle="Keep store context visible before order confirmation."
-      />
-      <BthCard
-        title={store.name}
-        subtitle={store.subtitle}
-        footer={
-          <BthBox layoutDirection="row" gap={2}>
-            <BthButton
-              label="Open store"
-              tone="secondary"
-              onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
-            />
-          </BthBox>
-        }
-      />
-      <BthBox layoutDirection="row" gap={2}>
-        {store.statusLabel ? <BthText role="caption">{store.statusLabel}</BthText> : null}
-        {store.ratingLabel ? <BthText role="caption" tone="muted">{store.ratingLabel}</BthText> : null}
-      </BthBox>
-    </BthSurface>
-  );
-}
-
-function renderOrderSection(order: DshCartOrderSummary, onOpenOrder?: (orderId: string) => void) {
-  return (
-    <BthSurface tone="raised" gap={3}>
-      <BthSectionHeader
-        title="Active order"
-        subtitle="One dominant action: open the order and continue the journey."
-      />
-      <BthListItem
-        title={order.title}
-        subtitle={order.subtitle}
-        meta={order.meta}
-        badgeLabel={order.statusLabel}
-        onPress={onOpenOrder ? () => onOpenOrder(order.id) : undefined}
-      />
-    </BthSurface>
-  );
-}
-
-function renderStatusSection(
-  statusTitle: string,
-  statusDescription: string,
-  onContinue?: () => void
-) {
-  return (
-    <BthSurface tone="inset" gap={3}>
-      <BthSectionHeader
-        title="Current status"
-        subtitle="Keep closure and next action explicit at all times."
-      />
-      <BthCard
-        title={statusTitle}
-        subtitle={statusDescription}
-        footer={<BthButton label="Continue" onPress={onContinue} />}
-      />
-    </BthSurface>
-  );
-}
-
-export function DshCartGetScreen({
+export default function DshCartGetScreen({
   state = 'ready',
   store,
   activeOrder,
+  items,
   statusTitle = 'Ready for checkout',
   statusDescription = 'Review your order and continue to the next step.',
   onOpenStore,
@@ -187,25 +118,185 @@ export function DshCartGetScreen({
     );
   }
 
+  const parseAmount = (meta?: string) => {
+    if (!meta) return 0;
+    try {
+      const digits = String(meta).replace(/[^0-9.,-]/g, '').replace(',', '.');
+      const n = parseFloat(digits);
+      return Number.isFinite(n) ? n : 0;
+    } catch {
+      return 0;
+    }
+  };
+
+  type CartItem = {
+    id: string;
+    title: string;
+    subtitle?: string;
+    priceValue: number; // in SAR
+    qty: number;
+  };
+
+  const initialItems = useMemo<CartItem[]>(() => {
+    if (Array.isArray(items) && items.length) {
+      return items.map((it) => ({
+        id: it.id,
+        title: it.title,
+        subtitle: it.subtitle,
+        priceValue: Number(it.priceValue ?? 0) || 0,
+        qty: Math.max(1, Math.floor(Number(it.qty ?? 1) || 1)),
+      }));
+    }
+
+    if (!activeOrder) return [];
+
+    try {
+      const parsed = JSON.parse(activeOrder.meta ?? 'null');
+      if (Array.isArray(parsed) && parsed.length) {
+        return parsed.map((it: any, idx: number) => ({
+          id: it.id ?? `${activeOrder.id}-line-${idx}`,
+          title: it.title ?? activeOrder.title ?? 'Item',
+          subtitle: it.subtitle ?? undefined,
+          priceValue: Number(it.priceValue ?? parseAmount(it.meta) ?? 0) || 0,
+          qty: Math.max(1, Number(it.qty ?? 1) || 1),
+        }));
+      }
+    } catch {
+      // ignore
+    }
+
+    return [
+      {
+        id: `${activeOrder.id}-line`,
+        title: activeOrder.title,
+        subtitle: activeOrder.subtitle,
+        priceValue: parseAmount(activeOrder.meta),
+        qty: 1,
+      },
+    ];
+  }, [items, activeOrder]);
+
+  const [cartItems, setCartItems] = useState<CartItem[]>(initialItems);
+  useEffect(() => setCartItems(initialItems), [initialItems]);
+
+  const toHalalas = (value: number) => Math.round(value * 100);
+  const fromHalalas = (halalas: number) => halalas / 100;
+
+  const totalHalalas = useMemo(() => cartItems.reduce((acc, it) => acc + toHalalas(it.priceValue) * it.qty, 0), [cartItems]);
+  const totalAmount = fromHalalas(totalHalalas);
+  const formattedTotal = useMemo(() => {
+    try {
+      return new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(totalAmount);
+    } catch {
+      return `${totalAmount} ر.س`;
+    }
+  }, [totalAmount]);
+
+  const [showCartDetails, setShowCartDetails] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const actionBarBottomPadding = spacing[4] + sizes.controlMd + (safeArea.comfortable ?? 0) + spacing[3];
+
+  const updateItem = useCallback((id: string, patch: Partial<CartItem>) => {
+    setCartItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...patch } : it)));
+  }, []);
+
+  const removeItem = useCallback((id: string) => {
+    setCartItems((prev) => prev.filter((it) => it.id !== id));
+  }, []);
+
+  const increaseQty = useCallback((id: string) => updateItem(id, { qty: (cartItems.find((i) => i.id === id)?.qty ?? 1) + 1 }), [cartItems, updateItem]);
+  const decreaseQty = useCallback((id: string) => {
+    const current = cartItems.find((i) => i.id === id);
+    if (!current) return;
+    const next = Math.max(1, current.qty - 1);
+    updateItem(id, { qty: next });
+  }, [cartItems, updateItem]);
+
   return (
-    <BthMobileScrollView padding={4} gap={3}>
-      {renderStoreSection(store, onOpenStore)}
-      {renderOrderSection(activeOrder, onOpenOrder)}
-      <DshCartPrice
-        title="Price snapshot"
-        subtitle="Review the current cost context before opening the cart."
-        priceLines={[
-          { id: 'item', label: 'Item value', value: activeOrder.meta },
-          { id: 'store', label: 'Store', value: store.name },
-          { id: 'delivery', label: 'Delivery status', value: store.statusLabel ?? 'Ready' },
-        ]}
-        totalLabel={statusTitle}
-        totalValue={statusDescription}
-        footnote="Open cart to continue the sequential checkout flow."
-        onOpenCart={onContinue}
-        onBack={onOpenStore ? () => onOpenStore(store.id) : undefined}
-        onSupport={onOpenOrder ? () => onOpenOrder(activeOrder.id) : undefined}
+    <View style={{ flex: 1 }}>
+      <BthMobileScrollView padding={4} gap={3} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: actionBarBottomPadding }}>
+        <BthSurface tone="inset" gap={2}>
+          <BthBox gap={1}>
+            <BthText role="bodySm" tone="muted">المجموع</BthText>
+            <BthText role="titleLg" style={{ fontWeight: '700' }}>{formattedTotal}</BthText>
+          </BthBox>
+        </BthSurface>
+
+        <BthSurface tone="raised" gap={2}>
+          <BthSectionHeader title="السلة" subtitle={`عناصر: ${cartItems.length}`} />
+
+          {cartItems.length === 0 ? (
+            <BthBox gap={2}>
+              <BthText role="bodySm" tone="muted">السلة فارغة. أضف عناصرًا بالأسفل.</BthText>
+            </BthBox>
+          ) : (
+            cartItems.map((item) => {
+              const formattedUnitPrice = new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(item.priceValue);
+              const lineTotal = item.priceValue * item.qty;
+              const formattedLineTotal = new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(lineTotal);
+              const subtitleWithPrice = item.subtitle ? `${item.subtitle} · ${formattedUnitPrice}` : formattedUnitPrice;
+
+              return (
+                <BthCard key={item.id} title={item.title} subtitle={subtitleWithPrice}>
+                  <BthBox gap={2} layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                    {editingId === item.id ? (
+                      <BthBox gap={2} style={{ flex: 1 }}>
+                        <BthTextField label="اسم العنصر" value={item.title} onChangeText={(v) => updateItem(item.id, { title: v })} />
+                        <BthTextField label="السعر (ر.س)" value={String(item.priceValue)} onChangeText={(v) => updateItem(item.id, { priceValue: Number(String(v).replace(/[^0-9.,-]/g, '').replace(',', '.')) || 0 })} keyboardType="decimal-pad" />
+                        <BthTextField label="الكمية" value={String(item.qty)} onChangeText={(v) => updateItem(item.id, { qty: Math.max(1, Math.floor(Number(v) || 1)) })} keyboardType="number-pad" />
+                        <BthBox gap={2}>
+                          <BthButton label="حفظ" onPress={() => setEditingId(null)} />
+                          <BthButton label="إلغاء" tone="secondary" onPress={() => setEditingId(null)} />
+                        </BthBox>
+                      </BthBox>
+                    ) : (
+                      <BthBox gap={1} style={{ flex: 1 }}>
+                        <BthBox layoutDirection="row" gap={2} style={{ alignItems: 'center', marginTop: 8 }}>
+                          <BthButton label="-" tone="ghost" size="sm" fullWidth={false} onPress={() => decreaseQty(item.id)} />
+                          <BthText role="bodyMd">{item.qty}</BthText>
+                          <BthButton label="+" tone="ghost" size="sm" fullWidth={false} onPress={() => increaseQty(item.id)} />
+                          <BthText role="bodyMd" tone="muted" style={{ marginStart: 12 }}>{formattedLineTotal}</BthText>
+                        </BthBox>
+                      </BthBox>
+                    )}
+
+                    <BthBox gap={1} style={{ alignItems: 'flex-end' }}>
+                      <BthButton label="تعديل" tone="ghost" size="sm" fullWidth={false} onPress={() => setEditingId(item.id)} />
+                      <BthButton label="حذف" tone="danger" size="sm" fullWidth={false} onPress={() => removeItem(item.id)} />
+                    </BthBox>
+                  </BthBox>
+                </BthCard>
+              );
+            })
+          )}
+
+        </BthSurface>
+
+      </BthMobileScrollView>
+
+      <StickyActionBar
+        fixed
+        primaryLabel={`إتمام الطلب — ${formattedTotal}`}
+        primaryOnPress={() => {
+          if (onContinue) {
+            onContinue();
+          } else {
+            setShowCartDetails(true);
+          }
+        }}
+        total={formattedTotal}
       />
-    </BthMobileScrollView>
+
+      <CartDetails
+        visible={showCartDetails}
+        onClose={() => setShowCartDetails(false)}
+        items={cartItems.map((it) => ({ id: it.id, title: it.title, subtitle: it.subtitle, qty: it.qty, price: it.priceValue }))}
+        onCheckout={() => {
+          setShowCartDetails(false);
+          onContinue && onContinue();
+        }}
+      />
+    </View>
   );
 }

@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { spacing } from '../../foundation/tokens';
-import { BthBox, BthButton } from '../../primitives';
+import { BthBox } from '../../primitives';
+import { BthButton } from '../actions/BthButton';
 
 export type ScreenState = 'content' | 'loading' | 'success' | 'error';
 

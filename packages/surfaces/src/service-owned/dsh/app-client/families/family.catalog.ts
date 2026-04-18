@@ -25,10 +25,7 @@ export const dshAppClientRouteFamilyCatalog = {
   'store-items-list': 'stores',
   'awnak-order-create': 'awnak',
   'cart-get': 'cart',
-  'cart-init': 'cart',
-  'cart-item-add': 'cart',
-  'cart-item-remove': 'cart',
-  'cart-item-update': 'cart',
+  // deprecated cart mutation routes removed
   'categories-list': 'categories',
   'category-get': 'categories',
   'favorite-toggle': 'favorites',

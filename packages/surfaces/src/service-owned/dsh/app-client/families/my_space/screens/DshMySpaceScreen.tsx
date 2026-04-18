@@ -1,6 +1,6 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
-import { BthBox, BthButton, BthKeyValueList, BthListItem, BthMobileScrollView, BthSectionHeader, BthSurface, BthText } from '@bthwani/ui-kit';
+import { Pressable } from 'react-native';
+import { BthBox, BthButton, BthListItem, BthMobileScrollView, BthSectionHeader, BthSurface, BthText } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../../patterns/screens/DshOperationScreen';
 
 export type DshMySpaceItem = {
@@ -120,29 +120,15 @@ function renderLoyaltyTab(name: string, onOpenBenefits?: () => void, onOpenSubsc
         </BthText>
       </BthBox>
 
-      <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-        <BthSurface tone="inset" padding={2} style={{ borderRadius: 999 }}><BthText role="caption" tone="inverse">DSH only</BthText></BthSurface>
-        <BthSurface tone="inset" padding={2} style={{ borderRadius: 999 }}><BthText role="caption" tone="inverse">Live routes</BthText></BthSurface>
-        <BthSurface tone="inset" padding={2} style={{ borderRadius: 999 }}><BthText role="caption" tone="inverse">No mock balance</BthText></BthSurface>
-      </BthBox>
+      {/* تم إزالة البلوكات الإرشادية وادراج محتوى ودي للولاء فقط */}
 
       <BthSurface tone="raised" padding={4} gap={3}>
-        <BthSectionHeader title="فتح الولاء" subtitle="المسار هنا يفتح الشاشات الحقيقية فقط، بدون أرقام أو حالات مختلقة." />
-        <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-          المسارات المتاحة الآن هي مفاتيح تشغيل حقيقية مثل loyalty-points-user-balance و subscription-sync و entitlements-get.
-        </BthText>
-        <BthKeyValueList
-          items={[
-            { label: 'Loyalty balance', value: 'loyalty-points-user-balance' },
-            { label: 'Redeem points', value: 'loyalty-points-redeem' },
-            { label: 'History', value: 'loyalty-points-user-history' },
-            { label: 'Subscription family', value: 'subscription-family-get' },
-            { label: 'Sync', value: 'subscription-sync' },
-            { label: 'Entitlements', value: 'entitlements-get' },
-          ]}
-        />
+        <BthSectionHeader title="الولاء" subtitle="إدارة نقاط الولاء والمكافآت" />
+        <BthListItem title="رصيد الولاء" subtitle="اطلع على رصيد نقاطك" meta="Balance" badgeLabel="الولاء" onPress={onOpenBenefits} />
+        <BthListItem title="استبدال النقاط" subtitle="استخدم نقاطك بالمكافآت المتاحة" meta="Redeem" badgeLabel="الولاء" onPress={onOpenBenefits} />
+        <BthListItem title="سجل النقاط" subtitle="عرض تاريخ المكافآت والنشاط" meta="History" badgeLabel="الولاء" onPress={onOpenBenefits} />
         <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <BthButton label="فتح الولاء" tone="secondary" onPress={onOpenBenefits ?? onOpenSubscriptions} />
+          <BthButton label="الولاء" tone="secondary" onPress={onOpenBenefits ?? onOpenSubscriptions} />
           <BthButton label="الاشتراكات" tone="secondary" onPress={onOpenSubscriptions} />
           <BthButton label="العروض" tone="ghost" onPress={onOpenOffers} />
         </BthBox>

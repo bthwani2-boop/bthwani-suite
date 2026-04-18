@@ -37,14 +37,24 @@ const subcategoryIconMap: Record<string, string> = {
   gas_refill_buy: '🧰',
 };
 
-function CategoryIconImage({ uri, emojiFallback }: { uri: string | null; emojiFallback: string }) {
+function CategoryIconImage({
+  uri,
+  emojiFallback,
+  style,
+  fallbackStyle,
+}: {
+  uri: string | null;
+  emojiFallback: string;
+  style?: any;
+  fallbackStyle?: any;
+}) {
   const [failed, setFailed] = useState(false);
 
   if (!uri || failed) {
-    return <BthText role="titleLg" style={styles.categoryIconFallback}>{emojiFallback}</BthText>;
+    return <BthText role="titleLg" style={fallbackStyle ?? { fontSize: 40, lineHeight: 42 }}>{emojiFallback}</BthText>;
   }
 
-  return <Image source={{ uri }} style={styles.categoryIconImage} resizeMode="cover" onError={() => setFailed(true)} />;
+  return <Image source={{ uri }} style={style ?? { width: '100%', height: '100%' }} resizeMode="cover" onError={() => setFailed(true)} />;
 }
 
 function getCategoryIcon(categoryId: string) {
@@ -108,7 +118,7 @@ export function DshCategoryGetScreen({ state = 'ready', category, onOpenList, on
         <View style={styles.summaryCard}>
           <View style={styles.summaryRow}>
             <View style={styles.categoryIconShell}>
-              <CategoryIconImage uri={getDshCategoryIconUrl(category.id)} emojiFallback={getCategoryIcon(category.id)} />
+              <CategoryIconImage uri={getDshCategoryIconUrl(category.id)} emojiFallback={getCategoryIcon(category.id)} style={styles.categoryIconImage} fallbackStyle={styles.categoryIconFallback} />
             </View>
 
             <View style={styles.summaryTextWrap}>
@@ -131,7 +141,7 @@ export function DshCategoryGetScreen({ state = 'ready', category, onOpenList, on
               {category.subcategories.map((subCategory) => (
                 <View key={subCategory.id} style={styles.subCard}>
                   <View style={styles.subIconShell}>
-                    <CategoryIconImage uri={getDshCategoryIconUrl(subCategory.id)} emojiFallback={getSubcategoryIcon(subCategory.id)} />
+                    <CategoryIconImage uri={getDshCategoryIconUrl(subCategory.id)} emojiFallback={getSubcategoryIcon(subCategory.id)} style={styles.categoryIconImage} fallbackStyle={styles.categoryIconFallback} />
                   </View>
                   <BthText role="bodySm" style={styles.subTitle} numberOfLines={2}>{subCategory.label}</BthText>
                   <BthText role="caption" tone="muted" style={styles.subHint} numberOfLines={2}>{subCategory.subtitle}</BthText>

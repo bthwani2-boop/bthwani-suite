@@ -12,7 +12,7 @@ import { DshSheinOrderCreateScreen } from './families/shein/screens';
 import { DshStoresListScreen, DshStoreGetScreen, DshStoreDetailScreen, DshStoreItemsScreen, DshStoreItemsListScreen } from './families/stores/screens';
 import { DshCategoriesListScreen, DshCategoryGetScreen } from './families/categories/screens';
 import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './families/favorites/screens';
-import { DshCartGetScreen, DshCartInitScreen, DshCartItemAddScreen, DshCartItemRemoveScreen, DshCartItemUpdateScreen } from './families/cart/screens';
+import { DshCartGetScreen } from './families/cart/screens';
 import { DshCheckoutHubScreen, DshReviewOrderScreen, DshCreateOrderScreen, DshIntakeHubScreen } from './families/checkout/screens';
 import { DshTrackingScreen, DshDeliveryManagementHubScreen } from './families/tracking/screens';
 import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshTrustHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './families/support/screens';
@@ -44,10 +44,6 @@ export type DshRoute =
   | 'store-items-list'
   | 'awnak-order-create'
   | 'cart-get'
-  | 'cart-init'
-  | 'cart-item-add'
-  | 'cart-item-remove'
-  | 'cart-item-update'
   | 'categories-list'
   | 'category-get'
   | 'favorite-toggle'
@@ -74,7 +70,7 @@ export type DshRoute =
   | 'orders-list'
   | 'tracking';
 
-export type DshCommandTarget = 'home' | 'stores-list' | 'orders-list' | 'tracking' | 'create-order' | 'cart-get' | 'cart-init';
+export type DshCommandTarget = 'home' | 'stores-list' | 'orders-list' | 'tracking' | 'create-order' | 'cart-get';
 
 type DshNavigationCommand = {
   token: number;
@@ -171,13 +167,7 @@ function commandTargetToRoute(target: DshCommandTarget): DshRoute {
     return 'cart-get';
   }
 
-  if (target === 'cart-init') {
-    return 'cart-init';
-  }
 
-  if (target === 'stores-list') {
-    return 'stores-list';
-  }
 
   if (target === 'orders-list') {
     return 'orders-list';
@@ -747,6 +737,22 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   }
 
   if (route === 'cart-get') {
+    // Build a demo cart with a few items from the active store so the cart screen
+    // demonstrates a multi-item, interactive experience instead of a single-line preview.
+    const parsePriceLabel = (label?: string) => {
+      if (!label) return 0;
+      const n = Number(String(label).replace(/[^0-9.,-]/g, '').replace(',', '.'));
+      return Number.isFinite(n) ? n : 0;
+    };
+
+    const demoCartItems = activeStoreItems.slice(0, 3).map((it) => ({
+      id: it.id,
+      title: it.name,
+      subtitle: it.subtitle,
+      priceValue: Number(it.priceValue ?? parsePriceLabel(it.priceLabel)),
+      qty: 1,
+    }));
+
     return (
       <DshCartGetScreen
         store={{
@@ -756,88 +762,25 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
           statusLabel: activeStore.statusLabel,
           ratingLabel: '4.8 / 5 quality confidence',
         }}
+        // provide structured items to the cart screen so it can render a true basket
+        items={demoCartItems}
         activeOrder={{
           id: selectedItem?.id ?? 'cart-preview',
           title: selectedItem ? `Cart includes ${selectedItem.name}` : 'Cart ready for checkout',
           subtitle: selectedItem
             ? `${selectedItem.subtitle} from ${activeStore.name}`
             : `Items from ${activeStore.name}`,
-          meta: selectedItem ? selectedItem.priceLabel : 'Review items and continue',
+          meta: selectedItem ? (selectedItem.priceLabel ?? 'Review items and continue') : 'Review items and continue',
           statusLabel: 'Ready',
         }}
         statusTitle="Cart context confirmed"
         statusDescription="Initialize the cart session before moving into the checkout route."
         onOpenStore={() => setRoute('store-get')}
         onOpenOrder={() => setRoute('review')}
-        onContinue={() => setRoute('cart-init')}
+        onContinue={() => setRoute('review')}
         onRetry={() => setRoute('cart-get')}
       />
-    );
-  }
-
-  if (route === 'cart-init') {
-    return (
-      <DshCartInitScreen
-        state="success"
-        cartId={`${activeStore.id}-cart`}
-        storeName={activeStore.name}
-        summaryLabel={selectedItem ? `Prepared with ${selectedItem.name}` : 'Prepared without a selected item'}
-        summaryDescription={selectedItem ? `${selectedItem.subtitle} · ${selectedItem.priceLabel}` : 'Context is ready for the next checkout step.'}
-        onOpenCart={() => setRoute('cart-item-add')}
-        onBack={() => setRoute('cart-get')}
-        onRetry={() => setRoute('cart-init')}
-        onSupport={openSupportDirectory}
-      />
-    );
-  }
-
-  if (route === 'cart-item-add') {
-    return (
-      <DshCartItemAddScreen
-        cartId={`${activeStore.id}-cart`}
-        storeName={activeStore.name}
-        suggestedItemName={selectedItem?.name ?? 'تفاح رويال غالا'}
-        suggestedQuantity={1}
-        suggestedInstructions={selectedItem ? `Add ${selectedItem.subtitle}` : 'Handle with care'}
-        onExecuteAdd={() => undefined}
-        onOpenCart={() => setRoute('cart-item-remove')}
-        onBack={() => setRoute('cart-init')}
-        onRetry={() => setRoute('cart-item-add')}
-        onSupport={openSupportDirectory}
-      />
-    );
-  }
-
-  if (route === 'cart-item-remove') {
-    return (
-      <DshCartItemRemoveScreen
-        cartId={`${activeStore.id}-cart`}
-        storeName={activeStore.name}
-        suggestedCartItemId={selectedItem?.id ?? 'item-apple-1'}
-        suggestedItemLabel={selectedItem ? selectedItem.name : 'Selected cart item'}
-        onExecuteRemove={() => undefined}
-        onOpenCart={() => setRoute('cart-item-update')}
-        onBack={() => setRoute('cart-item-add')}
-        onRetry={() => setRoute('cart-item-remove')}
-        onSupport={openSupportDirectory}
-      />
-    );
-  }
-
-  if (route === 'cart-item-update') {
-    return (
-      <DshCartItemUpdateScreen
-        cartId={`${activeStore.id}-cart`}
-        suggestedCartItemId={selectedItem?.id ?? 'item-apple-1'}
-        suggestedQuantity={2}
-        suggestedNotes={selectedItem ? `Update ${selectedItem.name}` : 'Adjust quantity as needed'}
-        onExecuteUpdate={() => undefined}
-        onOpenCart={() => setRoute('categories-list')}
-        onBack={() => setRoute('cart-item-remove')}
-        onRetry={() => setRoute('cart-item-update')}
-        onSupport={openSupportDirectory}
-      />
-    );
+      );
   }
 
   if (route === 'categories-list') {
@@ -855,7 +798,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
           setRoute(categoryId === 'awnak' ? 'awnak-order-create' : 'category-get');
         }}
         onOpenFavorites={() => setRoute('favorites-list')}
-        onBack={() => setRoute('cart-item-update')}
+        onBack={() => setRoute('home')}
         onRetry={() => setRoute('categories-list')}
         onSupport={openSupportDirectory}
       />

@@ -50,27 +50,19 @@ export type PartnerSupportScreenId =
   | 'subscription';
 
 type SupportMetric = {
-    subtitle: 'Review subscription state, benefits, loyalty value, and upgrade path for the branch.',
+  label: string;
   value: string;
-    heroDescription: 'Subscription visibility helps the branch understand limits, coupon readiness, and upgrade decisions without leaving DSH operations.',
+  deltaLabel?: string;
   tone?: 'default' | 'success' | 'warning' | 'danger' | 'info';
 };
 
 type SupportListItem = {
   title: string;
-  subtitle: string;
-  meta: string;
-    keyValues: [
-      { label: 'Points balance route', value: 'loyalty-points-user-balance' },
-      { label: 'Coupon lane', value: 'promo-apply' },
-      { label: 'Entitlement sync', value: 'subscription-sync' },
-    ],
-    listItems: [
-      { title: 'Family members', subtitle: 'Member changes stay attached to the live subscription routes.', meta: 'Family', badgeLabel: 'Route' },
-      { title: 'Coupon visibility', subtitle: 'Discount readiness stays tied to the live checkout lane.', meta: 'Promo', badgeLabel: 'Route' },
-      { title: 'Entitlements', subtitle: 'Keep the commercial visibility linked to the entitlement route.', meta: 'Loyalty', badgeLabel: 'Route' },
-    ],
+  subtitle?: string;
+  meta?: string;
   badgeLabel?: string;
+  keyValues?: Array<{ label: string; value: string }>;
+  listItems?: SupportListItem[];
 };
 
 type SupportConfig = {

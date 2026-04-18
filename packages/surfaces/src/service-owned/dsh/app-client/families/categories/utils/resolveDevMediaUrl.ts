@@ -1,3 +1,5 @@
+declare const process: any;
+
 export function resolveDevMediaUrl(path: string): string | null {
   const trimmedPath = path.trim();
 

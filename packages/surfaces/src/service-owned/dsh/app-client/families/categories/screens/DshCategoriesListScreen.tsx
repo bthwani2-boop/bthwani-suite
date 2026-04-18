@@ -30,14 +30,24 @@ export type DshCategoriesListScreenProps = {
   onSupport?: () => void;
 };
 
-function CategoryIconImage({ uri, emojiFallback }: { uri: string | null; emojiFallback: string }) {
+function CategoryIconImage({
+  uri,
+  emojiFallback,
+  style,
+  fallbackStyle,
+}: {
+  uri: string | null;
+  emojiFallback: string;
+  style?: any;
+  fallbackStyle?: any;
+}) {
   const [failed, setFailed] = useState(false);
 
   if (!uri || failed) {
-    return <BthText role="titleLg" style={styles.categoryIconFallback}>{emojiFallback}</BthText>;
+    return <BthText role="titleLg" style={fallbackStyle ?? { fontSize: 40, lineHeight: 42 }}>{emojiFallback}</BthText>;
   }
 
-  return <Image source={{ uri }} style={styles.categoryIconImage} resizeMode="cover" onError={() => setFailed(true)} />;
+  return <Image source={{ uri }} style={style ?? { width: '100%', height: '100%' }} resizeMode="cover" onError={() => setFailed(true)} />;
 }
 
 function renderState(state: NonNullable<DshCategoriesListScreenProps['state']>, onRetry?: () => void) {
@@ -98,7 +108,7 @@ export function DshCategoriesListScreen({ state = 'ready', items, onOpenCategory
             return (
               <Pressable key={item.id} style={styles.card} onPress={() => onOpenCategory?.(item.id)}>
                 <View style={styles.iconShell}>
-                  <CategoryIconImage uri={iconUrl} emojiFallback={icon} />
+                  <CategoryIconImage uri={iconUrl} emojiFallback={icon} style={styles.categoryIconImage} fallbackStyle={styles.categoryIconFallback} />
                 </View>
                 <BthText role="bodyMd" style={styles.cardTitle} numberOfLines={1}>{item.label}</BthText>
                 <BthText role="bodySm" style={styles.cardSubtitle} numberOfLines={2}>{item.subtitle}</BthText>

@@ -18,8 +18,8 @@ import {
 export type DshStoreItem = {
   id: string;
   name: string;
-  subtitle: string;
-  priceLabel: string;
+  subtitle?: string;
+  priceLabel?: string;
   categoryId: string;
   categoryLabel: string;
   statusLabel?: string;
@@ -169,7 +169,7 @@ export function DshStoreItemsScreen({
               subtitle={item.subtitle}
               footer={
                 <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                  <BthChip label={item.priceLabel} selected />
+                  <BthChip label={item.priceLabel ?? ''} selected />
                   <BthChip label={item.categoryLabel} />
                   {item.statusLabel ? <BthChip label={item.statusLabel} /> : null}
                   {item.preparationTime ? <BthChip label={item.preparationTime} /> : null}
