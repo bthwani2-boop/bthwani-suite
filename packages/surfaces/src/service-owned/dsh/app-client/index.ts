@@ -1,21 +1,21 @@
 export * from './surface-meta';
 export * from './surface-catalog';
-export * from './families/family.catalog';
-export * from './families/awnak/screens';
-export * from './families/categories/screens';
-export * from './families/cart/screens';
-export * from './families/discovery/screens';
-export * from './families/entry/screens';
-export * from './families/favorites/screens';
-export * from './families/gas/screens';
-export * from './families/home/screens';
-export * from './families/my_space/screens';
-export * from './families/notifications/screens';
-export * from './families/loyalty/screens';
+export * from './family.catalog';
+export * from './awnak/screens';
+export * from './categories/screens';
+export * from './cart/screens';
+export * from './discovery/screens';
+export * from './entry/screens';
+export * from './favorites/screens';
+export * from './gas/screens';
+export * from './home/screens';
+export * from './my_space/screens';
+export * from './notifications/screens';
+export * from './loyalty/screens';
 // orders folder consolidated into checkout/screens to avoid duplication
-export * from './families/shein/screens';
-export * from './families/stores/screens';
-export * from './families/support/screens';
+export * from './shein/screens';
+export * from './stores/screens';
+export * from './support/screens';
 // 'tracking' and 'checkout' families were consolidated; explicit exports removed.
 export { DshSurfaceHost } from './DshSurfaceHost';
 export type { DshCommandTarget, DshRoute } from './DshSurfaceHost';

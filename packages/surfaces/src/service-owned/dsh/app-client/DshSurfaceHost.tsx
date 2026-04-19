@@ -1,34 +1,34 @@
 import React from 'react';
 import { BackHandler, Platform, View, Text } from 'react-native';
-import { DshSearchScreen } from './families/discovery/screens';
-import { DshEntryScreen } from './families/entry/screens';
-import { DshAwnakOrderCreateScreen } from './families/awnak/screens';
-import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './families/home/screens';
-import { DshMySpaceScreen } from './families/my_space/screens';
-import { DshNotificationsScreen } from './families/notifications/screens';
-import { DshBenefitsHubScreen } from './families/loyalty/screens';
-import { DshOrdersListScreen, DshCreateOrderScreen, DshIntakeHubScreen, DshOrderSuccessState, DshTrackingScreen, DshDeliveryManagementHubScreen } from './families/placeholders/checkoutTracking';
-import { DshSheinOrderCreateScreen } from './families/shein/screens';
-import { DshStoreGetScreen, DshStoreItemsScreen } from './families/stores/screens';
-import { DshCategoriesListScreen, DshCategoryGetScreen } from './families/categories/screens';
-import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './families/favorites/screens';
-import { DshCartGetScreen } from './families/cart/screens';
-import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshTrustHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './families/support/screens';
+import { DshSearchScreen } from './discovery/screens';
+import { DshEntryScreen } from './entry/screens';
+import { DshAwnakOrderCreateScreen } from './awnak/screens';
+import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './home/screens';
+import { DshMySpaceScreen } from './my_space/screens';
+import { DshNotificationsScreen } from './notifications/screens';
+import { DshBenefitsHubScreen } from './loyalty/screens';
+import { DshOrdersListScreen, DshCreateOrderScreen, DshIntakeHubScreen, DshOrderSuccessState, DshTrackingScreen, DshDeliveryManagementHubScreen } from './placeholders/checkoutTracking';
+import { DshSheinOrderCreateScreen } from './shein/screens';
+import { DshStoreGetScreen, DshStoreItemsScreen } from './stores/screens';
+import { DshCategoriesListScreen, DshCategoryGetScreen } from './categories/screens';
+import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './favorites/screens';
+import { DshCartGetScreen } from './cart/screens';
+import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshTrustHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './support/screens';
 import {
   dshHomeGetFixturePromos,
   dshHomeGetFixtureStores,
-} from './families/home/fixtures/dshHomeGetFixtures';
+} from './home/fixtures/dshHomeGetFixtures';
 import {
   buildStoreCategories,
   buildStoreDeliveryModes,
   buildStoreTags,
   dshDiscoveryStores,
   storeItemsByStoreId,
-} from './families/stores/fixtures';
+} from './stores/fixtures';
 import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../shared/marketing/banner-store';
 import { getLiveMarketingGrowthItems } from '../shared/marketing/growth-store';
 // checkout/tracking screens consolidated into placeholders/checkoutTracking
-import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './families/categories/fixtures/dshCategoriesFixtures';
+import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './categories/fixtures/dshCategoriesFixtures';
 import { dshPartnerIntakeItems } from '../shared/partners/workflow';
 
 export type DshRoute =
