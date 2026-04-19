@@ -1,6 +1,6 @@
 import React from 'react';
 import { BthBox, BthListItem, BthStatCard, BthSurface, BthTextField } from '@bthwani/ui-kit';
-import { DshOperationScreen, type DshOperationScreenState } from '../../../patterns/screens/DshOperationScreen';
+import { DshOperationScreen, type DshOperationScreenState } from '../../patterns/screens/DshOperationScreen';
 import { clientSupportDefinitions, type ClientSupportScreenId } from './DshClientGeneratedSupportScreens';
 
 type ConversationScreenId = 'chat-read-ack' | 'chat-send';

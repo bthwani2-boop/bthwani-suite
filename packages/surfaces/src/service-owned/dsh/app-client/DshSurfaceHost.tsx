@@ -2,11 +2,12 @@ import React from 'react';
 import { BackHandler, Platform, View, Text } from 'react-native';
 import { DshSearchScreen } from './discovery/screens';
 import { DshEntryScreen } from './entry/screens';
+import { DshClientBellScreen } from './bell';
 import { DshAwnakOrderCreateScreen } from './awnak/screens';
 import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './home/screens';
 import { DshMySpaceScreen } from './my_space/screens';
 import { DshNotificationsScreen } from './notifications/screens';
-import { DshBenefitsHubScreen } from './loyalty/screens';
+import { DshBenefitsHubScreen } from './subscriptions/screens';
 import { DshOrdersListScreen, DshCreateOrderScreen, DshIntakeHubScreen, DshOrderSuccessState, DshTrackingScreen, DshDeliveryManagementHubScreen } from './placeholders/checkoutTracking';
 import { DshSheinOrderCreateScreen } from './shein/screens';
 import { DshStoreGetScreen, DshStoreItemsScreen } from './stores/screens';
@@ -45,6 +46,7 @@ export type DshRoute =
   | 'favorites-list'
   | 'search'
   | 'store-get'
+  | 'bell'
   | 'create-order'
   | 'checkout-workspace'
   | 'benefits'
@@ -64,7 +66,7 @@ export type DshRoute =
   | 'orders-list'
   | 'tracking';
 
-export type DshCommandTarget = 'home' | 'orders-list' | 'tracking' | 'create-order' | 'cart-get';
+export type DshCommandTarget = 'home' | 'orders-list' | 'tracking' | 'bell' | 'create-order' | 'cart-get';
 
 type DshNavigationCommand = {
   token: number;
@@ -131,11 +133,11 @@ function resolvePublishedHomePromos() {
 }
 
 const initialCreateOrderValues: CreateOrderValues = {
-  pickupAddress: 'Riyadh Park, Gate 2',
-  dropoffAddress: 'Olaya, King Fahad Road',
-  contactName: 'Ahmad',
+  pickupAddress: 'رياض بارك، البوابة 2',
+  dropoffAddress: 'العليا، طريق الملك فهد',
+  contactName: 'أحمد',
   contactPhone: '0501234567',
-  note: '',
+  note: 'لا توجد ملاحظات',
 };
 
 const initialOrders = [
@@ -169,6 +171,10 @@ function commandTargetToRoute(target: DshCommandTarget): DshRoute {
 
   if (target === 'tracking') {
     return 'tracking';
+  }
+
+  if (target === 'bell') {
+    return 'bell';
   }
 
   if (target === 'create-order') {
@@ -349,10 +355,9 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
 
   const trackingTimeline = React.useMemo(
     () => [
-      { id: 'created', title: 'Order created', detail: 'Your request was confirmed.', done: true },
-      { id: 'assigned', title: 'Captain assigned', detail: 'A captain accepted your order.', done: true },
-      { id: 'pickup', title: 'Pickup in progress', detail: 'Captain is heading to pickup location.', done: false },
-      { id: 'dropoff', title: 'On the way to dropoff', detail: 'Live tracking will appear here.', done: false },
+      { id: 'route', title: 'في الطريق', detail: 'الطلب متجه إلى العميل الآن.', done: true },
+      { id: 'arrived', title: 'وصل للعميل', detail: 'الطلب وصل إلى العميل وهو بانتظار الاستلام.', done: false },
+      { id: 'received', title: 'استلم العميل الطلب', detail: 'بعد الاستلام تظهر تقييمات المنتج والكابتن.', done: false },
     ],
     [],
   );
@@ -528,6 +533,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     ['DshCategoryGetScreen', (DshCategoryGetScreen as unknown) as any],
     ['DshFavoriteToggleScreen', (DshFavoriteToggleScreen as unknown) as any],
     ['DshFavoritesListScreen', (DshFavoritesListScreen as unknown) as any],
+    ['DshClientBellScreen', (DshClientBellScreen as unknown) as any],
     ['DshCartGetScreen', (DshCartGetScreen as unknown) as any],
     ['DshConversationHubScreen', (DshConversationHubScreen as unknown) as any],
     ['DshOrderIssueHubScreen', (DshOrderIssueHubScreen as unknown) as any],
@@ -563,9 +569,6 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   if (route === 'my-space') {
     return (
       <DshMySpaceScreen
-        subscriptionLabel={subscriptionMarketingProgram ? `${subscriptionMarketingProgram.title} · ${subscriptionMarketingProgram.highlight}` : undefined}
-        offersLabel={campaignMarketingProgram ? `${campaignMarketingProgram.title} · ${campaignMarketingProgram.highlight}` : undefined}
-        discountsLabel={promoMarketingProgram ? `${promoMarketingProgram.title} · ${promoMarketingProgram.routeTarget}` : undefined}
         marketingPrograms={liveMarketingPrograms.map((item) => ({
           id: item.id,
           title: item.title,
@@ -573,28 +576,9 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
           meta: item.routeTarget,
           badgeLabel: item.family === 'subscription' ? 'اشتراك' : item.family === 'promotion' ? 'برومو' : item.family === 'shorts' ? 'شورتات' : 'حملة',
         }))}
-        onOpenBenefits={() => {
-          setSelectedSupportScreen('entitlements-get');
-          setRoute('benefits');
-        }}
-        onOpenSubscriptions={() => {
-          setSelectedSupportScreen('subscription-family-get');
-          setRoute('benefits');
-        }}
-        onOpenPreferences={() => {
-          setSelectedSupportScreen('service-modes-resolve');
-          setRoute('service-settings');
-        }}
-        onOpenOffers={() => setRoute('home')}
-        onOpenDiscounts={() => {
-          setSelectedSupportScreen('promo-apply');
-          setRoute('checkout-workspace');
-        }}
         onOpenOrders={() => setRoute('orders-list')}
-        onChangeAddress={() => {
-          setSelectedSupportScreen('zone-set');
-          setRoute('service-settings');
-        }}
+        onOpenTracking={() => setRoute('tracking')}
+        onRepeatOrder={() => setRoute('create-order')}
         onBack={() => setRoute('home')}
         onRetry={() => setRoute('my-space')}
       />
@@ -814,8 +798,10 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     return (
       <DshCreateOrderScreen
         values={createOrderValues}
+        timeline={trackingTimeline}
         onChange={handleCreateOrderChange}
         onContinue={() => setRoute('create-order')}
+        onBack={() => setRoute('cart-get')}
       />
     );
   }
@@ -994,11 +980,24 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   if (route === 'tracking') {
     return (
       <DshTrackingScreen
-        currentStatusLabel="On route"
+        values={createOrderValues}
+        currentStatusLabel="في الطريق"
         timeline={trackingTimeline}
+        onBell={() => setRoute('bell')}
         onSupport={openSupportDirectory}
         onRetry={() => setRoute('tracking')}
         onNextAction={() => setRoute('orders-list')}
+      />
+    );
+  }
+
+  if (route === 'bell') {
+    return (
+      <DshClientBellScreen
+        onOpenTracking={() => setRoute('tracking')}
+        onOpenOrders={() => setRoute('orders-list')}
+        onBack={() => setRoute('tracking')}
+        onRetry={() => setRoute('bell')}
       />
     );
   }

@@ -2,7 +2,9 @@ export { default as ControlPanelDshOperationsScreen, DshOperationsHubSurface } f
 export type { ControlPanelDshOperationsScreenProps } from './ControlPanelDshOperationsScreen';
 export * from './flow-meta';
 export * from './arrival-bell';
+export * from './bell';
 export * from './orders';
+export * from './orderchat';
 export * from './peak-mode';
 export * from './reassign';
 export * from './sheinproxy';

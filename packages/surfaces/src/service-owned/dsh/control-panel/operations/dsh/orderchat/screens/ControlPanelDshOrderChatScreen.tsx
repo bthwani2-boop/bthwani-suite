@@ -1,0 +1,235 @@
+"use client";
+
+import React from 'react';
+import { Pressable, ScrollView } from 'react-native';
+import { useRouter } from 'next/navigation';
+import {
+  BthBadge,
+  BthBox,
+  BthButton,
+  BthSurface,
+  BthText,
+  BthTextField,
+  useTheme,
+} from '@bthwani/ui-kit';
+import {
+  BthWebMissionHeroCard,
+  BthWebPageFrame,
+  BthWebSectionCard,
+} from '@bthwani/ui-kit/web';
+import { getSampleDshOrder } from '../../orders/order-fixtures';
+import { useDshControlPanelText } from '../../shared/dshControlPanelText';
+
+type ChatSide = 'start' | 'end';
+
+type OrderChatMessage = {
+  id: string;
+  sender: string;
+  text: string;
+  time: string;
+  side: ChatSide;
+};
+
+const initialMessages: OrderChatMessage[] = [
+  {
+    id: 'msg-1',
+    sender: 'العمليات',
+    text: 'الطلب تحت المراجعة. أبقِ التحديثات مختصرة حتى لا يضيع المسار.',
+    time: '09:04',
+    side: 'end',
+  },
+  {
+    id: 'msg-2',
+    sender: 'الكابتن',
+    text: 'تم الوصول إلى نقطة الاستلام وأنتظر الإشارة التالية.',
+    time: '09:06',
+    side: 'start',
+  },
+  {
+    id: 'msg-3',
+    sender: 'العميل',
+    text: 'أنا جاهز عند الباب عند الوصول.',
+    time: '09:08',
+    side: 'start',
+  },
+];
+
+type ComposerActionButtonProps = {
+  symbol: string;
+  accessibilityLabel: string;
+  disabled?: boolean;
+  onPress?: () => void;
+};
+
+function ComposerActionButton({ symbol, accessibilityLabel, disabled = false, onPress }: ComposerActionButtonProps) {
+  const { theme } = useTheme();
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      disabled={disabled}
+      onPress={onPress}
+      hitSlop={8}
+      style={({ pressed }) => ({
+        width: 42,
+        height: 42,
+        borderRadius: 21,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: disabled ? theme.disabledSurface : pressed ? theme.surfaceInset : theme.surface,
+        borderWidth: 1,
+        borderColor: disabled ? theme.line : theme.lineStrong,
+        opacity: disabled ? 0.55 : 1,
+      })}
+    >
+      <BthText role="label" tone={disabled ? 'soft' : 'brand'}>
+        {symbol}
+      </BthText>
+    </Pressable>
+  );
+}
+
+function OrderChatBubble({ message }: { message: OrderChatMessage }) {
+  const isOutbound = message.side === 'end';
+
+  return (
+    <BthBox style={{ alignSelf: isOutbound ? 'flex-end' : 'flex-start', width: '100%', maxWidth: '86%' }}>
+      <BthSurface tone={isOutbound ? 'brand' : 'raised'} padding={3} gap={2} radiusToken="xl" border={false}>
+        <BthBox layoutDirection="row" justify="space-between" align="center" gap={2}>
+          <BthBadge label={message.sender} tone={isOutbound ? 'brand' : 'default'} />
+          <BthText role="caption" tone={isOutbound ? 'inverse' : 'soft'}>{message.time}</BthText>
+        </BthBox>
+        <BthText role="bodySm" tone={isOutbound ? 'inverse' : 'default'}>
+          {message.text}
+        </BthText>
+      </BthSurface>
+    </BthBox>
+  );
+}
+
+export type ControlPanelDshOrderChatScreenProps = {
+  orderId: string;
+  ordersHref?: string;
+  embedded?: boolean;
+  showHeader?: boolean;
+};
+
+export function ControlPanelDshOrderChatScreen({
+  orderId,
+  ordersHref = '/operations/dsh/orders',
+  embedded = false,
+  showHeader = true,
+}: ControlPanelDshOrderChatScreenProps) {
+  const router = useRouter();
+  const dshText = useDshControlPanelText();
+  const order = getSampleDshOrder(dshText, orderId);
+  const resolvedOrder = order ?? {
+    id: orderId,
+    customer: 'طلب غير متاح',
+    route: 'تفاصيل الطريق غير متوفرة',
+    amount: '--',
+    eta: '--',
+    statusLabel: 'غير متاح',
+    statusTone: 'warning' as const,
+    createdLabel: '--',
+    destinationLabel: '--',
+    captainLabel: '--',
+    notes: '--',
+  };
+  const isReadOnly = resolvedOrder.statusTone === 'success';
+  const [draft, setDraft] = React.useState('');
+  const [messages, setMessages] = React.useState<OrderChatMessage[]>(() => initialMessages);
+
+  const canSend = !isReadOnly && draft.trim().length > 0;
+  const orderDetailHref = `${ordersHref}/${resolvedOrder.id}`;
+
+  const handleSend = React.useCallback(() => {
+    if (!canSend) {
+      return;
+    }
+
+    const text = draft.trim();
+
+    setMessages((current) => [
+      ...current,
+      {
+        id: `msg-${current.length + 1}`,
+        sender: 'العمليات',
+        text,
+        time: 'الآن',
+        side: 'end',
+      },
+    ]);
+    setDraft('');
+  }, [canSend, draft]);
+
+  return (
+    <BthWebPageFrame
+      eyebrow="تواصل الطلب"
+      title="تواصل الطلب"
+      description="الطلب نفسه يملك قناة مختصرة بين العمليات والكابتن حتى الإغلاق."
+      maxWidth={1120}
+      embedded={embedded}
+      showHeader={showHeader}
+    >
+      <BthBox gap={4}>
+        <BthWebMissionHeroCard
+          badges={[resolvedOrder.id, resolvedOrder.statusLabel, isReadOnly ? 'مقروء فقط' : 'Live']}
+            eyebrow="قناة التواصل"
+          title={resolvedOrder.customer}
+          description={resolvedOrder.route}
+          metaItems={[
+            `الكابتن: ${resolvedOrder.captainLabel}`,
+            `ETA: ${resolvedOrder.eta}`,
+            `الوجهة: ${resolvedOrder.destinationLabel}`,
+          ]}
+          primaryAction={{ label: 'العودة للتفاصيل', href: orderDetailHref }}
+          secondaryAction={{ label: 'العودة إلى الطلبات', href: ordersHref }}
+        />
+
+        <BthWebSectionCard title="سجل الرسائل" description="الردود المختصرة تبقى مرتبطة بنفس الطلب، والمحادثة تتحول إلى القراءة فقط بعد التسليم.">
+          <BthBox gap={4}>
+            <ScrollView style={{ maxHeight: 380 }} contentContainerStyle={{ gap: 12 }} showsVerticalScrollIndicator={false}>
+              {messages.map((message) => (
+                <OrderChatBubble key={message.id} message={message} />
+              ))}
+            </ScrollView>
+
+            <BthSurface tone={isReadOnly ? 'inset' : 'default'} padding={3} gap={2} radiusToken="lg">
+              <BthTextField
+                value={draft}
+                onChangeText={setDraft}
+                editable={!isReadOnly}
+                placeholder={isReadOnly ? 'الطلب مغلق الآن' : 'اكتب ردًا مختصرًا...'}
+                multiline
+                numberOfLines={3}
+                style={{ minHeight: 92, textAlignVertical: 'top' }}
+              />
+              <BthBox layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
+                <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                    <ComposerActionButton symbol="🎙" accessibilityLabel="رسالة صوتية" disabled={isReadOnly} />
+                    <ComposerActionButton symbol="📷" accessibilityLabel="التقاط صورة" disabled={isReadOnly} />
+                    <ComposerActionButton symbol="🎥" accessibilityLabel="التقاط فيديو" disabled={isReadOnly} />
+                </BthBox>
+                <BthButton
+                  label={isReadOnly ? 'مقفل' : 'إرسال'}
+                  tone={isReadOnly ? 'secondary' : 'primary'}
+                  size="sm"
+                  fullWidth={false}
+                  disabled={!canSend}
+                  onPress={handleSend}
+                />
+              </BthBox>
+              <BthText role="caption" tone="muted">
+                {isReadOnly ? 'تم التسليم. التواصل هنا للقراءة فقط.' : 'الرسائل المختصرة فقط داخل هذا المسار.'}
+              </BthText>
+            </BthSurface>
+          </BthBox>
+        </BthWebSectionCard>
+      </BthBox>
+    </BthWebPageFrame>
+  );
+}
+
+export default ControlPanelDshOrderChatScreen;

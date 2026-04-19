@@ -82,7 +82,7 @@ function buildDshWorkbenches(text: ReturnType<typeof useDshControlPanelText>): R
     {
       id: 'arrival-bell',
       ...text.hub.workbenches.arrivalBell,
-      liveHref: '/operations/dsh/arrival-bell',
+      liveHref: '/operations/dsh/bell',
     },
   ] as const;
 }
@@ -113,7 +113,7 @@ function resolveWorkbenchLiveHref(workbenchId: DshWorkbenchId) {
   }
 
   if (workbenchId === 'arrival-bell') {
-    return '/operations/dsh/arrival-bell';
+     return '/operations/dsh/bell';
   }
 
   if (workbenchId === 'sheinproxy') {

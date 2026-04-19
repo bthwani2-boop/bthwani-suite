@@ -65,13 +65,13 @@ const groups: Array<{
     ],
   },
   {
-    title: 'Analytics and commercial controls',
-    subtitle: 'Insights, staffing, commission, and plan visibility.',
+    title: 'التحكم التجاري والتحليلات',
+    subtitle: 'الرؤية، العمولة، والاشتراك في مكان واحد.',
     items: [
       { id: 'audience-insights', title: 'Audience insights', subtitle: 'Review branch demand mix.', badgeLabel: 'Insights' },
       { id: 'staff-analytics', title: 'Staff analytics', subtitle: 'Inspect team execution load.', badgeLabel: 'Insights' },
       { id: 'commission-by-mode', title: 'Commission by mode', subtitle: 'Compare commercial mode impact.', badgeLabel: 'Commercial' },
-      { id: 'subscription', title: 'Subscription', subtitle: 'Review current branch plan.', badgeLabel: 'Commercial' },
+      { id: 'subscription', title: 'بثواني برو', subtitle: 'راجع الخطة الحالية والعائلة ومسار الترقية.', badgeLabel: 'اشتراك' },
     ],
   },
 ];
@@ -80,9 +80,9 @@ export function DshPartnerSupportDirectoryScreen({ onOpenScreen }: DshPartnerSup
   return (
     <BthMobileScrollView padding={4} gap={4}>
       <BthBox gap={2}>
-        <BthText role="titleLg">Partner support directory</BthText>
+        <BthText role="titleLg">دليل دعم الشريك</BthText>
         <BthText role="bodyMd" tone="muted">
-          Central directory for the remaining DSH partner support surfaces so branch operators can reach every named workflow from one owned place.
+          دليل مركزي لبقية أسطح دعم الشريك في DSH حتى يصل مشغلو الفروع إلى كل مسار من مكان واحد واضح.
         </BthText>
       </BthBox>
 

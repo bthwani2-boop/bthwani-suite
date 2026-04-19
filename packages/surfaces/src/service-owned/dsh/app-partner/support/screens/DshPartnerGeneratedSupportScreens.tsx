@@ -499,16 +499,29 @@ const partnerSupportConfigs: Record<PartnerSupportScreenId, SupportConfig> = {
   },
   subscription: {
     id: 'subscription',
-    title: 'Subscription',
-    subtitle: 'Review subscription state, benefits, and upgrade path for the branch.',
-    heroTitle: 'Commercial plan control',
-    heroDescription: 'Subscription visibility helps the branch understand limits and upgrade decisions without leaving DSH operations.',
-    primaryLabel: 'Open upgrade path',
-    secondaryLabel: 'Back to support directory',
+    title: 'بثواني برو',
+    subtitle: 'مراجعة حالة الاشتراك، العائلة، ومسار الترقية من صفحة واحدة.',
+    heroTitle: 'الاشتراك التجاري',
+    heroDescription: 'تظهر الخطة الحالية والمزامنة والعائلة بوضوح حتى تبقى قرارات الفرع سريعة ومفهومة.',
+    primaryLabel: 'إدارة الاشتراك',
+    secondaryLabel: 'العودة إلى الدليل',
+    primaryHint: 'العائلة حزمة داخل بثواني برو وليست منتجًا منفصلًا.',
+    keyValues: [
+      { label: 'الخطة الحالية', value: 'بثواني برو', tone: 'brand' },
+      { label: 'العائلة', value: 'مفعلة' },
+      { label: 'الترقية', value: 'متاحة الآن', tone: 'warning' },
+      { label: 'المزامنة', value: 'مباشر', tone: 'success' },
+    ],
     metrics: [
-      { label: 'Current tier', value: 'Growth', deltaLabel: 'Branch plan', tone: 'info' },
-      { label: 'Monthly cap', value: '900 orders', deltaLabel: 'Included volume', tone: 'default' },
-      { label: 'Usage', value: '74%', deltaLabel: 'Current month', tone: 'warning' },
+      { label: 'الخطة الحالية', value: 'فردي / عائلي', deltaLabel: 'قابلة للترقية', tone: 'info' },
+      { label: 'التجديد', value: 'قريب', deltaLabel: 'واضح وسريع', tone: 'default' },
+      { label: 'المزامنة', value: 'مباشر', deltaLabel: 'بدون ضوضاء', tone: 'success' },
+    ],
+    listItems: [
+      { title: 'الخطة الحالية', subtitle: 'اعرض الباقة النشطة قبل أي تعديل.', meta: 'بثواني برو', badgeLabel: 'رئيسي' },
+      { title: 'أفراد العائلة', subtitle: 'أضف أو راجع الأفراد المرتبطين بالخطة.', meta: 'إدارة', badgeLabel: 'عائلة' },
+      { title: 'المزامنة', subtitle: 'حدّث الحالة الحالية من نفس السطح.', meta: 'تحديث', badgeLabel: 'مباشر' },
+      { title: 'الترقية', subtitle: 'انتقل إلى باقة أعلى عند الحاجة.', meta: 'CTA', badgeLabel: 'ترقية' },
     ],
   },
 };
@@ -522,9 +535,9 @@ function renderSupportState(state: Exclude<PartnerSupportScreenState, 'ready' | 
     return (
       <BthStateView
         stateId="empty"
-        title="No support content is loaded"
-        description="Reload the support screen and keep the operational context focused."
-        actionLabel={onRetry ? 'Reload support screen' : undefined}
+        title="لا يوجد محتوى دعم محمّل"
+        description="أعد تحميل شاشة الدعم وابقِ السياق التشغيلي واضحًا."
+        actionLabel={onRetry ? 'إعادة التحميل' : undefined}
         onActionPress={onRetry}
       />
     );
@@ -534,9 +547,9 @@ function renderSupportState(state: Exclude<PartnerSupportScreenState, 'ready' | 
     return (
       <BthStateView
         stateId="offline"
-        title="Support screen is offline"
-        description="Retry when connectivity returns. Draft context should remain stable."
-        actionLabel={onRetry ? 'Retry support screen' : undefined}
+        title="شاشة الدعم غير متصلة"
+        description="أعد المحاولة عند عودة الاتصال. يجب أن يبقى السياق التشغيلي ثابتًا."
+        actionLabel={onRetry ? 'إعادة المحاولة' : undefined}
         onActionPress={onRetry}
       />
     );
@@ -546,9 +559,9 @@ function renderSupportState(state: Exclude<PartnerSupportScreenState, 'ready' | 
     return (
       <BthStateView
         stateId="success"
-        title="Support action completed"
-        description="The operation finished and the branch can continue from the next screen in the same flow."
-        actionLabel={onBack ? 'Back to support directory' : undefined}
+        title="اكتمل الإجراء بنجاح"
+        description="انتهت العملية ويمكن للفرع متابعة الخطوة التالية من نفس المسار."
+        actionLabel={onBack ? 'العودة إلى الدليل' : undefined}
         onActionPress={onBack}
       />
     );
@@ -557,9 +570,9 @@ function renderSupportState(state: Exclude<PartnerSupportScreenState, 'ready' | 
   return (
     <BthStateView
       stateId="recoverableError"
-      title="Support screen failed"
-      description="Retry the current support step without losing branch context."
-      actionLabel={onRetry ? 'Retry support step' : undefined}
+      title="تعذّر عرض شاشة الدعم"
+      description="أعد المحاولة في الخطوة نفسها دون فقدان سياق الفرع."
+      actionLabel={onRetry ? 'إعادة المحاولة' : undefined}
       onActionPress={onRetry}
     />
   );
@@ -610,14 +623,14 @@ function createPartnerSupportScreen(config: SupportConfig) {
 
         {config.keyValues?.length ? (
           <BthSurface tone="raised" gap={3}>
-            <BthSectionHeader title="Operational details" subtitle="Keep only the details needed for the current branch decision." />
+            <BthSectionHeader title="تفاصيل تشغيلية" subtitle="احتفظ فقط بالبيانات اللازمة للقرار الحالي." />
             <BthKeyValueList items={config.keyValues} />
           </BthSurface>
         ) : null}
 
         {config.listItems?.length ? (
           <BthSurface tone="default" gap={3}>
-            <BthSectionHeader title="Current work items" subtitle="The list remains compact so the operator can act without scanning noise." />
+            <BthSectionHeader title="العناصر الحالية" subtitle="تظل القائمة مختصرة حتى يتحرك المشغّل دون ضجيج." />
             <BthBox gap={2}>
               {config.listItems.map((item) => (
                 <BthListItem
@@ -634,7 +647,7 @@ function createPartnerSupportScreen(config: SupportConfig) {
 
         {config.inputLabel ? (
           <BthSurface tone="raised" gap={3}>
-            <BthSectionHeader title="Draft input" subtitle="Only one concise branch input is collected at a time in this support screen." />
+            <BthSectionHeader title="مدخل مختصر" subtitle="لا نجمع إلا إدخالًا واحدًا واضحًا في كل مرة." />
             <BthTextField
               label={config.inputLabel}
               value={draftValue}

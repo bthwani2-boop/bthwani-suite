@@ -1,6 +1,6 @@
 import React from 'react';
 import { BthCard, BthSectionHeader, BthStateView, BthSurface, BthText } from '@bthwani/ui-kit';
-import { DshOperationScreen } from '../../../patterns/screens/DshOperationScreen';
+import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
 
 export type DshFavoriteToggleScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';

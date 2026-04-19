@@ -1,4 +1,4 @@
-import type { DshHomeGetPromo } from '../../../app-client/families/home/screens';
+import type { DshHomeGetPromo } from '../../../app-client/home/screens';
 
 export type MarketingBannerActionType = NonNullable<DshHomeGetPromo['actionType']>;
 export type MarketingBannerAudience = 'home' | 'stores' | 'all';

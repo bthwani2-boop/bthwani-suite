@@ -8,6 +8,7 @@ export * from './discovery/screens';
 export * from './entry/screens';
 export * from './favorites/screens';
 export * from './gas/screens';
+export * from './bell';
 export * from './home/screens';
 export * from './my_space/screens';
 export * from './notifications/screens';

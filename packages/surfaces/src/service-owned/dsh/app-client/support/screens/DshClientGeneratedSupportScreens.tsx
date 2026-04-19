@@ -1,6 +1,6 @@
 import React from 'react';
 import { BthBox, BthKeyValueList, BthListItem, BthStatCard, BthSurface, BthTextField } from '@bthwani/ui-kit';
-import { DshOperationScreen, type DshOperationScreenState } from '../../../patterns/screens/DshOperationScreen';
+import { DshOperationScreen, type DshOperationScreenState } from '../../patterns/screens/DshOperationScreen';
 
 export type ClientSupportScreenId =
 	| 'awnak-order-create'

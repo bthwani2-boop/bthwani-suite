@@ -11,13 +11,7 @@ import {
   BthText,
 } from '@bthwani/ui-kit';
 
-export type DshPartnerStoreMaintenanceWorkspaceState =
-  | 'ready'
-  | 'loading'
-  | 'empty'
-  | 'error'
-  | 'offline'
-  | 'disabled';
+export type DshPartnerStoreMaintenanceWorkspaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
 export type DshPartnerStoreMaintenanceProfile = {
   storeName: string;
@@ -82,10 +76,7 @@ const demoServiceModes: DshPartnerServiceMode[] = [
   },
 ];
 
-function renderState(
-  state: Exclude<DshPartnerStoreMaintenanceWorkspaceState, 'ready' | 'disabled'>,
-  onRetry?: () => void,
-) {
+function renderState(state: Exclude<DshPartnerStoreMaintenanceWorkspaceState, 'ready' | 'disabled'>, onRetry?: () => void) {
   if (state === 'loading') {
     return <BthStateView stateId="loading" />;
   }
@@ -94,9 +85,9 @@ function renderState(
     return (
       <BthStateView
         stateId="empty"
-        title="No store profile is loaded"
-        description="Load the owned branch profile before changing availability, service modes, or coverage."
-        actionLabel={onRetry ? 'Reload profile' : undefined}
+        title="لا يوجد ملف فرع محمّل"
+        description="أعد تحميل مساحة الصيانة قبل تغيير التوفر أو القنوات أو أوقات العمل."
+        actionLabel={onRetry ? 'إعادة التحميل' : undefined}
         onActionPress={onRetry}
       />
     );
@@ -106,8 +97,9 @@ function renderState(
     return (
       <BthStateView
         stateId="offline"
-        title="Store maintenance is offline"
-        description="Keep branch controls visible and retry once connectivity returns."
+        title="مساحة الصيانة غير متصلة"
+        description="أعد المحاولة عندما تعود الشبكة مع إبقاء سياق الفرع محفوظًا."
+        actionLabel={onRetry ? 'إعادة المحاولة' : undefined}
         onActionPress={onRetry}
       />
     );
@@ -116,8 +108,9 @@ function renderState(
   return (
     <BthStateView
       stateId="recoverableError"
-      title="Store maintenance is unavailable"
-      description="Retry the branch workspace without losing the maintenance context."
+      title="تعذر فتح مساحة الصيانة"
+      description="أعد المحاولة دون فقدان سياق الفرع الحالي."
+      actionLabel={onRetry ? 'إعادة المحاولة' : undefined}
       onActionPress={onRetry}
     />
   );
@@ -148,44 +141,38 @@ export function DshPartnerStoreMaintenanceWorkspaceScreen({
   return (
     <BthMobileScrollView padding={4} gap={4}>
       <BthBox gap={2}>
-        <BthText role="titleLg">Store maintenance workspace</BthText>
+        <BthText role="titleLg">مساحة صيانة الفرع</BthText>
         <BthText role="bodyMd" tone="muted">
-          Partner branch controls stay centralized here: store profile, listing availability, service modes, hours, and coverage.
+          تبقى حالة المتجر والقنوات والأوقات والمناطق في مساحة واحدة واضحة وسريعة.
         </BthText>
       </BthBox>
 
       <BthSurface tone="brand" gap={3}>
-        <BthSectionHeader
-          title="Owned branch profile"
-          subtitle="The maintenance slice starts from one accountable branch summary."
-        />
+        <BthSectionHeader title="ملف الفرع" subtitle="ابدأ من ملخص واضح واحد قبل أي تعديل تشغيلي." />
         <BthKeyValueList
           items={[
-            { label: 'Store', value: profile.storeName },
-            { label: 'Branch', value: profile.branchLabel },
-            { label: 'City', value: profile.cityLabel },
-            { label: 'Manager', value: profile.managerLabel },
-            { label: 'Today hours', value: profile.todayHoursLabel },
-            { label: 'Coverage zone', value: profile.activeZoneLabel, tone: 'brand' },
+            { label: 'المتجر', value: profile.storeName },
+            { label: 'الفرع', value: profile.branchLabel },
+            { label: 'المدينة', value: profile.cityLabel },
+            { label: 'المدير', value: profile.managerLabel },
+            { label: 'أوقات اليوم', value: profile.todayHoursLabel },
+            { label: 'منطقة التغطية', value: profile.activeZoneLabel, tone: 'brand' },
           ]}
         />
       </BthSurface>
 
       <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
-          title="Availability controls"
-          subtitle="Store status and listing status remain explicit and independently controlled."
-        />
+        <BthSectionHeader title="حالة التوفر" subtitle="التشغيل والظهور منفصلان حتى تبقى القرارات واضحة." />
         <BthSwitch
-          label="Store is open"
-          description="Controls whether the branch can keep receiving new DSH work."
+          label="المتجر مفتوح"
+          description="يتحكم في استقبال أعمال DSH الجديدة لهذا الفرع."
           value={storeOpen}
           disabled={isDisabled}
           onValueChange={onToggleStoreOpen}
         />
         <BthSwitch
-          label="Listing is visible"
-          description="Controls customer-side listing availability without changing branch identity."
+          label="الظهور في القوائم"
+          description="يتحكم في ظهور الفرع للمستخدمين دون تغيير هوية المتجر."
           value={listingEnabled}
           disabled={isDisabled}
           onValueChange={onToggleListingEnabled}
@@ -193,10 +180,7 @@ export function DshPartnerStoreMaintenanceWorkspaceScreen({
       </BthSurface>
 
       <BthSurface tone="default" gap={3}>
-        <BthSectionHeader
-          title="Service modes"
-          subtitle="Each mode can be toggled directly from the branch workspace instead of spreading controls across multiple screens."
-        />
+        <BthSectionHeader title="قنوات الخدمة" subtitle="كل قناة لها مفتاح مستقل حتى يبقى السجل التشغيلي واضحًا." />
         <BthBox gap={2}>
           {serviceModes.map((mode) => (
             <BthSwitch
@@ -212,19 +196,16 @@ export function DshPartnerStoreMaintenanceWorkspaceScreen({
       </BthSurface>
 
       <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
-          title="Branch actions"
-          subtitle="Hours, zones, and delivery monitoring stay one tap away from the same maintenance slice."
-        />
+        <BthSectionHeader title="إجراءات الفرع" subtitle="الأوقات والمناطق والعمليات تبقى خطوة واحدة بعيدة." />
         <BthBox gap={2}>
-          <BthButton label="Update store hours" tone="secondary" onPress={onOpenHours} disabled={isDisabled} />
-          <BthButton label="Update delivery zones" tone="secondary" onPress={onOpenZones} disabled={isDisabled} />
-          <BthButton label="Open delivery ops board" tone="ghost" onPress={onOpenDeliveryBoard} disabled={isDisabled} />
-          <BthButton label="Open support directory" tone="ghost" onPress={onOpenSupportDirectory} disabled={isDisabled} />
+          <BthButton label="تحديث أوقات العمل" tone="secondary" onPress={onOpenHours} disabled={isDisabled} />
+          <BthButton label="تحديث مناطق التغطية" tone="secondary" onPress={onOpenZones} disabled={isDisabled} />
+          <BthButton label="فتح لوحة العمليات" tone="ghost" onPress={onOpenDeliveryBoard} disabled={isDisabled} />
+          <BthButton label="فتح دليل الدعم" tone="ghost" onPress={onOpenSupportDirectory} disabled={isDisabled} />
         </BthBox>
       </BthSurface>
 
-      <BthButton label="Save maintenance changes" onPress={onSave} disabled={isDisabled} />
+      <BthButton label="حفظ التغييرات" onPress={onSave} disabled={isDisabled} />
     </BthMobileScrollView>
   );
 }

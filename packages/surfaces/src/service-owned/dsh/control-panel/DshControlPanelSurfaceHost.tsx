@@ -10,8 +10,9 @@ import {
   BthWebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from './operations/dsh/shared/dshControlPanelText';
-import { ControlPanelDshArrivalBellScreen } from './operations/dsh/arrival-bell';
+import { ControlPanelDshBellScreen } from './operations/dsh/bell';
 import { ControlPanelDshCatalogScreen } from './catalogs/dsh';
+import { ControlPanelDshOrderChatScreen } from './operations/dsh/orderchat';
 import { ControlPanelDshOrderDetailScreen, ControlPanelDshOrdersScreen } from './operations/dsh/orders';
 import { ControlPanelDshPeakModeScreen } from './operations/dsh/peak-mode';
 import { ControlPanelDshPartnerApprovalsScreen } from './partners/dsh';
@@ -28,11 +29,11 @@ const liveRouteHrefs = {
   sheinProxy: '/operations/dsh/sheinproxy',
   reassign: '/operations/dsh/reassign',
   peakMode: '/operations/dsh/peak-mode',
-  arrivalBell: '/operations/dsh/arrival-bell',
+  arrivalBell: '/operations/dsh/bell',
   zoneSet: '/operations/dsh/zone-set',
 } as const;
 
-type DshWorkspaceId = 'overview' | 'orders' | 'order-detail' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'arrival-bell' | 'zone-set' | 'marketing' | 'catalogs' | 'partners';
+type DshWorkspaceId = 'overview' | 'orders' | 'order-detail' | 'orderchat' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'arrival-bell' | 'bell' | 'zone-set' | 'marketing' | 'catalogs' | 'partners';
 
 type DshDockText = {
   dockEyebrow: string;
@@ -260,7 +261,11 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
   const uiText = useUiText();
   const dshText = useDshControlPanelText();
 
-  const normalizedWorkspace = workspace === 'order-detail' ? 'orders' : workspace;
+  const normalizedWorkspace = workspace === 'order-detail' || workspace === 'orderchat'
+    ? 'orders'
+    : workspace === 'arrival-bell'
+      ? 'bell'
+      : workspace;
 
   const tabs = [
     { id: 'overview', label: dshText.hub.workbenches.overview.label, active: normalizedWorkspace === 'overview' },
@@ -271,7 +276,7 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
     { id: 'sheinproxy', label: dshText.hub.workbenches.sheinProxy.label, active: normalizedWorkspace === 'sheinproxy' },
     { id: 'reassign', label: dshText.hub.workbenches.reassign.label, active: normalizedWorkspace === 'reassign' },
     { id: 'peak-mode', label: dshText.hub.workbenches.peakMode.label, active: normalizedWorkspace === 'peak-mode' },
-    { id: 'arrival-bell', label: dshText.hub.workbenches.arrivalBell.label, active: normalizedWorkspace === 'arrival-bell' },
+    { id: 'bell', label: dshText.hub.workbenches.arrivalBell.label, active: normalizedWorkspace === 'bell' },
     { id: 'zone-set', label: dshText.hub.workbenches.zoneSet.label, active: normalizedWorkspace === 'zone-set' },
   ] as const;
 
@@ -299,6 +304,7 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
 
       {workspace === 'orders' ? <ControlPanelDshOrdersScreen embedded showHeader={false} hubHref="/operations" operationsHref="/operations" /> : null}
       {workspace === 'order-detail' && orderId ? <ControlPanelDshOrderDetailScreen embedded showHeader={false} orderId={orderId} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
+      {workspace === 'orderchat' && orderId ? <ControlPanelDshOrderChatScreen embedded showHeader={false} orderId={orderId} ordersHref="/operations/dsh/orders" /> : null}
       {workspace === 'sheinproxy' ? (
         <ControlPanelDshManualAssignmentScreen
           requestId={orderId ?? 'shein-proxy-001'}
@@ -310,7 +316,7 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
       ) : null}
       {workspace === 'reassign' ? <ControlPanelDshReassignScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
       {workspace === 'peak-mode' ? <ControlPanelDshPeakModeScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
-      {workspace === 'arrival-bell' ? <ControlPanelDshArrivalBellScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
+      {workspace === 'bell' || workspace === 'arrival-bell' ? <ControlPanelDshBellScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
       {workspace === 'zone-set' ? <ControlPanelDshZoneSetScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
     </BthBox>
   );

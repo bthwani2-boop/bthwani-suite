@@ -1,6 +1,6 @@
 import React from 'react';
 import { BthBox, BthKeyValueList, BthListItem, BthStatCard, BthSurface } from '@bthwani/ui-kit';
-import { DshOperationScreen, type DshOperationScreenState } from '../../../patterns/screens/DshOperationScreen';
+import { DshOperationScreen, type DshOperationScreenState } from '../../patterns/screens/DshOperationScreen';
 import { clientSupportDefinitions, type ClientSupportScreenId } from './DshClientGeneratedSupportScreens';
 
 type ServiceSettingsScreenId = 'listing-status-update' | 'service-modes-resolve' | 'zone-set';

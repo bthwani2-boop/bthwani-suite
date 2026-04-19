@@ -64,7 +64,7 @@ export function DshOperationScreen({
       {content}
 
       <BthSurface tone="inset" gap={3}>
-        <BthSectionHeader title="Action" subtitle="Keep one dominant CTA and a small recovery lane." />
+        <BthSectionHeader title="الإجراء" subtitle="زر رئيسي واحد مع مسار رجوع صغير وواضح." />
         <BthBox gap={2}>
           {primaryActionLabel ? <BthButton label={primaryActionLabel} onPress={onPrimaryAction} /> : null}
           {secondaryActionLabel ? <BthButton label={secondaryActionLabel} tone="secondary" onPress={onSecondaryAction} /> : null}

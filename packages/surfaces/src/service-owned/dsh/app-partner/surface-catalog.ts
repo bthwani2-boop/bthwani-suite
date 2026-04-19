@@ -6,6 +6,7 @@ export const surfaceCatalog = [
   'orders-inbox',
   'order-detail',
   'delivery-ops-board',
+  'bell',
   'store-maintenance',
   'store-hours',
   'zone-set',

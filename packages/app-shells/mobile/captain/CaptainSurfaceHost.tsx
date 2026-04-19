@@ -10,6 +10,8 @@ const {
   CaptainDeliveryConfirmSheet,
   CaptainPickupConfirmSheet,
   CaptainTaskDetailScreen,
+  DshCaptainOrderChatScreen,
+  DshCaptainBellScreen,
   CaptainTasksInboxScreen,
   DshCaptainSupportDirectoryScreen,
   DshCaptainChatReadAckScreen,
@@ -60,7 +62,7 @@ const shortcuts = [
   'تبديل الحالة'
 ] as const;
 
-type CaptainRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'support-directory' | 'support-screen';
+type CaptainRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'orderchat' | 'bell' | 'support-directory' | 'support-screen';
 type CaptainServiceType = 'dsh' | 'amn';
 
 const captainTypeOptions: readonly MobileAccountTypeOption[] = [
@@ -100,6 +102,7 @@ export function CaptainSurfaceHost() {
   const routeTransitionFromBackRef = React.useRef(false);
 
   const activeSummary = defaultDetailByTaskId[activeTaskId] ?? defaultDetailByTaskId['captain-task-9021'];
+  const orderChatState = inboxState === 'delivered' ? 'readOnly' : 'active';
 
   if (!activeSummary) {
     return null;
@@ -202,14 +205,17 @@ export function CaptainSurfaceHost() {
     if (route === 'detail') {
       return (
         <>
-          <CaptainTaskDetailScreen
-            summary={activeSummary}
-            onConfirmPickup={() => setIsPickupSheetVisible(true)}
-            onConfirmDelivery={() => setIsDeliverySheetVisible(true)}
-            onOpenNextTask={() => setRoute('inbox')}
-            onBackToInbox={() => setRoute('inbox')}
-            onRetry={() => setRoute('detail')}
-          />
+          <BthBox gap={3}>
+            <CaptainTaskDetailScreen
+              summary={activeSummary}
+              onConfirmPickup={() => setIsPickupSheetVisible(true)}
+              onConfirmDelivery={() => setIsDeliverySheetVisible(true)}
+              onOpenNextTask={() => setRoute('inbox')}
+              onBackToInbox={() => setRoute('inbox')}
+              onRetry={() => setRoute('detail')}
+            />
+            <BthButton label="فتح تواصل الطلب" tone="secondary" fullWidth={false} onPress={() => setRoute('orderchat')} />
+          </BthBox>
 
           <CaptainPickupConfirmSheet
             visible={isPickupSheetVisible}
@@ -232,6 +238,29 @@ export function CaptainSurfaceHost() {
       );
     }
 
+    if (route === 'bell') {
+      return (
+        <DshCaptainBellScreen
+          onOpenInbox={() => setRoute('inbox')}
+          onOpenNextTask={() => openTaskDetail(activeTaskId)}
+          onBack={() => setRoute('inbox')}
+          onRetry={() => setRoute('bell')}
+        />
+      );
+    }
+
+    if (route === 'orderchat') {
+      return (
+        <DshCaptainOrderChatScreen
+          taskId={activeSummary.taskId}
+          pickupLabel={activeSummary.pickupLabel}
+          dropoffLabel={activeSummary.dropoffLabel}
+          state={orderChatState}
+          onBack={() => setRoute('detail')}
+        />
+      );
+    }
+
     return null;
   };
 
@@ -247,7 +276,17 @@ export function CaptainSurfaceHost() {
           accessibilityLabel: 'الحساب',
           onPress: () => setAccountSheetVisible(true),
         },
-        { id: 'notifications', iconName: 'notifications-outline', badgeCount: 2, accessibilityLabel: 'الإشعارات' },
+        {
+          id: 'notifications',
+          iconName: 'notifications-outline',
+          badgeCount: 2,
+          accessibilityLabel: 'الإشعارات',
+          onPress: () => {
+            if (activeServiceType === 'dsh') {
+              setRoute('bell');
+            }
+          },
+        },
         {
           id: 'tasks',
           iconName: 'bicycle-outline',

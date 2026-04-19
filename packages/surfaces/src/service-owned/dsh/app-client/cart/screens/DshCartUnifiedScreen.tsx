@@ -68,6 +68,8 @@ export default function DshCartUnifiedScreen(props: any) {
   const [note] = useState('لا يوجد ملاحظة');
   const [scheduling, setScheduling] = useState<'now' | 'later'>('now');
   const [activeQuickAction, setActiveQuickAction] = useState<'coupon' | 'address' | 'note' | 'bring' | null>(null);
+  const checkoutAction = props.onContinue ?? props.onOpenOrder ?? (() => {});
+  const editAction = props.onOpenOrder ?? props.onContinue ?? (() => {});
 
   const totalHalalas = useMemo(
     () => items.reduce((acc, item) => acc + Math.round((item.priceValue ?? 0) * 100) * (item.qty ?? 1), 0),
@@ -456,8 +458,8 @@ export default function DshCartUnifiedScreen(props: any) {
 
       <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[2], paddingTop: spacing[1], paddingBottom: safeArea.comfortable ?? spacing[1], backgroundColor: colorPalette.white, borderTopWidth: 1, borderColor: '#D6D6D6' }}>
         <View style={{ flexDirection: 'row', gap: spacing[1] }}>
-          <BthButton label="تنفيذ الطلب" size="sm" fullWidth={false} onPress={() => {}} style={{ flex: 1, minHeight: 42, backgroundColor: HEADER_RED, borderRadius: 14 }} />
-          <BthButton label="تعديل الطلب" tone="secondary" size="sm" fullWidth={false} onPress={() => {}} style={{ flex: 1, minHeight: 42, borderRadius: 14 }} />
+          <BthButton label="تنفيذ الطلب" size="sm" fullWidth={false} onPress={checkoutAction} style={{ flex: 1, minHeight: 42, backgroundColor: HEADER_RED, borderRadius: 14 }} />
+          <BthButton label="تعديل الطلب" tone="secondary" size="sm" fullWidth={false} onPress={editAction} style={{ flex: 1, minHeight: 42, borderRadius: 14 }} />
         </View>
       </View>
 
@@ -465,7 +467,7 @@ export default function DshCartUnifiedScreen(props: any) {
         visible={false}
         onClose={() => {}}
         items={items.map((item) => ({ id: item.id, title: item.title, subtotal: item.priceValue, qty: item.qty, price: item.priceValue }))}
-        onCheckout={() => {}}
+        onCheckout={checkoutAction}
       />
     </View>
   );

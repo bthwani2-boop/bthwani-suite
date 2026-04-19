@@ -10,6 +10,7 @@ const {
   PartnerOrdersInboxScreen,
   PartnerOrderDetailScreen,
   DshPartnerDeliveryOpsBoardScreen,
+  DshPartnerBellScreen,
   DshPartnerStoreMaintenanceWorkspaceScreen,
   DshPartnerHoursUpdateScreen,
   DshPartnerZoneSetScreen,
@@ -49,8 +50,7 @@ const {
   DshPartnerSubscriptionScreen,
 } = dshPartner;
 
-type PartnerRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'operations' | 'maintenance' | 'hours' | 'zones' | 'support-directory' | 'support-screen';
-type PartnerRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'operations' | 'maintenance' | 'hours' | 'zones' | 'support-directory' | 'support-screen' | 'inventory-management';
+type PartnerRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'bell' | 'operations' | 'maintenance' | 'hours' | 'zones' | 'support-directory' | 'support-screen' | 'inventory-management';
 type PartnerSupportRoute =
   | 'auction-status-update'
   | 'audience-insights'
@@ -393,7 +393,17 @@ export function PartnerSurfaceHost() {
           accessibilityLabel: 'الحساب',
           onPress: () => setAccountSheetVisible(true),
         },
-        { id: 'notifications', iconName: 'notifications-outline', badgeCount: 3, accessibilityLabel: 'الإشعارات' },
+        {
+          id: 'notifications',
+          iconName: 'notifications-outline',
+          badgeCount: 3,
+          accessibilityLabel: 'الإشعارات',
+          onPress: () => {
+            if (activeServiceType === 'dsh') {
+              setRoute('bell');
+            }
+          },
+        },
         { id: 'orders', iconName: 'receipt-outline', accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
         { id: 'search', iconName: 'search-outline', accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
       ]}
@@ -491,6 +501,23 @@ export function PartnerSurfaceHost() {
             }}
             onOpenMaintenancePress={openStoreMaintenance}
             onOpenIssueQueuePress={() => setRoute('operations')}
+          />
+        </BthSurface>
+        {accountSheet}
+      </BthBox>
+    );
+  }
+
+  if (route === 'bell') {
+    return (
+      <BthBox style={{ flex: 1 }} background="background">
+        {topBar}
+        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+          <DshPartnerBellScreen
+            onOpenInbox={() => setRoute('inbox')}
+            onOpenNextOrder={() => setRoute('detail')}
+            onBack={() => setRoute('inbox')}
+            onRetry={() => setRoute('bell')}
           />
         </BthSurface>
         {accountSheet}
@@ -616,6 +643,18 @@ export function PartnerSurfaceHost() {
             onBack={() => setRoute('maintenance')}
             onRetry={() => setRoute('zones')}
           />
+        </BthSurface>
+        {accountSheet}
+      </BthBox>
+    );
+  }
+
+  if (route === 'inventory-management') {
+    return (
+      <BthBox style={{ flex: 1 }} background="background">
+        {topBar}
+        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+          <DshInventoryManagementScreen />
         </BthSurface>
         {accountSheet}
       </BthBox>
@@ -754,17 +793,6 @@ export function PartnerSurfaceHost() {
                       openInventoryManagement();
                       return;
                     }
-    return (
-      <BthBox style={{ flex: 1 }} background="background">
-        {topBar}
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-          <DshInventoryManagementScreen />
-        </BthSurface>
-        {accountSheet}
-      </BthBox>
-    );
-  }
-
                     setActiveOrderId('partner-order-1051');
                     setRoute('inbox');
                   }}

@@ -3,8 +3,6 @@ import React from 'react';
 export type DshRoute =
   | 'entry'
   | 'home'
-  | 'tasks-inbox'
-  | 'task-detail'
   | 'wallet'
   | 'support'
   | 'success';

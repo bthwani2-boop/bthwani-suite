@@ -2,6 +2,8 @@ export const surfaceCatalog = [
   'entry',
   'tasks-inbox',
   'task-detail',
+  'orderchat',
+  'bell',
   'support-directory',
   'chat-read-ack',
   'chat-send',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BthBox, BthListItem, BthSurface, BthText } from '@bthwani/ui-kit';
-import { DshOperationScreen } from '../../../patterns/screens/DshOperationScreen';
+import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
 
 export type DshFavoritesListItem = { id: string; name: string; subtitle: string; meta: string; };
 export type DshFavoritesListScreenProps = {

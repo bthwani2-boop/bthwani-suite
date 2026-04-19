@@ -9,6 +9,7 @@ export const surfaceCatalog = [
   'favorites-list',
   'search',
   'store-get',
+  'bell',
   'create-order',
   'review',
   'support-directory',

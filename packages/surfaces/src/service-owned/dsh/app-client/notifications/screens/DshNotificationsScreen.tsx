@@ -1,6 +1,6 @@
 import React from 'react';
 import { BthBox, BthButton, BthListItem, BthSectionHeader, BthSurface, BthText } from '@bthwani/ui-kit';
-import { DshOperationScreen } from '../../../patterns/screens/DshOperationScreen';
+import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
 
 export type DshNotificationItem = {
   id: string;

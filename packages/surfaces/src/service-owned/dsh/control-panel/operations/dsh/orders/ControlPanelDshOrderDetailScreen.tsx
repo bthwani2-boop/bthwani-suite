@@ -91,7 +91,7 @@ export function ControlPanelDshOrderDetailScreen({
   ordersHref = '/operations/dsh/orders',
   hubHref = '/operations/dsh',
   supportHref = '/support',
-  arrivalBellHref = '/operations/dsh/arrival-bell',
+  arrivalBellHref = '/operations/dsh/bell',
   reassignHref = '/operations/dsh/reassign',
   embedded = false,
   showHeader = true,
@@ -218,6 +218,20 @@ export function ControlPanelDshOrderDetailScreen({
             <BthButton label={dshText.orderDetail.openReassignWorkspace} tone="secondary" fullWidth={false} onPress={() => router.push(reassignHref)} />
             {!embedded ? <BthButton label={actionPlan.supportLabel} tone="secondary" fullWidth={false} onPress={() => router.push(supportHref)} /> : null}
           </div>
+        </BthWebSectionCard>
+
+        <BthWebSectionCard title="تواصل الطلب" description="افتح المسار المختصر للمحادثة المرتبطة بنفس الطلب.">
+          <BthBox gap={2}>
+            <BthText role="bodySm" tone="muted">
+              الرسائل المختصرة والمرفقات الخفيفة تبقى داخل orderchat حتى الإغلاق.
+            </BthText>
+            <BthButton
+              label="فتح تواصل الطلب"
+              tone="secondary"
+              fullWidth={false}
+              onPress={() => router.push(`${ordersHref}/${order.id}/orderchat`)}
+            />
+          </BthBox>
         </BthWebSectionCard>
       </div>
     </BthWebPageFrame>

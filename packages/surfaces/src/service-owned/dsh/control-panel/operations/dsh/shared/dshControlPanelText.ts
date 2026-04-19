@@ -109,7 +109,7 @@ const enDshControlPanelText = {
       arrivalBell: {
         label: 'Arrival bell',
         description: 'Arrival and live notification settings near handoff.',
-        routeHint: '/operations/dsh/arrival-bell',
+        routeHint: '/operations/dsh/bell',
         statusLabel: 'Live'
       }
     },
@@ -1048,7 +1048,7 @@ const arDshControlPanelText = {
       arrivalBell: {
         label: 'جرس الوصول',
         description: 'إعدادات الوصول والتنبيهات الحية عند الاقتراب من التسليم.',
-        routeHint: '/operations/dsh/arrival-bell',
+        routeHint: '/operations/dsh/bell',
         statusLabel: 'حي'
       }
     },
