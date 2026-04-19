@@ -48,6 +48,7 @@ const {
   DshPartnerStoreStatusUpdateScreen,
   DshPartnerStoreUpdateScreen,
   DshPartnerSubscriptionScreen,
+  DshPartnerVideoUploadScreen,
 } = dshPartner;
 
 type PartnerRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'bell' | 'operations' | 'maintenance' | 'hours' | 'zones' | 'support-directory' | 'support-screen' | 'inventory-management';
@@ -83,7 +84,8 @@ type PartnerSupportRoute =
   | 'store-service-modes-update'
   | 'store-status-update'
   | 'store-update'
-  | 'subscription';
+  | 'subscription'
+  | 'video-upload';
 
 const primaryAreas = [
   'الطلبات',
@@ -707,6 +709,7 @@ export function PartnerSurfaceHost() {
       'store-status-update': <DshPartnerStoreStatusUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'store-update': <DshPartnerStoreUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       subscription: <DshPartnerSubscriptionScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'video-upload': <DshPartnerVideoUploadScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
     };
 
     return (

@@ -1,7 +1,20 @@
 export type MarketingGrowthFamily = 'campaign' | 'promotion' | 'subscription' | 'shorts';
-export type MarketingGrowthStatus = 'draft' | 'published' | 'paused';
+export type MarketingGrowthSource = 'marketing' | 'partner';
+export type MarketingGrowthStatus = 'draft' | 'pending-marketing' | 'published' | 'paused';
 export type MarketingGrowthAudience = 'all' | 'client' | 'operations';
-export type MarketingGrowthRouteTarget = 'home' | 'categories-list' | 'promo-apply' | 'subscription-family-get' | 'entitlements-get';
+export type MarketingGrowthRouteTarget =
+  | 'home'
+  | 'categories-list'
+  | 'promo-apply'
+  | 'subscription-family-get'
+  | 'entitlements-get'
+  | 'main_category'
+  | 'sub_category'
+  | 'store'
+  | 'store_category'
+  | 'product'
+  | 'subscription'
+  | 'search';
 
 export type MarketingGrowthRecord = {
   id: string;
@@ -10,11 +23,16 @@ export type MarketingGrowthRecord = {
   family: MarketingGrowthFamily;
   status: MarketingGrowthStatus;
   audience: MarketingGrowthAudience;
+  source: MarketingGrowthSource;
   routeTarget: MarketingGrowthRouteTarget;
+  routeTargetId?: string;
+  routeTargetExtra?: string;
   ctaLabel: string;
   highlight: string;
   metricValue: string;
   accentColor: string;
+  videoUrl?: string;
+  posterUrl?: string;
   impressions: number;
   clicks: number;
 };
@@ -29,7 +47,9 @@ const seededGrowthItems: MarketingGrowthRecord[] = [
     family: 'campaign',
     status: 'published',
     audience: 'client',
-    routeTarget: 'home',
+    source: 'marketing',
+    routeTarget: 'main_category',
+    routeTargetId: 'restaurants',
     ctaLabel: 'استكشف العروض',
     highlight: 'ظهور في الرئيسية + قائمة المتاجر',
     metricValue: '١٢٥ ألف مشاهدة',
@@ -44,7 +64,9 @@ const seededGrowthItems: MarketingGrowthRecord[] = [
     family: 'promotion',
     status: 'published',
     audience: 'client',
-    routeTarget: 'promo-apply',
+    source: 'marketing',
+    routeTarget: 'store',
+    routeTargetId: 'store-1001',
     ctaLabel: 'تطبيق الخصم',
     highlight: 'مرتبط مباشرة بمسار الدفع',
     metricValue: '٤,٥٢٠ استخدام',
@@ -59,7 +81,8 @@ const seededGrowthItems: MarketingGrowthRecord[] = [
     family: 'subscription',
     status: 'published',
     audience: 'client',
-    routeTarget: 'subscription-family-get',
+    source: 'marketing',
+    routeTarget: 'subscription',
     ctaLabel: 'مراجعة الاشتراك',
     highlight: 'مرتبط بمسار الاشتراك الحقيقي',
     metricValue: '٢,٨٤٠ عضو نشط',
@@ -68,19 +91,41 @@ const seededGrowthItems: MarketingGrowthRecord[] = [
     clicks: 1910,
   },
   {
-    id: 'growth-shorts-spotlight',
-    title: 'مواضع الشورتات',
-    subtitle: 'مساحة ترويجية قصيرة لدفع فئات موسمية ومنتجات حية داخل التطبيق.',
+    id: 'growth-shorts-partner-teaser',
+    title: 'فيديو الشريك قيد المراجعة',
+    subtitle: 'تم رفعه من تطبيق الشريك وينتظر اعتماد التسويق قبل الظهور للعميل.',
     family: 'shorts',
-    status: 'draft',
+    status: 'pending-marketing',
     audience: 'client',
-    routeTarget: 'categories-list',
-    ctaLabel: 'فتح الفئات',
-    highlight: 'جاهز للنشر الموسمي',
-    metricValue: '٣ مواضع جاهزة',
+    source: 'partner',
+    routeTarget: 'product',
+    routeTargetId: 'item-apple-1',
+    routeTargetExtra: 'store-1001',
+    ctaLabel: 'راجع الفيديو',
+    highlight: 'بانتظار موافقة التسويق',
+    metricValue: 'مرفق جديد',
     accentColor: '#0f766e',
     impressions: 12000,
     clicks: 610,
+  },
+  {
+    id: 'growth-shorts-marketing-launch',
+    title: 'فيديو إطلاق من التسويق',
+    subtitle: 'تم رفعه من لوحة التحكم ويظهر للعميل فقط بعد الاعتماد النهائي.',
+    family: 'shorts',
+    status: 'published',
+    audience: 'client',
+    source: 'marketing',
+    routeTarget: 'sub_category',
+    routeTargetId: 'grocery_vegetables_fruits',
+    ctaLabel: 'شاهد الآن',
+    highlight: 'مباشر بعد الاعتماد',
+    metricValue: 'معتمد للعرض',
+    accentColor: '#f97316',
+    videoUrl: 'marketing/shorts/launch.mp4',
+    posterUrl: 'marketing/shorts/launch.jpg',
+    impressions: 18000,
+    clicks: 870,
   },
 ];
 
@@ -103,8 +148,8 @@ function setMutableStore(next: MarketingGrowthRecord[]) {
 
 function sortGrowthItems(items: MarketingGrowthRecord[]) {
   return [...items].sort((left, right) => {
-    const leftWeight = left.status === 'published' ? 0 : left.status === 'draft' ? 1 : 2;
-    const rightWeight = right.status === 'published' ? 0 : right.status === 'draft' ? 1 : 2;
+    const leftWeight = left.status === 'published' ? 0 : left.status === 'pending-marketing' ? 1 : left.status === 'draft' ? 2 : 3;
+    const rightWeight = right.status === 'published' ? 0 : right.status === 'pending-marketing' ? 1 : right.status === 'draft' ? 2 : 3;
     if (leftWeight !== rightWeight) {
       return leftWeight - rightWeight;
     }
@@ -126,13 +171,25 @@ export function getLiveMarketingGrowthItems(audience: MarketingGrowthAudience | 
   });
 }
 
+export function getPendingMarketingGrowthItems(audience: MarketingGrowthAudience | 'all' = 'all'): MarketingGrowthRecord[] {
+  return getMarketingGrowthItems().filter((item) => {
+    if (item.status !== 'pending-marketing') {
+      return false;
+    }
+
+    return audience === 'all' || item.audience === 'all' || item.audience === audience;
+  });
+}
+
 export function getMarketingGrowthKpis() {
   const items = getMarketingGrowthItems();
   const live = items.filter((item) => item.status === 'published');
+  const pendingMarketing = items.filter((item) => item.status === 'pending-marketing');
 
   return {
     total: items.length,
     live: live.length,
+    pendingMarketing: pendingMarketing.length,
     subscriptions: live.filter((item) => item.family === 'subscription').length,
     promotions: live.filter((item) => item.family === 'promotion' || item.family === 'campaign').length,
     clicks: live.reduce((sum, item) => sum + item.clicks, 0),
@@ -151,11 +208,16 @@ export function upsertMarketingGrowthItem(item: Partial<MarketingGrowthRecord>) 
     family: item.family ?? existing?.family ?? 'campaign',
     status: item.status ?? existing?.status ?? 'draft',
     audience: item.audience ?? existing?.audience ?? 'client',
+    source: item.source ?? existing?.source ?? 'marketing',
     routeTarget: item.routeTarget ?? existing?.routeTarget ?? 'home',
+    routeTargetId: item.routeTargetId?.trim() || existing?.routeTargetId,
+    routeTargetExtra: item.routeTargetExtra?.trim() || existing?.routeTargetExtra,
     ctaLabel: item.ctaLabel?.trim() || existing?.ctaLabel || 'فتح الآن',
     highlight: item.highlight?.trim() || existing?.highlight || 'مهيأ للنشر',
     metricValue: item.metricValue?.trim() || existing?.metricValue || 'بدون بيانات',
     accentColor: item.accentColor?.trim() || existing?.accentColor || '#f97316',
+    videoUrl: item.videoUrl?.trim() || existing?.videoUrl,
+    posterUrl: item.posterUrl?.trim() || existing?.posterUrl,
     impressions: item.impressions ?? existing?.impressions ?? 0,
     clicks: item.clicks ?? existing?.clicks ?? 0,
   };
@@ -168,7 +230,7 @@ export function upsertMarketingGrowthItem(item: Partial<MarketingGrowthRecord>) 
   return nextEntry;
 }
 
-export function toggleMarketingGrowthStatus(id: string) {
+export function approveMarketingGrowthItem(id: string) {
   const current = getMarketingGrowthItems();
   const next = current.map((item) => {
     if (item.id !== id) {
@@ -177,7 +239,57 @@ export function toggleMarketingGrowthStatus(id: string) {
 
     return {
       ...item,
-      status: item.status === 'published' ? 'paused' : 'published',
+      status: 'published',
+    } satisfies MarketingGrowthRecord;
+  });
+
+  setMutableStore(next);
+}
+
+export function pauseMarketingGrowthItem(id: string) {
+  const current = getMarketingGrowthItems();
+  const next = current.map((item) => {
+    if (item.id !== id) {
+      return item;
+    }
+
+    return {
+      ...item,
+      status: 'paused',
+    } satisfies MarketingGrowthRecord;
+  });
+
+  setMutableStore(next);
+}
+
+export function submitMarketingGrowthItem(id: string) {
+  const current = getMarketingGrowthItems();
+  const next = current.map((item) => {
+    if (item.id !== id) {
+      return item;
+    }
+
+    return {
+      ...item,
+      status: 'pending-marketing',
+    } satisfies MarketingGrowthRecord;
+  });
+
+  setMutableStore(next);
+}
+
+export function toggleMarketingGrowthStatus(id: string) {
+  const current = getMarketingGrowthItems();
+  const next = current.map((item) => {
+    if (item.id !== id) {
+      return item;
+    }
+
+    const nextStatus: MarketingGrowthStatus = item.status === 'published' ? 'paused' : 'published';
+
+    return {
+      ...item,
+      status: nextStatus,
     } satisfies MarketingGrowthRecord;
   });
 

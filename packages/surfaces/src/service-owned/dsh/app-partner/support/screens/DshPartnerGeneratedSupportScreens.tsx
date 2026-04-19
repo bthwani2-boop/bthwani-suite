@@ -9,9 +9,15 @@ import {
   BthStateView,
   BthStatCard,
   BthSurface,
+  BthTabs,
   BthText,
   BthTextField,
 } from '@bthwani/ui-kit';
+import {
+  getMarketingGrowthItems,
+  upsertMarketingGrowthItem,
+  type MarketingGrowthRouteTarget,
+} from '../../../shared/marketing/growth-store';
 
 export type PartnerSupportScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'success' | 'disabled';
 
@@ -47,7 +53,8 @@ export type PartnerSupportScreenId =
   | 'store-service-modes-update'
   | 'store-status-update'
   | 'store-update'
-  | 'subscription';
+  | 'subscription'
+  | 'video-upload';
 
 type SupportMetric = {
   label: string;
@@ -168,6 +175,20 @@ const partnerSupportConfigs: Record<PartnerSupportScreenId, SupportConfig> = {
       { label: 'Required now', value: 'Commercial register' },
       { label: 'Next renewal', value: 'In 18 days', tone: 'warning' },
       { label: 'Reviewer', value: 'Partner ops' },
+    ],
+  },
+  'video-upload': {
+    id: 'video-upload',
+    title: 'Video upload',
+    subtitle: 'Submit short videos from the partner app for marketing approval before client publishing.',
+    heroTitle: 'Partner video submission lane',
+    heroDescription: 'Video uploads move into the marketing review queue first so nothing reaches the client without approval.',
+    primaryLabel: 'Queue video for marketing review',
+    secondaryLabel: 'Back to support directory',
+    keyValues: [
+      { label: 'Source', value: 'Partner app' },
+      { label: 'Approval owner', value: 'Marketing team', tone: 'warning' },
+      { label: 'Client visibility', value: 'Only after publish', tone: 'success' },
     ],
   },
   'identity-submit': {
@@ -665,6 +686,239 @@ function createPartnerSupportScreen(config: SupportConfig) {
       </BthMobileScrollView>
     );
   };
+}
+
+type PartnerVideoDraft = {
+  title: string;
+  subtitle: string;
+  videoUrl: string;
+  posterUrl: string;
+  routeTarget: MarketingGrowthRouteTarget;
+  routeTargetId: string;
+  routeTargetExtra: string;
+  ctaLabel: string;
+  highlight: string;
+  accentColor: string;
+};
+
+function createPartnerVideoDraft(): PartnerVideoDraft {
+  return {
+    title: 'فيديو شريك جديد',
+    subtitle: 'تم رفع الفيديو من تطبيق الشريك ويحتاج موافقة التسويق قبل الظهور للعميل.',
+    videoUrl: '',
+    posterUrl: '',
+    routeTarget: 'home',
+    routeTargetId: '',
+    routeTargetExtra: '',
+    ctaLabel: 'راجع الفيديو',
+    highlight: 'بانتظار التسويق',
+    accentColor: '#0f766e',
+  };
+}
+
+function routeTargetLabel(target: MarketingGrowthRouteTarget) {
+  if (target === 'home') return 'الرئيسية';
+  if (target === 'main_category') return 'فئة رئيسية';
+  if (target === 'sub_category') return 'فئة فرعية';
+  if (target === 'store') return 'متجر';
+  if (target === 'store_category') return 'متجر + فئة';
+  if (target === 'product') return 'منتج';
+  if (target === 'subscription') return 'اشتراك';
+  if (target === 'search') return 'بحث';
+  if (target === 'promo-apply') return 'العروض';
+  return 'الرئيسية';
+}
+
+function routeTargetPrimaryLabel(target: MarketingGrowthRouteTarget) {
+  if (target === 'store') return 'معرّف المتجر';
+  if (target === 'product') return 'معرّف المنتج';
+  return 'معرّف الفئة';
+}
+
+function routeTargetPrimaryHint(target: MarketingGrowthRouteTarget) {
+  if (target === 'store') return 'مثال: store-1001';
+  if (target === 'product') return 'مثال: item-apple-1';
+  return 'مثال: grocery أو restaurants';
+}
+
+function routeTargetNeedsPrimaryInput(target: MarketingGrowthRouteTarget) {
+  return target === 'main_category' || target === 'sub_category' || target === 'store' || target === 'store_category' || target === 'product';
+}
+
+function routeTargetNeedsSecondaryInput(target: MarketingGrowthRouteTarget) {
+  return target === 'store_category' || target === 'product';
+}
+
+function routeTargetSecondaryLabel(target: MarketingGrowthRouteTarget) {
+  if (target === 'store_category') return 'معرّف الفئة';
+  if (target === 'product') return 'معرّف المتجر';
+  return 'معرّف إضافي';
+}
+
+function routeTargetSecondaryHint(target: MarketingGrowthRouteTarget) {
+  if (target === 'store_category') return 'مثال: grocery_vegetables_fruits';
+  if (target === 'product') return 'مثال: store-1001';
+  return 'معرّف إضافي';
+}
+
+export function DshPartnerVideoUploadScreen({
+  state = 'ready',
+  onPrimaryAction,
+  onSecondaryAction,
+  onRetry,
+  onBack,
+}: PartnerGeneratedSupportScreenProps) {
+  const [draft, setDraft] = React.useState<PartnerVideoDraft>(() => createPartnerVideoDraft());
+  const [queueVersion, setQueueVersion] = React.useState(0);
+  const screenTitle = 'رفع الفيديو';
+  const screenSubtitle = 'يرفع الشريك الفيديو القصير هنا ثم يذهب للتسويق للموافقة قبل ظهور العميل.';
+  const heroTitle = 'مسار رفع فيديو الشريك';
+  const heroDescription = 'أي فيديو يرفعه الشريك يدخل طابور المراجعة أولًا، ثم يُنشر بعد الاعتماد فقط.';
+
+  const queuedVideos = React.useMemo(
+    () => getMarketingGrowthItems().filter((item) => item.family === 'shorts'),
+    [queueVersion]
+  );
+
+  const queueMetrics = React.useMemo(() => {
+    const pendingMarketing = queuedVideos.filter((item) => item.status === 'pending-marketing').length;
+    const published = queuedVideos.filter((item) => item.status === 'published').length;
+
+    return [
+      { label: 'في المراجعة', value: String(pendingMarketing), tone: 'warning' as const },
+      { label: 'منشور', value: String(published), tone: 'success' as const },
+      { label: 'إجمالي الفيديوهات', value: String(queuedVideos.length), tone: 'info' as const },
+    ];
+  }, [queuedVideos]);
+
+  if (state !== 'ready' && state !== 'disabled') {
+    return renderSupportState(state, onRetry, onBack);
+  }
+
+  const isDisabled = state === 'disabled';
+
+  function refreshQueue() {
+    setQueueVersion((current) => current + 1);
+  }
+
+  function handleSubmit() {
+    const saved = upsertMarketingGrowthItem({
+      title: draft.title.trim() || 'فيديو شريك جديد',
+      subtitle: draft.subtitle.trim() || 'تم رفع الفيديو من تطبيق الشريك.',
+      family: 'shorts',
+      status: 'pending-marketing',
+      audience: 'client',
+      source: 'partner',
+      routeTarget: draft.routeTarget,
+      routeTargetId: draft.routeTargetId.trim() || undefined,
+      routeTargetExtra: draft.routeTargetExtra.trim() || undefined,
+      ctaLabel: draft.ctaLabel.trim() || 'راجع الفيديو',
+      highlight: draft.highlight.trim() || 'بانتظار التسويق',
+      metricValue: 'مرفق جديد',
+      accentColor: draft.accentColor.trim() || '#0f766e',
+      videoUrl: draft.videoUrl.trim() || undefined,
+      posterUrl: draft.posterUrl.trim() || undefined,
+      impressions: 0,
+      clicks: 0,
+    });
+
+    setDraft(createPartnerVideoDraft());
+    refreshQueue();
+    onPrimaryAction?.();
+    return saved;
+  }
+
+  return (
+    <BthMobileScrollView padding={4} gap={4}>
+      <BthBox gap={2}>
+        <BthText role="titleLg">{screenTitle}</BthText>
+        <BthText role="bodyMd" tone="muted">
+          {screenSubtitle}
+        </BthText>
+      </BthBox>
+
+      <BthSurface tone="brand" gap={3}>
+        <BthSectionHeader title={heroTitle} subtitle={heroDescription} />
+        <BthText role="bodySm" tone="inverse">
+          أي فيديو يرفعه الشريك يدخل في طابور التسويق أولًا، ثم يُنشر فقط بعد الموافقة.
+        </BthText>
+        <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          {queueMetrics.map((metric) => (
+            <BthStatCard key={metric.label} label={metric.label} value={metric.value} tone={metric.tone} />
+          ))}
+        </BthBox>
+      </BthSurface>
+
+      <BthSurface tone="raised" gap={3}>
+        <BthSectionHeader title="بيانات الفيديو" subtitle="رفع واحد واضح ثم مراجعة واحدة واضحة من التسويق." />
+        <BthTextField label="عنوان الفيديو" value={draft.title} onChangeText={(value) => setDraft((current) => ({ ...current, title: value }))} />
+        <BthTextField label="وصف الفيديو" value={draft.subtitle} onChangeText={(value) => setDraft((current) => ({ ...current, subtitle: value }))} multiline numberOfLines={3} />
+        <BthTextField label="رابط الفيديو" value={draft.videoUrl} onChangeText={(value) => setDraft((current) => ({ ...current, videoUrl: value }))} hint="مثال: /media/shorts/partner-launch.mp4" />
+        <BthTextField label="صورة الغلاف" value={draft.posterUrl} onChangeText={(value) => setDraft((current) => ({ ...current, posterUrl: value }))} hint="مثال: /media/shorts/partner-launch.jpg" />
+
+        <BthTabs<MarketingGrowthRouteTarget>
+          items={[
+            { value: 'home', label: 'الرئيسية' },
+            { value: 'main_category', label: 'فئة رئيسية' },
+            { value: 'sub_category', label: 'فئة فرعية' },
+            { value: 'store', label: 'متجر' },
+            { value: 'store_category', label: 'متجر + فئة' },
+            { value: 'product', label: 'منتج' },
+            { value: 'subscription', label: 'اشتراك' },
+            { value: 'search', label: 'بحث' },
+          ]}
+          value={draft.routeTarget}
+          onValueChange={(value) => setDraft((current) => ({ ...current, routeTarget: value }))}
+          variant="pill"
+        />
+
+        <BthSurface tone="inset" gap={2}>
+          <BthText role="bodyStrong">الوجهة المباشرة</BthText>
+          <BthText role="bodySm" tone="muted">{routeTargetLabel(draft.routeTarget)} · هذا هو المسار الذي يفتحه CTA داخل الريلز.</BthText>
+        </BthSurface>
+
+        {routeTargetNeedsPrimaryInput(draft.routeTarget) ? (
+          <BthTextField label={routeTargetPrimaryLabel(draft.routeTarget)} value={draft.routeTargetId} onChangeText={(value) => setDraft((current) => ({ ...current, routeTargetId: value }))} hint={routeTargetPrimaryHint(draft.routeTarget)} />
+        ) : null}
+
+        {routeTargetNeedsSecondaryInput(draft.routeTarget) ? (
+          <BthTextField label={routeTargetSecondaryLabel(draft.routeTarget)} value={draft.routeTargetExtra} onChangeText={(value) => setDraft((current) => ({ ...current, routeTargetExtra: value }))} hint={routeTargetSecondaryHint(draft.routeTarget)} />
+        ) : null}
+
+        <BthTextField label="نص الزر" value={draft.ctaLabel} onChangeText={(value) => setDraft((current) => ({ ...current, ctaLabel: value }))} />
+        <BthTextField label="الجملة البارزة" value={draft.highlight} onChangeText={(value) => setDraft((current) => ({ ...current, highlight: value }))} />
+        <BthTextField label="لون التمييز" value={draft.accentColor} onChangeText={(value) => setDraft((current) => ({ ...current, accentColor: value }))} hint="مثال: #0f766e" />
+      </BthSurface>
+
+      <BthSurface tone="inset" gap={3}>
+        <BthSectionHeader title="المدخل الحالي" subtitle="لا يظهر هذا الفيديو للعميل حتى يوافق عليه التسويق." />
+        <BthBox gap={1}>
+          <BthText role="bodyStrong">{draft.title}</BthText>
+          <BthText role="bodySm" tone="muted">{draft.subtitle}</BthText>
+        </BthBox>
+      </BthSurface>
+
+      <BthButton label="إرسال الفيديو للمراجعة" onPress={handleSubmit} disabled={isDisabled} />
+      <BthButton label="العودة إلى دليل الدعم" tone="secondary" onPress={onSecondaryAction ?? onBack} />
+
+      <BthSurface tone="raised" gap={3}>
+        <BthSectionHeader title="الفيديوهات الحالية" subtitle="هنا ترى ما هو في المراجعة أو ما تم نشره بالفعل." />
+        <BthBox gap={2}>
+          {queuedVideos.length > 0 ? queuedVideos.map((item) => (
+            <BthListItem
+              key={item.id}
+              title={item.title}
+              subtitle={`${item.subtitle} · ${item.source === 'partner' ? 'من الشريك' : 'من التسويق'}`}
+              meta={`${item.status === 'pending-marketing' ? 'في المراجعة' : item.status === 'published' ? 'منشور' : item.status === 'paused' ? 'موقوف' : 'مسودة'} · ${item.ctaLabel}`}
+              badgeLabel="شورتات"
+            />
+          )) : (
+            <BthText role="bodySm" tone="muted">لا توجد فيديوهات محفوظة بعد.</BthText>
+          )}
+        </BthBox>
+      </BthSurface>
+    </BthMobileScrollView>
+  );
 }
 
 export const DshPartnerAuctionStatusUpdateScreen = createPartnerSupportScreen(partnerSupportConfigs['auction-status-update']);

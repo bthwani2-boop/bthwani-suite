@@ -4,19 +4,23 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { BthBox, BthButton, BthSurface, BthTabs, BthText, BthTextField, useDirection } from '@bthwani/ui-kit';
 import {
+  approveMarketingGrowthItem,
   duplicateMarketingGrowthItem,
   getLiveMarketingGrowthItems,
   getMarketingGrowthItems,
   getMarketingGrowthKpis,
+  pauseMarketingGrowthItem,
   removeMarketingGrowthItem,
-  toggleMarketingGrowthStatus,
+  submitMarketingGrowthItem,
   upsertMarketingGrowthItem,
+  toggleMarketingGrowthStatus,
   type MarketingGrowthAudience,
   type MarketingGrowthFamily,
   type MarketingGrowthRecord,
+  type MarketingGrowthSource,
   type MarketingGrowthRouteTarget,
   type MarketingGrowthStatus,
-} from './growth-store';
+} from '../../../shared/marketing/growth-store';
 
 export type GrowthCommandDeckScreenProps = {
   hubHref?: string;
@@ -30,11 +34,16 @@ type GrowthDraft = {
   family: MarketingGrowthFamily;
   status: MarketingGrowthStatus;
   audience: MarketingGrowthAudience;
+  source: MarketingGrowthSource;
   routeTarget: MarketingGrowthRouteTarget;
+  routeTargetId: string;
+  routeTargetExtra: string;
   ctaLabel: string;
   highlight: string;
   metricValue: string;
   accentColor: string;
+  videoUrl: string;
+  posterUrl: string;
 };
 
 function createDraft(item?: MarketingGrowthRecord | null): GrowthDraft {
@@ -45,11 +54,16 @@ function createDraft(item?: MarketingGrowthRecord | null): GrowthDraft {
     family: item?.family ?? 'campaign',
     status: item?.status ?? 'draft',
     audience: item?.audience ?? 'client',
+    source: item?.source ?? 'marketing',
     routeTarget: item?.routeTarget ?? 'home',
+    routeTargetId: item?.routeTargetId ?? '',
+    routeTargetExtra: item?.routeTargetExtra ?? '',
     ctaLabel: item?.ctaLabel ?? 'فتح الآن',
     highlight: item?.highlight ?? '',
     metricValue: item?.metricValue ?? '',
     accentColor: item?.accentColor ?? '#f97316',
+    videoUrl: item?.videoUrl ?? '',
+    posterUrl: item?.posterUrl ?? '',
   };
 }
 
@@ -62,8 +76,14 @@ function familyLabel(family: MarketingGrowthFamily) {
 
 function statusLabel(status: MarketingGrowthStatus) {
   if (status === 'published') return 'منشور';
+  if (status === 'pending-marketing') return 'بانتظار التسويق';
   if (status === 'paused') return 'موقوف';
   return 'مسودة';
+}
+
+function sourceLabel(source: MarketingGrowthSource) {
+  if (source === 'partner') return 'من الشريك';
+  return 'من التسويق';
 }
 
 function audienceLabel(audience: MarketingGrowthAudience) {
@@ -74,11 +94,50 @@ function audienceLabel(audience: MarketingGrowthAudience) {
 
 function routeTargetLabel(target: MarketingGrowthRouteTarget) {
   if (target === 'home') return 'الرئيسية';
+  if (target === 'main_category') return 'فئة رئيسية';
+  if (target === 'sub_category') return 'فئة فرعية';
+  if (target === 'store') return 'متجر';
+  if (target === 'store_category') return 'متجر + فئة';
+  if (target === 'product') return 'منتج';
+  if (target === 'subscription') return 'اشتراك';
+  if (target === 'search') return 'بحث';
   if (target === 'promo-apply') return 'تطبيق العروض';
   if (target === 'subscription-family-get') return 'إدارة الاشتراك';
   if (target === 'entitlements-get') return 'الاستحقاقات والمزايا';
   if (target === 'categories-list') return 'التصنيفات';
   return 'الرئيسية';
+}
+
+function routeTargetPrimaryLabel(target: MarketingGrowthRouteTarget) {
+  if (target === 'store') return 'معرّف المتجر';
+  if (target === 'product') return 'معرّف المنتج';
+  return 'معرّف الفئة';
+}
+
+function routeTargetPrimaryHint(target: MarketingGrowthRouteTarget) {
+  if (target === 'store') return 'مثال: store-1001';
+  if (target === 'product') return 'مثال: item-apple-1';
+  return 'مثال: grocery أو restaurants';
+}
+
+function routeTargetNeedsPrimaryInput(target: MarketingGrowthRouteTarget) {
+  return target === 'main_category' || target === 'sub_category' || target === 'store' || target === 'store_category' || target === 'product';
+}
+
+function routeTargetNeedsSecondaryInput(target: MarketingGrowthRouteTarget) {
+  return target === 'store_category' || target === 'product';
+}
+
+function routeTargetSecondaryLabel(target: MarketingGrowthRouteTarget) {
+  if (target === 'store_category') return 'معرّف الفئة';
+  if (target === 'product') return 'معرّف المتجر';
+  return 'معرّف إضافي';
+}
+
+function routeTargetSecondaryHint(target: MarketingGrowthRouteTarget) {
+  if (target === 'store_category') return 'مثال: grocery_vegetables_fruits';
+  if (target === 'product') return 'مثال: store-1001';
+  return 'معرّف إضافي';
 }
 
 export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
@@ -94,7 +153,10 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
   }, [selected]);
 
   const kpis = React.useMemo(() => getMarketingGrowthKpis(), [items]);
-  const livePreview = React.useMemo(() => getLiveMarketingGrowthItems('client').slice(0, 4), [items]);
+  const livePreview = React.useMemo(
+    () => getLiveMarketingGrowthItems('client').filter((item) => item.family === 'shorts').slice(0, 4),
+    [items]
+  );
 
   function refresh() {
     setItems(getMarketingGrowthItems());
@@ -106,13 +168,31 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
   }
 
   function handleSave() {
-    const saved = upsertMarketingGrowthItem({ ...draft });
+    const saved = upsertMarketingGrowthItem({
+      ...draft,
+      status: draft.source === 'partner' ? 'pending-marketing' : draft.status,
+    });
     refresh();
     setSelectedId(saved.id);
   }
 
+  function handleApprove(item: MarketingGrowthRecord) {
+    approveMarketingGrowthItem(item.id);
+    refresh();
+  }
+
+  function handlePause(item: MarketingGrowthRecord) {
+    pauseMarketingGrowthItem(item.id);
+    refresh();
+  }
+
   function handleToggle(item: MarketingGrowthRecord) {
     toggleMarketingGrowthStatus(item.id);
+    refresh();
+  }
+
+  function handleQueue(item: MarketingGrowthRecord) {
+    submitMarketingGrowthItem(item.id);
     refresh();
   }
 
@@ -134,16 +214,17 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
   return (
     <BthBox gap={4}>
       <BthSurface tone="raised" gap={3}>
-        <BthText role="caption" style={styles.brandEyebrow}>العروض والاشتراكات الآن مملوكة للتسويق</BthText>
-        <BthText role="titleLg">إغلاق البرومو والحملات والاشتراك داخل مسار واحد</BthText>
+        <BthText role="caption" style={styles.brandEyebrow}>العروض والفيديوهات الآن مملوكة للتسويق</BthText>
+        <BthText role="titleLg">إغلاق البرومو والفيديوهات والحملات والاشتراك داخل مسار واحد</BthText>
         <BthText role="bodySm" tone="muted">
-          هذا السطح يجمع الحملات، الأكواد الترويجية، الاشتراكات، ومواضع الشورتات ثم يربطها بواجهة العميل ومساراتها الحية.
+          هذا السطح يجمع الحملات، الأكواد الترويجية، الاشتراكات، والفيديوهات القصيرة ثم يربطها بواجهة العميل ومساراتها الحية.
         </BthText>
 
         <View style={[styles.kpiGrid, isRtl && styles.rowReverse]}>
           {[
             { label: 'إجمالي البرامج', value: kpis.total, color: '#2563eb' },
             { label: 'حي الآن', value: kpis.live, color: '#16a34a' },
+            { label: 'بانتظار الموافقة', value: kpis.pendingMarketing, color: '#f59e0b' },
             { label: 'اشتراكات', value: kpis.subscriptions, color: '#dc2626' },
             { label: 'حملات وبرومو', value: kpis.promotions, color: '#8b5cf6' },
           ].map((entry) => (
@@ -163,15 +244,22 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
               <BthButton label="برنامج جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} />
             </View>
 
-            <View style={styles.previewStack}>
-              {livePreview.map((item) => (
-                <View key={item.id} style={[styles.previewCard, { backgroundColor: item.accentColor }]}>
-                  <BthText role="caption" style={styles.previewBadge}>{familyLabel(item.family)}</BthText>
-                  <BthText role="titleSm" style={styles.previewTitle}>{item.title}</BthText>
-                  <BthText role="bodySm" style={styles.previewSubtitle}>{item.highlight}</BthText>
-                </View>
-              ))}
-            </View>
+            {livePreview.length > 0 ? (
+              <View style={styles.previewStack}>
+                {livePreview.map((item) => (
+                  <View key={item.id} style={[styles.previewCard, { backgroundColor: item.accentColor }]}>
+                    <BthText role="caption" style={styles.previewBadge}>{familyLabel(item.family)}</BthText>
+                    <BthText role="titleSm" style={styles.previewTitle}>{item.title}</BthText>
+                    <BthText role="bodySm" style={styles.previewSubtitle}>{item.highlight}</BthText>
+                    <BthText role="caption" style={styles.previewMeta}>{sourceLabel(item.source)} · {item.ctaLabel}</BthText>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <BthSurface tone="inset" gap={2}>
+                <BthText role="bodySm" tone="muted">لا توجد فيديوهات معتمدة بعد. سيظهر هنا فقط ما وافق عليه التسويق.</BthText>
+              </BthSurface>
+            )}
           </BthSurface>
 
           <BthSurface tone="raised" gap={3}>
@@ -190,8 +278,13 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
                         <BthText role="titleSm">{item.title}</BthText>
                         <BthText role="bodySm" tone="muted">{item.subtitle}</BthText>
                       </View>
-                      <View style={styles.statusPill}>
-                        <BthText role="caption" style={styles.statusText}>{statusLabel(item.status)}</BthText>
+                      <View style={styles.statusStack}>
+                        <View style={styles.statusPill}>
+                          <BthText role="caption" style={styles.statusText}>{statusLabel(item.status)}</BthText>
+                        </View>
+                        <View style={styles.sourcePill}>
+                          <BthText role="caption" style={styles.sourceText}>{sourceLabel(item.source)}</BthText>
+                        </View>
                       </View>
                     </View>
 
@@ -204,7 +297,12 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
                     </BthText>
 
                     <View style={[styles.actionsRow, isRtl && styles.rowReverse]}>
-                      <BthButton label={item.status === 'published' ? 'إيقاف' : 'نشر'} tone="ghost" fullWidth={false} onPress={() => handleToggle(item)} />
+                      <BthButton
+                        label={item.status === 'pending-marketing' ? 'اعتماد للنشر' : item.status === 'published' ? 'إيقاف' : 'إرسال للمراجعة'}
+                        tone={item.status === 'published' ? 'ghost' : 'secondary'}
+                        fullWidth={false}
+                        onPress={() => (item.status === 'pending-marketing' ? handleApprove(item) : item.status === 'published' ? handlePause(item) : handleQueue(item))}
+                      />
                       <BthButton label="نسخ" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(item)} />
                       <BthButton label="حذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(item)} />
                     </View>
@@ -222,11 +320,22 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
             <BthTabs<MarketingGrowthStatus>
               items={[
                 { value: 'draft', label: 'مسودة' },
+                { value: 'pending-marketing', label: 'بانتظار التسويق' },
                 { value: 'published', label: 'منشور' },
                 { value: 'paused', label: 'موقوف' },
               ]}
               value={draft.status}
               onValueChange={(value) => setDraft((current) => ({ ...current, status: value }))}
+              variant="pill"
+            />
+
+            <BthTabs<MarketingGrowthSource>
+              items={[
+                { value: 'marketing', label: 'التسويق' },
+                { value: 'partner', label: 'الشريك' },
+              ]}
+              value={draft.source}
+              onValueChange={(value) => setDraft((current) => ({ ...current, source: value }))}
               variant="pill"
             />
 
@@ -255,14 +364,19 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
 
             <BthTextField label="العنوان" value={draft.title} onChangeText={(value) => setDraft((current) => ({ ...current, title: value }))} />
             <BthTextField label="الوصف" value={draft.subtitle} onChangeText={(value) => setDraft((current) => ({ ...current, subtitle: value }))} />
+            <BthTextField label="رابط الفيديو" value={draft.videoUrl} onChangeText={(value) => setDraft((current) => ({ ...current, videoUrl: value }))} hint="مثال: /media/shorts/launch.mp4" />
+            <BthTextField label="صورة الغلاف" value={draft.posterUrl} onChangeText={(value) => setDraft((current) => ({ ...current, posterUrl: value }))} hint="مثال: /media/shorts/launch.jpg" />
 
             <BthTabs<MarketingGrowthRouteTarget>
               items={[
                 { value: 'home', label: 'الرئيسية' },
-                { value: 'categories-list', label: 'التصنيفات' },
-                { value: 'promo-apply', label: 'العروض' },
-                { value: 'subscription-family-get', label: 'الاشتراك' },
-                { value: 'entitlements-get', label: 'الاستحقاقات' },
+                { value: 'main_category', label: 'فئة رئيسية' },
+                { value: 'sub_category', label: 'فئة فرعية' },
+                { value: 'store', label: 'متجر' },
+                { value: 'store_category', label: 'متجر + فئة' },
+                { value: 'product', label: 'منتج' },
+                { value: 'subscription', label: 'اشتراك' },
+                { value: 'search', label: 'بحث' },
               ]}
               value={draft.routeTarget}
               onValueChange={(value) => setDraft((current) => ({ ...current, routeTarget: value }))}
@@ -271,8 +385,26 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
 
             <BthSurface tone="inset" gap={2}>
               <BthText role="bodyStrong">الوجهة الحالية</BthText>
-              <BthText role="bodySm" tone="muted">{routeTargetLabel(draft.routeTarget)} · يتم استخدام الربط التشغيلي الحقيقي داخليًا دون إظهار أكواد تطويرية مزعجة.</BthText>
+              <BthText role="bodySm" tone="muted">{routeTargetLabel(draft.routeTarget)} · هذا هو المسار الذي يفتحه CTA داخل الفيديو.</BthText>
             </BthSurface>
+
+            {routeTargetNeedsPrimaryInput(draft.routeTarget) ? (
+              <BthTextField
+                label={routeTargetPrimaryLabel(draft.routeTarget)}
+                value={draft.routeTargetId}
+                onChangeText={(value) => setDraft((current) => ({ ...current, routeTargetId: value }))}
+                hint={routeTargetPrimaryHint(draft.routeTarget)}
+              />
+            ) : null}
+
+            {routeTargetNeedsSecondaryInput(draft.routeTarget) ? (
+              <BthTextField
+                label={routeTargetSecondaryLabel(draft.routeTarget)}
+                value={draft.routeTargetExtra}
+                onChangeText={(value) => setDraft((current) => ({ ...current, routeTargetExtra: value }))}
+                hint={routeTargetSecondaryHint(draft.routeTarget)}
+              />
+            ) : null}
 
             <BthTextField label="نص الزر" value={draft.ctaLabel} onChangeText={(value) => setDraft((current) => ({ ...current, ctaLabel: value }))} />
             <BthTextField label="الجملة البارزة" value={draft.highlight} onChangeText={(value) => setDraft((current) => ({ ...current, highlight: value }))} />
@@ -354,6 +486,10 @@ const styles = StyleSheet.create({
   previewSubtitle: {
     color: 'rgba(255,255,255,0.92)',
   },
+  previewMeta: {
+    color: 'rgba(255,255,255,0.92)',
+    fontWeight: '700',
+  },
   listCard: {
     borderRadius: 18,
     borderWidth: 1,
@@ -377,8 +513,22 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     backgroundColor: '#ede9fe',
   },
+  sourcePill: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: '#ecfeff',
+  },
+  statusStack: {
+    gap: 6,
+    alignItems: 'flex-end',
+  },
   statusText: {
     color: '#6d28d9',
+    fontWeight: '700',
+  },
+  sourceText: {
+    color: '#0f766e',
     fontWeight: '700',
   },
   actionsRow: {

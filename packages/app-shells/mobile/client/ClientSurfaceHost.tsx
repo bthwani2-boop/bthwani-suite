@@ -37,6 +37,7 @@ const { ClientNotificationsSurface } = appClientSurfaceOwned.ClientNotifications
 const { ClientSupportSurface } = appClientSurfaceOwned.ClientSupport;
 const { ClientSettingsSurface } = appClientSurfaceOwned.ClientSettings;
 type DshCommandTarget = React.ComponentProps<typeof DshSurfaceHost>['command']['target'];
+type DshApprovedVideoReelsViewerRenderer = React.ComponentProps<typeof DshSurfaceHost>['renderApprovedVideoReelsViewer'];
 
 type ClientRoute =
   | 'entry'
@@ -67,7 +68,7 @@ type ServiceEntry = {
   iconName: React.ComponentProps<typeof Ionicons>['name'];
 };
 
-export function ClientSurfaceHost() {
+export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderApprovedVideoReelsViewer?: DshApprovedVideoReelsViewerRenderer } = {}) {
   const [route, setRoute] = React.useState<ClientRoute>('entry');
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
   const [accountSheetTab, setAccountSheetTab] = React.useState<AccountSheetTab>('menu');
@@ -386,7 +387,7 @@ export function ClientSurfaceHost() {
     }
 
     if (route === 'dsh') {
-      return <DshSurfaceHost command={dshCommand} onExit={() => setRoute('home')} />;
+      return <DshSurfaceHost command={dshCommand} onExit={() => setRoute('home')} renderApprovedVideoReelsViewer={renderApprovedVideoReelsViewer} />;
     }
 
     if (route === 'amn-entry') {

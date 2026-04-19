@@ -1,1 +1,1 @@
-export * from './ControlPanelDshBellScreen';export * from './ControlPanelDshBellScreen';
+export * from './ControlPanelDshBellScreen';

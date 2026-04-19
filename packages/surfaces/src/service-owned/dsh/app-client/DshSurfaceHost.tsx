@@ -15,6 +15,7 @@ import { DshCategoriesListScreen, DshCategoryGetScreen } from './categories/scre
 import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './favorites/screens';
 import { DshCartGetScreen } from './cart/screens';
 import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshTrustHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './support/screens';
+import type { DshHomeApprovedVideoReelsViewerProps } from './home/components/DshHomeApprovedVideoReelsViewer';
 import {
   dshHomeGetFixturePromos,
   dshHomeGetFixtureStores,
@@ -76,6 +77,7 @@ type DshNavigationCommand = {
 type DshSurfaceHostProps = {
   command: DshNavigationCommand;
   onExit?: () => void;
+  renderApprovedVideoReelsViewer?: (props: DshHomeApprovedVideoReelsViewerProps) => React.ReactNode;
 };
 
 type CreateOrderValues = {
@@ -254,7 +256,7 @@ function supportScreenToRoute(screenId: ClientSupportScreenId): DshRoute {
   return 'support-screen';
 }
 
-export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
+export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer }: DshSurfaceHostProps) {
   const [route, setRoute] = React.useState<DshRoute>('home');
   const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
   const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
@@ -507,6 +509,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   );
 
   const liveMarketingPrograms = getLiveMarketingGrowthItems('client');
+  const liveMarketingShorts = liveMarketingPrograms.filter((item) => item.family === 'shorts');
   const subscriptionMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'subscription');
   const promoMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'promotion');
   const campaignMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'campaign');
@@ -588,7 +591,11 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
   if (route === 'notifications') {
     return (
       <DshNotificationsScreen
-        onOpenMySpace={() => setRoute('my-space')}
+        onOpenBenefits={() => {
+          setSelectedSupportScreen('subscription-sync');
+          setRoute('benefits');
+        }}
+        onOpenTracking={() => setRoute('tracking')}
         onOpenOrders={() => setRoute('orders-list')}
         onOpenSearch={() => setRoute('search')}
         onBack={() => setRoute('home')}
@@ -1006,6 +1013,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
     <DshHomeGetScreen
       categories={dshCategoryListFixtures}
       promos={resolvePublishedHomePromos() as DshHomeGetPromo[]}
+      approvedVideoShorts={liveMarketingShorts}
       stores={dshHomeGetFixtureStores as DshHomeGetStore[]}
       recentOrders={[
         {
@@ -1082,6 +1090,7 @@ export function DshSurfaceHost({ command, onExit }: DshSurfaceHostProps) {
       onCloseSheinInline={() => setSheinInlineOpen(false)}
       awnakInlineVisible={awnakInlineOpen}
       onCloseAwnakInline={() => setAwnakInlineOpen(false)}
+      renderApprovedVideoReelsViewer={renderApprovedVideoReelsViewer}
       onRetry={() => setRoute('home')}
     />
   );

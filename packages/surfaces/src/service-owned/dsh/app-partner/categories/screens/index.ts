@@ -1,1 +1,1 @@
-export * from '../../../app-client/families/categories/screens';
+export * from '../../../app-client/categories/screens';

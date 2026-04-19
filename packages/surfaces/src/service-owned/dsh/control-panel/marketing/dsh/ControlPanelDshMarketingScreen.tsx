@@ -15,8 +15,8 @@ type MarketingControlView = 'banners' | 'growth' | 'loyalty' | 'signals';
 
 const marketingViewMeta: Record<MarketingControlView, { title: string; description: string }> = {
 	growth: {
-		title: 'النمو والعروض',
-		description: 'إدارة البرامج، الاشتراكات، والحملات من سطح واحد واضح وسريع الاستيعاب.',
+		title: 'النمو والفيديوهات والعروض',
+		description: 'إدارة الفيديوهات القصيرة، البرامج، الاشتراكات، والحملات من سطح واحد واضح وسريع الاستيعاب.',
 	},
 	banners: {
 		title: 'إدارة البنرات',
@@ -41,7 +41,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
 			<BthWebSegmentedTabs
 				ariaLabel="DSH marketing control view"
 				items={[
-					{ id: 'growth', label: 'العروض + الاشتراكات', metaLabel: 'تحكم موحد', active: activeView === 'growth' },
+					{ id: 'growth', label: 'الفيديوهات + العروض', metaLabel: 'تحكم موحد', active: activeView === 'growth' },
 					{ id: 'banners', label: 'إدارة البنرات', metaLabel: 'نشر مباشر', active: activeView === 'banners' },
 					{ id: 'loyalty', label: 'الولاء', metaLabel: 'قيمة العميل', active: activeView === 'loyalty' },
 					{ id: 'signals', label: 'الإشارات الذكية', metaLabel: 'تفاعل حي', active: activeView === 'signals' },

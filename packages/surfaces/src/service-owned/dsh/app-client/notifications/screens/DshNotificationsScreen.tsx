@@ -1,6 +1,10 @@
 import React from 'react';
-import { BthBox, BthButton, BthListItem, BthSectionHeader, BthSurface, BthText } from '@bthwani/ui-kit';
+import { Pressable } from 'react-native';
+import { BthBadge, BthBox, BthButton, BthMobileScrollView, BthSurface, BthText } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
+import { dshNotificationsFixtures } from '../fixtures/dshNotificationsFixtures';
+
+export type DshNotificationActionTarget = 'benefits' | 'tracking' | 'orders-list' | 'search';
 
 export type DshNotificationItem = {
   id: string;
@@ -8,83 +12,240 @@ export type DshNotificationItem = {
   subtitle: string;
   meta: string;
   badgeLabel: string;
+  actionTarget: DshNotificationActionTarget;
+  onPress?: () => void;
 };
 
 export type DshNotificationsScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
   items?: DshNotificationItem[];
-  onOpenMySpace?: () => void;
+  onOpenBenefits?: () => void;
+  onOpenTracking?: () => void;
   onOpenOrders?: () => void;
   onOpenSearch?: () => void;
   onBack?: () => void;
   onRetry?: () => void;
 };
 
-const defaultItems: DshNotificationItem[] = [
-  {
-    id: 'notif-1',
-    title: 'تحديث الاشتراك',
-    subtitle: 'تمت مزامنة subscription-sync داخل DSH بنجاح.',
-    meta: 'الآن',
-    badgeLabel: 'Live',
+function resolveBadgeTone(badgeLabel: string) {
+  if (/اشتراك/i.test(badgeLabel)) {
+    return 'brand' as const;
+  }
+
+  if (/مباشر|Live/i.test(badgeLabel)) {
+    return 'warning' as const;
+  }
+
+  if (/طلب|Order/i.test(badgeLabel)) {
+    return 'brand' as const;
+  }
+
+  if (/عرض|Offer/i.test(badgeLabel)) {
+    return 'info' as const;
+  }
+
+  return 'default' as const;
+}
+
+function resolveNotificationPress(
+  actionTarget: DshNotificationActionTarget,
+  callbacks: {
+    onOpenBenefits?: () => void;
+    onOpenTracking?: () => void;
+    onOpenOrders?: () => void;
+    onOpenSearch?: () => void;
   },
-  {
-    id: 'notif-2',
-    title: 'طلبك جاهز للمتابعة',
-    subtitle: 'الطلب النشط يمكن فتحه من نفس المسار.',
-    meta: 'قبل قليل',
-    badgeLabel: 'Order',
-  },
-  {
-    id: 'notif-3',
-    title: 'عرض شخصي جديد',
-    subtitle: 'خصم مرتبط بحسابك داخل المسار الحالي.',
-    meta: 'اليوم',
-    badgeLabel: 'Offer',
-  },
-];
+) {
+  if (actionTarget === 'benefits') {
+    return callbacks.onOpenBenefits ?? callbacks.onOpenSearch;
+  }
+
+  if (actionTarget === 'tracking') {
+    return callbacks.onOpenTracking ?? callbacks.onOpenOrders;
+  }
+
+  if (actionTarget === 'orders-list') {
+    return callbacks.onOpenOrders ?? callbacks.onOpenTracking;
+  }
+
+  return callbacks.onOpenSearch ?? callbacks.onOpenBenefits;
+}
+
+function NotificationGlyph() {
+  return (
+    <BthBox
+      background="warningSurface"
+      border
+      borderTone="brand"
+      radiusToken="pill"
+      align="center"
+      justify="center"
+      style={{ width: 48, height: 48, flexShrink: 0 }}
+    >
+      <BthBox background="brand" radiusToken="pill" style={{ width: 12, height: 12 }} />
+    </BthBox>
+  );
+}
+
+function DshNotificationCard({
+  item,
+  onPress,
+}: {
+  item: DshNotificationItem;
+  onPress?: () => void;
+}) {
+  const card = (
+    <BthSurface tone="raised" padding={4} gap={3} radiusToken="xl" elevationToken="raised" style={{ width: '100%' }}>
+      <BthBox layoutDirection="row" justify="space-between" align="flex-start" gap={3}>
+        <NotificationGlyph />
+        <BthBox gap={2} style={{ flex: 1 }}>
+          <BthText role="bodyStrong" align="start" numberOfLines={2}>
+            {item.title}
+          </BthText>
+          <BthText role="bodySm" tone="muted" align="start" numberOfLines={3}>
+            {item.subtitle}
+          </BthText>
+        </BthBox>
+      </BthBox>
+      <BthBox layoutDirection="row" justify="space-between" align="center" gap={3}>
+        <BthBadge label={item.badgeLabel} tone={resolveBadgeTone(item.badgeLabel)} />
+        <BthText role="caption" tone="soft" align="end">
+          {item.meta}
+        </BthText>
+      </BthBox>
+    </BthSurface>
+  );
+
+  if (!onPress) {
+    return card;
+  }
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [
+        {
+          width: '100%',
+          opacity: pressed ? 0.94 : 1,
+        },
+      ]}
+    >
+      {card}
+    </Pressable>
+  );
+}
+
+function DshNotificationsSectionHeader({ count }: { count: number }) {
+  return (
+    <BthBox gap={2}>
+      <BthBox layoutDirection="row" justify="space-between" align="center" gap={3}>
+        <BthBox gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+          <BthText role="titleSm">آخر التنبيهات</BthText>
+          <BthText role="bodySm" tone="muted" align="start">
+            كل بطاقة تختصر خطوة واحدة وتفتح مساراً واضحاً.
+          </BthText>
+        </BthBox>
+        <BthBox
+          background="brandSurface"
+          border
+          borderTone="brand"
+          radiusToken="pill"
+          align="center"
+          justify="center"
+          style={{ width: 42, height: 42, flexShrink: 0 }}
+        >
+          <BthText role="bodyStrong" tone="brand" align="center">
+            {count}
+          </BthText>
+        </BthBox>
+      </BthBox>
+    </BthBox>
+  );
+}
+
+function DshNotificationsEmptyState({
+  onOpenSearch,
+  onBack,
+}: {
+  onOpenSearch?: () => void;
+  onBack?: () => void;
+}) {
+  return (
+    <BthSurface tone="inset" padding={5} gap={3}>
+      <BthText role="titleSm">لا توجد إشعارات حالياً</BthText>
+      <BthText role="bodySm" tone="muted">
+        عندما يصل تنبيه جديد سيظهر هنا بنفس البنية الواضحة والبسيطة.
+      </BthText>
+      <BthBox layoutDirection="row" gap={2}>
+        {onOpenSearch ? <BthButton label="بحث DSH" tone="secondary" fullWidth={false} onPress={onOpenSearch} /> : null}
+        {onBack ? <BthButton label="رجوع" tone="ghost" fullWidth={false} onPress={onBack} /> : null}
+      </BthBox>
+    </BthSurface>
+  );
+}
 
 function renderContent(
   items: DshNotificationItem[],
-  onOpenMySpace?: () => void,
+  onOpenBenefits?: () => void,
+  onOpenTracking?: () => void,
   onOpenOrders?: () => void,
   onOpenSearch?: () => void,
+  onBack?: () => void,
 ) {
+  const resolvedItems = items.slice(0, 2).map((item) => ({
+    ...item,
+    onPress: item.onPress ?? resolveNotificationPress(item.actionTarget, { onOpenBenefits, onOpenTracking, onOpenOrders, onOpenSearch }),
+  }));
+
   return (
-    <BthBox gap={3}>
-      <BthSurface tone="brand" gap={3}>
-        <BthSectionHeader title="الإشعارات" subtitle="تنبيهات DSH فقط مع وصول سريع إلى المسار المناسب" />
-        <BthText role="bodySm" tone="inverse" style={{ opacity: 0.9 }}>
-          الإشعارات هنا مخصصة لهذه الخدمة فقط، وتبقى مرتبطة بالطلبات والعروض والمساحة الشخصية.
-        </BthText>
-        <BthBox layoutDirection="row" gap={2}>
-          <BthButton label="مساحتي" tone="secondary" onPress={onOpenMySpace} />
-          <BthButton label="طلباتي" tone="secondary" onPress={onOpenOrders} />
-          <BthButton label="بحث" tone="ghost" onPress={onOpenSearch} />
+    <BthMobileScrollView fill padding={4} gap={4}>
+      <BthSurface tone="brand" padding={5} gap={4} radiusToken="xl" elevationToken="raised">
+        <BthBox layoutDirection="row" justify="space-between" align="center" gap={3}>
+          <BthButton label="رجوع" tone="ghost" size="sm" fullWidth={false} onPress={onBack} />
+          <BthBox
+            background="surface"
+            border
+            borderTone="brand"
+            radiusToken="pill"
+            paddingX={3}
+            paddingY={1}
+            style={{ alignSelf: 'flex-start' }}
+          >
+            <BthText role="label" tone="brand">
+              DSH تنبيهات
+            </BthText>
+          </BthBox>
+        </BthBox>
+
+        <BthBox gap={2}>
+          <BthText role="titleLg" align="center">
+            الإشعارات
+          </BthText>
+          <BthText role="bodyMd" tone="muted" align="center">
+            إشعارات DSH المرتبطة بمزامنة الاشتراك والطلب النشط، بواجهة أوضح وأخف.
+          </BthText>
         </BthBox>
       </BthSurface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader title="آخر التنبيهات" subtitle="كل تنبيه يختصر خطوة ويقود إلى وجهة واضحة" />
-        {items.map((item) => (
-          <BthListItem key={item.id} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} onPress={onOpenOrders} />
-        ))}
-      </BthSurface>
+      <DshNotificationsSectionHeader count={resolvedItems.length} />
 
-      <BthSurface tone="inset" gap={3}>
-        <BthSectionHeader title="مسار سريع" subtitle="تحرك إلى المساحة الشخصية أو الطلبات أو البحث" />
-        <BthListItem title="مساحتي" subtitle="الاشتراكات، التفضيلات، والعنوان" meta="Profile lane" badgeLabel="Space" onPress={onOpenMySpace} />
-        <BthListItem title="طلباتي" subtitle="آخر الطلبات والحالة الحالية" meta="Order lane" badgeLabel="Orders" onPress={onOpenOrders} />
-        <BthListItem title="بحث DSH" subtitle="العثور على متجر أو عنصر أو فئة" meta="Search lane" badgeLabel="Find" onPress={onOpenSearch} />
-      </BthSurface>
-    </BthBox>
+      <BthBox gap={3}>
+        {resolvedItems.length ? (
+          resolvedItems.map((item) => <DshNotificationCard key={item.id} item={item} onPress={item.onPress} />)
+        ) : (
+          <DshNotificationsEmptyState onOpenSearch={onOpenSearch} onBack={onBack} />
+        )}
+      </BthBox>
+    </BthMobileScrollView>
   );
 }
 
 export function DshNotificationsScreen({
   state = 'ready',
-  items = defaultItems,
-  onOpenMySpace,
+  items = dshNotificationsFixtures,
+  onOpenBenefits,
+  onOpenTracking,
   onOpenOrders,
   onOpenSearch,
   onBack,
@@ -94,21 +255,7 @@ export function DshNotificationsScreen({
     return <DshOperationScreen state={state} title="الإشعارات" subtitle="تنبيهات DSH المخصصة" onRetry={onRetry} />;
   }
 
-  return (
-    <DshOperationScreen
-      state="ready"
-      title="الإشعارات"
-      subtitle="قائمة إشعارات DSH مع وصول مباشر إلى المسارات الأكثر استخدامًا"
-      content={renderContent(items, onOpenMySpace, onOpenOrders, onOpenSearch)}
-      primaryActionLabel="مساحتي"
-      secondaryActionLabel="طلباتي"
-      tertiaryActionLabel="بحث"
-      onPrimaryAction={onOpenMySpace}
-      onSecondaryAction={onOpenOrders}
-      onTertiaryAction={onOpenSearch ?? onBack}
-      onRetry={onRetry}
-    />
-  );
+  return renderContent(items, onOpenBenefits, onOpenTracking, onOpenOrders, onOpenSearch, onBack);
 }
 
 export default DshNotificationsScreen;

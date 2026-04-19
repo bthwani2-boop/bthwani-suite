@@ -46,6 +46,7 @@ const groups: Array<{
       { id: 'store-nomination', title: 'Store nomination', subtitle: 'Nominate a new branch.', badgeLabel: 'Onboarding' },
       { id: 'identity-submit', title: 'Identity submit', subtitle: 'Submit identity documents.', badgeLabel: 'Compliance' },
       { id: 'doc-upload', title: 'Document upload', subtitle: 'Upload branch compliance files.', badgeLabel: 'Compliance' },
+      { id: 'video-upload', title: 'رفع الفيديو', subtitle: 'أرسل فيديو قصيرًا لمراجعة التسويق.', badgeLabel: 'وسائط' },
       { id: 'intake-start', title: 'Intake start', subtitle: 'Start the branch intake flow.', badgeLabel: 'Onboarding' },
       { id: 'manager-invite', title: 'Manager invite', subtitle: 'Invite a branch manager.', badgeLabel: 'Access' },
     ],

@@ -1,6 +1,5 @@
 export * from './surface-meta';
 export * from './surface-catalog';
-export * from './family.catalog';
 export * from './awnak/screens';
 export * from './categories/screens';
 export * from './cart/screens';
