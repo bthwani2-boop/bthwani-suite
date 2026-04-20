@@ -15,19 +15,29 @@ import {
   useUiText,
 } from '@bthwani/ui-kit';
 import {
-  AmnEntryScreen,
-  ArbEntryScreen,
-  DshSurfaceHost,
-  EsfEntryScreen,
-  KnzEntryScreen,
-  KwdEntryScreen,
-  MrfEntryScreen,
-  SndEntryScreen,
-  WltHomeGetScreen,
-  WltTopupScreen,
+  amnAppClient,
+  arbAppClient,
+  dshAppClient,
+  esfAppClient,
+  knzAppClient,
+  kwdAppClient,
+  mrfAppClient,
+  sndAppClient,
+  wltAppClient,
   appClientSurfaceOwned,
 } from '@bthwani/surfaces/app-client';
 import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
+
+const { AmnEntryScreen } = amnAppClient;
+const { ArbEntryScreen } = arbAppClient;
+const { DshSurfaceHost } = dshAppClient;
+const { EsfEntryScreen } = esfAppClient;
+const { KnzEntryScreen } = knzAppClient;
+const { KwdEntryScreen } = kwdAppClient;
+const { MrfEntryScreen } = mrfAppClient;
+const { SndEntryScreen } = sndAppClient;
+const { WltHomeGetScreen, WltTopupScreen } = wltAppClient;
+
 
 const { ClientEntrySurface } = appClientSurfaceOwned.ClientEntry;
 const { ClientLoginSurface } = appClientSurfaceOwned.ClientLogin;
