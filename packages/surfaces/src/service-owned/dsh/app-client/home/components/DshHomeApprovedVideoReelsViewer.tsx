@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Image, Modal, Pressable, ScrollView, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { BthBox, BthText } from '@bthwani/ui-kit';
 import type { MarketingGrowthRecord } from '../../../shared/marketing/growth-store';
 
@@ -37,6 +37,18 @@ function clampIndex(index: number, length: number) {
   return Math.min(Math.max(index, 0), length - 1);
 }
 
+type ExpoAvModule = {
+  Video?: React.ComponentType<any>;
+};
+
+function resolveExpoAv(): ExpoAvModule | null {
+  try {
+    return require('expo-av') as ExpoAvModule;
+  } catch {
+    return null;
+  }
+}
+
 export function DshHomeApprovedVideoReelsViewer({
   visible,
   items,
@@ -46,18 +58,36 @@ export function DshHomeApprovedVideoReelsViewer({
 }: DshHomeApprovedVideoReelsViewerProps) {
   const { height } = useWindowDimensions();
   const safeIndex = clampIndex(initialIndex, items.length);
+  const listRef = React.useRef<FlatList<MarketingGrowthRecord>>(null);
+  const [activeIndex, setActiveIndex] = React.useState(safeIndex);
+  const expoAv = React.useMemo(() => resolveExpoAv(), []);
+  const ExpoVideo = expoAv?.Video;
 
   React.useEffect(() => {
-    if (visible) {
-      return undefined;
+    if (!visible) {
+      return;
     }
 
-    return undefined;
-  }, [visible]);
+    setActiveIndex(safeIndex);
+
+    requestAnimationFrame(() => {
+      listRef.current?.scrollToIndex({ index: safeIndex, animated: false });
+    });
+  }, [safeIndex, visible]);
 
   const handleClose = React.useCallback(() => {
     onClose();
   }, [onClose]);
+
+  const viewabilityConfig = React.useMemo(() => ({ itemVisiblePercentThreshold: 80 }), []);
+
+  const handleViewableItemsChanged = React.useRef(({ viewableItems }: { viewableItems: Array<{ index: number | null }> }) => {
+    const nextIndex = viewableItems[0]?.index;
+
+    if (typeof nextIndex === 'number') {
+      setActiveIndex(nextIndex);
+    }
+  }).current;
 
   if (!visible) {
     return null;
@@ -90,46 +120,76 @@ export function DshHomeApprovedVideoReelsViewer({
           <Ionicons name="close" size={20} color="#ffffff" />
         </Pressable>
 
-        <ScrollView
+        <FlatList
+          ref={listRef}
+          data={items}
+          keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
-          snapToInterval={Math.max(height * 0.72, 560)}
+          pagingEnabled
           decelerationRate="fast"
-          contentContainerStyle={styles.listContent}
-        >
-          {items.map((item, index) => {
+          initialScrollIndex={safeIndex}
+          getItemLayout={(_, index) => ({ length: height, offset: height * index, index })}
+          viewabilityConfig={viewabilityConfig}
+          onViewableItemsChanged={handleViewableItemsChanged}
+          renderItem={({ item, index }) => {
+            const videoUri = resolveMediaUri(item.videoUrl);
             const posterUri = resolveMediaUri(item.posterUrl ?? item.videoUrl);
+            const isActive = index === activeIndex;
 
             return (
-              <View key={item.id} style={[styles.slideCard, index === safeIndex && styles.slideCardActive]}>
-                <View style={styles.slideMediaShell}>
-                  {posterUri ? <Image source={{ uri: posterUri }} style={styles.poster} resizeMode="cover" /> : <View style={styles.posterFallback} />}
-                  <View style={styles.mediaScrim} />
-                  <View style={styles.mediaTag}>
-                    <BthText role="caption" style={styles.mediaTagText}>فيديو معتمد</BthText>
+              <View style={[styles.slideShell, { height }]}>
+                <View style={styles.slideCard}>
+                  <View style={styles.mediaShell}>
+                    {videoUri && ExpoVideo ? (
+                      <ExpoVideo
+                        source={{ uri: videoUri }}
+                        style={StyleSheet.absoluteFillObject}
+                        resizeMode="cover"
+                        shouldPlay={isActive}
+                        isLooping
+                        isMuted={false}
+                        useNativeControls={false}
+                        usePoster={Boolean(posterUri)}
+                        posterSource={posterUri ? { uri: posterUri } : undefined}
+                      />
+                    ) : posterUri ? (
+                      <Image source={{ uri: posterUri }} style={styles.poster} resizeMode="cover" />
+                    ) : (
+                      <View style={styles.posterFallback} />
+                    )}
+
+                    <View style={styles.mediaScrim} />
+
+                    <View style={styles.mediaHeader}>
+                      <View style={styles.mediaTag}>
+                        <BthText role="caption" style={styles.mediaTagText}>فيديو معتمد</BthText>
+                      </View>
+                      <BthText role="caption" style={styles.mediaSwipeHint}>اسحب للأعلى أو للأسفل</BthText>
+                    </View>
+
+                    <View style={styles.mediaBody}>
+                      <BthBox gap={2} style={styles.cardBody}>
+                        <BthText role="titleSm" style={styles.title} numberOfLines={2}>{item.title}</BthText>
+                        <BthText role="bodySm" style={styles.subtitle} numberOfLines={3}>{item.subtitle}</BthText>
+                        <BthText role="bodySm" style={styles.highlight} numberOfLines={2}>{item.highlight}</BthText>
+
+                        <Pressable
+                          style={[styles.ctaButton, { backgroundColor: item.accentColor }]}
+                          onPress={() => onCtaPress(item)}
+                          accessibilityRole="button"
+                          accessibilityLabel={item.ctaLabel}
+                        >
+                          <BthText role="bodyMd" style={styles.ctaText}>{item.ctaLabel}</BthText>
+                          <Ionicons name="arrow-back" size={18} color="#ffffff" />
+                        </Pressable>
+                      </BthBox>
+                    </View>
                   </View>
                 </View>
-
-                <BthBox gap={2} style={styles.cardBody}>
-                  <BthText role="titleSm" style={styles.title} numberOfLines={2}>{item.title}</BthText>
-                  <BthText role="bodySm" style={styles.subtitle} numberOfLines={3}>{item.subtitle}</BthText>
-                  <BthText role="bodySm" style={styles.highlight} numberOfLines={2}>{item.highlight}</BthText>
-
-                  <Pressable
-                    style={[styles.ctaButton, { backgroundColor: item.accentColor }]}
-                    onPress={() => onCtaPress(item)}
-                    accessibilityRole="button"
-                    accessibilityLabel={item.ctaLabel}
-                  >
-                    <BthText role="bodyMd" style={styles.ctaText}>{item.ctaLabel}</BthText>
-                    <Ionicons name="arrow-back" size={18} color="#ffffff" />
-                  </Pressable>
-                </BthBox>
-
-                <BthText role="caption" style={styles.swipeHint}>اسحب للأعلى أو للأسفل لمشاهدة فيديوهات أخرى</BthText>
               </View>
             );
-          })}
-        </ScrollView>
+          }}
+        />
       </View>
     </Modal>
   );
@@ -140,24 +200,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#020617',
   },
-  listContent: {
-    paddingHorizontal: 16,
-    paddingTop: 56,
-    paddingBottom: 28,
-    gap: 18,
+  slideShell: {
+    width: '100%',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
   },
   slideCard: {
-    borderRadius: 28,
-    backgroundColor: 'rgba(15, 23, 42, 0.72)',
+    flex: 1,
+    borderRadius: 30,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(15, 23, 42, 0.86)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
-    overflow: 'hidden',
   },
-  slideCardActive: {
-    borderColor: '#f97316',
-  },
-  slideMediaShell: {
-    aspectRatio: 9 / 16,
+  mediaShell: {
+    flex: 1,
     backgroundColor: '#0f172a',
   },
   poster: {
@@ -171,12 +228,19 @@ const styles = StyleSheet.create({
   },
   mediaScrim: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(2, 6, 23, 0.28)',
+    backgroundColor: 'rgba(2, 6, 23, 0.38)',
   },
-  mediaTag: {
+  mediaHeader: {
     position: 'absolute',
     top: 14,
     left: 14,
+    right: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  mediaTag: {
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
@@ -188,8 +252,23 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '800',
   },
-  cardBody: {
+  mediaSwipeHint: {
+    color: 'rgba(255,255,255,0.84)',
+    fontWeight: '700',
+    textAlign: 'right',
+    backgroundColor: 'rgba(15, 23, 42, 0.42)',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  mediaBody: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
     padding: 16,
+  },
+  cardBody: {
     gap: 10,
   },
   closeButton: {
@@ -233,10 +312,6 @@ const styles = StyleSheet.create({
   ctaText: {
     color: '#ffffff',
     fontWeight: '900',
-  },
-  swipeHint: {
-    color: 'rgba(255,255,255,0.78)',
-    textAlign: 'center',
   },
   emptyContainer: {
     flex: 1,

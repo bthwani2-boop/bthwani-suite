@@ -33,7 +33,7 @@ export function DshZoneSetScreen({ state = 'ready', onPrimaryAction, onSecondary
             <BthKeyValueList items={[{ label: 'Resolved from', value: 'Manual selection' }, { label: 'Zone id', value: 'zone-central-01' }, { label: 'Outcome', value: definition.primaryOutcome, tone: 'brand' }]} />
           </BthSurface>
           <BthSurface tone="raised" gap={2}>
-            {[{ title: 'Zone selection', subtitle: 'Let the client confirm the service territory explicitly.', meta: 'Zone', badgeLabel: 'Area' }, { title: 'Discovery continuity', subtitle: 'Return to home or categories-list with the selected zone preserved.', meta: 'Flow', badgeLabel: 'Next' }].map((item) => (
+            {[{ title: 'Zone selection', subtitle: 'Let the client confirm the service territory explicitly.', meta: 'Zone', badgeLabel: 'Area' }, { title: 'Discovery continuity', subtitle: 'Return to home with the selected zone preserved.', meta: 'Flow', badgeLabel: 'Next' }].map((item) => (
               <BthListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
             ))}
           </BthSurface>

@@ -104,7 +104,6 @@ function routeTargetLabel(target: MarketingGrowthRouteTarget) {
   if (target === 'promo-apply') return 'تطبيق العروض';
   if (target === 'subscription-family-get') return 'إدارة الاشتراك';
   if (target === 'entitlements-get') return 'الاستحقاقات والمزايا';
-  if (target === 'categories-list') return 'التصنيفات';
   return 'الرئيسية';
 }
 

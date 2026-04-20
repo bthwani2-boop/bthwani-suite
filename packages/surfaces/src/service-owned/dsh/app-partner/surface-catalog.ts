@@ -1,7 +1,5 @@
 export const surfaceCatalog = [
   'entry',
-  'categories-list',
-  'category-get',
   'inventory-management',
   'orders-inbox',
   'order-detail',

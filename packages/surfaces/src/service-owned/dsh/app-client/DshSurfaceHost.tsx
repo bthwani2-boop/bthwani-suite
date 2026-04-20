@@ -11,7 +11,6 @@ import { DshBenefitsHubScreen } from './subscriptions/screens';
 import { DshOrdersListScreen, DshCreateOrderScreen, DshIntakeHubScreen, DshOrderSuccessState, DshTrackingScreen, DshDeliveryManagementHubScreen } from './placeholders/checkoutTracking';
 import { DshSheinOrderCreateScreen } from './shein/screens';
 import { DshStoreGetScreen, DshStoreItemsScreen } from './stores/screens';
-import { DshCategoriesListScreen, DshCategoryGetScreen } from './categories/screens';
 import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './favorites/screens';
 import { DshCartGetScreen } from './cart/screens';
 import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshTrustHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './support/screens';
@@ -41,8 +40,6 @@ export type DshRoute =
   | 'store-items'
   | 'awnak-order-create'
   | 'cart-get'
-  | 'categories-list'
-  | 'category-get'
   | 'favorite-toggle'
   | 'favorites-list'
   | 'search'
@@ -532,8 +529,6 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
     ['DshSheinOrderCreateScreen', (DshSheinOrderCreateScreen as unknown) as any],
     ['DshStoreGetScreen', (DshStoreGetScreen as unknown) as any],
     ['DshStoreItemsScreen', (DshStoreItemsScreen as unknown) as any],
-    ['DshCategoriesListScreen', (DshCategoriesListScreen as unknown) as any],
-    ['DshCategoryGetScreen', (DshCategoryGetScreen as unknown) as any],
     ['DshFavoriteToggleScreen', (DshFavoriteToggleScreen as unknown) as any],
     ['DshFavoritesListScreen', (DshFavoritesListScreen as unknown) as any],
     ['DshClientBellScreen', (DshClientBellScreen as unknown) as any],
@@ -636,6 +631,10 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
           setRoute('store-items');
         }}
         onOpenCart={() => setRoute('cart-get')}
+        onOpenBenefits={() => {
+          setSelectedSupportScreen('entitlements-get');
+          setRoute('benefits');
+        }}
         onBack={() => setRoute('home')}
         onRetry={() => setRoute('store-get')}
         onSupport={openSupportDirectory}
@@ -710,50 +709,6 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
       );
   }
 
-  if (route === 'categories-list') {
-    return (
-      <DshCategoriesListScreen
-        items={publishedCategoryListFixtures}
-        onOpenCategory={(categoryId) => {
-          setItemsCategory(categoryId);
-          if (categoryId === 'shein') {
-            setSheinInlineOpen(true);
-            setRoute('home');
-            return;
-          }
-
-          setRoute(categoryId === 'awnak' ? 'awnak-order-create' : 'category-get');
-        }}
-        onOpenFavorites={() => setRoute('favorites-list')}
-        onBack={() => setRoute('home')}
-        onRetry={() => setRoute('categories-list')}
-        onSupport={openSupportDirectory}
-      />
-    );
-  }
-
-  if (route === 'category-get') {
-    const category = getDshCategoryFixture(itemsCategory);
-    return (
-      <DshCategoryGetScreen
-        category={{
-          id: category?.id ?? itemsCategory,
-          label: category?.label ?? (itemsCategory === 'all' ? 'جميع الفئات' : itemsCategory),
-          subtitle: category?.subtitle ?? 'تفاصيل مختصرة للفئة الحالية داخل مسار الاستكشاف.',
-          summary: category?.subcategories.length
-            ? `فئة رئيسية تحتوي على ${category.subcategories.length} فئات فرعية جاهزة للاستكشاف.`
-            : 'افتح قائمة الفئات للمتابعة مع هذه الفئة.',
-          itemCountLabel: category?.subcategories.length ? `${category.subcategories.length} فئات فرعية` : 'تفاصيل الفئة جاهزة',
-          subcategories: category?.subcategories,
-        }}
-        onOpenList={() => setRoute('store-items')}
-        onBack={() => setRoute('categories-list')}
-        onRetry={() => setRoute('category-get')}
-        onSupport={openSupportDirectory}
-      />
-    );
-  }
-
   if (route === 'favorite-toggle') {
     return (
       <DshFavoriteToggleScreen
@@ -761,7 +716,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
         currentFavorite={Boolean(activeStore.isOffer)}
         onToggleFavorite={() => undefined}
         onOpenFavorites={() => setRoute('favorites-list')}
-        onBack={() => setRoute('category-get')}
+        onBack={() => setRoute('home')}
         onRetry={() => setRoute('favorite-toggle')}
         onSupport={openSupportDirectory}
       />
@@ -776,7 +731,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
           { id: 'item-apple-1', name: 'تفاح رويال غالا', subtitle: 'صندوق طازج 1 كجم', meta: 'عنصر محفوظ' },
         ]}
         onOpenItem={() => setRoute('favorite-toggle')}
-        onBack={() => setRoute('categories-list')}
+        onBack={() => setRoute('home')}
         onRetry={() => setRoute('favorites-list')}
         onSupport={openSupportDirectory}
       />
@@ -789,7 +744,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
         query={storesQuery}
         results={filteredSearchStores.map((store) => ({ id: store.id, title: store.name, subtitle: store.subtitle, meta: store.meta }))}
         onQueryChange={setStoresQuery}
-        onOpenCategories={() => setRoute('categories-list')}
+        onOpenCategories={() => setRoute('home')}
         onOpenFavorites={() => setRoute('favorites-list')}
         onOpenResult={(resultId) => {
           setActiveStoreId(resultId);
@@ -825,7 +780,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   if (route === 'shein-order-create') {
     return (
       <DshSheinOrderCreateScreen
-        onBack={() => setRoute('categories-list')}
+        onBack={() => setRoute('home')}
       />
     );
   }
@@ -1038,9 +993,8 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
       onOpenMySpace={() => setRoute('my-space')}
       onOpenNotifications={() => setRoute('notifications')}
       onOpenCart={() => setRoute('cart-get')}
-      onOpenList={() => setRoute('categories-list')}
+      onOpenList={() => setRoute('home')}
       onOpenCategory={(categoryId) => {
-        setItemsCategory(categoryId);
         if (categoryId === 'shein') {
           setSheinInlineOpen(true);
           setRoute('home');
@@ -1053,7 +1007,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
           return;
         }
 
-        setRoute('category-get');
+        setRoute('home');
       }}
       onOpenDiscovery={() => setRoute('home')}
       onOpenStoreCategory={(storeId, categoryId) => {

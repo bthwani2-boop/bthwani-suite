@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import {
   BthUnifiedMobileTopBar,
   BthBox,
@@ -38,11 +38,16 @@ import {
 import { getDshCategoryFixture } from '../../categories/fixtures/dshCategoriesFixtures';
 import { DshSheinOrderCreateScreen } from '../../shein/screens';
 import { DshAwnakOrderCreateScreen } from '../../awnak/screens';
+import {
+  DshHomeApprovedVideoReelsViewer,
+  type DshHomeApprovedVideoReelsViewerProps,
+} from '../components/DshHomeApprovedVideoReelsViewer';
 import CategoryClockDial, {
   type CategoryDialItem,
   type DialAnchorLayout,
 } from '../components/CategoryClockDial';
 import { getDshCategoryIconUrl } from '../../categories/utils/getDshCategoryIconUrl';
+import type { MarketingGrowthRecord } from '../../../shared/marketing/growth-store';
 
 export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
@@ -50,6 +55,7 @@ export type DshHomeGetScreenProps = {
   promos?: DshHomeGetPromo[];
   stores?: DshHomeGetStore[];
   recentOrders?: DshHomeRecentOrder[];
+  approvedVideoShorts?: MarketingGrowthRecord[];
   onBack?: () => void;
   onOpenEntry?: () => void;
   onOpenMySpace?: () => void;
@@ -71,14 +77,8 @@ export type DshHomeGetScreenProps = {
   onCloseSheinInline?: () => void;
   awnakInlineVisible?: boolean;
   onCloseAwnakInline?: () => void;
+  renderApprovedVideoReelsViewer?: (props: DshHomeApprovedVideoReelsViewerProps) => React.ReactNode;
   onRetry?: () => void;
-};
-
-type HomeShortItem = {
-  id: string;
-  title: string;
-  subtitle: string;
-  tone: 'promo' | 'store' | 'tracking';
 };
 
 export type DshHomeCategory = {
@@ -421,10 +421,12 @@ export function DshHomeGetScreen({
   onOpenNotifications,
   onOpenStore,
   onOpenSheinInfo,
+  approvedVideoShorts = [],
   sheinInlineVisible = false,
   onCloseSheinInline,
   awnakInlineVisible = false,
   onCloseAwnakInline,
+  renderApprovedVideoReelsViewer,
   onRetry,
   onOpenEntry,
 }: DshHomeGetScreenProps) {
@@ -575,20 +577,44 @@ export function DshHomeGetScreen({
     return renderState(state, onRetry);
   }
 
+  const resolveHomeCategoryContext = React.useCallback((targetId?: string) => {
+    if (!targetId) {
+      return null;
+    }
+
+    const matchedCategory = visibleCategoryFixtures.find((category) => category.id === targetId);
+    if (matchedCategory) {
+      return { categoryId: matchedCategory.id, subcategoryId: null as string | null };
+    }
+
+    const parentCategory = visibleCategoryFixtures.find((category) =>
+      category.subcategories?.some((subcategory) => subcategory.id === targetId),
+    );
+
+    if (parentCategory) {
+      return { categoryId: parentCategory.id, subcategoryId: targetId };
+    }
+
+    return null;
+  }, [visibleCategoryFixtures]);
+
   const resolveBannerPress = React.useCallback(
     (promo: DshHomeGetPromo) => () => {
       if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
+        const nextHomeContext = resolveHomeCategoryContext(promo.actionTarget);
+
+        if (nextHomeContext) {
+          setActiveCategoryId(nextHomeContext.categoryId);
+          setActiveSubcategoryId(nextHomeContext.subcategoryId);
+          return;
+        }
+
         if (promo.actionTarget === 'shein' && onOpenSheinInfo) {
           onOpenSheinInfo();
           return;
         }
 
-        if (promo.actionTarget && onOpenCategory) {
-          onOpenCategory(promo.actionTarget);
-          return;
-        }
-
-        onOpenList?.();
+        onOpenDiscovery?.();
         return;
       }
 
@@ -652,45 +678,103 @@ export function DshHomeGetScreen({
         return;
       }
 
-      if (onOpenDiscovery) {
-        onOpenDiscovery();
-        return;
-      }
-
-      setInlineSearchVisible(true);
+      onOpenDiscovery?.();
     },
-    [onOpenBenefits, onOpenCategory, onOpenDiscovery, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory]
+    [onOpenBenefits, onOpenDiscovery, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, resolveHomeCategoryContext]
   );
 
   const activePromo = promos[activePromoIndex % promos.length] ?? dshHomeGetFixturePromos[0];
   const promoDiscount = activePromo.subtitle.match(/\d+%/)?.[0] ?? '30%';
   const promoTail = activePromo.subtitle.replace(promoDiscount, '').trim();
-  const primaryStore = stores[0] ?? null;
-  const homeShorts = React.useMemo<HomeShortItem[]>(
-    () => [
-      {
-        id: 'short-promo',
-        title: activePromo.title,
-        subtitle: activePromo.subtitle,
-        tone: 'promo',
-      },
-      primaryStore
-        ? {
-            id: 'short-store',
-            title: primaryStore.name,
-            subtitle: `${primaryStore.deliveryLabel} · ${primaryStore.serviceLabel}`,
-            tone: 'store',
-          }
-        : null,
-      {
-        id: 'short-tracking',
-        title: 'تتبع الطلب',
-        subtitle: 'انتقل إلى الطلب النشط أو الطلبات الأخيرة',
-        tone: 'tracking',
-      },
-    ].filter(Boolean) as HomeShortItem[],
-    [activePromo.subtitle, activePromo.title, primaryStore]
+
+  const resolveVideoCtaPress = React.useCallback(
+    (item: MarketingGrowthRecord) => {
+      setShortsVisible(false);
+
+      if (item.routeTarget === 'main_category' || item.routeTarget === 'sub_category') {
+        const nextHomeContext = resolveHomeCategoryContext(item.routeTargetId);
+
+        if (nextHomeContext) {
+          setActiveCategoryId(nextHomeContext.categoryId);
+          setActiveSubcategoryId(nextHomeContext.subcategoryId);
+          return;
+        }
+
+        if (item.routeTargetId === 'shein' && onOpenSheinInfo) {
+          onOpenSheinInfo();
+          return;
+        }
+
+        onOpenList?.();
+        return;
+      }
+
+      if (item.routeTarget === 'store') {
+        if (item.routeTargetId && onOpenStore) {
+          onOpenStore(item.routeTargetId);
+          return;
+        }
+
+        onOpenDiscovery?.();
+        return;
+      }
+
+      if (item.routeTarget === 'store_category') {
+        if (item.routeTargetId && item.routeTargetExtra && onOpenStoreCategory) {
+          onOpenStoreCategory(item.routeTargetId, item.routeTargetExtra);
+          return;
+        }
+
+        if (item.routeTargetId && onOpenStore) {
+          onOpenStore(item.routeTargetId);
+          return;
+        }
+
+        onOpenDiscovery?.();
+        return;
+      }
+
+      if (item.routeTarget === 'product') {
+        if (item.routeTargetExtra && item.routeTargetId && onOpenProduct) {
+          onOpenProduct(item.routeTargetExtra, item.routeTargetId);
+          return;
+        }
+
+        if (item.routeTargetExtra && onOpenStore) {
+          onOpenStore(item.routeTargetExtra);
+          return;
+        }
+
+        onOpenDiscovery?.();
+        return;
+      }
+
+      if (item.routeTarget === 'subscription' || item.routeTarget === 'subscription-family-get' || item.routeTarget === 'entitlements-get') {
+        onOpenBenefits?.();
+        return;
+      }
+
+      if (item.routeTarget === 'search') {
+        onOpenSearch?.();
+        return;
+      }
+
+      if (item.routeTarget === 'promo-apply') {
+        onOpenCart?.();
+        return;
+      }
+
+      if (onOpenDiscovery) {
+        onOpenDiscovery();
+        return;
+      }
+
+      onOpenList?.();
+    },
+    [onOpenBenefits, onOpenCart, onOpenDiscovery, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, resolveHomeCategoryContext]
   );
+
+  const approvedVideoReels = approvedVideoShorts.length > 0 ? approvedVideoShorts : [];
   // Marketing-driven banner carousel items: promos are the single source of truth for banner content and routing.
   const bannerItems: HomeBannerCarouselItem[] = promos.map((promo) => ({
     id: promo.id,
@@ -1171,38 +1255,23 @@ export function DshHomeGetScreen({
           }}
         />
 
-        <Modal visible={shortsVisible} transparent animationType="fade" onRequestClose={() => setShortsVisible(false)}>
-          <Pressable style={styles.shortsOverlay} onPress={() => setShortsVisible(false)}>
-            <Pressable style={styles.shortsPanel} onPress={(event) => event.stopPropagation()}>
-              <View style={styles.shortsHandle} />
-              <View style={styles.shortsHeader}>
-                <BthText role="titleSm" style={styles.shortsTitle}>لقطات DSH</BthText>
-                <Pressable style={styles.shortsCloseButton} onPress={() => setShortsVisible(false)}>
-                  <Ionicons name="close" size={18} color="#1f2937" />
-                </Pressable>
-              </View>
-              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.shortsList}>
-                {homeShorts.map((item) => (
-                  <Pressable key={item.id} style={[styles.shortsCard, item.tone === 'promo' && styles.shortsCardPromo, item.tone === 'store' && styles.shortsCardStore, item.tone === 'tracking' && styles.shortsCardTracking]}>
-                    <View style={styles.shortsCardTopRow}>
-                      <View style={styles.shortsPlayBadge}>
-                        <Ionicons name="play" size={14} color="#ffffff" />
-                      </View>
-                      <View style={styles.shortsCardTextWrap}>
-                        <BthText role="bodyMd" style={styles.shortsCardTitle} numberOfLines={1}>{item.title}</BthText>
-                        <BthText role="bodySm" style={styles.shortsCardSubtitle} numberOfLines={2}>{item.subtitle}</BthText>
-                      </View>
-                    </View>
-                    <View style={styles.shortsCardFooter}>
-                      <BthText role="caption" style={styles.shortsCardFooterText}>مشاهدة سريعة</BthText>
-                      <Ionicons name="chevron-forward" size={16} color="#ff6a00" />
-                    </View>
-                  </Pressable>
-                ))}
-              </ScrollView>
-            </Pressable>
-          </Pressable>
-        </Modal>
+        {shortsVisible
+          ? (renderApprovedVideoReelsViewer?.({
+              visible: shortsVisible,
+              items: approvedVideoReels,
+              initialIndex: 0,
+              onClose: () => setShortsVisible(false),
+              onCtaPress: resolveVideoCtaPress,
+            }) ?? (
+              <DshHomeApprovedVideoReelsViewer
+                visible={shortsVisible}
+                items={approvedVideoReels}
+                initialIndex={0}
+                onClose={() => setShortsVisible(false)}
+                onCtaPress={resolveVideoCtaPress}
+              />
+            ))
+          : null}
       </ScrollView>
     </View>
   );

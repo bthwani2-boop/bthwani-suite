@@ -51,6 +51,7 @@ export type DshStoreGetScreenProps = {
   onOpenItems?: () => void;
   onOpenSearch?: () => void;
   onOpenCart?: () => void;
+  onOpenBenefits?: () => void;
   onBack?: () => void;
   onRetry?: () => void;
   onSupport?: () => void;
@@ -472,6 +473,7 @@ export function DshStoreGetScreen({
   onOpenItems,
   onOpenSearch,
   onOpenCart,
+  onOpenBenefits,
   onBack,
   onRetry,
   onSupport,
@@ -1067,41 +1069,127 @@ export function DshStoreGetScreen({
     ),
   ).slice(0, 3);
 
+  const firstVisibleItem = React.useMemo(
+    () => visibleItems[0] ?? customerVisibleItems[0] ?? null,
+    [customerVisibleItems, visibleItems],
+  );
+
+  const firstOfferItem = React.useMemo(
+    () => visibleItems.find((item) => isOfferItem(item)) ?? customerVisibleItems.find((item) => isOfferItem(item)) ?? firstVisibleItem,
+    [customerVisibleItems, firstVisibleItem, isOfferItem, visibleItems],
+  );
+
+  const firstNewItem = React.useMemo(
+    () => visibleItems.find((item) => isNewItem(item)) ?? customerVisibleItems.find((item) => isNewItem(item)) ?? firstVisibleItem,
+    [customerVisibleItems, firstVisibleItem, isNewItem, visibleItems],
+  );
+
+  const openStoreItemPreview = React.useCallback((item?: DshStoreGetMenuItem | null) => {
+    if (!item) {
+      return;
+    }
+
+    openImagePreview(item, store.imageUri);
+  }, [openImagePreview, store.imageUri]);
+
+  const resolveFeaturePress = React.useCallback((label: string) => {
+    const normalized = normalizeDisplayText(label).toLowerCase();
+
+    if (normalized.includes('برو') || normalized.includes('أولوية') || normalized.includes('pro')) {
+      if (onOpenBenefits) {
+        onOpenBenefits();
+        return;
+      }
+
+      if (firstVisibleItem) {
+        openStoreItemPreview(firstVisibleItem);
+      }
+
+      return;
+    }
+
+    if (normalized.includes('كوبون') || normalized.includes('خصم') || normalized.includes('عرض') || normalized.includes('offer')) {
+      changeCategory('offers');
+      return;
+    }
+
+    if (normalized.includes('جديد') || normalized.includes('new')) {
+      changeCategory('new');
+      return;
+    }
+
+    if (normalized.includes('استلم') || normalized.includes('pickup')) {
+      setSelectedMode('pickup');
+      return;
+    }
+
+    if (normalized.includes('متجر') || normalized.includes('store delivery')) {
+      setSelectedMode('store_delivery');
+      return;
+    }
+
+    if (normalized.includes('توصيل')) {
+      setSelectedMode('delivery');
+      return;
+    }
+
+    if (firstVisibleItem) {
+      openStoreItemPreview(firstVisibleItem);
+    }
+  }, [changeCategory, firstVisibleItem, onOpenBenefits, openStoreItemPreview]);
+
   const smartRailItems = React.useMemo(() => {
     const featureImages = menuItems.map((item) => item.imageUri).filter((image): image is string => Boolean(image));
     const pickFeatureImage = (index: number) => featureImages[index] ?? store.imageUri;
 
     const storeDriven = [
-      {
-        id: `${store.id}-entry`,
-        title: 'وصل حديثاً',
-        subtitle: normalizedPriceMatchLabel,
-        badge: getStatusLabel(store.statusLabel, storeText),
-        image: pickFeatureImage(0),
-        emoji: '🔥',
-        onPress: onOpenItems,
-      },
-      normalizedFollowersLabel
+      firstVisibleItem
+        ? {
+            id: `${store.id}-entry`,
+            title: 'وصل حديثاً',
+            subtitle: normalizedPriceMatchLabel,
+            badge: getStatusLabel(store.statusLabel, storeText),
+            image: pickFeatureImage(0),
+            emoji: '🔥',
+            cta: 'معاينة',
+            onPress: () => openStoreItemPreview(firstVisibleItem),
+          }
+        : null,
+      firstOfferItem
         ? {
             id: `${store.id}-social`,
             title: 'موصى به',
-            subtitle: normalizedFollowersLabel,
+            subtitle: normalizedFollowersLabel ?? 'الأكثر تفاعلاً في هذا المتجر',
             badge: 'رائج',
             image: pickFeatureImage(1),
             emoji: '⭐',
-            onPress: onOpenItems,
+            cta: 'افتح',
+            onPress: () => openStoreItemPreview(firstOfferItem),
           }
         : null,
-      ...(store.tags ?? []).slice(0, 2).map((tag, index) => ({
-        id: `${store.id}-tag-${index}`,
-        title: normalizeTagLabel(tag, storeText),
-        subtitle: 'ميزة مفعلة داخل المتجر',
-        badge: 'ميزة',
-        image: pickFeatureImage(index + 2),
-        emoji: '✨',
-        onPress: onSupport,
+      firstNewItem && firstNewItem.id !== firstVisibleItem?.id && firstNewItem.id !== firstOfferItem?.id
+        ? {
+            id: `${store.id}-new`,
+            title: 'الجديد الآن',
+            subtitle: 'استعرض أحدث العناصر داخل المتجر',
+            badge: 'جديد',
+            image: pickFeatureImage(2),
+            emoji: '🆕',
+            cta: 'صفِّ',
+            onPress: () => changeCategory('new'),
+          }
+        : null,
+      ...(benefitChips ?? []).slice(0, 3).map((chip, index) => ({
+        id: `${store.id}-benefit-${index}`,
+        title: normalizeTagLabel(chip, storeText),
+        subtitle: 'ميزة مرتبطة بهذا المتجر',
+        badge: chip.includes('برو') || chip.includes('أولوية') ? 'اشتراك' : chip.includes('كوبون') || chip.includes('خصم') || chip.includes('عرض') ? 'عرض' : 'ميزة',
+        image: pickFeatureImage(index + 3),
+        emoji: chip.includes('برو') || chip.includes('أولوية') ? '⭐' : chip.includes('كوبون') || chip.includes('خصم') || chip.includes('عرض') ? '💸' : '✨',
+        cta: 'افتح',
+        onPress: () => resolveFeaturePress(chip),
       })),
-    ].filter(Boolean) as Array<{ id: string; title: string; subtitle: string; badge?: string; image?: string; emoji?: string; onPress?: () => void }>;
+    ].filter(Boolean) as Array<{ id: string; title: string; subtitle: string; badge?: string; cta?: string; image?: string; emoji?: string; onPress?: () => void }>;
 
     const productDriven = menuItems
       .filter((item) => item.isAvailable !== false)
@@ -1113,11 +1201,12 @@ export function DshStoreGetScreen({
         badge: normalizeDisplayText(item.categoryLabel),
         image: item.imageUri ?? store.imageUri,
         emoji: getItemEmoji(item),
-        onPress: onOpenItems,
+        cta: 'تفاصيل',
+        onPress: () => openStoreItemPreview(item),
       }));
 
     return [...storeDriven, ...productDriven].slice(0, 15);
-  }, [menuItems, normalizedFollowersLabel, normalizedPriceMatchLabel, onOpenItems, onSupport, store.id, store.imageUri, store.statusLabel, store.tags, storeText]);
+  }, [benefitChips, changeCategory, firstNewItem, firstOfferItem, firstVisibleItem, menuItems, normalizedFollowersLabel, normalizedPriceMatchLabel, openStoreItemPreview, resolveFeaturePress, store.id, store.imageUri, store.statusLabel, storeText]);
 
   return (
     <View style={styles.screen}>
