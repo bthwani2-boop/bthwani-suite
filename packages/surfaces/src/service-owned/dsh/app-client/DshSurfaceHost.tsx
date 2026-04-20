@@ -13,7 +13,7 @@ import { DshSheinOrderCreateScreen } from './shein/screens';
 import { DshStoreGetScreen, DshStoreItemsScreen } from './stores/screens';
 import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './favorites/screens';
 import { DshCartGetScreen } from './cart/screens';
-import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshTrustHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './operations/screens';
+import { DshClientOperationDirectoryScreen, clientOperationScreenRegistry, type ClientOperationScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshTrustHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './operations/screens';
 import type { DshHomeApprovedVideoReelsViewerProps } from './home/components/DshHomeApprovedVideoReelsViewer';
 import {
   dshHomeGetFixturePromos,
@@ -183,20 +183,20 @@ function commandTargetToRoute(target: DshCommandTarget): DshRoute {
   return 'home';
 }
 
-function supportScreenToRoute(screenId: ClientSupportScreenId): DshRoute {
-  const intakeTargets: ClientSupportScreenId[] = ['booking-create', 'estimate-create', 'external-order-create', 'gas-refill-order-create'];
-  const checkoutTargets: ClientSupportScreenId[] = ['checkout-gate', 'estimate-get', 'pricing-preview', 'pricing-snapshot-get', 'promo-apply'];
-  const conversationTargets: ClientSupportScreenId[] = ['chat-read-ack', 'chat-send'];
-  const deliveryManagementTargets: ClientSupportScreenId[] = ['delivery-attempt-create', 'delivery-attempts-list', 'delivery-close', 'delivery-reassign'];
-  const subscriptionTargets: ClientSupportScreenId[] = ['subscription-family-get', 'subscription-family-members-get', 'subscription-family-members-post', 'subscription-pro-catalog', 'subscription-sync', 'subscription-tier-get', 'subscription-upgrade-post'];
-  const loyaltyTargets: ClientSupportScreenId[] = ['loyalty-points-redeem', 'loyalty-points-user-balance', 'loyalty-points-user-history', 'entitlements-get'];
-  const proxyTargets: ClientSupportScreenId[] = ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review', 'proxy-request-reject', 'proxy-request-tracking'];
-  const settingsTargets: ClientSupportScreenId[] = ['service-modes-resolve'];
-  const listingTargets: ClientSupportScreenId[] = ['listing-status-update'];
-  const externalTargets: ClientSupportScreenId[] = ['gas-refill-order-create'];
-  const zoneTargets: ClientSupportScreenId[] = ['zone-set'];
-  const issueTargets: ClientSupportScreenId[] = ['order-issue-flag'];
-  const trustTargets: ClientSupportScreenId[] = ['order-proof-code-generate', 'order-proof-verify', 'order-escrow-hold', 'order-escrow-release'];
+function operationScreenToRoute(screenId: ClientOperationScreenId): DshRoute {
+  const intakeTargets: ClientOperationScreenId[] = ['booking-create', 'estimate-create', 'external-order-create', 'gas-refill-order-create'];
+  const checkoutTargets: ClientOperationScreenId[] = ['checkout-gate', 'estimate-get', 'pricing-preview', 'pricing-snapshot-get', 'promo-apply'];
+  const conversationTargets: ClientOperationScreenId[] = ['chat-read-ack', 'chat-send'];
+  const deliveryManagementTargets: ClientOperationScreenId[] = ['delivery-attempt-create', 'delivery-attempts-list', 'delivery-close', 'delivery-reassign'];
+  const subscriptionTargets: ClientOperationScreenId[] = ['subscription-family-get', 'subscription-family-members-get', 'subscription-family-members-post', 'subscription-pro-catalog', 'subscription-sync', 'subscription-tier-get', 'subscription-upgrade-post'];
+  const loyaltyTargets: ClientOperationScreenId[] = ['loyalty-points-redeem', 'loyalty-points-user-balance', 'loyalty-points-user-history', 'entitlements-get'];
+  const proxyTargets: ClientOperationScreenId[] = ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review', 'proxy-request-reject', 'proxy-request-tracking'];
+  const settingsTargets: ClientOperationScreenId[] = ['service-modes-resolve'];
+  const listingTargets: ClientOperationScreenId[] = ['listing-status-update'];
+  const externalTargets: ClientOperationScreenId[] = ['gas-refill-order-create'];
+  const zoneTargets: ClientOperationScreenId[] = ['zone-set'];
+  const issueTargets: ClientOperationScreenId[] = ['order-issue-flag'];
+  const trustTargets: ClientOperationScreenId[] = ['order-proof-code-generate', 'order-proof-verify', 'order-escrow-hold', 'order-escrow-release'];
 
   if (intakeTargets.includes(screenId)) {
     return 'intake-workspace';
@@ -265,7 +265,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
   const [selectedItemId, setSelectedItemId] = React.useState<string>('');
   const [storeItemsEntryOrigin, setStoreItemsEntryOrigin] = React.useState<'home' | 'store-get'>('home');
-  const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<ClientSupportScreenId>('checkout-gate');
+  const [selectedOperationScreen, setSelectedOperationScreen] = React.useState<ClientOperationScreenId>('checkout-gate');
   const routeHistoryRef = React.useRef<DshRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
 
@@ -365,30 +365,30 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
     setCreateOrderValues((current) => ({ ...current, [field]: value }));
   }, []);
 
-  const openSupportDirectory = React.useCallback(() => {
+  const openOperationDirectory = React.useCallback(() => {
     setRoute('operations-directory');
   }, []);
 
-  const openSupportScreen = React.useCallback((screenId: ClientSupportScreenId) => {
-    setSelectedSupportScreen(screenId);
-    setRoute(supportScreenToRoute(screenId));
+  const openOperationScreen = React.useCallback((screenId: ClientOperationScreenId) => {
+    setSelectedOperationScreen(screenId);
+    setRoute(operationScreenToRoute(screenId));
   }, []);
 
-  const handleSupportPrimaryAction = React.useCallback((screenId: ClientSupportScreenId) => {
-    const awnakTargets: ClientSupportScreenId[] = ['awnak-order-create'];
-    const createTargets: ClientSupportScreenId[] = ['booking-create', 'estimate-create', 'external-order-create', 'gas-refill-order-create', 'order-create'];
-    const deliveryTargets: ClientSupportScreenId[] = ['delivery-attempt-create', 'delivery-attempts-list', 'delivery-close', 'delivery-eta-get', 'delivery-get', 'delivery-reassign', 'delivery-track-get', 'order-status-get', 'order-status-update'];
-    const checkoutTargets: ClientSupportScreenId[] = ['checkout-gate', 'estimate-get', 'pricing-preview', 'pricing-snapshot-get', 'promo-apply'];
-    const orderTargets: ClientSupportScreenId[] = ['order-accept', 'order-cancel', 'order-complete', 'order-get', 'order-receipt-get'];
-    const issueTargets: ClientSupportScreenId[] = ['order-issue-flag'];
-    const trustTargets: ClientSupportScreenId[] = ['order-proof-code-generate', 'order-proof-verify', 'order-escrow-hold', 'order-escrow-release'];
-    const reviewTargets: ClientSupportScreenId[] = ['order-rate', 'review-create'];
-    const reviewHistoryTargets: ClientSupportScreenId[] = ['reviews-list'];
-    const subscriptionTargets: ClientSupportScreenId[] = ['subscription-family-get', 'subscription-family-members-get', 'subscription-family-members-post', 'subscription-pro-catalog', 'subscription-sync', 'subscription-tier-get', 'subscription-upgrade-post'];
-    const loyaltyTargets: ClientSupportScreenId[] = ['loyalty-points-redeem', 'loyalty-points-user-balance', 'loyalty-points-user-history'];
-    const proxyRequestTargets: ClientSupportScreenId[] = ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review'];
-    const proxyRejectTargets: ClientSupportScreenId[] = ['proxy-request-reject'];
-    const proxyTrackingTargets: ClientSupportScreenId[] = ['proxy-request-tracking'];
+  const handleOperationPrimaryAction = React.useCallback((screenId: ClientOperationScreenId) => {
+    const awnakTargets: ClientOperationScreenId[] = ['awnak-order-create'];
+    const createTargets: ClientOperationScreenId[] = ['booking-create', 'estimate-create', 'external-order-create', 'gas-refill-order-create', 'order-create'];
+    const deliveryTargets: ClientOperationScreenId[] = ['delivery-attempt-create', 'delivery-attempts-list', 'delivery-close', 'delivery-eta-get', 'delivery-get', 'delivery-reassign', 'delivery-track-get', 'order-status-get', 'order-status-update'];
+    const checkoutTargets: ClientOperationScreenId[] = ['checkout-gate', 'estimate-get', 'pricing-preview', 'pricing-snapshot-get', 'promo-apply'];
+    const orderTargets: ClientOperationScreenId[] = ['order-accept', 'order-cancel', 'order-complete', 'order-get', 'order-receipt-get'];
+    const issueTargets: ClientOperationScreenId[] = ['order-issue-flag'];
+    const trustTargets: ClientOperationScreenId[] = ['order-proof-code-generate', 'order-proof-verify', 'order-escrow-hold', 'order-escrow-release'];
+    const reviewTargets: ClientOperationScreenId[] = ['order-rate', 'review-create'];
+    const reviewHistoryTargets: ClientOperationScreenId[] = ['reviews-list'];
+    const subscriptionTargets: ClientOperationScreenId[] = ['subscription-family-get', 'subscription-family-members-get', 'subscription-family-members-post', 'subscription-pro-catalog', 'subscription-sync', 'subscription-tier-get', 'subscription-upgrade-post'];
+    const loyaltyTargets: ClientOperationScreenId[] = ['loyalty-points-redeem', 'loyalty-points-user-balance', 'loyalty-points-user-history'];
+    const proxyRequestTargets: ClientOperationScreenId[] = ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review'];
+    const proxyRejectTargets: ClientOperationScreenId[] = ['proxy-request-reject'];
+    const proxyTrackingTargets: ClientOperationScreenId[] = ['proxy-request-tracking'];
 
     if (awnakTargets.includes(screenId)) {
       setRoute('awnak-order-create');
@@ -587,7 +587,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
     return (
       <DshNotificationsScreen
         onOpenBenefits={() => {
-          setSelectedSupportScreen('subscription-sync');
+          setSelectedOperationScreen('subscription-sync');
           setRoute('benefits');
         }}
         onOpenTracking={() => setRoute('tracking')}
@@ -632,12 +632,12 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
         }}
         onOpenCart={() => setRoute('cart-get')}
         onOpenBenefits={() => {
-          setSelectedSupportScreen('entitlements-get');
+          setSelectedOperationScreen('entitlements-get');
           setRoute('benefits');
         }}
         onBack={() => setRoute('home')}
         onRetry={() => setRoute('store-get')}
-        onSupport={openSupportDirectory}
+        onSupport={openOperationDirectory}
       />
     );
   }
@@ -718,7 +718,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
         onOpenFavorites={() => setRoute('favorites-list')}
         onBack={() => setRoute('home')}
         onRetry={() => setRoute('favorite-toggle')}
-        onSupport={openSupportDirectory}
+        onSupport={openOperationDirectory}
       />
     );
   }
@@ -733,7 +733,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
         onOpenItem={() => setRoute('favorite-toggle')}
         onBack={() => setRoute('home')}
         onRetry={() => setRoute('favorites-list')}
-        onSupport={openSupportDirectory}
+        onSupport={openOperationDirectory}
       />
     );
   }
@@ -771,7 +771,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   if (route === 'awnak-order-create') {
     return (
       <DshAwnakOrderCreateScreen
-        onBack={openSupportDirectory}
+        onBack={openOperationDirectory}
         onContinue={() => setRoute('create-order')}
       />
     );
@@ -791,9 +791,9 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
     // Render the create-order screen inline instead of a separate checkout wrapper
     return (
       <DshCreateOrderScreen
-        screenId={selectedSupportScreen as 'checkout-gate' | 'estimate-get' | 'pricing-preview' | 'pricing-snapshot-get' | 'promo-apply'}
+        screenId={selectedOperationScreen as 'checkout-gate' | 'estimate-get' | 'pricing-preview' | 'pricing-snapshot-get' | 'promo-apply'}
         onPrimaryAction={() => setRoute('create-order')}
-        onSecondaryAction={openSupportDirectory}
+        onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('checkout-workspace')}
       />
     );
@@ -802,9 +802,9 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   if (route === 'intake-workspace') {
     return (
       <DshIntakeHubScreen
-        screenId={selectedSupportScreen as 'booking-create' | 'estimate-create' | 'external-order-create' | 'gas-refill-order-create'}
-        onPrimaryAction={() => setRoute(selectedSupportScreen === 'estimate-create' ? 'checkout-workspace' : 'create-order')}
-        onSecondaryAction={openSupportDirectory}
+        screenId={selectedOperationScreen as 'booking-create' | 'estimate-create' | 'external-order-create' | 'gas-refill-order-create'}
+        onPrimaryAction={() => setRoute(selectedOperationScreen === 'estimate-create' ? 'checkout-workspace' : 'create-order')}
+        onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('intake-workspace')}
       />
     );
@@ -813,9 +813,9 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   if (route === 'benefits') {
     return (
       <DshBenefitsHubScreen
-        screenId={selectedSupportScreen as 'subscription-family-get' | 'subscription-family-members-get' | 'subscription-family-members-post' | 'subscription-pro-catalog' | 'subscription-sync' | 'subscription-tier-get' | 'subscription-upgrade-post' | 'loyalty-points-redeem' | 'loyalty-points-user-balance' | 'loyalty-points-user-history' | 'entitlements-get'}
+        screenId={selectedOperationScreen as 'subscription-family-get' | 'subscription-family-members-get' | 'subscription-family-members-post' | 'subscription-pro-catalog' | 'subscription-sync' | 'subscription-tier-get' | 'subscription-upgrade-post' | 'loyalty-points-redeem' | 'loyalty-points-user-balance' | 'loyalty-points-user-history' | 'entitlements-get'}
         onPrimaryAction={() => setRoute('home')}
-        onSecondaryAction={openSupportDirectory}
+        onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('benefits')}
       />
     );
@@ -824,9 +824,9 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   if (route === 'conversation-workspace') {
     return (
       <DshConversationHubScreen
-        screenId={selectedSupportScreen as 'chat-read-ack' | 'chat-send'}
+        screenId={selectedOperationScreen as 'chat-read-ack' | 'chat-send'}
         onPrimaryAction={() => setRoute('orders-list')}
-        onSecondaryAction={openSupportDirectory}
+        onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('conversation-workspace')}
       />
     );
@@ -835,9 +835,9 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   if (route === 'delivery-management-workspace') {
     return (
       <DshDeliveryManagementHubScreen
-        screenId={selectedSupportScreen as 'delivery-attempt-create' | 'delivery-attempts-list' | 'delivery-close' | 'delivery-reassign'}
+        screenId={selectedOperationScreen as 'delivery-attempt-create' | 'delivery-attempts-list' | 'delivery-close' | 'delivery-reassign'}
         onPrimaryAction={() => setRoute('tracking')}
-        onSecondaryAction={openSupportDirectory}
+        onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('delivery-management-workspace')}
       />
     );
@@ -847,7 +847,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
     return (
       <DshOrderIssueHubScreen
         onPrimaryAction={() => setRoute('orders-list')}
-        onSecondaryAction={openSupportDirectory}
+        onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('order-issue-workspace')}
       />
     );
@@ -856,9 +856,9 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   if (route === 'proxy-workspace') {
     return (
       <DshProxyHubScreen
-        screenId={selectedSupportScreen as 'proxy-request-create' | 'proxy-request-approve' | 'proxy-request-review' | 'proxy-request-reject' | 'proxy-request-tracking'}
-        onPrimaryAction={() => setRoute(selectedSupportScreen === 'proxy-request-tracking' ? 'tracking' : 'orders-list')}
-        onSecondaryAction={openSupportDirectory}
+        screenId={selectedOperationScreen as 'proxy-request-create' | 'proxy-request-approve' | 'proxy-request-review' | 'proxy-request-reject' | 'proxy-request-tracking'}
+        onPrimaryAction={() => setRoute(selectedOperationScreen === 'proxy-request-tracking' ? 'tracking' : 'orders-list')}
+        onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('proxy-workspace')}
       />
     );
@@ -867,9 +867,9 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   if (route === 'trust-workspace') {
     return (
       <DshTrustHubScreen
-        screenId={selectedSupportScreen as 'order-proof-code-generate' | 'order-proof-verify' | 'order-escrow-hold' | 'order-escrow-release'}
+        screenId={selectedOperationScreen as 'order-proof-code-generate' | 'order-proof-verify' | 'order-escrow-hold' | 'order-escrow-release'}
         onPrimaryAction={() => setRoute('orders-list')}
-        onSecondaryAction={openSupportDirectory}
+        onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('trust-workspace')}
       />
     );
@@ -879,7 +879,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
     return (
       <DshListingStatusUpdateScreen
         onPrimaryAction={() => setRoute('home')}
-        onSecondaryAction={openSupportDirectory}
+        onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('listing-status-update')}
       />
     );
@@ -889,7 +889,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
     return (
       <DshZoneSetScreen
         onPrimaryAction={() => setRoute('home')}
-        onSecondaryAction={openSupportDirectory}
+        onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('zone-set')}
       />
     );
@@ -898,11 +898,11 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   if (route === 'service-settings') {
     return (
       <DshServiceSettingsHubScreen
-        screenId={selectedSupportScreen as 'listing-status-update' | 'service-modes-resolve' | 'zone-set'}
+        screenId={selectedOperationScreen as 'listing-status-update' | 'service-modes-resolve' | 'zone-set'}
         onPrimaryAction={() => {
           setRoute('home');
         }}
-        onSecondaryAction={openSupportDirectory}
+        onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('service-settings')}
       />
     );
@@ -913,16 +913,16 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   }
 
   if (route === 'operations-directory') {
-    return <DshClientSupportDirectoryScreen onOpenScreen={openSupportScreen} />;
+    return <DshClientOperationDirectoryScreen onOpenScreen={openOperationScreen} />;
   }
 
   if (route === 'operations-screen') {
-    const SelectedSupportScreen = clientSupportScreenRegistry[selectedSupportScreen];
+    const SelectedOperationScreen = clientOperationScreenRegistry[selectedOperationScreen];
 
     return (
-      <SelectedSupportScreen
-        onPrimaryAction={() => handleSupportPrimaryAction(selectedSupportScreen)}
-        onSecondaryAction={openSupportDirectory}
+      <SelectedOperationScreen
+        onPrimaryAction={() => handleOperationPrimaryAction(selectedOperationScreen)}
+        onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('operations-screen')}
       />
     );
@@ -946,7 +946,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
         currentStatusLabel="في الطريق"
         timeline={trackingTimeline}
         onBell={() => setRoute('bell')}
-        onSupport={openSupportDirectory}
+        onSupport={openOperationDirectory}
         onRetry={() => setRoute('tracking')}
         onNextAction={() => setRoute('orders-list')}
       />
@@ -1022,7 +1022,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
         setRoute('cart-get');
       }}
       onOpenBenefits={() => {
-        setSelectedSupportScreen('entitlements-get');
+        setSelectedOperationScreen('entitlements-get');
         setRoute('benefits');
       }}
       onOpenFavorites={() => setRoute('favorites-list')}

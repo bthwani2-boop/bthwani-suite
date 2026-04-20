@@ -2,7 +2,7 @@ import React from 'react';
 import { BthBox, BthKeyValueList, BthListItem, BthMobileScrollView, BthSectionHeader, BthStatCard, BthSurface, BthText, BthTextField } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../../patterns/screens/DshOperationScreen';
 
-export const clientOperationScreenIds = [
+const clientOperationScreenIds = [
   'awnak-order-create',
   'booking-create',
   'chat-read-ack',
@@ -61,16 +61,16 @@ export const clientOperationScreenIds = [
 
 export type ClientOperationScreenId = (typeof clientOperationScreenIds)[number];
 
-export type ClientGeneratedOperationScreenProps = {
+type ClientGeneratedOperationScreenProps = {
   state?: DshOperationScreenState;
   onPrimaryAction?: () => void;
   onSecondaryAction?: () => void;
   onRetry?: () => void;
 };
 
-export type ClientOperationKind = 'create' | 'order' | 'delivery' | 'loyalty' | 'subscription' | 'proxy' | 'chat' | 'settings' | 'review';
+type ClientOperationKind = 'create' | 'order' | 'delivery' | 'loyalty' | 'subscription' | 'proxy' | 'chat' | 'settings' | 'review';
 
-export type ClientOperationGroupId =
+type ClientOperationGroupId =
   | 'create-checkout'
   | 'order-delivery'
   | 'messaging-reviews'
@@ -157,7 +157,7 @@ const proxyControlIds: ClientOperationScreenId[] = [
   'zone-set',
 ];
 
-export const clientOperationDirectoryGroups: ClientOperationDirectoryGroup[] = [
+const clientOperationDirectoryGroups: ClientOperationDirectoryGroup[] = [
   {
     id: 'create-checkout',
     title: 'Create and checkout',
@@ -328,7 +328,7 @@ function primaryLabelByKind(kind: ClientOperationKind) {
   return 'Open order flow';
 }
 
-export const clientOperationDefinitions: Record<ClientOperationScreenId, ClientOperationDefinition> = Object.fromEntries(
+const clientOperationDefinitions: Record<ClientOperationScreenId, ClientOperationDefinition> = Object.fromEntries(
   clientOperationScreenIds.map((screenId) => [screenId, getOperationDefinition(screenId)]),
 ) as Record<ClientOperationScreenId, ClientOperationDefinition>;
 
@@ -561,7 +561,7 @@ export const clientOperationScreenRegistry: Record<ClientOperationScreenId, Reac
 
 type ConversationScreenId = 'chat-read-ack' | 'chat-send';
 
-export type DshConversationHubScreenProps = {
+type DshConversationHubScreenProps = {
   screenId: ConversationScreenId;
   state?: DshOperationScreenState;
   onPrimaryAction?: () => void;
@@ -583,7 +583,7 @@ export function DshConversationHubScreen({ screenId, state = 'ready', onPrimaryA
   );
 }
 
-export type DshOrderIssueHubScreenProps = {
+type DshOrderIssueHubScreenProps = {
   state?: DshOperationScreenState;
   onPrimaryAction?: () => void;
   onSecondaryAction?: () => void;
@@ -604,7 +604,7 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
   );
 }
 
-export type DshProxyHubScreenProps = {
+type DshProxyHubScreenProps = {
   screenId: 'proxy-request-create' | 'proxy-request-approve' | 'proxy-request-review' | 'proxy-request-reject' | 'proxy-request-tracking';
   state?: DshOperationScreenState;
   onPrimaryAction?: () => void;
@@ -626,7 +626,7 @@ export function DshProxyHubScreen({ screenId, state = 'ready', onPrimaryAction, 
   );
 }
 
-export type DshTrustHubScreenProps = {
+type DshTrustHubScreenProps = {
   screenId: 'order-proof-code-generate' | 'order-proof-verify' | 'order-escrow-hold' | 'order-escrow-release';
   state?: DshOperationScreenState;
   onPrimaryAction?: () => void;
@@ -648,7 +648,7 @@ export function DshTrustHubScreen({ screenId, state = 'ready', onPrimaryAction, 
   );
 }
 
-export type DshServiceSettingsHubScreenProps = {
+type DshServiceSettingsHubScreenProps = {
   screenId: 'listing-status-update' | 'service-modes-resolve' | 'zone-set';
   state?: DshOperationScreenState;
   onPrimaryAction?: () => void;
@@ -670,7 +670,7 @@ export function DshServiceSettingsHubScreen({ screenId, state = 'ready', onPrima
   );
 }
 
-export type DshZoneSetScreenProps = {
+type DshZoneSetScreenProps = {
   state?: DshOperationScreenState;
   onPrimaryAction?: () => void;
   onSecondaryAction?: () => void;
@@ -691,7 +691,7 @@ export function DshZoneSetScreen({ state = 'ready', onPrimaryAction, onSecondary
   );
 }
 
-export type DshListingStatusUpdateScreenProps = {
+type DshListingStatusUpdateScreenProps = {
   state?: DshOperationScreenState;
   onPrimaryAction?: () => void;
   onSecondaryAction?: () => void;
@@ -712,14 +712,3 @@ export function DshListingStatusUpdateScreen({ state = 'ready', onPrimaryAction,
   );
 }
 
-export default DshClientOperationDirectoryScreen;
-
-export type ClientSupportScreenId = ClientOperationScreenId;
-export type ClientGeneratedSupportScreenProps = ClientGeneratedOperationScreenProps;
-export type ClientSupportKind = ClientOperationKind;
-export type ClientSupportGroupId = ClientOperationGroupId;
-
-export const clientSupportDefinitions = clientOperationDefinitions;
-export const clientSupportDirectoryGroups = clientOperationDirectoryGroups;
-export const clientSupportScreenRegistry = clientOperationScreenRegistry;
-export const DshClientSupportDirectoryScreen = DshClientOperationDirectoryScreen;
