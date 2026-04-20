@@ -19,7 +19,7 @@ import {
   spacing,
   useTheme,
 } from '@bthwani/ui-kit';
-import { DshOperationScreen, type DshOperationScreenState } from '../patterns/screens/DshOperationScreen';
+import { DshOperationScreen, type DshOperationScreenState } from '../../patterns/screens/DshOperationScreen';
 
 type CreateOrderValues = {
   pickupAddress: string;

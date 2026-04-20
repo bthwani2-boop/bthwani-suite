@@ -12,10 +12,11 @@ export * from './home/screens';
 export * from './my_space/screens';
 export * from './notifications/screens';
 export * from './loyalty/screens';
+export * from './checkout/screens';
 // orders folder consolidated into checkout/screens to avoid duplication
 export * from './shein/screens';
 export * from './stores/screens';
-export * from './support/screens';
+export * from './operations/screens';
 // 'tracking' and 'checkout' families were consolidated; explicit exports removed.
 export { DshSurfaceHost } from './DshSurfaceHost';
 export type { DshCommandTarget, DshRoute } from './DshSurfaceHost';

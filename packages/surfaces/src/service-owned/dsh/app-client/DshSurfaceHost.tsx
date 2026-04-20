@@ -8,12 +8,12 @@ import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './
 import { DshMySpaceScreen } from './my_space/screens';
 import { DshNotificationsScreen } from './notifications/screens';
 import { DshBenefitsHubScreen } from './subscriptions/screens';
-import { DshOrdersListScreen, DshCreateOrderScreen, DshIntakeHubScreen, DshOrderSuccessState, DshTrackingScreen, DshDeliveryManagementHubScreen } from './placeholders/checkoutTracking';
+import { DshOrdersListScreen, DshCreateOrderScreen, DshIntakeHubScreen, DshOrderSuccessState, DshTrackingScreen, DshDeliveryManagementHubScreen } from './checkout/screens';
 import { DshSheinOrderCreateScreen } from './shein/screens';
 import { DshStoreGetScreen, DshStoreItemsScreen } from './stores/screens';
 import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './favorites/screens';
 import { DshCartGetScreen } from './cart/screens';
-import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshTrustHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './support/screens';
+import { DshClientSupportDirectoryScreen, clientSupportScreenRegistry, type ClientSupportScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshTrustHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './operations/screens';
 import type { DshHomeApprovedVideoReelsViewerProps } from './home/components/DshHomeApprovedVideoReelsViewer';
 import {
   dshHomeGetFixturePromos,
@@ -28,7 +28,7 @@ import {
 } from './stores/fixtures';
 import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../shared/marketing/banner-store';
 import { getLiveMarketingGrowthItems } from '../shared/marketing/growth-store';
-// checkout/tracking screens consolidated into placeholders/checkoutTracking
+// checkout/tracking screens consolidated into checkout/screens
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './categories/fixtures/dshCategoriesFixtures';
 import { dshPartnerIntakeItems } from '../shared/partners/workflow';
 
@@ -58,8 +58,8 @@ export type DshRoute =
   | 'service-settings'
   | 'trust-workspace'
   | 'zone-set'
-  | 'support-directory'
-  | 'support-screen'
+  | 'operations-directory'
+  | 'operations-screen'
   | 'success'
   | 'orders-list'
   | 'tracking';
@@ -250,7 +250,7 @@ function supportScreenToRoute(screenId: ClientSupportScreenId): DshRoute {
     return 'trust-workspace';
   }
 
-  return 'support-screen';
+  return 'operations-screen';
 }
 
 export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer }: DshSurfaceHostProps) {
@@ -366,7 +366,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   }, []);
 
   const openSupportDirectory = React.useCallback(() => {
-    setRoute('support-directory');
+    setRoute('operations-directory');
   }, []);
 
   const openSupportScreen = React.useCallback((screenId: ClientSupportScreenId) => {
@@ -912,18 +912,18 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
     return <DshOrderSuccessState onNext={() => setRoute('tracking')} />;
   }
 
-  if (route === 'support-directory') {
+  if (route === 'operations-directory') {
     return <DshClientSupportDirectoryScreen onOpenScreen={openSupportScreen} />;
   }
 
-  if (route === 'support-screen') {
+  if (route === 'operations-screen') {
     const SelectedSupportScreen = clientSupportScreenRegistry[selectedSupportScreen];
 
     return (
       <SelectedSupportScreen
         onPrimaryAction={() => handleSupportPrimaryAction(selectedSupportScreen)}
         onSecondaryAction={openSupportDirectory}
-        onRetry={() => setRoute('support-screen')}
+        onRetry={() => setRoute('operations-screen')}
       />
     );
   }

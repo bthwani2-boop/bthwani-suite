@@ -10,7 +10,7 @@ export const surfaceCatalog = [
   'bell',
   'create-order',
   'review',
-  'support-directory',
+  'operations-directory',
   'awnak-order-create',
   'booking-create',
   'chat-read-ack',

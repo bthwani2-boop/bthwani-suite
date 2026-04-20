@@ -1,5 +1,5 @@
 import React from 'react';
-import { DshIntakeHubScreen as DshIntakeHubPlaceholder, DshOrdersListScreen, DshCreateOrderScreen, DshOrderSuccessState, DshTrackingScreen, DshDeliveryManagementHubScreen } from '../../placeholders/checkoutTracking';
+import { DshIntakeHubScreen as DshIntakeHubPlaceholder, DshOrdersListScreen, DshCreateOrderScreen, DshOrderSuccessState, DshTrackingScreen, DshDeliveryManagementHubScreen } from './checkoutTracking';
 
 export type DshIntakeHubScreenProps = {
   screenId: string;
