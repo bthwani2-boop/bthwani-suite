@@ -66,7 +66,7 @@ const captainSupportConfigs: Record<CaptainSupportScreenId, CaptainConfig> = {
   'chat-read-ack': {
     id: 'chat-read-ack',
     title: 'Captain chat read acknowledgement',
-    subtitle: 'Acknowledge the newest operational conversation without leaving the active task lane.',
+    subtitle: 'Acknowledge the newest operational conversation without leaving the active order lane.',
     heroTitle: 'Unread operational messages',
     heroDescription: 'The captain clears unread communication while staying focused on the next route step.',
     primaryLabel: 'Mark chat as read',
@@ -104,10 +104,10 @@ const captainSupportConfigs: Record<CaptainSupportScreenId, CaptainConfig> = {
   'job-reject': {
     id: 'job-reject',
     title: 'Job reject',
-    subtitle: 'Reject a task with a visible operational reason.',
+    subtitle: 'Reject a order with a visible operational reason.',
     heroTitle: 'Exception handling',
     heroDescription: 'Rejection should remain rare and fully explicit so reassignment can happen cleanly.',
-    primaryLabel: 'Reject task',
+    primaryLabel: 'Reject order',
     secondaryLabel: 'Back to support directory',
     inputLabel: 'Rejection reason',
     inputHint: 'Example: vehicle issue or unsafe route condition.',
@@ -115,10 +115,10 @@ const captainSupportConfigs: Record<CaptainSupportScreenId, CaptainConfig> = {
   'order-accept': {
     id: 'order-accept',
     title: 'Order accept',
-    subtitle: 'Confirm the captain accepts the task and is committing to pickup.',
+    subtitle: 'Confirm the captain accepts the order and is committing to pickup.',
     heroTitle: 'Captain acceptance',
     heroDescription: 'Acceptance moves the route from queued work into committed execution.',
-    primaryLabel: 'Accept task',
+    primaryLabel: 'Accept order',
     secondaryLabel: 'Back to support directory',
     keyValues: [
       { label: 'Pickup ETA', value: '8 min' },
@@ -144,9 +144,9 @@ const captainSupportConfigs: Record<CaptainSupportScreenId, CaptainConfig> = {
     id: 'order-details',
     title: 'Order details',
     subtitle: 'Review the captain-focused route snapshot.',
-    heroTitle: 'Captain task snapshot',
+    heroTitle: 'Captain order snapshot',
     heroDescription: 'Only pickup, dropoff, timing, and current stage should remain visible here.',
-    primaryLabel: 'Refresh task detail',
+    primaryLabel: 'Refresh order detail',
     secondaryLabel: 'Back to support directory',
     keyValues: [
       { label: 'Pickup', value: 'Burger Lab - Hittin branch' },
@@ -163,7 +163,7 @@ const captainSupportConfigs: Record<CaptainSupportScreenId, CaptainConfig> = {
     primaryLabel: 'Refresh route snapshot',
     secondaryLabel: 'Back to support directory',
     keyValues: [
-      { label: 'Task', value: '#9021' },
+      { label: 'Order', value: '#9021' },
       { label: 'Current ETA', value: '8 min' },
       { label: 'Traffic impact', value: 'Moderate', tone: 'warning' },
     ],
@@ -185,22 +185,22 @@ const captainSupportConfigs: Record<CaptainSupportScreenId, CaptainConfig> = {
   'orders-list': {
     id: 'orders-list',
     title: 'Orders list',
-    subtitle: 'Browse all captain tasks from one focused queue screen.',
+    subtitle: 'Browse all captain orders from one focused queue screen.',
     heroTitle: 'Captain route queue',
-    heroDescription: 'This list complements the inbox with a broader yet still task-oriented view.',
-    primaryLabel: 'Refresh task list',
+    heroDescription: 'This list complements the inbox with a broader yet still order-oriented view.',
+    primaryLabel: 'Refresh order list',
     secondaryLabel: 'Back to support directory',
     listItems: [
-      { title: 'Task #9021', subtitle: 'Burger Lab to Olaya', meta: 'Pickup in 8 min', badgeLabel: 'Next up' },
-      { title: 'Task #9024', subtitle: 'Green Bowl to King Fahad Rd', meta: 'Pickup in 15 min', badgeLabel: 'Queued' },
+      { title: 'Order #9021', subtitle: 'Burger Lab to Olaya', meta: 'Pickup in 8 min', badgeLabel: 'Next up' },
+      { title: 'Order #9024', subtitle: 'Green Bowl to King Fahad Rd', meta: 'Pickup in 15 min', badgeLabel: 'Queued' },
     ],
   },
   'orders-offers-list': {
     id: 'orders-offers-list',
     title: 'Orders offers list',
-    subtitle: 'Review open task offers that are not yet accepted.',
-    heroTitle: 'Available task offers',
-    heroDescription: 'Offer review stays separated from accepted tasks so the captain always knows commitment level.',
+    subtitle: 'Review open order offers that are not yet accepted.',
+    heroTitle: 'Available order offers',
+    heroDescription: 'Offer review stays separated from accepted orders so the captain always knows commitment level.',
     primaryLabel: 'Refresh offers',
     secondaryLabel: 'Back to support directory',
     listItems: [
@@ -276,7 +276,7 @@ function renderCaptainSupportState(state: Exclude<CaptainSupportScreenState, 're
       <BthStateView
         stateId="empty"
         title="No captain support content is loaded"
-        description="Reload the screen and keep the task context stable."
+        description="Reload the screen and keep the order context stable."
         actionLabel={onRetry ? 'Reload support screen' : undefined}
         onActionPress={onRetry}
       />
@@ -311,7 +311,7 @@ function renderCaptainSupportState(state: Exclude<CaptainSupportScreenState, 're
     <BthStateView
       stateId="recoverableError"
       title="Captain support screen failed"
-      description="Retry without leaving the task-focused support lane."
+      description="Retry without leaving the order-focused support lane."
       actionLabel={onRetry ? 'Retry support step' : undefined}
       onActionPress={onRetry}
     />
@@ -413,3 +413,4 @@ export const DshCaptainProfileGetScreen = createCaptainSupportScreen(captainSupp
 export const DshCaptainProofUploadScreen = createCaptainSupportScreen(captainSupportConfigs['proof-upload']);
 export const DshCaptainTierEvaluateScreen = createCaptainSupportScreen(captainSupportConfigs['tier-evaluate']);
 export const DshCaptainTierInfoScreen = createCaptainSupportScreen(captainSupportConfigs['tier-info']);
+

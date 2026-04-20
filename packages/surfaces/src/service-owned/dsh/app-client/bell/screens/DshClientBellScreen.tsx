@@ -112,7 +112,7 @@ function resolveStateCopy(state: Exclude<DshClientBellScreenState, 'ready'>): Be
   };
 }
 
-type DshClientBellScreenProps = {
+export type DshClientBellScreenProps = {
   state?: DshClientBellScreenState;
   summary?: ClientBellSummary;
   events?: ClientBellEvent[];

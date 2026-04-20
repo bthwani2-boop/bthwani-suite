@@ -3,6 +3,8 @@ import { type StyleProp, type ViewStyle } from 'react-native';
 import { BthBox } from './BthBox';
 import type { BorderToken, ElevationToken, RadiusToken, SpacingToken } from '../foundation/tokens';
 
+declare const process: { env: { NODE_ENV?: string } };
+
 export type BthSurfaceTone = 'default' | 'raised' | 'inset' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
 export type BthSurfaceProps = {
@@ -63,3 +65,5 @@ export function BthSurface({
     </BthBox>
   );
 }
+
+

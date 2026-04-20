@@ -123,7 +123,7 @@ export function PartnerOrderDetailScreen({
       <BthBox gap={2}>
         <BthText role="titleLg">Order detail</BthText>
         <BthText role="bodySm" tone="muted">
-          Detail supports one decision: execute the current order action, then move to the next inbox task.
+          Detail supports one decision: execute the current order action, then move to the next inbox order.
         </BthText>
       </BthBox>
 
@@ -167,3 +167,4 @@ export function PartnerOrderDetailScreen({
 }
 
 export default PartnerOrderDetailScreen;
+

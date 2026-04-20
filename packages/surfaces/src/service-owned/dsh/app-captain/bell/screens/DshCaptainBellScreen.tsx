@@ -39,7 +39,7 @@ const defaultItems: CaptainBellItem[] = [
     id: 'captain-bell-2',
     title: 'New order #9024',
     subtitle: 'Green Bowl needs an immediate review before the queue grows.',
-    meta: 'Next: open task detail',
+    meta: 'Next: open order detail',
     badgeLabel: 'Urgent',
     tone: 'brand',
   },
@@ -81,7 +81,7 @@ function resolveStateCopy(state: Exclude<DshCaptainBellScreenState, 'ready'>): B
   return { stateId: 'recoverableError', title: 'Unable to load the captain bell', description: 'Reload the same path and keep the attention queue visible.', actionLabel: 'Retry bell' };
 }
 
-type DshCaptainBellScreenProps = {
+export type DshCaptainBellScreenProps = {
   state?: DshCaptainBellScreenState;
   summary?: CaptainBellSummary;
   items?: CaptainBellItem[];
@@ -166,3 +166,5 @@ export function DshCaptainBellScreen({
 }
 
 export default DshCaptainBellScreen;
+
+

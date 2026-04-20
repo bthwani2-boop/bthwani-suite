@@ -28,7 +28,7 @@ For any active service, maintain a helper folder at:
 
 Example:
 
-- `docs/services/dsh/ready/`
+- `packages/surfaces/src/service-owned/dsh/SERVICE_BLUEPRINT.md/ready/`
 
 This folder is not live implementation code.
 It is not a runtime folder.
@@ -256,7 +256,7 @@ Any artifact that is `100% closed` for the current phase must be promoted into:
 
 For service `dsh`, the canonical destination is:
 
-- `docs/services/dsh/ready/`
+- `packages/surfaces/src/service-owned/dsh/SERVICE_BLUEPRINT.md/ready/`
 
 Promotion must happen in the same closure cycle, not deferred, and must update both:
 

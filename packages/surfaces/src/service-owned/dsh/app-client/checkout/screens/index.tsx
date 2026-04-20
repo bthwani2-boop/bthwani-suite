@@ -1,19 +1,14 @@
-import React from 'react';
-import { DshIntakeHubScreen as DshIntakeHubPlaceholder, DshOrdersListScreen, DshCreateOrderScreen, DshOrderSuccessState, DshTrackingScreen, DshDeliveryManagementHubScreen } from './checkoutTracking';
-
-export type DshIntakeHubScreenProps = {
-  screenId: string;
-  [key: string]: any;
-};
-
-export function DshIntakeHubScreen(_props: DshIntakeHubScreenProps) {
-  return <DshIntakeHubPlaceholder />;
-}
-
 export {
   DshOrdersListScreen,
   DshCreateOrderScreen,
+  DshIntakeHubScreen,
   DshOrderSuccessState,
   DshTrackingScreen,
   DshDeliveryManagementHubScreen,
-};
+} from './checkoutTracking';
+
+export type {
+  DshIntakeHubScreenProps,
+  DshDeliveryManagementHubScreenProps,
+} from './checkoutTracking';
+

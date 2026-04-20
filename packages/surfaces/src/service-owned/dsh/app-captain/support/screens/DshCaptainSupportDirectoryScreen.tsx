@@ -24,9 +24,9 @@ const groups: Array<{
     items: [
       { id: 'orders-offers-list', title: 'Orders offers list', subtitle: 'Review open offers before commitment.', badgeLabel: 'Offers' },
       { id: 'orders-list', title: 'Orders list', subtitle: 'Browse active route queue.', badgeLabel: 'Queue' },
-      { id: 'order-accept', title: 'Order accept', subtitle: 'Accept the task.', badgeLabel: 'Execution' },
+      { id: 'order-accept', title: 'Order accept', subtitle: 'Accept the order.', badgeLabel: 'Execution' },
       { id: 'order-get', title: 'Order get', subtitle: 'Open route snapshot.', badgeLabel: 'Read' },
-      { id: 'order-details', title: 'Order details', subtitle: 'Inspect task detail.', badgeLabel: 'Read' },
+      { id: 'order-details', title: 'Order details', subtitle: 'Inspect order detail.', badgeLabel: 'Read' },
       { id: 'order-pickup', title: 'Order pickup', subtitle: 'Confirm pickup.', badgeLabel: 'Execution' },
       { id: 'order-deliver', title: 'Order deliver', subtitle: 'Confirm delivery.', badgeLabel: 'Closure' },
       { id: 'proof-upload', title: 'Proof upload', subtitle: 'Upload delivery evidence.', badgeLabel: 'Proof' },

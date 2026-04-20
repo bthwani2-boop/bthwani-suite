@@ -34,14 +34,14 @@ function calculateEstimate(orderType: AwnakOrderType): PricingEstimate {
 
   return {
     priceEstimate: Math.round(base * multiplier[orderType]),
-    currency: 'SAR',
+    currency: 'YER',
   };
 }
 
 export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, onClose, onBack, onContinue }: DshAwnakOrderCreateScreenProps) {
   const isDisabled = state === 'disabled';
-  const [pickupAddress, setPickupAddress] = React.useState('Riyadh Park, Gate 2');
-  const [dropoffAddress, setDropoffAddress] = React.useState('Olaya, King Fahad Road');
+  const [pickupAddress, setPickupAddress] = React.useState('Sanaa Hadda Street');
+  const [dropoffAddress, setDropoffAddress] = React.useState('Sanaa Bab Al-Yemen');
   const [orderType, setOrderType] = React.useState<AwnakOrderType>('PERSONAL_ITEMS');
   const [timeMode, setTimeMode] = React.useState<AwnakTimeMode>('now');
   const [scheduledDate, setScheduledDate] = React.useState('');
@@ -87,7 +87,7 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
         <BthSectionHeader title="المسار" subtitle="اختر من أين وإلى أين، ثم أكمل بقية التفاصيل." />
         <BthBox gap={2} layoutDirection="row" style={{ alignItems: 'center' }}>
           <BthBox style={{ flex: 1 }}>
-            <Pressable onPress={() => undefined} disabled={isDisabled}>
+            <Pressable onPress={() => setValidationError('Use the address field below to edit this location.')} disabled={isDisabled}>
               <BthSurface tone="raised" gap={2}>
                 <BthText role="bodySm" tone="muted">من عنوان</BthText>
                 <BthText role="bodyStrong">حدد الموقع</BthText>
@@ -103,7 +103,7 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
           </BthBox>
 
           <BthBox style={{ flex: 1 }}>
-            <Pressable onPress={() => undefined} disabled={isDisabled}>
+            <Pressable onPress={() => setValidationError('Use the address field below to edit this location.')} disabled={isDisabled}>
               <BthSurface tone="raised" gap={2}>
                 <BthText role="bodySm" tone="muted">إلى عنوان</BthText>
                 <BthText role="bodyStrong">حدد الموقع</BthText>
@@ -229,3 +229,4 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
 }
 
 export default DshAwnakOrderCreateScreen;
+

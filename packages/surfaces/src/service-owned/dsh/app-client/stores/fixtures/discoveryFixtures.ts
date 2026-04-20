@@ -14,7 +14,7 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
     isOffer: true,
     isFavorite: true,
     isFollowing: false,
-    imageUri: createFixtureImageUrl('#F97316', '#FFFFFF', 'OLAYA'),
+    imageUri: createFixtureImageUrl('#F97316', '#FFFFFF', 'HADDA'),
     deliveryLabel: 'توصيل مجاني',
     serviceLabel: 'توصيل برو',
     followerCount: 11000,
@@ -77,3 +77,4 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
     supportsPartnerDelivery: true,
   },
 ];
+

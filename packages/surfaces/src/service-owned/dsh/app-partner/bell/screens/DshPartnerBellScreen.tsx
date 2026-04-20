@@ -81,7 +81,7 @@ function resolveStateCopy(state: Exclude<DshPartnerBellScreenState, 'ready'>): B
   return { stateId: 'recoverableError', title: 'Unable to load the partner bell', description: 'Reload the same path and keep the branch attention lane stable.', actionLabel: 'Retry bell' };
 }
 
-type DshPartnerBellScreenProps = {
+export type DshPartnerBellScreenProps = {
   state?: DshPartnerBellScreenState;
   summary?: PartnerBellSummary;
   items?: PartnerBellItem[];
@@ -166,3 +166,4 @@ export function DshPartnerBellScreen({
 }
 
 export default DshPartnerBellScreen;
+

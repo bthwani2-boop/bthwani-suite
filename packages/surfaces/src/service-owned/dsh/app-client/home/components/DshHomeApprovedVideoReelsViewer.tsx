@@ -4,6 +4,8 @@ import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWind
 import { BthBox, BthText } from '@bthwani/ui-kit';
 import type { MarketingGrowthRecord } from '../../../shared/marketing/growth-store';
 
+declare const process: { env: { EXPO_PUBLIC_MEDIA_BASE_URL?: string } };
+
 export type DshHomeApprovedVideoReelsViewerProps = {
   visible: boolean;
   items: MarketingGrowthRecord[];
@@ -340,3 +342,4 @@ const styles = StyleSheet.create({
 });
 
 export default DshHomeApprovedVideoReelsViewer;
+

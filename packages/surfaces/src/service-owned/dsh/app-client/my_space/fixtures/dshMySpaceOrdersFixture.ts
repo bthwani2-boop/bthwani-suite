@@ -133,7 +133,7 @@ export const dshMySpaceOrdersFixture: DshMySpaceOrder[] = [
     statusTone: 'brand',
     orderNumber: '#3770204',
     placedAt: '26 مارس 2026 · 17:35',
-    totalLabel: '13,450 ر.س',
+    totalLabel: '13,450 ر.ي',
     statusTrailLabel: 'في الطريق',
   },
   {
@@ -147,7 +147,7 @@ export const dshMySpaceOrdersFixture: DshMySpaceOrder[] = [
     statusTone: 'success',
     orderNumber: '#3770118',
     placedAt: '25 مارس 2026 · 19:05',
-    totalLabel: '28,900 ر.س',
+    totalLabel: '28,900 ر.ي',
     statusTrailLabel: 'مكتمل · 4.9/5',
   },
   {
@@ -161,7 +161,8 @@ export const dshMySpaceOrdersFixture: DshMySpaceOrder[] = [
     statusTone: 'warning',
     orderNumber: '#3769982',
     placedAt: '24 مارس 2026 · 12:20',
-    totalLabel: '56,100 ر.س',
+    totalLabel: '56,100 ر.ي',
     statusTrailLabel: 'جاهز الآن',
   },
 ];
+

@@ -65,7 +65,7 @@ function renderEvidenceSection(onOpenVisitLogPress?: () => void) {
     <BthBox gap={3}>
       <BthCard
         title="Record visit log"
-        subtitle="Visit evidence stays close to activation so the operator can complete the task without losing context."
+        subtitle="Visit evidence stays close to activation so the operator can complete the order without losing context."
         footer={<BthButton label="Open visit log" tone="secondary" onPress={onOpenVisitLogPress} />}
       />
       <BthCard

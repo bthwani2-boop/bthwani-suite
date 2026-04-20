@@ -27,9 +27,9 @@ import {
 } from '../fixtures/dshMySpaceOrdersFixture';
 
 export type DshMySpaceOrdersScreenProps = {
-  onOpenOrders?: () => void;
   onOpenTracking?: () => void;
   onRepeatOrder?: () => void;
+  onOpenOrders?: () => void;
 };
 
 function OrderMetricCard({ metric }: { metric: DshMySpaceOrderMetric }) {
@@ -105,11 +105,13 @@ function OrderCard({
   featured,
   onOpenTracking,
   onRepeatOrder,
+  onOpenOrders,
 }: {
   order: DshMySpaceOrder;
   featured?: boolean;
   onOpenTracking?: () => void;
   onRepeatOrder?: () => void;
+  onOpenOrders?: () => void;
 }) {
   const { theme } = useTheme();
   const iconName = resolveOrderIconName(order);
@@ -189,9 +191,9 @@ function OrderCard({
 function resolveQuickActionHandler(
   kind: DshMySpaceQuickActionKind,
   callbacks: {
-    onOpenOrders?: () => void;
     onOpenTracking?: () => void;
     onRepeatOrder?: () => void;
+  onOpenOrders?: () => void;
   },
 ) {
   if (kind === 'tracking') {
@@ -212,9 +214,9 @@ function QuickActionPanel({
   onRepeatOrder,
 }: {
   quickActions: DshMySpaceQuickAction[];
-  onOpenOrders?: () => void;
   onOpenTracking?: () => void;
   onRepeatOrder?: () => void;
+  onOpenOrders?: () => void;
 }) {
   return (
     <BthSurface tone="raised" padding={2} gap={2}>
@@ -285,6 +287,7 @@ export function DshMySpaceOrdersScreen({ onOpenOrders, onOpenTracking, onRepeatO
                 featured={index === 0}
                 onOpenTracking={onOpenTracking}
                 onRepeatOrder={onRepeatOrder}
+                onOpenOrders={onOpenOrders}
               />
             ))
           ) : (
@@ -313,3 +316,7 @@ export function DshMySpaceOrdersScreen({ onOpenOrders, onOpenTracking, onRepeatO
 }
 
 export default DshMySpaceOrdersScreen;
+
+
+
+

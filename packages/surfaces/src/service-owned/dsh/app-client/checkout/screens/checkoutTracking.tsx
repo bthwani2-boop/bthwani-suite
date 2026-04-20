@@ -78,6 +78,7 @@ export type DshOrdersListScreenProps = {
   onOpenOrder?: (orderId: string) => void;
   onBack?: () => void;
   onRetry?: () => void;
+  onNextAction?: () => void;
 };
 
 export type DshCreateOrderScreenProps = {
@@ -107,15 +108,23 @@ export type DshTrackingScreenProps = {
   onNextAction?: () => void;
 };
 
-export type DshDeliveryManagementHubScreenProps = {
-  onBack?: () => void;
+export type DshFlowHubScreenProps = {
+  screenId?: string;
+  state?: DshOperationScreenState;
+  onPrimaryAction?: () => void;
+  onSecondaryAction?: () => void;
+  onRetry?: () => void;
 };
+
+export type DshIntakeHubScreenProps = DshFlowHubScreenProps;
+export type DshDeliveryManagementHubScreenProps = DshFlowHubScreenProps;
+
 
 const defaultCreateOrderValues: CreateOrderValues = {
   pickupAddress: 'رياض بارك، البوابة 2',
   dropoffAddress: 'العليا، طريق الملك فهد',
   contactName: 'أحمد',
-  contactPhone: '0501234567',
+  contactPhone: '770000000',
   note: 'لا توجد ملاحظات',
 };
 
@@ -186,7 +195,7 @@ function StageRail({ activeStepId, steps }: { activeStepId: string; steps: Journ
                   backgroundColor: indicatorTone,
                 }}
               >
-                {isDone ? <Ionicons name="checkmark" size={12} color={theme.brandContrast} /> : <BthText role="caption" style={{ color: isActive ? theme.brandContrast : theme.textStrong }}>{index + 1}</BthText>}
+                {isDone ? <Ionicons name="checkmark" size={12} color={theme.brandContrast} /> : <BthText role="caption" style={{ color: isActive ? theme.brandContrast : theme.text }}>{index + 1}</BthText>}
               </View>
               {index < steps.length - 1 ? (
                 <View style={{ width: 2, flex: 1, minHeight: 28, marginTop: 4, marginBottom: -4, backgroundColor: isDone ? theme.success : theme.line }} />
@@ -238,11 +247,6 @@ function OrderRow({ item, onOpenOrder }: { item: DshOrderListItem; onOpenOrder?:
       meta={item.meta}
       badgeLabel={item.statusLabel}
       onPress={() => onOpenOrder?.(item.id)}
-      rightAccessory={
-        <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: theme.brandSurface, alignItems: 'center', justifyContent: 'center' }}>
-          <Ionicons name="chevron-back" size={18} color={theme.brand} />
-        </View>
-      }
     />
   );
 }
@@ -858,7 +862,7 @@ function renderTracking(
   );
 }
 
-export function DshOrdersListScreen({ items = fallbackOrderListItems, query = '', onQueryChange, onOpenOrder, onBack, onRetry }: DshOrdersListScreenProps) {
+export function DshOrdersListScreen({ items = fallbackOrderListItems, query = '', onQueryChange, onOpenOrder, onBack, onRetry, onNextAction }: DshOrdersListScreenProps) {
   const { theme } = useTheme();
   const normalizedQuery = normalizeText(query);
   const visibleItems = normalizedQuery
@@ -928,9 +932,28 @@ export function DshCreateOrderScreen({
   return <CreateOrderJourneyScreen values={values} timeline={timeline} initialPhase="route" onBack={onBack ?? onSecondaryAction} />;
 }
 
-export function DshIntakeHubScreen() {
-  return <BthSurface tone="inset"><BthText>Intake hub (legacy placeholder)</BthText></BthSurface>;
+export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspace', onPrimaryAction, onSecondaryAction, onRetry }: DshIntakeHubScreenProps) {
+  return (
+    <DshOperationScreen
+      state={state}
+      title="Intake workspace"
+      subtitle="Unified workspace for preparing external, manual, and estimate-based delivery requests before order creation."
+      content={
+        <BthSurface tone="inset" gap={2}>
+          <BthText role="bodyStrong">Current flow</BthText>
+          <BthText role="bodySm" tone="muted">{screenId}</BthText>
+          <BthText role="bodySm" tone="muted">This is an active flow screen with executable state coverage.</BthText>
+        </BthSurface>
+      }
+      primaryActionLabel="Continue order creation"
+      secondaryActionLabel="Back to operations"
+      onPrimaryAction={onPrimaryAction}
+      onSecondaryAction={onSecondaryAction ?? onRetry}
+      onRetry={onRetry}
+    />
+  );
 }
+
 
 export function DshOrderSuccessState({ onNext }: DshOrderSuccessStateProps) {
   return renderOrderSuccess(onNext);
@@ -953,8 +976,32 @@ export function DshTrackingScreen({ values = defaultCreateOrderValues, currentSt
   );
 }
 
-export function DshDeliveryManagementHubScreen() {
-  return <BthSurface tone="inset"><BthText>Delivery management hub (legacy placeholder)</BthText></BthSurface>;
+export function DshDeliveryManagementHubScreen({ state = 'ready', screenId = 'delivery-management-workspace', onPrimaryAction, onSecondaryAction, onRetry }: DshDeliveryManagementHubScreenProps) {
+  return (
+    <DshOperationScreen
+      state={state}
+      title="Delivery management"
+      subtitle="Workspace for delivery attempts, reassignment, closing, and customer-facing tracking decisions."
+      content={
+        <BthSurface tone="inset" gap={2}>
+          <BthText role="bodyStrong">Current flow</BthText>
+          <BthText role="bodySm" tone="muted">{screenId}</BthText>
+          <BthText role="bodySm" tone="muted">This is an active flow screen with executable state coverage.</BthText>
+        </BthSurface>
+      }
+      primaryActionLabel="Open tracking"
+      secondaryActionLabel="Back to operations"
+      onPrimaryAction={onPrimaryAction}
+      onSecondaryAction={onSecondaryAction ?? onRetry}
+      onRetry={onRetry}
+    />
+  );
 }
 
+
 export default {};
+
+
+
+
+

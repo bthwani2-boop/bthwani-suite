@@ -7,7 +7,7 @@ export type DshRoute =
   | 'support'
   | 'success';
 
-export type DshCommandTarget = 'home' | 'tasks-inbox' | 'task-detail' | 'wallet';
+export type DshCommandTarget = 'home' | 'orders-inbox' | 'order-detail' | 'wallet';
 
 type DshNavigationCommand = {
   token: number;
@@ -29,8 +29,8 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
     if (!command) return;
     const map: Record<DshCommandTarget, DshRoute> = {
       home: 'home',
-      'tasks-inbox': 'tasks-inbox',
-      'task-detail': 'task-detail',
+      'orders-inbox': 'orders-inbox',
+      'order-detail': 'order-detail',
       wallet: 'wallet',
     };
     const next = map[command.target] ?? initialRoute;
@@ -58,20 +58,20 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
     );
   }
 
-  if (route === 'tasks-inbox') {
+  if (route === 'orders-inbox') {
     return (
       <div>
-        <h1>Captain — Tasks Inbox</h1>
+        <h1>Captain — Orders Inbox</h1>
         <button onClick={handleBack}>Back</button>
         <p>قائمة المهام placeholder.</p>
       </div>
     );
   }
 
-  if (route === 'task-detail') {
+  if (route === 'order-detail') {
     return (
       <div>
-        <h1>Captain — Task Detail</h1>
+        <h1>Captain — Order Detail</h1>
         <button onClick={handleBack}>Back</button>
         <p>تفاصيل المهمة placeholder.</p>
       </div>
@@ -107,3 +107,4 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
 }
 
 export default DshSurfaceHost;
+

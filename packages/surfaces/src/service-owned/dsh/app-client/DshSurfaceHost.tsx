@@ -135,7 +135,7 @@ const initialCreateOrderValues: CreateOrderValues = {
   pickupAddress: 'رياض بارك، البوابة 2',
   dropoffAddress: 'العليا، طريق الملك فهد',
   contactName: 'أحمد',
-  contactPhone: '0501234567',
+  contactPhone: '770000000',
   note: 'لا توجد ملاحظات',
 };
 
@@ -143,14 +143,14 @@ const initialOrders = [
   {
     id: 'dsh-10021',
     title: 'Order #10021',
-    subtitle: 'Riyadh Park to Olaya',
+    subtitle: 'Hadda to Bab Al-Yemen',
     statusLabel: 'In transit',
     meta: 'ETA 18 min',
   },
   {
     id: 'dsh-10019',
     title: 'Order #10019',
-    subtitle: 'Hittin to Al Malqa',
+    subtitle: 'Sabeen to Tahrir',
     statusLabel: 'Delivered',
     meta: 'Today 03:10 PM',
   },
@@ -264,6 +264,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   const [itemsCategory, setItemsCategory] = React.useState('all');
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
   const [selectedItemId, setSelectedItemId] = React.useState<string>('');
+  const [favoriteOverrides, setFavoriteOverrides] = React.useState<Record<string, boolean>>({});
   const [storeItemsEntryOrigin, setStoreItemsEntryOrigin] = React.useState<'home' | 'store-get'>('home');
   const [selectedOperationScreen, setSelectedOperationScreen] = React.useState<ClientOperationScreenId>('checkout-gate');
   const routeHistoryRef = React.useRef<DshRoute[]>(['home']);
@@ -345,7 +346,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
         { id: 'phone', label: 'Contact phone', value: createOrderValues.contactPhone || 'Not provided' },
       ],
       pricing: [
-        { id: 'base', label: 'Delivery fee', value: '22 SAR' },
+        { id: 'base', label: 'Delivery fee', value: '22 YER' },
         { id: 'eta', label: 'Estimated time', value: '25 min' },
       ],
     }),
@@ -544,7 +545,6 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
 
   const missing = importedScreens.filter(([, v]) => typeof v === 'undefined').map(([n]) => String(n));
   if (missing.length > 0) {
-    console.error('DshSurfaceHost missing imports:', missing);
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 12 }}>Missing components</Text>
@@ -608,7 +608,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
           subtitle: activeStore.subtitle,
           statusLabel: activeStore.statusLabel,
           etaLabel: activeStore.meta,
-          deliveryFeeLabel: 'رسوم التوصيل 12 ر.س',
+          deliveryFeeLabel: 'رسوم التوصيل 12 ر.ي',
           followersLabel: `${activeStore.followerCount.toLocaleString()} متابع`,
           priceMatchLabel: 'الأسعار مطابقة للمطعم',
           imageUri: activeStore.imageUri,
@@ -663,7 +663,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
   }
 
   if (route === 'cart-get') {
-    // Build a demo cart with a few items from the active store so the cart screen
+    // Build a cart preview with a few items from the active store so the cart screen
     // demonstrates a multi-item, interactive experience instead of a single-line preview.
     const parsePriceLabel = (label?: string) => {
       if (!label) return 0;
@@ -671,7 +671,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
       return Number.isFinite(n) ? n : 0;
     };
 
-    const demoCartItems = activeStoreItems.slice(0, 3).map((it) => ({
+    const cartPreviewItems = activeStoreItems.slice(0, 3).map((it) => ({
       id: it.id,
       title: it.name,
       subtitle: it.subtitle,
@@ -689,7 +689,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
           ratingLabel: '4.8 / 5 quality confidence',
         }}
         // provide structured items to the cart screen so it can render a true basket
-        items={demoCartItems}
+        items={cartPreviewItems}
         activeOrder={{
           id: selectedItem?.id ?? 'cart-preview',
           title: selectedItem ? `Cart includes ${selectedItem.name}` : 'Cart ready for checkout',
@@ -713,8 +713,14 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
     return (
       <DshFavoriteToggleScreen
         itemLabel={selectedItem?.name ?? 'Saved item'}
-        currentFavorite={Boolean(activeStore.isOffer)}
-        onToggleFavorite={() => undefined}
+        currentFavorite={favoriteOverrides[selectedItem?.id ?? activeStore.id] ?? Boolean(activeStore.isOffer)}
+        onToggleFavorite={() => {
+          const favoriteKey = selectedItem?.id ?? activeStore.id;
+          setFavoriteOverrides((previous) => ({
+            ...previous,
+            [favoriteKey]: !(previous[favoriteKey] ?? Boolean(activeStore.isOffer)),
+          }));
+        }}
         onOpenFavorites={() => setRoute('favorites-list')}
         onBack={() => setRoute('home')}
         onRetry={() => setRoute('favorite-toggle')}
@@ -1051,3 +1057,4 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
 }
 
 export default DshSurfaceHost;
+

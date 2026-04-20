@@ -127,7 +127,7 @@ export function PartnerOrdersInboxScreen({
       <BthBox gap={2}>
         <BthText role="titleLg">Partner orders inbox</BthText>
         <BthText role="bodySm" tone="muted">
-          Task-first queue for the next operational decision. The next order stays obvious without extra filters in this wave.
+          Order-first queue for the next operational decision. The next order stays obvious without extra filters in this wave.
         </BthText>
       </BthBox>
 

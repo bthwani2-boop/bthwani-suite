@@ -3,7 +3,7 @@ import { DshOperationScreen, type DshOperationScreenProps } from '../../patterns
 import { LoyaltyRewardsPage } from '../../loyalty/screens/LoyaltyRewardsPage';
 import { SubscriptionsPage } from './SubscriptionsPage';
 
-export type DshBenefitsHubScreenProps = DshOperationScreenProps & {
+export type DshBenefitsHubScreenProps = Omit<DshOperationScreenProps, 'title' | 'subtitle'> & {
   screenId?: string;
 };
 

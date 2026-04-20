@@ -10,7 +10,7 @@ import {
   BthText,
 } from '@bthwani/ui-kit';
 
-export type CaptainTasksInboxScreenState =
+export type CaptainOrdersInboxScreenState =
   | 'active'
   | 'noTasks'
   | 'delivered'
@@ -27,8 +27,8 @@ export type CaptainTaskInboxItem = {
   statusLabel: string;
 };
 
-export type CaptainTasksInboxScreenProps = {
-  state?: CaptainTasksInboxScreenState;
+export type CaptainOrdersInboxScreenProps = {
+  state?: CaptainOrdersInboxScreenState;
   items?: CaptainTaskInboxItem[];
   onOpenTask?: (taskId: string) => void;
   onOpenNextTask?: (taskId: string) => void;
@@ -37,8 +37,8 @@ export type CaptainTasksInboxScreenProps = {
 
 const demoActiveItems: CaptainTaskInboxItem[] = [
   {
-    id: 'captain-task-9021',
-    title: 'Task #9021',
+    id: 'captain-order-9021',
+    title: 'Order #9021',
     pickupLabel: 'Pickup: Burger Lab',
     dropoffLabel: 'Dropoff: Olaya District',
     timingLabel: 'Pickup in 8 min',
@@ -46,8 +46,8 @@ const demoActiveItems: CaptainTaskInboxItem[] = [
     statusLabel: 'Next up',
   },
   {
-    id: 'captain-task-9024',
-    title: 'Task #9024',
+    id: 'captain-order-9024',
+    title: 'Order #9024',
     pickupLabel: 'Pickup: Green Bowl',
     dropoffLabel: 'Dropoff: King Fahad Rd',
     timingLabel: 'Pickup in 15 min',
@@ -61,7 +61,7 @@ function renderLoadingState() {
     <BthStateView
       stateId="loading"
       title="Loading captain inbox"
-      description="Keep the next task visible as soon as queue data is available."
+      description="Keep the next order visible as soon as queue data is available."
     />
   );
 }
@@ -70,9 +70,9 @@ function renderNoTasksState(onRetry?: () => void) {
   return (
     <BthStateView
       stateId="empty"
-      title="No tasks right now"
-      description="Stay ready. New tasks will land here first."
-      actionLabel={onRetry ? 'Refresh tasks' : undefined}
+      title="No orders right now"
+      description="Stay ready. New orders will land here first."
+      actionLabel={onRetry ? 'Refresh orders' : undefined}
       onActionPress={onRetry}
     />
   );
@@ -82,9 +82,9 @@ function renderDeliveredState(onRetry?: () => void) {
   return (
     <BthStateView
       kind="success"
-      title="All tasks delivered"
+      title="All orders delivered"
       description="Great run. Refresh to catch the next assignment."
-      actionLabel={onRetry ? 'Check for new tasks' : undefined}
+      actionLabel={onRetry ? 'Check for new orders' : undefined}
       onActionPress={onRetry}
     />
   );
@@ -94,21 +94,21 @@ function renderErrorState(onRetry?: () => void) {
   return (
     <BthStateView
       stateId="recoverableError"
-      title="Tasks inbox is unavailable"
-      description="Retry and continue from the next task without switching flow."
+      title="Orders inbox is unavailable"
+      description="Retry and continue from the next order without switching flow."
       actionLabel="Retry inbox"
       onActionPress={onRetry}
     />
   );
 }
 
-export function CaptainTasksInboxScreen({
+export function CaptainOrdersInboxScreen({
   state = 'active',
   items = demoActiveItems,
   onOpenTask,
   onOpenNextTask,
   onRetry,
-}: CaptainTasksInboxScreenProps) {
+}: CaptainOrdersInboxScreenProps) {
   if (state === 'loading') {
     return renderLoadingState();
   }
@@ -143,15 +143,15 @@ export function CaptainTasksInboxScreen({
   return (
     <BthMobileScrollView padding={4} gap={3}>
       <BthBox gap={2}>
-        <BthText role="titleLg">Captain tasks inbox</BthText>
+        <BthText role="titleLg">Captain orders inbox</BthText>
         <BthText role="bodySm" tone="muted">
-          Inbox-first flow keeps the immediate task obvious and removes dashboard clutter.
+          Inbox-first flow keeps the immediate order obvious and removes dashboard clutter.
         </BthText>
       </BthBox>
 
       <BthSurface tone="brand" gap={3}>
         <BthSectionHeader
-          title="Next task"
+          title="Next order"
           subtitle="One clear action before scanning the rest of the queue."
         />
         <BthBox gap={1}>
@@ -163,12 +163,12 @@ export function CaptainTasksInboxScreen({
             {nextTask.timingLabel} | Next: {nextTask.nextActionLabel}
           </BthText>
         </BthBox>
-        <BthButton label="Open next task" onPress={handleOpenNextTask} />
+        <BthButton label="Open next order" onPress={handleOpenNextTask} />
       </BthSurface>
 
       <BthSurface tone="raised" gap={3}>
         <BthSectionHeader
-          title="Queued tasks"
+          title="Queued orders"
           subtitle="List baseline: pickup, dropoff, timing, and next action."
         />
         <BthBox gap={2}>
@@ -188,4 +188,5 @@ export function CaptainTasksInboxScreen({
   );
 }
 
-export default CaptainTasksInboxScreen;
+export default CaptainOrdersInboxScreen;
+

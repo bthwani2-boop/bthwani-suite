@@ -1,7 +1,7 @@
 export const surfaceCatalog = [
   'entry',
-  'tasks-inbox',
-  'task-detail',
+  'orders-inbox',
+  'order-detail',
   'orderchat',
   'bell',
   'support-directory',
@@ -22,3 +22,4 @@ export const surfaceCatalog = [
   'tier-info',
   'amn-control-panel-operations-flow'
 ] as const;
+

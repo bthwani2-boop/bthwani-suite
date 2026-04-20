@@ -78,9 +78,9 @@ export default function DshCartUnifiedScreen(props: any) {
   const totalAmount = totalHalalas / 100;
   const formattedTotal = useMemo(() => {
     try {
-      return new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(totalAmount);
+      return new Intl.NumberFormat('ar-YE', { style: 'currency', currency: 'YER' }).format(totalAmount);
     } catch {
-      return `${totalAmount} ر.س`;
+      return `${totalAmount} ر.ي`;
     }
   }, [totalAmount]);
 
@@ -306,7 +306,7 @@ export default function DshCartUnifiedScreen(props: any) {
   function ItemsTable() {
     const formatAmount = (value: number) => {
       try {
-        return new Intl.NumberFormat('ar-SA').format(value);
+        return new Intl.NumberFormat('ar-YE').format(value);
       } catch {
         return String(value);
       }
@@ -432,10 +432,10 @@ export default function DshCartUnifiedScreen(props: any) {
               </View>
               <View style={{ alignItems: 'flex-start' }}>
                 <BthText role="bodySm" style={{ color: TEXT_DARK }}>
-                  12,600 ر.س
+                  12,600 ر.ي
                 </BthText>
                 <BthText role="bodySm" style={{ color: TEXT_DARK }}>
-                  950 ر.س
+                  950 ر.ي
                 </BthText>
               </View>
             </View>
@@ -447,7 +447,7 @@ export default function DshCartUnifiedScreen(props: any) {
                 الإجمالي الكلي
               </BthText>
               <BthText role="titleLg" style={{ fontWeight: '700', color: '#111827' }}>
-                13,550 ر.س
+                13,550 ر.ي
               </BthText>
             </View>
           </View>
@@ -472,3 +472,4 @@ export default function DshCartUnifiedScreen(props: any) {
     </View>
   );
 }
+

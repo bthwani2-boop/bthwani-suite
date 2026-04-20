@@ -124,7 +124,7 @@ bthwani-suite/
 - `05_SCREEN_RATIONALIZATION.md`
 - `06_SCREEN_PURPOSE_LOCK.csv`
 - `07_BUILD_QUEUE.csv`
-- `08_FIRST_SCREEN_DECISION.md`
+- `SERVICE_BLUEPRINT.md`
 - `09_WAVE_MAP.md`
 - `10_UI_KIT_PREREQS.csv`
 - `11_CODE_TARGETS.csv`
@@ -587,7 +587,7 @@ bthwani-suite/
 
 ### TodoList
 
-- [ ] أنشئ `docs/services/dsh/00_SERVICE_SELECTION.md` أو ما يعادلها للخدمة المختارة.
+- [ ] أنشئ `packages/surfaces/src/service-owned/dsh/SERVICE_BLUEPRINT.md/00_SERVICE_SELECTION.md` أو ما يعادلها للخدمة المختارة.
 - [ ] اشرح لماذا هذه الخدمة هي الأولى.
 - [ ] اثبت أنها تكشف أكبر قدر من القيمة والأنماط.
 - [ ] اثبت أننا لن نبدأ بخدمتين استهلاكيتين عميقتين معًا.
@@ -2283,3 +2283,4 @@ bthwani-suite/
 ابنِ `bthwani-suite` من الصفر على أساس قانون واضح، وهيكل واضح، وخدمة واحدة عميقة، ومراحل بسيطة لكن صارمة، وموجات صغيرة لها TodoList واضحة ومعايير تحقق واضحة، حتى يصبح التنفيذ اليدوي ممكنًا لك خطوة بخطوة دون ضجيج أو قفز أو ادعاء جاهزية قبل أوانها.
 
 ---
+

@@ -155,7 +155,7 @@ function normalizeDisplayText(value?: string) {
   if (!value) return '';
 
   return value
-    .replace(/Olaya Fresh Market/gi, 'أسواق العليا الطازجة')
+    .replace(/Hadda Fresh Market/gi, 'أسواق العليا الطازجة')
     .replace(/Hittin Bakery/gi, 'مخبز حطين')
     .replace(/Malqa Kitchen/gi, 'مطبخ الملقا')
     .replace(/Groceries and daily essentials/gi, 'مقاضي يومية ومنتجات طازجة')
@@ -186,7 +186,7 @@ function normalizeDisplayText(value?: string) {
     .replace(/Sweets/gi, 'حلويات')
     .replace(/ETA\s*/gi, '')
     .replace(/\bmin\b/gi, 'دقيقة')
-    .replace(/\bSAR\b/gi, 'ر.س')
+    .replace(/\bYER\b/gi, 'ر.ي')
     .replace(/\s{2,}/g, ' ')
     .trim();
 }
@@ -258,7 +258,7 @@ function sampleProductDataUri(name: string) {
 
 function formatCurrencyValue(value: number) {
   const normalized = value % 1 === 0 ? String(value) : value.toFixed(1).replace(/\.0$/, '');
-  return `${normalized} ر.س`;
+  return `${normalized} ر.ي`;
 }
 
 function resolveMeasurementUnitPrice(item: DshStoreGetMenuItem, option: string) {
@@ -1628,7 +1628,7 @@ export function DshStoreGetScreen({
                 </View>
               </View>
 
-              <Pressable style={styles.measurePopoverCard} onPress={() => undefined}>
+              <Pressable style={styles.measurePopoverCard} onPress={(event) => event.stopPropagation()}>
                 {pickerItem ? (
                   <>
                     <View style={styles.measurePopoverHeader}>
@@ -2999,3 +2999,5 @@ const styles = StyleSheet.create({
 });
 
 export default DshStoreGetScreen;
+
+

@@ -1,3 +1,3 @@
-export { CaptainTaskDetailScreen } from './CaptainTaskDetailScreen';
-export type { CaptainTaskDetailScreenProps, CaptainTaskDetailSummary } from './CaptainTaskDetailScreen';
-export { default } from './CaptainTaskDetailScreen';
+export { CaptainOrderDetailScreen } from './CaptainOrderDetailScreen';
+export type { CaptainOrderDetailScreenProps, CaptainOrderDetailSummary } from './CaptainOrderDetailScreen';
+export { default } from './CaptainOrderDetailScreen';
