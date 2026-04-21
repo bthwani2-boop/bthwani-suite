@@ -1,6 +1,29 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+
+function resolveDshHomeStoreImageSource(mediaKey?: string, imageUri?: string) {
+  if (mediaKey) {
+    return resolveSeedMediaSource(mediaKey as never) as never;
+  }
+
+  if (imageUri) {
+    return { uri: imageUri };
+  }
+
+  return undefined;
+}
+function resolveDshHomeBannerImageSource(mediaKey?: string, imageUrl?: string) {
+  if (mediaKey) {
+    return resolveSeedMediaSource(mediaKey as never) as never;
+  }
+
+  if (imageUrl) {
+    return { uri: imageUrl };
+  }
+
+  return undefined;
+}
 import {
   BthUnifiedMobileTopBar,
   BthBox,
@@ -48,7 +71,8 @@ import CategoryClockDial, {
 } from '../components/CategoryClockDial';
 import { getDshCategoryIconUrl } from '../../categories/utils/getDshCategoryIconUrl';
 import type { MarketingGrowthRecord } from '../../../shared/marketing/growth-store';
-
+
+import { resolveSeedMediaSource } from '@bthwani/media-fixtures';
 export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
   categories?: DshHomeCategory[];
@@ -107,6 +131,8 @@ export type DshHomeGetStore = {
   name: string;
   address: string;
   categoryId?: string;
+  mediaKey?: string;
+
   imageUri?: string;
   rating?: number;
   statusLabel: string;
@@ -199,60 +225,7 @@ function CategoryIconImage({
 
 function CategoryHubIcon() {
   return (
-    <View
-      style={{
-        width: 46,
-        height: 46,
-        borderRadius: 14,
-        backgroundColor: '#FF8A00',
-        borderWidth: 1,
-        borderColor: '#FFB35C',
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#FF8A00',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.26,
-        shadowRadius: 8,
-        elevation: 5,
-        overflow: 'hidden',
-      }}
-    >
-      <View style={{ position: 'absolute', left: 7, top: 12 }}>
-        <View style={{ width: 20, height: 7, borderRadius: 999, backgroundColor: '#FFFFFF', marginBottom: 4 }} />
-        <View style={{ width: 22, height: 7, borderRadius: 999, backgroundColor: '#FFFFFF', marginBottom: 4 }} />
-        <View
-          style={{
-            width: 19,
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: '#FFFFFF',
-            transform: [{ skewX: '-24deg' }],
-          }}
-        />
-      </View>
-
-      <View style={{ position: 'absolute', top: 4, right: 11, alignItems: 'center', gap: 2 }}>
-        <View style={{ width: 2, height: 7, borderRadius: 999, backgroundColor: '#FFF7E9' }} />
-        <View style={{ flexDirection: 'row', gap: 4 }}>
-          <View style={{ width: 2, height: 6, borderRadius: 999, backgroundColor: '#FFF7E9', transform: [{ rotate: '-30deg' }] }} />
-          <View style={{ width: 2, height: 6, borderRadius: 999, backgroundColor: '#FFF7E9', transform: [{ rotate: '30deg' }] }} />
-        </View>
-      </View>
-
-      <BthText
-        role="titleLg"
-        style={{
-          position: 'absolute',
-          right: 0,
-          bottom: -1,
-          fontSize: 28,
-          lineHeight: 30,
-          transform: [{ rotate: '-2deg' }],
-        }}
-      >
-        ☝️
-      </BthText>
-    </View>
+    <Ionicons name="grid-outline" size={22} color="#FF6A00" />
   );
 }
 
@@ -780,6 +753,8 @@ export function DshHomeGetScreen({
     id: promo.id,
     title: promo.title,
     subtitle: promo.subtitle,
+    image: resolveDshHomeBannerImageSource(promo.mediaKey, promo.imageUrl),
+
     imageUrl: promo.imageUrl,
     accentColor: promo.accentColor,
     onPress: resolveBannerPress(promo),
@@ -918,7 +893,7 @@ export function DshHomeGetScreen({
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ padding: spacing[3], gap: spacing[2], flexGrow: 1 }}
+        contentContainerStyle={{ paddingHorizontal: spacing[3], paddingVertical: spacing[0], gap: spacing[0], flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
         {inlineSearchVisible ? (
@@ -932,7 +907,7 @@ export function DshHomeGetScreen({
           </BthSurface>
         ) : (
           <View style={styles.carouselViewport}>
-            <HomeBannerCarousel banners={bannerItems} />
+            <HomeBannerCarousel banners={bannerItems} height={256} />
           </View>
         )}
 
@@ -953,11 +928,9 @@ export function DshHomeGetScreen({
             <View style={styles.fixedIconsContainer}>
               <Pressable style={styles.categorySelectorCard} onPress={() => setShortsVisible(true)}>
                 <View style={styles.videoIconContainer}>
-                  <View style={styles.videoPlayIcon}>
-                    <View style={styles.videoPlayTriangle} />
-                  </View>
+                  <Ionicons name="play" size={22} color="#FF6A00" />
                 </View>
-                <View style={[styles.categoryNameContainer, styles.videoNameContainer]}>
+                <View style={styles.categoryNameContainer}>
                   <BthText role="bodySm" style={styles.categoryName} numberOfLines={1}>فيديو</BthText>
                 </View>
               </Pressable>
@@ -1181,13 +1154,13 @@ export function DshHomeGetScreen({
           </ScrollView>
         </View>
 
-        <BthBox gap={3}>
+        <BthBox gap={2}>
           {visibleStores.map((store, index) => {
             const card: DshStoreCompactCardData = {
               id: store.id,
               name: store.name,
               subtitle: store.address,
-              image: { uri: store.imageUri ?? '' },
+              image: resolveDshHomeStoreImageSource(store.mediaKey, store.imageUri),
               rating: store.rating ?? null,
               distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
               isOpen: store.statusTone === 'open',
@@ -1626,7 +1599,7 @@ function createStyles(direction: Direction) {
     fontWeight: '700',
   },
   carouselViewport: {
-    gap: 4,
+    gap: 0,
     marginTop: 0,
   },
   carouselStage: {
@@ -1695,42 +1668,15 @@ function createStyles(direction: Direction) {
     transform: [{ translateY: -1 }],
   },
   videoIconContainer: {
-    width: 52,
-    height: 52,
+    width: 60,
+    height: 60,
+    borderRadius: 12,
+    backgroundColor: '#FFF4E8',
+    borderWidth: 1,
+    borderColor: '#FFD6B0',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 2,
-  },
-  videoPlayIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: '#FF6A00',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#FF6A00',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  videoPlayTriangle: {
-    width: 0,
-    height: 0,
-    backgroundColor: 'transparent',
-    borderStyle: 'solid',
-    borderLeftWidth: 14,
-    borderRightWidth: 0,
-    borderBottomWidth: 9,
-    borderTopWidth: 9,
-    borderLeftColor: '#FFFFFF',
-    borderRightColor: 'transparent',
-    borderBottomColor: 'transparent',
-    borderTopColor: 'transparent',
-    marginStart: 3,
-  },
-  videoNameContainer: {
-    backgroundColor: '#FF6A00',
   },
   categoryIconContainer: {
     width: 60,
@@ -1831,7 +1777,8 @@ function createStyles(direction: Direction) {
   },
   heroPromoCardInline: {
     flex: 1,
-    minWidth: 240,
+    minWidth: 168,
+    maxWidth: 204,
     alignSelf: 'flex-start',
   },
   heroPromoContent: {
@@ -2232,3 +2179,7 @@ function createStyles(direction: Direction) {
 }
 
 export default DshHomeGetScreen;
+
+
+
+

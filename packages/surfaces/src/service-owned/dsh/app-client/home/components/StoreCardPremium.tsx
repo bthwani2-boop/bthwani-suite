@@ -11,7 +11,7 @@ export type DshStoreCompactCardData = {
   id: string;
   name: string;
   subtitle: string;
-  image: ImageSourcePropType | { uri: string };
+  image?: ImageSourcePropType | null;
   rating?: number | null;
   distanceKm?: number | null;
   isOpen: boolean;
@@ -98,8 +98,7 @@ export const StoreCardPremium = memo(function StoreCardPremium({
   const serviceTokens = item.serviceTokens ?? buildServiceTokens(item.supportsPickup, item.supportsPartnerDelivery);
   const followersLabel = formatFollowers(item.followersCount);
   const ratingValue = item.rating == null || Number.isNaN(item.rating) ? 0 : item.rating;
-  const imageSource = typeof item.image === 'object' && 'uri' in item.image ? item.image.uri : '';
-  const hasImage = Boolean(imageSource);
+  const hasImage = Boolean(item.image);
 
   return (
     <Pressable
@@ -543,3 +542,5 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], rowDirection:
 }
 
 export default StoreCardPremium;
+
+

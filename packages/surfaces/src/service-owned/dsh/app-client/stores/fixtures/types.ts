@@ -10,6 +10,7 @@ export type DshDiscoveryStore = {
   isOffer: boolean;
   isFavorite: boolean;
   isFollowing: boolean;
+  mediaKey?: string;
   imageUri: string;
   deliveryLabel: string;
   serviceLabel: string;
@@ -53,7 +54,9 @@ export type DshStoreFixtureItem = {
   isAvailable?: boolean;
   hasOptions?: boolean;
   preparationTime?: string;
+  mediaKey?: string;
   imageUri?: string;
 };
 
 export type StoreItemsByStoreId = Record<string, DshStoreFixtureItem[]>;
+

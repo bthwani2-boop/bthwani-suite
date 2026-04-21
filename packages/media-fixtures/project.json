@@ -1,0 +1,7 @@
+{
+  "name": "media-fixtures",
+  "root": "packages/media-fixtures",
+  "sourceRoot": "packages/media-fixtures/src",
+  "projectType": "library",
+  "targets": {}
+}

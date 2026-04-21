@@ -13,7 +13,8 @@
     "docs"
   ],
   "dependencies": {
-    "@bthwani/ui-kit": "workspace:*"
+    "@bthwani/ui-kit": "workspace:*",
+    "@bthwani/media-fixtures": "workspace:*"
   },
   "exports": {
     ".": {

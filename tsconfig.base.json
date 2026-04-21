@@ -15,7 +15,10 @@
         "./packages/api-types/src/index.ts"
       ],
       "@bthwani/ui-kit": [
-        "./packages/ui-kit/src/index.ts" ], "@bthwani/ui-kit/*": [ "./packages/ui-kit/src/*.ts"
+        "./packages/ui-kit/src/index.ts"
+      ],
+      "@bthwani/ui-kit/*": [
+        "./packages/ui-kit/src/*.ts"
       ],
       "@bthwani/app-shells": [
         "./packages/app-shells/index.ts"
@@ -40,6 +43,12 @@
       ],
       "@bthwani/surfaces/composition/*": [
         "./packages/surfaces/src/composition/*"
+      ],
+      "@bthwani/media-fixtures": [
+        "packages/media-fixtures/src/index.ts"
+      ],
+      "@bthwani/media-fixtures/*": [
+        "packages/media-fixtures/src/*"
       ]
     },
     "resolveJsonModule": true,

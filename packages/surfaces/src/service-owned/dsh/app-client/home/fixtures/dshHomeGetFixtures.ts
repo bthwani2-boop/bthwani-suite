@@ -27,6 +27,8 @@ export type DshHomeGetFixtureStore = {
   isFollowing: boolean;
   hasOffer?: boolean;
   rating?: number;
+  mediaKey?: string;
+
   imageUri?: string;
   hasBthwaniPro?: boolean;
   subscriptionPackageChips?: string[];
@@ -80,6 +82,49 @@ function createBannerDataUrl(background: string, accent: string, title: string, 
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
+function createTestBannerDataUrl(): string {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680">
+      <defs>
+        <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#0D2F67" />
+          <stop offset="52%" stop-color="#143B83" />
+          <stop offset="100%" stop-color="#F97316" />
+        </linearGradient>
+        <radialGradient id="glow" cx="50%" cy="42%" r="52%">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.26" />
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="1200" height="680" rx="44" fill="url(#bg)" />
+      <circle cx="980" cy="110" r="140" fill="#ffffff" fill-opacity="0.16" />
+      <circle cx="280" cy="560" r="220" fill="#ffffff" fill-opacity="0.08" />
+      <circle cx="600" cy="340" r="250" fill="url(#glow)" />
+      <rect x="72" y="70" width="286" height="56" rx="28" fill="#ffffff" fill-opacity="0.14" />
+      <text x="214" y="108" font-family="Arial, sans-serif" font-size="30" font-weight="700" text-anchor="middle" fill="#ffffff">صورة تجريبية</text>
+      <rect x="76" y="168" width="520" height="14" rx="7" fill="#ffffff" fill-opacity="0.32" />
+      <rect x="76" y="200" width="390" height="14" rx="7" fill="#ffffff" fill-opacity="0.24" />
+      <rect x="76" y="274" width="420" height="252" rx="36" fill="#ffffff" fill-opacity="0.14" />
+      <rect x="108" y="304" width="236" height="54" rx="27" fill="#ffffff" fill-opacity="0.18" />
+      <text x="226" y="340" font-family="Arial, sans-serif" font-size="26" font-weight="700" text-anchor="middle" fill="#ffffff">إطار عرض حي</text>
+      <rect x="108" y="388" width="296" height="16" rx="8" fill="#ffffff" fill-opacity="0.28" />
+      <rect x="108" y="420" width="248" height="16" rx="8" fill="#ffffff" fill-opacity="0.20" />
+      <rect x="108" y="464" width="180" height="64" rx="32" fill="#ffffff" fill-opacity="0.18" />
+      <text x="198" y="506" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="middle" fill="#ffffff">Preview</text>
+      <rect x="644" y="126" width="476" height="430" rx="44" fill="#ffffff" fill-opacity="0.13" />
+      <circle cx="884" cy="302" r="136" fill="#ffffff" fill-opacity="0.16" />
+      <circle cx="884" cy="302" r="78" fill="#ffffff" fill-opacity="0.18" />
+      <path d="M868 248 C885 230, 913 230, 930 248 C947 266, 947 294, 930 312 C913 330, 885 330, 868 312 C851 294, 851 266, 868 248 Z" fill="#F97316" />
+      <path d="M826 362 H942" stroke="#ffffff" stroke-opacity="0.78" stroke-width="18" stroke-linecap="round" />
+      <path d="M840 404 H928" stroke="#ffffff" stroke-opacity="0.56" stroke-width="14" stroke-linecap="round" />
+      <path d="M856 438 H912" stroke="#ffffff" stroke-opacity="0.42" stroke-width="10" stroke-linecap="round" />
+      <text x="884" y="566" font-family="Arial, sans-serif" font-size="28" font-weight="700" text-anchor="middle" fill="#ffffff">DSH Test Banner</text>
+    </svg>
+  `.trim();
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
 const bannerImages = [
   createBannerDataUrl('#ff7a00', '#ff9b33', 'عروض اليوم', 'توصيل أسرع بلمسة واحدة'),
   createBannerDataUrl('#0d2f67', '#2557c9', 'مختارات DSH', 'أفضل المتاجر الأقرب لك'),
@@ -89,16 +134,18 @@ const bannerImages = [
 export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
   {
     id: 'promo-1',
+    mediaKey: 'dsh.banner.home.promo-1.v1',
     title: 'تخفيضات',
     subtitle: 'خصم 30% على أول طلب',
     icon: '🔥',
-    imageUrl: bannerImages[0],
+    imageUrl: createTestBannerDataUrl(),
     accentColor: '#ff9b33',
     actionType: 'main_category',
     actionTarget: 'restaurants',
   },
   {
     id: 'promo-2',
+    mediaKey: 'dsh.banner.home.promo-2.v1',
     title: 'تتبّع مباشر',
     subtitle: 'افتح الطلب النشط دون ضياع المسار',
     icon: '📍',
@@ -109,6 +156,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
   },
   {
     id: 'promo-3',
+    mediaKey: 'dsh.banner.home.promo-3.v1',
     title: 'الفئات المختارة',
     subtitle: 'فئات قصيرة ومباشرة من نفس الواجهة',
     icon: '✨',
@@ -120,6 +168,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
   },
   {
     id: 'promo-4',
+    mediaKey: 'dsh.banner.home.promo-4.v1',
     title: 'متجر مباشر',
     subtitle: 'افتح المتجر ثم تابع إلى القائمة',
     icon: '🏪',
@@ -130,6 +179,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
   },
   {
     id: 'promo-5',
+    mediaKey: 'dsh.banner.home.promo-5.v1',
     title: 'منتج مباشر',
     subtitle: 'افتح المنتج الجاهز للتفاعل',
     icon: '📦',
@@ -141,6 +191,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
   },
   {
     id: 'promo-6',
+    mediaKey: 'dsh.banner.home.promo-6.v1',
     title: 'قائمة المتاجر',
     subtitle: 'واجهة تجمع كل المتاجر القريبة',
     icon: '🛍️',
@@ -151,10 +202,11 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
   },
   {
     id: 'promo-7',
+    mediaKey: 'dsh.banner.home.promo-7.v1',
     title: 'اشتراك مميز',
     subtitle: 'اعرض فوائد الاشتراك مباشرة',
     icon: '⭐',
-    imageUrl: createBannerDataUrl('#7a4fff', '#9d7cff', 'اشتراك مميز', 'افتح باقة الفوائد'),
+    imageUrl: bannerImages[0],
     accentColor: '#7a4fff',
     actionType: 'subscription',
   },
@@ -178,6 +230,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: false,
     hasOffer: true,
     rating: 4.3,
+    mediaKey: 'dsh.store.hadda.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['توصيل مجاني', 'أولوية'],
@@ -200,6 +254,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: false,
     hasOffer: false,
     rating: 3.3,
+    mediaKey: 'dsh.store.hittin.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['كوبون', 'توصيل مجاني'],
@@ -223,6 +279,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: false,
     hasOffer: true,
     rating: 4.6,
+    mediaKey: 'dsh.store.malqa.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['توصيل سريع', 'أولوية'],
@@ -246,6 +304,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: true,
     hasOffer: true,
     rating: 2.8,
+    mediaKey: 'dsh.store.hadda.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['توصيل سريع', 'عروض يومية'],
@@ -268,6 +328,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: false,
     hasOffer: false,
     rating: 3.9,
+    mediaKey: 'dsh.store.hittin.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['توصيل مجاني', 'مقاضي يومية'],
@@ -291,6 +353,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: false,
     hasOffer: true,
     rating: 4.1,
+    mediaKey: 'dsh.store.malqa.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: false,
     subscriptionPackageChips: ['عصائر طازجة', 'حلويات'],
@@ -313,6 +377,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: true,
     hasOffer: false,
     rating: 3.6,
+    mediaKey: 'dsh.store.hadda.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['حلويات', 'آيسكريم'],
@@ -336,6 +402,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: true,
     hasOffer: true,
     rating: 2.7,
+    mediaKey: 'dsh.store.hittin.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: false,
     subscriptionPackageChips: ['عطور', 'ملابس'],
@@ -358,6 +426,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: false,
     hasOffer: false,
     rating: 4.0,
+    mediaKey: 'dsh.store.malqa.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['إكسسوارات', 'تجميل'],
@@ -381,6 +451,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: true,
     hasOffer: true,
     rating: 5,
+    mediaKey: 'dsh.store.hadda.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['منتجات مختارة', 'أولوية'],
@@ -403,6 +475,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: false,
     hasOffer: false,
     rating: 3.1,
+    mediaKey: 'dsh.store.hittin.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: false,
     subscriptionPackageChips: ['أسر منتجة', 'منتجات منزلية'],
@@ -426,6 +500,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: true,
     hasOffer: true,
     rating: 4.2,
+    mediaKey: 'dsh.store.malqa.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: false,
     subscriptionPackageChips: ['تعبئة', 'إصلاح'],
@@ -448,6 +524,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: false,
     hasOffer: false,
     rating: 3.0,
+    mediaKey: 'dsh.store.hadda.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['قطع غيار', 'إكسسوارات'],
@@ -471,6 +549,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: true,
     hasOffer: true,
     rating: 4.4,
+    mediaKey: 'dsh.store.hittin.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['عسل', 'تمور'],
@@ -493,6 +573,8 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     isFollowing: false,
     hasOffer: false,
     rating: 2.5,
+    mediaKey: 'dsh.store.malqa.cover.v1',
+
     imageUri: '',
     hasBthwaniPro: false,
     subscriptionPackageChips: ['إلكترونيات', 'إكسسوارات'],
@@ -500,3 +582,6 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     hasNewProducts: true,
   },
 ];
+
+
+

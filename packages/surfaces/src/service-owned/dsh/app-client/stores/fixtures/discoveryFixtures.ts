@@ -14,6 +14,7 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
     isOffer: true,
     isFavorite: true,
     isFollowing: false,
+    mediaKey: 'dsh.store.hadda.cover.v1',
     imageUri: createFixtureImageUrl('#F97316', '#FFFFFF', 'HADDA'),
     deliveryLabel: 'توصيل مجاني',
     serviceLabel: 'توصيل برو',
@@ -39,6 +40,7 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
     isOffer: false,
     isFavorite: false,
     isFollowing: false,
+    mediaKey: 'dsh.store.hittin.cover.v1',
     imageUri: createFixtureImageUrl('#D97706', '#FFFFFF', 'HITTIN'),
     deliveryLabel: 'كوبون',
     serviceLabel: 'توصيل برو',
@@ -63,6 +65,7 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
     isOffer: true,
     isFavorite: false,
     isFollowing: false,
+    mediaKey: 'dsh.store.malqa.cover.v1',
     imageUri: createFixtureImageUrl('#0F172A', '#FFFFFF', 'MALQA'),
     deliveryLabel: 'توصيل سريع',
     serviceLabel: 'توصيل برو',
@@ -77,4 +80,5 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
     supportsPartnerDelivery: true,
   },
 ];
+
 

@@ -263,8 +263,13 @@ importers:
         specifier: workspace:*
         version: link:../ui-kit
 
+  packages/media-fixtures: {}
+
   packages/surfaces:
     dependencies:
+      '@bthwani/media-fixtures':
+        specifier: workspace:*
+        version: link:../media-fixtures
       '@bthwani/ui-kit':
         specifier: workspace:*
         version: link:../ui-kit
