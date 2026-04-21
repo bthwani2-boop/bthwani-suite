@@ -1188,7 +1188,7 @@ export function DshHomeGetScreen({
               name: store.name,
               subtitle: store.address,
               image: { uri: store.imageUri ?? '' },
-              rating: store.rating ?? (store.hasOffer ? 5 : 4.8),
+              rating: store.rating ?? null,
               distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
               isOpen: store.statusTone === 'open',
               supportsPickup: true,
@@ -1667,7 +1667,7 @@ function createStyles(direction: Direction) {
   },
   categoriesSelectorRow: {
     flexDirection: rowDirection,
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 4,
   },
   categoriesSelectorScroll: {
@@ -1681,7 +1681,7 @@ function createStyles(direction: Direction) {
   },
   fixedIconsContainer: {
     flexDirection: rowDirection,
-    alignItems: 'stretch',
+    alignItems: 'flex-start',
     gap: 4,
     flexShrink: 0,
   },
@@ -1689,6 +1689,7 @@ function createStyles(direction: Direction) {
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 0,
+    alignSelf: 'flex-start',
   },
   categorySelectorCardActive: {
     transform: [{ translateY: -1 }],
@@ -1830,7 +1831,8 @@ function createStyles(direction: Direction) {
   },
   heroPromoCardInline: {
     flex: 1,
-    minWidth: 280,
+    minWidth: 240,
+    alignSelf: 'flex-start',
   },
   heroPromoContent: {
     flexDirection: rowDirection,

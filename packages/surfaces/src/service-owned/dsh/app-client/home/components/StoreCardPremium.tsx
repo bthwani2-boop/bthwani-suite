@@ -42,12 +42,12 @@ export type StoreCardPremiumProps = {
 
 const CARD_HEIGHT = 98;
 const CARD_RADIUS = 14;
-const IMAGE_SIZE = 58;
+const IMAGE_SIZE = 72;
 const STATUS_HEIGHT = 22;
 const METRICS_BAR_HEIGHT = 24;
 const SERVICE_LANE_MIN_HEIGHT = 18;
 const SUBSCRIPTION_LANE_HEIGHT = 20;
-const LEFT_COL_WIDTH = 48;
+const LEFT_COL_WIDTH = 54;
 
 function formatFollowers(value?: number): string {
   const count = Number(value ?? 0);
@@ -97,7 +97,7 @@ export const StoreCardPremium = memo(function StoreCardPremium({
   const styles = useMemo(() => createStyles(theme, rowDirection, resolveTextAlign(direction)), [direction, theme]);
   const serviceTokens = item.serviceTokens ?? buildServiceTokens(item.supportsPickup, item.supportsPartnerDelivery);
   const followersLabel = formatFollowers(item.followersCount);
-  const ratingValue = item.rating == null || Number.isNaN(item.rating) ? 5 : item.rating;
+  const ratingValue = item.rating == null || Number.isNaN(item.rating) ? 0 : item.rating;
   const imageSource = typeof item.image === 'object' && 'uri' in item.image ? item.image.uri : '';
   const hasImage = Boolean(imageSource);
 
@@ -107,8 +107,15 @@ export const StoreCardPremium = memo(function StoreCardPremium({
       onPress={() => onPress?.(item.id)}
       style={({ pressed }) => [styles.card, style, pressed && styles.cardPressed]}
     >
+      <View style={[styles.statusPill, item.isOpen ? styles.statusPillOpen : styles.statusPillClosed]}>
+        <View style={[styles.statusDot, item.isOpen ? styles.statusDotOpen : styles.statusDotClosed]} />
+        <Text style={[styles.statusText, item.isOpen ? styles.statusTextOpen : styles.statusTextClosed]}>
+          {item.isOpen ? 'مفتوح' : 'مغلق'}
+        </Text>
+      </View>
+
       <View style={styles.detailsBlock}>
-        <View style={styles.rightCol}>
+        <View style={styles.mediaCol}>
           <View style={styles.imageWrap}>
             {hasImage ? (
               <Image source={item.image} style={styles.image} resizeMode="cover" />
@@ -133,6 +140,16 @@ export const StoreCardPremium = memo(function StoreCardPremium({
           </View>
 
           <View style={styles.metricsBar}>
+            <Pressable onPress={() => onToggleFollow?.(item.id)} style={styles.followersWrap}>
+              <Text style={styles.followersText} numberOfLines={1}>{followersLabel}</Text>
+              <View style={styles.followIconWrap}>
+                <Ionicons name="people-outline" size={18} color={theme.text} style={{ transform: [{ scaleX: -1 }] }} />
+                <View style={styles.followPlusBadge}>
+                  <Ionicons name="add" size={8} color={theme.textInverse} />
+                </View>
+              </View>
+            </Pressable>
+
             <View style={styles.ratingSection}>
               <View style={styles.starRatingWrap}>
                 <View style={styles.starOutline}>
@@ -149,20 +166,10 @@ export const StoreCardPremium = memo(function StoreCardPremium({
                 </View>
               ) : null}
             </View>
-
-            <Pressable onPress={() => onToggleFollow?.(item.id)} style={styles.followersWrap}>
-              <Text style={styles.followersText} numberOfLines={1}>{followersLabel}</Text>
-              <View style={styles.followIconWrap}>
-                <Ionicons name="people-outline" size={18} color={theme.text} style={{ transform: [{ scaleX: -1 }] }} />
-                <View style={styles.followPlusBadge}>
-                  <Ionicons name="add" size={8} color={theme.textInverse} />
-                </View>
-              </View>
-            </Pressable>
           </View>
         </View>
 
-        <View style={styles.centerCol}>
+        <View style={styles.contentCol}>
           <Text numberOfLines={1} style={styles.name}>{item.name}</Text>
           <Text numberOfLines={1} style={styles.subtitle}>{item.subtitle}</Text>
 
@@ -211,13 +218,6 @@ export const StoreCardPremium = memo(function StoreCardPremium({
       </View>
 
       <View style={styles.leftCol}>
-        <View style={[styles.statusPill, item.isOpen ? styles.statusPillOpen : styles.statusPillClosed]}>
-          <View style={[styles.statusDot, item.isOpen ? styles.statusDotOpen : styles.statusDotClosed]} />
-          <Text style={[styles.statusText, item.isOpen ? styles.statusTextOpen : styles.statusTextClosed]}>
-            {item.isOpen ? 'مفتوح' : 'مغلق'}
-          </Text>
-        </View>
-
         <Pressable hitSlop={10} onPress={() => onToggleFavorite?.(item.id)} style={styles.favoriteBtn}>
           <Ionicons
             name={item.isFavorite ? 'heart' : 'heart-outline'}
@@ -240,8 +240,8 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], rowDirection:
       backgroundColor: theme.surface,
       borderWidth: 1,
       borderColor: theme.line,
-      paddingVertical: 8,
-      paddingHorizontal: 10,
+      paddingVertical: 0,
+      paddingHorizontal: 0,
       flexDirection: rowDirection,
       alignItems: 'stretch',
       shadowColor: '#000',
@@ -258,21 +258,36 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], rowDirection:
       minWidth: 0,
       alignItems: 'stretch',
     },
+    mediaCol: {
+      width: IMAGE_SIZE + 20,
+      alignItems: 'stretch',
+      justifyContent: 'space-between',
+      paddingVertical: 0,
+      paddingHorizontal: 0,
+    },
     leftCol: {
       width: LEFT_COL_WIDTH,
-      marginStart: 6,
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingVertical: 2,
+      marginStart: 0,
+      alignItems: 'flex-start',
+      justifyContent: 'flex-start',
+      paddingTop: 0,
+      paddingBottom: 8,
+      paddingHorizontal: 0,
     },
     statusPill: {
-      height: STATUS_HEIGHT,
-      paddingHorizontal: 6,
-      borderRadius: STATUS_HEIGHT / 2,
+      position: 'absolute',
+      top: -4,
+      left: -4,
+      minWidth: 50,
+      height: 26,
+      paddingHorizontal: 8,
+      borderRadius: 13,
       flexDirection: rowDirection,
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 3,
+      gap: 4,
+      zIndex: 2,
+      borderTopLeftRadius: CARD_RADIUS + 1,
     },
     statusPillOpen: {
       backgroundColor: theme.successSurface,
@@ -283,16 +298,16 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], rowDirection:
       backgroundColor: theme.danger,
     },
     statusDot: {
-      width: 5,
-      height: 5,
-      borderRadius: 2.5,
+      width: 6,
+      height: 6,
+      borderRadius: 3,
     },
     statusDotOpen: { backgroundColor: theme.success },
     statusDotClosed: { backgroundColor: theme.textInverse },
     statusText: {
-      fontSize: 9,
-      lineHeight: 11,
-      fontWeight: '700',
+      fontSize: 11,
+      lineHeight: 12,
+      fontWeight: '800',
     },
     statusTextOpen: { color: theme.successText },
     statusTextClosed: { color: theme.textInverse },
@@ -303,16 +318,13 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], rowDirection:
       justifyContent: 'center',
       marginTop: 'auto',
     },
-    rightCol: {
-      width: IMAGE_SIZE + 4,
-      marginEnd: 4,
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
     imageWrap: {
-      width: IMAGE_SIZE,
+      width: '100%',
       height: IMAGE_SIZE,
-      borderRadius: 10,
+      borderTopStartRadius: 0,
+      borderTopEndRadius: CARD_RADIUS,
+      borderBottomStartRadius: 10,
+      borderBottomEndRadius: 10,
       overflow: 'hidden',
       backgroundColor: theme.surfaceRaised,
       borderWidth: 1,
@@ -360,13 +372,13 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], rowDirection:
     metricsBar: {
       height: METRICS_BAR_HEIGHT,
       width: '100%',
-      maxWidth: IMAGE_SIZE + 4,
       flexDirection: rowDirection,
       alignItems: 'center',
       justifyContent: 'flex-start',
-      gap: 0,
+      gap: 6,
       backgroundColor: 'transparent',
       paddingHorizontal: 0,
+      transform: [{ translateX: -4 }],
     },
     ratingSection: {
       flexDirection: rowDirection,
@@ -402,6 +414,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], rowDirection:
       flexDirection: rowDirection,
       alignItems: 'center',
       gap: 2,
+      flexShrink: 0,
     },
     followersText: {
       fontSize: 10,
@@ -421,12 +434,14 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], rowDirection:
       alignItems: 'center',
       justifyContent: 'center',
     },
-    centerCol: {
+    contentCol: {
       flex: 1,
       minWidth: 0,
       justifyContent: 'space-between',
       alignItems: alignItemsDirection,
-      marginEnd: 4,
+      marginEnd: 0,
+      paddingVertical: 8,
+      paddingHorizontal: 10,
     },
     name: {
       fontSize: 15,
