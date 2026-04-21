@@ -24,7 +24,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { resolveSeedMediaSource, type BthSeedMediaKey } from '@bthwani/media-fixtures';
 import { BthButton, BthChip, BthHighlightsRail, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText, BthProductCard } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../../shared/catalog/catalog';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../fixtures';
+import { storeItemsByStoreId, type DshStoreFixtureItem as DshStoreGetMenuItem } from '../fixtures';
 import { mapMenuItemToProductCard } from '../adapters/mapMenuItemToProductCard';
 
 // Menu item type is imported from fixtures for consistency across surfaces
@@ -122,7 +122,7 @@ function normalizeFollowersLabel(label: string | undefined, suffix: string) {
     const compactValue = Number.isInteger(numericValue / 1000)
       ? `${numericValue / 1000}`
       : `${(numericValue / 1000).toFixed(1).replace(/\.0$/, '')}`;
-    return `${compactValue} ألف`;
+    return `${compactValue} ألف ${suffix || 'متابع'}`;
   }
 
   return suffix ? `${digits} ${suffix}` : digits;
@@ -412,7 +412,7 @@ function MenuItemCard({
   item: DshStoreGetMenuItem;
   isRTL: boolean;
   labels: { available: string; options: string; unavailable: string };
-  partnerImageUri?: string;
+  partnerImageUri?: ImageSourcePropType | string;
   onAddPress?: (anchor: { x: number; y: number }) => void;
   onImagePress?: (item: DshStoreGetMenuItem) => void;
   onFavoritePress?: () => void;
@@ -433,7 +433,10 @@ function MenuItemCard({
         <View style={styles.menuImageCard}>
           <View style={styles.menuPartnerTile}>
             {partnerImageUri ? (
-              <Image source={{ uri: partnerImageUri }} style={styles.menuPartnerTileImage} />
+              <Image
+                source={typeof partnerImageUri === 'string' ? { uri: partnerImageUri } : partnerImageUri}
+                style={styles.menuPartnerTileImage}
+              />
             ) : (
               <Ionicons name="storefront-outline" size={16} color={stylesTokens.orange} />
             )}
@@ -485,12 +488,15 @@ function MenuItemCard({
             ) : null}
           </View>
 
-          <View style={[styles.menuChipRow, isRTL && styles.rowReverse]}>
-            {normalizedDiscount ? (
+          {normalizedDiscount ? (
+            <View style={styles.menuDiscountRow}>
               <View style={styles.discountChip}>
                 <Text style={styles.discountChipText}>{normalizedDiscount}</Text>
               </View>
-            ) : null}
+            </View>
+          ) : null}
+
+          <View style={[styles.menuChipRow, isRTL && styles.rowReverse]}>
             {normalizedStatus ? (
               <View style={styles.smallChipPrimary}>
                 <Text style={styles.smallChipPrimaryText}>{normalizedStatus}</Text>
@@ -552,7 +558,8 @@ export function DshStoreGetScreen({
   const [cartToastVisible, setCartToastVisible] = React.useState(false);
   const [cartDecisionVisible, setCartDecisionVisible] = React.useState(false);
   const [addedItemLabel, setAddedItemLabel] = React.useState('');
-  const [previewItem, setPreviewItem] = React.useState<(DshStoreGetMenuItem & { partnerImageUri?: string }) | null>(null);
+  const [previewItem, setPreviewItem] = React.useState<(DshStoreGetMenuItem & { partnerImageUri?: ImageSourcePropType | string }) | null>(null);
+  const [isFollowingStore, setIsFollowingStore] = React.useState(false);
 
   const [favoriteIds, setFavoriteIds] = React.useState<Set<string>>(new Set());
 
@@ -565,7 +572,10 @@ export function DshStoreGetScreen({
     });
   }, []);
 
-  const openImagePreview = React.useCallback((item: DshStoreGetMenuItem, partnerImageUri?: string) => setPreviewItem({ ...item, partnerImageUri }), []);
+  const openImagePreview = React.useCallback(
+    (item: DshStoreGetMenuItem, partnerImageUri?: ImageSourcePropType | string) => setPreviewItem({ ...item, partnerImageUri }),
+    [],
+  );
   const closeImagePreview = React.useCallback(() => setPreviewItem(null), []);
 
   const deliveryModes = React.useMemo(() => getDeliveryModes(storeText), [storeText]);
@@ -578,9 +588,22 @@ export function DshStoreGetScreen({
     [storeText],
   );
 
+  const storeCoverImageSource = React.useMemo(() => (store ? resolveDshStoreCoverImageSource(store) : undefined), [store]);
+  const fallbackMenuItems = React.useMemo(() => {
+    if (menuItems.length) {
+      return menuItems;
+    }
+
+    if (store?.id && storeItemsByStoreId[store.id]?.length) {
+      return storeItemsByStoreId[store.id];
+    }
+
+    return storeItemsByStoreId['store-1001'];
+  }, [menuItems, store?.id]);
+
   const customerVisibleItems = React.useMemo(
-    () => menuItems.filter((item) => item.isAvailable !== false),
-    [menuItems],
+    () => fallbackMenuItems.filter((item) => item.isAvailable !== false),
+    [fallbackMenuItems],
   );
 
   const isOfferItem = React.useCallback((item: DshStoreGetMenuItem) => {
@@ -632,7 +655,7 @@ export function DshStoreGetScreen({
   }, [customerVisibleItems, store?.categories, isFavoriteItem, isNewItem, isOfferItem, favoriteIds]);
 
   const CARD_HEIGHT = 126;
-  const CARD_GAP = 10;
+  const CARD_GAP = 2;
   const SNAP_INTERVAL = CARD_HEIGHT + CARD_GAP;
 
   const listRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
@@ -645,7 +668,7 @@ export function DshStoreGetScreen({
   const previewRotateDeg = previewRotate.interpolate({ inputRange: [-200, 200], outputRange: ['-6deg', '6deg'], extrapolate: 'clamp' });
 
   // Staging preview (next card) shown while user drags
-  const [stagingPreviewItem, setStagingPreviewItem] = React.useState<(DshStoreGetMenuItem & { partnerImageUri?: string }) | null>(null);
+  const [stagingPreviewItem, setStagingPreviewItem] = React.useState<(DshStoreGetMenuItem & { partnerImageUri?: ImageSourcePropType | string }) | null>(null);
   const [stagingType, setStagingType] = React.useState<'category' | 'item' | null>(null);
   const [stagingSign, setStagingSign] = React.useState<number>(1);
 
@@ -663,7 +686,7 @@ export function DshStoreGetScreen({
   const prefetchedUrisRef = React.useRef<Record<string, boolean>>({});
   const stagingIdRef = React.useRef<string | null>(null);
 
-  const trySetStaging = React.useCallback((nextPreview: (DshStoreGetMenuItem & { partnerImageUri?: string }) | null, type: 'category' | 'item' | null, sign: number) => {
+  const trySetStaging = React.useCallback((nextPreview: (DshStoreGetMenuItem & { partnerImageUri?: ImageSourcePropType | string }) | null, type: 'category' | 'item' | null, sign: number) => {
     const now = Date.now();
     if (!nextPreview) {
       stagingIdRef.current = null;
@@ -830,8 +853,8 @@ export function DshStoreGetScreen({
     }
 
     const nextItem = previewItems[nextIndex];
-    setPreviewItem({ ...nextItem, partnerImageUri: store?.imageUri });
-  }, [previewCurrentIndex, previewItem, previewItems, store?.imageUri]);
+    setPreviewItem({ ...nextItem, partnerImageUri: storeCoverImageSource });
+  }, [previewCurrentIndex, previewItem, previewItems, storeCoverImageSource]);
 
   const movePreviewByCategoryOffset = React.useCallback((offset: number) => {
     if (!categories.length) {
@@ -853,9 +876,9 @@ export function DshStoreGetScreen({
 
     const nextCategoryItems = resolveItemsForCategory(nextCategoryId);
     if (nextCategoryItems.length) {
-      setPreviewItem({ ...nextCategoryItems[0], partnerImageUri: store?.imageUri });
+      setPreviewItem({ ...nextCategoryItems[0], partnerImageUri: storeCoverImageSource });
     }
-  }, [categories, changeCategory, resolveItemsForCategory, selectedCategory, store?.imageUri]);
+  }, [categories, changeCategory, resolveItemsForCategory, selectedCategory, storeCoverImageSource]);
 
   const previewPanResponder = React.useMemo(() =>
     PanResponder.create({
@@ -902,7 +925,7 @@ export function DshStoreGetScreen({
           if (candidateCatIndex !== currentCatIndex) {
             const nextCategoryItems = resolveItemsForCategory(categories[candidateCatIndex].id);
               if (nextCategoryItems.length) {
-              const nextPreview = { ...nextCategoryItems[0], partnerImageUri: store?.imageUri } as (DshStoreGetMenuItem & { partnerImageUri?: string });
+              const nextPreview = { ...nextCategoryItems[0], partnerImageUri: storeCoverImageSource } as (DshStoreGetMenuItem & { partnerImageUri?: ImageSourcePropType | string });
               trySetStaging(nextPreview, 'category', toLeft ? 1 : -1);
             } else {
               // clear staging if no candidate
@@ -919,7 +942,7 @@ export function DshStoreGetScreen({
             const toUp = dy < 0;
             const candidateItemIndex = Math.max(0, Math.min(previewItems.length - 1, previewCurrentIndex + (toUp ? 1 : -1)));
             if (candidateItemIndex !== previewCurrentIndex) {
-              const nextPreview = { ...previewItems[candidateItemIndex], partnerImageUri: store?.imageUri } as (DshStoreGetMenuItem & { partnerImageUri?: string });
+              const nextPreview = { ...previewItems[candidateItemIndex], partnerImageUri: storeCoverImageSource } as (DshStoreGetMenuItem & { partnerImageUri?: ImageSourcePropType | string });
               trySetStaging(nextPreview, 'item', toUp ? 1 : -1);
             } else {
               trySetStaging(null, null, 1);
@@ -1008,7 +1031,7 @@ export function DshStoreGetScreen({
       },
       onShouldBlockNativeResponder: () => true,
     }),
-    [isRTL, movePreviewByCategoryOffset, movePreviewByItemOffset, previewDrag, categories, selectedCategory, previewItems, previewCurrentIndex, store?.imageUri, stagingPreviewItem, stagingType]
+    [isRTL, movePreviewByCategoryOffset, movePreviewByItemOffset, previewDrag, categories, selectedCategory, previewItems, previewCurrentIndex, storeCoverImageSource, stagingPreviewItem, stagingType]
   );
 
   const activeMeasurementOptions = React.useMemo(
@@ -1198,8 +1221,8 @@ export function DshStoreGetScreen({
   }, [changeCategory, firstVisibleItem, onOpenBenefits, openStoreItemPreview]);
 
   const smartRailItems = React.useMemo(() => {
-    const featureImages = menuItems.map((item) => item.imageUri).filter((image): image is string => Boolean(image));
-    const pickFeatureImage = (index: number) => featureImages[index] ?? store.imageUri;
+    const featureImages = menuItems.map((item) => resolveDshStoreMenuItemImageSource(item));
+    const pickFeatureImage = (index: number) => featureImages[index] ?? resolveDshStoreCoverImageSource(store);
 
     const storeDriven = [
       firstVisibleItem
@@ -1254,18 +1277,18 @@ export function DshStoreGetScreen({
       .filter((item) => item.isAvailable !== false)
       .slice(0, 12)
       .map((item) => ({
-        id: `product-`,
+        id: `product-${item.id}`,
         title: normalizeDisplayText(item.name),
         subtitle: normalizeDisplayText(item.statusLabel ?? item.subtitle),
         badge: normalizeDisplayText(item.categoryLabel),
-        image: item.imageUri ?? store.imageUri,
+        image: resolveDshStoreMenuItemImageSource(item),
         emoji: getItemEmoji(item),
         cta: 'تفاصيل',
         onPress: () => openStoreItemPreview(item),
       }));
 
     return [...storeDriven, ...productDriven].slice(0, 15);
-  }, [benefitChips, changeCategory, firstNewItem, firstOfferItem, firstVisibleItem, menuItems, normalizedFollowersLabel, normalizedPriceMatchLabel, openStoreItemPreview, resolveFeaturePress, store.id, store.imageUri, store.statusLabel, storeText]);
+  }, [benefitChips, changeCategory, firstNewItem, firstOfferItem, firstVisibleItem, menuItems, normalizedFollowersLabel, normalizedPriceMatchLabel, openStoreItemPreview, resolveFeaturePress, store, storeText]);
 
   return (
     <View style={styles.screen}>
@@ -1330,134 +1353,149 @@ export function DshStoreGetScreen({
           )}
         </View>
 
-        <View style={styles.heroCard}>
-          <View style={styles.heroGlowOrb} />
-
-          <View style={[styles.heroIdentityRow, isRTL && styles.rowReverse]}>
-            <View style={styles.heroAvatar}>
-              <Ionicons name="storefront-outline" size={24} color={stylesTokens.orange} />
-              {store ? <Image source={resolveDshStoreCoverImageSource(store)} style={styles.heroAvatarImage} /> : null}
-            </View>
-
-            <View style={[styles.heroIdentityContent, isRTL && styles.heroIdentityContentRTL]}>
-              <View style={[styles.heroTopRow, isRTL && styles.rowReverse]}>
-                <View style={[styles.heroTitleInfo, isRTL && styles.heroTitleInfoRTL]}>
-                  <Text style={[styles.heroInlineName, isRTL && styles.textAlignRight]} numberOfLines={1}>
-                    {normalizedStoreName}
-                  </Text>
-                  <Text style={[styles.heroInlineSubtitle, isRTL && styles.textAlignRight]} numberOfLines={1}>
-                    {normalizedStoreSubtitle}
-                  </Text>
-                </View>
-
-                <View style={styles.heroBadgePrimary}>
-                  <Text style={styles.heroBadgePrimaryText}>{getStatusLabel(store.statusLabel, storeText)}</Text>
-                </View>
-              </View>
-
-              <View style={[styles.heroCompactMetaRow, isRTL && styles.rowReverse]}>
-                {normalizedFollowersLabel ? (
-                  <View style={styles.topMetaChip}>
-                    <Ionicons name="people-outline" size={13} color={stylesTokens.orange} />
-                    <Text style={styles.topMetaChipText}>{normalizedFollowersLabel}</Text>
-                  </View>
-                ) : null}
-                <View style={styles.topMetaChip}>
-                  <Ionicons name="time-outline" size={13} color={stylesTokens.orange} />
-                  <Text style={styles.topMetaChipText}>{normalizedEtaLabel}</Text>
-                </View>
-                <View style={styles.topMetaChip}>
-                  <Ionicons name="star" size={13} color="#f59e0b" />
-                  <Text style={styles.topMetaChipText}>{storeText.get.ratingValue}</Text>
-                </View>
-              </View>
-
-              {benefitChips.length ? (
-                <View style={styles.subscriptionBlock}>
-                  <View style={[styles.tagRow, isRTL && styles.rowReverse]}>
-                    {benefitChips.map((chip) => {
-                      const isPrimaryBenefit = chip.includes('برو') || chip.includes('مجاني');
-                      return (
-                        <View key={`${store.id}-${chip}`} style={[styles.tagChip, isPrimaryBenefit && styles.tagChipAccent]}>
-                          <Ionicons
-                            name={isPrimaryBenefit ? 'sparkles-outline' : 'checkmark-circle-outline'}
-                            size={11}
-                            color={isPrimaryBenefit ? stylesTokens.white : stylesTokens.orange}
-                          />
-                          <Text style={[styles.tagChipText, isPrimaryBenefit && styles.tagChipTextAccent]}>{chip}</Text>
-                        </View>
-                      );
-                    })}
-                  </View>
-                </View>
-              ) : null}
-            </View>
-          </View>
-
-          <View style={styles.deliveryControlCluster}>
-            <View style={styles.modeStripWrapInline}>
-              <View style={[styles.modeStrip, isRTL && styles.rowReverse]}>
-                {deliveryModes.map((mode) => (
-                  <ModePill
-                    key={mode.id}
-                    label={mode.label}
-                    icon={mode.icon}
-                    active={selectedMode === mode.id}
-                    onPress={() => setSelectedMode(mode.id)}
-                  />
-                ))}
-              </View>
-            </View>
-
-            {smartRailItems.length ? (
-              <BthHighlightsRail
-                items={smartRailItems}
-                maxItems={15}
-                variant="mediaCompact"
-                style={styles.smartRailSection}
-              />
-            ) : null}
-          </View>
-        </View>
-
-        <View style={styles.sectionBlock}>
-          <ScrollView
-            horizontal
-            ref={(r) => { chipsScrollRef.current = r; }}
-            onLayout={(e) => setChipsContainerWidth(e.nativeEvent.layout.width)}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={[styles.categoryRow, isRTL && styles.rowReverse]}
-          >
-            {categories.map((category) => {
-              const selected = selectedCategory === category.id;
-              return (
-                <View
-                  key={category.id}
-                  onLayout={(e) => {
-                    chipLayoutsRef.current[category.id] = {
-                      x: e.nativeEvent.layout.x,
-                      width: e.nativeEvent.layout.width,
-                    };
-                  }}
-                >
-                  <BthChip
-                    label={`${normalizeDisplayText(category.label)} ${CATEGORY_ICON[category.id] ?? '•'}`}
-                    selected={selected}
-                    tone="brand"
-                    onPress={() => changeCategory(category.id)}
-                  />
-                </View>
-              );
-            })}
-          </ScrollView>
-        </View>
-
         <View style={styles.feedSection}>
           <Animated.View style={[styles.feedList, { opacity: transitionAnim, transform: [{ scale: transitionAnim }] }]} {...panResponder.panHandlers}>
             <Animated.FlatList
               ref={(r) => { listRef.current = r as unknown as FlatList<DshStoreGetMenuItem> | null; }}
               data={visibleItems as DshStoreGetMenuItem[]}
               keyExtractor={(item) => (item as DshStoreGetMenuItem).id}
+              ListHeaderComponent={
+                <>
+                  <View style={styles.heroCard}>
+                    <View style={styles.heroGlowOrb} />
+
+                    <View style={[styles.heroIdentityRow, isRTL && styles.rowReverse]}>
+                      <View style={styles.heroAvatar}>
+                        <Ionicons name="storefront-outline" size={24} color={stylesTokens.orange} />
+                        {store ? <Image source={resolveDshStoreCoverImageSource(store)} style={styles.heroAvatarImage} /> : null}
+                      </View>
+
+                      <View style={[styles.heroIdentityContent, isRTL && styles.heroIdentityContentRTL]}>
+                        <View style={[styles.heroTopRow, isRTL && styles.rowReverse]}>
+                          <View style={[styles.heroTitleInfo, isRTL && styles.heroTitleInfoRTL]}>
+                            <Text style={[styles.heroInlineName, isRTL && styles.textAlignRight]} numberOfLines={1}>
+                              {normalizedStoreName}
+                            </Text>
+                            <Text style={[styles.heroInlineSubtitle, isRTL && styles.textAlignRight]} numberOfLines={1}>
+                              {normalizedStoreSubtitle}
+                            </Text>
+                          </View>
+
+                          <View style={styles.heroBadgePrimary}>
+                            <Text style={styles.heroBadgePrimaryText}>{getStatusLabel(store.statusLabel, storeText)}</Text>
+                          </View>
+                        </View>
+
+                        <View style={[styles.heroCompactMetaRow, isRTL && styles.rowReverse]}>
+                          {normalizedFollowersLabel ? (
+                            <TouchableOpacity
+                              style={[styles.topMetaChip, styles.followMetaChip, isFollowingStore && styles.followMetaChipActive]}
+                              activeOpacity={0.85}
+                              onPress={() => setIsFollowingStore((prev) => !prev)}
+                              accessibilityRole="button"
+                              accessibilityLabel={isFollowingStore ? 'تمت المتابعة' : 'متابعة المتجر'}
+                            >
+                              <Ionicons
+                                name={isFollowingStore ? 'checkmark' : 'add'}
+                                size={13}
+                                color={isFollowingStore ? stylesTokens.white : stylesTokens.orange}
+                              />
+                              <Text style={[styles.topMetaChipText, isFollowingStore && styles.followMetaChipTextActive]}>
+                                {normalizedFollowersLabel}
+                              </Text>
+                            </TouchableOpacity>
+                          ) : null}
+                          <View style={styles.topMetaChip}>
+                            <Ionicons name="time-outline" size={13} color={stylesTokens.orange} />
+                            <Text style={styles.topMetaChipText}>{normalizedEtaLabel}</Text>
+                          </View>
+                          <View style={styles.topMetaChip}>
+                            <Ionicons name="star" size={13} color="#f59e0b" />
+                            <Text style={styles.topMetaChipText}>{storeText.get.ratingValue}</Text>
+                          </View>
+                        </View>
+
+                        {benefitChips.length ? (
+                          <View style={styles.subscriptionBlock}>
+                            <View style={[styles.tagRow, isRTL && styles.rowReverse]}>
+                              {benefitChips.map((chip) => {
+                                const isPrimaryBenefit = chip.includes('برو') || chip.includes('مجاني');
+                                return (
+                                  <View key={`${store.id}-${chip}`} style={[styles.tagChip, isPrimaryBenefit && styles.tagChipAccent]}>
+                                    <Ionicons
+                                      name={isPrimaryBenefit ? 'sparkles-outline' : 'checkmark-circle-outline'}
+                                      size={11}
+                                      color={isPrimaryBenefit ? stylesTokens.white : stylesTokens.orange}
+                                    />
+                                    <Text style={[styles.tagChipText, isPrimaryBenefit && styles.tagChipTextAccent]}>{chip}</Text>
+                                  </View>
+                                );
+                              })}
+                            </View>
+                          </View>
+                        ) : null}
+                      </View>
+                    </View>
+
+                    <View style={styles.deliveryControlCluster}>
+                      <View style={styles.modeStripWrapInline}>
+                        <View style={[styles.modeStrip, isRTL && styles.rowReverse]}>
+                          {deliveryModes.map((mode) => (
+                            <ModePill
+                              key={mode.id}
+                              label={mode.label}
+                              icon={mode.icon}
+                              active={selectedMode === mode.id}
+                              onPress={() => setSelectedMode(mode.id)}
+                            />
+                          ))}
+                        </View>
+                      </View>
+
+                      {smartRailItems.length ? (
+                        <BthHighlightsRail
+                          items={smartRailItems}
+                          maxItems={15}
+                          variant="mediaCompact"
+                          style={styles.smartRailSection}
+                        />
+                      ) : null}
+                    </View>
+                  </View>
+
+                  <View style={styles.sectionBlock}>
+                    <ScrollView
+                      horizontal
+                      ref={(r) => { chipsScrollRef.current = r; }}
+                      onLayout={(e) => setChipsContainerWidth(e.nativeEvent.layout.width)}
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={[styles.categoryRow, isRTL && styles.rowReverse]}
+                    >
+                      {categories.map((category) => {
+                        const selected = selectedCategory === category.id;
+                        return (
+                          <View
+                            key={category.id}
+                            onLayout={(e) => {
+                              chipLayoutsRef.current[category.id] = {
+                                x: e.nativeEvent.layout.x,
+                                width: e.nativeEvent.layout.width,
+                              };
+                            }}
+                          >
+                            <BthChip
+                              label={`${normalizeDisplayText(category.label)} ${CATEGORY_ICON[category.id] ?? '•'}`}
+                              selected={selected}
+                              tone="brand"
+                              onPress={() => changeCategory(category.id)}
+                            />
+                          </View>
+                        );
+                      })}
+                    </ScrollView>
+                  </View>
+                </>
+              }
               renderItem={({ item, index }) => {
                 const inputRange = [(index - 1) * SNAP_INTERVAL, index * SNAP_INTERVAL, (index + 1) * SNAP_INTERVAL];
                 const scale = scrollY.interpolate({ inputRange, outputRange: [0.986, 1, 0.986], extrapolate: 'clamp' });
@@ -1476,9 +1514,9 @@ export function DshStoreGetScreen({
                             item={item}
                             isRTL={isRTL}
                             labels={itemLabels}
-                            partnerImageUri={store?.imageUri}
+                            partnerImageUri={storeCoverImageSource}
                             onAddPress={(anchor) => openMeasurementPicker(item, anchor ?? { x: 32, y: 360 })}
-                            onImagePress={(it) => openImagePreview(it, store?.imageUri)}
+                            onImagePress={(it) => openImagePreview(it, storeCoverImageSource)}
                             onFavoritePress={() => handleToggleFavorite(item.id)}
                             isFavorited={favoriteIds.has(item.id)}
                           />
@@ -1790,7 +1828,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f7f8fb',
   },
   scrollContent: {
-    paddingBottom: 28,
+    paddingBottom: 16,
   },
   rowReverse: {
     flexDirection: 'row-reverse',
@@ -1801,9 +1839,9 @@ const styles = StyleSheet.create({
 
   topChrome: {
     backgroundColor: '#f7f8fb',
-    paddingTop: Platform.OS === 'android' ? 22 : 16,
+    paddingTop: Platform.OS === 'android' ? 16 : 10,
     paddingHorizontal: 12,
-    paddingBottom: 10,
+    paddingBottom: 2,
   },
   topChromeRow: {
     flexDirection: 'row',
@@ -1811,9 +1849,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     position: 'relative',
     zIndex: 4,
-    minHeight: 76,
+    minHeight: 68,
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 6,
     backgroundColor: stylesTokens.white,
     borderRadius: 24,
     borderWidth: 1,
@@ -1908,7 +1946,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     zIndex: 8,
-    marginTop: 6,
+    marginTop: 0,
   },
   iconButton: {
     width: 42,
@@ -1943,7 +1981,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     justifyContent: 'center',
     flexShrink: 1,
-    paddingTop: 4,
+    paddingTop: 0,
   },
   titleBlockRTL: {
     alignItems: 'stretch',
@@ -1972,7 +2010,7 @@ const styles = StyleSheet.create({
     borderColor: '#fed7aa',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: 0,
   },
   headerMetaRow: {
     marginTop: 10,
@@ -1997,6 +2035,17 @@ const styles = StyleSheet.create({
     color: stylesTokens.dark,
     fontSize: 10.5,
     fontWeight: '700',
+  },
+  followMetaChip: {
+    backgroundColor: '#fffaf5',
+    borderColor: '#fed7aa',
+  },
+  followMetaChipActive: {
+    backgroundColor: stylesTokens.orange,
+    borderColor: stylesTokens.orange,
+  },
+  followMetaChipTextActive: {
+    color: stylesTokens.white,
   },
   headerMetaText: {
     color: stylesTokens.muted,
@@ -2025,12 +2074,13 @@ const styles = StyleSheet.create({
   heroCard: {
     position: 'relative',
     overflow: 'hidden',
-    marginTop: 8,
-    marginHorizontal: 12,
+    marginTop: 2,
+    marginHorizontal: 0,
+    width: '100%',
     backgroundColor: stylesTokens.white,
     borderRadius: 22,
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 4,
     borderWidth: 1,
     borderColor: stylesTokens.line,
     ...Platform.select({
@@ -2086,7 +2136,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
-    gap: 4,
+    gap: 2,
   },
   heroIdentityContentRTL: {
     alignItems: 'flex-end',
@@ -2113,7 +2163,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   heroInlineSubtitle: {
-    marginTop: 1,
+    marginTop: 0,
     color: stylesTokens.muted,
     fontSize: 10.5,
     lineHeight: 14,
@@ -2122,9 +2172,9 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
     flexWrap: 'wrap',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
   },
   heroBadgePrimary: {
     backgroundColor: '#ff6a00',
@@ -2198,11 +2248,11 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   deliveryControlCluster: {
-    marginTop: 8,
-    gap: 8,
+    marginTop: 2,
+    gap: 4,
   },
   smartRailSection: {
-    marginTop: 2,
+    marginTop: 0,
   },
   subscriptionBlock: {
     marginTop: 1,
@@ -2294,15 +2344,16 @@ const styles = StyleSheet.create({
   },
 
   sectionBlock: {
-    marginTop: 10,
-    paddingHorizontal: 12,
+    marginTop: 0,
+    paddingHorizontal: 0,
+    width: '100%',
   },
   categoryRow: {
     marginTop: 0,
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
     justifyContent: 'flex-end',
-    paddingVertical: 2,
+    paddingVertical: 0,
   },
   categoryPill: {
     backgroundColor: stylesTokens.white,
@@ -2339,12 +2390,12 @@ const styles = StyleSheet.create({
   feedSection: {
     flex: 1,
     minHeight: 0,
-    marginTop: 12,
+    marginTop: 2,
     paddingHorizontal: 12,
   },
   feedList: {
     flex: 1,
-    gap: 10,
+    gap: 2,
   },
 
   menuCard: {
@@ -2357,6 +2408,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     alignItems: 'stretch',
     height: 126,
+    overflow: 'hidden',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -2813,8 +2865,9 @@ const styles = StyleSheet.create({
   menuBody: {
     flex: 1,
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    justifyContent: 'space-between',
+    paddingVertical: 5,
+    justifyContent: 'flex-start',
+    gap: 3,
     alignItems: 'flex-end',
   },
   menuBodyRTL: {
@@ -2822,17 +2875,19 @@ const styles = StyleSheet.create({
   },
   menuInfoZone: {
     width: '100%',
-    minHeight: 60,
+    minHeight: 50,
     justifyContent: 'flex-start',
-    gap: 2,
+    gap: 1,
     alignItems: 'flex-end',
+    flexShrink: 1,
   },
   menuCommerceZone: {
     width: '100%',
     justifyContent: 'flex-start',
-    gap: 3,
+    gap: 1,
     alignItems: 'flex-end',
-    marginTop: -4,
+    marginTop: 0,
+    flexShrink: 1,
   },
   menuTitle: {
     color: stylesTokens.dark,
@@ -2863,6 +2918,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     gap: 6,
     flexWrap: 'wrap',
+    maxWidth: '100%',
   },
   menuPrice: {
     color: stylesTokens.dark,
@@ -2879,7 +2935,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fef2f2',
     borderRadius: 999,
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 2,
   },
   discountChipText: {
     color: '#dc2626',
@@ -2891,19 +2947,27 @@ const styles = StyleSheet.create({
     fontSize: 10.5,
     fontWeight: '600',
   },
+  menuDiscountRow: {
+    marginTop: 0,
+    width: '100%',
+    flexDirection: 'row-reverse',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
   menuChipRow: {
-    marginTop: -1,
-    flexDirection: 'row',
+    marginTop: 0,
+    width: '100%',
+    flexDirection: 'row-reverse',
     flexWrap: 'wrap',
-    gap: 6,
-    justifyContent: 'flex-end',
-    alignSelf: 'flex-end',
+    gap: 5,
+    justifyContent: 'flex-start',
+    alignSelf: 'stretch',
   },
   smallChipPrimary: {
     backgroundColor: stylesTokens.orangeSoft,
     borderRadius: 999,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 4,
   },
   smallChipPrimaryText: {
     color: stylesTokens.orange,
@@ -2914,7 +2978,7 @@ const styles = StyleSheet.create({
     backgroundColor: stylesTokens.chip,
     borderRadius: 999,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 4,
   },
   smallChipLightText: {
     color: stylesTokens.chipText,
@@ -3033,7 +3097,7 @@ const styles = StyleSheet.create({
   },
 
   fullMenuLink: {
-    marginTop: 14,
+    marginTop: 8,
     marginHorizontal: 12,
     alignSelf: 'center',
     flexDirection: 'row',
@@ -3052,7 +3116,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   footerNoteWrap: {
-    marginTop: 12,
+    marginTop: 8,
     paddingHorizontal: 12,
   },
 });

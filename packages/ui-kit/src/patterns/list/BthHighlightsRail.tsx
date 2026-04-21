@@ -6,6 +6,7 @@ import {
   Pressable,
   StyleSheet,
   View,
+  type ImageSourcePropType,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
@@ -23,7 +24,7 @@ export type BthHighlightsRailItem = {
   subtitle: string;
   badge?: string;
   cta?: string;
-  image?: string;
+  image?: ImageSourcePropType | string | null;
   emoji?: string;
   onPress?: () => void;
 };
@@ -106,7 +107,17 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
     return null;
   }
 
+  const resolveImageSource = (image?: ImageSourcePropType | string | null): ImageSourcePropType | undefined => {
+    if (!image) {
+      return undefined;
+    }
+
+    return typeof image === 'string' ? { uri: image } : image;
+  };
+
   const renderCard = (item: BthHighlightsRailItem, embedded = false) => {
+    const imageSource = resolveImageSource(item.image);
+
     if (compact) {
       return (
         <Pressable
@@ -123,7 +134,7 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
           <View style={[styles.imageCompactFallback, { backgroundColor: theme.brandSurface, borderColor: theme.line }]}>
             <BthText role="titleLg">{item.emoji ?? '✨'}</BthText>
           </View>
-          {item.image ? <Image source={{ uri: item.image }} style={styles.imageCompactFull} /> : null}
+          {imageSource ? <Image source={imageSource} style={styles.imageCompactFull} /> : null}
           <View style={styles.compactOverlay} />
           <View style={[styles.compactFooterGlass, { backgroundColor: colorPalette.overlaySoft }] }>
             <BthText role="label" tone="inverse" numberOfLines={2} align="center" style={styles.compactTitle}>
@@ -173,8 +184,8 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
           ) : null}
         </View>
 
-        {item.image ? (
-          <Image source={{ uri: item.image }} style={styles.image} />
+        {imageSource ? (
+          <Image source={imageSource} style={styles.image} />
         ) : (
           <View style={[styles.imageFallback, { backgroundColor: theme.brandSurface, borderColor: theme.line }]}>
             <BthText role="titleLg" tone="default">
