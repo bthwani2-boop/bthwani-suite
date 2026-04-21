@@ -22,7 +22,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { resolveSeedMediaSource, type BthSeedMediaKey } from '@bthwani/media-fixtures';
-import { BthButton, BthChip, BthHighlightsRail, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText, BthProductCard } from '@bthwani/ui-kit';
+import { BthButton, BthChip, BthHighlightsRail, BthMobileTopBar, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText, BthProductCard } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../../shared/catalog/catalog';
 import { formatDshStoreFollowersLabel } from '../../shared/store-profile';
 import { storeItemsByStoreId, type DshStoreFixtureItem as DshStoreGetMenuItem } from '../fixtures';
@@ -1300,66 +1300,67 @@ export function DshStoreGetScreen({
 
   return (
     <View style={styles.screen}>
-        <View style={styles.topChrome}>
-          {headerSearchVisible ? (
-            <View style={styles.inlineSearchShell}>
-              <View style={[styles.inlineSearchRow, isRTL && styles.rowReverse]}>
-                <TouchableOpacity
-                  style={styles.inlineSearchCloseButton}
-                  onPress={closeInlineSearch}
-                  activeOpacity={0.85}
-                >
-                  <Ionicons name="close-outline" size={20} color={stylesTokens.dark} />
-                </TouchableOpacity>
+      {headerSearchVisible ? (
+        <View style={styles.inlineSearchShell}>
+          <View style={[styles.inlineSearchRow, isRTL && styles.rowReverse]}>
+            <TouchableOpacity
+              style={styles.inlineSearchCloseButton}
+              onPress={closeInlineSearch}
+              activeOpacity={0.85}
+            >
+              <Ionicons name="close-outline" size={20} color={stylesTokens.dark} />
+            </TouchableOpacity>
 
-                <View style={styles.inlineSearchFieldWrap}>
-                  <Ionicons name="search-outline" size={18} color={stylesTokens.orange} />
-                  <TextInput
-                    value={headerSearchQuery}
-                    onChangeText={setHeaderSearchQuery}
-                    placeholder={`ابحث داخل ${normalizedStoreName}`}
-                    placeholderTextColor="#94a3b8"
-                    style={styles.inlineSearchInput}
-                    autoFocus
-                    returnKeyType="search"
-                    textAlign="right"
-                  />
-                </View>
-              </View>
-
-              <Text style={[styles.inlineSearchHint, isRTL && styles.textAlignRight]}>
-                {`بحث محلي داخل ${normalizedStoreName} فقط للوصول السريع إلى الأصناف.`}
-              </Text>
+            <View style={styles.inlineSearchFieldWrap}>
+              <Ionicons name="search-outline" size={18} color={stylesTokens.orange} />
+              <TextInput
+                value={headerSearchQuery}
+                onChangeText={setHeaderSearchQuery}
+                placeholder={`ابحث داخل ${normalizedStoreName}`}
+                placeholderTextColor="#94a3b8"
+                style={styles.inlineSearchInput}
+                autoFocus
+                returnKeyType="search"
+                textAlign="right"
+              />
             </View>
-          ) : (
-            <View style={styles.topChromeRow}>
-              <View style={styles.headerEdgeSlot}>
-                <View style={styles.actionsRow}>
-                  <IconActionButton icon="share-social-outline" onPress={handleStoreShare} />
-                  <IconActionButton icon="cart-outline" onPress={onOpenCart ?? onOpenItems} />
-                  <IconActionButton icon="search-outline" onPress={openInlineSearch} />
-                </View>
-              </View>
+          </View>
 
-              <View style={styles.titleBlock} pointerEvents="none">
-                <Text style={styles.storeName} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.82}>
-                  {normalizedStoreName}
-                </Text>
-              </View>
-
-              <View style={[styles.headerEdgeSlot, styles.headerEdgeSlotEnd]}>
-                <TouchableOpacity
-                  style={styles.backButton}
-                  onPress={onBack}
-                  activeOpacity={0.8}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color={stylesTokens.orange} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
+          <Text style={[styles.inlineSearchHint, isRTL && styles.textAlignRight]}>
+            {`بحث محلي داخل ${normalizedStoreName} فقط للوصول السريع إلى الأصناف.`}
+          </Text>
         </View>
+      ) : (
+        <BthMobileTopBar
+          title={normalizedStoreName}
+          actions={[
+            {
+              id: 'share',
+              icon: <Ionicons name="share-social-outline" size={20} color={stylesTokens.dark} />,
+              accessibilityLabel: 'مشاركة المتجر',
+              onPress: handleStoreShare,
+            },
+            {
+              id: 'cart',
+              icon: <Ionicons name="cart-outline" size={20} color={stylesTokens.dark} />,
+              accessibilityLabel: 'السلة',
+              onPress: onOpenCart ?? onOpenItems,
+            },
+            {
+              id: 'search',
+              icon: <Ionicons name="search-outline" size={20} color={stylesTokens.dark} />,
+              accessibilityLabel: 'بحث',
+              onPress: openInlineSearch,
+            },
+          ]}
+          trailingAction={{
+            id: 'back',
+            icon: <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color={stylesTokens.orange} />,
+            accessibilityLabel: 'رجوع',
+            onPress: onBack,
+          }}
+        />
+      )}
 
         <View style={styles.feedSection}>
           <Animated.View style={[styles.feedList, { opacity: transitionAnim, transform: [{ scale: transitionAnim }] }]} {...panResponder.panHandlers}>
