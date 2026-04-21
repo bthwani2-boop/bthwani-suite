@@ -1,29 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
+import { resolveSeedMediaSource, type BthSeedMediaKey } from '@bthwani/media-fixtures';
 import { Image, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-function resolveDshHomeStoreImageSource(mediaKey?: string, imageUri?: string) {
-  if (mediaKey) {
-    return resolveSeedMediaSource(mediaKey as never) as never;
-  }
-
-  if (imageUri) {
-    return { uri: imageUri };
-  }
-
-  return undefined;
-}
-function resolveDshHomeBannerImageSource(mediaKey?: string, imageUrl?: string) {
-  if (mediaKey) {
-    return resolveSeedMediaSource(mediaKey as never) as never;
-  }
-
-  if (imageUrl) {
-    return { uri: imageUrl };
-  }
-
-  return undefined;
-}
 import {
   BthUnifiedMobileTopBar,
   BthBox,
@@ -72,8 +51,21 @@ import CategoryClockDial, {
 import { getDshCategoryIconUrl } from '../../categories/utils/getDshCategoryIconUrl';
 import type { MarketingGrowthRecord } from '../../../shared/marketing/growth-store';
 
+function resolveDshHomeStoreImageSource(mediaKey?: string) {
+  if (!mediaKey) {
+    return undefined;
+  }
 
-import { resolveSeedMediaSource } from '@bthwani/media-fixtures';
+  return resolveSeedMediaSource(mediaKey as BthSeedMediaKey);
+}
+
+function resolveDshHomeBannerImageSource(mediaKey?: string) {
+  if (!mediaKey) {
+    return undefined;
+  }
+
+  return resolveSeedMediaSource(mediaKey as BthSeedMediaKey);
+}
 export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
   categories?: DshHomeCategory[];
@@ -123,6 +115,7 @@ export type DshHomeGetPromo = {
   actionType?: DshHomeBannerActionType;
   actionTarget?: string;
   actionExtra?: string;
+  mediaKey?: string;
   imageUrl?: string;
   accentColor?: string;
 };
@@ -754,8 +747,7 @@ export function DshHomeGetScreen({
     id: promo.id,
     title: promo.title,
     subtitle: promo.subtitle,
-    image: resolveDshHomeBannerImageSource(promo.mediaKey, promo.imageUrl),
-
+    image: resolveDshHomeBannerImageSource(promo.mediaKey),
     imageUrl: promo.imageUrl,
     accentColor: promo.accentColor,
     onPress: resolveBannerPress(promo),
@@ -1161,7 +1153,7 @@ export function DshHomeGetScreen({
               id: store.id,
               name: store.name,
               subtitle: store.address,
-              image: resolveDshHomeStoreImageSource(store.mediaKey, store.imageUri),
+              image: resolveDshHomeStoreImageSource(store.mediaKey),
               rating: store.rating ?? null,
               distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
               isOpen: store.statusTone === 'open',
@@ -2180,7 +2172,5 @@ function createStyles(direction: Direction) {
 }
 
 export default DshHomeGetScreen;
-
-
 
 

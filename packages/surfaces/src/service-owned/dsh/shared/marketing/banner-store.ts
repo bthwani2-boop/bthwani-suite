@@ -9,6 +9,7 @@ export type MarketingBannerRecord = {
   title: string;
   subtitle: string;
   imageUrl?: string;
+  mediaKey?: string;
   accentColor?: string;
   audience: MarketingBannerAudience;
   status: MarketingBannerStatus;
@@ -59,6 +60,7 @@ const seededBanners: MarketingBannerRecord[] = [
     title: 'تخفيضات',
     subtitle: 'خصم 30% على أول طلب',
     imageUrl: createBannerDataUrl('#f97316', '#2563eb', 'تخفيضات', 'خصم 30% على أول طلب'),
+    mediaKey: 'dsh.banner.home.promo-1.v1',
     accentColor: '#f97316',
     audience: 'all',
     status: 'published',
@@ -78,6 +80,7 @@ const seededBanners: MarketingBannerRecord[] = [
     title: 'متجر مباشر',
     subtitle: 'افتح المتجر ثم تابع إلى القائمة',
     imageUrl: createBannerDataUrl('#1d4ed8', '#0f172a', 'متجر مباشر', 'تابع الطلب من نفس المسار'),
+    mediaKey: 'dsh.banner.home.promo-2.v1',
     accentColor: '#1d4ed8',
     audience: 'stores',
     status: 'published',
@@ -97,6 +100,7 @@ const seededBanners: MarketingBannerRecord[] = [
     title: 'اشتراك مميز',
     subtitle: 'اعرض فوائد الاشتراك مباشرة',
     imageUrl: createBannerDataUrl('#dc2626', '#f59e0b', 'اشتراك مميز', 'أولوية وتوصيل أسرع'),
+    mediaKey: 'dsh.banner.home.promo-3.v1',
     accentColor: '#dc2626',
     audience: 'home',
     status: 'published',
@@ -115,6 +119,7 @@ const seededBanners: MarketingBannerRecord[] = [
     title: 'فئات الموسم',
     subtitle: 'استكشف الفئات المختارة هذا الأسبوع',
     imageUrl: createBannerDataUrl('#0f766e', '#14b8a6', 'فئات الموسم', 'انتقال مختصر إلى الفئات'),
+    mediaKey: 'dsh.banner.home.promo-4.v1',
     accentColor: '#0f766e',
     audience: 'all',
     status: 'draft',
@@ -129,6 +134,13 @@ const seededBanners: MarketingBannerRecord[] = [
   },
 ];
 
+const seededBannerMediaKeysById: Record<string, string> = {
+  'marketing-banner-hero': 'dsh.banner.home.promo-1.v1',
+  'marketing-banner-stores': 'dsh.banner.home.promo-2.v1',
+  'marketing-banner-benefits': 'dsh.banner.home.promo-3.v1',
+  'marketing-banner-draft': 'dsh.banner.home.promo-4.v1',
+};
+
 function getGlobalStore(): typeof globalThis & { [STORE_KEY]?: MarketingBannerRecord[] } {
   return globalThis as typeof globalThis & { [STORE_KEY]?: MarketingBannerRecord[] };
 }
@@ -137,6 +149,11 @@ function getMutableStore(): MarketingBannerRecord[] {
   const scope = getGlobalStore();
   if (!Array.isArray(scope[STORE_KEY]) || scope[STORE_KEY]?.length === 0) {
     scope[STORE_KEY] = seededBanners.map((item) => ({ ...item }));
+  } else {
+    scope[STORE_KEY] = scope[STORE_KEY].map((item) => ({
+      ...item,
+      mediaKey: item.mediaKey?.trim() || seededBannerMediaKeysById[item.id] || item.mediaKey,
+    }));
   }
 
   return scope[STORE_KEY] ?? [];
@@ -201,6 +218,7 @@ export function mapMarketingBannerToPromo(item: MarketingBannerRecord): DshHomeG
     actionType: item.actionType,
     actionTarget: item.actionTarget,
     actionExtra: item.actionExtra,
+    mediaKey: item.mediaKey,
     imageUrl: item.imageUrl,
     accentColor: item.accentColor,
   };
@@ -222,6 +240,7 @@ export function upsertMarketingBannerItem(item: Partial<MarketingBannerRecord>) 
     title: item.title?.trim() || existing?.title || 'بنر جديد',
     subtitle: item.subtitle?.trim() || existing?.subtitle || 'أضف نصًا مختصرًا وواضحًا هنا',
     imageUrl: item.imageUrl?.trim() || existing?.imageUrl || createBannerDataUrl(item.accentColor?.trim() || '#f97316', '#1d4ed8', item.title?.trim() || 'بنر جديد', item.subtitle?.trim() || 'أضف النص هنا'),
+    mediaKey: item.mediaKey?.trim() || existing?.mediaKey,
     accentColor: item.accentColor?.trim() || existing?.accentColor || '#f97316',
     audience: item.audience || existing?.audience || 'all',
     status: item.status || existing?.status || 'draft',

@@ -35,3 +35,6 @@ Thumbs.db
 
 # Local-only donor/service intelligence outputs
 docs/services/surfaces-legacy-trash/
+
+# Local-only media fixture assets
+packages/media-fixtures/assets/

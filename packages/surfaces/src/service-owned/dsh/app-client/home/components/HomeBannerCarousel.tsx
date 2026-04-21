@@ -221,7 +221,8 @@ export function HomeBannerCarousel({
 
   const renderItem = React.useCallback(
     ({ item, index }: { item: HomeBannerCarouselItem; index: number }) => {
-      const resolvedImageSource = item.image ?? (item.imageUrl ? { uri: item.imageUrl } : null);
+      const resolvedImageSource: ImageSourcePropType | null =
+        item.image ?? (item.imageUrl ? { uri: item.imageUrl } : null);
 
       const inputRange = [
         (index - 2) * snapInterval,
@@ -482,3 +483,5 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     },
   });
 }
+
+

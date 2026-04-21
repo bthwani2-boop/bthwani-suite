@@ -18,8 +18,10 @@ import {
   TouchableOpacity,
   View,
   type GestureResponderEvent,
+  type ImageSourcePropType,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { resolveSeedMediaSource, type BthSeedMediaKey } from '@bthwani/media-fixtures';
 import { BthButton, BthChip, BthHighlightsRail, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText, BthProductCard } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../../shared/catalog/catalog';
 import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../fixtures';
@@ -191,6 +193,71 @@ function normalizeDisplayText(value?: string) {
     .trim();
 }
 
+const DSH_STORE_PRODUCT_MEDIA_KEY_BY_CATEGORY: Record<string, BthSeedMediaKey> = {
+  fresh: 'dsh.product.apple.v1',
+  dairy: 'dsh.product.milk.v1',
+  bakery: 'dsh.product.croissant.v1',
+  meals: 'dsh.product.chicken.v1',
+  healthy: 'dsh.product.salad.v1',
+  sweets: 'dsh.product.choco.v1',
+};
+
+function resolveDshStoreMenuItemMediaKey(item: DshStoreGetMenuItem): BthSeedMediaKey {
+  const haystack = normalizeDisplayText(
+    [
+      item.id,
+      item.name,
+      item.subtitle,
+      item.categoryId,
+      item.categoryLabel,
+    ]
+      .filter(Boolean)
+      .join(' '),
+  ).toLowerCase();
+
+  if (haystack.includes('milk') || haystack.includes('حليب') || haystack.includes('ألبان')) return 'dsh.product.milk.v1';
+  if (haystack.includes('croissant') || haystack.includes('كرواسون') || haystack.includes('مخبوز')) return 'dsh.product.croissant.v1';
+  if (haystack.includes('bread') || haystack.includes('خبز')) return 'dsh.product.bread.v1';
+  if (haystack.includes('choco') || haystack.includes('شوكولات')) return 'dsh.product.choco.v1';
+  if (haystack.includes('chicken') || haystack.includes('دجاج')) return 'dsh.product.chicken.v1';
+  if (haystack.includes('pasta') || haystack.includes('باستا')) return 'dsh.product.pasta.v1';
+  if (haystack.includes('roll') || haystack.includes('لفافة')) return 'dsh.product.roll.v1';
+  if (haystack.includes('salad') || haystack.includes('سلطة')) return 'dsh.product.salad.v1';
+  if (haystack.includes('yogurt') || haystack.includes('زبادي')) return 'dsh.product.yogurt.v1';
+  if (haystack.includes('apple') || haystack.includes('تفاح')) return 'dsh.product.apple.v1';
+
+  return DSH_STORE_PRODUCT_MEDIA_KEY_BY_CATEGORY[item.categoryId] ?? 'dsh.product.apple.v1';
+}
+
+function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType {
+  return resolveSeedMediaSource(resolveDshStoreMenuItemMediaKey(item)) as ImageSourcePropType;
+}
+
+function resolveDshStoreCoverMediaKey(store?: DshStoreGetScreenProps['store']): BthSeedMediaKey {
+  const haystack = normalizeDisplayText(
+    [
+      store?.id,
+      store?.name,
+      store?.subtitle,
+    ]
+      .filter(Boolean)
+      .join(' '),
+  ).toLowerCase();
+
+  if (haystack.includes('حطين') || haystack.includes('bakery') || haystack.includes('مخبز')) {
+    return 'dsh.store.hittin.cover.v1';
+  }
+
+  if (haystack.includes('ملقا') || haystack.includes('kitchen') || haystack.includes('مطعم') || haystack.includes('مطبخ')) {
+    return 'dsh.store.malqa.cover.v1';
+  }
+
+  return 'dsh.store.hadda.cover.v1';
+}
+
+function resolveDshStoreCoverImageSource(store?: DshStoreGetScreenProps['store']): ImageSourcePropType {
+  return resolveSeedMediaSource(resolveDshStoreCoverMediaKey(store)) as ImageSourcePropType;
+}
 function getItemEmoji(item: DshStoreGetMenuItem) {
   return CATEGORY_EMOJI[item.categoryId] ?? '🍽️';
 }
@@ -249,13 +316,6 @@ function getOverlayColor(name: string, alpha = 0.88) {
   return hexToRgba(pickSampleBackgroundColor(name), alpha);
 }
 
-function sampleProductDataUri(name: string) {
-  const label = (name || 'منتج').replace(/&/g, '&amp;').slice(0, 18).toUpperCase();
-  const bg = pickSampleBackgroundColor(name);
-  const svg = `<?xml version='1.0' encoding='UTF-8'?>\n<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'>\n  <rect width='100%' height='100%' rx='36' fill='${bg}' />\n  <text x='50%' y='56%' font-family='Inter, Arial, Helvetica, sans-serif' font-size='88' font-weight='800' fill='#21313a' text-anchor='middle'>${label}</text>\n</svg>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-}
-
 function formatCurrencyValue(value: number) {
   const normalized = value % 1 === 0 ? String(value) : value.toFixed(1).replace(/\.0$/, '');
   return `${normalized} ر.ي`;
@@ -264,7 +324,6 @@ function formatCurrencyValue(value: number) {
 function resolveMeasurementUnitPrice(item: DshStoreGetMenuItem, option: string) {
   return extractPriceValue(item.priceLabel) * resolveMeasurementMultiplier(option);
 }
-
 
 function renderNonReadyState(
   state: 'loading' | 'empty' | 'error' | 'offline' | 'disabled',
@@ -382,10 +441,10 @@ function MenuItemCard({
           <Text style={styles.menuEmoji}>{getItemEmoji(item)}</Text>
           {
             (() => {
-              const imageUri = item.imageUri ?? sampleProductDataUri(normalizedName);
+              const imageSource = resolveDshStoreMenuItemImageSource(item);
               return (
                 <Pressable onPress={() => onImagePress?.(item)} style={styles.menuImagePressable} accessibilityRole="imagebutton">
-                  <Image source={{ uri: imageUri }} style={styles.menuImage} />
+                  <Image source={imageSource} style={styles.menuImage} />
                 </Pressable>
               );
             })()
@@ -1195,7 +1254,7 @@ export function DshStoreGetScreen({
       .filter((item) => item.isAvailable !== false)
       .slice(0, 12)
       .map((item) => ({
-        id: `product-${item.id}`,
+        id: `product-`,
         title: normalizeDisplayText(item.name),
         subtitle: normalizeDisplayText(item.statusLabel ?? item.subtitle),
         badge: normalizeDisplayText(item.categoryLabel),
@@ -1277,7 +1336,7 @@ export function DshStoreGetScreen({
           <View style={[styles.heroIdentityRow, isRTL && styles.rowReverse]}>
             <View style={styles.heroAvatar}>
               <Ionicons name="storefront-outline" size={24} color={stylesTokens.orange} />
-              {store.imageUri ? <Image source={{ uri: store.imageUri }} style={styles.heroAvatarImage} /> : null}
+              {store ? <Image source={resolveDshStoreCoverImageSource(store)} style={styles.heroAvatarImage} /> : null}
             </View>
 
             <View style={[styles.heroIdentityContent, isRTL && styles.heroIdentityContentRTL]}>
@@ -1500,8 +1559,8 @@ export function DshStoreGetScreen({
                   >
                     <View style={styles.previewImageWrap} pointerEvents="box-none">
                       <View style={styles.previewPartnerTile} pointerEvents="box-none">
-                        {stagingPreviewItem.partnerImageUri ? (
-                          <Image source={{ uri: stagingPreviewItem.partnerImageUri }} style={styles.previewPartnerImage} />
+                        {store ? (
+                          <Image source={resolveDshStoreCoverImageSource(store)} style={styles.previewPartnerImage} />
                         ) : (
                           <Ionicons name="storefront-outline" size={20} color={stylesTokens.orange} />
                         )}
@@ -1510,7 +1569,7 @@ export function DshStoreGetScreen({
                       <Text style={styles.previewEmoji}>{getItemEmoji(stagingPreviewItem)}</Text>
 
                       <Image
-                        source={{ uri: stagingPreviewItem.imageUri ?? sampleProductDataUri(normalizeDisplayText(stagingPreviewItem.name)) }}
+                        source={resolveDshStoreMenuItemImageSource(stagingPreviewItem)}
                         style={styles.previewImage}
                       />
 
@@ -1562,8 +1621,8 @@ export function DshStoreGetScreen({
                 <View style={styles.previewSwipeLayer} pointerEvents="auto" {...previewPanResponder.panHandlers} />
                 <View style={styles.previewImageWrap} pointerEvents="box-none">
                   <View style={styles.previewPartnerTile} pointerEvents="box-none">
-                    {previewItem!.partnerImageUri ? (
-                      <Image source={{ uri: previewItem!.partnerImageUri }} style={styles.previewPartnerImage} />
+                    {store ? (
+                      <Image source={resolveDshStoreCoverImageSource(store)} style={styles.previewPartnerImage} />
                     ) : (
                       <Ionicons name="storefront-outline" size={20} color={stylesTokens.orange} />
                     )}
@@ -1572,7 +1631,7 @@ export function DshStoreGetScreen({
                   <Text style={styles.previewEmoji}>{getItemEmoji(previewItem!)}</Text>
 
                   <Image
-                    source={{ uri: previewItem!.imageUri ?? sampleProductDataUri(normalizeDisplayText(previewItem!.name)) }}
+                    source={resolveDshStoreMenuItemImageSource(previewItem!)}
                     style={styles.previewImage}
                   />
 

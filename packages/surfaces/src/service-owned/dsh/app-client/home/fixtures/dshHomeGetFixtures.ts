@@ -1,3 +1,8 @@
+export type DshHomeGetFixtureProduct = {
+  id: string;
+  name: string;
+  mediaKey: string;
+};
 export type DshHomeGetFixturePromo = {
   id: string;
   title: string;
@@ -56,81 +61,6 @@ export const dshHomeGetFixtureTickerBanner: DshHomeGetFixtureTickerBanner = {
   closedMessage: 'خارج الدوام تظهر المساحة مغلقة مع بقاء المسارات محفوظة للعودة لاحقًا',
 };
 
-function createBannerDataUrl(background: string, accent: string, title: string, subtitle: string): string {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680">
-      <defs>
-        <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stop-color="${background}" />
-          <stop offset="100%" stop-color="#ffffff" stop-opacity="0.08" />
-        </linearGradient>
-      </defs>
-      <rect width="1200" height="680" rx="44" fill="url(#bg)" />
-      <circle cx="1060" cy="120" r="110" fill="#ffffff" fill-opacity="0.16" />
-      <circle cx="980" cy="540" r="160" fill="#ffffff" fill-opacity="0.10" />
-      <rect x="68" y="68" width="310" height="58" rx="29" fill="${accent}" fill-opacity="0.92" />
-      <text x="224" y="108" font-family="Arial, sans-serif" font-size="30" font-weight="700" text-anchor="middle" fill="#ffffff">${title}</text>
-      <text x="78" y="230" font-family="Arial, sans-serif" font-size="64" font-weight="800" fill="#ffffff">${subtitle}</text>
-      <rect x="78" y="292" width="390" height="14" rx="7" fill="#ffffff" fill-opacity="0.42" />
-      <rect x="78" y="322" width="310" height="14" rx="7" fill="#ffffff" fill-opacity="0.3" />
-      <rect x="78" y="392" width="208" height="72" rx="36" fill="#ffffff" fill-opacity="0.22" />
-      <text x="182" y="439" font-family="Arial, sans-serif" font-size="28" font-weight="700" text-anchor="middle" fill="#ffffff">تجربة أسرع</text>
-      <rect x="82" y="500" width="1020" height="96" rx="48" fill="#000000" fill-opacity="0.08" />
-    </svg>
-  `.trim();
-
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-}
-
-function createTestBannerDataUrl(): string {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680">
-      <defs>
-        <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stop-color="#0D2F67" />
-          <stop offset="52%" stop-color="#143B83" />
-          <stop offset="100%" stop-color="#F97316" />
-        </linearGradient>
-        <radialGradient id="glow" cx="50%" cy="42%" r="52%">
-          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.26" />
-          <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
-        </radialGradient>
-      </defs>
-      <rect width="1200" height="680" rx="44" fill="url(#bg)" />
-      <circle cx="980" cy="110" r="140" fill="#ffffff" fill-opacity="0.16" />
-      <circle cx="280" cy="560" r="220" fill="#ffffff" fill-opacity="0.08" />
-      <circle cx="600" cy="340" r="250" fill="url(#glow)" />
-      <rect x="72" y="70" width="286" height="56" rx="28" fill="#ffffff" fill-opacity="0.14" />
-      <text x="214" y="108" font-family="Arial, sans-serif" font-size="30" font-weight="700" text-anchor="middle" fill="#ffffff">صورة تجريبية</text>
-      <rect x="76" y="168" width="520" height="14" rx="7" fill="#ffffff" fill-opacity="0.32" />
-      <rect x="76" y="200" width="390" height="14" rx="7" fill="#ffffff" fill-opacity="0.24" />
-      <rect x="76" y="274" width="420" height="252" rx="36" fill="#ffffff" fill-opacity="0.14" />
-      <rect x="108" y="304" width="236" height="54" rx="27" fill="#ffffff" fill-opacity="0.18" />
-      <text x="226" y="340" font-family="Arial, sans-serif" font-size="26" font-weight="700" text-anchor="middle" fill="#ffffff">إطار عرض حي</text>
-      <rect x="108" y="388" width="296" height="16" rx="8" fill="#ffffff" fill-opacity="0.28" />
-      <rect x="108" y="420" width="248" height="16" rx="8" fill="#ffffff" fill-opacity="0.20" />
-      <rect x="108" y="464" width="180" height="64" rx="32" fill="#ffffff" fill-opacity="0.18" />
-      <text x="198" y="506" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="middle" fill="#ffffff">Preview</text>
-      <rect x="644" y="126" width="476" height="430" rx="44" fill="#ffffff" fill-opacity="0.13" />
-      <circle cx="884" cy="302" r="136" fill="#ffffff" fill-opacity="0.16" />
-      <circle cx="884" cy="302" r="78" fill="#ffffff" fill-opacity="0.18" />
-      <path d="M868 248 C885 230, 913 230, 930 248 C947 266, 947 294, 930 312 C913 330, 885 330, 868 312 C851 294, 851 266, 868 248 Z" fill="#F97316" />
-      <path d="M826 362 H942" stroke="#ffffff" stroke-opacity="0.78" stroke-width="18" stroke-linecap="round" />
-      <path d="M840 404 H928" stroke="#ffffff" stroke-opacity="0.56" stroke-width="14" stroke-linecap="round" />
-      <path d="M856 438 H912" stroke="#ffffff" stroke-opacity="0.42" stroke-width="10" stroke-linecap="round" />
-      <text x="884" y="566" font-family="Arial, sans-serif" font-size="28" font-weight="700" text-anchor="middle" fill="#ffffff">DSH Test Banner</text>
-    </svg>
-  `.trim();
-
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-}
-
-const bannerImages = [
-  createBannerDataUrl('#ff7a00', '#ff9b33', 'عروض اليوم', 'توصيل أسرع بلمسة واحدة'),
-  createBannerDataUrl('#0d2f67', '#2557c9', 'مختارات DSH', 'أفضل المتاجر الأقرب لك'),
-  createBannerDataUrl('#f54747', '#ff6a6a', 'خصومات مباشرة', 'تابع البنر وانتقل فورًا'),
-];
-
 export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
   {
     id: 'promo-1',
@@ -138,7 +68,6 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'تخفيضات',
     subtitle: 'خصم 30% على أول طلب',
     icon: '🔥',
-    imageUrl: createTestBannerDataUrl(),
     accentColor: '#ff9b33',
     actionType: 'main_category',
     actionTarget: 'restaurants',
@@ -149,7 +78,6 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'تتبّع مباشر',
     subtitle: 'افتح الطلب النشط دون ضياع المسار',
     icon: '📍',
-    imageUrl: bannerImages[1],
     accentColor: '#2557c9',
     actionType: 'store',
     actionTarget: 'store-1001',
@@ -160,7 +88,6 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'الفئات المختارة',
     subtitle: 'فئات قصيرة ومباشرة من نفس الواجهة',
     icon: '✨',
-    imageUrl: bannerImages[2],
     accentColor: '#ff6a6a',
     actionType: 'sub_category',
     actionTarget: 'grocery',
@@ -172,7 +99,6 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'متجر مباشر',
     subtitle: 'افتح المتجر ثم تابع إلى القائمة',
     icon: '🏪',
-    imageUrl: createBannerDataUrl('#0d2f67', '#2557c9', 'متجر مباشر', 'افتح واجهة المتجر'),
     accentColor: '#0d2f67',
     actionType: 'store',
     actionTarget: 'store-1002',
@@ -183,7 +109,6 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'منتج مباشر',
     subtitle: 'افتح المنتج الجاهز للتفاعل',
     icon: '📦',
-    imageUrl: createBannerDataUrl('#f54747', '#ff6a6a', 'منتج مباشر', 'انتقال مباشر إلى الطلب'),
     accentColor: '#f54747',
     actionType: 'product',
     actionTarget: 'item-apple-1',
@@ -195,7 +120,6 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'قائمة المتاجر',
     subtitle: 'واجهة تجمع كل المتاجر القريبة',
     icon: '🛍️',
-    imageUrl: createBannerDataUrl('#15a26b', '#30c98a', 'قائمة المتاجر', 'انتقل إلى استكشاف المتاجر'),
     accentColor: '#15a26b',
     actionType: 'external',
     actionTarget: 'DshStoresList',
@@ -206,9 +130,61 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'اشتراك مميز',
     subtitle: 'اعرض فوائد الاشتراك مباشرة',
     icon: '⭐',
-    imageUrl: bannerImages[0],
     accentColor: '#7a4fff',
     actionType: 'subscription',
+  },
+];
+
+export const dshHomeGetFixtureProducts: DshHomeGetFixtureProduct[] = [
+  {
+    id: 'home-product-1',
+    name: 'apple',
+    mediaKey: 'dsh.product.apple.v1',
+  },
+  {
+    id: 'home-product-2',
+    name: 'bread',
+    mediaKey: 'dsh.product.bread.v1',
+  },
+  {
+    id: 'home-product-3',
+    name: 'chicken',
+    mediaKey: 'dsh.product.chicken.v1',
+  },
+  {
+    id: 'home-product-4',
+    name: 'choco',
+    mediaKey: 'dsh.product.choco.v1',
+  },
+  {
+    id: 'home-product-5',
+    name: 'croissant',
+    mediaKey: 'dsh.product.croissant.v1',
+  },
+  {
+    id: 'home-product-6',
+    name: 'milk',
+    mediaKey: 'dsh.product.milk.v1',
+  },
+  {
+    id: 'home-product-7',
+    name: 'pasta',
+    mediaKey: 'dsh.product.pasta.v1',
+  },
+  {
+    id: 'home-product-8',
+    name: 'roll',
+    mediaKey: 'dsh.product.roll.v1',
+  },
+  {
+    id: 'home-product-9',
+    name: 'salad',
+    mediaKey: 'dsh.product.salad.v1',
+  },
+  {
+    id: 'home-product-10',
+    name: 'yogurt',
+    mediaKey: 'dsh.product.yogurt.v1',
   },
 ];
 
@@ -582,6 +558,5 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
     hasNewProducts: true,
   },
 ];
-
 
 
