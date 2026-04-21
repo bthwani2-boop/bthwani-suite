@@ -1,3 +1,5 @@
+import { dshDiscoveryStores, type DshDiscoveryStore } from '../../stores/fixtures/discoveryFixtures';
+
 export type DshHomeGetFixtureProduct = {
   id: string;
   name: string;
@@ -40,6 +42,37 @@ export type DshHomeGetFixtureStore = {
   hasCouponAvailable?: boolean;
   hasNewProducts?: boolean;
 };
+
+function formatDistanceLabel(distanceKm: number) {
+  return `${distanceKm.toFixed(1).replace(/\.0$/, '')} كم`;
+}
+
+function toDshHomeGetFixtureStore(store: DshDiscoveryStore): DshHomeGetFixtureStore {
+  return {
+    id: store.id,
+    name: store.name,
+    address: store.subtitle,
+    categoryId: 'restaurants',
+    statusLabel: store.statusLabel,
+    statusTone: store.statusLabel === 'مفتوح' ? 'open' : 'closed',
+    distanceLabel: formatDistanceLabel(store.distanceKm),
+    deliveryLabel: store.deliveryLabel,
+    serviceLabel: store.serviceLabel,
+    followerCount: store.followerCount,
+    multiplierLabel: store.multiplierLabel,
+    offerLabel: store.offerLabel,
+    isFavorite: store.isFavorite,
+    isFollowing: store.isFollowing,
+    hasOffer: store.isOffer,
+    rating: store.rating,
+    mediaKey: store.mediaKey,
+    imageUri: store.imageUri,
+    hasBthwaniPro: store.hasBthwaniPro,
+    subscriptionPackageChips: store.subscriptionPackageChips,
+    hasCouponAvailable: store.hasCouponAvailable,
+    hasNewProducts: store.hasNewProducts,
+  };
+}
 
 export type DshHomeGetFixtureTickerBanner = {
   id: string;
@@ -188,82 +221,7 @@ export const dshHomeGetFixtureProducts: DshHomeGetFixtureProduct[] = [
   },
 ];
 
-export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
-  {
-    id: 'store-1001',
-    name: 'مطعم القلعة',
-    address: 'شارع التحرير، صنعاء',
-    categoryId: 'restaurants',
-    statusLabel: 'مفتوح',
-    statusTone: 'open',
-    distanceLabel: '2.1 كم',
-    deliveryLabel: 'توصيل مجاني',
-    serviceLabel: 'توصيل برو',
-    followerCount: 11000,
-    multiplierLabel: 'x2',
-    offerLabel: 'خصم 20%',
-    isFavorite: true,
-    isFollowing: false,
-    hasOffer: true,
-    rating: 4.3,
-    mediaKey: 'dsh.store.hadda.cover.v1',
-
-    imageUri: '',
-    hasBthwaniPro: true,
-    subscriptionPackageChips: ['توصيل مجاني', 'أولوية'],
-    hasCouponAvailable: false,
-    hasNewProducts: true,
-  },
-  {
-    id: 'store-1002',
-    name: 'مطاعم الأرض الخضراء',
-    address: 'شارع حدة، جوار البنك',
-    categoryId: 'restaurants',
-    statusLabel: 'مفتوح',
-    statusTone: 'open',
-    distanceLabel: '1.8 كم',
-    deliveryLabel: 'كوبون',
-    serviceLabel: 'توصيل برو',
-    followerCount: 9000,
-    multiplierLabel: 'x1',
-    isFavorite: false,
-    isFollowing: false,
-    hasOffer: false,
-    rating: 3.3,
-    mediaKey: 'dsh.store.hittin.cover.v1',
-
-    imageUri: '',
-    hasBthwaniPro: true,
-    subscriptionPackageChips: ['كوبون', 'توصيل مجاني'],
-    hasCouponAvailable: true,
-    hasNewProducts: false,
-  },
-  {
-    id: 'store-1003',
-    name: 'مؤسسة الشيباني للمطاعم',
-    address: 'شارع الزبيري، أمام الجامعة',
-    categoryId: 'restaurants',
-    statusLabel: 'مغلق',
-    statusTone: 'closed',
-    distanceLabel: '3.5 كم',
-    deliveryLabel: 'توصيل سريع',
-    serviceLabel: 'توصيل برو',
-    followerCount: 9000,
-    multiplierLabel: 'x3',
-    offerLabel: 'خصم 15%',
-    isFavorite: true,
-    isFollowing: false,
-    hasOffer: true,
-    rating: 4.6,
-    mediaKey: 'dsh.store.malqa.cover.v1',
-
-    imageUri: '',
-    hasBthwaniPro: true,
-    subscriptionPackageChips: ['توصيل سريع', 'أولوية'],
-    hasCouponAvailable: false,
-    hasNewProducts: true,
-  },
-  {
+export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = dshDiscoveryStores.map(toDshHomeGetFixtureStore);
     id: 'store-2001',
     name: 'سوبر ماركت النور',
     address: 'حي النصر، شارع الستين',

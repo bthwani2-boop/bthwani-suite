@@ -1,3 +1,4 @@
+import { dshDiscoveryStores } from '../../stores/fixtures/discoveryFixtures';
 import type {
   DshHomeCategory,
   DshHomeGetPromo,
@@ -56,38 +57,16 @@ export const defaultPromos: DshHomePromo[] = [
   },
 ];
 
-export const defaultStores: DshHomeStore[] = [
-  {
-    id: 'store-1001',
-    name: 'سوق العليا الطازج',
-    subtitle: 'بقالة واحتياجات يومية',
-    statusLabel: 'مفتوح',
-    meta: 'متوقع 18 دقيقة',
-    etaMinutes: 18,
-    hasOffer: true,
-    isFavorite: true,
-  },
-  {
-    id: 'store-1002',
-    name: 'مخبز حطين',
-    subtitle: 'خبز ومعجنات',
-    statusLabel: 'مفتوح',
-    meta: 'متوقع 25 دقيقة',
-    etaMinutes: 25,
-    hasOffer: false,
-    isFavorite: false,
-  },
-  {
-    id: 'store-1003',
-    name: 'مطبخ الملقا',
-    subtitle: 'وجبات جاهزة',
-    statusLabel: 'مشغول',
-    meta: 'متوقع 32 دقيقة',
-    etaMinutes: 32,
-    hasOffer: true,
-    isFavorite: false,
-  },
-];
+export const defaultStores: DshHomeStore[] = dshDiscoveryStores.map((store) => ({
+  id: store.id,
+  name: store.name,
+  subtitle: store.subtitle,
+  statusLabel: store.statusLabel,
+  meta: `متوقع ${store.etaMinutes} دقيقة`,
+  etaMinutes: store.etaMinutes,
+  hasOffer: store.isOffer,
+  isFavorite: store.isFavorite,
+}));
 
 export function toRecentOrders(featuredStores: DshHomeStore[]): DshHomeRecentOrder[] {
   return featuredStores.slice(0, 3).map((store, index) => ({

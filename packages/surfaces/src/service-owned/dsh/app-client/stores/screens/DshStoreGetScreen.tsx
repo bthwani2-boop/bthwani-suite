@@ -24,6 +24,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { resolveSeedMediaSource, type BthSeedMediaKey } from '@bthwani/media-fixtures';
 import { BthButton, BthChip, BthHighlightsRail, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText, BthProductCard } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../../shared/catalog/catalog';
+import { formatDshStoreFollowersLabel } from '../../shared/store-profile';
 import { storeItemsByStoreId, type DshStoreFixtureItem as DshStoreGetMenuItem } from '../fixtures';
 import { mapMenuItemToProductCard } from '../adapters/mapMenuItemToProductCard';
 
@@ -38,6 +39,7 @@ export type DshStoreGetScreenProps = {
     statusLabel: string;
     etaLabel: string;
     deliveryFeeLabel: string;
+    followersCount?: number;
     followersLabel?: string;
     priceMatchLabel?: string;
     imageUri?: string;
@@ -107,22 +109,28 @@ function getStatusLabel(statusLabel: string, storeText: ReturnType<typeof useUiT
   return normalizeDisplayText(statusLabel) || storeText.get.platformDelivery;
 }
 
-function normalizeFollowersLabel(label: string | undefined, suffix: string) {
-  if (!label) {
+function normalizeFollowersLabel(value: number | string | undefined, suffix: string) {
+  if (typeof value === 'number') {
+    return formatDshStoreFollowersLabel(value, suffix);
+  }
+
+  if (!value) {
     return undefined;
   }
 
-  const digits = label.match(/[\d.,]+/g)?.join('')?.trim();
+  const normalizedValue = normalizeDisplayText(value);
+  if (normalizedValue.includes('ألف') || normalizedValue.includes('مليون')) {
+    return normalizedValue;
+  }
+
+  const digits = normalizedValue.match(/[\d.,]+/g)?.join('')?.trim();
   if (!digits) {
-    return label;
+    return normalizedValue;
   }
 
   const numericValue = Number(digits.replace(/,/g, ''));
   if (Number.isFinite(numericValue) && numericValue >= 1000) {
-    const compactValue = Number.isInteger(numericValue / 1000)
-      ? `${numericValue / 1000}`
-      : `${(numericValue / 1000).toFixed(1).replace(/\.0$/, '')}`;
-    return `${compactValue} ألف ${suffix || 'متابع'}`;
+    return formatDshStoreFollowersLabel(numericValue, suffix);
   }
 
   return suffix ? `${digits} ${suffix}` : digits;
@@ -1124,7 +1132,7 @@ export function DshStoreGetScreen({
     );
   }
 
-  const normalizedFollowersLabel = normalizeFollowersLabel(store.followersLabel, storeText.get.followersSuffix);
+  const normalizedFollowersLabel = normalizeFollowersLabel(store.followersCount ?? store.followersLabel, storeText.get.followersSuffix);
   const normalizedPriceMatchLabel = normalizePriceMatchLabel(store.priceMatchLabel, storeText.get.priceMatch);
   const normalizedStoreName = normalizeDisplayText(store.name);
   const normalizedStoreSubtitle = normalizeDisplayText(store.subtitle);

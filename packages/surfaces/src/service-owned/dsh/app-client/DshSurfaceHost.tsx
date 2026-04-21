@@ -608,9 +608,9 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
           subtitle: activeStore.subtitle,
           statusLabel: activeStore.statusLabel,
           etaLabel: activeStore.meta,
-          deliveryFeeLabel: 'رسوم التوصيل 12 ر.ي',
-          followersLabel: `${activeStore.followerCount.toLocaleString()} متابع`,
-          priceMatchLabel: 'الأسعار مطابقة للمطعم',
+          deliveryFeeLabel: activeStore.deliveryFeeLabel ?? 'رسوم التوصيل 12 ر.ي',
+          followersCount: activeStore.followerCount,
+          priceMatchLabel: activeStore.priceMatchLabel ?? 'الأسعار مطابقة للمطعم',
           imageUri: activeStore.imageUri,
           deliveryLabel: activeStore.deliveryLabel,
           serviceLabel: activeStore.serviceLabel,
@@ -733,7 +733,12 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
     return (
       <DshFavoritesListScreen
         items={[
-          { id: 'store-1001', name: 'أسواق العليا الطازجة', subtitle: 'مقاضي يومية ومنتجات طازجة', meta: 'متجر مفضل' },
+          {
+            id: activeStore.id,
+            name: activeStore.name,
+            subtitle: activeStore.subtitle,
+            meta: activeStore.isFavorite ? 'متجر مفضل' : 'متجر محفوظ',
+          },
           { id: 'item-apple-1', name: 'تفاح رويال غالا', subtitle: 'صندوق طازج 1 كجم', meta: 'عنصر محفوظ' },
         ]}
         onOpenItem={() => setRoute('favorite-toggle')}

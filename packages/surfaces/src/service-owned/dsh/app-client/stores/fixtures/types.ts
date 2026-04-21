@@ -16,6 +16,8 @@ export type DshDiscoveryStore = {
   serviceLabel: string;
   followerCount: number;
   multiplierLabel: string;
+  deliveryFeeLabel?: string;
+  priceMatchLabel?: string;
   subscriptionPackageChips: string[];
   offerLabel?: string;
   hasBthwaniPro: boolean;

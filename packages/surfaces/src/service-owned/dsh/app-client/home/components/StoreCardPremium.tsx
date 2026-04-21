@@ -2,6 +2,7 @@ import React, { memo, useMemo } from 'react';
 import { Image, Pressable, StyleSheet, Text, View, type ImageSourcePropType, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { resolveRowDirection, resolveTextAlign, useDirection, useTheme } from '@bthwani/ui-kit';
+import { formatDshStoreFollowerCount } from '../../shared/store-profile';
 
 export type ServiceToken = {
   label: string;
@@ -49,17 +50,6 @@ const SERVICE_LANE_MIN_HEIGHT = 18;
 const SUBSCRIPTION_LANE_HEIGHT = 20;
 const LEFT_COL_WIDTH = 54;
 
-function formatFollowers(value?: number): string {
-  const count = Number(value ?? 0);
-  if (count >= 1_000_000) {
-    return `${Math.round(count / 1_000_000)} مليون`;
-  }
-  if (count >= 1_000) {
-    return `${Math.round(count / 1_000)} ألف`;
-  }
-  return `${count}`;
-}
-
 function formatDistance(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) {
     return '—';
@@ -96,7 +86,7 @@ export const StoreCardPremium = memo(function StoreCardPremium({
   const rowDirection = resolveRowDirection(direction);
   const styles = useMemo(() => createStyles(theme, rowDirection, resolveTextAlign(direction)), [direction, theme]);
   const serviceTokens = item.serviceTokens ?? buildServiceTokens(item.supportsPickup, item.supportsPartnerDelivery);
-  const followersLabel = formatFollowers(item.followersCount);
+  const followersLabel = formatDshStoreFollowerCount(item.followersCount);
   const ratingValue = item.rating == null || Number.isNaN(item.rating) ? 0 : item.rating;
   const hasImage = Boolean(item.image);
 
