@@ -1846,9 +1846,9 @@ const styles = StyleSheet.create({
   },
 
   topChrome: {
-    backgroundColor: '#f7f8fb',
-    paddingTop: Platform.OS === 'android' ? 16 : 10,
-    paddingHorizontal: 12,
+    backgroundColor: stylesTokens.white,
+    paddingTop: 0,
+    paddingHorizontal: 0,
     paddingBottom: 2,
   },
   topChromeRow: {
@@ -1857,11 +1857,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     position: 'relative',
     zIndex: 4,
-    minHeight: 68,
+    minHeight: 76,
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingTop: 22,
+    paddingBottom: 4,
     backgroundColor: stylesTokens.white,
-    borderRadius: 24,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     borderWidth: 1,
     borderColor: '#edf0f5',
     ...Platform.select({
@@ -2261,6 +2265,8 @@ const styles = StyleSheet.create({
   },
   smartRailSection: {
     marginTop: 0,
+    marginHorizontal: -12,
+    marginBottom: -6,
   },
   subscriptionBlock: {
     marginTop: 1,

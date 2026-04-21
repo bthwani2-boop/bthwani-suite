@@ -222,6 +222,8 @@ export const dshHomeGetFixtureProducts: DshHomeGetFixtureProduct[] = [
 ];
 
 export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = dshDiscoveryStores.map(toDshHomeGetFixtureStore);
+export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
+  {
     id: 'store-2001',
     name: 'سوبر ماركت النور',
     address: 'حي النصر، شارع الستين',

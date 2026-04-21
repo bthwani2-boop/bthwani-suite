@@ -15,7 +15,6 @@ import { useDirection, useTheme } from '../../hooks';
 import { BthText } from '../../primitives';
 
 const cardWidth = Dimensions.get('window').width - 28;
-const compactCardWidth = 168;
 const compactGap = 10;
 
 export type BthHighlightsRailItem = {
@@ -43,8 +42,9 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
   const compact = variant === 'mediaCompact';
   const visibleItems = items.slice(0, maxItems);
   const [railWidth, setRailWidth] = React.useState(Dimensions.get('window').width);
+  const compactCardWidth = compact ? Math.max(216, Math.round(railWidth * 0.64)) : 168;
   const compactStep = compactCardWidth + compactGap;
-  const compactPeekInset = Math.max(0, Math.round((railWidth - compactCardWidth) / 2));
+  const compactPeekInset = compact ? Math.max(0, Math.round((railWidth - compactCardWidth) / 2)) : 0;
   const compactLoopItems = React.useMemo(
     () => (compact && visibleItems.length > 1
       ? [...visibleItems, ...visibleItems, ...visibleItems, ...visibleItems, ...visibleItems]
@@ -66,7 +66,7 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
     }, 0);
 
     const timer = setInterval(() => {
-      autoIndexRef.current += 1;
+      autoIndexRef.current -= 1;
       listRef.current?.scrollToOffset({ offset: autoIndexRef.current * compactStep, animated: true });
     }, 2400);
 
@@ -125,6 +125,7 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
           onPress={item.onPress}
           style={[
             styles.cardCompact,
+            { width: compactCardWidth },
             {
               backgroundColor: theme.surfaceRaised,
               borderColor: theme.line,
@@ -212,7 +213,7 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
         keyExtractor={(item, index) => (compact ? `${item.id}-${index}` : item.id)}
         contentContainerStyle={compact ? [styles.listContentCompact, { paddingHorizontal: compactPeekInset }] : styles.listContent}
         snapToInterval={compact ? compactStep : cardWidth + 12}
-        snapToAlignment="start"
+        snapToAlignment={compact ? 'center' : 'start'}
         decelerationRate="fast"
         disableIntervalMomentum
         bounces={false}
@@ -252,8 +253,8 @@ const styles = StyleSheet.create({
     minHeight: 84,
   },
   cardCompact: {
-    width: compactCardWidth,
-    minHeight: 136,
+    width: 168,
+    minHeight: 148,
     borderRadius: 18,
     borderWidth: 1,
     overflow: 'hidden',
@@ -282,11 +283,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    minHeight: 44,
+    minHeight: 48,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 11,
     justifyContent: 'center',
     alignItems: 'center',
     borderTopWidth: 1,
