@@ -38,3 +38,5 @@ docs/services/surfaces-legacy-trash/
 
 # Local-only media fixture assets
 packages/media-fixtures/assets/
+# Local Python virtual environments
+.venv/
