@@ -730,8 +730,7 @@
                 ".": "./src/index.ts",
                 "./web": "./src/web.ts",
                 "./mobile": "./src/mobile.ts",
-                "./next": "./src/next.ts",
-                "./preview": "./src/preview.ts"
+                "./next": "./src/next.ts"
               },
               "packageMain": "./src/index.ts",
               "isInPackageManagerWorkspaces": true

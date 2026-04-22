@@ -120,5 +120,3 @@ Screens may own:
 - screen-specific content
 - rare specialized UI that is not yet canonical
 
-- hosted preview boundary: `packages/ui-kit/docs/HOSTED_PREVIEW_BOUNDARY_DECISION.md`
-

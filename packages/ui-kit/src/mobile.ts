@@ -1,1 +1,1 @@
-export * from './root/mobile/BthMobileRoot';
+export * from './BthMobileRoot';

@@ -13,4 +13,4 @@
  * from the existing compatibility source until the family is physically merged.
  */
 
-export * from './components/navigation/BthTopBar';
+export { BthNewsTickerBar, BthScreenHeader, BthSectionHeader, BthTabs, LegacyBthTopBar as BthTopBar } from './components';

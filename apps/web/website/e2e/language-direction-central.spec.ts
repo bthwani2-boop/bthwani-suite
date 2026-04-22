@@ -14,22 +14,6 @@ const rootContractFiles = [
 ];
 
 test.describe('central language and direction governance', () => {
-  test('ui-kit preview flips direction with language only', async ({ page }) => {
-    await page.goto('/ui-kit?theme=light&section=lab&language=ar');
-
-    const previewSurface = page.getByTestId('ui-kit-preview-surface');
-    await expect(previewSurface).toHaveAttribute('data-preview-language', 'ar');
-    await expect(previewSurface).toHaveAttribute('data-preview-direction', 'rtl');
-
-    await page.getByRole('button', { name: 'English' }).click();
-    await expect(previewSurface).toHaveAttribute('data-preview-language', 'en');
-    await expect(previewSurface).toHaveAttribute('data-preview-direction', 'ltr');
-
-    await page.getByRole('button', { name: 'Arabic' }).click();
-    await expect(previewSurface).toHaveAttribute('data-preview-language', 'ar');
-    await expect(previewSurface).toHaveAttribute('data-preview-direction', 'rtl');
-  });
-
   test('all app roots avoid local direction overrides', async () => {
     for (const relativePath of rootContractFiles) {
       const filePath = path.join(repoRoot, relativePath);

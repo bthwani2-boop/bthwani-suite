@@ -29,7 +29,7 @@ export default defineConfig({
   webServer: {
     command: 'pnpm start',
     cwd: __dirname,
-    url: 'http://127.0.0.1:3002/ui-kit',
+    url: 'http://127.0.0.1:3002',
     reuseExistingServer: true,
     timeout: 120_000,
   },

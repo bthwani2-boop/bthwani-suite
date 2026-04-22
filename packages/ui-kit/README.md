@@ -44,9 +44,8 @@
 
 ## Proof stack
 
-- live lab exports: `BthComponentLab`, `BthStateGallery`
-- hosted preview route: `website:/ui-kit`
-- visual regression and interaction proof: `apps/web/website/playwright.config.ts` and `apps/web/website/e2e/ui-kit-preview.spec.ts`
+- generated proof artifacts: `packages/ui-kit/docs/generated`
+- visual regression and interaction proof: `apps/web/website/playwright.config.ts` and `packages/ui-kit/docs/generated`
 - verification targets: `pnpm nx run ui-kit:typecheck`, `pnpm nx run ui-kit:build-outputs`, `pnpm nx run ui-kit:proof`
 
 ## Phase boundary note
@@ -57,5 +56,4 @@ Phase 06 authorizes foundation hardening, primitives, direction, and shared stat
 
 This package should eliminate local visual drift by making theme, typography, direction, state framing, and baseline building blocks flow from a single shared owner instead of being recreated per surface.
 
-- hosted preview boundary: `packages/ui-kit/docs/HOSTED_PREVIEW_BOUNDARY_DECISION.md`
 

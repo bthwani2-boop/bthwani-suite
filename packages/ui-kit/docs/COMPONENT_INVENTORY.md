@@ -69,19 +69,12 @@ Execution plan: [BTH_UI_KIT_SUPREME_EXECUTION_PLAN_2026_AR.md](./BTH_UI_KIT_SUPR
 
 ### Quality Proof Assets
 
-- BthComponentLab
-- BthStateGallery
-- proof/manifest
-- hosted preview route: website `/ui-kit`
 - docs/generated/token-output.css
 - docs/generated/theme-output.css
 - docs/generated/native-tokens.json
 - docs/generated/native-themes.json
 - docs/generated/proof-manifest.json
 - docs/generated/proof-manifest.md
-- docs/generated/visual-regression/ui-kit-preview-light.png
-- docs/generated/visual-regression/ui-kit-preview-dark.png
-- docs/generated/visual-regression/ui-kit-preview-high-contrast.png
 - docs/generated/playwright-report/index.html
 
 ## Deferred For Later Screen-Proven Review

@@ -1,2 +1,2 @@
-export { BthWebRootLayout } from './root/web/BthWebRootLayout';
-export { BthWebDocumentShell } from './root/web/BthWebDocumentShell';
+export { BthWebRootLayout } from './BthWebRootLayout';
+export { BthWebDocumentShell } from './BthWebDocumentShell';
