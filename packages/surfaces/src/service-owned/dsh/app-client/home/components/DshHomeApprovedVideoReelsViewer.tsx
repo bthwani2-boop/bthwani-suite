@@ -1,3 +1,4 @@
+import { Video as ExpoVideo } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
@@ -40,15 +41,11 @@ function clampIndex(index: number, length: number) {
 }
 
 type ExpoAvModule = {
-  Video?: React.ComponentType<any>;
+  Video?: typeof ExpoVideo;
 };
 
 function resolveExpoAv(): ExpoAvModule | null {
-  try {
-    return require('expo-av') as ExpoAvModule;
-  } catch {
-    return null;
-  }
+  return { Video: ExpoVideo };
 }
 
 export function DshHomeApprovedVideoReelsViewer({

@@ -10,5 +10,5 @@ type Props = {
 };
 
 export default function DshWltPaymentOption({ title, subtitle, selected, meta, onPress }: Props) {
-  return <BthListItem title={title} subtitle={subtitle} meta={selected ? 'Selected' : (meta as any)} onPress={onPress} />;
+  return <BthListItem title={title} subtitle={subtitle} meta={selected ? 'Selected' : meta == null ? undefined : String(meta)} onPress={onPress} />;
 }

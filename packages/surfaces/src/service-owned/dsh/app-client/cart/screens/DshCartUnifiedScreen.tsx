@@ -53,8 +53,48 @@ async function localTopUpWallet(amountHalalas: number) {
   return { success: true, balance: newBal };
 }
 
-export default function DshCartUnifiedScreen(props: any) {
-  const [items, setItems] = useState<any[]>(
+type DshCartItem = {
+  id: string;
+  title: string;
+  priceValue: number;
+  qty?: number;
+};
+
+type DshCartUnifiedScreenProps = {
+  items?: DshCartItem[];
+};
+
+type DshCartIconName = React.ComponentProps<typeof Ionicons>['name'];
+
+type HeaderIconButtonProps = {
+  icon: DshCartIconName;
+  background: string;
+  color: string;
+  size?: number;
+  onPress?: () => void;
+};
+
+type ActionRowProps = {
+  id: string;
+  icon: DshCartIconName;
+  title: string;
+  subtitle?: string;
+  actionLabel?: string;
+  actionColor?: string;
+};
+
+type PaymentRowProps = {
+  icon: DshCartIconName;
+  title: string;
+  subtitle?: string;
+  checked: boolean;
+  actionLabel?: string;
+  onAction?: () => void;
+  onSelect?: () => void;
+};
+
+export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps = {}) {
+  const [items, setItems] = useState<DshCartItem[]>(
     props.items ?? [
       { id: 'p1', title: 'دجاج فحم تركي مع التوابع', priceValue: 3000, qty: 1 },
       { id: 'p2', title: 'كريسبي رول مفرد', priceValue: 1500, qty: 2 },
@@ -97,7 +137,7 @@ export default function DshCartUnifiedScreen(props: any) {
     setItems((prev) => prev.filter((item) => item.id !== id));
   }, []);
 
-  function HeaderIconButton({ icon, background, color, size = 42, onPress }: { icon: any; background: string; color: string; size?: number; onPress?: () => void }) {
+  function HeaderIconButton({ icon, background, color, size = 42, onPress }: HeaderIconButtonProps) {
     return (
       <Pressable onPress={onPress} style={({ pressed }) => ({ width: size, height: size, borderRadius: size / 2, backgroundColor: background, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.82 : 1 })}>
         <Ionicons name={icon} size={Math.max(16, Math.round(size * 0.43))} color={color} />
@@ -153,7 +193,7 @@ export default function DshCartUnifiedScreen(props: any) {
     );
   }
 
-  function ActionRow({ id, icon, title, subtitle, actionLabel, actionColor = LINK_BLUE }: any) {
+  function ActionRow({ id, icon, title, subtitle, actionLabel, actionColor = LINK_BLUE }: ActionRowProps) {
     const selected = activeQuickAction === id;
     return (
       <Pressable onPress={() => setActiveQuickAction(id)} style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingVertical: spacing[1], paddingHorizontal: spacing[1], minHeight: 54, borderBottomWidth: 1, borderColor: '#E5E7EB', backgroundColor: selected ? colorPalette.brandSoft : 'transparent' }}>
@@ -216,7 +256,7 @@ export default function DshCartUnifiedScreen(props: any) {
     );
   }
 
-  function PaymentRow({ icon, title, subtitle, checked, actionLabel, onAction, onSelect }: any) {
+  function PaymentRow({ icon, title, subtitle, checked, actionLabel, onAction, onSelect }: PaymentRowProps) {
     return (
       <Pressable onPress={onSelect} style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingVertical: spacing[1], opacity: checked ? 1 : 0.98 }}>
         <View style={{ width: 30, alignItems: 'flex-end' }}>

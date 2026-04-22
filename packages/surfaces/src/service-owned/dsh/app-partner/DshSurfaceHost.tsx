@@ -15,7 +15,7 @@ export type DshCommandTarget = 'home' | 'orders-inbox' | 'order-detail' | 'store
 type DshNavigationCommand = {
   token: number;
   target: DshCommandTarget;
-  payload?: any;
+  payload?: unknown;
 };
 
 type DshSurfaceHostProps = {

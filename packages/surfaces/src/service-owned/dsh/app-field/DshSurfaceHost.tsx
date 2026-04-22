@@ -15,7 +15,7 @@ export type DshCommandTarget = 'home' | 'store-activation' | 'visit-log' | 'geo-
 type DshNavigationCommand = {
   token: number;
   target: DshCommandTarget;
-  payload?: any;
+  payload?: unknown;
 };
 
 type DshSurfaceHostProps = {

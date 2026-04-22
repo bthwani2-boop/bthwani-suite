@@ -2,6 +2,13 @@ import React from 'react';
 import { View, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { BthBadge, BthButton, BthSurface, BthText, spacing, useTheme } from '@bthwani/ui-kit';
 
+type ClientEntryThemeShape = {
+  brand?: string;
+  textMuted?: string;
+  surfaceContrast?: string;
+};
+
+
 export type ClientEntrySurfaceProps = {
   appName?: string;
   userLabel?: string;
@@ -31,9 +38,10 @@ export function ClientEntrySurface({
   const { theme } = useTheme();
 
   // theme may not expose every token on the TS type; cast to any for optional tokens
-  const brandColor = (theme as any).brand ?? '#F37021';
-  const mutedText = (theme as any).textMuted ?? '#8A8F98';
-  const surfaceContrast = (theme as any).surfaceContrast ?? '#FFFFFF';
+  const clientEntryTheme = theme as ClientEntryThemeShape;
+  const brandColor = clientEntryTheme.brand ?? '#F37021';
+  const mutedText = clientEntryTheme.textMuted ?? '#8A8F98';
+  const surfaceContrast = clientEntryTheme.surfaceContrast ?? '#FFFFFF';
 
   const [expanded, setExpanded] = React.useState(false);
   const [identifier, setIdentifier] = React.useState('');

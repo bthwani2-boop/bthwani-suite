@@ -795,7 +795,7 @@ function renderTracking(
               >
                 <BthBox layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
                   <View style={{ width: 28, alignItems: 'center' }}>
-                    <Ionicons name={iconName as any} size={18} color={isActive ? theme.brand : isDone ? theme.success : theme.textSoft} />
+                    <Ionicons name={iconName as keyof typeof Ionicons.glyphMap} size={18} color={isActive ? theme.brand : isDone ? theme.success : theme.textSoft} />
                   </View>
 
                   <BthBox gap={0} style={{ flex: 1 }}>

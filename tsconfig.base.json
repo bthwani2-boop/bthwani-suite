@@ -1,6 +1,7 @@
 {
   "$schema": "./tools/schemas/tsconfig.schema.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
