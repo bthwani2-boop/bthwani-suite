@@ -1,778 +1,101 @@
-import { uiKitLocales } from './locales';
-
-export const tokenSourceMetadata = {
-	authorityPackage: '@bthwani/ui-kit',
-	authorityFile: 'src/foundation.ts',
-	format: 'bth-token-source.v1',
-	version: '2026.04.09',
-	stage: 'phase-b-bootstrap'
-} as const;
-
-export const rawColorPalettes = {
-	neutral: {
-		0: '#FFFFFF',
-		50: '#F8FAFC',
-		100: '#F1F5F9',
-		200: '#E2E8F0',
-		300: '#CBD5E1',
-		400: '#94A3B8',
-		500: '#64748B',
-		600: '#475569',
-		700: '#334155',
-		800: '#1E293B',
-		900: '#0F172A',
-		950: '#020617'
-	},
-	brand: {
-		50: '#FFF7ED',
-		100: '#FFEDD5',
-		500: '#F97316',
-		600: '#EA580C',
-		700: '#C2410C'
-	},
-	success: {
-		50: '#ECFDF3',
-		100: '#DCFCE7',
-		600: '#16A34A',
-		700: '#15803D'
-	},
-	warning: {
-		50: '#FFFBEB',
-		100: '#FEF3C7',
-		600: '#D97706',
-		700: '#B45309'
-	},
-	danger: {
-		50: '#FEF2F2',
-		100: '#FEE2E2',
-		600: '#DC2626',
-		700: '#B91C1C'
-	},
-	info: {
-		50: '#EFF6FF',
-		100: '#DBEAFE',
-		600: '#2563EB',
-		700: '#1D4ED8'
-	}
-} as const;
-
-export function withAlpha(hex: string, alpha: number) {
-	const normalized = hex.replace('#', '');
-	const offset = normalized.length === 3 ? 1 : 2;
-	const values = normalized.length === 3
-		? normalized.split('').map((value) => parseInt(`${value}${value}`, 16))
-		: [0, 1, 2].map((index) => parseInt(normalized.slice(index * offset, index * offset + offset), 16));
-
-	return `rgba(${values[0]}, ${values[1]}, ${values[2]}, ${alpha})`;
-}
-
-export const semanticColorRoles = {
-	brand: rawColorPalettes.brand[500],
-	brandStrong: rawColorPalettes.brand[600],
-	brandSoft: rawColorPalettes.brand[50],
-	brandSurface: rawColorPalettes.brand[100],
-	ink: rawColorPalettes.neutral[900],
-	inkMuted: rawColorPalettes.neutral[600],
-	inkSoft: rawColorPalettes.neutral[500],
-	line: rawColorPalettes.neutral[200],
-	lineStrong: rawColorPalettes.neutral[300],
-	surface: rawColorPalettes.neutral[0],
-	surfaceAlt: rawColorPalettes.neutral[50],
-	surfaceInset: rawColorPalettes.neutral[100],
-	surfaceRaised: rawColorPalettes.neutral[0],
-	success: rawColorPalettes.success[600],
-	successStrong: rawColorPalettes.success[700],
-	successSoft: rawColorPalettes.success[50],
-	warning: rawColorPalettes.warning[600],
-	warningStrong: rawColorPalettes.warning[700],
-	warningSoft: rawColorPalettes.warning[50],
-	danger: rawColorPalettes.danger[600],
-	dangerStrong: rawColorPalettes.danger[700],
-	dangerSoft: rawColorPalettes.danger[50],
-	info: rawColorPalettes.info[600],
-	infoStrong: rawColorPalettes.info[700],
-	infoSoft: rawColorPalettes.info[50],
-	overlay: withAlpha(rawColorPalettes.neutral[950], 0.48),
-	overlaySoft: withAlpha(rawColorPalettes.neutral[950], 0.24),
-	focusRing: withAlpha(rawColorPalettes.brand[500], 0.32),
-	disabledSurface: rawColorPalettes.neutral[100],
-	disabledInk: rawColorPalettes.neutral[400],
-	black: rawColorPalettes.neutral[950],
-	white: rawColorPalettes.neutral[0]
-} as const;
-
-export const rawSpacingScale = {
-	0: 0,
-	1: 4,
-	2: 8,
-	3: 12,
-	4: 16,
-	5: 20,
-	6: 24,
-	8: 32,
-	10: 40,
-	12: 48,
-	14: 56,
-	16: 64
-} as const;
-
-export const rawRadiusScale = {
-	none: 0,
-	xs: 6,
-	sm: 10,
-	md: 14,
-	lg: 18,
-	xl: 24,
-	pill: 999
-} as const;
-
-export const rawElevationScale = {
-	flat: 0,
-	raised: 1,
-	overlay: 2,
-	floating: 3
-} as const;
-
-export const shadowPresets = {
-	flat: undefined,
-	raised: {
-		shadowColor: '#000000',
-		shadowOpacity: 0.06,
-		shadowRadius: 10,
-		shadowOffset: { width: 0, height: 2 },
-		elevation: 2
-	},
-	overlay: {
-		shadowColor: '#000000',
-		shadowOpacity: 0.08,
-		shadowRadius: 18,
-		shadowOffset: { width: 0, height: 6 },
-		elevation: 6
-	},
-	floating: {
-		shadowColor: '#000000',
-		shadowOpacity: 0.12,
-		shadowRadius: 28,
-		shadowOffset: { width: 0, height: 10 },
-		elevation: 10
-	}
-} as const;
-
-export const rawMotionScale = {
-	instant: 0,
-	quick: 120,
-	standard: 180,
-	calm: 240,
-	emphasized: 320
-} as const;
-
-export const rawSizingScale = {
-	controlSm: 36,
-	controlMd: 44,
-	controlLg: 52,
-	iconSm: 16,
-	iconMd: 20,
-	iconLg: 24,
-	avatarSm: 28,
-	avatarMd: 40,
-	avatarLg: 56
-} as const;
-
-export const rawBreakpointScale = {
-	xs: 0,
-	sm: 480,
-	md: 768,
-	lg: 1024,
-	xl: 1280,
-	wide: 1440
-} as const;
-
-export const rawSafeAreaScale = {
-	none: 0,
-	compact: 8,
-	comfortable: 16,
-	spacious: 24
-} as const;
-
-export const rawZIndexScale = {
-	base: 0,
-	dropdown: 100,
-	sticky: 200,
-	overlay: 300,
-	modal: 400,
-	toast: 500
-} as const;
-
-export const rawOpacityScale = {
-	disabled: 0.48,
-	pressed: 0.9,
-	subtle: 0.72,
-	overlay: 0.4
-} as const;
-
-export const rawBorderScale = {
-	none: 0,
-	hairline: 1,
-	strong: 2
-} as const;
-
-export const rawTypographyScale = {
-	fontFamilies: {
-		arabic: 'System',
-		latin: 'System',
-		display: 'System',
-		mono: 'monospace'
-	},
-	fontWeights: {
-		regular: '400',
-		medium: '500',
-		semibold: '600',
-		bold: '700',
-		black: '800'
-	},
-	letterSpacings: {
-		tighter: -0.8,
-		tight: -0.4,
-		normal: 0,
-		wide: 0.2,
-		wider: 0.4
-	},
-	textRoles: {
-		displayXl: { fontSize: 40, lineHeight: 46, fontWeight: '800', letterSpacing: -0.8 },
-		displayLg: { fontSize: 34, lineHeight: 40, fontWeight: '700', letterSpacing: -0.4 },
-		hero: { fontSize: 30, lineHeight: 36, fontWeight: '700', letterSpacing: -0.4 },
-		titleXl: { fontSize: 28, lineHeight: 34, fontWeight: '700', letterSpacing: -0.4 },
-		titleLg: { fontSize: 24, lineHeight: 30, fontWeight: '700', letterSpacing: -0.4 },
-		titleMd: { fontSize: 20, lineHeight: 27, fontWeight: '600', letterSpacing: 0 },
-		titleSm: { fontSize: 18, lineHeight: 24, fontWeight: '600', letterSpacing: 0 },
-		bodyLg: { fontSize: 17, lineHeight: 26, fontWeight: '400', letterSpacing: 0 },
-		bodyMd: { fontSize: 15, lineHeight: 23, fontWeight: '400', letterSpacing: 0 },
-		bodySm: { fontSize: 14, lineHeight: 20, fontWeight: '400', letterSpacing: 0 },
-		bodyStrong: { fontSize: 15, lineHeight: 23, fontWeight: '600', letterSpacing: 0 },
-		labelLg: { fontSize: 14, lineHeight: 18, fontWeight: '600', letterSpacing: 0.2 },
-		label: { fontSize: 13, lineHeight: 17, fontWeight: '600', letterSpacing: 0.2 },
-		caption: { fontSize: 12, lineHeight: 16, fontWeight: '500', letterSpacing: 0.2 },
-		overline: { fontSize: 11, lineHeight: 15, fontWeight: '600', letterSpacing: 0.4, textTransform: 'uppercase' as const },
-		code: { fontSize: 13, lineHeight: 18, fontWeight: '500', letterSpacing: 0 }
-	}
-} as const;
-
-export type PaletteKey = keyof typeof colorPalette;
-export type SpacingToken = keyof typeof spacing;
-export type RadiusToken = keyof typeof radius;
-export type ElevationToken = keyof typeof elevation;
-export type MotionToken = keyof typeof motion;
-export type BreakpointToken = keyof typeof breakpoints;
-export type SafeAreaToken = keyof typeof safeArea;
-export type BorderToken = keyof typeof borders;
-export type TextRole = keyof typeof textRoles;
-export type FontFamilyToken = keyof typeof fontFamilies;
-export type FontWeightToken = keyof typeof fontWeights;
-export type Direction = 'rtl' | 'ltr';
-export type BthLanguage = 'ar' | 'en' | string;
-export type LogicalTextAlign = 'start' | 'center' | 'end';
-
-export const neutralPalette = rawColorPalettes.neutral;
-export const brandPalette = rawColorPalettes.brand;
-export const successPalette = rawColorPalettes.success;
-export const warningPalette = rawColorPalettes.warning;
-export const dangerPalette = rawColorPalettes.danger;
-export const infoPalette = rawColorPalettes.info;
-
-export const colorPalette = semanticColorRoles;
-export const spacing = rawSpacingScale;
-export const radius = rawRadiusScale;
-export const elevation = rawElevationScale;
-export const shadowByElevation = shadowPresets;
-export const motion = rawMotionScale;
-export const sizes = rawSizingScale;
-export const breakpoints = rawBreakpointScale;
-export const safeArea = rawSafeAreaScale;
-export const zIndex = rawZIndexScale;
-export const opacities = rawOpacityScale;
-export const borders = rawBorderScale;
-export const fontFamilies = rawTypographyScale.fontFamilies;
-export const fontWeights = rawTypographyScale.fontWeights;
-export const letterSpacings = rawTypographyScale.letterSpacings;
-export const textRoles = rawTypographyScale.textRoles;
-
-export function resolveFontFamily(direction: Direction, family: FontFamilyToken = 'latin') {
-	if (family === 'mono') {
-		return fontFamilies.mono;
-	}
-
-	if (family === 'display') {
-		return fontFamilies.display;
-	}
-
-	return direction === 'rtl' ? fontFamilies.arabic : fontFamilies.latin;
-}
-
-export function resolveTextRole(role: TextRole) {
-	return textRoles[role];
-}
-
-export const directionConfig = {
-	defaultDirection: 'rtl' as Direction,
-	defaultLanguage: 'ar',
-	languageStorageKey: 'bth-language',
-	supportedDirections: ['rtl', 'ltr'] as const,
-	rtlLanguages: ['ar', 'fa', 'he', 'ur'] as const,
-	useLogicalStartEnd: true,
-	mirroredDirectionalIcons: true
-};
-
-export function isRtl(direction: Direction) {
-	return direction === 'rtl';
-}
-
-export function isRtlLanguage(language?: BthLanguage) {
-	if (!language) {
-		return directionConfig.defaultDirection === 'rtl';
-	}
-
-	const normalized = language.toLowerCase();
-	return directionConfig.rtlLanguages.some((candidate) => normalized === candidate || normalized.startsWith(`${candidate}-`));
-}
-
-export function resolveDirectionFromLanguage(language?: BthLanguage, fallback: Direction = directionConfig.defaultDirection) {
-	if (!language) {
-		return fallback;
-	}
-
-	return isRtlLanguage(language) ? 'rtl' : 'ltr';
-}
-
-export function resolveLogicalInsets(direction: Direction, start: number, end: number, property: 'padding' | 'margin' = 'padding') {
-	if (property === 'margin') {
-		return isRtl(direction)
-			? { marginRight: start, marginLeft: end }
-			: { marginLeft: start, marginRight: end };
-	}
-
-	return isRtl(direction)
-		? { paddingRight: start, paddingLeft: end }
-		: { paddingLeft: start, paddingRight: end };
-}
-
-export function resolveLogicalPadding(direction: Direction, start: number, end: number) {
-	return resolveLogicalInsets(direction, start, end, 'padding');
-}
-
-export function resolveLogicalMargin(direction: Direction, start: number, end: number) {
-	return resolveLogicalInsets(direction, start, end, 'margin');
-}
-
-export function resolveLogicalBorderRadius(direction: Direction, start: number, end: number) {
-	return isRtl(direction)
-		? {
-				borderTopRightRadius: start,
-				borderBottomRightRadius: start,
-				borderTopLeftRadius: end,
-				borderBottomLeftRadius: end
-			}
-		: {
-				borderTopLeftRadius: start,
-				borderBottomLeftRadius: start,
-				borderTopRightRadius: end,
-				borderBottomRightRadius: end
-			};
-}
-
-export function resolveTextAlign(direction: Direction, align: LogicalTextAlign = 'start') {
-	if (align === 'center') return 'center';
-	if (align === 'start') return isRtl(direction) ? 'right' : 'left';
-	return isRtl(direction) ? 'left' : 'right';
-}
-
-export function resolveRowDirection(direction: Direction, reversed = false) {
-	const baseDirection = isRtl(direction) ? 'row-reverse' : 'row';
-
-	if (!reversed) {
-		return baseDirection;
-	}
-
-	return baseDirection === 'row' ? 'row-reverse' : 'row';
-}
-
-export type BthCssVariableMap = Record<string, string>;
-
-function toKebabCase(value: string) {
-	return value
-		.replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-		.replace(/[_\s]+/g, '-')
-		.toLowerCase();
-}
-
-function toPixel(value: number) {
-	return value === 0 ? '0' : `${value}px`;
-}
-
-function toMilliseconds(value: number) {
-	return value === 0 ? '0ms' : `${value}ms`;
-}
-
-function appendVariables(target: BthCssVariableMap, entries: Record<string, string>) {
-	for (const [name, value] of Object.entries(entries)) {
-		target[name] = value;
-	}
-}
-
-function createPaletteCssVariables() {
-	const variables: BthCssVariableMap = {};
-
-	for (const [paletteName, paletteValues] of Object.entries(rawColorPalettes)) {
-		for (const [tokenName, tokenValue] of Object.entries(paletteValues)) {
-			variables[`--bth-palette-${toKebabCase(paletteName)}-${tokenName}`] = tokenValue;
-		}
-	}
-
-	for (const [semanticRole, tokenValue] of Object.entries(semanticColorRoles)) {
-		variables[`--bth-color-${toKebabCase(semanticRole)}`] = tokenValue;
-	}
-
-	return variables;
-}
-
-function createScaleCssVariables(prefix: string, values: Record<string, number>, formatter: (value: number) => string) {
-	const variables: BthCssVariableMap = {};
-
-	for (const [tokenName, tokenValue] of Object.entries(values)) {
-		variables[`--bth-${prefix}-${toKebabCase(tokenName)}`] = formatter(tokenValue);
-	}
-
-	return variables;
-}
-
-function createTypographyCssVariables() {
-	const variables: BthCssVariableMap = {};
-
-	for (const [familyName, familyValue] of Object.entries(rawTypographyScale.fontFamilies)) {
-		variables[`--bth-font-family-${toKebabCase(familyName)}`] = familyValue;
-	}
-
-	for (const [weightName, weightValue] of Object.entries(rawTypographyScale.fontWeights)) {
-		variables[`--bth-font-weight-${toKebabCase(weightName)}`] = weightValue;
-	}
-
-	for (const [spacingName, spacingValue] of Object.entries(rawTypographyScale.letterSpacings)) {
-		variables[`--bth-letter-spacing-${toKebabCase(spacingName)}`] = `${spacingValue}px`;
-	}
-
-	for (const [roleName, roleValues] of Object.entries(rawTypographyScale.textRoles)) {
-		for (const [propertyName, propertyValue] of Object.entries(roleValues)) {
-			const variableName = `--bth-text-role-${toKebabCase(roleName)}-${toKebabCase(propertyName)}`;
-
-			if (typeof propertyValue === 'number') {
-				variables[variableName] = `${propertyValue}px`;
-			} else {
-				variables[variableName] = String(propertyValue);
-			}
-		}
-	}
-
-	return variables;
-}
-
-export function createTokenCssVariables() {
-	const variables: BthCssVariableMap = {};
-
-	appendVariables(variables, createPaletteCssVariables());
-	appendVariables(variables, createScaleCssVariables('spacing', rawSpacingScale, toPixel));
-	appendVariables(variables, createScaleCssVariables('radius', rawRadiusScale, toPixel));
-	appendVariables(variables, createScaleCssVariables('size', rawSizingScale, toPixel));
-	appendVariables(variables, createScaleCssVariables('breakpoint', rawBreakpointScale, toPixel));
-	appendVariables(variables, createScaleCssVariables('safe-area', rawSafeAreaScale, toPixel));
-	appendVariables(variables, createScaleCssVariables('motion', rawMotionScale, toMilliseconds));
-	appendVariables(variables, createScaleCssVariables('border', rawBorderScale, toPixel));
-	appendVariables(variables, createScaleCssVariables('z-index', rawZIndexScale, String));
-	appendVariables(variables, createScaleCssVariables('opacity', rawOpacityScale, String));
-	appendVariables(variables, createScaleCssVariables('elevation', rawElevationScale, String));
-	appendVariables(variables, createTypographyCssVariables());
-
-	return variables;
-}
-
-export function createTokenCssDeclarations() {
-	return Object.entries(createTokenCssVariables())
-		.map(([variableName, variableValue]) => `  ${variableName}: ${variableValue};`)
-		.join('\n');
-}
-
-export function createTokenCssBlock(selector = ':root') {
-	return `${selector} {\n${createTokenCssDeclarations()}\n}`;
-}
-
-export function createNativeTokenOutput() {
-	return {
-		metadata: tokenSourceMetadata,
-		colors: {
-			raw: rawColorPalettes,
-			semantic: semanticColorRoles
-		},
-		spacing: rawSpacingScale,
-		radius: rawRadiusScale,
-		elevation: rawElevationScale,
-		motion: rawMotionScale,
-		sizing: rawSizingScale,
-		breakpoints: rawBreakpointScale,
-		safeArea: rawSafeAreaScale,
-		borders: rawBorderScale,
-		zIndex: rawZIndexScale,
-		opacity: rawOpacityScale,
-		typography: rawTypographyScale
-	};
-}
-
-export const bthTokenCssVariables = createTokenCssVariables();
-export const bthNativeTokenOutput = createNativeTokenOutput();
-
-export type ThemeMode = 'light' | 'dark' | 'high-contrast';
-
-export type SemanticTheme = {
-	mode: ThemeMode;
-	background: string;
-	backgroundAlt: string;
-	surface: string;
-	surfaceRaised: string;
-	surfaceInset: string;
-	line: string;
-	lineStrong: string;
-	text: string;
-	textMuted: string;
-	textSoft: string;
-	textInverse: string;
-	brand: string;
-	brandContrast: string;
-	brandSurface: string;
-	success: string;
-	successSurface: string;
-	successText: string;
-	warning: string;
-	warningSurface: string;
-	warningText: string;
-	danger: string;
-	dangerSurface: string;
-	dangerText: string;
-	info: string;
-	infoSurface: string;
-	infoText: string;
-	focusRing: string;
-	overlay: string;
-	overlaySoft: string;
-	disabledSurface: string;
-	disabledText: string;
-	fieldBackground: string;
-	fieldBorder: string;
-	fieldBorderActive: string;
-	fieldPlaceholder: string;
-};
-
-export const lightTheme: SemanticTheme = {
-	mode: 'light',
-	background: colorPalette.surfaceAlt,
-	backgroundAlt: colorPalette.white,
-	surface: colorPalette.surface,
-	surfaceRaised: colorPalette.surfaceRaised,
-	surfaceInset: colorPalette.surfaceInset,
-	line: colorPalette.line,
-	lineStrong: colorPalette.lineStrong,
-	text: colorPalette.ink,
-	textMuted: colorPalette.inkMuted,
-	textSoft: colorPalette.inkSoft,
-	textInverse: colorPalette.white,
-	brand: colorPalette.brand,
-	brandContrast: colorPalette.white,
-	brandSurface: colorPalette.brandSurface,
-	success: colorPalette.success,
-	successSurface: colorPalette.successSoft,
-	successText: colorPalette.successStrong,
-	warning: colorPalette.warning,
-	warningSurface: colorPalette.warningSoft,
-	warningText: colorPalette.warningStrong,
-	danger: colorPalette.danger,
-	dangerSurface: colorPalette.dangerSoft,
-	dangerText: colorPalette.dangerStrong,
-	info: colorPalette.info,
-	infoSurface: colorPalette.infoSoft,
-	infoText: colorPalette.infoStrong,
-	focusRing: colorPalette.focusRing,
-	overlay: colorPalette.overlay,
-	overlaySoft: colorPalette.overlaySoft,
-	disabledSurface: colorPalette.disabledSurface,
-	disabledText: colorPalette.disabledInk,
-	fieldBackground: colorPalette.surface,
-	fieldBorder: colorPalette.line,
-	fieldBorderActive: colorPalette.brand,
-	fieldPlaceholder: colorPalette.inkSoft
-};
-
-export const darkTheme: SemanticTheme = {
-	mode: 'dark',
-	background: '#020617',
-	backgroundAlt: '#0F172A',
-	surface: '#111827',
-	surfaceRaised: '#182232',
-	surfaceInset: '#0B1324',
-	line: '#22304A',
-	lineStrong: '#334155',
-	text: '#F8FAFC',
-	textMuted: '#CBD5E1',
-	textSoft: '#94A3B8',
-	textInverse: colorPalette.ink,
-	brand: '#FB923C',
-	brandContrast: '#1C1917',
-	brandSurface: withAlpha('#FB923C', 0.16),
-	success: '#4ADE80',
-	successSurface: withAlpha('#4ADE80', 0.16),
-	successText: '#BBF7D0',
-	warning: '#FBBF24',
-	warningSurface: withAlpha('#FBBF24', 0.16),
-	warningText: '#FDE68A',
-	danger: '#F87171',
-	dangerSurface: withAlpha('#F87171', 0.16),
-	dangerText: '#FECACA',
-	info: '#60A5FA',
-	infoSurface: withAlpha('#60A5FA', 0.16),
-	infoText: '#BFDBFE',
-	focusRing: withAlpha('#FB923C', 0.4),
-	overlay: withAlpha('#020617', 0.72),
-	overlaySoft: withAlpha('#020617', 0.36),
-	disabledSurface: '#1E293B',
-	disabledText: '#64748B',
-	fieldBackground: '#0F172A',
-	fieldBorder: '#334155',
-	fieldBorderActive: '#FB923C',
-	fieldPlaceholder: '#64748B'
-};
-
-export const highContrastTheme: SemanticTheme = {
-	mode: 'high-contrast',
-	background: '#000000',
-	backgroundAlt: '#000000',
-	surface: '#000000',
-	surfaceRaised: '#0A0A0A',
-	surfaceInset: '#000000',
-	line: '#FFFFFF',
-	lineStrong: '#FFFFFF',
-	text: '#FFFFFF',
-	textMuted: '#FFFFFF',
-	textSoft: '#E5E7EB',
-	textInverse: '#000000',
-	brand: '#FFD60A',
-	brandContrast: '#000000',
-	brandSurface: '#FFD60A',
-	success: '#7CFC00',
-	successSurface: '#0F2F00',
-	successText: '#FFFFFF',
-	warning: '#FFD60A',
-	warningSurface: '#3D2F00',
-	warningText: '#FFFFFF',
-	danger: '#FF453A',
-	dangerSurface: '#3B0600',
-	dangerText: '#FFFFFF',
-	info: '#59C3FF',
-	infoSurface: '#002A3D',
-	infoText: '#FFFFFF',
-	focusRing: '#FFFFFF',
-	overlay: withAlpha('#000000', 0.88),
-	overlaySoft: withAlpha('#000000', 0.72),
-	disabledSurface: '#1A1A1A',
-	disabledText: '#B3B3B3',
-	fieldBackground: '#000000',
-	fieldBorder: '#FFFFFF',
-	fieldBorderActive: '#FFD60A',
-	fieldPlaceholder: '#D1D5DB'
-};
-
-export const semanticThemeByMode: Record<ThemeMode, SemanticTheme> = {
-	light: lightTheme,
-	dark: darkTheme,
-	'high-contrast': highContrastTheme
-};
-
-export function resolveSemanticTheme(mode: ThemeMode) {
-	return semanticThemeByMode[mode];
-}
-
-export type BthThemeCssVariableMap = Record<string, string>;
-
-function toThemeKebabCase(value: string) {
-	return value
-		.replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-		.replace(/[_\s]+/g, '-')
-		.toLowerCase();
-}
-
-function resolveColorScheme(mode: ThemeMode) {
-	return mode === 'dark' || mode === 'high-contrast' ? 'dark' : 'light';
-}
-
-export function createThemeCssVariables(theme: SemanticTheme) {
-	const variables: BthThemeCssVariableMap = {};
-
-	for (const [themeKey, themeValue] of Object.entries(theme)) {
-		if (themeKey === 'mode') {
-			continue;
-		}
-
-		variables[`--bth-${toThemeKebabCase(themeKey)}`] = themeValue;
-	}
-
-	variables['--bth-color-scheme'] = resolveColorScheme(theme.mode);
-
-	return variables;
-}
-
-export function createThemeCssDeclarations(theme: SemanticTheme) {
-	return Object.entries(createThemeCssVariables(theme))
-		.map(([variableName, variableValue]) => `  ${variableName}: ${variableValue};`)
-		.concat(`  color-scheme: ${resolveColorScheme(theme.mode)};`)
-		.join('\n');
-}
-
-export function createThemeCssBlock(theme: SemanticTheme, selector: string) {
-	return `${selector} {\n${createThemeCssDeclarations(theme)}\n}`;
-}
-
-export function buildBthWebThemeStyleSheet(rootSelector = '[data-bth-root="true"]') {
-	return [
-		createTokenCssBlock(rootSelector),
-		createThemeCssBlock(lightTheme, `${rootSelector}, ${rootSelector}[data-bth-theme='light']`),
-		createThemeCssBlock(darkTheme, `${rootSelector}[data-bth-theme='dark']`),
-		createThemeCssBlock(highContrastTheme, `${rootSelector}[data-bth-theme='high-contrast']`)
-	].join('\n\n');
-}
-
-export function createNativeThemeOutput(mode: ThemeMode) {
-	return {
-		mode,
-		theme: resolveSemanticTheme(mode),
-		tokens: createNativeTokenOutput()
-	};
-}
-
-export const bthThemeModes = Object.freeze(Object.keys(semanticThemeByMode) as ThemeMode[]);
-
-export const bthNativeThemeOutputs = Object.freeze(
-	Object.fromEntries(bthThemeModes.map((mode) => [mode, createNativeThemeOutput(mode)])) as Record<ThemeMode, ReturnType<typeof createNativeThemeOutput>>
-);
-
+export type BthDirection = 'rtl' | 'ltr';
 export type BthLocale = 'ar' | 'en';
+export type BthTone = 'default' | 'primary' | 'success' | 'danger' | 'warning' | 'muted';
 
-type BthUiTextCatalogStringLeafShape<T> = {
-	readonly [K in keyof T]: T[K] extends string
-		? string
-		: BthUiTextCatalogStringLeafShape<T[K]>;
+export const bthDefaultLocale: BthLocale = 'ar';
+export const bthDefaultDirection: BthDirection = 'rtl';
+
+export const bthColors = {
+  brand: {
+    white: '#ffffff',
+    orange: '#f97316',
+    navy: '#0f172a',
+  },
+  surface: {
+    canvas: '#f8fafc',
+    card: '#ffffff',
+    raised: '#fff7ed',
+    inverse: '#0f172a',
+  },
+  text: {
+    strong: '#0f172a',
+    body: '#334155',
+    muted: '#64748b',
+    inverse: '#ffffff',
+  },
+  line: {
+    soft: '#e2e8f0',
+    strong: '#cbd5e1',
+  },
+  state: {
+    success: '#16a34a',
+    danger: '#dc2626',
+    warning: '#f59e0b',
+    info: '#2563eb',
+  },
+} as const;
+
+export const bthSpacing = {
+  none: 0,
+  xxs: 2,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+  xxxl: 32,
+} as const;
+
+export const bthRadius = {
+  none: 0,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  pill: 999,
+} as const;
+
+export const bthTypography = {
+  family: {
+    system: 'System',
+  },
+  size: {
+    caption: 12,
+    body: 14,
+    title: 18,
+    headline: 24,
+  },
+  weight: {
+    regular: '400',
+    medium: '600',
+    bold: '800',
+  },
+} as const;
+
+export const bthElevation = {
+  none: {
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  soft: {
+    shadowColor: '#0f172a',
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
+  },
+} as const;
+
+export const bthToneColors: Record<BthTone, { background: string; foreground: string; border: string }> = {
+  default: { background: bthColors.surface.card, foreground: bthColors.text.strong, border: bthColors.line.soft },
+  primary: { background: bthColors.brand.orange, foreground: bthColors.brand.white, border: bthColors.brand.orange },
+  success: { background: '#ecfdf5', foreground: bthColors.state.success, border: '#bbf7d0' },
+  danger: { background: '#fef2f2', foreground: bthColors.state.danger, border: '#fecaca' },
+  warning: { background: '#fffbeb', foreground: bthColors.state.warning, border: '#fde68a' },
+  muted: { background: '#f1f5f9', foreground: bthColors.text.body, border: bthColors.line.soft },
 };
 
-export type BthUiTextCatalogShape = BthUiTextCatalogStringLeafShape<typeof uiKitLocales.ar.common>;
-
-export const bthUiTextCatalog = {
-	ar: uiKitLocales.ar.common,
-	en: uiKitLocales.en.common,
-} as const satisfies Record<BthLocale, BthUiTextCatalogShape>;
-
-export function getBthUiText(locale: BthLocale = 'ar') {
-	return bthUiTextCatalog[locale];
+export function resolveBthDirection(locale: BthLocale = bthDefaultLocale): BthDirection {
+  return locale === 'ar' ? 'rtl' : 'ltr';
 }
