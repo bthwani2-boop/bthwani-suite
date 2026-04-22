@@ -451,7 +451,7 @@ export type UiKitLocale = keyof typeof uiKitLocales;
 export type UiKitLocaleNamespace = keyof typeof uiKitLocales.ar;
 
 export function getUiKitLocale(locale: UiKitLocale) {
-  return uiKitLocales[locale] ?? uiKitLocales.ar;
+  return uiKitLocales[locale];
 }
 
 export function getUiKitCommon(locale: UiKitLocale) {

@@ -1,12 +1,10 @@
-import arCommon from './locales/ar/common.json';
-import enCommon from './locales/en/common.json';
-
+import { uiKitLocales } from '../../locales';
 export type BthLocale = 'ar' | 'en';
-export type BthUiTextCatalogShape = typeof arCommon;
+export type BthUiTextCatalogShape = typeof uiKitLocales.ar.common;
 
 export const bthUiTextCatalog = {
-  ar: arCommon,
-  en: enCommon,
+  ar: uiKitLocales.ar.common,
+  en: uiKitLocales.en.common,
 } as const satisfies Record<BthLocale, BthUiTextCatalogShape>;
 
 export function getBthUiText(locale: BthLocale = 'ar') {
