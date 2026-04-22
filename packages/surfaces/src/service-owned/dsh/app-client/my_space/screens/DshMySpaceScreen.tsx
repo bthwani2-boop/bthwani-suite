@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, View, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
-import { BthBox, BthMobileScrollView, BthSurface, BthText, spacing, useTheme } from '@bthwani/ui-kit';
+import { BthBox, BthMobileScrollView, BthSurface, BthText, BthTopBar, spacing, useTheme } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
 import { DshMySpaceCommercialScreen } from './DshMySpaceCommercialScreen';
 import { DshMySpaceOrdersScreen } from './DshMySpaceOrdersScreen';
@@ -16,7 +16,6 @@ export type DshMySpaceItem = {
 
 export type DshMySpaceScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
-  name?: string;
   marketingPrograms?: DshMySpaceItem[];
   onOpenOrders?: () => void;
   onOpenTracking?: () => void;
@@ -158,7 +157,6 @@ function renderPrimarySectionContent(
 
 export function DshMySpaceScreen({
   state = 'ready',
-  name = 'مساحتي داخل DSH',
   marketingPrograms = [],
   onOpenOrders,
   onOpenTracking,
@@ -180,25 +178,14 @@ export function DshMySpaceScreen({
   };
 
   return (
-    <BthMobileScrollView padding={2} gap={2}>
-      <BthSurface tone="brand" padding={2} gap={1}>
-        <BthBox gap={0} style={{ alignItems: 'flex-end' }}>
-          <BthText role="titleLg" tone="inverse">مساحتي</BthText>
-          <BthText role="bodySm" tone="inverse" style={{ opacity: 0.92 }}>{name}</BthText>
-        </BthBox>
+    <View style={{ flex: 1 }}>
+      <BthTopBar
+        variant="surface"
+        title="مساحتي"
+        trailingAction={onBack ? { id: 'back', icon: <Ionicons name="arrow-back" size={24} color="#F97316" />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
+      />
 
-        <BthSurface tone="inset" padding={1} gap={0}>
-          <BthText role="caption" tone="muted">
-            المسار الحالي
-          </BthText>
-          <BthText role="bodyStrong">{activePrimaryLabel}</BthText>
-          <BthText role="bodySm" tone="muted">
-            {activePrimarySection.summary}
-          </BthText>
-        </BthSurface>
-      </BthSurface>
-
-      <BthBox gap={2}>
+      <BthMobileScrollView fill padding={2} gap={2}>
         <BthSurface tone="raised" padding={2} gap={2}>
           <BthBox gap={0} style={{ alignItems: 'flex-end' }}>
             <BthText role="titleSm">المسارات الرئيسية</BthText>
@@ -228,8 +215,8 @@ export function DshMySpaceScreen({
             ))}
           </BthBox>
         </BthSurface>
-      </BthBox>
-    </BthMobileScrollView>
+      </BthMobileScrollView>
+    </View>
   );
 }
 

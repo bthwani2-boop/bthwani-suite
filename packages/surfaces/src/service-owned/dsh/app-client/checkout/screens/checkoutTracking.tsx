@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, Easing, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   BthBadge,
@@ -16,6 +16,7 @@ import {
   BthTextField,
   BthSurface,
   BthText,
+  BthTopBar,
   spacing,
   useTheme,
 } from '@bthwani/ui-kit';
@@ -519,7 +520,6 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
   const [productRating, setProductRating] = React.useState(0);
   const [captainRating, setCaptainRating] = React.useState(0);
   const [ratingsSubmitted, setRatingsSubmitted] = React.useState(false);
-  const progress = React.useRef(new Animated.Value(0)).current;
   const note = normalizeText(values.note).length ? values.note : 'لا توجد ملاحظات';
   const timelineItems = timeline.length > 0
     ? timeline
@@ -529,22 +529,10 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
       detail: step.detail,
       done: index === 0,
     }));
-
-  React.useEffect(() => {
-    Animated.timing(progress, {
-      toValue: phase === 'received' ? 1 : 0,
-      duration: 280,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
-  }, [phase, progress]);
-
-  const reviewOpacity = progress.interpolate({ inputRange: [0, 1], outputRange: [1, 0.28] });
-  const reviewTranslateY = progress.interpolate({ inputRange: [0, 1], outputRange: [0, -8] });
-  const trackingOpacity = progress.interpolate({ inputRange: [0, 1], outputRange: [0.55, 1] });
-  const trackingTranslateY = progress.interpolate({ inputRange: [0, 1], outputRange: [8, 0] });
   const activeTimelineIndex = phase === 'route' ? 0 : 2;
   const deliveryStatusLabel = currentStatusLabel ?? 'في الطريق';
+  const journeyTopBarTitle = phase === 'route' ? 'الطلب في الطريق إلى العميل' : 'وصل الطلب للعميل واستلمه';
+  const journeyStageTitle = phase === 'route' ? 'في الطريق إلى العميل' : 'استلم العميل الطلب';
   const hasCustomerReceived = phase === 'received';
   const canSubmitRatings = hasCustomerReceived && productRating > 0 && captainRating > 0;
   const productRatingLabel = productRating > 0 ? `${productRating}/5` : 'غير محدد';
@@ -606,46 +594,20 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
   };
 
   return (
-    <BthMobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
-      <BthSurface
-        tone="brand"
-        gap={2}
-        padding={3}
-        style={{ borderRadius: 24, borderWidth: 1, borderColor: theme.brand, backgroundColor: theme.brandSurface }}
-      >
-        <Animated.View style={{ opacity: reviewOpacity, transform: [{ translateY: reviewTranslateY }] }}>
-          <BthBox gap={1} style={{ alignItems: 'flex-end' }}>
-            <BthBadge label={phase === 'route' ? deliveryStatusLabel : 'تم الاستلام'} tone={phase === 'route' ? 'warning' : 'success'} />
-            <BthText role="titleLg" style={{ textAlign: 'right' }}>{phase === 'route' ? 'الطلب في الطريق إلى العميل' : 'وصل الطلب للعميل واستلمه'}</BthText>
-            <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-              {phase === 'route'
-                ? 'عند الوصول والاستلام ستظهر التقييمات هنا مباشرة في نفس الشاشة.'
-                : ratingsSubmitted
-                  ? 'تم حفظ تقييم المنتج وتقييم الكابتن داخل نفس الصفحة.'
-                  : 'العميل استلم الطلب، والآن قيّم المنتج والكابتن دون مغادرة الصفحة.'}
-            </BthText>
-          </BthBox>
-        </Animated.View>
+    <View style={{ flex: 1, backgroundColor: theme.surface }}>
+      <BthTopBar
+        variant="surface"
+        title={journeyTopBarTitle}
+        trailingAction={onBack ? { id: 'back', icon: <Ionicons name="arrow-back" size={24} color="#F97316" />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
+      />
 
-        <Animated.View style={{ opacity: trackingOpacity, transform: [{ translateY: trackingTranslateY }] }}>
-          <BthSurface tone="inset" gap={1} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line, backgroundColor: phase === 'received' ? theme.surfaceRaised : theme.surface }}>
-            <BthBox layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
-              <View style={{ width: 28, alignItems: 'center' }}>
-                <Ionicons name={phase === 'route' ? 'hourglass-outline' : 'checkmark-circle-outline'} size={18} color={phase === 'route' ? theme.warning : theme.success} />
-              </View>
-              <BthBox gap={0} style={{ flex: 1 }}>
-                <BthText role="bodyStrong" style={{ textAlign: 'right' }}>{phase === 'route' ? 'المرحلة التالية: وصول الطلب واستلام العميل' : 'المرحلة الحالية: التقييم داخل نفس الصفحة'}</BthText>
-                <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                  {phase === 'route' ? 'يظهر الاستلام ثم التقييم من دون أي انتقال إضافي.' : 'التقييمان يظهران بعد الاستلام وبنفس الشاشة.'}
-                </BthText>
-              </BthBox>
-            </BthBox>
-          </BthSurface>
-        </Animated.View>
-      </BthSurface>
-
+      <BthMobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
       <BthSurface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader title={phase === 'route' ? 'في الطريق إلى العميل' : 'استلم العميل الطلب'} subtitle={phase === 'route' ? 'الوصول والاستلام سيظهران هنا فور الانتقال من الطريق.' : 'الآن ظهرت التقييمات بعد الاستلام داخل نفس الشاشة.'} />
+        <BthSectionHeader
+          title={journeyStageTitle}
+          subtitle={phase === 'route' ? 'الوصول والاستلام سيظهران هنا فور الانتقال من الطريق.' : 'الآن ظهرت التقييمات بعد الاستلام داخل نفس الشاشة.'}
+          trailing={<BthBadge label={phase === 'route' ? deliveryStatusLabel : 'تم الاستلام'} tone={phase === 'route' ? 'warning' : 'success'} />}
+        />
         <BthKeyValueList items={orderReceiptItems} />
       </BthSurface>
 
@@ -750,7 +712,8 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
         {onBell && phase === 'route' ? <BthButton label="جرس الوصول" tone="secondary" onPress={onBell} /> : null}
         {onBack ? <BthButton label="تعديل الطلب" tone="secondary" onPress={onBack} /> : null}
       </BthBox>
-    </BthMobileScrollView>
+      </BthMobileScrollView>
+    </View>
   );
 }
 

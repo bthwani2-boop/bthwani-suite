@@ -1,6 +1,7 @@
 import React from 'react';
-import { Pressable } from 'react-native';
-import { BthBadge, BthBox, BthButton, BthMobileScrollView, BthSurface, BthText } from '@bthwani/ui-kit';
+import { Pressable, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { BthBadge, BthBox, BthButton, BthMobileScrollView, BthSurface, BthText, BthTopBar } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
 import { dshNotificationsFixtures } from '../fixtures/dshNotificationsFixtures';
 
@@ -142,9 +143,6 @@ function DshNotificationsSectionHeader({ count }: { count: number }) {
       <BthBox layoutDirection="row" justify="space-between" align="center" gap={3}>
         <BthBox gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
           <BthText role="titleSm">آخر التنبيهات</BthText>
-          <BthText role="bodySm" tone="muted" align="start">
-            كل بطاقة تختصر خطوة واحدة وتفتح مساراً واضحاً.
-          </BthText>
         </BthBox>
         <BthBox
           background="brandSurface"
@@ -199,45 +197,35 @@ function renderContent(
   }));
 
   return (
-    <BthMobileScrollView fill padding={4} gap={4}>
-      <BthSurface tone="brand" padding={5} gap={4} radiusToken="xl" elevationToken="raised">
-        <BthBox layoutDirection="row" justify="space-between" align="center" gap={3}>
-          <BthButton label="رجوع" tone="ghost" size="sm" fullWidth={false} onPress={onBack} />
-          <BthBox
-            background="surface"
-            border
-            borderTone="brand"
-            radiusToken="pill"
-            paddingX={3}
-            paddingY={1}
-            style={{ alignSelf: 'flex-start' }}
-          >
-            <BthText role="label" tone="brand">
-              DSH تنبيهات
-            </BthText>
-          </BthBox>
+    <View style={{ flex: 1 }}>
+      <BthTopBar
+        variant="surface"
+        title="الإشعارات"
+        trailingAction={
+          onBack
+            ? {
+                id: 'back',
+                icon: <Ionicons name="arrow-back" size={24} color="#F97316" />,
+                mirrorInRtl: true,
+                accessibilityLabel: 'رجوع',
+                onPress: onBack,
+              }
+            : undefined
+        }
+      />
+
+      <BthMobileScrollView fill padding={4} gap={4}>
+        <DshNotificationsSectionHeader count={resolvedItems.length} />
+
+        <BthBox gap={3}>
+          {resolvedItems.length ? (
+            resolvedItems.map((item) => <DshNotificationCard key={item.id} item={item} onPress={item.onPress} />)
+          ) : (
+            <DshNotificationsEmptyState onOpenSearch={onOpenSearch} onBack={onBack} />
+          )}
         </BthBox>
-
-        <BthBox gap={2}>
-          <BthText role="titleLg" align="center">
-            الإشعارات
-          </BthText>
-          <BthText role="bodyMd" tone="muted" align="center">
-            إشعارات DSH المرتبطة بمزامنة الاشتراك والطلب النشط، بواجهة أوضح وأخف.
-          </BthText>
-        </BthBox>
-      </BthSurface>
-
-      <DshNotificationsSectionHeader count={resolvedItems.length} />
-
-      <BthBox gap={3}>
-        {resolvedItems.length ? (
-          resolvedItems.map((item) => <DshNotificationCard key={item.id} item={item} onPress={item.onPress} />)
-        ) : (
-          <DshNotificationsEmptyState onOpenSearch={onOpenSearch} onBack={onBack} />
-        )}
-      </BthBox>
-    </BthMobileScrollView>
+      </BthMobileScrollView>
+    </View>
   );
 }
 
