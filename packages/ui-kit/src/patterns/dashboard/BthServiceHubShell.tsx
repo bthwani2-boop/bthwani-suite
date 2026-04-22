@@ -1,8 +1,7 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { spacing } from '../../foundation/tokens';
-import { BthSearchField, BthSectionHeader, BthServiceTileCard, BthStateView } from '../../components';
-import { BthScreenHeader } from '../../components/navigation/BthScreenHeader';
+import { BthScreenHeader, BthSearchField, BthSectionHeader, BthServiceTileCard, BthStateView } from '../../components';
 import type { BthServiceTileCardProps } from '../../components/display/BthServiceTileCard';
 
 export type BthServiceHubSection = {

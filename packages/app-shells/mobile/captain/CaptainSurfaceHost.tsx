@@ -1,8 +1,8 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
-import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthStateView, BthSurface, BthText } from '@bthwani/ui-kit';
+import { Ionicons } from '@expo/vector-icons';
+import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthStateView, BthSurface, BthText, BthTopBar } from '@bthwani/ui-kit';
 import { dshCaptain } from '@bthwani/surfaces/app-captain';
-import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
 const {
@@ -56,14 +56,14 @@ const primaryAreas = [
   'الحالة'
 ] as const;
 
+type CaptainRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'orderchat' | 'bell' | 'support-directory' | 'support-screen';
+type CaptainServiceType = 'dsh' | 'amn';
+
 const shortcuts = [
   'المهام الحالية',
   'ملخص الأرباح',
-  'تبديل الحالة'
+  'تبديل الحالة',
 ] as const;
-
-type CaptainRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'orderchat' | 'bell' | 'support-directory' | 'support-screen';
-type CaptainServiceType = 'dsh' | 'amn';
 
 const captainTypeOptions: readonly MobileAccountTypeOption[] = [
   { id: 'dsh', label: 'DSH', description: 'تشغيل الطلبات والمهام اليومية' },
@@ -265,20 +265,21 @@ export function CaptainSurfaceHost() {
   };
 
   const topBar = (
-    <UnifiedMobileTopBar
+    <BthTopBar
+      variant="brand"
       title="بثواني"
       subtitle="تطبيق الكابتن"
       locationLabel="الرياض، خط التشغيل الشمالي"
       actions={[
         {
           id: 'profile',
-          iconName: 'person-outline',
+          icon: <Ionicons name="person-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الحساب',
           onPress: () => setAccountSheetVisible(true),
         },
         {
           id: 'notifications',
-          iconName: 'notifications-outline',
+          icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />,
           badgeCount: 2,
           accessibilityLabel: 'الإشعارات',
           onPress: () => {
@@ -289,7 +290,7 @@ export function CaptainSurfaceHost() {
         },
         {
           id: 'tasks',
-          iconName: 'bicycle-outline',
+          icon: <Ionicons name="bicycle-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'المهام',
           onPress: () => {
             if (activeServiceType === 'dsh') {
@@ -297,7 +298,7 @@ export function CaptainSurfaceHost() {
             }
           },
         },
-        { id: 'search', iconName: 'search-outline', accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
+        { id: 'search', icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
       ]}
       ticker={{
         statusLabel: activeServiceType === 'dsh' ? 'مباشر' : 'وضع AMN',

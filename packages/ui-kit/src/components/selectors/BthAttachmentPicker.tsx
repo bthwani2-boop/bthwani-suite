@@ -6,7 +6,7 @@ import { useDirection, useTheme } from '../../hooks';
 import { BthSurface, BthText } from '../../primitives';
 import { BthBadge } from '../display/BthBadge';
 import { BthButton } from '../actions/BthButton';
-import { BthSectionHeader } from '../navigation/BthSectionHeader';
+import { BthSectionHeader } from '../navigation/BthTopBar';
 
 export type BthAttachmentPickerTone = 'default' | 'brand' | 'success' | 'warning' | 'info';
 

@@ -12,6 +12,7 @@ import {
   safeArea,
   sizes,
   spacing,
+  BthTopBar,
 } from '@bthwani/ui-kit';
 
 const HEADER_RED = colorPalette.brandStrong ?? colorPalette.brand ?? '#F97316';
@@ -349,16 +350,27 @@ export default function DshCartUnifiedScreen(props: any) {
 
   return (
     <View style={{ flex: 1, backgroundColor: PAGE_BG }}>
-      <BthMobileScrollView padding={2} gap={1} contentContainerStyle={{ paddingBottom: actionBarBottomPadding }}>
-        <BthSurface padding={2} style={{ backgroundColor: HEADER_RED, paddingVertical: spacing[1], paddingHorizontal: spacing[2], borderRadius: 18 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <HeaderIconButton size={44} icon="trash-outline" background={colorPalette.white} color={HEADER_RED} onPress={() => setItems([])} />
-            <BthText role="titleMd" style={{ color: colorPalette.white, fontWeight: '700' }}>
-              تأكيد الطلب
-            </BthText>
-              <HeaderIconButton size={44} icon="arrow-forward" background="rgba(255,255,255,0.18)" color={colorPalette.white} onPress={() => props.onExit?.()} />
-          </View>
-        </BthSurface>
+      <BthTopBar
+        variant="surface"
+        title="تأكيد الطلب"
+        actions={[
+          {
+            id: 'clear-cart',
+            icon: <Ionicons name="trash-outline" size={20} color={TEXT_DARK} />,
+            accessibilityLabel: 'تفريغ السلة',
+            onPress: () => setItems([]),
+          },
+        ]}
+        trailingAction={{
+          id: 'exit-checkout',
+          icon: <Ionicons name="arrow-back" size={24} color={ACCENT_GOLD} />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'الرجوع',
+          onPress: () => props.onExit?.(),
+        }}
+      />
+
+      <BthMobileScrollView fill padding={2} gap={1} contentContainerStyle={{ paddingBottom: actionBarBottomPadding }}>
 
         <PromoBanner />
 

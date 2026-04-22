@@ -22,7 +22,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { resolveSeedMediaSource, type BthSeedMediaKey } from '@bthwani/media-fixtures';
-import { BthButton, BthChip, BthHighlightsRail, BthMobileTopBar, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText, BthProductCard } from '@bthwani/ui-kit';
+import { BthButton, BthChip, BthHighlightsRail, BthTopBar, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText, BthProductCard } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../../shared/catalog/catalog';
 import { formatDshStoreFollowersLabel } from '../../shared/store-profile';
 import { storeItemsByStoreId, type DshStoreFixtureItem as DshStoreGetMenuItem } from '../fixtures';
@@ -1331,7 +1331,7 @@ export function DshStoreGetScreen({
           </Text>
         </View>
       ) : (
-        <BthMobileTopBar
+        <BthTopBar
           title={normalizedStoreName}
           actions={[
             {

@@ -48,12 +48,19 @@ Execution plan: [BTH_UI_KIT_SUPREME_EXECUTION_PLAN_2026_AR.md](./BTH_UI_KIT_SUPR
 - BthRadio
 - BthSwitch
 - BthSegmentedControl
+- BthTabs
+- BthNewsTickerBar
 - BthBadge
 - BthCard
 - BthStatCard
 - BthListItem
-- BthMobileTopBar
-- BthUnifiedMobileTopBar
+
+### Top Bars
+
+- BthTopBar
+
+### Content Headers
+
 - BthScreenHeader
 - BthSectionHeader
 - BthSheetFrame

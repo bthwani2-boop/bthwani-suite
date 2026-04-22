@@ -4,12 +4,12 @@ import { resolveSeedMediaSource, type BthSeedMediaKey } from '@bthwani/media-fix
 import { Image, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import {
-  BthUnifiedMobileTopBar,
   BthBox,
   BthListItem,
   BthStateView,
   BthSurface,
   BthText,
+  BthTopBar,
   radius,
   resolveRowDirection,
   resolveTextAlign,
@@ -837,7 +837,8 @@ export function DshHomeGetScreen({
           </BthText>
         </View>
       ) : (
-        <BthUnifiedMobileTopBar
+        <BthTopBar
+          variant="brand"
           title={uiText.topBar.brandName}
           subtitle={uiText.topBar.brandTagline}
           locationLabel={uiText.topBar.location}

@@ -6,6 +6,7 @@
     "strict": true,
     "declaration": true,
     "emitDeclarationOnly": false,
+    "baseUrl": "../..",
     "rootDir": "./src",
     "outDir": "./dist",
     "ignoreDeprecations": "5.0",

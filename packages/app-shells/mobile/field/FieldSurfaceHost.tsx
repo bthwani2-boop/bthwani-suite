@@ -14,9 +14,9 @@ import {
   BthStatCard,
   BthSurface,
   BthText,
+  BthTopBar,
 } from '@bthwani/ui-kit';
 import { dshField } from '@bthwani/surfaces/app-field';
-import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
 const {
@@ -299,21 +299,22 @@ export function FieldSurfaceHost() {
   };
 
   const topBar = (
-    <UnifiedMobileTopBar
+    <BthTopBar
+      variant="brand"
       title="بثواني"
       subtitle={activeServiceType === 'dsh' ? 'تشغيل الميدان - DSH' : 'تشغيل الميدان - ARB'}
       locationLabel="الرياض، مسار التغطية الشمالي"
       actions={[
         {
           id: 'profile',
-          iconName: 'person-outline',
+          icon: <Ionicons name="person-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الحساب',
           onPress: () => setAccountSheetVisible(true),
         },
-        { id: 'notifications', iconName: 'notifications-outline', badgeCount: 3, accessibilityLabel: 'الإشعارات' },
+        { id: 'notifications', icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />, badgeCount: 3, accessibilityLabel: 'الإشعارات' },
         {
           id: 'geo',
-          iconName: 'navigate-outline',
+          icon: <Ionicons name="navigate-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الموقع',
           onPress: () => {
             if (activeServiceType === 'dsh') {
@@ -321,7 +322,7 @@ export function FieldSurfaceHost() {
             }
           },
         },
-        { id: 'search', iconName: 'search-outline', accessibilityLabel: 'بحث' },
+        { id: 'search', icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'بحث' },
       ]}
       ticker={{
         statusLabel: activeServiceType === 'dsh' ? 'نشط' : 'ARB نشط',

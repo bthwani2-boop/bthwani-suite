@@ -1,4 +1,4 @@
-هل اص---
+---
 name: bthwani-surface-core-lossless
 description: 'Thin sovereign routing kernel for bthwani-suite surface work. Use one base profile plus only the minimum overlays needed for the current task.'
 ---

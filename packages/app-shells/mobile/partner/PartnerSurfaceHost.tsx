@@ -1,8 +1,7 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
-import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthSurface, BthText } from '@bthwani/ui-kit';
+import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthSurface, BthText, BthTopBar } from '@bthwani/ui-kit';
 import { dshPartner } from '@bthwani/surfaces/app-partner';
-import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
 const {
@@ -384,20 +383,21 @@ export function PartnerSurfaceHost() {
   };
 
   const topBar = (
-    <UnifiedMobileTopBar
+    <BthTopBar
+      variant="brand"
       title="بثواني"
       subtitle={activeServiceType === 'dsh' ? 'لوحة الشريك - DSH' : 'لوحة الشريك - ARB'}
       locationLabel="الرياض، فرع الياسمين"
       actions={[
         {
           id: 'profile',
-          iconName: 'person-outline',
+          icon: <Ionicons name="person-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الحساب',
           onPress: () => setAccountSheetVisible(true),
         },
         {
           id: 'notifications',
-          iconName: 'notifications-outline',
+          icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />,
           badgeCount: 3,
           accessibilityLabel: 'الإشعارات',
           onPress: () => {
@@ -406,8 +406,8 @@ export function PartnerSurfaceHost() {
             }
           },
         },
-        { id: 'orders', iconName: 'receipt-outline', accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
-        { id: 'search', iconName: 'search-outline', accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
+        { id: 'orders', icon: <Ionicons name="receipt-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
+        { id: 'search', icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
       ]}
       ticker={{
         statusLabel: activeServiceType === 'dsh' ? 'نشط' : 'ARB نشط',

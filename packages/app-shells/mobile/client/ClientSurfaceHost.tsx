@@ -11,6 +11,7 @@ import {
   BthStateView,
   BthSurface,
   BthText,
+  BthTopBar,
   useDirection,
   useUiText,
 } from '@bthwani/ui-kit';
@@ -26,7 +27,6 @@ import {
   wltAppClient,
   appClientSurfaceOwned,
 } from '@bthwani/surfaces/app-client';
-import { UnifiedMobileTopBar } from '../shared/UnifiedMobileTopBar';
 
 const { AmnEntryScreen } = amnAppClient;
 const { ArbEntryScreen } = arbAppClient;
@@ -229,14 +229,15 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
 
   const renderUnifiedTopBar = React.useCallback(() => {
     return (
-      <UnifiedMobileTopBar
+      <BthTopBar
+        variant="brand"
         title={uiText.topBar.brandName}
         subtitle={uiText.topBar.brandTagline}
         locationLabel={uiText.topBar.location}
         actions={[
           {
             id: 'account',
-            iconName: 'person-outline',
+            icon: <Ionicons name="person-outline" size={21} color="#FFFFFF" />,
             accessibilityLabel: uiText.accountSheet.title,
             onPress: () => {
               setAccountSheetTab('menu');
@@ -245,14 +246,14 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
           },
           {
             id: 'notifications',
-            iconName: 'notifications-outline',
+            icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />,
             badgeCount: notificationItems.length,
             accessibilityLabel: uiText.accountSheet.tabs.notifications,
             onPress: () => setRoute('notifications'),
           },
           {
             id: 'search',
-            iconName: 'search-outline',
+            icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />,
             accessibilityLabel: 'البحث',
             onPress: () => setRoute('search'),
           },
