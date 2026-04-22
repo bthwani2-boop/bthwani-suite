@@ -62,7 +62,7 @@ It may not own the service screen itself, its data, its flow, or its service-spe
 - screen truth owner: the owning service, not the surface app shell
 - app surface shell owner: surface delivery owner, with no authority to redefine service truth
 - `runtime/` owner when introduced later: runtime owner
-- evidence artifacts under `kdt/volatile/registry/runs/` owner: phase executor for the current phase
+- evidence artifacts under `tools/registry/runs/` owner: phase executor for the current phase
 
 ## Required Domain Owners
 
@@ -224,3 +224,4 @@ If ownership conflicts arise, resolve them in this order:
 - role ownership is explicit
 - human assignee roster is `[TBD]`
 - no implementation owners are allowed to bypass governance phase order
+

@@ -25,7 +25,7 @@
 - do not let app shells or preview registries redefine service truth
 - do not start multiple deep service tracks before the current service is sealed with evidence
 - do not create runtime truth, generated layers, or binding before their lawful later phases
-- proceed only by phase order with evidence under `kdt/volatile/registry/runs/{SESSION_ID}/` and governed packs under `kdt/factory/`
+- proceed only by phase order with evidence under `tools/registry/runs/{SESSION_ID}/` and governed packs under `kdt/factory/`
 
 ## Architecture Lock
 
@@ -34,3 +34,4 @@
 ## Next Planned Step
 
 After accepted Phase `13` screen purpose lock, the next allowed phase is Phase `14`: Flow Compression.
+

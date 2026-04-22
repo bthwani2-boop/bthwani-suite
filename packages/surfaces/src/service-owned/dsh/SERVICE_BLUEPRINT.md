@@ -139,8 +139,8 @@ Last updated: 2026-04-20 23:29:45
 | API / Contract | TBD |
 | App-client TypeScript | PASS |
 | Raw surfaces TypeScript | FAIL — outside-scope failures are not app-client closure blockers |
-| Closure evidence | kdt/volatile/registry/runs/SEAL_DSH_APP_CLIENT_UX_UI_FLOW_CLOSURE-20260420-222955 |
-| Docs retirement evidence | kdt/volatile/registry/runs/APPLY_VERIFY_DSH_DOCS_RETIRE_AND_SERVICE_BLUEPRINT_CREATE-20260420-231558 |
+| Closure evidence | tools/registry/runs/SEAL_DSH_APP_CLIENT_UX_UI_FLOW_CLOSURE-20260420-222955 |
+| Docs retirement evidence | tools/registry/runs/APPLY_VERIFY_DSH_DOCS_RETIRE_AND_SERVICE_BLUEPRINT_CREATE-20260420-231558 |
 
 ### 10.1 Verified Inventory Counts
 
@@ -285,7 +285,7 @@ This section prevents future agent drift, forgotten closure updates, and noisy d
 | Before DSH work | Read this file first |
 | During DSH work | Do not promote unverified claims |
 | After DSH work | Update this file or verify that no update is needed |
-| Evidence | Every closed DSH phase must reference an Evidence Pack under kdt/volatile/registry/runs/{SESSION_ID} |
+| Evidence | Every closed DSH phase must reference an Evidence Pack under tools/registry/runs/{SESSION_ID} |
 | UI / UX / Flow | Current verified closure exists for app-client only |
 | Binding | Must remain TBD until binding evidence exists |
 | Integration | Must remain TBD until integration evidence exists |
@@ -300,4 +300,5 @@ Run this guard before accepting any DSH closure:
 tools/scripts/APPLY_VERIFY_DSH_SERVICE_BLUEPRINT_AGENT_GUARD.ps1
 
 <!-- END DSH_BLUEPRINT_UPDATE_GUARD -->
+
 

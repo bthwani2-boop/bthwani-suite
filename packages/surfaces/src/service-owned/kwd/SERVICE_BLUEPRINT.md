@@ -94,7 +94,7 @@ Status: REQUIRED
 | Before service work | Read this file first |
 | During service work | Do not promote unverified claims |
 | After service work | Update this file or verify that no update is needed |
-| Evidence | Every closed phase must reference an Evidence Pack under kdt/volatile/registry/runs/{SESSION_ID} |
+| Evidence | Every closed phase must reference an Evidence Pack under tools/registry/runs/{SESSION_ID} |
 | Binding | Must remain TBD until binding evidence exists |
 | Integration | Must remain TBD until integration evidence exists |
 | API / Contract | Must remain TBD until contract evidence exists |
@@ -109,5 +109,6 @@ Status: REQUIRED
 
 | Date | Change | Evidence |
 |---|---|---|
-| 2026-04-20 23:46:18 | Empty service blueprint template initialized. | C:\bthwani-suite\kdt\volatile\registry\runs\APPLY_VERIFY_SERVICE_BLUEPRINT_EMPTY_TEMPLATES_ALL_SERVICES_V2-20260420-234618 |
+| 2026-04-20 23:46:18 | Empty service blueprint template initialized. | C:\bthwani-suite\tools\registry\runs\APPLY_VERIFY_SERVICE_BLUEPRINT_EMPTY_TEMPLATES_ALL_SERVICES_V2-20260420-234618 |
+
 

@@ -29,10 +29,11 @@ Before deleting a meaningful artifact, preserve traceable evidence first.
 
 During bootstrap, the preferred quarantine location is under the current session evidence root, for example:
 
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-XX/quarantine/`
+- `tools/registry/runs/{SESSION_ID}/phase-XX/quarantine/`
 
 ## Explicit Prohibition
 
 - do not silently delete governance or bootstrap artifacts without evidence
 - do not remove files in a way that destroys source trace
 - do not bypass evidence just because the file looks small or temporary
+

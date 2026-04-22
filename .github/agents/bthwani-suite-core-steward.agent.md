@@ -234,14 +234,14 @@ After bootstrap, the repo may proceed to:
 
 For bootstrap phases, every phase must deposit proof under:
 
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-00/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-01/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-02/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-03/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-04/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-05/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-06/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-07/`
+- `tools/registry/runs/{SESSION_ID}/phase-00/`
+- `tools/registry/runs/{SESSION_ID}/phase-01/`
+- `tools/registry/runs/{SESSION_ID}/phase-02/`
+- `tools/registry/runs/{SESSION_ID}/phase-03/`
+- `tools/registry/runs/{SESSION_ID}/phase-04/`
+- `tools/registry/runs/{SESSION_ID}/phase-05/`
+- `tools/registry/runs/{SESSION_ID}/phase-06/`
+- `tools/registry/runs/{SESSION_ID}/phase-07/`
 
 Always state the expected evidence location for the current phase.
 
@@ -289,7 +289,7 @@ Allowed bootstrap shell includes:
 - `docs/services/`
 - `governance/`
 - `tools/`
-- `kdt/volatile/registry/runs/`
+- `tools/registry/runs/`
 
 Do not invent broader product tree content before its phase unlock.
 

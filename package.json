@@ -4,7 +4,7 @@
   "private": true,
   "description": "Bootstrap workspace shell for the bthwani-suite clean build line",
   "scripts": {
-    "phase:review": "echo Review phase evidence under kdt/volatile/registry/runs",
+    "phase:review": "echo Review phase evidence under tools/registry/runs",
     "serve:surfaces": "pnpm nx run-many --target=serve --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7",
     "build:surfaces": "pnpm nx run-many --target=build --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7",
     "build:mobile-control-panel": "pnpm nx run-many --target=build --projects=control-panel,app-client,app-partner,app-captain,app-field --parallel=5",
@@ -37,3 +37,4 @@
     "@expo/vector-icons": "15.1.1"
   }
 }
+

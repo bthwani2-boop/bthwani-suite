@@ -16,7 +16,7 @@
 
 Use this root pattern for governed evidence artifacts:
 
-- `kdt/volatile/registry/runs/{SESSION_ID}/`
+- `tools/registry/runs/{SESSION_ID}/`
 
 ## Phase Subpath Rule
 
@@ -35,7 +35,7 @@ Each phase must deposit evidence under its own phase folder:
 
 For the current session, the active root is:
 
-- `kdt/volatile/registry/runs/f0b4b460-01e3-46fb-b37f-19737d6a04d9/`
+- `tools/registry/runs/f0b4b460-01e3-46fb-b37f-19737d6a04d9/`
 
 ## Evidence Quality Rule
 
@@ -51,3 +51,4 @@ Evidence should show:
 ## Evidence Mutation Rule
 
 If a phase artifact is materially revised, the related evidence for that phase must be revised as well.
+
