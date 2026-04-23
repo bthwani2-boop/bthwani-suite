@@ -1,0 +1,85 @@
+name: governance-baseline
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: .gitleaks.toml
+
+      - name: Dependency Cruiser
+        shell: bash
+        run: |
+          set -euo pipefail
+          TARGETS=()
+          for dir in apps packages services; do
+            if [ -d "$dir" ]; then
+              TARGETS+=("$dir")
+            fi
+          done
+
+          if [ ${#TARGETS[@]} -eq 0 ]; then
+            echo "No dependency-cruiser targets found."
+            exit 0
+          fi
+
+          pnpm dlx dependency-cruiser@17.3.10 --config .dependency-cruiser.cjs "${TARGETS[@]}"
+
+      - name: Spectral OpenAPI lint
+        shell: bash
+        run: |
+          set -euo pipefail
+          SEARCH_ROOTS=()
+          for dir in contracts apps packages services governance; do
+            if [ -d "$dir" ]; then
+              SEARCH_ROOTS+=("$dir")
+            fi
+          done
+
+          if [ ${#SEARCH_ROOTS[@]} -eq 0 ]; then
+            echo "No search roots found for Spectral."
+            exit 0
+          fi
+
+          mapfile -t OAS_FILES < <(
+            find "${SEARCH_ROOTS[@]}" -type f \( -iname "*.yaml" -o -iname "*.yml" -o -iname "*.json" \) 2>/dev/null \
+            | grep -E '(^|/)(openapi|swagger|contract|contracts)(/|\.|_)' || true
+          )
+
+          if [ ${#OAS_FILES[@]} -eq 0 ]; then
+            echo "No OpenAPI-like files found."
+            exit 0
+          fi
+
+          pnpm dlx @stoplight/spectral-cli@6.15.0 lint "${OAS_FILES[@]}" --ruleset .spectral.yaml
