@@ -1,9 +1,6 @@
-// Mobile root: wraps app with all root providers and safe area logic
-import { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
-import { useTheme } from './hooks';
-import { BthRootProviders, BthRootProvidersProps } from './BthRootProviders';
-import { BthMobileProviders } from './BthMobileProviders';
+import { BthRootProviders, type BthRootProvidersProps, useTheme } from '../providers';
 
 export interface BthMobileRootProps extends BthRootProvidersProps {
   children: ReactNode;
@@ -29,9 +26,7 @@ function BthMobileRootFrame({ children }: { children: ReactNode }) {
 export function BthMobileRoot({ children, ...rootProps }: BthMobileRootProps) {
   return (
     <BthRootProviders {...rootProps}>
-      <BthMobileRootFrame>
-        <BthMobileProviders>{children}</BthMobileProviders>
-      </BthMobileRootFrame>
+      <BthMobileRootFrame>{children}</BthMobileRootFrame>
     </BthRootProviders>
   );
 }

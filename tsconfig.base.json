@@ -7,6 +7,7 @@
     "jsx": "react-jsx",
     "strict": true,
     "noEmit": true,
+    "baseUrl": ".",
     "paths": {
       "@bthwani/api-clients": [
         "./packages/api-clients/src/index.ts"

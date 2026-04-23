@@ -6,10 +6,8 @@
     "strict": true,
     "declaration": true,
     "emitDeclarationOnly": false,
-    "baseUrl": "../..",
     "rootDir": "./src",
     "outDir": "./dist",
-    "ignoreDeprecations": "5.0",
     "types": ["react", "react-native"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"]

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, Text, View, type ScrollViewProps, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
-import { useDirection, useTheme } from './hooks';
+import { useDirection, useTheme } from './providers';
 import {
 	borders,
 	fontWeights,
@@ -160,7 +160,7 @@ export function BthSurface({
 	borderTone,
 	style
 }: BthSurfaceProps) {
-	const toneMap = {
+	const toneMap: Record<BthSurfaceTone, { background: BthBoxBackground; borderTone: BthBoxBorderTone; elevationToken: ElevationToken }> = {
 		default: { background: 'surface' as const, borderTone: 'line' as const, elevationToken: 'flat' as const },
 		raised: { background: 'surfaceRaised' as const, borderTone: 'lineStrong' as const, elevationToken: 'raised' as const },
 		inset: { background: 'surfaceInset' as const, borderTone: 'line' as const, elevationToken: 'flat' as const },
@@ -169,9 +169,9 @@ export function BthSurface({
 		warning: { background: 'warningSurface' as const, borderTone: 'warning' as const, elevationToken: 'flat' as const },
 		danger: { background: 'dangerSurface' as const, borderTone: 'danger' as const, elevationToken: 'flat' as const },
 		info: { background: 'infoSurface' as const, borderTone: 'info' as const, elevationToken: 'flat' as const }
-	} as const;
+	};
 
-	const toneConfig = (toneMap as any)[tone] ?? toneMap.default;
+	const toneConfig = toneMap[tone];
 	if ((process.env.NODE_ENV ?? '') !== 'production' && !(tone in toneMap)) {
 		// eslint-disable-next-line no-console
 		console.warn(`BthSurface: unknown tone "${String(tone)}" — falling back to 'default'`);
