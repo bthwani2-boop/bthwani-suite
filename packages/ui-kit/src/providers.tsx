@@ -10,6 +10,8 @@ import React, {
 	type ReactNode,
 } from 'react';
 import { Platform } from 'react-native';
+import { TamaguiProvider } from 'tamagui';
+import tamaguiConfig from '../../../tamagui.config';
 import {
 	directionConfig,
 	getBthUiText,
@@ -345,4 +347,5 @@ export function BthRootProviders({ children, language, themeMode }: BthRootProvi
 }
 
 export type { BthLanguage, Direction, SemanticTheme, ThemeMode } from './foundation';
+
 

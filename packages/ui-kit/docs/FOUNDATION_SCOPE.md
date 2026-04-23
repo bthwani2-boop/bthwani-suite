@@ -44,7 +44,7 @@ Execution plan: [BTH_UI_KIT_SUPREME_EXECUTION_PLAN_2026_AR.md](./BTH_UI_KIT_SUPR
 
 ## Current Reality Note
 
-- the package still contains generic `components/` and `patterns/` directories from earlier growth
+- the package still contains generic `components/` from earlier growth
 - this execution window does not treat those directories as blanket permission for screen-driven expansion
 - shared screen shells remain provisional until a later retained-screen review proves demand and duplicate-family cleanup
 

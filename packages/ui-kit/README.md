@@ -12,17 +12,13 @@
 
 ## Current package layers
 
-- `foundation/tokens`
-- `foundation/themes`
-- `foundation/direction`
-- `providers`
-- `hooks`
-- `primitives`
-- `states`
-- `components`
-- `patterns`
-- `adapters`
-- `docs`
+- `foundation` for tokens, themes, direction, and output helpers
+- `providers` for theme, direction, i18n, and portal context
+- `primitives` for base box, surface, text, divider, and scroll primitives
+- `components` for shared buttons, cards, fields, headers, media, overlays, and state shells
+- `mobile` and `web` for platform entrypoints and root shells
+- `next` for the Next.js bridge exports
+- `index` and `locales` for package aggregation and text catalogs
 
 ## Governance sources
 
@@ -37,10 +33,10 @@
 
 ## Runtime outputs
 
-- token output APIs now live under `foundation/tokens/outputs`
-- theme output APIs now live under `foundation/themes/outputs`
+- token output APIs live in the foundation layer
+- theme output APIs live in the foundation layer
 - web root CSS variables are generated from the same theme source consumed by native modes
-- generated proof artifacts are not claimed in this snapshot unless the files physically exist under `packages/ui-kit/docs/generated`
+- generated proof artifacts, when produced, live under `packages/ui-kit/docs/generated`
 
 ## Proof stack
 

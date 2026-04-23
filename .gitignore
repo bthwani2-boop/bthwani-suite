@@ -1,9 +1,7 @@
 # Dependencies
 node_modules/
-
 # Package manager
 .pnpm-store/
-
 # Build and cache output
 dist/
 build/
@@ -13,33 +11,28 @@ coverage/
 .cache/
 tmp/
 temp/
-
 # Logs
 *.log
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
 # Environment files
 .env
 .env.*
 .expo/
-
 # OS/editor noise
 .DS_Store
 Thumbs.db
-
 .claude/worktrees
 .claude/settings.local.json
-
 # Local-only donor/service intelligence outputs
 docs/services/surfaces-legacy-trash/
-
 # Local registry run artifacts
 tools/registry/runs/
-
 # Local-only media fixture assets
 packages/media-fixtures/assets/
 # Local Python virtual environments
 .venv/
+.tamagui/
+tamagui.generated.css
