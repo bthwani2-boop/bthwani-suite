@@ -1,6 +1,6 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
-import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthSurface, BthText, BthTopBar } from '@bthwani/ui-kit';
+import { BthBox, BthButton, BthIcon, BthMobileScrollView, BthScreenHeader, BthSurface, BthText, BthTopBar } from '@bthwani/ui-kit';
 import { dshPartner } from '@bthwani/surfaces/app-partner';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
@@ -145,13 +145,13 @@ type PartnerStoreHoursDay = {
 
 const partnerTypeOptions: readonly MobileAccountTypeOption[] = [
   { id: 'dsh', label: 'DSH', description: 'تشغيل الطلبات والتسليم' },
-  { id: 'arb', label: 'ARB', description: 'تشغيل عرب الشركاء والمسارات' },
+                icon: <BthIcon name="person-outline" size={21} color="#FFFFFF" />,
 ];
 
 export function PartnerSurfaceHost() {
   const [activeServiceType, setActiveServiceType] = React.useState<PartnerServiceType>('dsh');
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
-  const [route, setRoute] = React.useState<PartnerRoute>('entry');
+                icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
   const [activeOrderId, setActiveOrderId] = React.useState('partner-order-1042');
   const [listingEnabled, setListingEnabled] = React.useState(true);
   const [storeOpen, setStoreOpen] = React.useState(true);
@@ -160,8 +160,8 @@ export function PartnerSurfaceHost() {
       id: 'delivery',
       label: 'Delivery',
       description: 'Accept delivery demand and keep captain handoff open.',
-      enabled: true,
-    },
+              { id: 'orders', icon: <BthIcon name="receipt-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
+              { id: 'search', icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
     {
       id: 'pickup',
       label: 'Pickup',
@@ -391,13 +391,13 @@ export function PartnerSurfaceHost() {
       actions={[
         {
           id: 'profile',
-          icon: <Ionicons name="person-outline" size={21} color="#FFFFFF" />,
+          icon: <BthIcon name="person-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الحساب',
           onPress: () => setAccountSheetVisible(true),
         },
         {
           id: 'notifications',
-          icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />,
+          icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
           badgeCount: 3,
           accessibilityLabel: 'الإشعارات',
           onPress: () => {
@@ -406,8 +406,8 @@ export function PartnerSurfaceHost() {
             }
           },
         },
-        { id: 'orders', icon: <Ionicons name="receipt-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
-        { id: 'search', icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
+        { id: 'orders', icon: <BthIcon name="receipt-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
+        { id: 'search', icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
       ]}
       ticker={{
         statusLabel: activeServiceType === 'dsh' ? 'نشط' : 'ARB نشط',

@@ -22,7 +22,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { resolveSeedMediaSource, type BthSeedMediaKey } from '@bthwani/media-fixtures';
-import { BthButton, BthChip, BthHighlightsRail, BthTopBar, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText, BthProductCard } from '@bthwani/ui-kit';
+import { BthButton, BthChip, BthHighlightsRail, BthIcon, BthTopBar, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText, BthProductCard } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../../shared/catalog/catalog';
 import { formatDshStoreFollowersLabel } from '../../shared/store-profile';
 import { storeItemsByStoreId, type DshStoreFixtureItem as DshStoreGetMenuItem } from '../fixtures';
@@ -1336,26 +1336,27 @@ export function DshStoreGetScreen({
           actions={[
             {
               id: 'share',
-              icon: <Ionicons name="share-social-outline" size={20} color={stylesTokens.dark} />,
+              icon: <BthIcon name="share-social-outline" size={20} color={stylesTokens.dark} />,
               accessibilityLabel: 'مشاركة المتجر',
               onPress: handleStoreShare,
             },
             {
               id: 'cart',
-              icon: <Ionicons name="cart-outline" size={20} color={stylesTokens.dark} />,
+              icon: <BthIcon name="cart-outline" size={20} color={stylesTokens.dark} />,
               accessibilityLabel: 'السلة',
               onPress: onOpenCart ?? onOpenItems,
             },
             {
               id: 'search',
-              icon: <Ionicons name="search-outline" size={20} color={stylesTokens.dark} />,
+              icon: <BthIcon name="search-outline" size={20} color={stylesTokens.dark} />,
               accessibilityLabel: 'بحث',
               onPress: openInlineSearch,
             },
           ]}
           trailingAction={{
             id: 'back',
-            icon: <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color={stylesTokens.orange} />,
+            icon: <BthIcon name="arrow-back" size={24} color={colorPalette.brand ?? stylesTokens.orange} />,
+            mirrorInRtl: true,
             accessibilityLabel: 'رجوع',
             onPress: onBack,
           }}

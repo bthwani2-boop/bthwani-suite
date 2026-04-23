@@ -6,6 +6,7 @@ import { Image, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react
 import {
   BthBox,
   BthListItem,
+  BthIcon,
   BthStateView,
   BthSurface,
   BthText,
@@ -842,7 +843,7 @@ export function DshHomeGetScreen({
           title={uiText.topBar.brandName}
           subtitle={uiText.topBar.brandTagline}
           locationLabel={uiText.topBar.location}
-          locationIcon={<Ionicons name="location-outline" size={14} color="#FFFFFF" />}
+          locationIcon={<BthIcon name="location-outline" size={14} color="#FFFFFF" />}
           actions={[
             {
               id: 'my-space',
@@ -859,20 +860,20 @@ export function DshHomeGetScreen({
             },
             {
               id: 'notifications',
-              icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />,
+              icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
               badgeCount: 5,
               accessibilityLabel: 'الإشعارات',
               onPress: onOpenNotifications,
             },
             {
               id: 'cart',
-              icon: <Ionicons name="cart-outline" size={21} color="#FFFFFF" />,
+              icon: <BthIcon name="cart-outline" size={21} color="#FFFFFF" />,
               accessibilityLabel: 'السلة',
               onPress: onOpenCart,
             },
             {
               id: 'search',
-              icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />,
+              icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />,
               accessibilityLabel: 'بحث',
               onPress: openInlineSearch,
             },

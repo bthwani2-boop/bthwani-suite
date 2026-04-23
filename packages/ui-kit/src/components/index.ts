@@ -6,6 +6,8 @@ export { AmountInput, BthCheckbox, BthFormScreenShell, BthOptionRow, BthRadio, B
 export type { AmountInputProps, BthCheckboxProps, BthFormScreenShellProps, BthOptionRowProps, BthRadioProps, BthSelectFieldProps, BthSelectOption, BthSegmentedControlProps, BthSegmentedOption, BthSwitchProps, BthTextFieldProps, PaymentMethod, PaymentMethodListProps, QuickAmountGridProps, SummaryCardProps, SummaryItem } from './field';
 export { BthNewsTickerBar, BthScreenHeader, BthSectionHeader, BthTabs, BthTopBar } from './header';
 export type { BthNewsTickerBarProps, BthScreenHeaderProps, BthSectionHeaderProps, BthTabItem, BthTabsProps, BthTopBarAction, BthTopBarProps } from './header';
+export { BthIcon } from './icons';
+export type { BthIconName, BthIconProps, BthIconTone } from './icons';
 export { BthDataTable, BthHighlightsRail, BthKeyValueList, BthListItem } from './list';
 export type { BthDataTableColumn, BthDataTableProps, BthHighlightsRailItem, BthHighlightsRailProps, BthKeyValueItem, BthKeyValueListProps, BthListItemProps } from './list';
 export { BthAvatar, BthBanner, BthImage, BthLogo, DirectionalIcon } from './media';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BthBadge, BthBox, BthButton, BthMobileScrollView, BthSurface, BthText, BthTopBar } from '@bthwani/ui-kit';
+import { BthBadge, BthBox, BthButton, BthIcon, BthMobileScrollView, BthSurface, BthText, BthTopBar, colorPalette } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
 import { dshNotificationsFixtures } from '../fixtures/dshNotificationsFixtures';
 
@@ -205,7 +205,7 @@ function renderContent(
           onBack
             ? {
                 id: 'back',
-                icon: <Ionicons name="arrow-back" size={24} color="#F97316" />,
+                icon: <BthIcon name="arrow-back" size={24} color={colorPalette.brand ?? '#F97316'} />,
                 mirrorInRtl: true,
                 accessibilityLabel: 'رجوع',
                 onPress: onBack,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BthBox, BthButton, BthMobileScrollView, BthScreenHeader, BthStateView, BthSurface, BthText, BthTopBar } from '@bthwani/ui-kit';
+import { BthBox, BthButton, BthIcon, BthMobileScrollView, BthScreenHeader, BthStateView, BthSurface, BthText, BthTopBar } from '@bthwani/ui-kit';
 import { dshCaptain } from '@bthwani/surfaces/app-captain';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
@@ -186,13 +186,13 @@ export function CaptainSurfaceHost() {
             setActiveTaskId('captain-task-9021');
             setIsDeliverySheetVisible(true);
             setRoute('detail');
-          }}
+                icon: <BthIcon name="person-outline" size={21} color="#FFFFFF" />,
         />
       );
     }
 
     if (route === 'inbox') {
-      return (
+                icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
         <CaptainTasksInboxScreen
           state={inboxState}
           onRetry={() => setInboxState('active')}
@@ -203,7 +203,7 @@ export function CaptainSurfaceHost() {
     }
 
     if (route === 'detail') {
-      return (
+                icon: <BthIcon name="bicycle-outline" size={21} color="#FFFFFF" />,
         <>
           <BthBox gap={3}>
             <CaptainTaskDetailScreen
@@ -211,7 +211,7 @@ export function CaptainSurfaceHost() {
               onConfirmPickup={() => setIsPickupSheetVisible(true)}
               onConfirmDelivery={() => setIsDeliverySheetVisible(true)}
               onOpenNextTask={() => setRoute('inbox')}
-              onBackToInbox={() => setRoute('inbox')}
+              { id: 'search', icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
               onRetry={() => setRoute('detail')}
             />
             <BthButton label="فتح تواصل الطلب" tone="secondary" fullWidth={false} onPress={() => setRoute('orderchat')} />
@@ -273,13 +273,13 @@ export function CaptainSurfaceHost() {
       actions={[
         {
           id: 'profile',
-          icon: <Ionicons name="person-outline" size={21} color="#FFFFFF" />,
+          icon: <BthIcon name="person-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الحساب',
           onPress: () => setAccountSheetVisible(true),
         },
         {
           id: 'notifications',
-          icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />,
+          icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
           badgeCount: 2,
           accessibilityLabel: 'الإشعارات',
           onPress: () => {
@@ -290,7 +290,7 @@ export function CaptainSurfaceHost() {
         },
         {
           id: 'tasks',
-          icon: <Ionicons name="bicycle-outline" size={21} color="#FFFFFF" />,
+          icon: <BthIcon name="bicycle-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'المهام',
           onPress: () => {
             if (activeServiceType === 'dsh') {
@@ -298,7 +298,7 @@ export function CaptainSurfaceHost() {
             }
           },
         },
-        { id: 'search', icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
+        { id: 'search', icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
       ]}
       ticker={{
         statusLabel: activeServiceType === 'dsh' ? 'مباشر' : 'وضع AMN',

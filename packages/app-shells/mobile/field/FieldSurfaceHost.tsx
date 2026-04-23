@@ -5,6 +5,7 @@ import {
   BthBox,
   BthButton,
   BthCard,
+  BthIcon,
   BthKeyValueList,
   BthListItem,
   BthMobileScrollView,
@@ -307,14 +308,19 @@ export function FieldSurfaceHost() {
       actions={[
         {
           id: 'profile',
-          icon: <Ionicons name="person-outline" size={21} color="#FFFFFF" />,
+          icon: <BthIcon name="person-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الحساب',
           onPress: () => setAccountSheetVisible(true),
         },
-        { id: 'notifications', icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />, badgeCount: 3, accessibilityLabel: 'الإشعارات' },
+        {
+          id: 'notifications',
+          icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
+          badgeCount: 3,
+          accessibilityLabel: 'الإشعارات',
+        },
         {
           id: 'geo',
-          icon: <Ionicons name="navigate-outline" size={21} color="#FFFFFF" />,
+          icon: <BthIcon name="navigate-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الموقع',
           onPress: () => {
             if (activeServiceType === 'dsh') {
@@ -322,7 +328,7 @@ export function FieldSurfaceHost() {
             }
           },
         },
-        { id: 'search', icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'بحث' },
+        { id: 'search', icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'بحث' },
       ]}
       ticker={{
         statusLabel: activeServiceType === 'dsh' ? 'نشط' : 'ARB نشط',

@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, View, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
-import { BthBox, BthMobileScrollView, BthSurface, BthText, BthTopBar, spacing, useTheme } from '@bthwani/ui-kit';
+import { BthBox, BthIcon, BthMobileScrollView, BthSurface, BthText, BthTopBar, spacing, useTheme } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
 import { DshMySpaceCommercialScreen } from './DshMySpaceCommercialScreen';
 import { DshMySpaceOrdersScreen } from './DshMySpaceOrdersScreen';
@@ -182,7 +182,7 @@ export function DshMySpaceScreen({
       <BthTopBar
         variant="surface"
         title="مساحتي"
-        trailingAction={onBack ? { id: 'back', icon: <Ionicons name="arrow-back" size={24} color="#F97316" />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
+        trailingAction={onBack ? { id: 'back', icon: <BthIcon name="arrow-back" size={24} color={theme.brand} />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
       />
 
       <BthMobileScrollView fill padding={2} gap={2}>

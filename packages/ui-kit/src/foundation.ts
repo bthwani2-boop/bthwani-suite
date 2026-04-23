@@ -24,11 +24,11 @@ export const rawColorPalettes = {
 		950: '#020617'
 	},
 	brand: {
-		50: '#FFF7ED',
-		100: '#FFEDD5',
-		500: '#F97316',
-		600: '#EA580C',
-		700: '#C2410C'
+		50: '#FFF4ED',
+		100: '#FFE6D9',
+		500: '#FF500D',
+		600: '#0A2F5C',
+		700: '#07213F'
 	},
 	success: {
 		50: '#ECFDF3',
@@ -620,9 +620,9 @@ export const darkTheme: SemanticTheme = {
 	textMuted: '#CBD5E1',
 	textSoft: '#94A3B8',
 	textInverse: colorPalette.ink,
-	brand: '#FB923C',
-	brandContrast: '#1C1917',
-	brandSurface: withAlpha('#FB923C', 0.16),
+	brand: '#FF500D',
+	brandContrast: '#FFFFFF',
+	brandSurface: withAlpha('#FF500D', 0.16),
 	success: '#4ADE80',
 	successSurface: withAlpha('#4ADE80', 0.16),
 	successText: '#BBF7D0',
@@ -635,14 +635,14 @@ export const darkTheme: SemanticTheme = {
 	info: '#60A5FA',
 	infoSurface: withAlpha('#60A5FA', 0.16),
 	infoText: '#BFDBFE',
-	focusRing: withAlpha('#FB923C', 0.4),
+	focusRing: withAlpha('#FF500D', 0.4),
 	overlay: withAlpha('#020617', 0.72),
 	overlaySoft: withAlpha('#020617', 0.36),
 	disabledSurface: '#1E293B',
 	disabledText: '#64748B',
 	fieldBackground: '#0F172A',
 	fieldBorder: '#334155',
-	fieldBorderActive: '#FB923C',
+	fieldBorderActive: '#FF500D',
 	fieldPlaceholder: '#64748B'
 };
 

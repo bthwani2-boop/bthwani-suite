@@ -5,6 +5,7 @@ import {
   BthBadge,
   BthBox,
   BthButton,
+  BthIcon,
   BthCard,
   BthChip,
   BthKeyValueList,
@@ -598,7 +599,7 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
       <BthTopBar
         variant="surface"
         title={journeyTopBarTitle}
-        trailingAction={onBack ? { id: 'back', icon: <Ionicons name="arrow-back" size={24} color="#F97316" />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
+        trailingAction={onBack ? { id: 'back', icon: <BthIcon name="arrow-back" size={24} color={ACCENT_GOLD} />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
       />
 
       <BthMobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>

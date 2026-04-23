@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import {
   BthBox,
   BthButton,
+  BthIcon,
   BthSectionHeader,
   BthServiceTileCard,
   BthSheetFrame,
@@ -237,7 +238,7 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
         actions={[
           {
             id: 'account',
-            icon: <Ionicons name="person-outline" size={21} color="#FFFFFF" />,
+            icon: <BthIcon name="person-outline" size={21} color="#FFFFFF" />,
             accessibilityLabel: uiText.accountSheet.title,
             onPress: () => {
               setAccountSheetTab('menu');
@@ -246,14 +247,14 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
           },
           {
             id: 'notifications',
-            icon: <Ionicons name="notifications-outline" size={21} color="#FFFFFF" />,
+            icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
             badgeCount: notificationItems.length,
             accessibilityLabel: uiText.accountSheet.tabs.notifications,
             onPress: () => setRoute('notifications'),
           },
           {
             id: 'search',
-            icon: <Ionicons name="search-outline" size={21} color="#FFFFFF" />,
+            icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />,
             accessibilityLabel: 'البحث',
             onPress: () => setRoute('search'),
           },

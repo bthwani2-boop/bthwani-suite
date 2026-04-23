@@ -3,6 +3,7 @@ import { View, I18nManager, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   BthButton,
+  BthIcon,
   BthMobileScrollView,
   BthSectionHeader,
   BthSurface,
@@ -356,14 +357,14 @@ export default function DshCartUnifiedScreen(props: any) {
         actions={[
           {
             id: 'clear-cart',
-            icon: <Ionicons name="trash-outline" size={20} color={TEXT_DARK} />,
+            icon: <BthIcon name="trash-outline" size={20} color={TEXT_DARK} />,
             accessibilityLabel: 'تفريغ السلة',
             onPress: () => setItems([]),
           },
         ]}
         trailingAction={{
           id: 'exit-checkout',
-          icon: <Ionicons name="arrow-back" size={24} color={ACCENT_GOLD} />,
+          icon: <BthIcon name="arrow-back" size={24} color={ACCENT_GOLD} />,
           mirrorInRtl: true,
           accessibilityLabel: 'الرجوع',
           onPress: () => props.onExit?.(),
