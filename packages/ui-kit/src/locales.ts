@@ -6,8 +6,8 @@ export const uiKitLocales = {
 			},
 			topBar: {
 				brandName: 'بثواني',
-				brandTagline: 'تحقق الأماني',
-				location: 'صنعاء، الجيل الجديد',
+				brandTagline: 'نحقق الأماني',
+				location: 'صنعاء، حي الأصبحي',
 			},
 			serviceHub: {
 				availableServices: 'الخدمات المتاحة',

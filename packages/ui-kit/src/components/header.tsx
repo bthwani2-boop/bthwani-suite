@@ -1,32 +1,104 @@
 import React from 'react';
-import { Pressable, ScrollView, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Animated, Easing, Pressable, ScrollView, View, type StyleProp, type ViewStyle } from 'react-native';
 import { radius, resolveRowDirection, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { BthBadge, BthButton } from './button';
 import { BthSurface, BthText } from '../primitives';
 
-export type BthTopBarVariant = 'default' | 'brand';
+export type BthTopBarVariant = 'default' | 'surface' | 'brand';
 
 export type BthNewsTickerBarProps = {
   statusLabel: string;
   message: string;
   onPress?: () => void;
   variant?: BthTopBarVariant;
+  marquee?: boolean;
+  marqueeDurationMs?: number;
 };
 
-export function BthNewsTickerBar({ statusLabel, message, onPress, variant = 'default' }: BthNewsTickerBarProps) {
+export function BthNewsTickerBar({ statusLabel, message, onPress, variant = 'default', marquee = false, marqueeDurationMs = 18000 }: BthNewsTickerBarProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const isBrand = variant === 'brand';
+  const messageLines = isBrand ? 1 : 2;
+  const verticalPadding = isBrand ? 0 : spacing[2];
+  const horizontalPadding = isBrand ? spacing[3] : spacing[4];
+  const marqueeTranslateX = React.useRef(new Animated.Value(0)).current;
+  const [viewportWidth, setViewportWidth] = React.useState(0);
+  const [copyWidth, setCopyWidth] = React.useState(0);
+  const shouldMarquee = marquee && viewportWidth > 0 && copyWidth > viewportWidth;
+  const marqueeDistance = copyWidth + spacing[4];
+  const marqueeStartOffset = direction === 'rtl' ? -marqueeDistance : 0;
+  const marqueeEndOffset = direction === 'rtl' ? 0 : -marqueeDistance;
+
+  React.useEffect(() => {
+    marqueeTranslateX.stopAnimation();
+    marqueeTranslateX.setValue(0);
+    setViewportWidth(0);
+    setCopyWidth(0);
+  }, [message, marquee, marqueeTranslateX]);
+
+  React.useEffect(() => {
+    if (!shouldMarquee) {
+      marqueeTranslateX.stopAnimation();
+      marqueeTranslateX.setValue(marqueeStartOffset);
+      return undefined;
+    }
+
+    marqueeTranslateX.setValue(marqueeStartOffset);
+
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.delay(1200),
+        Animated.timing(marqueeTranslateX, {
+          toValue: marqueeEndOffset,
+          duration: marqueeDurationMs,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+      ]),
+      { resetBeforeIteration: true },
+    );
+
+    loop.start();
+
+    return () => {
+      loop.stop();
+      marqueeTranslateX.stopAnimation();
+      marqueeTranslateX.setValue(marqueeStartOffset);
+    };
+  }, [marqueeDistance, marqueeDurationMs, marqueeStartOffset, marqueeEndOffset, marqueeTranslateX, shouldMarquee]);
+
+  const messageTone = isBrand ? 'inverse' : 'default';
 
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [{ paddingVertical: spacing[2], paddingHorizontal: spacing[4], borderRadius: radius.pill, backgroundColor: isBrand ? 'rgba(255, 255, 255, 0.14)' : theme.surfaceInset, borderWidth: isBrand ? 1 : 0, borderColor: isBrand ? 'rgba(255, 255, 255, 0.14)' : theme.line, opacity: pressed ? 0.9 : 1 }]}
+      style={({ pressed }) => [{ paddingVertical: verticalPadding, paddingHorizontal: horizontalPadding, borderRadius: radius.pill, backgroundColor: isBrand ? 'rgba(255, 255, 255, 0.14)' : theme.surfaceInset, borderWidth: isBrand ? 1 : 0, borderColor: isBrand ? 'rgba(255, 255, 255, 0.14)' : theme.line, opacity: pressed ? 0.9 : 1 }]}
     >
       <View style={{ flexDirection: resolveRowDirection(direction), gap: spacing[2], alignItems: 'center' }}>
         <BthBadge label={statusLabel} tone="info" />
-        <BthText role="bodySm" tone={isBrand ? 'inverse' : 'default'} numberOfLines={2} style={{ flex: 1 }}>{message}</BthText>
+        <View style={{ flex: 1, overflow: 'hidden', justifyContent: 'center' }} onLayout={(event) => setViewportWidth(event.nativeEvent.layout.width)}>
+          {shouldMarquee ? (
+            <Animated.View style={{ flexDirection: 'row', alignItems: 'center', transform: [{ translateX: marqueeTranslateX }] }}>
+              <View onLayout={(event) => setCopyWidth(event.nativeEvent.layout.width)} style={{ flexShrink: 0 }}>
+                <BthText role="bodySm" tone={messageTone} numberOfLines={1}>
+                  {message}
+                </BthText>
+              </View>
+              <View style={{ width: spacing[4] }} />
+              <View style={{ flexShrink: 0 }}>
+                <BthText role="bodySm" tone={messageTone} numberOfLines={1}>
+                  {message}
+                </BthText>
+              </View>
+            </Animated.View>
+          ) : (
+            <BthText role="bodySm" tone={messageTone} numberOfLines={messageLines} style={{ flex: 1 }}>
+              {message}
+            </BthText>
+          )}
+        </View>
       </View>
     </Pressable>
   );
@@ -139,13 +211,15 @@ export type BthTopBarProps = {
   ticker?: BthNewsTickerBarProps;
   tabs?: BthTabsProps<string>;
   variant?: BthTopBarVariant;
+  contentOffsetY?: number;
   style?: StyleProp<ViewStyle>;
 };
 
-export function BthTopBar({ title, subtitle, locationLabel, locationIcon, actions = [], trailingAction, ticker, tabs, variant = 'default', style }: BthTopBarProps) {
+export function BthTopBar({ title, subtitle, locationLabel, locationIcon, actions = [], trailingAction, ticker, tabs, variant = 'default', contentOffsetY = 0, style }: BthTopBarProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const isBrand = variant === 'brand';
+  const brandHeadline = isBrand && subtitle ? `${title} ${subtitle}` : title;
 
   function renderAction(action: BthTopBarAction) {
     const badgeAnchorStyle = direction === 'rtl' ? { left: -spacing[1] } : { right: -spacing[1] };
@@ -153,7 +227,7 @@ export function BthTopBar({ title, subtitle, locationLabel, locationIcon, action
     const showBadge = typeof action.badgeCount === 'number' && action.badgeCount > 0;
 
     return (
-      <Pressable key={action.id} accessibilityRole="button" accessibilityLabel={action.accessibilityLabel} disabled={action.disabled} onPress={action.onPress} style={({ pressed }) => [{ padding: spacing[2], opacity: action.disabled ? 0.56 : pressed ? 0.9 : 1 }]}>
+      <Pressable key={action.id} accessibilityRole="button" accessibilityLabel={action.accessibilityLabel} disabled={action.disabled} onPress={action.onPress} style={({ pressed }) => [{ padding: isBrand ? spacing[2] : spacing[2], opacity: action.disabled ? 0.56 : pressed ? 0.9 : 1 }]}>
         <View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
           {showBadge ? (
             <View style={[{ position: 'absolute', top: -spacing[1], zIndex: 1 }, badgeAnchorStyle]}>
@@ -167,12 +241,18 @@ export function BthTopBar({ title, subtitle, locationLabel, locationIcon, action
   }
 
   return (
-    <BthSurface tone={isBrand ? 'brand' : 'raised'} border={!isBrand} padding={4} gap={3} style={[isBrand ? { backgroundColor: theme.brand } : undefined, style]}>
+    <BthSurface tone={isBrand ? 'brand' : 'raised'} border={!isBrand} padding={isBrand ? 2 : 4} gap={isBrand ? 1 : 3} style={[isBrand ? { backgroundColor: theme.brand, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, paddingBottom: 0 } : undefined, style]}>
       {variant !== 'brand' && ticker ? <BthNewsTickerBar {...ticker} variant={variant} /> : null}
-      <View style={{ flexDirection: resolveRowDirection(direction), justifyContent: 'space-between', alignItems: locationLabel && isBrand ? 'flex-start' : 'center', gap: spacing[3] }}>
-        <View style={{ flex: 1, gap: spacing[1] }}>
-          <BthText role="titleSm" tone={isBrand ? 'inverse' : 'default'}>{title}</BthText>
-          {subtitle ? <BthText role="bodySm" tone={isBrand ? 'inverse' : 'muted'}>{subtitle}</BthText> : null}
+      <View style={[{ flexDirection: resolveRowDirection(direction), justifyContent: 'space-between', alignItems: locationLabel && isBrand ? 'flex-start' : 'center', gap: spacing[2] }, isBrand && contentOffsetY ? { transform: [{ translateY: contentOffsetY }] } : null]}>
+        <View style={{ flex: 1, gap: isBrand ? spacing[0] : spacing[1] }}>
+          {isBrand ? (
+            <BthText role="titleSm" tone="inverse" numberOfLines={1}>{brandHeadline}</BthText>
+          ) : (
+            <>
+              <BthText role="titleSm" tone="default">{title}</BthText>
+              {subtitle ? <BthText role="bodySm" tone="muted">{subtitle}</BthText> : null}
+            </>
+          )}
           {locationLabel ? (
             <View style={{ flexDirection: resolveRowDirection(direction), gap: spacing[1], alignItems: 'center' }}>
               {locationIcon}
@@ -180,7 +260,7 @@ export function BthTopBar({ title, subtitle, locationLabel, locationIcon, action
             </View>
           ) : null}
         </View>
-        <View style={{ flexDirection: resolveRowDirection(direction), gap: spacing[2], alignItems: 'center' }}>
+        <View style={{ flexDirection: 'row', gap: isBrand ? spacing[2] : spacing[2], alignItems: 'center' }}>
           {actions.map(renderAction)}
           {trailingAction ? renderAction(trailingAction) : null}
         </View>

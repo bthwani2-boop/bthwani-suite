@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { resolveSeedMediaSource, type BthSeedMediaKey } from '@bthwani/media-fixtures';
-import { Image, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, TextInput, View, type ImageSourcePropType } from 'react-native';
 
 import {
   BthBox,
@@ -39,8 +39,8 @@ import {
   DSH_CATEGORY_ICONS,
 } from '../../categories/fixtures/dshCategoriesFixtures';
 import { getDshCategoryFixture } from '../../categories/fixtures/dshCategoriesFixtures';
-import { DshSheinOrderCreateScreen } from '../../shein/screens';
 import { DshAwnakOrderCreateScreen } from '../../awnak/screens';
+import { DshSheinOrderCreateScreen } from '../../shein/screens';
 import {
   DshHomeApprovedVideoReelsViewer,
   type DshHomeApprovedVideoReelsViewerProps,
@@ -52,20 +52,20 @@ import CategoryClockDial, {
 import { getDshCategoryIconUrl } from '../../categories/utils/getDshCategoryIconUrl';
 import type { MarketingGrowthRecord } from '../../../shared/marketing/growth-store';
 
-function resolveDshHomeStoreImageSource(mediaKey?: string) {
+function resolveDshHomeStoreImageSource(mediaKey?: string): ImageSourcePropType | undefined {
   if (!mediaKey) {
     return undefined;
   }
 
-  return resolveSeedMediaSource(mediaKey as BthSeedMediaKey);
+  return resolveSeedMediaSource(mediaKey as BthSeedMediaKey) as ImageSourcePropType;
 }
 
-function resolveDshHomeBannerImageSource(mediaKey?: string) {
+function resolveDshHomeBannerImageSource(mediaKey?: string): ImageSourcePropType | undefined {
   if (!mediaKey) {
     return undefined;
   }
 
-  return resolveSeedMediaSource(mediaKey as BthSeedMediaKey);
+  return resolveSeedMediaSource(mediaKey as BthSeedMediaKey) as ImageSourcePropType;
 }
 export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
@@ -79,6 +79,7 @@ export type DshHomeGetScreenProps = {
   onOpenMySpace?: () => void;
   onOpenNotifications?: () => void;
   onOpenCart?: () => void;
+  onOpenService?: (serviceId: DshServiceId) => void;
   onOpenList?: () => void;
   onOpenCategory?: (categoryId: string) => void;
   onOpenDiscovery?: () => void;
@@ -153,6 +154,122 @@ export type DshHomeRecentOrder = {
   statusLabel: string;
 };
 
+type DshServiceId = 'dsh' | 'knz' | 'amn' | 'arb' | 'wlt' | 'esf' | 'kwd' | 'mrf' | 'snd';
+
+const serviceDialAnchorLayout: DialAnchorLayout = {
+  x: spacing[3],
+  y: spacing[14],
+  width: 40,
+  height: 40,
+};
+
+const serviceDialItems: CategoryDialItem[] = [
+  {
+    id: 'service-dsh',
+    key: 'dsh',
+    title: 'توصيل',
+    iconUrl: null,
+    emojiFallback: '🚚',
+  },
+  {
+    id: 'service-knz',
+    key: 'knz',
+    title: 'كنز',
+    iconUrl: null,
+    emojiFallback: '🪙',
+  },
+  {
+    id: 'service-amn',
+    key: 'amn',
+    title: 'أمان',
+    iconUrl: null,
+    emojiFallback: '🛡️',
+  },
+  {
+    id: 'service-arb',
+    key: 'arb',
+    title: 'عربون',
+    iconUrl: null,
+    emojiFallback: '💳',
+  },
+  {
+    id: 'service-wlt',
+    key: 'wlt',
+    title: 'المحفظة',
+    iconUrl: null,
+    emojiFallback: '👛',
+  },
+  {
+    id: 'service-esf',
+    key: 'esf',
+    title: 'أسعفني',
+    iconUrl: null,
+    emojiFallback: '🩺',
+  },
+  {
+    id: 'service-kwd',
+    key: 'kwd',
+    title: 'كوادر',
+    iconUrl: null,
+    emojiFallback: '🧰',
+  },
+  {
+    id: 'service-mrf',
+    key: 'mrf',
+    title: 'معروف',
+    iconUrl: null,
+    emojiFallback: '🏷️',
+  },
+  {
+    id: 'service-snd',
+    key: 'snd',
+    title: 'سند',
+    iconUrl: null,
+    emojiFallback: '🤝',
+  },
+];
+
+const serviceLauncherMarkStyles = StyleSheet.create({
+  root: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#fff7f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  orbit: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#173a6a',
+    borderTopColor: '#ff6a00',
+  },
+  needle: {
+    position: 'absolute',
+    top: 4,
+    right: 5,
+    width: 5,
+    height: 12,
+    borderRadius: 999,
+    backgroundColor: '#173a6a',
+    transform: [{ rotate: '24deg' }],
+  },
+  planeWrap: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ffffff',
+  },
+});
+
 const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; iconName: React.ComponentProps<typeof Ionicons>['name'] }> = [
   { value: 'all', label: 'الكل', iconName: 'reorder-three-outline' },
   { value: 'favorites', label: 'المفضلة', iconName: 'heart-outline' },
@@ -218,6 +335,18 @@ function CategoryIconImage({
   );
 }
 
+function DshServiceLauncherMark() {
+  return (
+    <View style={serviceLauncherMarkStyles.root}>
+      <View style={serviceLauncherMarkStyles.orbit} />
+      <View style={serviceLauncherMarkStyles.needle} />
+      <View style={serviceLauncherMarkStyles.planeWrap}>
+        <BthIcon name="paper-plane" size={12} color="#FF6A00" />
+      </View>
+    </View>
+  );
+}
+
 function CategoryHubIcon() {
   return (
     <Ionicons name="grid-outline" size={22} color="#FF6A00" />
@@ -228,8 +357,8 @@ function MySpaceIcon() {
   return (
     <View
       style={{
-        width: 26,
-        height: 26,
+        width: 34,
+        height: 34,
         alignItems: 'center',
         justifyContent: 'center',
       }}
@@ -238,7 +367,7 @@ function MySpaceIcon() {
         style={{
           position: 'absolute',
           inset: 0,
-          borderRadius: 13,
+          borderRadius: 17,
           borderWidth: 1.5,
           borderColor: 'rgba(255,255,255,0.95)',
           backgroundColor: 'rgba(255,255,255,0.10)',
@@ -246,9 +375,9 @@ function MySpaceIcon() {
       />
       <View
         style={{
-          width: 15,
-          height: 15,
-          borderRadius: 8,
+          width: 19,
+          height: 19,
+          borderRadius: 10,
           borderWidth: 1.5,
           borderColor: 'rgba(255,255,255,0.96)',
           alignItems: 'center',
@@ -256,17 +385,17 @@ function MySpaceIcon() {
           backgroundColor: 'rgba(255,255,255,0.06)',
         }}
       >
-        <Ionicons name="person" size={10} color="#FFFFFF" />
+        <Ionicons name="person" size={13} color="#FFFFFF" />
       </View>
       <Ionicons
         name="sparkles"
-        size={7}
+        size={9}
         color="#FFF8DE"
         style={{ position: 'absolute', top: 1, right: 0, transform: [{ rotate: '14deg' }] }}
       />
       <Ionicons
         name="sparkles"
-        size={6}
+        size={8}
         color="#FFF8DE"
         style={{ position: 'absolute', top: 4, left: 1, transform: [{ rotate: '-12deg' }] }}
       />
@@ -387,6 +516,7 @@ export function DshHomeGetScreen({
   onOpenTracking,
   onOpenMySpace,
   onOpenNotifications,
+  onOpenService,
   onOpenStore,
   onOpenSheinInfo,
   approvedVideoShorts = [],
@@ -417,6 +547,7 @@ export function DshHomeGetScreen({
   const [currentTime, setCurrentTime] = React.useState(() => new Date());
   const [inlineSearchVisible, setInlineSearchVisible] = React.useState(false);
   const [inlineSearchQuery, setInlineSearchQuery] = React.useState('');
+  const [serviceDialVisible, setServiceDialVisible] = React.useState(false);
   const categoryItems = React.useMemo(() => {
     if (categories) {
       return categories;
@@ -654,6 +785,8 @@ export function DshHomeGetScreen({
   const activePromo = promos[activePromoIndex % promos.length] ?? dshHomeGetFixturePromos[0];
   const promoDiscount = activePromo.subtitle.match(/\d+%/)?.[0] ?? '30%';
   const promoTail = activePromo.subtitle.replace(promoDiscount, '').trim();
+  const tickerMessage = `${activePromo.title} • ${activePromo.subtitle}`;
+  const tickerAction = resolveBannerPress(activePromo);
 
   const resolveVideoCtaPress = React.useCallback(
     (item: MarketingGrowthRecord) => {
@@ -766,7 +899,10 @@ export function DshHomeGetScreen({
     setInlineSearchQuery('');
   }, []);
 
-  const tickerAction = onOpenOrders ?? onOpenTracking ?? openInlineSearch;
+  const openServiceDial = React.useCallback(() => {
+    setServiceDialVisible(true);
+  }, []);
+
   const categoriesDialItems = React.useMemo<CategoryDialItem[]>(() => {
     return visibleCategoryFixtures.map((category) => ({
       id: category.id,
@@ -860,31 +996,45 @@ export function DshHomeGetScreen({
             },
             {
               id: 'notifications',
-              icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
-              badgeCount: 5,
+              icon: <BthIcon name="notifications-outline" size={28} color="#FFFFFF" />,
               accessibilityLabel: 'الإشعارات',
               onPress: onOpenNotifications,
             },
             {
               id: 'cart',
-              icon: <BthIcon name="cart-outline" size={21} color="#FFFFFF" />,
+              icon: <BthIcon name="cart-outline" size={28} color="#FFFFFF" />,
               accessibilityLabel: 'السلة',
               onPress: onOpenCart,
             },
             {
               id: 'search',
-              icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />,
+              icon: <BthIcon name="search-outline" size={28} color="#FFFFFF" />,
               accessibilityLabel: 'بحث',
               onPress: openInlineSearch,
             },
           ]}
           ticker={{
             statusLabel: tickerState.statusLabel,
-            message: tickerState.message,
+            message: tickerMessage,
             onPress: tickerAction,
+            marquee: true,
+            marqueeDurationMs: 22000,
           }}
+          contentOffsetY={spacing[2]}
+          style={styles.brandTopBarOffset}
         />
       )}
+
+      {!inlineSearchVisible ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="الخدمات"
+          onPress={openServiceDial}
+          style={({ pressed }) => [styles.serviceLauncherButton, { opacity: pressed ? 0.9 : 1 }]}
+        >
+          <DshServiceLauncherMark />
+        </Pressable>
+      ) : null}
 
       <ScrollView
         style={{ flex: 1 }}
@@ -1223,6 +1373,22 @@ export function DshHomeGetScreen({
           }}
         />
 
+        <CategoryClockDial
+          visible={serviceDialVisible}
+          anchorLayout={serviceDialAnchorLayout}
+          items={serviceDialItems}
+          onClose={() => setServiceDialVisible(false)}
+          onSelect={(item) => {
+            setServiceDialVisible(false);
+
+            if (item.key === 'dsh') {
+              return;
+            }
+
+            onOpenService?.(item.key as DshServiceId);
+          }}
+        />
+
         {shortsVisible
           ? (renderApprovedVideoReelsViewer?.({
               visible: shortsVisible,
@@ -1328,6 +1494,15 @@ function createStyles(direction: Direction) {
   },
   screenRoot: {
     flex: 1,
+  },
+  brandTopBarOffset: {
+    marginTop: spacing[0],
+  },
+  serviceLauncherButton: {
+    position: 'absolute',
+    zIndex: 5,
+    left: spacing[3],
+    top: spacing[14],
   },
   inlineSearchHeader: {
     backgroundColor: '#ff6a00',
@@ -1856,8 +2031,6 @@ function createStyles(direction: Direction) {
     fontSize: 14,
   },
   categoryRailLabel: {
-    fontSize: 12,
-    fontWeight: '700',
     color: '#4B5563',
     textAlign: 'center',
   },
@@ -1866,7 +2039,6 @@ function createStyles(direction: Direction) {
   },
   heroPagerRow: {
     alignItems: 'center',
-    marginTop: 6,
   },
   heroPagerActive: {
     width: 18,
@@ -1874,27 +2046,20 @@ function createStyles(direction: Direction) {
     borderRadius: 3,
     backgroundColor: '#fff',
   },
-  quickActionsCluster: {
-    width: 124,
-    flexShrink: 0,
-  },
   quickActionBottomRow: {
     flexDirection: rowDirection,
     alignItems: 'stretch',
     gap: 8,
   },
   quickActionSecondary: {
-    flex: 1.05,
     minHeight: 42,
     borderRadius: 21,
     backgroundColor: '#0d2f67',
-    paddingHorizontal: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   quickActionTertiary: {
     flex: 0.95,
-    minHeight: 42,
     borderRadius: 21,
     backgroundColor: '#ff6a00',
     paddingHorizontal: 10,

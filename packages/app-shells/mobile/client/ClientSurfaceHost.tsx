@@ -121,6 +121,55 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
     setAccountSheetTab('menu');
   }, []);
 
+  const handleOpenDshService = React.useCallback((serviceId: string) => {
+    if (serviceId === 'dsh') {
+      setRoute('dsh');
+      return;
+    }
+
+    if (serviceId === 'amn') {
+      setRoute('amn-entry');
+      return;
+    }
+
+    if (serviceId === 'arb') {
+      setRoute('arb-entry');
+      return;
+    }
+
+    if (serviceId === 'wlt') {
+      setRoute('wlt-entry');
+      return;
+    }
+
+    if (serviceId === 'knz') {
+      setRoute('knz-entry');
+      return;
+    }
+
+    if (serviceId === 'esf') {
+      setRoute('esf-entry');
+      return;
+    }
+
+    if (serviceId === 'kwd') {
+      setRoute('kwd-entry');
+      return;
+    }
+
+    if (serviceId === 'mrf') {
+      setRoute('mrf-entry');
+      return;
+    }
+
+    if (serviceId === 'snd') {
+      setRoute('snd-entry');
+      return;
+    }
+
+    setRoute('dsh');
+  }, []);
+
   React.useEffect(() => {
     if (Platform.OS !== 'android') {
       return undefined;
@@ -399,7 +448,7 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
     }
 
     if (route === 'dsh') {
-      return <DshSurfaceHost command={dshCommand} onExit={() => setRoute('home')} renderApprovedVideoReelsViewer={renderApprovedVideoReelsViewer} />;
+      return <DshSurfaceHost command={dshCommand} onExit={() => setRoute('home')} onOpenService={handleOpenDshService} renderApprovedVideoReelsViewer={renderApprovedVideoReelsViewer} />;
     }
 
     if (route === 'amn-entry') {

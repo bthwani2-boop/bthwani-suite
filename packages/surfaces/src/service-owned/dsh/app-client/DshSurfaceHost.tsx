@@ -74,6 +74,7 @@ type DshNavigationCommand = {
 type DshSurfaceHostProps = {
   command: DshNavigationCommand;
   onExit?: () => void;
+  onOpenService?: (serviceId: string) => void;
   renderApprovedVideoReelsViewer?: (props: DshHomeApprovedVideoReelsViewerProps) => React.ReactNode;
 };
 
@@ -253,7 +254,7 @@ function operationScreenToRoute(screenId: ClientOperationScreenId): DshRoute {
   return 'operations-screen';
 }
 
-export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer }: DshSurfaceHostProps) {
+export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedVideoReelsViewer }: DshSurfaceHostProps) {
   const [route, setRoute] = React.useState<DshRoute>('home');
   const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
   const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
@@ -1004,6 +1005,7 @@ export function DshSurfaceHost({ command, onExit, renderApprovedVideoReelsViewer
       onOpenMySpace={() => setRoute('my-space')}
       onOpenNotifications={() => setRoute('notifications')}
       onOpenCart={() => setRoute('cart-get')}
+      onOpenService={onOpenService}
       onOpenList={() => setRoute('home')}
       onOpenCategory={(categoryId) => {
         if (categoryId === 'shein') {
