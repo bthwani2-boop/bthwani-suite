@@ -4,8 +4,8 @@ export const tokenSourceMetadata = {
 	authorityPackage: '@bthwani/ui-kit',
 	authorityFile: 'src/foundation.ts',
 	format: 'bth-token-source.v1',
-	version: '2026.04.09',
-	stage: 'phase-b-bootstrap'
+	version: '2026.04.23',
+	stage: 'phase-c-hardening'
 } as const;
 
 export const rawColorPalettes = {
@@ -56,6 +56,24 @@ export const rawColorPalettes = {
 	}
 } as const;
 
+export const brandColorRoles = {
+	brand: rawColorPalettes.brand[500],
+	brandStrong: rawColorPalettes.brand[600],
+	brandSurface: rawColorPalettes.brand[100],
+	brandSoft: rawColorPalettes.brand[50]
+} as const;
+
+export const surfaceContainerRoles = {
+	background: rawColorPalettes.neutral[50],
+	backgroundAlt: rawColorPalettes.neutral[0],
+	surface: rawColorPalettes.neutral[0],
+	surfaceRaised: rawColorPalettes.neutral[0],
+	surfaceInset: rawColorPalettes.neutral[100],
+	line: rawColorPalettes.neutral[200],
+	lineStrong: rawColorPalettes.neutral[300],
+	disabledSurface: rawColorPalettes.neutral[100]
+} as const;
+
 export function withAlpha(hex: string, alpha: number) {
 	const normalized = hex.replace('#', '');
 	const offset = normalized.length === 3 ? 1 : 2;
@@ -67,10 +85,10 @@ export function withAlpha(hex: string, alpha: number) {
 }
 
 export const semanticColorRoles = {
-	brand: rawColorPalettes.brand[500],
-	brandStrong: rawColorPalettes.brand[600],
-	brandSoft: rawColorPalettes.brand[50],
-	brandSurface: rawColorPalettes.brand[100],
+	brand: brandColorRoles.brand,
+	brandStrong: brandColorRoles.brandStrong,
+	brandSoft: brandColorRoles.brandSoft,
+	brandSurface: brandColorRoles.brandSurface,
 	ink: rawColorPalettes.neutral[900],
 	inkMuted: rawColorPalettes.neutral[600],
 	inkSoft: rawColorPalettes.neutral[500],
@@ -157,6 +175,8 @@ export const shadowPresets = {
 		elevation: 10
 	}
 } as const;
+
+export const shadowLaw = shadowPresets;
 
 export const rawMotionScale = {
 	instant: 0,
@@ -257,6 +277,8 @@ export const rawTypographyScale = {
 	}
 } as const;
 
+export const typographyRoles = rawTypographyScale.textRoles;
+
 export type PaletteKey = keyof typeof colorPalette;
 export type SpacingToken = keyof typeof spacing;
 export type RadiusToken = keyof typeof radius;
@@ -269,7 +291,8 @@ export type TextRole = keyof typeof textRoles;
 export type FontFamilyToken = keyof typeof fontFamilies;
 export type FontWeightToken = keyof typeof fontWeights;
 export type Direction = 'rtl' | 'ltr';
-export type BthLanguage = 'ar' | 'en' | string;
+export type Language = 'ar' | 'en' | string;
+export type BthLanguage = Language;
 export type LogicalTextAlign = 'start' | 'center' | 'end';
 
 export const neutralPalette = rawColorPalettes.neutral;
@@ -326,7 +349,7 @@ export function isRtl(direction: Direction) {
 	return direction === 'rtl';
 }
 
-export function isRtlLanguage(language?: BthLanguage) {
+export function isRtlLanguage(language?: Language) {
 	if (!language) {
 		return directionConfig.defaultDirection === 'rtl';
 	}
@@ -335,7 +358,7 @@ export function isRtlLanguage(language?: BthLanguage) {
 	return directionConfig.rtlLanguages.some((candidate) => normalized === candidate || normalized.startsWith(`${candidate}-`));
 }
 
-export function resolveDirectionFromLanguage(language?: BthLanguage, fallback: Direction = directionConfig.defaultDirection) {
+export function resolveDirectionFromLanguage(language?: Language, fallback: Direction = directionConfig.defaultDirection) {
 	if (!language) {
 		return fallback;
 	}
@@ -570,20 +593,20 @@ export type SemanticTheme = {
 
 export const lightTheme: SemanticTheme = {
 	mode: 'light',
-	background: colorPalette.surfaceAlt,
-	backgroundAlt: colorPalette.white,
-	surface: colorPalette.surface,
-	surfaceRaised: colorPalette.surfaceRaised,
-	surfaceInset: colorPalette.surfaceInset,
-	line: colorPalette.line,
-	lineStrong: colorPalette.lineStrong,
+	background: surfaceContainerRoles.background,
+	backgroundAlt: surfaceContainerRoles.backgroundAlt,
+	surface: surfaceContainerRoles.surface,
+	surfaceRaised: surfaceContainerRoles.surfaceRaised,
+	surfaceInset: surfaceContainerRoles.surfaceInset,
+	line: surfaceContainerRoles.line,
+	lineStrong: surfaceContainerRoles.lineStrong,
 	text: colorPalette.ink,
 	textMuted: colorPalette.inkMuted,
 	textSoft: colorPalette.inkSoft,
 	textInverse: colorPalette.white,
-	brand: colorPalette.brand,
+	brand: brandColorRoles.brand,
 	brandContrast: colorPalette.white,
-	brandSurface: colorPalette.brandSurface,
+	brandSurface: brandColorRoles.brandSurface,
 	success: colorPalette.success,
 	successSurface: colorPalette.successSoft,
 	successText: colorPalette.successStrong,
@@ -599,11 +622,11 @@ export const lightTheme: SemanticTheme = {
 	focusRing: colorPalette.focusRing,
 	overlay: colorPalette.overlay,
 	overlaySoft: colorPalette.overlaySoft,
-	disabledSurface: colorPalette.disabledSurface,
+	disabledSurface: surfaceContainerRoles.disabledSurface,
 	disabledText: colorPalette.disabledInk,
-	fieldBackground: colorPalette.surface,
-	fieldBorder: colorPalette.line,
-	fieldBorderActive: colorPalette.brand,
+	fieldBackground: surfaceContainerRoles.surface,
+	fieldBorder: surfaceContainerRoles.line,
+	fieldBorderActive: brandColorRoles.brand,
 	fieldPlaceholder: colorPalette.inkSoft
 };
 
@@ -691,6 +714,8 @@ export const semanticThemeByMode: Record<ThemeMode, SemanticTheme> = {
 	'high-contrast': highContrastTheme
 };
 
+export const themeByMode = semanticThemeByMode;
+
 export function resolveSemanticTheme(mode: ThemeMode) {
 	return semanticThemeByMode[mode];
 }
@@ -744,6 +769,8 @@ export function buildBthWebThemeStyleSheet(rootSelector = '[data-bth-root="true"
 	].join('\n\n');
 }
 
+export const buildWebThemeStyleSheet = buildBthWebThemeStyleSheet;
+
 export function createNativeThemeOutput(mode: ThemeMode) {
 	return {
 		mode,
@@ -758,23 +785,31 @@ export const bthNativeThemeOutputs = Object.freeze(
 	Object.fromEntries(bthThemeModes.map((mode) => [mode, createNativeThemeOutput(mode)])) as Record<ThemeMode, ReturnType<typeof createNativeThemeOutput>>
 );
 
-export type BthLocale = 'ar' | 'en';
+export type Locale = 'ar' | 'en';
+export type BthLocale = Locale;
 
-type BthUiTextCatalogStringLeafShape<T> = {
+export type UiTextCatalogStringLeafShape<T> = {
 	readonly [K in keyof T]: T[K] extends string
 		? string
-		: BthUiTextCatalogStringLeafShape<T[K]>;
+		: UiTextCatalogStringLeafShape<T[K]>;
 };
 
-export type BthUiTextCatalogShape = BthUiTextCatalogStringLeafShape<typeof uiKitLocales.ar.common>;
+export type UiTextCatalogShape = UiTextCatalogStringLeafShape<typeof uiKitLocales.ar.common>;
+export type BthUiTextCatalogStringLeafShape<T> = UiTextCatalogStringLeafShape<T>;
+export type BthUiTextCatalogShape = UiTextCatalogShape;
 
-export const bthUiTextCatalog = {
+export const uiTextCatalog = {
 	ar: uiKitLocales.ar.common,
 	en: uiKitLocales.en.common,
-} as const satisfies Record<BthLocale, BthUiTextCatalogShape>;
+} as const satisfies Record<Locale, UiTextCatalogShape>;
+export const bthUiTextCatalog = uiTextCatalog;
+
+export function getUiText(locale: Locale = 'ar') {
+	return uiTextCatalog[locale];
+}
 
 export function getBthUiText(locale: BthLocale = 'ar') {
-	return bthUiTextCatalog[locale];
+	return getUiText(locale);
 }
 
 export function amountToArabicText(n: number, t: (key: string) => string): string {

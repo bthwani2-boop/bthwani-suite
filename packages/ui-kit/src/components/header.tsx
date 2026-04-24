@@ -2,21 +2,24 @@ import React from 'react';
 import { Animated, Easing, Pressable, ScrollView, View, type StyleProp, type ViewStyle } from 'react-native';
 import { radius, resolveRowDirection, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
-import { BthBadge, BthButton } from './button';
-import { BthSurface, BthText } from '../primitives';
+import { Badge, Button } from './button';
+import { BthSurface as Surface, BthText as Text } from '../primitives';
 
-export type BthTopBarVariant = 'default' | 'surface' | 'brand';
+export type TopBarVariant = 'default' | 'surface' | 'brand';
+export type BthTopBarVariant = TopBarVariant;
 
-export type BthNewsTickerBarProps = {
+export type NewsTickerBarProps = {
   statusLabel: string;
   message: string;
   onPress?: () => void;
-  variant?: BthTopBarVariant;
+  variant?: TopBarVariant;
   marquee?: boolean;
   marqueeDurationMs?: number;
 };
 
-export function BthNewsTickerBar({ statusLabel, message, onPress, variant = 'default', marquee = false, marqueeDurationMs = 18000 }: BthNewsTickerBarProps) {
+export type BthNewsTickerBarProps = NewsTickerBarProps;
+
+export function NewsTickerBar({ statusLabel, message, onPress, variant = 'default', marquee = false, marqueeDurationMs = 18000 }: NewsTickerBarProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const isBrand = variant === 'brand';
@@ -77,26 +80,26 @@ export function BthNewsTickerBar({ statusLabel, message, onPress, variant = 'def
       style={({ pressed }) => [{ paddingVertical: verticalPadding, paddingHorizontal: horizontalPadding, borderRadius: radius.pill, backgroundColor: isBrand ? 'rgba(255, 255, 255, 0.14)' : theme.surfaceInset, borderWidth: isBrand ? 1 : 0, borderColor: isBrand ? 'rgba(255, 255, 255, 0.14)' : theme.line, opacity: pressed ? 0.9 : 1 }]}
     >
       <View style={{ flexDirection: resolveRowDirection(direction), gap: spacing[2], alignItems: 'center' }}>
-        <BthBadge label={statusLabel} tone="info" />
+        <Badge label={statusLabel} tone="info" />
         <View style={{ flex: 1, overflow: 'hidden', justifyContent: 'center' }} onLayout={(event) => setViewportWidth(event.nativeEvent.layout.width)}>
           {shouldMarquee ? (
             <Animated.View style={{ flexDirection: 'row', alignItems: 'center', transform: [{ translateX: marqueeTranslateX }] }}>
               <View onLayout={(event) => setCopyWidth(event.nativeEvent.layout.width)} style={{ flexShrink: 0 }}>
-                <BthText role="bodySm" tone={messageTone} numberOfLines={1}>
+                <Text role="bodySm" tone={messageTone} numberOfLines={1}>
                   {message}
-                </BthText>
+                </Text>
               </View>
               <View style={{ width: spacing[4] }} />
               <View style={{ flexShrink: 0 }}>
-                <BthText role="bodySm" tone={messageTone} numberOfLines={1}>
+                <Text role="bodySm" tone={messageTone} numberOfLines={1}>
                   {message}
-                </BthText>
+                </Text>
               </View>
             </Animated.View>
           ) : (
-            <BthText role="bodySm" tone={messageTone} numberOfLines={messageLines} style={{ flex: 1 }}>
+            <Text role="bodySm" tone={messageTone} numberOfLines={messageLines} style={{ flex: 1 }}>
               {message}
-            </BthText>
+            </Text>
           )}
         </View>
       </View>
@@ -104,47 +107,55 @@ export function BthNewsTickerBar({ statusLabel, message, onPress, variant = 'def
   );
 }
 
-export type BthScreenHeaderProps = {
+export const BthNewsTickerBar = NewsTickerBar;
+
+export type ScreenHeaderProps = {
   title: string;
   subtitle?: string;
   actionLabel?: string;
   onActionPress?: () => void;
 };
 
-export function BthScreenHeader({ title, subtitle, actionLabel, onActionPress }: BthScreenHeaderProps) {
+export type BthScreenHeaderProps = ScreenHeaderProps;
+
+export function ScreenHeader({ title, subtitle, actionLabel, onActionPress }: ScreenHeaderProps) {
   return (
-    <BthSurface tone="raised" padding={4} gap={2}>
+    <Surface tone="raised" padding={4} gap={2}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing[3] }}>
         <View style={{ flex: 1, gap: spacing[1] }}>
-          <BthText role="titleSm">{title}</BthText>
-          {subtitle ? <BthText role="bodySm" tone="muted">{subtitle}</BthText> : null}
+          <Text role="titleSm">{title}</Text>
+          {subtitle ? <Text role="bodySm" tone="muted">{subtitle}</Text> : null}
         </View>
-        {actionLabel ? <BthButton label={actionLabel} size="sm" fullWidth={false} onPress={onActionPress} /> : null}
+        {actionLabel ? <Button label={actionLabel} size="sm" fullWidth={false} onPress={onActionPress} /> : null}
       </View>
-    </BthSurface>
+    </Surface>
   );
 }
 
-export type BthSectionHeaderProps = {
+export const BthScreenHeader = ScreenHeader;
+
+export type SectionHeaderProps = {
   title: string;
   subtitle?: string;
   trailing?: React.ReactNode;
   count?: number | string;
-  countTone?: React.ComponentProps<typeof BthBadge>['tone'];
+  countTone?: React.ComponentProps<typeof Badge>['tone'];
   headingOrder?: 'title-first' | 'count-first';
 };
 
-export function BthSectionHeader({ title, subtitle, trailing, count, countTone = 'default', headingOrder = 'title-first' }: BthSectionHeaderProps) {
+export type BthSectionHeaderProps = SectionHeaderProps;
+
+export function SectionHeader({ title, subtitle, trailing, count, countTone = 'default', headingOrder = 'title-first' }: SectionHeaderProps) {
   return (
     <View style={{ gap: spacing[2] }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing[3] }}>
         <View style={{ flex: 1, flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>
-          {headingOrder === 'count-first' && count != null ? <BthBadge label={String(count)} tone={countTone} /> : null}
+          {headingOrder === 'count-first' && count != null ? <Badge label={String(count)} tone={countTone} /> : null}
           <View style={{ flex: 1, gap: spacing[1] }}>
-            <BthText role="titleSm">{title}</BthText>
-            {subtitle ? <BthText role="bodySm" tone="muted">{subtitle}</BthText> : null}
+            <Text role="titleSm">{title}</Text>
+            {subtitle ? <Text role="bodySm" tone="muted">{subtitle}</Text> : null}
           </View>
-          {headingOrder === 'title-first' && count != null ? <BthBadge label={String(count)} tone={countTone} /> : null}
+          {headingOrder === 'title-first' && count != null ? <Badge label={String(count)} tone={countTone} /> : null}
         </View>
         {trailing}
       </View>
@@ -152,15 +163,19 @@ export function BthSectionHeader({ title, subtitle, trailing, count, countTone =
   );
 }
 
-export type BthTabItem<Value extends string = string> = {
+export const BthSectionHeader = SectionHeader;
+
+export type TabItem<Value extends string = string> = {
   value: Value;
   label: string;
   badgeLabel?: string;
   disabled?: boolean;
 };
 
-export type BthTabsProps<Value extends string = string> = {
-  items: readonly BthTabItem<Value>[];
+export type BthTabItem<Value extends string = string> = TabItem<Value>;
+
+export type TabsProps<Value extends string = string> = {
+  items: readonly TabItem<Value>[];
   value: Value;
   onValueChange?: (nextValue: Value) => void;
   stretch?: boolean;
@@ -171,7 +186,9 @@ export type BthTabsProps<Value extends string = string> = {
   testID?: string;
 };
 
-export function BthTabs<Value extends string = string>({ items, value, onValueChange, stretch = false, variant = 'line', scrollable = false, wrap = false, style, testID }: BthTabsProps<Value>) {
+export type BthTabsProps<Value extends string = string> = TabsProps<Value>;
+
+export function Tabs<Value extends string = string>({ items, value, onValueChange, stretch = false, variant = 'line', scrollable = false, wrap = false, style, testID }: TabsProps<Value>) {
   const { theme } = useTheme();
   const content = (
     <View style={[{ flexDirection: 'row', flexWrap: wrap ? 'wrap' : 'nowrap', gap: spacing[2] }, style]} testID={testID}>
@@ -179,8 +196,8 @@ export function BthTabs<Value extends string = string>({ items, value, onValueCh
         const selected = item.value === value;
         const tab = (
           <Pressable key={String(item.value)} accessibilityRole="tab" accessibilityState={{ selected, disabled: item.disabled }} disabled={item.disabled} onPress={() => onValueChange?.(item.value)} style={({ pressed }) => [{ flex: stretch ? 1 : undefined, paddingHorizontal: spacing[4], paddingVertical: spacing[2], borderRadius: variant === 'pill' ? radius.pill : radius.md, borderWidth: 1, borderColor: selected ? theme.brand : theme.line, backgroundColor: selected ? theme.brand : theme.surface, opacity: item.disabled ? 0.56 : pressed ? 0.9 : 1, alignItems: 'center', gap: spacing[1] }]}>
-            <BthText role="label" tone={selected ? 'inverse' : 'default'}>{item.label}</BthText>
-            {item.badgeLabel ? <BthBadge label={item.badgeLabel} /> : null}
+            <Text role="label" tone={selected ? 'inverse' : 'default'}>{item.label}</Text>
+            {item.badgeLabel ? <Badge label={item.badgeLabel} /> : null}
           </Pressable>
         );
         return tab;
@@ -191,7 +208,9 @@ export function BthTabs<Value extends string = string>({ items, value, onValueCh
   return scrollable ? <ScrollView horizontal showsHorizontalScrollIndicator={false}>{content}</ScrollView> : content;
 }
 
-export type BthTopBarAction = {
+export const BthTabs = Tabs;
+
+export type TopBarAction = {
   id: string;
   icon: React.ReactNode;
   badgeCount?: number;
@@ -201,27 +220,31 @@ export type BthTopBarAction = {
   accessibilityLabel?: string;
 };
 
-export type BthTopBarProps = {
+export type BthTopBarAction = TopBarAction;
+
+export type TopBarProps = {
   title: string;
   subtitle?: string;
   locationLabel?: string;
   locationIcon?: React.ReactNode;
-  actions?: BthTopBarAction[];
-  trailingAction?: BthTopBarAction;
-  ticker?: BthNewsTickerBarProps;
-  tabs?: BthTabsProps<string>;
-  variant?: BthTopBarVariant;
+  actions?: TopBarAction[];
+  trailingAction?: TopBarAction;
+  ticker?: NewsTickerBarProps;
+  tabs?: TabsProps<string>;
+  variant?: TopBarVariant;
   contentOffsetY?: number;
   style?: StyleProp<ViewStyle>;
 };
 
-export function BthTopBar({ title, subtitle, locationLabel, locationIcon, actions = [], trailingAction, ticker, tabs, variant = 'default', contentOffsetY = 0, style }: BthTopBarProps) {
+export type BthTopBarProps = TopBarProps;
+
+export function TopBar({ title, subtitle, locationLabel, locationIcon, actions = [], trailingAction, ticker, tabs, variant = 'default', contentOffsetY = 0, style }: TopBarProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const isBrand = variant === 'brand';
   const brandHeadline = isBrand && subtitle ? `${title} ${subtitle}` : title;
 
-  function renderAction(action: BthTopBarAction) {
+  function renderAction(action: TopBarAction) {
     const badgeAnchorStyle = direction === 'rtl' ? { left: -spacing[1] } : { right: -spacing[1] };
     const iconStyle = action.mirrorInRtl && direction === 'rtl' ? { transform: [{ scaleX: -1 }] } : undefined;
     const showBadge = typeof action.badgeCount === 'number' && action.badgeCount > 0;
@@ -231,7 +254,7 @@ export function BthTopBar({ title, subtitle, locationLabel, locationIcon, action
         <View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
           {showBadge ? (
             <View style={[{ position: 'absolute', top: -spacing[1], zIndex: 1 }, badgeAnchorStyle]}>
-              <BthBadge label={String(action.badgeCount)} tone={isBrand ? 'brand' : 'danger'} />
+              <Badge label={String(action.badgeCount)} tone={isBrand ? 'brand' : 'danger'} />
             </View>
           ) : null}
           <View style={iconStyle}>{action.icon}</View>
@@ -241,22 +264,22 @@ export function BthTopBar({ title, subtitle, locationLabel, locationIcon, action
   }
 
   return (
-    <BthSurface tone={isBrand ? 'brand' : 'raised'} border={!isBrand} padding={isBrand ? 2 : 4} gap={isBrand ? 1 : 3} style={[isBrand ? { backgroundColor: theme.brand, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, paddingBottom: 0 } : undefined, style]}>
-      {variant !== 'brand' && ticker ? <BthNewsTickerBar {...ticker} variant={variant} /> : null}
+    <Surface tone={isBrand ? 'brand' : 'raised'} border={!isBrand} padding={isBrand ? 2 : 4} gap={isBrand ? 1 : 3} style={[isBrand ? { backgroundColor: theme.brand, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, paddingBottom: 0 } : undefined, style]}>
+      {variant !== 'brand' && ticker ? <NewsTickerBar {...ticker} variant={variant} /> : null}
       <View style={[{ flexDirection: resolveRowDirection(direction), justifyContent: 'space-between', alignItems: locationLabel && isBrand ? 'flex-start' : 'center', gap: spacing[2] }, isBrand && contentOffsetY ? { transform: [{ translateY: contentOffsetY }] } : null]}>
         <View style={{ flex: 1, gap: isBrand ? spacing[0] : spacing[1] }}>
           {isBrand ? (
-            <BthText role="titleSm" tone="inverse" numberOfLines={1}>{brandHeadline}</BthText>
+            <Text role="titleSm" tone="inverse" numberOfLines={1}>{brandHeadline}</Text>
           ) : (
             <>
-              <BthText role="titleSm" tone="default">{title}</BthText>
-              {subtitle ? <BthText role="bodySm" tone="muted">{subtitle}</BthText> : null}
+              <Text role="titleSm" tone="default">{title}</Text>
+              {subtitle ? <Text role="bodySm" tone="muted">{subtitle}</Text> : null}
             </>
           )}
           {locationLabel ? (
             <View style={{ flexDirection: resolveRowDirection(direction), gap: spacing[1], alignItems: 'center' }}>
               {locationIcon}
-              <BthText role="bodySm" tone={isBrand ? 'inverse' : 'muted'} numberOfLines={1}>{locationLabel}</BthText>
+              <Text role="bodySm" tone={isBrand ? 'inverse' : 'muted'} numberOfLines={1}>{locationLabel}</Text>
             </View>
           ) : null}
         </View>
@@ -265,8 +288,10 @@ export function BthTopBar({ title, subtitle, locationLabel, locationIcon, action
           {trailingAction ? renderAction(trailingAction) : null}
         </View>
       </View>
-      {variant === 'brand' && ticker ? <BthNewsTickerBar {...ticker} variant={variant} /> : null}
-      {tabs ? <BthTabs {...tabs} /> : null}
-    </BthSurface>
+      {variant === 'brand' && ticker ? <NewsTickerBar {...ticker} variant={variant} /> : null}
+      {tabs ? <Tabs {...tabs} /> : null}
+    </Surface>
   );
 }
+
+export const BthTopBar = TopBar;

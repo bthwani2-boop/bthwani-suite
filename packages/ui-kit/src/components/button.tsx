@@ -2,7 +2,7 @@ import React from 'react';
 import { ActivityIndicator, Pressable, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
 import { borders, radius, resolveRowDirection, sizes, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
-import { BthText } from '../primitives';
+import { BthText as Text } from '../primitives';
 
 type PressableStyle = StyleProp<ViewStyle> | ((state: PressableStateCallbackType) => StyleProp<ViewStyle>);
 
@@ -10,19 +10,25 @@ function resolvePressableStyle(style: PressableStyle | undefined, state: Pressab
   return typeof style === 'function' ? style(state) : style;
 }
 
-export type BthButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
+export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
 
-export type BthButtonProps = PressableProps & {
+export type BthButtonTone = ButtonTone;
+
+export type ButtonProps = PressableProps & {
   label: string;
-  tone?: BthButtonTone;
+  tone?: ButtonTone;
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   fullWidth?: boolean;
   leadingAccessory?: React.ReactNode;
   trailingAccessory?: React.ReactNode;
+  icon?: React.ReactNode;
+  iconPosition?: 'leading' | 'trailing';
 };
 
-export function BthButton({
+export type BthButtonProps = ButtonProps;
+
+export function Button({
   label,
   tone = 'primary',
   size = 'md',
@@ -31,12 +37,16 @@ export function BthButton({
   fullWidth = true,
   leadingAccessory,
   trailingAccessory,
+  icon,
+  iconPosition = 'leading',
   style,
   ...rest
-}: BthButtonProps) {
+}: ButtonProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const resolvedDisabled = disabled || loading;
+  const resolvedLeadingAccessory = leadingAccessory ?? (icon && iconPosition === 'leading' ? icon : null);
+  const resolvedTrailingAccessory = trailingAccessory ?? (icon && iconPosition === 'trailing' ? icon : null);
 
   const toneConfig = {
     primary: { backgroundColor: theme.brand, borderColor: theme.brand, labelColor: theme.brandContrast },
@@ -61,7 +71,7 @@ export function BthButton({
           width: fullWidth ? '100%' : undefined,
           minHeight: sizeConfig.minHeight,
           paddingHorizontal: sizeConfig.paddingHorizontal,
-          borderRadius: radius.lg,
+          borderRadius: size === 'lg' ? radius.xl : radius.lg,
           borderWidth: tone === 'ghost' ? 0 : borders.hairline,
           borderColor: toneConfig.borderColor,
           backgroundColor: toneConfig.backgroundColor,
@@ -71,31 +81,31 @@ export function BthButton({
           flexDirection: resolveRowDirection(direction),
           gap: spacing[2],
         },
-        resolvePressableStyle(style as PressableStyle, { pressed } as PressableStateCallbackType),
+        resolvePressableStyle(style, { pressed } as PressableStateCallbackType),
       ]}
       {...rest}
     >
       {loading ? <ActivityIndicator color={toneConfig.labelColor} /> : null}
-      {leadingAccessory}
-      <BthText role={sizeConfig.textRole} style={{ color: toneConfig.labelColor }}>
+      {resolvedLeadingAccessory}
+      <Text role={sizeConfig.textRole} style={{ color: toneConfig.labelColor }}>
         {label}
-      </BthText>
-      {trailingAccessory}
+      </Text>
+      {resolvedTrailingAccessory}
     </Pressable>
   );
 }
 
-export function Button(props: BthButtonProps) {
-  return <BthButton {...props} />;
-}
+export const BthButton = Button;
 
-export type BthBadgeProps = {
+export type BadgeProps = {
   label: string;
   tone?: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
   style?: StyleProp<ViewStyle>;
 };
 
-export function BthBadge({ label, tone = 'default', style }: BthBadgeProps) {
+export type BthBadgeProps = BadgeProps;
+
+export function Badge({ label, tone = 'default', style }: BadgeProps) {
   const { theme } = useTheme();
   const palette = {
     default: { backgroundColor: theme.surfaceInset, textColor: theme.textMuted, borderColor: theme.line },
@@ -123,21 +133,25 @@ export function BthBadge({ label, tone = 'default', style }: BthBadgeProps) {
       ]}
       disabled
     >
-      <BthText role="label" style={{ color: palette.textColor }}>
+      <Text role="label" style={{ color: palette.textColor }}>
         {label}
-      </BthText>
+      </Text>
     </Pressable>
   );
 }
 
-export type BthChipProps = {
+export const BthBadge = Badge;
+
+export type ChipProps = {
   label: string;
   selected?: boolean;
   tone?: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
   onPress?: () => void;
 };
 
-export function BthChip({ label, selected = false, tone = 'default', onPress }: BthChipProps) {
+export type BthChipProps = ChipProps;
+
+export function Chip({ label, selected = false, tone = 'default', onPress }: ChipProps) {
   const { theme } = useTheme();
   const toneScheme = {
     default: { accent: theme.lineStrong, surface: theme.surface, label: theme.text, selectedSurface: theme.surfaceInset, selectedLabel: theme.text },
@@ -166,9 +180,11 @@ export function BthChip({ label, selected = false, tone = 'default', onPress }: 
         },
       ]}
     >
-      <BthText role="label" style={{ color: selected ? toneScheme.selectedLabel : toneScheme.label }}>
+      <Text role="label" style={{ color: selected ? toneScheme.selectedLabel : toneScheme.label }}>
         {label}
-      </BthText>
+      </Text>
     </Pressable>
   );
 }
+
+export const BthChip = Chip;

@@ -1,7 +1,7 @@
 import Script from 'next/script';
 import { type ReactNode } from 'react';
-import { BthRootProviders, type BthRootProvidersProps } from '../providers';
-import { buildBthWebThemeStyleSheet, directionConfig, resolveDirectionFromLanguage, type ThemeMode } from '../foundation';
+import { RootProviders, type RootProvidersProps } from '../providers';
+import { buildWebThemeStyleSheet, directionConfig, resolveDirectionFromLanguage, type ThemeMode } from '../foundation';
 
 const webRootBodyCss = `
 html {
@@ -11,9 +11,9 @@ html {
 body.bth-web-root-body {
   margin: 0;
   min-height: 100vh;
-  background: #f8fafc;
-  color: #0f172a;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bth-background);
+  color: var(--bth-text);
+  font-family: var(--bth-font-family-latin), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 `;
 
@@ -33,14 +33,16 @@ function buildStoredLanguageBootstrapScript() {
 `.trim();
 }
 
-export function BthWebThemeStyle() {
-  return <style>{buildBthWebThemeStyleSheet()}</style>;
+export function WebThemeStyle() {
+	return <style>{buildWebThemeStyleSheet()}</style>;
 }
 
-export type BthWebRootLayoutProps = BthRootProvidersProps & {
+export type WebRootLayoutProps = RootProvidersProps & {
   children: ReactNode;
   appName?: string;
 };
+
+export type BthWebRootLayoutProps = WebRootLayoutProps;
 
 export function buildWebRootMetadata({ appName, lang = 'ar', dir = 'rtl' }: { appName?: string; lang?: string; dir?: 'ltr' | 'rtl'; }) {
   return {
@@ -51,7 +53,7 @@ export function buildWebRootMetadata({ appName, lang = 'ar', dir = 'rtl' }: { ap
   };
 }
 
-export function BthWebRootBody({
+export function WebRootBody({
   children,
   appName,
   themeMode = 'light',
@@ -72,7 +74,7 @@ export function BthWebRootBody({
   );
 }
 
-export function BthWebDocumentShell({
+export function WebDocumentShell({
   children,
   lang = directionConfig.defaultLanguage,
   dir = resolveDirectionFromLanguage(directionConfig.defaultLanguage),
@@ -90,14 +92,14 @@ export function BthWebDocumentShell({
           dangerouslySetInnerHTML={{ __html: buildStoredLanguageBootstrapScript() }}
         />
         <style>{webRootBodyCss}</style>
-        <BthWebThemeStyle />
+        <WebThemeStyle />
       </head>
       {children}
     </html>
   );
 }
 
-export function BthWebRootLayout({ children, appName, ...rootProps }: BthWebRootLayoutProps) {
+export function WebRootLayout({ children, appName, ...rootProps }: WebRootLayoutProps) {
   const webRootMetadata = buildWebRootMetadata({
     appName,
     lang: rootProps.language,
@@ -105,10 +107,15 @@ export function BthWebRootLayout({ children, appName, ...rootProps }: BthWebRoot
   });
 
   return (
-    <BthWebDocumentShell lang={webRootMetadata.lang} dir={webRootMetadata.dir}>
-      <BthWebRootBody appName={webRootMetadata.appName} themeMode={rootProps.themeMode}>
-        <BthRootProviders {...rootProps}>{children}</BthRootProviders>
-      </BthWebRootBody>
-    </BthWebDocumentShell>
+    <WebDocumentShell lang={webRootMetadata.lang} dir={webRootMetadata.dir}>
+      <WebRootBody appName={webRootMetadata.appName} themeMode={rootProps.themeMode}>
+        <RootProviders {...rootProps}>{children}</RootProviders>
+      </WebRootBody>
+    </WebDocumentShell>
   );
 }
+
+export const BthWebThemeStyle = WebThemeStyle;
+export const BthWebRootBody = WebRootBody;
+export const BthWebDocumentShell = WebDocumentShell;
+export const BthWebRootLayout = WebRootLayout;

@@ -41,6 +41,11 @@ Skipping any step invalidates the run.
 
 Never copy legacy blindly. Legacy only informs reconstruction after evidence classification.
 
+## BTH Token Rename & Alias Policy
+
+Any rename, refactor, cleanup, or normalization involving tokens containing `Bth`, `bth`, or `BTH` must follow [../Policies/bth.token.rename.alias.policy.md](../Policies/bth.token.rename.alias.policy.md).
+Do not treat that work as a blind global replace. Keep it file-by-file, classify tokens first, and require explicit compatibility handling for any public or shared name.
+
 ## Canonical ownership
 - `apps/` = delivery apps only.
 - `services/` = backend truth only.

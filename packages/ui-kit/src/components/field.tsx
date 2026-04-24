@@ -1,38 +1,53 @@
 import React, { useMemo, useState } from 'react';
-import { Image, Pressable, ScrollView, Switch, TextInput, View, type PressableProps, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
-import { borders, colorPalette, radius, resolveLogicalPadding, resolveTextAlign, resolveRowDirection, sizes, spacing } from '../foundation';
+import { Image, Pressable, ScrollView, Switch as RNSwitch, TextInput, View, type PressableProps, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
+import { borders, radius, resolveLogicalPadding, resolveTextAlign, resolveRowDirection, sizes, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
-import { BthBadge, BthButton } from './button';
-import { BthKeyValueList } from './list';
-import { BthCard } from './card';
-import { BthSurface, BthText } from '../primitives';
+import { Button } from './button';
+import { BthKeyValueList as KeyValueList } from './list';
+import { BthCard as Card } from './card';
+import { BthSurface as Surface, BthText as Text } from '../primitives';
 
-export type BthTextFieldProps = TextInputProps & {
+const fieldFrameLaw = {
+  labelGap: spacing[2],
+  messageGap: spacing[1],
+  controlMinHeight: sizes.controlLg,
+  controlRadius: radius.lg,
+  controlPaddingX: spacing[4],
+  controlPaddingY: spacing[3],
+  shellGap: spacing[4],
+  sectionGap: spacing[3],
+  itemGap: spacing[2],
+  listGap: spacing[3],
+} as const;
+
+export type TextFieldProps = TextInputProps & {
   label?: string;
   hint?: string;
   error?: string;
 };
 
-export function BthTextField({ label, hint, error, style, ...rest }: BthTextFieldProps) {
+export type BthTextFieldProps = TextFieldProps;
+
+export function TextField({ label, hint, error, style, ...rest }: TextFieldProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const isDisabled = rest.editable === false;
 
   return (
-    <View style={{ gap: spacing[2] }}>
-      {label ? <BthText role="label">{label}</BthText> : null}
+    <View style={{ gap: fieldFrameLaw.labelGap }}>
+      {label ? <Text role="label">{label}</Text> : null}
       <TextInput
         editable={rest.editable}
-        placeholderTextColor={theme.textSoft}
+        placeholderTextColor={theme.fieldPlaceholder}
         style={[
           {
-            minHeight: sizes.controlLg,
+            minHeight: fieldFrameLaw.controlMinHeight,
             borderWidth: borders.hairline,
             borderColor: error ? theme.danger : theme.fieldBorder,
-            borderRadius: radius.lg,
+            borderRadius: fieldFrameLaw.controlRadius,
             backgroundColor: isDisabled ? theme.disabledSurface : theme.fieldBackground,
             color: isDisabled ? theme.disabledText : theme.text,
-            ...resolveLogicalPadding(direction, spacing[4], spacing[4]),
+            ...resolveLogicalPadding(direction, fieldFrameLaw.controlPaddingX, fieldFrameLaw.controlPaddingX),
             textAlign: resolveTextAlign(direction, 'start'),
             writingDirection: direction,
           },
@@ -40,39 +55,47 @@ export function BthTextField({ label, hint, error, style, ...rest }: BthTextFiel
         ]}
         {...rest}
       />
-      {error ? <BthText role="caption" tone="danger">{error}</BthText> : hint ? <BthText role="caption" tone="muted">{hint}</BthText> : null}
+      {error ? <Text role="caption" tone="danger">{error}</Text> : hint ? <Text role="caption" tone="muted">{hint}</Text> : null}
     </View>
   );
 }
 
-export function BthSearchField({ placeholder, ...props }: BthTextFieldProps) {
+export const BthTextField = TextField;
+
+export function SearchField({ placeholder, ...props }: TextFieldProps) {
   const { language } = useDirection();
   const fallbackPlaceholder = String(language).toLowerCase().startsWith('en') ? 'Search' : 'ابحث';
 
-  return <BthTextField placeholder={placeholder ?? fallbackPlaceholder} {...props} />;
+  return <TextField placeholder={placeholder ?? fallbackPlaceholder} {...props} />;
 }
 
-export type BthSelectOption<Value extends string = string> = {
+export const BthSearchField = SearchField;
+
+export type SelectOption<Value extends string = string> = {
   value: Value;
   label: string;
   description?: string;
   disabled?: boolean;
 };
 
-export type BthSelectFieldProps<Value extends string = string> = {
+export type BthSelectOption<Value extends string = string> = SelectOption<Value>;
+
+export type SelectFieldProps<Value extends string = string> = {
   label?: string;
   hint?: string;
   error?: string;
   placeholder?: string;
   value?: Value;
-  options: readonly BthSelectOption<Value>[];
+  options: readonly SelectOption<Value>[];
   disabled?: boolean;
   onValueChange?: (nextValue: Value) => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 };
 
-export function BthSelectField<Value extends string = string>({
+export type BthSelectFieldProps<Value extends string = string> = SelectFieldProps<Value>;
+
+export function SelectField<Value extends string = string>({
   label,
   hint,
   error,
@@ -83,7 +106,7 @@ export function BthSelectField<Value extends string = string>({
   onValueChange,
   style,
   testID,
-}: BthSelectFieldProps<Value>) {
+}: SelectFieldProps<Value>) {
   const [expanded, setExpanded] = useState(false);
   const { direction, language } = useDirection();
   const { theme } = useTheme();
@@ -93,35 +116,35 @@ export function BthSelectField<Value extends string = string>({
   const resolvedDisabled = disabled || options.length === 0;
 
   return (
-    <View style={{ gap: spacing[2] }} testID={testID}>
-      {label ? <BthText role="label">{label}</BthText> : null}
+    <View style={{ gap: fieldFrameLaw.labelGap }} testID={testID}>
+      {label ? <Text role="label">{label}</Text> : null}
       <Pressable
         accessibilityRole="button"
         disabled={resolvedDisabled}
         onPress={() => setExpanded((current) => !current)}
         style={({ pressed }) => [
           {
-            minHeight: sizes.controlLg,
+            minHeight: fieldFrameLaw.controlMinHeight,
             borderWidth: borders.hairline,
             borderColor: error ? theme.danger : expanded ? theme.fieldBorderActive : theme.fieldBorder,
-            borderRadius: radius.lg,
+            borderRadius: fieldFrameLaw.controlRadius,
             backgroundColor: resolvedDisabled ? theme.disabledSurface : theme.fieldBackground,
             opacity: resolvedDisabled ? 0.56 : pressed ? 0.9 : 1,
             alignItems: 'center',
             justifyContent: 'space-between',
             flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
             gap: spacing[3],
-            ...resolveLogicalPadding(direction, spacing[4], spacing[4]),
+            ...resolveLogicalPadding(direction, fieldFrameLaw.controlPaddingX, fieldFrameLaw.controlPaddingX),
           },
           style,
         ]}
       >
-        <BthText role="bodyMd" tone={selectedOption ? 'default' : 'soft'}>{selectedOption ? selectedOption.label : resolvedPlaceholder}</BthText>
-        <BthText role="label" tone="soft">▾</BthText>
+        <Text role="bodyMd" tone={selectedOption ? 'default' : 'soft'}>{selectedOption ? selectedOption.label : resolvedPlaceholder}</Text>
+        <Text role="label" tone="soft">▾</Text>
       </Pressable>
 
       {expanded ? (
-        <View style={{ gap: spacing[2] }}>
+        <View style={{ gap: fieldFrameLaw.itemGap }}>
           {options.map((option) => (
             <Pressable
               key={option.value}
@@ -134,22 +157,24 @@ export function BthSelectField<Value extends string = string>({
               style={{
                 borderWidth: borders.hairline,
                 borderColor: option.value === value ? theme.brand : theme.line,
-                borderRadius: radius.lg,
-                padding: spacing[3],
+                borderRadius: fieldFrameLaw.controlRadius,
+                padding: fieldFrameLaw.controlPaddingY,
                 backgroundColor: option.value === value ? theme.brandSurface : theme.surface,
               }}
             >
-              <BthText role="bodyStrong" tone={option.value === value ? 'brand' : 'default'}>{option.label}</BthText>
-              {option.description ? <BthText role="caption" tone="muted">{option.description}</BthText> : null}
+              <Text role="bodyStrong" tone={option.value === value ? 'brand' : 'default'}>{option.label}</Text>
+              {option.description ? <Text role="caption" tone="muted">{option.description}</Text> : null}
             </Pressable>
           ))}
         </View>
       ) : null}
 
-      {error ? <BthText role="caption" tone="danger">{error}</BthText> : hint ? <BthText role="caption" tone="muted">{hint}</BthText> : null}
+      {error ? <Text role="caption" tone="danger">{error}</Text> : hint ? <Text role="caption" tone="muted">{hint}</Text> : null}
     </View>
   );
 }
+
+export const BthSelectField = SelectField;
 
 export type AmountInputProps = {
   value: string;
@@ -161,12 +186,12 @@ export type AmountInputProps = {
 
 export function AmountInput({ value, onChange, label, placeholder = '0.00', currencyLabel }: AmountInputProps) {
   return (
-    <View style={{ gap: spacing[2] }}>
-      {label ? <BthText role="label">{label}</BthText> : null}
+    <View style={{ gap: fieldFrameLaw.labelGap }}>
+      {label ? <Text role="label">{label}</Text> : null}
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <BthTextField value={value} onChangeText={(t) => onChange(t.replace(/[^0-9.]/g, ''))} placeholder={placeholder} style={{ flex: 1, minWidth: 120 }} />
+        <TextField value={value} onChangeText={(t) => onChange(t.replace(/[^0-9.]/g, ''))} placeholder={placeholder} style={{ flex: 1, minWidth: 120 }} />
       </View>
-      {currencyLabel ? <BthText role="caption" tone="muted">{currencyLabel}</BthText> : null}
+      {currencyLabel ? <Text role="caption" tone="muted">{currencyLabel}</Text> : null}
     </View>
   );
 }
@@ -183,7 +208,7 @@ export function PaymentMethodList({ methods, selectedId, onSelect }: PaymentMeth
   const { theme } = useTheme();
 
   return (
-    <View style={{ gap: spacing[3], paddingHorizontal: spacing[4], marginTop: spacing[3] }}>
+    <View style={{ gap: fieldFrameLaw.listGap, paddingHorizontal: spacing[4], marginTop: spacing[3] }}>
       {methods.map((method) => {
         const selected = selectedId === method.id;
         const hasRemoteIcon = typeof method.icon === 'string' && (method.icon.startsWith('http://') || method.icon.startsWith('https://'));
@@ -206,7 +231,7 @@ export function PaymentMethodList({ methods, selectedId, onSelect }: PaymentMeth
             ]}
           >
             {hasRemoteIcon ? <Image source={{ uri: method.icon }} style={{ width: 44, height: 44, borderRadius: radius.sm }} /> : <View style={{ width: 44, height: 44, borderRadius: radius.sm, backgroundColor: theme.surfaceInset }} />}
-            <BthText role="bodyStrong">{method.label}</BthText>
+            <Text role="bodyStrong">{method.label}</Text>
           </Pressable>
         );
       })}
@@ -221,11 +246,13 @@ export type QuickAmountGridProps = {
 };
 
 export function QuickAmountGrid({ amounts, onSelect, selected }: QuickAmountGridProps) {
+  const { theme } = useTheme();
+
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: spacing[3], paddingHorizontal: spacing[4], marginTop: spacing[3] }}>
       {amounts.map((amount) => (
-        <Pressable key={amount} onPress={() => onSelect(amount)} style={({ pressed }) => [{ width: '30%', padding: spacing[3], borderRadius: radius.md, alignItems: 'center', borderWidth: 1, borderColor: selected === amount ? colorPalette.brand : '#E6E6E6', backgroundColor: selected === amount ? colorPalette.brandSoft : 'transparent', opacity: pressed ? 0.85 : 1 }]}>
-          <BthText role="bodyStrong">{String(amount)}</BthText>
+        <Pressable key={amount} onPress={() => onSelect(amount)} style={({ pressed }) => [{ width: '30%', padding: spacing[3], borderRadius: radius.md, alignItems: 'center', borderWidth: 1, borderColor: selected === amount ? theme.brand : theme.line, backgroundColor: selected === amount ? theme.brandSurface : 'transparent', opacity: pressed ? 0.85 : 1 }]}>
+          <Text role="bodyStrong">{String(amount)}</Text>
         </Pressable>
       ))}
     </View>
@@ -242,15 +269,15 @@ export type SummaryCardProps = {
 
 export function SummaryCard({ items, totalLabel = 'Total', totalValue }: SummaryCardProps) {
   return (
-    <BthCard>
-      <BthKeyValueList items={items.map((item) => ({ label: item.label, value: item.value, helperText: item.helper }))} />
-      {totalValue ? <View style={{ marginTop: 12 }} /> : null}
-      {totalValue ? <BthKeyValueList items={[{ label: totalLabel, value: totalValue }]} dense /> : null}
-    </BthCard>
+    <Card>
+      <KeyValueList items={items.map((item) => ({ label: item.label, value: item.value, helperText: item.helper }))} />
+      {totalValue ? <View style={{ marginTop: spacing[3] }} /> : null}
+      {totalValue ? <KeyValueList items={[{ label: totalLabel, value: totalValue }]} dense /> : null}
+    </Card>
   );
 }
 
-export type BthFormScreenShellProps = {
+export type FormScreenShellProps = {
   title: string;
   subtitle?: string;
   submitLabel?: string;
@@ -259,27 +286,31 @@ export type BthFormScreenShellProps = {
   children?: React.ReactNode;
 };
 
-export function BthFormScreenShell({
+export type BthFormScreenShellProps = FormScreenShellProps;
+
+export function FormScreenShell({
   title,
   subtitle,
   submitLabel = 'متابعة',
   onSubmit,
   submitDisabled = false,
   children,
-}: BthFormScreenShellProps) {
+}: FormScreenShellProps) {
   return (
     <ScrollView contentContainerStyle={{ padding: spacing[4], gap: spacing[4] }}>
       <View style={{ gap: spacing[2] }}>
-        <BthText role="titleLg">{title}</BthText>
-        {subtitle ? <BthText role="bodyMd" tone="muted">{subtitle}</BthText> : null}
+        <Text role="titleLg">{title}</Text>
+        {subtitle ? <Text role="bodyMd" tone="muted">{subtitle}</Text> : null}
       </View>
-      <BthSurface gap={4}>{children}</BthSurface>
-      <BthButton label={submitLabel} onPress={onSubmit} disabled={submitDisabled} />
+      <Surface gap={4}>{children}</Surface>
+      <Button label={submitLabel} onPress={onSubmit} disabled={submitDisabled} />
     </ScrollView>
   );
 }
 
-export type BthOptionRowProps = {
+export const BthFormScreenShell = FormScreenShell;
+
+export type OptionRowProps = {
   title: string;
   subtitle?: string;
   actionLabel?: string;
@@ -287,21 +318,25 @@ export type BthOptionRowProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-export function BthOptionRow({ title, subtitle, actionLabel, onAction, style }: BthOptionRowProps) {
+export type BthOptionRowProps = OptionRowProps;
+
+export function OptionRow({ title, subtitle, actionLabel, onAction, style }: OptionRowProps) {
   return (
-    <BthSurface tone="inset" padding={2} gap={0} style={style}>
+    <Surface tone="inset" padding={2} gap={0} style={style}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing[2] }}>
         <View style={{ gap: spacing[1], flex: 1 }}>
-          <BthText role="bodyStrong" numberOfLines={1}>{title}</BthText>
-          {subtitle ? <BthText role="bodySm" tone="muted" numberOfLines={2}>{subtitle}</BthText> : null}
+          <Text role="bodyStrong" numberOfLines={1}>{title}</Text>
+          {subtitle ? <Text role="bodySm" tone="muted" numberOfLines={2}>{subtitle}</Text> : null}
         </View>
-        {actionLabel ? <BthButton label={actionLabel} size="sm" tone="secondary" fullWidth={false} onPress={onAction} /> : null}
+        {actionLabel ? <Button label={actionLabel} size="sm" tone="secondary" fullWidth={false} onPress={onAction} /> : null}
       </View>
-    </BthSurface>
+    </Surface>
   );
 }
 
-export type BthCheckboxProps = {
+export const BthOptionRow = OptionRow;
+
+export type CheckboxProps = {
   label: string;
   description?: string;
   checked: boolean;
@@ -311,7 +346,9 @@ export type BthCheckboxProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-export function BthCheckbox({ label, description, checked, disabled = false, error, onCheckedChange, style }: BthCheckboxProps) {
+export type BthCheckboxProps = CheckboxProps;
+
+export function Checkbox({ label, description, checked, disabled = false, error, onCheckedChange, style }: CheckboxProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
 
@@ -332,18 +369,20 @@ export function BthCheckbox({ label, description, checked, disabled = false, err
       ]}
     >
       <View style={{ width: sizes.iconLg, height: sizes.iconLg, marginTop: 1, borderRadius: radius.sm, borderWidth: 1, borderColor: error ? theme.danger : checked ? theme.brand : theme.lineStrong, backgroundColor: disabled ? theme.disabledSurface : checked ? theme.brand : theme.surface, alignItems: 'center', justifyContent: 'center' }}>
-        {checked ? <BthText role="label" tone="inverse">✓</BthText> : null}
+        {checked ? <Text role="label" tone="inverse">✓</Text> : null}
       </View>
       <View style={{ flex: 1, gap: spacing[1] }}>
-        <BthText role="bodyStrong" tone={disabled ? 'soft' : 'default'}>{label}</BthText>
-        {description ? <BthText role="bodySm" tone={disabled ? 'soft' : 'muted'}>{description}</BthText> : null}
-        {error ? <BthText role="caption" tone="danger">{error}</BthText> : null}
+        <Text role="bodyStrong" tone={disabled ? 'soft' : 'default'}>{label}</Text>
+        {description ? <Text role="bodySm" tone={disabled ? 'soft' : 'muted'}>{description}</Text> : null}
+        {error ? <Text role="caption" tone="danger">{error}</Text> : null}
       </View>
     </Pressable>
   );
 }
 
-export type BthRadioProps = {
+export const BthCheckbox = Checkbox;
+
+export type RadioProps = {
   label: string;
   description?: string;
   selected: boolean;
@@ -352,7 +391,9 @@ export type BthRadioProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-export function BthRadio({ label, description, selected, disabled = false, onSelect, style }: BthRadioProps) {
+export type BthRadioProps = RadioProps;
+
+export function Radio({ label, description, selected, disabled = false, onSelect, style }: RadioProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
 
@@ -376,21 +417,25 @@ export function BthRadio({ label, description, selected, disabled = false, onSel
         {selected ? <View style={{ width: sizes.iconSm - 2, height: sizes.iconSm - 2, borderRadius: radius.pill, backgroundColor: theme.brand }} /> : null}
       </View>
       <View style={{ flex: 1, gap: spacing[1] }}>
-        <BthText role="bodyStrong" tone={disabled ? 'soft' : 'default'}>{label}</BthText>
-        {description ? <BthText role="bodySm" tone={disabled ? 'soft' : 'muted'}>{description}</BthText> : null}
+        <Text role="bodyStrong" tone={disabled ? 'soft' : 'default'}>{label}</Text>
+        {description ? <Text role="bodySm" tone={disabled ? 'soft' : 'muted'}>{description}</Text> : null}
       </View>
     </Pressable>
   );
 }
 
-export type BthSegmentedOption<Value extends string = string> = {
+export const BthRadio = Radio;
+
+export type SegmentedOption<Value extends string = string> = {
   value: Value;
   label: string;
   disabled?: boolean;
 };
 
-export type BthSegmentedControlProps<Value extends string = string> = {
-  options: readonly BthSegmentedOption<Value>[];
+export type BthSegmentedOption<Value extends string = string> = SegmentedOption<Value>;
+
+export type SegmentedControlProps<Value extends string = string> = {
+  options: readonly SegmentedOption<Value>[];
   value: Value;
   onValueChange?: (nextValue: Value) => void;
   size?: 'sm' | 'md';
@@ -398,7 +443,9 @@ export type BthSegmentedControlProps<Value extends string = string> = {
   style?: StyleProp<ViewStyle>;
 };
 
-export function BthSegmentedControl<Value extends string = string>({ options, value, onValueChange, size = 'md', fullWidth = true, style }: BthSegmentedControlProps<Value>) {
+export type BthSegmentedControlProps<Value extends string = string> = SegmentedControlProps<Value>;
+
+export function SegmentedControl<Value extends string = string>({ options, value, onValueChange, size = 'md', fullWidth = true, style }: SegmentedControlProps<Value>) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const sizeConfig = { sm: { minHeight: sizes.controlSm, textRole: 'label' as const }, md: { minHeight: sizes.controlMd, textRole: 'bodyStrong' as const } }[size];
@@ -410,7 +457,7 @@ export function BthSegmentedControl<Value extends string = string>({ options, va
         const disabled = option.disabled;
         return (
           <Pressable key={option.value} accessibilityRole="button" accessibilityState={{ selected, disabled }} disabled={disabled} onPress={() => onValueChange?.(option.value)} style={({ pressed }) => [{ flex: fullWidth ? 1 : undefined, minHeight: sizeConfig.minHeight, paddingHorizontal: spacing[4], borderRadius: radius.pill, backgroundColor: selected ? theme.brand : 'transparent', alignItems: 'center', justifyContent: 'center', opacity: disabled ? 0.56 : pressed ? 0.9 : 1 }]}>
-            <BthText role={sizeConfig.textRole} tone={selected ? 'inverse' : disabled ? 'soft' : 'default'} align="center">{option.label}</BthText>
+            <Text role={sizeConfig.textRole} tone={selected ? 'inverse' : disabled ? 'soft' : 'default'} align="center">{option.label}</Text>
           </Pressable>
         );
       })}
@@ -418,7 +465,9 @@ export function BthSegmentedControl<Value extends string = string>({ options, va
   );
 }
 
-export type BthSwitchProps = {
+export const BthSegmentedControl = SegmentedControl;
+
+export type SwitchProps = {
   label: string;
   description?: string;
   value: boolean;
@@ -427,17 +476,21 @@ export type BthSwitchProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-export function BthSwitch({ label, description, value, disabled = false, onValueChange, style }: BthSwitchProps) {
+export type BthSwitchProps = SwitchProps;
+
+export function Switch({ label, description, value, disabled = false, onValueChange, style }: SwitchProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
 
   return (
     <Pressable accessibilityRole="switch" accessibilityState={{ checked: value, disabled }} disabled={disabled} onPress={() => onValueChange?.(!value)} style={({ pressed }) => [{ flexDirection: resolveRowDirection(direction, true), alignItems: 'center', justifyContent: 'space-between', gap: spacing[3], opacity: disabled ? 0.56 : pressed ? 0.9 : 1 }, style]}>
       <View style={{ flex: 1, gap: spacing[1] }}>
-        <BthText role="bodyStrong" tone={disabled ? 'soft' : 'default'}>{label}</BthText>
-        {description ? <BthText role="bodySm" tone={disabled ? 'soft' : 'muted'}>{description}</BthText> : null}
+        <Text role="bodyStrong" tone={disabled ? 'soft' : 'default'}>{label}</Text>
+        {description ? <Text role="bodySm" tone={disabled ? 'soft' : 'muted'}>{description}</Text> : null}
       </View>
-      <Switch disabled={disabled} value={value} onValueChange={onValueChange} thumbColor={value ? theme.brandContrast : theme.surfaceRaised} trackColor={{ false: theme.lineStrong, true: theme.brand }} ios_backgroundColor={theme.lineStrong} />
+      <RNSwitch disabled={disabled} value={value} onValueChange={onValueChange} thumbColor={value ? theme.brandContrast : theme.surfaceRaised} trackColor={{ false: theme.lineStrong, true: theme.brand }} ios_backgroundColor={theme.lineStrong} />
     </Pressable>
   );
 }
+
+export const BthSwitch = Switch;

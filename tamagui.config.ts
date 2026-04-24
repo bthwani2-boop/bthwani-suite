@@ -1,14 +1,2 @@
-import { defaultConfig } from '@tamagui/config/v5'
-import { createTamagui } from 'tamagui'
-
-export const tamaguiConfig = createTamagui({
-  ...defaultConfig,
-})
-
-type BthTamaguiConfig = typeof tamaguiConfig
-
-declare module 'tamagui' {
-  interface TamaguiCustomConfig extends BthTamaguiConfig {}
-}
-
-export default tamaguiConfig
+export { tamaguiConfig } from './packages/ui-kit/src/tamagui-config';
+export { default } from './packages/ui-kit/src/tamagui-config';

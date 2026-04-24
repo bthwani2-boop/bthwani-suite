@@ -60,6 +60,12 @@ Before the first service is sealed with evidence:
 - local `node_modules/` folders under apps or packages are workspace install artifacts, not separate ownership truth
 - no app or package may silently redefine the canonical workspace toolchain version policy
 
+## BTH Token Rename And Alias Law
+
+Any task that changes tokens containing `Bth`, `bth`, or `BTH` must follow [../.github/agents/platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md](../.github/agents/platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md).
+
+Treat it as one-file-at-a-time governed cleanup; do not use blind global replace.
+
 ## Mobile Toolchain Ownership Law
 
 - the current mobile app roots are shell packages, not standalone Expo ownership roots

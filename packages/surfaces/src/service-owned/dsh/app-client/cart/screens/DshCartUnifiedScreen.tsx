@@ -1,19 +1,19 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, I18nManager, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  BthButton,
-  BthIcon,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthSurface,
-  BthText,
+  Button,
+  Icon,
+  MobileScrollView,
+  SectionHeader,
+  Surface,
+  Text,
   CartDetails,
   colorPalette,
   safeArea,
   sizes,
   spacing,
-  BthTopBar,
+  TopBar,
 } from '@bthwani/ui-kit';
 
 const HEADER_RED = colorPalette.brandStrong ?? colorPalette.brand ?? '#F97316';
@@ -70,6 +70,7 @@ export default function DshCartUnifiedScreen(props: any) {
   const [note] = useState('لا يوجد ملاحظة');
   const [scheduling, setScheduling] = useState<'now' | 'later'>('now');
   const [activeQuickAction, setActiveQuickAction] = useState<'coupon' | 'address' | 'note' | 'bring' | null>(null);
+  const [cartDetailsVisible, setCartDetailsVisible] = useState(false);
   const checkoutAction = props.onContinue ?? props.onOpenOrder ?? (() => {});
   const editAction = props.onOpenOrder ?? props.onContinue ?? (() => {});
 
@@ -86,17 +87,18 @@ export default function DshCartUnifiedScreen(props: any) {
     }
   }, [totalAmount]);
 
-  const increaseQty = useCallback((id: string) => {
-    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, qty: (item.qty ?? 1) + 1 } : item)));
-  }, []);
+  const updateItemQty = (id: string, qty: number) => {
+    if (qty <= 0) {
+      setItems((prev) => prev.filter((item) => item.id !== id));
+      return;
+    }
 
-  const decreaseQty = useCallback((id: string) => {
-    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, qty: Math.max(1, (item.qty ?? 1) - 1) } : item)));
-  }, []);
+    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, qty } : item)));
+  };
 
-  const removeItem = useCallback((id: string) => {
+  const removeItem = (id: string) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
-  }, []);
+  };
 
   function HeaderIconButton({ icon, background, color, size = 42, onPress }: { icon: any; background: string; color: string; size?: number; onPress?: () => void }) {
     return (
@@ -118,7 +120,7 @@ export default function DshCartUnifiedScreen(props: any) {
     const isRTL = I18nManager.isRTL;
 
     return (
-      <BthSurface
+      <Surface
         tone="default"
         padding={2}
         style={{
@@ -134,23 +136,23 @@ export default function DshCartUnifiedScreen(props: any) {
         <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', minHeight: 40 }}>
           <View style={{ width: 86, alignItems: 'center' }}>
             <View style={{ width: 86, height: 36, borderRadius: 18, backgroundColor: HEADER_RED, alignItems: 'center', justifyContent: 'center' }}>
-              <BthText role="bodySm" style={{ color: colorPalette.white, fontWeight: '700' }}>
+              <Text role="bodySm" style={{ color: colorPalette.white, fontWeight: '700' }}>
                 اشترك الآن
-              </BthText>
+              </Text>
             </View>
           </View>
 
           <View style={{ flex: 1, paddingHorizontal: spacing[2], alignItems: 'center', justifyContent: 'center' }}>
-            <BthText role="bodyMd" style={{ color: TEXT_DARK, textAlign: 'center', lineHeight: 19 }}>
+          <Text role="bodyMd" style={{ color: TEXT_DARK, textAlign: 'center', lineHeight: 19 }}>
               اشترك بخدمة بثواني برو لا ستفاده من افضل العروض
-            </BthText>
+          </Text>
           </View>
 
           <View style={{ width: 24, alignItems: 'center' }}>
             <Ionicons name="ribbon-outline" size={13} color={ACCENT_GOLD} />
           </View>
         </View>
-      </BthSurface>
+      </Surface>
     );
   }
 
@@ -163,18 +165,18 @@ export default function DshCartUnifiedScreen(props: any) {
         </View>
 
         <View style={{ flex: 1, alignItems: 'flex-end', paddingHorizontal: spacing[1] }}>
-          <BthText role="bodyStrong" style={{ textAlign: 'right', color: TEXT_DARK }}>
+          <Text role="bodyStrong" style={{ textAlign: 'right', color: TEXT_DARK }}>
             {title}
-          </BthText>
+          </Text>
           {subtitle ? (
-            <BthText role="bodySm" style={{ textAlign: 'right', color: MUTED_TEXT, lineHeight: 18 }}>
+            <Text role="bodySm" style={{ textAlign: 'right', color: MUTED_TEXT, lineHeight: 18 }}>
               {subtitle}
-            </BthText>
+            </Text>
           ) : null}
         </View>
 
         <View style={{ width: 62, alignItems: 'flex-start' }}>
-          {actionLabel ? <BthText role="bodyMd" style={{ color: actionColor, fontWeight: '600' }}>{actionLabel}</BthText> : null}
+          {actionLabel ? <Text role="bodyMd" style={{ color: actionColor, fontWeight: '600' }}>{actionLabel}</Text> : null}
         </View>
 
       </Pressable>
@@ -187,16 +189,16 @@ export default function DshCartUnifiedScreen(props: any) {
         <HeaderIconButton size={40} icon="time-outline" background={HEADER_RED} color={colorPalette.white} onPress={() => setScheduling((prev) => (prev === 'now' ? 'later' : 'now'))} />
 
         <View style={{ flex: 1, alignItems: 'flex-end' }}>
-          <BthText role="bodyStrong" style={{ textAlign: 'right', color: TEXT_DARK }}>
+          <Text role="bodyStrong" style={{ textAlign: 'right', color: TEXT_DARK }}>
             تحديد وقت الطلب
-          </BthText>
-          <BthText role="bodySm" style={{ textAlign: 'right', color: MUTED_TEXT }}>
+          </Text>
+          <Text role="bodySm" style={{ textAlign: 'right', color: MUTED_TEXT }}>
             وقت تنفيذ الطلب
-          </BthText>
+          </Text>
         </View>
 
         <View style={{ width: 96, alignItems: 'flex-start', gap: 6 }}>
-          <BthButton
+          <Button
             label={scheduling === 'now' ? 'الآن ✓' : 'الآن'}
             tone="danger"
             size="sm"
@@ -204,7 +206,7 @@ export default function DshCartUnifiedScreen(props: any) {
             onPress={() => setScheduling('now')}
             style={{ width: 78, minHeight: 32 }}
           />
-          <BthButton
+          <Button
             label="في وقت لاحق"
             tone="secondary"
             size="sm"
@@ -229,19 +231,19 @@ export default function DshCartUnifiedScreen(props: any) {
         </View>
 
         <View style={{ flex: 1, alignItems: 'flex-end', paddingHorizontal: spacing[1] }}>
-          <BthText role="bodyStrong" style={{ textAlign: 'right', color: TEXT_DARK }}>
+          <Text role="bodyStrong" style={{ textAlign: 'right', color: TEXT_DARK }}>
             {title}
-          </BthText>
+          </Text>
           {subtitle ? (
-            <BthText role="bodySm" style={{ textAlign: 'right', color: MUTED_TEXT, lineHeight: 18 }}>
+            <Text role="bodySm" style={{ textAlign: 'right', color: MUTED_TEXT, lineHeight: 18 }}>
               {subtitle}
-            </BthText>
+            </Text>
           ) : null}
         </View>
 
         <View style={{ width: 76, alignItems: 'flex-start' }}>
           {actionLabel ? (
-            <BthButton
+            <Button
               label={actionLabel}
               tone="primary"
               size="sm"
@@ -264,15 +266,15 @@ export default function DshCartUnifiedScreen(props: any) {
             <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: '#FDE68A' }} />
           </View>
           <View style={{ position: 'absolute', bottom: 8, left: 8, borderRadius: 6, backgroundColor: ACCENT_GOLD, paddingHorizontal: 10, paddingVertical: 3 }}>
-            <BthText role="bodySm" style={{ color: '#111827', fontWeight: '600' }}>
+            <Text role="bodySm" style={{ color: '#111827', fontWeight: '600' }}>
               {price}
-            </BthText>
+            </Text>
           </View>
         </View>
         <View style={{ paddingHorizontal: spacing[1], paddingTop: spacing[1], paddingBottom: spacing[1] }}>
-          <BthText role="bodySm" style={{ color: TEXT_DARK, textAlign: 'center' }}>
+          <Text role="bodySm" style={{ color: TEXT_DARK, textAlign: 'center' }}>
             {title}
-          </BthText>
+          </Text>
         </View>
       </View>
     );
@@ -286,14 +288,14 @@ export default function DshCartUnifiedScreen(props: any) {
     ];
 
     return (
-      <BthSurface tone="inset" padding={2} gap={1}>
+      <Surface tone="inset" padding={2} gap={1}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <BthText role="bodyMd" style={{ color: HEADER_RED, fontWeight: '600' }}>
+          <Text role="bodyMd" style={{ color: HEADER_RED, fontWeight: '600' }}>
             عرض الكل
-          </BthText>
-          <BthText role="bodyMd" style={{ color: TEXT_DARK, fontWeight: '600' }}>
+          </Text>
+          <Text role="bodyMd" style={{ color: TEXT_DARK, fontWeight: '600' }}>
             قد تعجبك هذه المنتجات أيضاً
-          </BthText>
+          </Text>
         </View>
 
         <View style={{ flexDirection: 'row', gap: spacing[1], overflow: 'hidden' }}>
@@ -301,7 +303,7 @@ export default function DshCartUnifiedScreen(props: any) {
             <RecommendationCard key={product.id} title={product.title} price={product.price} />
           ))}
         </View>
-      </BthSurface>
+      </Surface>
     );
   }
 
@@ -315,35 +317,47 @@ export default function DshCartUnifiedScreen(props: any) {
     };
 
     return (
-      <BthSurface tone="raised" padding={2} gap={1}>
-        <BthSectionHeader title="تفاصيل السلة" subtitle={`عناصر: ${items.length}`} />
+      <Surface tone="raised" padding={2} gap={1}>
+        <SectionHeader
+          title="تفاصيل السلة"
+          subtitle={`عناصر: ${items.length}`}
+          trailing={(
+              <Button
+              label="التفاصيل"
+              tone="secondary"
+              size="sm"
+              fullWidth={false}
+              onPress={() => setCartDetailsVisible(true)}
+            />
+          )}
+        />
 
         <View style={{ borderWidth: 1, borderColor: '#CFCFCF', borderRadius: 12, overflow: 'hidden', backgroundColor: colorPalette.white }}>
           <View style={{ flexDirection: 'row-reverse', backgroundColor: '#FAFAFA', borderBottomWidth: 1, borderColor: '#CFCFCF', paddingVertical: 4 }}>
-            <View style={{ flex: 3, paddingHorizontal: 6 }}><BthText role="bodySm" style={{ fontWeight: '700', color: TEXT_DARK, textAlign: 'right' }}>المنتج</BthText></View>
-            <View style={{ flex: 1.3, paddingHorizontal: 6 }}><BthText role="bodySm" style={{ fontWeight: '700', color: TEXT_DARK, textAlign: 'center' }}>السعر</BthText></View>
-            <View style={{ flex: 1, paddingHorizontal: 6 }}><BthText role="bodySm" style={{ fontWeight: '700', color: TEXT_DARK, textAlign: 'center' }}>الكمية</BthText></View>
-            <View style={{ flex: 1.3, paddingHorizontal: 6 }}><BthText role="bodySm" style={{ fontWeight: '700', color: TEXT_DARK, textAlign: 'center' }}>الإجمالي</BthText></View>
+            <View style={{ flex: 3, paddingHorizontal: 6 }}><Text role="bodySm" style={{ fontWeight: '700', color: TEXT_DARK, textAlign: 'right' }}>المنتج</Text></View>
+            <View style={{ flex: 1.3, paddingHorizontal: 6 }}><Text role="bodySm" style={{ fontWeight: '700', color: TEXT_DARK, textAlign: 'center' }}>السعر</Text></View>
+            <View style={{ flex: 1, paddingHorizontal: 6 }}><Text role="bodySm" style={{ fontWeight: '700', color: TEXT_DARK, textAlign: 'center' }}>الكمية</Text></View>
+            <View style={{ flex: 1.3, paddingHorizontal: 6 }}><Text role="bodySm" style={{ fontWeight: '700', color: TEXT_DARK, textAlign: 'center' }}>الإجمالي</Text></View>
           </View>
 
           {items.map((item) => (
             <View key={item.id} style={{ flexDirection: 'row-reverse', alignItems: 'center', borderBottomWidth: 1, borderColor: '#D9D9D9', paddingVertical: 6 }}>
               <View style={{ flex: 3, paddingHorizontal: 6 }}>
-                <BthText role="bodySm" style={{ color: TEXT_DARK, textAlign: 'right' }}>{item.title}</BthText>
+                <Text role="bodySm" style={{ color: TEXT_DARK, textAlign: 'right' }}>{item.title}</Text>
               </View>
               <View style={{ flex: 1.3, paddingHorizontal: 6 }}>
-                <BthText role="bodySm" style={{ color: TEXT_DARK, textAlign: 'center' }}>{formatAmount(item.priceValue)}</BthText>
+                <Text role="bodySm" style={{ color: TEXT_DARK, textAlign: 'center' }}>{formatAmount(item.priceValue)}</Text>
               </View>
               <View style={{ flex: 1, paddingHorizontal: 6, alignItems: 'center' }}>
-                <BthText role="bodySm" style={{ color: TEXT_DARK }}>{item.qty}</BthText>
+                <Text role="bodySm" style={{ color: TEXT_DARK }}>{item.qty}</Text>
               </View>
               <View style={{ flex: 1.3, paddingHorizontal: 6 }}>
-                <BthText role="bodySm" style={{ color: TEXT_DARK, textAlign: 'center' }}>{formatAmount((item.priceValue ?? 0) * (item.qty ?? 1))}</BthText>
+                <Text role="bodySm" style={{ color: TEXT_DARK, textAlign: 'center' }}>{formatAmount((item.priceValue ?? 0) * (item.qty ?? 1))}</Text>
               </View>
             </View>
           ))}
         </View>
-      </BthSurface>
+      </Surface>
     );
   }
 
@@ -351,31 +365,31 @@ export default function DshCartUnifiedScreen(props: any) {
 
   return (
     <View style={{ flex: 1, backgroundColor: PAGE_BG }}>
-      <BthTopBar
+      <TopBar
         variant="surface"
         title="تأكيد الطلب"
         actions={[
           {
             id: 'clear-cart',
-            icon: <BthIcon name="trash-outline" size={20} color={TEXT_DARK} />,
+              icon: <Icon name="trash-outline" size={20} color={TEXT_DARK} />,
             accessibilityLabel: 'تفريغ السلة',
             onPress: () => setItems([]),
           },
         ]}
         trailingAction={{
           id: 'exit-checkout',
-          icon: <BthIcon name="arrow-back" size={24} color={ACCENT_GOLD} />,
+            icon: <Icon name="arrow-back" size={24} color={ACCENT_GOLD} />,
           mirrorInRtl: true,
           accessibilityLabel: 'الرجوع',
           onPress: () => props.onExit?.(),
         }}
       />
 
-      <BthMobileScrollView fill padding={2} gap={1} contentContainerStyle={{ paddingBottom: actionBarBottomPadding }}>
+        <MobileScrollView fill padding={2} gap={1} contentContainerStyle={{ paddingBottom: actionBarBottomPadding }}>
 
         <PromoBanner />
 
-        <BthSurface tone="raised" padding={1} gap={1} style={{ overflow: 'hidden' }}>
+        <Surface tone="raised" padding={1} gap={1} style={{ overflow: 'hidden' }}>
           <ActionRow icon="pricetag-outline" title="هل لديك قسيمة تخفيض؟" actionLabel="إضافة" />
           <ActionRow icon="location-outline" title="عنوان التوصيل:" subtitle={pickupAddr} actionLabel="تغيير" />
           <ActionRow icon="document-text-outline" title="ملاحظات الطلب" subtitle={note} actionLabel="إضافة" />
@@ -386,10 +400,10 @@ export default function DshCartUnifiedScreen(props: any) {
             actionLabel="إضافة"
           />
           <SchedulePanel />
-        </BthSurface>
+        </Surface>
 
-        <BthSurface tone="raised" padding={2} gap={1}>
-          <BthSectionHeader title="الدفع" subtitle="( الدفع عند الاستلام )" />
+        <Surface tone="raised" padding={2} gap={1}>
+          <SectionHeader title="الدفع" subtitle="( الدفع عند الاستلام )" />
           <View style={{ gap: spacing[1] }}>
             <PaymentRow icon="wallet-outline" title="الدفع عند الاستلام" subtitle="الدفع عند الاستلام" checked={paymentMethod === 'cod'} onSelect={() => setPaymentMethod('cod')} />
             <PaymentRow
@@ -428,7 +442,7 @@ export default function DshCartUnifiedScreen(props: any) {
               }}
             />
           </View>
-        </BthSurface>
+        </Surface>
 
         <RecommendedSection />
 
@@ -436,51 +450,63 @@ export default function DshCartUnifiedScreen(props: any) {
           <View style={{ marginTop: spacing[1], marginBottom: spacing[1], gap: 6 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <View style={{ alignItems: 'flex-end' }}>
-                <BthText role="bodySm" style={{ color: TEXT_DARK }}>
+                <Text role="bodySm" style={{ color: TEXT_DARK }}>
                   الإجمالي
-                </BthText>
-                <BthText role="bodySm" style={{ color: TEXT_DARK }}>
+                </Text>
+                <Text role="bodySm" style={{ color: TEXT_DARK }}>
                   التوصيل
-                </BthText>
+                </Text>
               </View>
               <View style={{ alignItems: 'flex-start' }}>
-                <BthText role="bodySm" style={{ color: TEXT_DARK }}>
+                <Text role="bodySm" style={{ color: TEXT_DARK }}>
                   12,600 ر.ي
-                </BthText>
-                <BthText role="bodySm" style={{ color: TEXT_DARK }}>
+                </Text>
+                <Text role="bodySm" style={{ color: TEXT_DARK }}>
                   950 ر.ي
-                </BthText>
+                </Text>
               </View>
             </View>
           </View>
 
           <View style={{ backgroundColor: ACCENT_GOLD, borderRadius: 14, paddingHorizontal: spacing[2], paddingVertical: spacing[2], marginVertical: spacing[1] }}>
             <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-              <BthText role="bodyMd" style={{ color: '#111827', fontWeight: '600' }}>
+              <Text role="bodyMd" style={{ color: '#111827', fontWeight: '600' }}>
                 الإجمالي الكلي
-              </BthText>
-              <BthText role="titleLg" style={{ fontWeight: '700', color: '#111827' }}>
+              </Text>
+              <Text role="titleLg" style={{ fontWeight: '700', color: '#111827' }}>
                 13,550 ر.ي
-              </BthText>
+              </Text>
             </View>
           </View>
         </View>
 
         <ItemsTable />
-      </BthMobileScrollView>
+      </MobileScrollView>
 
       <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[2], paddingTop: spacing[1], paddingBottom: safeArea.comfortable ?? spacing[1], backgroundColor: colorPalette.white, borderTopWidth: 1, borderColor: '#D6D6D6' }}>
         <View style={{ flexDirection: 'row', gap: spacing[1] }}>
-          <BthButton label="تنفيذ الطلب" size="sm" fullWidth={false} onPress={checkoutAction} style={{ flex: 1, minHeight: 42, backgroundColor: HEADER_RED, borderRadius: 14 }} />
-          <BthButton label="تعديل الطلب" tone="secondary" size="sm" fullWidth={false} onPress={editAction} style={{ flex: 1, minHeight: 42, borderRadius: 14 }} />
+          <Button label="تنفيذ الطلب" size="sm" fullWidth={false} onPress={checkoutAction} style={{ flex: 1, minHeight: 42, backgroundColor: HEADER_RED, borderRadius: 14 }} />
+          <Button label="تعديل الطلب" tone="secondary" size="sm" fullWidth={false} onPress={editAction} style={{ flex: 1, minHeight: 42, borderRadius: 14 }} />
         </View>
       </View>
 
       <CartDetails
-        visible={false}
-        onClose={() => {}}
-        items={items.map((item) => ({ id: item.id, title: item.title, subtotal: item.priceValue, qty: item.qty, price: item.priceValue }))}
-        onCheckout={checkoutAction}
+        visible={cartDetailsVisible}
+        onClose={() => setCartDetailsVisible(false)}
+        currency="YER"
+        items={items.map((item) => ({
+          id: item.id,
+          title: item.title,
+          subtotal: (item.priceValue ?? 0) * (item.qty ?? 1),
+          qty: item.qty,
+          price: item.priceValue,
+        }))}
+        onChangeQty={updateItemQty}
+        onRemove={removeItem}
+        onCheckout={() => {
+          setCartDetailsVisible(false);
+          checkoutAction();
+        }}
       />
     </View>
   );

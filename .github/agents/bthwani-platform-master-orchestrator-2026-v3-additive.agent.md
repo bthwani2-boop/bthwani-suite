@@ -35,6 +35,11 @@ Choose one base profile first, then add only the overlays justified by evidence.
 Load the skills required by the chosen route exactly as listed in the routing index.
 If the dominant intent is still ambiguous, stop and block instead of mixing base profiles.
 
+## BTH Token Rename & Alias Policy
+
+Any rename, refactor, cleanup, or normalization involving tokens containing `Bth`, `bth`, or `BTH` must follow [platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md](platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md).
+Do not treat that work as a blind global replace. Keep it file-by-file, classify tokens first, and require explicit compatibility handling for any public or shared name.
+
 ## Mandatory sequence
 ```text
 INTAKE

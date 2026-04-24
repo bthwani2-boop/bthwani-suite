@@ -1,7 +1,7 @@
 import React, { useEffect, type ReactNode } from 'react';
 import { Modal as RNModal, Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 import { radius, spacing } from '../foundation';
-import { BthPortalLayer, useTheme } from '../providers';
+import { PortalLayer, useTheme } from '../providers';
 import { BthButton } from './button';
 import { BthBox, BthSurface, BthText } from '../primitives';
 
@@ -77,7 +77,7 @@ export function BthSheetFrame({ visible, title, onClose, children }: BthSheetFra
   );
 
   return (
-    <BthPortalLayer
+    <PortalLayer
       active={visible}
       fallback={
         <RNModal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -86,7 +86,7 @@ export function BthSheetFrame({ visible, title, onClose, children }: BthSheetFra
       }
     >
       {sheetContent}
-    </BthPortalLayer>
+    </PortalLayer>
   );
 }
 
@@ -136,7 +136,7 @@ export function BthToast({ visible, title, description, tone = 'neutral', placem
   );
 
   return (
-    <BthPortalLayer
+    <PortalLayer
       active={visible}
       fallback={
         <RNModal transparent visible animationType="fade" onRequestClose={onDismiss}>
@@ -145,7 +145,7 @@ export function BthToast({ visible, title, description, tone = 'neutral', placem
       }
     >
       {toastContent}
-    </BthPortalLayer>
+    </PortalLayer>
   );
 }
 

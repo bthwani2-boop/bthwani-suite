@@ -1,13 +1,17 @@
 import React from 'react';
 import { ActivityIndicator, View, type StyleProp, type ViewStyle } from 'react-native';
-import { BthButton } from './button';
-import { spacing, type BthLanguage } from '../foundation';
+import { Button } from './button';
+import { spacing, type Language } from '../foundation';
 import { useDirection, useTheme } from '../providers';
-import { BthSurface, BthText } from '../primitives';
+import { BthSurface as Surface, BthText as Text } from '../primitives';
 
-export type BthStateKind = 'loading' | 'empty' | 'error' | 'success' | 'warning' | 'info';
-export type BthStateTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
-export type BthStateId =
+export type StateKind = 'loading' | 'empty' | 'error' | 'success' | 'warning' | 'info';
+export type BthStateKind = StateKind;
+
+export type StateTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+export type BthStateTone = StateTone;
+
+export type StateId =
   | 'loading'
   | 'empty'
   | 'noResults'
@@ -19,16 +23,20 @@ export type BthStateId =
   | 'unauthorized'
   | 'notFound';
 
-export type BthStateDefinition = {
-  id: BthStateId;
-  kind: BthStateKind;
-  tone: BthStateTone;
+export type BthStateId = StateId;
+
+export type StateDefinition = {
+  id: StateId;
+  kind: StateKind;
+  tone: StateTone;
   title: string;
   description: string;
   actionLabel?: string;
 };
 
-type LocalizedStateCatalog = Record<BthStateId, BthStateDefinition>;
+export type BthStateDefinition = StateDefinition;
+
+type LocalizedStateCatalog = Record<StateId, StateDefinition>;
 
 const arabicStateCatalog: LocalizedStateCatalog = {
   loading: { id: 'loading', kind: 'loading', tone: 'info', title: 'جار التحميل', description: 'يبقى هيكل الشاشة واضحًا أثناء جلب البيانات أو تنفيذ العملية.' },
@@ -56,17 +64,20 @@ const englishStateCatalog: LocalizedStateCatalog = {
   notFound: { id: 'notFound', kind: 'empty', tone: 'neutral', title: 'Resource not found', description: 'The requested item is no longer available. Move back to a known destination.', actionLabel: 'Back to list' },
 };
 
-export const bthStateIds = Object.freeze(Object.keys(arabicStateCatalog) as BthStateId[]);
+export const stateIds = Object.freeze(Object.keys(arabicStateCatalog) as StateId[]);
+export const bthStateIds = stateIds;
 
-export function getBthStateDefinition(stateId: BthStateId, language?: BthLanguage) {
+export function getStateDefinition(stateId: StateId, language?: Language) {
   const normalizedLanguage = String(language ?? 'ar').toLowerCase();
   const catalog = normalizedLanguage.startsWith('en') ? englishStateCatalog : arabicStateCatalog;
   return catalog[stateId];
 }
 
-export type BthStateViewProps = {
-  kind?: BthStateKind;
-  stateId?: BthStateId;
+export const getBthStateDefinition = getStateDefinition;
+
+export type StateViewProps = {
+  kind?: StateKind;
+  stateId?: StateId;
   language?: string;
   title?: string;
   description?: string;
@@ -74,10 +85,12 @@ export type BthStateViewProps = {
   onActionPress?: () => void;
 };
 
-export function BthStateView({ kind, stateId, language, title, description, actionLabel, onActionPress }: BthStateViewProps) {
+export type BthStateViewProps = StateViewProps;
+
+export function StateView({ kind, stateId, language, title, description, actionLabel, onActionPress }: StateViewProps) {
   const { language: contextLanguage } = useDirection();
   const { theme } = useTheme();
-  const stateDefinition = stateId ? getBthStateDefinition(stateId, language ?? contextLanguage) : undefined;
+  const stateDefinition = stateId ? getStateDefinition(stateId, language ?? contextLanguage) : undefined;
   const resolvedKind = kind ?? stateDefinition?.kind ?? 'empty';
   const resolvedTitle = title ?? stateDefinition?.title ?? (resolvedKind === 'loading' ? 'جار التحميل' : 'No state title');
   const resolvedDescription = description ?? stateDefinition?.description;
@@ -92,35 +105,45 @@ export function BthStateView({ kind, stateId, language, title, description, acti
   }[tone];
 
   return (
-    <BthSurface tone={appearance.surfaceTone} padding={6} gap={4} style={{ alignItems: 'center' }}>
+    <Surface tone={appearance.surfaceTone} padding={6} gap={4} style={{ alignItems: 'center' }}>
       <View style={{ alignItems: 'center', justifyContent: 'center', gap: spacing[3], width: '100%' }}>
         <View style={{ width: 56, height: 5, borderRadius: 999, backgroundColor: appearance.accentColor }} />
         {resolvedKind === 'loading' ? <ActivityIndicator color={appearance.accentColor} size="large" /> : null}
         <View style={{ alignItems: 'center', gap: spacing[2], width: '100%' }}>
-          <BthText role="titleMd" align="center">{resolvedTitle}</BthText>
-          {resolvedDescription ? <BthText role="bodyMd" tone={appearance.textTone} align="center">{resolvedDescription}</BthText> : null}
+          <Text role="titleMd" align="center">{resolvedTitle}</Text>
+          {resolvedDescription ? <Text role="bodyMd" tone={appearance.textTone} align="center">{resolvedDescription}</Text> : null}
         </View>
-        {resolvedActionLabel && onActionPress ? <BthButton label={resolvedActionLabel} tone={appearance.buttonTone} onPress={onActionPress} /> : null}
+        {resolvedActionLabel && onActionPress ? <Button label={resolvedActionLabel} tone={appearance.buttonTone} onPress={onActionPress} /> : null}
       </View>
-    </BthSurface>
+    </Surface>
   );
 }
 
-export function BthEmptyState(props: Omit<BthStateViewProps, 'kind' | 'stateId'>) {
-  return <BthStateView stateId="empty" {...props} />;
+export const BthStateView = StateView;
+
+export function EmptyState(props: Omit<StateViewProps, 'kind' | 'stateId'>) {
+  return <StateView stateId="empty" {...props} />;
 }
 
-export function BthLoadingState(props: Omit<BthStateViewProps, 'kind' | 'stateId'>) {
-  return <BthStateView stateId="loading" {...props} />;
+export const BthEmptyState = EmptyState;
+
+export function LoadingState(props: Omit<StateViewProps, 'kind' | 'stateId'>) {
+  return <StateView stateId="loading" {...props} />;
 }
 
-export function BthSuccessState(props: Omit<BthStateViewProps, 'kind' | 'stateId'>) {
-  return <BthStateView stateId="success" {...props} />;
+export const BthLoadingState = LoadingState;
+
+export function SuccessState(props: Omit<StateViewProps, 'kind' | 'stateId'>) {
+  return <StateView stateId="success" {...props} />;
 }
 
-export function BthErrorState(props: Omit<BthStateViewProps, 'kind' | 'stateId'>) {
-  return <BthStateView stateId="blockingError" {...props} />;
+export const BthSuccessState = SuccessState;
+
+export function ErrorState(props: Omit<StateViewProps, 'kind' | 'stateId'>) {
+  return <StateView stateId="blockingError" {...props} />;
 }
+
+export const BthErrorState = ErrorState;
 
 export type ScreenState = 'content' | 'loading' | 'success' | 'error';
 
@@ -137,7 +160,7 @@ export function ScreenWrapper({ state = 'content', loadingMessage, successMessag
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing[4] }}>
         <ActivityIndicator size="large" />
-        {loadingMessage ? <BthText style={{ marginTop: spacing[3], textAlign: 'center' }}>{loadingMessage}</BthText> : null}
+        {loadingMessage ? <Text style={{ marginTop: spacing[3], textAlign: 'center' }}>{loadingMessage}</Text> : null}
       </View>
     );
   }
@@ -145,8 +168,8 @@ export function ScreenWrapper({ state = 'content', loadingMessage, successMessag
   if (state === 'success') {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing[4] }}>
-        <BthText style={{ marginTop: spacing[3], textAlign: 'center' }}>{successMessage ?? 'Success'}</BthText>
-        {onSuccessAction ? <BthButton label="OK" onPress={onSuccessAction} /> : null}
+        <Text style={{ marginTop: spacing[3], textAlign: 'center' }}>{successMessage ?? 'Success'}</Text>
+        {onSuccessAction ? <Button label="OK" onPress={onSuccessAction} /> : null}
       </View>
     );
   }
@@ -154,7 +177,7 @@ export function ScreenWrapper({ state = 'content', loadingMessage, successMessag
   if (state === 'error') {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing[4] }}>
-        <BthText style={{ marginTop: spacing[3], textAlign: 'center' }}>حدث خطأ، الرجاء المحاولة لاحقًا</BthText>
+        <Text style={{ marginTop: spacing[3], textAlign: 'center' }}>حدث خطأ، الرجاء المحاولة لاحقًا</Text>
         {children}
       </View>
     );
@@ -163,43 +186,45 @@ export function ScreenWrapper({ state = 'content', loadingMessage, successMessag
   return <>{children}</>;
 }
 
-export type AppEmptyStateProps = Omit<BthStateViewProps, 'kind' | 'stateId'>;
-export type AppLoadingStateProps = Omit<BthStateViewProps, 'kind' | 'stateId'>;
-export type AppSuccessStateProps = Omit<BthStateViewProps, 'kind' | 'stateId'>;
-export type AppErrorStateProps = Omit<BthStateViewProps, 'kind' | 'stateId'>;
+export type AppEmptyStateProps = Omit<StateViewProps, 'kind' | 'stateId'>;
+export type AppLoadingStateProps = Omit<StateViewProps, 'kind' | 'stateId'>;
+export type AppSuccessStateProps = Omit<StateViewProps, 'kind' | 'stateId'>;
+export type AppErrorStateProps = Omit<StateViewProps, 'kind' | 'stateId'>;
 
 export function AppEmptyState(props: AppEmptyStateProps) {
-  return <BthEmptyState {...props} />;
+  return <EmptyState {...props} />;
 }
 
 export function AppLoadingState(props: AppLoadingStateProps) {
-  return <BthLoadingState {...props} />;
+  return <LoadingState {...props} />;
 }
 
 export function AppSuccessState(props: AppSuccessStateProps) {
-  return <BthSuccessState {...props} />;
+  return <SuccessState {...props} />;
 }
 
 export function AppErrorState(props: AppErrorStateProps) {
-  return <BthErrorState {...props} />;
+  return <ErrorState {...props} />;
 }
 
 export function Loading(props: AppLoadingStateProps) {
-  return <BthLoadingState {...props} />;
+  return <LoadingState {...props} />;
 }
 
 export function ErrorBoundary(props: AppErrorStateProps) {
-  return <BthErrorState {...props} />;
+  return <ErrorState {...props} />;
 }
 
-export function BthStateGallery({ states }: { states?: readonly BthStateId[] }) {
-  const ids = states ?? bthStateIds;
+export function StateGallery({ states }: { states?: readonly StateId[] }) {
+  const ids = states ?? stateIds;
 
   return (
     <View style={{ gap: spacing[3] }}>
       {ids.map((stateId) => (
-        <BthStateView key={stateId} stateId={stateId} />
+        <StateView key={stateId} stateId={stateId} />
       ))}
     </View>
   );
 }
+
+export const BthStateGallery = StateGallery;

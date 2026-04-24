@@ -358,6 +358,11 @@ However, in source trace and evidence sections, preserve the original legacy nam
 - source label: `app-user`
 - normalized target: `app-client`
 
+## BTH Token Rename & Alias Policy
+
+For any rename, refactor, cleanup, or normalization involving tokens containing `Bth`, `bth`, or `BTH`, follow [platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md](platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md).
+Keep the work file-by-file, never run a blind global replace, and prefer proposal-only or alias-based handling when scope is ambiguous, shared, or consumer-facing.
+
 ## Internal Name vs Visible Label Law
 
 Keep these layers distinct:

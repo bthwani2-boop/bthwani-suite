@@ -15,9 +15,9 @@ import {
 } from 'react-native';
 import { colorPalette, radius, resolveRowDirection, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
-import { BthBadge } from './button';
-import { BthEmptyState } from './state';
-import { BthDivider, BthSurface, BthText } from '../primitives';
+import { Badge } from './button';
+import { BthEmptyState as EmptyState } from './state';
+import { BthDivider as Divider, BthSurface as Surface, BthText as Text } from '../primitives';
 
 const cardWidth = Dimensions.get('window').width - 28;
 const compactGap = 10;
@@ -28,7 +28,7 @@ function resolvePressableStyle(style: PressableStyle | undefined, state: Pressab
   return typeof style === 'function' ? style(state) : style;
 }
 
-export type BthHighlightsRailItem = {
+export type HighlightsRailItem = {
   id: string;
   title: string;
   subtitle: string;
@@ -39,14 +39,18 @@ export type BthHighlightsRailItem = {
   onPress?: () => void;
 };
 
-export type BthHighlightsRailProps = {
-  items: BthHighlightsRailItem[];
+export type BthHighlightsRailItem = HighlightsRailItem;
+
+export type HighlightsRailProps = {
+  items: HighlightsRailItem[];
   maxItems?: number;
   variant?: 'default' | 'mediaCompact';
   style?: StyleProp<ViewStyle>;
 };
 
-export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', style }: BthHighlightsRailProps) {
+export type BthHighlightsRailProps = HighlightsRailProps;
+
+export function HighlightsRail({ items, maxItems = 5, variant = 'default', style }: HighlightsRailProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const isRTL = direction === 'rtl';
@@ -60,7 +64,7 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
     () => (compact && visibleItems.length > 1 ? [...visibleItems, ...visibleItems, ...visibleItems, ...visibleItems, ...visibleItems] : visibleItems),
     [compact, visibleItems]
   );
-  const listRef = React.useRef<FlatList<BthHighlightsRailItem>>(null);
+  const listRef = React.useRef<FlatList<HighlightsRailItem>>(null);
   const middleLoopStart = visibleItems.length * 2;
   const autoIndexRef = React.useRef(middleLoopStart);
 
@@ -124,7 +128,7 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
     return typeof image === 'string' ? { uri: image } : image;
   };
 
-  const renderCard = (item: BthHighlightsRailItem, embedded = false) => {
+  const renderCard = (item: HighlightsRailItem, embedded = false) => {
     const imageSource = resolveImageSource(item.image);
 
     if (compact) {
@@ -145,14 +149,14 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
           ]}
         >
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.brandSurface }}>
-            <BthText role="titleLg">{item.emoji ?? '✨'}</BthText>
+            <Text role="titleLg">{item.emoji ?? '✨'}</Text>
           </View>
           {imageSource ? <Image source={imageSource} style={{ position: 'absolute', inset: 0 }} /> : null}
           <View style={{ position: 'absolute', inset: 0, backgroundColor: colorPalette.overlaySoft }} />
           <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: spacing[3], backgroundColor: 'rgba(255,255,255,0.12)' }}>
-            <BthText role="label" tone="inverse" numberOfLines={2} align="center">
+            <Text role="label" tone="inverse" numberOfLines={2} align="center">
               {item.title}
-            </BthText>
+            </Text>
           </View>
         </Pressable>
       );
@@ -182,25 +186,25 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
         <View style={{ gap: spacing[2], flex: 1 }}>
           {item.badge ? (
             <View style={{ alignSelf: 'flex-start', paddingHorizontal: spacing[2], paddingVertical: spacing[1], borderRadius: radius.pill, backgroundColor: theme.warning }}>
-              <BthText role="label" style={{ color: theme.brandContrast }}>
+              <Text role="label" style={{ color: theme.brandContrast }}>
                 {item.badge}
-              </BthText>
+              </Text>
             </View>
           ) : null}
 
-          <BthText role="titleMd" tone="default" numberOfLines={1} align="end">
+          <Text role="titleMd" tone="default" numberOfLines={1} align="end">
             {item.title}
-          </BthText>
+          </Text>
 
-          <BthText role="bodySm" tone="muted" numberOfLines={2} align="end">
+          <Text role="bodySm" tone="muted" numberOfLines={2} align="end">
             {item.subtitle}
-          </BthText>
+          </Text>
 
           {item.cta ? (
             <View style={{ alignSelf: 'flex-start', paddingHorizontal: spacing[3], paddingVertical: spacing[1], borderRadius: radius.pill, backgroundColor: theme.brand }}>
-              <BthText role="label" tone="inverse">
+              <Text role="label" tone="inverse">
                 {item.cta}
-              </BthText>
+              </Text>
             </View>
           ) : null}
         </View>
@@ -209,9 +213,9 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
           <Image source={imageSource} style={{ width: 80, height: 80, borderRadius: radius.md }} />
         ) : (
           <View style={{ width: 80, height: 80, borderRadius: radius.md, backgroundColor: theme.brandSurface, borderWidth: 1, borderColor: theme.line, alignItems: 'center', justifyContent: 'center' }}>
-            <BthText role="titleLg" tone="default">
+            <Text role="titleLg" tone="default">
               {item.emoji ?? '✨'}
-            </BthText>
+            </Text>
           </View>
         )}
       </Pressable>
@@ -250,20 +254,26 @@ export function BthHighlightsRail({ items, maxItems = 5, variant = 'default', st
   );
 }
 
-export type BthKeyValueItem = {
+export const BthHighlightsRail = HighlightsRail;
+
+export type KeyValueItem = {
   label: string;
   value: React.ReactNode;
   tone?: 'default' | 'muted' | 'soft' | 'inverse' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
   helperText?: string;
 };
 
-export type BthKeyValueListProps = {
-  items: readonly BthKeyValueItem[];
+export type BthKeyValueItem = KeyValueItem;
+
+export type KeyValueListProps = {
+  items: readonly KeyValueItem[];
   dense?: boolean;
   dividers?: boolean;
 };
 
-export function BthKeyValueList({ items, dense = false, dividers = true }: BthKeyValueListProps) {
+export type BthKeyValueListProps = KeyValueListProps;
+
+export function KeyValueList({ items, dense = false, dividers = true }: KeyValueListProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
 
@@ -283,21 +293,21 @@ export function BthKeyValueList({ items, dense = false, dividers = true }: BthKe
                 gap: spacing[3],
               }}
             >
-              <BthText role={dense ? 'caption' : 'label'} tone="muted">
+              <Text role={dense ? 'caption' : 'label'} tone="muted">
                 {item.label}
-              </BthText>
+              </Text>
               <View style={{ flex: 1, gap: spacing[1], alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end' }}>
                 {typeof item.value === 'string' || typeof item.value === 'number' ? (
-                  <BthText role={dense ? 'bodySm' : 'bodyStrong'} tone={item.tone ?? 'default'}>
+                  <Text role={dense ? 'bodySm' : 'bodyStrong'} tone={item.tone ?? 'default'}>
                     {String(item.value)}
-                  </BthText>
+                  </Text>
                 ) : (
                   item.value
                 )}
-                {item.helperText ? <BthText role="caption" tone="soft">{item.helperText}</BthText> : null}
+                {item.helperText ? <Text role="caption" tone="soft">{item.helperText}</Text> : null}
               </View>
             </View>
-            {dividers && !isLast ? <BthDivider color={theme.line} /> : null}
+            {dividers && !isLast ? <Divider color={theme.line} /> : null}
           </View>
         );
       })}
@@ -305,14 +315,18 @@ export function BthKeyValueList({ items, dense = false, dividers = true }: BthKe
   );
 }
 
-export type BthListItemProps = React.ComponentProps<typeof Pressable> & {
+export const BthKeyValueList = KeyValueList;
+
+export type ListItemProps = React.ComponentProps<typeof Pressable> & {
   title: string;
   subtitle?: string;
   meta?: string;
   badgeLabel?: string;
 };
 
-export function BthListItem({ title, subtitle, meta, badgeLabel, style, ...rest }: BthListItemProps) {
+export type BthListItemProps = ListItemProps;
+
+export function ListItem({ title, subtitle, meta, badgeLabel, style, ...rest }: ListItemProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
 
@@ -334,15 +348,17 @@ export function BthListItem({ title, subtitle, meta, badgeLabel, style, ...rest 
     >
       <View style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between', gap: spacing[3] }}>
         <View style={{ flex: 1, gap: spacing[1] }}>
-          <BthText role="bodyStrong">{title}</BthText>
-          {subtitle ? <BthText role="bodySm" tone="muted">{subtitle}</BthText> : null}
+          <Text role="bodyStrong">{title}</Text>
+          {subtitle ? <Text role="bodySm" tone="muted">{subtitle}</Text> : null}
         </View>
-        {badgeLabel ? <BthBadge label={badgeLabel} tone="brand" /> : null}
+        {badgeLabel ? <Badge label={badgeLabel} tone="brand" /> : null}
       </View>
-      {meta ? <BthText role="caption" tone="soft">{meta}</BthText> : null}
+      {meta ? <Text role="caption" tone="soft">{meta}</Text> : null}
     </Pressable>
   );
 }
+
+export const BthListItem = ListItem;
 
 function resolveCellAlignment(direction: 'rtl' | 'ltr', align: 'start' | 'center' | 'end') {
   if (align === 'center') return 'center';
@@ -350,7 +366,7 @@ function resolveCellAlignment(direction: 'rtl' | 'ltr', align: 'start' | 'center
   return direction === 'rtl' ? 'flex-end' : 'flex-start';
 }
 
-export type BthDataTableColumn<Row extends Record<string, unknown>> = {
+export type DataTableColumn<Row extends Record<string, unknown>> = {
   id: string;
   header: string;
   renderCell: (row: Row) => React.ReactNode;
@@ -358,8 +374,10 @@ export type BthDataTableColumn<Row extends Record<string, unknown>> = {
   grow?: number;
 };
 
-export type BthDataTableProps<Row extends Record<string, unknown>> = {
-  columns: readonly BthDataTableColumn<Row>[];
+export type BthDataTableColumn<Row extends Record<string, unknown>> = DataTableColumn<Row>;
+
+export type DataTableProps<Row extends Record<string, unknown>> = {
+  columns: readonly DataTableColumn<Row>[];
   rows: readonly Row[];
   rowKey: keyof Row | ((row: Row, index: number) => string);
   caption?: string;
@@ -369,7 +387,9 @@ export type BthDataTableProps<Row extends Record<string, unknown>> = {
   language?: string;
 };
 
-export function BthDataTable<Row extends Record<string, unknown>>({
+export type BthDataTableProps<Row extends Record<string, unknown>> = DataTableProps<Row>;
+
+export function DataTable<Row extends Record<string, unknown>>({
   columns,
   rows,
   rowKey,
@@ -378,33 +398,33 @@ export function BthDataTable<Row extends Record<string, unknown>>({
   emptyDescription,
   dense = false,
   language,
-}: BthDataTableProps<Row>) {
+}: DataTableProps<Row>) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const rowGap = dense ? spacing[2] : spacing[3];
 
   if (rows.length === 0) {
-    return <BthEmptyState title={emptyTitle} description={emptyDescription} language={language} />;
+    return <EmptyState title={emptyTitle} description={emptyDescription} language={language} />;
   }
 
   const resolveRowId = (row: Row, index: number) => (typeof rowKey === 'function' ? rowKey(row, index) : String(row[rowKey]));
 
   return (
-    <BthSurface tone="raised" padding={0} gap={0} radiusToken="xl" style={{ overflow: 'hidden' }}>
+    <Surface tone="raised" padding={0} gap={0} radiusToken="xl" style={{ overflow: 'hidden' }}>
       {caption ? (
         <View style={{ paddingHorizontal: spacing[4], paddingTop: spacing[4], paddingBottom: spacing[2] }}>
-          <BthText role="caption" tone="muted">
+          <Text role="caption" tone="muted">
             {caption}
-          </BthText>
+          </Text>
         </View>
       ) : null}
 
       <View style={{ flexDirection: resolveRowDirection(direction), paddingHorizontal: spacing[4], paddingBottom: spacing[2], gap: spacing[3] }}>
         {columns.map((column) => (
           <View key={column.id} style={{ flex: column.grow ?? 1, alignItems: resolveCellAlignment(direction, column.align ?? 'start') }}>
-            <BthText role="label" tone="muted">
+            <Text role="label" tone="muted">
               {column.header}
-            </BthText>
+            </Text>
           </View>
         ))}
       </View>
@@ -422,6 +442,8 @@ export function BthDataTable<Row extends Record<string, unknown>>({
       </View>
 
       <View style={{ height: 1, backgroundColor: theme.line, borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl }} />
-    </BthSurface>
+    </Surface>
   );
 }
+
+export const BthDataTable = DataTable;

@@ -10,7 +10,7 @@ import {
 	resolveRowDirection,
 	resolveTextAlign,
 	resolveTextRole,
-	shadowByElevation,
+	shadowLaw,
 	spacing,
 	type BorderToken,
 	type ElevationToken,
@@ -112,7 +112,7 @@ export function BthBox({
 					justifyContent: justify,
 					flexDirection: layoutDirection === 'row' ? resolveRowDirection(direction, reversed) : 'column'
 				},
-				shadowByElevation[elevationToken],
+				shadowLaw[elevationToken],
 				style
 			]}
 		>
@@ -134,6 +134,17 @@ export function BthDivider({ color, style }: BthDividerProps) {
 declare const process: { env: { NODE_ENV?: string } };
 
 export type BthSurfaceTone = 'default' | 'raised' | 'inset' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+
+const surfaceToneLaw: Record<BthSurfaceTone, { background: BthBoxBackground; borderTone: BthBoxBorderTone; elevationToken: ElevationToken }> = {
+	default: { background: 'surface', borderTone: 'line', elevationToken: 'flat' },
+	raised: { background: 'surfaceRaised', borderTone: 'lineStrong', elevationToken: 'raised' },
+	inset: { background: 'surfaceInset', borderTone: 'line', elevationToken: 'flat' },
+	brand: { background: 'brandSurface', borderTone: 'brand', elevationToken: 'flat' },
+	success: { background: 'successSurface', borderTone: 'success', elevationToken: 'flat' },
+	warning: { background: 'warningSurface', borderTone: 'warning', elevationToken: 'flat' },
+	danger: { background: 'dangerSurface', borderTone: 'danger', elevationToken: 'flat' },
+	info: { background: 'infoSurface', borderTone: 'info', elevationToken: 'flat' }
+};
 
 export type BthSurfaceProps = {
 	children?: React.ReactNode;
@@ -160,19 +171,8 @@ export function BthSurface({
 	borderTone,
 	style
 }: BthSurfaceProps) {
-	const toneMap: Record<BthSurfaceTone, { background: BthBoxBackground; borderTone: BthBoxBorderTone; elevationToken: ElevationToken }> = {
-		default: { background: 'surface' as const, borderTone: 'line' as const, elevationToken: 'flat' as const },
-		raised: { background: 'surfaceRaised' as const, borderTone: 'lineStrong' as const, elevationToken: 'raised' as const },
-		inset: { background: 'surfaceInset' as const, borderTone: 'line' as const, elevationToken: 'flat' as const },
-		brand: { background: 'brandSurface' as const, borderTone: 'brand' as const, elevationToken: 'flat' as const },
-		success: { background: 'successSurface' as const, borderTone: 'success' as const, elevationToken: 'flat' as const },
-		warning: { background: 'warningSurface' as const, borderTone: 'warning' as const, elevationToken: 'flat' as const },
-		danger: { background: 'dangerSurface' as const, borderTone: 'danger' as const, elevationToken: 'flat' as const },
-		info: { background: 'infoSurface' as const, borderTone: 'info' as const, elevationToken: 'flat' as const }
-	};
-
-	const toneConfig = toneMap[tone];
-	if ((process.env.NODE_ENV ?? '') !== 'production' && !(tone in toneMap)) {
+	const toneConfig = surfaceToneLaw[tone];
+	if ((process.env.NODE_ENV ?? '') !== 'production' && !(tone in surfaceToneLaw)) {
 		// eslint-disable-next-line no-console
 		console.warn(`BthSurface: unknown tone "${String(tone)}" — falling back to 'default'`);
 	}

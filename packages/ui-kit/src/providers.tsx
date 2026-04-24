@@ -11,35 +11,40 @@ import React, {
 } from 'react';
 import { Platform } from 'react-native';
 import { TamaguiProvider } from 'tamagui';
-import tamaguiConfig from '../../../tamagui.config';
+import tamaguiConfig from './tamagui-config';
 import {
 	directionConfig,
-	getBthUiText,
+	getUiText,
 	lightTheme,
 	resolveDirectionFromLanguage,
 	resolveSemanticTheme,
+	type Language,
 	type BthLanguage,
 	type Direction,
 	type SemanticTheme,
 	type ThemeMode,
 } from './foundation';
 
-export type BthRootConfig = {
-	language?: BthLanguage;
+export type RootConfig = {
+	language?: Language;
 	themeMode?: ThemeMode;
 };
 
-export const BTH_ROOT_DEFAULTS: Required<Pick<BthRootConfig, 'language' | 'themeMode'>> = {
+export type BthRootConfig = RootConfig;
+
+export const ROOT_DEFAULTS: Required<Pick<RootConfig, 'language' | 'themeMode'>> = {
 	language: directionConfig.defaultLanguage,
 	themeMode: 'light',
 };
 
+export const BTH_ROOT_DEFAULTS = ROOT_DEFAULTS;
+
 type DirectionContextValue = {
 	direction: Direction;
-	language: BthLanguage;
+	language: Language;
 	isRtl: boolean;
 	usesLogicalStartEnd: boolean;
-	setLanguage: (language: BthLanguage) => void;
+	setLanguage: (language: Language) => void;
 };
 
 const DirectionContext = createContext<DirectionContextValue>({
@@ -62,12 +67,12 @@ const ThemeContext = createContext<ThemeContextValue>({
 
 type PortalFactory = (children: ReactNode, container: Element) => ReactNode;
 
-type BthPortalContextValue = {
+type PortalContextValue = {
 	hostElement: Element | null;
 	isWeb: boolean;
 };
 
-const BthPortalContext = createContext<BthPortalContextValue>({
+const PortalContext = createContext<PortalContextValue>({
 	hostElement: null,
 	isWeb: Platform.OS === 'web',
 });
@@ -87,7 +92,7 @@ function readStoredLanguage() {
 	}
 }
 
-function syncDocumentLanguage(language: BthLanguage, direction: Direction) {
+function syncDocumentLanguage(language: Language, direction: Direction) {
 	if (typeof document === 'undefined') {
 		return;
 	}
@@ -146,12 +151,12 @@ export function useTheme() {
 }
 
 export type DirectionProviderProps = {
-	language?: BthLanguage;
+	language?: Language;
 	children: ReactNode;
 };
 
 export function DirectionProvider({ language = directionConfig.defaultLanguage, children }: DirectionProviderProps) {
-	const [activeLanguage, setActiveLanguage] = useState<BthLanguage>(() => readStoredLanguage() ?? language);
+	const [activeLanguage, setActiveLanguage] = useState<Language>(() => readStoredLanguage() ?? language);
 
 	useEffect(() => {
 		const storedLanguage = readStoredLanguage();
@@ -170,7 +175,7 @@ export function DirectionProvider({ language = directionConfig.defaultLanguage, 
 		syncDocumentLanguage(activeLanguage, resolvedDirection);
 	}, [activeLanguage, resolvedDirection]);
 
-	const setLanguage = useCallback((nextLanguage: BthLanguage) => {
+	const setLanguage = useCallback((nextLanguage: Language) => {
 		setActiveLanguage(nextLanguage);
 	}, []);
 
@@ -213,7 +218,7 @@ export function useUiLanguage() {
 
 export function useUiText() {
 	const { language } = useDirection();
-	return getBthUiText(language === 'en' ? 'en' : 'ar');
+	return getUiText(language === 'en' ? 'en' : 'ar');
 }
 
 type UiTextVars = Record<string, string | number | boolean | null | undefined>;
@@ -261,20 +266,20 @@ export function useI18n() {
 }
 
 export type UiKitProviderProps = {
-	language?: BthLanguage;
+	language?: Language;
 	themeMode?: ThemeMode;
 	children: ReactNode;
 };
 
-export function BthPortalHost({ children }: { children?: ReactNode }) {
+export function PortalHost({ children }: { children?: ReactNode }) {
 	const [hostElement, setHostElement] = useState<Element | null>(null);
 	const hostId = useMemo(() => `bth-portal-host-${Math.random().toString(36).slice(2, 10)}`, []);
 	const isWeb = Platform.OS === 'web';
 
-	const contextValue = useMemo<BthPortalContextValue>(() => ({ hostElement, isWeb }), [hostElement, isWeb]);
+	const contextValue = useMemo<PortalContextValue>(() => ({ hostElement, isWeb }), [hostElement, isWeb]);
 
 	return (
-		<BthPortalContext.Provider value={contextValue}>
+		<PortalContext.Provider value={contextValue}>
 			{children}
 			{isWeb
 				? React.createElement('div', {
@@ -291,18 +296,22 @@ export function BthPortalHost({ children }: { children?: ReactNode }) {
 						},
 					})
 				: null}
-		</BthPortalContext.Provider>
+		</PortalContext.Provider>
 	);
 }
 
-export type BthPortalLayerProps = {
+export const BthPortalHost = PortalHost;
+
+export type PortalLayerProps = {
 	active?: boolean;
 	children: ReactNode;
 	fallback?: ReactNode;
 };
 
-export function BthPortalLayer({ active = true, children, fallback = null }: BthPortalLayerProps) {
-	const { hostElement, isWeb } = useContext(BthPortalContext);
+export type BthPortalLayerProps = PortalLayerProps;
+
+export function PortalLayer({ active = true, children, fallback = null }: PortalLayerProps) {
+	const { hostElement, isWeb } = useContext(PortalContext);
 
 	if (!active) {
 		return null;
@@ -321,31 +330,39 @@ export function BthPortalLayer({ active = true, children, fallback = null }: Bth
 	return <>{children}</>;
 }
 
+export const BthPortalLayer = PortalLayer;
+
 export function UiKitProvider({ language = 'ar', themeMode = 'light', children }: UiKitProviderProps) {
 	return (
-		<ThemeProvider mode={themeMode}>
-			<DirectionProvider language={language}>
-				<BthPortalHost>{children}</BthPortalHost>
-			</DirectionProvider>
-		</ThemeProvider>
+		<TamaguiProvider config={tamaguiConfig} defaultTheme={themeMode === 'dark' || themeMode === 'high-contrast' ? 'dark' : 'light'}>
+			<ThemeProvider mode={themeMode}>
+				<DirectionProvider language={language}>
+					<PortalHost>{children}</PortalHost>
+				</DirectionProvider>
+			</ThemeProvider>
+		</TamaguiProvider>
 	);
 }
 
-export type BthRootProvidersProps = BthRootConfig & {
+export type RootProvidersProps = RootConfig & {
 	children: ReactNode;
 };
 
-export function BthRootProviders({ children, language, themeMode }: BthRootProvidersProps) {
+export type BthRootProvidersProps = RootProvidersProps;
+
+export function RootProviders({ children, language, themeMode }: RootProvidersProps) {
 	return (
 		<UiKitProvider
-			language={language ?? BTH_ROOT_DEFAULTS.language}
-			themeMode={themeMode ?? BTH_ROOT_DEFAULTS.themeMode}
+			language={language ?? ROOT_DEFAULTS.language}
+			themeMode={themeMode ?? ROOT_DEFAULTS.themeMode}
 		>
 			{children}
 		</UiKitProvider>
 	);
 }
 
-export type { BthLanguage, Direction, SemanticTheme, ThemeMode } from './foundation';
+export const BthRootProviders = RootProviders;
+
+export type { Language, BthLanguage, Direction, SemanticTheme, ThemeMode } from './foundation';
 
 

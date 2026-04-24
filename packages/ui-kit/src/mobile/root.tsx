@@ -1,12 +1,14 @@
 import React, { type ReactNode } from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
-import { BthRootProviders, type BthRootProvidersProps, useTheme } from '../providers';
+import { RootProviders, type RootProvidersProps, useTheme } from '../providers';
 
-export interface BthMobileRootProps extends BthRootProvidersProps {
+export type MobileRootProps = RootProvidersProps & {
   children: ReactNode;
-}
+};
 
-function BthMobileRootFrame({ children }: { children: ReactNode }) {
+export type BthMobileRootProps = MobileRootProps;
+
+function MobileRootFrame({ children }: { children: ReactNode }) {
   const { mode, theme } = useTheme();
 
   return (
@@ -23,10 +25,12 @@ function BthMobileRootFrame({ children }: { children: ReactNode }) {
   );
 }
 
-export function BthMobileRoot({ children, ...rootProps }: BthMobileRootProps) {
+export function MobileRoot({ children, ...rootProps }: MobileRootProps) {
   return (
-    <BthRootProviders {...rootProps}>
-      <BthMobileRootFrame>{children}</BthMobileRootFrame>
-    </BthRootProviders>
+    <RootProviders {...rootProps}>
+      <MobileRootFrame>{children}</MobileRootFrame>
+    </RootProviders>
   );
 }
+
+export const BthMobileRoot = MobileRoot;

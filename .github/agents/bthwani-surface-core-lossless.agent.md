@@ -63,6 +63,11 @@ Choose exactly one base profile first.
 Add overlays only when the task proves the need.
 Do not flatten the whole skill set into one always-on policy surface.
 
+## BTH Token Rename & Alias Policy
+
+If a surface task includes tokens containing `Bth`, `bth`, or `BTH`, follow [platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md](platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md) before changing anything.
+Treat the work as one file at a time, and keep aliases only where shared or consumer-facing compatibility requires them.
+
 ## Governance Hierarchy
 
 This agent file is the primary governing surface.

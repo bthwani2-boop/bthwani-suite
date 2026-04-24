@@ -60,6 +60,49 @@ Copy this block for every accepted update.
 
 ## Active Entries
 
+### AGENT-2026-04-24-001
+
+- Date: 2026-04-24
+- Author: GitHub Copilot
+- Files changed: `governance/EXECUTION_LAW.md`, `.github/agents/platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md`, `AGENTS.md`, `.github/agents/bthwani-platform-master-orchestrator-2026-v3-additive.agent.md`, `.github/agents/bthwani-suite-core-steward.agent.md`, `.github/agents/bthwani-surface-core-lossless.agent.md`, `.github/agents/platform-agent-os-2026-v3-additive/OS/MASTER_ORCHESTRATOR.md`, `docs/governance/AGENT_CHANGE_LEDGER.md`
+- Change type: `guard`
+
+#### AGENT-2026-04-24-001 Rationale
+
+- Trigger: Bth/bth/BTH rename and normalization work needed an explicit file-by-file policy so future agents do not treat it as a blind global replace.
+- Observed problem: the repo already had legacy-name normalization guidance, but it did not spell out the per-file analysis, alias, backup, verification, and rollback workflow for token-specific renames.
+- Why existing rules were insufficient: the prior naming laws covered target normalization and legacy donor handling, but they did not fully gate BTH-token refactors that can affect brand, package, repo, or consumer-facing identifiers.
+
+#### AGENT-2026-04-24-001 Change Summary
+
+- Added: a canonical BTH token rename and alias policy file with required workflow, direct-rename gate, alias gate, and short card.
+- Updated: root and agent-level instructions to point at the canonical policy and enforce file-by-file handling.
+- Removed: nothing.
+
+#### AGENT-2026-04-24-001 Safety Checks
+
+- Duplicate-rule check: `PASS`
+- Contradiction check: `PASS`
+- Scope expansion check: `PASS`
+- Noise check: `PASS`
+- Minimal-patch check: `PASS`
+
+#### AGENT-2026-04-24-001 Expected Effect
+
+- What failure or ambiguity this change should prevent: blind global replacements, unsafe brand or package renames, and premature alias removal for BTH-token changes.
+- What behavior becomes stricter or clearer: future agents must analyze one file at a time, classify token scope before changing it, and keep aliases only for compatibility.
+
+#### AGENT-2026-04-24-001 Verification
+
+- Validation method: markdown review of the new policy and instruction references.
+- Result: `PASS`
+- Residual risk or [TBD]: any future agent file that bypasses the root or orchestrator instructions may still need the same reference added locally.
+
+#### AGENT-2026-04-24-001 Rollback
+
+- Safe rollback path: remove the new policy file and the added instruction references, then delete this ledger entry.
+- When rollback should be considered: if the policy needs to be re-scoped, renamed, or centralized in a different canonical governance file.
+
 ### AGENT-2026-04-18-001
 
 - Date: 2026-04-18

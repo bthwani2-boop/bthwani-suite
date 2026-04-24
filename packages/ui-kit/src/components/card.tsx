@@ -2,9 +2,9 @@ import React from 'react';
 import { Image, Pressable, ScrollView, View, type ImageSourcePropType, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
 import { radius, spacing } from '../foundation';
 import { useTheme } from '../providers';
-import { BthBadge, BthButton } from './button';
-import { BthSurface, BthText } from '../primitives';
-import { BthStateView } from './state';
+import { Badge, Button } from './button';
+import { BthSurface as Surface, BthText as Text } from '../primitives';
+import { BthStateView as StateView } from './state';
 
 type PressableStyle = PressableProps['style'];
 
@@ -12,7 +12,7 @@ function resolvePressableStyle(style: PressableStyle | undefined, state: Pressab
   return typeof style === 'function' ? style(state) : style;
 }
 
-export type BthCardProps = {
+export type CardProps = {
   title?: string;
   subtitle?: string;
   children?: React.ReactNode;
@@ -24,7 +24,9 @@ export type BthCardProps = {
   testID?: string;
 };
 
-export function BthCard({
+export type BthCardProps = CardProps;
+
+export function Card({
   title,
   subtitle,
   children,
@@ -34,18 +36,20 @@ export function BthCard({
   disabled = false,
   accessibilityLabel,
   testID,
-}: BthCardProps) {
+}: CardProps) {
   const surface = (
-    <BthSurface style={style}>
-      {(title || subtitle) ? (
-        <View style={{ gap: spacing[1] }}>
-          {title ? <BthText role="titleSm">{title}</BthText> : null}
-          {subtitle ? <BthText role="bodySm" tone="muted">{subtitle}</BthText> : null}
-        </View>
-      ) : null}
-      {children}
-      {footer ? <View>{footer}</View> : null}
-    </BthSurface>
+    <Surface style={style}>
+      <View style={{ gap: spacing[3] }}>
+        {(title || subtitle) ? (
+          <View style={{ gap: spacing[1] }}>
+            {title ? <Text role="titleSm">{title}</Text> : null}
+            {subtitle ? <Text role="bodySm" tone="muted">{subtitle}</Text> : null}
+          </View>
+        ) : null}
+        {children}
+        {footer ? <View>{footer}</View> : null}
+      </View>
+    </Surface>
   );
 
   if (!onPress) {
@@ -59,26 +63,36 @@ export function BthCard({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? title ?? subtitle}
       testID={testID}
+      style={({ pressed }) => [
+        {
+          opacity: disabled ? 0.56 : pressed ? 0.96 : 1,
+        },
+        resolvePressableStyle(undefined, { pressed } as PressableStateCallbackType),
+      ]}
     >
       {surface}
     </Pressable>
   );
 }
 
-export type BthProductCardPrice = {
+export const BthCard = Card;
+
+export type ProductCardPrice = {
   value?: number;
   label?: string;
   currency?: string;
 };
 
-export type BthProductCardProps = {
+export type BthProductCardPrice = ProductCardPrice;
+
+export type ProductCardProps = {
   id?: string;
   title: string;
   subtitle?: string;
   imageUri?: string;
   showImage?: boolean;
-  price?: BthProductCardPrice;
-  oldPrice?: BthProductCardPrice;
+  price?: ProductCardPrice;
+  oldPrice?: ProductCardPrice;
   discountLabel?: string;
   badges?: string[];
   isFavorited?: boolean;
@@ -88,6 +102,8 @@ export type BthProductCardProps = {
   style?: StyleProp<ViewStyle>;
 };
 
+export type BthProductCardProps = ProductCardProps;
+
 function formatCurrencyAmount(amount: number, currency: string) {
   try {
     return new Intl.NumberFormat('ar-SA', { style: 'currency', currency }).format(amount);
@@ -96,7 +112,7 @@ function formatCurrencyAmount(amount: number, currency: string) {
   }
 }
 
-export function BthProductCard({
+export function ProductCard({
   title,
   subtitle,
   imageUri,
@@ -110,7 +126,7 @@ export function BthProductCard({
   onFavorite,
   onPress,
   style,
-}: BthProductCardProps) {
+}: ProductCardProps) {
   const { theme } = useTheme();
   const imageSize = 120;
 
@@ -118,19 +134,19 @@ export function BthProductCard({
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4] }}>
       <View style={{ flex: 1 }}>
         <View style={{ gap: spacing[1] }}>
-          <BthText role="bodyStrong">{title}</BthText>
-          {subtitle ? <BthText role="bodySm" tone="muted">{subtitle}</BthText> : null}
-          {badges.length ? <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1] }}>{badges.map((badge) => <BthBadge key={badge} label={badge} tone="default" />)}</View> : null}
+          <Text role="bodyStrong">{title}</Text>
+          {subtitle ? <Text role="bodySm" tone="muted">{subtitle}</Text> : null}
+          {badges.length ? <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1] }}>{badges.map((badge) => <Badge key={badge} label={badge} tone="default" />)}</View> : null}
         </View>
 
         <View style={{ marginTop: spacing[3], gap: spacing[1] }}>
-          {price?.value != null ? <BthText role="titleSm">{formatCurrencyAmount(price.value, price.currency ?? 'SAR')}</BthText> : null}
-          {oldPrice?.value != null ? <BthText role="bodySm" tone="soft">{formatCurrencyAmount(oldPrice.value, oldPrice.currency ?? 'SAR')}</BthText> : null}
+          {price?.value != null ? <Text role="titleSm">{formatCurrencyAmount(price.value, price.currency ?? 'SAR')}</Text> : null}
+          {oldPrice?.value != null ? <Text role="bodySm" tone="soft">{formatCurrencyAmount(oldPrice.value, oldPrice.currency ?? 'SAR')}</Text> : null}
         </View>
 
         <View style={{ marginTop: spacing[3], flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>
-          {onFavorite ? <BthButton label={isFavorited ? 'Favorited' : 'Favorite'} tone="secondary" size="sm" fullWidth={false} onPress={onFavorite} /> : null}
-          {onAdd ? <BthButton label="Add" size="sm" fullWidth={false} onPress={() => onAdd()} /> : null}
+          {onFavorite ? <Button label={isFavorited ? 'Favorited' : 'Favorite'} tone="secondary" size="sm" fullWidth={false} onPress={onFavorite} /> : null}
+          {onAdd ? <Button label="Add" size="sm" fullWidth={false} onPress={() => onAdd()} /> : null}
         </View>
       </View>
 
@@ -142,46 +158,54 @@ export function BthProductCard({
     </View>
   );
 
-  const footer = discountLabel ? <View style={{ position: 'relative', marginTop: spacing[3] }}><BthBadge label={discountLabel} tone="warning" /></View> : null;
+  const footer = discountLabel ? <View style={{ position: 'relative', marginTop: spacing[3] }}><Badge label={discountLabel} tone="warning" /></View> : null;
 
   return (
-    <BthCard onPress={onPress} footer={footer} style={style}>
+    <Card onPress={onPress} footer={footer} style={style}>
       {content}
-    </BthCard>
+    </Card>
   );
 }
 
-export type BthStatCardProps = {
+export const BthProductCard = ProductCard;
+
+export type StatCardProps = {
   label: string;
   value: string;
   deltaLabel?: string;
   tone?: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 };
 
-export function BthStatCard({ label, value, deltaLabel, tone = 'default' }: BthStatCardProps) {
+export type BthStatCardProps = StatCardProps;
+
+export function StatCard({ label, value, deltaLabel, tone = 'default' }: StatCardProps) {
   return (
-    <BthCard>
+    <Card>
       <View style={{ gap: spacing[2] }}>
-        <BthText role="label" tone="muted">{label}</BthText>
-        <BthText role="hero">{value}</BthText>
-        {deltaLabel ? <BthBadge label={deltaLabel} tone={tone} /> : null}
+        <Text role="label" tone="muted">{label}</Text>
+        <Text role="hero">{value}</Text>
+        {deltaLabel ? <Badge label={deltaLabel} tone={tone} /> : null}
       </View>
-    </BthCard>
+    </Card>
   );
 }
 
-export type BthServiceTileCardProps = PressableProps & {
+export const BthStatCard = StatCard;
+
+export type ServiceTileCardProps = PressableProps & {
   title: string;
   subtitle?: string;
   description?: string;
   icon?: React.ReactNode;
   badgeLabel?: string;
-  badgeTone?: React.ComponentProps<typeof BthBadge>['tone'];
+  badgeTone?: React.ComponentProps<typeof Badge>['tone'];
   minHeight?: number;
   titleOnly?: boolean;
 };
 
-export function BthServiceTileCard({
+export type BthServiceTileCardProps = ServiceTileCardProps;
+
+export function ServiceTileCard({
   title,
   subtitle,
   description,
@@ -193,7 +217,7 @@ export function BthServiceTileCard({
   style,
   disabled,
   ...rest
-}: BthServiceTileCardProps) {
+}: ServiceTileCardProps) {
   const { theme } = useTheme();
   const showTopRow = !titleOnly && (icon || badgeLabel);
 
@@ -212,7 +236,7 @@ export function BthServiceTileCard({
           gap: spacing[3],
           opacity: disabled ? 0.56 : 1,
         },
-        resolvePressableStyle(style, { pressed }),
+        resolvePressableStyle(style, { pressed } as PressableStateCallbackType),
       ]}
       {...rest}
     >
@@ -223,20 +247,22 @@ export function BthServiceTileCard({
               {icon}
             </View>
           ) : null}
-          {badgeLabel ? <BthBadge label={badgeLabel} tone={badgeTone} /> : null}
+          {badgeLabel ? <Badge label={badgeLabel} tone={badgeTone} /> : null}
         </View>
       ) : null}
 
       <View style={titleOnly ? { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing[2] } : { gap: spacing[1] }}>
-        <BthText role="bodyStrong" align={titleOnly ? 'center' : 'start'}>{title}</BthText>
-        {subtitle ? <BthText role="bodySm" tone="muted" align={titleOnly ? 'center' : 'start'}>{subtitle}</BthText> : null}
-        {description ? <BthText role="bodySm" tone="soft" align={titleOnly ? 'center' : 'start'}>{description}</BthText> : null}
+        <Text role="bodyStrong" align={titleOnly ? 'center' : 'start'}>{title}</Text>
+        {subtitle ? <Text role="bodySm" tone="muted" align={titleOnly ? 'center' : 'start'}>{subtitle}</Text> : null}
+        {description ? <Text role="bodySm" tone="soft" align={titleOnly ? 'center' : 'start'}>{description}</Text> : null}
       </View>
     </Pressable>
   );
 }
 
-export type BthDashboardShellProps = {
+export const BthServiceTileCard = ServiceTileCard;
+
+export type DashboardShellProps = {
   title: string;
   subtitle?: string;
   hero?: React.ReactNode;
@@ -247,19 +273,21 @@ export type BthDashboardShellProps = {
   }>;
 };
 
-export function BthDashboardShell({ title, subtitle, hero, sections = [] }: BthDashboardShellProps) {
+export type BthDashboardShellProps = DashboardShellProps;
+
+export function DashboardShell({ title, subtitle, hero, sections = [] }: DashboardShellProps) {
   return (
     <ScrollView contentContainerStyle={{ padding: spacing[4], gap: spacing[5] }}>
       <View style={{ gap: spacing[1] }}>
-        <BthText role="titleLg">{title}</BthText>
-        {subtitle ? <BthText role="bodyMd" tone="muted">{subtitle}</BthText> : null}
+        <Text role="titleLg">{title}</Text>
+        {subtitle ? <Text role="bodyMd" tone="muted">{subtitle}</Text> : null}
       </View>
       {hero ? <View>{hero}</View> : null}
       {sections.map((section, index) => (
         <View key={`${section.title}-${index}`} style={{ gap: spacing[3] }}>
           <View style={{ gap: spacing[1] }}>
-            <BthText role="titleSm">{section.title}</BthText>
-            {section.subtitle ? <BthText role="bodySm" tone="muted">{section.subtitle}</BthText> : null}
+            <Text role="titleSm">{section.title}</Text>
+            {section.subtitle ? <Text role="bodySm" tone="muted">{section.subtitle}</Text> : null}
           </View>
           <View>{section.content}</View>
         </View>
@@ -268,16 +296,18 @@ export function BthDashboardShell({ title, subtitle, hero, sections = [] }: BthD
   );
 }
 
+export const BthDashboardShell = DashboardShell;
+
 export type BthServiceHubSection = {
   id: string;
   title: string;
   subtitle?: string;
   count?: number | string;
   headingOrder?: 'title-first' | 'count-first';
-  tiles: BthServiceTileCardProps[];
+  tiles: ServiceTileCardProps[];
 };
 
-export type BthServiceHubShellProps = {
+export type ServiceHubShellProps = {
   title: string;
   subtitle?: string;
   sections: BthServiceHubSection[];
@@ -289,7 +319,9 @@ export type BthServiceHubShellProps = {
   footer?: React.ReactNode;
 };
 
-export function BthServiceHubShell({
+export type BthServiceHubShellProps = ServiceHubShellProps;
+
+export function ServiceHubShell({
   title,
   subtitle,
   sections,
@@ -305,38 +337,38 @@ export function BthServiceHubShell({
   return (
     <ScrollView contentContainerStyle={{ padding: spacing[4], gap: spacing[5] }}>
       <View style={{ gap: spacing[1] }}>
-        <BthText role="titleLg">{title}</BthText>
-        {subtitle ? <BthText role="bodyMd" tone="muted">{subtitle}</BthText> : null}
+        <Text role="titleLg">{title}</Text>
+        {subtitle ? <Text role="bodyMd" tone="muted">{subtitle}</Text> : null}
       </View>
 
       {hero ? <View>{hero}</View> : null}
 
       {onSearchChange ? (
         <View style={{ gap: spacing[2] }}>
-          <BthText role="label" tone="muted">{searchPlaceholder ?? 'Search'}</BthText>
-          <BthSurface padding={3} tone="inset">
+          <Text role="label" tone="muted">{searchPlaceholder ?? 'Search'}</Text>
+          <Surface padding={3} tone="inset">
             <View style={{ paddingHorizontal: spacing[4], paddingVertical: spacing[2] }}>
-              <BthText role="bodyMd" tone={searchValue ? 'default' : 'soft'}>{searchValue ?? searchPlaceholder ?? 'Search'}</BthText>
+              <Text role="bodyMd" tone={searchValue ? 'default' : 'soft'}>{searchValue ?? searchPlaceholder ?? 'Search'}</Text>
             </View>
-          </BthSurface>
+          </Surface>
         </View>
       ) : null}
 
       {totalTiles === 0
-        ? (emptyState ?? <BthStateView stateId="empty" />)
+        ? (emptyState ?? <StateView stateId="empty" />)
         : sections.map((section) => (
             <View key={section.id} style={{ gap: spacing[3] }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing[3] }}>
                 <View style={{ flex: 1, gap: spacing[1] }}>
-                  <BthText role="titleSm">{section.title}</BthText>
-                  {section.subtitle ? <BthText role="bodySm" tone="muted">{section.subtitle}</BthText> : null}
+                  <Text role="titleSm">{section.title}</Text>
+                  {section.subtitle ? <Text role="bodySm" tone="muted">{section.subtitle}</Text> : null}
                 </View>
-                {section.count != null ? <BthBadge label={String(section.count)} tone="default" /> : null}
+                {section.count != null ? <Badge label={String(section.count)} tone="default" /> : null}
               </View>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[3] }}>
                 {section.tiles.map((tile) => (
                   <View key={tile.title} style={{ width: '48%' }}>
-                    <BthServiceTileCard {...tile} />
+                    <ServiceTileCard {...tile} />
                   </View>
                 ))}
               </View>
@@ -348,7 +380,9 @@ export function BthServiceHubShell({
   );
 }
 
-export type BthDetailScreenShellProps = {
+export const BthServiceHubShell = ServiceHubShell;
+
+export type DetailScreenShellProps = {
   title: string;
   subtitle?: string;
   sections: Array<{
@@ -358,76 +392,88 @@ export type BthDetailScreenShellProps = {
   }>;
 };
 
-export function BthDetailScreenShell({ title, subtitle, sections }: BthDetailScreenShellProps) {
+export type BthDetailScreenShellProps = DetailScreenShellProps;
+
+export function DetailScreenShell({ title, subtitle, sections }: DetailScreenShellProps) {
   return (
     <ScrollView contentContainerStyle={{ padding: spacing[4], gap: spacing[4] }}>
       <View style={{ gap: spacing[1] }}>
-        <BthText role="titleLg">{title}</BthText>
-        {subtitle ? <BthText role="bodyMd" tone="muted">{subtitle}</BthText> : null}
+        <Text role="titleLg">{title}</Text>
+        {subtitle ? <Text role="bodyMd" tone="muted">{subtitle}</Text> : null}
       </View>
       {sections.map((section, index) => (
-        <BthSurface key={`${section.title}-${index}`}>
+        <Surface key={`${section.title}-${index}`}>
           <View style={{ gap: spacing[1] }}>
-            <BthText role="titleSm">{section.title}</BthText>
-            {section.subtitle ? <BthText role="bodySm" tone="muted">{section.subtitle}</BthText> : null}
+            <Text role="titleSm">{section.title}</Text>
+            {section.subtitle ? <Text role="bodySm" tone="muted">{section.subtitle}</Text> : null}
           </View>
           <View>{section.content}</View>
-        </BthSurface>
+        </Surface>
       ))}
     </ScrollView>
   );
 }
 
-export type BthAttachmentPickerTone = 'default' | 'brand' | 'success' | 'warning' | 'info';
+export const BthDetailScreenShell = DetailScreenShell;
 
-export type BthAttachmentPickerItem = {
+export type AttachmentPickerTone = 'default' | 'brand' | 'success' | 'warning' | 'info';
+
+export type BthAttachmentPickerTone = AttachmentPickerTone;
+
+export type AttachmentPickerItem = {
   key: string;
   title: string;
   subtitle: string;
   selectedLabel: string;
   actionLabel?: string;
-  tone?: BthAttachmentPickerTone;
+  tone?: AttachmentPickerTone;
   selected?: boolean;
   disabled?: boolean;
   leadingAccessory?: React.ReactNode;
   onPress?: () => void;
 };
 
-export type BthAttachmentPickerProps = {
+export type BthAttachmentPickerItem = AttachmentPickerItem;
+
+export type AttachmentPickerProps = {
   title: string;
   subtitle?: string;
-  items: BthAttachmentPickerItem[];
+  items: AttachmentPickerItem[];
   locked?: boolean;
   onClear?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
-export function BthAttachmentPicker({ title, subtitle, items, locked = false, onClear, style }: BthAttachmentPickerProps) {
+export type BthAttachmentPickerProps = AttachmentPickerProps;
+
+export function AttachmentPicker({ title, subtitle, items, locked = false, onClear, style }: AttachmentPickerProps) {
   const selectedItems = items.filter((item) => item.selected);
   const selectedCount = selectedItems.length;
 
   return (
-    <BthCard style={style}>
+    <Card style={style}>
       <View style={{ gap: spacing[3] }}>
         <View style={{ gap: spacing[1] }}>
-          <BthText role="titleSm">{title}</BthText>
-          {subtitle ? <BthText role="bodySm" tone="muted">{subtitle}</BthText> : null}
+          <Text role="titleSm">{title}</Text>
+          {subtitle ? <Text role="bodySm" tone="muted">{subtitle}</Text> : null}
         </View>
 
         <View style={{ gap: spacing[2] }}>
-          <BthText role="caption" tone="soft">{selectedCount ? `${selectedCount} selected` : 'Nothing selected yet'}</BthText>
+          <Text role="caption" tone="soft">{selectedCount ? `${selectedCount} selected` : 'Nothing selected yet'}</Text>
           {selectedItems.map((item) => (
             <AttachmentPickerRow key={item.key} item={item} locked={locked} />
           ))}
         </View>
 
-        {onClear ? <BthButton label="Clear" tone="secondary" size="sm" fullWidth={false} onPress={onClear} /> : null}
+        {onClear ? <Button label="Clear" tone="secondary" size="sm" fullWidth={false} onPress={onClear} /> : null}
       </View>
-    </BthCard>
+    </Card>
   );
 }
 
-function AttachmentPickerRow({ item, locked }: { item: BthAttachmentPickerItem; locked: boolean }) {
+export const BthAttachmentPicker = AttachmentPicker;
+
+function AttachmentPickerRow({ item, locked }: { item: AttachmentPickerItem; locked: boolean }) {
   const { theme } = useTheme();
   const selected = Boolean(item.selected);
   const disabled = locked || Boolean(item.disabled);
@@ -448,10 +494,10 @@ function AttachmentPickerRow({ item, locked }: { item: BthAttachmentPickerItem; 
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
         {item.leadingAccessory}
         <View style={{ flex: 1, gap: spacing[1] }}>
-          <BthText role="bodyStrong">{item.title}</BthText>
-          <BthText role="bodySm" tone="muted">{item.subtitle}</BthText>
+          <Text role="bodyStrong">{item.title}</Text>
+          <Text role="bodySm" tone="muted">{item.subtitle}</Text>
         </View>
-        <BthBadge label={selected ? item.selectedLabel : item.actionLabel ?? item.selectedLabel} tone={item.tone ?? 'default'} />
+        <Badge label={selected ? item.selectedLabel : item.actionLabel ?? item.selectedLabel} tone={item.tone ?? 'default'} />
       </View>
     </Pressable>
   );
