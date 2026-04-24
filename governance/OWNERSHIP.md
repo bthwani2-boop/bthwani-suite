@@ -208,8 +208,22 @@ Rules:
 - if a consumer needs a symbol that is not public yet, promote it through the package root first instead of reaching into internals
 - thin app shells must consume shared package exports without redefining or bypassing their package-level ownership boundary
 
-## Conflict Resolution Rule
+<!-- TAMAGUI_INTEGRATION_BOUNDARY_START -->
+## Tamagui Integration Boundary
 
+Tamagui is governed as an internal implementation engine inside `@bthwani/ui-kit` only.
+
+Rules:
+
+- direct imports from `tamagui` and `@tamagui/*` are forbidden outside `packages/ui-kit/**`
+- the only documented root-level build-time exception is `tamagui.build.ts`
+- `TamaguiProvider` remains owned by UI Kit and must not be mounted by app shells or surfaces
+- `governance/TAMAGUI_INTEGRATION_LAW.md` is the governing law for this boundary
+- screens and surfaces must consume `@bthwani/ui-kit` rather than reaching into Tamagui directly
+- Runtime proof is deferred until the first suitable EAS/dev-client rebuild
+<!-- TAMAGUI_INTEGRATION_BOUNDARY_END -->
+
+## Conflict Resolution Rule
 If ownership conflicts arise, resolve them in this order:
 
 1. repo governance owner for phase legality

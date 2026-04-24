@@ -115,8 +115,23 @@ The canonical runtime direction at this stage is:
 
 This file locks the governance direction for runtime timing and ownership, not a prematurely implemented runtime stack.
 
-## WLT Rates Capability Lock
+<!-- TAMAGUI_INTEGRATION_LOCK_START -->
+## Tamagui Integration Lock
 
+Tamagui remains an internal implementation engine inside `@bthwani/ui-kit`.
+
+The governing law is [governance/TAMAGUI_INTEGRATION_LAW.md](TAMAGUI_INTEGRATION_LAW.md).
+
+This means:
+
+- screen and surface code must consume `@bthwani/ui-kit` rather than importing Tamagui directly
+- `TamaguiProvider` stays owned by UI Kit
+- `tamagui.build.ts` is the only documented root-level build-time exception for a direct Tamagui import
+- no other root or runtime file may become a hidden Tamagui authority without a separate governance update
+- Runtime proof is deferred until the first suitable EAS/dev-client rebuild
+<!-- TAMAGUI_INTEGRATION_LOCK_END -->
+
+## WLT Rates Capability Lock
 `exchangeprice` is adopted as a `wlt`-owned capability, not as an independent financial owner and not as a second money-moving path.
 
 The clean split is:
@@ -152,5 +167,5 @@ Those decisions may be adopted later only through explicit repo-local governance
 
 ## Official Lock Summary
 
-> **BTHWANI ARCHITECTURE LOCK — APPROVED**  
+> **BTHWANI ARCHITECTURE LOCK — APPROVED**
 > The canonical foundation for `bthwani-suite` is `pnpm + Nx + TypeScript`. The canonical internal surfaces are `app-client`, `app-partner`, `app-captain`, `app-field`, `control-panel`, `webapp`, and `website`. The canonical current clean service set is `amn`, `arb`, `dsh`, `esf`, `hr`, `knz`, `kwd`, `mrf`, `snd`, and `wlt`, with `dsh` as the current first governed service. App shells are thin delivery shells only. Service truth belongs to `services/*`, shared UI foundation belongs to `packages/ui-kit`, shared surface structure belongs to `packages/surfaces`, and canonical contract authority belongs to `contracts/master`. Runtime remains phase-gated. `exchangeprice` is adopted as a `wlt`-owned low-privilege rates capability, isolated from wallet-sensitive logic and storage, with `wlt-core` retaining sole ownership of ledger, balances, settlement, and payouts.
