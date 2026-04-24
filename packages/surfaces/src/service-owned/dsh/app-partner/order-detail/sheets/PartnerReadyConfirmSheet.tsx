@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthBox, BthButton, BthSheetFrame, BthText } from '@bthwani/ui-kit';
+import { Box, Button, SheetFrame, Text } from '@bthwani/ui-kit';
 
 export type PartnerReadyConfirmSheetProps = {
   visible: boolean;
@@ -21,19 +21,19 @@ export function PartnerReadyConfirmSheet({
   onCancel,
 }: PartnerReadyConfirmSheetProps) {
   return (
-    <BthSheetFrame visible={visible} title="Confirm readiness" onClose={onCancel}>
-      <BthBox gap={2}>
-        <BthText role="bodyMd">
+    <SheetFrame visible={visible} title="Confirm readiness" onClose={onCancel}>
+      <Box gap={2}>
+        <Text role="bodyMd">
           Confirm that {orderTitle} is packed and ready for captain handoff.
-        </BthText>
-        <BthText role="caption" tone="muted">
+        </Text>
+        <Text role="caption" tone="muted">
           This stays a lightweight sheet and does not become a standalone route.
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthButton label={confirmLabel} tone="success" loading={confirming} onPress={onConfirm} />
-      <BthButton label={cancelLabel} tone="secondary" onPress={onCancel} />
-    </BthSheetFrame>
+      <Button label={confirmLabel} tone="success" loading={confirming} onPress={onConfirm} />
+      <Button label={cancelLabel} tone="secondary" onPress={onCancel} />
+    </SheetFrame>
   );
 }
 

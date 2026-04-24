@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthCard,
-  BthDashboardShell,
-  BthStateView,
-  BthText,
+  Box,
+  Button,
+  Card,
+  DashboardShell,
+  StateView,
+  Text,
 } from '@bthwani/ui-kit';
 
 export type DshEntryScreenState =
@@ -32,12 +32,12 @@ function renderNonReadyState(
   onRetry?: () => void
 ) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         actionLabel="Start delivery"
         onActionPress={onStartDelivery}
@@ -46,12 +46,12 @@ function renderNonReadyState(
   }
 
   if (state === 'offline') {
-    return <BthStateView stateId="offline" onActionPress={onRetry} />;
+    return <StateView stateId="offline" onActionPress={onRetry} />;
   }
 
   if (state === 'disabled') {
     return (
-      <BthStateView
+      <StateView
         stateId="warning"
         title="Delivery entry is temporarily paused"
         description="This route is currently restricted. Keep retry and fallback visible."
@@ -62,7 +62,7 @@ function renderNonReadyState(
   }
 
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title="Entry is unavailable"
       description="Retry first. If the issue persists, use the orders path as fallback."
@@ -74,43 +74,43 @@ function renderNonReadyState(
 
 function renderHero(onStartDelivery?: () => void) {
   return (
-    <BthCard
+    <Card
       title="ابدأ توصيل DSH"
       subtitle="مدخل واضح وسريع لاكتشاف المتاجر، مراجعة السلة، أو متابعة الطلبات دون تشتت."
-      footer={<BthButton label="ابدأ التوصيل" onPress={onStartDelivery} />}
+      footer={<Button label="ابدأ التوصيل" onPress={onStartDelivery} />}
     />
   );
 }
 
 function renderDiscoverySection(onBrowseStores?: () => void) {
   return (
-    <BthBox gap={3}>
-      <BthCard
+    <Box gap={3}>
+      <Card
         title="استكشف المتاجر القريبة"
         subtitle="ابدأ من مسار اكتشاف سريع قبل التوسع في السلة أو الدفع."
-        footer={<BthButton label="تصفح المتاجر" tone="secondary" onPress={onBrowseStores} />}
+        footer={<Button label="تصفح المتاجر" tone="secondary" onPress={onBrowseStores} />}
       />
-      <BthCard
+      <Card
         title="أكمل من السلة"
         subtitle="ارجع إلى أول خطوة قابلة للتنفيذ دون فروع إضافية أو ضياع المسار."
       />
-    </BthBox>
+    </Box>
   );
 }
 
 function renderReviewSection(onOpenOrders?: () => void) {
   return (
-    <BthBox gap={3}>
-      <BthCard
+    <Box gap={3}>
+      <Card
         title="راجع قبل التأكيد"
         subtitle="إجراء رئيسي واحد مع مسار رجوع واضح وآمن."
       />
-      <BthCard
+      <Card
         title="افتح الطلبات النشطة"
         subtitle="يبقى التتبع والطلبات متاحين دائمًا كمسار ثقة واسترجاع."
-        footer={<BthButton label="عرض الطلبات" tone="ghost" onPress={onOpenOrders} />}
+        footer={<Button label="عرض الطلبات" tone="ghost" onPress={onOpenOrders} />}
       />
-    </BthBox>
+    </Box>
   );
 }
 
@@ -128,7 +128,7 @@ export function DshEntryScreen({
   }
 
   return (
-    <BthDashboardShell
+    <DashboardShell
       title={title}
       subtitle={subtitle}
       hero={renderHero(onStartDelivery)}
@@ -147,11 +147,11 @@ export function DshEntryScreen({
           title: 'ضوابط التدفق',
           subtitle: 'هذه الشريحة مخصصة حاليًا للواجهة والتجربة والتدفق فقط.',
           content: (
-            <BthBox>
-              <BthText role="bodySm" tone="muted">
+            <Box>
+              <Text role="bodySm" tone="muted">
                 لا يحتوي هذا المسار على ربط API أو تكامل أو منطق runtime في هذه المرحلة.
-              </BthText>
-            </BthBox>
+              </Text>
+            </Box>
           ),
         },
       ]}

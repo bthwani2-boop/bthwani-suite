@@ -1,17 +1,17 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import {
   useRouter } from 'next/navigation';
-import { BthBox,
-  BthStateView,
-  BthText
+import { Box,
+  StateView,
+  Text
 } from '@bthwani/ui-kit';
 import {
-  BthWebMissionHeroCard,
-  BthWebPageFrame,
-  BthWebSectionCard,
-  BthWebSignalCard,
+  WebMissionHeroCard,
+  WebPageFrame,
+  WebSectionCard,
+  WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import {
@@ -71,21 +71,21 @@ function resolveStateCopy(text: ReturnType<typeof useDshControlPanelText>, state
 
 function renderLaneBlock(title: string, description: string, lanes: ReadonlyArray<DshArrivalBellLane>) {
   return (
-    <BthWebSectionCard title={title} description={description}>
+    <WebSectionCard title={title} description={description}>
       <div className={styles.laneGrid}>
         {lanes.map((lane) => (
-          <BthBox key={`${title}-${lane.orderId}`} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-            <BthBox layoutDirection="row" justify="space-between" align="center">
-              <BthText role="bodyStrong">{lane.orderId}</BthText>
-              <BthText role="caption" tone={lane.tone}>{lane.statusLabel}</BthText>
-            </BthBox>
-            <BthText role="bodySm">{lane.actorLabel}</BthText>
-            <BthText role="caption" tone="soft">{lane.etaLabel} · {lane.ringLabel}</BthText>
-            <BthText role="bodySm" tone="muted">{lane.actionHint}</BthText>
-          </BthBox>
+          <Box key={`${title}-${lane.orderId}`} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+            <Box layoutDirection="row" justify="space-between" align="center">
+              <Text role="bodyStrong">{lane.orderId}</Text>
+              <Text role="caption" tone={lane.tone}>{lane.statusLabel}</Text>
+            </Box>
+            <Text role="bodySm">{lane.actorLabel}</Text>
+            <Text role="caption" tone="soft">{lane.etaLabel} · {lane.ringLabel}</Text>
+            <Text role="bodySm" tone="muted">{lane.actionHint}</Text>
+          </Box>
         ))}
       </div>
-    </BthWebSectionCard>
+    </WebSectionCard>
   );
 }
 
@@ -116,7 +116,7 @@ export function ControlPanelDshArrivalBellScreen({
     const stateCopy = resolveStateCopy(dshText, state);
 
     return (
-      <BthWebPageFrame
+      <WebPageFrame
         eyebrow={dshText.arrivalBell.pageEyebrow}
         title={dshText.arrivalBell.pageTitle}
         description={dshText.arrivalBell.unavailableDescription}
@@ -124,13 +124,13 @@ export function ControlPanelDshArrivalBellScreen({
         embedded={embedded}
         showHeader={showHeader}
       >
-        <BthStateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
-      </BthWebPageFrame>
+        <StateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
+      </WebPageFrame>
     );
   }
 
   return (
-    <BthWebPageFrame
+    <WebPageFrame
       eyebrow={dshText.arrivalBell.pageEyebrow}
       title={dshText.arrivalBell.pageTitle}
       description={dshText.arrivalBell.pageDescription}
@@ -139,7 +139,7 @@ export function ControlPanelDshArrivalBellScreen({
       showHeader={showHeader}
     >
       <div className={styles.stack}>
-        <BthWebMissionHeroCard
+        <WebMissionHeroCard
           badges={['/operations/dsh/arrival-bell', dshText.common.live, `${dshText.arrivalBell.signals.activeArrivals}: ${summary.activeArrivals}`]}
           eyebrow={dshText.arrivalBell.heroEyebrow}
           title={dshText.arrivalBell.heroTitle}
@@ -154,16 +154,16 @@ export function ControlPanelDshArrivalBellScreen({
         />
 
         <div className={styles.signalGrid}>
-          <BthWebSignalCard title={dshText.arrivalBell.signals.activeArrivals} value={String(summary.activeArrivals)} description={dshText.arrivalBell.signals.activeArrivalsDescription} tone="best" />
-          <BthWebSignalCard title={dshText.arrivalBell.signals.awaitingAcknowledgement} value={String(summary.awaitingAcknowledgement)} description={dshText.arrivalBell.signals.awaitingAcknowledgementDescription} />
-          <BthWebSignalCard title={dshText.arrivalBell.signals.blockedRings} value={String(summary.blockedRings)} description={dshText.arrivalBell.signals.blockedRingsDescription} />
-          <BthWebSignalCard title={dshText.arrivalBell.signals.resolvedToday} value={String(summary.resolvedToday)} description={dshText.arrivalBell.signals.resolvedTodayDescription} />
+          <WebSignalCard title={dshText.arrivalBell.signals.activeArrivals} value={String(summary.activeArrivals)} description={dshText.arrivalBell.signals.activeArrivalsDescription} tone="best" />
+          <WebSignalCard title={dshText.arrivalBell.signals.awaitingAcknowledgement} value={String(summary.awaitingAcknowledgement)} description={dshText.arrivalBell.signals.awaitingAcknowledgementDescription} />
+          <WebSignalCard title={dshText.arrivalBell.signals.blockedRings} value={String(summary.blockedRings)} description={dshText.arrivalBell.signals.blockedRingsDescription} />
+          <WebSignalCard title={dshText.arrivalBell.signals.resolvedToday} value={String(summary.resolvedToday)} description={dshText.arrivalBell.signals.resolvedTodayDescription} />
         </div>
 
         {renderLaneBlock(dshText.arrivalBell.captainLaneTitle, dshText.arrivalBell.captainLaneDescription, captainLane)}
         {renderLaneBlock(dshText.arrivalBell.customerLaneTitle, dshText.arrivalBell.customerLaneDescription, customerLane)}
       </div>
-    </BthWebPageFrame>
+    </WebPageFrame>
   );
 }
 

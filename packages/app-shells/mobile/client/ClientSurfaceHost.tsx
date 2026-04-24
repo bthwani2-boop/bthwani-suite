@@ -1,18 +1,18 @@
-import { useBthServiceLabels } from '../../shared/BthServiceLabels';
+import { useServiceLabels } from '../../shared/ServiceLabels';
 import React from 'react';
 import { BackHandler, Platform, ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  BthBox,
-  BthButton,
-  BthIcon,
-  BthSectionHeader,
-  BthServiceTileCard,
-  BthSheetFrame,
-  BthStateView,
-  BthSurface,
-  BthText,
-  BthTopBar,
+  Box,
+  Button,
+  Icon,
+  SectionHeader,
+  ServiceTileCard,
+  SheetFrame,
+  StateView,
+  Surface,
+  Text,
+  TopBar,
   useDirection,
   useUiText,
 } from '@bthwani/ui-kit';
@@ -114,7 +114,7 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
   });
   const { direction, language, setLanguage } = useDirection();
   const uiText = useUiText();
-  const serviceLabels = useBthServiceLabels();
+  const serviceLabels = useServiceLabels();
   const routeOwnsTopBar = route === 'dsh';
   const closeAccountSheet = React.useCallback(() => {
     setAccountSheetVisible(false);
@@ -279,7 +279,7 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
 
   const renderUnifiedTopBar = React.useCallback(() => {
     return (
-      <BthTopBar
+      <TopBar
         variant="brand"
         title={uiText.topBar.brandName}
         subtitle={uiText.topBar.brandTagline}
@@ -287,7 +287,7 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
         actions={[
           {
             id: 'account',
-            icon: <BthIcon name="person-outline" size={21} color="#FFFFFF" />,
+            icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
             accessibilityLabel: uiText.accountSheet.title,
             onPress: () => {
               setAccountSheetTab('menu');
@@ -296,14 +296,14 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
           },
           {
             id: 'notifications',
-            icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
+            icon: <Icon name="notifications-outline" size={21} color="#FFFFFF" />,
             badgeCount: notificationItems.length,
             accessibilityLabel: uiText.accountSheet.tabs.notifications,
             onPress: () => setRoute('notifications'),
           },
           {
             id: 'search',
-            icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />,
+            icon: <Icon name="search-outline" size={21} color="#FFFFFF" />,
             accessibilityLabel: 'البحث',
             onPress: () => setRoute('search'),
           },
@@ -538,20 +538,20 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
 
   if (route === 'entry' || route === 'login') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {renderSubSurface()}
-      </BthBox>
+      </Box>
     );
   }
 
   if (route !== 'home') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {!routeOwnsTopBar ? renderUnifiedTopBar() : null}
         {routeOwnsTopBar ? (
           renderSubSurface()
         ) : (
-          <BthSurface
+          <Surface
             tone="raised"
             padding={0}
             gap={0}
@@ -566,17 +566,17 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
             }}
           >
             {renderSubSurface()}
-          </BthSurface>
+          </Surface>
         )}
 
-        <BthSheetFrame
+        <SheetFrame
           visible={accountSheetVisible}
           title={accountSheetTab === 'settings' ? uiText.accountSheet.languageTitle : uiText.accountSheet.title}
           onClose={closeAccountSheet}
         >
           {accountSheetTab === 'menu' ? (
             <>
-              <BthButton
+              <Button
                 label={isAuthenticated ? 'الحساب' : 'تسجيل الدخول'}
                 tone="secondary"
                 onPress={() => {
@@ -584,7 +584,7 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
                   setRoute(isAuthenticated ? 'account' : 'login');
                 }}
               />
-              <BthButton
+              <Button
                 label="الدعم"
                 tone="secondary"
                 onPress={() => {
@@ -592,7 +592,7 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
                   setRoute('support');
                 }}
               />
-              <BthButton
+              <Button
                 label="الإعدادات"
                 tone="primary"
                 onPress={() => {
@@ -603,9 +603,9 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
             </>
           ) : (
             <>
-              <BthText role="bodySm" tone="muted">{uiText.accountSheet.languagePrompt}</BthText>
-              <BthBox layoutDirection="row" gap={2}>
-                <BthButton
+              <Text role="bodySm" tone="muted">{uiText.accountSheet.languagePrompt}</Text>
+              <Box layoutDirection="row" gap={2}>
+                <Button
                   label={uiText.accountSheet.languageArabic}
                   tone={language === 'ar' ? 'primary' : 'secondary'}
                   fullWidth={false}
@@ -614,7 +614,7 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
                     setLanguage('ar');
                   }}
                 />
-                <BthButton
+                <Button
                   label={uiText.accountSheet.languageEnglish}
                   tone={language === 'en' ? 'primary' : 'secondary'}
                   fullWidth={false}
@@ -623,20 +623,20 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
                     setLanguage('en');
                   }}
                 />
-              </BthBox>
-              <BthButton label={uiText.accountSheet.back} tone="ghost" onPress={() => setAccountSheetTab('menu')} />
+              </Box>
+              <Button label={uiText.accountSheet.back} tone="ghost" onPress={() => setAccountSheetTab('menu')} />
             </>
           )}
-        </BthSheetFrame>
-      </BthBox>
+        </SheetFrame>
+      </Box>
     );
   }
 
   return (
-    <BthBox style={{ flex: 1 }} background="background">
+    <Box style={{ flex: 1 }} background="background">
       {showUnifiedTopBar ? renderUnifiedTopBar() : null}
 
-      <BthSurface
+      <Surface
         tone="raised"
         padding={0}
         gap={0}
@@ -650,14 +650,14 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
           overflow: 'hidden',
         }}
       >
-        <BthBox padding={4} gap={2} style={{ flex: 1 }}>
-          <BthSectionHeader
+        <Box padding={4} gap={2} style={{ flex: 1 }}>
+          <SectionHeader
             title={uiText.serviceHub.availableServices}
             subtitle={uiText.serviceHub.chooseService}
             count={serviceEntries.length}
           />
           {serviceEntries.length === 0 ? (
-            <BthStateView stateId="empty" />
+            <StateView stateId="empty" />
           ) : (
             <ScrollView
               style={{ flex: 1 }}
@@ -667,7 +667,7 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
               <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                 {serviceEntries.map((service) => (
                   <View key={service.id} style={{ width: '48.5%', marginBottom: 10 }}>
-                    <BthServiceTileCard
+                    <ServiceTileCard
                       title={service.title}
                       icon={<Ionicons name={service.iconName} size={16} color="#F97316" />}
                       titleOnly
@@ -679,17 +679,17 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
               </View>
             </ScrollView>
           )}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSheetFrame
+      <SheetFrame
         visible={accountSheetVisible}
         title={accountSheetTab === 'settings' ? uiText.accountSheet.languageTitle : uiText.accountSheet.title}
         onClose={closeAccountSheet}
       >
         {accountSheetTab === 'menu' ? (
           <>
-            <BthButton
+            <Button
               label={isAuthenticated ? 'الحساب' : 'تسجيل الدخول'}
               tone="secondary"
               onPress={() => {
@@ -697,7 +697,7 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
                 setRoute(isAuthenticated ? 'account' : 'login');
               }}
             />
-            <BthButton
+            <Button
               label="الدعم"
               tone="secondary"
               onPress={() => {
@@ -705,7 +705,7 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
                 setRoute('support');
               }}
             />
-            <BthButton
+            <Button
               label="الإعدادات"
               tone="primary"
               onPress={() => {
@@ -716,9 +716,9 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
           </>
         ) : (
           <>
-            <BthText role="bodySm" tone="muted">{uiText.accountSheet.languagePrompt}</BthText>
-            <BthBox layoutDirection="row" gap={2}>
-              <BthButton
+            <Text role="bodySm" tone="muted">{uiText.accountSheet.languagePrompt}</Text>
+            <Box layoutDirection="row" gap={2}>
+              <Button
                 label={uiText.accountSheet.languageArabic}
                 tone={language === 'ar' ? 'primary' : 'secondary'}
                 fullWidth={false}
@@ -727,7 +727,7 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
                   setLanguage('ar');
                 }}
               />
-              <BthButton
+              <Button
                 label={uiText.accountSheet.languageEnglish}
                 tone={language === 'en' ? 'primary' : 'secondary'}
                 fullWidth={false}
@@ -736,12 +736,12 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: { renderAp
                   setLanguage('en');
                 }}
               />
-            </BthBox>
-            <BthButton label={uiText.accountSheet.back} tone="ghost" onPress={() => setAccountSheetTab('menu')} />
+            </Box>
+            <Button label={uiText.accountSheet.back} tone="ghost" onPress={() => setAccountSheetTab('menu')} />
           </>
         )}
-      </BthSheetFrame>
-    </BthBox>
+      </SheetFrame>
+    </Box>
   );
 }
 

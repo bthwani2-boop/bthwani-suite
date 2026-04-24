@@ -1,10 +1,10 @@
-import type { BthSeedMediaKey } from './catalog';
+import type { SeedMediaKey } from './catalog';
 
 declare const require: (path: string) => unknown;
 
-export type BthSeedMediaSource = unknown;
+export type SeedMediaSource = unknown;
 
-export const bthSeedMediaSourceRegistry = {
+export const SeedMediaSourceRegistry = {
   'dsh.product.apple.v1': require('../assets/seed/dsh/products/dsh-product-apple-v1.png'),
   'dsh.product.bread.v1': require('../assets/seed/dsh/products/dsh-product-bread-v1.png'),
   'dsh.product.chicken.v1': require('../assets/seed/dsh/products/dsh-product-chicken-v1.png'),
@@ -25,10 +25,10 @@ export const bthSeedMediaSourceRegistry = {
   'dsh.banner.home.promo-5.v1': require('../assets/seed/dsh/banners/dsh-banner-home-promo-5-v1.png'),
   'dsh.banner.home.promo-6.v1': require('../assets/seed/dsh/banners/dsh-banner-home-promo-6-v1.png'),
   'dsh.banner.home.promo-7.v1': require('../assets/seed/dsh/banners/dsh-banner-home-promo-7-v1.png'),
-} as const satisfies Record<BthSeedMediaKey, BthSeedMediaSource>;
+} as const satisfies Record<SeedMediaKey, SeedMediaSource>;
 
-export function resolveSeedMediaSource(key: BthSeedMediaKey): BthSeedMediaSource {
-  return bthSeedMediaSourceRegistry[key];
+export function resolveSeedMediaSource(key: SeedMediaKey): SeedMediaSource {
+  return SeedMediaSourceRegistry[key];
 }
 
 

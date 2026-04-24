@@ -3,8 +3,8 @@ import { Image, Pressable, ScrollView, View, type ImageSourcePropType, type Pres
 import { radius, spacing } from '../foundation';
 import { useTheme } from '../providers';
 import { Badge, Button } from './button';
-import { BthSurface as Surface, BthText as Text } from '../primitives';
-import { BthStateView as StateView } from './state';
+import { Surface, Text } from '../primitives';
+import { StateView } from './state';
 
 type PressableStyle = PressableProps['style'];
 
@@ -23,8 +23,6 @@ export type CardProps = {
   accessibilityLabel?: string;
   testID?: string;
 };
-
-export type BthCardProps = CardProps;
 
 export function Card({
   title,
@@ -75,15 +73,11 @@ export function Card({
   );
 }
 
-export const BthCard = Card;
-
 export type ProductCardPrice = {
   value?: number;
   label?: string;
   currency?: string;
 };
-
-export type BthProductCardPrice = ProductCardPrice;
 
 export type ProductCardProps = {
   id?: string;
@@ -101,8 +95,6 @@ export type ProductCardProps = {
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
 };
-
-export type BthProductCardProps = ProductCardProps;
 
 function formatCurrencyAmount(amount: number, currency: string) {
   try {
@@ -167,16 +159,12 @@ export function ProductCard({
   );
 }
 
-export const BthProductCard = ProductCard;
-
 export type StatCardProps = {
   label: string;
   value: string;
   deltaLabel?: string;
   tone?: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 };
-
-export type BthStatCardProps = StatCardProps;
 
 export function StatCard({ label, value, deltaLabel, tone = 'default' }: StatCardProps) {
   return (
@@ -190,8 +178,6 @@ export function StatCard({ label, value, deltaLabel, tone = 'default' }: StatCar
   );
 }
 
-export const BthStatCard = StatCard;
-
 export type ServiceTileCardProps = PressableProps & {
   title: string;
   subtitle?: string;
@@ -202,8 +188,6 @@ export type ServiceTileCardProps = PressableProps & {
   minHeight?: number;
   titleOnly?: boolean;
 };
-
-export type BthServiceTileCardProps = ServiceTileCardProps;
 
 export function ServiceTileCard({
   title,
@@ -260,8 +244,6 @@ export function ServiceTileCard({
   );
 }
 
-export const BthServiceTileCard = ServiceTileCard;
-
 export type DashboardShellProps = {
   title: string;
   subtitle?: string;
@@ -272,8 +254,6 @@ export type DashboardShellProps = {
     content: React.ReactNode;
   }>;
 };
-
-export type BthDashboardShellProps = DashboardShellProps;
 
 export function DashboardShell({ title, subtitle, hero, sections = [] }: DashboardShellProps) {
   return (
@@ -296,9 +276,7 @@ export function DashboardShell({ title, subtitle, hero, sections = [] }: Dashboa
   );
 }
 
-export const BthDashboardShell = DashboardShell;
-
-export type BthServiceHubSection = {
+export type ServiceHubSection = {
   id: string;
   title: string;
   subtitle?: string;
@@ -310,7 +288,7 @@ export type BthServiceHubSection = {
 export type ServiceHubShellProps = {
   title: string;
   subtitle?: string;
-  sections: BthServiceHubSection[];
+  sections: ServiceHubSection[];
   searchValue?: string;
   searchPlaceholder?: string;
   onSearchChange?: (value: string) => void;
@@ -318,8 +296,6 @@ export type ServiceHubShellProps = {
   emptyState?: React.ReactNode;
   footer?: React.ReactNode;
 };
-
-export type BthServiceHubShellProps = ServiceHubShellProps;
 
 export function ServiceHubShell({
   title,
@@ -331,7 +307,7 @@ export function ServiceHubShell({
   hero,
   emptyState,
   footer,
-}: BthServiceHubShellProps) {
+}: ServiceHubShellProps) {
   const totalTiles = sections.reduce((sum, section) => sum + section.tiles.length, 0);
 
   return (
@@ -380,8 +356,6 @@ export function ServiceHubShell({
   );
 }
 
-export const BthServiceHubShell = ServiceHubShell;
-
 export type DetailScreenShellProps = {
   title: string;
   subtitle?: string;
@@ -391,8 +365,6 @@ export type DetailScreenShellProps = {
     content: React.ReactNode;
   }>;
 };
-
-export type BthDetailScreenShellProps = DetailScreenShellProps;
 
 export function DetailScreenShell({ title, subtitle, sections }: DetailScreenShellProps) {
   return (
@@ -414,11 +386,7 @@ export function DetailScreenShell({ title, subtitle, sections }: DetailScreenShe
   );
 }
 
-export const BthDetailScreenShell = DetailScreenShell;
-
 export type AttachmentPickerTone = 'default' | 'brand' | 'success' | 'warning' | 'info';
-
-export type BthAttachmentPickerTone = AttachmentPickerTone;
 
 export type AttachmentPickerItem = {
   key: string;
@@ -433,8 +401,6 @@ export type AttachmentPickerItem = {
   onPress?: () => void;
 };
 
-export type BthAttachmentPickerItem = AttachmentPickerItem;
-
 export type AttachmentPickerProps = {
   title: string;
   subtitle?: string;
@@ -443,8 +409,6 @@ export type AttachmentPickerProps = {
   onClear?: () => void;
   style?: StyleProp<ViewStyle>;
 };
-
-export type BthAttachmentPickerProps = AttachmentPickerProps;
 
 export function AttachmentPicker({ title, subtitle, items, locked = false, onClear, style }: AttachmentPickerProps) {
   const selectedItems = items.filter((item) => item.selected);
@@ -470,8 +434,6 @@ export function AttachmentPicker({ title, subtitle, items, locked = false, onCle
     </Card>
   );
 }
-
-export const BthAttachmentPicker = AttachmentPicker;
 
 function AttachmentPickerRow({ item, locked }: { item: AttachmentPickerItem; locked: boolean }) {
   const { theme } = useTheme();

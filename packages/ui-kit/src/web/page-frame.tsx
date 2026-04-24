@@ -415,12 +415,3 @@ export function WebSignalCard({
   );
 }
 
-export type BthWebPageFrameProps = WebPageFrameProps;
-export const BthWebPageFrame = WebPageFrame;
-export type BthWebMissionHeroCardProps = WebMissionHeroCardProps;
-export const BthWebMissionHeroCard = WebMissionHeroCard;
-export type BthWebSectionCardProps = WebSectionCardProps;
-export const BthWebSectionCard = WebSectionCard;
-export type BthWebSignalCardTone = WebSignalCardTone;
-export type BthWebSignalCardProps = WebSignalCardProps;
-export const BthWebSignalCard = WebSignalCard;

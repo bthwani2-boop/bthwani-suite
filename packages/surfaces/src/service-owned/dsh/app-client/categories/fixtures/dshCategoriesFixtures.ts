@@ -51,7 +51,7 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
     ],
   },
   {
-    id: 'bthwani_store',
+    id: 'wani_store',
     label: 'بثواني ستور',
     subtitle: 'متجر شامل للمنتجات المختارة بعناية',
     subcategories: [],
@@ -119,7 +119,7 @@ export const DSH_CATEGORY_ICONS: Record<string, string> = {
   grocery: '🛒',
   sweets_juices: '🧃',
   anaqati: '👗',
-  bthwani_store: '🏪',
+  wani_store: '🏪',
   home_projects: '🏠',
   awnak: '🤝',
   gas_refill: '⛽',

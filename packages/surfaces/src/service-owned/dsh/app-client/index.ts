@@ -17,6 +17,8 @@ export * from './shein/screens';
 export * from './stores/screens';
 export * from './operations/screens';
 // 'tracking' and 'checkout' families were consolidated; explicit exports removed.
+export { DshHomeApprovedVideoReelsViewer } from './home/components/DshHomeApprovedVideoReelsViewer';
+export type { DshHomeApprovedVideoReelsViewerProps } from './home/components/DshHomeApprovedVideoReelsViewer';
 export { DshSurfaceHost } from './DshSurfaceHost';
 export type { DshCommandTarget, DshRoute } from './DshSurfaceHost';
 

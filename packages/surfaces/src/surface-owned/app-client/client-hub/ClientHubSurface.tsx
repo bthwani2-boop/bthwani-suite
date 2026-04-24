@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { BthButton, BthDashboardShell, BthKeyValueList, BthListItem, BthSurface, BthText, spacing } from '@bthwani/ui-kit';
+import { Button, DashboardShell, KeyValueList, ListItem, Surface, Text, spacing } from '@bthwani/ui-kit';
 
 export type ClientHubSurfaceProps = {
   headline?: string;
@@ -40,37 +40,37 @@ export function ClientHubSurface({
   ].filter((action): action is { label: string; onPress: () => void; tone: 'secondary' | 'ghost' } => Boolean(action));
 
   return (
-    <BthDashboardShell
+    <DashboardShell
       title={headline}
       subtitle={summary}
       hero={
-        <BthSurface tone="brand" padding={5} gap={4}>
+        <Surface tone="brand" padding={5} gap={4}>
           <View style={{ gap: spacing[2] }}>
-            <BthText role="titleSm" tone="inverse">
+            <Text role="titleSm" tone="inverse">
               نقطة عبور موحدة
-            </BthText>
-            <BthText role="bodyMd" tone="inverse">
+            </Text>
+            <Text role="bodyMd" tone="inverse">
               اختصارات عامة، إشارات حالة، ومسارات مشتركة تظهر في مكان واحد فقط.
-            </BthText>
+            </Text>
           </View>
 
-          <BthKeyValueList items={highlights} />
+          <KeyValueList items={highlights} />
 
           <View style={{ gap: spacing[2], flexDirection: 'row', flexWrap: 'wrap' }}>
             {primaryActions.map((action) => (
-              <BthButton key={action.label} label={action.label} onPress={action.onPress} tone={action.tone} />
+              <Button key={action.label} label={action.label} onPress={action.onPress} tone={action.tone} />
             ))}
           </View>
-        </BthSurface>
+        </Surface>
       }
       sections={[
         {
           title: 'الاختصارات العامة',
           subtitle: 'مؤشرات أو انتقالات لا تملك بيانات خدمة',
           content: (
-            <BthSurface tone="raised" padding={3} gap={2}>
+            <Surface tone="raised" padding={3} gap={2}>
               {quickActions.length ? quickActions.map((action) => (
-                <BthListItem
+                <ListItem
                   key={action.title}
                   title={action.title}
                   subtitle={action.subtitle}
@@ -78,26 +78,26 @@ export function ClientHubSurface({
                   badgeLabel="عام"
                 />
               )) : (
-                <BthText role="bodySm" tone="muted">
+                <Text role="bodySm" tone="muted">
                   لا توجد اختصارات مضافة بعد.
-                </BthText>
+                </Text>
               )}
-            </BthSurface>
+            </Surface>
           ),
         },
         {
           title: 'المسارات المشتركة',
           subtitle: 'نقطة دخول رسمية إلى البرامج العامة والاشتراكات والمزايا',
           content: (
-            <BthSurface tone="raised" padding={3} gap={3}>
+            <Surface tone="raised" padding={3} gap={3}>
               <View style={{ gap: spacing[2] }}>
                 {loyaltyHighlights.map((item) => (
-                  <BthListItem key={item.label} title={item.label} meta={item.value} badgeLabel="عام" />
+                  <ListItem key={item.label} title={item.label} meta={item.value} badgeLabel="عام" />
                 ))}
               </View>
               <View style={{ gap: spacing[2] }}>
                 {loyaltyActions.length ? loyaltyActions.map((action) => (
-                  <BthListItem
+                  <ListItem
                     key={action.title}
                     title={action.title}
                     subtitle={action.subtitle}
@@ -106,19 +106,19 @@ export function ClientHubSurface({
                   />
                 )) : (
                   <>
-                    <BthListItem
+                    <ListItem
                       title="فتح المنافع العامة"
                       subtitle="عرض المسارات المشتركة، النقاط، والعروض"
                       onPress={onOpenBenefits}
                       badgeLabel="عام"
                     />
-                    <BthListItem
+                    <ListItem
                       title="فتح الدفع"
                       subtitle="مراجعة العروض والأسعار قبل الإكمال"
                       onPress={onOpenCheckout}
                       badgeLabel="عام"
                     />
-                    <BthListItem
+                    <ListItem
                       title="مراجعة الاشتراك"
                       subtitle="عرض الخطة العامة ومؤشرات التزامن"
                       onPress={onOpenSubscriptionReview}
@@ -127,7 +127,7 @@ export function ClientHubSurface({
                   </>
                 )}
               </View>
-            </BthSurface>
+            </Surface>
           ),
         },
       ]}

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { BthBox, BthButton, BthSurface, BthTabs, BthText, BthTextField, useDirection } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Tabs, Text, TextField, useDirection } from '@bthwani/ui-kit';
 import {
   approveMarketingGrowthItem,
   duplicateMarketingGrowthItem,
@@ -211,13 +211,13 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
   }
 
   return (
-    <BthBox gap={4}>
-      <BthSurface tone="raised" gap={3}>
-        <BthText role="caption" style={styles.brandEyebrow}>العروض والفيديوهات الآن مملوكة للتسويق</BthText>
-        <BthText role="titleLg">إغلاق البرومو والفيديوهات والحملات والاشتراك داخل مسار واحد</BthText>
-        <BthText role="bodySm" tone="muted">
+    <Box gap={4}>
+      <Surface tone="raised" gap={3}>
+        <Text role="caption" style={styles.brandEyebrow}>العروض والفيديوهات الآن مملوكة للتسويق</Text>
+        <Text role="titleLg">إغلاق البرومو والفيديوهات والحملات والاشتراك داخل مسار واحد</Text>
+        <Text role="bodySm" tone="muted">
           هذا السطح يجمع الحملات، الأكواد الترويجية، الاشتراكات، والفيديوهات القصيرة ثم يربطها بواجهة العميل ومساراتها الحية.
-        </BthText>
+        </Text>
 
         <View style={[styles.kpiGrid, isRtl && styles.rowReverse]}>
           {[
@@ -228,95 +228,95 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
             { label: 'حملات وبرومو', value: kpis.promotions, color: '#8b5cf6' },
           ].map((entry) => (
             <View key={entry.label} style={styles.kpiCard}>
-              <BthText role="caption" tone="muted">{entry.label}</BthText>
-              <BthText role="titleLg" style={{ color: entry.color }}>{String(entry.value)}</BthText>
+              <Text role="caption" tone="muted">{entry.label}</Text>
+              <Text role="titleLg" style={{ color: entry.color }}>{String(entry.value)}</Text>
             </View>
           ))}
         </View>
-      </BthSurface>
+      </Surface>
 
       <View style={[styles.columnsWrap, isRtl && styles.rowReverse]}>
         <View style={styles.column}>
-          <BthSurface tone="inset" gap={3}>
+          <Surface tone="inset" gap={3}>
             <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-              <BthText role="titleSm">المعاينة الحية في العميل</BthText>
-              <BthButton label="برنامج جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} />
+              <Text role="titleSm">المعاينة الحية في العميل</Text>
+              <Button label="برنامج جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} />
             </View>
 
             {livePreview.length > 0 ? (
               <View style={styles.previewStack}>
                 {livePreview.map((item) => (
                   <View key={item.id} style={[styles.previewCard, { backgroundColor: item.accentColor }]}>
-                    <BthText role="caption" style={styles.previewBadge}>{familyLabel(item.family)}</BthText>
-                    <BthText role="titleSm" style={styles.previewTitle}>{item.title}</BthText>
-                    <BthText role="bodySm" style={styles.previewSubtitle}>{item.highlight}</BthText>
-                    <BthText role="caption" style={styles.previewMeta}>{sourceLabel(item.source)} · {item.ctaLabel}</BthText>
+                    <Text role="caption" style={styles.previewBadge}>{familyLabel(item.family)}</Text>
+                    <Text role="titleSm" style={styles.previewTitle}>{item.title}</Text>
+                    <Text role="bodySm" style={styles.previewSubtitle}>{item.highlight}</Text>
+                    <Text role="caption" style={styles.previewMeta}>{sourceLabel(item.source)} · {item.ctaLabel}</Text>
                   </View>
                 ))}
               </View>
             ) : (
-              <BthSurface tone="inset" gap={2}>
-                <BthText role="bodySm" tone="muted">لا توجد فيديوهات معتمدة بعد. سيظهر هنا فقط ما وافق عليه التسويق.</BthText>
-              </BthSurface>
+              <Surface tone="inset" gap={2}>
+                <Text role="bodySm" tone="muted">لا توجد فيديوهات معتمدة بعد. سيظهر هنا فقط ما وافق عليه التسويق.</Text>
+              </Surface>
             )}
-          </BthSurface>
+          </Surface>
 
-          <BthSurface tone="raised" gap={3}>
+          <Surface tone="raised" gap={3}>
             <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-              <BthText role="titleSm">برامج التسويق الحية</BthText>
-              <BthText role="caption" tone="muted">{items.length} عنصر</BthText>
+              <Text role="titleSm">برامج التسويق الحية</Text>
+              <Text role="caption" tone="muted">{items.length} عنصر</Text>
             </View>
 
-            <BthBox gap={2}>
+            <Box gap={2}>
               {items.map((item) => {
                 const isSelected = selected?.id === item.id;
                 return (
                   <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={[styles.listCard, isSelected && styles.listCardSelected]}>
                     <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
                       <View style={styles.listTextWrap}>
-                        <BthText role="titleSm">{item.title}</BthText>
-                        <BthText role="bodySm" tone="muted">{item.subtitle}</BthText>
+                        <Text role="titleSm">{item.title}</Text>
+                        <Text role="bodySm" tone="muted">{item.subtitle}</Text>
                       </View>
                       <View style={styles.statusStack}>
                         <View style={styles.statusPill}>
-                          <BthText role="caption" style={styles.statusText}>{statusLabel(item.status)}</BthText>
+                          <Text role="caption" style={styles.statusText}>{statusLabel(item.status)}</Text>
                         </View>
                         <View style={styles.sourcePill}>
-                          <BthText role="caption" style={styles.sourceText}>{sourceLabel(item.source)}</BthText>
+                          <Text role="caption" style={styles.sourceText}>{sourceLabel(item.source)}</Text>
                         </View>
                       </View>
                     </View>
 
-                    <BthText role="caption" tone="muted">
+                    <Text role="caption" tone="muted">
                       {familyLabel(item.family)}
                       {' · '}
                       {routeTargetLabel(item.routeTarget)}
                       {' · '}
                       {audienceLabel(item.audience)}
-                    </BthText>
+                    </Text>
 
                     <View style={[styles.actionsRow, isRtl && styles.rowReverse]}>
-                      <BthButton
+                      <Button
                         label={item.status === 'pending-marketing' ? 'اعتماد للنشر' : item.status === 'published' ? 'إيقاف' : 'إرسال للمراجعة'}
                         tone={item.status === 'published' ? 'ghost' : 'secondary'}
                         fullWidth={false}
                         onPress={() => (item.status === 'pending-marketing' ? handleApprove(item) : item.status === 'published' ? handlePause(item) : handleQueue(item))}
                       />
-                      <BthButton label="نسخ" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(item)} />
-                      <BthButton label="حذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(item)} />
+                      <Button label="نسخ" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(item)} />
+                      <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(item)} />
                     </View>
                   </Pressable>
                 );
               })}
-            </BthBox>
-          </BthSurface>
+            </Box>
+          </Surface>
         </View>
 
         <View style={styles.column}>
-          <BthSurface tone="raised" gap={3}>
-            <BthText role="titleSm">تحرير البرنامج المحدد</BthText>
+          <Surface tone="raised" gap={3}>
+            <Text role="titleSm">تحرير البرنامج المحدد</Text>
 
-            <BthTabs<MarketingGrowthStatus>
+            <Tabs<MarketingGrowthStatus>
               items={[
                 { value: 'draft', label: 'مسودة' },
                 { value: 'pending-marketing', label: 'بانتظار التسويق' },
@@ -328,7 +328,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
               variant="pill"
             />
 
-            <BthTabs<MarketingGrowthSource>
+            <Tabs<MarketingGrowthSource>
               items={[
                 { value: 'marketing', label: 'التسويق' },
                 { value: 'partner', label: 'الشريك' },
@@ -338,7 +338,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
               variant="pill"
             />
 
-            <BthTabs<MarketingGrowthFamily>
+            <Tabs<MarketingGrowthFamily>
               items={[
                 { value: 'campaign', label: 'حملة' },
                 { value: 'promotion', label: 'برومو' },
@@ -350,7 +350,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
               variant="pill"
             />
 
-            <BthTabs<MarketingGrowthAudience>
+            <Tabs<MarketingGrowthAudience>
               items={[
                 { value: 'client', label: 'العميل' },
                 { value: 'operations', label: 'العمليات' },
@@ -361,12 +361,12 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
               variant="pill"
             />
 
-            <BthTextField label="العنوان" value={draft.title} onChangeText={(value) => setDraft((current) => ({ ...current, title: value }))} />
-            <BthTextField label="الوصف" value={draft.subtitle} onChangeText={(value) => setDraft((current) => ({ ...current, subtitle: value }))} />
-            <BthTextField label="رابط الفيديو" value={draft.videoUrl} onChangeText={(value) => setDraft((current) => ({ ...current, videoUrl: value }))} hint="مثال: /media/shorts/launch.mp4" />
-            <BthTextField label="صورة الغلاف" value={draft.posterUrl} onChangeText={(value) => setDraft((current) => ({ ...current, posterUrl: value }))} hint="مثال: /media/shorts/launch.jpg" />
+            <TextField label="العنوان" value={draft.title} onChangeText={(value) => setDraft((current) => ({ ...current, title: value }))} />
+            <TextField label="الوصف" value={draft.subtitle} onChangeText={(value) => setDraft((current) => ({ ...current, subtitle: value }))} />
+            <TextField label="رابط الفيديو" value={draft.videoUrl} onChangeText={(value) => setDraft((current) => ({ ...current, videoUrl: value }))} hint="مثال: /media/shorts/launch.mp4" />
+            <TextField label="صورة الغلاف" value={draft.posterUrl} onChangeText={(value) => setDraft((current) => ({ ...current, posterUrl: value }))} hint="مثال: /media/shorts/launch.jpg" />
 
-            <BthTabs<MarketingGrowthRouteTarget>
+            <Tabs<MarketingGrowthRouteTarget>
               items={[
                 { value: 'home', label: 'الرئيسية' },
                 { value: 'main_category', label: 'فئة رئيسية' },
@@ -382,13 +382,13 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
               variant="pill"
             />
 
-            <BthSurface tone="inset" gap={2}>
-              <BthText role="bodyStrong">الوجهة الحالية</BthText>
-              <BthText role="bodySm" tone="muted">{routeTargetLabel(draft.routeTarget)} · هذا هو المسار الذي يفتحه CTA داخل الفيديو.</BthText>
-            </BthSurface>
+            <Surface tone="inset" gap={2}>
+              <Text role="bodyStrong">الوجهة الحالية</Text>
+              <Text role="bodySm" tone="muted">{routeTargetLabel(draft.routeTarget)} · هذا هو المسار الذي يفتحه CTA داخل الفيديو.</Text>
+            </Surface>
 
             {routeTargetNeedsPrimaryInput(draft.routeTarget) ? (
-              <BthTextField
+              <TextField
                 label={routeTargetPrimaryLabel(draft.routeTarget)}
                 value={draft.routeTargetId}
                 onChangeText={(value) => setDraft((current) => ({ ...current, routeTargetId: value }))}
@@ -397,7 +397,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
             ) : null}
 
             {routeTargetNeedsSecondaryInput(draft.routeTarget) ? (
-              <BthTextField
+              <TextField
                 label={routeTargetSecondaryLabel(draft.routeTarget)}
                 value={draft.routeTargetExtra}
                 onChangeText={(value) => setDraft((current) => ({ ...current, routeTargetExtra: value }))}
@@ -405,21 +405,21 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
               />
             ) : null}
 
-            <BthTextField label="نص الزر" value={draft.ctaLabel} onChangeText={(value) => setDraft((current) => ({ ...current, ctaLabel: value }))} />
-            <BthTextField label="الجملة البارزة" value={draft.highlight} onChangeText={(value) => setDraft((current) => ({ ...current, highlight: value }))} />
-            <BthTextField label="المؤشر التجاري" value={draft.metricValue} onChangeText={(value) => setDraft((current) => ({ ...current, metricValue: value }))} />
-            <BthTextField label="لون التمييز" value={draft.accentColor} onChangeText={(value) => setDraft((current) => ({ ...current, accentColor: value }))} hint="مثال: #8b5cf6" />
+            <TextField label="نص الزر" value={draft.ctaLabel} onChangeText={(value) => setDraft((current) => ({ ...current, ctaLabel: value }))} />
+            <TextField label="الجملة البارزة" value={draft.highlight} onChangeText={(value) => setDraft((current) => ({ ...current, highlight: value }))} />
+            <TextField label="المؤشر التجاري" value={draft.metricValue} onChangeText={(value) => setDraft((current) => ({ ...current, metricValue: value }))} />
+            <TextField label="لون التمييز" value={draft.accentColor} onChangeText={(value) => setDraft((current) => ({ ...current, accentColor: value }))} hint="مثال: #8b5cf6" />
 
             <View style={[styles.actionsRow, isRtl && styles.rowReverse]}>
-              <BthButton label="حفظ البرنامج" fullWidth={false} onPress={handleSave} />
+              <Button label="حفظ البرنامج" fullWidth={false} onPress={handleSave} />
               {selected ? (
-                <BthButton label={selected.status === 'published' ? 'إيقاف الآن' : 'نشر الآن'} tone="secondary" fullWidth={false} onPress={() => handleToggle(selected)} />
+                <Button label={selected.status === 'published' ? 'إيقاف الآن' : 'نشر الآن'} tone="secondary" fullWidth={false} onPress={() => handleToggle(selected)} />
               ) : null}
             </View>
-          </BthSurface>
+          </Surface>
         </View>
       </View>
-    </BthBox>
+    </Box>
   );
 }
 

@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthCard,
-  BthDashboardShell,
-  BthStateView,
-  BthText,
+  Box,
+  Button,
+  Card,
+  DashboardShell,
+  StateView,
+  Text,
 } from '@bthwani/ui-kit';
 
 export type DshEntryScreenState = 'ready' | 'loading' | 'empty';
@@ -19,12 +19,12 @@ export type DshEntryScreenProps = {
 
 function renderHero(state: DshEntryScreenState, onOpenOffersPress?: () => void) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title="No active offers right now"
         description="Keep the offers entry visible so captains can retry without leaving the service shell."
@@ -35,44 +35,44 @@ function renderHero(state: DshEntryScreenState, onOpenOffersPress?: () => void) 
   }
 
   return (
-    <BthCard
+    <Card
       title="Captain dispatch entry"
       subtitle="One focused start point for offer review, active execution, and proof handoff."
-      footer={<BthButton label="Open offers" onPress={onOpenOffersPress} />}
+      footer={<Button label="Open offers" onPress={onOpenOffersPress} />}
     />
   );
 }
 
 function renderOffersSection(onOpenOffersPress?: () => void, onOpenExecutionPress?: () => void) {
   return (
-    <BthBox gap={3}>
-      <BthCard
+    <Box gap={3}>
+      <Card
         title="Review incoming offers"
         subtitle="Start from the captain offers list so the next dispatch decision is obvious within seconds."
-        footer={<BthButton label="View offers" tone="secondary" onPress={onOpenOffersPress} />}
+        footer={<Button label="View offers" tone="secondary" onPress={onOpenOffersPress} />}
       />
-      <BthCard
+      <Card
         title="Open execution workspace"
         subtitle="Accepted work, reject companion actions, and operational chat stay grouped in one captain pattern."
-        footer={<BthButton label="Open execution" tone="ghost" onPress={onOpenExecutionPress} />}
+        footer={<Button label="Open execution" tone="ghost" onPress={onOpenExecutionPress} />}
       />
-    </BthBox>
+    </Box>
   );
 }
 
 function renderCompletionSection(onOpenProofCapturePress?: () => void) {
   return (
-    <BthBox gap={3}>
-      <BthCard
+    <Box gap={3}>
+      <Card
         title="Capture delivery proof"
         subtitle="Proof upload remains an explicit completion gate before the order fully closes."
-        footer={<BthButton label="Open proof capture" tone="secondary" onPress={onOpenProofCapturePress} />}
+        footer={<Button label="Open proof capture" tone="secondary" onPress={onOpenProofCapturePress} />}
       />
-      <BthCard
+      <Card
         title="Stay inside one captain flow"
         subtitle="Finance, tier, and other non-critical clusters stay out of this first entry so delivery actions remain primary."
       />
-    </BthBox>
+    </Box>
   );
 }
 
@@ -83,7 +83,7 @@ export function DshEntryScreen({
   onOpenProofCapturePress,
 }: DshEntryScreenProps) {
   return (
-    <BthDashboardShell
+    <DashboardShell
       title="Captain Entry"
       subtitle="Single-purpose entry for app-captain delivery operations and first dispatch action."
       hero={renderHero(state, onOpenOffersPress)}
@@ -106,11 +106,11 @@ export function DshEntryScreen({
                 title: 'Entry State',
                 subtitle: 'The screen keeps one clear captain purpose while handling base states.',
                 content: (
-                  <BthBox>
-                    <BthText role="bodyMd" tone="muted">
+                  <Box>
+                    <Text role="bodyMd" tone="muted">
                       Entry state is active. No business logic or network requests are executed here.
-                    </BthText>
-                  </BthBox>
+                    </Text>
+                  </Box>
                 ),
               },
             ]

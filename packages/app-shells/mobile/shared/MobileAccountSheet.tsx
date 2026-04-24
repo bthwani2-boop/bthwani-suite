@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthBox, BthButton, BthSheetFrame, BthText, useDirection } from '@bthwani/ui-kit';
+import { Box, Button, SheetFrame, Text, useDirection } from '@bthwani/ui-kit';
 
 type MobileAccountTypeOption = {
   id: string;
@@ -53,10 +53,10 @@ export function MobileAccountSheet({
         : 'الحساب';
 
   return (
-    <BthSheetFrame visible={visible} title={title} onClose={onClose}>
+    <SheetFrame visible={visible} title={title} onClose={onClose}>
       {tab === 'menu' ? (
         <>
-          <BthButton
+          <Button
             label={profileLabel}
             tone="secondary"
             onPress={() => {
@@ -64,40 +64,40 @@ export function MobileAccountSheet({
               onOpenProfile?.();
             }}
           />
-          <BthButton label={settingsLabel} tone="secondary" onPress={() => setTab('settings')} />
-          <BthButton label={typeSwitchLabel} tone="primary" onPress={() => setTab('type-switch')} />
+          <Button label={settingsLabel} tone="secondary" onPress={() => setTab('settings')} />
+          <Button label={typeSwitchLabel} tone="primary" onPress={() => setTab('type-switch')} />
         </>
       ) : null}
 
       {tab === 'settings' ? (
         <>
-          <BthText role="bodySm" tone="muted">اختر لغة العرض للتطبيق.</BthText>
-          <BthBox layoutDirection="row" gap={2}>
-            <BthButton
+          <Text role="bodySm" tone="muted">اختر لغة العرض للتطبيق.</Text>
+          <Box layoutDirection="row" gap={2}>
+            <Button
               label="العربية"
               tone={language === 'ar' ? 'primary' : 'secondary'}
               fullWidth={false}
               style={{ flex: 1 }}
               onPress={() => setLanguage('ar')}
             />
-            <BthButton
+            <Button
               label="English"
               tone={language === 'en' ? 'primary' : 'secondary'}
               fullWidth={false}
               style={{ flex: 1 }}
               onPress={() => setLanguage('en')}
             />
-          </BthBox>
-          <BthButton label="رجوع" tone="ghost" onPress={() => setTab('menu')} />
+          </Box>
+          <Button label="رجوع" tone="ghost" onPress={() => setTab('menu')} />
         </>
       ) : null}
 
       {tab === 'type-switch' ? (
         <>
-          <BthText role="bodySm" tone="muted">{typeSwitchPrompt}</BthText>
-          <BthBox gap={2}>
+          <Text role="bodySm" tone="muted">{typeSwitchPrompt}</Text>
+          <Box gap={2}>
             {typeOptions.map((option) => (
-              <BthButton
+              <Button
                 key={option.id}
                 label={`${option.label} - ${option.description}`}
                 tone={option.id === activeTypeId ? 'primary' : 'secondary'}
@@ -107,11 +107,11 @@ export function MobileAccountSheet({
                 }}
               />
             ))}
-          </BthBox>
-          <BthButton label="رجوع" tone="ghost" onPress={() => setTab('menu')} />
+          </Box>
+          <Button label="رجوع" tone="ghost" onPress={() => setTab('menu')} />
         </>
       ) : null}
-    </BthSheetFrame>
+    </SheetFrame>
   );
 }
 

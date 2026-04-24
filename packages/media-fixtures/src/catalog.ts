@@ -1,6 +1,6 @@
-import type { BthSeedMediaItem } from './types';
+import type { SeedMediaItem } from './types';
 
-export const bthSeedMediaCatalog = {
+export const SeedMediaCatalog = {
   'dsh.product.apple.v1': {
     key: 'dsh.product.apple.v1',
     service: 'dsh',
@@ -221,12 +221,12 @@ export const bthSeedMediaCatalog = {
     relativePath: 'assets/seed/dsh/banners/dsh-banner-home-promo-7-v1.png',
     description: 'Development seed banner image for DSH home promo dsh.banner.home.promo-7.v1.'
   }
-} as const satisfies Record<string, BthSeedMediaItem>;
+} as const satisfies Record<string, SeedMediaItem>;
 
-export type BthSeedMediaKey = keyof typeof bthSeedMediaCatalog;
+export type SeedMediaKey = keyof typeof SeedMediaCatalog;
 
-export function resolveSeedMedia(key: BthSeedMediaKey): BthSeedMediaItem {
-  return bthSeedMediaCatalog[key];
+export function resolveSeedMedia(key: SeedMediaKey): SeedMediaItem {
+  return SeedMediaCatalog[key];
 }
 
 

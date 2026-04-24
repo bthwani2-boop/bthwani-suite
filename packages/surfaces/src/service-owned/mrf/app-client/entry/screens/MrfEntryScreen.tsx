@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthServiceHubShell, BthStateView } from '@bthwani/ui-kit';
+import { ServiceHubShell, StateView } from '@bthwani/ui-kit';
 
 export type MrfEntryScreenState = 'ready' | 'loading' | 'empty';
 
@@ -55,10 +55,10 @@ export function MrfEntryScreen({
   const emptyState =
     state === 'loading'
       ? (
-        <BthStateView stateId="loading" />
+        <StateView stateId="loading" />
       )
       : (
-        <BthStateView
+        <StateView
           stateId="empty"
           title="No active MRF workspace"
           description="Keep one visible start point so operators can re-enter the MRF flow quickly."
@@ -68,7 +68,7 @@ export function MrfEntryScreen({
       );
 
   return (
-    <BthServiceHubShell
+    <ServiceHubShell
       title="MRF Entry"
       subtitle="Single-purpose entry for app-client merchant referrals and first action."
       sections={sections}

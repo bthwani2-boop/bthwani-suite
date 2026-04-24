@@ -1,16 +1,16 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthKeyValueList,
-  BthListItem,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthStateView,
-  BthStatCard,
-  BthSurface,
-  BthText,
-  BthTextField,
+  Box,
+  Button,
+  KeyValueList,
+  ListItem,
+  MobileScrollView,
+  SectionHeader,
+  StateView,
+  StatCard,
+  Surface,
+  Text,
+  TextField,
 } from '@bthwani/ui-kit';
 
 export type CaptainSupportScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'success' | 'disabled';
@@ -268,12 +268,12 @@ const captainSupportConfigs: Record<CaptainSupportScreenId, CaptainConfig> = {
 
 function renderCaptainSupportState(state: Exclude<CaptainSupportScreenState, 'ready' | 'disabled'>, onRetry?: () => void, onBack?: () => void) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title="No captain support content is loaded"
         description="Reload the screen and keep the order context stable."
@@ -285,7 +285,7 @@ function renderCaptainSupportState(state: Exclude<CaptainSupportScreenState, 're
 
   if (state === 'offline') {
     return (
-      <BthStateView
+      <StateView
         stateId="offline"
         title="Captain support screen is offline"
         description="Retry the support step when connectivity returns."
@@ -297,7 +297,7 @@ function renderCaptainSupportState(state: Exclude<CaptainSupportScreenState, 're
 
   if (state === 'success') {
     return (
-      <BthStateView
+      <StateView
         stateId="success"
         title="Captain support action completed"
         description="The support step is complete and the captain can continue to the next route action."
@@ -308,7 +308,7 @@ function renderCaptainSupportState(state: Exclude<CaptainSupportScreenState, 're
   }
 
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title="Captain support screen failed"
       description="Retry without leaving the order-focused support lane."
@@ -335,16 +335,16 @@ function createCaptainSupportScreen(config: CaptainConfig) {
     const isDisabled = state === 'disabled';
 
     return (
-      <BthMobileScrollView padding={4} gap={4}>
-        <BthBox gap={2}>
-          <BthText role="titleLg">{config.title}</BthText>
-          <BthText role="bodyMd" tone="muted">{config.subtitle}</BthText>
-        </BthBox>
+      <MobileScrollView padding={4} gap={4}>
+        <Box gap={2}>
+          <Text role="titleLg">{config.title}</Text>
+          <Text role="bodyMd" tone="muted">{config.subtitle}</Text>
+        </Box>
 
-        <BthSurface tone="brand" gap={3}>
-          <BthSectionHeader title={config.heroTitle} subtitle={config.heroDescription} />
+        <Surface tone="brand" gap={3}>
+          <SectionHeader title={config.heroTitle} subtitle={config.heroDescription} />
           {config.metrics?.map((metric) => (
-            <BthStatCard
+            <StatCard
               key={metric.label}
               label={metric.label}
               value={metric.value}
@@ -352,21 +352,21 @@ function createCaptainSupportScreen(config: CaptainConfig) {
               tone={metric.tone ?? 'default'}
             />
           ))}
-        </BthSurface>
+        </Surface>
 
         {config.keyValues?.length ? (
-          <BthSurface tone="raised" gap={3}>
-            <BthSectionHeader title="Route details" subtitle="Only the details needed for the immediate captain action stay visible." />
-            <BthKeyValueList items={config.keyValues} />
-          </BthSurface>
+          <Surface tone="raised" gap={3}>
+            <SectionHeader title="Route details" subtitle="Only the details needed for the immediate captain action stay visible." />
+            <KeyValueList items={config.keyValues} />
+          </Surface>
         ) : null}
 
         {config.listItems?.length ? (
-          <BthSurface tone="default" gap={3}>
-            <BthSectionHeader title="Current queue" subtitle="Every item keeps the next route decision explicit." />
-            <BthBox gap={2}>
+          <Surface tone="default" gap={3}>
+            <SectionHeader title="Current queue" subtitle="Every item keeps the next route decision explicit." />
+            <Box gap={2}>
               {config.listItems.map((item) => (
-                <BthListItem
+                <ListItem
                   key={`${config.id}-${item.title}`}
                   title={item.title}
                   subtitle={item.subtitle}
@@ -374,26 +374,26 @@ function createCaptainSupportScreen(config: CaptainConfig) {
                   badgeLabel={item.badgeLabel}
                 />
               ))}
-            </BthBox>
-          </BthSurface>
+            </Box>
+          </Surface>
         ) : null}
 
         {config.inputLabel ? (
-          <BthSurface tone="raised" gap={3}>
-            <BthSectionHeader title="Draft input" subtitle="One concise captain input keeps the workflow focused." />
-            <BthTextField
+          <Surface tone="raised" gap={3}>
+            <SectionHeader title="Draft input" subtitle="One concise captain input keeps the workflow focused." />
+            <TextField
               label={config.inputLabel}
               value={draftValue}
               onChangeText={setDraftValue}
               hint={config.inputHint}
               editable={!isDisabled}
             />
-          </BthSurface>
+          </Surface>
         ) : null}
 
-        <BthButton label={config.primaryLabel} onPress={onPrimaryAction} disabled={isDisabled} />
-        {config.secondaryLabel ? <BthButton label={config.secondaryLabel} tone="secondary" onPress={onSecondaryAction ?? onBack} /> : null}
-      </BthMobileScrollView>
+        <Button label={config.primaryLabel} onPress={onPrimaryAction} disabled={isDisabled} />
+        {config.secondaryLabel ? <Button label={config.secondaryLabel} tone="secondary" onPress={onSecondaryAction ?? onBack} /> : null}
+      </MobileScrollView>
     );
   };
 }

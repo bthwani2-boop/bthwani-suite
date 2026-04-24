@@ -1,17 +1,17 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import {
   useRouter } from 'next/navigation';
-import { BthBox,
-  BthStateView,
-  BthText
+import { Box,
+  StateView,
+  Text
 } from '@bthwani/ui-kit';
 import {
-  BthWebMissionHeroCard,
-  BthWebPageFrame,
-  BthWebSectionCard,
-  BthWebSignalCard,
+  WebMissionHeroCard,
+  WebPageFrame,
+  WebSectionCard,
+  WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import {
@@ -95,7 +95,7 @@ export function ControlPanelDshZoneSetScreen({
     const stateCopy = resolveStateCopy(dshText, state);
 
     return (
-      <BthWebPageFrame
+      <WebPageFrame
         eyebrow={dshText.zoneSet.pageEyebrow}
         title={dshText.zoneSet.pageTitle}
         description={dshText.zoneSet.unavailableDescription}
@@ -103,13 +103,13 @@ export function ControlPanelDshZoneSetScreen({
         embedded={embedded}
         showHeader={showHeader}
       >
-        <BthStateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
-      </BthWebPageFrame>
+        <StateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
+      </WebPageFrame>
     );
   }
 
   return (
-    <BthWebPageFrame
+    <WebPageFrame
       eyebrow={dshText.zoneSet.pageEyebrow}
       title={dshText.zoneSet.pageTitle}
       description={dshText.zoneSet.pageDescription}
@@ -118,7 +118,7 @@ export function ControlPanelDshZoneSetScreen({
       showHeader={showHeader}
     >
       <div className={styles.stack}>
-        <BthWebMissionHeroCard
+        <WebMissionHeroCard
           badges={['/operations/dsh/zone-set', dshText.common.live, `${dshText.zoneSet.signals.reviewZones}: ${summary.reviewZones}`]}
           eyebrow={dshText.zoneSet.heroEyebrow}
           title={dshText.zoneSet.heroTitle}
@@ -133,43 +133,43 @@ export function ControlPanelDshZoneSetScreen({
         />
 
         <div className={styles.signalGrid}>
-          <BthWebSignalCard title={dshText.zoneSet.signals.configuredZones} value={String(summary.configuredZones)} description={dshText.zoneSet.signals.configuredZonesDescription} tone="best" />
-          <BthWebSignalCard title={dshText.zoneSet.signals.protectedZones} value={String(summary.protectedZones)} description={dshText.zoneSet.signals.protectedZonesDescription} />
-          <BthWebSignalCard title={dshText.zoneSet.signals.freeDeliveryZones} value={String(summary.freeDeliveryZones)} description={dshText.zoneSet.signals.freeDeliveryZonesDescription} />
-          <BthWebSignalCard title={dshText.zoneSet.signals.reviewZones} value={String(summary.reviewZones)} description={dshText.zoneSet.signals.reviewZonesDescription} />
+          <WebSignalCard title={dshText.zoneSet.signals.configuredZones} value={String(summary.configuredZones)} description={dshText.zoneSet.signals.configuredZonesDescription} tone="best" />
+          <WebSignalCard title={dshText.zoneSet.signals.protectedZones} value={String(summary.protectedZones)} description={dshText.zoneSet.signals.protectedZonesDescription} />
+          <WebSignalCard title={dshText.zoneSet.signals.freeDeliveryZones} value={String(summary.freeDeliveryZones)} description={dshText.zoneSet.signals.freeDeliveryZonesDescription} />
+          <WebSignalCard title={dshText.zoneSet.signals.reviewZones} value={String(summary.reviewZones)} description={dshText.zoneSet.signals.reviewZonesDescription} />
         </div>
 
-        <BthWebSectionCard title={dshText.zoneSet.policiesTitle} description={dshText.zoneSet.policiesDescription}>
+        <WebSectionCard title={dshText.zoneSet.policiesTitle} description={dshText.zoneSet.policiesDescription}>
           <div className={styles.cardGrid}>
             {policies.map((policy) => (
-              <BthBox key={policy.label} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-                <BthBox layoutDirection="row" justify="space-between" align="center">
-                  <BthText role="bodyStrong">{policy.label}</BthText>
-                  <BthText role="caption" tone="brand">{policy.statusLabel}</BthText>
-                </BthBox>
-                <BthText role="bodySm" tone="muted">{policy.description}</BthText>
-              </BthBox>
+              <Box key={policy.label} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+                <Box layoutDirection="row" justify="space-between" align="center">
+                  <Text role="bodyStrong">{policy.label}</Text>
+                  <Text role="caption" tone="brand">{policy.statusLabel}</Text>
+                </Box>
+                <Text role="bodySm" tone="muted">{policy.description}</Text>
+              </Box>
             ))}
           </div>
-        </BthWebSectionCard>
+        </WebSectionCard>
 
-        <BthWebSectionCard title={dshText.zoneSet.lanesTitle} description={dshText.zoneSet.lanesDescription}>
+        <WebSectionCard title={dshText.zoneSet.lanesTitle} description={dshText.zoneSet.lanesDescription}>
           <div className={styles.cardGrid}>
             {lanes.map((lane) => (
-              <BthBox key={lane.zoneLabel} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-                <BthBox layoutDirection="row" justify="space-between" align="center">
-                  <BthText role="bodyStrong">{lane.zoneLabel}</BthText>
-                  <BthText role="caption" tone={lane.tone}>{lane.recommendationLabel}</BthText>
-                </BthBox>
-                <BthText role="bodySm">{lane.statusLabel}</BthText>
-                <BthText role="caption" tone="soft">{lane.feeLabel} · {lane.etaLabel}</BthText>
-                <BthText role="bodySm" tone="muted">{lane.note}</BthText>
-              </BthBox>
+              <Box key={lane.zoneLabel} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+                <Box layoutDirection="row" justify="space-between" align="center">
+                  <Text role="bodyStrong">{lane.zoneLabel}</Text>
+                  <Text role="caption" tone={lane.tone}>{lane.recommendationLabel}</Text>
+                </Box>
+                <Text role="bodySm">{lane.statusLabel}</Text>
+                <Text role="caption" tone="soft">{lane.feeLabel} · {lane.etaLabel}</Text>
+                <Text role="bodySm" tone="muted">{lane.note}</Text>
+              </Box>
             ))}
           </div>
-        </BthWebSectionCard>
+        </WebSectionCard>
       </div>
-    </BthWebPageFrame>
+    </WebPageFrame>
   );
 }
 

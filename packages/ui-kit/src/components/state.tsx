@@ -3,13 +3,11 @@ import { ActivityIndicator, View, type StyleProp, type ViewStyle } from 'react-n
 import { Button } from './button';
 import { spacing, type Language } from '../foundation';
 import { useDirection, useTheme } from '../providers';
-import { BthSurface as Surface, BthText as Text } from '../primitives';
+import { Surface, Text } from '../primitives';
 
 export type StateKind = 'loading' | 'empty' | 'error' | 'success' | 'warning' | 'info';
-export type BthStateKind = StateKind;
 
 export type StateTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
-export type BthStateTone = StateTone;
 
 export type StateId =
   | 'loading'
@@ -23,8 +21,6 @@ export type StateId =
   | 'unauthorized'
   | 'notFound';
 
-export type BthStateId = StateId;
-
 export type StateDefinition = {
   id: StateId;
   kind: StateKind;
@@ -33,8 +29,6 @@ export type StateDefinition = {
   description: string;
   actionLabel?: string;
 };
-
-export type BthStateDefinition = StateDefinition;
 
 type LocalizedStateCatalog = Record<StateId, StateDefinition>;
 
@@ -65,15 +59,12 @@ const englishStateCatalog: LocalizedStateCatalog = {
 };
 
 export const stateIds = Object.freeze(Object.keys(arabicStateCatalog) as StateId[]);
-export const bthStateIds = stateIds;
 
 export function getStateDefinition(stateId: StateId, language?: Language) {
   const normalizedLanguage = String(language ?? 'ar').toLowerCase();
   const catalog = normalizedLanguage.startsWith('en') ? englishStateCatalog : arabicStateCatalog;
   return catalog[stateId];
 }
-
-export const getBthStateDefinition = getStateDefinition;
 
 export type StateViewProps = {
   kind?: StateKind;
@@ -84,8 +75,6 @@ export type StateViewProps = {
   actionLabel?: string;
   onActionPress?: () => void;
 };
-
-export type BthStateViewProps = StateViewProps;
 
 export function StateView({ kind, stateId, language, title, description, actionLabel, onActionPress }: StateViewProps) {
   const { language: contextLanguage } = useDirection();
@@ -119,31 +108,21 @@ export function StateView({ kind, stateId, language, title, description, actionL
   );
 }
 
-export const BthStateView = StateView;
-
 export function EmptyState(props: Omit<StateViewProps, 'kind' | 'stateId'>) {
   return <StateView stateId="empty" {...props} />;
 }
-
-export const BthEmptyState = EmptyState;
 
 export function LoadingState(props: Omit<StateViewProps, 'kind' | 'stateId'>) {
   return <StateView stateId="loading" {...props} />;
 }
 
-export const BthLoadingState = LoadingState;
-
 export function SuccessState(props: Omit<StateViewProps, 'kind' | 'stateId'>) {
   return <StateView stateId="success" {...props} />;
 }
 
-export const BthSuccessState = SuccessState;
-
 export function ErrorState(props: Omit<StateViewProps, 'kind' | 'stateId'>) {
   return <StateView stateId="blockingError" {...props} />;
 }
-
-export const BthErrorState = ErrorState;
 
 export type ScreenState = 'content' | 'loading' | 'success' | 'error';
 
@@ -226,5 +205,3 @@ export function StateGallery({ states }: { states?: readonly StateId[] }) {
     </View>
   );
 }
-
-export const BthStateGallery = StateGallery;

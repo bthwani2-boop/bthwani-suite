@@ -107,7 +107,7 @@ export const StoreCardPremium = memo(function StoreCardPremium({
         <View style={styles.mediaCol}>
           <View style={styles.imageWrap}>
             {hasImage ? (
-              <Image source={item.image} style={styles.image} resizeMode="cover" />
+              <Image source={item.image ?? undefined} style={styles.image} resizeMode="cover" />
             ) : (
               <View style={styles.imagePlaceholder} />
             )}

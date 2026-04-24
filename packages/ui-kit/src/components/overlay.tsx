@@ -2,52 +2,52 @@ import React, { useEffect, type ReactNode } from 'react';
 import { Modal as RNModal, Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 import { radius, spacing } from '../foundation';
 import { PortalLayer, useTheme } from '../providers';
-import { BthButton } from './button';
-import { BthBox, BthSurface, BthText } from '../primitives';
+import { Button } from './button';
+import { Box, Surface, Text } from '../primitives';
 
-export type BthDialogAction = {
+export type DialogAction = {
   label: string;
   onPress: () => void;
-  tone?: React.ComponentProps<typeof BthButton>['tone'];
+  tone?: React.ComponentProps<typeof Button>['tone'];
 };
 
-export type BthDialogTone = 'default' | 'danger' | 'warning' | 'success' | 'info';
+export type DialogTone = 'default' | 'danger' | 'warning' | 'success' | 'info';
 
-export type BthDialogProps = {
+export type DialogProps = {
   visible: boolean;
   title: string;
   description?: string;
-  tone?: BthDialogTone;
+  tone?: DialogTone;
   onClose: () => void;
   dismissible?: boolean;
-  primaryAction?: BthDialogAction;
-  secondaryAction?: BthDialogAction;
+  primaryAction?: DialogAction;
+  secondaryAction?: DialogAction;
   children?: ReactNode;
 };
 
-export function BthDialog({ visible, title, description, tone = 'default', onClose, dismissible = true, primaryAction, secondaryAction, children }: BthDialogProps) {
+export function Dialog({ visible, title, description, tone = 'default', onClose, dismissible = true, primaryAction, secondaryAction, children }: DialogProps) {
   const { theme } = useTheme();
   const accentColor = { default: theme.brand, danger: theme.danger, warning: theme.warning, success: theme.success, info: theme.info }[tone];
 
   const overlayContent = (
     <Pressable onPress={dismissible ? onClose : undefined} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing[4], backgroundColor: theme.overlay }}>
       <Pressable style={{ width: '100%', maxWidth: 520 }}>
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="xl" style={{ overflow: 'hidden' }}>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="xl" style={{ overflow: 'hidden' }}>
           <View style={{ height: 5, backgroundColor: accentColor }} />
-          <BthBox padding={5} gap={4} style={{ borderRadius: radius.xl }}>
-            <BthBox gap={2}>
-              <BthText role="titleMd">{title}</BthText>
-              {description ? <BthText role="bodyMd" tone="muted">{description}</BthText> : null}
-            </BthBox>
-            {children ? <BthBox gap={3}>{children}</BthBox> : null}
+          <Box padding={5} gap={4} style={{ borderRadius: radius.xl }}>
+            <Box gap={2}>
+              <Text role="titleMd">{title}</Text>
+              {description ? <Text role="bodyMd" tone="muted">{description}</Text> : null}
+            </Box>
+            {children ? <Box gap={3}>{children}</Box> : null}
             {primaryAction || secondaryAction ? (
               <View style={{ flexDirection: 'row', gap: spacing[2], justifyContent: 'flex-end' }}>
-                {secondaryAction ? <BthButton label={secondaryAction.label} tone={secondaryAction.tone ?? 'secondary'} onPress={secondaryAction.onPress} /> : null}
-                {primaryAction ? <BthButton label={primaryAction.label} tone={primaryAction.tone ?? 'primary'} onPress={primaryAction.onPress} /> : null}
+                {secondaryAction ? <Button label={secondaryAction.label} tone={secondaryAction.tone ?? 'secondary'} onPress={secondaryAction.onPress} /> : null}
+                {primaryAction ? <Button label={primaryAction.label} tone={primaryAction.tone ?? 'primary'} onPress={primaryAction.onPress} /> : null}
               </View>
             ) : null}
-          </BthBox>
-        </BthSurface>
+          </Box>
+        </Surface>
       </Pressable>
     </Pressable>
   );
@@ -55,23 +55,23 @@ export function BthDialog({ visible, title, description, tone = 'default', onClo
   return overlayContent;
 }
 
-export type BthSheetFrameProps = {
+export type SheetFrameProps = {
   visible: boolean;
   title?: string;
   onClose: () => void;
   children?: ReactNode;
 };
 
-export function BthSheetFrame({ visible, title, onClose, children }: BthSheetFrameProps) {
+export function SheetFrame({ visible, title, onClose, children }: SheetFrameProps) {
   const { theme } = useTheme();
 
   const sheetContent = (
     <Pressable onPress={onClose} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: theme.overlay }}>
       <Pressable>
-        <BthBox background="surface" padding={4} gap={3} radiusToken="xl" style={{ borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
-          {title ? <BthText role="titleSm">{title}</BthText> : null}
-          <BthBox gap={3}>{children}</BthBox>
-        </BthBox>
+        <Box background="surface" padding={4} gap={3} radiusToken="xl" style={{ borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
+          {title ? <Text role="titleSm">{title}</Text> : null}
+          <Box gap={3}>{children}</Box>
+        </Box>
       </Pressable>
     </Pressable>
   );
@@ -90,13 +90,13 @@ export function BthSheetFrame({ visible, title, onClose, children }: BthSheetFra
   );
 }
 
-export type BthToastTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+export type ToastTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
 
-export type BthToastProps = {
+export type ToastProps = {
   visible: boolean;
   title: string;
   description?: string;
-  tone?: BthToastTone;
+  tone?: ToastTone;
   placement?: 'top' | 'bottom';
   durationMs?: number;
   onDismiss?: () => void;
@@ -104,7 +104,7 @@ export type BthToastProps = {
   onActionPress?: () => void;
 };
 
-export function BthToast({ visible, title, description, tone = 'neutral', placement = 'bottom', durationMs = 3200, onDismiss, actionLabel, onActionPress }: BthToastProps) {
+export function Toast({ visible, title, description, tone = 'neutral', placement = 'bottom', durationMs = 3200, onDismiss, actionLabel, onActionPress }: ToastProps) {
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -125,13 +125,13 @@ export function BthToast({ visible, title, description, tone = 'neutral', placem
 
   const toastContent = (
     <View pointerEvents="box-none" style={{ flex: 1, justifyContent: placement === 'top' ? 'flex-start' : 'flex-end', padding: spacing[4] }}>
-      <BthSurface tone={toneConfig.surfaceTone} padding={4} gap={3} elevationToken="floating" style={{ borderColor: toneConfig.accentColor }}>
-        <BthBox gap={1}>
-          <BthText role="bodyStrong" tone={toneConfig.textTone}>{title}</BthText>
-          {description ? <BthText role="bodySm" tone={toneConfig.textTone}>{description}</BthText> : null}
-        </BthBox>
-        {actionLabel ? <BthButton label={actionLabel} tone={toneConfig.actionTone} size="sm" fullWidth={false} onPress={onActionPress} /> : null}
-      </BthSurface>
+      <Surface tone={toneConfig.surfaceTone} padding={4} gap={3} elevationToken="floating" style={{ borderColor: toneConfig.accentColor }}>
+        <Box gap={1}>
+          <Text role="bodyStrong" tone={toneConfig.textTone}>{title}</Text>
+          {description ? <Text role="bodySm" tone={toneConfig.textTone}>{description}</Text> : null}
+        </Box>
+        {actionLabel ? <Button label={actionLabel} tone={toneConfig.actionTone} size="sm" fullWidth={false} onPress={onActionPress} /> : null}
+      </Surface>
     </View>
   );
 
@@ -149,13 +149,13 @@ export function BthToast({ visible, title, description, tone = 'neutral', placem
   );
 }
 
-export type BthModalProps = {
+export type ModalProps = {
   visible: boolean;
   children: ReactNode;
   onClose?: () => void;
 };
 
-export function BthModal({ visible, children, onClose }: BthModalProps) {
+export function Modal({ visible, children, onClose }: ModalProps) {
   if (!visible) return null;
   return (
     <RNModal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -164,8 +164,8 @@ export function BthModal({ visible, children, onClose }: BthModalProps) {
   );
 }
 
-export type BthSheetProps = BthSheetFrameProps;
+export type SheetProps = SheetFrameProps;
 
-export function BthSheet(props: BthSheetProps) {
-  return <BthSheetFrame {...props} />;
+export function Sheet(props: SheetProps) {
+  return <SheetFrame {...props} />;
 }

@@ -228,7 +228,7 @@ export const uiKitLocales = {
 				backHome: 'Back to Home',
 			},
 			topBar: {
-				brandName: 'Bthawani',
+				brandName: 'BThwani',
 				brandTagline: 'Make Wishes Happen',
 				location: 'Sanaa, New Generation',
 			},
@@ -396,11 +396,11 @@ export const uiKitLocales = {
 					favorites: 'Favorites',
 				},
 				list: {
-					headerTitle: 'Bthawani',
+					headerTitle: 'BThwani',
 					headerSubtitle: 'Choose the right store and start quickly',
 					headerChipPrimary: 'Top offers today',
 					headerChipAccent: 'Discounts up to 30%',
-					headerChipMuted: 'Bthawani Pro',
+					headerChipMuted: 'BThwani Pro',
 					searchLabel: 'Find a store',
 					searchHint: 'Search by name, cuisine, or short description.',
 					favoritesCta: 'Open favorites',
@@ -425,7 +425,7 @@ export const uiKitLocales = {
 				get: {
 					storeDelivery: 'Store delivery',
 					pickup: 'Pick up yourself',
-					platformDelivery: 'Bthawani delivery',
+					platformDelivery: 'BThwani delivery',
 					availableCategories: 'Available categories',
 					subscriptionsTitle: 'Available subscriptions',
 					favoritesChip: 'Favorites',

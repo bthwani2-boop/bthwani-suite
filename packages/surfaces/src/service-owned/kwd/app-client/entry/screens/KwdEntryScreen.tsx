@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthServiceHubShell, BthStateView } from '@bthwani/ui-kit';
+import { ServiceHubShell, StateView } from '@bthwani/ui-kit';
 
 export type KwdEntryScreenState = 'ready' | 'loading' | 'empty';
 
@@ -55,10 +55,10 @@ export function KwdEntryScreen({
   const emptyState =
     state === 'loading'
       ? (
-        <BthStateView stateId="loading" />
+        <StateView stateId="loading" />
       )
       : (
-        <BthStateView
+        <StateView
           stateId="empty"
           title="No active KWD workspace"
           description="Keep one visible start point so operators can re-enter the KWD flow quickly."
@@ -68,7 +68,7 @@ export function KwdEntryScreen({
       );
 
   return (
-    <BthServiceHubShell
+    <ServiceHubShell
       title="KWD Entry"
       subtitle="Single-purpose entry for app-client keyword operations and first action."
       sections={sections}

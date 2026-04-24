@@ -16,8 +16,8 @@ import {
 import { colorPalette, radius, resolveRowDirection, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Badge } from './button';
-import { BthEmptyState as EmptyState } from './state';
-import { BthDivider as Divider, BthSurface as Surface, BthText as Text } from '../primitives';
+import { EmptyState } from './state';
+import { Divider, Surface, Text } from '../primitives';
 
 const cardWidth = Dimensions.get('window').width - 28;
 const compactGap = 10;
@@ -39,16 +39,12 @@ export type HighlightsRailItem = {
   onPress?: () => void;
 };
 
-export type BthHighlightsRailItem = HighlightsRailItem;
-
 export type HighlightsRailProps = {
   items: HighlightsRailItem[];
   maxItems?: number;
   variant?: 'default' | 'mediaCompact';
   style?: StyleProp<ViewStyle>;
 };
-
-export type BthHighlightsRailProps = HighlightsRailProps;
 
 export function HighlightsRail({ items, maxItems = 5, variant = 'default', style }: HighlightsRailProps) {
   const { direction } = useDirection();
@@ -254,8 +250,6 @@ export function HighlightsRail({ items, maxItems = 5, variant = 'default', style
   );
 }
 
-export const BthHighlightsRail = HighlightsRail;
-
 export type KeyValueItem = {
   label: string;
   value: React.ReactNode;
@@ -263,15 +257,11 @@ export type KeyValueItem = {
   helperText?: string;
 };
 
-export type BthKeyValueItem = KeyValueItem;
-
 export type KeyValueListProps = {
   items: readonly KeyValueItem[];
   dense?: boolean;
   dividers?: boolean;
 };
-
-export type BthKeyValueListProps = KeyValueListProps;
 
 export function KeyValueList({ items, dense = false, dividers = true }: KeyValueListProps) {
   const { direction } = useDirection();
@@ -315,16 +305,12 @@ export function KeyValueList({ items, dense = false, dividers = true }: KeyValue
   );
 }
 
-export const BthKeyValueList = KeyValueList;
-
 export type ListItemProps = React.ComponentProps<typeof Pressable> & {
   title: string;
   subtitle?: string;
   meta?: string;
   badgeLabel?: string;
 };
-
-export type BthListItemProps = ListItemProps;
 
 export function ListItem({ title, subtitle, meta, badgeLabel, style, ...rest }: ListItemProps) {
   const { direction } = useDirection();
@@ -358,8 +344,6 @@ export function ListItem({ title, subtitle, meta, badgeLabel, style, ...rest }: 
   );
 }
 
-export const BthListItem = ListItem;
-
 function resolveCellAlignment(direction: 'rtl' | 'ltr', align: 'start' | 'center' | 'end') {
   if (align === 'center') return 'center';
   if (align === 'end') return direction === 'rtl' ? 'flex-start' : 'flex-end';
@@ -374,8 +358,6 @@ export type DataTableColumn<Row extends Record<string, unknown>> = {
   grow?: number;
 };
 
-export type BthDataTableColumn<Row extends Record<string, unknown>> = DataTableColumn<Row>;
-
 export type DataTableProps<Row extends Record<string, unknown>> = {
   columns: readonly DataTableColumn<Row>[];
   rows: readonly Row[];
@@ -386,8 +368,6 @@ export type DataTableProps<Row extends Record<string, unknown>> = {
   dense?: boolean;
   language?: string;
 };
-
-export type BthDataTableProps<Row extends Record<string, unknown>> = DataTableProps<Row>;
 
 export function DataTable<Row extends Record<string, unknown>>({
   columns,
@@ -446,4 +426,3 @@ export function DataTable<Row extends Record<string, unknown>>({
   );
 }
 
-export const BthDataTable = DataTable;

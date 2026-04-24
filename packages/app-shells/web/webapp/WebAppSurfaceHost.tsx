@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthWebPageFrame, BthWebSectionCard } from '@bthwani/ui-kit/web';
+import { WebPageFrame, WebSectionCard } from '@bthwani/ui-kit/web';
 import styles from '../shared/shared-web-shell.module.css';
 
 export type WebAppSurfaceHostProps = Record<string, never>;
@@ -12,14 +12,14 @@ const webAppOperatingPrinciples = [
 
 export function WebAppSurfaceHost(_props: WebAppSurfaceHostProps) {
   return (
-    <BthWebPageFrame
+    <WebPageFrame
       eyebrow="BThwani WebApp"
       title="Operational web surface with centralized UI authority"
       description="This shell is the sanctioned entrypoint for the application web surface. Shared styling decisions now stay inside ui-kit."
       centered
       maxWidth={900}
     >
-      <BthWebSectionCard
+      <WebSectionCard
         title="Operating model"
         description="Application-specific composition lives in surfaces while shared UI decisions stay upstream."
       >
@@ -30,8 +30,8 @@ export function WebAppSurfaceHost(_props: WebAppSurfaceHostProps) {
             </p>
           ))}
         </div>
-      </BthWebSectionCard>
-    </BthWebPageFrame>
+      </WebSectionCard>
+    </WebPageFrame>
   );
 }
 

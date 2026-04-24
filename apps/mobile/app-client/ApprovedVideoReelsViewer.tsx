@@ -2,8 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { ResizeMode, Video } from 'expo-av';
 import React from 'react';
 import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { BthBox, BthText } from '@bthwani/ui-kit';
-import type { DshHomeApprovedVideoReelsViewerProps } from '@bthwani/surfaces/dsh/app-client/home/components/DshHomeApprovedVideoReelsViewer';
+import { Box, Text } from '@bthwani/ui-kit';
+import type { DshHomeApprovedVideoReelsViewerProps } from '../../../packages/surfaces/src/service-owned/dsh/app-client/home/components/DshHomeApprovedVideoReelsViewer';
 
 function resolveMediaUri(uri?: string) {
   if (!uri) {
@@ -74,12 +74,12 @@ export function ApprovedVideoReelsViewer({
           <Pressable style={styles.closeButton} onPress={handleClose} accessibilityRole="button" accessibilityLabel="إغلاق">
             <Ionicons name="close" size={20} color="#ffffff" />
           </Pressable>
-          <BthBox gap={2} style={styles.emptyCard}>
-            <BthText role="titleSm" style={styles.emptyTitle}>لا توجد فيديوهات معتمدة بعد</BthText>
-            <BthText role="bodySm" style={styles.emptyBody}>
+          <Box gap={2} style={styles.emptyCard}>
+            <Text role="titleSm" style={styles.emptyTitle}>لا توجد فيديوهات معتمدة بعد</Text>
+            <Text role="bodySm" style={styles.emptyBody}>
               يرفع الشريك الفيديوهات أولًا، ثم تعتمدها التسويق قبل أن تظهر هنا في تطبيق العميل.
-            </BthText>
-          </BthBox>
+            </Text>
+          </Box>
         </View>
       </Modal>
     );
@@ -121,13 +121,13 @@ export function ApprovedVideoReelsViewer({
 
                 <View style={styles.content}>
                   <View style={styles.tag}>
-                    <BthText role="caption" style={styles.tagText}>فيديو معتمد</BthText>
+                    <Text role="caption" style={styles.tagText}>فيديو معتمد</Text>
                   </View>
 
-                  <BthBox gap={2} style={styles.copyCard}>
-                    <BthText role="titleMd" style={styles.title} numberOfLines={2}>{item.title}</BthText>
-                    <BthText role="bodySm" style={styles.subtitle} numberOfLines={3}>{item.subtitle}</BthText>
-                    <BthText role="bodySm" style={styles.highlight} numberOfLines={2}>{item.highlight}</BthText>
+                  <Box gap={2} style={styles.copyCard}>
+                    <Text role="titleMd" style={styles.title} numberOfLines={2}>{item.title}</Text>
+                    <Text role="bodySm" style={styles.subtitle} numberOfLines={3}>{item.subtitle}</Text>
+                    <Text role="bodySm" style={styles.highlight} numberOfLines={2}>{item.highlight}</Text>
 
                     <Pressable
                       style={[styles.ctaButton, { backgroundColor: item.accentColor }]}
@@ -135,11 +135,11 @@ export function ApprovedVideoReelsViewer({
                       accessibilityRole="button"
                       accessibilityLabel={item.ctaLabel}
                     >
-                      <BthText role="bodyMd" style={styles.ctaText}>{item.ctaLabel}</BthText>
+                      <Text role="bodyMd" style={styles.ctaText}>{item.ctaLabel}</Text>
                     </Pressable>
-                  </BthBox>
+                  </Box>
 
-                  <BthText role="caption" style={styles.swipeHint}>اسحب للأعلى أو للأسفل لمشاهدة فيديوهات أخرى</BthText>
+                  <Text role="caption" style={styles.swipeHint}>اسحب للأعلى أو للأسفل لمشاهدة فيديوهات أخرى</Text>
                 </View>
               </View>
             );

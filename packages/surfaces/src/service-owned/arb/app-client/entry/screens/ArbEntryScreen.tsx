@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthServiceHubShell, BthStateView } from '@bthwani/ui-kit';
+import { ServiceHubShell, StateView } from '@bthwani/ui-kit';
 
 export type ArbEntryScreenState = 'ready' | 'loading' | 'empty';
 
@@ -55,10 +55,10 @@ export function ArbEntryScreen({
   const emptyState =
     state === 'loading'
       ? (
-        <BthStateView stateId="loading" />
+        <StateView stateId="loading" />
       )
       : (
-        <BthStateView
+        <StateView
           stateId="empty"
           title="No active ARB workspace"
           description="Keep one visible start point so operators can re-enter the ARB flow quickly."
@@ -68,7 +68,7 @@ export function ArbEntryScreen({
       );
 
   return (
-    <BthServiceHubShell
+    <ServiceHubShell
       title="ARB Entry"
       subtitle="Single-purpose entry for app-client arbitration and first action."
       sections={sections}

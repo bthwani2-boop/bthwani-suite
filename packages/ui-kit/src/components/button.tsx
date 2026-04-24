@@ -12,8 +12,6 @@ function resolvePressableStyle(style: PressableStyle | undefined, state: Pressab
 
 export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
 
-export type BthButtonTone = ButtonTone;
-
 export type ButtonProps = PressableProps & {
   label: string;
   tone?: ButtonTone;
@@ -25,8 +23,6 @@ export type ButtonProps = PressableProps & {
   icon?: React.ReactNode;
   iconPosition?: 'leading' | 'trailing';
 };
-
-export type BthButtonProps = ButtonProps;
 
 export function Button({
   label,
@@ -95,15 +91,11 @@ export function Button({
   );
 }
 
-export const BthButton = Button;
-
 export type BadgeProps = {
   label: string;
   tone?: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
   style?: StyleProp<ViewStyle>;
 };
-
-export type BthBadgeProps = BadgeProps;
 
 export function Badge({ label, tone = 'default', style }: BadgeProps) {
   const { theme } = useTheme();
@@ -140,16 +132,12 @@ export function Badge({ label, tone = 'default', style }: BadgeProps) {
   );
 }
 
-export const BthBadge = Badge;
-
 export type ChipProps = {
   label: string;
   selected?: boolean;
   tone?: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
   onPress?: () => void;
 };
-
-export type BthChipProps = ChipProps;
 
 export function Chip({ label, selected = false, tone = 'default', onPress }: ChipProps) {
   const { theme } = useTheme();
@@ -187,4 +175,3 @@ export function Chip({ label, selected = false, tone = 'default', onPress }: Chi
   );
 }
 
-export const BthChip = Chip;

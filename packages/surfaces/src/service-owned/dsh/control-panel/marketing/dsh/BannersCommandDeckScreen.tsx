@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { BthBox, BthButton, BthSurface, BthTabs, BthText, BthTextField, useDirection } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Tabs, Text, TextField, useDirection } from '@bthwani/ui-kit';
 import {
   computeMarketingBannerQuality,
   duplicateMarketingBannerItem,
@@ -149,13 +149,13 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
   }
 
   return (
-    <BthBox gap={4}>
-      <BthSurface tone="raised" gap={3}>
-        <BthText role="caption" style={styles.brandEyebrow}>مسار البنر مملوك للتسويق</BthText>
-        <BthText role="titleLg">إغلاق نهائي للبنر في العميل ولوحة التسويق</BthText>
-        <BthText role="bodySm" tone="muted">
+    <Box gap={4}>
+      <Surface tone="raised" gap={3}>
+        <Text role="caption" style={styles.brandEyebrow}>مسار البنر مملوك للتسويق</Text>
+        <Text role="titleLg">إغلاق نهائي للبنر في العميل ولوحة التسويق</Text>
+        <Text role="bodySm" tone="muted">
           من هنا يتم إنشاء البنر، ترتيبه، نشره، ثم ظهوره مباشرة داخل واجهة العميل في المنزل وقائمة المتاجر.
-        </BthText>
+        </Text>
 
         <View style={[styles.kpiGrid, isRtl && styles.rowReverse]}>
           {[
@@ -165,19 +165,19 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
             { label: 'النقرات', value: kpis.clicks, color: '#dc2626' },
           ].map((entry) => (
             <View key={entry.label} style={styles.kpiCard}>
-              <BthText role="caption" tone="muted">{entry.label}</BthText>
-              <BthText role="titleLg" style={{ color: entry.color }}>{String(entry.value)}</BthText>
+              <Text role="caption" tone="muted">{entry.label}</Text>
+              <Text role="titleLg" style={{ color: entry.color }}>{String(entry.value)}</Text>
             </View>
           ))}
         </View>
-      </BthSurface>
+      </Surface>
 
       <View style={[styles.columnsWrap, isRtl && styles.rowReverse]}>
         <View style={styles.column}>
-          <BthSurface tone="inset" gap={3}>
+          <Surface tone="inset" gap={3}>
             <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-              <BthText role="titleSm">المعاينة الحية في التطبيق</BthText>
-              <BthButton label="بنر جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} />
+              <Text role="titleSm">المعاينة الحية في التطبيق</Text>
+              <Button label="بنر جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} />
             </View>
 
             <View style={styles.previewStack}>
@@ -189,24 +189,24 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
                     { backgroundColor: item.accentColor ?? '#f97316' },
                   ]}
                 >
-                  <BthText role="titleSm" style={styles.previewTitle}>{item.title}</BthText>
-                  <BthText role="bodySm" style={styles.previewSubtitle}>{item.subtitle}</BthText>
+                  <Text role="titleSm" style={styles.previewTitle}>{item.title}</Text>
+                  <Text role="bodySm" style={styles.previewSubtitle}>{item.subtitle}</Text>
                 </View>
               ))}
             </View>
 
-            <BthText role="caption" tone="muted">
+            <Text role="caption" tone="muted">
               التدفق الآن واضح: التسويق ⇠ تحكم مباشر ⇠ نشر ⇠ ظهور في التطبيق ⇠ قياس التفاعل.
-            </BthText>
-          </BthSurface>
+            </Text>
+          </Surface>
 
-          <BthSurface tone="raised" gap={3}>
+          <Surface tone="raised" gap={3}>
             <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-              <BthText role="titleSm">قائمة البنرات</BthText>
-              <BthText role="caption" tone="muted">{items.length} عنصر</BthText>
+              <Text role="titleSm">قائمة البنرات</Text>
+              <Text role="caption" tone="muted">{items.length} عنصر</Text>
             </View>
 
-            <BthBox gap={2}>
+            <Box gap={2}>
               {items.map((item) => {
                 const isSelected = selected?.id === item.id;
                 return (
@@ -220,44 +220,44 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
                   >
                     <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
                       <View style={styles.listTextWrap}>
-                        <BthText role="titleSm">{item.title}</BthText>
-                        <BthText role="bodySm" tone="muted">{item.subtitle}</BthText>
+                        <Text role="titleSm">{item.title}</Text>
+                        <Text role="bodySm" tone="muted">{item.subtitle}</Text>
                       </View>
                       <View style={[styles.statusPill, item.status === 'published' ? styles.statusLive : styles.statusDraft]}>
-                        <BthText role="caption" style={styles.statusText}>{bannerStatusLabel(item.status)}</BthText>
+                        <Text role="caption" style={styles.statusText}>{bannerStatusLabel(item.status)}</Text>
                       </View>
                     </View>
 
-                    <BthText role="caption" tone="muted">
+                    <Text role="caption" tone="muted">
                       {item.audience === 'all' ? 'المنزل + قائمة المتاجر' : item.audience === 'home' ? 'المنزل فقط' : 'قائمة المتاجر فقط'}
                       {' · '}
                       {bannerActionTypeLabel(item.actionType)}
                       {' · '}
                       {bannerTargetLabel(item.actionTarget)}
-                    </BthText>
+                    </Text>
 
                     <View style={[styles.actionsRow, isRtl && styles.rowReverse]}>
-                      <BthButton
+                      <Button
                         label={item.status === 'published' ? 'إيقاف' : 'نشر'}
                         tone="ghost"
                         fullWidth={false}
                         onPress={() => handleToggle(item)}
                       />
-                      <BthButton label="نسخ" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(item)} />
-                      <BthButton label="حذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(item)} />
+                      <Button label="نسخ" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(item)} />
+                      <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(item)} />
                     </View>
                   </Pressable>
                 );
               })}
-            </BthBox>
-          </BthSurface>
+            </Box>
+          </Surface>
         </View>
 
         <View style={styles.column}>
-          <BthSurface tone="raised" gap={3}>
-            <BthText role="titleSm">تحرير البنر المحدد</BthText>
+          <Surface tone="raised" gap={3}>
+            <Text role="titleSm">تحرير البنر المحدد</Text>
 
-            <BthTabs<MarketingBannerStatus>
+            <Tabs<MarketingBannerStatus>
               items={[
                 { value: 'draft', label: 'مسودة' },
                 { value: 'published', label: 'منشور' },
@@ -267,7 +267,7 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
               variant="pill"
             />
 
-            <BthTabs<MarketingBannerAudience>
+            <Tabs<MarketingBannerAudience>
               items={[
                 { value: 'all', label: 'الكل' },
                 { value: 'home', label: 'الرئيسية' },
@@ -278,7 +278,7 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
               variant="pill"
             />
 
-            <BthTabs<MarketingBannerActionType>
+            <Tabs<MarketingBannerActionType>
               items={[
                 { value: 'main_category', label: 'فئة' },
                 { value: 'store', label: 'متجر' },
@@ -290,25 +290,25 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
               variant="pill"
             />
 
-            <BthTextField label="عنوان البنر" value={draft.title} onChangeText={(value) => setDraft((current) => ({ ...current, title: value }))} />
-            <BthTextField label="الوصف المختصر" value={draft.subtitle} onChangeText={(value) => setDraft((current) => ({ ...current, subtitle: value }))} />
-            <BthTextField label="الوجهة التسويقية" value={draft.actionTarget} onChangeText={(value) => setDraft((current) => ({ ...current, actionTarget: value }))} hint="مثال: فئة المطاعم أو متجر مميز أو صفحة اشتراك" />
-            <BthSurface tone="inset" gap={2}>
-              <BthText role="bodyStrong">المسار الذي سيفتحه البنر</BthText>
-              <BthText role="bodySm" tone="muted">{bannerTargetLabel(draft.actionTarget)} · الربط الفعلي يتم داخليًا بدون لغة تقنية ظاهرة للمستخدم.</BthText>
-            </BthSurface>
-            <BthTextField label="اسم الشريك أو المصدر" value={draft.partnerName} onChangeText={(value) => setDraft((current) => ({ ...current, partnerName: value }))} />
-            <BthTextField label="نص زر الإجراء" value={draft.ctaLabel} onChangeText={(value) => setDraft((current) => ({ ...current, ctaLabel: value }))} />
-            <BthTextField label="لون التمييز" value={draft.accentColor} onChangeText={(value) => setDraft((current) => ({ ...current, accentColor: value }))} hint="مثال: #f97316" />
-            <BthTextField label="الترتيب" value={draft.position} onChangeText={(value) => setDraft((current) => ({ ...current, position: value }))} hint="1 يظهر أولاً" />
-            <BthTextField label="رابط الصورة" value={draft.imageUrl} onChangeText={(value) => setDraft((current) => ({ ...current, imageUrl: value }))} hint="يمكن تركه فارغًا وسيتم توليد معاينة تلقائية" />
+            <TextField label="عنوان البنر" value={draft.title} onChangeText={(value) => setDraft((current) => ({ ...current, title: value }))} />
+            <TextField label="الوصف المختصر" value={draft.subtitle} onChangeText={(value) => setDraft((current) => ({ ...current, subtitle: value }))} />
+            <TextField label="الوجهة التسويقية" value={draft.actionTarget} onChangeText={(value) => setDraft((current) => ({ ...current, actionTarget: value }))} hint="مثال: فئة المطاعم أو متجر مميز أو صفحة اشتراك" />
+            <Surface tone="inset" gap={2}>
+              <Text role="bodyStrong">المسار الذي سيفتحه البنر</Text>
+              <Text role="bodySm" tone="muted">{bannerTargetLabel(draft.actionTarget)} · الربط الفعلي يتم داخليًا بدون لغة تقنية ظاهرة للمستخدم.</Text>
+            </Surface>
+            <TextField label="اسم الشريك أو المصدر" value={draft.partnerName} onChangeText={(value) => setDraft((current) => ({ ...current, partnerName: value }))} />
+            <TextField label="نص زر الإجراء" value={draft.ctaLabel} onChangeText={(value) => setDraft((current) => ({ ...current, ctaLabel: value }))} />
+            <TextField label="لون التمييز" value={draft.accentColor} onChangeText={(value) => setDraft((current) => ({ ...current, accentColor: value }))} hint="مثال: #f97316" />
+            <TextField label="الترتيب" value={draft.position} onChangeText={(value) => setDraft((current) => ({ ...current, position: value }))} hint="1 يظهر أولاً" />
+            <TextField label="رابط الصورة" value={draft.imageUrl} onChangeText={(value) => setDraft((current) => ({ ...current, imageUrl: value }))} hint="يمكن تركه فارغًا وسيتم توليد معاينة تلقائية" />
 
             <View>
               <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-                <BthText role="bodySm">جودة البنر</BthText>
-                <BthText role="bodySm" style={{ color: quality >= 80 ? '#16a34a' : quality >= 60 ? '#f97316' : '#dc2626' }}>
+                <Text role="bodySm">جودة البنر</Text>
+                <Text role="bodySm" style={{ color: quality >= 80 ? '#16a34a' : quality >= 60 ? '#f97316' : '#dc2626' }}>
                   {quality}%
-                </BthText>
+                </Text>
               </View>
               <View style={styles.qualityTrack}>
                 <View
@@ -324,9 +324,9 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
             </View>
 
             <View style={[styles.actionsRow, isRtl && styles.rowReverse]}>
-              <BthButton label="حفظ البنر" fullWidth={false} onPress={handleSave} />
+              <Button label="حفظ البنر" fullWidth={false} onPress={handleSave} />
               {selected ? (
-                <BthButton
+                <Button
                   label={selected.status === 'published' ? 'إيقاف العرض' : 'نشر الآن'}
                   tone="secondary"
                   fullWidth={false}
@@ -334,10 +334,10 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
                 />
               ) : null}
             </View>
-          </BthSurface>
+          </Surface>
         </View>
       </View>
-    </BthBox>
+    </Box>
   );
 }
 

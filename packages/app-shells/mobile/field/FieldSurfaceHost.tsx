@@ -1,21 +1,21 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
 import {
-  BthBadge,
-  BthBox,
-  BthButton,
-  BthCard,
-  BthIcon,
-  BthKeyValueList,
-  BthListItem,
-  BthMobileScrollView,
-  BthSearchField,
-  BthScreenHeader,
-  BthSectionHeader,
-  BthStatCard,
-  BthSurface,
-  BthText,
-  BthTopBar,
+  Badge,
+  Box,
+  Button,
+  Card,
+  Icon,
+  KeyValueList,
+  ListItem,
+  MobileScrollView,
+  SearchField,
+  ScreenHeader,
+  SectionHeader,
+  StatCard,
+  Surface,
+  Text,
+  TopBar,
 } from '@bthwani/ui-kit';
 import { dshField } from '@bthwani/surfaces/app-field';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
@@ -300,7 +300,7 @@ export function FieldSurfaceHost() {
   };
 
   const topBar = (
-    <BthTopBar
+    <TopBar
       variant="brand"
       title="بثواني"
       subtitle={activeServiceType === 'dsh' ? 'تشغيل الميدان - DSH' : 'تشغيل الميدان - ARB'}
@@ -308,19 +308,19 @@ export function FieldSurfaceHost() {
       actions={[
         {
           id: 'profile',
-          icon: <BthIcon name="person-outline" size={21} color="#FFFFFF" />,
+          icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الحساب',
           onPress: () => setAccountSheetVisible(true),
         },
         {
           id: 'notifications',
-          icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
+          icon: <Icon name="notifications-outline" size={21} color="#FFFFFF" />,
           badgeCount: 3,
           accessibilityLabel: 'الإشعارات',
         },
         {
           id: 'geo',
-          icon: <BthIcon name="navigate-outline" size={21} color="#FFFFFF" />,
+          icon: <Icon name="navigate-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الموقع',
           onPress: () => {
             if (activeServiceType === 'dsh') {
@@ -328,7 +328,7 @@ export function FieldSurfaceHost() {
             }
           },
         },
-        { id: 'search', icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'بحث' },
+        { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'بحث' },
       ]}
       ticker={{
         statusLabel: activeServiceType === 'dsh' ? 'نشط' : 'ARB نشط',
@@ -360,9 +360,9 @@ export function FieldSurfaceHost() {
 
   if (activeServiceType === 'arb') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface
+        <Surface
           tone="raised"
           padding={0}
           gap={0}
@@ -376,67 +376,67 @@ export function FieldSurfaceHost() {
             overflow: 'hidden',
           }}
         >
-          <BthMobileScrollView fill padding={5} gap={5}>
-            <BthScreenHeader
+          <MobileScrollView fill padding={5} gap={5}>
+            <ScreenHeader
               title="عمليات الميدان - ARB"
               subtitle="التطبيق الآن في سياق ARB بالكامل."
               actionLabel="تحديث المسارات"
               onActionPress={() => {}}
             />
 
-            <BthSurface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
-              <BthText role="label" tone="inverse">وضع التشغيل الحالي</BthText>
-              <BthText role="titleLg" tone="inverse">تم تفعيل نوع ARB</BthText>
-              <BthText role="bodyMd" tone="inverse">كل محتوى التطبيق الآن موجّه إلى مسارات ARB، مع منع خلط مسارات DSH داخل نفس السياق.</BthText>
-            </BthSurface>
+            <Surface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
+              <Text role="label" tone="inverse">وضع التشغيل الحالي</Text>
+              <Text role="titleLg" tone="inverse">تم تفعيل نوع ARB</Text>
+              <Text role="bodyMd" tone="inverse">كل محتوى التطبيق الآن موجّه إلى مسارات ARB، مع منع خلط مسارات DSH داخل نفس السياق.</Text>
+            </Surface>
 
-            <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
-              <BthText role="label">المساحات الأساسية - ARB</BthText>
-              <BthSurface tone="default" padding={4} gap={2} radiusToken="lg">
-                <BthText role="bodyStrong">إدارة المسارات</BthText>
-                <BthText role="bodySm" tone="muted">تجهيز المسار، ترتيب نقاط الخدمة، ومتابعة الإنجاز.</BthText>
-              </BthSurface>
-              <BthSurface tone="default" padding={4} gap={2} radiusToken="lg">
-                <BthText role="bodyStrong">مهام الميدان</BthText>
-                <BthText role="bodySm" tone="muted">عرض المهام المرتبطة بنوع ARB فقط.</BthText>
-              </BthSurface>
-            </BthSurface>
+            <Surface tone="raised" padding={5} gap={4} radiusToken="xl">
+              <Text role="label">المساحات الأساسية - ARB</Text>
+              <Surface tone="default" padding={4} gap={2} radiusToken="lg">
+                <Text role="bodyStrong">إدارة المسارات</Text>
+                <Text role="bodySm" tone="muted">تجهيز المسار، ترتيب نقاط الخدمة، ومتابعة الإنجاز.</Text>
+              </Surface>
+              <Surface tone="default" padding={4} gap={2} radiusToken="lg">
+                <Text role="bodyStrong">مهام الميدان</Text>
+                <Text role="bodySm" tone="muted">عرض المهام المرتبطة بنوع ARB فقط.</Text>
+              </Surface>
+            </Surface>
 
-            <BthSurface tone="inset" padding={4} gap={2} radiusToken="lg">
-              <BthText role="label">حالة الربط</BthText>
-              <BthText role="bodySm" tone="muted">واجهات ARB الميدانية قيد التوسعة، لكن التبديل مطبق ويبدّل سياق التطبيق بالكامل بالفعل.</BthText>
-            </BthSurface>
-          </BthMobileScrollView>
-        </BthSurface>
+            <Surface tone="inset" padding={4} gap={2} radiusToken="lg">
+              <Text role="label">حالة الربط</Text>
+              <Text role="bodySm" tone="muted">واجهات ARB الميدانية قيد التوسعة، لكن التبديل مطبق ويبدّل سياق التطبيق بالكامل بالفعل.</Text>
+            </Surface>
+          </MobileScrollView>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   if (route !== 'home') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthBox padding={4} gap={3}>
-          <BthButton label="العودة للرئيسية" tone="secondary" onPress={handleBackHome} />
-          <BthSurface tone="inset" padding={3} gap={2} radiusToken="lg">
-            <BthText role="label">معاينة Phase 12</BthText>
-            <BthText role="bodySm" tone="muted">
+        <Box padding={4} gap={3}>
+          <Button label="العودة للرئيسية" tone="secondary" onPress={handleBackHome} />
+          <Surface tone="inset" padding={3} gap={2} radiusToken="lg">
+            <Text role="label">معاينة Phase 12</Text>
+            <Text role="bodySm" tone="muted">
               غيّر حالة الشاشة الحالية للتأكد من تغطية shell لجميع الحالات القانونية قبل الربط النهائي.
-            </BthText>
-            <BthBox gap={2}>
+            </Text>
+            <Box gap={2}>
               {previewStateOptions.map((option) => (
-                <BthButton
+                <Button
                   key={option.id}
                   label={option.label}
                   tone={previewState === option.id ? 'primary' : 'secondary'}
                   onPress={() => setPreviewState(option.id)}
                 />
               ))}
-            </BthBox>
-          </BthSurface>
-        </BthBox>
-        <BthSurface
+            </Box>
+          </Surface>
+        </Box>
+        <Surface
           tone="raised"
           padding={0}
           gap={0}
@@ -451,16 +451,16 @@ export function FieldSurfaceHost() {
           }}
         >
           {renderFieldFlow()}
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   return (
-    <BthBox style={{ flex: 1 }} background="background">
+    <Box style={{ flex: 1 }} background="background">
       {topBar}
-      <BthSurface
+      <Surface
         tone="raised"
         padding={0}
         gap={0}
@@ -474,59 +474,59 @@ export function FieldSurfaceHost() {
           overflow: 'hidden',
         }}
       >
-        <BthMobileScrollView fill padding={5} gap={5}>
-          <BthSurface tone="raised" padding={4} gap={4} radiusToken="xl">
-            <BthBox layoutDirection="row" justify="space-between" align="center" gap={3}>
-              <BthBox gap={1} style={{ flex: 1 }}>
-                <BthText role="label" tone="muted">الحساب التشغيلي</BthText>
-                <BthText role="titleSm">مشرف الميدان - ناصر القحطاني</BthText>
-                <BthText role="bodySm" tone="muted">الفريق الشمالي | بداية الوردية 08:00 ص</BthText>
-              </BthBox>
-              <BthBox align="flex-start" gap={2}>
-                <BthBadge label="مفعل" tone="success" />
-                <BthBadge label="3 إشعارات جديدة" tone="warning" />
-              </BthBox>
-            </BthBox>
+        <MobileScrollView fill padding={5} gap={5}>
+          <Surface tone="raised" padding={4} gap={4} radiusToken="xl">
+            <Box layoutDirection="row" justify="space-between" align="center" gap={3}>
+              <Box gap={1} style={{ flex: 1 }}>
+                <Text role="label" tone="muted">الحساب التشغيلي</Text>
+                <Text role="titleSm">مشرف الميدان - ناصر القحطاني</Text>
+                <Text role="bodySm" tone="muted">الفريق الشمالي | بداية الوردية 08:00 ص</Text>
+              </Box>
+              <Box align="flex-start" gap={2}>
+                <Badge label="مفعل" tone="success" />
+                <Badge label="3 إشعارات جديدة" tone="warning" />
+              </Box>
+            </Box>
 
-            <BthBox layoutDirection="row" gap={2}>
-              <BthButton label="الإشعارات" tone="secondary" size="sm" fullWidth={false} onPress={() => {}} />
-              <BthButton label="الحساب" tone="secondary" size="sm" fullWidth={false} onPress={() => {}} />
-              <BthButton label="المهام" tone="ghost" size="sm" fullWidth={false} onPress={() => setRoute('entry')} />
-            </BthBox>
+            <Box layoutDirection="row" gap={2}>
+              <Button label="الإشعارات" tone="secondary" size="sm" fullWidth={false} onPress={() => {}} />
+              <Button label="الحساب" tone="secondary" size="sm" fullWidth={false} onPress={() => {}} />
+              <Button label="المهام" tone="ghost" size="sm" fullWidth={false} onPress={() => setRoute('entry')} />
+            </Box>
 
-            <BthSearchField
+            <SearchField
               label="ابحث داخل الزيارات والمتاجر"
               value={homeSearchQuery}
               onChangeText={setHomeSearchQuery}
               hint="ابحث باسم المتجر أو الحي أو نوع المهمة."
             />
-          </BthSurface>
+          </Surface>
 
-          <BthScreenHeader
+          <ScreenHeader
             title="عمليات الميدان"
             subtitle="لوحة تشغيل يومية لفرق الميدان، مع انتقال مباشر إلى التفعيل، تثبيت الموقع، وإثبات الزيارة."
             actionLabel="افتح مساحة العمل"
             onActionPress={() => setRoute('entry')}
           />
 
-          <BthSurface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
-            <BthText role="label" tone="inverse">وردية اليوم</BthText>
-            <BthText role="titleLg" tone="inverse">تشغيل ميداني منظم من أول شاشة</BthText>
-            <BthText role="bodyMd" tone="inverse">الواجهة الآن تعرض أولويات الفريق، المهمة التالية، ومسارات التنفيذ الأساسية بدل شاشة تمهيدية عامة.</BthText>
-            <BthBox gap={2}>
-              <BthBadge label="المنطقة: شمال الرياض" tone="info" />
-              <BthBadge label="الحالة: وردية نشطة" tone="success" />
-            </BthBox>
-          </BthSurface>
+          <Surface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
+            <Text role="label" tone="inverse">وردية اليوم</Text>
+            <Text role="titleLg" tone="inverse">تشغيل ميداني منظم من أول شاشة</Text>
+            <Text role="bodyMd" tone="inverse">الواجهة الآن تعرض أولويات الفريق، المهمة التالية، ومسارات التنفيذ الأساسية بدل شاشة تمهيدية عامة.</Text>
+            <Box gap={2}>
+              <Badge label="المنطقة: شمال الرياض" tone="info" />
+              <Badge label="الحالة: وردية نشطة" tone="success" />
+            </Box>
+          </Surface>
 
-          <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
-            <BthSectionHeader
+          <Surface tone="raised" padding={5} gap={4} radiusToken="xl">
+            <SectionHeader
               title="ملخص التشغيل"
               subtitle="مؤشرات سريعة قبل الدخول إلى أي مسار تنفيذي."
             />
-            <BthBox gap={3}>
+            <Box gap={3}>
               {fieldOperationsSnapshot.map((item) => (
-                <BthStatCard
+                <StatCard
                   key={item.label}
                   label={item.label}
                   value={item.value}
@@ -534,15 +534,15 @@ export function FieldSurfaceHost() {
                   tone={item.tone}
                 />
               ))}
-            </BthBox>
-          </BthSurface>
+            </Box>
+          </Surface>
 
-          <BthCard
+          <Card
             title="المهمة التالية"
             subtitle="نقطة الدخول الأوضح لفريق الميدان الآن."
-            footer={<BthButton label="ابدأ طلب التفعيل" onPress={() => { setPreviewState('ready'); setRoute('activation'); }} />}
+            footer={<Button label="ابدأ طلب التفعيل" onPress={() => { setPreviewState('ready'); setRoute('activation'); }} />}
           >
-            <BthKeyValueList
+            <KeyValueList
               items={[
                 { label: 'المتجر', value: 'محمصة الساحة - حي الياسمين' },
                 { label: 'نوع المهمة', value: 'تفعيل أولي + مراجعة جاهزية', tone: 'brand' },
@@ -550,16 +550,16 @@ export function FieldSurfaceHost() {
                 { label: 'الخطوة التالية', value: 'فتح طلب التفعيل ثم الانتقال لتثبيت الموقع' },
               ]}
             />
-          </BthCard>
+          </Card>
 
-          <BthSurface tone="default" padding={5} gap={4} radiusToken="xl">
-            <BthSectionHeader
+          <Surface tone="default" padding={5} gap={4} radiusToken="xl">
+            <SectionHeader
               title="الزيارات القريبة"
               subtitle="قائمة تشغيلية سريعة بدلاً من مساحة وصفية عامة."
             />
-            <BthBox gap={2}>
+            <Box gap={2}>
               {filteredFieldVisits.map((item) => (
-                <BthListItem
+                <ListItem
                   key={item.id}
                   title={item.title}
                   subtitle={item.subtitle}
@@ -583,22 +583,22 @@ export function FieldSurfaceHost() {
                 />
               ))}
               {filteredFieldVisits.length === 0 ? (
-                <BthSurface tone="inset" padding={4} gap={2} radiusToken="lg">
-                  <BthText role="bodyStrong">لا توجد نتائج مطابقة</BthText>
-                  <BthText role="bodySm" tone="muted">جرّب اسم متجر آخر أو امسح خانة البحث للعودة إلى الزيارات القريبة.</BthText>
-                </BthSurface>
+                <Surface tone="inset" padding={4} gap={2} radiusToken="lg">
+                  <Text role="bodyStrong">لا توجد نتائج مطابقة</Text>
+                  <Text role="bodySm" tone="muted">جرّب اسم متجر آخر أو امسح خانة البحث للعودة إلى الزيارات القريبة.</Text>
+                </Surface>
               ) : null}
-            </BthBox>
-          </BthSurface>
+            </Box>
+          </Surface>
 
-          <BthSurface tone="default" padding={5} gap={4} radiusToken="xl">
-            <BthSectionHeader
+          <Surface tone="default" padding={5} gap={4} radiusToken="xl">
+            <SectionHeader
               title="اختصارات التنفيذ"
               subtitle="إجراءات مباشرة إلى مسارات العمل الأساسية."
             />
-            <BthBox gap={3}>
+            <Box gap={3}>
               {shortcuts.map((item, index) => (
-                <BthButton
+                <Button
                   key={item}
                   label={item}
                   tone="secondary"
@@ -624,19 +624,19 @@ export function FieldSurfaceHost() {
                   }}
                 />
               ))}
-            </BthBox>
-          </BthSurface>
+            </Box>
+          </Surface>
 
-          <BthSurface tone="inset" padding={4} gap={2} radiusToken="lg">
-            <BthText role="label">حكم معماري</BthText>
-            <BthText role="bodySm" tone="muted">app-field يبدأ من shell تشغيلية طويلة الأمد، بينما تبقى معاينات Phase 12 داخل المسارات نفسها للتحقق قبل الإغلاق النهائي.</BthText>
-          </BthSurface>
+          <Surface tone="inset" padding={4} gap={2} radiusToken="lg">
+            <Text role="label">حكم معماري</Text>
+            <Text role="bodySm" tone="muted">app-field يبدأ من shell تشغيلية طويلة الأمد، بينما تبقى معاينات Phase 12 داخل المسارات نفسها للتحقق قبل الإغلاق النهائي.</Text>
+          </Surface>
 
-          <BthButton label="افتح مساحة العمل" onPress={() => setRoute('entry')} />
-        </BthMobileScrollView>
-      </BthSurface>
+          <Button label="افتح مساحة العمل" onPress={() => setRoute('entry')} />
+        </MobileScrollView>
+      </Surface>
       {accountSheet}
-    </BthBox>
+    </Box>
   );
 }
 

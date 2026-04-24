@@ -1,14 +1,14 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthKeyValueList,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthStateView,
-  BthSurface,
-  BthSwitch,
-  BthText,
+  Box,
+  Button,
+  KeyValueList,
+  MobileScrollView,
+  SectionHeader,
+  StateView,
+  Surface,
+  Switch,
+  Text,
 } from '@bthwani/ui-kit';
 
 export type DshPartnerStoreMaintenanceWorkspaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
@@ -78,12 +78,12 @@ const demoServiceModes: DshPartnerServiceMode[] = [
 
 function renderState(state: Exclude<DshPartnerStoreMaintenanceWorkspaceState, 'ready' | 'disabled'>, onRetry?: () => void) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title="لا يوجد ملف فرع محمّل"
         description="أعد تحميل مساحة الصيانة قبل تغيير التوفر أو القنوات أو أوقات العمل."
@@ -95,7 +95,7 @@ function renderState(state: Exclude<DshPartnerStoreMaintenanceWorkspaceState, 'r
 
   if (state === 'offline') {
     return (
-      <BthStateView
+      <StateView
         stateId="offline"
         title="مساحة الصيانة غير متصلة"
         description="أعد المحاولة عندما تعود الشبكة مع إبقاء سياق الفرع محفوظًا."
@@ -106,7 +106,7 @@ function renderState(state: Exclude<DshPartnerStoreMaintenanceWorkspaceState, 'r
   }
 
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title="تعذر فتح مساحة الصيانة"
       description="أعد المحاولة دون فقدان سياق الفرع الحالي."
@@ -139,17 +139,17 @@ export function DshPartnerStoreMaintenanceWorkspaceScreen({
   const isDisabled = state === 'disabled';
 
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">مساحة صيانة الفرع</BthText>
-        <BthText role="bodyMd" tone="muted">
+    <MobileScrollView padding={4} gap={4}>
+      <Box gap={2}>
+        <Text role="titleLg">مساحة صيانة الفرع</Text>
+        <Text role="bodyMd" tone="muted">
           تبقى حالة المتجر والقنوات والأوقات والمناطق في مساحة واحدة واضحة وسريعة.
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthSurface tone="brand" gap={3}>
-        <BthSectionHeader title="ملف الفرع" subtitle="ابدأ من ملخص واضح واحد قبل أي تعديل تشغيلي." />
-        <BthKeyValueList
+      <Surface tone="brand" gap={3}>
+        <SectionHeader title="ملف الفرع" subtitle="ابدأ من ملخص واضح واحد قبل أي تعديل تشغيلي." />
+        <KeyValueList
           items={[
             { label: 'المتجر', value: profile.storeName },
             { label: 'الفرع', value: profile.branchLabel },
@@ -159,31 +159,31 @@ export function DshPartnerStoreMaintenanceWorkspaceScreen({
             { label: 'منطقة التغطية', value: profile.activeZoneLabel, tone: 'brand' },
           ]}
         />
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader title="حالة التوفر" subtitle="التشغيل والظهور منفصلان حتى تبقى القرارات واضحة." />
-        <BthSwitch
+      <Surface tone="raised" gap={3}>
+        <SectionHeader title="حالة التوفر" subtitle="التشغيل والظهور منفصلان حتى تبقى القرارات واضحة." />
+        <Switch
           label="المتجر مفتوح"
           description="يتحكم في استقبال أعمال DSH الجديدة لهذا الفرع."
           value={storeOpen}
           disabled={isDisabled}
           onValueChange={onToggleStoreOpen}
         />
-        <BthSwitch
+        <Switch
           label="الظهور في القوائم"
           description="يتحكم في ظهور الفرع للمستخدمين دون تغيير هوية المتجر."
           value={listingEnabled}
           disabled={isDisabled}
           onValueChange={onToggleListingEnabled}
         />
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="default" gap={3}>
-        <BthSectionHeader title="قنوات الخدمة" subtitle="كل قناة لها مفتاح مستقل حتى يبقى السجل التشغيلي واضحًا." />
-        <BthBox gap={2}>
+      <Surface tone="default" gap={3}>
+        <SectionHeader title="قنوات الخدمة" subtitle="كل قناة لها مفتاح مستقل حتى يبقى السجل التشغيلي واضحًا." />
+        <Box gap={2}>
           {serviceModes.map((mode) => (
-            <BthSwitch
+            <Switch
               key={mode.id}
               label={mode.label}
               description={mode.description}
@@ -192,21 +192,21 @@ export function DshPartnerStoreMaintenanceWorkspaceScreen({
               onValueChange={(nextValue) => onToggleServiceMode?.(mode.id, nextValue)}
             />
           ))}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader title="إجراءات الفرع" subtitle="الأوقات والمناطق والعمليات تبقى خطوة واحدة بعيدة." />
-        <BthBox gap={2}>
-          <BthButton label="تحديث أوقات العمل" tone="secondary" onPress={onOpenHours} disabled={isDisabled} />
-          <BthButton label="تحديث مناطق التغطية" tone="secondary" onPress={onOpenZones} disabled={isDisabled} />
-          <BthButton label="فتح لوحة العمليات" tone="ghost" onPress={onOpenDeliveryBoard} disabled={isDisabled} />
-          <BthButton label="فتح دليل الدعم" tone="ghost" onPress={onOpenSupportDirectory} disabled={isDisabled} />
-        </BthBox>
-      </BthSurface>
+      <Surface tone="raised" gap={3}>
+        <SectionHeader title="إجراءات الفرع" subtitle="الأوقات والمناطق والعمليات تبقى خطوة واحدة بعيدة." />
+        <Box gap={2}>
+          <Button label="تحديث أوقات العمل" tone="secondary" onPress={onOpenHours} disabled={isDisabled} />
+          <Button label="تحديث مناطق التغطية" tone="secondary" onPress={onOpenZones} disabled={isDisabled} />
+          <Button label="فتح لوحة العمليات" tone="ghost" onPress={onOpenDeliveryBoard} disabled={isDisabled} />
+          <Button label="فتح دليل الدعم" tone="ghost" onPress={onOpenSupportDirectory} disabled={isDisabled} />
+        </Box>
+      </Surface>
 
-      <BthButton label="حفظ التغييرات" onPress={onSave} disabled={isDisabled} />
-    </BthMobileScrollView>
+      <Button label="حفظ التغييرات" onPress={onSave} disabled={isDisabled} />
+    </MobileScrollView>
   );
 }
 

@@ -1,12 +1,12 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthStateView,
-  BthSurface,
-  BthText,
+  Box,
+  Button,
+  MobileScrollView,
+  SectionHeader,
+  StateView,
+  Surface,
+  Text,
 } from '@bthwani/ui-kit';
 
 export type PartnerOrderDetailScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'disabled';
@@ -41,7 +41,7 @@ const demoSummary: PartnerOrderDetailSummary = {
 
 function renderLoadingState() {
   return (
-    <BthStateView
+    <StateView
       stateId="loading"
       title="Loading order detail"
       description="Bring only the context needed for the next operational decision."
@@ -51,7 +51,7 @@ function renderLoadingState() {
 
 function renderEmptyState(onBackToInbox?: () => void) {
   return (
-    <BthStateView
+    <StateView
       stateId="empty"
       title="No order selected"
       description="Open the inbox and pick the next queued order."
@@ -63,8 +63,8 @@ function renderEmptyState(onBackToInbox?: () => void) {
 
 function renderErrorState(onRetry?: () => void, onBackToInbox?: () => void) {
   return (
-    <BthMobileScrollView padding={4} gap={3}>
-      <BthStateView
+    <MobileScrollView padding={4} gap={3}>
+      <StateView
         stateId="recoverableError"
         title="Order detail is unavailable"
         description="Retry this order or return to inbox to keep the queue moving."
@@ -72,24 +72,24 @@ function renderErrorState(onRetry?: () => void, onBackToInbox?: () => void) {
         onActionPress={onRetry}
       />
       {onBackToInbox ? (
-        <BthButton label="Back to inbox" tone="secondary" onPress={onBackToInbox} />
+        <Button label="Back to inbox" tone="secondary" onPress={onBackToInbox} />
       ) : null}
-    </BthMobileScrollView>
+    </MobileScrollView>
   );
 }
 
 function renderDisabledState(reason: string, onBackToInbox?: () => void) {
   return (
-    <BthMobileScrollView padding={4} gap={3}>
-      <BthStateView
+    <MobileScrollView padding={4} gap={3}>
+      <StateView
         kind="warning"
         title="This order is temporarily locked"
         description={reason}
       />
       {onBackToInbox ? (
-        <BthButton label="Back to inbox" tone="secondary" onPress={onBackToInbox} />
+        <Button label="Back to inbox" tone="secondary" onPress={onBackToInbox} />
       ) : null}
-    </BthMobileScrollView>
+    </MobileScrollView>
   );
 }
 
@@ -119,50 +119,50 @@ export function PartnerOrderDetailScreen({
   }
 
   return (
-    <BthMobileScrollView padding={4} gap={3}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">Order detail</BthText>
-        <BthText role="bodySm" tone="muted">
+    <MobileScrollView padding={4} gap={3}>
+      <Box gap={2}>
+        <Text role="titleLg">Order detail</Text>
+        <Text role="bodySm" tone="muted">
           Detail supports one decision: execute the current order action, then move to the next inbox order.
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
+      <Surface tone="raised" gap={3}>
+        <SectionHeader
           title="Order summary"
           subtitle="Only the fields needed to validate this decision."
         />
-        <BthBox gap={1}>
-          <BthText role="bodyStrong">Order #{summary.orderId.replace('partner-order-', '')}</BthText>
-          <BthText role="bodySm" tone="muted">
+        <Box gap={1}>
+          <Text role="bodyStrong">Order #{summary.orderId.replace('partner-order-', '')}</Text>
+          <Text role="bodySm" tone="muted">
             {summary.merchantName} | Customer: {summary.customerName}
-          </BthText>
-          <BthText role="caption" tone="soft">
+          </Text>
+          <Text role="caption" tone="soft">
             {summary.serviceWindowLabel}
-          </BthText>
-        </BthBox>
-      </BthSurface>
+          </Text>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="brand" gap={3}>
-        <BthSectionHeader
+      <Surface tone="brand" gap={3}>
+        <SectionHeader
           title="Next action"
           subtitle="Primary CTA stays operational and explicit."
         />
-        <BthBox gap={1}>
-          <BthText role="bodyStrong">{summary.nextActionLabel}</BthText>
-          <BthText role="bodySm" tone="muted">
+        <Box gap={1}>
+          <Text role="bodyStrong">{summary.nextActionLabel}</Text>
+          <Text role="bodySm" tone="muted">
             {summary.readinessNote}
-          </BthText>
-        </BthBox>
-        <BthButton
+          </Text>
+        </Box>
+        <Button
           label="Confirm ready for pickup"
           onPress={() => onConfirmReady?.(summary.orderId)}
         />
-      </BthSurface>
+      </Surface>
 
-      <BthButton label="Open next order" tone="secondary" onPress={onOpenNextOrder} />
-      <BthButton label="Back to inbox" tone="ghost" onPress={onBackToInbox} />
-    </BthMobileScrollView>
+      <Button label="Open next order" tone="secondary" onPress={onOpenNextOrder} />
+      <Button label="Back to inbox" tone="ghost" onPress={onBackToInbox} />
+    </MobileScrollView>
   );
 }
 

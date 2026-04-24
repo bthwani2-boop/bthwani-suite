@@ -1,15 +1,15 @@
 import React from 'react';
 import { Pressable, ScrollView } from 'react-native';
 import {
-  BthBox,
-  BthBadge,
-  BthButton,
-  BthCheckbox,
-  BthChip,
-  BthSurface,
-  BthSectionHeader,
-  BthText,
+  Badge,
+  Box,
+  Button,
+  Checkbox,
+  Chip,
+  SectionHeader,
   spacing,
+  Surface,
+  Text,
   useTheme,
 } from '@bthwani/ui-kit';
 import { subscriptionHeroCopy, subscriptionPlanCards, type SubscriptionPlanCard } from '../subscriptionsCommercialDeck';
@@ -31,7 +31,7 @@ function SubscriptionPlanTile({
 
   return (
     <Pressable accessibilityRole="button" accessibilityState={{ selected }} onPress={onPress} style={{ width: 120 }}>
-      <BthSurface
+      <Surface
         tone="raised"
         gap={1}
         padding={2}
@@ -48,19 +48,19 @@ function SubscriptionPlanTile({
           transform: [{ translateY: selected ? 6 : 0 }],
         }}
       >
-        <BthBox gap={0} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <BthText role="bodyStrong">باقة</BthText>
-          <BthText role="titleLg" style={{ color: selected ? theme.brand : undefined }}>
+        <Box gap={0} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Text role="bodyStrong">باقة</Text>
+          <Text role="titleLg" style={{ color: selected ? theme.brand : undefined }}>
             {plan.price}
-          </BthText>
-          <BthText role="bodySm" tone="muted">
+          </Text>
+          <Text role="bodySm" tone="muted">
             {plan.cadence}
-          </BthText>
-        </BthBox>
-        <BthText role="caption" style={{ color: selected ? theme.brand : undefined }} align="center">
+          </Text>
+        </Box>
+        <Text role="caption" style={{ textAlign: 'center', color: selected ? theme.brand : undefined }}>
           {plan.title}
-        </BthText>
-      </BthSurface>
+        </Text>
+      </Surface>
     </Pressable>
   );
 }
@@ -104,16 +104,16 @@ export function SubscriptionsPage({ compact = false }: SubscriptionsPageProps) {
   };
 
   return (
-    <BthBox gap={compact ? 2 : 3}>
-      <BthSurface tone="raised" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader
+    <Box gap={compact ? 2 : 3}>
+      <Surface tone="raised" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader
           title={subscriptionHeroCopy.title}
           subtitle={subscriptionHeroCopy.subtitle}
-          trailing={<BthBadge tone="brand" label={subscriptionHeroCopy.eyebrow} />}
+          trailing={<Badge tone="brand" label={subscriptionHeroCopy.eyebrow} />}
         />
-      </BthSurface>
+      </Surface>
 
-      <BthSurface
+      <Surface
         gap={3}
         padding={compact ? 2 : 3}
         style={{
@@ -124,7 +124,7 @@ export function SubscriptionsPage({ compact = false }: SubscriptionsPageProps) {
         }}
       >
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: spacing[1] }}>
-          <BthBox layoutDirection="row" gap={2}>
+          <Box layoutDirection="row" gap={2}>
             {visiblePlans.map((plan) => (
               <SubscriptionPlanTile
                 key={plan.id}
@@ -133,66 +133,49 @@ export function SubscriptionsPage({ compact = false }: SubscriptionsPageProps) {
                 onPress={() => setSelectedPlanId(plan.id)}
               />
             ))}
-          </BthBox>
+          </Box>
         </ScrollView>
-      </BthSurface>
+      </Surface>
 
-      <BthSurface
-        tone="default"
-        gap={0}
-        padding={2}
-        style={{
-          borderRadius: 18,
-          backgroundColor: theme.brandSurface,
-          borderWidth: 0,
-        }}
-      >
-        <BthBox layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-          <BthText role="bodyStrong">استعراض الباقات المميزة</BthText>
-          <BthText role="titleSm">‹</BthText>
-        </BthBox>
-      </BthSurface>
+      <Surface tone="default" gap={0} padding={2} style={{ borderRadius: 18, backgroundColor: theme.brandSurface, borderWidth: 0 }}>
+        <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text role="bodyStrong">استعراض الباقات المميزة</Text>
+          <Text role="titleSm">‹</Text>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="raised" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.line }}>
-        <BthBox gap={0} style={{ alignItems: 'flex-end' }}>
-          <BthText role="titleSm">طريقة الدفع</BthText>
-          <BthText role="bodySm" tone="muted">
-            الدفع عند أول طلب.
-          </BthText>
-        </BthBox>
+      <Surface tone="raised" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.line }}>
+        <Box gap={0} style={{ alignItems: 'flex-end' }}>
+          <Text role="titleSm">طريقة الدفع</Text>
+          <Text role="bodySm" tone="muted">الدفع عند أول طلب.</Text>
+        </Box>
 
-        <BthBox layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-          <BthBox gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
-            <BthText role="bodyStrong">{selectedPaymentProfile.label}</BthText>
-            <BthText role="bodySm" tone="muted">
-              {selectedPaymentProfile.detail}
-            </BthText>
-          </BthBox>
-          <BthChip label="تغيير" tone="brand" onPress={togglePaymentProfile} />
-        </BthBox>
+        <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+            <Text role="bodyStrong">{selectedPaymentProfile.label}</Text>
+            <Text role="bodySm" tone="muted">{selectedPaymentProfile.detail}</Text>
+          </Box>
+          <Chip label="تغيير" tone="brand" onPress={togglePaymentProfile} />
+        </Box>
 
-        <BthSurface tone="inset" gap={2} padding={2} style={{ borderWidth: 1, borderColor: theme.line }}>
-          <BthBox layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-            <BthText role="bodyStrong">هل لديك قسيمة اشتراك؟</BthText>
-            <BthChip label="إضافة" tone="brand" onPress={() => setCouponOpen((value) => !value)} />
-          </BthBox>
-          {couponOpen ? <BthText role="caption" tone="muted">يمكن إضافة القسيمة من هنا.</BthText> : null}
-        </BthSurface>
+        <Surface tone="inset" gap={2} padding={2} style={{ borderWidth: 1, borderColor: theme.line }}>
+          <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text role="bodyStrong">هل لديك قسيمة اشتراك؟</Text>
+            <Chip label="إضافة" tone="brand" onPress={() => setCouponOpen((value) => !value)} />
+          </Box>
+          {couponOpen ? <Text role="caption" tone="muted">يمكن إضافة القسيمة من هنا.</Text> : null}
+        </Surface>
 
-        <BthCheckbox
-          label="التجديد التلقائي للاشتراك عند الانتهاء"
-          checked={autoRenew}
-          onCheckedChange={setAutoRenew}
-        />
+        <Checkbox label="التجديد التلقائي للاشتراك عند الانتهاء" checked={autoRenew} onCheckedChange={setAutoRenew} />
 
-        <BthBox layoutDirection="row" style={{ alignItems: 'baseline', justifyContent: 'space-between' }}>
-          <BthText role="bodySm" tone="muted">إجمالي الاشتراك</BthText>
-          <BthText role="titleSm">{totalAmount} ريال</BthText>
-        </BthBox>
+        <Box layoutDirection="row" style={{ alignItems: 'baseline', justifyContent: 'space-between' }}>
+          <Text role="bodySm" tone="muted">إجمالي الاشتراك</Text>
+          <Text role="titleSm">{totalAmount} ريال</Text>
+        </Box>
 
-        <BthButton label="اشترك الآن" onPress={applySelectedPlan} />
-      </BthSurface>
-    </BthBox>
+        <Button label="اشترك الآن" onPress={applySelectedPlan} />
+      </Surface>
+    </Box>
   );
 }
 

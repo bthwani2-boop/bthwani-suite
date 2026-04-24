@@ -19,7 +19,6 @@ import {
 	resolveDirectionFromLanguage,
 	resolveSemanticTheme,
 	type Language,
-	type BthLanguage,
 	type Direction,
 	type SemanticTheme,
 	type ThemeMode,
@@ -30,14 +29,10 @@ export type RootConfig = {
 	themeMode?: ThemeMode;
 };
 
-export type BthRootConfig = RootConfig;
-
 export const ROOT_DEFAULTS: Required<Pick<RootConfig, 'language' | 'themeMode'>> = {
 	language: directionConfig.defaultLanguage,
 	themeMode: 'light',
 };
-
-export const BTH_ROOT_DEFAULTS = ROOT_DEFAULTS;
 
 type DirectionContextValue = {
 	direction: Direction;
@@ -300,15 +295,11 @@ export function PortalHost({ children }: { children?: ReactNode }) {
 	);
 }
 
-export const BthPortalHost = PortalHost;
-
 export type PortalLayerProps = {
 	active?: boolean;
 	children: ReactNode;
 	fallback?: ReactNode;
 };
-
-export type BthPortalLayerProps = PortalLayerProps;
 
 export function PortalLayer({ active = true, children, fallback = null }: PortalLayerProps) {
 	const { hostElement, isWeb } = useContext(PortalContext);
@@ -330,8 +321,6 @@ export function PortalLayer({ active = true, children, fallback = null }: Portal
 	return <>{children}</>;
 }
 
-export const BthPortalLayer = PortalLayer;
-
 export function UiKitProvider({ language = 'ar', themeMode = 'light', children }: UiKitProviderProps) {
 	return (
 		<TamaguiProvider config={tamaguiConfig} defaultTheme={themeMode === 'dark' || themeMode === 'high-contrast' ? 'dark' : 'light'}>
@@ -348,8 +337,6 @@ export type RootProvidersProps = RootConfig & {
 	children: ReactNode;
 };
 
-export type BthRootProvidersProps = RootProvidersProps;
-
 export function RootProviders({ children, language, themeMode }: RootProvidersProps) {
 	return (
 		<UiKitProvider
@@ -361,8 +348,6 @@ export function RootProviders({ children, language, themeMode }: RootProvidersPr
 	);
 }
 
-export const BthRootProviders = RootProviders;
-
-export type { Language, BthLanguage, Direction, SemanticTheme, ThemeMode } from './foundation';
+export type { Language, Direction, SemanticTheme, ThemeMode } from './foundation';
 
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthListItem } from '@bthwani/ui-kit';
+import { ListItem } from '@bthwani/ui-kit';
 
 type Props = {
   title: string;
@@ -10,5 +10,5 @@ type Props = {
 };
 
 export default function DshWltPaymentOption({ title, subtitle, selected, meta, onPress }: Props) {
-  return <BthListItem title={title} subtitle={subtitle} meta={selected ? 'Selected' : (meta as any)} onPress={onPress} />;
+  return <ListItem title={title} subtitle={subtitle} meta={selected ? 'Selected' : (meta as any)} onPress={onPress} />;
 }

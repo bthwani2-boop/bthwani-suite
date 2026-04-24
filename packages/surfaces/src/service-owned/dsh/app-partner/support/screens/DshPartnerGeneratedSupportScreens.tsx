@@ -1,17 +1,17 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthKeyValueList,
-  BthListItem,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthStateView,
-  BthStatCard,
-  BthSurface,
-  BthTabs,
-  BthText,
-  BthTextField,
+  Box,
+  Button,
+  KeyValueList,
+  ListItem,
+  MobileScrollView,
+  SectionHeader,
+  StateView,
+  StatCard,
+  Surface,
+  Tabs,
+  Text,
+  TextField,
 } from '@bthwani/ui-kit';
 import {
   getMarketingGrowthItems,
@@ -549,12 +549,12 @@ const partnerSupportConfigs: Record<PartnerSupportScreenId, SupportConfig> = {
 
 function renderSupportState(state: Exclude<PartnerSupportScreenState, 'ready' | 'disabled'>, onRetry?: () => void, onBack?: () => void) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title="لا يوجد محتوى دعم محمّل"
         description="أعد تحميل شاشة الدعم وابقِ السياق التشغيلي واضحًا."
@@ -566,7 +566,7 @@ function renderSupportState(state: Exclude<PartnerSupportScreenState, 'ready' | 
 
   if (state === 'offline') {
     return (
-      <BthStateView
+      <StateView
         stateId="offline"
         title="شاشة الدعم غير متصلة"
         description="أعد المحاولة عند عودة الاتصال. يجب أن يبقى السياق التشغيلي ثابتًا."
@@ -578,7 +578,7 @@ function renderSupportState(state: Exclude<PartnerSupportScreenState, 'ready' | 
 
   if (state === 'success') {
     return (
-      <BthStateView
+      <StateView
         stateId="success"
         title="اكتمل الإجراء بنجاح"
         description="انتهت العملية ويمكن للفرع متابعة الخطوة التالية من نفس المسار."
@@ -589,7 +589,7 @@ function renderSupportState(state: Exclude<PartnerSupportScreenState, 'ready' | 
   }
 
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title="تعذّر عرض شاشة الدعم"
       description="أعد المحاولة في الخطوة نفسها دون فقدان سياق الفرع."
@@ -616,23 +616,23 @@ function createPartnerSupportScreen(config: SupportConfig) {
     const isDisabled = state === 'disabled';
 
     return (
-      <BthMobileScrollView padding={4} gap={4}>
-        <BthBox gap={2}>
-          <BthText role="titleLg">{config.title}</BthText>
-          <BthText role="bodyMd" tone="muted">
+      <MobileScrollView padding={4} gap={4}>
+        <Box gap={2}>
+          <Text role="titleLg">{config.title}</Text>
+          <Text role="bodyMd" tone="muted">
             {config.subtitle}
-          </BthText>
-        </BthBox>
+          </Text>
+        </Box>
 
-        <BthSurface tone="brand" gap={3}>
-          <BthSectionHeader title={config.heroTitle} subtitle={config.heroDescription} />
+        <Surface tone="brand" gap={3}>
+          <SectionHeader title={config.heroTitle} subtitle={config.heroDescription} />
           {config.primaryHint ? (
-            <BthText role="bodySm" tone="inverse">
+            <Text role="bodySm" tone="inverse">
               {config.primaryHint}
-            </BthText>
+            </Text>
           ) : null}
           {config.metrics?.map((metric) => (
-            <BthStatCard
+            <StatCard
               key={metric.label}
               label={metric.label}
               value={metric.value}
@@ -640,21 +640,21 @@ function createPartnerSupportScreen(config: SupportConfig) {
               tone={metric.tone ?? 'default'}
             />
           ))}
-        </BthSurface>
+        </Surface>
 
         {config.keyValues?.length ? (
-          <BthSurface tone="raised" gap={3}>
-            <BthSectionHeader title="تفاصيل تشغيلية" subtitle="احتفظ فقط بالبيانات اللازمة للقرار الحالي." />
-            <BthKeyValueList items={config.keyValues} />
-          </BthSurface>
+          <Surface tone="raised" gap={3}>
+            <SectionHeader title="تفاصيل تشغيلية" subtitle="احتفظ فقط بالبيانات اللازمة للقرار الحالي." />
+            <KeyValueList items={config.keyValues} />
+          </Surface>
         ) : null}
 
         {config.listItems?.length ? (
-          <BthSurface tone="default" gap={3}>
-            <BthSectionHeader title="العناصر الحالية" subtitle="تظل القائمة مختصرة حتى يتحرك المشغّل دون ضجيج." />
-            <BthBox gap={2}>
+          <Surface tone="default" gap={3}>
+            <SectionHeader title="العناصر الحالية" subtitle="تظل القائمة مختصرة حتى يتحرك المشغّل دون ضجيج." />
+            <Box gap={2}>
               {config.listItems.map((item) => (
-                <BthListItem
+                <ListItem
                   key={`${config.id}-${item.title}`}
                   title={item.title}
                   subtitle={item.subtitle}
@@ -662,28 +662,28 @@ function createPartnerSupportScreen(config: SupportConfig) {
                   badgeLabel={item.badgeLabel}
                 />
               ))}
-            </BthBox>
-          </BthSurface>
+            </Box>
+          </Surface>
         ) : null}
 
         {config.inputLabel ? (
-          <BthSurface tone="raised" gap={3}>
-            <BthSectionHeader title="مدخل مختصر" subtitle="لا نجمع إلا إدخالًا واحدًا واضحًا في كل مرة." />
-            <BthTextField
+          <Surface tone="raised" gap={3}>
+            <SectionHeader title="مدخل مختصر" subtitle="لا نجمع إلا إدخالًا واحدًا واضحًا في كل مرة." />
+            <TextField
               label={config.inputLabel}
               value={draftValue}
               onChangeText={setDraftValue}
               hint={config.inputHint}
               editable={!isDisabled}
             />
-          </BthSurface>
+          </Surface>
         ) : null}
 
-        <BthButton label={config.primaryLabel} onPress={onPrimaryAction} disabled={isDisabled} />
+        <Button label={config.primaryLabel} onPress={onPrimaryAction} disabled={isDisabled} />
         {config.secondaryLabel ? (
-          <BthButton label={config.secondaryLabel} tone="secondary" onPress={onSecondaryAction ?? onBack} />
+          <Button label={config.secondaryLabel} tone="secondary" onPress={onSecondaryAction ?? onBack} />
         ) : null}
-      </BthMobileScrollView>
+      </MobileScrollView>
     );
   };
 }
@@ -829,34 +829,34 @@ export function DshPartnerVideoUploadScreen({
   }
 
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">{screenTitle}</BthText>
-        <BthText role="bodyMd" tone="muted">
+    <MobileScrollView padding={4} gap={4}>
+      <Box gap={2}>
+        <Text role="titleLg">{screenTitle}</Text>
+        <Text role="bodyMd" tone="muted">
           {screenSubtitle}
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthSurface tone="brand" gap={3}>
-        <BthSectionHeader title={heroTitle} subtitle={heroDescription} />
-        <BthText role="bodySm" tone="inverse">
+      <Surface tone="brand" gap={3}>
+        <SectionHeader title={heroTitle} subtitle={heroDescription} />
+        <Text role="bodySm" tone="inverse">
           أي فيديو يرفعه الشريك يدخل في طابور التسويق أولًا، ثم يُنشر فقط بعد الموافقة.
-        </BthText>
-        <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+        </Text>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           {queueMetrics.map((metric) => (
-            <BthStatCard key={metric.label} label={metric.label} value={metric.value} tone={metric.tone} />
+            <StatCard key={metric.label} label={metric.label} value={metric.value} tone={metric.tone} />
           ))}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader title="بيانات الفيديو" subtitle="رفع واحد واضح ثم مراجعة واحدة واضحة من التسويق." />
-        <BthTextField label="عنوان الفيديو" value={draft.title} onChangeText={(value) => setDraft((current) => ({ ...current, title: value }))} />
-        <BthTextField label="وصف الفيديو" value={draft.subtitle} onChangeText={(value) => setDraft((current) => ({ ...current, subtitle: value }))} multiline numberOfLines={3} />
-        <BthTextField label="رابط الفيديو" value={draft.videoUrl} onChangeText={(value) => setDraft((current) => ({ ...current, videoUrl: value }))} hint="مثال: /media/shorts/partner-launch.mp4" />
-        <BthTextField label="صورة الغلاف" value={draft.posterUrl} onChangeText={(value) => setDraft((current) => ({ ...current, posterUrl: value }))} hint="مثال: /media/shorts/partner-launch.jpg" />
+      <Surface tone="raised" gap={3}>
+        <SectionHeader title="بيانات الفيديو" subtitle="رفع واحد واضح ثم مراجعة واحدة واضحة من التسويق." />
+        <TextField label="عنوان الفيديو" value={draft.title} onChangeText={(value) => setDraft((current) => ({ ...current, title: value }))} />
+        <TextField label="وصف الفيديو" value={draft.subtitle} onChangeText={(value) => setDraft((current) => ({ ...current, subtitle: value }))} multiline numberOfLines={3} />
+        <TextField label="رابط الفيديو" value={draft.videoUrl} onChangeText={(value) => setDraft((current) => ({ ...current, videoUrl: value }))} hint="مثال: /media/shorts/partner-launch.mp4" />
+        <TextField label="صورة الغلاف" value={draft.posterUrl} onChangeText={(value) => setDraft((current) => ({ ...current, posterUrl: value }))} hint="مثال: /media/shorts/partner-launch.jpg" />
 
-        <BthTabs<MarketingGrowthRouteTarget>
+        <Tabs<MarketingGrowthRouteTarget>
           items={[
             { value: 'home', label: 'الرئيسية' },
             { value: 'main_category', label: 'فئة رئيسية' },
@@ -872,40 +872,40 @@ export function DshPartnerVideoUploadScreen({
           variant="pill"
         />
 
-        <BthSurface tone="inset" gap={2}>
-          <BthText role="bodyStrong">الوجهة المباشرة</BthText>
-          <BthText role="bodySm" tone="muted">{routeTargetLabel(draft.routeTarget)} · هذا هو المسار الذي يفتحه CTA داخل الريلز.</BthText>
-        </BthSurface>
+        <Surface tone="inset" gap={2}>
+          <Text role="bodyStrong">الوجهة المباشرة</Text>
+          <Text role="bodySm" tone="muted">{routeTargetLabel(draft.routeTarget)} · هذا هو المسار الذي يفتحه CTA داخل الريلز.</Text>
+        </Surface>
 
         {routeTargetNeedsPrimaryInput(draft.routeTarget) ? (
-          <BthTextField label={routeTargetPrimaryLabel(draft.routeTarget)} value={draft.routeTargetId} onChangeText={(value) => setDraft((current) => ({ ...current, routeTargetId: value }))} hint={routeTargetPrimaryHint(draft.routeTarget)} />
+          <TextField label={routeTargetPrimaryLabel(draft.routeTarget)} value={draft.routeTargetId} onChangeText={(value) => setDraft((current) => ({ ...current, routeTargetId: value }))} hint={routeTargetPrimaryHint(draft.routeTarget)} />
         ) : null}
 
         {routeTargetNeedsSecondaryInput(draft.routeTarget) ? (
-          <BthTextField label={routeTargetSecondaryLabel(draft.routeTarget)} value={draft.routeTargetExtra} onChangeText={(value) => setDraft((current) => ({ ...current, routeTargetExtra: value }))} hint={routeTargetSecondaryHint(draft.routeTarget)} />
+          <TextField label={routeTargetSecondaryLabel(draft.routeTarget)} value={draft.routeTargetExtra} onChangeText={(value) => setDraft((current) => ({ ...current, routeTargetExtra: value }))} hint={routeTargetSecondaryHint(draft.routeTarget)} />
         ) : null}
 
-        <BthTextField label="نص الزر" value={draft.ctaLabel} onChangeText={(value) => setDraft((current) => ({ ...current, ctaLabel: value }))} />
-        <BthTextField label="الجملة البارزة" value={draft.highlight} onChangeText={(value) => setDraft((current) => ({ ...current, highlight: value }))} />
-        <BthTextField label="لون التمييز" value={draft.accentColor} onChangeText={(value) => setDraft((current) => ({ ...current, accentColor: value }))} hint="مثال: #0f766e" />
-      </BthSurface>
+        <TextField label="نص الزر" value={draft.ctaLabel} onChangeText={(value) => setDraft((current) => ({ ...current, ctaLabel: value }))} />
+        <TextField label="الجملة البارزة" value={draft.highlight} onChangeText={(value) => setDraft((current) => ({ ...current, highlight: value }))} />
+        <TextField label="لون التمييز" value={draft.accentColor} onChangeText={(value) => setDraft((current) => ({ ...current, accentColor: value }))} hint="مثال: #0f766e" />
+      </Surface>
 
-      <BthSurface tone="inset" gap={3}>
-        <BthSectionHeader title="المدخل الحالي" subtitle="لا يظهر هذا الفيديو للعميل حتى يوافق عليه التسويق." />
-        <BthBox gap={1}>
-          <BthText role="bodyStrong">{draft.title}</BthText>
-          <BthText role="bodySm" tone="muted">{draft.subtitle}</BthText>
-        </BthBox>
-      </BthSurface>
+      <Surface tone="inset" gap={3}>
+        <SectionHeader title="المدخل الحالي" subtitle="لا يظهر هذا الفيديو للعميل حتى يوافق عليه التسويق." />
+        <Box gap={1}>
+          <Text role="bodyStrong">{draft.title}</Text>
+          <Text role="bodySm" tone="muted">{draft.subtitle}</Text>
+        </Box>
+      </Surface>
 
-      <BthButton label="إرسال الفيديو للمراجعة" onPress={handleSubmit} disabled={isDisabled} />
-      <BthButton label="العودة إلى دليل الدعم" tone="secondary" onPress={onSecondaryAction ?? onBack} />
+      <Button label="إرسال الفيديو للمراجعة" onPress={handleSubmit} disabled={isDisabled} />
+      <Button label="العودة إلى دليل الدعم" tone="secondary" onPress={onSecondaryAction ?? onBack} />
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader title="الفيديوهات الحالية" subtitle="هنا ترى ما هو في المراجعة أو ما تم نشره بالفعل." />
-        <BthBox gap={2}>
+      <Surface tone="raised" gap={3}>
+        <SectionHeader title="الفيديوهات الحالية" subtitle="هنا ترى ما هو في المراجعة أو ما تم نشره بالفعل." />
+        <Box gap={2}>
           {queuedVideos.length > 0 ? queuedVideos.map((item) => (
-            <BthListItem
+            <ListItem
               key={item.id}
               title={item.title}
               subtitle={`${item.subtitle} · ${item.source === 'partner' ? 'من الشريك' : 'من التسويق'}`}
@@ -913,11 +913,11 @@ export function DshPartnerVideoUploadScreen({
               badgeLabel="شورتات"
             />
           )) : (
-            <BthText role="bodySm" tone="muted">لا توجد فيديوهات محفوظة بعد.</BthText>
+            <Text role="bodySm" tone="muted">لا توجد فيديوهات محفوظة بعد.</Text>
           )}
-        </BthBox>
-      </BthSurface>
-    </BthMobileScrollView>
+        </Box>
+      </Surface>
+    </MobileScrollView>
   );
 }
 

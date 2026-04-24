@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-  BthBox,
-  BthListItem,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthSurface,
-  BthText,
+  Box,
+  ListItem,
+  MobileScrollView,
+  SectionHeader,
+  Surface,
+  Text,
 } from '@bthwani/ui-kit';
 import type { PartnerSupportScreenId } from './DshPartnerGeneratedSupportScreens';
 
@@ -79,20 +79,20 @@ const groups: Array<{
 
 export function DshPartnerSupportDirectoryScreen({ onOpenScreen }: DshPartnerSupportDirectoryScreenProps) {
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">دليل دعم الشريك</BthText>
-        <BthText role="bodyMd" tone="muted">
+    <MobileScrollView padding={4} gap={4}>
+      <Box gap={2}>
+        <Text role="titleLg">دليل دعم الشريك</Text>
+        <Text role="bodyMd" tone="muted">
           دليل مركزي لبقية أسطح دعم الشريك في DSH حتى يصل مشغلو الفروع إلى كل مسار من مكان واحد واضح.
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
       {groups.map((group) => (
-        <BthSurface key={group.title} tone="raised" gap={3}>
-          <BthSectionHeader title={group.title} subtitle={group.subtitle} />
-          <BthBox gap={2}>
+        <Surface key={group.title} tone="raised" gap={3}>
+          <SectionHeader title={group.title} subtitle={group.subtitle} />
+          <Box gap={2}>
             {group.items.map((item) => (
-              <BthListItem
+              <ListItem
                 key={item.id}
                 title={item.title}
                 subtitle={item.subtitle}
@@ -101,10 +101,10 @@ export function DshPartnerSupportDirectoryScreen({ onOpenScreen }: DshPartnerSup
                 onPress={() => onOpenScreen?.(item.id)}
               />
             ))}
-          </BthBox>
-        </BthSurface>
+          </Box>
+        </Surface>
       ))}
-    </BthMobileScrollView>
+    </MobileScrollView>
   );
 }
 

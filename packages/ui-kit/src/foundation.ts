@@ -292,7 +292,6 @@ export type FontFamilyToken = keyof typeof fontFamilies;
 export type FontWeightToken = keyof typeof fontWeights;
 export type Direction = 'rtl' | 'ltr';
 export type Language = 'ar' | 'en' | string;
-export type BthLanguage = Language;
 export type LogicalTextAlign = 'start' | 'center' | 'end';
 
 export const neutralPalette = rawColorPalettes.neutral;
@@ -418,7 +417,7 @@ export function resolveRowDirection(direction: Direction, reversed = false) {
 	return baseDirection === 'row' ? 'row-reverse' : 'row';
 }
 
-export type BthCssVariableMap = Record<string, string>;
+export type CssVariableMap = Record<string, string>;
 
 function toKebabCase(value: string) {
 	return value
@@ -435,14 +434,14 @@ function toMilliseconds(value: number) {
 	return value === 0 ? '0ms' : `${value}ms`;
 }
 
-function appendVariables(target: BthCssVariableMap, entries: Record<string, string>) {
+function appendVariables(target: CssVariableMap, entries: Record<string, string>) {
 	for (const [name, value] of Object.entries(entries)) {
 		target[name] = value;
 	}
 }
 
 function createPaletteCssVariables() {
-	const variables: BthCssVariableMap = {};
+	const variables: CssVariableMap = {};
 
 	for (const [paletteName, paletteValues] of Object.entries(rawColorPalettes)) {
 		for (const [tokenName, tokenValue] of Object.entries(paletteValues)) {
@@ -458,7 +457,7 @@ function createPaletteCssVariables() {
 }
 
 function createScaleCssVariables(prefix: string, values: Record<string, number>, formatter: (value: number) => string) {
-	const variables: BthCssVariableMap = {};
+	const variables: CssVariableMap = {};
 
 	for (const [tokenName, tokenValue] of Object.entries(values)) {
 		variables[`--bth-${prefix}-${toKebabCase(tokenName)}`] = formatter(tokenValue);
@@ -468,7 +467,7 @@ function createScaleCssVariables(prefix: string, values: Record<string, number>,
 }
 
 function createTypographyCssVariables() {
-	const variables: BthCssVariableMap = {};
+	const variables: CssVariableMap = {};
 
 	for (const [familyName, familyValue] of Object.entries(rawTypographyScale.fontFamilies)) {
 		variables[`--bth-font-family-${toKebabCase(familyName)}`] = familyValue;
@@ -498,7 +497,7 @@ function createTypographyCssVariables() {
 }
 
 export function createTokenCssVariables() {
-	const variables: BthCssVariableMap = {};
+	const variables: CssVariableMap = {};
 
 	appendVariables(variables, createPaletteCssVariables());
 	appendVariables(variables, createScaleCssVariables('spacing', rawSpacingScale, toPixel));
@@ -548,9 +547,7 @@ export function createNativeTokenOutput() {
 }
 
 export const tokenCssVariables = createTokenCssVariables();
-export const bthTokenCssVariables = tokenCssVariables;
 export const nativeTokenOutput = createNativeTokenOutput();
-export const bthNativeTokenOutput = nativeTokenOutput;
 
 export type ThemeMode = 'light' | 'dark' | 'high-contrast';
 
@@ -722,7 +719,7 @@ export function resolveSemanticTheme(mode: ThemeMode) {
 	return semanticThemeByMode[mode];
 }
 
-export type BthThemeCssVariableMap = Record<string, string>;
+export type ThemeCssVariableMap = Record<string, string>;
 
 function toThemeKebabCase(value: string) {
 	return value
@@ -736,7 +733,7 @@ function resolveColorScheme(mode: ThemeMode) {
 }
 
 export function createThemeCssVariables(theme: SemanticTheme) {
-	const variables: BthThemeCssVariableMap = {};
+	const variables: ThemeCssVariableMap = {};
 
 	for (const [themeKey, themeValue] of Object.entries(theme)) {
 		if (themeKey === 'mode') {
@@ -762,7 +759,7 @@ export function createThemeCssBlock(theme: SemanticTheme, selector: string) {
 	return `${selector} {\n${createThemeCssDeclarations(theme)}\n}`;
 }
 
-export function buildBthWebThemeStyleSheet(rootSelector = '[data-bth-root="true"]') {
+export function buildWebThemeStyleSheet(rootSelector = '[data-bth-root="true"]') {
 	return [
 		createTokenCssBlock(rootSelector),
 		createThemeCssBlock(lightTheme, `${rootSelector}, ${rootSelector}[data-bth-theme='light']`),
@@ -770,8 +767,6 @@ export function buildBthWebThemeStyleSheet(rootSelector = '[data-bth-root="true"
 		createThemeCssBlock(highContrastTheme, `${rootSelector}[data-bth-theme='high-contrast']`)
 	].join('\n\n');
 }
-
-export const buildWebThemeStyleSheet = buildBthWebThemeStyleSheet;
 
 export function createNativeThemeOutput(mode: ThemeMode) {
 	return {
@@ -782,12 +777,10 @@ export function createNativeThemeOutput(mode: ThemeMode) {
 }
 
 export const themeModes = Object.freeze(Object.keys(semanticThemeByMode) as ThemeMode[]);
-export const bthThemeModes = themeModes;
 
 export const nativeThemeOutputs = Object.freeze(
 	Object.fromEntries(themeModes.map((mode) => [mode, createNativeThemeOutput(mode)])) as Record<ThemeMode, ReturnType<typeof createNativeThemeOutput>>
 );
-export const bthNativeThemeOutputs = nativeThemeOutputs;
 
 type TamaguiThemeBridge = Record<ThemeMode, Omit<SemanticTheme, 'mode'>>;
 
@@ -803,8 +796,6 @@ export type TamaguiBridge = {
 	defaultThemeByMode: Record<ThemeMode, 'light' | 'dark'>;
 	logicalDirection: typeof directionConfig;
 };
-
-export type BthTamaguiBridge = TamaguiBridge;
 
 export function createTamaguiBridge(): TamaguiBridge {
 	return {
@@ -825,10 +816,8 @@ export function createTamaguiBridge(): TamaguiBridge {
 }
 
 export const tamaguiBridge = createTamaguiBridge();
-export const bthTamaguiBridge = tamaguiBridge;
 
 export type Locale = 'ar' | 'en';
-export type BthLocale = Locale;
 
 export type UiTextCatalogStringLeafShape<T> = {
 	readonly [K in keyof T]: T[K] extends string
@@ -837,21 +826,14 @@ export type UiTextCatalogStringLeafShape<T> = {
 };
 
 export type UiTextCatalogShape = UiTextCatalogStringLeafShape<typeof uiKitLocales.ar.common>;
-export type BthUiTextCatalogStringLeafShape<T> = UiTextCatalogStringLeafShape<T>;
-export type BthUiTextCatalogShape = UiTextCatalogShape;
 
 export const uiTextCatalog = {
 	ar: uiKitLocales.ar.common,
 	en: uiKitLocales.en.common,
 } as const satisfies Record<Locale, UiTextCatalogShape>;
-export const bthUiTextCatalog = uiTextCatalog;
 
 export function getUiText(locale: Locale = 'ar') {
 	return uiTextCatalog[locale];
-}
-
-export function getBthUiText(locale: BthLocale = 'ar') {
-	return getUiText(locale);
 }
 
 export function amountToArabicText(n: number, t: (key: string) => string): string {
@@ -882,3 +864,4 @@ export function amountToArabicText(n: number, t: (key: string) => string): strin
 
 	return inner(n);
 }
+

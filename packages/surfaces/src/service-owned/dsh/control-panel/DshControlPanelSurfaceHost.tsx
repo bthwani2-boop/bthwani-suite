@@ -2,12 +2,12 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { BthBox, BthButton, BthText, useUiText } from '@bthwani/ui-kit';
+import { Box, Button, Text, useUiText } from '@bthwani/ui-kit';
 import {
-  BthWebMissionHeroCard,
-  BthWebSectionCard,
-  BthWebSegmentedTabs,
-  BthWebSignalCard,
+  WebMissionHeroCard,
+  WebSectionCard,
+  WebSegmentedTabs,
+  WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from './operations/dsh/shared/dshControlPanelText';
 import { ControlPanelDshBellScreen } from './operations/dsh/bell';
@@ -182,8 +182,8 @@ function ControlPanelDshOperationsDock() {
   const plannedRoutesCount = 0;
 
   return (
-    <BthBox gap={4}>
-      <BthWebMissionHeroCard
+    <Box gap={4}>
+      <WebMissionHeroCard
         badges={[dockText.liveBadge, dockText.plannedBadge, 'DSH']}
         eyebrow={dockText.dockEyebrow}
         title={dockText.dockTitle}
@@ -197,26 +197,26 @@ function ControlPanelDshOperationsDock() {
         secondaryAction={{ label: dockText.openReassignAction, href: liveRouteHrefs.reassign }}
       />
 
-      <BthBox gap={2}>
-        <BthWebSignalCard title={dockText.liveSignalTitle} value={String(liveRouteItems.length)} description={dockText.liveSignalDescription} tone="best" />
-        <BthWebSignalCard title={dockText.plannedSignalTitle} value={String(plannedRoutesCount)} description={dockText.plannedSignalDescription} />
-        <BthWebSignalCard title={dockText.entrySignalTitle} value="3" description={dockText.entrySignalDescription} />
-      </BthBox>
+      <Box gap={2}>
+        <WebSignalCard title={dockText.liveSignalTitle} value={String(liveRouteItems.length)} description={dockText.liveSignalDescription} tone="best" />
+        <WebSignalCard title={dockText.plannedSignalTitle} value={String(plannedRoutesCount)} description={dockText.plannedSignalDescription} />
+        <WebSignalCard title={dockText.entrySignalTitle} value="3" description={dockText.entrySignalDescription} />
+      </Box>
 
-      <BthWebSectionCard title={dockText.liveRoutesTitle} description={dockText.liveRoutesDescription}>
-        <BthBox gap={2}>
+      <WebSectionCard title={dockText.liveRoutesTitle} description={dockText.liveRoutesDescription}>
+        <Box gap={2}>
           {liveRouteItems.map((item) => (
-            <BthBox key={item.label} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthBox layoutDirection="row" justify="space-between" align="center">
-                <BthText role="bodyStrong">{item.label}</BthText>
-                <BthText role="caption" tone="success">
+            <Box key={item.label} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Box layoutDirection="row" justify="space-between" align="center">
+                <Text role="bodyStrong">{item.label}</Text>
+                <Text role="caption" tone="success">
                   {item.statusLabel}
-                </BthText>
-              </BthBox>
-              <BthText role="bodySm" tone="muted">
+                </Text>
+              </Box>
+              <Text role="bodySm" tone="muted">
                 {item.description}
-              </BthText>
-              <BthButton
+              </Text>
+              <Button
                 label={dockText.openRouteAction}
                 tone="secondary"
                 fullWidth={false}
@@ -226,33 +226,33 @@ function ControlPanelDshOperationsDock() {
                   }
                 }}
               />
-            </BthBox>
+            </Box>
           ))}
-        </BthBox>
-      </BthWebSectionCard>
+        </Box>
+      </WebSectionCard>
 
-      <BthWebSectionCard title={dockText.entrySignalTitle} description={dockText.entrySignalDescription}>
-        <BthBox gap={2}>
-          <BthButton label={dockText.openOrdersAction} onPress={() => router.push(liveRouteHrefs.orders)} />
-          <BthButton label={dockText.openReassignAction} tone="secondary" onPress={() => router.push(liveRouteHrefs.reassign)} />
-          <BthButton label={dockText.openPeakModeAction} tone="secondary" onPress={() => router.push(liveRouteHrefs.peakMode)} />
-          <BthButton label={dockText.openArrivalBellAction} tone="secondary" onPress={() => router.push(liveRouteHrefs.arrivalBell)} />
-        </BthBox>
-      </BthWebSectionCard>
+      <WebSectionCard title={dockText.entrySignalTitle} description={dockText.entrySignalDescription}>
+        <Box gap={2}>
+          <Button label={dockText.openOrdersAction} onPress={() => router.push(liveRouteHrefs.orders)} />
+          <Button label={dockText.openReassignAction} tone="secondary" onPress={() => router.push(liveRouteHrefs.reassign)} />
+          <Button label={dockText.openPeakModeAction} tone="secondary" onPress={() => router.push(liveRouteHrefs.peakMode)} />
+          <Button label={dockText.openArrivalBellAction} tone="secondary" onPress={() => router.push(liveRouteHrefs.arrivalBell)} />
+        </Box>
+      </WebSectionCard>
 
-      <BthWebSectionCard title={marketingTitle} description={marketingDescription}>
-        <BthBox gap={2}>
-          <BthText role="bodySm" tone="muted">
+      <WebSectionCard title={marketingTitle} description={marketingDescription}>
+        <Box gap={2}>
+          <Text role="bodySm" tone="muted">
             {marketingDescription}
-          </BthText>
-          <BthButton
+          </Text>
+          <Button
             label={marketingTitle}
             tone="secondary"
             onPress={() => router.push('/operations/dsh/marketing')}
           />
-        </BthBox>
-      </BthWebSectionCard>
-    </BthBox>
+        </Box>
+      </WebSectionCard>
+    </Box>
   );
 }
 
@@ -281,14 +281,14 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
   ] as const;
 
   return (
-    <BthBox gap={4}>
+    <Box gap={4}>
       {workspace === 'overview' ? <ControlPanelDshOperationsDock /> : null}
       {workspace === 'catalogs' ? <ControlPanelDshCatalogScreen hubHref="/operations/dsh" operationsHref="/operations" partnersHref="/operations/dsh/partners" marketingHref="/operations/dsh/marketing" /> : null}
       {workspace === 'partners' ? <ControlPanelDshPartnerApprovalsScreen hubHref="/operations/dsh" operationsHref="/operations" catalogHref="/operations/dsh/catalogs" marketingHref="/operations/dsh/marketing" /> : null}
       {workspace === 'marketing' ? <ControlPanelDshMarketingScreen hubHref="/operations/dsh" operationsHref="/operations" /> : null}
 
       {workspace !== 'overview' ? (
-        <BthWebSegmentedTabs
+        <WebSegmentedTabs
           ariaLabel={uiText.controlPanel.surfaceTitles.operations}
           items={tabs}
           onSelect={(workspaceId) => {
@@ -318,7 +318,7 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
       {workspace === 'peak-mode' ? <ControlPanelDshPeakModeScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
       {workspace === 'bell' || workspace === 'arrival-bell' ? <ControlPanelDshBellScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
       {workspace === 'zone-set' ? <ControlPanelDshZoneSetScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
-    </BthBox>
+    </Box>
   );
 }
 

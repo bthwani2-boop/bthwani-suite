@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthBox, BthCard, BthKeyValueList, BthSectionHeader, BthSurface, BthText, useTheme } from '@bthwani/ui-kit';
+import { Box, Card, KeyValueList, SectionHeader, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { loyaltyRewardsFixture } from '../loyaltyCommercialDeck';
 
 export type LoyaltyRewardsPageProps = {
@@ -19,15 +19,15 @@ export function LoyaltyRewardsPage({ compact = false }: LoyaltyRewardsPageProps)
     }[tone];
 
     return (
-      <BthCard
+      <Card
         title={label}
         subtitle={helperText}
         style={{ flexBasis: '48%', flexGrow: 1, borderRadius: 18, borderWidth: 1, borderColor: theme.line }}
       >
-        <BthText role="hero" style={{ color: accent }}>
+        <Text role="hero" style={{ color: accent }}>
           {value}
-        </BthText>
-      </BthCard>
+        </Text>
+      </Card>
     );
   }
 
@@ -41,19 +41,19 @@ export function LoyaltyRewardsPage({ compact = false }: LoyaltyRewardsPageProps)
     items: Array<{ label: string; value: string; helperText?: string; tone?: 'default' | 'muted' | 'soft' | 'inverse' | 'brand' | 'success' | 'warning' | 'danger' | 'info' }>;
   }) {
     return (
-      <BthCard
+      <Card
         title={title}
         subtitle={subtitle}
         style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}
       >
-        <BthKeyValueList items={items} dense />
-      </BthCard>
+        <KeyValueList items={items} dense />
+      </Card>
     );
   }
 
   return (
-    <BthBox gap={compact ? 2 : 3}>
-      <BthSurface
+    <Box gap={compact ? 2 : 3}>
+      <Surface
         tone="raised"
         gap={2}
         padding={compact ? 2 : 3}
@@ -64,13 +64,13 @@ export function LoyaltyRewardsPage({ compact = false }: LoyaltyRewardsPageProps)
           backgroundColor: theme.brandSurface,
         }}
       >
-        <BthSectionHeader
+        <SectionHeader
           title={loyaltyRewardsFixture.title}
           subtitle={loyaltyRewardsFixture.subtitle}
         />
-      </BthSurface>
+      </Surface>
 
-      <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
         {metrics.map((metric) => (
           <LoyaltyMetricCard
             key={metric.label}
@@ -80,9 +80,9 @@ export function LoyaltyRewardsPage({ compact = false }: LoyaltyRewardsPageProps)
             tone={metric.tone}
           />
         ))}
-      </BthBox>
+      </Box>
 
-      <BthBox gap={2}>
+      <Box gap={2}>
         {sections.map((section) => (
           <LoyaltySectionCard
             key={section.title}
@@ -91,8 +91,8 @@ export function LoyaltyRewardsPage({ compact = false }: LoyaltyRewardsPageProps)
             items={section.items}
           />
         ))}
-      </BthBox>
-    </BthBox>
+      </Box>
+    </Box>
   );
 }
 

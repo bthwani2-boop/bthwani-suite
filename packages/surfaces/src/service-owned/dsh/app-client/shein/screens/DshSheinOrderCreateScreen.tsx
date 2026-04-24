@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Modal, Pressable } from 'react-native';
-import { BthBox, BthButton, BthFormScreenShell, BthSurface, BthText, BthTextField } from '@bthwani/ui-kit';
+import { Box, Button, FormScreenShell, Surface, Text, TextField } from '@bthwani/ui-kit';
 
 export type DshSheinOrderCreateScreenState = 'ready' | 'loading' | 'disabled';
 
@@ -41,8 +41,8 @@ export function DshSheinOrderCreateScreen({ state = 'ready', embedded = false, o
   };
 
   const formFields = (
-    <BthBox gap={3}>
-      <BthTextField
+    <Box gap={3}>
+      <TextField
         label="رابط المنتج"
         value={productUrl}
         onChangeText={(value) => {
@@ -55,9 +55,9 @@ export function DshSheinOrderCreateScreen({ state = 'ready', embedded = false, o
         error={validationError ?? undefined}
       />
 
-      <BthBox gap={3} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
-        <BthBox style={{ flex: 1, minWidth: 160 }}>
-          <BthTextField
+      <Box gap={3} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
+        <Box style={{ flex: 1, minWidth: 160 }}>
+          <TextField
             label="الكمية"
             value={quantity}
             onChangeText={(value) => {
@@ -68,19 +68,19 @@ export function DshSheinOrderCreateScreen({ state = 'ready', embedded = false, o
             keyboardType="number-pad"
             placeholder="1"
           />
-        </BthBox>
-        <BthBox style={{ flex: 1, minWidth: 160 }}>
-          <BthTextField
+        </Box>
+        <Box style={{ flex: 1, minWidth: 160 }}>
+          <TextField
             label="المقاس / اللون"
             value={sizeColor}
             onChangeText={setSizeColor}
             editable={!isDisabled}
             placeholder="M - Black"
           />
-        </BthBox>
-      </BthBox>
+        </Box>
+      </Box>
 
-      <BthTextField
+      <TextField
         label="ملاحظات إضافية"
         value={notes}
         onChangeText={setNotes}
@@ -90,18 +90,18 @@ export function DshSheinOrderCreateScreen({ state = 'ready', embedded = false, o
       />
 
       {submitted ? (
-        <BthSurface tone="success" gap={2}>
-          <BthText role="bodyStrong">تم تسجيل الطلب</BthText>
-          <BthText role="bodySm" tone="muted">
+        <Surface tone="success" gap={2}>
+          <Text role="bodyStrong">تم تسجيل الطلب</Text>
+          <Text role="bodySm" tone="muted">
             ستراجع العمليات الطلب ثم تضيفه إلى مسار الشراء والتجميع المناسب.
-          </BthText>
-        </BthSurface>
+          </Text>
+        </Surface>
       ) : null}
 
-      {validationError ? <BthText role="bodySm" tone="muted">{validationError}</BthText> : null}
+      {validationError ? <Text role="bodySm" tone="muted">{validationError}</Text> : null}
 
-      {!embedded && onBack ? <BthButton label="العودة" tone="secondary" onPress={onBack} /> : null}
-    </BthBox>
+      {!embedded && onBack ? <Button label="العودة" tone="secondary" onPress={onBack} /> : null}
+    </Box>
   );
 
   if (embedded) {
@@ -125,27 +125,27 @@ export function DshSheinOrderCreateScreen({ state = 'ready', embedded = false, o
               elevation: 18,
             }}
           >
-            <BthBox gap={2}>
-              <BthBox style={{ alignSelf: 'center', width: 54, height: 5, borderRadius: 999, backgroundColor: '#D6DDE8' }} />
-              <BthBox gap={1}>
-                <BthText role="titleSm">طلب شراء من SHEIN</BthText>
-                <BthText role="bodySm" tone="muted">
+            <Box gap={2}>
+              <Box style={{ alignSelf: 'center', width: 54, height: 5, borderRadius: 999, backgroundColor: '#D6DDE8' }} />
+              <Box gap={1}>
+                <Text role="titleSm">طلب شراء من SHEIN</Text>
+                <Text role="bodySm" tone="muted">
                   لوح سفلي مختصر للطلب اليدوي، داخل نفس الصفحة.
-                </BthText>
-              </BthBox>
-            </BthBox>
+                </Text>
+              </Box>
+            </Box>
 
-            <BthBox gap={2}>
-              <BthSurface tone="brand" gap={2}>
-                <BthText role="bodyStrong">SHEIN</BthText>
-                <BthText role="bodySm" tone="muted">لا يوجد شركاء لهذه الفئة.</BthText>
-                <BthText role="bodySm" tone="muted">المنصة نفسها تشتري وتجمع الطلبات قبل التوصيل.</BthText>
-              </BthSurface>
+            <Box gap={2}>
+              <Surface tone="brand" gap={2}>
+                <Text role="bodyStrong">SHEIN</Text>
+                <Text role="bodySm" tone="muted">لا يوجد شركاء لهذه الفئة.</Text>
+                <Text role="bodySm" tone="muted">المنصة نفسها تشتري وتجمع الطلبات قبل التوصيل.</Text>
+              </Surface>
 
               {formFields}
 
-              <BthButton label={submitted ? 'تم التسجيل' : 'إرسال الطلب'} tone="primary" onPress={handleSubmit} disabled={isDisabled} />
-            </BthBox>
+              <Button label={submitted ? 'تم التسجيل' : 'إرسال الطلب'} tone="primary" onPress={handleSubmit} disabled={isDisabled} />
+            </Box>
           </Pressable>
         </Pressable>
       </Modal>
@@ -153,22 +153,22 @@ export function DshSheinOrderCreateScreen({ state = 'ready', embedded = false, o
   }
 
   return (
-    <BthFormScreenShell
+    <FormScreenShell
       title="طلب شراء من SHEIN"
       subtitle="استمارة مباشرة وسهلة للعميل. أدخل الرابط والكمية والمقاس أو اللون والملاحظات ثم أرسل الطلب للعمليات."
       submitLabel={submitted ? 'تم تسجيل الطلب' : 'إرسال الطلب'}
       onSubmit={handleSubmit}
       submitDisabled={isDisabled}
     >
-      <BthBox gap={3}>
-        <BthSurface tone="brand" gap={2}>
-          <BthText role="bodyStrong">SHEIN</BthText>
-          <BthText role="bodySm" tone="muted">طلب مباشر داخل نفس الصفحة.</BthText>
-        </BthSurface>
+      <Box gap={3}>
+        <Surface tone="brand" gap={2}>
+          <Text role="bodyStrong">SHEIN</Text>
+          <Text role="bodySm" tone="muted">طلب مباشر داخل نفس الصفحة.</Text>
+        </Surface>
 
         {formFields}
-      </BthBox>
-    </BthFormScreenShell>
+      </Box>
+    </FormScreenShell>
   );
 }
 

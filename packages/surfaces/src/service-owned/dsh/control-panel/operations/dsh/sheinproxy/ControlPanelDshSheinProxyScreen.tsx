@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 
@@ -7,17 +7,17 @@ import { View } from 'react-native';
 import { useRouter } from 'next/navigation';
 import { useDirection } from '@bthwani/ui-kit';
 import {
-  BthBadge,
-  BthBox,
-  BthButton,
-  BthCard,
-  BthDataTable,
-  BthKeyValueList,
-  BthStateView,
-  BthStatCard,
-  BthText,
-  BthWebCommandCenterFrame,
-  BthWebSectionCard,
+  Badge,
+  Box,
+  Button,
+  Card,
+  DataTable,
+  KeyValueList,
+  StateView,
+  StatCard,
+  Text,
+  WebCommandCenterFrame,
+  WebSectionCard,
   useUiText
 } from '@bthwani/ui-kit';
 import { getSheinProxyRequests, type SheinProxyRequest, type SheinProxyRequestStatus } from './sheinproxy-fixtures';
@@ -257,10 +257,10 @@ export function ControlPanelDshSheinProxyScreen({
       id: 'request',
       header: dshText.sheinProxy.requestLabel,
       renderCell: (row: SheinProxyRequest) => (
-        <BthBox gap={1}>
-          <BthText role="bodyStrong">{row.id}</BthText>
-          <BthText role="caption" tone="soft">{row.product}</BthText>
-        </BthBox>
+        <Box gap={1}>
+          <Text role="bodyStrong">{row.id}</Text>
+          <Text role="caption" tone="soft">{row.product}</Text>
+        </Box>
       ),
     },
     {
@@ -272,7 +272,7 @@ export function ControlPanelDshSheinProxyScreen({
       id: 'status',
       header: dshText.sheinProxy.statusLabel,
       renderCell: (row: SheinProxyRequest) => (
-        <BthBadge label={resolveStatusLabel(dshText, row.status)} tone={resolveStatusTone(row.status)} />
+        <Badge label={resolveStatusLabel(dshText, row.status)} tone={resolveStatusTone(row.status)} />
       ),
     },
     {
@@ -292,7 +292,7 @@ export function ControlPanelDshSheinProxyScreen({
       header: dshText.sheinProxy.nextActionLabel,
       align: 'end' as const,
       renderCell: (row: SheinProxyRequest) => (
-        <BthButton
+        <Button
           label={dshText.sheinProxy.inspectRequest}
           size="sm"
           tone="secondary"
@@ -304,7 +304,7 @@ export function ControlPanelDshSheinProxyScreen({
   ] as const;
 
   const stateContent = readyForSelection ? null : (
-    <BthStateView
+    <StateView
       {...resolveStateCopy(dshText, state)}
       onActionPress={() => {
         if (state === 'error' || state === 'loading' || state === 'offline') {
@@ -319,7 +319,7 @@ export function ControlPanelDshSheinProxyScreen({
 
   if (!readyForSelection) {
     return (
-      <BthWebCommandCenterFrame
+      <WebCommandCenterFrame
         brandLabel={uiText.controlPanel.brandLabel}
         surfaceTitle={dshText.sheinProxy.pageTitle}
         surfaceSubtitle={dshText.sheinProxy.pageDescription}
@@ -334,12 +334,12 @@ export function ControlPanelDshSheinProxyScreen({
         railItems={railItems}
       >
         {stateContent}
-      </BthWebCommandCenterFrame>
+      </WebCommandCenterFrame>
     );
   }
 
   return (
-    <BthWebCommandCenterFrame
+    <WebCommandCenterFrame
       brandLabel={uiText.controlPanel.brandLabel}
       surfaceTitle={dshText.sheinProxy.pageTitle}
       surfaceSubtitle={`${dshText.sheinProxy.pageDescription} · ${activeFilterLabel}`}
@@ -366,11 +366,11 @@ export function ControlPanelDshSheinProxyScreen({
       railItems={railItems}
       onRailItemSelect={(itemId) => setSelectedRequestId(itemId)}
     >
-      <BthBox gap={4}>
+      <Box gap={4}>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
           {signalCards.map((signalCard) => (
             <View key={signalCard.label} style={{ flexBasis: 280, flexGrow: 1, minWidth: 240 }}>
-              <BthStatCard
+              <StatCard
                 label={signalCard.label}
                 value={signalCard.value}
                 deltaLabel={signalCard.description}
@@ -380,11 +380,11 @@ export function ControlPanelDshSheinProxyScreen({
           ))}
         </View>
 
-        <BthWebSectionCard
+        <WebSectionCard
           title={dshText.sheinProxy.tableTitle}
           description={dshText.sheinProxy.tableDescription}
         >
-          <BthDataTable
+          <DataTable
             caption={dshText.sheinProxy.tableDescription}
             emptyTitle={dshText.sheinProxy.tableEmptyTitle}
             emptyDescription={dshText.sheinProxy.tableEmptyDescription}
@@ -393,13 +393,13 @@ export function ControlPanelDshSheinProxyScreen({
             rowKey="id"
             columns={tableColumns}
           />
-        </BthWebSectionCard>
+        </WebSectionCard>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
           <View style={{ flexBasis: 360, flexGrow: 1, minWidth: 320 }}>
-            <BthCard title={selectedRequest.id} subtitle={`${selectedRequest.customer} · ${selectedRequest.product}`}>
-              <BthBox gap={3}>
-                <BthKeyValueList
+            <Card title={selectedRequest.id} subtitle={`${selectedRequest.customer} · ${selectedRequest.product}`}>
+              <Box gap={3}>
+                <KeyValueList
                   items={[
                     { label: dshText.sheinProxy.requestLabel, value: selectedRequest.id },
                     { label: dshText.sheinProxy.customerLabel, value: selectedRequest.customer },
@@ -410,14 +410,14 @@ export function ControlPanelDshSheinProxyScreen({
                     { label: dshText.sheinProxy.nextActionLabel, value: resolveNextActionLabel(dshText, selectedRequest.status) },
                   ]}
                 />
-              </BthBox>
-            </BthCard>
+              </Box>
+            </Card>
           </View>
 
           <View style={{ flexBasis: 360, flexGrow: 1, minWidth: 320 }}>
-            <BthCard title={dshText.sheinProxy.pricingTitle} subtitle={selectedRequest.note}>
-              <BthBox gap={3}>
-                <BthKeyValueList
+            <Card title={dshText.sheinProxy.pricingTitle} subtitle={selectedRequest.note}>
+              <Box gap={3}>
+                <KeyValueList
                   items={[
                     { label: dshText.sheinProxy.amountLabel, value: selectedRequest.amount },
                     { label: dshText.sheinProxy.shippingLabel, value: selectedRequest.shipping },
@@ -431,38 +431,38 @@ export function ControlPanelDshSheinProxyScreen({
                   ]}
                 />
 
-                <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                  <BthButton
+                <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                  <Button
                     label={dshText.sheinProxy.retryLabel}
                     tone="ghost"
                     fullWidth={false}
                     onPress={() => router.refresh()}
                   />
-                  <BthButton
+                  <Button
                     label={dshText.common.openGeneralOperations}
                     tone="primary"
                     fullWidth={false}
                     onPress={() => router.push(operationsHref)}
                   />
-                  <BthButton
+                  <Button
                     label={dshText.sheinProxy.backToHub}
                     tone="secondary"
                     fullWidth={false}
                     onPress={() => router.push(hubHref)}
                   />
-                  <BthButton
+                  <Button
                     label={dshText.common.openSupport}
                     tone="secondary"
                     fullWidth={false}
                     onPress={() => router.push(supportHref)}
                   />
-                </BthBox>
-              </BthBox>
-            </BthCard>
+                </Box>
+              </Box>
+            </Card>
           </View>
         </View>
-      </BthBox>
-    </BthWebCommandCenterFrame>
+      </Box>
+    </WebCommandCenterFrame>
   );
 }
 

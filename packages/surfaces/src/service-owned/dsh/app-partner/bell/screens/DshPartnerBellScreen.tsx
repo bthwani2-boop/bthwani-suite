@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthBadge, BthBox, BthButton, BthKeyValueList, BthListItem, BthMobileScrollView, BthSectionHeader, BthStateView, BthStatCard, BthSurface, BthText } from '@bthwani/ui-kit';
+import { Badge, Box, Button, KeyValueList, ListItem, MobileScrollView, SectionHeader, StateView, StatCard, Surface, Text } from '@bthwani/ui-kit';
 
 type DshPartnerBellScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
@@ -104,64 +104,64 @@ export function DshPartnerBellScreen({
     const stateCopy = resolveStateCopy(state);
 
     return (
-      <BthMobileScrollView padding={4} gap={4}>
-        <BthStateView {...stateCopy} onActionPress={onRetry ?? onOpenInbox ?? onBack} />
-      </BthMobileScrollView>
+      <MobileScrollView padding={4} gap={4}>
+        <StateView {...stateCopy} onActionPress={onRetry ?? onOpenInbox ?? onBack} />
+      </MobileScrollView>
     );
   }
 
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <BthSurface tone="brand" gap={3}>
-        <BthBox gap={1} style={{ alignItems: 'flex-end' }}>
-          <BthBadge label="Branch alerts" tone="warning" />
-          <BthText role="titleLg" style={{ textAlign: 'right' }}>جرس الطلبات الجديدة للشريك</BthText>
-          <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+    <MobileScrollView padding={4} gap={4}>
+      <Surface tone="brand" gap={3}>
+        <Box gap={1} style={{ alignItems: 'flex-end' }}>
+          <Badge label="Branch alerts" tone="warning" />
+          <Text role="titleLg" style={{ textAlign: 'right' }}>جرس الطلبات الجديدة للشريك</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             هذا الجرس يضيء عندما يصل طلب جديد أو يحتاج الفرع إلى موافقة سريعة قبل تحريره للكابتن.
-          </BthText>
-        </BthBox>
+          </Text>
+        </Box>
 
-        <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <BthStatCard label="طلبات جديدة" value={String(items.length)} deltaLabel="مباشر" tone="warning" />
-          <BthStatCard label="بحاجة موافقة" value="2" deltaLabel={summary.approvalLabel} tone="brand" />
-          <BthStatCard label="جاهزة للإفراج" value="1" deltaLabel={summary.releaseLabel} tone="success" />
-        </BthBox>
-      </BthSurface>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          <StatCard label="طلبات جديدة" value={String(items.length)} deltaLabel="مباشر" tone="warning" />
+          <StatCard label="بحاجة موافقة" value="2" deltaLabel={summary.approvalLabel} tone="brand" />
+          <StatCard label="جاهزة للإفراج" value="1" deltaLabel={summary.releaseLabel} tone="success" />
+        </Box>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader title={summary.inboxLabel} subtitle="أول قرار يبقى واضحًا حتى لا يتشتت الفريق بين الطلبات." />
-        <BthKeyValueList
+      <Surface tone="raised" gap={3}>
+        <SectionHeader title={summary.inboxLabel} subtitle="أول قرار يبقى واضحًا حتى لا يتشتت الفريق بين الطلبات." />
+        <KeyValueList
           items={[
             { label: 'الحالة', value: summary.approvalLabel, tone: 'brand' },
             { label: 'الإجراء التالي', value: summary.releaseLabel, tone: 'success' },
             { label: 'الأولوية', value: 'احفظ القرار القصير ثم حرر الطلب', tone: 'warning' },
           ]}
         />
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader title="الرنات الحالية" subtitle="كل رن يختصر القفز بين الشاشات ويقود إلى قرار واحد." />
-        <BthBox gap={2}>
+      <Surface tone="raised" gap={3}>
+        <SectionHeader title="الرنات الحالية" subtitle="كل رن يختصر القفز بين الشاشات ويقود إلى قرار واحد." />
+        <Box gap={2}>
           {items.map((item) => (
-            <BthListItem key={item.id} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
+            <ListItem key={item.id} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
           ))}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="inset" gap={2}>
-        <BthText role="bodyStrong" style={{ textAlign: 'right' }}>{summary.nextActionLabel}</BthText>
-        <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+      <Surface tone="inset" gap={2}>
+        <Text role="bodyStrong" style={{ textAlign: 'right' }}>{summary.nextActionLabel}</Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
           الجرس هنا لا يملأ الواجهة. هو فقط يسلط الضوء على الطلب الجديد حتى يصدر الفرع قراره بسرعة.
-        </BthText>
-      </BthSurface>
+        </Text>
+      </Surface>
 
-      <BthBox gap={2}>
-        {onOpenNextOrder ? <BthButton label="فتح أول طلب" onPress={onOpenNextOrder} /> : null}
-        {onOpenInbox ? <BthButton label="صندوق الطلبات" tone="secondary" onPress={onOpenInbox} /> : null}
-        {onBack ? <BthButton label="العودة" tone="ghost" onPress={onBack} /> : null}
-        {onRetry ? <BthButton label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
-      </BthBox>
-    </BthMobileScrollView>
+      <Box gap={2}>
+        {onOpenNextOrder ? <Button label="فتح أول طلب" onPress={onOpenNextOrder} /> : null}
+        {onOpenInbox ? <Button label="صندوق الطلبات" tone="secondary" onPress={onOpenInbox} /> : null}
+        {onBack ? <Button label="العودة" tone="ghost" onPress={onBack} /> : null}
+        {onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
+      </Box>
+    </MobileScrollView>
   );
 }
 

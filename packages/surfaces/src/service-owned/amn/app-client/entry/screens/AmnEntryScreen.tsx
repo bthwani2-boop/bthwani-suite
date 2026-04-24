@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthServiceHubShell, BthStateView } from '@bthwani/ui-kit';
+import { ServiceHubShell, StateView } from '@bthwani/ui-kit';
 
 export type AmnEntryScreenState = 'ready' | 'loading' | 'empty';
 
@@ -55,10 +55,10 @@ export function AmnEntryScreen({
   const emptyState =
     state === 'loading'
       ? (
-        <BthStateView stateId="loading" />
+        <StateView stateId="loading" />
       )
       : (
-        <BthStateView
+        <StateView
           stateId="empty"
           title="No active AMN workspace"
           description="Keep one visible start point so operators can re-enter the AMN flow quickly."
@@ -68,7 +68,7 @@ export function AmnEntryScreen({
       );
 
   return (
-    <BthServiceHubShell
+    <ServiceHubShell
       title="AMN Entry"
       subtitle="Single-purpose entry for app-client account management and first action."
       sections={sections}

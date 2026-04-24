@@ -4,18 +4,18 @@ import { useDshControlPanelText, ControlPanelDshCatalogScreen, ControlPanelDshPa
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  BthBox,
-  BthButton,
-  BthText,
+  Box,
+  Button,
+  Text,
   useDirection,
   useUiText,
 } from '@bthwani/ui-kit';
 import {
-  BthWebCommandCenterFrame,
-  BthWebMissionHeroCard,
-  BthWebSectionCard,
-  BthWebSegmentedTabs,
-  BthWebSignalCard,
+  WebCommandCenterFrame,
+  WebMissionHeroCard,
+  WebSectionCard,
+  WebSegmentedTabs,
+  WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
@@ -276,7 +276,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
   }, []);
 
   return (
-    <BthWebCommandCenterFrame
+    <WebCommandCenterFrame
       brandLabel={panelText.brandLabel}
       surfaceTitle={shellCopy.title}
       surfaceSubtitle={shellCopy.description}
@@ -318,7 +318,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
             </section>
 
             <section className={styles.priorityPanel}>
-              <BthWebMissionHeroCard
+              <WebMissionHeroCard
                 dense
                 badges={[
                   `${panelText.ui.serviceBadge} ${isAllFilterActive ? panelText.filters.allServices : selectedServiceLabel}`,
@@ -353,7 +353,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
                         : signal.value;
 
                   return (
-                    <BthWebSignalCard
+                    <WebSignalCard
                       key={signal.id}
                       title={signal.title}
                       value={dynamicValue}
@@ -395,21 +395,21 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
               <h3 className={styles.subsectionTitle}>{dshText.hub.workbenches.sheinProxy.label}</h3>
               <p className={styles.subsectionDescription}>{dshText.hub.workbenches.sheinProxy.description}</p>
             </div>
-            <BthWebSectionCard
+            <WebSectionCard
               title={dshText.hub.workbenches.sheinProxy.label}
               description={dshText.hub.workbenches.sheinProxy.description}
             >
-              <BthBox gap={2}>
-                <BthText role="bodySm" tone="muted">
+              <Box gap={2}>
+                <Text role="bodySm" tone="muted">
                   {dshText.hub.workbenches.sheinProxy.routeHint}
-                </BthText>
-                <BthButton
+                </Text>
+                <Button
                   label={panelText.openSheinProxy}
                   tone="primary"
                   onPress={() => router.push('/operations/dsh/sheinproxy')}
                 />
-              </BthBox>
-            </BthWebSectionCard>
+              </Box>
+            </WebSectionCard>
           </section>
         ) : null}
 
@@ -439,7 +439,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
               <h3 className={styles.subsectionTitle}>{panelText.ui.subsectionTitle}</h3>
               <p className={styles.subsectionDescription}>{panelText.ui.subsectionDescription}</p>
             </div>
-            <BthWebSegmentedTabs
+            <WebSegmentedTabs
               ariaLabel={panelText.ui.subsectionTitle}
               items={controlSubSectionIds.map((subsectionId) => ({
                 id: subsectionId,
@@ -476,7 +476,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
           </section>
         ) : null}
       </div>
-    </BthWebCommandCenterFrame>
+    </WebCommandCenterFrame>
   );
 }
 

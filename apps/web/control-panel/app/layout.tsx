@@ -4,12 +4,12 @@ export const metadata = {
 };
 
 import type { ReactNode } from 'react';
-import { BthWebRootLayout } from '@bthwani/ui-kit/next';
+import { WebRootLayout } from '@bthwani/ui-kit/next';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <BthWebRootLayout appName="control-panel" language="ar" themeMode="light">
+    <WebRootLayout appName="control-panel" language="ar" themeMode="light">
       {children}
-    </BthWebRootLayout>
+    </WebRootLayout>
   );
 }

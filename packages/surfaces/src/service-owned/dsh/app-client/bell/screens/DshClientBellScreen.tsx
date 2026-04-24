@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthBadge, BthBox, BthButton, BthKeyValueList, BthMobileScrollView, BthSectionHeader, BthStateView, BthStatCard, BthSurface, BthText } from '@bthwani/ui-kit';
+import { Badge, Box, Button, KeyValueList, MobileScrollView, SectionHeader, StateView, StatCard, Surface, Text } from '@bthwani/ui-kit';
 
 type DshClientBellScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
@@ -124,14 +124,14 @@ export type DshClientBellScreenProps = {
 
 function BellEventRow({ event }: { event: ClientBellEvent }) {
   return (
-    <BthSurface tone={event.tone === 'success' ? 'raised' : 'default'} padding={3} gap={1} radiusToken="xl" border>
-      <BthBox layoutDirection="row" justify="space-between" align="center" gap={2}>
-        <BthText role="bodyStrong" style={{ textAlign: 'right' }}>{event.title}</BthText>
-        <BthBadge label={event.badgeLabel} tone={event.tone === 'info' ? 'brand' : event.tone} />
-      </BthBox>
-      <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{event.subtitle}</BthText>
-      <BthText role="caption" tone="soft" style={{ textAlign: 'right' }}>{event.meta}</BthText>
-    </BthSurface>
+    <Surface tone={event.tone === 'success' ? 'raised' : 'default'} padding={3} gap={1} radiusToken="xl" border>
+      <Box layoutDirection="row" justify="space-between" align="center" gap={2}>
+        <Text role="bodyStrong" style={{ textAlign: 'right' }}>{event.title}</Text>
+        <Badge label={event.badgeLabel} tone={event.tone === 'info' ? 'brand' : event.tone} />
+      </Box>
+      <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{event.subtitle}</Text>
+      <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>{event.meta}</Text>
+    </Surface>
   );
 }
 
@@ -148,33 +148,33 @@ export function DshClientBellScreen({
     const stateCopy = resolveStateCopy(state);
 
     return (
-      <BthMobileScrollView padding={4} gap={4}>
-        <BthStateView {...stateCopy} onActionPress={onRetry ?? onOpenTracking ?? onBack} />
-      </BthMobileScrollView>
+      <MobileScrollView padding={4} gap={4}>
+        <StateView {...stateCopy} onActionPress={onRetry ?? onOpenTracking ?? onBack} />
+      </MobileScrollView>
     );
   }
 
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <BthSurface tone="brand" gap={3}>
-        <BthBox gap={1} style={{ alignItems: 'flex-end' }}>
-          <BthBadge label="Arrival bell" tone="warning" />
-          <BthText role="titleLg" style={{ textAlign: 'right' }}>جرس وصول الكابتن</BthText>
-          <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+    <MobileScrollView padding={4} gap={4}>
+      <Surface tone="brand" gap={3}>
+        <Box gap={1} style={{ alignItems: 'flex-end' }}>
+          <Badge label="Arrival bell" tone="warning" />
+          <Text role="titleLg" style={{ textAlign: 'right' }}>جرس وصول الكابتن</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             يرن الجرس عند الاقتراب، ثم عند وصول الكابتن إلى نقطة العميل، وبعدها ينتقل الطلب إلى الاستلام والتقييم.
-          </BthText>
-        </BthBox>
+          </Text>
+        </Box>
 
-        <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <BthStatCard label="الرنات الفعالة" value="2" deltaLabel="اقتراب + وصول" tone="info" />
-          <BthStatCard label="المرحلة الحالية" value="قريب" deltaLabel={summary.etaLabel} tone="warning" />
-          <BthStatCard label="بعد الاستلام" value="التقييم" deltaLabel={summary.receiptLabel} tone="success" />
-        </BthBox>
-      </BthSurface>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          <StatCard label="الرنات الفعالة" value="2" deltaLabel="اقتراب + وصول" tone="info" />
+          <StatCard label="المرحلة الحالية" value="قريب" deltaLabel={summary.etaLabel} tone="warning" />
+          <StatCard label="بعد الاستلام" value="التقييم" deltaLabel={summary.receiptLabel} tone="success" />
+        </Box>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader title="تفاصيل الطلب" subtitle="المعلومة المختصرة تبقى في نفس الصفحة مع الجرس." />
-        <BthKeyValueList
+      <Surface tone="raised" gap={3}>
+        <SectionHeader title="تفاصيل الطلب" subtitle="المعلومة المختصرة تبقى في نفس الصفحة مع الجرس." />
+        <KeyValueList
           items={[
             { label: 'الطلب', value: summary.orderLabel, tone: 'brand' },
             { label: 'الكابتن', value: summary.captainLabel },
@@ -183,31 +183,31 @@ export function DshClientBellScreen({
             { label: 'حالة التسليم', value: summary.receiptLabel, tone: 'success' },
           ]}
         />
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader title="متى يرن الجرس" subtitle="السطور التالية تختصر منطق الرن من دون ضوضاء." />
-        <BthBox gap={2}>
+      <Surface tone="raised" gap={3}>
+        <SectionHeader title="متى يرن الجرس" subtitle="السطور التالية تختصر منطق الرن من دون ضوضاء." />
+        <Box gap={2}>
           {events.map((event) => (
             <BellEventRow key={event.id} event={event} />
           ))}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="inset" gap={2}>
-        <BthText role="bodyStrong" style={{ textAlign: 'right' }}>{summary.nextActionLabel}</BthText>
-        <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+      <Surface tone="inset" gap={2}>
+        <Text role="bodyStrong" style={{ textAlign: 'right' }}>{summary.nextActionLabel}</Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
           هذا المسار يظل خفيفًا: رنين عند الاقتراب، رنين عند الوصول، ثم استلام وتقييم في نفس الرحلة.
-        </BthText>
-      </BthSurface>
+        </Text>
+      </Surface>
 
-      <BthBox gap={2}>
-        {onOpenTracking ? <BthButton label="فتح التتبع" onPress={onOpenTracking} /> : null}
-        {onOpenOrders ? <BthButton label="الطلبات" tone="secondary" onPress={onOpenOrders} /> : null}
-        {onBack ? <BthButton label="العودة" tone="ghost" onPress={onBack} /> : null}
-        {onRetry ? <BthButton label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
-      </BthBox>
-    </BthMobileScrollView>
+      <Box gap={2}>
+        {onOpenTracking ? <Button label="فتح التتبع" onPress={onOpenTracking} /> : null}
+        {onOpenOrders ? <Button label="الطلبات" tone="secondary" onPress={onOpenOrders} /> : null}
+        {onBack ? <Button label="العودة" tone="ghost" onPress={onBack} /> : null}
+        {onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
+      </Box>
+    </MobileScrollView>
   );
 }
 

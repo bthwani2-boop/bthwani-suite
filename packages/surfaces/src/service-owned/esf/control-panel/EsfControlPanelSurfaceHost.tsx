@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { BthBox, BthButton, BthText } from '@bthwani/ui-kit';
-import { BthWebMissionHeroCard, BthWebSectionCard } from '@bthwani/ui-kit/web';
+import { Box, Button, Text } from '@bthwani/ui-kit';
+import { WebMissionHeroCard, WebSectionCard } from '@bthwani/ui-kit/web';
 import { sectionCatalog } from './catalogs';
 import { sectionMeta } from './catalogs/section-meta';
 import { flowMeta } from './catalogs/esf-control-panel-catalogs-flow/flow-meta';
@@ -16,8 +16,8 @@ export function EsfControlPanelSurfaceHost({ hubHref = '/dashboard' }: EsfContro
   const router = useRouter();
 
   return (
-    <BthBox gap={4}>
-      <BthWebMissionHeroCard
+    <Box gap={4}>
+      <WebMissionHeroCard
         badges={[sectionMeta.id.toUpperCase(), flowMeta.owner.toUpperCase(), flowMeta.placeholder ? 'Placeholder' : 'Live']}
         eyebrow="ESF / control-panel / catalogs"
         title="Community catalog space"
@@ -31,24 +31,24 @@ export function EsfControlPanelSurfaceHost({ hubHref = '/dashboard' }: EsfContro
         secondaryAction={{ label: 'Refresh route', href: '/catalogs' }}
       />
 
-      <BthWebSectionCard title="Catalog definition" description="The section stays anchored to the service-owned catalog structure that ships with ESF.">
-        <BthBox gap={2}>
-          <BthText role="bodySm" tone="muted">
+      <WebSectionCard title="Catalog definition" description="The section stays anchored to the service-owned catalog structure that ships with ESF.">
+        <Box gap={2}>
+          <Text role="bodySm" tone="muted">
             Active section: {sectionMeta.id}
-          </BthText>
-          <BthText role="bodySm" tone="muted">
+          </Text>
+          <Text role="bodySm" tone="muted">
             Flow owner: {flowMeta.owner}
-          </BthText>
-          <BthText role="bodySm" tone="muted">
+          </Text>
+          <Text role="bodySm" tone="muted">
             Catalog items: {sectionCatalog.join(', ')}
-          </BthText>
-          <BthBox layoutDirection="row" gap={2}>
-            <BthButton label="Back to hub" onPress={() => router.push(hubHref)} />
-            <BthButton label="Open catalogs" tone="secondary" onPress={() => router.push('/catalogs')} />
-          </BthBox>
-        </BthBox>
-      </BthWebSectionCard>
-    </BthBox>
+          </Text>
+          <Box layoutDirection="row" gap={2}>
+            <Button label="Back to hub" onPress={() => router.push(hubHref)} />
+            <Button label="Open catalogs" tone="secondary" onPress={() => router.push('/catalogs')} />
+          </Box>
+        </Box>
+      </WebSectionCard>
+    </Box>
   );
 }
 

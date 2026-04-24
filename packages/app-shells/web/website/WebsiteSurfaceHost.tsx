@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthWebPageFrame, BthWebSectionCard } from '@bthwani/ui-kit/web';
+import { WebPageFrame, WebSectionCard } from '@bthwani/ui-kit/web';
 import styles from '../shared/shared-web-shell.module.css';
 
 export type WebsiteSurfaceHostProps = Record<string, never>;
@@ -12,14 +12,14 @@ const websiteHighlights = [
 
 export function WebsiteSurfaceHost(_props: WebsiteSurfaceHostProps) {
   return (
-    <BthWebPageFrame
+    <WebPageFrame
       eyebrow="BThwani Website"
       title="Public web presence under one governed shell"
       description="The public website now consumes a centralized web root and shared shell language instead of carrying its own page-level styling system."
       centered
       maxWidth={860}
     >
-      <BthWebSectionCard
+      <WebSectionCard
         title="Shared baseline"
         description="Website routes remain thin while ui-kit owns the visual baseline and shared shell contract."
       >
@@ -30,8 +30,8 @@ export function WebsiteSurfaceHost(_props: WebsiteSurfaceHostProps) {
             </p>
           ))}
         </div>
-      </BthWebSectionCard>
-    </BthWebPageFrame>
+      </WebSectionCard>
+    </WebPageFrame>
   );
 }
 

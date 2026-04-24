@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { BthBox, BthText } from '@bthwani/ui-kit';
-import { BthWebSectionCard } from '@bthwani/ui-kit/web';
+import { Box, Text } from '@bthwani/ui-kit';
+import { WebSectionCard } from '@bthwani/ui-kit/web';
 import { dshCatalogNodes } from '../catalog';
 
 function resolveCategoryOwnerLabel(owner: 'catalog' | 'partner' | 'marketing') {
@@ -21,25 +21,25 @@ export function ControlPanelDshCatalogCategoriesScreen() {
   const categoryNodes = dshCatalogNodes.filter((node) => node.kind !== 'approved-product');
 
   return (
-    <BthWebSectionCard
+    <WebSectionCard
       title="الفئات الخفيفة"
       description="تمثيل خفيف للفئات يظهر في الكتالوج، بينما تبقى الشاشة التشغيلية الأساسية في app-client."
     >
-      <BthBox gap={3}>
+      <Box gap={3}>
         {categoryNodes.map((node) => (
-          <BthBox key={node.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-            <BthBox layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
-              <BthText role="bodyStrong">{node.label}</BthText>
-              <BthText role="caption" tone="success">{node.countLabel}</BthText>
-            </BthBox>
-            <BthText role="bodySm" tone="muted">{node.summary}</BthText>
-            <BthText role="caption" tone="muted">
+          <Box key={node.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+            <Box layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
+              <Text role="bodyStrong">{node.label}</Text>
+              <Text role="caption" tone="success">{node.countLabel}</Text>
+            </Box>
+            <Text role="bodySm" tone="muted">{node.summary}</Text>
+            <Text role="caption" tone="muted">
               {resolveCategoryOwnerLabel(node.owner)} · {node.stage}
-            </BthText>
-          </BthBox>
+            </Text>
+          </Box>
         ))}
-      </BthBox>
-    </BthWebSectionCard>
+      </Box>
+    </WebSectionCard>
   );
 }
 

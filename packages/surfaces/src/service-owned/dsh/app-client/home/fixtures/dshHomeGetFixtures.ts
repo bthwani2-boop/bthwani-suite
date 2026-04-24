@@ -1,4 +1,5 @@
-import { dshDiscoveryStores, type DshDiscoveryStore } from '../../stores/fixtures/discoveryFixtures';
+import { dshDiscoveryStores } from '../../stores/fixtures/discoveryFixtures';
+import type { DshDiscoveryStore } from '../../stores/fixtures/types';
 
 export type DshHomeGetFixtureProduct = {
   id: string;
@@ -10,6 +11,7 @@ export type DshHomeGetFixturePromo = {
   title: string;
   subtitle: string;
   icon: string;
+  mediaKey?: string;
   actionType?: 'main_category' | 'sub_category' | 'store' | 'external' | 'store_category' | 'product' | 'subscription';
   actionTarget?: string;
   actionExtra?: string;
@@ -374,7 +376,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     id: 'store-2301',
     name: 'بثواني ستور',
     address: 'المركز الرئيسي، شارع الستين',
-    categoryId: 'bthwani_store',
+    categoryId: 'wani_store',
     statusLabel: 'مفتوح',
     statusTone: 'open',
     distanceLabel: '1.2 كم',

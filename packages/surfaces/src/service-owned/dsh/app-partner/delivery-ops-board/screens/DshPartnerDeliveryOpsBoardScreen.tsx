@@ -1,14 +1,14 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthListItem,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthStateView,
-  BthStatCard,
-  BthSurface,
-  BthText,
+  Box,
+  Button,
+  ListItem,
+  MobileScrollView,
+  SectionHeader,
+  StateView,
+  StatCard,
+  Surface,
+  Text,
 } from '@bthwani/ui-kit';
 
 export type DshPartnerDeliveryOpsBoardState =
@@ -80,12 +80,12 @@ const demoOrders: DshPartnerDeliveryOpsOrder[] = [
 
 function renderState(state: Exclude<DshPartnerDeliveryOpsBoardState, 'ready' | 'disabled'>, onRetry?: () => void) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title="No delivery work is active"
         description="Keep the board available so the branch can resume handoff monitoring as soon as new work appears."
@@ -97,7 +97,7 @@ function renderState(state: Exclude<DshPartnerDeliveryOpsBoardState, 'ready' | '
 
   if (state === 'offline') {
     return (
-      <BthStateView
+      <StateView
         stateId="offline"
         title="Delivery board is offline"
         description="Retry the board and keep handoff risk visible once connectivity returns."
@@ -107,7 +107,7 @@ function renderState(state: Exclude<DshPartnerDeliveryOpsBoardState, 'ready' | '
   }
 
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title="Delivery board is unavailable"
       description="Retry the board without losing visibility over the active branch workload."
@@ -129,33 +129,33 @@ export function DshPartnerDeliveryOpsBoardScreen({
   }
 
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">Partner delivery ops board</BthText>
-        <BthText role="bodyMd" tone="muted">
+    <MobileScrollView padding={4} gap={4}>
+      <Box gap={2}>
+        <Text role="titleLg">Partner delivery ops board</Text>
+        <Text role="bodyMd" tone="muted">
           One compact board for branch handoff pressure, active deliveries, and issue risk.
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthSurface tone="brand" gap={3}>
-        <BthSectionHeader
+      <Surface tone="brand" gap={3}>
+        <SectionHeader
           title="Branch delivery health"
           subtitle="Handoff and delivery pressure stay visible before operators drill into a single order."
         />
-        <BthStatCard label="Out for delivery" value={String(summary.outForDelivery)} deltaLabel="Active trips" tone="info" />
-        <BthStatCard label="Ready for handoff" value={String(summary.handoffReady)} deltaLabel="Branch release queue" tone="success" />
-        <BthStatCard label="Delivered today" value={String(summary.deliveredToday)} deltaLabel="Closed successfully" tone="default" />
-        <BthStatCard label="Delay risk" value={String(summary.delayedRisk)} deltaLabel="Needs attention" tone="warning" />
-      </BthSurface>
+        <StatCard label="Out for delivery" value={String(summary.outForDelivery)} deltaLabel="Active trips" tone="info" />
+        <StatCard label="Ready for handoff" value={String(summary.handoffReady)} deltaLabel="Branch release queue" tone="success" />
+        <StatCard label="Delivered today" value={String(summary.deliveredToday)} deltaLabel="Closed successfully" tone="default" />
+        <StatCard label="Delay risk" value={String(summary.delayedRisk)} deltaLabel="Needs attention" tone="warning" />
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
+      <Surface tone="raised" gap={3}>
+        <SectionHeader
           title="Orders needing attention"
           subtitle="Every row exposes the next operational decision without forcing route-hopping."
         />
-        <BthBox gap={2}>
+        <Box gap={2}>
           {orders.map((order) => (
-            <BthListItem
+            <ListItem
               key={order.id}
               title={order.title}
               subtitle={order.subtitle}
@@ -164,11 +164,11 @@ export function DshPartnerDeliveryOpsBoardScreen({
               onPress={() => onOpenOrder?.(order.id)}
             />
           ))}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthButton label="Open issue queue" tone="secondary" onPress={onOpenIssueQueue} />
-    </BthMobileScrollView>
+      <Button label="Open issue queue" tone="secondary" onPress={onOpenIssueQueue} />
+    </MobileScrollView>
   );
 }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthBox, BthKeyValueList, BthListItem, BthMobileScrollView, BthSectionHeader, BthStatCard, BthSurface, BthText, BthTextField } from '@bthwani/ui-kit';
+import { Box, KeyValueList, ListItem, MobileScrollView, SectionHeader, StatCard, Surface, Text, TextField } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../../patterns/screens/DshOperationScreen';
 
 const clientOperationScreenIds = [
@@ -350,136 +350,136 @@ function buildOperationContent(definition: ClientOperationDefinition, draftValue
 
   if (definition.kind === 'chat') {
     return (
-      <BthBox gap={3}>
-        <BthSurface tone="brand" gap={3}>
-          <BthStatCard label="Conversation lane" value="Live" deltaLabel={definition.stageLabel} tone="info" />
-          <BthStatCard label="Expected behavior" value="Short" deltaLabel="Actionable and explicit" tone="success" />
-        </BthSurface>
-        <BthSurface tone="raised" gap={3}>
-          <BthTextField
+      <Box gap={3}>
+        <Surface tone="brand" gap={3}>
+          <StatCard label="Conversation lane" value="Live" deltaLabel={definition.stageLabel} tone="info" />
+          <StatCard label="Expected behavior" value="Short" deltaLabel="Actionable and explicit" tone="success" />
+        </Surface>
+        <Surface tone="raised" gap={3}>
+          <TextField
             label="Message draft"
             value={draftValue}
             onChangeText={setDraftValue}
             hint="Keep the note short, concrete, and tied to the active delivery or order."
           />
-        </BthSurface>
-      </BthBox>
+        </Surface>
+      </Box>
     );
   }
 
   if (definition.kind === 'proxy') {
     return (
-      <BthBox gap={3}>
-        <BthSurface tone="brand" gap={3}>
-          <BthStatCard label="Control state" value="Focused" deltaLabel={definition.stageLabel} tone="info" />
-          <BthStatCard label="Decision style" value="Guarded" deltaLabel="Review before commit" tone="success" />
-        </BthSurface>
-        <BthSurface tone="raised" gap={3}>
-          <BthKeyValueList
+      <Box gap={3}>
+        <Surface tone="brand" gap={3}>
+          <StatCard label="Control state" value="Focused" deltaLabel={definition.stageLabel} tone="info" />
+          <StatCard label="Decision style" value="Guarded" deltaLabel="Review before commit" tone="success" />
+        </Surface>
+        <Surface tone="raised" gap={3}>
+          <KeyValueList
             items={[
               { label: 'Surface', value: definition.title },
               { label: 'Purpose', value: definition.primaryOutcome, tone: 'brand' },
               { label: 'Scope', value: 'Proxy and service-control handling' },
             ]}
           />
-        </BthSurface>
-        <BthSurface tone="raised" gap={2}>
+        </Surface>
+        <Surface tone="raised" gap={2}>
           {guidanceItems.map((item) => (
-            <BthListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
+            <ListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
           ))}
-        </BthSurface>
-      </BthBox>
+        </Surface>
+      </Box>
     );
   }
 
   if (definition.kind === 'subscription' || definition.kind === 'loyalty') {
     return (
-      <BthBox gap={3}>
-        <BthSurface tone="brand" gap={3}>
-          <BthStatCard label="Benefit state" value="Visible" deltaLabel={definition.stageLabel} tone="info" />
-          <BthStatCard label="Customer confidence" value="High" deltaLabel="Value is explicit before action" tone="success" />
-        </BthSurface>
-        <BthSurface tone="raised" gap={3}>
-          <BthKeyValueList
+      <Box gap={3}>
+        <Surface tone="brand" gap={3}>
+          <StatCard label="Benefit state" value="Visible" deltaLabel={definition.stageLabel} tone="info" />
+          <StatCard label="Customer confidence" value="High" deltaLabel="Value is explicit before action" tone="success" />
+        </Surface>
+        <Surface tone="raised" gap={3}>
+          <KeyValueList
             items={[
               { label: 'Surface', value: definition.title },
               { label: 'Customer benefit', value: definition.primaryOutcome, tone: 'brand' },
               { label: 'Category', value: definition.kind === 'subscription' ? 'Subscription management' : 'Loyalty value' },
             ]}
           />
-        </BthSurface>
-      </BthBox>
+        </Surface>
+      </Box>
     );
   }
 
   if (definition.kind === 'delivery') {
     return (
-      <BthBox gap={3}>
-        <BthSurface tone="brand" gap={3}>
-          <BthStatCard label="Delivery lane" value="Active" deltaLabel={definition.stageLabel} tone="info" />
-          <BthStatCard label="Recovery bias" value="Fast" deltaLabel="Minimize taps during active delivery" tone="success" />
-        </BthSurface>
-        <BthSurface tone="raised" gap={2}>
+      <Box gap={3}>
+        <Surface tone="brand" gap={3}>
+          <StatCard label="Delivery lane" value="Active" deltaLabel={definition.stageLabel} tone="info" />
+          <StatCard label="Recovery bias" value="Fast" deltaLabel="Minimize taps during active delivery" tone="success" />
+        </Surface>
+        <Surface tone="raised" gap={2}>
           {guidanceItems.map((item) => (
-            <BthListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
+            <ListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
           ))}
-        </BthSurface>
-      </BthBox>
+        </Surface>
+      </Box>
     );
   }
 
   if (definition.kind === 'review') {
     return (
-      <BthBox gap={3}>
-        <BthSurface tone="brand" gap={3}>
-          <BthStatCard label="Feedback lane" value="Ready" deltaLabel={definition.stageLabel} tone="info" />
-          <BthStatCard label="Friction target" value="Low" deltaLabel="Capture sentiment while the order is still fresh" tone="success" />
-        </BthSurface>
-        <BthSurface tone="raised" gap={2}>
+      <Box gap={3}>
+        <Surface tone="brand" gap={3}>
+          <StatCard label="Feedback lane" value="Ready" deltaLabel={definition.stageLabel} tone="info" />
+          <StatCard label="Friction target" value="Low" deltaLabel="Capture sentiment while the order is still fresh" tone="success" />
+        </Surface>
+        <Surface tone="raised" gap={2}>
           {guidanceItems.map((item) => (
-            <BthListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
+            <ListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
           ))}
-        </BthSurface>
-      </BthBox>
+        </Surface>
+      </Box>
     );
   }
 
   if (definition.kind === 'settings') {
     return (
-      <BthBox gap={3}>
-        <BthSurface tone="brand" gap={3}>
-          <BthStatCard label="Control state" value="Visible" deltaLabel={definition.stageLabel} tone="info" />
-          <BthStatCard label="Flow clarity" value="High" deltaLabel="Avoid hidden settings detours" tone="success" />
-        </BthSurface>
-        <BthSurface tone="raised" gap={3}>
-          <BthKeyValueList
+      <Box gap={3}>
+        <Surface tone="brand" gap={3}>
+          <StatCard label="Control state" value="Visible" deltaLabel={definition.stageLabel} tone="info" />
+          <StatCard label="Flow clarity" value="High" deltaLabel="Avoid hidden settings detours" tone="success" />
+        </Surface>
+        <Surface tone="raised" gap={3}>
+          <KeyValueList
             items={[
               { label: 'Surface', value: definition.title },
               { label: 'Purpose', value: definition.primaryOutcome, tone: 'brand' },
               { label: 'Group', value: definition.group },
             ]}
           />
-        </BthSurface>
-      </BthBox>
+        </Surface>
+      </Box>
     );
   }
 
   return (
-    <BthBox gap={3}>
-      <BthSurface tone="brand" gap={3}>
-        <BthStatCard label="Current lane" value="Ready" deltaLabel={definition.stageLabel} tone="info" />
-        <BthStatCard label="Primary outcome" value="Visible" deltaLabel="One dominant next action" tone="success" />
-      </BthSurface>
-      <BthSurface tone="raised" gap={3}>
-        <BthKeyValueList
+    <Box gap={3}>
+      <Surface tone="brand" gap={3}>
+        <StatCard label="Current lane" value="Ready" deltaLabel={definition.stageLabel} tone="info" />
+        <StatCard label="Primary outcome" value="Visible" deltaLabel="One dominant next action" tone="success" />
+      </Surface>
+      <Surface tone="raised" gap={3}>
+        <KeyValueList
           items={[
             { label: 'Surface', value: definition.title },
             { label: 'Purpose', value: definition.primaryOutcome, tone: 'brand' },
             { label: 'Group', value: definition.group },
           ]}
         />
-      </BthSurface>
-    </BthBox>
+      </Surface>
+    </Box>
   );
 }
 
@@ -526,32 +526,32 @@ export function DshClientOperationDirectoryScreen({ onOpenScreen }: { onOpenScre
   const operationScreenCount = clientOperationScreenIds.length;
 
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">DSH client operations library</BthText>
-        <BthText role="bodyMd" tone="muted">
+    <MobileScrollView padding={4} gap={4}>
+      <Box gap={2}>
+        <Text role="titleLg">DSH client operations library</Text>
+        <Text role="bodyMd" tone="muted">
           Internal capability library for residual DSH client flows, grouped by customer journey instead of a flat fallback bucket.
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthSurface tone="brand" gap={3}>
-        <BthStatCard label="Covered capabilities" value={String(operationScreenCount)} deltaLabel="Documented internal client matrix" tone="info" />
-        <BthStatCard label="Navigation model" value="Grouped" deltaLabel="Create, delivery, benefits, proxy, settings" tone="success" />
-      </BthSurface>
+      <Surface tone="brand" gap={3}>
+        <StatCard label="Covered capabilities" value={String(operationScreenCount)} deltaLabel="Documented internal client matrix" tone="info" />
+        <StatCard label="Navigation model" value="Grouped" deltaLabel="Create, delivery, benefits, proxy, settings" tone="success" />
+      </Surface>
 
       {clientOperationDirectoryGroups.map((group) => (
-        <BthSurface key={group.title} tone="raised" gap={3}>
-          <BthSectionHeader title={group.title} subtitle={group.subtitle} />
-          <BthBox gap={2}>
+        <Surface key={group.title} tone="raised" gap={3}>
+          <SectionHeader title={group.title} subtitle={group.subtitle} />
+          <Box gap={2}>
             {group.itemIds.map((itemId) => {
               const item = clientOperationDefinitions[itemId];
 
-              return <BthListItem key={itemId} title={item.title} subtitle={item.subtitle} meta={item.stageLabel} badgeLabel={item.badgeLabel} onPress={() => onOpenScreen?.(itemId)} />;
+              return <ListItem key={itemId} title={item.title} subtitle={item.subtitle} meta={item.stageLabel} badgeLabel={item.badgeLabel} onPress={() => onOpenScreen?.(itemId)} />;
             })}
-          </BthBox>
-        </BthSurface>
+          </Box>
+        </Surface>
       ))}
-    </BthMobileScrollView>
+    </MobileScrollView>
   );
 }
 

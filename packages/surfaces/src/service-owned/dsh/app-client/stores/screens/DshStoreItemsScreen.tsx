@@ -1,17 +1,17 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthChip,
-  BthCard,
-  BthListItem,
-  BthMobileScrollView,
-  BthSearchField,
-  BthSectionHeader,
-  BthStateView,
-  BthSurface,
-  BthTabs,
-  BthText,
+  Box,
+  Button,
+  Chip,
+  Card,
+  ListItem,
+  MobileScrollView,
+  SearchField,
+  SectionHeader,
+  StateView,
+  Surface,
+  Tabs,
+  Text,
   useUiText,
 } from '@bthwani/ui-kit';
 
@@ -48,12 +48,12 @@ function renderNonReadyState(
   onRetry?: () => void,
 ) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title={storeText.states.itemsEmptyTitle}
         description={storeText.states.itemsEmptyDescription}
@@ -62,7 +62,7 @@ function renderNonReadyState(
   }
 
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title={storeText.states.itemsErrorTitle}
       description={storeText.states.itemsErrorDescription}
@@ -125,68 +125,68 @@ export function DshStoreItemsScreen({
   }
 
   return (
-    <BthMobileScrollView padding={4} gap={3}>
-      <BthSurface tone="brand" gap={3}>
-        <BthSectionHeader
+    <MobileScrollView padding={4} gap={3}>
+      <Surface tone="brand" gap={3}>
+        <SectionHeader
           title={storeName}
           subtitle={storeText.items.browseSubtitle}
         />
-        <BthBox layoutDirection="row" gap={2}>
-          <BthButton label={storeText.items.backToStore} tone="secondary" onPress={onBack} />
-          <BthButton label={storeText.items.openCart} onPress={onOpenCart} />
-        </BthBox>
-      </BthSurface>
+        <Box layoutDirection="row" gap={2}>
+          <Button label={storeText.items.backToStore} tone="secondary" onPress={onBack} />
+          <Button label={storeText.items.openCart} onPress={onOpenCart} />
+        </Box>
+      </Surface>
 
-      <BthSurface tone="inset" gap={3}>
-        <BthSearchField
+      <Surface tone="inset" gap={3}>
+        <SearchField
           label={storeText.items.searchLabel}
           value={query}
           onChangeText={onQueryChange}
           hint={storeText.items.searchHint}
         />
-        <BthTabs
+        <Tabs
           items={categoryTabs}
           value={activeCategory}
           onValueChange={onCategoryChange}
           variant="pill"
         />
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
+      <Surface tone="raised" gap={3}>
+        <SectionHeader
           title={storeText.items.sectionTitle}
           subtitle={storeText.items.sectionSubtitle}
           count={visibleItems.length}
         />
-        <BthText role="caption" tone="muted">
+        <Text role="caption" tone="muted">
           {storeText.items.sectionHint}
-        </BthText>
-        <BthBox gap={2}>
+        </Text>
+        <Box gap={2}>
           {visibleItems.map((item) => (
-            <BthCard
+            <Card
               key={item.id}
               title={item.name}
               subtitle={item.subtitle}
               footer={
-                <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                  <BthChip label={item.priceLabel ?? ''} selected />
-                  <BthChip label={item.categoryLabel} />
-                  {item.statusLabel ? <BthChip label={item.statusLabel} /> : null}
-                  {item.preparationTime ? <BthChip label={item.preparationTime} /> : null}
-                  {item.hasOptions ? <BthChip label={storeText.items.options} /> : null}
-                  {item.isAvailable === false ? <BthChip label={storeText.items.unavailable} /> : null}
-                </BthBox>
+                <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                  <Chip label={item.priceLabel ?? ''} selected />
+                  <Chip label={item.categoryLabel} />
+                  {item.statusLabel ? <Chip label={item.statusLabel} /> : null}
+                  {item.preparationTime ? <Chip label={item.preparationTime} /> : null}
+                  {item.hasOptions ? <Chip label={storeText.items.options} /> : null}
+                  {item.isAvailable === false ? <Chip label={storeText.items.unavailable} /> : null}
+                </Box>
               }
               onPress={() => onOpenItem?.(item.id)}
             />
           ))}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthText role="caption" tone="muted">
+      <Text role="caption" tone="muted">
         {storeText.items.runtimeNote}
-      </BthText>
-    </BthMobileScrollView>
+      </Text>
+    </MobileScrollView>
   );
 }
 

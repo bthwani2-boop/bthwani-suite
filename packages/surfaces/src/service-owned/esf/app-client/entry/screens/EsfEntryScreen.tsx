@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthServiceHubShell, BthStateView } from '@bthwani/ui-kit';
+import { ServiceHubShell, StateView } from '@bthwani/ui-kit';
 
 export type EsfEntryScreenState = 'ready' | 'loading' | 'empty';
 
@@ -55,10 +55,10 @@ export function EsfEntryScreen({
   const emptyState =
     state === 'loading'
       ? (
-        <BthStateView stateId="loading" />
+        <StateView stateId="loading" />
       )
       : (
-        <BthStateView
+        <StateView
           stateId="empty"
           title="No active ESF workspace"
           description="Keep one visible start point so operators can re-enter the ESF flow quickly."
@@ -68,7 +68,7 @@ export function EsfEntryScreen({
       );
 
   return (
-    <BthServiceHubShell
+    <ServiceHubShell
       title="ESF Entry"
       subtitle="Single-purpose entry for app-client escalation support and first action."
       sections={sections}

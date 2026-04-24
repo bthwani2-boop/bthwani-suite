@@ -2,14 +2,14 @@ import React from 'react';
 import { Pressable, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  BthBadge,
-  BthBox,
-  BthButton,
-  BthMobileScrollView,
-  BthScreenHeader,
-  BthSurface,
-  BthText,
-  BthTextField,
+  Badge,
+  Box,
+  Button,
+  MobileScrollView,
+  ScreenHeader,
+  Surface,
+  Text,
+  TextField,
   useTheme,
 } from '@bthwani/ui-kit';
 
@@ -85,17 +85,17 @@ function OrderChatBubble({ message }: { message: OrderChatMessage }) {
   const isOutbound = message.side === 'end';
 
   return (
-    <BthBox style={{ alignSelf: isOutbound ? 'flex-end' : 'flex-start', width: '100%', maxWidth: '86%' }}>
-      <BthSurface tone={isOutbound ? 'brand' : 'raised'} padding={3} gap={2} radiusToken="xl" border={false}>
-        <BthBox layoutDirection="row" justify="space-between" align="center" gap={2}>
-          <BthBadge label={message.sender} tone={isOutbound ? 'brand' : 'default'} />
-          <BthText role="caption" tone={isOutbound ? 'inverse' : 'soft'}>{message.time}</BthText>
-        </BthBox>
-        <BthText role="bodySm" tone={isOutbound ? 'inverse' : 'default'}>
+    <Box style={{ alignSelf: isOutbound ? 'flex-end' : 'flex-start', width: '100%', maxWidth: '86%' }}>
+      <Surface tone={isOutbound ? 'brand' : 'raised'} padding={3} gap={2} radiusToken="xl" border={false}>
+        <Box layoutDirection="row" justify="space-between" align="center" gap={2}>
+          <Badge label={message.sender} tone={isOutbound ? 'brand' : 'default'} />
+          <Text role="caption" tone={isOutbound ? 'inverse' : 'soft'}>{message.time}</Text>
+        </Box>
+        <Text role="bodySm" tone={isOutbound ? 'inverse' : 'default'}>
           {message.text}
-        </BthText>
-      </BthSurface>
-    </BthBox>
+        </Text>
+      </Surface>
+    </Box>
   );
 }
 
@@ -143,31 +143,31 @@ export function DshCaptainOrderChatScreen({
   }, [canSend, draft]);
 
   return (
-    <BthMobileScrollView fill padding={4} gap={4}>
-      <BthScreenHeader
+    <MobileScrollView fill padding={4} gap={4}>
+      <ScreenHeader
         title="تواصل الطلب"
         subtitle="رسائل الطلب المختصرة تبقى مع نفس المهمة حتى الإغلاق."
         actionLabel={onBack ? 'عودة للتفاصيل' : undefined}
         onActionPress={onBack}
       />
 
-      <BthBox gap={2}>
-        <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <BthBadge label={`#${taskId}`} tone="brand" />
-          <BthBadge label={isReadOnly ? 'مقروء فقط' : 'نشط'} tone={isReadOnly ? 'success' : 'warning'} />
-        </BthBox>
-        <BthText role="bodySm" tone="muted">
+      <Box gap={2}>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          <Badge label={`#${taskId}`} tone="brand" />
+          <Badge label={isReadOnly ? 'مقروء فقط' : 'نشط'} tone={isReadOnly ? 'success' : 'warning'} />
+        </Box>
+        <Text role="bodySm" tone="muted">
           {pickupLabel} · {dropoffLabel}
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthSurface tone="raised" padding={4} gap={3} radiusToken="xl">
-        <BthBox gap={1}>
-          <BthText role="titleSm">سجل تواصل الطلب</BthText>
-          <BthText role="bodySm" tone="muted">
+      <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+        <Box gap={1}>
+          <Text role="titleSm">سجل تواصل الطلب</Text>
+          <Text role="bodySm" tone="muted">
             تحديثات قصيرة، مرفقات خفيفة، ومتابعة مباشرة من نفس الطلب.
-          </BthText>
-        </BthBox>
+          </Text>
+        </Box>
 
         <ScrollView style={{ maxHeight: 380 }} contentContainerStyle={{ gap: 12 }} showsVerticalScrollIndicator={false}>
           {messages.map((message) => (
@@ -175,8 +175,8 @@ export function DshCaptainOrderChatScreen({
           ))}
         </ScrollView>
 
-        <BthSurface tone={isReadOnly ? 'inset' : 'default'} padding={3} gap={2} radiusToken="lg">
-          <BthTextField
+        <Surface tone={isReadOnly ? 'inset' : 'default'} padding={3} gap={2} radiusToken="lg">
+          <TextField
             value={draft}
             onChangeText={setDraft}
             editable={!isReadOnly}
@@ -185,13 +185,13 @@ export function DshCaptainOrderChatScreen({
             numberOfLines={3}
             style={{ minHeight: 92, textAlignVertical: 'top' }}
           />
-          <BthBox layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
-            <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          <Box layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
               <ComposerActionButton iconName="mic-outline" accessibilityLabel="رسالة صوتية" disabled={isReadOnly} />
               <ComposerActionButton iconName="camera-outline" accessibilityLabel="التقاط صورة" disabled={isReadOnly} />
               <ComposerActionButton iconName="videocam-outline" accessibilityLabel="التقاط فيديو" disabled={isReadOnly} />
-            </BthBox>
-            <BthButton
+            </Box>
+            <Button
               label={isReadOnly ? 'مقفل' : 'إرسال'}
               tone={isReadOnly ? 'secondary' : 'primary'}
               size="sm"
@@ -199,13 +199,13 @@ export function DshCaptainOrderChatScreen({
               disabled={!canSend}
               onPress={handleSend}
             />
-          </BthBox>
-          <BthText role="caption" tone="muted">
+          </Box>
+          <Text role="caption" tone="muted">
             {isReadOnly ? 'تم تسليم الطلب. التواصل هنا للقراءة فقط.' : 'الرسائل المختصرة فقط داخل هذا المسار.'}
-          </BthText>
-        </BthSurface>
-      </BthSurface>
-    </BthMobileScrollView>
+          </Text>
+        </Surface>
+      </Surface>
+    </MobileScrollView>
   );
 }
 

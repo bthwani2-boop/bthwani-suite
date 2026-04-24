@@ -1,2 +1,2 @@
-export { MobileRoot, BthMobileRoot } from './root';
-export type { MobileRootProps, BthMobileRootProps } from './root';
+export { MobileRoot } from './root';
+export type { MobileRootProps } from './root';

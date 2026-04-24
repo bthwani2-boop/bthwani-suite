@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BthBadge, BthBox, BthButton, BthIcon, BthMobileScrollView, BthSurface, BthText, BthTopBar, colorPalette } from '@bthwani/ui-kit';
+import { Badge, Box, Button, Icon, MobileScrollView, Surface, Text, TopBar } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
 import { dshNotificationsFixtures } from '../fixtures/dshNotificationsFixtures';
 
@@ -74,7 +74,7 @@ function resolveNotificationPress(
 
 function NotificationGlyph() {
   return (
-    <BthBox
+    <Box
       background="warningSurface"
       border
       borderTone="brand"
@@ -83,8 +83,8 @@ function NotificationGlyph() {
       justify="center"
       style={{ width: 48, height: 48, flexShrink: 0 }}
     >
-      <BthBox background="brand" radiusToken="pill" style={{ width: 12, height: 12 }} />
-    </BthBox>
+      <Box background="brand" radiusToken="pill" style={{ width: 12, height: 12 }} />
+    </Box>
   );
 }
 
@@ -96,25 +96,25 @@ function DshNotificationCard({
   onPress?: () => void;
 }) {
   const card = (
-    <BthSurface tone="raised" padding={4} gap={3} radiusToken="xl" elevationToken="raised" style={{ width: '100%' }}>
-      <BthBox layoutDirection="row" justify="space-between" align="flex-start" gap={3}>
+    <Surface tone="raised" padding={4} gap={3} radiusToken="xl" elevationToken="raised" style={{ width: '100%' }}>
+      <Box layoutDirection="row" justify="space-between" align="flex-start" gap={3}>
         <NotificationGlyph />
-        <BthBox gap={2} style={{ flex: 1 }}>
-          <BthText role="bodyStrong" align="start" numberOfLines={2}>
+        <Box gap={2} style={{ flex: 1 }}>
+          <Text role="bodyStrong" align="start" numberOfLines={2}>
             {item.title}
-          </BthText>
-          <BthText role="bodySm" tone="muted" align="start" numberOfLines={3}>
+          </Text>
+          <Text role="bodySm" tone="muted" align="start" numberOfLines={3}>
             {item.subtitle}
-          </BthText>
-        </BthBox>
-      </BthBox>
-      <BthBox layoutDirection="row" justify="space-between" align="center" gap={3}>
-        <BthBadge label={item.badgeLabel} tone={resolveBadgeTone(item.badgeLabel)} />
-        <BthText role="caption" tone="soft" align="end">
+          </Text>
+        </Box>
+      </Box>
+      <Box layoutDirection="row" justify="space-between" align="center" gap={3}>
+        <Badge label={item.badgeLabel} tone={resolveBadgeTone(item.badgeLabel)} />
+        <Text role="caption" tone="soft" align="end">
           {item.meta}
-        </BthText>
-      </BthBox>
-    </BthSurface>
+        </Text>
+      </Box>
+    </Surface>
   );
 
   if (!onPress) {
@@ -139,12 +139,12 @@ function DshNotificationCard({
 
 function DshNotificationsSectionHeader({ count }: { count: number }) {
   return (
-    <BthBox gap={2}>
-      <BthBox layoutDirection="row" justify="space-between" align="center" gap={3}>
-        <BthBox gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
-          <BthText role="titleSm">آخر التنبيهات</BthText>
-        </BthBox>
-        <BthBox
+    <Box gap={2}>
+      <Box layoutDirection="row" justify="space-between" align="center" gap={3}>
+        <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+          <Text role="titleSm">آخر التنبيهات</Text>
+        </Box>
+        <Box
           background="brandSurface"
           border
           borderTone="brand"
@@ -153,12 +153,12 @@ function DshNotificationsSectionHeader({ count }: { count: number }) {
           justify="center"
           style={{ width: 42, height: 42, flexShrink: 0 }}
         >
-          <BthText role="bodyStrong" tone="brand" align="center">
+          <Text role="bodyStrong" tone="brand" align="center">
             {count}
-          </BthText>
-        </BthBox>
-      </BthBox>
-    </BthBox>
+          </Text>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
@@ -170,16 +170,16 @@ function DshNotificationsEmptyState({
   onBack?: () => void;
 }) {
   return (
-    <BthSurface tone="inset" padding={5} gap={3}>
-      <BthText role="titleSm">لا توجد إشعارات حالياً</BthText>
-      <BthText role="bodySm" tone="muted">
+    <Surface tone="inset" padding={5} gap={3}>
+      <Text role="titleSm">لا توجد إشعارات حالياً</Text>
+      <Text role="bodySm" tone="muted">
         عندما يصل تنبيه جديد سيظهر هنا بنفس البنية الواضحة والبسيطة.
-      </BthText>
-      <BthBox layoutDirection="row" gap={2}>
-        {onOpenSearch ? <BthButton label="بحث DSH" tone="secondary" fullWidth={false} onPress={onOpenSearch} /> : null}
-        {onBack ? <BthButton label="رجوع" tone="ghost" fullWidth={false} onPress={onBack} /> : null}
-      </BthBox>
-    </BthSurface>
+      </Text>
+      <Box layoutDirection="row" gap={2}>
+        {onOpenSearch ? <Button label="بحث DSH" tone="secondary" fullWidth={false} onPress={onOpenSearch} /> : null}
+        {onBack ? <Button label="رجوع" tone="ghost" fullWidth={false} onPress={onBack} /> : null}
+      </Box>
+    </Surface>
   );
 }
 
@@ -198,14 +198,14 @@ function renderContent(
 
   return (
     <View style={{ flex: 1 }}>
-      <BthTopBar
+      <TopBar
         variant="surface"
         title="الإشعارات"
         trailingAction={
           onBack
             ? {
                 id: 'back',
-                icon: <BthIcon name="arrow-back" size={24} color={colorPalette.brand ?? '#F97316'} />,
+                icon: <Icon name="arrow-back" size={24} tone="brand" />,
                 mirrorInRtl: true,
                 accessibilityLabel: 'رجوع',
                 onPress: onBack,
@@ -214,17 +214,17 @@ function renderContent(
         }
       />
 
-      <BthMobileScrollView fill padding={4} gap={4}>
+      <MobileScrollView fill padding={4} gap={4}>
         <DshNotificationsSectionHeader count={resolvedItems.length} />
 
-        <BthBox gap={3}>
+        <Box gap={3}>
           {resolvedItems.length ? (
             resolvedItems.map((item) => <DshNotificationCard key={item.id} item={item} onPress={item.onPress} />)
           ) : (
             <DshNotificationsEmptyState onOpenSearch={onOpenSearch} onBack={onBack} />
           )}
-        </BthBox>
-      </BthMobileScrollView>
+        </Box>
+      </MobileScrollView>
     </View>
   );
 }

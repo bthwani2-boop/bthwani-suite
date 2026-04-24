@@ -1,13 +1,13 @@
 import React from 'react';
 import { View } from 'react-native';
 import {
-  BthBadge,
-  BthButton,
-  BthDashboardShell,
-  BthListItem,
-  BthSearchField,
-  BthSurface,
-  BthText,
+  Badge,
+  Button,
+  DashboardShell,
+  ListItem,
+  SearchField,
+  Surface,
+  Text,
   spacing,
 } from '@bthwani/ui-kit';
 
@@ -35,22 +35,22 @@ export function ClientSearchSurface({
   onClearQuery,
 }: ClientSearchSurfaceProps) {
   return (
-    <BthDashboardShell
+    <DashboardShell
       title="البحث العام"
       subtitle="مدخل موحد للوصول السريع إلى الخدمات والمسارات المشتركة"
       hero={
-        <BthSurface tone="brand" padding={5} gap={4}>
+        <Surface tone="brand" padding={5} gap={4}>
           <View style={{ gap: spacing[2] }}>
-            <BthBadge label="عالمي · سريع" tone="default" />
-            <BthText role="titleSm" tone="inverse">
+            <Badge label="عالمي · سريع" tone="default" />
+            <Text role="titleSm" tone="inverse">
               ابحث مرة واحدة
-            </BthText>
-            <BthText role="bodyMd" tone="inverse">
+            </Text>
+            <Text role="bodyMd" tone="inverse">
               خدمة، إعداد، إشعار، أو مسار عام. كل شيء يمر من هنا بدون تشتيت.
-            </BthText>
+            </Text>
           </View>
 
-          <BthSearchField
+          <SearchField
             label="بحث"
             value={queryValue}
             onChangeText={onChangeQuery}
@@ -58,20 +58,20 @@ export function ClientSearchSurface({
           />
 
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
-            {onBack ? <BthButton label="العودة" tone="ghost" onPress={onBack} fullWidth={false} /> : null}
-            {onClearQuery ? <BthButton label="مسح" tone="secondary" onPress={onClearQuery} fullWidth={false} /> : null}
+            {onBack ? <Button label="العودة" tone="ghost" onPress={onBack} fullWidth={false} /> : null}
+            {onClearQuery ? <Button label="مسح" tone="secondary" onPress={onClearQuery} fullWidth={false} /> : null}
           </View>
-        </BthSurface>
+        </Surface>
       }
       sections={[
         {
           title: 'نتائج البحث',
           subtitle: results.length ? `${results.length} نتيجة متاحة` : 'لا توجد نتيجة مطابقة حاليًا',
           content: (
-            <BthSurface tone="raised" padding={3} gap={2}>
+            <Surface tone="raised" padding={3} gap={2}>
               {results.length ? (
                 results.map((item) => (
-                  <BthListItem
+                  <ListItem
                     key={item.id}
                     title={item.title}
                     subtitle={item.subtitle}
@@ -80,11 +80,11 @@ export function ClientSearchSurface({
                   />
                 ))
               ) : (
-                <BthText role="bodySm" tone="muted">
+                <Text role="bodySm" tone="muted">
                   لا توجد نتائج مطابقة. جرّب اسم خدمة أو مسار عام مختلف.
-                </BthText>
+                </Text>
               )}
-            </BthSurface>
+            </Surface>
           ),
         },
       ]}

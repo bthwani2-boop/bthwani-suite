@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Pressable } from 'react-native';
-import { BthBox, BthButton, BthFormScreenShell, BthSectionHeader, BthStateView, BthSurface, BthTabs, BthText, BthTextField } from '@bthwani/ui-kit';
+import { Box, Button, FormScreenShell, SectionHeader, StateView, Surface, Tabs, Text, TextField } from '@bthwani/ui-kit';
 
 export type DshAwnakOrderCreateScreenState = 'ready' | 'loading' | 'disabled';
 
@@ -52,7 +52,7 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
   const submitLabel = 'عرض الفاتورة';
 
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   const validate = () => {
@@ -82,41 +82,41 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
   };
 
   const formFields = (
-    <BthBox gap={3}>
-      <BthBox gap={2}>
-        <BthSectionHeader title="المسار" subtitle="اختر من أين وإلى أين، ثم أكمل بقية التفاصيل." />
-        <BthBox gap={2} layoutDirection="row" style={{ alignItems: 'center' }}>
-          <BthBox style={{ flex: 1 }}>
+    <Box gap={3}>
+      <Box gap={2}>
+        <SectionHeader title="المسار" subtitle="اختر من أين وإلى أين، ثم أكمل بقية التفاصيل." />
+        <Box gap={2} layoutDirection="row" style={{ alignItems: 'center' }}>
+          <Box style={{ flex: 1 }}>
             <Pressable onPress={() => setValidationError('Use the address field below to edit this location.')} disabled={isDisabled}>
-              <BthSurface tone="raised" gap={2}>
-                <BthText role="bodySm" tone="muted">من عنوان</BthText>
-                <BthText role="bodyStrong">حدد الموقع</BthText>
-              </BthSurface>
+              <Surface tone="raised" gap={2}>
+                <Text role="bodySm" tone="muted">من عنوان</Text>
+                <Text role="bodyStrong">حدد الموقع</Text>
+              </Surface>
             </Pressable>
-            <BthTextField value={pickupAddress} onChangeText={setPickupAddress} editable={!isDisabled} placeholder="حدد الموقع" />
-          </BthBox>
+            <TextField value={pickupAddress} onChangeText={setPickupAddress} editable={!isDisabled} placeholder="حدد الموقع" />
+          </Box>
 
-          <BthBox style={{ width: 42, alignItems: 'center', justifyContent: 'center' }}>
-            <BthSurface tone="raised" gap={0}>
-              <BthText role="titleSm">⇄</BthText>
-            </BthSurface>
-          </BthBox>
+          <Box style={{ width: 42, alignItems: 'center', justifyContent: 'center' }}>
+            <Surface tone="raised" gap={0}>
+              <Text role="titleSm">⇄</Text>
+            </Surface>
+          </Box>
 
-          <BthBox style={{ flex: 1 }}>
+          <Box style={{ flex: 1 }}>
             <Pressable onPress={() => setValidationError('Use the address field below to edit this location.')} disabled={isDisabled}>
-              <BthSurface tone="raised" gap={2}>
-                <BthText role="bodySm" tone="muted">إلى عنوان</BthText>
-                <BthText role="bodyStrong">حدد الموقع</BthText>
-              </BthSurface>
+              <Surface tone="raised" gap={2}>
+                <Text role="bodySm" tone="muted">إلى عنوان</Text>
+                <Text role="bodyStrong">حدد الموقع</Text>
+              </Surface>
             </Pressable>
-            <BthTextField value={dropoffAddress} onChangeText={setDropoffAddress} editable={!isDisabled} placeholder="حدد الموقع" />
-          </BthBox>
-        </BthBox>
-      </BthBox>
+            <TextField value={dropoffAddress} onChangeText={setDropoffAddress} editable={!isDisabled} placeholder="حدد الموقع" />
+          </Box>
+        </Box>
+      </Box>
 
-      <BthBox gap={3}>
-        <BthSectionHeader title="نوع الطلب" subtitle="اختر التصنيف المناسب لهذا الطلب." />
-        <BthTabs
+      <Box gap={3}>
+        <SectionHeader title="نوع الطلب" subtitle="اختر التصنيف المناسب لهذا الطلب." />
+        <Tabs
           items={[
             { value: 'PERSONAL_ITEMS', label: 'أغراض شخصية' },
             { value: 'FOOD', label: 'طعام' },
@@ -130,11 +130,11 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
           onValueChange={(value) => setOrderType(value as AwnakOrderType)}
           variant="pill"
         />
-      </BthBox>
+      </Box>
 
-      <BthBox gap={3}>
-        <BthSectionHeader title="وقت تنفيذ الطلب" subtitle="اختر التنفيذ الآن أو لاحقًا." />
-        <BthTabs
+      <Box gap={3}>
+        <SectionHeader title="وقت تنفيذ الطلب" subtitle="اختر التنفيذ الآن أو لاحقًا." />
+        <Tabs
           items={[
             { value: 'now', label: 'الآن' },
             { value: 'scheduled', label: 'لاحقًا' },
@@ -144,24 +144,24 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
           variant="pill"
         />
         {timeMode === 'scheduled' ? (
-          <BthBox gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
-            <BthBox style={{ flex: 1, minWidth: 150 }}>
-              <BthTextField label="Date" value={scheduledDate} onChangeText={setScheduledDate} editable={!isDisabled} placeholder="YYYY-MM-DD" />
-            </BthBox>
-            <BthBox style={{ flex: 1, minWidth: 150 }}>
-              <BthTextField label="Time" value={scheduledTime} onChangeText={setScheduledTime} editable={!isDisabled} placeholder="HH:MM" />
-            </BthBox>
-          </BthBox>
+          <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
+            <Box style={{ flex: 1, minWidth: 150 }}>
+              <TextField label="Date" value={scheduledDate} onChangeText={setScheduledDate} editable={!isDisabled} placeholder="YYYY-MM-DD" />
+            </Box>
+            <Box style={{ flex: 1, minWidth: 150 }}>
+              <TextField label="Time" value={scheduledTime} onChangeText={setScheduledTime} editable={!isDisabled} placeholder="HH:MM" />
+            </Box>
+          </Box>
         ) : null}
-      </BthBox>
+      </Box>
 
-      <BthBox gap={3}>
-        <BthSectionHeader title="ملاحظات الطلب" subtitle="اكتب ملاحظاتك بشكل مختصر وواضح." />
-        <BthTextField label="Order note" value={notes} onChangeText={setNotes} editable={!isDisabled} placeholder="اكتب ملاحظاتك هنا" />
-      </BthBox>
+      <Box gap={3}>
+        <SectionHeader title="ملاحظات الطلب" subtitle="اكتب ملاحظاتك بشكل مختصر وواضح." />
+        <TextField label="Order note" value={notes} onChangeText={setNotes} editable={!isDisabled} placeholder="اكتب ملاحظاتك هنا" />
+      </Box>
 
-      {validationError ? <BthText role="bodySm" tone="muted">{validationError}</BthText> : null}
-    </BthBox>
+      {validationError ? <Text role="bodySm" tone="muted">{validationError}</Text> : null}
+    </Box>
   );
 
   if (embedded) {
@@ -185,27 +185,27 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
               elevation: 18,
             }}
           >
-            <BthBox gap={2}>
-              <BthBox style={{ alignSelf: 'center', width: 54, height: 5, borderRadius: 999, backgroundColor: '#D6DDE8' }} />
-              <BthBox gap={1}>
-                <BthText role="titleSm">طلب عونك</BthText>
-                <BthText role="bodySm" tone="muted">
+            <Box gap={2}>
+              <Box style={{ alignSelf: 'center', width: 54, height: 5, borderRadius: 999, backgroundColor: '#D6DDE8' }} />
+              <Box gap={1}>
+                <Text role="titleSm">طلب عونك</Text>
+                <Text role="bodySm" tone="muted">
                   نفس أسلوب SHEIN: داخل نفس الصفحة ولوح سفلي خفيف.
-                </BthText>
-              </BthBox>
-            </BthBox>
+                </Text>
+              </Box>
+            </Box>
 
-            <BthBox gap={2}>
-              <BthSurface tone="brand" gap={2}>
-                <BthText role="bodyStrong">DSH</BthText>
-                <BthText role="bodySm" tone="muted">طلب يدوي مباشر بدون تغيير الصفحة.</BthText>
-                <BthText role="bodySm" tone="muted">المطلوب واضح: المسار، نوع الطلب، وقت التنفيذ، والملاحظات.</BthText>
-              </BthSurface>
+            <Box gap={2}>
+              <Surface tone="brand" gap={2}>
+                <Text role="bodyStrong">DSH</Text>
+                <Text role="bodySm" tone="muted">طلب يدوي مباشر بدون تغيير الصفحة.</Text>
+                <Text role="bodySm" tone="muted">المطلوب واضح: المسار، نوع الطلب، وقت التنفيذ، والملاحظات.</Text>
+              </Surface>
 
               {formFields}
 
-              <BthButton label={submitLabel} tone="primary" onPress={handleSubmit} disabled={isDisabled} />
-            </BthBox>
+              <Button label={submitLabel} tone="primary" onPress={handleSubmit} disabled={isDisabled} />
+            </Box>
           </Pressable>
         </Pressable>
       </Modal>
@@ -213,18 +213,18 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
   }
 
   return (
-    <BthFormScreenShell
+    <FormScreenShell
       title="طلب عونك"
       subtitle="اطلب سائق لتوصيل أي غرض من مكان إلى مكان مع تحديد نوع الطلب ووقت التنفيذ."
       submitLabel={submitLabel}
       onSubmit={handleSubmit}
       submitDisabled={isDisabled}
     >
-      <BthBox gap={3}>
+      <Box gap={3}>
         {formFields}
-        <BthButton label={submitLabel} tone="primary" onPress={handleSubmit} disabled={isDisabled} />
-      </BthBox>
-    </BthFormScreenShell>
+        <Button label={submitLabel} tone="primary" onPress={handleSubmit} disabled={isDisabled} />
+      </Box>
+    </FormScreenShell>
   );
 }
 

@@ -1,18 +1,18 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import {
   useRouter } from 'next/navigation';
-import { BthBox,
-  BthButton,
-  BthStateView,
-  BthText
+import { Box,
+  Button,
+  StateView,
+  Text
 } from '@bthwani/ui-kit';
 import {
-  BthWebMissionHeroCard,
-  BthWebPageFrame,
-  BthWebSectionCard,
-  BthWebSignalCard,
+  WebMissionHeroCard,
+  WebPageFrame,
+  WebSectionCard,
+  WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import { getSampleDshOrders } from './order-fixtures';
@@ -91,7 +91,7 @@ export function ControlPanelDshOrdersScreen({
     const stateCopy = resolveStateCopy(dshText, state);
 
     return (
-      <BthWebPageFrame
+      <WebPageFrame
         eyebrow={dshText.orders.pageEyebrow}
         title={dshText.orders.pageTitle}
         description={dshText.orders.pageDescription}
@@ -99,13 +99,13 @@ export function ControlPanelDshOrdersScreen({
         embedded={embedded}
         showHeader={showHeader}
       >
-        <BthStateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
-      </BthWebPageFrame>
+        <StateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
+      </WebPageFrame>
     );
   }
 
   return (
-    <BthWebPageFrame
+    <WebPageFrame
       eyebrow={dshText.orders.pageEyebrow}
       title={dshText.orders.pageTitle}
       description={dshText.orders.pageDescription}
@@ -114,7 +114,7 @@ export function ControlPanelDshOrdersScreen({
       showHeader={showHeader}
     >
       <div className={styles.stack}>
-        <BthWebMissionHeroCard
+        <WebMissionHeroCard
           badges={['/operations/dsh/orders', dshText.common.live, `${dshText.orders.badgesLabel}: ${orders.length}`]}
           eyebrow={dshText.orders.heroEyebrow}
           title={dshText.orders.heroTitle}
@@ -129,43 +129,43 @@ export function ControlPanelDshOrdersScreen({
         />
 
         <div className={styles.signalGrid}>
-          <BthWebSignalCard title={dshText.orders.assignedTitle} value={String(assignedCount)} description={dshText.orders.assignedDescription} tone="best" />
-          <BthWebSignalCard title={dshText.orders.newTitle} value={String(openCount)} description={dshText.orders.newDescription} />
-          <BthWebSignalCard title={dshText.orders.reviewTitle} value={String(reviewCount)} description={dshText.orders.reviewDescription} />
+          <WebSignalCard title={dshText.orders.assignedTitle} value={String(assignedCount)} description={dshText.orders.assignedDescription} tone="best" />
+          <WebSignalCard title={dshText.orders.newTitle} value={String(openCount)} description={dshText.orders.newDescription} />
+          <WebSignalCard title={dshText.orders.reviewTitle} value={String(reviewCount)} description={dshText.orders.reviewDescription} />
         </div>
 
-        <BthWebSectionCard title={dshText.orders.listTitle} description={dshText.orders.listDescription}>
+        <WebSectionCard title={dshText.orders.listTitle} description={dshText.orders.listDescription}>
           <div className={styles.cardGrid}>
             {orders.map((order) => (
-              <BthBox key={order.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-                <BthBox layoutDirection="row" justify="space-between" align="center">
-                  <BthText role="bodyStrong">{order.id}</BthText>
-                  <BthText role="caption" tone={order.statusTone}>
+              <Box key={order.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+                <Box layoutDirection="row" justify="space-between" align="center">
+                  <Text role="bodyStrong">{order.id}</Text>
+                  <Text role="caption" tone={order.statusTone}>
                     {order.statusLabel}
-                  </BthText>
-                </BthBox>
-                <BthText role="bodySm" tone="muted">{order.customer}</BthText>
-                <BthText role="bodySm" tone="muted">{order.route}</BthText>
-                <BthBox layoutDirection="row" justify="space-between" align="center">
-                  <BthText role="caption" tone="soft">
+                  </Text>
+                </Box>
+                <Text role="bodySm" tone="muted">{order.customer}</Text>
+                <Text role="bodySm" tone="muted">{order.route}</Text>
+                <Box layoutDirection="row" justify="space-between" align="center">
+                  <Text role="caption" tone="soft">
                     {dshText.orders.etaPrefix} {order.eta}
-                  </BthText>
-                  <BthText role="caption" tone="soft">{order.amount}</BthText>
-                </BthBox>
-                <BthText role="caption" tone="soft">{order.destinationLabel}</BthText>
-                <BthBox>
-                  <BthButton
+                  </Text>
+                  <Text role="caption" tone="soft">{order.amount}</Text>
+                </Box>
+                <Text role="caption" tone="soft">{order.destinationLabel}</Text>
+                <Box>
+                  <Button
                     label={dshText.orders.openDetail}
                     tone="ghost"
                     onPress={() => router.push(`/operations/dsh/orders/${order.id}`)}
                   />
-                </BthBox>
-              </BthBox>
+                </Box>
+              </Box>
             ))}
           </div>
-        </BthWebSectionCard>
+        </WebSectionCard>
       </div>
-    </BthWebPageFrame>
+    </WebPageFrame>
   );
 }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthBadge, BthBox, BthButton, BthKeyValueList, BthMobileScrollView, BthSectionHeader, BthSurface, BthText } from '@bthwani/ui-kit';
+import { Badge, Box, Button, KeyValueList, MobileScrollView, SectionHeader, Surface, Text } from '@bthwani/ui-kit';
 
 export type CaptainOrderDetailSummary = {
   taskId: string;
@@ -28,17 +28,17 @@ export function CaptainOrderDetailScreen({
   onRetry,
 }: CaptainOrderDetailScreenProps) {
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <BthSurface tone="brand" gap={3}>
-        <BthBox gap={1} style={{ alignItems: 'flex-end' }}>
-          <BthBadge label="Captain order" tone="warning" />
-          <BthText role="titleLg" style={{ textAlign: 'right' }}>{summary.taskId}</BthText>
-          <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+    <MobileScrollView padding={4} gap={4}>
+      <Surface tone="brand" gap={3}>
+        <Box gap={1} style={{ alignItems: 'flex-end' }}>
+          <Badge label="Captain order" tone="warning" />
+          <Text role="titleLg" style={{ textAlign: 'right' }}>{summary.taskId}</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             {summary.currentStageLabel}
-          </BthText>
-        </BthBox>
+          </Text>
+        </Box>
 
-        <BthKeyValueList
+        <KeyValueList
           items={[
             { label: 'Pickup', value: summary.pickupLabel, tone: 'brand' },
             { label: 'Dropoff', value: summary.dropoffLabel },
@@ -46,19 +46,19 @@ export function CaptainOrderDetailScreen({
             { label: 'Next step', value: summary.nextActionLabel, tone: 'success' },
           ]}
         />
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader title="Order actions" subtitle="Confirm the next step without leaving the order detail surface." />
-        <BthBox gap={2}>
-          {onConfirmPickup ? <BthButton label="Confirm pickup" onPress={onConfirmPickup} /> : null}
-          {onConfirmDelivery ? <BthButton label="Confirm delivery" tone="secondary" onPress={onConfirmDelivery} /> : null}
-          {onOpenNextTask ? <BthButton label="Open next order" tone="secondary" onPress={onOpenNextTask} /> : null}
-          {onBackToInbox ? <BthButton label="Back to inbox" tone="ghost" onPress={onBackToInbox} /> : null}
-          {onRetry ? <BthButton label="Retry" tone="ghost" onPress={onRetry} /> : null}
-        </BthBox>
-      </BthSurface>
-    </BthMobileScrollView>
+      <Surface tone="raised" gap={3}>
+        <SectionHeader title="Order actions" subtitle="Confirm the next step without leaving the order detail surface." />
+        <Box gap={2}>
+          {onConfirmPickup ? <Button label="Confirm pickup" onPress={onConfirmPickup} /> : null}
+          {onConfirmDelivery ? <Button label="Confirm delivery" tone="secondary" onPress={onConfirmDelivery} /> : null}
+          {onOpenNextTask ? <Button label="Open next order" tone="secondary" onPress={onOpenNextTask} /> : null}
+          {onBackToInbox ? <Button label="Back to inbox" tone="ghost" onPress={onBackToInbox} /> : null}
+          {onRetry ? <Button label="Retry" tone="ghost" onPress={onRetry} /> : null}
+        </Box>
+      </Surface>
+    </MobileScrollView>
   );
 }
 

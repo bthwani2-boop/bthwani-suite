@@ -2,16 +2,16 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View } from 'react-native';
 import {
-  BthBadge,
-  BthBox,
-  BthButton,
-  BthCard,
-  BthChip,
-  BthKeyValueList,
-  BthOptionRow,
-  BthSectionHeader,
-  BthSurface,
-  BthText,
+  Badge,
+  Box,
+  Button,
+  Card,
+  Chip,
+  KeyValueList,
+  OptionRow,
+  SectionHeader,
+  Surface,
+  Text,
   useTheme,
 } from '@bthwani/ui-kit';
 import {
@@ -42,7 +42,7 @@ function OrderMetricCard({ metric }: { metric: DshMySpaceOrderMetric }) {
   }[metric.tone];
 
   return (
-    <BthCard
+    <Card
       title={metric.label}
       subtitle={metric.helperText}
       style={{
@@ -52,11 +52,11 @@ function OrderMetricCard({ metric }: { metric: DshMySpaceOrderMetric }) {
         borderWidth: 1,
         borderColor: theme.line,
       }}
-      >
-      <BthText role="hero" style={{ color: accent }}>
+    >
+      <Text role="hero" style={{ color: accent }}>
         {metric.value}
-      </BthText>
-    </BthCard>
+      </Text>
+    </Card>
   );
 }
 
@@ -123,7 +123,7 @@ function OrderCard({
   const secondaryAction = order.statusId === 'active' ? repeatAction : trackingAction;
 
   return (
-    <BthSurface
+    <Surface
       tone={featured ? 'inset' : 'raised'}
       padding={2}
       gap={2}
@@ -139,7 +139,7 @@ function OrderCard({
         elevation: featured ? 3 : 1,
       }}
     >
-      <BthBox layoutDirection="row" align="center" gap={2}>
+      <Box layoutDirection="row" align="center" gap={2}>
         <View
           style={{
             width: 46,
@@ -155,20 +155,20 @@ function OrderCard({
           <Ionicons name={iconName} size={20} color={featured ? theme.brandContrast : theme.brand} />
         </View>
 
-        <BthBox gap={0} style={{ flex: 1 }}>
-          <BthText role="bodyStrong">{order.title}</BthText>
-          <BthText role="bodySm" tone="muted" numberOfLines={2}>
+        <Box gap={0} style={{ flex: 1 }}>
+          <Text role="bodyStrong">{order.title}</Text>
+          <Text role="bodySm" tone="muted" numberOfLines={2}>
             {order.summary}
-          </BthText>
-        </BthBox>
+          </Text>
+        </Box>
 
-        <BthBox gap={1} style={{ alignItems: 'flex-end' }}>
-          <BthBadge label={order.statusLabel} tone={resolveStatusTone(order)} />
-          <BthChip label={order.fulfillmentLabel} selected />
-        </BthBox>
-      </BthBox>
+        <Box gap={1} style={{ alignItems: 'flex-end' }}>
+          <Badge label={order.statusLabel} tone={resolveStatusTone(order)} />
+          <Chip label={order.fulfillmentLabel} selected />
+        </Box>
+      </Box>
 
-      <BthKeyValueList
+      <KeyValueList
         dense
         items={[
           { label: 'رقم الطلب', value: order.orderNumber },
@@ -178,13 +178,13 @@ function OrderCard({
         ]}
       />
 
-      <BthBox layoutDirection="row" gap={2}>
-        {primaryAction ? <BthButton label={primaryLabel} onPress={primaryAction} fullWidth={false} style={{ flex: 1 }} /> : null}
+      <Box layoutDirection="row" gap={2}>
+        {primaryAction ? <Button label={primaryLabel} onPress={primaryAction} fullWidth={false} style={{ flex: 1 }} /> : null}
         {secondaryAction ? (
-          <BthButton label={secondaryLabel} tone="secondary" onPress={secondaryAction} fullWidth={false} style={{ flex: 1 }} />
+          <Button label={secondaryLabel} tone="secondary" onPress={secondaryAction} fullWidth={false} style={{ flex: 1 }} />
         ) : null}
-      </BthBox>
-    </BthSurface>
+      </Box>
+    </Surface>
   );
 }
 
@@ -193,7 +193,7 @@ function resolveQuickActionHandler(
   callbacks: {
     onOpenTracking?: () => void;
     onRepeatOrder?: () => void;
-  onOpenOrders?: () => void;
+    onOpenOrders?: () => void;
   },
 ) {
   if (kind === 'tracking') {
@@ -219,12 +219,12 @@ function QuickActionPanel({
   onOpenOrders?: () => void;
 }) {
   return (
-    <BthSurface tone="raised" padding={2} gap={2}>
-      <BthSectionHeader title="مسارات سريعة" subtitle="فتح الطلبات الحديثة أو الانتقال إلى التتبع دون ضياع المسار." />
+    <Surface tone="raised" padding={2} gap={2}>
+      <SectionHeader title="مسارات سريعة" subtitle="فتح الطلبات الحديثة أو الانتقال إلى التتبع دون ضياع المسار." />
 
-      <BthBox gap={2}>
+      <Box gap={2}>
         {quickActions.map((action) => (
-          <BthOptionRow
+          <OptionRow
             key={action.id}
             title={action.label}
             subtitle={action.summary}
@@ -232,8 +232,8 @@ function QuickActionPanel({
             onAction={resolveQuickActionHandler(action.kind, { onOpenOrders, onOpenTracking, onRepeatOrder })}
           />
         ))}
-      </BthBox>
-    </BthSurface>
+      </Box>
+    </Surface>
   );
 }
 
@@ -243,42 +243,34 @@ export function DshMySpaceOrdersScreen({ onOpenOrders, onOpenTracking, onRepeatO
   const visibleOrders = resolveFilterOrders(selectedFilterId, dshMySpaceOrdersFixture);
 
   return (
-    <BthBox gap={2}>
-      <BthSurface tone="raised" padding={2} gap={2}>
-        <BthSectionHeader
+    <Box gap={2}>
+      <Surface tone="raised" padding={2} gap={2}>
+        <SectionHeader
           title="لمحة سريعة"
           subtitle="الطلبات النشطة والسابقة ظاهرة هنا مع تكرار مباشر وتتبّع واضح في خطوة واحدة."
         />
 
-        <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           {dshMySpaceOrderMetrics.map((metric) => (
             <OrderMetricCard key={metric.label} metric={metric} />
           ))}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="raised" padding={2} gap={2}>
-        <BthSectionHeader title="الفلترة" subtitle="اختر نوع الطلب الذي تريد أن يبقى في الواجهة." />
+      <Surface tone="raised" padding={2} gap={2}>
+        <SectionHeader title="الفلترة" subtitle="اختر نوع الطلب الذي تريد أن يبقى في الواجهة." />
 
-        <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {dshMySpaceOrderFilters.map((filter) => (
-            <BthChip
-              key={filter.id}
-              label={filter.label}
-              selected={selectedFilterId === filter.id}
-              onPress={() => setSelectedFilterId(filter.id)}
-            />
+            <Chip key={filter.id} label={filter.label} selected={selectedFilterId === filter.id} onPress={() => setSelectedFilterId(filter.id)} />
           ))}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="raised" padding={2} gap={2}>
-        <BthSectionHeader
-          title="الطلبات المعروضة"
-          subtitle={`${visibleOrders.length} طلبات ظاهرة الآن مع مسار حالة واضح لكل بطاقة.`}
-        />
+      <Surface tone="raised" padding={2} gap={2}>
+        <SectionHeader title="الطلبات المعروضة" subtitle={`${visibleOrders.length} طلبات ظاهرة الآن مع مسار حالة واضح لكل بطاقة.`} />
 
-        <BthBox gap={2}>
+        <Box gap={2}>
           {visibleOrders.length > 0 ? (
             visibleOrders.map((order, index) => (
               <OrderCard
@@ -291,19 +283,19 @@ export function DshMySpaceOrdersScreen({ onOpenOrders, onOpenTracking, onRepeatO
               />
             ))
           ) : (
-            <BthSurface tone="inset" padding={2} gap={1}>
-              <BthText role="bodyStrong">لا توجد طلبات مطابقة لهذا الفلتر.</BthText>
-              <BthText role="bodySm" tone="muted">
+            <Surface tone="inset" padding={2} gap={1}>
+              <Text role="bodyStrong">لا توجد طلبات مطابقة لهذا الفلتر.</Text>
+              <Text role="bodySm" tone="muted">
                 جرّب إظهار الكل أو العودة إلى التتبع المباشر.
-              </BthText>
-              <BthBox layoutDirection="row" gap={2}>
-                <BthButton label="إظهار الكل" onPress={() => setSelectedFilterId('all')} fullWidth={false} />
-                {onOpenTracking ? <BthButton label="التتبع" tone="secondary" onPress={onOpenTracking} fullWidth={false} /> : null}
-              </BthBox>
-            </BthSurface>
+              </Text>
+              <Box layoutDirection="row" gap={2}>
+                <Button label="إظهار الكل" onPress={() => setSelectedFilterId('all')} fullWidth={false} />
+                {onOpenTracking ? <Button label="التتبع" tone="secondary" onPress={onOpenTracking} fullWidth={false} /> : null}
+              </Box>
+            </Surface>
           )}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
       <QuickActionPanel
         quickActions={dshMySpaceQuickActions}
@@ -311,12 +303,8 @@ export function DshMySpaceOrdersScreen({ onOpenOrders, onOpenTracking, onRepeatO
         onOpenTracking={onOpenTracking}
         onRepeatOrder={onRepeatOrder}
       />
-    </BthBox>
+    </Box>
   );
 }
 
 export default DshMySpaceOrdersScreen;
-
-
-
-

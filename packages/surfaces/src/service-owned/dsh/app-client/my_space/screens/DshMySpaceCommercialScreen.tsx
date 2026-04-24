@@ -1,16 +1,16 @@
 import React from 'react';
 import { Pressable, ScrollView } from 'react-native';
 import {
-  BthBadge,
-  BthBox,
-  BthButton,
-  BthCard,
-  BthCheckbox,
-  BthChip,
-  BthKeyValueList,
-  BthSectionHeader,
-  BthSurface,
-  BthText,
+  Badge,
+  Box,
+  Button,
+  Card,
+  Checkbox,
+  Chip,
+  KeyValueList,
+  SectionHeader,
+  Surface,
+  Text,
   spacing,
   useTheme,
 } from '@bthwani/ui-kit';
@@ -50,7 +50,7 @@ function CommercialMetricCard({
   }[tone];
 
   return (
-    <BthCard
+    <Card
       title={label}
       subtitle={helperText}
       style={{
@@ -61,10 +61,10 @@ function CommercialMetricCard({
         borderColor: theme.line,
       }}
     >
-      <BthText role="hero" style={{ color: accent }}>
+      <Text role="hero" style={{ color: accent }}>
         {value}
-      </BthText>
-    </BthCard>
+      </Text>
+    </Card>
   );
 }
 
@@ -81,7 +81,7 @@ function SubscriptionPlanTile({
 
   return (
     <Pressable accessibilityRole="button" accessibilityState={{ selected }} onPress={onPress} style={{ width: 124 }}>
-      <BthSurface
+      <Surface
         tone="raised"
         gap={1}
         padding={2}
@@ -98,16 +98,16 @@ function SubscriptionPlanTile({
           transform: [{ translateY: selected ? 6 : 0 }],
         }}
       >
-        <BthBox gap={0} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <BthText role="bodyStrong">{plan.title}</BthText>
-          <BthText role="titleLg" style={{ color: selected ? theme.brand : undefined }}>
+        <Box gap={0} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Text role="bodyStrong">{plan.title}</Text>
+          <Text role="titleLg" style={{ color: selected ? theme.brand : undefined }}>
             {plan.price}
-          </BthText>
-          <BthText role="bodySm" tone="muted">
+          </Text>
+          <Text role="bodySm" tone="muted">
             {plan.cadence}
-          </BthText>
-        </BthBox>
-      </BthSurface>
+          </Text>
+        </Box>
+      </Surface>
     </Pressable>
   );
 }
@@ -185,21 +185,21 @@ export function DshMySpaceCommercialScreen({
   };
 
   return (
-    <BthBox gap={compact ? 2 : 3}>
-      <BthSurface
+    <Box gap={compact ? 2 : 3}>
+      <Surface
         tone="raised"
         gap={2}
         padding={compact ? 2 : 3}
         style={{ borderWidth: 1, borderColor: theme.line, borderRadius: 22 }}
       >
-        <BthSectionHeader
+        <SectionHeader
           title="العروض والاشتراكات"
           subtitle="الولاء والمكافآت والاشتراكات والعروض في صفحة واحدة قابلة للتحكم."
-          trailing={<BthBadge tone="brand" label={subscriptionHeroCopy.eyebrow} />}
+          trailing={<Badge tone="brand" label={subscriptionHeroCopy.eyebrow} />}
         />
-      </BthSurface>
+      </Surface>
 
-      <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
         {metricCards.map((metric) => (
           <CommercialMetricCard
             key={metric.label}
@@ -209,45 +209,46 @@ export function DshMySpaceCommercialScreen({
             tone={metric.tone}
           />
         ))}
-      </BthBox>
+      </Box>
 
-      <BthSurface tone="raised" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader title="الولاء والمكافآت" subtitle="الرصيد والمزايا والاستبدال من نفس الصفحة." />
-        <BthKeyValueList
+      <Surface tone="raised" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title="الولاء والمكافآت" subtitle="الرصيد والمزايا والاستبدال من نفس الصفحة." />
+        <KeyValueList
           items={[
             { label: 'الرصيد الحالي', value: loyaltyBalanceMetric?.value ?? '—', tone: 'brand' },
             { label: 'المكافآت المتاحة', value: rewardsAvailableMetric?.value ?? '—' },
             { label: 'الاستحقاقات النشطة', value: activeEntitlementsMetric?.value ?? '—', tone: 'success' },
           ]}
+          dense
         />
 
-        <BthBox layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {rewardOptions.map((reward) => (
-            <BthChip
+            <Chip
               key={reward.label}
               label={reward.label}
               tone={selectedRewardId === reward.label ? 'brand' : 'default'}
               onPress={() => setSelectedRewardId(reward.label)}
             />
           ))}
-        </BthBox>
+        </Box>
 
-        <BthSurface tone="inset" gap={1} padding={2} style={{ borderWidth: 1, borderColor: theme.line }}>
-          <BthText role="bodyStrong">{selectedReward?.label ?? 'اختر مكافأة'}</BthText>
-          <BthText role="bodySm" tone="muted">
+        <Surface tone="inset" gap={1} padding={2} style={{ borderWidth: 1, borderColor: theme.line }}>
+          <Text role="bodyStrong">{selectedReward?.label ?? 'اختر مكافأة'}</Text>
+          <Text role="bodySm" tone="muted">
             {selectedReward?.helperText ?? 'حدد مكافأة ثم اعتمد التغييرات.'}
-          </BthText>
-          <BthText role="caption" tone="muted">
+          </Text>
+          <Text role="caption" tone="muted">
             {selectedReward?.value ?? '—'}
-          </BthText>
-        </BthSurface>
-      </BthSurface>
+          </Text>
+        </Surface>
+      </Surface>
 
-      <BthSurface tone="raised" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader title="الاشتراكات" subtitle={subscriptionHeroCopy.subtitle} />
+      <Surface tone="raised" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title="الاشتراكات" subtitle={subscriptionHeroCopy.subtitle} />
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: spacing[1] }}>
-          <BthBox layoutDirection="row" gap={2}>
+          <Box layoutDirection="row" gap={2}>
             {subscriptionPlanCards.map((plan) => (
               <SubscriptionPlanTile
                 key={plan.id}
@@ -256,10 +257,10 @@ export function DshMySpaceCommercialScreen({
                 onPress={() => setSelectedPlanId(plan.id)}
               />
             ))}
-          </BthBox>
+          </Box>
         </ScrollView>
 
-        <BthKeyValueList
+        <KeyValueList
           items={[
             { label: 'الخطة الحالية', value: currentPlan.title, tone: 'brand' },
             { label: 'الخطة المختارة', value: selectedPlan.title },
@@ -267,34 +268,34 @@ export function DshMySpaceCommercialScreen({
           ]}
         />
 
-        <BthBox layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-          <BthBox gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
-            <BthText role="bodyStrong">{selectedPaymentProfile.label}</BthText>
-            <BthText role="bodySm" tone="muted">
+        <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+            <Text role="bodyStrong">{selectedPaymentProfile.label}</Text>
+            <Text role="bodySm" tone="muted">
               {selectedPaymentProfile.detail}
-            </BthText>
-          </BthBox>
-          <BthChip label="تغيير" tone="brand" onPress={() => setPaymentProfileIndex((value) => (value + 1) % paymentProfiles.length)} />
-        </BthBox>
+            </Text>
+          </Box>
+          <Chip label="تغيير" tone="brand" onPress={() => setPaymentProfileIndex((value) => (value + 1) % paymentProfiles.length)} />
+        </Box>
 
-        <BthSurface tone="inset" gap={2} padding={2} style={{ borderWidth: 1, borderColor: theme.line }}>
-          <BthBox layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-            <BthText role="bodyStrong">قسيمة اشتراك</BthText>
-            <BthChip label={couponOpen ? 'مفتوحة' : 'إضافة'} tone="brand" onPress={() => setCouponOpen((value) => !value)} />
-          </BthBox>
-          {couponOpen ? <BthText role="caption" tone="muted">القسيمة جاهزة للإضافة.</BthText> : null}
-        </BthSurface>
+        <Surface tone="inset" gap={2} padding={2} style={{ borderWidth: 1, borderColor: theme.line }}>
+          <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text role="bodyStrong">قسيمة اشتراك</Text>
+            <Chip label={couponOpen ? 'مفتوحة' : 'إضافة'} tone="brand" onPress={() => setCouponOpen((value) => !value)} />
+          </Box>
+          {couponOpen ? <Text role="caption" tone="muted">القسيمة جاهزة للإضافة.</Text> : null}
+        </Surface>
 
-        <BthCheckbox
+        <Checkbox
           label="التجديد التلقائي للاشتراك"
           checked={autoRenew}
           onCheckedChange={setAutoRenew}
         />
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="raised" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader title="العروض" subtitle="العروض والحملات والخصومات من نفس الصفحة." />
-        <BthKeyValueList
+      <Surface tone="raised" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title="العروض" subtitle="العروض والحملات والخصومات من نفس الصفحة." />
+        <KeyValueList
           items={[
             { label: 'العروض المتاحة', value: String(marketingPrograms.length || 0), tone: 'brand' },
             { label: 'الخصومات النشطة', value: marketingPrograms.length ? 'متاحة' : 'غير متاحة' },
@@ -303,41 +304,41 @@ export function DshMySpaceCommercialScreen({
 
         {marketingPrograms.length ? (
           <>
-            <BthBox layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
               {marketingPrograms.map((program) => (
-                <BthChip
+                <Chip
                   key={program.id}
                   label={program.title}
                   tone={selectedOfferId === program.id ? 'brand' : 'default'}
                   onPress={() => setSelectedOfferId(program.id)}
                 />
               ))}
-            </BthBox>
+            </Box>
 
-            <BthSurface tone="inset" gap={1} padding={2} style={{ borderWidth: 1, borderColor: theme.line }}>
-              <BthText role="bodyStrong">{selectedOffer?.title ?? 'اختر عرضًا'}</BthText>
-              <BthText role="bodySm" tone="muted">
+            <Surface tone="inset" gap={1} padding={2} style={{ borderWidth: 1, borderColor: theme.line }}>
+              <Text role="bodyStrong">{selectedOffer?.title ?? 'اختر عرضًا'}</Text>
+              <Text role="bodySm" tone="muted">
                 {selectedOffer?.subtitle ?? 'حدد عرضًا واضحًا ثم اعتمده.'}
-              </BthText>
-              <BthText role="caption" tone="muted">
+              </Text>
+              <Text role="caption" tone="muted">
                 {selectedOffer?.meta ?? '—'}
-              </BthText>
-            </BthSurface>
+              </Text>
+            </Surface>
           </>
         ) : (
-          <BthText role="bodySm" tone="muted">
+          <Text role="bodySm" tone="muted">
             لا توجد عروض مباشرة الآن.
-          </BthText>
+          </Text>
         )}
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="brand" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.brand, borderRadius: 22 }}>
-        <BthButton label="اعتماد التغييرات" onPress={applyChanges} />
-        <BthText role="caption" tone="muted" align="center">
+      <Surface tone="brand" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.brand, borderRadius: 22 }}>
+        <Button label="اعتماد التغييرات" onPress={applyChanges} />
+        <Text role="caption" tone="muted" align="center">
           يتم اعتماد الرصيد والخطة والعرض المختار من نفس الصفحة.
-        </BthText>
-      </BthSurface>
-    </BthBox>
+        </Text>
+      </Surface>
+    </Box>
   );
 }
 

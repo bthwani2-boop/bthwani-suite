@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { BthBox, BthButton, BthText } from '@bthwani/ui-kit';
-import { BthWebMissionHeroCard, BthWebSectionCard, BthWebSignalCard } from '@bthwani/ui-kit/web';
+import { Box, Button, Text } from '@bthwani/ui-kit';
+import { WebMissionHeroCard, WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
 import { dshCatalogMetrics, dshCatalogNodes, dshCatalogPipeline } from './catalog';
 import { ControlPanelDshCatalogCategoriesScreen } from './categories';
 
@@ -23,8 +23,8 @@ export function ControlPanelDshCatalogScreen({
   const router = useRouter();
 
   return (
-    <BthBox gap={4}>
-      <BthWebMissionHeroCard
+    <Box gap={4}>
+      <WebMissionHeroCard
         badges={['DSH', 'Catalog', 'Governance']}
         eyebrow="كتالوج DSH"
         title="الملكية النهائية للفئات والمنتجات"
@@ -38,77 +38,77 @@ export function ControlPanelDshCatalogScreen({
         secondaryAction={{ label: 'افتح التسويق', href: marketingHref }}
       />
 
-      <BthBox gap={2}>
-        <BthWebSignalCard
+      <Box gap={2}>
+        <WebSignalCard
           title="مراجعات الشركاء"
           value={String(dshCatalogMetrics.pendingPartnerReviews)}
           description="طلبات جديدة تنتظر قبول البوابة الأولى."
           tone="best"
         />
-        <BthWebSignalCard
+        <WebSignalCard
           title="مراجعات التسويق"
           value={String(dshCatalogMetrics.pendingMarketingReviews)}
           description="عناصر اجتازت الشركاء وتنتظر الاعتماد التسويقي."
         />
-        <BthWebSignalCard
+        <WebSignalCard
           title="الكتالوج المنشور"
           value={String(dshCatalogMetrics.approvedProducts)}
           description="كل ما هو متاح الآن لكل الشركاء."
         />
-      </BthBox>
+      </Box>
 
-      <BthWebSectionCard title="الفئات السيادية" description="الفئات الرئيسية والفرعية تُدار من هنا فقط، وليس من الشريك أو الميداني.">
-        <BthBox gap={2}>
+      <WebSectionCard title="الفئات السيادية" description="الفئات الرئيسية والفرعية تُدار من هنا فقط، وليس من الشريك أو الميداني.">
+        <Box gap={2}>
           {dshCatalogNodes.filter((node) => node.kind !== 'approved-product').map((node) => (
-            <BthBox key={node.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthBox layoutDirection="row" justify="space-between" align="center">
-                <BthText role="bodyStrong">{node.label}</BthText>
-                <BthText role="caption" tone="success">
+            <Box key={node.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Box layoutDirection="row" justify="space-between" align="center">
+                <Text role="bodyStrong">{node.label}</Text>
+                <Text role="caption" tone="success">
                   {node.countLabel}
-                </BthText>
-              </BthBox>
-              <BthText role="bodySm" tone="muted">
+                </Text>
+              </Box>
+              <Text role="bodySm" tone="muted">
                 {node.summary}
-              </BthText>
-              <BthButton
+              </Text>
+              <Button
                 label="افتح الكتالوج"
                 tone="secondary"
                 fullWidth={false}
                 onPress={() => router.push(hubHref)}
               />
-            </BthBox>
+            </Box>
           ))}
-        </BthBox>
-      </BthWebSectionCard>
+        </Box>
+      </WebSectionCard>
 
       <ControlPanelDshCatalogCategoriesScreen />
 
-      <BthWebSectionCard title="رحلة النشر" description="كل بطاقة تمر عبر نفس السلسلة: إدخال، شراكات، تسويق، ثم نشر نهائي.">
-        <BthBox gap={2}>
+      <WebSectionCard title="رحلة النشر" description="كل بطاقة تمر عبر نفس السلسلة: إدخال، شراكات، تسويق، ثم نشر نهائي.">
+        <Box gap={2}>
           {dshCatalogPipeline.map((step, index) => (
-            <BthBox key={step.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthBox layoutDirection="row" justify="space-between" align="center">
-                <BthText role="bodyStrong">{step.title}</BthText>
-                <BthText role="caption" tone={index < 2 ? 'warning' : 'success'}>
+            <Box key={step.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Box layoutDirection="row" justify="space-between" align="center">
+                <Text role="bodyStrong">{step.title}</Text>
+                <Text role="caption" tone={index < 2 ? 'warning' : 'success'}>
                   {step.statusLabel}
-                </BthText>
-              </BthBox>
-              <BthText role="bodySm" tone="muted">
+                </Text>
+              </Box>
+              <Text role="bodySm" tone="muted">
                 {step.description}
-              </BthText>
-            </BthBox>
+              </Text>
+            </Box>
           ))}
-        </BthBox>
-      </BthWebSectionCard>
+        </Box>
+      </WebSectionCard>
 
-      <BthWebSectionCard title="المسارات الحية" description="يفتح الكتالوج الرجوع إلى العمليات أو المراجعة دون كسر التسلسل.">
-        <BthBox gap={2}>
-          <BthButton label="الرجوع إلى العمليات" tone="secondary" onPress={() => router.push(operationsHref)} />
-          <BthButton label="بوابة الشركاء" tone="secondary" onPress={() => router.push(partnersHref)} />
-          <BthButton label="التسويق" tone="ghost" onPress={() => router.push(marketingHref)} />
-        </BthBox>
-      </BthWebSectionCard>
-    </BthBox>
+      <WebSectionCard title="المسارات الحية" description="يفتح الكتالوج الرجوع إلى العمليات أو المراجعة دون كسر التسلسل.">
+        <Box gap={2}>
+          <Button label="الرجوع إلى العمليات" tone="secondary" onPress={() => router.push(operationsHref)} />
+          <Button label="بوابة الشركاء" tone="secondary" onPress={() => router.push(partnersHref)} />
+          <Button label="التسويق" tone="ghost" onPress={() => router.push(marketingHref)} />
+        </Box>
+      </WebSectionCard>
+    </Box>
   );
 }
 

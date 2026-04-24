@@ -1,18 +1,18 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import {
   useRouter } from 'next/navigation';
-import { BthBox,
-  BthButton,
-  BthStateView,
-  BthText
+import { Box,
+  Button,
+  StateView,
+  Text
 } from '@bthwani/ui-kit';
 import {
-  BthWebMissionHeroCard,
-  BthWebPageFrame,
-  BthWebSectionCard,
-  BthWebSignalCard,
+  WebMissionHeroCard,
+  WebPageFrame,
+  WebSectionCard,
+  WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import {
@@ -105,7 +105,7 @@ export function ControlPanelDshOrderDetailScreen({
     const stateCopy = resolveStateCopy(dshText, resolvedState, orderId);
 
     return (
-      <BthWebPageFrame
+      <WebPageFrame
         eyebrow={dshText.orderDetail.pageEyebrow}
         title={`${dshText.orderDetail.pageTitlePrefix} ${orderId}`}
         description={dshText.orderDetail.unavailableDescription}
@@ -113,8 +113,8 @@ export function ControlPanelDshOrderDetailScreen({
         embedded={embedded}
         showHeader={showHeader}
       >
-        <BthStateView {...stateCopy} onActionPress={() => router.push(ordersHref)} />
-      </BthWebPageFrame>
+        <StateView {...stateCopy} onActionPress={() => router.push(ordersHref)} />
+      </WebPageFrame>
     );
   }
 
@@ -126,7 +126,7 @@ export function ControlPanelDshOrderDetailScreen({
   const actionPlan = getSampleDshOrderActionPlan(dshText, orderId);
 
   return (
-    <BthWebPageFrame
+    <WebPageFrame
       eyebrow={dshText.orderDetail.pageEyebrow}
       title={`${dshText.orderDetail.pageTitlePrefix} ${order.id}`}
       description={dshText.orderDetail.pageDescription}
@@ -135,7 +135,7 @@ export function ControlPanelDshOrderDetailScreen({
       showHeader={showHeader}
     >
       <div className={styles.stack}>
-        <BthWebMissionHeroCard
+        <WebMissionHeroCard
           badges={[order.id, order.statusLabel, order.eta]}
           eyebrow={dshText.orderDetail.heroEyebrow}
           title={order.customer}
@@ -150,91 +150,91 @@ export function ControlPanelDshOrderDetailScreen({
         />
 
         <div className={styles.signalGrid}>
-          <BthWebSignalCard title={dshText.orderDetail.signals.status} value={order.statusLabel} description={dshText.orderDetail.signals.statusDescription} tone="best" />
-          <BthWebSignalCard title={dshText.orderDetail.signals.destination} value={order.destinationLabel} description={dshText.orderDetail.signals.destinationDescription} />
-          <BthWebSignalCard title={dshText.orderDetail.signals.eta} value={order.eta} description={dshText.orderDetail.signals.etaDescription} />
-          <BthWebSignalCard title={dshText.orderDetail.signals.amount} value={order.amount} description={dshText.orderDetail.signals.amountDescription} />
+          <WebSignalCard title={dshText.orderDetail.signals.status} value={order.statusLabel} description={dshText.orderDetail.signals.statusDescription} tone="best" />
+          <WebSignalCard title={dshText.orderDetail.signals.destination} value={order.destinationLabel} description={dshText.orderDetail.signals.destinationDescription} />
+          <WebSignalCard title={dshText.orderDetail.signals.eta} value={order.eta} description={dshText.orderDetail.signals.etaDescription} />
+          <WebSignalCard title={dshText.orderDetail.signals.amount} value={order.amount} description={dshText.orderDetail.signals.amountDescription} />
         </div>
 
-        <BthWebSectionCard title={dshText.orderDetail.identityTitle} description={dshText.orderDetail.identityDescription}>
+        <WebSectionCard title={dshText.orderDetail.identityTitle} description={dshText.orderDetail.identityDescription}>
           <div className={styles.cardGrid}>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.orderDetail.routeLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{order.route}</BthText>
-            </BthBox>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.orderDetail.finalDestinationLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{order.destinationLabel}</BthText>
-            </BthBox>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.orderDetail.noteLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{order.notes}</BthText>
-            </BthBox>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.orderDetail.routeLabel}</Text>
+              <Text role="bodySm" tone="muted">{order.route}</Text>
+            </Box>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.orderDetail.finalDestinationLabel}</Text>
+              <Text role="bodySm" tone="muted">{order.destinationLabel}</Text>
+            </Box>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.orderDetail.noteLabel}</Text>
+              <Text role="bodySm" tone="muted">{order.notes}</Text>
+            </Box>
           </div>
-        </BthWebSectionCard>
+        </WebSectionCard>
 
-        <BthWebSectionCard title={dshText.orderDetail.arrivalTitle} description={dshText.orderDetail.arrivalDescription}>
+        <WebSectionCard title={dshText.orderDetail.arrivalTitle} description={dshText.orderDetail.arrivalDescription}>
           <div className={styles.cardGrid}>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.orderDetail.arrivedLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{arrivalTimeline?.arrivedLabel ?? dshText.orderDetail.noArrivalData}</BthText>
-            </BthBox>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.orderDetail.ringLogLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{arrivalTimeline ? `${arrivalTimeline.ringCount} ${dshText.orderDetail.ringAttempts}, ${arrivalTimeline.lastRingLabel}` : dshText.orderDetail.noRingsYet}</BthText>
-            </BthBox>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.orderDetail.acknowledgementLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{arrivalTimeline?.acknowledgedLabel ?? dshText.orderDetail.noAcknowledgementYet}</BthText>
-            </BthBox>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.orderDetail.cooldownLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{arrivalTimeline?.cooldownLabel ?? dshText.orderDetail.unavailable}</BthText>
-              <BthText role="bodySm" tone="muted">{arrivalTimeline?.blockReason ?? dshText.orderDetail.noCurrentBlock}</BthText>
-            </BthBox>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.orderDetail.arrivedLabel}</Text>
+              <Text role="bodySm" tone="muted">{arrivalTimeline?.arrivedLabel ?? dshText.orderDetail.noArrivalData}</Text>
+            </Box>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.orderDetail.ringLogLabel}</Text>
+              <Text role="bodySm" tone="muted">{arrivalTimeline ? `${arrivalTimeline.ringCount} ${dshText.orderDetail.ringAttempts}, ${arrivalTimeline.lastRingLabel}` : dshText.orderDetail.noRingsYet}</Text>
+            </Box>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.orderDetail.acknowledgementLabel}</Text>
+              <Text role="bodySm" tone="muted">{arrivalTimeline?.acknowledgedLabel ?? dshText.orderDetail.noAcknowledgementYet}</Text>
+            </Box>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.orderDetail.cooldownLabel}</Text>
+              <Text role="bodySm" tone="muted">{arrivalTimeline?.cooldownLabel ?? dshText.orderDetail.unavailable}</Text>
+              <Text role="bodySm" tone="muted">{arrivalTimeline?.blockReason ?? dshText.orderDetail.noCurrentBlock}</Text>
+            </Box>
           </div>
-        </BthWebSectionCard>
+        </WebSectionCard>
 
-        <BthWebSectionCard title={dshText.orderDetail.decisionTitle} description={dshText.orderDetail.decisionDescription}>
+        <WebSectionCard title={dshText.orderDetail.decisionTitle} description={dshText.orderDetail.decisionDescription}>
           <div className={styles.cardGrid}>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.orderDetail.primaryActionLabel}</BthText>
-              <BthText role="bodySm">{actionPlan.primaryLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{actionPlan.primaryDescription}</BthText>
-            </BthBox>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.orderDetail.secondaryActionLabel}</BthText>
-              <BthText role="bodySm">{actionPlan.secondaryLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{actionPlan.secondaryDescription}</BthText>
-            </BthBox>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.orderDetail.supportPathLabel}</BthText>
-              <BthText role="bodySm">{actionPlan.supportLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{actionPlan.supportDescription}</BthText>
-            </BthBox>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.orderDetail.primaryActionLabel}</Text>
+              <Text role="bodySm">{actionPlan.primaryLabel}</Text>
+              <Text role="bodySm" tone="muted">{actionPlan.primaryDescription}</Text>
+            </Box>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.orderDetail.secondaryActionLabel}</Text>
+              <Text role="bodySm">{actionPlan.secondaryLabel}</Text>
+              <Text role="bodySm" tone="muted">{actionPlan.secondaryDescription}</Text>
+            </Box>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.orderDetail.supportPathLabel}</Text>
+              <Text role="bodySm">{actionPlan.supportLabel}</Text>
+              <Text role="bodySm" tone="muted">{actionPlan.supportDescription}</Text>
+            </Box>
           </div>
           <div className={`${styles.actionRow} ${styles.actionRowSpaced}`}>
-            <BthButton label={dshText.orderDetail.openArrivalBellWorkspace} tone="secondary" fullWidth={false} onPress={() => router.push(arrivalBellHref)} />
-            <BthButton label={dshText.orderDetail.openReassignWorkspace} tone="secondary" fullWidth={false} onPress={() => router.push(reassignHref)} />
-            {!embedded ? <BthButton label={actionPlan.supportLabel} tone="secondary" fullWidth={false} onPress={() => router.push(supportHref)} /> : null}
+            <Button label={dshText.orderDetail.openArrivalBellWorkspace} tone="secondary" fullWidth={false} onPress={() => router.push(arrivalBellHref)} />
+            <Button label={dshText.orderDetail.openReassignWorkspace} tone="secondary" fullWidth={false} onPress={() => router.push(reassignHref)} />
+            {!embedded ? <Button label={actionPlan.supportLabel} tone="secondary" fullWidth={false} onPress={() => router.push(supportHref)} /> : null}
           </div>
-        </BthWebSectionCard>
+        </WebSectionCard>
 
-        <BthWebSectionCard title="تواصل الطلب" description="افتح المسار المختصر للمحادثة المرتبطة بنفس الطلب.">
-          <BthBox gap={2}>
-            <BthText role="bodySm" tone="muted">
+        <WebSectionCard title="تواصل الطلب" description="افتح المسار المختصر للمحادثة المرتبطة بنفس الطلب.">
+          <Box gap={2}>
+            <Text role="bodySm" tone="muted">
               الرسائل المختصرة والمرفقات الخفيفة تبقى داخل orderchat حتى الإغلاق.
-            </BthText>
-            <BthButton
+            </Text>
+            <Button
               label="فتح تواصل الطلب"
               tone="secondary"
               fullWidth={false}
               onPress={() => router.push(`${ordersHref}/${order.id}/orderchat`)}
             />
-          </BthBox>
-        </BthWebSectionCard>
+          </Box>
+        </WebSectionCard>
       </div>
-    </BthWebPageFrame>
+    </WebPageFrame>
   );
 }
 

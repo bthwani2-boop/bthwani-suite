@@ -1,5 +1,5 @@
 import type { DshStoreFixtureItem } from '../fixtures';
-import type { BthProductCardProps } from '@bthwani/ui-kit';
+import type { ProductCardProps } from '@bthwani/ui-kit';
 
 function pickSampleBackgroundColor(name: string) {
   const n = (name || '').toLowerCase();
@@ -24,7 +24,7 @@ function extractPriceValue(label?: string): number | undefined {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
-export function mapMenuItemToProductCard(item: DshStoreFixtureItem): BthProductCardProps {
+export function mapMenuItemToProductCard(item: DshStoreFixtureItem): ProductCardProps {
   return {
     id: item.id,
     title: item.name ?? '',

@@ -3,15 +3,15 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  BthBox,
-  BthButton,
-  BthKeyValueList,
-  BthListItem,
-  BthSurface,
-  BthTextField,
-  BthText,
+  Box,
+  Button,
+  KeyValueList,
+  ListItem,
+  Surface,
+  TextField,
+  Text,
 } from '@bthwani/ui-kit';
-import { BthWebMissionHeroCard, BthWebSectionCard, BthWebSegmentedTabs, BthWebSignalCard } from '@bthwani/ui-kit/web';
+import { WebMissionHeroCard, WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
 import {
   loyaltyCommercialLaneItems,
   loyaltyCommercialKeyValues,
@@ -85,8 +85,8 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations/dsh', operatio
   const visibleItems = loyaltyCommercialLaneItems.filter((item) => item.lane === lane || item.lane === 'all');
 
   return (
-    <BthBox gap={4}>
-      <BthWebMissionHeroCard
+    <Box gap={4}>
+      <WebMissionHeroCard
         dense
         badges={['الولاء', 'قيمة العميل', 'تحكم مباشر']}
         eyebrow="غرفة قيادة الولاء"
@@ -101,73 +101,73 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations/dsh', operatio
         secondaryAction={{ label: 'العودة للتسويق', href: operationsHref }}
       />
 
-      <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-        <BthWebSignalCard title="المسارات النشطة" value={String(liveLaneCount)} description="قنوات ولاء واشتراك تعمل من نفس الغرفة" tone="best" />
-        <BthWebSignalCard title="نقاط التحكم" value={String(routeCount)} description="مفاتيح قرار واضحة وسريعة القراءة" />
-        <BthWebSignalCard title="الجمهور" value={resolveAudienceLabel(audience)} description="من يستفيد من العرض الحالي" />
-        <BthWebSignalCard title="نمط النشر" value={resolveDeliveryLabel(deliveryMode)} description="كيف يتم الدفع نحو الواجهة" />
-      </BthBox>
+      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+        <WebSignalCard title="المسارات النشطة" value={String(liveLaneCount)} description="قنوات ولاء واشتراك تعمل من نفس الغرفة" tone="best" />
+        <WebSignalCard title="نقاط التحكم" value={String(routeCount)} description="مفاتيح قرار واضحة وسريعة القراءة" />
+        <WebSignalCard title="الجمهور" value={resolveAudienceLabel(audience)} description="من يستفيد من العرض الحالي" />
+        <WebSignalCard title="نمط النشر" value={resolveDeliveryLabel(deliveryMode)} description="كيف يتم الدفع نحو الواجهة" />
+      </Box>
 
-      <BthWebSegmentedTabs
+      <WebSegmentedTabs
         ariaLabel="أقسام الولاء"
         items={loyaltySectionTabs.map((item) => ({ ...item, active: item.id === section }))}
         onSelect={(itemId) => setSection(itemId as LoyaltyCommandSection)}
       />
 
       {section === 'overview' ? (
-        <BthWebSectionCard title="الرؤية التنفيذية" description="تلخيص نظيف وقوي لمسار الولاء الحالي دون ضوضاء تقنية أو تسميات خام.">
-          <BthBox layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
-            <BthSurface tone="brand" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 300 }}>
-              <BthText role="titleSm" tone="inverse">{resolveLaneTitle(lane)}</BthText>
-              <BthText role="bodySm" tone="inverse" style={{ opacity: 0.92 }}>
+        <WebSectionCard title="الرؤية التنفيذية" description="تلخيص نظيف وقوي لمسار الولاء الحالي دون ضوضاء تقنية أو تسميات خام.">
+          <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
+            <Surface tone="brand" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 300 }}>
+              <Text role="titleSm" tone="inverse">{resolveLaneTitle(lane)}</Text>
+              <Text role="bodySm" tone="inverse" style={{ opacity: 0.92 }}>
                 {resolveLaneDescription(lane, activeSignal.description)}
-              </BthText>
+              </Text>
 
-              <BthWebSegmentedTabs
+              <WebSegmentedTabs
                 ariaLabel="مسارات الولاء"
                 items={loyaltyLaneTabs.map((item) => ({ ...item, active: item.id === lane }))}
                 onSelect={(itemId) => setLane(itemId as LoyaltyLane)}
               />
 
-              <BthBox gap={1}>
-                <BthText role="bodyStrong" tone="inverse">القيمة الأبرز الآن</BthText>
-                <BthText role="bodySm" tone="inverse" style={{ opacity: 0.9 }}>{activeSignal.value}</BthText>
-                <BthText role="bodySm" tone="inverse" style={{ opacity: 0.84 }}>{programMessage}</BthText>
-              </BthBox>
+              <Box gap={1}>
+                <Text role="bodyStrong" tone="inverse">القيمة الأبرز الآن</Text>
+                <Text role="bodySm" tone="inverse" style={{ opacity: 0.9 }}>{activeSignal.value}</Text>
+                <Text role="bodySm" tone="inverse" style={{ opacity: 0.84 }}>{programMessage}</Text>
+              </Box>
 
-              <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                <BthButton label="فتح محرر البرنامج" onPress={() => setSection('builder')} fullWidth={false} />
-                <BthButton label="عرض المزامنة" tone="secondary" onPress={() => setSection('sync')} fullWidth={false} />
-              </BthBox>
-            </BthSurface>
+              <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                <Button label="فتح محرر البرنامج" onPress={() => setSection('builder')} fullWidth={false} />
+                <Button label="عرض المزامنة" tone="secondary" onPress={() => setSection('sync')} fullWidth={false} />
+              </Box>
+            </Surface>
 
-            <BthSurface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
-              <BthText role="titleSm">ملخص العقد الحي</BthText>
-              <BthKeyValueList items={loyaltyCommercialKeyValues} />
-              <BthBox gap={2}>
+            <Surface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
+              <Text role="titleSm">ملخص العقد الحي</Text>
+              <KeyValueList items={loyaltyCommercialKeyValues} />
+              <Box gap={2}>
                 {visibleItems.map((item) => (
-                  <BthListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
+                  <ListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
                 ))}
-              </BthBox>
-            </BthSurface>
-          </BthBox>
-        </BthWebSectionCard>
+              </Box>
+            </Surface>
+          </Box>
+        </WebSectionCard>
       ) : null}
 
       {section === 'builder' ? (
-        <BthWebSectionCard title="مصمم البرنامج" description="تحرير الرسالة التجارية والجمهور والنشر من مساحة أكثر هدوءًا ووضوحًا وهيمنة على القرار.">
-          <BthBox layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
-            <BthSurface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
-              <BthTextField label="اسم البرنامج" value={programName} onChangeText={setProgramName} hint="اسم واضح يتعامل معه فريق التسويق والعمليات" />
-              <BthTextField label="رسالة البرنامج" value={programMessage} onChangeText={setProgramMessage} hint="رسالة قصيرة تظهر القيمة الحقيقية للعرض" />
+        <WebSectionCard title="مصمم البرنامج" description="تحرير الرسالة التجارية والجمهور والنشر من مساحة أكثر هدوءًا ووضوحًا وهيمنة على القرار.">
+          <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
+            <Surface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
+              <TextField label="اسم البرنامج" value={programName} onChangeText={setProgramName} hint="اسم واضح يتعامل معه فريق التسويق والعمليات" />
+              <TextField label="رسالة البرنامج" value={programMessage} onChangeText={setProgramMessage} hint="رسالة قصيرة تظهر القيمة الحقيقية للعرض" />
 
-              <BthWebSegmentedTabs
+              <WebSegmentedTabs
                 ariaLabel="اختيار المسار"
                 items={loyaltyLaneTabs.map((item) => ({ ...item, active: item.id === lane }))}
                 onSelect={(itemId) => setLane(itemId as LoyaltyLane)}
               />
 
-              <BthWebSegmentedTabs
+              <WebSegmentedTabs
                 ariaLabel="اختيار الجمهور"
                 items={[
                   { id: 'client', label: 'واجهة العميل', metaLabel: 'أساسي', active: audience === 'client' },
@@ -177,7 +177,7 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations/dsh', operatio
                 onSelect={(itemId) => setAudience(itemId as 'all' | 'client' | 'operations')}
               />
 
-              <BthWebSegmentedTabs
+              <WebSegmentedTabs
                 ariaLabel="اختيار النشر"
                 items={[
                   { id: 'auto', label: 'تلقائي', metaLabel: 'سريع', active: deliveryMode === 'auto' },
@@ -187,61 +187,61 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations/dsh', operatio
                 onSelect={(itemId) => setDeliveryMode(itemId as 'auto' | 'manual' | 'pinned')}
               />
 
-              <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                <BthButton label="حفظ كمسودة" onPress={() => setLastAction(`تم حفظ ${programName} كمسودة`)} fullWidth={false} />
-                <BthButton label="نشر الآن" tone="secondary" onPress={() => setLastAction(`تم نشر ${programName}`)} fullWidth={false} />
-                <BthButton label="إيقاف" tone="ghost" onPress={() => setLastAction(`تم إيقاف ${programName}`)} fullWidth={false} />
-              </BthBox>
-            </BthSurface>
+              <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                <Button label="حفظ كمسودة" onPress={() => setLastAction(`تم حفظ ${programName} كمسودة`)} fullWidth={false} />
+                <Button label="نشر الآن" tone="secondary" onPress={() => setLastAction(`تم نشر ${programName}`)} fullWidth={false} />
+                <Button label="إيقاف" tone="ghost" onPress={() => setLastAction(`تم إيقاف ${programName}`)} fullWidth={false} />
+              </Box>
+            </Surface>
 
-            <BthSurface tone="inset" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 300 }}>
-              <BthText role="titleSm">المعاينة التنفيذية</BthText>
-              <BthSurface tone="brand" padding={4} gap={2}>
-                <BthText role="titleSm" tone="inverse">{programName}</BthText>
-                <BthText role="bodySm" tone="inverse" style={{ opacity: 0.92 }}>{programMessage}</BthText>
-                <BthText role="bodySm" tone="inverse" style={{ opacity: 0.84 }}>
+            <Surface tone="inset" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 300 }}>
+              <Text role="titleSm">المعاينة التنفيذية</Text>
+              <Surface tone="brand" padding={4} gap={2}>
+                <Text role="titleSm" tone="inverse">{programName}</Text>
+                <Text role="bodySm" tone="inverse" style={{ opacity: 0.92 }}>{programMessage}</Text>
+                <Text role="bodySm" tone="inverse" style={{ opacity: 0.84 }}>
                   الجمهور: {resolveAudienceLabel(audience)} · النشر: {resolveDeliveryLabel(deliveryMode)}
-                </BthText>
-              </BthSurface>
+                </Text>
+              </Surface>
 
-              <BthListItem title="القيمة الرئيسية" subtitle={activeSignal.description} meta={activeSignal.value} badgeLabel="حي" />
-              <BthListItem title="المسار الحالي" subtitle={resolveLaneTitle(lane)} meta={resolveAudienceLabel(audience)} badgeLabel="جاهز" />
-              <BthListItem title="آخر إجراء" subtitle={lastAction} meta={resolveDeliveryLabel(deliveryMode)} badgeLabel="تشغيل" />
-            </BthSurface>
-          </BthBox>
-        </BthWebSectionCard>
+              <ListItem title="القيمة الرئيسية" subtitle={activeSignal.description} meta={activeSignal.value} badgeLabel="حي" />
+              <ListItem title="المسار الحالي" subtitle={resolveLaneTitle(lane)} meta={resolveAudienceLabel(audience)} badgeLabel="جاهز" />
+              <ListItem title="آخر إجراء" subtitle={lastAction} meta={resolveDeliveryLabel(deliveryMode)} badgeLabel="تشغيل" />
+            </Surface>
+          </Box>
+        </WebSectionCard>
       ) : null}
 
       {section === 'sync' ? (
-        <BthWebSectionCard title="المزامنة الحية" description="المفاتيح المهمة تظهر هنا بلغة مفهومة وتجارية بدل الأسماء التطويرية المجردة.">
-          <BthBox gap={3}>
-            <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-              <BthWebSignalCard title="الاشتراك" value="الخطة الأسرية" description="تحديث الخطة والعائلة قبل الإجراء المدفوع" tone="best" />
-              <BthWebSignalCard title="النقاط" value="ميزان الولاء" description="الرصيد والاسترداد قبل الدفع" />
-              <BthWebSignalCard title="العرض" value="تطبيق الكوبون" description="الخصم يظهر داخل مسار السعر" />
-              <BthWebSignalCard title="الاستحقاقات" value="المزايا الفعلية" description="الرؤية الواضحة للحقوق والمكافآت" />
-            </BthBox>
+        <WebSectionCard title="المزامنة الحية" description="المفاتيح المهمة تظهر هنا بلغة مفهومة وتجارية بدل الأسماء التطويرية المجردة.">
+          <Box gap={3}>
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+              <WebSignalCard title="الاشتراك" value="الخطة الأسرية" description="تحديث الخطة والعائلة قبل الإجراء المدفوع" tone="best" />
+              <WebSignalCard title="النقاط" value="ميزان الولاء" description="الرصيد والاسترداد قبل الدفع" />
+              <WebSignalCard title="العرض" value="تطبيق الكوبون" description="الخصم يظهر داخل مسار السعر" />
+              <WebSignalCard title="الاستحقاقات" value="المزايا الفعلية" description="الرؤية الواضحة للحقوق والمكافآت" />
+            </Box>
 
-            <BthSurface tone="raised" padding={4} gap={2}>
+            <Surface tone="raised" padding={4} gap={2}>
               {visibleItems.map((item) => (
-                <BthListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
+                <ListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
               ))}
-            </BthSurface>
+            </Surface>
 
-            <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-              <BthButton label="تشغيل المزامنة" onPress={() => setLastAction('تمت جدولة المزامنة الآن')} fullWidth={false} />
-              <BthButton label="فتح العمليات" tone="secondary" onPress={() => router.push(hubHref)} fullWidth={false} />
-              <BthButton label="العودة للتسويق" tone="ghost" onPress={() => router.push(operationsHref)} fullWidth={false} />
-            </BthBox>
-          </BthBox>
-        </BthWebSectionCard>
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+              <Button label="تشغيل المزامنة" onPress={() => setLastAction('تمت جدولة المزامنة الآن')} fullWidth={false} />
+              <Button label="فتح العمليات" tone="secondary" onPress={() => router.push(hubHref)} fullWidth={false} />
+              <Button label="العودة للتسويق" tone="ghost" onPress={() => router.push(operationsHref)} fullWidth={false} />
+            </Box>
+          </Box>
+        </WebSectionCard>
       ) : null}
 
       {section === 'guardrails' ? (
-        <BthWebSectionCard title="الضوابط والحماية" description="القرار والجمهور والنشر أصبحوا أوضح بصريًا وأسهل مراجعةً من السابق.">
-          <BthBox layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
-            <BthSurface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
-              <BthWebSegmentedTabs
+        <WebSectionCard title="الضوابط والحماية" description="القرار والجمهور والنشر أصبحوا أوضح بصريًا وأسهل مراجعةً من السابق.">
+          <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
+            <Surface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
+              <WebSegmentedTabs
                 ariaLabel="ضوابط الجمهور"
                 items={[
                   { id: 'all', label: 'عام', metaLabel: 'واسع', active: audience === 'all' },
@@ -251,7 +251,7 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations/dsh', operatio
                 onSelect={(itemId) => setAudience(itemId as 'all' | 'client' | 'operations')}
               />
 
-              <BthWebSegmentedTabs
+              <WebSegmentedTabs
                 ariaLabel="ضوابط النشر"
                 items={[
                   { id: 'auto', label: 'تلقائي', metaLabel: 'افتراضي', active: deliveryMode === 'auto' },
@@ -261,7 +261,7 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations/dsh', operatio
                 onSelect={(itemId) => setDeliveryMode(itemId as 'auto' | 'manual' | 'pinned')}
               />
 
-              <BthKeyValueList
+              <KeyValueList
                 items={[
                   { label: 'الجمهور', value: resolveAudienceLabel(audience) },
                   { label: 'نمط النشر', value: resolveDeliveryLabel(deliveryMode) },
@@ -269,19 +269,19 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations/dsh', operatio
                   { label: 'المسار الحالي', value: resolveLaneTitle(lane) },
                 ]}
               />
-            </BthSurface>
+            </Surface>
 
-            <BthSurface tone="inset" padding={4} gap={2} style={{ flexGrow: 1, minWidth: 300 }}>
-              <BthText role="titleSm">فحص الجودة</BthText>
-              <BthListItem title="هيمنة CTA" subtitle="الإجراء الأساسي الآن ظاهر وواضح بدل التشتت البصري" meta="ممتاز" badgeLabel="UX" />
-              <BthListItem title="وضوح القراءة" subtitle="تجميع المعلومات صار أكثر هدوءًا وأقوى هرمية" meta="واضح" badgeLabel="UI" />
-              <BthListItem title="اتساق RTL" subtitle="المحاذاة العربية أصبحت طبيعية وأكثر ثقة بصريًا" meta="مصقول" badgeLabel="RTL" />
-              <BthButton label="تأكيد الضوابط" onPress={() => setLastAction(`تم التحقق: ${resolveAudienceLabel(audience)} / ${resolveDeliveryLabel(deliveryMode)}`)} fullWidth={false} />
-            </BthSurface>
-          </BthBox>
-        </BthWebSectionCard>
+            <Surface tone="inset" padding={4} gap={2} style={{ flexGrow: 1, minWidth: 300 }}>
+              <Text role="titleSm">فحص الجودة</Text>
+              <ListItem title="هيمنة CTA" subtitle="الإجراء الأساسي الآن ظاهر وواضح بدل التشتت البصري" meta="ممتاز" badgeLabel="UX" />
+              <ListItem title="وضوح القراءة" subtitle="تجميع المعلومات صار أكثر هدوءًا وأقوى هرمية" meta="واضح" badgeLabel="UI" />
+              <ListItem title="اتساق RTL" subtitle="المحاذاة العربية أصبحت طبيعية وأكثر ثقة بصريًا" meta="مصقول" badgeLabel="RTL" />
+              <Button label="تأكيد الضوابط" onPress={() => setLastAction(`تم التحقق: ${resolveAudienceLabel(audience)} / ${resolveDeliveryLabel(deliveryMode)}`)} fullWidth={false} />
+            </Surface>
+          </Box>
+        </WebSectionCard>
       ) : null}
-    </BthBox>
+    </Box>
   );
 }
 

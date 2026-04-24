@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, View, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
-import { BthBox, BthIcon, BthMobileScrollView, BthSurface, BthText, BthTopBar, spacing, useTheme } from '@bthwani/ui-kit';
+import { Box, Icon, MobileScrollView, Surface, Text, TopBar, spacing, useTheme } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
 import { DshMySpaceCommercialScreen } from './DshMySpaceCommercialScreen';
 import { DshMySpaceOrdersScreen } from './DshMySpaceOrdersScreen';
@@ -59,7 +59,7 @@ function MySpacePrimaryRow({
   const isExpanded = selected && Boolean(details);
 
   return (
-    <BthSurface
+    <Surface
       tone={isExpanded ? 'inset' : 'raised'}
       padding={2}
       gap={isExpanded ? 2 : 0}
@@ -88,7 +88,7 @@ function MySpacePrimaryRow({
           opacity: pressed ? 0.96 : 1,
         })}
       >
-        <BthBox layoutDirection="row" align="center" gap={3}>
+        <Box layoutDirection="row" align="center" gap={3}>
           <View
             style={{
               width: 44,
@@ -104,25 +104,25 @@ function MySpacePrimaryRow({
             <Ionicons name={iconName} size={21} color={selected ? theme.brandContrast : theme.brand} />
           </View>
 
-          <BthBox gap={0} style={{ flex: 1 }}>
-            <BthText role="bodyStrong">{title}</BthText>
-            <BthText role="bodySm" tone="muted" numberOfLines={2}>
+          <Box gap={0} style={{ flex: 1 }}>
+            <Text role="bodyStrong">{title}</Text>
+            <Text role="bodySm" tone="muted" numberOfLines={2}>
               {subtitle}
-            </BthText>
-          </BthBox>
+            </Text>
+          </Box>
 
           <View style={{ width: 28, alignItems: 'center', justifyContent: 'center' }}>
             <Ionicons name={isExpanded ? 'chevron-down' : 'chevron-back'} size={20} color={isExpanded ? theme.brand : theme.textSoft} />
           </View>
-        </BthBox>
+        </Box>
       </Pressable>
 
       {selected && details ? (
-        <BthBox gap={2} style={{ borderTopWidth: 1, borderTopColor: theme.line, paddingTop: spacing[2] }}>
+        <Box gap={2} style={{ borderTopWidth: 1, borderTopColor: theme.line, paddingTop: spacing[2] }}>
           {details}
-        </BthBox>
+        </Box>
       ) : null}
-    </BthSurface>
+    </Surface>
   );
 }
 
@@ -165,13 +165,13 @@ export function DshMySpaceScreen({
   onRetry,
 }: DshMySpaceScreenProps) {
   const [activePrimaryTab, setActivePrimaryTab] = React.useState<MySpacePrimaryTab>('orders');
+  const { theme } = useTheme();
 
   if (state !== 'ready') {
     return <DshOperationScreen state={state} title="مساحتي" subtitle="الهوية الشخصية داخل DSH" onRetry={onRetry} />;
   }
 
   const activePrimarySection = primaryTabs.find((tab) => tab.id === activePrimaryTab) ?? primaryTabs[0];
-  const activePrimaryLabel = activePrimarySection.label;
 
   const handlePrimaryChange = (nextTab: MySpacePrimaryTab) => {
     setActivePrimaryTab(nextTab);
@@ -179,19 +179,19 @@ export function DshMySpaceScreen({
 
   return (
     <View style={{ flex: 1 }}>
-      <BthTopBar
+      <TopBar
         variant="surface"
         title="مساحتي"
-        trailingAction={onBack ? { id: 'back', icon: <BthIcon name="arrow-back" size={24} color={theme.brand} />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
+        trailingAction={onBack ? { id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
       />
 
-      <BthMobileScrollView fill padding={2} gap={2}>
-        <BthSurface tone="raised" padding={2} gap={2}>
-          <BthBox gap={0} style={{ alignItems: 'flex-end' }}>
-            <BthText role="titleSm">المسارات الرئيسية</BthText>
-          </BthBox>
+      <MobileScrollView fill padding={2} gap={2}>
+        <Surface tone="raised" padding={2} gap={2}>
+          <Box gap={0} style={{ alignItems: 'flex-end' }}>
+            <Text role="titleSm">المسارات الرئيسية</Text>
+          </Box>
 
-          <BthBox gap={2}>
+          <Box gap={2}>
             {primaryTabs.map((section) => (
               <MySpacePrimaryRow
                 key={section.id}
@@ -213,9 +213,9 @@ export function DshMySpaceScreen({
                 }
               />
             ))}
-          </BthBox>
-        </BthSurface>
-      </BthMobileScrollView>
+            </Box>
+          </Surface>
+        </MobileScrollView>
     </View>
   );
 }

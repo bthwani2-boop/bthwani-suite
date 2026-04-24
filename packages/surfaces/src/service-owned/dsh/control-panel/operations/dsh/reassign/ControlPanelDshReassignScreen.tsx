@@ -1,17 +1,17 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import {
   useRouter } from 'next/navigation';
-import { BthBox,
-  BthStateView,
-  BthText
+import { Box,
+  StateView,
+  Text
 } from '@bthwani/ui-kit';
 import {
-  BthWebMissionHeroCard,
-  BthWebPageFrame,
-  BthWebSectionCard,
-  BthWebSignalCard,
+  WebMissionHeroCard,
+  WebPageFrame,
+  WebSectionCard,
+  WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import { getDshReassignCandidates, getDshReassignSummary } from './reassign-fixtures';
@@ -90,7 +90,7 @@ export function ControlPanelDshReassignScreen({
     const stateCopy = resolveStateCopy(dshText, state);
 
     return (
-      <BthWebPageFrame
+      <WebPageFrame
         eyebrow={dshText.reassign.pageEyebrow}
         title={dshText.reassign.pageTitle}
         description={dshText.reassign.unavailableDescription}
@@ -98,13 +98,13 @@ export function ControlPanelDshReassignScreen({
         embedded={embedded}
         showHeader={showHeader}
       >
-        <BthStateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
-      </BthWebPageFrame>
+        <StateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
+      </WebPageFrame>
     );
   }
 
   return (
-    <BthWebPageFrame
+    <WebPageFrame
       eyebrow={dshText.reassign.pageEyebrow}
       title={dshText.reassign.pageTitle}
       description={dshText.reassign.pageDescription}
@@ -113,7 +113,7 @@ export function ControlPanelDshReassignScreen({
       showHeader={showHeader}
     >
       <div className={styles.stack}>
-        <BthWebMissionHeroCard
+        <WebMissionHeroCard
           badges={['/operations/dsh/reassign', dshText.common.live, `${dshText.reassign.signals.active}: ${summary.activeCases}`]}
           eyebrow={dshText.reassign.heroEyebrow}
           title={dshText.reassign.heroTitle}
@@ -128,51 +128,51 @@ export function ControlPanelDshReassignScreen({
         />
 
         <div className={styles.signalGrid}>
-          <BthWebSignalCard title={dshText.reassign.signals.active} value={String(summary.activeCases)} description={dshText.reassign.signals.activeDescription} tone="best" />
-          <BthWebSignalCard title={dshText.reassign.signals.urgent} value={String(summary.urgentCases)} description={dshText.reassign.signals.urgentDescription} />
-          <BthWebSignalCard title={dshText.reassign.signals.blocked} value={String(summary.blockedCases)} description={dshText.reassign.signals.blockedDescription} />
-          <BthWebSignalCard title={dshText.reassign.signals.fallbacks} value={String(summary.readyFallbacks)} description={dshText.reassign.signals.fallbacksDescription} />
+          <WebSignalCard title={dshText.reassign.signals.active} value={String(summary.activeCases)} description={dshText.reassign.signals.activeDescription} tone="best" />
+          <WebSignalCard title={dshText.reassign.signals.urgent} value={String(summary.urgentCases)} description={dshText.reassign.signals.urgentDescription} />
+          <WebSignalCard title={dshText.reassign.signals.blocked} value={String(summary.blockedCases)} description={dshText.reassign.signals.blockedDescription} />
+          <WebSignalCard title={dshText.reassign.signals.fallbacks} value={String(summary.readyFallbacks)} description={dshText.reassign.signals.fallbacksDescription} />
         </div>
 
-        <BthWebSectionCard title={dshText.reassign.candidatesTitle} description={dshText.reassign.candidatesDescription}>
+        <WebSectionCard title={dshText.reassign.candidatesTitle} description={dshText.reassign.candidatesDescription}>
           <div className={styles.cardGrid}>
             {candidates.map((candidate) => (
-              <BthBox key={candidate.deliveryId} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-                <BthBox layoutDirection="row" justify="space-between" align="center">
-                  <BthText role="bodyStrong">{candidate.deliveryId}</BthText>
-                  <BthText role="caption" tone={candidate.tone}>{candidate.statusLabel}</BthText>
-                </BthBox>
-                <BthText role="bodySm">{candidate.orderId}</BthText>
-                <BthText role="caption" tone="soft">{candidate.reasonLabel} · {candidate.priorityLabel}</BthText>
-                <BthText role="bodySm" tone="muted">{dshText.reassign.currentCaptainLabel}: {candidate.currentCaptain}</BthText>
-                <BthText role="bodySm" tone="muted">{dshText.reassign.fallbackCaptainLabel}: {candidate.fallbackCaptain}</BthText>
-                <BthText role="bodySm" tone="muted">{candidate.note}</BthText>
-              </BthBox>
+              <Box key={candidate.deliveryId} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+                <Box layoutDirection="row" justify="space-between" align="center">
+                  <Text role="bodyStrong">{candidate.deliveryId}</Text>
+                  <Text role="caption" tone={candidate.tone}>{candidate.statusLabel}</Text>
+                </Box>
+                <Text role="bodySm">{candidate.orderId}</Text>
+                <Text role="caption" tone="soft">{candidate.reasonLabel} · {candidate.priorityLabel}</Text>
+                <Text role="bodySm" tone="muted">{dshText.reassign.currentCaptainLabel}: {candidate.currentCaptain}</Text>
+                <Text role="bodySm" tone="muted">{dshText.reassign.fallbackCaptainLabel}: {candidate.fallbackCaptain}</Text>
+                <Text role="bodySm" tone="muted">{candidate.note}</Text>
+              </Box>
             ))}
           </div>
-        </BthWebSectionCard>
+        </WebSectionCard>
 
-        <BthWebSectionCard title={dshText.reassign.decisionTitle} description={dshText.reassign.decisionDescription}>
+        <WebSectionCard title={dshText.reassign.decisionTitle} description={dshText.reassign.decisionDescription}>
           <div className={styles.cardGrid}>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.reassign.primaryDecisionTitle}</BthText>
-              <BthText role="bodySm">{dshText.reassign.primaryDecisionLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{dshText.reassign.primaryDecisionDescription}</BthText>
-            </BthBox>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.reassign.secondaryDecisionTitle}</BthText>
-              <BthText role="bodySm">{dshText.reassign.secondaryDecisionLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{dshText.reassign.secondaryDecisionDescription}</BthText>
-            </BthBox>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.reassign.supportDecisionTitle}</BthText>
-              <BthText role="bodySm">{dshText.reassign.supportDecisionLabel}</BthText>
-              <BthText role="bodySm" tone="muted">{dshText.reassign.supportDecisionDescription}</BthText>
-            </BthBox>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.reassign.primaryDecisionTitle}</Text>
+              <Text role="bodySm">{dshText.reassign.primaryDecisionLabel}</Text>
+              <Text role="bodySm" tone="muted">{dshText.reassign.primaryDecisionDescription}</Text>
+            </Box>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.reassign.secondaryDecisionTitle}</Text>
+              <Text role="bodySm">{dshText.reassign.secondaryDecisionLabel}</Text>
+              <Text role="bodySm" tone="muted">{dshText.reassign.secondaryDecisionDescription}</Text>
+            </Box>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.reassign.supportDecisionTitle}</Text>
+              <Text role="bodySm">{dshText.reassign.supportDecisionLabel}</Text>
+              <Text role="bodySm" tone="muted">{dshText.reassign.supportDecisionDescription}</Text>
+            </Box>
           </div>
-        </BthWebSectionCard>
+        </WebSectionCard>
       </div>
-    </BthWebPageFrame>
+    </WebPageFrame>
   );
 }
 

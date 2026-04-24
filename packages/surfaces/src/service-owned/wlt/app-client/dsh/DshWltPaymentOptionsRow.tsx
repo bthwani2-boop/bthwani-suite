@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, View, StyleSheet, ScrollView } from 'react-native';
-import { BthBox, BthText, useTheme, spacing, radius } from '@bthwani/ui-kit';
+import { Box, Text, useTheme, spacing, radius } from '@bthwani/ui-kit';
 
 type Opt = {
   id: string;
@@ -25,7 +25,7 @@ export function PaymentOptionItem({ opt, selected, onPress }: { opt: Opt; select
 
   const getGlyph = (id: string) => {
     if (id === 'cod') return '💵';
-    if (id === 'bthwallet') return '👛';
+    if (id === 'wallet') return '👛';
     if (id === 'mixed') return '🔁';
     return id.charAt(0).toUpperCase();
   };
@@ -42,20 +42,20 @@ export function PaymentOptionItem({ opt, selected, onPress }: { opt: Opt; select
           {opt.icon ? (
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>{opt.icon}</View>
           ) : (
-            <BthText role="bodyStrong" style={{ fontSize: 16, color: selected ? '#fff' : undefined }}>
+            <Text role="bodyStrong" style={{ fontSize: 16, color: selected ? '#fff' : undefined }}>
               {getGlyph(opt.id)}
-            </BthText>
+            </Text>
           )}
         </View>
       </View>
 
-      <BthText role="bodyStrong" style={{ marginTop: 8, textAlign: 'center' }}>
+      <Text role="bodyStrong" style={{ marginTop: 8, textAlign: 'center' }}>
         {opt.label}
-      </BthText>
+      </Text>
       {opt.subtitle ? (
-        <BthText role="caption" tone="muted" style={{ marginTop: 4, textAlign: 'center' }}>
+        <Text role="caption" tone="muted" style={{ marginTop: 4, textAlign: 'center' }}>
           {opt.subtitle}
-        </BthText>
+        </Text>
       ) : null}
       {selected && opt.meta ? <View style={{ marginTop: 8 }}>{opt.meta}</View> : null}
     </Pressable>

@@ -1,4 +1,4 @@
-﻿import { useDirection } from '@bthwani/ui-kit';
+import { useDirection } from '@bthwani/ui-kit';
 
 type DshLocale = 'ar' | 'en';
 

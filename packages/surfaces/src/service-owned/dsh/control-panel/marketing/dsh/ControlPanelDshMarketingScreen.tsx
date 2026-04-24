@@ -1,6 +1,6 @@
 import React from 'react';
-import { BthBox, BthSurface, BthText } from '@bthwani/ui-kit';
-import { BthWebSegmentedTabs } from '@bthwani/ui-kit/web';
+import { Box, Surface, Text } from '@bthwani/ui-kit';
+import { WebSegmentedTabs } from '@bthwani/ui-kit/web';
 import {
 	ControlPanelDshMarketingScreen as SmartSignalLayerScreen,
 	type ControlPanelDshMarketingScreenProps as SmartSignalLayerScreenProps,
@@ -37,8 +37,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
 	const activeMeta = marketingViewMeta[activeView];
 
 	return (
-		<BthBox gap={4}>
-			<BthWebSegmentedTabs
+		<Box gap={4}>
+			<WebSegmentedTabs
 				ariaLabel="DSH marketing control view"
 				items={[
 					{ id: 'growth', label: 'الفيديوهات + العروض', metaLabel: 'تحكم موحد', active: activeView === 'growth' },
@@ -49,18 +49,18 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
 				onSelect={(itemId) => setActiveView(itemId as MarketingControlView)}
 			/>
 
-			<BthSurface tone="inset" padding={4} gap={1}>
-				<BthText role="caption" tone="muted">{activeMeta.title}</BthText>
-				<BthText role="bodySm" tone="muted">{activeMeta.description}</BthText>
-			</BthSurface>
+			<Surface tone="inset" padding={4} gap={1}>
+				<Text role="caption" tone="muted">{activeMeta.title}</Text>
+				<Text role="bodySm" tone="muted">{activeMeta.description}</Text>
+			</Surface>
 
-			<BthSurface tone="raised" padding={4} gap={4}>
+			<Surface tone="raised" padding={4} gap={4}>
 				{activeView === 'growth' ? <GrowthCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} /> : null}
 				{activeView === 'banners' ? <BannersCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} /> : null}
 				{activeView === 'signals' ? <SmartSignalLayerScreen hubHref={props.hubHref} operationsHref={props.operationsHref} /> : null}
 				{activeView === 'loyalty' ? <LoyaltyCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} /> : null}
-			</BthSurface>
-		</BthBox>
+			</Surface>
+		</Box>
 	);
 }
 

@@ -6,8 +6,6 @@ export type MobileRootProps = RootProvidersProps & {
   children: ReactNode;
 };
 
-export type BthMobileRootProps = MobileRootProps;
-
 function MobileRootFrame({ children }: { children: ReactNode }) {
   const { mode, theme } = useTheme();
 
@@ -32,5 +30,3 @@ export function MobileRoot({ children, ...rootProps }: MobileRootProps) {
     </RootProviders>
   );
 }
-
-export const BthMobileRoot = MobileRoot;

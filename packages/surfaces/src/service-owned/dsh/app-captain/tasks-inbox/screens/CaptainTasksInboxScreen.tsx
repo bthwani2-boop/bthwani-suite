@@ -1,13 +1,13 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthListItem,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthStateView,
-  BthSurface,
-  BthText,
+  Box,
+  Button,
+  ListItem,
+  MobileScrollView,
+  SectionHeader,
+  StateView,
+  Surface,
+  Text,
 } from '@bthwani/ui-kit';
 
 export type CaptainOrdersInboxScreenState =
@@ -58,7 +58,7 @@ const demoActiveItems: CaptainTaskInboxItem[] = [
 
 function renderLoadingState() {
   return (
-    <BthStateView
+    <StateView
       stateId="loading"
       title="Loading captain inbox"
       description="Keep the next order visible as soon as queue data is available."
@@ -68,7 +68,7 @@ function renderLoadingState() {
 
 function renderNoTasksState(onRetry?: () => void) {
   return (
-    <BthStateView
+    <StateView
       stateId="empty"
       title="No orders right now"
       description="Stay ready. New orders will land here first."
@@ -80,7 +80,7 @@ function renderNoTasksState(onRetry?: () => void) {
 
 function renderDeliveredState(onRetry?: () => void) {
   return (
-    <BthStateView
+    <StateView
       kind="success"
       title="All orders delivered"
       description="Great run. Refresh to catch the next assignment."
@@ -92,7 +92,7 @@ function renderDeliveredState(onRetry?: () => void) {
 
 function renderErrorState(onRetry?: () => void) {
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title="Orders inbox is unavailable"
       description="Retry and continue from the next order without switching flow."
@@ -141,39 +141,39 @@ export function CaptainOrdersInboxScreen({
   };
 
   return (
-    <BthMobileScrollView padding={4} gap={3}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">Captain orders inbox</BthText>
-        <BthText role="bodySm" tone="muted">
+    <MobileScrollView padding={4} gap={3}>
+      <Box gap={2}>
+        <Text role="titleLg">Captain orders inbox</Text>
+        <Text role="bodySm" tone="muted">
           Inbox-first flow keeps the immediate order obvious and removes dashboard clutter.
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthSurface tone="brand" gap={3}>
-        <BthSectionHeader
+      <Surface tone="brand" gap={3}>
+        <SectionHeader
           title="Next order"
           subtitle="One clear action before scanning the rest of the queue."
         />
-        <BthBox gap={1}>
-          <BthText role="bodyStrong">{nextTask.title}</BthText>
-          <BthText role="bodySm" tone="muted">
+        <Box gap={1}>
+          <Text role="bodyStrong">{nextTask.title}</Text>
+          <Text role="bodySm" tone="muted">
             {nextTask.pickupLabel} | {nextTask.dropoffLabel}
-          </BthText>
-          <BthText role="caption" tone="soft">
+          </Text>
+          <Text role="caption" tone="soft">
             {nextTask.timingLabel} | Next: {nextTask.nextActionLabel}
-          </BthText>
-        </BthBox>
-        <BthButton label="Open next order" onPress={handleOpenNextTask} />
-      </BthSurface>
+          </Text>
+        </Box>
+        <Button label="Open next order" onPress={handleOpenNextTask} />
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
+      <Surface tone="raised" gap={3}>
+        <SectionHeader
           title="Queued orders"
           subtitle="List baseline: pickup, dropoff, timing, and next action."
         />
-        <BthBox gap={2}>
+        <Box gap={2}>
           {items.map((item) => (
-            <BthListItem
+            <ListItem
               key={item.id}
               title={item.title}
               subtitle={`${item.pickupLabel} | ${item.dropoffLabel}`}
@@ -182,9 +182,9 @@ export function CaptainOrdersInboxScreen({
               onPress={() => onOpenTask?.(item.id)}
             />
           ))}
-        </BthBox>
-      </BthSurface>
-    </BthMobileScrollView>
+        </Box>
+      </Surface>
+    </MobileScrollView>
   );
 }
 

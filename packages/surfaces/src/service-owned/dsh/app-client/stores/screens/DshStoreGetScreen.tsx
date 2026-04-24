@@ -13,7 +13,6 @@ import {
   Platform,
   Share,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -21,8 +20,8 @@ import {
   type ImageSourcePropType,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { resolveSeedMediaSource, type BthSeedMediaKey } from '@bthwani/media-fixtures';
-import { BthButton, BthChip, BthHighlightsRail, BthIcon, BthTopBar, BthStateView, BthText, BthToast, colorPalette, useDirection, useUiText, BthProductCard } from '@bthwani/ui-kit';
+import { resolveSeedMediaSource, type SeedMediaKey } from '@bthwani/media-fixtures';
+import { Button, Chip, HighlightsRail, Icon, TopBar, StateView, Text, Toast, colorPalette, useDirection, useUiText, ProductCard } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../../shared/catalog/catalog';
 import { formatDshStoreFollowersLabel } from '../../shared/store-profile';
 import { storeItemsByStoreId, type DshStoreFixtureItem as DshStoreGetMenuItem } from '../fixtures';
@@ -201,7 +200,7 @@ function normalizeDisplayText(value?: string) {
     .trim();
 }
 
-const DSH_STORE_PRODUCT_MEDIA_KEY_BY_CATEGORY: Record<string, BthSeedMediaKey> = {
+const DSH_STORE_PRODUCT_MEDIA_KEY_BY_CATEGORY: Record<string, SeedMediaKey> = {
   fresh: 'dsh.product.apple.v1',
   dairy: 'dsh.product.milk.v1',
   bakery: 'dsh.product.croissant.v1',
@@ -210,7 +209,7 @@ const DSH_STORE_PRODUCT_MEDIA_KEY_BY_CATEGORY: Record<string, BthSeedMediaKey> =
   sweets: 'dsh.product.choco.v1',
 };
 
-function resolveDshStoreMenuItemMediaKey(item: DshStoreGetMenuItem): BthSeedMediaKey {
+function resolveDshStoreMenuItemMediaKey(item: DshStoreGetMenuItem): SeedMediaKey {
   const haystack = normalizeDisplayText(
     [
       item.id,
@@ -241,7 +240,7 @@ function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSou
   return resolveSeedMediaSource(resolveDshStoreMenuItemMediaKey(item)) as ImageSourcePropType;
 }
 
-function resolveDshStoreCoverMediaKey(store?: DshStoreGetScreenProps['store']): BthSeedMediaKey {
+function resolveDshStoreCoverMediaKey(store?: DshStoreGetScreenProps['store']): SeedMediaKey {
   const haystack = normalizeDisplayText(
     [
       store?.id,
@@ -339,12 +338,12 @@ function renderNonReadyState(
   onRetry?: () => void,
 ) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title={storeText.states.storeEmptyTitle}
         description={storeText.states.storeEmptyDescription}
@@ -353,7 +352,7 @@ function renderNonReadyState(
   }
 
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title={storeText.states.storeErrorTitle}
       description={storeText.states.storeErrorDescription}
@@ -1124,7 +1123,7 @@ export function DshStoreGetScreen({
 
   if (!store) {
     return (
-      <BthStateView
+      <StateView
         stateId="blockingError"
         title={storeText.states.contextMissingTitle}
         description={storeText.states.contextMissingDescription}
@@ -1331,31 +1330,31 @@ export function DshStoreGetScreen({
           </Text>
         </View>
       ) : (
-        <BthTopBar
+        <TopBar
           title={normalizedStoreName}
           actions={[
             {
               id: 'share',
-              icon: <BthIcon name="share-social-outline" size={20} color={stylesTokens.dark} />,
+              icon: <Icon name="share-social-outline" size={20} color={stylesTokens.dark} />,
               accessibilityLabel: 'مشاركة المتجر',
               onPress: handleStoreShare,
             },
             {
               id: 'cart',
-              icon: <BthIcon name="cart-outline" size={20} color={stylesTokens.dark} />,
+              icon: <Icon name="cart-outline" size={20} color={stylesTokens.dark} />,
               accessibilityLabel: 'السلة',
               onPress: onOpenCart ?? onOpenItems,
             },
             {
               id: 'search',
-              icon: <BthIcon name="search-outline" size={20} color={stylesTokens.dark} />,
+              icon: <Icon name="search-outline" size={20} color={stylesTokens.dark} />,
               accessibilityLabel: 'بحث',
               onPress: openInlineSearch,
             },
           ]}
           trailingAction={{
             id: 'back',
-            icon: <BthIcon name="arrow-back" size={24} color={colorPalette.brand ?? stylesTokens.orange} />,
+            icon: <Icon name="arrow-back" size={24} color={colorPalette.brand ?? stylesTokens.orange} />,
             mirrorInRtl: true,
             accessibilityLabel: 'رجوع',
             onPress: onBack,
@@ -1463,7 +1462,7 @@ export function DshStoreGetScreen({
                       </View>
 
                       {smartRailItems.length ? (
-                        <BthHighlightsRail
+                        <HighlightsRail
                           items={smartRailItems}
                           maxItems={15}
                           variant="mediaCompact"
@@ -1493,7 +1492,7 @@ export function DshStoreGetScreen({
                               };
                             }}
                           >
-                            <BthChip
+                            <Chip
                               label={`${normalizeDisplayText(category.label)} ${CATEGORY_ICON[category.id] ?? '•'}`}
                               selected={selected}
                               tone="brand"
@@ -1559,7 +1558,7 @@ export function DshStoreGetScreen({
           </Animated.View>
         </View>
 
-      <BthToast
+      <Toast
         visible={cartToastVisible}
         title="تمت الإضافة إلى السلة"
         description={addedItemLabel ? `${addedItemLabel} أضيفت بنجاح.` : 'تمت الإضافة إلى السلة.'}
@@ -1575,8 +1574,8 @@ export function DshStoreGetScreen({
             <Text style={styles.cartDecisionTitle}>تمت الإضافة للسلة</Text>
             <Text style={styles.cartDecisionSubtitle}>{addedItemLabel ? `${addedItemLabel} أضيفت بنجاح إلى السلة.` : 'تمت الإضافة إلى السلة بنجاح.'}</Text>
             <View style={styles.cartDecisionActions}>
-              <BthButton label="انتقال للسلة" tone="primary" fullWidth onPress={handleGoToCart} />
-              <BthButton label="متابعة التسوق" tone="secondary" fullWidth onPress={handleContinueShopping} />
+              <Button label="انتقال للسلة" tone="primary" fullWidth onPress={handleGoToCart} />
+              <Button label="متابعة التسوق" tone="secondary" fullWidth onPress={handleContinueShopping} />
             </View>
           </View>
         </Pressable>

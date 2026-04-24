@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthBox, BthButton, BthMobileScrollView, BthSectionHeader, BthStateView, BthSurface, BthText } from '@bthwani/ui-kit';
+import { Box, Button, MobileScrollView, SectionHeader, StateView, Surface, Text } from '@bthwani/ui-kit';
 
 export type DshOperationScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
@@ -19,22 +19,22 @@ export type DshOperationScreenProps = {
 
 function renderNonReadyState(state: DshOperationScreenState, onRetry?: () => void) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
-    return <BthStateView stateId="empty" actionLabel="Retry" onActionPress={onRetry} />;
+    return <StateView stateId="empty" actionLabel="Retry" onActionPress={onRetry} />;
   }
 
   if (state === 'offline') {
-    return <BthStateView stateId="offline" onActionPress={onRetry} />;
+    return <StateView stateId="offline" onActionPress={onRetry} />;
   }
 
   if (state === 'disabled') {
-    return <BthStateView stateId="warning" title="Temporarily paused" description="Retry remains available when this step is re-enabled." actionLabel="Retry" onActionPress={onRetry} />;
+    return <StateView stateId="warning" title="Temporarily paused" description="Retry remains available when this step is re-enabled." actionLabel="Retry" onActionPress={onRetry} />;
   }
 
-  return <BthStateView stateId="recoverableError" title="Screen unavailable" description="Retry first. If the issue continues, return to the previous step." actionLabel="Retry" onActionPress={onRetry} />;
+  return <StateView stateId="recoverableError" title="Screen unavailable" description="Retry first. If the issue continues, return to the previous step." actionLabel="Retry" onActionPress={onRetry} />;
 }
 
 export function DshOperationScreen({
@@ -55,22 +55,22 @@ export function DshOperationScreen({
   }
 
   return (
-    <BthMobileScrollView padding={4} gap={3}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">{title}</BthText>
-        <BthText role="bodySm" tone="muted">{subtitle}</BthText>
-      </BthBox>
+    <MobileScrollView padding={4} gap={3}>
+      <Box gap={2}>
+        <Text role="titleLg">{title}</Text>
+        <Text role="bodySm" tone="muted">{subtitle}</Text>
+      </Box>
 
       {content}
 
-      <BthSurface tone="inset" gap={3}>
-        <BthSectionHeader title="الإجراء" subtitle="زر رئيسي واحد مع مسار رجوع صغير وواضح." />
-        <BthBox gap={2}>
-          {primaryActionLabel ? <BthButton label={primaryActionLabel} onPress={onPrimaryAction} /> : null}
-          {secondaryActionLabel ? <BthButton label={secondaryActionLabel} tone="secondary" onPress={onSecondaryAction} /> : null}
-          {tertiaryActionLabel ? <BthButton label={tertiaryActionLabel} tone="ghost" onPress={onTertiaryAction} /> : null}
-        </BthBox>
-      </BthSurface>
-    </BthMobileScrollView>
+      <Surface tone="inset" gap={3}>
+        <SectionHeader title="الإجراء" subtitle="زر رئيسي واحد مع مسار رجوع صغير وواضح." />
+        <Box gap={2}>
+          {primaryActionLabel ? <Button label={primaryActionLabel} onPress={onPrimaryAction} /> : null}
+          {secondaryActionLabel ? <Button label={secondaryActionLabel} tone="secondary" onPress={onSecondaryAction} /> : null}
+          {tertiaryActionLabel ? <Button label={tertiaryActionLabel} tone="ghost" onPress={onTertiaryAction} /> : null}
+        </Box>
+      </Surface>
+    </MobileScrollView>
   );
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BthBox, BthButton, BthIcon, BthMobileScrollView, BthScreenHeader, BthStateView, BthSurface, BthText, BthTopBar } from '@bthwani/ui-kit';
+import { Box, Button, Icon, MobileScrollView, ScreenHeader, StateView, Surface, Text, TopBar } from '@bthwani/ui-kit';
 import { dshCaptain } from '@bthwani/surfaces/app-captain';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
@@ -186,13 +186,13 @@ export function CaptainSurfaceHost() {
             setActiveTaskId('captain-task-9021');
             setIsDeliverySheetVisible(true);
             setRoute('detail');
-                icon: <BthIcon name="person-outline" size={21} color="#FFFFFF" />,
+                icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
         />
       );
     }
 
     if (route === 'inbox') {
-                icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
+                icon: <Icon name="notifications-outline" size={21} color="#FFFFFF" />,
         <CaptainTasksInboxScreen
           state={inboxState}
           onRetry={() => setInboxState('active')}
@@ -203,19 +203,19 @@ export function CaptainSurfaceHost() {
     }
 
     if (route === 'detail') {
-                icon: <BthIcon name="bicycle-outline" size={21} color="#FFFFFF" />,
+                icon: <Icon name="bicycle-outline" size={21} color="#FFFFFF" />,
         <>
-          <BthBox gap={3}>
+          <Box gap={3}>
             <CaptainTaskDetailScreen
               summary={activeSummary}
               onConfirmPickup={() => setIsPickupSheetVisible(true)}
               onConfirmDelivery={() => setIsDeliverySheetVisible(true)}
               onOpenNextTask={() => setRoute('inbox')}
-              { id: 'search', icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
+              { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
               onRetry={() => setRoute('detail')}
             />
-            <BthButton label="فتح تواصل الطلب" tone="secondary" fullWidth={false} onPress={() => setRoute('orderchat')} />
-          </BthBox>
+            <Button label="فتح تواصل الطلب" tone="secondary" fullWidth={false} onPress={() => setRoute('orderchat')} />
+          </Box>
 
           <CaptainPickupConfirmSheet
             visible={isPickupSheetVisible}
@@ -265,7 +265,7 @@ export function CaptainSurfaceHost() {
   };
 
   const topBar = (
-    <BthTopBar
+    <TopBar
       variant="brand"
       title="بثواني"
       subtitle="تطبيق الكابتن"
@@ -273,13 +273,13 @@ export function CaptainSurfaceHost() {
       actions={[
         {
           id: 'profile',
-          icon: <BthIcon name="person-outline" size={21} color="#FFFFFF" />,
+          icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الحساب',
           onPress: () => setAccountSheetVisible(true),
         },
         {
           id: 'notifications',
-          icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
+          icon: <Icon name="notifications-outline" size={21} color="#FFFFFF" />,
           badgeCount: 2,
           accessibilityLabel: 'الإشعارات',
           onPress: () => {
@@ -290,7 +290,7 @@ export function CaptainSurfaceHost() {
         },
         {
           id: 'tasks',
-          icon: <BthIcon name="bicycle-outline" size={21} color="#FFFFFF" />,
+          icon: <Icon name="bicycle-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'المهام',
           onPress: () => {
             if (activeServiceType === 'dsh') {
@@ -298,7 +298,7 @@ export function CaptainSurfaceHost() {
             }
           },
         },
-        { id: 'search', icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
+        { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
       ]}
       ticker={{
         statusLabel: activeServiceType === 'dsh' ? 'مباشر' : 'وضع AMN',
@@ -330,9 +330,9 @@ export function CaptainSurfaceHost() {
 
   if (activeServiceType === 'amn') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface
+        <Surface
           tone="raised"
           padding={5}
           gap={4}
@@ -346,11 +346,11 @@ export function CaptainSurfaceHost() {
             overflow: 'hidden',
           }}
         >
-          <BthStateView stateId="loading" title="تم تفعيل وضع AMN" description="التطبيق الآن في سياق AMN بالكامل. يجري تجهيز الشاشات التنفيذية الخاصة بهذا النوع." />
-          <BthButton label="العودة للرئيسية" tone="secondary" onPress={() => setRoute('home')} />
-        </BthSurface>
+          <StateView stateId="loading" title="تم تفعيل وضع AMN" description="التطبيق الآن في سياق AMN بالكامل. يجري تجهيز الشاشات التنفيذية الخاصة بهذا النوع." />
+          <Button label="العودة للرئيسية" tone="secondary" onPress={() => setRoute('home')} />
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
@@ -384,21 +384,21 @@ export function CaptainSurfaceHost() {
     }
 
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthBox padding={4} gap={3}>
-          <BthButton label="العودة للرئيسية" tone="secondary" onPress={() => setRoute('home')} />
-          <BthSurface tone="inset" padding={3} gap={2} radiusToken="lg">
-            <BthText role="label">حالة تشغيل الاختبار</BthText>
-            <BthBox gap={2}>
-              <BthButton label="Active" tone="secondary" onPress={() => setInboxState('active')} />
-              <BthButton label="No tasks" tone="secondary" onPress={() => setInboxState('noTasks')} />
-              <BthButton label="Delivered" tone="secondary" onPress={() => setInboxState('delivered')} />
-              <BthButton label="Error" tone="secondary" onPress={() => setInboxState('error')} />
-            </BthBox>
-          </BthSurface>
-        </BthBox>
-        <BthSurface
+        <Box padding={4} gap={3}>
+          <Button label="العودة للرئيسية" tone="secondary" onPress={() => setRoute('home')} />
+          <Surface tone="inset" padding={3} gap={2} radiusToken="lg">
+            <Text role="label">حالة تشغيل الاختبار</Text>
+            <Box gap={2}>
+              <Button label="Active" tone="secondary" onPress={() => setInboxState('active')} />
+              <Button label="No tasks" tone="secondary" onPress={() => setInboxState('noTasks')} />
+              <Button label="Delivered" tone="secondary" onPress={() => setInboxState('delivered')} />
+              <Button label="Error" tone="secondary" onPress={() => setInboxState('error')} />
+            </Box>
+          </Surface>
+        </Box>
+        <Surface
           tone="raised"
           padding={0}
           gap={0}
@@ -413,16 +413,16 @@ export function CaptainSurfaceHost() {
           }}
         >
           {content}
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   return (
-    <BthBox style={{ flex: 1 }} background="background">
+    <Box style={{ flex: 1 }} background="background">
       {topBar}
-      <BthSurface
+      <Surface
         tone="raised"
         padding={0}
         gap={0}
@@ -436,35 +436,35 @@ export function CaptainSurfaceHost() {
           overflow: 'hidden',
         }}
       >
-        <BthMobileScrollView fill padding={5} gap={5}>
-          <BthScreenHeader
+        <MobileScrollView fill padding={5} gap={5}>
+          <ScreenHeader
             title="مهام الكابتن"
             subtitle="هذه هي نقطة البداية الحقيقية لتطبيق الكابتن."
             actionLabel="ابدأ من entry"
             onActionPress={openCaptainEntry}
           />
 
-          <BthSurface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
-            <BthText role="label" tone="inverse">نقطة البداية الرسمية</BthText>
-            <BthText role="titleLg" tone="inverse">بداية تشغيلية حقيقية للكابتن</BthText>
-            <BthText role="bodyMd" tone="inverse">تطبيق الكابتن يجب أن يبدأ من shell تُظهر المهام والحالة والاختصارات، لا من preview service entry.</BthText>
-          </BthSurface>
+          <Surface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
+            <Text role="label" tone="inverse">نقطة البداية الرسمية</Text>
+            <Text role="titleLg" tone="inverse">بداية تشغيلية حقيقية للكابتن</Text>
+            <Text role="bodyMd" tone="inverse">تطبيق الكابتن يجب أن يبدأ من shell تُظهر المهام والحالة والاختصارات، لا من preview service entry.</Text>
+          </Surface>
 
-          <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
-            <BthText role="label">المساحات الأساسية</BthText>
+          <Surface tone="raised" padding={5} gap={4} radiusToken="xl">
+            <Text role="label">المساحات الأساسية</Text>
             {primaryAreas.map((item) => (
-              <BthSurface key={item} tone="default" padding={4} gap={2} radiusToken="lg">
-                <BthText role="bodyStrong">{item}</BthText>
-                <BthText role="bodySm" tone="muted">هذه مساحة رئيسية داخل التطبيق الحقيقي وليست preview route.</BthText>
-              </BthSurface>
+              <Surface key={item} tone="default" padding={4} gap={2} radiusToken="lg">
+                <Text role="bodyStrong">{item}</Text>
+                <Text role="bodySm" tone="muted">هذه مساحة رئيسية داخل التطبيق الحقيقي وليست preview route.</Text>
+              </Surface>
             ))}
-          </BthSurface>
+          </Surface>
 
-          <BthSurface tone="default" padding={5} gap={4} radiusToken="xl">
-            <BthText role="label">اختصارات البداية</BthText>
-            <BthBox gap={3}>
+          <Surface tone="default" padding={5} gap={4} radiusToken="xl">
+            <Text role="label">اختصارات البداية</Text>
+            <Box gap={3}>
               {shortcuts.map((item, index) => (
-                <BthButton
+                <Button
                   key={item}
                   label={item}
                   tone="secondary"
@@ -484,25 +484,25 @@ export function CaptainSurfaceHost() {
                   }}
                 />
               ))}
-            </BthBox>
-          </BthSurface>
+            </Box>
+          </Surface>
 
-          <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
-            <BthText role="label">أدلة الدعم التنفيذية</BthText>
-            <BthText role="bodySm" tone="muted">كل شاشات DSH المتبقية للكابتن أصبحت مجمعة في دليل دعم مركزي داخل نفس shell.</BthText>
-            <BthButton label="فتح دليل دعم الكابتن" tone="secondary" onPress={openSupportDirectory} />
-          </BthSurface>
+          <Surface tone="raised" padding={5} gap={4} radiusToken="xl">
+            <Text role="label">أدلة الدعم التنفيذية</Text>
+            <Text role="bodySm" tone="muted">كل شاشات DSH المتبقية للكابتن أصبحت مجمعة في دليل دعم مركزي داخل نفس shell.</Text>
+            <Button label="فتح دليل دعم الكابتن" tone="secondary" onPress={openSupportDirectory} />
+          </Surface>
 
-          <BthSurface tone="inset" padding={4} gap={2} radiusToken="lg">
-            <BthText role="label">حكم معماري</BthText>
-            <BthText role="bodySm" tone="muted">البدء من home shell يمنع خلط feature preview مع التشغيل الفعلي للتطبيق.</BthText>
-          </BthSurface>
+          <Surface tone="inset" padding={4} gap={2} radiusToken="lg">
+            <Text role="label">حكم معماري</Text>
+            <Text role="bodySm" tone="muted">البدء من home shell يمنع خلط feature preview مع التشغيل الفعلي للتطبيق.</Text>
+          </Surface>
 
-          <BthButton label="ابدأ من entry" onPress={openCaptainEntry} />
-        </BthMobileScrollView>
-      </BthSurface>
+          <Button label="ابدأ من entry" onPress={openCaptainEntry} />
+        </MobileScrollView>
+      </Surface>
       {accountSheet}
-    </BthBox>
+    </Box>
   );
 }
 

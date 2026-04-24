@@ -1,13 +1,13 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthListItem,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthStateView,
-  BthSurface,
-  BthText,
+  Box,
+  Button,
+  ListItem,
+  MobileScrollView,
+  SectionHeader,
+  StateView,
+  Surface,
+  Text,
 } from '@bthwani/ui-kit';
 
 export type PartnerOrdersInboxScreenState = 'ready' | 'loading' | 'empty' | 'error';
@@ -60,7 +60,7 @@ const demoPartnerOrdersInboxItems: PartnerOrdersInboxListItem[] = [
 
 function renderLoadingState() {
   return (
-    <BthStateView
+    <StateView
       stateId="loading"
       title="Loading partner inbox"
       description="Bring in only what the operator needs to decide the next order."
@@ -70,7 +70,7 @@ function renderLoadingState() {
 
 function renderEmptyState(onRetry?: () => void) {
   return (
-    <BthStateView
+    <StateView
       stateId="empty"
       title="No partner orders waiting"
       description="New work lands here. Keep the queue compact and move straight to the next order when it appears."
@@ -82,7 +82,7 @@ function renderEmptyState(onRetry?: () => void) {
 
 function renderErrorState(onRetry?: () => void) {
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title="Inbox is unavailable"
       description="Retry the queue and keep the next-order workflow visible once data returns."
@@ -123,39 +123,39 @@ export function PartnerOrdersInboxScreen({
   };
 
   return (
-    <BthMobileScrollView padding={4} gap={3}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">Partner orders inbox</BthText>
-        <BthText role="bodySm" tone="muted">
+    <MobileScrollView padding={4} gap={3}>
+      <Box gap={2}>
+        <Text role="titleLg">Partner orders inbox</Text>
+        <Text role="bodySm" tone="muted">
           Order-first queue for the next operational decision. The next order stays obvious without extra filters in this wave.
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthSurface tone="brand" gap={3}>
-        <BthSectionHeader
+      <Surface tone="brand" gap={3}>
+        <SectionHeader
           title="Next order"
           subtitle="Keep one primary action above the list so staff do not scan before acting."
         />
-        <BthBox gap={1}>
-          <BthText role="bodyStrong">{nextOrder.title}</BthText>
-          <BthText role="bodySm" tone="muted">
+        <Box gap={1}>
+          <Text role="bodyStrong">{nextOrder.title}</Text>
+          <Text role="bodySm" tone="muted">
             {nextOrder.subtitle}
-          </BthText>
-          <BthText role="caption" tone="soft">
+          </Text>
+          <Text role="caption" tone="soft">
             {nextOrder.serviceWindowLabel} | Next: {nextOrder.nextActionLabel}
-          </BthText>
-        </BthBox>
-        <BthButton label="Open next order" onPress={handleOpenNextOrder} />
-      </BthSurface>
+          </Text>
+        </Box>
+        <Button label="Open next order" onPress={handleOpenNextOrder} />
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
+      <Surface tone="raised" gap={3}>
+        <SectionHeader
           title="Queued orders"
           subtitle="List item baseline: order summary, service window, and next action. No dashboard clutter."
         />
-        <BthBox gap={2}>
+        <Box gap={2}>
           {items.map((item) => (
-            <BthListItem
+            <ListItem
               key={item.id}
               title={item.title}
               subtitle={item.subtitle}
@@ -164,9 +164,9 @@ export function PartnerOrdersInboxScreen({
               onPress={() => onOpenOrder?.(item.id)}
             />
           ))}
-        </BthBox>
-      </BthSurface>
-    </BthMobileScrollView>
+        </Box>
+      </Surface>
+    </MobileScrollView>
   );
 }
 

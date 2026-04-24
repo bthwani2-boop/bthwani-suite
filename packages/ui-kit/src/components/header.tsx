@@ -6,7 +6,6 @@ import { Badge, Button } from './button';
 import { Surface, Text } from '../primitives';
 
 export type TopBarVariant = 'default' | 'surface' | 'brand';
-export type BthTopBarVariant = TopBarVariant;
 
 export type NewsTickerBarProps = {
   statusLabel: string;
@@ -16,8 +15,6 @@ export type NewsTickerBarProps = {
   marquee?: boolean;
   marqueeDurationMs?: number;
 };
-
-export type BthNewsTickerBarProps = NewsTickerBarProps;
 
 export function NewsTickerBar({ statusLabel, message, onPress, variant = 'default', marquee = false, marqueeDurationMs = 18000 }: NewsTickerBarProps) {
   const { direction } = useDirection();
@@ -120,16 +117,12 @@ export function NewsTickerBar({ statusLabel, message, onPress, variant = 'defaul
   );
 }
 
-export const BthNewsTickerBar = NewsTickerBar;
-
 export type ScreenHeaderProps = {
   title: string;
   subtitle?: string;
   actionLabel?: string;
   onActionPress?: () => void;
 };
-
-export type BthScreenHeaderProps = ScreenHeaderProps;
 
 export function ScreenHeader({ title, subtitle, actionLabel, onActionPress }: ScreenHeaderProps) {
   return (
@@ -145,8 +138,6 @@ export function ScreenHeader({ title, subtitle, actionLabel, onActionPress }: Sc
   );
 }
 
-export const BthScreenHeader = ScreenHeader;
-
 export type SectionHeaderProps = {
   title: string;
   subtitle?: string;
@@ -155,8 +146,6 @@ export type SectionHeaderProps = {
   countTone?: React.ComponentProps<typeof Badge>['tone'];
   headingOrder?: 'title-first' | 'count-first';
 };
-
-export type BthSectionHeaderProps = SectionHeaderProps;
 
 export function SectionHeader({ title, subtitle, trailing, count, countTone = 'default', headingOrder = 'title-first' }: SectionHeaderProps) {
   return (
@@ -176,16 +165,12 @@ export function SectionHeader({ title, subtitle, trailing, count, countTone = 'd
   );
 }
 
-export const BthSectionHeader = SectionHeader;
-
 export type TabItem<Value extends string = string> = {
   value: Value;
   label: string;
   badgeLabel?: string;
   disabled?: boolean;
 };
-
-export type BthTabItem<Value extends string = string> = TabItem<Value>;
 
 export type TabsProps<Value extends string = string> = {
   items: readonly TabItem<Value>[];
@@ -198,8 +183,6 @@ export type TabsProps<Value extends string = string> = {
   style?: StyleProp<ViewStyle>;
   testID?: string;
 };
-
-export type BthTabsProps<Value extends string = string> = TabsProps<Value>;
 
 export function Tabs<Value extends string = string>({ items, value, onValueChange, stretch = false, variant = 'line', scrollable = false, wrap = false, style, testID }: TabsProps<Value>) {
   const { theme } = useTheme();
@@ -221,8 +204,6 @@ export function Tabs<Value extends string = string>({ items, value, onValueChang
   return scrollable ? <ScrollView horizontal showsHorizontalScrollIndicator={false}>{content}</ScrollView> : content;
 }
 
-export const BthTabs = Tabs;
-
 export type TopBarAction = {
   id: string;
   icon: React.ReactNode;
@@ -233,8 +214,6 @@ export type TopBarAction = {
   disabled?: boolean;
   accessibilityLabel?: string;
 };
-
-export type BthTopBarAction = TopBarAction;
 
 export type TopBarProps = {
   title: string;
@@ -251,8 +230,6 @@ export type TopBarProps = {
   contentOffsetY?: number;
   style?: StyleProp<ViewStyle>;
 };
-
-export type BthTopBarProps = TopBarProps;
 
 export function TopBar({ title, subtitle, locationLabel, locationIcon, onTitlePress, titleAccessibilityLabel, actions = [], trailingAction, ticker, tabs, variant = 'default', contentOffsetY = 0, style }: TopBarProps) {
   const { direction } = useDirection();
@@ -326,4 +303,3 @@ export function TopBar({ title, subtitle, locationLabel, locationIcon, onTitlePr
   );
 }
 
-export const BthTopBar = TopBar;

@@ -1,15 +1,15 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthKeyValueList,
-  BthListItem,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthStateView,
-  BthSurface,
-  BthText,
-  BthTextField,
+  Box,
+  Button,
+  KeyValueList,
+  ListItem,
+  MobileScrollView,
+  SectionHeader,
+  StateView,
+  Surface,
+  Text,
+  TextField,
 } from '@bthwani/ui-kit';
 
 export type DshFieldStoreVisitLogState =
@@ -66,12 +66,12 @@ const demoEvidenceItems: DshFieldVisitEvidenceItem[] = [
 
 function renderState(state: Exclude<DshFieldStoreVisitLogState, 'ready' | 'disabled'>, onRetry?: () => void) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title="No visit evidence recorded"
         description="Capture the first field note or proof item so the visit can close with auditability."
@@ -83,7 +83,7 @@ function renderState(state: Exclude<DshFieldStoreVisitLogState, 'ready' | 'disab
 
   if (state === 'offline') {
     return (
-      <BthStateView
+      <StateView
         stateId="offline"
         title="Visit log is waiting for sync"
         description="Keep local evidence visible and retry submission when the network returns."
@@ -94,7 +94,7 @@ function renderState(state: Exclude<DshFieldStoreVisitLogState, 'ready' | 'disab
 
   if (state === 'success') {
     return (
-      <BthStateView
+      <StateView
         stateId="success"
         title="Visit log submitted"
         description="The field visit now has captured evidence and a clear follow-up action."
@@ -105,7 +105,7 @@ function renderState(state: Exclude<DshFieldStoreVisitLogState, 'ready' | 'disab
   }
 
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title="Visit log could not be submitted"
       description="Retry the submission or correct the summary without losing the captured evidence list."
@@ -131,20 +131,20 @@ export function DshFieldStoreVisitLogScreen({
   const isDisabled = state === 'disabled';
 
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">Store visit log</BthText>
-        <BthText role="bodyMd" tone="muted">
+    <MobileScrollView padding={4} gap={4}>
+      <Box gap={2}>
+        <Text role="titleLg">Store visit log</Text>
+        <Text role="bodyMd" tone="muted">
           Record evidence and close the field visit with one summary and one owned follow-up action.
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
+      <Surface tone="raised" gap={3}>
+        <SectionHeader
           title="Visit summary"
           subtitle="The log should explain what was verified and what remains pending."
         />
-        <BthTextField
+        <TextField
           label="Visit summary"
           value={values.visitSummary}
           onChangeText={(value) => onChange('visitSummary', value)}
@@ -152,7 +152,7 @@ export function DshFieldStoreVisitLogScreen({
           error={errors?.visitSummary}
           hint="Example: storefront verified, staff briefed, activation request signed."
         />
-        <BthTextField
+        <TextField
           label="Follow-up action"
           value={values.followUpAction}
           onChangeText={(value) => onChange('followUpAction', value)}
@@ -160,16 +160,16 @@ export function DshFieldStoreVisitLogScreen({
           error={errors?.followUpAction}
           hint="Example: wait for pricing sync, revisit for final signage, ready for dispatch onboarding."
         />
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="default" gap={3}>
-        <BthSectionHeader
+      <Surface tone="default" gap={3}>
+        <SectionHeader
           title="Captured evidence"
           subtitle="Each evidence item remains openable without turning this screen into a gallery."
         />
-        <BthBox gap={2}>
+        <Box gap={2}>
           {evidenceItems.map((item) => (
-            <BthListItem
+            <ListItem
               key={item.id}
               title={item.title}
               subtitle={item.subtitle}
@@ -178,23 +178,23 @@ export function DshFieldStoreVisitLogScreen({
               onPress={() => onOpenEvidence?.(item.id)}
             />
           ))}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="inset" gap={3}>
-        <BthSectionHeader
+      <Surface tone="inset" gap={3}>
+        <SectionHeader
           title="Closure checks"
           subtitle="Visit evidence must keep the next accountable step visible."
         />
-        <BthKeyValueList
+        <KeyValueList
           items={[
             { label: 'Primary CTA', value: 'Submit visit log' },
             { label: 'Evidence count', value: String(evidenceItems.length) },
             { label: 'Next accountable step', value: values.followUpAction || 'Pending definition', tone: 'brand' },
           ]}
         />
-        <BthButton label="Submit visit log" onPress={onSubmit} disabled={isDisabled} />
-      </BthSurface>
-    </BthMobileScrollView>
+        <Button label="Submit visit log" onPress={onSubmit} disabled={isDisabled} />
+      </Surface>
+    </MobileScrollView>
   );
 }

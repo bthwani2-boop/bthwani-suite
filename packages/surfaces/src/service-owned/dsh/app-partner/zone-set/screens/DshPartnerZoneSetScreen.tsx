@@ -1,13 +1,13 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthListItem,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthStateView,
-  BthSurface,
-  BthText,
+  Box,
+  Button,
+  ListItem,
+  MobileScrollView,
+  SectionHeader,
+  StateView,
+  Surface,
+  Text,
 } from '@bthwani/ui-kit';
 
 export type DshPartnerZoneSetState =
@@ -66,12 +66,12 @@ const demoZones: DshPartnerZoneOption[] = [
 
 function renderState(state: Exclude<DshPartnerZoneSetState, 'ready' | 'disabled'>, onRetry?: () => void, onBack?: () => void) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title="No delivery zones are available"
         description="Load branch coverage options before assigning the active delivery zone."
@@ -83,7 +83,7 @@ function renderState(state: Exclude<DshPartnerZoneSetState, 'ready' | 'disabled'
 
   if (state === 'offline') {
     return (
-      <BthStateView
+      <StateView
         stateId="offline"
         title="Zone assignment is offline"
         description="Keep the selected branch zone visible and retry once connectivity returns."
@@ -94,7 +94,7 @@ function renderState(state: Exclude<DshPartnerZoneSetState, 'ready' | 'disabled'
 
   if (state === 'success') {
     return (
-      <BthStateView
+      <StateView
         stateId="success"
         title="Delivery zone updated"
         description="Coverage is saved and the branch can return to maintenance or delivery monitoring."
@@ -105,7 +105,7 @@ function renderState(state: Exclude<DshPartnerZoneSetState, 'ready' | 'disabled'
   }
 
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title="Zone update failed"
       description="Retry the coverage change without losing the selected branch context."
@@ -130,33 +130,33 @@ export function DshPartnerZoneSetScreen({
   const isDisabled = state === 'disabled';
 
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">Delivery zone set</BthText>
-        <BthText role="bodyMd" tone="muted">
+    <MobileScrollView padding={4} gap={4}>
+      <Box gap={2}>
+        <Text role="titleLg">Delivery zone set</Text>
+        <Text role="bodyMd" tone="muted">
           Keep one active coverage decision visible so the branch knows exactly where it can fulfill DSH demand.
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthSurface tone="brand" gap={3}>
-        <BthSectionHeader
+      <Surface tone="brand" gap={3}>
+        <SectionHeader
           title="Current coverage"
           subtitle="The active branch zone remains visible while operators review alternatives."
         />
-        <BthText role="bodyStrong">{selectedZone ? selectedZone.title : 'No zone selected'}</BthText>
-        <BthText role="bodySm" tone="muted">
+        <Text role="bodyStrong">{selectedZone ? selectedZone.title : 'No zone selected'}</Text>
+        <Text role="bodySm" tone="muted">
           {selectedZone ? `${selectedZone.deliveryFeeLabel} | ${selectedZone.etaLabel}` : 'Select a zone to continue.'}
-        </BthText>
-      </BthSurface>
+        </Text>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3}>
-        <BthSectionHeader
+      <Surface tone="raised" gap={3}>
+        <SectionHeader
           title="Available branch zones"
           subtitle="Each option shows cost and ETA impact before the operator commits."
         />
-        <BthBox gap={2}>
+        <Box gap={2}>
           {zones.map((zone) => (
-            <BthListItem
+            <ListItem
               key={zone.id}
               title={zone.title}
               subtitle={zone.subtitle}
@@ -165,12 +165,12 @@ export function DshPartnerZoneSetScreen({
               onPress={zone.disabled || isDisabled ? undefined : () => onSelectZone?.(zone.id)}
             />
           ))}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthButton label="Save active zone" onPress={onSave} disabled={isDisabled || !selectedZone} />
-      <BthButton label="Back to maintenance" tone="ghost" onPress={onBack} />
-    </BthMobileScrollView>
+      <Button label="Save active zone" onPress={onSave} disabled={isDisabled || !selectedZone} />
+      <Button label="Back to maintenance" tone="ghost" onPress={onBack} />
+    </MobileScrollView>
   );
 }
 

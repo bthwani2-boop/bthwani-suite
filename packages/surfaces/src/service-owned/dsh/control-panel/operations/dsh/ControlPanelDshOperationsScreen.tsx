@@ -1,21 +1,21 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import {
   useRouter } from 'next/navigation';
 import {
-  BthBox,
-  BthButton,
-  BthStateView,
-  BthText,
+  Box,
+  Button,
+  StateView,
+  Text,
   useDirection,
   useUiText
 } from '@bthwani/ui-kit';
 import {
-  BthWebCommandCenterFrame,
-  BthWebMissionHeroCard,
-  BthWebSectionCard,
-  BthWebSignalCard,
+  WebCommandCenterFrame,
+  WebMissionHeroCard,
+  WebSectionCard,
+  WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { formatDshWorkbenchSubtitle, useDshControlPanelText } from './shared/dshControlPanelText';
 import styles from './dsh-surface.module.css';
@@ -203,7 +203,7 @@ function renderStateView(
   const stateCopy = resolveStateCopy(text, state);
 
   return (
-    <BthStateView
+    <StateView
       {...stateCopy}
       onActionPress={onActionPress}
     />
@@ -308,7 +308,7 @@ export function ControlPanelDshOperationsScreen({
 
   const stageContent = readyForSelection ? (
     <div className={styles.stack}>
-      <BthWebMissionHeroCard
+      <WebMissionHeroCard
         badges={[
           `/operations/dsh`,
           `${dshText.common.period}: ${activeFilter.label}`,
@@ -327,36 +327,36 @@ export function ControlPanelDshOperationsScreen({
       />
 
       <div className={styles.signalGrid}>
-        <BthWebSignalCard
+        <WebSignalCard
           title={dshText.hub.selectedScopeTitle}
           value={activeWorkbench.label}
           description={dshText.hub.selectedScopeDescription}
           tone="best"
         />
-        <BthWebSignalCard
+        <WebSignalCard
           title={dshText.hub.plannedRoutesTitle}
           value={String(plannedWorkbenchCount)}
           description={dshText.hub.plannedRoutesDescription}
         />
-        <BthWebSignalCard
+        <WebSignalCard
           title={dshText.hub.safeTransitionTitle}
           value={fallbackHref}
           description={dshText.hub.safeTransitionDescription}
         />
-        <BthWebSignalCard
+        <WebSignalCard
           title={dshText.common.activeAlerts}
           value={String(alertCount)}
           description={dshText.hub.activeAlertsDescription}
         />
       </div>
 
-      <BthWebSectionCard
+      <WebSectionCard
         title={dshText.hub.quickActionsTitle}
         description={dshText.hub.quickActionsDescription}
       >
         <div className={styles.actionRow} dir={direction}>
           {liveWorkbenchActions.map((workbench) => (
-            <BthButton
+            <Button
               key={workbench.id}
               label={resolveWorkbenchActionLabel(dshText, workbench.id)}
               tone={workbench.id === 'orders' ? 'primary' : 'secondary'}
@@ -366,16 +366,16 @@ export function ControlPanelDshOperationsScreen({
             />
           ))}
         </div>
-      </BthWebSectionCard>
+      </WebSectionCard>
 
-      <BthWebSectionCard
+      <WebSectionCard
         title={dshText.hub.workbenchesTitle}
         description={dshText.hub.workbenchesDescription}
       >
         <div className={styles.cardGrid}>
           {dshWorkbenches.filter((workbench) => workbench.id !== 'overview').map((workbench) => (
             <div key={workbench.id} className={styles.compactCard}>
-              <BthBox
+              <Box
                 padding={3}
                 gap={1}
                 border
@@ -383,19 +383,19 @@ export function ControlPanelDshOperationsScreen({
                 background="surfaceRaised"
               >
                 <div className={styles.workbenchHeader} dir={direction}>
-                  <BthText role="bodyStrong">{workbench.label}</BthText>
-                  <BthText role="caption" tone={workbench.liveHref ? 'success' : 'brand'}>
+                  <Text role="bodyStrong">{workbench.label}</Text>
+                  <Text role="caption" tone={workbench.liveHref ? 'success' : 'brand'}>
                     {workbench.liveHref ? dshText.common.live : workbench.statusLabel}
-                  </BthText>
+                  </Text>
                 </div>
-                <BthText role="bodySm" tone="muted">
+                <Text role="bodySm" tone="muted">
                   {workbench.description}
-                </BthText>
-                <BthText role="caption" tone="soft">
+                </Text>
+                <Text role="caption" tone="soft">
                   {workbench.routeHint}
-                </BthText>
+                </Text>
                 {workbench.liveHref ? (
-                  <BthButton
+                  <Button
                     label={resolveWorkbenchActionLabel(dshText, workbench.id)}
                     tone="primary"
                     size="sm"
@@ -403,11 +403,11 @@ export function ControlPanelDshOperationsScreen({
                     onPress={() => router.push(workbench.liveHref!)}
                   />
                 ) : null}
-              </BthBox>
+              </Box>
             </div>
           ))}
         </div>
-      </BthWebSectionCard>
+      </WebSectionCard>
     </div>
   ) : (
     renderStateView(dshText, state, () => {
@@ -416,7 +416,7 @@ export function ControlPanelDshOperationsScreen({
   );
 
   return (
-    <BthWebCommandCenterFrame
+    <WebCommandCenterFrame
       brandLabel={uiText.controlPanel.brandLabel}
       surfaceTitle={readyForSelection ? heroTitle : dshText.hub.rootTitle}
       surfaceSubtitle={readyForSelection ? heroSubtitle : dshText.hub.unavailableTitle}
@@ -431,29 +431,29 @@ export function ControlPanelDshOperationsScreen({
       railItems={railItems}
       onRailItemSelect={readyForSelection ? handleRailSelect : undefined}
       railSupplementary={
-        <BthWebSectionCard
+        <WebSectionCard
           title={dshText.common.routeGuard}
           description={dshText.common.routeGuardDescription}
         >
-          <BthBox gap={2}>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.common.currentPath}</BthText>
-              <BthText role="bodySm" tone="muted">
+          <Box gap={2}>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.common.currentPath}</Text>
+              <Text role="bodySm" tone="muted">
                 /operations/dsh
-              </BthText>
-            </BthBox>
-            <BthBox padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{dshText.common.safeExit}</BthText>
-              <BthText role="bodySm" tone="muted">
+              </Text>
+            </Box>
+            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.common.safeExit}</Text>
+              <Text role="bodySm" tone="muted">
                 {fallbackHref}
-              </BthText>
-            </BthBox>
-          </BthBox>
-        </BthWebSectionCard>
+              </Text>
+            </Box>
+          </Box>
+        </WebSectionCard>
       }
     >
       {stageContent}
-    </BthWebCommandCenterFrame>
+    </WebCommandCenterFrame>
   );
 }
 

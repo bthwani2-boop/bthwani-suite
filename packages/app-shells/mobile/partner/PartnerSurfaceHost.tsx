@@ -1,6 +1,6 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
-import { BthBox, BthButton, BthIcon, BthMobileScrollView, BthScreenHeader, BthSurface, BthText, BthTopBar } from '@bthwani/ui-kit';
+import { Box, Button, Icon, MobileScrollView, ScreenHeader, Surface, Text, TopBar } from '@bthwani/ui-kit';
 import { dshPartner } from '@bthwani/surfaces/app-partner';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
@@ -145,13 +145,13 @@ type PartnerStoreHoursDay = {
 
 const partnerTypeOptions: readonly MobileAccountTypeOption[] = [
   { id: 'dsh', label: 'DSH', description: 'تشغيل الطلبات والتسليم' },
-                icon: <BthIcon name="person-outline" size={21} color="#FFFFFF" />,
+                icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
 ];
 
 export function PartnerSurfaceHost() {
   const [activeServiceType, setActiveServiceType] = React.useState<PartnerServiceType>('dsh');
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
-                icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
+                icon: <Icon name="notifications-outline" size={21} color="#FFFFFF" />,
   const [activeOrderId, setActiveOrderId] = React.useState('partner-order-1042');
   const [listingEnabled, setListingEnabled] = React.useState(true);
   const [storeOpen, setStoreOpen] = React.useState(true);
@@ -160,8 +160,8 @@ export function PartnerSurfaceHost() {
       id: 'delivery',
       label: 'Delivery',
       description: 'Accept delivery demand and keep captain handoff open.',
-              { id: 'orders', icon: <BthIcon name="receipt-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
-              { id: 'search', icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
+              { id: 'orders', icon: <Icon name="receipt-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
+              { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
     {
       id: 'pickup',
       label: 'Pickup',
@@ -383,7 +383,7 @@ export function PartnerSurfaceHost() {
   };
 
   const topBar = (
-    <BthTopBar
+    <TopBar
       variant="brand"
       title="بثواني"
       subtitle={activeServiceType === 'dsh' ? 'لوحة الشريك - DSH' : 'لوحة الشريك - ARB'}
@@ -391,13 +391,13 @@ export function PartnerSurfaceHost() {
       actions={[
         {
           id: 'profile',
-          icon: <BthIcon name="person-outline" size={21} color="#FFFFFF" />,
+          icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الحساب',
           onPress: () => setAccountSheetVisible(true),
         },
         {
           id: 'notifications',
-          icon: <BthIcon name="notifications-outline" size={21} color="#FFFFFF" />,
+          icon: <Icon name="notifications-outline" size={21} color="#FFFFFF" />,
           badgeCount: 3,
           accessibilityLabel: 'الإشعارات',
           onPress: () => {
@@ -406,8 +406,8 @@ export function PartnerSurfaceHost() {
             }
           },
         },
-        { id: 'orders', icon: <BthIcon name="receipt-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
-        { id: 'search', icon: <BthIcon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
+        { id: 'orders', icon: <Icon name="receipt-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
+        { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
       ]}
       ticker={{
         statusLabel: activeServiceType === 'dsh' ? 'نشط' : 'ARB نشط',
@@ -436,9 +436,9 @@ export function PartnerSurfaceHost() {
 
   if (activeServiceType === 'arb') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface
+        <Surface
           tone="raised"
           padding={0}
           gap={0}
@@ -452,48 +452,48 @@ export function PartnerSurfaceHost() {
             overflow: 'hidden',
           }}
         >
-          <BthMobileScrollView fill padding={5} gap={5}>
-            <BthScreenHeader
+          <MobileScrollView fill padding={5} gap={5}>
+            <ScreenHeader
               title="عمليات الشريك - ARB"
               subtitle="التطبيق الآن في سياق ARB بالكامل."
               actionLabel="تحديث المسارات"
               onActionPress={() => {}}
             />
 
-            <BthSurface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
-              <BthText role="label" tone="inverse">وضع التشغيل الحالي</BthText>
-              <BthText role="titleLg" tone="inverse">تم تفعيل نوع ARB</BthText>
-              <BthText role="bodyMd" tone="inverse">كل محتوى التطبيق الآن موجّه إلى مسارات ARB، مع منع خلط مسارات DSH داخل نفس السياق.</BthText>
-            </BthSurface>
+            <Surface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
+              <Text role="label" tone="inverse">وضع التشغيل الحالي</Text>
+              <Text role="titleLg" tone="inverse">تم تفعيل نوع ARB</Text>
+              <Text role="bodyMd" tone="inverse">كل محتوى التطبيق الآن موجّه إلى مسارات ARB، مع منع خلط مسارات DSH داخل نفس السياق.</Text>
+            </Surface>
 
-            <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
-              <BthText role="label">المساحات الأساسية - ARB</BthText>
-              <BthSurface tone="default" padding={4} gap={2} radiusToken="lg">
-                <BthText role="bodyStrong">إدارة المسارات</BthText>
-                <BthText role="bodySm" tone="muted">تجهيز المسار، ترتيب نقاط الخدمة، ومتابعة الإنجاز.</BthText>
-              </BthSurface>
-              <BthSurface tone="default" padding={4} gap={2} radiusToken="lg">
-                <BthText role="bodyStrong">مهام الميدان</BthText>
-                <BthText role="bodySm" tone="muted">عرض المهام المرتبطة بنوع ARB فقط.</BthText>
-              </BthSurface>
-            </BthSurface>
+            <Surface tone="raised" padding={5} gap={4} radiusToken="xl">
+              <Text role="label">المساحات الأساسية - ARB</Text>
+              <Surface tone="default" padding={4} gap={2} radiusToken="lg">
+                <Text role="bodyStrong">إدارة المسارات</Text>
+                <Text role="bodySm" tone="muted">تجهيز المسار، ترتيب نقاط الخدمة، ومتابعة الإنجاز.</Text>
+              </Surface>
+              <Surface tone="default" padding={4} gap={2} radiusToken="lg">
+                <Text role="bodyStrong">مهام الميدان</Text>
+                <Text role="bodySm" tone="muted">عرض المهام المرتبطة بنوع ARB فقط.</Text>
+              </Surface>
+            </Surface>
 
-            <BthSurface tone="inset" padding={4} gap={2} radiusToken="lg">
-              <BthText role="label">حالة الربط</BthText>
-              <BthText role="bodySm" tone="muted">واجهات ARB الميدانية قيد التوسعة، لكن التبديل مطبق ويبدّل سياق التطبيق بالكامل بالفعل.</BthText>
-            </BthSurface>
-          </BthMobileScrollView>
-        </BthSurface>
+            <Surface tone="inset" padding={4} gap={2} radiusToken="lg">
+              <Text role="label">حالة الربط</Text>
+              <Text role="bodySm" tone="muted">واجهات ARB الميدانية قيد التوسعة، لكن التبديل مطبق ويبدّل سياق التطبيق بالكامل بالفعل.</Text>
+            </Surface>
+          </MobileScrollView>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   if (route === 'entry') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
           <DshEntryScreen
             state={partnerEntryState}
             onOpenOrdersBoardPress={() => setRoute('inbox')}
@@ -504,34 +504,34 @@ export function PartnerSurfaceHost() {
             onOpenMaintenancePress={openStoreMaintenance}
             onOpenIssueQueuePress={() => setRoute('operations')}
           />
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   if (route === 'bell') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
           <DshPartnerBellScreen
             onOpenInbox={() => setRoute('inbox')}
             onOpenNextOrder={() => setRoute('detail')}
             onBack={() => setRoute('inbox')}
             onRetry={() => setRoute('bell')}
           />
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   if (route === 'inbox') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
           <PartnerOrdersInboxScreen
             onOpenOrder={(orderId) => {
               setActiveOrderId(orderId);
@@ -543,17 +543,17 @@ export function PartnerSurfaceHost() {
             }}
             onRetry={() => setRoute('inbox')}
           />
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   if (route === 'detail') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
           <PartnerOrderDetailScreen
             summary={activeOrderSummary}
             onConfirmReady={() => setRoute('inbox')}
@@ -561,17 +561,17 @@ export function PartnerSurfaceHost() {
             onBackToInbox={() => setRoute('inbox')}
             onRetry={() => setRoute('detail')}
           />
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   if (route === 'operations') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
           <DshPartnerDeliveryOpsBoardScreen
             summary={deliveryOpsSummary}
             orders={deliveryOpsOrders}
@@ -582,17 +582,17 @@ export function PartnerSurfaceHost() {
             onOpenIssueQueue={() => setRoute('inbox')}
             onRetry={() => setRoute('operations')}
           />
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   if (route === 'maintenance') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
           <DshPartnerStoreMaintenanceWorkspaceScreen
             profile={maintenanceProfile}
             serviceModes={serviceModes}
@@ -608,17 +608,17 @@ export function PartnerSurfaceHost() {
             onSave={() => setRoute('entry')}
             onRetry={() => setRoute('maintenance')}
           />
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   if (route === 'hours') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
           <DshPartnerHoursUpdateScreen
             days={storeHours}
             onToggleDay={toggleStoreHoursDay}
@@ -627,17 +627,17 @@ export function PartnerSurfaceHost() {
             onBack={() => setRoute('maintenance')}
             onRetry={() => setRoute('hours')}
           />
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   if (route === 'zones') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
           <DshPartnerZoneSetScreen
             zones={zoneOptions}
             onSelectZone={setSelectedZoneId}
@@ -645,33 +645,33 @@ export function PartnerSurfaceHost() {
             onBack={() => setRoute('maintenance')}
             onRetry={() => setRoute('zones')}
           />
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   if (route === 'inventory-management') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
           <DshInventoryManagementScreen />
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   if (route === 'support-directory') {
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
           <DshPartnerSupportDirectoryScreen onOpenScreen={(screenId) => openSupportScreen(screenId as PartnerSupportRoute)} />
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
@@ -713,20 +713,20 @@ export function PartnerSurfaceHost() {
     };
 
     return (
-      <BthBox style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <BthSurface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
           {supportScreens[selectedSupportScreen]}
-        </BthSurface>
+        </Surface>
         {accountSheet}
-      </BthBox>
+      </Box>
     );
   }
 
   return (
-    <BthBox style={{ flex: 1 }} background="background">
+    <Box style={{ flex: 1 }} background="background">
       {topBar}
-      <BthSurface
+      <Surface
         tone="raised"
         padding={0}
         gap={0}
@@ -740,8 +740,8 @@ export function PartnerSurfaceHost() {
           overflow: 'hidden',
         }}
       >
-        <BthMobileScrollView fill padding={5} gap={5}>
-          <BthScreenHeader
+        <MobileScrollView fill padding={5} gap={5}>
+          <ScreenHeader
             title={activeServiceType === 'dsh' ? 'لوحة الشريك' : 'لوحة الشريك - ARB'}
             subtitle={
               activeServiceType === 'dsh'
@@ -752,33 +752,33 @@ export function PartnerSurfaceHost() {
             onActionPress={activeServiceType === 'dsh' ? openOrdersBoard : undefined}
           />
 
-          <BthSurface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
-            <BthText role="label" tone="inverse">نقطة البداية الرسمية</BthText>
-            <BthText role="titleLg" tone="inverse">
+          <Surface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
+            <Text role="label" tone="inverse">نقطة البداية الرسمية</Text>
+            <Text role="titleLg" tone="inverse">
               {activeServiceType === 'dsh' ? 'تشغيل الشريك من shell رسمية' : 'تشغيل ARB من shell رسمية'}
-            </BthText>
-            <BthText role="bodyMd" tone="inverse">
+            </Text>
+            <Text role="bodyMd" tone="inverse">
               {activeServiceType === 'dsh'
                 ? 'البداية الصحيحة لتطبيق الشريك هي home shell تُظهر المهام الأساسية، لا شاشة preview مرتبطة بخدمة واحدة.'
                 : 'البداية الصحيحة لوضع ARB هي shell تشغيلية تعرض المسارات والمهام ذات العلاقة بهذا النوع فقط.'}
-            </BthText>
-          </BthSurface>
+            </Text>
+          </Surface>
 
-          <BthSurface tone="raised" padding={5} gap={4} radiusToken="xl">
-            <BthText role="label">المساحات الأساسية</BthText>
+          <Surface tone="raised" padding={5} gap={4} radiusToken="xl">
+            <Text role="label">المساحات الأساسية</Text>
             {activePrimaryAreas.map((item) => (
-              <BthSurface key={item} tone="default" padding={4} gap={2} radiusToken="lg">
-                <BthText role="bodyStrong">{item}</BthText>
-                <BthText role="bodySm" tone="muted">هذه مساحة رئيسية داخل التطبيق الحقيقي وليست preview route.</BthText>
-              </BthSurface>
+              <Surface key={item} tone="default" padding={4} gap={2} radiusToken="lg">
+                <Text role="bodyStrong">{item}</Text>
+                <Text role="bodySm" tone="muted">هذه مساحة رئيسية داخل التطبيق الحقيقي وليست preview route.</Text>
+              </Surface>
             ))}
-          </BthSurface>
+          </Surface>
 
-          <BthSurface tone="default" padding={5} gap={4} radiusToken="xl">
-            <BthText role="label">اختصارات البداية</BthText>
-            <BthBox gap={3}>
+          <Surface tone="default" padding={5} gap={4} radiusToken="xl">
+            <Text role="label">اختصارات البداية</Text>
+            <Box gap={3}>
               {activeShortcuts.map((item, index) => (
-                <BthButton
+                <Button
                   key={item}
                   label={item}
                   tone="secondary"
@@ -801,23 +801,23 @@ export function PartnerSurfaceHost() {
                   }}
                 />
               ))}
-            </BthBox>
-          </BthSurface>
+            </Box>
+          </Surface>
 
-          <BthSurface tone="inset" padding={4} gap={2} radiusToken="lg">
-            <BthText role="label">حكم معماري</BthText>
-            <BthText role="bodySm" tone="muted">
+          <Surface tone="inset" padding={4} gap={2} radiusToken="lg">
+            <Text role="label">حكم معماري</Text>
+            <Text role="bodySm" tone="muted">
               {activeServiceType === 'dsh'
                 ? 'DSH يظل ضمن feature flows الداخلية، وليس الشاشة الافتراضية عند فتح التطبيق.'
                 : 'عند اختيار ARB يجب أن تظهر فقط عناصر ARB بدون خلط مع مسارات DSH.'}
-            </BthText>
-          </BthSurface>
+            </Text>
+          </Surface>
 
-          <BthButton label={activeServiceType === 'dsh' ? 'ابدأ من entry' : 'إدارة عرب'} onPress={activeServiceType === 'dsh' ? openOrdersBoard : undefined} />
-        </BthMobileScrollView>
-      </BthSurface>
+          <Button label={activeServiceType === 'dsh' ? 'ابدأ من entry' : 'إدارة عرب'} onPress={activeServiceType === 'dsh' ? openOrdersBoard : undefined} />
+        </MobileScrollView>
+      </Surface>
       {accountSheet}
-    </BthBox>
+    </Box>
   );
 }
 

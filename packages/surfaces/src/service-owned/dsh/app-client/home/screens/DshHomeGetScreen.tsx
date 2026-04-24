@@ -284,7 +284,7 @@ const categoryIconMap: Record<string, string> = {
   grocery: '🛒',
   sweets_juices: '🧃',
   anaqati: '👗',
-  bthwani_store: '🏪',
+  wani_store: '🏪',
   home_projects: '🏠',
   awnak: '🤝',
   gas_refill: '⛽',

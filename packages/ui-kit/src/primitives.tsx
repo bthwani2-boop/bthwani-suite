@@ -194,10 +194,6 @@ export function Surface({
 	);
 }
 
-export const BthBox = Box;
-export const BthDivider = Divider;
-export const BthSurface = Surface;
-
 export type TextProps = {
 	children: React.ReactNode;
 	role?: TextRole;
@@ -258,8 +254,6 @@ export function Text({
 	);
 }
 
-export const BthText = Text;
-
 export type MobileScrollViewProps = Omit<ScrollViewProps, 'style' | 'contentContainerStyle'> & {
 	children?: React.ReactNode;
 	fill?: boolean;
@@ -292,14 +286,4 @@ export function MobileScrollView({
 		</ScrollView>
 	);
 }
-
-export type BthBoxBackground = BoxBackground;
-export type BthBoxBorderTone = BoxBorderTone;
-export type BthBoxProps = BoxProps;
-export type BthDividerProps = DividerProps;
-export type BthSurfaceTone = SurfaceTone;
-export type BthSurfaceProps = SurfaceProps;
-export type BthTextProps = TextProps;
-export type BthMobileScrollViewProps = MobileScrollViewProps;
-export const BthMobileScrollView = MobileScrollView;
 

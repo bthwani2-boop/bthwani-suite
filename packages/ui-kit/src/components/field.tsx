@@ -3,9 +3,9 @@ import { Image, Pressable, ScrollView, Switch as RNSwitch, TextInput, View, type
 import { borders, radius, resolveLogicalPadding, resolveTextAlign, resolveRowDirection, sizes, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Button } from './button';
-import { BthKeyValueList as KeyValueList } from './list';
-import { BthCard as Card } from './card';
-import { BthSurface as Surface, BthText as Text } from '../primitives';
+import { KeyValueList } from './list';
+import { Card } from './card';
+import { Surface, Text } from '../primitives';
 
 const fieldFrameLaw = {
   labelGap: spacing[2],
@@ -25,8 +25,6 @@ export type TextFieldProps = TextInputProps & {
   hint?: string;
   error?: string;
 };
-
-export type BthTextFieldProps = TextFieldProps;
 
 export function TextField({ label, hint, error, style, ...rest }: TextFieldProps) {
   const { direction } = useDirection();
@@ -60,8 +58,6 @@ export function TextField({ label, hint, error, style, ...rest }: TextFieldProps
   );
 }
 
-export const BthTextField = TextField;
-
 export function SearchField({ placeholder, ...props }: TextFieldProps) {
   const { language } = useDirection();
   const fallbackPlaceholder = String(language).toLowerCase().startsWith('en') ? 'Search' : 'ابحث';
@@ -69,16 +65,12 @@ export function SearchField({ placeholder, ...props }: TextFieldProps) {
   return <TextField placeholder={placeholder ?? fallbackPlaceholder} {...props} />;
 }
 
-export const BthSearchField = SearchField;
-
 export type SelectOption<Value extends string = string> = {
   value: Value;
   label: string;
   description?: string;
   disabled?: boolean;
 };
-
-export type BthSelectOption<Value extends string = string> = SelectOption<Value>;
 
 export type SelectFieldProps<Value extends string = string> = {
   label?: string;
@@ -92,8 +84,6 @@ export type SelectFieldProps<Value extends string = string> = {
   style?: StyleProp<ViewStyle>;
   testID?: string;
 };
-
-export type BthSelectFieldProps<Value extends string = string> = SelectFieldProps<Value>;
 
 export function SelectField<Value extends string = string>({
   label,
@@ -173,8 +163,6 @@ export function SelectField<Value extends string = string>({
     </View>
   );
 }
-
-export const BthSelectField = SelectField;
 
 export type AmountInputProps = {
   value: string;
@@ -286,8 +274,6 @@ export type FormScreenShellProps = {
   children?: React.ReactNode;
 };
 
-export type BthFormScreenShellProps = FormScreenShellProps;
-
 export function FormScreenShell({
   title,
   subtitle,
@@ -308,8 +294,6 @@ export function FormScreenShell({
   );
 }
 
-export const BthFormScreenShell = FormScreenShell;
-
 export type OptionRowProps = {
   title: string;
   subtitle?: string;
@@ -317,8 +301,6 @@ export type OptionRowProps = {
   onAction?: () => void;
   style?: StyleProp<ViewStyle>;
 };
-
-export type BthOptionRowProps = OptionRowProps;
 
 export function OptionRow({ title, subtitle, actionLabel, onAction, style }: OptionRowProps) {
   return (
@@ -334,8 +316,6 @@ export function OptionRow({ title, subtitle, actionLabel, onAction, style }: Opt
   );
 }
 
-export const BthOptionRow = OptionRow;
-
 export type CheckboxProps = {
   label: string;
   description?: string;
@@ -345,8 +325,6 @@ export type CheckboxProps = {
   onCheckedChange?: (checked: boolean) => void;
   style?: StyleProp<ViewStyle>;
 };
-
-export type BthCheckboxProps = CheckboxProps;
 
 export function Checkbox({ label, description, checked, disabled = false, error, onCheckedChange, style }: CheckboxProps) {
   const { direction } = useDirection();
@@ -380,8 +358,6 @@ export function Checkbox({ label, description, checked, disabled = false, error,
   );
 }
 
-export const BthCheckbox = Checkbox;
-
 export type RadioProps = {
   label: string;
   description?: string;
@@ -390,8 +366,6 @@ export type RadioProps = {
   onSelect?: () => void;
   style?: StyleProp<ViewStyle>;
 };
-
-export type BthRadioProps = RadioProps;
 
 export function Radio({ label, description, selected, disabled = false, onSelect, style }: RadioProps) {
   const { direction } = useDirection();
@@ -424,15 +398,11 @@ export function Radio({ label, description, selected, disabled = false, onSelect
   );
 }
 
-export const BthRadio = Radio;
-
 export type SegmentedOption<Value extends string = string> = {
   value: Value;
   label: string;
   disabled?: boolean;
 };
-
-export type BthSegmentedOption<Value extends string = string> = SegmentedOption<Value>;
 
 export type SegmentedControlProps<Value extends string = string> = {
   options: readonly SegmentedOption<Value>[];
@@ -442,8 +412,6 @@ export type SegmentedControlProps<Value extends string = string> = {
   fullWidth?: boolean;
   style?: StyleProp<ViewStyle>;
 };
-
-export type BthSegmentedControlProps<Value extends string = string> = SegmentedControlProps<Value>;
 
 export function SegmentedControl<Value extends string = string>({ options, value, onValueChange, size = 'md', fullWidth = true, style }: SegmentedControlProps<Value>) {
   const { direction } = useDirection();
@@ -465,8 +433,6 @@ export function SegmentedControl<Value extends string = string>({ options, value
   );
 }
 
-export const BthSegmentedControl = SegmentedControl;
-
 export type SwitchProps = {
   label: string;
   description?: string;
@@ -475,8 +441,6 @@ export type SwitchProps = {
   onValueChange?: (nextValue: boolean) => void;
   style?: StyleProp<ViewStyle>;
 };
-
-export type BthSwitchProps = SwitchProps;
 
 export function Switch({ label, description, value, disabled = false, onValueChange, style }: SwitchProps) {
   const { direction } = useDirection();
@@ -493,4 +457,3 @@ export function Switch({ label, description, value, disabled = false, onValueCha
   );
 }
 
-export const BthSwitch = Switch;

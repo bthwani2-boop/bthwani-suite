@@ -2,22 +2,22 @@ import React from 'react';
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  BthBadge,
-  BthBox,
-  BthButton,
-  BthIcon,
-  BthCard,
-  BthChip,
-  BthKeyValueList,
-  BthListItem,
-  BthMobileScrollView,
-  BthSearchField,
-  BthSectionHeader,
-  BthStatCard,
-  BthTextField,
-  BthSurface,
-  BthText,
-  BthTopBar,
+  Badge,
+  Box,
+  Button,
+  Icon,
+  Card,
+  Chip,
+  KeyValueList,
+  ListItem,
+  MobileScrollView,
+  SearchField,
+  SectionHeader,
+  StatCard,
+  TextField,
+  Surface,
+  Text,
+  TopBar,
   spacing,
   useTheme,
 } from '@bthwani/ui-kit';
@@ -178,14 +178,14 @@ function StageRail({ activeStepId, steps }: { activeStepId: string; steps: Journ
   const activeIndex = Math.max(0, steps.findIndex((step) => step.id === activeStepId));
 
   return (
-    <BthBox gap={2}>
+    <Box gap={2}>
       {steps.map((step, index) => {
         const isDone = index < activeIndex;
         const isActive = index === activeIndex;
         const indicatorTone = isActive ? theme.brand : isDone ? theme.success : theme.line;
 
         return (
-          <BthBox key={step.id} layoutDirection="row" gap={2} align="center" style={{ flexDirection: 'row-reverse' }}>
+          <Box key={step.id} layoutDirection="row" gap={2} align="center" style={{ flexDirection: 'row-reverse' }}>
             <View style={{ width: 24, alignItems: 'center', justifyContent: 'center' }}>
               <View
                 style={{
@@ -197,14 +197,14 @@ function StageRail({ activeStepId, steps }: { activeStepId: string; steps: Journ
                   backgroundColor: indicatorTone,
                 }}
               >
-                {isDone ? <Ionicons name="checkmark" size={12} color={theme.brandContrast} /> : <BthText role="caption" style={{ color: isActive ? theme.brandContrast : theme.text }}>{index + 1}</BthText>}
+                {isDone ? <Ionicons name="checkmark" size={12} color={theme.brandContrast} /> : <Text role="caption" style={{ color: isActive ? theme.brandContrast : theme.text }}>{index + 1}</Text>}
               </View>
               {index < steps.length - 1 ? (
                 <View style={{ width: 2, flex: 1, minHeight: 28, marginTop: 4, marginBottom: -4, backgroundColor: isDone ? theme.success : theme.line }} />
               ) : null}
             </View>
 
-            <BthSurface
+            <Surface
               tone={isActive ? 'brand' : 'raised'}
               padding={2}
               gap={0}
@@ -215,13 +215,13 @@ function StageRail({ activeStepId, steps }: { activeStepId: string; steps: Journ
                 backgroundColor: isActive ? theme.brandSurface : theme.surfaceRaised,
               }}
             >
-              <BthText role="bodyStrong" style={{ textAlign: 'right' }}>{step.title}</BthText>
-              <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{step.detail}</BthText>
-            </BthSurface>
-          </BthBox>
+              <Text role="bodyStrong" style={{ textAlign: 'right' }}>{step.title}</Text>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{step.detail}</Text>
+            </Surface>
+          </Box>
         );
       })}
-    </BthBox>
+    </Box>
   );
 }
 
@@ -229,13 +229,13 @@ function OrdersListStatCard({ label, value, helperText }: { label: string; value
   const { theme } = useTheme();
 
   return (
-    <BthCard
+    <Card
       title={label}
       subtitle={helperText}
       style={{ flexBasis: '48%', flexGrow: 1, borderRadius: 18, borderWidth: 1, borderColor: theme.line }}
     >
-      <BthText role="hero" style={{ color: theme.brand }}>{value}</BthText>
-    </BthCard>
+      <Text role="hero" style={{ color: theme.brand }}>{value}</Text>
+    </Card>
   );
 }
 
@@ -243,7 +243,7 @@ function OrderRow({ item, onOpenOrder }: { item: DshOrderListItem; onOpenOrder?:
   const { theme } = useTheme();
 
   return (
-    <BthListItem
+    <ListItem
       title={item.title}
       subtitle={item.subtitle}
       meta={item.meta}
@@ -257,7 +257,7 @@ function RatingStars({ value, disabled, onChange }: { value: number; disabled?: 
   const { theme } = useTheme();
 
   return (
-    <BthBox layoutDirection="row" gap={1} style={{ flexDirection: 'row-reverse', justifyContent: 'flex-end', opacity: disabled ? 0.62 : 1 }}>
+    <Box layoutDirection="row" gap={1} style={{ flexDirection: 'row-reverse', justifyContent: 'flex-end', opacity: disabled ? 0.62 : 1 }}>
       {[5, 4, 3, 2, 1].map((score) => {
         const isSelected = score <= value;
 
@@ -277,7 +277,7 @@ function RatingStars({ value, disabled, onChange }: { value: number; disabled?: 
           </Pressable>
         );
       })}
-    </BthBox>
+    </Box>
   );
 }
 
@@ -347,33 +347,33 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
   };
 
   return (
-    <BthSurface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-      <BthSectionHeader
+    <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+      <SectionHeader
         title="الدردشة مع الكابتن"
         subtitle={isClosed ? 'الدردشة مقفلة بعد التسليم، والسجل فقط ما يزال ظاهرًا.' : 'صوت، كاميرا، وفيديو داخل نفس الصندوق دون ضوضاء إضافية.'}
       />
 
-      <BthBox gap={1} style={{ alignItems: 'flex-end' }}>
-        <BthBadge label={isClosed ? 'الدردشة مقفلة' : 'مرتبطة بهذا الطلب'} tone={isClosed ? 'warning' : 'brand'} />
-        <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+      <Box gap={1} style={{ alignItems: 'flex-end' }}>
+        <Badge label={isClosed ? 'الدردشة مقفلة' : 'مرتبطة بهذا الطلب'} tone={isClosed ? 'warning' : 'brand'} />
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
           {isClosed ? 'بعد التسليم يبقى السجل فقط.' : 'اكتب الرسالة وأرفق بسرعة من نفس الصندوق.'}
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthBox gap={2}>
+      <Box gap={2}>
         {chatMessages.map((message) => {
           if (message.align === 'center') {
             return (
-              <BthSurface
+              <Surface
                 key={message.id}
                 tone="inset"
                 padding={2}
                 gap={1}
                 style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line, backgroundColor: theme.surfaceRaised }}
               >
-                <BthBadge label={message.senderLabel} tone={message.tone} />
-                <BthText role="bodySm" style={{ textAlign: 'right' }}>{message.body}</BthText>
-              </BthSurface>
+                <Badge label={message.senderLabel} tone={message.tone} />
+                <Text role="bodySm" style={{ textAlign: 'right' }}>{message.body}</Text>
+              </Surface>
             );
           }
 
@@ -381,7 +381,7 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
 
           return (
             <View key={message.id} style={{ alignSelf: isCustomer ? 'flex-end' : 'flex-start', width: '88%' }}>
-              <BthSurface
+              <Surface
                 tone={isCustomer ? 'brand' : 'raised'}
                 padding={2}
                 gap={1}
@@ -392,37 +392,37 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
                   backgroundColor: isCustomer ? theme.brandSurface : theme.surfaceRaised,
                 }}
               >
-                <BthBox layoutDirection="row" gap={2} style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                  <BthBadge label={message.senderLabel} tone={message.tone} />
-                  <BthText role="caption" tone="muted">{message.time}</BthText>
-                </BthBox>
+                <Box layoutDirection="row" gap={2} style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Badge label={message.senderLabel} tone={message.tone} />
+                  <Text role="caption" tone="muted">{message.time}</Text>
+                </Box>
 
-                <BthText role="bodySm" style={{ textAlign: 'right' }}>{message.body}</BthText>
+                <Text role="bodySm" style={{ textAlign: 'right' }}>{message.body}</Text>
 
                 {message.attachments?.length ? (
-                  <BthBox layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                  <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                     {message.attachments.map((attachmentKind) => {
                       const attachment = orderChatAttachmentOptions[attachmentKind];
 
                       return (
-                        <BthBadge
+                        <Badge
                           key={`${message.id}-${attachment.kind}`}
                           label={attachment.selectedLabel}
                           tone={attachment.tone}
                         />
                       );
                     })}
-                  </BthBox>
+                  </Box>
                 ) : null}
-              </BthSurface>
+              </Surface>
             </View>
           );
         })}
-      </BthBox>
+      </Box>
 
       {!isClosed ? (
-        <BthSurface tone="raised" gap={2} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
-          <BthBox layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
+          <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             {([
               { kind: 'voice', label: 'صوت', iconName: 'mic-outline' as const },
               { kind: 'image', label: 'كاميرا', iconName: 'camera-outline' as const },
@@ -431,7 +431,7 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
               const isSelected = draftAttachments.includes(action.kind);
 
               return (
-                <BthButton
+                <Button
                   key={action.kind}
                   label={action.label}
                   tone={isSelected ? 'primary' : 'secondary'}
@@ -443,9 +443,9 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
                 />
               );
             })}
-          </BthBox>
+          </Box>
 
-          <BthTextField
+          <TextField
             label="رسالة إلى الكابتن"
             value={draftMessage}
             onChangeText={setDraftMessage}
@@ -455,17 +455,17 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
             style={{ minHeight: 96, textAlignVertical: 'top' }}
           />
 
-          <BthButton label={canSend ? sendButtonLabel : 'أضف نصًا أو مرفقًا'} onPress={handleSendMessage} disabled={!canSend} />
-        </BthSurface>
+          <Button label={canSend ? sendButtonLabel : 'أضف نصًا أو مرفقًا'} onPress={handleSendMessage} disabled={!canSend} />
+        </Surface>
       ) : (
-        <BthSurface tone="inset" gap={1} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
-          <BthBadge label="الدردشة مقفلة" tone="warning" />
-          <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+        <Surface tone="inset" gap={1} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
+          <Badge label="الدردشة مقفلة" tone="warning" />
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             لا يمكن إرسال رسائل جديدة بعد التسليم. يبقى السجل هنا للمراجعة فقط.
-          </BthText>
-        </BthSurface>
+          </Text>
+        </Surface>
       )}
-    </BthSurface>
+    </Surface>
   );
 }
 
@@ -490,9 +490,9 @@ function renderCheckoutGate(screenId?: string, state: DshOperationScreenState = 
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
       content={
-        <BthSurface tone="raised" gap={3} padding={2}>
-          <BthSectionHeader title={gateCopy.sectionTitle} subtitle={gateCopy.sectionSubtitle} />
-          <BthKeyValueList
+        <Surface tone="raised" gap={3} padding={2}>
+          <SectionHeader title={gateCopy.sectionTitle} subtitle={gateCopy.sectionSubtitle} />
+          <KeyValueList
             items={[
               { label: 'المسار', value: screenId ?? 'checkout-gate', tone: 'brand' },
               { label: 'المرحلة التالية', value: 'قيد المراجعة' },
@@ -500,7 +500,7 @@ function renderCheckoutGate(screenId?: string, state: DshOperationScreenState = 
             ]}
           />
           <StageRail activeStepId="route" steps={deliveryJourneySteps} />
-        </BthSurface>
+        </Surface>
       }
     />
   );
@@ -596,30 +596,30 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
-      <BthTopBar
+      <TopBar
         variant="surface"
         title={journeyTopBarTitle}
-        trailingAction={onBack ? { id: 'back', icon: <BthIcon name="arrow-back" size={24} color={ACCENT_GOLD} />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
+        trailingAction={onBack ? { id: 'back', icon: <Icon name="arrow-back" size={24} color="#F97316" />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
       />
 
-      <BthMobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
-      <BthSurface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader
+      <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
+      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader
           title={journeyStageTitle}
           subtitle={phase === 'route' ? 'الوصول والاستلام سيظهران هنا فور الانتقال من الطريق.' : 'الآن ظهرت التقييمات بعد الاستلام داخل نفس الشاشة.'}
-          trailing={<BthBadge label={phase === 'route' ? deliveryStatusLabel : 'تم الاستلام'} tone={phase === 'route' ? 'warning' : 'success'} />}
+          trailing={<Badge label={phase === 'route' ? deliveryStatusLabel : 'تم الاستلام'} tone={phase === 'route' ? 'warning' : 'success'} />}
         />
-        <BthKeyValueList items={orderReceiptItems} />
-      </BthSurface>
+        <KeyValueList items={orderReceiptItems} />
+      </Surface>
 
-      <BthSurface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader title="مسار الحالة" subtitle="في الطريق ثم وصول العميل ثم الاستلام في صفحة واحدة فقط." />
+      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title="مسار الحالة" subtitle="في الطريق ثم وصول العميل ثم الاستلام في صفحة واحدة فقط." />
         <StageRail activeStepId={phase === 'route' ? 'route' : 'received'} steps={deliveryJourneySteps} />
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader title="تفاصيل الطلب" subtitle="بيانات فعلية مستقاة من الطلب نفسه." />
-        <BthKeyValueList
+      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title="تفاصيل الطلب" subtitle="بيانات فعلية مستقاة من الطلب نفسه." />
+        <KeyValueList
           items={[
             { label: 'عنوان الاستلام', value: values.pickupAddress || 'غير محدد', tone: 'brand' },
             { label: 'عنوان التسليم', value: values.dropoffAddress || 'غير محدد' },
@@ -628,46 +628,46 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
             { label: 'الملاحظات', value: note },
           ]}
         />
-      </BthSurface>
+      </Surface>
 
       <OrderCaptainChatSection phase={phase} />
 
-      <BthSurface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader title="تقييم الطلب (المنتج)" subtitle="بعد استلام العميل، تقييم المنتج يظهر هنا دون مغادرة الصفحة." />
-        <BthBox gap={2}>
-          <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <BthStatCard label="التقييم الحالي" value={productRatingLabel} deltaLabel={productRatingDelta} tone={productRating > 0 ? 'warning' : 'info'} />
-            <BthStatCard label="الوضع" value={phase === 'route' ? 'بانتظار الوصول' : ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن'} deltaLabel={phase === 'route' ? 'سيظهر بعد الاستلام' : ratingsSubmitted ? 'يمكن التعديل' : 'بعد استلام العميل'} tone={phase === 'route' ? 'info' : ratingsSubmitted ? 'success' : 'warning'} />
-          </BthBox>
-          <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{productHelperText}</BthText>
+      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title="تقييم الطلب (المنتج)" subtitle="بعد استلام العميل، تقييم المنتج يظهر هنا دون مغادرة الصفحة." />
+        <Box gap={2}>
+          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+            <StatCard label="التقييم الحالي" value={productRatingLabel} deltaLabel={productRatingDelta} tone={productRating > 0 ? 'warning' : 'info'} />
+            <StatCard label="الوضع" value={phase === 'route' ? 'بانتظار الوصول' : ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن'} deltaLabel={phase === 'route' ? 'سيظهر بعد الاستلام' : ratingsSubmitted ? 'يمكن التعديل' : 'بعد استلام العميل'} tone={phase === 'route' ? 'info' : ratingsSubmitted ? 'success' : 'warning'} />
+          </Box>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{productHelperText}</Text>
           <RatingStars value={productRating} disabled={!hasCustomerReceived} onChange={handleProductRatingChange} />
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader title="تقييم الكابتن" subtitle="ومن نفس الصفحة أيضًا يمكنك تقييم الكابتن بعد الاستلام." />
-        <BthBox gap={2}>
-          <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <BthStatCard label="التقييم الحالي" value={captainRatingLabel} deltaLabel="الكابتن" tone={captainRating > 0 ? 'info' : 'brand'} />
-            <BthStatCard label="الحالة" value={ratingsSubmitted ? 'تم الإرسال' : hasCustomerReceived ? 'جاهز الآن' : 'بانتظار الاستلام'} deltaLabel={hasCustomerReceived ? (ratingsSubmitted ? 'يمكن التعديل' : 'داخل نفس الصفحة') : 'سيظهر بعد الاستلام'} tone={ratingsSubmitted ? 'success' : hasCustomerReceived ? 'warning' : 'info'} />
-          </BthBox>
-          <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{captainHelperText}</BthText>
+      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title="تقييم الكابتن" subtitle="ومن نفس الصفحة أيضًا يمكنك تقييم الكابتن بعد الاستلام." />
+        <Box gap={2}>
+          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+            <StatCard label="التقييم الحالي" value={captainRatingLabel} deltaLabel="الكابتن" tone={captainRating > 0 ? 'info' : 'brand'} />
+            <StatCard label="الحالة" value={ratingsSubmitted ? 'تم الإرسال' : hasCustomerReceived ? 'جاهز الآن' : 'بانتظار الاستلام'} deltaLabel={hasCustomerReceived ? (ratingsSubmitted ? 'يمكن التعديل' : 'داخل نفس الصفحة') : 'سيظهر بعد الاستلام'} tone={ratingsSubmitted ? 'success' : hasCustomerReceived ? 'warning' : 'info'} />
+          </Box>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{captainHelperText}</Text>
           <RatingStars value={captainRating} disabled={!hasCustomerReceived} onChange={handleCaptainRatingChange} />
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
       {ratingsSubmitted ? (
-        <BthSurface tone="brand" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.brand }}>
-          <BthText role="bodyStrong" style={{ textAlign: 'right' }}>تم حفظ التقييمين</BthText>
-          <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+        <Surface tone="brand" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.brand }}>
+          <Text role="bodyStrong" style={{ textAlign: 'right' }}>تم حفظ التقييمين</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             تقييم الطلب وتقييم الكابتن بقيا في نفس الصفحة وتم اعتمادهما.
-          </BthText>
-        </BthSurface>
+          </Text>
+        </Surface>
       ) : null}
 
-      <BthSurface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader title={phase === 'route' ? 'المسار الحي' : 'بعد الاستلام' } subtitle="لا توجد شاشة جديدة بين الوصول والاستلام والتقييم." />
-        <BthBox gap={2}>
+      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title={phase === 'route' ? 'المسار الحي' : 'بعد الاستلام' } subtitle="لا توجد شاشة جديدة بين الوصول والاستلام والتقييم." />
+        <Box gap={2}>
           {timelineItems.map((step, index) => {
             const isDone = index < activeTimelineIndex || (!hasCustomerReceived && index === 0);
             const isActive = index === activeTimelineIndex;
@@ -676,44 +676,44 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
             const badgeTone = isActive ? 'brand' : isDone ? 'success' : 'default';
 
             return (
-              <BthSurface
+              <Surface
                 key={step.id}
                 tone={isActive ? 'brand' : 'raised'}
                 gap={0}
                 padding={2}
                 style={{ borderRadius: 18, borderWidth: 1, borderColor, backgroundColor }}
               >
-                <BthBox layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
+                <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
                   <View style={{ width: 28, alignItems: 'center' }}>
                     <Ionicons name={isDone ? 'checkmark' : isActive ? 'ellipse' : 'ellipse-outline'} size={18} color={isActive ? theme.brand : isDone ? theme.success : theme.textSoft} />
                   </View>
 
-                  <BthBox gap={0} style={{ flex: 1 }}>
-                    <BthText role="bodyStrong" style={{ textAlign: 'right' }}>{step.title}</BthText>
-                    <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{step.detail}</BthText>
-                  </BthBox>
+                  <Box gap={0} style={{ flex: 1 }}>
+                    <Text role="bodyStrong" style={{ textAlign: 'right' }}>{step.title}</Text>
+                    <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{step.detail}</Text>
+                  </Box>
 
-                  <BthChip label={isDone ? 'تم' : isActive ? 'الآن' : 'قادم'} tone={badgeTone} />
-                </BthBox>
-              </BthSurface>
+                  <Chip label={isDone ? 'تم' : isActive ? 'الآن' : 'قادم'} tone={badgeTone} />
+                </Box>
+              </Surface>
             );
           })}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthText role="bodyStrong" style={{ textAlign: 'right' }}>الوصول والاستلام وتقييم المنتج والكابتن في صفحة واحدة</BthText>
-        <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+      <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <Text role="bodyStrong" style={{ textAlign: 'right' }}>الوصول والاستلام وتقييم المنتج والكابتن في صفحة واحدة</Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
           لا يوجد انتقال إلى صفحة أخرى هنا. الطلب يصل للعميل، يستلمه، ثم يظهر تقييم المنتج وتقييم الكابتن داخل نفس الشاشة.
-        </BthText>
-      </BthSurface>
+        </Text>
+      </Surface>
 
-      <BthBox gap={2}>
-        <BthButton label={primaryActionLabel} onPress={handlePrimaryAction} disabled={primaryActionDisabled} />
-        {onBell && phase === 'route' ? <BthButton label="جرس الوصول" tone="secondary" onPress={onBell} /> : null}
-        {onBack ? <BthButton label="تعديل الطلب" tone="secondary" onPress={onBack} /> : null}
-      </BthBox>
-      </BthMobileScrollView>
+      <Box gap={2}>
+        <Button label={primaryActionLabel} onPress={handlePrimaryAction} disabled={primaryActionDisabled} />
+        {onBell && phase === 'route' ? <Button label="جرس الوصول" tone="secondary" onPress={onBell} /> : null}
+        {onBack ? <Button label="تعديل الطلب" tone="secondary" onPress={onBack} /> : null}
+      </Box>
+      </MobileScrollView>
     </View>
   );
 }
@@ -722,24 +722,24 @@ function renderOrderSuccess(onNext?: () => void) {
   const { theme } = useTheme();
 
   return (
-    <BthMobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
-      <BthSurface tone="brand" gap={2} padding={3} style={{ borderRadius: 24, borderWidth: 1, borderColor: theme.brand }}>
-        <BthBox gap={1} style={{ alignItems: 'flex-end' }}>
-          <BthBadge label="في الطريق" tone="warning" />
-          <BthText role="titleLg" style={{ textAlign: 'right' }}>الطلب في الطريق إلى العميل</BthText>
-          <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+    <MobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
+      <Surface tone="brand" gap={2} padding={3} style={{ borderRadius: 24, borderWidth: 1, borderColor: theme.brand }}>
+        <Box gap={1} style={{ alignItems: 'flex-end' }}>
+          <Badge label="في الطريق" tone="warning" />
+          <Text role="titleLg" style={{ textAlign: 'right' }}>الطلب في الطريق إلى العميل</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             ستظهر هنا لحظة الوصول ثم استلام العميل ثم التقييمان في نفس الشاشة.
-          </BthText>
-        </BthBox>
-      </BthSurface>
+          </Text>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader title="المسار التالي" subtitle="في الطريق ثم الوصول ثم الاستلام من العميل." />
+      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title="المسار التالي" subtitle="في الطريق ثم الوصول ثم الاستلام من العميل." />
         <StageRail activeStepId="route" steps={deliveryJourneySteps} />
-      </BthSurface>
+      </Surface>
 
-      <BthButton label="عرض التتبع" onPress={onNext} />
-    </BthMobileScrollView>
+      <Button label="عرض التتبع" onPress={onNext} />
+    </MobileScrollView>
   );
 }
 
@@ -754,31 +754,31 @@ function renderTracking(
   const activeItem = timeline[activeTimelineIndex] ?? timeline[timeline.length - 1];
 
   return (
-    <BthMobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
-      <BthSurface tone="brand" gap={2} padding={3} style={{ borderRadius: 24, borderWidth: 1, borderColor: theme.brand }}>
-        <BthBox gap={1} style={{ alignItems: 'flex-end' }}>
-          <BthBadge label={currentStatusLabel} tone="info" />
-          <BthText role="titleLg" style={{ textAlign: 'right' }}>في الطريق</BthText>
-          <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+    <MobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
+      <Surface tone="brand" gap={2} padding={3} style={{ borderRadius: 24, borderWidth: 1, borderColor: theme.brand }}>
+        <Box gap={1} style={{ alignItems: 'flex-end' }}>
+          <Badge label={currentStatusLabel} tone="info" />
+          <Text role="titleLg" style={{ textAlign: 'right' }}>في الطريق</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             التتبع الحي ظاهر الآن، ويمكنك متابعة المحطات حتى الوصول.
-          </BthText>
-        </BthBox>
-      </BthSurface>
+          </Text>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader title="الحالة الحالية" subtitle="آخر محطة مرئية الآن في مسار التنفيذ." />
-        <BthKeyValueList
+      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title="الحالة الحالية" subtitle="آخر محطة مرئية الآن في مسار التنفيذ." />
+        <KeyValueList
           items={[
             { label: 'المرحلة الحالية', value: activeItem?.title ?? currentStatusLabel, tone: 'brand' },
             { label: 'الخطوة التالية', value: timeline[activeTimelineIndex + 1]?.title ?? 'التسليم', tone: 'success' },
             { label: 'آخر تحديث', value: activeItem?.detail ?? 'Live' },
           ]}
         />
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthSectionHeader title="المسار المباشر" subtitle="يظهر كل انتقال بوضوح حتى يبقى السياق بسيطًا." />
-        <BthBox gap={2}>
+      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title="المسار المباشر" subtitle="يظهر كل انتقال بوضوح حتى يبقى السياق بسيطًا." />
+        <Box gap={2}>
           {timeline.map((step, index) => {
             const isActive = !step.done && index === activeTimelineIndex;
             const isDone = step.done;
@@ -787,42 +787,42 @@ function renderTracking(
             const iconName = isDone ? 'checkmark' : isActive ? 'ellipse' : 'ellipse-outline';
 
             return (
-              <BthSurface
+              <Surface
                 key={step.id}
                 tone={isActive ? 'brand' : 'raised'}
                 gap={0}
                 padding={2}
                 style={{ borderRadius: 18, borderWidth: 1, borderColor, backgroundColor }}
               >
-                <BthBox layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
+                <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
                   <View style={{ width: 28, alignItems: 'center' }}>
                     <Ionicons name={iconName as any} size={18} color={isActive ? theme.brand : isDone ? theme.success : theme.textSoft} />
                   </View>
 
-                  <BthBox gap={0} style={{ flex: 1 }}>
-                    <BthText role="bodyStrong" style={{ textAlign: 'right' }}>{step.title}</BthText>
-                    <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{step.detail}</BthText>
-                  </BthBox>
+                  <Box gap={0} style={{ flex: 1 }}>
+                    <Text role="bodyStrong" style={{ textAlign: 'right' }}>{step.title}</Text>
+                    <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{step.detail}</Text>
+                  </Box>
 
-                  <BthChip label={isDone ? 'تم' : isActive ? 'الآن' : 'قادم'} tone={isActive ? 'brand' : isDone ? 'success' : 'default'} />
-                </BthBox>
-              </BthSurface>
+                  <Chip label={isDone ? 'تم' : isActive ? 'الآن' : 'قادم'} tone={isActive ? 'brand' : isDone ? 'success' : 'default'} />
+                </Box>
+              </Surface>
             );
           })}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthText role="bodyStrong" style={{ textAlign: 'right' }}>الدعم والرجوع</BthText>
-        <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+      <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <Text role="bodyStrong" style={{ textAlign: 'right' }}>الدعم والرجوع</Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
           إذا احتجت مراجعة إضافية أو دعمًا سريعًا، يمكنك الانتقال من هنا دون كسر المسار.
-        </BthText>
-        <BthBox gap={2}>
-          {onNextAction ? <BthButton label="العودة إلى الطلبات" onPress={onNextAction} /> : null}
-          {onSupport ? <BthButton label="الدعم" tone="secondary" onPress={onSupport} /> : null}
-        </BthBox>
-      </BthSurface>
-    </BthMobileScrollView>
+        </Text>
+        <Box gap={2}>
+          {onNextAction ? <Button label="العودة إلى الطلبات" onPress={onNextAction} /> : null}
+          {onSupport ? <Button label="الدعم" tone="secondary" onPress={onSupport} /> : null}
+        </Box>
+      </Surface>
+    </MobileScrollView>
   );
 }
 
@@ -834,47 +834,47 @@ export function DshOrdersListScreen({ items = fallbackOrderListItems, query = ''
     : items;
 
   return (
-    <BthMobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
-      <BthBox gap={1}>
-        <BthText role="titleLg">الطلبات</BthText>
-        <BthText role="bodySm" tone="muted">قائمة مختصرة للطلبات الحديثة مع حالة واضحة في كل صف.</BthText>
-      </BthBox>
+    <MobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
+      <Box gap={1}>
+        <Text role="titleLg">الطلبات</Text>
+        <Text role="bodySm" tone="muted">قائمة مختصرة للطلبات الحديثة مع حالة واضحة في كل صف.</Text>
+      </Box>
 
-      <BthSurface tone="brand" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.brand }}>
-        <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+      <Surface tone="brand" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.brand }}>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           <OrdersListStatCard label="الكل" value={String(items.length)} helperText="كل الطلبات المرئية" />
           <OrdersListStatCard label="المطابق للبحث" value={String(visibleItems.length)} helperText="النتائج الحالية" />
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthSearchField label="بحث في الطلبات" value={query} onChangeText={onQueryChange} hint="جرّب عنوانًا أو حالة أو ملاحظة." />
-        <BthSectionHeader title="الصفوف الحالية" subtitle="اضغط على أي طلب لفتح تتبعه مباشرة." count={visibleItems.length} />
+      <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <SearchField label="بحث في الطلبات" value={query} onChangeText={onQueryChange} hint="جرّب عنوانًا أو حالة أو ملاحظة." />
+        <SectionHeader title="الصفوف الحالية" subtitle="اضغط على أي طلب لفتح تتبعه مباشرة." count={visibleItems.length} />
 
-        <BthBox gap={2}>
+        <Box gap={2}>
           {visibleItems.length ? visibleItems.map((item) => <OrderRow key={item.id} item={item} onOpenOrder={onOpenOrder} />) : (
-            <BthCard title="لا توجد نتائج" subtitle="جرّب كلمة مختلفة أو أعد عرض الكل.">
-              <BthBox gap={2}>
-                {onQueryChange ? <BthButton label="إظهار الكل" onPress={() => onQueryChange('')} /> : null}
-                {onBack ? <BthButton label="العودة" tone="secondary" onPress={onBack} /> : null}
-                {onRetry ? <BthButton label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
-              </BthBox>
-            </BthCard>
+            <Card title="لا توجد نتائج" subtitle="جرّب كلمة مختلفة أو أعد عرض الكل.">
+              <Box gap={2}>
+                {onQueryChange ? <Button label="إظهار الكل" onPress={() => onQueryChange('')} /> : null}
+                {onBack ? <Button label="العودة" tone="secondary" onPress={onBack} /> : null}
+                {onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
+              </Box>
+            </Card>
           )}
-        </BthBox>
-      </BthSurface>
+        </Box>
+      </Surface>
 
-      <BthSurface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <BthText role="bodyStrong" style={{ textAlign: 'right' }}>الخطوة التالية</BthText>
-        <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+      <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <Text role="bodyStrong" style={{ textAlign: 'right' }}>الخطوة التالية</Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
           اذهب إلى التتبع لعرض الحالة الحية أو استخدم العودة للخروج من هذا المسار.
-        </BthText>
-        <BthBox gap={2}>
-          {onNextAction ? <BthButton label="التتبع" onPress={onNextAction} /> : null}
-          {onBack ? <BthButton label="العودة" tone="secondary" onPress={onBack} /> : null}
-        </BthBox>
-      </BthSurface>
-    </BthMobileScrollView>
+        </Text>
+        <Box gap={2}>
+          {onNextAction ? <Button label="التتبع" onPress={onNextAction} /> : null}
+          {onBack ? <Button label="العودة" tone="secondary" onPress={onBack} /> : null}
+        </Box>
+      </Surface>
+    </MobileScrollView>
   );
 }
 
@@ -903,11 +903,11 @@ export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspa
       title="Intake workspace"
       subtitle="Unified workspace for preparing external, manual, and estimate-based delivery requests before order creation."
       content={
-        <BthSurface tone="inset" gap={2}>
-          <BthText role="bodyStrong">Current flow</BthText>
-          <BthText role="bodySm" tone="muted">{screenId}</BthText>
-          <BthText role="bodySm" tone="muted">This is an active flow screen with executable state coverage.</BthText>
-        </BthSurface>
+        <Surface tone="inset" gap={2}>
+          <Text role="bodyStrong">Current flow</Text>
+          <Text role="bodySm" tone="muted">{screenId}</Text>
+          <Text role="bodySm" tone="muted">This is an active flow screen with executable state coverage.</Text>
+        </Surface>
       }
       primaryActionLabel="Continue order creation"
       secondaryActionLabel="Back to operations"
@@ -947,11 +947,11 @@ export function DshDeliveryManagementHubScreen({ state = 'ready', screenId = 'de
       title="Delivery management"
       subtitle="Workspace for delivery attempts, reassignment, closing, and customer-facing tracking decisions."
       content={
-        <BthSurface tone="inset" gap={2}>
-          <BthText role="bodyStrong">Current flow</BthText>
-          <BthText role="bodySm" tone="muted">{screenId}</BthText>
-          <BthText role="bodySm" tone="muted">This is an active flow screen with executable state coverage.</BthText>
-        </BthSurface>
+        <Surface tone="inset" gap={2}>
+          <Text role="bodyStrong">Current flow</Text>
+          <Text role="bodySm" tone="muted">{screenId}</Text>
+          <Text role="bodySm" tone="muted">This is an active flow screen with executable state coverage.</Text>
+        </Surface>
       }
       primaryActionLabel="Open tracking"
       secondaryActionLabel="Back to operations"

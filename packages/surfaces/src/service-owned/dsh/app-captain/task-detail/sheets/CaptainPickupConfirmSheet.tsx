@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthBox, BthButton, BthSurface, BthText } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
 
 export type CaptainPickupConfirmSheetProps = {
   visible: boolean;
@@ -14,16 +14,16 @@ export function CaptainPickupConfirmSheet({ visible, taskTitle, onConfirm, onCan
   }
 
   return (
-    <BthSurface tone="raised" gap={3} padding={4}>
-      <BthBox gap={1} style={{ alignItems: 'flex-end' }}>
-        <BthText role="titleMd" style={{ textAlign: 'right' }}>Confirm pickup</BthText>
-        <BthText role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{taskTitle}</BthText>
-      </BthBox>
-      <BthBox gap={2}>
-        <BthButton label="Confirm" onPress={onConfirm} />
-        <BthButton label="Cancel" tone="secondary" onPress={onCancel} />
-      </BthBox>
-    </BthSurface>
+    <Surface tone="raised" gap={3} padding={4}>
+      <Box gap={1} style={{ alignItems: 'flex-end' }}>
+        <Text role="titleMd" style={{ textAlign: 'right' }}>Confirm pickup</Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{taskTitle}</Text>
+      </Box>
+      <Box gap={2}>
+        <Button label="Confirm" onPress={onConfirm} />
+        <Button label="Cancel" tone="secondary" onPress={onCancel} />
+      </Box>
+    </Surface>
   );
 }
 

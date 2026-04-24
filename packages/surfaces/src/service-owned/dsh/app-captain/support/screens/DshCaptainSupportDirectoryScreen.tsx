@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-  BthBox,
-  BthListItem,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthSurface,
-  BthText,
+  Box,
+  ListItem,
+  MobileScrollView,
+  SectionHeader,
+  Surface,
+  Text,
 } from '@bthwani/ui-kit';
 import type { CaptainSupportScreenId } from './DshCaptainGeneratedSupportScreens';
 
@@ -49,20 +49,20 @@ const groups: Array<{
 
 export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: DshCaptainSupportDirectoryScreenProps) {
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">Captain support directory</BthText>
-        <BthText role="bodyMd" tone="muted">
+    <MobileScrollView padding={4} gap={4}>
+      <Box gap={2}>
+        <Text role="titleLg">Captain support directory</Text>
+        <Text role="bodyMd" tone="muted">
           Central directory for the remaining DSH captain surfaces so every named workflow is reachable from one owned execution lane.
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
       {groups.map((group) => (
-        <BthSurface key={group.title} tone="raised" gap={3}>
-          <BthSectionHeader title={group.title} subtitle={group.subtitle} />
-          <BthBox gap={2}>
+        <Surface key={group.title} tone="raised" gap={3}>
+          <SectionHeader title={group.title} subtitle={group.subtitle} />
+          <Box gap={2}>
             {group.items.map((item) => (
-              <BthListItem
+              <ListItem
                 key={item.id}
                 title={item.title}
                 subtitle={item.subtitle}
@@ -71,10 +71,10 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: DshCaptainSup
                 onPress={() => onOpenScreen?.(item.id)}
               />
             ))}
-          </BthBox>
-        </BthSurface>
+          </Box>
+        </Surface>
       ))}
-    </BthMobileScrollView>
+    </MobileScrollView>
   );
 }
 

@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { BthBox, BthText } from '@bthwani/ui-kit';
+import { Box, Text } from '@bthwani/ui-kit';
 import type { MarketingGrowthRecord } from '../../../shared/marketing/growth-store';
 
 declare const process: { env: { EXPO_PUBLIC_MEDIA_BASE_URL?: string } };
@@ -103,12 +103,12 @@ export function DshHomeApprovedVideoReelsViewer({
           <Pressable style={styles.closeButton} onPress={handleClose} accessibilityRole="button" accessibilityLabel="إغلاق">
             <Ionicons name="close" size={20} color="#ffffff" />
           </Pressable>
-          <BthBox gap={2} style={styles.emptyCard}>
-            <BthText role="titleSm" style={styles.emptyTitle}>لا توجد فيديوهات معتمدة بعد</BthText>
-            <BthText role="bodySm" style={styles.emptyBody}>
+          <Box gap={2} style={styles.emptyCard}>
+            <Text role="titleSm" style={styles.emptyTitle}>لا توجد فيديوهات معتمدة بعد</Text>
+            <Text role="bodySm" style={styles.emptyBody}>
               يرفع الشريك الفيديوهات أولًا، ثم تعتمدها التسويق قبل أن تظهر هنا في تطبيق العميل.
-            </BthText>
-          </BthBox>
+            </Text>
+          </Box>
         </View>
       </Modal>
     );
@@ -164,16 +164,16 @@ export function DshHomeApprovedVideoReelsViewer({
 
                     <View style={styles.mediaHeader}>
                       <View style={styles.mediaTag}>
-                        <BthText role="caption" style={styles.mediaTagText}>فيديو معتمد</BthText>
+                        <Text role="caption" style={styles.mediaTagText}>فيديو معتمد</Text>
                       </View>
-                      <BthText role="caption" style={styles.mediaSwipeHint}>اسحب للأعلى أو للأسفل</BthText>
+                      <Text role="caption" style={styles.mediaSwipeHint}>اسحب للأعلى أو للأسفل</Text>
                     </View>
 
                     <View style={styles.mediaBody}>
-                      <BthBox gap={2} style={styles.cardBody}>
-                        <BthText role="titleSm" style={styles.title} numberOfLines={2}>{item.title}</BthText>
-                        <BthText role="bodySm" style={styles.subtitle} numberOfLines={3}>{item.subtitle}</BthText>
-                        <BthText role="bodySm" style={styles.highlight} numberOfLines={2}>{item.highlight}</BthText>
+                      <Box gap={2} style={styles.cardBody}>
+                        <Text role="titleSm" style={styles.title} numberOfLines={2}>{item.title}</Text>
+                        <Text role="bodySm" style={styles.subtitle} numberOfLines={3}>{item.subtitle}</Text>
+                        <Text role="bodySm" style={styles.highlight} numberOfLines={2}>{item.highlight}</Text>
 
                         <Pressable
                           style={[styles.ctaButton, { backgroundColor: item.accentColor }]}
@@ -181,10 +181,10 @@ export function DshHomeApprovedVideoReelsViewer({
                           accessibilityRole="button"
                           accessibilityLabel={item.ctaLabel}
                         >
-                          <BthText role="bodyMd" style={styles.ctaText}>{item.ctaLabel}</BthText>
+                          <Text role="bodyMd" style={styles.ctaText}>{item.ctaLabel}</Text>
                           <Ionicons name="arrow-back" size={18} color="#ffffff" />
                         </Pressable>
-                      </BthBox>
+                      </Box>
                     </View>
                   </View>
                 </View>

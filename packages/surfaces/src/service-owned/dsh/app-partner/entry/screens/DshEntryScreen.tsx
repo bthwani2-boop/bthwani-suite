@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthCard,
-  BthDashboardShell,
-  BthStateView,
-  BthText,
+  Box,
+  Button,
+  Card,
+  DashboardShell,
+  StateView,
+  Text,
 } from '@bthwani/ui-kit';
 
 export type DshEntryScreenState = 'ready' | 'loading' | 'empty';
@@ -20,12 +20,12 @@ export type DshEntryScreenProps = {
 
 function renderHero(state: DshEntryScreenState, onOpenOrdersBoardPress?: () => void) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title="No partner orders waiting"
         description="Keep the orders board entry visible so branch operators can restart queue triage without leaving the service shell."
@@ -36,10 +36,10 @@ function renderHero(state: DshEntryScreenState, onOpenOrdersBoardPress?: () => v
   }
 
   return (
-    <BthCard
+    <Card
       title="Partner operations entry"
       subtitle="One focused start point for order triage, workspace actions, store maintenance, and issue review."
-      footer={<BthButton label="Open orders board" onPress={onOpenOrdersBoardPress} />}
+      footer={<Button label="Open orders board" onPress={onOpenOrdersBoardPress} />}
     />
   );
 }
@@ -49,18 +49,18 @@ function renderOrdersSection(
   onOpenOrderWorkspacePress?: () => void,
 ) {
   return (
-    <BthBox gap={3}>
-      <BthCard
+    <Box gap={3}>
+      <Card
         title="Review partner queue"
         subtitle="Start from the orders board so the next branch decision stays obvious within seconds."
-        footer={<BthButton label="View orders board" tone="secondary" onPress={onOpenOrdersBoardPress} />}
+        footer={<Button label="View orders board" tone="secondary" onPress={onOpenOrdersBoardPress} />}
       />
-      <BthCard
+      <Card
         title="Open order workspace"
         subtitle="Release, packaging, and handoff actions stay grouped in one order workspace pattern."
-        footer={<BthButton label="Open workspace" tone="ghost" onPress={onOpenOrderWorkspacePress} />}
+        footer={<Button label="Open workspace" tone="ghost" onPress={onOpenOrderWorkspacePress} />}
       />
-    </BthBox>
+    </Box>
   );
 }
 
@@ -69,18 +69,18 @@ function renderSupportSection(
   onOpenIssueQueuePress?: () => void,
 ) {
   return (
-    <BthBox gap={3}>
-      <BthCard
+    <Box gap={3}>
+      <Card
         title="Store maintenance workspace"
         subtitle="Availability and branch maintenance stay reachable without displacing the main order flow."
-        footer={<BthButton label="Open maintenance" tone="secondary" onPress={onOpenMaintenancePress} />}
+        footer={<Button label="Open maintenance" tone="secondary" onPress={onOpenMaintenancePress} />}
       />
-      <BthCard
+      <Card
         title="Order issue queue"
         subtitle="Escalations and problem orders remain visible as a contained companion queue."
-        footer={<BthButton label="Open issue queue" tone="ghost" onPress={onOpenIssueQueuePress} />}
+        footer={<Button label="Open issue queue" tone="ghost" onPress={onOpenIssueQueuePress} />}
       />
-    </BthBox>
+    </Box>
   );
 }
 
@@ -92,7 +92,7 @@ export function DshEntryScreen({
   onOpenIssueQueuePress,
 }: DshEntryScreenProps) {
   return (
-    <BthDashboardShell
+    <DashboardShell
       title="Partner Entry"
       subtitle="Single-purpose entry for app-partner delivery operations and first order action."
       hero={renderHero(state, onOpenOrdersBoardPress)}
@@ -115,11 +115,11 @@ export function DshEntryScreen({
                 title: 'Entry State',
                 subtitle: 'The screen keeps one clear partner purpose while handling base states.',
                 content: (
-                  <BthBox>
-                    <BthText role="bodyMd" tone="muted">
+                  <Box>
+                    <Text role="bodyMd" tone="muted">
                       Entry state is active. No business logic or network requests are executed here.
-                    </BthText>
-                  </BthBox>
+                    </Text>
+                  </Box>
                 ),
               },
             ]

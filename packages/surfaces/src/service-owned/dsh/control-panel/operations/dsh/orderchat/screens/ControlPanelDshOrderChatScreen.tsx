@@ -4,18 +4,18 @@ import React from 'react';
 import { Pressable, ScrollView } from 'react-native';
 import { useRouter } from 'next/navigation';
 import {
-  BthBadge,
-  BthBox,
-  BthButton,
-  BthSurface,
-  BthText,
-  BthTextField,
+  Badge,
+  Box,
+  Button,
+  Surface,
+  Text,
+  TextField,
   useTheme,
 } from '@bthwani/ui-kit';
 import {
-  BthWebMissionHeroCard,
-  BthWebPageFrame,
-  BthWebSectionCard,
+  WebMissionHeroCard,
+  WebPageFrame,
+  WebSectionCard,
 } from '@bthwani/ui-kit/web';
 import { getSampleDshOrder } from '../../orders/order-fixtures';
 import { useDshControlPanelText } from '../../shared/dshControlPanelText';
@@ -83,9 +83,9 @@ function ComposerActionButton({ symbol, accessibilityLabel, disabled = false, on
         opacity: disabled ? 0.55 : 1,
       })}
     >
-      <BthText role="label" tone={disabled ? 'soft' : 'brand'}>
+      <Text role="label" tone={disabled ? 'soft' : 'brand'}>
         {symbol}
-      </BthText>
+      </Text>
     </Pressable>
   );
 }
@@ -94,17 +94,17 @@ function OrderChatBubble({ message }: { message: OrderChatMessage }) {
   const isOutbound = message.side === 'end';
 
   return (
-    <BthBox style={{ alignSelf: isOutbound ? 'flex-end' : 'flex-start', width: '100%', maxWidth: '86%' }}>
-      <BthSurface tone={isOutbound ? 'brand' : 'raised'} padding={3} gap={2} radiusToken="xl" border={false}>
-        <BthBox layoutDirection="row" justify="space-between" align="center" gap={2}>
-          <BthBadge label={message.sender} tone={isOutbound ? 'brand' : 'default'} />
-          <BthText role="caption" tone={isOutbound ? 'inverse' : 'soft'}>{message.time}</BthText>
-        </BthBox>
-        <BthText role="bodySm" tone={isOutbound ? 'inverse' : 'default'}>
+    <Box style={{ alignSelf: isOutbound ? 'flex-end' : 'flex-start', width: '100%', maxWidth: '86%' }}>
+      <Surface tone={isOutbound ? 'brand' : 'raised'} padding={3} gap={2} radiusToken="xl" border={false}>
+        <Box layoutDirection="row" justify="space-between" align="center" gap={2}>
+          <Badge label={message.sender} tone={isOutbound ? 'brand' : 'default'} />
+          <Text role="caption" tone={isOutbound ? 'inverse' : 'soft'}>{message.time}</Text>
+        </Box>
+        <Text role="bodySm" tone={isOutbound ? 'inverse' : 'default'}>
           {message.text}
-        </BthText>
-      </BthSurface>
-    </BthBox>
+        </Text>
+      </Surface>
+    </Box>
   );
 }
 
@@ -165,7 +165,7 @@ export function ControlPanelDshOrderChatScreen({
   }, [canSend, draft]);
 
   return (
-    <BthWebPageFrame
+    <WebPageFrame
       eyebrow="تواصل الطلب"
       title="تواصل الطلب"
       description="الطلب نفسه يملك قناة مختصرة بين العمليات والكابتن حتى الإغلاق."
@@ -173,8 +173,8 @@ export function ControlPanelDshOrderChatScreen({
       embedded={embedded}
       showHeader={showHeader}
     >
-      <BthBox gap={4}>
-        <BthWebMissionHeroCard
+      <Box gap={4}>
+        <WebMissionHeroCard
           badges={[resolvedOrder.id, resolvedOrder.statusLabel, isReadOnly ? 'مقروء فقط' : 'Live']}
             eyebrow="قناة التواصل"
           title={resolvedOrder.customer}
@@ -188,16 +188,16 @@ export function ControlPanelDshOrderChatScreen({
           secondaryAction={{ label: 'العودة إلى الطلبات', href: ordersHref }}
         />
 
-        <BthWebSectionCard title="سجل الرسائل" description="الردود المختصرة تبقى مرتبطة بنفس الطلب، والمحادثة تتحول إلى القراءة فقط بعد التسليم.">
-          <BthBox gap={4}>
+        <WebSectionCard title="سجل الرسائل" description="الردود المختصرة تبقى مرتبطة بنفس الطلب، والمحادثة تتحول إلى القراءة فقط بعد التسليم.">
+          <Box gap={4}>
             <ScrollView style={{ maxHeight: 380 }} contentContainerStyle={{ gap: 12 }} showsVerticalScrollIndicator={false}>
               {messages.map((message) => (
                 <OrderChatBubble key={message.id} message={message} />
               ))}
             </ScrollView>
 
-            <BthSurface tone={isReadOnly ? 'inset' : 'default'} padding={3} gap={2} radiusToken="lg">
-              <BthTextField
+            <Surface tone={isReadOnly ? 'inset' : 'default'} padding={3} gap={2} radiusToken="lg">
+              <TextField
                 value={draft}
                 onChangeText={setDraft}
                 editable={!isReadOnly}
@@ -206,13 +206,13 @@ export function ControlPanelDshOrderChatScreen({
                 numberOfLines={3}
                 style={{ minHeight: 92, textAlignVertical: 'top' }}
               />
-              <BthBox layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
-                <BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+              <Box layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
+                <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
                     <ComposerActionButton symbol="🎙" accessibilityLabel="رسالة صوتية" disabled={isReadOnly} />
                     <ComposerActionButton symbol="📷" accessibilityLabel="التقاط صورة" disabled={isReadOnly} />
                     <ComposerActionButton symbol="🎥" accessibilityLabel="التقاط فيديو" disabled={isReadOnly} />
-                </BthBox>
-                <BthButton
+                </Box>
+                <Button
                   label={isReadOnly ? 'مقفل' : 'إرسال'}
                   tone={isReadOnly ? 'secondary' : 'primary'}
                   size="sm"
@@ -220,15 +220,15 @@ export function ControlPanelDshOrderChatScreen({
                   disabled={!canSend}
                   onPress={handleSend}
                 />
-              </BthBox>
-              <BthText role="caption" tone="muted">
+              </Box>
+              <Text role="caption" tone="muted">
                 {isReadOnly ? 'تم التسليم. التواصل هنا للقراءة فقط.' : 'الرسائل المختصرة فقط داخل هذا المسار.'}
-              </BthText>
-            </BthSurface>
-          </BthBox>
-        </BthWebSectionCard>
-      </BthBox>
-    </BthWebPageFrame>
+              </Text>
+            </Surface>
+          </Box>
+        </WebSectionCard>
+      </Box>
+    </WebPageFrame>
   );
 }
 

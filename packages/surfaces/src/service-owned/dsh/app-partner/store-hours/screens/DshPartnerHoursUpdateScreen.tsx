@@ -1,14 +1,14 @@
 import React from 'react';
 import {
-  BthBox,
-  BthButton,
-  BthMobileScrollView,
-  BthSectionHeader,
-  BthStateView,
-  BthSurface,
-  BthSwitch,
-  BthText,
-  BthTextField,
+  Box,
+  Button,
+  MobileScrollView,
+  SectionHeader,
+  StateView,
+  Surface,
+  Switch,
+  Text,
+  TextField,
 } from '@bthwani/ui-kit';
 
 export type DshPartnerHoursUpdateState =
@@ -50,12 +50,12 @@ const demoDays: DshPartnerHoursDay[] = [
 
 function renderState(state: Exclude<DshPartnerHoursUpdateState, 'ready' | 'disabled'>, onRetry?: () => void, onBack?: () => void) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title="No hours profile is loaded"
         description="Load the branch schedule before editing daily availability."
@@ -67,7 +67,7 @@ function renderState(state: Exclude<DshPartnerHoursUpdateState, 'ready' | 'disab
 
   if (state === 'offline') {
     return (
-      <BthStateView
+      <StateView
         stateId="offline"
         title="Hours update is offline"
         description="Keep the draft visible and retry once the branch connection is back."
@@ -78,7 +78,7 @@ function renderState(state: Exclude<DshPartnerHoursUpdateState, 'ready' | 'disab
 
   if (state === 'success') {
     return (
-      <BthStateView
+      <StateView
         stateId="success"
         title="Store hours updated"
         description="The branch schedule is ready and the maintenance workspace can continue with coverage or listing changes."
@@ -89,7 +89,7 @@ function renderState(state: Exclude<DshPartnerHoursUpdateState, 'ready' | 'disab
   }
 
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title="Hours update failed"
       description="Retry the schedule update without dropping the branch context."
@@ -114,22 +114,22 @@ export function DshPartnerHoursUpdateScreen({
   const isDisabled = state === 'disabled';
 
   return (
-    <BthMobileScrollView padding={4} gap={4}>
-      <BthBox gap={2}>
-        <BthText role="titleLg">Store hours update</BthText>
-        <BthText role="bodyMd" tone="muted">
+    <MobileScrollView padding={4} gap={4}>
+      <Box gap={2}>
+        <Text role="titleLg">Store hours update</Text>
+        <Text role="bodyMd" tone="muted">
           Update the weekly schedule without leaving the branch maintenance slice.
-        </BthText>
-      </BthBox>
+        </Text>
+      </Box>
 
-      <BthBox gap={3}>
+      <Box gap={3}>
         {days.map((day) => (
-          <BthSurface key={day.id} tone="raised" gap={3}>
-            <BthSectionHeader
+          <Surface key={day.id} tone="raised" gap={3}>
+            <SectionHeader
               title={day.label}
               subtitle="Open or close the day, then keep the visible time window explicit."
             />
-            <BthSwitch
+            <Switch
               label="Branch accepts orders"
               description="Close the day completely when the branch should stop receiving DSH demand."
               value={day.isOpen}
@@ -137,28 +137,28 @@ export function DshPartnerHoursUpdateScreen({
               onValueChange={(nextValue) => onToggleDay?.(day.id, nextValue)}
             />
             {day.isOpen ? (
-              <BthBox gap={2}>
-                <BthTextField
+              <Box gap={2}>
+                <TextField
                   label="Open time"
                   value={day.openTime}
                   onChangeText={(value) => onChangeDayTime?.(day.id, 'openTime', value)}
                   editable={!isDisabled}
                 />
-                <BthTextField
+                <TextField
                   label="Close time"
                   value={day.closeTime}
                   onChangeText={(value) => onChangeDayTime?.(day.id, 'closeTime', value)}
                   editable={!isDisabled}
                 />
-              </BthBox>
+              </Box>
             ) : null}
-          </BthSurface>
+          </Surface>
         ))}
-      </BthBox>
+      </Box>
 
-      <BthButton label="Save hours" onPress={onSave} disabled={isDisabled} />
-      <BthButton label="Back to maintenance" tone="ghost" onPress={onBack} />
-    </BthMobileScrollView>
+      <Button label="Save hours" onPress={onSave} disabled={isDisabled} />
+      <Button label="Back to maintenance" tone="ghost" onPress={onBack} />
+    </MobileScrollView>
   );
 }
 

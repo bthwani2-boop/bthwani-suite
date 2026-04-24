@@ -42,11 +42,9 @@ export type WebRootLayoutProps = RootProvidersProps & {
   appName?: string;
 };
 
-export type BthWebRootLayoutProps = WebRootLayoutProps;
-
 export function buildWebRootMetadata({ appName, lang = 'ar', dir = 'rtl' }: { appName?: string; lang?: string; dir?: 'ltr' | 'rtl'; }) {
   return {
-    title: appName ? `${appName} | Bthwani` : 'Bthwani',
+    title: appName ? `${appName} | BThwani` : 'BThwani',
     appName,
     lang,
     dir,
@@ -114,8 +112,3 @@ export function WebRootLayout({ children, appName, ...rootProps }: WebRootLayout
     </WebDocumentShell>
   );
 }
-
-export const BthWebThemeStyle = WebThemeStyle;
-export const BthWebRootBody = WebRootBody;
-export const BthWebDocumentShell = WebDocumentShell;
-export const BthWebRootLayout = WebRootLayout;

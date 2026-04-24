@@ -5,17 +5,17 @@ import { Platform } from 'react-native';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
-	BthBox,
-	BthButton,
-	BthNewsTickerBar,
-	BthSurface,
-	BthTabs,
-	BthText,
-	BthTextField,
+	Box,
+	Button,
+	NewsTickerBar,
+	Surface,
+	Tabs,
+	Text,
+	TextField,
 	useDirection,
 	useUiText,
 } from '@bthwani/ui-kit';
-import { BthWebMissionHeroCard, BthWebSectionCard, BthWebSignalCard } from '@bthwani/ui-kit/web';
+import { WebMissionHeroCard, WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
 import {
 	buildMarketingTickerPlan,
 	createMarketingTickerDraft,
@@ -369,14 +369,14 @@ function resolveBackgroundTone(kind: MarketingNewsTickerKind | MarketingNewsTick
 
 function Pill({ label, tone }: { label: string; tone: PillTone }) {
 	return (
-		<BthBox paddingX={2} paddingY={1} radiusToken="pill" background={tone} border borderToken="hairline" borderTone="line">
-			<BthText role="caption">{label}</BthText>
-		</BthBox>
+		<Box paddingX={2} paddingY={1} radiusToken="pill" background={tone} border borderToken="hairline" borderTone="line">
+			<Text role="caption">{label}</Text>
+		</Box>
 	);
 }
 
 function ItemActionButton({ label, tone = 'secondary', onPress }: { label: string; tone?: ItemActionTone; onPress: () => void }) {
-	return <BthButton label={label} tone={tone} size="sm" fullWidth={false} onPress={onPress} />;
+	return <Button label={label} tone={tone} size="sm" fullWidth={false} onPress={onPress} />;
 }
 
 function laneLabel(item: MarketingNewsTickerItem, locale: MarketingNewsTickerLocale) {
@@ -594,8 +594,8 @@ export function ControlPanelDshMarketingScreen({
 	const primaryPreview = activePreview ?? selectedPreview;
 
 	return (
-		<BthBox gap={4}>
-			<BthWebMissionHeroCard
+		<Box gap={4}>
+			<WebMissionHeroCard
 				dense
 				badges={[
 					copy.heroEyebrow,
@@ -614,81 +614,81 @@ export function ControlPanelDshMarketingScreen({
 				secondaryAction={{ label: marketingCopy.openDashboard, href: hubHref }}
 			/>
 
-			<BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-				<BthWebSignalCard title={copy.totalLabel} value={String(counts.total)} description={copy.planDescription} />
-				<BthWebSignalCard title={copy.automaticLabel} value={String(counts.automatic)} description={copy.automaticLaneTitle} tone={counts.automatic > 0 ? 'best' : 'neutral'} />
-				<BthWebSignalCard title={copy.manualLabel} value={String(counts.manual)} description={copy.manualLaneTitle} />
-				<BthWebSignalCard title={copy.pinnedLabel} value={String(counts.pinned)} description={copy.smartPreviewTitle} />
-			</BthBox>
+			<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+				<WebSignalCard title={copy.totalLabel} value={String(counts.total)} description={copy.planDescription} />
+				<WebSignalCard title={copy.automaticLabel} value={String(counts.automatic)} description={copy.automaticLaneTitle} tone={counts.automatic > 0 ? 'best' : 'neutral'} />
+				<WebSignalCard title={copy.manualLabel} value={String(counts.manual)} description={copy.manualLaneTitle} />
+				<WebSignalCard title={copy.pinnedLabel} value={String(counts.pinned)} description={copy.smartPreviewTitle} />
+			</Box>
 
-			<BthWebSectionCard title={copy.audienceFocusTitle} description={copy.audienceFocusDescription}>
-				<BthBox layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
-					<BthSurface tone="brand" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 300 }}>
-						<BthText role="titleSm" tone="inverse">{copy.smartPreviewTitle}</BthText>
-						<BthText role="bodySm" tone="inverse" style={{ opacity: 0.92 }}>
+			<WebSectionCard title={copy.audienceFocusTitle} description={copy.audienceFocusDescription}>
+				<Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
+					<Surface tone="brand" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 300 }}>
+						<Text role="titleSm" tone="inverse">{copy.smartPreviewTitle}</Text>
+						<Text role="bodySm" tone="inverse" style={{ opacity: 0.92 }}>
 							{copy.smartPreviewDescription}
-						</BthText>
-						<BthTabs<MarketingNewsTickerAudience>
+						</Text>
+						<Tabs<MarketingNewsTickerAudience>
 							items={audienceTabs}
 							value={audienceFocus}
 							onValueChange={setAudienceFocus}
 							variant="pill"
 							stretch
 						/>
-						<BthNewsTickerBar
+						<NewsTickerBar
 							statusLabel={primaryPreview?.statusLabel ?? copy.noActiveLabel}
 							message={primaryPreview?.message ?? (locale === 'en' ? 'No active message for this audience yet.' : 'لا توجد رسالة فعالة لهذا الجمهور حتى الآن.')}
 							onPress={() => router.push(hubHref)}
 						/>
-						<BthBox layoutDirection="row" gap={1} style={{ flexWrap: 'wrap' }}>
+						<Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap' }}>
 							<Pill label={`${copy.activeLabel}: ${counts.active}`} tone="successSurface" />
 							<Pill label={`${copy.suppressedLabel}: ${counts.suppressed}`} tone="warningSurface" />
 							<Pill label={`${copy.pinnedLabel}: ${counts.pinned}`} tone="brandSurface" />
-						</BthBox>
-					</BthSurface>
+						</Box>
+					</Surface>
 
-					<BthSurface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
-						<BthText role="titleSm">{locale === 'en' ? 'Category handoff lane' : 'مسار تسليم الفئات للتسويق'}</BthText>
-						<BthText role="bodySm" tone="muted">
+					<Surface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
+						<Text role="titleSm">{locale === 'en' ? 'Category handoff lane' : 'مسار تسليم الفئات للتسويق'}</Text>
+						<Text role="bodySm" tone="muted">
 							{locale === 'en' ? 'Partner-approved items appear here before they reach the client experience.' : 'العناصر المقبولة من الشركاء تظهر هنا قبل أن تُدفع إلى تجربة العميل.'}
-						</BthText>
-						<BthBox gap={2}>
+						</Text>
+						<Box gap={2}>
 							{marketingCategoryLanes.length > 0 ? marketingCategoryLanes.map((lane) => (
-								<BthBox key={lane.categoryLabel} padding={3} gap={2} border radiusToken="xl" background="surfaceInset" borderTone="line">
-									<BthBox layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
-										<BthText role="bodyStrong">{lane.categoryLabel}</BthText>
-										<BthBox layoutDirection="row" gap={1} style={{ flexWrap: 'wrap' }}>
+								<Box key={lane.categoryLabel} padding={3} gap={2} border radiusToken="xl" background="surfaceInset" borderTone="line">
+									<Box layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
+										<Text role="bodyStrong">{lane.categoryLabel}</Text>
+										<Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap' }}>
 											<Pill label={`${locale === 'en' ? 'Review' : 'مراجعة'}: ${lane.pendingCount}`} tone="warningSurface" />
 											<Pill label={`${locale === 'en' ? 'Published' : 'منشور'}: ${lane.publishedCount}`} tone="successSurface" />
-										</BthBox>
-									</BthBox>
+										</Box>
+									</Box>
 									{lane.items.slice(0, 2).map((item) => (
-										<BthText key={item.id} role="bodySm" tone="muted">
+										<Text key={item.id} role="bodySm" tone="muted">
 											{item.productName} · {item.ownerLabel}
-										</BthText>
+										</Text>
 									))}
-								</BthBox>
+								</Box>
 							)) : (
-								<BthText role="bodySm" tone="muted">
+								<Text role="bodySm" tone="muted">
 									{locale === 'en' ? 'No partner-approved categories yet.' : 'لا توجد فئات جاهزة حتى الآن.'}
-								</BthText>
+								</Text>
 							)}
-						</BthBox>
-					</BthSurface>
-				</BthBox>
-			</BthWebSectionCard>
+						</Box>
+					</Surface>
+				</Box>
+			</WebSectionCard>
 
-			<BthWebSectionCard title={copy.editorTitle} description={copy.editorDescription}>
-				<BthBox layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
-					<BthSurface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 340 }}>
-						<BthBox gap={1}>
-							<BthText role="bodyStrong">{copy.selectedLabel}: {selectedTicker ? (locale === 'en' ? 'Live marketing message' : 'رسالة تسويقية نشطة') : '—'}</BthText>
-							<BthText role="bodySm" tone="muted">
+			<WebSectionCard title={copy.editorTitle} description={copy.editorDescription}>
+				<Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
+					<Surface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 340 }}>
+						<Box gap={1}>
+							<Text role="bodyStrong">{copy.selectedLabel}: {selectedTicker ? (locale === 'en' ? 'Live marketing message' : 'رسالة تسويقية نشطة') : '—'}</Text>
+							<Text role="bodySm" tone="muted">
 								{selectedTicker ? laneLabel(selectedTicker, locale) : copy.noActiveLabel}
-							</BthText>
-						</BthBox>
+							</Text>
+						</Box>
 
-						<BthTextField
+						<TextField
 							label={copy.messageLabel}
 							value={draft.message}
 							onChangeText={(value) => {
@@ -702,8 +702,8 @@ export function ControlPanelDshMarketingScreen({
 							hint={copy.messageHint}
 						/>
 
-						<BthText role="label">{copy.statusLabel}</BthText>
-						<BthTabs<MarketingNewsTickerStatus>
+						<Text role="label">{copy.statusLabel}</Text>
+						<Tabs<MarketingNewsTickerStatus>
 							items={[
 								{ value: 'draft', label: locale === 'en' ? 'Draft' : 'مسودة' },
 								{ value: 'published', label: locale === 'en' ? 'Published' : 'منشور' },
@@ -714,8 +714,8 @@ export function ControlPanelDshMarketingScreen({
 							stretch
 						/>
 
-						<BthText role="label">{copy.sourceLabel}</BthText>
-						<BthTabs<MarketingNewsTickerSource>
+						<Text role="label">{copy.sourceLabel}</Text>
+						<Tabs<MarketingNewsTickerSource>
 							items={sourceTabs}
 							value={draft.source}
 							onValueChange={(source) => setDraft((current) => ({ ...current, source }))}
@@ -723,8 +723,8 @@ export function ControlPanelDshMarketingScreen({
 							stretch
 						/>
 
-						<BthText role="label">{copy.audienceLabel}</BthText>
-						<BthTabs<MarketingNewsTickerAudience>
+						<Text role="label">{copy.audienceLabel}</Text>
+						<Tabs<MarketingNewsTickerAudience>
 							items={audienceTabs}
 							value={draft.audience}
 							onValueChange={(audience) => setDraft((current) => ({ ...current, audience }))}
@@ -732,8 +732,8 @@ export function ControlPanelDshMarketingScreen({
 							stretch
 						/>
 
-						<BthText role="label">{copy.priorityLabel}</BthText>
-						<BthTabs<MarketingNewsTickerPriority>
+						<Text role="label">{copy.priorityLabel}</Text>
+						<Tabs<MarketingNewsTickerPriority>
 							items={priorityTabs}
 							value={draft.priority}
 							onValueChange={(priority) => setDraft((current) => ({ ...current, priority }))}
@@ -741,8 +741,8 @@ export function ControlPanelDshMarketingScreen({
 							stretch
 						/>
 
-						<BthText role="label">{copy.deliveryLabel}</BthText>
-						<BthTabs<MarketingNewsTickerDeliveryMode>
+						<Text role="label">{copy.deliveryLabel}</Text>
+						<Tabs<MarketingNewsTickerDeliveryMode>
 							items={deliveryTabs}
 							value={draft.deliveryMode}
 							onValueChange={(deliveryMode) => setDraft((current) => ({ ...current, deliveryMode }))}
@@ -750,8 +750,8 @@ export function ControlPanelDshMarketingScreen({
 							stretch
 						/>
 
-						<BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-							<BthTextField
+						<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+							<TextField
 								label={copy.openHourLabel}
 								value={draft.openHour}
 								onChangeText={(value) => setDraft((current) => ({ ...current, openHour: value }))}
@@ -759,7 +759,7 @@ export function ControlPanelDshMarketingScreen({
 								placeholder="08"
 								hint="00 - 23"
 							/>
-							<BthTextField
+							<TextField
 								label={copy.closeHourLabel}
 								value={draft.closeHour}
 								onChangeText={(value) => setDraft((current) => ({ ...current, closeHour: value }))}
@@ -767,110 +767,110 @@ export function ControlPanelDshMarketingScreen({
 								placeholder="23"
 								hint="00 - 23"
 							/>
-						</BthBox>
+						</Box>
 
-						<BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-							<BthTextField
+						<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+							<TextField
 								label={copy.cooldownLabel}
 								value={draft.cooldownMinutes}
 								onChangeText={(value) => setDraft((current) => ({ ...current, cooldownMinutes: value }))}
 								keyboardType="number-pad"
 								placeholder="30"
 							/>
-							<BthTextField
+							<TextField
 								label={copy.repeatGapLabel}
 								value={draft.repeatGapMinutes}
 								onChangeText={(value) => setDraft((current) => ({ ...current, repeatGapMinutes: value }))}
 								keyboardType="number-pad"
 								placeholder="60"
 							/>
-						</BthBox>
+						</Box>
 
-						<BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-							<BthButton label={copy.saveAction} onPress={handleSaveTicker} fullWidth={false} />
-							<BthButton label={copy.newDraftAction} tone="secondary" onPress={handleCreateDraft} fullWidth={false} />
-							<BthButton label={selectedTicker?.status === 'published' ? copy.pauseAction : copy.publishAction} tone={selectedTicker?.status === 'published' ? 'secondary' : 'success'} onPress={() => { if (selectedTicker) { handleToggleTicker(selectedTicker); } }} fullWidth={false} />
-						</BthBox>
-					</BthSurface>
+						<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+							<Button label={copy.saveAction} onPress={handleSaveTicker} fullWidth={false} />
+							<Button label={copy.newDraftAction} tone="secondary" onPress={handleCreateDraft} fullWidth={false} />
+							<Button label={selectedTicker?.status === 'published' ? copy.pauseAction : copy.publishAction} tone={selectedTicker?.status === 'published' ? 'secondary' : 'success'} onPress={() => { if (selectedTicker) { handleToggleTicker(selectedTicker); } }} fullWidth={false} />
+						</Box>
+					</Surface>
 
-					<BthBox gap={3} style={{ flexGrow: 1, minWidth: 300 }}>
-						<BthSurface tone="brand" padding={4} gap={3}>
-							<BthText role="titleSm" tone="inverse">{copy.smartPreviewTitle}</BthText>
-							<BthText role="bodySm" tone="inverse" style={{ opacity: 0.92 }}>
+					<Box gap={3} style={{ flexGrow: 1, minWidth: 300 }}>
+						<Surface tone="brand" padding={4} gap={3}>
+							<Text role="titleSm" tone="inverse">{copy.smartPreviewTitle}</Text>
+							<Text role="bodySm" tone="inverse" style={{ opacity: 0.92 }}>
 								{primaryPreview ? `${primaryPreview.statusLabel} · ${primaryPreview.windowLabel}` : copy.noActiveLabel}
-							</BthText>
-							<BthText role="bodySm" tone="inverse" style={{ opacity: 0.88 }}>
+							</Text>
+							<Text role="bodySm" tone="inverse" style={{ opacity: 0.88 }}>
 								{primaryPreview?.message ?? (locale === 'en' ? 'No active signal at the moment.' : 'لا توجد إشارة نشطة حاليًا.')}
-							</BthText>
-							<BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-								<BthButton label={copy.markDisplayedAction} onPress={() => { if (smartPlan.activeItem) { handleMarkDisplayed(smartPlan.activeItem); } }} fullWidth={false} />
-								<BthButton label={marketingCopy.openDashboard} tone="secondary" onPress={() => router.push(hubHref)} fullWidth={false} />
-							</BthBox>
-						</BthSurface>
+							</Text>
+							<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+								<Button label={copy.markDisplayedAction} onPress={() => { if (smartPlan.activeItem) { handleMarkDisplayed(smartPlan.activeItem); } }} fullWidth={false} />
+								<Button label={marketingCopy.openDashboard} tone="secondary" onPress={() => router.push(hubHref)} fullWidth={false} />
+							</Box>
+						</Surface>
 
-						<BthSurface tone="inset" padding={4} gap={2}>
-							<BthText role="titleSm">{locale === 'en' ? 'Selection summary' : 'ملخص العنصر المحدد'}</BthText>
-							<BthText role="bodySm" tone="muted">
+						<Surface tone="inset" padding={4} gap={2}>
+							<Text role="titleSm">{locale === 'en' ? 'Selection summary' : 'ملخص العنصر المحدد'}</Text>
+							<Text role="bodySm" tone="muted">
 								{selectedTicker ? laneLabel(selectedTicker, locale) : copy.noActiveLabel}
-							</BthText>
-							<BthText role="bodySm" tone="muted">
+							</Text>
+							<Text role="bodySm" tone="muted">
 								{copy.reasonReady}: {smartPlan.activeEntry ? resolveMarketingTickerPlanReasonLabel(locale, smartPlan.activeEntry.reason) : copy.noActiveLabel}
-							</BthText>
-						</BthSurface>
-					</BthBox>
-				</BthBox>
-			</BthWebSectionCard>
+							</Text>
+						</Surface>
+					</Box>
+				</Box>
+			</WebSectionCard>
 
-			<BthWebSectionCard title={copy.planTitle} description={copy.planDescription}>
-				<BthBox layoutDirection="row" gap={3} style={{ flexWrap: 'wrap', alignItems: 'flex-start' }}>
-					<BthSurface tone="raised" padding={4} gap={2} style={{ flexGrow: 1, minWidth: 300 }}>
-						<BthText role="titleSm">{copy.automaticLaneTitle}</BthText>
+			<WebSectionCard title={copy.planTitle} description={copy.planDescription}>
+				<Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap', alignItems: 'flex-start' }}>
+					<Surface tone="raised" padding={4} gap={2} style={{ flexGrow: 1, minWidth: 300 }}>
+						<Text role="titleSm">{copy.automaticLaneTitle}</Text>
 						{orderedAutomaticEntries.length > 0 ? orderedAutomaticEntries.map((entry) => {
 							const preview = resolveMarketingTickerPreviewForItem(currentTime, entry.item, locale);
 							const isActive = entry.state === 'active';
 							return (
-								<BthBox key={entry.item.id} padding={3} gap={2} border radiusToken="xl" background={isActive ? 'brandSurface' : 'surfaceInset'} borderTone={isActive ? 'brand' : 'line'}>
-									<BthText role="bodyStrong">{entry.item.message}</BthText>
-									<BthText role="bodySm" tone="muted">{resolveMarketingTickerAudienceLabel(locale, entry.item.audience)} · {preview.windowLabel}</BthText>
-									<BthBox layoutDirection="row" gap={1} style={{ flexWrap: 'wrap' }}>
+								<Box key={entry.item.id} padding={3} gap={2} border radiusToken="xl" background={isActive ? 'brandSurface' : 'surfaceInset'} borderTone={isActive ? 'brand' : 'line'}>
+									<Text role="bodyStrong">{entry.item.message}</Text>
+									<Text role="bodySm" tone="muted">{resolveMarketingTickerAudienceLabel(locale, entry.item.audience)} · {preview.windowLabel}</Text>
+									<Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap' }}>
 										<Pill label={resolveMarketingTickerPriorityLabel(locale, entry.item.priority)} tone={resolveBackgroundTone(entry.item.priority)} />
 										<Pill label={resolveMarketingTickerDeliveryLabel(locale, entry.item.deliveryMode)} tone={resolveBackgroundTone(entry.item.deliveryMode)} />
-									</BthBox>
+									</Box>
 									<ItemActionButton label={copy.loadAction} tone="secondary" onPress={() => handleSelectTicker(entry.item)} />
-								</BthBox>
+								</Box>
 							);
-						}) : <BthText role="bodySm" tone="muted">{copy.noActiveLabel}</BthText>}
-					</BthSurface>
+						}) : <Text role="bodySm" tone="muted">{copy.noActiveLabel}</Text>}
+					</Surface>
 
-					<BthSurface tone="raised" padding={4} gap={2} style={{ flexGrow: 1, minWidth: 300 }}>
-						<BthText role="titleSm">{copy.manualLaneTitle}</BthText>
+					<Surface tone="raised" padding={4} gap={2} style={{ flexGrow: 1, minWidth: 300 }}>
+						<Text role="titleSm">{copy.manualLaneTitle}</Text>
 						{orderedManualEntries.length > 0 ? orderedManualEntries.map((entry) => {
 							const preview = resolveMarketingTickerPreviewForItem(currentTime, entry.item, locale);
 							return (
-								<BthBox key={entry.item.id} padding={3} gap={2} border radiusToken="xl" background="surfaceInset" borderTone="line">
-									<BthText role="bodyStrong">{entry.item.message}</BthText>
-									<BthText role="bodySm" tone="muted">{resolveMarketingTickerAudienceLabel(locale, entry.item.audience)} · {preview.windowLabel}</BthText>
-									<BthBox layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+								<Box key={entry.item.id} padding={3} gap={2} border radiusToken="xl" background="surfaceInset" borderTone="line">
+									<Text role="bodyStrong">{entry.item.message}</Text>
+									<Text role="bodySm" tone="muted">{resolveMarketingTickerAudienceLabel(locale, entry.item.audience)} · {preview.windowLabel}</Text>
+									<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
 										<ItemActionButton label={copy.loadAction} tone="secondary" onPress={() => handleSelectTicker(entry.item)} />
 										<ItemActionButton label={copy.publishAction} tone="success" onPress={() => handleToggleTicker(entry.item)} />
-									</BthBox>
-								</BthBox>
+									</Box>
+								</Box>
 							);
-						}) : <BthText role="bodySm" tone="muted">{locale === 'en' ? 'No manual items yet.' : 'لا توجد عناصر يدوية حتى الآن.'}</BthText>}
-					</BthSurface>
+						}) : <Text role="bodySm" tone="muted">{locale === 'en' ? 'No manual items yet.' : 'لا توجد عناصر يدوية حتى الآن.'}</Text>}
+					</Surface>
 
-					<BthSurface tone="inset" padding={4} gap={2} style={{ flexGrow: 1, minWidth: 280 }}>
-						<BthText role="titleSm">{copy.suppressedLaneTitle}</BthText>
+					<Surface tone="inset" padding={4} gap={2} style={{ flexGrow: 1, minWidth: 280 }}>
+						<Text role="titleSm">{copy.suppressedLaneTitle}</Text>
 						{orderedSuppressedEntries.length > 0 ? orderedSuppressedEntries.map((entry) => (
-							<BthBox key={entry.item.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised" borderTone="warning">
-								<BthText role="bodyStrong">{entry.item.message}</BthText>
-								<BthText role="bodySm" tone="muted">{resolveMarketingTickerPlanReasonLabel(locale, entry.reason)}</BthText>
-							</BthBox>
-						)) : <BthText role="bodySm" tone="muted">{locale === 'en' ? 'Nothing is suppressed right now.' : 'لا يوجد محتوى مكبوت حاليًا.'}</BthText>}
-					</BthSurface>
-				</BthBox>
-			</BthWebSectionCard>
-		</BthBox>
+							<Box key={entry.item.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised" borderTone="warning">
+								<Text role="bodyStrong">{entry.item.message}</Text>
+								<Text role="bodySm" tone="muted">{resolveMarketingTickerPlanReasonLabel(locale, entry.reason)}</Text>
+							</Box>
+						)) : <Text role="bodySm" tone="muted">{locale === 'en' ? 'Nothing is suppressed right now.' : 'لا يوجد محتوى مكبوت حاليًا.'}</Text>}
+					</Surface>
+				</Box>
+			</WebSectionCard>
+		</Box>
 	);
 }
 

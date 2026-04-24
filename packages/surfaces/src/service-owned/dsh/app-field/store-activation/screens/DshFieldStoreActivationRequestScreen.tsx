@@ -1,12 +1,12 @@
 import React from 'react';
 import {
-  BthBox,
-  BthFormScreenShell,
-  BthKeyValueList,
-  BthSectionHeader,
-  BthStateView,
-  BthText,
-  BthTextField,
+  Box,
+  FormScreenShell,
+  KeyValueList,
+  SectionHeader,
+  StateView,
+  Text,
+  TextField,
 } from '@bthwani/ui-kit';
 
 export type DshFieldStoreActivationRequestState =
@@ -40,12 +40,12 @@ export type DshFieldStoreActivationRequestScreenProps = {
 
 function renderState(state: Exclude<DshFieldStoreActivationRequestState, 'ready' | 'disabled'>, onRetry?: () => void) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title="No store request is active"
         description="Start a clean activation request so field work begins from one owned workspace."
@@ -57,7 +57,7 @@ function renderState(state: Exclude<DshFieldStoreActivationRequestState, 'ready'
 
   if (state === 'offline') {
     return (
-      <BthStateView
+      <StateView
         stateId="offline"
         title="Connection is unavailable"
         description="Keep the request draft visible and retry submission when connectivity returns."
@@ -68,7 +68,7 @@ function renderState(state: Exclude<DshFieldStoreActivationRequestState, 'ready'
 
   if (state === 'success') {
     return (
-      <BthStateView
+      <StateView
         stateId="success"
         title="Activation request is ready"
         description="The request is captured and the next field step can move to geo pin confirmation."
@@ -79,7 +79,7 @@ function renderState(state: Exclude<DshFieldStoreActivationRequestState, 'ready'
   }
 
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title="Activation request could not be completed"
       description="Correct the required data or retry without losing the field context."
@@ -103,33 +103,33 @@ export function DshFieldStoreActivationRequestScreen({
   const isDisabled = state === 'disabled';
 
   return (
-    <BthFormScreenShell
+    <FormScreenShell
       title="Store activation request"
       subtitle="Capture only the field-ready details needed before the store moves to pinning and visit evidence."
       submitLabel="Submit activation request"
       onSubmit={onSubmit}
       submitDisabled={isDisabled}
     >
-      <BthBox gap={3}>
-        <BthSectionHeader
+      <Box gap={3}>
+        <SectionHeader
           title="Store identity"
           subtitle="The activation request starts with the minimum accountable store profile."
         />
-        <BthTextField
+        <TextField
           label="Store name"
           value={values.storeName}
           onChangeText={(value) => onChange('storeName', value)}
           editable={!isDisabled}
           error={errors?.storeName}
         />
-        <BthTextField
+        <TextField
           label="Owner name"
           value={values.ownerName}
           onChangeText={(value) => onChange('ownerName', value)}
           editable={!isDisabled}
           error={errors?.ownerName}
         />
-        <BthTextField
+        <TextField
           label="Owner phone"
           value={values.ownerPhone}
           onChangeText={(value) => onChange('ownerPhone', value)}
@@ -137,35 +137,35 @@ export function DshFieldStoreActivationRequestScreen({
           keyboardType="phone-pad"
           error={errors?.ownerPhone}
         />
-      </BthBox>
+      </Box>
 
-      <BthBox gap={3}>
-        <BthSectionHeader
+      <Box gap={3}>
+        <SectionHeader
           title="Coverage context"
           subtitle="Zone and city keep downstream dispatch ownership explicit."
         />
-        <BthTextField
+        <TextField
           label="City"
           value={values.city}
           onChangeText={(value) => onChange('city', value)}
           editable={!isDisabled}
           error={errors?.city}
         />
-        <BthTextField
+        <TextField
           label="Zone"
           value={values.zone}
           onChangeText={(value) => onChange('zone', value)}
           editable={!isDisabled}
           error={errors?.zone}
         />
-      </BthBox>
+      </Box>
 
-      <BthBox gap={3}>
-        <BthSectionHeader
+      <Box gap={3}>
+        <SectionHeader
           title="Field handoff note"
           subtitle="Keep the note practical and constrained to what the next action needs."
         />
-        <BthTextField
+        <TextField
           label="Activation note"
           value={values.activationNote ?? ''}
           onChangeText={(value) => onChange('activationNote', value)}
@@ -173,25 +173,25 @@ export function DshFieldStoreActivationRequestScreen({
           hint="Examples: storefront ready, signage pending, owner available after 3 PM."
           error={errors?.activationNote}
         />
-      </BthBox>
+      </Box>
 
-      <BthBox gap={3}>
-        <BthSectionHeader
+      <Box gap={3}>
+        <SectionHeader
           title="Execution rules"
           subtitle="Field activation stays mutation-bound and must keep validation visible."
         />
-        <BthKeyValueList
+        <KeyValueList
           items={[
             { label: 'Primary CTA', value: 'Submit activation request' },
             { label: 'Next owned step', value: 'Geo pin confirmation', tone: 'brand' },
             { label: 'Required states', value: 'loading, empty, error, success, offline, disabled' },
           ]}
         />
-      </BthBox>
+      </Box>
 
-      <BthText role="caption" tone="muted">
+      <Text role="caption" tone="muted">
         Validation behavior: missing store identity or coverage data keeps the submit action blocked.
-      </BthText>
-    </BthFormScreenShell>
+      </Text>
+    </FormScreenShell>
   );
 }

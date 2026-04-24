@@ -5,11 +5,7 @@ import { useDirection, useTheme } from '../providers';
 
 export type IconTone = 'default' | 'muted' | 'soft' | 'inverse' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
-export type BthIconTone = IconTone;
-
 export type IconName = React.ComponentProps<typeof Ionicons>['name'];
-
-export type BthIconName = IconName;
 
 export type IconProps = {
   name: IconName;
@@ -19,8 +15,6 @@ export type IconProps = {
   mirrored?: boolean;
   style?: StyleProp<TextStyle>;
 };
-
-export type BthIconProps = IconProps;
 
 export function Icon({ name, size = 20, tone = 'default', color, mirrored = false, style }: IconProps) {
   const { direction } = useDirection();
@@ -42,4 +36,3 @@ export function Icon({ name, size = 20, tone = 'default', color, mirrored = fals
   return <Ionicons name={name} size={size} color={resolvedColor} style={[shouldMirror ? { transform: [{ scaleX: -1 }] } : undefined, style]} />;
 }
 
-export const BthIcon = Icon;

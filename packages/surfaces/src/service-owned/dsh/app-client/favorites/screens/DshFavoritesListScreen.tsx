@@ -1,5 +1,5 @@
 import React from 'react';
-import { BthBox, BthListItem, BthSurface, BthText } from '@bthwani/ui-kit';
+import { Box, ListItem, Surface, Text } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
 
 export type DshFavoritesListItem = { id: string; name: string; subtitle: string; meta: string; };
@@ -27,14 +27,14 @@ export function DshFavoritesListScreen({ state = 'ready', items, onOpenItem, onB
       title="Favorites list"
       subtitle="Open a saved item with the shortest possible path."
       content={
-        <BthSurface tone="raised" gap={3}>
-          <BthBox gap={2}>
+        <Surface tone="raised" gap={3}>
+          <Box gap={2}>
             {items.map((item) => (
-              <BthListItem key={item.id} title={item.name} subtitle={item.subtitle} meta={item.meta} onPress={() => onOpenItem?.(item.id)} />
+              <ListItem key={item.id} title={item.name} subtitle={item.subtitle} meta={item.meta} onPress={() => onOpenItem?.(item.id)} />
             ))}
-          </BthBox>
-          <BthText role="caption" tone="muted">Saved items stay one tap away from active discovery.</BthText>
-        </BthSurface>
+          </Box>
+          <Text role="caption" tone="muted">Saved items stay one tap away from active discovery.</Text>
+        </Surface>
       }
       primaryActionLabel="Back"
       onPrimaryAction={onBack}

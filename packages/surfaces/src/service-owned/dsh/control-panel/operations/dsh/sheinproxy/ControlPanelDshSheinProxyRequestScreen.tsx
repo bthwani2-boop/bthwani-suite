@@ -3,20 +3,20 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  BthBox,
-  BthButton,
-  BthCard,
-  BthKeyValueList,
-  BthStateView,
-  BthTabs,
-  BthText,
-  BthTextField,
+  Box,
+  Button,
+  Card,
+  KeyValueList,
+  StateView,
+  Tabs,
+  Text,
+  TextField,
 } from '@bthwani/ui-kit';
 import {
-  BthWebMissionHeroCard,
-  BthWebPageFrame,
-  BthWebSectionCard,
-  BthWebSignalCard,
+  WebMissionHeroCard,
+  WebPageFrame,
+  WebSectionCard,
+  WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 
@@ -202,7 +202,7 @@ export function ControlPanelDshSheinProxyRequestScreen({
 
   if (resolvedState !== 'ready') {
     return (
-      <BthWebPageFrame
+      <WebPageFrame
         eyebrow='DSH / operations / assignment'
         title='Manual assignment'
         description='A general operations form for SHEIN, Awnak, or any other platform-owned delivery family.'
@@ -210,7 +210,7 @@ export function ControlPanelDshSheinProxyRequestScreen({
         embedded={embedded}
         showHeader={showHeader}
       >
-        <BthStateView
+        <StateView
           {...resolveStateCopy(dshText, resolvedState)}
           onActionPress={() => {
             if (resolvedState === 'loading' || resolvedState === 'offline' || resolvedState === 'error') {
@@ -221,12 +221,12 @@ export function ControlPanelDshSheinProxyRequestScreen({
             router.push(listHref);
           }}
         />
-      </BthWebPageFrame>
+      </WebPageFrame>
     );
   }
 
   return (
-    <BthWebPageFrame
+    <WebPageFrame
       eyebrow='DSH / operations / assignment'
       title='Manual assignment'
       description='General form for platform-owned families such as SHEIN and Awnak, with no partner dependency.'
@@ -234,8 +234,8 @@ export function ControlPanelDshSheinProxyRequestScreen({
       embedded={embedded}
       showHeader={showHeader}
     >
-      <BthBox gap={4}>
-        <BthWebMissionHeroCard
+      <Box gap={4}>
+        <WebMissionHeroCard
           badges={['DSH', family.toUpperCase(), stageMeta.label]}
           eyebrow='Assignment workspace'
           title='General manual assignment'
@@ -249,48 +249,48 @@ export function ControlPanelDshSheinProxyRequestScreen({
           secondaryAction={{ label: 'Open operations', href: operationsHref }}
         />
 
-        <BthBox layoutDirection='row' gap={2}>
-          <BthWebSignalCard title='Families' value='3' description='SHEIN, Awnak, and generic presets.' tone='neutral' />
-          <BthWebSignalCard title='Customers' value={customerCount || '1'} description='Customer count in this batch.' tone='best' />
-          <BthWebSignalCard title='Captains' value={captainCount || '1'} description='Captain allocation for the route.' />
-          <BthWebSignalCard title='Step' value={stageMeta.label} description={stageMeta.description} />
-        </BthBox>
+        <Box layoutDirection='row' gap={2}>
+          <WebSignalCard title='Families' value='3' description='SHEIN, Awnak, and generic presets.' tone='neutral' />
+          <WebSignalCard title='Customers' value={customerCount || '1'} description='Customer count in this batch.' tone='best' />
+          <WebSignalCard title='Captains' value={captainCount || '1'} description='Captain allocation for the route.' />
+          <WebSignalCard title='Step' value={stageMeta.label} description={stageMeta.description} />
+        </Box>
 
-        <BthWebSectionCard title='Assignment identity' description='Pick the family preset and give this batch a stable reference.'>
-          <BthBox gap={3}>
-            <BthTabs<AssignmentFamily>
+        <WebSectionCard title='Assignment identity' description='Pick the family preset and give this batch a stable reference.'>
+          <Box gap={3}>
+            <Tabs<AssignmentFamily>
               items={familyOptions}
               value={family}
               onValueChange={(value) => setFamily(value)}
               variant='pill'
             />
 
-            <BthBox gap={2} layoutDirection='row' style={{ flexWrap: 'wrap' }}>
-              <BthBox style={{ flex: 1, minWidth: 240 }}>
-                <BthTextField label='Assignment reference' value={assignmentReference} onChangeText={setAssignmentReference} placeholder='DSH-ASSIGN-0001' />
-              </BthBox>
-              <BthBox style={{ flex: 1, minWidth: 240 }}>
-                <BthTextField label='Source' value={pickupNode} onChangeText={setPickupNode} placeholder='Operations intake / hub' />
-              </BthBox>
-              <BthBox style={{ flex: 1, minWidth: 240 }}>
-                <BthTextField label='Destination' value={dropoffNode} onChangeText={setDropoffNode} placeholder='Customer delivery route' />
-              </BthBox>
-            </BthBox>
-          </BthBox>
-        </BthWebSectionCard>
+            <Box gap={2} layoutDirection='row' style={{ flexWrap: 'wrap' }}>
+              <Box style={{ flex: 1, minWidth: 240 }}>
+                <TextField label='Assignment reference' value={assignmentReference} onChangeText={setAssignmentReference} placeholder='DSH-ASSIGN-0001' />
+              </Box>
+              <Box style={{ flex: 1, minWidth: 240 }}>
+                <TextField label='Source' value={pickupNode} onChangeText={setPickupNode} placeholder='Operations intake / hub' />
+              </Box>
+              <Box style={{ flex: 1, minWidth: 240 }}>
+                <TextField label='Destination' value={dropoffNode} onChangeText={setDropoffNode} placeholder='Customer delivery route' />
+              </Box>
+            </Box>
+          </Box>
+        </WebSectionCard>
 
-        <BthWebSectionCard title='Batch planning' description='Plan the customer grouping and captain allocation before sending the assignment.'>
-          <BthBox gap={3}>
-            <BthBox layoutDirection='row' gap={2}>
-              <BthBox style={{ flex: 1, minWidth: 180 }}>
-                <BthTextField label='Customers in batch' value={customerCount} onChangeText={setCustomerCount} keyboardType='number-pad' placeholder='1' />
-              </BthBox>
-              <BthBox style={{ flex: 1, minWidth: 180 }}>
-                <BthTextField label='Captains needed' value={captainCount} onChangeText={setCaptainCount} keyboardType='number-pad' placeholder='1' />
-              </BthBox>
-            </BthBox>
+        <WebSectionCard title='Batch planning' description='Plan the customer grouping and captain allocation before sending the assignment.'>
+          <Box gap={3}>
+            <Box layoutDirection='row' gap={2}>
+              <Box style={{ flex: 1, minWidth: 180 }}>
+                <TextField label='Customers in batch' value={customerCount} onChangeText={setCustomerCount} keyboardType='number-pad' placeholder='1' />
+              </Box>
+              <Box style={{ flex: 1, minWidth: 180 }}>
+                <TextField label='Captains needed' value={captainCount} onChangeText={setCaptainCount} keyboardType='number-pad' placeholder='1' />
+              </Box>
+            </Box>
 
-            <BthTabs<AssignmentMode>
+            <Tabs<AssignmentMode>
               items={modeOptions}
               value={mode}
               onValueChange={(value) => setMode(value)}
@@ -298,51 +298,51 @@ export function ControlPanelDshSheinProxyRequestScreen({
             />
 
             {mode === 'scheduled' ? (
-              <BthBox layoutDirection='row' gap={2} style={{ flexWrap: 'wrap' }}>
-                <BthBox style={{ flex: 1, minWidth: 180 }}>
-                  <BthTextField label='Date' value={scheduleDate} onChangeText={setScheduleDate} placeholder='YYYY-MM-DD' />
-                </BthBox>
-                <BthBox style={{ flex: 1, minWidth: 180 }}>
-                  <BthTextField label='Time' value={scheduleTime} onChangeText={setScheduleTime} placeholder='HH:MM' />
-                </BthBox>
-              </BthBox>
+              <Box layoutDirection='row' gap={2} style={{ flexWrap: 'wrap' }}>
+                <Box style={{ flex: 1, minWidth: 180 }}>
+                  <TextField label='Date' value={scheduleDate} onChangeText={setScheduleDate} placeholder='YYYY-MM-DD' />
+                </Box>
+                <Box style={{ flex: 1, minWidth: 180 }}>
+                  <TextField label='Time' value={scheduleTime} onChangeText={setScheduleTime} placeholder='HH:MM' />
+                </Box>
+              </Box>
             ) : null}
-          </BthBox>
-        </BthWebSectionCard>
+          </Box>
+        </WebSectionCard>
 
-        <BthWebSectionCard title='Operational notes' description='Use the notes field for sorting, packaging, route, or special handling instructions.'>
-          <BthBox gap={2}>
-            <BthTextField label='Notes' value={notes} onChangeText={setNotes} placeholder='Sorting, packaging, route, or handoff instructions' />
-            {validationError ? <BthText role='bodySm' tone='muted'>{validationError}</BthText> : null}
-            {draftSaved ? <BthText role='bodySm'>Draft saved locally for this manual assignment.</BthText> : null}
-            {submitted ? <BthText role='bodySm'>Assignment is ready for the next operations step.</BthText> : null}
-          </BthBox>
-        </BthWebSectionCard>
+        <WebSectionCard title='Operational notes' description='Use the notes field for sorting, packaging, route, or special handling instructions.'>
+          <Box gap={2}>
+            <TextField label='Notes' value={notes} onChangeText={setNotes} placeholder='Sorting, packaging, route, or handoff instructions' />
+            {validationError ? <Text role='bodySm' tone='muted'>{validationError}</Text> : null}
+            {draftSaved ? <Text role='bodySm'>Draft saved locally for this manual assignment.</Text> : null}
+            {submitted ? <Text role='bodySm'>Assignment is ready for the next operations step.</Text> : null}
+          </Box>
+        </WebSectionCard>
 
-        <BthWebSectionCard title='Assignment preview' description='The preview keeps the most important operational facts visible without duplicating the entire form.'>
-          <BthBox gap={2}>
-            <BthCard>
-              <BthKeyValueList items={summaryItems} />
-            </BthCard>
-            <BthCard>
-              <BthBox gap={2}>
-                <BthText role='bodyStrong'>No partner lane</BthText>
-                <BthText role='bodySm' tone='muted'>Platform-owned families are purchased, sorted, and delivered by the platform itself.</BthText>
-                <BthText role='bodySm' tone='muted'>The captain will later see a batch route, not a partner identity.</BthText>
-              </BthBox>
-            </BthCard>
-          </BthBox>
-        </BthWebSectionCard>
+        <WebSectionCard title='Assignment preview' description='The preview keeps the most important operational facts visible without duplicating the entire form.'>
+          <Box gap={2}>
+            <Card>
+              <KeyValueList items={summaryItems} />
+            </Card>
+            <Card>
+              <Box gap={2}>
+                <Text role='bodyStrong'>No partner lane</Text>
+                <Text role='bodySm' tone='muted'>Platform-owned families are purchased, sorted, and delivered by the platform itself.</Text>
+                <Text role='bodySm' tone='muted'>The captain will later see a batch route, not a partner identity.</Text>
+              </Box>
+            </Card>
+          </Box>
+        </WebSectionCard>
 
-        <BthBox layoutDirection='row' gap={2} style={{ flexWrap: 'wrap' }}>
-          <BthButton label='Save draft' tone='secondary' fullWidth={false} onPress={handleSaveDraft} />
-          <BthButton label='Assign now' tone='primary' fullWidth={false} onPress={handleSubmit} />
-          <BthButton label='Back to list' tone='secondary' fullWidth={false} onPress={() => router.push(listHref)} />
-          <BthButton label='Open hub' tone='ghost' fullWidth={false} onPress={() => router.push(hubHref)} />
-          <BthButton label='Open support' tone='ghost' fullWidth={false} onPress={() => router.push(supportHref)} />
-        </BthBox>
-      </BthBox>
-    </BthWebPageFrame>
+        <Box layoutDirection='row' gap={2} style={{ flexWrap: 'wrap' }}>
+          <Button label='Save draft' tone='secondary' fullWidth={false} onPress={handleSaveDraft} />
+          <Button label='Assign now' tone='primary' fullWidth={false} onPress={handleSubmit} />
+          <Button label='Back to list' tone='secondary' fullWidth={false} onPress={() => router.push(listHref)} />
+          <Button label='Open hub' tone='ghost' fullWidth={false} onPress={() => router.push(hubHref)} />
+          <Button label='Open support' tone='ghost' fullWidth={false} onPress={() => router.push(supportHref)} />
+        </Box>
+      </Box>
+    </WebPageFrame>
   );
 }
 

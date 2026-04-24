@@ -1,6 +1,6 @@
-export type BthSeedMediaService = 'dsh' | 'shared';
+export type SeedMediaService = 'dsh' | 'shared';
 
-export type BthSeedMediaRole =
+export type SeedMediaRole =
   | 'store-cover'
   | 'product-image'
   | 'category-image'
@@ -8,13 +8,13 @@ export type BthSeedMediaRole =
   | 'offer-image'
   | 'empty-state';
 
-export type BthSeedMediaFormat = 'png' | 'webp';
+export type SeedMediaFormat = 'png' | 'webp';
 
-export type BthSeedMediaItem = {
+export type SeedMediaItem = {
   readonly key: string;
-  readonly service: BthSeedMediaService;
-  readonly role: BthSeedMediaRole;
-  readonly format: BthSeedMediaFormat;
+  readonly service: SeedMediaService;
+  readonly role: SeedMediaRole;
+  readonly format: SeedMediaFormat;
   readonly width: number;
   readonly height: number;
   readonly aspectRatio: string;

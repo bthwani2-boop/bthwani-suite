@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { BthBox, BthButton, BthText } from '@bthwani/ui-kit';
-import { BthWebMissionHeroCard, BthWebSectionCard, BthWebSignalCard } from '@bthwani/ui-kit/web';
+import { Box, Button, Text } from '@bthwani/ui-kit';
+import { WebMissionHeroCard, WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
 import { dshPartnerApprovalLanes, dshPartnerIntakeItems, dshPartnerIntakeMetrics } from './workflow';
 
 export type ControlPanelDshPartnerApprovalsScreenProps = {
@@ -22,8 +22,8 @@ export function ControlPanelDshPartnerApprovalsScreen({
   const router = useRouter();
 
   return (
-    <BthBox gap={4}>
-      <BthWebMissionHeroCard
+    <Box gap={4}>
+      <WebMissionHeroCard
         badges={['DSH', 'Partners', 'Intake']}
         eyebrow="بوابة الشركاء"
         title="المراجعة الأولى لطلبات المنتجات"
@@ -38,9 +38,9 @@ export function ControlPanelDshPartnerApprovalsScreen({
         secondaryAction={{ label: 'افتح التسويق', href: marketingHref }}
       />
 
-      <BthBox gap={2}>
+      <Box gap={2}>
         {dshPartnerIntakeMetrics.map((metric, index) => (
-          <BthWebSignalCard
+          <WebSignalCard
             key={metric.id}
             title={metric.label}
             value={String(metric.value)}
@@ -48,76 +48,76 @@ export function ControlPanelDshPartnerApprovalsScreen({
             tone={index === 0 ? 'best' : undefined}
           />
         ))}
-      </BthBox>
+      </Box>
 
-      <BthWebSectionCard title="طلبات معلقة" description="هذه هي العناصر التي لا تزال داخل queue الشركاء وتنتظر القرار الأول.">
-        <BthBox gap={2}>
+      <WebSectionCard title="طلبات معلقة" description="هذه هي العناصر التي لا تزال داخل queue الشركاء وتنتظر القرار الأول.">
+        <Box gap={2}>
           {dshPartnerIntakeItems.filter((item) => item.stage !== 'published').map((item) => (
-            <BthBox key={item.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthBox layoutDirection="row" justify="space-between" align="center">
-                <BthText role="bodyStrong">{item.productName}</BthText>
-                <BthText role="caption" tone={item.stage === 'pending-partner' ? 'warning' : 'success'}>
+            <Box key={item.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Box layoutDirection="row" justify="space-between" align="center">
+                <Text role="bodyStrong">{item.productName}</Text>
+                <Text role="caption" tone={item.stage === 'pending-partner' ? 'warning' : 'success'}>
                   {item.stage === 'pending-partner' ? 'مراجعة أولية' : 'مراجعة تسويقية'}
-                </BthText>
-              </BthBox>
-              <BthText role="bodySm" tone="muted">
+                </Text>
+              </Box>
+              <Text role="bodySm" tone="muted">
                 {item.categoryLabel} · {item.ownerLabel} · {item.submittedAt}
-              </BthText>
-              <BthText role="bodySm" tone="muted">
+              </Text>
+              <Text role="bodySm" tone="muted">
                 {item.note}
-              </BthText>
-              <BthBox layoutDirection="row" gap={2}>
-                <BthButton label="اعتماد" tone="secondary" fullWidth={false} onPress={() => router.push(catalogHref)} />
-                <BthButton label="راجع التسويق" tone="ghost" fullWidth={false} onPress={() => router.push(marketingHref)} />
-              </BthBox>
-            </BthBox>
+              </Text>
+              <Box layoutDirection="row" gap={2}>
+                <Button label="اعتماد" tone="secondary" fullWidth={false} onPress={() => router.push(catalogHref)} />
+                <Button label="راجع التسويق" tone="ghost" fullWidth={false} onPress={() => router.push(marketingHref)} />
+              </Box>
+            </Box>
           ))}
-        </BthBox>
-      </BthWebSectionCard>
+        </Box>
+      </WebSectionCard>
 
-      <BthWebSectionCard title="سلسلة الموافقة" description="لا يظهر المنتج في الكتالوج إلا بعد مرور واضح على كل بوابة.">
-        <BthBox gap={2}>
+      <WebSectionCard title="سلسلة الموافقة" description="لا يظهر المنتج في الكتالوج إلا بعد مرور واضح على كل بوابة.">
+        <Box gap={2}>
           {dshPartnerApprovalLanes.map((lane) => (
-            <BthBox key={lane.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthText role="bodyStrong">{lane.title}</BthText>
-              <BthText role="bodySm" tone="muted">
+            <Box key={lane.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{lane.title}</Text>
+              <Text role="bodySm" tone="muted">
                 {lane.description}
-              </BthText>
-            </BthBox>
+              </Text>
+            </Box>
           ))}
-        </BthBox>
-      </BthWebSectionCard>
+        </Box>
+      </WebSectionCard>
 
-      <BthWebSectionCard title="المخرجات المنشورة" description="هذه العناصر أصبحت مرئية في الكتالوج النهائي لكل الشركاء.">
-        <BthBox gap={2}>
+      <WebSectionCard title="المخرجات المنشورة" description="هذه العناصر أصبحت مرئية في الكتالوج النهائي لكل الشركاء.">
+        <Box gap={2}>
           {dshPartnerIntakeItems.filter((item) => item.stage === 'published').map((item) => (
-            <BthBox key={item.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <BthBox layoutDirection="row" justify="space-between" align="center">
-                <BthText role="bodyStrong">{item.productName}</BthText>
-                <BthText role="caption" tone="success">
+            <Box key={item.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Box layoutDirection="row" justify="space-between" align="center">
+                <Text role="bodyStrong">{item.productName}</Text>
+                <Text role="caption" tone="success">
                   منشور
-                </BthText>
-              </BthBox>
-              <BthText role="bodySm" tone="muted">
+                </Text>
+              </Box>
+              <Text role="bodySm" tone="muted">
                 {item.categoryLabel} · {item.note}
-              </BthText>
-            </BthBox>
+              </Text>
+            </Box>
           ))}
-        </BthBox>
-      </BthWebSectionCard>
+        </Box>
+      </WebSectionCard>
 
-      <BthWebSectionCard title="المسارات الحية" description="من هنا يمكن الرجوع إلى العمليات أو الذهاب مباشرة إلى الكتالوج.">
-        <BthBox gap={2}>
-          <BthButton label="الرجوع إلى العمليات" tone="secondary" onPress={() => router.push(operationsHref)} />
-          <BthButton label="افتح الكتالوج" tone="secondary" onPress={() => router.push(catalogHref)} />
-          <BthButton label="افتح التسويق" tone="ghost" onPress={() => router.push(marketingHref)} />
-        </BthBox>
-      </BthWebSectionCard>
+      <WebSectionCard title="المسارات الحية" description="من هنا يمكن الرجوع إلى العمليات أو الذهاب مباشرة إلى الكتالوج.">
+        <Box gap={2}>
+          <Button label="الرجوع إلى العمليات" tone="secondary" onPress={() => router.push(operationsHref)} />
+          <Button label="افتح الكتالوج" tone="secondary" onPress={() => router.push(catalogHref)} />
+          <Button label="افتح التسويق" tone="ghost" onPress={() => router.push(marketingHref)} />
+        </Box>
+      </WebSectionCard>
 
-      <BthWebSectionCard title="عودة سريعة" description="يبقى المركز الحاكم ظاهرًا حتى لا تضيع بوابة المراجعة.">
-        <BthButton label="العودة إلى hub" onPress={() => router.push(hubHref)} />
-      </BthWebSectionCard>
-    </BthBox>
+      <WebSectionCard title="عودة سريعة" description="يبقى المركز الحاكم ظاهرًا حتى لا تضيع بوابة المراجعة.">
+        <Button label="العودة إلى hub" onPress={() => router.push(hubHref)} />
+      </WebSectionCard>
+    </Box>
   );
 }
 

@@ -1,17 +1,17 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import {
   useRouter } from 'next/navigation';
-import { BthBox,
-  BthStateView,
-  BthText
+import { Box,
+  StateView,
+  Text
 } from '@bthwani/ui-kit';
 import {
-  BthWebMissionHeroCard,
-  BthWebPageFrame,
-  BthWebSectionCard,
-  BthWebSignalCard,
+  WebMissionHeroCard,
+  WebPageFrame,
+  WebSectionCard,
+  WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import {
@@ -95,7 +95,7 @@ export function ControlPanelDshPeakModeScreen({
     const stateCopy = resolveStateCopy(dshText, state);
 
     return (
-      <BthWebPageFrame
+      <WebPageFrame
         eyebrow={dshText.peakMode.pageEyebrow}
         title={dshText.peakMode.pageTitle}
         description={dshText.peakMode.unavailableDescription}
@@ -103,13 +103,13 @@ export function ControlPanelDshPeakModeScreen({
         embedded={embedded}
         showHeader={showHeader}
       >
-        <BthStateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
-      </BthWebPageFrame>
+        <StateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
+      </WebPageFrame>
     );
   }
 
   return (
-    <BthWebPageFrame
+    <WebPageFrame
       eyebrow={dshText.peakMode.pageEyebrow}
       title={dshText.peakMode.pageTitle}
       description={dshText.peakMode.pageDescription}
@@ -118,7 +118,7 @@ export function ControlPanelDshPeakModeScreen({
       showHeader={showHeader}
     >
       <div className={styles.stack}>
-        <BthWebMissionHeroCard
+        <WebMissionHeroCard
           badges={['/operations/dsh/peak-mode', dshText.common.live, `${dshText.peakMode.signals.pressureZones}: ${summary.pressureZones}`]}
           eyebrow={dshText.peakMode.heroEyebrow}
           title={dshText.peakMode.heroTitle}
@@ -133,43 +133,43 @@ export function ControlPanelDshPeakModeScreen({
         />
 
         <div className={styles.signalGrid}>
-          <BthWebSignalCard title={dshText.peakMode.signals.activeZones} value={String(summary.activeZones)} description={dshText.peakMode.signals.activeZonesDescription} tone="best" />
-          <BthWebSignalCard title={dshText.peakMode.signals.pressureZones} value={String(summary.pressureZones)} description={dshText.peakMode.signals.pressureZonesDescription} />
-          <BthWebSignalCard title={dshText.peakMode.signals.flexCaptains} value={String(summary.flexCaptains)} description={dshText.peakMode.signals.flexCaptainsDescription} />
-          <BthWebSignalCard title={dshText.peakMode.signals.protectedQueues} value={String(summary.protectedQueues)} description={dshText.peakMode.signals.protectedQueuesDescription} />
+          <WebSignalCard title={dshText.peakMode.signals.activeZones} value={String(summary.activeZones)} description={dshText.peakMode.signals.activeZonesDescription} tone="best" />
+          <WebSignalCard title={dshText.peakMode.signals.pressureZones} value={String(summary.pressureZones)} description={dshText.peakMode.signals.pressureZonesDescription} />
+          <WebSignalCard title={dshText.peakMode.signals.flexCaptains} value={String(summary.flexCaptains)} description={dshText.peakMode.signals.flexCaptainsDescription} />
+          <WebSignalCard title={dshText.peakMode.signals.protectedQueues} value={String(summary.protectedQueues)} description={dshText.peakMode.signals.protectedQueuesDescription} />
         </div>
 
-        <BthWebSectionCard title={dshText.peakMode.policiesTitle} description={dshText.peakMode.policiesDescription}>
+        <WebSectionCard title={dshText.peakMode.policiesTitle} description={dshText.peakMode.policiesDescription}>
           <div className={styles.cardGrid}>
             {policies.map((policy) => (
-              <BthBox key={policy.label} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-                <BthBox layoutDirection="row" justify="space-between" align="center">
-                  <BthText role="bodyStrong">{policy.label}</BthText>
-                  <BthText role="caption" tone="brand">{policy.statusLabel}</BthText>
-                </BthBox>
-                <BthText role="bodySm" tone="muted">{policy.description}</BthText>
-              </BthBox>
+              <Box key={policy.label} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+                <Box layoutDirection="row" justify="space-between" align="center">
+                  <Text role="bodyStrong">{policy.label}</Text>
+                  <Text role="caption" tone="brand">{policy.statusLabel}</Text>
+                </Box>
+                <Text role="bodySm" tone="muted">{policy.description}</Text>
+              </Box>
             ))}
           </div>
-        </BthWebSectionCard>
+        </WebSectionCard>
 
-        <BthWebSectionCard title={dshText.peakMode.lanesTitle} description={dshText.peakMode.lanesDescription}>
+        <WebSectionCard title={dshText.peakMode.lanesTitle} description={dshText.peakMode.lanesDescription}>
           <div className={styles.cardGrid}>
             {lanes.map((lane) => (
-              <BthBox key={lane.zoneLabel} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-                <BthBox layoutDirection="row" justify="space-between" align="center">
-                  <BthText role="bodyStrong">{lane.zoneLabel}</BthText>
-                  <BthText role="caption" tone={lane.tone}>{lane.recommendationLabel}</BthText>
-                </BthBox>
-                <BthText role="bodySm">{lane.loadLabel}</BthText>
-                <BthText role="caption" tone="soft">{lane.captainCapacityLabel} · {lane.queueLabel}</BthText>
-                <BthText role="bodySm" tone="muted">{lane.note}</BthText>
-              </BthBox>
+              <Box key={lane.zoneLabel} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+                <Box layoutDirection="row" justify="space-between" align="center">
+                  <Text role="bodyStrong">{lane.zoneLabel}</Text>
+                  <Text role="caption" tone={lane.tone}>{lane.recommendationLabel}</Text>
+                </Box>
+                <Text role="bodySm">{lane.loadLabel}</Text>
+                <Text role="caption" tone="soft">{lane.captainCapacityLabel} · {lane.queueLabel}</Text>
+                <Text role="bodySm" tone="muted">{lane.note}</Text>
+              </Box>
             ))}
           </div>
-        </BthWebSectionCard>
+        </WebSectionCard>
       </div>
-    </BthWebPageFrame>
+    </WebPageFrame>
   );
 }
 

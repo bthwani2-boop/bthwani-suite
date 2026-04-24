@@ -3,8 +3,8 @@ import { FlatList, Pressable, View } from 'react-native';
 import { spacing } from '../../foundation';
 import { Button } from '../button';
 import { Card } from '../card';
-import { BthSheetFrame } from '../overlay';
-import { BthSurface as Surface, BthText as Text } from '../../primitives';
+import { SheetFrame } from '../overlay';
+import { Surface, Text } from '../../primitives';
 
 export type CartLine = {
 	id: string;
@@ -46,7 +46,7 @@ export function CartDetails({ visible, onClose, items, currency = 'SAR', onChang
 	}
 
 	return (
-		<BthSheetFrame visible={visible} onClose={onClose} title={`Cart — ${formatAmount(total, currency)}`}>
+		<SheetFrame visible={visible} onClose={onClose} title={`Cart — ${formatAmount(total, currency)}`}>
 			<View style={{ gap: spacing[3] }}>
 				<FlatList
 					data={items}
@@ -118,7 +118,7 @@ export function CartDetails({ visible, onClose, items, currency = 'SAR', onChang
 					</View>
 				</Surface>
 			</View>
-		</BthSheetFrame>
+		</SheetFrame>
 	);
 }
 
