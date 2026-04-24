@@ -1,5 +1,13 @@
 import React from 'react';
-import { ScrollView, Text as RNText, View, type ScrollViewProps, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import { ScrollView as TamaguiScrollView, Text as TamaguiText, View as TamaguiView } from 'tamagui';
+import {
+  type ScrollViewProps,
+  type StyleProp,
+  type TextProps as RNTextNativeProps,
+  type TextStyle,
+  type ViewProps,
+  type ViewStyle
+} from 'react-native';
 import { useDirection, useTheme } from './providers';
 import {
 	borders,
@@ -21,6 +29,10 @@ import {
 	type TextRole,
 } from './foundation';
 
+
+const HostView = TamaguiView as unknown as React.ComponentType<ViewProps>;
+const HostText = TamaguiText as unknown as React.ComponentType<RNTextNativeProps>;
+const HostScrollView = TamaguiScrollView as unknown as React.ComponentType<ScrollViewProps>;
 export type BoxBackground =
 	| 'surface'
 	| 'surfaceRaised'
@@ -97,7 +109,7 @@ export function Box({
 	}[borderTone];
 
 	return (
-		<View
+		<HostView
 			style={[
 				{
 					paddingTop: spacing[resolvedPaddingY],
@@ -117,7 +129,7 @@ export function Box({
 			]}
 		>
 			{children}
-		</View>
+		</HostView>
 	);
 }
 
@@ -128,7 +140,7 @@ export type DividerProps = {
 
 export function Divider({ color, style }: DividerProps) {
 	const { theme } = useTheme();
-	return <View style={[{ height: 1, backgroundColor: color ?? theme.line, width: '100%' }, style]} />;
+	return <HostView style={[{ height: 1, backgroundColor: color ?? theme.line, width: '100%' }, style]} />;
 }
 
 declare const process: { env: { NODE_ENV?: string } };
@@ -234,7 +246,7 @@ export function Text({
 	}[tone];
 
 	return (
-		<RNText
+		<HostText
 			allowFontScaling={allowFontScaling}
 			numberOfLines={numberOfLines}
 			style={[
@@ -250,7 +262,7 @@ export function Text({
 			]}
 		>
 			{children}
-		</RNText>
+		</HostText>
 	);
 }
 
@@ -273,7 +285,7 @@ export function MobileScrollView({
 	...scrollProps
 }: MobileScrollViewProps) {
 	return (
-		<ScrollView
+		<HostScrollView
 			{...scrollProps}
 			style={[fill ? { flex: 1 } : undefined, style]}
 			contentContainerStyle={[
@@ -283,7 +295,7 @@ export function MobileScrollView({
 			]}
 		>
 			{children}
-		</ScrollView>
+		</HostScrollView>
 	);
 }
 
