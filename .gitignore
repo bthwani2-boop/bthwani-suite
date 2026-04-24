@@ -30,6 +30,8 @@ Thumbs.db
 docs/services/surfaces-legacy-trash/
 # Local registry run artifacts
 tools/registry/runs/
+# Local-only scripts
+tools/scripts/
 # Local-only media fixture assets
 packages/media-fixtures/assets/
 # Local Python virtual environments

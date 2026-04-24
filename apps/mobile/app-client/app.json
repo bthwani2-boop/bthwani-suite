@@ -7,7 +7,7 @@
       "android"
     ],
     "sdkVersion": "54.0.0",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "extra": {
       "appKey": "app-client",
       "appVariant": "development",
