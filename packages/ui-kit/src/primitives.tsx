@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Text, View, type ScrollViewProps, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import { ScrollView, Text as RNText, View, type ScrollViewProps, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import { useDirection, useTheme } from './providers';
 import {
 	borders,
@@ -21,7 +21,7 @@ import {
 	type TextRole,
 } from './foundation';
 
-export type BthBoxBackground =
+export type BoxBackground =
 	| 'surface'
 	| 'surfaceRaised'
 	| 'surfaceInset'
@@ -36,9 +36,9 @@ export type BthBoxBackground =
 	| 'overlaySoft'
 	| 'disabledSurface';
 
-export type BthBoxBorderTone = 'line' | 'lineStrong' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+	export type BoxBorderTone = 'line' | 'lineStrong' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
-export type BthBoxProps = {
+export type BoxProps = {
 	children?: React.ReactNode;
 	padding?: SpacingToken;
 	paddingX?: SpacingToken;
@@ -47,11 +47,11 @@ export type BthBoxProps = {
 	paddingEnd?: SpacingToken;
 	gap?: SpacingToken;
 	radiusToken?: RadiusToken;
-	background?: BthBoxBackground;
+	background?: BoxBackground;
 	elevationToken?: ElevationToken;
 	border?: boolean;
 	borderToken?: BorderToken;
-	borderTone?: BthBoxBorderTone;
+	borderTone?: BoxBorderTone;
 	align?: ViewStyle['alignItems'];
 	justify?: ViewStyle['justifyContent'];
 	layoutDirection?: 'column' | 'row';
@@ -59,7 +59,7 @@ export type BthBoxProps = {
 	style?: StyleProp<ViewStyle>;
 };
 
-export function BthBox({
+export function Box({
 	children,
 	padding = 0,
 	paddingX,
@@ -78,7 +78,7 @@ export function BthBox({
 	layoutDirection = 'column',
 	reversed = false,
 	style
-}: BthBoxProps) {
+}: BoxProps) {
 	const { direction } = useDirection();
 	const { theme } = useTheme();
 	const backgroundColor = background ? theme[background] : undefined;
@@ -121,21 +121,21 @@ export function BthBox({
 	);
 }
 
-export type BthDividerProps = {
+export type DividerProps = {
 	color?: string;
 	style?: StyleProp<ViewStyle>;
 };
 
-export function BthDivider({ color, style }: BthDividerProps) {
+export function Divider({ color, style }: DividerProps) {
 	const { theme } = useTheme();
 	return <View style={[{ height: 1, backgroundColor: color ?? theme.line, width: '100%' }, style]} />;
 }
 
 declare const process: { env: { NODE_ENV?: string } };
 
-export type BthSurfaceTone = 'default' | 'raised' | 'inset' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+export type SurfaceTone = 'default' | 'raised' | 'inset' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
-const surfaceToneLaw: Record<BthSurfaceTone, { background: BthBoxBackground; borderTone: BthBoxBorderTone; elevationToken: ElevationToken }> = {
+const surfaceToneLaw: Record<SurfaceTone, { background: BoxBackground; borderTone: BoxBorderTone; elevationToken: ElevationToken }> = {
 	default: { background: 'surface', borderTone: 'line', elevationToken: 'flat' },
 	raised: { background: 'surfaceRaised', borderTone: 'lineStrong', elevationToken: 'raised' },
 	inset: { background: 'surfaceInset', borderTone: 'line', elevationToken: 'flat' },
@@ -146,20 +146,20 @@ const surfaceToneLaw: Record<BthSurfaceTone, { background: BthBoxBackground; bor
 	info: { background: 'infoSurface', borderTone: 'info', elevationToken: 'flat' }
 };
 
-export type BthSurfaceProps = {
+export type SurfaceProps = {
 	children?: React.ReactNode;
 	padding?: SpacingToken;
 	gap?: SpacingToken;
 	radiusToken?: RadiusToken;
 	elevationToken?: ElevationToken;
-	tone?: BthSurfaceTone;
+	tone?: SurfaceTone;
 	border?: boolean;
 	borderToken?: BorderToken;
 	borderTone?: 'line' | 'lineStrong' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 	style?: StyleProp<ViewStyle>;
 };
 
-export function BthSurface({
+export function Surface({
 	children,
 	padding = 5,
 	gap = 3,
@@ -170,15 +170,15 @@ export function BthSurface({
 	borderToken = 'hairline',
 	borderTone,
 	style
-}: BthSurfaceProps) {
+}: SurfaceProps) {
 	const toneConfig = surfaceToneLaw[tone];
 	if ((process.env.NODE_ENV ?? '') !== 'production' && !(tone in surfaceToneLaw)) {
 		// eslint-disable-next-line no-console
-		console.warn(`BthSurface: unknown tone "${String(tone)}" — falling back to 'default'`);
+		console.warn(`Surface: unknown tone "${String(tone)}" — falling back to 'default'`);
 	}
 
 	return (
-		<BthBox
+		<Box
 			padding={padding}
 			gap={gap}
 			radiusToken={radiusToken}
@@ -190,11 +190,15 @@ export function BthSurface({
 			style={style}
 		>
 			{children}
-		</BthBox>
+		</Box>
 	);
 }
 
-export type BthTextProps = {
+export const BthBox = Box;
+export const BthDivider = Divider;
+export const BthSurface = Surface;
+
+export type TextProps = {
 	children: React.ReactNode;
 	role?: TextRole;
 	tone?: 'default' | 'muted' | 'soft' | 'inverse' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
@@ -206,7 +210,7 @@ export type BthTextProps = {
 	style?: StyleProp<TextStyle>;
 };
 
-export function BthText({
+export function Text({
 	children,
 	role = 'bodyMd',
 	tone = 'default',
@@ -216,7 +220,7 @@ export function BthText({
 	allowFontScaling = true,
 	numberOfLines,
 	style
-}: BthTextProps) {
+}: TextProps) {
 	const { direction } = useDirection();
 	const { theme } = useTheme();
 	const roleStyle = resolveTextRole(role);
@@ -234,7 +238,7 @@ export function BthText({
 	}[tone];
 
 	return (
-		<Text
+		<RNText
 			allowFontScaling={allowFontScaling}
 			numberOfLines={numberOfLines}
 			style={[
@@ -250,11 +254,13 @@ export function BthText({
 			]}
 		>
 			{children}
-		</Text>
+		</RNText>
 	);
 }
 
-export type BthMobileScrollViewProps = Omit<ScrollViewProps, 'style' | 'contentContainerStyle'> & {
+export const BthText = Text;
+
+export type MobileScrollViewProps = Omit<ScrollViewProps, 'style' | 'contentContainerStyle'> & {
 	children?: React.ReactNode;
 	fill?: boolean;
 	padding?: SpacingToken;
@@ -263,7 +269,7 @@ export type BthMobileScrollViewProps = Omit<ScrollViewProps, 'style' | 'contentC
 	contentContainerStyle?: StyleProp<ViewStyle>;
 };
 
-export function BthMobileScrollView({
+export function MobileScrollView({
 	children,
 	fill = false,
 	padding = 0,
@@ -271,7 +277,7 @@ export function BthMobileScrollView({
 	style,
 	contentContainerStyle,
 	...scrollProps
-}: BthMobileScrollViewProps) {
+}: MobileScrollViewProps) {
 	return (
 		<ScrollView
 			{...scrollProps}
@@ -286,4 +292,14 @@ export function BthMobileScrollView({
 		</ScrollView>
 	);
 }
+
+export type BthBoxBackground = BoxBackground;
+export type BthBoxBorderTone = BoxBorderTone;
+export type BthBoxProps = BoxProps;
+export type BthDividerProps = DividerProps;
+export type BthSurfaceTone = SurfaceTone;
+export type BthSurfaceProps = SurfaceProps;
+export type BthTextProps = TextProps;
+export type BthMobileScrollViewProps = MobileScrollViewProps;
+export const BthMobileScrollView = MobileScrollView;
 

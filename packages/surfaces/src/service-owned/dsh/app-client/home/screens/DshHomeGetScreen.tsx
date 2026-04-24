@@ -1,16 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { resolveSeedMediaSource, type BthSeedMediaKey } from '@bthwani/media-fixtures';
+import { resolveSeedMediaSource } from '@bthwani/media-fixtures';
 import { Image, Pressable, ScrollView, StyleSheet, TextInput, View, type ImageSourcePropType } from 'react-native';
 
 import {
-  BthBox,
-  BthListItem,
-  BthIcon,
-  BthStateView,
-  BthSurface,
-  BthText,
-  BthTopBar,
+  Box,
+  Icon,
+  StateView,
+  Surface,
+  Text,
+  TopBar,
   radius,
   resolveRowDirection,
   resolveTextAlign,
@@ -52,12 +51,14 @@ import CategoryClockDial, {
 import { getDshCategoryIconUrl } from '../../categories/utils/getDshCategoryIconUrl';
 import type { MarketingGrowthRecord } from '../../../shared/marketing/growth-store';
 
+type SeedMediaKey = Parameters<typeof resolveSeedMediaSource>[0];
+
 function resolveDshHomeStoreImageSource(mediaKey?: string): ImageSourcePropType | undefined {
   if (!mediaKey) {
     return undefined;
   }
 
-  return resolveSeedMediaSource(mediaKey as BthSeedMediaKey) as ImageSourcePropType;
+  return resolveSeedMediaSource(mediaKey as SeedMediaKey) as ImageSourcePropType;
 }
 
 function resolveDshHomeBannerImageSource(mediaKey?: string): ImageSourcePropType | undefined {
@@ -65,7 +66,7 @@ function resolveDshHomeBannerImageSource(mediaKey?: string): ImageSourcePropType
     return undefined;
   }
 
-  return resolveSeedMediaSource(mediaKey as BthSeedMediaKey) as ImageSourcePropType;
+  return resolveSeedMediaSource(mediaKey as SeedMediaKey) as ImageSourcePropType;
 }
 export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
@@ -322,7 +323,7 @@ function CategoryIconImage({
   const [failed, setFailed] = React.useState(false);
 
   if (!uri || failed) {
-    return <BthText role="titleLg" style={style}>{emojiFallback}</BthText>;
+    return <Text role="titleLg" style={style}>{emojiFallback}</Text>;
   }
 
   return (
@@ -341,7 +342,7 @@ function DshServiceLauncherMark() {
       <View style={serviceLauncherMarkStyles.orbit} />
       <View style={serviceLauncherMarkStyles.needle} />
       <View style={serviceLauncherMarkStyles.planeWrap}>
-        <BthIcon name="paper-plane" size={12} color="#FF6A00" />
+        <Icon name="paper-plane" size={12} color="#FF6A00" />
       </View>
     </View>
   );
@@ -353,62 +354,8 @@ function CategoryHubIcon() {
   );
 }
 
-function MySpaceIcon() {
-  return (
-    <View
-      style={{
-        width: 34,
-        height: 34,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <View
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: 17,
-          borderWidth: 1.5,
-          borderColor: 'rgba(255,255,255,0.95)',
-          backgroundColor: 'rgba(255,255,255,0.10)',
-        }}
-      />
-      <View
-        style={{
-          width: 19,
-          height: 19,
-          borderRadius: 10,
-          borderWidth: 1.5,
-          borderColor: 'rgba(255,255,255,0.96)',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'rgba(255,255,255,0.06)',
-        }}
-      >
-        <Ionicons name="person" size={13} color="#FFFFFF" />
-      </View>
-      <Ionicons
-        name="sparkles"
-        size={9}
-        color="#FFF8DE"
-        style={{ position: 'absolute', top: 1, right: 0, transform: [{ rotate: '14deg' }] }}
-      />
-      <Ionicons
-        name="sparkles"
-        size={8}
-        color="#FFF8DE"
-        style={{ position: 'absolute', top: 4, left: 1, transform: [{ rotate: '-12deg' }] }}
-      />
-    </View>
-  );
-}
-
 function isWithinOperatingHours(now: Date, openHour: number, closeHour: number) {
   const currentHour = now.getHours();
-
-  if (openHour === closeHour) {
-    return true;
-  }
 
   if (openHour < closeHour) {
     return currentHour >= openHour && currentHour < closeHour;
@@ -454,12 +401,12 @@ function resolveTickerBanner(
 
 function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>, 'ready'>, onRetry?: () => void) {
   if (state === 'loading') {
-    return <BthStateView stateId="loading" />;
+    return <StateView stateId="loading" />;
   }
 
   if (state === 'empty') {
     return (
-      <BthStateView
+      <StateView
         stateId="empty"
         title="لا توجد بيانات عرض بعد"
         description="أعد المحاولة لاستعادة واجهة DSH الرئيسية واختصاراتها."
@@ -470,12 +417,12 @@ function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>,
   }
 
   if (state === 'offline') {
-    return <BthStateView stateId="offline" onActionPress={onRetry} />;
+    return <StateView stateId="offline" onActionPress={onRetry} />;
   }
 
   if (state === 'disabled') {
     return (
-      <BthStateView
+      <StateView
         stateId="warning"
         title="الواجهة الرئيسية موقوفة مؤقتاً"
         description="أبقِ المحاولة مرئية حتى تعود هذه الواجهة للخدمة."
@@ -486,7 +433,7 @@ function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>,
   }
 
   return (
-    <BthStateView
+    <StateView
       stateId="recoverableError"
       title="تعذر تحميل الواجهة الرئيسية"
       description="أعد المحاولة ثم انتقل إلى الفئات أو الطلبات إذا لزم."
@@ -548,6 +495,15 @@ export function DshHomeGetScreen({
   const [inlineSearchVisible, setInlineSearchVisible] = React.useState(false);
   const [inlineSearchQuery, setInlineSearchQuery] = React.useState('');
   const [serviceDialVisible, setServiceDialVisible] = React.useState(false);
+  const handleOpenMySpace = React.useCallback(() => {
+    if (onOpenMySpace) {
+      onOpenMySpace();
+      return;
+    }
+
+    onOpenEntry?.();
+  }, [onOpenEntry, onOpenMySpace]);
+
   const categoryItems = React.useMemo(() => {
     if (categories) {
       return categories;
@@ -969,46 +925,41 @@ export function DshHomeGetScreen({
               />
             </View>
           </View>
-          <BthText role="caption" style={styles.inlineSearchHint}>
+          <Text role="caption" style={styles.inlineSearchHint}>
             بحث عام سريع داخل تجربة DSH الحالية للوصول إلى المتاجر والمسارات بدون مغادرة الصفحة.
-          </BthText>
+          </Text>
         </View>
       ) : (
-        <BthTopBar
+        <TopBar
           variant="brand"
           title={uiText.topBar.brandName}
           subtitle={uiText.topBar.brandTagline}
+          onTitlePress={handleOpenMySpace}
           locationLabel={uiText.topBar.location}
-          locationIcon={<BthIcon name="location-outline" size={14} color="#FFFFFF" />}
+          locationIcon={<Icon name="location-outline" size={14} color="#FFFFFF" />}
           actions={[
             {
               id: 'my-space',
-              icon: <MySpaceIcon />,
+              icon: <Icon name="person" size={22} color="#FFFFFF" />,
+              size: 'lg',
               accessibilityLabel: 'مساحتي',
-              onPress: () => {
-                if (onOpenMySpace) {
-                  onOpenMySpace();
-                  return;
-                }
-
-                onOpenEntry?.();
-              },
+              onPress: handleOpenMySpace,
             },
             {
               id: 'notifications',
-              icon: <BthIcon name="notifications-outline" size={28} color="#FFFFFF" />,
+              icon: <Icon name="notifications-outline" size={28} color="#FFFFFF" />,
               accessibilityLabel: 'الإشعارات',
               onPress: onOpenNotifications,
             },
             {
               id: 'cart',
-              icon: <BthIcon name="cart-outline" size={28} color="#FFFFFF" />,
+              icon: <Icon name="cart-outline" size={28} color="#FFFFFF" />,
               accessibilityLabel: 'السلة',
               onPress: onOpenCart,
             },
             {
               id: 'search',
-              icon: <BthIcon name="search-outline" size={28} color="#FFFFFF" />,
+              icon: <Icon name="search-outline" size={28} color="#FFFFFF" />,
               accessibilityLabel: 'بحث',
               onPress: openInlineSearch,
             },
@@ -1018,9 +969,8 @@ export function DshHomeGetScreen({
             message: tickerMessage,
             onPress: tickerAction,
             marquee: true,
-            marqueeDurationMs: 22000,
+            marqueeDurationMs: 36000,
           }}
-          contentOffsetY={spacing[2]}
           style={styles.brandTopBarOffset}
         />
       )}
@@ -1042,30 +992,30 @@ export function DshHomeGetScreen({
         showsVerticalScrollIndicator={false}
       >
         {inlineSearchVisible ? (
-          <BthSurface tone="raised" padding={3} gap={2}>
-            <BthText role="titleSm">نتائج البحث داخل DSH</BthText>
-            <BthText role="bodySm" tone="muted">
+          <Surface tone="raised" padding={3} gap={2}>
+            <Text role="titleSm">نتائج البحث داخل DSH</Text>
+            <Text role="bodySm" tone="muted">
               {inlineSearchQuery.trim()
                 ? `يتم الآن تصفية المتاجر والمسارات المتاحة حسب: ${inlineSearchQuery}`
                 : 'ابدأ بكتابة اسم متجر أو خدمة أو فئة، وستظهر النتائج مباشرة في نفس الصفحة.'}
-            </BthText>
-          </BthSurface>
+            </Text>
+          </Surface>
         ) : (
-          <View style={styles.carouselViewport}>
+          <Surface tone="raised" padding={0} gap={0} radiusToken="xl" style={{ overflow: 'hidden' }}>
             <HomeBannerCarousel banners={bannerItems} height={256} />
-          </View>
+          </Surface>
         )}
 
         {showSheinInline ? (
-          <BthBox gap={3}>
+          <Box gap={3}>
             <DshSheinOrderCreateScreen embedded onClose={onCloseSheinInline} />
-          </BthBox>
+          </Box>
         ) : null}
 
         {showAwnakInline ? (
-          <BthBox gap={3}>
+          <Box gap={3}>
             <DshAwnakOrderCreateScreen embedded onClose={onCloseAwnakInline} />
-          </BthBox>
+          </Box>
         ) : null}
 
         <View style={styles.categoriesSelectorSection}>
@@ -1076,7 +1026,7 @@ export function DshHomeGetScreen({
                   <Ionicons name="play" size={22} color="#FF6A00" />
                 </View>
                 <View style={styles.categoryNameContainer}>
-                  <BthText role="bodySm" style={styles.categoryName} numberOfLines={1}>فيديو</BthText>
+                  <Text role="bodySm" style={styles.categoryName} numberOfLines={1}>فيديو</Text>
                 </View>
               </Pressable>
 
@@ -1086,7 +1036,7 @@ export function DshHomeGetScreen({
                     <CategoryHubIcon />
                   </View>
                   <View style={styles.categoryNameContainer}>
-                    <BthText role="bodySm" style={styles.categoryName} numberOfLines={1}>الفئات</BthText>
+                    <Text role="bodySm" style={styles.categoryName} numberOfLines={1}>الفئات</Text>
                   </View>
                 </Pressable>
               </View>
@@ -1104,9 +1054,9 @@ export function DshHomeGetScreen({
                     />
                   </View>
                   <View style={[styles.categoryNameContainer, styles.categoryNameContainerSelected]}>
-                    <BthText role="bodySm" style={styles.categoryName} numberOfLines={1}>
+                    <Text role="bodySm" style={styles.categoryName} numberOfLines={1}>
                       {selectedCategoryLabel}
-                    </BthText>
+                    </Text>
                   </View>
                 </Pressable>
               ) : null}
@@ -1115,23 +1065,23 @@ export function DshHomeGetScreen({
             <Pressable style={[styles.heroPromoCard, styles.heroPromoCardInline]} onPress={openInlineSearch}>
               <View style={styles.heroPromoContent}>
                 <View style={styles.heroPromoIconWrap}>
-                  <BthText role="titleLg" style={styles.heroIcon}>
+                  <Text role="titleLg" style={styles.heroIcon}>
                     {activePromo.icon}
-                  </BthText>
+                  </Text>
                 </View>
 
                 <View style={styles.heroPromoTextWrap}>
                   <View style={styles.heroPromoBadge}>
-                    <BthText role="bodySm" style={styles.heroPromoBadgeText}>
+                    <Text role="bodySm" style={styles.heroPromoBadgeText}>
                       {activePromo.title}
-                    </BthText>
+                    </Text>
                   </View>
-                  <BthText role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
+                  <Text role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
                     {promoDiscount}
-                  </BthText>
-                  <BthText role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
+                  </Text>
+                  <Text role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
                     {promoTail || 'على أول طلب'}
-                  </BthText>
+                  </Text>
                 </View>
               </View>
 
@@ -1157,13 +1107,13 @@ export function DshHomeGetScreen({
                     onPress={() => setActiveSubcategoryId(subcategory.id)}
                   >
                     <View style={styles.subcategoryIconContainer}>
-                      <BthText role="titleSm" style={styles.subcategoryEmoji}>
+                      <Text role="titleSm" style={styles.subcategoryEmoji}>
                         {subcategory.emoji}
-                      </BthText>
+                      </Text>
                     </View>
-                    <BthText role="bodySm" style={[styles.subcategoryName, activeSubcategoryId === subcategory.id && styles.subcategoryNameActive]} numberOfLines={1}>
+                    <Text role="bodySm" style={[styles.subcategoryName, activeSubcategoryId === subcategory.id && styles.subcategoryNameActive]} numberOfLines={1}>
                       {subcategory.title}
-                    </BthText>
+                    </Text>
                   </Pressable>
                 ))}
               </ScrollView>
@@ -1194,7 +1144,7 @@ export function DshHomeGetScreen({
                   color={activeCategoryId === 'all' ? theme.textInverse : theme.textMuted}
                 />
               </View>
-              <BthText
+              <Text
                 role="bodySm"
                 style={[
                   styles.filterChipLabel,
@@ -1203,7 +1153,7 @@ export function DshHomeGetScreen({
                 numberOfLines={1}
               >
                 الكل
-              </BthText>
+              </Text>
             </View>
           </Pressable>
 
@@ -1233,7 +1183,7 @@ export function DshHomeGetScreen({
                     size={16}
                     color={isActive ? theme.textInverse : theme.textMuted}
                   />
-                  <BthText
+                  <Text
                     role="bodySm"
                     style={[
                       styles.filterChipLabel,
@@ -1241,7 +1191,7 @@ export function DshHomeGetScreen({
                     ]}
                   >
                     {filter.label}
-                  </BthText>
+                  </Text>
                 </View>
               </Pressable>
             );
@@ -1282,7 +1232,7 @@ export function DshHomeGetScreen({
                       style={styles.filterChipIcon}
                     />
                   </View>
-                  <BthText
+                  <Text
                     role="bodySm"
                     style={[
                       styles.filterChipLabel,
@@ -1291,7 +1241,7 @@ export function DshHomeGetScreen({
                     numberOfLines={1}
                   >
                     {category.label}
-                  </BthText>
+                  </Text>
                 </View>
               </Pressable>
             );
@@ -1299,7 +1249,7 @@ export function DshHomeGetScreen({
           </ScrollView>
         </View>
 
-        <BthBox gap={2}>
+        <Box gap={2}>
           {visibleStores.map((store, index) => {
             const card: DshStoreCompactCardData = {
               id: store.id,
@@ -1351,7 +1301,7 @@ export function DshHomeGetScreen({
               />
             );
           })}
-        </BthBox>
+        </Box>
 
         <CategoryClockDial
           visible={categoriesSheetVisible}
@@ -1767,10 +1717,6 @@ function createStyles(direction: Direction) {
   shortsCardFooterText: {
     color: '#ff6a00',
     fontWeight: '700',
-  },
-  carouselViewport: {
-    gap: 0,
-    marginTop: 0,
   },
   carouselStage: {
     height: 238,

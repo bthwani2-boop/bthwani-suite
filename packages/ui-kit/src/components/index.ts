@@ -8,8 +8,8 @@ export { AmountInput, BthCheckbox, BthFormScreenShell, BthOptionRow, BthRadio, B
 export type { AmountInputProps, BthCheckboxProps, BthFormScreenShellProps, BthOptionRowProps, BthRadioProps, BthSelectFieldProps, BthSelectOption, BthSegmentedControlProps, BthSegmentedOption, BthSwitchProps, BthTextFieldProps, PaymentMethod, PaymentMethodListProps, QuickAmountGridProps, SummaryCardProps, SummaryItem } from './field';
 export { NewsTickerBar, BthNewsTickerBar, ScreenHeader, BthScreenHeader, SectionHeader, BthSectionHeader, Tabs, BthTabs, TopBar, BthTopBar } from './header';
 export type { NewsTickerBarProps, BthNewsTickerBarProps, ScreenHeaderProps, BthScreenHeaderProps, SectionHeaderProps, BthSectionHeaderProps, TabItem, BthTabItem, TabsProps, BthTabsProps, TopBarAction, BthTopBarAction, TopBarProps, BthTopBarProps, TopBarVariant, BthTopBarVariant } from './header';
-export { BthIcon } from './icons';
-export type { BthIconName, BthIconProps, BthIconTone } from './icons';
+export { BthIcon, Icon } from './icons';
+export type { BthIconName, BthIconProps, BthIconTone, IconName, IconProps, IconTone } from './icons';
 export { DataTable, BthDataTable, HighlightsRail, BthHighlightsRail, KeyValueList, BthKeyValueList, ListItem, BthListItem } from './list';
 export type { DataTableColumn, BthDataTableColumn, DataTableProps, BthDataTableProps, HighlightsRailItem, BthHighlightsRailItem, HighlightsRailProps, BthHighlightsRailProps, KeyValueItem, BthKeyValueItem, KeyValueListProps, BthKeyValueListProps, ListItemProps, BthListItemProps } from './list';
 export { BthAvatar, BthBanner, BthImage, BthLogo, DirectionalIcon } from './media';

@@ -2,7 +2,7 @@ import React from 'react';
 import { ActivityIndicator, Pressable, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
 import { borders, radius, resolveRowDirection, sizes, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
-import { BthText as Text } from '../primitives';
+import { Text } from '../primitives';
 
 type PressableStyle = StyleProp<ViewStyle> | ((state: PressableStateCallbackType) => StyleProp<ViewStyle>);
 

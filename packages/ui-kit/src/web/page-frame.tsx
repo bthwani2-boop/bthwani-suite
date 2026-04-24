@@ -229,7 +229,7 @@ function WebPageFrameStyles() {
   return <style>{webPageFrameCss}</style>;
 }
 
-export type BthWebPageFrameProps = {
+export type WebPageFrameProps = {
   title: string;
   description?: string;
   eyebrow?: string;
@@ -240,7 +240,7 @@ export type BthWebPageFrameProps = {
   children?: ReactNode;
 };
 
-export function BthWebPageFrame({
+export function WebPageFrame({
   title,
   description,
   eyebrow,
@@ -249,7 +249,7 @@ export function BthWebPageFrame({
   embedded = false,
   showHeader = true,
   children,
-}: BthWebPageFrameProps) {
+}: WebPageFrameProps) {
   const widthClassName = maxWidth <= 880
     ? 'bth-web-page-frame-content--narrow'
     : maxWidth <= 920
@@ -292,7 +292,7 @@ export function BthWebPageFrame({
   );
 }
 
-export type BthWebMissionHeroCardProps = {
+export type WebMissionHeroCardProps = {
   eyebrow?: string;
   title: string;
   description?: string;
@@ -303,7 +303,7 @@ export type BthWebMissionHeroCardProps = {
   secondaryAction?: { label: string; href: string };
 };
 
-export function BthWebMissionHeroCard({
+export function WebMissionHeroCard({
   eyebrow,
   title,
   description,
@@ -312,7 +312,7 @@ export function BthWebMissionHeroCard({
   metaItems = [],
   primaryAction,
   secondaryAction,
-}: BthWebMissionHeroCardProps) {
+}: WebMissionHeroCardProps) {
   const { direction } = useDirection();
   const cardClassName = ['bth-web-mission-hero-card', dense ? 'bth-web-mission-hero-card--dense' : ''].filter(Boolean).join(' ');
 
@@ -363,13 +363,13 @@ export function BthWebMissionHeroCard({
   );
 }
 
-export type BthWebSectionCardProps = {
+export type WebSectionCardProps = {
   title: string;
   description?: string;
   children?: ReactNode;
 };
 
-export function BthWebSectionCard({ title, description, children }: BthWebSectionCardProps) {
+export function WebSectionCard({ title, description, children }: WebSectionCardProps) {
   return (
     <>
       <WebPageFrameStyles />
@@ -384,21 +384,21 @@ export function BthWebSectionCard({ title, description, children }: BthWebSectio
   );
 }
 
-export type BthWebSignalCardTone = 'neutral' | 'best' | 'danger';
+export type WebSignalCardTone = 'neutral' | 'best' | 'danger';
 
-export type BthWebSignalCardProps = {
+export type WebSignalCardProps = {
   title: string;
   value: string;
   description: string;
-  tone?: BthWebSignalCardTone;
+  tone?: WebSignalCardTone;
 };
 
-export function BthWebSignalCard({
+export function WebSignalCard({
   title,
   value,
   description,
   tone = 'neutral',
-}: BthWebSignalCardProps) {
+}: WebSignalCardProps) {
   const className = ['bth-web-signal-card', tone === 'best' ? 'bth-web-signal-card--best' : '', tone === 'danger' ? 'bth-web-signal-card--danger' : '']
     .filter(Boolean)
     .join(' ');
@@ -414,3 +414,13 @@ export function BthWebSignalCard({
     </>
   );
 }
+
+export type BthWebPageFrameProps = WebPageFrameProps;
+export const BthWebPageFrame = WebPageFrame;
+export type BthWebMissionHeroCardProps = WebMissionHeroCardProps;
+export const BthWebMissionHeroCard = WebMissionHeroCard;
+export type BthWebSectionCardProps = WebSectionCardProps;
+export const BthWebSectionCard = WebSectionCard;
+export type BthWebSignalCardTone = WebSignalCardTone;
+export type BthWebSignalCardProps = WebSignalCardProps;
+export const BthWebSignalCard = WebSignalCard;

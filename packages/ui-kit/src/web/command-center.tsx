@@ -252,7 +252,7 @@ function WebCommandCenterStyles() {
   return <style>{webCommandCenterCss}</style>;
 }
 
-export type BthWebCommandCenterFilter = {
+export type WebCommandCenterFilter = {
   id: string;
   label: string;
   icon?: string;
@@ -260,7 +260,7 @@ export type BthWebCommandCenterFilter = {
   active?: boolean;
 };
 
-export type BthWebCommandCenterNavItem = {
+export type WebCommandCenterNavItem = {
   id: string;
   label: string;
   href?: string;
@@ -269,15 +269,15 @@ export type BthWebCommandCenterNavItem = {
   active?: boolean;
 };
 
-export type BthWebCommandStripFilter = BthWebCommandCenterFilter;
+export type WebCommandStripFilter = WebCommandCenterFilter;
 
-export type BthWebCommandStripProps = {
+export type WebCommandStripProps = {
   brandLabel: string;
   searchPlaceholder?: string;
   languageLabel?: string;
   alertCountLabel?: string;
   refreshLabel?: string;
-  filters?: ReadonlyArray<BthWebCommandStripFilter>;
+  filters?: ReadonlyArray<WebCommandStripFilter>;
   onFilterSelect?: (filterId: string) => void;
   onBrandClick?: () => void;
   onSearchClick?: () => void;
@@ -286,7 +286,7 @@ export type BthWebCommandStripProps = {
   onAlertClick?: () => void;
 };
 
-export function BthWebCommandStrip({
+export function WebCommandStrip({
   brandLabel,
   searchPlaceholder,
   languageLabel,
@@ -299,7 +299,7 @@ export function BthWebCommandStrip({
   onRefreshClick,
   onLanguageClick,
   onAlertClick,
-}: BthWebCommandStripProps) {
+}: WebCommandStripProps) {
   const { direction } = useDirection();
   const { toggleLanguage } = useUiLanguage();
   const uiText = useUiText();
@@ -359,7 +359,7 @@ export function BthWebCommandStrip({
 }
 
 function renderRailItems(
-  items: ReadonlyArray<BthWebCommandCenterNavItem>,
+  items: ReadonlyArray<WebCommandCenterNavItem>,
   railNavigationLabel: string,
   onRailItemSelect?: (itemId: string) => void,
 ) {
@@ -406,7 +406,7 @@ function renderRailItems(
   );
 }
 
-export type BthWebCommandCenterFrameProps = {
+export type WebCommandCenterFrameProps = {
   brandLabel: string;
   surfaceTitle: string;
   surfaceSubtitle?: string;
@@ -415,7 +415,7 @@ export type BthWebCommandCenterFrameProps = {
   languageLabel?: string;
   alertCountLabel?: string;
   refreshLabel?: string;
-  topFilters?: ReadonlyArray<BthWebCommandCenterFilter>;
+  topFilters?: ReadonlyArray<WebCommandCenterFilter>;
   onTopFilterSelect?: (filterId: string) => void;
   onBrandClick?: () => void;
   onSearchClick?: () => void;
@@ -425,12 +425,12 @@ export type BthWebCommandCenterFrameProps = {
   railTitle: string;
   railNavigationLabel?: string;
   railStatusLabel?: string;
-  railItems: ReadonlyArray<BthWebCommandCenterNavItem>;
+  railItems: ReadonlyArray<WebCommandCenterNavItem>;
   railSupplementary?: ReactNode;
   children?: ReactNode;
 };
 
-export function BthWebCommandCenterFrame({
+export function WebCommandCenterFrame({
   brandLabel,
   surfaceTitle,
   surfaceSubtitle,
@@ -452,7 +452,7 @@ export function BthWebCommandCenterFrame({
   railItems,
   railSupplementary,
   children,
-}: BthWebCommandCenterFrameProps) {
+}: WebCommandCenterFrameProps) {
   const { direction } = useDirection();
   const uiText = useUiText();
   const panelText = uiText.controlPanel;
@@ -465,7 +465,7 @@ export function BthWebCommandCenterFrame({
     <>
       <WebCommandCenterStyles />
       <main className="bth-web-command-center-root" dir={direction}>
-        <BthWebCommandStrip
+        <WebCommandStrip
           brandLabel={brandLabel}
           searchPlaceholder={resolvedSearchPlaceholder}
           languageLabel={resolvedLanguageLabel}
@@ -504,20 +504,20 @@ export function BthWebCommandCenterFrame({
   );
 }
 
-export type BthWebSegmentedTabItem = {
+export type WebSegmentedTabItem = {
   id: string;
   label: string;
   metaLabel?: string;
   active?: boolean;
 };
 
-export type BthWebSegmentedTabsProps = {
-  items: ReadonlyArray<BthWebSegmentedTabItem>;
+export type WebSegmentedTabsProps = {
+  items: ReadonlyArray<WebSegmentedTabItem>;
   ariaLabel: string;
   onSelect?: (itemId: string) => void;
 };
 
-export function BthWebSegmentedTabs({ items, ariaLabel, onSelect }: BthWebSegmentedTabsProps) {
+export function WebSegmentedTabs({ items, ariaLabel, onSelect }: WebSegmentedTabsProps) {
   const { direction } = useDirection();
 
   return (
@@ -540,23 +540,23 @@ export function BthWebSegmentedTabs({ items, ariaLabel, onSelect }: BthWebSegmen
   );
 }
 
-export type BthWebRailServiceItem = {
+export type WebRailServiceItem = {
   id: string;
   label: string;
   status?: string;
 };
 
-export type BthWebRailServiceListProps = {
+export type WebRailServiceListProps = {
   title: string;
   searchPlaceholder?: string;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
   selectedServiceId?: string;
   onServiceSelect?: (serviceId: string) => void;
-  items: ReadonlyArray<BthWebRailServiceItem>;
+  items: ReadonlyArray<WebRailServiceItem>;
 };
 
-export function BthWebRailServiceList({
+export function WebRailServiceList({
   title,
   searchPlaceholder = 'بحث سريع...',
   searchValue = '',
@@ -564,7 +564,7 @@ export function BthWebRailServiceList({
   selectedServiceId,
   onServiceSelect,
   items,
-}: BthWebRailServiceListProps) {
+}: WebRailServiceListProps) {
   const visibleItems = React.useMemo(() => {
     const value = searchValue.trim().toLowerCase();
 
@@ -602,3 +602,17 @@ export function BthWebRailServiceList({
     </>
   );
 }
+
+export type BthWebCommandCenterFilter = WebCommandCenterFilter;
+export type BthWebCommandCenterNavItem = WebCommandCenterNavItem;
+export type BthWebCommandStripFilter = WebCommandStripFilter;
+export type BthWebCommandStripProps = WebCommandStripProps;
+export const BthWebCommandStrip = WebCommandStrip;
+export type BthWebCommandCenterFrameProps = WebCommandCenterFrameProps;
+export const BthWebCommandCenterFrame = WebCommandCenterFrame;
+export type BthWebSegmentedTabItem = WebSegmentedTabItem;
+export type BthWebSegmentedTabsProps = WebSegmentedTabsProps;
+export const BthWebSegmentedTabs = WebSegmentedTabs;
+export type BthWebRailServiceItem = WebRailServiceItem;
+export type BthWebRailServiceListProps = WebRailServiceListProps;
+export const BthWebRailServiceList = WebRailServiceList;

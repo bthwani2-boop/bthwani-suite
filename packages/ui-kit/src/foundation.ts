@@ -547,8 +547,10 @@ export function createNativeTokenOutput() {
 	};
 }
 
-export const bthTokenCssVariables = createTokenCssVariables();
-export const bthNativeTokenOutput = createNativeTokenOutput();
+export const tokenCssVariables = createTokenCssVariables();
+export const bthTokenCssVariables = tokenCssVariables;
+export const nativeTokenOutput = createNativeTokenOutput();
+export const bthNativeTokenOutput = nativeTokenOutput;
 
 export type ThemeMode = 'light' | 'dark' | 'high-contrast';
 
@@ -779,11 +781,51 @@ export function createNativeThemeOutput(mode: ThemeMode) {
 	};
 }
 
-export const bthThemeModes = Object.freeze(Object.keys(semanticThemeByMode) as ThemeMode[]);
+export const themeModes = Object.freeze(Object.keys(semanticThemeByMode) as ThemeMode[]);
+export const bthThemeModes = themeModes;
 
-export const bthNativeThemeOutputs = Object.freeze(
-	Object.fromEntries(bthThemeModes.map((mode) => [mode, createNativeThemeOutput(mode)])) as Record<ThemeMode, ReturnType<typeof createNativeThemeOutput>>
+export const nativeThemeOutputs = Object.freeze(
+	Object.fromEntries(themeModes.map((mode) => [mode, createNativeThemeOutput(mode)])) as Record<ThemeMode, ReturnType<typeof createNativeThemeOutput>>
 );
+export const bthNativeThemeOutputs = nativeThemeOutputs;
+
+type TamaguiThemeBridge = Record<ThemeMode, Omit<SemanticTheme, 'mode'>>;
+
+function stripThemeMode(theme: SemanticTheme): Omit<SemanticTheme, 'mode'> {
+	const { mode, ...themeTokens } = theme;
+	return themeTokens;
+}
+
+export type TamaguiBridge = {
+	themes: TamaguiThemeBridge;
+	tokens: ReturnType<typeof createNativeTokenOutput>;
+	defaultTheme: 'light';
+	defaultThemeByMode: Record<ThemeMode, 'light' | 'dark'>;
+	logicalDirection: typeof directionConfig;
+};
+
+export type BthTamaguiBridge = TamaguiBridge;
+
+export function createTamaguiBridge(): TamaguiBridge {
+	return {
+		themes: {
+			light: stripThemeMode(lightTheme),
+			dark: stripThemeMode(darkTheme),
+			'high-contrast': stripThemeMode(highContrastTheme)
+		},
+		tokens: nativeTokenOutput,
+		defaultTheme: 'light',
+		defaultThemeByMode: {
+			light: 'light',
+			dark: 'dark',
+			'high-contrast': 'dark'
+		},
+		logicalDirection: directionConfig
+	};
+}
+
+export const tamaguiBridge = createTamaguiBridge();
+export const bthTamaguiBridge = tamaguiBridge;
 
 export type Locale = 'ar' | 'en';
 export type BthLocale = Locale;

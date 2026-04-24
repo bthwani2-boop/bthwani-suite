@@ -3,20 +3,26 @@ import { Ionicons } from '@expo/vector-icons';
 import { type StyleProp, type TextStyle } from 'react-native';
 import { useDirection, useTheme } from '../providers';
 
-export type BthIconTone = 'default' | 'muted' | 'soft' | 'inverse' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+export type IconTone = 'default' | 'muted' | 'soft' | 'inverse' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
-export type BthIconName = React.ComponentProps<typeof Ionicons>['name'];
+export type BthIconTone = IconTone;
 
-export type BthIconProps = {
-  name: BthIconName;
+export type IconName = React.ComponentProps<typeof Ionicons>['name'];
+
+export type BthIconName = IconName;
+
+export type IconProps = {
+  name: IconName;
   size?: number;
-  tone?: BthIconTone;
+  tone?: IconTone;
   color?: string;
   mirrored?: boolean;
   style?: StyleProp<TextStyle>;
 };
 
-export function BthIcon({ name, size = 20, tone = 'default', color, mirrored = false, style }: BthIconProps) {
+export type BthIconProps = IconProps;
+
+export function Icon({ name, size = 20, tone = 'default', color, mirrored = false, style }: IconProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const toneColor = {
@@ -35,3 +41,5 @@ export function BthIcon({ name, size = 20, tone = 'default', color, mirrored = f
 
   return <Ionicons name={name} size={size} color={resolvedColor} style={[shouldMirror ? { transform: [{ scaleX: -1 }] } : undefined, style]} />;
 }
+
+export const BthIcon = Icon;

@@ -3,7 +3,7 @@ import { Animated, Easing, Pressable, ScrollView, View, type StyleProp, type Vie
 import { radius, resolveRowDirection, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Badge, Button } from './button';
-import { BthSurface as Surface, BthText as Text } from '../primitives';
+import { Surface, Text } from '../primitives';
 
 export type TopBarVariant = 'default' | 'surface' | 'brand';
 export type BthTopBarVariant = TopBarVariant;
@@ -24,8 +24,14 @@ export function NewsTickerBar({ statusLabel, message, onPress, variant = 'defaul
   const { theme } = useTheme();
   const isBrand = variant === 'brand';
   const messageLines = isBrand ? 1 : 2;
-  const verticalPadding = isBrand ? 0 : spacing[2];
+  const verticalPadding = isBrand ? spacing[0] : spacing[2];
   const horizontalPadding = isBrand ? spacing[3] : spacing[4];
+  const badgeStyle = isBrand
+    ? {
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderColor: 'rgba(255, 255, 255, 0.95)',
+      }
+    : undefined;
   const marqueeTranslateX = React.useRef(new Animated.Value(0)).current;
   const [viewportWidth, setViewportWidth] = React.useState(0);
   const [copyWidth, setCopyWidth] = React.useState(0);
@@ -51,15 +57,12 @@ export function NewsTickerBar({ statusLabel, message, onPress, variant = 'defaul
     marqueeTranslateX.setValue(marqueeStartOffset);
 
     const loop = Animated.loop(
-      Animated.sequence([
-        Animated.delay(1200),
-        Animated.timing(marqueeTranslateX, {
-          toValue: marqueeEndOffset,
-          duration: marqueeDurationMs,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }),
-      ]),
+      Animated.timing(marqueeTranslateX, {
+        toValue: marqueeEndOffset,
+        duration: marqueeDurationMs,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
       { resetBeforeIteration: true },
     );
 
@@ -77,10 +80,20 @@ export function NewsTickerBar({ statusLabel, message, onPress, variant = 'defaul
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [{ paddingVertical: verticalPadding, paddingHorizontal: horizontalPadding, borderRadius: radius.pill, backgroundColor: isBrand ? 'rgba(255, 255, 255, 0.14)' : theme.surfaceInset, borderWidth: isBrand ? 1 : 0, borderColor: isBrand ? 'rgba(255, 255, 255, 0.14)' : theme.line, opacity: pressed ? 0.9 : 1 }]}
+      style={({ pressed }) => [
+        {
+          paddingVertical: verticalPadding,
+          paddingHorizontal: horizontalPadding,
+          borderRadius: radius.pill,
+          backgroundColor: isBrand ? 'rgba(255, 255, 255, 0.12)' : theme.surfaceInset,
+          borderWidth: isBrand ? 1 : 0,
+          borderColor: isBrand ? 'rgba(255, 255, 255, 0.16)' : theme.line,
+          opacity: pressed ? 0.9 : 1,
+        },
+      ]}
     >
       <View style={{ flexDirection: resolveRowDirection(direction), gap: spacing[2], alignItems: 'center' }}>
-        <Badge label={statusLabel} tone="info" />
+        <Badge label={statusLabel} tone="info" style={badgeStyle} />
         <View style={{ flex: 1, overflow: 'hidden', justifyContent: 'center' }} onLayout={(event) => setViewportWidth(event.nativeEvent.layout.width)}>
           {shouldMarquee ? (
             <Animated.View style={{ flexDirection: 'row', alignItems: 'center', transform: [{ translateX: marqueeTranslateX }] }}>
@@ -215,6 +228,7 @@ export type TopBarAction = {
   icon: React.ReactNode;
   badgeCount?: number;
   mirrorInRtl?: boolean;
+  size?: 'sm' | 'md' | 'lg';
   onPress?: () => void;
   disabled?: boolean;
   accessibilityLabel?: string;
@@ -227,6 +241,8 @@ export type TopBarProps = {
   subtitle?: string;
   locationLabel?: string;
   locationIcon?: React.ReactNode;
+  onTitlePress?: () => void;
+  titleAccessibilityLabel?: string;
   actions?: TopBarAction[];
   trailingAction?: TopBarAction;
   ticker?: NewsTickerBarProps;
@@ -238,38 +254,54 @@ export type TopBarProps = {
 
 export type BthTopBarProps = TopBarProps;
 
-export function TopBar({ title, subtitle, locationLabel, locationIcon, actions = [], trailingAction, ticker, tabs, variant = 'default', contentOffsetY = 0, style }: TopBarProps) {
+export function TopBar({ title, subtitle, locationLabel, locationIcon, onTitlePress, titleAccessibilityLabel, actions = [], trailingAction, ticker, tabs, variant = 'default', contentOffsetY = 0, style }: TopBarProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const isBrand = variant === 'brand';
-  const brandHeadline = isBrand && subtitle ? `${title} ${subtitle}` : title;
+  const resolvedContentOffsetY = contentOffsetY || (isBrand ? spacing[1] : 0);
+  const titleTone = isBrand ? 'inverse' : 'default';
 
   function renderAction(action: TopBarAction) {
     const badgeAnchorStyle = direction === 'rtl' ? { left: -spacing[1] } : { right: -spacing[1] };
     const iconStyle = action.mirrorInRtl && direction === 'rtl' ? { transform: [{ scaleX: -1 }] } : undefined;
     const showBadge = typeof action.badgeCount === 'number' && action.badgeCount > 0;
+    const actionSize = action.size ?? 'md';
+    const actionBoxSize = actionSize === 'lg' ? 44 : actionSize === 'sm' ? 34 : isBrand ? 40 : 36;
+    const iconScale = actionSize === 'lg' ? 1 : actionSize === 'sm' ? 0.88 : 0.94;
 
     return (
-      <Pressable key={action.id} accessibilityRole="button" accessibilityLabel={action.accessibilityLabel} disabled={action.disabled} onPress={action.onPress} style={({ pressed }) => [{ padding: isBrand ? spacing[2] : spacing[2], opacity: action.disabled ? 0.56 : pressed ? 0.9 : 1 }]}>
-        <View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
+      <Pressable key={action.id} accessibilityRole="button" accessibilityLabel={action.accessibilityLabel} disabled={action.disabled} hitSlop={8} onPress={action.onPress} style={({ pressed }) => [{ padding: 0, opacity: action.disabled ? 0.56 : pressed ? 0.92 : 1 }]}>
+        <View style={{ position: 'relative', width: actionBoxSize, height: actionBoxSize, alignItems: 'center', justifyContent: 'center' }}>
           {showBadge ? (
             <View style={[{ position: 'absolute', top: -spacing[1], zIndex: 1 }, badgeAnchorStyle]}>
-              <Badge label={String(action.badgeCount)} tone={isBrand ? 'brand' : 'danger'} />
+              <Badge label={String(action.badgeCount)} tone={isBrand ? 'info' : 'danger'} />
             </View>
           ) : null}
-          <View style={iconStyle}>{action.icon}</View>
+          <View style={[{ alignItems: 'center', justifyContent: 'center', transform: [{ scale: iconScale }] }, iconStyle]}>{action.icon}</View>
         </View>
       </Pressable>
     );
   }
 
   return (
-    <Surface tone={isBrand ? 'brand' : 'raised'} border={!isBrand} padding={isBrand ? 2 : 4} gap={isBrand ? 1 : 3} style={[isBrand ? { backgroundColor: theme.brand, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, paddingBottom: 0 } : undefined, style]}>
+    <Surface tone={isBrand ? 'brand' : 'raised'} border={!isBrand} padding={isBrand ? 2 : 4} gap={isBrand ? 1 : 3} style={[isBrand ? { backgroundColor: theme.brand, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, paddingBottom: spacing[1] } : undefined, style]}>
       {variant !== 'brand' && ticker ? <NewsTickerBar {...ticker} variant={variant} /> : null}
-      <View style={[{ flexDirection: resolveRowDirection(direction), justifyContent: 'space-between', alignItems: locationLabel && isBrand ? 'flex-start' : 'center', gap: spacing[2] }, isBrand && contentOffsetY ? { transform: [{ translateY: contentOffsetY }] } : null]}>
-        <View style={{ flex: 1, gap: isBrand ? spacing[0] : spacing[1] }}>
+      <View style={[{ flexDirection: resolveRowDirection(direction), justifyContent: 'space-between', alignItems: locationLabel && isBrand ? 'flex-start' : 'center', gap: spacing[1] }, resolvedContentOffsetY ? { transform: [{ translateY: resolvedContentOffsetY }] } : null]}>
+        <View style={{ flex: 1, gap: spacing[0] }}>
           {isBrand ? (
-            <Text role="titleSm" tone="inverse" numberOfLines={1}>{brandHeadline}</Text>
+            <Pressable
+              accessibilityRole={onTitlePress ? 'button' : 'text'}
+              accessibilityLabel={titleAccessibilityLabel ?? title}
+              disabled={!onTitlePress}
+              hitSlop={8}
+              onPress={onTitlePress}
+              style={({ pressed }) => [{ opacity: pressed && onTitlePress ? 0.98 : 1 }]}
+            >
+              <Text role="titleSm" tone={titleTone} numberOfLines={1} style={{ flexShrink: 1 }}>
+                {title}
+                {subtitle ? <Text role="bodySm" tone={titleTone} style={{ opacity: 0.92 }}>{` ${subtitle}`}</Text> : null}
+              </Text>
+            </Pressable>
           ) : (
             <>
               <Text role="titleSm" tone="default">{title}</Text>
@@ -277,7 +309,7 @@ export function TopBar({ title, subtitle, locationLabel, locationIcon, actions =
             </>
           )}
           {locationLabel ? (
-            <View style={{ flexDirection: resolveRowDirection(direction), gap: spacing[1], alignItems: 'center' }}>
+            <View style={[{ flexDirection: resolveRowDirection(direction), gap: spacing[1], alignItems: 'center' }, isBrand ? { paddingHorizontal: spacing[2], paddingVertical: spacing[0], borderRadius: radius.pill, backgroundColor: 'rgba(255, 255, 255, 0.12)' } : null]}>
               {locationIcon}
               <Text role="bodySm" tone={isBrand ? 'inverse' : 'muted'} numberOfLines={1}>{locationLabel}</Text>
             </View>
