@@ -1,13 +1,13 @@
 import React from 'react';
 import { View } from 'react-native';
 import {
-  BthButton,
-  BthFormScreenShell,
-  BthKeyValueList,
-  BthListItem,
-  BthSurface,
-  BthSwitch,
-  BthText,
+  Button,
+  FormScreenShell,
+  KeyValueList,
+  ListItem,
+  Surface,
+  Switch,
+  Text,
   spacing,
 } from '@bthwani/ui-kit';
 
@@ -69,16 +69,16 @@ export function ClientSettingsSurface({
   onResetPreferences,
 }: ClientSettingsSurfaceProps) {
   return (
-    <BthFormScreenShell
+    <FormScreenShell
       title="التفضيلات العامة"
       subtitle="هذه الصفحة مخصصة للتفضيلات المشتركة في التطبيق كله"
       submitLabel="إعادة الضبط"
       onSubmit={onResetPreferences}
       submitDisabled={!onResetPreferences}
     >
-      <BthSurface tone="brand" padding={4} gap={3}>
-        <BthText role="titleSm" tone="inverse">ملخص سريع</BthText>
-        <BthKeyValueList
+      <Surface tone="brand" padding={4} gap={3}>
+        <Text role="titleSm" tone="inverse">ملخص سريع</Text>
+        <KeyValueList
           items={[
             { label: 'اللغة الحالية', value: snapshot.languageLabel },
             { label: 'المظهر الحالي', value: snapshot.themeLabel },
@@ -86,33 +86,33 @@ export function ClientSettingsSurface({
             { label: 'الوضع المدمج', value: snapshot.compactModeEnabled ? 'مفعل' : 'معطل' },
           ]}
         />
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="raised" padding={4} gap={3}>
-        <BthText role="titleSm">تفضيلات عامة</BthText>
+      <Surface tone="raised" padding={4} gap={3}>
+        <Text role="titleSm">تفضيلات عامة</Text>
         <View style={{ gap: spacing[3] }}>
-          <BthListItem
+          <ListItem
             title="اللغة"
             subtitle="اختر لغة الواجهة العامة"
             meta={snapshot.languageLabel}
             badgeLabel="عام"
             onPress={onOpenLanguage}
           />
-          <BthListItem
+          <ListItem
             title="المظهر"
             subtitle="الوضع الفاتح أو الداكن أو التلقائي"
             meta={snapshot.themeLabel}
             badgeLabel="عام"
             onPress={onOpenTheme}
           />
-          <BthListItem
+          <ListItem
             title="الخصوصية"
             subtitle="ضوابط عامة للعرض والمشاركة"
             meta={snapshot.privacyModeEnabled ? 'مشددة' : 'عادية'}
             badgeLabel="عام"
             onPress={onOpenPrivacy}
           />
-          <BthListItem
+          <ListItem
             title="إمكانية الوصول"
             subtitle="تسهيلات عامة لقراءة الواجهات والتفاعل معها"
             meta={snapshot.accessibilityModeEnabled ? 'مفعلة' : 'معطلة'}
@@ -120,46 +120,46 @@ export function ClientSettingsSurface({
             onPress={onOpenAccessibility}
           />
         </View>
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="raised" padding={4} gap={3}>
-        <BthText role="titleSm">مفاتيح تشغيل عامة</BthText>
+      <Surface tone="raised" padding={4} gap={3}>
+        <Text role="titleSm">مفاتيح تشغيل عامة</Text>
         <View style={{ gap: spacing[3] }}>
-          <BthSwitch
+          <Switch
             label="الإشعارات العامة"
             description="إظهار أو إخفاء التنبيهات على مستوى التطبيق"
             value={snapshot.notificationsEnabled}
             onValueChange={onToggleNotifications}
           />
-          <BthSwitch
+          <Switch
             label="الوضع المدمج"
             description="تقليل المسافات والكثافة في العرض العام"
             value={snapshot.compactModeEnabled}
             onValueChange={onToggleCompactMode}
           />
-          <BthSwitch
+          <Switch
             label="وضع الخصوصية"
             description="تقليل ظهور التفاصيل العامة أثناء التصفح"
             value={snapshot.privacyModeEnabled}
             onValueChange={onTogglePrivacyMode}
           />
-          <BthSwitch
+          <Switch
             label="تسهيلات الوصول"
             description="زيادة قابلية القراءة والتباين في كل التطبيق"
             value={snapshot.accessibilityModeEnabled}
             onValueChange={onToggleAccessibilityMode}
           />
         </View>
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="inset" padding={4} gap={2}>
-        <BthText role="titleSm">نطاق السطح</BthText>
-        <BthText role="bodySm" tone="muted">
+      <Surface tone="inset" padding={4} gap={2}>
+        <Text role="titleSm">نطاق السطح</Text>
+        <Text role="bodySm" tone="muted">
           هذه الإعدادات عامة ومشتركة بين كل أجزاء التطبيق. أي إعداد محلي لجزء محدد يجب أن يبقى في مساره الخاص.
-        </BthText>
+        </Text>
         <View style={{ gap: spacing[2], marginTop: spacing[2] }}>
           {settingsSummary.map((item) => (
-            <BthListItem
+            <ListItem
               key={item.label}
               title={item.label}
               subtitle={item.helperText}
@@ -167,15 +167,15 @@ export function ClientSettingsSurface({
             />
           ))}
         </View>
-      </BthSurface>
+      </Surface>
 
-      <BthButton
+      <Button
         label="حفظ التفضيلات العامة"
         onPress={onResetPreferences}
         tone="primary"
         disabled={!onResetPreferences}
       />
-    </BthFormScreenShell>
+    </FormScreenShell>
   );
 }
 

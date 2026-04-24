@@ -1,11 +1,11 @@
 import React from 'react';
 import { View } from 'react-native';
 import {
-  BthBadge,
-  BthButton,
-  BthSurface,
-  BthText,
-  BthTextField,
+  Badge,
+  Button,
+  Surface,
+  Text,
+  TextField,
   spacing,
   useTheme,
 } from '@bthwani/ui-kit';
@@ -38,19 +38,19 @@ export function ClientLoginSurface({
   return (
     <View style={{ flex: 1, paddingHorizontal: spacing[5], paddingVertical: spacing[6], justifyContent: 'space-between', backgroundColor: theme.background }}>
       <View style={{ gap: spacing[4], marginTop: spacing[4] }}>
-        <BthBadge label="دخول آمن · 2026" tone="brand" />
+        <Badge label="دخول آمن · 2026" tone="brand" />
         <View style={{ gap: spacing[2] }}>
-          <BthText role="titleLg" style={{ fontSize: 36, lineHeight: 44 }}>
+          <Text role="titleLg" style={{ fontSize: 36, lineHeight: 44 }}>
             دخول موحد
-          </BthText>
-          <BthText role="bodyMd" tone="muted">
+          </Text>
+          <Text role="bodyMd" tone="muted">
             طبقة دخول أهدأ وأكثر نضجًا للوصول إلى حسابك العام، مع مسار منفصل ومحدد للمطور.
-          </BthText>
+          </Text>
         </View>
       </View>
 
       <View style={{ gap: spacing[3] }}>
-        <BthSurface
+        <Surface
           tone="default"
           padding={5}
           gap={4}
@@ -66,14 +66,14 @@ export function ClientLoginSurface({
           }}
         >
           <View style={{ gap: spacing[2] }}>
-            <BthText role="titleSm" tone="inverse">بيانات الدخول</BthText>
-            <BthText role="bodySm" tone="inverse" style={{ opacity: 0.88 }}>
+            <Text role="titleSm" tone="inverse">بيانات الدخول</Text>
+            <Text role="bodySm" tone="inverse" style={{ opacity: 0.88 }}>
               أدخل هويتك العامة ثم أكمل التحقق بخطوة واحدة واضحة.
-            </BthText>
+            </Text>
           </View>
 
           <View style={{ gap: spacing[3] }}>
-            <BthTextField
+            <TextField
               label="رقم الجوال أو البريد"
               value={identityValue}
               onChangeText={onChangeIdentity}
@@ -82,7 +82,7 @@ export function ClientLoginSurface({
               keyboardType="default"
               hint="استخدم بياناتك العامة للدخول الموحد"
             />
-            <BthTextField
+            <TextField
               label="رمز التحقق"
               value={verificationCodeValue}
               onChangeText={onChangeVerificationCode}
@@ -93,25 +93,25 @@ export function ClientLoginSurface({
           </View>
 
           <View style={{ gap: spacing[2] }}>
-            <BthButton label="دخول آمن" onPress={onSubmit} disabled={submitDisabled} size="lg" />
-            <BthButton label="إرسال رمز التحقق" onPress={onRequestCode} tone="secondary" size="md" />
+            <Button label="دخول آمن" onPress={onSubmit} disabled={submitDisabled} size="lg" />
+            <Button label="إرسال رمز التحقق" onPress={onRequestCode} tone="secondary" size="md" />
           </View>
-        </BthSurface>
+        </Surface>
 
-        <BthSurface tone="inset" padding={4} gap={3} border={false} style={{ borderRadius: 24 }}>
+        <Surface tone="inset" padding={4} gap={3} border={false} style={{ borderRadius: 24 }}>
           <View style={{ gap: spacing[1] }}>
-            <BthBadge label="خاص بالمطور" tone="warning" />
-            <BthText role="bodyStrong">مدخل المطور</BthText>
-            <BthText role="bodySm" tone="muted">
+            <Badge label="خاص بالمطور" tone="warning" />
+            <Text role="bodyStrong">مدخل المطور</Text>
+            <Text role="bodySm" tone="muted">
               هذا المسار مخصص للدخول المحلي السريع أثناء الاختبار والتطوير فقط.
-            </BthText>
+            </Text>
           </View>
 
           <View style={{ gap: spacing[2], alignItems: 'flex-start' }}>
-            <BthButton label="دخول المطور المحلي" onPress={onDeveloperLogin} tone="ghost" fullWidth={false} />
-            <BthButton label="العودة إلى الترحيب" onPress={onBack} tone="ghost" fullWidth={false} />
+            <Button label="دخول المطور المحلي" onPress={onDeveloperLogin} tone="ghost" fullWidth={false} />
+            <Button label="العودة إلى الترحيب" onPress={onBack} tone="ghost" fullWidth={false} />
           </View>
-        </BthSurface>
+        </Surface>
       </View>
     </View>
   );

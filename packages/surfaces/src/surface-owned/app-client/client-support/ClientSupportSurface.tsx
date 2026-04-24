@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { BthButton, BthFormScreenShell, BthListItem, BthSurface, BthText, spacing } from '@bthwani/ui-kit';
+import { Button, FormScreenShell, ListItem, Surface, Text, spacing } from '@bthwani/ui-kit';
 
 export type ClientSupportSurfaceProps = {
   faqCount?: number;
@@ -20,35 +20,35 @@ export function ClientSupportSurface({
   onSendFeedback,
 }: ClientSupportSurfaceProps) {
   return (
-    <BthFormScreenShell
+    <FormScreenShell
       title="مركز الدعم العام"
       subtitle="مركز مساعدة موحد للتطبيق كله"
       submitLabel="تواصل الآن"
       onSubmit={onContactSupport}
       submitDisabled={!onContactSupport}
     >
-      <BthSurface tone="brand" padding={4} gap={3}>
-        <BthText role="titleSm" tone="inverse">ملخص الدعم</BthText>
+      <Surface tone="brand" padding={4} gap={3}>
+        <Text role="titleSm" tone="inverse">ملخص الدعم</Text>
         <View style={{ gap: spacing[3] }}>
-          <BthListItem title="الأسئلة الشائعة" subtitle="إجابات عامة على مستوى التطبيق" meta={`${faqCount} عنصر`} badgeLabel="عام" onPress={onOpenFaq} />
-          <BthListItem title="التذاكر" subtitle="متابعة الحالات العامة المفتوحة" meta={`${ticketCount} حالة`} badgeLabel="عام" onPress={onOpenTickets} />
-          <BthListItem title="إرسال ملاحظة" subtitle="ملاحظات أو اقتراحات عامة" meta="عام" badgeLabel="عام" onPress={onSendFeedback} />
+          <ListItem title="الأسئلة الشائعة" subtitle="إجابات عامة على مستوى التطبيق" meta={`${faqCount} عنصر`} badgeLabel="عام" onPress={onOpenFaq} />
+          <ListItem title="التذاكر" subtitle="متابعة الحالات العامة المفتوحة" meta={`${ticketCount} حالة`} badgeLabel="عام" onPress={onOpenTickets} />
+          <ListItem title="إرسال ملاحظة" subtitle="ملاحظات أو اقتراحات عامة" meta="عام" badgeLabel="عام" onPress={onSendFeedback} />
         </View>
-      </BthSurface>
+      </Surface>
 
-      <BthSurface tone="inset" padding={4} gap={2}>
-        <BthText role="titleSm">مبادئ الدعم العام</BthText>
-        <BthText role="bodySm" tone="muted">
+      <Surface tone="inset" padding={4} gap={2}>
+        <Text role="titleSm">مبادئ الدعم العام</Text>
+        <Text role="bodySm" tone="muted">
           هذا السطح يخدم التطبيق كله. أي مساعدة أو سياسة أو طلب محلي يجب أن ينتقل إلى مساره الخاص.
-        </BthText>
-      </BthSurface>
+        </Text>
+      </Surface>
 
       <View style={{ gap: spacing[3] }}>
-        <BthButton label="الأسئلة الشائعة" onPress={onOpenFaq} tone="secondary" />
-        <BthButton label="التذاكر العامة" onPress={onOpenTickets} tone="secondary" />
-        <BthButton label="إرسال feedback" onPress={onSendFeedback} tone="ghost" fullWidth={false} />
+        <Button label="الأسئلة الشائعة" onPress={onOpenFaq} tone="secondary" />
+        <Button label="التذاكر العامة" onPress={onOpenTickets} tone="secondary" />
+        <Button label="إرسال feedback" onPress={onSendFeedback} tone="ghost" fullWidth={false} />
       </View>
-    </BthFormScreenShell>
+    </FormScreenShell>
   );
 }
 
