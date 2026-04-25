@@ -41,6 +41,7 @@ export type BoxBackground =
 	| 'backgroundAlt'
 	| 'brand'
 	| 'brandSurface'
+	| 'brandHeaderBackground'
 	| 'successSurface'
 	| 'warningSurface'
 	| 'dangerSurface'
@@ -145,18 +146,21 @@ export function Divider({ color, style }: DividerProps) {
 
 declare const process: { env: { NODE_ENV?: string } };
 
-export type SurfaceTone = 'default' | 'raised' | 'inset' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+type SurfaceVariant = 'default' | 'raised' | 'inset' | 'brandHeader' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
-const surfaceToneLaw: Record<SurfaceTone, { background: BoxBackground; borderTone: BoxBorderTone; elevationToken: ElevationToken }> = {
+const surfaceToneLaw: Record<SurfaceVariant, { background: BoxBackground; borderTone: BoxBorderTone; elevationToken: ElevationToken }> = {
 	default: { background: 'surface', borderTone: 'line', elevationToken: 'flat' },
 	raised: { background: 'surfaceRaised', borderTone: 'lineStrong', elevationToken: 'raised' },
 	inset: { background: 'surfaceInset', borderTone: 'line', elevationToken: 'flat' },
+	brandHeader: { background: 'brandHeaderBackground', borderTone: 'brand', elevationToken: 'flat' },
 	brand: { background: 'brandSurface', borderTone: 'brand', elevationToken: 'flat' },
 	success: { background: 'successSurface', borderTone: 'success', elevationToken: 'flat' },
 	warning: { background: 'warningSurface', borderTone: 'warning', elevationToken: 'flat' },
 	danger: { background: 'dangerSurface', borderTone: 'danger', elevationToken: 'flat' },
 	info: { background: 'infoSurface', borderTone: 'info', elevationToken: 'flat' }
-};
+} as const;
+
+export type SurfaceTone = SurfaceVariant;
 
 export type SurfaceProps = {
 	children?: React.ReactNode;
@@ -164,7 +168,7 @@ export type SurfaceProps = {
 	gap?: SpacingToken;
 	radiusToken?: RadiusToken;
 	elevationToken?: ElevationToken;
-	tone?: SurfaceTone;
+	tone?: SurfaceVariant;
 	border?: boolean;
 	borderToken?: BorderToken;
 	borderTone?: 'line' | 'lineStrong' | 'brand' | 'success' | 'warning' | 'danger' | 'info';

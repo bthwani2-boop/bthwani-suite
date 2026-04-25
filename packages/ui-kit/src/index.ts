@@ -189,11 +189,13 @@ export {
 	ListItem,
 	LoadingState,
 	Modal,
+	BannerCarousel,
 	NewsTickerBar,
 	OptionRow,
 	ProductCard,
 	Radio,
 	SearchField,
+	SearchTopBar,
 	ScreenHeader,
 	SectionHeader,
 	SelectField,
@@ -244,6 +246,9 @@ export type {
 	DashboardShellProps,
 	DataTableColumn,
 	DataTableProps,
+	BannerCarouselItem,
+	BannerCarouselProps,
+	BannerCarouselVariant,
 	DetailScreenShellProps,
 	DialogAction,
 	DialogProps,
@@ -264,6 +269,7 @@ export type {
 	ProductCardPrice,
 	ProductCardProps,
 	RadioProps,
+	SearchTopBarProps,
 	SelectFieldProps,
 	SelectOption,
 	SegmentedControlProps,
@@ -295,6 +301,3 @@ export type {
 	SummaryCardProps,
 	SummaryItem,
 } from './components';
-
-
-

@@ -1,11 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { resolveSeedMediaSource } from '@bthwani/media-fixtures';
-import { Image, Pressable, ScrollView, StyleSheet, TextInput, View, type ImageSourcePropType } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
 
 import {
   Box,
   Icon,
+  BannerCarousel,
+  SearchTopBar,
   StateView,
   Surface,
   Text,
@@ -29,10 +31,6 @@ import {
   StoreCardPremium,
   type DshStoreCompactCardData,
 } from '../components/StoreCardPremium';
-import {
-  HomeBannerCarousel,
-  type HomeBannerCarouselItem,
-} from '../components/HomeBannerCarousel';
 import {
   dshCategoryFixtures,
   DSH_CATEGORY_ICONS,
@@ -159,9 +157,9 @@ type DshServiceId = 'dsh' | 'knz' | 'amn' | 'arb' | 'wlt' | 'esf' | 'kwd' | 'mrf
 
 const serviceDialAnchorLayout: DialAnchorLayout = {
   x: spacing[3],
-  y: spacing[14],
-  width: 40,
-  height: 40,
+  y: spacing[15],
+  width: 48,
+  height: 48,
 };
 
 const serviceDialItems: CategoryDialItem[] = [
@@ -232,9 +230,9 @@ const serviceDialItems: CategoryDialItem[] = [
 
 const serviceLauncherMarkStyles = StyleSheet.create({
   root: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#fff7f0',
     alignItems: 'center',
     justifyContent: 'center',
@@ -246,25 +244,25 @@ const serviceLauncherMarkStyles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    borderRadius: 15,
+    borderRadius: 18,
     borderWidth: 2,
     borderColor: '#173a6a',
     borderTopColor: '#ff6a00',
   },
   needle: {
     position: 'absolute',
-    top: 4,
-    right: 5,
-    width: 5,
-    height: 12,
+    top: 5,
+    right: 6,
+    width: 6,
+    height: 14,
     borderRadius: 999,
     backgroundColor: '#173a6a',
     transform: [{ rotate: '24deg' }],
   },
   planeWrap: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#ffffff',
@@ -477,6 +475,7 @@ export function DshHomeGetScreen({
 }: DshHomeGetScreenProps) {
   const { direction, language: resolvedLanguage } = useDirection();
   const currentLanguage = resolvedLanguage ?? 'ar';
+  const { width: viewportWidth } = useWindowDimensions();
   const { theme } = useTheme();
   const uiText = useUiText();
   const styles = React.useMemo(() => createStyles(direction), [direction]);
@@ -741,7 +740,6 @@ export function DshHomeGetScreen({
   const activePromo = promos[activePromoIndex % promos.length] ?? dshHomeGetFixturePromos[0];
   const promoDiscount = activePromo.subtitle.match(/\d+%/)?.[0] ?? '30%';
   const promoTail = activePromo.subtitle.replace(promoDiscount, '').trim();
-  const tickerMessage = `${activePromo.title} • ${activePromo.subtitle}`;
   const tickerAction = resolveBannerPress(activePromo);
 
   const resolveVideoCtaPress = React.useCallback(
@@ -833,7 +831,7 @@ export function DshHomeGetScreen({
 
   const approvedVideoReels = approvedVideoShorts.length > 0 ? approvedVideoShorts : [];
   // Marketing-driven banner carousel items: promos are the single source of truth for banner content and routing.
-  const bannerItems: HomeBannerCarouselItem[] = promos.map((promo) => ({
+  const bannerItems = promos.map((promo) => ({
     id: promo.id,
     title: promo.title,
     subtitle: promo.subtitle,
@@ -907,34 +905,24 @@ export function DshHomeGetScreen({
   return (
     <View style={styles.screenRoot}>
       {inlineSearchVisible ? (
-        <View style={styles.inlineSearchHeader}>
-          <View style={[styles.inlineSearchHeaderRow, direction === 'rtl' && { flexDirection: 'row-reverse' }]}>
-            <Pressable style={styles.inlineSearchCloseButton} onPress={closeInlineSearch}>
-              <Ionicons name="close-outline" size={20} color="#111827" />
-            </Pressable>
-            <View style={styles.inlineSearchInputWrap}>
-              <Ionicons name="search-outline" size={18} color="#ff6a00" />
-              <TextInput
-                value={inlineSearchQuery}
-                onChangeText={setInlineSearchQuery}
-                placeholder="ابحث عن متجر أو فئة داخل DSH"
-                placeholderTextColor="#94a3b8"
-                style={styles.inlineSearchInput}
-                textAlign={direction === 'rtl' ? 'right' : 'left'}
-                autoFocus
-              />
-            </View>
-          </View>
-          <Text role="caption" style={styles.inlineSearchHint}>
-            بحث عام سريع داخل تجربة DSH الحالية للوصول إلى المتاجر والمسارات بدون مغادرة الصفحة.
-          </Text>
-        </View>
+        <SearchTopBar
+          value={inlineSearchQuery}
+          onChangeText={setInlineSearchQuery}
+          onClose={closeInlineSearch}
+          variant="main"
+          autoFocus
+          placeholder="ابحث عن متجر أو فئة داخل DSH"
+          hint="بحث عام سريع داخل تجربة DSH الحالية للوصول إلى المتاجر والمسارات بدون مغادرة الصفحة."
+          style={styles.brandTopBarShell}
+        />
       ) : (
         <TopBar
-          variant="brand"
+          variant="main"
+          layoutMode="relaxed-main"
           title={uiText.topBar.brandName}
           subtitle={uiText.topBar.brandTagline}
           onTitlePress={handleOpenMySpace}
+          contentOffsetY={spacing[1]}
           locationLabel={uiText.topBar.location}
           locationIcon={<Icon name="location-outline" size={14} color="#FFFFFF" />}
           actions={[
@@ -966,25 +954,19 @@ export function DshHomeGetScreen({
           ]}
           ticker={{
             statusLabel: tickerState.statusLabel,
-            message: tickerMessage,
+            message: tickerState.message,
             onPress: tickerAction,
             marquee: true,
             marqueeDurationMs: 36000,
+            trailingAction: {
+              accessibilityLabel: 'الخدمات',
+              onPress: openServiceDial,
+              icon: <DshServiceLauncherMark />,
+            },
           }}
-          style={styles.brandTopBarOffset}
+          style={styles.brandTopBarShell}
         />
       )}
-
-      {!inlineSearchVisible ? (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="الخدمات"
-          onPress={openServiceDial}
-          style={({ pressed }) => [styles.serviceLauncherButton, { opacity: pressed ? 0.9 : 1 }]}
-        >
-          <DshServiceLauncherMark />
-        </Pressable>
-      ) : null}
 
       <ScrollView
         style={{ flex: 1 }}
@@ -1001,9 +983,13 @@ export function DshHomeGetScreen({
             </Text>
           </Surface>
         ) : (
-          <Surface tone="raised" padding={0} gap={0} radiusToken="xl" style={{ overflow: 'hidden' }}>
-            <HomeBannerCarousel banners={bannerItems} height={256} />
-          </Surface>
+          <BannerCarousel
+            banners={bannerItems}
+            height={184}
+            variant="secondary"
+            width={viewportWidth}
+            style={styles.bannerCarouselFullBleed}
+          />
         )}
 
         {showSheinInline ? (
@@ -1448,56 +1434,16 @@ function createStyles(direction: Direction) {
   brandTopBarOffset: {
     marginTop: spacing[0],
   },
-  serviceLauncherButton: {
-    position: 'absolute',
-    zIndex: 5,
-    left: spacing[3],
-    top: spacing[14],
+  brandTopBarShell: {
+    marginTop: spacing[0],
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    overflow: 'hidden',
+    paddingTop: spacing[2],
+    paddingBottom: spacing[2],
   },
-  inlineSearchHeader: {
-    backgroundColor: '#ff6a00',
-    paddingHorizontal: 14,
-    paddingTop: 14,
-    paddingBottom: 12,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
-    gap: 8,
-  },
-  inlineSearchHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  inlineSearchInputWrap: {
-    flex: 1,
-    height: 46,
-    borderRadius: 16,
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#ffd3ad',
-    paddingHorizontal: 12,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 8,
-  },
-  inlineSearchInput: {
-    flex: 1,
-    color: '#111827',
-    fontSize: 14,
-    fontWeight: '700',
-    paddingVertical: 0,
-  },
-  inlineSearchCloseButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  inlineSearchHint: {
-    color: '#fff7ed',
-    lineHeight: 16,
+  bannerCarouselFullBleed: {
+    marginHorizontal: -spacing[3],
   },
   activeOrderStatusLabel: {
     color: '#6b7280',

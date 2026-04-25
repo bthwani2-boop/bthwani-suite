@@ -567,6 +567,11 @@ export type SemanticTheme = {
 	brand: string;
 	brandContrast: string;
 	brandSurface: string;
+	brandHeaderBackground: string;
+	brandHeaderSurface: string;
+	brandHeaderSurfaceStrong: string;
+	brandHeaderStroke: string;
+	brandHeaderStatusBar: string;
 	success: string;
 	successSurface: string;
 	successText: string;
@@ -606,6 +611,11 @@ export const lightTheme: SemanticTheme = {
 	brand: brandColorRoles.brand,
 	brandContrast: colorPalette.white,
 	brandSurface: brandColorRoles.brandSurface,
+	brandHeaderBackground: brandColorRoles.brand,
+	brandHeaderSurface: withAlpha(colorPalette.white, 0.08),
+	brandHeaderSurfaceStrong: withAlpha(colorPalette.white, 0.14),
+	brandHeaderStroke: withAlpha(colorPalette.white, 0.16),
+	brandHeaderStatusBar: brandColorRoles.brand,
 	success: colorPalette.success,
 	successSurface: colorPalette.successSoft,
 	successText: colorPalette.successStrong,
@@ -645,6 +655,11 @@ export const darkTheme: SemanticTheme = {
 	brand: '#FF500D',
 	brandContrast: '#FFFFFF',
 	brandSurface: withAlpha('#FF500D', 0.16),
+	brandHeaderBackground: '#FF500D',
+	brandHeaderSurface: withAlpha('#FFFFFF', 0.08),
+	brandHeaderSurfaceStrong: withAlpha('#FFFFFF', 0.14),
+	brandHeaderStroke: withAlpha('#FFFFFF', 0.18),
+	brandHeaderStatusBar: '#FF500D',
 	success: '#4ADE80',
 	successSurface: withAlpha('#4ADE80', 0.16),
 	successText: '#BBF7D0',
@@ -684,6 +699,11 @@ export const highContrastTheme: SemanticTheme = {
 	brand: '#FFD60A',
 	brandContrast: '#000000',
 	brandSurface: '#FFD60A',
+	brandHeaderBackground: '#FF500D',
+	brandHeaderSurface: withAlpha('#FFFFFF', 0.12),
+	brandHeaderSurfaceStrong: withAlpha('#FFFFFF', 0.2),
+	brandHeaderStroke: '#FFFFFF',
+	brandHeaderStatusBar: '#FF500D',
 	success: '#7CFC00',
 	successSurface: '#0F2F00',
 	successText: '#FFFFFF',

@@ -21,7 +21,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { resolveSeedMediaSource, type SeedMediaKey } from '@bthwani/media-fixtures';
-import { Button, Chip, HighlightsRail, Icon, TopBar, StateView, Text, Toast, colorPalette, useDirection, useUiText, ProductCard } from '@bthwani/ui-kit';
+import { BannerCarousel, Button, Chip, Icon, SearchTopBar, TopBar, StateView, Text, Toast, colorPalette, useDirection, useUiText, ProductCard, type BannerCarouselItem } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../../shared/catalog/catalog';
 import { formatDshStoreFollowersLabel } from '../../shared/store-profile';
 import { storeItemsByStoreId, type DshStoreFixtureItem as DshStoreGetMenuItem } from '../fixtures';
@@ -1227,7 +1227,7 @@ export function DshStoreGetScreen({
     }
   }, [changeCategory, firstVisibleItem, onOpenBenefits, openStoreItemPreview]);
 
-  const smartRailItems = React.useMemo(() => {
+  const smartRailItems = React.useMemo<BannerCarouselItem[]>(() => {
     const featureImages = menuItems.map((item) => resolveDshStoreMenuItemImageSource(item));
     const pickFeatureImage = (index: number) => featureImages[index] ?? resolveDshStoreCoverImageSource(store);
 
@@ -1238,8 +1238,7 @@ export function DshStoreGetScreen({
             title: 'وصل حديثاً',
             subtitle: normalizedPriceMatchLabel,
             badge: getStatusLabel(store.statusLabel, storeText),
-            image: pickFeatureImage(0),
-            emoji: '🔥',
+            image: pickFeatureImage(0) ?? null,
             cta: 'معاينة',
             onPress: () => openStoreItemPreview(firstVisibleItem),
           }
@@ -1250,8 +1249,7 @@ export function DshStoreGetScreen({
             title: 'موصى به',
             subtitle: normalizedFollowersLabel ?? 'الأكثر تفاعلاً في هذا المتجر',
             badge: 'رائج',
-            image: pickFeatureImage(1),
-            emoji: '⭐',
+            image: pickFeatureImage(1) ?? null,
             cta: 'افتح',
             onPress: () => openStoreItemPreview(firstOfferItem),
           }
@@ -1262,8 +1260,7 @@ export function DshStoreGetScreen({
             title: 'الجديد الآن',
             subtitle: 'استعرض أحدث العناصر داخل المتجر',
             badge: 'جديد',
-            image: pickFeatureImage(2),
-            emoji: '🆕',
+            image: pickFeatureImage(2) ?? null,
             cta: 'صفِّ',
             onPress: () => changeCategory('new'),
           }
@@ -1273,12 +1270,11 @@ export function DshStoreGetScreen({
         title: normalizeTagLabel(chip, storeText),
         subtitle: 'ميزة مرتبطة بهذا المتجر',
         badge: chip.includes('برو') || chip.includes('أولوية') ? 'اشتراك' : chip.includes('كوبون') || chip.includes('خصم') || chip.includes('عرض') ? 'عرض' : 'ميزة',
-        image: pickFeatureImage(index + 3),
-        emoji: chip.includes('برو') || chip.includes('أولوية') ? '⭐' : chip.includes('كوبون') || chip.includes('خصم') || chip.includes('عرض') ? '💸' : '✨',
+        image: pickFeatureImage(index + 3) ?? null,
         cta: 'افتح',
         onPress: () => resolveFeaturePress(chip),
       })),
-    ].filter(Boolean) as Array<{ id: string; title: string; subtitle: string; badge?: string; cta?: string; image?: string; emoji?: string; onPress?: () => void }>;
+    ].filter(Boolean) as BannerCarouselItem[];
 
     const productDriven = menuItems
       .filter((item) => item.isAvailable !== false)
@@ -1288,8 +1284,7 @@ export function DshStoreGetScreen({
         title: normalizeDisplayText(item.name),
         subtitle: normalizeDisplayText(item.statusLabel ?? item.subtitle),
         badge: normalizeDisplayText(item.categoryLabel),
-        image: resolveDshStoreMenuItemImageSource(item),
-        emoji: getItemEmoji(item),
+        image: resolveDshStoreMenuItemImageSource(item) ?? null,
         cta: 'تفاصيل',
         onPress: () => openStoreItemPreview(item),
       }));
@@ -1300,37 +1295,19 @@ export function DshStoreGetScreen({
   return (
     <View style={styles.screen}>
       {headerSearchVisible ? (
-        <View style={styles.inlineSearchShell}>
-          <View style={[styles.inlineSearchRow, isRTL && styles.rowReverse]}>
-            <TouchableOpacity
-              style={styles.inlineSearchCloseButton}
-              onPress={closeInlineSearch}
-              activeOpacity={0.85}
-            >
-              <Ionicons name="close-outline" size={20} color={stylesTokens.dark} />
-            </TouchableOpacity>
-
-            <View style={styles.inlineSearchFieldWrap}>
-              <Ionicons name="search-outline" size={18} color={stylesTokens.orange} />
-              <TextInput
-                value={headerSearchQuery}
-                onChangeText={setHeaderSearchQuery}
-                placeholder={`ابحث داخل ${normalizedStoreName}`}
-                placeholderTextColor="#94a3b8"
-                style={styles.inlineSearchInput}
-                autoFocus
-                returnKeyType="search"
-                textAlign="right"
-              />
-            </View>
-          </View>
-
-          <Text style={[styles.inlineSearchHint, isRTL && styles.textAlignRight]}>
-            {`بحث محلي داخل ${normalizedStoreName} فقط للوصول السريع إلى الأصناف.`}
-          </Text>
-        </View>
+        <SearchTopBar
+          value={headerSearchQuery}
+          onChangeText={setHeaderSearchQuery}
+          onClose={closeInlineSearch}
+          variant="secondary"
+          autoFocus
+          placeholder={`ابحث داخل ${normalizedStoreName}`}
+          hint={`بحث محلي داخل ${normalizedStoreName} فقط للوصول السريع إلى الأصناف.`}
+        />
       ) : (
         <TopBar
+          variant="secondary"
+          layoutMode="balanced-secondary"
           title={normalizedStoreName}
           actions={[
             {
@@ -1462,10 +1439,10 @@ export function DshStoreGetScreen({
                       </View>
 
                       {smartRailItems.length ? (
-                        <HighlightsRail
-                          items={smartRailItems}
-                          maxItems={15}
-                          variant="mediaCompact"
+                        <BannerCarousel
+                          banners={smartRailItems}
+                          height={166}
+                          variant="secondary"
                           style={styles.smartRailSection}
                         />
                       ) : null}
@@ -1624,7 +1601,7 @@ export function DshStoreGetScreen({
                         (() => {
                           const overlayColor = getOverlayColor(normalizeDisplayText(stagingPreviewItem.name), 0.86);
                           return (
-                            <View style={[styles.previewDetailsBox, { backgroundColor: overlayColor, flexDirection: isRTL ? 'row-reverse' : 'row' }]}> 
+                            <View style={[styles.previewDetailsBox, { backgroundColor: overlayColor, flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                               <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]}>
                                 {store ? <Text style={[styles.previewStoreName, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizedStoreName}</Text> : null}
                                 <Text style={[styles.previewDetailsTitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(stagingPreviewItem.name)}</Text>
@@ -1686,7 +1663,7 @@ export function DshStoreGetScreen({
                     (() => {
                       const overlayColor = getOverlayColor(normalizeDisplayText(previewItem!.name), 0.86);
                       return (
-                        <View style={[styles.previewDetailsBox, { backgroundColor: overlayColor, flexDirection: isRTL ? 'row-reverse' : 'row' }]}> 
+                        <View style={[styles.previewDetailsBox, { backgroundColor: overlayColor, flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                           <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]}>
                             {store ? <Text style={[styles.previewStoreName, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizedStoreName}</Text> : null}
                             <Text style={[styles.previewDetailsTitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.name)}</Text>
