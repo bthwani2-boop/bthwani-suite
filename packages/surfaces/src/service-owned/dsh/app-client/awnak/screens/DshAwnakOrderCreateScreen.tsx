@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import { Box, Button, FormScreenShell, SectionHeader, StateView, Surface, Tabs, Text, TextField } from '@bthwani/ui-kit';
 
 export type DshAwnakOrderCreateScreenState = 'ready' | 'loading' | 'disabled';
@@ -166,43 +166,22 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
 
   if (embedded) {
     return (
-      <Modal visible transparent animationType="slide" onRequestClose={onClose}>
-        <Pressable style={{ flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.42)', justifyContent: 'flex-end' }} onPress={onClose}>
-          <Pressable
-            onPress={(event) => event.stopPropagation()}
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderTopLeftRadius: 28,
-              borderTopRightRadius: 28,
-              paddingHorizontal: 18,
-              paddingTop: 14,
-              paddingBottom: 18,
-              maxHeight: '88%',
-              shadowColor: '#000',
-              shadowOpacity: 0.16,
-              shadowRadius: 24,
-              shadowOffset: { width: 0, height: -6 },
-              elevation: 18,
-            }}
-          >
-            <Box gap={2}>
-              <Box style={{ alignSelf: 'center', width: 54, height: 5, borderRadius: 999, backgroundColor: '#D6DDE8' }} />
-              <Box gap={1}>
-                <Text role="titleSm">طلب عونك</Text>
-                <Text role="bodySm" tone="muted">
-                  نفس أسلوب SHEIN: داخل نفس الصفحة ولوح سفلي خفيف.
-                </Text>
-              </Box>
-            </Box>
+      <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 24, overflow: 'hidden' }}>
+        <Box gap={1}>
+          <Text role="titleSm">طلب عونك</Text>
+          <Text role="bodySm" tone="muted">
+            نموذج يدوي داخل نفس الصفحة بدون bottom sheet.
+          </Text>
+        </Box>
 
-            <Box gap={2}>
-              {formFields}
+        {onClose ? <Button label="إخفاء" tone="secondary" size="sm" fullWidth={false} onPress={onClose} /> : null}
 
-              <Button label={submitLabel} tone="primary" onPress={handleSubmit} disabled={isDisabled} />
-            </Box>
-          </Pressable>
-        </Pressable>
-      </Modal>
+        <Box gap={2}>
+          {formFields}
+
+          <Button label={submitLabel} tone="primary" onPress={handleSubmit} disabled={isDisabled} />
+        </Box>
+      </Surface>
     );
   }
 

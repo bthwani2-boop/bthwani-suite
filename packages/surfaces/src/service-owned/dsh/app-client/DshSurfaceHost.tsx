@@ -90,6 +90,7 @@ type PublishedCategoryItem = {
   id: string;
   label: string;
   subtitle: string;
+  renderMode?: 'stores' | 'manual-order';
   countLabel: string;
 };
 

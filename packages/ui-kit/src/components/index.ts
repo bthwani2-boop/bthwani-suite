@@ -8,6 +8,8 @@ export { StoreCardPremium } from './store-card';
 export type { ServiceToken, StoreCardPremiumItem, StoreCardPremiumProps } from './store-card';
 export { BannerCarousel } from './banner';
 export type { BannerCarouselItem, BannerCarouselProps, BannerCarouselVariant } from './banner';
+export { CategoryOrbitCarousel, OrbitCarousel, ServiceOrbitCarousel } from './orbit-carousel';
+export type { OrbitAnchorLayout, OrbitCarouselItem, OrbitCarouselPlacement, OrbitCarouselProps } from './orbit-carousel';
 export { AmountInput, Checkbox, FormScreenShell, OptionRow, Radio, SearchField, SegmentedControl, SelectField, Switch, TextField, PaymentMethodList, QuickAmountGrid, SummaryCard } from './field';
 export type { AmountInputProps, CheckboxProps, FormScreenShellProps, OptionRowProps, RadioProps, SelectFieldProps, SelectOption, SegmentedControlProps, SegmentedOption, SwitchProps, TextFieldProps, PaymentMethod, PaymentMethodListProps, QuickAmountGridProps, SummaryCardProps, SummaryItem } from './field';
 export { Icon } from './icons';

@@ -4,6 +4,7 @@ import { FlatList, Image, Pressable, ScrollView, StyleSheet, View, useWindowDime
 
 import {
   Box,
+  CategoryOrbitCarousel,
   Icon,
   BannerCarousel,
   SearchTopBar,
@@ -18,6 +19,9 @@ import {
   resolveTextAlign,
   sizes,
   spacing,
+  ServiceOrbitCarousel,
+  type OrbitAnchorLayout,
+  type OrbitCarouselItem,
   type Direction,
   useDirection,
   useTheme,
@@ -29,10 +33,6 @@ import {
   DshHomeApprovedVideoReelsViewer,
   type DshHomeApprovedVideoReelsViewerProps,
 } from '../components/DshHomeApprovedVideoReelsViewer';
-import CategoryClockDial, {
-  type CategoryDialItem,
-  type DialAnchorLayout,
-} from '../components/CategoryClockDial';
 import { getDshCategoryIconUrl } from '../../categories/utils/getDshCategoryIconUrl';
 import { resolveDshImageSource } from '../../shared/resolve-image-source';
 import type { MarketingGrowthRecord } from '../../../shared/marketing/growth-store';
@@ -44,6 +44,10 @@ function resolveDshHomeStoreImageSource(imageUri?: string): ImageSourcePropType 
 function resolveDshHomeBannerImageSource(imageUrl?: string): ImageSourcePropType | undefined {
   return resolveDshImageSource(imageUrl);
 }
+
+type CategoryDialItem = OrbitCarouselItem;
+type DialAnchorLayout = OrbitAnchorLayout;
+
 export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
   categories?: DshHomeCategory[];
@@ -82,6 +86,7 @@ export type DshHomeCategory = {
   label: string;
   subtitle?: string;
   countLabel?: string;
+  renderMode?: 'stores' | 'manual-order';
   subcategories?: Array<{
     id: string;
     label: string;
@@ -95,6 +100,7 @@ type DiscoveryFilter = 'all' | 'favorites' | 'nearest' | 'new' | 'offers';
 
 type StorePagerPage = {
   categoryId: string;
+  renderMode: 'stores' | 'manual-order';
   stores: DshHomeGetStore[];
 };
 
@@ -554,11 +560,17 @@ export function DshHomeGetScreen({
   }, [activeFilter, favoriteToggles, inlineSearchQuery, resolvedStores]);
 
   const storePagerItems = React.useMemo<StorePagerPage[]>(() => (
-    categoryPageIds.map((categoryId) => ({
-      categoryId,
-      stores: resolveStoresForCategory(categoryId),
-    }))
-  ), [categoryPageIds, resolveStoresForCategory]);
+    categoryPageIds.map((categoryId) => {
+      const category = categoryItems.find((entry) => entry.id === categoryId);
+      const renderMode = category?.renderMode ?? 'stores';
+
+      return {
+        categoryId,
+        renderMode,
+        stores: renderMode === 'manual-order' ? [] : resolveStoresForCategory(categoryId),
+      };
+    })
+  ), [categoryItems, categoryPageIds, resolveStoresForCategory]);
 
   const storePagerPageWidth = React.useMemo(
     () => Math.max(300, Math.round((viewportWidth - spacing[3] * 2) * 0.9)),
@@ -893,9 +905,6 @@ export function DshHomeGetScreen({
     }));
   }, [categoryItems]);
 
-  const showSheinInline = sheinInlineVisible;
-  const showAwnakInline = awnakInlineVisible;
-
   const activeCategoryDialItem = React.useMemo<CategoryDialItem | null>(() => {
     if (!selectedCategoryFixture) {
       return null;
@@ -928,6 +937,18 @@ export function DshHomeGetScreen({
     });
   }, []);
 
+  React.useEffect(() => {
+    if (sheinInlineVisible) {
+      selectCategoryPage('shein');
+    }
+  }, [selectCategoryPage, sheinInlineVisible]);
+
+  React.useEffect(() => {
+    if (awnakInlineVisible) {
+      selectCategoryPage('awnak');
+    }
+  }, [awnakInlineVisible, selectCategoryPage]);
+
   return (
     <View style={styles.screenRoot}>
       {inlineSearchVisible ? (
@@ -950,7 +971,8 @@ export function DshHomeGetScreen({
           onTitlePress={handleOpenMySpace}
           locationLabel={uiText.topBar.location}
           locationIcon={<Icon name="location-outline" size={12} color="#FFFFFF" />}
-          actionsOffsetY={spacing[1]}
+          contentOffsetY={spacing[2]}
+          actionsOffsetY={spacing[2]}
           actions={[
             {
               id: 'my-space',
@@ -1015,18 +1037,6 @@ export function DshHomeGetScreen({
             width={viewportWidth}
             style={styles.bannerCarouselFullBleed}
           />
-        ) : null}
-
-        {showSheinInline ? (
-          <Box gap={3}>
-            <DshSheinOrderCreateScreen embedded onClose={onCloseSheinInline} />
-          </Box>
-        ) : null}
-
-        {showAwnakInline ? (
-          <Box gap={3}>
-            <DshAwnakOrderCreateScreen embedded onClose={onCloseAwnakInline} />
-          </Box>
         ) : null}
 
         <View style={styles.categoriesSelectorSection}>
@@ -1277,7 +1287,27 @@ export function DshHomeGetScreen({
                 contentContainerStyle={{ gap: spacing[2], paddingBottom: spacing[1] }}
                 style={{ flex: 1 }}
               >
-                {item.stores.length ? (
+                {item.renderMode === 'manual-order' ? (
+                  <Box gap={3}>
+                    {item.categoryId === 'shein' ? (
+                      <DshSheinOrderCreateScreen
+                        embedded
+                        onClose={() => {
+                          onCloseSheinInline?.();
+                          selectCategoryPage('all');
+                        }}
+                      />
+                    ) : item.categoryId === 'awnak' ? (
+                      <DshAwnakOrderCreateScreen
+                        embedded
+                        onClose={() => {
+                          onCloseAwnakInline?.();
+                          selectCategoryPage('all');
+                        }}
+                      />
+                    ) : null}
+                  </Box>
+                ) : item.stores.length ? (
                   item.stores.map((store, index) => {
                     const card: StoreCardPremiumItem = {
                       id: store.id,
@@ -1361,7 +1391,7 @@ export function DshHomeGetScreen({
           style={{ height: storePagerHeight, marginTop: spacing[2] }}
         />
 
-        <CategoryClockDial
+        <CategoryOrbitCarousel
           visible={categoriesSheetVisible}
           anchorLayout={categoriesDialLayout}
           items={categoriesDialItems}
@@ -1380,7 +1410,7 @@ export function DshHomeGetScreen({
           }}
         />
 
-        <CategoryClockDial
+        <ServiceOrbitCarousel
           visible={serviceDialVisible}
           anchorLayout={serviceDialAnchorLayout}
           items={serviceDialItems}

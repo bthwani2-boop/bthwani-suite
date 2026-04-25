@@ -9,6 +9,7 @@ export type DshCategoryFixture = {
   label: string;
   subtitle: string;
   subcategories: DshCategorySubcategoryFixture[];
+  renderMode?: 'stores' | 'manual-order';
 };
 
 export const dshCategoryFixtures: DshCategoryFixture[] = [
@@ -73,6 +74,7 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
     label: 'عونك',
     subtitle: 'خدمات ومشاوير محلية',
     subcategories: [],
+    renderMode: 'manual-order',
   },
   {
     id: 'gas_refill',
@@ -89,6 +91,7 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
     label: 'شي ان',
     subtitle: 'طلبات من شي إن (شراء وتوصيل)',
     subcategories: [],
+    renderMode: 'manual-order',
   },
   {
     id: 'spare_parts',
@@ -114,6 +117,7 @@ export const dshCategoryListFixtures = dshCategoryFixtures.map((category) => ({
   id: category.id,
   label: category.label,
   subtitle: category.subtitle,
+  renderMode: category.renderMode,
   countLabel: category.subcategories.length > 0 ? `${category.subcategories.length} فئات فرعية` : 'فئة رئيسية',
 }));
 
