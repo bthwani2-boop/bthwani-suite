@@ -63,6 +63,12 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
     subcategories: [],
   },
   {
+    id: 'cloud_kitchens',
+    label: 'مطابخ سحابية',
+    subtitle: 'مطابخ مجهزة ووجبات يومية سريعة',
+    subcategories: [],
+  },
+  {
     id: 'awnak',
     label: 'عونك',
     subtitle: 'خدمات ومشاوير محلية',
@@ -121,6 +127,7 @@ export const DSH_CATEGORY_ICONS: Record<string, string> = {
   anaqati: '👗',
   wani_store: '🏪',
   home_projects: '🏠',
+  cloud_kitchens: '🍳',
   awnak: '🤝',
   gas_refill: '⛽',
   shein: '🛍️',

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
+import { FlatList, Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ImageSourcePropType, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 
 import {
   Box,
@@ -92,6 +92,11 @@ export type DshHomeCategory = {
 export type DshHomeBannerActionType = 'main_category' | 'sub_category' | 'store' | 'external' | 'store_category' | 'product' | 'subscription';
 
 type DiscoveryFilter = 'all' | 'favorites' | 'nearest' | 'new' | 'offers';
+
+type StorePagerPage = {
+  categoryId: string;
+  stores: DshHomeGetStore[];
+};
 
 export type DshHomeGetPromo = {
   id: string;
@@ -269,6 +274,7 @@ const categoryIconMap: Record<string, string> = {
   anaqati: '👗',
   wani_store: '🏪',
   home_projects: '🏠',
+  cloud_kitchens: '🍳',
   awnak: '🤝',
   gas_refill: '⛽',
   shein: '🛍️',
@@ -459,7 +465,7 @@ export function DshHomeGetScreen({
 }: DshHomeGetScreenProps) {
   const { direction, language: resolvedLanguage } = useDirection();
   const currentLanguage = resolvedLanguage ?? 'ar';
-  const { width: viewportWidth } = useWindowDimensions();
+  const { width: viewportWidth, height: viewportHeight } = useWindowDimensions();
   const { theme } = useTheme();
   const uiText = useUiText();
   const styles = React.useMemo(() => createStyles(direction), [direction]);
@@ -467,7 +473,7 @@ export function DshHomeGetScreen({
   const [categoriesSheetVisible, setCategoriesSheetVisible] = React.useState(false);
   const [categoriesDialLayout, setCategoriesDialLayout] = React.useState<DialAnchorLayout | null>(null);
   const [activeFilter, setActiveFilter] = React.useState<DiscoveryFilter>('all');
-  const [activeCategoryId, setActiveCategoryId] = React.useState<string | null>(null);
+  const [activeCategoryId, setActiveCategoryId] = React.useState<string>('all');
   const [activeSubcategoryId, setActiveSubcategoryId] = React.useState<string | null>(null);
   const [activePromoIndex, setActivePromoIndex] = React.useState(0);
   const [favoriteToggles, setFavoriteToggles] = React.useState<Record<string, boolean>>({});
@@ -491,68 +497,18 @@ export function DshHomeGetScreen({
   const resolvedPromos = promos ?? [];
   const resolvedStores = stores ?? [];
   const resolvedRecentOrders = recentOrders ?? [];
+  const storePagerRef = React.useRef<FlatList<StorePagerPage> | null>(null);
 
   const categoryItems = React.useMemo(() => {
     return resolvedCategories;
   }, [resolvedCategories]);
-  const selectedCategoryFixture = React.useMemo(
-    () =>
-      activeCategoryId && activeCategoryId !== 'all'
-        ? categoryItems.find((category) => category.id === activeCategoryId) ?? null
-        : null,
-    [activeCategoryId, categoryItems]
-  );
-  const selectedCategoryLabel =
-    selectedCategoryFixture?.label ??
-    'الفئات';
-  const selectedSubcategories = selectedCategoryFixture?.subcategories ?? [];
-  React.useEffect(() => {
-    if (!categoryItems.length) {
-      return;
-    }
 
-    if (!activeCategoryId || activeCategoryId === 'all') {
-      return;
-    }
+  const categoryPageIds = React.useMemo(() => ['all', ...categoryItems.map((category) => category.id)], [categoryItems]);
 
-    if (!categoryItems.some((category) => category.id === activeCategoryId)) {
-      setActiveCategoryId(categoryItems[0].id);
-      setActiveSubcategoryId(null);
-    }
-  }, [activeCategoryId, categoryItems]);
-  const allCategoryRailItems = React.useMemo(
-    () =>
-      categoryItems.map((category) => ({
-        ...category,
-        icon: categoryIconMap[category.id] ?? '📂',
-      })),
-    [categoryItems]
-  );
-
-  React.useEffect(() => {
-    if (resolvedPromos.length <= 1) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setActivePromoIndex((current) => (current + 1) % resolvedPromos.length);
-    }, 3800);
-
-    return () => clearInterval(interval);
-  }, [resolvedPromos]);
-
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const visibleStores = React.useMemo(() => {
+  const resolveStoresForCategory = React.useCallback((categoryId: string) => {
     const categoryScopedStores =
-      activeCategoryId && activeCategoryId !== 'all'
-        ? resolvedStores.filter((store) => (store.categoryId ? store.categoryId === activeCategoryId : true))
+      categoryId && categoryId !== 'all'
+        ? resolvedStores.filter((store) => (store.categoryId ? store.categoryId === categoryId : false))
         : resolvedStores;
 
     const filteredByMode = categoryScopedStores.filter((store) => {
@@ -595,7 +551,107 @@ export function DshHomeGetScreen({
 
       return haystack.includes(normalizedQuery);
     });
-  }, [activeCategoryId, activeFilter, favoriteToggles, inlineSearchQuery, resolvedStores]);
+  }, [activeFilter, favoriteToggles, inlineSearchQuery, resolvedStores]);
+
+  const storePagerItems = React.useMemo<StorePagerPage[]>(() => (
+    categoryPageIds.map((categoryId) => ({
+      categoryId,
+      stores: resolveStoresForCategory(categoryId),
+    }))
+  ), [categoryPageIds, resolveStoresForCategory]);
+
+  const storePagerPageWidth = React.useMemo(
+    () => Math.max(300, Math.round((viewportWidth - spacing[3] * 2) * 0.9)),
+    [viewportWidth],
+  );
+  const storePagerPageGap = spacing[2];
+  const storePagerSnapInterval = storePagerPageWidth + storePagerPageGap;
+  const storePagerHeight = React.useMemo(
+    () => Math.max(460, Math.min(Math.round(viewportHeight * 0.56), 760)),
+    [viewportHeight],
+  );
+
+  const selectCategoryPage = React.useCallback((categoryId: string, animated = true) => {
+    setActiveCategoryId(categoryId);
+    setActiveSubcategoryId(null);
+
+    const nextIndex = storePagerItems.findIndex((page) => page.categoryId === categoryId);
+    if (nextIndex < 0) {
+      return;
+    }
+
+    try {
+      storePagerRef.current?.scrollToIndex({ index: nextIndex, animated });
+    } catch {
+      storePagerRef.current?.scrollToOffset({ offset: nextIndex * storePagerSnapInterval, animated });
+    }
+  }, [storePagerItems, storePagerSnapInterval]);
+
+  const handleStorePagerMomentumEnd = React.useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const nextIndex = Math.round(event.nativeEvent.contentOffset.x / storePagerSnapInterval);
+    const nextCategoryId = storePagerItems[nextIndex]?.categoryId;
+
+    if (!nextCategoryId || nextCategoryId === activeCategoryId) {
+      return;
+    }
+
+    setActiveCategoryId(nextCategoryId);
+    setActiveSubcategoryId(null);
+  }, [activeCategoryId, storePagerItems, storePagerSnapInterval]);
+
+  const selectedCategoryFixture = React.useMemo(
+    () =>
+      activeCategoryId && activeCategoryId !== 'all'
+        ? categoryItems.find((category) => category.id === activeCategoryId) ?? null
+        : null,
+    [activeCategoryId, categoryItems]
+  );
+  const selectedCategoryLabel =
+    selectedCategoryFixture?.label ??
+    'الفئات';
+  const selectedSubcategories = selectedCategoryFixture?.subcategories ?? [];
+  React.useEffect(() => {
+    if (!categoryItems.length) {
+      return;
+    }
+
+    if (!activeCategoryId || activeCategoryId === 'all') {
+      return;
+    }
+
+    if (!categoryItems.some((category) => category.id === activeCategoryId)) {
+      setActiveCategoryId('all');
+      setActiveSubcategoryId(null);
+    }
+  }, [activeCategoryId, categoryItems]);
+  const allCategoryRailItems = React.useMemo(
+    () =>
+      categoryItems.map((category) => ({
+        ...category,
+        icon: categoryIconMap[category.id] ?? '📂',
+      })),
+    [categoryItems]
+  );
+
+  React.useEffect(() => {
+    if (resolvedPromos.length <= 1) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setActivePromoIndex((current) => (current + 1) % resolvedPromos.length);
+    }, 3800);
+
+    return () => clearInterval(interval);
+  }, [resolvedPromos]);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   if (state !== 'ready') {
     return renderState(state, onRetry);
@@ -1091,8 +1147,7 @@ export function DshHomeGetScreen({
               },
             ]}
             onPress={() => {
-              setActiveCategoryId('all');
-              setActiveSubcategoryId(null);
+              selectCategoryPage('all');
             }}
           >
             <View style={styles.filterChipContent}>
@@ -1173,8 +1228,7 @@ export function DshHomeGetScreen({
                   },
                 ]}
                 onPress={() => {
-                  setActiveCategoryId(category.id);
-                  setActiveSubcategoryId(null);
+                  selectCategoryPage(category.id);
                   if (category.id === 'awnak') {
                     onOpenCategory?.('awnak');
                     return;
@@ -1210,59 +1264,102 @@ export function DshHomeGetScreen({
           </ScrollView>
         </View>
 
-        <Box gap={2}>
-          {visibleStores.map((store, index) => {
-            const card: StoreCardPremiumItem = {
-              id: store.id,
-              name: store.name,
-              subtitle: store.address,
-              image: resolveDshHomeStoreImageSource(store.mediaKey),
-              rating: store.rating ?? null,
-              distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
-              isOpen: store.statusTone === 'open',
-              supportsPickup: true,
-              supportsPartnerDelivery: true,
-              serviceTokens: [
-                { label: store.deliveryLabel },
-                { label: store.serviceLabel },
-              ],
-              isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
-              isFollowing: followToggles[store.id] ?? store.isFollowing,
-              followersCount: followCounts[store.id] ?? store.followerCount,
-              hasBthwaniPro: store.hasOffer !== false,
-              subscriptionPackageChips: store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel],
-              hasNewProducts: store.hasOffer === true,
-              hasOffer: store.hasOffer,
-              offerText: store.offerLabel,
-              pointsMultiplier: Number.parseInt(store.multiplierLabel.replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
-              hasCouponAvailable: store.hasOffer === false,
-            };
+        <FlatList
+          ref={storePagerRef}
+          horizontal
+          data={storePagerItems}
+          keyExtractor={(item) => item.categoryId}
+          renderItem={({ item }) => (
+            <View style={{ width: storePagerPageWidth, marginEnd: storePagerPageGap, height: storePagerHeight }}>
+              <ScrollView
+                nestedScrollEnabled
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ gap: spacing[2], paddingBottom: spacing[1] }}
+                style={{ flex: 1 }}
+              >
+                {item.stores.length ? (
+                  item.stores.map((store, index) => {
+                    const card: StoreCardPremiumItem = {
+                      id: store.id,
+                      name: store.name,
+                      subtitle: store.address,
+                      image: resolveDshHomeStoreImageSource(store.mediaKey),
+                      rating: store.rating ?? null,
+                      distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
+                      isOpen: store.statusTone === 'open',
+                      supportsPickup: true,
+                      supportsPartnerDelivery: true,
+                      serviceTokens: [
+                        { label: store.deliveryLabel },
+                        { label: store.serviceLabel },
+                      ],
+                      isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
+                      isFollowing: followToggles[store.id] ?? store.isFollowing,
+                      followersCount: followCounts[store.id] ?? store.followerCount,
+                      hasBthwaniPro: store.hasOffer !== false,
+                      subscriptionPackageChips: store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel],
+                      hasNewProducts: store.hasOffer === true,
+                      hasOffer: store.hasOffer,
+                      offerText: store.offerLabel,
+                      pointsMultiplier: Number.parseInt(store.multiplierLabel.replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
+                      hasCouponAvailable: store.hasOffer === false,
+                    };
 
-            return (
-              <StoreCardPremium
-                key={store.id}
-                item={card}
-                onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
-                onToggleFavorite={(id) => {
-                  setFavoriteToggles((current) => ({
-                    ...current,
-                    [id]: !(current[id] ?? store.isFavorite),
-                  }));
-                }}
-                onToggleFollow={(id) => {
-                  const isFollowing = followToggles[id] ?? store.isFollowing;
-                  const baseCount = followCounts[id] ?? store.followerCount;
-                  setFollowToggles((current) => ({ ...current, [id]: !isFollowing }));
-                  setFollowCounts((current) => ({
-                    ...current,
-                    [id]: isFollowing ? Math.max(0, baseCount - 1) : baseCount + 1,
-                  }));
-                }}
-                onPressSubscriptionChip={openInlineSearch}
-              />
-            );
+                    return (
+                      <StoreCardPremium
+                        key={store.id}
+                        item={card}
+                        onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
+                        onToggleFavorite={(id) => {
+                          setFavoriteToggles((current) => ({
+                            ...current,
+                            [id]: !(current[id] ?? store.isFavorite),
+                          }));
+                        }}
+                        onToggleFollow={(id) => {
+                          const isFollowing = followToggles[id] ?? store.isFollowing;
+                          const baseCount = followCounts[id] ?? store.followerCount;
+                          setFollowToggles((current) => ({ ...current, [id]: !isFollowing }));
+                          setFollowCounts((current) => ({
+                            ...current,
+                            [id]: isFollowing ? Math.max(0, baseCount - 1) : baseCount + 1,
+                          }));
+                        }}
+                        onPressSubscriptionChip={openInlineSearch}
+                      />
+                    );
+                  })
+                ) : (
+                  <View style={styles.emptyFeed}>
+                    <Text style={styles.emptyFeedEmoji}>{inlineSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
+                    <Text style={styles.emptyFeedTitle}>
+                      {inlineSearchQuery.trim() ? 'لا توجد نتائج داخل هذه الفئة' : 'لا توجد متاجر لهذه الفئة بعد'}
+                    </Text>
+                    <Text style={styles.emptyFeedText}>
+                      {inlineSearchQuery.trim()
+                        ? 'جرّب تغيير البحث أو انتقل إلى فئة أخرى.'
+                        : 'أضف fixtures لهذه الفئة كي تظهر هنا.'}
+                    </Text>
+                  </View>
+                )}
+              </ScrollView>
+            </View>
+          )}
+          showsHorizontalScrollIndicator={false}
+          nestedScrollEnabled
+          decelerationRate="fast"
+          snapToInterval={storePagerSnapInterval}
+          snapToAlignment="start"
+          disableIntervalMomentum
+          contentContainerStyle={{ paddingHorizontal: spacing[3] }}
+          getItemLayout={(_, index) => ({
+            length: storePagerSnapInterval,
+            offset: storePagerSnapInterval * index,
+            index,
           })}
-        </Box>
+          onMomentumScrollEnd={handleStorePagerMomentumEnd}
+          style={{ height: storePagerHeight, marginTop: spacing[2] }}
+        />
 
         <CategoryClockDial
           visible={categoriesSheetVisible}
@@ -1270,8 +1367,7 @@ export function DshHomeGetScreen({
           items={categoriesDialItems}
           onClose={() => setCategoriesSheetVisible(false)}
           onSelect={(item) => {
-            setActiveCategoryId(item.key);
-            setActiveSubcategoryId(null);
+            selectCategoryPage(item.key);
             setCategoriesSheetVisible(false);
             if (item.key === 'awnak') {
               onOpenCategory?.('awnak');

@@ -386,6 +386,7 @@ export type TopBarAction = {
 export type TopBarProps = {
   title: string;
   subtitle?: string;
+  titleSlot?: React.ReactNode;
   locationLabel?: string;
   locationIcon?: React.ReactNode;
   onTitlePress?: () => void;
@@ -401,7 +402,7 @@ export type TopBarProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-export function TopBar({ title, subtitle, locationLabel, locationIcon, onTitlePress, titleAccessibilityLabel, actions = [], trailingAction, ticker, tabs, variant = 'default', layoutMode = 'default', contentOffsetY = 0, actionsOffsetY = 0, style }: TopBarProps) {
+export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon, onTitlePress, titleAccessibilityLabel, actions = [], trailingAction, ticker, tabs, variant = 'default', layoutMode = 'default', contentOffsetY = 0, actionsOffsetY = 0, style }: TopBarProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const isMain = isMainHeaderVariant(variant);
@@ -504,12 +505,12 @@ export function TopBar({ title, subtitle, locationLabel, locationIcon, onTitlePr
   );
 
   const centeredSecondaryTitle = (
-    <View style={{ flex: 1, minWidth: 0, gap: spacing[0], alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing[1] }}>
-      <Text role="titleSm" tone={titleTone} numberOfLines={1} align="center">
+    <View style={{ width: '100%', minWidth: 0, gap: spacing[0], alignItems: 'center', justifyContent: 'center' }}>
+      <Text role="titleSm" tone={titleTone} numberOfLines={1} align="center" style={{ flexShrink: 1, minWidth: 0, width: '100%' }}>
         {title}
       </Text>
       {subtitle ? (
-        <Text role="bodySm" tone="muted" numberOfLines={1} align="center">
+        <Text role="bodySm" tone="muted" numberOfLines={1} align="center" style={{ flexShrink: 1, minWidth: 0, width: '100%' }}>
           {subtitle}
         </Text>
       ) : null}
@@ -526,6 +527,7 @@ export function TopBar({ title, subtitle, locationLabel, locationIcon, onTitlePr
 
   if (!isMain) {
     const titleInset = spacing[2];
+    const resolvedSecondaryTitle = titleSlot ?? centeredSecondaryTitle;
     return (
       <Surface tone="raised" border padding={3} gap={2} style={[surfaceStyle, style]}>
         <StatusBar animated barStyle="dark-content" backgroundColor={theme.surface} />
@@ -534,23 +536,21 @@ export function TopBar({ title, subtitle, locationLabel, locationIcon, onTitlePr
           <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center', flexShrink: 0, width: balancedSideWidth, justifyContent: 'flex-start' }}>
             {actions.map(renderAction)}
           </View>
-          <View style={{ flex: 1, minWidth: 0, position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
-            <View style={{ position: 'absolute', left: titleInset, right: titleInset, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' }} pointerEvents="box-none">
-              {onTitlePress ? (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={titleAccessibilityLabel ?? title}
-                  disabled={!onTitlePress}
-                  hitSlop={8}
-                  onPress={onTitlePress}
-                  style={({ pressed }) => [{ opacity: pressed ? 0.98 : 1, alignItems: 'center', justifyContent: 'center', flex: 1, minWidth: 0 }]}
-                >
-                  {centeredSecondaryTitle}
-                </Pressable>
-              ) : (
-                centeredSecondaryTitle
-              )}
-            </View>
+          <View style={{ flex: 1, minWidth: 0, paddingHorizontal: titleInset, alignItems: 'center', justifyContent: 'center' }}>
+            {onTitlePress ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={titleAccessibilityLabel ?? title}
+                disabled={!onTitlePress}
+                hitSlop={8}
+                onPress={onTitlePress}
+                style={({ pressed }) => [{ opacity: pressed ? 0.98 : 1, alignItems: 'center', justifyContent: 'center', width: '100%', minWidth: 0 }]}
+              >
+                {resolvedSecondaryTitle}
+              </Pressable>
+            ) : (
+              resolvedSecondaryTitle
+            )}
           </View>
           <View style={{ flexShrink: 0, width: balancedSideWidth, alignItems: 'flex-end', justifyContent: 'center' }}>
             {trailingAction ? renderAction(trailingAction) : <View style={{ width: 40, height: 40 }} />}

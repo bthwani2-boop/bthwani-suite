@@ -23,6 +23,9 @@ export type BannerCarouselProps = {
   variant?: BannerCarouselVariant;
   width?: number;
   height?: number;
+  fullBleed?: boolean;
+  itemWidth?: number;
+  itemGap?: number;
   autoPlayInterval?: number;
   resumeAfterMs?: number;
   onBannerPress?: (item: BannerCarouselItem) => void;
@@ -43,6 +46,9 @@ export function BannerCarousel({
   variant = 'main',
   width: widthProp,
   height = 172,
+  fullBleed = false,
+  itemWidth,
+  itemGap,
   autoPlayInterval = DEFAULT_AUTO_PLAY_INTERVAL_MS,
   resumeAfterMs = DEFAULT_RESUME_AFTER_MS,
   onBannerPress,
@@ -53,6 +59,8 @@ export function BannerCarousel({
   const { width: windowWidth } = useWindowDimensions();
   const [measuredWidth, setMeasuredWidth] = React.useState(0);
   const isSecondary = variant === 'secondary';
+  const isCompactSecondary = isSecondary && height <= 104;
+  const isPeekSecondary = isSecondary && !fullBleed;
 
   const resolvedWidth = widthProp ?? measuredWidth ?? windowWidth;
   const isRtl = direction === 'rtl';
@@ -70,12 +78,15 @@ export function BannerCarousel({
   const autoplayTimerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const resumeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const cardInset = isSecondary ? CARD_INSET : 0;
-  const itemGap = isSecondary ? ITEM_GAP : 0;
-  const centerCardWidth = Math.max(0, resolvedWidth - cardInset);
-  const snapInterval = centerCardWidth + itemGap;
+  const defaultSecondaryInset = isPeekSecondary ? CARD_INSET : 0;
+  const defaultSecondaryGap = isPeekSecondary ? ITEM_GAP : 0;
+  const resolvedItemWidth = itemWidth ?? Math.max(0, resolvedWidth - defaultSecondaryInset);
+  const resolvedItemGap = itemGap ?? defaultSecondaryGap;
+  const snapInterval = resolvedItemWidth + resolvedItemGap;
   const horizontalPadding = isSecondary ? Math.max(0, resolvedWidth / 2 - snapInterval / 2) : 0;
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const decelerationRate = isSecondary ? 'normal' : 'fast';
+  const snapAlignment = isSecondary ? 'center' : 'start';
+  const styles = React.useMemo(() => createStyles(theme, isCompactSecondary), [theme, isCompactSecondary]);
   const snapOffsets = React.useMemo(
     () => Array.from({ length: loopedCount }, (_, index) => index * snapInterval),
     [loopedCount, snapInterval],
@@ -247,31 +258,31 @@ export function BannerCarousel({
 
       const scale = scrollX.interpolate({
         inputRange,
-        outputRange: [0.9, 0.95, 1, 0.95, 0.9],
+        outputRange: isSecondary ? [0.94, 0.985, 1, 0.985, 0.94] : [0.9, 0.95, 1, 0.95, 0.9],
         extrapolate: 'clamp',
       });
 
       const opacity = scrollX.interpolate({
         inputRange,
-        outputRange: [0.62, 0.8, 1, 0.8, 0.62],
+        outputRange: isSecondary ? [0.78, 0.9, 1, 0.9, 0.78] : [0.62, 0.8, 1, 0.8, 0.62],
         extrapolate: 'clamp',
       });
 
       const translateX = scrollX.interpolate({
         inputRange,
-        outputRange: [-8, -4, 0, 4, 8],
+        outputRange: isSecondary ? [-5, -2, 0, 2, 5] : [-8, -4, 0, 4, 8],
         extrapolate: 'clamp',
       });
 
       const shadowOpacity = scrollX.interpolate({
         inputRange,
-        outputRange: [0.08, 0.13, 0.2, 0.13, 0.08],
+        outputRange: isSecondary ? [0.06, 0.1, 0.16, 0.1, 0.06] : [0.08, 0.13, 0.2, 0.13, 0.08],
         extrapolate: 'clamp',
       });
 
       const mediaShift = scrollX.interpolate({
         inputRange,
-        outputRange: [-6, -3, 0, 3, 6],
+        outputRange: isSecondary ? [-3, -1, 0, 1, 3] : [-6, -3, 0, 3, 6],
         extrapolate: 'clamp',
       });
 
@@ -300,7 +311,7 @@ export function BannerCarousel({
       return (
         <View style={[styles.itemWrap, { width: snapInterval, height }]}>
           <Pressable
-            style={{ width: centerCardWidth, height }}
+            style={{ width: resolvedItemWidth, height }}
             onPress={() => {
               item.onPress?.();
               onBannerPress?.(item);
@@ -312,7 +323,7 @@ export function BannerCarousel({
                 styles.card,
                 isSecondary ? styles.cardSecondary : styles.cardMain,
                 {
-                  width: centerCardWidth,
+                  width: resolvedItemWidth,
                   height,
                   backgroundColor: cardBackground,
                 },
@@ -409,7 +420,7 @@ export function BannerCarousel({
         </View>
       );
     },
-    [centerCardWidth, height, onBannerPress, pauseAutoplay, scrollX, snapInterval, styles, theme],
+    [height, onBannerPress, pauseAutoplay, resolvedItemWidth, scrollX, snapInterval, styles, theme],
   );
 
   const handleLayout = React.useCallback(
@@ -429,7 +440,7 @@ export function BannerCarousel({
   }
 
   return (
-    <View onLayout={handleLayout} style={[styles.root, { width: widthProp ?? '100%', height: height + (isSecondary ? spacing[4] : 0) }, style]}>
+    <View onLayout={handleLayout} style={[styles.root, { width: widthProp ?? '100%', height: height + (isSecondary ? (isCompactSecondary ? spacing[2] : spacing[4]) : 0) }, style]}>
       <Animated.FlatList
         ref={listRef}
         horizontal
@@ -438,11 +449,15 @@ export function BannerCarousel({
         renderItem={renderItem}
         showsHorizontalScrollIndicator={false}
         bounces={false}
-        decelerationRate="fast"
-        snapToOffsets={snapOffsets}
-        snapToAlignment={isSecondary ? 'center' : 'start'}
+        decelerationRate={decelerationRate}
+        snapToInterval={snapInterval}
+        snapToAlignment={snapAlignment}
         disableIntervalMomentum
-        contentContainerStyle={{ paddingHorizontal: horizontalPadding, paddingVertical: isSecondary ? spacing[1] : 0, flexDirection: 'row' }}
+        contentContainerStyle={{
+          paddingHorizontal: horizontalPadding,
+          paddingVertical: isSecondary ? (isCompactSecondary ? spacing[0] : spacing[1]) : 0,
+          flexDirection: 'row',
+        }}
         initialScrollIndex={count > 1 ? 1 : 0}
         getItemLayout={(_: unknown, index: number) => ({
           length: snapInterval,
@@ -481,7 +496,16 @@ export function BannerCarousel({
   );
 }
 
-function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
+function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSecondary: boolean) {
+  const secondaryCardRadius = isCompactSecondary ? 22 : 30;
+  const secondaryOverlayPadding = isCompactSecondary ? 10 : 18;
+  const secondaryOverlayGap = isCompactSecondary ? 6 : 10;
+  const secondaryCopyGap = isCompactSecondary ? 2 : 4;
+  const secondaryBadgePaddingVertical = isCompactSecondary ? 2 : spacing[1];
+  const secondaryBadgePaddingHorizontal = isCompactSecondary ? spacing[1] : spacing[2];
+  const secondaryCtaPaddingVertical = isCompactSecondary ? 2 : spacing[1];
+  const secondaryCtaPaddingHorizontal = isCompactSecondary ? spacing[2] : spacing[3];
+
   return StyleSheet.create({
     root: {
       overflow: 'visible',
@@ -514,7 +538,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
       backgroundColor: 'transparent',
     },
     cardSecondary: {
-      borderRadius: 30,
+      borderRadius: secondaryCardRadius,
       borderWidth: 1,
       borderColor: theme.line,
       shadowOpacity: 0.1,
@@ -529,120 +553,120 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     imageFallback: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: theme.surfaceRaised,
-      padding: 18,
+      padding: isCompactSecondary ? 12 : 18,
       justifyContent: 'center',
     },
     imageFallbackSecondary: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: theme.surfaceRaised,
-      padding: 18,
+      padding: isCompactSecondary ? 12 : 18,
       justifyContent: 'space-between',
     },
     fallbackContent: {
-      gap: 6,
+      gap: isCompactSecondary ? 4 : 6,
       alignItems: 'center',
     },
     secondaryFallbackContent: {
       ...StyleSheet.absoluteFillObject,
-      padding: 18,
+      padding: secondaryOverlayPadding,
       justifyContent: 'space-between',
       alignItems: 'stretch',
       backgroundColor: 'rgba(2,6,23,0.22)',
     },
     fallbackTitle: {
       color: '#ffffff',
-      fontSize: 25,
+      fontSize: isCompactSecondary ? 18 : 25,
       fontWeight: '800',
-      lineHeight: 30,
+      lineHeight: isCompactSecondary ? 22 : 30,
       textAlign: 'center',
     },
     fallbackSubtitle: {
       color: 'rgba(255,255,255,0.96)',
-      fontSize: 15,
+      fontSize: isCompactSecondary ? 11 : 15,
       fontWeight: '600',
-      lineHeight: 19,
+      lineHeight: isCompactSecondary ? 14 : 19,
       textAlign: 'center',
     },
     overlay: {
       ...StyleSheet.absoluteFillObject,
       justifyContent: 'center',
-      padding: 22,
+      padding: isCompactSecondary ? 14 : 22,
       backgroundColor: 'rgba(2,6,23,0.22)',
-      gap: 6,
+      gap: isCompactSecondary ? 4 : 6,
       alignItems: 'center',
     },
     secondaryOverlay: {
       ...StyleSheet.absoluteFillObject,
       justifyContent: 'space-between',
-      padding: 18,
+      padding: secondaryOverlayPadding,
       backgroundColor: 'rgba(2,6,23,0.26)',
-      gap: 10,
+      gap: secondaryOverlayGap,
     },
     secondaryTopRow: {
       alignItems: 'center',
       justifyContent: 'space-between',
-      gap: 10,
+      gap: secondaryOverlayGap,
     },
     secondaryCopyBlock: {
-      gap: 4,
+      gap: secondaryCopyGap,
       alignItems: 'center',
       justifyContent: 'center',
       paddingHorizontal: 4,
     },
     overlayTitle: {
       color: '#ffffff',
-      fontSize: 23,
+      fontSize: isCompactSecondary ? 18 : 23,
       fontWeight: '800',
-      lineHeight: 28,
+      lineHeight: isCompactSecondary ? 22 : 28,
       textAlign: 'center',
     },
     overlaySubtitle: {
       color: 'rgba(255,255,255,0.96)',
-      fontSize: 14,
+      fontSize: isCompactSecondary ? 11 : 14,
       fontWeight: '600',
-      lineHeight: 18,
+      lineHeight: isCompactSecondary ? 14 : 18,
       textAlign: 'center',
     },
     secondaryOverlayTitle: {
       color: '#ffffff',
-      fontSize: 20,
+      fontSize: isCompactSecondary ? 15 : 20,
       fontWeight: '800',
-      lineHeight: 24,
+      lineHeight: isCompactSecondary ? 18 : 24,
       textAlign: 'center',
     },
     secondaryOverlaySubtitle: {
       color: 'rgba(255,255,255,0.92)',
-      fontSize: 13,
+      fontSize: isCompactSecondary ? 11 : 13,
       fontWeight: '600',
-      lineHeight: 17,
+      lineHeight: isCompactSecondary ? 14 : 17,
       textAlign: 'center',
     },
     secondaryBadgePill: {
       alignSelf: 'flex-start',
       backgroundColor: 'rgba(255,255,255,0.92)',
       borderRadius: radius.pill,
-      paddingHorizontal: spacing[2],
-      paddingVertical: spacing[1],
+      paddingHorizontal: secondaryBadgePaddingHorizontal,
+      paddingVertical: secondaryBadgePaddingVertical,
       borderWidth: 1,
       borderColor: 'rgba(255,255,255,0.24)',
     },
     secondaryBadgeText: {
       color: '#0f172a',
-      fontSize: 11,
+      fontSize: isCompactSecondary ? 10 : 11,
       fontWeight: '800',
-      lineHeight: 14,
+      lineHeight: isCompactSecondary ? 12 : 14,
     },
     secondaryCtaPill: {
       alignSelf: 'flex-end',
       borderRadius: radius.pill,
-      paddingHorizontal: spacing[3],
-      paddingVertical: spacing[1],
+      paddingHorizontal: secondaryCtaPaddingHorizontal,
+      paddingVertical: secondaryCtaPaddingVertical,
     },
     secondaryCtaText: {
       color: '#ffffff',
-      fontSize: 11,
+      fontSize: isCompactSecondary ? 10 : 11,
       fontWeight: '800',
-      lineHeight: 14,
+      lineHeight: isCompactSecondary ? 12 : 14,
     },
     progressRow: {
       position: 'absolute',

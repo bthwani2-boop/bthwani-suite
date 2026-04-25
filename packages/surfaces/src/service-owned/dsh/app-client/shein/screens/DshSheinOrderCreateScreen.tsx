@@ -136,12 +136,6 @@ export function DshSheinOrderCreateScreen({ state = 'ready', embedded = false, o
             </Box>
 
             <Box gap={2}>
-              <Surface tone="brand" gap={2}>
-                <Text role="bodyStrong">SHEIN</Text>
-                <Text role="bodySm" tone="muted">لا يوجد شركاء لهذه الفئة.</Text>
-                <Text role="bodySm" tone="muted">المنصة نفسها تشتري وتجمع الطلبات قبل التوصيل.</Text>
-              </Surface>
-
               {formFields}
 
               <Button label={submitted ? 'تم التسجيل' : 'إرسال الطلب'} tone="primary" onPress={handleSubmit} disabled={isDisabled} />

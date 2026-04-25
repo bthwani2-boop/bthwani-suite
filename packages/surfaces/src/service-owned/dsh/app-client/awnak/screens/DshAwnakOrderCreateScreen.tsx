@@ -196,12 +196,6 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
             </Box>
 
             <Box gap={2}>
-              <Surface tone="brand" gap={2}>
-                <Text role="bodyStrong">DSH</Text>
-                <Text role="bodySm" tone="muted">طلب يدوي مباشر بدون تغيير الصفحة.</Text>
-                <Text role="bodySm" tone="muted">المطلوب واضح: المسار، نوع الطلب، وقت التنفيذ، والملاحظات.</Text>
-              </Surface>
-
               {formFields}
 
               <Button label={submitLabel} tone="primary" onPress={handleSubmit} disabled={isDisabled} />
