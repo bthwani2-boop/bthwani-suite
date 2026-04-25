@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, View, StyleSheet, ScrollView } from 'react-native';
-import { Box, Text, useTheme, spacing, radius } from '@bthwani/ui-kit';
+import { ListItem, Text, useTheme, spacing, radius } from '@bthwani/ui-kit';
 
 type Opt = {
   id: string;
@@ -9,6 +9,18 @@ type Opt = {
   icon?: React.ReactNode;
   meta?: React.ReactNode;
 };
+
+type DshWltPaymentOptionProps = {
+  title: string;
+  subtitle?: string;
+  selected?: boolean;
+  meta?: React.ReactNode;
+  onPress?: () => void;
+};
+
+export function DshWltPaymentOption({ title, subtitle, selected, meta, onPress }: DshWltPaymentOptionProps) {
+  return <ListItem title={title} subtitle={subtitle} meta={selected ? 'Selected' : meta} onPress={onPress} />;
+}
 
 export function PaymentOptionItem({ opt, selected, onPress }: { opt: Opt; selected: boolean; onPress?: () => void }) {
   const { theme } = useTheme();
@@ -71,8 +83,6 @@ export default function DshWltPaymentOptionsRow({
   selectedId?: string;
   onSelect: (id: string) => void;
 }) {
-  const selectedOption = options.find((o) => o.id === selectedId);
-
   return (
     <ScrollView horizontal contentContainerStyle={{ paddingHorizontal: spacing[4] }} showsHorizontalScrollIndicator={false}>
       <View style={styles.row}>

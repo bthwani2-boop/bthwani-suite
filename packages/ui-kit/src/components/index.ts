@@ -1,7 +1,7 @@
 export { Badge, Button, Chip } from './button';
 export type { BadgeProps, ButtonProps, ButtonTone, ChipProps } from './button';
-export { CartDetails, CartSummary } from './display/CartDetails';
-export type { CartDetailsProps, CartLine, CartSummaryProps } from './display/CartDetails';
+export { CartSummary } from './display/CartSummary';
+export type { CartSummaryProps } from './display/CartSummary';
 export { AttachmentPicker, Card, DashboardShell, DetailScreenShell, ProductCard, ServiceHubShell, ServiceTileCard, StatCard } from './card';
 export type { AttachmentPickerItem, AttachmentPickerProps, AttachmentPickerTone, CardProps, DashboardShellProps, DetailScreenShellProps, ProductCardPrice, ProductCardProps, ServiceHubSection, ServiceHubShellProps, ServiceTileCardProps, StatCardProps } from './card';
 export { StoreCardPremium } from './store-card';

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Image, Pressable, ScrollView, Switch as RNSwitch, TextInput, View, type PressableProps, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
-import { borders, radius, resolveLogicalPadding, resolveTextAlign, resolveRowDirection, sizes, spacing } from '../foundation';
+import { borders, radius, resolveLogicalPadding, resolveTextAlign, resolveRowDirection, sizes, spacing, type SpacingToken } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Button } from './button';
 import { KeyValueList } from './list';
@@ -253,11 +253,13 @@ export type SummaryCardProps = {
   items: SummaryItem[];
   totalLabel?: string;
   totalValue?: React.ReactNode;
+  padding?: SpacingToken;
+  gap?: SpacingToken;
 };
 
-export function SummaryCard({ items, totalLabel = 'Total', totalValue }: SummaryCardProps) {
+export function SummaryCard({ items, totalLabel = 'Total', totalValue, padding, gap }: SummaryCardProps) {
   return (
-    <Card>
+    <Card padding={padding} gap={gap}>
       <KeyValueList items={items.map((item) => ({ label: item.label, value: item.value, helperText: item.helper }))} />
       {totalValue ? <View style={{ marginTop: spacing[3] }} /> : null}
       {totalValue ? <KeyValueList items={[{ label: totalLabel, value: totalValue }]} dense /> : null}

@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { I18nManager, View } from 'react-native';
+import { Dimensions, I18nManager, Platform, StatusBar, View, useWindowDimensions } from 'react-native';
 import {
+  Chip,
   Button,
   Card,
-  CartDetails,
   colorPalette,
   Icon,
   MobileScrollView,
@@ -18,13 +18,19 @@ import {
   Text,
   TopBar,
 } from '@bthwani/ui-kit';
+import { DshCartDetails } from '../components/DshCartDetails';
 
-const HEADER_RED = colorPalette.brandStrong ?? colorPalette.brand ?? '#F97316';
-const SURFACE_PINK = colorPalette.brandSoft ?? '#FFF7ED';
-const SURFACE_PINK_BORDER = colorPalette.brandSurface ?? '#FDBA74';
-const ACCENT_GOLD = colorPalette.brand ?? '#F97316';
-const TEXT_DARK = colorPalette.ink ?? '#243247';
-const PAGE_BG = '#F9FAFB';
+const PAGE_BG = colorPalette.pageBackground;
+const SURFACE_SOFT = colorPalette.surfaceSecondary;
+const BORDER_SOFT = colorPalette.borderSubtle;
+const TEXT_PRIMARY = colorPalette.textPrimary;
+const TEXT_SECONDARY = colorPalette.textSecondary;
+const ACCENT_BLUE = colorPalette.accentBlue;
+const ACCENT_ORANGE = colorPalette.accentOrange;
+const CTA_PRIMARY = colorPalette.ctaPrimary;
+const CTA_SECONDARY = colorPalette.ctaSecondary;
+const SURFACE_WARM = colorPalette.brandSoft;
+const SURFACE_WARM_BORDER = colorPalette.brandSurface;
 const STORAGE_KEY_BALANCE = 'dsh_bth_wallet_balance';
 
 function formatAmount(value: number) {
@@ -63,6 +69,113 @@ async function localTopUpWallet(amountHalalas: number) {
   return { success: true, balance: newBal };
 }
 
+type ExecutionScheduleOption = {
+  value: string;
+  label: string;
+  fullLabel: string;
+};
+
+type ExecutionScheduleOptions = {
+  dateOptions: ExecutionScheduleOption[];
+  timeOptions: ExecutionScheduleOption[];
+};
+
+function padSchedulePart(value: number) {
+  return String(value).padStart(2, '0');
+}
+
+function createExecutionScheduleOptions(referenceDate = new Date()): ExecutionScheduleOptions {
+  const dateChipFormatter = new Intl.DateTimeFormat('ar-YE', { weekday: 'short', day: 'numeric' });
+  const dateSummaryFormatter = new Intl.DateTimeFormat('ar-YE', { weekday: 'long', day: 'numeric', month: 'long' });
+  const timeFormatter = new Intl.DateTimeFormat('ar-YE', { hour: 'numeric', minute: '2-digit' });
+
+  const dateOptions = Array.from({ length: 4 }, (_, index) => {
+    const date = new Date(referenceDate);
+    date.setHours(12, 0, 0, 0);
+    date.setDate(referenceDate.getDate() + index + 1);
+
+    return {
+      value: `${date.getFullYear()}-${padSchedulePart(date.getMonth() + 1)}-${padSchedulePart(date.getDate())}`,
+      label: index === 0 ? 'غدًا' : index === 1 ? 'بعد غد' : dateChipFormatter.format(date).replace('،', '').trim(),
+      fullLabel: dateSummaryFormatter.format(date),
+    };
+  });
+
+  const timeOptions = [9, 11, 13, 15, 17, 19].map((hour) => {
+    const time = new Date(referenceDate);
+    time.setHours(hour, 0, 0, 0);
+
+    return {
+      value: `${padSchedulePart(time.getHours())}:${padSchedulePart(time.getMinutes())}`,
+      label: timeFormatter.format(time),
+      fullLabel: timeFormatter.format(time),
+    };
+  });
+
+  return { dateOptions, timeOptions };
+}
+
+type ExecutionSchedulePickerProps = {
+  dateOptions: ExecutionScheduleOption[];
+  timeOptions: ExecutionScheduleOption[];
+  selectedDate: string;
+  selectedTime: string;
+  onDateChange: (value: string) => void;
+  onTimeChange: (value: string) => void;
+};
+
+function ExecutionSchedulePicker({ dateOptions, timeOptions, selectedDate, selectedTime, onDateChange, onTimeChange }: ExecutionSchedulePickerProps) {
+  const isRTL = I18nManager.isRTL;
+  const resolvedDate = dateOptions.find((option) => option.value === selectedDate) ?? dateOptions[0];
+  const resolvedTime = timeOptions.find((option) => option.value === selectedTime) ?? timeOptions[0];
+
+  return (
+    <Surface tone="default" padding={2} gap={1} style={{ backgroundColor: SURFACE_SOFT, borderColor: BORDER_SOFT }}>
+      <View style={{ gap: spacing[1] }}>
+        <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700' }}>
+          التاريخ
+        </Text>
+        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: spacing[1] }}>
+          {dateOptions.map((option) => (
+            <Chip
+              key={option.value}
+              label={option.label}
+              selected={option.value === resolvedDate?.value}
+              tone="brand"
+              onPress={() => onDateChange(option.value)}
+            />
+          ))}
+        </View>
+      </View>
+
+      <View style={{ gap: spacing[1] }}>
+        <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700' }}>
+          الوقت
+        </Text>
+        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: spacing[1] }}>
+          {timeOptions.map((option) => (
+            <Chip
+              key={option.value}
+              label={option.label}
+              selected={option.value === resolvedTime?.value}
+              tone="brand"
+              onPress={() => onTimeChange(option.value)}
+            />
+          ))}
+        </View>
+      </View>
+
+      {resolvedDate && resolvedTime ? (
+        <Surface tone="default" padding={1} gap={0} style={{ backgroundColor: SURFACE_WARM, borderColor: SURFACE_WARM_BORDER }}>
+          <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '600' }}>
+            سيتم تنفيذ الطلب {resolvedDate.fullLabel} عند {resolvedTime.fullLabel}
+          </Text>
+        </Surface>
+      ) : null}
+    </Surface>
+  );
+}
+
 function PromoBanner() {
   const isRTL = I18nManager.isRTL;
 
@@ -71,18 +184,18 @@ function PromoBanner() {
       tone="default"
       padding={2}
       style={{
-        backgroundColor: SURFACE_PINK,
+        backgroundColor: SURFACE_WARM,
         borderWidth: 1,
-        borderColor: SURFACE_PINK_BORDER,
+        borderColor: SURFACE_WARM_BORDER,
         borderRadius: 16,
         paddingHorizontal: spacing[2],
-        paddingVertical: spacing[2],
-        minHeight: 72,
+        paddingVertical: spacing[1],
+        minHeight: 60,
       }}
     >
-      <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', minHeight: 40 }}>
-        <View style={{ width: 86, alignItems: 'center' }}>
-          <View style={{ width: 86, height: 36, borderRadius: 18, backgroundColor: HEADER_RED, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', minHeight: 36 }}>
+        <View style={{ width: 84, alignItems: 'center' }}>
+          <View style={{ width: 84, height: 34, borderRadius: 17, backgroundColor: CTA_PRIMARY, alignItems: 'center', justifyContent: 'center' }}>
             <Text role="bodySm" style={{ color: colorPalette.white, fontWeight: '700' }}>
               اشترك الآن
             </Text>
@@ -90,13 +203,13 @@ function PromoBanner() {
         </View>
 
         <View style={{ flex: 1, paddingHorizontal: spacing[2], alignItems: 'center', justifyContent: 'center' }}>
-          <Text role="bodyMd" style={{ color: TEXT_DARK, textAlign: 'center', lineHeight: 19 }}>
+          <Text role="bodyMd" style={{ color: TEXT_PRIMARY, textAlign: 'center', lineHeight: 18 }}>
             اشترك بخدمة بثواني برو لا ستفاده من افضل العروض
           </Text>
         </View>
 
         <View style={{ width: 24, alignItems: 'center' }}>
-          <Icon name="ribbon-outline" size={14} color={ACCENT_GOLD} />
+          <Icon name="ribbon-outline" size={14} color={ACCENT_ORANGE} />
         </View>
       </View>
     </Surface>
@@ -114,7 +227,16 @@ type PaymentOptionCardProps = {
 
 function PaymentOptionCard({ title, subtitle, checked, onSelect, actionLabel, onAction }: PaymentOptionCardProps) {
   return (
-    <Surface tone={checked ? 'raised' : 'inset'} padding={2} gap={2} borderTone={checked ? 'brand' : 'line'}>
+    <Surface
+      tone="default"
+      padding={1}
+      gap={0}
+      style={{
+        backgroundColor: checked ? SURFACE_WARM : SURFACE_SOFT,
+        borderColor: checked ? ACCENT_ORANGE : BORDER_SOFT,
+        borderWidth: 1,
+      }}
+    >
       <Radio label={title} description={subtitle} selected={checked} onSelect={onSelect} />
 
       {actionLabel ? (
@@ -138,21 +260,21 @@ type RecommendationCardProps = {
 
 function RecommendationCard({ title, price }: RecommendationCardProps) {
   return (
-    <View style={{ width: 146, borderRadius: 18, overflow: 'hidden', backgroundColor: colorPalette.white, borderWidth: 1, borderColor: colorPalette.line ?? '#E5E7EB' }}>
-      <View style={{ height: 118, backgroundColor: colorPalette.surfaceInset ?? '#F8FAFC', position: 'relative', justifyContent: 'center', alignItems: 'center' }}>
-        <View style={{ width: 82, height: 82, borderRadius: 41, backgroundColor: colorPalette.white, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 10, elevation: 2, alignItems: 'center', justifyContent: 'center' }}>
-          <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: '#FDE68A' }} />
+    <View style={{ width: 132, borderRadius: 18, overflow: 'hidden', backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT }}>
+      <View style={{ height: 96, backgroundColor: SURFACE_SOFT, position: 'relative', justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: colorPalette.white, shadowColor: colorPalette.black, shadowOpacity: 0.06, shadowRadius: 8, elevation: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colorPalette.brandSoft }} />
         </View>
 
-        <View style={{ position: 'absolute', bottom: 8, left: 8, borderRadius: 8, backgroundColor: ACCENT_GOLD, paddingHorizontal: 10, paddingVertical: 4 }}>
-          <Text role="bodySm" style={{ color: '#111827', fontWeight: '600' }}>
+        <View style={{ position: 'absolute', bottom: 6, left: 6, borderRadius: 8, backgroundColor: ACCENT_ORANGE, paddingHorizontal: 8, paddingVertical: 3 }}>
+          <Text role="bodySm" style={{ color: colorPalette.white, fontWeight: '700' }}>
             {price}
           </Text>
         </View>
       </View>
 
-      <View style={{ paddingHorizontal: spacing[2], paddingTop: spacing[1], paddingBottom: spacing[2] }}>
-        <Text role="bodySm" style={{ color: TEXT_DARK, textAlign: 'center' }}>
+      <View style={{ paddingHorizontal: spacing[2], paddingTop: spacing[1], paddingBottom: spacing[1] }}>
+        <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>
           {title}
         </Text>
       </View>
@@ -168,17 +290,17 @@ function RecommendedSection() {
   ];
 
   return (
-    <Surface tone="inset" padding={2} gap={1}>
+    <Surface tone="default" padding={2} gap={1} style={{ backgroundColor: SURFACE_SOFT, borderColor: BORDER_SOFT }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text role="bodyMd" style={{ color: HEADER_RED, fontWeight: '600' }}>
+        <Text role="bodyMd" style={{ color: ACCENT_BLUE, fontWeight: '600' }}>
           عرض الكل
         </Text>
-        <Text role="bodyMd" style={{ color: TEXT_DARK, fontWeight: '600' }}>
+        <Text role="bodyMd" style={{ color: TEXT_PRIMARY, fontWeight: '600' }}>
           قد تعجبك هذه المنتجات أيضاً
         </Text>
       </View>
 
-      <View style={{ flexDirection: 'row', gap: spacing[1], overflow: 'hidden' }}>
+      <View style={{ flexDirection: 'row', gap: spacing[1], overflow: 'hidden', paddingTop: spacing[0] }}>
         {products.map((product) => (
           <RecommendationCard key={product.id} title={product.title} price={product.price} />
         ))}
@@ -197,6 +319,8 @@ function ItemsTable({ items, onOpenDetails }: ItemsTableProps) {
     <Card
       title="تفاصيل السلة"
       subtitle={`عناصر: ${items.length}`}
+      padding={2}
+      gap={1}
       footer={(
         <Button
           label="التفاصيل"
@@ -207,35 +331,35 @@ function ItemsTable({ items, onOpenDetails }: ItemsTableProps) {
         />
       )}
     >
-      <View style={{ borderWidth: 1, borderColor: colorPalette.line ?? '#CFCFCF', borderRadius: 16, overflow: 'hidden', backgroundColor: colorPalette.white }}>
-        <View style={{ flexDirection: 'row-reverse', backgroundColor: colorPalette.surfaceInset ?? '#FAFAFA', borderBottomWidth: 1, borderColor: colorPalette.line ?? '#CFCFCF', paddingVertical: spacing[1] }}>
+      <View style={{ borderWidth: 1, borderColor: BORDER_SOFT, borderRadius: 16, overflow: 'hidden', backgroundColor: colorPalette.surfacePrimary }}>
+        <View style={{ flexDirection: 'row-reverse', backgroundColor: SURFACE_SOFT, borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0] }}>
           <View style={{ flex: 3, paddingHorizontal: spacing[1] }}>
-            <Text role="bodySm" style={{ fontWeight: '700', color: TEXT_DARK, textAlign: 'right' }}>المنتج</Text>
+            <Text role="bodySm" style={{ fontWeight: '700', color: TEXT_PRIMARY, textAlign: 'right' }}>المنتج</Text>
           </View>
           <View style={{ flex: 1.3, paddingHorizontal: spacing[1] }}>
-            <Text role="bodySm" style={{ fontWeight: '700', color: TEXT_DARK, textAlign: 'center' }}>السعر</Text>
+            <Text role="bodySm" style={{ fontWeight: '700', color: TEXT_PRIMARY, textAlign: 'center' }}>السعر</Text>
           </View>
           <View style={{ flex: 1, paddingHorizontal: spacing[1] }}>
-            <Text role="bodySm" style={{ fontWeight: '700', color: TEXT_DARK, textAlign: 'center' }}>الكمية</Text>
+            <Text role="bodySm" style={{ fontWeight: '700', color: TEXT_PRIMARY, textAlign: 'center' }}>الكمية</Text>
           </View>
           <View style={{ flex: 1.3, paddingHorizontal: spacing[1] }}>
-            <Text role="bodySm" style={{ fontWeight: '700', color: TEXT_DARK, textAlign: 'center' }}>الإجمالي</Text>
+            <Text role="bodySm" style={{ fontWeight: '700', color: TEXT_PRIMARY, textAlign: 'center' }}>الإجمالي</Text>
           </View>
         </View>
 
         {items.map((item) => (
-          <View key={item.id} style={{ flexDirection: 'row-reverse', alignItems: 'center', borderBottomWidth: 1, borderColor: colorPalette.line ?? '#D9D9D9', paddingVertical: spacing[1] }}>
+          <View key={item.id} style={{ flexDirection: 'row-reverse', alignItems: 'center', borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0] }}>
             <View style={{ flex: 3, paddingHorizontal: spacing[1] }}>
-              <Text role="bodySm" style={{ color: TEXT_DARK, textAlign: 'right' }}>{item.title}</Text>
+              <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>{item.title}</Text>
             </View>
             <View style={{ flex: 1.3, paddingHorizontal: spacing[1] }}>
-              <Text role="bodySm" style={{ color: TEXT_DARK, textAlign: 'center' }}>{formatAmount(item.priceValue ?? 0)}</Text>
+              <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>{formatAmount(item.priceValue ?? 0)}</Text>
             </View>
             <View style={{ flex: 1, paddingHorizontal: spacing[1], alignItems: 'center' }}>
-              <Text role="bodySm" style={{ color: TEXT_DARK }}>{item.qty ?? 1}</Text>
+              <Text role="bodySm" style={{ color: TEXT_PRIMARY }}>{item.qty ?? 1}</Text>
             </View>
             <View style={{ flex: 1.3, paddingHorizontal: spacing[1] }}>
-              <Text role="bodySm" style={{ color: TEXT_DARK, textAlign: 'center' }}>{formatAmount((item.priceValue ?? 0) * (item.qty ?? 1))}</Text>
+              <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>{formatAmount((item.priceValue ?? 0) * (item.qty ?? 1))}</Text>
             </View>
           </View>
         ))}
@@ -245,6 +369,7 @@ function ItemsTable({ items, onOpenDetails }: ItemsTableProps) {
 }
 
 export default function DshCartUnifiedScreen(props: any) {
+  const { height: windowHeight } = useWindowDimensions();
   const [items, setItems] = useState<any[]>(
     props.items ?? [
       { id: 'p1', title: 'دجاج فحم تركي مع التوابع', priceValue: 3000, qty: 1 },
@@ -259,7 +384,11 @@ export default function DshCartUnifiedScreen(props: any) {
   const [pickupAddr] = useState('جوار الجبل الجديد');
   const [note] = useState('لا يوجد ملاحظة');
   const [scheduling, setScheduling] = useState<'now' | 'later'>('now');
+  const executionScheduleOptions = useMemo(() => createExecutionScheduleOptions(), []);
+  const [scheduledDate, setScheduledDate] = useState(() => executionScheduleOptions.dateOptions[0]?.value ?? '');
+  const [scheduledTime, setScheduledTime] = useState(() => executionScheduleOptions.timeOptions[0]?.value ?? '');
   const [cartDetailsVisible, setCartDetailsVisible] = useState(false);
+  const [footerHeight, setFooterHeight] = useState(0);
 
   const checkoutAction = props.onContinue ?? props.onOpenOrder ?? (() => {});
   const editAction = props.onOpenOrder ?? props.onContinue ?? (() => {});
@@ -274,8 +403,12 @@ export default function DshCartUnifiedScreen(props: any) {
   const formattedSubtotal = formatAmount(subtotalAmount);
   const formattedDelivery = formatAmount(deliveryAmount);
   const formattedGrandTotal = formatAmount(grandTotalAmount);
-  const footerBottomInset = safeArea.spacious ?? safeArea.comfortable ?? 0;
-  const actionBarBottomPadding = footerBottomInset + sizes.controlMd + spacing[4];
+  const androidSystemBottomInset = Platform.OS === 'android'
+    ? Math.max(0, Dimensions.get('screen').height - windowHeight - (StatusBar.currentHeight ?? 0))
+    : safeArea.comfortable;
+  const footerBottomInset = androidSystemBottomInset + spacing[2];
+  const resolvedFooterHeight = footerHeight > 0 ? footerHeight : sizes.controlMd + spacing[3];
+  const actionBarBottomPadding = footerBottomInset + resolvedFooterHeight + spacing[4];
 
   const updateItemQty = (id: string, qty: number) => {
     if (qty <= 0) {
@@ -296,63 +429,82 @@ export default function DshCartUnifiedScreen(props: any) {
         variant="secondary"
         title="تأكيد الطلب"
         titleSlot={(
-          <Text style={{ color: TEXT_DARK, fontSize: 17, fontWeight: '900', lineHeight: 20, maxWidth: '100%', flexShrink: 1, minWidth: 0, textAlign: 'center' }} numberOfLines={1}>
+          <Text style={{ color: TEXT_PRIMARY, fontSize: 17, fontWeight: '900', lineHeight: 20, maxWidth: '100%', flexShrink: 1, minWidth: 0, textAlign: 'center' }} numberOfLines={1}>
             تأكيد الطلب
           </Text>
         )}
         actions={[
           {
             id: 'clear-cart',
-            icon: <Icon name="trash-outline" size={20} color={TEXT_DARK} />,
+            icon: <Icon name="trash-outline" size={20} color={ACCENT_BLUE} />,
             accessibilityLabel: 'تفريغ السلة',
             onPress: () => setItems([]),
           },
         ]}
         trailingAction={{
           id: 'exit-checkout',
-          icon: <Icon name="arrow-back" size={24} color={ACCENT_GOLD} />,
+          icon: <Icon name="arrow-back" size={24} color={ACCENT_ORANGE} />,
           mirrorInRtl: true,
           accessibilityLabel: 'الرجوع',
           onPress: () => props.onExit?.(),
         }}
       />
 
-      <MobileScrollView fill padding={2} gap={2} contentContainerStyle={{ paddingBottom: actionBarBottomPadding }}>
+      <MobileScrollView fill padding={1} gap={1} contentContainerStyle={{ paddingBottom: actionBarBottomPadding }}>
         <PromoBanner />
 
-        <Card title="الخيارات السريعة" subtitle="القسيمة والعنوان والملاحظات">
-          <View style={{ gap: spacing[2] }}>
-            <OptionRow title="هل لديك قسيمة تخفيض؟" actionLabel="إضافة" onAction={() => {}} />
-            <OptionRow title="عنوان التوصيل" subtitle={pickupAddr} actionLabel="تغيير" onAction={() => {}} />
-            <OptionRow title="ملاحظات الطلب" subtitle={note} actionLabel="إضافة" onAction={() => {}} />
+        <Card title="الخيارات السريعة" subtitle="القسيمة والعنوان والملاحظات" padding={2} gap={1}>
+          <View style={{ gap: spacing[1] }}>
+            <OptionRow title="هل لديك قسيمة تخفيض؟" actionLabel="إضافة" onAction={() => {}} style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }} />
+            <OptionRow title="عنوان التوصيل" subtitle={pickupAddr} actionLabel="تغيير" onAction={() => {}} style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }} />
+            <OptionRow title="ملاحظات الطلب" subtitle={note} actionLabel="إضافة" onAction={() => {}} style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }} />
             <OptionRow
               title="طلب إضافي على الطريق"
               subtitle="مثال: بسبس أو ماء من أي ماركت على طريق الكابتن"
               actionLabel="إضافة"
               onAction={() => {}}
+              style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
             />
           </View>
         </Card>
 
-        <Card title="وقت التنفيذ" subtitle="اختر وقت تنفيذ الطلب">
-          <View style={{ gap: spacing[2] }}>
+        <Card title="وقت التنفيذ" subtitle="اختر وقت تنفيذ الطلب" padding={2} gap={1}>
+          <View style={{ gap: spacing[1] }}>
             <SegmentedControl
               options={[
                 { value: 'now', label: 'الآن' },
                 { value: 'later', label: 'في وقت لاحق' },
               ]}
               value={scheduling}
-              onValueChange={(nextValue) => setScheduling(nextValue)}
-              size="md"
+              onValueChange={(nextValue) => {
+                setScheduling(nextValue);
+                if (nextValue === 'later') {
+                  setScheduledDate((current) => current || (executionScheduleOptions.dateOptions[0]?.value ?? ''));
+                  setScheduledTime((current) => current || (executionScheduleOptions.timeOptions[0]?.value ?? ''));
+                }
+              }}
+              size="sm"
+              style={{ backgroundColor: SURFACE_SOFT, borderColor: BORDER_SOFT, padding: spacing[0] }}
             />
-            <Text role="caption" tone="muted">
-              {scheduling === 'now' ? 'سيتم تنفيذ الطلب مباشرة' : 'سيتم تنفيذ الطلب في الوقت الذي اخترته'}
-            </Text>
+            {scheduling === 'now' ? (
+              <Text role="caption" style={{ color: TEXT_SECONDARY }}>
+                سيتم تنفيذ الطلب مباشرة بعد اعتماد السلة.
+              </Text>
+            ) : (
+              <ExecutionSchedulePicker
+                dateOptions={executionScheduleOptions.dateOptions}
+                timeOptions={executionScheduleOptions.timeOptions}
+                selectedDate={scheduledDate}
+                selectedTime={scheduledTime}
+                onDateChange={setScheduledDate}
+                onTimeChange={setScheduledTime}
+              />
+            )}
           </View>
         </Card>
 
-        <Card title="الدفع" subtitle="اختر وسيلة الدفع المناسبة">
-          <View style={{ gap: spacing[2] }}>
+        <Card title="الدفع" subtitle="اختر وسيلة الدفع المناسبة" padding={2} gap={1}>
+          <View style={{ gap: spacing[1] }}>
             <PaymentOptionCard
               title="الدفع عند الاستلام"
               subtitle="ادفع نقدًا عند استلام الطلب"
@@ -400,6 +552,8 @@ export default function DshCartUnifiedScreen(props: any) {
         <RecommendedSection />
 
         <SummaryCard
+          padding={2}
+          gap={1}
           items={[
             { label: 'الإجمالي', value: formattedSubtotal },
             { label: 'التوصيل', value: formattedDelivery },
@@ -411,14 +565,17 @@ export default function DshCartUnifiedScreen(props: any) {
         <ItemsTable items={items} onOpenDetails={() => setCartDetailsVisible(true)} />
       </MobileScrollView>
 
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom: footerBottomInset, paddingHorizontal: spacing[2], paddingTop: spacing[1], paddingBottom: spacing[2], backgroundColor: colorPalette.white, borderTopWidth: 1, borderColor: '#D6D6D6' }}>
+      <View
+        onLayout={(event) => setFooterHeight(event.nativeEvent.layout.height)}
+        style={{ position: 'absolute', left: 0, right: 0, bottom: footerBottomInset, paddingHorizontal: spacing[2], paddingTop: spacing[1], paddingBottom: spacing[1], backgroundColor: colorPalette.surfacePrimary, borderTopWidth: 1, borderColor: BORDER_SOFT, zIndex: 5, elevation: 4 }}
+      >
         <View style={{ flexDirection: 'row', gap: spacing[1] }}>
-          <Button label="تنفيذ الطلب" size="md" fullWidth={false} onPress={checkoutAction} style={{ flex: 1, minHeight: 46, backgroundColor: HEADER_RED, borderRadius: 16 }} />
-          <Button label="تعديل الطلب" tone="secondary" size="md" fullWidth={false} onPress={editAction} style={{ flex: 1, minHeight: 46, borderRadius: 16 }} />
+          <Button label="تنفيذ الطلب" size="md" fullWidth={false} onPress={checkoutAction} style={{ flex: 1, minHeight: 46, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY, borderRadius: 16 }} />
+          <Button label="تعديل الطلب" tone="secondary" size="md" fullWidth={false} onPress={editAction} style={{ flex: 1, minHeight: 46, backgroundColor: CTA_SECONDARY, borderColor: BORDER_SOFT, borderRadius: 16 }} />
         </View>
       </View>
 
-      <CartDetails
+      <DshCartDetails
         visible={cartDetailsVisible}
         onClose={() => setCartDetailsVisible(false)}
         currency="YER"

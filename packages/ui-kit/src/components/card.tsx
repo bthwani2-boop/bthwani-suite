@@ -1,10 +1,10 @@
 import React, { memo, useMemo } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, View, type GestureResponderEvent, type ImageSourcePropType, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { radius, resolveRowDirection, resolveTextAlign, spacing } from '../foundation';
+import { radius, resolveRowDirection, resolveTextAlign, spacing, type SpacingToken } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Badge, Button } from './button';
-import { Surface, Text } from '../primitives';
+import { Surface, Text, type SurfaceTone } from '../primitives';
 import { StateView } from './state';
 
 type PressableStyle = PressableProps['style'];
@@ -18,6 +18,9 @@ export type CardProps = {
   subtitle?: string;
   children?: React.ReactNode;
   footer?: React.ReactNode;
+  padding?: SpacingToken;
+  gap?: SpacingToken;
+  tone?: SurfaceTone;
   style?: StyleProp<ViewStyle>;
   onPress?: PressableProps['onPress'];
   disabled?: boolean;
@@ -30,6 +33,9 @@ export function Card({
   subtitle,
   children,
   footer,
+  padding = 5,
+  gap = 3,
+  tone = 'default',
   style,
   onPress,
   disabled = false,
@@ -37,8 +43,8 @@ export function Card({
   testID,
 }: CardProps) {
   const surface = (
-    <Surface style={style}>
-      <View style={{ gap: spacing[3] }}>
+    <Surface tone={tone} padding={padding} gap={gap} style={style}>
+      <View style={{ gap: spacing[gap] }}>
         {(title || subtitle) ? (
           <View style={{ gap: spacing[1] }}>
             {title ? <Text role="titleSm">{title}</Text> : null}
