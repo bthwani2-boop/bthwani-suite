@@ -1,3 +1,4 @@
+import '../../../../tamagui.generated.css';
 export const metadata = {
   title: 'BThwani WebApp',
   description: 'Unified Next.js web surface',

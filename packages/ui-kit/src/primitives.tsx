@@ -1,12 +1,16 @@
 import React from 'react';
-import { ScrollView as TamaguiScrollView, Text as TamaguiText, View as TamaguiView } from 'tamagui';
+import {
+  ScrollView as TamaguiScrollView,
+  Text as TamaguiText,
+  View as TamaguiView,
+  } from 'tamagui';
 import {
   type ScrollViewProps,
   type StyleProp,
   type TextProps as RNTextNativeProps,
   type TextStyle,
   type ViewProps,
-  type ViewStyle
+  type ViewStyle,
 } from 'react-native';
 import { useDirection, useTheme } from './providers';
 import {
@@ -302,4 +306,3 @@ export function MobileScrollView({
 		</HostScrollView>
 	);
 }
-

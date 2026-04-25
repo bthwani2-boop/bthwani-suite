@@ -556,4 +556,3 @@ export function TopBar({ title, subtitle, locationLabel, locationIcon, onTitlePr
     </Surface>
   );
 }
-
