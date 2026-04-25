@@ -244,7 +244,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     rating: 2.8,
     mediaKey: 'dsh.store.hadda.cover.v1',
 
-    imageUri: '',
+    imageUri: 'dsh.store.hadda.cover.v1',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['توصيل سريع', 'عروض يومية'],
     hasCouponAvailable: true,
@@ -268,7 +268,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     rating: 3.9,
     mediaKey: 'dsh.store.hittin.cover.v1',
 
-    imageUri: '',
+    imageUri: 'dsh.store.hittin.cover.v1',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['توصيل مجاني', 'مقاضي يومية'],
     hasCouponAvailable: false,
@@ -293,7 +293,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     rating: 4.1,
     mediaKey: 'dsh.store.malqa.cover.v1',
 
-    imageUri: '',
+    imageUri: 'dsh.store.malqa.cover.v1',
     hasBthwaniPro: false,
     subscriptionPackageChips: ['عصائر طازجة', 'حلويات'],
     hasCouponAvailable: true,
@@ -317,7 +317,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     rating: 3.6,
     mediaKey: 'dsh.store.hadda.cover.v1',
 
-    imageUri: '',
+    imageUri: 'dsh.store.hadda.cover.v1',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['حلويات', 'آيسكريم'],
     hasCouponAvailable: false,
@@ -342,7 +342,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     rating: 2.7,
     mediaKey: 'dsh.store.hittin.cover.v1',
 
-    imageUri: '',
+    imageUri: 'dsh.store.hittin.cover.v1',
     hasBthwaniPro: false,
     subscriptionPackageChips: ['عطور', 'ملابس'],
     hasCouponAvailable: true,
@@ -366,7 +366,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     rating: 4.0,
     mediaKey: 'dsh.store.malqa.cover.v1',
 
-    imageUri: '',
+    imageUri: 'dsh.store.malqa.cover.v1',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['إكسسوارات', 'تجميل'],
     hasCouponAvailable: false,
@@ -391,7 +391,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     rating: 5,
     mediaKey: 'dsh.store.hadda.cover.v1',
 
-    imageUri: '',
+    imageUri: 'dsh.store.hadda.cover.v1',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['منتجات مختارة', 'أولوية'],
     hasCouponAvailable: true,
@@ -415,7 +415,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     rating: 3.1,
     mediaKey: 'dsh.store.hittin.cover.v1',
 
-    imageUri: '',
+    imageUri: 'dsh.store.hittin.cover.v1',
     hasBthwaniPro: false,
     subscriptionPackageChips: ['أسر منتجة', 'منتجات منزلية'],
     hasCouponAvailable: false,
@@ -440,7 +440,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     rating: 4.2,
     mediaKey: 'dsh.store.malqa.cover.v1',
 
-    imageUri: '',
+    imageUri: 'dsh.store.malqa.cover.v1',
     hasBthwaniPro: false,
     subscriptionPackageChips: ['تعبئة', 'إصلاح'],
     hasCouponAvailable: false,
@@ -464,7 +464,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     rating: 3.0,
     mediaKey: 'dsh.store.hadda.cover.v1',
 
-    imageUri: '',
+    imageUri: 'dsh.store.hadda.cover.v1',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['قطع غيار', 'إكسسوارات'],
     hasCouponAvailable: false,
@@ -489,7 +489,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     rating: 4.4,
     mediaKey: 'dsh.store.hittin.cover.v1',
 
-    imageUri: '',
+    imageUri: 'dsh.store.hittin.cover.v1',
     hasBthwaniPro: true,
     subscriptionPackageChips: ['عسل', 'تمور'],
     hasCouponAvailable: true,
@@ -513,7 +513,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     rating: 2.5,
     mediaKey: 'dsh.store.malqa.cover.v1',
 
-    imageUri: '',
+    imageUri: 'dsh.store.malqa.cover.v1',
     hasBthwaniPro: false,
     subscriptionPackageChips: ['إلكترونيات', 'إكسسوارات'],
     hasCouponAvailable: false,

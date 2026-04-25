@@ -20,14 +20,14 @@ import {
   type ImageSourcePropType,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { resolveSeedMediaSource, type SeedMediaKey } from '@bthwani/media-fixtures';
 import { BannerCarousel, Button, Chip, Icon, SearchTopBar, TopBar, StateView, Text, Toast, colorPalette, useDirection, useUiText, ProductCard, type BannerCarouselItem } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../../shared/catalog/catalog';
 import { formatDshStoreFollowersLabel } from '../../shared/store-profile';
-import { storeItemsByStoreId, type DshStoreFixtureItem as DshStoreGetMenuItem } from '../fixtures';
+import { resolveDshImageSource } from '../../shared/resolve-image-source';
+import { type DshStoreMenuItem as DshStoreGetMenuItem } from '../types';
 import { mapMenuItemToProductCard } from '../adapters/mapMenuItemToProductCard';
 
-// Menu item type is imported from fixtures for consistency across surfaces
+// Menu item view-model is shared locally to keep the screen fixture-free.
 
 export type DshStoreGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
@@ -200,70 +200,12 @@ function normalizeDisplayText(value?: string) {
     .trim();
 }
 
-const DSH_STORE_PRODUCT_MEDIA_KEY_BY_CATEGORY: Record<string, SeedMediaKey> = {
-  fresh: 'dsh.product.apple.v1',
-  dairy: 'dsh.product.milk.v1',
-  bakery: 'dsh.product.croissant.v1',
-  meals: 'dsh.product.chicken.v1',
-  healthy: 'dsh.product.salad.v1',
-  sweets: 'dsh.product.choco.v1',
-};
-
-function resolveDshStoreMenuItemMediaKey(item: DshStoreGetMenuItem): SeedMediaKey {
-  const haystack = normalizeDisplayText(
-    [
-      item.id,
-      item.name,
-      item.subtitle,
-      item.categoryId,
-      item.categoryLabel,
-    ]
-      .filter(Boolean)
-      .join(' '),
-  ).toLowerCase();
-
-  if (haystack.includes('milk') || haystack.includes('حليب') || haystack.includes('ألبان')) return 'dsh.product.milk.v1';
-  if (haystack.includes('croissant') || haystack.includes('كرواسون') || haystack.includes('مخبوز')) return 'dsh.product.croissant.v1';
-  if (haystack.includes('bread') || haystack.includes('خبز')) return 'dsh.product.bread.v1';
-  if (haystack.includes('choco') || haystack.includes('شوكولات')) return 'dsh.product.choco.v1';
-  if (haystack.includes('chicken') || haystack.includes('دجاج')) return 'dsh.product.chicken.v1';
-  if (haystack.includes('pasta') || haystack.includes('باستا')) return 'dsh.product.pasta.v1';
-  if (haystack.includes('roll') || haystack.includes('لفافة')) return 'dsh.product.roll.v1';
-  if (haystack.includes('salad') || haystack.includes('سلطة')) return 'dsh.product.salad.v1';
-  if (haystack.includes('yogurt') || haystack.includes('زبادي')) return 'dsh.product.yogurt.v1';
-  if (haystack.includes('apple') || haystack.includes('تفاح')) return 'dsh.product.apple.v1';
-
-  return DSH_STORE_PRODUCT_MEDIA_KEY_BY_CATEGORY[item.categoryId] ?? 'dsh.product.apple.v1';
+function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType | undefined {
+  return resolveDshImageSource(item.mediaKey ?? item.imageUri);
 }
 
-function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType {
-  return resolveSeedMediaSource(resolveDshStoreMenuItemMediaKey(item)) as ImageSourcePropType;
-}
-
-function resolveDshStoreCoverMediaKey(store?: DshStoreGetScreenProps['store']): SeedMediaKey {
-  const haystack = normalizeDisplayText(
-    [
-      store?.id,
-      store?.name,
-      store?.subtitle,
-    ]
-      .filter(Boolean)
-      .join(' '),
-  ).toLowerCase();
-
-  if (haystack.includes('حطين') || haystack.includes('bakery') || haystack.includes('مخبز')) {
-    return 'dsh.store.hittin.cover.v1';
-  }
-
-  if (haystack.includes('ملقا') || haystack.includes('kitchen') || haystack.includes('مطعم') || haystack.includes('مطبخ')) {
-    return 'dsh.store.malqa.cover.v1';
-  }
-
-  return 'dsh.store.hadda.cover.v1';
-}
-
-function resolveDshStoreCoverImageSource(store?: DshStoreGetScreenProps['store']): ImageSourcePropType {
-  return resolveSeedMediaSource(resolveDshStoreCoverMediaKey(store)) as ImageSourcePropType;
+function resolveDshStoreCoverImageSource(store?: DshStoreGetScreenProps['store']): ImageSourcePropType | undefined {
+  return resolveDshImageSource(store?.imageUri);
 }
 function getItemEmoji(item: DshStoreGetMenuItem) {
   return CATEGORY_EMOJI[item.categoryId] ?? '🍽️';
@@ -302,7 +244,7 @@ function resolveMeasurementMultiplier(option: string) {
   return 1;
 }
 
-function pickSampleBackgroundColor(name: string) {
+function pickBackdropColor(name: string) {
   const n = (name || '').toLowerCase();
   if (n.includes('تفاح') || n.includes('apple') || n.includes('gala')) return '#eaf9e6';
   if (n.includes('حليب') || n.includes('milk')) return '#eaf4ff';
@@ -320,7 +262,7 @@ function hexToRgba(hex: string, alpha = 0.9) {
 }
 
 function getOverlayColor(name: string, alpha = 0.88) {
-  return hexToRgba(pickSampleBackgroundColor(name), alpha);
+  return hexToRgba(pickBackdropColor(name), alpha);
 }
 
 function formatCurrencyValue(value: number) {
@@ -408,8 +350,6 @@ function ModePill({
 
 function MenuItemCard({
   item,
-  isRTL,
-  labels,
   partnerImageUri,
   onAddPress,
   onImagePress,
@@ -417,124 +357,30 @@ function MenuItemCard({
   isFavorited,
 }: {
   item: DshStoreGetMenuItem;
-  isRTL: boolean;
-  labels: { available: string; options: string; unavailable: string };
   partnerImageUri?: ImageSourcePropType | string;
-  onAddPress?: (anchor: { x: number; y: number }) => void;
+  onAddPress?: (anchor?: { x: number; y: number }) => void;
   onImagePress?: (item: DshStoreGetMenuItem) => void;
   onFavoritePress?: () => void;
   isFavorited?: boolean;
 }) {
-  const normalizedName = normalizeDisplayText(item.name);
-  const normalizedSubtitle = normalizeDisplayText(item.subtitle);
-  const normalizedPrice = normalizeDisplayText(item.priceLabel);
-  const normalizedOldPrice = item.oldPriceLabel ? normalizeDisplayText(item.oldPriceLabel) : undefined;
-  const normalizedDiscount = item.discountLabel ? normalizeDisplayText(item.discountLabel) : undefined;
-  const normalizedPrep = item.preparationTime ? normalizeDisplayText(item.preparationTime) : undefined;
-  const normalizedCategory = normalizeDisplayText(item.categoryLabel);
-  const normalizedStatus = item.statusLabel ? normalizeDisplayText(item.statusLabel) : undefined;
+  const productCard = mapMenuItemToProductCard(item);
 
   return (
-    <View style={[styles.menuCard, isRTL && styles.menuCardRTL]}>
-      <View style={styles.menuImageWrap}>
-        <View style={styles.menuImageCard}>
-          <View style={styles.menuPartnerTile}>
-            {partnerImageUri ? (
-              <Image
-                source={typeof partnerImageUri === 'string' ? { uri: partnerImageUri } : partnerImageUri}
-                style={styles.menuPartnerTileImage}
-              />
-            ) : (
-              <Ionicons name="storefront-outline" size={16} color={stylesTokens.orange} />
-            )}
-          </View>
-          <Text style={styles.menuEmoji}>{getItemEmoji(item)}</Text>
-          {
-            (() => {
-              const imageSource = resolveDshStoreMenuItemImageSource(item);
-              return (
-                <Pressable onPress={() => onImagePress?.(item)} style={styles.menuImagePressable} accessibilityRole="imagebutton">
-                  <Image source={imageSource} style={styles.menuImage} />
-                </Pressable>
-              );
-            })()
-          }
-          <TouchableOpacity style={styles.favoriteButton} activeOpacity={0.85} onPress={onFavoritePress} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-            <Ionicons name={isFavorited ? 'heart' : 'heart-outline'} size={18} color={stylesTokens.orange} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={[styles.menuBody, isRTL && styles.menuBodyRTL]}>
-        <View style={styles.menuInfoZone}>
-          <Text style={[styles.menuTitle, isRTL && styles.textAlignRight]} numberOfLines={2}>
-            {normalizedName}
-          </Text>
-          <Text style={[styles.menuSubtitle, isRTL && styles.textAlignRight]} numberOfLines={2}>
-            {normalizedSubtitle}
-          </Text>
-          {normalizedPrep ? (
-            <View style={[styles.menuTimingRow, isRTL && styles.rowReverse]}>
-              <Ionicons name="time-outline" size={14} color={stylesTokens.muted} />
-              <Text style={styles.menuPrep} numberOfLines={1}>
-                {normalizedPrep}
-              </Text>
-            </View>
-          ) : null}
-        </View>
-
-        <View style={styles.menuCommerceZone}>
-          <View style={[styles.menuPriceRow, isRTL && styles.rowReverse]}>
-            <Text style={[styles.menuPrice, isRTL && styles.textAlignRight]} numberOfLines={1}>
-              {normalizedPrice}
-            </Text>
-            {normalizedOldPrice ? (
-              <Text style={styles.menuOldPrice} numberOfLines={1}>
-                {normalizedOldPrice}
-              </Text>
-            ) : null}
-          </View>
-
-          {normalizedDiscount ? (
-            <View style={styles.menuDiscountRow}>
-              <View style={styles.discountChip}>
-                <Text style={styles.discountChipText}>{normalizedDiscount}</Text>
-              </View>
-            </View>
-          ) : null}
-
-          <View style={[styles.menuChipRow, isRTL && styles.rowReverse]}>
-            {normalizedStatus ? (
-              <View style={styles.smallChipPrimary}>
-                <Text style={styles.smallChipPrimaryText}>{normalizedStatus}</Text>
-              </View>
-            ) : null}
-            <View style={styles.smallChipLight}>
-              <Text style={styles.smallChipLightText}>{normalizedCategory}</Text>
-            </View>
-          </View>
-        </View>
-      </View>
-
-      <View style={[styles.menuActionRail, isRTL && styles.menuActionRailRTL]}>
-        <TouchableOpacity
-          style={styles.menuActionBadge}
-          activeOpacity={0.85}
-          onPress={(event: GestureResponderEvent) =>
-            onAddPress?.({ x: event.nativeEvent.pageX, y: event.nativeEvent.pageY })
-          }
-        >
-          <Ionicons
-            name="cart-outline"
-            size={18}
-            color={stylesTokens.white}
-          />
-          <View style={styles.menuActionPlusBadge}>
-            <Ionicons name="add" size={10} color={stylesTokens.orange} />
-          </View>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <ProductCard
+      {...productCard}
+      title={normalizeDisplayText(productCard.title)}
+      subtitle={normalizeDisplayText(productCard.subtitle)}
+      statusLabel={normalizeDisplayText(item.statusLabel ?? productCard.statusLabel ?? '') || undefined}
+      categoryLabel={normalizeDisplayText(item.categoryLabel ?? productCard.categoryLabel ?? '') || undefined}
+      preparationTime={normalizeDisplayText(item.preparationTime ?? productCard.preparationTime ?? '') || undefined}
+      imageSource={resolveDshStoreMenuItemImageSource(item)}
+      partnerImageSource={partnerImageUri}
+      emoji={getItemEmoji(item)}
+      onAdd={onAddPress}
+      onImagePress={onImagePress ? () => onImagePress(item) : undefined}
+      onFavorite={onFavoritePress}
+      isFavorited={isFavorited}
+    />
   );
 }
 
@@ -586,27 +432,9 @@ export function DshStoreGetScreen({
   const closeImagePreview = React.useCallback(() => setPreviewItem(null), []);
 
   const deliveryModes = React.useMemo(() => getDeliveryModes(storeText), [storeText]);
-  const itemLabels = React.useMemo(
-    () => ({
-      available: storeText.items.available,
-      options: storeText.items.options,
-      unavailable: storeText.items.unavailable,
-    }),
-    [storeText],
-  );
 
   const storeCoverImageSource = React.useMemo(() => (store ? resolveDshStoreCoverImageSource(store) : undefined), [store]);
-  const fallbackMenuItems = React.useMemo(() => {
-    if (menuItems.length) {
-      return menuItems;
-    }
-
-    if (store?.id && storeItemsByStoreId[store.id]?.length) {
-      return storeItemsByStoreId[store.id];
-    }
-
-    return storeItemsByStoreId['store-1001'];
-  }, [menuItems, store?.id]);
+  const fallbackMenuItems = React.useMemo<DshStoreGetMenuItem[]>(() => menuItems ?? [], [menuItems]);
 
   const customerVisibleItems = React.useMemo(
     () => fallbackMenuItems.filter((item) => item.isAvailable !== false),
@@ -1064,10 +892,10 @@ export function DshStoreGetScreen({
     [pickerAnchor.y],
   );
 
-  const openMeasurementPicker = React.useCallback((item: DshStoreGetMenuItem, anchor: { x: number; y: number }) => {
+  const openMeasurementPicker = React.useCallback((item: DshStoreGetMenuItem, anchor?: { x: number; y: number }) => {
     const options = resolveMeasurementOptions(item);
     setPickerItem(item);
-    setPickerAnchor(anchor);
+    setPickerAnchor(anchor ?? { x: 32, y: 360 });
     setSelectedMeasureQty(1);
     setSelectedMeasureOption(options[0] ?? null);
   }, []);
@@ -1386,18 +1214,18 @@ export function DshStoreGetScreen({
                                 size={13}
                                 color={isFollowingStore ? stylesTokens.white : stylesTokens.orange}
                               />
-                              <Text style={[styles.topMetaChipText, isFollowingStore && styles.followMetaChipTextActive]}>
+                              <Text style={[styles.topMetaChipText, isFollowingStore && styles.followMetaChipTextActive]} numberOfLines={1}>
                                 {normalizedFollowersLabel}
                               </Text>
                             </TouchableOpacity>
                           ) : null}
                           <View style={styles.topMetaChip}>
                             <Ionicons name="time-outline" size={13} color={stylesTokens.orange} />
-                            <Text style={styles.topMetaChipText}>{normalizedEtaLabel}</Text>
+                            <Text style={styles.topMetaChipText} numberOfLines={1}>{normalizedEtaLabel}</Text>
                           </View>
                           <View style={styles.topMetaChip}>
                             <Ionicons name="star" size={13} color="#f59e0b" />
-                            <Text style={styles.topMetaChipText}>{storeText.get.ratingValue}</Text>
+                            <Text style={styles.topMetaChipText} numberOfLines={1}>{storeText.get.ratingValue}</Text>
                           </View>
                         </View>
 
@@ -1413,7 +1241,7 @@ export function DshStoreGetScreen({
                                       size={11}
                                       color={isPrimaryBenefit ? stylesTokens.white : stylesTokens.orange}
                                     />
-                                    <Text style={[styles.tagChipText, isPrimaryBenefit && styles.tagChipTextAccent]}>{chip}</Text>
+                                    <Text style={[styles.tagChipText, isPrimaryBenefit && styles.tagChipTextAccent]} numberOfLines={1}>{chip}</Text>
                                   </View>
                                 );
                               })}
@@ -1455,6 +1283,8 @@ export function DshStoreGetScreen({
                       ref={(r) => { chipsScrollRef.current = r; }}
                       onLayout={(e) => setChipsContainerWidth(e.nativeEvent.layout.width)}
                       showsHorizontalScrollIndicator={false}
+                      nestedScrollEnabled
+                      decelerationRate="fast"
                       contentContainerStyle={[styles.categoryRow, isRTL && styles.rowReverse]}
                     >
                       {categories.map((category) => {
@@ -1498,8 +1328,6 @@ export function DshStoreGetScreen({
                           <MenuItemCard
                             key={item.id}
                             item={item}
-                            isRTL={isRTL}
-                            labels={itemLabels}
                             partnerImageUri={storeCoverImageSource}
                             onAddPress={(anchor) => openMeasurementPicker(item, anchor ?? { x: 32, y: 360 })}
                             onImagePress={(it) => openImagePreview(it, storeCoverImageSource)}
@@ -2014,28 +1842,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: stylesTokens.white,
+    backgroundColor: '#f8fafc',
     borderRadius: 999,
-    paddingHorizontal: 9,
-    paddingVertical: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderWidth: 1,
-    borderColor: '#e8ebf0',
+    borderColor: '#dbe3ec',
   },
   topMetaChipText: {
-    color: stylesTokens.dark,
-    fontSize: 10.5,
+    color: '#334155',
+    fontSize: 10,
     fontWeight: '700',
   },
   followMetaChip: {
-    backgroundColor: '#fffaf5',
-    borderColor: '#fed7aa',
+    backgroundColor: '#fefbf6',
+    borderColor: '#f2d3ab',
   },
   followMetaChipActive: {
-    backgroundColor: stylesTokens.orange,
-    borderColor: stylesTokens.orange,
+    backgroundColor: '#ffedd5',
+    borderColor: '#f59e0b',
   },
   followMetaChipTextActive: {
-    color: stylesTokens.white,
+    color: '#92400e',
   },
   headerMetaText: {
     color: stylesTokens.muted,
@@ -2162,19 +1990,21 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3,
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
   },
   heroBadgePrimary: {
-    backgroundColor: '#ff6a00',
+    backgroundColor: '#eef2ff',
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 5,
+    borderWidth: 1,
+    borderColor: '#c7d2fe',
   },
   heroBadgePrimaryText: {
-    color: stylesTokens.white,
-    fontSize: 11,
+    color: '#1d4ed8',
+    fontSize: 10.5,
     fontWeight: '800',
   },
   heroBadgeGhost: {
@@ -2208,27 +2038,11 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   heroStatsRow: {
-    marginTop: 0,
-    flexDirection: 'row',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     gap: 8,
-    flexWrap: 'wrap',
     justifyContent: 'flex-start',
     alignSelf: 'stretch',
-  },
-  heroStatCard: {
-    flex: 1,
-    backgroundColor: stylesTokens.light,
-    borderRadius: 14,
-    paddingHorizontal: 10,
-    paddingVertical: 9,
-    borderWidth: 1,
-    borderColor: stylesTokens.line,
-  },
-  heroStatValue: {
-    color: stylesTokens.dark,
-    fontSize: 13,
-    fontWeight: '800',
-    textAlign: 'center',
   },
   heroStatLabel: {
     color: stylesTokens.muted,
@@ -2854,215 +2668,6 @@ const styles = StyleSheet.create({
   cartDecisionActions: {
     gap: 10,
   },
-  menuBody: {
-    flex: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    justifyContent: 'flex-start',
-    gap: 3,
-    alignItems: 'flex-end',
-  },
-  menuBodyRTL: {
-    alignItems: 'flex-end',
-  },
-  menuInfoZone: {
-    width: '100%',
-    minHeight: 50,
-    justifyContent: 'flex-start',
-    gap: 1,
-    alignItems: 'flex-end',
-    flexShrink: 1,
-  },
-  menuCommerceZone: {
-    width: '100%',
-    justifyContent: 'flex-start',
-    gap: 1,
-    alignItems: 'flex-end',
-    marginTop: 0,
-    flexShrink: 1,
-  },
-  menuTitle: {
-    color: stylesTokens.dark,
-    fontSize: 16,
-    fontWeight: '900',
-    lineHeight: 20,
-  },
-  menuSubtitle: {
-    color: stylesTokens.muted,
-    fontSize: 11.5,
-    marginTop: 1,
-    lineHeight: 15,
-  },
-  menuTimingRow: {
-    marginTop: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    alignSelf: 'flex-end',
-    gap: 4,
-    flexWrap: 'wrap',
-  },
-  menuPriceRow: {
-    marginTop: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    alignSelf: 'flex-end',
-    gap: 6,
-    flexWrap: 'wrap',
-    maxWidth: '100%',
-  },
-  menuPrice: {
-    color: stylesTokens.dark,
-    fontSize: 14,
-    fontWeight: '900',
-  },
-  menuOldPrice: {
-    color: stylesTokens.muted,
-    fontSize: 10.5,
-    fontWeight: '700',
-    textDecorationLine: 'line-through',
-  },
-  discountChip: {
-    backgroundColor: '#fef2f2',
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  discountChipText: {
-    color: '#dc2626',
-    fontSize: 10,
-    fontWeight: '900',
-  },
-  menuPrep: {
-    color: stylesTokens.muted,
-    fontSize: 10.5,
-    fontWeight: '600',
-  },
-  menuDiscountRow: {
-    marginTop: 0,
-    width: '100%',
-    flexDirection: 'row-reverse',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-  },
-  menuChipRow: {
-    marginTop: 0,
-    width: '100%',
-    flexDirection: 'row-reverse',
-    flexWrap: 'wrap',
-    gap: 5,
-    justifyContent: 'flex-start',
-    alignSelf: 'stretch',
-  },
-  smallChipPrimary: {
-    backgroundColor: stylesTokens.orangeSoft,
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  smallChipPrimaryText: {
-    color: stylesTokens.orange,
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  smallChipLight: {
-    backgroundColor: stylesTokens.chip,
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  smallChipLightText: {
-    color: stylesTokens.chipText,
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  smallChipDanger: {
-    backgroundColor: '#fef2f2',
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  smallChipDangerText: {
-    color: stylesTokens.red,
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  menuImageWrap: {
-    width: 176,
-    alignItems: 'stretch',
-    justifyContent: 'center',
-  },
-  menuImageCard: {
-    flex: 1,
-    width: '100%',
-    borderTopRightRadius: 18,
-    borderBottomRightRadius: 18,
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    backgroundColor: '#f3f4f6',
-    borderWidth: 0,
-    overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  menuImage: {
-    position: 'absolute',
-    inset: 0,
-    width: '100%',
-    height: '100%',
-  },
-  menuPartnerTile: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    width: 44,
-    height: 36,
-    backgroundColor: 'rgba(255,255,255,0.96)',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    zIndex: 6,
-    overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  menuPartnerTileImage: {
-    width: '100%',
-    height: '100%',
-  },
-  menuEmoji: {
-    fontSize: 48,
-  },
-  favoriteButton: {
-    position: 'absolute',
-    bottom: 8,
-    end: 8,
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: stylesTokens.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#fed7aa',
-    zIndex: 3,
-  },
-
-  menuImagePressable: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    right: 0,
-    bottom: 0,
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-  },
-
   emptyFeed: {
     paddingVertical: 36,
     alignItems: 'center',

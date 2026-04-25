@@ -1,5 +1,4 @@
 import { DshStoreFixtureItem, StoreItemsByStoreId } from './types';
-import { createFixtureImageUrl } from './utils';
 
 export const storeItemsByStoreId: StoreItemsByStoreId = {
   'store-1001': [
@@ -19,7 +18,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: false,
       preparationTime: '10-15 دقيقة',
       mediaKey: 'dsh.product.apple.v1',
-      imageUri: createFixtureImageUrl('#ECFCCB', '#365314', 'APPLE'),
+      imageUri: 'dsh.product.apple.v1',
     },
     {
       id: 'item-milk-1',
@@ -36,7 +35,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: false,
       preparationTime: '5-10 دقائق',
       mediaKey: 'dsh.product.milk.v1',
-      imageUri: createFixtureImageUrl('#F5F3FF', '#4C1D95', 'MILK'),
+      imageUri: 'dsh.product.milk.v1',
     },
     {
       id: 'item-bread-1',
@@ -53,7 +52,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: false,
       preparationTime: '10-20 دقيقة',
       mediaKey: 'dsh.product.bread.v1',
-      imageUri: createFixtureImageUrl('#FEF3C7', '#92400E', 'BREAD'),
+      imageUri: 'dsh.product.bread.v1',
     },
     {
       id: 'item-yogurt-1',
@@ -69,7 +68,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: false,
       preparationTime: '5-8 دقائق',
       mediaKey: 'dsh.product.yogurt.v1',
-      imageUri: createFixtureImageUrl('#E0F2FE', '#075985', 'YOGURT'),
+      imageUri: 'dsh.product.yogurt.v1',
     },
     {
       id: 'item-bananas-1',
@@ -87,7 +86,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: false,
       preparationTime: '5-10 دقائق',
       mediaKey: 'dsh.product.apple.v1',
-      imageUri: createFixtureImageUrl('#FEF3C7', '#92400E', 'BANANA'),
+      imageUri: 'dsh.product.apple.v1',
     },
     {
       id: 'item-croissant-2',
@@ -105,7 +104,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: false,
       preparationTime: '8-12 دقيقة',
       mediaKey: 'dsh.product.croissant.v1',
-      imageUri: createFixtureImageUrl('#FFF7ED', '#9A3412', 'CROISSANT'),
+      imageUri: 'dsh.product.croissant.v1',
     },
     {
       id: 'item-chicken-2',
@@ -123,7 +122,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: true,
       preparationTime: '18-22 دقيقة',
       mediaKey: 'dsh.product.chicken.v1',
-      imageUri: createFixtureImageUrl('#FEF2F2', '#991B1B', 'CHICKEN'),
+      imageUri: 'dsh.product.chicken.v1',
     },
     {
       id: 'item-salad-2',
@@ -139,7 +138,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: false,
       preparationTime: '10-15 دقيقة',
       mediaKey: 'dsh.product.salad.v1',
-      imageUri: createFixtureImageUrl('#DCFCE7', '#166534', 'SALAD'),
+      imageUri: 'dsh.product.salad.v1',
     },
     {
       id: 'item-choco-2',
@@ -155,7 +154,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: true,
       preparationTime: '12-18 دقيقة',
       mediaKey: 'dsh.product.choco.v1',
-      imageUri: createFixtureImageUrl('#FDF2F8', '#9D174D', 'CHOCO'),
+      imageUri: 'dsh.product.choco.v1',
     },
   ],
 
@@ -172,7 +171,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: false,
       preparationTime: '8-12 دقيقة',
       mediaKey: 'dsh.product.croissant.v1',
-      imageUri: createFixtureImageUrl('#FFF7ED', '#9A3412', 'CROISSANT'),
+      imageUri: 'dsh.product.croissant.v1',
     },
     {
       id: 'item-cake-1',
@@ -185,7 +184,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: true,
       preparationTime: '12-18 دقيقة',
       mediaKey: 'dsh.product.choco.v1',
-      imageUri: createFixtureImageUrl('#FDF2F8', '#9D174D', 'CHOCO'),
+      imageUri: 'dsh.product.choco.v1',
     },
     {
       id: 'item-cheese-roll-1',
@@ -198,7 +197,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: false,
       preparationTime: '10-14 دقيقة',
       mediaKey: 'dsh.product.roll.v1',
-      imageUri: createFixtureImageUrl('#FEF3C7', '#78350F', 'ROLL'),
+      imageUri: 'dsh.product.roll.v1',
     },
   ],
 
@@ -215,7 +214,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: true,
       preparationTime: '20-25 دقيقة',
       mediaKey: 'dsh.product.pasta.v1',
-      imageUri: createFixtureImageUrl('#F3E8FF', '#6B21A8', 'PASTA'),
+      imageUri: 'dsh.product.pasta.v1',
     },
     {
       id: 'item-salad-1',
@@ -228,7 +227,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: false,
       preparationTime: '10-15 دقيقة',
       mediaKey: 'dsh.product.salad.v1',
-      imageUri: createFixtureImageUrl('#DCFCE7', '#166534', 'SALAD'),
+      imageUri: 'dsh.product.salad.v1',
     },
     {
       id: 'item-chicken-1',
@@ -242,7 +241,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       hasOptions: true,
       preparationTime: '18-22 دقيقة',
       mediaKey: 'dsh.product.chicken.v1',
-      imageUri: createFixtureImageUrl('#FEF2F2', '#991B1B', 'CHICKEN'),
+      imageUri: 'dsh.product.chicken.v1',
     },
   ],
 };

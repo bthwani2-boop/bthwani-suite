@@ -4,6 +4,8 @@ export { CartDetails, CartSummary } from './display/CartDetails';
 export type { CartDetailsProps, CartLine, CartSummaryProps } from './display/CartDetails';
 export { AttachmentPicker, Card, DashboardShell, DetailScreenShell, ProductCard, ServiceHubShell, ServiceTileCard, StatCard } from './card';
 export type { AttachmentPickerItem, AttachmentPickerProps, AttachmentPickerTone, CardProps, DashboardShellProps, DetailScreenShellProps, ProductCardPrice, ProductCardProps, ServiceHubSection, ServiceHubShellProps, ServiceTileCardProps, StatCardProps } from './card';
+export { StoreCardPremium } from './store-card';
+export type { ServiceToken, StoreCardPremiumItem, StoreCardPremiumProps } from './store-card';
 export { BannerCarousel } from './banner';
 export type { BannerCarouselItem, BannerCarouselProps, BannerCarouselVariant } from './banner';
 export { AmountInput, Checkbox, FormScreenShell, OptionRow, Radio, SearchField, SegmentedControl, SelectField, Switch, TextField, PaymentMethodList, QuickAmountGrid, SummaryCard } from './field';

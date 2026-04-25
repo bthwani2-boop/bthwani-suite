@@ -1,5 +1,4 @@
 import { DshDiscoveryStore } from './types';
-import { createFixtureImageUrl } from './utils';
 
 export const dshDiscoveryStores: DshDiscoveryStore[] = [
   {
@@ -15,7 +14,7 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
     isFavorite: true,
     isFollowing: false,
     mediaKey: 'dsh.store.hadda.cover.v1',
-    imageUri: createFixtureImageUrl('#F97316', '#FFFFFF', 'HADDA'),
+    imageUri: 'dsh.store.hadda.cover.v1',
     deliveryLabel: 'توصيل مجاني',
     serviceLabel: 'توصيل برو',
     followerCount: 11000,
@@ -43,7 +42,7 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
     isFavorite: false,
     isFollowing: false,
     mediaKey: 'dsh.store.hittin.cover.v1',
-    imageUri: createFixtureImageUrl('#D97706', '#FFFFFF', 'HITTIN'),
+    imageUri: 'dsh.store.hittin.cover.v1',
     deliveryLabel: 'كوبون',
     serviceLabel: 'توصيل برو',
     followerCount: 9000,
@@ -70,7 +69,7 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
     isFavorite: false,
     isFollowing: false,
     mediaKey: 'dsh.store.malqa.cover.v1',
-    imageUri: createFixtureImageUrl('#0F172A', '#FFFFFF', 'MALQA'),
+    imageUri: 'dsh.store.malqa.cover.v1',
     deliveryLabel: 'توصيل سريع',
     serviceLabel: 'توصيل برو',
     followerCount: 23400,

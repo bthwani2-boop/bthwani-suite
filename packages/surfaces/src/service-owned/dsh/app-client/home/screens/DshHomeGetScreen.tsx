@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { resolveSeedMediaSource } from '@bthwani/media-fixtures';
 import { Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
 
 import {
@@ -9,6 +8,8 @@ import {
   BannerCarousel,
   SearchTopBar,
   StateView,
+  StoreCardPremium,
+  type StoreCardPremiumItem,
   Surface,
   Text,
   TopBar,
@@ -22,20 +23,6 @@ import {
   useTheme,
   useUiText,
 } from '@bthwani/ui-kit';
-import {
-  dshHomeGetFixturePromos,
-  dshHomeGetFixtureStores,
-  dshHomeGetFixtureTickerBanner,
-} from '../fixtures/dshHomeGetFixtures';
-import {
-  StoreCardPremium,
-  type DshStoreCompactCardData,
-} from '../components/StoreCardPremium';
-import {
-  dshCategoryFixtures,
-  DSH_CATEGORY_ICONS,
-} from '../../categories/fixtures/dshCategoriesFixtures';
-import { getDshCategoryFixture } from '../../categories/fixtures/dshCategoriesFixtures';
 import { DshAwnakOrderCreateScreen } from '../../awnak/screens';
 import { DshSheinOrderCreateScreen } from '../../shein/screens';
 import {
@@ -47,24 +34,15 @@ import CategoryClockDial, {
   type DialAnchorLayout,
 } from '../components/CategoryClockDial';
 import { getDshCategoryIconUrl } from '../../categories/utils/getDshCategoryIconUrl';
+import { resolveDshImageSource } from '../../shared/resolve-image-source';
 import type { MarketingGrowthRecord } from '../../../shared/marketing/growth-store';
 
-type SeedMediaKey = Parameters<typeof resolveSeedMediaSource>[0];
-
-function resolveDshHomeStoreImageSource(mediaKey?: string): ImageSourcePropType | undefined {
-  if (!mediaKey) {
-    return undefined;
-  }
-
-  return resolveSeedMediaSource(mediaKey as SeedMediaKey) as ImageSourcePropType;
+function resolveDshHomeStoreImageSource(imageUri?: string): ImageSourcePropType | undefined {
+  return resolveDshImageSource(imageUri);
 }
 
-function resolveDshHomeBannerImageSource(mediaKey?: string): ImageSourcePropType | undefined {
-  if (!mediaKey) {
-    return undefined;
-  }
-
-  return resolveSeedMediaSource(mediaKey as SeedMediaKey) as ImageSourcePropType;
+function resolveDshHomeBannerImageSource(imageUrl?: string): ImageSourcePropType | undefined {
+  return resolveDshImageSource(imageUrl);
 }
 export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
@@ -102,6 +80,13 @@ export type DshHomeGetScreenProps = {
 export type DshHomeCategory = {
   id: string;
   label: string;
+  subtitle?: string;
+  countLabel?: string;
+  subcategories?: Array<{
+    id: string;
+    label: string;
+    subtitle: string;
+  }>;
 };
 
 export type DshHomeBannerActionType = 'main_category' | 'sub_category' | 'store' | 'external' | 'store_category' | 'product' | 'subscription';
@@ -157,9 +142,9 @@ type DshServiceId = 'dsh' | 'knz' | 'amn' | 'arb' | 'wlt' | 'esf' | 'kwd' | 'mrf
 
 const serviceDialAnchorLayout: DialAnchorLayout = {
   x: spacing[3],
-  y: spacing[15],
-  width: 48,
-  height: 48,
+  y: spacing[14],
+  width: 52,
+  height: 52,
 };
 
 const serviceDialItems: CategoryDialItem[] = [
@@ -230,9 +215,9 @@ const serviceDialItems: CategoryDialItem[] = [
 
 const serviceLauncherMarkStyles = StyleSheet.create({
   root: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: '#fff7f0',
     alignItems: 'center',
     justifyContent: 'center',
@@ -244,25 +229,25 @@ const serviceLauncherMarkStyles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    borderRadius: 18,
+    borderRadius: 25,
     borderWidth: 2,
     borderColor: '#173a6a',
     borderTopColor: '#ff6a00',
   },
   needle: {
     position: 'absolute',
-    top: 5,
-    right: 6,
+    top: 7,
+    right: 8,
     width: 6,
-    height: 14,
+    height: 17,
     borderRadius: 999,
     backgroundColor: '#173a6a',
     transform: [{ rotate: '24deg' }],
   },
   planeWrap: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#ffffff',
@@ -340,7 +325,7 @@ function DshServiceLauncherMark() {
       <View style={serviceLauncherMarkStyles.orbit} />
       <View style={serviceLauncherMarkStyles.needle} />
       <View style={serviceLauncherMarkStyles.planeWrap}>
-        <Icon name="paper-plane" size={12} color="#FF6A00" />
+        <Icon name="paper-plane" size={14} color="#FF6A00" />
       </View>
     </View>
   );
@@ -368,10 +353,10 @@ function resolveTickerBanner(
   locationLabel: string,
   languageCode: string,
 ) {
-  const fixture = dshHomeGetFixtureTickerBanner;
-  const isOpen = isWithinOperatingHours(now, fixture.openHour, fixture.closeHour);
+  const isOpen = isWithinOperatingHours(now, 8, 23);
   const tickerLines: string[] = [];
   const isEnglish = languageCode === 'en';
+  const statusLabel = isOpen ? (isEnglish ? 'Live' : 'مباشر') : (isEnglish ? 'Closed' : 'مغلق');
 
   if (locationLabel.trim()) {
     tickerLines.push(
@@ -390,10 +375,9 @@ function resolveTickerBanner(
   });
 
   return {
-    fixture,
     isOpen,
-    statusLabel: isOpen ? fixture.openStatusLabel : fixture.closedStatusLabel,
-    message: tickerLines.length ? tickerLines.join('   •   ') : isOpen ? fixture.openMessage : fixture.closedMessage,
+    statusLabel,
+    message: tickerLines.length ? tickerLines.join('   •   ') : isEnglish ? 'Browse stores and active orders' : 'استعرض المتاجر والطلبات النشطة',
   };
 }
 
@@ -444,8 +428,8 @@ function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>,
 export function DshHomeGetScreen({
   state = 'ready',
   categories,
-  promos = dshHomeGetFixturePromos,
-  stores = dshHomeGetFixtureStores,
+  promos,
+  stores,
   recentOrders = [],
   onBack,
   onOpenList,
@@ -503,41 +487,27 @@ export function DshHomeGetScreen({
     onOpenEntry?.();
   }, [onOpenEntry, onOpenMySpace]);
 
+  const resolvedCategories = categories ?? [];
+  const resolvedPromos = promos ?? [];
+  const resolvedStores = stores ?? [];
+  const resolvedRecentOrders = recentOrders ?? [];
+
   const categoryItems = React.useMemo(() => {
-    if (categories) {
-      return categories;
-    }
-
-    return dshCategoryFixtures.map((category) => ({
-      id: category.id,
-      label: category.label,
-    }));
-  }, [categories]);
-  const visibleCategoryFixtures = React.useMemo(
-    () => {
-      if (categories) {
-        return categories
-          .map((category) => getDshCategoryFixture(category.id))
-          .filter((fixture): fixture is NonNullable<ReturnType<typeof getDshCategoryFixture>> => Boolean(fixture));
-      }
-
-      return dshCategoryFixtures;
-    },
-    [categories],
-  );
+    return resolvedCategories;
+  }, [resolvedCategories]);
   const selectedCategoryFixture = React.useMemo(
     () =>
       activeCategoryId && activeCategoryId !== 'all'
-        ? visibleCategoryFixtures.find((category) => category.id === activeCategoryId) ?? null
+        ? categoryItems.find((category) => category.id === activeCategoryId) ?? null
         : null,
-    [activeCategoryId, visibleCategoryFixtures]
+    [activeCategoryId, categoryItems]
   );
   const selectedCategoryLabel =
     selectedCategoryFixture?.label ??
     'الفئات';
   const selectedSubcategories = selectedCategoryFixture?.subcategories ?? [];
   React.useEffect(() => {
-    if (!visibleCategoryFixtures.length) {
+    if (!categoryItems.length) {
       return;
     }
 
@@ -545,31 +515,31 @@ export function DshHomeGetScreen({
       return;
     }
 
-    if (!visibleCategoryFixtures.some((category) => category.id === activeCategoryId)) {
-      setActiveCategoryId(visibleCategoryFixtures[0].id);
+    if (!categoryItems.some((category) => category.id === activeCategoryId)) {
+      setActiveCategoryId(categoryItems[0].id);
       setActiveSubcategoryId(null);
     }
-  }, [activeCategoryId, visibleCategoryFixtures]);
+  }, [activeCategoryId, categoryItems]);
   const allCategoryRailItems = React.useMemo(
     () =>
-      visibleCategoryFixtures.map((category) => ({
+      categoryItems.map((category) => ({
         ...category,
         icon: categoryIconMap[category.id] ?? '📂',
       })),
-    [visibleCategoryFixtures]
+    [categoryItems]
   );
 
   React.useEffect(() => {
-    if (promos.length <= 1) {
+    if (resolvedPromos.length <= 1) {
       return;
     }
 
     const interval = setInterval(() => {
-      setActivePromoIndex((current) => (current + 1) % promos.length);
+      setActivePromoIndex((current) => (current + 1) % resolvedPromos.length);
     }, 3800);
 
     return () => clearInterval(interval);
-  }, [promos]);
+  }, [resolvedPromos]);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -582,8 +552,8 @@ export function DshHomeGetScreen({
   const visibleStores = React.useMemo(() => {
     const categoryScopedStores =
       activeCategoryId && activeCategoryId !== 'all'
-        ? stores.filter((store) => (store.categoryId ? store.categoryId === activeCategoryId : true))
-        : stores;
+        ? resolvedStores.filter((store) => (store.categoryId ? store.categoryId === activeCategoryId : true))
+        : resolvedStores;
 
     const filteredByMode = categoryScopedStores.filter((store) => {
       const isFavorite = favoriteToggles[store.id] ?? store.isFavorite;
@@ -625,7 +595,7 @@ export function DshHomeGetScreen({
 
       return haystack.includes(normalizedQuery);
     });
-  }, [activeCategoryId, activeFilter, favoriteToggles, inlineSearchQuery, stores]);
+  }, [activeCategoryId, activeFilter, favoriteToggles, inlineSearchQuery, resolvedStores]);
 
   if (state !== 'ready') {
     return renderState(state, onRetry);
@@ -636,12 +606,12 @@ export function DshHomeGetScreen({
       return null;
     }
 
-    const matchedCategory = visibleCategoryFixtures.find((category) => category.id === targetId);
+    const matchedCategory = categoryItems.find((category) => category.id === targetId);
     if (matchedCategory) {
       return { categoryId: matchedCategory.id, subcategoryId: null as string | null };
     }
 
-    const parentCategory = visibleCategoryFixtures.find((category) =>
+    const parentCategory = categoryItems.find((category) =>
       category.subcategories?.some((subcategory) => subcategory.id === targetId),
     );
 
@@ -650,7 +620,7 @@ export function DshHomeGetScreen({
     }
 
     return null;
-  }, [visibleCategoryFixtures]);
+  }, [categoryItems]);
 
   const resolveBannerPress = React.useCallback(
     (promo: DshHomeGetPromo) => () => {
@@ -737,10 +707,10 @@ export function DshHomeGetScreen({
     [onOpenBenefits, onOpenDiscovery, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, resolveHomeCategoryContext]
   );
 
-  const activePromo = promos[activePromoIndex % promos.length] ?? dshHomeGetFixturePromos[0];
-  const promoDiscount = activePromo.subtitle.match(/\d+%/)?.[0] ?? '30%';
-  const promoTail = activePromo.subtitle.replace(promoDiscount, '').trim();
-  const tickerAction = resolveBannerPress(activePromo);
+  const activePromo = resolvedPromos[activePromoIndex % resolvedPromos.length] ?? null;
+  const promoDiscount = activePromo?.subtitle.match(/\d+%/)?.[0] ?? '';
+  const promoTail = activePromo ? activePromo.subtitle.replace(promoDiscount, '').trim() : '';
+  const tickerAction = activePromo ? resolveBannerPress(activePromo) : undefined;
 
   const resolveVideoCtaPress = React.useCallback(
     (item: MarketingGrowthRecord) => {
@@ -831,18 +801,18 @@ export function DshHomeGetScreen({
 
   const approvedVideoReels = approvedVideoShorts.length > 0 ? approvedVideoShorts : [];
   // Marketing-driven banner carousel items: promos are the single source of truth for banner content and routing.
-  const bannerItems = promos.map((promo) => ({
+  const bannerItems = resolvedPromos.map((promo) => ({
     id: promo.id,
     title: promo.title,
     subtitle: promo.subtitle,
-    image: resolveDshHomeBannerImageSource(promo.mediaKey),
-    imageUrl: promo.imageUrl,
+    image: resolveDshHomeBannerImageSource(promo.mediaKey ?? promo.imageUrl),
+    imageUrl: promo.imageUrl ?? promo.mediaKey,
     accentColor: promo.accentColor,
     onPress: resolveBannerPress(promo),
   }));
   const tickerState = React.useMemo(
-    () => resolveTickerBanner(currentTime, recentOrders, uiText.topBar.location, currentLanguage),
-    [currentLanguage, currentTime, recentOrders, uiText.topBar.location]
+    () => resolveTickerBanner(currentTime, resolvedRecentOrders, uiText.topBar.location, currentLanguage),
+    [currentLanguage, currentTime, resolvedRecentOrders, uiText.topBar.location]
   );
   const openInlineSearch = React.useCallback(() => {
     setInlineSearchVisible(true);
@@ -858,14 +828,14 @@ export function DshHomeGetScreen({
   }, []);
 
   const categoriesDialItems = React.useMemo<CategoryDialItem[]>(() => {
-    return visibleCategoryFixtures.map((category) => ({
+    return categoryItems.map((category) => ({
       id: category.id,
       key: category.id,
       title: category.label,
       iconUrl: getDshCategoryIconUrl(category.id),
-      emojiFallback: DSH_CATEGORY_ICONS[category.id] ?? '📂',
+      emojiFallback: categoryIconMap[category.id] ?? '📂',
     }));
-  }, [visibleCategoryFixtures]);
+  }, [categoryItems]);
 
   const showSheinInline = sheinInlineVisible;
   const showAwnakInline = awnakInlineVisible;
@@ -880,7 +850,7 @@ export function DshHomeGetScreen({
       key: selectedCategoryFixture.id,
       title: selectedCategoryLabel,
       iconUrl: getDshCategoryIconUrl(selectedCategoryFixture.id),
-      emojiFallback: DSH_CATEGORY_ICONS[selectedCategoryFixture.id] ?? '📂',
+      emojiFallback: categoryIconMap[selectedCategoryFixture.id] ?? '📂',
     };
   }, [selectedCategoryFixture, selectedCategoryLabel]);
 
@@ -918,36 +888,36 @@ export function DshHomeGetScreen({
       ) : (
         <TopBar
           variant="main"
-          layoutMode="relaxed-main"
+          layoutMode="default"
           title={uiText.topBar.brandName}
           subtitle={uiText.topBar.brandTagline}
           onTitlePress={handleOpenMySpace}
-          contentOffsetY={spacing[1]}
           locationLabel={uiText.topBar.location}
-          locationIcon={<Icon name="location-outline" size={14} color="#FFFFFF" />}
+          locationIcon={<Icon name="location-outline" size={12} color="#FFFFFF" />}
+          actionsOffsetY={spacing[1]}
           actions={[
             {
               id: 'my-space',
-              icon: <Icon name="person" size={22} color="#FFFFFF" />,
+              icon: <Icon name="person" size={20} color="#FFFFFF" />,
               size: 'lg',
               accessibilityLabel: 'مساحتي',
               onPress: handleOpenMySpace,
             },
             {
               id: 'notifications',
-              icon: <Icon name="notifications-outline" size={28} color="#FFFFFF" />,
+              icon: <Icon name="notifications-outline" size={24} color="#FFFFFF" />,
               accessibilityLabel: 'الإشعارات',
               onPress: onOpenNotifications,
             },
             {
               id: 'cart',
-              icon: <Icon name="cart-outline" size={28} color="#FFFFFF" />,
+              icon: <Icon name="cart-outline" size={24} color="#FFFFFF" />,
               accessibilityLabel: 'السلة',
               onPress: onOpenCart,
             },
             {
               id: 'search',
-              icon: <Icon name="search-outline" size={28} color="#FFFFFF" />,
+              icon: <Icon name="search-outline" size={24} color="#FFFFFF" />,
               accessibilityLabel: 'بحث',
               onPress: openInlineSearch,
             },
@@ -957,14 +927,13 @@ export function DshHomeGetScreen({
             message: tickerState.message,
             onPress: tickerAction,
             marquee: true,
-            marqueeDurationMs: 36000,
+            marqueeDurationMs: 14000,
             trailingAction: {
               accessibilityLabel: 'الخدمات',
               onPress: openServiceDial,
               icon: <DshServiceLauncherMark />,
             },
           }}
-          style={styles.brandTopBarShell}
         />
       )}
 
@@ -982,7 +951,7 @@ export function DshHomeGetScreen({
                 : 'ابدأ بكتابة اسم متجر أو خدمة أو فئة، وستظهر النتائج مباشرة في نفس الصفحة.'}
             </Text>
           </Surface>
-        ) : (
+        ) : bannerItems.length ? (
           <BannerCarousel
             banners={bannerItems}
             height={184}
@@ -990,7 +959,7 @@ export function DshHomeGetScreen({
             width={viewportWidth}
             style={styles.bannerCarouselFullBleed}
           />
-        )}
+        ) : null}
 
         {showSheinInline ? (
           <Box gap={3}>
@@ -1048,38 +1017,42 @@ export function DshHomeGetScreen({
               ) : null}
             </View>
 
-            <Pressable style={[styles.heroPromoCard, styles.heroPromoCardInline]} onPress={openInlineSearch}>
-              <View style={styles.heroPromoContent}>
-                <View style={styles.heroPromoIconWrap}>
-                  <Text role="titleLg" style={styles.heroIcon}>
-                    {activePromo.icon}
-                  </Text>
-                </View>
-
-                <View style={styles.heroPromoTextWrap}>
-                  <View style={styles.heroPromoBadge}>
-                    <Text role="bodySm" style={styles.heroPromoBadgeText}>
-                      {activePromo.title}
+            {activePromo ? (
+              <Pressable style={[styles.heroPromoCard, styles.heroPromoCardInline]} onPress={openInlineSearch}>
+                <View style={styles.heroPromoContent}>
+                  <View style={styles.heroPromoIconWrap}>
+                    <Text role="titleLg" style={styles.heroIcon}>
+                      {activePromo.icon}
                     </Text>
                   </View>
-                  <Text role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
-                    {promoDiscount}
-                  </Text>
-                  <Text role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
-                    {promoTail || 'على أول طلب'}
-                  </Text>
-                </View>
-              </View>
 
-              <View style={styles.heroPagerRow}>
-                <View style={styles.heroPagerActive} />
-              </View>
-            </Pressable>
+                  <View style={styles.heroPromoTextWrap}>
+                    <View style={styles.heroPromoBadge}>
+                      <Text role="bodySm" style={styles.heroPromoBadgeText}>
+                        {activePromo.title}
+                      </Text>
+                    </View>
+                    <Text role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
+                      {promoDiscount}
+                    </Text>
+                    <Text role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
+                      {promoTail || 'على أول طلب'}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.heroPagerRow}>
+                  <View style={styles.heroPagerActive} />
+                </View>
+              </Pressable>
+            ) : null}
 
             {selectedSubcategoryCards.length > 0 ? (
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
+                nestedScrollEnabled
+                decelerationRate="fast"
                 contentContainerStyle={styles.categoriesSelectorScrollContent}
                 style={styles.categoriesSelectorScroll}
               >
@@ -1146,6 +1119,8 @@ export function DshHomeGetScreen({
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
+            nestedScrollEnabled
+            decelerationRate="fast"
             contentContainerStyle={styles.filtersRowScrollContent}
             style={styles.filtersRowScroll}
           >
@@ -1237,7 +1212,7 @@ export function DshHomeGetScreen({
 
         <Box gap={2}>
           {visibleStores.map((store, index) => {
-            const card: DshStoreCompactCardData = {
+            const card: StoreCardPremiumItem = {
               id: store.id,
               name: store.name,
               subtitle: store.address,

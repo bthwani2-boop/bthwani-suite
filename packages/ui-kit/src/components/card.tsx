@@ -1,7 +1,8 @@
-import React from 'react';
-import { Image, Pressable, ScrollView, View, type ImageSourcePropType, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
-import { radius, spacing } from '../foundation';
-import { useTheme } from '../providers';
+import React, { memo, useMemo } from 'react';
+import { Image, Pressable, ScrollView, StyleSheet, View, type GestureResponderEvent, type ImageSourcePropType, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { radius, resolveRowDirection, resolveTextAlign, spacing } from '../foundation';
+import { useDirection, useTheme } from '../providers';
 import { Badge, Button } from './button';
 import { Surface, Text } from '../primitives';
 import { StateView } from './state';
@@ -84,7 +85,15 @@ export type ProductCardProps = {
   title: string;
   subtitle?: string;
   imageUri?: string;
+  imageSource?: ImageSourcePropType | string | null;
+  partnerImageUri?: string;
+  partnerImageSource?: ImageSourcePropType | string | null;
+  emoji?: string;
   showImage?: boolean;
+  statusLabel?: string;
+  statusTone?: 'default' | 'success' | 'warning' | 'danger';
+  categoryLabel?: string;
+  preparationTime?: string;
   price?: ProductCardPrice;
   oldPrice?: ProductCardPrice;
   discountLabel?: string;
@@ -92,9 +101,19 @@ export type ProductCardProps = {
   isFavorited?: boolean;
   onAdd?: (anchor?: { x: number; y: number }) => void;
   onFavorite?: () => void;
+  onImagePress?: () => void;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
+  testID?: string;
 };
+
+function resolveImageSource(source?: ImageSourcePropType | string | null): ImageSourcePropType | undefined {
+  if (!source) {
+    return undefined;
+  }
+
+  return typeof source === 'string' ? { uri: source } : source;
+}
 
 function formatCurrencyAmount(amount: number, currency: string) {
   try {
@@ -104,60 +123,506 @@ function formatCurrencyAmount(amount: number, currency: string) {
   }
 }
 
-export function ProductCard({
+function resolveStatusTone(statusLabel?: string, statusTone?: ProductCardProps['statusTone']): ProductCardProps['statusTone'] {
+  if (statusTone) {
+    return statusTone;
+  }
+
+  if (!statusLabel) {
+    return 'default';
+  }
+
+  const normalized = statusLabel.trim().toLowerCase();
+  if (normalized.includes('مغلق') || normalized.includes('closed') || normalized.includes('غير متاح')) {
+    return 'danger';
+  }
+
+  if (normalized.includes('مفتوح') || normalized.includes('open') || normalized.includes('متاح')) {
+    return 'success';
+  }
+
+  return 'default';
+}
+
+function formatPriceLabel(price?: ProductCardPrice) {
+  if (!price) {
+    return undefined;
+  }
+
+  if (price.label) {
+    return price.label;
+  }
+
+  if (price.value == null) {
+    return undefined;
+  }
+
+  return formatCurrencyAmount(price.value, price.currency ?? 'SAR');
+}
+
+type ProductCardStyles = ReturnType<typeof createProductCardStyles>;
+
+function createProductCardStyles(theme: ReturnType<typeof useTheme>['theme'], rowDirection: 'row' | 'row-reverse', textAlign: 'left' | 'right' | 'center') {
+  const alignItemsDirection = textAlign === 'right' ? 'flex-end' : 'flex-start';
+
+  return StyleSheet.create({
+    card: {
+      width: '100%',
+      backgroundColor: theme.surface,
+      borderRadius: 18,
+      paddingVertical: 0,
+      paddingHorizontal: 0,
+      borderWidth: 1,
+      borderColor: theme.line,
+      flexDirection: rowDirection,
+      alignItems: 'stretch',
+      height: 126,
+      overflow: 'hidden',
+      shadowColor: '#000',
+      shadowOpacity: 0.08,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 2 },
+      elevation: 1,
+    },
+    cardPressed: {
+      opacity: 0.98,
+    },
+    imageWrap: {
+      width: 176,
+      alignItems: 'stretch',
+      justifyContent: 'center',
+    },
+    imageCard: {
+      flex: 1,
+      width: '100%',
+      borderTopRightRadius: 18,
+      borderBottomRightRadius: 18,
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0,
+      backgroundColor: theme.surfaceInset,
+      borderWidth: 0,
+      overflow: 'hidden',
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'relative',
+    },
+    image: {
+      position: 'absolute',
+      inset: 0,
+      width: '100%',
+      height: '100%',
+    },
+    imagePlaceholder: {
+      width: '100%',
+      height: '100%',
+      backgroundColor: theme.surfaceInset,
+    },
+    partnerTile: {
+      position: 'absolute',
+      top: 10,
+      left: 10,
+      width: 44,
+      height: 36,
+      backgroundColor: 'rgba(255,255,255,0.96)',
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: '#e5e7eb',
+      zIndex: 6,
+      overflow: 'hidden',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    partnerTileImage: {
+      width: '100%',
+      height: '100%',
+    },
+    emoji: {
+      position: 'absolute',
+      top: 36,
+      right: 36,
+      fontSize: 48,
+    },
+    imagePressable: {
+      position: 'absolute',
+      left: 0,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1,
+    },
+    favoriteButton: {
+      position: 'absolute',
+      bottom: 8,
+      end: 8,
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      backgroundColor: theme.surface,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#fed7aa',
+      zIndex: 3,
+    },
+    body: {
+      flex: 1,
+      minWidth: 0,
+      justifyContent: 'space-between',
+      alignItems: alignItemsDirection,
+      marginEnd: 0,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+    },
+    infoZone: {
+      width: '100%',
+      minHeight: 50,
+      justifyContent: 'flex-start',
+      gap: 1,
+      alignItems: alignItemsDirection,
+      flexShrink: 1,
+    },
+    title: {
+      color: theme.text,
+      fontSize: 16,
+      fontWeight: '900',
+      lineHeight: 20,
+      textAlign,
+    },
+    subtitle: {
+      color: theme.textMuted,
+      fontSize: 11.5,
+      marginTop: 1,
+      lineHeight: 15,
+      textAlign,
+    },
+    timingRow: {
+      marginTop: 2,
+      flexDirection: rowDirection,
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      alignSelf: 'flex-end',
+      gap: 4,
+      flexWrap: 'wrap',
+    },
+    prep: {
+      color: theme.textMuted,
+      fontSize: 10.5,
+      fontWeight: '600',
+    },
+    commerceZone: {
+      width: '100%',
+      justifyContent: 'flex-start',
+      gap: 1,
+      alignItems: alignItemsDirection,
+      marginTop: 0,
+      flexShrink: 1,
+    },
+    priceRow: {
+      marginTop: 0,
+      flexDirection: rowDirection,
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      alignSelf: 'flex-end',
+      gap: 6,
+      flexWrap: 'wrap',
+      maxWidth: '100%',
+    },
+    price: {
+      color: theme.text,
+      fontSize: 14,
+      fontWeight: '900',
+    },
+    oldPrice: {
+      color: theme.textMuted,
+      fontSize: 10.5,
+      fontWeight: '700',
+      textDecorationLine: 'line-through',
+    },
+    discountRow: {
+      marginTop: 0,
+      width: '100%',
+      flexDirection: rowDirection,
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+    },
+    discountChip: {
+      backgroundColor: '#fef2f2',
+      borderRadius: 999,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+    },
+    discountText: {
+      color: '#dc2626',
+      fontSize: 10,
+      fontWeight: '900',
+    },
+    chipRow: {
+      marginTop: 0,
+      width: '100%',
+      flexDirection: rowDirection,
+      flexWrap: 'wrap',
+      gap: 5,
+      justifyContent: 'flex-start',
+      alignSelf: 'stretch',
+    },
+    smallChipPrimary: {
+      backgroundColor: theme.brandSurface,
+      borderRadius: 999,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+    },
+    smallChipPrimaryText: {
+      color: theme.brand,
+      fontSize: 11,
+      fontWeight: '800',
+    },
+    smallChipSuccess: {
+      backgroundColor: theme.successSurface,
+    },
+    smallChipSuccessText: {
+      color: theme.successText,
+    },
+    smallChipDanger: {
+      backgroundColor: theme.dangerSurface,
+    },
+    smallChipDangerText: {
+      color: theme.dangerText,
+    },
+    smallChipLight: {
+      backgroundColor: theme.surfaceInset,
+      borderRadius: 999,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+    },
+    smallChipLightText: {
+      color: theme.textMuted,
+      fontSize: 11,
+      fontWeight: '700',
+    },
+    actionRail: {
+      width: 44,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingTop: 6,
+      paddingLeft: 8,
+    },
+    actionRailRTL: {
+      alignItems: 'center',
+    },
+    actionBadge: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: theme.brand,
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'relative',
+    },
+    actionPlusBadge: {
+      position: 'absolute',
+      top: -3,
+      left: -3,
+      width: 15,
+      height: 15,
+      borderRadius: 7.5,
+      backgroundColor: theme.surface,
+      borderWidth: 1,
+      borderColor: '#fed7aa',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    rowReverse: {
+      flexDirection: 'row-reverse',
+    },
+  });
+}
+
+export const ProductCard = memo(function ProductCard({
   title,
   subtitle,
   imageUri,
+  imageSource,
+  partnerImageUri,
+  partnerImageSource,
+  emoji,
   showImage = true,
+  statusLabel,
+  statusTone,
+  categoryLabel,
+  preparationTime,
   price,
   oldPrice,
   discountLabel,
-  badges = [],
   isFavorited,
   onAdd,
   onFavorite,
+  onImagePress,
   onPress,
   style,
+  testID,
 }: ProductCardProps) {
+  const { direction } = useDirection();
   const { theme } = useTheme();
-  const imageSize = 120;
+  const rowDirection = resolveRowDirection(direction);
+  const textAlign = resolveTextAlign(direction);
+  const logicalAlign = textAlign === 'left' ? 'start' : textAlign === 'right' ? 'end' : 'center';
+  const isRTL = direction === 'rtl';
+  const styles = useMemo(() => createProductCardStyles(theme, rowDirection, textAlign), [theme, rowDirection, textAlign]);
+  const resolvedImageSource = resolveImageSource(imageSource ?? imageUri);
+  const resolvedPartnerSource = resolveImageSource(partnerImageSource ?? partnerImageUri);
+  const resolvedStatusTone = resolveStatusTone(statusLabel, statusTone);
+  const priceLabel = formatPriceLabel(price);
+  const oldPriceLabel = formatPriceLabel(oldPrice);
 
-  const content = (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[4] }}>
-      <View style={{ flex: 1 }}>
-        <View style={{ gap: spacing[1] }}>
-          <Text role="bodyStrong">{title}</Text>
-          {subtitle ? <Text role="bodySm" tone="muted">{subtitle}</Text> : null}
-          {badges.length ? <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1] }}>{badges.map((badge) => <Badge key={badge} label={badge} tone="default" />)}</View> : null}
-        </View>
+  return (
+    <Pressable
+      testID={testID}
+      onPress={onPress}
+      accessibilityRole={onPress ? 'button' : undefined}
+      style={({ pressed }) => [styles.card, style, pressed && onPress ? styles.cardPressed : null]}
+    >
+      <View style={styles.imageWrap}>
+        <View style={styles.imageCard}>
+          {showImage && resolvedImageSource ? (
+            <Image source={resolvedImageSource} style={styles.image} resizeMode="cover" />
+          ) : (
+            <View style={styles.imagePlaceholder} />
+          )}
 
-        <View style={{ marginTop: spacing[3], gap: spacing[1] }}>
-          {price?.value != null ? <Text role="titleSm">{formatCurrencyAmount(price.value, price.currency ?? 'SAR')}</Text> : null}
-          {oldPrice?.value != null ? <Text role="bodySm" tone="soft">{formatCurrencyAmount(oldPrice.value, oldPrice.currency ?? 'SAR')}</Text> : null}
-        </View>
+          {resolvedPartnerSource ? (
+            <View style={styles.partnerTile}>
+              <Image source={resolvedPartnerSource} style={styles.partnerTileImage} resizeMode="cover" />
+            </View>
+          ) : null}
 
-        <View style={{ marginTop: spacing[3], flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>
-          {onFavorite ? <Button label={isFavorited ? 'Favorited' : 'Favorite'} tone="secondary" size="sm" fullWidth={false} onPress={onFavorite} /> : null}
-          {onAdd ? <Button label="Add" size="sm" fullWidth={false} onPress={() => onAdd()} /> : null}
+          {emoji ? <Text role="titleLg" style={styles.emoji}>{emoji}</Text> : null}
+
+          {onImagePress ? (
+            <Pressable
+              accessibilityRole="imagebutton"
+              accessibilityLabel={`${title} · معاينة الصورة`}
+              hitSlop={8}
+              onPress={onImagePress}
+              style={styles.imagePressable}
+            />
+          ) : null}
+
+          {onFavorite ? (
+            <Pressable
+              hitSlop={8}
+              onPress={onFavorite}
+              style={styles.favoriteButton}
+            >
+              <Ionicons
+                name={isFavorited ? 'heart' : 'heart-outline'}
+                size={18}
+                color={isFavorited ? theme.danger : theme.textMuted}
+              />
+            </Pressable>
+          ) : null}
         </View>
       </View>
 
-      {showImage && imageUri ? (
-        <Image source={{ uri: imageUri }} style={{ width: imageSize, height: imageSize, borderRadius: radius.md }} resizeMode="cover" />
-      ) : (
-        <View style={{ width: imageSize, height: imageSize, borderRadius: radius.md, backgroundColor: theme.surfaceInset }} />
-      )}
-    </View>
-  );
+      <View style={styles.body}>
+        <View style={styles.infoZone}>
+          <Text role="bodyStrong" align={logicalAlign} numberOfLines={2} style={styles.title}>
+            {title}
+          </Text>
+          {subtitle ? (
+            <Text role="bodySm" tone="muted" align={logicalAlign} numberOfLines={2} style={styles.subtitle}>
+              {subtitle}
+            </Text>
+          ) : null}
 
-  const footer = discountLabel ? <View style={{ position: 'relative', marginTop: spacing[3] }}><Badge label={discountLabel} tone="warning" /></View> : null;
+          {preparationTime ? (
+            <View style={styles.timingRow}>
+              <Ionicons name="time-outline" size={14} color={theme.textMuted} />
+              <Text role="bodySm" style={styles.prep} numberOfLines={1}>
+                {preparationTime}
+              </Text>
+            </View>
+          ) : null}
+        </View>
 
-  return (
-    <Card onPress={onPress} footer={footer} style={style}>
-      {content}
-    </Card>
+        <View style={styles.commerceZone}>
+          <View style={styles.priceRow}>
+            {priceLabel ? (
+              <Text role="titleSm" align={logicalAlign} style={styles.price} numberOfLines={1}>
+                {priceLabel}
+              </Text>
+            ) : null}
+            {oldPriceLabel ? (
+              <Text role="bodySm" tone="soft" style={styles.oldPrice} numberOfLines={1}>
+                {oldPriceLabel}
+              </Text>
+            ) : null}
+          </View>
+
+          {discountLabel ? (
+            <View style={styles.discountRow}>
+              <View style={styles.discountChip}>
+                <Text role="label" style={styles.discountText} numberOfLines={1}>
+                  {discountLabel}
+                </Text>
+              </View>
+            </View>
+          ) : null}
+
+          <View style={styles.chipRow}>
+            {statusLabel ? (
+              <View
+                style={[
+                  styles.smallChipPrimary,
+                  resolvedStatusTone === 'success' ? styles.smallChipSuccess : null,
+                  resolvedStatusTone === 'danger' ? styles.smallChipDanger : null,
+                ]}
+              >
+                <Text
+                  role="label"
+                  style={[
+                    styles.smallChipPrimaryText,
+                    resolvedStatusTone === 'success' ? styles.smallChipSuccessText : null,
+                    resolvedStatusTone === 'danger' ? styles.smallChipDangerText : null,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {statusLabel}
+                </Text>
+              </View>
+            ) : null}
+
+            {categoryLabel ? (
+              <View style={styles.smallChipLight}>
+                <Text role="label" style={styles.smallChipLightText} numberOfLines={1}>
+                  {categoryLabel}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.actionRail}>
+        {onAdd ? (
+          <Pressable
+            hitSlop={10}
+            onPress={(event: GestureResponderEvent) => onAdd({ x: event.nativeEvent.pageX, y: event.nativeEvent.pageY })}
+            style={styles.actionBadge}
+          >
+            <Ionicons name="cart-outline" size={18} color={theme.textInverse} />
+            <View style={styles.actionPlusBadge}>
+              <Ionicons name="add" size={8} color={theme.text} />
+            </View>
+          </Pressable>
+        ) : null}
+      </View>
+    </Pressable>
   );
-}
+});
 
 export type StatCardProps = {
   label: string;

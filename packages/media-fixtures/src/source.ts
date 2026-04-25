@@ -1,8 +1,9 @@
 import type { SeedMediaKey } from './catalog';
+import type { ImageSourcePropType } from 'react-native';
 
-declare const require: (path: string) => unknown;
+declare const require: (path: string) => ImageSourcePropType;
 
-export type SeedMediaSource = unknown;
+export type SeedMediaSource = ImageSourcePropType;
 
 export const SeedMediaSourceRegistry = {
   'dsh.product.apple.v1': require('../assets/seed/dsh/products/dsh-product-apple-v1.png'),
