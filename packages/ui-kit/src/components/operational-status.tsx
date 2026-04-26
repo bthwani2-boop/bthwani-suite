@@ -4,6 +4,7 @@ import {
   Dimensions,
   Platform,
   Pressable,
+  TextInput,
   View,
   type LayoutChangeEvent,
   type StyleProp,
@@ -18,7 +19,6 @@ import {
 import { useDirection, useTheme } from '../providers';
 import { Surface, Text, type SurfaceTone } from '../primitives';
 import { Badge, Button, type BadgeProps, type ButtonTone } from './button';
-import { TextField } from './field';
 import { SectionHeader } from './header';
 import { KeyValueList, type KeyValueItem } from './list';
 
@@ -266,6 +266,9 @@ export function OrderLinkedChat({
 }: OrderLinkedChatProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
+  const hasValue = value.trim().length > 0;
+  const canSend = Boolean(onSend) && !sendDisabled;
+  const isRtl = direction === 'rtl';
 
   return (
     <Surface tone="default" padding={2} gap={2} style={{ borderColor: theme.line }}>
@@ -298,48 +301,112 @@ export function OrderLinkedChat({
         </Text>
       ) : null}
 
-      {quickActions.length ? (
+      <Surface
+        tone="inset"
+        padding={2}
+        gap={2}
+        style={{
+          borderRadius: radius.lg,
+          borderColor: theme.lineStrong,
+          backgroundColor: theme.surface,
+        }}
+      >
         <View
           style={{
-            flexDirection: 'row-reverse',
-            flexWrap: 'wrap',
-            justifyContent: 'flex-start',
-            gap: spacing[1],
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: spacing[2],
           }}
         >
-          {quickActions.map((action) => (
-            <Button
-              key={action.id}
-              label={action.label}
-              tone={action.selected ? 'primary' : 'secondary'}
-              size="sm"
-              fullWidth={false}
-              disabled={action.disabled}
-              leadingAccessory={action.icon}
-              onPress={action.onPress}
-              style={{ minWidth: 96 }}
-            />
-          ))}
-        </View>
-      ) : null}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+            {quickActions.map((action) => (
+              <Pressable
+                key={action.id}
+                accessibilityRole="button"
+                accessibilityLabel={action.label}
+                accessibilityState={{ selected: action.selected, disabled: action.disabled }}
+                disabled={action.disabled}
+                onPress={action.onPress}
+                style={({ pressed }) => ({
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: action.selected ? theme.brand : theme.line,
+                  backgroundColor: action.selected ? theme.brandSurface : pressed ? theme.surfaceInset : theme.surface,
+                  opacity: action.disabled ? 0.5 : 1,
+                })}
+              >
+                {action.icon ?? (
+                  <Text role="caption" tone={action.selected ? 'brand' : 'muted'}>
+                    {action.label.slice(0, 1)}
+                  </Text>
+                )}
+              </Pressable>
+            ))}
+          </View>
 
-      <TextField
-        label={inputLabel}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={inputPlaceholder}
-        multiline
-        numberOfLines={4}
-        style={{ minHeight: 104, textAlignVertical: 'top' }}
-      />
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            {inputLabel}
+          </Text>
+        </View>
+
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          editable={!sendDisabled || hasValue}
+          placeholder={inputPlaceholder}
+          placeholderTextColor={theme.textSoft}
+          multiline
+          numberOfLines={4}
+          textAlign={isRtl ? 'right' : 'left'}
+          textAlignVertical="top"
+          style={{
+            minHeight: 96,
+            borderWidth: 0,
+            paddingHorizontal: 0,
+            paddingVertical: spacing[1],
+            color: theme.text,
+            writingDirection: isRtl ? 'rtl' : 'ltr',
+          }}
+        />
+
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={sendLabel}
+            accessibilityState={{ disabled: !canSend }}
+            disabled={!canSend}
+            onPress={onSend}
+            style={({ pressed }) => ({
+              width: 36,
+              height: 36,
+              borderRadius: 18,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderWidth: 1,
+              borderColor: canSend ? theme.brand : theme.line,
+              backgroundColor: canSend ? theme.brandSurface : theme.surface,
+              opacity: canSend ? (pressed ? 0.9 : 1) : 0.45,
+            })}
+          >
+            <Ionicons
+              name={isRtl ? 'paper-plane' : 'paper-plane-outline'}
+              size={18}
+              color={canSend ? theme.brand : theme.textSoft}
+            />
+          </Pressable>
+        </View>
+      </Surface>
 
       {disabledReason ? (
         <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
           {disabledReason}
         </Text>
       ) : null}
-
-      <Button label={sendLabel} onPress={onSend} disabled={sendDisabled} />
     </Surface>
   );
 }

@@ -4,8 +4,12 @@ import * as WltAdapter from '../WltAdapter';
 export function useWlt() {
   const [linked, setLinked] = React.useState<boolean>(false);
   const [balance, setBalance] = React.useState<number | null>(null);
+  const [hydrated, setHydrated] = React.useState<boolean>(false);
+  const [refreshing, setRefreshing] = React.useState<boolean>(false);
+  const [lastError, setLastError] = React.useState<string | null>(null);
 
   const refresh = React.useCallback(async () => {
+    setRefreshing(true);
     try {
       const l = await WltAdapter.isLinked();
       setLinked(Boolean(l));
@@ -15,9 +19,14 @@ export function useWlt() {
       } else {
         setBalance(null);
       }
+      setLastError(null);
     } catch (e) {
       setLinked(false);
       setBalance(null);
+      setLastError('wallet_refresh_failed');
+    } finally {
+      setHydrated(true);
+      setRefreshing(false);
     }
   }, []);
 
@@ -45,7 +54,19 @@ export function useWlt() {
     return r;
   }, [refresh]);
 
-  return { linked, balance, refresh, requestPayment, getBalance, link, topUp, createDeepLink: WltAdapter.createDeepLink } as const;
+  return {
+    linked,
+    balance,
+    hydrated,
+    refreshing,
+    lastError,
+    refresh,
+    requestPayment,
+    getBalance,
+    link,
+    topUp,
+    createDeepLink: WltAdapter.createDeepLink,
+  } as const;
 }
 
 export default useWlt;

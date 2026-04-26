@@ -14,6 +14,7 @@ import {
 } from '@bthwani/ui-kit';
 
 type ChatSide = 'start' | 'end';
+type ComposerAttachmentKind = 'voice' | 'camera' | 'video' | 'attachment';
 
 type OrderChatMessage = {
   id: string;
@@ -118,9 +119,46 @@ export function DshCaptainOrderChatScreen({
 }: DshCaptainOrderChatScreenProps) {
   const isReadOnly = state === 'readOnly';
   const [draft, setDraft] = React.useState('');
+  const [attachments, setAttachments] = React.useState<ComposerAttachmentKind[]>([]);
+  const [isSending, setIsSending] = React.useState(false);
+  const [composerState, setComposerState] = React.useState<'idle' | 'typing' | 'with-attachment' | 'sending' | 'success' | 'error' | 'disabled'>(isReadOnly ? 'disabled' : 'idle');
   const [messages, setMessages] = React.useState<OrderChatMessage[]>(() => initialMessages);
 
-  const canSend = !isReadOnly && draft.trim().length > 0;
+  const canSend = !isReadOnly && !isSending && (draft.trim().length > 0 || attachments.length > 0);
+
+  React.useEffect(() => {
+    if (isReadOnly) {
+      setComposerState('disabled');
+      return;
+    }
+
+    if (isSending) {
+      setComposerState('sending');
+      return;
+    }
+
+    if (draft.trim().length > 0) {
+      setComposerState('typing');
+      return;
+    }
+
+    if (attachments.length > 0) {
+      setComposerState('with-attachment');
+      return;
+    }
+
+    setComposerState('idle');
+  }, [attachments.length, draft, isReadOnly, isSending]);
+
+  const toggleAttachment = React.useCallback((kind: ComposerAttachmentKind) => {
+    if (isReadOnly || isSending) {
+      return;
+    }
+
+    setAttachments((current) => (current.includes(kind)
+      ? current.filter((item) => item !== kind)
+      : [...current, kind]));
+  }, [isReadOnly, isSending]);
 
   const handleSend = React.useCallback(() => {
     if (!canSend) {
@@ -128,19 +166,47 @@ export function DshCaptainOrderChatScreen({
     }
 
     const text = draft.trim();
+    const attachmentsLabel = attachments.length ? ` [مرفقات: ${attachments.join('، ')}]` : '';
 
-    setMessages((current) => [
-      ...current,
-      {
-        id: `msg-${current.length + 1}`,
-        sender: 'الكابتن',
-        text,
-        time: 'الآن',
-        side: 'end',
-      },
-    ]);
-    setDraft('');
-  }, [canSend, draft]);
+    setIsSending(true);
+    setComposerState('sending');
+
+    Promise.resolve()
+      .then(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 220));
+        setMessages((current) => [
+          ...current,
+          {
+            id: `msg-${current.length + 1}`,
+            sender: 'الكابتن',
+            text: `${text || 'تم إرسال مرفقات مرتبطة بالطلب'}${attachmentsLabel}`,
+            time: 'الآن',
+            side: 'end',
+          },
+        ]);
+        setDraft('');
+        setAttachments([]);
+        setComposerState('success');
+      })
+      .catch(() => {
+        setComposerState('error');
+      })
+      .finally(() => {
+        setIsSending(false);
+      });
+  }, [attachments, canSend, draft]);
+
+  const composerHint = isReadOnly
+    ? 'تم تسليم الطلب. التواصل هنا للقراءة فقط.'
+    : composerState === 'sending'
+      ? 'جاري الإرسال...'
+      : composerState === 'success'
+        ? 'تم الإرسال بنجاح.'
+        : composerState === 'error'
+          ? 'تعذر الإرسال. حاول مرة أخرى.'
+          : composerState === 'with-attachment'
+            ? 'المرفقات جاهزة، أضف نصًا اختياريًا ثم أرسل.'
+            : 'الرسائل المختصرة فقط داخل هذا المسار.';
 
   return (
     <MobileScrollView fill padding={4} gap={4}>
@@ -187,21 +253,23 @@ export function DshCaptainOrderChatScreen({
           />
           <Box layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
             <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-              <ComposerActionButton iconName="mic-outline" accessibilityLabel="رسالة صوتية" disabled={isReadOnly} />
-              <ComposerActionButton iconName="camera-outline" accessibilityLabel="التقاط صورة" disabled={isReadOnly} />
-              <ComposerActionButton iconName="videocam-outline" accessibilityLabel="التقاط فيديو" disabled={isReadOnly} />
+              <ComposerActionButton iconName="mic-outline" accessibilityLabel="رسالة صوتية" disabled={isReadOnly || isSending} onPress={() => toggleAttachment('voice')} />
+              <ComposerActionButton iconName="camera-outline" accessibilityLabel="التقاط صورة" disabled={isReadOnly || isSending} onPress={() => toggleAttachment('camera')} />
+              <ComposerActionButton iconName="videocam-outline" accessibilityLabel="التقاط فيديو" disabled={isReadOnly || isSending} onPress={() => toggleAttachment('video')} />
+              <ComposerActionButton iconName="attach-outline" accessibilityLabel="إرفاق ملف" disabled={isReadOnly || isSending} onPress={() => toggleAttachment('attachment')} />
             </Box>
             <Button
-              label={isReadOnly ? 'مقفل' : 'إرسال'}
+              label={isReadOnly ? 'مقفل' : isSending ? 'جاري الإرسال' : 'إرسال'}
               tone={isReadOnly ? 'secondary' : 'primary'}
               size="sm"
               fullWidth={false}
               disabled={!canSend}
+              loading={isSending}
               onPress={handleSend}
             />
           </Box>
           <Text role="caption" tone="muted">
-            {isReadOnly ? 'تم تسليم الطلب. التواصل هنا للقراءة فقط.' : 'الرسائل المختصرة فقط داخل هذا المسار.'}
+            {composerHint}
           </Text>
         </Surface>
       </Surface>

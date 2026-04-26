@@ -460,8 +460,12 @@ export default function DshCartUnifiedScreen(props: any) {
   const {
     linked: walletLinked,
     balance: walletBalanceRaw,
+    hydrated: walletHydrated,
+    refreshing: walletRefreshing,
     refresh: refreshWallet,
     requestPayment: requestWalletPayment,
+    link: linkWallet,
+    topUp: topUpWallet,
   } = useWlt();
 
   const checkoutAction = props.onContinue ?? props.onOpenOrder;
@@ -531,8 +535,51 @@ export default function DshCartUnifiedScreen(props: any) {
     );
   };
 
+  const linkWalletInline = async () => {
+    try {
+      const result = await linkWallet();
+      if (!result.success) {
+        showNotice('تعذر ربط المحفظة', 'لم يكتمل الربط، حاول مرة أخرى.', 'danger');
+        return;
+      }
+
+      await refreshWallet();
+      showNotice('تم ربط المحفظة', 'أصبح خيار الدفع من الرصيد متاحًا عند كفاية الرصيد.', 'success');
+    } catch {
+      showNotice('تعذر ربط المحفظة', 'حدث خطأ أثناء الربط المحلي للمحفظة.', 'danger');
+    }
+  };
+
+  const topUpWalletInline = async (amountHalalas: number) => {
+    try {
+      const normalizedAmount = Math.max(amountHalalas, 0);
+      if (!normalizedAmount) {
+        showNotice('لا يوجد مبلغ مطلوب للشحن', 'الرصيد الحالي يغطي الطلب أو لا توجد بيانات كافية.', 'info');
+        return;
+      }
+
+      await topUpWallet(normalizedAmount);
+      await refreshWallet();
+      showNotice('تم شحن الرصيد', `تم شحن ${formatHalalasAmount(normalizedAmount)} في المحفظة.`, 'success');
+    } catch {
+      showNotice('تعذر شحن الرصيد', 'حدث خطأ أثناء تحديث رصيد المحفظة.', 'danger');
+    }
+  };
+
   const paymentSelection = useMemo<PaymentSelection>(() => {
     if (paymentMethod === 'wallet') {
+      if (!walletHydrated || walletRefreshing) {
+        return {
+          method: 'wallet',
+          walletAmountHalalas: 0,
+          amountDueOnDeliveryHalalas: grandTotalHalalas,
+          valid: false,
+          summary: 'جاري التحقق من حالة المحفظة.',
+          blockingReason: 'انتظر اكتمال مزامنة حالة الربط والرصيد ثم أعد المحاولة.',
+          feedbackTone: 'info',
+        };
+      }
+
       if (!walletLinked) {
         return {
           method: 'wallet',
@@ -568,6 +615,18 @@ export default function DshCartUnifiedScreen(props: any) {
     }
 
     if (paymentMethod === 'mixed') {
+      if (!walletHydrated || walletRefreshing) {
+        return {
+          method: 'mixed',
+          walletAmountHalalas: 0,
+          amountDueOnDeliveryHalalas: grandTotalHalalas,
+          valid: false,
+          summary: 'جاري التحقق من حالة المحفظة.',
+          blockingReason: 'انتظر اكتمال المزامنة قبل تفعيل الدفع المدمج.',
+          feedbackTone: 'info',
+        };
+      }
+
       if (!walletLinked || walletBalance <= 0) {
         return {
           method: 'mixed',
@@ -626,7 +685,7 @@ export default function DshCartUnifiedScreen(props: any) {
       summary: 'ستدفع كامل المبلغ عند الاستلام.',
       feedbackTone: 'info',
     };
-  }, [formattedWalletBalance, formattedWalletShortfall, grandTotalHalalas, hasWltServiceRoute, paymentMethod, walletBalance, walletLinked]);
+  }, [formattedWalletBalance, formattedWalletShortfall, grandTotalHalalas, hasWltServiceRoute, paymentMethod, walletBalance, walletHydrated, walletLinked, walletRefreshing]);
 
   React.useEffect(() => {
     if (paymentMethod === 'wallet' && !canUseWalletFull) {
@@ -639,13 +698,15 @@ export default function DshCartUnifiedScreen(props: any) {
   }, [canUseMixedPayment, canUseWalletFull, paymentMethod]);
 
   const paymentDecisionOptions = useMemo<PaymentDecisionOption[]>(() => {
+    const walletPending = !walletHydrated || walletRefreshing;
+
     return [
       {
         id: 'cod',
         title: 'عند الاستلام',
         description: 'ادفع كامل الطلب عند الاستلام.',
         selected: paymentMethod === 'cod',
-        statusLabel: paymentMethod === 'cod' ? 'محدد' : 'متاح',
+        statusLabel: paymentMethod === 'cod' ? 'محدد' : 'جاهز الآن',
         statusTone: paymentMethod === 'cod' ? 'brand' : 'info',
         amountRows: [
           { label: 'من المحفظة', value: formatHalalasAmount(0), tone: 'muted' },
@@ -660,9 +721,9 @@ export default function DshCartUnifiedScreen(props: any) {
         title: 'من رصيد المحفظة',
         description: 'ادفع كامل الطلب من رصيد WLT الداخلي.',
         selected: paymentMethod === 'wallet',
-        disabled: !canUseWalletFull,
-        statusLabel: paymentMethod === 'wallet' ? 'محدد' : !walletLinked ? 'غير مرتبط' : walletBalance <= 0 ? 'لا يوجد رصيد' : canUseWalletFull ? 'متاح' : 'لا يكفي',
-        statusTone: paymentMethod === 'wallet' ? 'brand' : !walletLinked || walletBalance <= 0 ? 'info' : canUseWalletFull ? 'success' : 'warning',
+        disabled: walletPending || !canUseWalletFull,
+        statusLabel: paymentMethod === 'wallet' ? 'محدد' : walletPending ? 'قيد التحقق' : !walletLinked ? 'يتطلب إجراء' : walletBalance <= 0 ? 'يتطلب إجراء' : canUseWalletFull ? 'جاهز الآن' : 'يتطلب إجراء',
+        statusTone: paymentMethod === 'wallet' ? 'brand' : walletPending ? 'info' : !walletLinked || walletBalance <= 0 ? 'warning' : canUseWalletFull ? 'success' : 'warning',
         amountRows: canUseWalletFull
           ? [
               { label: 'من المحفظة', value: formatHalalasAmount(grandTotalHalalas), tone: 'brand' },
@@ -679,6 +740,8 @@ export default function DshCartUnifiedScreen(props: any) {
               ],
         helperText: canUseWalletFull
           ? 'الرصيد يكفي للدفع الكامل.'
+          : walletPending
+            ? 'جاري التحقق من حالة الربط والرصيد...'
           : !walletLinked
             ? (hasWltServiceRoute ? 'اربط محفظتك أولًا عبر WLT.' : '[TBD: WLT top-up route]')
             : walletBalance <= 0
@@ -690,8 +753,10 @@ export default function DshCartUnifiedScreen(props: any) {
           : {
               label: walletLinked ? 'شحن الرصيد' : 'ربط المحفظة',
               tone: 'primary',
-              onPress: hasWltServiceRoute ? () => openWltService('wallet-topup') : undefined,
-              disabled: !hasWltServiceRoute,
+              onPress: walletLinked
+                ? (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void topUpWalletInline(walletShortfallHalalas))
+                : (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void linkWalletInline()),
+              disabled: walletPending,
             },
         onSelect: canUseWalletFull ? () => setPaymentMethod('wallet') : undefined,
       },
@@ -700,9 +765,9 @@ export default function DshCartUnifiedScreen(props: any) {
         title: 'محفظة + عند الاستلام',
         description: 'استخدم الرصيد المتاح وادفع المتبقي عند الاستلام.',
         selected: paymentMethod === 'mixed',
-        disabled: !canUseMixedPayment,
-        statusLabel: paymentMethod === 'mixed' ? 'محدد' : canUseMixedPayment ? 'متاح' : !walletLinked ? 'غير مرتبط' : walletBalance <= 0 ? 'لا يوجد رصيد' : 'غير ضروري',
-        statusTone: canUseMixedPayment ? (paymentMethod === 'mixed' ? 'brand' : 'info') : 'info',
+        disabled: walletPending || !canUseMixedPayment,
+        statusLabel: paymentMethod === 'mixed' ? 'محدد' : walletPending ? 'قيد التحقق' : canUseMixedPayment ? 'جاهز الآن' : !walletLinked ? 'يتطلب إجراء' : walletBalance <= 0 ? 'يتطلب إجراء' : 'غير ضروري',
+        statusTone: walletPending ? 'info' : canUseMixedPayment ? (paymentMethod === 'mixed' ? 'brand' : 'info') : !walletLinked || walletBalance <= 0 ? 'warning' : 'info',
         amountRows: canUseMixedPayment
           ? [
               { label: 'من المحفظة', value: formattedWalletBalance, tone: 'brand' },
@@ -714,6 +779,8 @@ export default function DshCartUnifiedScreen(props: any) {
             ],
         helperText: canUseMixedPayment
           ? `من المحفظة ${formattedWalletBalance}، وعند الاستلام ${formatHalalasAmount(grandTotalHalalas - walletBalance)}.`
+          : walletPending
+            ? 'جاري التحقق من رصيد المحفظة...'
           : !walletLinked
             ? (hasWltServiceRoute ? 'افتح WLT لربط المحفظة.' : '[TBD: WLT top-up route]')
             : walletBalance <= 0
@@ -725,8 +792,10 @@ export default function DshCartUnifiedScreen(props: any) {
           : {
               label: !walletLinked ? 'فتح WLT' : 'شحن الرصيد',
               tone: 'secondary',
-              onPress: hasWltServiceRoute ? () => openWltService('wallet-topup') : undefined,
-              disabled: !hasWltServiceRoute,
+              onPress: !walletLinked
+                ? (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void linkWalletInline())
+                : (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void topUpWalletInline(walletShortfallHalalas)),
+              disabled: walletPending,
             },
         onSelect: canUseMixedPayment ? () => setPaymentMethod('mixed') : undefined,
       },
@@ -736,7 +805,7 @@ export default function DshCartUnifiedScreen(props: any) {
         description: 'اختر محفظة رسمية وأكمل عبر WLT.',
         selected: paymentMethod === 'official-wallets',
         disabled: !hasWltServiceRoute,
-        statusLabel: hasWltServiceRoute ? (paymentMethod === 'official-wallets' ? 'محدد' : 'WLT') : '[TBD]',
+        statusLabel: hasWltServiceRoute ? (paymentMethod === 'official-wallets' ? 'محدد' : 'مسار خارجي') : '[TBD]',
         statusTone: paymentMethod === 'official-wallets' ? 'brand' : 'info',
         amountRows: [
           { label: 'إجمالي الطلب', value: formattedGrandTotal, tone: 'brand' },
@@ -754,7 +823,7 @@ export default function DshCartUnifiedScreen(props: any) {
         onSelect: hasWltServiceRoute ? () => setPaymentMethod('official-wallets') : undefined,
       },
     ];
-  }, [canUseMixedPayment, canUseWalletFull, formattedGrandTotal, formattedWalletBalance, formattedWalletShortfall, grandTotalHalalas, hasWltServiceRoute, paymentMethod, walletBalance, walletLinked]);
+  }, [canUseMixedPayment, canUseWalletFull, formattedGrandTotal, formattedWalletBalance, formattedWalletShortfall, grandTotalHalalas, hasWltServiceRoute, paymentMethod, topUpWalletInline, walletBalance, walletHydrated, walletLinked, walletRefreshing, walletShortfallHalalas]);
 
   const handleBackPress = () => {
     if (backAction) {

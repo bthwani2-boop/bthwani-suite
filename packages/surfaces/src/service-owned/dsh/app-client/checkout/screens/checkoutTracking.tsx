@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Dimensions, Platform, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   Badge,
@@ -24,6 +24,7 @@ import {
   Surface,
   Text,
   TopBar,
+  safeArea,
   spacing,
   useTheme,
 } from '@bthwani/ui-kit';
@@ -652,7 +653,10 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
       : ratingsSubmitted
         ? 'تم حفظ التقييمين ولا توجد خطوة إضافية مطلوبة.'
         : 'لن يتفعّل الإرسال حتى تختار تقييم المنتج والكابتن.';
-  const contentBottomPadding = (actionBarHeight > 0 ? actionBarHeight : spacing[16]) + spacing[2];
+  const runtimeBottomInset = Platform.OS === 'android'
+    ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
+    : safeArea.comfortable;
+  const contentBottomPadding = (actionBarHeight > 0 ? actionBarHeight : spacing[16]) + runtimeBottomInset + spacing[4];
 
   const handleProductRatingChange = (nextValue: number) => {
     setProductRating(nextValue);
