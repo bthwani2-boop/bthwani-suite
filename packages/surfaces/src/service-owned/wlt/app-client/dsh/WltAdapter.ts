@@ -4,72 +4,128 @@ export type WalletAccount = { id: string; name: string };
 const STORAGE_KEY_ACCOUNT = 'dsh_bth_wallet_account';
 const STORAGE_KEY_BALANCE = 'dsh_bth_wallet_balance';
 
-function ensureBalanceLocal() {
+let walletAccountMemory: WalletAccount | null = null;
+let walletBalanceMemory = 10000;
+
+function getStorageHandle() {
   try {
-    if (!localStorage.getItem(STORAGE_KEY_BALANCE)) {
-      localStorage.setItem(STORAGE_KEY_BALANCE, String(10000));
-    }
-  } catch (e) {
-    // ignore (SSR/native)
+    return typeof globalThis !== 'undefined' && 'localStorage' in globalThis ? globalThis.localStorage : null;
+  } catch {
+    return null;
   }
 }
 
-export const isLinked = async (): Promise<boolean> => {
-  try {
-    return Boolean(localStorage.getItem(STORAGE_KEY_ACCOUNT));
-  } catch {
-    return false;
+function readAccountLocal(): WalletAccount | null {
+  const storage = getStorageHandle();
+  if (storage) {
+    try {
+      const raw = storage.getItem(STORAGE_KEY_ACCOUNT);
+      if (!raw) return walletAccountMemory;
+      const parsed = JSON.parse(raw) as WalletAccount;
+      walletAccountMemory = parsed;
+      return parsed;
+    } catch {
+      return walletAccountMemory;
+    }
   }
+
+  return walletAccountMemory;
+}
+
+function writeAccountLocal(account: WalletAccount | null) {
+  walletAccountMemory = account;
+  const storage = getStorageHandle();
+  if (!storage) {
+    return;
+  }
+
+  try {
+    if (account) {
+      storage.setItem(STORAGE_KEY_ACCOUNT, JSON.stringify(account));
+    } else {
+      storage.removeItem(STORAGE_KEY_ACCOUNT);
+    }
+  } catch {
+    // ignore
+  }
+}
+
+function readBalanceLocal() {
+  const storage = getStorageHandle();
+  if (storage) {
+    try {
+      const raw = storage.getItem(STORAGE_KEY_BALANCE);
+      if (raw == null) {
+        storage.setItem(STORAGE_KEY_BALANCE, String(walletBalanceMemory));
+        return walletBalanceMemory;
+      }
+      const parsed = Number(raw);
+      walletBalanceMemory = Number.isFinite(parsed) ? parsed : walletBalanceMemory;
+      return walletBalanceMemory;
+    } catch {
+      return walletBalanceMemory;
+    }
+  }
+
+  return walletBalanceMemory;
+}
+
+function writeBalanceLocal(nextBalance: number) {
+  walletBalanceMemory = nextBalance;
+  const storage = getStorageHandle();
+  if (!storage) {
+    return;
+  }
+
+  try {
+    storage.setItem(STORAGE_KEY_BALANCE, String(nextBalance));
+  } catch {
+    // ignore
+  }
+}
+
+function ensureBalanceLocal() {
+  readBalanceLocal();
+}
+
+export const isLinked = async (): Promise<boolean> => {
+  return Boolean(readAccountLocal());
 };
 
 export const getBalance = async (): Promise<number> => {
-  try {
-    ensureBalanceLocal();
-    const raw = localStorage.getItem(STORAGE_KEY_BALANCE) ?? '0';
-    return Number(raw);
-  } catch {
-    return 0;
-  }
+  ensureBalanceLocal();
+  return readBalanceLocal();
 };
 
 export const link = async (): Promise<{ success: boolean; account?: WalletAccount }> => {
   await new Promise((r) => setTimeout(r, 300));
   const account = { id: `wallet-${Date.now()}`, name: 'محفظة بثواني' };
-  try {
-    localStorage.setItem(STORAGE_KEY_ACCOUNT, JSON.stringify(account));
-    ensureBalanceLocal();
-    return { success: true, account };
-  } catch {
-    return { success: false };
-  }
+  writeAccountLocal(account);
+  ensureBalanceLocal();
+  return { success: true, account };
 };
 
 export const unlink = async (): Promise<void> => {
   await new Promise((r) => setTimeout(r, 100));
-  try { localStorage.removeItem(STORAGE_KEY_ACCOUNT); } catch {}
+  writeAccountLocal(null);
 };
 
 export const requestPayment = async (amountHalalas: number): Promise<{ success: boolean; txId?: string; error?: string }> => {
-  try {
-    ensureBalanceLocal();
-    const bal = Number(localStorage.getItem(STORAGE_KEY_BALANCE) ?? '0');
-    if (bal < amountHalalas) return { success: false, error: 'insufficient_balance' };
-    const newBal = bal - amountHalalas;
-    localStorage.setItem(STORAGE_KEY_BALANCE, String(newBal));
-    await new Promise((r) => setTimeout(r, 300));
-    return { success: true, txId: `tx-${Date.now()}` };
-  } catch (e) {
-    return { success: false, error: 'unknown' };
-  }
+  ensureBalanceLocal();
+  const balance = readBalanceLocal();
+  if (balance < amountHalalas) return { success: false, error: 'insufficient_balance' };
+  writeBalanceLocal(balance - amountHalalas);
+  await new Promise((r) => setTimeout(r, 300));
+  return { success: true, txId: `tx-${Date.now()}` };
 };
 
 export const topUp = async (amountHalalas: number): Promise<{ success: boolean; balance: number }> => {
   ensureBalanceLocal();
-  const bal = Number(localStorage.getItem(STORAGE_KEY_BALANCE) ?? '0');
-  const newBal = bal + amountHalalas;
-  localStorage.setItem(STORAGE_KEY_BALANCE, String(newBal));
+  const balance = readBalanceLocal();
+  const newBalance = balance + amountHalalas;
+  writeBalanceLocal(newBalance);
   await new Promise((r) => setTimeout(r, 200));
-  return { success: true, balance: newBal };
+  return { success: true, balance: newBalance };
 };
 
 export const createDeepLink = (orderId: string, amountHalalas: number): string => {

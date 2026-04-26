@@ -704,6 +704,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
         statusTitle="Cart context confirmed"
         statusDescription="Initialize the cart session before moving into the checkout route."
         onOpenStore={() => setRoute('store-get')}
+        onOpenService={onOpenService}
         onOpenOrder={() => setRoute('create-order')}
         onContinue={() => setRoute('create-order')}
         onRetry={() => setRoute('cart-get')}

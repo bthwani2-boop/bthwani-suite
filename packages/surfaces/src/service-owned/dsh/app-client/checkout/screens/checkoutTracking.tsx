@@ -1,19 +1,25 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   Badge,
   Box,
   Button,
+  CompactStatusStepper,
   Icon,
   Card,
   Chip,
+  DeferredReviewBlock,
+  KeyValueDetails,
   KeyValueList,
   ListItem,
   MobileScrollView,
+  OperationalStatusHero,
+  OrderLinkedChat,
   SearchField,
   SectionHeader,
   StatCard,
+  StickyActionBar,
   TextField,
   Surface,
   Text,
@@ -52,7 +58,9 @@ type JourneyStep = {
   detail: string;
 };
 
-type OrderChatAttachmentKind = 'image' | 'video' | 'voice';
+type JourneyPhase = 'route' | 'arrived' | 'received';
+
+type OrderChatAttachmentKind = 'voice' | 'camera' | 'video' | 'attachment';
 
 type OrderChatAttachment = {
   kind: OrderChatAttachmentKind;
@@ -137,19 +145,17 @@ const deliveryJourneySteps: JourneyStep[] = [
 ];
 
 const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttachment> = {
-  image: {
-    kind: 'image',
-    label: 'صورة',
+  camera: {
+    kind: 'camera',
+    label: 'كاميرا',
     selectedLabel: 'صورة مرفقة',
-    detail: 'أرفق صورة للمنتج أو الغلاف',
     tone: 'brand',
-    iconName: 'image-outline',
+    iconName: 'camera-outline',
   },
   video: {
     kind: 'video',
     label: 'فيديو',
     selectedLabel: 'فيديو مرفق',
-    detail: 'أرفق فيديو قصير يوضح التفاصيل',
     tone: 'info',
     iconName: 'videocam-outline',
   },
@@ -157,9 +163,15 @@ const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttac
     kind: 'voice',
     label: 'صوت',
     selectedLabel: 'رسالة صوتية',
-    detail: 'سجل ملاحظة صوتية قصيرة',
     tone: 'warning',
     iconName: 'mic-outline',
+  },
+  attachment: {
+    kind: 'attachment',
+    label: 'مرفق',
+    selectedLabel: 'مرفق مرتبط',
+    tone: 'brand',
+    iconName: 'attach-outline',
   },
 };
 
@@ -490,17 +502,36 @@ function renderCheckoutGate(screenId?: string, state: DshOperationScreenState = 
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
       content={
-        <Surface tone="raised" gap={3} padding={2}>
-          <SectionHeader title={gateCopy.sectionTitle} subtitle={gateCopy.sectionSubtitle} />
-          <KeyValueList
+        <Box gap={3}>
+          <OperationalStatusHero
+            statusLabel="جاهز"
+            statusTone="brand"
+            title={gateCopy.title}
+            summary="كل ما تحتاجه للقرار موجود هنا دون ضوضاء أو قفز بين بطاقات متعددة."
+            routeLabel="المسار"
+            routeValue={screenId ?? 'checkout-gate'}
+            nextStepLabel="النتيجة المتوقعة"
+            nextStepValue="التتبع المباشر بعد القبول"
+          />
+          <CompactStatusStepper
+            title="المسار المختصر"
+            subtitle="ثلاث مراحل واضحة فقط بعد قبول الطلب."
+            steps={deliveryJourneySteps.map((step, index) => ({
+              id: step.id,
+              title: step.title,
+              state: index === 0 ? 'current' : 'next',
+            }))}
+          />
+          <KeyValueDetails
+            title={gateCopy.sectionTitle}
+            subtitle={gateCopy.sectionSubtitle}
             items={[
               { label: 'المسار', value: screenId ?? 'checkout-gate', tone: 'brand' },
               { label: 'المرحلة التالية', value: 'قيد المراجعة' },
               { label: 'النتيجة المتوقعة', value: 'التتبع المباشر بعد القبول', tone: 'success' },
             ]}
           />
-          <StageRail activeStepId="route" steps={deliveryJourneySteps} />
-        </Surface>
+        </Box>
       }
     />
   );
@@ -511,61 +542,117 @@ type CreateOrderJourneyScreenProps = {
   timeline: DshTrackingTimelineItem[];
   onBack?: () => void;
   onBell?: () => void;
-  initialPhase?: 'route' | 'received';
+  initialPhase?: JourneyPhase;
   currentStatusLabel?: string;
 };
 
 function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
   const { theme } = useTheme();
-  const [phase, setPhase] = React.useState<'route' | 'received'>(initialPhase);
+  const [phase, setPhase] = React.useState<JourneyPhase>(initialPhase);
   const [productRating, setProductRating] = React.useState(0);
   const [captainRating, setCaptainRating] = React.useState(0);
   const [ratingsSubmitted, setRatingsSubmitted] = React.useState(false);
+  const [draftMessage, setDraftMessage] = React.useState('');
+  const [draftAttachments, setDraftAttachments] = React.useState<OrderChatAttachmentKind[]>([]);
+  const [actionBarHeight, setActionBarHeight] = React.useState(0);
+  const [lastChatMessage, setLastChatMessage] = React.useState<OrderChatMessage>({
+    id: 'chat-captain-1',
+    senderLabel: 'الكابتن المكلّف',
+    body: 'إذا احتجت صورة أو فيديو أو رسالة صوتية للمنتج فأرسلها هنا ضمن نفس الطلب.',
+    time: 'قبل قليل',
+    tone: 'info',
+    align: 'start',
+    attachments: ['camera', 'video', 'voice'],
+  });
   const note = normalizeText(values.note).length ? values.note : 'لا توجد ملاحظات';
-  const timelineItems = timeline.length > 0
-    ? timeline
-    : deliveryJourneySteps.map((step, index) => ({
-      id: step.id,
-      title: step.title,
-      detail: step.detail,
-      done: index === 0,
-    }));
-  const activeTimelineIndex = phase === 'route' ? 0 : 2;
-  const deliveryStatusLabel = currentStatusLabel ?? 'في الطريق';
-  const journeyTopBarTitle = phase === 'route' ? 'الطلب في الطريق إلى العميل' : 'وصل الطلب للعميل واستلمه';
-  const journeyStageTitle = phase === 'route' ? 'في الطريق إلى العميل' : 'استلم العميل الطلب';
+  const phaseIndex = phase === 'route' ? 0 : phase === 'arrived' ? 1 : 2;
+  const deliveryStatusLabel = phase === 'route' ? currentStatusLabel ?? 'في الطريق' : phase === 'arrived' ? 'وصل للعميل' : 'استلم العميل الطلب';
+  const journeyTopBarTitle = phase === 'route' ? 'الطلب في الطريق إلى العميل' : phase === 'arrived' ? 'وصل الطلب للعميل' : 'استلم العميل الطلب';
+  const heroTitle = phase === 'route' ? 'في الطريق' : phase === 'arrived' ? 'وصل للعميل' : 'تم الاستلام';
+  const heroSummary = phase === 'route'
+    ? 'الطلب متجه الآن إلى العميل مع بقاء الخطوة التالية واضحة ومباشرة.'
+    : phase === 'arrived'
+      ? 'الطلب وصل إلى العميل وهو الآن بانتظار تثبيت الاستلام.'
+      : 'اكتمل الاستلام ويمكنك تقييم التجربة من نفس الصفحة.';
   const hasCustomerReceived = phase === 'received';
   const canSubmitRatings = hasCustomerReceived && productRating > 0 && captainRating > 0;
   const productRatingLabel = productRating > 0 ? `${productRating}/5` : 'غير محدد';
   const captainRatingLabel = captainRating > 0 ? `${captainRating}/5` : 'غير محدد';
-  const productRatingDelta = productRating > 0 ? 'المنتج' : 'اختر التقييم';
-  const orderReceiptItems = [
-    { label: 'وصول الطلب', value: phase === 'route' ? deliveryStatusLabel : 'وصل للعميل', tone: 'brand' as const },
-    { label: 'استلام العميل', value: phase === 'route' ? 'بانتظار الاستلام' : 'استلم العميل الطلب', tone: 'success' as const },
-    {
-      label: 'الخطوة التالية',
-      value: phase === 'route'
-        ? 'سوف تظهر التقييمات بعد الاستلام'
-        : ratingsSubmitted
-          ? 'تم إرسال التقييمين داخل نفس الصفحة'
-          : 'اختر التقييمين ثم أرسل من نفس الصفحة',
-      tone: 'warning' as const,
-    },
-    { label: 'الطلب نفسه', value: `${values.pickupAddress || 'غير محدد'} → ${values.dropoffAddress || 'غير محدد'}` },
+  const compactSteps = deliveryJourneySteps.map((step, index) => ({
+    id: step.id,
+    title: step.title,
+    state: index < phaseIndex ? 'done' : index === phaseIndex ? 'current' : 'next',
+  })) as Array<{ id: string; title: string; state: 'done' | 'current' | 'next' }>;
+  const orderDetailsItems = [
+    { label: 'عنوان الاستلام', value: values.pickupAddress || 'غير محدد', tone: 'brand' as const },
+    { label: 'عنوان التسليم', value: values.dropoffAddress || 'غير محدد' },
+    { label: 'جهة الاتصال', value: values.contactName || 'غير محدد' },
+    { label: 'رقم الجوال', value: values.contactPhone || 'غير محدد' },
+    { label: 'الملاحظات', value: note },
   ];
+  const nextStepValue = phase === 'route'
+    ? 'ثبّت الوصول عند مقابلة العميل.'
+    : phase === 'arrived'
+      ? 'ثبّت الاستلام لتفعيل التقييمات.'
+      : ratingsSubmitted
+        ? 'تم حفظ التقييمين داخل نفس الصفحة.'
+        : 'اختر التقييمين ثم أرسل.';
+  const canSendMessage = phase !== 'received' && (draftMessage.trim().length > 0 || draftAttachments.length > 0);
+  const chatSendLabel = draftMessage.trim().length > 0 ? 'إرسال الرسالة' : draftAttachments.length > 0 ? 'إرسال المرفقات' : 'أضف نصًا أو مرفقًا';
+  const quickActions = (['voice', 'camera', 'video', 'attachment'] as OrderChatAttachmentKind[]).map((kind) => {
+    const option = orderChatAttachmentOptions[kind];
+    const selected = draftAttachments.includes(kind);
 
-  const primaryActionLabel = phase === 'route' ? 'وصل الطلب للعميل' : ratingsSubmitted ? 'تم إرسال التقييمين' : 'إرسال التقييمين';
+    return {
+      id: option.kind,
+      label: option.label,
+      selected,
+      disabled: phase === 'received',
+      icon: <Ionicons name={option.iconName} size={16} color={selected ? theme.brandContrast : theme.text} />,
+      onPress: () => {
+        if (phase === 'received') {
+          return;
+        }
+
+        setDraftAttachments((current) => (
+          current.includes(kind)
+            ? current.filter((item) => item !== kind)
+            : [...current, kind]
+        ));
+      },
+    };
+  });
+
+  const primaryActionLabel = phase === 'route'
+    ? 'وصل الطلب للعميل'
+    : phase === 'arrived'
+      ? 'استلم العميل الطلب'
+      : ratingsSubmitted
+        ? 'تم إرسال التقييمين'
+        : 'إرسال التقييمين';
   const primaryActionDisabled = phase === 'received' && (!canSubmitRatings || ratingsSubmitted);
   const productHelperText = phase === 'route'
-    ? 'هذا الحقل سيصبح نشطًا بعد وصول الطلب للعميل.'
+    ? 'سيظهر تقييم المنتج بعد الاستلام.'
+    : phase === 'arrived'
+      ? 'سيفتح التقييم بعد تثبيت استلام العميل للطلب.'
     : ratingsSubmitted
       ? 'تم إرسال التقييمين. أي تعديل جديد سيعيد فتح الإرسال.'
       : 'اختر تقييم المنتج من 1 إلى 5 ثم أرسل التقييمين بالأسفل.';
   const captainHelperText = phase === 'route'
-    ? 'تقييم الكابتن يظهر بعد استلام العميل للطلب.'
+    ? 'سيظهر تقييم الكابتن بعد الاستلام.'
+    : phase === 'arrived'
+      ? 'سيبقى تقييم الكابتن مؤجلًا حتى تثبيت الاستلام.'
     : ratingsSubmitted
       ? 'تم إرسال التقييمين. يمكنك تعديل الكابتن ثم إعادة الإرسال.'
       : 'اختر تقييم الكابتن من 1 إلى 5 ثم أرسل التقييمين بالأسفل.';
+  const stickyNote = phase === 'route'
+    ? 'يمكنك تثبيت الوصول من الزر الرئيسي عند وصول الطلب.'
+    : phase === 'arrived'
+      ? 'ثبّت الاستلام لتظهر التقييمات داخل نفس الصفحة.'
+      : ratingsSubmitted
+        ? 'تم حفظ التقييمين ولا توجد خطوة إضافية مطلوبة.'
+        : 'لن يتفعّل الإرسال حتى تختار تقييم المنتج والكابتن.';
+  const contentBottomPadding = (actionBarHeight > 0 ? actionBarHeight : spacing[16]) + spacing[2];
 
   const handleProductRatingChange = (nextValue: number) => {
     setProductRating(nextValue);
@@ -583,6 +670,11 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
 
   const handlePrimaryAction = () => {
     if (phase === 'route') {
+      setPhase('arrived');
+      return;
+    }
+
+    if (phase === 'arrived') {
       setPhase('received');
       return;
     }
@@ -594,6 +686,34 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
     setRatingsSubmitted(true);
   };
 
+  const handleSendMessage = () => {
+    if (!canSendMessage) {
+      return;
+    }
+
+    const body = draftMessage.trim().length
+      ? draftMessage.trim()
+      : draftAttachments.map((kind) => orderChatAttachmentOptions[kind].selectedLabel).join(' • ');
+
+    setLastChatMessage({
+      id: `chat-customer-${Date.now()}`,
+      senderLabel: 'العميل',
+      body,
+      time: 'الآن',
+      tone: 'brand',
+      align: 'end',
+      attachments: draftAttachments,
+    });
+    setDraftMessage('');
+    setDraftAttachments([]);
+  };
+
+  const secondaryAction = phase === 'route' && onBell
+    ? { label: 'جرس الوصول', onPress: onBell, tone: 'secondary' as const }
+    : onBack
+      ? { label: phase === 'route' ? 'تعديل الطلب' : 'العودة', onPress: onBack, tone: 'secondary' as const }
+      : undefined;
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
       <TopBar
@@ -602,143 +722,120 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
         trailingAction={onBack ? { id: 'back', icon: <Icon name="arrow-back" size={24} color="#F97316" />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
       />
 
-      <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
-      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <SectionHeader
-          title={journeyStageTitle}
-          subtitle={phase === 'route' ? 'الوصول والاستلام سيظهران هنا فور الانتقال من الطريق.' : 'الآن ظهرت التقييمات بعد الاستلام داخل نفس الشاشة.'}
-          trailing={<Badge label={phase === 'route' ? deliveryStatusLabel : 'تم الاستلام'} tone={phase === 'route' ? 'warning' : 'success'} />}
+      <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: contentBottomPadding }}>
+        <OperationalStatusHero
+          statusLabel={deliveryStatusLabel}
+          statusTone={phase === 'received' ? 'success' : phase === 'arrived' ? 'brand' : 'warning'}
+          title={heroTitle}
+          summary={heroSummary}
+          routeLabel="المسار"
+          routeValue={`${values.pickupAddress || 'غير محدد'} → ${values.dropoffAddress || 'غير محدد'}`}
+          nextStepLabel="الإجراء التالي"
+          nextStepValue={nextStepValue}
         />
-        <KeyValueList items={orderReceiptItems} />
-      </Surface>
 
-      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <SectionHeader title="مسار الحالة" subtitle="في الطريق ثم وصول العميل ثم الاستلام في صفحة واحدة فقط." />
-        <StageRail activeStepId={phase === 'route' ? 'route' : 'received'} steps={deliveryJourneySteps} />
-      </Surface>
-
-      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <SectionHeader title="تفاصيل الطلب" subtitle="بيانات فعلية مستقاة من الطلب نفسه." />
-        <KeyValueList
-          items={[
-            { label: 'عنوان الاستلام', value: values.pickupAddress || 'غير محدد', tone: 'brand' },
-            { label: 'عنوان التسليم', value: values.dropoffAddress || 'غير محدد' },
-            { label: 'جهة الاتصال', value: values.contactName || 'غير محدد' },
-            { label: 'رقم الجوال', value: values.contactPhone || 'غير محدد' },
-            { label: 'الملاحظات', value: note },
-          ]}
+        <CompactStatusStepper
+          title="المسار الحي"
+          subtitle="ثلاث مراحل واضحة دون بطاقات ضخمة أو نصوص مكررة."
+          steps={compactSteps}
         />
-      </Surface>
 
-      <OrderCaptainChatSection phase={phase} />
+        <KeyValueDetails
+          title="تفاصيل الطلب"
+          subtitle="المعلومات المهمة فقط، بشكل مضغوط وقابل للقراءة."
+          items={orderDetailsItems}
+        />
 
-      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <SectionHeader title="تقييم الطلب (المنتج)" subtitle="بعد استلام العميل، تقييم المنتج يظهر هنا دون مغادرة الصفحة." />
-        <Box gap={2}>
-          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <StatCard label="التقييم الحالي" value={productRatingLabel} deltaLabel={productRatingDelta} tone={productRating > 0 ? 'warning' : 'info'} />
-            <StatCard label="الوضع" value={phase === 'route' ? 'بانتظار الوصول' : ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن'} deltaLabel={phase === 'route' ? 'سيظهر بعد الاستلام' : ratingsSubmitted ? 'يمكن التعديل' : 'بعد استلام العميل'} tone={phase === 'route' ? 'info' : ratingsSubmitted ? 'success' : 'warning'} />
-          </Box>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{productHelperText}</Text>
-          <RatingStars value={productRating} disabled={!hasCustomerReceived} onChange={handleProductRatingChange} />
-        </Box>
-      </Surface>
+        <OrderLinkedChat
+          title="الدردشة مع الكابتن"
+          subtitle={phase === 'received' ? 'السجل ظاهر للمراجعة فقط بعد الاستلام.' : 'آخر رسالة ومرفقات سريعة داخل نفس الصندوق.'}
+          statusLabel={phase === 'received' ? 'الدردشة مقفلة' : 'مرتبطة بهذا الطلب'}
+          statusTone={phase === 'received' ? 'warning' : 'brand'}
+          helperText={phase === 'received' ? 'لا يمكن إرسال رسائل جديدة بعد الاستلام.' : 'اكتب رسالة واحدة واضحة أو أرسل مرفقًا سريعًا دون فتح واجهات إضافية.'}
+          message={{
+            senderLabel: lastChatMessage.senderLabel,
+            body: lastChatMessage.body,
+            meta: lastChatMessage.time,
+            tone: lastChatMessage.tone,
+          }}
+          quickActions={quickActions}
+          inputLabel="رسالة إلى الكابتن"
+          inputPlaceholder="اكتب رسالتك هنا"
+          value={draftMessage}
+          onChangeText={setDraftMessage}
+          sendLabel={chatSendLabel}
+          onSend={handleSendMessage}
+          sendDisabled={!canSendMessage}
+          disabledReason={phase === 'received' ? 'الدردشة أغلقت بعد استلام العميل للطلب.' : !canSendMessage ? 'أضف نصًا أو اختر مرفقًا واحدًا على الأقل.' : undefined}
+        />
 
-      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <SectionHeader title="تقييم الكابتن" subtitle="ومن نفس الصفحة أيضًا يمكنك تقييم الكابتن بعد الاستلام." />
-        <Box gap={2}>
-          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <StatCard label="التقييم الحالي" value={captainRatingLabel} deltaLabel="الكابتن" tone={captainRating > 0 ? 'info' : 'brand'} />
-            <StatCard label="الحالة" value={ratingsSubmitted ? 'تم الإرسال' : hasCustomerReceived ? 'جاهز الآن' : 'بانتظار الاستلام'} deltaLabel={hasCustomerReceived ? (ratingsSubmitted ? 'يمكن التعديل' : 'داخل نفس الصفحة') : 'سيظهر بعد الاستلام'} tone={ratingsSubmitted ? 'success' : hasCustomerReceived ? 'warning' : 'info'} />
-          </Box>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{captainHelperText}</Text>
-          <RatingStars value={captainRating} disabled={!hasCustomerReceived} onChange={handleCaptainRatingChange} />
-        </Box>
-      </Surface>
+        <DeferredReviewBlock
+          title="تقييم المنتج"
+          subtitle="يظهر بعد استلام العميل للطلب، ويبقى مضغوطًا قبل ذلك."
+          enabled={hasCustomerReceived}
+          placeholderText="سيظهر تقييم المنتج بعد الاستلام."
+          currentValueLabel={productRatingLabel}
+          stateLabel={ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن'}
+          helperText={productHelperText}
+          value={productRating}
+          onChange={handleProductRatingChange}
+          submitted={ratingsSubmitted}
+        />
 
-      {ratingsSubmitted ? (
-        <Surface tone="brand" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.brand }}>
-          <Text role="bodyStrong" style={{ textAlign: 'right' }}>تم حفظ التقييمين</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            تقييم الطلب وتقييم الكابتن بقيا في نفس الصفحة وتم اعتمادهما.
-          </Text>
-        </Surface>
-      ) : null}
+        <DeferredReviewBlock
+          title="تقييم الكابتن"
+          subtitle="يبقى مؤجلًا حتى يكتمل الاستلام من العميل."
+          enabled={hasCustomerReceived}
+          placeholderText="سيظهر تقييم الكابتن بعد الاستلام."
+          currentValueLabel={captainRatingLabel}
+          stateLabel={ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن'}
+          helperText={captainHelperText}
+          value={captainRating}
+          onChange={handleCaptainRatingChange}
+          submitted={ratingsSubmitted}
+          placeholderTone="brand"
+        />
 
-      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <SectionHeader title={phase === 'route' ? 'المسار الحي' : 'بعد الاستلام' } subtitle="لا توجد شاشة جديدة بين الوصول والاستلام والتقييم." />
-        <Box gap={2}>
-          {timelineItems.map((step, index) => {
-            const isDone = index < activeTimelineIndex || (!hasCustomerReceived && index === 0);
-            const isActive = index === activeTimelineIndex;
-            const borderColor = isActive ? theme.brand : theme.line;
-            const backgroundColor = isActive ? theme.brandSurface : isDone ? theme.successSurface : theme.surfaceRaised;
-            const badgeTone = isActive ? 'brand' : isDone ? 'success' : 'default';
-
-            return (
-              <Surface
-                key={step.id}
-                tone={isActive ? 'brand' : 'raised'}
-                gap={0}
-                padding={2}
-                style={{ borderRadius: 18, borderWidth: 1, borderColor, backgroundColor }}
-              >
-                <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
-                  <View style={{ width: 28, alignItems: 'center' }}>
-                    <Ionicons name={isDone ? 'checkmark' : isActive ? 'ellipse' : 'ellipse-outline'} size={18} color={isActive ? theme.brand : isDone ? theme.success : theme.textSoft} />
-                  </View>
-
-                  <Box gap={0} style={{ flex: 1 }}>
-                    <Text role="bodyStrong" style={{ textAlign: 'right' }}>{step.title}</Text>
-                    <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{step.detail}</Text>
-                  </Box>
-
-                  <Chip label={isDone ? 'تم' : isActive ? 'الآن' : 'قادم'} tone={badgeTone} />
-                </Box>
-              </Surface>
-            );
-          })}
-        </Box>
-      </Surface>
-
-      <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <Text role="bodyStrong" style={{ textAlign: 'right' }}>الوصول والاستلام وتقييم المنتج والكابتن في صفحة واحدة</Text>
-        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-          لا يوجد انتقال إلى صفحة أخرى هنا. الطلب يصل للعميل، يستلمه، ثم يظهر تقييم المنتج وتقييم الكابتن داخل نفس الشاشة.
-        </Text>
-      </Surface>
-
-      <Box gap={2}>
-        <Button label={primaryActionLabel} onPress={handlePrimaryAction} disabled={primaryActionDisabled} />
-        {onBell && phase === 'route' ? <Button label="جرس الوصول" tone="secondary" onPress={onBell} /> : null}
-        {onBack ? <Button label="تعديل الطلب" tone="secondary" onPress={onBack} /> : null}
-      </Box>
+        <View style={{ height: spacing[1] }} />
       </MobileScrollView>
+
+      <StickyActionBar
+        primaryAction={{
+          label: primaryActionLabel,
+          onPress: handlePrimaryAction,
+          disabled: primaryActionDisabled,
+        }}
+        secondaryAction={secondaryAction}
+        note={stickyNote}
+        onHeightChange={setActionBarHeight}
+      />
     </View>
   );
 }
 
 function renderOrderSuccess(onNext?: () => void) {
-  const { theme } = useTheme();
-
   return (
     <MobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
-      <Surface tone="brand" gap={2} padding={3} style={{ borderRadius: 24, borderWidth: 1, borderColor: theme.brand }}>
-        <Box gap={1} style={{ alignItems: 'flex-end' }}>
-          <Badge label="في الطريق" tone="warning" />
-          <Text role="titleLg" style={{ textAlign: 'right' }}>الطلب في الطريق إلى العميل</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            ستظهر هنا لحظة الوصول ثم استلام العميل ثم التقييمان في نفس الشاشة.
-          </Text>
-        </Box>
-      </Surface>
+      <OperationalStatusHero
+        statusLabel="في الطريق"
+        statusTone="warning"
+        title="الطلب في الطريق إلى العميل"
+        summary="ستظهر لحظة الوصول ثم الاستلام ثم التقييمات من نفس الشاشة دون مسارات إضافية."
+        nextStepLabel="الإجراء التالي"
+        nextStepValue="افتح شاشة الحالة لمتابعة الوصول والاستلام."
+      />
 
-      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <SectionHeader title="المسار التالي" subtitle="في الطريق ثم الوصول ثم الاستلام من العميل." />
-        <StageRail activeStepId="route" steps={deliveryJourneySteps} />
-      </Surface>
+      <CompactStatusStepper
+        title="المسار التالي"
+        subtitle="في الطريق ثم الوصول ثم الاستلام داخل رحلة واحدة قصيرة."
+        steps={deliveryJourneySteps.map((step, index) => ({
+          id: step.id,
+          title: step.title,
+          state: index === 0 ? 'current' : 'next',
+        }))}
+      />
 
-      <Button label="عرض التتبع" onPress={onNext} />
+      <Button label="عرض التتبع" disabled={!onNext} onPress={() => onNext?.()} />
     </MobileScrollView>
   );
 }

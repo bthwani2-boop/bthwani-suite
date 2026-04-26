@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FlatList, View } from 'react-native';
-import { colorPalette, spacing } from '@bthwani/ui-kit';
-import { Button, Card, SheetFrame, Surface, Text } from '@bthwani/ui-kit';
+import { Button, Card, SheetFrame, Surface, Text, colorPalette, spacing } from '@bthwani/ui-kit';
 
 export type DshCartLine = {
 	id: string;
@@ -43,7 +42,7 @@ export function DshCartDetails({ visible, onClose, items, currency = 'SAR', onCh
 	}
 
 	return (
-		<SheetFrame visible={visible} onClose={onClose} title={`Cart — ${formatAmount(total, currency)}`}>
+		<SheetFrame visible={visible} onClose={onClose} title={`تفاصيل السلة — ${formatAmount(total, currency)}`}>
 			<View style={{ gap: spacing[2] }}>
 				<FlatList
 					data={items}
@@ -52,25 +51,25 @@ export function DshCartDetails({ visible, onClose, items, currency = 'SAR', onCh
 					contentContainerStyle={{ gap: spacing[1] }}
 					ListEmptyComponent={(
 						<Surface tone="default" gap={1} style={{ backgroundColor: colorPalette.surfaceSecondary, borderColor: colorPalette.borderSubtle }}>
-							<Text role="bodyMd" align="center">No items in the cart yet.</Text>
-							<Text role="bodySm" tone="muted" align="center">Add products to review quantities and totals here.</Text>
+							<Text role="bodyMd" align="center">لا توجد عناصر في السلة حتى الآن.</Text>
+							<Text role="bodySm" tone="muted" align="center">أضف منتجات جديدة لتتمكن من مراجعة الكميات والإجماليات هنا.</Text>
 						</Surface>
 					)}
 					renderItem={({ item }) => (
 						<Card
 							title={item.title}
 							subtitle={item.subtitle}
-							padding={3}
-							gap={2}
+							padding={2}
+							gap={1}
 							footer={(
 								<View style={{ gap: spacing[2] }}>
-									<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing[2] }}>
-										<Text role="caption" tone="muted">{formatAmount(item.price, currency)} each</Text>
+									<View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', gap: spacing[2] }}>
+										<Text role="caption" tone="muted">سعر الوحدة {formatAmount(item.price, currency)}</Text>
 										<Text role="bodySm" tone="soft">{formatAmount(item.subtotal ?? item.price * item.qty, currency)}</Text>
 									</View>
 
-									<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing[2] }}>
-										<View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}>
+									<View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', gap: spacing[2] }}>
+										<View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
 											<Button
 												label="-"
 												tone="secondary"
@@ -92,7 +91,7 @@ export function DshCartDetails({ visible, onClose, items, currency = 'SAR', onCh
 
 										{onRemove ? (
 											<Button
-												label="Remove"
+												label="حذف"
 												tone="ghost"
 												size="sm"
 												fullWidth={false}
@@ -108,12 +107,26 @@ export function DshCartDetails({ visible, onClose, items, currency = 'SAR', onCh
 				/>
 
 				<Surface tone="default" gap={1} style={{ backgroundColor: colorPalette.surfaceSecondary, borderColor: colorPalette.borderSubtle }}>
-					<Text role="bodyMd">Order total</Text>
+					<Text role="bodyMd">إجمالي الطلب</Text>
 					<Text role="titleSm">{formatAmount(total, currency)}</Text>
-					<View style={{ flexDirection: 'row', gap: spacing[3] }}>
-						<Button label="Proceed to checkout" disabled={!onCheckout || items.length === 0} onPress={() => onCheckout?.()} />
-						<Button label="Close" tone="secondary" onPress={onClose} />
-						{onRemove ? <Button label="Remove all" tone="ghost" disabled={items.length === 0} onPress={() => items.forEach((item) => onRemove(item.id))} /> : null}
+					<View style={{ flexDirection: 'row-reverse', gap: spacing[2], flexWrap: 'wrap' }}>
+						<Button
+							label="تنفيذ الطلب"
+							fullWidth={false}
+							disabled={!onCheckout || items.length === 0}
+							onPress={() => onCheckout?.()}
+							style={{ backgroundColor: colorPalette.accentOrange, borderColor: colorPalette.accentOrange }}
+						/>
+						<Button label="إغلاق" tone="secondary" fullWidth={false} onPress={onClose} />
+						{onRemove ? (
+							<Button
+								label="حذف الكل"
+								tone="ghost"
+								fullWidth={false}
+								disabled={items.length === 0}
+								onPress={() => items.forEach((item) => onRemove(item.id))}
+							/>
+						) : null}
 					</View>
 				</Surface>
 			</View>
