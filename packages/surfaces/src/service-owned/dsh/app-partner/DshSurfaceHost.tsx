@@ -1,16 +1,56 @@
 import React from 'react';
+import { PartnerOrdersHomeScreen } from './orders';
+import { DshEntryScreen } from './entry/screens';
+import { DshPartnerStoreMaintenanceWorkspaceScreen } from './store-maintenance/screens';
+import { DshInventoryManagementScreen } from './inventory-management/screens';
+import { DshPartnerSupportDirectoryScreen } from './support/screens';
+import {
+  DshPartnerAuctionStatusUpdateScreen,
+  DshPartnerAudienceInsightsGetScreen,
+  DshPartnerChatReadAckScreen,
+  DshPartnerChatSendScreen,
+  DshPartnerCommissionByModeGetScreen,
+  DshPartnerDocUploadScreen,
+  DshPartnerIdentitySubmitScreen,
+  DshPartnerIntakeStartScreen,
+  DshPartnerInventoryAdjustScreen,
+  DshPartnerInventoryUpdateScreen,
+  DshPartnerItemsUpsertScreen,
+  DshPartnerListingStatusUpdateScreen,
+  DshPartnerManagerInviteScreen,
+  DshPartnerOrderAcceptScreen,
+  DshPartnerOrderGetScreen,
+  DshPartnerOrderHandoffScreen,
+  DshPartnerOrderIssueQueueScreen,
+  DshPartnerOrderOutForDeliveryScreen,
+  DshPartnerOrderPrepareScreen,
+  DshPartnerOrderReadyScreen,
+  DshPartnerOrderRejectScreen,
+  DshPartnerOrderStoreDeliveredScreen,
+  DshPartnerProfileGetScreen,
+  DshPartnerQuickReplyConfigGetScreen,
+  DshPartnerQuickReplySettingsScreen,
+  DshPartnerQuickReplySetupScreen,
+  DshPartnerStaffAnalyticsGetScreen,
+  DshPartnerStoreNominationScreen,
+  DshPartnerStoreServiceModesUpdateScreen,
+  DshPartnerStoreStatusUpdateScreen,
+  DshPartnerStoreUpdateScreen,
+  DshPartnerSubscriptionScreen,
+  DshPartnerVideoUploadScreen,
+  type PartnerSupportScreenId,
+} from './support/screens/DshPartnerGeneratedSupportScreens';
 
 export type DshRoute =
+  | 'orders-home'
   | 'entry'
-  | 'home'
-  | 'orders-inbox'
-  | 'order-detail'
   | 'store-maintenance'
   | 'inventory-management'
-  | 'support'
+  | 'support-directory'
+  | 'support-screen'
   | 'success';
 
-export type DshCommandTarget = 'home' | 'orders-inbox' | 'order-detail' | 'store-maintenance';
+export type DshCommandTarget = 'orders-home' | 'store-maintenance';
 
 type DshNavigationCommand = {
   token: number;
@@ -21,19 +61,18 @@ type DshNavigationCommand = {
 type DshSurfaceHostProps = {
   command?: DshNavigationCommand;
   onExit?: () => void;
-  initialRoute?: DshRoute;
+  initialRoute?: Exclude<DshRoute, 'success'>;
 };
 
-export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshSurfaceHostProps) {
+export function DshSurfaceHost({ command, onExit, initialRoute = 'orders-home' }: DshSurfaceHostProps) {
   const [route, setRoute] = React.useState<DshRoute>(initialRoute);
+  const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<PartnerSupportScreenId>('profile-get');
   const routeHistoryRef = React.useRef<DshRoute[]>([initialRoute]);
 
   React.useEffect(() => {
     if (!command) return;
     const map: Record<DshCommandTarget, DshRoute> = {
-      home: 'home',
-      'orders-inbox': 'orders-inbox',
-      'order-detail': 'order-detail',
+      'orders-home': 'orders-home',
       'store-maintenance': 'store-maintenance',
     };
     const next = map[command.target] ?? initialRoute;
@@ -52,50 +91,158 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
     }
   }, [onExit]);
 
+  const openOrdersHome = React.useCallback(() => {
+    routeHistoryRef.current.push('orders-home');
+    setRoute('orders-home');
+  }, []);
+
+  const openEntry = React.useCallback(() => {
+    routeHistoryRef.current.push('entry');
+    setRoute('entry');
+  }, []);
+
+  const openMaintenance = React.useCallback(() => {
+    routeHistoryRef.current.push('store-maintenance');
+    setRoute('store-maintenance');
+  }, []);
+
+  const openInventoryManagement = React.useCallback(() => {
+    routeHistoryRef.current.push('inventory-management');
+    setRoute('inventory-management');
+  }, []);
+
+  const openSupportDirectory = React.useCallback(() => {
+    routeHistoryRef.current.push('support-directory');
+    setRoute('support-directory');
+  }, []);
+
+  const openSupportScreen = React.useCallback((screenId: PartnerSupportScreenId) => {
+    setSelectedSupportScreen(screenId);
+    routeHistoryRef.current.push('support-screen');
+    setRoute('support-screen');
+  }, []);
+
+  function openOrderActionFromHub(actionId: 'accept' | 'details' | 'prepare' | 'ready' | 'handoff' | 'issue' | 'delivering') {
+    if (actionId === 'accept') {
+      openSupportScreen('order-accept');
+      return;
+    }
+    if (actionId === 'details') {
+      openSupportScreen('order-get');
+      return;
+    }
+    if (actionId === 'prepare') {
+      openSupportScreen('order-prepare');
+      return;
+    }
+    if (actionId === 'ready') {
+      openSupportScreen('order-ready');
+      return;
+    }
+    if (actionId === 'handoff') {
+      openSupportScreen('order-handoff');
+      return;
+    }
+    if (actionId === 'delivering') {
+      openSupportScreen('order-out-for-delivery');
+      return;
+    }
+    openSupportScreen('order-issue-queue');
+  }
+
+  if (route === 'orders-home') {
+    return (
+      <PartnerOrdersHomeScreen
+        onOpenEntryPress={openEntry}
+        onOpenOrderAction={openOrderActionFromHub}
+        onOpenAccountArea={openSupportDirectory}
+        onOpenAccountEntry={openSupportScreen}
+        onOpenMaintenancePress={openMaintenance}
+        onOpenInventoryManagementPress={openInventoryManagement}
+        onRetry={openOrdersHome}
+      />
+    );
+  }
+
   if (route === 'entry') {
     return (
-      <div>
-        <h1>Partner — Entry</h1>
-        <p>مخطط شاشة الدخول لشريك المتجر (Partner).</p>
-      </div>
-    );
-  }
-
-  if (route === 'orders-inbox') {
-    return (
-      <div>
-        <h1>Partner — Orders Inbox</h1>
-        <button onClick={handleBack}>Back</button>
-        <p>قائمة الطلبات placeholder.</p>
-      </div>
-    );
-  }
-
-  if (route === 'order-detail') {
-    return (
-      <div>
-        <h1>Partner — Order Detail</h1>
-        <button onClick={handleBack}>Back</button>
-        <p>تفاصيل الطلب placeholder.</p>
-      </div>
+      <DshEntryScreen
+        onOpenOrdersBoardPress={openOrdersHome}
+        onOpenOrderWorkspacePress={() => openOrderActionFromHub('details')}
+        onOpenMaintenancePress={openMaintenance}
+        onOpenIssueQueuePress={() => openOrderActionFromHub('issue')}
+      />
     );
   }
 
   if (route === 'store-maintenance') {
     return (
-      <div>
-        <h1>Partner — Store Maintenance</h1>
-        <button onClick={handleBack}>Back</button>
-        <p>صيانة المتجر placeholder.</p>
-      </div>
+      <DshPartnerStoreMaintenanceWorkspaceScreen
+        onOpenSupportDirectory={openSupportDirectory}
+        onOpenDeliveryBoard={() => openOrderActionFromHub('delivering')}
+        onSave={openOrdersHome}
+      />
     );
   }
 
+  if (route === 'inventory-management') {
+    return <DshInventoryManagementScreen />;
+  }
+
+  if (route === 'support-directory') {
+    return <DshPartnerSupportDirectoryScreen onOpenScreen={openSupportScreen} />;
+  }
+
+  if (route === 'support-screen') {
+    const supportScreens: Record<PartnerSupportScreenId, React.ReactNode> = {
+      'auction-status-update': <DshPartnerAuctionStatusUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'audience-insights': <DshPartnerAudienceInsightsGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'chat-read-ack': <DshPartnerChatReadAckScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('quick-reply-config')} />,
+      'chat-send': <DshPartnerChatSendScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('quick-reply-setup')} />,
+      'commission-by-mode': <DshPartnerCommissionByModeGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'doc-upload': <DshPartnerDocUploadScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'identity-submit': <DshPartnerIdentitySubmitScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'intake-start': <DshPartnerIntakeStartScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'inventory-adjust': <DshPartnerInventoryAdjustScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('inventory-update')} />,
+      'inventory-update': <DshPartnerInventoryUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'items-upsert': <DshPartnerItemsUpsertScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'listing-status-update': <DshPartnerListingStatusUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'manager-invite': <DshPartnerManagerInviteScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'order-accept': <DshPartnerOrderAcceptScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('order-get')} />,
+      'order-get': <DshPartnerOrderGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'order-handoff': <DshPartnerOrderHandoffScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'order-issue-queue': <DshPartnerOrderIssueQueueScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'order-out-for-delivery': <DshPartnerOrderOutForDeliveryScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'order-prepare': <DshPartnerOrderPrepareScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'order-ready': <DshPartnerOrderReadyScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'order-reject': <DshPartnerOrderRejectScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'order-store-delivered': <DshPartnerOrderStoreDeliveredScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'profile-get': <DshPartnerProfileGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'quick-reply-config': <DshPartnerQuickReplyConfigGetScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('quick-reply-settings')} />,
+      'quick-reply-settings': <DshPartnerQuickReplySettingsScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('quick-reply-setup')} />,
+      'quick-reply-setup': <DshPartnerQuickReplySetupScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'staff-analytics': <DshPartnerStaffAnalyticsGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'store-nomination': <DshPartnerStoreNominationScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'store-service-modes-update': <DshPartnerStoreServiceModesUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'store-status-update': <DshPartnerStoreStatusUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'store-update': <DshPartnerStoreUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      subscription: <DshPartnerSubscriptionScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'video-upload': <DshPartnerVideoUploadScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+    };
+
+    return supportScreens[selectedSupportScreen];
+  }
+
   return (
-    <div>
-      <h1>Partner — {route}</h1>
-      <button onClick={handleBack}>Back</button>
-    </div>
+    <PartnerOrdersHomeScreen
+      onOpenEntryPress={openEntry}
+      onOpenOrderAction={openOrderActionFromHub}
+      onOpenAccountArea={openSupportDirectory}
+      onOpenAccountEntry={openSupportScreen}
+      onOpenMaintenancePress={openMaintenance}
+      onOpenInventoryManagementPress={openInventoryManagement}
+      onRetry={openOrdersHome}
+    />
   );
 }
 

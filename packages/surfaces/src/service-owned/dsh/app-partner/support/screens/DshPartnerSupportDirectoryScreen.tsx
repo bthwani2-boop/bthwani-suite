@@ -19,23 +19,8 @@ const groups: Array<{
   items: Array<{ id: PartnerSupportScreenId; title: string; subtitle: string; badgeLabel: string }>;
 }> = [
   {
-    title: 'Orders execution',
-    subtitle: 'Branch order states and exception handling.',
-    items: [
-      { id: 'order-accept', title: 'Order accept', subtitle: 'Accept the current branch order.', badgeLabel: 'Execution' },
-      { id: 'order-get', title: 'Order get', subtitle: 'Open compact order details.', badgeLabel: 'Read' },
-      { id: 'order-prepare', title: 'Order prepare', subtitle: 'Drive branch preparation.', badgeLabel: 'Execution' },
-      { id: 'order-ready', title: 'Order ready', subtitle: 'Expose handoff readiness.', badgeLabel: 'Execution' },
-      { id: 'order-handoff', title: 'Order handoff', subtitle: 'Confirm captain handoff.', badgeLabel: 'Execution' },
-      { id: 'order-out-for-delivery', title: 'Order out for delivery', subtitle: 'Monitor live delivery progress.', badgeLabel: 'Monitor' },
-      { id: 'order-store-delivered', title: 'Order store delivered', subtitle: 'Close store-side delivery receipt.', badgeLabel: 'Closure' },
-      { id: 'order-reject', title: 'Order reject', subtitle: 'Reject with explicit reason.', badgeLabel: 'Exception' },
-      { id: 'order-issue-queue', title: 'Order issue queue', subtitle: 'Review escalated branch orders.', badgeLabel: 'Queue' },
-    ],
-  },
-  {
     title: 'Store operations',
-    subtitle: 'Branch state, listing, profile, and onboarding actions.',
+    subtitle: 'Branch state, listing, profile, and onboarding actions under account.',
     items: [
       { id: 'profile-get', title: 'Partner profile', subtitle: 'Read current branch profile.', badgeLabel: 'Read' },
       { id: 'store-update', title: 'Store update', subtitle: 'Apply branch profile updates.', badgeLabel: 'Update' },
@@ -81,9 +66,9 @@ export function DshPartnerSupportDirectoryScreen({ onOpenScreen }: DshPartnerSup
   return (
     <MobileScrollView padding={4} gap={4}>
       <Box gap={2}>
-        <Text role="titleLg">دليل دعم الشريك</Text>
+        <Text role="titleLg">مداخل الحساب للشريك</Text>
         <Text role="bodyMd" tone="muted">
-          دليل مركزي لبقية أسطح دعم الشريك في DSH حتى يصل مشغلو الفروع إلى كل مسار من مكان واحد واضح.
+          تم تجميع المجالات غير الخاصة بالطلبات داخل الحساب في دليل واحد واضح لتقليل التشويش على مركز الطلبات.
         </Text>
       </Box>
 

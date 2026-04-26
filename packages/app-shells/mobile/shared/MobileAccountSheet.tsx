@@ -13,11 +13,13 @@ type MobileAccountSheetProps = {
   visible: boolean;
   onClose: () => void;
   profileLabel?: string;
+  walletHubLabel?: string;
   settingsLabel?: string;
   typeSwitchLabel?: string;
   typeSwitchTitle?: string;
   typeSwitchPrompt?: string;
   onOpenProfile?: () => void;
+  onOpenWalletHub?: () => void;
   typeOptions: readonly MobileAccountTypeOption[];
   activeTypeId: string;
   onSelectType: (typeId: string) => void;
@@ -27,11 +29,13 @@ export function MobileAccountSheet({
   visible,
   onClose,
   profileLabel = 'الملف الشخصي',
+  walletHubLabel = 'المحفظة والحسابات المالية',
   settingsLabel = 'الإعدادات',
   typeSwitchLabel = 'تغيير النوع',
   typeSwitchTitle = 'اختيار النوع التشغيلي',
   typeSwitchPrompt = 'اختر نوع التشغيل الذي تريد الانتقال إليه. سيتم تطبيق التغيير على التطبيق بالكامل.',
   onOpenProfile,
+  onOpenWalletHub,
   typeOptions,
   activeTypeId,
   onSelectType,
@@ -62,6 +66,14 @@ export function MobileAccountSheet({
             onPress={() => {
               onClose();
               onOpenProfile?.();
+            }}
+          />
+          <Button
+            label={walletHubLabel}
+            tone="secondary"
+            onPress={() => {
+              onClose();
+              onOpenWalletHub?.();
             }}
           />
           <Button label={settingsLabel} tone="secondary" onPress={() => setTab('settings')} />

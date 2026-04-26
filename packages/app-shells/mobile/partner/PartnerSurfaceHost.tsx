@@ -3,6 +3,8 @@ import { BackHandler, Platform } from 'react-native';
 import { Box, Button, Icon, MobileScrollView, ScreenHeader, Surface, Text, TopBar } from '@bthwani/ui-kit';
 import { dshPartner } from '@bthwani/surfaces/app-partner';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
+import { PartnerWalletHubSheet, type PartnerWalletHubDestination } from '../shared/PartnerWalletHubSheet';
+import { PartnerStoreScopeSheet, type PartnerStoreScopeOption } from '../shared/PartnerStoreScopeSheet';
 
 const {
   DshEntryScreen,
@@ -148,9 +150,35 @@ const partnerTypeOptions: readonly MobileAccountTypeOption[] = [
   { id: 'arb', label: 'ARB', description: 'تشغيل عرب الشركاء والمسارات' },
 ];
 
+const storeScopeOptions: readonly PartnerStoreScopeOption[] = [
+  {
+    id: 'all',
+    label: 'كل الفروع',
+    description: 'عرض موحّد لكل فروع الشريك.',
+  },
+  {
+    id: 'fakhama-1',
+    label: 'الفخامة 1',
+    description: 'الفرع الأساسي الحالي.',
+  },
+  {
+    id: 'fakhama-2',
+    label: 'الفخامة 2',
+    description: 'فرع المدينة الثاني للتشغيل.',
+  },
+  {
+    id: 'fakhama-3',
+    label: 'الفخامة 3',
+    description: 'فرع داعم لنطاق الطلبات الممتد.',
+  },
+];
+
 export function PartnerSurfaceHost() {
   const [activeServiceType, setActiveServiceType] = React.useState<PartnerServiceType>('dsh');
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
+  const [walletHubVisible, setWalletHubVisible] = React.useState(false);
+  const [storeScopeVisible, setStoreScopeVisible] = React.useState(false);
+  const [selectedStoreScopeId, setSelectedStoreScopeId] = React.useState('all');
   const [route, setRoute] = React.useState<PartnerRoute>('entry');
   const [activeOrderId, setActiveOrderId] = React.useState('partner-order-1042');
   const [listingEnabled, setListingEnabled] = React.useState(true);
@@ -190,6 +218,11 @@ export function PartnerSurfaceHost() {
     activeServiceType === 'dsh'
       ? shortcuts
       : (['فتح عرب اليوم', 'تحديث مسار', 'مراجعة التسليمات'] as const);
+
+  const selectedStoreScope = React.useMemo(
+    () => storeScopeOptions.find((option) => option.id === selectedStoreScopeId) ?? storeScopeOptions[0],
+    [selectedStoreScopeId],
+  );
 
   const activeOrderSummary = React.useMemo(() => {
     if (activeOrderId === 'partner-order-1048') {
@@ -242,13 +275,13 @@ export function PartnerSurfaceHost() {
   const maintenanceProfile = React.useMemo(
     () => ({
       storeName: activeOrderSummary.merchantName,
-      branchLabel: 'Yasmin branch',
-      cityLabel: 'Riyadh',
+      branchLabel: selectedStoreScope.label,
+      cityLabel: 'الرياض',
       managerLabel: 'Khaled A.',
       todayHoursLabel,
       activeZoneLabel: selectedZone.title,
     }),
-    [activeOrderSummary.merchantName, selectedZone.title, todayHoursLabel],
+    [activeOrderSummary.merchantName, selectedStoreScope.label, selectedZone.title, todayHoursLabel],
   );
 
   const zoneOptions = React.useMemo(
@@ -320,6 +353,16 @@ export function PartnerSurfaceHost() {
     }
 
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (storeScopeVisible) {
+        setStoreScopeVisible(false);
+        return true;
+      }
+
+      if (walletHubVisible) {
+        setWalletHubVisible(false);
+        return true;
+      }
+
       if (accountSheetVisible) {
         setAccountSheetVisible(false);
         return true;
@@ -337,7 +380,7 @@ export function PartnerSurfaceHost() {
     });
 
     return () => subscription.remove();
-  }, [accountSheetVisible]);
+  }, [accountSheetVisible, storeScopeVisible, walletHubVisible]);
 
   const openOrdersBoard = () => {
     setRoute('inbox');
@@ -382,13 +425,38 @@ export function PartnerSurfaceHost() {
     );
   };
 
+  const openWalletHub = React.useCallback(() => {
+    setWalletHubVisible(true);
+  }, []);
+
+  const openStoreScope = React.useCallback(() => {
+    setStoreScopeVisible(true);
+  }, []);
+
+  const handleWalletHubNavigation = React.useCallback((destination: PartnerWalletHubDestination) => {
+    if (destination === 'partner_subscription') {
+      openSupportScreen('subscription');
+      return;
+    }
+    setRoute('support-directory');
+  }, []);
+
   const topBar = (
     <TopBar
       variant="brand"
       title="بثواني"
       subtitle={activeServiceType === 'dsh' ? 'لوحة الشريك - DSH' : 'لوحة الشريك - ARB'}
-      locationLabel="الرياض، فرع الياسمين"
+      locationLabel={`الرياض، ${selectedStoreScope.label}`}
+      locationIcon={<Icon name="git-branch-outline" size={14} color="#FFFFFF" />}
+      onTitlePress={openStoreScope}
+      titleAccessibilityLabel="فتح اختيار المتجر أو الفرع"
       actions={[
+        {
+          id: 'branch-scope',
+          icon: <Icon name="git-branch-outline" size={21} color="#0A2F5C" />,
+          accessibilityLabel: 'اختيار الفرع',
+          onPress: openStoreScope,
+        },
         {
           id: 'profile',
           icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
@@ -405,6 +473,12 @@ export function PartnerSurfaceHost() {
               setRoute('bell');
             }
           },
+        },
+        {
+          id: 'wallet',
+          icon: <Icon name="book-outline" size={21} color="#FFFFFF" />,
+          accessibilityLabel: 'المحفظة والحسابات المالية',
+          onPress: openWalletHub,
         },
         { id: 'orders', icon: <Icon name="receipt-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
         { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
@@ -424,6 +498,7 @@ export function PartnerSurfaceHost() {
       visible={accountSheetVisible}
       onClose={() => setAccountSheetVisible(false)}
       onOpenProfile={() => {}}
+      onOpenWalletHub={openWalletHub}
       typeOptions={partnerTypeOptions}
       activeTypeId={activeServiceType}
       onSelectType={(typeId) => {
@@ -431,6 +506,24 @@ export function PartnerSurfaceHost() {
       }}
       typeSwitchTitle="تغيير نوع تشغيل الشريك"
       typeSwitchPrompt="بدّل بين DSH و ARB. عند التبديل يتم تحديث محتوى التطبيق بالكامل حسب النوع المختار."
+    />
+  );
+
+  const walletHubSheet = (
+    <PartnerWalletHubSheet
+      visible={walletHubVisible}
+      onClose={() => setWalletHubVisible(false)}
+      onNavigate={handleWalletHubNavigation}
+    />
+  );
+
+  const storeScopeSheet = (
+    <PartnerStoreScopeSheet
+      visible={storeScopeVisible}
+      onClose={() => setStoreScopeVisible(false)}
+      options={storeScopeOptions}
+      selectedId={selectedStoreScopeId}
+      onSelect={setSelectedStoreScopeId}
     />
   );
 
@@ -485,6 +578,8 @@ export function PartnerSurfaceHost() {
           </MobileScrollView>
         </Surface>
         {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
       </Box>
     );
   }
@@ -506,6 +601,8 @@ export function PartnerSurfaceHost() {
           />
         </Surface>
         {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
       </Box>
     );
   }
@@ -523,6 +620,8 @@ export function PartnerSurfaceHost() {
           />
         </Surface>
         {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
       </Box>
     );
   }
@@ -545,6 +644,8 @@ export function PartnerSurfaceHost() {
           />
         </Surface>
         {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
       </Box>
     );
   }
@@ -563,6 +664,8 @@ export function PartnerSurfaceHost() {
           />
         </Surface>
         {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
       </Box>
     );
   }
@@ -584,6 +687,8 @@ export function PartnerSurfaceHost() {
           />
         </Surface>
         {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
       </Box>
     );
   }
@@ -610,6 +715,8 @@ export function PartnerSurfaceHost() {
           />
         </Surface>
         {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
       </Box>
     );
   }
@@ -629,6 +736,8 @@ export function PartnerSurfaceHost() {
           />
         </Surface>
         {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
       </Box>
     );
   }
@@ -647,6 +756,8 @@ export function PartnerSurfaceHost() {
           />
         </Surface>
         {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
       </Box>
     );
   }
@@ -659,6 +770,8 @@ export function PartnerSurfaceHost() {
           <DshInventoryManagementScreen />
         </Surface>
         {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
       </Box>
     );
   }
@@ -671,6 +784,8 @@ export function PartnerSurfaceHost() {
           <DshPartnerSupportDirectoryScreen onOpenScreen={(screenId) => openSupportScreen(screenId as PartnerSupportRoute)} />
         </Surface>
         {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
       </Box>
     );
   }
@@ -719,6 +834,8 @@ export function PartnerSurfaceHost() {
           {supportScreens[selectedSupportScreen]}
         </Surface>
         {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
       </Box>
     );
   }
@@ -817,6 +934,8 @@ export function PartnerSurfaceHost() {
         </MobileScrollView>
       </Surface>
       {accountSheet}
+        {walletHubSheet}
+        {storeScopeSheet}
     </Box>
   );
 }
