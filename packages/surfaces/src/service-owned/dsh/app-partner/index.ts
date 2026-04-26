@@ -11,4 +11,5 @@ export * from './store-maintenance/screens';
 export * from './store-hours/screens';
 export * from './zone-set/screens';
 export * from './support/screens';
+export * from './PartnerDshConsoleScreen';
 

@@ -42,7 +42,8 @@ const webPageFrameCss = `
   font-size: 12px;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: #c2410c;
+  color: #FF500D;
+  font-weight: 700;
 }
 
 .bth-web-page-frame-title-block {
@@ -59,7 +60,7 @@ const webPageFrameCss = `
   margin: 0;
   font-size: 32px;
   line-height: 1.1;
-  color: #0f172a;
+  color: #0A2F5C;
 }
 
 .bth-web-page-frame-description {
@@ -74,13 +75,20 @@ const webPageFrameCss = `
   gap: 16px;
   padding: 24px;
   border-radius: 24px;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(10, 47, 92, 0.12);
+  background: linear-gradient(180deg, #FFF4ED 0%, #FFFFFF 100%);
+  box-shadow: 0 12px 30px rgba(10, 47, 92, 0.08);
 }
 
 .bth-web-mission-hero-card--dense {
   gap: 12px;
+  padding: 18px;
+}
+
+.bth-web-mission-hero-card--compact {
+  gap: 10px;
+  padding: 16px;
+  border-radius: 20px;
 }
 
 .bth-web-mission-hero-card__badge-row,
@@ -96,18 +104,23 @@ const webPageFrameCss = `
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  color: #ea580c;
+  color: #FF500D;
+  font-weight: 700;
 }
 
 .bth-web-mission-hero-card__title {
   margin: 0;
   font-size: 34px;
   line-height: 1.1;
-  color: #0f172a;
+  color: #0A2F5C;
 }
 
 .bth-web-mission-hero-card--dense .bth-web-mission-hero-card__title {
   font-size: 28px;
+}
+
+.bth-web-mission-hero-card--compact .bth-web-mission-hero-card__title {
+  font-size: 24px;
 }
 
 .bth-web-mission-hero-card__description {
@@ -126,13 +139,13 @@ const webPageFrameCss = `
 
 .bth-web-mission-hero-card__badge {
   padding: 4px 10px;
-  background: #ffedd5;
-  color: #c2410c;
+  background: #FFEDD5;
+  color: #0A2F5C;
 }
 
 .bth-web-mission-hero-card__meta-chip {
   padding: 6px 10px;
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  border: 1px solid rgba(10, 47, 92, 0.12);
   background: rgba(255, 255, 255, 0.72);
   color: #334155;
 }
@@ -145,16 +158,24 @@ const webPageFrameCss = `
   border-radius: 14px;
   text-decoration: none;
   font-weight: 700;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bth-web-mission-hero-card__cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 47, 92, 0.12);
 }
 
 .bth-web-mission-hero-card__cta--secondary {
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  color: #0f172a;
+  border: 1px solid rgba(10, 47, 92, 0.18);
+  color: #0A2F5C;
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .bth-web-mission-hero-card__cta--primary {
-  background: #f97316;
+  background: #FF500D;
   color: #ffffff;
+  box-shadow: 0 4px 14px rgba(255, 80, 13, 0.3);
 }
 
 .bth-web-section-card {
@@ -162,8 +183,9 @@ const webPageFrameCss = `
   gap: 16px;
   padding: 20px;
   border-radius: 24px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  border: 1px solid rgba(10, 47, 92, 0.1);
   background: #ffffff;
+  box-shadow: 0 2px 8px rgba(10, 47, 92, 0.04);
 }
 
 .bth-web-section-card__header {
@@ -174,7 +196,7 @@ const webPageFrameCss = `
 .bth-web-section-card__title {
   margin: 0;
   font-size: 22px;
-  color: #0f172a;
+  color: #0A2F5C;
 }
 
 .bth-web-section-card__description {
@@ -189,24 +211,47 @@ const webPageFrameCss = `
   gap: 10px;
   padding: 18px;
   border-radius: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  border: 1px solid rgba(10, 47, 92, 0.1);
   background: #ffffff;
+  box-shadow: 0 2px 8px rgba(10, 47, 92, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bth-web-signal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(10, 47, 92, 0.08);
 }
 
 .bth-web-signal-card--best {
-  border-color: #bbf7d0;
-  background: linear-gradient(180deg, #ecfdf3 0%, #ffffff 100%);
+  border-color: rgba(74, 222, 128, 0.4);
+  background: linear-gradient(180deg, #ECFDF3 0%, #ffffff 100%);
 }
 
 .bth-web-signal-card--danger {
-  border-color: #fecaca;
-  background: linear-gradient(180deg, #fef2f2 0%, #ffffff 100%);
+  border-color: rgba(254, 202, 202, 0.6);
+  background: linear-gradient(180deg, #FEF2F2 0%, #ffffff 100%);
+}
+
+.bth-web-signal-card--warning {
+  border-color: rgba(254, 243, 199, 0.6);
+  background: linear-gradient(180deg, #FFFBEB 0%, #ffffff 100%);
+}
+
+.bth-web-signal-card--info {
+  border-color: rgba(219, 234, 254, 0.6);
+  background: linear-gradient(180deg, #EFF6FF 0%, #ffffff 100%);
+}
+
+.bth-web-signal-card--brand {
+  border-color: rgba(255, 237, 213, 0.6);
+  background: linear-gradient(180deg, #FFF4ED 0%, #ffffff 100%);
 }
 
 .bth-web-signal-card__title {
   margin: 0;
   font-size: 13px;
   color: #475569;
+  font-weight: 600;
 }
 
 .bth-web-signal-card__value {
@@ -214,7 +259,7 @@ const webPageFrameCss = `
   font-size: 28px;
   line-height: 1.1;
   font-weight: 800;
-  color: #0f172a;
+  color: #0A2F5C;
 }
 
 .bth-web-signal-card__description {
@@ -297,6 +342,7 @@ export type WebMissionHeroCardProps = {
   title: string;
   description?: string;
   dense?: boolean;
+  compact?: boolean;
   badges?: ReadonlyArray<string>;
   metaItems?: ReadonlyArray<string>;
   primaryAction?: { label: string; href: string };
@@ -308,13 +354,18 @@ export function WebMissionHeroCard({
   title,
   description,
   dense = false,
+  compact = false,
   badges = [],
   metaItems = [],
   primaryAction,
   secondaryAction,
 }: WebMissionHeroCardProps) {
   const { direction } = useDirection();
-  const cardClassName = ['bth-web-mission-hero-card', dense ? 'bth-web-mission-hero-card--dense' : ''].filter(Boolean).join(' ');
+  const cardClassName = [
+    'bth-web-mission-hero-card',
+    dense ? 'bth-web-mission-hero-card--dense' : '',
+    compact ? 'bth-web-mission-hero-card--compact' : ''
+  ].filter(Boolean).join(' ');
 
   return (
     <>
@@ -384,7 +435,7 @@ export function WebSectionCard({ title, description, children }: WebSectionCardP
   );
 }
 
-export type WebSignalCardTone = 'neutral' | 'best' | 'danger';
+export type WebSignalCardTone = 'neutral' | 'best' | 'danger' | 'warning' | 'info' | 'brand';
 
 export type WebSignalCardProps = {
   title: string;
@@ -399,9 +450,14 @@ export function WebSignalCard({
   description,
   tone = 'neutral',
 }: WebSignalCardProps) {
-  const className = ['bth-web-signal-card', tone === 'best' ? 'bth-web-signal-card--best' : '', tone === 'danger' ? 'bth-web-signal-card--danger' : '']
-    .filter(Boolean)
-    .join(' ');
+  const className = [
+    'bth-web-signal-card',
+    tone === 'best' ? 'bth-web-signal-card--best' : '',
+    tone === 'danger' ? 'bth-web-signal-card--danger' : '',
+    tone === 'warning' ? 'bth-web-signal-card--warning' : '',
+    tone === 'info' ? 'bth-web-signal-card--info' : '',
+    tone === 'brand' ? 'bth-web-signal-card--brand' : ''
+  ].filter(Boolean).join(' ');
 
   return (
     <>

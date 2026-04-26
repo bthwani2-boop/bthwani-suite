@@ -287,7 +287,7 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
       {workspace === 'partners' ? <ControlPanelDshPartnerApprovalsScreen hubHref="/operations/dsh" operationsHref="/operations" catalogHref="/operations/dsh/catalogs" marketingHref="/operations/dsh/marketing" /> : null}
       {workspace === 'marketing' ? <ControlPanelDshMarketingScreen hubHref="/operations/dsh" operationsHref="/operations" /> : null}
 
-      {workspace !== 'overview' ? (
+      <Box style={{ overflow: 'hidden' }}>
         <WebSegmentedTabs
           ariaLabel={uiText.controlPanel.surfaceTitles.operations}
           items={tabs}
@@ -300,7 +300,7 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
             router.push(`/operations/dsh/${workspaceId}`);
           }}
         />
-      ) : null}
+      </Box>
 
       {workspace === 'orders' ? <ControlPanelDshOrdersScreen embedded showHeader={false} hubHref="/operations" operationsHref="/operations" /> : null}
       {workspace === 'order-detail' && orderId ? <ControlPanelDshOrderDetailScreen embedded showHeader={false} orderId={orderId} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}

@@ -46,10 +46,10 @@
         "./packages/surfaces/src/composition/*"
       ],
       "@bthwani/media-fixtures": [
-        "packages/media-fixtures/src/index.ts"
+        "./packages/media-fixtures/src/index.ts"
       ],
       "@bthwani/media-fixtures/*": [
-        "packages/media-fixtures/src/*"
+        "./packages/media-fixtures/src/*"
       ]
     },
     "resolveJsonModule": true,

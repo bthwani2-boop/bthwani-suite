@@ -1,15 +1,15 @@
 'use client';
 
 import React from 'react';
-import {
-  useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Button,
   StateView,
   Text,
   useDirection,
-  useUiText
+  useUiText,
+  Badge,
 } from '@bthwani/ui-kit';
 import {
   WebCommandCenterFrame,
@@ -234,6 +234,7 @@ export function ControlPanelDshOperationsScreen({
   const activeWorkbench = dshWorkbenches.find((item) => item.id === activeWorkbenchId) ?? dshWorkbenches[0];
   const activeFilter = topFilterItems.find((item) => item.id === activeFilterId) ?? topFilterItems[0];
   const plannedWorkbenchCount = dshWorkbenches.filter((item) => !item.liveHref && item.id !== 'overview').length;
+  const liveWorkbenchCount = dshWorkbenches.filter((item) => Boolean(item.liveHref)).length;
   const liveWorkbenchActions = dshWorkbenches.filter((item) => Boolean(item.liveHref));
   const topFilters = topFilterItems.map((item) => ({
     ...item,
@@ -309,21 +310,21 @@ export function ControlPanelDshOperationsScreen({
   const stageContent = readyForSelection ? (
     <div className={styles.stack}>
       <WebMissionHeroCard
+        compact
         badges={[
-          `/operations/dsh`,
+          dshText.common.live,
           `${dshText.common.period}: ${activeFilter.label}`,
-          `${dshText.common.language}: ${languageChip}`,
+          languageChip,
         ]}
         eyebrow={dshText.hub.rootEyebrow}
         title={heroTitle}
         description={heroSubtitle}
         metaItems={[
-          `${dshText.common.safePath}: ${fallbackHref}`,
+          `${dshText.common.activeAlerts}: ${alertCount}`,
           `${dshText.hub.plannedRoutesTitle}: ${plannedWorkbenchCount}`,
-          `${dshText.common.visibleUpdate}: ${refreshCount}`,
         ]}
-        primaryAction={{ label: dshText.common.openGeneralOperations, href: fallbackHref }}
-        secondaryAction={{ label: dshText.common.controlPanel, href: '/dashboard' }}
+        primaryAction={{ label: dshText.hub.actions.openOrders, href: '/operations/dsh/orders' }}
+        secondaryAction={{ label: dshText.common.openGeneralOperations, href: fallbackHref }}
       />
 
       <div className={styles.signalGrid}>
@@ -331,22 +332,25 @@ export function ControlPanelDshOperationsScreen({
           title={dshText.hub.selectedScopeTitle}
           value={activeWorkbench.label}
           description={dshText.hub.selectedScopeDescription}
-          tone="best"
+          tone="brand"
         />
         <WebSignalCard
           title={dshText.hub.plannedRoutesTitle}
           value={String(plannedWorkbenchCount)}
           description={dshText.hub.plannedRoutesDescription}
+          tone="warning"
         />
         <WebSignalCard
           title={dshText.hub.safeTransitionTitle}
-          value={fallbackHref}
+          value={String(liveWorkbenchCount)}
           description={dshText.hub.safeTransitionDescription}
+          tone="best"
         />
         <WebSignalCard
           title={dshText.common.activeAlerts}
           value={String(alertCount)}
           description={dshText.hub.activeAlertsDescription}
+          tone={alertCount > 0 ? 'danger' : 'neutral'}
         />
       </div>
 
@@ -377,16 +381,18 @@ export function ControlPanelDshOperationsScreen({
             <div key={workbench.id} className={styles.compactCard}>
               <Box
                 padding={3}
-                gap={1}
+                gap={2}
                 border
                 radiusToken="xl"
                 background="surfaceRaised"
               >
                 <div className={styles.workbenchHeader} dir={direction}>
                   <Text role="bodyStrong">{workbench.label}</Text>
-                  <Text role="caption" tone={workbench.liveHref ? 'success' : 'brand'}>
-                    {workbench.liveHref ? dshText.common.live : workbench.statusLabel}
-                  </Text>
+                  <Badge
+                    label={workbench.liveHref ? dshText.common.live : workbench.statusLabel}
+                    tone={workbench.liveHref ? 'success' : 'warning'}
+                    size="sm"
+                  />
                 </div>
                 <Text role="bodySm" tone="muted">
                   {workbench.description}
@@ -402,7 +408,15 @@ export function ControlPanelDshOperationsScreen({
                     fullWidth={false}
                     onPress={() => router.push(workbench.liveHref!)}
                   />
-                ) : null}
+                ) : (
+                  <Button
+                    label={dshText.common.planned}
+                    tone="ghost"
+                    size="sm"
+                    fullWidth={false}
+                    disabled
+                  />
+                )}
               </Box>
             </div>
           ))}
@@ -427,30 +441,9 @@ export function ControlPanelDshOperationsScreen({
       onRefreshClick={readyForSelection ? handleRefreshClick : undefined}
       onAlertClick={readyForSelection ? handleAlertClick : undefined}
       railTitle={dshText.hub.railTitle}
-      railStatusLabel={readyForSelection ? dshText.hub.railStatusReady : state}
+      railStatusLabel={readyForSelection ? `${dshText.common.live}: ${liveWorkbenchCount}` : state}
       railItems={railItems}
       onRailItemSelect={readyForSelection ? handleRailSelect : undefined}
-      railSupplementary={
-        <WebSectionCard
-          title={dshText.common.routeGuard}
-          description={dshText.common.routeGuardDescription}
-        >
-          <Box gap={2}>
-            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <Text role="bodyStrong">{dshText.common.currentPath}</Text>
-              <Text role="bodySm" tone="muted">
-                /operations/dsh
-              </Text>
-            </Box>
-            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <Text role="bodyStrong">{dshText.common.safeExit}</Text>
-              <Text role="bodySm" tone="muted">
-                {fallbackHref}
-              </Text>
-            </Box>
-          </Box>
-        </WebSectionCard>
-      }
     >
       {stageContent}
     </WebCommandCenterFrame>

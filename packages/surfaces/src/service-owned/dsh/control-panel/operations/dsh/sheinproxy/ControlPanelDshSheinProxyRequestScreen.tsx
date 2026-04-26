@@ -6,8 +6,10 @@ import {
   Box,
   Button,
   Card,
+  CompactStatusStepper,
   KeyValueList,
   StateView,
+  StickyActionBar,
   Tabs,
   Text,
   TextField,
@@ -48,6 +50,28 @@ const modeOptions: Array<{ value: AssignmentMode; label: string }> = [
   { value: 'scheduled', label: 'لاحقًا' },
 ];
 
+const stageSteps: Array<{ id: string; label: string; state: 'complete' | 'current' | 'pending' }> = [
+  { id: 'detail', label: 'التفاصيل', state: 'current' },
+  { id: 'estimate', label: 'التقدير', state: 'pending' },
+  { id: 'offer', label: 'العرض', state: 'pending' },
+  { id: 'schedule', label: 'الجدولة', state: 'pending' },
+];
+
+function resolveStepperState(currentStage: AssignmentStage) {
+  const stages: AssignmentStage[] = ['detail', 'estimate', 'offer', 'schedule'];
+  const currentIndex = stages.indexOf(currentStage);
+
+  return stages.map((stage, index) => {
+    if (index < currentIndex) {
+      return { id: stage, label: stageSteps[index].label, state: 'complete' as const };
+    }
+    if (index === currentIndex) {
+      return { id: stage, label: stageSteps[index].label, state: 'current' as const };
+    }
+    return { id: stage, label: stageSteps[index].label, state: 'pending' as const };
+  });
+}
+
 function resolveStateCopy(
   text: ReturnType<typeof useDshControlPanelText>,
   state: Exclude<ManualAssignmentScreenState, 'ready'>,
@@ -55,8 +79,8 @@ function resolveStateCopy(
   if (state === 'loading') {
     return {
       stateId: 'loading' as const,
-      title: 'Preparing manual assignment',
-      description: 'The general assignment form is loading and keeps the safe exit visible.',
+      title: text.sheinProxy.stateLoadingTitle,
+      description: text.sheinProxy.stateLoadingDescription,
       actionLabel: text.sheinProxy.retryLabel,
     };
   }
@@ -64,8 +88,8 @@ function resolveStateCopy(
   if (state === 'empty') {
     return {
       stateId: 'empty' as const,
-      title: 'No assignment selected',
-      description: 'Pick a preset or return to the operations queue.',
+      title: text.sheinProxy.stateEmptyTitle,
+      description: text.sheinProxy.stateEmptyDescription,
       actionLabel: text.sheinProxy.backToHub,
     };
   }
@@ -73,8 +97,8 @@ function resolveStateCopy(
   if (state === 'offline') {
     return {
       stateId: 'offline' as const,
-      title: 'Connection unavailable',
-      description: 'The form stays explicit even when the route is paused.',
+      title: text.sheinProxy.stateOfflineTitle,
+      description: text.sheinProxy.stateOfflineDescription,
       actionLabel: text.sheinProxy.retryLabel,
     };
   }
@@ -82,34 +106,34 @@ function resolveStateCopy(
   if (state === 'disabled') {
     return {
       kind: 'warning' as const,
-      title: 'Manual assignment is not enabled yet',
-      description: 'This slice is ready for the general form but execution stays out of scope.',
+      title: text.sheinProxy.stateDisabledTitle,
+      description: text.sheinProxy.stateDisabledDescription,
       actionLabel: text.sheinProxy.backToHub,
     };
   }
 
   return {
     stateId: 'recoverableError' as const,
-    title: 'Unable to load manual assignment',
-    description: 'Try again or return to the list without leaving the operations lane.',
+    title: text.sheinProxy.stateErrorTitle,
+    description: text.sheinProxy.stateErrorDescription,
     actionLabel: text.sheinProxy.retryLabel,
   };
 }
 
 function resolveStageMeta(stage: AssignmentStage) {
   if (stage === 'estimate') {
-    return { label: 'Estimate', description: 'Review the cost assumptions before assignment.' };
+    return { label: 'التقدير', description: 'راجع افتراضات التكلفة قبل الإسناد.' };
   }
 
   if (stage === 'offer') {
-    return { label: 'Offer', description: 'The batch is ready for confirmation or review.' };
+    return { label: 'العرض', description: 'الدفعة جاهزة للتأكيد أو المراجعة.' };
   }
 
   if (stage === 'schedule') {
-    return { label: 'Schedule', description: 'Lock the pickup or delivery window.' };
+    return { label: 'الجدولة', description: 'ثبّت نافذة الاستلام أو التسليم.' };
   }
 
-  return { label: 'Detail', description: 'Review the assignment payload and route scope.' };
+  return { label: 'التفاصيل', description: 'راجع حمولة الإسناد ونطاق المسار.' };
 }
 
 export function ControlPanelDshSheinProxyRequestScreen({
@@ -141,6 +165,22 @@ export function ControlPanelDshSheinProxyRequestScreen({
 
   const stageMeta = resolveStageMeta(stage);
   const resolvedState = state;
+  const stepperItems = resolveStepperState(stage);
+
+  const isFormValid = React.useMemo(() => {
+    const normalizedReference = assignmentReference.trim();
+    const normalizedPickup = pickupNode.trim();
+    const normalizedDropoff = dropoffNode.trim();
+    const parsedCustomers = Number(customerCount.trim());
+    const parsedCaptains = Number(captainCount.trim());
+
+    if (!normalizedReference || !normalizedPickup || !normalizedDropoff) return false;
+    if (Number.isNaN(parsedCustomers) || parsedCustomers < 1) return false;
+    if (Number.isNaN(parsedCaptains) || parsedCaptains < 1) return false;
+    if (mode === 'scheduled' && (!scheduleDate.trim() || !scheduleTime.trim())) return false;
+
+    return true;
+  }, [assignmentReference, pickupNode, dropoffNode, customerCount, captainCount, mode, scheduleDate, scheduleTime]);
 
   const validate = () => {
     const normalizedReference = assignmentReference.trim();
@@ -192,20 +232,26 @@ export function ControlPanelDshSheinProxyRequestScreen({
   };
 
   const summaryItems = [
-    { label: 'Family', value: family.toUpperCase() },
-    { label: 'Reference', value: assignmentReference || 'Pending' },
-    { label: 'Customers', value: customerCount },
-    { label: 'Captains', value: captainCount },
-    { label: 'Mode', value: mode === 'now' ? 'Now' : 'Scheduled' },
-    { label: 'Step', value: stageMeta.label },
+    { label: 'الفئة', value: family.toUpperCase() },
+    { label: 'المرجع', value: assignmentReference || 'قيد الانتظار' },
+    { label: 'العملاء', value: customerCount },
+    { label: 'الكباتن', value: captainCount },
+    { label: 'النمط', value: mode === 'now' ? 'الآن' : 'مجدول' },
+    { label: 'الخطوة', value: stageMeta.label },
+  ];
+
+  const stickyActions = [
+    { label: 'حفظ مسودة', tone: 'ghost' as const, onPress: handleSaveDraft, disabled: !assignmentReference.trim() },
+    { label: 'إسناد الآن', tone: 'primary' as const, onPress: handleSubmit, disabled: !isFormValid },
+    { label: 'العودة للقائمة', tone: 'secondary' as const, onPress: () => router.push(listHref) },
   ];
 
   if (resolvedState !== 'ready') {
     return (
       <WebPageFrame
-        eyebrow='DSH / operations / assignment'
-        title='Manual assignment'
-        description='A general operations form for SHEIN, Awnak, or any other platform-owned delivery family.'
+        eyebrow={dshText.sheinProxy.pageEyebrow}
+        title={dshText.sheinProxy.pageTitle}
+        description={dshText.sheinProxy.pageDescription}
         maxWidth={1120}
         embedded={embedded}
         showHeader={showHeader}
@@ -227,66 +273,73 @@ export function ControlPanelDshSheinProxyRequestScreen({
 
   return (
     <WebPageFrame
-      eyebrow='DSH / operations / assignment'
-      title='Manual assignment'
-      description='General form for platform-owned families such as SHEIN and Awnak, with no partner dependency.'
+      eyebrow={dshText.sheinProxy.pageEyebrow}
+      title={dshText.sheinProxy.pageTitle}
+      description={dshText.sheinProxy.pageDescription}
       maxWidth={1120}
       embedded={embedded}
       showHeader={showHeader}
     >
       <Box gap={4}>
         <WebMissionHeroCard
-          badges={['DSH', family.toUpperCase(), stageMeta.label]}
-          eyebrow='Assignment workspace'
-          title='General manual assignment'
-          description='One reusable ops form for intake, batching, and captain allocation.'
+          compact
+          badges={[family.toUpperCase(), stageMeta.label, requestId]}
+          eyebrow={dshText.sheinProxy.heroEyebrow}
+          title={dshText.sheinProxy.heroTitle}
+          description={stageMeta.description}
           metaItems={[
-            'No partner lane is required for this family.',
-            `Mode: ${mode === 'now' ? 'Now' : 'Scheduled'}`,
-            `Step: ${stageMeta.description}`,
+            `${familyOptions.find((f) => f.value === family)?.description ?? ''}`,
+            `النمط: ${mode === 'now' ? 'الآن' : 'مجدول'}`,
           ]}
-          primaryAction={{ label: 'Back to queue', href: listHref }}
-          secondaryAction={{ label: 'Open operations', href: operationsHref }}
+          primaryAction={{ label: dshText.sheinProxy.backToList, href: listHref }}
+          secondaryAction={{ label: dshText.common.openGeneralOperations, href: operationsHref }}
         />
 
-        <Box layoutDirection='row' gap={2}>
-          <WebSignalCard title='Families' value='3' description='SHEIN, Awnak, and generic presets.' tone='neutral' />
-          <WebSignalCard title='Customers' value={customerCount || '1'} description='Customer count in this batch.' tone='best' />
-          <WebSignalCard title='Captains' value={captainCount || '1'} description='Captain allocation for the route.' />
-          <WebSignalCard title='Step' value={stageMeta.label} description={stageMeta.description} />
-        </Box>
+        <WebSectionCard title="تقدم الإسناد" description={`الخطوة الحالية: ${stageMeta.label}`}>
+          <CompactStatusStepper
+            steps={stepperItems}
+            activeStepId={stage}
+          />
+        </WebSectionCard>
 
-        <WebSectionCard title='Assignment identity' description='Pick the family preset and give this batch a stable reference.'>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+          <WebSignalCard title="الفئات" value="3" description="SHEIN، عونك، وأخرى." tone="neutral" />
+          <WebSignalCard title="العملاء" value={customerCount || '1'} description="عدد العملاء في الدفعة." tone="best" />
+          <WebSignalCard title="الكباتن" value={captainCount || '1'} description="عدد الكباتن المخصصين." tone="info" />
+          <WebSignalCard title="الخطوة" value={stageMeta.label} description={stageMeta.description} tone="brand" />
+        </div>
+
+        <WebSectionCard title="هوية الإسناد" description="اختر الفئة وأعطِ الدفعة مرجعًا ثابتًا.">
           <Box gap={3}>
             <Tabs<AssignmentFamily>
               items={familyOptions}
               value={family}
               onValueChange={(value) => setFamily(value)}
-              variant='pill'
+              variant="pill"
             />
 
-            <Box gap={2} layoutDirection='row' style={{ flexWrap: 'wrap' }}>
+            <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
               <Box style={{ flex: 1, minWidth: 240 }}>
-                <TextField label='Assignment reference' value={assignmentReference} onChangeText={setAssignmentReference} placeholder='DSH-ASSIGN-0001' />
+                <TextField label="مرجع الإسناد" value={assignmentReference} onChangeText={setAssignmentReference} placeholder="DSH-ASSIGN-0001" />
               </Box>
               <Box style={{ flex: 1, minWidth: 240 }}>
-                <TextField label='Source' value={pickupNode} onChangeText={setPickupNode} placeholder='Operations intake / hub' />
+                <TextField label="نقطة الاستلام" value={pickupNode} onChangeText={setPickupNode} placeholder="مدخل العمليات / المركز" />
               </Box>
               <Box style={{ flex: 1, minWidth: 240 }}>
-                <TextField label='Destination' value={dropoffNode} onChangeText={setDropoffNode} placeholder='Customer delivery route' />
+                <TextField label="نقطة التسليم" value={dropoffNode} onChangeText={setDropoffNode} placeholder="مسار توصيل العملاء" />
               </Box>
             </Box>
           </Box>
         </WebSectionCard>
 
-        <WebSectionCard title='Batch planning' description='Plan the customer grouping and captain allocation before sending the assignment.'>
+        <WebSectionCard title="تخطيط الدفعة" description="خطط لتجميع العملاء وتخصيص الكباتن قبل إرسال الإسناد.">
           <Box gap={3}>
-            <Box layoutDirection='row' gap={2}>
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
               <Box style={{ flex: 1, minWidth: 180 }}>
-                <TextField label='Customers in batch' value={customerCount} onChangeText={setCustomerCount} keyboardType='number-pad' placeholder='1' />
+                <TextField label="عدد العملاء" value={customerCount} onChangeText={setCustomerCount} keyboardType="number-pad" placeholder="1" />
               </Box>
               <Box style={{ flex: 1, minWidth: 180 }}>
-                <TextField label='Captains needed' value={captainCount} onChangeText={setCaptainCount} keyboardType='number-pad' placeholder='1' />
+                <TextField label="عدد الكباتن" value={captainCount} onChangeText={setCaptainCount} keyboardType="number-pad" placeholder="1" />
               </Box>
             </Box>
 
@@ -294,53 +347,55 @@ export function ControlPanelDshSheinProxyRequestScreen({
               items={modeOptions}
               value={mode}
               onValueChange={(value) => setMode(value)}
-              variant='pill'
+              variant="pill"
             />
 
             {mode === 'scheduled' ? (
-              <Box layoutDirection='row' gap={2} style={{ flexWrap: 'wrap' }}>
+              <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
                 <Box style={{ flex: 1, minWidth: 180 }}>
-                  <TextField label='Date' value={scheduleDate} onChangeText={setScheduleDate} placeholder='YYYY-MM-DD' />
+                  <TextField label="التاريخ" value={scheduleDate} onChangeText={setScheduleDate} placeholder="YYYY-MM-DD" />
                 </Box>
                 <Box style={{ flex: 1, minWidth: 180 }}>
-                  <TextField label='Time' value={scheduleTime} onChangeText={setScheduleTime} placeholder='HH:MM' />
+                  <TextField label="الوقت" value={scheduleTime} onChangeText={setScheduleTime} placeholder="HH:MM" />
                 </Box>
               </Box>
             ) : null}
           </Box>
         </WebSectionCard>
 
-        <WebSectionCard title='Operational notes' description='Use the notes field for sorting, packaging, route, or special handling instructions.'>
+        <WebSectionCard title="ملاحظات تشغيلية" description="استخدم هذا الحقل لتعليمات الترتيب، التعبئة، المسار، أو المعالجة الخاصة.">
           <Box gap={2}>
-            <TextField label='Notes' value={notes} onChangeText={setNotes} placeholder='Sorting, packaging, route, or handoff instructions' />
-            {validationError ? <Text role='bodySm' tone='muted'>{validationError}</Text> : null}
-            {draftSaved ? <Text role='bodySm'>Draft saved locally for this manual assignment.</Text> : null}
-            {submitted ? <Text role='bodySm'>Assignment is ready for the next operations step.</Text> : null}
+            <TextField label="الملاحظات" value={notes} onChangeText={setNotes} placeholder="تعليمات الترتيب، التعبئة، المسار، أو التسليم" />
+            {validationError ? (
+              <Text role="bodySm" tone="danger">{validationError}</Text>
+            ) : null}
+            {draftSaved ? (
+              <Text role="bodySm" tone="success">تم حفظ المسودة محليًا لهذا الإسناد اليدوي.</Text>
+            ) : null}
+            {submitted ? (
+              <Text role="bodySm" tone="success">الإسناد جاهز للخطوة التشغيلية التالية.</Text>
+            ) : null}
           </Box>
         </WebSectionCard>
 
-        <WebSectionCard title='Assignment preview' description='The preview keeps the most important operational facts visible without duplicating the entire form.'>
+        <WebSectionCard title="معاينة الإسناد" description="المعاينة تحافظ على أهم الحقائق التشغيلية مرئية بدون تكرار الاستمارة.">
           <Box gap={2}>
             <Card>
               <KeyValueList items={summaryItems} />
             </Card>
             <Card>
               <Box gap={2}>
-                <Text role='bodyStrong'>No partner lane</Text>
-                <Text role='bodySm' tone='muted'>Platform-owned families are purchased, sorted, and delivered by the platform itself.</Text>
-                <Text role='bodySm' tone='muted'>The captain will later see a batch route, not a partner identity.</Text>
+                <Text role="bodyStrong">لا يوجد مسار شريك</Text>
+                <Text role="bodySm" tone="muted">الفئات المملوكة للمنصة تُشترى وتُرتب وتُسلم من قبل المنصة نفسها.</Text>
+                <Text role="bodySm" tone="muted">الكابتن سيرى لاحقًا مسار دفعة، لا هوية شريك.</Text>
               </Box>
             </Card>
           </Box>
         </WebSectionCard>
 
-        <Box layoutDirection='row' gap={2} style={{ flexWrap: 'wrap' }}>
-          <Button label='Save draft' tone='secondary' fullWidth={false} onPress={handleSaveDraft} />
-          <Button label='Assign now' tone='primary' fullWidth={false} onPress={handleSubmit} />
-          <Button label='Back to list' tone='secondary' fullWidth={false} onPress={() => router.push(listHref)} />
-          <Button label='Open hub' tone='ghost' fullWidth={false} onPress={() => router.push(hubHref)} />
-          <Button label='Open support' tone='ghost' fullWidth={false} onPress={() => router.push(supportHref)} />
-        </Box>
+        <StickyActionBar
+          actions={stickyActions}
+        />
       </Box>
     </WebPageFrame>
   );

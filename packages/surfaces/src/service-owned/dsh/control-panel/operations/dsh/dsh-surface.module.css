@@ -5,7 +5,7 @@
 
 .signalGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
 }
 
@@ -33,30 +33,19 @@
   gap: 10px;
 }
 
-.actionRowSpaced {
-  margin-top: 12px;
-}
-
-.laneGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 12px;
-}
-
-.inlineMeta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
 @media (max-width: 760px) {
   .stack {
     gap: 14px;
   }
 
   .signalGrid,
-  .cardGrid,
-  .laneGrid {
+  .cardGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .actionRow {
+    justify-content: flex-start;
   }
 }

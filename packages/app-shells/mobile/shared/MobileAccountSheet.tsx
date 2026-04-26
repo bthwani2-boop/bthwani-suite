@@ -20,6 +20,14 @@ type MobileAccountSheetProps = {
   typeSwitchPrompt?: string;
   onOpenProfile?: () => void;
   onOpenWalletHub?: () => void;
+  onOpenOrders?: () => void;
+  onOpenOperations?: () => void;
+  onOpenInventory?: () => void;
+  onOpenAnalytics?: () => void;
+  ordersLabel?: string;
+  operationsLabel?: string;
+  inventoryLabel?: string;
+  analyticsLabel?: string;
   typeOptions: readonly MobileAccountTypeOption[];
   activeTypeId: string;
   onSelectType: (typeId: string) => void;
@@ -36,6 +44,14 @@ export function MobileAccountSheet({
   typeSwitchPrompt = 'اختر نوع التشغيل الذي تريد الانتقال إليه. سيتم تطبيق التغيير على التطبيق بالكامل.',
   onOpenProfile,
   onOpenWalletHub,
+  onOpenOrders,
+  onOpenOperations,
+  onOpenInventory,
+  onOpenAnalytics,
+  ordersLabel = 'الطلبات',
+  operationsLabel = 'العمليات',
+  inventoryLabel = 'المخزون والمنتجات',
+  analyticsLabel = 'التحليلات',
   typeOptions,
   activeTypeId,
   onSelectType,
@@ -60,6 +76,38 @@ export function MobileAccountSheet({
     <SheetFrame visible={visible} title={title} onClose={onClose}>
       {tab === 'menu' ? (
         <>
+          <Button
+            label={ordersLabel}
+            tone="secondary"
+            onPress={() => {
+              onClose();
+              onOpenOrders?.();
+            }}
+          />
+          <Button
+            label={operationsLabel}
+            tone="secondary"
+            onPress={() => {
+              onClose();
+              onOpenOperations?.();
+            }}
+          />
+          <Button
+            label={inventoryLabel}
+            tone="secondary"
+            onPress={() => {
+              onClose();
+              onOpenInventory?.();
+            }}
+          />
+          <Button
+            label={analyticsLabel}
+            tone="secondary"
+            onPress={() => {
+              onClose();
+              onOpenAnalytics?.();
+            }}
+          />
           <Button
             label={profileLabel}
             tone="secondary"

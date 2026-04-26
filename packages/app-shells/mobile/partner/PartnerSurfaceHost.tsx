@@ -50,6 +50,7 @@ const {
   DshPartnerStoreUpdateScreen,
   DshPartnerSubscriptionScreen,
   DshPartnerVideoUploadScreen,
+  PartnerDshConsoleScreen,
 } = dshPartner;
 
 type PartnerRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'bell' | 'operations' | 'maintenance' | 'hours' | 'zones' | 'support-directory' | 'support-screen' | 'inventory-management';
@@ -179,7 +180,7 @@ export function PartnerSurfaceHost() {
   const [walletHubVisible, setWalletHubVisible] = React.useState(false);
   const [storeScopeVisible, setStoreScopeVisible] = React.useState(false);
   const [selectedStoreScopeId, setSelectedStoreScopeId] = React.useState('all');
-  const [route, setRoute] = React.useState<PartnerRoute>('entry');
+  const [route, setRoute] = React.useState<PartnerRoute>(activeServiceType === 'dsh' ? 'inbox' : 'entry');
   const [activeOrderId, setActiveOrderId] = React.useState('partner-order-1042');
   const [listingEnabled, setListingEnabled] = React.useState(true);
   const [storeOpen, setStoreOpen] = React.useState(true);
@@ -499,6 +500,10 @@ export function PartnerSurfaceHost() {
       onClose={() => setAccountSheetVisible(false)}
       onOpenProfile={() => {}}
       onOpenWalletHub={openWalletHub}
+      onOpenOrders={openOrdersBoard}
+      onOpenOperations={() => setRoute('operations')}
+      onOpenInventory={openInventoryManagement}
+      onOpenAnalytics={() => openSupportScreen('staff-analytics')}
       typeOptions={partnerTypeOptions}
       activeTypeId={activeServiceType}
       onSelectType={(typeId) => {
@@ -857,81 +862,16 @@ export function PartnerSurfaceHost() {
           overflow: 'hidden',
         }}
       >
-        <MobileScrollView fill padding={5} gap={5}>
-          <ScreenHeader
-            title={activeServiceType === 'dsh' ? 'لوحة الشريك' : 'لوحة الشريك - ARB'}
-            subtitle={
-              activeServiceType === 'dsh'
-                ? 'هذه هي نقطة البداية الحقيقية لتطبيق الشريك.'
-                : 'هذه هي نقطة البداية الحقيقية لتشغيل الشريك على نوع ARB.'
-            }
-            actionLabel={activeServiceType === 'dsh' ? 'ابدأ من entry' : 'إدارة عرب'}
-            onActionPress={activeServiceType === 'dsh' ? openOrdersBoard : undefined}
-          />
-
-          <Surface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
-            <Text role="label" tone="inverse">نقطة البداية الرسمية</Text>
-            <Text role="titleLg" tone="inverse">
-              {activeServiceType === 'dsh' ? 'تشغيل الشريك من shell رسمية' : 'تشغيل ARB من shell رسمية'}
-            </Text>
-            <Text role="bodyMd" tone="inverse">
-              {activeServiceType === 'dsh'
-                ? 'البداية الصحيحة لتطبيق الشريك هي home shell تُظهر المهام الأساسية، لا شاشة preview مرتبطة بخدمة واحدة.'
-                : 'البداية الصحيحة لوضع ARB هي shell تشغيلية تعرض المسارات والمهام ذات العلاقة بهذا النوع فقط.'}
-            </Text>
-          </Surface>
-
-          <Surface tone="raised" padding={5} gap={4} radiusToken="xl">
-            <Text role="label">المساحات الأساسية</Text>
-            {activePrimaryAreas.map((item) => (
-              <Surface key={item} tone="default" padding={4} gap={2} radiusToken="lg">
-                <Text role="bodyStrong">{item}</Text>
-                <Text role="bodySm" tone="muted">هذه مساحة رئيسية داخل التطبيق الحقيقي وليست preview route.</Text>
-              </Surface>
-            ))}
-          </Surface>
-
-          <Surface tone="default" padding={5} gap={4} radiusToken="xl">
-            <Text role="label">اختصارات البداية</Text>
-            <Box gap={3}>
-              {activeShortcuts.map((item, index) => (
-                <Button
-                  key={item}
-                  label={item}
-                  tone="secondary"
-                  onPress={() => {
-                    if (activeServiceType !== 'dsh') {
-                      return;
-                    }
-
-                    if (index === 0) {
-                      setRoute('entry');
-                      return;
-                    }
-
-                    if (index === 1) {
-                      openInventoryManagement();
-                      return;
-                    }
-                    setActiveOrderId('partner-order-1051');
-                    setRoute('inbox');
-                  }}
-                />
-              ))}
-            </Box>
-          </Surface>
-
-          <Surface tone="inset" padding={4} gap={2} radiusToken="lg">
-            <Text role="label">حكم معماري</Text>
-            <Text role="bodySm" tone="muted">
-              {activeServiceType === 'dsh'
-                ? 'DSH يظل ضمن feature flows الداخلية، وليس الشاشة الافتراضية عند فتح التطبيق.'
-                : 'عند اختيار ARB يجب أن تظهر فقط عناصر ARB بدون خلط مع مسارات DSH.'}
-            </Text>
-          </Surface>
-
-          <Button label={activeServiceType === 'dsh' ? 'ابدأ من entry' : 'إدارة عرب'} onPress={activeServiceType === 'dsh' ? openOrdersBoard : undefined} />
-        </MobileScrollView>
+        <PartnerDshConsoleScreen
+          activeServiceType={activeServiceType}
+          onOpenOrdersBoard={openOrdersBoard}
+          onOpenInventoryManagement={openInventoryManagement}
+          onOpenEntry={() => setRoute('entry')}
+          openStoreScope={openStoreScope}
+          onOpenWalletHub={openWalletHub}
+          onOpenAccountHub={() => setAccountSheetVisible(true)}
+          onOpenSupportDirectory={openSupportDirectory}
+        />
       </Surface>
       {accountSheet}
         {walletHubSheet}

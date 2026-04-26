@@ -1,4 +1,5 @@
 import React from 'react';
+import { BackHandler, Platform } from 'react-native';
 import { PartnerOrdersHomeScreen } from './orders';
 import { DshEntryScreen } from './entry/screens';
 import { DshPartnerStoreMaintenanceWorkspaceScreen } from './store-maintenance/screens';
@@ -68,6 +69,7 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'orders-home' }
   const [route, setRoute] = React.useState<DshRoute>(initialRoute);
   const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<PartnerSupportScreenId>('profile-get');
   const routeHistoryRef = React.useRef<DshRoute[]>([initialRoute]);
+  const routeTransitionFromBackRef = React.useRef(false);
 
   React.useEffect(() => {
     if (!command) return;
@@ -77,10 +79,32 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'orders-home' }
     };
     const next = map[command.target] ?? initialRoute;
     if (next !== route) {
-      routeHistoryRef.current.push(next);
+      if (routeTransitionFromBackRef.current) {
+        routeTransitionFromBackRef.current = false;
+      } else {
+        routeHistoryRef.current.push(next);
+      }
       setRoute(next);
     }
   }, [command, initialRoute, route]);
+
+  React.useEffect(() => {
+    if (Platform.OS !== 'android') return undefined;
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (routeHistoryRef.current.length > 1) {
+        routeTransitionFromBackRef.current = true;
+        routeHistoryRef.current.pop();
+        setRoute(routeHistoryRef.current[routeHistoryRef.current.length - 1]);
+        return true;
+      }
+
+      onExit?.();
+      return true;
+    });
+
+    return () => subscription.remove();
+  }, [onExit]);
 
   const handleBack = React.useCallback(() => {
     if (routeHistoryRef.current.length > 1) {

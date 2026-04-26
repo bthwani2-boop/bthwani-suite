@@ -3,23 +3,22 @@
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 
 import React from 'react';
-import { View } from 'react-native';
 import { useRouter } from 'next/navigation';
-import { useDirection } from '@bthwani/ui-kit';
 import {
   Badge,
   Box,
   Button,
-  Card,
   DataTable,
   KeyValueList,
   StateView,
   StatCard,
   Text,
+  useUiText,
+} from '@bthwani/ui-kit';
+import {
   WebCommandCenterFrame,
   WebSectionCard,
-  useUiText
-} from '@bthwani/ui-kit';
+} from '@bthwani/ui-kit/web';
 import { getSheinProxyRequests, type SheinProxyRequest, type SheinProxyRequestStatus } from './sheinproxy-fixtures';
 
 export type ControlPanelDshSheinProxyScreenState = 'ready' | 'loading' | 'empty' | 'offline' | 'disabled' | 'error';
@@ -152,7 +151,6 @@ export function ControlPanelDshSheinProxyScreen({
   const router = useRouter();
   const uiText = useUiText();
   const dshText = useDshControlPanelText();
-  const { language } = useDirection();
   const requests = React.useMemo(() => getSheinProxyRequests(), []);
   const [activeFilterId, setActiveFilterId] = React.useState<SheinProxyFilterId>('all');
   const [selectedRequestId, setSelectedRequestId] = React.useState<string>(requests[0]?.id ?? '');
@@ -367,18 +365,17 @@ export function ControlPanelDshSheinProxyScreen({
       onRailItemSelect={(itemId) => setSelectedRequestId(itemId)}
     >
       <Box gap={4}>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
           {signalCards.map((signalCard) => (
-            <View key={signalCard.label} style={{ flexBasis: 280, flexGrow: 1, minWidth: 240 }}>
-              <StatCard
-                label={signalCard.label}
-                value={signalCard.value}
-                deltaLabel={signalCard.description}
-                tone={signalCard.tone}
-              />
-            </View>
+            <StatCard
+              key={signalCard.label}
+              label={signalCard.label}
+              value={signalCard.value}
+              deltaLabel={signalCard.description}
+              tone={signalCard.tone}
+            />
           ))}
-        </View>
+        </div>
 
         <WebSectionCard
           title={dshText.sheinProxy.tableTitle}
@@ -388,79 +385,78 @@ export function ControlPanelDshSheinProxyScreen({
             caption={dshText.sheinProxy.tableDescription}
             emptyTitle={dshText.sheinProxy.tableEmptyTitle}
             emptyDescription={dshText.sheinProxy.tableEmptyDescription}
-            language={language}
             rows={filteredRequests}
             rowKey="id"
             columns={tableColumns}
           />
         </WebSectionCard>
 
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
-          <View style={{ flexBasis: 360, flexGrow: 1, minWidth: 320 }}>
-            <Card title={selectedRequest.id} subtitle={`${selectedRequest.customer} · ${selectedRequest.product}`}>
-              <Box gap={3}>
-                <KeyValueList
-                  items={[
-                    { label: dshText.sheinProxy.requestLabel, value: selectedRequest.id },
-                    { label: dshText.sheinProxy.customerLabel, value: selectedRequest.customer },
-                    { label: dshText.sheinProxy.productLabel, value: selectedRequest.product },
-                    { label: dshText.sheinProxy.quantityLabel, value: String(selectedRequest.quantity) },
-                    { label: dshText.sheinProxy.statusLabel, value: resolveStatusLabel(dshText, selectedRequest.status) },
-                    { label: dshText.sheinProxy.updatedLabel, value: selectedRequest.updated },
-                    { label: dshText.sheinProxy.nextActionLabel, value: resolveNextActionLabel(dshText, selectedRequest.status) },
-                  ]}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+          <div>
+            <Box padding={3} gap={2} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{selectedRequest.id}</Text>
+              <Text role="bodySm" tone="muted">{`${selectedRequest.customer} · ${selectedRequest.product}`}</Text>
+              <KeyValueList
+                items={[
+                  { label: dshText.sheinProxy.requestLabel, value: selectedRequest.id },
+                  { label: dshText.sheinProxy.customerLabel, value: selectedRequest.customer },
+                  { label: dshText.sheinProxy.productLabel, value: selectedRequest.product },
+                  { label: dshText.sheinProxy.quantityLabel, value: String(selectedRequest.quantity) },
+                  { label: dshText.sheinProxy.statusLabel, value: resolveStatusLabel(dshText, selectedRequest.status) },
+                  { label: dshText.sheinProxy.updatedLabel, value: selectedRequest.updated },
+                  { label: dshText.sheinProxy.nextActionLabel, value: resolveNextActionLabel(dshText, selectedRequest.status) },
+                ]}
+              />
+            </Box>
+          </div>
+
+          <div>
+            <Box padding={3} gap={2} border radiusToken="xl" background="surfaceRaised">
+              <Text role="bodyStrong">{dshText.sheinProxy.pricingTitle}</Text>
+              <Text role="bodySm" tone="muted">{selectedRequest.note}</Text>
+              <KeyValueList
+                items={[
+                  { label: dshText.sheinProxy.amountLabel, value: selectedRequest.amount },
+                  { label: dshText.sheinProxy.shippingLabel, value: selectedRequest.shipping },
+                  { label: dshText.sheinProxy.serviceFeeLabel, value: selectedRequest.fee },
+                  { label: dshText.sheinProxy.totalLabel, value: selectedRequest.total, tone: 'success' },
+                  {
+                    label: dshText.sheinProxy.notesLabel,
+                    value: selectedRequest.note,
+                    helperText: resolveNextActionLabel(dshText, selectedRequest.status),
+                  },
+                ]}
+              />
+
+              <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                <Button
+                  label={dshText.sheinProxy.retryLabel}
+                  tone="ghost"
+                  fullWidth={false}
+                  onPress={() => router.refresh()}
+                />
+                <Button
+                  label={dshText.common.openGeneralOperations}
+                  tone="primary"
+                  fullWidth={false}
+                  onPress={() => router.push(operationsHref)}
+                />
+                <Button
+                  label={dshText.sheinProxy.backToHub}
+                  tone="secondary"
+                  fullWidth={false}
+                  onPress={() => router.push(hubHref)}
+                />
+                <Button
+                  label={dshText.common.openSupport}
+                  tone="secondary"
+                  fullWidth={false}
+                  onPress={() => router.push(supportHref)}
                 />
               </Box>
-            </Card>
-          </View>
-
-          <View style={{ flexBasis: 360, flexGrow: 1, minWidth: 320 }}>
-            <Card title={dshText.sheinProxy.pricingTitle} subtitle={selectedRequest.note}>
-              <Box gap={3}>
-                <KeyValueList
-                  items={[
-                    { label: dshText.sheinProxy.amountLabel, value: selectedRequest.amount },
-                    { label: dshText.sheinProxy.shippingLabel, value: selectedRequest.shipping },
-                    { label: dshText.sheinProxy.serviceFeeLabel, value: selectedRequest.fee },
-                    { label: dshText.sheinProxy.totalLabel, value: selectedRequest.total, tone: 'success' },
-                    {
-                      label: dshText.sheinProxy.notesLabel,
-                      value: selectedRequest.note,
-                      helperText: resolveNextActionLabel(dshText, selectedRequest.status),
-                    },
-                  ]}
-                />
-
-                <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                  <Button
-                    label={dshText.sheinProxy.retryLabel}
-                    tone="ghost"
-                    fullWidth={false}
-                    onPress={() => router.refresh()}
-                  />
-                  <Button
-                    label={dshText.common.openGeneralOperations}
-                    tone="primary"
-                    fullWidth={false}
-                    onPress={() => router.push(operationsHref)}
-                  />
-                  <Button
-                    label={dshText.sheinProxy.backToHub}
-                    tone="secondary"
-                    fullWidth={false}
-                    onPress={() => router.push(hubHref)}
-                  />
-                  <Button
-                    label={dshText.common.openSupport}
-                    tone="secondary"
-                    fullWidth={false}
-                    onPress={() => router.push(supportHref)}
-                  />
-                </Box>
-              </Box>
-            </Card>
-          </View>
-        </View>
+            </Box>
+          </div>
+        </div>
       </Box>
     </WebCommandCenterFrame>
   );
