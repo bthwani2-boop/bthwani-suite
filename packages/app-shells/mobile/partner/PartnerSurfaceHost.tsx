@@ -145,13 +145,13 @@ type PartnerStoreHoursDay = {
 
 const partnerTypeOptions: readonly MobileAccountTypeOption[] = [
   { id: 'dsh', label: 'DSH', description: 'تشغيل الطلبات والتسليم' },
-                icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
+  { id: 'arb', label: 'ARB', description: 'تشغيل عرب الشركاء والمسارات' },
 ];
 
 export function PartnerSurfaceHost() {
   const [activeServiceType, setActiveServiceType] = React.useState<PartnerServiceType>('dsh');
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
-                icon: <Icon name="notifications-outline" size={21} color="#FFFFFF" />,
+  const [route, setRoute] = React.useState<PartnerRoute>('entry');
   const [activeOrderId, setActiveOrderId] = React.useState('partner-order-1042');
   const [listingEnabled, setListingEnabled] = React.useState(true);
   const [storeOpen, setStoreOpen] = React.useState(true);
@@ -160,8 +160,8 @@ export function PartnerSurfaceHost() {
       id: 'delivery',
       label: 'Delivery',
       description: 'Accept delivery demand and keep captain handoff open.',
-              { id: 'orders', icon: <Icon name="receipt-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
-              { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
+      enabled: true,
+    },
     {
       id: 'pickup',
       label: 'Pickup',

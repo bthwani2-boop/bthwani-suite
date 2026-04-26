@@ -1,2 +1,1 @@
-export * from './CaptainOrdersInboxScreen';
-
+export * from './CaptainTasksInboxScreen';

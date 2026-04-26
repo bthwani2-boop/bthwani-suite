@@ -1,5 +1,17 @@
-import type { DshHomeGetPromo } from '../../../app-client/home/screens';
-
+type DshHomeGetPromo = {
+  readonly id?: string;
+  readonly title?: string;
+  readonly subtitle?: string;
+  readonly description?: string;
+  readonly imageUrl?: string;
+  readonly image?: string;
+  readonly href?: string;
+  readonly ctaLabel?: string;
+  readonly ctaHref?: string;
+  readonly badge?: string;
+  readonly tone?: string;
+  readonly [key: string]: unknown;
+};
 export type MarketingBannerActionType = NonNullable<DshHomeGetPromo['actionType']>;
 export type MarketingBannerAudience = 'home' | 'stores' | 'all';
 export type MarketingBannerStatus = 'draft' | 'published';

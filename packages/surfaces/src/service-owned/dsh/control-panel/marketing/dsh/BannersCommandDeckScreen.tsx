@@ -186,7 +186,7 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
                   key={item.id}
                   style={[
                     styles.previewCard,
-                    { backgroundColor: item.accentColor ?? '#f97316' },
+                    { backgroundColor: typeof item.accentColor === 'string' ? item.accentColor : '#f97316' },
                   ]}
                 >
                   <Text role="titleSm" style={styles.previewTitle}>{item.title}</Text>

@@ -3,6 +3,8 @@ import React from 'react';
 export type DshRoute =
   | 'entry'
   | 'home'
+  | 'orders-inbox'
+  | 'order-detail'
   | 'wallet'
   | 'support'
   | 'success';
@@ -107,4 +109,3 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
 }
 
 export default DshSurfaceHost;
-

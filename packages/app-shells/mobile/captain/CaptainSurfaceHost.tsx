@@ -186,13 +186,13 @@ export function CaptainSurfaceHost() {
             setActiveTaskId('captain-task-9021');
             setIsDeliverySheetVisible(true);
             setRoute('detail');
-                icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
+          }}
         />
       );
     }
 
     if (route === 'inbox') {
-                icon: <Icon name="notifications-outline" size={21} color="#FFFFFF" />,
+      return (
         <CaptainTasksInboxScreen
           state={inboxState}
           onRetry={() => setInboxState('active')}
@@ -203,7 +203,7 @@ export function CaptainSurfaceHost() {
     }
 
     if (route === 'detail') {
-                icon: <Icon name="bicycle-outline" size={21} color="#FFFFFF" />,
+      return (
         <>
           <Box gap={3}>
             <CaptainTaskDetailScreen
@@ -211,7 +211,6 @@ export function CaptainSurfaceHost() {
               onConfirmPickup={() => setIsPickupSheetVisible(true)}
               onConfirmDelivery={() => setIsDeliverySheetVisible(true)}
               onOpenNextTask={() => setRoute('inbox')}
-              { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
               onRetry={() => setRoute('detail')}
             />
             <Button label="فتح تواصل الطلب" tone="secondary" fullWidth={false} onPress={() => setRoute('orderchat')} />
