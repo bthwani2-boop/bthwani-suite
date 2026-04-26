@@ -84,9 +84,8 @@ export function WebDocumentShell({
   return (
     <html suppressHydrationWarning lang={lang} dir={dir}>
       <head>
-        <Script
+        <script
           id="bth-language-bootstrap"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: buildStoredLanguageBootstrapScript() }}
         />
         <style>{webRootBodyCss}</style>
