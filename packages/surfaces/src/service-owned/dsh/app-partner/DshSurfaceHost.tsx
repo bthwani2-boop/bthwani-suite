@@ -179,8 +179,6 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'orders-home' }
       <PartnerOrdersHomeScreen
         onOpenEntryPress={openEntry}
         onOpenOrderAction={openOrderActionFromHub}
-        onOpenAccountArea={openSupportDirectory}
-        onOpenAccountEntry={openSupportScreen}
         onOpenMaintenancePress={openMaintenance}
         onOpenInventoryManagementPress={openInventoryManagement}
         onRetry={openOrdersHome}
@@ -261,8 +259,6 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'orders-home' }
     <PartnerOrdersHomeScreen
       onOpenEntryPress={openEntry}
       onOpenOrderAction={openOrderActionFromHub}
-      onOpenAccountArea={openSupportDirectory}
-      onOpenAccountEntry={openSupportScreen}
       onOpenMaintenancePress={openMaintenance}
       onOpenInventoryManagementPress={openInventoryManagement}
       onRetry={openOrdersHome}

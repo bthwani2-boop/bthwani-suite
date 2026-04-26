@@ -4,13 +4,13 @@ import {
   Button,
   Card,
   MobileScrollView,
+  SearchTopBar,
   SectionHeader,
   StateView,
   Surface,
   Text,
   TextField,
 } from '@bthwani/ui-kit';
-import type { PartnerSupportScreenId } from '../support/screens/DshPartnerGeneratedSupportScreens';
 
 const BTH_DEEP_BLUE = '#0A2F5C';
 const BTH_ORANGE = '#FF500D';
@@ -27,8 +27,6 @@ type PartnerOrderStatus =
   | 'cancelled';
 
 type PartnerOrderPriority = 'high' | 'normal' | 'low';
-
-type OrdersMainTab = 'orders' | 'account';
 
 type OrderHubAction = 'accept' | 'details' | 'prepare' | 'ready' | 'handoff' | 'issue' | 'delivering';
 
@@ -54,9 +52,9 @@ export type PartnerOrdersHomeScreenProps = {
   items?: readonly PartnerOrderItem[];
   branchLabel?: string;
   quickAlert?: string;
+  searchMode?: boolean;
+  onCloseSearch?: () => void;
   onOpenOrderAction?: (actionId: OrderHubAction, orderId: string) => void;
-  onOpenAccountArea?: () => void;
-  onOpenAccountEntry?: (entryId: PartnerSupportScreenId) => void;
   onOpenEntryPress?: () => void;
   onOpenMaintenancePress?: () => void;
   onOpenInventoryManagementPress?: () => void;
@@ -75,27 +73,6 @@ const statusFilters: ReadonlyArray<{ id: StatusFilter; label: string }> = [
   { id: 'delivering', label: 'في الطريق' },
   { id: 'completed', label: 'مكتملة' },
   { id: 'cancelled', label: 'ملغاة/مشكلة' },
-];
-
-const accountEntries: ReadonlyArray<{ id: PartnerSupportScreenId; label: string; description: string }> = [
-  { id: 'profile-get', label: 'الملف والتشغيل', description: 'الملف، حالة الفرع، الظهور، وأنماط الخدمة.' },
-  { id: 'store-update', label: 'تحديث بيانات الفرع', description: 'تعديل بيانات الفرع الأساسية.' },
-  { id: 'store-status-update', label: 'حالة الفرع', description: 'فتح/إغلاق الفرع تشغيليًا.' },
-  { id: 'listing-status-update', label: 'حالة الظهور', description: 'إدارة ظهور المتجر للعملاء.' },
-  { id: 'store-service-modes-update', label: 'أنماط الخدمة', description: 'تفعيل delivery/pickup.' },
-  { id: 'auction-status-update', label: 'حالة المزاد', description: 'التحكم في مشاركة المزاد.' },
-  { id: 'store-nomination', label: 'الترشيح والانضمام', description: 'ترشيح فرع وبدء مسار onboarding.' },
-  { id: 'intake-start', label: 'بدء الإدخال', description: 'تشغيل intake flow للفرع.' },
-  { id: 'identity-submit', label: 'الامتثال والهوية', description: 'إرسال الهوية والوثائق المطلوبة.' },
-  { id: 'doc-upload', label: 'رفع المستندات', description: 'رفع ملفات الامتثال.' },
-  { id: 'video-upload', label: 'الوسائط والفيديو', description: 'رفع فيديو قصير لمراجعة التسويق.' },
-  { id: 'inventory-adjust', label: 'الكتالوج والمخزون', description: 'تعديل المخزون والمنتجات.' },
-  { id: 'items-upsert', label: 'إدارة العناصر', description: 'إضافة/تعديل عناصر الفرع.' },
-  { id: 'chat-send', label: 'التواصل والرسائل', description: 'الدردشة والردود السريعة.' },
-  { id: 'quick-reply-config', label: 'إعداد الردود السريعة', description: 'سياسات الرسائل الجاهزة.' },
-  { id: 'audience-insights', label: 'التحليلات', description: 'تحليلات الجمهور والأداء التجاري.' },
-  { id: 'commission-by-mode', label: 'العمولة والاشتراك', description: 'العمولات والخطة والاشتراك.' },
-  { id: 'subscription', label: 'بثواني برو', description: 'مراجعة الخطة ومسار الترقية.' },
 ];
 
 const demoOrders: readonly PartnerOrderItem[] = [
@@ -261,15 +238,14 @@ export function PartnerOrdersHomeScreen({
   items = demoOrders,
   branchLabel = 'الرياض، فرع الياسمين',
   quickAlert = 'توجد طلبات بحاجة إجراء فوري خلال الدقائق القادمة.',
+  searchMode = false,
+  onCloseSearch,
   onOpenOrderAction,
-  onOpenAccountArea,
-  onOpenAccountEntry,
   onOpenEntryPress,
   onOpenMaintenancePress,
   onOpenInventoryManagementPress,
   onRetry,
 }: PartnerOrdersHomeScreenProps) {
-  const [mainTab, setMainTab] = React.useState<OrdersMainTab>('orders');
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
   const [query, setQuery] = React.useState('');
 
@@ -332,123 +308,112 @@ export function PartnerOrdersHomeScreen({
       </Surface>
 
       <Surface tone="raised" gap={3} style={{ borderColor: BTH_DEEP_BLUE, borderWidth: 1 }}>
-        <Box layoutDirection="row" gap={2}>
-          <Button label="الطلبات" tone={mainTab === 'orders' ? 'primary' : 'secondary'} onPress={() => setMainTab('orders')} />
-          <Button
-            label="الحساب"
-            tone={mainTab === 'account' ? 'primary' : 'secondary'}
-            onPress={() => {
-              setMainTab('account');
-              onOpenAccountArea?.();
-            }}
-          />
+        <SectionHeader title="اختصارات الطلبات" subtitle="مدخلات تشغيلية مرتبطة بمسار الطلبات فقط." />
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          <Button label="مدخل التشغيل" onPress={onOpenEntryPress} />
+          <Button label="صيانة الفرع" tone="secondary" onPress={onOpenMaintenancePress} />
+          <Button label="إدارة المنتجات" tone="secondary" onPress={onOpenInventoryManagementPress} />
         </Box>
       </Surface>
 
-      {mainTab === 'orders' ? (
-        <>
-          <Surface tone="raised" gap={3}>
-            <SectionHeader title="تصفية الطلبات" subtitle="فلترة ذكية بالحالة + بحث سريع." />
-            <TextField
-              label="بحث"
-              placeholder="رقم الطلب / العميل / الفرع"
-              value={query}
-              onChangeText={setQuery}
-            />
-            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-              {statusFilters.map((filter) => (
-                <Button
-                  key={filter.id}
-                  label={filter.label}
-                  fullWidth={false}
-                  tone={statusFilter === filter.id ? 'primary' : 'secondary'}
-                  style={{ minWidth: 112 }}
-                  onPress={() => setStatusFilter(filter.id)}
-                />
-              ))}
-            </Box>
-          </Surface>
+      {searchMode ? (
+        <SearchTopBar
+          value={query}
+          onChangeText={setQuery}
+          onClose={onCloseSearch}
+          placeholder="ابحث برقم الطلب أو اسم العميل أو الفرع"
+          hint="أغلق البحث للعودة إلى بقية أدوات التصفية."
+          autoFocus
+        />
+      ) : null}
 
-          <Surface tone="default" gap={2}>
-            <SectionHeader title="دورة الطلبات" subtitle="قبول → تحضير → جاهز → تسليم → مكتمل" />
-            <Text role="caption" tone="muted">جديدة: {byStatus.new} | تحتاج قبول: {byStatus.needsAccept} | تحضير: {byStatus.preparing}</Text>
-            <Text role="caption" tone="muted">جاهزة: {byStatus.ready} | handoff: {byStatus.handoff} | في الطريق: {byStatus.delivering}</Text>
-            <Text role="caption" tone="muted">مكتملة: {byStatus.completed} | ملغاة/مشكلة: {byStatus.cancelled}</Text>
-          </Surface>
-
-          {filteredItems.length === 0 ? (
-            <StateView
-              stateId="empty"
-              title="لا توجد طلبات بهذه الحالة"
-              description="غيّر الفلتر أو البحث لاستعراض طلبات أخرى."
-              actionLabel="إعادة الضبط"
-              onActionPress={() => {
-                setStatusFilter('all');
-                setQuery('');
-              }}
-            />
-          ) : (
-            <Box gap={3}>
-              {filteredItems.map((item) => {
-                const nextAction = resolveOrderAction(item.status);
-                return (
-                  <Card
-                    key={item.id}
-                    title={`${item.orderCode} - ${item.customerName}`}
-                    subtitle={`${resolveStatusLabel(item.status)} | ${item.orderTypeLabel} | ${item.branchLabel}`}
-                    footer={
-                      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                        <Button
-                          label={item.nextActionLabel}
-                          onPress={() => onOpenOrderAction?.(nextAction, item.id)}
-                        />
-                        <Button
-                          label="عرض التفاصيل"
-                          tone="secondary"
-                          onPress={() => onOpenOrderAction?.('details', item.id)}
-                        />
-                      </Box>
-                    }
-                  >
-                    <Box gap={1}>
-                      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                        <Text role="caption" tone="muted">{item.createdAtLabel}</Text>
-                        <Text role="caption" tone="muted">{item.elapsedLabel}</Text>
-                        <Text role="caption" tone="muted">{item.itemsCountLabel}</Text>
-                        <Text role="caption" tone="muted">{item.amountLabel}</Text>
-                      </Box>
-                      <Text role="caption" tone={resolvePriorityTone(item.priority)}>
-                        {resolvePriorityLabel(item.priority)}
-                      </Text>
-                    </Box>
-                  </Card>
-                );
-              })}
-            </Box>
-          )}
-        </>
-      ) : (
-        <Surface tone="raised" gap={3}>
-          <SectionHeader
-            title="مداخل الحساب الرئيسية"
-            subtitle="تم تجميع المجالات غير الخاصة بالطلبات هنا بدل بعثرتها في واجهة التشغيل الرئيسية."
+      <Surface tone="raised" gap={3}>
+        <SectionHeader
+          title={searchMode ? 'فلاتر البحث' : 'تصفية الطلبات'}
+          subtitle={searchMode ? 'ضيّق النتائج بالحالة من دون مغادرة البحث.' : 'فلترة ذكية بالحالة + بحث سريع.'}
+        />
+        {searchMode ? (
+          <Text role="caption" tone="muted">
+            البحث نشط الآن داخل مركز الطلبات ويمكنك استخدام الفلاتر لتقليل النتائج بسرعة.
+          </Text>
+        ) : (
+          <TextField
+            label="بحث"
+            placeholder="رقم الطلب / العميل / الفرع"
+            value={query}
+            onChangeText={setQuery}
           />
-          <Box gap={2}>
-            {accountEntries.map((entry) => (
+        )}
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          {statusFilters.map((filter) => (
+            <Button
+              key={filter.id}
+              label={filter.label}
+              fullWidth={false}
+              tone={statusFilter === filter.id ? 'primary' : 'secondary'}
+              style={{ minWidth: 112 }}
+              onPress={() => setStatusFilter(filter.id)}
+            />
+          ))}
+        </Box>
+      </Surface>
+
+      <Surface tone="default" gap={2}>
+        <SectionHeader title="دورة الطلبات" subtitle="قبول → تحضير → جاهز → تسليم → مكتمل" />
+        <Text role="caption" tone="muted">جديدة: {byStatus.new} | تحتاج قبول: {byStatus.needsAccept} | تحضير: {byStatus.preparing}</Text>
+        <Text role="caption" tone="muted">جاهزة: {byStatus.ready} | handoff: {byStatus.handoff} | في الطريق: {byStatus.delivering}</Text>
+        <Text role="caption" tone="muted">مكتملة: {byStatus.completed} | ملغاة/مشكلة: {byStatus.cancelled}</Text>
+      </Surface>
+
+      {filteredItems.length === 0 ? (
+        <StateView
+          stateId="empty"
+          title="لا توجد طلبات بهذه الحالة"
+          description="غيّر الفلتر أو البحث لاستعراض طلبات أخرى."
+          actionLabel="إعادة الضبط"
+          onActionPress={() => {
+            setStatusFilter('all');
+            setQuery('');
+          }}
+        />
+      ) : (
+        <Box gap={3}>
+          {filteredItems.map((item) => {
+            const nextAction = resolveOrderAction(item.status);
+            return (
               <Card
-                key={entry.id}
-                title={entry.label}
-                subtitle={entry.description}
-                footer={<Button label="فتح" tone="secondary" onPress={() => onOpenAccountEntry?.(entry.id)} />}
-              />
-            ))}
-          </Box>
-          <Box layoutDirection="row" gap={2}>
-            <Button label="مدخل التشغيل" tone="ghost" onPress={onOpenEntryPress} />
-            <Button label="صيانة الفرع" tone="ghost" onPress={onOpenMaintenancePress} />
-            <Button label="إدارة المنتجات" tone="ghost" onPress={onOpenInventoryManagementPress} />
-          </Box>
-        </Surface>
+                key={item.id}
+                title={`${item.orderCode} - ${item.customerName}`}
+                subtitle={`${resolveStatusLabel(item.status)} | ${item.orderTypeLabel} | ${item.branchLabel}`}
+                footer={
+                  <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                    <Button
+                      label={item.nextActionLabel}
+                      onPress={() => onOpenOrderAction?.(nextAction, item.id)}
+                    />
+                    <Button
+                      label="عرض التفاصيل"
+                      tone="secondary"
+                      onPress={() => onOpenOrderAction?.('details', item.id)}
+                    />
+                  </Box>
+                }
+              >
+                <Box gap={1}>
+                  <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                    <Text role="caption" tone="muted">{item.createdAtLabel}</Text>
+                    <Text role="caption" tone="muted">{item.elapsedLabel}</Text>
+                    <Text role="caption" tone="muted">{item.itemsCountLabel}</Text>
+                    <Text role="caption" tone="muted">{item.amountLabel}</Text>
+                  </Box>
+                  <Text role="caption" tone={resolvePriorityTone(item.priority)}>
+                    {resolvePriorityLabel(item.priority)}
+                  </Text>
+                </Box>
+              </Card>
+            );
+          })}
+        </Box>
       )}
 
       <Surface tone="raised" gap={1} style={{ borderColor: BTH_ORANGE, borderWidth: 1 }}>
@@ -462,22 +427,25 @@ export function PartnerOrdersHomeScreen({
 
 export default PartnerOrdersHomeScreen;
 
-// Backward-compatible exports for current consumers while keeping one canonical orders screen file.
 export type PartnerOrdersInboxScreenState = PartnerOrdersHomeScreenState;
 export type PartnerOrdersInboxListItem = PartnerOrderItem;
 export type PartnerOrdersInboxScreenProps = {
   state?: PartnerOrdersInboxScreenState;
   items?: readonly PartnerOrdersInboxListItem[];
+  searchMode?: boolean;
+  onCloseSearch?: () => void;
   onOpenOrder?: (orderId: string) => void;
   onOpenNextOrder?: (orderId: string) => void;
   onRetry?: () => void;
 };
 
-export function PartnerOrdersInboxScreen({ state = 'ready', items, onOpenOrder, onOpenNextOrder, onRetry }: PartnerOrdersInboxScreenProps) {
+export function PartnerOrdersInboxScreen({ state = 'ready', items, searchMode, onCloseSearch, onOpenOrder, onOpenNextOrder, onRetry }: PartnerOrdersInboxScreenProps) {
   return (
     <PartnerOrdersHomeScreen
       state={state}
       items={items}
+      searchMode={searchMode}
+      onCloseSearch={onCloseSearch}
       onOpenOrderAction={(actionId, orderId) => {
         if (actionId === 'details') {
           onOpenOrder?.(orderId);
@@ -531,7 +499,6 @@ export function PartnerOrderDetailScreen({ state = 'ready', summary, onConfirmRe
       onOpenOrderAction={(actionId, orderId) => {
         if (actionId === 'ready' || actionId === 'handoff' || actionId === 'details') {
           onConfirmReady?.(orderId);
-          return;
         }
       }}
       onRetry={onRetry}

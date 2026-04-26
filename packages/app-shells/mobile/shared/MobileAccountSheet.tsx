@@ -25,7 +25,6 @@ type MobileAccountSheetProps = {
   onOpenInventory?: () => void;
   onOpenTeam?: () => void;
   onOpenAnalytics?: () => void;
-  onOpenTeam?: () => void;
   ordersLabel?: string;
   operationsLabel?: string;
   inventoryLabel?: string;
@@ -38,7 +37,7 @@ type MobileAccountSheetProps = {
 export function MobileAccountSheet({
   visible,
   onClose,
-  profileLabel = 'الملف الشخصي',
+  profileLabel = 'ملف المتجر',
   walletHubLabel = 'المحفظة والحسابات المالية',
   settingsLabel = 'الإعدادات',
   typeSwitchLabel = 'تغيير النوع',

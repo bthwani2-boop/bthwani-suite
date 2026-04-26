@@ -2,7 +2,7 @@ import React from 'react';
 import { BackHandler, Platform } from 'react-native';
 import { Box, Button, Icon, MobileScrollView, ScreenHeader, Surface, Text, TopBar } from '@bthwani/ui-kit';
 import { dshPartner } from '@bthwani/surfaces/app-partner';
-import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
+import { MobileAccountSheet } from '../shared/MobileAccountSheet';
 import { PartnerWalletHubSheet, type PartnerWalletHubDestination } from '../shared/PartnerWalletHubSheet';
 import { PartnerStoreScopeSheet, type PartnerStoreScopeOption } from '../shared/PartnerStoreScopeSheet';
 
@@ -148,10 +148,12 @@ type PartnerStoreHoursDay = {
   closeTime: string;
 };
 
-const partnerTypeOptions: readonly MobileAccountTypeOption[] = [
+const partnerTypeOptions: readonly { id: PartnerServiceType; label: string; description: string }[] = [
   { id: 'dsh', label: 'DSH', description: 'تشغيل الطلبات والتسليم' },
   { id: 'arb', label: 'ARB', description: 'تشغيل عرب الشركاء والمسارات' },
 ];
+
+type PartnerHubSection = 'orders' | 'profile' | 'operations' | 'inventory' | 'wallet' | 'analytics' | 'settings' | 'type-switch';
 
 const storeScopeOptions: readonly PartnerStoreScopeOption[] = [
   {
@@ -181,6 +183,8 @@ export function PartnerSurfaceHost() {
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
   const [walletHubVisible, setWalletHubVisible] = React.useState(false);
   const [storeScopeVisible, setStoreScopeVisible] = React.useState(false);
+  const [accountHubSection, setAccountHubSection] = React.useState<PartnerHubSection>('profile');
+  const [ordersSearchMode, setOrdersSearchMode] = React.useState(false);
   const [selectedStoreScopeId, setSelectedStoreScopeId] = React.useState('all');
   const [route, setRoute] = React.useState<PartnerRoute>(activeServiceType === 'dsh' ? 'inbox' : 'entry');
   const [activeOrderId, setActiveOrderId] = React.useState('partner-order-1042');
@@ -209,8 +213,14 @@ export function PartnerSurfaceHost() {
   const [storeHours, setStoreHours] = React.useState<PartnerStoreHoursDay[]>(defaultStoreHours.map((day) => ({ ...day })));
   const [selectedZoneId, setSelectedZoneId] = React.useState('yasmin');
   const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<PartnerSupportRoute>('order-issue-queue');
-  const routeHistoryRef = React.useRef<PartnerRoute[]>(['entry']);
+  const routeHistoryRef = React.useRef<PartnerRoute[]>([activeServiceType === 'dsh' ? 'inbox' : 'entry']);
   const routeTransitionFromBackRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (route !== 'inbox' && ordersSearchMode) {
+      setOrdersSearchMode(false);
+    }
+  }, [ordersSearchMode, route]);
 
   const activePrimaryAreas =
     activeServiceType === 'dsh'
@@ -371,6 +381,16 @@ export function PartnerSurfaceHost() {
         return true;
       }
 
+      if (ordersSearchMode) {
+        setOrdersSearchMode(false);
+        return true;
+      }
+
+      if (route === 'home' && accountHubSection !== 'orders') {
+        setAccountHubSection('orders');
+        return true;
+      }
+
       if (routeHistoryRef.current.length > 1) {
         routeTransitionFromBackRef.current = true;
         routeHistoryRef.current.pop();
@@ -383,10 +403,21 @@ export function PartnerSurfaceHost() {
     });
 
     return () => subscription.remove();
-  }, [accountSheetVisible, storeScopeVisible, walletHubVisible]);
+  }, [accountHubSection, accountSheetVisible, ordersSearchMode, route, storeScopeVisible, walletHubVisible]);
 
   const openOrdersBoard = () => {
+    setOrdersSearchMode(false);
     setRoute('inbox');
+  };
+
+  const openOrdersSearch = () => {
+    setOrdersSearchMode(true);
+    setRoute('inbox');
+  };
+
+  const openAccountHub = (section: PartnerHubSection) => {
+    setAccountHubSection(section);
+    setRoute('home');
   };
 
   const openOrderWorkspace = () => {
@@ -450,7 +481,6 @@ export function PartnerSurfaceHost() {
       title="بثواني"
       subtitle={activeServiceType === 'dsh' ? 'لوحة الشريك - DSH' : 'لوحة الشريك - ARB'}
       locationLabel={`الرياض، ${selectedStoreScope.label}`}
-      locationIcon={<Icon name="git-branch-outline" size={14} color="#FFFFFF" />}
       onTitlePress={openStoreScope}
       titleAccessibilityLabel="فتح اختيار المتجر أو الفرع"
       actions={[
@@ -458,7 +488,7 @@ export function PartnerSurfaceHost() {
           id: 'profile',
           icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الحساب',
-          onPress: () => setAccountSheetVisible(true),
+          onPress: activeServiceType === 'dsh' ? () => openAccountHub('profile') : () => setAccountSheetVisible(true),
         },
         {
           id: 'notifications',
@@ -473,19 +503,19 @@ export function PartnerSurfaceHost() {
         },
         {
           id: 'wallet',
-          icon: <Icon name="book-outline" size={21} color="#FFFFFF" />,
+          icon: <Icon name="wallet-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'المحفظة والحسابات المالية',
-          onPress: openWalletHub,
+          onPress: activeServiceType === 'dsh' ? () => openAccountHub('wallet') : openWalletHub,
         },
         { id: 'orders', icon: <Icon name="receipt-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
-        { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
+        { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'البحث', onPress: activeServiceType === 'dsh' ? openOrdersSearch : openOrdersBoard },
       ]}
       ticker={{
         statusLabel: activeServiceType === 'dsh' ? 'نشط' : 'ARB نشط',
         message:
           activeServiceType === 'dsh'
-            ? 'المساحة مخصصة للتحديثات العاجلة الخاصة بعمليات الشريك'
-            : 'وضع ARB مفعل. الواجهة تعمل الآن ضمن سياق ARB الكامل.',
+            ? 'الطلبات، ملف المتجر، العمليات، المخزون، والتحليلات في مركز واحد. البحث وتغيير النوع والنطاق متاحان من هذا الشريط.'
+            : 'وضع ARB مفعّل. الواجهة تعرض سياق التوزيع والتبديل فقط دون خلط مع DSH.',
       }}
     />
   );
@@ -494,13 +524,13 @@ export function PartnerSurfaceHost() {
     <MobileAccountSheet
       visible={accountSheetVisible}
       onClose={() => setAccountSheetVisible(false)}
-      onOpenProfile={() => {}}
+      onOpenProfile={() => openAccountHub('profile')}
       onOpenWalletHub={openWalletHub}
       onOpenOrders={openOrdersBoard}
       onOpenOperations={() => setRoute('operations')}
       onOpenInventory={openInventoryManagement}
       onOpenTeam={() => openSupportScreen('team-management')}
-      onOpenAnalytics={() => openSupportScreen('staff-analytics')}
+      onOpenAnalytics={() => openAccountHub('analytics')}
       typeOptions={partnerTypeOptions}
       activeTypeId={activeServiceType}
       onSelectType={(typeId) => {
@@ -586,6 +616,50 @@ export function PartnerSurfaceHost() {
     );
   }
 
+    if (route === 'home') {
+      return (
+        <Box style={{ flex: 1 }} background="background">
+          {topBar}
+          <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
+            <PartnerDshConsoleScreen
+              activeServiceType={activeServiceType}
+              section={accountHubSection}
+              onSectionChange={setAccountHubSection}
+              storeName={maintenanceProfile.storeName}
+              branchLabel={selectedStoreScope.label}
+              cityLabel={maintenanceProfile.cityLabel}
+              managerLabel={maintenanceProfile.managerLabel}
+              todayHoursLabel={maintenanceProfile.todayHoursLabel}
+              activeZoneLabel={maintenanceProfile.activeZoneLabel}
+              storeOpen={storeOpen}
+              listingEnabled={listingEnabled}
+              serviceModes={serviceModes}
+              activeOrdersCount={deliveryOpsSummary.outForDelivery + deliveryOpsSummary.handoffReady}
+              urgentOrdersCount={deliveryOpsSummary.delayedRisk}
+              pendingActionsCount={deliveryOpsSummary.handoffReady}
+              typeOptions={partnerTypeOptions}
+              onSelectType={(typeId) => {
+                setActiveServiceType(typeId === 'arb' ? 'arb' : 'dsh');
+                setRoute(typeId === 'arb' ? 'entry' : 'inbox');
+              }}
+              onOpenOrdersBoard={openOrdersBoard}
+              onOpenInventoryManagement={openInventoryManagement}
+              onOpenMaintenance={openStoreMaintenance}
+              onOpenHours={() => setRoute('hours')}
+              onOpenZones={() => setRoute('zones')}
+              onOpenStoreScope={openStoreScope}
+              onOpenSupportDirectory={openSupportDirectory}
+              onOpenSupportScreen={openSupportScreen}
+              onOpenWalletHub={openWalletHub}
+            />
+          </Surface>
+          {accountSheet}
+          {walletHubSheet}
+          {storeScopeSheet}
+        </Box>
+      );
+    }
+
   if (route === 'entry') {
     return (
       <Box style={{ flex: 1 }} background="background">
@@ -634,6 +708,8 @@ export function PartnerSurfaceHost() {
         {topBar}
         <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
           <PartnerOrdersInboxScreen
+              searchMode={ordersSearchMode}
+              onCloseSearch={() => setOrdersSearchMode(false)}
             onOpenOrder={(orderId) => {
               setActiveOrderId(orderId);
               setRoute('detail');
@@ -864,10 +940,8 @@ export function PartnerSurfaceHost() {
           activeServiceType={activeServiceType}
           onOpenOrdersBoard={openOrdersBoard}
           onOpenInventoryManagement={openInventoryManagement}
-          onOpenEntry={() => setRoute('entry')}
-          openStoreScope={openStoreScope}
+          onOpenStoreScope={openStoreScope}
           onOpenWalletHub={openWalletHub}
-          onOpenAccountHub={() => setAccountSheetVisible(true)}
           onOpenSupportDirectory={openSupportDirectory}
         />
       </Surface>
