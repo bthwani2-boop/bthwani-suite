@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { FlatList, Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ImageSourcePropType, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
 
 import {
   Box,
@@ -503,7 +503,6 @@ export function DshHomeGetScreen({
   const resolvedPromos = promos ?? [];
   const resolvedStores = stores ?? [];
   const resolvedRecentOrders = recentOrders ?? [];
-  const storePagerRef = React.useRef<FlatList<StorePagerPage> | null>(null);
 
   const categoryItems = React.useMemo(() => {
     return resolvedCategories;
@@ -572,44 +571,15 @@ export function DshHomeGetScreen({
     })
   ), [categoryItems, categoryPageIds, resolveStoresForCategory]);
 
-  const storePagerPageWidth = React.useMemo(
-    () => Math.max(300, Math.round((viewportWidth - spacing[3] * 2) * 0.9)),
-    [viewportWidth],
-  );
-  const storePagerPageGap = spacing[2];
-  const storePagerSnapInterval = storePagerPageWidth + storePagerPageGap;
-  const storePagerHeight = React.useMemo(
-    () => Math.max(460, Math.min(Math.round(viewportHeight * 0.56), 760)),
-    [viewportHeight],
+  const activeStorePage = React.useMemo(
+    () => storePagerItems.find((page) => page.categoryId === activeCategoryId) ?? storePagerItems[0] ?? null,
+    [activeCategoryId, storePagerItems],
   );
 
-  const selectCategoryPage = React.useCallback((categoryId: string, animated = true) => {
+  const selectCategoryPage = React.useCallback((categoryId: string, _animated = true) => {
     setActiveCategoryId(categoryId);
     setActiveSubcategoryId(null);
-
-    const nextIndex = storePagerItems.findIndex((page) => page.categoryId === categoryId);
-    if (nextIndex < 0) {
-      return;
-    }
-
-    try {
-      storePagerRef.current?.scrollToIndex({ index: nextIndex, animated });
-    } catch {
-      storePagerRef.current?.scrollToOffset({ offset: nextIndex * storePagerSnapInterval, animated });
-    }
-  }, [storePagerItems, storePagerSnapInterval]);
-
-  const handleStorePagerMomentumEnd = React.useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const nextIndex = Math.round(event.nativeEvent.contentOffset.x / storePagerSnapInterval);
-    const nextCategoryId = storePagerItems[nextIndex]?.categoryId;
-
-    if (!nextCategoryId || nextCategoryId === activeCategoryId) {
-      return;
-    }
-
-    setActiveCategoryId(nextCategoryId);
-    setActiveSubcategoryId(null);
-  }, [activeCategoryId, storePagerItems, storePagerSnapInterval]);
+  }, []);
 
   const selectedCategoryFixture = React.useMemo(
     () =>
@@ -1274,122 +1244,96 @@ export function DshHomeGetScreen({
           </ScrollView>
         </View>
 
-        <FlatList
-          ref={storePagerRef}
-          horizontal
-          data={storePagerItems}
-          keyExtractor={(item) => item.categoryId}
-          renderItem={({ item }) => (
-            <View style={{ width: storePagerPageWidth, marginEnd: storePagerPageGap, height: storePagerHeight }}>
-              <ScrollView
-                nestedScrollEnabled
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ gap: spacing[2], paddingBottom: spacing[1] }}
-                style={{ flex: 1 }}
-              >
-                {item.renderMode === 'manual-order' ? (
-                  <Box gap={3}>
-                    {item.categoryId === 'shein' ? (
-                      <DshSheinOrderCreateScreen
-                        embedded
-                        onClose={() => {
-                          onCloseSheinInline?.();
-                          selectCategoryPage('all');
-                        }}
-                      />
-                    ) : item.categoryId === 'awnak' ? (
-                      <DshAwnakOrderCreateScreen
-                        embedded
-                        onClose={() => {
-                          onCloseAwnakInline?.();
-                          selectCategoryPage('all');
-                        }}
-                      />
-                    ) : null}
-                  </Box>
-                ) : item.stores.length ? (
-                  item.stores.map((store, index) => {
-                    const card: StoreCardPremiumItem = {
-                      id: store.id,
-                      name: store.name,
-                      subtitle: store.address,
-                      image: resolveDshHomeStoreImageSource(store.mediaKey),
-                      rating: store.rating ?? null,
-                      distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
-                      isOpen: store.statusTone === 'open',
-                      supportsPickup: true,
-                      supportsPartnerDelivery: true,
-                      serviceTokens: [
-                        { label: store.deliveryLabel },
-                        { label: store.serviceLabel },
-                      ],
-                      isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
-                      isFollowing: followToggles[store.id] ?? store.isFollowing,
-                      followersCount: followCounts[store.id] ?? store.followerCount,
-                      hasBthwaniPro: store.hasOffer !== false,
-                      subscriptionPackageChips: store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel],
-                      hasNewProducts: store.hasOffer === true,
-                      hasOffer: store.hasOffer,
-                      offerText: store.offerLabel,
-                      pointsMultiplier: Number.parseInt(store.multiplierLabel.replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
-                      hasCouponAvailable: store.hasOffer === false,
-                    };
+        <View style={styles.storeListViewport}>
+          <View style={styles.storeListContent}>
+            {activeStorePage?.renderMode === 'manual-order' ? (
+              <Box gap={3}>
+                {activeStorePage.categoryId === 'shein' ? (
+                  <DshSheinOrderCreateScreen
+                    embedded
+                    onClose={() => {
+                      onCloseSheinInline?.();
+                      selectCategoryPage('all');
+                    }}
+                  />
+                ) : activeStorePage.categoryId === 'awnak' ? (
+                  <DshAwnakOrderCreateScreen
+                    embedded
+                    onClose={() => {
+                      onCloseAwnakInline?.();
+                      selectCategoryPage('all');
+                    }}
+                  />
+                ) : null}
+              </Box>
+            ) : activeStorePage?.stores.length ? (
+              activeStorePage.stores.map((store, index) => {
+                const card: StoreCardPremiumItem = {
+                  id: store.id,
+                  name: store.name,
+                  subtitle: store.address,
+                  image: resolveDshHomeStoreImageSource(store.mediaKey),
+                  rating: store.rating ?? null,
+                  distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
+                  isOpen: store.statusTone === 'open',
+                  supportsPickup: true,
+                  supportsPartnerDelivery: true,
+                  serviceTokens: [
+                    { label: store.deliveryLabel },
+                    { label: store.serviceLabel },
+                  ],
+                  isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
+                  isFollowing: followToggles[store.id] ?? store.isFollowing,
+                  followersCount: followCounts[store.id] ?? store.followerCount,
+                  hasBthwaniPro: store.hasOffer !== false,
+                  subscriptionPackageChips: store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel],
+                  hasNewProducts: store.hasOffer === true,
+                  hasOffer: store.hasOffer,
+                  offerText: store.offerLabel,
+                  pointsMultiplier: Number.parseInt(store.multiplierLabel.replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
+                  hasCouponAvailable: store.hasOffer === false,
+                };
 
-                    return (
-                      <StoreCardPremium
-                        key={store.id}
-                        item={card}
-                        onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
-                        onToggleFavorite={(id) => {
-                          setFavoriteToggles((current) => ({
-                            ...current,
-                            [id]: !(current[id] ?? store.isFavorite),
-                          }));
-                        }}
-                        onToggleFollow={(id) => {
-                          const isFollowing = followToggles[id] ?? store.isFollowing;
-                          const baseCount = followCounts[id] ?? store.followerCount;
-                          setFollowToggles((current) => ({ ...current, [id]: !isFollowing }));
-                          setFollowCounts((current) => ({
-                            ...current,
-                            [id]: isFollowing ? Math.max(0, baseCount - 1) : baseCount + 1,
-                          }));
-                        }}
-                        onPressSubscriptionChip={openInlineSearch}
-                      />
-                    );
-                  })
-                ) : (
-                  <View style={styles.emptyFeed}>
-                    <Text style={styles.emptyFeedEmoji}>{inlineSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
-                    <Text style={styles.emptyFeedTitle}>
-                      {inlineSearchQuery.trim() ? 'لا توجد نتائج داخل هذه الفئة' : 'لا توجد متاجر لهذه الفئة بعد'}
-                    </Text>
-                    <Text style={styles.emptyFeedText}>
-                      {inlineSearchQuery.trim()
-                        ? 'جرّب تغيير البحث أو انتقل إلى فئة أخرى.'
-                        : 'أضف fixtures لهذه الفئة كي تظهر هنا.'}
-                    </Text>
-                  </View>
-                )}
-              </ScrollView>
-            </View>
-          )}
-          showsHorizontalScrollIndicator={false}
-          nestedScrollEnabled
-          decelerationRate="fast"
-          snapToInterval={storePagerSnapInterval}
-          snapToAlignment="start"
-          disableIntervalMomentum
-          contentContainerStyle={{ paddingHorizontal: spacing[3] }}
-          getItemLayout={(_, index) => ({
-            length: storePagerSnapInterval,
-            offset: storePagerSnapInterval * index,
-            index,
-          })}
-          onMomentumScrollEnd={handleStorePagerMomentumEnd}
-          style={{ height: storePagerHeight, marginTop: spacing[2] }}
-        />
+                return (
+                  <StoreCardPremium
+                    key={store.id}
+                    item={card}
+                    style={styles.storeListCard}
+                    onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
+                    onToggleFavorite={(id) => {
+                      setFavoriteToggles((current) => ({
+                        ...current,
+                        [id]: !(current[id] ?? store.isFavorite),
+                      }));
+                    }}
+                    onToggleFollow={(id) => {
+                      const isFollowing = followToggles[id] ?? store.isFollowing;
+                      const baseCount = followCounts[id] ?? store.followerCount;
+                      setFollowToggles((current) => ({ ...current, [id]: !isFollowing }));
+                      setFollowCounts((current) => ({
+                        ...current,
+                        [id]: isFollowing ? Math.max(0, baseCount - 1) : baseCount + 1,
+                      }));
+                    }}
+                    onPressSubscriptionChip={openInlineSearch}
+                  />
+                );
+              })
+            ) : (
+              <View style={styles.emptyFeed}>
+                <Text style={styles.emptyFeedEmoji}>{inlineSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
+                <Text style={styles.emptyFeedTitle}>
+                  {inlineSearchQuery.trim() ? 'لا توجد نتائج داخل هذه الفئة' : 'لا توجد متاجر لهذه الفئة بعد'}
+                </Text>
+                <Text style={styles.emptyFeedText}>
+                  {inlineSearchQuery.trim()
+                    ? 'جرّب تغيير البحث أو انتقل إلى فئة أخرى.'
+                    : 'أضف fixtures لهذه الفئة كي تظهر هنا.'}
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
 
         <CategoryOrbitCarousel
           visible={categoriesSheetVisible}
@@ -1545,6 +1489,21 @@ function createStyles(direction: Direction) {
   },
   bannerCarouselFullBleed: {
     marginHorizontal: -spacing[3],
+  },
+  storeListViewport: {
+    marginTop: spacing[2],
+    width: '100%',
+    overflow: 'hidden',
+    alignSelf: 'stretch',
+  },
+  storeListContent: {
+    width: '100%',
+    gap: spacing[2],
+    alignSelf: 'stretch',
+  },
+  storeListCard: {
+    width: '100%',
+    alignSelf: 'stretch',
   },
   activeOrderStatusLabel: {
     color: '#6b7280',
