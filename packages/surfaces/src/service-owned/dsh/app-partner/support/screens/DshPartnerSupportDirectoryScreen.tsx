@@ -34,6 +34,7 @@ const groups: Array<{
       { id: 'video-upload', title: 'رفع الفيديو', subtitle: 'أرسل فيديو قصيرًا لمراجعة التسويق.', badgeLabel: 'وسائط' },
       { id: 'intake-start', title: 'Intake start', subtitle: 'Start the branch intake flow.', badgeLabel: 'Onboarding' },
       { id: 'manager-invite', title: 'Manager invite', subtitle: 'Invite a branch manager.', badgeLabel: 'Access' },
+      { id: 'team-management', title: 'Team management', subtitle: 'Manage branch staff and roles.', badgeLabel: 'Access' },
     ],
   },
   {

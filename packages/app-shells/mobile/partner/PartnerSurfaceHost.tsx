@@ -30,6 +30,7 @@ const {
   DshPartnerItemsUpsertScreen,
   DshPartnerListingStatusUpdateScreen,
   DshPartnerManagerInviteScreen,
+  DshPartnerTeamManagementScreen,
   DshPartnerOrderAcceptScreen,
   DshPartnerOrderGetScreen,
   DshPartnerOrderHandoffScreen,
@@ -68,6 +69,7 @@ type PartnerSupportRoute =
   | 'items-upsert'
   | 'listing-status-update'
   | 'manager-invite'
+  | 'team-management'
   | 'order-accept'
   | 'order-get'
   | 'order-handoff'
@@ -453,12 +455,6 @@ export function PartnerSurfaceHost() {
       titleAccessibilityLabel="فتح اختيار المتجر أو الفرع"
       actions={[
         {
-          id: 'branch-scope',
-          icon: <Icon name="git-branch-outline" size={21} color="#0A2F5C" />,
-          accessibilityLabel: 'اختيار الفرع',
-          onPress: openStoreScope,
-        },
-        {
           id: 'profile',
           icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
           accessibilityLabel: 'الحساب',
@@ -503,6 +499,7 @@ export function PartnerSurfaceHost() {
       onOpenOrders={openOrdersBoard}
       onOpenOperations={() => setRoute('operations')}
       onOpenInventory={openInventoryManagement}
+      onOpenTeam={() => openSupportScreen('team-management')}
       onOpenAnalytics={() => openSupportScreen('staff-analytics')}
       typeOptions={partnerTypeOptions}
       activeTypeId={activeServiceType}
@@ -810,6 +807,7 @@ export function PartnerSurfaceHost() {
       'items-upsert': <DshPartnerItemsUpsertScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'listing-status-update': <DshPartnerListingStatusUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'manager-invite': <DshPartnerManagerInviteScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'team-management': <DshPartnerTeamManagementScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'order-accept': <DshPartnerOrderAcceptScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('order-get')} />,
       'order-get': <DshPartnerOrderGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'order-handoff': <DshPartnerOrderHandoffScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,

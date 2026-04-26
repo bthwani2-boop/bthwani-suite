@@ -35,6 +35,7 @@ export type PartnerSupportScreenId =
   | 'items-upsert'
   | 'listing-status-update'
   | 'manager-invite'
+  | 'team-management'
   | 'order-accept'
   | 'order-get'
   | 'order-handoff'
@@ -281,6 +282,28 @@ const partnerSupportConfigs: Record<PartnerSupportScreenId, SupportConfig> = {
     secondaryLabel: 'Back to support directory',
     inputLabel: 'Manager email or phone',
     inputHint: 'Example: branch.manager@bthwani.sa',
+  },
+  'team-management': {
+    id: 'team-management',
+    title: 'Team management',
+    subtitle: 'Manage branch staff and roles.',
+    heroTitle: 'إدارة طاقم الشريك',
+    heroDescription: 'Create, invite, and assign roles to branch staff. Use the new role "موصل" for delivery-only staff.',
+    primaryLabel: 'Invite staff',
+    secondaryLabel: 'Back to support directory',
+    primaryHint: 'يمكنك إنشاء حتى 3 موظفين وتحديد صلاحياتهم التشغيلية والمالية بدقة.',
+    keyValues: [
+      { label: 'Allowed staff', value: '3' },
+      { label: 'Active managers', value: '1' },
+      { label: 'Delivery role', value: 'موصل', tone: 'brand' },
+    ],
+    listItems: [
+      { title: 'Khaled A.', subtitle: 'Manager', meta: 'Full access', badgeLabel: 'Manager' },
+      { title: 'Sami H.', subtitle: 'موصل', meta: 'Delivery-only', badgeLabel: 'موصل' },
+      { title: 'Lina M.', subtitle: 'Staff', meta: 'Catalog + orders', badgeLabel: 'Staff' },
+    ],
+    inputLabel: 'Employee email or phone',
+    inputHint: 'Example: staff@bthwani.sa',
   },
   'order-accept': {
     id: 'order-accept',
@@ -934,6 +957,7 @@ export const DshPartnerInventoryUpdateScreen = createPartnerSupportScreen(partne
 export const DshPartnerItemsUpsertScreen = createPartnerSupportScreen(partnerSupportConfigs['items-upsert']);
 export const DshPartnerListingStatusUpdateScreen = createPartnerSupportScreen(partnerSupportConfigs['listing-status-update']);
 export const DshPartnerManagerInviteScreen = createPartnerSupportScreen(partnerSupportConfigs['manager-invite']);
+export const DshPartnerTeamManagementScreen = createPartnerSupportScreen(partnerSupportConfigs['team-management']);
 export const DshPartnerOrderAcceptScreen = createPartnerSupportScreen(partnerSupportConfigs['order-accept']);
 export const DshPartnerOrderGetScreen = createPartnerSupportScreen(partnerSupportConfigs['order-get']);
 export const DshPartnerOrderHandoffScreen = createPartnerSupportScreen(partnerSupportConfigs['order-handoff']);

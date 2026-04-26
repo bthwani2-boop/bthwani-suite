@@ -23,7 +23,9 @@ type MobileAccountSheetProps = {
   onOpenOrders?: () => void;
   onOpenOperations?: () => void;
   onOpenInventory?: () => void;
+  onOpenTeam?: () => void;
   onOpenAnalytics?: () => void;
+  onOpenTeam?: () => void;
   ordersLabel?: string;
   operationsLabel?: string;
   inventoryLabel?: string;
@@ -47,6 +49,7 @@ export function MobileAccountSheet({
   onOpenOrders,
   onOpenOperations,
   onOpenInventory,
+  onOpenTeam,
   onOpenAnalytics,
   ordersLabel = 'الطلبات',
   operationsLabel = 'العمليات',
@@ -98,6 +101,14 @@ export function MobileAccountSheet({
             onPress={() => {
               onClose();
               onOpenInventory?.();
+            }}
+          />
+          <Button
+            label="إدارة الطاقم"
+            tone="secondary"
+            onPress={() => {
+              onClose();
+              onOpenTeam?.();
             }}
           />
           <Button
