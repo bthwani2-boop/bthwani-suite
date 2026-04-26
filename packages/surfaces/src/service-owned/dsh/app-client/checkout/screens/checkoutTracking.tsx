@@ -656,7 +656,8 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
   const runtimeBottomInset = Platform.OS === 'android'
     ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
     : safeArea.comfortable;
-  const contentBottomPadding = (actionBarHeight > 0 ? actionBarHeight : spacing[16]) + runtimeBottomInset + spacing[4];
+  const contentBottomPadding = (actionBarHeight > 0 ? actionBarHeight : spacing[16]) + runtimeBottomInset + safeArea.comfortable;
+  const reviewStateLabel = phase === 'received' ? (ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن') : 'مؤجل حتى الاستلام';
 
   const handleProductRatingChange = (nextValue: number) => {
     setProductRating(nextValue);
@@ -779,7 +780,7 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
           enabled={hasCustomerReceived}
           placeholderText="سيظهر تقييم المنتج بعد الاستلام."
           currentValueLabel={productRatingLabel}
-          stateLabel={ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن'}
+          stateLabel={reviewStateLabel}
           helperText={productHelperText}
           value={productRating}
           onChange={handleProductRatingChange}
@@ -792,7 +793,7 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
           enabled={hasCustomerReceived}
           placeholderText="سيظهر تقييم الكابتن بعد الاستلام."
           currentValueLabel={captainRatingLabel}
-          stateLabel={ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن'}
+          stateLabel={reviewStateLabel}
           helperText={captainHelperText}
           value={captainRating}
           onChange={handleCaptainRatingChange}

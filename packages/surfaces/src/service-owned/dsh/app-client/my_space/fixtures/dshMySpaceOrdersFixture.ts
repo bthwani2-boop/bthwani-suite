@@ -38,6 +38,7 @@ export type DshMySpaceOrder = {
   placedAt: string;
   totalLabel: string;
   statusTrailLabel: string;
+  needsReview?: boolean;
 };
 
 export const dshMySpaceOrderMetrics: DshMySpaceOrderMetric[] = [
@@ -139,7 +140,7 @@ export const dshMySpaceOrdersFixture: DshMySpaceOrder[] = [
   {
     id: 'completed-order',
     title: 'مقهى الدانة',
-    summary: 'طلب مكتمل مع تقييم ظاهر وإعادة طلب مباشرة من البطاقة.',
+    summary: 'طلب مكتمل ويمكن إعادة الطلب مباشرة من نفس البطاقة.',
     fulfillmentId: 'delivery',
     fulfillmentLabel: 'توصيل',
     statusId: 'completed',
@@ -148,7 +149,8 @@ export const dshMySpaceOrdersFixture: DshMySpaceOrder[] = [
     orderNumber: '#3770118',
     placedAt: '25 مارس 2026 · 19:05',
     totalLabel: '28,900 ر.ي',
-    statusTrailLabel: 'مكتمل · 4.9/5',
+    statusTrailLabel: 'بانتظار التقييم',
+    needsReview: true,
   },
   {
     id: 'pickup-order',

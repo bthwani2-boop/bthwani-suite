@@ -5,7 +5,6 @@ import {
   Badge,
   Box,
   Button,
-  Card,
   Chip,
   KeyValueList,
   OptionRow,
@@ -15,15 +14,11 @@ import {
   useTheme,
 } from '@bthwani/ui-kit';
 import {
-  dshMySpaceOrderFilters,
-  dshMySpaceOrderMetrics,
   dshMySpaceOrdersFixture,
   dshMySpaceQuickActions,
   type DshMySpaceOrder,
   type DshMySpaceQuickAction,
   type DshMySpaceQuickActionKind,
-  type DshMySpaceOrderFilterId,
-  type DshMySpaceOrderMetric,
 } from '../fixtures/dshMySpaceOrdersFixture';
 
 export type DshMySpaceOrdersScreenProps = {
@@ -31,34 +26,6 @@ export type DshMySpaceOrdersScreenProps = {
   onRepeatOrder?: () => void;
   onOpenOrders?: () => void;
 };
-
-function OrderMetricCard({ metric }: { metric: DshMySpaceOrderMetric }) {
-  const { theme } = useTheme();
-  const accent = {
-    brand: theme.brand,
-    info: theme.info,
-    warning: theme.warning,
-    success: theme.success,
-  }[metric.tone];
-
-  return (
-    <Card
-      title={metric.label}
-      subtitle={metric.helperText}
-      style={{
-        flexBasis: '48%',
-        flexGrow: 1,
-        borderRadius: 18,
-        borderWidth: 1,
-        borderColor: theme.line,
-      }}
-    >
-      <Text role="hero" style={{ color: accent }}>
-        {metric.value}
-      </Text>
-    </Card>
-  );
-}
 
 function resolveOrderIconName(order: DshMySpaceOrder): React.ComponentProps<typeof Ionicons>['name'] {
   if (order.statusId === 'active') {
@@ -84,20 +51,16 @@ function resolveStatusTone(order: DshMySpaceOrder): 'brand' | 'success' | 'warni
   return order.statusTone;
 }
 
-function resolveFilterOrders(filterId: DshMySpaceOrderFilterId, orders: DshMySpaceOrder[]) {
-  if (filterId === 'all') {
-    return orders;
-  }
+function resolvePrimaryOrder(orders: DshMySpaceOrder[]) {
+  return orders.find((order) => order.statusId === 'active') ?? orders[0];
+}
 
-  if (filterId === 'active') {
-    return orders.filter((order) => order.statusId === 'active');
-  }
+function resolveRepeatReadyOrders(orders: DshMySpaceOrder[]) {
+  return orders.filter((order) => order.statusId === 'completed' || order.statusId === 'ready');
+}
 
-  if (filterId === 'pickup') {
-    return orders.filter((order) => order.fulfillmentId === 'pickup');
-  }
-
-  return orders.filter((order) => order.fulfillmentId === 'delivery');
+function resolvePendingReviewOrders(orders: DshMySpaceOrder[]) {
+  return orders.filter((order) => order.needsReview);
 }
 
 function OrderCard({
@@ -238,45 +201,62 @@ function QuickActionPanel({
 }
 
 export function DshMySpaceOrdersScreen({ onOpenOrders, onOpenTracking, onRepeatOrder }: DshMySpaceOrdersScreenProps) {
-  const [selectedFilterId, setSelectedFilterId] = React.useState<DshMySpaceOrderFilterId>('all');
-
-  const visibleOrders = resolveFilterOrders(selectedFilterId, dshMySpaceOrdersFixture);
+  const primaryOrder = resolvePrimaryOrder(dshMySpaceOrdersFixture);
+  const repeatReadyOrders = resolveRepeatReadyOrders(dshMySpaceOrdersFixture).filter((order) => order.id !== primaryOrder?.id);
+  const pendingReviewOrders = resolvePendingReviewOrders(dshMySpaceOrdersFixture).filter((order) => order.id !== primaryOrder?.id);
 
   return (
     <Box gap={2}>
       <Surface tone="raised" padding={2} gap={2}>
         <SectionHeader
-          title="لمحة سريعة"
-          subtitle="الطلبات النشطة والسابقة ظاهرة هنا مع تكرار مباشر وتتبّع واضح في خطوة واحدة."
+          title="لوحة مساحتي"
+          subtitle="الأولوية دائمًا: الطلب النشط ثم الجاهز للتكرار ثم المراجعات المعلقة ثم المسارات السريعة."
         />
 
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          {dshMySpaceOrderMetrics.map((metric) => (
-            <OrderMetricCard key={metric.label} metric={metric} />
-          ))}
-        </Box>
+        <KeyValueList
+          dense
+          items={[
+            { label: 'الطلب النشط الآن', value: primaryOrder ? 'متاح' : 'لا يوجد', tone: primaryOrder ? 'brand' : 'warning' },
+            { label: 'جاهز للتكرار', value: String(repeatReadyOrders.length), tone: repeatReadyOrders.length > 0 ? 'success' : 'warning' },
+            { label: 'مراجعات معلقة', value: String(pendingReviewOrders.length), tone: pendingReviewOrders.length > 0 ? 'warning' : 'success' },
+          ]}
+        />
       </Surface>
 
       <Surface tone="raised" padding={2} gap={2}>
-        <SectionHeader title="الفلترة" subtitle="اختر نوع الطلب الذي تريد أن يبقى في الواجهة." />
+        <SectionHeader title="الطلب النشط" subtitle="هذا هو المسار الأعلى أولوية ويظهر أولًا مع إجراء واضح." />
 
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          {dshMySpaceOrderFilters.map((filter) => (
-            <Chip key={filter.id} label={filter.label} selected={selectedFilterId === filter.id} onPress={() => setSelectedFilterId(filter.id)} />
-          ))}
-        </Box>
+        {primaryOrder ? (
+          <OrderCard
+            order={primaryOrder}
+            featured
+            onOpenTracking={onOpenTracking}
+            onRepeatOrder={onRepeatOrder}
+            onOpenOrders={onOpenOrders}
+          />
+        ) : (
+          <Surface tone="inset" padding={2} gap={1}>
+            <Text role="bodyStrong">لا يوجد طلب نشط الآن.</Text>
+            <Text role="bodySm" tone="muted">
+              يمكنك فتح سجل الطلبات أو بدء طلب جديد مباشرة.
+            </Text>
+            <Box layoutDirection="row" gap={2}>
+              {onOpenOrders ? <Button label="فتح الطلبات" onPress={onOpenOrders} fullWidth={false} /> : null}
+              {onRepeatOrder ? <Button label="تكرار سريع" tone="secondary" onPress={onRepeatOrder} fullWidth={false} /> : null}
+            </Box>
+          </Surface>
+        )}
       </Surface>
 
       <Surface tone="raised" padding={2} gap={2}>
-        <SectionHeader title="الطلبات المعروضة" subtitle={`${visibleOrders.length} طلبات ظاهرة الآن مع مسار حالة واضح لكل بطاقة.`} />
+        <SectionHeader title="جاهز للتكرار" subtitle="طلبات مكتملة أو جاهزة للاستلام مع إعادة طلب مباشرة." />
 
         <Box gap={2}>
-          {visibleOrders.length > 0 ? (
-            visibleOrders.map((order, index) => (
+          {repeatReadyOrders.length > 0 ? (
+            repeatReadyOrders.map((order) => (
               <OrderCard
                 key={order.id}
                 order={order}
-                featured={index === 0}
                 onOpenTracking={onOpenTracking}
                 onRepeatOrder={onRepeatOrder}
                 onOpenOrders={onOpenOrders}
@@ -286,12 +266,50 @@ export function DshMySpaceOrdersScreen({ onOpenOrders, onOpenTracking, onRepeatO
             <Surface tone="inset" padding={2} gap={1}>
               <Text role="bodyStrong">لا توجد طلبات مطابقة لهذا الفلتر.</Text>
               <Text role="bodySm" tone="muted">
-                جرّب إظهار الكل أو العودة إلى التتبع المباشر.
+                ستظهر هنا الطلبات الجاهزة لإعادة التنفيذ عند توفرها.
               </Text>
               <Box layoutDirection="row" gap={2}>
-                <Button label="إظهار الكل" onPress={() => setSelectedFilterId('all')} fullWidth={false} />
-                {onOpenTracking ? <Button label="التتبع" tone="secondary" onPress={onOpenTracking} fullWidth={false} /> : null}
+                {onOpenOrders ? <Button label="فتح الطلبات" onPress={onOpenOrders} fullWidth={false} /> : null}
+                {onRepeatOrder ? <Button label="تكرار سريع" tone="secondary" onPress={onRepeatOrder} fullWidth={false} /> : null}
               </Box>
+            </Surface>
+          )}
+        </Box>
+      </Surface>
+
+      <Surface tone="raised" padding={2} gap={2}>
+        <SectionHeader title="مراجعات معلقة" subtitle="طلبات تحتاج تقييمًا أو مراجعة قبل إغلاق التجربة بالكامل." />
+
+        <Box gap={2}>
+          {pendingReviewOrders.length > 0 ? (
+            pendingReviewOrders.map((order) => (
+              <Surface key={order.id} tone="inset" padding={2} gap={2} style={{ borderRadius: 18 }}>
+                <Box layoutDirection="row" align="center" gap={2}>
+                  <Box gap={0} style={{ flex: 1 }}>
+                    <Text role="bodyStrong">{order.title}</Text>
+                    <Text role="bodySm" tone="muted">
+                      {order.statusTrailLabel}
+                    </Text>
+                  </Box>
+                  <Badge label="مراجعة مطلوبة" tone="warning" />
+                </Box>
+
+                <Text role="bodySm" tone="muted">
+                  افتح الطلب ثم أكمل التقييم حتى ينتقل المسار من المراجعة إلى الإغلاق.
+                </Text>
+
+                <Box layoutDirection="row" gap={2}>
+                  {onOpenOrders ? <Button label="فتح الطلب" onPress={onOpenOrders} fullWidth={false} /> : null}
+                  {onOpenTracking ? <Button label="متابعة الحالة" tone="secondary" onPress={onOpenTracking} fullWidth={false} /> : null}
+                </Box>
+              </Surface>
+            ))
+          ) : (
+            <Surface tone="inset" padding={2} gap={1}>
+              <Text role="bodyStrong">لا توجد مراجعات معلقة.</Text>
+              <Text role="bodySm" tone="muted">
+                جميع الطلبات الحالية إما نشطة أو جاهزة للتكرار مباشرة.
+              </Text>
             </Surface>
           )}
         </Box>
@@ -303,6 +321,21 @@ export function DshMySpaceOrdersScreen({ onOpenOrders, onOpenTracking, onRepeatO
         onOpenTracking={onOpenTracking}
         onRepeatOrder={onRepeatOrder}
       />
+
+      <Surface tone="raised" padding={2} gap={2}>
+        <SectionHeader title="كل الطلبات الحديثة" subtitle={`${dshMySpaceOrdersFixture.length} بطاقات متاحة مع CTA حسب الحالة.`} />
+        <Box gap={2}>
+          {dshMySpaceOrdersFixture.map((order) => (
+            <OrderCard
+              key={order.id}
+              order={order}
+              onOpenTracking={onOpenTracking}
+              onRepeatOrder={onRepeatOrder}
+              onOpenOrders={onOpenOrders}
+            />
+          ))}
+        </Box>
+      </Surface>
     </Box>
   );
 }

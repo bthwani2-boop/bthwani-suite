@@ -725,7 +725,10 @@ export function DshStoreGetScreen({
         const { dx, dy } = gestureState;
         return Math.abs(dx) > 10 || Math.abs(dy) > 10;
       },
-      onMoveShouldSetPanResponderCapture: () => false,
+      onMoveShouldSetPanResponderCapture: (_evt, gestureState) => {
+        const { dx, dy } = gestureState;
+        return Math.abs(dx) > 10 || Math.abs(dy) > 10;
+      },
       onPanResponderGrant: () => {
         previewDrag.stopAnimation();
         // subtle lift when grabbing
@@ -863,9 +866,10 @@ export function DshStoreGetScreen({
           Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
         ]).start(() => { stagingIdRef.current = null; try { setStagingPreviewItem(null); setStagingType(null); } catch {} });
       },
+      onPanResponderTerminationRequest: () => false,
       onShouldBlockNativeResponder: () => true,
     }),
-    [isRTL, movePreviewByCategoryOffset, movePreviewByItemOffset, previewDrag, categories, selectedCategory, previewItems, previewCurrentIndex, stagingPreviewItem, stagingType]
+    [isRTL, movePreviewByCategoryOffset, movePreviewByItemOffset, previewDrag, categories, selectedCategory, previewItems, previewCurrentIndex, previewRotate, previewScale, resolveItemsForCategory]
   );
 
   const activeMeasurementOptions = React.useMemo(
@@ -1474,12 +1478,13 @@ export function DshStoreGetScreen({
                   },
                 ]}
                 collapsable={false}
-                {...previewPanResponder.panHandlers}
               >
                 <View style={styles.previewImageWrap} pointerEvents="box-none">
+                  <View style={styles.previewSwipeLayer} {...previewPanResponder.panHandlers} />
+
                   {previewPartnerBadge}
 
-                  <Text style={styles.previewEmoji}>{getItemEmoji(previewItem!)}</Text>
+                  <Text style={styles.previewEmoji} pointerEvents="none">{getItemEmoji(previewItem!)}</Text>
 
                   <Image
                     source={resolveDshStoreMenuItemImageSource(previewItem!)}
@@ -1491,7 +1496,7 @@ export function DshStoreGetScreen({
                       const overlayColor = getOverlayColor(normalizeDisplayText(previewItem!.name), 0.86);
                       return (
                         <View style={[styles.previewDetailsBox, { backgroundColor: overlayColor, flexDirection: isRTL ? 'row-reverse' : 'row' }]} pointerEvents="box-none">
-                          <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]}>
+                          <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]} pointerEvents="none">
                             {store ? <Text style={[styles.previewStoreName, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizedStoreName}</Text> : null}
                             <Text style={[styles.previewDetailsTitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.name)}</Text>
                             {previewItem!.subtitle ? <Text style={[styles.previewDetailsSubtitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.subtitle)}</Text> : null}
@@ -2280,6 +2285,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+  },
+  previewSwipeLayer: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 4,
   },
   previewImage: {
     position: 'absolute',

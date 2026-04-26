@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, View, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
-import { Box, Icon, MobileScrollView, Surface, Text, TopBar, spacing, useTheme } from '@bthwani/ui-kit';
+import { Box, Icon, MobileScrollView, Surface, Text, TopBar, safeArea, spacing, useTheme } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
 import { DshMySpaceCommercialScreen } from './DshMySpaceCommercialScreen';
 import { DshMySpaceOrdersScreen } from './DshMySpaceOrdersScreen';
@@ -185,7 +185,7 @@ export function DshMySpaceScreen({
         trailingAction={onBack ? { id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
       />
 
-      <MobileScrollView fill padding={2} gap={2}>
+      <MobileScrollView fill padding={2} gap={2} contentContainerStyle={{ paddingBottom: safeArea.comfortable + spacing[12] }}>
         <Surface tone="raised" padding={2} gap={2}>
           <Box gap={0} style={{ alignItems: 'flex-end' }}>
             <Text role="titleSm">المسارات الرئيسية</Text>
@@ -215,7 +215,7 @@ export function DshMySpaceScreen({
             ))}
             </Box>
           </Surface>
-        </MobileScrollView>
+      </MobileScrollView>
     </View>
   );
 }
