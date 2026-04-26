@@ -661,8 +661,8 @@ export default function DshCartUnifiedScreen(props: any) {
         description: 'ادفع كامل الطلب من رصيد WLT الداخلي.',
         selected: paymentMethod === 'wallet',
         disabled: !canUseWalletFull,
-        statusLabel: !walletLinked ? 'غير مرتبط' : canUseWalletFull ? (paymentMethod === 'wallet' ? 'محدد' : 'كافٍ') : 'يحتاج شحن',
-        statusTone: !walletLinked ? 'info' : canUseWalletFull ? (paymentMethod === 'wallet' ? 'brand' : 'success') : 'brand',
+        statusLabel: paymentMethod === 'wallet' ? 'محدد' : !walletLinked ? 'غير مرتبط' : walletBalance <= 0 ? 'لا يوجد رصيد' : canUseWalletFull ? 'متاح' : 'لا يكفي',
+        statusTone: paymentMethod === 'wallet' ? 'brand' : !walletLinked || walletBalance <= 0 ? 'info' : canUseWalletFull ? 'success' : 'warning',
         amountRows: canUseWalletFull
           ? [
               { label: 'من المحفظة', value: formatHalalasAmount(grandTotalHalalas), tone: 'brand' },
@@ -678,15 +678,17 @@ export default function DshCartUnifiedScreen(props: any) {
                 { label: 'حالة المحفظة', value: 'غير مرتبطة', tone: 'muted' },
               ],
         helperText: canUseWalletFull
-          ? 'الرصيد يكفي، سيتم الدفع كاملًا من المحفظة.'
-          : walletLinked
-            ? `رصيدك لا يكفي، تحتاج شحن ${formattedWalletShortfall}.`
-            : 'اربط محفظتك عبر WLT أولًا حتى يتمكن النظام من قراءة الرصيد الداخلي.',
-        helperTone: canUseWalletFull ? 'success' : walletLinked ? 'brand' : 'info',
+          ? 'الرصيد يكفي للدفع الكامل.'
+          : !walletLinked
+            ? (hasWltServiceRoute ? 'اربط محفظتك أولًا عبر WLT.' : '[TBD: WLT top-up route]')
+            : walletBalance <= 0
+              ? 'لا يوجد رصيد متاح الآن.'
+              : `المتبقي للشحن ${formattedWalletShortfall}.`,
+        helperTone: canUseWalletFull ? 'success' : 'info',
         action: canUseWalletFull
           ? undefined
           : {
-              label: walletLinked ? 'شحن المحفظة' : 'فتح WLT',
+              label: walletLinked ? 'شحن الرصيد' : 'ربط المحفظة',
               tone: 'primary',
               onPress: hasWltServiceRoute ? () => openWltService('wallet-topup') : undefined,
               disabled: !hasWltServiceRoute,
@@ -699,7 +701,7 @@ export default function DshCartUnifiedScreen(props: any) {
         description: 'استخدم الرصيد المتاح وادفع المتبقي عند الاستلام.',
         selected: paymentMethod === 'mixed',
         disabled: !canUseMixedPayment,
-        statusLabel: canUseMixedPayment ? (paymentMethod === 'mixed' ? 'محدد' : 'متاح') : (!walletLinked || walletBalance <= 0 ? 'لا يوجد رصيد' : 'غير ضروري'),
+        statusLabel: paymentMethod === 'mixed' ? 'محدد' : canUseMixedPayment ? 'متاح' : !walletLinked ? 'غير مرتبط' : walletBalance <= 0 ? 'لا يوجد رصيد' : 'غير ضروري',
         statusTone: canUseMixedPayment ? (paymentMethod === 'mixed' ? 'brand' : 'info') : 'info',
         amountRows: canUseMixedPayment
           ? [
@@ -711,11 +713,21 @@ export default function DshCartUnifiedScreen(props: any) {
               { label: 'عند الاستلام', value: formattedGrandTotal, tone: 'brand' },
             ],
         helperText: canUseMixedPayment
-          ? `من المحفظة: ${formattedWalletBalance}، وعند الاستلام: ${formatHalalasAmount(grandTotalHalalas - walletBalance)}.`
-          : (!walletLinked || walletBalance <= 0)
-            ? 'لا يوجد رصيد لاستخدام الدفع المدمج الآن.'
-            : 'الرصيد يكفي للدفع الكامل من المحفظة، لذلك الدفع المدمج غير ضروري.',
-        helperTone: canUseMixedPayment ? 'info' : 'info',
+          ? `من المحفظة ${formattedWalletBalance}، وعند الاستلام ${formatHalalasAmount(grandTotalHalalas - walletBalance)}.`
+          : !walletLinked
+            ? (hasWltServiceRoute ? 'افتح WLT لربط المحفظة.' : '[TBD: WLT top-up route]')
+            : walletBalance <= 0
+              ? 'لا يوجد رصيد للدفع المدمج.'
+              : 'الرصيد يكفي للدفع الكامل من المحفظة.',
+        helperTone: 'info',
+        action: canUseMixedPayment || walletBalance >= grandTotalHalalas
+          ? undefined
+          : {
+              label: !walletLinked ? 'فتح WLT' : 'شحن الرصيد',
+              tone: 'secondary',
+              onPress: hasWltServiceRoute ? () => openWltService('wallet-topup') : undefined,
+              disabled: !hasWltServiceRoute,
+            },
         onSelect: canUseMixedPayment ? () => setPaymentMethod('mixed') : undefined,
       },
       {
@@ -730,11 +742,11 @@ export default function DshCartUnifiedScreen(props: any) {
           { label: 'إجمالي الطلب', value: formattedGrandTotal, tone: 'brand' },
         ],
         helperText: hasWltServiceRoute
-          ? 'هذا الخيار منفصل عن رصيد المحفظة الداخلي. استخدمه لاختيار محفظة رسمية وإكمال الدفع أو الشحن عبر WLT.'
+          ? 'خيار مستقل عن رصيد المحفظة الداخلي.'
           : '[TBD: WLT official wallet route]',
         helperTone: 'info',
         action: {
-          label: hasWltServiceRoute ? 'اختيار محفظة رسمية' : '[TBD: WLT official wallet route]',
+          label: hasWltServiceRoute ? (walletLinked ? 'اختيار محفظة رسمية' : 'فتح WLT') : '[TBD: WLT official wallet route]',
           tone: 'secondary',
           onPress: hasWltServiceRoute ? () => openWltService('official-wallets') : undefined,
           disabled: !hasWltServiceRoute,
