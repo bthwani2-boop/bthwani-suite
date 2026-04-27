@@ -8,24 +8,40 @@ const webCommandCenterCss = `
 }
 
 .bth-web-command-strip {
-  display: grid;
-  gap: 14px;
-  padding: 18px 20px;
-  border-radius: 24px;
-  border: 1px solid rgba(10, 47, 92, 0.1);
-  background: #ffffff;
-  box-shadow: 0 12px 30px rgba(10, 47, 92, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: linear-gradient(135deg, rgba(10, 47, 92, 0.02) 0%, rgba(255, 80, 13, 0.015) 100%);
+  box-shadow: 0 2px 12px rgba(10, 47, 92, 0.04);
+  flex-wrap: wrap;
 }
 
 .bth-web-command-strip__top-row,
 .bth-web-command-strip__secondary-row,
 .bth-web-command-strip__identity,
 .bth-web-command-strip__actions,
-.bth-web-command-strip__filter-row,
 .bth-web-rail-service-list__list {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
+}
+
+.bth-web-command-strip__filter-row {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  flex-shrink: 0;
+  max-width: 100%;
+}
+
+.bth-web-command-strip__filter-row::-webkit-scrollbar {
+  display: none;
 }
 
 .bth-web-command-strip__top-row,
@@ -122,9 +138,7 @@ const webCommandCenterCss = `
 }
 
 .bth-web-command-center__hero {
-  display: grid;
-  gap: 8px;
-  padding: 24px 2px 6px;
+  display: none;
 }
 
 .bth-web-command-center__eyebrow {
@@ -138,24 +152,30 @@ const webCommandCenterCss = `
 
 .bth-web-command-center__title {
   margin: 0;
-  font-size: 34px;
-  line-height: 1.1;
+  font-size: 24px;
+  line-height: 1.2;
   color: #0A2F5C;
 }
 
 .bth-web-command-center__subtitle {
   margin: 0;
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.5;
   color: #475569;
 }
 
-.bth-web-command-center__workspace {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 20px;
-  align-items: start;
-}
+ .bth-web-command-center__workspace {
+   display: grid;
+   grid-template-columns: minmax(0, 1fr) 288px;
+   gap: 24px;
+   align-items: start;
+   direction: rtl;
+ }
+
+ [dir="ltr"] .bth-web-command-center__workspace {
+   grid-template-columns: 288px minmax(0, 1fr);
+   direction: ltr;
+ }
 
 @media (max-width: 900px) {
   .bth-web-command-center__workspace {
@@ -170,11 +190,14 @@ const webCommandCenterCss = `
 }
 
 .bth-web-command-center__rail {
-  padding: 18px;
-  border-radius: 24px;
-  border: 1px solid rgba(10, 47, 92, 0.1);
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(10, 47, 92, 0.04);
+  position: sticky;
+  top: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: linear-gradient(180deg, rgba(10, 47, 92, 0.015) 0%, rgba(255, 255, 255, 1) 40%);
+  box-shadow: 0 4px 16px rgba(10, 47, 92, 0.04);
+  backdrop-filter: blur(8px);
 }
 
 .bth-web-command-center__rail-header {
@@ -182,19 +205,25 @@ const webCommandCenterCss = `
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(10, 47, 92, 0.06);
 }
 
 .bth-web-command-center__rail-title {
   margin: 0;
-  font-size: 18px;
+  font-size: 15px;
   color: #0A2F5C;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.2px;
 }
 
 .bth-web-command-center__rail-status {
-  font-size: 12px;
+  font-size: 11px;
   color: #64748b;
-  font-weight: 600;
+  font-weight: 700;
+  background: rgba(10, 47, 92, 0.04);
+  padding: 4px 10px;
+  border-radius: 999px;
 }
 
 .bth-web-command-center__rail-nav {
@@ -394,45 +423,41 @@ export function WebCommandStrip({
     <>
       <WebCommandCenterStyles />
       <header className="bth-web-command-strip" dir={direction}>
-        <div className="bth-web-command-strip__top-row">
-          <div className="bth-web-command-strip__identity">
-            <button type="button" className="bth-web-command-strip__pill bth-web-command-strip__brand" onClick={onBrandClick}>
-              {brandLabel}
-            </button>
-            <button type="button" className="bth-web-command-strip__pill bth-web-command-strip__alert" onClick={onAlertClick}>
-              {alertCountLabel}
-            </button>
-            <button type="button" className="bth-web-command-strip__pill bth-web-command-strip__language" onClick={resolvedLanguageClick}>
-              {resolvedLanguageLabel}
-            </button>
-          </div>
+        <div className="bth-web-command-strip__identity">
+          <button type="button" className="bth-web-command-strip__pill bth-web-command-strip__brand" onClick={onBrandClick}>
+            {brandLabel}
+          </button>
+          <button type="button" className="bth-web-command-strip__pill bth-web-command-strip__alert" onClick={onAlertClick} aria-label={panelText.ui.alertCountLabel}>
+            {alertCountLabel}
+          </button>
+        </div>
 
+        <div className="bth-web-command-strip__filter-row">
+          {filters.length > 0 ? filters.map((filter) => (
+            <button
+              key={filter.id}
+              type="button"
+              className={['bth-web-command-strip__filter-chip', filter.active ? 'bth-web-command-strip__filter-chip--active' : ''].filter(Boolean).join(' ')}
+              onClick={() => onFilterSelect?.(filter.id)}
+            >
+              {filter.icon ? <span className="bth-web-command-strip__filter-icon">{filter.icon}</span> : null}
+              <span className="bth-web-command-strip__filter-label">{filter.label}</span>
+              {filter.metaLabel ? <span className="bth-web-command-strip__filter-meta">{filter.metaLabel}</span> : null}
+            </button>
+          )) : null}
+        </div>
+
+        <div className="bth-web-command-strip__actions">
           <button type="button" className="bth-web-command-strip__pill bth-web-command-strip__search" onClick={onSearchClick}>
             <span className="bth-web-command-strip__search-icon">⌕</span>
             <span className="bth-web-command-strip__search-placeholder">{resolvedSearchPlaceholder}</span>
           </button>
-        </div>
-
-        <div className="bth-web-command-strip__secondary-row">
           <button type="button" className="bth-web-command-strip__pill bth-web-command-strip__refresh" onClick={onRefreshClick}>
             {resolvedRefreshLabel}
           </button>
-          {filters.length > 0 ? (
-            <div className="bth-web-command-strip__filter-row">
-              {filters.map((filter) => (
-                <button
-                  key={filter.id}
-                  type="button"
-                  className={['bth-web-command-strip__filter-chip', filter.active ? 'bth-web-command-strip__filter-chip--active' : ''].filter(Boolean).join(' ')}
-                  onClick={() => onFilterSelect?.(filter.id)}
-                >
-                  {filter.icon ? <span className="bth-web-command-strip__filter-icon">{filter.icon}</span> : null}
-                  <span className="bth-web-command-strip__filter-label">{filter.label}</span>
-                  {filter.metaLabel ? <span className="bth-web-command-strip__filter-meta">{filter.metaLabel}</span> : null}
-                </button>
-              ))}
-            </div>
-          ) : null}
+          <button type="button" className="bth-web-command-strip__pill bth-web-command-strip__language" onClick={resolvedLanguageClick}>
+            {resolvedLanguageLabel}
+          </button>
         </div>
       </header>
     </>

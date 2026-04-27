@@ -1,36 +1,34 @@
 import React from 'react';
-import {
-  Box,
-  Button,
-  KeyValueList,
-  ListItem,
-  MobileCommandCenterShell,
-  MobileCommandSectionList,
-  MobileCommandSummaryStrip,
-  MobileInlineManagementPanel,
-  MobileOperationalWorkspace,
-  MobileQuickActions,
-  MobileStickyPrimaryAction,
-  Surface,
-  Text,
-  TextField,
-  useDirection,
-} from '@bthwani/ui-kit';
-import type {
-  MobileCommandSectionItemData,
-  MobileQuickActionItem,
-} from '@bthwani/ui-kit';
+import { Pressable, View } from 'react-native';
+import { Box, Button, Chip, Icon, ListItem, MobileCommandSectionList, MobileScrollView, MobileStickyPrimaryAction, StateView, Surface, Text, TextField, useDirection, useTheme } from '@bthwani/ui-kit';
 
 type PartnerHubSection = 'hub' | 'profile' | 'operations' | 'inventory' | 'wallet' | 'analytics' | 'settings' | 'type-switch';
 
 type PartnerServiceType = 'dsh' | 'arb';
 
-type PartnerServiceMode = {
-  id: string;
-  label: string;
-  description: string;
+type PartnerOperationalMode = {
+  id: 'pickup' | 'delivery' | 'scheduled';
+  title: string;
+  subtitle: string;
+  commission: string;
   enabled: boolean;
 };
+
+type PartnerTeamMember = {
+  id: string;
+  name: string;
+  roleLabel: 'مشرف' | 'موظف' | 'موصل';
+  subtitle: string;
+};
+
+type PartnerCoverageZone = {
+  id: string;
+  name: string;
+  subtitle: string;
+  active: boolean;
+};
+
+type PartnerDshConsoleScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
 type PartnerTypeOption = {
   id: PartnerServiceType;
@@ -38,7 +36,21 @@ type PartnerTypeOption = {
   description: string;
 };
 
-type PartnerDshConsoleScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
+type HubNavigationItem = {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ComponentProps<typeof Icon>['name'];
+  kind: 'orders' | 'section';
+  section?: Exclude<PartnerHubSection, 'hub'>;
+};
+
+type SummaryItem = {
+  id: string;
+  label: string;
+  value: string;
+  tone?: 'default' | 'brand' | 'success' | 'warning' | 'info';
+};
 
 type Props = {
   state?: PartnerDshConsoleScreenState;
@@ -53,7 +65,7 @@ type Props = {
   activeZoneLabel?: string;
   storeOpen?: boolean;
   listingEnabled?: boolean;
-  serviceModes?: readonly PartnerServiceMode[];
+  serviceModes?: readonly { id: string; label: string; description: string; enabled: boolean }[];
   activeOrdersCount?: number;
   urgentOrdersCount?: number;
   pendingActionsCount?: number;
@@ -73,33 +85,618 @@ const defaultTypeOptions: readonly PartnerTypeOption[] = [
   { id: 'arb', label: 'ARB', description: 'تشغيل عرب الشركاء والمسارات' },
 ] as const;
 
-const defaultServiceModes: readonly PartnerServiceMode[] = [
-  { id: 'pickup', label: 'استلم بنفسك', description: 'استلام من الفرع مباشرة.', enabled: true },
-  { id: 'delivery', label: 'توصيل المتجر', description: 'توصيل من الفرع بطاقم المتجر.', enabled: true },
-  { id: 'scheduled', label: 'توصيل بثواني', description: 'قناة سريعة عند الحاجة.', enabled: false },
+const defaultOperationalModes: readonly PartnerOperationalMode[] = [
+  { id: 'pickup', title: 'استلم بنفسك', subtitle: 'استلام من الفرع مباشرة.', commission: '0%', enabled: true },
+  { id: 'delivery', title: 'توصيل المتجر', subtitle: 'قناة توصيل داخلية.', commission: '8%', enabled: true },
+  { id: 'scheduled', title: 'توصيل بثواني', subtitle: 'جدولة سريعة عند الحاجة.', commission: '15%', enabled: false },
 ] as const;
 
-function resolveOperationsModes(serviceModes: readonly PartnerServiceMode[]) {
-  return [
-    {
-      id: 'pickup',
-      title: 'استلم بنفسك',
-      commission: '0%',
-      enabled: serviceModes.find((mode) => mode.id === 'pickup')?.enabled ?? true,
-    },
-    {
-      id: 'store-delivery',
-      title: 'توصيل المتجر',
-      commission: '8%',
-      enabled: serviceModes.find((mode) => mode.id === 'delivery' || mode.id === 'store-delivery')?.enabled ?? true,
-    },
-    {
-      id: 'seconds',
-      title: 'توصيل بثواني',
-      commission: '15%',
-      enabled: serviceModes.find((mode) => mode.id === 'seconds' || mode.id === 'scheduled')?.enabled ?? false,
-    },
-  ] as const;
+const defaultTeamMembers: readonly PartnerTeamMember[] = [
+  { id: 'manager', name: 'خالد', roleLabel: 'مشرف', subtitle: 'مشرف الفرع الحالي' },
+  { id: 'staff-1', name: 'سارة', roleLabel: 'موظف', subtitle: 'إدارة الطلبات والردود' },
+  { id: 'staff-2', name: 'مروان', roleLabel: 'موظف', subtitle: 'التجهيز والكتالوج' },
+  { id: 'rider-1', name: 'عمر', roleLabel: 'موصل', subtitle: 'التسليم والحركة' },
+] as const;
+
+const defaultCoverageZones: readonly PartnerCoverageZone[] = [
+  { id: 'yasmin', name: 'الياسمين', subtitle: 'نطاق رئيسي عالي الجاهزية.', active: true },
+  { id: 'nada', name: 'الندى', subtitle: 'نطاق قريب مع طلب ثابت.', active: true },
+] as const;
+
+const partnerHubBottomInset = 112;
+
+const hubNavigationItems: readonly HubNavigationItem[] = [
+  {
+    id: 'orders',
+    title: 'الطلبات',
+    description: 'إدارة الطلبات الحالية والسابقة وتتبع حالتها.',
+    icon: 'receipt-outline',
+    kind: 'orders',
+  },
+  {
+    id: 'profile',
+    title: 'ملف المتجر',
+    description: 'تحديث معلومات المتجر والهوية والظهور.',
+    icon: 'storefront-outline',
+    kind: 'section',
+    section: 'profile',
+  },
+  {
+    id: 'operations',
+    title: 'العمليات والفريق',
+    description: 'حالة المتجر، التوصيل، الفريق، ومناطق التغطية.',
+    icon: 'people-outline',
+    kind: 'section',
+    section: 'operations',
+  },
+  {
+    id: 'inventory',
+    title: 'المخزون والكتالوج',
+    description: 'إدارة المنتجات، الأسعار، والمخزون.',
+    icon: 'cube-outline',
+    kind: 'section',
+    section: 'inventory',
+  },
+  {
+    id: 'wallet',
+    title: 'المحفظة والحسابات المالية',
+    description: 'الرصيد، المستحقات، التسويات، وآخر حركة.',
+    icon: 'wallet-outline',
+    kind: 'section',
+    section: 'wallet',
+  },
+  {
+    id: 'analytics',
+    title: 'التحليلات والنمو والتسويق',
+    description: 'الأداء، الفرص، العروض، والتوصيات.',
+    icon: 'trending-up-outline',
+    kind: 'section',
+    section: 'analytics',
+  },
+  {
+    id: 'settings',
+    title: 'الإعدادات',
+    description: 'التنبيهات، اللغة، التفضيلات، وإعدادات المتجر.',
+    icon: 'settings-outline',
+    kind: 'section',
+    section: 'settings',
+  },
+  {
+    id: 'type-switch',
+    title: 'تغيير النوع',
+    description: 'تبديل نوع الحساب أو الخدمة.',
+    icon: 'swap-horizontal-outline',
+    kind: 'section',
+    section: 'type-switch',
+  },
+] as const;
+
+const sectionCopy: Record<Exclude<PartnerHubSection, 'hub'>, { title: string; description: string; icon: React.ComponentProps<typeof Icon>['name'] }> = {
+  profile: {
+    title: 'ملف المتجر',
+    description: 'تحديث معلومات المتجر والهوية والظهور.',
+    icon: 'storefront-outline',
+  },
+  operations: {
+    title: 'العمليات والفريق',
+    description: 'حالة المتجر، التوصيل، الفريق، ومناطق التغطية.',
+    icon: 'people-outline',
+  },
+  inventory: {
+    title: 'المخزون والكتالوج',
+    description: 'إدارة المنتجات، الأسعار، والمخزون.',
+    icon: 'cube-outline',
+  },
+  wallet: {
+    title: 'المحفظة والحسابات المالية',
+    description: 'الرصيد، المستحقات، التسويات، وآخر حركة.',
+    icon: 'wallet-outline',
+  },
+  analytics: {
+    title: 'التحليلات والنمو والتسويق',
+    description: 'الأداء، الفرص، العروض، والتوصيات.',
+    icon: 'trending-up-outline',
+  },
+  settings: {
+    title: 'الإعدادات',
+    description: 'التنبيهات، اللغة، التفضيلات، وإعدادات المتجر.',
+    icon: 'settings-outline',
+  },
+  'type-switch': {
+    title: 'تغيير النوع',
+    description: 'تبديل نوع الحساب أو الخدمة.',
+    icon: 'swap-horizontal-outline',
+  },
+};
+
+function SummaryCell({ label, value, tone = 'default' }: Omit<SummaryItem, 'id'>) {
+  const { theme } = useTheme();
+  const accentColor =
+    tone === 'success'
+      ? theme.success
+      : tone === 'warning'
+        ? theme.warning
+        : tone === 'brand'
+          ? theme.brand
+          : tone === 'info'
+            ? theme.info
+            : theme.lineStrong;
+
+  return (
+    <Surface
+      tone="default"
+      padding={3}
+      gap={1}
+      style={{ flex: 1, minWidth: 96, borderWidth: 1, borderColor: accentColor }}
+    >
+      <Text role="caption" tone="muted" numberOfLines={1} align="start">
+        {label}
+      </Text>
+      <Text role="bodyStrong" tone={tone} numberOfLines={1} align="start">
+        {value}
+      </Text>
+    </Surface>
+  );
+}
+
+function HubWorkspaceShell({
+  title,
+  description,
+  icon,
+  onBack,
+  children,
+}: {
+  title: string;
+  description: string;
+  icon: React.ComponentProps<typeof Icon>['name'];
+  onBack: () => void;
+  children?: React.ReactNode;
+}) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
+
+  return (
+    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
+      <Surface tone="raised" padding={4} gap={3}>
+        <View
+          style={{
+            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
+          <View
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 16,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.surfaceInset,
+              borderWidth: 1,
+              borderColor: theme.line,
+            }}
+          >
+            <Icon name={icon} size={20} tone="brand" />
+          </View>
+
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text role="titleMd" align={direction === 'rtl' ? 'end' : 'start'}>
+              {title}
+            </Text>
+            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+              {description}
+            </Text>
+          </View>
+        </View>
+
+        <Surface tone="default" padding={3} gap={1}>
+          <Text role="bodyStrong">[TBD-workspace-binding]</Text>
+          <Text role="bodySm" tone="muted">
+            هذه مساحة مؤقتة مضغوطة للمرحلة 1 فقط. التفاصيل الكاملة لهذا القسم ستأتي لاحقًا.
+          </Text>
+        </Surface>
+
+        {children}
+
+        <Box>
+          <Button label="العودة إلى مركز الحساب" tone="secondary" fullWidth={false} onPress={onBack} />
+        </Box>
+      </Surface>
+    </MobileScrollView>
+  );
+}
+
+function TypeSwitchWorkspace({
+  activeServiceType,
+  typeOptions,
+  onSelectType,
+  onBack,
+}: {
+  activeServiceType: PartnerServiceType;
+  typeOptions: readonly PartnerTypeOption[];
+  onSelectType?: (typeId: PartnerServiceType) => void;
+  onBack: () => void;
+}) {
+  const { direction } = useDirection();
+  const canSwitch = typeof onSelectType === 'function';
+
+  return (
+    <HubWorkspaceShell
+      title="تغيير النوع"
+      description="بدّل بين نوعي الخدمة من نفس المسار دون فتح صفحة جديدة أو إنشاء تبويب مستقل."
+      icon="swap-horizontal-outline"
+      onBack={onBack}
+    >
+      <Surface tone="default" padding={3} gap={3}>
+        <Text role="bodyStrong">اختر النوع النشط</Text>
+        <View
+          style={{
+            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+            flexWrap: 'wrap',
+            gap: 8,
+          }}
+        >
+          {typeOptions.map((option) => (
+            <Button
+              key={option.id}
+              label={`${option.label} · ${option.description}`}
+              tone={option.id === activeServiceType ? 'primary' : 'secondary'}
+              fullWidth={false}
+              disabled={!canSwitch}
+              onPress={() => onSelectType?.(option.id)}
+            />
+          ))}
+        </View>
+        {!canSwitch ? (
+          <Text role="caption" tone="muted">
+            [TBD-workspace-binding] الربط الفعلي للتبديل سيكتمل لاحقًا.
+          </Text>
+        ) : null}
+      </Surface>
+    </HubWorkspaceShell>
+  );
+}
+
+function resolveServiceModeEnabled(serviceModes: readonly { id: string; enabled: boolean }[] | undefined, modeId: PartnerOperationalMode['id'], fallback: boolean) {
+  const matched = serviceModes?.find((mode) => {
+    if (modeId === 'pickup') return mode.id === 'pickup';
+    if (modeId === 'delivery') return mode.id === 'delivery' || mode.id === 'store-delivery';
+    return mode.id === 'scheduled' || mode.id === 'seconds';
+  });
+
+  return matched?.enabled ?? fallback;
+}
+
+function OperationsModeRow({
+  mode,
+  selected,
+  onPress,
+}: {
+  mode: PartnerOperationalMode;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={mode.title}
+      onPress={onPress}
+      style={({ pressed }) => [
+        {
+          width: '100%',
+          paddingHorizontal: 16,
+          paddingVertical: 14,
+          backgroundColor: pressed ? theme.surfaceInset : theme.surface,
+          borderBottomWidth: 1,
+          borderBottomColor: theme.line,
+        },
+      ]}
+    >
+      <View
+        style={{
+          flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+          alignItems: 'center',
+        }}
+      >
+        <View
+          style={{
+            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+            alignItems: 'center',
+            gap: 10,
+            flexShrink: 1,
+            minWidth: 0,
+          }}
+        >
+          <View
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 13,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: selected ? theme.brandSurface : theme.surfaceInset,
+              borderWidth: 1,
+              borderColor: selected ? theme.brand : theme.line,
+              flexShrink: 0,
+            }}
+          >
+            <Icon name={mode.id === 'pickup' ? 'hand-left-outline' : mode.id === 'delivery' ? 'car-outline' : 'time-outline'} size={16} tone={selected ? 'brand' : 'default'} />
+          </View>
+
+          <View style={{ flexShrink: 1, minWidth: 0, gap: 2 }}>
+            <Text role="bodyStrong" align="start" numberOfLines={1}>
+              {mode.title}
+            </Text>
+            <Text role="bodySm" tone="muted" align="start" numberOfLines={1}>
+              {mode.subtitle}
+            </Text>
+          </View>
+        </View>
+
+        <View style={{ flex: 1 }} />
+
+        <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 4, marginEnd: 10 }}>
+          <Chip label={mode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={mode.enabled ? 'success' : 'warning'} />
+          <Text role="caption" tone="muted">
+            {`عمولة ${mode.commission}`}
+          </Text>
+        </View>
+
+        <Icon name="chevron-forward-outline" mirrored tone="muted" size={18} />
+      </View>
+    </Pressable>
+  );
+}
+
+function OperationsWorkspace({
+  activeServiceType,
+  branchLabel,
+  cityLabel,
+  storeName,
+  todayHoursLabel,
+  storeOpen,
+  activeZoneLabel,
+  serviceModes,
+  onBack,
+}: {
+  activeServiceType: PartnerServiceType;
+  branchLabel: string;
+  cityLabel: string;
+  storeName: string;
+  todayHoursLabel: string;
+  storeOpen: boolean;
+  activeZoneLabel: string;
+  serviceModes: readonly { id: string; label: string; description: string; enabled: boolean }[];
+  onBack: () => void;
+}) {
+  const { direction } = useDirection();
+  const [selectedModeId, setSelectedModeId] = React.useState<PartnerOperationalMode['id']>('pickup');
+  const [modeOverrides, setModeOverrides] = React.useState<Partial<Record<PartnerOperationalMode['id'], boolean>>>({});
+  const [teamPanelOpen, setTeamPanelOpen] = React.useState(false);
+  const [coveragePanelOpen, setCoveragePanelOpen] = React.useState(false);
+  const [inviteDraft, setInviteDraft] = React.useState('');
+  const [lastSaveLabel, setLastSaveLabel] = React.useState<string | null>(null);
+
+  const resolvedModes = React.useMemo(
+    () =>
+      defaultOperationalModes.map((mode) => ({
+        ...mode,
+        enabled: modeOverrides[mode.id] ?? resolveServiceModeEnabled(serviceModes, mode.id, mode.enabled),
+      })),
+    [modeOverrides, serviceModes],
+  );
+
+  const activeModesCount = resolvedModes.filter((mode) => mode.enabled).length;
+  const selectedMode = resolvedModes.find((mode) => mode.id === selectedModeId) ?? resolvedModes[0];
+
+  return (
+    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
+      <Surface tone="raised" padding={4} gap={3}>
+        <View
+          style={{
+            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
+          <Button
+            label="العودة"
+            tone="secondary"
+            fullWidth={false}
+            icon={<Icon name="chevron-forward-outline" mirrored size={16} />}
+            onPress={onBack}
+          />
+
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text role="titleMd" align="start">
+              العمليات والفريق
+            </Text>
+            <Text role="bodySm" tone="muted" align="start">
+              {`${storeName} · ${branchLabel} · ${cityLabel} · نوع الخدمة ${activeServiceType === 'dsh' ? 'DSH' : 'ARB'}`}
+            </Text>
+          </View>
+        </View>
+      </Surface>
+
+      <Surface tone="raised" padding={4} gap={3}>
+        <Text role="label" tone="muted">
+          حالة التشغيل الآن
+        </Text>
+
+        <View
+          style={{
+            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+            flexWrap: 'wrap',
+            gap: 10,
+          }}
+        >
+          <SummaryCell label="حالة المتجر" value={storeOpen ? 'مفتوح الآن' : 'مغلق الآن'} tone={storeOpen ? 'success' : 'warning'} />
+          <SummaryCell label="ساعات العمل" value={todayHoursLabel} tone="info" />
+          <SummaryCell label="أوضاع مفعلة" value={`${activeModesCount}/3`} tone="brand" />
+          <SummaryCell label="مناطق نشطة" value="منطقتان" tone="success" />
+        </View>
+      </Surface>
+
+      <Surface tone="raised" padding={0} gap={0} style={{ overflow: 'hidden' }}>
+        <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 10 }}>
+          <Text role="label" tone="muted">
+            أوضاع الخدمة
+          </Text>
+        </View>
+
+        {resolvedModes.map((mode) => (
+          <OperationsModeRow
+            key={mode.id}
+            mode={mode}
+            selected={mode.id === selectedMode.id}
+            onPress={() => setSelectedModeId(mode.id)}
+          />
+        ))}
+
+        <Surface tone="default" padding={3} gap={2} style={{ margin: 16, marginTop: 12 }}>
+          <View
+            style={{
+              flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+            }}
+          >
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text role="bodyStrong" align="start">
+                {selectedMode.title}
+              </Text>
+              <Text role="bodySm" tone="muted" align="start">
+                {selectedMode.subtitle}
+              </Text>
+            </View>
+            <Chip label={selectedMode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={selectedMode.enabled ? 'success' : 'warning'} />
+          </View>
+          <Text role="caption" tone="muted" align="start">
+            {`عمولة ${selectedMode.commission}`}
+          </Text>
+          <Text role="bodySm" tone="muted" align="start">
+            تفاصيل هذا الوضع تظهر داخل نفس الصفحة فقط، ويمكن تبديل حالته محليًا دون أي route جديد.
+          </Text>
+          <Button
+            label={selectedMode.enabled ? 'إيقاف الوضع' : 'تفعيل الوضع'}
+            tone="secondary"
+            fullWidth={false}
+            onPress={() => {
+              setModeOverrides((current) => ({
+                ...current,
+                [selectedMode.id]: !selectedMode.enabled,
+              }));
+            }}
+          />
+        </Surface>
+      </Surface>
+
+      <Surface tone="raised" padding={4} gap={3}>
+        <Text role="label" tone="muted">
+          الفريق
+        </Text>
+        <Text role="bodyStrong" align="start">
+          مشرف 1 · موظف 3 · موصل 2
+        </Text>
+        <Button
+          label="إدارة الفريق"
+          tone="secondary"
+          fullWidth={false}
+          onPress={() => setTeamPanelOpen((current) => !current)}
+        />
+
+        {teamPanelOpen ? (
+          <Surface tone="inset" padding={3} gap={3}>
+            <View
+              style={{
+                flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+                flexWrap: 'wrap',
+                gap: 8,
+              }}
+            >
+              <Chip label="مشرف" tone="brand" />
+              <Chip label="موظف" tone="info" />
+              <Chip label="موصل" tone="success" />
+            </View>
+
+            <View style={{ gap: 10 }}>
+              {defaultTeamMembers.map((member) => (
+                <ListItem key={member.id} title={member.name} subtitle={member.subtitle} meta={member.roleLabel} badgeLabel={member.roleLabel} />
+              ))}
+            </View>
+
+            <Surface tone="default" padding={3} gap={3}>
+              <TextField
+                label="اسم العضو أو البريد"
+                placeholder="مثال: staff@bthwani.sa"
+                value={inviteDraft}
+                onChangeText={setInviteDraft}
+                hint="إضافة عضو تتم داخل نفس الصفحة بدون انتقال إلى أي route جديد."
+              />
+              <Button
+                label="إضافة عضو"
+                tone="secondary"
+                fullWidth={false}
+                onPress={() => {
+                  if (!inviteDraft.trim()) {
+                    return;
+                  }
+
+                  setLastSaveLabel(`دعوة محلية: ${inviteDraft.trim()}`);
+                  setInviteDraft('');
+                }}
+              />
+              {lastSaveLabel ? (
+                <Text role="caption" tone="success">
+                  {lastSaveLabel}
+                </Text>
+              ) : null}
+            </Surface>
+          </Surface>
+        ) : null}
+      </Surface>
+
+      <Surface tone="raised" padding={4} gap={3}>
+        <Text role="label" tone="muted">
+          مناطق التغطية
+        </Text>
+        <Text role="bodyStrong" align="start">
+          منطقتان نشطتان
+        </Text>
+        <Button
+          label="إدارة المناطق"
+          tone="secondary"
+          fullWidth={false}
+          onPress={() => setCoveragePanelOpen((current) => !current)}
+        />
+
+        {coveragePanelOpen ? (
+          <Surface tone="inset" padding={3} gap={3}>
+            <Text role="bodySm" tone="muted" align="start">
+              {`النطاق الحالي: ${activeZoneLabel}`}
+            </Text>
+
+            <View style={{ gap: 10 }}>
+              {defaultCoverageZones.map((zone) => (
+                <ListItem key={zone.id} title={zone.name} subtitle={zone.subtitle} badgeLabel={zone.active ? 'نشط' : 'موقوف'} />
+              ))}
+            </View>
+          </Surface>
+        ) : null}
+      </Surface>
+
+      <MobileStickyPrimaryAction
+        label="حفظ إعدادات العمليات"
+        helperText={lastSaveLabel ? `آخر حفظ: ${lastSaveLabel}` : 'التعديلات تحفظ من نفس الصفحة.'}
+        onPress={() => setLastSaveLabel(new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }))}
+      />
+    </MobileScrollView>
+  );
 }
 
 export function PartnerDshConsoleScreen(props: Props) {
@@ -111,507 +708,171 @@ export function PartnerDshConsoleScreen(props: Props) {
     storeName = 'متجر الفخامة',
     branchLabel = 'الرياض، فرع الياسمين',
     cityLabel = 'الرياض',
-    managerLabel = 'خالد',
     todayHoursLabel = '09:00 - 23:00',
-    activeZoneLabel = 'الياسمين + الملقا',
     storeOpen = true,
-    listingEnabled = true,
-    serviceModes = defaultServiceModes,
+    activeZoneLabel = 'الياسمين / الندى',
     activeOrdersCount = 13,
-    urgentOrdersCount = 2,
-    pendingActionsCount = 5,
+    serviceModes = [],
     typeOptions = defaultTypeOptions,
     onSelectType,
     onOpenOrdersBoard,
-    onOpenInventoryManagement,
     onOpenStoreScope,
     onOpenSupportDirectory,
-    onOpenWalletHub,
     onOpenBell,
   } = props;
-  const { language, setLanguage } = useDirection();
+
+  const { direction } = useDirection();
   const [internalSection, setInternalSection] = React.useState<PartnerHubSection>('hub');
-  const [inventoryQuery, setInventoryQuery] = React.useState('');
-  const [profilePanel, setProfilePanel] = React.useState<'full-profile' | 'identity' | 'scope' | null>(null);
-  const [operationsPanel, setOperationsPanel] = React.useState<'team' | 'coverage' | null>(null);
-  const [operationsSavedAt, setOperationsSavedAt] = React.useState<string | null>(null);
   const activeSection = section ?? internalSection;
   const updateSection = onSectionChange ?? setInternalSection;
-  const operationalModes = React.useMemo(() => resolveOperationsModes(serviceModes), [serviceModes]);
-  const activeModesCount = operationalModes.filter((mode) => mode.enabled).length;
-  const typeSwitchBound = typeof onSelectType === 'function';
-  const availableTypeOptions = typeOptions.length > 0 ? typeOptions : defaultTypeOptions;
 
-  React.useEffect(() => {
-    if (activeSection !== 'profile') {
-      setProfilePanel(null);
-    }
-    if (activeSection !== 'operations') {
-      setOperationsPanel(null);
-    }
-  }, [activeSection]);
+  const summaryItems = React.useMemo<readonly SummaryItem[]>(
+    () => [
+      { id: 'store-status', label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: storeOpen ? 'success' : 'warning' },
+      { id: 'active-orders', label: 'الطلبات النشطة', value: String(activeOrdersCount), tone: 'brand' },
+      { id: 'hours', label: 'ساعات العمل', value: todayHoursLabel, tone: 'info' },
+    ],
+    [activeOrdersCount, storeOpen, todayHoursLabel],
+  );
 
-  const stateConfig = {
-    title: 'جاري تجهيز مركز حساب الشريك',
-    description: 'نجهز الآن مركز الحساب ومساحات العمل التشغيلية.',
-    actionLabel: onOpenOrdersBoard ? 'إعادة المحاولة' : undefined,
-    onActionPress: onOpenOrdersBoard,
-  };
+  if (state !== 'ready') {
+    const stateId = state === 'loading' ? 'loading' : state === 'empty' ? 'empty' : state === 'offline' ? 'offline' : 'blockingError';
 
-  const commandSummary = [
-    { id: 'store-status', label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: storeOpen ? 'success' : 'warning' },
-    { id: 'active-orders', label: 'الطلبات النشطة', value: String(activeOrdersCount), tone: 'brand' },
-    { id: 'hours', label: 'ساعات العمل', value: todayHoursLabel, tone: 'info' },
-    { id: 'branch', label: 'الفرع', value: branchLabel },
-  ] as const;
-
-  const commandSections: readonly MobileCommandSectionItemData[] = [
-    {
-      id: 'orders',
-      title: 'الطلبات',
-      subtitle: 'افتح الطلبات الجارية مباشرة دون المرور بأي لوحة إضافية.',
-      icon: 'receipt-outline',
-      meta: 'الهبوط الافتراضي لتطبيق الشريك',
-      statusLabel: `${activeOrdersCount} نشطة`,
-      statusTone: 'brand',
-      onPress: onOpenOrdersBoard,
-    },
-    {
-      id: 'profile',
-      title: 'ملف المتجر',
-      subtitle: 'بيانات المتجر، الهوية، والنطاق من مساحة عمل واحدة.',
-      icon: 'storefront-outline',
-      meta: branchLabel,
-      statusLabel: listingEnabled ? 'جاهز' : 'يحتاج مراجعة',
-      statusTone: listingEnabled ? 'success' : 'warning',
-      onPress: () => updateSection('profile'),
-    },
-    {
-      id: 'operations',
-      title: 'العمليات والفريق',
-      subtitle: 'حالة المتجر، أوضاع الخدمة، الفريق، ومناطق التغطية في سطح واحد.',
-      icon: 'grid-outline',
-      meta: `${activeModesCount}/3 أوضاع مفعلة`,
-      statusLabel: 'تشغيل يومي',
-      statusTone: 'brand',
-      onPress: () => updateSection('operations'),
-    },
-    {
-      id: 'inventory',
-      title: 'المخزون والكتالوج',
-      subtitle: 'بحث أولًا ثم إدخال سريع مع دعم GTIN و SKU و barcode.',
-      icon: 'albums-outline',
-      meta: 'Search-first central catalog',
-      statusLabel: 'منع التكرار',
-      statusTone: 'info',
-      onPress: () => updateSection('inventory'),
-    },
-    {
-      id: 'wallet',
-      title: 'المحفظة والحسابات المالية',
-      subtitle: 'الرصيد، المستحقات، التسويات، وآخر حركة من نفس الممر.',
-      icon: 'wallet-outline',
-      meta: 'رؤية مالية مختصرة',
-      statusLabel: 'جاهزة',
-      statusTone: 'success',
-      onPress: () => updateSection('wallet'),
-    },
-    {
-      id: 'analytics',
-      title: 'التحليلات والنمو والتسويق',
-      subtitle: 'الأداء، الفرص، العروض، الاشتراك، والتوصيات العملية.',
-      icon: 'trending-up-outline',
-      meta: 'قراءة تنفيذية سريعة',
-      statusLabel: 'فرص جديدة',
-      statusTone: 'warning',
-      onPress: () => updateSection('analytics'),
-    },
-    {
-      id: 'settings',
-      title: 'الإعدادات',
-      subtitle: 'إعدادات مختصرة مع لغة الواجهة والنطاق وقنوات الإشعار.',
-      icon: 'settings-outline',
-      meta: 'إعدادات خفيفة',
-      statusLabel: 'مختصرة',
-      statusTone: 'default',
-      onPress: () => updateSection('settings'),
-    },
-    {
-      id: 'type-switch',
-      title: 'تغيير النوع',
-      subtitle: 'بدّل بين DSH و ARB من نفس المسار بدون تشتيت.',
-      icon: 'swap-horizontal-outline',
-      meta: activeServiceType === 'dsh' ? 'DSH مفعل' : 'ARB مفعل',
-      statusLabel: typeSwitchBound ? 'مرتبط' : '[TBD-binding]',
-      statusTone: typeSwitchBound ? 'success' : 'warning',
-      onPress: () => updateSection('type-switch'),
-    },
-  ];
-
-  const quickActions: readonly MobileQuickActionItem[] = [
-    { id: 'notifications', label: 'الإشعارات', icon: 'notifications-outline', onPress: onOpenBell },
-    { id: 'branch', label: 'اختيار الفرع', icon: 'git-branch-outline', onPress: onOpenStoreScope, tone: 'secondary' },
-    { id: 'support', label: 'الدعم', icon: 'headset-outline', onPress: onOpenSupportDirectory, tone: 'ghost' },
-  ];
-
-  if (activeSection === 'hub') {
     return (
-      <MobileCommandCenterShell
-        state={state}
-        stateConfig={stateConfig}
-        badgeLabel={activeServiceType === 'dsh' ? 'DSH' : 'ARB'}
-        badgeTone="warning"
+      <StateView
+        stateId={stateId}
         title="مركز حساب الشريك"
-        description="كل ما تحتاجه لإدارة متجرك وتنمية أعمالك من مكان واحد. ابدأ بالقسم المطلوب وستبقى كل التفاصيل داخل مساحة عمل واحدة هادئة وواضحة."
-        headerNote={`${storeName} · ${branchLabel}`}
-        summaryStrip={<MobileCommandSummaryStrip items={commandSummary} />}
-        quickActions={<MobileQuickActions title="إجراءات سريعة" items={quickActions} />}
-      >
-        <MobileCommandSectionList
-          title="الأقسام الرئيسية"
-          subtitle="قائمة عمودية واضحة بدل التبويبات الأفقية الرئيسية. كل عنصر يفتح مساحة عمل واحدة فقط."
-          items={commandSections}
+        description="نجهز الآن نموذج التنقل الخاص بالحساب. سيبقى المسار واضحًا ومضغوطًا حتى يكتمل التحميل."
+        actionLabel={onOpenOrdersBoard ? 'فتح الطلبات' : undefined}
+        onActionPress={onOpenOrdersBoard}
+      />
+    );
+  }
+
+  if (activeSection !== 'hub') {
+    if (activeSection === 'operations') {
+      return (
+        <OperationsWorkspace
+          activeServiceType={activeServiceType}
+          branchLabel={branchLabel}
+          cityLabel={cityLabel}
+          storeName={storeName}
+          todayHoursLabel={todayHoursLabel}
+          storeOpen={storeOpen}
+          activeZoneLabel={activeZoneLabel}
+          serviceModes={serviceModes}
+          onBack={() => updateSection('hub')}
         />
-      </MobileCommandCenterShell>
-    );
-  }
+      );
+    }
 
-  if (activeSection === 'profile') {
+    if (activeSection === 'type-switch') {
+      return (
+        <TypeSwitchWorkspace
+          activeServiceType={activeServiceType}
+          typeOptions={typeOptions.length > 0 ? typeOptions : defaultTypeOptions}
+          onSelectType={onSelectType}
+          onBack={() => updateSection('hub')}
+        />
+      );
+    }
+
+    const copy = sectionCopy[activeSection];
+
     return (
-      <MobileOperationalWorkspace
-        state={state}
-        stateConfig={stateConfig}
-        title="ملف المتجر"
-        description="إدارة ملف المتجر، الهوية، والاعتماد من مساحة تشغيل واحدة مضغوطة بدل تشتيت التفاصيل عبر شاشات متعددة."
+      <HubWorkspaceShell
+        title={copy.title}
+        description={copy.description}
+        icon={copy.icon}
         onBack={() => updateSection('hub')}
-        overview={
-          <MobileCommandSummaryStrip
-            items={[
-              { id: 'profile-ready', label: 'الملف', value: 'جاهز', tone: 'success' },
-              { id: 'listing', label: 'الظهور', value: listingEnabled ? 'مفعّل' : 'موقوف', tone: listingEnabled ? 'success' : 'warning' },
-              { id: 'identity', label: 'الاعتماد', value: 'قيد المتابعة', tone: 'info' },
-              { id: 'scope', label: 'النطاق', value: activeZoneLabel },
-            ]}
-          />
-        }
-      >
-        <Surface tone="raised" gap={3}>
-          <KeyValueList
-            items={[
-              { label: 'اسم المتجر', value: storeName },
-              { label: 'الفرع', value: branchLabel },
-              { label: 'المدينة', value: cityLabel },
-              { label: 'المدير', value: managerLabel },
-              { label: 'ساعات العمل', value: todayHoursLabel },
-            ]}
-          />
-          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <Button label="عرض الملف الكامل" tone="secondary" fullWidth={false} onPress={() => setProfilePanel((current) => (current === 'full-profile' ? null : 'full-profile'))} />
-            <Button label="الهوية والاعتماد" tone="secondary" fullWidth={false} onPress={() => setProfilePanel((current) => (current === 'identity' ? null : 'identity'))} />
-            <Button label="اختيار النطاق" tone="ghost" fullWidth={false} onPress={() => setProfilePanel((current) => (current === 'scope' ? null : 'scope'))} />
-          </Box>
-        </Surface>
-
-        <MobileInlineManagementPanel
-          title="عرض الملف الكامل"
-          subtitle="تفاصيل الملف الأساسية تظهر inline داخل نفس مساحة العمل."
-          open={profilePanel === 'full-profile'}
-          onToggle={() => setProfilePanel((current) => (current === 'full-profile' ? null : 'full-profile'))}
-          summaryItems={[
-            { label: 'الاسم التجاري', value: storeName },
-            { label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: storeOpen ? 'success' : 'warning' },
-            { label: 'الظهور في القائمة', value: listingEnabled ? 'مفعّل' : 'موقوف', tone: listingEnabled ? 'success' : 'warning' },
-          ]}
-        >
-          <KeyValueList
-            items={[
-              { label: 'اسم المسؤول', value: managerLabel },
-              { label: 'الفرع الحالي', value: branchLabel },
-              { label: 'المدينة', value: cityLabel },
-              { label: 'ساعات اليوم', value: todayHoursLabel },
-              { label: 'منطقة التغطية', value: activeZoneLabel, tone: 'brand' },
-            ]}
-          />
-        </MobileInlineManagementPanel>
-
-        <MobileInlineManagementPanel
-          title="الهوية والاعتماد"
-          subtitle="الهوية والامتثال داخل نفس الصفحة بدل فتح شاشة مشتتة."
-          open={profilePanel === 'identity'}
-          onToggle={() => setProfilePanel((current) => (current === 'identity' ? null : 'identity'))}
-          summaryItems={[
-            { label: 'السجل التجاري', value: 'محدث' },
-            { label: 'هوية المفوض', value: 'قيد التحقق', tone: 'warning' },
-            { label: 'SLA', value: '24 ساعة', tone: 'info' },
-          ]}
-        >
-          <ListItem title="الهوية النظامية" subtitle="رفع وتحديث مستندات الهوية بدون الخروج من ملف المتجر." badgeLabel="Ready" />
-          <ListItem title="حالة الاعتماد" subtitle="كل خطوة تظهر هنا بصيغة عملية واضحة وقابلة للمراجعة." badgeLabel="Inline" />
-        </MobileInlineManagementPanel>
-
-        <MobileInlineManagementPanel
-          title="اختيار النطاق"
-          subtitle="يمكن إدارة النطاق من هذا السطح أو فتح sheet خفيف عند الحاجة."
-          open={profilePanel === 'scope'}
-          onToggle={() => setProfilePanel((current) => (current === 'scope' ? null : 'scope'))}
-          summaryItems={[
-            { label: 'النطاق الحالي', value: activeZoneLabel, tone: 'brand' },
-            { label: 'الفرع', value: branchLabel },
-          ]}
-          footer={onOpenStoreScope ? <Button label="فتح اختيار الفرع" tone="secondary" onPress={onOpenStoreScope} /> : null}
-        >
-          <ListItem title="نطاق الفرع الحالي" subtitle="تبديل النطاق يتم من نفس الممر دون شاشة مشتتة." badgeLabel="Scope" />
-        </MobileInlineManagementPanel>
-      </MobileOperationalWorkspace>
-    );
-  }
-
-  if (activeSection === 'operations') {
-    return (
-      <MobileOperationalWorkspace
-        state={state}
-        stateConfig={stateConfig}
-        title="العمليات والفريق"
-        description="إدارة حالة المتجر، أوضاع التوصيل، الفريق، ومناطق التغطية من سطح واحد."
-        onBack={() => updateSection('hub')}
-        overview={
-          <MobileCommandSummaryStrip
-            items={[
-              { id: 'operations-status', label: 'حالة التشغيل الآن', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: storeOpen ? 'success' : 'warning' },
-              { id: 'operations-hours', label: 'ساعات العمل', value: todayHoursLabel },
-              { id: 'operations-modes', label: 'أوضاع الخدمة', value: `${activeModesCount}/3`, tone: 'brand' },
-              { id: 'operations-zones', label: 'مناطق التغطية', value: 'منطقتان نشطتان', tone: 'info' },
-            ]}
-          />
-        }
-        stickyPrimaryAction={
-          <MobileStickyPrimaryAction
-            label="حفظ إعدادات العمليات"
-            helperText={operationsSavedAt ? `آخر حفظ: ${operationsSavedAt}` : 'إجراء أساسي واحد وواضح لهذه الصفحة.'}
-            onPress={() => setOperationsSavedAt(new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }))}
-          />
-        }
-      >
-        <Surface tone="raised" gap={3}>
-          <Text role="bodyStrong">أوضاع الخدمة</Text>
-          <Box gap={2}>
-            {operationalModes.map((mode) => (
-              <ListItem
-                key={mode.id}
-                title={mode.title}
-                subtitle={`${mode.enabled ? 'مفعّل' : 'غير مفعّل'} — عمولة ${mode.commission}`}
-                meta={mode.id === 'pickup' ? 'استلام سريع من الفرع' : mode.id === 'store-delivery' ? 'توصيل المتجر بطاقم الفرع' : 'قناة سرعة عالية عند الحاجة'}
-                badgeLabel={mode.enabled ? 'مفعّل' : 'غير مفعّل'}
-              />
-            ))}
-          </Box>
-        </Surface>
-
-        <MobileInlineManagementPanel
-          title="الفريق"
-          subtitle="مشرف 1 · موظف 3 · موصل 2"
-          open={operationsPanel === 'team'}
-          onToggle={() => setOperationsPanel((current) => (current === 'team' ? null : 'team'))}
-          summaryItems={[
-            { label: 'المشرفون', value: '1' },
-            { label: 'الموظفون', value: '3' },
-            { label: 'الموصلون', value: '2' },
-          ]}
-          chips={[
-            { id: 'manager', label: 'مشرف', tone: 'brand' },
-            { id: 'staff', label: 'موظف', tone: 'info' },
-            { id: 'rider', label: 'موصل', tone: 'success' },
-          ]}
-          footer={<Button label="إضافة عضو" tone="secondary" onPress={onOpenSupportDirectory} />}
-        >
-          <ListItem title="مشرف الفرع" subtitle="يدير القرار التشغيلي ويغلق التصعيد." badgeLabel="مشرف" />
-          <ListItem title="طاقم التشغيل" subtitle="يتعامل مع التحضير والكتالوج والردود اليومية." badgeLabel="موظف" />
-          <ListItem title="الموصلون" subtitle="يتعاملون مع التسليم والالتقاط فقط داخل نفس السطح." badgeLabel="موصل" />
-        </MobileInlineManagementPanel>
-
-        <MobileInlineManagementPanel
-          title="مناطق التغطية"
-          subtitle="منطقتان نشطتان"
-          open={operationsPanel === 'coverage'}
-          onToggle={() => setOperationsPanel((current) => (current === 'coverage' ? null : 'coverage'))}
-          summaryItems={[
-            { label: 'النطاق الحالي', value: activeZoneLabel, tone: 'brand' },
-            { label: 'المدينة', value: cityLabel },
-            { label: 'الحالة', value: 'منطقتان نشطتان', tone: 'success' },
-          ]}
-          footer={onOpenStoreScope ? <Button label="إدارة المناطق" tone="secondary" onPress={onOpenStoreScope} /> : null}
-        >
-          <ListItem title="الياسمين" subtitle="نطاق رئيسي عالي الجاهزية." badgeLabel="نشط" />
-          <ListItem title="الملقا" subtitle="نطاق قريب مع طلب ثابت." badgeLabel="نشط" />
-        </MobileInlineManagementPanel>
-      </MobileOperationalWorkspace>
-    );
-  }
-
-  if (activeSection === 'inventory') {
-    return (
-      <MobileOperationalWorkspace
-        state={state}
-        stateConfig={stateConfig}
-        title="المخزون والكتالوج"
-        description="مساحة بحث أولًا للكتالوج المركزي، مع إدخال سريع ودعم واضح لـ GTIN و SKU و barcode ومنع التكرار."
-        onBack={() => updateSection('hub')}
-        overview={
-          <MobileCommandSummaryStrip
-            items={[
-              { id: 'catalog-search', label: 'Search-first', value: 'مفعّل', tone: 'brand' },
-              { id: 'catalog-gtin', label: 'GTIN/SKU', value: 'جاهز', tone: 'info' },
-              { id: 'catalog-dedupe', label: 'التكرار', value: 'ممنوع', tone: 'warning' },
-              { id: 'catalog-intake', label: 'الإدخال السريع', value: 'متاح' },
-            ]}
-          />
-        }
-      >
-        <Surface tone="raised" gap={3}>
-          <TextField
-            label="بحث في الكتالوج المركزي"
-            placeholder="GTIN / SKU / barcode / الاسم"
-            value={inventoryQuery}
-            onChangeText={setInventoryQuery}
-            hint="ابدأ دائمًا بالبحث قبل إنشاء عنصر جديد حتى لا يتكرر المنتج."
-          />
-          <Box gap={2}>
-            <ListItem title="إدخال سريع" subtitle="ابدأ من البحث ثم أنشئ أو حدّث المنتج من نفس المسار." badgeLabel="Fast" />
-            <ListItem title="مطابقة GTIN / SKU / barcode" subtitle="المسار جاهز لالتقاط المعرّفات المعيارية قبل الحفظ. [TBD-binding]" badgeLabel="Standard" />
-            <ListItem title="مراجعة قبل النشر" subtitle="لا يتم حفظ أي دفعة قبل التأكد من عدم وجود تكرار أو تضارب." badgeLabel="Review" />
-          </Box>
-          <Button label="فتح إدارة المنتجات" tone="secondary" onPress={onOpenInventoryManagement} />
-        </Surface>
-      </MobileOperationalWorkspace>
-    );
-  }
-
-  if (activeSection === 'wallet') {
-    return (
-      <MobileOperationalWorkspace
-        state={state}
-        stateConfig={stateConfig}
-        title="المحفظة والحسابات المالية"
-        description="الرصيد، المستحقات، التسويات، وآخر حركة في مساحة مالية واحدة واضحة."
-        onBack={() => updateSection('hub')}
-        overview={
-          <MobileCommandSummaryStrip
-            items={[
-              { id: 'balance', label: 'الرصيد', value: 'SAR 12,480', tone: 'brand' },
-              { id: 'dues', label: 'المستحقات', value: 'SAR 3,240', tone: 'success' },
-              { id: 'settlements', label: 'التسويات', value: 'جاهزة', tone: 'info' },
-              { id: 'movement', label: 'آخر حركة', value: 'اليوم 10:15' },
-            ]}
-          />
-        }
-      >
-        <Surface tone="raised" gap={3}>
-          <KeyValueList
-            items={[
-              { label: 'الرصيد المتاح', value: 'SAR 12,480', tone: 'brand' },
-              { label: 'المستحق القادم', value: 'SAR 3,240', tone: 'success' },
-              { label: 'التسوية القادمة', value: 'غدًا 09:00' },
-              { label: 'آخر حركة', value: 'إيداع تسوية صباحية' },
-            ]}
-          />
-          {onOpenWalletHub ? <Button label="فتح المحفظة والتسويات" tone="secondary" onPress={onOpenWalletHub} /> : null}
-        </Surface>
-      </MobileOperationalWorkspace>
-    );
-  }
-
-  if (activeSection === 'analytics') {
-    return (
-      <MobileOperationalWorkspace
-        state={state}
-        stateConfig={stateConfig}
-        title="التحليلات والنمو والتسويق"
-        description="قراءة تنفيذية مختصرة للأداء والفرص والعروض والاشتراك والتوصيات العملية."
-        onBack={() => updateSection('hub')}
-        overview={
-          <MobileCommandSummaryStrip
-            items={[
-              { id: 'performance', label: 'الأداء', value: 'مستقر', tone: 'success' },
-              { id: 'opportunities', label: 'الفرص', value: '3 فرص', tone: 'warning' },
-              { id: 'offers', label: 'العروض', value: '8%', tone: 'brand' },
-              { id: 'subscription', label: 'الاشتراك', value: 'بثواني برو', tone: 'info' },
-            ]}
-          />
-        }
-      >
-        <Surface tone="raised" gap={3}>
-          <ListItem title="الأداء التشغيلي" subtitle={`يوجد ${activeOrdersCount} طلبًا نشطًا و${urgentOrdersCount} بحاجة متابعة دقيقة.`} badgeLabel="أداء" />
-          <ListItem title="فرص النمو" subtitle="العروض القصيرة المرتبطة بفئة أو اشتراك واحد أكثر وضوحًا من الرسائل العامة." badgeLabel="فرص" />
-          <ListItem title="التوصيات" subtitle="ابدأ بعرض واحد ثم راقب أثره قبل فتح مسار جديد. [TBD-binding]" badgeLabel="توصية" />
-        </Surface>
-      </MobileOperationalWorkspace>
-    );
-  }
-
-  if (activeSection === 'settings') {
-    return (
-      <MobileOperationalWorkspace
-        state={state}
-        stateConfig={stateConfig}
-        title="الإعدادات"
-        description="إعدادات مختصرة وواضحة للغة الواجهة، النطاق، والتنبيهات الأساسية."
-        onBack={() => updateSection('hub')}
-        overview={
-          <MobileCommandSummaryStrip
-            items={[
-              { id: 'settings-language', label: 'اللغة', value: language === 'ar' ? 'العربية' : 'English', tone: 'brand' },
-              { id: 'settings-alerts', label: 'التنبيهات', value: 'مفعلة [TBD-binding]', tone: 'warning' },
-              { id: 'settings-scope', label: 'الفرع', value: branchLabel },
-              { id: 'settings-service', label: 'النوع', value: activeServiceType.toUpperCase(), tone: 'info' },
-            ]}
-          />
-        }
-      >
-        <Surface tone="raised" gap={3}>
-          <Text role="bodyStrong">لغة الواجهة</Text>
-          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <Button label="العربية" tone={language === 'ar' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setLanguage('ar')} />
-            <Button label="English" tone={language === 'en' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setLanguage('en')} />
-          </Box>
-          <ListItem title="التنبيهات" subtitle="تخصيص التنبيهات سيُربط لاحقًا بمصدره الحي. [TBD-binding]" badgeLabel="TBD" />
-          {onOpenStoreScope ? <Button label="تغيير النطاق" tone="secondary" onPress={onOpenStoreScope} /> : null}
-        </Surface>
-      </MobileOperationalWorkspace>
+      />
     );
   }
 
   return (
-    <MobileOperationalWorkspace
-      state={state}
-      stateConfig={stateConfig}
-      title="تغيير النوع"
-      description="بدّل بين DSH و ARB من نفس الممر، مع توضيح حالة الربط الحالية بوضوح."
-      onBack={() => updateSection('hub')}
-      overview={
-        <MobileCommandSummaryStrip
-          items={[
-            { id: 'current-type', label: 'النوع الحالي', value: activeServiceType.toUpperCase(), tone: 'brand' },
-            { id: 'binding', label: 'حالة الربط', value: typeSwitchBound ? 'مرتبط محليًا' : '[TBD-binding]', tone: typeSwitchBound ? 'success' : 'warning' },
-          ]}
-        />
-      }
-    >
-      <Surface tone="raised" gap={3}>
-        <Box gap={2}>
-          {availableTypeOptions.map((option) => (
-            <Button
-              key={option.id}
-              label={`${option.label} · ${option.description}`}
-              tone={option.id === activeServiceType ? 'primary' : 'secondary'}
-              onPress={() => onSelectType?.(option.id)}
-            />
-          ))}
-        </Box>
-        <Text role="caption" tone="muted">
-          {typeSwitchBound ? 'التبديل يحدّث shell الحالي مباشرة.' : '[TBD-binding] لا يوجد ربط تشغيلي فعلي بعد.'}
+    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
+      <Surface tone="raised" padding={4} gap={2}>
+        <Text role="titleLg">مركز حساب الشريك</Text>
+        <Text role="bodySm" tone="muted">
+          كل ما تحتاجه لإدارة متجرك وتنمية أعمالك من مكان واحد.
         </Text>
       </Surface>
-    </MobileOperationalWorkspace>
+
+      <Surface tone="raised" padding={3} gap={3}>
+        <View
+          style={{
+            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+            flexWrap: 'wrap',
+            gap: 10,
+          }}
+        >
+          {summaryItems.map((item) => (
+            <SummaryCell key={item.id} {...item} />
+          ))}
+        </View>
+      </Surface>
+
+      <MobileCommandSectionList
+        title="الأقسام الرئيسية"
+        subtitle="قائمة عمودية واضحة لكل قسم داخل الحساب."
+        items={hubNavigationItems.map((item) => ({
+          id: item.id,
+          title: item.title,
+          subtitle: item.description,
+          icon: item.icon,
+          onPress: () => {
+            if (item.kind === 'orders') {
+              onOpenOrdersBoard?.();
+              return;
+            }
+
+            if (item.section) {
+              updateSection(item.section);
+            }
+          },
+        }))}
+      />
+
+      <Surface tone="raised" padding={4} gap={3}>
+        <Text role="label" tone="muted">
+          إجراءات سريعة
+        </Text>
+
+        <View
+          style={{
+            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+            flexWrap: 'wrap',
+            gap: 8,
+          }}
+        >
+          <Button
+            label="الإشعارات"
+            tone="secondary"
+            fullWidth={false}
+            icon={<Icon name="notifications-outline" size={16} />}
+            onPress={onOpenBell}
+          />
+          <Button
+            label="اختيار الفرع"
+            tone="secondary"
+            fullWidth={false}
+            icon={<Icon name="git-branch-outline" size={16} />}
+            onPress={onOpenStoreScope}
+          />
+          <Button
+            label="الدعم"
+            tone="secondary"
+            fullWidth={false}
+            icon={<Icon name="headset-outline" size={16} />}
+            onPress={onOpenSupportDirectory}
+          />
+        </View>
+
+        <Text role="caption" tone="muted">
+          {storeName} · {branchLabel}
+        </Text>
+      </Surface>
+    </MobileScrollView>
   );
 }
 

@@ -1,61 +1,58 @@
 .stageStack {
   display: grid;
-  gap: 12px;
+  gap: 20px;
+  direction: rtl;
+  text-align: right;
 }
 
-.missionDockHeader {
-  border-radius: 16px;
-  border: 1px solid #fed7aa;
-  background:
-    linear-gradient(135deg, #fff7ed 0%, #ffffff 82%);
-  padding: 10px 12px;
+/* ===== Context Bar (replaces mission dock header + hero card) ===== */
+.contextBar {
   display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(10, 47, 92, 0.04) 0%, rgba(255, 80, 13, 0.03) 100%);
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  border-radius: 16px;
+}
+
+.contextBarMain {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.contextBarEyebrow {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
+}
+
+.contextBarActions {
+  display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-.missionDockEyebrow {
-  margin: 0;
-  color: var(--bth-brand);
-  font-size: 10px;
-  font-weight: 700;
-  border: 1px solid #fed7aa;
-  border-radius: 999px;
-  padding: 3px 8px;
-  background: #fff7ed;
-}
-
-.missionDockTitle {
-  margin: 0;
-  color: var(--bth-text);
-  font-size: 22px;
-  line-height: 1.25;
-  font-weight: 800;
-}
-
-.missionDockSubtitle {
-  margin: 0;
-  color: var(--bth-text-muted);
-  font-size: 12px;
-  margin-inline-start: auto;
-}
-
-.priorityPanel {
+/* ===== Metrics Strip ===== */
+.metricsStrip {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
 }
 
-.signalGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
+/* ===== Context Panel (service chips) ===== */
 .contextPanel {
   border: 1px solid var(--bth-line);
   border-radius: 16px;
-  padding: 12px;
+  padding: 12px 16px;
   background: var(--bth-surface-raised);
   display: grid;
   gap: 8px;
@@ -64,7 +61,7 @@
 .contextTitle {
   margin: 0;
   color: var(--bth-text);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -95,7 +92,8 @@
   color: var(--bth-text-muted);
 }
 
-.subsectionPanel {
+/* ===== Section Panels ===== */
+.sectionPanel {
   border-radius: 20px;
   border: 1px solid var(--bth-line);
   background: var(--bth-surface);
@@ -104,31 +102,31 @@
   gap: 12px;
 }
 
-.subsectionHeader {
+.sectionHeader {
   display: grid;
   gap: 4px;
 }
 
-.subsectionTitle {
+.sectionTitle {
   margin: 0;
   color: var(--bth-text);
   font-size: 20px;
   font-weight: 800;
 }
 
-.subsectionDescription {
+.sectionDescription {
   margin: 0;
   color: var(--bth-text-muted);
   font-size: 13px;
 }
 
-.subsectionGrid {
+.sectionGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
-.subsectionLink {
+.sectionLink {
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -139,41 +137,42 @@
   background: var(--bth-surface-raised);
 }
 
-.subsectionLinkActive {
-  border-color: #fb923c;
+.sectionLinkActive {
+  border-color: var(--bth-brand);
   background: var(--bth-brand-surface);
 }
 
-.subsectionLinkLabel {
+.sectionLinkLabel {
   color: var(--bth-text);
   font-size: 15px;
   font-weight: 800;
 }
 
-.subsectionLinkDescription {
+.sectionLinkDescription {
   color: var(--bth-text-muted);
   font-size: 12px;
   line-height: 1.5;
 }
 
+/* ===== State Container ===== */
+.stateContainer {
+  padding: 40px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+}
+
 @media (max-width: 980px) {
-  .signalGrid,
-  .subsectionGrid {
+  .metricsStrip,
+  .sectionGrid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 640px) {
-  .missionDockTitle {
-    font-size: 18px;
-  }
-
-  .missionDockSubtitle {
-    margin-inline-start: 0;
-    width: 100%;
-  }
-
-  .subsectionPanel {
-    padding: 13px;
+  .contextBar {
+    flex-direction: column;
+    padding: 16px;
   }
 }
