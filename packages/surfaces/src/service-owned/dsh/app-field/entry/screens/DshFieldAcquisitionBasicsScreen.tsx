@@ -1,22 +1,20 @@
 import React from 'react';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import {
   Badge,
   Box,
-  Button,
   Card,
   Chip,
-  CompactStatusStepper,
   KeyValueList,
   ListItem,
   MobileScrollView,
+  SheetFrame,
   StateView,
   StickyActionBar,
   Text,
   TextField,
   useTheme,
 } from '@bthwani/ui-kit';
-import type { CompactStatusStep } from '@bthwani/ui-kit';
 
 export type DshEntryScreenState = 'ready' | 'loading' | 'empty' | 'offline' | 'error' | 'disabled' | 'submitted';
 
@@ -42,8 +40,7 @@ type LeadStatus =
   | 'follow-up-required'
   | 'ready-for-onboarding'
   | 'submitted';
-type LeadFilter = 'all' | 'approval-pending' | 'follow-up' | 'ready' | 'submitted';
-type WorkspaceMode = 'quick' | 'full';
+type LeadFilter = 'all' | 'today' | 'ready' | 'follow-up' | 'pending' | 'submitted';
 type LeadResult = 'interested' | 'follow-up' | 'not-interested' | 'not-suitable' | 'ready-for-onboarding';
 
 type LeadRecord = {
@@ -64,15 +61,15 @@ type LeadRecord = {
 };
 
 const leadStatusLabels: Record<LeadStatus, string> = {
-  'new-lead': 'New Lead',
-  'visit-planned': 'Visit Planned',
-  'offer-pending-approval': 'Offer Pending Approval',
-  'offer-approved': 'Offer Approved',
-  'appointment-scheduled': 'Appointment Scheduled',
-  visited: 'Visited',
-  'follow-up-required': 'Follow-up Required',
-  'ready-for-onboarding': 'Ready for Onboarding',
-  submitted: 'Submitted',
+  'new-lead': 'فرصة جديدة',
+  'visit-planned': 'زيارة مخططة',
+  'offer-pending-approval': 'بانتظار اعتماد العرض',
+  'offer-approved': 'العرض معتمد',
+  'appointment-scheduled': 'جاهز للزيارة',
+  visited: 'بانتظار تسجيل النتيجة',
+  'follow-up-required': 'تحتاج متابعة',
+  'ready-for-onboarding': 'جاهز للإضافة',
+  submitted: 'قيد مراجعة الشركاء',
 };
 
 const leadStatusTones: Record<LeadStatus, 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info'> = {
@@ -89,10 +86,11 @@ const leadStatusTones: Record<LeadStatus, 'default' | 'brand' | 'success' | 'war
 
 const leadFilterOptions: readonly { id: LeadFilter; label: string; tone: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' }[] = [
   { id: 'all', label: 'الكل', tone: 'default' },
-  { id: 'approval-pending', label: 'بانتظار الموافقة', tone: 'warning' },
-  { id: 'follow-up', label: 'متابعة', tone: 'info' },
+  { id: 'today', label: 'اليوم', tone: 'brand' },
   { id: 'ready', label: 'جاهز للإضافة', tone: 'success' },
-  { id: 'submitted', label: 'مُرسل', tone: 'brand' },
+  { id: 'follow-up', label: 'تحتاج متابعة', tone: 'info' },
+  { id: 'pending', label: 'بانتظار اعتماد', tone: 'warning' },
+  { id: 'submitted', label: 'مرسل', tone: 'brand' },
 ];
 
 const visitResultOptions: readonly { id: LeadResult; label: string; tone: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' }[] = [
@@ -112,12 +110,12 @@ const defaultLeads: LeadRecord[] = [
     location: 'حي الياسمين',
     status: 'offer-pending-approval',
     nextVisitLabel: 'اليوم 5:30 م',
-    visitPurpose: 'مراجعة العرض وتثبيت الموعد',
+    visitPurpose: 'إرسال العرض المختصر إلى قسم الشركاء',
     proposedOffer: 'خصم أول 3 أشهر + عمولة معيارية',
-    approvalNote: 'بانتظار اعتماد قسم الشركاء.',
-    resultNote: 'العميل مهتم لكن يحتاج تأكيد الشروط.',
+    approvalNote: 'سيظهر في لوحة الشركاء كـ Offer Pending Approval حتى يصدر القرار.',
+    resultNote: 'المتجر مهتم، والقرار الآن عند قسم الشركاء.',
     followUpLabel: 'الأربعاء 12:00 م',
-    onboardingNote: 'يتحول إلى الإضافة بعد الجاهزية فقط.',
+    onboardingNote: 'الخطوة التالية: اعتماد أو رفض أو تعديل العرض من قسم الشركاء.',
     visitResult: null,
   },
   {
@@ -126,14 +124,14 @@ const defaultLeads: LeadRecord[] = [
     name: 'مخبز الزاوية',
     category: 'مخابز',
     location: 'النرجس',
-    status: 'appointment-scheduled',
+    status: 'offer-approved',
     nextVisitLabel: 'غدًا 10:30 ص',
-    visitPurpose: 'تأكيد الموعد وتفقد الجاهزية',
+    visitPurpose: 'بدء الزيارة بعد اعتماد العرض',
     proposedOffer: 'بداية تجريبية بعمولة خفيفة',
-    approvalNote: 'العرض معتمد ويمكن استخدامه أثناء الزيارة.',
-    resultNote: 'تم الاتفاق على العودة غدًا.',
+    approvalNote: 'قسم الشركاء اعتمد العرض، ويمكن للمندوب بدء الزيارة.',
+    resultNote: 'الزيارة التالية ستثبت القرار الميداني.',
     followUpLabel: '',
-    onboardingNote: 'بانتظار نتيجة الزيارة النهائية.',
+    onboardingNote: 'بعد الزيارة يسجل المندوب النتيجة داخل نفس المسار.',
     visitResult: 'interested',
   },
   {
@@ -142,14 +140,14 @@ const defaultLeads: LeadRecord[] = [
     name: 'متجر المدى',
     category: 'بقالات',
     location: 'العقيق',
-    status: 'offer-approved',
+    status: 'visited',
     nextVisitLabel: 'اليوم 7:00 م',
-    visitPurpose: 'بدء الزيارة بعد اعتماد العرض',
+    visitPurpose: 'تسجيل نتيجة الزيارة الأخيرة',
     proposedOffer: 'نطاق افتتاح محدود + مراجعة تشغيلية',
-    approvalNote: 'اعتمد قسم الشركاء العرض المختصر.',
-    resultNote: 'يمكن بدء الزيارة مباشرة.',
+    approvalNote: 'العرض معتمد مسبقًا.',
+    resultNote: 'الزيارة تمت، ويتبقى فقط تثبيت النتيجة التالية.',
     followUpLabel: '',
-    onboardingNote: 'جاهز فقط بعد نتيجة الزيارة.',
+    onboardingNote: 'إما متابعة لاحقة أو جاهزية للإضافة حسب النتيجة.',
     visitResult: 'interested',
   },
   {
@@ -160,12 +158,12 @@ const defaultLeads: LeadRecord[] = [
     location: 'الملقا',
     status: 'follow-up-required',
     nextVisitLabel: 'الأربعاء 1:00 م',
-    visitPurpose: 'متابعة بعد العرض الأول',
+    visitPurpose: 'جدولة متابعة قصيرة بدل فتح مسار طويل',
     proposedOffer: 'عرض مبدئي تحت المراجعة',
-    approvalNote: 'أحتاج متابعة مع الشريك قبل الإقفال.',
+    approvalNote: 'يحتاج تعديلًا بسيطًا قبل الحسم.',
     resultNote: 'العميل طلب مراجعة الأسعار.',
     followUpLabel: 'الأربعاء 1:00 م',
-    onboardingNote: 'لا يفتح مسار الإضافة قبل الجاهزية.',
+    onboardingNote: 'بعد المتابعة إما اعتماد العرض أو انتقال مباشر للإضافة.',
     visitResult: 'follow-up',
   },
   {
@@ -178,7 +176,7 @@ const defaultLeads: LeadRecord[] = [
     nextVisitLabel: 'اليوم 9:00 م',
     visitPurpose: 'التحويل إلى إضافة المتجر',
     proposedOffer: 'الانتقال إلى نموذج الإضافة الحالي',
-    approvalNote: 'مؤهل للانتقال الآن إلى store-activation.',
+    approvalNote: 'الحالة أصبحت Ready for Onboarding بعد اعتماد الشركاء.',
     resultNote: 'كل الشروط الأساسية مكتملة.',
     followUpLabel: '',
     onboardingNote: 'يفتح نموذج إضافة المتجر مباشرة.',
@@ -191,46 +189,28 @@ const defaultLeads: LeadRecord[] = [
     category: 'مقاهٍ',
     location: 'الصحافة',
     status: 'submitted',
-    nextVisitLabel: 'مُرسل اليوم',
-    visitPurpose: 'تمت الإحالة للمراجعة',
-    proposedOffer: 'مرفوع للمراجعة الداخلية',
-    approvalNote: 'تمت الإحالة إلى المراجعة النهائية.',
-    resultNote: 'تم الإرسال بعد اكتمال المراجعة.',
+    nextVisitLabel: 'اليوم 11:20 ص',
+    visitPurpose: 'تمت الإحالة إلى Partner Review',
+    proposedOffer: 'الملف المرسل ينتظر مراجعة الشركاء',
+    approvalNote: 'الطلب في لوحة التحكم داخل Partner Review. توليد كود الشريك [TBD] بعد الموافقة.',
+    resultNote: 'تم الإرسال من الميدان ولا يحتاج إجراء ميداني جديد الآن.',
     followUpLabel: '',
-    onboardingNote: 'بانتظار نتيجة الإرسال فقط.',
-    visitResult: 'not-interested',
+    onboardingNote: 'بعد قرار الشركاء ينتقل إلى التسويق للمراجعة النهائية [TBD].',
+    visitResult: null,
   },
 ];
 
-function statusRank(status: LeadStatus) {
-  if (status === 'new-lead') return 0;
-  if (status === 'visit-planned') return 1;
-  if (status === 'offer-pending-approval' || status === 'offer-approved' || status === 'appointment-scheduled') return 2;
-  if (status === 'visited' || status === 'follow-up-required') return 3;
-  if (status === 'ready-for-onboarding') return 4;
-  return 5;
-}
-
-function buildSteps(status: LeadStatus): readonly CompactStatusStep[] {
-  const currentStage = statusRank(status);
-
-  return [
-    { id: 'lead', title: 'الفرصة', state: currentStage > 0 ? 'done' : currentStage === 0 ? 'current' : 'next' },
-    { id: 'visit-plan', title: 'الزيارة', state: currentStage > 1 ? 'done' : currentStage === 1 ? 'current' : 'next' },
-    { id: 'offer', title: 'العرض', state: currentStage > 2 ? 'done' : currentStage === 2 ? 'current' : 'next' },
-    { id: 'result', title: 'النتيجة', state: currentStage > 3 ? 'done' : currentStage === 3 ? 'current' : 'next' },
-    { id: 'onboarding', title: 'الإضافة', state: currentStage > 4 ? 'done' : currentStage === 4 ? 'current' : 'next' },
-    { id: 'submitted', title: 'الإرسال', state: currentStage >= 5 ? 'current' : 'next' },
-  ];
+function isTodayLead(lead: LeadRecord) {
+  return lead.nextVisitLabel.includes('اليوم');
 }
 
 function resolvePrimaryActionLabel(status: LeadStatus) {
-  if (status === 'offer-pending-approval') return 'طلب اعتماد العرض';
-  if (status === 'new-lead' || status === 'visit-planned') return 'تحديد موعد';
-  if (status === 'offer-approved' || status === 'appointment-scheduled') return 'بدء الزيارة';
-  if (status === 'visited' || status === 'follow-up-required') return 'تسجيل نتيجة الزيارة';
+  if (status === 'offer-pending-approval' || status === 'new-lead') return 'طلب اعتماد العرض';
+  if (status === 'visit-planned' || status === 'offer-approved' || status === 'appointment-scheduled') return 'بدء الزيارة';
+  if (status === 'visited') return 'تسجيل النتيجة';
+  if (status === 'follow-up-required') return 'جدولة متابعة';
   if (status === 'ready-for-onboarding') return 'فتح إضافة المتجر';
-  return 'العودة إلى القائمة';
+  return 'بانتظار مراجعة الشركاء';
 }
 
 function resolvePrimaryActionTone(status: LeadStatus): 'primary' | 'secondary' | 'success' {
@@ -239,28 +219,55 @@ function resolvePrimaryActionTone(status: LeadStatus): 'primary' | 'secondary' |
   return 'primary';
 }
 
+function resolvePrimaryActionDisabled(status: LeadStatus) {
+  return status === 'submitted';
+}
+
 function resolveStatusLabel(status: LeadStatus) {
   return leadStatusLabels[status];
 }
 
+function resolveSourceLabel(source: LeadSource) {
+  return source === 'manual' ? 'يدوي' : 'مرشحة';
+}
+
+function resolveControlPanelStatus(status: LeadStatus) {
+  if (status === 'offer-pending-approval') {
+    return 'يظهر لقسم الشركاء كـ Offer Pending Approval.';
+  }
+
+  if (status === 'offer-approved') {
+    return 'اعتمد قسم الشركاء العرض، ويظهر للمندوب Offer Approved.';
+  }
+
+  if (status === 'ready-for-onboarding') {
+    return 'عند الجاهزية يفتح نموذج إضافة المتجر الحالي مباشرة.';
+  }
+
+  if (status === 'submitted') {
+    return 'بعد الإرسال ينتقل إلى Partner Review، ثم كود الشريك [TBD] فالتسويق [TBD].';
+  }
+
+  return 'التفاصيل تبقى داخل المتجر، ولا تُفتح إلا عند الحاجة.';
+}
+
 export function DshFieldAcquisitionBasicsScreen({
   state = 'ready',
-  title = 'DSH Field Acquisition Basics',
-  subtitle = 'قائمة المتاجر هي المدخل الرئيسي. التفاصيل الإضافية تظهر فقط عند الحاجة أو من تبويبات الحساب.',
+  title = 'تشغيل الميدان اليوم',
+  subtitle = 'قائمة سريعة للمتاجر والإجراء التالي.',
   onOpenActivationPress,
   onOpenGeoPinPress,
   onOpenVisitLogPress,
-  onOpenInventoryPress,
   onRetry,
 }: DshEntryScreenProps) {
   const { theme } = useTheme();
-  const [mode, setMode] = React.useState<WorkspaceMode>('quick');
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [leadFilter, setLeadFilter] = React.useState<LeadFilter>('all');
+  const [leadFilter, setLeadFilter] = React.useState<LeadFilter>('today');
   const [selectedLeadId, setSelectedLeadId] = React.useState(defaultLeads[0]?.id ?? '');
+  const [detailsVisible, setDetailsVisible] = React.useState(false);
   const [leads, setLeads] = React.useState<LeadRecord[]>(defaultLeads);
 
-  const selectedLead = React.useMemo(() => leads.find((lead) => lead.id === selectedLeadId) ?? leads[0] ?? null, [leads, selectedLeadId]);
+  const selectedLead = React.useMemo(() => leads.find((lead) => lead.id === selectedLeadId) ?? null, [leads, selectedLeadId]);
 
   const filteredLeads = React.useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -268,9 +275,10 @@ export function DshFieldAcquisitionBasicsScreen({
     return leads.filter((lead) => {
       const filterMatches =
         leadFilter === 'all'
-          || (leadFilter === 'approval-pending' && (lead.status === 'new-lead' || lead.status === 'visit-planned' || lead.status === 'offer-pending-approval' || lead.status === 'appointment-scheduled'))
+          || (leadFilter === 'today' && isTodayLead(lead))
           || (leadFilter === 'follow-up' && lead.status === 'follow-up-required')
           || (leadFilter === 'ready' && lead.status === 'ready-for-onboarding')
+          || (leadFilter === 'pending' && (lead.status === 'new-lead' || lead.status === 'offer-pending-approval'))
           || (leadFilter === 'submitted' && lead.status === 'submitted');
 
       if (!filterMatches) {
@@ -286,12 +294,36 @@ export function DshFieldAcquisitionBasicsScreen({
     });
   }, [leads, leadFilter, searchQuery]);
 
+  React.useEffect(() => {
+    if (!filteredLeads.length) {
+      setSelectedLeadId('');
+      setDetailsVisible(false);
+      return;
+    }
+
+    const selectionIsVisible = filteredLeads.some((lead) => lead.id === selectedLeadId);
+    if (!selectionIsVisible) {
+      setSelectedLeadId(filteredLeads[0].id);
+    }
+  }, [filteredLeads, selectedLeadId]);
+
   const summaryCounts = React.useMemo(() => ({
-    total: leads.length,
+    all: leads.length,
+    today: leads.filter(isTodayLead).length,
     ready: leads.filter((lead) => lead.status === 'ready-for-onboarding').length,
     followUp: leads.filter((lead) => lead.status === 'follow-up-required').length,
+    pending: leads.filter((lead) => lead.status === 'new-lead' || lead.status === 'offer-pending-approval').length,
     submitted: leads.filter((lead) => lead.status === 'submitted').length,
   }), [leads]);
+
+  const leadFilterCounts = React.useMemo<Record<LeadFilter, number>>(() => ({
+    all: summaryCounts.all,
+    today: summaryCounts.today,
+    ready: summaryCounts.ready,
+    'follow-up': summaryCounts.followUp,
+    pending: summaryCounts.pending,
+    submitted: summaryCounts.submitted,
+  }), [summaryCounts]);
 
   const updateSelectedLead = React.useCallback((updater: (current: LeadRecord) => LeadRecord) => {
     setLeads((current) => current.map((lead) => (lead.id === selectedLeadId ? updater(lead) : lead)));
@@ -302,12 +334,12 @@ export function DshFieldAcquisitionBasicsScreen({
     const nextLead: LeadRecord = {
       id,
       source: 'manual',
-      name: 'فرصة يدوية جديدة',
+      name: 'فرصة ميدانية جديدة',
       category: 'قيد التحديد',
       location: 'لم يُحدد بعد',
       status: 'new-lead',
-      nextVisitLabel: 'لم يُحدد الموعد بعد',
-      visitPurpose: 'تخطيط أول زيارة',
+      nextVisitLabel: 'اليوم',
+      visitPurpose: 'تجهيز عرض مختصر قبل الإرسال',
       proposedOffer: 'بانتظار إعداد العرض المختصر',
       approvalNote: 'لم يُرسل إلى قسم الشركاء بعد.',
       resultNote: '',
@@ -318,8 +350,9 @@ export function DshFieldAcquisitionBasicsScreen({
 
     setLeads((current) => [nextLead, ...current]);
     setSelectedLeadId(id);
-    setLeadFilter('all');
+    setLeadFilter('today');
     setSearchQuery('');
+    setDetailsVisible(true);
   }, []);
 
   const handleScheduleVisit = React.useCallback(() => {
@@ -331,8 +364,9 @@ export function DshFieldAcquisitionBasicsScreen({
       ...lead,
       status: 'appointment-scheduled',
       nextVisitLabel: lead.nextVisitLabel || 'غدًا 10:30 ص',
-      visitPurpose: lead.visitPurpose || 'تثبيت الموعد وتفقد الجاهزية',
-      approvalNote: 'تم تثبيت الموعد المختصر.',
+      visitPurpose: 'الزيارة جاهزة الآن داخل المسار اليومي المختصر',
+      approvalNote: 'العرض معتمد والزيارة أصبحت جاهزة للتنفيذ.',
+      resultNote: 'ابدأ الزيارة ثم سجّل نتيجتها من البطاقة المختصرة.',
     }));
   }, [selectedLead, updateSelectedLead]);
 
@@ -343,8 +377,10 @@ export function DshFieldAcquisitionBasicsScreen({
 
     updateSelectedLead((lead) => ({
       ...lead,
-      status: 'offer-approved',
-      approvalNote: 'العرض معتمد ويمكن إظهاره أثناء الزيارة.',
+      status: 'submitted',
+      approvalNote: 'أُرسل الآن إلى Partner Review داخل لوحة الشركاء كـ Offer Pending Approval.',
+      onboardingNote: 'بانتظار قرار اعتماد أو رفض أو تعديل العرض من قسم الشركاء.',
+      resultNote: 'لا يحتاج المندوب أي خطوة أخرى حتى يعود القرار من لوحة التحكم.',
     }));
   }, [selectedLead, updateSelectedLead]);
 
@@ -364,11 +400,16 @@ export function DshFieldAcquisitionBasicsScreen({
             : 'visited',
       resultNote:
         result === 'follow-up'
-          ? 'العميل طلب متابعة.'
+          ? 'العميل طلب متابعة قصيرة قبل الإغلاق.'
           : result === 'ready-for-onboarding'
             ? 'جاهز للإضافة مباشرة.'
-            : lead.resultNote,
-      onboardingNote: result === 'ready-for-onboarding' ? 'يفتح نموذج إضافة المتجر الآن.' : lead.onboardingNote,
+            : 'تم تثبيت النتيجة الميدانية، ويمكن الرجوع لها من البطاقة المختصرة.',
+      onboardingNote:
+        result === 'ready-for-onboarding'
+          ? 'يفتح نموذج إضافة المتجر الآن.'
+          : result === 'follow-up'
+            ? 'الخطوة التالية هي جدولة متابعة واحدة واضحة.'
+            : lead.onboardingNote,
     }));
   }, [selectedLead, updateSelectedLead]);
 
@@ -377,18 +418,42 @@ export function DshFieldAcquisitionBasicsScreen({
       return;
     }
 
-    if (selectedLead.status === 'offer-pending-approval') {
+    if (selectedLead.status === 'offer-pending-approval' || selectedLead.status === 'new-lead') {
       handleRequestApproval();
+      setDetailsVisible(true);
       return;
     }
 
-    if (selectedLead.status === 'new-lead' || selectedLead.status === 'visit-planned') {
+    if (selectedLead.status === 'visit-planned') {
       handleScheduleVisit();
+      setDetailsVisible(true);
       return;
     }
 
-    if (selectedLead.status === 'offer-approved' || selectedLead.status === 'appointment-scheduled' || selectedLead.status === 'visited' || selectedLead.status === 'follow-up-required') {
+    if (selectedLead.status === 'offer-approved' || selectedLead.status === 'appointment-scheduled') {
+      updateSelectedLead((lead) => ({
+        ...lead,
+        status: 'visited',
+        resultNote: 'بدأت الزيارة. سجّل النتيجة عند الانتهاء.',
+      }));
+      setDetailsVisible(true);
       onOpenVisitLogPress?.();
+      return;
+    }
+
+    if (selectedLead.status === 'visited') {
+      setDetailsVisible(true);
+      onOpenVisitLogPress?.();
+      return;
+    }
+
+    if (selectedLead.status === 'follow-up-required') {
+      updateSelectedLead((lead) => ({
+        ...lead,
+        nextVisitLabel: lead.followUpLabel || 'غدًا 11:00 ص',
+        approvalNote: 'تم تثبيت متابعة مختصرة لهذا المتجر.',
+      }));
+      setDetailsVisible(true);
       return;
     }
 
@@ -397,33 +462,26 @@ export function DshFieldAcquisitionBasicsScreen({
       return;
     }
 
-    setSelectedLeadId(leads[0]?.id ?? '');
-  }, [handleRequestApproval, handleScheduleVisit, leads, onOpenActivationPress, onOpenVisitLogPress, selectedLead]);
+    setDetailsVisible(true);
+  }, [handleRequestApproval, handleScheduleVisit, onOpenActivationPress, onOpenVisitLogPress, selectedLead, updateSelectedLead]);
 
-  const primaryActionLabel = selectedLead ? resolvePrimaryActionLabel(selectedLead.status) : 'العودة إلى القائمة';
+  const primaryActionLabel = selectedLead ? resolvePrimaryActionLabel(selectedLead.status) : 'اختر متجرًا';
   const primaryActionTone = selectedLead ? resolvePrimaryActionTone(selectedLead.status) : 'secondary';
-
-  const secondaryActionLabel = selectedLead?.status === 'ready-for-onboarding' ? 'إدارة المنتجات' : 'إضافة فرصة يدوية';
-  const secondaryActionHandler = selectedLead?.status === 'ready-for-onboarding' ? onOpenInventoryPress : handleAddManualLead;
 
   const selectedDetailItems = React.useMemo(() => {
     if (!selectedLead) {
       return [];
     }
 
-    const items = [
+    return [
       { label: 'الحالة', value: resolveStatusLabel(selectedLead.status), tone: leadStatusTones[selectedLead.status] },
-      { label: 'الموقع', value: selectedLead.location },
-      { label: 'موعد الزيارة القادمة', value: selectedLead.nextVisitLabel, tone: 'brand' as const },
-      { label: 'العرض المختصر', value: selectedLead.proposedOffer, tone: 'warning' as const },
-      { label: 'ملاحظة الشريك', value: selectedLead.approvalNote },
-      { label: 'ما تبقى', value: selectedLead.onboardingNote },
+      { label: 'الموقع والوقت', value: `${selectedLead.location} · ${selectedLead.nextVisitLabel}` },
+      { label: 'الإجراء التالي', value: resolvePrimaryActionLabel(selectedLead.status), tone: 'brand' as const },
+      { label: 'لوحة الشركاء', value: resolveControlPanelStatus(selectedLead.status) },
+      { label: 'ملاحظة العمل', value: selectedLead.resultNote || selectedLead.approvalNote },
+      { label: 'ما بعد هذه الخطوة', value: selectedLead.onboardingNote },
     ];
-
-    return mode === 'quick' ? items.slice(0, 4) : items;
-  }, [mode, selectedLead]);
-
-  const selectedSteps = React.useMemo(() => selectedLead ? buildSteps(selectedLead.status) : [], [selectedLead]);
+  }, [selectedLead]);
 
   if (state === 'loading') {
     return <StateView stateId="loading" title="جار تجهيز قائمة المتاجر" description="تبقى الواجهة خفيفة حتى يكتمل تحميل بيانات الميدان." />;
@@ -451,42 +509,62 @@ export function DshFieldAcquisitionBasicsScreen({
 
   return (
     <Box style={{ flex: 1 }} background="background">
-      <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 96 }}>
+      <MobileScrollView fill padding={4} gap={2} contentContainerStyle={{ paddingBottom: 148 }}>
         <Card title={title} subtitle={subtitle}>
-          <Box gap={3}>
+          <Box gap={2}>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              <Badge label={`${summaryCounts.total} متجر`} tone="brand" />
-              <Badge label={`${summaryCounts.ready} جاهز للإضافة`} tone="success" />
-              <Badge label={`${summaryCounts.followUp} متابعة`} tone="warning" />
-              <Badge label={`${summaryCounts.submitted} مرسلة`} tone="info" />
-            </View>
-
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              <Chip label="خلاصة سريعة" selected={mode === 'quick'} tone="brand" onPress={() => setMode('quick')} />
-              <Chip label="تفاصيل كاملة" selected={mode === 'full'} tone="info" onPress={() => setMode('full')} />
+              <Badge label={`اليوم ${summaryCounts.today}`} tone="brand" />
+              <Badge label={`جاهز للإضافة ${summaryCounts.ready}`} tone="success" />
+              <Badge label={`تحتاج متابعة ${summaryCounts.followUp}`} tone="warning" />
+              <Badge label={`مرسل ${summaryCounts.submitted}`} tone="info" />
             </View>
           </Box>
         </Card>
 
-        <Card title="قائمة المتاجر" subtitle="الصفحة الرئيسية الآن هي قائمة متاجر مختصرة. انقر على أي متجر لتظهر باقي التفاصيل فقط له.">
-          <Box gap={3}>
+        <Card title="قائمة المتاجر">
+          <Box gap={2}>
             <TextField label="ابحث في المتاجر" value={searchQuery} onChangeText={setSearchQuery} placeholder="الاسم، التصنيف، الموقع، أو الحالة" />
 
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              {leadFilterOptions.map((option) => (
-                <Chip key={option.id} label={option.label} selected={leadFilter === option.id} tone={option.tone} onPress={() => setLeadFilter(option.id)} />
-              ))}
-            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              nestedScrollEnabled
+              decelerationRate="fast"
+              style={{ transform: [{ scaleX: -1 }] }}
+              contentContainerStyle={{
+                flexDirection: 'row',
+                gap: 8,
+                paddingHorizontal: 2,
+              }}
+            >
+              {leadFilterOptions.map((option) => {
+                const isSelected = leadFilter === option.id;
 
-            <View style={{ gap: 12 }}>
+                return (
+                  <View key={option.id} style={{ transform: [{ scaleX: -1 }] }}>
+                    <Chip
+                      label={`${option.label} ${leadFilterCounts[option.id]}`}
+                      selected={isSelected}
+                      tone={isSelected ? option.tone : 'default'}
+                      onPress={() => setLeadFilter(option.id)}
+                    />
+                  </View>
+                );
+              })}
+            </ScrollView>
+
+            <View style={{ gap: 8 }}>
               {filteredLeads.length ? filteredLeads.map((lead) => (
                 <ListItem
                   key={lead.id}
                   title={lead.name}
-                  subtitle={`${lead.category} · ${lead.source === 'manual' ? 'مضافة يدويًا' : 'مرشحة'}`}
-                  meta={`${lead.location} · ${lead.nextVisitLabel}`}
+                  subtitle={`${lead.location} · ${lead.nextVisitLabel}`}
+                  meta={`التالي: ${resolvePrimaryActionLabel(lead.status)} · ${resolveSourceLabel(lead.source)}`}
                   badgeLabel={resolveStatusLabel(lead.status)}
-                  onPress={() => setSelectedLeadId(lead.id)}
+                  onPress={() => {
+                    setSelectedLeadId(lead.id);
+                    setDetailsVisible(true);
+                  }}
                   style={({ pressed }) => selectedLeadId === lead.id ? [{ borderColor: theme.brand, backgroundColor: pressed ? theme.brandSurface : theme.surfaceInset }] : undefined}
                 />
               )) : (
@@ -495,50 +573,59 @@ export function DshFieldAcquisitionBasicsScreen({
             </View>
           </Box>
         </Card>
-
-        <Card title="ما تبقى للمتجر المختار" subtitle="قائمة بروجرس مختصرة تكشف فقط ما يتبقى لهذا المتجر عند الضغط عليه.">
-          {selectedLead ? (
-            <Box gap={3}>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                <Badge label={resolveStatusLabel(selectedLead.status)} tone={leadStatusTones[selectedLead.status]} />
-                <Badge label={selectedLead.source === 'manual' ? 'مضافة يدويًا' : 'مرشحة'} tone="default" />
-              </View>
-
-              <KeyValueList items={selectedDetailItems} dense={mode === 'quick'} />
-
-              <CompactStatusStepper title="التقدم المختصر" subtitle="مراحل قصيرة داخل نفس المتجر بدلاً من Wizard طويل." steps={selectedSteps} />
-
-              <View style={{ flexDirection: 'row', gap: 8 }}>
-                <Button label={primaryActionLabel} tone={primaryActionTone} onPress={handlePrimaryAction} />
-                <Button label="مراجعة الموقع" tone="secondary" onPress={onOpenGeoPinPress} disabled={!onOpenGeoPinPress} />
-              </View>
-
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                {visitResultOptions.map((option) => (
-                  <Chip
-                    key={option.id}
-                    label={option.label}
-                    selected={selectedLead.visitResult === option.id}
-                    tone={option.tone}
-                    onPress={() => handleVisitResultChange(option.id)}
-                  />
-                ))}
-              </View>
-
-              {selectedLead.status === 'ready-for-onboarding' ? (
-                <Text role="bodySm" tone="muted">هذا المتجر جاهز للإضافة، لذلك يصبح مدخل onboarding هو الخطوة التالية فقط.</Text>
-              ) : null}
-            </Box>
-          ) : (
-            <StateView stateId="empty" title="اختر متجرًا من القائمة" description="سيظهر باقي ما يحتاجه المتجر داخل بطاقة التقدم المختصر فور الاختيار." />
-          )}
-        </Card>
       </MobileScrollView>
 
+      <SheetFrame visible={detailsVisible && Boolean(selectedLead)} onClose={() => setDetailsVisible(false)} title={selectedLead ? selectedLead.name : 'تفاصيل المتجر'}>
+        {selectedLead ? (
+          <Box gap={3}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              <Badge label={resolveStatusLabel(selectedLead.status)} tone={leadStatusTones[selectedLead.status]} />
+              <Badge label={resolveSourceLabel(selectedLead.source)} tone="default" />
+              <Badge label={resolvePrimaryActionLabel(selectedLead.status)} tone="brand" />
+            </View>
+
+            <Text role="bodySm" tone="muted">{selectedLead.category} · {selectedLead.visitPurpose}</Text>
+
+            <KeyValueList items={selectedDetailItems} dense />
+
+            {(selectedLead.status === 'visited' || selectedLead.status === 'follow-up-required' || selectedLead.status === 'ready-for-onboarding') ? (
+              <Box gap={2}>
+                <Text role="bodySm" tone="muted">نتيجة الزيارة</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                  {visitResultOptions.map((option) => (
+                    <Chip
+                      key={option.id}
+                      label={option.label}
+                      selected={selectedLead.visitResult === option.id}
+                      tone={option.tone}
+                      onPress={() => handleVisitResultChange(option.id)}
+                    />
+                  ))}
+                </View>
+              </Box>
+            ) : null}
+
+            {selectedLead.status === 'submitted' ? (
+              <Text role="bodySm" tone="muted">قسم الشركاء يعتمد أو يرفض أو يعدل العرض، ثم ينتقل الطلب إلى التسويق بعد الموافقة [TBD].</Text>
+            ) : null}
+
+            {selectedLead.status === 'ready-for-onboarding' ? (
+              <Text role="bodySm" tone="muted">عند Ready for Onboarding يفتح نموذج إضافة المتجر الحالي مباشرة بدون Wizard إضافي.</Text>
+            ) : null}
+
+            {onOpenGeoPinPress ? <Chip label="فتح الموقع" tone="default" onPress={onOpenGeoPinPress} /> : null}
+          </Box>
+        ) : null}
+      </SheetFrame>
+
       <StickyActionBar
-        note={selectedLead ? `${selectedLead.name} · ${selectedLead.followUpLabel || selectedLead.nextVisitLabel} · ${selectedLead.onboardingNote}` : 'اختر متجرًا من القائمة ثم افتح ما تبقى له فقط عند الحاجة.'}
-        primaryAction={{ label: primaryActionLabel, tone: primaryActionTone, onPress: handlePrimaryAction }}
-        secondaryAction={{ label: secondaryActionLabel, tone: 'secondary', onPress: secondaryActionHandler }}
+        note={selectedLead ? `${selectedLead.location} · ${selectedLead.nextVisitLabel} · ${resolvePrimaryActionLabel(selectedLead.status)}` : 'اختر متجرًا من القائمة ثم نفّذ الإجراء التالي فقط.'}
+        primaryAction={{
+          label: primaryActionLabel,
+          tone: primaryActionTone,
+          disabled: selectedLead ? resolvePrimaryActionDisabled(selectedLead.status) : true,
+          onPress: handlePrimaryAction,
+        }}
       />
     </Box>
   );
