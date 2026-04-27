@@ -1,7 +1,6 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Box, Button, Icon, MobileScrollView, ScreenHeader, StateView, Surface, Text, TopBar } from '@bthwani/ui-kit';
+import { Badge, Box, Button, Icon, KeyValueList, MobileScrollView, MobileWorkspaceHeader, SectionHeader, ServiceTileCard, SheetFrame, StateView, Surface, Text, TopBar } from '@bthwani/ui-kit';
 import { dshCaptain } from '@bthwani/surfaces/app-captain';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
@@ -50,42 +49,30 @@ type CaptainSupportRoute =
   | 'tier-evaluate'
   | 'tier-info';
 
-const primaryAreas = [
-  'الطلبات',
-  'الأرباح',
-  'الحالة'
-] as const;
-
 type CaptainRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'orderchat' | 'bell' | 'support-directory' | 'support-screen';
 type CaptainServiceType = 'dsh' | 'amn';
 
-const shortcuts = [
-  'الطلبات الحالية',
-  'ملخص الأرباح',
-  'تبديل الحالة',
-] as const;
-
 const captainTypeOptions: readonly MobileAccountTypeOption[] = [
-  { id: 'dsh', label: 'DSH', description: 'تشغيل الطلبات اليومية' },
-  { id: 'amn', label: 'AMN', description: 'تشغيل الأمان والمراقبة' },
+  { id: 'dsh', label: 'DSH', description: 'السياق النشط الآن' },
+  { id: 'amn', label: 'AMN', description: 'مسار [TBD] غير مكتمل' },
 ];
 
 const defaultDetailByOrderId: Record<string, CaptainOrderDetailSummary> = {
   'captain-order-9021': {
     orderId: 'captain-order-9021',
-    pickupLabel: 'Burger Lab - Hittin branch',
-    dropoffLabel: 'Olaya District, King Fahad Road',
-    etaLabel: 'ETA to pickup: 8 min',
-    currentStageLabel: 'Heading to pickup',
-    nextActionLabel: 'Confirm pickup once package is collected',
+    pickupLabel: 'Burger Lab - فرع حطين',
+    dropoffLabel: 'حي العليا، طريق الملك فهد',
+    etaLabel: 'مدة الوصول إلى الاستلام: 8 دقائق',
+    currentStageLabel: 'في الطريق إلى الاستلام',
+    nextActionLabel: 'أكد الاستلام بعد التقاط الطلب',
   },
   'captain-order-9024': {
     orderId: 'captain-order-9024',
-    pickupLabel: 'Green Bowl - Yasmin branch',
-    dropoffLabel: 'King Fahad Road, North district',
-    etaLabel: 'ETA to pickup: 15 min',
-    currentStageLabel: 'Queued for dispatch',
-    nextActionLabel: 'Start route and confirm pickup on arrival',
+    pickupLabel: 'Green Bowl - فرع الياسمين',
+    dropoffLabel: 'طريق الملك فهد، الحي الشمالي',
+    etaLabel: 'مدة الوصول إلى الاستلام: 15 دقيقة',
+    currentStageLabel: 'في قائمة الإرسال',
+    nextActionLabel: 'ابدأ المسار وأكد الاستلام عند الوصول',
   },
 };
 
@@ -98,11 +85,39 @@ export function CaptainSurfaceHost() {
   const [isPickupSheetVisible, setIsPickupSheetVisible] = React.useState(false);
   const [isDeliverySheetVisible, setIsDeliverySheetVisible] = React.useState(false);
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
+  const [gpsSheetVisible, setGpsSheetVisible] = React.useState(false);
+  const [isCaptainAvailable, setIsCaptainAvailable] = React.useState(true);
   const routeHistoryRef = React.useRef<CaptainRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
 
   const activeSummary = defaultDetailByOrderId[activeOrderId] ?? defaultDetailByOrderId['captain-order-9021'];
   const orderChatState = inboxState === 'delivered' ? 'readOnly' : 'active';
+  const goBack = React.useCallback(() => {
+    if (gpsSheetVisible) {
+      setGpsSheetVisible(false);
+      return true;
+    }
+
+    if (accountSheetVisible) {
+      setAccountSheetVisible(false);
+      return true;
+    }
+
+    if (routeHistoryRef.current.length > 1) {
+      routeTransitionFromBackRef.current = true;
+      routeHistoryRef.current.pop();
+      const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'home';
+      setRoute(previousRoute);
+      return true;
+    }
+
+    if (route !== 'home') {
+      setRoute('home');
+      return true;
+    }
+
+    return false;
+  }, [accountSheetVisible, gpsSheetVisible, route]);
 
   if (!activeSummary) {
     return null;
@@ -126,24 +141,11 @@ export function CaptainSurfaceHost() {
     }
 
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (accountSheetVisible) {
-        setAccountSheetVisible(false);
-        return true;
-      }
-
-      if (routeHistoryRef.current.length > 1) {
-        routeTransitionFromBackRef.current = true;
-        routeHistoryRef.current.pop();
-        const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'home';
-        setRoute(previousRoute);
-        return true;
-      }
-
-      return false;
+      return goBack();
     });
 
     return () => subscription.remove();
-  }, [accountSheetVisible]);
+  }, [goBack]);
 
   const openOrderDetail = (orderId: string) => {
     setActiveOrderId(orderId);
@@ -242,7 +244,6 @@ export function CaptainSurfaceHost() {
         <DshCaptainBellScreen
           onOpenInbox={() => setRoute('inbox')}
           onOpenNextOrder={() => openOrderDetail(activeOrderId)}
-          onBack={() => setRoute('inbox')}
           onRetry={() => setRoute('bell')}
         />
       );
@@ -255,7 +256,6 @@ export function CaptainSurfaceHost() {
           pickupLabel={activeSummary.pickupLabel}
           dropoffLabel={activeSummary.dropoffLabel}
           state={orderChatState}
-          onBack={() => setRoute('detail')}
         />
       );
     }
@@ -263,78 +263,407 @@ export function CaptainSurfaceHost() {
     return null;
   };
 
+  const captainSummaryItems = [
+    {
+      label: 'الاسم',
+      value: <Badge label="الكابتن [TBD]" tone="warning" />,
+      helperText: 'الاسم النهائي غير مرتبط بعد.',
+    },
+    {
+      label: 'النوع',
+      value: <Badge label={activeServiceType === 'dsh' ? 'DSH' : 'AMN [TBD]'} tone={activeServiceType === 'dsh' ? 'success' : 'warning'} />,
+      helperText: 'DSH هو السياق النشط. AMN يبقى [TBD].',
+    },
+    {
+      label: 'المحفظة',
+      value: <Badge label="[TBD]" tone="warning" />,
+      helperText: 'الرصيد والربط المالي غير مكتملين.',
+    },
+    {
+      label: 'التقييم',
+      value: <Badge label="[TBD]" tone="warning" />,
+      helperText: 'التقييم النهائي سيظهر عند اكتمال الربط.',
+    },
+    {
+      label: 'المستوى',
+      value: <Badge label="[TBD]" tone="warning" />,
+      helperText: 'المستوى غير محسوم بعد.',
+    },
+  ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
+
+  const captainMenuSections = [
+    {
+      title: 'التشغيل',
+      subtitle: 'الطريق والطلبات والخريطة تبقى في واجهة واحدة.',
+      items: [
+        {
+          id: 'orders',
+          title: 'الطلبات',
+          subtitle: 'فتح صندوق الطلبات الحالي.',
+          meta: 'مباشر',
+          badgeLabel: 'مباشر',
+          onPress: () => {
+            setAccountSheetVisible(false);
+            setRoute('inbox');
+          },
+        },
+        {
+          id: 'map',
+          title: 'الخريطة',
+          subtitle: 'العودة إلى الشاشة الرئيسية.',
+          meta: 'الرئيسية',
+          badgeLabel: 'الرئيسية',
+          onPress: () => {
+            setAccountSheetVisible(false);
+            setRoute('home');
+          },
+        },
+      ],
+    },
+    {
+      title: 'المالية',
+      subtitle: 'المحفظة والأرباح والتسويات.',
+      items: [
+        {
+          id: 'wallet',
+          title: 'المحفظة',
+          subtitle: 'عرض المحفظة والملخص المالي المؤقت.',
+          meta: 'مالية',
+          badgeLabel: '[TBD]',
+          onPress: () => {
+            setAccountSheetVisible(false);
+            openCaptainSupportScreen('cod-balance');
+          },
+        },
+        {
+          id: 'earnings',
+          title: 'الأرباح',
+          subtitle: 'الأرباح النهائية ما تزال [TBD].',
+          meta: '[TBD]',
+          badgeLabel: '[TBD]',
+          disabled: true,
+        },
+        {
+          id: 'settlements',
+          title: 'التسويات',
+          subtitle: 'التسويات ما تزال غير موصولة [TBD].',
+          meta: '[TBD]',
+          badgeLabel: '[TBD]',
+          disabled: true,
+        },
+      ],
+    },
+    {
+      title: 'الهوية والتقييم',
+      subtitle: 'الملف الشخصي والوثائق ومستوى الأداء.',
+      items: [
+        {
+          id: 'profile',
+          title: 'الملف الشخصي',
+          subtitle: 'بيانات الكابتن الأساسية.',
+          meta: 'مباشر',
+          badgeLabel: 'مباشر',
+          onPress: () => {
+            setAccountSheetVisible(false);
+            openCaptainSupportScreen('profile-get');
+          },
+        },
+        {
+          id: 'documents',
+          title: 'الوثائق',
+          subtitle: 'المرفقات والملفات الداعمة.',
+          meta: 'مباشر',
+          badgeLabel: 'مباشر',
+          onPress: () => {
+            setAccountSheetVisible(false);
+            openCaptainSupportScreen('proof-upload');
+          },
+        },
+        {
+          id: 'rating',
+          title: 'التقييم',
+          subtitle: 'مؤشرات الأداء والتقييم الحالي.',
+          meta: 'مباشر',
+          badgeLabel: 'مباشر',
+          onPress: () => {
+            setAccountSheetVisible(false);
+            openCaptainSupportScreen('tier-evaluate');
+          },
+        },
+        {
+          id: 'level',
+          title: 'المستوى',
+          subtitle: 'قراءة المستوى الحالي والامتيازات.',
+          meta: 'مباشر',
+          badgeLabel: 'مباشر',
+          onPress: () => {
+            setAccountSheetVisible(false);
+            openCaptainSupportScreen('tier-info');
+          },
+        },
+      ],
+    },
+  ] as const;
+
   const topBar = (
     <TopBar
       variant="brand"
-      title="بثواني"
-      subtitle="تطبيق الكابتن"
-      locationLabel="الرياض، خط التشغيل الشمالي"
+      title="الكابتن [TBD]"
+      subtitle="DSH · القيادة اليومية"
+      locationLabel="المحفظة [TBD]"
+      locationIcon={<Icon name="wallet-outline" size={18} color="#FFFFFF" />}
       actions={[
-        {
-          id: 'profile',
-          icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
-          accessibilityLabel: 'الحساب',
-          onPress: () => setAccountSheetVisible(true),
-        },
+        { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'البحث', onPress: openSupportDirectory },
         {
           id: 'notifications',
           icon: <Icon name="notifications-outline" size={21} color="#FFFFFF" />,
           badgeCount: 2,
           accessibilityLabel: 'الإشعارات',
-          onPress: () => {
-            if (activeServiceType === 'dsh') {
-              setRoute('bell');
-            }
-          },
+          onPress: () => setRoute('bell'),
         },
-        {
-          id: 'orders',
-          icon: <Icon name="bicycle-outline" size={21} color="#FFFFFF" />,
-          accessibilityLabel: 'الطلبات',
-          onPress: () => {
-            if (activeServiceType === 'dsh') {
-              setRoute('entry');
-            }
-          },
-        },
-        { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الدعم', onPress: openSupportDirectory },
+        { id: 'account', icon: <Icon name="person-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الحساب', onPress: () => setAccountSheetVisible(true) },
       ]}
-      ticker={{
-        statusLabel: activeServiceType === 'dsh' ? 'مباشر' : 'وضع AMN',
-        message:
-          activeServiceType === 'dsh'
-            ? 'أولوية اليوم: طلب الاستلام الأول خلال 8 دقائق'
-            : 'تم تفعيل وضع AMN. سيتم تحميل مسارات الأمان فور اكتمال ربط الشاشات.',
-        onPress: () => {
-          if (activeServiceType === 'dsh') {
-            setRoute('entry');
-          }
-        },
-      }}
     />
+  );
+
+  const renderRouteHeader = () => {
+    if (route === 'entry') {
+      return <MobileWorkspaceHeader title="بوابة التنفيذ" description="ابدأ من الفرز والقبول قبل الخروج للميدان." icon="navigate-outline" backLabel="العودة للخريطة" onBack={goBack} />;
+    }
+
+    if (route === 'inbox') {
+      return <MobileWorkspaceHeader title="صندوق الطلبات" description="الطلب النشط أولًا ثم بقية الصف." icon="list-outline" backLabel="العودة للخريطة" onBack={goBack} />;
+    }
+
+    if (route === 'detail') {
+      return <MobileWorkspaceHeader title="تفاصيل الطلب" description="راجع الطلب قبل التنفيذ أو التسليم." icon="document-text-outline" backLabel="العودة للخريطة" onBack={goBack} />;
+    }
+
+    if (route === 'orderchat') {
+      return <MobileWorkspaceHeader title="تواصل الطلب" description="مراسلات قصيرة مرتبطة بالطلب النشط." icon="chatbubble-ellipses-outline" backLabel="العودة للخريطة" onBack={goBack} />;
+    }
+
+    if (route === 'bell') {
+      return <MobileWorkspaceHeader title="الإشعارات" description="تنبيهات الطلبات الجديدة دون ضجيج." icon="notifications-outline" backLabel="العودة للخريطة" onBack={goBack} />;
+    }
+
+    if (route === 'support-directory') {
+      return <MobileWorkspaceHeader title="دليل الدعم" description="كل مسارات DSH المتبقية في مكان واحد." icon="albums-outline" backLabel="العودة للخريطة" onBack={goBack} />;
+    }
+
+    if (route === 'support-screen') {
+      return <MobileWorkspaceHeader title="الدعم" description="المسار المفتوح من الدليل." icon="layers-outline" backLabel="العودة للخريطة" onBack={goBack} />;
+    }
+
+    return null;
+  };
+
+  const renderHomeOrderPanel = () => {
+    if (!isCaptainAvailable) {
+      return (
+        <StateView
+          stateId="blockingError"
+          title="الكابتن غير متوفر"
+          description="أوقف التوفر الآن ثم عد إلى الخريطة عندما تكون جاهزًا لاستلام الطلب التالي."
+          actionLabel="العودة إلى التوفر"
+          onActionPress={() => setIsCaptainAvailable(true)}
+        />
+      );
+    }
+
+    if (inboxState === 'loading') {
+      return <StateView stateId="loading" title="الخريطة قيد التحضير" description="الطلب النشط سيظهر عندما تكتمل بيانات التشغيل." />;
+    }
+
+    if (inboxState === 'error') {
+      return (
+        <StateView
+          stateId="recoverableError"
+          title="تعذر تحميل الطلب النشط"
+          description="أعد المحاولة من نفس السياق أو ارجع إلى صندوق الطلبات."
+          actionLabel="إعادة المحاولة"
+          onActionPress={() => setInboxState('active')}
+        />
+      );
+    }
+
+    if (inboxState === 'noOrders') {
+      return (
+        <StateView
+          stateId="empty"
+          title="لا يوجد طلب نشط"
+          description="ابقَ على الخريطة حتى تصل حركة جديدة ثم افتح صندوق الطلبات."
+          actionLabel="فتح الطلبات"
+          onActionPress={() => setRoute('inbox')}
+        />
+      );
+    }
+
+    if (inboxState === 'delivered') {
+      return (
+        <StateView
+          stateId="success"
+          title="تم تسليم الطلب"
+          description="التسليم مغلق الآن ويمكنك الانتقال مباشرة إلى الطلب التالي."
+          actionLabel="فتح الطلب التالي"
+          onActionPress={() => setRoute('inbox')}
+        />
+      );
+    }
+
+    return (
+      <Box gap={3}>
+        <SectionHeader title="الطلب النشط" subtitle="الوجهة التالية تبقى أوضح من الخريطة نفسها." />
+        <KeyValueList
+          dense
+          items={[
+            { label: 'الطلب', value: `#${activeSummary.orderId}`, tone: 'brand', helperText: 'السياق الحي الحالي.' },
+            { label: 'الاستلام', value: activeSummary.pickupLabel, helperText: 'نقطة الالتقاط الحالية.' },
+            { label: 'التسليم', value: activeSummary.dropoffLabel, helperText: 'الوجهة التالية.' },
+            { label: 'المرحلة', value: activeSummary.currentStageLabel, tone: 'warning', helperText: 'الخطوة الجارية.' },
+            { label: 'التالي', value: activeSummary.nextActionLabel, tone: 'success', helperText: 'الإجراء التالي من نفس الخريطة.' },
+          ]}
+        />
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          <Button label="تفاصيل الطلب" onPress={() => setRoute('detail')} />
+          <Button label="تواصل الطلب" tone="secondary" onPress={() => setRoute('orderchat')} />
+          <Button label="بوابة التنفيذ" tone="ghost" onPress={openCaptainEntry} />
+          <Button label="صندوق الطلبات" tone="ghost" onPress={() => setRoute('inbox')} />
+        </Box>
+      </Box>
+    );
+  };
+
+  const renderHomeScreen = () => (
+    <MobileScrollView fill padding={4} gap={4}>
+      <Surface tone="brand" padding={4} gap={4} radiusToken="xl" border={false}>
+        <Box gap={1} style={{ alignItems: 'flex-end' }}>
+          <Badge label="DSH" tone="warning" />
+          <Text role="titleLg" tone="inverse" style={{ textAlign: 'right' }}>
+            الخريطة الرئيسية
+          </Text>
+          <Text role="bodySm" tone="inverse" style={{ textAlign: 'right' }}>
+            تحديد موقع العميل وتسليم الطلب من مساحة واحدة. مزود الخريطة الفعلي يبقى [TBD].
+          </Text>
+        </Box>
+
+        <Surface tone="inset" padding={4} gap={3} radiusToken="xl" style={{ minHeight: 262, overflow: 'hidden' }}>
+          <Box style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14 }}>
+            <Icon name="map-outline" size={42} color="#0A2F5C" />
+            <Text role="titleMd" align="center">
+              مزود الخريطة [TBD]
+            </Text>
+            <Text role="bodySm" tone="muted" align="center">
+              لا يوجد binding فعلي بعد. هذه مساحة جاهزة لمزود الخرائط لاحقًا من دون API جديد.
+            </Text>
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'center' }}>
+              <Badge label={isCaptainAvailable ? 'متاح' : 'غير متاح'} tone={isCaptainAvailable ? 'success' : 'warning'} />
+              <Badge label="العميل" tone="brand" />
+              <Badge label="التسليم" tone="info" />
+            </Box>
+          </Box>
+        </Surface>
+      </Surface>
+
+      <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
+        <ServiceTileCard
+          title="حالة التوفر"
+          subtitle={isCaptainAvailable ? 'متاح الآن' : 'غير متاح الآن'}
+          description="اضغط لتبديل حالة الكابتن من نفس الخريطة."
+          icon={<Icon name={isCaptainAvailable ? 'checkmark-circle-outline' : 'pause-circle-outline'} size={24} color={isCaptainAvailable ? '#0A2F5C' : '#FF500D'} />}
+          badgeLabel={isCaptainAvailable ? 'متاح' : 'غير متاح'}
+          badgeTone={isCaptainAvailable ? 'success' : 'warning'}
+          minHeight={156}
+          style={{ flex: 1, minWidth: 160 }}
+          onPress={() => setIsCaptainAvailable((current) => !current)}
+        />
+        <ServiceTileCard
+          title="GPS / الموقع"
+          subtitle="مؤشر جاهزية الموقع"
+          description="افتح حالة GPS والموقع والخرائط [TBD]."
+          icon={<Icon name="navigate-outline" size={24} color="#0A2F5C" />}
+          badgeLabel="[TBD]"
+          badgeTone="warning"
+          minHeight={156}
+          style={{ flex: 1, minWidth: 160 }}
+          onPress={() => setGpsSheetVisible(true)}
+        />
+      </Box>
+
+      <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+        <SectionHeader title="جاهزية التشغيل" subtitle="كل حالة لازمة تظهر هنا من دون تكامل runtime جديد." />
+        <KeyValueList
+          items={[
+            { label: 'التوفر', value: <Badge label={isCaptainAvailable ? 'متاح' : 'غير متاح'} tone={isCaptainAvailable ? 'success' : 'warning'} />, helperText: 'تبديله محليًا فقط.' },
+            { label: 'GPS', value: <Badge label="[TBD]" tone="warning" />, helperText: 'تفاصيل GPS داخل الشيت.' },
+            { label: 'الموقع', value: <Badge label="[TBD]" tone="warning" />, helperText: 'الموقع الدقيق غير موصول بعد.' },
+            { label: 'الطلب النشط', value: <Badge label={inboxState === 'noOrders' ? 'لا يوجد' : `#${activeSummary.orderId}`} tone={inboxState === 'noOrders' ? 'warning' : 'brand'} />, helperText: 'يتغير وفق الحالة الحالية.' },
+            { label: 'البيانات', value: <Badge label="[TBD]" tone="warning" />, helperText: 'الخريطة والربط والتقييمات غير مكتملة.' },
+          ]}
+        />
+      </Surface>
+
+      <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+        {renderHomeOrderPanel()}
+      </Surface>
+    </MobileScrollView>
   );
 
   const accountSheet = (
     <MobileAccountSheet
+      mode="captain"
       visible={accountSheetVisible}
       onClose={() => setAccountSheetVisible(false)}
-      onOpenProfile={() => setRoute('home')}
       typeOptions={captainTypeOptions}
       activeTypeId={activeServiceType}
       onSelectType={handleSelectServiceType}
       typeSwitchTitle="تغيير نوع تشغيل الكابتن"
-      typeSwitchPrompt="اختر نوع التشغيل للكابتن. عند التبديل يتم إعادة ضبط المسار وتحديث التطبيق بالكامل بحسب النوع الجديد."
+      typeSwitchPrompt="DSH هو السياق النشط الآن. AMN يبقى مسارًا غير مكتمل [TBD]."
+      captainSummaryItems={captainSummaryItems}
+      captainSections={captainMenuSections}
     />
+  );
+
+  const gpsSheet = (
+    <SheetFrame visible={gpsSheetVisible} title="GPS / الموقع [TBD]" onClose={() => setGpsSheetVisible(false)}>
+      <MobileScrollView fill padding={0} gap={3} style={{ maxHeight: 620 }}>
+        <Text role="bodySm" tone="muted">
+          لا يوجد ربط runtime مع مزود الخرائط أو الموقع حتى الآن. ما يلي مجرد قوالب حالة واضحة للاستخدام لاحقًا.
+        </Text>
+        <StateView
+          stateId="offline"
+          title="GPS غير مفعل"
+          description="فعّل GPS قبل البدء بالتوجيه أو قبول الحركة التالية."
+        />
+        <StateView
+          stateId="warning"
+          title="الموقع غير متاح"
+          description="تم فتح الخريطة لكن موقع الجهاز الدقيق ما يزال غير متاح."
+        />
+        <StateView
+          stateId="warning"
+          title="بيانات الخريطة غير مكتملة [TBD]"
+          description="مزود الخريطة والربط المستقبلي ما يزالان في مرحلة placeholder."
+        />
+        <Button label="العودة إلى الخريطة" tone="secondary" onPress={() => setGpsSheetVisible(false)} />
+      </MobileScrollView>
+    </SheetFrame>
   );
 
   if (activeServiceType === 'amn') {
     return (
       <Box style={{ flex: 1 }} background="background">
-        {topBar}
+        <MobileWorkspaceHeader
+          title="AMN [TBD]"
+          description="هذا المسار غير مكتمل ولا ينافس DSH النشط حاليًا."
+          icon="alert-circle-outline"
+          backLabel="العودة إلى DSH"
+          onBack={() => handleSelectServiceType('dsh')}
+        />
         <Surface
           tone="raised"
-          padding={5}
-          gap={4}
+          padding={0}
+          gap={0}
           radiusToken="none"
           border={false}
           style={{
@@ -345,10 +674,24 @@ export function CaptainSurfaceHost() {
             overflow: 'hidden',
           }}
         >
-          <StateView stateId="loading" title="تم تفعيل وضع AMN" description="التطبيق الآن في سياق AMN بالكامل. يجري تجهيز الشاشات التنفيذية الخاصة بهذا النوع." />
-          <Button label="العودة للرئيسية" tone="secondary" onPress={() => setRoute('home')} />
+          <MobileScrollView fill padding={4} gap={4}>
+            <StateView
+              stateId="warning"
+              title="AMN يبقى [TBD]"
+              description="DSH هو السياق التنفيذي النشط، بينما AMN يظهر هنا كمسار placeholder فقط حتى يكتمل الربط."
+              actionLabel="العودة إلى DSH"
+              onActionPress={() => handleSelectServiceType('dsh')}
+            />
+            <Surface tone="inset" padding={4} gap={2} radiusToken="xl">
+              <Text role="bodyStrong">لا نضيف أي binding جديد هنا.</Text>
+              <Text role="bodySm" tone="muted">
+                AMN حاضر فقط كمرجع غير مكتمل [TBD]، ولا ينبغي أن يزاحم DSH في هذا السطح.
+              </Text>
+            </Surface>
+          </MobileScrollView>
         </Surface>
         {accountSheet}
+        {gpsSheet}
       </Box>
     );
   }
@@ -384,19 +727,7 @@ export function CaptainSurfaceHost() {
 
     return (
       <Box style={{ flex: 1 }} background="background">
-        {topBar}
-        <Box padding={4} gap={3}>
-          <Button label="العودة للرئيسية" tone="secondary" onPress={() => setRoute('home')} />
-          <Surface tone="inset" padding={3} gap={2} radiusToken="lg">
-            <Text role="label">حالة تشغيل الاختبار</Text>
-            <Box gap={2}>
-              <Button label="Active" tone="secondary" onPress={() => setInboxState('active')} />
-              <Button label="No orders" tone="secondary" onPress={() => setInboxState('noOrders')} />
-              <Button label="Delivered" tone="secondary" onPress={() => setInboxState('delivered')} />
-              <Button label="Error" tone="secondary" onPress={() => setInboxState('error')} />
-            </Box>
-          </Surface>
-        </Box>
+        {renderRouteHeader()}
         <Surface
           tone="raised"
           padding={0}
@@ -414,6 +745,7 @@ export function CaptainSurfaceHost() {
           {content}
         </Surface>
         {accountSheet}
+        {gpsSheet}
       </Box>
     );
   }
@@ -435,72 +767,10 @@ export function CaptainSurfaceHost() {
           overflow: 'hidden',
         }}
       >
-        <MobileScrollView fill padding={5} gap={5}>
-          <ScreenHeader
-            title="طلبات الكابتن"
-            subtitle="هذه هي نقطة البداية الحقيقية لتطبيق الكابتن."
-            actionLabel="ابدأ من entry"
-            onActionPress={openCaptainEntry}
-          />
-
-          <Surface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
-            <Text role="label" tone="inverse">نقطة البداية الرسمية</Text>
-            <Text role="titleLg" tone="inverse">بداية تشغيلية حقيقية للكابتن</Text>
-            <Text role="bodyMd" tone="inverse">تطبيق الكابتن يجب أن يبدأ من shell تُظهر الطلبات والحالة والاختصارات، لا من preview service entry.</Text>
-          </Surface>
-
-          <Surface tone="raised" padding={5} gap={4} radiusToken="xl">
-            <Text role="label">المساحات الأساسية</Text>
-            {primaryAreas.map((item) => (
-              <Surface key={item} tone="default" padding={4} gap={2} radiusToken="lg">
-                <Text role="bodyStrong">{item}</Text>
-                <Text role="bodySm" tone="muted">هذه مساحة رئيسية داخل التطبيق الحقيقي وليست preview route.</Text>
-              </Surface>
-            ))}
-          </Surface>
-
-          <Surface tone="default" padding={5} gap={4} radiusToken="xl">
-            <Text role="label">اختصارات البداية</Text>
-            <Box gap={3}>
-              {shortcuts.map((item, index) => (
-                <Button
-                  key={item}
-                  label={item}
-                  tone="secondary"
-                  onPress={() => {
-                    if (index === 0) {
-                      setInboxState('active');
-                      setRoute('entry');
-                      return;
-                    }
-
-                    if (index === 1) {
-                      openCaptainSupportScreen('cod-balance');
-                      return;
-                    }
-
-                    openCaptainSupportScreen('profile-get');
-                  }}
-                />
-              ))}
-            </Box>
-          </Surface>
-
-          <Surface tone="raised" padding={5} gap={4} radiusToken="xl">
-            <Text role="label">أدلة الدعم التنفيذية</Text>
-            <Text role="bodySm" tone="muted">كل شاشات DSH المتبقية للكابتن أصبحت مجمعة في دليل دعم مركزي داخل نفس shell.</Text>
-            <Button label="فتح دليل دعم الكابتن" tone="secondary" onPress={openSupportDirectory} />
-          </Surface>
-
-          <Surface tone="inset" padding={4} gap={2} radiusToken="lg">
-            <Text role="label">حكم معماري</Text>
-            <Text role="bodySm" tone="muted">البدء من home shell يمنع خلط feature preview مع التشغيل الفعلي للتطبيق.</Text>
-          </Surface>
-
-          <Button label="ابدأ من entry" onPress={openCaptainEntry} />
-        </MobileScrollView>
+        {renderHomeScreen()}
       </Surface>
       {accountSheet}
+      {gpsSheet}
     </Box>
   );
 }

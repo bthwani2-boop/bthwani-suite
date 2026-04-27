@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   MobileScrollView,
-  ScreenHeader,
   Surface,
   Text,
   TextField,
@@ -122,7 +121,7 @@ export function DshCaptainOrderChatScreen({
   const [attachments, setAttachments] = React.useState<ComposerAttachmentKind[]>([]);
   const [isSending, setIsSending] = React.useState(false);
   const [composerState, setComposerState] = React.useState<'idle' | 'typing' | 'with-attachment' | 'sending' | 'success' | 'error' | 'disabled'>(isReadOnly ? 'disabled' : 'idle');
-  const [messages, setMessages] = React.useState<OrderChatMessage[]>(() => initialMessages);
+  const [messages, setMessages] = React.useState<OrderChatMessage[]>(initialMessages);
 
   const canSend = !isReadOnly && !isSending && (draft.trim().length > 0 || attachments.length > 0);
 
@@ -210,13 +209,6 @@ export function DshCaptainOrderChatScreen({
 
   return (
     <MobileScrollView fill padding={4} gap={4}>
-      <ScreenHeader
-        title="تواصل الطلب"
-        subtitle="رسائل الطلب المختصرة تبقى مع نفس الطلب حتى الإغلاق."
-        actionLabel={onBack ? 'عودة للتفاصيل' : undefined}
-        onActionPress={onBack}
-      />
-
       <Box gap={2}>
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           <Badge label={`#${orderId}`} tone="brand" />
@@ -236,7 +228,7 @@ export function DshCaptainOrderChatScreen({
         </Box>
 
         <ScrollView style={{ maxHeight: 380 }} contentContainerStyle={{ gap: 12 }} showsVerticalScrollIndicator={false}>
-          {messages.map((message) => (
+          {messages.map((message: OrderChatMessage) => (
             <OrderChatBubble key={message.id} message={message} />
           ))}
         </ScrollView>

@@ -54,8 +54,8 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
   if (route === 'entry') {
     return (
       <div>
-        <h1>Captain — Entry</h1>
-        <p>مخطط شاشة الدخول لقائد الخدمة (Captain).</p>
+        <h1>الكابتن — المدخل</h1>
+        <p>مخطط شاشة الدخول لقائد الخدمة.</p>
       </div>
     );
   }
@@ -63,8 +63,8 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
   if (route === 'orders-inbox') {
     return (
       <div>
-        <h1>Captain — Orders Inbox</h1>
-        <button onClick={handleBack}>Back</button>
+        <h1>الكابتن — صندوق الطلبات</h1>
+        <button onClick={handleBack}>عودة</button>
         <p>قائمة الطلبات placeholder.</p>
       </div>
     );
@@ -73,8 +73,8 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
   if (route === 'order-detail') {
     return (
       <div>
-        <h1>Captain — Order Detail</h1>
-        <button onClick={handleBack}>Back</button>
+        <h1>الكابتن — تفاصيل الطلب</h1>
+        <button onClick={handleBack}>عودة</button>
         <p>تفاصيل الطلب placeholder.</p>
       </div>
     );
@@ -83,8 +83,8 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
   if (route === 'wallet') {
     return (
       <div>
-        <h1>Captain — Wallet</h1>
-        <button onClick={handleBack}>Back</button>
+        <h1>الكابتن — المحفظة</h1>
+        <button onClick={handleBack}>عودة</button>
         <p>محفظة القائد placeholder.</p>
       </div>
     );
@@ -93,8 +93,8 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
   if (route === 'support') {
     return (
       <div>
-        <h1>Captain — Support</h1>
-        <button onClick={handleBack}>Back</button>
+        <h1>الكابتن — الدعم</h1>
+        <button onClick={handleBack}>عودة</button>
         <p>شاشات الدعم placeholder.</p>
       </div>
     );
@@ -102,8 +102,8 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
 
   return (
     <div>
-      <h1>Captain — {route}</h1>
-      <button onClick={handleBack}>Back</button>
+      <h1>الكابتن — {route}</h1>
+      <button onClick={handleBack}>عودة</button>
     </div>
   );
 }

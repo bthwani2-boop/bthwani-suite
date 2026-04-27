@@ -31,7 +31,7 @@ export function CaptainOrderDetailScreen({
     <MobileScrollView padding={4} gap={4}>
       <Surface tone="brand" gap={3}>
         <Box gap={1} style={{ alignItems: 'flex-end' }}>
-          <Badge label="Captain order" tone="warning" />
+          <Badge label="طلب الكابتن" tone="warning" />
           <Text role="titleLg" style={{ textAlign: 'right' }}>{summary.orderId}</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             {summary.currentStageLabel}
@@ -40,22 +40,22 @@ export function CaptainOrderDetailScreen({
 
         <KeyValueList
           items={[
-            { label: 'Pickup', value: summary.pickupLabel, tone: 'brand' },
-            { label: 'Dropoff', value: summary.dropoffLabel },
-            { label: 'ETA', value: summary.etaLabel, tone: 'warning' },
-            { label: 'Next step', value: summary.nextActionLabel, tone: 'success' },
+            { label: 'الاستلام', value: summary.pickupLabel, tone: 'brand' },
+            { label: 'التسليم', value: summary.dropoffLabel },
+            { label: 'الوقت المتوقع', value: summary.etaLabel, tone: 'warning' },
+            { label: 'الخطوة التالية', value: summary.nextActionLabel, tone: 'success' },
           ]}
         />
       </Surface>
 
       <Surface tone="raised" gap={3}>
-        <SectionHeader title="Order actions" subtitle="Confirm the next step without leaving the order detail surface." />
+        <SectionHeader title="إجراءات الطلب" subtitle="أكد الخطوة التالية من دون مغادرة سطح تفاصيل الطلب." />
         <Box gap={2}>
-          {onConfirmPickup ? <Button label="Confirm pickup" onPress={onConfirmPickup} /> : null}
-          {onConfirmDelivery ? <Button label="Confirm delivery" tone="secondary" onPress={onConfirmDelivery} /> : null}
-          {onOpenNextOrder ? <Button label="Open next order" tone="secondary" onPress={onOpenNextOrder} /> : null}
-          {onBackToInbox ? <Button label="Back to inbox" tone="ghost" onPress={onBackToInbox} /> : null}
-          {onRetry ? <Button label="Retry" tone="ghost" onPress={onRetry} /> : null}
+          {onConfirmPickup ? <Button label="تأكيد الاستلام" onPress={onConfirmPickup} /> : null}
+          {onConfirmDelivery ? <Button label="تأكيد التسليم" tone="secondary" onPress={onConfirmDelivery} /> : null}
+          {onOpenNextOrder ? <Button label="فتح الطلب التالي" tone="secondary" onPress={onOpenNextOrder} /> : null}
+          {onBackToInbox ? <Button label="العودة إلى الصندوق" tone="ghost" onPress={onBackToInbox} /> : null}
+          {onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
         </Box>
       </Surface>
     </MobileScrollView>
@@ -76,11 +76,11 @@ export function CaptainPickupConfirmSheet({ visible, orderTitle, onConfirm, onCa
 
   return (
     <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-      <SectionHeader title="Confirm pickup" subtitle="Acknowledge the order pickup before moving it to the next stage." />
+      <SectionHeader title="تأكيد الاستلام" subtitle="أقر باستلام الطلب قبل نقله إلى المرحلة التالية." />
       <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{orderTitle}</Text>
       <Box gap={2}>
-        <Button label="Confirm pickup" onPress={onConfirm} />
-        <Button label="Cancel" tone="ghost" onPress={onCancel} />
+        <Button label="تأكيد الاستلام" onPress={onConfirm} />
+        <Button label="إلغاء" tone="ghost" onPress={onCancel} />
       </Box>
     </Surface>
   );
@@ -100,11 +100,11 @@ export function CaptainDeliveryConfirmSheet({ visible, orderTitle, onConfirm, on
 
   return (
     <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-      <SectionHeader title="Confirm delivery" subtitle="Close the order once the customer receives it." />
+      <SectionHeader title="تأكيد التسليم" subtitle="أغلق الطلب بعد استلام العميل له." />
       <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{orderTitle}</Text>
       <Box gap={2}>
-        <Button label="Confirm delivery" onPress={onConfirm} />
-        <Button label="Cancel" tone="ghost" onPress={onCancel} />
+        <Button label="تأكيد التسليم" onPress={onConfirm} />
+        <Button label="إلغاء" tone="ghost" onPress={onCancel} />
       </Box>
     </Surface>
   );

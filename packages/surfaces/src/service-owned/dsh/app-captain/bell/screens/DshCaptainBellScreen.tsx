@@ -20,35 +20,35 @@ type CaptainBellSummary = {
 };
 
 const defaultSummary: CaptainBellSummary = {
-  inboxLabel: 'Captain orders inbox',
-  approvalLabel: 'Approval needed',
-  urgentLabel: 'Urgent order rings',
-  nextActionLabel: 'A new order ring should push the captain toward approval or the inbox without extra noise.',
+  inboxLabel: 'صندوق طلبات الكابتن',
+  approvalLabel: 'بحاجة إلى موافقة',
+  urgentLabel: 'رنات الطلبات العاجلة',
+  nextActionLabel: 'رنّة الطلب الجديدة يجب أن تدفع الكابتن إلى الموافقة أو الصندوق مباشرة من دون ضوضاء إضافية.',
 };
 
 const defaultItems: CaptainBellItem[] = [
   {
     id: 'captain-bell-1',
-    title: 'New order #9021',
-    subtitle: 'Burger Lab is waiting for a captain to accept the route.',
-    meta: 'Next: review and accept',
-    badgeLabel: 'New',
+    title: 'طلب جديد #9021',
+    subtitle: 'Burger Lab بانتظار كابتن يقبل المسار.',
+    meta: 'التالي: مراجعة ثم قبول',
+    badgeLabel: 'جديد',
     tone: 'warning',
   },
   {
     id: 'captain-bell-2',
-    title: 'New order #9024',
-    subtitle: 'Green Bowl needs an immediate review before the queue grows.',
-    meta: 'Next: open order detail',
-    badgeLabel: 'Urgent',
+    title: 'طلب جديد #9024',
+    subtitle: 'Green Bowl تحتاج مراجعة فورية قبل أن يكبر الصف.',
+    meta: 'التالي: فتح تفاصيل الطلب',
+    badgeLabel: 'عاجل',
     tone: 'brand',
   },
   {
     id: 'captain-bell-3',
-    title: 'New order #9027',
-    subtitle: 'Bean House is ready if the captain confirms availability.',
-    meta: 'Next: open inbox',
-    badgeLabel: 'Ready',
+    title: 'طلب جديد #9027',
+    subtitle: 'Bean House جاهزة إذا أكد الكابتن التوفر.',
+    meta: 'التالي: فتح الصندوق',
+    badgeLabel: 'جاهز',
     tone: 'info',
   },
 ];
@@ -63,22 +63,22 @@ type BellStateCopy = {
 
 function resolveStateCopy(state: Exclude<DshCaptainBellScreenState, 'ready'>): BellStateCopy {
   if (state === 'loading') {
-    return { stateId: 'loading', title: 'Preparing captain bell', description: 'The next order ring will appear once queue data arrives.', actionLabel: 'Retry bell' };
+    return { stateId: 'loading', title: 'جارٍ تجهيز جرس الكابتن', description: 'ستظهر رنّة الطلب التالية بمجرد وصول بيانات الصف.', actionLabel: 'إعادة المحاولة' };
   }
 
   if (state === 'empty') {
-    return { stateId: 'empty', title: 'No new order rings', description: 'The bell stays quiet until a new order arrives in the queue.', actionLabel: 'Open inbox' };
+    return { stateId: 'empty', title: 'لا توجد رنات طلب جديدة', description: 'يبقى الجرس هادئًا حتى يصل طلب جديد إلى الصف.', actionLabel: 'فتح الصندوق' };
   }
 
   if (state === 'offline') {
-    return { stateId: 'offline', title: 'Captain bell is offline', description: 'Reconnect to restore the live new-order attention lane.', actionLabel: 'Retry bell' };
+    return { stateId: 'offline', title: 'جرس الكابتن غير متصل', description: 'أعد الاتصال لاسترجاع مسار التنبيه المباشر للطلبات الجديدة.', actionLabel: 'إعادة المحاولة' };
   }
 
   if (state === 'disabled') {
-    return { kind: 'warning', title: 'Captain bell is disabled', description: 'The bell can stay read-only until the DSH captain queue is re-enabled.', actionLabel: 'Open inbox' };
+    return { kind: 'warning', title: 'جرس الكابتن متوقف', description: 'يمكن إبقاء الجرس للقراءة فقط حتى يعاد تفعيل صف DSH.', actionLabel: 'فتح الصندوق' };
   }
 
-  return { stateId: 'recoverableError', title: 'Unable to load the captain bell', description: 'Reload the same path and keep the attention queue visible.', actionLabel: 'Retry bell' };
+  return { stateId: 'recoverableError', title: 'تعذر تحميل جرس الكابتن', description: 'أعد تحميل المسار نفسه مع إبقاء صف التنبيه ظاهرًا.', actionLabel: 'إعادة المحاولة' };
 }
 
 export type DshCaptainBellScreenProps = {
@@ -114,16 +114,16 @@ export function DshCaptainBellScreen({
     <MobileScrollView padding={4} gap={4}>
       <Surface tone="brand" gap={3}>
         <Box gap={1} style={{ alignItems: 'flex-end' }}>
-          <Badge label="New orders" tone="warning" />
+          <Badge label="طلبات جديدة" tone="warning" />
           <Text role="titleLg" style={{ textAlign: 'right' }}>جرس الطلبات الجديدة للكابتن</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            الرن هنا يلفت الانتباه فقط عند وصول طلب جديد أو عند الحاجة إلى موافقة سريعة من الكابتن.
+            هذا الجرس يلفت الانتباه فقط عند وصول طلب جديد أو عند الحاجة إلى موافقة سريعة من الكابتن.
           </Text>
         </Box>
 
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           <StatCard label="طلبات جديدة" value={String(items.length)} deltaLabel="مباشر" tone="warning" />
-          <StatCard label="بحاجة موافقة" value="2" deltaLabel={summary.approvalLabel} tone="brand" />
+          <StatCard label="بحاجة إلى موافقة" value="2" deltaLabel={summary.approvalLabel} tone="brand" />
           <StatCard label="رنات عاجلة" value="1" deltaLabel={summary.urgentLabel} tone="info" />
         </Box>
       </Surface>

@@ -65,203 +65,203 @@ export type CaptainGeneratedSupportScreenProps = {
 const captainSupportConfigs: Record<CaptainSupportScreenId, CaptainConfig> = {
   'chat-read-ack': {
     id: 'chat-read-ack',
-    title: 'Captain chat read acknowledgement',
-    subtitle: 'Acknowledge the newest operational conversation without leaving the active order lane.',
-    heroTitle: 'Unread operational messages',
-    heroDescription: 'The captain clears unread communication while staying focused on the next route step.',
-    primaryLabel: 'Mark chat as read',
-    secondaryLabel: 'Back to support directory',
+    title: 'تأكيد قراءة دردشة الكابتن',
+    subtitle: 'أكد أحدث محادثة تشغيلية من دون مغادرة مسار الطلب النشط.',
+    heroTitle: 'الرسائل التشغيلية غير المقروءة',
+    heroDescription: 'يمسح الكابتن التواصل غير المقروء مع البقاء مركزًا على خطوة المسار التالية.',
+    primaryLabel: 'وضع علامة مقروء',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     listItems: [
-      { title: 'Branch', subtitle: 'Order is ready at counter 2.', meta: '2 min ago', badgeLabel: 'Unread' },
-      { title: 'Customer', subtitle: 'Please call on arrival.', meta: '5 min ago', badgeLabel: 'Unread' },
+      { title: 'الفرع', subtitle: 'الطلب جاهز عند الكاونتر 2.', meta: 'منذ دقيقتين', badgeLabel: 'غير مقروء' },
+      { title: 'العميل', subtitle: 'يرجى الاتصال عند الوصول.', meta: 'منذ 5 دقائق', badgeLabel: 'غير مقروء' },
     ],
   },
   'chat-send': {
     id: 'chat-send',
-    title: 'Captain chat send',
-    subtitle: 'Send a route-specific message from a focused compose surface.',
-    heroTitle: 'Route communication',
-    heroDescription: 'Use one concise message so the receiving party can act immediately.',
-    primaryLabel: 'Send message',
-    secondaryLabel: 'Back to support directory',
-    inputLabel: 'Message',
-    inputHint: 'Example: arrived at the pickup gate and waiting for handoff.',
+    title: 'إرسال رسالة الكابتن',
+    subtitle: 'أرسل رسالة مرتبطة بالمسار من مساحة كتابة مركزة.',
+    heroTitle: 'التواصل على المسار',
+    heroDescription: 'استخدم رسالة قصيرة واحدة حتى يتمكن الطرف المستلم من التصرف فورًا.',
+    primaryLabel: 'إرسال الرسالة',
+    secondaryLabel: 'العودة إلى دليل الدعم',
+    inputLabel: 'الرسالة',
+    inputHint: 'مثال: وصلت إلى بوابة الاستلام وأنتظر التسليم.',
   },
   'cod-balance': {
     id: 'cod-balance',
-    title: 'COD balance',
-    subtitle: 'Review cash-on-delivery balance and pending reconciliation.',
-    heroTitle: 'Cash visibility',
-    heroDescription: 'The captain can verify collected cash before the settlement workflow continues.',
-    primaryLabel: 'Refresh balance',
-    secondaryLabel: 'Back to support directory',
+    title: 'رصيد الدفع عند الاستلام',
+    subtitle: 'راجع رصيد الدفع عند الاستلام والتسوية المعلّقة.',
+    heroTitle: 'وضوح الرصيد النقدي',
+    heroDescription: 'يمكن للكابتن التحقق من النقد المحصّل قبل متابعة سير التسوية.',
+    primaryLabel: 'تحديث الرصيد',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     metrics: [
-      { label: 'Collected today', value: '420 SAR', deltaLabel: 'Cash received', tone: 'info' },
-      { label: 'Pending deposit', value: '180 SAR', deltaLabel: 'Needs settlement', tone: 'warning' },
-      { label: 'Variance', value: '0 SAR', deltaLabel: 'Balanced', tone: 'success' },
+      { label: 'المحصّل اليوم', value: '420 SAR', deltaLabel: 'النقد المستلم', tone: 'info' },
+      { label: 'الإيداع المعلّق', value: '180 SAR', deltaLabel: 'يحتاج تسوية', tone: 'warning' },
+      { label: 'الفارق', value: '0 SAR', deltaLabel: 'متوازن', tone: 'success' },
     ],
   },
   'job-reject': {
     id: 'job-reject',
-    title: 'Job reject',
-    subtitle: 'Reject a order with a visible operational reason.',
-    heroTitle: 'Exception handling',
-    heroDescription: 'Rejection should remain rare and fully explicit so reassignment can happen cleanly.',
-    primaryLabel: 'Reject order',
-    secondaryLabel: 'Back to support directory',
-    inputLabel: 'Rejection reason',
-    inputHint: 'Example: vehicle issue or unsafe route condition.',
+    title: 'رفض المهمة',
+    subtitle: 'ارفض طلبًا مع سبب تشغيلي ظاهر.',
+    heroTitle: 'التعامل مع الاستثناءات',
+    heroDescription: 'يجب أن يبقى الرفض نادرًا ومصرّحًا به بالكامل حتى تتم الإعادة بسلاسة.',
+    primaryLabel: 'رفض الطلب',
+    secondaryLabel: 'العودة إلى دليل الدعم',
+    inputLabel: 'سبب الرفض',
+    inputHint: 'مثال: مشكلة في المركبة أو حالة طريق غير آمنة.',
   },
   'order-accept': {
     id: 'order-accept',
-    title: 'Order accept',
-    subtitle: 'Confirm the captain accepts the order and is committing to pickup.',
-    heroTitle: 'Captain acceptance',
-    heroDescription: 'Acceptance moves the route from queued work into committed execution.',
-    primaryLabel: 'Accept order',
-    secondaryLabel: 'Back to support directory',
+    title: 'قبول الطلب',
+    subtitle: 'أكد أن الكابتن قبل الطلب والتزم بالاستلام.',
+    heroTitle: 'قبول الكابتن',
+    heroDescription: 'ينقل القبول المسار من عمل في الصف إلى تنفيذ ملتزم.',
+    primaryLabel: 'قبول الطلب',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     keyValues: [
-      { label: 'Pickup ETA', value: '8 min' },
-      { label: 'Dropoff zone', value: 'Olaya' },
-      { label: 'Commitment', value: 'Pending captain confirmation', tone: 'warning' },
+      { label: 'موعد الاستلام المتوقع', value: '8 دقائق' },
+      { label: 'منطقة التسليم', value: 'العليا' },
+      { label: 'الالتزام', value: 'بانتظار تأكيد الكابتن', tone: 'warning' },
     ],
   },
   'order-deliver': {
     id: 'order-deliver',
-    title: 'Order deliver',
-    subtitle: 'Close the route with final delivery confirmation.',
-    heroTitle: 'Last-mile closure',
-    heroDescription: 'The captain should confirm delivery only once proof and recipient handoff are clear.',
-    primaryLabel: 'Confirm delivery',
-    secondaryLabel: 'Back to support directory',
+    title: 'تسليم الطلب',
+    subtitle: 'أغلق المسار مع تأكيد التسليم النهائي.',
+    heroTitle: 'إغلاق المرحلة الأخيرة',
+    heroDescription: 'يجب أن يؤكد الكابتن التسليم فقط بعد وضوح الإثبات وتسليم الطلب للمتلقي.',
+    primaryLabel: 'تأكيد التسليم',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     keyValues: [
-      { label: 'Recipient', value: 'Customer confirmed' },
-      { label: 'Proof', value: 'Code entered', tone: 'success' },
-      { label: 'Balance impact', value: 'Updates COD if applicable' },
+      { label: 'المستلم', value: 'تم تأكيد العميل' },
+      { label: 'الإثبات', value: 'تم إدخال الرمز', tone: 'success' },
+      { label: 'أثر الرصيد', value: 'يحدّث COD إن انطبق' },
     ],
   },
   'order-details': {
     id: 'order-details',
-    title: 'Order details',
-    subtitle: 'Review the captain-focused route snapshot.',
-    heroTitle: 'Captain order snapshot',
-    heroDescription: 'Only pickup, dropoff, timing, and current stage should remain visible here.',
-    primaryLabel: 'Refresh order detail',
-    secondaryLabel: 'Back to support directory',
+    title: 'تفاصيل الطلب',
+    subtitle: 'راجع لقطة المسار الموجهة للكابتن.',
+    heroTitle: 'لقطة طلب الكابتن',
+    heroDescription: 'لا ينبغي أن تبقى ظاهرة هنا إلا الاستلام والتسليم والتوقيت والمرحلة الحالية.',
+    primaryLabel: 'تحديث تفاصيل الطلب',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     keyValues: [
-      { label: 'Pickup', value: 'Burger Lab - Hittin branch' },
-      { label: 'Dropoff', value: 'Olaya District' },
-      { label: 'Stage', value: 'Heading to pickup', tone: 'brand' },
+      { label: 'الاستلام', value: 'Burger Lab - فرع حطين' },
+      { label: 'التسليم', value: 'حي العليا' },
+      { label: 'المرحلة', value: 'متجه إلى الاستلام', tone: 'brand' },
     ],
   },
   'order-get': {
     id: 'order-get',
-    title: 'Order get',
-    subtitle: 'Open the compact read view for the assigned route.',
-    heroTitle: 'Assigned route read view',
-    heroDescription: 'The captain can reload route context without reopening the inbox.',
-    primaryLabel: 'Refresh route snapshot',
-    secondaryLabel: 'Back to support directory',
+    title: 'عرض الطلب',
+    subtitle: 'افتح العرض المقروء المدمج للمسار المخصص.',
+    heroTitle: 'عرض المسار المخصص',
+    heroDescription: 'يمكن للكابتن إعادة تحميل سياق المسار من دون إعادة فتح الصندوق.',
+    primaryLabel: 'تحديث لقطة المسار',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     keyValues: [
-      { label: 'Order', value: '#9021' },
-      { label: 'Current ETA', value: '8 min' },
-      { label: 'Traffic impact', value: 'Moderate', tone: 'warning' },
+      { label: 'الطلب', value: '#9021' },
+      { label: 'الوقت المتوقع الحالي', value: '8 دقائق' },
+      { label: 'أثر الازدحام', value: 'متوسط', tone: 'warning' },
     ],
   },
   'order-pickup': {
     id: 'order-pickup',
-    title: 'Order pickup',
-    subtitle: 'Confirm branch pickup before the delivery leg starts.',
-    heroTitle: 'Pickup confirmation',
-    heroDescription: 'Pickup is a separate confirmation step so the route timeline stays honest.',
-    primaryLabel: 'Confirm pickup',
-    secondaryLabel: 'Back to support directory',
+    title: 'استلام الطلب',
+    subtitle: 'أكد استلام الفرع قبل بدء مرحلة التوصيل.',
+    heroTitle: 'تأكيد الاستلام',
+    heroDescription: 'الاستلام خطوة تأكيد منفصلة حتى يبقى خط زمن المسار صادقًا.',
+    primaryLabel: 'تأكيد الاستلام',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     keyValues: [
-      { label: 'Branch', value: 'Burger Lab - Hittin branch' },
-      { label: 'Package status', value: 'Ready at counter 2' },
-      { label: 'Next step', value: 'Navigate to customer', tone: 'brand' },
+      { label: 'الفرع', value: 'Burger Lab - فرع حطين' },
+      { label: 'حالة الحزمة', value: 'جاهزة عند الكاونتر 2' },
+      { label: 'الخطوة التالية', value: 'الانتقال إلى العميل', tone: 'brand' },
     ],
   },
   'orders-list': {
     id: 'orders-list',
-    title: 'Orders list',
-    subtitle: 'Browse all captain orders from one focused queue screen.',
-    heroTitle: 'Captain route queue',
-    heroDescription: 'This list complements the inbox with a broader yet still order-oriented view.',
-    primaryLabel: 'Refresh order list',
-    secondaryLabel: 'Back to support directory',
+    title: 'قائمة الطلبات',
+    subtitle: 'تصفح كل طلبات الكابتن من شاشة صف مركزة واحدة.',
+    heroTitle: 'صف مسار الكابتن',
+    heroDescription: 'تكمّل هذه القائمة صندوق الطلبات برؤية أوسع لكنها ما زالت موجهة للطلبات.',
+    primaryLabel: 'تحديث قائمة الطلبات',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     listItems: [
-      { title: 'Order #9021', subtitle: 'Burger Lab to Olaya', meta: 'Pickup in 8 min', badgeLabel: 'Next up' },
-      { title: 'Order #9024', subtitle: 'Green Bowl to King Fahad Rd', meta: 'Pickup in 15 min', badgeLabel: 'Queued' },
+      { title: 'الطلب #9021', subtitle: 'Burger Lab إلى العليا', meta: 'الاستلام خلال 8 دقائق', badgeLabel: 'التالي' },
+      { title: 'الطلب #9024', subtitle: 'Green Bowl إلى طريق الملك فهد', meta: 'الاستلام خلال 15 دقيقة', badgeLabel: 'في الصف' },
     ],
   },
   'orders-offers-list': {
     id: 'orders-offers-list',
-    title: 'Orders offers list',
-    subtitle: 'Review open order offers that are not yet accepted.',
-    heroTitle: 'Available order offers',
-    heroDescription: 'Offer review stays separated from accepted orders so the captain always knows commitment level.',
-    primaryLabel: 'Refresh offers',
-    secondaryLabel: 'Back to support directory',
+    title: 'قائمة عروض الطلبات',
+    subtitle: 'راجع عروض الطلبات المفتوحة التي لم تقبل بعد.',
+    heroTitle: 'عروض الطلبات المتاحة',
+    heroDescription: 'يبقى مراجعة العروض منفصلة عن الطلبات المقبولة حتى يعرف الكابتن مستوى الالتزام دائمًا.',
+    primaryLabel: 'تحديث العروض',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     listItems: [
-      { title: 'Offer #440', subtitle: 'Bean House to Nakheel', meta: 'Estimated payout 22 SAR', badgeLabel: 'Open' },
-      { title: 'Offer #441', subtitle: 'Green Bowl to Olaya', meta: 'Estimated payout 19 SAR', badgeLabel: 'Open' },
+      { title: 'عرض #440', subtitle: 'Bean House إلى النخيل', meta: 'الدفع المتوقع 22 SAR', badgeLabel: 'مفتوح' },
+      { title: 'عرض #441', subtitle: 'Green Bowl إلى العليا', meta: 'الدفع المتوقع 19 SAR', badgeLabel: 'مفتوح' },
     ],
   },
   'profile-get': {
     id: 'profile-get',
-    title: 'Captain profile',
-    subtitle: 'Read the current captain profile and route readiness status.',
-    heroTitle: 'Captain identity snapshot',
-    heroDescription: 'The route profile remains accessible without leaving the DSH surface family.',
-    primaryLabel: 'Refresh profile',
-    secondaryLabel: 'Back to support directory',
+    title: 'ملف الكابتن',
+    subtitle: 'اقرأ ملف الكابتن الحالي وحالة الجاهزية للمسار.',
+    heroTitle: 'لقطة هوية الكابتن',
+    heroDescription: 'يبقى ملف المسار متاحًا من دون مغادرة عائلة أسطح DSH.',
+    primaryLabel: 'تحديث الملف',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     keyValues: [
-      { label: 'Captain', value: 'Captain #9021' },
-      { label: 'Vehicle', value: 'Motorbike' },
-      { label: 'Readiness', value: 'Online and available', tone: 'success' },
+      { label: 'الكابتن', value: 'الكابتن #9021' },
+      { label: 'المركبة', value: 'دراجة نارية' },
+      { label: 'الجاهزية', value: 'متصل وجاهز', tone: 'success' },
     ],
   },
   'proof-upload': {
     id: 'proof-upload',
-    title: 'Proof upload',
-    subtitle: 'Capture proof when final delivery confirmation needs media support.',
-    heroTitle: 'Delivery evidence',
-    heroDescription: 'Proof capture remains distinct from the delivery confirmation so exceptions can be handled clearly.',
-    primaryLabel: 'Upload proof',
-    secondaryLabel: 'Back to support directory',
+    title: 'رفع الإثبات',
+    subtitle: 'التقط الإثبات عندما يحتاج تأكيد التسليم النهائي إلى دعم وسائط.',
+    heroTitle: 'أدلة التسليم',
+    heroDescription: 'يبقى التقاط الإثبات منفصلًا عن تأكيد التسليم حتى يمكن التعامل مع الاستثناءات بوضوح.',
+    primaryLabel: 'رفع الإثبات',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     keyValues: [
-      { label: 'Required format', value: 'Photo or signed confirmation' },
-      { label: 'Current status', value: 'Pending upload', tone: 'warning' },
-      { label: 'Follow-up', value: 'Close route after proof' },
+      { label: 'الصيغة المطلوبة', value: 'صورة أو تأكيد موقّع' },
+      { label: 'الحالة الحالية', value: 'بانتظار الرفع', tone: 'warning' },
+      { label: 'المتابعة', value: 'أغلق المسار بعد الإثبات' },
     ],
   },
   'tier-evaluate': {
     id: 'tier-evaluate',
-    title: 'Tier evaluate',
-    subtitle: 'Review whether the captain is ready for the next tier.',
-    heroTitle: 'Tier progression check',
-    heroDescription: 'Tier logic stays operationally visible so the captain knows what affects eligibility.',
-    primaryLabel: 'Evaluate tier',
-    secondaryLabel: 'Back to support directory',
+    title: 'تقييم الطبقة',
+    subtitle: 'راجع ما إذا كان الكابتن جاهزًا للطبقة التالية.',
+    heroTitle: 'فحص التقدم في الطبقة',
+    heroDescription: 'تبقى منطق الطبقة مرئية تشغيليًا حتى يعرف الكابتن ما يؤثر على الأهلية.',
+    primaryLabel: 'تقييم الطبقة',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     metrics: [
-      { label: 'Completion rate', value: '97%', deltaLabel: 'Last 30 days', tone: 'success' },
-      { label: 'Cancellation rate', value: '1.2%', deltaLabel: 'Last 30 days', tone: 'info' },
-      { label: 'Incidents', value: '0', deltaLabel: 'Safety issues', tone: 'success' },
+      { label: 'معدل الإكمال', value: '97%', deltaLabel: 'آخر 30 يومًا', tone: 'success' },
+      { label: 'معدل الإلغاء', value: '1.2%', deltaLabel: 'آخر 30 يومًا', tone: 'info' },
+      { label: 'الحوادث', value: '0', deltaLabel: 'مشكلات السلامة', tone: 'success' },
     ],
   },
   'tier-info': {
     id: 'tier-info',
-    title: 'Tier info',
-    subtitle: 'Read the current benefits and requirements of the active captain tier.',
-    heroTitle: 'Current tier benefits',
-    heroDescription: 'The captain should understand what the current tier unlocks and what the next tier requires.',
-    primaryLabel: 'Refresh tier info',
-    secondaryLabel: 'Back to support directory',
+    title: 'معلومات الطبقة',
+    subtitle: 'اقرأ المزايا والمتطلبات الحالية للطبقة النشطة.',
+    heroTitle: 'مزايا الطبقة الحالية',
+    heroDescription: 'يجب أن يفهم الكابتن ما تفتحه الطبقة الحالية وما تتطلبه الطبقة التالية.',
+    primaryLabel: 'تحديث معلومات الطبقة',
+    secondaryLabel: 'العودة إلى دليل الدعم',
     keyValues: [
-      { label: 'Current tier', value: 'Gold', tone: 'brand' },
-      { label: 'Payout bonus', value: '+8%' },
-      { label: 'Next tier threshold', value: '120 completed routes' },
+      { label: 'الطبقة الحالية', value: 'ذهبية', tone: 'brand' },
+      { label: 'مكافأة الأجر', value: '+8%' },
+      { label: 'عتبة الطبقة التالية', value: '120 مسارًا مكتملًا' },
     ],
   },
 };
@@ -275,9 +275,9 @@ function renderCaptainSupportState(state: Exclude<CaptainSupportScreenState, 're
     return (
       <StateView
         stateId="empty"
-        title="No captain support content is loaded"
-        description="Reload the screen and keep the order context stable."
-        actionLabel={onRetry ? 'Reload support screen' : undefined}
+        title="لا يوجد محتوى دعم للكابتن محمّل"
+        description="أعد تحميل الشاشة وحافظ على سياق الطلب ثابتًا."
+        actionLabel={onRetry ? 'إعادة تحميل شاشة الدعم' : undefined}
         onActionPress={onRetry}
       />
     );
@@ -287,9 +287,9 @@ function renderCaptainSupportState(state: Exclude<CaptainSupportScreenState, 're
     return (
       <StateView
         stateId="offline"
-        title="Captain support screen is offline"
-        description="Retry the support step when connectivity returns."
-        actionLabel={onRetry ? 'Retry support screen' : undefined}
+        title="شاشة دعم الكابتن غير متصلة"
+        description="أعد المحاولة عندما يعود الاتصال."
+        actionLabel={onRetry ? 'إعادة المحاولة في شاشة الدعم' : undefined}
         onActionPress={onRetry}
       />
     );
@@ -299,9 +299,9 @@ function renderCaptainSupportState(state: Exclude<CaptainSupportScreenState, 're
     return (
       <StateView
         stateId="success"
-        title="Captain support action completed"
-        description="The support step is complete and the captain can continue to the next route action."
-        actionLabel={onBack ? 'Back to support directory' : undefined}
+        title="اكتمل إجراء دعم الكابتن"
+        description="أصبح مسار الدعم مكتملًا ويمكن للكابتن متابعة خطوة المسار التالية."
+        actionLabel={onBack ? 'العودة إلى دليل الدعم' : undefined}
         onActionPress={onBack}
       />
     );
@@ -310,9 +310,9 @@ function renderCaptainSupportState(state: Exclude<CaptainSupportScreenState, 're
   return (
     <StateView
       stateId="recoverableError"
-      title="Captain support screen failed"
-      description="Retry without leaving the order-focused support lane."
-      actionLabel={onRetry ? 'Retry support step' : undefined}
+      title="فشلت شاشة دعم الكابتن"
+      description="أعد المحاولة من دون مغادرة مسار الدعم المرتبط بالطلب."
+      actionLabel={onRetry ? 'إعادة محاولة خطوة الدعم' : undefined}
       onActionPress={onRetry}
     />
   );
@@ -356,14 +356,14 @@ function createCaptainSupportScreen(config: CaptainConfig) {
 
         {config.keyValues?.length ? (
           <Surface tone="raised" gap={3}>
-            <SectionHeader title="Route details" subtitle="Only the details needed for the immediate captain action stay visible." />
+            <SectionHeader title="تفاصيل المسار" subtitle="تبقى فقط التفاصيل اللازمة لإجراء الكابتن الفوري ظاهرة." />
             <KeyValueList items={config.keyValues} />
           </Surface>
         ) : null}
 
         {config.listItems?.length ? (
           <Surface tone="default" gap={3}>
-            <SectionHeader title="Current queue" subtitle="Every item keeps the next route decision explicit." />
+            <SectionHeader title="الصف الحالي" subtitle="كل عنصر يحافظ على قرار المسار التالي واضحًا." />
             <Box gap={2}>
               {config.listItems.map((item) => (
                 <ListItem
@@ -380,7 +380,7 @@ function createCaptainSupportScreen(config: CaptainConfig) {
 
         {config.inputLabel ? (
           <Surface tone="raised" gap={3}>
-            <SectionHeader title="Draft input" subtitle="One concise captain input keeps the workflow focused." />
+            <SectionHeader title="إدخال المسودة" subtitle="إدخال واحد موجز من الكابتن يبقي المسار مركزًا." />
             <TextField
               label={config.inputLabel}
               value={draftValue}

@@ -19,30 +19,30 @@ const groups: Array<{
   items: Array<{ id: CaptainSupportScreenId; title: string; subtitle: string; badgeLabel: string }>;
 }> = [
   {
-    title: 'Execution flow',
-    subtitle: 'The captain route lifecycle from offer to completion.',
+    title: 'مسار التنفيذ',
+    subtitle: 'دورة مسار الكابتن من العرض حتى الإتمام.',
     items: [
-      { id: 'orders-offers-list', title: 'Orders offers list', subtitle: 'Review open offers before commitment.', badgeLabel: 'Offers' },
-      { id: 'orders-list', title: 'Orders list', subtitle: 'Browse active route queue.', badgeLabel: 'Queue' },
-      { id: 'order-accept', title: 'Order accept', subtitle: 'Accept the order.', badgeLabel: 'Execution' },
-      { id: 'order-get', title: 'Order get', subtitle: 'Open route snapshot.', badgeLabel: 'Read' },
-      { id: 'order-details', title: 'Order details', subtitle: 'Inspect order detail.', badgeLabel: 'Read' },
-      { id: 'order-pickup', title: 'Order pickup', subtitle: 'Confirm pickup.', badgeLabel: 'Execution' },
-      { id: 'order-deliver', title: 'Order deliver', subtitle: 'Confirm delivery.', badgeLabel: 'Closure' },
-      { id: 'proof-upload', title: 'Proof upload', subtitle: 'Upload delivery evidence.', badgeLabel: 'Proof' },
-      { id: 'job-reject', title: 'Job reject', subtitle: 'Reject with reason.', badgeLabel: 'Exception' },
+      { id: 'orders-offers-list', title: 'قائمة عروض الطلبات', subtitle: 'راجع العروض المفتوحة قبل الالتزام.', badgeLabel: 'عروض' },
+      { id: 'orders-list', title: 'قائمة الطلبات', subtitle: 'تصفح صف المسار النشط.', badgeLabel: 'صف' },
+      { id: 'order-accept', title: 'قبول الطلب', subtitle: 'اقبل الطلب.', badgeLabel: 'تنفيذ' },
+      { id: 'order-get', title: 'عرض الطلب', subtitle: 'افتح لقطة المسار.', badgeLabel: 'قراءة' },
+      { id: 'order-details', title: 'تفاصيل الطلب', subtitle: 'افحص تفاصيل الطلب.', badgeLabel: 'قراءة' },
+      { id: 'order-pickup', title: 'استلام الطلب', subtitle: 'أكد الاستلام.', badgeLabel: 'تنفيذ' },
+      { id: 'order-deliver', title: 'تسليم الطلب', subtitle: 'أكد التسليم.', badgeLabel: 'إغلاق' },
+      { id: 'proof-upload', title: 'رفع الإثبات', subtitle: 'ارفع دليل التسليم.', badgeLabel: 'إثبات' },
+      { id: 'job-reject', title: 'رفض المهمة', subtitle: 'ارفض مع ذكر السبب.', badgeLabel: 'استثناء' },
     ],
   },
   {
-    title: 'Captain support',
-    subtitle: 'Communication, balance, profile, and performance.',
+    title: 'دعم الكابتن',
+    subtitle: 'التواصل والرصيد والملف الشخصي والأداء.',
     items: [
-      { id: 'chat-read-ack', title: 'Chat read acknowledgement', subtitle: 'Clear unread route messages.', badgeLabel: 'Comms' },
-      { id: 'chat-send', title: 'Chat send', subtitle: 'Send a route message.', badgeLabel: 'Comms' },
-      { id: 'cod-balance', title: 'COD balance', subtitle: 'Review cash collection.', badgeLabel: 'Finance' },
-      { id: 'profile-get', title: 'Captain profile', subtitle: 'Read captain profile.', badgeLabel: 'Profile' },
-      { id: 'tier-evaluate', title: 'Tier evaluate', subtitle: 'Evaluate next tier readiness.', badgeLabel: 'Tier' },
-      { id: 'tier-info', title: 'Tier info', subtitle: 'Read current tier benefits.', badgeLabel: 'Tier' },
+      { id: 'chat-read-ack', title: 'تأكيد قراءة الدردشة', subtitle: 'امسح رسائل المسار غير المقروءة.', badgeLabel: 'تواصل' },
+      { id: 'chat-send', title: 'إرسال رسالة', subtitle: 'أرسل رسالة مسار.', badgeLabel: 'تواصل' },
+      { id: 'cod-balance', title: 'رصيد الدفع عند الاستلام', subtitle: 'راجع تحصيل النقد.', badgeLabel: 'مالية' },
+      { id: 'profile-get', title: 'ملف الكابتن', subtitle: 'اقرأ ملف الكابتن.', badgeLabel: 'ملف' },
+      { id: 'tier-evaluate', title: 'تقييم الطبقة', subtitle: 'قيّم جاهزية الطبقة التالية.', badgeLabel: 'طبقة' },
+      { id: 'tier-info', title: 'معلومات الطبقة', subtitle: 'اقرأ مزايا الطبقة الحالية.', badgeLabel: 'طبقة' },
     ],
   },
 ];
@@ -51,9 +51,9 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: DshCaptainSup
   return (
     <MobileScrollView padding={4} gap={4}>
       <Box gap={2}>
-        <Text role="titleLg">Captain support directory</Text>
+        <Text role="titleLg">دليل دعم الكابتن</Text>
         <Text role="bodyMd" tone="muted">
-          Central directory for the remaining DSH captain surfaces so every named workflow is reachable from one owned execution lane.
+          دليل مركزي لباقي أسطح DSH الخاصة بالكابتن حتى يصبح كل مسار مسمّى قابلًا للوصول من خط تنفيذ واحد مملوك.
         </Text>
       </Box>
 
@@ -66,7 +66,7 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: DshCaptainSup
                 key={item.id}
                 title={item.title}
                 subtitle={item.subtitle}
-                meta="Open the named captain surface"
+                meta="افتح سطح الكابتن المسمّى"
                 badgeLabel={item.badgeLabel}
                 onPress={() => onOpenScreen?.(item.id)}
               />

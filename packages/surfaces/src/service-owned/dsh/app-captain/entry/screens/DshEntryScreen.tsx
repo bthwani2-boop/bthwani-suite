@@ -26,9 +26,9 @@ function renderHero(state: DshEntryScreenState, onOpenOffersPress?: () => void) 
     return (
       <StateView
         stateId="empty"
-        title="No active offers right now"
-        description="Keep the offers entry visible so captains can retry without leaving the service shell."
-        actionLabel="Open offers"
+        title="لا توجد عروض نشطة الآن"
+        description="أبقِ مدخل العروض ظاهرًا حتى يتمكن الكابتن من إعادة المحاولة من دون مغادرة الصدفة التشغيلية."
+        actionLabel="فتح العروض"
         onActionPress={onOpenOffersPress}
       />
     );
@@ -36,9 +36,9 @@ function renderHero(state: DshEntryScreenState, onOpenOffersPress?: () => void) 
 
   return (
     <Card
-      title="Captain dispatch entry"
-      subtitle="One focused start point for offer review, active execution, and proof handoff."
-      footer={<Button label="Open offers" onPress={onOpenOffersPress} />}
+      title="مدخل تشغيل الكابتن"
+      subtitle="نقطة بداية واحدة لمراجعة العروض والتنفيذ النشط وتسليم الإثبات."
+      footer={<Button label="فتح العروض" onPress={onOpenOffersPress} />}
     />
   );
 }
@@ -47,14 +47,14 @@ function renderOffersSection(onOpenOffersPress?: () => void, onOpenExecutionPres
   return (
     <Box gap={3}>
       <Card
-        title="Review incoming offers"
-        subtitle="Start from the captain offers list so the next dispatch decision is obvious within seconds."
-        footer={<Button label="View offers" tone="secondary" onPress={onOpenOffersPress} />}
+        title="مراجعة العروض الواردة"
+        subtitle="ابدأ من قائمة عروض الكابتن حتى يصبح قرار الإرسال التالي واضحًا خلال ثوانٍ."
+        footer={<Button label="عرض العروض" tone="secondary" onPress={onOpenOffersPress} />}
       />
       <Card
-        title="Open execution workspace"
-        subtitle="Accepted work, reject companion actions, and operational chat stay grouped in one captain pattern."
-        footer={<Button label="Open execution" tone="ghost" onPress={onOpenExecutionPress} />}
+        title="فتح مساحة التنفيذ"
+        subtitle="العمل المقبول وأفعال الرفض والدردشة التشغيلية تبقى مجمعة في نمط كابتن واحد."
+        footer={<Button label="فتح التنفيذ" tone="ghost" onPress={onOpenExecutionPress} />}
       />
     </Box>
   );
@@ -64,13 +64,13 @@ function renderCompletionSection(onOpenProofCapturePress?: () => void) {
   return (
     <Box gap={3}>
       <Card
-        title="Capture delivery proof"
-        subtitle="Proof upload remains an explicit completion gate before the order fully closes."
-        footer={<Button label="Open proof capture" tone="secondary" onPress={onOpenProofCapturePress} />}
+        title="التقاط إثبات التسليم"
+        subtitle="يبقى رفع الإثبات بوابة إغلاق واضحة قبل إقفال الطلب بالكامل."
+        footer={<Button label="فتح إثبات التسليم" tone="secondary" onPress={onOpenProofCapturePress} />}
       />
       <Card
-        title="Stay inside one captain flow"
-        subtitle="Finance, tier, and other non-critical clusters stay out of this first entry so delivery actions remain primary."
+        title="ابقَ داخل مسار كابتن واحد"
+        subtitle="تبقى المالية والطبقات والمجموعات غير الحرجة خارج هذا المدخل الأول حتى تظل إجراءات التسليم هي الأساسية."
       />
     </Box>
   );
@@ -84,31 +84,31 @@ export function DshEntryScreen({
 }: DshEntryScreenProps) {
   return (
     <DashboardShell
-      title="Captain Entry"
-      subtitle="Single-purpose entry for app-captain delivery operations and first dispatch action."
+      title="مدخل الكابتن"
+      subtitle="مدخل أحادي الغرض لعمليات تسليم app-captain وأول خطوة إرسال."
       hero={renderHero(state, onOpenOffersPress)}
       sections={
         state === 'ready'
           ? [
               {
-                title: 'Offers and Acceptance',
-                subtitle: 'Open-list entry and captain execution handoff pattern.',
+                title: 'العروض والقبول',
+                subtitle: 'نمط مدخل قائمة مفتوحة وتسليم التنفيذ للكابتن.',
                 content: renderOffersSection(onOpenOffersPress, onOpenExecutionPress),
               },
               {
-                title: 'Execution and Proof',
-                subtitle: 'Completion gate and proof-capture handoff stay explicit.',
+                title: 'التنفيذ والإثبات',
+                subtitle: 'تظل بوابة الإتمام وتسليم التقاط الإثبات واضحة ومباشرة.',
                 content: renderCompletionSection(onOpenProofCapturePress),
               },
             ]
           : [
               {
-                title: 'Entry State',
-                subtitle: 'The screen keeps one clear captain purpose while handling base states.',
+                title: 'حالة المدخل',
+                subtitle: 'تحتفظ الشاشة بهدف واحد واضح للكابتن أثناء التعامل مع الحالات الأساسية.',
                 content: (
                   <Box>
                     <Text role="bodyMd" tone="muted">
-                      Entry state is active. No business logic or network requests are executed here.
+                      حالة المدخل نشطة. لا يتم تنفيذ منطق أعمال أو طلبات شبكة هنا.
                     </Text>
                   </Box>
                 ),

@@ -29,21 +29,21 @@ export type CaptainOrdersInboxScreenProps = {
 const demoActiveOrders: CaptainOrderInboxItem[] = [
   {
     id: 'captain-order-9021',
-    title: 'Order #9021',
-    pickupLabel: 'Pickup: Burger Lab',
-    dropoffLabel: 'Dropoff: Olaya District',
-    timingLabel: 'Pickup in 8 min',
-    nextActionLabel: 'arrive at pickup and confirm collection',
-    statusLabel: 'Next up',
+    title: 'الطلب #9021',
+    pickupLabel: 'الاستلام: Burger Lab',
+    dropoffLabel: 'التسليم: حي العليا',
+    timingLabel: 'الاستلام خلال 8 دقائق',
+    nextActionLabel: 'الوصول إلى نقطة الاستلام وتأكيد الجمع',
+    statusLabel: 'التالي',
   },
   {
     id: 'captain-order-9024',
-    title: 'Order #9024',
-    pickupLabel: 'Pickup: Green Bowl',
-    dropoffLabel: 'Dropoff: King Fahad Rd',
-    timingLabel: 'Pickup in 15 min',
-    nextActionLabel: 'start route to pickup',
-    statusLabel: 'Queued',
+    title: 'الطلب #9024',
+    pickupLabel: 'الاستلام: Green Bowl',
+    dropoffLabel: 'التسليم: طريق الملك فهد',
+    timingLabel: 'الاستلام خلال 15 دقيقة',
+    nextActionLabel: 'بدء الطريق إلى نقطة الاستلام',
+    statusLabel: 'في الصف',
   },
 ];
 
@@ -51,8 +51,8 @@ function renderLoadingState() {
   return (
     <StateView
       stateId="loading"
-      title="Loading captain inbox"
-      description="Keep the next order visible as soon as queue data is available."
+      title="جارٍ تحميل صندوق الكابتن"
+      description="أبقِ الطلب التالي ظاهرًا فور توفر بيانات الصف."
     />
   );
 }
@@ -61,9 +61,9 @@ function renderNoOrdersState(onRetry?: () => void) {
   return (
     <StateView
       stateId="empty"
-      title="No orders right now"
-      description="Stay ready. New orders will land here first."
-      actionLabel={onRetry ? 'Refresh orders' : undefined}
+      title="لا توجد طلبات الآن"
+      description="ابقَ جاهزًا. الطلبات الجديدة ستصل هنا أولًا."
+      actionLabel={onRetry ? 'تحديث الطلبات' : undefined}
       onActionPress={onRetry}
     />
   );
@@ -73,9 +73,9 @@ function renderDeliveredState(onRetry?: () => void) {
   return (
     <StateView
       kind="success"
-      title="All orders delivered"
-      description="Great run. Refresh to catch the next assignment."
-      actionLabel={onRetry ? 'Check for new orders' : undefined}
+      title="تم تسليم كل الطلبات"
+      description="أداء ممتاز. حدّث الشاشة لالتقاط المهمة التالية."
+      actionLabel={onRetry ? 'التحقق من طلبات جديدة' : undefined}
       onActionPress={onRetry}
     />
   );
@@ -85,9 +85,9 @@ function renderErrorState(onRetry?: () => void) {
   return (
     <StateView
       stateId="recoverableError"
-      title="Orders inbox is unavailable"
-      description="Retry and continue from the next order without switching flow."
-      actionLabel="Retry inbox"
+      title="صندوق الطلبات غير متاح"
+      description="أعد المحاولة وواصل من الطلب التالي من دون تغيير المسار."
+      actionLabel="إعادة المحاولة"
       onActionPress={onRetry}
     />
   );
@@ -134,16 +134,16 @@ export function CaptainOrdersInboxScreen({
   return (
     <MobileScrollView padding={4} gap={3}>
       <Box gap={2}>
-        <Text role="titleLg">Captain orders inbox</Text>
+        <Text role="titleLg">صندوق طلبات الكابتن</Text>
         <Text role="bodySm" tone="muted">
-          Inbox-first flow keeps the immediate order obvious and removes dashboard clutter.
+          مسار الصندوق أولًا يبقي الطلب الفوري واضحًا ويزيل ضجيج اللوحة.
         </Text>
       </Box>
 
       <Surface tone="brand" gap={3}>
         <SectionHeader
-          title="Next order"
-          subtitle="One clear action before scanning the rest of the queue."
+          title="الطلب التالي"
+          subtitle="إجراء واحد واضح قبل مسح بقية الصف."
         />
         <Box gap={1}>
           <Text role="bodyStrong">{nextOrder.title}</Text>
@@ -151,16 +151,16 @@ export function CaptainOrdersInboxScreen({
             {nextOrder.pickupLabel} | {nextOrder.dropoffLabel}
           </Text>
           <Text role="caption" tone="soft">
-            {nextOrder.timingLabel} | Next: {nextOrder.nextActionLabel}
+            {nextOrder.timingLabel} | التالي: {nextOrder.nextActionLabel}
           </Text>
         </Box>
-        <Button label="Open next order" onPress={handleOpenNextOrder} />
+        <Button label="فتح الطلب التالي" onPress={handleOpenNextOrder} />
       </Surface>
 
       <Surface tone="raised" gap={3}>
         <SectionHeader
-          title="Queued orders"
-          subtitle="List baseline: pickup, dropoff, timing, and next action."
+          title="الطلبات في الصف"
+          subtitle="الحد الأدنى للقائمة: الاستلام والتسليم والوقت والخطوة التالية."
         />
         <Box gap={2}>
           {items.map((item) => (
@@ -168,7 +168,7 @@ export function CaptainOrdersInboxScreen({
               key={item.id}
               title={item.title}
               subtitle={`${item.pickupLabel} | ${item.dropoffLabel}`}
-              meta={`${item.timingLabel} | Next: ${item.nextActionLabel}`}
+              meta={`${item.timingLabel} | التالي: ${item.nextActionLabel}`}
               badgeLabel={item.statusLabel}
               onPress={() => onOpenOrder?.(item.id)}
             />
