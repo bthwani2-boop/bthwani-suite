@@ -111,6 +111,22 @@ function toEntryState(state: FieldPreviewState): DshEntryScreenState {
     return 'empty';
   }
 
+  if (state === 'error') {
+    return 'error';
+  }
+
+  if (state === 'offline') {
+    return 'offline';
+  }
+
+  if (state === 'disabled') {
+    return 'disabled';
+  }
+
+  if (state === 'success') {
+    return 'submitted';
+  }
+
   return 'ready';
 }
 
@@ -189,14 +205,14 @@ export function FieldSurfaceHost() {
   }, [accountSheetVisible]);
 
   const handleBackHome = () => {
-    setRoute('home');
+    setRoute('entry');
     setPreviewState('ready');
   };
 
   const handleSelectServiceType = React.useCallback((typeId: string) => {
     const nextType: FieldServiceType = typeId === 'arb' ? 'arb' : 'dsh';
     setActiveServiceType(nextType);
-    setRoute('home');
+    setRoute('entry');
     setPreviewState('ready');
   }, []);
 
@@ -230,14 +246,207 @@ export function FieldSurfaceHost() {
   };
 
   const handleInventoryManagementBack = () => {
-    setRoute('home');
+    setRoute('entry');
   };
+
+  const fieldHubTabs = [
+    {
+      id: 'visit-plan',
+      label: 'الخطة',
+      badgeLabel: 'الزيارة',
+      subtitle: 'خطة الزيارة، التوقيت، وما يجب تثبيته قبل الانتقال.',
+      icon: 'calendar-outline',
+      content: (
+        <Box gap={3}>
+          <Card title="خطة الزيارة" subtitle="المسار المختصر يظل واضحًا قبل أي خطوة إضافية.">
+            <KeyValueList
+              dense
+              items={[
+                { label: 'موعد الزيارة', value: 'اليوم 5:30 م', tone: 'brand' },
+                { label: 'سبب الزيارة', value: 'مراجعة العرض وتثبيت الموعد' },
+                { label: 'نوع المتجر', value: 'مقاهٍ ومحمصات' },
+              ]}
+            />
+          </Card>
+          <Button
+            label="مراجعة الموقع"
+            tone="secondary"
+            onPress={() => {
+              setAccountSheetVisible(false);
+              setRoute('geo-pin');
+            }}
+          />
+        </Box>
+      ),
+    },
+    {
+      id: 'offer',
+      label: 'العرض',
+      badgeLabel: 'الشركاء',
+      subtitle: 'العرض المختصر المعتمد قبل الزيارة أو أثناءها.',
+      icon: 'pricetag-outline',
+      content: (
+        <Box gap={3}>
+          <Card title="العرض المعتمد" subtitle="العرض المختصر فقط هو الذي يظهر للوكيل.">
+            <KeyValueList
+              dense
+              items={[
+                { label: 'الحالة', value: 'بانتظار موافقة قسم الشركاء', tone: 'warning' },
+                { label: 'العرض المختصر', value: 'خصم أول 3 أشهر + عمولة معيارية' },
+                { label: 'ملاحظة', value: 'لا تعرض شروطًا غير معتمدة أثناء الزيارة.' },
+              ]}
+            />
+          </Card>
+        </Box>
+      ),
+    },
+    {
+      id: 'result',
+      label: 'النتيجة',
+      badgeLabel: 'الزيارة',
+      subtitle: 'تسجيل نتيجة الزيارة ثم العودة للقائمة بسرعة.',
+      icon: 'checkmark-done-outline',
+      content: (
+        <Box gap={3}>
+          <Card title="نتيجة الزيارة" subtitle="سجل النتيجة بسرعة ثم عد إلى القائمة.">
+            <KeyValueList
+              dense
+              items={[
+                { label: 'مهتم', value: 'مناسب للمتابعة السريعة' },
+                { label: 'يحتاج متابعة', value: 'يفتح موعد متابعة واضح' },
+                { label: 'جاهز للإضافة', value: 'ينتقل مباشرة إلى onboarding', tone: 'success' },
+              ]}
+            />
+          </Card>
+          <Button
+            label="سجل الزيارة"
+            tone="primary"
+            onPress={() => {
+              setAccountSheetVisible(false);
+              setRoute('visit-log');
+            }}
+          />
+        </Box>
+      ),
+    },
+    {
+      id: 'onboarding',
+      label: 'الإضافة',
+      badgeLabel: 'جاهز',
+      subtitle: 'مسار إضافة المتجر عندما تصبح الجاهزية مكتملة.',
+      icon: 'storefront-outline',
+      content: (
+        <Box gap={3}>
+          <Card title="إضافة المتجر" subtitle="افتحها فقط عند Ready for Onboarding.">
+            <KeyValueList
+              dense
+              items={[
+                { label: 'الحالة', value: 'Ready for Onboarding', tone: 'success' },
+                { label: 'الخطوة التالية', value: 'فتح نموذج إضافة المتجر' },
+                { label: 'الربط', value: 'store-activation' },
+              ]}
+            />
+          </Card>
+          <Button
+            label="فتح إضافة المتجر"
+            tone="success"
+            onPress={() => {
+              setAccountSheetVisible(false);
+              setRoute('activation');
+            }}
+          />
+        </Box>
+      ),
+    },
+    {
+      id: 'products',
+      label: 'المنتجات',
+      badgeLabel: 'مخزون',
+      subtitle: 'مدخل الكتالوج والمنتج الأول والحوكمة المرتبطة به.',
+      icon: 'cube-outline',
+      content: (
+        <Box gap={3}>
+          <Card title="المنتجات" subtitle="هذا هو المدخل المتبقي للكتالوج والمنتج الأول.">
+            <KeyValueList
+              dense
+              items={[
+                { label: 'إدخال المنتج', value: 'UI contract حاضر' },
+                { label: 'البوابة', value: 'inventory-management' },
+                { label: 'الحوكمة', value: 'الشركاء ثم التسويق ثم النشر' },
+              ]}
+            />
+          </Card>
+          <Button
+            label="إدارة المنتجات"
+            tone="secondary"
+            onPress={() => {
+              setAccountSheetVisible(false);
+              setRoute('inventory-management');
+            }}
+          />
+        </Box>
+      ),
+    },
+    {
+      id: 'performance',
+      label: 'الأداء',
+      badgeLabel: 'WLT',
+      subtitle: 'ملخص التشغيل والعمولات والحالة المالية المختصرة.',
+      icon: 'trending-up-outline',
+      content: (
+        <Box gap={3}>
+          <Card title="ملخص الأداء ومحفظة الوكيل" subtitle="لوحة مختصرة فقط، والمحفظة تبقى [TBD] حتى يثبت الربط المركزي.">
+            <KeyValueList
+              dense
+              items={[
+                { label: 'زيارات اليوم', value: '12', tone: 'brand' },
+                { label: 'متاجر جاهزة للإضافة', value: '4', tone: 'success' },
+                { label: 'مرسلة للمراجعة', value: '2', tone: 'warning' },
+                { label: 'عمولات معلقة', value: '[TBD]' },
+                { label: 'عمولات معتمدة', value: '[TBD]' },
+              ]}
+            />
+          </Card>
+        </Box>
+      ),
+    },
+    {
+      id: 'qa',
+      label: 'التحقق',
+      badgeLabel: 'Phase 12',
+      subtitle: 'معاينات الحالات تبقى هنا بدل إعاقة الشاشة الرئيسية.',
+      icon: 'shield-checkmark-outline',
+      content: (
+        <Box gap={3}>
+          <Card
+            title="معاينات الحالة"
+            subtitle="هذه الأدوات تبقى هنا داخل الحساب بدل تعليقها فوق صفحة المتاجر أو الزيارة."
+          >
+            <Box gap={2}>
+              {previewStateOptions.map((option) => (
+                <Button
+                  key={option.id}
+                  label={option.label}
+                  tone={previewState === option.id ? 'primary' : 'secondary'}
+                  onPress={() => setPreviewState(option.id)}
+                />
+              ))}
+            </Box>
+          </Card>
+          <Text role="bodySm" tone="muted">
+            هذا تبويب QA فقط. الهدف أن تبقى شاشة المتاجر قابلة للتصفح، بينما تظل حالات المعاينة قابلة للوصول عند الحاجة.
+          </Text>
+        </Box>
+      ),
+    },
+  ] as const;
 
   const renderFieldFlow = () => {
     if (route === 'entry') {
       return (
         <DshEntryScreen
           state={toEntryState(previewState)}
+          onRetry={() => setPreviewState('ready')}
           onOpenActivationPress={() => {
             setPreviewState('ready');
             setRoute('activation');
@@ -347,6 +556,7 @@ export function FieldSurfaceHost() {
 
   const accountSheet = (
     <MobileAccountSheet
+      mode={activeServiceType === 'dsh' ? 'field' : 'generic'}
       visible={accountSheetVisible}
       onClose={() => setAccountSheetVisible(false)}
       onOpenProfile={handleBackHome}
@@ -355,6 +565,14 @@ export function FieldSurfaceHost() {
       onSelectType={handleSelectServiceType}
       typeSwitchTitle="تغيير نوع تشغيل الميدان"
       typeSwitchPrompt="اختر DSH أو ARB. عند التبديل يتم إعادة ضبط المسار وتحديث التطبيق بالكامل بحسب النوع الجديد."
+      fieldTitle="مركز حساب الميدان"
+      fieldSubtitle="قائمة المتاجر تبقى في الواجهة الرئيسية. ما تبقى ينتقل هنا كأقسام عمودية واضحة مباشرة."
+      fieldSummaryItems={[
+        { label: 'الواجهة الرئيسية', value: 'قائمة المتاجر' },
+        { label: 'الأقسام الثانوية', value: 'داخل مركز الحساب' },
+        { label: 'محفظة الوكيل', value: '[TBD]' },
+      ]}
+      fieldTabs={fieldHubTabs}
     />
   );
 
@@ -414,28 +632,16 @@ export function FieldSurfaceHost() {
   }
 
   if (route !== 'home') {
+    const isEntryRoute = route === 'entry';
+
     return (
       <Box style={{ flex: 1 }} background="background">
         {topBar}
-        <Box padding={4} gap={3}>
-          <Button label="العودة للرئيسية" tone="secondary" onPress={handleBackHome} />
-          <Surface tone="inset" padding={3} gap={2} radiusToken="lg">
-            <Text role="label">معاينة Phase 12</Text>
-            <Text role="bodySm" tone="muted">
-              غيّر حالة الشاشة الحالية للتأكد من تغطية shell لجميع الحالات القانونية قبل الربط النهائي.
-            </Text>
-            <Box gap={2}>
-              {previewStateOptions.map((option) => (
-                <Button
-                  key={option.id}
-                  label={option.label}
-                  tone={previewState === option.id ? 'primary' : 'secondary'}
-                  onPress={() => setPreviewState(option.id)}
-                />
-              ))}
-            </Box>
-          </Surface>
-        </Box>
+        {isEntryRoute ? null : (
+          <Box padding={4} gap={3}>
+            <Button label="العودة إلى قائمة المتاجر" tone="secondary" onPress={handleBackHome} />
+          </Box>
+        )}
         <Surface
           tone="raised"
           padding={0}

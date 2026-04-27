@@ -1,5 +1,5 @@
 export const flowMeta = {
-  id: 'amn-control-panel-operations-flow',
+  id: 'dsh-app-field-flow',
   owner: 'app-field',
   ownerKind: 'surface',
   placeholder: false,

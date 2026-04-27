@@ -3,12 +3,17 @@
 import React from 'react';
 import { Box, FormScreenShell, KeyValueList, SectionHeader, Text, TextField } from '@bthwani/ui-kit';
 
-export function DshInventoryManagementScreen() {
+export type DshInventoryManagementScreenProps = {
+  onBack?: () => void;
+};
+
+export function DshInventoryManagementScreen({ onBack }: DshInventoryManagementScreenProps) {
   return (
     <FormScreenShell
       title="إدخال منتج من الميداني"
       subtitle="المنتج يبدأ من الحقل، ثم يمر على الشركاء، ثم التسويق، ثم يظهر في الكتالوج النهائي."
-      submitLabel="إرسال إلى بوابة الشركاء"
+      submitLabel="العودة"
+      onSubmit={onBack}
     >
       <Box gap={3}>
         <SectionHeader
