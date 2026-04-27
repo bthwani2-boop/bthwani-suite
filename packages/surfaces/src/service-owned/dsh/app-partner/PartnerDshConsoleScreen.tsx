@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, Switch as RNSwitch, View } from 'react-native';
 import { AnalyticsGrowthMarketingWorkspaceContent } from './workspaces/AnalyticsGrowthMarketingWorkspaceContent';
 import { Box, Button, Chip, Icon, KeyValueList, ListItem, MobileCommandSectionList, MobileScrollView, MobileStickyPrimaryAction, MobileWorkspaceHeader, StateView, Surface, Text, TextField, useDirection, useTheme } from '@bthwani/ui-kit';
+import { PartnerDshWalletWorkspace } from '../../wlt/app-partner';
 import { InventoryCatalogWorkspaceContent } from './workspaces/InventoryCatalogWorkspaceContent';
 import { StoreProfileWorkspaceContent } from './workspaces/StoreProfileWorkspaceContent';
 
@@ -852,46 +853,13 @@ export function PartnerDshConsoleScreen(props: Props) {
 
     if (activeSection === 'wallet') {
       return (
-        <HubWorkspaceShell title={sectionCopy.wallet.title} description={sectionCopy.wallet.description} icon={sectionCopy.wallet.icon} onBack={() => updateSection('hub')}>
-          <Box gap={4}>
-            <Surface tone="raised" padding={3} gap={3}>
-              <Text role="label" tone="muted">
-                ملخص مالي سريع
-              </Text>
-              <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 10 }}>
-                <SummaryCell label="الرصيد المتاح" value="12,480 ر.س" tone="success" />
-                <SummaryCell label="المستحقات" value="3,250 ر.س" tone="warning" />
-                <SummaryCell label="آخر تسوية" value="اليوم 09:20" tone="brand" />
-              </View>
-            </Surface>
-
-            <Surface tone="raised" padding={3} gap={3}>
-              <Text role="label" tone="muted">
-                الحسابات والتسويات
-              </Text>
-              <KeyValueList
-                dense
-                items={[
-                  { label: 'الخطة المالية', value: 'نشطة' },
-                  { label: 'التحصيل القادم', value: 'خلال يومين', tone: 'warning' },
-                  { label: 'مرجع التسوية', value: 'دفعة محلية' },
-                  { label: 'النطاق المرتبط', value: activeZoneLabel, tone: 'info' },
-                ]}
-              />
-              <Text role="caption" tone="muted">
-                هذا المسار يعرض الحالة المالية المختصرة من دون فتح لوحة مالية منفصلة.
-              </Text>
-            </Surface>
-
-            <Surface tone="inset" padding={3} gap={2}>
-              <Text role="bodyStrong">إجراء مالي سريع</Text>
-              <Text role="bodySm" tone="muted">
-                افتح المحفظة الموسعة أو راجع التسويات الحالية من نفس السطح.
-              </Text>
-              <Button label="فتح المحفظة الموسعة" tone="secondary" fullWidth={false} onPress={onOpenWalletHub} />
-            </Surface>
-          </Box>
-        </HubWorkspaceShell>
+        <PartnerDshWalletWorkspace
+          branchLabel={branchLabel}
+          activeZoneLabel={activeZoneLabel}
+          serviceModes={serviceModes}
+          onBack={() => updateSection('hub')}
+          onOpenExpandedWallet={onOpenWalletHub}
+        />
       );
     }
 
@@ -1105,12 +1073,12 @@ export function PartnerDshConsoleScreen(props: Props) {
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
-      <Surface tone="raised" padding={4} gap={2}>
-        <Text role="titleLg">مركز حساب الشريك</Text>
-        <Text role="bodySm" tone="muted">
-          كل ما تحتاجه لإدارة متجرك وتنمية أعمالك من مكان واحد.
-        </Text>
-      </Surface>
+      <MobileWorkspaceHeader
+        title="مركز حساب الشريك"
+        description="كل ما تحتاجه لإدارة متجرك وتنمية أعمالك من مكان واحد."
+        icon="person-outline"
+        onBack={onOpenOrdersBoard}
+      />
 
       <Surface tone="raised" padding={3} gap={3}>
         <View

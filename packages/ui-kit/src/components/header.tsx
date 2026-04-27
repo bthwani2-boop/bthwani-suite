@@ -634,7 +634,18 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
     resolvedContentOffsetY ? { transform: [{ translateY: resolvedContentOffsetY }] } : null,
   ];
 
-  const mainTitleInline = (
+  const mainTitleInline = useRelaxedMain ? (
+    <View style={{ gap: spacing[0], flexShrink: 1, minWidth: 0, maxWidth: '100%', alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start', justifyContent: 'center' }}>
+      <Text role="titleLg" tone={titleTone} numberOfLines={1} align={titleAlign} style={{ flexShrink: 1, width: '100%' }}>
+        {title}
+      </Text>
+      {subtitle ? (
+        <Text role="bodySm" tone={titleTone} numberOfLines={1} align={titleAlign} style={{ opacity: 0.94, flexShrink: 1, width: '100%' }}>
+          {subtitle}
+        </Text>
+      ) : null}
+    </View>
+  ) : (
     <View style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'flex-start', gap: spacing[1], flexShrink: 1, minWidth: 0, maxWidth: '100%' }}>
       <Text role="titleLg" tone={titleTone} numberOfLines={1} align={titleAlign} style={{ flexShrink: 1 }}>
         {title}

@@ -5,7 +5,6 @@ import {
   Card,
   Chip,
   MobileScrollView,
-  MobileWorkspaceHeader,
   SearchField,
   SearchTopBar,
   SheetFrame,
@@ -895,18 +894,9 @@ export function PartnerOrdersHomeScreen(props: PartnerOrdersHomeScreenProps) {
     [onOpenOrderAction],
   );
 
-  const backToEntry = props.onOpenEntryPress ?? (() => undefined);
-
   return (
     <>
       <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
-        <MobileWorkspaceHeader
-          title="مركز طلبات الشريك"
-          description={branchLabel}
-          icon="receipt-outline"
-          onBack={backToEntry}
-        />
-
         <Surface tone="raised" padding={3} gap={3}>
           <Box gap={1}>
             <Text role="label" tone="muted">

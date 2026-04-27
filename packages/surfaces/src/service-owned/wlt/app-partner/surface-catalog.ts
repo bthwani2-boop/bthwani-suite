@@ -1,0 +1,1 @@
+export const surfaceCatalog = ['partner-dsh-wallet-workspace'] as const;

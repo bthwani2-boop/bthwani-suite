@@ -167,19 +167,23 @@ const webCommandCenterCss = `
  .bth-web-command-center__workspace {
    display: grid;
    grid-template-columns: minmax(0, 1fr) 288px;
+   grid-template-areas: "stage rail";
    gap: 24px;
    align-items: start;
-   direction: rtl;
+   direction: ltr;
  }
 
  [dir="ltr"] .bth-web-command-center__workspace {
    grid-template-columns: 288px minmax(0, 1fr);
-   direction: ltr;
+   grid-template-areas: "rail stage";
  }
 
 @media (max-width: 900px) {
   .bth-web-command-center__workspace {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "stage"
+      "rail";
   }
 }
 
@@ -187,6 +191,25 @@ const webCommandCenterCss = `
 .bth-web-command-center__rail {
   display: grid;
   gap: 16px;
+}
+
+.bth-web-command-center__stage {
+  grid-area: stage;
+  min-width: 0;
+}
+
+.bth-web-command-center__rail {
+  grid-area: rail;
+}
+
+[dir="rtl"] .bth-web-command-center__stage,
+[dir="rtl"] .bth-web-command-center__rail {
+  direction: rtl;
+}
+
+[dir="ltr"] .bth-web-command-center__stage,
+[dir="ltr"] .bth-web-command-center__rail {
+  direction: ltr;
 }
 
 .bth-web-command-center__rail {

@@ -447,8 +447,9 @@ export function PartnerSurfaceHost() {
   const topBar = (
     <TopBar
       variant="brand"
-      title="بثواني"
-      subtitle={activeServiceType === 'dsh' ? 'لوحة الشريك - DSH' : 'لوحة الشريك - ARB'}
+      layoutMode="relaxed-main"
+      title={maintenanceProfile.storeName}
+      subtitle={activeServiceType === 'dsh' ? 'DSH - لوحة الشريك' : 'ARB - لوحة الشريك'}
       locationLabel={`الرياض، ${selectedStoreScope.label}`}
       onTitlePress={openStoreScope}
       titleAccessibilityLabel="فتح اختيار المتجر أو الفرع"
@@ -476,16 +477,8 @@ export function PartnerSurfaceHost() {
           accessibilityLabel: 'المحفظة والحسابات المالية',
           onPress: activeServiceType === 'dsh' ? () => openAccountHub('wallet') : openWalletHub,
         },
-        { id: 'orders', icon: <Icon name="receipt-outline" size={21} color={theme.brandContrast} />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
         { id: 'search', icon: <Icon name="search-outline" size={21} color={theme.brandContrast} />, accessibilityLabel: 'البحث', onPress: activeServiceType === 'dsh' ? openOrdersSearch : openOrdersBoard },
       ]}
-      ticker={{
-        statusLabel: activeServiceType === 'dsh' ? 'نشط' : 'ARB نشط',
-        message:
-          activeServiceType === 'dsh'
-            ? 'الطلبات، ملف المتجر، العمليات، المخزون، والتحليلات في مركز واحد. البحث وتغيير النوع والنطاق متاحان من هذا الشريط.'
-            : 'وضع ARB مفعّل. الواجهة تعرض سياق التوزيع والتبديل فقط دون خلط مع DSH.',
-      }}
     />
   );
 
@@ -653,9 +646,7 @@ export function PartnerSurfaceHost() {
         />
       );
 
-      return accountHubSection === 'hub'
-        ? renderMainShell(partnerConsoleScreen)
-        : renderWorkspaceShell(partnerConsoleScreen);
+      return renderWorkspaceShell(partnerConsoleScreen);
     }
 
   if (route === 'entry') {
