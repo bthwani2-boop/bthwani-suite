@@ -1,18 +1,19 @@
 "use client";
 
-import { useDshControlPanelText, ControlPanelDshCatalogScreen, ControlPanelDshPartnerApprovalsScreen, ControlPanelDshMarketingScreen } from '@bthwani/surfaces/control-panel';
+import {
+  ControlPanelDshMarketingScreen,
+  ControlPanelDshPartnerApprovalsScreen,
+  useDshControlPanelText,
+} from '@bthwani/surfaces/control-panel';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useDirection, useUiText } from '@bthwani/ui-kit';
 import {
-  Box,
-  Button,
-  Text,
-  useDirection,
-  useUiText,
-} from '@bthwani/ui-kit';
-import {
+  WebControlActionButton,
+  WebControlActionCard,
   WebCommandCenterFrame,
-  WebMissionHeroCard,
+  WebControlDisclosureItem,
+  WebControlSurfaceHeader,
   WebSectionCard,
   WebSegmentedTabs,
   WebSignalCard,
@@ -20,34 +21,66 @@ import {
 import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 
-const primarySectionIds = ['dashboard', 'operations', 'finance', 'catalogs', 'support', 'community-services', 'partners', 'marketing', 'control'] as const;
+const phaseOneSectionIds = ['dashboard', 'operations', 'finance', 'catalogs', 'support'] as const;
+const hiddenSectionIds = ['community-services', 'partners', 'marketing', 'control'] as const;
+const primarySectionIds = [...phaseOneSectionIds, ...hiddenSectionIds] as const;
 const controlSubSectionIds = ['platform', 'administration', 'governance', 'hr'] as const;
+const dshLiveWorkbenchIds = ['orders', 'reassign', 'peakMode', 'arrivalBell'] as const;
+const dshPlannedWorkbenchIds = ['sheinProxy', 'zoneSet'] as const;
 
 type ControlPanelSectionId = (typeof primarySectionIds)[number];
+type PhaseOneSectionId = (typeof phaseOneSectionIds)[number];
 type ControlPanelSubSectionId = (typeof controlSubSectionIds)[number];
 type PrimarySectionHref = `/${ControlPanelSectionId}`;
 type ControlPanelText = ReturnType<typeof useUiText>['controlPanel'];
-type ControlPanelSignalId = 'best-path' | 'pressure' | 'live-refresh' | 'mode';
+type ActionTone = 'primary' | 'secondary';
+type SignalTone = React.ComponentProps<typeof WebSignalCard>['tone'];
+
+type SectionActionView = {
+  id: string;
+  label: string;
+  description: string;
+  footerLabel: string;
+  href?: string;
+  badge?: string;
+  tone?: ActionTone;
+  onAction?: () => void;
+};
+
+type DisclosureItemView = {
+  id: string;
+  label: string;
+  description: string;
+  href?: string;
+  badge?: string;
+  onAction?: () => void;
+};
+
+type KpiView = {
+  id: string;
+  title: string;
+  value: string;
+  description: string;
+  tone?: SignalTone;
+};
+
+type SectionBlueprint = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  primaryAction: SectionActionView;
+  kpis: ReadonlyArray<KpiView>;
+  quickActionsTitle: string;
+  quickActionsDescription: string;
+  quickActions: ReadonlyArray<SectionActionView>;
+  disclosureTitle: string;
+  disclosureDescription: string;
+  disclosureItems: ReadonlyArray<DisclosureItemView>;
+};
 
 export type ControlPanelSurfaceHostProps = {
   section?: ControlPanelSectionId;
   subsection?: ControlPanelSubSectionId;
-};
-
-type MissionCardView = {
-  missionTitle: string;
-  missionDescription: string;
-  owner: string;
-  dueLabel: string;
-  countLabel: string;
-};
-
-type SignalView = {
-  id: ControlPanelSignalId;
-  tone: 'best' | 'danger' | 'neutral';
-  title: string;
-  description: string;
-  value: string;
 };
 
 const allServiceTabId = 'all-services';
@@ -74,6 +107,18 @@ const sectionRouteMap: Record<ControlPanelSectionId, PrimarySectionHref> = {
   marketing: '/marketing',
   control: '/control',
 };
+
+const compactSectionDescriptions: Record<PhaseOneSectionId, string> = {
+  dashboard: 'ملخص قرار سريع يفتح القسم الصحيح من أول مستوى بدون تشتيت.',
+  operations: 'الضغط الحالي والمسارات الحية والتنبيهات في لوحة تشغيل واحدة.',
+  finance: 'مراقبة مالية مختصرة مع تركيز فوري على المسار الجاهز للتشغيل.',
+  catalogs: 'حوكمة عملية للمنتجات والفئات ومسارات المراجعة والنشر.',
+  support: 'تصعيدات واضحة واستعادة سريعة لتجربة العميل من أقرب مسار فعلي.',
+};
+
+function isPhaseOneSection(sectionId: ControlPanelSectionId): sectionId is PhaseOneSectionId {
+  return (phaseOneSectionIds as readonly string[]).includes(sectionId);
+}
 
 function getServiceLabel(uiText: ReturnType<typeof useUiText>, serviceId: string) {
   const serviceNames = (uiText as unknown as { serviceNames?: Record<string, string> }).serviceNames ?? {};
@@ -105,79 +150,33 @@ function resolveShellCopy(
   };
 }
 
+function getSectionServiceIds(sectionId: string) {
+  return controlPanelRuntimeData.sections.find((sectionEntry) => sectionEntry.id === sectionId)?.serviceIds ?? [];
+}
+
+function countLiveCoverage(serviceIds: readonly string[]) {
+  return serviceIds.filter((serviceId) => {
+    const serviceMeta = controlPanelRuntimeData.services.find((service) => service.id === serviceId);
+    return serviceMeta && !serviceMeta.placeholder;
+  }).length;
+}
+
 function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPanelText) {
-  return primarySectionIds
-    .map((sectionId) => {
-      const href = `/${sectionId}` as PrimarySectionHref;
+  return primarySectionIds.map((sectionId) => {
+    const href = `/${sectionId}` as PrimarySectionHref;
+    const description = isPhaseOneSection(sectionId)
+      ? compactSectionDescriptions[sectionId]
+      : panelText.surfaceDescriptions[sectionId];
 
-      return {
-        id: href,
-        href,
-        label: panelText.surfaceTitles[sectionId],
-        description: panelText.surfaceDescriptions[sectionId],
-        active: href === activeHref,
-        badge: href === '/dashboard' ? panelText.ui.openServiceSpace : undefined,
-      };
-    });
-}
-
-function resolveSignals(panelText: ControlPanelText): ReadonlyArray<SignalView> {
-  return [
-    {
-      id: 'best-path',
-      tone: 'best',
-      title: panelText.signals.bestPath.title,
-      description: panelText.signals.bestPath.description,
-      value: panelText.ui.defaultTitle,
-    },
-    {
-      id: 'pressure',
-      tone: 'danger',
-      title: panelText.signals.pressure.title,
-      description: panelText.signals.pressure.description,
-      value: '1',
-    },
-    {
-      id: 'live-refresh',
-      tone: 'neutral',
-      title: panelText.signals.liveRefresh.title,
-      description: panelText.signals.liveRefresh.description,
-      value: panelText.ui.liveRefreshValue,
-    },
-    {
-      id: 'mode',
-      tone: 'neutral',
-      title: panelText.signals.mode.title,
-      description: panelText.signals.mode.description,
-      value: panelText.ui.readingModeValue,
-    },
-  ];
-}
-
-function resolveFallbackMission(activeSectionLabel: string, panelText: ControlPanelText): MissionCardView {
-  return {
-    missionTitle: `${panelText.ui.fallbackMissionTitle} ${activeSectionLabel}`,
-    missionDescription: panelText.ui.fallbackMissionDescription,
-    owner: activeSectionLabel,
-    dueLabel: panelText.ui.fallbackDueLabel,
-    countLabel: '1',
-  };
-}
-
-function resolvePrimaryAction(activeSectionId: ControlPanelSectionId, panelText: ControlPanelText) {
-  if (activeSectionId === 'operations') {
-    return { label: panelText.ui.primaryAction, href: '/operations/dsh/sheinproxy' };
-  }
-
-  return { label: panelText.ui.primaryAction, href: '/finance' };
-}
-
-function resolveSecondaryAction(activeSectionId: ControlPanelSectionId, panelText: ControlPanelText) {
-  if (activeSectionId === 'operations') {
-    return { label: panelText.ui.secondaryActionDefault, href: '/dashboard' };
-  }
-
-  return { label: panelText.ui.secondaryAction, href: '/operations' };
+    return {
+      id: href,
+      href,
+      label: panelText.surfaceTitles[sectionId],
+      description,
+      active: href === activeHref,
+      badge: href === '/dashboard' ? panelText.ui.openServiceSpace : undefined,
+    };
+  });
 }
 
 export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSurfaceHostProps) {
@@ -186,7 +185,6 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
   const uiText = useUiText();
   const panelText = uiText.controlPanel;
   const dshText = useDshControlPanelText();
-  const marketingCopy = panelText.marketing;
   const [alertCount, setAlertCount] = React.useState(1);
   const [selectedServiceId, setSelectedServiceId] = React.useState<string>(allServiceTabId);
   const [activeSectionHref, setActiveSectionHref] = React.useState<PrimarySectionHref>(() => (
@@ -200,63 +198,28 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
   const activeSectionId = activeSectionHref.slice(1) as ControlPanelSectionId;
   const isControlSection = activeSectionId === 'control';
   const isMarketingSection = activeSectionId === 'marketing';
+  const activeControlHref = isControlSection && subsection ? `/control/${subsection}` : undefined;
+  const isAllFilterActive = selectedServiceId === allServiceTabId;
   const shellCopy = resolveShellCopy(panelText, activeSectionId, isControlSection ? subsection : undefined);
   const railItems = resolveRailItems(activeSectionHref, panelText);
-  const isAllFilterActive = selectedServiceId === allServiceTabId;
   const selectedServiceMeta = isAllFilterActive
     ? undefined
     : controlPanelRuntimeData.services.find((service) => service.id === selectedServiceId);
   const selectedServiceLabel = selectedServiceMeta ? getServiceLabel(uiText, selectedServiceMeta.id) : panelText.filters.allServices;
   const serviceSections = selectedServiceMeta?.sections ?? [];
   const serviceSectionLabels = serviceSections.map((sectionId) => panelText.surfaceTitles[sectionId as ControlPanelSectionId] ?? sectionId);
-  const selectedSectionMeta = controlPanelRuntimeData.sections.find((sectionEntry) => sectionEntry.id === activeSectionId);
-  const selectedSectionMission = controlPanelRuntimeData.missions.find((mission) => mission.sectionId === activeSectionId);
-  const sectionServiceIds = selectedSectionMeta?.serviceIds ?? [];
+  const sectionServiceIds = getSectionServiceIds(activeSectionId);
   const sectionServiceNames = sectionServiceIds.map((serviceId) => getServiceLabel(uiText, serviceId));
-  const serviceLeadMission = serviceSections
-    .map((serviceSectionId) => controlPanelRuntimeData.missions.find((mission) => mission.sectionId === serviceSectionId))
-    .find(Boolean);
-  const activeSectionLabel = panelText.surfaceTitles[activeSectionId] ?? activeSectionId;
-  const activeMission = isAllFilterActive
-    ? selectedSectionMission
-      ? {
-          missionTitle: `${panelText.ui.fallbackMissionTitle} ${activeSectionLabel}`,
-          missionDescription: `${panelText.ui.missionDockAll} ${shellCopy.title}`,
-          owner: activeSectionLabel,
-          dueLabel: selectedSectionMission.dueKind === 'missing' ? panelText.ui.fallbackDueLabel : panelText.ui.definedDueLabel,
-          countLabel: String(sectionServiceIds.length || 1),
-        }
-      : resolveFallbackMission(activeSectionLabel, panelText)
-    : serviceLeadMission
-      ? {
-          missionTitle: `${panelText.ui.fallbackMissionTitle} ${selectedServiceLabel}`,
-          missionDescription: `${panelText.ui.missionDockActive} ${selectedServiceLabel}`,
-          owner: selectedServiceLabel,
-          dueLabel: serviceLeadMission.dueKind === 'missing' ? panelText.ui.fallbackDueLabel : panelText.ui.definedDueLabel,
-          countLabel: String(serviceSectionLabels.length || 1),
-        }
-      : resolveFallbackMission(selectedServiceLabel, panelText);
-  const topFilters = [
-    {
-      id: allServiceTabId,
-      label: panelText.filters.allServices,
-      metaLabel: panelText.filters.allServicesMeta,
-      icon: '▦',
-      active: isAllFilterActive,
-    },
-    ...controlPanelRuntimeData.services.map((service) => ({
-      id: service.id,
-      label: getServiceLabel(uiText, service.id),
-      metaLabel: service.placeholder ? panelText.filters.reference : `${service.sections.length}`,
-      icon: serviceIconMap[service.id] ?? '◦',
-      active: selectedServiceId === service.id,
-    })),
-  ];
-  const heroPrimaryAction = resolvePrimaryAction(activeSectionId, panelText);
-  const heroSecondaryAction = resolveSecondaryAction(activeSectionId, panelText);
-  const signalCards = resolveSignals(panelText);
-  const activeControlHref = isControlSection && subsection ? `/control/${subsection}` : undefined;
+  const liveCoverageCount = countLiveCoverage(sectionServiceIds);
+  const referenceCoverageCount = sectionServiceIds.length - liveCoverageCount;
   const contextItems = isAllFilterActive ? sectionServiceNames : serviceSectionLabels;
+  const scopedSectionUnavailable = !isAllFilterActive && !serviceSections.includes(activeSectionId);
+  const readyMissionCount = controlPanelRuntimeData.missions.filter((mission) => !mission.placeholder).length;
+
+  const resolveActionHandler = React.useCallback(
+    (href?: string, onAction?: () => void) => onAction ?? (href ? () => router.push(href) : undefined),
+    [router],
+  );
 
   const handleBrandClick = React.useCallback(() => {
     setSelectedServiceId(allServiceTabId);
@@ -275,13 +238,429 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
     setAlertCount(0);
   }, []);
 
+  const buildServiceDisclosureItems = React.useCallback((sectionId: PhaseOneSectionId) => (
+    getSectionServiceIds(sectionId).map((serviceId) => {
+      const serviceMeta = controlPanelRuntimeData.services.find((service) => service.id === serviceId);
+
+      return {
+        id: `${sectionId}-${serviceId}`,
+        label: getServiceLabel(uiText, serviceId),
+        description: serviceMeta?.placeholder
+          ? 'يبقى ظاهرًا كمرجع في هذه المرحلة بدون رفعه إلى مسار أول.'
+          : 'متصل فعليًا بهذه الصفحة ويمكن تحويل العرض إليه بنقرة واحدة.',
+        badge: serviceMeta?.placeholder ? panelText.filters.reference : panelText.ui.liveRefreshValue,
+        onAction: () => setSelectedServiceId(serviceId),
+      } satisfies DisclosureItemView;
+    })
+  ), [panelText.filters.reference, panelText.ui.liveRefreshValue, uiText]);
+
+  const dashboardCards = phaseOneSectionIds.map((sectionId) => {
+    const serviceIds = getSectionServiceIds(sectionId);
+
+    return {
+      id: `dashboard-${sectionId}`,
+      label: panelText.surfaceTitles[sectionId],
+      description: compactSectionDescriptions[sectionId],
+      footerLabel: 'فتح القسم',
+      href: sectionRouteMap[sectionId],
+      badge: `${serviceIds.length} مساحات`,
+      tone: sectionId === 'operations' ? 'primary' : 'secondary',
+    } satisfies SectionActionView;
+  });
+
+  const phaseOneBlueprint: SectionBlueprint | null = isPhaseOneSection(activeSectionId)
+    ? (() => {
+        switch (activeSectionId) {
+          case 'dashboard':
+            return {
+              eyebrow: panelText.ui.missionEyebrow,
+              title: panelText.surfaceTitles.dashboard,
+              description: 'لوحة قرار قصيرة تضع العمليات والمالية والكتالوجات والدعم في أول نظرة، وتؤجل أي تفاصيل أقل أولوية إلى طبقة ثانوية.',
+              primaryAction: {
+                id: 'dashboard-primary',
+                label: 'ابدأ من العمليات',
+                description: 'أقرب مسار فعلي للحسم الآن.',
+                footerLabel: 'فتح مباشر',
+                href: '/operations',
+                badge: 'الموصى به الآن',
+                tone: 'primary',
+              },
+              kpis: [
+                {
+                  id: 'dashboard-core',
+                  title: 'الأقسام الأساسية',
+                  value: String(phaseOneSectionIds.length),
+                  description: 'النطاق المغلق لهذه المرحلة فقط.',
+                  tone: 'brand',
+                },
+                {
+                  id: 'dashboard-services',
+                  title: 'المساحات المتصلة',
+                  value: String(controlPanelRuntimeData.services.length),
+                  description: 'الخدمات الظاهرة في الشريط العلوي.',
+                },
+                {
+                  id: 'dashboard-ready',
+                  title: 'المسارات الجاهزة',
+                  value: String(readyMissionCount),
+                  description: 'مسارات موصولة فعليًا داخل control-panel.',
+                  tone: 'best',
+                },
+                {
+                  id: 'dashboard-alerts',
+                  title: 'تحتاج تركيز',
+                  value: String(alertCount),
+                  description: 'إشارات تحتاج قرارًا أسرع من بقية الصفحة.',
+                  tone: alertCount > 0 ? 'danger' : 'neutral',
+                },
+              ],
+              quickActionsTitle: 'الأقسام الأساسية',
+              quickActionsDescription: 'كل بطاقة تنقلك إلى القسم الصحيح من أول مستوى وبحد أقصى نقرتين.',
+              quickActions: dashboardCards,
+              disclosureTitle: 'أقسام أقل أولوية في Phase 1',
+              disclosureDescription: 'تبقى متاحة لكن لا تنافس القرار الأول.',
+              disclosureItems: hiddenSectionIds.map((sectionId) => ({
+                id: `hidden-${sectionId}`,
+                label: panelText.surfaceTitles[sectionId],
+                description: 'يبقى ظاهرًا داخل الشريط الجانبي مع خفض البروز حتى إغلاق المرحلة الحالية.',
+                href: sectionRouteMap[sectionId],
+                badge: 'خارج النطاق',
+              })),
+            };
+          case 'operations':
+            return {
+              eyebrow: 'غرفة القرار الحالية',
+              title: panelText.surfaceTitles.operations,
+              description: 'الضغط الحالي ومسارات التنفيذ الحية والتنبيهات موضوعة في سطح واحد، مع جعل الطلبات المسار الأول وترك التوسعات في طبقة أقل بروزًا.',
+              primaryAction: {
+                id: 'operations-primary',
+                label: 'افتح الطلبات',
+                description: dshText.hub.workbenches.orders.description,
+                footerLabel: 'فتح مباشر',
+                href: dshText.hub.workbenches.orders.routeHint,
+                badge: 'المسار الأول',
+                tone: 'primary',
+              },
+              kpis: [
+                {
+                  id: 'operations-services',
+                  title: 'المساحات المرتبطة',
+                  value: String(sectionServiceIds.length),
+                  description: 'الخدمات التي تظهر هذه الغرفة ضمن control-panel.',
+                  tone: 'brand',
+                },
+                {
+                  id: 'operations-live',
+                  title: 'مسارات حية',
+                  value: String(dshLiveWorkbenchIds.length),
+                  description: 'مهام يمكن فتحها الآن من أول نقرة.',
+                  tone: 'best',
+                },
+                {
+                  id: 'operations-planned',
+                  title: 'توسعات لاحقة',
+                  value: String(dshPlannedWorkbenchIds.length),
+                  description: 'تبقى ظاهرة دون أن تزاحم المسار الحي.',
+                },
+                {
+                  id: 'operations-pressure',
+                  title: 'الضغط الحالي',
+                  value: String(alertCount),
+                  description: 'إشارات مرئية تعود للصفر بعد المراجعة.',
+                  tone: alertCount > 0 ? 'danger' : 'neutral',
+                },
+              ],
+              quickActionsTitle: 'المسارات السريعة',
+              quickActionsDescription: 'العمل الأساسي يبدأ من هنا بنقرة واحدة بدل التمرير داخل وصف طويل.',
+              quickActions: dshLiveWorkbenchIds.map((workbenchId) => ({
+                id: `operations-${workbenchId}`,
+                label: dshText.hub.workbenches[workbenchId].label,
+                description: dshText.hub.workbenches[workbenchId].description,
+                footerLabel: 'فتح مباشر',
+                href: dshText.hub.workbenches[workbenchId].routeHint,
+                badge: 'حي',
+                tone: workbenchId === 'orders' ? 'primary' : 'secondary',
+              })),
+              disclosureTitle: 'مسارات أقل أولوية الآن',
+              disclosureDescription: 'تظل متاحة بشكل منضبط عبر progressive disclosure.',
+              disclosureItems: dshPlannedWorkbenchIds.map((workbenchId) => ({
+                id: `operations-disclosure-${workbenchId}`,
+                label: dshText.hub.workbenches[workbenchId].label,
+                description: `${dshText.hub.workbenches[workbenchId].description} · ${dshText.hub.workbenches[workbenchId].routeHint}`,
+                href: dshText.hub.workbenches[workbenchId].routeHint,
+                badge: 'قيد التوسعة',
+              })),
+            };
+          case 'finance':
+            return {
+              eyebrow: 'تشغيل مالي موحد',
+              title: panelText.surfaceTitles.finance,
+              description: 'الصفحة المالية أصبحت قراءة مختصرة لمسار التشغيل الجاهز، مع دفع المسارات المرجعية إلى طبقة ثانوية بدل تكديس الشرح في أول الشاشة.',
+              primaryAction: {
+                id: 'finance-primary',
+                label: 'حصر العرض على WLT',
+                description: 'المساحة الجاهزة حاليًا للمتابعة المالية.',
+                footerLabel: 'تصفية فورية',
+                badge: 'الموصى به الآن',
+                tone: 'primary',
+                onAction: () => setSelectedServiceId('wlt'),
+              },
+              kpis: [
+                {
+                  id: 'finance-services',
+                  title: 'المساحات المرتبطة',
+                  value: String(sectionServiceIds.length),
+                  description: 'كل مساحة تحمل مسارًا ماليًا داخل اللوحة.',
+                  tone: 'brand',
+                },
+                {
+                  id: 'finance-live',
+                  title: 'جاهز للتشغيل',
+                  value: String(liveCoverageCount),
+                  description: 'مسارات يمكن التركيز عليها الآن دون قفزات إضافية.',
+                  tone: 'best',
+                },
+                {
+                  id: 'finance-reference',
+                  title: 'مرجعي',
+                  value: String(referenceCoverageCount),
+                  description: 'مسارات تبقى ظاهرة بدون ادعاء جاهزية أعلى من الواقع.',
+                },
+                {
+                  id: 'finance-links',
+                  title: 'مخارج سريعة',
+                  value: '2',
+                  description: 'عودة مباشرة للنظرة العامة أو الدعم.',
+                },
+              ],
+              quickActionsTitle: 'إجراءات سريعة',
+              quickActionsDescription: 'الإجراء الأساسي هو تركيز القراءة على المسار الجاهز، ثم التنقل إلى أقرب قرار داعم.',
+              quickActions: [
+                {
+                  id: 'finance-focus-wlt',
+                  label: 'تركيز على WLT',
+                  description: 'فلترة الصفحة إلى المسار المالي الموصى به الآن.',
+                  footerLabel: 'تصفية فورية',
+                  badge: 'مباشر',
+                  tone: 'primary',
+                  onAction: () => setSelectedServiceId('wlt'),
+                },
+                {
+                  id: 'finance-overview',
+                  label: 'العودة للنظرة العامة',
+                  description: 'انتقال سريع لإعادة ترتيب الأولويات قبل الحسم التالي.',
+                  footerLabel: 'فتح القسم',
+                  href: '/dashboard',
+                },
+                {
+                  id: 'finance-support',
+                  label: 'تنسيق الدعم',
+                  description: 'افتح الدعم عندما يحتاج القرار المالي إلى استعادة تجربة العميل.',
+                  footerLabel: 'فتح القسم',
+                  href: '/support',
+                },
+                {
+                  id: 'finance-operations',
+                  label: 'العودة للعمليات',
+                  description: 'اربط القرار المالي بمسار التنفيذ المباشر بدون مغادرة الشريط الحاكم.',
+                  footerLabel: 'فتح القسم',
+                  href: '/operations',
+                },
+              ],
+              disclosureTitle: 'تغطية مالية حسب الخدمة',
+              disclosureDescription: 'التحويل بين الخدمات يبقى أقل بروزًا من الإجراء الأول.',
+              disclosureItems: buildServiceDisclosureItems('finance'),
+            };
+          case 'catalogs':
+            return {
+              eyebrow: 'حوكمة المنتجات',
+              title: panelText.surfaceTitles.catalogs,
+              description: 'الكتالوج أصبح بوابة قرار قصيرة: افتح المسار الحي، راجع الشركاء أو التسويق، واترك التفاصيل التفصيلية لما بعد الدخول للمسار المختار.',
+              primaryAction: {
+                id: 'catalogs-primary',
+                label: 'افتح كتالوج DSH',
+                description: 'المسار الحي الأقرب لحوكمة الفئات والمنتجات.',
+                footerLabel: 'فتح مباشر',
+                href: '/operations/dsh/catalogs',
+                badge: 'المسار الأول',
+                tone: 'primary',
+              },
+              kpis: [
+                {
+                  id: 'catalogs-services',
+                  title: 'المساحات المرتبطة',
+                  value: String(sectionServiceIds.length),
+                  description: 'الخدمات التي تستهلك حوكمة الكتالوج من هذا السطح.',
+                  tone: 'brand',
+                },
+                {
+                  id: 'catalogs-live',
+                  title: 'بوابات حية',
+                  value: '3',
+                  description: 'كتالوج، شركاء، وتسويق قابلة للفتح مباشرة.',
+                  tone: 'best',
+                },
+                {
+                  id: 'catalogs-ready',
+                  title: 'جاهز للتشغيل',
+                  value: String(liveCoverageCount),
+                  description: 'مساحات يمكن متابعتها الآن دون تكرار الشرح.',
+                },
+                {
+                  id: 'catalogs-reference',
+                  title: 'مرجعي',
+                  value: String(referenceCoverageCount),
+                  description: 'تغطية مرئية أقل بروزًا من القرار الأساسي.',
+                },
+              ],
+              quickActionsTitle: 'مفاتيح الحوكمة',
+              quickActionsDescription: 'أهم ثلاث بوابات تُفتح من أول الشاشة بدل دفنها داخل محتوى طويل.',
+              quickActions: [
+                {
+                  id: 'catalogs-open',
+                  label: 'كتالوج DSH',
+                  description: 'إدارة الفئات والمنتجات من المسار الحي المباشر.',
+                  footerLabel: 'فتح مباشر',
+                  href: '/operations/dsh/catalogs',
+                  badge: 'حي',
+                  tone: 'primary',
+                },
+                {
+                  id: 'catalogs-partners',
+                  label: 'بوابة الشركاء',
+                  description: 'مراجعة الإدخالات قبل انتقالها إلى الكتالوج النهائي.',
+                  footerLabel: 'فتح مباشر',
+                  href: '/operations/dsh/partners',
+                  badge: 'مراجعة',
+                },
+                {
+                  id: 'catalogs-marketing',
+                  label: 'التسويق',
+                  description: 'اعتماد الرسائل والعرض قبل النشر النهائي.',
+                  footerLabel: 'فتح مباشر',
+                  href: '/operations/dsh/marketing',
+                  badge: 'اعتماد',
+                },
+                {
+                  id: 'catalogs-overview',
+                  label: 'العودة للنظرة العامة',
+                  description: 'ارجع بسرعة إلى مركز القرار بدل التنقل عبر شاشات وسيطة.',
+                  footerLabel: 'فتح القسم',
+                  href: '/dashboard',
+                },
+              ],
+              disclosureTitle: 'تغطية الكتالوج حسب الخدمة',
+              disclosureDescription: 'التحويل بين الخدمات يبقى ثانويًا حتى لا ينافس بوابات الحوكمة الأساسية.',
+              disclosureItems: buildServiceDisclosureItems('catalogs'),
+            };
+          case 'support':
+            return {
+              eyebrow: 'استعادة تجربة العميل',
+              title: panelText.surfaceTitles.support,
+              description: 'الدعم صار مسار triage مختصرًا: ابدأ من أقرب صف تشغيلي، بدّل إلى المساحة المقترحة، واترك التفاصيل غير العاجلة داخل disclosure.',
+              primaryAction: {
+                id: 'support-primary',
+                label: 'ابدأ triage من الطلبات',
+                description: 'أقرب مسار فعلي للتصعيد والاستعادة داخل هذه المرحلة.',
+                footerLabel: 'فتح مباشر',
+                href: '/operations/dsh/orders',
+                badge: 'المسار الأول',
+                tone: 'primary',
+              },
+              kpis: [
+                {
+                  id: 'support-services',
+                  title: 'المساحات المرتبطة',
+                  value: String(sectionServiceIds.length),
+                  description: 'خدمات يمكن ربط الدعم بها من هذا السطح.',
+                  tone: 'brand',
+                },
+                {
+                  id: 'support-live',
+                  title: 'جاهز للتصعيد',
+                  value: String(liveCoverageCount),
+                  description: 'مسارات يمكن تحويل التركيز إليها الآن.',
+                  tone: 'best',
+                },
+                {
+                  id: 'support-pressure',
+                  title: 'تصعيدات مرئية',
+                  value: String(alertCount),
+                  description: 'إشارة مختصرة تحافظ على أولوية الدعم واضحة.',
+                  tone: alertCount > 0 ? 'danger' : 'neutral',
+                },
+                {
+                  id: 'support-recovery',
+                  title: 'مخرج آمن',
+                  value: '2',
+                  description: 'عودة سريعة للنظرة العامة أو العمليات.',
+                },
+              ],
+              quickActionsTitle: 'Quick triage',
+              quickActionsDescription: 'كل بطاقة تقلل التفرع وتبقي القرار في نقرة أو نقرتين.',
+              quickActions: [
+                {
+                  id: 'support-orders',
+                  label: 'طلبات قابلة للتصعيد',
+                  description: 'افتح الصف التشغيلي الأقرب للحسم بدل التدرج عبر صفحات وصفية.',
+                  footerLabel: 'فتح مباشر',
+                  href: '/operations/dsh/orders',
+                  badge: 'حي',
+                  tone: 'primary',
+                },
+                {
+                  id: 'support-arb',
+                  label: 'حصر العرض على ARB',
+                  description: 'تركيز الصفحة على المساحة الأنسب حاليًا للدعم.',
+                  footerLabel: 'تصفية فورية',
+                  badge: 'مباشر',
+                  onAction: () => setSelectedServiceId('arb'),
+                },
+                {
+                  id: 'support-operations',
+                  label: 'العودة للعمليات',
+                  description: 'انتقال سريع إذا احتاج التصعيد إلى قرار تشغيلي أولًا.',
+                  footerLabel: 'فتح القسم',
+                  href: '/operations',
+                },
+                {
+                  id: 'support-overview',
+                  label: 'العودة للنظرة العامة',
+                  description: 'استخدمها عندما تحتاج إعادة ترتيب الأولويات قبل المتابعة.',
+                  footerLabel: 'فتح القسم',
+                  href: '/dashboard',
+                },
+              ],
+              disclosureTitle: 'تغطية الدعم حسب الخدمة',
+              disclosureDescription: 'الخدمات الداعمة تبقى مرئية لكن أقل بروزًا من مسار triage الأساسي.',
+              disclosureItems: buildServiceDisclosureItems('support'),
+            };
+        }
+      })()
+    : null;
+
   return (
     <WebCommandCenterFrame
       brandLabel={panelText.brandLabel}
       surfaceTitle={shellCopy.title}
       surfaceSubtitle={shellCopy.description}
       showHero={false}
-      topFilters={topFilters}
+      topFilters={[
+        {
+          id: allServiceTabId,
+          label: panelText.filters.allServices,
+          metaLabel: panelText.filters.allServicesMeta,
+          icon: '▦',
+          active: isAllFilterActive,
+        },
+        ...controlPanelRuntimeData.services.map((service) => ({
+          id: service.id,
+          label: getServiceLabel(uiText, service.id),
+          metaLabel: service.placeholder ? panelText.filters.reference : `${service.sections.length}`,
+          icon: serviceIconMap[service.id] ?? '◦',
+          active: selectedServiceId === service.id,
+        })),
+      ]}
       onTopFilterSelect={setSelectedServiceId}
       onRailItemSelect={(itemId) => {
         const matchedSection = primarySectionIds.find((sectionId) => `/${sectionId}` === itemId);
@@ -305,140 +684,153 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
       alertCountLabel={String(alertCount)}
     >
       <div className={styles.stageStack} dir={direction}>
-        {!isMarketingSection ? (
+        {phaseOneBlueprint ? (
           <>
-            <section className={styles.missionDockHeader}>
-              <p className={styles.missionDockEyebrow}>{panelText.brandLabel}</p>
-              <h1 className={styles.missionDockTitle}>{shellCopy.title}</h1>
-              <p className={styles.missionDockSubtitle}>
-                {isAllFilterActive
-                  ? `${panelText.ui.missionDockAll} ${shellCopy.title}`
-                  : `${panelText.ui.missionDockActive} ${selectedServiceLabel}`}
-              </p>
-            </section>
+            <WebControlSurfaceHeader
+              chips={[
+                { label: panelText.brandLabel, tone: 'accent' },
+                { label: phaseOneBlueprint.eyebrow, tone: 'brand' },
+                { label: isAllFilterActive ? panelText.filters.allServicesMeta : selectedServiceLabel },
+              ]}
+              title={phaseOneBlueprint.title}
+              description={phaseOneBlueprint.description}
+              actions={[
+                {
+                  id: phaseOneBlueprint.primaryAction.id,
+                  label: phaseOneBlueprint.primaryAction.label,
+                  href: phaseOneBlueprint.primaryAction.href,
+                  onAction: resolveActionHandler(
+                    phaseOneBlueprint.primaryAction.href,
+                    phaseOneBlueprint.primaryAction.onAction,
+                  ),
+                  tone: phaseOneBlueprint.primaryAction.tone,
+                },
+              ]}
+            />
 
-            <section className={styles.priorityPanel}>
-              <WebMissionHeroCard
-                dense
-                badges={[
-                  `${panelText.ui.serviceBadge} ${isAllFilterActive ? panelText.filters.allServices : selectedServiceLabel}`,
-                  isAllFilterActive
-                    ? `${panelText.ui.sectionBadge} ${activeSectionLabel}`
-                    : `${panelText.ui.sectionsBadge} ${serviceSectionLabels.length}`,
-                  panelText.ui.lastUpdate,
-                ]}
-                eyebrow={`${shellCopy.title} · ${panelText.ui.missionEyebrow}`}
-                title={activeMission.missionTitle}
-                description={activeMission.missionDescription}
-                metaItems={[
-                  `${panelText.ui.serviceLabel}: ${activeMission.owner}`,
-                  activeMission.dueLabel,
-                  `${panelText.ui.sectionsBadge} ${activeMission.countLabel}`,
-                ]}
-                primaryAction={heroPrimaryAction}
-                secondaryAction={heroSecondaryAction}
-              />
+            <div className={styles.metricsStrip}>
+              {phaseOneBlueprint.kpis.map((kpi) => (
+                <WebSignalCard
+                  key={kpi.id}
+                  title={kpi.title}
+                  value={kpi.value}
+                  description={kpi.description}
+                  tone={kpi.tone}
+                />
+              ))}
+            </div>
 
-              <div className={styles.signalGrid}>
-                {signalCards.map((signal) => {
-                  const dynamicValue =
-                    signal.id === 'best-path'
-                      ? isAllFilterActive
-                        ? activeSectionLabel
-                        : selectedServiceLabel
-                      : signal.id === 'pressure'
-                        ? isAllFilterActive
-                          ? String(sectionServiceIds.length || 1)
-                          : String(serviceSectionLabels.length || 1)
-                        : signal.value;
-
-                  return (
-                    <WebSignalCard
-                      key={signal.id}
-                      title={signal.title}
-                      value={dynamicValue}
-                      description={signal.description}
-                      tone={signal.tone}
-                    />
-                  );
-                })}
-              </div>
-
-              <section className={styles.contextPanel}>
-                <h4 className={styles.contextTitle}>
-                  {isAllFilterActive ? panelText.ui.contextTitleSection : panelText.ui.contextTitleService}
-                </h4>
+            {scopedSectionUnavailable ? (
+              <section className={styles.statePanel}>
+                <h2 className={styles.stateTitle}>الخدمة المختارة لا تغطي هذا القسم</h2>
+                <p className={styles.stateDescription}>
+                  بدّل إلى خدمة مناسبة أو أعد العرض إلى كل المساحات حتى لا تبقى الصفحة فارغة بسبب فلتر غير مطابق.
+                </p>
                 <div className={styles.contextList}>
-                  {contextItems.map((item) => (
-                    <span key={item} className={styles.contextChip}>
-                      {item}
-                    </span>
+                  {sectionServiceNames.map((serviceName) => (
+                    <span key={serviceName} className={styles.contextChip}>{serviceName}</span>
                   ))}
-                  {contextItems.length === 0 ? (
-                    <span className={styles.contextChipMuted}>{panelText.ui.noItems}</span>
-                  ) : null}
+                </div>
+                <div className={styles.stateActions}>
+                  <WebControlActionButton
+                    id="state-reset"
+                    label="عرض كل المساحات"
+                    tone="primary"
+                    onAction={() => setSelectedServiceId(allServiceTabId)}
+                  />
+                  <WebControlActionButton
+                    id="state-dashboard"
+                    label="العودة للنظرة العامة"
+                    href="/dashboard"
+                    tone="secondary"
+                    onAction={() => router.push('/dashboard')}
+                  />
                 </div>
               </section>
-            </section>
+            ) : (
+              <>
+                <WebSectionCard
+                  title={phaseOneBlueprint.quickActionsTitle}
+                  description={phaseOneBlueprint.quickActionsDescription}
+                >
+                  <div className={styles.actionGrid}>
+                    {phaseOneBlueprint.quickActions.map((action) => (
+                      <WebControlActionCard
+                        key={action.id}
+                        id={action.id}
+                        title={action.label}
+                        description={action.description}
+                        footerLabel={action.footerLabel}
+                        href={action.href}
+                        badge={action.badge}
+                        tone={action.tone}
+                        onAction={resolveActionHandler(action.href, action.onAction)}
+                      />
+                    ))}
+                  </div>
+
+                  <details className={styles.disclosure}>
+                    <summary className={styles.disclosureSummary}>
+                      <span>{phaseOneBlueprint.disclosureTitle}</span>
+                      <span className={styles.disclosureHint}>{phaseOneBlueprint.disclosureDescription}</span>
+                    </summary>
+                    <div className={styles.disclosureBody}>
+                      {phaseOneBlueprint.disclosureItems.map((item) => (
+                        <WebControlDisclosureItem
+                          key={item.id}
+                          id={item.id}
+                          label={item.label}
+                          description={item.description}
+                          href={item.href}
+                          badge={item.badge}
+                          onAction={resolveActionHandler(item.href, item.onAction)}
+                        />
+                      ))}
+                    </div>
+                  </details>
+                </WebSectionCard>
+
+                <section className={styles.contextPanel}>
+                  <h3 className={styles.contextTitle}>
+                    {isAllFilterActive ? panelText.ui.contextTitleSection : panelText.ui.contextTitleService}
+                  </h3>
+                  <div className={styles.contextList}>
+                    {contextItems.map((item) => (
+                      <span key={item} className={styles.contextChip}>{item}</span>
+                    ))}
+                    {contextItems.length === 0 ? (
+                      <span className={styles.contextChipMuted}>{panelText.ui.noItems}</span>
+                    ) : null}
+                  </div>
+                </section>
+              </>
+            )}
           </>
         ) : null}
 
-        {activeSectionId === 'marketing' ? (
-          <section className={styles.subsectionPanel}>
-            <ControlPanelDshMarketingScreen hubHref="/marketing" operationsHref="/operations" />
-          </section>
-        ) : null}
-
-        {activeSectionId === 'operations' ? (
-          <section className={styles.subsectionPanel}>
-            <div className={styles.subsectionHeader}>
-              <h3 className={styles.subsectionTitle}>{dshText.hub.workbenches.sheinProxy.label}</h3>
-              <p className={styles.subsectionDescription}>{dshText.hub.workbenches.sheinProxy.description}</p>
-            </div>
-            <WebSectionCard
-              title={dshText.hub.workbenches.sheinProxy.label}
-              description={dshText.hub.workbenches.sheinProxy.description}
-            >
-              <Box gap={2}>
-                <Text role="bodySm" tone="muted">
-                  {dshText.hub.workbenches.sheinProxy.routeHint}
-                </Text>
-                <Button
-                  label={panelText.openSheinProxy}
-                  tone="primary"
-                  onPress={() => router.push('/operations/dsh/sheinproxy')}
-                />
-              </Box>
-            </WebSectionCard>
-          </section>
-        ) : null}
-
-        {activeSectionId === 'catalogs' ? (
-          <section className={styles.subsectionPanel}>
-            <div className={styles.subsectionHeader}>
-              <h3 className={styles.subsectionTitle}>{panelText.surfaceTitles.catalogs}</h3>
-              <p className={styles.subsectionDescription}>{panelText.surfaceDescriptions.catalogs}</p>
-            </div>
-            <ControlPanelDshCatalogScreen hubHref="/catalogs" operationsHref="/operations/dsh/catalogs" />
-          </section>
-        ) : null}
-
         {activeSectionId === 'partners' ? (
-          <section className={styles.subsectionPanel}>
-            <div className={styles.subsectionHeader}>
-              <h3 className={styles.subsectionTitle}>{panelText.surfaceTitles.partners}</h3>
-              <p className={styles.subsectionDescription}>{panelText.surfaceDescriptions.partners}</p>
-            </div>
+          <WebSectionCard
+            title={panelText.surfaceTitles.partners}
+            description={panelText.surfaceDescriptions.partners}
+          >
             <ControlPanelDshPartnerApprovalsScreen hubHref="/partners" operationsHref="/operations/dsh/partners" />
-          </section>
+          </WebSectionCard>
+        ) : null}
+
+        {isMarketingSection ? (
+          <WebSectionCard
+            title={panelText.surfaceTitles.marketing}
+            description={panelText.surfaceDescriptions.marketing}
+          >
+            <ControlPanelDshMarketingScreen hubHref="/marketing" operationsHref="/operations" />
+          </WebSectionCard>
         ) : null}
 
         {isControlSection ? (
-          <section className={styles.subsectionPanel}>
-            <div className={styles.subsectionHeader}>
-              <h3 className={styles.subsectionTitle}>{panelText.ui.subsectionTitle}</h3>
-              <p className={styles.subsectionDescription}>{panelText.ui.subsectionDescription}</p>
-            </div>
+          <WebSectionCard
+            title={panelText.ui.subsectionTitle}
+            description={panelText.ui.subsectionDescription}
+          >
             <WebSegmentedTabs
               ariaLabel={panelText.ui.subsectionTitle}
               items={controlSubSectionIds.map((subsectionId) => ({
@@ -450,7 +842,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
                 router.push(`/control/${subsectionId}`);
               }}
             />
-            <div className={styles.subsectionGrid}>
+            <div className={styles.sectionGrid}>
               {controlSubSectionIds.map((subsectionId) => {
                 const href = `/control/${subsectionId}`;
                 const isActive = href === activeControlHref;
@@ -463,17 +855,40 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
                       event.preventDefault();
                       router.push(href);
                     }}
-                    className={[styles.subsectionLink, isActive ? styles.subsectionLinkActive : '']
-                      .filter(Boolean)
-                      .join(' ')}
+                    className={[styles.sectionLink, isActive ? styles.sectionLinkActive : ''].filter(Boolean).join(' ')}
                   >
-                    <strong className={styles.subsectionLinkLabel}>{panelText.subSections[subsectionId]}</strong>
-                    <span className={styles.subsectionLinkDescription}>{panelText.subSectionDescriptions[subsectionId]}</span>
+                    <strong className={styles.sectionLinkLabel}>{panelText.subSections[subsectionId]}</strong>
+                    <span className={styles.sectionLinkDescription}>{panelText.subSectionDescriptions[subsectionId]}</span>
                   </a>
                 );
               })}
             </div>
-          </section>
+          </WebSectionCard>
+        ) : null}
+
+        {!phaseOneBlueprint && activeSectionId !== 'partners' && activeSectionId !== 'marketing' && !isControlSection ? (
+          <WebSectionCard title={shellCopy.title} description={shellCopy.description}>
+            <div className={styles.actionGrid}>
+              <WebControlActionCard
+                id="fallback-dashboard"
+                title="العودة للنظرة العامة"
+                description="هذا القسم خارج نطاق Phase 1، لذلك تبقى العودة للغرفة الأساسية هي المسار الأول."
+                footerLabel="فتح القسم"
+                href="/dashboard"
+                badge="Phase 1"
+                tone="primary"
+                onAction={() => router.push('/dashboard')}
+              />
+              <WebControlActionCard
+                id="fallback-operations"
+                title="الانتقال للعمليات"
+                description="افتح أقرب مسار تنفيذي حي بدل توسيع هذه الصفحة في هذه المرحلة."
+                footerLabel="فتح القسم"
+                href="/operations"
+                onAction={() => router.push('/operations')}
+              />
+            </div>
+          </WebSectionCard>
         ) : null}
       </div>
     </WebCommandCenterFrame>
@@ -481,3 +896,6 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
 }
 
 export default ControlPanelSurfaceHost;
+
+
+

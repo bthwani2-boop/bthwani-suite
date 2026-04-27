@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, Switch as RNSwitch, View } from 'react-native';
 import { AnalyticsGrowthMarketingWorkspaceContent } from './workspaces/AnalyticsGrowthMarketingWorkspaceContent';
-import { Box, Button, Chip, Icon, KeyValueList, ListItem, MobileCommandSectionList, MobileScrollView, MobileStickyPrimaryAction, MobileWorkspaceHeader, StateView, Surface, Text, TextField, useDirection, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Chip, Icon, KeyValueList, ListItem, MobileCommandSectionList, MobileScrollView, MobileStickyPrimaryAction, StateView, Surface, Text, TextField, TopBar, useDirection, useTheme } from '@bthwani/ui-kit';
 import { PartnerDshWalletWorkspace } from '../../wlt/app-partner';
 import { InventoryCatalogWorkspaceContent } from './workspaces/InventoryCatalogWorkspaceContent';
 import { StoreProfileWorkspaceContent } from './workspaces/StoreProfileWorkspaceContent';
@@ -373,7 +373,18 @@ function HubWorkspaceShell({
 }) {
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
-      <MobileWorkspaceHeader title={title} description={description} icon={icon} onBack={onBack} />
+      <TopBar
+        variant="secondary"
+        title={title}
+        style={{ marginHorizontal: -16, marginTop: -16 }}
+        trailingAction={{
+          id: 'back',
+          icon: <Icon name="arrow-back" size={24} tone="brand" />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'رجوع',
+          onPress: onBack,
+        }}
+      />
 
       <View style={{ gap: 16 }}>
         {children}
@@ -570,11 +581,18 @@ function OperationsWorkspace({
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
-      <MobileWorkspaceHeader
+      <TopBar
+        variant="secondary"
         title="العمليات والفريق"
-        description={`${storeName} · ${branchLabel} · ${cityLabel} · نوع الخدمة ${activeServiceType === 'dsh' ? 'DSH' : 'ARB'}`}
-        icon="people-outline"
-        onBack={onBack}
+        subtitle={`${storeName} · ${branchLabel}`}
+        style={{ marginHorizontal: -16, marginTop: -16 }}
+        trailingAction={{
+          id: 'back',
+          icon: <Icon name="arrow-back" size={24} tone="brand" />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'رجوع',
+          onPress: onBack,
+        }}
       />
 
       <Surface tone="raised" padding={4} gap={3}>
@@ -1073,11 +1091,18 @@ export function PartnerDshConsoleScreen(props: Props) {
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
-      <MobileWorkspaceHeader
+      <TopBar
+        variant="secondary"
         title="مركز حساب الشريك"
-        description="كل ما تحتاجه لإدارة متجرك وتنمية أعمالك من مكان واحد."
-        icon="person-outline"
-        onBack={onOpenOrdersBoard}
+        subtitle={`${storeName} · ${branchLabel}`}
+        style={{ marginHorizontal: -16, marginTop: -16 }}
+        trailingAction={onOpenOrdersBoard ? {
+          id: 'back',
+          icon: <Icon name="arrow-back" size={24} tone="brand" />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'رجوع',
+          onPress: onOpenOrdersBoard,
+        } : undefined}
       />
 
       <Surface tone="raised" padding={3} gap={3}>
@@ -1149,13 +1174,12 @@ export function PartnerDshConsoleScreen(props: Props) {
             onPress={onOpenSupportDirectory}
           />
         </View>
-
-        <Text role="caption" tone="muted">
-          {storeName} · {branchLabel}
-        </Text>
       </Surface>
     </MobileScrollView>
   );
 }
 
 export default PartnerDshConsoleScreen;
+
+
+

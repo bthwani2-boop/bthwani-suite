@@ -1,12 +1,13 @@
 import React from 'react';
 import {
   Box,
+  Icon,
   ListItem,
   MobileScrollView,
-  MobileWorkspaceHeader,
   SectionHeader,
   Surface,
   Text,
+  TopBar,
 } from '@bthwani/ui-kit';
 import type { PartnerSupportScreenId } from './DshPartnerGeneratedSupportScreens';
 
@@ -56,11 +57,17 @@ const groups: Array<{
 export function DshPartnerSupportDirectoryScreen({ onBack, onOpenScreen }: DshPartnerSupportDirectoryScreenProps) {
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
-      <MobileWorkspaceHeader
+      <TopBar
+        variant="secondary"
         title="مداخل الحساب للشريك"
-        description="هذا الدليل مخصص فقط للمهام الثانوية التي لم تعد جزءًا من مركز الحساب ومساحات العمل الأساسية."
-        icon="grid-outline"
-        onBack={onBack}
+        style={{ marginHorizontal: -16, marginTop: -16 }}
+        trailingAction={onBack ? {
+          id: 'back',
+          icon: <Icon name="arrow-back" size={24} tone="brand" />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'رجوع',
+          onPress: onBack,
+        } : undefined}
       />
 
       {groups.map((group) => (
@@ -85,3 +92,5 @@ export function DshPartnerSupportDirectoryScreen({ onBack, onOpenScreen }: DshPa
 }
 
 export default DshPartnerSupportDirectoryScreen;
+
+

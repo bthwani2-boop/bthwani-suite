@@ -3,6 +3,7 @@ import { useDirection, useUiLanguage, useUiText } from '../providers';
 
 const webCommandCenterCss = `
 .bth-web-command-center-root {
+  --rail-width: 288px;
   display: grid;
   gap: 20px;
 }
@@ -165,18 +166,18 @@ const webCommandCenterCss = `
 }
 
  .bth-web-command-center__workspace {
-   display: grid;
-   grid-template-columns: minmax(0, 1fr) 288px;
-   grid-template-areas: "stage rail";
-   gap: 24px;
-   align-items: start;
-   direction: ltr;
- }
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--rail-width);
+  grid-template-areas: "stage rail";
+  gap: 24px;
+  align-items: start;
+  direction: ltr;
+}
 
- [dir="ltr"] .bth-web-command-center__workspace {
-   grid-template-columns: 288px minmax(0, 1fr);
-   grid-template-areas: "rail stage";
- }
+[dir="ltr"] .bth-web-command-center__workspace {
+  grid-template-columns: var(--rail-width) minmax(0, 1fr);
+  grid-template-areas: "rail stage";
+}
 
 @media (max-width: 900px) {
   .bth-web-command-center__workspace {
@@ -221,6 +222,43 @@ const webCommandCenterCss = `
   background: linear-gradient(180deg, rgba(10, 47, 92, 0.015) 0%, rgba(255, 255, 255, 1) 40%);
   box-shadow: 0 4px 16px rgba(10, 47, 92, 0.04);
   backdrop-filter: blur(8px);
+  width: var(--rail-width);
+  transition: width 180ms ease;
+}
+
+/* collapsed rail */
+.bth-web-command-center-root[data-rail-collapsed="1"] {
+  --rail-width: 72px;
+}
+
+.bth-web-command-center__rail[data-collapsed="1"] {
+  width: var(--rail-width);
+}
+
+.bth-web-command-center__rail[data-collapsed="1"] .bth-web-command-center__rail-item-title,
+.bth-web-command-center__rail[data-collapsed="1"] .bth-web-command-center__rail-item-description,
+.bth-web-command-center__rail[data-collapsed="1"] .bth-web-command-center__rail-badge,
+.bth-web-command-center__rail[data-collapsed="1"] .bth-web-command-center__rail-status,
+.bth-web-command-center__rail[data-collapsed="1"] .bth-web-command-center__rail-title {
+  display: none;
+}
+
+.bth-web-command-center__rail-item::before {
+  content: attr(data-icon);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  margin-inline-end: 8px;
+  background: transparent;
+  color: #0A2F5C;
+  font-weight: 700;
+}
+
+.bth-web-command-center-root[data-rail-collapsed="1"] .bth-web-command-center__rail-item::before {
+  margin-inline: 0;
 }
 
 .bth-web-command-center__rail-header {
@@ -322,6 +360,22 @@ const webCommandCenterCss = `
 .bth-web-rail-service-list__search:focus {
   outline: none;
   border-color: #FF500D;
+}
+
+.bth-web-command-center__rail-toggle {
+  appearance: none;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: #ffffff;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #0A2F5C;
+  font-weight: 700;
+}
+
+.bth-web-command-center__rail-toggle:hover {
+  border-color: #FF500D;
+  transform: translateY(-1px);
 }
 
 .bth-web-rail-service-list__list {
@@ -496,12 +550,16 @@ function renderRailItems(
     <nav className="bth-web-command-center__rail-nav" aria-label={railNavigationLabel}>
       {items.map((item) => {
         const className = ['bth-web-command-center__rail-item', item.active ? 'bth-web-command-center__rail-item--active' : ''].filter(Boolean).join(' ');
+        const icon = (item as any).icon ?? (item.label ? item.label.charAt(0) : '•');
 
         if (item.href) {
           return (
             <a
               key={item.id}
               href={item.href}
+              title={item.label}
+              aria-label={item.label}
+              data-icon={icon}
               onClick={(event) => {
                 if (onRailItemSelect) {
                   event.preventDefault();
@@ -522,6 +580,9 @@ function renderRailItems(
           <button
             key={item.id}
             type="button"
+            title={item.label}
+            aria-label={item.label}
+            data-icon={icon}
             onClick={() => onRailItemSelect?.(item.id)}
             className={className}
           >
@@ -589,11 +650,12 @@ export function WebCommandCenterFrame({
   const resolvedLanguageLabel = languageLabel ?? panelText.ui.languageLabel;
   const resolvedRefreshLabel = refreshLabel ?? panelText.ui.refreshLabel;
   const resolvedRailNavigationLabel = railNavigationLabel ?? panelText.ui.railNavigationLabel;
+  const [railCollapsed, setRailCollapsed] = React.useState(false);
 
   return (
     <>
       <WebCommandCenterStyles />
-      <main className="bth-web-command-center-root" dir={direction}>
+      <main className="bth-web-command-center-root" dir={direction} data-rail-collapsed={railCollapsed ? '1' : '0'}>
         <WebCommandStrip
           brandLabel={brandLabel}
           searchPlaceholder={resolvedSearchPlaceholder}
@@ -619,10 +681,21 @@ export function WebCommandCenterFrame({
         <div className="bth-web-command-center__workspace">
           <section className="bth-web-command-center__stage">{children}</section>
 
-          <aside className="bth-web-command-center__rail">
+          <aside className="bth-web-command-center__rail" data-collapsed={railCollapsed ? '1' : '0'}>
             <div className="bth-web-command-center__rail-header">
               <h2 className="bth-web-command-center__rail-title">{railTitle}</h2>
-              {railStatusLabel ? <span className="bth-web-command-center__rail-status">{railStatusLabel}</span> : null}
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                {railStatusLabel ? <span className="bth-web-command-center__rail-status">{railStatusLabel}</span> : null}
+                <button
+                  type="button"
+                  aria-pressed={railCollapsed}
+                  className="bth-web-command-center__rail-toggle"
+                  onClick={() => setRailCollapsed((s) => !s)}
+                  aria-label={railCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                >
+                  {railCollapsed ? '»' : '‹'}
+                </button>
+              </div>
             </div>
             {renderRailItems(railItems, resolvedRailNavigationLabel, onRailItemSelect)}
             {railSupplementary ? <div className="bth-web-command-center__rail-supplementary">{railSupplementary}</div> : null}
@@ -741,4 +814,7 @@ export function WebRailServiceList({
     </>
   );
 }
+
+
+
 

@@ -12,7 +12,7 @@ type DshHomeGetPromo = {
   readonly tone?: string;
   readonly [key: string]: unknown;
 };
-export type MarketingBannerActionType = NonNullable<DshHomeGetPromo['actionType']>;
+export type MarketingBannerActionType = 'main_category' | 'store' | 'external' | 'subscription';
 export type MarketingBannerAudience = 'home' | 'stores' | 'all';
 export type MarketingBannerStatus = 'draft' | 'published';
 
@@ -329,3 +329,6 @@ export function recordMarketingBannerImpression(id: string) {
 
   setMutableStore(next);
 }
+
+
+

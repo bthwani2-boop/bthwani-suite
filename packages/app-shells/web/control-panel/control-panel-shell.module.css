@@ -1,66 +1,73 @@
 .stageStack {
   display: grid;
-  gap: 20px;
+  gap: 16px;
   direction: rtl;
   text-align: right;
-}
-
-/* ===== Context Bar (replaces mission dock header + hero card) ===== */
-.contextBar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 20px 24px;
-  background: linear-gradient(135deg, rgba(10, 47, 92, 0.04) 0%, rgba(255, 80, 13, 0.03) 100%);
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  border-radius: 16px;
-}
-
-.contextBarMain {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   min-width: 0;
-  flex: 1;
 }
 
-.contextBarEyebrow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
+.sectionLink:hover {
+  transform: translateY(-1px);
 }
 
-.contextBarActions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-/* ===== Metrics Strip ===== */
 .metricsStrip {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 12px;
 }
 
-/* ===== Context Panel (service chips) ===== */
-.contextPanel {
-  border: 1px solid var(--bth-line);
-  border-radius: 16px;
-  padding: 12px 16px;
-  background: var(--bth-surface-raised);
+.actionGrid,
+.sectionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.disclosure {
+  border-top: 1px solid rgba(10, 47, 92, 0.08);
+  padding-top: 12px;
+}
+
+.disclosureSummary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  color: #0A2F5C;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.disclosureSummary::-webkit-details-marker {
+  display: none;
+}
+
+.disclosureHint {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.disclosureBody {
   display: grid;
   gap: 8px;
+  padding-top: 12px;
+}
+
+.contextPanel {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: rgba(255, 255, 255, 0.96);
 }
 
 .contextTitle {
   margin: 0;
-  color: var(--bth-text);
+  color: #0A2F5C;
   font-size: 13px;
   font-weight: 800;
 }
@@ -68,7 +75,7 @@
 .contextList {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -76,103 +83,105 @@
 .contextChipMuted {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  padding: 5px 9px;
   border-radius: 999px;
-  border: 1px solid var(--bth-line);
-  padding: 4px 9px;
+  border: 1px solid rgba(10, 47, 92, 0.09);
+  background: rgba(10, 47, 92, 0.03);
   font-size: 12px;
   font-weight: 700;
-  background: var(--bth-surface);
 }
 
 .contextChip {
-  color: var(--bth-text);
+  color: #0A2F5C;
 }
 
 .contextChipMuted {
-  color: var(--bth-text-muted);
+  color: #64748b;
 }
 
-/* ===== Section Panels ===== */
-.sectionPanel {
-  border-radius: 20px;
-  border: 1px solid var(--bth-line);
-  background: var(--bth-surface);
-  padding: 16px;
+.statePanel {
   display: grid;
   gap: 12px;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px dashed rgba(255, 80, 13, 0.28);
+  background: linear-gradient(180deg, rgba(255, 244, 237, 0.75) 0%, #ffffff 100%);
 }
 
-.sectionHeader {
-  display: grid;
-  gap: 4px;
-}
-
-.sectionTitle {
+.stateTitle {
   margin: 0;
-  color: var(--bth-text);
-  font-size: 20px;
-  font-weight: 800;
+  color: #0A2F5C;
+  font-size: 18px;
+  font-weight: 900;
 }
 
-.sectionDescription {
+.stateDescription {
   margin: 0;
-  color: var(--bth-text-muted);
+  color: #64748b;
   font-size: 13px;
+  line-height: 1.7;
 }
 
-.sectionGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.stateActions {
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
+.stateActions :global(.bth-web-control-action-button) {
+  flex: 0 0 auto;
+}
+
 .sectionLink {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  border-radius: 14px;
-  border: 1px solid var(--bth-line);
-  text-decoration: none;
+  display: grid;
+  gap: 4px;
   padding: 12px;
-  background: var(--bth-surface-raised);
+  border-radius: 16px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: linear-gradient(180deg, #ffffff 0%, rgba(10, 47, 92, 0.02) 100%);
+  text-decoration: none;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .sectionLinkActive {
-  border-color: var(--bth-brand);
-  background: var(--bth-brand-surface);
+  border-color: rgba(255, 80, 13, 0.22);
+  background: linear-gradient(180deg, rgba(255, 244, 237, 0.95) 0%, #ffffff 100%);
 }
 
 .sectionLinkLabel {
-  color: var(--bth-text);
+  color: #0A2F5C;
   font-size: 15px;
   font-weight: 800;
 }
 
 .sectionLinkDescription {
-  color: var(--bth-text-muted);
+  color: #64748b;
   font-size: 12px;
-  line-height: 1.5;
-}
-
-/* ===== State Container ===== */
-.stateContainer {
-  padding: 40px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 320px;
+  line-height: 1.6;
 }
 
 @media (max-width: 980px) {
   .metricsStrip,
+  .actionGrid,
   .sectionGrid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 640px) {
-  .contextBar {
+  .stateActions {
+    width: 100%;
+  }
+
+  .stateActions :global(.bth-web-control-action-button) {
+    width: 100%;
+  }
+
+  .disclosureSummary {
+    align-items: flex-start;
     flex-direction: column;
-    padding: 16px;
   }
 }
+
+

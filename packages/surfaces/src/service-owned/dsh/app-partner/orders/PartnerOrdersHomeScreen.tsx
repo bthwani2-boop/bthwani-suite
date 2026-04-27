@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   Chip,
+  Icon,
   MobileScrollView,
   SearchField,
   SearchTopBar,
@@ -11,6 +12,7 @@ import {
   StateView,
   Surface,
   Text,
+  TopBar,
   resolveRowDirection,
   useDirection,
 } from '@bthwani/ui-kit';
@@ -1169,11 +1171,18 @@ export function PartnerOrderDetailScreen({ state = 'ready', summary, disableReas
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
-      <MobileWorkspaceHeader
+      <TopBar
+        variant="secondary"
         title="تفاصيل الطلب"
-        description={`${summary.customerName} · ${summary.merchantName}`}
-        icon="receipt-outline"
-        onBack={onBackToInbox}
+        subtitle={`${summary.customerName} · ${summary.merchantName}`}
+        style={{ marginHorizontal: -16, marginTop: -16 }}
+        trailingAction={onBackToInbox ? {
+          id: 'back',
+          icon: <Icon name="arrow-back" size={24} tone="brand" />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'رجوع',
+          onPress: onBackToInbox,
+        } : undefined}
       />
 
       <Card title="الملخص التشغيلي" subtitle={summary.readinessNote} padding={4} gap={3}>
@@ -1214,3 +1223,6 @@ export function PartnerOrderDetailScreen({ state = 'ready', summary, disableReas
     </MobileScrollView>
   );
 }
+
+
+

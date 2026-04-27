@@ -71,7 +71,7 @@ export function OperationalStatusHero({
         }}
       >
         <View style={{ flex: 1, gap: spacing[1], alignItems: 'flex-end' }}>
-          <Text role="titleLg" style={{ color: theme.brandStrong, textAlign: 'right' }}>
+          <Text role="titleLg" style={{ color: theme.brand, textAlign: 'right' }}>
             {title}
           </Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
@@ -168,7 +168,7 @@ export function CompactStatusStepper({ title, subtitle, steps }: CompactStatusSt
                 </View>
 
                 <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                  <Text role="bodyStrong" style={{ textAlign: 'right', color: isCurrent ? theme.brandStrong : theme.text }}>
+                  <Text role="bodyStrong" style={{ textAlign: 'right', color: isCurrent ? theme.brand : theme.text }}>
                     {step.title}
                   </Text>
                 </View>
@@ -591,3 +591,6 @@ export function StickyActionBar({ primaryAction, secondaryAction, note, onHeight
     </View>
   );
 }
+
+
+

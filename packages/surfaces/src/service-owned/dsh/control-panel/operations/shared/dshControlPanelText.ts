@@ -373,6 +373,7 @@ const enDshControlPanelText = {
     notesLabel: 'Operational note',
     inspectRequest: 'Inspect assignment',
     retryLabel: 'Retry',
+    backToList: 'Back to list',
     backToHub: 'Back to hub'
   },
   sheinProxyRequest: {
@@ -1313,6 +1314,7 @@ const arDshControlPanelText = {
     notesLabel: 'ملاحظة تشغيلية',
     inspectRequest: 'افحص الطلب',
     retryLabel: 'إعادة المحاولة',
+    backToList: 'العودة إلى القائمة',
     backToHub: 'العودة إلى المركز'
   },
   sheinProxyRequest: {
@@ -1908,3 +1910,6 @@ export function useDshControlPanelText() {
   const { language } = useDirection();
   return getDshControlPanelText(language === 'en' ? 'en' : 'ar');
 }
+
+
+

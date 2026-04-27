@@ -84,7 +84,7 @@ function OrbitItemCard({ item, isActive }: { item: OrbitCarouselItem; isActive: 
 					isActive ? styles.itemTitleContainerActive : null,
 				]}
 			>
-				<Text numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.82} role="bodySm" tone="inverse" style={[styles.itemTitle, isActive && styles.itemTitleActive]}>
+				<Text numberOfLines={2} role="bodySm" tone="inverse" style={[styles.itemTitle, isActive && styles.itemTitleActive]}>
 					{item.title}
 				</Text>
 			</View>
@@ -489,3 +489,5 @@ const styles = StyleSheet.create({
 		color: '#FFFFFF',
 	},
 });
+
+

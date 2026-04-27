@@ -49,20 +49,20 @@ const modeOptions: Array<{ value: AssignmentMode; label: string }> = [
   { value: 'scheduled', label: 'لاحقًا' },
 ];
 
-const stageSteps: Array<{ id: string; label: string; state: 'complete' | 'current' | 'pending' }> = [
-  { id: 'detail', label: 'التفاصيل', state: 'current' },
-  { id: 'estimate', label: 'التقدير', state: 'pending' },
-  { id: 'offer', label: 'العرض', state: 'pending' },
-  { id: 'schedule', label: 'الجدولة', state: 'pending' },
+const stageSteps: Array<{ id: AssignmentStage; title: string }> = [
+  { id: 'detail', title: 'التفاصيل' },
+  { id: 'estimate', title: 'التقدير' },
+  { id: 'offer', title: 'العرض' },
+  { id: 'schedule', title: 'الجدولة' },
 ];
 
 function resolveStepperState(currentStage: AssignmentStage) {
   const stages: AssignmentStage[] = ['detail', 'estimate', 'offer', 'schedule'];
   const currentIndex = stages.indexOf(currentStage);
   return stages.map((stage, index) => {
-    if (index < currentIndex) return { id: stage, label: stageSteps[index].label, state: 'complete' as const };
-    if (index === currentIndex) return { id: stage, label: stageSteps[index].label, state: 'current' as const };
-    return { id: stage, label: stageSteps[index].label, state: 'pending' as const };
+    if (index < currentIndex) return { id: stage, title: stageSteps[index].title, state: 'done' as const };
+    if (index === currentIndex) return { id: stage, title: stageSteps[index].title, state: 'current' as const };
+    return { id: stage, title: stageSteps[index].title, state: 'next' as const };
   });
 }
 
@@ -253,9 +253,11 @@ export function ControlPanelDshSheinProxyRequestScreen({
         </div>
 
         {/* ===== Assignment Progress ===== */}
-        <WebSectionCard title="تقدم الإسناد" description={`الخطوة الحالية: ${stageMeta.label}`}>
-          <CompactStatusStepper steps={stepperItems} activeStepId={stage} />
-        </WebSectionCard>
+        <CompactStatusStepper
+          title="تقدم الإسناد"
+          subtitle={`الخطوة الحالية: ${stageMeta.label}`}
+          steps={stepperItems}
+        />
 
         {/* ===== Assignment Identity ===== */}
         <WebSectionCard title="هوية الإسناد" description="اختر الفئة وأعطِ الدفعة مرجعًا ثابتًا.">
@@ -338,3 +340,5 @@ export function ControlPanelDshSheinProxyRequestScreen({
 }
 
 export default ControlPanelDshSheinProxyRequestScreen;
+
+

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, KeyValueList, MobileScrollView, MobileStickyPrimaryAction, MobileWorkspaceHeader, Surface, Text, TextField } from '@bthwani/ui-kit';
+import { Box, Icon, KeyValueList, MobileScrollView, MobileStickyPrimaryAction, Surface, Text, TextField, TopBar } from '@bthwani/ui-kit';
 
 export type DshInventoryManagementScreenProps = {
   onBack?: () => void;
@@ -10,11 +10,17 @@ export type DshInventoryManagementScreenProps = {
 export function DshInventoryManagementScreen({ onBack }: DshInventoryManagementScreenProps) {
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
-      <MobileWorkspaceHeader
+      <TopBar
+        variant="secondary"
         title="طلب منتج من الشريك"
-        description="إدخال المنتج يبدأ هنا، ثم ينتقل إلى مراجعة الشركاء قبل التسويق ثم الكتالوج النهائي."
-        icon="cube-outline"
-        onBack={onBack}
+        style={{ marginHorizontal: -16, marginTop: -16 }}
+        trailingAction={onBack ? {
+          id: 'back',
+          icon: <Icon name="arrow-back" size={24} tone="brand" />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'رجوع',
+          onPress: onBack,
+        } : undefined}
       />
 
       <Surface tone="raised" padding={3} gap={3}>
@@ -63,3 +69,6 @@ export function DshInventoryManagementScreen({ onBack }: DshInventoryManagementS
 }
 
 export default DshInventoryManagementScreen;
+
+
+

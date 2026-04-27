@@ -449,7 +449,6 @@ export function PartnerSurfaceHost() {
       variant="brand"
       layoutMode="relaxed-main"
       title={maintenanceProfile.storeName}
-      subtitle={activeServiceType === 'dsh' ? 'DSH - لوحة الشريك' : 'ARB - لوحة الشريك'}
       locationLabel={`الرياض، ${selectedStoreScope.label}`}
       onTitlePress={openStoreScope}
       titleAccessibilityLabel="فتح اختيار المتجر أو الفرع"
@@ -760,3 +759,6 @@ export function PartnerSurfaceHost() {
 }
 
 export default PartnerSurfaceHost;
+
+
+

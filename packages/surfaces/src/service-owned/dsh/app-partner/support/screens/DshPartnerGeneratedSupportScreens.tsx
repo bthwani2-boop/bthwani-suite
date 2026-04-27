@@ -2,10 +2,10 @@ import React from 'react';
 import {
   Box,
   Button,
+  Icon,
   KeyValueList,
   ListItem,
   MobileScrollView,
-  MobileWorkspaceHeader,
   SectionHeader,
   StateView,
   StatCard,
@@ -13,6 +13,7 @@ import {
   Tabs,
   Text,
   TextField,
+  TopBar,
 } from '@bthwani/ui-kit';
 import {
   getMarketingGrowthItems,
@@ -464,21 +465,27 @@ function createPartnerSupportScreen(config: SupportConfig) {
 
     return (
       <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
-        <MobileWorkspaceHeader
+        <TopBar
+          variant="secondary"
           title={config.title}
-          description={config.subtitle}
-          icon="sparkles-outline"
-          onBack={onBack}
+          style={{ marginHorizontal: -16, marginTop: -16 }}
+          trailingAction={onBack ? {
+            id: 'back',
+            icon: <Icon name="arrow-back" size={24} tone="brand" />,
+            mirrorInRtl: true,
+            accessibilityLabel: 'رجوع',
+            onPress: onBack,
+          } : undefined}
         />
 
         {state !== 'ready' && state !== 'disabled' ? (
           renderSupportState(state, onRetry, onBack)
         ) : (
           <>
-            <Surface tone="brand" gap={3}>
+            <Surface tone="raised" gap={3}>
               <SectionHeader title={config.heroTitle} subtitle={config.heroDescription} />
               {config.primaryHint ? (
-                <Text role="bodySm" tone="inverse">
+                <Text role="bodySm" tone="muted">
                   {config.primaryHint}
                 </Text>
               ) : null}
@@ -683,16 +690,22 @@ export function DshPartnerVideoUploadScreen({
 
   return (
     <MobileScrollView padding={4} gap={4}>
-      <Box gap={2}>
-        <Text role="titleLg">{screenTitle}</Text>
-        <Text role="bodyMd" tone="muted">
-          {screenSubtitle}
-        </Text>
-      </Box>
+      <TopBar
+        variant="secondary"
+        title={screenTitle}
+        style={{ marginHorizontal: -16, marginTop: -16 }}
+        trailingAction={onBack ? {
+          id: 'back',
+          icon: <Icon name="arrow-back" size={24} tone="brand" />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'رجوع',
+          onPress: onBack,
+        } : undefined}
+      />
 
-      <Surface tone="brand" gap={3}>
+      <Surface tone="raised" gap={3}>
         <SectionHeader title={heroTitle} subtitle={heroDescription} />
-        <Text role="bodySm" tone="inverse">
+        <Text role="bodySm" tone="muted">
           أي فيديو يرفعه الشريك يدخل في طابور التسويق أولًا، ثم يُنشر فقط بعد الموافقة.
         </Text>
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
@@ -795,3 +808,5 @@ export const DshPartnerQuickReplyConfigGetScreen = createPartnerSupportScreen(pa
 export const DshPartnerQuickReplySettingsScreen = createPartnerSupportScreen(partnerSupportConfigs['quick-reply-settings']);
 export const DshPartnerQuickReplySetupScreen = createPartnerSupportScreen(partnerSupportConfigs['quick-reply-setup']);
 export const DshPartnerStoreNominationScreen = createPartnerSupportScreen(partnerSupportConfigs['store-nomination']);
+
+

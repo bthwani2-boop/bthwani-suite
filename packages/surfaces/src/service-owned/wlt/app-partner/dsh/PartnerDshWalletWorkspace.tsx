@@ -7,10 +7,10 @@ import {
   Icon,
   KeyValueList,
   MobileScrollView,
-  MobileWorkspaceHeader,
   StateView,
   Surface,
   Text,
+  TopBar,
   useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
@@ -404,11 +404,17 @@ export function PartnerDshWalletWorkspace({
 
     return (
       <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: workspaceBottomInset }}>
-        <MobileWorkspaceHeader
+        <TopBar
+          variant="secondary"
           title="المحفظة والحسابات المالية"
-          description="الرصيد، المستحقات، التسويات، وآخر حركة."
-          icon="wallet-outline"
-          onBack={onBack}
+          style={{ marginHorizontal: -16, marginTop: -16 }}
+          trailingAction={onBack ? {
+            id: 'back',
+            icon: <Icon name="arrow-back" size={24} tone="brand" />,
+            mirrorInRtl: true,
+            accessibilityLabel: 'رجوع',
+            onPress: onBack,
+          } : undefined}
         />
         <StateView {...stateCopy} onActionPress={onBack} />
       </MobileScrollView>
@@ -462,11 +468,17 @@ export function PartnerDshWalletWorkspace({
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: workspaceBottomInset }}>
-      <MobileWorkspaceHeader
+      <TopBar
+        variant="secondary"
         title="المحفظة والحسابات المالية"
-        description="الرصيد، المستحقات، التسويات، وآخر حركة."
-        icon="wallet-outline"
-        onBack={onBack}
+        style={{ marginHorizontal: -16, marginTop: -16 }}
+        trailingAction={onBack ? {
+          id: 'back',
+          icon: <Icon name="arrow-back" size={24} tone="brand" />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'رجوع',
+          onPress: onBack,
+        } : undefined}
       />
 
       <Surface tone="raised" padding={3} gap={3}>
@@ -593,3 +605,5 @@ export function PartnerDshWalletWorkspace({
 }
 
 export default PartnerDshWalletWorkspace;
+
+

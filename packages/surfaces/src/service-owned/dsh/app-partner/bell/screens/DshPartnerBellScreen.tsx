@@ -6,11 +6,11 @@ import {
   Button,
   Icon,
   MobileScrollView,
-  MobileWorkspaceHeader,
   StateView,
   StatCard,
   Surface,
   Text,
+  TopBar,
   useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
@@ -338,11 +338,17 @@ export function DshPartnerBellScreen({
 
     return (
       <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
-        <MobileWorkspaceHeader
+        <TopBar
+          variant="secondary"
           title="الإشعارات"
-          description="تنبيهات الطلبات، التشغيل، المخزون، والحساب."
-          icon="notifications-outline"
-          onBack={onBack}
+          style={{ marginHorizontal: -16, marginTop: -16 }}
+          trailingAction={onBack ? {
+            id: 'back',
+            icon: <Icon name="arrow-back" size={24} tone="brand" />,
+            mirrorInRtl: true,
+            accessibilityLabel: 'رجوع',
+            onPress: onBack,
+          } : undefined}
         />
         <StateView {...stateCopy} onActionPress={onRetry ?? onOpenInbox ?? onBack} />
       </MobileScrollView>
@@ -351,11 +357,17 @@ export function DshPartnerBellScreen({
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
-      <MobileWorkspaceHeader
+      <TopBar
+        variant="secondary"
         title="الإشعارات"
-        description="تنبيهات الطلبات، التشغيل، المخزون، والحساب."
-        icon="notifications-outline"
-        onBack={onBack}
+        style={{ marginHorizontal: -16, marginTop: -16 }}
+        trailingAction={onBack ? {
+          id: 'back',
+          icon: <Icon name="arrow-back" size={24} tone="brand" />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'رجوع',
+          onPress: onBack,
+        } : undefined}
       />
 
       <Surface tone="raised" padding={3} gap={3}>
@@ -430,4 +442,7 @@ export function DshPartnerBellScreen({
 }
 
 export default DshPartnerBellScreen;
+
+
+
 

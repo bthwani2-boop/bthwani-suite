@@ -3,11 +3,12 @@ import {
   Box,
   Button,
   Card,
+  Icon,
   MobileScrollView,
-  MobileWorkspaceHeader,
   StateView,
   Surface,
   Text,
+  TopBar,
 } from '@bthwani/ui-kit';
 
 export type DshEntryScreenState = 'ready' | 'loading' | 'empty';
@@ -97,11 +98,17 @@ export function DshEntryScreen({
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
-      <MobileWorkspaceHeader
+      <TopBar
+        variant="secondary"
         title="Partner Entry"
-        description="Single-purpose entry for app-partner delivery operations and first order action."
-        icon="sparkles-outline"
-        onBack={backAction}
+        style={{ marginHorizontal: -16, marginTop: -16 }}
+        trailingAction={backAction ? {
+          id: 'back',
+          icon: <Icon name="arrow-back" size={24} tone="brand" />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'رجوع',
+          onPress: backAction,
+        } : undefined}
       />
 
       {renderHero(state, onOpenOrdersBoardPress)}
@@ -138,3 +145,5 @@ export function DshEntryScreen({
     </MobileScrollView>
   );
 }
+
+

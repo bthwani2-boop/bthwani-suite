@@ -1,13 +1,8 @@
 'use client';
 
 import React from 'react';
-import {
-  useRouter } from 'next/navigation';
-import { Box,
-  Button,
-  StateView,
-  Text
-} from '@bthwani/ui-kit';
+import { useRouter } from 'next/navigation';
+import { Box, Button, StateView, Text, SheetFrame } from '@bthwani/ui-kit';
 import {
   WebMissionHeroCard,
   WebPageFrame,
@@ -83,6 +78,7 @@ export function ControlPanelDshOrdersScreen({
   const router = useRouter();
   const dshText = useDshControlPanelText();
   const orders = React.useMemo(() => getSampleDshOrders(dshText), [dshText]);
+  const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(null);
   const assignedCount = orders.filter((order) => order.statusTone === 'success').length;
   const openCount = orders.filter((order) => order.statusTone === 'brand').length;
   const reviewCount = orders.filter((order) => order.statusTone === 'warning').length;
@@ -157,16 +153,28 @@ export function ControlPanelDshOrdersScreen({
                   <Button
                     label={dshText.orders.openDetail}
                     tone="ghost"
-                    onPress={() => router.push(`/operations/dsh/orders/${order.id}`)}
+                    onPress={() => setSelectedOrderId(order.id)}
                   />
                 </Box>
               </Box>
             ))}
           </div>
         </WebSectionCard>
+        <SheetFrame
+          visible={!!selectedOrderId}
+          title={selectedOrderId ? `${dshText.orders.openDetail}: ${selectedOrderId}` : dshText.orders.openDetail}
+          onClose={() => setSelectedOrderId(null)}
+        >
+          {selectedOrderId ? (
+            <ControlPanelDshOrderDetailScreen embedded showHeader={false} orderId={selectedOrderId} hubHref="/operations" ordersHref="/operations/dsh/orders" />
+          ) : null}
+        </SheetFrame>
       </div>
     </WebPageFrame>
   );
 }
 
 export default ControlPanelDshOrdersScreen;
+
+
+

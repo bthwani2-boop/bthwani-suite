@@ -79,6 +79,7 @@ export function PaymentDecisionCard({ item, style }: PaymentDecisionCardProps) {
   const canSelect = Boolean(item.onSelect) && !item.disabled;
   const resolvedStatusTone = resolveBadgeTone(item.statusTone, Boolean(item.selected));
   const resolvedHelperTone = resolveBadgeTone(item.helperTone, Boolean(item.selected));
+  const helperToneKey = resolvedHelperTone ?? 'default';
   const resolvedHelperColor = {
     default: theme.textMuted,
     info: theme.infoText,
@@ -86,7 +87,7 @@ export function PaymentDecisionCard({ item, style }: PaymentDecisionCardProps) {
     success: theme.successText,
     danger: theme.dangerText,
     warning: theme.brand,
-  }[resolvedHelperTone];
+  }[helperToneKey];
 
   return (
     <Pressable
@@ -180,3 +181,5 @@ export function PaymentDecisionList({ items, style }: PaymentDecisionListProps) 
     </View>
   );
 }
+
+
