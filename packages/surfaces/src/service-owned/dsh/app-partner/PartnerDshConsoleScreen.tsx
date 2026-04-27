@@ -1,6 +1,9 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
-import { Box, Button, Chip, Icon, ListItem, MobileCommandSectionList, MobileScrollView, MobileStickyPrimaryAction, StateView, Surface, Text, TextField, useDirection, useTheme } from '@bthwani/ui-kit';
+import { Pressable, Switch as RNSwitch, View } from 'react-native';
+import { AnalyticsGrowthMarketingWorkspaceContent } from './workspaces/AnalyticsGrowthMarketingWorkspaceContent';
+import { Box, Button, Chip, Icon, KeyValueList, ListItem, MobileCommandSectionList, MobileScrollView, MobileStickyPrimaryAction, MobileWorkspaceHeader, StateView, Surface, Text, TextField, useDirection, useTheme } from '@bthwani/ui-kit';
+import { InventoryCatalogWorkspaceContent } from './workspaces/InventoryCatalogWorkspaceContent';
+import { StoreProfileWorkspaceContent } from './workspaces/StoreProfileWorkspaceContent';
 
 type PartnerHubSection = 'hub' | 'profile' | 'operations' | 'inventory' | 'wallet' | 'analytics' | 'settings' | 'type-switch';
 
@@ -51,6 +54,19 @@ type SummaryItem = {
   value: string;
   tone?: 'default' | 'brand' | 'success' | 'warning' | 'info';
 };
+
+type NotificationPreferenceId =
+  | 'orders'
+  | 'operations'
+  | 'inventory'
+  | 'finance'
+  | 'marketing'
+  | 'system'
+  | 'sound'
+  | 'dailyDigest'
+  | 'priorityOnly';
+
+type NotificationPreferenceState = Record<NotificationPreferenceId, boolean>;
 
 type Props = {
   state?: PartnerDshConsoleScreenState;
@@ -105,6 +121,18 @@ const defaultCoverageZones: readonly PartnerCoverageZone[] = [
 
 const partnerHubBottomInset = 112;
 
+const defaultNotificationPreferences: NotificationPreferenceState = {
+  orders: true,
+  operations: true,
+  inventory: true,
+  finance: true,
+  marketing: false,
+  system: true,
+  sound: true,
+  dailyDigest: false,
+  priorityOnly: false,
+};
+
 const hubNavigationItems: readonly HubNavigationItem[] = [
   {
     id: 'orders',
@@ -116,7 +144,7 @@ const hubNavigationItems: readonly HubNavigationItem[] = [
   {
     id: 'profile',
     title: 'ملف المتجر',
-    description: 'تحديث معلومات المتجر والهوية والظهور.',
+    description: 'بيانات المتجر، الهوية، الظهور، الفرع، والنطاق في مساحة واحدة.',
     icon: 'storefront-outline',
     kind: 'section',
     section: 'profile',
@@ -132,7 +160,7 @@ const hubNavigationItems: readonly HubNavigationItem[] = [
   {
     id: 'inventory',
     title: 'المخزون والكتالوج',
-    description: 'إدارة المنتجات، الأسعار، والمخزون.',
+    description: 'بحث أولًا، إضافة ذكية، أسعار ومخزون بدون تكرار.',
     icon: 'cube-outline',
     kind: 'section',
     section: 'inventory',
@@ -148,7 +176,7 @@ const hubNavigationItems: readonly HubNavigationItem[] = [
   {
     id: 'analytics',
     title: 'التحليلات والنمو والتسويق',
-    description: 'الأداء، الفرص، العروض، والتوصيات.',
+    description: 'الأداء، الفرص، العروض، الاشتراك، والتوصيات العملية.',
     icon: 'trending-up-outline',
     kind: 'section',
     section: 'analytics',
@@ -174,7 +202,7 @@ const hubNavigationItems: readonly HubNavigationItem[] = [
 const sectionCopy: Record<Exclude<PartnerHubSection, 'hub'>, { title: string; description: string; icon: React.ComponentProps<typeof Icon>['name'] }> = {
   profile: {
     title: 'ملف المتجر',
-    description: 'تحديث معلومات المتجر والهوية والظهور.',
+    description: 'بيانات المتجر، الهوية، الظهور، الفرع، والنطاق في مساحة واحدة.',
     icon: 'storefront-outline',
   },
   operations: {
@@ -184,7 +212,7 @@ const sectionCopy: Record<Exclude<PartnerHubSection, 'hub'>, { title: string; de
   },
   inventory: {
     title: 'المخزون والكتالوج',
-    description: 'إدارة المنتجات، الأسعار، والمخزون.',
+    description: 'بحث أولًا، إضافة ذكية، أسعار ومخزون بدون تكرار.',
     icon: 'cube-outline',
   },
   wallet: {
@@ -194,7 +222,7 @@ const sectionCopy: Record<Exclude<PartnerHubSection, 'hub'>, { title: string; de
   },
   analytics: {
     title: 'التحليلات والنمو والتسويق',
-    description: 'الأداء، الفرص، العروض، والتوصيات.',
+    description: 'الأداء، الفرص، العروض، الاشتراك، والتوصيات العملية.',
     icon: 'trending-up-outline',
   },
   settings: {
@@ -239,6 +267,96 @@ function SummaryCell({ label, value, tone = 'default' }: Omit<SummaryItem, 'id'>
   );
 }
 
+function SettingsWorkspaceRow({
+  title,
+  subtitle,
+  icon,
+  value,
+  onValueChange,
+  onPress,
+  last = false,
+  disabled = false,
+}: {
+  title: string;
+  subtitle: string;
+  icon: React.ComponentProps<typeof Icon>['name'];
+  value?: boolean;
+  onValueChange?: (nextValue: boolean) => void;
+  onPress?: () => void;
+  last?: boolean;
+  disabled?: boolean;
+}) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
+  const isSwitchRow = typeof value === 'boolean' && typeof onValueChange === 'function';
+
+  return (
+    <Pressable
+      accessibilityRole={isSwitchRow ? undefined : 'button'}
+      accessibilityLabel={title}
+      accessibilityState={isSwitchRow ? undefined : { disabled }}
+      disabled={disabled}
+      onPress={isSwitchRow ? undefined : onPress}
+      style={({ pressed }) => [
+        {
+          width: '100%',
+          paddingHorizontal: 16,
+          paddingVertical: 14,
+          backgroundColor: pressed ? theme.surfaceInset : theme.surface,
+          borderBottomWidth: last ? 0 : 1,
+          borderBottomColor: theme.line,
+          opacity: disabled ? 0.56 : 1,
+        },
+      ]}
+    >
+      <View style={{ flexDirection: rowDirection, alignItems: 'center' }}>
+        <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12, flexShrink: 1, minWidth: 0 }}>
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 14,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.surfaceInset,
+              borderWidth: 1,
+              borderColor: theme.line,
+              flexShrink: 0,
+            }}
+          >
+            <Icon name={icon} size={17} tone={isSwitchRow && value ? 'brand' : 'default'} />
+          </View>
+
+          <View style={{ flexShrink: 1, minWidth: 0, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+            <Text role="bodyStrong" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
+              {title}
+            </Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={2}>
+              {subtitle}
+            </Text>
+          </View>
+        </View>
+
+        <View style={{ flex: 1 }} />
+
+        {isSwitchRow ? (
+          <RNSwitch
+            disabled={disabled}
+            value={value}
+            onValueChange={onValueChange}
+            thumbColor={value ? theme.brandContrast : theme.surfaceRaised}
+            trackColor={{ false: theme.lineStrong, true: theme.brand }}
+            ios_backgroundColor={theme.lineStrong}
+          />
+        ) : (
+          <Icon name="chevron-forward-outline" mirrored tone="muted" size={18} />
+        )}
+      </View>
+    </Pressable>
+  );
+}
+
 function HubWorkspaceShell({
   title,
   description,
@@ -252,57 +370,13 @@ function HubWorkspaceShell({
   onBack: () => void;
   children?: React.ReactNode;
 }) {
-  const { direction } = useDirection();
-  const { theme } = useTheme();
-
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
-      <Surface tone="raised" padding={4} gap={3}>
-        <View
-          style={{
-            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
-            alignItems: 'center',
-            gap: 12,
-          }}
-        >
-          <View
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 16,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: theme.surfaceInset,
-              borderWidth: 1,
-              borderColor: theme.line,
-            }}
-          >
-            <Icon name={icon} size={20} tone="brand" />
-          </View>
+      <MobileWorkspaceHeader title={title} description={description} icon={icon} onBack={onBack} />
 
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text role="titleMd" align={direction === 'rtl' ? 'end' : 'start'}>
-              {title}
-            </Text>
-            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
-              {description}
-            </Text>
-          </View>
-        </View>
-
-        <Surface tone="default" padding={3} gap={1}>
-          <Text role="bodyStrong">[TBD-workspace-binding]</Text>
-          <Text role="bodySm" tone="muted">
-            هذه مساحة مؤقتة مضغوطة للمرحلة 1 فقط. التفاصيل الكاملة لهذا القسم ستأتي لاحقًا.
-          </Text>
-        </Surface>
-
+      <View style={{ gap: 16 }}>
         {children}
-
-        <Box>
-          <Button label="العودة إلى مركز الحساب" tone="secondary" fullWidth={false} onPress={onBack} />
-        </Box>
-      </Surface>
+      </View>
     </MobileScrollView>
   );
 }
@@ -350,7 +424,7 @@ function TypeSwitchWorkspace({
         </View>
         {!canSwitch ? (
           <Text role="caption" tone="muted">
-            [TBD-workspace-binding] الربط الفعلي للتبديل سيكتمل لاحقًا.
+            تبديل النوع يدار من شريط الحساب العام حتى يتوفر ربطه التشغيلي في هذا السطح.
           </Text>
         ) : null}
       </Surface>
@@ -495,32 +569,12 @@ function OperationsWorkspace({
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
-      <Surface tone="raised" padding={4} gap={3}>
-        <View
-          style={{
-            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
-            alignItems: 'center',
-            gap: 12,
-          }}
-        >
-          <Button
-            label="العودة"
-            tone="secondary"
-            fullWidth={false}
-            icon={<Icon name="chevron-forward-outline" mirrored size={16} />}
-            onPress={onBack}
-          />
-
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text role="titleMd" align="start">
-              العمليات والفريق
-            </Text>
-            <Text role="bodySm" tone="muted" align="start">
-              {`${storeName} · ${branchLabel} · ${cityLabel} · نوع الخدمة ${activeServiceType === 'dsh' ? 'DSH' : 'ARB'}`}
-            </Text>
-          </View>
-        </View>
-      </Surface>
+      <MobileWorkspaceHeader
+        title="العمليات والفريق"
+        description={`${storeName} · ${branchLabel} · ${cityLabel} · نوع الخدمة ${activeServiceType === 'dsh' ? 'DSH' : 'ARB'}`}
+        icon="people-outline"
+        onBack={onBack}
+      />
 
       <Surface tone="raised" padding={4} gap={3}>
         <Text role="label" tone="muted">
@@ -708,8 +762,10 @@ export function PartnerDshConsoleScreen(props: Props) {
     storeName = 'متجر الفخامة',
     branchLabel = 'الرياض، فرع الياسمين',
     cityLabel = 'الرياض',
+    managerLabel = 'خالد',
     todayHoursLabel = '09:00 - 23:00',
     storeOpen = true,
+    listingEnabled = true,
     activeZoneLabel = 'الياسمين / الندى',
     activeOrdersCount = 13,
     serviceModes = [],
@@ -718,13 +774,26 @@ export function PartnerDshConsoleScreen(props: Props) {
     onOpenOrdersBoard,
     onOpenStoreScope,
     onOpenSupportDirectory,
+    onOpenWalletHub,
     onOpenBell,
   } = props;
 
   const { direction } = useDirection();
   const [internalSection, setInternalSection] = React.useState<PartnerHubSection>('hub');
+  const [notificationPreferences, setNotificationPreferences] = React.useState<NotificationPreferenceState>(defaultNotificationPreferences);
   const activeSection = section ?? internalSection;
   const updateSection = onSectionChange ?? setInternalSection;
+  const enabledNotificationChannelsCount = React.useMemo(
+    () => ['orders', 'operations', 'inventory', 'finance', 'marketing', 'system'].filter((key) => notificationPreferences[key as NotificationPreferenceId]).length,
+    [notificationPreferences],
+  );
+
+  function updateNotificationPreference(preferenceId: NotificationPreferenceId, nextValue: boolean) {
+    setNotificationPreferences((current) => ({
+      ...current,
+      [preferenceId]: nextValue,
+    }));
+  }
 
   const summaryItems = React.useMemo<readonly SummaryItem[]>(
     () => [
@@ -750,6 +819,251 @@ export function PartnerDshConsoleScreen(props: Props) {
   }
 
   if (activeSection !== 'hub') {
+    if (activeSection === 'profile') {
+      return (
+        <HubWorkspaceShell title={sectionCopy.profile.title} description={sectionCopy.profile.description} icon={sectionCopy.profile.icon} onBack={() => updateSection('hub')}>
+          <StoreProfileWorkspaceContent
+            storeName={storeName}
+            branchLabel={branchLabel}
+            cityLabel={cityLabel}
+            managerLabel={managerLabel}
+            todayHoursLabel={todayHoursLabel}
+            activeZoneLabel={activeZoneLabel}
+            storeOpen={storeOpen}
+            listingEnabled={listingEnabled}
+            onOpenStoreScope={onOpenStoreScope}
+          />
+        </HubWorkspaceShell>
+      );
+    }
+
+    if (activeSection === 'analytics') {
+      return (
+        <HubWorkspaceShell title={sectionCopy.analytics.title} description={sectionCopy.analytics.description} icon={sectionCopy.analytics.icon} onBack={() => updateSection('hub')}>
+          <AnalyticsGrowthMarketingWorkspaceContent
+            storeName={storeName}
+            branchLabel={branchLabel}
+            activeZoneLabel={activeZoneLabel}
+            todayHoursLabel={todayHoursLabel}
+          />
+        </HubWorkspaceShell>
+      );
+    }
+
+    if (activeSection === 'wallet') {
+      return (
+        <HubWorkspaceShell title={sectionCopy.wallet.title} description={sectionCopy.wallet.description} icon={sectionCopy.wallet.icon} onBack={() => updateSection('hub')}>
+          <Box gap={4}>
+            <Surface tone="raised" padding={3} gap={3}>
+              <Text role="label" tone="muted">
+                ملخص مالي سريع
+              </Text>
+              <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 10 }}>
+                <SummaryCell label="الرصيد المتاح" value="12,480 ر.س" tone="success" />
+                <SummaryCell label="المستحقات" value="3,250 ر.س" tone="warning" />
+                <SummaryCell label="آخر تسوية" value="اليوم 09:20" tone="brand" />
+              </View>
+            </Surface>
+
+            <Surface tone="raised" padding={3} gap={3}>
+              <Text role="label" tone="muted">
+                الحسابات والتسويات
+              </Text>
+              <KeyValueList
+                dense
+                items={[
+                  { label: 'الخطة المالية', value: 'نشطة' },
+                  { label: 'التحصيل القادم', value: 'خلال يومين', tone: 'warning' },
+                  { label: 'مرجع التسوية', value: 'دفعة محلية' },
+                  { label: 'النطاق المرتبط', value: activeZoneLabel, tone: 'info' },
+                ]}
+              />
+              <Text role="caption" tone="muted">
+                هذا المسار يعرض الحالة المالية المختصرة من دون فتح لوحة مالية منفصلة.
+              </Text>
+            </Surface>
+
+            <Surface tone="inset" padding={3} gap={2}>
+              <Text role="bodyStrong">إجراء مالي سريع</Text>
+              <Text role="bodySm" tone="muted">
+                افتح المحفظة الموسعة أو راجع التسويات الحالية من نفس السطح.
+              </Text>
+              <Button label="فتح المحفظة الموسعة" tone="secondary" fullWidth={false} onPress={onOpenWalletHub} />
+            </Surface>
+          </Box>
+        </HubWorkspaceShell>
+      );
+    }
+
+    if (activeSection === 'settings') {
+      const notificationSettingRows = [
+        {
+          id: 'orders' as const,
+          title: 'تنبيهات الطلبات',
+          subtitle: 'الطلبات الجديدة، التأخير، وحالات الموافقة والإفراج.',
+          icon: 'receipt-outline' as const,
+          value: notificationPreferences.orders,
+        },
+        {
+          id: 'operations' as const,
+          title: 'تنبيهات التشغيل',
+          subtitle: 'الفرع، الفريق، ساعات العمل، والتوصيات السريعة للورديات.',
+          icon: 'people-outline' as const,
+          value: notificationPreferences.operations,
+        },
+        {
+          id: 'inventory' as const,
+          title: 'تنبيهات المخزون',
+          subtitle: 'النواقص، المنتجات منخفضة الكمية، وتغييرات الجاهزية.',
+          icon: 'cube-outline' as const,
+          value: notificationPreferences.inventory,
+        },
+        {
+          id: 'finance' as const,
+          title: 'التسويات والتنبيهات المالية',
+          subtitle: 'المستحقات، التسويات، والتنبيهات ذات الأثر المالي.',
+          icon: 'wallet-outline' as const,
+          value: notificationPreferences.finance,
+        },
+        {
+          id: 'marketing' as const,
+          title: 'التسويق والنمو',
+          subtitle: 'العروض والتوصيات الموسمية والفرص المقترحة للنمو.',
+          icon: 'megaphone-outline' as const,
+          value: notificationPreferences.marketing,
+        },
+        {
+          id: 'system' as const,
+          title: 'تنبيهات النظام',
+          subtitle: 'الهوية، الإعدادات، وحالة الربط العام للحساب.',
+          icon: 'shield-checkmark-outline' as const,
+          value: notificationPreferences.system,
+        },
+        {
+          id: 'sound' as const,
+          title: 'الصوت والاهتزاز',
+          subtitle: 'تفعيل التنبيه السمعي والاهتزازي عند وجود حدث مهم.',
+          icon: 'volume-high-outline' as const,
+          value: notificationPreferences.sound,
+        },
+        {
+          id: 'dailyDigest' as const,
+          title: 'ملخص يومي مختصر',
+          subtitle: 'استلام ملخص يومي موحّد بدل فتح أكثر من شاشة منفصلة.',
+          icon: 'calendar-outline' as const,
+          value: notificationPreferences.dailyDigest,
+        },
+        {
+          id: 'priorityOnly' as const,
+          title: 'العاجلة فقط',
+          subtitle: 'تقليل التشويش وإبراز الحالات ذات الأولوية العالية فقط.',
+          icon: 'flash-outline' as const,
+          value: notificationPreferences.priorityOnly,
+        },
+      ];
+
+      const settingsActionRows = [
+        {
+          id: 'notification-center',
+          title: 'فتح مركز الإشعارات',
+          subtitle: 'الانتقال إلى نفس المركز الموحد الذي يفتحه زر الجرس في الهيدر.',
+          icon: 'notifications-outline' as const,
+          onPress: onOpenBell,
+        },
+        {
+          id: 'branch-scope',
+          title: 'اختيار الفرع',
+          subtitle: 'مراجعة النطاق والفرع المرتبطين بالإشعارات والتشغيل.',
+          icon: 'git-branch-outline' as const,
+          onPress: onOpenStoreScope,
+        },
+        {
+          id: 'support',
+          title: 'الدعم',
+          subtitle: 'الوصول السريع للدعم من نفس مساحة الإعدادات عند الحاجة.',
+          icon: 'headset-outline' as const,
+          onPress: onOpenSupportDirectory,
+        },
+      ];
+
+      return (
+        <HubWorkspaceShell title={sectionCopy.settings.title} description={sectionCopy.settings.description} icon={sectionCopy.settings.icon} onBack={() => updateSection('hub')}>
+          <Box gap={4}>
+            <Surface tone="raised" padding={3} gap={3}>
+              <Text role="label" tone="muted">
+                التفضيلات الحالية
+              </Text>
+              <KeyValueList
+                dense
+                items={[
+                  { label: 'القنوات المفعّلة', value: `${enabledNotificationChannelsCount}/6`, tone: 'brand' },
+                  { label: 'مستوى التنبيه', value: notificationPreferences.priorityOnly ? 'العاجلة فقط' : 'كل التنبيهات', tone: notificationPreferences.priorityOnly ? 'warning' : 'success' },
+                  { label: 'الصوت والاهتزاز', value: notificationPreferences.sound ? 'مفعّل' : 'موقوف', tone: notificationPreferences.sound ? 'success' : 'warning' },
+                  { label: 'الملخص اليومي', value: notificationPreferences.dailyDigest ? 'مفعّل' : 'موقوف', tone: notificationPreferences.dailyDigest ? 'info' : 'default' },
+                  { label: 'الظهور في القائمة', value: listingEnabled ? 'مفعل' : 'موقوف', tone: listingEnabled ? 'success' : 'warning' },
+                  { label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: storeOpen ? 'success' : 'warning' },
+                  { label: 'ساعات العمل', value: todayHoursLabel },
+                ]}
+              />
+            </Surface>
+
+            <Surface tone="raised" padding={0} gap={0}>
+              <Text role="label" tone="muted">
+                إعدادات الإشعارات
+              </Text>
+              <Text role="caption" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8, paddingTop: 8 }}>
+                كل سطر يضبط نوعًا واحدًا من التنبيهات دون إنشاء شاشة إعدادات ثانية أو نظام محلي منفصل.
+              </Text>
+              {notificationSettingRows.map((item, index) => (
+                <SettingsWorkspaceRow
+                  key={item.id}
+                  title={item.title}
+                  subtitle={item.subtitle}
+                  icon={item.icon}
+                  value={item.value}
+                  onValueChange={(nextValue) => updateNotificationPreference(item.id, nextValue)}
+                  last={index === notificationSettingRows.length - 1}
+                />
+              ))}
+            </Surface>
+
+            <Surface tone="raised" padding={0} gap={0}>
+              <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+                الوصول السريع
+              </Text>
+              <Text role="caption" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8, paddingTop: 8 }}>
+                كل الطرق التالية تعود إلى نفس الوجهة الموحدة بدل تكرار مركز إشعارات آخر داخل الحساب.
+              </Text>
+              {settingsActionRows.map((item, index) => (
+                <SettingsWorkspaceRow
+                  key={item.id}
+                  title={item.title}
+                  subtitle={item.subtitle}
+                  icon={item.icon}
+                  onPress={item.onPress}
+                  disabled={typeof item.onPress !== 'function'}
+                  last={index === settingsActionRows.length - 1}
+                />
+              ))}
+            </Surface>
+          </Box>
+        </HubWorkspaceShell>
+      );
+    }
+
+    if (activeSection === 'inventory') {
+      return (
+        <HubWorkspaceShell title={sectionCopy.inventory.title} description={sectionCopy.inventory.description} icon={sectionCopy.inventory.icon} onBack={() => updateSection('hub')}>
+          <InventoryCatalogWorkspaceContent
+            storeName={storeName}
+            branchLabel={branchLabel}
+            activeZoneLabel={activeZoneLabel}
+            todayHoursLabel={todayHoursLabel}
+          />
+        </HubWorkspaceShell>
+      );
+    }
+
     if (activeSection === 'operations') {
       return (
         <OperationsWorkspace
@@ -777,7 +1091,7 @@ export function PartnerDshConsoleScreen(props: Props) {
       );
     }
 
-    const copy = sectionCopy[activeSection];
+    const copy = sectionCopy[activeSection as Exclude<PartnerHubSection, 'hub'>];
 
     return (
       <HubWorkspaceShell

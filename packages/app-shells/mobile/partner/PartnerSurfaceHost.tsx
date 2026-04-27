@@ -214,32 +214,32 @@ export function PartnerSurfaceHost() {
     if (activeOrderId === 'partner-order-1048') {
       return {
         orderId: 'partner-order-1048',
-        merchantName: 'Green Bowl',
-        customerName: 'Nora A.',
-        serviceWindowLabel: '18 min to SLA',
-        nextActionLabel: 'confirm packaging',
-        readinessNote: 'Packaging check is pending before the order moves to handoff.',
+        merchantName: 'جرين بول',
+        customerName: 'نورا',
+        serviceWindowLabel: 'يتبقى 18 دقيقة قبل حد الخدمة',
+        nextActionLabel: 'تأكيد التغليف',
+        readinessNote: 'فحص التغليف ما يزال معلقًا قبل انتقال الطلب إلى التسليم.',
       };
     }
 
     if (activeOrderId === 'partner-order-1051') {
       return {
         orderId: 'partner-order-1051',
-        merchantName: 'Bean House',
-        customerName: 'Sara M.',
-        serviceWindowLabel: '24 min to SLA',
-        nextActionLabel: 'open order workspace',
-        readinessNote: 'Dispatch slot is booked and customer wait time is increasing.',
+        merchantName: 'بين هاوس',
+        customerName: 'سارة',
+        serviceWindowLabel: 'يتبقى 24 دقيقة قبل حد الخدمة',
+        nextActionLabel: 'فتح مساحة الطلب',
+        readinessNote: 'موعد الإرسال محجوز وزمن انتظار العميل يرتفع.',
       };
     }
 
     return {
       orderId: 'partner-order-1042',
-      merchantName: 'Burger Lab',
-      customerName: 'Omar A.',
-      serviceWindowLabel: '12 min to SLA',
-      nextActionLabel: 'confirm ready and release to captain',
-      readinessNote: 'Packaging is complete and handoff lane is available.',
+      merchantName: 'برغر لاب',
+      customerName: 'عمر',
+      serviceWindowLabel: 'يتبقى 12 دقيقة قبل حد الخدمة',
+      nextActionLabel: 'تأكيد الجاهزية وإرسال الطلب للكابتن',
+      readinessNote: 'التغليف مكتمل ومسار التسليم متاح.',
     };
   }, [activeOrderId]);
 
@@ -263,7 +263,7 @@ export function PartnerSurfaceHost() {
       storeName: activeOrderSummary.merchantName,
       branchLabel: selectedStoreScope.label,
       cityLabel: 'الرياض',
-      managerLabel: 'Khaled A.',
+      managerLabel: 'خالد',
       todayHoursLabel,
       activeZoneLabel: selectedZone.title,
     }),
@@ -528,6 +528,42 @@ export function PartnerSurfaceHost() {
     />
   );
 
+  const renderMainShell = (content: React.ReactNode) => (
+    <Box style={{ flex: 1 }} background="background">
+      {topBar}
+      <Surface
+        tone="raised"
+        padding={0}
+        gap={0}
+        radiusToken="none"
+        border={false}
+        style={{
+          flex: 1,
+          marginTop: -2,
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
+          overflow: 'hidden',
+        }}
+      >
+        {content}
+      </Surface>
+      {accountSheet}
+      {walletHubSheet}
+      {storeScopeSheet}
+    </Box>
+  );
+
+  const renderWorkspaceShell = (content: React.ReactNode) => (
+    <Box style={{ flex: 1 }} background="background">
+      <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, overflow: 'hidden' }}>
+        {content}
+      </Surface>
+      {accountSheet}
+      {walletHubSheet}
+      {storeScopeSheet}
+    </Box>
+  );
+
   if (activeServiceType === 'arb') {
     return (
       <Box style={{ flex: 1 }} background="background">
@@ -586,159 +622,108 @@ export function PartnerSurfaceHost() {
   }
 
     if (route === 'home') {
-      return (
-        <Box style={{ flex: 1 }} background="background">
-          {topBar}
-          <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-            <PartnerDshConsoleScreen
-              activeServiceType={activeServiceType}
-              section={accountHubSection}
-              onSectionChange={setAccountHubSection}
-              storeName={maintenanceProfile.storeName}
-              branchLabel={selectedStoreScope.label}
-              cityLabel={maintenanceProfile.cityLabel}
-              managerLabel={maintenanceProfile.managerLabel}
-              todayHoursLabel={maintenanceProfile.todayHoursLabel}
-              activeZoneLabel={maintenanceProfile.activeZoneLabel}
-              storeOpen={storeOpen}
-              listingEnabled={listingEnabled}
-              serviceModes={serviceModes}
-              activeOrdersCount={deliveryOpsSummary.outForDelivery + deliveryOpsSummary.handoffReady}
-              urgentOrdersCount={deliveryOpsSummary.delayedRisk}
-              pendingActionsCount={deliveryOpsSummary.handoffReady}
-              typeOptions={partnerTypeOptions}
-              onSelectType={(typeId) => {
-                setActiveServiceType(typeId === 'arb' ? 'arb' : 'dsh');
-                setRoute(typeId === 'arb' ? 'entry' : 'inbox');
-              }}
-              onOpenOrdersBoard={openOrdersBoard}
-              onOpenInventoryManagement={openInventoryManagement}
-              onOpenStoreScope={openStoreScope}
-              onOpenSupportDirectory={openSupportDirectory}
-              onOpenWalletHub={openWalletHub}
-              onOpenBell={() => setRoute('bell')}
-            />
-          </Surface>
-          {accountSheet}
-          {walletHubSheet}
-          {storeScopeSheet}
-        </Box>
+      const partnerConsoleScreen = (
+        <PartnerDshConsoleScreen
+          activeServiceType={activeServiceType}
+          section={accountHubSection}
+          onSectionChange={setAccountHubSection}
+          storeName={maintenanceProfile.storeName}
+          branchLabel={selectedStoreScope.label}
+          cityLabel={maintenanceProfile.cityLabel}
+          managerLabel={maintenanceProfile.managerLabel}
+          todayHoursLabel={maintenanceProfile.todayHoursLabel}
+          activeZoneLabel={maintenanceProfile.activeZoneLabel}
+          storeOpen={storeOpen}
+          listingEnabled={listingEnabled}
+          serviceModes={serviceModes}
+          activeOrdersCount={deliveryOpsSummary.outForDelivery + deliveryOpsSummary.handoffReady}
+          urgentOrdersCount={deliveryOpsSummary.delayedRisk}
+          pendingActionsCount={deliveryOpsSummary.handoffReady}
+          typeOptions={partnerTypeOptions}
+          onSelectType={(typeId) => {
+            setActiveServiceType(typeId === 'arb' ? 'arb' : 'dsh');
+            setRoute(typeId === 'arb' ? 'entry' : 'inbox');
+          }}
+          onOpenOrdersBoard={openOrdersBoard}
+          onOpenInventoryManagement={openInventoryManagement}
+          onOpenStoreScope={openStoreScope}
+          onOpenSupportDirectory={openSupportDirectory}
+          onOpenWalletHub={openWalletHub}
+          onOpenBell={() => setRoute('bell')}
+        />
       );
+
+      return accountHubSection === 'hub'
+        ? renderMainShell(partnerConsoleScreen)
+        : renderWorkspaceShell(partnerConsoleScreen);
     }
 
   if (route === 'entry') {
-    return (
-      <Box style={{ flex: 1 }} background="background">
-        {topBar}
-        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-          <DshEntryScreen
-            state={partnerEntryState}
-            onOpenOrdersBoardPress={() => setRoute('inbox')}
-            onOpenOrderWorkspacePress={() => {
-              setActiveOrderId('partner-order-1042');
-              setRoute('detail');
-            }}
-            onOpenMaintenancePress={() => openAccountHub('profile')}
-            onOpenIssueQueuePress={() => openAccountHub('operations')}
-          />
-        </Surface>
-        {accountSheet}
-        {walletHubSheet}
-        {storeScopeSheet}
-      </Box>
+    return renderWorkspaceShell(
+      <DshEntryScreen
+        state={partnerEntryState}
+        onOpenOrdersBoardPress={() => setRoute('inbox')}
+        onOpenOrderWorkspacePress={() => {
+          setActiveOrderId('partner-order-1042');
+          setRoute('detail');
+        }}
+        onOpenMaintenancePress={() => openAccountHub('profile')}
+        onOpenIssueQueuePress={() => openAccountHub('operations')}
+      />,
     );
   }
 
   if (route === 'bell') {
-    return (
-      <Box style={{ flex: 1 }} background="background">
-        {topBar}
-        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-          <DshPartnerBellScreen
-            onOpenInbox={() => setRoute('inbox')}
-            onOpenNextOrder={() => setRoute('detail')}
-            onBack={() => setRoute('inbox')}
-            onRetry={() => setRoute('bell')}
-          />
-        </Surface>
-        {accountSheet}
-        {walletHubSheet}
-        {storeScopeSheet}
-      </Box>
+    return renderWorkspaceShell(
+      <DshPartnerBellScreen
+        onOpenInbox={() => setRoute('inbox')}
+        onOpenNextOrder={() => setRoute('detail')}
+        onBack={() => setRoute('inbox')}
+        onRetry={() => setRoute('bell')}
+      />,
     );
   }
 
   if (route === 'inbox') {
-    return (
-      <Box style={{ flex: 1 }} background="background">
-        {topBar}
-        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-          <PartnerOrdersInboxScreen
-              searchMode={ordersSearchMode}
-              onCloseSearch={() => setOrdersSearchMode(false)}
-            onOpenOrder={(orderId) => {
-              setActiveOrderId(orderId);
-              setRoute('detail');
-            }}
-            onOpenNextOrder={(orderId) => {
-              setActiveOrderId(orderId);
-              setRoute('detail');
-            }}
-            onRetry={() => setRoute('inbox')}
-          />
-        </Surface>
-        {accountSheet}
-        {walletHubSheet}
-        {storeScopeSheet}
-      </Box>
+    return renderMainShell(
+      <PartnerOrdersInboxScreen
+        searchMode={ordersSearchMode}
+        onCloseSearch={() => setOrdersSearchMode(false)}
+        onOpenOrder={(orderId) => {
+          setActiveOrderId(orderId);
+          setRoute('detail');
+        }}
+        onOpenNextOrder={(orderId) => {
+          setActiveOrderId(orderId);
+          setRoute('detail');
+        }}
+        onRetry={() => setRoute('inbox')}
+      />,
     );
   }
 
   if (route === 'detail') {
-    return (
-      <Box style={{ flex: 1 }} background="background">
-        {topBar}
-        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-          <PartnerOrderDetailScreen
-            summary={activeOrderSummary}
-            onConfirmReady={() => setRoute('inbox')}
-            onOpenNextOrder={() => setRoute('inbox')}
-            onBackToInbox={() => setRoute('inbox')}
-            onRetry={() => setRoute('detail')}
-          />
-        </Surface>
-        {accountSheet}
-        {walletHubSheet}
-        {storeScopeSheet}
-      </Box>
+    return renderWorkspaceShell(
+      <PartnerOrderDetailScreen
+        summary={activeOrderSummary}
+        onConfirmReady={() => setRoute('inbox')}
+        onOpenNextOrder={() => setRoute('inbox')}
+        onBackToInbox={() => setRoute('inbox')}
+        onRetry={() => setRoute('detail')}
+      />,
     );
   }
 
   if (route === 'inventory-management') {
-    return (
-      <Box style={{ flex: 1 }} background="background">
-        {topBar}
-        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-          <DshInventoryManagementScreen />
-        </Surface>
-        {accountSheet}
-        {walletHubSheet}
-        {storeScopeSheet}
-      </Box>
-    );
+    return renderWorkspaceShell(<DshInventoryManagementScreen onBack={() => openAccountHub('hub')} />);
   }
 
   if (route === 'support-directory') {
-    return (
-      <Box style={{ flex: 1 }} background="background">
-        {topBar}
-        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-          <DshPartnerSupportDirectoryScreen onOpenScreen={(screenId) => openSupportScreen(screenId as PartnerSupportRoute)} />
-        </Surface>
-        {accountSheet}
-        {walletHubSheet}
-        {storeScopeSheet}
-      </Box>
+    return renderWorkspaceShell(
+      <DshPartnerSupportDirectoryScreen
+        onBack={() => openAccountHub('hub')}
+        onOpenScreen={(screenId) => openSupportScreen(screenId as PartnerSupportRoute)}
+      />,
     );
   }
 
@@ -768,49 +753,18 @@ export function PartnerSurfaceHost() {
       'video-upload': <DshPartnerVideoUploadScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
     };
 
-    return (
-      <Box style={{ flex: 1 }} background="background">
-        {topBar}
-        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-          {supportScreens[selectedSupportScreen]}
-        </Surface>
-        {accountSheet}
-        {walletHubSheet}
-        {storeScopeSheet}
-      </Box>
-    );
+    return renderWorkspaceShell(supportScreens[selectedSupportScreen]);
   }
 
-  return (
-    <Box style={{ flex: 1 }} background="background">
-      {topBar}
-      <Surface
-        tone="raised"
-        padding={0}
-        gap={0}
-        radiusToken="none"
-        border={false}
-        style={{
-          flex: 1,
-          marginTop: -2,
-          borderTopLeftRadius: 28,
-          borderTopRightRadius: 28,
-          overflow: 'hidden',
-        }}
-      >
-        <PartnerDshConsoleScreen
-          activeServiceType={activeServiceType}
-          onOpenOrdersBoard={openOrdersBoard}
-          onOpenInventoryManagement={openInventoryManagement}
-          onOpenStoreScope={openStoreScope}
-          onOpenWalletHub={openWalletHub}
-          onOpenSupportDirectory={openSupportDirectory}
-        />
-      </Surface>
-      {accountSheet}
-        {walletHubSheet}
-        {storeScopeSheet}
-    </Box>
+  return renderMainShell(
+    <PartnerDshConsoleScreen
+      activeServiceType={activeServiceType}
+      onOpenOrdersBoard={openOrdersBoard}
+      onOpenInventoryManagement={openInventoryManagement}
+      onOpenStoreScope={openStoreScope}
+      onOpenWalletHub={openWalletHub}
+      onOpenSupportDirectory={openSupportDirectory}
+    />,
   );
 }
 

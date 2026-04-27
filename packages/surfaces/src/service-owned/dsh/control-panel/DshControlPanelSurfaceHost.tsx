@@ -9,17 +9,17 @@ import {
   WebSegmentedTabs,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
-import { useDshControlPanelText } from './operations/dsh/shared/dshControlPanelText';
-import { ControlPanelDshBellScreen } from './operations/dsh/bell';
-import { ControlPanelDshCatalogScreen } from './catalogs/dsh';
-import { ControlPanelDshOrderChatScreen } from './operations/dsh/orderchat';
-import { ControlPanelDshOrderDetailScreen, ControlPanelDshOrdersScreen } from './operations/dsh/orders';
-import { ControlPanelDshPeakModeScreen } from './operations/dsh/peak-mode';
-import { ControlPanelDshPartnerApprovalsScreen } from './partners/dsh';
-import { ControlPanelDshReassignScreen } from './operations/dsh/reassign';
-import { ControlPanelDshManualAssignmentScreen } from './operations/dsh/sheinproxy';
-import { ControlPanelDshZoneSetScreen } from './operations/dsh/zone-set';
-import { ControlPanelDshMarketingScreen } from './marketing/dsh';
+import { useDshControlPanelText } from './operations/shared/dshControlPanelText';
+import { ControlPanelDshBellScreen } from './operations/bell';
+import { ControlPanelDshCatalogScreen } from './catalogs';
+import { ControlPanelDshOrderChatScreen } from './operations/orderchat';
+import { ControlPanelDshOrderDetailScreen, ControlPanelDshOrdersScreen } from './operations/orders';
+import { ControlPanelDshPeakModeScreen } from './operations/peak-mode';
+import { ControlPanelDshPartnerApprovalsScreen } from './partners';
+import { ControlPanelDshReassignScreen } from './operations/reassign';
+import { ControlPanelDshManualAssignmentScreen } from './operations/sheinproxy';
+import { ControlPanelDshZoneSetScreen } from './operations/zone-set';
+import { ControlPanelDshMarketingScreen } from './marketing';
 
 const liveRouteHrefs = {
   overview: '/operations',

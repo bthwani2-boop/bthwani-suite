@@ -95,6 +95,149 @@ export function SearchTopBar({ value, onChangeText, onClose, placeholder, hint, 
   );
 }
 
+export type MobileWorkspaceHeaderProps = {
+  title: string;
+  description?: string;
+  icon?: React.ComponentProps<typeof Icon>['name'];
+  iconSlot?: React.ReactNode;
+  actions?: TopBarAction[];
+  backLabel?: string;
+  backIcon?: React.ComponentProps<typeof Icon>['name'];
+  onBack?: () => void;
+  style?: StyleProp<ViewStyle>;
+};
+
+export function MobileWorkspaceHeader({
+  title,
+  description,
+  icon,
+  iconSlot,
+  actions = [],
+  backLabel = 'العودة',
+  backIcon = 'chevron-forward-outline',
+  onBack,
+  style,
+}: MobileWorkspaceHeaderProps) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
+  const rowDirection = resolveRowDirection(direction);
+  const textAlign = direction === 'rtl' ? 'end' : 'start';
+  const resolvedIcon = iconSlot ?? (icon ? <Icon name={icon} size={20} tone="brand" /> : <Icon name="grid-outline" size={20} tone="brand" />);
+
+  function renderAction(action: TopBarAction) {
+    const badgeAnchorStyle = direction === 'rtl' ? { left: -spacing[1] } : { right: -spacing[1] };
+    const iconStyle = action.mirrorInRtl && direction === 'rtl' ? { transform: [{ scaleX: -1 }] } : undefined;
+    const actionBoxSize = action.size === 'sm' ? 36 : action.size === 'lg' ? 42 : 40;
+    const showBadge = typeof action.badgeCount === 'number' && action.badgeCount > 0;
+
+    return (
+      <Pressable
+        key={action.id}
+        accessibilityRole="button"
+        accessibilityLabel={action.accessibilityLabel}
+        disabled={action.disabled}
+        hitSlop={8}
+        onPress={action.onPress}
+        style={({ pressed }) => [{ padding: 0, opacity: action.disabled ? 0.56 : pressed ? 0.92 : 1 }]}
+      >
+        <View
+          style={{
+            position: 'relative',
+            width: actionBoxSize,
+            height: actionBoxSize,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: actionBoxSize / 2,
+            backgroundColor: action.id === 'back' ? theme.brandSurface : theme.surface,
+            borderWidth: 1,
+            borderColor: action.id === 'back' ? theme.brand : theme.line,
+            shadowColor: '#020617',
+            shadowOpacity: 0.08,
+            shadowRadius: 10,
+            shadowOffset: { width: 0, height: 2 },
+            elevation: 2,
+          }}
+        >
+          {showBadge ? (
+            <View style={[{ position: 'absolute', top: -spacing[1], zIndex: 1 }, badgeAnchorStyle]}>
+              <Badge label={String(action.badgeCount)} tone="danger" />
+            </View>
+          ) : null}
+          <View style={[{ alignItems: 'center', justifyContent: 'center' }, iconStyle]}>{action.icon}</View>
+        </View>
+      </Pressable>
+    );
+  }
+
+  const backAction = onBack
+    ? {
+        id: 'back',
+        icon: <Icon name={backIcon} mirrored size={18} tone="inverse" />,
+        accessibilityLabel: backLabel,
+        onPress: onBack,
+        size: 'lg' as const,
+      }
+    : null;
+
+  return (
+    <Surface
+      tone="raised"
+      border
+      padding={3}
+      gap={2}
+      style={[
+        {
+          borderRadius: radius.xl,
+          shadowColor: '#020617',
+          shadowOpacity: 0.06,
+          shadowRadius: 10,
+          shadowOffset: { width: 0, height: 3 },
+          elevation: 3,
+        },
+        style,
+      ]}
+    >
+      <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing[3], minHeight: 56 }}>
+        <View style={{ flex: 1, flexDirection: rowDirection, alignItems: 'center', gap: spacing[3], minWidth: 0 }}>
+          <View
+            style={{
+              width: 46,
+              height: 46,
+              borderRadius: 23,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.surfaceInset,
+              borderWidth: 1,
+              borderColor: theme.lineStrong,
+              flexShrink: 0,
+            }}
+          >
+            {resolvedIcon}
+          </View>
+
+          <View style={{ flex: 1, minWidth: 0, gap: spacing[0], alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+            <Text role="titleMd" align={textAlign} numberOfLines={1}>
+              {title}
+            </Text>
+            {description ? (
+              <Text role="bodySm" tone="muted" align={textAlign} numberOfLines={2}>
+                {description}
+              </Text>
+            ) : null}
+          </View>
+        </View>
+
+        {actions.length || backAction ? (
+          <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing[2], flexShrink: 0 }}>
+            {actions.map(renderAction)}
+            {backAction ? renderAction(backAction) : null}
+          </View>
+        ) : null}
+      </View>
+    </Surface>
+  );
+}
+
 export type NewsTickerBarProps = {
   statusLabel: string;
   message: string;

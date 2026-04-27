@@ -3,8 +3,10 @@ import {
   Box,
   Button,
   Card,
-  DashboardShell,
+  MobileScrollView,
+  MobileWorkspaceHeader,
   StateView,
+  Surface,
   Text,
 } from '@bthwani/ui-kit';
 
@@ -91,39 +93,48 @@ export function DshEntryScreen({
   onOpenMaintenancePress,
   onOpenIssueQueuePress,
 }: DshEntryScreenProps) {
+  const backAction = onOpenOrdersBoardPress;
+
   return (
-    <DashboardShell
-      title="Partner Entry"
-      subtitle="Single-purpose entry for app-partner delivery operations and first order action."
-      hero={renderHero(state, onOpenOrdersBoardPress)}
-      sections={
-        state === 'ready'
-          ? [
-              {
-                title: 'Orders and Workspace',
-                subtitle: 'Orders board entry and workspace handoff pattern.',
-                content: renderOrdersSection(onOpenOrdersBoardPress, onOpenOrderWorkspacePress),
-              },
-              {
-                title: 'Maintenance and Issues',
-                subtitle: 'Maintenance workspace and issue-queue companion pattern.',
-                content: renderSupportSection(onOpenMaintenancePress, onOpenIssueQueuePress),
-              },
-            ]
-          : [
-              {
-                title: 'Entry State',
-                subtitle: 'The screen keeps one clear partner purpose while handling base states.',
-                content: (
-                  <Box>
-                    <Text role="bodyMd" tone="muted">
-                      Entry state is active. No business logic or network requests are executed here.
-                    </Text>
-                  </Box>
-                ),
-              },
-            ]
-      }
-    />
+    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
+      <MobileWorkspaceHeader
+        title="Partner Entry"
+        description="Single-purpose entry for app-partner delivery operations and first order action."
+        icon="sparkles-outline"
+        onBack={backAction}
+      />
+
+      {renderHero(state, onOpenOrdersBoardPress)}
+
+      {state === 'ready' ? (
+        <>
+          <Surface tone="raised" padding={3} gap={3}>
+            <Text role="label" tone="muted">
+              Orders and Workspace
+            </Text>
+            <Text role="bodySm" tone="muted">
+              Orders board entry and workspace handoff pattern.
+            </Text>
+            {renderOrdersSection(onOpenOrdersBoardPress, onOpenOrderWorkspacePress)}
+          </Surface>
+
+          <Surface tone="raised" padding={3} gap={3}>
+            <Text role="label" tone="muted">
+              Maintenance and Issues
+            </Text>
+            <Text role="bodySm" tone="muted">
+              Maintenance workspace and issue-queue companion pattern.
+            </Text>
+            {renderSupportSection(onOpenMaintenancePress, onOpenIssueQueuePress)}
+          </Surface>
+        </>
+      ) : (
+        <Surface tone="raised" padding={3} gap={2}>
+          <Text role="bodyMd" tone="muted">
+            Entry state is active. No business logic or network requests are executed here.
+          </Text>
+        </Surface>
+      )}
+    </MobileScrollView>
   );
 }

@@ -3,6 +3,7 @@ import {
   Box,
   ListItem,
   MobileScrollView,
+  MobileWorkspaceHeader,
   SectionHeader,
   Surface,
   Text,
@@ -10,6 +11,7 @@ import {
 import type { PartnerSupportScreenId } from './DshPartnerGeneratedSupportScreens';
 
 export type DshPartnerSupportDirectoryScreenProps = {
+  onBack?: () => void;
   onOpenScreen?: (screenId: PartnerSupportScreenId) => void;
 };
 
@@ -51,15 +53,15 @@ const groups: Array<{
   },
 ];
 
-export function DshPartnerSupportDirectoryScreen({ onOpenScreen }: DshPartnerSupportDirectoryScreenProps) {
+export function DshPartnerSupportDirectoryScreen({ onBack, onOpenScreen }: DshPartnerSupportDirectoryScreenProps) {
   return (
-    <MobileScrollView padding={4} gap={4}>
-      <Box gap={2}>
-        <Text role="titleLg">مداخل الحساب للشريك</Text>
-        <Text role="bodyMd" tone="muted">
-          هذا الدليل مخصص فقط للمهام الثانوية التي لم تعد جزءًا من مركز الحساب ومساحات العمل الأساسية.
-        </Text>
-      </Box>
+    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
+      <MobileWorkspaceHeader
+        title="مداخل الحساب للشريك"
+        description="هذا الدليل مخصص فقط للمهام الثانوية التي لم تعد جزءًا من مركز الحساب ومساحات العمل الأساسية."
+        icon="grid-outline"
+        onBack={onBack}
+      />
 
       {groups.map((group) => (
         <Surface key={group.title} tone="raised" gap={3}>

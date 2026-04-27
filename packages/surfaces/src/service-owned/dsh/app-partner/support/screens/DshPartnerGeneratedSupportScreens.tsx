@@ -5,6 +5,7 @@ import {
   KeyValueList,
   ListItem,
   MobileScrollView,
+  MobileWorkspaceHeader,
   SectionHeader,
   StateView,
   StatCard,
@@ -459,80 +460,82 @@ function createPartnerSupportScreen(config: SupportConfig) {
   }: PartnerGeneratedSupportScreenProps) {
     const [draftValue, setDraftValue] = React.useState('');
 
-    if (state !== 'ready' && state !== 'disabled') {
-      return renderSupportState(state, onRetry, onBack);
-    }
-
     const isDisabled = state === 'disabled';
 
     return (
-      <MobileScrollView padding={4} gap={4}>
-        <Box gap={2}>
-          <Text role="titleLg">{config.title}</Text>
-          <Text role="bodyMd" tone="muted">
-            {config.subtitle}
-          </Text>
-        </Box>
+      <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
+        <MobileWorkspaceHeader
+          title={config.title}
+          description={config.subtitle}
+          icon="sparkles-outline"
+          onBack={onBack}
+        />
 
-        <Surface tone="brand" gap={3}>
-          <SectionHeader title={config.heroTitle} subtitle={config.heroDescription} />
-          {config.primaryHint ? (
-            <Text role="bodySm" tone="inverse">
-              {config.primaryHint}
-            </Text>
-          ) : null}
-          {config.metrics?.map((metric) => (
-            <StatCard
-              key={metric.label}
-              label={metric.label}
-              value={metric.value}
-              deltaLabel={metric.deltaLabel}
-              tone={metric.tone ?? 'default'}
-            />
-          ))}
-        </Surface>
-
-        {config.keyValues?.length ? (
-          <Surface tone="raised" gap={3}>
-            <SectionHeader title="تفاصيل تشغيلية" subtitle="احتفظ فقط بالبيانات اللازمة للقرار الحالي." />
-            <KeyValueList items={config.keyValues} />
-          </Surface>
-        ) : null}
-
-        {config.listItems?.length ? (
-          <Surface tone="default" gap={3}>
-            <SectionHeader title="العناصر الحالية" subtitle="تظل القائمة مختصرة حتى يتحرك المشغّل دون ضجيج." />
-            <Box gap={2}>
-              {config.listItems.map((item) => (
-                <ListItem
-                  key={`${config.id}-${item.title}`}
-                  title={item.title}
-                  subtitle={item.subtitle}
-                  meta={item.meta}
-                  badgeLabel={item.badgeLabel}
+        {state !== 'ready' && state !== 'disabled' ? (
+          renderSupportState(state, onRetry, onBack)
+        ) : (
+          <>
+            <Surface tone="brand" gap={3}>
+              <SectionHeader title={config.heroTitle} subtitle={config.heroDescription} />
+              {config.primaryHint ? (
+                <Text role="bodySm" tone="inverse">
+                  {config.primaryHint}
+                </Text>
+              ) : null}
+              {config.metrics?.map((metric) => (
+                <StatCard
+                  key={metric.label}
+                  label={metric.label}
+                  value={metric.value}
+                  deltaLabel={metric.deltaLabel}
+                  tone={metric.tone ?? 'default'}
                 />
               ))}
-            </Box>
-          </Surface>
-        ) : null}
+            </Surface>
 
-        {config.inputLabel ? (
-          <Surface tone="raised" gap={3}>
-            <SectionHeader title="مدخل مختصر" subtitle="لا نجمع إلا إدخالًا واحدًا واضحًا في كل مرة." />
-            <TextField
-              label={config.inputLabel}
-              value={draftValue}
-              onChangeText={setDraftValue}
-              hint={config.inputHint}
-              editable={!isDisabled}
-            />
-          </Surface>
-        ) : null}
+            {config.keyValues?.length ? (
+              <Surface tone="raised" gap={3}>
+                <SectionHeader title="تفاصيل تشغيلية" subtitle="احتفظ فقط بالبيانات اللازمة للقرار الحالي." />
+                <KeyValueList items={config.keyValues} />
+              </Surface>
+            ) : null}
 
-        <Button label={config.primaryLabel} onPress={onPrimaryAction} disabled={isDisabled} />
-        {config.secondaryLabel ? (
-          <Button label={config.secondaryLabel} tone="secondary" onPress={onSecondaryAction ?? onBack} />
-        ) : null}
+            {config.listItems?.length ? (
+              <Surface tone="default" gap={3}>
+                <SectionHeader title="العناصر الحالية" subtitle="تظل القائمة مختصرة حتى يتحرك المشغّل دون ضجيج." />
+                <Box gap={2}>
+                  {config.listItems.map((item) => (
+                    <ListItem
+                      key={`${config.id}-${item.title}`}
+                      title={item.title}
+                      subtitle={item.subtitle}
+                      meta={item.meta}
+                      badgeLabel={item.badgeLabel}
+                    />
+                  ))}
+                </Box>
+              </Surface>
+            ) : null}
+
+            {config.inputLabel ? (
+              <Surface tone="raised" gap={3}>
+                <SectionHeader title="مدخل مختصر" subtitle="لا نجمع إلا إدخالًا واحدًا واضحًا في كل مرة." />
+                <TextField
+                  label={config.inputLabel}
+                  value={draftValue}
+                  onChangeText={setDraftValue}
+                  hint={config.inputHint}
+                  editable={!isDisabled}
+                />
+              </Surface>
+            ) : null}
+
+            <Button label={config.primaryLabel} onPress={onPrimaryAction} disabled={isDisabled} />
+            {config.secondaryLabel ? (
+              <Button label={config.secondaryLabel} tone="secondary" onPress={onSecondaryAction ?? onBack} />
+            ) : null}
+          </>
+        )}
       </MobileScrollView>
     );
   };
@@ -718,7 +721,7 @@ export function DshPartnerVideoUploadScreen({
             { value: 'search', label: 'بحث' },
           ]}
           value={draft.routeTarget}
-          onValueChange={(value) => setDraft((current) => ({ ...current, routeTarget: value }))}
+          onValueChange={(value: MarketingGrowthRouteTarget) => setDraft((current) => ({ ...current, routeTarget: value }))}
           variant="pill"
         />
 

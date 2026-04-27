@@ -1,12 +1,17 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { Button } from './components/button';
-import { Icon } from './components/icons';
-import { Box, MobileScrollView, Surface, Text } from './primitives';
-import { useDirection, useTheme } from './providers';
+import { Button } from '../components/button';
+import { Icon } from '../components/icons';
+import { resolveRowDirection } from '../foundation';
+import { Box, MobileScrollView, Surface, Text } from '../primitives';
+import { useDirection, useTheme } from '../providers';
 
 // ----- Types -----
 export type MobileCommandState = 'ready' | 'loading' | 'empty' | 'offline' | 'disabled' | 'error';
+
+export type MobileCommandViewState = MobileCommandState;
+
+export type MobileCommandStateConfig = Record<string, any>;
 
 export type MobileCommandSummaryItem = {
   id: string;
@@ -107,7 +112,7 @@ export function MobileCommandCenterShell({
   children,
 }: MobileCommandCenterShellProps) {
   return (
-    <MobileScrollView padding={4} gap={4} paddingBottom={96}>
+    <MobileScrollView padding={4} gap={4} contentContainerStyle={{ paddingBottom: 96 }}>
       <Surface tone="brand" gap={3}>
         <Box>
           {badgeLabel ? <Text role="label">{badgeLabel}</Text> : null}
@@ -166,15 +171,15 @@ export function MobileCommandSectionItem({ item, isLast = false }: MobileCommand
       <View
         style={{
           width: '100%',
-          flexDirection: direction === 'rtl' ? 'row' : 'row',
-          justifyContent: 'space-between',
+          flexDirection: resolveRowDirection(direction),
           alignItems: 'center',
+          gap: 12,
         }}
       >
-        {/* RIGHT SIDE CLUSTER: ICON + TEXT ALWAYS STICK TOGETHER */}
         <View
           style={{
-            flexDirection: direction === 'rtl' ? 'row' : 'row-reverse',
+            flex: 1,
+            flexDirection: resolveRowDirection(direction),
             alignItems: 'center',
             gap: 12,
             minWidth: 0,
@@ -196,17 +201,17 @@ export function MobileCommandSectionItem({ item, isLast = false }: MobileCommand
             <Icon name={iconName} size={18} tone="brand" />
           </View>
 
-          <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-            <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'} numberOfLines={1}>
+          <View style={{ flex: 1, minWidth: 0, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'} numberOfLines={1}>
               {item.title}
             </Text>
             {item.subtitle ? (
-              <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'right' : 'left'} numberOfLines={1}>
+              <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'} numberOfLines={1}>
                 {item.subtitle}
               </Text>
             ) : null}
             {item.meta || item.statusLabel ? (
-              <Text role="caption" tone={item.statusTone ?? 'soft'} align={direction === 'rtl' ? 'right' : 'left'} numberOfLines={1}>
+              <Text role="caption" tone={item.statusTone ?? 'soft'} align={direction === 'rtl' ? 'end' : 'start'} numberOfLines={1}>
                 {item.statusLabel ?? item.meta}
               </Text>
             ) : null}

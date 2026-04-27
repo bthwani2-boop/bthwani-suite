@@ -26,5 +26,5 @@ export { Dialog, Modal, Sheet, SheetFrame, Toast } from './overlay';
 export type { DialogAction, DialogProps, DialogTone, ModalProps, SheetFrameProps, SheetProps, ToastProps, ToastTone } from './overlay';
 export { AppErrorState, AppEmptyState, AppLoadingState, AppSuccessState, EmptyState, ErrorBoundary, ErrorState, Loading, LoadingState, ScreenWrapper, StateGallery, StateView, SuccessState, stateIds, getStateDefinition } from './state';
 export type { AppEmptyStateProps, AppErrorStateProps, AppLoadingStateProps, AppSuccessStateProps, StateDefinition, StateId, StateKind, StateTone, StateViewProps, ScreenState, ScreenWrapperProps } from './state';
-export { NewsTickerBar, ScreenHeader, SearchTopBar, SectionHeader, Tabs, TopBar } from './header';
-export type { NewsTickerBarProps, ScreenHeaderProps, SearchTopBarProps, SectionHeaderProps, TabItem, TabsProps, TopBarAction, TopBarProps, TopBarVariant } from './header';
+export { MobileWorkspaceHeader, NewsTickerBar, ScreenHeader, SearchTopBar, SectionHeader, Tabs, TopBar } from './header';
+export type { MobileWorkspaceHeaderProps, NewsTickerBarProps, ScreenHeaderProps, SearchTopBarProps, SectionHeaderProps, TabItem, TabsProps, TopBarAction, TopBarProps, TopBarVariant } from './header';

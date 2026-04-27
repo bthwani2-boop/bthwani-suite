@@ -1,1 +1,2 @@
-export * as dsh from './dsh';
+export * from './catalog';
+export * from './ControlPanelDshCatalogScreen';

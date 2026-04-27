@@ -40,7 +40,7 @@ import {
 	type MarketingNewsTickerSource,
 	type MarketingNewsTickerStatus,
 } from './news-ticker-store';
-import { dshPartnerIntakeItems } from '../../../partners/dsh/workflow';
+import { dshPartnerIntakeItems } from '../../partners/workflow';
 
 export type ControlPanelDshMarketingScreenProps = {
 	hubHref?: string;

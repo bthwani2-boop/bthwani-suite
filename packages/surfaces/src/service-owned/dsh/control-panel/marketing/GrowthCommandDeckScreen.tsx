@@ -20,7 +20,7 @@ import {
   type MarketingGrowthSource,
   type MarketingGrowthRouteTarget,
   type MarketingGrowthStatus,
-} from '../../../shared/marketing/growth-store';
+} from '../../shared/marketing/growth-store';
 
 export type GrowthCommandDeckScreenProps = {
   hubHref?: string;
