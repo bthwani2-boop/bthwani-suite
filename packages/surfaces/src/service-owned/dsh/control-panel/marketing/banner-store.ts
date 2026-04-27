@@ -114,7 +114,7 @@ const seededBanners: MarketingBannerRecord[] = [
     status: 'published',
     actionType: 'subscription',
     ctaLabel: 'اعرف المزيد',
-    partnerName: 'Bthwani Pro',
+    partnerName: 'الخدمة المميزة',
     position: 3,
     clicks: 47,
     impressions: 410,

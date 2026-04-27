@@ -65,131 +65,64 @@ const webCommandCenterCss = `
   border-radius: 999px;
   padding: 10px 14px;
   font: inherit;
-  import React, { type ReactNode } from 'react';
-  import { useDirection, useUiLanguage, useUiText } from '../providers';
+  color: #0A2F5C;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+}
 
-  const webCommandCenterCss = `
-  .ui-web-command-center-root {
-    --rail-width: 288px;
-    display: grid;
-    gap: 20px;
-  }
+.ui-web-command-strip__pill:hover,
+.ui-web-command-strip__filter-chip:hover,
+.ui-web-command-strip__refresh:hover,
+.ui-web-command-strip__search:hover,
+.ui-web-command-strip__language:hover,
+.ui-web-command-strip__alert:hover {
+  border-color: #FF500D;
+  transform: translateY(-1px);
+}
 
-  .ui-web-command-strip {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 18px;
-    border-radius: 18px;
-    border: 1px solid rgba(10, 47, 92, 0.08);
-    background: linear-gradient(135deg, rgba(10, 47, 92, 0.02) 0%, rgba(255, 80, 13, 0.015) 100%);
-    box-shadow: 0 2px 12px rgba(10, 47, 92, 0.04);
-    flex-wrap: wrap;
-  }
-  .ui-web-command-strip__top-row,
-  .ui-web-command-strip__secondary-row,
-  .ui-web-command-strip__identity,
-  .ui-web-command-strip__actions,
-  .ui-web-rail-service-list__list {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .ui-web-command-strip__filter-row {
-    display: flex;
-    gap: 7px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    flex-shrink: 0;
-    max-width: 100%;
-  }
+.ui-web-command-strip__brand {
+  background: #FF500D;
+  color: #ffffff;
+  border-color: #FF500D;
+  font-weight: 700;
+}
 
-  .ui-web-command-strip__filter-row::-webkit-scrollbar {
-    display: none;
-  }
+.ui-web-command-strip__brand:hover {
+  background: #E64A00;
+  border-color: #E64A00;
+  transform: translateY(-1px);
+}
 
-  .ui-web-command-strip__top-row,
-  .ui-web-command-strip__secondary-row {
-    justify-content: space-between;
-    align-items: center;
-  }
+.ui-web-command-strip__search {
+  min-width: 240px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start;
+}
 
-  .ui-web-command-strip__identity {
-    align-items: center;
-  }
+.ui-web-command-strip__search-icon {
+  font-size: 18px;
+  line-height: 1;
+  color: #FF500D;
+}
 
-  .ui-web-command-strip__pill,
-  .ui-web-command-strip__filter-chip,
-  .ui-web-command-strip__refresh,
-  .ui-web-command-strip__search,
-  .ui-web-command-strip__language,
-  .ui-web-command-strip__alert,
-  .ui-web-rail-service-list__item {
-    border: 1px solid rgba(10, 47, 92, 0.14);
-    background: #ffffff;
-    border-radius: 999px;
-    padding: 10px 14px;
-    font: inherit;
-    color: #0A2F5C;
-    cursor: pointer;
-    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
-  }
+.ui-web-command-strip__search-placeholder {
+  color: #64748b;
+}
 
-  .ui-web-command-strip__pill:hover,
-  .ui-web-command-strip__filter-chip:hover,
-  .ui-web-command-strip__refresh:hover,
-  .ui-web-command-strip__search:hover,
-  .ui-web-command-strip__language:hover,
-  .ui-web-command-strip__alert:hover {
-    border-color: #FF500D;
-    transform: translateY(-1px);
-  }
+.ui-web-command-strip__filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  .ui-web-command-strip__brand {
-    background: #FF500D;
-    color: #ffffff;
-    border-color: #FF500D;
-    font-weight: 700;
-  }
-
-  .ui-web-command-strip__brand:hover {
-    background: #E64A00;
-    border-color: #E64A00;
-    transform: translateY(-1px);
-  }
-
-  .ui-web-command-strip__search {
-    min-width: 240px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: flex-start;
-  }
-
-  .ui-web-command-strip__search-icon {
-    font-size: 18px;
-    line-height: 1;
-    color: #FF500D;
-  }
-
-  .ui-web-command-strip__search-placeholder {
-    color: #64748b;
-  }
-
-  .ui-web-command-strip__filter-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .ui-web-command-strip__filter-chip--active,
-  .ui-web-rail-service-list__item--active {
-    border-color: #FF500D;
-    background: #FFF4ED;
-    color: #0A2F5C;
-  }
+.ui-web-command-strip__filter-chip--active,
+.ui-web-rail-service-list__item--active {
+  border-color: #FF500D;
+  background: #FFF4ED;
+  color: #0A2F5C;
+}
 
   .ui-web-command-strip__filter-meta,
   .ui-web-rail-service-list__status {

@@ -7,7 +7,7 @@ type DshRoutePageProps = {
 };
 
 export default async function DshSheinProxyOrderPage({ params }: DshRoutePageProps) {
-  await params;
+  const { id } = await params;
 
-  return <DshControlPanelSurfaceHost workspace="sheinproxy" />;
+  return <DshControlPanelSurfaceHost workspace="sheinproxy" orderId={id} />;
 }

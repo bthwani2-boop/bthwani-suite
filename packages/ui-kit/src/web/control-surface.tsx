@@ -56,10 +56,8 @@ const webControlSurfaceCss = `
   font-size: clamp(28px, 3vw, 38px);
   line-height: 1.08;
   font-weight: 900;
-  const controlSurfaceCss = `
 }
 .ui-web-control-surface-header__description {
-    align-items: center;
   max-width: 62ch;
   color: #475569;
   font-size: 14px;

@@ -7,7 +7,7 @@ type DshRoutePageProps = {
 };
 
 export default async function DshOrderDetailPage({ params }: DshRoutePageProps) {
-  await params;
+  const { id } = await params;
 
-  return <DshControlPanelSurfaceHost workspace="orders" />;
+  return <DshControlPanelSurfaceHost workspace="order-detail" orderId={id} />;
 }

@@ -1,7 +1,7 @@
 import '../../../../tamagui.generated.css';
 export const metadata = {
-  title: 'BThwani Control Panel',
-  description: 'Unified Next.js web surface',
+  title: 'لوحة التحكم',
+  description: 'Unified control room',
 };
 
 import type { ReactNode } from 'react';

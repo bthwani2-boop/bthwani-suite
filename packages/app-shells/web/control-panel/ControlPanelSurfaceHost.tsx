@@ -198,6 +198,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
   const activeSectionId = activeSectionHref.slice(1) as ControlPanelSectionId;
   const isControlSection = activeSectionId === 'control';
   const isMarketingSection = activeSectionId === 'marketing';
+  const isCommunityServicesSection = activeSectionId === 'community-services';
   const activeControlHref = isControlSection && subsection ? `/control/${subsection}` : undefined;
   const isAllFilterActive = selectedServiceId === allServiceTabId;
   const shellCopy = resolveShellCopy(panelText, activeSectionId, isControlSection ? subsection : undefined);
@@ -215,6 +216,21 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
   const contextItems = isAllFilterActive ? sectionServiceNames : serviceSectionLabels;
   const scopedSectionUnavailable = !isAllFilterActive && !serviceSections.includes(activeSectionId);
   const readyMissionCount = controlPanelRuntimeData.missions.filter((mission) => !mission.placeholder).length;
+  const communityServiceItems = React.useMemo(() => (
+    sectionServiceIds.map((serviceId) => {
+      const serviceMeta = controlPanelRuntimeData.services.find((service) => service.id === serviceId);
+
+      return {
+        id: `community-${serviceId}`,
+        label: getServiceLabel(uiText, serviceId),
+        description: serviceMeta?.placeholder
+          ? 'يبقى ظاهرًا كمرجع داخل هذا القسم حتى لا يتشعب المسار قبل الجاهزية.'
+          : 'خدمة متصلة بهذا القسم ويمكن تثبيت تركيزها من نفس الغرفة دون فتح route جديد.',
+        badge: serviceMeta?.placeholder ? panelText.filters.reference : panelText.ui.liveRefreshValue,
+        onAction: () => setSelectedServiceId(serviceId),
+      } satisfies DisclosureItemView;
+    })
+  ), [panelText.filters.reference, panelText.ui.liveRefreshValue, sectionServiceIds, uiText]);
 
   const resolveActionHandler = React.useCallback(
     (href?: string, onAction?: () => void) => onAction ?? (href ? () => router.push(href) : undefined),
@@ -866,7 +882,89 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
           </WebSectionCard>
         ) : null}
 
-        {!phaseOneBlueprint && activeSectionId !== 'partners' && activeSectionId !== 'marketing' && !isControlSection ? (
+        {isCommunityServicesSection ? (
+          <>
+            <WebControlSurfaceHeader
+              chips={[
+                { label: shellCopy.title, tone: 'brand' },
+                { label: `${liveCoverageCount} حي`, tone: 'accent' },
+                { label: `${referenceCoverageCount} مرجعي`, tone: 'neutral' },
+              ]}
+              title={shellCopy.title}
+              description={shellCopy.description}
+              actions={[
+                { label: 'فتح الدعم', href: '/support', tone: 'primary' },
+                { label: 'فتح العمليات', href: '/operations', tone: 'secondary' },
+              ]}
+            />
+
+            <div className={styles.metricsStrip}>
+              <WebSignalCard
+                title="الخدمات المتصلة"
+                value={String(sectionServiceIds.length)}
+                description="الخدمات التي تظهر داخل هذا القسم من الشريط العلوي والحوكمة المشتركة."
+                tone="brand"
+              />
+              <WebSignalCard
+                title="المسارات الحية"
+                value={String(liveCoverageCount)}
+                description="خدمات متصلة فعليًا ويمكن تثبيت تركيزها من نفس الصفحة."
+                tone="best"
+              />
+              <WebSignalCard
+                title="المراجع المؤجلة"
+                value={String(referenceCoverageCount)}
+                description="تظل مرئية كمرجع بدون تضخيم route depth قبل الجاهزية."
+              />
+            </div>
+
+            <WebSectionCard
+              title="مساحات الخدمة المتصلة"
+              description="اختر خدمة مرتبطة بهذا القسم أو ثبت تركيزها من الشريط العلوي بدل الوقوع في fallback عام."
+            >
+              <div className={styles.disclosureBody}>
+                {communityServiceItems.map((item) => (
+                  <WebControlDisclosureItem
+                    key={item.id}
+                    id={item.id}
+                    label={item.label}
+                    description={item.description}
+                    badge={item.badge}
+                    onAction={item.onAction}
+                  />
+                ))}
+              </div>
+            </WebSectionCard>
+
+            <WebSectionCard
+              title="أقرب المسارات الحية"
+              description="بدل فتح صفحة فارغة، انتقل مباشرة إلى أقرب مساحة تشغيل أو دعم مرتبطة بهذا القسم."
+            >
+              <div className={styles.actionGrid}>
+                <WebControlActionCard
+                  id="community-support"
+                  title="الدعم"
+                  description="افتح مسار الدعم عندما تكون الخدمة المجتمعية بحاجة إلى تصعيد أو متابعة مباشرة."
+                  footerLabel="فتح القسم"
+                  href="/support"
+                  badge="حي"
+                  tone="primary"
+                  onAction={() => router.push('/support')}
+                />
+                <WebControlActionCard
+                  id="community-operations"
+                  title="العمليات"
+                  description="ارجع إلى مسار العمليات إذا كانت الحالة تحتاج قرارًا تشغيليًا سريعًا من نفس الغرفة."
+                  footerLabel="فتح القسم"
+                  href="/operations"
+                  onAction={() => router.push('/operations')}
+                />
+              </div>
+            </WebSectionCard>
+          </>
+        ) : null}
+
+        {!phaseOneBlueprint && activeSectionId !== 'partners' && activeSectionId !== 'marketing' && !isControlSection && !isCommunityServicesSection ? (
           <WebSectionCard title={shellCopy.title} description={shellCopy.description}>
             <div className={styles.actionGrid}>
               <WebControlActionCard

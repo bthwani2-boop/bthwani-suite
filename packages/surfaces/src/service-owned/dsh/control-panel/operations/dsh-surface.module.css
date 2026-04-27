@@ -160,7 +160,7 @@
   margin-bottom: 8px;
 }
 
-.reassignDecisionCard :global(.bth-button) {
+.reassignDecisionAction {
   margin-top: 8px;
 }
 

@@ -167,7 +167,7 @@ export function ControlPanelDshOrdersScreen({
           onClose={() => setSelectedOrderId(null)}
         >
           {selectedOrderId ? (
-            <ControlPanelDshOrderDetailScreen embedded showHeader={false} orderId={selectedOrderId} hubHref="/operations" ordersHref="/operations/dsh/orders" />
+            <ControlPanelDshOrderDetailScreen embedded showHeader={false} orderId={selectedOrderId} hubHref="/operations/dsh" ordersHref="/operations/dsh/orders" />
           ) : null}
         </SheetFrame>
       </div>

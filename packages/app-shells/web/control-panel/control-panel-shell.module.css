@@ -129,7 +129,7 @@
   gap: 10px;
 }
 
-.stateActions :global(.bth-web-control-action-button) {
+.stateActions :global(.ui-web-control-action-button) {
   flex: 0 0 auto;
 }
 
@@ -174,7 +174,7 @@
     width: 100%;
   }
 
-  .stateActions :global(.bth-web-control-action-button) {
+  .stateActions :global(.ui-web-control-action-button) {
     width: 100%;
   }
 

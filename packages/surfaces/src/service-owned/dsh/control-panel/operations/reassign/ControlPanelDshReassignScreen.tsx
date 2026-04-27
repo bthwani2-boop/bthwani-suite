@@ -247,13 +247,15 @@ export function ControlPanelDshReassignScreen({
                 <Text role="bodySm" tone="muted">
                   {dshText.reassign.primaryDecisionDescription}
                 </Text>
-                <Button
-                  label={dshText.reassign.primaryDecisionLabel}
-                  tone="primary"
-                  size="sm"
-                  fullWidth={false}
-                  onPress={() => router.push(hubHref)}
-                />
+                <div className={styles.reassignDecisionAction}>
+                  <Button
+                    label={dshText.reassign.primaryDecisionLabel}
+                    tone="primary"
+                    size="sm"
+                    fullWidth={false}
+                    onPress={() => router.push(hubHref)}
+                  />
+                </div>
               </Box>
             </div>
             <div className={styles.reassignDecisionCard}>
@@ -270,13 +272,15 @@ export function ControlPanelDshReassignScreen({
                 <Text role="bodySm" tone="muted">
                   {dshText.reassign.secondaryDecisionDescription}
                 </Text>
-                <Button
-                  label={dshText.reassign.secondaryDecisionLabel}
-                  tone="secondary"
-                  size="sm"
-                  fullWidth={false}
-                  onPress={() => router.push(ordersHref)}
-                />
+                <div className={styles.reassignDecisionAction}>
+                  <Button
+                    label={dshText.reassign.secondaryDecisionLabel}
+                    tone="secondary"
+                    size="sm"
+                    fullWidth={false}
+                    onPress={() => router.push(ordersHref)}
+                  />
+                </div>
               </Box>
             </div>
             <div className={styles.reassignDecisionCard}>
@@ -293,13 +297,15 @@ export function ControlPanelDshReassignScreen({
                 <Text role="bodySm" tone="muted">
                   {dshText.reassign.supportDecisionDescription}
                 </Text>
-                <Button
-                  label={dshText.reassign.supportDecisionLabel}
-                  tone="danger"
-                  size="sm"
-                  fullWidth={false}
-                  onPress={() => router.push(supportHref)}
-                />
+                <div className={styles.reassignDecisionAction}>
+                  <Button
+                    label={dshText.reassign.supportDecisionLabel}
+                    tone="danger"
+                    size="sm"
+                    fullWidth={false}
+                    onPress={() => router.push(supportHref)}
+                  />
+                </div>
               </Box>
             </div>
           </div>

@@ -22,7 +22,7 @@ import { ControlPanelDshZoneSetScreen } from './operations/zone-set';
 import { ControlPanelDshMarketingScreen } from './marketing';
 
 const liveRouteHrefs = {
-  overview: '/operations',
+  overview: '/operations/dsh',
   orders: '/operations/dsh/orders',
   partners: '/operations/dsh/partners',
   catalogs: '/operations/dsh/catalogs',
@@ -293,7 +293,7 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
           items={tabs}
           onSelect={(workspaceId) => {
             if (workspaceId === 'overview') {
-              router.push('/operations');
+              router.push('/operations/dsh');
               return;
             }
 
@@ -302,22 +302,22 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
         />
       </Box>
 
-      {workspace === 'orders' ? <ControlPanelDshOrdersScreen embedded showHeader={false} hubHref="/operations" operationsHref="/operations" /> : null}
-      {workspace === 'order-detail' && orderId ? <ControlPanelDshOrderDetailScreen embedded showHeader={false} orderId={orderId} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
+      {workspace === 'orders' ? <ControlPanelDshOrdersScreen embedded showHeader={false} hubHref="/operations/dsh" operationsHref="/operations" /> : null}
+      {workspace === 'order-detail' && orderId ? <ControlPanelDshOrderDetailScreen embedded showHeader={false} orderId={orderId} hubHref="/operations/dsh" ordersHref="/operations/dsh/orders" /> : null}
       {workspace === 'orderchat' && orderId ? <ControlPanelDshOrderChatScreen embedded showHeader={false} orderId={orderId} ordersHref="/operations/dsh/orders" /> : null}
       {workspace === 'sheinproxy' ? (
         <ControlPanelDshManualAssignmentScreen
           requestId={orderId ?? 'shein-proxy-001'}
           stage="detail"
-          hubHref="/operations"
+          hubHref="/operations/dsh"
           operationsHref="/operations"
           supportHref="/support"
         />
       ) : null}
-      {workspace === 'reassign' ? <ControlPanelDshReassignScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
-      {workspace === 'peak-mode' ? <ControlPanelDshPeakModeScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
-      {workspace === 'bell' || workspace === 'arrival-bell' ? <ControlPanelDshBellScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
-      {workspace === 'zone-set' ? <ControlPanelDshZoneSetScreen embedded showHeader={false} hubHref="/operations" ordersHref="/operations/dsh/orders" /> : null}
+      {workspace === 'reassign' ? <ControlPanelDshReassignScreen embedded showHeader={false} hubHref="/operations/dsh" ordersHref="/operations/dsh/orders" /> : null}
+      {workspace === 'peak-mode' ? <ControlPanelDshPeakModeScreen embedded showHeader={false} hubHref="/operations/dsh" ordersHref="/operations/dsh/orders" /> : null}
+      {workspace === 'bell' || workspace === 'arrival-bell' ? <ControlPanelDshBellScreen embedded showHeader={false} hubHref="/operations/dsh" ordersHref="/operations/dsh/orders" /> : null}
+      {workspace === 'zone-set' ? <ControlPanelDshZoneSetScreen embedded showHeader={false} hubHref="/operations/dsh" ordersHref="/operations/dsh/orders" /> : null}
     </Box>
   );
 }

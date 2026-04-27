@@ -7,7 +7,7 @@ type DshRoutePageProps = {
 };
 
 export default async function DshOrderChatPage({ params }: DshRoutePageProps) {
-  await params;
+  const { id } = await params;
 
-  return <DshControlPanelSurfaceHost workspace="orderchat" />;
+  return <DshControlPanelSurfaceHost workspace="orderchat" orderId={id} />;
 }
