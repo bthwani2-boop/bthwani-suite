@@ -1,17 +1,18 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  useRouter } from 'next/navigation';
-import { Box,
+  Box,
+  Button,
+  Badge,
   StateView,
-  Text
+  Text,
+  StatCard,
 } from '@bthwani/ui-kit';
 import {
-  WebMissionHeroCard,
   WebPageFrame,
   WebSectionCard,
-  WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import { getDshReassignCandidates, getDshReassignSummary } from './reassign-fixtures';
@@ -28,7 +29,6 @@ function resolveStateCopy(text: ReturnType<typeof useDshControlPanelText>, state
       actionLabel: text.common.backToHub,
     };
   }
-
   if (state === 'empty') {
     return {
       stateId: 'empty' as const,
@@ -37,7 +37,6 @@ function resolveStateCopy(text: ReturnType<typeof useDshControlPanelText>, state
       actionLabel: text.common.backToHub,
     };
   }
-
   if (state === 'offline') {
     return {
       stateId: 'offline' as const,
@@ -46,7 +45,6 @@ function resolveStateCopy(text: ReturnType<typeof useDshControlPanelText>, state
       actionLabel: text.common.backToHub,
     };
   }
-
   if (state === 'disabled') {
     return {
       kind: 'warning' as const,
@@ -55,13 +53,18 @@ function resolveStateCopy(text: ReturnType<typeof useDshControlPanelText>, state
       actionLabel: text.common.backToHub,
     };
   }
-
   return {
     stateId: 'recoverableError' as const,
     title: text.reassign.stateErrorTitle,
     description: text.reassign.stateErrorDescription,
     actionLabel: text.common.backToHub,
   };
+}
+
+function resolvePriorityTone(priority: string): 'brand' | 'success' | 'warning' | 'danger' {
+  if (priority === 'عاجلة' || priority === 'Urgent') return 'danger';
+  if (priority === 'عادية' || priority === 'Normal') return 'success';
+  return 'warning';
 }
 
 export type ControlPanelDshReassignScreenProps = {
@@ -88,7 +91,6 @@ export function ControlPanelDshReassignScreen({
 
   if (state !== 'ready') {
     const stateCopy = resolveStateCopy(dshText, state);
-
     return (
       <WebPageFrame
         eyebrow={dshText.reassign.pageEyebrow}
@@ -103,6 +105,10 @@ export function ControlPanelDshReassignScreen({
     );
   }
 
+  const urgentCount = summary.urgentCases;
+  const blockedCount = summary.blockedCases;
+  const hasUrgent = urgentCount > 0;
+
   return (
     <WebPageFrame
       eyebrow={dshText.reassign.pageEyebrow}
@@ -112,63 +118,190 @@ export function ControlPanelDshReassignScreen({
       embedded={embedded}
       showHeader={showHeader}
     >
-      <div className={styles.stack}>
-        <WebMissionHeroCard
-          badges={['/operations/dsh/reassign', dshText.common.live, `${dshText.reassign.signals.active}: ${summary.activeCases}`]}
-          eyebrow={dshText.reassign.heroEyebrow}
-          title={dshText.reassign.heroTitle}
-          description={dshText.reassign.heroDescription}
-          metaItems={[
-            `${dshText.reassign.signals.urgent}: ${summary.urgentCases}`,
-            `${dshText.reassign.signals.blocked}: ${summary.blockedCases}`,
-            `${dshText.reassign.signals.fallbacks}: ${summary.readyFallbacks}`,
-          ]}
-          primaryAction={{ label: dshText.common.openOperationsWorkspace, href: hubHref }}
-          secondaryAction={{ label: dshText.common.openOrders, href: ordersHref }}
-        />
-
-        <div className={styles.signalGrid}>
-          <WebSignalCard title={dshText.reassign.signals.active} value={String(summary.activeCases)} description={dshText.reassign.signals.activeDescription} tone="best" />
-          <WebSignalCard title={dshText.reassign.signals.urgent} value={String(summary.urgentCases)} description={dshText.reassign.signals.urgentDescription} />
-          <WebSignalCard title={dshText.reassign.signals.blocked} value={String(summary.blockedCases)} description={dshText.reassign.signals.blockedDescription} />
-          <WebSignalCard title={dshText.reassign.signals.fallbacks} value={String(summary.readyFallbacks)} description={dshText.reassign.signals.fallbacksDescription} />
+      <div className={styles.reassignWorkspace}>
+        {/* ===== Metrics Strip ===== */}
+        <div className={styles.reassignMetricsStrip}>
+          <StatCard
+            label={dshText.reassign.signals.active}
+            value={String(summary.activeCases)}
+            tone="brand"
+          />
+          <StatCard
+            label={dshText.reassign.signals.urgent}
+            value={String(summary.urgentCases)}
+            tone={hasUrgent ? 'danger' : 'default'}
+          />
+          <StatCard
+            label={dshText.reassign.signals.blocked}
+            value={String(summary.blockedCases)}
+            tone={blockedCount > 0 ? 'warning' : 'default'}
+          />
+          <StatCard
+            label={dshText.reassign.signals.fallbacks}
+            value={String(summary.readyFallbacks)}
+            tone="success"
+          />
         </div>
 
-        <WebSectionCard title={dshText.reassign.candidatesTitle} description={dshText.reassign.candidatesDescription}>
-          <div className={styles.cardGrid}>
+        {/* ===== Context Summary ===== */}
+        <div className={styles.reassignContextBar}>
+          <div className={styles.reassignContextMain}>
+            <Text role="caption" tone={hasUrgent ? 'danger' : 'brand'}>
+              {dshText.reassign.heroEyebrow}
+            </Text>
+            <Text role="titleSm">
+              {dshText.reassign.heroTitle}
+            </Text>
+            <Text role="bodySm" tone="muted">
+              {dshText.reassign.heroDescription}
+            </Text>
+          </div>
+          <div className={styles.reassignContextActions}>
+            <Button
+              label={dshText.common.openOperationsWorkspace}
+              tone="primary"
+              size="sm"
+              fullWidth={false}
+              onPress={() => router.push(hubHref)}
+            />
+            <Button
+              label={dshText.common.openOrders}
+              tone="ghost"
+              size="sm"
+              fullWidth={false}
+              onPress={() => router.push(ordersHref)}
+            />
+          </div>
+        </div>
+
+        {/* ===== Reassign Candidates ===== */}
+        <WebSectionCard
+          title={dshText.reassign.candidatesTitle}
+          description={dshText.reassign.candidatesDescription}
+        >
+          <div className={styles.reassignCandidatesGrid}>
             {candidates.map((candidate) => (
-              <Box key={candidate.deliveryId} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-                <Box layoutDirection="row" justify="space-between" align="center">
-                  <Text role="bodyStrong">{candidate.deliveryId}</Text>
-                  <Text role="caption" tone={candidate.tone}>{candidate.statusLabel}</Text>
+              <div key={candidate.deliveryId} className={styles.reassignCandidateCard}>
+                <Box
+                  padding={4}
+                  gap={2}
+                  border
+                  radiusToken="xl"
+                  background="surfaceRaised"
+                >
+                  <div className={styles.reassignCandidateHeader}>
+                    <Text role="label" tone="soft">{candidate.deliveryId}</Text>
+                    <Badge
+                      label={candidate.statusLabel}
+                      tone={candidate.tone as 'brand' | 'success' | 'warning' | 'danger'}
+                    />
+                  </div>
+                  <Text role="bodyStrong">{candidate.orderId}</Text>
+                  <div className={styles.reassignCandidateMeta}>
+                    <Text role="caption" tone="soft">
+                      {candidate.reasonLabel}
+                    </Text>
+                    <Text role="caption" tone={resolvePriorityTone(candidate.priorityLabel)}>
+                      {candidate.priorityLabel}
+                    </Text>
+                    <Text role="caption" tone="muted">
+                      {dshText.reassign.currentCaptainLabel}: {candidate.currentCaptain}
+                    </Text>
+                    <Text role="caption" tone="muted">
+                      {dshText.reassign.fallbackCaptainLabel}: {candidate.fallbackCaptain}
+                    </Text>
+                  </div>
+                  <Text role="bodySm" tone="muted">
+                    {candidate.note}
+                  </Text>
+                  <Button
+                    label={dshText.common.openOperationsWorkspace}
+                    tone="primary"
+                    size="sm"
+                    fullWidth={false}
+                    onPress={() => router.push(hubHref)}
+                  />
                 </Box>
-                <Text role="bodySm">{candidate.orderId}</Text>
-                <Text role="caption" tone="soft">{candidate.reasonLabel} · {candidate.priorityLabel}</Text>
-                <Text role="bodySm" tone="muted">{dshText.reassign.currentCaptainLabel}: {candidate.currentCaptain}</Text>
-                <Text role="bodySm" tone="muted">{dshText.reassign.fallbackCaptainLabel}: {candidate.fallbackCaptain}</Text>
-                <Text role="bodySm" tone="muted">{candidate.note}</Text>
-              </Box>
+              </div>
             ))}
           </div>
         </WebSectionCard>
 
-        <WebSectionCard title={dshText.reassign.decisionTitle} description={dshText.reassign.decisionDescription}>
-          <div className={styles.cardGrid}>
-            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <Text role="bodyStrong">{dshText.reassign.primaryDecisionTitle}</Text>
-              <Text role="bodySm">{dshText.reassign.primaryDecisionLabel}</Text>
-              <Text role="bodySm" tone="muted">{dshText.reassign.primaryDecisionDescription}</Text>
-            </Box>
-            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <Text role="bodyStrong">{dshText.reassign.secondaryDecisionTitle}</Text>
-              <Text role="bodySm">{dshText.reassign.secondaryDecisionLabel}</Text>
-              <Text role="bodySm" tone="muted">{dshText.reassign.secondaryDecisionDescription}</Text>
-            </Box>
-            <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <Text role="bodyStrong">{dshText.reassign.supportDecisionTitle}</Text>
-              <Text role="bodySm">{dshText.reassign.supportDecisionLabel}</Text>
-              <Text role="bodySm" tone="muted">{dshText.reassign.supportDecisionDescription}</Text>
-            </Box>
+        {/* ===== Decision Logic ===== */}
+        <WebSectionCard
+          title={dshText.reassign.decisionTitle}
+          description={dshText.reassign.decisionDescription}
+        >
+          <div className={styles.reassignDecisionGrid}>
+            <div className={styles.reassignDecisionCard}>
+              <Box
+                padding={4}
+                gap={2}
+                border
+                radiusToken="xl"
+                background="surfaceRaised"
+              >
+                <Text role="bodyStrong" tone="brand">
+                  {dshText.reassign.primaryDecisionTitle}
+                </Text>
+                <Text role="bodySm" tone="muted">
+                  {dshText.reassign.primaryDecisionDescription}
+                </Text>
+                <Button
+                  label={dshText.reassign.primaryDecisionLabel}
+                  tone="primary"
+                  size="sm"
+                  fullWidth={false}
+                  onPress={() => router.push(hubHref)}
+                />
+              </Box>
+            </div>
+            <div className={styles.reassignDecisionCard}>
+              <Box
+                padding={4}
+                gap={2}
+                border
+                radiusToken="xl"
+                background="surfaceRaised"
+              >
+                <Text role="bodyStrong" tone="success">
+                  {dshText.reassign.secondaryDecisionTitle}
+                </Text>
+                <Text role="bodySm" tone="muted">
+                  {dshText.reassign.secondaryDecisionDescription}
+                </Text>
+                <Button
+                  label={dshText.reassign.secondaryDecisionLabel}
+                  tone="secondary"
+                  size="sm"
+                  fullWidth={false}
+                  onPress={() => router.push(ordersHref)}
+                />
+              </Box>
+            </div>
+            <div className={styles.reassignDecisionCard}>
+              <Box
+                padding={4}
+                gap={2}
+                border
+                radiusToken="xl"
+                background="surfaceRaised"
+              >
+                <Text role="bodyStrong" tone="danger">
+                  {dshText.reassign.supportDecisionTitle}
+                </Text>
+                <Text role="bodySm" tone="muted">
+                  {dshText.reassign.supportDecisionDescription}
+                </Text>
+                <Button
+                  label={dshText.reassign.supportDecisionLabel}
+                  tone="danger"
+                  size="sm"
+                  fullWidth={false}
+                  onPress={() => router.push(supportHref)}
+                />
+              </Box>
+            </div>
           </div>
         </WebSectionCard>
       </div>

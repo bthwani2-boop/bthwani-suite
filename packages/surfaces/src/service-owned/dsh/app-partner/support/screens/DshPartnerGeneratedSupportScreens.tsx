@@ -23,19 +23,13 @@ export type PartnerSupportScreenState = 'ready' | 'loading' | 'empty' | 'error' 
 
 export type PartnerSupportScreenId =
   | 'auction-status-update'
-  | 'audience-insights'
   | 'chat-read-ack'
   | 'chat-send'
-  | 'commission-by-mode'
   | 'doc-upload'
-  | 'identity-submit'
   | 'intake-start'
   | 'inventory-adjust'
   | 'inventory-update'
   | 'items-upsert'
-  | 'listing-status-update'
-  | 'manager-invite'
-  | 'team-management'
   | 'order-accept'
   | 'order-get'
   | 'order-handoff'
@@ -45,23 +39,17 @@ export type PartnerSupportScreenId =
   | 'order-ready'
   | 'order-reject'
   | 'order-store-delivered'
-  | 'profile-get'
   | 'quick-reply-config'
   | 'quick-reply-settings'
   | 'quick-reply-setup'
-  | 'staff-analytics'
   | 'store-nomination'
-  | 'store-service-modes-update'
-  | 'store-status-update'
-  | 'store-update'
-  | 'subscription'
   | 'video-upload';
 
 type SupportMetric = {
   label: string;
   value: string;
   deltaLabel?: string;
-  tone?: 'default' | 'success' | 'warning' | 'danger' | 'info';
+  tone?: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 };
 
 type SupportListItem = {
@@ -112,32 +100,6 @@ const partnerSupportConfigs: Record<PartnerSupportScreenId, SupportConfig> = {
       { label: 'Next sync', value: 'In 3 min' },
     ],
   },
-  'audience-insights': {
-    id: 'audience-insights',
-    title: 'تحليلات الجمهور والطلب',
-    subtitle: 'راجع الطلب والعروض والشرائح الأعلى قيمة قبل تعديل الخصومات.',
-    heroTitle: 'مزيج الطلب والعروض',
-    heroDescription: 'يفصل هذا السطح بين الطلب والأثر التسويقي حتى ترى ما الذي يستحق عرضًا أو اشتراكًا أو فيديوًّا قصيرًا.',
-    primaryLabel: 'تحديث نظرة النمو',
-    secondaryLabel: 'Back to support directory',
-    metrics: [
-      { label: 'العائد المتكرر', value: '61%', deltaLabel: 'آخر 7 أيام', tone: 'success' },
-      { label: 'أثر العرض', value: '8%', deltaLabel: 'خصم قصير', tone: 'warning' },
-      { label: 'الفئة الأعلى', value: '5', deltaLabel: 'تقود الطلب', tone: 'info' },
-      { label: 'فرص الترقية', value: '2', deltaLabel: 'بثواني برو', tone: 'brand' },
-    ],
-    keyValues: [
-      { label: 'تشغيلي', value: 'تتبّع الضغط بين الطلبات العاجلة والمخزون المنخفض', tone: 'brand' },
-      { label: 'تسويقي', value: 'الخصم القصير أقوى عندما يرتبط بفئة أو اشتراك واضح', tone: 'warning' },
-      { label: 'الطلب', value: 'الفئات الأعلى دورانًا تستحق الظهور الأول', tone: 'info' },
-      { label: 'التوصية', value: 'ابدأ بعرض واحد ثم اربطه بمنتج أو فئة واحدة', tone: 'success' },
-    ],
-    listItems: [
-      { title: 'العروض المؤثرة', subtitle: 'اربط الخصم القصير بفئة أو اشتراك أو منتج واضح.', meta: 'Offer lift', badgeLabel: 'Offers' },
-      { title: 'الفئات الأعلى طلبًا', subtitle: 'امنح الفئات الأسرع حركة أولوية أعلى في العرض.', meta: 'Category mix', badgeLabel: 'Mix' },
-      { title: 'الخطوة التالية', subtitle: 'انقل الجمهور إلى subscription أو video-upload من نفس المسار.', meta: 'Actionable', badgeLabel: 'Next' },
-    ],
-  },
   'chat-read-ack': {
     id: 'chat-read-ack',
     title: 'Chat read acknowledgement',
@@ -161,20 +123,6 @@ const partnerSupportConfigs: Record<PartnerSupportScreenId, SupportConfig> = {
     secondaryLabel: 'Insert quick reply',
     inputLabel: 'Message',
     inputHint: 'Example: order is packed and ready at handoff counter 2.',
-  },
-  'commission-by-mode': {
-    id: 'commission-by-mode',
-    title: 'العمولة حسب الوضع',
-    subtitle: 'قارن أثر العمولة عبر التوصيل والاستلام والوضع المجدول قبل تغيير العرض أو الاشتراك.',
-    heroTitle: 'المزيج التجاري',
-    heroDescription: 'يفصل هذا السطح أثر الوضع عن القرار التسويقي حتى تبقى الهوامش والخصومات واضحة.',
-    primaryLabel: 'تحديث صورة العمولة',
-    secondaryLabel: 'Back to support directory',
-    metrics: [
-      { label: 'التوصيل', value: '18%', deltaLabel: 'صافي العمولة', tone: 'default' },
-      { label: 'الاستلام', value: '11%', deltaLabel: 'صافي العمولة', tone: 'success' },
-      { label: 'المجدول', value: '15%', deltaLabel: 'صافي العمولة', tone: 'info' },
-    ],
   },
   'doc-upload': {
     id: 'doc-upload',
@@ -202,20 +150,6 @@ const partnerSupportConfigs: Record<PartnerSupportScreenId, SupportConfig> = {
       { label: 'Source', value: 'Partner app' },
       { label: 'Approval owner', value: 'Marketing team', tone: 'warning' },
       { label: 'Client visibility', value: 'Only after publish', tone: 'success' },
-    ],
-  },
-  'identity-submit': {
-    id: 'identity-submit',
-    title: 'Identity submit',
-    subtitle: 'Capture the branch owner or manager identity pack for verification.',
-    heroTitle: 'Identity verification',
-    heroDescription: 'Identity capture stays separate from store profile editing so compliance remains audit-friendly.',
-    primaryLabel: 'Submit identity pack',
-    secondaryLabel: 'Back to support directory',
-    keyValues: [
-      { label: 'Owner name', value: 'Khaled A.' },
-      { label: 'Document status', value: 'Pending submission', tone: 'warning' },
-      { label: 'Verification SLA', value: '24 hours' },
     ],
   },
   'intake-start': {
@@ -291,53 +225,6 @@ const partnerSupportConfigs: Record<PartnerSupportScreenId, SupportConfig> = {
       { title: 'خريطة الأعمدة', subtitle: 'طابق الأعمدة قبل استيراد الدفعة.', meta: 'CSV mapping', badgeLabel: 'CSV' },
       { title: 'تعديل الأسعار', subtitle: 'غيّر السعر على أكثر من عنصر من نفس المسار.', meta: 'Mass edit', badgeLabel: 'Bulk' },
     ],
-  },
-  'listing-status-update': {
-    id: 'listing-status-update',
-    title: 'Listing status update',
-    subtitle: 'Change storefront visibility while keeping branch operations intact.',
-    heroTitle: 'Customer-facing listing state',
-    heroDescription: 'Listing visibility is separated from branch-open status so teams can pause discovery without closing the store.',
-    primaryLabel: 'Update listing status',
-    secondaryLabel: 'Back to support directory',
-    keyValues: [
-      { label: 'Current visibility', value: 'Visible' },
-      { label: 'Reason preset', value: 'Menu refresh' },
-      { label: 'Expected restore', value: '20 min' },
-    ],
-  },
-  'manager-invite': {
-    id: 'manager-invite',
-    title: 'دعوة مدير',
-    subtitle: 'أضف مديرًا جديدًا بصلاحيات تشغيلية محدودة وواضحة.',
-    heroTitle: 'صلاحية فرعية على مستوى الفرع',
-    heroDescription: 'دعوة المدير تظل خطوة واحدة واضحة قبل توسيع الصلاحيات لاحقًا.',
-    primaryLabel: 'إرسال الدعوة',
-    secondaryLabel: 'العودة إلى الدليل',
-    inputLabel: 'بريد أو هاتف المدير',
-    inputHint: 'مثال: branch.manager@bthwani.sa',
-  },
-  'team-management': {
-    id: 'team-management',
-    title: 'إدارة طاقم الشريك',
-    subtitle: 'أضف الطاقم وحدد الأدوار بوضوح دون خلط بين التشغيل والكتالوج.',
-    heroTitle: 'إدارة طاقم الشريك',
-    heroDescription: 'Create, invite, and assign roles to branch staff. Use the new role "موصل" for delivery-only staff.',
-    primaryLabel: 'دعوة موظف',
-    secondaryLabel: 'العودة إلى الدليل',
-    primaryHint: 'يمكنك إنشاء حتى 3 موظفين وتحديد صلاحياتهم التشغيلية والمالية بدقة.',
-    keyValues: [
-      { label: 'Allowed staff', value: '3' },
-      { label: 'Active managers', value: '1' },
-      { label: 'Delivery role', value: 'موصل', tone: 'brand' },
-    ],
-    listItems: [
-      { title: 'Khaled A.', subtitle: 'Manager', meta: 'Full access', badgeLabel: 'Manager' },
-      { title: 'Sami H.', subtitle: 'موصل', meta: 'Delivery-only', badgeLabel: 'موصل' },
-      { title: 'Lina M.', subtitle: 'Staff', meta: 'Catalog + orders', badgeLabel: 'Staff' },
-    ],
-    inputLabel: 'Employee email or phone',
-    inputHint: 'Example: staff@bthwani.sa',
   },
   'order-accept': {
     id: 'order-accept',
@@ -459,20 +346,6 @@ const partnerSupportConfigs: Record<PartnerSupportScreenId, SupportConfig> = {
       { label: 'Next step', value: 'Close order', tone: 'brand' },
     ],
   },
-  'profile-get': {
-    id: 'profile-get',
-    title: 'Partner profile',
-    subtitle: 'Read the current branch profile and ownership summary.',
-    heroTitle: 'Branch identity snapshot',
-    heroDescription: 'Use this view to validate the currently active branch profile before applying updates.',
-    primaryLabel: 'Refresh profile',
-    secondaryLabel: 'Back to support directory',
-    keyValues: [
-      { label: 'Store', value: 'Burger Lab' },
-      { label: 'Branch manager', value: 'Khaled A.' },
-      { label: 'Verification', value: 'Approved', tone: 'success' },
-    ],
-  },
   'quick-reply-config': {
     id: 'quick-reply-config',
     title: 'Quick reply config',
@@ -511,21 +384,6 @@ const partnerSupportConfigs: Record<PartnerSupportScreenId, SupportConfig> = {
     inputLabel: 'Quick reply text',
     inputHint: 'Example: captain is 3 minutes away from the branch.',
   },
-  'staff-analytics': {
-    id: 'staff-analytics',
-    title: 'تحليلات التشغيل',
-    subtitle: 'راجع إيقاع الفريق وحِمل التنفيذ قبل أن تتراجع الخدمة.',
-    heroTitle: 'رؤية الفريق',
-    heroDescription: 'يساعد هذا السطح على فهم ضغط الفريق قبل الذروة.',
-    primaryLabel: 'تحديث التحليلات',
-    secondaryLabel: 'Back to support directory',
-    metrics: [
-      { label: 'متوسط التحضير', value: '11 min', deltaLabel: 'اليوم', tone: 'default' },
-      { label: 'الطاقم النشط', value: '3', deltaLabel: 'الوردية الحالية', tone: 'info' },
-      { label: 'قمم الضغط', value: '2', deltaLabel: 'آخر 4 ساعات', tone: 'warning' },
-      { label: 'طلبات متأخرة', value: '1', deltaLabel: 'تحتاج دعمًا', tone: 'brand' },
-    ],
-  },
   'store-nomination': {
     id: 'store-nomination',
     title: 'Store nomination',
@@ -536,74 +394,6 @@ const partnerSupportConfigs: Record<PartnerSupportScreenId, SupportConfig> = {
     secondaryLabel: 'Back to support directory',
     inputLabel: 'Nomination summary',
     inputHint: 'Example: northern branch with strong delivery demand and verified kitchen readiness.',
-  },
-  'store-service-modes-update': {
-    id: 'store-service-modes-update',
-    title: 'Store service modes update',
-    subtitle: 'Publish service mode availability from a focused branch control surface.',
-    heroTitle: 'Mode publication',
-    heroDescription: 'This view separates mode publication from the broader maintenance workspace when a precise audit trail is needed.',
-    primaryLabel: 'Publish service mode changes',
-    secondaryLabel: 'Back to support directory',
-    keyValues: [
-      { label: 'Delivery', value: 'Enabled', tone: 'success' },
-      { label: 'Pickup', value: 'Enabled', tone: 'success' },
-      { label: 'Scheduled', value: 'Disabled', tone: 'warning' },
-    ],
-  },
-  'store-status-update': {
-    id: 'store-status-update',
-    title: 'Store status update',
-    subtitle: 'Change whether the branch is open for DSH operations.',
-    heroTitle: 'Branch live state',
-    heroDescription: 'Closing the branch should remain a deliberate decision with a visible operational reason.',
-    primaryLabel: 'Update store status',
-    secondaryLabel: 'Back to support directory',
-    keyValues: [
-      { label: 'Current state', value: 'Open' },
-      { label: 'Reason preset', value: 'Temporary pause' },
-      { label: 'Restore target', value: '15 min' },
-    ],
-  },
-  'store-update': {
-    id: 'store-update',
-    title: 'Store update',
-    subtitle: 'Apply store profile changes from a dedicated branch-edit screen.',
-    heroTitle: 'Branch profile editing',
-    heroDescription: 'Use this workspace for structural branch edits that should not be mixed with order flow decisions.',
-    primaryLabel: 'Save store updates',
-    secondaryLabel: 'Back to support directory',
-    inputLabel: 'Store update summary',
-    inputHint: 'Example: branch phone, contact email, and branch note changes.',
-  },
-  subscription: {
-    id: 'subscription',
-    title: 'بثواني برو',
-    subtitle: 'مراجعة حالة الاشتراك والعائلة والخصومات ومسار الترقية من صفحة واحدة.',
-    heroTitle: 'الاشتراك التجاري',
-    heroDescription: 'تظهر الخطة الحالية والمزامنة والعائلة والفرصة التالية بوضوح حتى تبقى قرارات الفرع سريعة ومفهومة.',
-    primaryLabel: 'إدارة الاشتراك',
-    secondaryLabel: 'العودة إلى الدليل',
-    primaryHint: 'العائلة جزء من الخطة وليست منتجًا منفصلًا.',
-    keyValues: [
-      { label: 'الخطة الحالية', value: 'بثواني برو', tone: 'brand' },
-      { label: 'العائلة', value: 'مفعلة' },
-      { label: 'الخصم', value: 'مرتبط بالعروض', tone: 'warning' },
-      { label: 'الترقية', value: 'متاحة الآن', tone: 'brand' },
-      { label: 'المزامنة', value: 'مباشر', tone: 'success' },
-    ],
-    metrics: [
-      { label: 'الخطة الحالية', value: 'فردي / عائلي', deltaLabel: 'قابلة للترقية', tone: 'info' },
-      { label: 'التجديد', value: 'قريب', deltaLabel: 'واضح وسريع', tone: 'default' },
-      { label: 'المزامنة', value: 'مباشر', deltaLabel: 'بدون ضوضاء', tone: 'success' },
-      { label: 'الترقية', value: '1 خطوة', deltaLabel: 'جاهزة', tone: 'brand' },
-    ],
-    listItems: [
-      { title: 'الخطة الحالية', subtitle: 'اعرض الباقة النشطة قبل أي تعديل.', meta: 'بثواني برو', badgeLabel: 'رئيسي' },
-      { title: 'أفراد العائلة', subtitle: 'أضف أو راجع الأفراد المرتبطين بالخطة.', meta: 'إدارة', badgeLabel: 'عائلة' },
-      { title: 'العروض والخصومات', subtitle: 'اربط الاشتراك بعرض واضح أو منفعة إضافية.', meta: 'Offer-ready', badgeLabel: 'عرض' },
-      { title: 'الترقية', subtitle: 'انتقل إلى باقة أعلى عند الحاجة.', meta: 'CTA', badgeLabel: 'ترقية' },
-    ],
   },
 };
 
@@ -982,19 +772,13 @@ export function DshPartnerVideoUploadScreen({
 }
 
 export const DshPartnerAuctionStatusUpdateScreen = createPartnerSupportScreen(partnerSupportConfigs['auction-status-update']);
-export const DshPartnerAudienceInsightsGetScreen = createPartnerSupportScreen(partnerSupportConfigs['audience-insights']);
 export const DshPartnerChatReadAckScreen = createPartnerSupportScreen(partnerSupportConfigs['chat-read-ack']);
 export const DshPartnerChatSendScreen = createPartnerSupportScreen(partnerSupportConfigs['chat-send']);
-export const DshPartnerCommissionByModeGetScreen = createPartnerSupportScreen(partnerSupportConfigs['commission-by-mode']);
 export const DshPartnerDocUploadScreen = createPartnerSupportScreen(partnerSupportConfigs['doc-upload']);
-export const DshPartnerIdentitySubmitScreen = createPartnerSupportScreen(partnerSupportConfigs['identity-submit']);
 export const DshPartnerIntakeStartScreen = createPartnerSupportScreen(partnerSupportConfigs['intake-start']);
 export const DshPartnerInventoryAdjustScreen = createPartnerSupportScreen(partnerSupportConfigs['inventory-adjust']);
 export const DshPartnerInventoryUpdateScreen = createPartnerSupportScreen(partnerSupportConfigs['inventory-update']);
 export const DshPartnerItemsUpsertScreen = createPartnerSupportScreen(partnerSupportConfigs['items-upsert']);
-export const DshPartnerListingStatusUpdateScreen = createPartnerSupportScreen(partnerSupportConfigs['listing-status-update']);
-export const DshPartnerManagerInviteScreen = createPartnerSupportScreen(partnerSupportConfigs['manager-invite']);
-export const DshPartnerTeamManagementScreen = createPartnerSupportScreen(partnerSupportConfigs['team-management']);
 export const DshPartnerOrderAcceptScreen = createPartnerSupportScreen(partnerSupportConfigs['order-accept']);
 export const DshPartnerOrderGetScreen = createPartnerSupportScreen(partnerSupportConfigs['order-get']);
 export const DshPartnerOrderHandoffScreen = createPartnerSupportScreen(partnerSupportConfigs['order-handoff']);
@@ -1004,13 +788,7 @@ export const DshPartnerOrderPrepareScreen = createPartnerSupportScreen(partnerSu
 export const DshPartnerOrderReadyScreen = createPartnerSupportScreen(partnerSupportConfigs['order-ready']);
 export const DshPartnerOrderRejectScreen = createPartnerSupportScreen(partnerSupportConfigs['order-reject']);
 export const DshPartnerOrderStoreDeliveredScreen = createPartnerSupportScreen(partnerSupportConfigs['order-store-delivered']);
-export const DshPartnerProfileGetScreen = createPartnerSupportScreen(partnerSupportConfigs['profile-get']);
 export const DshPartnerQuickReplyConfigGetScreen = createPartnerSupportScreen(partnerSupportConfigs['quick-reply-config']);
 export const DshPartnerQuickReplySettingsScreen = createPartnerSupportScreen(partnerSupportConfigs['quick-reply-settings']);
 export const DshPartnerQuickReplySetupScreen = createPartnerSupportScreen(partnerSupportConfigs['quick-reply-setup']);
-export const DshPartnerStaffAnalyticsGetScreen = createPartnerSupportScreen(partnerSupportConfigs['staff-analytics']);
 export const DshPartnerStoreNominationScreen = createPartnerSupportScreen(partnerSupportConfigs['store-nomination']);
-export const DshPartnerStoreServiceModesUpdateScreen = createPartnerSupportScreen(partnerSupportConfigs['store-service-modes-update']);
-export const DshPartnerStoreStatusUpdateScreen = createPartnerSupportScreen(partnerSupportConfigs['store-status-update']);
-export const DshPartnerStoreUpdateScreen = createPartnerSupportScreen(partnerSupportConfigs['store-update']);
-export const DshPartnerSubscriptionScreen = createPartnerSupportScreen(partnerSupportConfigs.subscription);

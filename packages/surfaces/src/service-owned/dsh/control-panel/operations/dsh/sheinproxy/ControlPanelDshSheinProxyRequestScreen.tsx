@@ -8,6 +8,7 @@ import {
   Card,
   CompactStatusStepper,
   KeyValueList,
+  StatCard,
   StateView,
   StickyActionBar,
   Tabs,
@@ -15,10 +16,8 @@ import {
   TextField,
 } from '@bthwani/ui-kit';
 import {
-  WebMissionHeroCard,
   WebPageFrame,
   WebSectionCard,
-  WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 
@@ -60,14 +59,9 @@ const stageSteps: Array<{ id: string; label: string; state: 'complete' | 'curren
 function resolveStepperState(currentStage: AssignmentStage) {
   const stages: AssignmentStage[] = ['detail', 'estimate', 'offer', 'schedule'];
   const currentIndex = stages.indexOf(currentStage);
-
   return stages.map((stage, index) => {
-    if (index < currentIndex) {
-      return { id: stage, label: stageSteps[index].label, state: 'complete' as const };
-    }
-    if (index === currentIndex) {
-      return { id: stage, label: stageSteps[index].label, state: 'current' as const };
-    }
+    if (index < currentIndex) return { id: stage, label: stageSteps[index].label, state: 'complete' as const };
+    if (index === currentIndex) return { id: stage, label: stageSteps[index].label, state: 'current' as const };
     return { id: stage, label: stageSteps[index].label, state: 'pending' as const };
   });
 }
@@ -76,63 +70,21 @@ function resolveStateCopy(
   text: ReturnType<typeof useDshControlPanelText>,
   state: Exclude<ManualAssignmentScreenState, 'ready'>,
 ) {
-  if (state === 'loading') {
-    return {
-      stateId: 'loading' as const,
-      title: text.sheinProxy.stateLoadingTitle,
-      description: text.sheinProxy.stateLoadingDescription,
-      actionLabel: text.sheinProxy.retryLabel,
-    };
-  }
-
-  if (state === 'empty') {
-    return {
-      stateId: 'empty' as const,
-      title: text.sheinProxy.stateEmptyTitle,
-      description: text.sheinProxy.stateEmptyDescription,
-      actionLabel: text.sheinProxy.backToHub,
-    };
-  }
-
-  if (state === 'offline') {
-    return {
-      stateId: 'offline' as const,
-      title: text.sheinProxy.stateOfflineTitle,
-      description: text.sheinProxy.stateOfflineDescription,
-      actionLabel: text.sheinProxy.retryLabel,
-    };
-  }
-
-  if (state === 'disabled') {
-    return {
-      kind: 'warning' as const,
-      title: text.sheinProxy.stateDisabledTitle,
-      description: text.sheinProxy.stateDisabledDescription,
-      actionLabel: text.sheinProxy.backToHub,
-    };
-  }
-
-  return {
-    stateId: 'recoverableError' as const,
-    title: text.sheinProxy.stateErrorTitle,
-    description: text.sheinProxy.stateErrorDescription,
-    actionLabel: text.sheinProxy.retryLabel,
-  };
+  if (state === 'loading')
+    return { stateId: 'loading' as const, title: text.sheinProxy.stateLoadingTitle, description: text.sheinProxy.stateLoadingDescription, actionLabel: text.sheinProxy.retryLabel };
+  if (state === 'empty')
+    return { stateId: 'empty' as const, title: text.sheinProxy.stateEmptyTitle, description: text.sheinProxy.stateEmptyDescription, actionLabel: text.sheinProxy.backToHub };
+  if (state === 'offline')
+    return { stateId: 'offline' as const, title: text.sheinProxy.stateOfflineTitle, description: text.sheinProxy.stateOfflineDescription, actionLabel: text.sheinProxy.retryLabel };
+  if (state === 'disabled')
+    return { kind: 'warning' as const, title: text.sheinProxy.stateDisabledTitle, description: text.sheinProxy.stateDisabledDescription, actionLabel: text.sheinProxy.backToHub };
+  return { stateId: 'recoverableError' as const, title: text.sheinProxy.stateErrorTitle, description: text.sheinProxy.stateErrorDescription, actionLabel: text.sheinProxy.retryLabel };
 }
 
 function resolveStageMeta(stage: AssignmentStage) {
-  if (stage === 'estimate') {
-    return { label: 'التقدير', description: 'راجع افتراضات التكلفة قبل الإسناد.' };
-  }
-
-  if (stage === 'offer') {
-    return { label: 'العرض', description: 'الدفعة جاهزة للتأكيد أو المراجعة.' };
-  }
-
-  if (stage === 'schedule') {
-    return { label: 'الجدولة', description: 'ثبّت نافذة الاستلام أو التسليم.' };
-  }
-
+  if (stage === 'estimate') return { label: 'التقدير', description: 'راجع افتراضات التكلفة قبل الإسناد.' };
+  if (stage === 'offer') return { label: 'العرض', description: 'الدفعة جاهزة للتأكيد أو المراجعة.' };
+  if (stage === 'schedule') return { label: 'الجدولة', description: 'ثبّت نافذة الاستلام أو التسليم.' };
   return { label: 'التفاصيل', description: 'راجع حمولة الإسناد ونطاق المسار.' };
 }
 
@@ -173,12 +125,10 @@ export function ControlPanelDshSheinProxyRequestScreen({
     const normalizedDropoff = dropoffNode.trim();
     const parsedCustomers = Number(customerCount.trim());
     const parsedCaptains = Number(captainCount.trim());
-
     if (!normalizedReference || !normalizedPickup || !normalizedDropoff) return false;
     if (Number.isNaN(parsedCustomers) || parsedCustomers < 1) return false;
     if (Number.isNaN(parsedCaptains) || parsedCaptains < 1) return false;
     if (mode === 'scheduled' && (!scheduleDate.trim() || !scheduleTime.trim())) return false;
-
     return true;
   }, [assignmentReference, pickupNode, dropoffNode, customerCount, captainCount, mode, scheduleDate, scheduleTime]);
 
@@ -188,27 +138,22 @@ export function ControlPanelDshSheinProxyRequestScreen({
     const normalizedDropoff = dropoffNode.trim();
     const parsedCustomers = Number(customerCount.trim());
     const parsedCaptains = Number(captainCount.trim());
-
     if (!normalizedReference || !normalizedPickup || !normalizedDropoff) {
       setValidationError('املأ المرجع ونقطة الاستلام ونقطة التسليم أولًا.');
       return false;
     }
-
     if (Number.isNaN(parsedCustomers) || parsedCustomers < 1) {
       setValidationError('عدد العملاء يجب أن يكون رقمًا يبدأ من 1.');
       return false;
     }
-
     if (Number.isNaN(parsedCaptains) || parsedCaptains < 1) {
       setValidationError('عدد الكباتن يجب أن يكون رقمًا يبدأ من 1.');
       return false;
     }
-
     if (mode === 'scheduled' && (!scheduleDate.trim() || !scheduleTime.trim())) {
       setValidationError('اختر التاريخ والوقت عند التنفيذ لاحقًا.');
       return false;
     }
-
     setValidationError(null);
     return true;
   };
@@ -218,16 +163,12 @@ export function ControlPanelDshSheinProxyRequestScreen({
       setValidationError('أضف مرجعًا للاستمارة قبل الحفظ.');
       return;
     }
-
     setValidationError(null);
     setDraftSaved(true);
   };
 
   const handleSubmit = () => {
-    if (!validate()) {
-      return;
-    }
-
+    if (!validate()) return;
     setSubmitted(true);
   };
 
@@ -240,11 +181,18 @@ export function ControlPanelDshSheinProxyRequestScreen({
     { label: 'الخطوة', value: stageMeta.label },
   ];
 
-  const stickyActions = [
-    { label: 'حفظ مسودة', tone: 'ghost' as const, onPress: handleSaveDraft, disabled: !assignmentReference.trim() },
-    { label: 'إسناد الآن', tone: 'primary' as const, onPress: handleSubmit, disabled: !isFormValid },
-    { label: 'العودة للقائمة', tone: 'secondary' as const, onPress: () => router.push(listHref) },
-  ];
+  const primaryAction = {
+    label: 'إسناد الآن',
+    tone: 'primary' as const,
+    onPress: handleSubmit,
+    disabled: !isFormValid,
+  };
+  const secondaryAction = {
+    label: 'حفظ مسودة',
+    tone: 'ghost' as const,
+    onPress: handleSaveDraft,
+    disabled: !assignmentReference.trim(),
+  };
 
   if (resolvedState !== 'ready') {
     return (
@@ -259,11 +207,7 @@ export function ControlPanelDshSheinProxyRequestScreen({
         <StateView
           {...resolveStateCopy(dshText, resolvedState)}
           onActionPress={() => {
-            if (resolvedState === 'loading' || resolvedState === 'offline' || resolvedState === 'error') {
-              router.refresh();
-              return;
-            }
-
+            if (resolvedState === 'loading' || resolvedState === 'offline' || resolvedState === 'error') { router.refresh(); return; }
             router.push(listHref);
           }}
         />
@@ -280,44 +224,43 @@ export function ControlPanelDshSheinProxyRequestScreen({
       embedded={embedded}
       showHeader={showHeader}
     >
-      <Box gap={4}>
-        <WebMissionHeroCard
-          compact
-          badges={[family.toUpperCase(), stageMeta.label, requestId]}
-          eyebrow={dshText.sheinProxy.heroEyebrow}
-          title={dshText.sheinProxy.heroTitle}
-          description={stageMeta.description}
-          metaItems={[
-            `${familyOptions.find((f) => f.value === family)?.description ?? ''}`,
-            `النمط: ${mode === 'now' ? 'الآن' : 'مجدول'}`,
-          ]}
-          primaryAction={{ label: dshText.sheinProxy.backToList, href: listHref }}
-          secondaryAction={{ label: dshText.common.openGeneralOperations, href: operationsHref }}
-        />
-
-        <WebSectionCard title="تقدم الإسناد" description={`الخطوة الحالية: ${stageMeta.label}`}>
-          <CompactStatusStepper
-            steps={stepperItems}
-            activeStepId={stage}
-          />
-        </WebSectionCard>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-          <WebSignalCard title="الفئات" value="3" description="SHEIN، عونك، وأخرى." tone="neutral" />
-          <WebSignalCard title="العملاء" value={customerCount || '1'} description="عدد العملاء في الدفعة." tone="best" />
-          <WebSignalCard title="الكباتن" value={captainCount || '1'} description="عدد الكباتن المخصصين." tone="info" />
-          <WebSignalCard title="الخطوة" value={stageMeta.label} description={stageMeta.description} tone="brand" />
+      <div style={{ display: 'grid', gap: '20px', direction: 'rtl', textAlign: 'right' }}>
+        {/* ===== Context Summary Bar ===== */}
+        <div style={{
+          display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between',
+          gap: '16px', padding: '20px 24px',
+          background: 'linear-gradient(135deg, rgba(10,47,92,0.04) 0%, rgba(255,80,13,0.03) 100%)',
+          border: '1px solid rgba(10,47,92,0.08)', borderRadius: '16px',
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0, flex: 1 }}>
+            <Text role="caption" tone="brand">{dshText.sheinProxy.heroEyebrow}</Text>
+            <Text role="titleSm">{dshText.sheinProxy.heroTitle}</Text>
+            <Text role="bodySm" tone="muted">{stageMeta.description}</Text>
+            <Text role="caption" tone="soft">{family.toUpperCase()} · {stageMeta.label} · {requestId}</Text>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+            <Button label={dshText.sheinProxy.backToList} tone="ghost" size="sm" fullWidth={false} onPress={() => router.push(listHref)} />
+            <Button label={dshText.common.openGeneralOperations} tone="secondary" size="sm" fullWidth={false} onPress={() => router.push(operationsHref)} />
+          </div>
         </div>
 
+        {/* ===== Operational Metrics ===== */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+          <StatCard label="الفئات" value="3" deltaLabel="SHEIN، عونك، وأخرى" tone="brand" />
+          <StatCard label="العملاء" value={customerCount || '1'} deltaLabel="عدد العملاء في الدفعة" tone="success" />
+          <StatCard label="الكباتن" value={captainCount || '1'} deltaLabel="عدد الكباتن المخصصين" tone="info" />
+          <StatCard label="الخطوة" value={stageMeta.label} deltaLabel={stageMeta.description} tone="warning" />
+        </div>
+
+        {/* ===== Assignment Progress ===== */}
+        <WebSectionCard title="تقدم الإسناد" description={`الخطوة الحالية: ${stageMeta.label}`}>
+          <CompactStatusStepper steps={stepperItems} activeStepId={stage} />
+        </WebSectionCard>
+
+        {/* ===== Assignment Identity ===== */}
         <WebSectionCard title="هوية الإسناد" description="اختر الفئة وأعطِ الدفعة مرجعًا ثابتًا.">
           <Box gap={3}>
-            <Tabs<AssignmentFamily>
-              items={familyOptions}
-              value={family}
-              onValueChange={(value) => setFamily(value)}
-              variant="pill"
-            />
-
+            <Tabs<AssignmentFamily> items={familyOptions} value={family} onValueChange={(value) => setFamily(value)} variant="pill" />
             <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
               <Box style={{ flex: 1, minWidth: 240 }}>
                 <TextField label="مرجع الإسناد" value={assignmentReference} onChangeText={setAssignmentReference} placeholder="DSH-ASSIGN-0001" />
@@ -332,6 +275,7 @@ export function ControlPanelDshSheinProxyRequestScreen({
           </Box>
         </WebSectionCard>
 
+        {/* ===== Batch Planning ===== */}
         <WebSectionCard title="تخطيط الدفعة" description="خطط لتجميع العملاء وتخصيص الكباتن قبل إرسال الإسناد.">
           <Box gap={3}>
             <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
@@ -342,14 +286,7 @@ export function ControlPanelDshSheinProxyRequestScreen({
                 <TextField label="عدد الكباتن" value={captainCount} onChangeText={setCaptainCount} keyboardType="number-pad" placeholder="1" />
               </Box>
             </Box>
-
-            <Tabs<AssignmentMode>
-              items={modeOptions}
-              value={mode}
-              onValueChange={(value) => setMode(value)}
-              variant="pill"
-            />
-
+            <Tabs<AssignmentMode> items={modeOptions} value={mode} onValueChange={(value) => setMode(value)} variant="pill" />
             {mode === 'scheduled' ? (
               <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
                 <Box style={{ flex: 1, minWidth: 180 }}>
@@ -363,26 +300,20 @@ export function ControlPanelDshSheinProxyRequestScreen({
           </Box>
         </WebSectionCard>
 
+        {/* ===== Operational Notes ===== */}
         <WebSectionCard title="ملاحظات تشغيلية" description="استخدم هذا الحقل لتعليمات الترتيب، التعبئة، المسار، أو المعالجة الخاصة.">
           <Box gap={2}>
             <TextField label="الملاحظات" value={notes} onChangeText={setNotes} placeholder="تعليمات الترتيب، التعبئة، المسار، أو التسليم" />
-            {validationError ? (
-              <Text role="bodySm" tone="danger">{validationError}</Text>
-            ) : null}
-            {draftSaved ? (
-              <Text role="bodySm" tone="success">تم حفظ المسودة محليًا لهذا الإسناد اليدوي.</Text>
-            ) : null}
-            {submitted ? (
-              <Text role="bodySm" tone="success">الإسناد جاهز للخطوة التشغيلية التالية.</Text>
-            ) : null}
+            {validationError ? <Text role="bodySm" tone="danger">{validationError}</Text> : null}
+            {draftSaved ? <Text role="bodySm" tone="success">تم حفظ المسودة محليًا لهذا الإسناد اليدوي.</Text> : null}
+            {submitted ? <Text role="bodySm" tone="success">الإسناد جاهز للخطوة التشغيلية التالية.</Text> : null}
           </Box>
         </WebSectionCard>
 
+        {/* ===== Assignment Preview ===== */}
         <WebSectionCard title="معاينة الإسناد" description="المعاينة تحافظ على أهم الحقائق التشغيلية مرئية بدون تكرار الاستمارة.">
           <Box gap={2}>
-            <Card>
-              <KeyValueList items={summaryItems} />
-            </Card>
+            <Card><KeyValueList items={summaryItems} /></Card>
             <Card>
               <Box gap={2}>
                 <Text role="bodyStrong">لا يوجد مسار شريك</Text>
@@ -393,10 +324,15 @@ export function ControlPanelDshSheinProxyRequestScreen({
           </Box>
         </WebSectionCard>
 
+        {/* ===== Sticky Action Bar ===== */}
         <StickyActionBar
-          actions={stickyActions}
+          primaryAction={primaryAction}
+          secondaryAction={secondaryAction}
+          note={
+            validationError ?? (draftSaved ? 'تم حفظ المسودة محليًا لهذا الإسناد اليدوي.' : submitted ? 'الإسناد جاهز للخطوة التشغيلية التالية.' : undefined)
+          }
         />
-      </Box>
+      </div>
     </WebPageFrame>
   );
 }

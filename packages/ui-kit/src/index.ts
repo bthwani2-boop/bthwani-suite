@@ -161,6 +161,31 @@ export type {
 	TextProps,
 } from './primitives';
 export {
+	MobileCommandCenterShell,
+	MobileCommandSummaryStrip,
+	MobileCommandSectionList,
+	MobileCommandSectionItem,
+	MobileOperationalWorkspace,
+	MobileInlineManagementPanel,
+	MobileQuickActions,
+	MobileStickyPrimaryAction,
+} from './MobileCommandCenter';
+export type {
+	MobileCommandCenterShellProps,
+	MobileCommandSummaryStripProps,
+	MobileCommandSectionItemData,
+	MobileCommandSectionItemProps,
+	MobileCommandSectionListProps,
+	MobileCommandSummaryItem,
+	MobileCommandViewState,
+	MobileCommandStateConfig,
+	MobileOperationalWorkspaceProps,
+	MobileInlineManagementPanelProps,
+	MobileQuickActionItem,
+	MobileQuickActionsProps,
+	MobileStickyPrimaryActionProps,
+} from './MobileCommandCenter';
+export {
 	AmountInput,
 	AppEmptyState,
 	AppErrorState,

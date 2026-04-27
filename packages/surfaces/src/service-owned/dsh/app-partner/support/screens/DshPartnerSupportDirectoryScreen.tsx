@@ -19,21 +19,13 @@ const groups: Array<{
   items: Array<{ id: PartnerSupportScreenId; title: string; subtitle: string; badgeLabel: string }>;
 }> = [
   {
-    title: 'ملف المتجر والعمليات',
-    subtitle: 'حالة المتجر والملف والظهور والطاقم تحت حساب واحد.',
+    title: 'التهيئة والامتثال',
+    subtitle: 'مهام الإدخال والامتثال غير الموجودة داخل مركز الحساب الأساسي.',
     items: [
-      { id: 'profile-get', title: 'ملف المتجر', subtitle: 'راجع ملف الفرع الحالي.', badgeLabel: 'Read' },
-      { id: 'store-update', title: 'تعديل الملف', subtitle: 'أدخل تحديثات بيانات الفرع.', badgeLabel: 'Update' },
-      { id: 'store-status-update', title: 'حالة المتجر', subtitle: 'افتح أو أغلق الفرع.', badgeLabel: 'Update' },
-      { id: 'listing-status-update', title: 'ظهور المتجر', subtitle: 'تحكم في الظهور داخل القائمة.', badgeLabel: 'Update' },
-      { id: 'store-service-modes-update', title: 'أوضاع الخدمة', subtitle: 'انشر أوضاع التوصيل والاستلام.', badgeLabel: 'Update' },
       { id: 'auction-status-update', title: 'Auction status update', subtitle: 'Control auction participation.', badgeLabel: 'Update' },
       { id: 'store-nomination', title: 'ترشيح متجر', subtitle: 'رشح فرعًا جديدًا.', badgeLabel: 'Onboarding' },
-      { id: 'identity-submit', title: 'الهوية والاعتماد', subtitle: 'أرسل مستندات الهوية.', badgeLabel: 'Compliance' },
       { id: 'doc-upload', title: 'رفع المستندات', subtitle: 'حمّل ملفات الامتثال الخاصة بالفرع.', badgeLabel: 'Compliance' },
       { id: 'intake-start', title: 'بدء الاستقبال', subtitle: 'ابدأ مسار إدخال الفرع.', badgeLabel: 'Onboarding' },
-      { id: 'manager-invite', title: 'دعوة مدير', subtitle: 'أضف مدير فرع بصلاحيات محدودة.', badgeLabel: 'Access' },
-      { id: 'team-management', title: 'إدارة الطاقم', subtitle: 'أضف الموظفين وحدد دور موصل.', badgeLabel: 'Access' },
     ],
   },
   {
@@ -51,13 +43,9 @@ const groups: Array<{
     ],
   },
   {
-    title: 'النمو والتسويق والتحليلات',
-    subtitle: 'العروض والاشتراكات والخصومات ومؤشرات الطلب تحت نفس المسار.',
+    title: 'المحتوى التسويقي',
+    subtitle: 'المحتوى الذي يحتاج مراجعة أو مرورًا منفصلًا قبل النشر.',
     items: [
-      { id: 'audience-insights', title: 'تحليلات الجمهور والطلب', subtitle: 'راجع الطلب والعروض قبل تعديل الخصومات.', badgeLabel: 'Insights' },
-      { id: 'staff-analytics', title: 'تحليلات التشغيل', subtitle: 'راقب ضغط الفريق والسرعة قبل أن تتراجع الخدمة.', badgeLabel: 'Insights' },
-      { id: 'commission-by-mode', title: 'العمولة حسب الوضع', subtitle: 'قارن أثر الوضع والخصم والاشتراك.', badgeLabel: 'Commercial' },
-      { id: 'subscription', title: 'بثواني برو', subtitle: 'راجع الخطة الحالية ومسار الترقية.', badgeLabel: 'اشتراك' },
       { id: 'video-upload', title: 'رفع الفيديو التسويقي', subtitle: 'أرسل فيديو قصيرًا ليغذي مراجعة التسويق.', badgeLabel: 'Content' },
     ],
   },
@@ -69,7 +57,7 @@ export function DshPartnerSupportDirectoryScreen({ onOpenScreen }: DshPartnerSup
       <Box gap={2}>
         <Text role="titleLg">مداخل الحساب للشريك</Text>
         <Text role="bodyMd" tone="muted">
-          تم تجميع المجالات غير الخاصة بالطلبات داخل الحساب في دليل واحد واضح لتقليل التشويش على مركز الطلبات.
+          هذا الدليل مخصص فقط للمهام الثانوية التي لم تعد جزءًا من مركز الحساب ومساحات العمل الأساسية.
         </Text>
       </Box>
 

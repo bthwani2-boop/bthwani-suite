@@ -10,11 +10,8 @@ import {
   Surface,
   Text,
   TextField,
+  useTheme,
 } from '@bthwani/ui-kit';
-
-const BTH_DEEP_BLUE = '#0A2F5C';
-const BTH_ORANGE = '#FF500D';
-const BTH_WHITE = '#FFFFFF';
 
 type PartnerOrderStatus =
   | 'new'
@@ -248,6 +245,7 @@ export function PartnerOrdersHomeScreen({
 }: PartnerOrdersHomeScreenProps) {
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
   const [query, setQuery] = React.useState('');
+  const { theme } = useTheme();
 
   if (state !== 'ready') {
     return renderState(state, onRetry);
@@ -284,7 +282,7 @@ export function PartnerOrdersHomeScreen({
 
   return (
     <MobileScrollView padding={4} gap={4}>
-      <Surface tone="brand" gap={3} style={{ borderColor: BTH_DEEP_BLUE, borderWidth: 1 }}>
+      <Surface tone="brand" gap={3} style={{ borderColor: theme.accentBlue, borderWidth: 1 }}>
         <Box gap={1}>
           <Text role="titleLg" tone="inverse">مركز طلبات الشريك</Text>
           <Text role="bodySm" tone="inverse" style={{ opacity: 0.96 }}>{branchLabel}</Text>
@@ -292,22 +290,22 @@ export function PartnerOrdersHomeScreen({
         </Box>
 
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <Surface tone="raised" style={{ flex: 1, minWidth: 132, borderWidth: 1, borderColor: BTH_ORANGE }}>
+          <Surface tone="raised" style={{ flex: 1, minWidth: 132, borderWidth: 1, borderColor: theme.brand }}>
             <Text role="caption" tone="muted">طلبات نشطة</Text>
-            <Text role="titleMd" style={{ color: BTH_DEEP_BLUE }}>{String(activeOrdersCount)}</Text>
+            <Text role="titleMd" style={{ color: theme.accentBlue }}>{String(activeOrdersCount)}</Text>
           </Surface>
-          <Surface tone="raised" style={{ flex: 1, minWidth: 132, borderWidth: 1, borderColor: BTH_ORANGE }}>
+          <Surface tone="raised" style={{ flex: 1, minWidth: 132, borderWidth: 1, borderColor: theme.brand }}>
             <Text role="caption" tone="muted">طلبات عاجلة</Text>
-            <Text role="titleMd" style={{ color: BTH_DEEP_BLUE }}>{String(urgentOrdersCount)}</Text>
+            <Text role="titleMd" style={{ color: theme.accentBlue }}>{String(urgentOrdersCount)}</Text>
           </Surface>
-          <Surface tone="raised" style={{ flex: 1, minWidth: 132, borderWidth: 1, borderColor: BTH_ORANGE }}>
+          <Surface tone="raised" style={{ flex: 1, minWidth: 132, borderWidth: 1, borderColor: theme.brand }}>
             <Text role="caption" tone="muted">إجراءات معلقة</Text>
-            <Text role="titleMd" style={{ color: BTH_DEEP_BLUE }}>{String(pendingActionsCount)}</Text>
+            <Text role="titleMd" style={{ color: theme.accentBlue }}>{String(pendingActionsCount)}</Text>
           </Surface>
         </Box>
       </Surface>
 
-      <Surface tone="raised" gap={3} style={{ borderColor: BTH_DEEP_BLUE, borderWidth: 1 }}>
+      <Surface tone="raised" gap={3} style={{ borderColor: theme.accentBlue, borderWidth: 1 }}>
         <SectionHeader title="اختصارات الطلبات" subtitle="مدخلات تشغيلية مرتبطة بمسار الطلبات فقط." />
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           <Button label="مدخل التشغيل" onPress={onOpenEntryPress} />
@@ -416,11 +414,6 @@ export function PartnerOrdersHomeScreen({
         </Box>
       )}
 
-      <Surface tone="raised" gap={1} style={{ borderColor: BTH_ORANGE, borderWidth: 1 }}>
-        <Text role="caption" style={{ color: BTH_DEEP_BLUE }}>
-          BThwani DNA: {BTH_DEEP_BLUE} / {BTH_ORANGE} / {BTH_WHITE}
-        </Text>
-      </Surface>
     </MobileScrollView>
   );
 }

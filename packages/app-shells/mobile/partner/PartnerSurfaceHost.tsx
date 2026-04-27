@@ -1,6 +1,6 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
-import { Box, Button, Icon, MobileScrollView, ScreenHeader, Surface, Text, TopBar } from '@bthwani/ui-kit';
+import { Box, Button, Icon, MobileScrollView, ScreenHeader, Surface, Text, TopBar, useTheme } from '@bthwani/ui-kit';
 import { dshPartner } from '@bthwani/surfaces/app-partner';
 import { MobileAccountSheet } from '../shared/MobileAccountSheet';
 import { PartnerWalletHubSheet, type PartnerWalletHubDestination } from '../shared/PartnerWalletHubSheet';
@@ -10,27 +10,17 @@ const {
   DshEntryScreen,
   PartnerOrdersInboxScreen,
   PartnerOrderDetailScreen,
-  DshPartnerDeliveryOpsBoardScreen,
   DshPartnerBellScreen,
-  DshPartnerStoreMaintenanceWorkspaceScreen,
-  DshPartnerHoursUpdateScreen,
-  DshPartnerZoneSetScreen,
   DshPartnerSupportDirectoryScreen,
   DshPartnerAuctionStatusUpdateScreen,
-  DshPartnerAudienceInsightsGetScreen,
   DshPartnerChatReadAckScreen,
   DshPartnerChatSendScreen,
-  DshPartnerCommissionByModeGetScreen,
   DshPartnerDocUploadScreen,
-  DshPartnerIdentitySubmitScreen,
   DshPartnerIntakeStartScreen,
   DshPartnerInventoryAdjustScreen,
     DshInventoryManagementScreen,
     DshPartnerInventoryUpdateScreen,
   DshPartnerItemsUpsertScreen,
-  DshPartnerListingStatusUpdateScreen,
-  DshPartnerManagerInviteScreen,
-  DshPartnerTeamManagementScreen,
   DshPartnerOrderAcceptScreen,
   DshPartnerOrderGetScreen,
   DshPartnerOrderHandoffScreen,
@@ -40,36 +30,24 @@ const {
   DshPartnerOrderReadyScreen,
   DshPartnerOrderRejectScreen,
   DshPartnerOrderStoreDeliveredScreen,
-  DshPartnerProfileGetScreen,
   DshPartnerQuickReplyConfigGetScreen,
   DshPartnerQuickReplySettingsScreen,
   DshPartnerQuickReplySetupScreen,
-  DshPartnerStaffAnalyticsGetScreen,
   DshPartnerStoreNominationScreen,
-  DshPartnerStoreServiceModesUpdateScreen,
-  DshPartnerStoreStatusUpdateScreen,
-  DshPartnerStoreUpdateScreen,
-  DshPartnerSubscriptionScreen,
   DshPartnerVideoUploadScreen,
   PartnerDshConsoleScreen,
 } = dshPartner;
 
-type PartnerRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'bell' | 'operations' | 'maintenance' | 'hours' | 'zones' | 'support-directory' | 'support-screen' | 'inventory-management';
+type PartnerRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'bell' | 'support-directory' | 'support-screen' | 'inventory-management';
 type PartnerSupportRoute =
   | 'auction-status-update'
-  | 'audience-insights'
   | 'chat-read-ack'
   | 'chat-send'
-  | 'commission-by-mode'
   | 'doc-upload'
-  | 'identity-submit'
   | 'intake-start'
   | 'inventory-adjust'
   | 'inventory-update'
   | 'items-upsert'
-  | 'listing-status-update'
-  | 'manager-invite'
-  | 'team-management'
   | 'order-accept'
   | 'order-get'
   | 'order-handoff'
@@ -79,16 +57,10 @@ type PartnerSupportRoute =
   | 'order-ready'
   | 'order-reject'
   | 'order-store-delivered'
-  | 'profile-get'
   | 'quick-reply-config'
   | 'quick-reply-settings'
   | 'quick-reply-setup'
-  | 'staff-analytics'
   | 'store-nomination'
-  | 'store-service-modes-update'
-  | 'store-status-update'
-  | 'store-update'
-  | 'subscription'
   | 'video-upload';
 
 const primaryAreas = [
@@ -153,7 +125,7 @@ const partnerTypeOptions: readonly { id: PartnerServiceType; label: string; desc
   { id: 'arb', label: 'ARB', description: 'تشغيل عرب الشركاء والمسارات' },
 ];
 
-type PartnerHubSection = 'orders' | 'profile' | 'operations' | 'inventory' | 'wallet' | 'analytics' | 'settings' | 'type-switch';
+type PartnerHubSection = 'hub' | 'profile' | 'operations' | 'inventory' | 'wallet' | 'analytics' | 'settings' | 'type-switch';
 
 const storeScopeOptions: readonly PartnerStoreScopeOption[] = [
   {
@@ -179,11 +151,12 @@ const storeScopeOptions: readonly PartnerStoreScopeOption[] = [
 ];
 
 export function PartnerSurfaceHost() {
+  const { theme } = useTheme();
   const [activeServiceType, setActiveServiceType] = React.useState<PartnerServiceType>('dsh');
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
   const [walletHubVisible, setWalletHubVisible] = React.useState(false);
   const [storeScopeVisible, setStoreScopeVisible] = React.useState(false);
-  const [accountHubSection, setAccountHubSection] = React.useState<PartnerHubSection>('profile');
+  const [accountHubSection, setAccountHubSection] = React.useState<PartnerHubSection>('hub');
   const [ordersSearchMode, setOrdersSearchMode] = React.useState(false);
   const [selectedStoreScopeId, setSelectedStoreScopeId] = React.useState('all');
   const [route, setRoute] = React.useState<PartnerRoute>(activeServiceType === 'dsh' ? 'inbox' : 'entry');
@@ -386,8 +359,8 @@ export function PartnerSurfaceHost() {
         return true;
       }
 
-      if (route === 'home' && accountHubSection !== 'orders') {
-        setAccountHubSection('orders');
+      if (route === 'home' && accountHubSection !== 'hub') {
+        setAccountHubSection('hub');
         return true;
       }
 
@@ -423,10 +396,6 @@ export function PartnerSurfaceHost() {
   const openOrderWorkspace = () => {
     setActiveOrderId('partner-order-1042');
     setRoute('detail');
-  };
-
-  const openStoreMaintenance = () => {
-    setRoute('maintenance');
   };
 
   const openSupportDirectory = () => {
@@ -469,7 +438,7 @@ export function PartnerSurfaceHost() {
 
   const handleWalletHubNavigation = React.useCallback((destination: PartnerWalletHubDestination) => {
     if (destination === 'partner_subscription') {
-      openSupportScreen('subscription');
+      openAccountHub('wallet');
       return;
     }
     setRoute('support-directory');
@@ -486,13 +455,13 @@ export function PartnerSurfaceHost() {
       actions={[
         {
           id: 'profile',
-          icon: <Icon name="person-outline" size={21} color="#FFFFFF" />,
+          icon: <Icon name="person-outline" size={21} color={theme.brandContrast} />,
           accessibilityLabel: 'الحساب',
-          onPress: activeServiceType === 'dsh' ? () => openAccountHub('profile') : () => setAccountSheetVisible(true),
+          onPress: activeServiceType === 'dsh' ? () => openAccountHub('hub') : () => setAccountSheetVisible(true),
         },
         {
           id: 'notifications',
-          icon: <Icon name="notifications-outline" size={21} color="#FFFFFF" />,
+          icon: <Icon name="notifications-outline" size={21} color={theme.brandContrast} />,
           badgeCount: 3,
           accessibilityLabel: 'الإشعارات',
           onPress: () => {
@@ -503,12 +472,12 @@ export function PartnerSurfaceHost() {
         },
         {
           id: 'wallet',
-          icon: <Icon name="wallet-outline" size={21} color="#FFFFFF" />,
+          icon: <Icon name="wallet-outline" size={21} color={theme.brandContrast} />,
           accessibilityLabel: 'المحفظة والحسابات المالية',
           onPress: activeServiceType === 'dsh' ? () => openAccountHub('wallet') : openWalletHub,
         },
-        { id: 'orders', icon: <Icon name="receipt-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
-        { id: 'search', icon: <Icon name="search-outline" size={21} color="#FFFFFF" />, accessibilityLabel: 'البحث', onPress: activeServiceType === 'dsh' ? openOrdersSearch : openOrdersBoard },
+        { id: 'orders', icon: <Icon name="receipt-outline" size={21} color={theme.brandContrast} />, accessibilityLabel: 'الطلبات', onPress: openOrdersBoard },
+        { id: 'search', icon: <Icon name="search-outline" size={21} color={theme.brandContrast} />, accessibilityLabel: 'البحث', onPress: activeServiceType === 'dsh' ? openOrdersSearch : openOrdersBoard },
       ]}
       ticker={{
         statusLabel: activeServiceType === 'dsh' ? 'نشط' : 'ARB نشط',
@@ -524,12 +493,12 @@ export function PartnerSurfaceHost() {
     <MobileAccountSheet
       visible={accountSheetVisible}
       onClose={() => setAccountSheetVisible(false)}
-      onOpenProfile={() => openAccountHub('profile')}
+      onOpenProfile={() => openAccountHub('hub')}
       onOpenWalletHub={openWalletHub}
       onOpenOrders={openOrdersBoard}
-      onOpenOperations={() => setRoute('operations')}
+      onOpenOperations={() => openAccountHub('operations')}
       onOpenInventory={openInventoryManagement}
-      onOpenTeam={() => openSupportScreen('team-management')}
+      onOpenTeam={() => openAccountHub('operations')}
       onOpenAnalytics={() => openAccountHub('analytics')}
       typeOptions={partnerTypeOptions}
       activeTypeId={activeServiceType}
@@ -644,13 +613,10 @@ export function PartnerSurfaceHost() {
               }}
               onOpenOrdersBoard={openOrdersBoard}
               onOpenInventoryManagement={openInventoryManagement}
-              onOpenMaintenance={openStoreMaintenance}
-              onOpenHours={() => setRoute('hours')}
-              onOpenZones={() => setRoute('zones')}
               onOpenStoreScope={openStoreScope}
               onOpenSupportDirectory={openSupportDirectory}
-              onOpenSupportScreen={openSupportScreen}
               onOpenWalletHub={openWalletHub}
+              onOpenBell={() => setRoute('bell')}
             />
           </Surface>
           {accountSheet}
@@ -672,8 +638,8 @@ export function PartnerSurfaceHost() {
               setActiveOrderId('partner-order-1042');
               setRoute('detail');
             }}
-            onOpenMaintenancePress={openStoreMaintenance}
-            onOpenIssueQueuePress={() => setRoute('operations')}
+            onOpenMaintenancePress={() => openAccountHub('profile')}
+            onOpenIssueQueuePress={() => openAccountHub('operations')}
           />
         </Surface>
         {accountSheet}
@@ -748,98 +714,6 @@ export function PartnerSurfaceHost() {
     );
   }
 
-  if (route === 'operations') {
-    return (
-      <Box style={{ flex: 1 }} background="background">
-        {topBar}
-        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-          <DshPartnerDeliveryOpsBoardScreen
-            summary={deliveryOpsSummary}
-            orders={deliveryOpsOrders}
-            onOpenOrder={(orderId) => {
-              setActiveOrderId(orderId);
-              setRoute('detail');
-            }}
-            onOpenIssueQueue={() => setRoute('inbox')}
-            onRetry={() => setRoute('operations')}
-          />
-        </Surface>
-        {accountSheet}
-        {walletHubSheet}
-        {storeScopeSheet}
-      </Box>
-    );
-  }
-
-  if (route === 'maintenance') {
-    return (
-      <Box style={{ flex: 1 }} background="background">
-        {topBar}
-        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-          <DshPartnerStoreMaintenanceWorkspaceScreen
-            profile={maintenanceProfile}
-            serviceModes={serviceModes}
-            listingEnabled={listingEnabled}
-            storeOpen={storeOpen}
-            onToggleListingEnabled={setListingEnabled}
-            onToggleStoreOpen={setStoreOpen}
-            onToggleServiceMode={toggleServiceMode}
-            onOpenHours={() => setRoute('hours')}
-            onOpenZones={() => setRoute('zones')}
-            onOpenDeliveryBoard={() => setRoute('operations')}
-            onOpenSupportDirectory={openSupportDirectory}
-            onSave={() => setRoute('entry')}
-            onRetry={() => setRoute('maintenance')}
-          />
-        </Surface>
-        {accountSheet}
-        {walletHubSheet}
-        {storeScopeSheet}
-      </Box>
-    );
-  }
-
-  if (route === 'hours') {
-    return (
-      <Box style={{ flex: 1 }} background="background">
-        {topBar}
-        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-          <DshPartnerHoursUpdateScreen
-            days={storeHours}
-            onToggleDay={toggleStoreHoursDay}
-            onChangeDayTime={changeStoreHoursDayTime}
-            onSave={() => setRoute('maintenance')}
-            onBack={() => setRoute('maintenance')}
-            onRetry={() => setRoute('hours')}
-          />
-        </Surface>
-        {accountSheet}
-        {walletHubSheet}
-        {storeScopeSheet}
-      </Box>
-    );
-  }
-
-  if (route === 'zones') {
-    return (
-      <Box style={{ flex: 1 }} background="background">
-        {topBar}
-        <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, marginTop: -2, borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' }}>
-          <DshPartnerZoneSetScreen
-            zones={zoneOptions}
-            onSelectZone={setSelectedZoneId}
-            onSave={() => setRoute('maintenance')}
-            onBack={() => setRoute('maintenance')}
-            onRetry={() => setRoute('zones')}
-          />
-        </Surface>
-        {accountSheet}
-        {walletHubSheet}
-        {storeScopeSheet}
-      </Box>
-    );
-  }
-
   if (route === 'inventory-management') {
     return (
       <Box style={{ flex: 1 }} background="background">
@@ -871,19 +745,13 @@ export function PartnerSurfaceHost() {
   if (route === 'support-screen') {
     const supportScreens: Record<PartnerSupportRoute, React.ReactNode> = {
       'auction-status-update': <DshPartnerAuctionStatusUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'audience-insights': <DshPartnerAudienceInsightsGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'chat-read-ack': <DshPartnerChatReadAckScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('quick-reply-config')} />,
       'chat-send': <DshPartnerChatSendScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('quick-reply-setup')} />,
-      'commission-by-mode': <DshPartnerCommissionByModeGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'doc-upload': <DshPartnerDocUploadScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'identity-submit': <DshPartnerIdentitySubmitScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'intake-start': <DshPartnerIntakeStartScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'inventory-adjust': <DshPartnerInventoryAdjustScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('inventory-update')} />,
       'inventory-update': <DshPartnerInventoryUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'items-upsert': <DshPartnerItemsUpsertScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'listing-status-update': <DshPartnerListingStatusUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'manager-invite': <DshPartnerManagerInviteScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'team-management': <DshPartnerTeamManagementScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'order-accept': <DshPartnerOrderAcceptScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('order-get')} />,
       'order-get': <DshPartnerOrderGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'order-handoff': <DshPartnerOrderHandoffScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
@@ -893,16 +761,10 @@ export function PartnerSurfaceHost() {
       'order-ready': <DshPartnerOrderReadyScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'order-reject': <DshPartnerOrderRejectScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'order-store-delivered': <DshPartnerOrderStoreDeliveredScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'profile-get': <DshPartnerProfileGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'quick-reply-config': <DshPartnerQuickReplyConfigGetScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('quick-reply-settings')} />,
       'quick-reply-settings': <DshPartnerQuickReplySettingsScreen onBack={openSupportDirectory} onSecondaryAction={() => openSupportScreen('quick-reply-setup')} />,
       'quick-reply-setup': <DshPartnerQuickReplySetupScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'staff-analytics': <DshPartnerStaffAnalyticsGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'store-nomination': <DshPartnerStoreNominationScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'store-service-modes-update': <DshPartnerStoreServiceModesUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'store-status-update': <DshPartnerStoreStatusUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'store-update': <DshPartnerStoreUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      subscription: <DshPartnerSubscriptionScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'video-upload': <DshPartnerVideoUploadScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
     };
 
