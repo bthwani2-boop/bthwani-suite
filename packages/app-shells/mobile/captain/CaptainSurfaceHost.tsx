@@ -9,10 +9,10 @@ const {
   DshEntryScreen,
   CaptainDeliveryConfirmSheet,
   CaptainPickupConfirmSheet,
-  CaptainTaskDetailScreen,
+  CaptainOrderDetailScreen,
   DshCaptainOrderChatScreen,
   DshCaptainBellScreen,
-  CaptainTasksInboxScreen,
+  CaptainOrdersInboxScreen,
   DshCaptainSupportDirectoryScreen,
   DshCaptainChatReadAckScreen,
   DshCaptainChatSendScreen,
@@ -31,8 +31,8 @@ const {
   DshCaptainTierInfoScreen,
 } = dshCaptain;
 
-type CaptainTaskDetailSummary = React.ComponentProps<typeof CaptainTaskDetailScreen>['summary'];
-type CaptainTasksInboxScreenState = React.ComponentProps<typeof CaptainTasksInboxScreen>['state'];
+type CaptainOrderDetailSummary = React.ComponentProps<typeof CaptainOrderDetailScreen>['summary'];
+type CaptainOrdersInboxScreenState = React.ComponentProps<typeof CaptainOrdersInboxScreen>['state'];
 type CaptainSupportRoute =
   | 'chat-read-ack'
   | 'chat-send'
@@ -51,7 +51,7 @@ type CaptainSupportRoute =
   | 'tier-info';
 
 const primaryAreas = [
-  'المهام',
+  'الطلبات',
   'الأرباح',
   'الحالة'
 ] as const;
@@ -60,27 +60,27 @@ type CaptainRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'orderchat' | 'bell'
 type CaptainServiceType = 'dsh' | 'amn';
 
 const shortcuts = [
-  'المهام الحالية',
+  'الطلبات الحالية',
   'ملخص الأرباح',
   'تبديل الحالة',
 ] as const;
 
 const captainTypeOptions: readonly MobileAccountTypeOption[] = [
-  { id: 'dsh', label: 'DSH', description: 'تشغيل الطلبات والمهام اليومية' },
+  { id: 'dsh', label: 'DSH', description: 'تشغيل الطلبات اليومية' },
   { id: 'amn', label: 'AMN', description: 'تشغيل الأمان والمراقبة' },
 ];
 
-const defaultDetailByTaskId: Record<string, CaptainTaskDetailSummary> = {
-  'captain-task-9021': {
-    taskId: 'captain-task-9021',
+const defaultDetailByOrderId: Record<string, CaptainOrderDetailSummary> = {
+  'captain-order-9021': {
+    orderId: 'captain-order-9021',
     pickupLabel: 'Burger Lab - Hittin branch',
     dropoffLabel: 'Olaya District, King Fahad Road',
     etaLabel: 'ETA to pickup: 8 min',
     currentStageLabel: 'Heading to pickup',
     nextActionLabel: 'Confirm pickup once package is collected',
   },
-  'captain-task-9024': {
-    taskId: 'captain-task-9024',
+  'captain-order-9024': {
+    orderId: 'captain-order-9024',
     pickupLabel: 'Green Bowl - Yasmin branch',
     dropoffLabel: 'King Fahad Road, North district',
     etaLabel: 'ETA to pickup: 15 min',
@@ -92,8 +92,8 @@ const defaultDetailByTaskId: Record<string, CaptainTaskDetailSummary> = {
 export function CaptainSurfaceHost() {
   const [activeServiceType, setActiveServiceType] = React.useState<CaptainServiceType>('dsh');
   const [route, setRoute] = React.useState<CaptainRoute>('home');
-  const [inboxState, setInboxState] = React.useState<CaptainTasksInboxScreenState>('active');
-  const [activeTaskId, setActiveTaskId] = React.useState<string>('captain-task-9021');
+  const [inboxState, setInboxState] = React.useState<CaptainOrdersInboxScreenState>('active');
+  const [activeOrderId, setActiveOrderId] = React.useState<string>('captain-order-9021');
   const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<CaptainSupportRoute>('orders-list');
   const [isPickupSheetVisible, setIsPickupSheetVisible] = React.useState(false);
   const [isDeliverySheetVisible, setIsDeliverySheetVisible] = React.useState(false);
@@ -101,7 +101,7 @@ export function CaptainSurfaceHost() {
   const routeHistoryRef = React.useRef<CaptainRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
 
-  const activeSummary = defaultDetailByTaskId[activeTaskId] ?? defaultDetailByTaskId['captain-task-9021'];
+  const activeSummary = defaultDetailByOrderId[activeOrderId] ?? defaultDetailByOrderId['captain-order-9021'];
   const orderChatState = inboxState === 'delivered' ? 'readOnly' : 'active';
 
   if (!activeSummary) {
@@ -145,8 +145,8 @@ export function CaptainSurfaceHost() {
     return () => subscription.remove();
   }, [accountSheetVisible]);
 
-  const openTaskDetail = (taskId: string) => {
-    setActiveTaskId(taskId);
+  const openOrderDetail = (orderId: string) => {
+    setActiveOrderId(orderId);
     setRoute('detail');
   };
 
@@ -168,12 +168,12 @@ export function CaptainSurfaceHost() {
     setActiveServiceType(nextType);
     setRoute('home');
     setInboxState('active');
-    setActiveTaskId('captain-task-9021');
+    setActiveOrderId('captain-order-9021');
     setIsPickupSheetVisible(false);
     setIsDeliverySheetVisible(false);
   }, []);
 
-  const captainEntryState = inboxState === 'loading' ? 'loading' : inboxState === 'noTasks' ? 'empty' : 'ready';
+  const captainEntryState = inboxState === 'loading' ? 'loading' : inboxState === 'noOrders' ? 'empty' : 'ready';
 
   const renderCaptainFlow = () => {
     if (route === 'entry') {
@@ -183,7 +183,7 @@ export function CaptainSurfaceHost() {
           onOpenOffersPress={() => setRoute('inbox')}
           onOpenExecutionPress={() => setRoute('detail')}
           onOpenProofCapturePress={() => {
-            setActiveTaskId('captain-task-9021');
+            setActiveOrderId('captain-order-9021');
             setIsDeliverySheetVisible(true);
             setRoute('detail');
           }}
@@ -193,11 +193,11 @@ export function CaptainSurfaceHost() {
 
     if (route === 'inbox') {
       return (
-        <CaptainTasksInboxScreen
+        <CaptainOrdersInboxScreen
           state={inboxState}
           onRetry={() => setInboxState('active')}
-          onOpenTask={openTaskDetail}
-          onOpenNextTask={openTaskDetail}
+          onOpenOrder={openOrderDetail}
+          onOpenNextOrder={openOrderDetail}
         />
       );
     }
@@ -206,11 +206,11 @@ export function CaptainSurfaceHost() {
       return (
         <>
           <Box gap={3}>
-            <CaptainTaskDetailScreen
+            <CaptainOrderDetailScreen
               summary={activeSummary}
               onConfirmPickup={() => setIsPickupSheetVisible(true)}
               onConfirmDelivery={() => setIsDeliverySheetVisible(true)}
-              onOpenNextTask={() => setRoute('inbox')}
+              onOpenNextOrder={() => setRoute('inbox')}
               onRetry={() => setRoute('detail')}
             />
             <Button label="فتح تواصل الطلب" tone="secondary" fullWidth={false} onPress={() => setRoute('orderchat')} />
@@ -218,14 +218,14 @@ export function CaptainSurfaceHost() {
 
           <CaptainPickupConfirmSheet
             visible={isPickupSheetVisible}
-            taskTitle={activeSummary.taskId}
+            orderTitle={activeSummary.orderId}
             onConfirm={() => setIsPickupSheetVisible(false)}
             onCancel={() => setIsPickupSheetVisible(false)}
           />
 
           <CaptainDeliveryConfirmSheet
             visible={isDeliverySheetVisible}
-            taskTitle={activeSummary.taskId}
+            orderTitle={activeSummary.orderId}
             onConfirm={() => {
               setIsDeliverySheetVisible(false);
               setInboxState('delivered');
@@ -241,7 +241,7 @@ export function CaptainSurfaceHost() {
       return (
         <DshCaptainBellScreen
           onOpenInbox={() => setRoute('inbox')}
-          onOpenNextTask={() => openTaskDetail(activeTaskId)}
+          onOpenNextOrder={() => openOrderDetail(activeOrderId)}
           onBack={() => setRoute('inbox')}
           onRetry={() => setRoute('bell')}
         />
@@ -251,7 +251,7 @@ export function CaptainSurfaceHost() {
     if (route === 'orderchat') {
       return (
         <DshCaptainOrderChatScreen
-          taskId={activeSummary.taskId}
+          orderId={activeSummary.orderId}
           pickupLabel={activeSummary.pickupLabel}
           dropoffLabel={activeSummary.dropoffLabel}
           state={orderChatState}
@@ -288,9 +288,9 @@ export function CaptainSurfaceHost() {
           },
         },
         {
-          id: 'tasks',
+          id: 'orders',
           icon: <Icon name="bicycle-outline" size={21} color="#FFFFFF" />,
-          accessibilityLabel: 'المهام',
+          accessibilityLabel: 'الطلبات',
           onPress: () => {
             if (activeServiceType === 'dsh') {
               setRoute('entry');
@@ -303,7 +303,7 @@ export function CaptainSurfaceHost() {
         statusLabel: activeServiceType === 'dsh' ? 'مباشر' : 'وضع AMN',
         message:
           activeServiceType === 'dsh'
-            ? 'أولوية اليوم: مهمة الاستلام الأولى خلال 8 دقائق'
+            ? 'أولوية اليوم: طلب الاستلام الأول خلال 8 دقائق'
             : 'تم تفعيل وضع AMN. سيتم تحميل مسارات الأمان فور اكتمال ربط الشاشات.',
         onPress: () => {
           if (activeServiceType === 'dsh') {
@@ -391,7 +391,7 @@ export function CaptainSurfaceHost() {
             <Text role="label">حالة تشغيل الاختبار</Text>
             <Box gap={2}>
               <Button label="Active" tone="secondary" onPress={() => setInboxState('active')} />
-              <Button label="No tasks" tone="secondary" onPress={() => setInboxState('noTasks')} />
+              <Button label="No orders" tone="secondary" onPress={() => setInboxState('noOrders')} />
               <Button label="Delivered" tone="secondary" onPress={() => setInboxState('delivered')} />
               <Button label="Error" tone="secondary" onPress={() => setInboxState('error')} />
             </Box>
@@ -437,7 +437,7 @@ export function CaptainSurfaceHost() {
       >
         <MobileScrollView fill padding={5} gap={5}>
           <ScreenHeader
-            title="مهام الكابتن"
+            title="طلبات الكابتن"
             subtitle="هذه هي نقطة البداية الحقيقية لتطبيق الكابتن."
             actionLabel="ابدأ من entry"
             onActionPress={openCaptainEntry}
@@ -446,7 +446,7 @@ export function CaptainSurfaceHost() {
           <Surface tone="brand" padding={5} gap={3} radiusToken="xl" border={false}>
             <Text role="label" tone="inverse">نقطة البداية الرسمية</Text>
             <Text role="titleLg" tone="inverse">بداية تشغيلية حقيقية للكابتن</Text>
-            <Text role="bodyMd" tone="inverse">تطبيق الكابتن يجب أن يبدأ من shell تُظهر المهام والحالة والاختصارات، لا من preview service entry.</Text>
+            <Text role="bodyMd" tone="inverse">تطبيق الكابتن يجب أن يبدأ من shell تُظهر الطلبات والحالة والاختصارات، لا من preview service entry.</Text>
           </Surface>
 
           <Surface tone="raised" padding={5} gap={4} radiusToken="xl">

@@ -1,23 +1,14 @@
 import React from 'react';
-import {
-  Box,
-  Button,
-  ListItem,
-  MobileScrollView,
-  SectionHeader,
-  StateView,
-  Surface,
-  Text,
-} from '@bthwani/ui-kit';
+import { Box, Button, ListItem, MobileScrollView, SectionHeader, StateView, Surface, Text } from '@bthwani/ui-kit';
 
 export type CaptainOrdersInboxScreenState =
   | 'active'
-  | 'noTasks'
+  | 'noOrders'
   | 'delivered'
   | 'loading'
   | 'error';
 
-export type CaptainTaskInboxItem = {
+export type CaptainOrderInboxItem = {
   id: string;
   title: string;
   pickupLabel: string;
@@ -29,13 +20,13 @@ export type CaptainTaskInboxItem = {
 
 export type CaptainOrdersInboxScreenProps = {
   state?: CaptainOrdersInboxScreenState;
-  items?: CaptainTaskInboxItem[];
-  onOpenTask?: (taskId: string) => void;
-  onOpenNextTask?: (taskId: string) => void;
+  items?: CaptainOrderInboxItem[];
+  onOpenOrder?: (orderId: string) => void;
+  onOpenNextOrder?: (orderId: string) => void;
   onRetry?: () => void;
 };
 
-const demoActiveItems: CaptainTaskInboxItem[] = [
+const demoActiveOrders: CaptainOrderInboxItem[] = [
   {
     id: 'captain-order-9021',
     title: 'Order #9021',
@@ -66,7 +57,7 @@ function renderLoadingState() {
   );
 }
 
-function renderNoTasksState(onRetry?: () => void) {
+function renderNoOrdersState(onRetry?: () => void) {
   return (
     <StateView
       stateId="empty"
@@ -104,9 +95,9 @@ function renderErrorState(onRetry?: () => void) {
 
 export function CaptainOrdersInboxScreen({
   state = 'active',
-  items = demoActiveItems,
-  onOpenTask,
-  onOpenNextTask,
+  items = demoActiveOrders,
+  onOpenOrder,
+  onOpenNextOrder,
   onRetry,
 }: CaptainOrdersInboxScreenProps) {
   if (state === 'loading') {
@@ -117,8 +108,8 @@ export function CaptainOrdersInboxScreen({
     return renderErrorState(onRetry);
   }
 
-  if (state === 'noTasks') {
-    return renderNoTasksState(onRetry);
+  if (state === 'noOrders') {
+    return renderNoOrdersState(onRetry);
   }
 
   if (state === 'delivered') {
@@ -126,18 +117,18 @@ export function CaptainOrdersInboxScreen({
   }
 
   if (items.length === 0) {
-    return renderNoTasksState(onRetry);
+    return renderNoOrdersState(onRetry);
   }
 
-  const nextTask = items[0];
+  const nextOrder = items[0];
 
-  const handleOpenNextTask = () => {
-    if (onOpenNextTask) {
-      onOpenNextTask(nextTask.id);
+  const handleOpenNextOrder = () => {
+    if (onOpenNextOrder) {
+      onOpenNextOrder(nextOrder.id);
       return;
     }
 
-    onOpenTask?.(nextTask.id);
+    onOpenOrder?.(nextOrder.id);
   };
 
   return (
@@ -155,15 +146,15 @@ export function CaptainOrdersInboxScreen({
           subtitle="One clear action before scanning the rest of the queue."
         />
         <Box gap={1}>
-          <Text role="bodyStrong">{nextTask.title}</Text>
+          <Text role="bodyStrong">{nextOrder.title}</Text>
           <Text role="bodySm" tone="muted">
-            {nextTask.pickupLabel} | {nextTask.dropoffLabel}
+            {nextOrder.pickupLabel} | {nextOrder.dropoffLabel}
           </Text>
           <Text role="caption" tone="soft">
-            {nextTask.timingLabel} | Next: {nextTask.nextActionLabel}
+            {nextOrder.timingLabel} | Next: {nextOrder.nextActionLabel}
           </Text>
         </Box>
-        <Button label="Open next order" onPress={handleOpenNextTask} />
+        <Button label="Open next order" onPress={handleOpenNextOrder} />
       </Surface>
 
       <Surface tone="raised" gap={3}>
@@ -179,7 +170,7 @@ export function CaptainOrdersInboxScreen({
               subtitle={`${item.pickupLabel} | ${item.dropoffLabel}`}
               meta={`${item.timingLabel} | Next: ${item.nextActionLabel}`}
               badgeLabel={item.statusLabel}
-              onPress={() => onOpenTask?.(item.id)}
+              onPress={() => onOpenOrder?.(item.id)}
             />
           ))}
         </Box>
@@ -189,4 +180,3 @@ export function CaptainOrdersInboxScreen({
 }
 
 export default CaptainOrdersInboxScreen;
-

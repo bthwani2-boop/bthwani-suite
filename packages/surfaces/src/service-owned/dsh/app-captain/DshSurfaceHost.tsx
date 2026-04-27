@@ -65,7 +65,7 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
       <div>
         <h1>Captain — Orders Inbox</h1>
         <button onClick={handleBack}>Back</button>
-        <p>قائمة المهام placeholder.</p>
+        <p>قائمة الطلبات placeholder.</p>
       </div>
     );
   }
@@ -75,7 +75,7 @@ export function DshSurfaceHost({ command, onExit, initialRoute = 'entry' }: DshS
       <div>
         <h1>Captain — Order Detail</h1>
         <button onClick={handleBack}>Back</button>
-        <p>تفاصيل المهمة placeholder.</p>
+        <p>تفاصيل الطلب placeholder.</p>
       </div>
     );
   }

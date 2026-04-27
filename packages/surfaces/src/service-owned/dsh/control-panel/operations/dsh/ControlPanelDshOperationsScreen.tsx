@@ -17,10 +17,10 @@ import {
   WebSectionCard,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
-import { formatDshWorkbenchSubtitle, useDshControlPanelText } from './shared/dshControlPanelText';
+import { formatDshWorkbenchSubtitle, useDshControlPanelText, DshScreenState, resolveDshStateCopy } from './shared';
 import styles from './dsh-surface.module.css';
 
-type ControlPanelDshOperationsScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
+type ControlPanelDshOperationsScreenState = DshScreenState;
 
 type DshWorkbenchId =
   | 'overview'
@@ -127,48 +127,7 @@ function resolveStateCopy(
   text: ReturnType<typeof useDshControlPanelText>,
   state: Exclude<ControlPanelDshOperationsScreenState, 'ready'>,
 ) {
-  if (state === 'loading') {
-    return {
-      stateId: 'loading' as const,
-      title: text.hub.stateLoadingTitle,
-      description: text.hub.stateLoadingDescription,
-      actionLabel: text.common.openGeneralOperations,
-    };
-  }
-
-  if (state === 'empty') {
-    return {
-      stateId: 'empty' as const,
-      title: text.hub.stateEmptyTitle,
-      description: text.hub.stateEmptyDescription,
-      actionLabel: text.common.openGeneralOperations,
-    };
-  }
-
-  if (state === 'offline') {
-    return {
-      stateId: 'offline' as const,
-      title: text.hub.stateOfflineTitle,
-      description: text.hub.stateOfflineDescription,
-      actionLabel: text.common.openGeneralOperations,
-    };
-  }
-
-  if (state === 'disabled') {
-    return {
-      kind: 'warning' as const,
-      title: text.hub.stateDisabledTitle,
-      description: text.hub.stateDisabledDescription,
-      actionLabel: text.common.openGeneralOperations,
-    };
-  }
-
-  return {
-    stateId: 'recoverableError' as const,
-    title: text.hub.stateErrorTitle,
-    description: text.hub.stateErrorDescription,
-    actionLabel: text.common.openGeneralOperations,
-  };
+  return resolveDshStateCopy(text, state);
 }
 
 function resolveWorkbenchTitle(text: ReturnType<typeof useDshControlPanelText>, workbench: DshWorkbench) {

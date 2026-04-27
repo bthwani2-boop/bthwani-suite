@@ -1,4 +1,5 @@
 import React from 'react';
+import { BackHandler } from 'react-native';
 import {
   Badge,
   Box,
@@ -91,7 +92,7 @@ const hubTabs: ReadonlyArray<{ value: PartnerHubSection; label: string }> = [
   { value: 'operations', label: 'العمليات والفريق' },
   { value: 'inventory', label: 'المنتجات والكتالوج' },
   { value: 'wallet', label: 'المحفظة والحسابات المالية' },
-  { value: 'analytics', label: 'النمو والتسويق' },
+  { value: 'analytics', label: 'التحليلات والنمو والتسويق' },
   { value: 'settings', label: 'الإعدادات' },
   { value: 'type-switch', label: 'تبديل النوع' },
 ] as const;
@@ -185,6 +186,8 @@ export function PartnerDshConsoleScreen({
   const { language, setLanguage } = useDirection();
   const [internalSection, setInternalSection] = React.useState<PartnerHubSection>('orders');
   const [inventoryQuery, setInventoryQuery] = React.useState('');
+  const [operationsDetail, setOperationsDetail] = React.useState<'team' | 'coverage' | null>(null);
+  const [operationsSavedAt, setOperationsSavedAt] = React.useState<string | null>(null);
   const activeSection = section ?? internalSection;
   const updateSection = onSectionChange ?? setInternalSection;
   const openStoreScope = onOpenStoreScope ?? onOpenSupportDirectory ?? onOpenMaintenance;
@@ -194,6 +197,25 @@ export function PartnerDshConsoleScreen({
   const openHours = onOpenHours ?? onOpenMaintenance ?? onOpenSupportDirectory;
   const openZones = onOpenZones ?? onOpenMaintenance ?? onOpenSupportDirectory;
   const openWalletHub = onOpenWalletHub ?? (() => resolveSupportScreen('subscription', { onOpenSupportDirectory, onOpenWalletHub }));
+
+  React.useEffect(() => {
+    if (activeSection !== 'operations') {
+      setOperationsDetail(null);
+    }
+  }, [activeSection]);
+
+  React.useEffect(() => {
+    if (activeSection !== 'operations' || !operationsDetail) {
+      return undefined;
+    }
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      setOperationsDetail(null);
+      return true;
+    });
+
+    return () => subscription.remove();
+  }, [activeSection, operationsDetail]);
 
   if (state !== 'ready') {
     return <MobileScrollView padding={4} gap={4}>{resolveStateNode(state, openOrdersBoard)}</MobileScrollView>;
@@ -277,49 +299,119 @@ export function PartnerDshConsoleScreen({
   }
 
   function renderOperationsSection() {
+    const operatingModes = [
+      {
+        id: 'pickup',
+        title: 'استلم بنفسك',
+        description: 'استلام مباشر من المتجر، بترتيب واضح وقناة تشغيل واحدة.',
+        commission: '0%',
+        enabled: serviceModes.find((mode) => mode.id === 'pickup')?.enabled ?? true,
+      },
+      {
+        id: 'delivery',
+        title: 'توصيل المتجر',
+        description: 'توصيل المتجر مع مسار تشغيلي ثابت وعمولة مفهومة.',
+        commission: '8%',
+        enabled: serviceModes.find((mode) => mode.id === 'delivery' || mode.id === 'store-delivery')?.enabled ?? true,
+      },
+      {
+        id: 'seconds',
+        title: 'توصيل بثواني',
+        description: 'مسار سريع جدًا عندما تحتاج السرعة قبل أي شيء آخر.',
+        commission: '15%',
+        enabled: serviceModes.find((mode) => mode.id === 'seconds' || mode.id === 'scheduled')?.enabled ?? false,
+      },
+    ] as const;
+
+    const teamExpanded = operationsDetail === 'team';
+    const coverageExpanded = operationsDetail === 'coverage';
+
     return (
       <Surface tone="raised" gap={3}>
-        <SectionHeader title="العمليات والفريق" subtitle="الأوقات والمناطق والطاقم والعمولة من سطح واحد واضح." />
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <StatCard label="القنوات" value={`${activeModesCount}/${serviceModes.length}`} deltaLabel="مفعلة" tone="brand" />
-          <StatCard label="الطاقم" value="3" deltaLabel="مدير + موصل + موظف" tone="info" />
-          <StatCard label="الوضع" value={storeOpen ? 'نشط' : 'متوقف'} deltaLabel="حالة الفرع" tone={storeOpen ? 'success' : 'warning'} />
-        </Box>
-        <KeyValueList
-          items={[
-            { label: 'ساعات العمل', value: todayHoursLabel },
-            { label: 'المناطق الفعالة', value: activeZoneLabel },
-            { label: 'القنوات المفعلة', value: `${activeModesCount}/${serviceModes.length}`, tone: 'brand' },
-            { label: 'وضع المتجر', value: storeOpen ? 'جاهز للتشغيل' : 'متوقف مؤقتًا', tone: storeOpen ? 'success' : 'warning' },
-            { label: 'عمولة بثواني', value: 'واضحة لكل وضع', tone: 'info' },
-            { label: 'الطاقم', value: 'مدير + موصل + موظف', tone: 'brand' },
-          ]}
+        <SectionHeader title="العمليات والفريق" subtitle="هيدر مضغوط، قنوات خدمة عمودية، وتفاصيل فريق/مناطق داخل نفس الصفحة." />
+        <Surface tone="inset" gap={2}>
+          <SectionHeader title="حالة التشغيل الآن" subtitle={storeOpen ? 'الفرع يعمل الآن والطلب يستقبل بشكل طبيعي.' : 'الفرع متوقف مؤقتًا حتى يعود الوضع التشغيلي.'} />
+          <KeyValueList
+            items={[
+              { label: 'حالة المتجر', value: storeOpen ? 'مفتوح' : 'مغلق', tone: storeOpen ? 'success' : 'warning' },
+              { label: 'القنوات المفعلة', value: `${activeModesCount}/${operatingModes.length}`, tone: 'brand' },
+              { label: 'الطاقم', value: 'مشرف 1 · موظف 3 · موصل 2' },
+              { label: 'النطاق', value: activeZoneLabel, tone: 'info' },
+            ]}
+          />
+        </Surface>
+
+        <Surface tone="default" gap={2}>
+          <SectionHeader title="أوضاع الخدمة" subtitle="قائمة عمودية مختصرة مع عمولة وحالة كل وضع." />
+          <Box gap={2}>
+            {operatingModes.map((mode) => (
+              <ListItem
+                key={mode.id}
+                title={mode.title}
+                subtitle={mode.description}
+                meta={`عمولة ${mode.commission}`}
+                badgeLabel={mode.enabled ? 'مفعّل' : 'غير مفعّل'}
+              />
+            ))}
+          </Box>
+        </Surface>
+
+        <Surface tone="raised" gap={2}>
+          <SectionHeader title="الفريق" subtitle="التفاصيل تتوسع inline عند الطلب بدل فتح route جديد." />
+          <Button
+            label="إدارة الفريق"
+            tone="secondary"
+            onPress={() => setOperationsDetail((current) => (current === 'team' ? null : 'team'))}
+          />
+          {teamExpanded ? (
+            <Surface tone="inset" gap={2}>
+              <KeyValueList
+                items={[
+                  { label: 'الحضور الحالي', value: 'مشرف 1 · موظف 3 · موصل 2' },
+                  { label: 'الصلاحيات', value: 'محددة بوضوح' },
+                  { label: 'المسار', value: 'inline expansion فقط' },
+                ]}
+              />
+              <ListItem title="مشرف الفرع" subtitle="يدير القرار التشغيلي ويثبت التصعيد." meta="1" badgeLabel="Manager" />
+              <ListItem title="الموظفون" subtitle="يديرون الطلبات اليومية والكتالوج." meta="3" badgeLabel="Staff" />
+              <ListItem title="الموصلون" subtitle="يستلمون التسليم فقط دون تشتيت آخر." meta="2" badgeLabel="موصل" />
+            </Surface>
+          ) : null}
+        </Surface>
+
+        <Surface tone="raised" gap={2}>
+          <SectionHeader title="مناطق التغطية" subtitle="ملخص compact مع توسعة خفيفة داخل الصفحة نفسها." />
+          <Button
+            label="إدارة المناطق"
+            tone="secondary"
+            onPress={() => setOperationsDetail((current) => (current === 'coverage' ? null : 'coverage'))}
+          />
+          {coverageExpanded ? (
+            <Surface tone="inset" gap={2}>
+              <KeyValueList
+                items={[
+                  { label: 'النطاق الحالي', value: activeZoneLabel, tone: 'brand' },
+                  { label: 'المدينة', value: cityLabel },
+                  { label: 'التوسعة', value: 'خريطة خفيفة داخل السطح' },
+                ]}
+              />
+              <ListItem title="Yasmin" subtitle="المنطقة الأساسية" meta="20-28 min" badgeLabel="Live" />
+              <ListItem title="Al Malqa" subtitle="منطقة قريبة عالية القيمة" meta="24-32 min" badgeLabel="Live" />
+              <ListItem title="Al Nakheel" subtitle="منطقة توسعة" meta="28-38 min" badgeLabel="Bounded" />
+            </Surface>
+          ) : null}
+        </Surface>
+
+        <Button
+          label="حفظ إعدادات العمليات"
+          onPress={() => {
+            setOperationsSavedAt(new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }));
+          }}
         />
-        <Box gap={2}>
-          <ListItem title="المدير" subtitle="يعتمد القرارات التشغيلية ويستلم التغيير الحرج." meta="دور" badgeLabel="Manager" />
-          <ListItem title="الموصل" subtitle="صلاحيات تسليم فقط لطاقم التوصيل دون توسيع نطاق المتجر." meta="دور" badgeLabel="موصل" />
-          <ListItem title="الموظف" subtitle="يدير الطلبات والكتالوج اليومي وفق الصلاحيات المحددة." meta="دور" badgeLabel="Staff" />
-          {serviceModes.map((mode) => (
-            <ListItem
-              key={mode.id}
-              title={mode.label}
-              subtitle={mode.description}
-              meta={mode.enabled ? 'مفعّل' : 'متوقف'}
-              badgeLabel={mode.enabled ? 'Live' : 'Off'}
-            />
-          ))}
-        </Box>
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <Button label="إدارة الطاقم" onPress={() => openSupport('team-management')} />
-          <Button label="دعوة مدير" tone="secondary" onPress={() => openSupport('manager-invite')} />
-          <Button label="مساحة الصيانة" onPress={openMaintenance} />
-          <Button label="ساعات العمل" tone="secondary" onPress={openHours} />
-          <Button label="المناطق" tone="secondary" onPress={openZones} />
-          <Button label="حالة المتجر" tone="ghost" onPress={() => openSupport('store-status-update')} />
-          <Button label="أوضاع الخدمة" tone="ghost" onPress={() => openSupport('store-service-modes-update')} />
-          <Button label="عمولة الوضع" tone="ghost" onPress={() => openSupport('commission-by-mode')} />
-          <Button label="تحليلات الطاقم" tone="ghost" onPress={() => openSupport('staff-analytics')} />
-        </Box>
+
+        {operationsSavedAt ? <Badge label={`آخر حفظ: ${operationsSavedAt}`} tone="success" /> : null}
+
+        <Text role="caption" tone="muted">هذا التبويب يبقى mobile-first ولا يفتح صفحة جديدة للفريق أو المناطق.</Text>
       </Surface>
     );
   }
@@ -521,15 +613,8 @@ export function PartnerDshConsoleScreen({
           </Text>
         </Box>
 
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <StatCard label="طلب نشط" value={String(activeOrdersCount)} deltaLabel="اليوم" tone="brand" />
-          <StatCard label="عاجل" value={String(urgentOrdersCount)} deltaLabel="يحتاج قرارًا" tone="warning" />
-          <StatCard label="معلّق" value={String(pendingActionsCount)} deltaLabel="مرئي الآن" tone="default" />
-        </Box>
-
         <KeyValueList
           items={[
-            { label: 'المتجر', value: storeName, tone: 'default' },
             { label: 'الفرع', value: branchLabel, tone: 'default' },
             { label: 'الساعات', value: todayHoursLabel, tone: 'default' },
             { label: 'المنطقة', value: activeZoneLabel, tone: 'default' },
@@ -548,15 +633,6 @@ export function PartnerDshConsoleScreen({
 
       {renderSectionContent()}
 
-      <Surface tone="inset" gap={2}>
-        <SectionHeader title="اختصارات سريعة" subtitle="وصول مباشر إلى المسارات الأكثر استخدامًا دون تكرار واجهات." />
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <Button label="الطلبات" onPress={openOrdersBoard} />
-          <Button label="المخزون" tone="secondary" onPress={openInventoryManagement} />
-          <Button label="الصيانة" tone="secondary" onPress={openMaintenance} />
-          <Button label="الدعم" tone="ghost" onPress={onOpenSupportDirectory} />
-        </Box>
-      </Surface>
     </MobileScrollView>
   );
 }

@@ -103,7 +103,7 @@ function OrderChatBubble({ message }: { message: OrderChatMessage }) {
 export type DshCaptainOrderChatScreenState = 'active' | 'readOnly';
 
 export type DshCaptainOrderChatScreenProps = {
-  taskId: string;
+  orderId: string;
   pickupLabel: string;
   dropoffLabel: string;
   state?: DshCaptainOrderChatScreenState;
@@ -111,7 +111,7 @@ export type DshCaptainOrderChatScreenProps = {
 };
 
 export function DshCaptainOrderChatScreen({
-  taskId,
+  orderId,
   pickupLabel,
   dropoffLabel,
   state = 'active',
@@ -212,14 +212,14 @@ export function DshCaptainOrderChatScreen({
     <MobileScrollView fill padding={4} gap={4}>
       <ScreenHeader
         title="تواصل الطلب"
-        subtitle="رسائل الطلب المختصرة تبقى مع نفس المهمة حتى الإغلاق."
+        subtitle="رسائل الطلب المختصرة تبقى مع نفس الطلب حتى الإغلاق."
         actionLabel={onBack ? 'عودة للتفاصيل' : undefined}
         onActionPress={onBack}
       />
 
       <Box gap={2}>
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <Badge label={`#${taskId}`} tone="brand" />
+          <Badge label={`#${orderId}`} tone="brand" />
           <Badge label={isReadOnly ? 'مقروء فقط' : 'نشط'} tone={isReadOnly ? 'success' : 'warning'} />
         </Box>
         <Text role="bodySm" tone="muted">

@@ -20,7 +20,7 @@ type CaptainBellSummary = {
 };
 
 const defaultSummary: CaptainBellSummary = {
-  inboxLabel: 'Captain inbox',
+  inboxLabel: 'Captain orders inbox',
   approvalLabel: 'Approval needed',
   urgentLabel: 'Urgent order rings',
   nextActionLabel: 'A new order ring should push the captain toward approval or the inbox without extra noise.',
@@ -86,7 +86,7 @@ export type DshCaptainBellScreenProps = {
   summary?: CaptainBellSummary;
   items?: CaptainBellItem[];
   onOpenInbox?: () => void;
-  onOpenNextTask?: () => void;
+  onOpenNextOrder?: () => void;
   onRetry?: () => void;
   onBack?: () => void;
 };
@@ -96,7 +96,7 @@ export function DshCaptainBellScreen({
   summary = defaultSummary,
   items = defaultItems,
   onOpenInbox,
-  onOpenNextTask,
+  onOpenNextOrder,
   onRetry,
   onBack,
 }: DshCaptainBellScreenProps) {
@@ -129,7 +129,7 @@ export function DshCaptainBellScreen({
       </Surface>
 
       <Surface tone="raised" gap={3}>
-        <SectionHeader title={summary.inboxLabel} subtitle="افتح الصندوق أو انتقل إلى أول مهمة من نفس الجرس." />
+        <SectionHeader title={summary.inboxLabel} subtitle="افتح الصندوق أو انتقل إلى أول طلب من نفس الجرس." />
         <KeyValueList
           items={[
             { label: 'الحالة', value: summary.approvalLabel, tone: 'brand' },
@@ -151,13 +151,13 @@ export function DshCaptainBellScreen({
       <Surface tone="inset" gap={2}>
         <Text role="bodyStrong" style={{ textAlign: 'right' }}>{summary.nextActionLabel}</Text>
         <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-          هذا الجرس لا يضيف ضوضاء. هو مجرد دفعة واضحة نحو صندوق المهام أو أول طلب يحتاج قرارًا.
+          هذا الجرس لا يضيف ضوضاء. هو مجرد دفعة واضحة نحو صندوق الطلبات أو أول طلب يحتاج قرارًا.
         </Text>
       </Surface>
 
       <Box gap={2}>
-        {onOpenNextTask ? <Button label="فتح أول طلب" onPress={onOpenNextTask} /> : null}
-        {onOpenInbox ? <Button label="صندوق المهام" tone="secondary" onPress={onOpenInbox} /> : null}
+        {onOpenNextOrder ? <Button label="فتح أول طلب" onPress={onOpenNextOrder} /> : null}
+        {onOpenInbox ? <Button label="صندوق الطلبات" tone="secondary" onPress={onOpenInbox} /> : null}
         {onBack ? <Button label="العودة" tone="ghost" onPress={onBack} /> : null}
         {onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
       </Box>
