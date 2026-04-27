@@ -10,6 +10,7 @@ import {
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
+import { ControlPanelDshOrderDetailScreen } from './ControlPanelDshOrderDetailScreen';
 import { getSampleDshOrders } from './order-fixtures';
 import styles from '../dsh-surface.module.css';
 

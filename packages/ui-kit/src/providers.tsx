@@ -7,6 +7,7 @@ import React, {
 	useEffect,
 	useMemo,
 	useState,
+	useId,
 	type ReactNode,
 } from 'react';
 import { Platform } from 'react-native';
@@ -268,7 +269,8 @@ export type UiKitProviderProps = {
 
 export function PortalHost({ children }: { children?: ReactNode }) {
 	const [hostElement, setHostElement] = useState<Element | null>(null);
-	const hostId = useMemo(() => `bth-portal-host-${Math.random().toString(36).slice(2, 10)}`, []);
+	const reactId = useId();
+	const hostId = useMemo(() => `portal-host-${String(reactId).replace(/[:.]/g, '')}`, [reactId]);
 	const isWeb = Platform.OS === 'web';
 
 	const contextValue = useMemo<PortalContextValue>(() => ({ hostElement, isWeb }), [hostElement, isWeb]);
@@ -280,7 +282,7 @@ export function PortalHost({ children }: { children?: ReactNode }) {
 				? React.createElement('div', {
 						id: hostId,
 						ref: (node: Element | null) => setHostElement(node),
-						'data-bth-portal-host': 'true',
+						'data-portal-host': 'true',
 						style: {
 							position: 'fixed',
 							inset: 0,

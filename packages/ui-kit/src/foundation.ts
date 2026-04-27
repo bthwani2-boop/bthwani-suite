@@ -522,6 +522,15 @@ export function createTokenCssVariables() {
 	appendVariables(variables, createScaleCssVariables('elevation', rawElevationScale, String));
 	appendVariables(variables, createTypographyCssVariables());
 
+	// Add UI-prefixed alias variables that reference the canonical --bth-* tokens.
+	const uiAliasEntries: CssVariableMap = {};
+	for (const [name, value] of Object.entries(variables)) {
+		if (name.startsWith('--bth-')) {
+			uiAliasEntries[name.replace('--bth-', '--ui-')] = `var(${name})`;
+		}
+	}
+	appendVariables(variables, uiAliasEntries);
+
 	return variables;
 }
 
@@ -774,6 +783,13 @@ export function createThemeCssVariables(theme: SemanticTheme) {
 	}
 
 	variables['--bth-color-scheme'] = resolveColorScheme(theme.mode);
+
+	// Add UI-prefixed aliases for theme variables to ease staged migration.
+	for (const [name, value] of Object.entries(variables)) {
+		if (name.startsWith('--bth-')) {
+			variables[name.replace('--bth-', '--ui-')] = `var(${name})` as string;
+		}
+	}
 
 	return variables;
 }

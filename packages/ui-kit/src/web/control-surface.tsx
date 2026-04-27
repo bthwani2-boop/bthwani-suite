@@ -2,7 +2,7 @@ import React from 'react';
 import { useDirection } from '../providers';
 
 const webControlSurfaceCss = `
-.bth-web-control-surface-header {
+.ui-web-control-surface-header {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -17,22 +17,19 @@ const webControlSurfaceCss = `
   box-shadow: 0 18px 36px rgba(10, 47, 92, 0.06);
   text-align: start;
 }
-
-.bth-web-control-surface-header__main {
+.ui-web-control-surface-header__main {
   display: grid;
   gap: 10px;
   min-width: 0;
   flex: 1;
 }
-
-.bth-web-control-surface-header__chips {
+.ui-web-control-surface-header__chips {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
-
-.bth-web-control-surface-header__chip {
+.ui-web-control-surface-header__chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -44,44 +41,38 @@ const webControlSurfaceCss = `
   font-size: 12px;
   font-weight: 800;
 }
-
-.bth-web-control-surface-header__chip--brand {
+.ui-web-control-surface-header__chip--brand {
   border-color: rgba(10, 47, 92, 0.14);
   background: rgba(10, 47, 92, 0.06);
 }
-
-.bth-web-control-surface-header__chip--accent {
+.ui-web-control-surface-header__chip--accent {
   border-color: rgba(255, 80, 13, 0.16);
   background: rgba(255, 80, 13, 0.08);
   color: #FF500D;
 }
-
-.bth-web-control-surface-header__title {
+.ui-web-control-surface-header__title {
   margin: 0;
   color: #0A2F5C;
   font-size: clamp(28px, 3vw, 38px);
   line-height: 1.08;
   font-weight: 900;
-  letter-spacing: -0.03em;
+  const controlSurfaceCss = `
 }
-
-.bth-web-control-surface-header__description {
-  margin: 0;
+.ui-web-control-surface-header__description {
+    align-items: center;
   max-width: 62ch;
   color: #475569;
   font-size: 14px;
   line-height: 1.8;
 }
-
-.bth-web-control-surface-header__actions {
+.ui-web-control-surface-header__actions {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: flex-start;
   gap: 10px;
 }
-
-.bth-web-control-action-button {
+.ui-web-control-action-button {
   appearance: none;
   box-sizing: border-box;
   display: inline-flex;
@@ -100,26 +91,22 @@ const webControlSurfaceCss = `
   text-align: center;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
-
-.bth-web-control-action-button:hover,
-.bth-web-control-action-card:hover,
-.bth-web-control-disclosure-item:hover {
+.ui-web-control-action-button:hover,
+.ui-web-control-action-card:hover,
+.ui-web-control-disclosure-item:hover {
   transform: translateY(-1px);
 }
-
-.bth-web-control-action-button--primary {
+.ui-web-control-action-button--primary {
   border-color: #FF500D;
   background: #FF500D;
   color: #ffffff;
   box-shadow: 0 12px 24px rgba(255, 80, 13, 0.18);
 }
-
-.bth-web-control-action-button--secondary {
+.ui-web-control-action-button--secondary {
   border-color: rgba(10, 47, 92, 0.12);
   background: #ffffff;
 }
-
-.bth-web-control-action-card {
+.ui-web-control-action-card {
   appearance: none;
   box-sizing: border-box;
   display: grid;
@@ -138,28 +125,25 @@ const webControlSurfaceCss = `
   text-align: start;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
-
-.bth-web-control-action-card--primary {
+.ui-web-control-action-card--primary {
   border-color: rgba(255, 80, 13, 0.22);
   background: linear-gradient(180deg, rgba(255, 244, 237, 0.95) 0%, #ffffff 100%);
   box-shadow: 0 10px 24px rgba(255, 80, 13, 0.08);
 }
 
-.bth-web-control-action-card__top {
+.ui-web-control-action-card__top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
-
-.bth-web-control-action-card__title {
+.ui-web-control-action-card__title {
   color: #0A2F5C;
   font-size: 16px;
   font-weight: 900;
 }
-
-.bth-web-control-action-card__badge,
-.bth-web-control-disclosure-item__badge {
+.ui-web-control-action-card__badge,
+.ui-web-control-disclosure-item__badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -172,15 +156,13 @@ const webControlSurfaceCss = `
   font-weight: 800;
   white-space: nowrap;
 }
-
-.bth-web-control-action-card__description {
+.ui-web-control-action-card__description {
   margin: 0;
   color: #475569;
   font-size: 13px;
   line-height: 1.7;
 }
-
-.bth-web-control-action-card__footer {
+.ui-web-control-action-card__footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -190,13 +172,11 @@ const webControlSurfaceCss = `
   font-size: 12px;
   font-weight: 700;
 }
-
-.bth-web-control-action-card__footer-arrow {
+.ui-web-control-action-card__footer-arrow {
   color: #FF500D;
   font-size: 14px;
 }
-
-.bth-web-control-disclosure-item {
+.ui-web-control-disclosure-item {
   appearance: none;
   box-sizing: border-box;
   display: flex;
@@ -216,35 +196,32 @@ const webControlSurfaceCss = `
   text-align: start;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
-
-.bth-web-control-disclosure-item__text {
+.ui-web-control-disclosure-item__text {
   display: grid;
   gap: 4px;
   min-width: 0;
 }
-
-.bth-web-control-disclosure-item__label {
+.ui-web-control-disclosure-item__label {
   color: #0A2F5C;
   font-size: 13px;
   font-weight: 800;
 }
-
-.bth-web-control-disclosure-item__description {
+.ui-web-control-disclosure-item__description {
   color: #64748b;
   font-size: 12px;
   line-height: 1.6;
 }
 
 @media (max-width: 640px) {
-  .bth-web-control-surface-header {
+  .ui-web-control-surface-header {
     padding: 16px;
   }
 
-  .bth-web-control-surface-header__actions {
+  .ui-web-control-surface-header__actions {
     width: 100%;
   }
 
-  .bth-web-control-surface-header__actions .bth-web-control-action-button {
+  .ui-web-control-surface-header__actions .ui-web-control-action-button {
     width: 100%;
   }
 }
@@ -270,10 +247,10 @@ type RenderableControlAction = WebControlSurfaceAction & {
 
 function renderControlAction(action: RenderableControlAction, key: React.Key) {
   const className = [
-    'bth-web-control-action-button',
+    'ui-web-control-action-button',
     action.tone === 'primary'
-      ? 'bth-web-control-action-button--primary'
-      : 'bth-web-control-action-button--secondary',
+      ? 'ui-web-control-action-button--primary'
+      : 'ui-web-control-action-button--secondary',
     action.className ?? '',
   ]
     .filter(Boolean)
@@ -343,15 +320,15 @@ export function WebControlSurfaceHeader({
   return (
     <>
       <WebControlSurfaceStyles />
-      <section className="bth-web-control-surface-header" dir={direction}>
-        <div className="bth-web-control-surface-header__main">
+      <section className="ui-web-control-surface-header" dir={direction}>
+        <div className="ui-web-control-surface-header__main">
           {chips.length > 0 ? (
-            <div className="bth-web-control-surface-header__chips">
+            <div className="ui-web-control-surface-header__chips">
               {chips.map((chip) => {
                 const chipClassName = [
-                  'bth-web-control-surface-header__chip',
-                  chip.tone === 'brand' ? 'bth-web-control-surface-header__chip--brand' : '',
-                  chip.tone === 'accent' ? 'bth-web-control-surface-header__chip--accent' : '',
+                  'ui-web-control-surface-header__chip',
+                  chip.tone === 'brand' ? 'ui-web-control-surface-header__chip--brand' : '',
+                  chip.tone === 'accent' ? 'ui-web-control-surface-header__chip--accent' : '',
                 ]
                   .filter(Boolean)
                   .join(' ');
@@ -365,12 +342,12 @@ export function WebControlSurfaceHeader({
             </div>
           ) : null}
 
-          <h1 className="bth-web-control-surface-header__title">{title}</h1>
-          {description ? <p className="bth-web-control-surface-header__description">{description}</p> : null}
+          <h1 className="ui-web-control-surface-header__title">{title}</h1>
+          {description ? <p className="ui-web-control-surface-header__description">{description}</p> : null}
         </div>
 
         {actions.length > 0 ? (
-          <div className="bth-web-control-surface-header__actions">
+          <div className="ui-web-control-surface-header__actions">
             {actions.map((action) => renderControlAction(action, action.id ?? action.label))}
           </div>
         ) : null}
@@ -401,22 +378,22 @@ export function WebControlActionCard({
   onAction,
 }: WebControlActionCardProps) {
   const className = [
-    'bth-web-control-action-card',
-    tone === 'primary' ? 'bth-web-control-action-card--primary' : '',
+    'ui-web-control-action-card',
+    tone === 'primary' ? 'ui-web-control-action-card--primary' : '',
   ]
     .filter(Boolean)
     .join(' ');
 
   const content = (
     <>
-      <div className="bth-web-control-action-card__top">
-        <strong className="bth-web-control-action-card__title">{title}</strong>
-        {badge ? <span className="bth-web-control-action-card__badge">{badge}</span> : null}
+      <div className="ui-web-control-action-card__top">
+        <strong className="ui-web-control-action-card__title">{title}</strong>
+        {badge ? <span className="ui-web-control-action-card__badge">{badge}</span> : null}
       </div>
-      <p className="bth-web-control-action-card__description">{description}</p>
-      <span className="bth-web-control-action-card__footer">
+      <p className="ui-web-control-action-card__description">{description}</p>
+      <span className="ui-web-control-action-card__footer">
         <span>{footerLabel}</span>
-        <span className="bth-web-control-action-card__footer-arrow">&gt;</span>
+        <span className="ui-web-control-action-card__footer-arrow">&gt;</span>
       </span>
     </>
   );
@@ -466,11 +443,11 @@ export function WebControlDisclosureItem({
 }: WebControlDisclosureItemProps) {
   const content = (
     <>
-      <div className="bth-web-control-disclosure-item__text">
-        <strong className="bth-web-control-disclosure-item__label">{label}</strong>
-        <span className="bth-web-control-disclosure-item__description">{description}</span>
+      <div className="ui-web-control-disclosure-item__text">
+        <strong className="ui-web-control-disclosure-item__label">{label}</strong>
+        <span className="ui-web-control-disclosure-item__description">{description}</span>
       </div>
-      {badge ? <span className="bth-web-control-disclosure-item__badge">{badge}</span> : null}
+      {badge ? <span className="ui-web-control-disclosure-item__badge">{badge}</span> : null}
     </>
   );
 
@@ -481,7 +458,7 @@ export function WebControlDisclosureItem({
         <a
           key={id ?? label}
           href={href}
-          className="bth-web-control-disclosure-item"
+          className="ui-web-control-disclosure-item"
           onClick={(event) => {
             if (onAction) {
               event.preventDefault();
@@ -492,7 +469,7 @@ export function WebControlDisclosureItem({
           {content}
         </a>
       ) : (
-        <button key={id ?? label} type="button" className="bth-web-control-disclosure-item" onClick={onAction}>
+        <button key={id ?? label} type="button" className="ui-web-control-disclosure-item" onClick={onAction}>
           {content}
         </button>
       )}

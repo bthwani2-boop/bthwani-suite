@@ -28,3 +28,5 @@ export { AppErrorState, AppEmptyState, AppLoadingState, AppSuccessState, EmptySt
 export type { AppEmptyStateProps, AppErrorStateProps, AppLoadingStateProps, AppSuccessStateProps, StateDefinition, StateId, StateKind, StateTone, StateViewProps, ScreenState, ScreenWrapperProps } from './state';
 export { MobileWorkspaceHeader, NewsTickerBar, ScreenHeader, SearchTopBar, SectionHeader, Tabs, TopBar } from './header';
 export type { MobileWorkspaceHeaderProps, NewsTickerBarProps, ScreenHeaderProps, SearchTopBarProps, SectionHeaderProps, TabItem, TabsProps, TopBarAction, TopBarProps, TopBarVariant } from './header';
+export { IconButton } from './icon-button';
+export type { IconButtonProps } from './icon-button';
