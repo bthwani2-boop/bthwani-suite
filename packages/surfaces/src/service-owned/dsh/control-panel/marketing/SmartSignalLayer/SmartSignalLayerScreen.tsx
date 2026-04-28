@@ -387,7 +387,7 @@ function resolveMarketingCategoryLanes(): ReadonlyArray<MarketingCategoryLane> {
 	const grouped = new Map<string, Array<(typeof dshPartnerIntakeItems)[number]>>();
 
 	dshPartnerIntakeItems
-		.filter((item) => item.stage === 'pending-marketing' || item.stage === 'published')
+		.filter((item) => item.queue === 'marketing-review')
 		.forEach((item) => {
 			const currentItems = grouped.get(item.categoryLabel) ?? [];
 			currentItems.push(item);
@@ -396,8 +396,8 @@ function resolveMarketingCategoryLanes(): ReadonlyArray<MarketingCategoryLane> {
 
 	return [...grouped.entries()].map(([categoryLabel, items]) => ({
 		categoryLabel,
-	pendingCount: items.filter((item) => item.stage === 'pending-marketing').length,
-		publishedCount: items.filter((item) => item.stage === 'published').length,
+		pendingCount: items.length,
+		publishedCount: 0,
 		items,
 	}));
 }
@@ -664,7 +664,7 @@ export function ControlPanelDshMarketingScreen({
 									</Box>
 									{lane.items.slice(0, 2).map((item) => (
 										<Text key={item.id} role="bodySm" tone="muted">
-											{item.productName} · {item.ownerLabel}
+											{item.storeName} · {item.ownerLabel}
 										</Text>
 									))}
 								</Box>

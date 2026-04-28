@@ -1,26 +1,12 @@
 import React from 'react';
-import { Badge, Box, Button, KeyValueList, ListItem, MobileCommandSectionList, MobileCommandSummaryStrip, MobileScrollView, SectionHeader, SheetFrame, Surface, Text, useDirection } from '@bthwani/ui-kit';
-import type { MobileCommandSectionItemData, MobileCommandSummaryItem } from '@bthwani/ui-kit';
-
-type MobileAccountTypeOption = {
-  id: string;
-  label: string;
-  description: string;
-};
+import { Badge, Box, Button, KeyValueList, ListItem, MobileScrollView, SectionHeader, SheetFrame, Surface, Text } from '@bthwani/ui-kit';
+import { MobileFieldAccountWorkspace, type MobileAccountTypeOption, type MobileFieldAccountWorkspaceTab } from './MobileFieldAccountWorkspace';
 
 type MobileAccountSheetTab = 'menu' | 'settings' | 'type-switch';
 
 type MobileAccountSheetMode = 'generic' | 'captain' | 'field';
 
-export type MobileAccountSheetFieldTab = {
-  id: string;
-  label: string;
-  subtitle?: string;
-  badgeLabel?: string;
-  icon?: MobileCommandSectionItemData['icon'];
-  statusTone?: MobileCommandSectionItemData['statusTone'];
-  content: React.ReactNode;
-};
+export type MobileAccountSheetFieldTab = MobileFieldAccountWorkspaceTab;
 
 export type MobileAccountSheetMenuItem = {
   id: string;
@@ -35,7 +21,7 @@ export type MobileAccountSheetMenuItem = {
 export type MobileAccountSheetCaptainSection = {
   title: string;
   subtitle?: string;
-  items: readonly MobileAccountSheetMenuItem[];
+  items: ReadonlyArray<MobileAccountSheetMenuItem>;
 };
 
 type MobileAccountSheetProps = {
@@ -59,15 +45,15 @@ type MobileAccountSheetProps = {
   operationsLabel?: string;
   inventoryLabel?: string;
   analyticsLabel?: string;
-  typeOptions: readonly MobileAccountTypeOption[];
+  typeOptions: ReadonlyArray<MobileAccountTypeOption>;
   activeTypeId: string;
   onSelectType: (typeId: string) => void;
   captainSummaryItems?: React.ComponentProps<typeof KeyValueList>['items'];
-  captainSections?: readonly MobileAccountSheetCaptainSection[];
+  captainSections?: ReadonlyArray<MobileAccountSheetCaptainSection>;
   fieldTitle?: string;
   fieldSubtitle?: string;
   fieldSummaryItems?: React.ComponentProps<typeof KeyValueList>['items'];
-  fieldTabs?: readonly MobileAccountSheetFieldTab[];
+  fieldTabs?: ReadonlyArray<MobileAccountSheetFieldTab>;
 };
 
 export function MobileAccountSheet({
@@ -102,17 +88,14 @@ export function MobileAccountSheet({
   fieldTabs,
 }: MobileAccountSheetProps) {
   const [tab, setTab] = React.useState<MobileAccountSheetTab>('menu');
-  const [fieldSectionId, setFieldSectionId] = React.useState(fieldTabs?.[0]?.id ?? 'overview');
-  const { language, setLanguage } = useDirection();
   const isCaptainMode = mode === 'captain';
   const isFieldMode = mode === 'field';
 
   React.useEffect(() => {
     if (!visible) {
       setTab('menu');
-      setFieldSectionId(fieldTabs?.[0]?.id ?? 'overview');
     }
-  }, [fieldTabs, visible]);
+  }, [visible]);
 
   const title =
     tab === 'settings'
@@ -243,69 +226,32 @@ export function MobileAccountSheet({
     );
   };
 
-  const renderFieldHub = () => {
-    const tabs = fieldTabs ?? [];
-    const activeSection = tabs.find((item) => item.id === fieldSectionId) ?? tabs[0];
-    const summaryStripItems: MobileCommandSummaryItem[] = (fieldSummaryItems ?? []).map((item, index) => ({
-      id: `field-summary-${index}`,
-      label: item.label,
-      value: typeof item.value === 'string' ? item.value : typeof item.value === 'number' ? String(item.value) : '[TBD]',
-      tone: typeof item.tone === 'string' ? item.tone : undefined,
-    }));
-
-    const commandSectionItems = tabs.map((item) => ({
-      id: item.id,
-      title: item.label,
-      subtitle: item.subtitle,
-      icon: item.icon,
-      statusLabel: item.badgeLabel,
-      statusTone: item.statusTone ?? (item.id === fieldSectionId ? 'brand' : 'soft'),
-      onPress: () => setFieldSectionId(item.id),
-    }));
-
-    return (
-      <MobileScrollView style={{ maxHeight: 620 }} gap={3} showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingBottom: 8 }}>
-        <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-          <Box gap={2} style={{ alignItems: 'flex-end' }}>
-            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-              <Badge label={activeTypeId === 'dsh' ? 'DSH' : 'ARB'} tone={activeTypeId === 'dsh' ? 'success' : 'warning'} />
-              <Badge label="مركز الحساب" tone="brand" />
-            </Box>
-            <Text role="titleMd" style={{ textAlign: 'right' }}>
-              {fieldTitle}
-            </Text>
-            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-              {fieldSubtitle}
-            </Text>
-          </Box>
-
-          {summaryStripItems.length ? <MobileCommandSummaryStrip items={summaryStripItems} /> : null}
-        </Surface>
-
-        <MobileCommandSectionList title="الأقسام الرئيسية" subtitle="قائمة عمودية واضحة لكل قسم داخل الحساب." items={commandSectionItems} />
-
-        <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-          {activeSection ? (
-            <Box gap={3}>
-              <SectionHeader title={activeSection.label} subtitle={activeSection.subtitle} />
-              {activeSection.content}
-            </Box>
-          ) : (
-            <Text role="bodySm" tone="muted">لا توجد أقسام معرفة بعد.</Text>
-          )}
-        </Surface>
-
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <Button label={settingsLabel} tone="secondary" fullWidth={false} style={{ flex: 1 }} onPress={() => setTab('settings')} />
-          <Button label={typeSwitchLabel} tone="primary" fullWidth={false} style={{ flex: 1 }} onPress={() => setTab('type-switch')} />
-        </Box>
-      </MobileScrollView>
-    );
-  };
-
   return (
     <SheetFrame visible={visible} title={title} onClose={onClose}>
-      {tab === 'menu' ? (isFieldMode ? renderFieldHub() : isCaptainMode ? renderCaptainMenu() : <>{renderGenericMenu()}</>) : null}
+      {tab === 'menu' ? (
+        isFieldMode ? (
+          <MobileFieldAccountWorkspace
+            presentation="sheet"
+            visible={visible}
+            fieldTitle={fieldTitle}
+            fieldSubtitle={fieldSubtitle}
+            fieldSummaryItems={fieldSummaryItems}
+            fieldTabs={fieldTabs}
+            activeTypeId={activeTypeId}
+            typeOptions={typeOptions}
+            settingsLabel={settingsLabel}
+            typeSwitchLabel={typeSwitchLabel}
+            typeSwitchTitle={typeSwitchTitle}
+            typeSwitchPrompt={typeSwitchPrompt}
+            onSelectType={onSelectType}
+            onClose={onClose}
+          />
+        ) : isCaptainMode ? (
+          renderCaptainMenu()
+        ) : (
+          <>{renderGenericMenu()}</>
+        )
+      ) : null}
 
       {tab === 'settings' ? (
         <>

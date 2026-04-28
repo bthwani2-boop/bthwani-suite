@@ -155,40 +155,82 @@ function Get-CheckpointMessage {
 
 function Get-BranchSlug {
     param([string]$Text, [string[]]$ChangedPaths)
-    $source = $Text
-    if ($ChangedPaths -and $ChangedPaths.Count -gt 0) {
-        $roots = @(
+
+    $source = [string]$Text
+
+    if ([string]::IsNullOrWhiteSpace($source) -and $ChangedPaths -and $ChangedPaths.Count -gt 0) {
+        $top = @(
             $ChangedPaths |
-                ForEach-Object { ($_ -split '[\\/]', 3)[0..([Math]::Min(1, (($_ -split '[\\/]').Count - 1)))] -join '-' } |
-                ForEach-Object { $_.ToLowerInvariant() } |
+                ForEach-Object { ($_ -split '[\\/]', 2)[0].ToLowerInvariant() } |
+                Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
                 Select-Object -Unique |
-                Select-Object -First 3
+                Select-Object -First 2
         )
-        if ($roots.Count -gt 0) { $source = "$($roots -join '-') $Text" }
+        if ($top.Count -gt 0) { $source = ($top -join '-') }
     }
-    if ([string]::IsNullOrWhiteSpace($source)) { return 'checkpoint' }
+
+    if ([string]::IsNullOrWhiteSpace($source)) {
+        $source = 'checkpoint'
+    }
+
     $value = $source.ToLowerInvariant()
     $value = $value -replace '^(feat|fix|chore|refactor|docs|test|ci|build|style|perf):\s*', ''
+    $value = $value -replace '\b(checkpoint|finalize|repair|workflow|tools|script|scripts)\b', ''
     $value = $value -replace '[^a-z0-9]+', '-'
     $value = $value.Trim('-')
-    if ([string]::IsNullOrWhiteSpace($value)) { return 'checkpoint' }
-    if ($value.Length -gt 64) { $value = $value.Substring(0, 64).TrimEnd('-') }
+
+    if ([string]::IsNullOrWhiteSpace($value)) {
+        $value = 'checkpoint'
+    }
+
+    # Keep branch names short and practical.
+    if ($value.Length -gt 32) {
+        $value = $value.Substring(0, 32).TrimEnd('-')
+    }
+
+    if ([string]::IsNullOrWhiteSpace($value)) {
+        $value = 'checkpoint'
+    }
+
     return $value
 }
 
 function Get-NextGhbSequenceNumber {
     Invoke-Git -Arguments @('fetch', '--prune', 'origin') -StepName 'fetch origin branches' -AllowFailure | Out-Null
+
     $result = Invoke-Git -Arguments @('branch', '-a') -StepName 'list branches' -AllowFailure
     $max = 0
+
     foreach ($raw in @($result['output'])) {
         $name = ([string]$raw).Trim()
         if ($name.StartsWith('*')) { $name = $name.Substring(1).Trim() }
         if ($name -match '^remotes/[^/]+/(.+)$') { $name = $Matches[1] }
-        if ($name -match '^ghb/[\(]?([0-9]+)[\)]?-') {
+
+        # Accepted ghb sequence formats:
+        #   ghb/(99)-...
+        #   ghb/0099-...
+        #   ghb/0100-...
+        #
+        # Rejected as sequence:
+        #   ghb/20260408-...  => date-like mistake, not a sequence.
+        if ($name -match '^ghb/\(([0-9]{1,4})\)-') {
             $n = [int]$Matches[1]
             if ($n -gt $max) { $max = $n }
+            continue
+        }
+
+        if ($name -match '^ghb/([0-9]{4})-') {
+            $candidate = [int]$Matches[1]
+
+            # Reject date-like accidental branch names such as 20260408.
+            if ($candidate -ge 1 -and $candidate -le 9999) {
+                $n = $candidate
+                if ($n -gt $max) { $max = $n }
+            }
+            continue
         }
     }
+
     return ($max + 1)
 }
 

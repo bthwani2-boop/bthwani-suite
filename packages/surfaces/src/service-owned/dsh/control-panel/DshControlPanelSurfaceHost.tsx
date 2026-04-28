@@ -76,6 +76,7 @@ type DshDockText = {
 export type DshControlPanelSurfaceHostProps = {
   workspace?: DshWorkspaceId;
   orderId?: string;
+  orderOverlayMode?: 'detail' | 'chat';
 };
 
 type DshDockRouteItem = {
@@ -256,7 +257,7 @@ function ControlPanelDshOperationsDock() {
   );
 }
 
-export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: DshControlPanelSurfaceHostProps) {
+export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId, orderOverlayMode }: DshControlPanelSurfaceHostProps) {
   const router = useRouter();
   const uiText = useUiText();
   const dshText = useDshControlPanelText();
@@ -266,6 +267,7 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
     : workspace === 'arrival-bell'
       ? 'bell'
       : workspace;
+  const initialOrdersOverlayMode = orderOverlayMode ?? (workspace === 'orderchat' ? 'chat' : workspace === 'order-detail' ? 'detail' : null);
 
   const tabs = [
     { id: 'overview', label: dshText.hub.workbenches.overview.label, active: normalizedWorkspace === 'overview' },
@@ -302,9 +304,16 @@ export function DshControlPanelSurfaceHost({ workspace = 'overview', orderId }: 
         />
       </Box>
 
-      {workspace === 'orders' ? <ControlPanelDshOrdersScreen embedded showHeader={false} hubHref="/operations/dsh" operationsHref="/operations" /> : null}
-      {workspace === 'order-detail' && orderId ? <ControlPanelDshOrderDetailScreen embedded showHeader={false} orderId={orderId} hubHref="/operations/dsh" ordersHref="/operations/dsh/orders" /> : null}
-      {workspace === 'orderchat' && orderId ? <ControlPanelDshOrderChatScreen embedded showHeader={false} orderId={orderId} ordersHref="/operations/dsh/orders" /> : null}
+      {normalizedWorkspace === 'orders' ? (
+        <ControlPanelDshOrdersScreen
+          embedded
+          showHeader={false}
+          hubHref="/operations/dsh"
+          operationsHref="/operations"
+          initialSelectedOrderId={orderId ?? null}
+          initialOverlayMode={initialOrdersOverlayMode}
+        />
+      ) : null}
       {workspace === 'sheinproxy' ? (
         <ControlPanelDshManualAssignmentScreen
           requestId={orderId ?? 'shein-proxy-001'}

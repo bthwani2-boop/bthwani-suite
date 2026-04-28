@@ -7,12 +7,14 @@ const webRootBodyCss = `
 html {
   color-scheme: light;
   background: var(--bth-background);
+  height: 100%;
   min-height: 100vh;
 }
 
 /* compatibility: accept both old and new root class names so styles continue to apply */
 body.bth-web-root-body, body.ui-web-root-body, html, #__next {
   margin: 0;
+  height: 100%;
   min-height: 100vh;
   background: var(--bth-background);
   color: var(--bth-text);

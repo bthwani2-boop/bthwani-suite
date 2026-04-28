@@ -9,12 +9,14 @@ import {
   WebSectionCard,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
+import { ControlPanelDshOrderChatScreen } from '../orderchat';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import { ControlPanelDshOrderDetailScreen } from './ControlPanelDshOrderDetailScreen';
 import { getSampleDshOrders } from './order-fixtures';
 import styles from '../dsh-surface.module.css';
 
 type ControlPanelDshOrdersScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
+type OrdersOverlayMode = 'detail' | 'chat';
 
 function resolveStateCopy(text: ReturnType<typeof useDshControlPanelText>, state: Exclude<ControlPanelDshOrdersScreenState, 'ready'>) {
   if (state === 'loading') {
@@ -67,6 +69,8 @@ export type ControlPanelDshOrdersScreenProps = {
   operationsHref?: string;
   embedded?: boolean;
   showHeader?: boolean;
+  initialSelectedOrderId?: string | null;
+  initialOverlayMode?: OrdersOverlayMode | null;
 };
 
 export function ControlPanelDshOrdersScreen({
@@ -75,14 +79,43 @@ export function ControlPanelDshOrdersScreen({
   operationsHref = '/operations',
   embedded = false,
   showHeader = true,
+  initialSelectedOrderId = null,
+  initialOverlayMode = null,
 }: ControlPanelDshOrdersScreenProps) {
   const router = useRouter();
   const dshText = useDshControlPanelText();
   const orders = React.useMemo(() => getSampleDshOrders(dshText), [dshText]);
-  const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(null);
+  const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(initialSelectedOrderId);
+  const [overlayMode, setOverlayMode] = React.useState<OrdersOverlayMode>(initialOverlayMode ?? 'detail');
   const assignedCount = orders.filter((order) => order.statusTone === 'success').length;
   const openCount = orders.filter((order) => order.statusTone === 'brand').length;
   const reviewCount = orders.filter((order) => order.statusTone === 'warning').length;
+
+  React.useEffect(() => {
+    setSelectedOrderId(initialSelectedOrderId);
+  }, [initialSelectedOrderId]);
+
+  React.useEffect(() => {
+    if (initialOverlayMode) {
+      setOverlayMode(initialOverlayMode);
+    }
+  }, [initialOverlayMode]);
+
+  const selectedOrderLabel = selectedOrderId ?? dshText.orders.openDetail;
+  const handleOpenOrderDetail = React.useCallback((orderId: string) => {
+    setSelectedOrderId(orderId);
+    setOverlayMode('detail');
+  }, []);
+
+  const handleOpenOrderChat = React.useCallback((orderId: string) => {
+    setSelectedOrderId(orderId);
+    setOverlayMode('chat');
+  }, []);
+
+  const handleCloseSheet = React.useCallback(() => {
+    setSelectedOrderId(null);
+    setOverlayMode('detail');
+  }, []);
 
   if (state !== 'ready') {
     const stateCopy = resolveStateCopy(dshText, state);
@@ -154,7 +187,7 @@ export function ControlPanelDshOrdersScreen({
                   <Button
                     label={dshText.orders.openDetail}
                     tone="ghost"
-                    onPress={() => setSelectedOrderId(order.id)}
+                    onPress={() => handleOpenOrderDetail(order.id)}
                   />
                 </Box>
               </Box>
@@ -163,11 +196,27 @@ export function ControlPanelDshOrdersScreen({
         </WebSectionCard>
         <SheetFrame
           visible={!!selectedOrderId}
-          title={selectedOrderId ? `${dshText.orders.openDetail}: ${selectedOrderId}` : dshText.orders.openDetail}
-          onClose={() => setSelectedOrderId(null)}
+          title={selectedOrderId ? `${overlayMode === 'chat' ? 'تواصل الطلب' : dshText.orders.openDetail}: ${selectedOrderLabel}` : dshText.orders.openDetail}
+          onClose={handleCloseSheet}
         >
           {selectedOrderId ? (
-            <ControlPanelDshOrderDetailScreen embedded showHeader={false} orderId={selectedOrderId} hubHref="/operations/dsh" ordersHref="/operations/dsh/orders" />
+            overlayMode === 'chat' ? (
+              <ControlPanelDshOrderChatScreen
+                embedded
+                showHeader={false}
+                orderId={selectedOrderId}
+                ordersHref="/operations/dsh/orders"
+              />
+            ) : (
+              <ControlPanelDshOrderDetailScreen
+                embedded
+                showHeader={false}
+                orderId={selectedOrderId}
+                hubHref="/operations/dsh"
+                ordersHref="/operations/dsh/orders"
+                onOpenOrderChat={handleOpenOrderChat}
+              />
+            )
           ) : null}
         </SheetFrame>
       </div>

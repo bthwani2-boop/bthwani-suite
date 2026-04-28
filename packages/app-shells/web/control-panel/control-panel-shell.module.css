@@ -1,8 +1,8 @@
 .stageStack {
   display: grid;
   gap: 16px;
-  direction: rtl;
-  text-align: right;
+  direction: inherit;
+  text-align: inherit;
   min-width: 0;
 }
 

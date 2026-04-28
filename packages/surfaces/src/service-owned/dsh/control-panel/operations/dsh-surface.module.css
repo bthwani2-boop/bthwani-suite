@@ -164,6 +164,21 @@
   margin-top: 8px;
 }
 
+.partnersDecisionGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: 16px;
+}
+
+.partnersQueueList {
+  display: grid;
+  gap: 12px;
+}
+
+.partnersDecisionPanel {
+  min-height: 100%;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 760px) {
   .opsWorkspace,
@@ -178,7 +193,8 @@
 
   .workbenchGrid,
   .reassignCandidatesGrid,
-  .reassignDecisionGrid {
+  .reassignDecisionGrid,
+  .partnersDecisionGrid {
     grid-template-columns: 1fr;
   }
 

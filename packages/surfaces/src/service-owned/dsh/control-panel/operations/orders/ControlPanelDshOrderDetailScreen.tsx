@@ -83,6 +83,7 @@ export type ControlPanelDshOrderDetailScreenProps = {
   reassignHref?: string;
   embedded?: boolean;
   showHeader?: boolean;
+  onOpenOrderChat?: (orderId: string) => void;
 };
 
 export function ControlPanelDshOrderDetailScreen({
@@ -95,6 +96,7 @@ export function ControlPanelDshOrderDetailScreen({
   reassignHref = '/operations/dsh/reassign',
   embedded = false,
   showHeader = true,
+  onOpenOrderChat,
 }: ControlPanelDshOrderDetailScreenProps) {
   const router = useRouter();
   const dshText = useDshControlPanelText();
@@ -229,7 +231,14 @@ export function ControlPanelDshOrderDetailScreen({
               label="فتح تواصل الطلب"
               tone="secondary"
               fullWidth={false}
-              onPress={() => router.push(`${ordersHref}/${order.id}/orderchat`)}
+              onPress={() => {
+                if (onOpenOrderChat) {
+                  onOpenOrderChat(order.id);
+                  return;
+                }
+
+                router.push(`${ordersHref}/${order.id}/orderchat`);
+              }}
             />
           </Box>
         </WebSectionCard>

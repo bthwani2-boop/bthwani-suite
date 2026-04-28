@@ -8,6 +8,12 @@ const webCommandCenterCss = `
   gap: 20px;
   align-content: start;
   min-height: 100vh;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 12px 16px;
+  background: var(--bth-surface, #ffffff) !important;
+  color: var(--bth-text);
 }
 
 .ui-web-command-strip {
@@ -18,13 +24,13 @@ const webCommandCenterCss = `
   padding: 8px 12px;
   border-radius: 12px;
   border: 1px solid rgba(10, 47, 92, 0.08);
-  background: var(--bth-surface);
-  box-shadow: 0 1px 8px rgba(10, 47, 92, 0.04);
+  background: var(--bth-surface, #ffffff) !important;
+  box-shadow: none !important;
   flex-wrap: wrap;
   position: sticky;
   top: 12px;
   z-index: 30;
-  backdrop-filter: none;
+  backdrop-filter: none !important;
 }
 .ui-web-command-strip__top-row,
 .ui-web-command-strip__secondary-row,
@@ -174,20 +180,8 @@ const webCommandCenterCss = `
     gap: 24px;
     align-items: stretch;
     min-height: calc(100vh - 116px);
-    direction: inherit;
-    /* default layout: stage then rail (RTL-first) */
-    grid-template-columns: minmax(0, 1fr) var(--rail-width);
-    grid-template-areas: "stage rail";
-  }
-
-  [dir="ltr"] .ui-web-command-center__workspace {
-    /* LTR: rail on the left, stage on the right */
-    grid-template-columns: var(--rail-width) minmax(0, 1fr);
-    grid-template-areas: "rail stage";
-  }
-
-  [dir="rtl"] .ui-web-command-center__workspace {
-    /* RTL: stage on the left, rail on the right */
+    direction: ltr;
+    /* Desktop: reserve space for a rail column so it does not overlay the stage */
     grid-template-columns: minmax(0, 1fr) var(--rail-width);
     grid-template-areas: "stage rail";
   }
@@ -217,11 +211,12 @@ const webCommandCenterCss = `
     min-width: 0;
     align-content: start;
     min-height: calc(100vh - 132px);
-    max-height: calc(100vh - 132px);
+    /* allow stage to size naturally and be the single vertical scroller */
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
     padding-inline-end: 6px;
+    margin: 0; /* reset any external margins so grid sizing controls layout */
   }
 
   .ui-web-command-center__rail {
@@ -238,16 +233,19 @@ const webCommandCenterCss = `
     }
   }
 
-  [dir="rtl"] .ui-web-command-center__stage,
-  [dir="rtl"] .ui-web-command-center__rail {
+  /* ensure direction is resolved from the component root only */
+  .ui-web-command-center-root[dir="rtl"] .ui-web-command-center__stage,
+  .ui-web-command-center-root[dir="rtl"] .ui-web-command-center__rail {
     direction: rtl;
   }
 
-  [dir="ltr"] .ui-web-command-center__stage,
-  [dir="ltr"] .ui-web-command-center__rail {
+  .ui-web-command-center-root[dir="ltr"] .ui-web-command-center__stage,
+  .ui-web-command-center-root[dir="ltr"] .ui-web-command-center__rail {
     direction: ltr;
   }
 
+  /* Desktop: keep the rail in-flow using sticky positioning inside the reserved grid column
+     so it doesn't overlay the stage content. On narrow screens it becomes static below the stage. */
   .ui-web-command-center__rail {
     position: sticky;
     top: 84px;
@@ -259,10 +257,12 @@ const webCommandCenterCss = `
     box-shadow: 0 4px 12px rgba(10, 47, 92, 0.03);
     backdrop-filter: none;
     width: var(--rail-width);
-    overflow: visible;
+    overflow: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
     transition: width 180ms ease;
+    z-index: 40;
+    height: calc(100vh - 104px);
   }
 
   @media (max-width: 900px) {
@@ -272,7 +272,20 @@ const webCommandCenterCss = `
       width: 100%;
       max-height: none;
       overflow: visible;
+      height: auto;
+      z-index: auto;
     }
+  }
+
+  /* Layout grid ordering: place rail on visual end depending on direction */
+  .ui-web-command-center-root[dir="rtl"] .ui-web-command-center__workspace {
+    grid-template-columns: minmax(0, 1fr) var(--rail-width);
+    grid-template-areas: "stage rail";
+  }
+
+  .ui-web-command-center-root[dir="ltr"] .ui-web-command-center__workspace {
+    grid-template-columns: var(--rail-width) minmax(0, 1fr);
+    grid-template-areas: "rail stage";
   }
 
   .ui-web-command-center-root[data-rail-collapsed="1"] {
@@ -290,6 +303,15 @@ const webCommandCenterCss = `
   .ui-web-command-center__rail[data-collapsed="1"] .ui-web-command-center__rail-status,
   .ui-web-command-center__rail[data-collapsed="1"] .ui-web-command-center__rail-title {
     display: none;
+  }
+
+  /* No manual stage margin required; grid reserves the rail column to avoid jumps */
+  .ui-web-command-center-root[dir="rtl"] .ui-web-command-center__stage {
+    margin: 0;
+  }
+
+  .ui-web-command-center-root[dir="ltr"] .ui-web-command-center__stage {
+    margin: 0;
   }
 
   .ui-web-command-center__rail-item::before {
@@ -735,7 +757,6 @@ const webCommandCenterCss = `
               className="ui-web-command-center__rail"
               data-collapsed={railCollapsed ? '1' : '0'}
               role="complementary"
-              aria-hidden={railCollapsed}
             >
               <div className="ui-web-command-center__rail-header">
                 <h2 className="ui-web-command-center__rail-title">{railTitle}</h2>

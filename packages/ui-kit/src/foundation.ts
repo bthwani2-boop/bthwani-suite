@@ -806,11 +806,34 @@ export function createThemeCssBlock(theme: SemanticTheme, selector: string) {
 }
 
 export function buildWebThemeStyleSheet(rootSelector = '[data-bth-root="true"]') {
+	// Split comma-separated root selectors and apply theme suffixes per-selector.
+	function splitRootSelectors(selector: string) {
+		return selector
+			.split(',')
+			.map((s) => s.trim())
+			.filter(Boolean);
+	}
+
+	// Normalize and dedupe selectors so duplicate entries don't produce repeated rules.
+	const parts = Array.from(new Set(splitRootSelectors(rootSelector)));
+
+	// Build light selectors: include bare root selectors and light-suffixed selectors.
+	const lightBare = parts.join(', ');
+	const lightSuffixed = parts.map((s) => `${s}[data-bth-theme='light']`).join(', ');
+	const lightSelector = [lightBare, lightSuffixed].filter(Boolean).join(', ');
+
+	// Dark and high-contrast must only match selectors that include the theme suffix.
+	const darkSelector = parts.map((s) => `${s}[data-bth-theme='dark']`).join(', ');
+	const highContrastSelector = parts.map((s) => `${s}[data-bth-theme='high-contrast']`).join(', ');
+
 	return [
+		// token block intentionally uses the original `rootSelector` as before
 		createTokenCssBlock(rootSelector),
-		createThemeCssBlock(lightTheme, `${rootSelector}, ${rootSelector}[data-bth-theme='light']`),
-		createThemeCssBlock(darkTheme, `${rootSelector}[data-bth-theme='dark']`),
-		createThemeCssBlock(highContrastTheme, `${rootSelector}[data-bth-theme='high-contrast']`)
+		// light must apply to both the bare root selectors and the light-suffixed selectors
+		createThemeCssBlock(lightTheme, lightSelector),
+		// dark / high-contrast must only match selectors that include the theme suffix
+		createThemeCssBlock(darkTheme, darkSelector),
+		createThemeCssBlock(highContrastTheme, highContrastSelector)
 	].join('\n\n');
 }
 

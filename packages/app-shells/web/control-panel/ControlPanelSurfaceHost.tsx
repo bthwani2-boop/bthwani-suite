@@ -109,11 +109,11 @@ const sectionRouteMap: Record<ControlPanelSectionId, PrimarySectionHref> = {
 };
 
 const compactSectionDescriptions: Record<PhaseOneSectionId, string> = {
-  dashboard: 'ملخص قرار سريع يفتح القسم الصحيح من أول مستوى بدون تشتيت.',
-  operations: 'الضغط الحالي والمسارات الحية والتنبيهات في لوحة تشغيل واحدة.',
-  finance: 'مراقبة مالية مختصرة مع تركيز فوري على المسار الجاهز للتشغيل.',
-  catalogs: 'حوكمة عملية للمنتجات والفئات ومسارات المراجعة والنشر.',
-  support: 'تصعيدات واضحة واستعادة سريعة لتجربة العميل من أقرب مسار فعلي.',
+  dashboard: 'نظرة سريعة',
+  operations: 'حالة التشغيل',
+  finance: 'المركز المالي',
+  catalogs: 'حوكمة الكتالوج',
+  support: 'دعم قابل للتصعيد',
 };
 
 function isPhaseOneSection(sectionId: ControlPanelSectionId): sectionId is PhaseOneSectionId {
@@ -223,9 +223,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
       return {
         id: `community-${serviceId}`,
         label: getServiceLabel(uiText, serviceId),
-        description: serviceMeta?.placeholder
-          ? 'يبقى ظاهرًا كمرجع داخل هذا القسم حتى لا يتشعب المسار قبل الجاهزية.'
-          : 'خدمة متصلة بهذا القسم ويمكن تثبيت تركيزها من نفس الغرفة دون فتح route جديد.',
+        description: serviceMeta?.placeholder ? 'مرجع' : 'متصل',
         badge: serviceMeta?.placeholder ? panelText.filters.reference : panelText.ui.liveRefreshValue,
         onAction: () => setSelectedServiceId(serviceId),
       } satisfies DisclosureItemView;
@@ -261,9 +259,7 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
       return {
         id: `${sectionId}-${serviceId}`,
         label: getServiceLabel(uiText, serviceId),
-        description: serviceMeta?.placeholder
-          ? 'يبقى ظاهرًا كمرجع في هذه المرحلة بدون رفعه إلى مسار أول.'
-          : 'متصل فعليًا بهذه الصفحة ويمكن تحويل العرض إليه بنقرة واحدة.',
+        description: serviceMeta?.placeholder ? 'مرجع' : 'متصل',
         badge: serviceMeta?.placeholder ? panelText.filters.reference : panelText.ui.liveRefreshValue,
         onAction: () => setSelectedServiceId(serviceId),
       } satisfies DisclosureItemView;
@@ -276,8 +272,8 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
     return {
       id: `dashboard-${sectionId}`,
       label: panelText.surfaceTitles[sectionId],
-      description: compactSectionDescriptions[sectionId],
-      footerLabel: 'فتح القسم',
+      description: '',
+      footerLabel: 'فتح',
       href: sectionRouteMap[sectionId],
       badge: `${serviceIds.length} مساحات`,
       tone: sectionId === 'operations' ? 'primary' : 'secondary',
@@ -291,14 +287,14 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
             return {
               eyebrow: panelText.ui.missionEyebrow,
               title: panelText.surfaceTitles.dashboard,
-              description: 'لوحة قرار قصيرة تضع العمليات والمالية والكتالوجات والدعم في أول نظرة، وتؤجل أي تفاصيل أقل أولوية إلى طبقة ثانوية.',
+              description: 'نظرة مختصرة',
               primaryAction: {
                 id: 'dashboard-primary',
                 label: 'ابدأ من العمليات',
-                description: 'أقرب مسار فعلي للحسم الآن.',
-                footerLabel: 'فتح مباشر',
+                description: '',
+                footerLabel: 'فتح',
                 href: '/operations',
-                badge: 'الموصى به الآن',
+                badge: 'موصى',
                 tone: 'primary',
               },
               kpis: [
@@ -330,8 +326,8 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
                   tone: alertCount > 0 ? 'danger' : 'neutral',
                 },
               ],
-              quickActionsTitle: 'الأقسام الأساسية',
-              quickActionsDescription: 'كل بطاقة تنقلك إلى القسم الصحيح من أول مستوى وبحد أقصى نقرتين.',
+              quickActionsTitle: 'أساسيات',
+              quickActionsDescription: 'إجراءات سريعة',
               quickActions: dashboardCards,
               disclosureTitle: 'أقسام أقل أولوية في Phase 1',
               disclosureDescription: 'تبقى متاحة لكن لا تنافس القرار الأول.',
@@ -345,16 +341,16 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
             };
           case 'operations':
             return {
-              eyebrow: 'غرفة القرار الحالية',
+              eyebrow: 'غرفة القرار',
               title: panelText.surfaceTitles.operations,
-              description: 'الضغط الحالي ومسارات التنفيذ الحية والتنبيهات موضوعة في سطح واحد، مع جعل الطلبات المسار الأول وترك التوسعات في طبقة أقل بروزًا.',
+              description: 'حالة تشغيل',
               primaryAction: {
                 id: 'operations-primary',
                 label: 'افتح الطلبات',
-                description: dshText.hub.workbenches.orders.description,
-                footerLabel: 'فتح مباشر',
+                description: '',
+                footerLabel: 'فتح',
                 href: dshText.hub.workbenches.orders.routeHint,
-                badge: 'المسار الأول',
+                badge: 'حي',
                 tone: 'primary',
               },
               kpis: [
@@ -386,8 +382,8 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
                   tone: alertCount > 0 ? 'danger' : 'neutral',
                 },
               ],
-              quickActionsTitle: 'المسارات السريعة',
-              quickActionsDescription: 'العمل الأساسي يبدأ من هنا بنقرة واحدة بدل التمرير داخل وصف طويل.',
+              quickActionsTitle: 'مسارات',
+              quickActionsDescription: 'أزرار سريعة',
               quickActions: dshLiveWorkbenchIds.map((workbenchId) => ({
                 id: `operations-${workbenchId}`,
                 label: dshText.hub.workbenches[workbenchId].label,
@@ -409,15 +405,15 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
             };
           case 'finance':
             return {
-              eyebrow: 'تشغيل مالي موحد',
+              eyebrow: 'مالي',
               title: panelText.surfaceTitles.finance,
-              description: 'الصفحة المالية أصبحت قراءة مختصرة لمسار التشغيل الجاهز، مع دفع المسارات المرجعية إلى طبقة ثانوية بدل تكديس الشرح في أول الشاشة.',
+              description: 'عرض مالي',
               primaryAction: {
                 id: 'finance-primary',
-                label: 'حصر العرض على WLT',
-                description: 'المساحة الجاهزة حاليًا للمتابعة المالية.',
-                footerLabel: 'تصفية فورية',
-                badge: 'الموصى به الآن',
+                label: 'تركيز WLT',
+                description: '',
+                footerLabel: 'تصفية',
+                badge: 'موصى',
                 tone: 'primary',
                 onAction: () => setSelectedServiceId('wlt'),
               },
@@ -449,8 +445,8 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
                   description: 'عودة مباشرة للنظرة العامة أو الدعم.',
                 },
               ],
-              quickActionsTitle: 'إجراءات سريعة',
-              quickActionsDescription: 'الإجراء الأساسي هو تركيز القراءة على المسار الجاهز، ثم التنقل إلى أقرب قرار داعم.',
+              quickActionsTitle: 'إجراءات',
+              quickActionsDescription: 'أزرار',
               quickActions: [
                 {
                   id: 'finance-focus-wlt',
@@ -489,16 +485,16 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
             };
           case 'catalogs':
             return {
-              eyebrow: 'حوكمة المنتجات',
+              eyebrow: 'كتالوج',
               title: panelText.surfaceTitles.catalogs,
-              description: 'الكتالوج أصبح بوابة قرار قصيرة: افتح المسار الحي، راجع الشركاء أو التسويق، واترك التفاصيل التفصيلية لما بعد الدخول للمسار المختار.',
+              description: 'حوكمة مختصرة',
               primaryAction: {
                 id: 'catalogs-primary',
-                label: 'افتح كتالوج DSH',
-                description: 'المسار الحي الأقرب لحوكمة الفئات والمنتجات.',
-                footerLabel: 'فتح مباشر',
+                label: 'افتح الكتالوج',
+                description: '',
+                footerLabel: 'فتح',
                 href: '/operations/dsh/catalogs',
-                badge: 'المسار الأول',
+                badge: 'حي',
                 tone: 'primary',
               },
               kpis: [
@@ -529,8 +525,8 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
                   description: 'تغطية مرئية أقل بروزًا من القرار الأساسي.',
                 },
               ],
-              quickActionsTitle: 'مفاتيح الحوكمة',
-              quickActionsDescription: 'أهم ثلاث بوابات تُفتح من أول الشاشة بدل دفنها داخل محتوى طويل.',
+              quickActionsTitle: 'مفاتيح',
+              quickActionsDescription: 'أزرار',
               quickActions: [
                 {
                   id: 'catalogs-open',
@@ -573,14 +569,14 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
             return {
               eyebrow: 'استعادة تجربة العميل',
               title: panelText.surfaceTitles.support,
-              description: 'الدعم صار مسار triage مختصرًا: ابدأ من أقرب صف تشغيلي، بدّل إلى المساحة المقترحة، واترك التفاصيل غير العاجلة داخل disclosure.',
+              description: 'دعم مختصر',
               primaryAction: {
                 id: 'support-primary',
-                label: 'ابدأ triage من الطلبات',
-                description: 'أقرب مسار فعلي للتصعيد والاستعادة داخل هذه المرحلة.',
-                footerLabel: 'فتح مباشر',
+                label: 'ابدأ من الطلبات',
+                description: '',
+                footerLabel: 'فتح',
                 href: '/operations/dsh/orders',
-                badge: 'المسار الأول',
+                badge: 'حي',
                 tone: 'primary',
               },
               kpis: [
@@ -612,8 +608,8 @@ export function ControlPanelSurfaceHost({ section, subsection }: ControlPanelSur
                   description: 'عودة سريعة للنظرة العامة أو العمليات.',
                 },
               ],
-              quickActionsTitle: 'Quick triage',
-              quickActionsDescription: 'كل بطاقة تقلل التفرع وتبقي القرار في نقرة أو نقرتين.',
+              quickActionsTitle: 'إجراءات',
+              quickActionsDescription: 'أزرار سريعة',
               quickActions: [
                 {
                   id: 'support-orders',
