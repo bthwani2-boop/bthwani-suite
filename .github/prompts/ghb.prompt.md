@@ -5,7 +5,7 @@ argument-hint: '[optional message] [--branch BRANCH] [--no-push] [--allow-empty]
 
 # GHB Command
 
-Use the repo-local workflow script at `tools/scripts/ghb.ps1`.
+Use the repo-local workflow script at `tools/ghb.ps1`.
 
 ## Context
 
@@ -29,7 +29,7 @@ ${input:args}
 5. Execute the script with PowerShell from the repo root:
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File ".\\tools\\scripts\\ghb.ps1" [-Message "..."] [-BranchName "..."] [-NoPush] [-AllowEmpty]
+   pwsh -NoProfile -ExecutionPolicy Bypass -File ".\\tools\\ghb.ps1" [-Message "..."] [-BranchName "..."] [-NoPush] [-AllowEmpty]
    ```
 
 6. Summarize the result in chat with the commit message, the branch that was checkpointed, and the new branch that was created.
