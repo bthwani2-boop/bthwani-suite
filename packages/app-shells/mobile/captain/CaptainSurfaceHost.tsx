@@ -1,5 +1,20 @@
 import React from 'react';
-import { BackHandler, Platform } from 'react-native';
+import { BackHandler, Platform, Pressable } from 'react-native';
+
+// Dynamic safe-area insets loader: avoids hard import so Metro won't fail when
+// `react-native-safe-area-context` isn't installed in some environments.
+let useSafeAreaInsets: () => { top: number; bottom: number; left: number; right: number } = () => ({ top: 0, bottom: 0, left: 0, right: 0 });
+try {
+  // hide from static analysis so bundlers that can't resolve the package won't fail
+  // eslint-disable-next-line no-eval
+  const r: any = eval('require');
+  const safe = r('react-native-safe-area-context');
+  if (safe && typeof safe.useSafeAreaInsets === 'function') {
+    useSafeAreaInsets = safe.useSafeAreaInsets;
+  }
+} catch (err) {
+  // fallback is already a zero-insets function
+}
 import { Badge, Box, Button, Icon, KeyValueList, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TopBar, Switch, useTheme } from '@bthwani/ui-kit';
 import { dshCaptain } from '@bthwani/surfaces/app-captain';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
@@ -159,6 +174,7 @@ const captainHeatZones = [
 
 export function CaptainSurfaceHost() {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const [activeServiceType, setActiveServiceType] = React.useState<CaptainServiceType>('dsh');
   const [route, setRoute] = React.useState<CaptainRoute>('home');
   const [inboxState, setInboxState] = React.useState<CaptainOrdersInboxScreenState>('active');
@@ -628,14 +644,16 @@ export function CaptainSurfaceHost() {
   };
 
   const renderHomeOrderPanel = () => {
+    const panelPadding = activeOrderExpanded ? 3 : 2;
+    const panelMinHeightStyle = !activeOrderExpanded ? { minHeight: 56 } : {};
     if (!isCaptainAvailable) {
       return (
         <Surface
           tone="raised"
-          padding={3}
+          padding={panelPadding}
           gap={3}
           radiusToken="xl"
-          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
+          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
         >
           <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} />
           <Box gap={1}>
@@ -718,33 +736,17 @@ export function CaptainSurfaceHost() {
     }
 
     if (inboxState === 'delivered') {
-      return (
-        <Surface
-          tone="raised"
-          padding={3}
-          gap={3}
-          radiusToken="xl"
-          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
-        >
-          <Badge label="مغلق" tone="success" />
-          <Box gap={1}>
-            <Text role="bodyStrong">تم تسليم الطلب</Text>
-            <Text role="bodySm" tone="muted">
-              أُغلق الطلب الأخير بنجاح ويمكنك الانتقال مباشرة إلى الصف التالي.
-            </Text>
-          </Box>
-          <Button size="sm" fullWidth={false} label="فتح الطلب التالي" onPress={() => setRoute('inbox')} />
-        </Surface>
-      );
+      // Order completed: hide active order panel from Home. Logical handoff to history/account is [TBD].
+      return null;
     }
 
     return (
       <Surface
         tone="raised"
-        padding={3}
+        padding={panelPadding}
         gap={3}
         radiusToken="xl"
-        style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
+        style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
       >
         <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
           <Box gap={1} style={{ flex: 1 }}>
@@ -756,8 +758,8 @@ export function CaptainSurfaceHost() {
           <Badge label={currentAvailabilityMeta.orderBadgeLabel} tone={currentAvailabilityMeta.chipTone} />
         </Box>
         {!activeOrderExpanded ? (
-          <>
-            <Text role="bodySm" numberOfLines={1} tone="muted">
+          <Pressable accessibilityRole="button" onPress={() => setActiveOrderExpanded(true)}>
+            <Text role="bodySm" numberOfLines={1} ellipsizeMode="tail" tone="muted">
               {activeSummary.pickupLabel} → {activeSummary.dropoffLabel}
             </Text>
 
@@ -765,20 +767,20 @@ export function CaptainSurfaceHost() {
               <Text role="bodySm" tone="muted" style={{ flex: 1 }}>{activeSummary.etaLabel}</Text>
               <Button size="sm" fullWidth={false} label="تفاصيل مختصرة" onPress={() => setActiveOrderExpanded(true)} />
             </Box>
-          </>
+          </Pressable>
         ) : (
           <Box gap={2}>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
               <Text role="caption" tone="muted">الاستلام</Text>
-              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>{activeSummary.pickupLabel}</Text>
+              <Text role="bodySm" align="end" numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1 }}>{activeSummary.pickupLabel}</Text>
             </Box>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
               <Text role="caption" tone="muted">التسليم</Text>
-              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>{activeSummary.dropoffLabel}</Text>
+              <Text role="bodySm" align="end" numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1 }}>{activeSummary.dropoffLabel}</Text>
             </Box>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
               <Text role="caption" tone="muted">المرحلة</Text>
-              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>{activeSummary.currentStageLabel}</Text>
+              <Text role="bodySm" align="end" numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1 }}>{activeSummary.currentStageLabel}</Text>
             </Box>
 
             <Box layoutDirection="row" gap={2} style={{ marginTop: 6 }}>
@@ -791,37 +793,7 @@ export function CaptainSurfaceHost() {
   };
 
   const renderHomeScreen = () => (
-    <Box style={{ flex: 1 }}>
-      {/* Compact controls row: availability, GPS, and small map legend */}
-      <Box style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: 6 }}>
-        <Box layoutDirection="row" align="center" justify="space-between">
-          <Box layoutDirection="row" align="center" gap={3}>
-            <Switch
-              label={`التوفر · ${currentAvailabilityMeta.label}`}
-              value={isCaptainAvailable}
-              onValueChange={(v) => setCaptainAvailabilityStatus(v ? 'available' : 'unavailable')}
-              style={{ paddingVertical: 2 }}
-            />
-
-            <Switch
-              label={`GPS · ${currentGpsMeta.label}`}
-              value={gpsStatus === 'ready'}
-              onValueChange={(v) => setGpsStatus(v ? 'ready' : 'disabled')}
-              style={{ paddingVertical: 2 }}
-            />
-          </Box>
-
-          <Surface tone="inset" padding={2} gap={2} radiusToken="lg" style={{ minWidth: 180 }}>
-            <Box layoutDirection="row" gap={2} align="center">
-              <Box style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: 'rgba(255, 80, 13, 0.95)' }} />
-              <Text role="bodySm">كثافة طلبات</Text>
-              <Box style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: 'rgba(10, 47, 92, 0.95)', marginLeft: 8 }} />
-              <Text role="bodySm">تجمع كباتن</Text>
-            </Box>
-          </Surface>
-        </Box>
-      </Box>
-
+    <Box style={{ flex: 1, position: 'relative' }}>
       {/* Map area - occupies remaining screen space */}
       <Surface tone="inset" padding={0} gap={0} radiusToken="xl" style={{ flex: 1, overflow: 'hidden', borderColor: theme.lineStrong }}>
         <Box style={{ flex: 1, backgroundColor: '#EFF5FA', overflow: 'hidden' }}>
@@ -873,13 +845,45 @@ export function CaptainSurfaceHost() {
           <Box style={{ position: 'absolute', top: 182, left: 148, alignItems: 'center', gap: 6 }}>
             <Box style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0A2F5C', borderWidth: 4, borderColor: '#FFFFFF' }} />
           </Box>
+
+          {/* Compact controls overlay (absolute) - Availability, GPS, and small map keys */}
+          <Box style={{ position: 'absolute', left: 12, right: 12, top: 8, zIndex: 9999, elevation: 20 }}>
+            <Surface tone="inset" padding={2} gap={2} radiusToken="lg" style={{ alignSelf: 'stretch', elevation: 20 }}>
+              <Box layoutDirection="row" align="center" justify="space-between">
+                <Box layoutDirection="row" align="center" gap={2}>
+                  <Box style={{ minWidth: 120, flexShrink: 0 }}>
+                    <Switch
+                      label={`التوفر · ${currentAvailabilityMeta.label}`}
+                      value={isCaptainAvailable}
+                      onValueChange={(v) => setCaptainAvailabilityStatus(v ? 'available' : 'unavailable')}
+                      style={{ paddingVertical: 2 }}
+                    />
+                  </Box>
+
+                  <Box style={{ minWidth: 110, flexShrink: 0 }}>
+                    <Switch
+                      label={`GPS`}
+                      value={gpsStatus === 'ready'}
+                      onValueChange={(v) => setGpsStatus(v ? 'ready' : 'disabled')}
+                      style={{ paddingVertical: 2 }}
+                    />
+                  </Box>
+                </Box>
+
+                <Box layoutDirection="row" gap={2} align="center" style={{ alignItems: 'center' }}>
+                  <Box style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'rgba(255, 80, 13, 0.95)' }} />
+                  <Text role="bodySm">فرص طلبات</Text>
+                  <Box style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'rgba(10, 47, 92, 0.95)', marginLeft: 8 }} />
+                  <Text role="bodySm">تجمع كباتن</Text>
+                </Box>
+              </Box>
+            </Surface>
+          </Box>
         </Box>
       </Surface>
 
-      {/* Order card pinned to bottom with safe spacing to avoid bottom nav overlap */}
-      <Box style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: 84 }}>
-        {renderHomeOrderPanel()}
-      </Box>
+      {/* Order card pinned overlay (absolute) to avoid pushing map and to ensure safe bottom spacing) */}
+      <Box style={{ position: 'absolute', left: 12, right: 12, bottom: insets.bottom + 24 }}>{renderHomeOrderPanel()}</Box>
     </Box>
   );
 
