@@ -791,31 +791,40 @@ export function CaptainSurfaceHost() {
   };
 
   const renderHomeScreen = () => (
-      <MobileScrollView
-        fill
-        padding={4}
-        gap={2}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 220 }}
-      >
-      <Box layoutDirection="row" gap={3} align="center" style={{ alignItems: 'center' }}>
-        <Switch
-          label={`التوفر · ${currentAvailabilityMeta.label}`}
-          value={isCaptainAvailable}
-          onValueChange={(v) => setCaptainAvailabilityStatus(v ? 'available' : 'unavailable')}
-          style={{ paddingVertical: 2 }}
-        />
+    <Box style={{ flex: 1 }}>
+      {/* Compact controls row: availability, GPS, and small map legend */}
+      <Box style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: 6 }}>
+        <Box layoutDirection="row" align="center" justify="space-between">
+          <Box layoutDirection="row" align="center" gap={3}>
+            <Switch
+              label={`التوفر · ${currentAvailabilityMeta.label}`}
+              value={isCaptainAvailable}
+              onValueChange={(v) => setCaptainAvailabilityStatus(v ? 'available' : 'unavailable')}
+              style={{ paddingVertical: 2 }}
+            />
 
-        <Switch
-          label={`GPS · ${currentGpsMeta.label}`}
-          value={gpsStatus === 'ready'}
-          onValueChange={(v) => setGpsStatus(v ? 'ready' : 'disabled')}
-          style={{ paddingVertical: 2 }}
-        />
+            <Switch
+              label={`GPS · ${currentGpsMeta.label}`}
+              value={gpsStatus === 'ready'}
+              onValueChange={(v) => setGpsStatus(v ? 'ready' : 'disabled')}
+              style={{ paddingVertical: 2 }}
+            />
+          </Box>
+
+          <Surface tone="inset" padding={2} gap={2} radiusToken="lg" style={{ minWidth: 180 }}>
+            <Box layoutDirection="row" gap={2} align="center">
+              <Box style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: 'rgba(255, 80, 13, 0.95)' }} />
+              <Text role="bodySm">كثافة طلبات</Text>
+              <Box style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: 'rgba(10, 47, 92, 0.95)', marginLeft: 8 }} />
+              <Text role="bodySm">تجمع كباتن</Text>
+            </Box>
+          </Surface>
+        </Box>
       </Box>
 
-      <Surface tone="inset" padding={0} gap={0} radiusToken="xl" style={{ minHeight: 560, overflow: 'hidden', borderColor: theme.lineStrong }}>
-        <Box style={{ minHeight: 560, backgroundColor: '#EFF5FA', overflow: 'hidden' }}>
+      {/* Map area - occupies remaining screen space */}
+      <Surface tone="inset" padding={0} gap={0} radiusToken="xl" style={{ flex: 1, overflow: 'hidden', borderColor: theme.lineStrong }}>
+        <Box style={{ flex: 1, backgroundColor: '#EFF5FA', overflow: 'hidden' }}>
           <Box style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(255,255,255,0.12)' }} />
           <Box style={{ position: 'absolute', top: 78, left: 40, width: 7, height: 222, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.10)' }} />
           <Box style={{ position: 'absolute', top: 136, left: 40, right: 74, height: 7, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.08)' }} />
@@ -860,31 +869,18 @@ export function CaptainSurfaceHost() {
             />
           ))}
 
-          {/* Small fixed legend (compact, privacy-safe) */}
-          <Surface tone="inset" padding={2} gap={2} radiusToken="lg" style={{ position: 'absolute', left: 14, bottom: 14, minWidth: 180 }}>
-            <Box layoutDirection="row" gap={2} align="center">
-              <Box style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: 'rgba(255, 80, 13, 0.95)' }} />
-              <Text role="bodySm">كثافة طلبات</Text>
-              <Box style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: 'rgba(10, 47, 92, 0.95)', marginLeft: 8 }} />
-              <Text role="bodySm">تجمع كباتن</Text>
-            </Box>
-            <Box layoutDirection="row" gap={2} align="center" style={{ marginTop: 6 }}>
-              <Box style={{ width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: theme.brand, backgroundColor: '#FFFFFF' }} />
-              <Text role="bodySm">نطاقك</Text>
-              <Box style={{ flex: 1 }} />
-              <Badge label={currentGpsMeta.label} tone={currentGpsMeta.chipTone} />
-            </Box>
-          </Surface>
-
+          {/* 'نطاقك الحالي' marker remains a visual point inside map (no legend mention) */}
           <Box style={{ position: 'absolute', top: 182, left: 148, alignItems: 'center', gap: 6 }}>
             <Box style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0A2F5C', borderWidth: 4, borderColor: '#FFFFFF' }} />
-            <Badge label="نطاقك الحالي" tone="brand" />
           </Box>
         </Box>
       </Surface>
 
-      {renderHomeOrderPanel()}
-    </MobileScrollView>
+      {/* Order card pinned to bottom with safe spacing to avoid bottom nav overlap */}
+      <Box style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: 84 }}>
+        {renderHomeOrderPanel()}
+      </Box>
+    </Box>
   );
 
   const accountSheet = (
