@@ -28,6 +28,7 @@ type MobileAccountSheetProps = {
   mode?: MobileAccountSheetMode;
   visible: boolean;
   onClose: () => void;
+  captainDisplayName?: string;
   profileLabel?: string;
   walletHubLabel?: string;
   settingsLabel?: string;
@@ -60,6 +61,7 @@ export function MobileAccountSheet({
   mode = 'generic',
   visible,
   onClose,
+  captainDisplayName = 'الكابتن',
   profileLabel = 'ملف المتجر',
   walletHubLabel = 'المحفظة والحسابات المالية',
   settingsLabel = 'الإعدادات',
@@ -88,6 +90,7 @@ export function MobileAccountSheet({
   fieldTabs,
 }: MobileAccountSheetProps) {
   const [tab, setTab] = React.useState<MobileAccountSheetTab>('menu');
+  const [language, setLanguage] = React.useState<'ar' | 'en'>('ar');
   const isCaptainMode = mode === 'captain';
   const isFieldMode = mode === 'field';
 
@@ -181,10 +184,10 @@ export function MobileAccountSheet({
               <Badge label="ملف الكابتن" tone="brand" />
             </Box>
             <Text role="titleMd" style={{ textAlign: 'right' }}>
-              مركز الكابتن
+              {captainDisplayName}
             </Text>
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-              ملخص الهوية والجاهزية والوصول إلى مسارات التشغيل من مكان واحد.
+              مركز موحد للكابتن: الطلبات والمحفظة والأرباح والتسويات والملف الشخصي والوثائق والخريطة والإعدادات من نفس الشيت المشترك.
             </Text>
           </Box>
           {summary ? (

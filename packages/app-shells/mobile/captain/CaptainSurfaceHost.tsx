@@ -51,6 +51,8 @@ type CaptainSupportRoute =
 
 type CaptainRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'orderchat' | 'bell' | 'support-directory' | 'support-screen';
 type CaptainServiceType = 'dsh' | 'amn';
+type CaptainAvailabilityStatus = 'available' | 'unavailable' | 'break' | 'planned-leave';
+type CaptainGpsStatus = 'ready' | 'limited' | 'offline' | 'disabled';
 
 const captainTypeOptions: readonly MobileAccountTypeOption[] = [
   { id: 'dsh', label: 'DSH', description: 'السياق النشط الآن' },
@@ -76,6 +78,85 @@ const defaultDetailByOrderId: Record<string, CaptainOrderDetailSummary> = {
   },
 };
 
+const captainDisplayName = 'الكابتن عبدالله السبيعي';
+const captainWalletBalanceLabel = '348 ر.س';
+
+const availabilityStatusMeta: Record<
+  CaptainAvailabilityStatus,
+  {
+    label: string;
+    description: string;
+    chipTone: 'success' | 'warning' | 'default';
+    orderBadgeLabel: string;
+  }
+> = {
+  available: {
+    label: 'متاح',
+    description: 'جاهز الآن لاستقبال الطلبات والتنقل مباشرة إلى مناطق الطلب.',
+    chipTone: 'success',
+    orderBadgeLabel: 'نشط',
+  },
+  unavailable: {
+    label: 'غير متاح',
+    description: 'تم إيقاف استقبال الطلبات مؤقتًا حتى إعادة التفعيل.',
+    chipTone: 'warning',
+    orderBadgeLabel: 'موقوف',
+  },
+  break: {
+    label: 'استراحة',
+    description: 'استراحة قصيرة محلية بلا أي ربط تشغيلي خارجي.',
+    chipTone: 'warning',
+    orderBadgeLabel: 'استراحة',
+  },
+  'planned-leave': {
+    label: 'إجازة مخططة',
+    description: 'إدارة الإجازات والغياب ستُربط لاحقًا مع عمليات الأسطول [TBD].',
+    chipTone: 'default',
+    orderBadgeLabel: 'إجازة',
+  },
+};
+
+const gpsStatusMeta: Record<
+  CaptainGpsStatus,
+  {
+    label: string;
+    description: string;
+    chipTone: 'success' | 'warning' | 'default';
+  }
+> = {
+  ready: {
+    label: 'GPS جاهز',
+    description: 'إشارة الموقع مستقرة محليًا ويمكن عرض الخريطة التجريبية بثقة.',
+    chipTone: 'success',
+  },
+  limited: {
+    label: 'GPS محدود',
+    description: 'الإشارة متاحة جزئيًا ويجب التعامل معها كإرشاد تقريبي فقط.',
+    chipTone: 'warning',
+  },
+  offline: {
+    label: 'GPS دون اتصال',
+    description: 'تعذر تحديث الموقع الآن. المسار يعمل كـ placeholder فقط.',
+    chipTone: 'warning',
+  },
+  disabled: {
+    label: 'GPS معطل',
+    description: 'الموقع مغلق من الجهاز ويحتاج تفعيلًا لاحقًا [TBD].',
+    chipTone: 'default',
+  },
+};
+
+const demandHeatZones = [
+  { id: 'demand-1', top: 58, right: 34, size: 164, color: 'rgba(255, 80, 13, 0.20)', label: 'طلب مرتفع' },
+  { id: 'demand-2', top: 188, left: 26, size: 118, color: 'rgba(255, 80, 13, 0.14)', label: 'ذروة قريبة' },
+  { id: 'demand-3', bottom: 108, right: 96, size: 146, color: 'rgba(255, 133, 75, 0.16)', label: 'متاجر نشطة' },
+] as const;
+
+const captainHeatZones = [
+  { id: 'captain-1', top: 128, left: 112, size: 132, color: 'rgba(10, 47, 92, 0.14)', label: 'كباتن أكثر' },
+  { id: 'captain-2', bottom: 138, left: 154, size: 104, color: 'rgba(10, 47, 92, 0.10)', label: 'تغطية قريبة' },
+] as const;
+
 export function CaptainSurfaceHost() {
   const { theme } = useTheme();
   const [activeServiceType, setActiveServiceType] = React.useState<CaptainServiceType>('dsh');
@@ -86,20 +167,30 @@ export function CaptainSurfaceHost() {
   const [isPickupSheetVisible, setIsPickupSheetVisible] = React.useState(false);
   const [isDeliverySheetVisible, setIsDeliverySheetVisible] = React.useState(false);
   const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
-  const [gpsSheetVisible, setGpsSheetVisible] = React.useState(false);
-  const [isCaptainAvailable, setIsCaptainAvailable] = React.useState(true);
+  const [captainAvailabilityStatus, setCaptainAvailabilityStatus] = React.useState<CaptainAvailabilityStatus>('available');
+  const [gpsStatus, setGpsStatus] = React.useState<CaptainGpsStatus>('limited');
+  const [activeOrderExpanded, setActiveOrderExpanded] = React.useState(false);
   const routeHistoryRef = React.useRef<CaptainRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
 
   const activeSummary = defaultDetailByOrderId[activeOrderId] ?? defaultDetailByOrderId['captain-order-9021'];
   const activeOrderDisplayId = activeSummary.orderId.replace('captain-order-', '');
   const orderChatState = inboxState === 'delivered' ? 'readOnly' : 'active';
-  const goBack = React.useCallback(() => {
-    if (gpsSheetVisible) {
-      setGpsSheetVisible(false);
-      return true;
-    }
+  const isCaptainAvailable = captainAvailabilityStatus === 'available';
+  const currentAvailabilityMeta = availabilityStatusMeta[captainAvailabilityStatus];
+  const currentGpsMeta = gpsStatusMeta[gpsStatus];
 
+  // Binary toggle: available <-> unavailable (owner decision)
+  const cycleAvailabilityStatus = React.useCallback(() => {
+    setCaptainAvailabilityStatus((current) => (current === 'available' ? 'unavailable' : 'available'));
+  }, []);
+
+  // Simple GPS toggle: ready <-> disabled. No sheet/screen opened by toggle.
+  const cycleGpsStatus = React.useCallback(() => {
+    setGpsStatus((current) => (current === 'ready' ? 'disabled' : 'ready'));
+  }, []);
+
+  const goBack = React.useCallback(() => {
     if (accountSheetVisible) {
       setAccountSheetVisible(false);
       return true;
@@ -119,7 +210,7 @@ export function CaptainSurfaceHost() {
     }
 
     return false;
-  }, [accountSheetVisible, gpsSheetVisible, route]);
+  }, [accountSheetVisible, route]);
 
   if (!activeSummary) {
     return null;
@@ -173,6 +264,7 @@ export function CaptainSurfaceHost() {
     setRoute('home');
     setInboxState('active');
     setActiveOrderId('captain-order-9021');
+    setActiveOrderExpanded(false);
     setIsPickupSheetVisible(false);
     setIsDeliverySheetVisible(false);
   }, []);
@@ -268,8 +360,8 @@ export function CaptainSurfaceHost() {
   const captainSummaryItems = [
     {
       label: 'الاسم',
-      value: <Badge label="الكابتن [TBD]" tone="warning" />,
-      helperText: 'الاسم النهائي غير مرتبط بعد.',
+      value: <Badge label={captainDisplayName} tone="brand" />,
+      helperText: 'يظهر الاسم الحقيقي داخل الهيدر والـ account sheet دون title block إضافي.',
     },
     {
       label: 'النوع',
@@ -278,23 +370,23 @@ export function CaptainSurfaceHost() {
     },
     {
       label: 'التوفر',
-      value: <Badge label={isCaptainAvailable ? 'متاح الآن' : 'خارج التوفر'} tone={isCaptainAvailable ? 'success' : 'warning'} />,
-      helperText: 'يمكن تبديله مباشرة من الخريطة الرئيسية.',
-    },
-    {
-      label: 'المركبة',
-      value: <Badge label="[TBD]" tone="warning" />,
-      helperText: 'المركبة ولوحة التسجيل غير مربوطتين بعد.',
+      value: <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} />,
+      helperText: 'يمكن تبديله محليًا من chip التوفر أو من الشيت نفسه.',
     },
     {
       label: 'المحفظة',
-      value: <Badge label="[TBD]" tone="warning" />,
-      helperText: 'الرصيد والربط المالي غير مكتملين.',
+      value: <Badge label={captainWalletBalanceLabel} tone="success" />,
+      helperText: 'عرض محلي مؤقت بدون أي API مالي جديد.',
+    },
+    {
+      label: 'التقييم',
+      value: <Badge label="4.9 / 5" tone="info" />,
+      helperText: 'عرض محلي واضح حتى اكتمال الربط التشغيلي [TBD].',
     },
     {
       label: 'المستوى',
-      value: <Badge label="[TBD]" tone="warning" />,
-      helperText: 'المستوى غير محسوم بعد.',
+      value: <Badge label="Elite 3" tone="brand" />,
+      helperText: 'المستوى الحالي placeholder واضح بدل قيمة باهتة غير مقروءة.',
     },
   ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
 
@@ -306,24 +398,18 @@ export function CaptainSurfaceHost() {
         {
           id: 'availability',
           title: 'حالة التوفر',
-          subtitle: isCaptainAvailable ? 'الكابتن متاح الآن لاستقبال الحركة.' : 'الكابتن خارج التوفر حاليًا.',
-          meta: isCaptainAvailable ? 'متاح' : 'موقوف',
-          badgeLabel: isCaptainAvailable ? 'متاح' : 'موقوف',
-          onPress: () => {
-            setAccountSheetVisible(false);
-            setIsCaptainAvailable((current) => !current);
-          },
+          subtitle: currentAvailabilityMeta.description,
+          meta: currentAvailabilityMeta.label,
+          badgeLabel: currentAvailabilityMeta.label,
+          onPress: cycleAvailabilityStatus,
         },
         {
           id: 'gps',
           title: 'GPS / الموقع',
-          subtitle: 'فتح حالة GPS والموقع والخرائط التجريبية.',
-          meta: '[TBD]',
-          badgeLabel: '[TBD]',
-          onPress: () => {
-            setAccountSheetVisible(false);
-            setGpsSheetVisible(true);
-          },
+          subtitle: currentGpsMeta.description,
+          meta: currentGpsMeta.label,
+          badgeLabel: currentGpsMeta.label,
+          onPress: cycleGpsStatus,
         },
         {
           id: 'leave-absence',
@@ -345,10 +431,7 @@ export function CaptainSurfaceHost() {
           subtitle: 'الفرز والقبول قبل الخروج للميدان.',
           meta: 'مباشر',
           badgeLabel: 'مباشر',
-          onPress: () => {
-            setAccountSheetVisible(false);
-            openCaptainEntry();
-          },
+          onPress: openCaptainEntry,
         },
         {
           id: 'orders',
@@ -356,10 +439,7 @@ export function CaptainSurfaceHost() {
           subtitle: 'فتح صندوق الطلبات الحالي.',
           meta: 'مباشر',
           badgeLabel: 'مباشر',
-          onPress: () => {
-            setAccountSheetVisible(false);
-            setRoute('inbox');
-          },
+          onPress: () => setRoute('inbox'),
         },
         {
           id: 'map',
@@ -367,10 +447,7 @@ export function CaptainSurfaceHost() {
           subtitle: 'العودة إلى الشاشة الرئيسية.',
           meta: 'الرئيسية',
           badgeLabel: 'الرئيسية',
-          onPress: () => {
-            setAccountSheetVisible(false);
-            setRoute('home');
-          },
+          onPress: () => setRoute('home'),
         },
       ],
     },
@@ -383,11 +460,8 @@ export function CaptainSurfaceHost() {
           title: 'المحفظة',
           subtitle: 'عرض المحفظة والملخص المالي المؤقت.',
           meta: 'مالية',
-          badgeLabel: '[TBD]',
-          onPress: () => {
-            setAccountSheetVisible(false);
-            openCaptainSupportScreen('cod-balance');
-          },
+          badgeLabel: captainWalletBalanceLabel,
+          onPress: () => openCaptainSupportScreen('cod-balance'),
         },
         {
           id: 'earnings',
@@ -417,10 +491,7 @@ export function CaptainSurfaceHost() {
           subtitle: 'بيانات الكابتن الأساسية.',
           meta: 'مباشر',
           badgeLabel: 'مباشر',
-          onPress: () => {
-            setAccountSheetVisible(false);
-            openCaptainSupportScreen('profile-get');
-          },
+          onPress: () => openCaptainSupportScreen('profile-get'),
         },
         {
           id: 'documents',
@@ -428,10 +499,7 @@ export function CaptainSurfaceHost() {
           subtitle: 'المرفقات والملفات الداعمة.',
           meta: 'مباشر',
           badgeLabel: 'مباشر',
-          onPress: () => {
-            setAccountSheetVisible(false);
-            openCaptainSupportScreen('proof-upload');
-          },
+          onPress: () => openCaptainSupportScreen('proof-upload'),
         },
         {
           id: 'rating',
@@ -439,10 +507,7 @@ export function CaptainSurfaceHost() {
           subtitle: 'مؤشرات الأداء والتقييم الحالي.',
           meta: 'مباشر',
           badgeLabel: 'مباشر',
-          onPress: () => {
-            setAccountSheetVisible(false);
-            openCaptainSupportScreen('tier-evaluate');
-          },
+          onPress: () => openCaptainSupportScreen('tier-evaluate'),
         },
         {
           id: 'level',
@@ -450,10 +515,7 @@ export function CaptainSurfaceHost() {
           subtitle: 'قراءة المستوى الحالي والامتيازات.',
           meta: 'مباشر',
           badgeLabel: 'مباشر',
-          onPress: () => {
-            setAccountSheetVisible(false);
-            openCaptainSupportScreen('tier-info');
-          },
+          onPress: () => openCaptainSupportScreen('tier-info'),
         },
       ],
     },
@@ -461,63 +523,67 @@ export function CaptainSurfaceHost() {
 
   const homeTicker = !isCaptainAvailable
     ? {
-        statusLabel: 'متوقف',
-        message: 'أنت خارج التوفر الآن. فعّل التوفر للعودة إلى استقبال الطلبات.',
-        onPress: () => setIsCaptainAvailable(true),
+        statusLabel: currentAvailabilityMeta.label,
+        message: currentAvailabilityMeta.description,
+        onPress: cycleAvailabilityStatus,
+        marquee: false,
       }
     : inboxState === 'loading'
       ? {
           statusLabel: 'تحميل',
-          message: 'جارٍ تجهيز حركة الكابتن وتهيئة الخريطة الرئيسية.',
+        message: 'جارٍ تجهيز حركة الكابتن وطبقة الحرارة التجريبية على الخريطة.',
           onPress: () => setRoute('inbox'),
+        marquee: false,
         }
       : inboxState === 'error'
         ? {
             statusLabel: 'تنبيه',
             message: 'تعذر تحميل الطلب النشط. أعد المحاولة أو افتح صندوق الطلبات.',
             onPress: () => setInboxState('active'),
+            marquee: false,
           }
         : inboxState === 'noOrders'
           ? {
               statusLabel: 'انتظار',
               message: 'لا يوجد طلب نشط الآن. ابقَ على الخريطة وانتظر الحركة التالية.',
               onPress: () => setRoute('inbox'),
+              marquee: false,
             }
           : inboxState === 'delivered'
             ? {
                 statusLabel: 'مغلق',
                 message: 'تم تسليم الطلب الأخير. افتح صندوق الطلبات لالتقاط الحركة التالية.',
                 onPress: () => setRoute('inbox'),
+                marquee: false,
               }
             : {
                 statusLabel: `#${activeOrderDisplayId}`,
                 message: `${activeSummary.currentStageLabel} · ${activeSummary.etaLabel}`,
-                onPress: () => setRoute('detail'),
+                onPress: () => setActiveOrderExpanded((current) => !current),
+                marquee: false,
               };
 
   const topBar = (
     <TopBar
       variant="brand"
-      layoutMode="relaxed-main"
-      title="الكابتن [TBD]"
-      subtitle="DSH · القيادة اليومية"
-      locationLabel="الرياض · تغطية DSH"
+      title={captainDisplayName}
+      locationLabel={`المحفظة · ${captainWalletBalanceLabel}`}
+      locationIcon={<Icon name="wallet-outline" size={14} color={theme.brandContrast} />}
       actions={[
-        { id: 'account', icon: <Icon name="person-outline" size={21} color={theme.brandContrast} />, accessibilityLabel: 'الحساب', onPress: () => setAccountSheetVisible(true) },
+        {
+          id: 'account',
+          icon: <Icon name="person-outline" size={20} color={theme.brandContrast} />,
+          accessibilityLabel: 'الحساب',
+          onPress: () => setAccountSheetVisible(true),
+        },
+        { id: 'search', icon: <Icon name="search-outline" size={20} color={theme.brandContrast} />, accessibilityLabel: 'البحث', onPress: openSupportDirectory },
         {
           id: 'notifications',
-          icon: <Icon name="notifications-outline" size={21} color={theme.brandContrast} />,
+          icon: <Icon name="notifications-outline" size={20} color={theme.brandContrast} />,
           badgeCount: 2,
           accessibilityLabel: 'الإشعارات',
           onPress: () => setRoute('bell'),
         },
-        {
-          id: 'wallet',
-          icon: <Icon name="wallet-outline" size={21} color={theme.brandContrast} />,
-          accessibilityLabel: 'المحفظة',
-          onPress: () => openCaptainSupportScreen('cod-balance'),
-        },
-        { id: 'search', icon: <Icon name="search-outline" size={21} color={theme.brandContrast} />, accessibilityLabel: 'البحث', onPress: openSupportDirectory },
       ]}
       ticker={homeTicker}
     />
@@ -560,30 +626,20 @@ export function CaptainSurfaceHost() {
       return (
         <Surface
           tone="raised"
-          padding={4}
+          padding={3}
           gap={3}
           radiusToken="xl"
-          style={{
-            position: 'absolute',
-            left: 16,
-            right: 16,
-            bottom: 16,
-            shadowColor: '#020617',
-            shadowOpacity: 0.14,
-            shadowRadius: 18,
-            shadowOffset: { width: 0, height: 10 },
-            elevation: 6,
-          }}
+          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
-          <Badge label="خارج التوفر" tone="warning" />
+          <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} />
           <Box gap={1}>
-            <Text role="bodyStrong">الكابتن غير متاح الآن</Text>
+            <Text role="bodyStrong">الواجهة متوقفة حتى يعود الكابتن للتوفر</Text>
             <Text role="bodySm" tone="muted">
-              فعّل التوفر من هذه البطاقة أو من الشريحة العلوية للعودة إلى استقبال الطلبات.
+              {currentAvailabilityMeta.description}
             </Text>
           </Box>
           <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <Button size="sm" fullWidth={false} tone="success" label="تفعيل التوفر" onPress={() => setIsCaptainAvailable(true)} />
+            <Button size="sm" fullWidth={false} tone="success" label="تبديل الحالة" onPress={cycleAvailabilityStatus} />
             <Button size="sm" fullWidth={false} tone="ghost" label="فتح الطلبات" onPress={() => setRoute('inbox')} />
           </Box>
         </Surface>
@@ -594,20 +650,10 @@ export function CaptainSurfaceHost() {
       return (
         <Surface
           tone="raised"
-          padding={4}
+          padding={3}
           gap={3}
           radiusToken="xl"
-          style={{
-            position: 'absolute',
-            left: 16,
-            right: 16,
-            bottom: 16,
-            shadowColor: '#020617',
-            shadowOpacity: 0.14,
-            shadowRadius: 18,
-            shadowOffset: { width: 0, height: 10 },
-            elevation: 6,
-          }}
+          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
           <Badge label="تحميل" tone="info" />
           <Box gap={1}>
@@ -624,20 +670,10 @@ export function CaptainSurfaceHost() {
       return (
         <Surface
           tone="raised"
-          padding={4}
+          padding={3}
           gap={3}
           radiusToken="xl"
-          style={{
-            position: 'absolute',
-            left: 16,
-            right: 16,
-            bottom: 16,
-            shadowColor: '#020617',
-            shadowOpacity: 0.14,
-            shadowRadius: 18,
-            shadowOffset: { width: 0, height: 10 },
-            elevation: 6,
-          }}
+          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
           <Badge label="تنبيه" tone="danger" />
           <Box gap={1}>
@@ -658,20 +694,10 @@ export function CaptainSurfaceHost() {
       return (
         <Surface
           tone="raised"
-          padding={4}
+          padding={3}
           gap={3}
           radiusToken="xl"
-          style={{
-            position: 'absolute',
-            left: 16,
-            right: 16,
-            bottom: 16,
-            shadowColor: '#020617',
-            shadowOpacity: 0.14,
-            shadowRadius: 18,
-            shadowOffset: { width: 0, height: 10 },
-            elevation: 6,
-          }}
+          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
           <Badge label="انتظار" tone="warning" />
           <Box gap={1}>
@@ -689,20 +715,10 @@ export function CaptainSurfaceHost() {
       return (
         <Surface
           tone="raised"
-          padding={4}
+          padding={3}
           gap={3}
           radiusToken="xl"
-          style={{
-            position: 'absolute',
-            left: 16,
-            right: 16,
-            bottom: 16,
-            shadowColor: '#020617',
-            shadowOpacity: 0.14,
-            shadowRadius: 18,
-            shadowOffset: { width: 0, height: 10 },
-            elevation: 6,
-          }}
+          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
           <Badge label="مغلق" tone="success" />
           <Box gap={1}>
@@ -719,20 +735,10 @@ export function CaptainSurfaceHost() {
     return (
       <Surface
         tone="raised"
-        padding={4}
+        padding={3}
         gap={3}
         radiusToken="xl"
-        style={{
-          position: 'absolute',
-          left: 16,
-          right: 16,
-          bottom: 16,
-          shadowColor: '#020617',
-          shadowOpacity: 0.14,
-          shadowRadius: 18,
-          shadowOffset: { width: 0, height: 10 },
-          elevation: 6,
-        }}
+        style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
       >
         <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
           <Box gap={1} style={{ flex: 1 }}>
@@ -741,27 +747,45 @@ export function CaptainSurfaceHost() {
             </Text>
             <Text role="bodyStrong">#{activeOrderDisplayId}</Text>
           </Box>
-          <Badge label={activeSummary.currentStageLabel} tone="warning" />
+          <Badge label={currentAvailabilityMeta.orderBadgeLabel} tone={currentAvailabilityMeta.chipTone} />
         </Box>
 
-        <Box gap={2}>
-          <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
-            <Text role="caption" tone="muted">
-              الاستلام
-            </Text>
-            <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
-              {activeSummary.pickupLabel}
-            </Text>
+        <Text role="bodySm" tone="muted">
+          {activeSummary.currentStageLabel} · {activeSummary.etaLabel}
+        </Text>
+
+        {activeOrderExpanded ? (
+          <Box gap={2}>
+            <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
+              <Text role="caption" tone="muted">
+                الاستلام
+              </Text>
+              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
+                {activeSummary.pickupLabel}
+              </Text>
+            </Box>
+            <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
+              <Text role="caption" tone="muted">
+                التسليم
+              </Text>
+              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
+                {activeSummary.dropoffLabel}
+              </Text>
+            </Box>
+            <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
+              <Text role="caption" tone="muted">
+                المرحلة
+              </Text>
+              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
+                {activeSummary.currentStageLabel}
+              </Text>
+            </Box>
           </Box>
-          <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
-            <Text role="caption" tone="muted">
-              التسليم
-            </Text>
-            <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
-              {activeSummary.dropoffLabel}
-            </Text>
-          </Box>
-        </Box>
+        ) : (
+          <Text role="bodySm" numberOfLines={2}>
+            {activeSummary.pickupLabel} → {activeSummary.dropoffLabel}
+          </Text>
+        )}
 
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           <Badge label={activeSummary.etaLabel} tone="info" />
@@ -769,7 +793,8 @@ export function CaptainSurfaceHost() {
         </Box>
 
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <Button size="sm" fullWidth={false} label="تفاصيل الطلب" onPress={() => setRoute('detail')} />
+          <Button size="sm" fullWidth={false} label={activeOrderExpanded ? 'إخفاء المختصر' : 'تفاصيل مختصرة'} onPress={() => setActiveOrderExpanded((current) => !current)} />
+          <Button size="sm" fullWidth={false} tone="secondary" label={activeSummary.nextActionLabel} onPress={() => setActiveOrderExpanded(true)} />
           <Button size="sm" fullWidth={false} tone="secondary" label="تواصل الطلب" onPress={() => setRoute('orderchat')} />
           <Button size="sm" fullWidth={false} tone="ghost" label="صندوق الطلبات" onPress={() => setRoute('inbox')} />
         </Box>
@@ -781,68 +806,101 @@ export function CaptainSurfaceHost() {
     <MobileScrollView
       fill
       padding={4}
-      gap={3}
+      gap={2}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 128 }}
+      contentContainerStyle={{ paddingBottom: 156 }}
     >
       <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
         <Button
           size="sm"
           fullWidth={false}
-          tone={isCaptainAvailable ? 'success' : 'secondary'}
-          label={isCaptainAvailable ? 'متاح الآن' : 'خارج التوفر'}
-          leadingAccessory={<Icon name={isCaptainAvailable ? 'checkmark-circle-outline' : 'pause-circle-outline'} size={16} color={isCaptainAvailable ? '#FFFFFF' : theme.warning} />}
-          style={{ borderRadius: 999 }}
-          onPress={() => setIsCaptainAvailable((current) => !current)}
+          tone={currentAvailabilityMeta.chipTone}
+          label={`التوفر · ${currentAvailabilityMeta.label}`}
+          leadingAccessory={<Icon name={isCaptainAvailable ? 'checkmark-circle-outline' : captainAvailabilityStatus === 'break' ? 'cafe-outline' : 'pause-circle-outline'} size={14} color={currentAvailabilityMeta.chipTone === 'success' ? '#FFFFFF' : theme.brand} />}
+          style={{ borderRadius: 999, minHeight: 34, paddingHorizontal: 8 }}
+          onPress={cycleAvailabilityStatus}
         />
         <Button
           size="sm"
           fullWidth={false}
           tone="secondary"
-          label="GPS / الموقع [TBD]"
-          leadingAccessory={<Icon name="navigate-outline" size={16} color={theme.brand} />}
-          style={{ borderRadius: 999 }}
-          onPress={() => setGpsSheetVisible(true)}
+          label={currentGpsMeta.label}
+          leadingAccessory={<Icon name="navigate-outline" size={14} color={theme.brand} />}
+          style={{ borderRadius: 999, minHeight: 34, paddingHorizontal: 8 }}
+          onPress={cycleGpsStatus}
         />
       </Box>
 
-      <Surface tone="inset" padding={0} gap={0} radiusToken="xl" style={{ minHeight: 432, overflow: 'hidden', borderColor: theme.lineStrong }}>
-        <Box style={{ minHeight: 432, backgroundColor: '#F7F4EF', overflow: 'hidden' }}>
-          <Box style={{ position: 'absolute', top: 62, right: 36, width: 148, height: 148, borderRadius: 74, backgroundColor: 'rgba(255, 80, 13, 0.16)' }} />
-          <Box style={{ position: 'absolute', top: 120, left: 28, width: 126, height: 126, borderRadius: 63, backgroundColor: 'rgba(10, 47, 92, 0.09)' }} />
-          <Box style={{ position: 'absolute', bottom: 126, right: 112, width: 176, height: 176, borderRadius: 88, backgroundColor: 'rgba(255, 197, 94, 0.18)' }} />
-          <Box style={{ position: 'absolute', bottom: 182, left: 98, width: 112, height: 112, borderRadius: 56, backgroundColor: 'rgba(255, 80, 13, 0.12)' }} />
+      <Surface tone="inset" padding={0} gap={0} radiusToken="xl" style={{ minHeight: 560, overflow: 'hidden', borderColor: theme.lineStrong }}>
+        <Box style={{ minHeight: 560, backgroundColor: '#EFF5FA', overflow: 'hidden' }}>
+          <Box style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(255,255,255,0.12)' }} />
+          <Box style={{ position: 'absolute', top: 78, left: 40, width: 7, height: 222, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.10)' }} />
+          <Box style={{ position: 'absolute', top: 136, left: 40, right: 74, height: 7, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.08)' }} />
+          <Box style={{ position: 'absolute', top: 214, right: 58, width: 148, height: 7, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.08)', transform: [{ rotate: '-18deg' }] }} />
+          <Box style={{ position: 'absolute', bottom: 122, left: 92, right: 42, height: 7, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.06)', transform: [{ rotate: '14deg' }] }} />
 
-          <Box style={{ position: 'absolute', top: 96, left: 46, width: 6, height: 188, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.10)' }} />
-          <Box style={{ position: 'absolute', top: 154, left: 46, right: 72, height: 6, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.08)' }} />
-          <Box style={{ position: 'absolute', top: 206, right: 68, width: 132, height: 6, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.08)', transform: [{ rotate: '-18deg' }] }} />
+          {demandHeatZones.map((zone) => (
+            <Box
+              key={zone.id}
+              style={{
+                position: 'absolute',
+                width: zone.size,
+                height: zone.size,
+                borderRadius: zone.size / 2,
+                backgroundColor: zone.color,
+                borderWidth: 1,
+                borderColor: 'rgba(255, 80, 13, 0.12)',
+                ...(zone.top != null ? { top: zone.top } : {}),
+                ...(zone.bottom != null ? { bottom: zone.bottom } : {}),
+                ...(zone.left != null ? { left: zone.left } : {}),
+                ...(zone.right != null ? { right: zone.right } : {}),
+              }}
+            />
+          ))}
 
-          <Surface tone="raised" padding={3} gap={2} radiusToken="lg" style={{ position: 'absolute', top: 16, right: 16, maxWidth: 250 }}>
-            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-              <Badge label="حرارة تجريبية" tone="warning" />
-              <Badge label="بدون تتبع فعلي" tone="info" />
+          {captainHeatZones.map((zone) => (
+            <Box
+              key={zone.id}
+              style={{
+                position: 'absolute',
+                width: zone.size,
+                height: zone.size,
+                borderRadius: zone.size / 2,
+                backgroundColor: zone.color,
+                borderWidth: 1,
+                borderColor: 'rgba(10, 47, 92, 0.12)',
+                ...(zone.top != null ? { top: zone.top } : {}),
+                ...(zone.bottom != null ? { bottom: zone.bottom } : {}),
+                ...(zone.left != null ? { left: zone.left } : {}),
+                ...(zone.right != null ? { right: zone.right } : {}),
+              }}
+            />
+          ))}
+
+          {/* Small fixed legend (compact, privacy-safe) */}
+          <Surface tone="inset" padding={2} gap={2} radiusToken="lg" style={{ position: 'absolute', left: 14, bottom: 14, minWidth: 180 }}>
+            <Box layoutDirection="row" gap={2} align="center">
+              <Box style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: 'rgba(255, 80, 13, 0.95)' }} />
+              <Text role="bodySm">كثافة طلبات</Text>
+              <Box style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: 'rgba(10, 47, 92, 0.95)', marginLeft: 8 }} />
+              <Text role="bodySm">تجمع كباتن</Text>
             </Box>
-            <Text role="bodySm" tone="muted">
-              الكثافة المعروضة تقديرية وآمنة بصريًا حتى اكتمال ربط مزود الخرائط لاحقًا.
-            </Text>
+            <Box layoutDirection="row" gap={2} align="center" style={{ marginTop: 6 }}>
+              <Box style={{ width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: theme.brand, backgroundColor: '#FFFFFF' }} />
+              <Text role="bodySm">نطاقك</Text>
+              <Box style={{ flex: 1 }} />
+              <Badge label={currentGpsMeta.label} tone={currentGpsMeta.chipTone} />
+            </Box>
           </Surface>
 
-          <Box style={{ position: 'absolute', top: 216, left: 54, alignItems: 'center', gap: 6 }}>
-            <Box style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: theme.brand, borderWidth: 3, borderColor: '#FFFFFF' }} />
-            <Badge label="أنت" tone="brand" />
+          <Box style={{ position: 'absolute', top: 182, left: 148, alignItems: 'center', gap: 6 }}>
+            <Box style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0A2F5C', borderWidth: 4, borderColor: '#FFFFFF' }} />
+            <Badge label="نطاقك الحالي" tone="brand" />
           </Box>
-          <Box style={{ position: 'absolute', top: 140, right: 58, alignItems: 'center', gap: 6 }}>
-            <Box style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: theme.warning, borderWidth: 3, borderColor: '#FFFFFF' }} />
-            <Badge label="استلام" tone="warning" />
-          </Box>
-          <Box style={{ position: 'absolute', bottom: 152, left: 132, alignItems: 'center', gap: 6 }}>
-            <Box style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: theme.info, borderWidth: 3, borderColor: '#FFFFFF' }} />
-            <Badge label="تسليم" tone="info" />
-          </Box>
-
-          {renderHomeOrderPanel()}
         </Box>
       </Surface>
+
+      {renderHomeOrderPanel()}
     </MobileScrollView>
   );
 
@@ -851,6 +909,7 @@ export function CaptainSurfaceHost() {
       mode="captain"
       visible={accountSheetVisible}
       onClose={() => setAccountSheetVisible(false)}
+      captainDisplayName={captainDisplayName}
       typeOptions={captainTypeOptions}
       activeTypeId={activeServiceType}
       onSelectType={handleSelectServiceType}
@@ -861,31 +920,7 @@ export function CaptainSurfaceHost() {
     />
   );
 
-  const gpsSheet = (
-    <SheetFrame visible={gpsSheetVisible} title="GPS / الموقع [TBD]" onClose={() => setGpsSheetVisible(false)}>
-      <MobileScrollView fill padding={0} gap={3} style={{ maxHeight: 620 }}>
-        <Text role="bodySm" tone="muted">
-          لا يوجد ربط runtime مع مزود الخرائط أو الموقع حتى الآن. ما يلي مجرد قوالب حالة واضحة للاستخدام لاحقًا.
-        </Text>
-        <StateView
-          stateId="offline"
-          title="GPS غير مفعل"
-          description="فعّل GPS قبل البدء بالتوجيه أو قبول الحركة التالية."
-        />
-        <StateView
-          stateId="warning"
-          title="الموقع غير متاح"
-          description="تم فتح الخريطة لكن موقع الجهاز الدقيق ما يزال غير متاح."
-        />
-        <StateView
-          stateId="warning"
-          title="بيانات الخريطة غير مكتملة [TBD]"
-          description="مزود الخريطة والربط المستقبلي ما يزالان في مرحلة placeholder."
-        />
-        <Button label="العودة إلى الخريطة" tone="secondary" onPress={() => setGpsSheetVisible(false)} />
-      </MobileScrollView>
-    </SheetFrame>
-  );
+  /* GPS sheet removed: GPS toggles are local-only and do not open sheets (Phase A) */
 
   if (activeServiceType === 'amn') {
     return (
@@ -928,7 +963,6 @@ export function CaptainSurfaceHost() {
           </MobileScrollView>
         </Surface>
         {accountSheet}
-        {gpsSheet}
       </Box>
     );
   }
@@ -982,7 +1016,6 @@ export function CaptainSurfaceHost() {
           {content}
         </Surface>
         {accountSheet}
-        {gpsSheet}
       </Box>
     );
   }
@@ -1007,7 +1040,6 @@ export function CaptainSurfaceHost() {
         {renderHomeScreen()}
       </Surface>
       {accountSheet}
-      {gpsSheet}
     </Box>
   );
 }
