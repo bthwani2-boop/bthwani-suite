@@ -6,15 +6,18 @@ import { buildWebThemeStyleSheet, directionConfig, resolveDirectionFromLanguage,
 const webRootBodyCss = `
 html {
   color-scheme: light;
+  background: var(--bth-background);
+  min-height: 100vh;
 }
 
 /* compatibility: accept both old and new root class names so styles continue to apply */
-body.bth-web-root-body, body.ui-web-root-body {
+body.bth-web-root-body, body.ui-web-root-body, html, #__next {
   margin: 0;
   min-height: 100vh;
   background: var(--bth-background);
   color: var(--bth-text);
   font-family: var(--bth-font-family-latin), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow-x: hidden;
 }
 `;
 

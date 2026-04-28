@@ -6,6 +6,8 @@ const webCommandCenterCss = `
   --rail-width: 288px;
   display: grid;
   gap: 20px;
+  align-content: start;
+  min-height: 100vh;
 }
 
 .ui-web-command-strip {
@@ -13,12 +15,16 @@ const webCommandCenterCss = `
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 18px;
-  border-radius: 18px;
+  padding: 8px 12px;
+  border-radius: 12px;
   border: 1px solid rgba(10, 47, 92, 0.08);
-  background: linear-gradient(135deg, rgba(10, 47, 92, 0.02) 0%, rgba(255, 80, 13, 0.015) 100%);
-  box-shadow: 0 2px 12px rgba(10, 47, 92, 0.04);
+  background: var(--bth-surface);
+  box-shadow: 0 1px 8px rgba(10, 47, 92, 0.04);
   flex-wrap: wrap;
+  position: sticky;
+  top: 12px;
+  z-index: 30;
+  backdrop-filter: none;
 }
 .ui-web-command-strip__top-row,
 .ui-web-command-strip__secondary-row,
@@ -165,24 +171,38 @@ const webCommandCenterCss = `
 
   .ui-web-command-center__workspace {
     display: grid;
+    gap: 24px;
+    align-items: stretch;
+    min-height: calc(100vh - 116px);
+    direction: inherit;
+    /* default layout: stage then rail (RTL-first) */
     grid-template-columns: minmax(0, 1fr) var(--rail-width);
     grid-template-areas: "stage rail";
-    gap: 24px;
-    align-items: start;
-    direction: ltr;
   }
 
   [dir="ltr"] .ui-web-command-center__workspace {
+    /* LTR: rail on the left, stage on the right */
     grid-template-columns: var(--rail-width) minmax(0, 1fr);
     grid-template-areas: "rail stage";
   }
 
+  [dir="rtl"] .ui-web-command-center__workspace {
+    /* RTL: stage on the left, rail on the right */
+    grid-template-columns: minmax(0, 1fr) var(--rail-width);
+    grid-template-areas: "stage rail";
+  }
+
   @media (max-width: 900px) {
+    .ui-web-command-strip {
+      position: static;
+    }
+
     .ui-web-command-center__workspace {
       grid-template-columns: 1fr;
       grid-template-areas:
         "stage"
         "rail";
+      min-height: auto;
     }
   }
 
@@ -195,10 +215,27 @@ const webCommandCenterCss = `
   .ui-web-command-center__stage {
     grid-area: stage;
     min-width: 0;
+    align-content: start;
+    min-height: calc(100vh - 132px);
+    max-height: calc(100vh - 132px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding-inline-end: 6px;
   }
 
   .ui-web-command-center__rail {
     grid-area: rail;
+  }
+
+  @media (max-width: 900px) {
+    .ui-web-command-center__stage,
+    .ui-web-command-center__rail {
+      min-height: auto;
+      max-height: none;
+      overflow: visible;
+      padding-inline-end: 0;
+    }
   }
 
   [dir="rtl"] .ui-web-command-center__stage,
@@ -213,15 +250,29 @@ const webCommandCenterCss = `
 
   .ui-web-command-center__rail {
     position: sticky;
-    top: 20px;
-    padding: 20px;
-    border-radius: 20px;
+    top: 84px;
+    align-self: start;
+    padding: 16px;
+    border-radius: 16px;
     border: 1px solid rgba(10, 47, 92, 0.08);
-    background: linear-gradient(180deg, rgba(10, 47, 92, 0.015) 0%, rgba(255, 255, 255, 1) 40%);
-    box-shadow: 0 4px 16px rgba(10, 47, 92, 0.04);
-    backdrop-filter: blur(8px);
+    background: var(--bth-surface);
+    box-shadow: 0 4px 12px rgba(10, 47, 92, 0.03);
+    backdrop-filter: none;
     width: var(--rail-width);
+    overflow: visible;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
     transition: width 180ms ease;
+  }
+
+  @media (max-width: 900px) {
+    .ui-web-command-center__rail {
+      position: static;
+      top: auto;
+      width: 100%;
+      max-height: none;
+      overflow: visible;
+    }
   }
 
   .ui-web-command-center-root[data-rail-collapsed="1"] {
@@ -230,6 +281,7 @@ const webCommandCenterCss = `
 
   .ui-web-command-center__rail[data-collapsed="1"] {
     width: var(--rail-width);
+    overflow-x: hidden;
   }
 
   .ui-web-command-center__rail[data-collapsed="1"] .ui-web-command-center__rail-item-title,
@@ -373,6 +425,12 @@ const webCommandCenterCss = `
   .ui-web-command-center__rail-toggle:hover {
     border-color: #FF500D;
     transform: translateY(-1px);
+  }
+
+  .ui-web-command-center__rail-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
   }
 
   .ui-web-rail-service-list__list {
@@ -545,6 +603,7 @@ const webCommandCenterCss = `
                 href={item.href}
                 title={item.label}
                 aria-label={item.label}
+                aria-current={item.active ? 'page' : undefined}
                 data-icon={icon}
                 onClick={(event) => {
                   if (onRailItemSelect) {
@@ -568,6 +627,7 @@ const webCommandCenterCss = `
               type="button"
               title={item.label}
               aria-label={item.label}
+              aria-current={item.active ? 'page' : undefined}
               data-icon={icon}
               onClick={() => onRailItemSelect?.(item.id)}
               className={className}
@@ -637,6 +697,9 @@ const webCommandCenterCss = `
     const resolvedRefreshLabel = refreshLabel ?? panelText.ui.refreshLabel;
     const resolvedRailNavigationLabel = railNavigationLabel ?? panelText.ui.railNavigationLabel;
     const [railCollapsed, setRailCollapsed] = React.useState(false);
+    const railToggleGlyph = direction === 'rtl'
+      ? (railCollapsed ? '«' : '›')
+      : (railCollapsed ? '»' : '‹');
 
     return (
       <>
@@ -667,19 +730,26 @@ const webCommandCenterCss = `
           <div className="ui-web-command-center__workspace">
             <section className="ui-web-command-center__stage">{children}</section>
 
-            <aside className="ui-web-command-center__rail" data-collapsed={railCollapsed ? '1' : '0'}>
+            <aside
+              id="ui-web-command-center-rail"
+              className="ui-web-command-center__rail"
+              data-collapsed={railCollapsed ? '1' : '0'}
+              role="complementary"
+              aria-hidden={railCollapsed}
+            >
               <div className="ui-web-command-center__rail-header">
                 <h2 className="ui-web-command-center__rail-title">{railTitle}</h2>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div className="ui-web-command-center__rail-header-actions">
                   {railStatusLabel ? <span className="ui-web-command-center__rail-status">{railStatusLabel}</span> : null}
                   <button
                     type="button"
-                    aria-pressed={railCollapsed}
                     className="ui-web-command-center__rail-toggle"
                     onClick={() => setRailCollapsed((s) => !s)}
-                    aria-label={railCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                    aria-expanded={!railCollapsed}
+                    aria-controls="ui-web-command-center-rail"
+                    title={railCollapsed ? ((panelText as any)?.ui?.railExpandLabel ?? 'Expand sidebar') : ((panelText as any)?.ui?.railCollapseLabel ?? 'Collapse sidebar')}
                   >
-                    {railCollapsed ? '»' : '‹'}
+                    {railToggleGlyph}
                   </button>
                 </div>
               </div>
