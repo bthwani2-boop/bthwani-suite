@@ -812,4 +812,3 @@ Write-Host "summary: $SummaryPath"
 if ($status -eq 'BLOCKED') { exit 2 }
 if ($status -eq 'PASS_WITH_WARNINGS') { exit 1 }
 exit 0
-

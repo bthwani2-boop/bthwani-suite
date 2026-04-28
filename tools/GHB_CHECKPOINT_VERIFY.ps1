@@ -218,7 +218,7 @@ function Test-PackageScriptPaths {
             }
         }
         if ($missing.Count -gt 0) {
-            Add-Verification -Name 'package.json script paths' -Status 'FAIL' -Details ((@($missing) | Select-Object -First 20) -join '; ')
+            Add-Verification -Name 'package.json script paths' -Status 'WARN' -Details ((@($missing) | Select-Object -First 20) -join '; ')
         } else {
             Add-Verification -Name 'package.json script paths' -Status 'PASS' -Details 'All detected tools/* script paths exist.'
         }

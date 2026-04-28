@@ -164,6 +164,3 @@ Write-Host "evidence_root: $($Script:EvidenceRoot)"
 if ($finalStatus -eq 'BLOCKED') { exit 2 }
 if ($finalStatus -eq 'PASS_WITH_WARNINGS') { exit 1 }
 exit 0
-
-
-
