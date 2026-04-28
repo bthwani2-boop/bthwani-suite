@@ -1,6 +1,6 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
-import { Badge, Box, Button, Icon, KeyValueList, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TopBar, useTheme } from '@bthwani/ui-kit';
+import { Badge, Box, Button, Icon, KeyValueList, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TopBar, Switch, useTheme } from '@bthwani/ui-kit';
 import { dshCaptain } from '@bthwani/surfaces/app-captain';
 import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
@@ -584,6 +584,12 @@ export function CaptainSurfaceHost() {
           accessibilityLabel: 'الإشعارات',
           onPress: () => setRoute('bell'),
         },
+        {
+          id: 'wallet',
+          icon: <Icon name="wallet-outline" size={20} color={theme.brandContrast} />,
+          accessibilityLabel: 'المحفظة',
+          onPress: () => openCaptainSupportScreen('cod-balance'),
+        },
       ]}
       ticker={homeTicker}
     />
@@ -749,85 +755,62 @@ export function CaptainSurfaceHost() {
           </Box>
           <Badge label={currentAvailabilityMeta.orderBadgeLabel} tone={currentAvailabilityMeta.chipTone} />
         </Box>
+        {!activeOrderExpanded ? (
+          <>
+            <Text role="bodySm" numberOfLines={1} tone="muted">
+              {activeSummary.pickupLabel} → {activeSummary.dropoffLabel}
+            </Text>
 
-        <Text role="bodySm" tone="muted">
-          {activeSummary.currentStageLabel} · {activeSummary.etaLabel}
-        </Text>
-
-        {activeOrderExpanded ? (
+            <Box layoutDirection="row" align="center" gap={2} style={{ marginTop: 8 }}>
+              <Text role="bodySm" tone="muted" style={{ flex: 1 }}>{activeSummary.etaLabel}</Text>
+              <Button size="sm" fullWidth={false} label="تفاصيل مختصرة" onPress={() => setActiveOrderExpanded(true)} />
+            </Box>
+          </>
+        ) : (
           <Box gap={2}>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
-              <Text role="caption" tone="muted">
-                الاستلام
-              </Text>
-              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
-                {activeSummary.pickupLabel}
-              </Text>
+              <Text role="caption" tone="muted">الاستلام</Text>
+              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>{activeSummary.pickupLabel}</Text>
             </Box>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
-              <Text role="caption" tone="muted">
-                التسليم
-              </Text>
-              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
-                {activeSummary.dropoffLabel}
-              </Text>
+              <Text role="caption" tone="muted">التسليم</Text>
+              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>{activeSummary.dropoffLabel}</Text>
             </Box>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
-              <Text role="caption" tone="muted">
-                المرحلة
-              </Text>
-              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
-                {activeSummary.currentStageLabel}
-              </Text>
+              <Text role="caption" tone="muted">المرحلة</Text>
+              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>{activeSummary.currentStageLabel}</Text>
+            </Box>
+
+            <Box layoutDirection="row" gap={2} style={{ marginTop: 6 }}>
+              <Button size="sm" fullWidth={false} label="إخفاء المختصر" onPress={() => setActiveOrderExpanded(false)} />
             </Box>
           </Box>
-        ) : (
-          <Text role="bodySm" numberOfLines={2}>
-            {activeSummary.pickupLabel} → {activeSummary.dropoffLabel}
-          </Text>
         )}
-
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <Badge label={activeSummary.etaLabel} tone="info" />
-          <Badge label={activeSummary.nextActionLabel} tone="brand" />
-        </Box>
-
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <Button size="sm" fullWidth={false} label={activeOrderExpanded ? 'إخفاء المختصر' : 'تفاصيل مختصرة'} onPress={() => setActiveOrderExpanded((current) => !current)} />
-          <Button size="sm" fullWidth={false} tone="secondary" label={activeSummary.nextActionLabel} onPress={() => setActiveOrderExpanded(true)} />
-          <Button size="sm" fullWidth={false} tone="secondary" label="تواصل الطلب" onPress={() => setRoute('orderchat')} />
-          <Button size="sm" fullWidth={false} tone="ghost" label="صندوق الطلبات" onPress={() => setRoute('inbox')} />
-        </Box>
       </Surface>
     );
   };
 
   const renderHomeScreen = () => (
-    <MobileScrollView
-      fill
-      padding={4}
-      gap={2}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 156 }}
-    >
-      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-        <Button
-          size="sm"
-          fullWidth={false}
-          tone={currentAvailabilityMeta.chipTone}
+      <MobileScrollView
+        fill
+        padding={4}
+        gap={2}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 220 }}
+      >
+      <Box layoutDirection="row" gap={3} align="center" style={{ alignItems: 'center' }}>
+        <Switch
           label={`التوفر · ${currentAvailabilityMeta.label}`}
-          leadingAccessory={<Icon name={isCaptainAvailable ? 'checkmark-circle-outline' : captainAvailabilityStatus === 'break' ? 'cafe-outline' : 'pause-circle-outline'} size={14} color={currentAvailabilityMeta.chipTone === 'success' ? '#FFFFFF' : theme.brand} />}
-          style={{ borderRadius: 999, minHeight: 34, paddingHorizontal: 8 }}
-          onPress={cycleAvailabilityStatus}
+          value={isCaptainAvailable}
+          onValueChange={(v) => setCaptainAvailabilityStatus(v ? 'available' : 'unavailable')}
+          style={{ paddingVertical: 2 }}
         />
-        <Button
-          size="sm"
-          fullWidth={false}
-          tone="secondary"
-          label={currentGpsMeta.label}
-          leadingAccessory={<Icon name="navigate-outline" size={14} color={theme.brand} />}
-          style={{ borderRadius: 999, minHeight: 34, paddingHorizontal: 8 }}
-          onPress={cycleGpsStatus}
+
+        <Switch
+          label={`GPS · ${currentGpsMeta.label}`}
+          value={gpsStatus === 'ready'}
+          onValueChange={(v) => setGpsStatus(v ? 'ready' : 'disabled')}
+          style={{ paddingVertical: 2 }}
         />
       </Box>
 
