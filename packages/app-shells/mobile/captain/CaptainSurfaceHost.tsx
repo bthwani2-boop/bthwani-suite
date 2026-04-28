@@ -1,5 +1,5 @@
 import React from 'react';
-import { BackHandler, Platform, Pressable } from 'react-native';
+import { BackHandler, Platform, Pressable, Switch as RNSwitch } from 'react-native';
 
 // Dynamic safe-area insets loader: avoids hard import so Metro won't fail when
 // `react-native-safe-area-context` isn't installed in some environments.
@@ -15,9 +15,8 @@ try {
 } catch (err) {
   // fallback is already a zero-insets function
 }
-import { Badge, Box, Button, Icon, KeyValueList, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TopBar, Switch, useTheme } from '@bthwani/ui-kit';
+import { Badge, Box, Button, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme } from '@bthwani/ui-kit';
 import { dshCaptain } from '@bthwani/surfaces/app-captain';
-import { MobileAccountSheet, type MobileAccountTypeOption } from '../shared/MobileAccountSheet';
 
 const {
   DshEntryScreen,
@@ -64,15 +63,34 @@ type CaptainSupportRoute =
   | 'tier-evaluate'
   | 'tier-info';
 
-type CaptainRoute = 'home' | 'entry' | 'inbox' | 'detail' | 'orderchat' | 'bell' | 'support-directory' | 'support-screen';
+type CaptainRoute =
+  | 'home'
+  | 'account'
+  | 'account-profile'
+  | 'account-finance'
+  | 'account-orders'
+  | 'account-docs'
+  | 'account-shifts'
+  | 'account-support'
+  | 'entry'
+  | 'inbox'
+  | 'detail'
+  | 'orderchat'
+  | 'bell'
+  | 'support-directory'
+  | 'support-screen';
 type CaptainServiceType = 'dsh' | 'amn';
 type CaptainAvailabilityStatus = 'available' | 'unavailable' | 'break' | 'planned-leave';
 type CaptainGpsStatus = 'ready' | 'limited' | 'offline' | 'disabled';
+type ActiveOrderPhase = 'pickup' | 'delivery';
 
-const captainTypeOptions: readonly MobileAccountTypeOption[] = [
-  { id: 'dsh', label: 'DSH', description: 'السياق النشط الآن' },
-  { id: 'amn', label: 'AMN', description: 'مسار [TBD] غير مكتمل' },
-];
+type CompactOrderChatMessage = {
+  id: string;
+  sender: string;
+  text: string;
+  time: string;
+  side: 'start' | 'end';
+};
 
 const defaultDetailByOrderId: Record<string, CaptainOrderDetailSummary> = {
   'captain-order-9021': {
@@ -92,6 +110,30 @@ const defaultDetailByOrderId: Record<string, CaptainOrderDetailSummary> = {
     nextActionLabel: 'ابدأ المسار وأكد الاستلام عند الوصول',
   },
 };
+
+const compactOrderChatSeed: CompactOrderChatMessage[] = [
+  {
+    id: 'compact-msg-1',
+    sender: 'العميل',
+    text: 'أبقي التحديثات قصيرة لو سمحت، وأنا جاهز عند الوصول.',
+    time: '09:12',
+    side: 'start',
+  },
+  {
+    id: 'compact-msg-2',
+    sender: 'الكابتن',
+    text: 'تم. أنا الآن في الطريق إلى الاستلام.',
+    time: '09:13',
+    side: 'end',
+  },
+  {
+    id: 'compact-msg-3',
+    sender: 'العميل',
+    text: 'أخبرني قبل دقيقة من الوصول.',
+    time: '09:14',
+    side: 'start',
+  },
+];
 
 const captainDisplayName = 'الكابتن عبدالله السبيعي';
 const captainWalletBalanceLabel = '348 ر.س';
@@ -161,16 +203,43 @@ const gpsStatusMeta: Record<
   },
 };
 
-const demandHeatZones = [
+type MapHeatZone = {
+  id: string;
+  size: number;
+  color: string;
+  label: string;
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+const demandHeatZones: readonly MapHeatZone[] = [
   { id: 'demand-1', top: 58, right: 34, size: 164, color: 'rgba(255, 80, 13, 0.20)', label: 'طلب مرتفع' },
   { id: 'demand-2', top: 188, left: 26, size: 118, color: 'rgba(255, 80, 13, 0.14)', label: 'ذروة قريبة' },
   { id: 'demand-3', bottom: 108, right: 96, size: 146, color: 'rgba(255, 133, 75, 0.16)', label: 'متاجر نشطة' },
-] as const;
+] satisfies readonly MapHeatZone[];
 
-const captainHeatZones = [
+const captainHeatZones: readonly MapHeatZone[] = [
   { id: 'captain-1', top: 128, left: 112, size: 132, color: 'rgba(10, 47, 92, 0.14)', label: 'كباتن أكثر' },
   { id: 'captain-2', bottom: 138, left: 154, size: 104, color: 'rgba(10, 47, 92, 0.10)', label: 'تغطية قريبة' },
-] as const;
+] satisfies readonly MapHeatZone[];
+
+function CompactOrderChatBubble({ message }: { message: CompactOrderChatMessage }) {
+  const isOutbound = message.side === 'end';
+
+  return (
+    <Surface tone={isOutbound ? 'brand' : 'raised'} padding={2} gap={1} radiusToken="lg" border={false}>
+      <Box layoutDirection="row" justify="space-between" align="center" gap={2}>
+        <Badge label={message.sender} tone={isOutbound ? 'brand' : 'default'} />
+        <Text role="caption" tone={isOutbound ? 'inverse' : 'muted'}>{message.time}</Text>
+      </Box>
+      <Text role="bodySm" tone={isOutbound ? 'inverse' : 'default'}>
+        {message.text}
+      </Text>
+    </Surface>
+  );
+}
 
 export function CaptainSurfaceHost() {
   const { theme } = useTheme();
@@ -182,10 +251,12 @@ export function CaptainSurfaceHost() {
   const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<CaptainSupportRoute>('orders-list');
   const [isPickupSheetVisible, setIsPickupSheetVisible] = React.useState(false);
   const [isDeliverySheetVisible, setIsDeliverySheetVisible] = React.useState(false);
-  const [accountSheetVisible, setAccountSheetVisible] = React.useState(false);
   const [captainAvailabilityStatus, setCaptainAvailabilityStatus] = React.useState<CaptainAvailabilityStatus>('available');
   const [gpsStatus, setGpsStatus] = React.useState<CaptainGpsStatus>('limited');
   const [activeOrderExpanded, setActiveOrderExpanded] = React.useState(false);
+  const [activeOrderPhase, setActiveOrderPhase] = React.useState<ActiveOrderPhase>('pickup');
+  const [activeOrderDraft, setActiveOrderDraft] = React.useState('');
+  const [activeOrderMessages, setActiveOrderMessages] = React.useState<CompactOrderChatMessage[]>(compactOrderChatSeed);
   const routeHistoryRef = React.useRef<CaptainRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
 
@@ -193,6 +264,7 @@ export function CaptainSurfaceHost() {
   const activeOrderDisplayId = activeSummary.orderId.replace('captain-order-', '');
   const orderChatState = inboxState === 'delivered' ? 'readOnly' : 'active';
   const isCaptainAvailable = captainAvailabilityStatus === 'available';
+  const isGpsEnabled = gpsStatus !== 'disabled';
   const currentAvailabilityMeta = availabilityStatusMeta[captainAvailabilityStatus];
   const currentGpsMeta = gpsStatusMeta[gpsStatus];
 
@@ -207,11 +279,6 @@ export function CaptainSurfaceHost() {
   }, []);
 
   const goBack = React.useCallback(() => {
-    if (accountSheetVisible) {
-      setAccountSheetVisible(false);
-      return true;
-    }
-
     if (routeHistoryRef.current.length > 1) {
       routeTransitionFromBackRef.current = true;
       routeHistoryRef.current.pop();
@@ -226,7 +293,7 @@ export function CaptainSurfaceHost() {
     }
 
     return false;
-  }, [accountSheetVisible, route]);
+  }, [route]);
 
   if (!activeSummary) {
     return null;
@@ -256,13 +323,28 @@ export function CaptainSurfaceHost() {
     return () => subscription.remove();
   }, [goBack]);
 
+  React.useEffect(() => {
+    if (inboxState !== 'active') {
+      return;
+    }
+
+    setActiveOrderExpanded(false);
+    setActiveOrderPhase('pickup');
+    setActiveOrderDraft('');
+    setActiveOrderMessages(compactOrderChatSeed);
+  }, [activeOrderId, inboxState]);
+
   const openOrderDetail = (orderId: string) => {
     setActiveOrderId(orderId);
     setRoute('detail');
   };
 
-  const openCaptainEntry = () => {
-    setRoute('entry');
+  const openCaptainAccount = () => {
+    setRoute('account');
+  };
+
+  const openCaptainAccountSection = (sectionRoute: CaptainRoute) => {
+    setRoute(sectionRoute);
   };
 
   const openSupportDirectory = () => {
@@ -273,6 +355,53 @@ export function CaptainSurfaceHost() {
     setSelectedSupportScreen(screenId);
     setRoute('support-screen');
   };
+
+  const expandActiveOrder = React.useCallback(() => {
+    setActiveOrderExpanded(true);
+  }, []);
+
+  const collapseActiveOrder = React.useCallback(() => {
+    setActiveOrderExpanded(false);
+  }, []);
+
+  const confirmPickup = React.useCallback(() => {
+    setActiveOrderPhase('delivery');
+    setActiveOrderMessages((current) => [
+      ...current,
+      {
+        id: `compact-msg-${current.length + 1}`,
+        sender: 'النظام',
+        text: 'تم تأكيد الاستلام. المرحلة التالية هي التسليم.',
+        time: 'الآن',
+        side: 'start',
+      },
+    ]);
+  }, []);
+
+  const confirmDelivery = React.useCallback(() => {
+    setInboxState('delivered');
+    setActiveOrderExpanded(false);
+  }, []);
+
+  const sendQuickMessage = React.useCallback(() => {
+    const text = activeOrderDraft.trim();
+
+    if (!text) {
+      return;
+    }
+
+    setActiveOrderMessages((current) => [
+      ...current,
+      {
+        id: `compact-msg-${current.length + 1}`,
+        sender: 'الكابتن',
+        text,
+        time: 'الآن',
+        side: 'end',
+      },
+    ]);
+    setActiveOrderDraft('');
+  }, [activeOrderDraft]);
 
   const handleSelectServiceType = React.useCallback((typeId: string) => {
     const nextType: CaptainServiceType = typeId === 'amn' ? 'amn' : 'dsh';
@@ -373,169 +502,190 @@ export function CaptainSurfaceHost() {
     return null;
   };
 
-  const captainSummaryItems = [
-    {
-      label: 'الاسم',
-      value: <Badge label={captainDisplayName} tone="brand" />,
-      helperText: 'يظهر الاسم الحقيقي داخل الهيدر والـ account sheet دون title block إضافي.',
-    },
-    {
-      label: 'النوع',
-      value: <Badge label={activeServiceType === 'dsh' ? 'DSH' : 'AMN [TBD]'} tone={activeServiceType === 'dsh' ? 'success' : 'warning'} />,
-      helperText: 'DSH هو السياق النشط. AMN يبقى [TBD].',
-    },
-    {
-      label: 'التوفر',
-      value: <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} />,
-      helperText: 'يمكن تبديله محليًا من chip التوفر أو من الشيت نفسه.',
-    },
-    {
-      label: 'المحفظة',
-      value: <Badge label={captainWalletBalanceLabel} tone="success" />,
-      helperText: 'عرض محلي مؤقت بدون أي API مالي جديد.',
-    },
-    {
-      label: 'التقييم',
-      value: <Badge label="4.9 / 5" tone="info" />,
-      helperText: 'عرض محلي واضح حتى اكتمال الربط التشغيلي [TBD].',
-    },
-    {
-      label: 'المستوى',
-      value: <Badge label="Elite 3" tone="brand" />,
-      helperText: 'المستوى الحالي placeholder واضح بدل قيمة باهتة غير مقروءة.',
-    },
-  ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
+  const renderCaptainAccountShell = (title: string, subtitle: string, content: React.ReactNode) => {
+    return (
+      <Box style={{ flex: 1 }} background="background">
+        <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 96 }}>
+          <TopBar
+            variant="secondary"
+            title={title}
+            subtitle={subtitle}
+            style={{ marginHorizontal: -16, marginTop: -16 }}
+            trailingAction={{
+              id: 'back',
+              icon: <Icon name="arrow-back" size={24} tone="brand" />,
+              mirrorInRtl: true,
+              accessibilityLabel: 'العودة',
+              onPress: goBack,
+            }}
+          />
+          {content}
+        </MobileScrollView>
+      </Box>
+    );
+  };
 
-  const captainMenuSections = [
-    {
-      title: 'الجاهزية والارتباط',
-      subtitle: 'الحضور والموقع وربط الإجازات يبقون واضحين من دون runtime جديد.',
-      items: [
-        {
-          id: 'availability',
-          title: 'حالة التوفر',
-          subtitle: currentAvailabilityMeta.description,
-          meta: currentAvailabilityMeta.label,
-          badgeLabel: currentAvailabilityMeta.label,
-          onPress: cycleAvailabilityStatus,
-        },
-        {
-          id: 'gps',
-          title: 'GPS / الموقع',
-          subtitle: currentGpsMeta.description,
-          meta: currentGpsMeta.label,
-          badgeLabel: currentGpsMeta.label,
-          onPress: cycleGpsStatus,
-        },
-        {
-          id: 'leave-absence',
-          title: 'الإجازة والغياب',
-          subtitle: 'يرتبط لاحقًا مع إدارة الأسطول وطلبات الغياب [TBD].',
-          meta: '[TBD]',
-          badgeLabel: '[TBD]',
-          disabled: true,
-        },
-      ],
-    },
-    {
-      title: 'التشغيل',
-      subtitle: 'الطريق والطلبات والخريطة تبقى في واجهة واحدة.',
-      items: [
-        {
-          id: 'entry',
-          title: 'بوابة التنفيذ',
-          subtitle: 'الفرز والقبول قبل الخروج للميدان.',
-          meta: 'مباشر',
-          badgeLabel: 'مباشر',
-          onPress: openCaptainEntry,
-        },
-        {
-          id: 'orders',
-          title: 'الطلبات',
-          subtitle: 'فتح صندوق الطلبات الحالي.',
-          meta: 'مباشر',
-          badgeLabel: 'مباشر',
-          onPress: () => setRoute('inbox'),
-        },
-        {
-          id: 'map',
-          title: 'الخريطة',
-          subtitle: 'العودة إلى الشاشة الرئيسية.',
-          meta: 'الرئيسية',
-          badgeLabel: 'الرئيسية',
-          onPress: () => setRoute('home'),
-        },
-      ],
-    },
-    {
-      title: 'المالية',
-      subtitle: 'المحفظة والأرباح والتسويات.',
-      items: [
-        {
-          id: 'wallet',
-          title: 'المحفظة',
-          subtitle: 'عرض المحفظة والملخص المالي المؤقت.',
-          meta: 'مالية',
-          badgeLabel: captainWalletBalanceLabel,
-          onPress: () => openCaptainSupportScreen('cod-balance'),
-        },
-        {
-          id: 'earnings',
-          title: 'الأرباح',
-          subtitle: 'الأرباح النهائية ما تزال [TBD].',
-          meta: '[TBD]',
-          badgeLabel: '[TBD]',
-          disabled: true,
-        },
-        {
-          id: 'settlements',
-          title: 'التسويات',
-          subtitle: 'التسويات ما تزال غير موصولة [TBD].',
-          meta: '[TBD]',
-          badgeLabel: '[TBD]',
-          disabled: true,
-        },
-      ],
-    },
-    {
-      title: 'الهوية والتقييم',
-      subtitle: 'الملف الشخصي والوثائق ومستوى الأداء.',
-      items: [
-        {
-          id: 'profile',
-          title: 'الملف الشخصي',
-          subtitle: 'بيانات الكابتن الأساسية.',
-          meta: 'مباشر',
-          badgeLabel: 'مباشر',
-          onPress: () => openCaptainSupportScreen('profile-get'),
-        },
-        {
-          id: 'documents',
-          title: 'الوثائق',
-          subtitle: 'المرفقات والملفات الداعمة.',
-          meta: 'مباشر',
-          badgeLabel: 'مباشر',
-          onPress: () => openCaptainSupportScreen('proof-upload'),
-        },
-        {
-          id: 'rating',
-          title: 'التقييم',
-          subtitle: 'مؤشرات الأداء والتقييم الحالي.',
-          meta: 'مباشر',
-          badgeLabel: 'مباشر',
-          onPress: () => openCaptainSupportScreen('tier-evaluate'),
-        },
-        {
-          id: 'level',
-          title: 'المستوى',
-          subtitle: 'قراءة المستوى الحالي والامتيازات.',
-          meta: 'مباشر',
-          badgeLabel: 'مباشر',
-          onPress: () => openCaptainSupportScreen('tier-info'),
-        },
-      ],
-    },
-  ] as const;
+  const renderCaptainAccountRootScreen = () => {
+    const summaryItems = [
+      { label: 'الاسم', value: <Badge label={captainDisplayName} tone="brand" /> },
+      { label: 'النوع', value: <Badge label="DSH" tone="success" /> },
+      { label: 'الحالة', value: <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} /> },
+      { label: 'المحفظة', value: <Badge label={captainWalletBalanceLabel} tone="success" /> },
+      { label: 'التقييم', value: <Badge label="4.9 / 5" tone="info" /> },
+      { label: 'المستوى', value: <Badge label="Elite 3" tone="brand" /> },
+      { label: 'الطلب النشط', value: <Badge label={inboxState === 'delivered' ? 'لا يوجد' : `#${activeOrderDisplayId}`} tone="default" /> },
+    ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
+
+    const accountListItems = [
+      {
+        title: 'بيانات الكابتن',
+        subtitle: 'الهوية، النوع، والحالة الحالية.',
+        meta: 'فتح',
+        badgeLabel: 'مباشر',
+        onPress: () => openCaptainAccountSection('account-profile'),
+      },
+      {
+        title: 'المالية',
+        subtitle: 'المحفظة والأرباح والتسويات في صفحة واحدة.',
+        meta: 'فتح',
+        badgeLabel: 'مالي',
+        onPress: () => openCaptainAccountSection('account-finance'),
+      },
+      {
+        title: 'الطلبات',
+        subtitle: 'الطلب النشط والسجل المختصر.',
+        meta: 'فتح',
+        badgeLabel: 'نشط',
+        onPress: () => openCaptainAccountSection('account-orders'),
+      },
+      {
+        title: 'الوثائق والتقييم',
+        subtitle: 'الملفات، التقييم، والمستوى.',
+        meta: 'فتح',
+        badgeLabel: 'جاهز',
+        onPress: () => openCaptainAccountSection('account-docs'),
+      },
+      {
+        title: 'الدوام / الإجازات',
+        subtitle: 'الحضور وجدول اليوم وخطة الإجازة.',
+        meta: 'فتح',
+        badgeLabel: 'اليوم',
+        onPress: () => openCaptainAccountSection('account-shifts'),
+      },
+      {
+        title: 'الإعدادات والدعم',
+        subtitle: 'اللغة، الإشعارات، والمساعدة.',
+        meta: 'فتح',
+        badgeLabel: 'متابعة',
+        onPress: () => openCaptainAccountSection('account-support'),
+      },
+    ] as const;
+
+    return (
+      <>
+        <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+          <KeyValueList items={summaryItems} />
+        </Surface>
+
+        <Surface tone="raised" padding={0} gap={0} radiusToken="xl">
+          {accountListItems.map((item) => (
+            <ListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} onPress={item.onPress} />
+          ))}
+        </Surface>
+      </>
+    );
+  };
+
+  const renderCaptainAccountSectionPage = (title: string, subtitle: string, items: React.ComponentProps<typeof KeyValueList>['items'], footerNote?: string) => {
+    return renderCaptainAccountShell(
+      title,
+      subtitle,
+      <>
+        <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+          <KeyValueList items={items} />
+        </Surface>
+        {footerNote ? (
+          <Surface tone="inset" padding={3} gap={2} radiusToken="xl">
+            <Text role="bodySm" tone="muted" align="end">
+              {footerNote}
+            </Text>
+          </Surface>
+        ) : null}
+      </>
+    );
+  };
+
+  const renderCaptainAccountFinanceScreen = () => {
+    const items = [
+      { label: 'رصيد المحفظة', value: <Badge label={captainWalletBalanceLabel} tone="success" /> },
+      { label: 'أرباح اليوم', value: <Badge label="86 ر.س" tone="info" /> },
+      { label: 'أرباح الأسبوع', value: <Badge label="612 ر.س" tone="brand" /> },
+      { label: 'التسوية القادمة', value: <Badge label="قيد المراجعة" tone="warning" /> },
+      { label: 'آخر تسوية', value: <Badge label="12 أبريل 2026" tone="default" /> },
+    ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
+
+    return renderCaptainAccountSectionPage('المالية', 'المحفظة والأرباح والتسويات', items, 'الربط الحقيقي للتسويات سيكتمل لاحقًا [TBD].');
+  };
+
+  const renderCaptainAccountProfileScreen = () => {
+    const items = [
+      { label: 'الاسم', value: <Badge label={captainDisplayName} tone="brand" /> },
+      { label: 'النوع', value: <Badge label="DSH" tone="success" /> },
+      { label: 'الحالة', value: <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} /> },
+      { label: 'المنطقة', value: <Badge label="المنطقة الوسطى" tone="default" /> },
+      { label: 'التقييم', value: <Badge label="4.9 / 5" tone="info" /> },
+      { label: 'المستوى', value: <Badge label="Elite 3" tone="brand" /> },
+    ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
+
+    return renderCaptainAccountSectionPage('بيانات الكابتن', 'الهوية والحالة والملف التشغيلي', items);
+  };
+
+  const renderCaptainAccountOrdersScreen = () => {
+    const items = [
+      { label: 'الطلب النشط', value: <Badge label={`#${activeOrderDisplayId}`} tone="success" /> },
+      { label: 'المتجر', value: <Badge label="Burger Lab" tone="brand" /> },
+      { label: 'المرحلة الحالية', value: <Badge label={activeSummary.currentStageLabel} tone="info" /> },
+      { label: 'الاستلام', value: <Badge label={activeSummary.pickupLabel} tone="default" /> },
+      { label: 'التسليم', value: <Badge label={activeSummary.dropoffLabel} tone="default" /> },
+      { label: 'الخطوة التالية', value: <Badge label={activeSummary.nextActionLabel} tone="warning" /> },
+    ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
+
+    return renderCaptainAccountSectionPage('الطلبات', 'الطلب النشط والسجل المختصر', items, 'السجل التاريخي الكامل سيُربط لاحقًا [TBD].');
+  };
+
+  const renderCaptainAccountDocsScreen = () => {
+    const items = [
+      { label: 'الوثائق', value: <Badge label="3 ملفات محلية" tone="success" /> },
+      { label: 'التقييم', value: <Badge label="4.9 / 5" tone="info" /> },
+      { label: 'المستوى', value: <Badge label="Elite 3" tone="brand" /> },
+      { label: 'حالة المراجعة', value: <Badge label="جاهز للمراجعة" tone="default" /> },
+      { label: 'الاعتماد الحقيقي', value: <Badge label="قيد الربط" tone="warning" /> },
+    ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
+
+    return renderCaptainAccountSectionPage('الوثائق والتقييم', 'الملفات والمستوى وجاهزية الاعتماد', items, 'ربط الوثائق الحقيقي مع المسار التشغيلي سيكتمل لاحقًا [TBD].');
+  };
+
+  const renderCaptainAccountShiftsScreen = () => {
+    const items = [
+      { label: 'حالة الدوام', value: <Badge label={isCaptainAvailable ? 'متاح اليوم' : 'غير متاح اليوم'} tone={isCaptainAvailable ? 'success' : 'warning'} /> },
+      { label: 'جدول اليوم', value: <Badge label="صباحي" tone="brand" /> },
+      { label: 'الإجازة القادمة', value: <Badge label="قيد المراجعة" tone="default" /> },
+      { label: 'آخر تحديث', value: <Badge label="الآن" tone="info" /> },
+    ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
+
+    return renderCaptainAccountSectionPage('الدوام / الإجازات', 'الحضور وجدول اليوم وخطة الإجازة', items, 'طلب الإجازة الحقيقي يرتبط بإدارة الأسطول لاحقًا [TBD].');
+  };
+
+  const renderCaptainAccountSupportScreen = () => {
+    return renderCaptainAccountShell(
+      'الإعدادات والدعم',
+      'اللغة والإشعارات والمساندة المختصرة',
+      <Surface tone="raised" padding={0} gap={0} radiusToken="xl">
+        <ListItem title="الإعدادات" subtitle="اللغة، الإشعارات، والتفضيلات المحلية." meta="جاهز" />
+        <ListItem title="الدعم" subtitle="قنوات المساندة والتصعيد المختصر." meta="جاهز" />
+      </Surface>
+    );
+  };
 
   const homeTicker = !isCaptainAvailable
     ? {
@@ -590,7 +740,7 @@ export function CaptainSurfaceHost() {
           id: 'account',
           icon: <Icon name="person-outline" size={20} color={theme.brandContrast} />,
           accessibilityLabel: 'الحساب',
-          onPress: () => setAccountSheetVisible(true),
+          onPress: openCaptainAccount,
         },
         { id: 'search', icon: <Icon name="search-outline" size={20} color={theme.brandContrast} />, accessibilityLabel: 'البحث', onPress: openSupportDirectory },
         {
@@ -614,6 +764,10 @@ export function CaptainSurfaceHost() {
   const renderRouteHeader = () => {
     if (route === 'entry') {
       return <MobileWorkspaceHeader title="بوابة التنفيذ" description="ابدأ من الفرز والقبول قبل الخروج للميدان." icon="navigate-outline" backLabel="العودة للخريطة" onBack={goBack} />;
+    }
+
+    if (route === 'account') {
+      return <TopBar variant="secondary" title="حساب الكابتن" subtitle="ملف التشغيل والمالية والدوام" style={{ marginHorizontal: -16, marginTop: -16 }} trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: goBack }} />;
     }
 
     if (route === 'inbox') {
@@ -645,7 +799,11 @@ export function CaptainSurfaceHost() {
 
   const renderHomeOrderPanel = () => {
     const panelPadding = activeOrderExpanded ? 3 : 2;
-    const panelMinHeightStyle = !activeOrderExpanded ? { minHeight: 56 } : {};
+    const panelMinHeightStyle = !activeOrderExpanded ? { minHeight: 72 } : {};
+    const activeOrderCompactRouteLabel = 'Burger Lab → العميل';
+    const activeOrderStageLabel = activeOrderPhase === 'pickup' ? activeSummary.currentStageLabel : 'في الطريق إلى التسليم';
+    const activeOrderNextActionLabel = activeOrderPhase === 'pickup' ? activeSummary.nextActionLabel : 'أكد التسليم بعد الوصول إلى العميل';
+
     if (!isCaptainAvailable) {
       return (
         <Surface
@@ -727,7 +885,10 @@ export function CaptainSurfaceHost() {
           <Box gap={1}>
             <Text role="bodyStrong">لا يوجد طلب نشط</Text>
             <Text role="bodySm" tone="muted">
-              ابقَ على الخريطة حتى تصل الحركة التالية ثم افتح صندوق الطلبات عند الحاجة.
+              ابقَ على الخريطة حتى تصل الحركة التالية. التاريخ والحساب جاهزان لاحقًا كـ [TBD].
+            </Text>
+            <Text role="caption" tone="muted">
+              التواصل بعد الإغلاق سيبقى read-only مؤقتًا حتى يحدد التحكم المركزي المدة [TBD].
             </Text>
           </Box>
           <Button size="sm" fullWidth={false} label="فتح الطلبات" onPress={() => setRoute('inbox')} />
@@ -736,59 +897,157 @@ export function CaptainSurfaceHost() {
     }
 
     if (inboxState === 'delivered') {
-      // Order completed: hide active order panel from Home. Logical handoff to history/account is [TBD].
-      return null;
+      return (
+        <Surface
+          tone="raised"
+          padding={3}
+          gap={2}
+          radiusToken="xl"
+          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
+        >
+          <Badge label="مغلق" tone="default" />
+          <Box gap={1}>
+            <Text role="bodyStrong">لا يوجد طلب نشط</Text>
+            <Text role="bodySm" tone="muted">
+              تم إغلاق الطلب. التاريخ والحساب سيُربطان لاحقًا كـ [TBD].
+            </Text>
+            <Text role="caption" tone="muted">
+              التواصل هنا أصبح read-only/closed بعد مدة يحددها التحكم المركزي لاحقًا [TBD].
+            </Text>
+          </Box>
+          <Button size="sm" fullWidth={false} tone="ghost" label="عرض صندوق الطلبات" onPress={() => setRoute('inbox')} />
+        </Surface>
+      );
     }
 
     return (
-      <Surface
-        tone="raised"
-        padding={panelPadding}
-        gap={3}
-        radiusToken="xl"
-        style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
-      >
-        <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
-          <Box gap={1} style={{ flex: 1 }}>
-            <Text role="caption" tone="muted">
-              الطلب النشط
-            </Text>
-            <Text role="bodyStrong">#{activeOrderDisplayId}</Text>
-          </Box>
-          <Badge label={currentAvailabilityMeta.orderBadgeLabel} tone={currentAvailabilityMeta.chipTone} />
-        </Box>
-        {!activeOrderExpanded ? (
-          <Pressable accessibilityRole="button" onPress={() => setActiveOrderExpanded(true)}>
-            <Text role="bodySm" numberOfLines={1} ellipsizeMode="tail" tone="muted">
-              {activeSummary.pickupLabel} → {activeSummary.dropoffLabel}
-            </Text>
-
-            <Box layoutDirection="row" align="center" gap={2} style={{ marginTop: 8 }}>
-              <Text role="bodySm" tone="muted" style={{ flex: 1 }}>{activeSummary.etaLabel}</Text>
-              <Button size="sm" fullWidth={false} label="تفاصيل مختصرة" onPress={() => setActiveOrderExpanded(true)} />
+      activeOrderExpanded ? (
+        <Surface
+          tone="raised"
+          padding={panelPadding}
+          gap={3}
+          radiusToken="xl"
+          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
+        >
+          <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
+            <Box gap={1} style={{ flex: 1 }}>
+              <Text role="caption" tone="muted">
+                الطلب النشط
+              </Text>
+              <Box layoutDirection="row" align="center" gap={2}>
+                <Badge label={currentAvailabilityMeta.orderBadgeLabel} tone={currentAvailabilityMeta.chipTone} />
+                <Text role="bodyStrong">#{activeOrderDisplayId}</Text>
+              </Box>
             </Box>
-          </Pressable>
-        ) : (
+            <Button size="sm" fullWidth={false} tone="ghost" label="طي" onPress={collapseActiveOrder} />
+          </Box>
+
           <Box gap={2}>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
-              <Text role="caption" tone="muted">الاستلام</Text>
-              <Text role="bodySm" align="end" numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1 }}>{activeSummary.pickupLabel}</Text>
+              <Text role="caption" tone="muted">
+                الاستلام
+              </Text>
+              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
+                {activeSummary.pickupLabel}
+              </Text>
             </Box>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
-              <Text role="caption" tone="muted">التسليم</Text>
-              <Text role="bodySm" align="end" numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1 }}>{activeSummary.dropoffLabel}</Text>
+              <Text role="caption" tone="muted">
+                التسليم
+              </Text>
+              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
+                {activeSummary.dropoffLabel}
+              </Text>
             </Box>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
-              <Text role="caption" tone="muted">المرحلة</Text>
-              <Text role="bodySm" align="end" numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1 }}>{activeSummary.currentStageLabel}</Text>
+              <Text role="caption" tone="muted">
+                المرحلة
+              </Text>
+              <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
+                {activeOrderStageLabel}
+              </Text>
+            </Box>
+            <Text role="caption" tone="muted">
+              {activeOrderNextActionLabel}
+            </Text>
+          </Box>
+
+          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+            {activeOrderPhase === 'pickup' ? (
+              <Button size="sm" fullWidth={false} tone="success" label="تأكيد الاستلام" onPress={confirmPickup} />
+            ) : (
+              <Button size="sm" fullWidth={false} tone="primary" label="تأكيد التسليم" onPress={confirmDelivery} />
+            )}
+          </Box>
+
+          <Surface tone="inset" padding={2} gap={2} radiusToken="lg">
+            <Box gap={1}>
+              <Text role="caption" tone="muted">
+                مراسلة مختصرة
+              </Text>
+              <Text role="bodySm" tone="muted">
+                رسائل قصيرة فقط، مباشرة داخل نفس البطاقة، من دون scroll إضافي.
+              </Text>
             </Box>
 
-            <Box layoutDirection="row" gap={2} style={{ marginTop: 6 }}>
-              <Button size="sm" fullWidth={false} label="إخفاء المختصر" onPress={() => setActiveOrderExpanded(false)} />
+            <Box gap={2}>
+              {activeOrderMessages.slice(-2).map((message) => (
+                <CompactOrderChatBubble key={message.id} message={message} />
+              ))}
             </Box>
-          </Box>
-        )}
-      </Surface>
+
+            <Box gap={2}>
+              <TextField
+                value={activeOrderDraft}
+                onChangeText={setActiveOrderDraft}
+                placeholder="اكتب رسالة مختصرة..."
+                multiline
+                numberOfLines={2}
+                style={{ minHeight: 68, textAlignVertical: 'top' }}
+              />
+              <Box layoutDirection="row" justify="space-between" align="center" gap={2} style={{ flexWrap: 'wrap' }}>
+                <Text role="caption" tone="muted">
+                  الحوار يبقى compact داخل البطاقة.
+                </Text>
+                <Button size="sm" fullWidth={false} label="إرسال" onPress={sendQuickMessage} disabled={!activeOrderDraft.trim()} />
+              </Box>
+            </Box>
+          </Surface>
+        </Surface>
+      ) : (
+        <Pressable accessibilityRole="button" accessibilityLabel="توسيع الطلب النشط" onPress={expandActiveOrder} style={({ pressed }) => ({ opacity: pressed ? 0.95 : 1 })}>
+          <Surface
+            tone="raised"
+            padding={panelPadding}
+            gap={2}
+            radiusToken="xl"
+            style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
+          >
+            <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
+              <Box gap={1} style={{ flex: 1 }}>
+                <Text role="caption" tone="muted">
+                  الطلب النشط
+                </Text>
+                <Box layoutDirection="row" align="center" gap={2}>
+                  <Badge label="نشط" tone="success" />
+                  <Text role="bodyStrong">#{activeOrderDisplayId}</Text>
+                </Box>
+              </Box>
+              <Button size="sm" fullWidth={false} tone="secondary" label="توسيع" onPress={expandActiveOrder} />
+            </Box>
+
+            <Text role="bodySm" numberOfLines={1} tone="muted">
+              {activeOrderCompactRouteLabel}
+            </Text>
+
+            <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
+              <Text role="caption" tone="muted">
+                {activeSummary.etaLabel}
+              </Text>
+            </Box>
+          </Surface>
+        </Pressable>
+      )
     );
   };
 
@@ -841,40 +1100,67 @@ export function CaptainSurfaceHost() {
             />
           ))}
 
-          {/* 'نطاقك الحالي' marker remains a visual point inside map (no legend mention) */}
+          {/* Map marker remains a visual point inside the map. */}
           <Box style={{ position: 'absolute', top: 182, left: 148, alignItems: 'center', gap: 6 }}>
             <Box style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0A2F5C', borderWidth: 4, borderColor: '#FFFFFF' }} />
           </Box>
 
-          {/* Compact controls overlay (absolute) - Availability, GPS, and small map keys */}
-          <Box style={{ position: 'absolute', left: 12, right: 12, top: 8, zIndex: 9999, elevation: 20 }}>
-            <Surface tone="inset" padding={2} gap={2} radiusToken="lg" style={{ alignSelf: 'stretch', elevation: 20 }}>
-              <Box layoutDirection="row" align="center" justify="space-between">
-                <Box layoutDirection="row" align="center" gap={2}>
-                  <Box style={{ minWidth: 120, flexShrink: 0 }}>
-                    <Switch
-                      label={`التوفر · ${currentAvailabilityMeta.label}`}
-                      value={isCaptainAvailable}
-                      onValueChange={(v) => setCaptainAvailabilityStatus(v ? 'available' : 'unavailable')}
-                      style={{ paddingVertical: 2 }}
-                    />
-                  </Box>
-
-                  <Box style={{ minWidth: 110, flexShrink: 0 }}>
-                    <Switch
-                      label={`GPS`}
-                      value={gpsStatus === 'ready'}
-                      onValueChange={(v) => setGpsStatus(v ? 'ready' : 'disabled')}
-                      style={{ paddingVertical: 2 }}
-                    />
-                  </Box>
+          {/* Soft map-edge controls overlay for availability, GPS, and map keys. */}
+          <Box style={{ position: 'absolute', left: 8, right: 8, top: 4, zIndex: 9999, elevation: 20 }}>
+            <Surface
+              tone="inset"
+              padding={1}
+              gap={1}
+              radiusToken="xl"
+              style={{
+                alignSelf: 'stretch',
+                shadowColor: '#020617',
+                shadowOpacity: 0.05,
+                shadowRadius: 14,
+                shadowOffset: { width: 0, height: 5 },
+                elevation: 2,
+              }}
+            >
+              <Box layoutDirection="row" align="center" gap={1} style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-start' }}>
+                <Box layoutDirection="row" align="center" gap={1} paddingX={1} paddingY={1} radiusToken="pill" background="surfaceRaised" border borderTone="line">
+                  <Text role="caption" tone={isCaptainAvailable ? 'success' : 'warning'} weight="semibold" numberOfLines={1}>
+                    {currentAvailabilityMeta.label}
+                  </Text>
+                  <RNSwitch
+                    value={isCaptainAvailable}
+                    onValueChange={(nextValue) => setCaptainAvailabilityStatus(nextValue ? 'available' : 'unavailable')}
+                    thumbColor={isCaptainAvailable ? theme.brandContrast : theme.surfaceRaised}
+                    trackColor={{ false: theme.lineStrong, true: theme.brand }}
+                    ios_backgroundColor={theme.lineStrong}
+                  />
                 </Box>
 
-                <Box layoutDirection="row" gap={2} align="center" style={{ alignItems: 'center' }}>
-                  <Box style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'rgba(255, 80, 13, 0.95)' }} />
-                  <Text role="bodySm">فرص طلبات</Text>
-                  <Box style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'rgba(10, 47, 92, 0.95)', marginLeft: 8 }} />
-                  <Text role="bodySm">تجمع كباتن</Text>
+                <Box layoutDirection="row" align="center" gap={1} paddingX={1} paddingY={1} radiusToken="pill" background="surfaceRaised" border borderTone="line">
+                  <Text role="caption" tone="muted" weight="semibold" numberOfLines={1}>
+                    GPS
+                  </Text>
+                  <RNSwitch
+                    value={isGpsEnabled}
+                    onValueChange={(nextValue) => setGpsStatus(nextValue ? 'ready' : 'disabled')}
+                    thumbColor={isGpsEnabled ? theme.brandContrast : theme.surfaceRaised}
+                    trackColor={{ false: theme.lineStrong, true: theme.brand }}
+                    ios_backgroundColor={theme.lineStrong}
+                  />
+                </Box>
+
+                <Box layoutDirection="row" align="center" gap={1} paddingX={1} paddingY={1} radiusToken="pill" background="surfaceRaised" border borderTone="line">
+                  <Box layoutDirection="row" align="center" gap={1}>
+                    <Box style={{ width: 8, height: 8, borderRadius: 999, backgroundColor: 'rgba(255, 80, 13, 0.95)' }} />
+                    <Text role="caption" tone="muted" weight="semibold" numberOfLines={1}>
+                      فرص طلبات
+                    </Text>
+                  </Box>
+                  <Box layoutDirection="row" align="center" gap={1}>
+                    <Box style={{ width: 8, height: 8, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.95)' }} />
+                    <Text role="caption" tone="muted" weight="semibold" numberOfLines={1}>
+                      تجمع كباتن
+                    </Text>
+                  </Box>
                 </Box>
               </Box>
             </Surface>
@@ -882,25 +1168,9 @@ export function CaptainSurfaceHost() {
         </Box>
       </Surface>
 
-      {/* Order card pinned overlay (absolute) to avoid pushing map and to ensure safe bottom spacing) */}
-      <Box style={{ position: 'absolute', left: 12, right: 12, bottom: insets.bottom + 24 }}>{renderHomeOrderPanel()}</Box>
+      {/* Order card pinned overlay keeps the map first while staying clear of the bottom bar. */}
+      <Box style={{ position: 'absolute', left: 12, right: 12, bottom: insets.bottom + (activeOrderExpanded ? 96 : 80) }}>{renderHomeOrderPanel()}</Box>
     </Box>
-  );
-
-  const accountSheet = (
-    <MobileAccountSheet
-      mode="captain"
-      visible={accountSheetVisible}
-      onClose={() => setAccountSheetVisible(false)}
-      captainDisplayName={captainDisplayName}
-      typeOptions={captainTypeOptions}
-      activeTypeId={activeServiceType}
-      onSelectType={handleSelectServiceType}
-      typeSwitchTitle="تغيير نوع تشغيل الكابتن"
-      typeSwitchPrompt="DSH هو السياق النشط الآن. AMN يبقى مسارًا غير مكتمل [TBD]."
-      captainSummaryItems={captainSummaryItems}
-      captainSections={captainMenuSections}
-    />
   );
 
   /* GPS sheet removed: GPS toggles are local-only and do not open sheets (Phase A) */
@@ -945,12 +1215,35 @@ export function CaptainSurfaceHost() {
             </Surface>
           </MobileScrollView>
         </Surface>
-        {accountSheet}
       </Box>
     );
   }
 
   if (route !== 'home') {
+    if (route === 'account-finance') {
+      return renderCaptainAccountFinanceScreen();
+    }
+
+    if (route === 'account-profile') {
+      return renderCaptainAccountProfileScreen();
+    }
+
+    if (route === 'account-orders') {
+      return renderCaptainAccountOrdersScreen();
+    }
+
+    if (route === 'account-docs') {
+      return renderCaptainAccountDocsScreen();
+    }
+
+    if (route === 'account-shifts') {
+      return renderCaptainAccountShiftsScreen();
+    }
+
+    if (route === 'account-support') {
+      return renderCaptainAccountSupportScreen();
+    }
+
     const supportScreens: Record<CaptainSupportRoute, React.ReactNode> = {
       'chat-read-ack': <DshCaptainChatReadAckScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'chat-send': <DshCaptainChatSendScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
@@ -979,6 +1272,10 @@ export function CaptainSurfaceHost() {
       content = supportScreens[selectedSupportScreen];
     }
 
+    if (route === 'account') {
+      content = renderCaptainAccountRootScreen();
+    }
+
     return (
       <Box style={{ flex: 1 }} background="background">
         {renderRouteHeader()}
@@ -998,7 +1295,6 @@ export function CaptainSurfaceHost() {
         >
           {content}
         </Surface>
-        {accountSheet}
       </Box>
     );
   }
@@ -1022,7 +1318,6 @@ export function CaptainSurfaceHost() {
       >
         {renderHomeScreen()}
       </Surface>
-      {accountSheet}
     </Box>
   );
 }
