@@ -522,9 +522,9 @@ function main() {
 
   const summary = `# GUARD-03 — Unused / Dead / Orphan Code Guard
 
-**Decision:** ${decision}  
-**EvidenceRoot:** ${toPosix(path.relative(ROOT, evidenceRoot))}  
-**GuardVersion:** 1.0.0  
+**Decision:** ${decision}
+**EvidenceRoot:** ${toPosix(path.relative(ROOT, evidenceRoot))}
+**GuardVersion:** 1.0.0
 
 ## Counts
 

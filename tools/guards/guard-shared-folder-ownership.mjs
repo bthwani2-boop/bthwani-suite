@@ -571,9 +571,9 @@ function main() {
 
   const summary = `# GUARD-02 — Shared Folder Ownership Guard
 
-**Decision:** ${decision}  
-**EvidenceRoot:** ${toPosix(path.relative(ROOT, evidenceRoot))}  
-**GuardVersion:** 1.0.0  
+**Decision:** ${decision}
+**EvidenceRoot:** ${toPosix(path.relative(ROOT, evidenceRoot))}
+**GuardVersion:** 1.0.0
 
 ## Counts
 
