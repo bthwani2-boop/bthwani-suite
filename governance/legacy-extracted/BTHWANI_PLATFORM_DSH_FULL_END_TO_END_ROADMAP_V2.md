@@ -1,9 +1,9 @@
 # Extracted Legacy Governance — BThwani Platform + DSH Full End-to-End Forensic Closure Roadmap
 
 Status: LEGACY_EXTRACTED_CANONICAL_REVIEW
-Source: $Source
-Source SHA256: $Hash
-Extraction session: $SessionId
+Source: `docs/governance/BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2.md`
+Source SHA256: `599d0cc1f7c1b496f6b906813130e9195f335790e261ca12f8cea0bcbc3284ad`
+Extraction session: `FIX_LEGACY_EXTRACTED_METADATA_SAFE-20260429-220722`
 
 ## Extraction Rule
 

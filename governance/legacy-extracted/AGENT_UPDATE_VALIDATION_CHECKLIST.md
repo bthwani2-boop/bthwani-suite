@@ -1,9 +1,9 @@
 # Extracted Legacy Governance — Agent Update Validation Checklist
 
 Status: LEGACY_EXTRACTED_CANONICAL_REVIEW
-Source: $Source
-Source SHA256: $Hash
-Extraction session: $SessionId
+Source: `docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md`
+Source SHA256: `02060592cba9fe37a4f453c85a634cacbf2f1bbda270362872c372530c3e9bb1`
+Extraction session: `FIX_LEGACY_EXTRACTED_METADATA_SAFE-20260429-220722`
 
 ## Extraction Rule
 

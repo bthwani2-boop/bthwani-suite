@@ -1,9 +1,9 @@
 # Extracted Legacy Governance — BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE
 
 Status: LEGACY_EXTRACTED_CANONICAL_REVIEW
-Source: $Source
-Source SHA256: $Hash
-Extraction session: $SessionId
+Source: `docs/governance/BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE.md`
+Source SHA256: `fdc194428dbca19b2aeaaa880f10280ea37f2fd4d21815b0e8566c519241f007`
+Extraction session: `FIX_LEGACY_EXTRACTED_METADATA_SAFE-20260429-220722`
 
 ## Extraction Rule
 

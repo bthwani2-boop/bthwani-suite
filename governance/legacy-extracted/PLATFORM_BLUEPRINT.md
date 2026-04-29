@@ -1,9 +1,9 @@
 # Extracted Legacy Governance — PLATFORM_BLUEPRINT.md
 
 Status: LEGACY_EXTRACTED_CANONICAL_REVIEW
-Source: $Source
-Source SHA256: $Hash
-Extraction session: $SessionId
+Source: `docs/governance/PLATFORM_BLUEPRINT.md`
+Source SHA256: `130f920c0e6b956a40f5f134cec4b086defa258a9e86025a18e298af5597f979`
+Extraction session: `FIX_LEGACY_EXTRACTED_METADATA_SAFE-20260429-220722`
 
 ## Extraction Rule
 

@@ -1,9 +1,9 @@
 # Extracted Legacy Governance — BTHWANI GUIDE
 
 Status: LEGACY_EXTRACTED_CANONICAL_REVIEW
-Source: $Source
-Source SHA256: $Hash
-Extraction session: $SessionId
+Source: `docs/governance/BTHWANI_GUIDE__Unified_Execution_OS__V4_Phases_Waves_Todolists.md`
+Source SHA256: `d24572a7d564cfddbd00ec7d49643c206556a1cc08340a29901f2022a4f2265e`
+Extraction session: `FIX_LEGACY_EXTRACTED_METADATA_SAFE-20260429-220722`
 
 ## Extraction Rule
 

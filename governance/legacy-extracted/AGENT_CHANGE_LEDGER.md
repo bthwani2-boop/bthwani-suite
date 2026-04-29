@@ -1,9 +1,9 @@
 # Extracted Legacy Governance — Agent Change Ledger
 
 Status: LEGACY_EXTRACTED_CANONICAL_REVIEW
-Source: $Source
-Source SHA256: $Hash
-Extraction session: $SessionId
+Source: `docs/governance/AGENT_CHANGE_LEDGER.md`
+Source SHA256: `a980162ed97a0cd99893127cf0468a239aef0e0324f293c1f132e55b7c698258`
+Extraction session: `FIX_LEGACY_EXTRACTED_METADATA_SAFE-20260429-220722`
 
 ## Extraction Rule
 
