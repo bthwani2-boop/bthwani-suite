@@ -143,8 +143,8 @@ For implementation work:
 
 Any update to agent or skill governance files must follow:
 
-- `docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md`
-- `docs/governance/AGENT_CHANGE_LEDGER.md`
+- governance/AGENT_GOVERNANCE_POLICY.md
+- governance/AGENT_CHANGE_LEDGER_POLICY.md
 
 This file is the canonical thin routing kernel for surface work.
 Detailed laws, specialized procedures, repeated patterns, and workflow contracts belong in skills, base profiles, and overlays.

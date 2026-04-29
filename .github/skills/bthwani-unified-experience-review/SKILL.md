@@ -202,8 +202,8 @@ When the work includes updating agent or skill files themselves, require all of 
 
 - explicit statement of the operational gap being fixed
 - confirmation that the update is not speculative policy noise
-- validation against `docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md`
-- logging in `docs/governance/AGENT_CHANGE_LEDGER.md`
+- validation against governance/AGENT_GOVERNANCE_POLICY.md
+- logging in governance/AGENT_CHANGE_LEDGER_POLICY.md
 - honest statement of any residual ambiguity or rollback condition
 
 Do not accept governance-file changes as complete if they are unlogged or unvalidated.

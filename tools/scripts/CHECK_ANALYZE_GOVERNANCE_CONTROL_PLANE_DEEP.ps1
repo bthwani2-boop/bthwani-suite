@@ -167,7 +167,7 @@ $RootsToInventory = @(
   "contracts",
   "runtime",
   "docs",
-  "docs\governance",
+  "governance\legacy-extracted",
   "governance",
   "tools",
   "tools\scripts",
@@ -206,8 +206,8 @@ foreach ($Required in @(".github\agents", ".github\skills", "tools\scripts", "pa
   }
 }
 
-if (Test-PathRelative "docs\governance") {
-  Add-Finding -Severity "WARNING" -Code "TRANSITIONAL_DOCS_GOVERNANCE_EXISTS" -Message "docs/governance exists and must be treated as transitional until references are migrated." -Path "docs\governance" -Recommendation "Make governance/ the canonical control plane and migrate references evidence-first."
+if (Test-PathRelative "governance\legacy-extracted") {
+  Add-Finding -Severity "WARNING" -Code "TRANSITIONAL_DOCS_GOVERNANCE_EXISTS" -Message "governance/legacy-extracted exists as the transitional review area until deletion readiness is complete." -Path "governance\legacy-extracted" -Recommendation "Make governance/ the canonical control plane and migrate references evidence-first."
 }
 
 if (Test-PathRelative "tools\registry") {
@@ -218,7 +218,7 @@ if (-not (Test-PathRelative "kdt\volatile\registry")) {
   Add-Finding -Severity "BLOCKER" -Code "CANONICAL_EVIDENCE_ROOT_MISSING" -Message "Canonical evidence root kdt/volatile/registry is missing." -Path "kdt\volatile\registry" -Recommendation "Restore canonical evidence root before claiming governance closure."
 }
 
-$GovernanceScanRoots = @("governance", "docs\governance")
+$GovernanceScanRoots = @("governance", "governance\legacy-extracted")
 $GovernanceRows = @()
 
 foreach ($Root in $GovernanceScanRoots) {
@@ -274,7 +274,7 @@ foreach ($Root in $GovernanceScanRoots) {
 $GovernanceRows | Export-Csv -LiteralPath $GovernanceFilesCsv -NoTypeInformation -Encoding UTF8
 
 $GovernanceFileCount = @($GovernanceRows | Where-Object { $_.root -eq "governance" }).Count
-$DocsGovernanceFileCount = @($GovernanceRows | Where-Object { $_.root -eq "docs\governance" }).Count
+$DocsGovernanceFileCount = @($GovernanceRows | Where-Object { $_.root -eq "governance\legacy-extracted" }).Count
 
 if ($GovernanceFileCount -eq 0) {
   Add-Finding -Severity "BLOCKER" -Code "EMPTY_GOVERNANCE_ROOT" -Message "governance/ has no scanned files." -Path "governance" -Recommendation "Create canonical governance index and control files."
@@ -305,7 +305,7 @@ $AllScanRoots = @(
   ".codex",
   "tools\scripts",
   "governance",
-  "docs\governance",
+  "governance\legacy-extracted",
   "package.json",
   "pnpm-workspace.yaml",
   "nx.json",
@@ -370,7 +370,7 @@ $ReferenceRows | Export-Csv -LiteralPath $ReferenceMapCsv -NoTypeInformation -En
 
 $DocsGovRefs = @($ReferenceRows | Where-Object { $_.referenceType -eq "docs_governance" }).Count
 if ($DocsGovRefs -gt 0) {
-  Add-Finding -Severity "WARNING" -Code "DOCS_GOVERNANCE_REFERENCES_EXIST" -Message "Some files still reference docs/governance." -Path "reference-map.csv" -Recommendation "Migrate references to governance/ only after central files are created."
+  Add-Finding -Severity "WARNING" -Code "DOCS_GOVERNANCE_REFERENCES_EXIST" -Message "Some files still reference legacy governance paths." -Path "reference-map.csv" -Recommendation "Migrate references to governance/ canonical policies or governance/legacy-extracted review artifacts only after central files are created."
 }
 
 $OldEvidenceRefs = @($ReferenceRows | Where-Object { $_.referenceType -eq "old_kdt_registry" }).Count
@@ -795,7 +795,7 @@ else {
 Add-SummaryLine ""
 Add-SummaryLine "CANONICAL_DECISION_CHECK:"
 Add-SummaryLine "- governance/ should be treated as the Governance Control Plane target."
-Add-SummaryLine "- docs/governance should remain transitional until references are migrated."
+Add-SummaryLine "- governance/legacy-extracted remains the transitional review area; docs/governance deletion requires separate readiness proof."
 Add-SummaryLine "- tools/registry/runs remains the current canonical evidence root."
 Add-SummaryLine "- tools/registry must not replace kdt/volatile/registry without explicit SSoT override."
 Add-SummaryLine "- Spec Kit is not present unless signals are found above."

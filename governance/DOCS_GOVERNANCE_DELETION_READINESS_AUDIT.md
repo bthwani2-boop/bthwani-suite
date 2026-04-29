@@ -2,8 +2,8 @@
 
 Status: CANONICAL_READINESS_AUDIT
 Owner: BThwani Governance
-SourceEvidence: `C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_05_FIX_BATCH04_AND_EXPAND-20260429-231805`
-HeadBefore: `b9a175c4ad5e9e8b0fd17390e18e025f7f6555e1`
+SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_06_REMEDIATE_DOCS_REFS_V3-20260429-234031
+HeadBefore: c470db1508c74c6641a279cd9549fa2155bcf147
 
 ## Decision
 
@@ -15,51 +15,21 @@ NOT_READY_ACTIVE_REFERENCES_EXIST
 - governance/legacy-extracted exists: True
 - source docs reviewed: 7
 - missing extraction rows: 0
-- docs/governance reference rows: 101
-- active reference blockers: 24
-- guard warnings: 11711
+- active reference blockers before: 24
+- active reference blockers after: 1
 
 ## Source extraction map
 
 | Source | Source SHA256 | Extracted target | Extracted? | Promotion decision |
 |---|---|---|---|---|
-| `docs/governance/AGENT_CHANGE_LEDGER.md` | `a980162ed97a0cd99893127cf0468a239aef0e0324f293c1f132e55b7c698258` | `governance/legacy-extracted/AGENT_CHANGE_LEDGER.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-| `docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md` | `02060592cba9fe37a4f453c85a634cacbf2f1bbda270362872c372530c3e9bb1` | `governance/legacy-extracted/AGENT_UPDATE_VALIDATION_CHECKLIST.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-| `docs/governance/BTHWANI_GUIDE__Unified_Execution_OS__V4_Phases_Waves_Todolists.md` | `d24572a7d564cfddbd00ec7d49643c206556a1cc08340a29901f2022a4f2265e` | `governance/legacy-extracted/BTHWANI_GUIDE__Unified_Execution_OS__V4_Phases_Waves_Todolists.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-| `docs/governance/BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE.md` | `fdc194428dbca19b2aeaaa880f10280ea37f2fd4d21815b0e8566c519241f007` | `governance/legacy-extracted/BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-| `docs/governance/BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2.md` | `599d0cc1f7c1b496f6b906813130e9195f335790e261ca12f8cea0bcbc3284ad` | `governance/legacy-extracted/BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-| `docs/governance/PLATFORM_BLUEPRINT_EXECUTION_ROADMAP.md` | `f657d82ef788d87174d7392e0d2cfb9887df95c26b1201eb51cbb0d05fe7713f` | `governance/legacy-extracted/PLATFORM_BLUEPRINT_EXECUTION_ROADMAP.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-| `docs/governance/PLATFORM_BLUEPRINT.md` | `130f920c0e6b956a40f5f134cec4b086defa258a9e86025a18e298af5597f979` | `governance/legacy-extracted/PLATFORM_BLUEPRINT.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-
-## Active reference blockers
-
-| Path | Line | Action | Sample |
-|---|---:|---|---|
-| `.github/agents/bthwani-platform-master-orchestrator-2026-v3-additive.agent.md` | 67 | REPOINT_OR_REMOVE_BEFORE_DELETE | 2. Current repo docs/governance/contracts. |
-| `.github/agents/bthwani-surface-core-lossless.agent.md` | 146 | REPOINT_OR_REMOVE_BEFORE_DELETE | - `docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md` |
-| `.github/agents/bthwani-surface-core-lossless.agent.md` | 147 | REPOINT_OR_REMOVE_BEFORE_DELETE | - `docs/governance/AGENT_CHANGE_LEDGER.md` |
-| `.github/agents/platform-agent-os-2026-v3-additive/OS/MASTER_ORCHESTRATOR.md` | 37 | REPOINT_OR_REMOVE_BEFORE_DELETE | 2. Current repo docs/governance/contracts. |
-| `.github/agents/platform-agent-os-2026-v3-additive/OS/SOURCE_PRECEDENCE.md` | 1 | REPOINT_OR_REMOVE_BEFORE_DELETE | # Source Precedence\n\nCurrent repo > current docs/governance > surfaces-legacy-trash read-only > bthfinal read-only > human. |
-| `.github/skills/bthwani-unified-experience-review/SKILL.md` | 205 | REPOINT_OR_REMOVE_BEFORE_DELETE | - validation against `docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md` |
-| `.github/skills/bthwani-unified-experience-review/SKILL.md` | 206 | REPOINT_OR_REMOVE_BEFORE_DELETE | - logging in `docs/governance/AGENT_CHANGE_LEDGER.md` |
-| `.nx/workspace-data/file-map.json` | 4942 | REPOINT_OR_REMOVE_BEFORE_DELETE | "file": "docs/governance/AGENT_CHANGE_LEDGER.md", |
-| `.nx/workspace-data/file-map.json` | 4946 | REPOINT_OR_REMOVE_BEFORE_DELETE | "file": "docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md", |
-| `.nx/workspace-data/file-map.json` | 4950 | REPOINT_OR_REMOVE_BEFORE_DELETE | "file": "docs/governance/BTHWANI_GUIDE__Unified_Execution_OS__V4_Phases_Waves_Todolists.md", |
-| `.nx/workspace-data/file-map.json` | 4954 | REPOINT_OR_REMOVE_BEFORE_DELETE | "file": "docs/governance/BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE.md", |
-| `.nx/workspace-data/file-map.json` | 4958 | REPOINT_OR_REMOVE_BEFORE_DELETE | "file": "docs/governance/BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2.md", |
-| `.nx/workspace-data/file-map.json` | 4962 | REPOINT_OR_REMOVE_BEFORE_DELETE | "file": "docs/governance/PLATFORM_BLUEPRINT.md", |
-| `.nx/workspace-data/file-map.json` | 4966 | REPOINT_OR_REMOVE_BEFORE_DELETE | "file": "docs/governance/PLATFORM_BLUEPRINT_EXECUTION_ROADMAP.md", |
-| `tools/guards/guard-governance-boundaries.config.json` | 99 | REPOINT_OR_REMOVE_BEFORE_DELETE | "^docs/governance/", |
-| `tools/guards/guard-governance-boundaries.config.json` | 133 | REPOINT_OR_REMOVE_BEFORE_DELETE | "^docs/governance/", |
-| `tools/guards/guard-governance-boundaries.config.json` | 167 | REPOINT_OR_REMOVE_BEFORE_DELETE | "^docs/governance/", |
-| `tools/guards/guard-governance-boundaries.config.json` | 201 | REPOINT_OR_REMOVE_BEFORE_DELETE | "^docs/governance/", |
-| `tools/guards/guard-governance-ssot-conflict.config.json` | 10 | REPOINT_OR_REMOVE_BEFORE_DELETE | "pattern": "docs/governance", |
-| `tools/scripts/CHECK_ANALYZE_GOVERNANCE_CONTROL_PLANE_DEEP.ps1` | 210 | REPOINT_OR_REMOVE_BEFORE_DELETE | Add-Finding -Severity "WARNING" -Code "TRANSITIONAL_DOCS_GOVERNANCE_EXISTS" -Message "docs/governance exists and must be treated as transitional until references are migrated." -Path "docs\governance" -Recommendation "Make governance/ the canonical control plane and migrate references evidence-first." |
-| `tools/scripts/CHECK_ANALYZE_GOVERNANCE_CONTROL_PLANE_DEEP.ps1` | 373 | REPOINT_OR_REMOVE_BEFORE_DELETE | Add-Finding -Severity "WARNING" -Code "DOCS_GOVERNANCE_REFERENCES_EXIST" -Message "Some files still reference docs/governance." -Path "reference-map.csv" -Recommendation "Migrate references to governance/ only after central files are created." |
-| `tools/scripts/CHECK_ANALYZE_GOVERNANCE_CONTROL_PLANE_DEEP.ps1` | 798 | REPOINT_OR_REMOVE_BEFORE_DELETE | Add-SummaryLine "- docs/governance should remain transitional until references are migrated." |
-| `tools/scripts/validate-agent-governance.mjs` | 69 | REPOINT_OR_REMOVE_BEFORE_DELETE | 'docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md', |
-| `tools/scripts/validate-agent-governance.mjs` | 70 | REPOINT_OR_REMOVE_BEFORE_DELETE | 'docs/governance/AGENT_CHANGE_LEDGER.md', |
+| docs/governance/AGENT_CHANGE_LEDGER.md | a980162ed97a0cd99893127cf0468a239aef0e0324f293c1f132e55b7c698258 | governance/legacy-extracted/AGENT_CHANGE_LEDGER.md | YES | PENDING_PROMOTION_OR_REJECTION |
+| docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md | 02060592cba9fe37a4f453c85a634cacbf2f1bbda270362872c372530c3e9bb1 | governance/legacy-extracted/AGENT_UPDATE_VALIDATION_CHECKLIST.md | YES | PENDING_PROMOTION_OR_REJECTION |
+| docs/governance/BTHWANI_GUIDE__Unified_Execution_OS__V4_Phases_Waves_Todolists.md | d24572a7d564cfddbd00ec7d49643c206556a1cc08340a29901f2022a4f2265e | governance/legacy-extracted/BTHWANI_GUIDE__Unified_Execution_OS__V4_Phases_Waves_Todolists.md | YES | PENDING_PROMOTION_OR_REJECTION |
+| docs/governance/BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE.md | fdc194428dbca19b2aeaaa880f10280ea37f2fd4d21815b0e8566c519241f007 | governance/legacy-extracted/BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE.md | YES | PENDING_PROMOTION_OR_REJECTION |
+| docs/governance/BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2.md | 599d0cc1f7c1b496f6b906813130e9195f335790e261ca12f8cea0bcbc3284ad | governance/legacy-extracted/BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2.md | YES | PENDING_PROMOTION_OR_REJECTION |
+| docs/governance/PLATFORM_BLUEPRINT_EXECUTION_ROADMAP.md | f657d82ef788d87174d7392e0d2cfb9887df95c26b1201eb51cbb0d05fe7713f | governance/legacy-extracted/PLATFORM_BLUEPRINT_EXECUTION_ROADMAP.md | YES | PENDING_PROMOTION_OR_REJECTION |
+| docs/governance/PLATFORM_BLUEPRINT.md | 130f920c0e6b956a40f5f134cec4b086defa258a9e86025a18e298af5597f979 | governance/legacy-extracted/PLATFORM_BLUEPRINT.md | YES | PENDING_PROMOTION_OR_REJECTION |
 
 ## Rule
 
-Do not delete docs/governance/ until extraction, promotion/rejection, reference scan, warning classification, rollback, and owner decision are complete.
+Do not delete docs/governance inside a remediation batch. Deletion must be a separate commit after final readiness proof.

@@ -2,23 +2,21 @@
 
 Status: CANONICAL_ROADMAP
 Owner: BThwani Governance
-SourceEvidence: `C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_05_FIX_BATCH04_AND_EXPAND-20260429-231805`
+SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_06_REMEDIATE_DOCS_REFS_V3-20260429-234031
 
 ## Current state
 
-- Batch 04 matrix files were repaired in this Batch 05 run.
-- Warning baseline was regenerated with real evidence values.
-- Docs governance deletion readiness was regenerated with real source/target/SHA rows.
+- Batch 06 V3 remediated active docs/governance references in agents, skills, scripts, guard configs, and Nx workspace data when present.
+- Active blockers before: 24
+- Active blockers after: 1
 - No deletion was performed.
 
 ## Next execution waves
 
-1. Resolve 24 active docs/governance reference blockers or confirm count from latest scan.
-2. Classify top warning families by owner and risk.
-3. Calibrate false positives for high-confidence promotion candidates.
-4. Create CI report-only workflow after baseline artifacts are stable.
-5. Delete docs/governance/ only in a dedicated commit after readiness is green.
-6. Start service-level blueprint closure one service at a time.
+1. Review remaining blockers from docs-governance-reference-scan-after.csv.
+2. Run targeted blocker remediation package.
+3. Start warning family classification batches.
+4. Prepare CI report-only workflow.
 
 ## Hard stop
 

@@ -66,8 +66,8 @@ const requiredCanonicalPhrases = [
   'donor.trace-reconstruct',
   'ready.pack',
   'infra.workspace-link',
-  'docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md',
-  'docs/governance/AGENT_CHANGE_LEDGER.md',
+  'governance/AGENT_GOVERNANCE_POLICY.md',
+  'governance/AGENT_CHANGE_LEDGER_POLICY.md',
 ];
 
 function readText(filePath) {

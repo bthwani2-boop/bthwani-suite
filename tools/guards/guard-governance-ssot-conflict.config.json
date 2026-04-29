@@ -7,7 +7,7 @@
   },
   "conflictPatterns": [
     {
-      "pattern": "docs/governance",
+      "pattern": "governance/legacy-extracted",
       "reason": "Legacy governance root reference; canonical root is governance/."
     },
     {

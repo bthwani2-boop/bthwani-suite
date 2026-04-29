@@ -64,7 +64,7 @@ If the decision is BLOCKED, stop after the block reasons.
 
 ## Source fallback sequence
 1. Current repo: `C:\bthwani-suite`.
-2. Current repo docs/governance/contracts.
+2. Current repo governance/ canonical policies and governance/legacy-extracted/ review artifacts.
 3. `C:\bthwani-suite\docs\services\surfaces-legacy-trash` as read-only fallback.
 4. `C:\Users\b\Documents\GitHub\bthfinal` as read-only donor fallback.
 5. Human escalation.

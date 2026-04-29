@@ -96,7 +96,7 @@
         "^\\.github/",
         "^\\.agents/",
         "^\\.cursor/",
-        "^docs/governance/",
+        "^governance/legacy-extracted/",
         "^packages/"
       ],
       "allowLinePatterns": [
@@ -130,7 +130,7 @@
         "^\\.github/",
         "^\\.agents/",
         "^\\.cursor/",
-        "^docs/governance/",
+        "^governance/legacy-extracted/",
         "^packages/"
       ],
       "allowLinePatterns": [
@@ -164,7 +164,7 @@
         "^\\.github/",
         "^\\.agents/",
         "^\\.cursor/",
-        "^docs/governance/",
+        "^governance/legacy-extracted/",
         "^packages/"
       ],
       "allowLinePatterns": [
@@ -198,7 +198,7 @@
         "^\\.github/",
         "^\\.agents/",
         "^\\.cursor/",
-        "^docs/governance/",
+        "^governance/legacy-extracted/",
         "^packages/"
       ],
       "allowLinePatterns": [
