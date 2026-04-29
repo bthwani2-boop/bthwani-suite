@@ -1,39 +1,16 @@
-# Docs Governance Deletion Readiness Audit
+# Docs Governance Active Reference Remediation Plan
 
-Status: CANONICAL_READINESS_AUDIT
+Status: CANONICAL_REMEDIATION_PLAN
 Owner: BThwani Governance
 SourceEvidence: `C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_05_FIX_BATCH04_AND_EXPAND-20260429-231805`
-HeadBefore: `b9a175c4ad5e9e8b0fd17390e18e025f7f6555e1`
 
 ## Decision
 
 NOT_READY_ACTIVE_REFERENCES_EXIST
 
-## Counts
+## Active blockers
 
-- docs/governance exists: True
-- governance/legacy-extracted exists: True
-- source docs reviewed: 7
-- missing extraction rows: 0
-- docs/governance reference rows: 101
-- active reference blockers: 24
-- guard warnings: 11711
-
-## Source extraction map
-
-| Source | Source SHA256 | Extracted target | Extracted? | Promotion decision |
-|---|---|---|---|---|
-| `docs/governance/AGENT_CHANGE_LEDGER.md` | `a980162ed97a0cd99893127cf0468a239aef0e0324f293c1f132e55b7c698258` | `governance/legacy-extracted/AGENT_CHANGE_LEDGER.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-| `docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md` | `02060592cba9fe37a4f453c85a634cacbf2f1bbda270362872c372530c3e9bb1` | `governance/legacy-extracted/AGENT_UPDATE_VALIDATION_CHECKLIST.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-| `docs/governance/BTHWANI_GUIDE__Unified_Execution_OS__V4_Phases_Waves_Todolists.md` | `d24572a7d564cfddbd00ec7d49643c206556a1cc08340a29901f2022a4f2265e` | `governance/legacy-extracted/BTHWANI_GUIDE__Unified_Execution_OS__V4_Phases_Waves_Todolists.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-| `docs/governance/BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE.md` | `fdc194428dbca19b2aeaaa880f10280ea37f2fd4d21815b0e8566c519241f007` | `governance/legacy-extracted/BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-| `docs/governance/BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2.md` | `599d0cc1f7c1b496f6b906813130e9195f335790e261ca12f8cea0bcbc3284ad` | `governance/legacy-extracted/BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-| `docs/governance/PLATFORM_BLUEPRINT_EXECUTION_ROADMAP.md` | `f657d82ef788d87174d7392e0d2cfb9887df95c26b1201eb51cbb0d05fe7713f` | `governance/legacy-extracted/PLATFORM_BLUEPRINT_EXECUTION_ROADMAP.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-| `docs/governance/PLATFORM_BLUEPRINT.md` | `130f920c0e6b956a40f5f134cec4b086defa258a9e86025a18e298af5597f979` | `governance/legacy-extracted/PLATFORM_BLUEPRINT.md` | YES | PENDING_PROMOTION_OR_REJECTION |
-
-## Active reference blockers
-
-| Path | Line | Action | Sample |
+| Path | Line | Proposed action | Sample |
 |---|---:|---|---|
 | `.github/agents/bthwani-platform-master-orchestrator-2026-v3-additive.agent.md` | 67 | REPOINT_OR_REMOVE_BEFORE_DELETE | 2. Current repo docs/governance/contracts. |
 | `.github/agents/bthwani-surface-core-lossless.agent.md` | 146 | REPOINT_OR_REMOVE_BEFORE_DELETE | - `docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md` |
@@ -60,6 +37,6 @@ NOT_READY_ACTIVE_REFERENCES_EXIST
 | `tools/scripts/validate-agent-governance.mjs` | 69 | REPOINT_OR_REMOVE_BEFORE_DELETE | 'docs/governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md', |
 | `tools/scripts/validate-agent-governance.mjs` | 70 | REPOINT_OR_REMOVE_BEFORE_DELETE | 'docs/governance/AGENT_CHANGE_LEDGER.md', |
 
-## Rule
+## Execution rule
 
-Do not delete docs/governance/ until extraction, promotion/rejection, reference scan, warning classification, rollback, and owner decision are complete.
+Fix active blockers before any deletion attempt. Deletion must be a separate commit with rollback evidence.
