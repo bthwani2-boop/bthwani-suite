@@ -1,0 +1,22 @@
+{
+  "guard": "GUARD-10_EVIDENCE_REGISTRY_RUNS_HYGIENE",
+  "version": "1.0.1",
+  "mode": "CHECK_ONLY",
+  "registryRoot": "tools/registry/runs",
+  "maxRunsToScan": 250,
+  "policy": {
+    "missingGenericHandoffSeverity": "warning",
+    "missingNamedHandoffSeverity": "warning",
+    "missingSummarySeverity": "warning",
+    "missingStatusSeverity": "warning",
+    "missingEvidenceJsonSeverity": "warning",
+    "ambiguousGenericHandoffOnlySeverity": "warning",
+    "zeroByteEvidenceFileSeverity": "warning"
+  },
+  "excludeRunNamePatterns": [
+    "^GUARD_10_EVIDENCE_REGISTRY_RUNS_HYGIENE-",
+    "^FIX_GUARD_10",
+    "^FINALIZE_GUARD_10",
+    "^COMMIT_GUARD_10"
+  ]
+}
