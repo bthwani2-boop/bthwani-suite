@@ -1,0 +1,12 @@
+{
+  "guard": "GUARD-14_AGENT_SKILL_REGISTRY_OWNERSHIP",
+  "version": "1.0.0",
+  "mode": "CHECK_ONLY",
+  "policy": {
+    "defaultSeverity": "warning"
+  },
+  "agentRoots": [
+    ".agents/skills",
+    ".github/agents"
+  ]
+}
