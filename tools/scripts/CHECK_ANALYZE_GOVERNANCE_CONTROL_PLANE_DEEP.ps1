@@ -795,7 +795,7 @@ else {
 Add-SummaryLine ""
 Add-SummaryLine "CANONICAL_DECISION_CHECK:"
 Add-SummaryLine "- governance/ should be treated as the Governance Control Plane target."
-Add-SummaryLine "- governance/legacy-extracted remains the transitional review area; docs/governance deletion requires separate readiness proof."
+Add-SummaryLine "- governance/legacy-extracted remains the transitional review area; legacy governance deletion requires separate readiness proof."
 Add-SummaryLine "- tools/registry/runs remains the current canonical evidence root."
 Add-SummaryLine "- tools/registry must not replace kdt/volatile/registry without explicit SSoT override."
 Add-SummaryLine "- Spec Kit is not present unless signals are found above."

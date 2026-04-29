@@ -6,7 +6,7 @@ SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_06_REMEDIA
 
 | Area | Count | Risk | Priority | Next batch |
 |---|---:|---|---:|---|
-| docs/governance active blockers | 1 | blocks deletion | 1 | Final readiness/delete package if zero |
+| legacy governance docs active code/script blockers | 0 | deletion-readiness package required before deletion | 1 | Run dedicated deletion-readiness DryRun package |
 | guard warnings baseline | 11775 | quality debt | 2 | Warning family classification |
 | docs source self references | 15 | expected until deletion | 3 | Dedicated deletion commit |
 

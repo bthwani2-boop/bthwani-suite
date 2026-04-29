@@ -28,7 +28,7 @@ $PathsToCheck = @(
   "packages\ui-kit",
   "packages\surfaces",
   "governance",
-  "docs\governance"
+  "governance\legacy-extracted"
 )
 
 foreach ($RelativePath in $PathsToCheck) {

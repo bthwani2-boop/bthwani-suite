@@ -2,23 +2,24 @@
 
 Status: CANONICAL_GATE_DECISION
 Owner: BThwani Governance
-SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_06_REMEDIATE_DOCS_REFS_V3-20260429-234031
+SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_08_RESCUE_FINAL_DELETE_CLOSE-20260430-000328
+HeadBefore: 3fe946da3c707ebb0893c7521e05542a67622ca1
 
 ## Decision
 
-NOT_READY_ACTIVE_REFERENCES_EXIST
+PASS_FINAL_DELETION_LOCAL_COMMIT_READY_FOR_PUSH_REVIEW
 
 ## Gate checks
 
 | Check | Result |
 |---|---|
-| docs/governance exists | True |
-| governance/legacy-extracted exists | True |
-| missing extraction rows | 0 |
-| active blockers before | 24 |
-| active blockers after | 1 |
-| deletion performed in this batch | NO |
+| docs/governance exists after deletion | False |
+| rollback zip created from HEAD | True |
+| rollback patch created | True |
+| active docs/governance references after deletion | 0 |
+| deletion performed in this batch | YES |
+| GitHub push performed | NO |
 
-## Next
+## Rule
 
-Deletion is allowed only in a future dedicated package after final guard pass and owner approval.
+This closes the legacy docs/governance root locally only. GitHub closure requires a separate explicit push after reviewing the evidence pack.

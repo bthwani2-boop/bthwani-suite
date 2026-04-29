@@ -2,26 +2,26 @@
 
 Status: CANONICAL_REMEDIATION_PLAN
 Owner: BThwani Governance
-SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_06_REMEDIATE_DOCS_REFS_V3-20260429-234031
-HeadBefore: c470db1508c74c6641a279cd9549fa2155bcf147
+SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_07_CLOSE_ACTIVE_REFS_AND_CLASSIFY_AUDIT-20260429-235302
+HeadBefore: 3fe946da3c707ebb0893c7521e05542a67622ca1
 
 ## Decision
 
-NOT_READY_ACTIVE_REFERENCES_EXIST
+READY_FOR_DELETION_READINESS_PACKAGE
 
 ## Counts
 
-- Active blockers before: 24
-- Active blockers after: 1
-- Replacement attempts: 23
-- Successful replacement groups: 23
+- Active code/script blockers before Batch 06: 24
+- Active code/script blockers before Batch 07: 2
+- Active code/script blockers after Batch 07: 0
+- Replacement groups applied in Batch 07: 2
 
-## Remaining active blockers
+## Remaining active code/script blockers
 
-| Path | Line | Proposed action | Sample |
-|---|---:|---|---|
-| tools/scripts/CHECK_ANALYZE_GOVERNANCE_CONTROL_PLANE_DEEP.ps1 | 798 | REPOINT_OR_REMOVE_BEFORE_DELETE | Add-SummaryLine "- governance/legacy-extracted remains the transitional review area; docs/governance deletion requires separate readiness proof." |
+See evidence file:
+
+$ActiveBlockersCsv
 
 ## Rule
 
-If active blockers after remediation equals 0, deletion may move to its own dedicated readiness package. No deletion is performed in this batch.
+If active code/script blockers after remediation equals 0, deletion may move to its own dedicated readiness package. No deletion is performed in this batch.

@@ -21,3 +21,18 @@ SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_06_REMEDIA
 ## Hard stop
 
 No deletion, hard CI gate, or warning-to-error promotion is allowed without its own evidence package and rollback path.
+
+## Batch 07 active reference closure
+
+- Status: READY_FOR_DELETION_READINESS_PACKAGE if post-scan active code/script blockers equals 0.
+- Evidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_07_CLOSE_ACTIVE_REFS_AND_CLASSIFY_AUDIT-20260429-235302
+- No deletion, no CI hard gate, and no warning-to-error promotion performed in this batch.
+
+
+## Batch 08 Final Deletion
+
+- Status: PASS_FINAL_DELETION_LOCAL_COMMIT_READY_FOR_PUSH_REVIEW
+- Evidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_08_RESCUE_FINAL_DELETE_CLOSE-20260430-000328
+- Deleted: docs/governance
+- Preserved: governance/legacy-extracted
+- GitHub push: NO
