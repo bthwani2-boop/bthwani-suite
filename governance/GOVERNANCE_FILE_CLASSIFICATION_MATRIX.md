@@ -2,23 +2,27 @@
 
 Status: CANONICAL_MATRIX
 Owner: BThwani Governance
-LastStandardizedBy: GOVERNANCE_BATCH_10_RESCUE_DEDUP_CONTRADICTION_STANDARDIZE-20260430-002239
+SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134
+LastRebuiltBy: GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134
 
 ## Summary
 
-- Governance/control files scanned: 428
-- Guard files scanned: 25
-- Script files scanned: 55
-- Agent/skill/rule files scanned: 209
-- Workflow files scanned: 4
-- Active docs/governance references: 0
-- Duplicate candidates: 50
-- Contradiction/review candidates: 142
+| Metric | Count |
+|---|---:|
+| Governance-related files scanned | 431 |
+| Guard files scanned | 25 |
+| Script files scanned | 55 |
+| Agent/skill/rule files scanned | 209 |
+| Workflow files scanned | 4 |
+| Active docs/governance references | 0 |
+| Classified candidates | 190 |
+| Unclassified candidates | 0 |
 
-## Classification rule
+## Classification authority
 
-Every governance-related file must be classified as one of:
+Each governance-related file must map to one of:
 
+- CANONICAL_MASTER_CONTROL_PLANE
 - CANONICAL_POLICY
 - CANONICAL_STANDARD
 - CANONICAL_DECISION
@@ -29,10 +33,10 @@ Every governance-related file must be classified as one of:
 - SKILL_CONTRACT
 - CI_WORKFLOW
 - TRANSITIONAL_REFERENCE_ONLY
-- REMOVAL_CANDIDATE
+- REMOVAL_CANDIDATE_IN_DEDICATED_BATCH
 
-## Evidence
+## Evidence CSVs
 
-- C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_10_RESCUE_DEDUP_CONTRADICTION_STANDARDIZE-20260430-002239\governance-inventory.csv
-- C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_10_RESCUE_DEDUP_CONTRADICTION_STANDARDIZE-20260430-002239\guard-inventory.csv
-- C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_10_RESCUE_DEDUP_CONTRADICTION_STANDARDIZE-20260430-002239\reference-scan.csv
+- C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134\batch11-governance-inventory.csv
+- C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134\batch11-guard-inventory.csv
+- C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134\batch11-candidate-resolution-matrix.csv

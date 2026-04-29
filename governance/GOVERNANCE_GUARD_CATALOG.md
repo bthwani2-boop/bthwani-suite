@@ -2,12 +2,13 @@
 
 Status: CANONICAL_CATALOG
 Owner: BThwani Governance
-LastStandardizedBy: GOVERNANCE_BATCH_10_RESCUE_DEDUP_CONTRADICTION_STANDARDIZE-20260430-002239
+SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134
+LastRebuiltBy: GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134
 
 ## Summary
 
 - Guard files scanned: 25
-- Pre-batch guard failures: 0
+- Active docs/governance references: 0
 
 | Guard | Purpose | Path |
 |---|---|---|
