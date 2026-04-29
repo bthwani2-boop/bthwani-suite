@@ -41,18 +41,26 @@ $RemoteUrl = ""
 $Pushed = $false
 $Committed = $false
 $HadLocalChanges = $false
+$RemoteBranchExists = $false
+$Ahead = 0
+$Behind = 0
 
 New-Item -ItemType Directory -Force -Path $TempRoot | Out-Null
 
-function Write-TextFile {
+function Write-Utf8NoBom {
   param(
     [Parameter(Mandatory = $true)][string]$Path,
     [Parameter(Mandatory = $false)][AllowNull()][string]$Content
   )
   $dir = Split-Path -Parent $Path
-  if ($dir) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
-  if ($null -eq $Content) { $Content = "" }
-  Set-Content -LiteralPath $Path -Value $Content -Encoding UTF8
+  if ($dir) {
+    New-Item -ItemType Directory -Force -Path $dir | Out-Null
+  }
+  if ($null -eq $Content) {
+    $Content = ""
+  }
+  $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+  [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
 }
 
 function Add-Log {
@@ -96,7 +104,7 @@ EXIT_CODE: $exit
 OUTPUT:
 $outputText
 "@
-  Write-TextFile -Path $outFile -Content $record
+  Write-Utf8NoBom -Path $outFile -Content $record
 
   $checkStatus = if ($exit -eq 0) { "PASS" } elseif ($AllowFail) { "WARN" } else { "FAIL" }
   $script:Checks.Add([pscustomobject]@{
@@ -174,13 +182,14 @@ try {
 
   $remoteRefCheck = Invoke-Git -Name "remote-branch-exists" -GitArgs @("show-ref", "--verify", "--quiet", "refs/remotes/$Remote/$Branch") -AllowFail:$true
   if ($remoteRefCheck.ExitCode -eq 0) {
+    $RemoteBranchExists = $true
     $aheadBehind = (Invoke-Git -Name "ahead-behind-remote-vs-head" -GitArgs @("rev-list", "--left-right", "--count", "$Remote/$Branch...HEAD")).Output.Trim()
     $parts = $aheadBehind -split "\s+"
-    $behind = [int]$parts[0]
-    $ahead = [int]$parts[1]
-    Write-TextFile -Path (Join-Path $TempRoot "ahead-behind.txt") -Content "behind=$behind`nahead=$ahead`nraw=$aheadBehind"
-    if ($behind -gt 0) {
-      Block-Run "Current branch '$Branch' is behind '$Remote/$Branch' by $behind commit(s). Pull/rebase/merge intentionally first, then rerun."
+    $Behind = [int]$parts[0]
+    $Ahead = [int]$parts[1]
+    Write-Utf8NoBom -Path (Join-Path $TempRoot "ahead-behind.txt") -Content "behind=$Behind`nahead=$Ahead`nraw=$aheadBehind`n"
+    if ($Behind -gt 0) {
+      Block-Run "Current branch '$Branch' is behind '$Remote/$Branch' by $Behind commit(s). Pull/rebase/merge intentionally first, then rerun."
     }
   } else {
     $Warnings.Add("Remote branch '$Remote/$Branch' does not exist yet. Script will push with upstream if not DryRun.") | Out-Null
@@ -188,43 +197,6 @@ try {
 
   $statusBefore = (Invoke-Git -Name "status-porcelain-before-stage" -GitArgs @("status", "--porcelain")).Output
   $HadLocalChanges = -not [string]::IsNullOrWhiteSpace($statusBefore)
-
-  if ($HadLocalChanges) {
-    if ($StageMode -eq "All") {
-      Invoke-Git -Name "stage-all-excluding-this-evidence-session" -GitArgs @("add", "-A", "--", ".", ":(exclude)tools/registry/runs/$SessionId/**") | Out-Null
-    } elseif ($StageMode -eq "TrackedOnly") {
-      Invoke-Git -Name "stage-tracked-only" -GitArgs @("add", "-u", "--", ".") | Out-Null
-    } else {
-      $Warnings.Add("StageMode=AlreadyStaged: no automatic staging was performed.") | Out-Null
-    }
-
-    Invoke-Git -Name "staged-name-status" -GitArgs @("--no-pager", "diff", "--cached", "--name-status") | Out-Null
-
-    $hasStaged = Invoke-Git -Name "has-staged-changes-check" -GitArgs @("diff", "--cached", "--quiet") -AllowFail:$true
-    if ($hasStaged.ExitCode -eq 0) {
-      Block-Run "Local changes exist, but no staged changes are available for commit. Use StageMode=All or stage files intentionally."
-    }
-
-    Invoke-Git -Name "diff-cached-check" -GitArgs @("--no-pager", "diff", "--cached", "--check") | Out-Null
-
-    if (-not $SkipTypecheck) {
-      Invoke-External -Name "pnpm-workspace-tsc-noemit" -Exe "pnpm" -Args @("-w", "exec", "tsc", "--noEmit") | Out-Null
-    } else {
-      $Warnings.Add("TypeScript check skipped by -SkipTypecheck.") | Out-Null
-    }
-
-    if ($DryRun) {
-      $Warnings.Add("DryRun enabled: commit and push were not executed.") | Out-Null
-    } else {
-      Invoke-Git -Name "commit" -GitArgs @("commit", "-m", $CommitMessage) | Out-Null
-      $Committed = $true
-    }
-  } else {
-    $Warnings.Add("No local working-tree changes detected. Script will only push existing local commits if any.") | Out-Null
-  }
-
-  $CommitShaAfter = (Invoke-Git -Name "rev-parse-head-after" -GitArgs @("rev-parse", "HEAD")).Output.Trim()
-  Invoke-Git -Name "status-short-after-commit-before-push" -GitArgs @("--no-pager", "status", "--short", "--branch") | Out-Null
 
   $upstream = Invoke-Git -Name "current-upstream" -GitArgs @("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}") -AllowFail:$true
   $hasUpstream = ($upstream.ExitCode -eq 0)
@@ -235,15 +207,65 @@ try {
   }
 
   if ($DryRun) {
+    $Warnings.Add("DryRun enabled: no staging, commit, or push was executed.") | Out-Null
+    Invoke-Git -Name "dryrun-working-tree-diff-check" -GitArgs @("--no-pager", "diff", "--check") | Out-Null
+    Invoke-Git -Name "dryrun-staged-diff-check" -GitArgs @("--no-pager", "diff", "--cached", "--check") | Out-Null
+    Invoke-Git -Name "dryrun-diff-stat" -GitArgs @("--no-pager", "diff", "--stat") -AllowFail:$true | Out-Null
+    Invoke-Git -Name "dryrun-staged-name-status" -GitArgs @("--no-pager", "diff", "--cached", "--name-status") -AllowFail:$true | Out-Null
+
+    if (-not $SkipTypecheck) {
+      Invoke-External -Name "pnpm-workspace-tsc-noemit" -Exe "pnpm" -Args @("-w", "exec", "tsc", "--noEmit") | Out-Null
+    } else {
+      $Warnings.Add("TypeScript check skipped by -SkipTypecheck.") | Out-Null
+    }
+
+    $CommitShaAfter = (Invoke-Git -Name "rev-parse-head-after-dryrun" -GitArgs @("rev-parse", "HEAD")).Output.Trim()
+    Invoke-Git -Name "status-short-after-dryrun" -GitArgs @("--no-pager", "status", "--short", "--branch") | Out-Null
+
     $Status = "DRY_RUN"
-    $Recommendation = "REVIEW_DRY_RUN_OUTPUT_THEN_RUN_WITHOUT_DRYRUN"
+    $Recommendation = "REVIEW_DRY_RUN_OUTPUT_THEN_RUN_WITHOUT_DRYRUN_OR_USE_GP"
     $ExitCode = 0
   } else {
+    if ($HadLocalChanges) {
+      if ($StageMode -eq "All") {
+        Invoke-Git -Name "stage-all" -GitArgs @("add", "-A", "--", ".") | Out-Null
+        Invoke-Git -Name "unstage-registry-runs" -GitArgs @("reset", "-q", "--", "tools/registry/runs") -AllowFail:$true | Out-Null
+      } elseif ($StageMode -eq "TrackedOnly") {
+        Invoke-Git -Name "stage-tracked-only" -GitArgs @("add", "-u", "--", ".") | Out-Null
+      } else {
+        $Warnings.Add("StageMode=AlreadyStaged: no automatic staging was performed.") | Out-Null
+      }
+
+      Invoke-Git -Name "staged-name-status" -GitArgs @("--no-pager", "diff", "--cached", "--name-status") | Out-Null
+
+      $hasStaged = Invoke-Git -Name "has-staged-changes-check" -GitArgs @("diff", "--cached", "--quiet") -AllowFail:$true
+      if ($hasStaged.ExitCode -eq 0) {
+        Block-Run "Local changes exist, but no staged changes are available for commit. Use StageMode=All or stage files intentionally."
+      }
+
+      Invoke-Git -Name "diff-cached-check" -GitArgs @("--no-pager", "diff", "--cached", "--check") | Out-Null
+
+      if (-not $SkipTypecheck) {
+        Invoke-External -Name "pnpm-workspace-tsc-noemit" -Exe "pnpm" -Args @("-w", "exec", "tsc", "--noEmit") | Out-Null
+      } else {
+        $Warnings.Add("TypeScript check skipped by -SkipTypecheck.") | Out-Null
+      }
+
+      Invoke-Git -Name "commit" -GitArgs @("commit", "-m", $CommitMessage) | Out-Null
+      $Committed = $true
+    } else {
+      $Warnings.Add("No local working-tree changes detected. Script will only push existing local commits if any.") | Out-Null
+    }
+
+    $CommitShaAfter = (Invoke-Git -Name "rev-parse-head-after" -GitArgs @("rev-parse", "HEAD")).Output.Trim()
+    Invoke-Git -Name "status-short-after-commit-before-push" -GitArgs @("--no-pager", "status", "--short", "--branch") | Out-Null
+
     if ($hasUpstream) {
       Invoke-Git -Name "push-current-branch" -GitArgs @("push", $Remote, "HEAD:$Branch") | Out-Null
     } else {
       Invoke-Git -Name "push-current-branch-set-upstream" -GitArgs @("push", "-u", $Remote, "HEAD:$Branch") | Out-Null
     }
+
     $Pushed = $true
 
     Invoke-Git -Name "status-short-after-push" -GitArgs @("--no-pager", "status", "--short", "--branch") | Out-Null
@@ -271,6 +293,9 @@ expected_github_repo: $ExpectedGitHubRepo
 remote: $Remote
 remote_url: $RemoteUrl
 branch: $Branch
+remote_branch_exists: $RemoteBranchExists
+behind: $Behind
+ahead: $Ahead
 commit_sha_before: $CommitShaBefore
 commit_sha_after: $CommitShaAfter
 committed: $Committed
@@ -290,12 +315,12 @@ errors:
 $($Errors | ForEach-Object { "- $_" } | Out-String)
 
 next_action:
+- If status is DRY_RUN: review evidence, then run without -DryRun or use gp when ready.
 - If status is PASS_PUSHED_WITH_COMMIT or PASS_PUSHED_NO_NEW_COMMIT: upload _HANDOFF.zip if you want ChatGPT review.
 - If status is BLOCKED: fix the listed error, then rerun.
-- If DryRun was used: review evidence, then rerun without -DryRun when ready.
 "@
 
-  Write-TextFile -Path (Join-Path $TempRoot "summary.txt") -Content $summary
+  Write-Utf8NoBom -Path (Join-Path $TempRoot "summary.txt") -Content $summary
 
   $evidence = [pscustomobject]@{
     status = $Status
@@ -306,6 +331,9 @@ next_action:
     remote = $Remote
     remote_url = $RemoteUrl
     branch = $Branch
+    remote_branch_exists = $RemoteBranchExists
+    behind = $Behind
+    ahead = $Ahead
     commit_sha_before = $CommitShaBefore
     commit_sha_after = $CommitShaAfter
     committed = $Committed
@@ -322,7 +350,7 @@ next_action:
     errors = $Errors
   }
 
-  Write-TextFile -Path (Join-Path $TempRoot "evidence.json") -Content ($evidence | ConvertTo-Json -Depth 8)
+  Write-Utf8NoBom -Path (Join-Path $TempRoot "evidence.json") -Content ($evidence | ConvertTo-Json -Depth 8)
 
   New-Item -ItemType Directory -Force -Path $FinalRoot | Out-Null
   Get-ChildItem -LiteralPath $TempRoot -Force |
@@ -331,7 +359,9 @@ next_action:
   if (Test-Path -LiteralPath $HandoffZip) {
     Remove-Item -LiteralPath $HandoffZip -Force
   }
-  Compress-Archive -Path (Join-Path $FinalRoot "*") -DestinationPath $HandoffZip -Force
+
+  $zipItems = Get-ChildItem -LiteralPath $FinalRoot -Force | Where-Object { $_.Name -ne "_HANDOFF.zip" }
+  Compress-Archive -Path $zipItems.FullName -DestinationPath $HandoffZip -Force
 
   Write-Host ""
   Write-Host $Status
@@ -339,6 +369,9 @@ next_action:
   Write-Host "recommendation: $Recommendation"
   Write-Host "session_id: $SessionId"
   Write-Host "branch: $Branch"
+  Write-Host "remote_branch_exists: $RemoteBranchExists"
+  Write-Host "behind: $Behind"
+  Write-Host "ahead: $Ahead"
   Write-Host "commit_sha_before: $CommitShaBefore"
   Write-Host "commit_sha_after: $CommitShaAfter"
   Write-Host "committed: $Committed"
@@ -346,10 +379,12 @@ next_action:
   Write-Host "evidence_root: $FinalRoot"
   Write-Host "handoff_zip: $HandoffZip"
   Write-Host ""
+
   if ($Warnings.Count -gt 0) {
     Write-Host "warnings:"
     $Warnings | ForEach-Object { Write-Host "- $_" }
   }
+
   if ($Errors.Count -gt 0) {
     Write-Host "errors:"
     $Errors | ForEach-Object { Write-Host "- $_" }
