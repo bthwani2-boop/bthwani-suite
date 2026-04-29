@@ -1,0 +1,17 @@
+# Legacy Extracted Governance Index
+
+Status: CANONICAL_REVIEW_AREA
+
+Purpose: preserve rich legacy/transitional content from docs/governance before deleting the legacy root later.
+
+Rule: these extracted files are not final canonical policy unless explicitly promoted by a later decision.
+
+| Source | Extracted target | Source SHA256 | Status |
+|---|---|---|---|
+| $Source | $Target | $Hash | LEGACY_EXTRACTED_CANONICAL_REVIEW |
+| $Source | $Target | $Hash | LEGACY_EXTRACTED_CANONICAL_REVIEW |
+| $Source | $Target | $Hash | LEGACY_EXTRACTED_CANONICAL_REVIEW |
+| $Source | $Target | $Hash | LEGACY_EXTRACTED_CANONICAL_REVIEW |
+| $Source | $Target | $Hash | LEGACY_EXTRACTED_CANONICAL_REVIEW |
+| $Source | $Target | $Hash | LEGACY_EXTRACTED_CANONICAL_REVIEW |
+| $Source | $Target | $Hash | LEGACY_EXTRACTED_CANONICAL_REVIEW |
