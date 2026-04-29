@@ -6,4 +6,4 @@ export * as PartnerAccount from './partner-account';
 export * as PartnerSettings from './partner-settings';
 export * as PartnerNotifications from './partner-notifications';
 export * as PartnerSupport from './partner-support';
-
+export * as PartnerAccountSheets from './account';

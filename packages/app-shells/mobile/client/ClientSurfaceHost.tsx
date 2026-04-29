@@ -1,4 +1,4 @@
-import { useServiceLabels } from '../../shared/ServiceLabels';
+import { useServiceLabels } from '@bthwani/surfaces';
 import React from 'react';
 import { BackHandler, Platform, ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

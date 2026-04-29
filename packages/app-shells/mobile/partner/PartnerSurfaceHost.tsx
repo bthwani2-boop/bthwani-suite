@@ -2,9 +2,9 @@ import React from 'react';
 import { BackHandler, Platform } from 'react-native';
 import { Box, Button, Icon, MobileScrollView, ScreenHeader, Surface, Text, TopBar, useTheme } from '@bthwani/ui-kit';
 import { dshPartner } from '@bthwani/surfaces/app-partner';
-import { MobileAccountSheet } from '../shared/MobileAccountSheet';
-import { PartnerWalletHubSheet, type PartnerWalletHubDestination } from '../shared/PartnerWalletHubSheet';
-import { PartnerStoreScopeSheet, type PartnerStoreScopeOption } from '../shared/PartnerStoreScopeSheet';
+import { MobileAccountSheet } from '@bthwani/surfaces';
+import { PartnerWalletHubSheet, type PartnerWalletHubDestination } from '@bthwani/surfaces/app-partner';
+import { PartnerStoreScopeSheet, type PartnerStoreScopeOption } from '@bthwani/surfaces/app-partner';
 
 const {
   DshEntryScreen,

@@ -1,0 +1,80 @@
+{
+  "$schema": "https://bthwani.local/schemas/unused-dead-orphan-code-guard.schema.json",
+  "version": "1.0.0",
+  "evidenceRoot": "tools/registry/runs",
+  "failOnError": false,
+  "extensions": [
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".cjs"
+  ],
+  "scanRoots": [
+    "apps",
+    "packages/app-shells",
+    "packages/surfaces",
+    "packages/ui-kit",
+    "packages/api-types",
+    "packages/api-clients",
+    "services"
+  ],
+  "ignore": [
+    "(^|/)node_modules(/|$)",
+    "(^|/)dist(/|$)",
+    "(^|/)build(/|$)",
+    "(^|/)coverage(/|$)",
+    "(^|/)\\.next(/|$)",
+    "(^|/)\\.expo(/|$)",
+    "^tools/registry/runs/",
+    "\\.map$",
+    "\\.d\\.ts$",
+    "\\.test\\.",
+    "\\.spec\\."
+  ],
+  "entryPathPatterns": [
+    "^apps/[^/]+/[^/]+/App\\.(ts|tsx|js|jsx)$",
+    "^apps/[^/]+/[^/]+/index\\.(ts|tsx|js|jsx)$",
+    "^apps/web/[^/]+/app/(layout|page)\\.(ts|tsx)$",
+    "^packages/[^/]+/src/index\\.(ts|tsx|js|jsx)$",
+    "^packages/[^/]+/index\\.(ts|tsx|js|jsx)$",
+    "^packages/[^/]+/src/public/[^/]+\\.(ts|tsx|js|jsx)$",
+    "^packages/surfaces/src/(app-client|app-partner|app-captain|app-field|control-panel|webapp|website)\\.(ts|tsx|js|jsx)$"
+  ],
+  "protectedPathPatterns": [
+    "package\\.json$",
+    "project\\.json$",
+    "tsconfig\\.json$",
+    "next\\.config\\.",
+    "metro\\.config\\.",
+    "babel\\.config\\.",
+    "app\\.config\\.",
+    "tamagui\\.config\\.",
+    "tamagui\\.build\\."
+  ],
+  "domainTerms": [
+    "dsh",
+    "wlt",
+    "amn",
+    "arb",
+    "knz",
+    "kwd",
+    "mrf",
+    "snd",
+    "esf",
+    "order",
+    "orders",
+    "store",
+    "stores",
+    "cart",
+    "checkout",
+    "captain",
+    "merchant",
+    "partner",
+    "wallet",
+    "delivery",
+    "shopping"
+  ],
+  "minDuplicateBytes": 300
+}
