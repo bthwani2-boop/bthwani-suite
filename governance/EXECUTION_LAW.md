@@ -1,92 +1,128 @@
-# EXECUTION_LAW
+# Execution Law
 
-## Mandatory Header
+Status: CANONICAL
+Owner: BThwani Governance
+Scope: phased execution, acceleration, closure, and promotion from legacy-extracted governance content
 
-- WorkMode: `BOOTSTRAP MODE`
-- CurrentPhase: `Phase 01 - Governance Freeze`
-- TargetService: `_shared`
-- RequestType: `bootstrap_artifact_work`
-- PrimaryRepo: `bthwani-suite`
-- LegacyRepo: `bthfinal`
-- PackStatus: `Phase 01 active`
-- BlockingGaps: `Later-phase artifacts are not unlocked`
-- NextAllowed: `Phase-correct progression only`
+## 1. Execution principle
 
-## Execution Law
+BThwani execution must be fast, scoped, evidence-backed, and non-random.
 
-Work in `bthwani-suite` must proceed phase-by-phase, evidence-backed, and target-first.
+Speed is achieved by batching cohesive tasks, not by removing verification.
 
-## Explicit Prohibitions
+## 2. Phase model
 
-- no binding-first rebuild
-- no runtime-first rebuild
-- no API-first rebuild
-- no full-stack-first rebuild
-- no big-bang multi-service start
-- no donor-copy-first rebuild
-- no generated-layer-first execution
+Allowed phase sequence:
 
-## Required Order Bias
+1. AUDIT
+2. CLASSIFY
+3. WRITE_SCOPED
+4. VERIFY
+5. COMMIT_SCOPED
+6. PUSH
+7. EVIDENCE_HANDOFF
+8. PROMOTE_OR_CLOSE
+9. NEXT_SCOPE
 
-- governance before broad structure
-- structure before implementation
-- service truth before screens
-- screens and flows before contract finalization
-- contract finalization before generation
-- generation before binding
-- binding before runtime proof
-- runtime proof before final seal
+A later phase may not claim closure for an earlier skipped phase.
 
-## Controlled Parallelism Rule
+## 3. Batch sizing rule
 
-Before the first service is sealed with evidence:
+A batch may include multiple tasks only when they share:
 
-- one primary service only
-- ui-kit growth only when demanded by that service
-- shared package or shared service work only when it unblocks that service
+- same owner
+- same root
+- same risk class
+- same verification path
+- same commit purpose
 
-## Runtime Law
+Examples of valid batches:
 
-- minimal necessary runtime only
-- no runtime stack during bootstrap phases 00-07
-- no production-like proof before the later runtime and verification phases
+- six canonical governance policies
+- multiple policy docs under `governance/`
+- guard documentation plus matching guard config
+- service blueprint repairs for one service only
 
-## Workspace Tooling And Install Law
+Examples of invalid batches:
 
-- root `package.json` and root `pnpm-lock.yaml` are the canonical home for workspace toolchain truth
-- the governed workspace toolchain versions are `node`, `pnpm`, `nx`, and `typescript`
-- installs that change the workspace dependency graph must start from the repo root only
-- app roots and package roots are not canonical install roots for workspace graph changes
-- local `node_modules/` folders under apps or packages are workspace install artifacts, not separate ownership truth
-- no app or package may silently redefine the canonical workspace toolchain version policy
+- governance docs + UI redesign + API binding
+- multiple services without service matrix
+- deletion plus unrelated refactor
+- CI hardening plus UI fixes
 
-## BTH Token Rename And Alias Law
+## 4. Stop conditions
 
-Any task that changes tokens containing `Bth`, `bth`, or `BTH` must follow [../.github/agents/platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md](../.github/agents/platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md).
+Execution must stop on:
 
-Treat it as one-file-at-a-time governed cleanup; do not use blind global replace.
+- wrong branch
+- dirty working tree outside expected scope
+- missing expected file
+- unexpected staged file
+- diff-check failure
+- typecheck failure
+- guard Errors > 0
+- missing evidence zip
+- unclassified destructive action
 
-## Mobile Toolchain Ownership Law
+## 5. Warning handling
 
-- the current mobile app roots are shell packages, not standalone Expo ownership roots
-- no app root may become the canonical install or run root for Expo or React Native by convenience
-- Expo Go legality in screen phases governs preview timing only; it does not grant app-local ownership of installs or runtime tooling
-- until a lawful mobile runtime phase explicitly opens, do not add ad hoc Expo install or run workflows under app roots as if they were canonical
-- when lawful mobile execution opens later, the canonical run entrypoints must be repo-root owned commands, targets, or governed scripts first
-- during bootstrap and shell-first phases, `react`, `react-native`, and `expo` may appear as support dependencies in leaf apps or packages where technically required, but no leaf app or leaf package may define or redefine the canonical workspace version policy for them
-- no app or package may act as an independent authority for `react`, `react-native`, or `expo`
-- no app-local upgrade, downgrade, or SDK transition is allowed as a sovereignty decision
-- canonical version truth for `react`, `react-native`, and `expo` must remain workspace-governed and approval-driven
-- app-level divergence is forbidden unless an explicit approved exception is recorded in repo governance
+Warnings do not automatically block every task while baseline is being normalized.
 
-## Phase Gate Law
+However, warnings must be counted, preserved, and classified later as:
 
-No phase passes on file existence alone.
+- ACCEPTED_BASELINE
+- FALSE_POSITIVE
+- NEEDS_OWNER_DECISION
+- NEEDS_FIX
+- PROMOTE_TO_ERROR_LATER
+- BLOCKS_CLEANUP
 
-A phase passes only when:
+## 6. Promotion from legacy-extracted
 
-- required repo artifacts exist
-- required evidence artifacts exist
-- artifacts contain usable content
-- artifacts are coherent with adjacent governance artifacts
-- forbidden early work has not started
+Legacy-extracted files are preservation artifacts.
+
+A rule from `governance/legacy-extracted/` becomes canonical only when:
+
+- extracted into a canonical file under `governance/`
+- deduplicated
+- scoped
+- verified
+- committed
+- cited by a policy or standard
+
+No legacy-extracted file is final policy by itself.
+
+## 7. Closure language
+
+Do not use absolute closure language unless evidence proves the exact scope.
+
+Allowed wording:
+
+- closed for this scope
+- ready for next phase
+- blocked by listed evidence gap
+- pass with warnings carried forward
+- fix required before promotion
+
+Forbidden unsupported wording:
+
+- done 100%
+- no future issue possible
+- impossible to challenge
+- final for all future contexts
+
+## 8. Acceleration rule
+
+When the user asks to speed up, the assistant should increase batch size within cohesive boundaries.
+
+Preferred batch size:
+
+- docs/policies: 3 to 8 files
+- guards/configs: 2 to 5 related guards
+- service work: one service at a time
+- UI work: one screen/flow cluster at a time
+- deletions: one deletion family at a time with rollback
+
+## 9. Evidence rule
+
+Every accelerated batch must produce a stronger evidence pack, not weaker evidence.
