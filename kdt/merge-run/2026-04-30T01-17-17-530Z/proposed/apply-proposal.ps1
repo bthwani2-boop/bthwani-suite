@@ -22,8 +22,9 @@ if ($branch -notlike 'governance/*') {
     exit 2
 }
 
-$porcelain = git status --porcelain
-if ($porcelain.Trim()) {
+$porcelain = git status --porcelain 2>$null
+if ($null -eq $porcelain) { $porcelain = '' }
+if ($porcelain.ToString().Trim()) {
     Write-Error "Working tree is not clean: commit or stash changes before applying. Aborting."
     exit 3
 }
