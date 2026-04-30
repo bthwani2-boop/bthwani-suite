@@ -16,8 +16,9 @@ $changes = Get-Content $prFile -Raw | ConvertFrom-Json
 $branch = ''
 try { $branch = (git rev-parse --abbrev-ref HEAD 2>$null).Trim() } catch { $branch = '' }
 Write-Host "Current branch: $branch"
-if ($branch -ne 'governance/demo-service-pilot') {
-    Write-Error "Expected to run on branch 'governance/demo-service-pilot'. Current branch: '$branch'. Aborting to preserve safety."
+# Allow running on any governance/* branch to enable safe local feature branches
+if ($branch -notlike 'governance/*') {
+    Write-Error "Expected to run on a 'governance/*' branch. Current branch: '$branch'. Aborting to preserve safety."
     exit 2
 }
 
