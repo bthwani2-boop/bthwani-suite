@@ -1,4 +1,28 @@
 ---
+generatedAt: 2026-04-30T04:52:00+03:00
+note: Governance reorganization ledger (staging). Record of consolidation operations and provenance. Do not remove entries.
+---
+
+# GOV_REORGANIZATION_LEDGER
+
+This ledger records structural governance operations (merges, archives, aliasing, deletion-candidates) performed inside `governance/`.
+
+Each entry MUST include: `timestamp`, `operator`, `branch` (if any), `changes` (array of operations), `evidence` (paths to `_handoff` artifacts).
+
+## Initial staging entry
+
+- timestamp: 2026-04-30T04:52:00+03:00
+- operator: governance consolidation (assistant staging run)
+- branch: governance/consolidation-staging
+- changes:
+  - created: `_staging/00_README_AND_INDEX.md` (merged draft of `README.md` + `00_GOVERNANCE_INDEX.md`)
+  - created: `_staging/GOVERNANCE_GUARD_CATALOG_STAGING.md` (guard catalog staging; contains list of guard sources)
+  - created: `_handoff/reorg-verification.json` (verification skeleton)
+  - created: `archive/README.md` (archive folder marker)
+- evidence: `_handoff/reorg-verification.json`
+
+Note: This ledger is intentionally minimal for staging. Each subsequent consolidation batch must append a detailed entry with commit SHA, diffs and per-file provenance.
+---
 generatedFrom: governance/GOVERNANCE_REORGANIZATION_LEDGER.md
 generatedAt: 2026-04-30T04:48:37.5661458+03:00
 note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
