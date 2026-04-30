@@ -1,0 +1,5 @@
+{
+  "version": "1.0.0",
+  "dataImportPatterns": ["api-clients", "@bthwani/api", "contracts", "/api", "useQuery(", "fetch(", "axios"],
+  "evidenceSearchDepth": 10
+}

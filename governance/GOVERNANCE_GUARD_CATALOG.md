@@ -37,3 +37,55 @@ LastRebuiltBy: GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003
 | guard-typescript-strictness.mjs | typescript strictness | tools/guards/guard-typescript-strictness.mjs |
 | guard-uikit-tamagui-boundary.mjs | uikit tamagui boundary | tools/guards/guard-uikit-tamagui-boundary.mjs |
 | guard-unused-dead-orphan-code.mjs | unused dead orphan code | tools/guards/guard-unused-dead-orphan-code.mjs |
+
+## Guard-01 Governance Boundaries
+
+Files:
+
+```text
+tools/guards/guard-governance-boundaries.mjs
+tools/guards/guard-governance-boundaries.config.json
+```
+
+Default run command:
+
+```powershell
+node tools/guards/guard-governance-boundaries.mjs
+```
+
+Evidence output root:
+
+```text
+tools/registry/runs/GUARD_01_GOVERNANCE_BOUNDARIES-{timestamp}
+```
+
+### Current Calibration
+
+`GUARD-01` is calibrated so that boundary and import violations remain blocking errors, while legacy token cleanup stays warning-first until dedicated cleanup batches close the baseline.
+
+Blocking errors for this guard include:
+
+```text
+APP_OR_SHELL_DEEP_SURFACES_IMPORT
+APP_RELATIVE_PACKAGE_IMPORT
+PUBLIC_SURFACE_EXPORT_HAS_LOGIC
+SURFACE_LOCAL_DESIGN_SYSTEM
+UI_KIT_IMPORTS_SURFACE_OR_SHELL
+MISSING_REQUIRED_GOVERNANCE_FILE
+```
+
+Warning queues for this guard include:
+
+```text
+APP_USER_LEGACY
+MCPW_LEGACY
+OLD_EVIDENCE_ROOT
+OLD_ACTIVE_BTH_PATH
+NPM_COMMAND_REVIEW
+SURFACE_HARDCODED_COLOR_REVIEW
+UI_KIT_DOMAIN_CONTENT_CANDIDATE
+DEEP_UI_KIT_IMPORT
+APP_PRODUCT_CONTENT_CANDIDATE
+```
+
+Calibration must not hide live source violations. This guard remains `CHECK`-only and must not mutate product files.

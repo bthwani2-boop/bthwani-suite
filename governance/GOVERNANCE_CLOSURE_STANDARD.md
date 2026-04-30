@@ -32,7 +32,8 @@ Minimum evidence for any code or governance change:
 - typecheck when code can affect TypeScript
 - applicable guards
 - decision file or summary
-- evidence zip in `tools/registry/runs/<SESSION_ID>/`
+- `_HANDOFF.zip` in `tools/registry/runs/<SESSION_ID>/`
+- `<SESSION_ID>_HANDOFF.zip` in `tools/registry/runs/<SESSION_ID>/`
 
 ## 3. Source-of-truth rule
 
@@ -44,13 +45,16 @@ Canonical roots:
 |---|---|
 | Repository | `C:\bthwani-suite` and `bthwani2-boop/bthwani-suite` |
 | Governance | `governance/` |
-| Transitional governance | `docs/governance/` until extracted and deleted |
+| Transitional governance | `docs/governance/` until extracted and archived or deleted |
+| Governance archive | `governance/archive/` when created by canonical cleanup |
 | Evidence | `tools/registry/runs/<SESSION_ID>/` |
 | UI system | `@bthwani/ui-kit` public exports |
 | Tamagui | internal to `@bthwani/ui-kit` only |
 | Services | `packages/surfaces/src/service-owned/<service>/` |
 | Surface-owned experiences | `packages/surfaces/src/surface-owned/` |
 | Public surface contracts | `packages/surfaces/src/public` |
+
+Files marked as aliases or archive notes inside `governance/` do not create new authority. They only point to a stronger canonical file.
 
 ## 4. Scope rule
 
@@ -257,6 +261,29 @@ Every warning must eventually become one of:
 - NEEDS_FIX
 - PROMOTE_TO_ERROR_LATER
 - BLOCKS_CLEANUP
+
+## 18. Final decision vocabulary
+
+The only canonical final closure decisions are:
+
+- PASS
+- PASS_WITH_WARNINGS
+- FIX_REQUIRED
+- BLOCKED
+- READY_FOR_PR
+- REVERT_REQUIRED
+- NEEDS_EVIDENCE
+- NEEDS_VISUAL_EVIDENCE
+
+Operational phrases such as `READY_FOR_NEXT_PHASE` are allowed as workflow markers only. They do not count as final closure decisions.
+
+## 19. Reorganization trace rule
+
+Any governance merge, archive move, alias downgrade, or delete-candidate decision must also be recorded in:
+
+`GOVERNANCE_REORGANIZATION_LEDGER.md`
+
+Structural cleanup is not complete until the ledger records the source path, target path, reason, proof status, and current status.
 
 Unclassified warnings may not be treated as clean closure.
 

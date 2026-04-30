@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "requiredFields": [
+    "id",
+    "name",
+    "owner",
+    "public_export_path",
+    "screens_matrix",
+    "flow_matrix",
+    "evidence_root",
+    "closure_decision"
+  ]
+}

@@ -7,7 +7,8 @@ GUARD-02 checks whether every `shared` folder has a valid architectural reason t
 It is based on:
 
 ```text
-governance/20_SHARED_AND_STRUCTURE_BOUNDARY_CONTRACT.md
+governance/03_PACKAGE_BOUNDARY_CONTRACT.md
+governance/09_SHARED_FOLDER_GOVERNANCE.md
 ```
 
 ## What It Checks

@@ -35,7 +35,32 @@ export function gitLsFiles() {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   });
-  return output.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  let files = output.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+
+  // Support running guards only on affected files/roots via env overrides
+  const affectedFilesRaw = process.env.AFFECTED_FILES || '';
+  const affectedRootsRaw = process.env.AFFECTED_ROOTS || '';
+
+  if (affectedFilesRaw) {
+    const listed = affectedFilesRaw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+    // intersect with git-tracked files to avoid bogus paths
+    const set = new Set(listed);
+    files = files.filter((f) => set.has(f));
+    return files;
+  }
+
+  if (affectedRootsRaw) {
+    const roots = affectedRootsRaw.split(',').map((r) => r.trim()).filter(Boolean);
+    if (roots.length) {
+      files = files.filter((f) => {
+        const top = f.includes('/') ? f.split('/')[0] : f.split('\\')[0];
+        return roots.includes(top);
+      });
+    }
+    return files;
+  }
+
+  return files;
 }
 
 export function isTextLike(file) {

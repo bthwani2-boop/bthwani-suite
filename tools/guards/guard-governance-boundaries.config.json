@@ -46,7 +46,6 @@
     "governance/02_BRANCH_AND_EVIDENCE_POLICY.md",
     "governance/03_PACKAGE_BOUNDARY_CONTRACT.md",
     "governance/04_APPS_SHELL_ONLY_CONTRACT.md",
-    "governance/05_APP_SHELLS_CONTRACT.md",
     "governance/06_SURFACES_OWNERSHIP_CONTRACT.md",
     "governance/07_UI_KIT_AUTHORITY_CONTRACT.md",
     "governance/08_SCREEN_FILE_MODEL_CONTRACT.md",
@@ -96,7 +95,7 @@
         "^\\.github/",
         "^\\.agents/",
         "^\\.cursor/",
-        "^governance/legacy-extracted/",
+        "^governance/archive/legacy-extracted/",
         "^packages/"
       ],
       "allowLinePatterns": [
@@ -130,7 +129,7 @@
         "^\\.github/",
         "^\\.agents/",
         "^\\.cursor/",
-        "^governance/legacy-extracted/",
+        "^governance/archive/legacy-extracted/",
         "^packages/"
       ],
       "allowLinePatterns": [
@@ -164,7 +163,7 @@
         "^\\.github/",
         "^\\.agents/",
         "^\\.cursor/",
-        "^governance/legacy-extracted/",
+        "^governance/archive/legacy-extracted/",
         "^packages/"
       ],
       "allowLinePatterns": [
@@ -198,7 +197,7 @@
         "^\\.github/",
         "^\\.agents/",
         "^\\.cursor/",
-        "^governance/legacy-extracted/",
+        "^governance/archive/legacy-extracted/",
         "^packages/"
       ],
       "allowLinePatterns": [

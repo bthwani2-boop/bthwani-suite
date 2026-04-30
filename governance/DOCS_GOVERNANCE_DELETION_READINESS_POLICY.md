@@ -17,7 +17,7 @@ Deletion is allowed only when all are true:
 - every file has extraction evidence
 - rich content has been promoted or rejected
 - canonical replacement exists where needed
-- `governance/legacy-extracted/README.md` maps source to target and SHA
+- `governance/archive/legacy-extracted/README.md` maps source to target and SHA
 - no active code/script/CI path depends on `docs/governance/`
 - no unresolved owner question remains
 - rollback path exists

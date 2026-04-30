@@ -1,12 +1,24 @@
 # Branch and Evidence Policy
 
+Status: CANONICAL_POLICY
+Owner: BThwani Governance
+Scope: branch reality, checkpoint evidence, evidence-root usage, dirty-tree accounting, and destructive-change proof
+
 ## Purpose
 
-This policy prevents false closure, branch confusion, and evidence-free claims.
+This policy prevents branch fiction, evidence-free closure, source-of-truth drift, and destructive changes without traceable proof.
+
+## Canonical Facts
+
+- active local repository: `C:\bthwani-suite`
+- active governance root: `governance/`
+- canonical evidence root: `tools/registry/runs/{SESSION_ID}/`
+- evidence pack schema authority: `18_EVIDENCE_PACK_STANDARD.md`
+- closure decision authority: `GOVERNANCE_CLOSURE_STANDARD.md`
 
 ## Branch Reality
 
-Before any diagnostic or apply phase, capture:
+Before any check, apply, review, or verify phase, capture:
 
 ```powershell
 git branch --show-current
@@ -29,55 +41,85 @@ ghb/0102-20260429-015636-packages
 
 Treat it as the latest known checkpoint only when local and/or GitHub evidence confirms it.
 
-## Evidence Root
+## Evidence Root Rule
 
-All diagnostics, APPLY phases, and verification phases must write evidence under:
+All diagnostics, APPLY phases, verification phases, review phases, and runtime-proof phases must write evidence under:
 
 ```text
-tools/registry/runs/{SESSION_ID}
+tools/registry/runs/{SESSION_ID}/
 ```
 
-Do not write new evidence into `docs/governance`.
+Optional phase subpaths are allowed when a run benefits from them, for example:
 
-## Required Evidence Files
+```text
+tools/registry/runs/{SESSION_ID}/phase-03/
+```
 
-Each phase should include, at minimum:
+Do not write new evidence into `docs/governance`, `governance/archive/legacy-extracted/`, or ad hoc roots outside the canonical run root.
+
+## Minimum Evidence Gate
+
+Each run must include, at minimum:
 
 ```text
 SUMMARY.md
 status.txt
 evidence.json
 commands.log
+git-branch-current.txt
 git-status-before.txt
 git-status-after.txt
 git-diff-check-before.txt
 git-diff-check-after.txt
+```
+
+When the change can affect TypeScript, guards, scripts, or configuration, also include:
+
+```text
 tsc-noemit-before.txt
 tsc-noemit-after.txt
 ```
 
-Additional files depend on the phase.
+The complete pack shape is owned by `18_EVIDENCE_PACK_STANDARD.md`.
 
-## Status Decisions
+## Dirty Tree Accounting
 
-Allowed status decisions:
+A dirty tree is not automatically fatal. It must be classified as one of:
+
+- expected current governance changes
+- expected current scoped changes
+- evidence output
+- untracked transitional files
+- unexpected changes
+- forbidden-scope changes
+
+Unexpected or forbidden-scope changes block closure.
+
+## Destructive Change Gate
+
+No file may be deleted, moved, renamed, archived, or downgraded to alias until all of the following are true:
+
+- zero-reference or controlled-reference proof exists
+- owner/consumer impact is documented
+- rollback path is known
+- the decision is recorded in `GOVERNANCE_REORGANIZATION_LEDGER.md`
+
+## Final Decision Gate
+
+The only canonical final closure decisions are:
 
 ```text
 PASS
 PASS_WITH_WARNINGS
-READY_FOR_NEXT_PHASE
-READY_FOR_GOVERNANCE_APPLY_PHASE_01_PLAN
-READY_FOR_DSH_FORENSICS
-BLOCKED_BY_DIFF_CHECK
-BLOCKED_BY_TSC
-BLOCKED_BY_UNEXPECTED_DIRTY_TREE
-BLOCKED_BY_SCOPE_VIOLATION
-BLOCKED_BY_MISSING_EVIDENCE
-BLOCKED_BY_VERIFICATION
-NEEDS_EVIDENCE
-NEEDS_REVIEW
 FIX_REQUIRED
+BLOCKED
+READY_FOR_PR
+REVERT_REQUIRED
+NEEDS_EVIDENCE
+NEEDS_VISUAL_EVIDENCE
 ```
+
+Operational markers such as `READY_FOR_NEXT_PHASE` may still appear inside plans or evidence packs, but they are workflow markers only. They are not final closure decisions.
 
 ## No Closure Without Evidence
 
@@ -91,19 +133,3 @@ FINAL
 ```
 
 unless the relevant evidence pack proves it.
-
-## Dirty Tree Accounting
-
-A dirty tree is not automatically fatal. It must be classified:
-
-- expected current governance changes
-- untracked transitional files
-- evidence output
-- unexpected changes
-- forbidden-scope changes
-
-Unexpected or forbidden-scope changes block closure.
-
-## No Deletion Without Proof
-
-No file may be deleted, moved, or renamed until zero-reference proof exists and the owner/consumer impact is documented.

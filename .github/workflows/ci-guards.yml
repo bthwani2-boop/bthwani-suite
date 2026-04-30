@@ -1,0 +1,34 @@
+name: Guard Checks
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  guard_checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - name: Install pnpm
+        run: npm i -g pnpm@8
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run fast pre-commit checks
+        run: pnpm run precommit:fast
+      - name: Run guard scripts
+        run: |
+          pnpm run guard:service-blueprint
+          pnpm run guard:patch-review
+          pnpm run guard:binding-proof
+          pnpm run guard:test-coverage
+          pnpm run guard:visual
+          pnpm run guard:rtl-visual
+          pnpm run guard:runtime-smoke
+          pnpm run guard:secret-scan

@@ -1,71 +1,31 @@
 # Patch Review Protocol
 
-## Purpose
+Status: TRANSITIONAL_ALIAS
+Owner: BThwani Governance
+CanonicalTarget: `14_AGENT_EXECUTION_RULES.md`
 
-This protocol controls sensitive AI-assisted changes and prevents hidden file drift.
+## Reason This File Still Exists
 
-## Default Method
+This path remains because active references, including guard configuration, still point to it.
 
-For sensitive local code or governance changes, prefer patch handoff:
+Its live patch-review authority has been merged into `14_AGENT_EXECUTION_RULES.md`.
 
-```powershell
-git --no-pager diff > LOCAL_CHANGE_REVIEW.patch
-git --no-pager status --short > LOCAL_CHANGE_STATUS.txt
-git ls-files --others --exclude-standard > LOCAL_UNTRACKED_FILES.txt
-```
+## Non-Authority Rule
 
-## Important Rule for Untracked Files
+This file must not introduce new rules for:
 
-Plain `git diff` does not include untracked files. Every patch handoff must include a separate untracked-file list.
+- patch handoff format
+- sensitive scopes
+- review requirements
+- rollback expectations
+- review decision vocabulary
 
-## Review Requirements
+Use `14_AGENT_EXECUTION_RULES.md` instead.
 
-Before accepting any change:
+## Deletion Gate
 
-- inspect changed paths
-- inspect untracked paths
-- verify no forbidden scope was touched
-- run `git diff --check`
-- run `pnpm -w exec tsc --noEmit`
-- preserve rollback path
-- do not commit until review passes
+This alias may be removed only after:
 
-## Forbidden Without Explicit Approval
-
-- deleting files
-- moving files
-- renaming files
-- broad legacy replacement
-- broad import rewrites
-- workflow permission changes
-- DSH implementation during governance repair
-- source boundary repairs during SSoT-only phases
-
-## Rollback
-
-Before APPLY, back up target files to the evidence pack when practical.
-
-Rollback options:
-
-```powershell
-git restore -- <tracked-file>
-Remove-Item <untracked-file>
-```
-
-Use removal only when the file is confirmed to be an unintended untracked output.
-
-## Final Review Status
-
-Allowed review decisions:
-
-```text
-PASS
-PASS_WITH_WARNINGS
-FIX_REQUIRED
-REVERT_REQUIRED
-NEEDS_EVIDENCE
-NEEDS_VISUAL_EVIDENCE
-READY_FOR_NEXT_PHASE
-```
-
-Do not use `CLOSED` unless the evidence pack proves complete closure.
+- reference repair is complete
+- the action is recorded in `GOVERNANCE_REORGANIZATION_LEDGER.md`
+- no active consumer still depends on this path
