@@ -1,0 +1,28 @@
+{
+	"folders": [
+		{
+			"name": "bthwani-suite",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.git": true,
+			"**/.nx/cache": true,
+			"**/dist": true,
+			"**/tmp": true
+		},
+		"mcp": {
+			"servers": {
+				"nx-mcp": {
+					"type": "stdio",
+					"command": "npx",
+					"args": [
+						"nx-mcp@latest"
+					]
+				}
+			},
+			"inputs": []
+		}
+	}
+}

@@ -1,0 +1,2 @@
+export { McpwTickerListPage } from './McpwTickerListPage';
+

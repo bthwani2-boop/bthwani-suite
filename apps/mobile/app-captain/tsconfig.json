@@ -1,0 +1,9 @@
+{
+  "$schema": "../../../tools/schemas/tsconfig.schema.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "extends": "expo/tsconfig.base"
+}

@@ -1,0 +1,8 @@
+{
+  "guard": "GUARD-16_PACKAGE_EXPORTS_COMPLETENESS",
+  "version": "1.0.0",
+  "mode": "CHECK_ONLY",
+  "policy": {
+    "defaultSeverity": "warning"
+  }
+}

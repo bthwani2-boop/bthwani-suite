@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "app-partner",
+    "slug": "app-partner",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "sdkVersion": "54.0.0",
+    "extra": {
+      "appKey": "app-partner",
+      "appVariant": "development",
+      "eas": {
+        "projectId": "bcd22a76-d4b2-4de0-93b3-f6d13074a802"
+      }
+    }
+  }
+}

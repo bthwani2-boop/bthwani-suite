@@ -1,0 +1,14 @@
+# BThwani governance ownership baseline
+# Single-owner baseline until team owners are formally expanded.
+
+* @bthwani2-boop
+
+/.github/                @bthwani2-boop
+/governance/             @bthwani2-boop
+/tools/                  @bthwani2-boop
+/contracts/              @bthwani2-boop
+/apps/                   @bthwani2-boop
+/packages/ui-kit/        @bthwani2-boop
+/packages/surfaces/      @bthwani2-boop
+/packages/api-clients/   @bthwani2-boop
+/packages/api-types/     @bthwani2-boop

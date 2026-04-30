@@ -1,0 +1,26 @@
+title = "BThwani Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Project-wide allowlist for generated, fixture, and evidence paths"
+paths = [
+  '''(^|/)\.gitleaks\.toml$''',
+  '''(^|/)tools/registry/runs(/.*)?$''',
+  '''(^|/)node_modules(/.*)?$''',
+  '''(^|/)\.next(/.*)?$''',
+  '''(^|/)dist(/.*)?$''',
+  '''(^|/)build(/.*)?$''',
+  '''(^|/)\.expo(/.*)?$''',
+  '''(^|/)coverage(/.*)?$''',
+  '''(^|/)pnpm-lock\.yaml$''',
+  '''(^|/)package-lock\.json$''',
+  '''(^|/)yarn\.lock$''',
+  '''(?i)\.(?:png|jpe?g|gif|webp|svg|pdf|ttf|otf|woff2?)$'''
+]
+
+regexes = [
+  '''^\$\{\{[ \t]*(?:env|github|secrets|vars)(?:\.[A-Za-z_]\w*)+[ \t]*}}$''',
+  '''(?i)^(example|sample|placeholder|changeme|your[-_ ]?(token|key|secret))$'''
+]

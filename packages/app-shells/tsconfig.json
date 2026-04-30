@@ -1,0 +1,16 @@
+{
+  "$schema": "../../tools/schemas/tsconfig.schema.json",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "index.ts",
+    "css-modules.d.ts",
+    "mobile/**/*.ts",
+    "mobile/**/*.tsx",
+    "web/**/*.ts",
+    "web/**/*.tsx"
+  ]
+}

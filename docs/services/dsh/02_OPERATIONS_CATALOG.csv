@@ -1,9 +1,0 @@
-operation_key,operation_family,primary_actor,primary_surfaces,service_purpose,source_status,source_trace
-dsh_browse_and_discover,store-discovery,customer,app-client,"discover stores, categories, and purchase entry points",observed,"DSH_UX_FLOW + DSH_SERVICE_SCOPE"
-dsh_cart_and_checkout_gate,cart-checkout,customer,app-client,"build cart, validate checkout gate, and reach order confirmation",observed,"DSH_UX_FLOW + DSH_OPERATION_CATALOG"
-dsh_order_create,order,customer,app-client,"create the operational order intent",observed,"DSH_UX_FLOW + DSH_OPERATION_CATALOG"
-dsh_partner_order_handling,partner-ops,partner,app-partner,"view and progress partner-side order/store handling",observed,"DSH_SERVICE_SCOPE + DSH_OPERATION_CATALOG"
-dsh_captain_job_flow,captain-ops,captain,app-captain,"receive offers, accept jobs, reject if needed, and complete with proof",observed,"DSH_UX_FLOW + DSH_OPERATION_CATALOG"
-dsh_field_support,field-ops,field,app-field,"support store activation and field visit tasks when required",observed,"DSH_SERVICE_SCOPE + DSH_OPERATION_CATALOG"
-dsh_control_panel_ops,ops-oversight,ops,control-panel,"operate peak mode, monitor exceptions, and manage DSH operational control actions",observed,"DSH_SERVICE_SCOPE + DSH_OPERATION_CATALOG"
-dsh_order_tracking,tracking,"customer|partner|captain|ops","app-client|app-partner|app-captain|control-panel","maintain clear shared order status visibility across participating actors",inferred,"DSH primary job + DSH_UX_FLOW"

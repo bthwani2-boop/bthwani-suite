@@ -1,11 +1,57 @@
 {
+  "$schema": "./tools/schemas/tsconfig.schema.json",
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
     "strict": true,
     "noEmit": true,
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@bthwani/api-clients": [
+        "./packages/api-clients/src/index.ts"
+      ],
+      "@bthwani/api-types": [
+        "./packages/api-types/src/index.ts"
+      ],
+      "@bthwani/ui-kit": [
+        "./packages/ui-kit/src/index.ts"
+      ],
+      "@bthwani/ui-kit/*": [
+        "./packages/ui-kit/src/*.ts"
+      ],
+      "@bthwani/app-shells": [
+        "./packages/app-shells/index.ts"
+      ],
+      "@bthwani/app-shells/*": [
+        "./packages/app-shells/*"
+      ],
+      "@bthwani/surface-mobile": [
+        "./packages/surface-mobile/src/index.tsx"
+      ],
+      "@bthwani/surfaces": [
+        "./packages/surfaces/src/index.ts"
+      ],
+      "@bthwani/surfaces/*": [
+        "./packages/surfaces/src/service-owned/*"
+      ],
+      "@bthwani/surfaces/service-owned/*": [
+        "./packages/surfaces/src/service-owned/*"
+      ],
+      "@bthwani/surfaces/surface-owned/*": [
+        "./packages/surfaces/src/surface-owned/*"
+      ],
+      "@bthwani/surfaces/composition/*": [
+        "./packages/surfaces/src/composition/*"
+      ],
+      "@bthwani/media-fixtures": [
+        "./packages/media-fixtures/src/index.ts"
+      ],
+      "@bthwani/media-fixtures/*": [
+        "./packages/media-fixtures/src/*"
+      ]
+    },
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

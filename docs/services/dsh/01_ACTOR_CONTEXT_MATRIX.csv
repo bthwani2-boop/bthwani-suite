@@ -1,6 +1,0 @@
-actor_id,actor_label,normalized_surface,context_role,primary_jobs,source_status,notes
-customer,Client App,app-client,primary external actor,"browse, add to cart, checkout, track order",observed,"derived from DSH_SERVICE_SCOPE and DSH_UX_FLOW"
-partner,Partner App,app-partner,primary fulfillment actor,"manage store orders, accept handoff, prepare order",observed,"derived from DSH_SERVICE_SCOPE"
-captain,Captain App,app-captain,primary execution actor,"receive offers, accept job, deliver, upload proof",observed,"derived from DSH_SERVICE_SCOPE and DSH_OPERATION_CATALOG"
-field,Field App,app-field,optional support actor,"store activation, geo pin, visit log",observed,"derived from DSH_SERVICE_SCOPE and DSH_OPERATION_CATALOG"
-ops,Control Panel,control-panel,primary internal ops actor,"peak mode, governance, operational exceptions, DSH oversight",observed,"derived from DSH_SERVICE_SCOPE and DSH_OPERATION_CATALOG with MCPW normalized to control-panel"

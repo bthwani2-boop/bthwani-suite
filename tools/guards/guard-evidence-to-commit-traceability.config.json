@@ -1,0 +1,8 @@
+{
+  "guard": "GUARD-24_EVIDENCE_TO_COMMIT_TRACEABILITY",
+  "version": "1.0.0",
+  "mode": "CHECK_ONLY",
+  "policy": {
+    "defaultSeverity": "warning"
+  }
+}

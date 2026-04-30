@@ -10,6 +10,12 @@
 - For Nx plugin best practices, check `node_modules/@nx/<plugin>/PLUGIN.md`. Not all plugins have this file - proceed without it if unavailable.
 - NEVER guess CLI flags - always check nx_docs or `--help` first when unsure
 
+## BTH Token Rename & Alias Policy
+
+- Any rename, refactor, cleanup, or normalization involving tokens containing `Bth`, `bth`, or `BTH` must follow [.github/agents/platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md](.github/agents/platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md).
+- Work file-by-file only; never run blind global replace.
+- Treat public, shared, brand, package, repo, live dependency, or ambiguous tokens as proposal-only unless an explicit compatibility plan exists.
+
 ## Scaffolding & Generators
 
 - For scaffolding tasks (creating apps, libs, project structure, setup), ALWAYS invoke the `nx-generate` skill FIRST before exploring or calling MCP tools
@@ -19,13 +25,5 @@
 - USE for: advanced config options, unfamiliar flags, migration guides, plugin configuration, edge cases
 - DON'T USE for: basic generator syntax (`nx g @nx/react:app`), standard commands, things you already know
 - The `nx-generate` skill handles generator discovery internally - don't call nx_docs just to look up generator syntax
-
-## Repo Chat Shortcuts
-
-- If the user says `ghb`, `غب`, or asks for checkpoint commit + push + new branch from chat, use `tools/scripts/ghb.ps1`.
-- Prefer the repo-local script over ad hoc git command sequences.
-- If the user did not provide a message, infer a short context-appropriate message from the current changes.
-- Do not ask the user to switch to the terminal for this workflow.
-
 
 <!-- nx configuration end-->

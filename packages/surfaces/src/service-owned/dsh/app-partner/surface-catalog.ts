@@ -1,0 +1,20 @@
+export const surfaceCatalog = [
+  'orders-home',
+  'entry',
+  'inventory-management',
+  'bell',
+  'support-directory',
+  'auction-status-update',
+  'chat-read-ack',
+  'chat-send',
+  'doc-upload',
+  'intake-start',
+  'inventory-adjust',
+  'inventory-update',
+  'items-upsert',
+  'quick-reply-config',
+  'quick-reply-settings',
+  'quick-reply-setup',
+  'store-nomination',
+  'amn-control-panel-operations-flow'
+] as const;

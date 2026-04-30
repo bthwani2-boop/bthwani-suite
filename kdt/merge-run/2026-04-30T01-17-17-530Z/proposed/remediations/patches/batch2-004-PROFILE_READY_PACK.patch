@@ -1,0 +1,12 @@
+PROFILE_READY_PACK.md — conservative proposal (non-destructive)
+File: .github/agents/base-profiles/PROFILE_READY_PACK.md
+
+Purpose: Add explicit example-only note.
+
+Proposed diff (apply only after owner review):
+--- a/.github/agents/base-profiles/PROFILE_READY_PACK.md
++++ b/.github/agents/base-profiles/PROFILE_READY_PACK.md
+@@
+ # PROFILE_READY_PACK
+ 
++<!-- NOTE (example-only): May contain token-like strings used purely for documentation examples. Not runtime secrets. -->

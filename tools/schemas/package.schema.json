@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./package.schema.json",
+  "title": "Local Package Schema",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "private": {
+      "type": "boolean"
+    },
+    "type": {
+      "type": "string"
+    }
+  }
+}

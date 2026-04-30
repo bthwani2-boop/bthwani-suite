@@ -1,0 +1,17 @@
+{
+  "name": "website",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir apps/web/website dev"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir apps/web/website build"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+PROFILE_BUILD_SLICE.md — conservative proposal (non-destructive)
+File: .github/agents/base-profiles/PROFILE_BUILD_SLICE.md
+
+Purpose: Add an explicit example-only note near the top of the document so token-like literals are clearly documented as non-secret examples. Non-destructive; for owner review.
+
+Proposed diff (apply only after owner review):
+--- a/.github/agents/base-profiles/PROFILE_BUILD_SLICE.md
++++ b/.github/agents/base-profiles/PROFILE_BUILD_SLICE.md
+@@
+ # PROFILE_BUILD_SLICE
+ 
++<!-- NOTE (example-only): This document may contain BThwani tokens or identifiers used for policy examples. They are not runtime secrets. See kdt/merge-run/.../proposed/PROTECTED_TOKENS_ALLOWLIST.md. -->

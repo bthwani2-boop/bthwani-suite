@@ -1,0 +1,12 @@
+apps/web/control-panel/app/layout.tsx — conservative proposal (non-destructive)
+File: apps/web/control-panel/app/layout.tsx
+
+Purpose: Add a top-line comment documenting that placeholder tokens in layout or UI text are example values and not runtime secrets.
+
+Proposed diff (apply only after owner review):
+--- a/apps/web/control-panel/app/layout.tsx
++++ b/apps/web/control-panel/app/layout.tsx
+@@
+ // Control panel layout
++// NOTE (example-only): UI text and layout placeholders may include governance tokens for documentation; these are not runtime secrets. See PROTECTED_TOKENS_ALLOWLIST.md.
+*** End Patch

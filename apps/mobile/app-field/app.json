@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "app-field",
+    "slug": "app-field",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "sdkVersion": "54.0.0",
+    "extra": {
+      "appKey": "app-field",
+      "appVariant": "development",
+      "eas": {
+        "projectId": "8fcddca1-71ad-4f85-84ff-756d669c3e27"
+      }
+    }
+  }
+}

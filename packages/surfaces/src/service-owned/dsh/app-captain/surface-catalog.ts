@@ -1,0 +1,25 @@
+export const surfaceCatalog = [
+  'entry',
+  'orders-inbox',
+  'order-detail',
+  'orderchat',
+  'bell',
+  'support-directory',
+  'chat-read-ack',
+  'chat-send',
+  'cod-balance',
+  'job-reject',
+  'order-accept',
+  'order-deliver',
+  'order-details',
+  'order-get',
+  'order-pickup',
+  'orders-list',
+  'orders-offers-list',
+  'profile-get',
+  'proof-upload',
+  'tier-evaluate',
+  'tier-info',
+  'amn-control-panel-operations-flow'
+] as const;
+

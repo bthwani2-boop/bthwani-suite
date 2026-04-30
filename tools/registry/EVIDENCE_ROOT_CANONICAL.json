@@ -1,0 +1,11 @@
+{
+  "status": "CANONICAL",
+  "decision": "Evidence root moved from legacy kdt registry runs to tools registry runs",
+  "repo_root": "C:\\bthwani-suite",
+  "old_evidence_root": "kdt/volatile/registry/runs",
+  "new_evidence_root": "tools/registry/runs",
+  "current_run_root": "tools/registry/runs/APPLY_VERIFY_EVIDENCE_ROOT_REBASE-20260422-063422",
+  "timestamp_local": "2026-04-22 06:36:02",
+  "timezone": "Asia/Aden",
+  "rule": "Only tools/registry/runs is canonical for evidence packs going forward"
+}

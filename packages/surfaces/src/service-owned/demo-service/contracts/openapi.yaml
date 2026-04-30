@@ -1,0 +1,25 @@
+openapi: 3.0.0
+info:
+  title: Demo Service API
+  version: 0.1.0
+paths:
+  /demo:
+    get:
+      summary: List demo items
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        title:
+                          type: string

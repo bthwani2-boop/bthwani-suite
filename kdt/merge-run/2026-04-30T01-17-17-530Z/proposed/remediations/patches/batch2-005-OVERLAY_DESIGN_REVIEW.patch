@@ -1,0 +1,12 @@
+OVERLAY_DESIGN_REVIEW.md — conservative proposal (non-destructive)
+File: .github/agents/overlays/OVERLAY_DESIGN_REVIEW.md
+
+Purpose: Add example-only note near top to reduce protected-token noise.
+
+Proposed diff (apply only after owner review):
+--- a/.github/agents/overlays/OVERLAY_DESIGN_REVIEW.md
++++ b/.github/agents/overlays/OVERLAY_DESIGN_REVIEW.md
+@@
+ # OVERLAY_DESIGN_REVIEW
+ 
++<!-- NOTE (example-only): Design overlays may reference BThwani tokens or artifacts for examples. These are illustrative only. -->

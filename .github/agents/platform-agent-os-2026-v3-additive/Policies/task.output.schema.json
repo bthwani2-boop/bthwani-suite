@@ -1,0 +1,15 @@
+{
+  "required": [
+    "routing",
+    "evidence",
+    "score",
+    "decision",
+    "next_action"
+  ],
+  "decision": [
+    "PASS",
+    "FAIL",
+    "BLOCKED"
+  ],
+  "score_rule": "100 only passes"
+}

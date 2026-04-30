@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "owner": "BThwani Governance",
+  "policy_source_rule": "governance is sovereign text; tools/guards is executable enforcement only",
+  "guards": [
+    {
+      "id": "GOV-SOVEREIGNTY",
+      "file": "tools/guards/guard-governance-sovereignty.mjs",
+      "policySource": "governance/00_GOVERNANCE_INDEX.md",
+      "checks": ["canonical governance root", "retired docs/governance references", "guard manifest policy linkage"]
+    },
+    {
+      "id": "UI-ARCH-BOUNDARY",
+      "file": "tools/guards/guard-ui-architecture-boundary.mjs",
+      "policySource": "governance/GUARD_IMPLEMENTATION_MAP.md",
+      "checks": ["Tamagui boundary", "ui-kit public exports", "local design-system import risk"]
+    },
+    {
+      "id": "DESIGN-TOKEN-DRIFT",
+      "file": "tools/guards/guard-design-token-drift.mjs",
+      "policySource": "governance/GUARD_IMPLEMENTATION_MAP.md",
+      "checks": ["random hardcoded color drift outside ui-kit", "brand color normalization risk"]
+    },
+    {
+      "id": "SERVICE-CONTRACT-MATRIX",
+      "file": "tools/guards/guard-service-contract-matrix.mjs",
+      "policySource": "governance/GUARD_IMPLEMENTATION_MAP.md",
+      "checks": ["canonical services", "service blueprint presence", "forbidden standalone services"]
+    },
+    {
+      "id": "API-BINDING-RUNTIME",
+      "file": "tools/guards/guard-api-binding-runtime.mjs",
+      "policySource": "governance/GUARD_IMPLEMENTATION_MAP.md",
+      "checks": ["data-bound screen states", "api/client binding hints", "runtime proof hints"]
+    },
+    {
+      "id": "EVIDENCE-CLOSURE",
+      "file": "tools/guards/guard-evidence-closure.mjs",
+      "policySource": "governance/00_GOVERNANCE_INDEX.md",
+      "checks": ["no closure claims without evidence", "evidence root", "registry runs"]
+    },
+    {
+      "id": "WORKFLOW-CI-PARITY",
+      "file": "tools/guards/guard-workflow-ci-parity.mjs",
+      "policySource": "governance/GUARD_IMPLEMENTATION_MAP.md",
+      "checks": ["governance baseline workflow", "new guard CI workflow", "security/boundary/check parity"]
+    }
+  ]
+}

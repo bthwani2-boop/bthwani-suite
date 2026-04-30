@@ -1,0 +1,13 @@
+bthwani-agent-os-2026-v3-evolution-guard.yml — conservative proposal (non-destructive)
+File: .github/workflows/bthwani-agent-os-2026-v3-evolution-guard.yml
+
+Purpose: Add an annotation comment to the workflow file clarifying allowed token appearance.
+
+Proposed diff (apply only after owner review):
+--- a/.github/workflows/bthwani-agent-os-2026-v3-evolution-guard.yml
++++ b/.github/workflows/bthwani-agent-os-2026-v3-evolution-guard.yml
+@@
+ name: bthwani-agent-os-2026-v3-evolution-guard
+ 
++# NOTE (example-only): Workflow `name` and step identifiers reference governance tokens; these are documentation identifiers, not secrets.
+*** End Patch

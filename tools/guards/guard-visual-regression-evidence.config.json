@@ -1,0 +1,6 @@
+{
+  "version": "1.0.0",
+  "screenshotExtensions": [".png", ".jpg", ".jpeg", ".webp"],
+  "evidenceDirs": ["visual", "visuals", "screenshots"],
+  "checkEvidenceRuns": 40
+}

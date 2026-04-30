@@ -1,0 +1,217 @@
+.opsWorkspace {
+  display: grid;
+  gap: 20px;
+  direction: rtl;
+  text-align: right;
+}
+
+/* ===== Operational Metrics Strip ===== */
+.metricsStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+/* ===== Context Bar ===== */
+.contextBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(10, 47, 92, 0.04) 0%, rgba(255, 80, 13, 0.03) 100%);
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  border-radius: 16px;
+}
+
+.contextBarMain {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.contextBarEyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.contextBarActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ===== Quick Access Tray ===== */
+.quickAccessTray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ===== Workbench Grid ===== */
+.workbenchGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.workbenchCard {
+  min-height: 100%;
+}
+
+.workbenchCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+/* ===== State Container ===== */
+.stateContainer {
+  padding: 40px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+}
+
+/* ===== Reassign Workspace Styles ===== */
+.reassignWorkspace {
+  display: grid;
+  gap: 20px;
+  direction: rtl;
+  text-align: right;
+}
+
+.reassignMetricsStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.reassignContextBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(10, 47, 92, 0.04) 0%, rgba(255, 80, 13, 0.03) 100%);
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  border-radius: 16px;
+}
+
+.reassignContextMain {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.reassignContextActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.reassignCandidatesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.reassignCandidateCard {
+  min-height: 100%;
+}
+
+.reassignCandidateHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.reassignCandidateMeta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+}
+
+.reassignDecisionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.reassignDecisionCard {
+  margin-bottom: 8px;
+}
+
+.reassignDecisionAction {
+  margin-top: 8px;
+}
+
+.partnersDecisionGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: 16px;
+}
+
+.partnersQueueList {
+  display: grid;
+  gap: 12px;
+}
+
+.partnersDecisionPanel {
+  min-height: 100%;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 760px) {
+  .opsWorkspace,
+  .reassignWorkspace {
+    gap: 14px;
+  }
+
+  .metricsStrip,
+  .reassignMetricsStrip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .workbenchGrid,
+  .reassignCandidatesGrid,
+  .reassignDecisionGrid,
+  .partnersDecisionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .contextBar,
+  .reassignContextBar {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .reassignCandidateMeta {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .metricsStrip,
+  .reassignMetricsStrip {
+    grid-template-columns: 1fr;
+  }
+}

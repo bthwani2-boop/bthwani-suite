@@ -1,0 +1,10 @@
+*** BTH_UI_KIT_SUPREME_BLUEPRINT_2026_AR.md — conservative proposal (non-destructive)
+File: packages/ui-kit/docs/BTH_UI_KIT_SUPREME_BLUEPRINT_2026_AR.md
+
+Purpose: Clarify branding vs runtime tokens and recommend placeholder patterns.
+
+Proposed diff:
+--- a/packages/ui-kit/docs/BTH_UI_KIT_SUPREME_BLUEPRINT_2026_AR.md
++++ b/packages/ui-kit/docs/BTH_UI_KIT_SUPREME_BLUEPRINT_2026_AR.md
+@@
+ > NOTE (example-only): This blueprint contains canonical branding identifiers. Do not embed runtime secrets in docs. Replace runtime tokens with placeholders like `__BTHWANI_*__` and manage secrets via vault/CI. Proposed placeholder replacements are in kdt/merge-run/.../proposed/remediations/patches/

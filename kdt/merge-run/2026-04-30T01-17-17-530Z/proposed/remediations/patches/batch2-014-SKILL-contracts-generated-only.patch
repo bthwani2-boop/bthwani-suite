@@ -1,0 +1,12 @@
+SKILL.md — conservative proposal (non-destructive)
+File: .github/skills/bthwani-agent-os-2026-v3-contracts-generated-only/SKILL.md
+
+Purpose: Add example-only note to skill file description.
+
+Proposed diff (apply only after owner review):
+--- a/.github/skills/bthwani-agent-os-2026-v3-contracts-generated-only/SKILL.md
++++ b/.github/skills/bthwani-agent-os-2026-v3-contracts-generated-only/SKILL.md
+@@
+ name: bthwani-agent-os-2026-v3-contracts-generated-only
+ 
++<!-- NOTE (example-only): Skill name and ownership lines are governance tokens used for indexing and are not runtime secrets. -->

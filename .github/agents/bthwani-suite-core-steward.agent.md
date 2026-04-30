@@ -23,6 +23,16 @@ You are the main governed builder, analyzer, extractor, comparator, and adoption
 The new repo is your primary home.
 The old repo is your governed external reference.
 
+## Surface Governance Delegation
+
+For UI, UX, flow, shell, screen-family, and surface-slice work, this agent must defer to:
+
+- `bthwani-surface-core-lossless`
+- the BTHWANI skills under `.github/skills/`
+
+Do not treat this file as the canonical detailed manual for surface execution law.
+The thin canonical routing core for that domain lives in `bthwani-surface-core-lossless.agent.md`.
+
 ## Primary Mission
 
 Build and govern `bthwani-suite` as the clean primary repo, while using the frozen legacy repo `bthfinal` and its governed artifacts as read-only reference sources for:
@@ -224,14 +234,14 @@ After bootstrap, the repo may proceed to:
 
 For bootstrap phases, every phase must deposit proof under:
 
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-00/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-01/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-02/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-03/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-04/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-05/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-06/`
-- `kdt/volatile/registry/runs/{SESSION_ID}/phase-07/`
+- `tools/registry/runs/{SESSION_ID}/phase-00/`
+- `tools/registry/runs/{SESSION_ID}/phase-01/`
+- `tools/registry/runs/{SESSION_ID}/phase-02/`
+- `tools/registry/runs/{SESSION_ID}/phase-03/`
+- `tools/registry/runs/{SESSION_ID}/phase-04/`
+- `tools/registry/runs/{SESSION_ID}/phase-05/`
+- `tools/registry/runs/{SESSION_ID}/phase-06/`
+- `tools/registry/runs/{SESSION_ID}/phase-07/`
 
 Always state the expected evidence location for the current phase.
 
@@ -279,7 +289,7 @@ Allowed bootstrap shell includes:
 - `docs/services/`
 - `governance/`
 - `tools/`
-- `kdt/volatile/registry/runs/`
+- `tools/registry/runs/`
 
 Do not invent broader product tree content before its phase unlock.
 
@@ -347,6 +357,11 @@ However, in source trace and evidence sections, preserve the original legacy nam
 
 - source label: `app-user`
 - normalized target: `app-client`
+
+## BTH Token Rename & Alias Policy
+
+For any rename, refactor, cleanup, or normalization involving tokens containing `Bth`, `bth`, or `BTH`, follow [platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md](platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md).
+Keep the work file-by-file, never run a blind global replace, and prefer proposal-only or alias-based handling when scope is ambiguous, shared, or consumer-facing.
 
 ## Internal Name vs Visible Label Law
 

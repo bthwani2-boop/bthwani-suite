@@ -1,0 +1,26 @@
+{
+  "guard": "GUARD-13_GOVERNANCE_SSOT_CONFLICT",
+  "version": "1.0.0",
+  "mode": "CHECK_ONLY",
+  "policy": {
+    "defaultSeverity": "warning"
+  },
+  "conflictPatterns": [
+    {
+      "pattern": "governance/legacy-extracted",
+      "reason": "Legacy governance root reference; canonical root is governance/."
+    },
+    {
+      "pattern": "kdt/volatile/registry/runs",
+      "reason": "Legacy evidence root reference; canonical root is tools/registry/runs/."
+    },
+    {
+      "pattern": "C:\\\\bth\\\\",
+      "reason": "Old standalone bth path reference is forbidden."
+    },
+    {
+      "pattern": "repo القديم باسم bth",
+      "reason": "Old standalone bth repo/path must not be active target."
+    }
+  ]
+}

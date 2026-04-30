@@ -1,0 +1,12 @@
+OVERLAY_VIOLATION_AUDIT.md — conservative proposal (non-destructive)
+File: .github/agents/overlays/OVERLAY_VIOLATION_AUDIT.md
+
+Purpose: Add example-only note.
+
+Proposed diff (apply only after owner review):
+--- a/.github/agents/overlays/OVERLAY_VIOLATION_AUDIT.md
++++ b/.github/agents/overlays/OVERLAY_VIOLATION_AUDIT.md
+@@
+ # OVERLAY_VIOLATION_AUDIT
+ 
++<!-- NOTE (example-only): Audit examples may contain BThwani tokens used solely for illustration. -->

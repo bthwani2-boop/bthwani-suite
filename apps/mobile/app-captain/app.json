@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "app-captain",
+    "slug": "app-captain",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "sdkVersion": "54.0.0",
+    "extra": {
+      "appKey": "app-captain",
+      "appVariant": "development",
+      "eas": {
+        "projectId": "7efa39e1-895f-44d7-a597-d613c79297b6"
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "version": "1.0.0",
+  "lawPath": "governance/TAMAGUI_INTEGRATION_LAW.md",
+  "allowedBuildFileName": "tamagui.build.ts"
+}

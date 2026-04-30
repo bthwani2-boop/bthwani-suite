@@ -1,0 +1,13 @@
+# Agent Router Matrix
+
+| Task Type | Primary | Required |
+|---|---|---|
+| UX_UI | `ux-ui-master` | `brand-identity-design-system`, `ui-kit-quality-amplifier`, `surfaces` |
+| MOBILE | `mobile-apps` | `runtime-local-stack`, `qa-verification` |
+| WEB | `web-apps` | `security-privacy`, `qa-verification` |
+| BACKEND | `backend-services` | `contracts-openapi`, `data-model`, `security-privacy` |
+| CONTRACTS | `contracts-openapi` | `api-types-clients`, `qa-verification` |
+| WLT_FINANCE | `wlt-finance` | `security-privacy`, `governance-ssot` |
+| RUNTIME | `runtime-local-stack` | `devops-ci`, `qa-verification` |
+| RELEASE | `release-readiness` | `qa-verification`, `devops-ci`, `observability` |
+| DOCS | `documentation-handoff` | `governance-ssot` |

@@ -1,0 +1,8 @@
+{
+  "guard": "GUARD-19_TYPESCRIPT_STRICTNESS",
+  "version": "1.0.0",
+  "mode": "CHECK_ONLY",
+  "policy": {
+    "defaultSeverity": "warning"
+  }
+}

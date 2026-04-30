@@ -1,0 +1,22 @@
+*** apps/mobile/app-field/package.json — proposed guidance (non-destructive)
+File: apps/mobile/app-field/package.json
+
+Purpose: package.json is a manifest and should not contain secrets. This proposal documents that the package.json is allowed but suggests using `process.env` placeholders in example scripts where appropriate.
+
+Proposed guidance (non-destructive):
+- Do not embed tokens or secrets in `package.json`.
+- For example scripts that require runtime tokens, set them via environment variables, e.g. `TOKEN=$TOKEN pnpm start` or load via config at runtime.
+
+Suggested patch (illustrative only — do not apply without owner approval):
+--- a/apps/mobile/app-field/package.json
++++ b/apps/mobile/app-field/package.json
+@@
+   "scripts": {
+-    "dev": "expo start --dev-client --clear",
++    "dev": "TOKEN=__BTHWANI_PLACEHOLDER__ expo start --dev-client --clear",
+     "go": "expo start --go --clear",
+     "android": "expo run:android",
+     "config": "expo config --json"
+   }
+
+Note: The illustrative change above uses `__BTHWANI_PLACEHOLDER__` to show recommended placeholder usage; owners should replace with proper env-var usage instead of hard-coding placeholders in manifests.

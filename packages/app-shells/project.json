@@ -1,0 +1,7 @@
+{
+  "name": "app-shells",
+  "root": "packages/app-shells",
+  "sourceRoot": "packages/app-shells",
+  "projectType": "library",
+  "targets": {}
+}

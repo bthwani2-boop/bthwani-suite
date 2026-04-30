@@ -1,0 +1,12 @@
+VISUAL_IDENTITY_GUARD.md — conservative proposal (non-destructive)
+File: .github/agents/platform-agent-os-2026-v3-additive/UiKitEvolution/VISUAL_IDENTITY_GUARD.md
+
+Purpose: Add example-only clarification in identity guard text to reduce token noise.
+
+Proposed diff (apply only after owner review):
+--- a/.github/agents/platform-agent-os-2026-v3-additive/UiKitEvolution/VISUAL_IDENTITY_GUARD.md
++++ b/.github/agents/platform-agent-os-2026-v3-additive/UiKitEvolution/VISUAL_IDENTITY_GUARD.md
+@@
+ "BThwani identity is premium, modern, clean, fast, trustworthy, clear, and simple. Core color direction: white base, orange primary action/energy, dark navy/blue trust/depth. Helper colors only for functional states. Exact hex values are TBD until verified from source evidence."
+ 
++<!-- NOTE (example-only): Visual identity descriptors are documentation artifacts and not runtime tokens. -->

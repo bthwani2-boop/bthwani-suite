@@ -1,0 +1,57 @@
+name: Guards CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches:
+      - main
+      - 'release/**'
+  workflow_dispatch: {}
+
+jobs:
+  guards:
+    name: Run repository guards
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run fast precommit guards
+        run: pnpm run precommit:fast
+
+      - name: Run core guards
+        run: |
+          pnpm run guard:protected-tokens || true
+          pnpm run guard:tamagui-law || true
+          pnpm run guard:tamagui-import-boundary || true
+
+      - name: Run additional guards (best-effort)
+        run: |
+          pnpm run guard:secret-scan || true
+          pnpm run guard:visual || true
+          pnpm run guard:runtime-smoke || true
+
+      - name: Upload guard evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: guard-evidence
+          path: tools/registry/runs/**
+          retention-days: 7

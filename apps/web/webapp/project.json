@@ -1,0 +1,17 @@
+{
+  "name": "webapp",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir apps/web/webapp dev"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir apps/web/webapp build"
+      }
+    }
+  }
+}

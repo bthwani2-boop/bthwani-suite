@@ -1,0 +1,12 @@
+PROFILE_DONOR_TRACE_RECONSTRUCT.md — conservative proposal (non-destructive)
+File: .github/agents/base-profiles/PROFILE_DONOR_TRACE_RECONSTRUCT.md
+
+Purpose: Add an explicit example-only note near the top of the document so token-like literals are clearly documented as non-secret examples. Non-destructive; for owner review.
+
+Proposed diff (apply only after owner review):
+--- a/.github/agents/base-profiles/PROFILE_DONOR_TRACE_RECONSTRUCT.md
++++ b/.github/agents/base-profiles/PROFILE_DONOR_TRACE_RECONSTRUCT.md
+@@
+ # PROFILE_DONOR_TRACE_RECONSTRUCT
+ 
++<!-- NOTE (example-only): Document may show ownership tokens or identifiers for tracing examples. They are illustrative; not runtime secrets. See PROTECTED_TOKENS_ALLOWLIST.md for accepted tokens. -->

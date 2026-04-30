@@ -1,0 +1,17 @@
+{
+  "name": "control-panel",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir apps/web/control-panel dev"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir apps/web/control-panel build"
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+---
+description: Service-owned SERVICE_BLUEPRINT living SSoT guard
+globs:
+  - packages/surfaces/src/service-owned/**
+  - tools/scripts/*SERVICE_BLUEPRINT*
+alwaysApply: false
+---
+
+# Service-Owned Blueprint Living SSoT Guard
+
+For any service-owned work, first read the service file:
+
+packages/surfaces/src/service-owned/<service>/SERVICE_BLUEPRINT.md
+
+## Mandatory Rules
+
+1. Each service must own a compact SERVICE_BLUEPRINT.md.
+2. Do not add noisy generated screen catalogs.
+3. Do not mark UI/UX/Flow, Binding, Integration, API, Runtime Vars, Guards, QA, or full closure as VERIFIED/CLOSED unless the service blueprint is updated with evidence.
+4. Any service evidence must be written under kdt/volatile/registry/runs/{SESSION_ID}.
+5. Unknown phase fields must remain TBD.
+6. Full service closure must remain NOT CLOSED until all required phases pass evidence gates.
+
+## Current Baseline
+
+- DSH has a filled app-client section.
+- Other service blueprints may start as TEMPLATE / TBD only.
+- Future service work must progressively update the correct service blueprint.
+

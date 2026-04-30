@@ -1,0 +1,13 @@
+{
+  "$schema": "../../tools/schemas/tsconfig.schema.json",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "ignoreDeprecations": "5.0"
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts"
+  ]
+}
