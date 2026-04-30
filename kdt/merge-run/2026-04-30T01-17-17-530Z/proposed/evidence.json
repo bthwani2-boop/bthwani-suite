@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-04-30T04:30:00.000Z",
+  "branch": "governance/demo-service-pilot",
+  "gitStatus": [
+    " M .gitignore",
+    "?? governance/EVIDENCE_PACK_TEMPLATE.md",
+    "?? governance/GOVERNANCE_CANONICAL.md",
+    "?? tools/gov-dedup.js",
+    "?? tools/guards/config-ui-kit-deep-imports.json"
+  ],
+  "guards": [
+    {
+      "id": "GUARD_BTHWANI_PROTECTED_TOKENS",
+      "decision": "PROTECTED_TOKENS_WARNINGS",
+      "evidenceRoot": "C:\\bthwani-suite\\tools\\registry\\runs\\GUARD_BTHWANI_PROTECTED_TOKENS-20260430-013027",
+      "handoffZip": "C:\\bthwani-suite\\tools\\registry\\runs\\GUARD_BTHWANI_PROTECTED_TOKENS-20260430-013027\\_HANDOFF.zip",
+      "findings": 945,
+      "errors": 0,
+      "warnings": 945,
+      "note": "Large set of allowed protected-token usages detected; requires owner review and accept-listing if desired."
+    },
+    {
+      "id": "GUARD_TAMAGUI_GOVERNANCE_LAW",
+      "decision": "PASS_TAMAGUI_LAW",
+      "evidenceRoot": "C:\\bthwani-suite\\tools\\registry\\runs\\GUARD_TAMAGUI_GOVERNANCE_LAW-20260430-013027",
+      "handoffZip": "C:\\bthwani-suite\\tools\\registry\\runs\\GUARD_TAMAGUI_GOVERNANCE_LAW-20260430-013027\\_HANDOFF.zip",
+      "findings": 0,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "id": "GUARD_TAMAGUI_IMPORT_BOUNDARY",
+      "decision": "TAMAGUI_IMPORT_WARNINGS",
+      "evidenceRoot": "C:\\bthwani-suite\\tools\\registry\\runs\\GUARD_TAMAGUI_IMPORT_BOUNDARY-20260430-013027",
+      "handoffZip": "C:\\bthwani-suite\\tools\\registry\\runs\\GUARD_TAMAGUI_IMPORT_BOUNDARY-20260430-013027\\_HANDOFF.zip",
+      "findings": 4,
+      "errors": 0,
+      "warnings": 4
+    },
+    {
+      "id": "GUARD_11_SECRET_SCAN",
+      "decision": "SECRET_WARNINGS",
+      "evidenceRoot": "C:\\bthwani-suite\\tools\\registry\\runs\\GUARD_11_SECRET_SCAN-20260430-013027",
+      "handoffZip": "C:\\bthwani-suite\\tools\\registry\\runs\\GUARD_11_SECRET_SCAN-20260430-013027\\_HANDOFF.zip",
+      "findings": 2,
+      "errors": 0,
+      "warnings": 2,
+      "note": "Two possible password-like patterns flagged in .agents skill docs; recommend manual review and redaction if they are real secrets."
+    },
+    {
+      "id": "GUARD_09_RUNTIME_SMOKE_TEST",
+      "decision": "PASS_RUNTIME_SMOKE",
+      "evidenceRoot": "C:\\bthwani-suite\\tools\\registry\\runs\\GUARD_09_RUNTIME_SMOKE_TEST-20260430-013028",
+      "handoffZip": "C:\\bthwani-suite\\tools\\registry\\runs\\GUARD_09_RUNTIME_SMOKE_TEST-20260430-013028\\_HANDOFF.zip",
+      "findings": 0,
+      "errors": 0,
+      "warnings": 0,
+      "note": "Runtime smoke evidence now present (auto-run logs + evidence run)."
+    }
+  ],
+  "manifest": "proposed/manifest.json",
+  "proposedCanonicalFolder": "proposed/canonical/",
+  "notes": [
+    "No governance/ files modified — this is a review-only package.",
+    "Runtime smoke guard has passed after attaching an evidence run, so that specific blocker is cleared.",
+    "Remaining warnings: Protected-token occurrences (945 warnings) and secret-scan (2 warnings). These require manual triage or safe allow-listing before non-dry-run apply to meet a zero-warning policy.",
+    "Recommended next steps: (1) review and accept or redact protected-token findings; (2) inspect and remove/rotate any real secrets flagged by secret-scan; (3) re-run guards and refresh this evidence summary."
+  ]
+}

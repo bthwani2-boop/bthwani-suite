@@ -30,6 +30,8 @@ Thumbs.db
 docs/services/surfaces-legacy-trash/
 # Local registry run artifacts
 tools/registry/runs/
+# Local analysis outputs — keep local only (do not push)
+tools/analysis/
 # Local-only scripts
 # tools/scripts/ # ENABLED_FOR_GOVERNANCE_SCRIPT_TRACKING
 # Local-only media fixture assets
