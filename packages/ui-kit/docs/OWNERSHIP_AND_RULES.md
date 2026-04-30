@@ -85,7 +85,7 @@ Screens must not own:
 
 No screen is acceptable unless it is:
 
-- measurably aligned with BTH identity
+- measurably aligned with bthwani identity
 - complete in states and recovery behavior
 - correct in RTL/LTR and ar/en usage
 - accessible by default

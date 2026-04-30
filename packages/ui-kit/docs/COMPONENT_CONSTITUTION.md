@@ -12,7 +12,7 @@ This constitution governs which component families may exist inside `@bthwani/ui
 
 - every shared export must be reachable from `src/index.ts`
 - deep imports into `@bthwani/ui-kit/*` internals are forbidden for consumers
-- public names must stay semantic and stable, using the `Bth*` prefix for public component families
+- public names must stay semantic and stable, using the `bthwani*` prefix for public component families
 - breaking public API changes require explicit review and a migration path
 
 ## Admission Rules
@@ -58,3 +58,4 @@ Current lawful classes are:
 - data display families
 
 Screen-pattern families are provisional until pattern promotion evidence passes the contract.
+

@@ -1,70 +1,101 @@
-# UI Kit, Tamagui, Brand, RTL
+# UI Kit, Brand, Tamagui, RTL
 
-## Authority
+**Status:** Canonical Governance Payload v2
+**Owner:** `Design System Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** 07_UI_KIT_AUTHORITY_CONTRACT, UI_UX_GUARDRAILS, DIRECTION_I18N_OWNERSHIP
 
-`@bthwani/ui-kit` is the single design authority.
+## Non-negotiable reading law
 
-## Tamagui rule
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
 
-Tamagui may be used internally inside `@bthwani/ui-kit` only. Screens, surfaces, and apps must consume public UI-kit exports.
 
-## Brand tokens
+## Design authority
 
-| Token | Value |
-|---|---|
-| deepBlue | `#0A2F5C` |
-| orange | `#FF500D` |
-| white | `#FFFFFF` |
+`@bthwani/ui-kit` is the only central design authority. Screens, surfaces, and apps consume public exports only. Tamagui may be used internally inside ui-kit, not directly in apps/surfaces.
 
-Support colors such as success/warning/error are allowed only through central tokens.
+## Brand DNA
 
-## Premium UX law
+| Token | Value | Use |
+|---|---|---|
+| deepBlue | `#0A2F5C` | trust, headers, primary structure |
+| orange | `#FF500D` | primary actions, brand emphasis |
+| white | `#FFFFFF` | clean surfaces, secondary headers |
 
-BThwani UI must be:
-
-- premium 2026
-- RTL-correct
-- low-noise
-- cohesive
-- practical
-- elegant
-- fast to understand
-- easy to operate
+The visual system must be premium, modern, clean, low-noise, practical, and cohesive. Random blues, grays, gradients, or one-off palettes are forbidden unless tokenized centrally.
 
 ## RTL contract
 
-Arabic/RTL UI must enforce:
+For Arabic UI:
 
-- text aligned right unless intentionally centered for banners/heroes
-- icon + text clustered on the right side for list rows
-- chevron/action placed on the opposite side
-- no misuse of `space-between` that separates icon from text
-- no clipped tabs or filters
-- no mixed Arabic/English labels without reason
-- safe-area respected
-- overflow/clipping checked
-- row hierarchy readable at mobile width
+- text aligns right unless intentionally centered for hero/headline,
+- icon + label are in the same right-side cluster in list rows,
+- chevron/action appears on the opposite side,
+- do not use `space-between` in a way that separates icon from its label,
+- no mixed Arabic/English ordering unless content requires it,
+- horizontal filters must start from the correct RTL edge,
+- ticker/carousel direction must be explicitly defined,
+- safe-area and clipping must be tested.
 
 ## Header law
 
-- Orange primary header: top-level/high-level screens.
-- White secondary header: sub-pages/sub-screens.
-- Header variants must be centralized in UI-kit.
-- Apps/surfaces must not invent parallel header models.
+| Header | Use | Rule |
+|---|---|---|
+| Primary orange header | top-level/high identity surfaces | compact, brand-owned, not over-tall |
+| Secondary white header | sub-pages/sub-screens | consistent across mobile apps |
+| Control-panel topbar | web admin | dense, functional, not mobile-like |
 
-## Component state law
+Headers must be centralized through ui-kit/surface shell patterns, not rewritten per screen.
 
-Reusable components must support:
+## Component ownership
 
-- loading
-- empty
-- error
-- success
-- disabled
-- selected/active
-- focus/press/hover where platform supports it
-- offline when relevant
+Reusable components must live in ui-kit:
 
-## Visual evidence
+```text
+Button
+Card
+Field
+Header
+List
+Media
+Modal/Sheet
+State
+Tabs/Segmented controls
+Banner/Ticker
+```
 
-UI changes require screenshots or visual proof. Without visual evidence, final decision must be `NEEDS_VISUAL_EVIDENCE`.
+Service-specific composition can live in surfaces but must use ui-kit primitives.
+
+## Visual evidence gate
+
+Any UI change must include:
+
+- before screenshot when available,
+- after screenshot,
+- device/viewport,
+- RTL/language note,
+- clipping/overflow check,
+- spacing/alignment check,
+- primary CTA visibility,
+- no unrelated visual drift,
+- diff evidence.
+
+## Forbidden UI patterns
+
+- local design system inside app/surface,
+- direct Tamagui import outside ui-kit,
+- hardcoded random color,
+- centered Arabic list text without reason,
+- oversized headers without functional value,
+- long explanatory blocks replacing smart UI,
+- duplicated banners/cards per app.
+
+## Closure checklist for this file
+
+- [ ] Every rule above has exactly one owner file.
+- [ ] Any derived script/guard points back to this file and not to legacy.
+- [ ] Evidence exists for any claim of compliance.
+- [ ] No local app/surface/package silently overrides this file.
+- [ ] Any exception is documented with owner, expiry, risk, and rollback.

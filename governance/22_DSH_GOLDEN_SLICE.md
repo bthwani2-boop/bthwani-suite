@@ -1,45 +1,93 @@
 # DSH Golden Slice
 
+**Status:** Canonical Governance Payload v2
+**Owner:** `DSH Service Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** 11_DSH_GOLDEN_SLICE_PROTOCOL, BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2
+
+## Non-negotiable reading law
+
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
+
+
 ## Purpose
 
-DSH is the first official golden vertical slice used to prove the platform closure model.
+DSH is the first official golden slice. It must prove the governance model works across all relevant surfaces before the platform claims maturity.
 
-## Required DSH surfaces
+## DSH actors
 
-- app-client
-- app-partner
-- app-captain
-- app-field
-- control-panel
+| Actor | Surface | Core goals |
+|---|---|---|
+| Client | app-client | discover store, cart, order, pay, track, rate |
+| Partner | app-partner | receive/accept/prepare order, manage catalog/ops |
+| Captain | app-captain | accept assignment, pickup, deliver, prove completion |
+| Field | app-field | onboard/verify partner and operational readiness |
+| Operator | control-panel | monitor, intervene, configure, audit |
+| Finance | control-panel/WLT | settle, refund, reconcile via WLT |
 
-## Golden path
+## DSH flow closure
 
-1. customer opens client surface
-2. customer discovers categories/store/products
-3. customer builds basket
-4. customer confirms order/payment decision
-5. partner receives/manages order
-6. captain/field flow participates where applicable
-7. control panel observes/supports
-8. WLT records money path when money exists
-9. runtime/API evidence proves the flow
-10. traceability row maps every artifact
+Minimum flows:
 
-## DSH closure matrix
+```text
+store discovery
+store details
+cart
+checkout
+payment decision via WLT
+order creation
+partner acceptance/preparation
+captain assignment
+pickup
+delivery
+completion/rating
+refund/issue path
+ops intervention
+```
 
-| Area | Required proof |
-|---|---|
-| UI/UX | screenshots, state coverage, RTL |
-| Flow | order lifecycle states |
-| API | contracts/request-response |
-| Binding | typed client/surface integration |
-| Runtime | logs/smoke test |
-| Partner ops | acceptance/rejection/prep/status |
-| Captain/field | assignment/execution if applicable |
-| Finance | WLT fee/commission/refund/settlement proof |
-| Control panel | admin visibility/action proof |
-| Evidence | evidence pack + traceability |
+## DSH must not own
 
-## Do not start broad service closure before DSH golden path
+- wallet balance,
+- ledger mutation,
+- final settlement,
+- refund finalization,
+- financial reconciliation.
 
-Other services can progress, but DSH is the primary proof pattern until its closure gates are stable.
+These belong to WLT.
+
+## DSH evidence matrices
+
+### Surface matrix
+
+```text
+surface | screen | route | state coverage | screenshot | API binding | status
+```
+
+### Order state matrix
+
+```text
+state | actor who sees it | next actions | failure state | evidence
+```
+
+### Control-panel operations
+
+```text
+operation | permission | side effect | audit | rollback | evidence
+```
+
+## Golden slice acceptance
+
+DSH is not closed until:
+
+- all required surfaces are mapped,
+- WLT financial boundary is respected,
+- UI uses ui-kit,
+- API binding is typed,
+- runtime evidence exists,
+- control-panel ops are defined,
+- warnings are classified,
+- evidence pack is complete.
+
+{standard_footer()}

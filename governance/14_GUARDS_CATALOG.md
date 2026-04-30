@@ -1,57 +1,84 @@
 # Guards Catalog
 
-## Canonical guard records
+**Status:** Canonical Governance Payload v2
+**Owner:** `Guard Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** GOVERNANCE_GUARD_CATALOG, GUARDRAILS_INDEX, GUARD_* files, WARNING_CLASSIFICATION_POLICY
 
-| ID | Domain | Severity | Purpose | Evidence |
-|---|---|---|---|---|
-| `GUARD_01_SCOPE_AND_PATH_LOCK` | `scope` | `blocking` | ensures changes stay within approved paths | changed file list, allow/deny match |
-| `GUARD_02_SHARED_FOLDER_OWNERSHIP` | `architecture` | `blocking` | prevents shared folder ownership drift | shared path scan |
-| `GUARD_03_UNUSED_DEAD_ORPHAN_CODE` | `cleanup` | `report-only` | detects dead/orphan code candidates | reference scan |
-| `GUARD_04_PUBLIC_EXPORT_BARREL_CONTRACT` | `packages` | `blocking` | checks public exports/barrels | export scan |
-| `GUARD_05_PACKAGE_INTERNAL_DEEP_IMPORT` | `packages` | `blocking` | detects forbidden deep imports | import scan |
-| `GUARD_06_LEGACY_FORBIDDEN_NAMING` | `naming` | `blocking` | detects standalone legacy names except valid bthwani terms | token scan |
-| `GUARD_07_UIKIT_TAMAGUI_BOUNDARY` | `ui` | `blocking` | ensures Tamagui stays inside ui-kit | import scan |
-| `GUARD_08_RUNTIME_ROUTE_ENTRYPOINT_PROTECTION` | `runtime` | `blocking` | protects routes/entrypoints | route scan |
-| `GUARD_09_RTL_I18N` | `ui` | `report-only` | detects RTL/i18n risks | screen scan |
-| `GUARD_10_EVIDENCE_REGISTRY_RUNS_HYGIENE` | `evidence` | `blocking` | checks registry run artifacts | evidence folder scan |
-| `GUARD_11_EMPTY_PLACEHOLDER_ZERO_BYTE_FILES` | `cleanup` | `blocking` | rejects empty placeholders | file size scan |
-| `GUARD_12_API_BINDING_RUNTIME` | `api` | `blocking` | checks contract/binding/runtime evidence | contract/runtime scan |
-| `GUARD_13_GOVERNANCE_SSOT_CONFLICT` | `governance` | `blocking` | detects duplicate/conflicting governance truth | docs scan |
-| `GUARD_14_AGENT_SKILL_REGISTRY_OWNERSHIP` | `agents` | `report-only` | checks agents/skills registry ownership | registry scan |
-| `GUARD_15_CI_WORKFLOW_COVERAGE` | `ci` | `blocking` | checks expected CI workflow coverage | workflow scan |
-| `GUARD_16_PACKAGE_EXPORTS_COMPLETENESS` | `packages` | `blocking` | checks export completeness | package export scan |
-| `GUARD_17_SERVICE_BLUEPRINT_COVERAGE` | `services` | `report-only` | checks service blueprint presence | service scan |
-| `GUARD_18_SURFACE_SCREEN_OWNERSHIP` | `surfaces` | `blocking` | checks screen ownership placement | surface scan |
-| `GUARD_19_TYPESCRIPT_STRICTNESS` | `typescript` | `blocking` | checks TS strictness/no unsafe suppressions | tsc + grep |
-| `GUARD_20_DESIGN_TOKEN_BRAND_DRIFT` | `ui` | `report-only` | detects random colors/token drift | style scan |
-| `GUARD_21_ROUTE_SCREEN_FILE_STRUCTURE` | `routes` | `report-only` | checks route/screen file model | route scan |
-| `GUARD_22_TEST_SMOKE_COVERAGE_PRESENCE` | `testing` | `report-only` | detects missing smoke tests | test scan |
-| `GUARD_23_SCRIPT_SAFETY` | `scripts` | `blocking` | checks script safety requirements | script scan |
-| `GUARD_24_EVIDENCE_TO_COMMIT_TRACEABILITY` | `evidence` | `blocking` | maps evidence to commit/branch | evidence/commit scan |
+## Non-negotiable reading law
 
-## ID conflict resolution
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
 
-Legacy guard IDs that conflict with this catalog are preserved in `99_LEGACY_MERGE_LEDGER.md` as source evidence but are not canonical IDs.
 
-Specifically, legacy `GUARD_12_DUPLICATE_DOCS_AGENT_SKILL_CONTENT` is superseded by `GUARD_13_GOVERNANCE_SSOT_CONFLICT` plus docs/reference scans. Canonical `GUARD_12` is `GUARD_12_API_BINDING_RUNTIME`.
+## Guard record schema
 
-## Guard record requirements
+Every guard must have:
 
-Every implemented guard must define:
+```text
+id | domain | purpose | severity | mode | owner file | evidence | remediation | false-positive policy
+```
 
-- ID
-- domain
-- purpose
-- severity
-- mode: blocking/report-only
-- input paths
-- excluded paths
-- output files
-- false-positive handling
-- remediation
-- owner
-- evidence schema
+## Canonical guard catalog
 
-## Guard acceptance
+| ID | Domain | Purpose | Default severity | Acceptance evidence | Owner |
+| --- | --- | --- | --- | --- | --- |
+| GUARD_01_GOVERNANCE_ROOT | governance | active governance roots and legacy quarantine | BLOCKING | No parallel policy roots; legacy archive only | 00,03,99 |
+| GUARD_02_SHARED_FOLDER_OWNERSHIP | architecture | shared folder ownership | BLOCKING | No ambiguous shared implementation buckets | 04 |
+| GUARD_03_PACKAGE_BOUNDARY | packages | package import/export boundaries | BLOCKING | No deep imports, no direct Tamagui outside ui-kit | 05,08 |
+| GUARD_04_APPS_SHELL_ONLY | apps | apps remain shells | BLOCKING | No service logic/design system in apps | 06 |
+| GUARD_05_SURFACE_SERVICE_OWNERSHIP | surfaces | service-owned vs surface-owned correctness | BLOCKING | Feature placed in correct lane | 04,07 |
+| GUARD_06_UI_KIT_AUTHORITY | ui | ui-kit central authority | BLOCKING | No local duplicate UI systems | 08 |
+| GUARD_07_RTL_BRAND_VISUAL | ui | RTL/brand visual checks | REPORT/BLOCK | Screenshots prove RTL and brand compliance | 08 |
+| GUARD_08_SCREEN_STATE_MODEL | ui/flow | loading/empty/error/success/offline/disabled | BLOCKING when flow closure | State model documented | 04,08,10 |
+| GUARD_09_API_CONTRACT | api | OpenAPI and contract presence | BLOCKING for public APIs | Public endpoint has contract | 09 |
+| GUARD_10_API_BINDING_RUNTIME | runtime | contract→client→surface→runtime chain | BLOCKING for runtime closure | Binding matrix and runtime evidence | 09,10 |
+| GUARD_11_WLT_FINANCIAL_OWNER | finance | WLT-only money truth | BLOCKING | No money mutation outside WLT | 02,07,20 |
+| GUARD_12_VAR_POLICY | runtime policy | mutable VAR/provider control | BLOCKING for mutable policy | No hardcoded mutable operational policy | 20 |
+| GUARD_13_EVIDENCE_PACK | evidence | evidence pack shape | BLOCKING | Required evidence files and _HANDOFF.zip | 11 |
+| GUARD_14_BRANCH_CHECKPOINT | git | branch/checkpoint readiness | BLOCKING | branch reality captured | 18 |
+| GUARD_15_SECURITY_SECRETS | security | secrets/PII/auth/security | BLOCKING | No secrets; security evidence | 16 |
+| GUARD_16_TESTING_READINESS | quality | testing and readiness | BLOCKING when applicable | Type/test/build/runtime evidence | 12 |
+| GUARD_17_CI_GATES | ci | CI blocking/report-only correctness | BLOCKING | No unclassified failing gates | 13,23 |
+| GUARD_18_AGENT_EXECUTION | ai | AI/Copilot/script scope | BLOCKING for AI changes | Narrow scope and evidence | 15 |
+| GUARD_19_CLEANUP_DEPRECATION | cleanup | delete/archive/deprecation safety | BLOCKING | Inventory/reference/rollback | 17 |
+| GUARD_20_CONTROL_PANEL | control-panel | web-first control room model | REPORT/BLOCK | No route/page sprawl; ops tied to services | 19 |
+| GUARD_21_OBSERVABILITY | runtime | logs/metrics/errors/health | BLOCKING for prod readiness | Observable runtime evidence | 21 |
+| GUARD_22_DSH_GOLDEN_SLICE | dsh | DSH end-to-end closure | BLOCKING for DSH closure | All surfaces and states evidenced | 22 |
+| GUARD_23_WARNING_CLASSIFICATION | warnings | warnings and false positives | BLOCKING if unclassified | Warning owner/severity/expiry | 23 |
+| GUARD_24_TRACEABILITY_ROADMAP | roadmap | traceability and phase discipline | REPORT/BLOCK | No task without phase/evidence | 24 |
+| GUARD_25_SERVICE_BLUEPRINT | services | blueprint and operation catalog | BLOCKING for service closure | Blueprint exists and complete | 25 |
 
-A guard is accepted only when it can run repeatedly, produce deterministic output, and be traced to a governance source.
+## Guard severity
+
+| Severity | Meaning |
+|---|---|
+| BLOCKING | Must stop merge/closure until fixed or explicitly overridden. |
+| REPORT | Does not block but must be documented. |
+| INFO | Diagnostic only. |
+
+## Guard output schema
+
+```json
+{
+  "guardId": "GUARD_13_EVIDENCE_PACK",
+  "mode": "CHECK",
+  "status": "PASS | WARN | FAIL | INFO",
+  "severity": "BLOCKING | REPORT | INFO",
+  "ownerFile": "governance/11_EVIDENCE_AND_TRACEABILITY.md",
+  "findings": [],
+  "evidenceFiles": [],
+  "remediation": []
+}
+```
+
+## ID collision rule
+
+Guard IDs must never be reused for a different meaning. If a legacy file used a conflicting ID, the new catalog wins and the legacy conflict is recorded in `99_LEGACY_MERGE_LEDGER.md`.
+
+## Guard implementation rule
+
+Guard scripts live under `tools/guards` or equivalent implementation roots. They are derived from this catalog. Changing a guard behavior requires updating this file or the owner file first.
+
+{standard_footer()}

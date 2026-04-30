@@ -1,65 +1,74 @@
-# Apps and App-Shells Contract
+# Apps and Shells
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `App Shell Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** 04_APPS_SHELL_ONLY_CONTRACT, APPROVED_SURFACE_NAMING, platform app roots
 
-Apps are deployable shells. App-shells are reusable composition frames. Neither should own reusable business logic or design-system authority.
+## Non-negotiable reading law
 
-## App responsibilities
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
 
-Apps may own:
 
-- app bootstrap
-- runtime entrypoint
-- platform-specific wiring
-- navigation registration
-- environment selection
-- dev-client integration
-- app-specific configuration
-- final shell composition
+## App shell principle
 
-Apps must not own:
+Apps are runtime shells. They should mount navigation, providers, platform runtime, and surface entrypoints. They must not duplicate reusable design systems, service-owned business flows, or API contract truth.
 
-- duplicated UI system
-- service-specific business rules
-- generated contract truth
-- cross-service financial truth
-- shared workflow logic that belongs in `packages/surfaces`
+## Canonical app roots
 
-## App-shell responsibilities
+| App root | Surface | Allowed ownership | Forbidden ownership |
+| --- | --- | --- | --- |
+| apps/mobile/app-client | app-client | mobile bootstrap, navigation, permissions, surface mount | service logic, local UI system |
+| apps/mobile/app-partner | app-partner | partner shell, navigation, runtime glue | DSH/WLT ownership, local brand components |
+| apps/mobile/app-captain | app-captain | captain shell, device permissions, route mount | order state machine outside surfaces |
+| apps/mobile/app-field | app-field | field shell and route mount | partner/field business logic duplication |
+| apps/web/control-panel | control-panel | Next shell, admin layout mount, auth shell | domain service ownership |
+| apps/web/webapp | webapp | web runtime shell | control-panel operations |
+| apps/web/website | website | marketing shell | live service operations |
 
-`packages/app-shells` may own:
+## Shell-only allowed work
 
-- shared shell frame
-- providers composition
-- layout frame
-- navigation adapters
-- route metadata adapters
-- safe-area/top-level shell concerns
+- configure app providers,
+- set platform navigation,
+- wire public surface exports,
+- handle platform-specific permissions,
+- handle environment bootstrap,
+- delegate UI to `@bthwani/ui-kit` and surfaces,
+- delegate API to clients/contracts.
 
-It must not own:
+## Shell forbidden work
 
-- DSH/WLT/KNZ/etc service internals
-- per-service screen state machines
-- API endpoint definitions
-- money ledger truth
+- direct Tamagui usage outside `@bthwani/ui-kit`,
+- local Header/Card/Button systems,
+- local service catalogs,
+- local fee/commission/refund formulas,
+- local screen state standards,
+- direct mutable policy,
+- hardcoded provider selection,
+- hidden API endpoint definitions.
 
-## App list
+## App state and navigation evidence
 
-- `apps/mobile/app-client`
-- `apps/mobile/app-partner`
-- `apps/mobile/app-captain`
-- `apps/mobile/app-field`
-- `apps/web/control-panel`
-- `apps/web/webapp`
-- `apps/web/website`
+UI/navigation changes require:
 
-## Shell acceptance gates
+- target app,
+- target route,
+- before/after screenshot when visual,
+- route/back behavior note when mobile,
+- TypeScript verification,
+- no unrelated app changes.
 
-A shell change requires:
+## Surface mounting law
 
-- affected app list
-- route/navigation impact
-- platform impact
-- TypeScript verification
-- runtime smoke proof when behavior changes
-- screenshots for visual shell changes
+A shell imports only stable public entrypoints. If the needed entrypoint does not exist, update the owning package first with evidence, not a deep import workaround.
+
+## Mobile app special rules
+
+- Expo Dev Client is canonical development model.
+- Expo Go is not production/development truth.
+- Native dependency changes require explicit rebuild classification.
+- Hardware back behavior must be verified when navigation changes.
+
+{standard_footer()}

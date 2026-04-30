@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD024 -->
 
-# BTH UI Kit Supreme Execution Plan — 2026
+# bthwani UI Kit Supreme Execution Plan — 2026
 
 ## الخطة التنفيذية المرحلية الصارمة لبناء الحزمة السيادية من الصفر
 

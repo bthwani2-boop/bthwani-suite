@@ -1,54 +1,90 @@
-# Security, Secrets, Privacy
+# Security and Secrets
 
-## Core security law
+**Status:** Canonical Governance Payload v2
+**Owner:** `Security Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** 16_SECURITY_AND_SECRETS_POLICY, SECURITY posture references
 
-No secrets in code, docs, evidence, screenshots, logs, patches, or prompts.
+## Non-negotiable reading law
 
-## Secret examples
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
 
-- API keys
-- tokens
-- passwords
-- private certificates
-- cookies/session values
-- database URLs with credentials
-- private provider credentials
-- production secrets
-- personally identifiable data unless explicitly required and redacted
 
-## Required scans/checks
+## Secret law
 
-Security-sensitive work requires:
+Never commit or paste:
 
-- secret scan or explicit manual review
-- env/config diff review
-- permission/auth impact note
-- evidence redaction check
-- threat/abuse note when user-visible behavior changes
+```text
+API keys
+tokens
+passwords
+private certificates
+production secrets
+private signing keys
+database credentials
+session cookies
+access tokens
+```
 
-## Auth and permission changes
+## Secret storage
 
-Changes to auth/RBAC/permissions require:
+Secrets must live in approved secret managers, CI secret stores, or local untracked environment files. Documentation may describe variable names but not secret values.
 
-- old behavior
-- new behavior
-- affected roles
-- denied states
-- audit trail
-- tests or manual proof
-- rollback plan
+## Security evidence
 
-## Logs and evidence
+Security-sensitive changes require:
 
-Logs may be uploaded only after redaction. If a diff includes secret-like material, decision is `BLOCKED` until removed and rotated if needed.
+- changed file list,
+- secret scan or reason,
+- auth/permission impact,
+- PII impact,
+- rollback plan,
+- test/log evidence when applicable.
+
+## PII and privacy
+
+User data, addresses, phone numbers, payment data, captain location, partner financial data, and operational logs must be minimized and protected. Evidence packs should redact sensitive values.
+
+## Auth/RBAC law
+
+Control-panel operations must define:
+
+- role,
+- permission,
+- action,
+- audit log,
+- denial state,
+- rollback/undo when possible.
 
 ## WLT security
 
-Financial paths require extra proof for:
+Financial operations require stronger evidence:
 
-- ledger integrity
-- idempotency
-- reconciliation
-- refund/payout permissions
-- auditability
-- rollback/compensation
+- immutable ledger/audit trail,
+- reconciliation,
+- dual-control or approval where appropriate,
+- no direct mutation from unrelated services,
+- clear error handling.
+
+## Tooling
+
+Recommended security checks:
+
+```powershell
+git --no-pager diff --check
+rg -i "api[_-]?key|secret|token|password|private_key" .
+```
+
+If gitleaks or equivalent exists, run it for security-sensitive changes.
+
+## Blocking conditions
+
+- secret-like value in diff,
+- production credential exposure,
+- hidden auth bypass,
+- unaudited money mutation,
+- PII in evidence without redaction.
+
+{standard_footer()}

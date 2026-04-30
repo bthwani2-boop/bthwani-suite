@@ -1,55 +1,65 @@
-# Traceability Matrix and Roadmap
+# Traceability and Roadmap
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `Roadmap Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** PLATFORM_BLUEPRINT_EXECUTION_ROADMAP, BTHWANI_GUIDE phases/waves/todolists, VERIFICATION_MATRIX
 
-This file owns the closure roadmap and requirement-to-evidence mapping standard.
+## Non-negotiable reading law
 
-## Matrix schema
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
+
+
+## Traceability purpose
+
+Traceability prevents scattered work. Every requirement must map to source, owner, implementation path, evidence, and decision.
+
+## Canonical traceability row
 
 ```text
-requirement_id | source | owner | implementation_paths | tests | evidence | status | notes
+id | source | requirement | owner file | implementation paths | evidence | status | next action
 ```
 
-## Requirement ID format
+## Phase model
 
-Examples:
+| Phase | Goal | Output |
+|---|---|---|
+| 0 Repo truth | branch/paths/status known | evidence snapshot |
+| 1 Governance | owner rules closed | governance package + ledger |
+| 2 Architecture | boundaries enforced | guard evidence |
+| 3 UI/UX/Flow | screens/states mapped | visual/flow matrix |
+| 4 Binding | API/client contracts mapped | binding matrix |
+| 5 Runtime | logs/tests prove behavior | runtime evidence |
+| 6 Production | readiness/ops/security | production pack |
+| 7 PR/merge | branch ready | checkpoint evidence |
 
-```text
-GOV-SSOT-001
-GOV-ARCH-001
-GOV-UI-RTL-001
-GOV-WLT-001
-GOV-DSH-001
-GOV-SEC-001
-GOV-CI-001
-```
+## Wave discipline
 
-## Roadmap phases
+A wave must have:
 
-| Phase | Goal |
-|---|---|
-| P0 | Governance package installed and legacy authority removed/quarantined |
-| P1 | Guard catalog aligned and runnable |
-| P2 | Surface/service registry proven against repo paths |
-| P3 | DSH golden slice closed |
-| P4 | WLT financial law enforced |
-| P5 | Control-panel operating model aligned |
-| P6 | CI gates promoted from report-only to blocking |
-| P7 | PR/merge readiness with evidence pack |
+- one objective,
+- exact scope,
+- forbidden scope,
+- evidence,
+- decision,
+- next wave.
 
-## Closure board
+Do not bundle many unrelated tasks into one broad AI prompt.
 
-A closure board must track:
+## Roadmap closure
 
-- blocker count
-- high-risk gaps
-- warning families
-- guard status
-- evidence pack status
-- runtime proof status
-- owner
-- next action
+A roadmap item is closed only when:
 
-## Acceptance
+- target files changed or no-change reason exists,
+- verification ran,
+- evidence saved,
+- traceability updated,
+- owner decision recorded.
 
-Roadmap items become closed only after their traceability row has `PASS` and points to artifacts.
+## Anti-noise roadmap rule
+
+Do not use roadmaps to postpone obvious fixes. Roadmap is for sequencing verified work, not hiding gaps.
+
+{standard_footer()}

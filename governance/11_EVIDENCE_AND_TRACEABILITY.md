@@ -1,8 +1,20 @@
 # Evidence and Traceability
 
-## Core law
+**Status:** Canonical Governance Payload v2
+**Owner:** `Evidence Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** 18_EVIDENCE_PACK_STANDARD, EVIDENCE_AND_CLOSURE_GATES, PATCH_REVIEW_PROTOCOL
 
-No `PASS`, `READY`, `CLOSED`, `FINAL`, `LOCKED`, or `100%` claim without evidence.
+## Non-negotiable reading law
+
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
+
+
+## Core evidence law
+
+Evidence is inspectable output. A summary from Copilot, ChatGPT, or a script is not evidence by itself.
 
 ## Canonical evidence root
 
@@ -10,13 +22,12 @@ No `PASS`, `READY`, `CLOSED`, `FINAL`, `LOCKED`, or `100%` claim without evidenc
 tools/registry/runs/{SESSION_ID}/
 ```
 
-## Minimum evidence pack
+## Evidence pack standard
 
-Every meaningful gate should produce:
+### Always required after code/doc changes
 
 ```text
-SUMMARY.md
-status.txt
+SUMMARY.md or summary.txt
 evidence.json
 commands.log
 git-branch-current.txt
@@ -29,72 +40,93 @@ untracked-after.txt
 _HANDOFF.zip
 ```
 
-Add when relevant:
+### Required when TypeScript/runtime can be affected
 
 ```text
 tsc-noemit.txt
-lint.txt
-tests.txt
-build.txt
-runtime-logs/
-screenshots/
-patches/
-traceability-matrix.csv
-guard-results.json
+lint.txt or lint-not-run-reason.txt
+test.txt or test-not-run-reason.txt
+build.txt or build-not-run-reason.txt
 ```
 
-## evidence.json minimum schema
+### Required when UI is affected
+
+```text
+screenshots/before
+screenshots/after
+visual-review.md
+rtl-check.md
+```
+
+### Required when branch/checkpoint is affected
+
+```text
+branch-reality.txt
+commit-sha.txt
+ahead-behind.txt
+merge-base.txt
+```
+
+## evidence.json minimum
 
 ```json
 {
-  "issueCode": "GOVERNANCE_TASK",
-  "sessionId": "TASK-YYYYMMDD-HHMMSS",
+  "issueCode": "GOVERNANCE_DEEPENING",
+  "sessionId": "GOVERNANCE_DEEPENING-YYYYMMDD-HHMMSS",
   "repo": "C:\\bthwani-suite",
-  "branch": "branch-name",
-  "headSha": "sha",
-  "mode": "CHECK | FORENSICS | APPLY | VERIFY | REVIEW | RUNTIME_VERIFY",
-  "allowedPaths": [],
-  "forbiddenPaths": [],
+  "branch": "...",
+  "commitSha": "...",
+  "mode": "CHECK | FORENSICS | APPLY | VERIFY | REVIEW",
+  "allowedFiles": [],
+  "forbiddenRoots": [],
   "finalDecision": "PASS | PASS_WITH_WARNINGS | FIX_REQUIRED | BLOCKED | READY_FOR_PR | REVERT_REQUIRED | NEEDS_EVIDENCE | NEEDS_VISUAL_EVIDENCE",
   "diffCheckPass": true,
-  "tscPass": true,
+  "typecheckPass": true,
   "scopeViolationCount": 0,
   "warnings": [],
   "errors": [],
-  "artifacts": []
+  "outputFiles": []
 }
 ```
 
-## Decision vocabulary
+## Traceability matrix
 
-`PASS`, `PASS_WITH_WARNINGS`, `FIX_REQUIRED`, `BLOCKED`, `READY_FOR_PR`, `REVERT_REQUIRED`, `NEEDS_EVIDENCE`, `NEEDS_VISUAL_EVIDENCE`
-
-## Traceability row schema
+Canonical columns:
 
 ```text
-requirement_id | governance_source | implementation_paths | tests | artifacts | status | notes
+requirement_id | source_file | owner_file | code_paths | tests | artifacts | status | notes
 ```
 
-Status values:
+Status vocabulary:
 
-- `PASS`
-- `WARN`
-- `FAIL`
-- `NOT_APPLICABLE`
-- `INFO`
+```text
+PASS | WARN | FAIL | NOT_APPLICABLE | INFO | TBD | BLOCKED
+```
 
-## Evidence is not
+## Patch handoff rule
 
-- Copilot verbal summary
-- screenshots without code evidence
-- code diff without verification
-- policy text without artifacts
-- assumed behavior
+Sensitive local changes require:
 
-## Untracked/staged rule
+```powershell
+git --no-pager status --short > LOCAL_CHANGE_STATUS.txt
+git --no-pager diff --stat > LOCAL_CHANGE_DIFF_STAT.txt
+git --no-pager diff --name-status > LOCAL_CHANGE_NAME_STATUS.txt
+git --no-pager diff --check > LOCAL_CHANGE_DIFF_CHECK.txt
+git --no-pager diff -- . > LOCAL_CHANGE_REVIEW.patch
+git ls-files --others --exclude-standard > LOCAL_CHANGE_UNTRACKED_FILES.txt
+```
 
-No final acceptance until:
+Untracked files are not included in normal `git diff`. They must be uploaded, added with intent-to-add for review, or discarded intentionally.
 
-- staged changes are accounted for
-- untracked files are listed and reviewed
-- local diff is clean or intentionally included
+## Evidence acceptance
+
+A task cannot pass if:
+
+- diff check fails,
+- verification output is missing,
+- untracked files are unexplained,
+- staged changes are unreviewed,
+- UI screenshots are missing for UI work,
+- evidence pack lacks `_HANDOFF.zip` when a script writes under registry runs.
+
+{standard_footer()}

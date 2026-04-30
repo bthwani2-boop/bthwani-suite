@@ -1,12 +1,32 @@
 # Testing and Production Readiness
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `Quality Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** 17_TESTING_AND_PRODUCTION_READINESS, VERIFICATION_MATRIX, LOCAL_PRODUCTION_READINESS
 
-This file defines testing and readiness expectations by change type.
+## Non-negotiable reading law
+
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
+
+
+## Test categories
+
+| Category | Required when | Evidence |
+|---|---|---|
+| TypeScript | any TS/TSX/config impact | `pnpm -w exec tsc --noEmit` |
+| Lint | code style/static checks exist | lint output or not-run reason |
+| Unit | pure logic changed | test output |
+| Integration | API/client/service binding changed | integration output |
+| Contract | OpenAPI/schema/client changed | contract test output |
+| Runtime | behavior changed | logs/manual reproduction |
+| Visual | UI changed | screenshots |
+| Mobile device | mobile navigation/native behavior changed | device evidence |
+| Build | release/deploy/config changed | build output |
 
 ## Baseline commands
-
-For code changes:
 
 ```powershell
 Set-Location -LiteralPath "C:\bthwani-suite"
@@ -15,36 +35,62 @@ git --no-pager diff --check
 pnpm -w exec tsc --noEmit
 ```
 
-## Test classes
+## Production readiness dimensions
 
-| Change type | Required proof |
-|---|---|
-| Docs only | diff check, link/path sanity |
-| UI | typecheck, screenshot/visual evidence, RTL/overflow check |
-| Package exports | typecheck, import/consumer scan, guard |
-| API/contract | contract test, generated type/client proof |
-| Runtime behavior | logs, smoke test, relevant integration test |
-| Security/config | secret scan/config review |
-| Cleanup/delete | reference scan, diff, rollback plan |
-| CI/guards | workflow/guard run output |
+A feature is not production-ready until these are understood:
 
-## Production readiness requires
+- data plane,
+- auth and permissions,
+- error handling,
+- observability,
+- rollback,
+- provider/config policy,
+- seed/migration state,
+- fixtures exit path,
+- performance risk,
+- security risk,
+- support/ops path.
 
-- no fixture-only truth
-- no stale compose/runtime truth
-- no LAN/IP hardcoding as production route
-- provider control plane or documented bootstrap exception
-- observability path
-- rollback plan
-- seed/simulation plan if required
-- access/scale gate when applicable
+## Fixture law
 
-## Warning handling
+Fixtures may support development, but fixture success is not runtime success. Any feature relying on fixtures must be marked `BOOTSTRAP`, `DEMO`, or `TBD`, not `CLOSED`.
 
-Warnings are acceptable only if:
+## Mobile readiness
 
-- classified
-- non-blocking
-- recorded in evidence
-- owner/remediation exists
-- not hiding a defect
+Mobile work must classify:
+
+```text
+JS-only
+Metro/bundler
+native/dev-client rebuild
+dependency/native module rebuild
+```
+
+Expo Dev Client is canonical. Expo Go is not acceptance evidence.
+
+## Web/control-panel readiness
+
+Control-panel readiness requires:
+
+- route loads,
+- action state,
+- permission state,
+- audit/log path for operations,
+- no huge page-scroll replacement for control-room workflows,
+- responsive density appropriate for web-first admin.
+
+## Readiness decision
+
+Use:
+
+```text
+READY_FOR_PR
+PASS_WITH_WARNINGS
+FIX_REQUIRED
+BLOCKED
+NEEDS_EVIDENCE
+```
+
+Never use `READY` without exact evidence.
+
+{standard_footer()}

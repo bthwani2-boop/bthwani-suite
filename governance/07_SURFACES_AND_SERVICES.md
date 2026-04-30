@@ -1,99 +1,75 @@
 # Surfaces and Services Registry
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `Service/Surface Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** SURFACES_OWNERSHIP_CONTRACT, APPROVED_SURFACE_NAMING, PLATFORM_BLUEPRINT, ARCHITECTURE_LOCK
 
-This file is the canonical registry of surfaces, services, service-to-surface ownership, and closure obligations.
+## Non-negotiable reading law
 
-## Canonical surfaces
-
-| Surface | Canonical path / role | Owns | Must not own |
-|---|---|---|---|
-| `app-client` | Mobile customer shell/surface | customer entry, DSH/KNZ/AMN/ARB/WLT/ESF/MRF/SND/KWD customer journeys | service internals, design-system forks |
-| `app-partner` | Mobile partner shell/surface | partner operations, DSH merchant/order/account journeys | money ledger truth, local UI kit |
-| `app-captain` | Mobile captain shell/surface | captain task/order/service execution | partner/store ownership |
-| `app-field` | Mobile field shell/surface | field ops, onboarding/inspection/verification flows | partner account truth |
-| `control-panel` | Web admin/control room | platform ops, service admin, audit, reporting, support | direct screen-owned service logic outside surfaces |
-| `webapp` | Public/authenticated web app | web customer/community flows | admin control-plane logic |
-| `website` | marketing/public website | public marketing/info pages | app runtime/backend truth |
-| `app-shells` | package-level shell composition | navigation/frame/providers/routing adapters | service-owned business screens |
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
 
 
-## Canonical services
+## Surface registry
 
-| Service | Name / domain | Canonical surfaces | Service-owned obligations |
-|---|---|---|---|
-| `dsh` | Delivery & Shopping | app-client, app-partner, app-captain, app-field, control-panel | store, catalog, basket, order, fulfillment, partner ops, captain/field handoff |
-| `wlt` | Wallet / finance ledger | app-client, control-panel, cross-service finance | wallet, ledger, fees, commissions, refunds, settlement, reconciliation |
-| `knz` | Kanz / rewards or offers domain | app-client, control-panel | campaign/reward flows, customer-facing earning/redemption evidence |
-| `arb` | Partner/business enablement | app-client, app-partner, app-field, control-panel | partner onboarding/verification, business profile, operational modes |
-| `amn` | Safety/security/service assurance | app-client, app-captain, control-panel | safety cases, trust signals, incident evidence, safety rules |
-| `esf` | Community service family | app-client, webapp, control-panel | community service catalog/requests, ops proof |
-| `mrf` | Community service family | app-client, webapp, control-panel | community service catalog/requests, ops proof |
-| `snd` | Community service family | app-client, webapp, control-panel | community service catalog/requests, ops proof |
-| `kwd` | Community service family | app-client, webapp, control-panel | community service catalog/requests, ops proof |
+| Surface | Canonical path concept | Primary package owner | Closure evidence |
+| --- | --- | --- | --- |
+| app-client | `packages/surfaces/src/service-owned/<service>/app-client` or `surface-owned/app-client` | surfaces + app shell | screens, states, routes, visual evidence, API binding |
+| app-partner | `packages/surfaces/src/service-owned/<service>/app-partner` | surfaces + app shell | orders/ops/account evidence |
+| app-captain | `packages/surfaces/src/service-owned/<service>/app-captain` | surfaces + app shell | assignment/trip/state evidence |
+| app-field | `packages/surfaces/src/service-owned/<service>/app-field` | surfaces + app shell | field workflow evidence |
+| control-panel | `packages/surfaces/src/service-owned/<service>/control-panel` | surfaces + web shell | control room evidence |
+| webapp | `packages/surfaces/src/service-owned/<service>/webapp` | surfaces + web shell | web runtime evidence |
+| website | `packages/surfaces/src/surface-owned/website` | surface-owned | marketing/content evidence |
 
+## Service registry
 
-## Service-owned path
-
-```text
-packages/surfaces/src/service-owned/<service>/<surface>/
-```
-
-## Surface-owned path
-
-```text
-packages/surfaces/src/surface-owned/<surface>/
-```
+| Service | Canonical status | Must have | Must not do |
+| --- | --- | --- | --- |
+| dsh | canonical first golden slice | service blueprint, client/partner/captain/field/control-panel flows, API matrix | own wallet ledger truth |
+| wlt | canonical financial owner | ledger, settlement, refund, fee/commission truth, reconciliation | delegate money mutation to DSH/control-panel |
+| knz | canonical service | blueprint before closure | invent financial ledger |
+| arb | canonical service/domain | clear service interpretation and surfaces | become undefined bucket |
+| amn | canonical safety/trust | incident, verification, assurance contracts | hide security evidence |
+| esf | community service | community surface/control-panel flow | pretend to be standalone without blueprint |
+| mrf | community service | community surface/control-panel flow | duplicate DSH/WLT ownership |
+| snd | community service | community surface/control-panel flow | duplicate DSH/WLT ownership |
+| kwd | community service | community surface/control-panel flow | duplicate DSH/WLT ownership |
 
 ## Service-to-surface matrix
 
 | Service | app-client | app-partner | app-captain | app-field | control-panel | webapp | website |
-|---|---|---|---|---|---|---|---|
-| `dsh` | yes | yes | yes | yes | yes | no | no |
-| `wlt` | yes | no | no | no | yes | no | no |
-| `knz` | yes | no | no | no | yes | no | no |
-| `arb` | yes | yes | no | yes | yes | no | no |
-| `amn` | yes | no | yes | no | yes | no | no |
-| `esf` | yes | no | no | no | yes | yes | no |
-| `mrf` | yes | no | no | no | yes | yes | no |
-| `snd` | yes | no | no | no | yes | yes | no |
-| `kwd` | yes | no | no | no | yes | yes | no |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| dsh | YES | YES | YES | YES | YES | TBD | TBD |
+| wlt | YES | TBD-view-only | NO unless approved | NO unless approved | YES | TBD | NO |
+| knz | YES | NO unless approved | NO | NO | YES | TBD | TBD |
+| arb | YES | YES | NO unless approved | YES | YES | TBD | TBD |
+| amn | YES | TBD | YES | TBD | YES | NO unless approved | NO |
+| esf | YES | NO | NO | NO | YES | YES | TBD |
+| mrf | YES | NO | NO | NO | YES | YES | TBD |
+| snd | YES | NO | NO | NO | YES | YES | TBD |
+| kwd | YES | NO | NO | NO | YES | YES | TBD |
 
-## DSH priority
+`TBD` means not proven as closed. It must not be implemented as a fact without a blueprint and evidence.
 
-DSH is the first golden vertical slice. It must close through:
+## Service closure minimum
 
-1. customer discovery/store/order
-2. partner operations
-3. captain/field execution where applicable
-4. control-panel oversight
-5. WLT financial binding for money paths
-6. evidence and runtime verification
+Each service-surface pair that claims closure needs:
 
-## WLT cross-service law
+- user/actor goal,
+- screen/route path,
+- state model,
+- UI owner,
+- API/binding owner,
+- evidence artifacts,
+- test/verification,
+- rollback/disable path,
+- control-panel operation entry where applicable.
 
-Any service may create financial intent, but final financial state belongs to WLT only.
+## Non-canonical standalone services
 
-## Blueprint law
+`exchangeprice` and `hr` are not standalone canonical services unless future governance promotes them with evidence. HR is a control-panel/internal domain, not a service in the nine-service catalog.
 
-Every service may have:
-
-```text
-packages/surfaces/src/service-owned/<service>/SERVICE_BLUEPRINT.md
-```
-
-Blueprint files must contain verified truth only. Unknowns are `TBD`, not assumptions.
-
-## Closure requirements per service
-
-A service cannot be called closed without:
-
-- service blueprint
-- surface matrix
-- role/permission model
-- UI/UX/flow proof
-- API/binding proof
-- WLT proof if money is involved
-- tests/guards
-- runtime evidence
-- traceability row
+{standard_footer()}

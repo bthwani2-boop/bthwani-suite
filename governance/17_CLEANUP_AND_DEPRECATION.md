@@ -1,58 +1,71 @@
-# Cleanup, Deletion, Deprecation
+# Cleanup and Deprecation
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `Cleanup Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** CLEANUP_AND_DEPRECATION_POLICY, DOCS_GOVERNANCE_DELETION_* plans, GOVERNANCE_CLEANUP_CANDIDATES
 
-This file defines safe cleanup, archive, deletion, and deprecation.
+## Non-negotiable reading law
 
-## Cleanup modes
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
 
-| Mode | Meaning |
+
+## Cleanup law
+
+Cleanup is not deletion. Cleanup means preserve required truth, remove duplication, update references, prove consumers are safe, and keep rollback available.
+
+## Cleanup decision types
+
+| Decision | Meaning |
 |---|---|
-| `DEDUP` | merge duplicate truth into owner file |
-| `QUARANTINE` | move out of active authority |
-| `ARCHIVE` | preserve as historical evidence |
-| `DEPRECATE` | keep temporarily with removal date |
-| `DELETE` | remove after gates pass |
-| `REJECT` | reviewed and intentionally not adopted |
+| `PROMOTE` | move rule into canonical owner |
+| `MERGE` | combine duplicate into owner file |
+| `ARCHIVE` | keep read-only historical source |
+| `DELETE` | remove after references and evidence prove safe |
+| `REJECT` | do not carry forward |
+| `TBD` | not enough evidence |
 
-## Deletion readiness gates
+## Deletion readiness
 
-Before deleting or moving a file/folder:
+Before deleting or moving anything:
 
-1. classify it
-2. search references/imports/links
-3. identify owner replacement
-4. update ledger
-5. capture before/after status
-6. run diff check
-7. provide rollback path
+```text
+inventory
+reference scan
+consumer scan
+owner approval
+impact note
+rollback path
+evidence pack
+```
 
-## Governance legacy rule
+## Legacy governance handling
 
-`governance-legacy` must not remain active authority. It can only be:
+Legacy governance must not stay active next to canonical governance. Allowed outcomes:
 
-- archived outside the canonical authority path
-- quarantined under explicit archive/read-only label
-- removed after `99_LEGACY_MERGE_LEDGER.md` proves every source file disposition
+1. fully accounted in `99_LEGACY_MERGE_LEDGER.md`,
+2. archived under a clearly non-active archive path,
+3. deleted after evidence proves no required information remains only there.
 
-## No blind deletion
+## Deprecation requirements
 
-Never run broad delete/clean commands without:
+For deprecated APIs/components/docs:
 
-- exact target list
-- risk note
-- backup or Git safety
-- verification
-- user approval for destructive action
+- replacement path,
+- migration date,
+- compatibility alias if public,
+- consumer list,
+- removal gate,
+- evidence.
 
-## Deprecation record
+## Forbidden cleanup
 
-Every deprecation must include:
+- blind global replace,
+- deleting untracked files without inventory,
+- moving package roots without consumer scan,
+- removing aliases in same step as public rename,
+- deleting legacy before ledger coverage.
 
-- old path/name
-- replacement
-- reason
-- date
-- owner
-- removal gate
-- rollback
+{standard_footer()}

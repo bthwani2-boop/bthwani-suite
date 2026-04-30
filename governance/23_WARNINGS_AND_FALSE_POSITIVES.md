@@ -1,56 +1,60 @@
 # Warnings and False Positives
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `Warning Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** WARNING_CLASSIFICATION_POLICY, WARNING_BASELINE_CLASSIFICATION_MATRIX, GOVERNANCE_AUDIT_FALSE_POSITIVE_CLASSIFICATION
 
-This file prevents warning noise from hiding real defects or blocking progress without reason.
+## Non-negotiable reading law
 
-## Warning classification
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
 
-| Status | Meaning |
-|---|---|
-| `TRUE_DEFECT` | real issue requiring fix |
-| `KNOWN_LIMITATION` | accepted short-term limitation |
-| `FALSE_POSITIVE` | tool warning not representing a defect |
-| `BASELINE_WARNING` | existing warning tracked for later remediation |
-| `PROMOTE_TO_BLOCKING` | warning family must become gate |
-| `IGNORE_REJECTED` | proposed ignore rejected |
 
-## False-positive requirements
+## Warning categories
+
+| Category | Meaning | Default action |
+|---|---|---|
+| `TRUE_POSITIVE_BLOCKING` | real issue blocks closure | fix |
+| `TRUE_POSITIVE_REPORT` | real issue but non-blocking | record owner/expiry |
+| `FALSE_POSITIVE` | tool finding is wrong | document rule and suppress narrowly |
+| `ACCEPTED_RISK` | real risk accepted temporarily | owner/expiry/rollback |
+| `TBD` | not classified | blocks final acceptance |
+
+## False positive requirements
 
 A false positive must include:
 
-- warning text
-- source tool
-- affected file/path
-- reason not a defect
-- reviewer/owner
-- expiry/review date
-- evidence
+- tool/guard id,
+- finding,
+- reason false,
+- evidence,
+- exact suppression scope,
+- expiry/review date if needed.
 
-## Baseline warning rule
+## Warning baseline
 
-Baseline warnings may be tolerated only if:
+Warnings may be tolerated only when:
 
-- counted
-- categorized
-- non-increasing or intentionally explained
-- not security-critical
-- not hiding failed closure
-- remediation plan exists
+- classified,
+- not security/money critical,
+- owner exists,
+- remediation or expiry exists,
+- CI/guard mode is clear.
 
-## Promotion rule
+## Warning escalation
 
-A warning family becomes blocking when:
+A report-only warning becomes blocking when:
 
-- false positives are controlled
-- signal is stable
-- remediation path exists
-- owner accepts gate
-- CI can enforce deterministically
+- repeated without owner,
+- affects security/finance,
+- hides missing evidence,
+- blocks runtime verification,
+- indicates scope drift.
 
-## Forbidden
+## Final acceptance
 
-- no broad suppressions
-- no silent ignore
-- no PASS if critical warnings are unexplained
-- no hiding TypeScript/security/runtime errors as warnings
+No final governance closure may include unclassified warnings. Use `PASS_WITH_WARNINGS` only when warnings are documented and non-blocking.
+
+{standard_footer()}

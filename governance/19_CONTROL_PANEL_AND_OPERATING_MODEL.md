@@ -1,62 +1,78 @@
 # Control Panel and Operating Model
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `Control Panel Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** GOVERNANCE_CONTROL_PLANE_STANDARD, PLATFORM_OPERATING_MODEL, PLATFORM_BLUEPRINT
 
-This file governs the control panel as a web-first operating control room, not a collection of scattered pages.
+## Non-negotiable reading law
 
-## Control panel role
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
 
-`apps/web/control-panel` owns platform/admin operations:
 
-- service operations
-- partner/store oversight
-- customer/support visibility
-- finance read models from WLT
-- audit
-- reports
-- workflows
-- risk/incident queues
-- settings and provider controls
+## Control-panel definition
 
-## Control room UX law
+The control panel is a web-first control room for operations, not a collection of long mobile-like pages. It must expose service operations, evidence, approvals, provider controls, and monitoring with dense, clear, low-noise information design.
 
-The control panel should prefer:
+## Control room principles
 
-- fewer routes
-- dense but clear information design
-- tabs/accordions/drawers/sheets/popovers for progressive disclosure
-- fixed/collapsible sidebar
-- one/two-click primary flows
-- clear top summaries
-- audit and action trail
-- premium 2026 visual identity
+- fewer routes,
+- more tabs/drawers/sheets/accordions for progressive disclosure,
+- fixed/collapsible sidebar,
+- high-signal summaries,
+- service-oriented operations,
+- one/two-click primary tasks,
+- audit and permission awareness,
+- no huge explanatory blocks replacing tools.
 
-## Forbidden
+## Domain groups
 
-- long unstructured pages for complex operations
-- duplicate service logic outside `packages/surfaces`
-- finance truth outside WLT
-- local UI design system
-- random colors/tokens
-- route sprawl without workflow reason
-
-## Domain grouping
-
-| Domain | Source of truth |
+| Group | Includes |
 |---|---|
-| DSH operations | DSH service-owned surfaces + control-panel views |
-| WLT finance | WLT contracts/read models |
-| Partner/business | ARB/DSH as applicable |
-| Safety/security | AMN/security governance |
-| Community services | ESF/MRF/SND/KWD |
-| HR/internal admin | control-panel domain only, not canonical service |
+| DSH Operations | stores, orders, delivery, captain assignment, partner ops |
+| WLT Finance | ledger, settlements, refunds, reconciliation |
+| Community Services | esf, mrf, snd, kwd |
+| Safety/Trust | amn, incidents, verification |
+| Growth/Content | knz/arb where approved |
+| Governance/Ops | evidence, guards, branch/checkpoint, runtime health |
 
-## Evidence
+## Control-panel operation record
 
-Control panel changes require:
+Every operation must define:
 
-- route/surface impact
-- UI evidence
-- role/permission impact
-- data/binding source
-- no service ownership violation
+```text
+operation_id
+service
+surface
+role/permission
+input
+validation
+side effect
+audit log
+rollback/undo
+evidence
+```
+
+## Forbidden control-panel patterns
+
+- treating HR as one of the nine platform services,
+- owning WLT money logic outside WLT,
+- implementing service state machines locally,
+- adding new route per small action,
+- mixing Arabic/English labels randomly,
+- ignoring web-first density.
+
+## Operations evidence
+
+For a control-panel change, provide:
+
+- route/screen path,
+- operation catalog row,
+- permission model,
+- screenshot,
+- API/runtime evidence if action has side effect,
+- audit/rollback note.
+
+{standard_footer()}

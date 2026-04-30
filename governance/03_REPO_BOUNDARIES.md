@@ -1,57 +1,87 @@
-# Repository Boundaries and Root Ownership
+# Repository Boundaries
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `Repository Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** DOCS_GOVERNANCE_* policies, GOVERNANCE_CONTROL_PLANE_STANDARD, ARCHITECTURE_LOCK
 
-This file defines what each top-level repository root may own and what it must not own.
+## Non-negotiable reading law
 
-## Top-level root ownership
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
 
-| Root | Status | Owns | Must not own |
-|---|---|---|---|
-| `apps/` | canonical | deployable shells and app-specific entrypoints | reusable business logic, design system, service truth |
-| `packages/ui-kit/` | canonical | tokens, primitives, components, providers, public UI exports | app-specific service flow logic |
-| `packages/surfaces/` | canonical | service-owned and surface-owned screens/flows | app shell navigation truth |
-| `packages/app-shells/` | canonical | shell frames, route adapters, provider composition | service internals |
-| `packages/api-types/` | canonical | generated/shared types from contracts | handwritten runtime behavior without source contract |
-| `packages/api-clients/` | canonical | typed clients/adapters | UI layout or service ownership |
-| `services/` | canonical | backend/runtime service implementations | frontend design authority |
-| `contracts/master/` | canonical when present | public API contract source | generated mirror-only copies |
-| `governance/` | canonical | policy, evidence requirements, guard catalog | runtime code or unverified legacy authority |
-| `tools/guards/` | execution | guard implementations | policy authority beyond governance |
-| `tools/scripts/` | execution | deterministic scripts | policy authority beyond governance |
-| `tools/registry/runs/` | evidence output | run artifacts | source policy |
-| `.github/workflows/` | CI execution | workflow enforcement | policy authority beyond governance |
-| `.github/agents/` | AI agent definitions | agent execution surface | governance replacement |
-| `.github/skills/` | AI skill definitions | skill registry | governance replacement |
 
-## Legacy and archive roots
+## Canonical active roots
 
-Any legacy root must be explicitly classified as one of:
+| Root | Role | May contain policy? |
+|---|---|---|
+| `governance/` | Canonical policy/control plane | Yes |
+| `apps/mobile/app-client` | Client mobile app shell | No, implementation only |
+| `apps/mobile/app-partner` | Partner mobile app shell | No |
+| `apps/mobile/app-captain` | Captain mobile app shell | No |
+| `apps/mobile/app-field` | Field mobile app shell | No |
+| `apps/web/control-panel` | Control panel app shell | No |
+| `apps/web/webapp` | Web app shell | No |
+| `apps/web/website` | Marketing site shell | No |
+| `packages/ui-kit` | Design/component authority | Technical source, not governance policy |
+| `packages/surfaces` | Surface/service-owned UI flows | Technical source, not governance policy |
+| `packages/app-shells` | App shell composition | Technical source, not governance policy |
+| `packages/api-types` | Generated/shared API types | Derived from contracts |
+| `packages/api-clients` | API clients | Derived from contracts/runtime binding |
+| `services/*` | Backend/service implementations | Technical source |
+| `contracts/master` | Contract source for public APIs | Contract truth |
+| `tools/guards` | Guard implementation | Derived from governance |
+| `tools/registry/runs` | Evidence output | Evidence only |
+| `.github/workflows` | CI implementation | Derived from governance |
+| `.github/agents`, `.github/skills` | Agent/skill definitions | Derived from governance |
 
-- `LEGACY_REFERENCE`
-- `ARCHIVE`
-- `TRANSITIONAL`
-- `DEPRECATED`
-- `REJECTED`
+## Transitional roots
 
-No legacy root may be imported from or cited as active truth without a migration decision.
+| Root | Status | Rule |
+|---|---|---|
+| `docs/governance` | Legacy/transitional | Must not be active authority. Migrate or remove references. |
+| `kdt/volatile/registry/runs` | Legacy evidence root | Do not create new evidence there. |
+| `governance/governance-legacy` | Source archive only | Must not be active policy after package application. |
 
-## Forbidden boundary drift
+## Forbidden root behavior
 
-- No local design system under `apps/`.
-- No direct Tamagui import outside allowed UI-kit internals.
-- No service-owned business flow inside app shell.
-- No runtime API truth hidden in UI files.
+- No policy duplication outside `governance/`.
+- No app-local design system that competes with `@bthwani/ui-kit`.
+- No surface-local API contract that competes with `contracts/master`.
 - No generated evidence treated as policy.
-- No deletion of roots without dependency/reference audit.
+- No `.github` workflow introducing governance rules not defined here.
+- No old repo/path named standalone `bth` as active target.
 
-## Required boundary evidence
+## Boundary proof
 
-For any change crossing roots, provide:
+For a boundary-sensitive change, evidence must include:
 
-- changed files
-- dependency/import impact
-- public API impact
-- consumer impact
-- guard result
-- rollback plan
+```powershell
+git branch --show-current
+git --no-pager status --short
+git --no-pager diff --name-status
+git --no-pager diff --check
+git ls-files --others --exclude-standard
+```
+
+Plus targeted scans:
+
+```powershell
+rg "from ['\"]tamagui['\"]" apps packages/surfaces
+rg "docs/governance|kdt/volatile|governance-legacy" .
+rg "export \*" packages/ui-kit/src packages/surfaces/src
+```
+
+## Deletion and movement rule
+
+Deleting, moving, or quarantining a root requires:
+
+- inventory,
+- references scan,
+- consumer impact note,
+- rollback plan,
+- evidence pack,
+- explicit owner decision.
+
+{standard_footer()}

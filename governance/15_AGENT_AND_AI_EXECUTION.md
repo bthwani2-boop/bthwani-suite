@@ -1,73 +1,95 @@
-# Agent and AI Execution
+# Agent and AI Execution Governance
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `AI Workflow Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** 14_AGENT_EXECUTION_RULES, AI_EXECUTION_GOVERNANCE, BTHWANI_GUIDE, MASTER_EXECUTION_PLAYBOOK
 
-This file governs ChatGPT, VS Code, Copilot, local scripts, generated files, patch review, and evidence handoff.
+## Non-negotiable reading law
+
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
+
 
 ## Authority model
 
-- ChatGPT chooses method and reviews evidence.
-- Copilot executes locally only inside scope.
-- Git evidence decides.
-- User operates local repo and provides evidence.
-- GitHub is read-only unless explicit write is requested.
+ChatGPT analyzes, prepares execution packages, and reviews evidence. Copilot/VS Code agents execute locally only inside scope. Git evidence decides. No AI verbal claim is final.
 
 ## Delivery modes
 
-- `DECISION_ONLY`
-- `TERMINAL_COMMAND`
-- `SINGLE_FILE`
-- `ZIP_PACKAGE`
-- `PATCH_HANDOFF`
-- `EVIDENCE_BUNDLE`
-- `VISUAL_REVIEW`
-- `NO_ACTION`
+| Mode | Use |
+|---|---|
+| `DECISION_ONLY` | analysis, diagnosis, recommendation |
+| `TERMINAL_COMMAND` | quick checks, evidence, guards |
+| `SINGLE_FILE` | one SOP/report/config/prompt |
+| `ZIP_PACKAGE` | multiple files, scripts, payloads |
+| `PATCH_HANDOFF` | sensitive local changes |
+| `EVIDENCE_BUNDLE` | verification pack |
+| `VISUAL_REVIEW` | screenshots/UI |
+| `NO_ACTION` | unsafe or insufficient evidence |
 
-## Method selection law
+## Prompt contract for weak agents
 
-Do not force prompt-only work. Use the safest deterministic method:
+A prompt must include:
 
-- prompt for narrow local adaptation
-- command for checks
-- script for repeatable scans/fixes
-- generated file for exact docs/config
-- ZIP for multi-file payload
-- patch handoff for sensitive changes
+- exact repo path,
+- exact target files/directories,
+- allowed actions,
+- forbidden actions,
+- before-edit file intention,
+- after-edit changed files,
+- verification commands,
+- evidence to return,
+- no final `PASS/CLOSED/100%` claim.
 
-## Copilot contract
+## Forbidden agent behavior
 
-Copilot must:
+- broad “fix everything” commands,
+- touching unrelated files,
+- deleting/moving/renaming without explicit permission,
+- modifying dependencies/config/CI unless in scope,
+- changing GitHub remotely without explicit user request,
+- claiming success without evidence,
+- continuing to another task.
 
-- stay inside scope
-- identify intended changed files before editing
-- not delete/move/rename unless explicitly allowed
-- not change dependencies/config/runtime/API/backend unless explicitly allowed
-- not claim PASS/CLOSED/100%
-- return changed files and verification commands
+## Script governance
+
+Scripts are allowed when more deterministic than prompt-only execution. Write-capable scripts must have:
+
+- purpose,
+- scope,
+- excluded paths,
+- DryRun/Apply behavior when risky,
+- backup/rollback note,
+- evidence output,
+- `_HANDOFF.zip` if writing to registry runs.
 
 ## Patch handoff
 
-Sensitive local changes require:
+Use patch handoff when:
 
-```powershell
-git --no-pager status --short
-git --no-pager diff --stat
-git --no-pager diff --name-status
-git --no-pager diff --check
-git --no-pager diff -- . > LOCAL_CHANGE_REVIEW.patch
-git ls-files --others --exclude-standard > LOCAL_CHANGE_UNTRACKED_FILES.txt
+- Copilot changed files,
+- scripts changed files,
+- UI-kit/package boundaries changed,
+- governance changed,
+- deletion/move/refactor happened,
+- user asks for review before commit.
+
+## Final decision vocabulary
+
+```text
+PASS
+PASS_WITH_WARNINGS
+FIX_REQUIRED
+BLOCKED
+READY_FOR_PR
+REVERT_REQUIRED
+NEEDS_EVIDENCE
+NEEDS_VISUAL_EVIDENCE
+NO_ACTION_REQUIRED
 ```
 
-## Scripts
+`NO_ACTION_REQUIRED` is allowed as workflow decision, but traceability row status should use `NOT_APPLICABLE`.
 
-PowerShell scripts for this project must start with:
-
-```powershell
-Set-Location -LiteralPath "C:\bthwani-suite"
-```
-
-Scripts that write under `tools/registry/runs/` must produce `_HANDOFF.zip`.
-
-## Decisions
-
-Use only: `PASS`, `PASS_WITH_WARNINGS`, `FIX_REQUIRED`, `BLOCKED`, `READY_FOR_PR`, `REVERT_REQUIRED`, `NEEDS_EVIDENCE`, `NEEDS_VISUAL_EVIDENCE`
+{standard_footer()}

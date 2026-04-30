@@ -1,64 +1,78 @@
-# Runtime, Observability, Production Operations
+# Runtime Observability and Production
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `Runtime Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** LOCAL_PRODUCTION_READINESS, runtime verification requirements
 
-This file controls runtime proof, observability, local-production readiness, and operational evidence.
+## Non-negotiable reading law
 
-## Runtime proof
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
 
-A runtime claim requires one or more:
 
-- request/response logs
-- app logs
-- server logs
-- smoke test result
-- E2E output
-- screenshot/recording for UI behavior
-- CI run artifact
-- monitoring signal
+## Runtime truth
 
-## Local-production readiness
+Runtime truth is proven through logs, requests, tests, traces, health checks, and user-visible behavior. Documentation alone does not prove runtime.
 
-No local-production readiness claim without:
+## Observability dimensions
 
-- canonical local stack
-- local data plane
-- runtime vars backend
-- provider control plane
-- fixture exit path
-- seed/simulation path
-- access/scale gates
-- observability path
+| Dimension | Minimum |
+|---|---|
+| Logs | structured enough to diagnose service/operation |
+| Metrics | success/failure/latency where applicable |
+| Errors | captured and user-safe |
+| Health | service/dependency readiness |
+| Audit | actor/action/time/scope for operations |
+| Alerts | critical failures route to owner |
+| Traces | cross-service flows when possible |
 
-Forbidden as live readiness proof:
+## Runtime evidence examples
 
-- fixture-only behavior
-- stale compose truth
-- sqlite as unapproved runtime truth
-- hardcoded LAN/IP
-- ENV-only provider control
-- placeholder pages
+```text
+request/response sample with redaction
+server log excerpt
+client log excerpt
+test run output
+health endpoint output
+screenshot of state
+control-panel operation audit entry
+```
 
-## Observability
+## Production readiness blockers
 
-Runtime services should define:
+- fixture-only success,
+- no error state,
+- no rollback,
+- no health check,
+- no owner,
+- no alert path for critical operation,
+- no audit for money/admin operation,
+- hardcoded LAN/IP/provider.
 
-- logs
-- metrics
-- tracing or correlation ID where appropriate
-- error classification
-- audit events
-- health checks
-- alerting path for critical services
+## Local-production distinction
 
-## Incident evidence
+A local dev run may prove integration direction, but production readiness needs stronger evidence:
 
-Incidents require:
+- environment model,
+- provider control,
+- seed/migration readiness,
+- secrets handling,
+- scale/performance risk,
+- monitoring.
 
-- timeline
-- impact
-- root cause
-- mitigation
-- rollback/forward fix
-- evidence artifacts
-- post-mortem if material
+## Runtime closure
+
+Runtime closure requires the chain:
+
+```text
+contract
+→ implementation
+→ client binding
+→ UI state
+→ logs/tests
+→ evidence pack
+```
+
+{standard_footer()}

@@ -1,83 +1,105 @@
-# API, Binding, Runtime
+# API / Binding / Runtime
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `API Runtime Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** 12_API_BINDING_RUNTIME_PROTOCOL, API_CONTRACT_POLICY, FLOW_API_BINDING_RUNTIME_GUARDRAILS
 
-This file owns contract format, binding rules, bootstrap vs steady-state truth, and runtime verification.
+## Non-negotiable reading law
 
-## Canonical contract root
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
+
+
+## Contract source
+
+Public HTTP APIs must be represented by OpenAPI under:
 
 ```text
 contracts/master/
 ```
 
-## Contract format
+During bootstrap, forensics may begin from UI/runtime evidence, but no public contract is closed until OpenAPI exists.
 
-OpenAPI is the canonical public HTTP contract format for public endpoints.
+## Phase law
 
-## Bootstrap phase
+### Bootstrap phase
 
-During bootstrap, development may start from:
+Allowed:
 
-- screen/flow evidence
-- runtime logs
-- API discovery
-- UX need
-- request/response observation
+- inspect screens,
+- inspect runtime logs,
+- map user flows,
+- identify missing endpoints,
+- define provisional binding matrix.
 
-But no public endpoint is closed until its public contract exists under `contracts/master/`.
+Not allowed:
 
-## Steady-state phase
+- claim contract closure,
+- hide missing OpenAPI,
+- hardcode endpoint truth in screens,
+- treat fixtures as runtime truth.
 
-When a contract exists:
+### Steady-state phase
 
-- OpenAPI is the legal schema/endpoint reference.
-- runtime drift from contract is a defect.
-- generated types/clients must derive from contract truth.
-- changes require compatibility review.
+When OpenAPI exists:
+
+- OpenAPI is legal contract truth.
+- `packages/api-types` is generated/derived from contract.
+- `packages/api-clients` follows contract.
+- services implement contract.
+- runtime verification proves behavior.
+
+## NestJS backend contract
+
+NestJS services must expose or feed contract generation consistently. Controller DTOs, validation, auth decorators, and OpenAPI schemas must not drift silently.
+
+Minimum backend evidence for API change:
+
+- changed controller/service path,
+- contract diff,
+- type generation or typecheck,
+- integration/contract test,
+- runtime log or request evidence when needed.
 
 ## Binding chain
 
 ```text
-Contract -> api-types -> api-clients -> service adapter -> surface binding -> screen state -> runtime proof -> evidence pack
+OpenAPI contract
+→ api-types
+→ api-clients
+→ surface binding
+→ screen state
+→ runtime evidence
 ```
 
-## NestJS/backend law
+Every break in this chain is a defect until documented as `TBD/BLOCKED`.
 
-Backend/API work must identify:
+## API binding matrix columns
 
-- controller/module/provider owner
-- DTO/schema
-- validation
-- auth/permissions
-- persistence model
-- error model
-- observability/logging
-- contract/test proof
+```text
+service | surface | screen/operation | endpoint | method | request type | response type | auth | states covered | evidence | status
+```
 
-## Non-HTTP binding
+## Runtime forbidden patterns
 
-Non-HTTP binding requires:
+- direct fetch in screen when API client exists,
+- undocumented endpoint,
+- fixture-only success path,
+- local mock treated as production,
+- env-only provider truth,
+- unvalidated response shape,
+- silent catch that hides API failure.
 
-- adapter owner
-- equivalent contract representation
-- runtime proof
-- failure modes
-- security review
+## API closure criteria
 
-## Runtime verification
+- endpoint documented,
+- auth/security model documented,
+- request/response examples exist,
+- API client typed,
+- surface handles states,
+- tests/runtime evidence exist,
+- rollback/disable path exists for risky changes.
 
-For API/binding changes, evidence must include:
-
-- contract artifact
-- request/response sample or test
-- integration/contract test output
-- relevant logs
-- TypeScript output
-- rollback/compatibility note
-
-## Forbidden
-
-- no UI-only task may silently change API/backend
-- no backend task may bypass contract evidence
-- no secrets in contracts or evidence
-- no fixture-only runtime readiness claim
+{standard_footer()}

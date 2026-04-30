@@ -1,77 +1,95 @@
 # Variable Policy and Provider Control
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `Mutable Policy Governance`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** PLATFORM_OPERATING_MODEL mutable policy law, provider control-plane notes
 
-This file owns mutable platform policy variables, provider settings, overrides, and operational control.
+## Non-negotiable reading law
+
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
+
 
 ## VAR law
 
-Mutable policies must use `VAR_*` style governance or equivalent structured control, not hardcoded scattered constants.
+Any mutable business/runtime value that can change by service, store, city, zone, category, provider, rollout, or operational mode must be treated as `VAR_*`.
 
-Examples:
+## Examples
 
-- fees
-- commissions
-- delivery ranges
-- ETA buffers
-- service availability windows
-- retry limits
-- OTP rules
-- provider selection
-- refund windows
-- operational modes
-- risk thresholds
+```text
+VAR_DSH_DELIVERY_FEE
+VAR_DSH_SMALL_ORDER_FEE
+VAR_DSH_STORE_COMMISSION_RATE
+VAR_DSH_ZONE_SURGE_MULTIPLIER
+VAR_WLT_SETTLEMENT_WINDOW
+VAR_WLT_REFUND_POLICY
+VAR_AMN_OTP_RETRY_LIMIT
+VAR_PROVIDER_PAYMENT_PRIORITY
+VAR_CAPTAIN_ASSIGNMENT_RADIUS
+```
 
-## Override precedence
+## Precedence
 
-Highest to lowest:
+Default precedence:
 
-1. Store
-2. Subcategory
-3. Category
-4. Zone
-5. City
-6. Region
-7. Global
+```text
+Store
+→ Subcategory
+→ Category
+→ Zone
+→ City
+→ Region
+→ Service
+→ Global
+```
 
-Every override must include:
-
-- owner
-- reason
-- effective date
-- expiry or review date
-- audit trail
-- rollback path
+A service may define a narrower precedence only with evidence and owner approval.
 
 ## Provider control plane
 
-Providers must be controlled through documented configuration, not ENV-only hidden truth for live operation.
+Provider selection, provider priority, provider failover, and provider rollout must be controlled through explicit policy, not scattered env-only logic.
 
-Provider changes require:
+Provider policy record:
 
-- provider name
-- scope
-- credentials redaction
-- health check
-- fallback behavior
-- monitoring
-- rollback
-- evidence
+```text
+provider_id
+service
+capability
+priority
+fallback
+region/scope
+status
+owner
+last_changed_by
+evidence
+rollback
+```
 
-## Preview and rollback
+## Change requirements
 
-Policy changes should support:
+A `VAR_*` change requires:
 
-- preview
-- dry run where possible
-- validation
-- staged rollout
-- rollback/restore
-- audit trail
+- owner,
+- reason,
+- before/after,
+- scope,
+- preview/simulation where possible,
+- audit log,
+- rollback,
+- evidence pack.
 
 ## Forbidden
 
-- hardcoded live policy values in screens
-- hidden finance variables outside WLT
-- provider switching without evidence
-- production behavior controlled only by undocumented local env
+- hardcoded fee/commission/refund formula inside screen,
+- env-only provider truth for live runtime,
+- hidden fallback without monitoring,
+- store-specific policy in code,
+- mutable value with no owner or rollback.
+
+## WLT relationship
+
+Any `VAR_*` that affects money settlement, refunds, commissions, fees, or wallet balance must be approved by WLT governance and must produce financial audit evidence.
+
+{standard_footer()}

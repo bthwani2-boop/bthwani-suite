@@ -1,68 +1,87 @@
-# Governance Index and Authority Map
+# Governance Index and Reading Map
 
-## Purpose
+**Status:** Canonical Governance Payload v2
+**Owner:** `Governance Control Plane`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** 00_GOVERNANCE_INDEX, GOVERNANCE_REORGANIZATION_LEDGER, GOVERNANCE_CONSOLIDATION_DECISION_MATRIX
 
-This file is the routing table for every governance decision. It prevents duplication by assigning one owner file per decision family.
+## Non-negotiable reading law
 
-## Precedence order
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
 
-1. User's latest explicit instruction for the current task.
-2. Safety/security constraints.
-3. This governance package.
-4. Repository evidence.
-5. Project resources/SOPs.
-6. Historical attachments or legacy files only as donor/reference.
 
-When repo evidence contradicts policy text, mark the status `FIX_REQUIRED` or `BLOCKED`; do not silently rewrite truth.
+## Reading order
 
-## Authority map
+1. `00_README.md` — scope and authority.
+2. `02_PLATFORM_SSOT.md` — platform truth.
+3. `07_SURFACES_AND_SERVICES.md` — services and surfaces.
+4. `04_ARCHITECTURE_RULES.md` — ownership and direction.
+5. `11_EVIDENCE_AND_TRACEABILITY.md` — proof requirements.
+6. Domain file for the current task.
+7. `14_GUARDS_CATALOG.md` — enforcement mapping.
+8. `99_LEGACY_MERGE_LEDGER.md` — source accounting.
 
-| Decision family | Owner file |
+## File classification
+
+| Class | Files | Meaning |
+|---|---|---|
+| Entry | `00`, `01` | How to use governance. |
+| Platform truth | `02`, `07`, `19`, `20`, `22`, `25` | What BThwani is and how services operate. |
+| Architecture | `03`, `04`, `05`, `06`, `08`, `09` | Where code belongs and how it connects. |
+| Closure | `10`, `11`, `12`, `13`, `14`, `21`, `23`, `24` | How proof, testing, warnings, roadmap, and runtime are accepted. |
+| AI/workflow/security | `15`, `16`, `17`, `18` | How AI, secrets, cleanup, branches, and checkpoints behave. |
+| Ledger | `99` | Legacy source coverage and extraction accountability. |
+
+## Authority vocabulary
+
+| Term | Meaning |
 |---|---|
-| Platform naming, stack, service catalog, surface catalog | `02_PLATFORM_SSOT.md` |
-| Repository roots, active/current/legacy/archive classification | `03_REPO_BOUNDARIES.md` |
-| Architecture direction and dependency ladder | `04_ARCHITECTURE_RULES.md` |
-| Package exports/imports/deep-import boundaries | `05_PACKAGE_BOUNDARIES.md` |
-| App shells and shell-only responsibilities | `06_APPS_AND_SHELLS.md` |
-| Service-owned and surface-owned registry | `07_SURFACES_AND_SERVICES.md` |
-| UI kit, Tamagui, brand, RTL, states | `08_UI_KIT_AND_BRAND.md` |
-| API contracts, binding, runtime proof | `09_API_BINDING_RUNTIME.md` |
-| Service closure and golden-slice gates | `10_SERVICE_CLOSURE.md` |
-| Evidence schema and traceability | `11_EVIDENCE_AND_TRACEABILITY.md` |
-| Testing and production readiness | `12_TESTING_AND_PRODUCTION_READINESS.md` |
-| CI gates and blocking/report-only policy | `13_CI_AND_GATES.md` |
-| Guards catalog and severity | `14_GUARDS_CATALOG.md` |
-| AI agents, Copilot, scripts, patch handoff | `15_AGENT_AND_AI_EXECUTION.md` |
-| Security, secrets, privacy, threat posture | `16_SECURITY_AND_SECRETS.md` |
-| Cleanup, deletion, deprecation, archive | `17_CLEANUP_AND_DEPRECATION.md` |
-| Branches, checkpoints, divergence, PR readiness | `18_BRANCH_AND_CHECKPOINTS.md` |
-| Control panel and operating model | `19_CONTROL_PANEL_AND_OPERATING_MODEL.md` |
-| Mutable policy variables and provider control plane | `20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md` |
-| Runtime observability and production operations | `21_RUNTIME_OBSERVABILITY_AND_PRODUCTION.md` |
-| DSH golden-slice closure plan | `22_DSH_GOLDEN_SLICE.md` |
-| Warning families and false-positive governance | `23_WARNINGS_AND_FALSE_POSITIVES.md` |
-| Traceability matrix and roadmap | `24_TRACEABILITY_AND_ROADMAP.md` |
-| Service blueprint and operation catalog standard | `25_SERVICE_BLUEPRINT_AND_OPERATION_CATALOG.md` |
-| Legacy source merge accounting | `99_LEGACY_MERGE_LEDGER.md` |
+| `Canonical` | Must be followed unless superseded with evidence and governance update. |
+| `Current` | Exists now but may not be correct. |
+| `Legacy` | Historical/donor source only. |
+| `Derived` | Generated from canonical source; cannot override it. |
+| `Transitional` | Temporarily tolerated with expiry and owner. |
+| `TBD` | Unknown; cannot be implemented as truth. |
+| `Blocked` | Must not proceed without missing decision/evidence. |
 
-## Canonical status vocabulary
+## One-owner rule
 
-- `CANONICAL`: approved authority.
-- `CURRENT`: actual repo state, may need correction.
-- `LEGACY`: historical donor/reference, not authority.
-- `TRANSITIONAL`: temporary migration state with expiry.
-- `TBD`: unknown until proven.
-- `DEPRECATED`: approved for removal after gates.
-- `REJECTED`: reviewed and intentionally not adopted.
+Every rule must have one owner file. If two files appear to govern the same thing, apply this resolution order:
 
-## Decision vocabulary
+1. More specific domain owner wins.
+2. If conflict is cross-domain, `02_PLATFORM_SSOT.md` decides platform facts.
+3. Evidence procedure conflicts are decided by `11_EVIDENCE_AND_TRACEABILITY.md`.
+4. AI execution conflicts are decided by `15_AGENT_AND_AI_EXECUTION.md`.
+5. Update `99_LEGACY_MERGE_LEDGER.md` when the conflict came from legacy.
 
-Final decisions: `PASS`, `PASS_WITH_WARNINGS`, `FIX_REQUIRED`, `BLOCKED`, `READY_FOR_PR`, `REVERT_REQUIRED`, `NEEDS_EVIDENCE`, `NEEDS_VISUAL_EVIDENCE`
+## Required cross-links
 
-## Duplication rule
+Each file must answer:
 
-A rule may be restated only as a short pointer. The full rule lives in exactly one owner file.
+- What does this file own?
+- What is forbidden?
+- What evidence proves compliance?
+- Which guard enforces it?
+- Which file owns adjacent domains?
+- What remains out of scope?
 
-## Missing evidence rule
+## Minimum governance quality bar
 
-If a claim cannot be supported by repo output, source hash, CI output, screenshot, runtime log, or patch evidence, it must be marked `UNPROVEN` or `TBD`.
+A governance file is unacceptable if it is only slogans. It must include enforceable rules, owner paths, allowed/forbidden examples, evidence requirements, and closure conditions.
+
+## Current package structure
+
+```text
+governance/
+  00_README.md
+  01_GOVERNANCE_INDEX.md
+  ...
+  25_SERVICE_BLUEPRINT_AND_OPERATION_CATALOG.md
+  99_LEGACY_MERGE_LEDGER.md
+```
+
+No active `governance-legacy` folder is required after this package is applied. If retained locally for review, it must be quarantined/archive-only and excluded from active policy.
+
+{standard_footer()}

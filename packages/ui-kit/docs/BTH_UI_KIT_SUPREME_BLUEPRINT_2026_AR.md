@@ -1,4 +1,4 @@
-# BTH UI Kit Supreme Blueprint — 2026
+# bthwani UI Kit Supreme Blueprint — 2026
 
 > NOTE (example-only): This blueprint contains canonical branding identifiers. Do not embed runtime secrets in docs. Replace runtime tokens with placeholders like `__BTHWANI_*__` and manage secrets via vault/CI. Proposed placeholder replacements are in kdt/merge-run/.../proposed/remediations/patches/
 
@@ -12,7 +12,7 @@
 
 - لا نعتمد على ادعاء إنشائي مثل: "سنكون الأفضل عالميًا".
 - نعتمد على بناء **نظام تصميم وتشغيل واجهات** يجعل الوصول إلى هذا المستوى ممكنًا وقابلًا للقياس والفرض والتحقق.
-- الهدف هنا هو: **أعلى مستوى عملي ومقاس من جودة الواجهات وتجربة المستخدم عبر كل أسطح BTH**.
+- الهدف هنا هو: **أعلى مستوى عملي ومقاس من جودة الواجهات وتجربة المستخدم عبر كل أسطح bthwani**.
 
 هذه الوثيقة لا تعتبر الشاشات الحالية مرجعًا.
 
@@ -89,12 +89,12 @@
 - WCAG 2.2 كمعيار وصولية أساسي
 - Design Tokens Community Group كاتجاه معياري لتوحيد التوكنز وتبادلها بين الأدوات والمنصات
 
-لكن BTH لا ينسخ أي نظام منها كما هو.
+لكن bthwani لا ينسخ أي نظام منها كما هو.
 
 **القرار السيادي:**
 
 - نستفيد من أفضل ما في هذه الأنظمة
-- نعيد صياغته داخل نظام BTH الخاص
+- نعيد صياغته داخل نظام bthwani الخاص
 - ننتج هوية وتجربة موحدة ومناسبة لسوقنا ومنصتنا
 
 ---
@@ -150,7 +150,7 @@
 
 ## 5) القانون الأعلى للحزمة
 
-## BTH UI Kit Sovereignty Law
+## bthwani UI Kit Sovereignty Law
 
 يجب أن يملك `@bthwani/ui-kit` حصريًا:
 
@@ -829,7 +829,7 @@
 
 ## الصياغة الحاكمة النهائية
 
-> `@bthwani/ui-kit` must become the single design operating system for every future BTH screen.
+> `@bthwani/ui-kit` must become the single design operating system for every future bthwani screen.
 
 والمعنى العملي لهذه الجملة:
 

@@ -1,70 +1,106 @@
 # Governance (Canonical)
 
-**Status**: Canonical governance package for `bthwani-suite`.
+**Status:** Canonical Governance Payload v2
+**Owner:** `Governance Control Plane`
+**Canonical repo:** `C:\bthwani-suite`
+**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
+**Legacy families promoted here:** GOVERNANCE_CANONICAL, GOVERNANCE_CONTROL_PLANE_STANDARD, GOVERNANCE_CLOSURE_STANDARD
 
-**Canonical local repo**: `C:\bthwani-suite`
+## Non-negotiable reading law
 
-**Canonical GitHub repo**: `bthwani2-boop/bthwani-suite`
+This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
 
-**Canonical docs root**: `governance/`
 
-**Canonical evidence root**: `tools/registry/runs/{SESSION_ID}/`
+## Purpose
 
-## Executive law
+This folder is the canonical governance control plane for BThwani. It defines how the monorepo, services, surfaces, applications, packages, UI system, API contracts, runtime verification, evidence, branches, checkpoints, agents, and cleanup must behave.
 
-This governance folder is the single textual authority for repository governance, architecture boundaries, service/surface ownership, UI authority, API/runtime binding, verification, evidence, guards, cleanup, and AI-assisted execution.
+## Canonical roots
 
-No result may be called `PASS`, `READY`, `CLOSED`, `FINAL`, `LOCKED`, or `100%` unless an evidence pack proves it.
+```text
+C:\bthwani-suite
+governance/
+tools/registry/runs/{SESSION_ID}/
+packages/ui-kit
+packages/surfaces
+packages/app-shells
+packages/api-types
+packages/api-clients
+services/
+contracts/master/
+apps/mobile/*
+apps/web/*
+```
 
-## What this package replaces
+## Authority order
 
-This package replaces weak extracted summaries with a closure-grade governance control plane. Legacy files are treated as source evidence only; they must not remain a parallel authority.
+1. Safety and explicit user instruction.
+2. Repository evidence from the active branch.
+3. This governance folder.
+4. Project resources/SOPs.
+5. Legacy files as source material only.
+6. AI/Copilot summaries.
 
-If an old `governance/governance-legacy/` folder exists in the repository, it is read-only reference material until the install/audit process quarantines it or removes it after ledger verification.
+Legacy files are **not** active policy after this package is applied. Legacy is evidence for extraction only and is accounted for in `99_LEGACY_MERGE_LEDGER.md`.
 
-## Mandatory stack
+## BThwani fixed facts
 
-`Node.js / TypeScript / pnpm / Nx / React / React Native / Expo / Next.js / NestJS`
+- Active local repo: `C:\bthwani-suite`.
+- Canonical remote: `bthwani2-boop/bthwani-suite`.
+- Canonical stack: Node.js, TypeScript, pnpm, Nx, React, React Native, Expo Dev Client, Next.js, NestJS.
+- Canonical architecture ladder: Screen / Surface / App → `@bthwani/ui-kit` public exports → Tamagui internally inside ui-kit only.
+- Canonical visual identity: `#0A2F5C` deepBlue, `#FF500D` orange, `#FFFFFF` white.
+- Canonical language contract: Arabic/RTL correctness is mandatory where Arabic UI exists.
+- Canonical evidence root: `tools/registry/runs/{SESSION_ID}/`.
 
-## Mandatory BThwani architecture rule
+## What governance owns
 
-`Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only`
+| Domain | Owner file |
+|---|---|
+| Platform SSoT and service catalog | `02_PLATFORM_SSOT.md` |
+| Repository roots and boundaries | `03_REPO_BOUNDARIES.md` |
+| Architecture and ownership | `04_ARCHITECTURE_RULES.md` |
+| Packages and public exports | `05_PACKAGE_BOUNDARIES.md` |
+| Apps and shells | `06_APPS_AND_SHELLS.md` |
+| Surfaces and services | `07_SURFACES_AND_SERVICES.md` |
+| UI Kit, brand, RTL | `08_UI_KIT_AND_BRAND.md` |
+| API, contracts, binding, runtime | `09_API_BINDING_RUNTIME.md` |
+| Service closure | `10_SERVICE_CLOSURE.md` |
+| Evidence and traceability | `11_EVIDENCE_AND_TRACEABILITY.md` |
+| Testing and production readiness | `12_TESTING_AND_PRODUCTION_READINESS.md` |
+| CI and gates | `13_CI_AND_GATES.md` |
+| Guards | `14_GUARDS_CATALOG.md` |
+| AI / agent execution | `15_AGENT_AND_AI_EXECUTION.md` |
+| Security and secrets | `16_SECURITY_AND_SECRETS.md` |
+| Cleanup and deprecation | `17_CLEANUP_AND_DEPRECATION.md` |
+| Branches and checkpoints | `18_BRANCH_AND_CHECKPOINTS.md` |
+| Control panel | `19_CONTROL_PANEL_AND_OPERATING_MODEL.md` |
+| Mutable policy and providers | `20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md` |
+| Observability and production | `21_RUNTIME_OBSERVABILITY_AND_PRODUCTION.md` |
+| DSH golden slice | `22_DSH_GOLDEN_SLICE.md` |
+| Warnings and false positives | `23_WARNINGS_AND_FALSE_POSITIVES.md` |
+| Roadmap and traceability | `24_TRACEABILITY_AND_ROADMAP.md` |
+| Service blueprint and operation catalog | `25_SERVICE_BLUEPRINT_AND_OPERATION_CATALOG.md` |
+| Legacy merge ledger | `99_LEGACY_MERGE_LEDGER.md` |
 
-## Mandatory brand DNA
+## Anti-drift law
 
-Deep Blue `#0A2F5C`, Orange `#FF500D`, White `#FFFFFF`, RTL-correct, premium 2026, low-noise, cohesive, practical, clear, elegant.
+Do not create a parallel governance root in `docs/governance`, `kdt/volatile`, app folders, package folders, or `.github` documents. Implementation roots may contain generated evidence or guard source, but they must point back here.
 
-## Read order
+## Change protocol
 
-1. `01_GOVERNANCE_INDEX.md`
-2. `02_PLATFORM_SSOT.md`
-3. `03_REPO_BOUNDARIES.md`
-4. `04_ARCHITECTURE_RULES.md`
-5. `07_SURFACES_AND_SERVICES.md`
-6. `11_EVIDENCE_AND_TRACEABILITY.md`
-7. `14_GUARDS_CATALOG.md`
-8. `99_LEGACY_MERGE_LEDGER.md`
+1. CHECK: capture branch/status/diff/untracked.
+2. FORENSICS: prove the exact problem or missing rule.
+3. APPLY: change the smallest owner file only.
+4. VERIFY: run diff check and governance verification.
+5. LEDGER: update `99_LEGACY_MERGE_LEDGER.md` if legacy coverage changed.
+6. EVIDENCE: save evidence pack under `tools/registry/runs/{SESSION_ID}/`.
 
-## Change law
+## Closure checklist for this file
 
-Any governance change must include:
-
-- exact scope
-- reason
-- changed files
-- source evidence
-- conflict review
-- `git diff --check`
-- status/evidence pack
-- decision using the canonical decision vocabulary
-
-## Forbidden
-
-- No parallel governance root.
-- No stale `docs/governance` authority.
-- No `governance-legacy` as active authority.
-- No broad undocumented deletion.
-- No silent path drift.
-- No blind global replace.
-- No old standalone repo/path named `bth` as an active target.
-- No removal of valid names such as `BThwani`, `bthwani-suite`, `@bthwani/*`, or `bthwani2-boop/bthwani-suite`.
+- [ ] Every rule above has exactly one owner file.
+- [ ] Any derived script/guard points back to this file and not to legacy.
+- [ ] Evidence exists for any claim of compliance.
+- [ ] No local app/surface/package silently overrides this file.
+- [ ] Any exception is documented with owner, expiry, risk, and rollback.
