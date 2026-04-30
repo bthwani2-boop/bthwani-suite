@@ -1,0 +1,13 @@
+*** PartnerSurfaceHost.tsx — conservative proposal (non-destructive)
+File: packages/app-shells/mobile/partner/PartnerSurfaceHost.tsx
+
+Purpose: Add an explicit example-only note near the top of the file so token-like literals are clearly documented as non-secret examples. This is non-destructive and intended for owner review.
+
+Proposed diff (apply only after owner review):
+--- a/packages/app-shells/mobile/partner/PartnerSurfaceHost.tsx
++++ b/packages/app-shells/mobile/partner/PartnerSurfaceHost.tsx
+@@
+ import React from 'react';
++// NOTE (example-only): This file may include decorative identifiers and example literals.
++// Do NOT store runtime secrets or production tokens in repository files.
++// Use secure vaults or CI-managed secrets for runtime values. Placeholder proposals live under kdt/merge-run/.../proposed/remediations/

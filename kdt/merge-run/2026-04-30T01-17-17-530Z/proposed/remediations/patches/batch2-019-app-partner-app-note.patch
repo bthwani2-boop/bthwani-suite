@@ -1,0 +1,12 @@
+apps/mobile/app-partner/App.tsx — conservative proposal (non-destructive)
+File: apps/mobile/app-partner/App.tsx
+
+Purpose: Add a top-line comment documenting that placeholder tokens in the app config are example values and not runtime secrets.
+
+Proposed diff (apply only after owner review):
+--- a/apps/mobile/app-partner/App.tsx
++++ b/apps/mobile/app-partner/App.tsx
+@@
+ // App entry for app-partner
++// NOTE (example-only): Placeholder identifiers in this file are examples for development and not runtime secrets. See PROTECTED_TOKENS_ALLOWLIST.md for accepted tokens.
+*** End Patch

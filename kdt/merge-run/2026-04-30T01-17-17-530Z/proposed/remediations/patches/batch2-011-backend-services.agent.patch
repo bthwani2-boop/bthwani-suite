@@ -1,0 +1,12 @@
+backend-services.agent.md — conservative proposal (non-destructive)
+File: .github/agents/platform-agent-os-2026-v3-additive/Domains/backend-services.agent.md
+
+Purpose: Add example-only note.
+
+Proposed diff (apply only after owner review):
+--- a/.github/agents/platform-agent-os-2026-v3-additive/Domains/backend-services.agent.md
++++ b/.github/agents/platform-agent-os-2026-v3-additive/Domains/backend-services.agent.md
+@@
+ name: bthwani-backend-services-2026-v3-additive
+ 
++<!-- NOTE (example-only): Owner and domain metadata are allowed and documented here. -->

@@ -1,0 +1,17 @@
+*** packages/ui-kit/src/locales.ts — conservative proposal (non-destructive)
+File: packages/ui-kit/src/locales.ts
+
+Purpose: Add an inline note clarifying that locale strings are branding/display-only and not runtime secrets.
+
+Proposed diff:
+--- a/packages/ui-kit/src/locales.ts
++++ b/packages/ui-kit/src/locales.ts
+@@
+ export const AR_LOCALE = {
+   direction: 'rtl',
+   labels: {
+     // ...
+   }
+ };
+
+// NOTE (example-only): Locale and branding strings are display text. If any token-like values exist, replace with placeholders and avoid embedding secrets in locale files.

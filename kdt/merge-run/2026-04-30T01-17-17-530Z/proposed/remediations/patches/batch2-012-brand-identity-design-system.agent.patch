@@ -1,0 +1,12 @@
+brand-identity-design-system.agent.md — conservative proposal (non-destructive)
+File: .github/agents/platform-agent-os-2026-v3-additive/Domains/brand-identity-design-system.agent.md
+
+Purpose: Add example-only note about identity description lines.
+
+Proposed diff (apply only after owner review):
+--- a/.github/agents/platform-agent-os-2026-v3-additive/Domains/brand-identity-design-system.agent.md
++++ b/.github/agents/platform-agent-os-2026-v3-additive/Domains/brand-identity-design-system.agent.md
+@@
+ description: White/orange/dark navy-blue premium BThwani identity.
+ 
++<!-- NOTE (example-only): Visual identity descriptors and helper colors are documentation artifacts, not secrets. -->

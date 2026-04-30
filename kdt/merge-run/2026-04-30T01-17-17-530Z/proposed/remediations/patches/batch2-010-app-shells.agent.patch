@@ -1,0 +1,12 @@
+app-shells.agent.md — conservative proposal (non-destructive)
+File: .github/agents/platform-agent-os-2026-v3-additive/Domains/app-shells.agent.md
+
+Purpose: Add example-only note to domain agent file.
+
+Proposed diff (apply only after owner review):
+--- a/.github/agents/platform-agent-os-2026-v3-additive/Domains/app-shells.agent.md
++++ b/.github/agents/platform-agent-os-2026-v3-additive/Domains/app-shells.agent.md
+@@
+ name: bthwani-app-shells-2026-v3-additive
+ 
++<!-- NOTE (example-only): Owner and domain names are established BThwani tokens; included for clarity. -->

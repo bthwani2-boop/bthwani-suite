@@ -1,0 +1,14 @@
+*** packages/app-shells/index.ts — conservative proposal (non-destructive)
+File: packages/app-shells/index.ts
+
+Purpose: Add top-of-file example-only note to clarify any token-like identifiers.
+
+Proposed diff:
+--- a/packages/app-shells/index.ts
++++ b/packages/app-shells/index.ts
+@@
+ export * from './mobile';
+ export * from './web';
+
++// NOTE (example-only): Exports and identifiers here may reference canonical package IDs.
++// Do not hard-code runtime secrets in package entry points. Use placeholders and secure secret stores.

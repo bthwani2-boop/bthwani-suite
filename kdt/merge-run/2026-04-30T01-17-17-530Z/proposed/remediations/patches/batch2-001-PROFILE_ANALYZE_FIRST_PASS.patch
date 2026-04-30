@@ -1,0 +1,12 @@
+PROFILE_ANALYZE_FIRST_PASS.md — conservative proposal (non-destructive)
+File: .github/agents/base-profiles/PROFILE_ANALYZE_FIRST_PASS.md
+
+Purpose: Add an explicit example-only note near the top of the document so token-like literals are clearly documented as non-secret examples. Non-destructive; for owner review.
+
+Proposed diff (apply only after owner review):
+--- a/.github/agents/base-profiles/PROFILE_ANALYZE_FIRST_PASS.md
++++ b/.github/agents/base-profiles/PROFILE_ANALYZE_FIRST_PASS.md
+@@
+ # PROFILE_ANALYZE_FIRST_PASS
+ 
++<!-- NOTE (example-only): This document may include token-like identifiers for ownership or example flows. These are documented examples and not runtime secrets. See kdt/merge-run/.../proposed/PROTECTED_TOKENS_ALLOWLIST.md for accepted tokens and triage evidence. -->
