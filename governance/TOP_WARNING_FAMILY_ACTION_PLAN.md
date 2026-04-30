@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/TOP_WARNING_FAMILY_ACTION_PLAN.md
+generatedAt: 2026-04-30T04:48:37.9442973+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Top Warning Family Action Plan
 
 Status: CANONICAL_ACTION_PLAN
@@ -22,3 +27,4 @@ SourceEvidence: `C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_05_FIX_BA
 ## Rule
 
 Do not attempt to fix all warnings at once. Use family-specific batches with evidence and rollback.
+

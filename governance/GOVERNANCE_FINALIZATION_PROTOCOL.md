@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_FINALIZATION_PROTOCOL.md
+generatedAt: 2026-04-30T04:48:37.5197910+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Finalization Protocol
 
 Status: CANONICAL_PROTOCOL
@@ -34,3 +39,4 @@ Allowed decisions:
 ## Push rule
 
 GitHub push is a separate operation and must not be hidden inside standardization scripts.
+

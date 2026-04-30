@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/SERVICE_BLUEPRINT_TEMPLATE.md
+generatedAt: 2026-04-30T04:48:37.9036991+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Service Blueprint Template
 
 Status: CANONICAL_TEMPLATE

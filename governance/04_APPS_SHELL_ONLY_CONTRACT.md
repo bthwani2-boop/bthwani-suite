@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/04_APPS_SHELL_ONLY_CONTRACT.md
+generatedAt: 2026-04-30T04:48:37.1589170+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Apps And App-Shells Boundary Contract
 
 ## Purpose
@@ -91,3 +96,4 @@ If a file is a product screen, flow, widget, order board, dashboard, wallet expe
 Any app file that contains screen/domain content is a boundary risk and must be moved only in a later boundary repair phase with consumer proof.
 
 Any shell file containing service or domain tokens such as DSH orders, stores, products, wallets, captains, or merchant workflows is also a boundary risk and must be reviewed as a shell-ownership candidate.
+

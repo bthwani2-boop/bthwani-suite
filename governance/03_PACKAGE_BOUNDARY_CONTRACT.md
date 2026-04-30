@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/03_PACKAGE_BOUNDARY_CONTRACT.md
+generatedAt: 2026-04-30T04:48:37.1428985+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Package Boundary Contract
 
 ## Purpose
@@ -103,3 +108,4 @@ pnpm -w exec tsc --noEmit
 ```
 
 Later guard phases must convert this contract into automated checks.
+

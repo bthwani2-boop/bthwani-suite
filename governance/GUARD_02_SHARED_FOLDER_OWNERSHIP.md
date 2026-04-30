@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GUARD_02_SHARED_FOLDER_OWNERSHIP.md
+generatedAt: 2026-04-30T04:48:37.5912382+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # GUARD-02 — Shared Folder Ownership Guard
 
 ## Purpose
@@ -54,3 +59,4 @@ This guard is CHECK-only.
 It must not move, delete, rename, or refactor files.
 
 The remediation queue is used to plan small scoped fixes only after owner and consumer proof.
+

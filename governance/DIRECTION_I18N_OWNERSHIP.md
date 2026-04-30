@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/DIRECTION_I18N_OWNERSHIP.md
+generatedAt: 2026-04-30T04:48:37.3830638+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Direction I18n Ownership
 
 Status: CANONICAL_POLICY
@@ -62,3 +67,4 @@ Direction and i18n ownership is not considered closed unless:
 - local consumers do not redefine shared direction primitives
 - public consumption paths are clear
 - conflicting ownership claims are removed from governance text
+

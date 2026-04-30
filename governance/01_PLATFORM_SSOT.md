@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/01_PLATFORM_SSOT.md
+generatedAt: 2026-04-30T04:48:37.1309608+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Platform SSoT
 
 This file defines the current canonical platform truth for BThwani.
@@ -75,3 +80,4 @@ Core colors:
 - white `#FFFFFF`
 
 Other colors require controlled design-system justification.
+

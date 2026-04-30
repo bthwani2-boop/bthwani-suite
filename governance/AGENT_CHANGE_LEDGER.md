@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/AGENT_CHANGE_LEDGER.md
+generatedAt: 2026-04-30T04:48:37.2595323+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Extracted Legacy Governance — Agent Change Ledger
 
 Status: LEGACY_EXTRACTED_CANONICAL_REVIEW
@@ -331,3 +336,4 @@ Copy this block for every accepted update.
 
 - Safe rollback path: revert only the specific governance sections or checklist entries introduced by this change.
 - When rollback should be considered: if a later rule proves redundant, contradictory, or too heavy for the governed workflow.
+

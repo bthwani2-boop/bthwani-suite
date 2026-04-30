@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/README.md
+generatedAt: 2026-04-30T04:48:37.8534154+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # BThwani Governance
 
 Status: CANONICAL_CONTROL_PLANE_ENTRY
@@ -90,3 +95,4 @@ That ledger is the mandatory internal record for why a governance file was kept,
 ## Canonical Index
 
 Read `00_GOVERNANCE_INDEX.md` first.
+

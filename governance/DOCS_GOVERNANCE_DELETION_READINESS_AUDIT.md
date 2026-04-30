@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/DOCS_GOVERNANCE_DELETION_READINESS_AUDIT.md
+generatedAt: 2026-04-30T04:48:37.3997943+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Docs Governance Deletion Readiness Audit
 
 Status: CANONICAL_READINESS_AUDIT
@@ -33,3 +38,4 @@ NOT_READY_ACTIVE_REFERENCES_EXIST
 ## Rule
 
 Do not delete docs/governance inside a remediation batch. Deletion must be a separate commit after final readiness proof.
+

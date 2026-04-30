@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_GUARD_EXECUTION_STANDARD.md
+generatedAt: 2026-04-30T04:48:37.5389621+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Guard Execution Standard
 
 Status: CANONICAL_GUARD_STANDARD
@@ -29,3 +34,4 @@ This file governs execution timing and discipline only. It must not duplicate th
 - A guard must not silently mutate broad repo state.
 - Warning baselines must not become hard failures without a dedicated batch.
 - New guards must pass in the same batch that introduces them.
+

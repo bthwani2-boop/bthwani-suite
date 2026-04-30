@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/LEGACY_REFERENCE_CLEANUP_POLICY.md
+generatedAt: 2026-04-30T04:48:37.8038990+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Legacy Reference Cleanup Policy
 
 Status: CANONICAL_POLICY

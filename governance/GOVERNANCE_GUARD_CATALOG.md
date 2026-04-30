@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_GUARD_CATALOG.md
+generatedAt: 2026-04-30T04:48:37.5317902+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Guard Catalog
 
 Status: CANONICAL_CATALOG
@@ -89,3 +94,4 @@ APP_PRODUCT_CONTENT_CANDIDATE
 ```
 
 Calibration must not hide live source violations. This guard remains `CHECK`-only and must not mutate product files.
+

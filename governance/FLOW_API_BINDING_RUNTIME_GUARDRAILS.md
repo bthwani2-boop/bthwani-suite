@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/FLOW_API_BINDING_RUNTIME_GUARDRAILS.md
+generatedAt: 2026-04-30T04:48:37.4251662+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Flow, API, Binding, and Runtime Guardrails
 
 Status: CANONICAL  
@@ -106,3 +111,4 @@ tests/checks run
 evidence stored
 decision recorded
 ```
+

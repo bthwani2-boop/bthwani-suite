@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/13_CI_GATES_CONTRACT.md
+generatedAt: 2026-04-30T04:48:37.2107976+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # CI Gates Contract
 
 ## Purpose
@@ -75,3 +80,4 @@ pnpm -w exec tsc --noEmit
 ```
 
 Then run the affected guard command directly and attach output to the evidence pack.
+

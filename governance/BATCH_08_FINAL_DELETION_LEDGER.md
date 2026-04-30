@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/BATCH_08_FINAL_DELETION_LEDGER.md
+generatedAt: 2026-04-30T04:48:37.3249731+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Batch 08 Final Deletion Ledger
 
 Status: CANONICAL_LEDGER
@@ -33,3 +38,4 @@ Forbidden:
 ## Decision
 
 PASS_FINAL_DELETION_LOCAL_COMMIT_READY_FOR_PUSH_REVIEW
+

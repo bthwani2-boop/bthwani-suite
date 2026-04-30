@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/CI_GRADUAL_GATE_POLICY.md
+generatedAt: 2026-04-30T04:48:37.3672620+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # CI Gradual Gate Policy
 
 Status: CANONICAL
@@ -61,3 +66,4 @@ Release gate requires:
 - required builds pass
 - evidence pack
 - rollback plan
+

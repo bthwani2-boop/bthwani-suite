@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GUARD_14_AGENT_SKILL_REGISTRY_OWNERSHIP.md
+generatedAt: 2026-04-30T04:48:37.6803091+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # GUARD-14 — Agent / Skill Registry Ownership
 
 ## Purpose
@@ -15,3 +20,4 @@ This guard must not delete, move, rename, rewrite production files, or activate 
 ## Promotion
 
 After warning classification, selected findings can be promoted from warning to error with precise allowlists.
+

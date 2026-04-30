@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/AGENT_GOVERNANCE_POLICY.md
+generatedAt: 2026-04-30T04:48:37.2660710+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Agent Governance Policy
 
 Status: TRANSITIONAL_ALIAS
@@ -30,3 +35,4 @@ This alias may be removed only after:
 - reference repair is complete
 - the action is recorded in `GOVERNANCE_REORGANIZATION_LEDGER.md`
 - no active consumer still depends on this path
+

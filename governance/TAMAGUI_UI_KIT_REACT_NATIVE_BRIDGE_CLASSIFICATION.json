@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/TAMAGUI_UI_KIT_REACT_NATIVE_BRIDGE_CLASSIFICATION.json
+generatedAt: 2026-04-30T04:48:37.9377801+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 {
   "status": "CLASSIFIED",
   "rule": "Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only",
@@ -90,3 +95,4 @@
     }
   ]
 }
+

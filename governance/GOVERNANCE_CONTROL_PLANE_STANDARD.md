@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_CONTROL_PLANE_STANDARD.md
+generatedAt: 2026-04-30T04:48:37.4891793+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Control Plane Standard
 
 Status: CANONICAL_STANDARD
@@ -138,3 +143,4 @@ No structural governance cleanup is complete until that ledger records the decis
 ## BThwani Architecture Rule
 
 Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only.
+

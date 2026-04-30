@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/TRACEABILITY_MATRIX_STANDARD.md
+generatedAt: 2026-04-30T04:48:37.9529277+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Traceability Matrix Standard
 
 Status: CANONICAL

@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_FILE_CLASSIFICATION_MATRIX.md
+generatedAt: 2026-04-30T04:48:37.5135867+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance File Classification Matrix
 
 Status: CANONICAL_MATRIX
@@ -40,3 +45,4 @@ Each governance-related file must map to one of:
 - C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134\batch11-governance-inventory.csv
 - C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134\batch11-guard-inventory.csv
 - C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134\batch11-candidate-resolution-matrix.csv
+

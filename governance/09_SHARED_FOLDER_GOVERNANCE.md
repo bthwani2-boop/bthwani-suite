@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/09_SHARED_FOLDER_GOVERNANCE.md
+generatedAt: 2026-04-30T04:48:37.1845385+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Shared Folder Governance
 
 ## Purpose
@@ -49,3 +54,4 @@ Before moving code to shared, document or prove:
 ## Deletion Rule
 
 Do not delete shared files before zero-reference proof and semantic owner replacement exist.
+

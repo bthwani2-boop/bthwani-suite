@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/BATCH_07_ACTIVE_REFERENCE_CLOSE_LEDGER.md
+generatedAt: 2026-04-30T04:48:37.3188344+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Batch 07 Active Reference Close Ledger
 
 Status: CANONICAL_LEDGER
@@ -28,3 +33,4 @@ Close the remaining active code/script references to the legacy governance docs 
 ## Next
 
 If active code/script blockers after verification equals 0, move to a dedicated deletion-readiness DryRun package. Do not delete legacy docs in this batch.
+

@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/PLATFORM_BLUEPRINT_EXECUTION_ROADMAP.md
+generatedAt: 2026-04-30T04:48:37.8317776+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Extracted Legacy Governance — PLATFORM_BLUEPRINT_EXECUTION_ROADMAP.md
 
 Status: LEGACY_EXTRACTED_CANONICAL_REVIEW
@@ -928,3 +933,4 @@ Truth
 ```
 
 No shortcut is valid without evidence.
+

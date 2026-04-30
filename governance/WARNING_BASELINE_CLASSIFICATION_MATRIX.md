@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/WARNING_BASELINE_CLASSIFICATION_MATRIX.md
+generatedAt: 2026-04-30T04:48:37.9785393+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Warning Baseline Classification Matrix
 
 Status: CANONICAL_BASELINE_MATRIX
@@ -59,3 +64,4 @@ HeadBefore: `b9a175c4ad5e9e8b0fd17390e18e025f7f6555e1`
 ## Rule
 
 Warnings are not closure. They are baseline debt until classified, fixed, accepted, or promoted by owner-approved policy.
+

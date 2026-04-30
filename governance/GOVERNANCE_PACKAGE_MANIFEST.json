@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_PACKAGE_MANIFEST.json
+generatedAt: 2026-04-30T04:48:37.5600769+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 {
   "package": "BTHWANI_GOVERNANCE_PACKAGE_20260430",
   "version": "1.0.0",
@@ -39,3 +44,4 @@
     "installer creates backups of overwritten files in evidence folder"
   ]
 }
+

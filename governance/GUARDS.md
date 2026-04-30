@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GUARDS.md
+generatedAt: 2026-04-30T04:48:37.7839239+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 tools/guards/guard-governance-boundaries.config.json
 # Governance Guards
 
@@ -30,3 +35,4 @@ This alias may be removed only after:
 - reference repair is complete
 - the action is recorded in `GOVERNANCE_REORGANIZATION_LEDGER.md`
 - no active consumer still depends on this path
+

@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_CANDIDATE_RESOLUTION_MATRIX.md
+generatedAt: 2026-04-30T04:48:37.4370486+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Candidate Resolution Matrix
 
 Status: CANONICAL_RESOLUTION_MATRIX
@@ -23,3 +28,4 @@ This matrix classifies all detected candidates from the current scan. It does no
 - C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134\batch11-duplicate-resolution.csv
 - C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134\batch11-contradiction-resolution.csv
 - C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003134\batch11-candidate-resolution-matrix.csv
+

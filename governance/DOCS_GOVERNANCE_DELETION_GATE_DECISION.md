@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/DOCS_GOVERNANCE_DELETION_GATE_DECISION.md
+generatedAt: 2026-04-30T04:48:37.3937350+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Docs Governance Deletion Gate Decision
 
 Status: CANONICAL_GATE_DECISION
@@ -23,3 +28,4 @@ PASS_FINAL_DELETION_LOCAL_COMMIT_READY_FOR_PUSH_REVIEW
 ## Rule
 
 This closes the legacy docs/governance root locally only. GitHub closure requires a separate explicit push after reviewing the evidence pack.
+

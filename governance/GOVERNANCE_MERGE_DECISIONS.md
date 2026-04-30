@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_MERGE_DECISIONS.md
+generatedAt: 2026-04-30T04:48:37.5528259+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Merge Decisions
 
 Status: CANONICAL_LEDGER  
@@ -32,3 +37,4 @@ Decision:
 | GOV-PKG-20260430-002 | Guard standards | `GUARDRAILS_INDEX.md` + domain guardrail files | ADOPTED | Make guardrails textual and executable-map friendly |
 | GOV-PKG-20260430-003 | Service closure standards | `SERVICE_CLOSURE_GUARDRAILS.md` | ADOPTED | Prevent service closure without identity, matrices, contracts, runtime proof, and evidence |
 | GOV-PKG-20260430-004 | Cleanup requirements | `CLEANUP_AND_DEPRECATION_POLICY.md` + `GOVERNANCE_CLEANUP_CANDIDATES.md` | ADOPTED | Prevent deletion before reference proof and rollback |
+

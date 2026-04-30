@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/BTHWANI_GUIDE__Unified_Execution_OS__V4_Phases_Waves_Todolists.md
+generatedAt: 2026-04-30T04:48:37.3388761+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Extracted Legacy Governance — BTHWANI GUIDE
 
 Status: LEGACY_EXTRACTED_CANONICAL_REVIEW
@@ -2297,3 +2302,4 @@ bthwani-suite/
 ابنِ `bthwani-suite` من الصفر على أساس قانون واضح، وهيكل واضح، وخدمة واحدة عميقة، ومراحل بسيطة لكن صارمة، وموجات صغيرة لها TodoList واضحة ومعايير تحقق واضحة، حتى يصبح التنفيذ اليدوي ممكنًا لك خطوة بخطوة دون ضجيج أو قفز أو ادعاء جاهزية قبل أوانها.
 
 ---
+

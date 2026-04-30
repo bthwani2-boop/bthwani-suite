@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE.md
+generatedAt: 2026-04-30T04:48:37.3464456+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Extracted Legacy Governance — BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE
 
 Status: LEGACY_EXTRACTED_CANONICAL_REVIEW
@@ -1131,3 +1136,4 @@ This document should now be treated as the single-file operational reference for
 - phase-1 execution boundaries
 
 It is the normalized answer to scattered notes, conflicting structures, and duplicated summaries.
+

@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/OPERATION_CATALOG_TEMPLATE.md
+generatedAt: 2026-04-30T04:48:37.8192713+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # OPERATION_CATALOG_TEMPLATE
 
 ## Mandatory Header
@@ -33,3 +38,4 @@ Every canonical operation record should capture at least:
 - one operation must map to one service owner
 - one operation must not spawn multiple competing binding chains later
 - service operation truth must be defined before contract finalization
+

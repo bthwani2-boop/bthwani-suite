@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_CLOSURE_DECISION.md
+generatedAt: 2026-04-30T04:48:37.4711963+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Closure Decision
 
 Status: CANONICAL_DECISION
@@ -25,3 +30,4 @@ Deletion and physical merge are not performed in Batch 12. They require dedicate
 ## Final closure condition
 
 Final deletion closure requires remove_dedicated_count to be executed or confirmed as zero, plus rollback evidence and post-delete guard pass.
+

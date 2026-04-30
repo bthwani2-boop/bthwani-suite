@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/APPROVED_SURFACE_NAMING.md
+generatedAt: 2026-04-30T04:48:37.2904148+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # APPROVED_SURFACE_NAMING
 
 ## Mandatory Header
@@ -31,3 +36,4 @@
 ## Explicit Rule
 
 These internal names must be used in paths, code, contracts, and governance artifacts.
+

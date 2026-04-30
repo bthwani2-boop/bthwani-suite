@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/07_UI_KIT_AUTHORITY_CONTRACT.md
+generatedAt: 2026-04-30T04:48:37.1702903+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # UI Kit Authority Contract
 
 ## Purpose
@@ -66,3 +71,4 @@ Consumers should import from `@bthwani/ui-kit` public exports, not deep internal
 ## Verification
 
 Any local design tokens or reusable component families outside ui-kit are governance violations unless explicitly approved as temporary migration code.
+

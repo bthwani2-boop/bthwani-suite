@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/19_PATCH_REVIEW_PROTOCOL.md
+generatedAt: 2026-04-30T04:48:37.2475827+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Patch Review Protocol
 
 Status: TRANSITIONAL_ALIAS
@@ -29,3 +34,4 @@ This alias may be removed only after:
 - reference repair is complete
 - the action is recorded in `GOVERNANCE_REORGANIZATION_LEDGER.md`
 - no active consumer still depends on this path
+

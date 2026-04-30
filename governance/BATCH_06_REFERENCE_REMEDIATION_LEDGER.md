@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/BATCH_06_REFERENCE_REMEDIATION_LEDGER.md
+generatedAt: 2026-04-30T04:48:37.3132068+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Batch 06 Reference Remediation Ledger
 
 Status: CANONICAL_LEDGER
@@ -37,3 +42,4 @@ SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_06_REMEDIA
 - Active blockers before: 24
 - Active blockers after: 1
 - Decision: NOT_READY_ACTIVE_REFERENCES_EXIST
+

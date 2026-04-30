@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GUARD_09_RTL_I18N.md
+generatedAt: 2026-04-30T04:48:37.6410313+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # GUARD-09 — RTL / i18n Guard
 
 ## Purpose
@@ -17,3 +22,4 @@ CHECK-only and warning-first until baseline review is complete.
 ## Rule
 
 No automatic text rewrite. No automatic RTL transformation. Any UI/RTL/i18n change requires owner proof and visual evidence where relevant.
+

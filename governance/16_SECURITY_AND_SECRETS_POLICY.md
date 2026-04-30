@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/16_SECURITY_AND_SECRETS_POLICY.md
+generatedAt: 2026-04-30T04:48:37.2260312+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Security and Secrets Policy
 
 ## Purpose
@@ -67,3 +72,4 @@ pnpm -w exec tsc --noEmit
 ```
 
 plus the relevant security guard output when available.
+

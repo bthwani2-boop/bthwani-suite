@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/REPO_BOUNDARY.md
+generatedAt: 2026-04-30T04:48:37.8660210+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # REPO_BOUNDARY
 
 ## Mandatory Header
@@ -59,3 +64,4 @@ This means:
 - no donor holding area under `services/`
 - no donor holding area under `packages/`
 - no donor holding area under `contracts/`
+

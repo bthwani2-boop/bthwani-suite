@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/CI_REPORT_ONLY_READINESS_PLAN.md
+generatedAt: 2026-04-30T04:48:37.3722217+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # CI Report-Only Readiness Plan
 
 Status: CANONICAL_CI_READINESS_PLAN
@@ -22,3 +27,4 @@ CI-REPORT
 - DocsDeletionDecision: NOT_READY_ACTIVE_REFERENCES_EXIST
 - DocsActiveReferenceBlockers: 24
 - Warning families need classification before hard gating.
+

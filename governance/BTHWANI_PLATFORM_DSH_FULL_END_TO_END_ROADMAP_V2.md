@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2.md
+generatedAt: 2026-04-30T04:48:37.3558418+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Extracted Legacy Governance — BThwani Platform + DSH Full End-to-End Forensic Closure Roadmap
 
 Status: LEGACY_EXTRACTED_CANONICAL_REVIEW
@@ -2613,3 +2618,4 @@ Truth
 ```
 
 Any shortcut that jumps directly to UI, deletion, API, live binding, or production risks recreating the same fragmentation under a new technical layer.
+

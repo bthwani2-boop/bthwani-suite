@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_MASTER_CONTROL_PLANE.md
+generatedAt: 2026-04-30T04:48:37.5469996+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # BThwani Governance Master Control Plane
 
 Status: CANONICAL_MASTER_CONTROL_PLANE
@@ -47,3 +52,4 @@ No governance or guard work may be called 100% closed unless all of the followin
 - every duplicate/contradiction candidate is either resolved or explicitly classified with a follow-up decision
 - GitHub contains the final commit after push
 - CI status is checked when available
+

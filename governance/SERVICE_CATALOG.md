@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/SERVICE_CATALOG.md
+generatedAt: 2026-04-30T04:48:37.9101018+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # SERVICE_CATALOG
 
 ## Mandatory Header
@@ -56,3 +61,4 @@ The current official service catalog for bootstrap is:
 
 These slugs are the official current service identifiers for bootstrap governance.
 They are not permission to start multiple service tracks at once.
+

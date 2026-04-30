@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/DOCS_GOVERNANCE_DELETION_READINESS_POLICY.md
+generatedAt: 2026-04-30T04:48:37.4048139+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Docs Governance Deletion Readiness Policy
 
 Status: CANONICAL
@@ -54,3 +59,4 @@ Do not delete if:
 Deletion of `docs/governance/` must be its own commit.
 
 It must not be combined with policy creation, guard changes, UI work, service work, or CI hardening.
+

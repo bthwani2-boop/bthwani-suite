@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/10_SERVICE_CLOSURE_PROTOCOL.md
+generatedAt: 2026-04-30T04:48:37.1916274+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Service Closure Protocol
 
 Status: CANONICAL_POLICY
@@ -313,3 +318,4 @@ NOT_APPLICABLE
 ```
 
 Closure is allowed only when the applicable metadata, matrices, contract proof, binding proof, permissions, runtime proof, tests, blueprint truth, and evidence pack are present.
+

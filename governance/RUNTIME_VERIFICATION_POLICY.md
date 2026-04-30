@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/RUNTIME_VERIFICATION_POLICY.md
+generatedAt: 2026-04-30T04:48:37.8749906+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Runtime Verification Policy
 
 Status: CANONICAL
@@ -99,3 +104,4 @@ A runtime-sensitive change may not be marked closed until:
 - visual proof exists when UI/UX changed
 - evidence root is recorded
 - warnings are classified or carried forward
+

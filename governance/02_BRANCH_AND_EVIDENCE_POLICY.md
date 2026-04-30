@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/02_BRANCH_AND_EVIDENCE_POLICY.md
+generatedAt: 2026-04-30T04:48:37.1375158+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Branch and Evidence Policy
 
 Status: CANONICAL_POLICY
@@ -133,3 +138,4 @@ FINAL
 ```
 
 unless the relevant evidence pack proves it.
+

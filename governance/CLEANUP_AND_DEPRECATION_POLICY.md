@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/CLEANUP_AND_DEPRECATION_POLICY.md
+generatedAt: 2026-04-30T04:48:37.3787607+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Cleanup and Deprecation Policy
 
 Status: CANONICAL  
@@ -90,3 +95,4 @@ GOVERNANCE_CLEANUP_CANDIDATES.md
 ```
 
 No actual deletion is accepted without ledger and verification.
+

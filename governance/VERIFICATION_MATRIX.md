@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/VERIFICATION_MATRIX.md
+generatedAt: 2026-04-30T04:48:37.9732622+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Verification Matrix
 
 Status: CANONICAL  
@@ -66,3 +71,4 @@ TSC_NOEMIT.txt when code changed
 ## 6. Acceptance
 
 Verification output must be reviewed before any final decision.
+

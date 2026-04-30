@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/DOCS_GOVERNANCE_ACTIVE_REFERENCE_REMEDIATION_PLAN.md
+generatedAt: 2026-04-30T04:48:37.3888562+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Docs Governance Active Reference Remediation Plan
 
 Status: CANONICAL_REMEDIATION_PLAN
@@ -25,3 +30,4 @@ $ActiveBlockersCsv
 ## Rule
 
 If active code/script blockers after remediation equals 0, deletion may move to its own dedicated readiness package. No deletion is performed in this batch.
+

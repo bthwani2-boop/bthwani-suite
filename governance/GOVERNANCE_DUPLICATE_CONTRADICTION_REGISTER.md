@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_DUPLICATE_CONTRADICTION_REGISTER.md
+generatedAt: 2026-04-30T04:48:37.5072075+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Duplicate and Contradiction Register
 
 Status: CANONICAL_REGISTER
@@ -21,3 +26,4 @@ This register is evidence only. It does not authorize deletion or merging by its
 ## Next safe action
 
 Use the generated CSV files to create a dedicated Batch 11 consolidation plan with one narrow target category at a time.
+

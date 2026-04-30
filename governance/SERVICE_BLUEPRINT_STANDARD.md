@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/SERVICE_BLUEPRINT_STANDARD.md
+generatedAt: 2026-04-30T04:48:37.8970925+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Service Blueprint Standard
 
 Status: CANONICAL

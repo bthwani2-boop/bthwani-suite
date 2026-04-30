@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/SECURITY_AND_SECRETS_GUARDRAILS.md
+generatedAt: 2026-04-30T04:48:37.8909087+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Security and Secrets Guardrails
 
 Status: CANONICAL  
@@ -77,3 +82,4 @@ logs review
 owner decision
 rollback path
 ```
+

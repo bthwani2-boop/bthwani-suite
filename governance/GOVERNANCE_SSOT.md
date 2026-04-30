@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_SSOT.md
+generatedAt: 2026-04-30T04:48:37.5746692+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance SSoT
 
 Status: CANONICAL  
@@ -149,3 +154,4 @@ Do not delete, move, or rename files until:
 3. replacement is documented,
 4. rollback is available,
 5. evidence is captured.
+

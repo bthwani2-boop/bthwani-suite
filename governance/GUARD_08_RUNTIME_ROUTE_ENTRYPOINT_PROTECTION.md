@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GUARD_08_RUNTIME_ROUTE_ENTRYPOINT_PROTECTION.md
+generatedAt: 2026-04-30T04:48:37.6330184+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # GUARD-08 — Runtime / Route Entrypoint Protection Guard
 
 ## Purpose
@@ -20,3 +25,4 @@ CHECK-only and warning-first until baseline review is complete.
 ## Rule
 
 No delete, move, rename, or cleanup is allowed for these files without runtime proof, route proof, owner decision, rollback path, and full guard rerun.
+

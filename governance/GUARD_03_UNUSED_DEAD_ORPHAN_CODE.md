@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GUARD_03_UNUSED_DEAD_ORPHAN_CODE.md
+generatedAt: 2026-04-30T04:48:37.5980985+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # GUARD-03 — Unused / Dead / Orphan Code Guard
 
 ## Purpose
@@ -67,3 +72,4 @@ GUARD-03 re-run
 3. Choose a small safe batch.
 4. Apply move/merge/archive only after proof.
 5. Re-run all guards.
+

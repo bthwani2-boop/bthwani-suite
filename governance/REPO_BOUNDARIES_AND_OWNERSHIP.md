@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/REPO_BOUNDARIES_AND_OWNERSHIP.md
+generatedAt: 2026-04-30T04:48:37.8589923+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Repo Boundaries and Ownership
 
 Status: CANONICAL  
@@ -81,3 +86,4 @@ typecheck
 guard output
 decision ledger entry
 ```
+

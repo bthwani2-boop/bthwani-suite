@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/18_EVIDENCE_PACK_STANDARD.md
+generatedAt: 2026-04-30T04:48:37.2401260+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Evidence Pack Standard
 
 Status: CANONICAL_STANDARD
@@ -122,3 +127,4 @@ Evidence must not include:
 ## Evidence Is Not Product Source
 
 Evidence packs under `tools/registry/runs/` are output artifacts. They must not become product code or canonical governance authority.
+

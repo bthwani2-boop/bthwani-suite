@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/CHANGE_ENTRY_RULE.md
+generatedAt: 2026-04-30T04:48:37.3621831+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # CHANGE_ENTRY_RULE
 
 ## Mandatory Header
@@ -55,3 +60,4 @@ No silent change may introduce:
 ## No Silent Drift Rule
 
 Do not make untracked structural changes that are not explained by the current phase.
+

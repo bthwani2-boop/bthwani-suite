@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/08_SCREEN_FILE_MODEL_CONTRACT.md
+generatedAt: 2026-04-30T04:48:37.1772053+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Screen File Model Contract
 
 ## Purpose
@@ -73,3 +78,4 @@ Do not scatter order screen pieces across unrelated folders.
 ## Verification
 
 A screen model is valid when a developer can locate the owner, feature, and surface from the path without guessing.
+

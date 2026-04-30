@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/AGENT_UPDATE_VALIDATION_CHECKLIST.md
+generatedAt: 2026-04-30T04:48:37.2725702+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Extracted Legacy Governance — Agent Update Validation Checklist
 
 Status: LEGACY_EXTRACTED_CANONICAL_REVIEW
@@ -60,3 +65,4 @@ Reject or revise the update immediately if any of the following are true:
 - missing verification detected
 - missing ledger entry detected
 - no rollback path exists
+

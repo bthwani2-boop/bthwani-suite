@@ -1,0 +1,92 @@
+{
+  "status": "CLASSIFIED",
+  "rule": "Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only",
+  "decision": "react-native imports are allowed only inside @bthwani/ui-kit as explicit platform bridge/native adapter usage; consumers must not import Tamagui directly.",
+  "generatedAt": "2026-04-25T07:56:11.7536786+03:00",
+  "classifiedFiles": [
+    {
+      "file": "packages\\ui-kit\\src\\primitives.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\providers.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\components\\banner.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\components\\button.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\components\\card.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\components\\field.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\components\\header.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\components\\icons.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\components\\list.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\components\\media.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\components\\overlay.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\components\\state.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\components\\display\\CartDetails.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    },
+    {
+      "file": "packages\\ui-kit\\src\\mobile\\root.tsx",
+      "count": 1,
+      "classification": "UI_KIT_PLATFORM_BRIDGE",
+      "allowedReason": "Native primitive/event/style adapter inside @bthwani/ui-kit; not a Screen/Surface/App dependency."
+    }
+  ]
+}

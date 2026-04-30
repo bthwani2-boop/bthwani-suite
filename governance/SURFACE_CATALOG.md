@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/SURFACE_CATALOG.md
+generatedAt: 2026-04-30T04:48:37.9241193+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # SURFACE_CATALOG
 
 ## Mandatory Header
@@ -39,3 +44,4 @@
 - internal names are the canonical filesystem and code identifiers used in governance, paths, and contracts
 - visible labels are user-facing text and must not replace internal names in canonical repo artifacts
 - IA domains or business groupings do not replace internal surface names
+

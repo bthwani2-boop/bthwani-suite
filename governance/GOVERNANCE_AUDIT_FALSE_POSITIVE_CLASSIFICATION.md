@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_AUDIT_FALSE_POSITIVE_CLASSIFICATION.md
+generatedAt: 2026-04-30T04:48:37.4312829+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Audit False Positive Classification
 
 Status: CANONICAL_AUDIT_CLASSIFICATION
@@ -34,3 +39,4 @@ The latest read-only full repo audit is useful for discovery, but its 15 reporte
 ## Rule
 
 Do not convert these read-only audit ERROR rows into CI blockers until the scanner is calibrated, false positives are documented, and the owner accepts the promotion criteria.
+

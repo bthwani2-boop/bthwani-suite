@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_DEEP_DEDUP_ANALYSIS_MATRIX.md
+generatedAt: 2026-04-30T04:48:37.5012121+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Deep Deduplication and Contradiction Analysis
 
 Status: CANONICAL_ANALYSIS
@@ -29,3 +34,4 @@ This Batch 10 rescue analyzes and standardizes governance/capability files only.
 KEEP_CURRENT_STRUCTURE_AND_PREPARE_DEDICATED_CONSOLIDATION_BATCHES
 
 Batch 10 creates the evidence basis. Actual deletion, merging, file moving, or guard severity changes require dedicated follow-up batches with rollback and evidence.
+

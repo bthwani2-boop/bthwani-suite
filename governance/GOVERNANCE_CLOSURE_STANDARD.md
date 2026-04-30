@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_CLOSURE_STANDARD.md
+generatedAt: 2026-04-30T04:48:37.4770950+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Closure Standard
 
 Status: CANONICAL

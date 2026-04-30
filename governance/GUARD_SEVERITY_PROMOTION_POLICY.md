@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GUARD_SEVERITY_PROMOTION_POLICY.md
+generatedAt: 2026-04-30T04:48:37.7702376+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Guard Severity Promotion Policy
 
 Status: CANONICAL
@@ -57,3 +62,4 @@ Each severity promotion must include:
 - owner decision
 - CI impact
 - rollback note
+

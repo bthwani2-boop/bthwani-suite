@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/EVIDENCE_PACK_TEMPLATE.md
+generatedAt: 2026-04-30T04:48:37.4181991+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # قالب Evidence Pack
 
 هذا القالب يجب إرفاقه مع أي PR أو طلب إغلاق يُطالب بـ"100%" أو قرار نهائي.
@@ -48,3 +53,4 @@
 ---
 
 ضع جميع الملفات المرفقة في مجلد مضغوط واحد وأرفقه بالـPR كـ`evidence_pack_<ID>.zip`.
+

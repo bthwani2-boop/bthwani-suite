@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/00_GOVERNANCE_INDEX.md
+generatedAt: 2026-04-30T04:48:37.1112843+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # BThwani Governance Index
 
 Status: CANONICAL_INDEX
@@ -105,3 +110,4 @@ No governance change is accepted without:
 - evidence under `tools/registry/runs/{SESSION_ID}` when the scope requires it
 - explicit recording of merge/archive/alias/delete-candidate decisions in `GOVERNANCE_REORGANIZATION_LEDGER.md`
 - no unsupported claim of `READY`, `FINAL`, `CLOSED`, or `100%`
+

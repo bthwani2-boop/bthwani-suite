@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/AI_EXECUTION_GOVERNANCE.md
+generatedAt: 2026-04-30T04:48:37.2787906+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # AI Execution Governance
 
 Status: CANONICAL  
@@ -98,3 +103,4 @@ screenshots/runtime logs when relevant
 patch review
 decision
 ```
+

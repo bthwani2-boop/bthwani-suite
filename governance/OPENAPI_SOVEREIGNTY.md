@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/OPENAPI_SOVEREIGNTY.md
+generatedAt: 2026-04-30T04:48:37.8116630+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # OPENAPI_SOVEREIGNTY
 
 ## Mandatory Header
@@ -65,3 +70,4 @@ Rules:
 - reject API-first rebuild
 - reject generated-client-first rebuild
 - reject updating master contract shape before UX demand is known
+

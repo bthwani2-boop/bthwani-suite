@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_CLOSEOUT_ROADMAP.md
+generatedAt: 2026-04-30T04:48:37.4660093+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Closeout Roadmap
 
 Status: CANONICAL_ROADMAP
@@ -36,3 +41,4 @@ No deletion, hard CI gate, or warning-to-error promotion is allowed without its 
 - Deleted: docs/governance
 - Preserved: governance/legacy-extracted
 - GitHub push: NO
+

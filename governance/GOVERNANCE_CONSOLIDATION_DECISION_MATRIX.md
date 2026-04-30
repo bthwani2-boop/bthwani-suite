@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_CONSOLIDATION_DECISION_MATRIX.md
+generatedAt: 2026-04-30T04:48:37.4825933+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Consolidation Decision Matrix
 
 Status: CANONICAL_DECISION_MATRIX
@@ -27,3 +32,4 @@ Batch 09 does not delete or merge additional files. It standardizes the control 
 - merging docs without preserving evidence
 - changing guard severity without a baseline
 - changing GitHub workflows without explicit verification
+

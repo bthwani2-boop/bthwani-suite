@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/SERVICE_CLOSURE_GUARDRAILS.md
+generatedAt: 2026-04-30T04:48:37.9163121+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Service Closure Guardrails
 
 Status: CANONICAL  
@@ -141,3 +146,4 @@ visual evidence when UI exists
 evidence pack
 decision
 ```
+

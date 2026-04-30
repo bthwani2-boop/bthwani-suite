@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GUARD_07_UIKIT_TAMAGUI_BOUNDARY.md
+generatedAt: 2026-04-30T04:48:37.6261658+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # GUARD-07 — UI-kit / Tamagui Boundary Guard
 
 ## Purpose
@@ -23,3 +28,4 @@ CHECK-only and warning-first until baseline review is complete.
 ## Rule
 
 No UI work should introduce local design systems or raw Tamagui imports outside ui-kit.
+

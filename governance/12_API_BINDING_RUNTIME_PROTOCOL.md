@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/12_API_BINDING_RUNTIME_PROTOCOL.md
+generatedAt: 2026-04-30T04:48:37.2047799+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # API / Binding / Runtime Protocol
 
 ## Purpose
@@ -56,3 +61,4 @@ Each layer must prove:
 - evidence pack
 
 No API/binding/integration claim is accepted without runnable verification.
+

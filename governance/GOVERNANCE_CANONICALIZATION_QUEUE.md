@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_CANONICALIZATION_QUEUE.md
+generatedAt: 2026-04-30T04:48:37.4509396+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Canonicalization Queue
 
 Status: CANONICAL_QUEUE
@@ -23,3 +28,4 @@ No deletion. No broad merge. No movement. No CI or guard severity changes.
 ## Evidence
 
 - C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_10_RESCUE_DEDUP_CONTRADICTION_STANDARDIZE-20260430-002239\canonicalization-queue.csv
+

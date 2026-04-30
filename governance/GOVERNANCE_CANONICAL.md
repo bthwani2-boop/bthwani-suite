@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_CANONICAL.md
+generatedAt: 2026-04-30T04:48:37.4431091+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # مسودة الهيكل القَنَوني للحوكمة — Governance Canonical Structure
 
 هذه المسودة تقترح بنية قنونية موحّدة لملفّات `governance/`، تُستخدم كمرجع للدمج وإعادة التنظيم.
@@ -31,3 +36,4 @@
 - لا تحذف الملفات الأصلية دفعة واحدة: انقل إلى `governance/archive/<timestamp>-<name>/` ثم التزم.
 
 ملاحظة: هذه مسودة قابلة للتعديل بعد مراجعة نتائج الفحص التفصيلي للتكرار (`tools/analysis/gov_dedup_output/gov_dedup_report.csv`).
+

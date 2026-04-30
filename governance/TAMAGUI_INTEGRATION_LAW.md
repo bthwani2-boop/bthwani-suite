@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/TAMAGUI_INTEGRATION_LAW.md
+generatedAt: 2026-04-30T04:48:37.9317465+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Tamagui Integration Law
 
 - Status: APPROVED
@@ -180,3 +185,4 @@ Any violation is a governance blocker.
 ## Runtime proof
 
 Runtime proof is deferred until the first suitable EAS/dev-client rebuild. This governance lock does not require EAS now, does not authorize a native rebuild, and does not claim device-level New Architecture runtime proof until a compatible dev client has been rebuilt.
+

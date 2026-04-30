@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/EVIDENCE_AND_CLOSURE_GATES.md
+generatedAt: 2026-04-30T04:48:37.4100403+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Evidence and Closure Gates
 
 Status: CANONICAL  
@@ -139,3 +144,4 @@ warning is documented
 warning does not block current scope
 follow-up is recorded
 ```
+

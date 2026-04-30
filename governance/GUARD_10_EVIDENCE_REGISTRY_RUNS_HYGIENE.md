@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GUARD_10_EVIDENCE_REGISTRY_RUNS_HYGIENE.md
+generatedAt: 2026-04-30T04:48:37.6552798+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # GUARD-10 — Evidence / Registry Runs Hygiene Guard
 
 ## Purpose

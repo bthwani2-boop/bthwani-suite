@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/11_DSH_GOLDEN_SLICE_PROTOCOL.md
+generatedAt: 2026-04-30T04:48:37.1985520+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # DSH Golden Slice Protocol
 
 ## Purpose
@@ -56,3 +61,4 @@ DSH must use the BThwani design system through `@bthwani/ui-kit` public exports.
 ## Evidence
 
 Every DSH phase must produce an evidence pack and must not claim 100% closure without proof.
+

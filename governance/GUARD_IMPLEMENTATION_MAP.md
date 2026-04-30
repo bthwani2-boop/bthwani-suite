@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GUARD_IMPLEMENTATION_MAP.md
+generatedAt: 2026-04-30T04:48:37.7626701+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Guard Implementation Map
 
 Status: CANONICAL_GUARD_MAP  
@@ -46,3 +51,4 @@ tools/registry/runs/{SESSION_ID}/_HANDOFF.zip
 - مخرجات `RUN_GOVERNANCE_GUARDS.ps1`
 - ملف `_HANDOFF.zip`
 - patch review عند وجود تغييرات حساسة أو ملفات جديدة.
+

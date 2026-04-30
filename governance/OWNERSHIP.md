@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/OWNERSHIP.md
+generatedAt: 2026-04-30T04:48:37.8262027+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Ownership Policy
 
 Status: CANONICAL
@@ -101,3 +106,4 @@ When ownership is unclear:
 6. keep rollback path
 
 No migration by assumption.
+

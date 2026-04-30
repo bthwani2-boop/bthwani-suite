@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/LEGACY_REFERENCE_CLEANUP_MATRIX.md
+generatedAt: 2026-04-30T04:48:37.7895533+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Legacy Reference Cleanup Matrix
 
 Status: CANONICAL_CLEANUP_MATRIX
@@ -14,3 +19,4 @@ SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_06_REMEDIA
 ## Rule
 
 Cleanup must be one family at a time, with owner decision, reference scan, rollback, and evidence. No blind global replace.
+

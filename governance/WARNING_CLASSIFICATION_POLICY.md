@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/WARNING_CLASSIFICATION_POLICY.md
+generatedAt: 2026-04-30T04:48:37.9843207+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Warning Classification Policy
 
 Status: CANONICAL_POLICY

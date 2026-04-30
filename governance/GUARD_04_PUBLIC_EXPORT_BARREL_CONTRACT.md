@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GUARD_04_PUBLIC_EXPORT_BARREL_CONTRACT.md
+generatedAt: 2026-04-30T04:48:37.6040390+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # GUARD-04 — Public Export / Barrel Contract Guard
 
 ## Purpose
@@ -56,3 +61,4 @@ pnpm -w exec tsc --noEmit PASS
 GUARD-01/02/03/04 rerun
 _HANDOFF.zip
 ```
+

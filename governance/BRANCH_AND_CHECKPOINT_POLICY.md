@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/BRANCH_AND_CHECKPOINT_POLICY.md
+generatedAt: 2026-04-30T04:48:37.3347866+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Branch and Checkpoint Policy
 
 Status: CANONICAL  
@@ -88,3 +93,4 @@ evidence pack exists
 patch review has no blocker
 scope is not mixed with unrelated work
 ```
+

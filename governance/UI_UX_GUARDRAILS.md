@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/UI_UX_GUARDRAILS.md
+generatedAt: 2026-04-30T04:48:37.9666212+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # UI/UX Guardrails
 
 Status: CANONICAL  
@@ -127,3 +132,4 @@ typecheck passes
 screenshots reviewed
 decision recorded
 ```
+

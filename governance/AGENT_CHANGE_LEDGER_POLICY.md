@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/AGENT_CHANGE_LEDGER_POLICY.md
+generatedAt: 2026-04-30T04:48:37.2533359+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Agent Change Ledger Policy
 
 Status: CANONICAL
@@ -102,3 +107,4 @@ A ledger entry can be:
 - REVERT_REQUIRED
 
 Superseded entries must point to the superseding evidence or commit.
+

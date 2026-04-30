@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/14_AGENT_EXECUTION_RULES.md
+generatedAt: 2026-04-30T04:48:37.2173273+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Agent Execution Rules
 
 Status: CANONICAL_POLICY
@@ -300,3 +305,4 @@ Workflow markers such as `READY_FOR_NEXT_PHASE` may exist in plans or evidence p
 Actual `.agents`, `.github/agents`, `.github/skills`, `.cursor`, workflow, or tool alignment must be done in later phases only.
 
 Derived files must point back to this policy instead of restating parallel authority.
+

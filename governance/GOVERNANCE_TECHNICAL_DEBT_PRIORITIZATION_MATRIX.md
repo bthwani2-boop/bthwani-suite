@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_TECHNICAL_DEBT_PRIORITIZATION_MATRIX.md
+generatedAt: 2026-04-30T04:48:37.5833573+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Technical Debt Prioritization Matrix
 
 Status: CANONICAL_PRIORITIZATION_MATRIX
@@ -13,3 +18,4 @@ SourceEvidence: C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_06_REMEDIA
 ## Rule
 
 Prioritize blockers and high-confidence families first. Avoid broad cleanup without proof.
+

@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/SCOPE_LOCK.md
+generatedAt: 2026-04-30T04:48:37.8818243+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # SCOPE_LOCK
 
 ## Mandatory Header
@@ -68,3 +73,4 @@ Phase 01 may close only when:
 - evidence root is explicit
 - move-don't-delete behavior is explicit
 - no broad implementation work has started
+

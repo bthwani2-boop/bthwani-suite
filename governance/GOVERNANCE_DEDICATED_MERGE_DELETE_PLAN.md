@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_DEDICATED_MERGE_DELETE_PLAN.md
+generatedAt: 2026-04-30T04:48:37.4952341+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Dedicated Merge/Delete Plan
 
 Status: CANONICAL_PLAN
@@ -37,3 +42,4 @@ No file is deleted in Batch 12. Any removal must be executed in Batch 13 with:
 
 - C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_12_DEDICATED_MERGE_DELETE_PLAN-20260430-004305\batch12-dedicated-merge-delete-plan.csv
 - C:\bthwani-suite\tools\registry\runs\GOVERNANCE_BATCH_12_DEDICATED_MERGE_DELETE_PLAN-20260430-004305\batch12-rollback-requirements.csv
+

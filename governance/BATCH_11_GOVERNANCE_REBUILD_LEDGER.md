@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/BATCH_11_GOVERNANCE_REBUILD_LEDGER.md
+generatedAt: 2026-04-30T04:48:37.3299096+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Batch 11 Governance and Guard Rebuild Ledger
 
 Status: CANONICAL_LEDGER
@@ -33,3 +38,4 @@ Forbidden:
 - pnpm -w exec tsc --noEmit
 - all tools/guards/guard-*.mjs
 - evidence pack
+

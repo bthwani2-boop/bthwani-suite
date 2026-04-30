@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/GOVERNANCE_REORGANIZATION_LEDGER.md
+generatedAt: 2026-04-30T04:48:37.5661458+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Governance Reorganization Ledger
 
 Status: ACTIVE_CANONICAL_LEDGER

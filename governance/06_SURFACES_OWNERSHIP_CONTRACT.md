@@ -1,3 +1,8 @@
+---
+generatedFrom: governance/06_SURFACES_OWNERSHIP_CONTRACT.md
+generatedAt: 2026-04-30T04:48:37.1642104+03:00
+note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
+---
 # Surfaces Ownership Contract
 
 ## Purpose
@@ -67,3 +72,4 @@ A service-owned surface must not import another service-owned implementation dir
 ## Verification
 
 Surface ownership must be checked by file path, import path, and semantic content.
+
