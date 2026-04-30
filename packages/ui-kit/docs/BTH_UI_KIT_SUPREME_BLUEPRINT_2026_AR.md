@@ -1,5 +1,7 @@
 # BTH UI Kit Supreme Blueprint — 2026
 
+> NOTE (example-only): This blueprint contains canonical branding identifiers. Do not embed runtime secrets in docs. Replace runtime tokens with placeholders like `__BTHWANI_*__` and manage secrets via vault/CI. Proposed placeholder replacements are in kdt/merge-run/.../proposed/remediations/patches/
+
 ## النسخة السيادية الصفرية النهائية لبناء أقوى حزمة UI Kit للمنصة كاملة
 
 ## 0) الحكم التنفيذي النهائي

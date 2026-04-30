@@ -1,5 +1,7 @@
 # UIKIT_CANONICAL_STANDARD
 
+> NOTE (example-only): Token-like strings shown in this document are canonical identifiers or branding references. If a value is used at runtime, replace it with an explicit placeholder (e.g., `__BTHWANI_EXAMPLE_TOKEN__`) and load the real value from a secure vault or CI secret. See kdt/merge-run/.../proposed/remediations/ for proposed placeholder replacements.
+
 ## Production entrypoints
 - @bthwani/ui-kit
 - @bthwani/ui-kit/web

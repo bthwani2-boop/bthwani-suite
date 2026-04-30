@@ -1,4 +1,7 @@
 import React from 'react';
+// NOTE (example-only): This file may include decorative identifiers and example literals.
+// Do NOT store runtime secrets or production tokens in repository files.
+// Use secure vaults or CI-managed secrets for runtime values. Placeholder proposals live under kdt/merge-run/.../proposed/remediations/
 import { BackHandler, Platform } from 'react-native';
 import { Box, Button, Icon, MobileScrollView, ScreenHeader, Surface, Text, TopBar, useTheme } from '@bthwani/ui-kit';
 import { dshPartner } from '@bthwani/surfaces/app-partner';

@@ -454,6 +454,8 @@ export function getUiKitLocale(locale: UiKitLocale) {
 	return uiKitLocales[locale];
 }
 
+// NOTE (example-only): Locale and branding strings are display text. If any token-like values exist, replace with placeholders and avoid embedding secrets in locale files.
+
 export function getUiKitCommon(locale: UiKitLocale) {
 	return getUiKitLocale(locale).common;
 }

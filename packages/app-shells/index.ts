@@ -10,3 +10,6 @@
  * - @bthwani/app-shells/mobile/field
  */
 export * from './web';
+
+// NOTE (example-only): Exports and identifiers here may reference canonical package IDs.
+// Do not hard-code runtime secrets in package entry points. Use placeholders and secure secret stores.
