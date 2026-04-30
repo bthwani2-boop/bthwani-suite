@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dimensions, Platform, View } from 'react-native';
+import { Dimensions, Platform, Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   Badge,
@@ -29,7 +29,7 @@ import {
   useTheme,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../../patterns/screens/DshOperationScreen';
-import { getDshCustomerStateMeta, type DshCustomerState } from '../../shared/dshCustomerStateModel';
+import { getDshClientStateMeta, type DshClientState } from '../../shared/dshClientStateModel';
 
 type CreateOrderValues = {
   pickupAddress: string;
@@ -96,6 +96,7 @@ export type DshOrdersListScreenProps = {
 export type DshCreateOrderScreenProps = {
   screenId?: string;
   state?: DshOperationScreenState;
+  clientState?: DshClientState;
   values?: CreateOrderValues;
   timeline?: DshTrackingTimelineItem[];
   onChange?: (field: keyof CreateOrderValues, value: string) => void;
@@ -107,12 +108,13 @@ export type DshCreateOrderScreenProps = {
 };
 
 export type DshOrderSuccessStateProps = {
+  clientState?: DshClientState;
   onNext?: () => void;
 };
 
 export type DshTrackingScreenProps = {
   values?: CreateOrderValues;
-  customerState?: DshCustomerState;
+  clientState?: DshClientState;
   currentStatusLabel?: string;
   timeline?: DshTrackingTimelineItem[];
   onBell?: () => void;
@@ -152,6 +154,7 @@ const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttac
     kind: 'camera',
     label: 'كاميرا',
     selectedLabel: 'صورة مرفقة',
+    detail: 'إرسال صورة مرتبطة مباشرة بالطلب الحالي.',
     tone: 'brand',
     iconName: 'camera-outline',
   },
@@ -159,6 +162,7 @@ const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttac
     kind: 'video',
     label: 'فيديو',
     selectedLabel: 'فيديو مرفق',
+    detail: 'إرسال فيديو قصير يوضح حالة الطلب.',
     tone: 'info',
     iconName: 'videocam-outline',
   },
@@ -166,6 +170,7 @@ const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttac
     kind: 'voice',
     label: 'صوت',
     selectedLabel: 'رسالة صوتية',
+    detail: 'إرسال رسالة صوتية مرتبطة بنفس الطلب.',
     tone: 'warning',
     iconName: 'mic-outline',
   },
@@ -173,6 +178,7 @@ const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttac
     kind: 'attachment',
     label: 'مرفق',
     selectedLabel: 'مرفق مرتبط',
+    detail: 'إضافة مرفق مرجعي داخل سياق الطلب.',
     tone: 'brand',
     iconName: 'attach-outline',
   },
@@ -317,7 +323,7 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
       time: 'قبل قليل',
       tone: 'info',
       align: 'start',
-      attachments: ['image', 'video', 'voice'],
+      attachments: ['camera', 'video', 'voice'],
     },
   ]);
 
@@ -440,7 +446,7 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
           <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             {([
               { kind: 'voice', label: 'صوت', iconName: 'mic-outline' as const },
-              { kind: 'image', label: 'كاميرا', iconName: 'camera-outline' as const },
+              { kind: 'camera', label: 'كاميرا', iconName: 'camera-outline' as const },
               { kind: 'video', label: 'فيديو', iconName: 'videocam-outline' as const },
             ] as const).map((action) => {
               const isSelected = draftAttachments.includes(action.kind);
@@ -484,14 +490,48 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
   );
 }
 
-function renderCheckoutGate(screenId?: string, state: DshOperationScreenState = 'ready', onPrimaryAction?: () => void, onSecondaryAction?: () => void, onRetry?: () => void) {
+function getClientWalletVisibilityCopy(clientStateMeta: ReturnType<typeof getDshClientStateMeta>) {
+  if (clientStateMeta.visibility.walletRefundVisible) {
+    return {
+      title: 'وضع الاسترداد',
+      description: clientStateMeta.state === 'refund_pending'
+        ? 'الاسترداد قيد المعالجة حاليًا. لا يلزم أي إجراء مالي إضافي من العميل حتى يكتمل تحديث الحالة.'
+        : clientStateMeta.state === 'refunded'
+          ? 'تم تثبيت الاسترداد للعميل ويمكنه مراجعة الأثر المالي النهائي بوضوح.'
+          : 'توجد معلومة استرداد ظاهرة مرتبطة بهذه الحالة ويجب إبقاؤها واضحة للعميل داخل نفس المسار.',
+    };
+  }
+
+  if (clientStateMeta.visibility.walletCreditVisible) {
+    return {
+      title: 'وضع الرصيد',
+      description: 'يوجد رصيد ظاهر للعميل داخل المحفظة. هذا العرض يوضح المعلومة فقط من دون تنفيذ أي ربط أو حركة مالية.',
+    };
+  }
+
+  return null;
+}
+
+function renderCheckoutGate(
+  screenId?: string,
+  state: DshOperationScreenState = 'ready',
+  clientState: DshClientState = 'checkout_ready',
+  onPrimaryAction?: () => void,
+  onSecondaryAction?: () => void,
+  onRetry?: () => void,
+) {
+  const { theme } = useTheme();
+  const checkoutStateMeta = getDshClientStateMeta(clientState);
+  const paymentPendingMeta = getDshClientStateMeta('payment_pending');
+  const orderCreatedMeta = getDshClientStateMeta('order_created');
+  const walletVisibilityCopy = getClientWalletVisibilityCopy(checkoutStateMeta);
   const gateCopy = {
-    title: 'بوابة الإرسال إلى الطلب',
-    subtitle: 'راجع الجاهزية النهائية قبل تحويله إلى حالة المراجعة المباشرة.',
+    title: checkoutStateMeta.title,
+    subtitle: checkoutStateMeta.description,
     primaryActionLabel: 'متابعة إلى المراجعة',
     secondaryActionLabel: 'العودة إلى الدعم',
     sectionTitle: 'ما الذي يثبت الآن؟',
-    sectionSubtitle: 'كل ما تحتاجه لقرار الإرسال يبقى مرئيًا دون ضوضاء.',
+    sectionSubtitle: 'تسلسل الجاهزية والدفع وإنشاء الطلب يبقى ظاهرًا داخل نفس المسار.',
   };
 
   return (
@@ -507,33 +547,50 @@ function renderCheckoutGate(screenId?: string, state: DshOperationScreenState = 
       content={
         <Box gap={3}>
           <OperationalStatusHero
-            statusLabel="جاهز"
-            statusTone="brand"
+            statusLabel={checkoutStateMeta.label}
+            statusTone={clientState === 'payment_pending' ? 'warning' : 'brand'}
             title={gateCopy.title}
-            summary="كل ما تحتاجه للقرار موجود هنا دون ضوضاء أو قفز بين بطاقات متعددة."
+            summary={gateCopy.subtitle}
             routeLabel="المسار"
             routeValue={screenId ?? 'checkout-gate'}
             nextStepLabel="النتيجة المتوقعة"
-            nextStepValue="التتبع المباشر بعد القبول"
+            nextStepValue={paymentPendingMeta.label}
           />
           <CompactStatusStepper
             title="المسار المختصر"
-            subtitle="ثلاث مراحل واضحة فقط بعد قبول الطلب."
-            steps={deliveryJourneySteps.map((step, index) => ({
-              id: step.id,
-              title: step.title,
-              state: index === 0 ? 'current' : 'next',
-            }))}
+            subtitle="الجاهزية تسبق الدفع ثم ينتقل الطلب إلى الإنشاء المؤكد."
+            steps={[
+              { id: 'checkout-ready', title: checkoutStateMeta.label, state: 'current' as const },
+              { id: 'payment-pending', title: paymentPendingMeta.label, state: 'next' as const },
+              { id: 'order-created', title: orderCreatedMeta.label, state: 'next' as const },
+            ]}
           />
           <KeyValueDetails
             title={gateCopy.sectionTitle}
             subtitle={gateCopy.sectionSubtitle}
             items={[
               { label: 'المسار', value: screenId ?? 'checkout-gate', tone: 'brand' },
-              { label: 'المرحلة التالية', value: 'قيد المراجعة' },
-              { label: 'النتيجة المتوقعة', value: 'التتبع المباشر بعد القبول', tone: 'success' },
+              { label: 'المرحلة الحالية', value: checkoutStateMeta.label, tone: 'brand' },
+              { label: 'المرحلة التالية', value: paymentPendingMeta.label },
+              { label: 'النتيجة المتوقعة', value: orderCreatedMeta.label, tone: 'success' },
             ]}
           />
+          {checkoutStateMeta.isException ? (
+            <Surface tone="inset" gap={1} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
+              <Text role="bodyStrong" style={{ textAlign: 'right' }}>متابعة الدعم</Text>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                هذه الحالة تتطلب متابعة دعم واضحة قبل استكمال أي خطوة لاحقة داخل هذا المسار.
+              </Text>
+            </Surface>
+          ) : null}
+          {walletVisibilityCopy ? (
+            <Surface tone="inset" gap={1} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
+              <Text role="bodyStrong" style={{ textAlign: 'right' }}>{walletVisibilityCopy.title}</Text>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                {walletVisibilityCopy.description}
+              </Text>
+            </Surface>
+          ) : null}
         </Box>
       }
     />
@@ -543,14 +600,16 @@ function renderCheckoutGate(screenId?: string, state: DshOperationScreenState = 
 type CreateOrderJourneyScreenProps = {
   values: CreateOrderValues;
   timeline: DshTrackingTimelineItem[];
-  customerState?: DshCustomerState;
+  clientState?: DshClientState;
   onBack?: () => void;
   onBell?: () => void;
+  onSupport?: () => void;
+  onNextAction?: () => void;
   initialPhase?: JourneyPhase;
   currentStatusLabel?: string;
 };
 
-function CreateOrderJourneyScreen({ values, timeline, customerState = 'tracking_active', onBack, onBell, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
+function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', onBack, onBell, onSupport, onNextAction, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
   const { theme } = useTheme();
   const [phase, setPhase] = React.useState<JourneyPhase>(initialPhase);
   const [productRating, setProductRating] = React.useState(0);
@@ -568,26 +627,86 @@ function CreateOrderJourneyScreen({ values, timeline, customerState = 'tracking_
     align: 'start',
     attachments: ['camera', 'video', 'voice'],
   });
-  const trackingStateMeta = getDshCustomerStateMeta(customerState);
+  const clientStateMeta = getDshClientStateMeta(clientState);
+  const paymentPendingMeta = getDshClientStateMeta('payment_pending');
+  const orderCreatedMeta = getDshClientStateMeta('order_created');
+  const orderConfirmedMeta = getDshClientStateMeta('order_confirmed');
+  const isDeliveredState = clientState === 'delivered';
+  const isTrackingJourneyState = clientState === 'tracking_active' || isDeliveredState;
   const note = normalizeText(values.note).length ? values.note : 'لا توجد ملاحظات';
   const phaseIndex = phase === 'route' ? 0 : phase === 'arrived' ? 1 : 2;
-  const deliveryStatusLabel = phase === 'route' ? currentStatusLabel ?? trackingStateMeta.label : phase === 'arrived' ? 'وصل للعميل' : 'استلم العميل الطلب';
-  const journeyTopBarTitle = phase === 'route' ? 'الطلب في الطريق إلى العميل' : phase === 'arrived' ? 'وصل الطلب للعميل' : 'استلم العميل الطلب';
-  const heroTitle = phase === 'route' ? 'في الطريق' : phase === 'arrived' ? 'وصل للعميل' : 'تم الاستلام';
-  const heroSummary = phase === 'route'
-    ? trackingStateMeta.description
-    : phase === 'arrived'
-      ? 'الطلب وصل إلى العميل وهو الآن بانتظار تثبيت الاستلام.'
-      : 'اكتمل الاستلام ويمكنك تقييم التجربة من نفس الصفحة.';
+  const deliveryStatusLabel = isTrackingJourneyState
+    ? phase === 'route'
+      ? currentStatusLabel ?? clientStateMeta.label
+      : phase === 'arrived'
+        ? 'وصل للعميل'
+        : isDeliveredState
+          ? 'تم التسليم'
+          : 'استلم العميل الطلب'
+    : currentStatusLabel ?? clientStateMeta.label;
+  const journeyTopBarTitle = isTrackingJourneyState
+    ? phase === 'route'
+      ? 'الطلب في الطريق إلى العميل'
+      : phase === 'arrived'
+        ? 'وصل الطلب للعميل'
+        : isDeliveredState
+          ? 'تم التسليم'
+          : 'استلم العميل الطلب'
+    : clientStateMeta.title;
+  const heroTitle = isTrackingJourneyState
+    ? phase === 'route'
+      ? 'في الطريق'
+      : phase === 'arrived'
+        ? 'وصل للعميل'
+        : isDeliveredState
+          ? 'تم التسليم'
+          : 'تم الاستلام'
+    : clientStateMeta.title;
+  const heroSummary = isTrackingJourneyState
+    ? phase === 'route'
+      ? clientStateMeta.description
+      : phase === 'arrived'
+        ? 'الطلب وصل إلى العميل وهو الآن بانتظار تثبيت الاستلام.'
+        : isDeliveredState
+          ? 'اكتمل التسليم ويمكنك تقييم المنتج والكابتن أو طلب الدعم من نفس الشاشة.'
+          : 'اكتمل الاستلام ويمكنك تقييم التجربة من نفس الصفحة.'
+    : clientStateMeta.description;
+  const journeySteps = isTrackingJourneyState
+    ? deliveryJourneySteps.map((step, index) => ({
+        id: step.id,
+        title: step.title,
+        state: index < phaseIndex ? 'done' : index === phaseIndex ? 'current' : 'next',
+      }))
+    : [
+        { id: 'checkout-ready', title: clientStateMeta.label, state: 'current' as const },
+        { id: 'payment-pending', title: paymentPendingMeta.label, state: 'next' as const },
+        { id: 'order-created', title: orderCreatedMeta.label, state: 'next' as const },
+        { id: 'order-confirmed', title: orderConfirmedMeta.label, state: 'next' as const },
+      ];
+  const nextStepValue = isTrackingJourneyState
+    ? phase === 'route'
+      ? 'ثبّت الوصول عند مقابلة العميل.'
+      : phase === 'arrived'
+        ? 'ثبّت الاستلام لتفعيل التقييمات.'
+        : ratingsSubmitted
+          ? 'تم حفظ التقييمين داخل نفس الصفحة.'
+          : onSupport || onNextAction
+            ? 'اختر التقييمين ثم أرسل، أو استخدم الدعم والإجراء التالي المتاح.'
+            : 'اختر التقييمين ثم أرسل.'
+    : clientState === 'checkout_ready'
+      ? `${paymentPendingMeta.label} ثم ${orderCreatedMeta.label}`
+      : clientState === 'payment_pending'
+        ? orderCreatedMeta.label
+        : clientState === 'order_created'
+          ? orderConfirmedMeta.label
+          : clientState === 'order_confirmed'
+            ? 'افتح صفحة التتبع لمتابعة التنفيذ.'
+            : clientStateMeta.description;
   const hasCustomerReceived = phase === 'received';
   const canSubmitRatings = hasCustomerReceived && productRating > 0 && captainRating > 0;
   const productRatingLabel = productRating > 0 ? `${productRating}/5` : 'غير محدد';
   const captainRatingLabel = captainRating > 0 ? `${captainRating}/5` : 'غير محدد';
-  const compactSteps = deliveryJourneySteps.map((step, index) => ({
-    id: step.id,
-    title: step.title,
-    state: index < phaseIndex ? 'done' : index === phaseIndex ? 'current' : 'next',
-  })) as Array<{ id: string; title: string; state: 'done' | 'current' | 'next' }>;
+  const compactSteps = journeySteps as Array<{ id: string; title: string; state: 'done' | 'current' | 'next' }>;
   const orderDetailsItems = [
     { label: 'عنوان الاستلام', value: values.pickupAddress || 'غير محدد', tone: 'brand' as const },
     { label: 'عنوان التسليم', value: values.dropoffAddress || 'غير محدد' },
@@ -595,13 +714,6 @@ function CreateOrderJourneyScreen({ values, timeline, customerState = 'tracking_
     { label: 'رقم الجوال', value: values.contactPhone || 'غير محدد' },
     { label: 'الملاحظات', value: note },
   ];
-  const nextStepValue = phase === 'route'
-    ? 'ثبّت الوصول عند مقابلة العميل.'
-    : phase === 'arrived'
-      ? 'ثبّت الاستلام لتفعيل التقييمات.'
-      : ratingsSubmitted
-        ? 'تم حفظ التقييمين داخل نفس الصفحة.'
-        : 'اختر التقييمين ثم أرسل.';
   const canSendMessage = phase !== 'received' && (draftMessage.trim().length > 0 || draftAttachments.length > 0);
   const chatSendLabel = draftMessage.trim().length > 0 ? 'إرسال الرسالة' : draftAttachments.length > 0 ? 'إرسال المرفقات' : 'أضف نصًا أو مرفقًا';
   const quickActions = (['voice', 'camera', 'video', 'attachment'] as OrderChatAttachmentKind[]).map((kind) => {
@@ -719,6 +831,8 @@ function CreateOrderJourneyScreen({ values, timeline, customerState = 'tracking_
 
   const secondaryAction = phase === 'route' && onBell
     ? { label: 'جرس الوصول', onPress: onBell, tone: 'secondary' as const }
+    : phase === 'received' && onSupport
+      ? { label: 'الدعم أو الإبلاغ عن مشكلة', onPress: onSupport, tone: 'secondary' as const }
     : onBack
       ? { label: phase === 'route' ? 'تعديل الطلب' : 'العودة', onPress: onBack, tone: 'secondary' as const }
       : undefined;
@@ -728,7 +842,7 @@ function CreateOrderJourneyScreen({ values, timeline, customerState = 'tracking_
       <TopBar
         variant="surface"
         title={journeyTopBarTitle}
-        trailingAction={onBack ? { id: 'back', icon: <Icon name="arrow-back" size={24} color="#F97316" />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
+        trailingAction={onBack ? { id: 'back', icon: <Icon name="arrow-back" size={24} color={theme.brand} />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
       />
 
       <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: contentBottomPadding }}>
@@ -805,6 +919,19 @@ function CreateOrderJourneyScreen({ values, timeline, customerState = 'tracking_
           placeholderTone="brand"
         />
 
+        {hasCustomerReceived && (onSupport || onNextAction) ? (
+          <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }}>ما بعد التسليم</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+              بعد اكتمال التسليم يمكنك الإبلاغ عن مشكلة أو الانتقال إلى الإجراء التالي المتاح من دون مغادرة هذا المسار.
+            </Text>
+            <Box gap={2}>
+              {onSupport ? <Button label="الدعم أو الإبلاغ عن مشكلة" tone="secondary" onPress={onSupport} /> : null}
+              {onNextAction ? <Button label="الانتقال إلى الطلبات" onPress={onNextAction} /> : null}
+            </Box>
+          </Surface>
+        ) : null}
+
         <View style={{ height: spacing[1] }} />
       </MobileScrollView>
 
@@ -822,26 +949,31 @@ function CreateOrderJourneyScreen({ values, timeline, customerState = 'tracking_
   );
 }
 
-function renderOrderSuccess(onNext?: () => void) {
+function renderOrderSuccess(clientState: DshClientState = 'order_confirmed', onNext?: () => void) {
+  const successStateMeta = getDshClientStateMeta(clientState);
+  const checkoutReadyMeta = getDshClientStateMeta('checkout_ready');
+  const orderCreatedMeta = getDshClientStateMeta('order_created');
+  const trackingStateMeta = getDshClientStateMeta('tracking_active');
+
   return (
     <MobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
       <OperationalStatusHero
-        statusLabel="في الطريق"
-        statusTone="warning"
-        title="الطلب في الطريق إلى العميل"
-        summary="ستظهر لحظة الوصول ثم الاستلام ثم التقييمات من نفس الشاشة دون مسارات إضافية."
+        statusLabel={successStateMeta.label}
+        statusTone={clientState === 'order_confirmed' ? 'success' : 'brand'}
+        title={successStateMeta.title}
+        summary={successStateMeta.description}
         nextStepLabel="الإجراء التالي"
-        nextStepValue="افتح شاشة الحالة لمتابعة الوصول والاستلام."
+        nextStepValue={trackingStateMeta.label}
       />
 
       <CompactStatusStepper
         title="المسار التالي"
-        subtitle="في الطريق ثم الوصول ثم الاستلام داخل رحلة واحدة قصيرة."
-        steps={deliveryJourneySteps.map((step, index) => ({
-          id: step.id,
-          title: step.title,
-          state: index === 0 ? 'current' : 'next',
-        }))}
+        subtitle="الطلب خرج من الجاهزية إلى الإنشاء ثم أصبح جاهزًا للتتبع."
+        steps={[
+          { id: 'checkout-ready', title: checkoutReadyMeta.label, state: 'done' as const },
+          { id: 'order-created', title: orderCreatedMeta.label, state: clientState === 'order_created' ? 'current' as const : 'done' as const },
+          { id: 'tracking-active', title: trackingStateMeta.label, state: 'next' as const },
+        ]}
       />
 
       <Button label="عرض التتبع" disabled={!onNext} onPress={() => onNext?.()} />
@@ -850,23 +982,31 @@ function renderOrderSuccess(onNext?: () => void) {
 }
 
 function renderTracking(
+  clientState: DshClientState,
   currentStatusLabel: string,
   timeline: DshTrackingTimelineItem[],
   onSupport?: () => void,
   onNextAction?: () => void,
 ) {
   const { theme } = useTheme();
+  const trackingStateMeta = getDshClientStateMeta(clientState);
   const activeTimelineIndex = Math.max(0, timeline.findIndex((item) => !item.done));
   const activeItem = timeline[activeTimelineIndex] ?? timeline[timeline.length - 1];
+  const walletVisibilityCopy = getClientWalletVisibilityCopy(trackingStateMeta);
+  const supportTitle = trackingStateMeta.isException ? 'الدعم مطلوب الآن' : 'الدعم والرجوع';
+  const supportDescription = trackingStateMeta.isException
+    ? 'هذه الحالة تحتاج متابعة دعم واضحة قبل أي خطوة لاحقة. استخدم زر الدعم الآن لشرح المشكلة ومتابعة الحل.'
+    : 'إذا احتجت مراجعة إضافية أو دعمًا سريعًا، يمكنك الانتقال من هنا دون كسر المسار.';
+  const supportButtonLabel = trackingStateMeta.isException ? 'طلب الدعم الآن' : 'الدعم';
 
   return (
     <MobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
       <Surface tone="brand" gap={2} padding={3} style={{ borderRadius: 24, borderWidth: 1, borderColor: theme.brand }}>
         <Box gap={1} style={{ alignItems: 'flex-end' }}>
           <Badge label={currentStatusLabel} tone="info" />
-          <Text role="titleLg" style={{ textAlign: 'right' }}>في الطريق</Text>
+          <Text role="titleLg" style={{ textAlign: 'right' }}>{trackingStateMeta.title}</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            التتبع الحي ظاهر الآن، ويمكنك متابعة المحطات حتى الوصول.
+            {trackingStateMeta.description}
           </Text>
         </Box>
       </Surface>
@@ -876,7 +1016,7 @@ function renderTracking(
         <KeyValueList
           items={[
             { label: 'المرحلة الحالية', value: activeItem?.title ?? currentStatusLabel, tone: 'brand' },
-            { label: 'الخطوة التالية', value: timeline[activeTimelineIndex + 1]?.title ?? 'التسليم', tone: 'success' },
+            { label: 'الخطوة التالية', value: timeline[activeTimelineIndex + 1]?.title ?? trackingStateMeta.label, tone: 'success' },
             { label: 'آخر تحديث', value: activeItem?.detail ?? 'Live' },
           ]}
         />
@@ -918,14 +1058,28 @@ function renderTracking(
         </Box>
       </Surface>
 
+      {walletVisibilityCopy ? (
+        <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+          <Text role="bodyStrong" style={{ textAlign: 'right' }}>{walletVisibilityCopy.title}</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            {walletVisibilityCopy.description}
+          </Text>
+        </Surface>
+      ) : null}
+
       <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <Text role="bodyStrong" style={{ textAlign: 'right' }}>الدعم والرجوع</Text>
+        <Text role="bodyStrong" style={{ textAlign: 'right' }}>{supportTitle}</Text>
         <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-          إذا احتجت مراجعة إضافية أو دعمًا سريعًا، يمكنك الانتقال من هنا دون كسر المسار.
+          {supportDescription}
         </Text>
+        {trackingStateMeta.isException && !onSupport ? (
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            لا يوجد مسار دعم موصول حاليًا داخل هذا العرض.
+          </Text>
+        ) : null}
         <Box gap={2}>
           {onNextAction ? <Button label="العودة إلى الطلبات" onPress={onNextAction} /> : null}
-          {onSupport ? <Button label="الدعم" tone="secondary" onPress={onSupport} /> : null}
+          {onSupport ? <Button label={supportButtonLabel} tone="secondary" onPress={onSupport} /> : null}
         </Box>
       </Surface>
     </MobileScrollView>
@@ -987,6 +1141,7 @@ export function DshOrdersListScreen({ items = fallbackOrderListItems, query = ''
 export function DshCreateOrderScreen({
   screenId,
   state = 'ready',
+  clientState = 'checkout_ready',
   values = defaultCreateOrderValues,
   timeline = [],
   onPrimaryAction,
@@ -996,10 +1151,10 @@ export function DshCreateOrderScreen({
   onRetry,
 }: DshCreateOrderScreenProps) {
   if (screenId) {
-    return renderCheckoutGate(screenId, state, onPrimaryAction, onSecondaryAction, onRetry);
+    return renderCheckoutGate(screenId, state, clientState, onPrimaryAction, onSecondaryAction, onRetry);
   }
 
-  return <CreateOrderJourneyScreen values={values} timeline={timeline} initialPhase="route" onBack={onBack ?? onSecondaryAction} />;
+  return <CreateOrderJourneyScreen values={values} timeline={timeline} clientState={clientState} initialPhase="route" onBack={onBack ?? onSecondaryAction} />;
 }
 
 export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspace', onPrimaryAction, onSecondaryAction, onRetry }: DshIntakeHubScreenProps) {
@@ -1025,24 +1180,47 @@ export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspa
 }
 
 
-export function DshOrderSuccessState({ onNext }: DshOrderSuccessStateProps) {
-  return renderOrderSuccess(onNext);
+export function DshOrderSuccessState({ clientState = 'order_confirmed', onNext }: DshOrderSuccessStateProps) {
+  return renderOrderSuccess(clientState, onNext);
 }
 
-export function DshTrackingScreen({ values = defaultCreateOrderValues, customerState = 'tracking_active', currentStatusLabel, timeline = [], onBell, onSupport, onRetry, onNextAction }: DshTrackingScreenProps) {
+export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, timeline = [], onBell, onSupport, onRetry, onNextAction }: DshTrackingScreenProps) {
+  const trackingStateMeta = getDshClientStateMeta(clientState);
   const fallbackTimeline: DshTrackingTimelineItem[] = timeline.length
     ? timeline
-    : deliveryJourneySteps.map((step, index) => ({ id: step.id, title: step.title, detail: step.detail, done: index === 0 }));
-  const trackingStateMeta = getDshCustomerStateMeta(customerState);
+    : clientState === 'tracking_active'
+      ? deliveryJourneySteps.map((step, index) => ({ id: step.id, title: step.title, detail: step.detail, done: index === 0 }))
+      : [{ id: clientState, title: trackingStateMeta.title, detail: trackingStateMeta.description, done: false }];
+
+  if (clientState === 'delivered') {
+    return (
+      <CreateOrderJourneyScreen
+        values={values}
+        timeline={fallbackTimeline}
+        clientState={clientState}
+        initialPhase="received"
+        currentStatusLabel={currentStatusLabel ?? trackingStateMeta.label}
+        onSupport={onSupport}
+        onNextAction={onNextAction}
+        onBack={onNextAction ?? onRetry}
+      />
+    );
+  }
+
+  if (clientState !== 'tracking_active') {
+    return renderTracking(clientState, currentStatusLabel ?? trackingStateMeta.label, fallbackTimeline, onSupport, onNextAction);
+  }
 
   return (
     <CreateOrderJourneyScreen
       values={values}
       timeline={fallbackTimeline}
-      customerState={customerState}
+      clientState={clientState}
       initialPhase="route"
       currentStatusLabel={currentStatusLabel ?? trackingStateMeta.label}
       onBell={onBell}
+      onSupport={onSupport}
+      onNextAction={onNextAction}
       onBack={onSupport ?? onNextAction ?? onRetry}
     />
   );

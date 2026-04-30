@@ -28,7 +28,7 @@ import {
 } from './stores/fixtures';
 import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../shared/marketing/banner-store';
 import { getLiveMarketingGrowthItems } from '../shared/marketing/growth-store';
-import { getDshCustomerStateMeta } from './shared/dshCustomerStateModel';
+import { getDshClientStateMeta } from './shared/dshClientStateModel';
 // checkout/tracking screens consolidated into checkout/screens
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './categories/fixtures/dshCategoriesFixtures';
 import { dshPartnerIntakeItems } from '../shared/partners/workflow';
@@ -159,6 +159,14 @@ const initialOrders = [
   },
 ];
 
+const hostClientStates = {
+  cartEmpty: 'cart_empty',
+  cartReady: 'cart_ready',
+  checkoutReady: 'checkout_ready',
+  orderConfirmed: 'order_confirmed',
+  trackingActive: 'tracking_active',
+} as const;
+
 
 function commandTargetToRoute(target: DshCommandTarget): DshRoute {
   if (target === 'cart-get') {
@@ -196,16 +204,11 @@ function operationScreenToRoute(screenId: ClientOperationScreenId): DshRoute {
   const proxyTargets: ClientOperationScreenId[] = ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review', 'proxy-request-reject', 'proxy-request-tracking'];
   const settingsTargets: ClientOperationScreenId[] = ['service-modes-resolve'];
   const listingTargets: ClientOperationScreenId[] = ['listing-status-update'];
-  const externalTargets: ClientOperationScreenId[] = ['gas-refill-order-create'];
   const zoneTargets: ClientOperationScreenId[] = ['zone-set'];
   const issueTargets: ClientOperationScreenId[] = ['order-issue-flag'];
   const trustTargets: ClientOperationScreenId[] = ['order-proof-code-generate', 'order-proof-verify', 'order-escrow-hold', 'order-escrow-release'];
 
   if (intakeTargets.includes(screenId)) {
-    return 'intake-workspace';
-  }
-
-  if (externalTargets.includes(screenId)) {
     return 'intake-workspace';
   }
 
@@ -235,10 +238,6 @@ function operationScreenToRoute(screenId: ClientOperationScreenId): DshRoute {
 
   if (listingTargets.includes(screenId)) {
     return 'listing-status-update';
-  }
-
-  if (externalTargets.includes(screenId)) {
-    return 'intake-workspace';
   }
 
   if (zoneTargets.includes(screenId)) {
@@ -681,32 +680,32 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
       priceValue: Number(it.priceValue ?? parsePriceLabel(it.priceLabel)),
       qty: 1,
     }));
-    const cartCustomerState = cartPreviewItems.length > 0 ? 'cart_ready' : 'cart_empty';
-    const cartCustomerStateMeta = getDshCustomerStateMeta(cartCustomerState);
+    const cartClientState = cartPreviewItems.length > 0 ? hostClientStates.cartReady : hostClientStates.cartEmpty;
+    const cartClientStateMeta = getDshClientStateMeta(cartClientState);
 
     return (
       <DshCartGetScreen
-        customerState={cartCustomerState}
+        clientState={cartClientState}
         store={{
           id: activeStore.id,
           name: activeStore.name,
           subtitle: activeStore.subtitle,
           statusLabel: activeStore.statusLabel,
-          ratingLabel: '4.8 / 5 quality confidence',
+          ratingLabel: '4.8 / 5 جودة المتجر',
         }}
         // provide structured items to the cart screen so it can render a true basket
         items={cartPreviewItems}
         activeOrder={{
           id: selectedItem?.id ?? 'cart-preview',
-          title: selectedItem ? `Cart includes ${selectedItem.name}` : 'Cart ready for checkout',
+          title: selectedItem ? `تتضمن السلة ${selectedItem.name}` : 'السلة جاهزة للدفع',
           subtitle: selectedItem
-            ? `${selectedItem.subtitle} from ${activeStore.name}`
-            : `Items from ${activeStore.name}`,
-          meta: selectedItem ? (selectedItem.priceLabel ?? 'Review items and continue') : 'Review items and continue',
-          statusLabel: 'Ready',
+            ? `${selectedItem.subtitle} من ${activeStore.name}`
+            : `عناصر من ${activeStore.name}`,
+          meta: selectedItem ? (selectedItem.priceLabel ?? 'راجع العناصر وتابع') : 'راجع العناصر وتابع',
+          statusLabel: 'جاهز',
         }}
-        statusTitle={cartCustomerStateMeta.label}
-        statusDescription={cartCustomerStateMeta.description}
+        statusTitle={cartClientStateMeta.label}
+        statusDescription={cartClientStateMeta.description}
         onOpenStore={() => setRoute('store-get')}
         onOpenService={onOpenService}
         onOpenOrder={() => setRoute('create-order')}
@@ -777,6 +776,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   if (route === 'create-order') {
     return (
       <DshCreateOrderScreen
+        clientState={hostClientStates.checkoutReady}
         values={createOrderValues}
         timeline={trackingTimeline}
         onChange={handleCreateOrderChange}
@@ -810,6 +810,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     return (
       <DshCreateOrderScreen
         screenId={selectedOperationScreen as 'checkout-gate' | 'estimate-get' | 'pricing-preview' | 'pricing-snapshot-get' | 'promo-apply'}
+        clientState={hostClientStates.checkoutReady}
         onPrimaryAction={() => setRoute('create-order')}
         onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('checkout-workspace')}
@@ -927,7 +928,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   }
 
   if (route === 'success') {
-    return <DshOrderSuccessState onNext={() => setRoute('tracking')} />;
+    return <DshOrderSuccessState clientState={hostClientStates.orderConfirmed} onNext={() => setRoute('tracking')} />;
   }
 
   if (route === 'operations-directory') {
@@ -961,7 +962,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     return (
       <DshTrackingScreen
         values={createOrderValues}
-        customerState="tracking_active"
+        clientState={hostClientStates.trackingActive}
         timeline={trackingTimeline}
         onBell={() => setRoute('bell')}
         onSupport={openOperationDirectory}

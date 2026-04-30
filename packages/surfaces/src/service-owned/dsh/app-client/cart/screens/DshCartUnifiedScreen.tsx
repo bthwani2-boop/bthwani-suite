@@ -23,7 +23,7 @@ import {
   type PaymentDecisionOption,
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../components/DshCartDetails';
-import { getDshCustomerStateMeta, type DshCustomerState } from '../../shared/dshCustomerStateModel';
+import { getDshClientStateMeta, type DshClientState } from '../../shared/dshClientStateModel';
 import useWlt from '../../../../wlt/app-client/dsh/hooks/useWlt';
 
 const PAGE_BG = colorPalette.pageBackground;
@@ -90,7 +90,23 @@ type CheckoutActionPayload = {
 
 type DshCartUnifiedScreenProps = {
   items?: CartItem[];
-  customerState?: DshCustomerState;
+  clientState?: DshClientState;
+  store?: {
+    id: string;
+    name: string;
+    subtitle: string;
+    statusLabel: string;
+    ratingLabel?: string;
+  };
+  activeOrder?: {
+    id: string;
+    title: string;
+    subtitle: string;
+    meta: string;
+    statusLabel: string;
+  };
+  statusTitle?: string;
+  statusDescription?: string;
   onContinue?: (payload: CheckoutActionPayload) => void | Promise<void>;
   onOpenOrder?: (payload?: CheckoutActionPayload) => void | Promise<void>;
   onOpenStore?: () => void;
@@ -335,6 +351,8 @@ function RecommendationCard({ title, price, onPress }: RecommendationCardProps) 
 }
 
 function RecommendedSection({ onShowAll, onAddProduct }: { onShowAll: () => void; onAddProduct: (product: RecommendationProduct) => void }) {
+  const isRTL = I18nManager.isRTL;
+
   return (
     <Surface tone="default" padding={2} gap={1} style={{ backgroundColor: SURFACE_SOFT, borderColor: BORDER_SOFT }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -344,7 +362,7 @@ function RecommendedSection({ onShowAll, onAddProduct }: { onShowAll: () => void
         </Text>
       </View>
 
-      <View style={{ flexDirection: 'row', gap: spacing[1], overflow: 'hidden', paddingTop: spacing[0] }}>
+      <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[1], overflow: 'hidden', paddingTop: spacing[0] }}>
         {RECOMMENDED_PRODUCTS.map((product) => (
           <RecommendationCard key={product.id} title={product.title} price={product.priceLabel} onPress={() => onAddProduct(product)} />
         ))}
@@ -498,15 +516,16 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const checkoutAction = props.onContinue ?? props.onOpenOrder;
   const editAction = props.onOpenStore ?? props.onOpenOrder ?? props.onContinue;
   const backAction = props.onOpenStore ?? props.onRetry ?? props.onExit;
+  const isRTL = I18nManager.isRTL;
   const quickActionMeta = quickActionKey ? QUICK_ACTION_META[quickActionKey] : null;
   const hasWltServiceRoute = typeof props.onOpenService === 'function';
-  const customerState = useMemo<DshCustomerState>(
-    () => props.customerState ?? (items.length > 0 ? 'cart_ready' : 'cart_empty'),
-    [items.length, props.customerState],
+  const clientState = useMemo<DshClientState>(
+    () => props.clientState ?? (items.length > 0 ? 'cart_ready' : 'cart_empty'),
+    [items.length, props.clientState],
   );
-  const customerStateMeta = useMemo(() => getDshCustomerStateMeta(customerState), [customerState]);
-  const paymentPendingMeta = useMemo(() => getDshCustomerStateMeta('payment_pending'), []);
-  const walletCreditMeta = useMemo(() => getDshCustomerStateMeta('wallet_credit_visible'), []);
+  const clientStateMeta = useMemo(() => getDshClientStateMeta(clientState), [clientState]);
+  const paymentPendingMeta = useMemo(() => getDshClientStateMeta('payment_pending'), []);
+  const walletCreditMeta = useMemo(() => getDshClientStateMeta('wallet_credit_visible'), []);
 
   const subtotalHalalas = useMemo(
     () => items.reduce((acc, item) => acc + Math.round((item.priceValue ?? 0) * 100) * (item.qty ?? 1), 0),
@@ -870,7 +889,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   const handleCheckoutPress = async () => {
     if (!canCheckout) {
-      showNotice(customerStateMeta.label, customerStateMeta.description, 'info');
+      showNotice(clientStateMeta.label, clientStateMeta.description, 'info');
       return;
     }
 
@@ -1111,12 +1130,16 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           padding={2}
           gap={1}
           items={[
+            { label: 'حالة السلة', value: clientStateMeta.label },
             { label: 'الإجمالي', value: formattedSubtotal },
             { label: 'التوصيل', value: formattedDelivery },
           ]}
           totalLabel="الإجمالي الكلي"
           totalValue={formattedGrandTotal}
         />
+        <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+          {clientStateMeta.description}
+        </Text>
 
         <ItemsTable items={items} onOpenDetails={() => setCartDetailsVisible(true)} />
         <View style={{ height: actionBarBottomPadding }} />
@@ -1126,7 +1149,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         onLayout={(event) => setFooterHeight(event.nativeEvent.layout.height)}
         style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[2], paddingTop: spacing[1], paddingBottom: footerSafePadding, backgroundColor: colorPalette.surfacePrimary, borderTopWidth: 1, borderColor: BORDER_SOFT, zIndex: 5, elevation: 8 }}
       >
-        <View style={{ flexDirection: 'row', gap: spacing[1] }}>
+        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[1] }}>
           <Button label="تنفيذ الطلب" size="md" fullWidth={false} disabled={!canCheckout || checkoutLoading} loading={checkoutLoading} onPress={handleCheckoutPress} style={{ flex: 1, minHeight: 46, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY, borderRadius: 16 }} />
           <Button label="تعديل الطلب" tone="secondary" size="md" fullWidth={false} disabled={!editAction} onPress={handleEditPress} style={{ flex: 1, minHeight: 46, backgroundColor: CTA_SECONDARY, borderColor: BORDER_SOFT, borderRadius: 16 }} />
         </View>
