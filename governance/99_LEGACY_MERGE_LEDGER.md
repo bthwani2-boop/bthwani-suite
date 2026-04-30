@@ -1,0 +1,131 @@
+# 99_LEGACY_MERGE_LEDGER.md
+
+Purpose
+- سجل قرار الدمج لكل ملف في `governance-legacy/`؛ يحدّد مصير كل ملف: MERGED / SUPERSEDED / OBSOLETE / NOT_RELEVANT.
+
+Instructions
+- هذا الملف هو المصدر الوحيد لقرارات ما حدث لكل وثيقة legacy. لا تُغيّر legacy مباشرة.
+
+Ledger (one-line per legacy file)
+- governance-legacy/WARNING_CLASSIFICATION_POLICY.md : MERGED -> 14_GUARDS_CATALOG.md : تصنيف التحذيرات دمج في كتالوج الحُرَس.
+- governance-legacy/WARNING_BASELINE_CLASSIFICATION_MATRIX.md : MERGED -> 14_GUARDS_CATALOG.md : جدول أساسيات التحذير مدموج ضمن الحُرَس.
+- governance-legacy/VERIFICATION_MATRIX.md : MERGED -> 11_EVIDENCE_AND_TRACEABILITY.md : مصفوفة التحقّق موحّدة ضمن التتبّع.
+- governance-legacy/UI_UX_GUARDRAILS.md : MERGED -> 08_UI_KIT_AND_BRAND.md : إرشادات UX مدموجة داخل سياسات الواجهة.
+- governance-legacy/TRACEABILITY_MATRIX_STANDARD.md : MERGED -> 11_EVIDENCE_AND_TRACEABILITY.md : معيار مصفوفة التتبّع.
+- governance-legacy/TRACEABILITY_MATRIX.md : MERGED -> 11_EVIDENCE_AND_TRACEABILITY.md : مصفوفة التتبّع.
+- governance-legacy/TOP_WARNING_FAMILY_ACTION_PLAN.md : MERGED -> 14_GUARDS_CATALOG.md : خطة إجراءات عائلات التحذير.
+- governance-legacy/TAMAGUI_UI_KIT_REACT_NATIVE_BRIDGE_CLASSIFICATION.json : NOT_RELEVANT : JSON تصنيف جسر Tamagui — ملف بيانات للحزمة، ليس وثيقة حكومية.
+- governance-legacy/TAMAGUI_INTEGRATION_LAW.md : MERGED -> 08_UI_KIT_AND_BRAND.md : قواعد دمج Tamagui داخل ui-kit.
+- governance-legacy/SURFACE_CATALOG.md : MERGED -> 07_SURFACES_AND_SERVICES.md : كتالوج السطوح.
+- governance-legacy/SERVICE_CLOSURE_GUARDRAILS.md : MERGED -> 10_SERVICE_CLOSURE.md : حواجز إغلاق الخدمة مدموجة.
+- governance-legacy/SERVICE_CATALOG.md : MERGED -> 07_SURFACES_AND_SERVICES.md : كتالوج الخدمات.
+- governance-legacy/SERVICE_BLUEPRINT_TEMPLATE.md : MERGED -> 07_SURFACES_AND_SERVICES.md : قالب بلوبرنت الخدمة.
+- governance-legacy/SERVICE_BLUEPRINT_STANDARD.md : MERGED -> 07_SURFACES_AND_SERVICES.md : معيار بلوبرنت.
+- governance-legacy/SECURITY_AND_SECRETS_GUARDRAILS.md : MERGED -> 16_SECURITY_AND_SECRETS.md : إرشادات الأمن.
+- governance-legacy/SCOPE_LOCK.md : MERGED -> 04_ARCHITECTURE_RULES.md : قفل النطاق مدموج ضمن القواعد المعمارية.
+- governance-legacy/RUNTIME_VERIFICATION_POLICY.md : MERGED -> 09_API_BINDING_RUNTIME.md : سياسة التحقق في وقت التشغيل.
+- governance-legacy/REPO_BOUNDARY.md : MERGED -> 03_REPO_BOUNDARIES.md : حدود الريبو.
+- governance-legacy/REPO_BOUNDARIES_AND_OWNERSHIP.md : MERGED -> 03_REPO_BOUNDARIES.md : حدود وملكية المجلدات.
+- governance-legacy/README.md : MERGED -> 00_README.md : README كانوني.
+- governance-legacy/PLATFORM_OPERATING_MODEL.md : MERGED -> 02_PLATFORM_SSOT.md : نموذج تشغيل المنصة.
+- governance-legacy/PLATFORM_BLUEPRINT_EXECUTION_ROADMAP.md : MERGED -> 02_PLATFORM_SSOT.md : خارطة طريق التنفيذ.
+- governance-legacy/PLATFORM_BLUEPRINT.md : MERGED -> 02_PLATFORM_SSOT.md : blueprint المنصة.
+- governance-legacy/OWNERSHIP.md : MERGED -> 03_REPO_BOUNDARIES.md : سياسة الملكية.
+- governance-legacy/OPERATION_CATALOG_TEMPLATE.md : MERGED -> 07_SURFACES_AND_SERVICES.md : قالب عمليات التشغيل.
+- governance-legacy/OPENAPI_SOVEREIGNTY.md : MERGED -> 09_API_BINDING_RUNTIME.md : سياسات OpenAPI.
+- governance-legacy/LEGACY_REFERENCE_CLEANUP_POLICY.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : سياسة تنظيف المراجع.
+- governance-legacy/LEGACY_REFERENCE_CLEANUP_MATRIX.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : مصفوفة تنظيف المراجع.
+- governance-legacy/GUARD_SEVERITY_PROMOTION_POLICY.md : MERGED -> 14_GUARDS_CATALOG.md : سياسة ترقية شدة الحُرَس.
+- governance-legacy/GUARD_IMPLEMENTATION_MAP.md : MERGED -> 14_GUARDS_CATALOG.md : خريطة تنفيذ الحُرَس.
+- governance-legacy/GUARD_ERROR_PROMOTION_PHASE_01_PLAN.md : MERGED -> 14_GUARDS_CATALOG.md : خطة رفع أخطاء الحُرَس.
+- governance-legacy/GUARD_24_EVIDENCE_TO_COMMIT_TRACEABILITY.md : MERGED -> 11_EVIDENCE_AND_TRACEABILITY.md : تتبّع الأدلة.
+- governance-legacy/GUARD_23_SCRIPT_SAFETY.md : MERGED -> 14_GUARDS_CATALOG.md : سلامة السكربتات.
+- governance-legacy/GUARD_22_TEST_SMOKE_COVERAGE_PRESENCE.md : MERGED -> 12_TESTING_AND_PRODUCTION_READINESS.md : شرط وجود smoke tests.
+- governance-legacy/GUARD_21_ROUTE_SCREEN_FILE_STRUCTURE.md : MERGED -> 04_ARCHITECTURE_RULES.md : هيكل ملفات الشاشات.
+- governance-legacy/GUARD_20_DESIGN_TOKEN_BRAND_DRIFT.md : MERGED -> 08_UI_KIT_AND_BRAND.md : قواعد ثبات الهوية.
+- governance-legacy/GUARD_19_TYPESCRIPT_STRICTNESS.md : MERGED -> 04_ARCHITECTURE_RULES.md : سياسة TypeScript strictness.
+- governance-legacy/GUARD_18_SURFACE_SCREEN_OWNERSHIP.md : MERGED -> 07_SURFACES_AND_SERVICES.md : ملكية شاشات السطوح.
+- governance-legacy/GUARD_17_SERVICE_BLUEPRINT_COVERAGE.md : MERGED -> 07_SURFACES_AND_SERVICES.md : تغطية بلوبرنت الخدمات.
+- governance-legacy/GUARD_16_PACKAGE_EXPORTS_COMPLETENESS.md : MERGED -> 05_PACKAGE_BOUNDARIES.md : اكتمال صادرات الحزم.
+- governance-legacy/GUARD_15_CI_WORKFLOW_COVERAGE.md : MERGED -> 13_CI_AND_GATES.md : تغطية تدفقات CI.
+- governance-legacy/GUARD_14_AGENT_SKILL_REGISTRY_OWNERSHIP.md : MERGED -> 15_AGENT_AND_AI_EXECUTION.md : ملكية سجل مهارات الوكلاء.
+- governance-legacy/GUARD_13_GOVERNANCE_SSOT_CONFLICT.md : MERGED -> 01_GOVERNANCE_INDEX.md : إدارة تعارضات SSOT.
+- governance-legacy/GUARD_12_DUPLICATE_DOCS_AGENT_SKILL_CONTENT.md : MERGED -> 15_AGENT_AND_AI_EXECUTION.md : تكرار مستندات الوكلاء.
+- governance-legacy/GUARD_11_EMPTY_PLACEHOLDER_ZERO_BYTE_FILES.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : ملفات صفريّة/نفايات.
+- governance-legacy/GUARD_10_EVIDENCE_REGISTRY_RUNS_HYGIENE.md : MERGED -> 11_EVIDENCE_AND_TRACEABILITY.md : نظافة سجلات الـ evidence.
+- governance-legacy/GUARD_10_EVIDENCE_REGISTRY_HYGIENE.md : SUPERSEDED : مكرر/نسخة قديمة من ملف GUARD_10 (دمجت المحتوى في GUARD_10_EVIDENCE_REGISTRY_RUNS_HYGIENE.md).
+- governance-legacy/GUARD_09_RTL_I18N.md : MERGED -> 08_UI_KIT_AND_BRAND.md : RTL وi18n.
+- governance-legacy/GUARD_08_RUNTIME_ROUTE_ENTRYPOINT_PROTECTION.md : MERGED -> 04_ARCHITECTURE_RULES.md : حماية نقاط الدخول.
+- governance-legacy/GUARD_07_UIKIT_TAMAGUI_BOUNDARY.md : MERGED -> 08_UI_KIT_AND_BRAND.md : حد Tamagui داخل ui-kit.
+- governance-legacy/GUARD_06_LEGACY_FORBIDDEN_NAMING.md : MERGED -> 03_REPO_BOUNDARIES.md : أسماء محظورة.
+- governance-legacy/GUARD_05_PACKAGE_INTERNAL_DEEP_IMPORT.md : MERGED -> 05_PACKAGE_BOUNDARIES.md : منع deep-import.
+- governance-legacy/GUARD_04_PUBLIC_EXPORT_BARREL_CONTRACT.md : MERGED -> 05_PACKAGE_BOUNDARIES.md : عقد exports العامة.
+- governance-legacy/GUARD_03_UNUSED_DEAD_ORPHAN_CODE.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : كود غير مستخدم.
+- governance-legacy/GUARD_02_SHARED_FOLDER_OWNERSHIP.md : MERGED -> 03_REPO_BOUNDARIES.md : ملكية المجلدات المشتركة.
+- governance-legacy/GUARDS.md : MERGED -> 14_GUARDS_CATALOG.md : مرجع مختصر للحُرَس.
+- governance-legacy/GUARDRAILS_INDEX.md : MERGED -> 14_GUARDS_CATALOG.md : فهرس الحواجز.
+- governance-legacy/GOVERNANCE_TECHNICAL_DEBT_PRIORITIZATION_MATRIX.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : مصفوفة الأولوية للديون التقنية.
+- governance-legacy/GOVERNANCE_SSOT.md : MERGED -> 02_PLATFORM_SSOT.md : SSOT للحوكمة.
+- governance-legacy/GOVERNANCE_REORGANIZATION_LEDGER.md : SUPERSEDED : استبدلَ بسجل الدمج المركزي `99_LEGACY_MERGE_LEDGER.md`.
+- governance-legacy/GOVERNANCE_PACKAGE_MANIFEST.json : NOT_RELEVANT : manifest للحزمة — ابقَ داخل الحزمة.
+- governance-legacy/GOVERNANCE_MERGE_DECISIONS.md : SUPERSEDED : تم توحيد قرارات الدمج في هذا الملف.
+- governance-legacy/GOVERNANCE_MASTER_CONTROL_PLANE.md : MERGED -> 02_PLATFORM_SSOT.md : عناصر السيطرة المركزية.
+- governance-legacy/GOVERNANCE_GUARD_EXECUTION_STANDARD.md : MERGED -> 14_GUARDS_CATALOG.md : معيار تنفيذ الحُرَس.
+- governance-legacy/GOVERNANCE_GUARD_CATALOG.md : MERGED -> 14_GUARDS_CATALOG.md : كتالوج الحُرَس.
+- governance-legacy/GOVERNANCE_FINALIZATION_PROTOCOL.md : MERGED -> 01_GOVERNANCE_INDEX.md : بروتوكول إنهاء القرارات.
+- governance-legacy/GOVERNANCE_FILE_CLASSIFICATION_MATRIX.md : MERGED -> 03_REPO_BOUNDARIES.md : مصفوفة تصنيف الملفات.
+- governance-legacy/GOVERNANCE_DUPLICATE_CONTRADICTION_REGISTER.md : MERGED -> 01_GOVERNANCE_INDEX.md : سجل التكرار والتناقض.
+- governance-legacy/GOVERNANCE_DEEP_DEDUP_ANALYSIS_MATRIX.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : تحليل إزالة التكرار.
+- governance-legacy/GOVERNANCE_DEDICATED_MERGE_DELETE_PLAN.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : خطة الدمج والحذف.
+- governance-legacy/GOVERNANCE_CONTROL_PLANE_STANDARD.md : MERGED -> 02_PLATFORM_SSOT.md : معايير Control Plane.
+- governance-legacy/GOVERNANCE_CONSOLIDATION_DECISION_MATRIX.md : MERGED -> 01_GOVERNANCE_INDEX.md : مصفوفة قرارات الدمج.
+- governance-legacy/GOVERNANCE_CLOSURE_STANDARD.md : MERGED -> 10_SERVICE_CLOSURE.md : معيار الإغلاق.
+- governance-legacy/GOVERNANCE_CLOSURE_DECISION.md : MERGED -> 10_SERVICE_CLOSURE.md : قرار إغلاق.
+- governance-legacy/GOVERNANCE_CLOSEOUT_ROADMAP.md : MERGED -> 10_SERVICE_CLOSURE.md : خارطة إغلاق الخدمة.
+- governance-legacy/GOVERNANCE_CLEANUP_CANDIDATES.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : مرشّحو الحذف.
+- governance-legacy/GOVERNANCE_CANONICALIZATION_QUEUE.md : MERGED -> 01_GOVERNANCE_INDEX.md : قائمة canonicalization.
+- governance-legacy/GOVERNANCE_CANONICAL.md : MERGED -> 01_GOVERNANCE_INDEX.md : وثيقة الكانونيك.
+- governance-legacy/GOVERNANCE_CANDIDATE_RESOLUTION_MATRIX.md : MERGED -> 01_GOVERNANCE_INDEX.md : مصفوفة حل المرشحين.
+- governance-legacy/GOVERNANCE_AUDIT_FALSE_POSITIVE_CLASSIFICATION.md : MERGED -> 11_EVIDENCE_AND_TRACEABILITY.md : تصنيف الإيجابيات الكاذبة.
+- governance-legacy/FLOW_API_BINDING_RUNTIME_GUARDRAILS.md : MERGED -> 09_API_BINDING_RUNTIME.md : حواجز ربط الـ API.
+- governance-legacy/EVIDENCE_PACK_TEMPLATE.md : MERGED -> 11_EVIDENCE_AND_TRACEABILITY.md : قالب حزمة الأدلة.
+- governance-legacy/EVIDENCE_AND_CLOSURE_GATES.md : MERGED -> 11_EVIDENCE_AND_TRACEABILITY.md : بوابات الأدلة والإغلاق.
+- governance-legacy/DOCS_GOVERNANCE_DELETION_READINESS_POLICY.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : سياسة الجاهزية للحذف.
+- governance-legacy/DOCS_GOVERNANCE_DELETION_READINESS_AUDIT.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : تدقيق الجاهزية.
+- governance-legacy/DOCS_GOVERNANCE_DELETION_GATE_DECISION.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : قرار بوابة الحذف.
+- governance-legacy/DOCS_GOVERNANCE_ACTIVE_REFERENCE_REMEDIATION_PLAN.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : خطة تصحيح المراجع النشطة.
+- governance-legacy/DIRECTION_I18N_OWNERSHIP.md : MERGED -> 08_UI_KIT_AND_BRAND.md : ملكية i18n.
+- governance-legacy/CLEANUP_AND_DEPRECATION_POLICY.md : MERGED -> 17_CLEANUP_AND_DEPRECATION.md : سياسة التنظيف.
+- governance-legacy/CI_REPORT_ONLY_READINESS_PLAN.md : MERGED -> 13_CI_AND_GATES.md : خطة readiness (report-only).
+- governance-legacy/CI_GRADUAL_GATE_POLICY.md : MERGED -> 13_CI_AND_GATES.md : سياسة البوابات المتدرجة.
+- governance-legacy/CHANGE_ENTRY_RULE.md : MERGED -> 18_BRANCH_AND_CHECKPOINTS.md : قاعدة إدخال التغيير.
+- governance-legacy/BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2.md : MERGED -> 02_PLATFORM_SSOT.md : خارطة الطريق المجمّعة.
+- governance-legacy/BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE.md : SUPERSEDED : خُلاصات واستنتاجات دمجت في SSOT؛ الملف التاريخي لم يُنقل حرفيًا.
+- governance-legacy/BTHWANI_GUIDE__Unified_Execution_OS__V4_Phases_Waves_Todolists.md : SUPERSEDED : دليل تشغيل مؤقت — الاستنتاجات الرئيسية دمجت.
+- governance-legacy/BRANCH_AND_CHECKPOINT_POLICY.md : MERGED -> 18_BRANCH_AND_CHECKPOINTS.md : سياسة الفروع والنقاط الوسيطة.
+- governance-legacy/ARCHITECTURE_LOCK.md : MERGED -> 04_ARCHITECTURE_RULES.md : قفل معمارية.
+- governance-legacy/ARCHITECTURE_GUARDRAILS.md : MERGED -> 04_ARCHITECTURE_RULES.md : حواجز معمارية.
+- governance-legacy/APPROVED_SURFACE_NAMING.md : MERGED -> 07_SURFACES_AND_SERVICES.md : أسماء السطوح المعتمدة.
+- governance-legacy/API_CONTRACT_POLICY.md : MERGED -> 09_API_BINDING_RUNTIME.md : سياسة عقود الـ API.
+- governance-legacy/AI_EXECUTION_GOVERNANCE.md : MERGED -> 15_AGENT_AND_AI_EXECUTION.md : حوكمة تنفيذ الذكاء الاصطناعي.
+- governance-legacy/AGENT_UPDATE_VALIDATION_CHECKLIST.md : MERGED -> 15_AGENT_AND_AI_EXECUTION.md : قائمة التحقق لتحديث الوكيل.
+- governance-legacy/AGENT_GOVERNANCE_POLICY.md : MERGED -> 15_AGENT_AND_AI_EXECUTION.md : سياسة حوكمة الوكلاء.
+- governance-legacy/AGENT_CHANGE_LEDGER_POLICY.md : MERGED -> 15_AGENT_AND_AI_EXECUTION.md : سياسة سجل تغييرات الوكيل.
+- governance-legacy/19_PATCH_REVIEW_PROTOCOL.md : MERGED -> 12_TESTING_AND_PRODUCTION_READINESS.md : بروتوكول مراجعة الباتش.
+- governance-legacy/18_EVIDENCE_PACK_STANDARD.md : MERGED -> 11_EVIDENCE_AND_TRACEABILITY.md : معيار حزم الأدلة.
+- governance-legacy/17_TESTING_AND_PRODUCTION_READINESS.md : MERGED -> 12_TESTING_AND_PRODUCTION_READINESS.md : معيار الجاهزية.
+- governance-legacy/16_SECURITY_AND_SECRETS_POLICY.md : MERGED -> 16_SECURITY_AND_SECRETS.md : سياسة الأمن والأسرار.
+- governance-legacy/14_AGENT_EXECUTION_RULES.md : MERGED -> 15_AGENT_AND_AI_EXECUTION.md : قواعد تنفيذ الوكلاء.
+- governance-legacy/13_CI_GATES_CONTRACT.md : MERGED -> 13_CI_AND_GATES.md : عقد بوابات CI.
+- governance-legacy/12_API_BINDING_RUNTIME_PROTOCOL.md : MERGED -> 09_API_BINDING_RUNTIME.md : بروتوكول ربط الـ runtime.
+- governance-legacy/11_DSH_GOLDEN_SLICE_PROTOCOL.md : MERGED -> 06_APPS_AND_SHELLS.md : بروتوكول golden slice.
+- governance-legacy/10_SERVICE_CLOSURE_PROTOCOL.md : MERGED -> 10_SERVICE_CLOSURE.md : بروتوكول الإغلاق.
+- governance-legacy/09_SHARED_FOLDER_GOVERNANCE.md : MERGED -> 03_REPO_BOUNDARIES.md : حوكمة المجلدات المشتركة.
+- governance-legacy/08_SCREEN_FILE_MODEL_CONTRACT.md : MERGED -> 04_ARCHITECTURE_RULES.md : عقد نموذج ملف الشاشة.
+- governance-legacy/07_UI_KIT_AUTHORITY_CONTRACT.md : MERGED -> 08_UI_KIT_AND_BRAND.md : سلطة الـ UI-kit.
+- governance-legacy/06_SURFACES_OWNERSHIP_CONTRACT.md : MERGED -> 07_SURFACES_AND_SERVICES.md : عقد ملكية السطوح.
+- governance-legacy/04_APPS_SHELL_ONLY_CONTRACT.md : MERGED -> 06_APPS_AND_SHELLS.md : عقد التطبيقات الشيل.
+- governance-legacy/03_PACKAGE_BOUNDARY_CONTRACT.md : MERGED -> 05_PACKAGE_BOUNDARIES.md : عقد حدود الحزم.
+- governance-legacy/02_BRANCH_AND_EVIDENCE_POLICY.md : MERGED -> 18_BRANCH_AND_CHECKPOINTS.md : سياسة الفرع والأدلة.
+- governance-legacy/01_PLATFORM_SSOT.md : MERGED -> 02_PLATFORM_SSOT.md : SSOT المنصة القديمة.
+- governance-legacy/00_GOVERNANCE_INDEX.md : MERGED -> 01_GOVERNANCE_INDEX.md : فهرس الحوكمة القديم.
