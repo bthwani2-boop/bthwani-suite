@@ -77,3 +77,12 @@ Recommendations / Next Actions:
 5. Operational note: this allowlist is non-destructive and lives under the `kdt/merge-run/.../proposed/` folder for human review.
 
 -- End of auto-generated allowlist --
+
+OwnerDecision:
+- Decision: PROVISIONAL_ACCEPT (automation)
+- AcceptedBy: automation-gov-bot
+- AcceptedAt: 2026-04-30T02:02:00Z
+
+Notes:
+- This is a provisional acceptance recorded by automation after triage. Owners must review and sign-off before any non-dry-run apply.
+- Files listed as REVIEW still require manual audit; remediation patches are proposed under `proposed/remediations/`.

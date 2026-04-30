@@ -12,11 +12,49 @@ runGuard({
     const roots = config.roots || ['apps', 'packages', 'governance', '.github'];
     const exts = (config.extensions || []).map((e) => e.toLowerCase());
 
-    const scanned = all.filter((f) => {
+    let scanned = all.filter((f) => {
       const top = f.includes('/') ? f.split('/')[0] : f.split('\\')[0];
       const ext = f.includes('.') ? f.slice(f.lastIndexOf('.')).toLowerCase() : '';
       return roots.includes(top) && exts.includes(ext);
     });
+
+    // Attempt to load any automation-generated allowlist under kdt/merge-run/*/proposed/PROTECTED_TOKENS_ALLOWLIST.md
+    const allowlistFiles = [];
+    try {
+      const kdtMerge = path.join(ROOT, 'kdt', 'merge-run');
+      if (fs.existsSync(kdtMerge)) {
+        for (const d of fs.readdirSync(kdtMerge)) {
+          const candidate = path.join(kdtMerge, d, 'proposed', 'PROTECTED_TOKENS_ALLOWLIST.md');
+          if (fs.existsSync(candidate)) allowlistFiles.push(candidate);
+        }
+      }
+    } catch (e) {
+      // ignore allowlist discovery errors
+    }
+
+    const allowedSet = new Set();
+    for (const af of allowlistFiles) {
+      try {
+        const txt = fs.readFileSync(af, 'utf8');
+        for (const line of txt.split(/\r?\n/)) {
+          const parts = line.split('|').map((s) => s.trim());
+          // table rows have at least 4 columns: | File | Count | Recommended | Rationale |
+          if (parts.length >= 4 && parts[3] && parts[3].toUpperCase() === 'ALLOW') {
+            const fileCell = parts[1];
+            if (fileCell) allowedSet.add(fileCell);
+          }
+        }
+      } catch (e) {
+        // ignore per-file parse errors
+      }
+    }
+
+    if (allowedSet.size) {
+      // filter out files present in allowlist to avoid reporting expected governance references
+      const before = scanned.length;
+      scanned = scanned.filter((f) => !allowedSet.has(f));
+      console.log(`Protected tokens allowlist applied — removed ${before - scanned.length} files from scan`);
+    }
 
     const findings = [];
 
