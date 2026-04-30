@@ -23,6 +23,7 @@ import {
   type PaymentDecisionOption,
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../components/DshCartDetails';
+import { getDshCustomerStateMeta, type DshCustomerState } from '../../shared/dshCustomerStateModel';
 import useWlt from '../../../../wlt/app-client/dsh/hooks/useWlt';
 
 const PAGE_BG = colorPalette.pageBackground;
@@ -70,6 +71,32 @@ type PaymentSelection = {
   summary: string;
   blockingReason?: string;
   feedbackTone: NonNullable<ScreenNotice['tone']>;
+};
+
+type CartItem = {
+  id: string;
+  title: string;
+  priceValue?: number;
+  qty?: number;
+};
+
+type CheckoutActionPayload = {
+  paymentMethod: PaymentMethodKey;
+  walletAmountHalalas: number;
+  amountDueOnDeliveryHalalas: number;
+  orderTotalHalalas: number;
+  summary: string;
+};
+
+type DshCartUnifiedScreenProps = {
+  items?: CartItem[];
+  customerState?: DshCustomerState;
+  onContinue?: (payload: CheckoutActionPayload) => void | Promise<void>;
+  onOpenOrder?: (payload?: CheckoutActionPayload) => void | Promise<void>;
+  onOpenStore?: () => void;
+  onRetry?: () => void;
+  onExit?: () => void;
+  onOpenService?: (serviceId: string) => void;
 };
 
 const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
@@ -432,8 +459,8 @@ function QuickActionSheet({ visible, meta, value, submitDisabled = false, onChan
   );
 }
 
-export default function DshCartUnifiedScreen(props: any) {
-  const [items, setItems] = useState<any[]>(
+export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
+  const [items, setItems] = useState<CartItem[]>(
     props.items ?? [
       { id: 'p1', title: 'دجاج فحم تركي مع التوابع', priceValue: 3000, qty: 1 },
       { id: 'p2', title: 'كريسبي رول مفرد', priceValue: 1500, qty: 2 },
@@ -473,6 +500,13 @@ export default function DshCartUnifiedScreen(props: any) {
   const backAction = props.onOpenStore ?? props.onRetry ?? props.onExit;
   const quickActionMeta = quickActionKey ? QUICK_ACTION_META[quickActionKey] : null;
   const hasWltServiceRoute = typeof props.onOpenService === 'function';
+  const customerState = useMemo<DshCustomerState>(
+    () => props.customerState ?? (items.length > 0 ? 'cart_ready' : 'cart_empty'),
+    [items.length, props.customerState],
+  );
+  const customerStateMeta = useMemo(() => getDshCustomerStateMeta(customerState), [customerState]);
+  const paymentPendingMeta = useMemo(() => getDshCustomerStateMeta('payment_pending'), []);
+  const walletCreditMeta = useMemo(() => getDshCustomerStateMeta('wallet_credit_visible'), []);
 
   const subtotalHalalas = useMemo(
     () => items.reduce((acc, item) => acc + Math.round((item.priceValue ?? 0) * 100) * (item.qty ?? 1), 0),
@@ -836,7 +870,7 @@ export default function DshCartUnifiedScreen(props: any) {
 
   const handleCheckoutPress = async () => {
     if (!canCheckout) {
-      showNotice('السلة فارغة', 'أضف منتجًا واحدًا على الأقل قبل تنفيذ الطلب.', 'info');
+      showNotice(customerStateMeta.label, customerStateMeta.description, 'info');
       return;
     }
 
@@ -846,7 +880,8 @@ export default function DshCartUnifiedScreen(props: any) {
     }
 
     if (!paymentSelection.valid) {
-      showNotice('طريقة الدفع غير مكتملة', paymentSelection.blockingReason ?? paymentSelection.summary, paymentSelection.feedbackTone);
+      const blockedStateMeta = paymentSelection.method === 'official-wallets' ? walletCreditMeta : paymentPendingMeta;
+      showNotice(blockedStateMeta.label, paymentSelection.blockingReason ?? blockedStateMeta.description, paymentSelection.feedbackTone);
       return;
     }
 

@@ -28,6 +28,7 @@ import {
 } from './stores/fixtures';
 import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../shared/marketing/banner-store';
 import { getLiveMarketingGrowthItems } from '../shared/marketing/growth-store';
+import { getDshCustomerStateMeta } from './shared/dshCustomerStateModel';
 // checkout/tracking screens consolidated into checkout/screens
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './categories/fixtures/dshCategoriesFixtures';
 import { dshPartnerIntakeItems } from '../shared/partners/workflow';
@@ -680,9 +681,12 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
       priceValue: Number(it.priceValue ?? parsePriceLabel(it.priceLabel)),
       qty: 1,
     }));
+    const cartCustomerState = cartPreviewItems.length > 0 ? 'cart_ready' : 'cart_empty';
+    const cartCustomerStateMeta = getDshCustomerStateMeta(cartCustomerState);
 
     return (
       <DshCartGetScreen
+        customerState={cartCustomerState}
         store={{
           id: activeStore.id,
           name: activeStore.name,
@@ -701,8 +705,8 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
           meta: selectedItem ? (selectedItem.priceLabel ?? 'Review items and continue') : 'Review items and continue',
           statusLabel: 'Ready',
         }}
-        statusTitle="Cart context confirmed"
-        statusDescription="Initialize the cart session before moving into the checkout route."
+        statusTitle={cartCustomerStateMeta.label}
+        statusDescription={cartCustomerStateMeta.description}
         onOpenStore={() => setRoute('store-get')}
         onOpenService={onOpenService}
         onOpenOrder={() => setRoute('create-order')}
@@ -957,7 +961,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     return (
       <DshTrackingScreen
         values={createOrderValues}
-        currentStatusLabel="في الطريق"
+        customerState="tracking_active"
         timeline={trackingTimeline}
         onBell={() => setRoute('bell')}
         onSupport={openOperationDirectory}

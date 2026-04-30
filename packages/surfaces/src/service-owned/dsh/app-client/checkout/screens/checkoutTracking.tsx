@@ -29,6 +29,7 @@ import {
   useTheme,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../../patterns/screens/DshOperationScreen';
+import { getDshCustomerStateMeta, type DshCustomerState } from '../../shared/dshCustomerStateModel';
 
 type CreateOrderValues = {
   pickupAddress: string;
@@ -111,6 +112,7 @@ export type DshOrderSuccessStateProps = {
 
 export type DshTrackingScreenProps = {
   values?: CreateOrderValues;
+  customerState?: DshCustomerState;
   currentStatusLabel?: string;
   timeline?: DshTrackingTimelineItem[];
   onBell?: () => void;
@@ -541,13 +543,14 @@ function renderCheckoutGate(screenId?: string, state: DshOperationScreenState = 
 type CreateOrderJourneyScreenProps = {
   values: CreateOrderValues;
   timeline: DshTrackingTimelineItem[];
+  customerState?: DshCustomerState;
   onBack?: () => void;
   onBell?: () => void;
   initialPhase?: JourneyPhase;
   currentStatusLabel?: string;
 };
 
-function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
+function CreateOrderJourneyScreen({ values, timeline, customerState = 'tracking_active', onBack, onBell, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
   const { theme } = useTheme();
   const [phase, setPhase] = React.useState<JourneyPhase>(initialPhase);
   const [productRating, setProductRating] = React.useState(0);
@@ -565,13 +568,14 @@ function CreateOrderJourneyScreen({ values, timeline, onBack, onBell, initialPha
     align: 'start',
     attachments: ['camera', 'video', 'voice'],
   });
+  const trackingStateMeta = getDshCustomerStateMeta(customerState);
   const note = normalizeText(values.note).length ? values.note : 'لا توجد ملاحظات';
   const phaseIndex = phase === 'route' ? 0 : phase === 'arrived' ? 1 : 2;
-  const deliveryStatusLabel = phase === 'route' ? currentStatusLabel ?? 'في الطريق' : phase === 'arrived' ? 'وصل للعميل' : 'استلم العميل الطلب';
+  const deliveryStatusLabel = phase === 'route' ? currentStatusLabel ?? trackingStateMeta.label : phase === 'arrived' ? 'وصل للعميل' : 'استلم العميل الطلب';
   const journeyTopBarTitle = phase === 'route' ? 'الطلب في الطريق إلى العميل' : phase === 'arrived' ? 'وصل الطلب للعميل' : 'استلم العميل الطلب';
   const heroTitle = phase === 'route' ? 'في الطريق' : phase === 'arrived' ? 'وصل للعميل' : 'تم الاستلام';
   const heroSummary = phase === 'route'
-    ? 'الطلب متجه الآن إلى العميل مع بقاء الخطوة التالية واضحة ومباشرة.'
+    ? trackingStateMeta.description
     : phase === 'arrived'
       ? 'الطلب وصل إلى العميل وهو الآن بانتظار تثبيت الاستلام.'
       : 'اكتمل الاستلام ويمكنك تقييم التجربة من نفس الصفحة.';
@@ -1025,17 +1029,19 @@ export function DshOrderSuccessState({ onNext }: DshOrderSuccessStateProps) {
   return renderOrderSuccess(onNext);
 }
 
-export function DshTrackingScreen({ values = defaultCreateOrderValues, currentStatusLabel = 'في الطريق', timeline = [], onBell, onSupport, onRetry, onNextAction }: DshTrackingScreenProps) {
+export function DshTrackingScreen({ values = defaultCreateOrderValues, customerState = 'tracking_active', currentStatusLabel, timeline = [], onBell, onSupport, onRetry, onNextAction }: DshTrackingScreenProps) {
   const fallbackTimeline: DshTrackingTimelineItem[] = timeline.length
     ? timeline
     : deliveryJourneySteps.map((step, index) => ({ id: step.id, title: step.title, detail: step.detail, done: index === 0 }));
+  const trackingStateMeta = getDshCustomerStateMeta(customerState);
 
   return (
     <CreateOrderJourneyScreen
       values={values}
       timeline={fallbackTimeline}
+      customerState={customerState}
       initialPhase="route"
-      currentStatusLabel={currentStatusLabel}
+      currentStatusLabel={currentStatusLabel ?? trackingStateMeta.label}
       onBell={onBell}
       onBack={onSupport ?? onNextAction ?? onRetry}
     />
@@ -1066,8 +1072,3 @@ export function DshDeliveryManagementHubScreen({ state = 'ready', screenId = 'de
 
 
 export default {};
-
-
-
-
-
