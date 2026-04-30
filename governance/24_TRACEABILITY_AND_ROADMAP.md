@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Roadmap Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** PLATFORM_BLUEPRINT_EXECUTION_ROADMAP, BTHWANI_GUIDE phases/waves/todolists, VERIFICATION_MATRIX
 
@@ -61,5 +61,3 @@ A roadmap item is closed only when:
 ## Anti-noise roadmap rule
 
 Do not use roadmaps to postpone obvious fixes. Roadmap is for sequencing verified work, not hiding gaps.
-
-{standard_footer()}

@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `API Runtime Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** 12_API_BINDING_RUNTIME_PROTOCOL, API_CONTRACT_POLICY, FLOW_API_BINDING_RUNTIME_GUARDRAILS
 
@@ -101,5 +101,3 @@ service | surface | screen/operation | endpoint | method | request type | respon
 - surface handles states,
 - tests/runtime evidence exist,
 - rollback/disable path exists for risky changes.
-
-{standard_footer()}

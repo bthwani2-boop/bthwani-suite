@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Legacy Accounting Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** GOVERNANCE_REORGANIZATION_LEDGER, GOVERNANCE_DEEP_DEDUP_ANALYSIS_MATRIX, all legacy files
 

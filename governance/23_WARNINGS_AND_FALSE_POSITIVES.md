@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Warning Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** WARNING_CLASSIFICATION_POLICY, WARNING_BASELINE_CLASSIFICATION_MATRIX, GOVERNANCE_AUDIT_FALSE_POSITIVE_CLASSIFICATION
 
@@ -56,5 +56,3 @@ A report-only warning becomes blocking when:
 ## Final acceptance
 
 No final governance closure may include unclassified warnings. Use `PASS_WITH_WARNINGS` only when warnings are documented and non-blocking.
-
-{standard_footer()}

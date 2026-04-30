@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Cleanup Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** CLEANUP_AND_DEPRECATION_POLICY, DOCS_GOVERNANCE_DELETION_* plans, GOVERNANCE_CLEANUP_CANDIDATES
 
@@ -67,5 +67,3 @@ For deprecated APIs/components/docs:
 - moving package roots without consumer scan,
 - removing aliases in same step as public rename,
 - deleting legacy before ledger coverage.
-
-{standard_footer()}

@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Evidence Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** 18_EVIDENCE_PACK_STANDARD, EVIDENCE_AND_CLOSURE_GATES, PATCH_REVIEW_PROTOCOL
 
@@ -128,5 +128,3 @@ A task cannot pass if:
 - staged changes are unreviewed,
 - UI screenshots are missing for UI work,
 - evidence pack lacks `_HANDOFF.zip` when a script writes under registry runs.
-
-{standard_footer()}

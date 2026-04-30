@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Security Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** 16_SECURITY_AND_SECRETS_POLICY, SECURITY posture references
 
@@ -86,5 +86,3 @@ If gitleaks or equivalent exists, run it for security-sensitive changes.
 - hidden auth bypass,
 - unaudited money mutation,
 - PII in evidence without redaction.
-
-{standard_footer()}

@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `AI Workflow Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** 14_AGENT_EXECUTION_RULES, AI_EXECUTION_GOVERNANCE, BTHWANI_GUIDE, MASTER_EXECUTION_PLAYBOOK
 
@@ -91,5 +91,3 @@ NO_ACTION_REQUIRED
 ```
 
 `NO_ACTION_REQUIRED` is allowed as workflow decision, but traceability row status should use `NOT_APPLICABLE`.
-
-{standard_footer()}

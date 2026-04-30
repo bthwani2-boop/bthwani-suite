@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Guard Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** GOVERNANCE_GUARD_CATALOG, GUARDRAILS_INDEX, GUARD_* files, WARNING_CLASSIFICATION_POLICY
 
@@ -80,5 +80,3 @@ Guard IDs must never be reused for a different meaning. If a legacy file used a 
 ## Guard implementation rule
 
 Guard scripts live under `tools/guards` or equivalent implementation roots. They are derived from this catalog. Changing a guard behavior requires updating this file or the owner file first.
-
-{standard_footer()}

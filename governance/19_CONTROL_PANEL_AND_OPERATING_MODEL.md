@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Control Panel Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** GOVERNANCE_CONTROL_PLANE_STANDARD, PLATFORM_OPERATING_MODEL, PLATFORM_BLUEPRINT
 
@@ -74,5 +74,3 @@ For a control-panel change, provide:
 - screenshot,
 - API/runtime evidence if action has side effect,
 - audit/rollback note.
-
-{standard_footer()}

@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Service Closure Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** 10_SERVICE_CLOSURE_PROTOCOL, GOVERNANCE_CLOSURE_STANDARD, GOVERNANCE_CLOSEOUT_ROADMAP
 
@@ -88,5 +88,3 @@ operation | control-panel entry | permission | audit log | rollback | evidence |
 - “Ready” with untracked files.
 - “Closed” with legacy unaccounted.
 - “100%” with failing diff/typecheck/test/guard.
-
-{standard_footer()}

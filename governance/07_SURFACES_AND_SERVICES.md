@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Service/Surface Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** SURFACES_OWNERSHIP_CONTRACT, APPROVED_SURFACE_NAMING, PLATFORM_BLUEPRINT, ARCHITECTURE_LOCK
 
@@ -71,5 +71,3 @@ Each service-surface pair that claims closure needs:
 ## Non-canonical standalone services
 
 `exchangeprice` and `hr` are not standalone canonical services unless future governance promotes them with evidence. HR is a control-panel/internal domain, not a service in the nine-service catalog.
-
-{standard_footer()}

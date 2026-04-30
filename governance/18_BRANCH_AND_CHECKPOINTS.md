@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Branch Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** BRANCH_AND_CHECKPOINT_POLICY, 02_BRANCH_AND_EVIDENCE_POLICY, CHANGE_ENTRY_RULE
 
@@ -86,5 +86,3 @@ decision
 ## No-force law
 
 Force-push is forbidden unless the user explicitly requests and evidence proves it is safe. Default is normal push after rebase/merge proof.
-
-{standard_footer()}

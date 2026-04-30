@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Architecture Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** ARCHITECTURE_LOCK, ARCHITECTURE_GUARDRAILS, SURFACES_OWNERSHIP_CONTRACT, SCREEN_FILE_MODEL_CONTRACT
 
@@ -117,5 +117,3 @@ A change passes this file only when:
 - no local design/API/service truth is introduced,
 - cross-service contracts are typed and evidenced,
 - diff contains no broad refactor outside scope.
-
-{standard_footer()}

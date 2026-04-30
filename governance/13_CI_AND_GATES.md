@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `CI Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** 13_CI_GATES_CONTRACT, CI_GRADUAL_GATE_POLICY, CI_REPORT_ONLY_READINESS_PLAN
 
@@ -74,5 +74,3 @@ If a gate fails:
 4. Fix root cause or mark BLOCKED.
 5. Re-run.
 6. Save evidence.
-
-{standard_footer()}

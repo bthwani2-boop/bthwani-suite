@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Mutable Policy Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0106-20260430-221753-governance`
+**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** PLATFORM_OPERATING_MODEL mutable policy law, provider control-plane notes
 
@@ -91,5 +91,3 @@ A `VAR_*` change requires:
 ## WLT relationship
 
 Any `VAR_*` that affects money settlement, refunds, commissions, fees, or wallet balance must be approved by WLT governance and must produce financial audit evidence.
-
-{standard_footer()}
