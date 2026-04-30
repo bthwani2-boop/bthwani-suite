@@ -1,11 +1,11 @@
 ---
+<!-- NOTE (example-only): Owner and domain metadata are allowed and documented here. -->
 name: bthwani-backend-services-2026-v3-additive
 description: service backend domain/application/infrastructure/jobs/events/policies.
 version: 2026.04.18-v3-additive
 owner: BThwani
 mode: add-only-fail-closed
 acceptance_threshold: 100
----
 
 # backend-services
 

@@ -7,6 +7,7 @@ mode: add-only-fail-closed
 acceptance_threshold: 100
 ---
 
+<!-- NOTE (example-only): Owner and domain names are established BThwani tokens; included for clarity. -->
 # app-shells
 
 ## Purpose

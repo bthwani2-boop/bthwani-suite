@@ -1,5 +1,7 @@
 # Base Profile: build.slice
 
+<!-- NOTE (example-only): This document may contain BThwani tokens or identifiers used for policy examples. They are not runtime secrets. See kdt/merge-run/.../proposed/PROTECTED_TOKENS_ALLOWLIST.md. -->
+
 ## Always Load
 
 - `bthwani-task-contracts`

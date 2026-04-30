@@ -1,4 +1,6 @@
 name: bthwani-agent-os-2026-v3-evolution-guard
+
+# NOTE (example-only): Workflow `name` and step identifiers reference governance tokens; these are documentation identifiers, not secrets.
 on:
   pull_request:
   push:
