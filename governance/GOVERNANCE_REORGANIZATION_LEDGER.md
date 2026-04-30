@@ -3,6 +3,20 @@ generatedAt: 2026-04-30T04:52:00+03:00
 note: Governance reorganization ledger (staging). Record of consolidation operations and provenance. Do not remove entries.
 ---
 
+## Correction: revert out-of-scope deletion (assistant)
+
+- timestamp: 2026-04-30T16:38:50+03:00
+- operator: assistant (restore action)
+- branch: governance/consolidation-staging
+- changes:
+  - restored: `apps/web/control-panel/app/control/governance/page.tsx` (restored from HEAD~1 to remove accidental deletion outside governance scope)
+  - note: This restoration removes non-governance file deletions from the consolidation commit; governance-only artifacts remain staged.
+- evidence:
+  - `_handoff/changed-files-raw.txt`
+  - `_handoff/changed-files-after-amend.txt`
+  - `_handoff/commit-summary-amended.txt`
+
+
 # GOV_REORGANIZATION_LEDGER
 
 This ledger records structural governance operations (merges, archives, aliasing, deletion-candidates) performed inside `governance/`.
