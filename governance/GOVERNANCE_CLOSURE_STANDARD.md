@@ -205,6 +205,13 @@ Forbidden without explicit approval:
 - branch deletion without archive proof
 - credentials or tokens in evidence files
 
+Security closure also requires:
+
+- secret scanning or equivalent proof when relevant
+- read-only-by-default workflow permissions unless justified
+- privacy and audit review for user, merchant, captain, wallet, order, location, or payment data
+- logging redaction for sensitive values
+
 ## 13. Git guard
 
 Before and after changes:
@@ -257,6 +264,35 @@ Sensitive changes require patch review before final acceptance:
 - mass refactors
 
 ## 17. Warning classification
+
+Warnings must be classified before closure as accepted baseline, false positive, needs fix, needs owner decision, promotion candidate, or cleanup blocker.
+
+## Cleanup And Deprecation Rule
+
+Cleanup statuses are:
+
+- KEEP_CANONICAL
+- MERGE_INTO_CANONICAL
+- DOWNGRADE_TO_ALIAS
+- MOVE_TO_ARCHIVE
+- DELETE_CANDIDATE_LATER
+- DELETE_APPROVED
+
+Delete or archive is blocked until reference impact, rollback, replacement, and evidence are explicit.
+
+## Finalization Rule
+
+A governance decision is final inside its scope only when:
+
+- scope is explicit
+- verification is attached
+- evidence exists
+- archive and merge decisions are recorded
+- residual warnings are classified
+
+## Provenance
+
+This standard now absorbs the live authority previously split across `CLEANUP_AND_DEPRECATION_POLICY.md`, `LEGACY_REFERENCE_CLEANUP_POLICY.md`, `SCOPE_LOCK.md`, `GOVERNANCE_FINALIZATION_PROTOCOL.md`, and `GOVERNANCE_CLOSURE_DECISION.md`.
 
 Every warning must eventually become one of:
 

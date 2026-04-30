@@ -20,6 +20,7 @@ This policy prevents branch fiction, evidence-free closure, source-of-truth drif
 - canonical evidence root: `tools/registry/runs/{SESSION_ID}/`
 - evidence pack schema authority: `18_EVIDENCE_PACK_STANDARD.md`
 - closure decision authority: `GOVERNANCE_CLOSURE_STANDARD.md`
+- change-entry accounting for governance work is required before and after any scoped write
 
 ## Branch Reality
 
@@ -62,9 +63,9 @@ tools/registry/runs/{SESSION_ID}/phase-03/
 
 Do not write new evidence into `docs/governance`, `governance/archive/legacy-extracted/`, or ad hoc roots outside the canonical run root.
 
-## Minimum Evidence Gate
+## Required Evidence Pack Shape
 
-Each run must include, at minimum:
+Every meaningful governance or code run must include, at minimum:
 
 ```text
 SUMMARY.md
@@ -76,6 +77,10 @@ git-status-before.txt
 git-status-after.txt
 git-diff-check-before.txt
 git-diff-check-after.txt
+untracked-before.txt
+untracked-after.txt
+_HANDOFF.zip
+{SESSION_ID}_HANDOFF.zip
 ```
 
 When the change can affect TypeScript, guards, scripts, or configuration, also include:
@@ -85,7 +90,9 @@ tsc-noemit-before.txt
 tsc-noemit-after.txt
 ```
 
-The complete pack shape is owned by `18_EVIDENCE_PACK_STANDARD.md`.
+## Evidence Metadata Rule
+
+`evidence.json` must capture scope, allowed files, forbidden roots, final decision, diff-check result, typecheck result when applicable, warning summary, and emitted output files.
 
 ## Dirty Tree Accounting
 
@@ -99,6 +106,19 @@ A dirty tree is not automatically fatal. It must be classified as one of:
 - forbidden-scope changes
 
 Unexpected or forbidden-scope changes block closure.
+
+## Change Entry Rule
+
+Every scoped write or destructive governance action must record:
+
+- allowed files
+- changed files before and after
+- untracked files before and after
+- whether the change is create, rewrite, merge, move, archive, alias, or delete
+- the canonical governance owner file
+- the evidence root and final decision
+
+If a change cannot be classified precisely, it is blocked until re-scoped.
 
 ## Destructive Change Gate
 
@@ -138,4 +158,10 @@ FINAL
 ```
 
 unless the relevant evidence pack proves it.
+
+## Provenance
+
+This file now absorbs the active branch/evidence/change-entry rules previously split across `BRANCH_AND_CHECKPOINT_POLICY.md`, `EVIDENCE_AND_CLOSURE_GATES.md`, `CHANGE_ENTRY_RULE.md`, and `18_EVIDENCE_PACK_STANDARD.md`.
+
+This file is the branch and evidence authority.
 

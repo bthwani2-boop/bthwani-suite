@@ -16,49 +16,87 @@ This protocol defines the mandatory order for API, binding, integration, runtime
 2. OpenAPI / contract source decision
 3. API types generation or alignment
 4. API clients generation or alignment
-5. Binding layer design
-6. Surface binding integration
-7. Runtime provider wiring
-8. Backend/service readiness
-9. Auth/RBAC/privacy/audit
-10. Observability/logging/monitoring
-11. Test pyramid/E2E
-12. Production readiness gate
+# API Binding Runtime Protocol
+
+Status: CANONICAL_PROTOCOL
+Owner: BThwani Governance
+Scope: OpenAPI sovereignty, contract quality, client and binding order, and runtime proof for data-driven features
+
+## Ordered Chain
+
+When data, integration, or runtime binding is involved, use this exact order:
+
+1. contract truth
+2. generated or shared types
+3. client or access layer
+4. binding or adapter layer
+5. screen or flow integration
+6. runtime proof
+
+Do not start from a screen and invent the contract later.
+
+## OpenAPI Sovereignty
+
+When contracts exist, they are the canonical source for request, response, and error truth.
+
+Rules:
+
+- donor contracts may be read for forensics only
+- rogue local contract truth is forbidden
+- generated types and clients must derive from the approved contract source
+- apps and surfaces consume contract outputs through the governed access chain, not ad hoc schema copies
+
+## Required Contract Elements
+
+Every governed API or integration surface must define:
+
+- request schema
+- response schema
+- error schema
+- permissions and caller assumptions
+- versioning rule
+- owner
+- binding target
+
+## Binding Rule
+
+Runtime screens and flows must not call ad hoc remote logic when a reusable client or binding layer is required.
+
+Binding proof must show:
+
+- data source
+- client or function used
+- binding owner
+- loading state
+- success state
+- empty state when relevant
+- error state
+- retry, offline, and stale handling when relevant
+
+## No API Required Case
+
+If no API is required, record:
+
+```text
+NO_API_REQUIRED
+Reason:
+Owner:
+Evidence:
 ```
 
-## Ownership
+## Runtime Closure
 
-| Layer | Owner |
-|---|---|
-| Contracts | `contracts` when present |
-| API Types | `packages/api-types` when present |
-| API Clients | `packages/api-clients` when present |
-| UI Binding | surfaces or dedicated binding package when defined |
-| Runtime Providers | app-shell/app integration layer when defined |
-| Backend | `services` when present |
+Type safety is not runtime proof.
 
-## Forbidden Shortcuts
+A runtime-bound feature is not complete until evidence proves:
 
-- UI must not call backend implementation directly.
-- app-shells must not hide service-specific API binding.
-- ui-kit must not know API or service runtime.
-- fake fixtures must not be treated as production binding.
-- runtime work must not start before contract/API ownership is decided.
+- route or entrypoint proof
+- contract or no-API decision
+- client and binding correctness
+- observable loading, success, error, and empty states
+- retry or offline behavior when relevant
 
-## DSH Application
+## Provenance
 
-For DSH, API/binding/runtime starts only after DSH UI/flow and gap map are clear, unless a separate phase explicitly targets contract forensics.
-
-## Verification
-
-Each layer must prove:
-
-- owner path
-- public exports
-- generated or hand-written source
-- consumer path
-- test/verification command
-- evidence pack
-
-No API/binding/integration claim is accepted without runnable verification.
+This file now absorbs the live authority previously split across `API_CONTRACT_POLICY.md`, `OPENAPI_SOVEREIGNTY.md`, and `FLOW_API_BINDING_RUNTIME_GUARDRAILS.md`.
 

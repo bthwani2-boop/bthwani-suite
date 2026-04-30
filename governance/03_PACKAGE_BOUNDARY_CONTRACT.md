@@ -96,7 +96,19 @@ When a file is misclassified or newly introduced, decide placement in this order
 
 - Boundary guards identify candidates; they do not authorize deletion by themselves.
 - Any delete or move still requires zero-reference proof, consumer proof, owner decision, rollback path, evidence, `git --no-pager diff --check`, and `pnpm -w exec tsc --noEmit` when code-bearing paths are touched.
-- Shared-folder structural guard expectations are owned jointly by this contract and `09_SHARED_FOLDER_GOVERNANCE.md`.
+- Shared-folder rules are owned here after consolidation.
+
+## Shared Folder Rules
+
+Shared code is allowed only when it has:
+
+- multiple real consumers or a documented platform role
+- a stable owner
+- a clear export path
+- consumer proof
+- a reason it is not ui-kit, app-shell, surface-owned, or service-owned instead
+
+Shared folders must not become dumping grounds for one-off service bodies, copied legacy UI, local design-system primitives, or code whose owner is unknown.
 
 ## Verification
 
@@ -108,4 +120,8 @@ pnpm -w exec tsc --noEmit
 ```
 
 Later guard phases must convert this contract into automated checks.
+
+## Provenance
+
+This contract now absorbs the live shared-folder rules previously split across `09_SHARED_FOLDER_GOVERNANCE.md`.
 

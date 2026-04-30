@@ -41,6 +41,25 @@ _HANDOFF.zip
 {SESSION_ID}_HANDOFF.zip
 ```
 
+## Minimal Pack Template
+
+Use this minimum directory shape:
+
+```text
+tools/registry/runs/{SESSION_ID}/
+  SUMMARY.md
+  status.txt
+  evidence.json
+  commands.log
+  git-branch-current.txt
+  git-status-before.txt
+  git-status-after.txt
+  git-diff-check-before.txt
+  git-diff-check-after.txt
+  _HANDOFF.zip
+  {SESSION_ID}_HANDOFF.zip
+```
+
 When the touched scope can affect TypeScript, scripts, guard code, or configuration, also include:
 
 ```text
@@ -127,4 +146,8 @@ Evidence must not include:
 ## Evidence Is Not Product Source
 
 Evidence packs under `tools/registry/runs/` are output artifacts. They must not become product code or canonical governance authority.
+
+## Provenance
+
+This standard now absorbs the live evidence-template guidance previously split across `EVIDENCE_PACK_TEMPLATE.md`.
 

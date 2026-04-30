@@ -46,6 +46,16 @@ Close one service deeply before generalizing.
 
 DSH remains the first intended golden slice after governance is ready.
 
+The DSH service sequence is:
+
+1. reality and boundary audit
+2. service metadata and catalog truth
+3. surface classification across all official surfaces
+4. flow matrix and screen matrix
+5. UI, state, and role closure
+6. API, client, and binding proof
+7. runtime, testing, and evidence pack closure
+
 ## Phase Separation
 
 Do not mix in one claimed closure batch:
@@ -91,7 +101,6 @@ Its live blueprint lives at:
 ```text
 packages/surfaces/src/service-owned/<service>/SERVICE_BLUEPRINT.md
 ```
-
 `governance/` owns the protocol and standard only. It does not own the live truth of each service implementation.
 
 ## Service Identity And Metadata
@@ -99,7 +108,7 @@ packages/surfaces/src/service-owned/<service>/SERVICE_BLUEPRINT.md
 Every service needs:
 
 | Field | Required |
-|---|---|
+| --- | --- |
 | id | yes |
 | name ar | yes |
 | name en | yes |
@@ -113,6 +122,22 @@ Every service needs:
 | public export path | yes when exported |
 
 Metadata must not duplicate contradictory truth across files.
+
+## Canonical Service Catalog
+
+The platform service slugs governed here are:
+
+- `amn`
+- `arb`
+- `dsh`
+- `esf`
+- `knz`
+- `kwd`
+- `mrf`
+- `snd`
+- `wlt`
+
+`hr` is not a standalone platform service slug. `exchangeprice` remains a WLT-owned capability rather than a parallel clean service.
 
 ## Public Contract Rule
 
@@ -133,7 +158,7 @@ Deep import exceptions require explicit owner approval and guard evidence.
 A service closure must classify every relevant surface:
 
 | Surface | Required classification |
-|---|---|
+| --- | --- |
 | app-client | SUPPORTED / NOT_APPLICABLE / OPEN_GAP |
 | app-partner | SUPPORTED / NOT_APPLICABLE / OPEN_GAP |
 | app-captain | SUPPORTED / NOT_APPLICABLE / OPEN_GAP |
@@ -173,6 +198,27 @@ Each service screen must map:
 - visual evidence
 - runtime evidence
 - closure decision
+
+## Live Service Blueprint Standard
+
+Each service-owned service must maintain exactly one live blueprint at:
+
+```text
+packages/surfaces/src/service-owned/<service>/SERVICE_BLUEPRINT.md
+```
+
+The required blueprint sections are:
+
+1. service identity
+2. surface/app coverage matrix
+3. current phase truth
+4. verified capabilities
+5. unverified capabilities
+6. blocked gaps
+7. evidence registry
+8. ownership boundaries
+9. public exports and runtime entrypoints
+10. change log
 
 ## API Contract And Binding Proof
 
@@ -237,6 +283,10 @@ If the service has UI, it must use:
 - white `#FFFFFF`
 - RTL correctness for Arabic
 - `@bthwani/ui-kit` public exports
+
+## Provenance
+
+This protocol now absorbs the live authority previously split across `11_DSH_GOLDEN_SLICE_PROTOCOL.md`, `SERVICE_CATALOG.md`, `SERVICE_BLUEPRINT_STANDARD.md`, `SERVICE_BLUEPRINT_TEMPLATE.md`, `SERVICE_CLOSURE_GUARDRAILS.md`, and `OPERATION_CATALOG_TEMPLATE.md`.
 
 Forbidden inside service UI:
 
@@ -318,4 +368,6 @@ NOT_APPLICABLE
 ```
 
 Closure is allowed only when the applicable metadata, matrices, contract proof, binding proof, permissions, runtime proof, tests, blueprint truth, and evidence pack are present.
+
+This file is the service-closure authority.
 

@@ -15,6 +15,8 @@ LastRebuiltBy: GOVERNANCE_BATCH_11_REBUILD_CONTROL_PLANE_AND_GUARDS-20260430-003
 - Guard files scanned: 25
 - Active docs/governance references: 0
 
+This catalog is the only active textual authority for guard inventory, warning classification, and severity promotion.
+
 | Guard | Purpose | Path |
 |---|---|---|
 | guard-agent-skill-registry-ownership.mjs | agent skill registry ownership | tools/guards/guard-agent-skill-registry-ownership.mjs |
@@ -94,4 +96,32 @@ APP_PRODUCT_CONTENT_CANDIDATE
 ```
 
 Calibration must not hide live source violations. This guard remains `CHECK`-only and must not mutate product files.
+
+## Warning Classification
+
+Every warning must be classified as one of:
+
+- ACCEPTED_BASELINE
+- FALSE_POSITIVE
+- NEEDS_OWNER_DECISION
+- NEEDS_FIX
+- PROMOTE_TO_ERROR_LATER
+- BLOCKS_CLEANUP
+
+Warnings remain decisions, not noise.
+
+## Severity Promotion Rule
+
+A warning can be promoted only when:
+
+- the rule is precise
+- false positives are controlled
+- baseline ownership is documented
+- CI impact is known
+- rollback exists
+- promotion evidence is attached
+
+## Guard Source Consolidation
+
+This catalog absorbs the live authority previously split across `GUARDS.md`, `GOVERNANCE_GUARD_EXECUTION_STANDARD.md`, `GUARDRAILS_INDEX.md`, `GUARD_IMPLEMENTATION_MAP.md`, `GUARD_SEVERITY_PROMOTION_POLICY.md`, `WARNING_CLASSIFICATION_POLICY.md`, `WARNING_BASELINE_CLASSIFICATION_MATRIX.md`, `TOP_WARNING_FAMILY_ACTION_PLAN.md`, and `GUARD_*.md`.
 

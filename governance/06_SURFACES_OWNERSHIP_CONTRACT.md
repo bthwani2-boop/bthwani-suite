@@ -5,6 +5,10 @@ note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
 ---
 # Surfaces Ownership Contract
 
+Status: CANONICAL_CONTRACT
+Owner: BThwani Governance
+Scope: surface ownership, official surface identifiers, and public surface boundaries
+
 ## Purpose
 
 `packages/surfaces` owns user-facing screens, flows, and experiences across apps and services.
@@ -16,6 +20,20 @@ packages/surfaces/src/public/{surface}.ts
 packages/surfaces/src/service-owned/{service}/{surface}/...
 packages/surfaces/src/surface-owned/{surface}/...
 ```
+
+## Official Surface Identifiers
+
+The only canonical internal surface names are:
+
+- `app-client`
+- `app-partner`
+- `app-captain`
+- `app-field`
+- `control-panel`
+- `webapp`
+- `website`
+
+These internal names are filesystem and contract truth. Visible labels do not replace them.
 
 ## service-owned
 
@@ -72,4 +90,10 @@ A service-owned surface must not import another service-owned implementation dir
 ## Verification
 
 Surface ownership must be checked by file path, import path, and semantic content.
+
+## Provenance
+
+This file now absorbs the live surface catalog and naming rules formerly split across `SURFACE_CATALOG.md`.
+
+This file is the surface ownership authority.
 

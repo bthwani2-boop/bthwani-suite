@@ -94,6 +94,26 @@ Use one of:
 
 | source_path | target_path | decision_type | reason | proof_status | external_reference_impact | current_status | notes |
 |---|---|---|---|---|---|---|---|
+
+## Root consolidation: 20-file governance surface
+
+- timestamp: 2026-04-30T17:20:00+03:00
+- operator: assistant
+- branch: governance/consolidation-staging
+- decision:
+  - canonical root reduced to 16 authority files
+  - 4 root files retained as transitional compatibility or trace paths: `19_PATCH_REVIEW_PROTOCOL.md`, `AGENT_GOVERNANCE_POLICY.md`, `GUARDS.md`, `GOVERNANCE_REORGANIZATION_LEDGER.md`
+  - all other governance-root files moved under `governance/archive/2026-04-30-consolidation/`
+- merged into canonical authority:
+  - `README.md` -> `00_GOVERNANCE_INDEX.md`
+  - `09_SHARED_FOLDER_GOVERNANCE.md` -> `03_PACKAGE_BOUNDARY_CONTRACT.md`
+  - `16_SECURITY_AND_SECRETS_POLICY.md` -> `GOVERNANCE_CLOSURE_STANDARD.md`
+  - `18_EVIDENCE_PACK_STANDARD.md` -> `02_BRANCH_AND_EVIDENCE_POLICY.md`
+  - multiple platform, API, CI, agent, verification, warning, guard, and planning files -> surviving canonical files listed in `00_GOVERNANCE_INDEX.md`
+- evidence:
+  - `archive/2026-04-30-consolidation/MANIFEST.md`
+  - `archive/2026-04-30-consolidation/ACTIVE_ROOT_FILES.txt`
+  - `archive/2026-04-30-consolidation/ACTIVE_ROOT_COUNT.txt`
 | `governance/README.md` | `governance/README.md` | REWRITE_CANONICAL | Promote the directory entry into a true control-plane gateway instead of a phase note. | PROVEN_SAFE | NONE | COMPLETED | First slice implementation. |
 | `governance/00_GOVERNANCE_INDEX.md` | `governance/00_GOVERNANCE_INDEX.md` | REWRITE_CANONICAL | Convert the index into the live classification matrix for canonical, transitional, alias, and archive content. | PROVEN_SAFE | LOW | COMPLETED | Remains path-stable for guard references while classifications continue to evolve. |
 | `governance/GOVERNANCE_CONTROL_PLANE_STANDARD.md` | `governance/GOVERNANCE_CONTROL_PLANE_STANDARD.md` | REWRITE_CANONICAL | Make the file the explicit organization law for policies, standards, ledgers, archives, and alias files. | PROVEN_SAFE | NONE | COMPLETED | Control-plane organization law now anchors the governance package. |

@@ -1,77 +1,106 @@
----
-generatedFrom: governance/01_PLATFORM_SSOT.md
-generatedAt: 2026-04-30T04:48:37.1309608+03:00
-note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
----
 # Platform SSoT
 
-This file defines the current canonical platform truth for BThwani.
+Status: CANONICAL_POLICY
+Owner: BThwani Governance
+Scope: repository truth, naming, architecture locks, ownership map, active surfaces, and active service set
 
 ## Canonical Repository
 
 | Item | Decision |
-|---|---|
+| --- | --- |
 | Local repo path | `C:\bthwani-suite` |
 | GitHub repo | `bthwani2-boop/bthwani-suite` |
-| Current checkpoint branch candidate | `ghb/0102-20260429-015636-packages` |
 | Package manager | `pnpm` |
 | Evidence root | `tools/registry/runs/{SESSION_ID}` |
+| Legacy donor repo | `bthfinal` is read-only reference only |
 
-The branch must be verified by branch evidence. Do not assume `main` is absolute truth without Branch Reality evidence.
+Branch reality is verified by evidence, not by assumption.
 
-## Legacy Naming Rules
+## Protected Active Names
 
-Forbidden as active targets:
-
-- old standalone repo/path named `bth`
-- `app-user`
-- `mcpw`
-- `kdt/volatile/registry/runs`
-- old local repo path `C:\Users\b\Documents\GitHub\bthwani-suite`
-
-Allowed current names:
+Allowed active identifiers:
 
 - `bthwani`
 - `BThwani`
 - `@bthwani/*`
 - `bthwani-suite`
 
-## Governance Ownership
+Forbidden as active truth:
 
-`governance/` is the canonical governance SSoT.
+- old standalone repo/path named `bth`
+- `app-user`
+- `mcpw`
+- `kdt/volatile/registry/runs`
+- donor folder names promoted without explicit governance approval
 
-`docs/governance/` is transitional/reference/archive until reconciled. It may contain useful historical or planning material, but it must not override canonical files under `governance/`.
+## Canonical Surface Set
 
-## Platform Ownership Model
+Official internal surface identifiers are:
 
-| Area | Ownership Decision |
-|---|---|
-| `apps/*` | Shell/Host only. |
-| `packages/app-shells` | shell/root behavior only. |
-| `packages/surfaces` | screens, flows, and experiences. |
-| `packages/surfaces/src/service-owned/{service}/{surface}` | service-specific surface implementation. |
-| `packages/surfaces/src/surface-owned/{surface}` | surface-level non-service-specific experience. |
-| `packages/ui-kit` | reusable design authority only. |
-| `packages/api-types` | generated/shared API types when present. |
-| `packages/api-clients` | API client layer when present. |
-| `contracts` | OpenAPI/contracts when present. |
-| `services` | backend/service runtime when present. |
+- `app-client`
+- `app-partner`
+- `app-captain`
+- `app-field`
+- `control-panel`
+- `webapp`
+- `website`
 
-## Current Product Scope
+`control-panel` is the operational web surface. It is not a service slug.
 
-BThwani contains multiple services and multiple surfaces. DSH is the first intended golden slice after governance is stabilized. No DSH closure starts before governance verification allows it.
+## Canonical Service Set
 
-## Architecture Rule
+Active governance service slugs are:
+
+- `amn`
+- `arb`
+- `dsh`
+- `esf`
+- `knz`
+- `kwd`
+- `mrf`
+- `snd`
+- `wlt`
+
+Additional clarifications:
+
+- `dsh` is the first governed golden slice.
+- `hr` is an internal control-panel domain, not a canonical standalone platform service.
+- `exchangeprice` is not a standalone clean service; exchange-rate capability belongs under `wlt`.
+- Financial and rates-related clean architecture must follow the WLT-only path unless governance explicitly replaces it.
+
+## Ownership Ladder
+
+| Area | Owner |
+| --- | --- |
+| `governance/` | governance control plane |
+| `apps/*` | app host/runtime shell only |
+| `packages/app-shells` | shell and root behavior only |
+| `packages/surfaces/src/service-owned/<service>/` | service-specific screens, flows, and local state |
+| `packages/surfaces/src/surface-owned/` | cross-service surface experience |
+| `packages/surfaces/src/public/` | public surface contracts |
+| `packages/ui-kit` | reusable design authority only |
+| `contracts` | OpenAPI/contracts when present |
+| `packages/api-types` and `packages/api-clients` | generated/shared contract layer when present |
+| `services` | backend/service runtime |
+
+## Architecture Lock
+
+The canonical architecture ladder is:
 
 ```text
 Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only
 ```
 
-No local design systems are allowed in apps, app-shells, or surfaces.
+Additional platform locks:
 
-## UI Identity
+- apps remain shell hosts and must not become design-system owners
+- surfaces own product experience, not reusable design primitives
+- ui-kit owns tokens, reusable components, and provider-level design behavior
+- donor structures may inform migration but never override clean target ownership
 
-BThwani visual identity is premium, cohesive, low-noise, RTL-correct, and 2026-ready.
+## Visual Identity
+
+BThwani visual DNA is premium, practical, low-noise, modern, and RTL-correct.
 
 Core colors:
 
@@ -79,5 +108,11 @@ Core colors:
 - orange `#FF500D`
 - white `#FFFFFF`
 
-Other colors require controlled design-system justification.
+No random palette or second design system is allowed outside ui-kit.
+
+## Provenance
+
+This file absorbs the live authority previously split across `OWNERSHIP.md`, `REPO_BOUNDARY.md`, `REPO_BOUNDARIES_AND_OWNERSHIP.md`, `APPROVED_SURFACE_NAMING.md`, `ARCHITECTURE_LOCK.md`, `ARCHITECTURE_GUARDRAILS.md`, `PLATFORM_OPERATING_MODEL.md`, `PLATFORM_BLUEPRINT.md`, `PLATFORM_BLUEPRINT_EXECUTION_ROADMAP.md`, and `GOVERNANCE_SSOT.md`.
+
+This file is the platform truth source.
 

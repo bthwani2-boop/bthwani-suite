@@ -58,6 +58,20 @@ Historical wording such as `READ-ONLY` should be interpreted as `READ_ONLY_AUDIT
 
 Never mix audit-only and write modes in the same instruction unless the write scope is explicitly listed.
 
+## Allowed Delivery Methods
+
+Preferred delivery methods are:
+
+- decision only
+- terminal command
+- single-file write
+- patch handoff
+- evidence bundle
+- visual review
+- no action when unsafe or ambiguous
+
+Choose the safest deterministic method for the actual scope.
+
 ## Required Task Declaration
 
 Every non-trivial AI task must declare:
@@ -111,6 +125,19 @@ _HANDOFF.zip
 Branch/evidence workflow details are owned by `02_BRANCH_AND_EVIDENCE_POLICY.md`.
 
 Evidence pack schema details are owned by `18_EVIDENCE_PACK_STANDARD.md`.
+
+## Agent Update Acceptance Checklist
+
+Any governance or agent-rule update must pass review for:
+
+- duplicate-rule check
+- contradiction check
+- scope-expansion check
+- noise check
+- minimal-patch check
+- explicit rollback path when sensitive
+
+Reject updates that widen scope silently, create parallel authority, or claim closure without evidence.
 
 ## Patch Review Rule
 
@@ -300,9 +327,30 @@ NEEDS_VISUAL_EVIDENCE
 
 Workflow markers such as `READY_FOR_NEXT_PHASE` may exist in plans or evidence packs, but they are not final closure decisions.
 
+## Agent Change Traceability
+
+Every AI-assisted accepted change must be traceable to:
+
+- session id
+- branch
+- mode
+- task summary
+- changed files
+- evidence root
+- verification performed
+- final decision
+- warnings or residual risk
+- next step
+
+Commit SHA and push status are required only when a commit or push actually occurs.
+
 ## Agent File Alignment
 
 Actual `.agents`, `.github/agents`, `.github/skills`, `.cursor`, workflow, or tool alignment must be done in later phases only.
 
 Derived files must point back to this policy instead of restating parallel authority.
+
+## Provenance
+
+This file now absorbs the live authority previously split across `AI_EXECUTION_GOVERNANCE.md`, `AGENT_GOVERNANCE_POLICY.md`, `19_PATCH_REVIEW_PROTOCOL.md`, `AGENT_UPDATE_VALIDATION_CHECKLIST.md`, and `AGENT_CHANGE_LEDGER_POLICY.md`.
 

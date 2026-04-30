@@ -43,6 +43,17 @@ This standard defines how the governance package is organized so it can stay:
 | Script | `tools/scripts/` | Controlled automation or diagnostics only. |
 | Evidence | `tools/registry/runs/` | Generated proof only. |
 
+## Active Root Structure
+
+The governance root is limited to the active 20-file canonical surface defined by `00_GOVERNANCE_INDEX.md`.
+
+Everything else must live under `governance/archive/` in one of these families:
+
+- `merged-sources/`
+- `historical-ledgers/`
+- `analysis/`
+- `aliases/` when temporary path compatibility is still required
+
 ## One-Owner-One-Role Rule
 
 A governance file must have one dominant purpose.
@@ -139,6 +150,10 @@ Any merge, archive move, alias downgrade, or delete-candidate decision must be r
 `GOVERNANCE_REORGANIZATION_LEDGER.md`
 
 No structural governance cleanup is complete until that ledger records the decision and proof status.
+
+## Provenance
+
+This standard now subsumes overlapping organization guidance formerly scattered across `GOVERNANCE_MASTER_CONTROL_PLANE.md`, `GOVERNANCE_CANONICAL.md`, and related reorganization planning documents.
 
 ## BThwani Architecture Rule
 

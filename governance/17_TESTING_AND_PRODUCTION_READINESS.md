@@ -5,6 +5,10 @@ note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
 ---
 # Testing and Production Readiness
 
+Status: CANONICAL_STANDARD
+Owner: BThwani Governance
+Scope: verification matrix, runtime proof, test pyramid, traceability, and production-readiness gates
+
 ## Purpose
 
 This contract defines minimum verification and release-readiness expectations for BThwani.
@@ -35,6 +39,24 @@ Use staged testing based on scope:
 | E2E tests | Validate critical user journeys. |
 | visual checks | Validate UI/UX/RTL/layout/safe-area. |
 | production-like runtime checks | Validate local runtime and deployment readiness. |
+
+## Traceability Matrix
+
+Every non-trivial governed change should be traceable across these fields when applicable:
+
+- requirement or issue id
+- owner
+- service
+- surface
+- flow
+- screen or route
+- contract source
+- binding layer
+- test proof
+- runtime or visual proof
+- final decision
+
+Traceability is incomplete when any mandatory downstream proof is missing.
 
 ## UI/UX Verification
 
@@ -74,6 +96,21 @@ A feature is not production-ready until:
 - E2E or equivalent critical path verification exists
 - rollback path is known
 - evidence pack proves the above
+
+## Verification Matrix
+
+Minimum expected verification by change type:
+
+- docs only: status, diff check, applicable guards
+- TypeScript code: status, diff check, workspace typecheck
+- UI or UX: typecheck, runtime or visual evidence, relevant guards
+- API or contracts: typecheck, contract proof, client and binding proof
+- scripts: script-safety review and dry-run when destructive
+- governance: guards, evidence zip, and scope isolation
+
+## Provenance
+
+This file now absorbs the live authority previously split across `RUNTIME_VERIFICATION_POLICY.md`, `TRACEABILITY_MATRIX_STANDARD.md`, `TRACEABILITY_MATRIX.md`, and `VERIFICATION_MATRIX.md`.
 
 ## DSH Readiness
 

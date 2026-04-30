@@ -5,6 +5,10 @@ note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
 ---
 # Security and Secrets Policy
 
+Status: CANONICAL_POLICY
+Owner: BThwani Governance
+Scope: secrets, privacy, audit, logging, workflow permissions, and GitHub write safety
+
 ## Purpose
 
 This policy prevents accidental exposure of secrets, weak permissions, privacy drift, and unsafe automation.
@@ -72,4 +76,8 @@ pnpm -w exec tsc --noEmit
 ```
 
 plus the relevant security guard output when available.
+
+## Provenance
+
+This file now absorbs the live authority previously split across `SECURITY_AND_SECRETS_GUARDRAILS.md`.
 

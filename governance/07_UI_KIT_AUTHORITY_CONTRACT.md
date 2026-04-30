@@ -5,6 +5,10 @@ note: AUTO-GENERATED DRAFT - REVIEW REQUIRED BEFORE APPLY
 ---
 # UI Kit Authority Contract
 
+Status: CANONICAL_CONTRACT
+Owner: BThwani Governance
+Scope: reusable design authority, Tamagui boundary, brand, RTL, and shared direction ownership
+
 ## Purpose
 
 `packages/ui-kit` is the single reusable design authority for BThwani.
@@ -32,6 +36,12 @@ Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally i
 ```
 
 Tamagui primitives, tokens, and variants should be used inside ui-kit. Surfaces and apps should benefit from them through public ui-kit exports.
+
+### Exact-Path Exception
+
+`tamagui.build.ts` is the only approved root-level Tamagui import exception and it is build-time only.
+
+No app, surface, app-shell, or other root file may import `tamagui` or `@tamagui/*` directly without a new governance decision.
 
 ## Forbidden in ui-kit
 
@@ -64,11 +74,22 @@ Arabic/RTL UI must be directionally correct:
 - no `space-between` misuse that separates related icon/text clusters
 - safe-area and spacing must be verified visually
 
+## Direction Ownership
+
+Shared direction and i18n foundation logic must be owned centrally and reused through governed shared foundations.
+
+Local consumers may consume direction and i18n utilities, but they must not fork parallel direction systems or duplicate global RTL logic.
+
 ## Public Export Rule
 
 Consumers should import from `@bthwani/ui-kit` public exports, not deep internals, unless a temporary migration bridge explicitly allows it.
 
 ## Verification
-
 Any local design tokens or reusable component families outside ui-kit are governance violations unless explicitly approved as temporary migration code.
+
+## Provenance
+
+This file now absorbs the live authority previously scattered across `TAMAGUI_INTEGRATION_LAW.md`, `DIRECTION_I18N_OWNERSHIP.md`, and `UI_UX_GUARDRAILS.md`.
+
+This file is the ui-kit and Tamagui authority.
 
