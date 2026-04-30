@@ -1,30 +1,54 @@
+# Security, Secrets, Privacy
 
-# Security & Secrets (Canonical)
+## Core security law
 
-هذا الملف يملك السلطة على:
-- منع الأسرار داخل الريبو/الوثائق/evidence
-- سياسات الدوران (rotation) ومبدأ أقل الامتيازات
-- الاستجابة للحوادث عند تسرب سر
+No secrets in code, docs, evidence, screenshots, logs, patches, or prompts.
 
-## Non-negotiables
-- **لا أسرار في الريبو** تحت أي ظرف (كود/Docs/Logs/Evidence).
-- إدارة الأسرار تكون عبر Secret Manager مع RBAC.
+## Secret examples
 
-## Rotation & access
-- Least privilege إلزامي.
-- Rotation دوري خصوصًا للأسرار عالية الحساسية (baseline: 90 يومًا أو حسب متطلبات الأمن).
+- API keys
+- tokens
+- passwords
+- private certificates
+- cookies/session values
+- database URLs with credentials
+- private provider credentials
+- production secrets
+- personally identifiable data unless explicitly required and redacted
 
-## Detection
-- يجب وجود فحص يمنع إدخال أسرار (pre-commit أو CI).
-- أي اكتشاف = incident.
+## Required scans/checks
 
-## Incident response (minimum)
-1. revoke/rotate immediately
-2. تحديد نطاق التسرب (blast radius)
-3. إخطار المالكين
-4. forensics
-5. evidence pack للحادث + إجراءات منع تكرار
+Security-sensitive work requires:
 
-## Evidence & retention
-- أي artefact حساس يُمنع حفظه ضمن evidence. الأدلة تُوثّق بدون أسرار (redaction) وفق `11_EVIDENCE_AND_TRACEABILITY.md`.
+- secret scan or explicit manual review
+- env/config diff review
+- permission/auth impact note
+- evidence redaction check
+- threat/abuse note when user-visible behavior changes
 
+## Auth and permission changes
+
+Changes to auth/RBAC/permissions require:
+
+- old behavior
+- new behavior
+- affected roles
+- denied states
+- audit trail
+- tests or manual proof
+- rollback plan
+
+## Logs and evidence
+
+Logs may be uploaded only after redaction. If a diff includes secret-like material, decision is `BLOCKED` until removed and rotated if needed.
+
+## WLT security
+
+Financial paths require extra proof for:
+
+- ledger integrity
+- idempotency
+- reconciliation
+- refund/payout permissions
+- auditability
+- rollback/compensation

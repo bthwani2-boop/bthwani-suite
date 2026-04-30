@@ -1,48 +1,99 @@
+# Surfaces and Services Registry
 
-# Surfaces & Services (Canonical registry)
+## Purpose
 
-هذا الملف هو **المرجع الوحيد** لكتالوج:
-- **Surfaces** (واجهات/تطبيقات/مداخل المستخدم)
-- **Services** (خدمات خلفية قابلة للتشغيل مع عقد/Runbook)
-- **Capabilities** (قدرات ليست “خدمة مستقلة”)
+This file is the canonical registry of surfaces, services, service-to-surface ownership, and closure obligations.
 
-أي قائمة خدمات/أسطح في أي ملف آخر تعتبر **غير كانونية** ويجب أن تشير هنا فقط.
+## Canonical surfaces
 
-## Vocabulary (ملزم)
-- **Surface**: منتج/واجهة تُعرض للمستخدم النهائي أو شريحة مستخدمين.
-- **Service**: وحدة تشغيل backend لها عقد، Runbook، ومراقبة.
-- **Capability**: وظيفة/مجال داخل Service آخر أو داخل Surface (ليست خدمة مستقلة).
-- **Status**: `ACTIVE` | `PLANNED` | `DEPRECATED` | `CAPABILITY_ONLY`
+| Surface | Canonical path / role | Owns | Must not own |
+|---|---|---|---|
+| `app-client` | Mobile customer shell/surface | customer entry, DSH/KNZ/AMN/ARB/WLT/ESF/MRF/SND/KWD customer journeys | service internals, design-system forks |
+| `app-partner` | Mobile partner shell/surface | partner operations, DSH merchant/order/account journeys | money ledger truth, local UI kit |
+| `app-captain` | Mobile captain shell/surface | captain task/order/service execution | partner/store ownership |
+| `app-field` | Mobile field shell/surface | field ops, onboarding/inspection/verification flows | partner account truth |
+| `control-panel` | Web admin/control room | platform ops, service admin, audit, reporting, support | direct screen-owned service logic outside surfaces |
+| `webapp` | Public/authenticated web app | web customer/community flows | admin control-plane logic |
+| `website` | marketing/public website | public marketing/info pages | app runtime/backend truth |
+| `app-shells` | package-level shell composition | navigation/frame/providers/routing adapters | service-owned business screens |
 
-## Canonical registry (minimal required fields)
-### Surface record
-- **name** (kebab-case)
-- **owner** (team)
-- **primary users**
-- **entrypoints** (routes / app ids)
-- **depends_on** (ui-kit exports, services)
 
-### Service record
-- **name** (kebab-case)
-- **owner** (team)
-- **purpose**
-- **contract_ref** (location + version; details in `09_API_BINDING_RUNTIME.md`)
-- **runbook_ref**
-- **evidence_ref** (points to evidence pack; schema in `11_EVIDENCE_AND_TRACEABILITY.md`)
-- **status**
+## Canonical services
 
-## Canonical decisions (resolves legacy conflicts)
-- **`hr`**: `CAPABILITY_ONLY` — ليست خدمة مستقلة كانونية. إن وُجد تطبيق/مجلد باسم hr فهو Surface أو Capability داخل خدمة أخرى بحسب هذا السجل، وليس “Service” بذاته إلا إذا تم ترقيته هنا عبر قرار واحد موثق.
-- **`exchangeprice`**: `CAPABILITY_ONLY` — قدرة ضمن نطاق/خدمة مالكها، وليست خدمة مستقلة كانونية إلا إذا تم ترقيتها هنا.
+| Service | Name / domain | Canonical surfaces | Service-owned obligations |
+|---|---|---|---|
+| `dsh` | Delivery & Shopping | app-client, app-partner, app-captain, app-field, control-panel | store, catalog, basket, order, fulfillment, partner ops, captain/field handoff |
+| `wlt` | Wallet / finance ledger | app-client, control-panel, cross-service finance | wallet, ledger, fees, commissions, refunds, settlement, reconciliation |
+| `knz` | Kanz / rewards or offers domain | app-client, control-panel | campaign/reward flows, customer-facing earning/redemption evidence |
+| `arb` | Partner/business enablement | app-client, app-partner, app-field, control-panel | partner onboarding/verification, business profile, operational modes |
+| `amn` | Safety/security/service assurance | app-client, app-captain, control-panel | safety cases, trust signals, incident evidence, safety rules |
+| `esf` | Community service family | app-client, webapp, control-panel | community service catalog/requests, ops proof |
+| `mrf` | Community service family | app-client, webapp, control-panel | community service catalog/requests, ops proof |
+| `snd` | Community service family | app-client, webapp, control-panel | community service catalog/requests, ops proof |
+| `kwd` | Community service family | app-client, webapp, control-panel | community service catalog/requests, ops proof |
 
-## Registry (initial)
-### Services
-- `dsh` — **status**: `ACTIVE` — **notes**: أول خدمة مُدارة وفق الحوكمة (legacy golden-slice lineage).
 
-### Capabilities (not services)
-- `hr` — **status**: `CAPABILITY_ONLY`
-- `exchangeprice` — **status**: `CAPABILITY_ONLY`
+## Service-owned path
 
-## Enforcement (reference)
-- Guard `GUARD_17_SERVICE_BLUEPRINT_COVERAGE`: يتحقق من وجود blueprint/metadata عند تعريف Service جديدة أو تغيير عقدها.
+```text
+packages/surfaces/src/service-owned/<service>/<surface>/
+```
 
+## Surface-owned path
+
+```text
+packages/surfaces/src/surface-owned/<surface>/
+```
+
+## Service-to-surface matrix
+
+| Service | app-client | app-partner | app-captain | app-field | control-panel | webapp | website |
+|---|---|---|---|---|---|---|---|
+| `dsh` | yes | yes | yes | yes | yes | no | no |
+| `wlt` | yes | no | no | no | yes | no | no |
+| `knz` | yes | no | no | no | yes | no | no |
+| `arb` | yes | yes | no | yes | yes | no | no |
+| `amn` | yes | no | yes | no | yes | no | no |
+| `esf` | yes | no | no | no | yes | yes | no |
+| `mrf` | yes | no | no | no | yes | yes | no |
+| `snd` | yes | no | no | no | yes | yes | no |
+| `kwd` | yes | no | no | no | yes | yes | no |
+
+## DSH priority
+
+DSH is the first golden vertical slice. It must close through:
+
+1. customer discovery/store/order
+2. partner operations
+3. captain/field execution where applicable
+4. control-panel oversight
+5. WLT financial binding for money paths
+6. evidence and runtime verification
+
+## WLT cross-service law
+
+Any service may create financial intent, but final financial state belongs to WLT only.
+
+## Blueprint law
+
+Every service may have:
+
+```text
+packages/surfaces/src/service-owned/<service>/SERVICE_BLUEPRINT.md
+```
+
+Blueprint files must contain verified truth only. Unknowns are `TBD`, not assumptions.
+
+## Closure requirements per service
+
+A service cannot be called closed without:
+
+- service blueprint
+- surface matrix
+- role/permission model
+- UI/UX/flow proof
+- API/binding proof
+- WLT proof if money is involved
+- tests/guards
+- runtime evidence
+- traceability row

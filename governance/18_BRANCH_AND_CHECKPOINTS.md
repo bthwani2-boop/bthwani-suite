@@ -1,61 +1,66 @@
+# Branch and Checkpoints
 
-# Branch & Checkpoints (Canonical)
+## Purpose
 
-هذا الملف يملك السلطة على:
+This file controls branch state, checkpoint readiness, divergence handling, and PR readiness.
 
-- قواعد الفروع
-- ما الذي يجعل تغييرًا “Checkpoint-required”
+## Canonical branch facts
 
-## Canonical facts (project-specific)
+- `main` is protected.
+- Work branches may use `governance/*`, `feature/*`, `fix/*`, `chore/*`, `release/*`, or checkpoint naming.
+- No branch truth without `git fetch` and local/remote comparison.
 
-- evidence root: `tools/registry/runs/{SESSION_ID}/` (الشكل في `11_EVIDENCE_AND_TRACEABILITY.md`)
-- لا “branch truth” بدون evidence pack يثبت الحالة الفعلية
-
-## Branch naming (baseline)
-
-- `main` محمي.
-- `release/*`
-- `feature/*`
-- `fix/*`
-- `chore/*`
-
-## Branch reality capture (minimum)
-
-قبل أي APPLY/VERIFY/REVIEW أو ادعاء “جاهزية/إغلاق”، التقط كحد أدنى (وأرفق المخرجات كأدلة):
+## Branch reality capture
 
 ```powershell
+Set-Location -LiteralPath "C:\bthwani-suite"
+git fetch origin
 git branch --show-current
+git rev-parse --short HEAD
+git rev-parse --short origin/<branch>
 git --no-pager status --short
-git --no-pager log --oneline -n 20
+git --no-pager log --oneline origin/<branch>..HEAD
+git --no-pager log --oneline HEAD..origin/<branch>
 git --no-pager diff --check
-pnpm -w exec tsc --noEmit
 git ls-files --others --exclude-standard
 ```
 
-## PR requirements (policy-level)
+## Divergence protocol
 
-- PR إلى `main` يجب أن يرفق:
-  - مرجع (issue أو قرار)
-  - evidence pack عند التغييرات ذات الأثر (`11_EVIDENCE_AND_TRACEABILITY.md`)
-  - نتائج CI gates (`13_CI_AND_GATES.md`)
+If local and remote diverge:
 
-## Checkpoint law
+1. stop
+2. inspect local-only commits
+3. inspect remote-only commits
+4. run `--cherry-pick` comparison
+5. create backup branch before rebase
+6. prefer linear rebase when remote commit is ancestor/equivalent
+7. avoid force push unless explicitly approved with reason
 
-Checkpoint مطلوب عندما يمس التغيير:
+## Backup branch before rebase
 
-- contracts / API / schema
+```powershell
+$BackupBranch = "backup/<branch>-before-rebase-$(Get-Date -Format yyyyMMdd-HHmmss)"
+git branch $BackupBranch
+```
+
+## Checkpoint required when changing
+
+- governance root
 - package public exports
-- boundary/ownership rules
+- API contracts
+- service/surface ownership
 - security posture
+- CI/guards
+- branch policy
+- deletion/move/rename
 
-Minimum checkpoint artifacts:
+## READY_FOR_PR requirements
 
-- traceability + rollback plan + consumer impact note (كلها داخل evidence pack)
-
-## Protected branch rule
-
-- لا دمج إلى `main` بدون مرور gates + موافقة مالك النطاق.
-
-## Emergency
-
-- الطوارئ تُوثّق بـ post-mortem داخل evidence pack بعد الاستقرار.
+- local/remote understood
+- working tree clean or patch intentionally reviewed
+- diff check clean
+- tsc/test/guard evidence as relevant
+- untracked/staged files accounted for
+- evidence pack exists
+- no unresolved blocker

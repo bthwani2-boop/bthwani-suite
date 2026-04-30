@@ -1,52 +1,70 @@
-
 # Governance (Canonical)
 
-**Canonical repo**: `C:\bthwani-suite`  
-**Canonical docs root**: `governance/` (هذا المجلد هو السلطة النصية الوحيدة)  
-**Legacy input (read-only)**: `governance/governance-legacy/` (مصدر قراءة/تحليل فقط؛ الهدف أن يصبح حذفه لاحقًا آمنًا بعد الاستخراج)
-**Canonical evidence root**: `tools/registry/runs/{SESSION_ID}/` (الشكل في `11_EVIDENCE_AND_TRACEABILITY.md`)
+**Status**: Canonical governance package for `bthwani-suite`.
 
-## ما الذي تملكه الحوكمة؟
+**Canonical local repo**: `C:\bthwani-suite`
 
-- **Repository truth**: حقائق الريبو، الأسماء المسموحة/الممنوعة، وحدود الملكية.
-- **Architecture**: فصل Screen/Surface/App، وحدود الحزم، وتدفّق الاعتمادات.
-- **UI system**: سيادة `@bthwani/ui-kit` + Tamagui داخل ui-kit فقط + هوية العلامة وRTL.
-- **API/binding/runtime**: سلسلة العقد→الأنواع→العملاء→الربط→الشاشات→إثبات التشغيل.
-- **Evidence-first**: لا “PASS/READY/CLOSED/FINAL/100%” بدون أدلة.
+**Canonical GitHub repo**: `bthwani2-boop/bthwani-suite`
 
-## ثوابت BThwani (ملزمة)
+**Canonical docs root**: `governance/`
 
-- **Repo**: الحقيقة النشطة الوحيدة هي `C:\bthwani-suite` (ممنوع اعتماد أي repo/مسار قديم باسم `bth` كحقيقة نشطة).
-- **Stack**: Node.js / TypeScript / pnpm / Nx / React / React Native / Expo / Next.js / NestJS.
-- **Architecture ladder**: Screen/Surface/App → `@bthwani/ui-kit` public exports → Tamagui internally inside ui-kit only.
-- **Brand DNA**: deepBlue `#0A2F5C`, orange `#FF500D`, white `#FFFFFF`, RTL صحيح، Premium 2026، صفر ضجيج.
+**Canonical evidence root**: `tools/registry/runs/{SESSION_ID}/`
 
-## كيف تقرأ هذه الحزمة؟
+## Executive law
 
-ابدأ من:
+This governance folder is the single textual authority for repository governance, architecture boundaries, service/surface ownership, UI authority, API/runtime binding, verification, evidence, guards, cleanup, and AI-assisted execution.
 
-- `01_GOVERNANCE_INDEX.md` (فهرس السلطة وخريطة الملفات)
-- ثم `02_PLATFORM_SSOT.md` (مصدر الحقيقة للمنصة)
+No result may be called `PASS`, `READY`, `CLOSED`, `FINAL`, `LOCKED`, or `100%` unless an evidence pack proves it.
 
-## كيف تغيّر الحوكمة بدون فوضى؟
+## What this package replaces
 
-- **قاعدة السلطة الواحدة**: كل قاعدة “قانون” يجب أن يكون لها **ملف مالك واحد** فقط داخل `governance/`.
-- **التغيير المسموح**: يقتصر على `governance/` فقط، مع توثيق مصير legacy داخل `99_LEGACY_MERGE_LEDGER.md`.
-- **لا أسرار**: ممنوع أي مفاتيح/توكنات/بيانات حساسة داخل docs أو evidence.
+This package replaces weak extracted summaries with a closure-grade governance control plane. Legacy files are treated as source evidence only; they must not remain a parallel authority.
 
-## جذور تنفيذية لا تتفوق على الحوكمة
+If an old `governance/governance-legacy/` folder exists in the repository, it is read-only reference material until the install/audit process quarantines it or removes it after ledger verification.
 
-هذه جذور “تنفيذ/اشتقاق/إخراج أدلة” ولا يجوز أن تصبح مصدر سياسة منافس:
+## Mandatory stack
 
-- `tools/guards/`
-- `tools/scripts/`
-- `tools/registry/runs/`
-- `.github/workflows/`
-- `.github/agents/`
-- `.github/skills/`
+`Node.js / TypeScript / pnpm / Nx / React / React Native / Expo / Next.js / NestJS`
 
-## Legacy merge ledger
+## Mandatory BThwani architecture rule
 
-كل ملف تحت `governance-legacy/` له قرار مصير داخل:
+`Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only`
 
-- `99_LEGACY_MERGE_LEDGER.md`
+## Mandatory brand DNA
+
+Deep Blue `#0A2F5C`, Orange `#FF500D`, White `#FFFFFF`, RTL-correct, premium 2026, low-noise, cohesive, practical, clear, elegant.
+
+## Read order
+
+1. `01_GOVERNANCE_INDEX.md`
+2. `02_PLATFORM_SSOT.md`
+3. `03_REPO_BOUNDARIES.md`
+4. `04_ARCHITECTURE_RULES.md`
+5. `07_SURFACES_AND_SERVICES.md`
+6. `11_EVIDENCE_AND_TRACEABILITY.md`
+7. `14_GUARDS_CATALOG.md`
+8. `99_LEGACY_MERGE_LEDGER.md`
+
+## Change law
+
+Any governance change must include:
+
+- exact scope
+- reason
+- changed files
+- source evidence
+- conflict review
+- `git diff --check`
+- status/evidence pack
+- decision using the canonical decision vocabulary
+
+## Forbidden
+
+- No parallel governance root.
+- No stale `docs/governance` authority.
+- No `governance-legacy` as active authority.
+- No broad undocumented deletion.
+- No silent path drift.
+- No blind global replace.
+- No old standalone repo/path named `bth` as an active target.
+- No removal of valid names such as `BThwani`, `bthwani-suite`, `@bthwani/*`, or `bthwani2-boop/bthwani-suite`.

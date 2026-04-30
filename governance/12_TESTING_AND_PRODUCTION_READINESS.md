@@ -1,25 +1,50 @@
+# Testing and Production Readiness
 
-# Testing & Production Readiness (Canonical)
+## Purpose
 
-هذا الملف يملك السلطة على:
-- فئات الاختبار المطلوبة
-- الحد الأدنى لإثبات “جاهزية” change قبل الدمج/النشر
+This file defines testing and readiness expectations by change type.
 
-## Required test categories (minimum)
-- **Unit**: سريع، يغطي منطق الوحدة.
-- **Integration**: تفاعل بين وحدات/بنية (DB/cache/etc) عندما ينطبق.
-- **Contract**: تطابق العقد (OpenAPI) مع التشغيل عند تغييرات API (راجع `09_API_BINDING_RUNTIME.md`).
-- **Smoke / E2E (golden slice)**: happy-path minimal لإثبات end-to-end (راجع `06_APPS_AND_SHELLS.md`).
-- **Security scan**: فحص تبعيات/ثغرات عند الإمكان (السلطة في `16_SECURITY_AND_SECRETS.md`).
+## Baseline commands
 
-## Readiness law
-- أي PR يُعتبر “جاهزًا” فقط عندما:
-  - متطلبات CI gates الخاصة به تحققت (راجع `13_CI_AND_GATES.md`)
-  - evidence pack يربط الاختبارات بالمطالب (راجع `11_EVIDENCE_AND_TRACEABILITY.md`)
+For code changes:
 
-## Breaking changes
-- يلزم: consumer list + migration + rollback + evidence.
+```powershell
+Set-Location -LiteralPath "C:\bthwani-suite"
+git --no-pager status --short
+git --no-pager diff --check
+pnpm -w exec tsc --noEmit
+```
 
-## Enforcement (reference)
-- Guard `GUARD_22_TEST_SMOKE_COVERAGE_PRESENCE`.
+## Test classes
 
+| Change type | Required proof |
+|---|---|
+| Docs only | diff check, link/path sanity |
+| UI | typecheck, screenshot/visual evidence, RTL/overflow check |
+| Package exports | typecheck, import/consumer scan, guard |
+| API/contract | contract test, generated type/client proof |
+| Runtime behavior | logs, smoke test, relevant integration test |
+| Security/config | secret scan/config review |
+| Cleanup/delete | reference scan, diff, rollback plan |
+| CI/guards | workflow/guard run output |
+
+## Production readiness requires
+
+- no fixture-only truth
+- no stale compose/runtime truth
+- no LAN/IP hardcoding as production route
+- provider control plane or documented bootstrap exception
+- observability path
+- rollback plan
+- seed/simulation plan if required
+- access/scale gate when applicable
+
+## Warning handling
+
+Warnings are acceptable only if:
+
+- classified
+- non-blocking
+- recorded in evidence
+- owner/remediation exists
+- not hiding a defect

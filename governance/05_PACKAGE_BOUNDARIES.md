@@ -1,36 +1,59 @@
+# Package Boundaries
 
-# Package Boundaries (Canonical)
+## Purpose
 
-هذا الملف يملك السلطة على:
-- عقد الحزم (Public API)
-- exports completeness
-- منع deep-imports
+This file controls package-level public APIs, internal folders, barrels, deep imports, and compatibility.
 
-## Public API law
-- أي استهلاك خارجي يجب أن يمر عبر **public exports** للحزمة فقط.
-- أي ملف/مسار غير مُصدّر يعتبر internal وغير قابل للاعتماد خارج مالكه.
+## Package role matrix
 
-## Minimum package contract
-لكل package:
-- `name`
-- `version`
-- `exports` (يشمل `.` كحد أدنى للحزم العامة)
-- `types` عند TypeScript
+| Package | Public role |
+|---|---|
+| `@bthwani/ui-kit` | design authority and reusable UI exports |
+| `@bthwani/surfaces` | service-owned and surface-owned screens/flows |
+| `@bthwani/app-shells` | app frames, providers, route/shell composition |
+| `@bthwani/api-types` | shared/generated contract types |
+| `@bthwani/api-clients` | typed API clients/adapters |
+| service packages | backend/runtime service code |
 
-## No deep-imports (non-negotiable)
-- ممنوع استيراد:
-  - `@scope/pkg/dist/*`
-  - `@scope/pkg/src/*`
-  - أو أي مسار داخلي غير مُعلن في `exports`
+## Export policy
 
-## Versioning
-- التغييرات الكاسرة في public exports تتطلب:
-  - خطة ترحيل (migration)
-  - نافذة إهمال عند الحاجة
-  - evidence pack يثبت المستهلكين وتأثير التغيير (راجع `11_EVIDENCE_AND_TRACEABILITY.md`)
+- Public API must be explicit.
+- Avoid `export *` when it weakens contract clarity or creates drift.
+- Public exports must be stable or intentionally versioned.
+- Internal modules must remain internal.
+- Any public API rename requires compatibility plan or evidence that no consumers exist.
 
-## Enforcement (reference)
-- `GUARD_04_PUBLIC_EXPORT_BARREL_CONTRACT`
-- `GUARD_05_PACKAGE_INTERNAL_DEEP_IMPORT`
-- `GUARD_16_PACKAGE_EXPORTS_COMPLETENESS`
+## Deep import policy
 
+Forbidden unless explicitly documented:
+
+```text
+@bthwani/ui-kit/src/...
+@bthwani/surfaces/src/...
+packages/*/src/internal/...
+```
+
+Allowed:
+
+```text
+import { ... } from "@bthwani/ui-kit"
+import { ... } from "@bthwani/surfaces"
+```
+
+## TypeScript policy
+
+- No new `any` unless documented as contained and temporary.
+- No type suppression without issue/evidence.
+- No public type drift without contract review.
+- `pnpm -w exec tsc --noEmit` is a baseline verification command for code changes.
+
+## Boundary evidence
+
+Package changes must include:
+
+- changed exports
+- impacted imports
+- consumer list
+- TypeScript output
+- guard output if available
+- rollback plan

@@ -1,32 +1,18 @@
-
-# Evidence & Traceability (Canonical)
-
-هذا الملف هو **السلطة الوحيدة** لتعريف:
-
-- ما هو “evidence” المقبول لإغلاق تغيير
-- الشكل الأدنى لـ evidence pack
-- مفردات القرارات (PASS/WARN/FAIL/…)
+# Evidence and Traceability
 
 ## Core law
 
-- **لا إغلاق بدون evidence**: أي claim من نوع “READY / PASS / CLOSED / FINAL / 100%” يجب أن يكون قابلًا للتدقيق عبر evidence pack.
-- **evidence لا يعني نصًا**: policy text لا يحل محل artifacts (نتائج اختبارات/CI/تقارير/روابط تشغيل).
+No `PASS`, `READY`, `CLOSED`, `FINAL`, `LOCKED`, or `100%` claim without evidence.
 
-## Canonical evidence root (project-specific)
-
-كل الأدلة التنفيذية يجب أن تعيش تحت:
+## Canonical evidence root
 
 ```text
 tools/registry/runs/{SESSION_ID}/
 ```
 
-قاعدة: هذه output artifacts وليست مصدر سياسة/كود.
+## Minimum evidence pack
 
-## Evidence pack (minimum standard)
-
-Evidence pack هو “حزمة إثبات” مرتبطة بالـ PR أو run id وتحتوي على **ملفات حد أدنى ثابتة**.
-
-### Required core files (must exist)
+Every meaningful gate should produce:
 
 ```text
 SUMMARY.md
@@ -41,81 +27,74 @@ git-diff-check-after.txt
 untracked-before.txt
 untracked-after.txt
 _HANDOFF.zip
-{SESSION_ID}_HANDOFF.zip
 ```
 
-عند تغييرات يمكن أن تؤثر على TypeScript/scripts/guards/config أضف:
+Add when relevant:
 
 ```text
-tsc-noemit-before.txt
-tsc-noemit-after.txt
+tsc-noemit.txt
+lint.txt
+tests.txt
+build.txt
+runtime-logs/
+screenshots/
+patches/
+traceability-matrix.csv
+guard-results.json
 ```
 
-### Required metadata (`evidence.json`)
-
-يجب أن يلتزم `evidence.json` (كحد أدنى) بهذه الحقول:
+## evidence.json minimum schema
 
 ```json
 {
-  "issueCode": "...",
-  "sessionId": "...",
-  "evidenceRoot": "tools/registry/runs/{SESSION_ID}/",
-  "mode": "READ_ONLY | CHECK | FORENSICS | PLAN | APPLY | VERIFY | REVIEW | RUNTIME_VERIFY",
-  "allowedFiles": [],
-  "forbiddenRoots": [],
+  "issueCode": "GOVERNANCE_TASK",
+  "sessionId": "TASK-YYYYMMDD-HHMMSS",
+  "repo": "C:\\bthwani-suite",
+  "branch": "branch-name",
+  "headSha": "sha",
+  "mode": "CHECK | FORENSICS | APPLY | VERIFY | REVIEW | RUNTIME_VERIFY",
+  "allowedPaths": [],
+  "forbiddenPaths": [],
   "finalDecision": "PASS | PASS_WITH_WARNINGS | FIX_REQUIRED | BLOCKED | READY_FOR_PR | REVERT_REQUIRED | NEEDS_EVIDENCE | NEEDS_VISUAL_EVIDENCE",
-  "phaseState": "...",
   "diffCheckPass": true,
   "tscPass": true,
   "scopeViolationCount": 0,
-  "warningSummary": [],
-  "outputFiles": []
+  "warnings": [],
+  "errors": [],
+  "artifacts": []
 }
 ```
 
-### Decision vocabulary
+## Decision vocabulary
 
-#### Final decisions (canonical)
+`PASS`, `PASS_WITH_WARNINGS`, `FIX_REQUIRED`, `BLOCKED`, `READY_FOR_PR`, `REVERT_REQUIRED`, `NEEDS_EVIDENCE`, `NEEDS_VISUAL_EVIDENCE`
+
+## Traceability row schema
+
+```text
+requirement_id | governance_source | implementation_paths | tests | artifacts | status | notes
+```
+
+Status values:
 
 - `PASS`
-- `PASS_WITH_WARNINGS`
-- `FIX_REQUIRED`
-- `BLOCKED`
-- `READY_FOR_PR`
-- `REVERT_REQUIRED`
-- `NEEDS_EVIDENCE`
-- `NEEDS_VISUAL_EVIDENCE`
+- `WARN`
+- `FAIL`
+- `NOT_APPLICABLE`
+- `INFO`
 
-#### Traceability row status (canonical)
+## Evidence is not
 
-- `PASS` | `WARN` | `FAIL` | `NOT_APPLICABLE` | `INFO`
+- Copilot verbal summary
+- screenshots without code evidence
+- code diff without verification
+- policy text without artifacts
+- assumed behavior
 
-> ملاحظة: أي مصطلحات قديمة مثل `NO_ACTION_REQUIRED` تُعامل كـ `NOT_APPLICABLE`.
+## Untracked/staged rule
 
-## Traceability matrix (canonical columns)
+No final acceptance until:
 
-`requirement_id | governance_source | code_paths | tests | artifacts | status`
-
-### status vocabulary (canonical)
-
-- `PASS`: تحقق الشرط بأدلة واضحة.
-- `WARN`: الشرط لم يتحقق بالكامل لكن لا يمنع الدمج في وضع report-only (يجب خطة علاج).
-- `FAIL`: الشرط لم يتحقق ويمنع الدمج عندما يكون gate blocking.
-- `NOT_APPLICABLE`: غير منطبق على هذا التغيير (مع سبب واحد سطر).
-- `INFO`: معلومة/إشارة بدون قرار.
-
-## Minimum verification expectations (by change type)
-
-- **Cross-boundary** (exports/boundaries/contracts/security): evidence pack يجب أن يحتوي على traceability + نتائج CI ذات صلة + impact note.
-- **API/contract**: يجب إرفاق contract artifact + اختبار تطابق (راجع `09_API_BINDING_RUNTIME.md`).
-- **UI system / ui-kit**: يجب إرفاق دليل بصري/اختبار ملائم + تحقق RTL عند التغيير المؤثر (راجع `08_UI_KIT_AND_BRAND.md`).
-
-## Storage & retention (policy-level)
-
-- يمكن أن تكون artifacts داخل CI، أو مرفقات PR، أو registry داخلي—المهم أن تكون **روابط ثابتة قابلة للتدقيق**.
-- الاحتفاظ: نافذة تدقيق افتراضية سنة واحدة ما لم تتطلب السياسة الأمنية/الامتثال أكثر (راجع `16_SECURITY_AND_SECRETS.md`).
-
-## CI integration (reference)
-
-- `13_CI_AND_GATES.md` يحدد ما الذي يعتبر gate blocking مقابل report-only.
-- `14_GUARDS_CATALOG.md` يحدد guards وكيف تنتج evidence/قراراتها.
+- staged changes are accounted for
+- untracked files are listed and reviewed
+- local diff is clean or intentionally included

@@ -1,56 +1,57 @@
+# Guards Catalog
 
-# Guards Catalog (Canonical)
+## Canonical guard records
 
-Guards هي **قواعد فحص** تهدف لمنع الانحراف (drift) عبر الزمن. هذا الملف يملك:
-- مبادئ guards
-- شكل القرار (PASS/WARN/FAIL/…)
-- سياسة التدرج report-only → blocking
+| ID | Domain | Severity | Purpose | Evidence |
+|---|---|---|---|---|
+| `GUARD_01_SCOPE_AND_PATH_LOCK` | `scope` | `blocking` | ensures changes stay within approved paths | changed file list, allow/deny match |
+| `GUARD_02_SHARED_FOLDER_OWNERSHIP` | `architecture` | `blocking` | prevents shared folder ownership drift | shared path scan |
+| `GUARD_03_UNUSED_DEAD_ORPHAN_CODE` | `cleanup` | `report-only` | detects dead/orphan code candidates | reference scan |
+| `GUARD_04_PUBLIC_EXPORT_BARREL_CONTRACT` | `packages` | `blocking` | checks public exports/barrels | export scan |
+| `GUARD_05_PACKAGE_INTERNAL_DEEP_IMPORT` | `packages` | `blocking` | detects forbidden deep imports | import scan |
+| `GUARD_06_LEGACY_FORBIDDEN_NAMING` | `naming` | `blocking` | detects standalone legacy names except valid bthwani terms | token scan |
+| `GUARD_07_UIKIT_TAMAGUI_BOUNDARY` | `ui` | `blocking` | ensures Tamagui stays inside ui-kit | import scan |
+| `GUARD_08_RUNTIME_ROUTE_ENTRYPOINT_PROTECTION` | `runtime` | `blocking` | protects routes/entrypoints | route scan |
+| `GUARD_09_RTL_I18N` | `ui` | `report-only` | detects RTL/i18n risks | screen scan |
+| `GUARD_10_EVIDENCE_REGISTRY_RUNS_HYGIENE` | `evidence` | `blocking` | checks registry run artifacts | evidence folder scan |
+| `GUARD_11_EMPTY_PLACEHOLDER_ZERO_BYTE_FILES` | `cleanup` | `blocking` | rejects empty placeholders | file size scan |
+| `GUARD_12_API_BINDING_RUNTIME` | `api` | `blocking` | checks contract/binding/runtime evidence | contract/runtime scan |
+| `GUARD_13_GOVERNANCE_SSOT_CONFLICT` | `governance` | `blocking` | detects duplicate/conflicting governance truth | docs scan |
+| `GUARD_14_AGENT_SKILL_REGISTRY_OWNERSHIP` | `agents` | `report-only` | checks agents/skills registry ownership | registry scan |
+| `GUARD_15_CI_WORKFLOW_COVERAGE` | `ci` | `blocking` | checks expected CI workflow coverage | workflow scan |
+| `GUARD_16_PACKAGE_EXPORTS_COMPLETENESS` | `packages` | `blocking` | checks export completeness | package export scan |
+| `GUARD_17_SERVICE_BLUEPRINT_COVERAGE` | `services` | `report-only` | checks service blueprint presence | service scan |
+| `GUARD_18_SURFACE_SCREEN_OWNERSHIP` | `surfaces` | `blocking` | checks screen ownership placement | surface scan |
+| `GUARD_19_TYPESCRIPT_STRICTNESS` | `typescript` | `blocking` | checks TS strictness/no unsafe suppressions | tsc + grep |
+| `GUARD_20_DESIGN_TOKEN_BRAND_DRIFT` | `ui` | `report-only` | detects random colors/token drift | style scan |
+| `GUARD_21_ROUTE_SCREEN_FILE_STRUCTURE` | `routes` | `report-only` | checks route/screen file model | route scan |
+| `GUARD_22_TEST_SMOKE_COVERAGE_PRESENCE` | `testing` | `report-only` | detects missing smoke tests | test scan |
+| `GUARD_23_SCRIPT_SAFETY` | `scripts` | `blocking` | checks script safety requirements | script scan |
+| `GUARD_24_EVIDENCE_TO_COMMIT_TRACEABILITY` | `evidence` | `blocking` | maps evidence to commit/branch | evidence/commit scan |
 
-## Guard law (non-negotiables)
-- **Guards لا تقوم بتغييرات destructive**: لا حذف/نقل/إعادة كتابة ملفات إنتاج أو تفعيل gates بنفسها.
-- **warning-first**: إدخال guard جديد يبدأ بـ report-only ثم يترقى تدريجيًا وفق `13_CI_AND_GATES.md`.
-- **single source of truth**: وصف guard وسلطته هنا؛ تفاصيل التنفيذ تعيش في tooling/CI.
+## ID conflict resolution
 
-## Decision vocabulary
-استخدم مفردات `11_EVIDENCE_AND_TRACEABILITY.md`:
-- `PASS` | `WARN` | `FAIL` | `NOT_APPLICABLE` | `INFO`
+Legacy guard IDs that conflict with this catalog are preserved in `99_LEGACY_MERGE_LEDGER.md` as source evidence but are not canonical IDs.
 
-## Guard record (minimum fields)
-- `id`
-- `domain` (governance file owner: 03/04/05/…)
-- `purpose`
-- `severity` (low/medium/high/critical)
-- `mode` (`report-only` | `blocking`)
-- `evidence` (ما الذي يثبت PASS)
-- `remediation` (خطوة إصلاح واحدة أو رابط لملف السياسة المالكة)
+Specifically, legacy `GUARD_12_DUPLICATE_DOCS_AGENT_SKILL_CONTENT` is superseded by `GUARD_13_GOVERNANCE_SSOT_CONFLICT` plus docs/reference scans. Canonical `GUARD_12` is `GUARD_12_API_BINDING_RUNTIME`.
 
-## Catalog (reference list)
-هذه قائمة guards الكانونية المستخرجة من legacy وتوزيع “الملكية” لها:
-- `GUARD_02_SHARED_FOLDER_OWNERSHIP` → `03_REPO_BOUNDARIES.md`
-- `GUARD_03_UNUSED_DEAD_ORPHAN_CODE` → `17_CLEANUP_AND_DEPRECATION.md`
-- `GUARD_04_PUBLIC_EXPORT_BARREL_CONTRACT` → `05_PACKAGE_BOUNDARIES.md`
-- `GUARD_05_PACKAGE_INTERNAL_DEEP_IMPORT` → `05_PACKAGE_BOUNDARIES.md`
-- `GUARD_06_LEGACY_FORBIDDEN_NAMING` → `03_REPO_BOUNDARIES.md`
-- `GUARD_07_UIKIT_TAMAGUI_BOUNDARY` → `08_UI_KIT_AND_BRAND.md`
-- `GUARD_08_RUNTIME_ROUTE_ENTRYPOINT_PROTECTION` → `04_ARCHITECTURE_RULES.md`
-- `GUARD_09_RTL_I18N` → `08_UI_KIT_AND_BRAND.md`
-- `GUARD_10_EVIDENCE_REGISTRY_RUNS_HYGIENE` → `11_EVIDENCE_AND_TRACEABILITY.md`
-- `GUARD_11_EMPTY_PLACEHOLDER_ZERO_BYTE_FILES` → `17_CLEANUP_AND_DEPRECATION.md`
-- `GUARD_12_API_BINDING_RUNTIME` → `09_API_BINDING_RUNTIME.md`
-- `GUARD_13_GOVERNANCE_SSOT_CONFLICT` → `01_GOVERNANCE_INDEX.md`
-- `GUARD_14_AGENT_SKILL_REGISTRY_OWNERSHIP` → `15_AGENT_AND_AI_EXECUTION.md`
-- `GUARD_15_CI_WORKFLOW_COVERAGE` → `13_CI_AND_GATES.md`
-- `GUARD_16_PACKAGE_EXPORTS_COMPLETENESS` → `05_PACKAGE_BOUNDARIES.md`
-- `GUARD_17_SERVICE_BLUEPRINT_COVERAGE` → `07_SURFACES_AND_SERVICES.md`
-- `GUARD_18_SURFACE_SCREEN_OWNERSHIP` → `07_SURFACES_AND_SERVICES.md`
-- `GUARD_19_TYPESCRIPT_STRICTNESS` → `04_ARCHITECTURE_RULES.md`
-- `GUARD_20_DESIGN_TOKEN_BRAND_DRIFT` → `08_UI_KIT_AND_BRAND.md`
-- `GUARD_21_ROUTE_SCREEN_FILE_STRUCTURE` → `04_ARCHITECTURE_RULES.md`
-- `GUARD_22_TEST_SMOKE_COVERAGE_PRESENCE` → `12_TESTING_AND_PRODUCTION_READINESS.md`
-- `GUARD_23_SCRIPT_SAFETY` → `15_AGENT_AND_AI_EXECUTION.md`
-- `GUARD_24_EVIDENCE_TO_COMMIT_TRACEABILITY` → `11_EVIDENCE_AND_TRACEABILITY.md`
+## Guard record requirements
 
-## Promotion rule (summary)
-- New guard: `report-only` until it produces stable signal and remediation paths exist.
-- Promotion to `blocking` requires evidence that false positives are controlled (documented under evidence/traceability).
+Every implemented guard must define:
 
+- ID
+- domain
+- purpose
+- severity
+- mode: blocking/report-only
+- input paths
+- excluded paths
+- output files
+- false-positive handling
+- remediation
+- owner
+- evidence schema
+
+## Guard acceptance
+
+A guard is accepted only when it can run repeatedly, produce deterministic output, and be traced to a governance source.

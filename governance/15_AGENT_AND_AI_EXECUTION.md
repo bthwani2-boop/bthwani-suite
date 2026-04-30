@@ -1,34 +1,73 @@
+# Agent and AI Execution
 
-# Agent & AI Execution (Canonical)
+## Purpose
 
-هذا الملف يملك السلطة على:
-- قواعد تشغيل AI/agents داخل الريبو
-- مبدأ “الإنسان في الحلقة” للأعمال الحساسة
-- متطلبات evidence لتغييرات الأدوات/الوكلاء
+This file governs ChatGPT, VS Code, Copilot, local scripts, generated files, patch review, and evidence handoff.
 
-## Core principles
-- **Human-in-the-loop**: أي إجراء قد يؤثر على بيانات/أمن/إنتاج يجب أن يمر بموافقة بشرية.
-- **Scope discipline**: الوكيل يعمل ضمن نطاق تغيير واضح؛ أي توسع نطاق يُعامل كتغيير جديد.
-- **Evidence-first**: أي تعديل tooling/agent behavior يرفق evidence (قبل/بعد، outputs، failure modes).
+## Authority model
 
-## Skill/automation governance
-- كل skill/automation يجب أن تعلن:
-  - `id`
-  - `owner`
-  - `purpose`
-  - `allowed_data_scope`
-  - `last_updated`
+- ChatGPT chooses method and reviews evidence.
+- Copilot executes locally only inside scope.
+- Git evidence decides.
+- User operates local repo and provides evidence.
+- GitHub is read-only unless explicit write is requested.
 
-## Safety baseline
-- scripts غير الموثوقة لا تُشغّل على إنتاج.
-- أي سلوك destructive يتطلب:
-  - قيود (timeouts/resource caps)
-  - مراجعة بشرية
-  - خطة rollback إن كان له أثر
+## Delivery modes
 
-## Auditing
-- كل actions تُغيّر حالة (state-changing) يجب أن تكون قابلة للربط بـ evidence pack وفق `11_EVIDENCE_AND_TRACEABILITY.md`.
+- `DECISION_ONLY`
+- `TERMINAL_COMMAND`
+- `SINGLE_FILE`
+- `ZIP_PACKAGE`
+- `PATCH_HANDOFF`
+- `EVIDENCE_BUNDLE`
+- `VISUAL_REVIEW`
+- `NO_ACTION`
 
-## Enforcement (reference)
-- Guards ذات صلة: `GUARD_14_AGENT_SKILL_REGISTRY_OWNERSHIP`, `GUARD_23_SCRIPT_SAFETY`.
+## Method selection law
 
+Do not force prompt-only work. Use the safest deterministic method:
+
+- prompt for narrow local adaptation
+- command for checks
+- script for repeatable scans/fixes
+- generated file for exact docs/config
+- ZIP for multi-file payload
+- patch handoff for sensitive changes
+
+## Copilot contract
+
+Copilot must:
+
+- stay inside scope
+- identify intended changed files before editing
+- not delete/move/rename unless explicitly allowed
+- not change dependencies/config/runtime/API/backend unless explicitly allowed
+- not claim PASS/CLOSED/100%
+- return changed files and verification commands
+
+## Patch handoff
+
+Sensitive local changes require:
+
+```powershell
+git --no-pager status --short
+git --no-pager diff --stat
+git --no-pager diff --name-status
+git --no-pager diff --check
+git --no-pager diff -- . > LOCAL_CHANGE_REVIEW.patch
+git ls-files --others --exclude-standard > LOCAL_CHANGE_UNTRACKED_FILES.txt
+```
+
+## Scripts
+
+PowerShell scripts for this project must start with:
+
+```powershell
+Set-Location -LiteralPath "C:\bthwani-suite"
+```
+
+Scripts that write under `tools/registry/runs/` must produce `_HANDOFF.zip`.
+
+## Decisions
+
+Use only: `PASS`, `PASS_WITH_WARNINGS`, `FIX_REQUIRED`, `BLOCKED`, `READY_FOR_PR`, `REVERT_REQUIRED`, `NEEDS_EVIDENCE`, `NEEDS_VISUAL_EVIDENCE`

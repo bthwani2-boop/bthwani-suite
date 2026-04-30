@@ -1,29 +1,58 @@
+# Cleanup, Deletion, Deprecation
 
-# Cleanup & Deprecation (Canonical)
+## Purpose
 
-هذا الملف يملك السلطة على:
-- سياسة الإهمال والحذف الآمن
-- متطلبات “عدم وجود مستهلكين” قبل الحذف
-- سجل الأثر (audit trail) عبر evidence
+This file defines safe cleanup, archive, deletion, and deprecation.
 
-## Non-destructive law
-- أي حذف/نقل/إزالة يجب أن يكون:
-  - قابلًا للرجوع (rollback) أو له خطة استرجاع
-  - موثقًا بـ evidence
-  - بعد إثبات عدم وجود مستهلكين (consumer proof)
+## Cleanup modes
 
-## Deprecation lifecycle
-1. **Proposal**: سبب + أثر + بديل + خطة ترحيل.
-2. **Announcement**: إشعار للمستهلكين + نافذة انتقال مناسبة.
-3. **Deprecation**: تعليم واضح + منع استخدام جديد تدريجيًا (lint/guards عند الإمكان).
-4. **Removal**: بعد انتهاء النافذة + evidence يثبت zero-consumers.
+| Mode | Meaning |
+|---|---|
+| `DEDUP` | merge duplicate truth into owner file |
+| `QUARANTINE` | move out of active authority |
+| `ARCHIVE` | preserve as historical evidence |
+| `DEPRECATE` | keep temporarily with removal date |
+| `DELETE` | remove after gates pass |
+| `REJECT` | reviewed and intentionally not adopted |
 
-## Evidence requirements
-- دليل المستهلكين (من يعتمد؟)
-- نتائج CI/اختبارات مرتبطة
-- قرار نهائي موثق في evidence pack (`11_EVIDENCE_AND_TRACEABILITY.md`)
+## Deletion readiness gates
 
-## Enforcement (reference)
-- `GUARD_03_UNUSED_DEAD_ORPHAN_CODE`
-- `GUARD_11_EMPTY_PLACEHOLDER_ZERO_BYTE_FILES`
+Before deleting or moving a file/folder:
 
+1. classify it
+2. search references/imports/links
+3. identify owner replacement
+4. update ledger
+5. capture before/after status
+6. run diff check
+7. provide rollback path
+
+## Governance legacy rule
+
+`governance-legacy` must not remain active authority. It can only be:
+
+- archived outside the canonical authority path
+- quarantined under explicit archive/read-only label
+- removed after `99_LEGACY_MERGE_LEDGER.md` proves every source file disposition
+
+## No blind deletion
+
+Never run broad delete/clean commands without:
+
+- exact target list
+- risk note
+- backup or Git safety
+- verification
+- user approval for destructive action
+
+## Deprecation record
+
+Every deprecation must include:
+
+- old path/name
+- replacement
+- reason
+- date
+- owner
+- removal gate
+- rollback

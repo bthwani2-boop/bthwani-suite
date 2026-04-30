@@ -1,20 +1,65 @@
+# Apps and App-Shells Contract
 
-# Apps & Shells (Canonical)
+## Purpose
 
-هذا الملف يملك السلطة على:
-- فصل المسؤوليات بين Shell وApp/Surfaces
-- قاعدة golden slice كحد أدنى لإثبات end-to-end
+Apps are deployable shells. App-shells are reusable composition frames. Neither should own reusable business logic or design-system authority.
 
-## Shell-only contract
-- **Shell**: مسؤول عن navigation العام، auth/session، تحميل الموارد المشتركة، وتهيئة runtime.
-- **Shell ممنوع** أن يحتوي: منطق نطاق العمل (domain rules) أو data access “الخاصة بالخدمة”.
-- منطق النطاق والبيانات يعيش في packages/services أو domain packages وفق حدود `05_PACKAGE_BOUNDARIES.md`.
+## App responsibilities
 
-## Golden slice law
-- أي Surface/Service جديدة لا تُعتبر “قابلة للتبني” بدون:
-  - تدفق واحد end-to-end واضح
-  - Evidence pack يثبت (smoke/e2e) وفق `11_EVIDENCE_AND_TRACEABILITY.md`
+Apps may own:
 
-## Dependency note
-- Apps/Shells تستهلك من workspace packages عبر public exports فقط (تفاصيل deep-import في `05_PACKAGE_BOUNDARIES.md`).
+- app bootstrap
+- runtime entrypoint
+- platform-specific wiring
+- navigation registration
+- environment selection
+- dev-client integration
+- app-specific configuration
+- final shell composition
 
+Apps must not own:
+
+- duplicated UI system
+- service-specific business rules
+- generated contract truth
+- cross-service financial truth
+- shared workflow logic that belongs in `packages/surfaces`
+
+## App-shell responsibilities
+
+`packages/app-shells` may own:
+
+- shared shell frame
+- providers composition
+- layout frame
+- navigation adapters
+- route metadata adapters
+- safe-area/top-level shell concerns
+
+It must not own:
+
+- DSH/WLT/KNZ/etc service internals
+- per-service screen state machines
+- API endpoint definitions
+- money ledger truth
+
+## App list
+
+- `apps/mobile/app-client`
+- `apps/mobile/app-partner`
+- `apps/mobile/app-captain`
+- `apps/mobile/app-field`
+- `apps/web/control-panel`
+- `apps/web/webapp`
+- `apps/web/website`
+
+## Shell acceptance gates
+
+A shell change requires:
+
+- affected app list
+- route/navigation impact
+- platform impact
+- TypeScript verification
+- runtime smoke proof when behavior changes
+- screenshots for visual shell changes

@@ -1,36 +1,100 @@
+# Platform SSoT
 
-# Platform SSOT (Single Source of Truth)
+## Canonical repository
 
-هذا الملف يحدد **حقائق المنصة** التي لا يجوز تكرارها عبر ملفات متعددة.  
-أي تفصيل تنفيذي (خطوات/قوالب/أوامر/مجلدات evidence) يجب أن يعيش في الملف المالك له ويُشار إليه من هنا فقط.
+- Local repo: `C:\bthwani-suite`
+- GitHub repo: `bthwani2-boop/bthwani-suite`
+- Canonical governance root: `governance/`
+- Canonical evidence root: `tools/registry/runs/{SESSION_ID}/`
 
-## Scope
-- حقائق المنصة المشتركة التي تؤثر على كل apps/packages/services.
-- تعريف “السلطة” ومتى نرفع النزاع (انظر `01_GOVERNANCE_INDEX.md`).
+## Stack
 
-## Non-negotiables (platform invariants)
-- **Canonical repo**: `C:\bthwani-suite`.
-- **Stack**: Node.js / TypeScript / pnpm / Nx / React / React Native / Expo / Next.js / NestJS.
-- **UI ladder**: apps/surfaces تستهلك من `@bthwani/ui-kit` public exports فقط (Tamagui داخل ui-kit فقط).
-- **Evidence-first**: لا قرار نهائي ولا “READY/CLOSED/100%” بدون evidence (الشكل في `11_EVIDENCE_AND_TRACEABILITY.md`).
+`Node.js / TypeScript / pnpm / Nx / React / React Native / Expo / Next.js / NestJS`
 
-## Control-plane responsibilities (textual governance)
-- تقرر: سياسات CI/Gates، سياسات guards، حدود الحزم، قواعد الأمن، وسياسات الـ AI execution.
-- لا تكرر تفاصيل الملفات الأخرى: SSOT يملك “الحقيقة العليا” ويشير للتفاصيل عبر روابط.
+Expo Development Build / Dev Client is canonical for mobile development. Expo Go is not the canonical development model.
 
-## Change classification (decision-level)
-- **Minor**: لا يعبر حدود surfaces/services/contracts/exports.
-- **Cross-boundary**: يمس export surface أو boundaries أو contract أو security posture.
-- **Breaking**: تغيير كاسر لعقد عام أو exports عامة أو boundary رسمي.
+## Canonical surfaces
 
-متطلبات الإثبات للتصنيفات أعلاه مملوكة داخل:
-- `11_EVIDENCE_AND_TRACEABILITY.md`
-- `13_CI_AND_GATES.md`
-- `16_SECURITY_AND_SECRETS.md`
-
-## Escalation triggers
-- أي غموض في owner لمساحة مشتركة.
-- أي تغيير يمس contract أو service registry (راجع `07_SURFACES_AND_SERVICES.md` و`09_API_BINDING_RUNTIME.md`).
-- أي محاولة لتجاوز سيادة `@bthwani/ui-kit`.
+| Surface | Canonical path / role | Owns | Must not own |
+|---|---|---|---|
+| `app-client` | Mobile customer shell/surface | customer entry, DSH/KNZ/AMN/ARB/WLT/ESF/MRF/SND/KWD customer journeys | service internals, design-system forks |
+| `app-partner` | Mobile partner shell/surface | partner operations, DSH merchant/order/account journeys | money ledger truth, local UI kit |
+| `app-captain` | Mobile captain shell/surface | captain task/order/service execution | partner/store ownership |
+| `app-field` | Mobile field shell/surface | field ops, onboarding/inspection/verification flows | partner account truth |
+| `control-panel` | Web admin/control room | platform ops, service admin, audit, reporting, support | direct screen-owned service logic outside surfaces |
+| `webapp` | Public/authenticated web app | web customer/community flows | admin control-plane logic |
+| `website` | marketing/public website | public marketing/info pages | app runtime/backend truth |
+| `app-shells` | package-level shell composition | navigation/frame/providers/routing adapters | service-owned business screens |
 
 
+## Canonical services
+
+| Service | Name / domain | Canonical surfaces | Service-owned obligations |
+|---|---|---|---|
+| `dsh` | Delivery & Shopping | app-client, app-partner, app-captain, app-field, control-panel | store, catalog, basket, order, fulfillment, partner ops, captain/field handoff |
+| `wlt` | Wallet / finance ledger | app-client, control-panel, cross-service finance | wallet, ledger, fees, commissions, refunds, settlement, reconciliation |
+| `knz` | Kanz / rewards or offers domain | app-client, control-panel | campaign/reward flows, customer-facing earning/redemption evidence |
+| `arb` | Partner/business enablement | app-client, app-partner, app-field, control-panel | partner onboarding/verification, business profile, operational modes |
+| `amn` | Safety/security/service assurance | app-client, app-captain, control-panel | safety cases, trust signals, incident evidence, safety rules |
+| `esf` | Community service family | app-client, webapp, control-panel | community service catalog/requests, ops proof |
+| `mrf` | Community service family | app-client, webapp, control-panel | community service catalog/requests, ops proof |
+| `snd` | Community service family | app-client, webapp, control-panel | community service catalog/requests, ops proof |
+| `kwd` | Community service family | app-client, webapp, control-panel | community service catalog/requests, ops proof |
+
+
+## Non-service capabilities
+
+| Name | Status | Rule |
+|---|---|---|
+| `hr` | internal domain/capability | Control-panel domain only; not a standalone canonical service. |
+| `exchangeprice` | non-canonical standalone service | May exist only as capability/provider logic if explicitly proven and owned. |
+
+## Financial sovereignty
+
+All money-state truth belongs to `wlt`.
+
+No other service may own final truth for:
+
+- wallet balance
+- ledger entries
+- fees
+- commissions
+- refunds
+- settlement
+- reconciliation
+- financial audit
+- payout status
+
+Other services may show financial UI only through documented WLT contracts or read models.
+
+## Canonical naming
+
+Preserve valid names:
+
+- `BThwani`
+- `bthwani-suite`
+- `@bthwani/*`
+- `bthwani2-boop/bthwani-suite`
+
+Forbidden as active target:
+
+- old standalone repo/path/name `bth`
+
+## Source-of-truth categories
+
+| Category | Meaning |
+|---|---|
+| `Canonical` | approved rule or path to follow |
+| `Current` | actual state found in repo |
+| `Legacy` | historical donor/reference |
+| `Temporary` | accepted short-lived state |
+| `TBD` | not proven yet |
+
+## Promotion rule
+
+A fact becomes SSoT only after:
+
+1. Repo evidence or source evidence proves it.
+2. It does not contradict higher-order policy.
+3. It is recorded in the proper governance owner file.
+4. The evidence pack captures the decision.
