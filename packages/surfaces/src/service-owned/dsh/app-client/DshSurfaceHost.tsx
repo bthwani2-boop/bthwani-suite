@@ -1,5 +1,6 @@
 import React from 'react';
-import { BackHandler, Platform, View, Text } from 'react-native';
+import { BackHandler, Platform, View } from 'react-native';
+import { Surface, Text } from '@bthwani/ui-kit';
 import { DshSearchScreen } from './discovery/screens';
 import { DshEntryScreen } from './entry/screens';
 import { DshClientBellScreen } from './bell';
@@ -667,34 +668,34 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   const campaignMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'campaign');
 
   // Sanity check: if any imported screen component is undefined, show a clear error
-  const importedScreens = [
-    ['DshSearchScreen', (DshSearchScreen as unknown) as any],
-    ['DshEntryScreen', (DshEntryScreen as unknown) as any],
-    ['DshAwnakOrderCreateScreen', (DshAwnakOrderCreateScreen as unknown) as any],
-    ['DshHomeGetScreen', (DshHomeGetScreen as unknown) as any],
-    ['DshMySpaceScreen', (DshMySpaceScreen as unknown) as any],
-    ['DshNotificationsScreen', (DshNotificationsScreen as unknown) as any],
-    ['DshBenefitsHubScreen', (DshBenefitsHubScreen as unknown) as any],
-    ['DshOrdersListScreen', (DshOrdersListScreen as unknown) as any],
-    ['DshCreateOrderScreen', (DshCreateOrderScreen as unknown) as any],
-    ['DshIntakeHubScreen', (DshIntakeHubScreen as unknown) as any],
-    ['DshOrderSuccessState', (DshOrderSuccessState as unknown) as any],
-    ['DshTrackingScreen', (DshTrackingScreen as unknown) as any],
-    ['DshDeliveryManagementHubScreen', (DshDeliveryManagementHubScreen as unknown) as any],
-    ['DshSheinOrderCreateScreen', (DshSheinOrderCreateScreen as unknown) as any],
-    ['DshStoreGetScreen', (DshStoreGetScreen as unknown) as any],
-    ['DshStoreItemsScreen', (DshStoreItemsScreen as unknown) as any],
-    ['DshFavoriteToggleScreen', (DshFavoriteToggleScreen as unknown) as any],
-    ['DshFavoritesListScreen', (DshFavoritesListScreen as unknown) as any],
-    ['DshClientBellScreen', (DshClientBellScreen as unknown) as any],
-    ['DshCartGetScreen', (DshCartGetScreen as unknown) as any],
-    ['DshConversationHubScreen', (DshConversationHubScreen as unknown) as any],
-    ['DshOrderIssueHubScreen', (DshOrderIssueHubScreen as unknown) as any],
-    ['DshProxyHubScreen', (DshProxyHubScreen as unknown) as any],
-    ['DshServiceSettingsHubScreen', (DshServiceSettingsHubScreen as unknown) as any],
-    ['DshTrustHubScreen', (DshTrustHubScreen as unknown) as any],
-    ['DshZoneSetScreen', (DshZoneSetScreen as unknown) as any],
-    ['DshListingStatusUpdateScreen', (DshListingStatusUpdateScreen as unknown) as any],
+  const importedScreens: Array<[string, unknown]> = [
+    ['DshSearchScreen', DshSearchScreen as unknown],
+    ['DshEntryScreen', DshEntryScreen as unknown],
+    ['DshAwnakOrderCreateScreen', DshAwnakOrderCreateScreen as unknown],
+    ['DshHomeGetScreen', DshHomeGetScreen as unknown],
+    ['DshMySpaceScreen', DshMySpaceScreen as unknown],
+    ['DshNotificationsScreen', DshNotificationsScreen as unknown],
+    ['DshBenefitsHubScreen', DshBenefitsHubScreen as unknown],
+    ['DshOrdersListScreen', DshOrdersListScreen as unknown],
+    ['DshCreateOrderScreen', DshCreateOrderScreen as unknown],
+    ['DshIntakeHubScreen', DshIntakeHubScreen as unknown],
+    ['DshOrderSuccessState', DshOrderSuccessState as unknown],
+    ['DshTrackingScreen', DshTrackingScreen as unknown],
+    ['DshDeliveryManagementHubScreen', DshDeliveryManagementHubScreen as unknown],
+    ['DshSheinOrderCreateScreen', DshSheinOrderCreateScreen as unknown],
+    ['DshStoreGetScreen', DshStoreGetScreen as unknown],
+    ['DshStoreItemsScreen', DshStoreItemsScreen as unknown],
+    ['DshFavoriteToggleScreen', DshFavoriteToggleScreen as unknown],
+    ['DshFavoritesListScreen', DshFavoritesListScreen as unknown],
+    ['DshClientBellScreen', DshClientBellScreen as unknown],
+    ['DshCartGetScreen', DshCartGetScreen as unknown],
+    ['DshConversationHubScreen', DshConversationHubScreen as unknown],
+    ['DshOrderIssueHubScreen', DshOrderIssueHubScreen as unknown],
+    ['DshProxyHubScreen', DshProxyHubScreen as unknown],
+    ['DshServiceSettingsHubScreen', DshServiceSettingsHubScreen as unknown],
+    ['DshTrustHubScreen', DshTrustHubScreen as unknown],
+    ['DshZoneSetScreen', DshZoneSetScreen as unknown],
+    ['DshListingStatusUpdateScreen', DshListingStatusUpdateScreen as unknown],
   ];
 
   const missing = importedScreens.filter(([, v]) => typeof v === 'undefined').map(([n]) => String(n));
@@ -1224,4 +1225,3 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
 }
 
 export default DshSurfaceHost;
-
