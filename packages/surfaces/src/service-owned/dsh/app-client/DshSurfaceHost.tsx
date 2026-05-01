@@ -28,7 +28,7 @@ import {
 } from './stores/fixtures';
 import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../shared/marketing/banner-store';
 import { getLiveMarketingGrowthItems } from '../shared/marketing/growth-store';
-import { getDshClientStateMeta } from './shared/dshClientStateModel';
+import { getDshClientStateMeta, type DshClientState } from './shared/dshClientStateModel';
 // checkout/tracking screens consolidated into checkout/screens
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './categories/fixtures/dshCategoriesFixtures';
 import { dshPartnerIntakeItems } from '../shared/partners/workflow';
@@ -87,6 +87,15 @@ type CreateOrderValues = {
   note: string;
 };
 
+type HostOrderSummary = {
+  id: string;
+  title: string;
+  subtitle: string;
+  statusLabel: string;
+  meta: string;
+  clientState: DshClientState;
+};
+
 type PublishedCategoryItem = {
   id: string;
   label: string;
@@ -142,30 +151,100 @@ const initialCreateOrderValues: CreateOrderValues = {
   note: 'لا توجد ملاحظات',
 };
 
-const initialOrders = [
-  {
-    id: 'dsh-10021',
-    title: 'Order #10021',
-    subtitle: 'Hadda to Bab Al-Yemen',
-    statusLabel: 'In transit',
-    meta: 'ETA 18 min',
-  },
-  {
-    id: 'dsh-10019',
-    title: 'Order #10019',
-    subtitle: 'Sabeen to Tahrir',
-    statusLabel: 'Delivered',
-    meta: 'Today 03:10 PM',
-  },
-];
-
 const hostClientStates = {
   cartEmpty: 'cart_empty',
   cartReady: 'cart_ready',
   checkoutReady: 'checkout_ready',
+  paymentPending: 'payment_pending',
+  orderCreated: 'order_created',
   orderConfirmed: 'order_confirmed',
   trackingActive: 'tracking_active',
+  delivered: 'delivered',
+  cancelled: 'cancelled',
+  failed: 'failed',
+  refundPending: 'refund_pending',
+  refunded: 'refunded',
+  supportRequired: 'support_required',
+  walletCreditVisible: 'wallet_credit_visible',
+  walletRefundVisible: 'wallet_refund_visible',
 } as const;
+
+const initialOrders: HostOrderSummary[] = [
+  {
+    id: 'dsh-10021',
+    title: 'طلب #10021',
+    subtitle: 'من حدة إلى باب اليمن',
+    statusLabel: getDshClientStateMeta(hostClientStates.trackingActive).label,
+    meta: 'الوصول المتوقع خلال 18 دقيقة',
+    clientState: hostClientStates.trackingActive,
+  },
+  {
+    id: 'dsh-10019',
+    title: 'طلب #10019',
+    subtitle: 'من السبعين إلى التحرير',
+    statusLabel: getDshClientStateMeta(hostClientStates.delivered).label,
+    meta: 'اليوم 03:10 م',
+    clientState: hostClientStates.delivered,
+  },
+  {
+    id: 'dsh-10017',
+    title: 'طلب #10017',
+    subtitle: 'من شميلة إلى التحرير',
+    statusLabel: getDshClientStateMeta(hostClientStates.cancelled).label,
+    meta: 'تم الإلغاء مع توضيح سبب الحالة',
+    clientState: hostClientStates.cancelled,
+  },
+  {
+    id: 'dsh-10016',
+    title: 'طلب #10016',
+    subtitle: 'من مذبح إلى باب السلام',
+    statusLabel: getDshClientStateMeta(hostClientStates.failed).label,
+    meta: 'توجد حاجة إلى مسار تعافٍ أو دعم واضح',
+    clientState: hostClientStates.failed,
+  },
+  {
+    id: 'dsh-10015',
+    title: 'طلب #10015',
+    subtitle: 'من السنينة إلى سعوان',
+    statusLabel: getDshClientStateMeta(hostClientStates.refundPending).label,
+    meta: 'الاسترداد ما يزال قيد المعالجة',
+    clientState: hostClientStates.refundPending,
+  },
+  {
+    id: 'dsh-10014',
+    title: 'طلب #10014',
+    subtitle: 'من التحرير إلى الجامعة',
+    statusLabel: getDshClientStateMeta(hostClientStates.refunded).label,
+    meta: 'تم تثبيت الأثر المالي النهائي للطلب',
+    clientState: hostClientStates.refunded,
+  },
+  {
+    id: 'dsh-10013',
+    title: 'طلب #10013',
+    subtitle: 'من الحصبة إلى بيت بوس',
+    statusLabel: getDshClientStateMeta(hostClientStates.supportRequired).label,
+    meta: 'هذه الحالة تحتاج متابعة دعم واضحة',
+    clientState: hostClientStates.supportRequired,
+  },
+  {
+    id: 'dsh-10012',
+    title: 'طلب #10012',
+    subtitle: 'من فج عطان إلى السبعين',
+    statusLabel: getDshClientStateMeta(hostClientStates.walletCreditVisible).label,
+    meta: 'يوجد رصيد ظاهر للعميل داخل المحفظة',
+    clientState: hostClientStates.walletCreditVisible,
+  },
+  {
+    id: 'dsh-10011',
+    title: 'طلب #10011',
+    subtitle: 'من باب اليمن إلى حدة',
+    statusLabel: getDshClientStateMeta(hostClientStates.walletRefundVisible).label,
+    meta: 'تظهر معلومة الاسترداد المالي ضمن المسار',
+    clientState: hostClientStates.walletRefundVisible,
+  },
+];
+
+const defaultTrackingOrderId = initialOrders[0]?.id ?? 'dsh-10021';
 
 
 function commandTargetToRoute(target: DshCommandTarget): DshRoute {
@@ -260,12 +339,16 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
   const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
   const [createOrderValues, setCreateOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
+  const [checkoutClientState, setCheckoutClientState] = React.useState<DshClientState>(hostClientStates.checkoutReady);
+  const [successClientState, setSuccessClientState] = React.useState<DshClientState>(hostClientStates.orderCreated);
+  const [trackingClientState, setTrackingClientState] = React.useState<DshClientState>(hostClientStates.trackingActive);
   const [ordersQuery, setOrdersQuery] = React.useState('');
   const [storesQuery, setStoresQuery] = React.useState('');
   const [itemsQuery, setItemsQuery] = React.useState('');
   const [itemsCategory, setItemsCategory] = React.useState('all');
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
   const [selectedItemId, setSelectedItemId] = React.useState<string>('');
+  const [selectedOrderId, setSelectedOrderId] = React.useState<string>(defaultTrackingOrderId);
   const [favoriteOverrides, setFavoriteOverrides] = React.useState<Record<string, boolean>>({});
   const [storeItemsEntryOrigin, setStoreItemsEntryOrigin] = React.useState<'home' | 'store-get'>('home');
   const [selectedOperationScreen, setSelectedOperationScreen] = React.useState<ClientOperationScreenId>('checkout-gate');
@@ -273,7 +356,19 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   const routeTransitionFromBackRef = React.useRef(false);
 
   React.useEffect(() => {
-    setRoute(commandTargetToRoute(command.target));
+    const nextRoute = commandTargetToRoute(command.target);
+
+    if (nextRoute === 'create-order') {
+      setCheckoutClientState(hostClientStates.checkoutReady);
+      setSuccessClientState(hostClientStates.orderCreated);
+    }
+
+    if (nextRoute === 'tracking') {
+      setSelectedOrderId(defaultTrackingOrderId);
+      setTrackingClientState(hostClientStates.trackingActive);
+    }
+
+    setRoute(nextRoute);
   }, [command]);
 
   React.useEffect(() => {
@@ -337,19 +432,24 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     });
   }, [storesQuery]);
 
+  const activeTrackedOrder = React.useMemo(
+    () => initialOrders.find((order) => order.id === selectedOrderId) ?? initialOrders[0],
+    [selectedOrderId],
+  );
+
   const reviewBlocks = React.useMemo(
     () => ({
       route: [
-        { id: 'pickup', label: 'Pickup', value: createOrderValues.pickupAddress || 'Not provided' },
-        { id: 'dropoff', label: 'Dropoff', value: createOrderValues.dropoffAddress || 'Not provided' },
+        { id: 'pickup', label: 'الاستلام', value: createOrderValues.pickupAddress || 'غير محدد' },
+        { id: 'dropoff', label: 'التسليم', value: createOrderValues.dropoffAddress || 'غير محدد' },
       ],
       contact: [
-        { id: 'name', label: 'Contact name', value: createOrderValues.contactName || 'Not provided' },
-        { id: 'phone', label: 'Contact phone', value: createOrderValues.contactPhone || 'Not provided' },
+        { id: 'name', label: 'اسم جهة التواصل', value: createOrderValues.contactName || 'غير محدد' },
+        { id: 'phone', label: 'جوال جهة التواصل', value: createOrderValues.contactPhone || 'غير محدد' },
       ],
       pricing: [
-        { id: 'base', label: 'Delivery fee', value: '22 YER' },
-        { id: 'eta', label: 'Estimated time', value: '25 min' },
+        { id: 'base', label: 'رسوم التوصيل', value: '22 ر.ي' },
+        { id: 'eta', label: 'الوقت المتوقع', value: '25 دقيقة' },
       ],
     }),
     [createOrderValues],
@@ -366,6 +466,52 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
 
   const handleCreateOrderChange = React.useCallback((field: keyof CreateOrderValues, value: string) => {
     setCreateOrderValues((current) => ({ ...current, [field]: value }));
+  }, []);
+
+  const openCreateOrderJourney = React.useCallback(() => {
+    setCheckoutClientState(hostClientStates.checkoutReady);
+    setSuccessClientState(hostClientStates.orderCreated);
+    setRoute('create-order');
+  }, []);
+
+  const openTrackedOrder = React.useCallback((orderId?: string) => {
+    const nextOrder = initialOrders.find((order) => order.id === orderId) ?? initialOrders[0];
+
+    setSelectedOrderId(nextOrder.id);
+    setTrackingClientState(nextOrder.clientState);
+    setRoute('tracking');
+  }, []);
+
+  const openSupportFlow = React.useCallback(() => {
+    setSelectedOperationScreen('order-issue-flag');
+    setRoute('order-issue-workspace');
+  }, []);
+
+  const handleCreateOrderContinue = React.useCallback(() => {
+    if (checkoutClientState === hostClientStates.checkoutReady) {
+      setCheckoutClientState(hostClientStates.paymentPending);
+      return;
+    }
+
+    if (checkoutClientState === hostClientStates.paymentPending) {
+      setCheckoutClientState(hostClientStates.orderCreated);
+      setSuccessClientState(hostClientStates.orderCreated);
+      setRoute('success');
+      return;
+    }
+
+    if (checkoutClientState === hostClientStates.orderCreated || checkoutClientState === hostClientStates.orderConfirmed) {
+      setSuccessClientState(checkoutClientState);
+      setRoute('success');
+    }
+  }, [checkoutClientState]);
+
+  const handleSuccessNext = React.useCallback(() => {
+    setCheckoutClientState(hostClientStates.orderConfirmed);
+    setSuccessClientState(hostClientStates.orderConfirmed);
+    setSelectedOrderId(defaultTrackingOrderId);
+    setTrackingClientState(hostClientStates.trackingActive);
+    setRoute('tracking');
   }, []);
 
   const openOperationDirectory = React.useCallback(() => {
@@ -399,21 +545,27 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     }
 
     if (createTargets.includes(screenId)) {
-      setRoute(screenId === 'order-create' ? 'create-order' : 'intake-workspace');
+      if (screenId === 'order-create') {
+        openCreateOrderJourney();
+        return;
+      }
+
+      setRoute('intake-workspace');
       return;
     }
 
     if (checkoutTargets.includes(screenId)) {
-      setRoute('create-order');
+      openCreateOrderJourney();
       return;
     }
 
     if (deliveryTargets.includes(screenId)) {
-      setRoute(
-        screenId === 'delivery-attempt-create' || screenId === 'delivery-attempts-list' || screenId === 'delivery-close' || screenId === 'delivery-reassign'
-          ? 'delivery-management-workspace'
-          : 'tracking',
-      );
+      if (screenId === 'delivery-attempt-create' || screenId === 'delivery-attempts-list' || screenId === 'delivery-close' || screenId === 'delivery-reassign') {
+        setRoute('delivery-management-workspace');
+        return;
+      }
+
+      openTrackedOrder();
       return;
     }
 
@@ -433,7 +585,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     }
 
     if (reviewTargets.includes(screenId)) {
-      setRoute('create-order');
+      openCreateOrderJourney();
       return;
     }
 
@@ -488,7 +640,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     }
 
     setRoute('orders-list');
-  }, []);
+  }, [openCreateOrderJourney, openTrackedOrder]);
 
   const activeStore = React.useMemo(
     () => dshDiscoveryStores.find((store) => store.id === activeStoreId) ?? dshDiscoveryStores[0],
@@ -549,7 +701,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   if (missing.length > 0) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 12 }}>Missing components</Text>
+        <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 12 }}>مكوّنات مفقودة</Text>
         <Text style={{ color: 'white' }}>{missing.join(', ')}</Text>
       </View>
     );
@@ -577,8 +729,8 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
           badgeLabel: item.family === 'subscription' ? 'اشتراك' : item.family === 'promotion' ? 'برومو' : item.family === 'shorts' ? 'شورتات' : 'حملة',
         }))}
         onOpenOrders={() => setRoute('orders-list')}
-        onOpenTracking={() => setRoute('tracking')}
-        onRepeatOrder={() => setRoute('create-order')}
+        onOpenTracking={() => openTrackedOrder()}
+        onRepeatOrder={openCreateOrderJourney}
         onBack={() => setRoute('home')}
         onRetry={() => setRoute('my-space')}
       />
@@ -592,7 +744,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
           setSelectedOperationScreen('subscription-sync');
           setRoute('benefits');
         }}
-        onOpenTracking={() => setRoute('tracking')}
+        onOpenTracking={() => openTrackedOrder()}
         onOpenOrders={() => setRoute('orders-list')}
         onOpenSearch={() => setRoute('search')}
         onBack={() => setRoute('home')}
@@ -639,7 +791,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
         }}
         onBack={() => setRoute('home')}
         onRetry={() => setRoute('store-get')}
-        onSupport={openOperationDirectory}
+        onSupport={openSupportFlow}
       />
     );
   }
@@ -708,8 +860,8 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
         statusDescription={cartClientStateMeta.description}
         onOpenStore={() => setRoute('store-get')}
         onOpenService={onOpenService}
-        onOpenOrder={() => setRoute('create-order')}
-        onContinue={() => setRoute('create-order')}
+        onOpenOrder={openCreateOrderJourney}
+        onContinue={openCreateOrderJourney}
         onRetry={() => setRoute('cart-get')}
       />
       );
@@ -776,11 +928,11 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   if (route === 'create-order') {
     return (
       <DshCreateOrderScreen
-        clientState={hostClientStates.checkoutReady}
+        clientState={checkoutClientState}
         values={createOrderValues}
         timeline={trackingTimeline}
         onChange={handleCreateOrderChange}
-        onContinue={() => setRoute('create-order')}
+        onContinue={handleCreateOrderContinue}
         onBack={() => setRoute('cart-get')}
       />
     );
@@ -790,7 +942,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     return (
       <DshAwnakOrderCreateScreen
         onBack={openOperationDirectory}
-        onContinue={() => setRoute('create-order')}
+        onContinue={openCreateOrderJourney}
       />
     );
   }
@@ -811,7 +963,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
       <DshCreateOrderScreen
         screenId={selectedOperationScreen as 'checkout-gate' | 'estimate-get' | 'pricing-preview' | 'pricing-snapshot-get' | 'promo-apply'}
         clientState={hostClientStates.checkoutReady}
-        onPrimaryAction={() => setRoute('create-order')}
+        onPrimaryAction={openCreateOrderJourney}
         onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('checkout-workspace')}
       />
@@ -855,7 +1007,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     return (
       <DshDeliveryManagementHubScreen
         screenId={selectedOperationScreen as 'delivery-attempt-create' | 'delivery-attempts-list' | 'delivery-close' | 'delivery-reassign'}
-        onPrimaryAction={() => setRoute('tracking')}
+        onPrimaryAction={() => openTrackedOrder()}
         onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('delivery-management-workspace')}
       />
@@ -928,7 +1080,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   }
 
   if (route === 'success') {
-    return <DshOrderSuccessState clientState={hostClientStates.orderConfirmed} onNext={() => setRoute('tracking')} />;
+    return <DshOrderSuccessState clientState={successClientState} onNext={handleSuccessNext} />;
   }
 
   if (route === 'operations-directory') {
@@ -953,7 +1105,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
         items={filteredOrders}
         query={ordersQuery}
         onQueryChange={setOrdersQuery}
-        onOpenOrder={() => setRoute('tracking')}
+        onOpenOrder={openTrackedOrder}
       />
     );
   }
@@ -962,11 +1114,12 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     return (
       <DshTrackingScreen
         values={createOrderValues}
-        clientState={hostClientStates.trackingActive}
-        timeline={trackingTimeline}
+        clientState={trackingClientState}
+        currentStatusLabel={activeTrackedOrder?.statusLabel}
+        timeline={trackingClientState === hostClientStates.trackingActive || trackingClientState === hostClientStates.delivered ? trackingTimeline : []}
         onBell={() => setRoute('bell')}
-        onSupport={openOperationDirectory}
-        onRetry={() => setRoute('tracking')}
+        onSupport={openSupportFlow}
+        onRetry={() => openTrackedOrder(activeTrackedOrder?.id)}
         onNextAction={() => setRoute('orders-list')}
       />
     );
@@ -975,9 +1128,9 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   if (route === 'bell') {
     return (
       <DshClientBellScreen
-        onOpenTracking={() => setRoute('tracking')}
+        onOpenTracking={() => openTrackedOrder(activeTrackedOrder?.id)}
         onOpenOrders={() => setRoute('orders-list')}
-        onBack={() => setRoute('tracking')}
+        onBack={() => openTrackedOrder(activeTrackedOrder?.id)}
         onRetry={() => setRoute('bell')}
       />
     );
@@ -1048,7 +1201,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
       onOpenFavorites={() => setRoute('favorites-list')}
       onOpenSearch={() => setRoute('search')}
       onOpenOrders={() => setRoute('orders-list')}
-      onOpenTracking={() => setRoute('tracking')}
+      onOpenTracking={() => openTrackedOrder()}
       onOpenSheinInfo={() => {
         setSheinInlineOpen(true);
         setRoute('home');

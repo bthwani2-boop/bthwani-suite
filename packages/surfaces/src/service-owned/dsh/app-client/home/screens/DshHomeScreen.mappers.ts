@@ -46,6 +46,34 @@ function resolveDefaultPromoAccentColor(index: number) {
   return defaultPromoAccentColors[index] ?? colorPalette.success;
 }
 
+function normalizeDiscoveryStatusLabel(statusLabel: string) {
+  const normalized = statusLabel.trim().toLowerCase();
+
+  if (normalized.includes('open') || normalized.includes('مفتوح')) {
+    return 'مفتوح';
+  }
+
+  if (normalized.includes('busy') || normalized.includes('مشغول')) {
+    return 'مشغول';
+  }
+
+  if (normalized.includes('closed') || normalized.includes('مغلق')) {
+    return 'مغلق';
+  }
+
+  return statusLabel;
+}
+
+function resolveDiscoveryStatusTone(statusLabel: string): 'open' | 'closed' {
+  const normalized = statusLabel.trim().toLowerCase();
+
+  if (normalized.includes('open') || normalized.includes('مفتوح') || normalized.includes('busy') || normalized.includes('مشغول')) {
+    return 'open';
+  }
+
+  return 'closed';
+}
+
 export const defaultCategories: DshHomeCategory[] = [
   ...dshCategoryFixtures.map((category) => ({
     id: category.id,
@@ -113,8 +141,8 @@ export function toDiscoveryStores(featuredStores: DshHomeStore[]): DshHomeGetSto
     id: store.id,
     name: store.name,
     address: store.subtitle,
-    statusLabel: store.statusLabel === 'Open' ? 'مفتوح' : store.statusLabel === 'Busy' ? 'مشغول' : store.statusLabel,
-    statusTone: store.statusLabel === 'Open' ? 'open' : 'closed',
+    statusLabel: normalizeDiscoveryStatusLabel(store.statusLabel),
+    statusTone: resolveDiscoveryStatusTone(store.statusLabel),
     distanceLabel: index === 0 ? '2.1 كم' : index === 1 ? '1.8 كم' : '3.5 كم',
     deliveryLabel: index === 1 ? 'كوبون' : index === 2 ? 'توصيل سريع' : 'توصيل مجاني',
     serviceLabel: index === 1 ? 'استلم بنفسك' : 'بثواني برو',

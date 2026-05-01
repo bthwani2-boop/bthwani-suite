@@ -601,6 +601,7 @@ type CreateOrderJourneyScreenProps = {
   values: CreateOrderValues;
   timeline: DshTrackingTimelineItem[];
   clientState?: DshClientState;
+  onPrimaryAction?: () => void;
   onBack?: () => void;
   onBell?: () => void;
   onSupport?: () => void;
@@ -609,7 +610,7 @@ type CreateOrderJourneyScreenProps = {
   currentStatusLabel?: string;
 };
 
-function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', onBack, onBell, onSupport, onNextAction, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
+function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', onPrimaryAction, onBack, onBell, onSupport, onNextAction, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
   const { theme } = useTheme();
   const [phase, setPhase] = React.useState<JourneyPhase>(initialPhase);
   const [productRating, setProductRating] = React.useState(0);
@@ -633,6 +634,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const orderConfirmedMeta = getDshClientStateMeta('order_confirmed');
   const isDeliveredState = clientState === 'delivered';
   const isTrackingJourneyState = clientState === 'tracking_active' || isDeliveredState;
+  const isCheckoutSequenceState = !isTrackingJourneyState;
   const note = normalizeText(values.note).length ? values.note : 'لا توجد ملاحظات';
   const phaseIndex = phase === 'route' ? 0 : phase === 'arrived' ? 1 : 2;
   const deliveryStatusLabel = isTrackingJourneyState
@@ -740,14 +742,24 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     };
   });
 
-  const primaryActionLabel = phase === 'route'
-    ? 'وصل الطلب للعميل'
-    : phase === 'arrived'
-      ? 'استلم العميل الطلب'
-      : ratingsSubmitted
-        ? 'تم إرسال التقييمين'
-        : 'إرسال التقييمين';
-  const primaryActionDisabled = phase === 'received' && (!canSubmitRatings || ratingsSubmitted);
+  const primaryActionLabel = isCheckoutSequenceState
+    ? clientState === 'checkout_ready'
+      ? 'متابعة الدفع'
+      : clientState === 'payment_pending'
+        ? 'تأكيد إنشاء الطلب'
+        : clientState === 'order_created'
+          ? 'عرض نجاح الطلب'
+          : clientState === 'order_confirmed'
+            ? 'فتح التتبع'
+            : 'متابعة'
+    : phase === 'route'
+      ? 'وصل الطلب للعميل'
+      : phase === 'arrived'
+        ? 'استلم العميل الطلب'
+        : ratingsSubmitted
+          ? 'تم إرسال التقييمين'
+          : 'إرسال التقييمين';
+  const primaryActionDisabled = isCheckoutSequenceState ? false : phase === 'received' && (!canSubmitRatings || ratingsSubmitted);
   const productHelperText = phase === 'route'
     ? 'سيظهر تقييم المنتج بعد الاستلام.'
     : phase === 'arrived'
@@ -762,13 +774,23 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     : ratingsSubmitted
       ? 'تم إرسال التقييمين. يمكنك تعديل الكابتن ثم إعادة الإرسال.'
       : 'اختر تقييم الكابتن من 1 إلى 5 ثم أرسل التقييمين بالأسفل.';
-  const stickyNote = phase === 'route'
-    ? 'يمكنك تثبيت الوصول من الزر الرئيسي عند وصول الطلب.'
-    : phase === 'arrived'
-      ? 'ثبّت الاستلام لتظهر التقييمات داخل نفس الصفحة.'
-      : ratingsSubmitted
-        ? 'تم حفظ التقييمين ولا توجد خطوة إضافية مطلوبة.'
-        : 'لن يتفعّل الإرسال حتى تختار تقييم المنتج والكابتن.';
+  const stickyNote = isCheckoutSequenceState
+    ? clientState === 'checkout_ready'
+      ? 'راجع تفاصيل الطلب ثم تابع إلى خطوة الدفع التالية.'
+      : clientState === 'payment_pending'
+        ? 'الدفع قيد المعالجة. الإجراء الرئيسي ينقل الطلب إلى حالة الإنشاء المؤكد.'
+        : clientState === 'order_created'
+          ? 'تم إنشاء الطلب. الإجراء الرئيسي يعرض حالة النجاح قبل فتح التتبع.'
+          : clientState === 'order_confirmed'
+            ? 'تم تأكيد الطلب. الإجراء الرئيسي يفتح التتبع بالحالة المناسبة.'
+            : clientStateMeta.description
+    : phase === 'route'
+      ? 'يمكنك تثبيت الوصول من الزر الرئيسي عند وصول الطلب.'
+      : phase === 'arrived'
+        ? 'ثبّت الاستلام لتظهر التقييمات داخل نفس الصفحة.'
+        : ratingsSubmitted
+          ? 'تم حفظ التقييمين ولا توجد خطوة إضافية مطلوبة.'
+          : 'لن يتفعّل الإرسال حتى تختار تقييم المنتج والكابتن.';
   const runtimeBottomInset = Platform.OS === 'android'
     ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
     : safeArea.comfortable;
@@ -790,6 +812,11 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   };
 
   const handlePrimaryAction = () => {
+    if (isCheckoutSequenceState) {
+      onPrimaryAction?.();
+      return;
+    }
+
     if (phase === 'route') {
       setPhase('arrived');
       return;
@@ -829,13 +856,17 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     setDraftAttachments([]);
   };
 
-  const secondaryAction = phase === 'route' && onBell
-    ? { label: 'جرس الوصول', onPress: onBell, tone: 'secondary' as const }
-    : phase === 'received' && onSupport
-      ? { label: 'الدعم أو الإبلاغ عن مشكلة', onPress: onSupport, tone: 'secondary' as const }
-    : onBack
-      ? { label: phase === 'route' ? 'تعديل الطلب' : 'العودة', onPress: onBack, tone: 'secondary' as const }
-      : undefined;
+  const secondaryAction = isCheckoutSequenceState
+    ? onBack
+      ? { label: 'العودة إلى السلة', onPress: onBack, tone: 'secondary' as const }
+      : undefined
+    : phase === 'route' && onBell
+      ? { label: 'جرس الوصول', onPress: onBell, tone: 'secondary' as const }
+      : phase === 'received' && onSupport
+        ? { label: 'الدعم أو الإبلاغ عن مشكلة', onPress: onSupport, tone: 'secondary' as const }
+        : onBack
+          ? { label: phase === 'route' ? 'تعديل الطلب' : 'العودة', onPress: onBack, tone: 'secondary' as const }
+          : undefined;
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
@@ -1154,7 +1185,16 @@ export function DshCreateOrderScreen({
     return renderCheckoutGate(screenId, state, clientState, onPrimaryAction, onSecondaryAction, onRetry);
   }
 
-  return <CreateOrderJourneyScreen values={values} timeline={timeline} clientState={clientState} initialPhase="route" onBack={onBack ?? onSecondaryAction} />;
+  return (
+    <CreateOrderJourneyScreen
+      values={values}
+      timeline={timeline}
+      clientState={clientState}
+      initialPhase="route"
+      onPrimaryAction={onContinue ?? onPrimaryAction}
+      onBack={onBack ?? onSecondaryAction}
+    />
+  );
 }
 
 export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspace', onPrimaryAction, onSecondaryAction, onRetry }: DshIntakeHubScreenProps) {

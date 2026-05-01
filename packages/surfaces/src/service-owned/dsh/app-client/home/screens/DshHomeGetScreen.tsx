@@ -363,33 +363,23 @@ function resolveTickerBanner(
   now: Date,
   recentOrders: DshHomeRecentOrder[],
   locationLabel: string,
-  languageCode: string,
 ) {
   const isOpen = isWithinOperatingHours(now, 8, 23);
   const tickerLines: string[] = [];
-  const isEnglish = languageCode === 'en';
-  const statusLabel = isOpen ? (isEnglish ? 'Live' : 'مباشر') : (isEnglish ? 'Closed' : 'مغلق');
+  const statusLabel = isOpen ? 'مباشر' : 'مغلق';
 
   if (locationLabel.trim()) {
-    tickerLines.push(
-      isEnglish
-        ? `Delivering to ${locationLabel.trim()}`
-        : `التوصيل إلى ${locationLabel.trim()}`,
-    );
+    tickerLines.push(`التوصيل إلى ${locationLabel.trim()}`);
   }
 
   recentOrders.slice(0, 2).forEach((order, index) => {
-    tickerLines.push(
-      isEnglish
-        ? `${index === 0 ? 'Active order' : 'Recent order'}: ${order.subtitle} · ${order.meta}`
-        : `${index === 0 ? 'الطلب النشط' : 'طلب سابق'}: ${order.subtitle} · ${order.meta}`,
-    );
+    tickerLines.push(`${index === 0 ? 'الطلب النشط' : 'طلب سابق'}: ${order.subtitle} · ${order.meta}`);
   });
 
   return {
     isOpen,
     statusLabel,
-    message: tickerLines.length ? tickerLines.join('   •   ') : isEnglish ? 'Browse stores and active orders' : 'استعرض المتاجر والطلبات النشطة',
+    message: tickerLines.length ? tickerLines.join('   •   ') : 'استعرض المتاجر والطلبات النشطة',
   };
 }
 
@@ -403,7 +393,7 @@ function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>,
       <StateView
         stateId="empty"
         title="لا توجد بيانات عرض بعد"
-        description="أعد المحاولة لاستعادة واجهة DSH الرئيسية واختصاراتها."
+        description="أعد المحاولة لاستعادة الواجهة الرئيسية واختصاراتها."
         actionLabel="إعادة المحاولة"
         onActionPress={onRetry}
       />
@@ -849,8 +839,8 @@ export function DshHomeGetScreen({
     onPress: resolveBannerPress(promo),
   }));
   const tickerState = React.useMemo(
-    () => resolveTickerBanner(currentTime, resolvedRecentOrders, uiText.topBar.location, currentLanguage),
-    [currentLanguage, currentTime, resolvedRecentOrders, uiText.topBar.location]
+    () => resolveTickerBanner(currentTime, resolvedRecentOrders, uiText.topBar.location),
+    [currentTime, resolvedRecentOrders, uiText.topBar.location]
   );
   const openInlineSearch = React.useCallback(() => {
     setInlineSearchVisible(true);
@@ -928,8 +918,8 @@ export function DshHomeGetScreen({
           onClose={closeInlineSearch}
           variant="main"
           autoFocus
-          placeholder="ابحث عن متجر أو فئة داخل DSH"
-          hint="بحث عام سريع داخل تجربة DSH الحالية للوصول إلى المتاجر والمسارات بدون مغادرة الصفحة."
+          placeholder="ابحث عن متجر أو فئة داخل الواجهة الحالية"
+          hint="بحث عام سريع داخل التجربة الحالية للوصول إلى المتاجر والمسارات بدون مغادرة الصفحة."
           style={styles.brandTopBarShell}
         />
       ) : (
@@ -992,7 +982,7 @@ export function DshHomeGetScreen({
       >
         {inlineSearchVisible ? (
           <Surface tone="raised" padding={3} gap={2}>
-            <Text role="titleSm">نتائج البحث داخل DSH</Text>
+            <Text role="titleSm">نتائج البحث داخل الواجهة الحالية</Text>
             <Text role="bodySm" tone="muted">
               {inlineSearchQuery.trim()
                 ? `يتم الآن تصفية المتاجر والمسارات المتاحة حسب: ${inlineSearchQuery}`

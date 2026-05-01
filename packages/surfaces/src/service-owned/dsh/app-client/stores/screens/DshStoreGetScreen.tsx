@@ -24,6 +24,7 @@ import { BannerCarousel, Button, Chip, Icon, SearchTopBar, TopBar, StateView, Te
 import { dshCategoryMeasurementPolicies } from '../../../shared/catalog/catalog';
 import { formatDshStoreFollowersLabel } from '../../shared/store-profile';
 import { resolveDshImageSource } from '../../shared/resolve-image-source';
+import { getDshClientStateMeta, type DshClientState } from '../../shared/dshClientStateModel';
 import { type DshStoreMenuItem as DshStoreGetMenuItem } from '../types';
 import { mapMenuItemToProductCard } from '../adapters/mapMenuItemToProductCard';
 
@@ -61,6 +62,8 @@ export type DshStoreGetScreenProps = {
 };
 
 type DeliveryMode = 'delivery' | 'pickup' | 'store_delivery';
+
+type DshStoreOperationalState = Extract<DshClientState, 'store_open' | 'store_closed' | 'area_unserviceable'>;
 
 function getDeliveryModes(storeText: ReturnType<typeof useUiText>['storeScreen']): Array<{
   id: DeliveryMode;
@@ -200,8 +203,33 @@ function normalizeDisplayText(value?: string) {
     .trim();
 }
 
+function resolveStoreOperationalState(statusLabel: string, deliveryLabel?: string, serviceLabel?: string): DshStoreOperationalState {
+  const normalized = [statusLabel, deliveryLabel, serviceLabel]
+    .filter(Boolean)
+    .join(' ')
+    .trim()
+    .toLowerCase();
+
+  if (
+    normalized.includes('area_unserviceable')
+    || normalized.includes('unserviceable')
+    || normalized.includes('outside coverage')
+    || normalized.includes('خارج التغطية')
+    || normalized.includes('خارج النطاق')
+    || normalized.includes('غير مخدوم')
+  ) {
+    return 'area_unserviceable';
+  }
+
+  if (normalized.includes('closed') || normalized.includes('مغلق')) {
+    return 'store_closed';
+  }
+
+  return 'store_open';
+}
+
 function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType | undefined {
-  return resolveDshImageSource(item.mediaKey ?? item.imageUri);
+  return resolveDshImageSource(item.imageUri);
 }
 
 function resolveDshStoreCoverImageSource(store?: DshStoreGetScreenProps['store']): ImageSourcePropType | undefined {
@@ -975,6 +1003,13 @@ export function DshStoreGetScreen({
   const normalizedStoreName = normalizeDisplayText(store.name);
   const normalizedStoreSubtitle = normalizeDisplayText(store.subtitle);
   const normalizedEtaLabel = normalizeDisplayText(store.etaLabel);
+  const operationalState = React.useMemo(
+    () => resolveStoreOperationalState(store.statusLabel, store.deliveryLabel, store.serviceLabel),
+    [store.deliveryLabel, store.serviceLabel, store.statusLabel],
+  );
+  const operationalStateMeta = React.useMemo(() => getDshClientStateMeta(operationalState), [operationalState]);
+  const showOperationalNotice = operationalState !== 'store_open';
+  const supportActionLabel = operationalState === 'area_unserviceable' ? 'تحديث العنوان أو طلب الدعم' : 'طلب الدعم';
   const handleStoreShare = React.useCallback(async () => {
     try {
       await Share.share({
@@ -1264,6 +1299,27 @@ export function DshStoreGetScreen({
                   </View>
 
                   <View style={styles.deliveryControlCluster}>
+                    {showOperationalNotice ? (
+                      <View
+                        style={[
+                          styles.storeStateNotice,
+                          operationalState === 'area_unserviceable' ? styles.storeStateNoticeDanger : styles.storeStateNoticeWarning,
+                        ]}
+                      >
+                        <View style={styles.storeStateNoticeCopy}>
+                          <Text style={[styles.storeStateNoticeTitle, isRTL && styles.textAlignRight]}>{operationalStateMeta.title}</Text>
+                          <Text style={[styles.storeStateNoticeDescription, isRTL && styles.textAlignRight]}>
+                            {operationalStateMeta.description}
+                          </Text>
+                        </View>
+                        {onSupport ? (
+                          <View style={styles.storeStateNoticeAction}>
+                            <Button label={supportActionLabel} tone="secondary" onPress={onSupport} />
+                          </View>
+                        ) : null}
+                      </View>
+                    ) : null}
+
                     <View style={styles.modeStripWrapInline}>
                       <View style={[styles.modeStrip, isRTL && styles.rowReverse]}>
                         {deliveryModes.map((mode) => (
@@ -1484,7 +1540,7 @@ export function DshStoreGetScreen({
 
                   {previewPartnerBadge}
 
-                  <Text style={styles.previewEmoji} pointerEvents="none">{getItemEmoji(previewItem!)}</Text>
+                  <Text style={styles.previewEmoji}>{getItemEmoji(previewItem!)}</Text>
 
                   <Image
                     source={resolveDshStoreMenuItemImageSource(previewItem!)}
@@ -2037,6 +2093,39 @@ const styles = StyleSheet.create({
   deliveryControlCluster: {
     marginTop: 2,
     gap: 4,
+  },
+  storeStateNotice: {
+    borderRadius: 18,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    gap: 10,
+  },
+  storeStateNoticeWarning: {
+    backgroundColor: '#fff7ed',
+    borderColor: '#fed7aa',
+  },
+  storeStateNoticeDanger: {
+    backgroundColor: '#fff7ed',
+    borderColor: '#fdba74',
+  },
+  storeStateNoticeCopy: {
+    gap: 4,
+    alignItems: 'flex-end',
+  },
+  storeStateNoticeTitle: {
+    color: stylesTokens.dark,
+    fontSize: 13,
+    fontWeight: '900',
+    lineHeight: 18,
+  },
+  storeStateNoticeDescription: {
+    color: stylesTokens.muted,
+    fontSize: 11.5,
+    lineHeight: 17,
+  },
+  storeStateNoticeAction: {
+    alignSelf: 'stretch',
   },
   smartRailSection: {
     marginTop: 0,
