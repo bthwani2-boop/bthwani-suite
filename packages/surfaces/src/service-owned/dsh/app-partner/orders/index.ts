@@ -1,1 +1,1 @@
-export * from './PartnerOrdersHomeScreen';
+export * from './screens/DshPartnerOrdersScreen';

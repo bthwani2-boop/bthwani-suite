@@ -1,1 +1,1 @@
-export * from './DshEntryScreen';
+export * from './DshPartnerEntryScreen';

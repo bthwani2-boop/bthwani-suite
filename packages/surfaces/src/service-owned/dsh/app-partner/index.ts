@@ -1,9 +1,9 @@
 export * from './surface-meta';
 export * from './surface-catalog';
+export * from './console';
+export * from './entry';
 export * from './orders';
-export * from './entry/screens';
-export * from './inventory-management/screens';
+export * from './inventory';
 export * from './bell';
-export * from './support/screens';
-export * from './PartnerDshConsoleScreen';
+export * from './support';
 
