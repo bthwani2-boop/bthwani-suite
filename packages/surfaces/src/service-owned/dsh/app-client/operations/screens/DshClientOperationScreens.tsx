@@ -83,6 +83,7 @@ type ClientOperationDefinition = {
   badgeLabel: string;
   kind: ClientOperationKind;
   group: ClientOperationGroupId;
+  audience: 'client' | 'internal';
   stageLabel: string;
   primaryOutcome: string;
 };
@@ -93,6 +94,16 @@ type ClientOperationDirectoryGroup = {
   subtitle: string;
   itemIds: ClientOperationScreenId[];
 };
+
+const internalDiagnosticOperationIds: ClientOperationScreenId[] = [
+  'delivery-reassign',
+  'order-accept',
+  'order-complete',
+  'order-escrow-hold',
+  'order-escrow-release',
+  'proxy-request-approve',
+  'proxy-request-reject',
+];
 
 const createCheckoutIds: ClientOperationScreenId[] = [
   'awnak-order-create',
@@ -109,9 +120,7 @@ const createCheckoutIds: ClientOperationScreenId[] = [
 ];
 
 const orderDeliveryIds: ClientOperationScreenId[] = [
-  'order-accept',
   'order-cancel',
-  'order-complete',
   'order-get',
   'order-issue-flag',
   'order-proof-code-generate',
@@ -119,14 +128,11 @@ const orderDeliveryIds: ClientOperationScreenId[] = [
   'order-receipt-get',
   'order-status-get',
   'order-status-update',
-  'order-escrow-hold',
-  'order-escrow-release',
   'delivery-attempt-create',
   'delivery-attempts-list',
   'delivery-close',
   'delivery-eta-get',
   'delivery-get',
-  'delivery-reassign',
   'delivery-track-get',
 ];
 
@@ -148,9 +154,7 @@ const subscriptionLoyaltyIds: ClientOperationScreenId[] = [
 
 const proxyControlIds: ClientOperationScreenId[] = [
   'proxy-request-create',
-  'proxy-request-approve',
   'proxy-request-review',
-  'proxy-request-reject',
   'proxy-request-tracking',
   'service-modes-resolve',
   'listing-status-update',
@@ -304,15 +308,17 @@ function getOperationGroup(screenId: ClientOperationScreenId): ClientOperationGr
 function getOperationDefinition(screenId: ClientOperationScreenId): ClientOperationDefinition {
   const kind = getOperationKind(screenId);
   const group = getOperationGroup(screenId);
+  const audience = internalDiagnosticOperationIds.includes(screenId) ? 'internal' : 'client';
 
   return {
     title: humanizeScreenId(screenId),
-    subtitle: subtitleByKind[kind],
-    badgeLabel: badgeLabelByKind[kind],
+    subtitle: audience === 'internal' ? 'مسار تشخيصي / داخلي غير مخصص كفعل عميل نهائي.' : subtitleByKind[kind],
+    badgeLabel: audience === 'internal' ? 'داخلي' : badgeLabelByKind[kind],
     kind,
     group,
-    stageLabel: stageLabelByKind[kind],
-    primaryOutcome: primaryOutcomeByKind[kind],
+    audience,
+    stageLabel: audience === 'internal' ? 'تشخيص داخلي' : stageLabelByKind[kind],
+    primaryOutcome: audience === 'internal' ? 'هذا المسار تشغيلي/تشخيصي ويجب ألا يظهر كإجراء عميل نهائي داخل الواجهة العميلية.' : primaryOutcomeByKind[kind],
   };
 }
 
@@ -506,7 +512,19 @@ function OperationScreenView({
       state={state}
       title={definition.title}
       subtitle={definition.subtitle}
-      content={buildOperationContent(definition, draftValue, setDraftValue)}
+      content={(
+        <Box gap={3}>
+          {definition.audience === 'internal' ? (
+            <Surface tone="inset" gap={2}>
+              <Text role="bodyStrong">تنبيه تشغيلي</Text>
+              <Text role="bodySm" tone="muted">
+                هذا المسار داخلي/تشخيصي فقط. لا يُمثّل إجراء عميل نهائي ولا يجب اعتباره جزءًا من customer-facing path.
+              </Text>
+            </Surface>
+          ) : null}
+          {buildOperationContent(definition, draftValue, setDraftValue)}
+        </Box>
+      )}
       primaryActionLabel={primaryActionLabel ?? primaryLabelByKind(definition.kind)}
       secondaryActionLabel={secondaryActionLabel ?? 'العودة إلى دليل العمليات'}
       onPrimaryAction={onPrimaryAction}
@@ -523,7 +541,7 @@ function createOperationScreen(screenId: ClientOperationScreenId) {
 }
 
 export function DshClientOperationDirectoryScreen({ onOpenScreen }: { onOpenScreen?: (screenId: ClientOperationScreenId) => void }) {
-  const operationScreenCount = clientOperationScreenIds.length;
+  const operationScreenCount = clientOperationDirectoryGroups.reduce((sum, group) => sum + group.itemIds.length, 0);
 
   return (
     <MobileScrollView padding={4} gap={4}>
@@ -537,6 +555,13 @@ export function DshClientOperationDirectoryScreen({ onOpenScreen }: { onOpenScre
       <Surface tone="brand" gap={3}>
         <StatCard label="القدرات المغطاة" value={String(operationScreenCount)} deltaLabel="مصفوفة عميل داخلية موثقة" tone="info" />
         <StatCard label="نمط التنقل" value="مجمّع" deltaLabel="الإنشاء، التوصيل، المزايا، الوكالة، الإعدادات" tone="success" />
+      </Surface>
+
+      <Surface tone="inset" gap={2}>
+        <Text role="bodyStrong">ضبط التسربات التشغيلية</Text>
+        <Text role="bodySm" tone="muted">
+          المسارات الداخلية/التشخيصية مثل قبول الطلب، إكماله، الحجز المالي، وإعادة الإسناد لم تعد معروضة داخل هذا الدليل customer-facing.
+        </Text>
       </Surface>
 
       {clientOperationDirectoryGroups.map((group) => (

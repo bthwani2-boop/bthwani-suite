@@ -4,10 +4,12 @@ export type DshClientState =
   | 'store_open'
   | 'store_closed'
   | 'area_unserviceable'
+  | 'item_unavailable'
   | 'cart_empty'
   | 'cart_ready'
   | 'checkout_ready'
   | 'payment_pending'
+  | 'payment_failed'
   | 'order_created'
   | 'order_confirmed'
   | 'tracking_active'
@@ -143,6 +145,22 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
     isException: true,
     walletVisible: false,
   },
+  item_unavailable: {
+    state: 'item_unavailable',
+    group: 'exception',
+    label: 'العناصر غير متاحة',
+    title: 'العناصر غير متاحة',
+    description: 'بعض العناصر المطلوبة غير متاحة الآن ويجب إظهار بديل واضح أو إعادة ضبط السلة قبل المتابعة.',
+    visibility: {
+      ...hiddenVisibility,
+      cartVisible: true,
+      checkoutVisible: true,
+      supportVisible: true,
+    },
+    isTerminal: false,
+    isException: true,
+    walletVisible: false,
+  },
   cart_empty: {
     state: 'cart_empty',
     group: 'cart',
@@ -199,6 +217,21 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
     },
     isTerminal: false,
     isException: false,
+    walletVisible: false,
+  },
+  payment_failed: {
+    state: 'payment_failed',
+    group: 'payment',
+    label: 'فشل الدفع',
+    title: 'فشل الدفع',
+    description: 'تعذر تثبيت قرار الدفع ويجب توضيح سبب الفشل مع إبقاء مسار المراجعة والدعم واضحًا.',
+    visibility: {
+      ...hiddenVisibility,
+      checkoutVisible: true,
+      supportVisible: true,
+    },
+    isTerminal: false,
+    isException: true,
     walletVisible: false,
   },
   order_created: {

@@ -30,6 +30,17 @@ import {
 } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../../patterns/screens/DshOperationScreen';
 import { getDshClientStateMeta, type DshClientState } from '../../shared/dshClientStateModel';
+import type {
+  DshClientAddressSnapshot,
+  DshClientDeliveryLifecycleStatus,
+  DshClientEventTimelineItem,
+  DshClientExceptionReason,
+  DshClientFulfillmentModeSnapshot,
+  DshClientHandoffVerification,
+  DshClientProofOfDeliveryVisibility,
+  DshClientServiceabilityQuote,
+  DshClientWalletImpactVisibility,
+} from '../../shared/dshClientBinding.contracts';
 
 type CreateOrderValues = {
   pickupAddress: string;
@@ -121,6 +132,7 @@ export type DshTrackingScreenProps = {
   onSupport?: () => void;
   onRetry?: () => void;
   onNextAction?: () => void;
+  onReorder?: () => void;
 };
 
 export type DshFlowHubScreenProps = {
@@ -512,10 +524,337 @@ function getClientWalletVisibilityCopy(clientStateMeta: ReturnType<typeof getDsh
   return null;
 }
 
+function formatDeliveryLifecycleStatus(status: DshClientDeliveryLifecycleStatus): string {
+  const labels: Record<DshClientDeliveryLifecycleStatus, string> = {
+    quote: 'التسعير والجاهزية',
+    created: 'تم إنشاء الطلب',
+    confirmed: 'تم تأكيد الطلب',
+    partner_accepted: 'قبول الشريك',
+    preparing: 'قيد التجهيز',
+    ready_for_pickup: 'جاهز للاستلام',
+    captain_assigned: 'تم تعيين الكابتن',
+    enroute_to_pickup: 'في الطريق إلى الاستلام',
+    arrived_at_pickup: 'وصل إلى نقطة الاستلام',
+    picked_up: 'تم الاستلام من المتجر',
+    enroute_to_dropoff: 'في الطريق إلى العميل',
+    arrived_at_dropoff: 'وصل إلى العميل',
+    delivered: 'تم التسليم',
+    cancelled: 'تم الإلغاء',
+    failed: 'فشل التنفيذ',
+    returned: 'قيد الإرجاع / الاسترداد',
+    refunded: 'تم الاسترداد',
+  };
+
+  return labels[status];
+}
+
+function formatExceptionReason(reason: DshClientExceptionReason): string {
+  const labels: Record<DshClientExceptionReason, string> = {
+    store_closed: 'المتجر مغلق',
+    item_unavailable: 'العنصر غير متاح',
+    customer_unreachable: 'تعذر الوصول إلى العميل',
+    address_not_found: 'تعذر العثور على العنوان',
+    unable_to_access: 'تعذر الوصول إلى نقطة التسليم',
+    captain_no_show: 'الكابتن لم يحضر',
+    partner_delay: 'تأخر الشريك',
+    payment_failed: 'فشل الدفع',
+    system_outage: 'عطل بالنظام',
+    area_unserviceable: 'المنطقة خارج التغطية',
+    refund_required: 'استرداد مطلوب',
+    return_required: 'إرجاع مطلوب',
+    redispatch_required: 'إعادة إسناد مطلوبة',
+  };
+
+  return labels[reason];
+}
+
+function formatProofType(proofType: DshClientProofOfDeliveryVisibility['proof_type']): string {
+  const labels: Record<DshClientProofOfDeliveryVisibility['proof_type'], string> = {
+    none: 'لا يوجد',
+    photo: 'صورة',
+    signature: 'توقيع',
+    otp: 'OTP',
+    pin: 'PIN',
+    qr: 'QR',
+    barcode: 'Barcode',
+  };
+
+  return labels[proofType];
+}
+
+function formatVerificationResult(result: DshClientProofOfDeliveryVisibility['verification_result']): string {
+  const labels: Record<DshClientProofOfDeliveryVisibility['verification_result'], string> = {
+    not_required: 'غير مطلوب',
+    pending: 'قيد الانتظار',
+    verified: 'تم التحقق',
+    failed: 'فشل التحقق',
+  };
+
+  return labels[result];
+}
+
+function formatFulfillmentMode(mode: DshClientFulfillmentModeSnapshot['mode']): string {
+  const labels: Record<DshClientFulfillmentModeSnapshot['mode'], string> = {
+    instant: 'فوري',
+    scheduled: 'مجدول',
+    pickup: 'استلام من المتجر',
+    partner_delivery: 'توصيل الشريك',
+    bthwani_delivery: 'توصيل بثواني',
+  };
+
+  return labels[mode];
+}
+
+function formatCapacityState(state: DshClientFulfillmentModeSnapshot['capacity_state']): string {
+  const labels: Record<DshClientFulfillmentModeSnapshot['capacity_state'], string> = {
+    available: 'متاح',
+    limited: 'محدود',
+    full: 'ممتلئ',
+    paused: 'متوقف مؤقتًا',
+  };
+
+  return labels[state];
+}
+
+function getDefaultExceptionReason(clientState: DshClientState): DshClientExceptionReason | null {
+  if (clientState === 'store_closed') return 'store_closed';
+  if (clientState === 'area_unserviceable') return 'area_unserviceable';
+  if (clientState === 'item_unavailable') return 'item_unavailable';
+  if (clientState === 'payment_failed') return 'payment_failed';
+  if (clientState === 'cancelled') return 'refund_required';
+  if (clientState === 'failed') return 'redispatch_required';
+  if (clientState === 'refund_pending' || clientState === 'refunded') return 'refund_required';
+  return null;
+}
+
+function buildDefaultServiceabilityQuote(clientState: DshClientState): DshClientServiceabilityQuote {
+  const unavailableReason = getDefaultExceptionReason(clientState);
+  const insideCoverage = clientState !== 'area_unserviceable';
+  const itemsAvailable = clientState !== 'item_unavailable';
+  const storeOpen = clientState !== 'store_closed';
+
+  return {
+    address_valid: clientState !== 'area_unserviceable',
+    inside_coverage: insideCoverage,
+    store_open: storeOpen,
+    items_available: itemsAvailable,
+    delivery_fee: insideCoverage && storeOpen ? 22 : 0,
+    eta_pickup: storeOpen ? '2026-05-01T20:05:00+03:00' : null,
+    eta_dropoff: insideCoverage && itemsAvailable ? '2026-05-01T20:28:00+03:00' : null,
+    quote_expires_at: '2026-05-01T20:15:00+03:00',
+    unavailable_reason: unavailableReason,
+    fallback_fulfillment_method: insideCoverage ? (itemsAvailable ? null : 'pickup') : 'scheduled',
+  };
+}
+
+function buildDefaultAddressSnapshot(values: CreateOrderValues): DshClientAddressSnapshot {
+  return {
+    address_label: values.dropoffAddress || 'غير محدد',
+    pin_adjustment: null,
+    reverse_lookup_label: `${values.pickupAddress || 'الاستلام'} → ${values.dropoffAddress || 'التسليم'}`,
+    delivery_notes: values.note || 'لا توجد ملاحظات',
+    building: 'المدخل الرئيسي',
+    floor: '1',
+    apartment: 'A3',
+    landmark: 'بجوار البوابة الرئيسية',
+    geocode_confidence: 'medium',
+    address_risk_flag: false,
+  };
+}
+
+function buildDefaultFulfillmentModeSnapshot(clientState: DshClientState): DshClientFulfillmentModeSnapshot {
+  return {
+    mode: clientState === 'area_unserviceable' ? 'scheduled' : 'bthwani_delivery',
+    available_windows: [
+      { start_at: '2026-05-01T20:00:00+03:00', end_at: '2026-05-01T20:45:00+03:00', label: 'فوري' },
+      { start_at: '2026-05-01T21:00:00+03:00', end_at: '2026-05-01T21:45:00+03:00', label: 'النافذة التالية' },
+    ],
+    capacity_state: clientState === 'payment_failed' ? 'limited' : clientState === 'area_unserviceable' ? 'paused' : 'available',
+    slot_reserved_until: clientState === 'area_unserviceable' ? null : '2026-05-01T20:12:00+03:00',
+    store_busy: clientState === 'item_unavailable',
+    area_busy: clientState === 'area_unserviceable',
+    captain_supply_low: clientState === 'payment_pending',
+  };
+}
+
+function buildDefaultLifecycleStatus(clientState: DshClientState, phase: JourneyPhase = 'route'): DshClientDeliveryLifecycleStatus {
+  if (clientState === 'quote' || clientState === 'serviceability' || clientState === 'area_unserviceable' || clientState === 'item_unavailable' || clientState === 'payment_failed' || clientState === 'checkout_ready' || clientState === 'payment_pending') {
+    return 'quote';
+  }
+
+  if (clientState === 'order_created') return 'created';
+  if (clientState === 'order_confirmed') return 'confirmed';
+  if (clientState === 'cancelled') return 'cancelled';
+  if (clientState === 'failed') return 'failed';
+  if (clientState === 'refund_pending') return 'returned';
+  if (clientState === 'refunded' || clientState === 'wallet_refund_visible') return 'refunded';
+  if (clientState === 'delivered') return 'delivered';
+
+  if (phase === 'received') return 'delivered';
+  if (phase === 'arrived') return 'arrived_at_dropoff';
+  return 'enroute_to_dropoff';
+}
+
+function buildDefaultEventTimeline(clientState: DshClientState, timeline: DshTrackingTimelineItem[], phase: JourneyPhase = 'route'): DshClientEventTimelineItem[] {
+  const fallbackLifecycle = buildDefaultLifecycleStatus(clientState, phase);
+  const exceptionReason = getDefaultExceptionReason(clientState);
+
+  if (!timeline.length) {
+    return [{
+      event_id: `event-${clientState}`,
+      order_id: 'dsh-order-active',
+      delivery_id: 'dsh-delivery-active',
+      actor_id: 'system',
+      actor_role: 'system',
+      from_status: null,
+      to_status: fallbackLifecycle,
+      timestamp: '2026-05-01T20:20:00+03:00',
+      source: 'system',
+      reason_code: exceptionReason,
+      notes: getDshClientStateMeta(clientState).description,
+      evidence_attachment_optional: null,
+    }];
+  }
+
+  const statusByStepId: Record<string, DshClientDeliveryLifecycleStatus> = {
+    route: 'enroute_to_dropoff',
+    arrived: 'arrived_at_dropoff',
+    received: 'delivered',
+  };
+
+  const fallbackStatuses: DshClientDeliveryLifecycleStatus[] = ['enroute_to_dropoff', 'arrived_at_dropoff', 'delivered'];
+
+  return timeline.map((item, index) => {
+    const toStatus = statusByStepId[item.id] ?? fallbackStatuses[Math.min(index, fallbackStatuses.length - 1)] ?? fallbackLifecycle;
+    const previousStatus = index === 0
+      ? (clientState === 'tracking_active' || clientState === 'delivered' ? 'picked_up' : null)
+      : (statusByStepId[timeline[index - 1]?.id] ?? fallbackStatuses[Math.min(index - 1, fallbackStatuses.length - 1)] ?? null);
+
+    return {
+      event_id: `event-${item.id}`,
+      order_id: 'dsh-order-active',
+      delivery_id: 'dsh-delivery-active',
+      actor_id: item.id === 'received' ? 'client' : 'captain-01',
+      actor_role: item.id === 'received' ? 'client' : 'captain',
+      from_status: previousStatus,
+      to_status: toStatus,
+      timestamp: `2026-05-01T20:${10 + index * 8}:00+03:00`,
+      source: 'system',
+      reason_code: index === timeline.length - 1 ? exceptionReason : null,
+      notes: item.detail,
+      evidence_attachment_optional: item.id === 'received'
+        ? {
+            asset_id: 'proof-delivered-01',
+            asset_type: 'image',
+            note: 'إثبات مرتبط بتثبيت التسليم النهائي.',
+          }
+        : null,
+    };
+  });
+}
+
+function buildDefaultProofOfDelivery(clientState: DshClientState, phase: JourneyPhase = 'route'): DshClientProofOfDeliveryVisibility {
+  if (clientState === 'delivered' || phase === 'received') {
+    return {
+      proof_type: 'otp',
+      is_required: true,
+      captured_by: 'captain',
+      captured_at: '2026-05-01T20:30:00+03:00',
+      proof_asset_url: 'https://example.invalid/dsh/proof/delivered',
+      verification_result: 'verified',
+      failure_reason: null,
+      customer_visible: true,
+    };
+  }
+
+  if (clientState === 'tracking_active' && phase === 'arrived') {
+    return {
+      proof_type: 'otp',
+      is_required: true,
+      captured_by: null,
+      captured_at: null,
+      proof_asset_url: null,
+      verification_result: 'pending',
+      failure_reason: null,
+      customer_visible: true,
+    };
+  }
+
+  return {
+    proof_type: 'none',
+    is_required: false,
+    captured_by: null,
+    captured_at: null,
+    proof_asset_url: null,
+    verification_result: 'not_required',
+    failure_reason: null,
+    customer_visible: false,
+  };
+}
+
+function buildDefaultHandoffVerification(): DshClientHandoffVerification {
+  return {
+    pickup_reference: 'PK-DSH-2201',
+    pickup_code_or_barcode: 'PICK-2201',
+    dropoff_otp: '4821',
+    contactless_allowed: true,
+    customer_instructions: 'سلّم الطلب عند الباب واتصل قبل الوصول.',
+    partner_instructions: 'ثبّت المطابقة قبل تسليم الكيس النهائي.',
+    captain_handoff_notes: 'جرى تثبيت نقطة التسليم في المدخل الرئيسي.',
+  };
+}
+
+function buildDefaultWalletImpact(clientState: DshClientState): DshClientWalletImpactVisibility | null {
+  if (clientState === 'refund_pending') {
+    return {
+      paid_amount: 148,
+      delivery_fee: 22,
+      discount: 8,
+      wallet_credit: 0,
+      wallet_debit: 140,
+      refund_pending: 140,
+      refund_completed: 0,
+      compensation: 12,
+      note: 'الاسترداد قيد المعالجة مع تعويض انتظار ظاهر للعميل.',
+    };
+  }
+
+  if (clientState === 'refunded' || clientState === 'wallet_refund_visible') {
+    return {
+      paid_amount: 148,
+      delivery_fee: 22,
+      discount: 8,
+      wallet_credit: 140,
+      wallet_debit: 140,
+      refund_pending: 0,
+      refund_completed: 140,
+      compensation: 12,
+      note: 'اكتمل الأثر المالي النهائي ويمكن للعميل مراجعته من نفس المسار.',
+    };
+  }
+
+  if (clientState === 'wallet_credit_visible') {
+    return {
+      paid_amount: 0,
+      delivery_fee: 0,
+      discount: 0,
+      wallet_credit: 45,
+      wallet_debit: 0,
+      refund_pending: 0,
+      refund_completed: 0,
+      compensation: 45,
+      note: 'تعويض رصيد ظاهر في المحفظة بدون أي ربط تنفيذي إضافي.',
+    };
+  }
+
+  return null;
+}
+
 function renderCheckoutGate(
   screenId?: string,
   state: DshOperationScreenState = 'ready',
   clientState: DshClientState = 'checkout_ready',
+  values: CreateOrderValues = defaultCreateOrderValues,
   onPrimaryAction?: () => void,
   onSecondaryAction?: () => void,
   onRetry?: () => void,
@@ -525,6 +864,16 @@ function renderCheckoutGate(
   const paymentPendingMeta = getDshClientStateMeta('payment_pending');
   const orderCreatedMeta = getDshClientStateMeta('order_created');
   const walletVisibilityCopy = getClientWalletVisibilityCopy(checkoutStateMeta);
+  const serviceabilityQuote = buildDefaultServiceabilityQuote(clientState);
+  const addressSnapshot = buildDefaultAddressSnapshot(values);
+  const fulfillmentModeSnapshot = buildDefaultFulfillmentModeSnapshot(clientState);
+  const paymentVisibilityLabel = clientState === 'payment_failed'
+    ? 'متوقف حتى إصلاح الدفع'
+    : checkoutStateMeta.isException
+      ? 'متوقف حتى معالجة الاستثناء'
+      : clientState === 'payment_pending'
+        ? 'قيد المعالجة'
+        : 'جاهز للتقدم';
   const gateCopy = {
     title: checkoutStateMeta.title,
     subtitle: checkoutStateMeta.description,
@@ -575,6 +924,38 @@ function renderCheckoutGate(
               { label: 'النتيجة المتوقعة', value: orderCreatedMeta.label, tone: 'success' },
             ]}
           />
+          <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
+            <SectionHeader title="التسعير وقابلية التوصيل" subtitle="يعرض ما إذا كان العنوان مغطى، والمتجر مفتوحًا، والعناصر قابلة للتنفيذ قبل الدفع." />
+            <KeyValueList
+              items={[
+                { label: 'صحة العنوان', value: serviceabilityQuote.address_valid ? 'صحيح' : 'يحتاج مراجعة', tone: serviceabilityQuote.address_valid ? 'success' : 'warning' },
+                { label: 'داخل التغطية', value: serviceabilityQuote.inside_coverage ? 'نعم' : 'لا', tone: serviceabilityQuote.inside_coverage ? 'success' : 'warning' },
+                { label: 'حالة المتجر', value: serviceabilityQuote.store_open ? 'مفتوح' : 'مغلق' },
+                { label: 'توفر العناصر', value: serviceabilityQuote.items_available ? 'متوفرة' : 'غير متوفرة' },
+                { label: 'رسوم التوصيل', value: `${serviceabilityQuote.delivery_fee} ر.ي` },
+                { label: 'انتهاء العرض', value: serviceabilityQuote.quote_expires_at ?? 'غير محدد' },
+              ]}
+            />
+            {serviceabilityQuote.unavailable_reason ? (
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                سبب التعذر الحالي: {formatExceptionReason(serviceabilityQuote.unavailable_reason)}
+                {serviceabilityQuote.fallback_fulfillment_method ? ` · البديل المقترح: ${formatFulfillmentMode(serviceabilityQuote.fallback_fulfillment_method)}` : ''}
+              </Text>
+            ) : null}
+          </Surface>
+          <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
+            <SectionHeader title="العنوان والدفع" subtitle="العنوان النهائي، نافذة التنفيذ، ووضع تفعيل الدفع تبقى ظاهرة في نفس الشاشة." />
+            <KeyValueList
+              items={[
+                { label: 'عنوان التسليم', value: addressSnapshot.address_label, tone: 'brand' },
+                { label: 'الوصف المرجعي', value: addressSnapshot.reverse_lookup_label ?? 'غير متوفر' },
+                { label: 'وضع التنفيذ', value: formatFulfillmentMode(fulfillmentModeSnapshot.mode) },
+                { label: 'السعة الحالية', value: formatCapacityState(fulfillmentModeSnapshot.capacity_state) },
+                { label: 'تفعيل الدفع', value: paymentVisibilityLabel, tone: checkoutStateMeta.isException ? 'warning' : clientState === 'payment_pending' ? 'warning' : 'success' },
+                { label: 'ملاحظات العميل', value: addressSnapshot.delivery_notes ?? 'لا توجد ملاحظات' },
+              ]}
+            />
+          </Surface>
           {checkoutStateMeta.isException ? (
             <Surface tone="inset" gap={1} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
               <Text role="bodyStrong" style={{ textAlign: 'right' }}>متابعة الدعم</Text>
@@ -606,11 +987,12 @@ type CreateOrderJourneyScreenProps = {
   onBell?: () => void;
   onSupport?: () => void;
   onNextAction?: () => void;
+  onReorder?: () => void;
   initialPhase?: JourneyPhase;
   currentStatusLabel?: string;
 };
 
-function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', onPrimaryAction, onBack, onBell, onSupport, onNextAction, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
+function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', onPrimaryAction, onBack, onBell, onSupport, onNextAction, onReorder, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
   const { theme } = useTheme();
   const [phase, setPhase] = React.useState<JourneyPhase>(initialPhase);
   const [productRating, setProductRating] = React.useState(0);
@@ -695,10 +1077,18 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           : onSupport || onNextAction
             ? 'اختر التقييمين ثم أرسل، أو استخدم الدعم والإجراء التالي المتاح.'
             : 'اختر التقييمين ثم أرسل.'
+    : clientState === 'quote'
+      ? 'فحص قابلية التوصيل ثم تثبيت الجاهزية النهائية.'
+      : clientState === 'serviceability'
+        ? 'تثبيت العنوان ثم فتح الدفع الجاهز.'
     : clientState === 'checkout_ready'
       ? `${paymentPendingMeta.label} ثم ${orderCreatedMeta.label}`
       : clientState === 'payment_pending'
         ? orderCreatedMeta.label
+        : clientState === 'payment_failed'
+          ? 'أعد محاولة الدفع أو اختر مسار دعم واضح.'
+          : clientState === 'item_unavailable'
+            ? 'عدّل السلة أو استخدم البديل المقترح قبل الدفع.'
         : clientState === 'order_created'
           ? orderConfirmedMeta.label
           : clientState === 'order_confirmed'
@@ -709,6 +1099,15 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const productRatingLabel = productRating > 0 ? `${productRating}/5` : 'غير محدد';
   const captainRatingLabel = captainRating > 0 ? `${captainRating}/5` : 'غير محدد';
   const compactSteps = journeySteps as Array<{ id: string; title: string; state: 'done' | 'current' | 'next' }>;
+  const serviceabilityQuote = React.useMemo(() => buildDefaultServiceabilityQuote(clientState), [clientState]);
+  const addressSnapshot = React.useMemo(() => buildDefaultAddressSnapshot(values), [values]);
+  const fulfillmentModeSnapshot = React.useMemo(() => buildDefaultFulfillmentModeSnapshot(clientState), [clientState]);
+  const lifecycleStatus = React.useMemo(() => buildDefaultLifecycleStatus(clientState, phase), [clientState, phase]);
+  const eventTimeline = React.useMemo(() => buildDefaultEventTimeline(clientState, timeline, phase), [clientState, timeline, phase]);
+  const proofVisibility = React.useMemo(() => buildDefaultProofOfDelivery(clientState, phase), [clientState, phase]);
+  const handoffVerification = React.useMemo(() => buildDefaultHandoffVerification(), []);
+  const walletImpactVisibility = React.useMemo(() => buildDefaultWalletImpact(clientState), [clientState]);
+  const exceptionReason = React.useMemo(() => getDefaultExceptionReason(clientState), [clientState]);
   const orderDetailsItems = [
     { label: 'عنوان الاستلام', value: values.pickupAddress || 'غير محدد', tone: 'brand' as const },
     { label: 'عنوان التسليم', value: values.dropoffAddress || 'غير محدد' },
@@ -743,10 +1142,18 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   });
 
   const primaryActionLabel = isCheckoutSequenceState
-    ? clientState === 'checkout_ready'
+    ? clientState === 'quote'
+      ? 'متابعة فحص التغطية'
+      : clientState === 'serviceability'
+        ? 'تثبيت العنوان'
+      : clientState === 'checkout_ready'
       ? 'متابعة الدفع'
       : clientState === 'payment_pending'
         ? 'تأكيد إنشاء الطلب'
+        : clientState === 'payment_failed'
+          ? 'إعادة محاولة الدفع'
+          : clientState === 'item_unavailable'
+            ? 'مراجعة البدائل'
         : clientState === 'order_created'
           ? 'عرض نجاح الطلب'
           : clientState === 'order_confirmed'
@@ -775,10 +1182,18 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       ? 'تم إرسال التقييمين. يمكنك تعديل الكابتن ثم إعادة الإرسال.'
       : 'اختر تقييم الكابتن من 1 إلى 5 ثم أرسل التقييمين بالأسفل.';
   const stickyNote = isCheckoutSequenceState
-    ? clientState === 'checkout_ready'
+    ? clientState === 'quote'
+      ? 'يتم تثبيت التسعير أولًا ثم التحقق من العنوان قبل إظهار خطوة الدفع.'
+      : clientState === 'serviceability'
+        ? 'العنوان قيد التحقق. بعد اعتماده تُفتح الجاهزية النهائية للدفع.'
+      : clientState === 'checkout_ready'
       ? 'راجع تفاصيل الطلب ثم تابع إلى خطوة الدفع التالية.'
       : clientState === 'payment_pending'
         ? 'الدفع قيد المعالجة. الإجراء الرئيسي ينقل الطلب إلى حالة الإنشاء المؤكد.'
+        : clientState === 'payment_failed'
+          ? 'يوجد تعذر في الدفع. يمكنك إعادة المحاولة من نفس الشاشة أو استخدام الدعم.'
+          : clientState === 'item_unavailable'
+            ? 'بعض العناصر غير متاحة الآن. راجع البدائل قبل متابعة الدفع.'
         : clientState === 'order_created'
           ? 'تم إنشاء الطلب. الإجراء الرئيسي يعرض حالة النجاح قبل فتح التتبع.'
           : clientState === 'order_confirmed'
@@ -900,6 +1315,111 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           items={orderDetailsItems}
         />
 
+        {isCheckoutSequenceState ? (
+          <>
+            <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+              <SectionHeader title="التسعير وقابلية التوصيل" subtitle="فحص العنوان، توفر العناصر، والرسوم قبل متابعة الدفع." />
+              <KeyValueList
+                items={[
+                  { label: 'صحة العنوان', value: serviceabilityQuote.address_valid ? 'صحيح' : 'يحتاج مراجعة', tone: serviceabilityQuote.address_valid ? 'success' : 'warning' },
+                  { label: 'داخل التغطية', value: serviceabilityQuote.inside_coverage ? 'نعم' : 'لا' },
+                  { label: 'حالة المتجر', value: serviceabilityQuote.store_open ? 'مفتوح' : 'مغلق' },
+                  { label: 'توفر العناصر', value: serviceabilityQuote.items_available ? 'متوفرة' : 'غير متوفرة' },
+                  { label: 'رسوم التوصيل', value: `${serviceabilityQuote.delivery_fee} ر.ي` },
+                  { label: 'الوقت المتوقع', value: serviceabilityQuote.eta_dropoff ?? serviceabilityQuote.eta_pickup ?? 'غير محدد' },
+                ]}
+              />
+              {serviceabilityQuote.unavailable_reason ? (
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                  سبب التعذر الحالي: {formatExceptionReason(serviceabilityQuote.unavailable_reason)}
+                  {serviceabilityQuote.fallback_fulfillment_method ? ` · البديل: ${formatFulfillmentMode(serviceabilityQuote.fallback_fulfillment_method)}` : ''}
+                </Text>
+              ) : null}
+            </Surface>
+
+            <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+              <SectionHeader title="العنوان والتفعيل" subtitle="حالة العنوان، نمط التنفيذ، وإتاحة الدفع أو التعطيل تبقى ظاهرة للعميل." />
+              <KeyValueList
+                items={[
+                  { label: 'العنوان النهائي', value: addressSnapshot.address_label, tone: 'brand' },
+                  { label: 'الوصف المرجعي', value: addressSnapshot.reverse_lookup_label ?? 'غير متوفر' },
+                  { label: 'نمط التنفيذ', value: formatFulfillmentMode(fulfillmentModeSnapshot.mode) },
+                  { label: 'السعة الحالية', value: formatCapacityState(fulfillmentModeSnapshot.capacity_state) },
+                  { label: 'حجز الفتحة', value: fulfillmentModeSnapshot.slot_reserved_until ?? 'غير محجوز' },
+                  { label: 'وضع المتابعة', value: clientStateMeta.isException ? 'متوقف حتى المعالجة' : clientState === 'payment_pending' ? 'قيد المعالجة' : 'جاهز للمتابعة', tone: clientStateMeta.isException ? 'warning' : clientState === 'payment_pending' ? 'warning' : 'success' },
+                ]}
+              />
+            </Surface>
+          </>
+        ) : (
+          <>
+            <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+              <SectionHeader title="دورة التنفيذ" subtitle="الحالة التشغيلية، سبب الاستثناء، وإثبات التسليم الظاهر في هذا المسار." />
+              <KeyValueList
+                items={[
+                  { label: 'الحالة التشغيلية', value: formatDeliveryLifecycleStatus(lifecycleStatus), tone: 'brand' },
+                  { label: 'نوع الإثبات', value: formatProofType(proofVisibility.proof_type) },
+                  { label: 'نتيجة التحقق', value: formatVerificationResult(proofVisibility.verification_result) },
+                  { label: 'إظهار الإثبات للعميل', value: proofVisibility.customer_visible ? 'نعم' : 'لا' },
+                  { label: 'مرجع الاستلام', value: handoffVerification.pickup_reference ?? 'غير متوفر' },
+                  { label: 'OTP التسليم', value: handoffVerification.dropoff_otp ?? 'غير متوفر' },
+                ]}
+              />
+              {exceptionReason ? (
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                  سبب الحالة الحالية: {formatExceptionReason(exceptionReason)}
+                </Text>
+              ) : null}
+            </Surface>
+
+            <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+              <SectionHeader title="سجل الأحداث" subtitle="آخر التحولات الزمنية المرتبطة بالطلب الحالي، بدون شاشة إضافية." />
+              <Box gap={2}>
+                {eventTimeline.map((eventItem) => (
+                  <ListItem
+                    key={eventItem.event_id}
+                    title={formatDeliveryLifecycleStatus(eventItem.to_status)}
+                    subtitle={eventItem.notes ?? 'لا توجد ملاحظات إضافية'}
+                    meta={eventItem.timestamp}
+                    badgeLabel={eventItem.reason_code ? formatExceptionReason(eventItem.reason_code) : eventItem.actor_role}
+                  />
+                ))}
+              </Box>
+            </Surface>
+
+            <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+              <SectionHeader title="التحقق والتسليم" subtitle="مرجع الاستلام، كود التحقق، وتعليمات التسليم/الاستلام تبقى في نفس العرض." />
+              <KeyValueList
+                items={[
+                  { label: 'التقاط الإثبات', value: proofVisibility.captured_at ?? 'لم يُلتقط بعد' },
+                  { label: 'التقطه', value: proofVisibility.captured_by ?? 'غير محدد' },
+                  { label: 'تعليمات العميل', value: handoffVerification.customer_instructions ?? 'لا توجد' },
+                  { label: 'تعليمات الشريك', value: handoffVerification.partner_instructions ?? 'لا توجد' },
+                  { label: 'تسليم بدون تلامس', value: handoffVerification.contactless_allowed ? 'مسموح' : 'غير مسموح' },
+                  { label: 'ملاحظات الكابتن', value: handoffVerification.captain_handoff_notes ?? 'لا توجد' },
+                ]}
+              />
+            </Surface>
+
+            {walletImpactVisibility ? (
+              <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+                <SectionHeader title="الأثر المالي الظاهر" subtitle="يعرض الرصيد/الاسترداد/التعويض فقط من دون أي تنفيذ مالي." />
+                <KeyValueList
+                  items={[
+                    { label: 'المبلغ المدفوع', value: `${walletImpactVisibility.paid_amount} ر.ي` },
+                    { label: 'رسوم التوصيل', value: `${walletImpactVisibility.delivery_fee} ر.ي` },
+                    { label: 'الخصم', value: `${walletImpactVisibility.discount} ر.ي` },
+                    { label: 'رصيد المحفظة', value: `${walletImpactVisibility.wallet_credit} ر.ي` },
+                    { label: 'المسترد المكتمل', value: `${walletImpactVisibility.refund_completed} ر.ي`, tone: 'success' },
+                    { label: 'الاسترداد المعلق', value: `${walletImpactVisibility.refund_pending} ر.ي`, tone: walletImpactVisibility.refund_pending > 0 ? 'warning' : 'default' },
+                  ]}
+                />
+                {walletImpactVisibility.note ? <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{walletImpactVisibility.note}</Text> : null}
+              </Surface>
+            ) : null}
+          </>
+        )}
+
         <OrderLinkedChat
           title="الدردشة مع الكابتن"
           subtitle={phase === 'received' ? 'السجل ظاهر للمراجعة فقط بعد الاستلام.' : 'آخر رسالة ومرفقات سريعة داخل نفس الصندوق.'}
@@ -950,13 +1470,20 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           placeholderTone="brand"
         />
 
-        {hasClientReceived && (onSupport || onNextAction) ? (
+        {hasClientReceived && (onSupport || onNextAction || onReorder || proofVisibility.customer_visible) ? (
           <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
             <Text role="bodyStrong" style={{ textAlign: 'right' }}>ما بعد التسليم</Text>
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
               بعد اكتمال التسليم يمكنك الإبلاغ عن مشكلة أو الانتقال إلى الإجراء التالي المتاح من دون مغادرة هذا المسار.
             </Text>
+            <KeyValueList
+              items={[
+                { label: 'نوع الإثبات الظاهر', value: formatProofType(proofVisibility.proof_type), tone: proofVisibility.customer_visible ? 'success' : 'default' },
+                { label: 'نتيجة التحقق', value: formatVerificationResult(proofVisibility.verification_result) },
+              ]}
+            />
             <Box gap={2}>
+              {onReorder ? <Button label="إعادة الطلب" onPress={onReorder} /> : null}
               {onSupport ? <Button label="الدعم أو الإبلاغ عن مشكلة" tone="secondary" onPress={onSupport} /> : null}
               {onNextAction ? <Button label="الانتقال إلى الطلبات" onPress={onNextAction} /> : null}
             </Box>
@@ -1018,12 +1545,21 @@ function renderTracking(
   timeline: DshTrackingTimelineItem[],
   onSupport?: () => void,
   onNextAction?: () => void,
+  onReorder?: () => void,
 ) {
   const { theme } = useTheme();
   const trackingStateMeta = getDshClientStateMeta(clientState);
   const activeTimelineIndex = Math.max(0, timeline.findIndex((item) => !item.done));
   const activeItem = timeline[activeTimelineIndex] ?? timeline[timeline.length - 1];
   const walletVisibilityCopy = getClientWalletVisibilityCopy(trackingStateMeta);
+  const lifecycleStatus = buildDefaultLifecycleStatus(clientState);
+  const eventTimeline = buildDefaultEventTimeline(clientState, timeline);
+  const proofVisibility = buildDefaultProofOfDelivery(clientState);
+  const handoffVerification = buildDefaultHandoffVerification();
+  const walletImpactVisibility = buildDefaultWalletImpact(clientState);
+  const exceptionReason = getDefaultExceptionReason(clientState);
+  const serviceabilityQuote = buildDefaultServiceabilityQuote(clientState);
+  const fulfillmentModeSnapshot = buildDefaultFulfillmentModeSnapshot(clientState);
   const supportTitle = trackingStateMeta.isException ? 'الدعم مطلوب الآن' : 'الدعم والرجوع';
   const supportDescription = trackingStateMeta.isException
     ? 'هذه الحالة تحتاج متابعة دعم واضحة قبل أي خطوة لاحقة. استخدم زر الدعم الآن لشرح المشكلة ومتابعة الحل.'
@@ -1089,12 +1625,78 @@ function renderTracking(
         </Box>
       </Surface>
 
+      <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title="التحقق والحالة التشغيلية" subtitle="سبب الاستثناء، إثبات التسليم، وتعليمات التسليم تبقى ضمن نفس شاشة التتبع." />
+        <KeyValueList
+          items={[
+            { label: 'الحالة التشغيلية', value: formatDeliveryLifecycleStatus(lifecycleStatus), tone: 'brand' },
+            { label: 'نوع الإثبات', value: formatProofType(proofVisibility.proof_type) },
+            { label: 'نتيجة التحقق', value: formatVerificationResult(proofVisibility.verification_result) },
+            { label: 'مرجع الاستلام', value: handoffVerification.pickup_reference ?? 'غير متوفر' },
+            { label: 'OTP التسليم', value: handoffVerification.dropoff_otp ?? 'غير متوفر' },
+            { label: 'ملاحظات الكابتن', value: handoffVerification.captain_handoff_notes ?? 'لا توجد' },
+          ]}
+        />
+        {exceptionReason ? (
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            سبب الحالة الحالية: {formatExceptionReason(exceptionReason)}
+          </Text>
+        ) : null}
+      </Surface>
+
+      <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <SectionHeader title="سجل الأحداث" subtitle="يربط كل محطة بالفاعل والوقت وسبب الاستثناء إن وجد." />
+        <Box gap={2}>
+          {eventTimeline.map((eventItem) => (
+            <ListItem
+              key={eventItem.event_id}
+              title={formatDeliveryLifecycleStatus(eventItem.to_status)}
+              subtitle={eventItem.notes ?? 'لا توجد ملاحظات إضافية'}
+              meta={eventItem.timestamp}
+              badgeLabel={eventItem.reason_code ? formatExceptionReason(eventItem.reason_code) : eventItem.actor_role}
+            />
+          ))}
+        </Box>
+      </Surface>
+
+      {(clientState === 'payment_failed' || clientState === 'area_unserviceable' || clientState === 'item_unavailable') ? (
+        <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+          <SectionHeader title="سبب توقف الإكمال" subtitle="توضيح صريح لحالة التسعير/العنوان/توفر العناصر دون ربط backend إضافي." />
+          <KeyValueList
+            items={[
+              { label: 'داخل التغطية', value: serviceabilityQuote.inside_coverage ? 'نعم' : 'لا' },
+              { label: 'توفر العناصر', value: serviceabilityQuote.items_available ? 'متوفرة' : 'غير متوفرة' },
+              { label: 'حالة المتجر', value: serviceabilityQuote.store_open ? 'مفتوح' : 'مغلق' },
+              { label: 'نمط التنفيذ', value: formatFulfillmentMode(fulfillmentModeSnapshot.mode) },
+              { label: 'السعة الحالية', value: formatCapacityState(fulfillmentModeSnapshot.capacity_state) },
+            ]}
+          />
+        </Surface>
+      ) : null}
+
       {walletVisibilityCopy ? (
         <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
           <Text role="bodyStrong" style={{ textAlign: 'right' }}>{walletVisibilityCopy.title}</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             {walletVisibilityCopy.description}
           </Text>
+        </Surface>
+      ) : null}
+
+      {walletImpactVisibility ? (
+        <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+          <SectionHeader title="الأثر المالي الظاهر" subtitle="ملخص مالي توضيحي فقط دون أي تنفيذ wallet/runtime." />
+          <KeyValueList
+            items={[
+              { label: 'المبلغ المدفوع', value: `${walletImpactVisibility.paid_amount} ر.ي` },
+              { label: 'رسوم التوصيل', value: `${walletImpactVisibility.delivery_fee} ر.ي` },
+              { label: 'الخصم', value: `${walletImpactVisibility.discount} ر.ي` },
+              { label: 'تعويض ظاهر', value: `${walletImpactVisibility.compensation} ر.ي` },
+              { label: 'استرداد معلق', value: `${walletImpactVisibility.refund_pending} ر.ي` },
+              { label: 'استرداد مكتمل', value: `${walletImpactVisibility.refund_completed} ر.ي`, tone: 'success' },
+            ]}
+          />
+          {walletImpactVisibility.note ? <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{walletImpactVisibility.note}</Text> : null}
         </Surface>
       ) : null}
 
@@ -1109,6 +1711,7 @@ function renderTracking(
           </Text>
         ) : null}
         <Box gap={2}>
+          {clientState === 'delivered' && onReorder ? <Button label="إعادة الطلب" onPress={onReorder} /> : null}
           {onNextAction ? <Button label="العودة إلى الطلبات" onPress={onNextAction} /> : null}
           {onSupport ? <Button label={supportButtonLabel} tone="secondary" onPress={onSupport} /> : null}
         </Box>
@@ -1182,7 +1785,7 @@ export function DshCreateOrderScreen({
   onRetry,
 }: DshCreateOrderScreenProps) {
   if (screenId) {
-    return renderCheckoutGate(screenId, state, clientState, onPrimaryAction, onSecondaryAction, onRetry);
+    return renderCheckoutGate(screenId, state, clientState, values, onPrimaryAction, onSecondaryAction, onRetry);
   }
 
   return (
@@ -1224,7 +1827,7 @@ export function DshOrderSuccessState({ clientState = 'order_confirmed', onNext }
   return renderOrderSuccess(clientState, onNext);
 }
 
-export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, timeline = [], onBell, onSupport, onRetry, onNextAction }: DshTrackingScreenProps) {
+export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, timeline = [], onBell, onSupport, onRetry, onNextAction, onReorder }: DshTrackingScreenProps) {
   const trackingStateMeta = getDshClientStateMeta(clientState);
   const fallbackTimeline: DshTrackingTimelineItem[] = timeline.length
     ? timeline
@@ -1242,13 +1845,14 @@ export function DshTrackingScreen({ values = defaultCreateOrderValues, clientSta
         currentStatusLabel={currentStatusLabel ?? trackingStateMeta.label}
         onSupport={onSupport}
         onNextAction={onNextAction}
+        onReorder={onReorder}
         onBack={onNextAction ?? onRetry}
       />
     );
   }
 
   if (clientState !== 'tracking_active') {
-    return renderTracking(clientState, currentStatusLabel ?? trackingStateMeta.label, fallbackTimeline, onSupport, onNextAction);
+    return renderTracking(clientState, currentStatusLabel ?? trackingStateMeta.label, fallbackTimeline, onSupport, onNextAction, onReorder);
   }
 
   return (
@@ -1261,6 +1865,7 @@ export function DshTrackingScreen({ values = defaultCreateOrderValues, clientSta
       onBell={onBell}
       onSupport={onSupport}
       onNextAction={onNextAction}
+      onReorder={onReorder}
       onBack={onSupport ?? onNextAction ?? onRetry}
     />
   );

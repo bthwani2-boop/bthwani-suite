@@ -153,10 +153,15 @@ const initialCreateOrderValues: CreateOrderValues = {
 };
 
 const hostClientStates = {
+  quote: 'quote',
+  serviceability: 'serviceability',
+  areaUnserviceable: 'area_unserviceable',
   cartEmpty: 'cart_empty',
   cartReady: 'cart_ready',
   checkoutReady: 'checkout_ready',
   paymentPending: 'payment_pending',
+  paymentFailed: 'payment_failed',
+  itemUnavailable: 'item_unavailable',
   orderCreated: 'order_created',
   orderConfirmed: 'order_confirmed',
   trackingActive: 'tracking_active',
@@ -360,7 +365,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     const nextRoute = commandTargetToRoute(command.target);
 
     if (nextRoute === 'create-order') {
-      setCheckoutClientState(hostClientStates.checkoutReady);
+      setCheckoutClientState(hostClientStates.quote);
       setSuccessClientState(hostClientStates.orderCreated);
     }
 
@@ -465,12 +470,36 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     [],
   );
 
+  const checkoutWorkspaceClientState = React.useMemo<DshClientState>(() => {
+    if (selectedOperationScreen === 'estimate-get') {
+      return hostClientStates.quote;
+    }
+
+    if (selectedOperationScreen === 'pricing-preview') {
+      return hostClientStates.serviceability;
+    }
+
+    if (selectedOperationScreen === 'pricing-snapshot-get') {
+      return hostClientStates.areaUnserviceable;
+    }
+
+    if (selectedOperationScreen === 'promo-apply') {
+      return hostClientStates.itemUnavailable;
+    }
+
+    if (selectedOperationScreen === 'checkout-gate') {
+      return hostClientStates.paymentFailed;
+    }
+
+    return hostClientStates.checkoutReady;
+  }, [selectedOperationScreen]);
+
   const handleCreateOrderChange = React.useCallback((field: keyof CreateOrderValues, value: string) => {
     setCreateOrderValues((current) => ({ ...current, [field]: value }));
   }, []);
 
   const openCreateOrderJourney = React.useCallback(() => {
-    setCheckoutClientState(hostClientStates.checkoutReady);
+    setCheckoutClientState(hostClientStates.quote);
     setSuccessClientState(hostClientStates.orderCreated);
     setRoute('create-order');
   }, []);
@@ -489,6 +518,16 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   }, []);
 
   const handleCreateOrderContinue = React.useCallback(() => {
+    if (checkoutClientState === hostClientStates.quote) {
+      setCheckoutClientState(hostClientStates.serviceability);
+      return;
+    }
+
+    if (checkoutClientState === hostClientStates.serviceability) {
+      setCheckoutClientState(hostClientStates.checkoutReady);
+      return;
+    }
+
     if (checkoutClientState === hostClientStates.checkoutReady) {
       setCheckoutClientState(hostClientStates.paymentPending);
       return;
@@ -963,7 +1002,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     return (
       <DshCreateOrderScreen
         screenId={selectedOperationScreen as 'checkout-gate' | 'estimate-get' | 'pricing-preview' | 'pricing-snapshot-get' | 'promo-apply'}
-        clientState={hostClientStates.checkoutReady}
+          clientState={checkoutWorkspaceClientState}
         onPrimaryAction={openCreateOrderJourney}
         onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('checkout-workspace')}
@@ -1122,6 +1161,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
         onSupport={openSupportFlow}
         onRetry={() => openTrackedOrder(activeTrackedOrder?.id)}
         onNextAction={() => setRoute('orders-list')}
+          onReorder={openCreateOrderJourney}
       />
     );
   }
