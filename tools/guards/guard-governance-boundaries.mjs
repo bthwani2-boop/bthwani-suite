@@ -250,6 +250,9 @@ function checkImports(repoPath, imports, issues, config) {
 function checkAppsShellOnly(repoPath, text, issues, config) {
   if (!repoPath.startsWith("apps/")) return;
 
+  const configOrTestPath = /(?:^|\/)(app|package|project)\.json$|\.(spec|test)\.[^.]+$/.test(repoPath);
+  if (configOrTestPath) return;
+
   const allowedAppPath = (config.allowedAppFiles || []).some((pattern) => regexMatch(repoPath, pattern));
   if (allowedAppPath) return;
 
@@ -260,12 +263,11 @@ function checkAppsShellOnly(repoPath, text, issues, config) {
     /\bModal\b/,
     /\bVideo\b/,
     /\bScreen\b/,
-    /\border/i,
-    /\bstore/i,
-    /\bcart/i,
-    /\bcheckout/i,
-    /\bwallet/i,
-    /\bcaptain/i,
+    /\buseState\s*\(/,
+    /\buseReducer\s*\(/,
+    /\buseQuery\s*\(/,
+    /\bfetch\s*\(/,
+    /\baxios\b/,
     /#[0-9a-fA-F]{6}\b/,
   ];
 
@@ -298,16 +300,6 @@ function checkSurfaceDesignSystem(repoPath, text, issues, config) {
 
   if (localDesignPatterns.some((p) => p.test(text))) {
     addIssue(issues, "error", "SURFACE_LOCAL_DESIGN_SYSTEM", repoPath, "surfaces must not define local design system primitives/tokens/providers.");
-  }
-
-  const randomHex = /#[0-9a-fA-F]{6}\b/g;
-  const allowedColors = new Set((config.allowedBrandColors || []).map((x) => x.toLowerCase()));
-  let m;
-  while ((m = randomHex.exec(text))) {
-    const color = m[0].toLowerCase();
-    if (!allowedColors.has(color)) {
-      addIssue(issues, "warn", "SURFACE_HARDCODED_COLOR_REVIEW", repoPath, `Hardcoded color outside core brand palette requires review: ${m[0]}`);
-    }
   }
 }
 

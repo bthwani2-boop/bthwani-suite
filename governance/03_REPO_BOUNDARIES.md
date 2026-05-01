@@ -42,7 +42,7 @@ This file is not a slogan file. It is a control-plane rule file for BThwani. Any
 |---|---|---|
 | `docs/governance` | Legacy/transitional | Must not be active authority. Migrate or remove references. |
 | `kdt/volatile/registry/runs` | Legacy evidence root | Do not create new evidence there. |
-| `governance/governance-legacy` | Source archive only | Must not be active policy after package application. |
+| `governance/governance-legacy` | Retired donor root | Removed after extraction; any reintroduction is archive-only and non-authoritative. |
 
 ## Forbidden root behavior
 

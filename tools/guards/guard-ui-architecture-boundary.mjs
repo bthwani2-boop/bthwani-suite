@@ -1,7 +1,7 @@
 import { parseArgs, createReport, finalize, walkFiles, readText, rel, CODE_EXTENSIONS, lineNumber } from './lib/guard-utils.mjs';
 
 const args = parseArgs();
-const report = createReport('UI-ARCH-BOUNDARY', 'governance/GUARD_IMPLEMENTATION_MAP.md');
+const report = createReport('UI-ARCH-BOUNDARY', 'governance/08_UI_KIT_AND_BRAND.md');
 const root = args.root;
 const files = walkFiles(root, { startDirs: ['apps', 'packages', 'services'], extensions: CODE_EXTENSIONS });
 

@@ -33,6 +33,8 @@ function Log-Line([string]$Message) {
 
 $Guards = @(
   "guard-governance-sovereignty.mjs",
+  "guard-governance-boundaries.mjs",
+  "guard-governance-canonical-control-plane.mjs",
   "guard-ui-architecture-boundary.mjs",
   "guard-design-token-drift.mjs",
   "guard-service-contract-matrix.mjs",
@@ -77,12 +79,24 @@ foreach ($Guard in $Guards) {
     $Result = Get-Content -LiteralPath $JsonOut -Raw | ConvertFrom-Json
     $Results += $Result
   } else {
+    $StdOutText = if (Test-Path -LiteralPath $StdOut) { Get-Content -LiteralPath $StdOut -Raw } else { '' }
+    $WarnMatch = [regex]::Match($StdOutText, 'Warnings:\s*(\d+)')
+    $WarnCount = if ($WarnMatch.Success) { [int]$WarnMatch.Groups[1].Value } elseif ($StdOutText -match '\bWARN\b|PASS_WITH_WARNINGS') { 1 } else { 0 }
+    $Status = if ($Process.ExitCode -ne 0 -or $StdOutText -match '\bFAILED\b') {
+      'FAIL'
+    } elseif ($WarnCount -gt 0) {
+      'WARN'
+    } else {
+      'PASS'
+    }
+
     $Results += [pscustomobject]@{
       guardId = $Guard
-      status = "FAIL"
-      failCount = 1
-      warnCount = 0
-      error = "Guard did not produce JSON output. ExitCode=$($Process.ExitCode)"
+      status = $Status
+      failCount = if ($Status -eq 'FAIL') { 1 } else { 0 }
+      warnCount = $WarnCount
+      infoCount = 0
+      error = if ($Status -eq 'FAIL') { if ($StdOutText) { $StdOutText.Trim() } else { "Guard did not produce JSON output. ExitCode=$($Process.ExitCode)" } } else { $null }
     }
   }
 }

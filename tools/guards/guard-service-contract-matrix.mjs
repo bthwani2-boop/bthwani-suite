@@ -3,10 +3,11 @@ import path from 'node:path';
 import { parseArgs, createReport, finalize, exists } from './lib/guard-utils.mjs';
 
 const args = parseArgs();
-const report = createReport('SERVICE-CONTRACT-MATRIX', 'governance/GUARD_IMPLEMENTATION_MAP.md');
+const report = createReport('SERVICE-CONTRACT-MATRIX', 'governance/10_SERVICE_CLOSURE.md');
 const root = args.root;
 const servicesRoot = path.join(root, 'packages/surfaces/src/service-owned');
 const canonicalServices = ['dsh', 'wlt', 'knz', 'arb', 'amn', 'esf', 'mrf', 'snd', 'kwd'];
+const governedTemplateServices = ['demo-service'];
 const forbiddenStandalone = ['exchangeprice', 'hr'];
 
 if (!fs.existsSync(servicesRoot)) {
@@ -19,8 +20,18 @@ if (!fs.existsSync(servicesRoot)) {
     }
   }
   for (const name of present) {
-    if (!canonicalServices.includes(name) && !name.startsWith('_')) {
+    if (!canonicalServices.includes(name) && !governedTemplateServices.includes(name) && !name.startsWith('_')) {
       report.warn(`packages/surfaces/src/service-owned/${name}`, 'Non-canonical service folder found. Classify as TBD/legacy or add a governance decision.');
+    }
+  }
+  for (const template of governedTemplateServices) {
+    if (!present.includes(template)) continue;
+    const base = `packages/surfaces/src/service-owned/${template}`;
+    if (!exists(root, `${base}/SERVICE_BLUEPRINT.md`)) {
+      report.warn(`${base}/SERVICE_BLUEPRINT.md`, 'Governed template service is missing its blueprint scaffold.');
+    }
+    if (!exists(root, `${base}/service-meta.ts`) && !exists(root, `${base}/service-meta.json`)) {
+      report.warn(`${base}/service-meta.ts`, 'Governed template service is missing service metadata.');
     }
   }
   for (const service of canonicalServices) {

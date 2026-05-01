@@ -5,7 +5,7 @@
 **Canonical repo:** `C:\bthwani-suite`
 **Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** 10_SERVICE_CLOSURE_PROTOCOL, GOVERNANCE_CLOSURE_STANDARD, GOVERNANCE_CLOSEOUT_ROADMAP
+**Legacy families promoted here:** 10_SERVICE_CLOSURE_PROTOCOL, GOVERNANCE_CLOSURE_STANDARD, GOVERNANCE_CLOSEOUT_ROADMAP, SERVICE_BLUEPRINT patterns, PLATFORM_BLUEPRINT, operation catalog standards
 
 ## Non-negotiable reading law
 
@@ -70,6 +70,104 @@ operation | endpoint/client | contract | auth | test | runtime evidence | status
 ```text
 operation | control-panel entry | permission | audit log | rollback | evidence | status
 ```
+
+## Service blueprint and operation catalog
+
+Every canonical service should have a living blueprint before closure. The blueprint captures only verified or explicitly `TBD` truths.
+
+### Blueprint location
+
+```text
+packages/surfaces/src/service-owned/<service>/SERVICE_BLUEPRINT.md
+```
+
+or another approved service-owned canonical path if the repo structure evolves with evidence.
+
+### Required blueprint sections
+
+```text
+service identity
+surface matrix
+actors
+flows
+screen inventory
+state model
+API/binding matrix
+control-panel operations
+WLT/financial boundary
+VAR/provider policy
+security/privacy
+testing/runtime evidence
+open gaps
+closure decision
+```
+
+### Operation catalog record
+
+```text
+operation_id
+service
+surface
+actor
+permission
+input
+validation
+state change
+side effect
+API/client
+audit log
+rollback
+evidence
+status
+```
+
+### Blueprint status vocabulary
+
+```text
+TEMPLATE
+TBD
+UNPROVEN
+VERIFIED
+CLOSED
+BLOCKED
+STALE_PATH
+DEPRECATED
+REJECTED
+```
+
+### Operation status vocabulary
+
+```text
+DRAFT
+READY_FOR_BINDING
+BOUND
+RUNTIME_VERIFIED
+CONTROLLED
+BLOCKED
+DEPRECATED
+```
+
+### Service blueprint anti-noise rules
+
+- no invented endpoints,
+- no fake “closed” status,
+- no copied generic text without service facts,
+- no financial logic outside WLT,
+- no UI states omitted,
+- no control-panel side effects without audit.
+
+### Governed template services
+
+`demo-service` is a governed template/sandbox service used to demonstrate required service-owned structure.
+
+- It is not part of the canonical business-service fleet.
+- It must remain clearly marked as template/example-only.
+- It must still keep `SERVICE_BLUEPRINT.md`, service metadata, contracts/tests/evidence placeholders, and must not be cited as proof that a real business service is closed.
+- Any additional template service must be explicitly named here before guards may treat it as allowed.
+
+### Closure relationship
+
+This file owns closure protocol and the blueprint/catalog shape used to prove closure.
 
 ## Closure decision vocabulary
 

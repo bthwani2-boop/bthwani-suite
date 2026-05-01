@@ -5,7 +5,7 @@
 **Canonical repo:** `C:\bthwani-suite`
 **Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** 18_EVIDENCE_PACK_STANDARD, EVIDENCE_AND_CLOSURE_GATES, PATCH_REVIEW_PROTOCOL
+**Legacy families promoted here:** 18_EVIDENCE_PACK_STANDARD, EVIDENCE_AND_CLOSURE_GATES, PATCH_REVIEW_PROTOCOL, GOVERNANCE_FINALIZATION_PROTOCOL
 
 ## Non-negotiable reading law
 
@@ -128,3 +128,22 @@ A task cannot pass if:
 - staged changes are unreviewed,
 - UI screenshots are missing for UI work,
 - evidence pack lacks `_HANDOFF.zip` when a script writes under registry runs.
+
+## Final governance closure gates
+
+Governance work may be called closed only when all applicable gates are proven:
+
+- git status is understood,
+- `git --no-pager diff --check` passes,
+- `pnpm -w exec tsc --noEmit` passes,
+- active governance guards pass with zero failures,
+- no active implementation path depends on retired governance roots,
+- evidence pack exists under `tools/registry/runs/{SESSION_ID}/`,
+- decision vocabulary is one of the canonical values in this file,
+- local-only work, branch work, or push state is stated explicitly rather than implied.
+
+## Finalization rule
+
+- Push, PR, or CI completion is a separate operation and must not be implied by local validation alone.
+- A task may be `PASS` locally and still be `READY_FOR_PR` rather than merged or published.
+- If CI is available and relevant, its state must be captured as evidence instead of guessed.

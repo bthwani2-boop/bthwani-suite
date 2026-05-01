@@ -1,6 +1,6 @@
 ---
 name: bthwani-agent-os-2026-v3-human-next-action-coach
-description: Forces clear next human action after every run.
+description: Forces clear next human action after every run; use when a workflow needs explicit user handoff or decision prompts after governed execution.
 version: 2026.3.0-additive-evolution
 fail_closed: true
 requires_evidence: true

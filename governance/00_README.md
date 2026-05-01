@@ -77,12 +77,18 @@ Legacy files are **not** active policy after this package is applied. Legacy is 
 | Branches and checkpoints | `18_BRANCH_AND_CHECKPOINTS.md` |
 | Control panel | `19_CONTROL_PANEL_AND_OPERATING_MODEL.md` |
 | Mutable policy and providers | `20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md` |
-| Observability and production | `21_RUNTIME_OBSERVABILITY_AND_PRODUCTION.md` |
+| Runtime observability and production proof | `09_API_BINDING_RUNTIME.md` |
 | DSH golden slice | `22_DSH_GOLDEN_SLICE.md` |
 | Warnings and false positives | `23_WARNINGS_AND_FALSE_POSITIVES.md` |
 | Roadmap and traceability | `24_TRACEABILITY_AND_ROADMAP.md` |
-| Service blueprint and operation catalog | `25_SERVICE_BLUEPRINT_AND_OPERATION_CATALOG.md` |
+| Service blueprint and operation catalog | `10_SERVICE_CLOSURE.md` |
 | Legacy merge ledger | `99_LEGACY_MERGE_LEDGER.md` |
+
+## Root file types
+
+- Canonical authority files are `00`, `01`, `02`, `03`, `04`, `05`, `06`, `07`, `08`, `09`, `10`, `11`, `12`, `13`, `14`, `15`, `16`, `17`, `18`, `19`, `20`, `22`, `23`, `24`, and `99`.
+- `AGENT_CHANGE_LEDGER.md` and `AGENT_UPDATE_VALIDATION_CHECKLIST.md` are support files owned by `15_AGENT_AND_AI_EXECUTION.md`.
+- No separate authority file should recreate runtime observability or service blueprint law outside `09_API_BINDING_RUNTIME.md` and `10_SERVICE_CLOSURE.md`.
 
 ## Anti-drift law
 

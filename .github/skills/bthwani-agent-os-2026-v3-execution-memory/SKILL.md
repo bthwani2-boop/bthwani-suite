@@ -1,6 +1,6 @@
 ---
 name: bthwani-agent-os-2026-v3-execution-memory
-description: Records verified execution memory from real runs.
+description: Records verified execution memory from real runs; use when durable lessons from completed executions should be captured for later governed reuse.
 version: 2026.3.0-additive-evolution
 fail_closed: true
 requires_evidence: true

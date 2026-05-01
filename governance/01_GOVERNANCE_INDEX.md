@@ -28,11 +28,12 @@ This file is not a slogan file. It is a control-plane rule file for BThwani. Any
 | Class | Files | Meaning |
 |---|---|---|
 | Entry | `00`, `01` | How to use governance. |
-| Platform truth | `02`, `07`, `19`, `20`, `22`, `25` | What BThwani is and how services operate. |
+| Platform truth | `02`, `07`, `19`, `20`, `22` | What BThwani is and how services operate. |
 | Architecture | `03`, `04`, `05`, `06`, `08`, `09` | Where code belongs and how it connects. |
-| Closure | `10`, `11`, `12`, `13`, `14`, `21`, `23`, `24` | How proof, testing, warnings, roadmap, and runtime are accepted. |
+| Closure | `10`, `11`, `12`, `13`, `14`, `23`, `24` | How proof, testing, warnings, roadmap, and runtime are accepted. |
 | AI/workflow/security | `15`, `16`, `17`, `18` | How AI, secrets, cleanup, branches, and checkpoints behave. |
 | Ledger | `99` | Legacy source coverage and extraction accountability. |
+| Support | `AGENT_CHANGE_LEDGER.md`, `AGENT_UPDATE_VALIDATION_CHECKLIST.md` | Guard support owned by `15`; not parallel authority. |
 
 ## Authority vocabulary
 
@@ -71,6 +72,58 @@ Each file must answer:
 
 A governance file is unacceptable if it is only slogans. It must include enforceable rules, owner paths, allowed/forbidden examples, evidence requirements, and closure conditions.
 
+## File classification law
+
+Governance-related files must be classified before they are promoted, retained, or removed.
+
+| Class | Meaning |
+|---|---|
+| `CANONICAL_AUTHORITY` | active numbered governance owner file in `governance/` |
+| `SUPPORT_FILE` | active support file owned by a numbered authority |
+| `EXECUTABLE_GUARD` | implementation under `tools/guards` derived from governance |
+| `EXECUTABLE_SCRIPT` | implementation helper derived from governance |
+| `AGENT_OR_SKILL_CONTRACT` | `.github` agent/skill file derived from governance |
+| `CI_WORKFLOW` | workflow derived from governance |
+| `TRANSITIONAL_REFERENCE_ONLY` | donor/archive reference, never active authority |
+| `REMOVAL_CANDIDATE` | may be deleted only through cleanup evidence |
+
+Every file must have exactly one active classification at a time.
+
+## Active authority set
+
+The canonical authority set contains 25 files only:
+
+```text
+00_README.md
+01_GOVERNANCE_INDEX.md
+02_PLATFORM_SSOT.md
+03_REPO_BOUNDARIES.md
+04_ARCHITECTURE_RULES.md
+05_PACKAGE_BOUNDARIES.md
+06_APPS_AND_SHELLS.md
+07_SURFACES_AND_SERVICES.md
+08_UI_KIT_AND_BRAND.md
+09_API_BINDING_RUNTIME.md
+10_SERVICE_CLOSURE.md
+11_EVIDENCE_AND_TRACEABILITY.md
+12_TESTING_AND_PRODUCTION_READINESS.md
+13_CI_AND_GATES.md
+14_GUARDS_CATALOG.md
+15_AGENT_AND_AI_EXECUTION.md
+16_SECURITY_AND_SECRETS.md
+17_CLEANUP_AND_DEPRECATION.md
+18_BRANCH_AND_CHECKPOINTS.md
+19_CONTROL_PANEL_AND_OPERATING_MODEL.md
+20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md
+22_DSH_GOLDEN_SLICE.md
+23_WARNINGS_AND_FALSE_POSITIVES.md
+24_TRACEABILITY_AND_ROADMAP.md
+99_LEGACY_MERGE_LEDGER.md
+```
+
+Standalone runtime-observability authority is absorbed into `09_API_BINDING_RUNTIME.md`.
+Standalone service-blueprint authority is absorbed into `10_SERVICE_CLOSURE.md`.
+
 ## Current package structure
 
 ```text
@@ -78,8 +131,10 @@ governance/
   00_README.md
   01_GOVERNANCE_INDEX.md
   ...
-  25_SERVICE_BLUEPRINT_AND_OPERATION_CATALOG.md
+  24_TRACEABILITY_AND_ROADMAP.md
   99_LEGACY_MERGE_LEDGER.md
+  AGENT_CHANGE_LEDGER.md (support-only; owner 15)
+  AGENT_UPDATE_VALIDATION_CHECKLIST.md (support-only; owner 15)
 ```
 
-No active `governance-legacy` folder is required after this package is applied. If retained locally for review, it must be quarantined/archive-only and excluded from active policy.
+The legacy donor folder `governance/governance-legacy` is not part of the active control plane. After extraction is complete it should be removed. Any future reintroduction is archive-only and excluded from active policy.

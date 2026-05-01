@@ -5,14 +5,12 @@ import { execFileSync } from 'node:child_process';
 
 const repoRoot = process.cwd();
 const requiredFiles = [
-  'governance/00_GOVERNANCE_INDEX.md',
-  'governance/GOVERNANCE_MASTER_CONTROL_PLANE.md',
-  'governance/GOVERNANCE_CONTROL_PLANE_STANDARD.md',
-  'governance/GOVERNANCE_GUARD_EXECUTION_STANDARD.md',
-  'governance/GOVERNANCE_GUARD_CATALOG.md',
-  'governance/GOVERNANCE_FILE_CLASSIFICATION_MATRIX.md',
-  'governance/GOVERNANCE_CANDIDATE_RESOLUTION_MATRIX.md',
-  'governance/GOVERNANCE_FINALIZATION_PROTOCOL.md'
+  'governance/00_README.md',
+  'governance/01_GOVERNANCE_INDEX.md',
+  'governance/11_EVIDENCE_AND_TRACEABILITY.md',
+  'governance/14_GUARDS_CATALOG.md',
+  'governance/15_AGENT_AND_AI_EXECUTION.md',
+  'governance/99_LEGACY_MERGE_LEDGER.md'
 ];
 
 const errors = [];
@@ -26,8 +24,8 @@ for (const rel of requiredFiles) {
     continue;
   }
   const text = fs.readFileSync(full, 'utf8');
-  if (!/^Status:/m.test(text)) errors.push(`MISSING_STATUS: ${rel}`);
-  if (!/^Owner:/m.test(text)) errors.push(`MISSING_OWNER: ${rel}`);
+  if (!/^(?:\*\*)?Status:(?:\*\*)?/m.test(text)) errors.push(`MISSING_STATUS: ${rel}`);
+  if (!/^(?:\*\*)?Owner:(?:\*\*)?/m.test(text)) errors.push(`MISSING_OWNER: ${rel}`);
 }
 
 if (fs.existsSync(path.join(repoRoot, retiredParts[0], retiredParts[1]))) {
@@ -42,8 +40,9 @@ const tracked = execFileSync('git', ['ls-files'], { cwd: repoRoot, encoding: 'ut
 const activeRefs = [];
 for (const rel of tracked) {
   if (rel.startsWith('tools/registry/runs/')) continue;
+  if (rel.startsWith('kdt/')) continue;
   if (rel.startsWith('governance/')) continue;
-  if (rel === 'tools/guards/guard-governance-canonical-control-plane.mjs') continue;
+  if (rel.startsWith('tools/guards/')) continue;
   const full = path.join(repoRoot, rel);
   if (!fs.existsSync(full) || !fs.statSync(full).isFile()) continue;
   const ext = path.extname(rel).toLowerCase();

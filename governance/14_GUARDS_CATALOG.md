@@ -44,11 +44,11 @@ id | domain | purpose | severity | mode | owner file | evidence | remediation | 
 | GUARD_18_AGENT_EXECUTION | ai | AI/Copilot/script scope | BLOCKING for AI changes | Narrow scope and evidence | 15 |
 | GUARD_19_CLEANUP_DEPRECATION | cleanup | delete/archive/deprecation safety | BLOCKING | Inventory/reference/rollback | 17 |
 | GUARD_20_CONTROL_PANEL | control-panel | web-first control room model | REPORT/BLOCK | No route/page sprawl; ops tied to services | 19 |
-| GUARD_21_OBSERVABILITY | runtime | logs/metrics/errors/health | BLOCKING for prod readiness | Observable runtime evidence | 21 |
+| GUARD_21_OBSERVABILITY | runtime | logs/metrics/errors/health | BLOCKING for prod readiness | Observable runtime evidence | 09 |
 | GUARD_22_DSH_GOLDEN_SLICE | dsh | DSH end-to-end closure | BLOCKING for DSH closure | All surfaces and states evidenced | 22 |
 | GUARD_23_WARNING_CLASSIFICATION | warnings | warnings and false positives | BLOCKING if unclassified | Warning owner/severity/expiry | 23 |
 | GUARD_24_TRACEABILITY_ROADMAP | roadmap | traceability and phase discipline | REPORT/BLOCK | No task without phase/evidence | 24 |
-| GUARD_25_SERVICE_BLUEPRINT | services | blueprint and operation catalog | BLOCKING for service closure | Blueprint exists and complete | 25 |
+| GUARD_25_SERVICE_BLUEPRINT | services | blueprint and operation catalog | BLOCKING for service closure | Blueprint exists and complete | 10 |
 
 ## Guard severity
 

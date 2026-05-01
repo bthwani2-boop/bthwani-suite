@@ -10,8 +10,6 @@ acceptance_threshold: 100
 
 <!-- NOTE (example-only): Visual identity descriptors and helper colors are documentation artifacts, not secrets. -->
 
-# brand-identity-design-system
-
 ## Purpose
 White/orange/dark navy-blue premium BThwani identity.
 

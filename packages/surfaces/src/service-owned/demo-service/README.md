@@ -1,6 +1,6 @@
 # demo-service (قالب خدمة)
 
-This folder is a governance-driven template for a service implementation. Follow `governance/EVIDENCE_PACK_TEMPLATE.md` and the repo `GOVERNANCE_CANONICAL.md` structure when filling files.
+This folder is a governance-driven template for a service implementation. Follow `governance/11_EVIDENCE_AND_TRACEABILITY.md` and `governance/10_SERVICE_CLOSURE.md` when filling these files.
 
 Key files:
 - `service-meta.ts` — service identity (id, names, owner, supported surfaces)

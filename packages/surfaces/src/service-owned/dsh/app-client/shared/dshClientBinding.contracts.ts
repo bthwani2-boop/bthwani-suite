@@ -78,6 +78,13 @@ export type DshClientCreateOrderResponse = {
   status: Extract<DshClientCheckoutState, 'order_created' | 'order_confirmed'>;
 };
 
+export type DshClientBindingError = {
+  code: string;
+  message: string;
+  retryable?: boolean;
+  field?: string;
+};
+
 export type DshClientOrderSuccessPayload = {
   orderId: DshClientId;
   status: Extract<DshClientCheckoutState, 'order_created' | 'order_confirmed'>;
@@ -123,6 +130,7 @@ export type DshClientIssueReportResponse = {
   issueId: DshClientId;
   orderId: DshClientId;
   accepted: boolean;
+  error?: DshClientBindingError;
 };
 
 export type DshClientWalletVisibility = {

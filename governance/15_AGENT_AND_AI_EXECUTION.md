@@ -5,7 +5,7 @@
 **Canonical repo:** `C:\bthwani-suite`
 **Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** 14_AGENT_EXECUTION_RULES, AI_EXECUTION_GOVERNANCE, BTHWANI_GUIDE, MASTER_EXECUTION_PLAYBOOK
+**Legacy families promoted here:** 14_AGENT_EXECUTION_RULES, AI_EXECUTION_GOVERNANCE, AGENT_CHANGE_LEDGER_POLICY, AGENT_UPDATE_VALIDATION_CHECKLIST, BTHWANI_GUIDE, MASTER_EXECUTION_PLAYBOOK
 
 ## Non-negotiable reading law
 
@@ -75,6 +75,12 @@ Use patch handoff when:
 - governance changed,
 - deletion/move/refactor happened,
 - user asks for review before commit.
+
+## Governance support files
+
+- `AGENT_CHANGE_LEDGER.md` records agent-governance changes and evidence pointers.
+- `AGENT_UPDATE_VALIDATION_CHECKLIST.md` is the support checklist for agent-governance verification.
+- These files are support-only. They do not create parallel authority and must defer to this file on any conflict.
 
 ## Final decision vocabulary
 

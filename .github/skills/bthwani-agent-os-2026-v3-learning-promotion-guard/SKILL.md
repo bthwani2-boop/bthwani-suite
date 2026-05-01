@@ -1,6 +1,6 @@
 ---
 name: bthwani-agent-os-2026-v3-learning-promotion-guard
-description: Blocks unsafe promotion of lessons into rules.
+description: Blocks unsafe promotion of lessons into rules; use when evaluating whether observed lessons can safely become durable governance or agent rules.
 version: 2026.3.0-additive-evolution
 fail_closed: true
 requires_evidence: true

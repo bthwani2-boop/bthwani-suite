@@ -2,11 +2,11 @@ import path from 'node:path';
 import { parseArgs, createReport, finalize, walkFiles, readText, rel, CODE_EXTENSIONS, lineNumber } from './lib/guard-utils.mjs';
 
 const args = parseArgs();
-const report = createReport('API-BINDING-RUNTIME', 'governance/GUARD_IMPLEMENTATION_MAP.md');
+const report = createReport('API-BINDING-RUNTIME', 'governance/09_API_BINDING_RUNTIME.md');
 const root = args.root;
 const files = walkFiles(root, { startDirs: ['packages/surfaces/src/service-owned', 'apps'], extensions: CODE_EXTENSIONS });
 
-const dataHints = /\b(fetch|axios|useQuery|apiClient|ApiClient|client\.|request\(|mutate\(|useMutation|subscribe\()/;
+const dataHints = /\b(fetch|axios|useQuery|apiClient|ApiClient|queryClient\.|serviceClient\.|httpClient\.|request\(|mutate\(|useMutation|subscribe\()/;
 const stateHints = {
   loading: /\b(loading|isLoading|pending|isPending|skeleton)\b/i,
   error: /\b(error|isError|failed|onError)\b/i,
