@@ -1,4 +1,5 @@
 import { dshDiscoveryStores } from '../../stores/fixtures/discoveryFixtures';
+import { colorPalette } from '@bthwani/ui-kit';
 import type {
   DshHomeCategory,
   DshHomeGetPromo,
@@ -35,6 +36,16 @@ export type DshHomePromo = {
   accentColor?: string;
 };
 
+const defaultPromoAccentColors = [
+  colorPalette.brand,
+  colorPalette.infoStrong,
+  colorPalette.success,
+] as const;
+
+function resolveDefaultPromoAccentColor(index: number) {
+  return defaultPromoAccentColors[index] ?? colorPalette.success;
+}
+
 export const defaultCategories: DshHomeCategory[] = [
   ...dshCategoryFixtures.map((category) => ({
     id: category.id,
@@ -47,13 +58,13 @@ export const defaultPromos: DshHomePromo[] = [
     id: 'promo-fast-delivery',
     title: 'نافذة توصيل سريعة',
     subtitle: 'ابدأ من متجر واحد وابقِ المسار مختصرًا.',
-    accentColor: '#FF6A00',
+    accentColor: resolveDefaultPromoAccentColor(0),
   },
   {
     id: 'promo-confidence',
     title: 'تتبّع يسبق الثقة',
     subtitle: 'افتح الطلبات بسرعة عندما تحتاج إلى وضوح فوري.',
-    accentColor: '#0D2F67',
+    accentColor: resolveDefaultPromoAccentColor(1),
   },
 ];
 
@@ -93,7 +104,7 @@ export function toDiscoveryPromos(promos: DshHomePromo[]): DshHomeGetPromo[] {
     actionType: promo.actionType,
     actionTarget: promo.actionTarget,
     actionExtra: promo.actionExtra,
-    accentColor: promo.accentColor ?? (index === 0 ? '#FF6A00' : index === 1 ? '#0D2F67' : '#15A26B'),
+    accentColor: promo.accentColor ?? resolveDefaultPromoAccentColor(index),
   }));
 }
 

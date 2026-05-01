@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text, colorPalette } from '@bthwani/ui-kit';
 import type { MarketingGrowthRecord } from '../../../shared/marketing/growth-store';
 
 declare const process: { env: { EXPO_PUBLIC_MEDIA_BASE_URL?: string } };
@@ -37,6 +37,18 @@ function clampIndex(index: number, length: number) {
   }
 
   return Math.min(Math.max(index, 0), length - 1);
+}
+
+function applyAlpha(hex: string, alpha: number) {
+  const normalized = hex.replace('#', '').trim();
+  const expanded = normalized.length === 3
+    ? normalized.split('').map((char) => `${char}${char}`).join('')
+    : normalized;
+  const red = Number.parseInt(expanded.slice(0, 2), 16);
+  const green = Number.parseInt(expanded.slice(2, 4), 16);
+  const blue = Number.parseInt(expanded.slice(4, 6), 16);
+
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
 type ExpoAvModule = {
@@ -101,7 +113,7 @@ export function DshHomeApprovedVideoReelsViewer({
         <StatusBar hidden />
         <View style={styles.emptyContainer}>
           <Pressable style={styles.closeButton} onPress={handleClose} accessibilityRole="button" accessibilityLabel="إغلاق">
-            <Ionicons name="close" size={20} color="#ffffff" />
+            <Ionicons name="close" size={20} color={colorPalette.white} />
           </Pressable>
           <Box gap={2} style={styles.emptyCard}>
             <Text role="titleSm" style={styles.emptyTitle}>لا توجد فيديوهات معتمدة بعد</Text>
@@ -119,7 +131,7 @@ export function DshHomeApprovedVideoReelsViewer({
       <StatusBar hidden />
       <View style={styles.container}>
         <Pressable style={styles.closeButton} onPress={handleClose} accessibilityRole="button" accessibilityLabel="إغلاق الفيديو">
-          <Ionicons name="close" size={20} color="#ffffff" />
+          <Ionicons name="close" size={20} color={colorPalette.white} />
         </Pressable>
 
         <FlatList
@@ -182,7 +194,7 @@ export function DshHomeApprovedVideoReelsViewer({
                           accessibilityLabel={item.ctaLabel}
                         >
                           <Text role="bodyMd" style={styles.ctaText}>{item.ctaLabel}</Text>
-                          <Ionicons name="arrow-back" size={18} color="#ffffff" />
+                          <Ionicons name="arrow-back" size={18} color={colorPalette.white} />
                         </Pressable>
                       </Box>
                     </View>
@@ -200,7 +212,7 @@ export function DshHomeApprovedVideoReelsViewer({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#020617',
+    backgroundColor: colorPalette.black,
   },
   slideShell: {
     width: '100%',
@@ -211,13 +223,13 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 30,
     overflow: 'hidden',
-    backgroundColor: 'rgba(15, 23, 42, 0.86)',
+    backgroundColor: applyAlpha(colorPalette.black, 0.86),
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: applyAlpha(colorPalette.white, 0.1),
   },
   mediaShell: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: applyAlpha(colorPalette.black, 0.92),
   },
   poster: {
     ...StyleSheet.absoluteFillObject,
@@ -226,11 +238,11 @@ const styles = StyleSheet.create({
   },
   posterFallback: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#0f172a',
+    backgroundColor: applyAlpha(colorPalette.black, 0.92),
   },
   mediaScrim: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(2, 6, 23, 0.38)',
+    backgroundColor: applyAlpha(colorPalette.black, 0.38),
   },
   mediaHeader: {
     position: 'absolute',
@@ -246,19 +258,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: 'rgba(15, 23, 42, 0.58)',
+    backgroundColor: applyAlpha(colorPalette.black, 0.58),
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
+    borderColor: applyAlpha(colorPalette.white, 0.14),
   },
   mediaTagText: {
-    color: '#ffffff',
+    color: colorPalette.white,
     fontWeight: '800',
   },
   mediaSwipeHint: {
-    color: 'rgba(255,255,255,0.84)',
+    color: applyAlpha(colorPalette.white, 0.84),
     fontWeight: '700',
     textAlign: 'right',
-    backgroundColor: 'rgba(15, 23, 42, 0.42)',
+    backgroundColor: applyAlpha(colorPalette.black, 0.42),
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -280,22 +292,22 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: 'rgba(15, 23, 42, 0.52)',
+    backgroundColor: applyAlpha(colorPalette.black, 0.52),
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
+    borderColor: applyAlpha(colorPalette.white, 0.14),
   },
   title: {
-    color: '#ffffff',
+    color: colorPalette.white,
     fontWeight: '900',
   },
   subtitle: {
-    color: 'rgba(255,255,255,0.92)',
+    color: applyAlpha(colorPalette.white, 0.92),
     lineHeight: 22,
   },
   highlight: {
-    color: 'rgba(255,255,255,0.86)',
+    color: applyAlpha(colorPalette.white, 0.86),
     fontWeight: '700',
   },
   ctaButton: {
@@ -305,19 +317,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    shadowColor: '#000',
+    shadowColor: colorPalette.black,
     shadowOpacity: 0.22,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     elevation: 5,
   },
   ctaText: {
-    color: '#ffffff',
+    color: colorPalette.white,
     fontWeight: '900',
   },
   emptyContainer: {
     flex: 1,
-    backgroundColor: '#020617',
+    backgroundColor: colorPalette.black,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
@@ -327,16 +339,16 @@ const styles = StyleSheet.create({
     maxWidth: 420,
     padding: 20,
     borderRadius: 28,
-    backgroundColor: 'rgba(15, 23, 42, 0.76)',
+    backgroundColor: applyAlpha(colorPalette.black, 0.76),
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: applyAlpha(colorPalette.white, 0.1),
   },
   emptyTitle: {
-    color: '#ffffff',
+    color: colorPalette.white,
     fontWeight: '900',
   },
   emptyBody: {
-    color: 'rgba(255,255,255,0.88)',
+    color: applyAlpha(colorPalette.white, 0.88),
     lineHeight: 22,
   },
 });
