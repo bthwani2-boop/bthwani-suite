@@ -281,7 +281,7 @@ function pickBackdropColor(name: string) {
 }
 
 function hexToRgba(hex: string, alpha = 0.9) {
-  const clean = (hex || '#ffffff').replace('#', '').trim();
+  const clean = (hex || colorPalette.white).replace('#', '').trim();
   const short = clean.length === 3;
   const r = parseInt(short ? clean[0] + clean[0] : clean.slice(0, 2), 16);
   const g = parseInt(short ? clean[1] + clean[1] : clean.slice(2, 4), 16);
@@ -532,10 +532,10 @@ export function DshStoreGetScreen({
   // tighter rotation range for a premium subtle feel
   const previewRotateDeg = previewRotate.interpolate({ inputRange: [-200, 200], outputRange: ['-6deg', '6deg'], extrapolate: 'clamp' });
 
-  // Staging preview (next card) shown while user drags
-  const [stagingPreviewItem, setStagingPreviewItem] = React.useState<DshStoreGetMenuItem | null>(null);
-  const [stagingType, setStagingType] = React.useState<'category' | 'item' | null>(null);
-  const [stagingSign, setStagingSign] = React.useState<number>(1);
+  // Preview peek (next card) shown while dragging
+  const [previewPeekItem, setPreviewPeekItem] = React.useState<DshStoreGetMenuItem | null>(null);
+  const [previewPeekType, setPreviewPeekType] = React.useState<'category' | 'item' | null>(null);
+  const [previewPeekSign, setPreviewPeekSign] = React.useState<number>(1);
 
   const STAGE_OFFSET_X = Dimensions.get('window').width + 220;
   const stageOffsetPosX = React.useRef(new Animated.Value(STAGE_OFFSET_X)).current;
@@ -546,43 +546,43 @@ export function DshStoreGetScreen({
   const stageOffsetNegY = React.useRef(new Animated.Value(-STAGE_OFFSET_Y)).current;
 
   // Throttle & prefetch helpers to avoid heavy work on every move event
-  const lastStagingUpdateRef = React.useRef<number>(0);
-  const STAGING_THROTTLE_MS = 90; // ms between staging updates
+  const lastPreviewPeekUpdateRef = React.useRef<number>(0);
+  const PREVIEW_PEEK_THROTTLE_MS = 90; // ms between preview-peek updates
   const prefetchedUrisRef = React.useRef<Record<string, boolean>>({});
-  const stagingIdRef = React.useRef<string | null>(null);
+  const previewPeekIdRef = React.useRef<string | null>(null);
 
-  const trySetStaging = React.useCallback((nextPreview: DshStoreGetMenuItem | null, type: 'category' | 'item' | null, sign: number) => {
+  const trySetPreviewPeek = React.useCallback((nextPreview: DshStoreGetMenuItem | null, type: 'category' | 'item' | null, sign: number) => {
     const now = Date.now();
     if (!nextPreview) {
-      stagingIdRef.current = null;
-      try { setStagingPreviewItem(null); setStagingType(null); setStagingSign(1); } catch {}
+      previewPeekIdRef.current = null;
+      try { setPreviewPeekItem(null); setPreviewPeekType(null); setPreviewPeekSign(1); } catch {}
       return;
     }
 
-    if (stagingIdRef.current === nextPreview.id && stagingType === type) {
+    if (previewPeekIdRef.current === nextPreview.id && previewPeekType === type) {
       return; // already staged
     }
 
-    if (now - lastStagingUpdateRef.current < STAGING_THROTTLE_MS) {
+    if (now - lastPreviewPeekUpdateRef.current < PREVIEW_PEEK_THROTTLE_MS) {
       return; // throttle frequent moves
     }
 
-    lastStagingUpdateRef.current = now;
+    lastPreviewPeekUpdateRef.current = now;
 
     const uri = nextPreview.imageUri;
     if (uri && !prefetchedUrisRef.current[uri]) {
       // mark as prefetched to avoid repeating
       prefetchedUrisRef.current[uri] = true;
-      // prefetch asynchronously then set staging (don't await on main thread)
+      // prefetch asynchronously then set the preview peek (don't await on main thread)
       Image.prefetch(uri).finally(() => {
-        stagingIdRef.current = nextPreview.id;
-        try { setStagingPreviewItem(nextPreview); setStagingType(type); setStagingSign(sign); } catch {}
+        previewPeekIdRef.current = nextPreview.id;
+        try { setPreviewPeekItem(nextPreview); setPreviewPeekType(type); setPreviewPeekSign(sign); } catch {}
       });
     } else {
-      stagingIdRef.current = nextPreview.id;
-      try { setStagingPreviewItem(nextPreview); setStagingType(type); setStagingSign(sign); } catch {}
+      previewPeekIdRef.current = nextPreview.id;
+      try { setPreviewPeekItem(nextPreview); setPreviewPeekType(type); setPreviewPeekSign(sign); } catch {}
     }
-  }, [stagingType]);
+  }, [previewPeekType]);
 
   const chipsScrollRef = React.useRef<ScrollView | null>(null);
   const chipLayoutsRef = React.useRef<Record<string, { x: number; width: number }>>({});
@@ -771,12 +771,12 @@ export function DshStoreGetScreen({
         // smaller, smoother rotation mapping
         previewRotate.setValue(gestureState.dx * 0.045);
 
-        // staging logic: reveal next card immediately while dragging
+        // preview-peek logic: reveal the next card immediately while dragging
         const { dx, dy } = gestureState;
         const absDx = Math.abs(dx);
         const absDy = Math.abs(dy);
 
-        // horizontal staging
+        // horizontal preview peek
         if (absDx >= absDy && absDx > 8) {
           const toLeft = dx < 0;
           const currentCatIndex = categories.findIndex((c) => c.id === selectedCategory);
@@ -791,31 +791,31 @@ export function DshStoreGetScreen({
             const nextCategoryItems = resolveItemsForCategory(categories[candidateCatIndex].id);
               if (nextCategoryItems.length) {
               const nextPreview = nextCategoryItems[0];
-              trySetStaging(nextPreview, 'category', toLeft ? 1 : -1);
+              trySetPreviewPeek(nextPreview, 'category', toLeft ? 1 : -1);
             } else {
-              // clear staging if no candidate
-              trySetStaging(null, null, 1);
+              // clear the preview peek if there is no candidate
+              trySetPreviewPeek(null, null, 1);
             }
-          } else if (stagingPreviewItem) {
-            setStagingPreviewItem(null);
-            setStagingType(null);
+          } else if (previewPeekItem) {
+            setPreviewPeekItem(null);
+            setPreviewPeekType(null);
           }
 
-        // vertical staging
+        // vertical preview peek
         } else if (absDy > absDx && absDy > 8) {
           if (previewCurrentIndex !== -1) {
             const toUp = dy < 0;
             const candidateItemIndex = Math.max(0, Math.min(previewItems.length - 1, previewCurrentIndex + (toUp ? 1 : -1)));
             if (candidateItemIndex !== previewCurrentIndex) {
               const nextPreview = previewItems[candidateItemIndex];
-              trySetStaging(nextPreview, 'item', toUp ? 1 : -1);
+              trySetPreviewPeek(nextPreview, 'item', toUp ? 1 : -1);
             } else {
-              trySetStaging(null, null, 1);
+              trySetPreviewPeek(null, null, 1);
             }
           }
         } else {
           // clear if movement is not directional enough
-          trySetStaging(null, null, 1);
+          trySetPreviewPeek(null, null, 1);
         }
       },
       onPanResponderRelease: (_evt, gestureState) => {
@@ -841,7 +841,7 @@ export function DshStoreGetScreen({
               Animated.timing(previewDrag.x, { toValue: 0, duration: Math.max(180, Math.floor(280 - speedAdj / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: true }),
               Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 6, tension: 90 }),
               Animated.timing(previewRotate, { toValue: 0, duration: 180, useNativeDriver: true }),
-            ]).start(() => { stagingIdRef.current = null; try { setStagingPreviewItem(null); setStagingType(null); } catch {} });
+            ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch {} });
             try { Vibration.vibrate(8); } catch {}
           });
         };
@@ -858,7 +858,7 @@ export function DshStoreGetScreen({
               Animated.timing(previewDrag.y, { toValue: 0, duration: Math.max(160, Math.floor(240 - speedAdjY / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: true }),
               Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 6, tension: 90 }),
               Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
-            ]).start(() => { stagingIdRef.current = null; try { setStagingPreviewItem(null); setStagingType(null); } catch {} });
+            ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch {} });
             try { Vibration.vibrate(6); } catch {}
           });
         };
@@ -884,7 +884,7 @@ export function DshStoreGetScreen({
             Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: true, friction: 7, tension: 90 }),
             Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 8, tension: 90 }),
             Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
-          ]).start(() => { stagingIdRef.current = null; try { setStagingPreviewItem(null); setStagingType(null); } catch {} });
+          ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch {} });
         }
       },
       onPanResponderTerminate: () => {
@@ -892,7 +892,7 @@ export function DshStoreGetScreen({
           Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: true, friction: 7, tension: 90 }),
           Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 8, tension: 90 }),
           Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
-        ]).start(() => { stagingIdRef.current = null; try { setStagingPreviewItem(null); setStagingType(null); } catch {} });
+        ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch {} });
       },
       onPanResponderTerminationRequest: () => false,
       onShouldBlockNativeResponder: () => true,
@@ -1017,7 +1017,7 @@ export function DshStoreGetScreen({
         message: `${normalizedStoreName} • ${normalizedStoreSubtitle}`,
       });
     } catch {
-      // no-op: sharing can be dismissed by the user
+      // sharing may be dismissed without completing the action
     }
   }, [normalizedStoreName, normalizedStoreSubtitle]);
 
@@ -1271,7 +1271,7 @@ export function DshStoreGetScreen({
                           <Text style={styles.topMetaChipText} numberOfLines={1}>{normalizedEtaLabel}</Text>
                         </View>
                         <View style={styles.topMetaChip}>
-                          <Ionicons name="star" size={9} color="#f59e0b" />
+                          <Ionicons name="star" size={9} color={stylesTokens.warning} />
                           <Text style={styles.topMetaChipText} numberOfLines={1}>{storeText.get.ratingValue}</Text>
                         </View>
                       </View>
@@ -1460,16 +1460,16 @@ export function DshStoreGetScreen({
         <View style={styles.previewOverlay}>
           <Pressable style={styles.previewBackdrop} onPress={closeImagePreview} />
           <View style={styles.previewWrap} pointerEvents="box-none">
-            {stagingPreviewItem ? (
+            {previewPeekItem ? (
               (() => {
-                // choose appropriate offset node for staging transform
-                const stageX = stagingSign === 1 ? stageOffsetPosX : stageOffsetNegX;
-                const stageY = stagingSign === 1 ? stageOffsetPosY : stageOffsetNegY;
+                // choose the appropriate offset node for the preview-peek transform
+                const stageX = previewPeekSign === 1 ? stageOffsetPosX : stageOffsetNegX;
+                const stageY = previewPeekSign === 1 ? stageOffsetPosY : stageOffsetNegY;
                 const stageTranslateX = Animated.add(previewDrag.x, stageX);
                 const stageTranslateY = Animated.add(previewDrag.y, stageY);
-                const stageOpacity = stagingType === 'category'
-                  ? previewDrag.x.interpolate({ inputRange: stagingSign === 1 ? [-24, 0] : [0, 24], outputRange: [1, 0], extrapolate: 'clamp' })
-                  : previewDrag.y.interpolate({ inputRange: stagingSign === 1 ? [-24, 0] : [0, 24], outputRange: [1, 0], extrapolate: 'clamp' });
+                const stageOpacity = previewPeekType === 'category'
+                  ? previewDrag.x.interpolate({ inputRange: previewPeekSign === 1 ? [-24, 0] : [0, 24], outputRange: [1, 0], extrapolate: 'clamp' })
+                  : previewDrag.y.interpolate({ inputRange: previewPeekSign === 1 ? [-24, 0] : [0, 24], outputRange: [1, 0], extrapolate: 'clamp' });
 
                 return (
                   <Animated.View
@@ -1477,37 +1477,37 @@ export function DshStoreGetScreen({
                     collapsable={false}
                     style={[
                       styles.previewCard,
-                      { position: 'absolute', left: 0, right: 0, zIndex: 1, opacity: stageOpacity, transform: stagingType === 'category' ? [{ translateX: stageTranslateX }] : [{ translateY: stageTranslateY }] },
+                      { position: 'absolute', left: 0, right: 0, zIndex: 1, opacity: stageOpacity, transform: previewPeekType === 'category' ? [{ translateX: stageTranslateX }] : [{ translateY: stageTranslateY }] },
                     ]}
                   >
                     <View style={styles.previewImageWrap} pointerEvents="box-none">
                       {previewPartnerBadge}
 
-                      <Text style={styles.previewEmoji}>{getItemEmoji(stagingPreviewItem)}</Text>
+                      <Text style={styles.previewEmoji}>{getItemEmoji(previewPeekItem)}</Text>
 
                       <Image
-                        source={resolveDshStoreMenuItemImageSource(stagingPreviewItem)}
+                        source={resolveDshStoreMenuItemImageSource(previewPeekItem)}
                         style={styles.previewImage}
                       />
 
                       {
                         (() => {
-                          const overlayColor = getOverlayColor(normalizeDisplayText(stagingPreviewItem.name), 0.86);
+                          const overlayColor = getOverlayColor(normalizeDisplayText(previewPeekItem.name), 0.86);
                           return (
                             <View style={[styles.previewDetailsBox, { backgroundColor: overlayColor, flexDirection: isRTL ? 'row-reverse' : 'row' }]} pointerEvents="box-none">
                               <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]}>
                                 {store ? <Text style={[styles.previewStoreName, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizedStoreName}</Text> : null}
-                                <Text style={[styles.previewDetailsTitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(stagingPreviewItem.name)}</Text>
-                                {stagingPreviewItem.subtitle ? <Text style={[styles.previewDetailsSubtitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(stagingPreviewItem.subtitle)}</Text> : null}
+                                <Text style={[styles.previewDetailsTitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.name)}</Text>
+                                {previewPeekItem.subtitle ? <Text style={[styles.previewDetailsSubtitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.subtitle)}</Text> : null}
 
                                 <View style={[styles.previewDetailsMetaRow, isRTL ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }]}>
-                                  {stagingPreviewItem.priceLabel ? <Text style={[styles.previewDetailsPrice, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(stagingPreviewItem.priceLabel)}</Text> : null}
-                                  {stagingPreviewItem.discountLabel ? <Text style={[styles.previewDetailsDiscount, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(stagingPreviewItem.discountLabel)}</Text> : null}
+                                  {previewPeekItem.priceLabel ? <Text style={[styles.previewDetailsPrice, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.priceLabel)}</Text> : null}
+                                  {previewPeekItem.discountLabel ? <Text style={[styles.previewDetailsDiscount, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.discountLabel)}</Text> : null}
                                 </View>
                               </View>
 
                               <View style={[styles.previewDetailsFavoriteButton, { opacity: 0.95 }]}>
-                                <Ionicons name={favoriteIds.has(stagingPreviewItem.id) ? 'heart' : 'heart-outline'} size={18} color={stylesTokens.orange} />
+                                <Ionicons name={favoriteIds.has(previewPeekItem.id) ? 'heart' : 'heart-outline'} size={18} color={stylesTokens.orange} />
                               </View>
                             </View>
                           );
@@ -1630,7 +1630,7 @@ export function DshStoreGetScreen({
                         activeOpacity={0.85}
                         onPress={() => setSelectedMeasureQty((current) => Math.max(1, current - 1))}
                       >
-                        <Ionicons name="remove" size={18} color="#8a94a6" />
+                        <Ionicons name="remove" size={18} color={stylesTokens.muted} />
                       </TouchableOpacity>
 
                       <View style={styles.measureQtyValuePill}>
@@ -1675,16 +1675,29 @@ const stylesTokens = {
   orange: colorPalette.brand,
   orangeSoft: colorPalette.brandSurface,
   orangeBorder: colorPalette.brandStrong,
+  brandSoft: colorPalette.brandSoft,
   white: colorPalette.white,
   dark: colorPalette.ink,
   muted: colorPalette.inkMuted,
   light: colorPalette.surfaceAlt,
   line: colorPalette.line,
+  lineStrong: colorPalette.lineStrong,
   chip: colorPalette.surfaceInset,
   chipText: colorPalette.inkMuted,
   green: colorPalette.success,
   blue: colorPalette.infoStrong,
+  infoSurface: colorPalette.infoSurface,
+  infoBorder: colorPalette.info,
+  infoText: colorPalette.infoStrong,
+  warning: colorPalette.warning,
+  warningSurface: colorPalette.warningSurface,
+  warningText: colorPalette.warningStrong,
   red: colorPalette.danger,
+  black: colorPalette.black,
+  overlaySoft: hexToRgba(colorPalette.brandStrong, 0.06),
+  overlayDense: hexToRgba(colorPalette.brandStrong, 0.42),
+  overlay: colorPalette.overlay,
+  whiteOverlay: hexToRgba(colorPalette.white, 0.96),
 };
 
 const styles = StyleSheet.create({
@@ -1962,7 +1975,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: stylesTokens.orangeSoft,
     borderWidth: 1,
-    borderColor: '#fed7aa',
+    borderColor: colorPalette.borderSubtle,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
@@ -2034,15 +2047,15 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   heroBadgePrimary: {
-    backgroundColor: '#eef2ff',
+    backgroundColor: stylesTokens.infoSurface,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderWidth: 1,
-    borderColor: '#c7d2fe',
+    borderColor: stylesTokens.infoBorder,
   },
   heroBadgePrimaryText: {
-    color: '#1d4ed8',
+    color: stylesTokens.infoText,
     fontSize: 10.5,
     fontWeight: '800',
   },
@@ -2066,7 +2079,7 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
   heroSubtitle: {
-    color: '#cbd5e1',
+    color: stylesTokens.lineStrong,
     fontSize: 13,
     marginTop: 4,
     lineHeight: 18,
@@ -2102,12 +2115,12 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   storeStateNoticeWarning: {
-    backgroundColor: '#fff7ed',
-    borderColor: '#fed7aa',
+    backgroundColor: stylesTokens.orangeSoft,
+    borderColor: colorPalette.borderSubtle,
   },
   storeStateNoticeDanger: {
-    backgroundColor: '#fff7ed',
-    borderColor: '#fdba74',
+    backgroundColor: stylesTokens.orangeSoft,
+    borderColor: stylesTokens.warning,
   },
   storeStateNoticeCopy: {
     gap: 4,
@@ -2148,26 +2161,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 1,
-    backgroundColor: '#fff8f1',
+    backgroundColor: stylesTokens.brandSoft,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#ead8c6',
+    borderColor: colorPalette.borderSubtle,
     paddingHorizontal: 5,
     paddingVertical: 0,
     minHeight: 18,
   },
   tagChipAccent: {
-    backgroundColor: '#fef2e4',
-    borderColor: '#f2c79c',
+    backgroundColor: stylesTokens.orangeSoft,
+    borderColor: colorPalette.borderSubtle,
   },
   tagChipText: {
-    color: '#1f2937',
+    color: stylesTokens.dark,
     fontSize: 8.5,
     fontWeight: '700',
     lineHeight: 10,
   },
   tagChipTextAccent: {
-    color: '#7c2d12',
+    color: stylesTokens.warningText,
   },
   modeStripWrapInline: {
     marginTop: 0,
@@ -2238,7 +2251,7 @@ const styles = StyleSheet.create({
   categoryPill: {
     backgroundColor: stylesTokens.white,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: stylesTokens.line,
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -2247,7 +2260,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   categoryPillSelected: {
-    backgroundColor: '#fff7ed',
+    backgroundColor: stylesTokens.orangeSoft,
     borderColor: stylesTokens.orange,
   },
   categoryPillIcon: {
@@ -2291,7 +2304,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: stylesTokens.black,
         shadowOpacity: 0.08,
         shadowRadius: 8,
         shadowOffset: { width: 0, height: 2 },
@@ -2332,18 +2345,18 @@ const styles = StyleSheet.create({
     borderRadius: 7.5,
     backgroundColor: stylesTokens.white,
     borderWidth: 1,
-    borderColor: '#fed7aa',
+    borderColor: colorPalette.borderSubtle,
     justifyContent: 'center',
     alignItems: 'center',
   },
   measureOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+    backgroundColor: stylesTokens.overlaySoft,
   },
   previewOverlay: {
     flex: 1,
     position: 'relative',
-    backgroundColor: 'rgba(15, 23, 42, 0.54)',
+    backgroundColor: stylesTokens.overlay,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 18,
@@ -2393,9 +2406,9 @@ const styles = StyleSheet.create({
     width: 44,
     height: 36,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.96)',
+    backgroundColor: stylesTokens.whiteOverlay,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: stylesTokens.line,
     zIndex: 8,
     overflow: 'hidden',
     justifyContent: 'center',
@@ -2425,7 +2438,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#fed7aa',
+    borderColor: colorPalette.borderSubtle,
     zIndex: 5,
   },
   previewDetailsBox: {
@@ -2495,7 +2508,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#fed7aa',
+    borderColor: colorPalette.borderSubtle,
     zIndex: 3,
     elevation: 3,
   },
@@ -2528,7 +2541,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
     borderWidth: 2,
-    borderColor: '#fff7ed',
+    borderColor: stylesTokens.orangeSoft,
   },
   measureOriginPlusBadge: {
     position: 'absolute',
@@ -2541,7 +2554,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#fed7aa',
+    borderColor: colorPalette.borderSubtle,
   },
   measurePopoverCard: {
     flex: 1,
@@ -2550,11 +2563,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 8,
     borderWidth: 1,
-    borderColor: '#d9e0ea',
+    borderColor: stylesTokens.line,
     gap: 6,
     ...Platform.select({
       ios: {
-        shadowColor: '#0f172a',
+        shadowColor: stylesTokens.black,
         shadowOpacity: 0.08,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 4 },
@@ -2590,7 +2603,7 @@ const styles = StyleSheet.create({
     minHeight: 48,
     backgroundColor: stylesTokens.white,
     borderWidth: 1,
-    borderColor: '#d9e0ea',
+    borderColor: stylesTokens.line,
     borderRadius: 18,
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -2616,7 +2629,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   measureOptionPriceTextActive: {
-    color: '#fff7ed',
+    color: stylesTokens.orangeSoft,
   },
   measureQtyRow: {
     flexDirection: 'row-reverse',
@@ -2629,9 +2642,9 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#f8fafc',
+    backgroundColor: stylesTokens.light,
     borderWidth: 1,
-    borderColor: '#d9e0ea',
+    borderColor: stylesTokens.line,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -2643,15 +2656,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#ffb35c',
+    borderColor: stylesTokens.orange,
   },
   measureQtyValuePill: {
     minWidth: 56,
     height: 38,
     borderRadius: 16,
-    backgroundColor: '#fffaf5',
+    backgroundColor: stylesTokens.brandSoft,
     borderWidth: 1,
-    borderColor: '#fed7aa',
+    borderColor: colorPalette.borderSubtle,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 10,
@@ -2667,7 +2680,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#d9e0ea',
+    borderColor: stylesTokens.line,
     marginTop: 4,
   },
   measurePriceValueBox: {
@@ -2700,7 +2713,7 @@ const styles = StyleSheet.create({
   },
   cartDecisionOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.42)',
+    backgroundColor: stylesTokens.overlayDense,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
@@ -2712,11 +2725,11 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#d9e0ea',
+    borderColor: stylesTokens.line,
     gap: 14,
     ...Platform.select({
       ios: {
-        shadowColor: '#0f172a',
+        shadowColor: stylesTokens.black,
         shadowOpacity: 0.06,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 6 },

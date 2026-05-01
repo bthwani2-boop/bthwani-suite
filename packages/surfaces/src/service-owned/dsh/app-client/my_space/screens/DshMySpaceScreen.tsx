@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, View, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
-import { Box, Icon, MobileScrollView, Surface, Text, TopBar, safeArea, spacing, useTheme } from '@bthwani/ui-kit';
+import { Box, Icon, MobileScrollView, Surface, Text, TopBar, colorPalette, safeArea, spacing, useTheme } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../../patterns/screens/DshOperationScreen';
 import { DshMySpaceCommercialScreen } from './DshMySpaceCommercialScreen';
 import { DshMySpaceOrdersScreen } from './DshMySpaceOrdersScreen';
@@ -69,7 +69,7 @@ function MySpacePrimaryRow({
         borderWidth: 1,
         borderColor: isExpanded ? theme.brand : theme.line,
         backgroundColor: isExpanded ? theme.brandSurface : theme.surfaceRaised,
-        shadowColor: isExpanded ? theme.brand : '#020617',
+        shadowColor: isExpanded ? theme.brand : colorPalette.black,
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: isExpanded ? 0.1 : 0.05,
         shadowRadius: isExpanded ? 14 : 10,

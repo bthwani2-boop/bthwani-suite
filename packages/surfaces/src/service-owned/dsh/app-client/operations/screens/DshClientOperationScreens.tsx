@@ -518,7 +518,7 @@ function OperationScreenView({
             <Surface tone="inset" gap={2}>
               <Text role="bodyStrong">تنبيه تشغيلي</Text>
               <Text role="bodySm" tone="muted">
-                هذا المسار داخلي/تشخيصي فقط. لا يُمثّل إجراء عميل نهائي ولا يجب اعتباره جزءًا من customer-facing path.
+                هذا المسار داخلي/تشخيصي فقط. لا يُمثّل إجراء عميل نهائي ولا يجب اعتباره جزءًا من المسار الظاهر للعميل.
               </Text>
             </Surface>
           ) : null}
@@ -560,7 +560,7 @@ export function DshClientOperationDirectoryScreen({ onOpenScreen }: { onOpenScre
       <Surface tone="inset" gap={2}>
         <Text role="bodyStrong">ضبط التسربات التشغيلية</Text>
         <Text role="bodySm" tone="muted">
-          المسارات الداخلية/التشخيصية مثل قبول الطلب، إكماله، الحجز المالي، وإعادة الإسناد لم تعد معروضة داخل هذا الدليل customer-facing.
+          المسارات الداخلية/التشخيصية مثل قبول الطلب، إكماله، الحجز المالي، وإعادة الإسناد لم تعد معروضة داخل هذا الدليل الظاهر للعميل.
         </Text>
       </Surface>
 

@@ -1,5 +1,6 @@
 import { dshDiscoveryStores } from '../../stores/fixtures/discoveryFixtures';
 import type { DshDiscoveryStore } from '../../stores/fixtures/types';
+import { brandPalette, dangerPalette, infoPalette, successPalette } from '@bthwani/ui-kit';
 
 export type DshHomeGetFixtureProduct = {
   id: string;
@@ -105,7 +106,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'تخفيضات',
     subtitle: 'خصم 30% على أول طلب',
     icon: '🔥',
-    accentColor: '#ff9b33',
+    accentColor: brandPalette[500],
     actionType: 'main_category',
     actionTarget: 'restaurants',
   },
@@ -115,7 +116,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'تتبّع مباشر',
     subtitle: 'افتح الطلب النشط دون ضياع المسار',
     icon: '📍',
-    accentColor: '#2557c9',
+    accentColor: infoPalette[600],
     actionType: 'store',
     actionTarget: 'store-1001',
   },
@@ -125,7 +126,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'الفئات المختارة',
     subtitle: 'فئات قصيرة ومباشرة من نفس الواجهة',
     icon: '✨',
-    accentColor: '#ff6a6a',
+    accentColor: dangerPalette[600],
     actionType: 'sub_category',
     actionTarget: 'grocery',
     actionExtra: 'grocery_vegetables_fruits',
@@ -136,7 +137,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'متجر مباشر',
     subtitle: 'افتح المتجر ثم تابع إلى القائمة',
     icon: '🏪',
-    accentColor: '#0d2f67',
+    accentColor: brandPalette[600],
     actionType: 'store',
     actionTarget: 'store-1002',
   },
@@ -146,7 +147,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'منتج مباشر',
     subtitle: 'افتح المنتج الجاهز للتفاعل',
     icon: '📦',
-    accentColor: '#f54747',
+    accentColor: dangerPalette[600],
     actionType: 'product',
     actionTarget: 'item-apple-1',
     actionExtra: 'store-1001',
@@ -157,7 +158,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'قائمة المتاجر',
     subtitle: 'واجهة تجمع كل المتاجر القريبة',
     icon: '🛍️',
-    accentColor: '#15a26b',
+    accentColor: successPalette[600],
     actionType: 'external',
     actionTarget: 'DshStoresList',
   },
@@ -167,7 +168,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     title: 'اشتراك مميز',
     subtitle: 'اعرض فوائد الاشتراك مباشرة',
     icon: '⭐',
-    accentColor: '#7a4fff',
+    accentColor: brandPalette[600],
     actionType: 'subscription',
   },
 ];

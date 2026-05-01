@@ -1,6 +1,6 @@
 import React from 'react';
 import { BackHandler, Platform, View } from 'react-native';
-import { Surface, Text } from '@bthwani/ui-kit';
+import { Surface, Text, colorPalette } from '@bthwani/ui-kit';
 import { DshSearchScreen } from './discovery/screens';
 import { DshEntryScreen } from './entry/screens';
 import { DshClientBellScreen } from './bell';
@@ -741,8 +741,8 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   if (missing.length > 0) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <Text style={{ color: '#0A2F5C', fontSize: 18, fontWeight: '700', marginBottom: 12 }}>مكوّنات مفقودة</Text>
-        <Text style={{ color: '#0A2F5C' }}>{missing.join(', ')}</Text>
+        <Text style={{ color: colorPalette.brandStrong, fontSize: 18, fontWeight: '700', marginBottom: 12 }}>مكوّنات مفقودة</Text>
+        <Text style={{ color: colorPalette.brandStrong }}>{missing.join(', ')}</Text>
       </View>
     );
   }

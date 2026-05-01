@@ -14,6 +14,7 @@ import {
   Surface,
   Text,
   TopBar,
+  colorPalette,
   radius,
   resolveRowDirection,
   resolveTextAlign,
@@ -229,7 +230,7 @@ const serviceLauncherMarkStyles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#FFF4E8', // BThwani light orange background
+    backgroundColor: colorPalette.brandSurface,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -242,8 +243,8 @@ const serviceLauncherMarkStyles = StyleSheet.create({
     bottom: 0,
     borderRadius: 25,
     borderWidth: 2,
-    borderColor: '#0A2F5C', // deepBlue
-    borderTopColor: '#FF500D', // orange
+    borderColor: colorPalette.brandStrong,
+    borderTopColor: colorPalette.brand,
   },
   needle: {
     position: 'absolute',
@@ -252,7 +253,7 @@ const serviceLauncherMarkStyles = StyleSheet.create({
     width: 6,
     height: 17,
     borderRadius: 999,
-    backgroundColor: '#0A2F5C', // deepBlue
+    backgroundColor: colorPalette.brandStrong,
     transform: [{ rotate: '24deg' }],
   },
   planeWrap: {
@@ -261,7 +262,7 @@ const serviceLauncherMarkStyles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF', // white
+    backgroundColor: colorPalette.white,
   },
 });
 
@@ -337,7 +338,7 @@ function DshServiceLauncherMark() {
       <View style={serviceLauncherMarkStyles.orbit} />
       <View style={serviceLauncherMarkStyles.needle} />
       <View style={serviceLauncherMarkStyles.planeWrap}>
-        <Icon name="paper-plane" size={14} color="#FF500D" /> {/* orange */}
+        <Icon name="paper-plane" size={14} color={colorPalette.brand} />
       </View>
     </View>
   );
@@ -345,7 +346,7 @@ function DshServiceLauncherMark() {
 
 function CategoryHubIcon() {
   return (
-    <Ionicons name="grid-outline" size={22} color="#FF500D" /> // orange
+    <Ionicons name="grid-outline" size={22} color={colorPalette.brand} />
   );
 }
 
@@ -464,7 +465,7 @@ export function DshHomeGetScreen({
   const { width: viewportWidth, height: viewportHeight } = useWindowDimensions();
   const { theme } = useTheme();
   const uiText = useUiText();
-  const styles = React.useMemo(() => createStyles(direction), [direction]);
+  const styles = React.useMemo(() => createStyles(direction, theme), [direction, theme]);
   const categoriesAnchorRef = React.useRef<View>(null);
   const [categoriesSheetVisible, setCategoriesSheetVisible] = React.useState(false);
   const [categoriesDialLayout, setCategoriesDialLayout] = React.useState<DialAnchorLayout | null>(null);
@@ -930,32 +931,32 @@ export function DshHomeGetScreen({
           subtitle={uiText.topBar.brandTagline}
           onTitlePress={handleOpenMySpace}
           locationLabel={uiText.topBar.location}
-          locationIcon={<Icon name="location-outline" size={12} color="#FFFFFF" />}
+          locationIcon={<Icon name="location-outline" size={12} color={colorPalette.white} />}
           contentOffsetY={spacing[2]}
           actionsOffsetY={spacing[2]}
           actions={[
             {
               id: 'my-space',
-              icon: <Icon name="person" size={20} color="#FFFFFF" />,
+              icon: <Icon name="person" size={20} color={colorPalette.white} />,
               size: 'lg',
               accessibilityLabel: 'مساحتي',
               onPress: handleOpenMySpace,
             },
             {
               id: 'notifications',
-              icon: <Icon name="notifications-outline" size={24} color="#FFFFFF" />,
+              icon: <Icon name="notifications-outline" size={24} color={colorPalette.white} />,
               accessibilityLabel: 'الإشعارات',
               onPress: onOpenNotifications,
             },
             {
               id: 'cart',
-              icon: <Icon name="cart-outline" size={24} color="#FFFFFF" />,
+              icon: <Icon name="cart-outline" size={24} color={colorPalette.white} />,
               accessibilityLabel: 'السلة',
               onPress: onOpenCart,
             },
             {
               id: 'search',
-              icon: <Icon name="search-outline" size={24} color="#FFFFFF" />,
+              icon: <Icon name="search-outline" size={24} color={colorPalette.white} />,
               accessibilityLabel: 'بحث',
               onPress: openInlineSearch,
             },
@@ -1004,7 +1005,7 @@ export function DshHomeGetScreen({
             <View style={styles.fixedIconsContainer}>
               <Pressable style={styles.categorySelectorCard} onPress={() => setShortsVisible(true)}>
                 <View style={styles.videoIconContainer}>
-                  <Ionicons name="play" size={22} color="#FF6A00" />
+                  <Ionicons name="play" size={22} color={colorPalette.brand} />
                 </View>
                 <View style={styles.categoryNameContainer}>
                   <Text role="bodySm" style={styles.categoryName} numberOfLines={1}>فيديو</Text>
@@ -1382,20 +1383,20 @@ export function DshHomeGetScreen({
   );
 }
 
-function createStyles(direction: Direction) {
+function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['theme']) {
   const rowDirection = resolveRowDirection(direction);
   const textAlign = resolveTextAlign(direction);
 
   return StyleSheet.create({
   activeOrderCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.surface,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: theme.line,
     paddingHorizontal: 14,
     paddingVertical: 12,
     gap: 8,
-    shadowColor: '#000',
+    shadowColor: colorPalette.black,
     shadowOpacity: 0.06,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 3 },
@@ -1407,20 +1408,20 @@ function createStyles(direction: Direction) {
     gap: 8,
   },
   activeOrderStatusPill: {
-    backgroundColor: '#eafff6',
+    backgroundColor: theme.successSurface,
     borderWidth: 1,
-    borderColor: '#45d2a0',
+    borderColor: theme.success,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   activeOrderStatusText: {
-    color: '#0f9d66',
+    color: theme.successText,
     fontWeight: '800',
     fontSize: 11,
   },
   activeOrderTitle: {
-    color: '#111827',
+    color: theme.text,
     fontWeight: '800',
     fontSize: 14,
     flex: 1,
@@ -1432,13 +1433,13 @@ function createStyles(direction: Direction) {
     gap: 8,
   },
   activeOrderMetaText: {
-    color: '#6b7280',
+    color: theme.textMuted,
     fontSize: 12,
     flex: 1,
     textAlign,
   },
   activeOrderEtaText: {
-    color: '#ff6a00',
+    color: theme.brand,
     fontWeight: '800',
     fontSize: 12,
   },
@@ -1451,15 +1452,15 @@ function createStyles(direction: Direction) {
     flexDirection: rowDirection,
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#fff4e9',
+    backgroundColor: theme.brandSurface,
     borderWidth: 1,
-    borderColor: '#ffc38f',
+    borderColor: colorPalette.borderSubtle,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
   activeOrderActionText: {
-    color: '#ff6a00',
+    color: theme.brand,
     fontWeight: '800',
     fontSize: 12,
   },
@@ -1493,9 +1494,9 @@ function createStyles(direction: Direction) {
   },
   emptyFeed: {
     borderWidth: 1,
-    borderColor: '#e6eaf1',
+    borderColor: theme.line,
     borderRadius: 18,
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.surface,
     paddingHorizontal: 16,
     paddingVertical: 18,
     gap: 8,
@@ -1507,13 +1508,13 @@ function createStyles(direction: Direction) {
     lineHeight: 28,
   },
   emptyFeedTitle: {
-    color: '#0A2F5C', // deepBlue
+    color: colorPalette.brandStrong,
     fontWeight: '800',
     fontSize: 14,
     textAlign,
   },
   emptyFeedText: {
-    color: '#657082', // muted text
+    color: theme.textMuted,
     fontSize: 12,
     lineHeight: 18,
     textAlign,
@@ -1523,7 +1524,7 @@ function createStyles(direction: Direction) {
     alignSelf: 'stretch',
   },
   activeOrderStatusLabel: {
-    color: '#657082', // muted text
+    color: theme.textMuted,
     fontSize: 11,
   },
   recentOrdersSection: {
@@ -1535,12 +1536,12 @@ function createStyles(direction: Direction) {
     justifyContent: 'space-between',
   },
   recentOrdersTitle: {
-    color: '#0A2F5C', // deepBlue
+    color: colorPalette.brandStrong,
     fontWeight: '800',
     fontSize: 14,
   },
   recentOrdersSubtitle: {
-    color: '#657082', // muted text
+    color: theme.textMuted,
     fontSize: 11,
     marginTop: 2,
   },
@@ -1548,10 +1549,10 @@ function createStyles(direction: Direction) {
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: '#F4F7FB', // BThwani light gray
+    backgroundColor: theme.surfaceInset,
   },
   recentOrdersHeaderActionText: {
-    color: '#5B6372', // muted text
+    color: theme.textMuted,
     fontWeight: '700',
     fontSize: 11,
   },
@@ -1561,13 +1562,13 @@ function createStyles(direction: Direction) {
   },
   recentOrderCard: {
     width: 212,
-    backgroundColor: '#FFFFFF', // white
+    backgroundColor: theme.surface,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: '#E6EAF1', // BThwani light border
+    borderColor: theme.line,
     padding: 14,
     gap: 8,
-    shadowColor: '#0A2F5C', // deepBlue shadow
+    shadowColor: colorPalette.brandStrong,
     shadowOpacity: 0.05,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 3 },
@@ -1583,33 +1584,33 @@ function createStyles(direction: Direction) {
     flexDirection: rowDirection,
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#FFF4E8', // light orange
+    backgroundColor: theme.brandSurface,
     borderWidth: 1,
-    borderColor: '#FFD6B0', // light orange border
+    borderColor: colorPalette.borderSubtle,
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   recentOrderBadgeText: {
-    color: '#FF500D', // orange
+    color: theme.brand,
     fontWeight: '800',
     fontSize: 11,
   },
   recentOrderTitle: {
-    color: '#0A2F5C', // deepBlue
+    color: colorPalette.brandStrong,
     fontWeight: '800',
     fontSize: 13,
     flex: 1,
     textAlign,
   },
   recentOrderSubtitle: {
-    color: '#5B6372', // muted text
+    color: theme.textMuted,
     fontWeight: '700',
     fontSize: 13,
     textAlign,
   },
   recentOrderMeta: {
-    color: '#657082', // muted text
+    color: theme.textMuted,
     fontSize: 11,
     textAlign,
   },
@@ -1619,29 +1620,29 @@ function createStyles(direction: Direction) {
     justifyContent: 'space-between',
   },
   recentOrderStatusPill: {
-    backgroundColor: '#F4F7FB', // BThwani light gray
+    backgroundColor: theme.surfaceInset,
     borderWidth: 1,
-    borderColor: '#E6EAF1', // BThwani light border
+    borderColor: theme.line,
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   recentOrderStatusText: {
-    color: '#FF500D', // orange (status highlight)
+    color: theme.brand,
     fontWeight: '700',
   },
   recentOrderCTA: {
-    color: '#FF500D', // orange
+    color: theme.brand,
     fontWeight: '800',
     fontSize: 12,
   },
   shortsOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.48)',
+    backgroundColor: theme.overlay,
     justifyContent: 'flex-end',
   },
   shortsPanel: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.surface,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     paddingHorizontal: 14,
@@ -1654,7 +1655,7 @@ function createStyles(direction: Direction) {
     width: 44,
     height: 4,
     borderRadius: 999,
-    backgroundColor: '#d1d5db',
+    backgroundColor: theme.lineStrong,
     marginBottom: 10,
   },
   shortsHeader: {
@@ -1664,7 +1665,7 @@ function createStyles(direction: Direction) {
     marginBottom: 10,
   },
   shortsTitle: {
-    color: '#111827',
+    color: theme.text,
     fontWeight: '800',
     flex: 1,
     textAlign: 'center',
@@ -1673,7 +1674,7 @@ function createStyles(direction: Direction) {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: theme.surfaceInset,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1685,21 +1686,21 @@ function createStyles(direction: Direction) {
     borderRadius: 20,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    backgroundColor: '#f8fafc',
+    borderColor: theme.line,
+    backgroundColor: colorPalette.surfaceAlt,
     gap: 10,
   },
   shortsCardPromo: {
-    backgroundColor: '#fff4e9',
-    borderColor: '#ffc38f',
+    backgroundColor: theme.brandSurface,
+    borderColor: colorPalette.borderSubtle,
   },
   shortsCardStore: {
-    backgroundColor: '#f1f5ff',
-    borderColor: '#c7d2fe',
+    backgroundColor: theme.infoSurface,
+    borderColor: theme.info,
   },
   shortsCardTracking: {
-    backgroundColor: '#f0fdf4',
-    borderColor: '#bbf7d0',
+    backgroundColor: theme.successSurface,
+    borderColor: theme.success,
   },
   shortsCardTopRow: {
     flexDirection: rowDirection,
@@ -1710,7 +1711,7 @@ function createStyles(direction: Direction) {
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#ff6a00',
+    backgroundColor: theme.brand,
     justifyContent: 'center',
     alignItems: 'center',
     flexShrink: 0,
@@ -1720,13 +1721,13 @@ function createStyles(direction: Direction) {
     alignItems: 'center',
   },
   shortsCardTitle: {
-    color: '#111827',
+    color: theme.text,
     fontWeight: '800',
     fontSize: 14,
     textAlign,
   },
   shortsCardSubtitle: {
-    color: '#6b7280',
+    color: theme.textMuted,
     marginTop: 4,
     fontSize: 12,
     lineHeight: 17,
@@ -1738,16 +1739,16 @@ function createStyles(direction: Direction) {
     justifyContent: 'space-between',
   },
   shortsCardFooterText: {
-    color: '#ff6a00',
+    color: theme.brand,
     fontWeight: '700',
   },
   carouselStage: {
     height: 238,
     borderRadius: 30,
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.surface,
     borderWidth: 1,
-    borderColor: '#e6eaf1',
-    shadowColor: '#0f172a',
+    borderColor: theme.line,
+    shadowColor: colorPalette.black,
     shadowOpacity: 0.05,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 6 },
@@ -1762,11 +1763,11 @@ function createStyles(direction: Direction) {
     width: 13,
     height: 13,
     borderRadius: 6.5,
-    backgroundColor: '#d5d8df',
+    backgroundColor: theme.lineStrong,
   },
   carouselDotActive: {
     width: 34,
-    backgroundColor: '#ff6a00',
+    backgroundColor: theme.brand,
   },
   heroRow: {
     flexDirection: rowDirection,
@@ -1810,9 +1811,9 @@ function createStyles(direction: Direction) {
     width: 60,
     height: 60,
     borderRadius: 12,
-    backgroundColor: '#FFF4E8',
+    backgroundColor: theme.brandSurface,
     borderWidth: 1,
-    borderColor: '#FFD6B0',
+    borderColor: colorPalette.borderSubtle,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 2,
@@ -1821,16 +1822,16 @@ function createStyles(direction: Direction) {
     width: 60,
     height: 60,
     borderRadius: 12,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: theme.surfaceInset,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
     marginBottom: 2,
   },
   categoryHubIconContainer: {
-    backgroundColor: '#FFF4E8',
+    backgroundColor: theme.brandSurface,
     borderWidth: 1,
-    borderColor: '#FFD6B0',
+    borderColor: colorPalette.borderSubtle,
   },
   categoryIconImage: {
     width: 42,
@@ -1843,13 +1844,13 @@ function createStyles(direction: Direction) {
     minHeight: 20,
   },
   categoryNameContainerSelected: {
-    backgroundColor: '#FF6A00',
+    backgroundColor: theme.brand,
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
   categoryName: {
-    color: '#1F2937',
+    color: theme.text,
     fontWeight: '700',
     fontSize: 11,
     textAlign: 'center',
@@ -1857,25 +1858,25 @@ function createStyles(direction: Direction) {
   subcategorySelectorCard: {
     flexDirection: rowDirection,
     alignItems: 'center',
-    backgroundColor: '#F4F7FB',
+    backgroundColor: theme.surfaceInset,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 6,
     gap: 8,
-    shadowColor: '#000',
+    shadowColor: colorPalette.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 3,
     elevation: 2,
   },
   subcategorySelectorCardActive: {
-    backgroundColor: '#0D2F67',
+    backgroundColor: colorPalette.brandStrong,
   },
   subcategoryIconContainer: {
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1883,13 +1884,13 @@ function createStyles(direction: Direction) {
     fontSize: 16,
   },
   subcategoryName: {
-    color: '#111827',
+    color: theme.text,
     fontWeight: '600',
     fontSize: 12,
     textAlign: 'center',
   },
   subcategoryNameActive: {
-    color: '#FFFFFF',
+    color: theme.textInverse,
   },
   selectorRail: {
     flexDirection: rowDirection,
@@ -1904,11 +1905,11 @@ function createStyles(direction: Direction) {
     minWidth: 200,
     height: 76,
     borderRadius: 18,
-    backgroundColor: '#f54747',
+    backgroundColor: theme.danger,
     paddingHorizontal: 12,
     paddingVertical: 10,
     justifyContent: 'space-between',
-    shadowColor: '#000',
+    shadowColor: colorPalette.black,
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
@@ -1929,7 +1930,7 @@ function createStyles(direction: Direction) {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: theme.brandHeaderSurfaceStrong,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
@@ -1943,31 +1944,31 @@ function createStyles(direction: Direction) {
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.14)',
+    backgroundColor: theme.brandHeaderSurface,
     alignSelf: 'center',
   },
   heroPromoBadgeText: {
-    color: '#fff',
+    color: theme.textInverse,
     fontWeight: '800',
     fontSize: 10,
     textAlign: 'center',
   },
   heroPromoTitle: {
-    color: '#fff',
+    color: theme.textInverse,
     fontWeight: '700',
     fontSize: 14,
     lineHeight: 16,
     textAlign: 'center',
   },
   heroPromoSubtitle: {
-    color: '#ffd3d3',
+    color: theme.surface,
     fontWeight: '500',
     textAlign: 'center',
     fontSize: 11,
     lineHeight: 13,
   },
   heroIcon: {
-    color: '#fff',
+    color: theme.textInverse,
     fontSize: 26,
     lineHeight: 24,
   },
@@ -1983,9 +1984,9 @@ function createStyles(direction: Direction) {
   categoryRailItem: {
     minHeight: 42,
     borderRadius: radius.pill,
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.surface,
     borderWidth: 1,
-    borderColor: '#E6EAF1',
+    borderColor: theme.line,
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[1],
     flexDirection: rowDirection,
@@ -1993,18 +1994,18 @@ function createStyles(direction: Direction) {
     gap: 6,
   },
   categoryRailItemActive: {
-    backgroundColor: '#FFF4E9',
-    borderColor: '#FF6A00',
+    backgroundColor: theme.brandSurface,
+    borderColor: theme.brand,
   },
   categoryRailIcon: {
     fontSize: 14,
   },
   categoryRailLabel: {
-    color: '#4B5563',
+    color: theme.textMuted,
     textAlign: 'center',
   },
   categoryRailLabelActive: {
-    color: '#C2410C',
+    color: theme.brand,
   },
   heroPagerRow: {
     alignItems: 'center',
@@ -2013,7 +2014,7 @@ function createStyles(direction: Direction) {
     width: 18,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#fff',
+    backgroundColor: theme.textInverse,
   },
   quickActionBottomRow: {
     flexDirection: rowDirection,
@@ -2023,14 +2024,14 @@ function createStyles(direction: Direction) {
   quickActionSecondary: {
     minHeight: 42,
     borderRadius: 21,
-    backgroundColor: '#0d2f67',
+    backgroundColor: colorPalette.brandStrong,
     alignItems: 'center',
     justifyContent: 'center',
   },
   quickActionTertiary: {
     flex: 0.95,
     borderRadius: 21,
-    backgroundColor: '#ff6a00',
+    backgroundColor: theme.brand,
     paddingHorizontal: 10,
     alignItems: 'center',
     justifyContent: 'center',
@@ -2041,7 +2042,7 @@ function createStyles(direction: Direction) {
     gap: 6,
   },
   quickActionLabel: {
-    color: '#fff',
+    color: theme.textInverse,
     fontWeight: '700',
     fontSize: 11,
   },
@@ -2101,11 +2102,11 @@ function createStyles(direction: Direction) {
   },
   storeCard: {
     borderWidth: 1.5,
-    borderColor: '#E6EAF1', // BThwani light border
+    borderColor: theme.line,
     borderRadius: 28,
-    backgroundColor: '#FFFFFF', // white
+    backgroundColor: theme.surface,
     padding: 14,
-    shadowColor: '#0A2F5C', // deepBlue shadow
+    shadowColor: colorPalette.brandStrong,
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
@@ -2120,33 +2121,33 @@ function createStyles(direction: Direction) {
   statusChip: {
     minHeight: 30,
     borderRadius: 15,
-    backgroundColor: '#eafff6',
+    backgroundColor: theme.successSurface,
     borderWidth: 1.2,
-    borderColor: '#45d2a0',
+    borderColor: theme.success,
     paddingHorizontal: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   statusChipClosed: {
-    backgroundColor: '#ffeded',
-    borderColor: '#ff4f4f',
+    backgroundColor: theme.dangerSurface,
+    borderColor: theme.danger,
   },
   statusChipText: {
-    color: '#15a26b',
+    color: theme.successText,
     fontWeight: '700',
   },
   statusChipTextClosed: {
-    color: '#d33939',
+    color: theme.dangerText,
   },
   storeImageStub: {
     width: 96,
     height: 96,
     borderRadius: 18,
-    backgroundColor: '#eef2f7',
+    backgroundColor: theme.surfaceInset,
     justifyContent: 'space-between',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#e2e7ee',
+    borderColor: theme.line,
   },
   storeImageOverlayRow: {
     flexDirection: rowDirection,
@@ -2162,36 +2163,36 @@ function createStyles(direction: Direction) {
     marginHorizontal: 8,
     marginBottom: 6,
     borderRadius: 14,
-    backgroundColor: '#e8edf3',
+    backgroundColor: colorPalette.surfaceAlt,
     opacity: 0.92,
     overflow: 'hidden',
   },
   storeImageCoreGlow: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.35)',
+    backgroundColor: theme.brandHeaderSurfaceStrong,
   },
   storeBadgeHot: {
     minHeight: 20,
     borderRadius: 10,
-    backgroundColor: '#ff6a00',
+    backgroundColor: theme.brand,
     paddingHorizontal: 7,
     alignItems: 'center',
     justifyContent: 'center',
   },
   storeBadgeText: {
-    color: '#fff',
+    color: theme.textInverse,
     fontWeight: '800',
     fontSize: 11,
   },
   storeOfferRibbon: {
-    backgroundColor: '#ff5b41',
+    backgroundColor: theme.brand,
     paddingVertical: 3,
     paddingHorizontal: 7,
     borderRadius: 9,
     alignItems: 'center',
   },
   storeOfferRibbonText: {
-    color: '#fff',
+    color: theme.textInverse,
     fontWeight: '700',
     fontSize: 11,
   },
@@ -2212,20 +2213,20 @@ function createStyles(direction: Direction) {
     gap: 4,
   },
   storeTitle: {
-    color: '#1c2330',
+    color: theme.text,
     fontWeight: '800',
     textAlign,
     fontSize: 18,
     lineHeight: 22,
   },
   storeAddress: {
-    color: '#6d7584',
+    color: theme.textMuted,
     textAlign,
     fontSize: 13,
     lineHeight: 16,
   },
   storeDistanceLine: {
-    color: '#5b6372',
+    color: theme.textMuted,
     textAlign,
     fontSize: 13,
     lineHeight: 16,
@@ -2240,20 +2241,20 @@ function createStyles(direction: Direction) {
   metaChip: {
     minHeight: 28,
     borderRadius: 14,
-    backgroundColor: '#eef1f6',
+    backgroundColor: theme.surfaceInset,
     paddingHorizontal: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   metaChipText: {
-    color: '#657082',
+    color: theme.textMuted,
     fontWeight: '700',
   },
   metaChipBlue: {
-    backgroundColor: '#d7efff',
+    backgroundColor: theme.infoSurface,
   },
   metaChipBlueText: {
-    color: '#2d74be',
+    color: theme.info,
     fontWeight: '800',
   },
   storeFooterRow: {
@@ -2267,24 +2268,24 @@ function createStyles(direction: Direction) {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#fff1cc',
+    backgroundColor: theme.warningSurface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   storeMultiplierPill: {
     minHeight: 28,
     borderRadius: 14,
-    backgroundColor: '#f8b12b',
+    backgroundColor: theme.warning,
     paddingHorizontal: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   storeMultiplierText: {
-    color: '#332300',
+    color: theme.warningText,
     fontWeight: '800',
   },
   storeFollowersText: {
-    color: '#454f5c',
+    color: theme.textMuted,
     fontWeight: '700',
     fontSize: 12,
   },
@@ -2292,17 +2293,17 @@ function createStyles(direction: Direction) {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#ff6a00',
+    backgroundColor: theme.brand,
     alignItems: 'center',
     justifyContent: 'center',
   },
   storeFollowAddText: {
-    color: '#fff',
+    color: theme.textInverse,
     fontWeight: '800',
     fontSize: 11,
   },
   storeFollowAdded: {
-    backgroundColor: '#FF500D', // orange (for added/followed state)
+    backgroundColor: theme.brand,
   },
   });
 }
