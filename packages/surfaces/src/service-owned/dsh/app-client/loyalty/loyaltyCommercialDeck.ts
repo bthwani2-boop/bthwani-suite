@@ -37,18 +37,18 @@ export type LoyaltyRewardsFixture = {
 
 export const loyaltyBenefitSurfaceItems: Record<LoyaltyBenefitMode, LoyaltyBenefitItem[]> = {
   loyalty: [
-    { title: 'loyalty-points-user-balance', subtitle: 'عرض الرصيد الحالي لنقاط الولاء.', meta: 'الرصيد', badgeLabel: 'مباشر' },
+    { title: 'loyalty-points-client-balance', subtitle: 'عرض الرصيد الحالي لنقاط الولاء.', meta: 'الرصيد', badgeLabel: 'مباشر' },
     { title: 'loyalty-points-redeem', subtitle: 'استبدال النقاط داخل نفس السطح.', meta: 'استبدال', badgeLabel: 'مباشر' },
-    { title: 'loyalty-points-user-history', subtitle: 'مراجعة سجل الكسب والاستبدال.', meta: 'السجل', badgeLabel: 'مراجعة' },
+    { title: 'loyalty-points-client-history', subtitle: 'مراجعة سجل الكسب والاستبدال.', meta: 'السجل', badgeLabel: 'مراجعة' },
     { title: 'entitlements-get', subtitle: 'التحقق من الاستحقاقات المتاحة.', meta: 'المزايا', badgeLabel: 'تحقق' },
   ],
 };
 
 export const loyaltyBenefitKeyValues: Record<LoyaltyBenefitMode, Array<{ label: string; value: string }>> = {
   loyalty: [
-    { label: 'الرصيد', value: 'loyalty-points-user-balance' },
+    { label: 'الرصيد', value: 'loyalty-points-client-balance' },
     { label: 'الاستبدال', value: 'loyalty-points-redeem' },
-    { label: 'السجل', value: 'loyalty-points-user-history' },
+    { label: 'السجل', value: 'loyalty-points-client-history' },
   ],
 };
 

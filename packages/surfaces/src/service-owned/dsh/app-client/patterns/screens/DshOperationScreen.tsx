@@ -23,7 +23,7 @@ function renderNonReadyState(state: DshOperationScreenState, onRetry?: () => voi
   }
 
   if (state === 'empty') {
-    return <StateView stateId="empty" actionLabel="Retry" onActionPress={onRetry} />;
+    return <StateView stateId="empty" actionLabel="إعادة المحاولة" onActionPress={onRetry} />;
   }
 
   if (state === 'offline') {
@@ -31,10 +31,10 @@ function renderNonReadyState(state: DshOperationScreenState, onRetry?: () => voi
   }
 
   if (state === 'disabled') {
-    return <StateView stateId="warning" title="Temporarily paused" description="Retry remains available when this step is re-enabled." actionLabel="Retry" onActionPress={onRetry} />;
+    return <StateView stateId="warning" title="متوقف مؤقتًا" description="يبقى خيار إعادة المحاولة متاحًا عند إعادة تفعيل هذه الخطوة." actionLabel="إعادة المحاولة" onActionPress={onRetry} />;
   }
 
-  return <StateView stateId="recoverableError" title="Screen unavailable" description="Retry first. If the issue continues, return to the previous step." actionLabel="Retry" onActionPress={onRetry} />;
+  return <StateView stateId="recoverableError" title="الشاشة غير متاحة" description="أعد المحاولة أولًا، وإذا استمرت المشكلة ارجع إلى الخطوة السابقة." actionLabel="إعادة المحاولة" onActionPress={onRetry} />;
 }
 
 export function DshOperationScreen({

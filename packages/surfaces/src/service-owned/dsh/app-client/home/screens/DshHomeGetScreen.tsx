@@ -229,7 +229,7 @@ const serviceLauncherMarkStyles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#fff7f0',
+    backgroundColor: '#FFF4E8', // BThwani light orange background
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -242,8 +242,8 @@ const serviceLauncherMarkStyles = StyleSheet.create({
     bottom: 0,
     borderRadius: 25,
     borderWidth: 2,
-    borderColor: '#173a6a',
-    borderTopColor: '#ff6a00',
+    borderColor: '#0A2F5C', // deepBlue
+    borderTopColor: '#FF500D', // orange
   },
   needle: {
     position: 'absolute',
@@ -252,7 +252,7 @@ const serviceLauncherMarkStyles = StyleSheet.create({
     width: 6,
     height: 17,
     borderRadius: 999,
-    backgroundColor: '#173a6a',
+    backgroundColor: '#0A2F5C', // deepBlue
     transform: [{ rotate: '24deg' }],
   },
   planeWrap: {
@@ -261,7 +261,7 @@ const serviceLauncherMarkStyles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF', // white
   },
 });
 
@@ -337,7 +337,7 @@ function DshServiceLauncherMark() {
       <View style={serviceLauncherMarkStyles.orbit} />
       <View style={serviceLauncherMarkStyles.needle} />
       <View style={serviceLauncherMarkStyles.planeWrap}>
-        <Icon name="paper-plane" size={14} color="#FF6A00" />
+        <Icon name="paper-plane" size={14} color="#FF500D" /> {/* orange */}
       </View>
     </View>
   );
@@ -345,7 +345,7 @@ function DshServiceLauncherMark() {
 
 function CategoryHubIcon() {
   return (
-    <Ionicons name="grid-outline" size={22} color="#FF6A00" />
+    <Ionicons name="grid-outline" size={22} color="#FF500D" /> // orange
   );
 }
 
@@ -1507,13 +1507,13 @@ function createStyles(direction: Direction) {
     lineHeight: 28,
   },
   emptyFeedTitle: {
-    color: '#1f2937',
+    color: '#0A2F5C', // deepBlue
     fontWeight: '800',
     fontSize: 14,
     textAlign,
   },
   emptyFeedText: {
-    color: '#6b7280',
+    color: '#657082', // muted text
     fontSize: 12,
     lineHeight: 18,
     textAlign,
@@ -1523,7 +1523,7 @@ function createStyles(direction: Direction) {
     alignSelf: 'stretch',
   },
   activeOrderStatusLabel: {
-    color: '#6b7280',
+    color: '#657082', // muted text
     fontSize: 11,
   },
   recentOrdersSection: {
@@ -1535,12 +1535,12 @@ function createStyles(direction: Direction) {
     justifyContent: 'space-between',
   },
   recentOrdersTitle: {
-    color: '#111827',
+    color: '#0A2F5C', // deepBlue
     fontWeight: '800',
     fontSize: 14,
   },
   recentOrdersSubtitle: {
-    color: '#6b7280',
+    color: '#657082', // muted text
     fontSize: 11,
     marginTop: 2,
   },
@@ -1548,10 +1548,10 @@ function createStyles(direction: Direction) {
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#F4F7FB', // BThwani light gray
   },
   recentOrdersHeaderActionText: {
-    color: '#374151',
+    color: '#5B6372', // muted text
     fontWeight: '700',
     fontSize: 11,
   },
@@ -1561,13 +1561,13 @@ function createStyles(direction: Direction) {
   },
   recentOrderCard: {
     width: 212,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF', // white
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: '#E6EAF1', // BThwani light border
     padding: 14,
     gap: 8,
-    shadowColor: '#000',
+    shadowColor: '#0A2F5C', // deepBlue shadow
     shadowOpacity: 0.05,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 3 },
@@ -1583,33 +1583,33 @@ function createStyles(direction: Direction) {
     flexDirection: rowDirection,
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#fff4e9',
+    backgroundColor: '#FFF4E8', // light orange
     borderWidth: 1,
-    borderColor: '#ffc38f',
+    borderColor: '#FFD6B0', // light orange border
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   recentOrderBadgeText: {
-    color: '#ff6a00',
+    color: '#FF500D', // orange
     fontWeight: '800',
     fontSize: 11,
   },
   recentOrderTitle: {
-    color: '#111827',
+    color: '#0A2F5C', // deepBlue
     fontWeight: '800',
     fontSize: 13,
     flex: 1,
     textAlign,
   },
   recentOrderSubtitle: {
-    color: '#374151',
+    color: '#5B6372', // muted text
     fontWeight: '700',
     fontSize: 13,
     textAlign,
   },
   recentOrderMeta: {
-    color: '#6b7280',
+    color: '#657082', // muted text
     fontSize: 11,
     textAlign,
   },
@@ -1619,19 +1619,19 @@ function createStyles(direction: Direction) {
     justifyContent: 'space-between',
   },
   recentOrderStatusPill: {
-    backgroundColor: '#eef2ff',
+    backgroundColor: '#F4F7FB', // BThwani light gray
     borderWidth: 1,
-    borderColor: '#c7d2fe',
+    borderColor: '#E6EAF1', // BThwani light border
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   recentOrderStatusText: {
-    color: '#4f46e5',
+    color: '#FF500D', // orange (status highlight)
     fontWeight: '700',
   },
   recentOrderCTA: {
-    color: '#ff6a00',
+    color: '#FF500D', // orange
     fontWeight: '800',
     fontSize: 12,
   },
@@ -2101,11 +2101,11 @@ function createStyles(direction: Direction) {
   },
   storeCard: {
     borderWidth: 1.5,
-    borderColor: '#d8dce4',
+    borderColor: '#E6EAF1', // BThwani light border
     borderRadius: 28,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF', // white
     padding: 14,
-    shadowColor: '#000',
+    shadowColor: '#0A2F5C', // deepBlue shadow
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
@@ -2302,7 +2302,7 @@ function createStyles(direction: Direction) {
     fontSize: 11,
   },
   storeFollowAdded: {
-    backgroundColor: '#0d9b65',
+    backgroundColor: '#FF500D', // orange (for added/followed state)
   },
   });
 }

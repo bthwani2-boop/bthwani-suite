@@ -40,8 +40,8 @@ function calculateEstimate(orderType: AwnakOrderType): PricingEstimate {
 
 export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, onClose, onBack, onContinue }: DshAwnakOrderCreateScreenProps) {
   const isDisabled = state === 'disabled';
-  const [pickupAddress, setPickupAddress] = React.useState('Sanaa Hadda Street');
-  const [dropoffAddress, setDropoffAddress] = React.useState('Sanaa Bab Al-Yemen');
+  const [pickupAddress, setPickupAddress] = React.useState('صنعاء - شارع حدة');
+  const [dropoffAddress, setDropoffAddress] = React.useState('صنعاء - باب اليمن');
   const [orderType, setOrderType] = React.useState<AwnakOrderType>('PERSONAL_ITEMS');
   const [timeMode, setTimeMode] = React.useState<AwnakTimeMode>('now');
   const [scheduledDate, setScheduledDate] = React.useState('');
@@ -87,7 +87,7 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
         <SectionHeader title="المسار" subtitle="اختر من أين وإلى أين، ثم أكمل بقية التفاصيل." />
         <Box gap={2} layoutDirection="row" style={{ alignItems: 'center' }}>
           <Box style={{ flex: 1 }}>
-            <Pressable onPress={() => setValidationError('Use the address field below to edit this location.')} disabled={isDisabled}>
+            <Pressable onPress={() => setValidationError('استخدم حقل العنوان أدناه لتعديل هذا الموقع.')} disabled={isDisabled}>
               <Surface tone="raised" gap={2}>
                 <Text role="bodySm" tone="muted">من عنوان</Text>
                 <Text role="bodyStrong">حدد الموقع</Text>
@@ -103,7 +103,7 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
           </Box>
 
           <Box style={{ flex: 1 }}>
-            <Pressable onPress={() => setValidationError('Use the address field below to edit this location.')} disabled={isDisabled}>
+            <Pressable onPress={() => setValidationError('استخدم حقل العنوان أدناه لتعديل هذا الموقع.')} disabled={isDisabled}>
               <Surface tone="raised" gap={2}>
                 <Text role="bodySm" tone="muted">إلى عنوان</Text>
                 <Text role="bodyStrong">حدد الموقع</Text>
@@ -146,10 +146,10 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
         {timeMode === 'scheduled' ? (
           <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
             <Box style={{ flex: 1, minWidth: 150 }}>
-              <TextField label="Date" value={scheduledDate} onChangeText={setScheduledDate} editable={!isDisabled} placeholder="YYYY-MM-DD" />
+              <TextField label="التاريخ" value={scheduledDate} onChangeText={setScheduledDate} editable={!isDisabled} placeholder="YYYY-MM-DD" />
             </Box>
             <Box style={{ flex: 1, minWidth: 150 }}>
-              <TextField label="Time" value={scheduledTime} onChangeText={setScheduledTime} editable={!isDisabled} placeholder="HH:MM" />
+              <TextField label="الوقت" value={scheduledTime} onChangeText={setScheduledTime} editable={!isDisabled} placeholder="HH:MM" />
             </Box>
           </Box>
         ) : null}
@@ -157,7 +157,7 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
 
       <Box gap={3}>
         <SectionHeader title="ملاحظات الطلب" subtitle="اكتب ملاحظاتك بشكل مختصر وواضح." />
-        <TextField label="Order note" value={notes} onChangeText={setNotes} editable={!isDisabled} placeholder="اكتب ملاحظاتك هنا" />
+        <TextField label="ملاحظة الطلب" value={notes} onChangeText={setNotes} editable={!isDisabled} placeholder="اكتب ملاحظاتك هنا" />
       </Box>
 
       {validationError ? <Text role="bodySm" tone="muted">{validationError}</Text> : null}

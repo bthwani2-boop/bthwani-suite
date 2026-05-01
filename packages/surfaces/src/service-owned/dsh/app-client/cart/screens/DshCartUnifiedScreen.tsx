@@ -24,7 +24,6 @@ import {
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../components/DshCartDetails';
 import { getDshClientStateMeta, type DshClientState } from '../../shared/dshClientStateModel';
-import useWlt from '../../../../wlt/app-client/dsh/hooks/useWlt';
 
 const PAGE_BG = colorPalette.pageBackground;
 const SURFACE_SOFT = colorPalette.surfaceSecondary;
@@ -139,7 +138,7 @@ const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
   extra: {
     title: 'طلب إضافي على الطريق',
     placeholder: 'مثال: ماء أو بسبس من أي ماركت على الطريق',
-    helper: 'سيتم إظهار الطلب الإضافي داخل نفس الشاشة كإضافة UI-ready.',
+    helper: 'سيظهر الطلب الإضافي داخل نفس الشاشة كإضافة جاهزة للمراجعة.',
     saveLabel: 'حفظ الطلب',
     multiline: true,
   },
@@ -580,7 +579,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     }
 
     showNotice(
-      mode === 'official-wallets' ? '[TBD: WLT official wallet route]' : '[TBD: WLT top-up route]',
+      mode === 'official-wallets' ? 'مسار المحافظ الرسمية غير موصول بعد' : 'مسار شحن المحفظة غير موصول بعد',
       mode === 'official-wallets'
         ? 'لا يوجد مسار مثبت داخل المضيف الحالي لفتح المحافظ الرسمية عبر WLT.'
         : 'لا يوجد مسار مثبت داخل المضيف الحالي لفتح شحن المحفظة عبر WLT.',
@@ -640,7 +639,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           amountDueOnDeliveryHalalas: grandTotalHalalas,
           valid: false,
           summary: 'ادفع كامل الطلب من رصيد WLT الداخلي.',
-          blockingReason: hasWltServiceRoute ? 'اربط المحفظة أو اشحنها عبر WLT أولًا ثم أعد الاختيار.' : '[TBD: WLT top-up route]',
+          blockingReason: hasWltServiceRoute ? 'اربط المحفظة أو اشحنها عبر WLT أولًا ثم أعد الاختيار.' : 'مسار شحن المحفظة غير موصول بعد داخل المضيف الحالي.',
           feedbackTone: 'info',
         };
       }
@@ -722,10 +721,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         valid: false,
         summary: hasWltServiceRoute
           ? 'سيتم تحويلك إلى WLT لاختيار محفظة رسمية وإكمال الدفع أو الشحن خارج هذه الشاشة.'
-          : '[TBD: WLT official wallet route]',
+          : 'مسار المحافظ الرسمية غير موصول بعد داخل المضيف الحالي.',
         blockingReason: hasWltServiceRoute
           ? 'أكمل الدفع أو الشحن عبر WLT أولًا ثم عد لإتمام الطلب.'
-          : '[TBD: WLT official wallet route]',
+          : 'مسار المحافظ الرسمية غير موصول بعد داخل المضيف الحالي.',
         feedbackTone: 'info',
       };
     }
@@ -796,7 +795,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           : walletPending
             ? 'جاري التحقق من حالة الربط والرصيد...'
           : !walletLinked
-            ? (hasWltServiceRoute ? 'اربط محفظتك أولًا عبر WLT.' : '[TBD: WLT top-up route]')
+            ? (hasWltServiceRoute ? 'اربط محفظتك أولًا عبر WLT.' : 'مسار شحن المحفظة غير موصول بعد داخل المضيف الحالي.')
             : walletBalance <= 0
               ? 'لا يوجد رصيد متاح الآن.'
               : `المتبقي للشحن ${formattedWalletShortfall}.`,
@@ -835,7 +834,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           : walletPending
             ? 'جاري التحقق من رصيد المحفظة...'
           : !walletLinked
-            ? (hasWltServiceRoute ? 'افتح WLT لربط المحفظة.' : '[TBD: WLT top-up route]')
+            ? (hasWltServiceRoute ? 'افتح WLT لربط المحفظة.' : 'مسار شحن المحفظة غير موصول بعد داخل المضيف الحالي.')
             : walletBalance <= 0
               ? 'لا يوجد رصيد للدفع المدمج.'
               : 'الرصيد يكفي للدفع الكامل من المحفظة.',
@@ -858,17 +857,17 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         description: 'اختر محفظة رسمية وأكمل عبر WLT.',
         selected: paymentMethod === 'official-wallets',
         disabled: !hasWltServiceRoute,
-        statusLabel: hasWltServiceRoute ? (paymentMethod === 'official-wallets' ? 'محدد' : 'مسار خارجي') : '[TBD]',
+        statusLabel: hasWltServiceRoute ? (paymentMethod === 'official-wallets' ? 'محدد' : 'مسار خارجي') : 'غير موصول',
         statusTone: paymentMethod === 'official-wallets' ? 'brand' : 'info',
         amountRows: [
           { label: 'إجمالي الطلب', value: formattedGrandTotal, tone: 'brand' },
         ],
         helperText: hasWltServiceRoute
           ? 'خيار مستقل عن رصيد المحفظة الداخلي.'
-          : '[TBD: WLT official wallet route]',
+          : 'هذا الخيار يحتاج ربط مسار المحافظ الرسمية داخل المضيف الحالي.',
         helperTone: 'info',
         action: {
-          label: hasWltServiceRoute ? (walletLinked ? 'اختيار محفظة رسمية' : 'فتح WLT') : '[TBD: WLT official wallet route]',
+          label: hasWltServiceRoute ? (walletLinked ? 'اختيار محفظة رسمية' : 'فتح WLT') : 'المسار غير موصول',
           tone: 'secondary',
           onPress: hasWltServiceRoute ? () => openWltService('official-wallets') : undefined,
           disabled: !hasWltServiceRoute,

@@ -14,18 +14,18 @@ export type DshFavoritesListScreenProps = {
 
 export function DshFavoritesListScreen({ state = 'ready', items, onOpenItem, onBack, onRetry, onSupport }: DshFavoritesListScreenProps) {
   if (state !== 'ready') {
-    return <DshOperationScreen state={state} title="Favorites list" subtitle="Open a favorite or return to discovery." onRetry={onRetry} />;
+    return <DshOperationScreen state={state} title="قائمة المفضلة" subtitle="افتح عنصرًا محفوظًا أو ارجع إلى الاكتشاف." onRetry={onRetry} />;
   }
 
   if (!items.length) {
-    return <DshOperationScreen state="empty" title="Favorites list" subtitle="No saved items yet. Return to discovery or retry." onRetry={onRetry} />;
+    return <DshOperationScreen state="empty" title="قائمة المفضلة" subtitle="لا توجد عناصر محفوظة حتى الآن. ارجع للاكتشاف أو أعد المحاولة." onRetry={onRetry} />;
   }
 
   return (
     <DshOperationScreen
       state="ready"
-      title="Favorites list"
-      subtitle="Open a saved item with the shortest possible path."
+      title="قائمة المفضلة"
+      subtitle="افتح العنصر المحفوظ بأقصر مسار ممكن."
       content={
         <Surface tone="raised" gap={3}>
           <Box gap={2}>
@@ -33,10 +33,10 @@ export function DshFavoritesListScreen({ state = 'ready', items, onOpenItem, onB
               <ListItem key={item.id} title={item.name} subtitle={item.subtitle} meta={item.meta} onPress={() => onOpenItem?.(item.id)} />
             ))}
           </Box>
-          <Text role="caption" tone="muted">Saved items stay one tap away from active discovery.</Text>
+          <Text role="caption" tone="muted">العناصر المحفوظة تبقى على بُعد نقرة واحدة من الاكتشاف النشط.</Text>
         </Surface>
       }
-      primaryActionLabel="Back"
+      primaryActionLabel="رجوع"
       onPrimaryAction={onBack}
       secondaryActionLabel="Support"
       onSecondaryAction={onSupport}

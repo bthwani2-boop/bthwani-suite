@@ -238,7 +238,12 @@ export function MobileAccountSheet({
             visible={visible}
             fieldTitle={fieldTitle}
             fieldSubtitle={fieldSubtitle}
-            fieldSummaryItems={fieldSummaryItems}
+            fieldSummaryItems={fieldSummaryItems?.map((item, idx) => ({
+              id: `field-summary-${idx}`,
+              label: item.label,
+              value: typeof item.value === 'string' ? item.value : typeof item.value === 'number' ? String(item.value) : '[TBD]',
+              tone: typeof item.tone === 'string' ? item.tone : undefined,
+            }))}
             fieldTabs={fieldTabs}
             activeTypeId={activeTypeId}
             typeOptions={typeOptions}

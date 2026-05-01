@@ -279,7 +279,7 @@ function operationScreenToRoute(screenId: ClientOperationScreenId): DshRoute {
   const conversationTargets: ClientOperationScreenId[] = ['chat-read-ack', 'chat-send'];
   const deliveryManagementTargets: ClientOperationScreenId[] = ['delivery-attempt-create', 'delivery-attempts-list', 'delivery-close', 'delivery-reassign'];
   const subscriptionTargets: ClientOperationScreenId[] = ['subscription-family-get', 'subscription-family-members-get', 'subscription-family-members-post', 'subscription-pro-catalog', 'subscription-sync', 'subscription-tier-get', 'subscription-upgrade-post'];
-  const loyaltyTargets: ClientOperationScreenId[] = ['loyalty-points-redeem', 'loyalty-points-user-balance', 'loyalty-points-user-history', 'entitlements-get'];
+  const loyaltyTargets: ClientOperationScreenId[] = ['loyalty-points-redeem', 'loyalty-points-client-balance', 'loyalty-points-client-history', 'entitlements-get'];
   const proxyTargets: ClientOperationScreenId[] = ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review', 'proxy-request-reject', 'proxy-request-tracking'];
   const settingsTargets: ClientOperationScreenId[] = ['service-modes-resolve'];
   const listingTargets: ClientOperationScreenId[] = ['listing-status-update'];
@@ -534,7 +534,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     const reviewTargets: ClientOperationScreenId[] = ['order-rate', 'review-create'];
     const reviewHistoryTargets: ClientOperationScreenId[] = ['reviews-list'];
     const subscriptionTargets: ClientOperationScreenId[] = ['subscription-family-get', 'subscription-family-members-get', 'subscription-family-members-post', 'subscription-pro-catalog', 'subscription-sync', 'subscription-tier-get', 'subscription-upgrade-post'];
-    const loyaltyTargets: ClientOperationScreenId[] = ['loyalty-points-redeem', 'loyalty-points-user-balance', 'loyalty-points-user-history'];
+    const loyaltyTargets: ClientOperationScreenId[] = ['loyalty-points-redeem', 'loyalty-points-client-balance', 'loyalty-points-client-history'];
     const proxyRequestTargets: ClientOperationScreenId[] = ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review'];
     const proxyRejectTargets: ClientOperationScreenId[] = ['proxy-request-reject'];
     const proxyTrackingTargets: ClientOperationScreenId[] = ['proxy-request-tracking'];
@@ -701,8 +701,8 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   if (missing.length > 0) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 12 }}>مكوّنات مفقودة</Text>
-        <Text style={{ color: 'white' }}>{missing.join(', ')}</Text>
+        <Text style={{ color: '#0A2F5C', fontSize: 18, fontWeight: '700', marginBottom: 12 }}>مكوّنات مفقودة</Text>
+        <Text style={{ color: '#0A2F5C' }}>{missing.join(', ')}</Text>
       </View>
     );
   }
@@ -870,7 +870,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   if (route === 'favorite-toggle') {
     return (
       <DshFavoriteToggleScreen
-        itemLabel={selectedItem?.name ?? 'Saved item'}
+        itemLabel={selectedItem?.name ?? 'عنصر محفوظ'}
         currentFavorite={favoriteOverrides[selectedItem?.id ?? activeStore.id] ?? Boolean(activeStore.isOffer)}
         onToggleFavorite={() => {
           const favoriteKey = selectedItem?.id ?? activeStore.id;
@@ -984,7 +984,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   if (route === 'benefits') {
     return (
       <DshBenefitsHubScreen
-        screenId={selectedOperationScreen as 'subscription-family-get' | 'subscription-family-members-get' | 'subscription-family-members-post' | 'subscription-pro-catalog' | 'subscription-sync' | 'subscription-tier-get' | 'subscription-upgrade-post' | 'loyalty-points-redeem' | 'loyalty-points-user-balance' | 'loyalty-points-user-history' | 'entitlements-get'}
+        screenId={selectedOperationScreen as 'subscription-family-get' | 'subscription-family-members-get' | 'subscription-family-members-post' | 'subscription-pro-catalog' | 'subscription-sync' | 'subscription-tier-get' | 'subscription-upgrade-post' | 'loyalty-points-redeem' | 'loyalty-points-client-balance' | 'loyalty-points-client-history' | 'entitlements-get'}
         onPrimaryAction={() => setRoute('home')}
         onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('benefits')}

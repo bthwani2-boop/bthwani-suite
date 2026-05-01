@@ -13,7 +13,7 @@ export type DshFavoriteToggleScreenProps = {
   onSupport?: () => void;
 };
 
-export function DshFavoriteToggleScreen({ state = 'ready', itemLabel = 'Selected item', currentFavorite = false, onToggleFavorite, onOpenFavorites, onBack, onRetry, onSupport }: DshFavoriteToggleScreenProps) {
+export function DshFavoriteToggleScreen({ state = 'ready', itemLabel = 'العنصر المحدد', currentFavorite = false, onToggleFavorite, onOpenFavorites, onBack, onRetry, onSupport }: DshFavoriteToggleScreenProps) {
   const [isFavorite, setIsFavorite] = React.useState(currentFavorite);
   const [phase, setPhase] = React.useState<'ready' | 'loading' | 'success'>('ready');
 
@@ -29,7 +29,7 @@ export function DshFavoriteToggleScreen({ state = 'ready', itemLabel = 'Selected
   }, [onToggleFavorite]);
 
   if (state !== 'ready') {
-    return <DshOperationScreen state={state} title="Favorite toggle" subtitle="Mark or unmark a favorite without losing context." onRetry={onRetry} />;
+    return <DshOperationScreen state={state} title="تبديل المفضلة" subtitle="أضف أو أزل المفضلة دون فقدان سياق المسار." onRetry={onRetry} />;
   }
 
   if (phase === 'loading') return <StateView stateId="loading" />;
@@ -38,17 +38,17 @@ export function DshFavoriteToggleScreen({ state = 'ready', itemLabel = 'Selected
     return (
       <DshOperationScreen
         state="ready"
-        title="Favorite updated"
-        subtitle="The saved state is now ready for the favorites list."
+        title="تم تحديث المفضلة"
+        subtitle="أصبحت الحالة المحفوظة جاهزة للعرض داخل قائمة المفضلة."
         content={
           <Surface tone="success" gap={3}>
-            <SectionHeader title="Toggle result" subtitle="Keep the result visible and the next route obvious." />
-            <Card title={itemLabel} subtitle={isFavorite ? 'Marked as favorite' : 'Removed from favorites'} />
+            <SectionHeader title="نتيجة التبديل" subtitle="أبقِ النتيجة واضحة مع خطوة تالية صريحة." />
+            <Card title={itemLabel} subtitle={isFavorite ? 'تمت الإضافة إلى المفضلة' : 'تمت الإزالة من المفضلة'} />
           </Surface>
         }
-        primaryActionLabel="Open favorites"
+        primaryActionLabel="فتح المفضلة"
         onPrimaryAction={onOpenFavorites}
-        secondaryActionLabel="Back"
+        secondaryActionLabel="رجوع"
         onSecondaryAction={onBack}
         tertiaryActionLabel="Support"
         onTertiaryAction={onSupport}
@@ -60,18 +60,18 @@ export function DshFavoriteToggleScreen({ state = 'ready', itemLabel = 'Selected
   return (
     <DshOperationScreen
       state="ready"
-      title="Favorite toggle"
-      subtitle="Mark or unmark a favorite without losing context."
+      title="تبديل المفضلة"
+      subtitle="أضف أو أزل المفضلة دون فقدان سياق المسار."
       content={
         <Surface tone="raised" gap={3}>
-          <SectionHeader title="Current item" subtitle="The item stays visible while you toggle its saved state." />
-          <Card title={itemLabel} subtitle={isFavorite ? 'Currently favorited' : 'Currently not favorited'} />
-          <Text role="caption" tone="muted">Use the save state to shorten future discovery.</Text>
+          <SectionHeader title="العنصر الحالي" subtitle="يبقى العنصر ظاهرًا أثناء تعديل حالة الحفظ." />
+          <Card title={itemLabel} subtitle={isFavorite ? 'موجود حاليًا في المفضلة' : 'غير موجود حاليًا في المفضلة'} />
+          <Text role="caption" tone="muted">استخدم الحفظ لتسريع الوصول في الزيارات القادمة.</Text>
         </Surface>
       }
-      primaryActionLabel={isFavorite ? 'Unfavorite' : 'Favorite'}
+      primaryActionLabel={isFavorite ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}
       onPrimaryAction={() => void submit()}
-      secondaryActionLabel="Open favorites"
+      secondaryActionLabel="فتح المفضلة"
       onSecondaryAction={onOpenFavorites}
       tertiaryActionLabel="Support"
       onTertiaryAction={onSupport}

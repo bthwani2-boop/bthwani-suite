@@ -39,7 +39,7 @@ function renderNonReadyState(
     return (
       <StateView
         stateId="empty"
-        actionLabel="Start delivery"
+        actionLabel="ابدأ التوصيل"
         onActionPress={onStartDelivery}
       />
     );
@@ -53,9 +53,9 @@ function renderNonReadyState(
     return (
       <StateView
         stateId="warning"
-        title="Delivery entry is temporarily paused"
-        description="This route is currently restricted. Keep retry and fallback visible."
-        actionLabel="Retry"
+        title="مدخل التوصيل متوقف مؤقتًا"
+        description="هذا المسار مقيّد حاليًا. أبقِ مسار إعادة المحاولة والبديل واضحين."
+        actionLabel="إعادة المحاولة"
         onActionPress={onRetry}
       />
     );
@@ -64,9 +64,9 @@ function renderNonReadyState(
   return (
     <StateView
       stateId="recoverableError"
-      title="Entry is unavailable"
-      description="Retry first. If the issue persists, use the orders path as fallback."
-      actionLabel="Retry"
+      title="المدخل غير متاح"
+      description="أعد المحاولة أولًا، وإذا استمرت المشكلة استخدم مسار الطلبات كبديل."
+      actionLabel="إعادة المحاولة"
       onActionPress={onRetry}
     />
   );
@@ -116,7 +116,7 @@ function renderReviewSection(onOpenOrders?: () => void) {
 
 export function DshEntryScreen({
   state = 'ready',
-  title = 'Delivery entry',
+  title = 'مدخل التوصيل',
   subtitle = 'المدخل الأساسي لخدمة DSH داخل تطبيق العميل.',
   onStartDelivery,
   onBrowseStores,

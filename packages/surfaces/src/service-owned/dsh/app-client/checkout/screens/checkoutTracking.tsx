@@ -186,7 +186,7 @@ const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttac
 
 const fallbackOrderListItems: DshOrderListItem[] = [
   { id: 'order-review', title: 'طلب قيد المراجعة', subtitle: 'العنوان والتواصل تحت التدقيق قبل التحريك', statusLabel: 'قيد المراجعة', meta: 'جاهز للتتبع' },
-  { id: 'order-route', title: 'طلب في الطريق', subtitle: 'تم التعيين ويظهر المسار الحي الآن', statusLabel: 'في الطريق', meta: 'Live' },
+  { id: 'order-route', title: 'طلب في الطريق', subtitle: 'تم التعيين ويظهر المسار الحي الآن', statusLabel: 'في الطريق', meta: 'مباشر' },
   { id: 'order-done', title: 'طلب مكتمل', subtitle: 'تم التسليم ويمكن الرجوع إليه لاحقًا', statusLabel: 'تم التسليم', meta: 'أرشيف' },
 ];
 
@@ -1048,7 +1048,7 @@ function renderTracking(
           items={[
             { label: 'المرحلة الحالية', value: activeItem?.title ?? currentStatusLabel, tone: 'brand' },
             { label: 'الخطوة التالية', value: timeline[activeTimelineIndex + 1]?.title ?? trackingStateMeta.label, tone: 'success' },
-            { label: 'آخر تحديث', value: activeItem?.detail ?? 'Live' },
+            { label: 'آخر تحديث', value: activeItem?.detail ?? 'مباشر' },
           ]}
         />
       </Surface>

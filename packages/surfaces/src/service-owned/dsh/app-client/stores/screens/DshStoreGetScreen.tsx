@@ -274,10 +274,10 @@ function resolveMeasurementMultiplier(option: string) {
 
 function pickBackdropColor(name: string) {
   const n = (name || '').toLowerCase();
-  if (n.includes('تفاح') || n.includes('apple') || n.includes('gala')) return '#eaf9e6';
-  if (n.includes('حليب') || n.includes('milk')) return '#eaf4ff';
-  if (n.includes('خبز') || n.includes('bread')) return '#fff6e8';
-  return '#f3f4f6';
+  if (n.includes('تفاح') || n.includes('apple') || n.includes('gala')) return colorPalette.successSoft;
+  if (n.includes('حليب') || n.includes('milk')) return colorPalette.infoSoft;
+  if (n.includes('خبز') || n.includes('bread')) return colorPalette.brandSoft;
+  return colorPalette.pageBackground;
 }
 
 function hexToRgba(hex: string, alpha = 0.9) {
@@ -1690,16 +1690,16 @@ const stylesTokens = {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#f7f8fb',
+    backgroundColor: colorPalette.pageBackground,
   },
   blockingState: {
     flex: 1,
-    backgroundColor: '#f7f8fb',
+    backgroundColor: colorPalette.pageBackground,
     justifyContent: 'center',
   },
   scroll: {
     flex: 1,
-    backgroundColor: '#f7f8fb',
+    backgroundColor: colorPalette.pageBackground,
   },
   scrollContent: {
     paddingBottom: 16,
@@ -1733,10 +1733,10 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
     borderWidth: 1,
-    borderColor: '#edf0f5',
+    borderColor: colorPalette.brandSurface,
     ...Platform.select({
       ios: {
-        shadowColor: '#0f172a',
+        shadowColor: colorPalette.brandStrong,
         shadowOpacity: 0.05,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 3 },
@@ -1753,10 +1753,10 @@ const styles = StyleSheet.create({
     backgroundColor: stylesTokens.white,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: '#fde7cf',
+    borderColor: colorPalette.brandSoft,
     ...Platform.select({
       ios: {
-        shadowColor: '#0f172a',
+        shadowColor: colorPalette.brandStrong,
         shadowOpacity: 0.05,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 3 },
@@ -1776,8 +1776,8 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#fed7aa',
-    backgroundColor: '#fffaf5',
+    borderColor: colorPalette.brandSoft,
+    backgroundColor: colorPalette.pageBackground,
     paddingHorizontal: 12,
     flexDirection: 'row-reverse',
     alignItems: 'center',
@@ -1796,9 +1796,9 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colorPalette.pageBackground,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: colorPalette.brandSurface,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1830,16 +1830,16 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#ffffff',
+    backgroundColor: stylesTokens.white,
     borderWidth: 1,
-    borderColor: '#e9edf3',
+    borderColor: colorPalette.brandSurface,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 9,
     elevation: 8,
     ...Platform.select({
       ios: {
-        shadowColor: '#0f172a',
+        shadowColor: colorPalette.brandStrong,
         shadowOpacity: 0.08,
         shadowRadius: 8,
         shadowOffset: { width: 0, height: 3 },
@@ -1865,7 +1865,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
   },
   storeName: {
-    color: '#1b2430',
+    color: stylesTokens.dark,
     fontSize: 18,
     fontWeight: '900',
     lineHeight: 23,
@@ -1883,9 +1883,9 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#fff7ed',
+    backgroundColor: colorPalette.brandSoft,
     borderWidth: 1,
-    borderColor: '#fed7aa',
+    borderColor: colorPalette.brand,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 0,
@@ -1902,30 +1902,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 1,
-    backgroundColor: '#fff8f1',
+    backgroundColor: colorPalette.brandSoft,
     borderRadius: 999,
     paddingHorizontal: 5,
     paddingVertical: 0,
     borderWidth: 1,
-    borderColor: '#ead8c6',
+    borderColor: colorPalette.brand,
     minHeight: 18,
   },
   topMetaChipText: {
-    color: '#1f2937',
+    color: stylesTokens.dark,
     fontSize: 8.5,
     fontWeight: '700',
     lineHeight: 10,
   },
   followMetaChip: {
-    backgroundColor: '#fff7ed',
-    borderColor: '#e9cda9',
+    backgroundColor: colorPalette.brandSoft,
+    borderColor: colorPalette.brand,
   },
   followMetaChipActive: {
-    backgroundColor: '#fdeccf',
-    borderColor: '#efb97a',
+    backgroundColor: colorPalette.brand,
+    borderColor: colorPalette.brand,
   },
   followMetaChipTextActive: {
-    color: '#7c2d12',
+    color: stylesTokens.orange,
   },
   headerMetaText: {
     color: stylesTokens.muted,
@@ -1933,12 +1933,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   statusPill: {
-    backgroundColor: '#dcfce7',
+    backgroundColor: colorPalette.successSoft,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#bbf7d0',
+    borderColor: colorPalette.success,
   },
   statusPillText: {
     color: stylesTokens.green,
