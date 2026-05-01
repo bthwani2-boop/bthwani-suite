@@ -514,7 +514,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   } = useWlt();
 
   const checkoutAction = props.onContinue ?? props.onOpenOrder;
-  const editAction = props.onOpenStore ?? props.onOpenOrder ?? props.onContinue;
+  const canEditOrder = Boolean(props.onOpenStore ?? props.onOpenOrder ?? props.onContinue);
   const backAction = props.onOpenStore ?? props.onRetry ?? props.onExit;
   const isRTL = I18nManager.isRTL;
   const quickActionMeta = quickActionKey ? QUICK_ACTION_META[quickActionKey] : null;
@@ -575,7 +575,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   const openWltService = (mode: 'wallet-topup' | 'official-wallets') => {
     if (hasWltServiceRoute) {
-      props.onOpenService('wlt');
+      props.onOpenService?.('wlt');
       return;
     }
 
@@ -937,12 +937,30 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   };
 
   const handleEditPress = () => {
-    if (!editAction) {
+    if (!canEditOrder) {
       showNotice('تعديل الطلب غير متاح الآن', 'زر التعديل يحتاج مسار رجوع أو تحرير موصول داخل المضيف.', 'info');
       return;
     }
 
-    editAction();
+    if (props.onOpenStore) {
+      props.onOpenStore();
+      return;
+    }
+
+    const editPayload: CheckoutActionPayload = {
+      paymentMethod: paymentSelection.method,
+      walletAmountHalalas: paymentSelection.walletAmountHalalas,
+      amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
+      orderTotalHalalas: grandTotalHalalas,
+      summary: paymentSelection.summary,
+    };
+
+    if (props.onOpenOrder) {
+      props.onOpenOrder(editPayload);
+      return;
+    }
+
+    props.onContinue?.(editPayload);
   };
 
   const openQuickAction = (actionKey: QuickActionKey) => {
@@ -1151,7 +1169,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       >
         <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[1] }}>
           <Button label="تنفيذ الطلب" size="md" fullWidth={false} disabled={!canCheckout || checkoutLoading} loading={checkoutLoading} onPress={handleCheckoutPress} style={{ flex: 1, minHeight: 46, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY, borderRadius: 16 }} />
-          <Button label="تعديل الطلب" tone="secondary" size="md" fullWidth={false} disabled={!editAction} onPress={handleEditPress} style={{ flex: 1, minHeight: 46, backgroundColor: CTA_SECONDARY, borderColor: BORDER_SOFT, borderRadius: 16 }} />
+          <Button label="تعديل الطلب" tone="secondary" size="md" fullWidth={false} disabled={!canEditOrder} onPress={handleEditPress} style={{ flex: 1, minHeight: 46, backgroundColor: CTA_SECONDARY, borderColor: BORDER_SOFT, borderRadius: 16 }} />
         </View>
       </View>
 
@@ -1184,8 +1202,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           id: item.id,
           title: item.title,
           subtotal: (item.priceValue ?? 0) * (item.qty ?? 1),
-          qty: item.qty,
-          price: item.priceValue,
+          qty: item.qty ?? 1,
+          price: item.priceValue ?? 0,
         }))}
         onChangeQty={updateItemQty}
         onRemove={removeItem}

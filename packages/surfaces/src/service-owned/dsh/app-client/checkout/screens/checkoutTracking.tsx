@@ -353,7 +353,7 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
     setChatMessages((current) => ([
       ...current,
       {
-        id: `chat-customer-${Date.now()}`,
+        id: `chat-client-${Date.now()}`,
         senderLabel: 'العميل',
         body: draftMessage.trim() || 'مرفقات مرتبطة بهذا الطلب',
         time: 'الآن',
@@ -398,19 +398,19 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
             );
           }
 
-          const isCustomer = message.align === 'end';
+          const isClient = message.align === 'end';
 
           return (
-            <View key={message.id} style={{ alignSelf: isCustomer ? 'flex-end' : 'flex-start', width: '88%' }}>
+            <View key={message.id} style={{ alignSelf: isClient ? 'flex-end' : 'flex-start', width: '88%' }}>
               <Surface
-                tone={isCustomer ? 'brand' : 'raised'}
+                tone={isClient ? 'brand' : 'raised'}
                 padding={2}
                 gap={1}
                 style={{
                   borderRadius: 18,
                   borderWidth: 1,
-                  borderColor: isCustomer ? theme.brand : theme.line,
-                  backgroundColor: isCustomer ? theme.brandSurface : theme.surfaceRaised,
+                  borderColor: isClient ? theme.brand : theme.line,
+                  backgroundColor: isClient ? theme.brandSurface : theme.surfaceRaised,
                 }}
               >
                 <Box layoutDirection="row" gap={2} style={{ justifyContent: 'space-between', alignItems: 'center' }}>
@@ -704,8 +704,8 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           : clientState === 'order_confirmed'
             ? 'افتح صفحة التتبع لمتابعة التنفيذ.'
             : clientStateMeta.description;
-  const hasCustomerReceived = phase === 'received';
-  const canSubmitRatings = hasCustomerReceived && productRating > 0 && captainRating > 0;
+  const hasClientReceived = phase === 'received';
+  const canSubmitRatings = hasClientReceived && productRating > 0 && captainRating > 0;
   const productRatingLabel = productRating > 0 ? `${productRating}/5` : 'غير محدد';
   const captainRatingLabel = captainRating > 0 ? `${captainRating}/5` : 'غير محدد';
   const compactSteps = journeySteps as Array<{ id: string; title: string; state: 'done' | 'current' | 'next' }>;
@@ -844,7 +844,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       : draftAttachments.map((kind) => orderChatAttachmentOptions[kind].selectedLabel).join(' • ');
 
     setLastChatMessage({
-      id: `chat-customer-${Date.now()}`,
+      id: `chat-client-${Date.now()}`,
       senderLabel: 'العميل',
       body,
       time: 'الآن',
@@ -926,7 +926,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         <DeferredReviewBlock
           title="تقييم المنتج"
           subtitle="يظهر بعد استلام العميل للطلب، ويبقى مضغوطًا قبل ذلك."
-          enabled={hasCustomerReceived}
+          enabled={hasClientReceived}
           placeholderText="سيظهر تقييم المنتج بعد الاستلام."
           currentValueLabel={productRatingLabel}
           stateLabel={reviewStateLabel}
@@ -939,7 +939,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         <DeferredReviewBlock
           title="تقييم الكابتن"
           subtitle="يبقى مؤجلًا حتى يكتمل الاستلام من العميل."
-          enabled={hasCustomerReceived}
+          enabled={hasClientReceived}
           placeholderText="سيظهر تقييم الكابتن بعد الاستلام."
           currentValueLabel={captainRatingLabel}
           stateLabel={reviewStateLabel}
@@ -950,7 +950,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           placeholderTone="brand"
         />
 
-        {hasCustomerReceived && (onSupport || onNextAction) ? (
+        {hasClientReceived && (onSupport || onNextAction) ? (
           <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
             <Text role="bodyStrong" style={{ textAlign: 'right' }}>ما بعد التسليم</Text>
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
@@ -1201,17 +1201,17 @@ export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspa
   return (
     <DshOperationScreen
       state={state}
-      title="Intake workspace"
-      subtitle="Unified workspace for preparing external, manual, and estimate-based delivery requests before order creation."
+      title="مساحة تجهيز الطلب"
+      subtitle="مساحة موحدة لتجهيز طلبات التوصيل اليدوية والخارجية والتقديرية قبل إنشاء الطلب."
       content={
         <Surface tone="inset" gap={2}>
-          <Text role="bodyStrong">Current flow</Text>
+          <Text role="bodyStrong">المسار الحالي</Text>
           <Text role="bodySm" tone="muted">{screenId}</Text>
-          <Text role="bodySm" tone="muted">This is an active flow screen with executable state coverage.</Text>
+          <Text role="bodySm" tone="muted">هذه شاشة مسار نشط مع تغطية تنفيذية للحالات.</Text>
         </Surface>
       }
-      primaryActionLabel="Continue order creation"
-      secondaryActionLabel="Back to operations"
+      primaryActionLabel="متابعة إنشاء الطلب"
+      secondaryActionLabel="العودة إلى العمليات"
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction ?? onRetry}
       onRetry={onRetry}
@@ -1270,17 +1270,17 @@ export function DshDeliveryManagementHubScreen({ state = 'ready', screenId = 'de
   return (
     <DshOperationScreen
       state={state}
-      title="Delivery management"
-      subtitle="Workspace for delivery attempts, reassignment, closing, and customer-facing tracking decisions."
+      title="إدارة التوصيل"
+      subtitle="مساحة لمحاولات التوصيل وإعادة الإسناد والإغلاق وقرارات التتبع المواجهة للعميل."
       content={
         <Surface tone="inset" gap={2}>
-          <Text role="bodyStrong">Current flow</Text>
+          <Text role="bodyStrong">المسار الحالي</Text>
           <Text role="bodySm" tone="muted">{screenId}</Text>
-          <Text role="bodySm" tone="muted">This is an active flow screen with executable state coverage.</Text>
+          <Text role="bodySm" tone="muted">هذه شاشة مسار نشط مع تغطية تنفيذية للحالات.</Text>
         </Surface>
       }
-      primaryActionLabel="Open tracking"
-      secondaryActionLabel="Back to operations"
+      primaryActionLabel="فتح التتبع"
+      secondaryActionLabel="العودة إلى العمليات"
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction ?? onRetry}
       onRetry={onRetry}

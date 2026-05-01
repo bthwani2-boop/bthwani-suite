@@ -1491,6 +1491,33 @@ function createStyles(direction: Direction) {
     gap: spacing[2],
     alignSelf: 'stretch',
   },
+  emptyFeed: {
+    borderWidth: 1,
+    borderColor: '#e6eaf1',
+    borderRadius: 18,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 16,
+    paddingVertical: 18,
+    gap: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyFeedEmoji: {
+    fontSize: 24,
+    lineHeight: 28,
+  },
+  emptyFeedTitle: {
+    color: '#1f2937',
+    fontWeight: '800',
+    fontSize: 14,
+    textAlign,
+  },
+  emptyFeedText: {
+    color: '#6b7280',
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign,
+  },
   storeListCard: {
     width: '100%',
     alignSelf: 'stretch',

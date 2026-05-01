@@ -78,6 +78,18 @@ export type DshClientCreateOrderResponse = {
   status: Extract<DshClientCheckoutState, 'order_created' | 'order_confirmed'>;
 };
 
+export type DshClientCheckoutSnapshot = {
+  orderId?: DshClientId;
+  state: DshClientCheckoutState;
+  quote: DshClientQuoteSnapshot;
+  serviceability: DshClientServiceabilitySnapshot;
+  cart: DshClientCartSnapshot;
+  paymentMethod: DshClientCreateOrderRequest['paymentMethod'];
+  walletAmountHalalas?: number;
+  amountDueOnDeliveryHalalas?: number;
+  note?: string;
+};
+
 export type DshClientBindingError = {
   code: string;
   message: string;
@@ -90,6 +102,11 @@ export type DshClientOrderSuccessPayload = {
   status: Extract<DshClientCheckoutState, 'order_created' | 'order_confirmed'>;
   successTitle?: string;
   successNote?: string;
+};
+
+export type DshClientOrderSuccessSnapshot = DshClientOrderSuccessPayload & {
+  nextState?: Extract<DshClientState, 'tracking_active' | 'delivered' | 'support_required'>;
+  nextAction?: 'tracking' | 'orders-list' | 'support';
 };
 
 export type DshClientOrderListItem = {
@@ -126,6 +143,14 @@ export type DshClientIssueReportRequest = {
   details?: string;
 };
 
+export type DshClientSupportIssuePayload = {
+  orderId: DshClientId;
+  issueType: 'order_issue' | 'delivery_issue' | 'payment_issue' | 'refund_issue' | 'other';
+  reason: string;
+  details?: string;
+  clientState?: Extract<DshClientState, 'support_required' | 'cancelled' | 'failed' | 'refund_pending' | 'refunded'>;
+};
+
 export type DshClientIssueReportResponse = {
   issueId: DshClientId;
   orderId: DshClientId;
@@ -141,6 +166,8 @@ export type DshClientWalletVisibility = {
   refundHalalas?: number;
   note?: string;
 };
+
+export type DshClientRefundVisibility = DshClientWalletVisibility;
 
 export type DshClientRefundSummary = {
   orderId: DshClientId;

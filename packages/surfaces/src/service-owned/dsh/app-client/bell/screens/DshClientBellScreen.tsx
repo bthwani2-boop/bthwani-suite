@@ -24,37 +24,37 @@ type ClientBellSummary = {
 };
 
 const defaultSummary: ClientBellSummary = {
-  orderLabel: 'DSH order #1042',
-  captainLabel: 'Captain Samer',
-  etaLabel: '4 min',
-  distanceLabel: '0.9 km away',
-  receiptLabel: 'Awaiting customer receipt',
-  nextActionLabel: 'The bell rings once the captain is close, then again when the order reaches the customer point.',
+  orderLabel: 'طلب DSH #1042',
+  captainLabel: 'الكابتن سامر',
+  etaLabel: '4 دقائق',
+  distanceLabel: 'يبعد 0.9 كم',
+  receiptLabel: 'بانتظار استلام العميل',
+  nextActionLabel: 'يرن الجرس مرة عند اقتراب الكابتن، ثم مرة ثانية عند وصوله إلى نقطة العميل.',
 };
 
 const defaultEvents: ClientBellEvent[] = [
   {
     id: 'approach',
-    title: 'Captain is approaching',
-    subtitle: 'The first bell rings when the captain is close enough to the customer point.',
-    meta: 'Approaching',
-    badgeLabel: 'Live',
+    title: 'الكابتن يقترب',
+    subtitle: 'الرنة الأولى تظهر عند اقتراب الكابتن من نقطة العميل.',
+    meta: 'اقتراب',
+    badgeLabel: 'مباشر',
     tone: 'info',
   },
   {
     id: 'arrived',
-    title: 'Captain reached the customer point',
-    subtitle: 'The second bell keeps the customer focused on the handoff and receipt moment.',
-    meta: 'Arrival',
-    badgeLabel: 'Alert',
+    title: 'الكابتن وصل إلى نقطة العميل',
+    subtitle: 'الرنة الثانية تؤكد لحظة التسليم والاستلام بوضوح.',
+    meta: 'وصول',
+    badgeLabel: 'تنبيه',
     tone: 'warning',
   },
   {
     id: 'received',
-    title: 'Customer receipt completed',
-    subtitle: 'After receipt, the bell calms down and the order moves into review and rating.',
-    meta: 'Closed',
-    badgeLabel: 'Done',
+    title: 'اكتمل استلام العميل',
+    subtitle: 'بعد الاستلام ينتقل الطلب إلى المراجعة والتقييم.',
+    meta: 'مغلق',
+    badgeLabel: 'تم',
     tone: 'success',
   },
 ];
@@ -71,44 +71,44 @@ function resolveStateCopy(state: Exclude<DshClientBellScreenState, 'ready'>): Be
   if (state === 'loading') {
     return {
       stateId: 'loading',
-      title: 'Preparing the client bell',
-      description: 'The arrival state is loading and the bell lane will show once the order context is ready.',
-      actionLabel: 'Retry bell',
+      title: 'جاري تجهيز جرس العميل',
+      description: 'تجري تهيئة حالة الوصول وسيظهر مسار الجرس فور جاهزية سياق الطلب.',
+      actionLabel: 'إعادة المحاولة',
     };
   }
 
   if (state === 'empty') {
     return {
       stateId: 'empty',
-      title: 'No active arrival bell',
-      description: 'The bell is live only while an order is close, arriving, or ready for receipt.',
-      actionLabel: 'Open tracking',
+      title: 'لا يوجد جرس وصول نشط',
+      description: 'يظهر الجرس فقط عندما يكون الطلب في حالة اقتراب أو وصول أو بانتظار الاستلام.',
+      actionLabel: 'فتح التتبع',
     };
   }
 
   if (state === 'offline') {
     return {
       stateId: 'offline',
-      title: 'Arrival bell is offline',
-      description: 'Reconnect to restore the customer arrival lane and keep the bell state visible.',
-      actionLabel: 'Retry bell',
+      title: 'جرس الوصول غير متصل',
+      description: 'أعد الاتصال لاستعادة مسار وصول العميل وإبقاء حالة الجرس ظاهرة.',
+      actionLabel: 'إعادة المحاولة',
     };
   }
 
   if (state === 'disabled') {
     return {
       kind: 'warning',
-      title: 'Arrival bell is temporarily disabled',
-      description: 'The customer bell stays read-only until the arrival workflow is re-enabled.',
-      actionLabel: 'Open tracking',
+      title: 'جرس الوصول متوقف مؤقتًا',
+      description: 'يبقى جرس العميل للعرض فقط حتى إعادة تفعيل تدفق الوصول.',
+      actionLabel: 'فتح التتبع',
     };
   }
 
   return {
     stateId: 'recoverableError',
-    title: 'Unable to load the client bell',
-    description: 'Reload the same path and keep the customer arrival sequence intact.',
-    actionLabel: 'Retry bell',
+    title: 'تعذر تحميل جرس العميل',
+    description: 'أعد التحميل لنفس المسار مع الحفاظ على تسلسل وصول العميل.',
+    actionLabel: 'إعادة المحاولة',
   };
 }
 
@@ -158,7 +158,7 @@ export function DshClientBellScreen({
     <MobileScrollView padding={4} gap={4}>
       <Surface tone="brand" gap={3}>
         <Box gap={1} style={{ alignItems: 'flex-end' }}>
-          <Badge label="Arrival bell" tone="warning" />
+          <Badge label="جرس الوصول" tone="warning" />
           <Text role="titleLg" style={{ textAlign: 'right' }}>جرس وصول الكابتن</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             يرن الجرس عند الاقتراب، ثم عند وصول الكابتن إلى نقطة العميل، وبعدها ينتقل الطلب إلى الاستلام والتقييم.

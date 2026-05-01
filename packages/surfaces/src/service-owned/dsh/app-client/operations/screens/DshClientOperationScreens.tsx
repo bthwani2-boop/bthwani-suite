@@ -160,82 +160,82 @@ const proxyControlIds: ClientOperationScreenId[] = [
 const clientOperationDirectoryGroups: ClientOperationDirectoryGroup[] = [
   {
     id: 'create-checkout',
-    title: 'Create and checkout',
-    subtitle: 'Create, quote, price, and pre-submit controls stay in one lane.',
+    title: 'الإنشاء والدفع',
+    subtitle: 'الإنشاء والتسعير وضوابط ما قبل الإرسال تبقى في مسار واحد.',
     itemIds: createCheckoutIds,
   },
   {
     id: 'order-delivery',
-    title: 'Order and delivery control',
-    subtitle: 'Execution, proof, status, and tracking stay together.',
+    title: 'الطلب والتحكم بالتوصيل',
+    subtitle: 'التنفيذ والإثبات والحالة والتتبع تبقى معًا.',
     itemIds: orderDeliveryIds,
   },
   {
     id: 'messaging-reviews',
-    title: 'Messaging and review',
-    subtitle: 'Conversation, rating, and feedback stay close to the active order.',
+    title: 'الرسائل والمراجعة',
+    subtitle: 'المحادثة والتقييم والتغذية الراجعة تبقى قريبة من الطلب النشط.',
     itemIds: messagingReviewIds,
   },
   {
     id: 'subscription-loyalty',
-    title: 'Subscription and loyalty',
-    subtitle: 'Benefits, family plans, upgrades, points, and entitlements stay visible.',
+    title: 'الاشتراك والولاء',
+    subtitle: 'المزايا والخطط العائلية والترقيات والنقاط والاستحقاقات تبقى ظاهرة.',
     itemIds: subscriptionLoyaltyIds,
   },
   {
     id: 'proxy-controls',
-    title: 'Proxy and service controls',
-    subtitle: 'Proxy requests and service-control surfaces stay out of the shopping lane.',
+    title: 'الوكالة وضوابط الخدمة',
+    subtitle: 'طلبات الوكالة وضوابط الخدمة تبقى خارج مسار التسوق.',
     itemIds: proxyControlIds,
   },
 ];
 
 const badgeLabelByKind: Record<ClientOperationKind, string> = {
-  create: 'Create',
-  order: 'Order',
-  delivery: 'Delivery',
-  loyalty: 'Loyalty',
-  subscription: 'Subscription',
-  proxy: 'Control',
-  chat: 'Comms',
-  settings: 'Settings',
-  review: 'Review',
+  create: 'إنشاء',
+  order: 'طلب',
+  delivery: 'توصيل',
+  loyalty: 'ولاء',
+  subscription: 'اشتراك',
+  proxy: 'ضبط',
+  chat: 'محادثة',
+  settings: 'إعدادات',
+  review: 'مراجعة',
 };
 
 const stageLabelByKind: Record<ClientOperationKind, string> = {
-  create: 'Pre-submit control',
-  order: 'Order snapshot',
-  delivery: 'Live movement',
-  loyalty: 'Benefit visibility',
-  subscription: 'Benefit visibility',
-  proxy: 'Control lane',
-  chat: 'Conversation state',
-  settings: 'Service control',
-  review: 'Feedback capture',
+  create: 'ضبط ما قبل الإرسال',
+  order: 'لقطة الطلب',
+  delivery: 'حركة مباشرة',
+  loyalty: 'وضوح المزايا',
+  subscription: 'وضوح المزايا',
+  proxy: 'مسار الضبط',
+  chat: 'حالة المحادثة',
+  settings: 'ضبط الخدمة',
+  review: 'التقاط التقييم',
 };
 
 const primaryOutcomeByKind: Record<ClientOperationKind, string> = {
-  create: 'The request stays in the active creation lane without extra detours.',
-  order: 'The order checkpoint stays visible and easy to continue.',
-  delivery: 'The delivery state stays readable while the user remains in flow.',
-  loyalty: 'Points and benefits stay visible before the next action.',
-  subscription: 'Subscription value stays visible before the next action.',
-  proxy: 'The control surface stays explicit without leaking into shopping.',
-  chat: 'The conversation stays attached to the active order.',
-  settings: 'The service control stays explicit before browsing continues.',
-  review: 'Feedback is captured while the order is still fresh.',
+  create: 'يبقى الطلب في مسار إنشاء واضح دون تحويلات إضافية.',
+  order: 'تبقى نقطة حالة الطلب واضحة وسهلة المتابعة.',
+  delivery: 'تبقى حالة التوصيل مقروءة أثناء استمرار العميل في المسار.',
+  loyalty: 'تبقى النقاط والمزايا ظاهرة قبل الخطوة التالية.',
+  subscription: 'تبقى قيمة الاشتراك ظاهرة قبل الخطوة التالية.',
+  proxy: 'تبقى واجهة الضبط واضحة دون تسرب إلى مسار التسوق.',
+  chat: 'تبقى المحادثة مرتبطة بالطلب النشط.',
+  settings: 'يبقى ضبط الخدمة واضحًا قبل متابعة التصفح.',
+  review: 'يتم التقاط التقييم بينما تجربة الطلب ما تزال حديثة.',
 };
 
 const subtitleByKind: Record<ClientOperationKind, string> = {
-  create: 'Compact create and pre-submit work stays in one lane.',
-  order: 'Order context remains explicit and easy to continue.',
-  delivery: 'Delivery control stays readable inside the tracking lane.',
-  loyalty: 'Points and benefits stay visible without leaving the flow.',
-  subscription: 'Subscription and family management stay close to the benefit path.',
-  proxy: 'Proxy and service-control decisions stay explicit.',
-  chat: 'Conversation stays attached to the current order.',
-  settings: 'Service settings stay visible before the customer continues.',
-  review: 'Feedback stays close to the order so the user can complete it quickly.',
+  create: 'مسار الإنشاء وضبط ما قبل الإرسال يبقى مختصرًا وواضحًا.',
+  order: 'سياق الطلب يبقى صريحًا وسهل الاستمرار.',
+  delivery: 'ضبط التوصيل يبقى مقروءًا داخل مسار التتبع.',
+  loyalty: 'النقاط والمزايا تبقى ظاهرة دون مغادرة المسار.',
+  subscription: 'الاشتراك وإدارة العائلة تبقى قريبة من مسار المزايا.',
+  proxy: 'قرارات الوكالة وضبط الخدمة تبقى واضحة.',
+  chat: 'المحادثة تبقى مرتبطة بالطلب الحالي.',
+  settings: 'إعدادات الخدمة تبقى واضحة قبل متابعة العميل.',
+  review: 'التقييم يبقى قريبًا من الطلب ليكتمل بسرعة.',
 };
 
 function humanizeScreenId(screenId: ClientOperationScreenId) {
@@ -317,15 +317,15 @@ function getOperationDefinition(screenId: ClientOperationScreenId): ClientOperat
 }
 
 function primaryLabelByKind(kind: ClientOperationKind) {
-  if (kind === 'create') return 'Open create flow';
-  if (kind === 'delivery') return 'Open tracking';
-  if (kind === 'loyalty') return 'Open loyalty context';
-  if (kind === 'subscription') return 'Open subscription context';
-  if (kind === 'proxy') return 'Open control context';
-  if (kind === 'review') return 'Open review flow';
-  if (kind === 'settings') return 'Return to service context';
-  if (kind === 'chat') return 'Open conversation';
-  return 'Open order flow';
+  if (kind === 'create') return 'فتح مسار الإنشاء';
+  if (kind === 'delivery') return 'فتح التتبع';
+  if (kind === 'loyalty') return 'فتح سياق الولاء';
+  if (kind === 'subscription') return 'فتح سياق الاشتراك';
+  if (kind === 'proxy') return 'فتح سياق الضبط';
+  if (kind === 'review') return 'فتح مسار التقييم';
+  if (kind === 'settings') return 'الرجوع إلى سياق الخدمة';
+  if (kind === 'chat') return 'فتح المحادثة';
+  return 'فتح مسار الطلب';
 }
 
 const clientOperationDefinitions: Record<ClientOperationScreenId, ClientOperationDefinition> = Object.fromEntries(
@@ -337,14 +337,14 @@ function buildOperationContent(definition: ClientOperationDefinition, draftValue
     {
       title: definition.stageLabel,
       subtitle: definition.primaryOutcome,
-      meta: 'Primary emphasis',
+      meta: 'تركيز أساسي',
       badgeLabel: definition.badgeLabel,
     },
     {
-      title: 'Next handoff',
-      subtitle: 'Keep the customer in one clear lane after this step completes.',
-      meta: 'Flow control',
-      badgeLabel: 'Next',
+      title: 'التسليم التالي',
+      subtitle: 'أبقِ العميل في مسار واضح بعد اكتمال هذه الخطوة.',
+      meta: 'ضبط المسار',
+      badgeLabel: 'التالي',
     },
   ];
 
@@ -352,15 +352,15 @@ function buildOperationContent(definition: ClientOperationDefinition, draftValue
     return (
       <Box gap={3}>
         <Surface tone="brand" gap={3}>
-          <StatCard label="Conversation lane" value="Live" deltaLabel={definition.stageLabel} tone="info" />
-          <StatCard label="Expected behavior" value="Short" deltaLabel="Actionable and explicit" tone="success" />
+          <StatCard label="مسار المحادثة" value="مباشر" deltaLabel={definition.stageLabel} tone="info" />
+          <StatCard label="السلوك المتوقع" value="مختصر" deltaLabel="واضح وقابل للتنفيذ" tone="success" />
         </Surface>
         <Surface tone="raised" gap={3}>
           <TextField
-            label="Message draft"
+            label="مسودة الرسالة"
             value={draftValue}
             onChangeText={setDraftValue}
-            hint="Keep the note short, concrete, and tied to the active delivery or order."
+            hint="اجعل الرسالة قصيرة وواضحة ومرتبطة بالطلب أو التوصيل النشط."
           />
         </Surface>
       </Box>
@@ -371,15 +371,15 @@ function buildOperationContent(definition: ClientOperationDefinition, draftValue
     return (
       <Box gap={3}>
         <Surface tone="brand" gap={3}>
-          <StatCard label="Control state" value="Focused" deltaLabel={definition.stageLabel} tone="info" />
-          <StatCard label="Decision style" value="Guarded" deltaLabel="Review before commit" tone="success" />
+          <StatCard label="حالة الضبط" value="مركزة" deltaLabel={definition.stageLabel} tone="info" />
+          <StatCard label="نمط القرار" value="محكوم" deltaLabel="راجع قبل الاعتماد" tone="success" />
         </Surface>
         <Surface tone="raised" gap={3}>
           <KeyValueList
             items={[
-              { label: 'Surface', value: definition.title },
-              { label: 'Purpose', value: definition.primaryOutcome, tone: 'brand' },
-              { label: 'Scope', value: 'Proxy and service-control handling' },
+              { label: 'الواجهة', value: definition.title },
+              { label: 'الغرض', value: definition.primaryOutcome, tone: 'brand' },
+              { label: 'النطاق', value: 'معالجة الوكالة وضبط الخدمة' },
             ]}
           />
         </Surface>
@@ -396,15 +396,15 @@ function buildOperationContent(definition: ClientOperationDefinition, draftValue
     return (
       <Box gap={3}>
         <Surface tone="brand" gap={3}>
-          <StatCard label="Benefit state" value="Visible" deltaLabel={definition.stageLabel} tone="info" />
-          <StatCard label="Customer confidence" value="High" deltaLabel="Value is explicit before action" tone="success" />
+          <StatCard label="حالة المزايا" value="ظاهرة" deltaLabel={definition.stageLabel} tone="info" />
+          <StatCard label="ثقة العميل" value="عالية" deltaLabel="القيمة واضحة قبل الإجراء" tone="success" />
         </Surface>
         <Surface tone="raised" gap={3}>
           <KeyValueList
             items={[
-              { label: 'Surface', value: definition.title },
-              { label: 'Customer benefit', value: definition.primaryOutcome, tone: 'brand' },
-              { label: 'Category', value: definition.kind === 'subscription' ? 'Subscription management' : 'Loyalty value' },
+              { label: 'الواجهة', value: definition.title },
+              { label: 'فائدة العميل', value: definition.primaryOutcome, tone: 'brand' },
+              { label: 'الفئة', value: definition.kind === 'subscription' ? 'إدارة الاشتراك' : 'قيمة الولاء' },
             ]}
           />
         </Surface>
@@ -416,8 +416,8 @@ function buildOperationContent(definition: ClientOperationDefinition, draftValue
     return (
       <Box gap={3}>
         <Surface tone="brand" gap={3}>
-          <StatCard label="Delivery lane" value="Active" deltaLabel={definition.stageLabel} tone="info" />
-          <StatCard label="Recovery bias" value="Fast" deltaLabel="Minimize taps during active delivery" tone="success" />
+          <StatCard label="مسار التوصيل" value="نشط" deltaLabel={definition.stageLabel} tone="info" />
+          <StatCard label="أولوية التعافي" value="سريع" deltaLabel="تقليل الخطوات أثناء التوصيل النشط" tone="success" />
         </Surface>
         <Surface tone="raised" gap={2}>
           {guidanceItems.map((item) => (
@@ -432,8 +432,8 @@ function buildOperationContent(definition: ClientOperationDefinition, draftValue
     return (
       <Box gap={3}>
         <Surface tone="brand" gap={3}>
-          <StatCard label="Feedback lane" value="Ready" deltaLabel={definition.stageLabel} tone="info" />
-          <StatCard label="Friction target" value="Low" deltaLabel="Capture sentiment while the order is still fresh" tone="success" />
+          <StatCard label="مسار التقييم" value="جاهز" deltaLabel={definition.stageLabel} tone="info" />
+          <StatCard label="مستوى الاحتكاك" value="منخفض" deltaLabel="التقاط الانطباع أثناء حداثة تجربة الطلب" tone="success" />
         </Surface>
         <Surface tone="raised" gap={2}>
           {guidanceItems.map((item) => (
@@ -448,15 +448,15 @@ function buildOperationContent(definition: ClientOperationDefinition, draftValue
     return (
       <Box gap={3}>
         <Surface tone="brand" gap={3}>
-          <StatCard label="Control state" value="Visible" deltaLabel={definition.stageLabel} tone="info" />
-          <StatCard label="Flow clarity" value="High" deltaLabel="Avoid hidden settings detours" tone="success" />
+          <StatCard label="حالة الضبط" value="ظاهرة" deltaLabel={definition.stageLabel} tone="info" />
+          <StatCard label="وضوح المسار" value="عالٍ" deltaLabel="تجنب تحويلات الإعدادات المخفية" tone="success" />
         </Surface>
         <Surface tone="raised" gap={3}>
           <KeyValueList
             items={[
-              { label: 'Surface', value: definition.title },
-              { label: 'Purpose', value: definition.primaryOutcome, tone: 'brand' },
-              { label: 'Group', value: definition.group },
+              { label: 'الواجهة', value: definition.title },
+              { label: 'الغرض', value: definition.primaryOutcome, tone: 'brand' },
+              { label: 'المجموعة', value: definition.group },
             ]}
           />
         </Surface>
@@ -467,15 +467,15 @@ function buildOperationContent(definition: ClientOperationDefinition, draftValue
   return (
     <Box gap={3}>
       <Surface tone="brand" gap={3}>
-        <StatCard label="Current lane" value="Ready" deltaLabel={definition.stageLabel} tone="info" />
-        <StatCard label="Primary outcome" value="Visible" deltaLabel="One dominant next action" tone="success" />
+        <StatCard label="المسار الحالي" value="جاهز" deltaLabel={definition.stageLabel} tone="info" />
+        <StatCard label="المحصلة الأساسية" value="ظاهرة" deltaLabel="خطوة تالية واضحة ومسيطرة" tone="success" />
       </Surface>
       <Surface tone="raised" gap={3}>
         <KeyValueList
           items={[
-            { label: 'Surface', value: definition.title },
-            { label: 'Purpose', value: definition.primaryOutcome, tone: 'brand' },
-            { label: 'Group', value: definition.group },
+            { label: 'الواجهة', value: definition.title },
+            { label: 'الغرض', value: definition.primaryOutcome, tone: 'brand' },
+            { label: 'المجموعة', value: definition.group },
           ]}
         />
       </Surface>
@@ -508,7 +508,7 @@ function OperationScreenView({
       subtitle={definition.subtitle}
       content={buildOperationContent(definition, draftValue, setDraftValue)}
       primaryActionLabel={primaryActionLabel ?? primaryLabelByKind(definition.kind)}
-      secondaryActionLabel={secondaryActionLabel ?? 'Back to operations directory'}
+      secondaryActionLabel={secondaryActionLabel ?? 'العودة إلى دليل العمليات'}
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
@@ -528,15 +528,15 @@ export function DshClientOperationDirectoryScreen({ onOpenScreen }: { onOpenScre
   return (
     <MobileScrollView padding={4} gap={4}>
       <Box gap={2}>
-        <Text role="titleLg">DSH client operations library</Text>
+        <Text role="titleLg">مكتبة عمليات عميل DSH</Text>
         <Text role="bodyMd" tone="muted">
-          Internal capability library for residual DSH client flows, grouped by customer journey instead of a flat fallback bucket.
+          مكتبة قدرات داخلية لمسارات عميل DSH المتبقية، ومجمّعة حسب رحلة العميل بدل قائمة fallback مسطحة.
         </Text>
       </Box>
 
       <Surface tone="brand" gap={3}>
-        <StatCard label="Covered capabilities" value={String(operationScreenCount)} deltaLabel="Documented internal client matrix" tone="info" />
-        <StatCard label="Navigation model" value="Grouped" deltaLabel="Create, delivery, benefits, proxy, settings" tone="success" />
+        <StatCard label="القدرات المغطاة" value={String(operationScreenCount)} deltaLabel="مصفوفة عميل داخلية موثقة" tone="info" />
+        <StatCard label="نمط التنقل" value="مجمّع" deltaLabel="الإنشاء، التوصيل، المزايا، الوكالة، الإعدادات" tone="success" />
       </Surface>
 
       {clientOperationDirectoryGroups.map((group) => (
@@ -577,8 +577,8 @@ export function DshConversationHubScreen({ screenId, state = 'ready', onPrimaryA
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
-      primaryActionLabel={screenId === 'chat-send' ? 'Send message' : 'Acknowledge thread'}
-      secondaryActionLabel="Back to operations directory"
+      primaryActionLabel={screenId === 'chat-send' ? 'إرسال رسالة' : 'تأكيد المحادثة'}
+      secondaryActionLabel="العودة إلى دليل العمليات"
     />
   );
 }
@@ -598,8 +598,8 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
-      primaryActionLabel="Flag issue"
-      secondaryActionLabel="Back to operations directory"
+      primaryActionLabel="تثبيت المشكلة"
+      secondaryActionLabel="العودة إلى دليل العمليات"
     />
   );
 }
@@ -620,8 +620,8 @@ export function DshProxyHubScreen({ screenId, state = 'ready', onPrimaryAction, 
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
-      primaryActionLabel={screenId === 'proxy-request-tracking' ? 'Open tracking' : screenId === 'proxy-request-reject' ? 'Reject request' : screenId === 'proxy-request-approve' ? 'Approve request' : screenId === 'proxy-request-review' ? 'Review request' : 'Create request'}
-      secondaryActionLabel="Back to operations directory"
+      primaryActionLabel={screenId === 'proxy-request-tracking' ? 'فتح التتبع' : screenId === 'proxy-request-reject' ? 'رفض الطلب' : screenId === 'proxy-request-approve' ? 'اعتماد الطلب' : screenId === 'proxy-request-review' ? 'مراجعة الطلب' : 'إنشاء طلب'}
+      secondaryActionLabel="العودة إلى دليل العمليات"
     />
   );
 }
@@ -642,8 +642,8 @@ export function DshTrustHubScreen({ screenId, state = 'ready', onPrimaryAction, 
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
-      primaryActionLabel={screenId === 'order-proof-code-generate' ? 'Generate code' : screenId === 'order-proof-verify' ? 'Verify handoff' : screenId === 'order-escrow-hold' ? 'Hold funds' : 'Release funds'}
-      secondaryActionLabel="Back to operations directory"
+      primaryActionLabel={screenId === 'order-proof-code-generate' ? 'توليد الرمز' : screenId === 'order-proof-verify' ? 'تحقق التسليم' : screenId === 'order-escrow-hold' ? 'تجميد المبلغ' : 'إطلاق المبلغ'}
+      secondaryActionLabel="العودة إلى دليل العمليات"
     />
   );
 }
@@ -664,8 +664,8 @@ export function DshServiceSettingsHubScreen({ screenId, state = 'ready', onPrima
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
-      primaryActionLabel="Confirm settings"
-      secondaryActionLabel="Back to operations directory"
+      primaryActionLabel="تأكيد الإعدادات"
+      secondaryActionLabel="العودة إلى دليل العمليات"
     />
   );
 }
@@ -685,8 +685,8 @@ export function DshZoneSetScreen({ state = 'ready', onPrimaryAction, onSecondary
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
-      primaryActionLabel="Confirm zone"
-      secondaryActionLabel="Back to operations directory"
+      primaryActionLabel="تأكيد النطاق"
+      secondaryActionLabel="العودة إلى دليل العمليات"
     />
   );
 }
@@ -706,8 +706,8 @@ export function DshListingStatusUpdateScreen({ state = 'ready', onPrimaryAction,
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
-      primaryActionLabel="Confirm listing state"
-      secondaryActionLabel="Back to operations directory"
+      primaryActionLabel="تأكيد حالة الإدراج"
+      secondaryActionLabel="العودة إلى دليل العمليات"
     />
   );
 }

@@ -466,7 +466,7 @@ export function DshStoreGetScreen({
     </View>
   ) : null;
 
-  const customerVisibleItems = React.useMemo(
+  const clientVisibleItems = React.useMemo(
     () => fallbackMenuItems.filter((item) => item.isAvailable !== false),
     [fallbackMenuItems],
   );
@@ -498,26 +498,26 @@ export function DshStoreGetScreen({
 
   const categories = React.useMemo(() => {
     const storeCategories = (store?.categories ?? []).filter((category) =>
-      customerVisibleItems.some((item) => item.categoryId === category.id),
+      clientVisibleItems.some((item) => item.categoryId === category.id),
     );
-    const popularCount = customerVisibleItems.filter((item) => {
+    const popularCount = clientVisibleItems.filter((item) => {
       const status = normalizeDisplayText(item.statusLabel ?? '');
       return status.includes('الأكثر') || status.includes('اختيار') || Boolean(item.hasOptions);
     }).length;
 
-    const favoritesCount = customerVisibleItems.filter((item) => isFavoriteItem(item) || favoriteIds.has(item.id)).length;
-    const newCount = customerVisibleItems.filter(isNewItem).length;
-    const offersCount = customerVisibleItems.filter(isOfferItem).length;
+    const favoritesCount = clientVisibleItems.filter((item) => isFavoriteItem(item) || favoriteIds.has(item.id)).length;
+    const newCount = clientVisibleItems.filter(isNewItem).length;
+    const offersCount = clientVisibleItems.filter(isOfferItem).length;
 
     return [
-      { id: 'all', label: 'جميع الأقسام', itemCount: customerVisibleItems.length, isPopular: true },
-      { id: 'popular', label: 'الأكثر طلبًا', itemCount: popularCount || Math.min(customerVisibleItems.length, 4), isPopular: true },
+      { id: 'all', label: 'جميع الأقسام', itemCount: clientVisibleItems.length, isPopular: true },
+      { id: 'popular', label: 'الأكثر طلبًا', itemCount: popularCount || Math.min(clientVisibleItems.length, 4), isPopular: true },
       { id: 'favorites', label: 'المفضلة', itemCount: favoritesCount },
       { id: 'new', label: 'الجديدة', itemCount: newCount },
       { id: 'offers', label: 'العروض', itemCount: offersCount },
       ...storeCategories,
     ];
-  }, [customerVisibleItems, store?.categories, isFavoriteItem, isNewItem, isOfferItem, favoriteIds]);
+  }, [clientVisibleItems, store?.categories, isFavoriteItem, isNewItem, isOfferItem, favoriteIds]);
 
   const CARD_HEIGHT = 126;
   const CARD_GAP = 2;
@@ -603,31 +603,31 @@ export function DshStoreGetScreen({
   const resolveItemsForCategory = React.useCallback((categoryId: string) => {
     const scopedItems = (() => {
       if (categoryId === 'all') {
-        return customerVisibleItems;
+        return clientVisibleItems;
       }
 
       if (categoryId === 'popular') {
-        const popularItems = customerVisibleItems.filter((item) => {
+        const popularItems = clientVisibleItems.filter((item) => {
           const status = normalizeDisplayText(item.statusLabel ?? '');
           return status.includes('الأكثر') || status.includes('اختيار') || Boolean(item.hasOptions);
         });
 
-        return popularItems.length ? popularItems : customerVisibleItems.slice(0, Math.min(4, customerVisibleItems.length));
+        return popularItems.length ? popularItems : clientVisibleItems.slice(0, Math.min(4, clientVisibleItems.length));
       }
 
       if (categoryId === 'favorites') {
-        return customerVisibleItems.filter((item) => isFavoriteItem(item) || favoriteIds.has(item.id));
+        return clientVisibleItems.filter((item) => isFavoriteItem(item) || favoriteIds.has(item.id));
       }
 
       if (categoryId === 'new') {
-        return customerVisibleItems.filter((item) => isNewItem(item));
+        return clientVisibleItems.filter((item) => isNewItem(item));
       }
 
       if (categoryId === 'offers') {
-        return customerVisibleItems.filter((item) => isOfferItem(item));
+        return clientVisibleItems.filter((item) => isOfferItem(item));
       }
 
-      return customerVisibleItems.filter((item) => item.categoryId === categoryId);
+      return clientVisibleItems.filter((item) => item.categoryId === categoryId);
     })();
 
     const normalizedQuery = headerSearchQuery.trim().toLowerCase();
@@ -646,7 +646,7 @@ export function DshStoreGetScreen({
 
       return searchableText.includes(normalizedQuery);
     });
-  }, [customerVisibleItems, headerSearchQuery, isFavoriteItem, isNewItem, isOfferItem, favoriteIds]);
+  }, [clientVisibleItems, headerSearchQuery, isFavoriteItem, isNewItem, isOfferItem, favoriteIds]);
 
   const changeCategory = React.useCallback((newId: string) => {
     if (newId === selectedCategory) return;
@@ -1033,18 +1033,18 @@ export function DshStoreGetScreen({
   ).slice(0, 3);
 
   const firstVisibleItem = React.useMemo(
-    () => visibleItems[0] ?? customerVisibleItems[0] ?? null,
-    [customerVisibleItems, visibleItems],
+    () => visibleItems[0] ?? clientVisibleItems[0] ?? null,
+    [clientVisibleItems, visibleItems],
   );
 
   const firstOfferItem = React.useMemo(
-    () => visibleItems.find((item) => isOfferItem(item)) ?? customerVisibleItems.find((item) => isOfferItem(item)) ?? firstVisibleItem,
-    [customerVisibleItems, firstVisibleItem, isOfferItem, visibleItems],
+    () => visibleItems.find((item) => isOfferItem(item)) ?? clientVisibleItems.find((item) => isOfferItem(item)) ?? firstVisibleItem,
+    [clientVisibleItems, firstVisibleItem, isOfferItem, visibleItems],
   );
 
   const firstNewItem = React.useMemo(
-    () => visibleItems.find((item) => isNewItem(item)) ?? customerVisibleItems.find((item) => isNewItem(item)) ?? firstVisibleItem,
-    [customerVisibleItems, firstVisibleItem, isNewItem, visibleItems],
+    () => visibleItems.find((item) => isNewItem(item)) ?? clientVisibleItems.find((item) => isNewItem(item)) ?? firstVisibleItem,
+    [clientVisibleItems, firstVisibleItem, isNewItem, visibleItems],
   );
 
   const openStoreItemPreview = React.useCallback((item?: DshStoreGetMenuItem | null) => {
