@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '@bthwani/ui-kit';
-import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../shared';
+import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame, type ControlPanelDshActionQueueItem } from '../shared';
 
 type SupportLane = 'order' | 'partner' | 'captain' | 'field';
 
@@ -17,7 +17,7 @@ function buildSupportItems(kind: 'queue' | 'dispute') {
     secondaryActionLabel: 'Assign owner',
     evidenceActionLabel: `Open linked ${lane}`,
     tone: lane === 'order' ? 'brand' : lane === 'partner' ? 'best' : lane === 'captain' ? 'warning' : 'warning',
-  })) as const;
+  })) satisfies readonly ControlPanelDshActionQueueItem[];
 }
 
 function SupportQueueBoard({

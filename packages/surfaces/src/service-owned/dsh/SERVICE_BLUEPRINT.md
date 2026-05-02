@@ -258,6 +258,19 @@ Last updated: 2026-04-20 23:29:45
 
 ### 10.6 Guard Results
 
+## 12. Current Control-Panel Verification
+
+| Field | Value |
+|---|---|
+| Surface | control-panel |
+| Scope | packages/surfaces/src/service-owned/dsh/control-panel/support/closure-workspaces.tsx |
+| Status | PARTIAL |
+| Verified change | Replaced invalid `as const` on mapped support workspace items with a typed `satisfies readonly ControlPanelDshActionQueueItem[]` contract. |
+| TypeScript | PASS |
+| control-panel build | PASS |
+| Full DSH closure | NOT CLOSED |
+| Evidence | tools/registry/runs/DSH_UI_UX_FLOW_CLOSURE-20260502-205238 |
+
 | Guard | Result |
 |---|---|
 | legacy placeholder | PASS — none detected |
