@@ -30,7 +30,6 @@ const {
   DshCaptainChatReadAckScreen,
   DshCaptainChatSendScreen,
   DshCaptainCodBalanceScreen,
-  DshCaptainJobRejectScreen,
   DshCaptainOrderAcceptScreen,
   DshCaptainOrderDeliverScreen,
   DshCaptainOrderDetailsScreen,
@@ -45,12 +44,11 @@ const {
 } = dshCaptain;
 
 type CaptainOrderDetailSummary = React.ComponentProps<typeof CaptainOrderDetailScreen>['summary'];
-type CaptainOrdersInboxScreenState = React.ComponentProps<typeof CaptainOrdersInboxScreen>['state'];
+type CaptainOrdersInboxScreenState = NonNullable<React.ComponentProps<typeof CaptainOrdersInboxScreen>>['state'];
 type CaptainSupportRoute =
   | 'chat-read-ack'
   | 'chat-send'
   | 'cod-balance'
-  | 'job-reject'
   | 'order-accept'
   | 'order-deliver'
   | 'order-details'
@@ -246,7 +244,7 @@ export function CaptainSurfaceHost() {
   const insets = useSafeAreaInsets();
   const [activeServiceType, setActiveServiceType] = React.useState<CaptainServiceType>('dsh');
   const [route, setRoute] = React.useState<CaptainRoute>('home');
-  const [inboxState, setInboxState] = React.useState<CaptainOrdersInboxScreenState>('active');
+  const [inboxState, setInboxState] = React.useState<CaptainOrdersInboxScreenState>('ready');
   const [activeOrderId, setActiveOrderId] = React.useState<string>('captain-order-9021');
   const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<CaptainSupportRoute>('orders-list');
   const [isPickupSheetVisible, setIsPickupSheetVisible] = React.useState(false);
@@ -260,7 +258,7 @@ export function CaptainSurfaceHost() {
   const routeHistoryRef = React.useRef<CaptainRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
 
-  const activeSummary = defaultDetailByOrderId[activeOrderId] ?? defaultDetailByOrderId['captain-order-9021'];
+  const activeSummary = defaultDetailByOrderId[activeOrderId] ?? defaultDetailByOrderId['captain-order-9021']!;
   const activeOrderDisplayId = activeSummary.orderId.replace('captain-order-', '');
   const orderChatState = inboxState === 'delivered' ? 'readOnly' : 'active';
   const isCaptainAvailable = captainAvailabilityStatus === 'available';
@@ -295,10 +293,6 @@ export function CaptainSurfaceHost() {
     return false;
   }, [route]);
 
-  if (!activeSummary) {
-    return null;
-  }
-
   React.useEffect(() => {
     const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1];
 
@@ -324,7 +318,7 @@ export function CaptainSurfaceHost() {
   }, [goBack]);
 
   React.useEffect(() => {
-    if (inboxState !== 'active') {
+    if (inboxState !== 'ready') {
       return;
     }
 
@@ -407,14 +401,14 @@ export function CaptainSurfaceHost() {
     const nextType: CaptainServiceType = typeId === 'amn' ? 'amn' : 'dsh';
     setActiveServiceType(nextType);
     setRoute('home');
-    setInboxState('active');
+    setInboxState('ready');
     setActiveOrderId('captain-order-9021');
     setActiveOrderExpanded(false);
     setIsPickupSheetVisible(false);
     setIsDeliverySheetVisible(false);
   }, []);
 
-  const captainEntryState = inboxState === 'loading' ? 'loading' : inboxState === 'noOrders' ? 'empty' : 'ready';
+  const captainEntryState = inboxState === 'loading' ? 'loading' : inboxState === 'empty' ? 'empty' : 'ready';
 
   const renderCaptainFlow = () => {
     if (route === 'entry') {
@@ -436,7 +430,7 @@ export function CaptainSurfaceHost() {
       return (
         <CaptainOrdersInboxScreen
           state={inboxState}
-          onRetry={() => setInboxState('active')}
+          onRetry={() => setInboxState('ready')}
           onOpenOrder={openOrderDetail}
           onOpenNextOrder={openOrderDetail}
         />
@@ -705,10 +699,10 @@ export function CaptainSurfaceHost() {
         ? {
             statusLabel: 'تنبيه',
             message: 'تعذر تحميل الطلب النشط. أعد المحاولة أو افتح صندوق الطلبات.',
-            onPress: () => setInboxState('active'),
+            onPress: () => setInboxState('ready'),
             marquee: false,
           }
-        : inboxState === 'noOrders'
+        : inboxState === 'empty'
           ? {
               statusLabel: 'انتظار',
               message: 'لا يوجد طلب نشط الآن. ابقَ على الخريطة وانتظر الحركة التالية.',
@@ -865,14 +859,14 @@ export function CaptainSurfaceHost() {
             </Text>
           </Box>
           <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <Button size="sm" fullWidth={false} label="إعادة المحاولة" onPress={() => setInboxState('active')} />
+            <Button size="sm" fullWidth={false} label="إعادة المحاولة" onPress={() => setInboxState('ready')} />
             <Button size="sm" fullWidth={false} tone="ghost" label="صندوق الطلبات" onPress={() => setRoute('inbox')} />
           </Box>
         </Surface>
       );
     }
 
-    if (inboxState === 'noOrders') {
+    if (inboxState === 'empty') {
       return (
         <Surface
           tone="raised"
@@ -1247,8 +1241,7 @@ export function CaptainSurfaceHost() {
     const supportScreens: Record<CaptainSupportRoute, React.ReactNode> = {
       'chat-read-ack': <DshCaptainChatReadAckScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'chat-send': <DshCaptainChatSendScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'cod-balance': <DshCaptainCodBalanceScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'job-reject': <DshCaptainJobRejectScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'cod-balance': <DshCaptainCodBalanceScreen onBack={openSupportDirectory} onRetry={openSupportDirectory} />,
       'order-accept': <DshCaptainOrderAcceptScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('order-get')} />,
       'order-deliver': <DshCaptainOrderDeliverScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('proof-upload')} />,
       'order-details': <DshCaptainOrderDetailsScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
@@ -1256,10 +1249,10 @@ export function CaptainSurfaceHost() {
       'order-pickup': <DshCaptainOrderPickupScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('order-deliver')} />,
       'orders-list': <DshCaptainOrdersListScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('orders-offers-list')} />,
       'orders-offers-list': <DshCaptainOrdersOffersListScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('order-accept')} />,
-      'profile-get': <DshCaptainProfileGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'profile-get': <DshCaptainProfileGetScreen onBack={openSupportDirectory} onRetry={openSupportDirectory} />,
       'proof-upload': <DshCaptainProofUploadScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'tier-evaluate': <DshCaptainTierEvaluateScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('tier-info')} />,
-      'tier-info': <DshCaptainTierInfoScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+      'tier-evaluate': <DshCaptainTierEvaluateScreen onBack={openSupportDirectory} onRetry={openSupportDirectory} />,
+      'tier-info': <DshCaptainTierInfoScreen onBack={openSupportDirectory} onRetry={openSupportDirectory} />,
     };
 
     let content: React.ReactNode = renderCaptainFlow();

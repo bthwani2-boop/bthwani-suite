@@ -6,7 +6,6 @@ export type CaptainSupportScreenId =
   | 'chat-read-ack'
   | 'chat-send'
   | 'cod-balance'
-  | 'job-reject'
   | 'order-accept'
   | 'order-deliver'
   | 'order-details'
@@ -247,7 +246,6 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
         { id: 'order-pickup', title: 'استلام الطلب', subtitle: 'أكد الاستلام.', badgeLabel: 'تنفيذ' },
         { id: 'order-deliver', title: 'تسليم الطلب', subtitle: 'أكد التسليم.', badgeLabel: 'إغلاق' },
         { id: 'proof-upload', title: 'رفع الإثبات', subtitle: 'ارفع دليل التسليم.', badgeLabel: 'إثبات' },
-        { id: 'job-reject', title: 'رفض المهمة', subtitle: 'ارفض مع ذكر السبب.', badgeLabel: 'استثناء' },
       ],
     },
     {

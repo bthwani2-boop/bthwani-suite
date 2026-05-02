@@ -419,7 +419,7 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
           <TextField label="المخزون" value={draftStock} onChangeText={setDraftStock} placeholder="42" keyboardType="numeric" />
           <Button
             label={draftAvailable ? 'التوفر: مفعّل' : 'التوفر: موقوف'}
-            tone={draftAvailable ? 'success' : 'warning'}
+            tone={draftAvailable ? 'success' : 'danger'}
             fullWidth={false}
             onPress={() => setDraftAvailable((current) => !current)}
           />

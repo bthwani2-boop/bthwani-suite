@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Badge, Box, Icon, Surface, Text, useDirection } from '@bthwani/ui-kit';
+import { Badge, Box, Card, Icon, Surface, Text, useDirection } from '@bthwani/ui-kit';
 import {
   resolveFieldCompletionPercent,
   resolveFieldStoreLifecycleLabel,
@@ -20,11 +20,10 @@ export function FieldStoreCard({ store, onPress }: FieldStoreCardProps) {
   const progress = resolveFieldCompletionPercent(store.draft);
 
   return (
-    <Surface
+    <Card
       tone="raised"
       padding={4}
       gap={3}
-      radiusToken="xl"
       onPress={onPress}
       style={{ borderWidth: 1, borderColor: 'rgba(255, 80, 13, 0.16)' }}
     >
@@ -58,7 +57,7 @@ export function FieldStoreCard({ store, onPress }: FieldStoreCardProps) {
           <Text role="bodySm" style={{ textAlign: 'right' }}>{store.lastUpdatedLabel} · {store.nextVisitLabel}</Text>
         </Box>
       </View>
-    </Surface>
+    </Card>
   );
 }
 

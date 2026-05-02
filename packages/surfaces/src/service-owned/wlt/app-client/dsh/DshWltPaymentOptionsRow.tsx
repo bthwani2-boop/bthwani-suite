@@ -14,7 +14,7 @@ type DshWltPaymentOptionProps = {
   title: string;
   subtitle?: string;
   selected?: boolean;
-  meta?: React.ReactNode;
+  meta?: string;
   onPress?: () => void;
 };
 

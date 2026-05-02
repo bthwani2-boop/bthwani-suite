@@ -24,6 +24,7 @@ import {
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../components/DshCartDetails';
 import { getDshClientStateMeta, type DshClientState } from '../../shared/dshClientStateModel';
+import useWlt from '../../../../wlt/app-client/dsh/hooks/useWlt';
 
 const PAGE_BG = colorPalette.pageBackground;
 const SURFACE_SOFT = colorPalette.surfaceSecondary;

@@ -1686,11 +1686,11 @@ const stylesTokens = {
   chipText: colorPalette.inkMuted,
   green: colorPalette.success,
   blue: colorPalette.infoStrong,
-  infoSurface: colorPalette.infoSurface,
+  infoSurface: colorPalette.infoSoft,
   infoBorder: colorPalette.info,
   infoText: colorPalette.infoStrong,
   warning: colorPalette.warning,
-  warningSurface: colorPalette.warningSurface,
+  warningSurface: colorPalette.warningSoft,
   warningText: colorPalette.warningStrong,
   red: colorPalette.danger,
   black: colorPalette.black,
@@ -2806,5 +2806,4 @@ const styles = StyleSheet.create({
 });
 
 export default DshStoreGetScreen;
-
 

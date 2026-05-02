@@ -6,15 +6,21 @@ import { FieldHistoryScreen } from './account/FieldHistoryScreen';
 import { FieldProfileScreen } from './account/FieldProfileScreen';
 import { FieldSupportScreen } from './account/FieldSupportScreen';
 import { FieldCommissionsScreen } from './commissions/FieldCommissionsScreen';
-import { FieldPartnerOnboardingScreen } from './onboarding/FieldPartnerOnboardingScreen';
+import { DshFieldStoreActivationRequestScreen, type DshFieldStoreActivationRequestValues } from './store-activation/screens/DshFieldStoreActivationRequestScreen';
 import { readFieldStoresLocal, writeFieldStoresLocal } from './onboarding/FieldOnboardingStorage';
+import { FieldPartnerOnboardingScreen } from './onboarding/FieldPartnerOnboardingScreen';
+import { DshFieldStoreGeoPinScreen, type DshFieldStoreGeoPinValues } from './geo-pin/screens/DshFieldStoreGeoPinScreen';
+import { DshFieldStoreVisitLogScreen, type DshFieldStoreVisitLogValues } from './visit-log/screens/DshFieldStoreVisitLogScreen';
 import { FieldSettingsScreen } from './settings/FieldSettingsScreen';
 import { FieldStoresHomeScreen } from './stores/FieldStoresHomeScreen';
 import { createManualFieldStore, submitFieldStoreForReview, type FieldStoreFile } from './stores/fieldStoreModel';
 
 type FieldRoute =
   | { kind: 'stores' }
+  | { kind: 'activation-request'; storeId: string }
   | { kind: 'onboarding'; storeId: string }
+  | { kind: 'geo-pin'; storeId: string }
+  | { kind: 'visit-log'; storeId: string }
   | { kind: 'account' }
   | { kind: 'profile' }
   | { kind: 'history' }
@@ -27,7 +33,19 @@ function isSameRoute(left: FieldRoute, right: FieldRoute) {
     return false;
   }
 
+  if (left.kind === 'activation-request' && right.kind === 'activation-request') {
+    return left.storeId === right.storeId;
+  }
+
   if (left.kind === 'onboarding' && right.kind === 'onboarding') {
+    return left.storeId === right.storeId;
+  }
+
+  if (left.kind === 'geo-pin' && right.kind === 'geo-pin') {
+    return left.storeId === right.storeId;
+  }
+
+  if (left.kind === 'visit-log' && right.kind === 'visit-log') {
     return left.storeId === right.storeId;
   }
 
@@ -37,6 +55,9 @@ function isSameRoute(left: FieldRoute, right: FieldRoute) {
 export function FieldSurfaceHost() {
   const [stores, setStores] = React.useState<FieldStoreFile[]>(() => readFieldStoresLocal());
   const [routeStack, setRouteStack] = React.useState<FieldRoute[]>([{ kind: 'stores' }]);
+  const [activationRequests, setActivationRequests] = React.useState<Record<string, DshFieldStoreActivationRequestValues>>({});
+  const [geoPinValues, setGeoPinValues] = React.useState<Record<string, DshFieldStoreGeoPinValues>>({});
+  const [visitLogValues, setVisitLogValues] = React.useState<Record<string, DshFieldStoreVisitLogValues>>({});
 
   const route = routeStack[routeStack.length - 1] ?? { kind: 'stores' };
 
@@ -79,7 +100,18 @@ export function FieldSurfaceHost() {
   const handleCreateStore = React.useCallback(() => {
     const nextStore = createManualFieldStore();
     setStores((current) => [nextStore, ...current]);
-    pushRoute({ kind: 'onboarding', storeId: nextStore.id });
+    setActivationRequests((current) => ({
+      ...current,
+      [nextStore.id]: {
+        storeName: nextStore.name,
+        ownerName: '',
+        ownerPhone: '',
+        city: nextStore.location,
+        zone: '',
+        activationNote: '',
+      },
+    }));
+    pushRoute({ kind: 'activation-request', storeId: nextStore.id });
   }, [pushRoute]);
 
   const handleLogout = React.useCallback(() => {
@@ -87,6 +119,9 @@ export function FieldSurfaceHost() {
   }, []);
 
   const activeStore = route.kind === 'onboarding' ? stores.find((store) => store.id === route.storeId) ?? null : null;
+  const activeActivationRequest = route.kind === 'activation-request' ? stores.find((store) => store.id === route.storeId) ?? null : null;
+  const activeGeoPinStore = route.kind === 'geo-pin' ? stores.find((store) => store.id === route.storeId) ?? null : null;
+  const activeVisitLogStore = route.kind === 'visit-log' ? stores.find((store) => store.id === route.storeId) ?? null : null;
 
   let content: React.ReactNode = null;
 
@@ -97,6 +132,65 @@ export function FieldSurfaceHost() {
         onOpenStore={(storeId) => pushRoute({ kind: 'onboarding', storeId })}
         onOpenAccount={() => pushRoute({ kind: 'account' })}
         onCreateStore={handleCreateStore}
+      />
+    );
+  }
+
+  if (route.kind === 'activation-request' && activeActivationRequest) {
+    const values = activationRequests[activeActivationRequest.id] ?? {
+      storeName: activeActivationRequest.name,
+      ownerName: '',
+      ownerPhone: '',
+      city: activeActivationRequest.location,
+      zone: '',
+      activationNote: '',
+    };
+
+    content = (
+      <DshFieldStoreActivationRequestScreen
+        values={values}
+        onRetry={popRoute}
+        onChange={(field, value) => {
+          setActivationRequests((current) => ({
+            ...current,
+            [activeActivationRequest.id]: {
+              ...values,
+              [field]: value,
+            },
+          }));
+        }}
+        onSubmit={() => {
+          const nextValues = activationRequests[activeActivationRequest.id] ?? values;
+
+          updateStore(activeActivationRequest.id, (store) => ({
+            ...store,
+            name: nextValues.storeName.trim() || store.name,
+            location: nextValues.city.trim() || store.location,
+            draft: {
+              ...store.draft,
+              basics: {
+                ...store.draft.basics,
+                storeName: nextValues.storeName,
+                ownerName: nextValues.ownerName,
+                ownerPhone: nextValues.ownerPhone,
+              },
+              location: {
+                ...store.draft.location,
+                city: nextValues.city,
+                zone: nextValues.zone,
+              },
+              review: {
+                ...store.draft.review,
+                fieldNotes: nextValues.activationNote ?? store.draft.review.fieldNotes,
+              },
+              lastSavedLabel: 'الآن',
+            },
+            lastUpdatedLabel: 'الآن',
+            lifecycleNote: 'تم تسجيل طلب التفعيل الميداني.',
+          }));
+
+          pushRoute({ kind: 'onboarding', storeId: activeActivationRequest.id });
+        }}
       />
     );
   }
@@ -117,7 +211,100 @@ export function FieldSurfaceHost() {
             },
           }))
         }
-        onSubmitReview={() => updateStore(activeStore.id, submitFieldStoreForReview)}
+        onSubmitReview={() => {
+          updateStore(activeStore.id, submitFieldStoreForReview);
+          pushRoute({ kind: 'geo-pin', storeId: activeStore.id });
+        }}
+      />
+    );
+  }
+
+  if (route.kind === 'geo-pin' && activeGeoPinStore) {
+    const values = geoPinValues[activeGeoPinStore.id] ?? {
+      latitude: activeGeoPinStore.draft.location.latitude,
+      longitude: activeGeoPinStore.draft.location.longitude,
+      landmark: activeGeoPinStore.draft.location.landmark,
+      accuracyMeters: '',
+    };
+
+    content = (
+      <DshFieldStoreGeoPinScreen
+        values={values}
+        onRetry={popRoute}
+        onChange={(field, value) => {
+          setGeoPinValues((current) => ({
+            ...current,
+            [activeGeoPinStore.id]: {
+              ...values,
+              [field]: value,
+            },
+          }));
+        }}
+        onCapturePin={() => {
+          setGeoPinValues((current) => ({
+            ...current,
+            [activeGeoPinStore.id]: {
+              ...values,
+              accuracyMeters: '12',
+            },
+          }));
+        }}
+        onConfirmPin={() => {
+          const nextValues = geoPinValues[activeGeoPinStore.id] ?? values;
+
+          updateStore(activeGeoPinStore.id, (store) => ({
+            ...store,
+            draft: {
+              ...store.draft,
+              location: {
+                ...store.draft.location,
+                latitude: nextValues.latitude,
+                longitude: nextValues.longitude,
+                landmark: nextValues.landmark,
+              },
+              lastSavedLabel: 'الآن',
+            },
+            lastUpdatedLabel: 'الآن',
+            lifecycleNote: 'تم تثبيت نقطة الموقع الميداني.',
+          }));
+
+          pushRoute({ kind: 'visit-log', storeId: activeGeoPinStore.id });
+        }}
+      />
+    );
+  }
+
+  if (route.kind === 'visit-log' && activeVisitLogStore) {
+    const values = visitLogValues[activeVisitLogStore.id] ?? {
+      visitSummary: '',
+      followUpAction: '',
+    };
+
+    content = (
+      <DshFieldStoreVisitLogScreen
+        values={values}
+        onRetry={popRoute}
+        onChange={(field, value) => {
+          setVisitLogValues((current) => ({
+            ...current,
+            [activeVisitLogStore.id]: {
+              ...values,
+              [field]: value,
+            },
+          }));
+        }}
+        onSubmit={() => {
+          const nextValues = visitLogValues[activeVisitLogStore.id] ?? values;
+
+          updateStore(activeVisitLogStore.id, (store) => ({
+            ...store,
+            lifecycleNote: nextValues.visitSummary || store.lifecycleNote,
+            reviewFeedback: nextValues.followUpAction || store.reviewFeedback,
+            lastUpdatedLabel: 'الآن',
+          }));
+
+          setRouteStack([{ kind: 'stores' }]);
+        }}
       />
     );
   }
