@@ -1,6 +1,6 @@
 import { ControlPanelSurfaceHost } from '@bthwani/app-shells/web/control-panel';
 
-type OperationsWorkspaceId = 'overview' | 'orders' | 'partners' | 'catalogs' | 'marketing' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'bell' | 'zone-set';
+type OperationsWorkspaceId = 'overview' | 'dashboard' | 'captain-ops' | 'field-ops' | 'finance' | 'settlements' | 'cod' | 'refunds' | 'issues' | 'serviceability' | 'guard-status' | 'evidence' | 'orders' | 'partners' | 'catalogs' | 'marketing' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'bell' | 'zone-set';
 
 type OperationsPageProps = {
   readonly searchParams?: Promise<{
@@ -12,6 +12,17 @@ type OperationsPageProps = {
 
 const operationsWorkspaceIds = new Set<OperationsWorkspaceId>([
   'overview',
+  'dashboard',
+  'captain-ops',
+  'field-ops',
+  'finance',
+  'settlements',
+  'cod',
+  'refunds',
+  'issues',
+  'serviceability',
+  'guard-status',
+  'evidence',
   'orders',
   'partners',
   'catalogs',

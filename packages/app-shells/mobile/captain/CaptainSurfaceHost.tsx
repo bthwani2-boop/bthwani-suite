@@ -18,30 +18,28 @@ try {
 import { Badge, Box, Button, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme } from '@bthwani/ui-kit';
 import { dshCaptain } from '@bthwani/surfaces/app-captain';
 
-const {
-  DshEntryScreen,
-  CaptainDeliveryConfirmSheet,
-  CaptainPickupConfirmSheet,
-  CaptainOrderDetailScreen,
-  DshCaptainOrderChatScreen,
-  DshCaptainBellScreen,
-  CaptainOrdersInboxScreen,
-  DshCaptainSupportDirectoryScreen,
-  DshCaptainChatReadAckScreen,
-  DshCaptainChatSendScreen,
-  DshCaptainCodBalanceScreen,
-  DshCaptainOrderAcceptScreen,
-  DshCaptainOrderDeliverScreen,
-  DshCaptainOrderDetailsScreen,
-  DshCaptainOrderGetScreen,
-  DshCaptainOrderPickupScreen,
-  DshCaptainOrdersListScreen,
-  DshCaptainOrdersOffersListScreen,
-  DshCaptainProfileGetScreen,
-  DshCaptainProofUploadScreen,
-  DshCaptainTierEvaluateScreen,
-  DshCaptainTierInfoScreen,
-} = dshCaptain;
+const DshEntryScreen = dshCaptain.entry.DshEntryScreen;
+const CaptainDeliveryConfirmSheet = dshCaptain.orders.CaptainDeliveryConfirmSheet;
+const CaptainPickupConfirmSheet = dshCaptain.orders.CaptainPickupConfirmSheet;
+const CaptainOrderDetailScreen = dshCaptain.orders.CaptainOrderDetailScreen;
+const DshCaptainOrderChatScreen = dshCaptain.orders.DshCaptainOrderChatScreen;
+const DshCaptainBellScreen = dshCaptain.orders.DshCaptainBellScreen;
+const CaptainOrdersInboxScreen = dshCaptain.orders.CaptainOrdersInboxScreen;
+const DshCaptainSupportDirectoryScreen = dshCaptain.operations.DshCaptainSupportDirectoryScreen;
+const DshCaptainChatReadAckScreen = dshCaptain.operations.DshCaptainChatReadAckScreen;
+const DshCaptainChatSendScreen = dshCaptain.operations.DshCaptainChatSendScreen;
+const DshCaptainCodBalanceScreen = dshCaptain.finance.DshCaptainCodBalanceScreen;
+const DshCaptainOrderAcceptScreen = dshCaptain.operations.DshCaptainOrderAcceptScreen;
+const DshCaptainOrderDeliverScreen = dshCaptain.operations.DshCaptainOrderDeliverScreen;
+const DshCaptainOrderDetailsScreen = dshCaptain.operations.DshCaptainOrderDetailsScreen;
+const DshCaptainOrderGetScreen = dshCaptain.operations.DshCaptainOrderGetScreen;
+const DshCaptainOrderPickupScreen = dshCaptain.operations.DshCaptainOrderPickupScreen;
+const DshCaptainOrdersListScreen = dshCaptain.operations.DshCaptainOrdersListScreen;
+const DshCaptainOrdersOffersListScreen = dshCaptain.operations.DshCaptainOrdersOffersListScreen;
+const DshCaptainProfileGetScreen = dshCaptain.profile.DshCaptainProfileGetScreen;
+const DshCaptainProofUploadScreen = dshCaptain.operations.DshCaptainProofUploadScreen;
+const DshCaptainTierEvaluateScreen = dshCaptain.profile.DshCaptainTierEvaluateScreen;
+const DshCaptainTierInfoScreen = dshCaptain.profile.DshCaptainTierInfoScreen;
 
 type CaptainOrderDetailSummary = React.ComponentProps<typeof CaptainOrderDetailScreen>['summary'];
 type CaptainOrdersInboxScreenState = NonNullable<React.ComponentProps<typeof CaptainOrdersInboxScreen>>['state'];

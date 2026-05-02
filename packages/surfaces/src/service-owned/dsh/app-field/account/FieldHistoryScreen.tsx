@@ -26,7 +26,7 @@ export function FieldHistoryScreen({ stores, onBack }: FieldHistoryScreenProps) 
               title={store.name}
               subtitle={resolveFieldStoreLifecycleLabel(store)}
               meta={`${resolveFieldStoreStatusLabel(store)} · ${store.lastUpdatedLabel}`}
-              badgeLabel={store.commissionLabel}
+              badgeLabel={store.financeLabel}
             />
           ))}
         </Surface>

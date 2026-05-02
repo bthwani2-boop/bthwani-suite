@@ -8,9 +8,8 @@ type FieldAccountHomeScreenProps = {
   onBack: () => void;
   onOpenProfile: () => void;
   onOpenHistory: () => void;
-  onOpenCommissions: () => void;
+  onOpenFinance: () => void;
   onOpenSettings: () => void;
-  onOpenSupport: () => void;
   onLogout: () => void;
 };
 
@@ -19,9 +18,8 @@ export function FieldAccountHomeScreen({
   onBack,
   onOpenProfile,
   onOpenHistory,
-  onOpenCommissions,
+  onOpenFinance,
   onOpenSettings,
-  onOpenSupport,
   onLogout,
 }: FieldAccountHomeScreenProps) {
   const counts = React.useMemo(() => resolveFieldFilterCounts(stores), [stores]);
@@ -49,20 +47,19 @@ export function FieldAccountHomeScreen({
             <Badge label="الميداني" tone="brand" />
           </View>
           <Text role="titleMd" style={{ textAlign: 'right' }}>ناصر القحطاني</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>الفريق الشمالي · دورك ينتهي عند اكتمال الملف وإرساله للمراجعة ثم متابعة حالته وعمولته.</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>الفريق الشمالي · دورك ينتهي عند اكتمال الملف وإرساله للمراجعة ثم متابعة حالته والمالية المرتبطة به.</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
             <Badge label={`ملفات اليوم ${counts.today}`} tone="brand" />
             <Badge label={`مرسل ${counts.submitted}`} tone="info" />
-            <Badge label={`عمولات جاهزة ${counts.done}`} tone="success" />
+            <Badge label={`مالية جاهزة ${counts.done}`} tone="success" />
           </View>
         </Surface>
 
         <Surface tone="raised" padding={0} gap={0} radiusToken="xl">
           <ListItem title="بيانات الميداني" subtitle="الهوية، التغطية، والوردية الحالية." onPress={onOpenProfile} />
           <ListItem title="السجل" subtitle="ملفات الانضمام التي مررت عليها والحالة الأخيرة لكل ملف." onPress={onOpenHistory} />
-          <ListItem title="العمولة" subtitle="ما بقي للميداني بعد اكتمال الاعتماد والظهور للعملاء." onPress={onOpenCommissions} />
+          <ListItem title="المالية" subtitle="المستحقات والملخص المالي بعد اكتمال الاعتماد." onPress={onOpenFinance} />
           <ListItem title="الإعدادات" subtitle="اللغة وتفضيلات الصفحة فقط، بدون تغيير نوع المستخدم." onPress={onOpenSettings} />
-          <ListItem title="الدعم" subtitle="قنوات التصعيد والمساندة الميدانية المختصرة." onPress={onOpenSupport} />
         </Surface>
 
         <Button label="تسجيل الخروج" tone="secondary" onPress={onLogout} />

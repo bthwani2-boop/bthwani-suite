@@ -2,8 +2,12 @@ export * from './surface-meta';
 export * from './surface-catalog';
 export { DshControlPanelSurfaceHost } from './DshControlPanelSurfaceHost';
 export type { DshControlPanelSurfaceHostProps } from './DshControlPanelSurfaceHost';
+export * as dashboard from './dashboard';
+export * as finance from './finance';
 export * as catalogs from './catalogs';
+export * as support from './support';
 export * as partners from './partners';
 export * as operations from './operations';
 export * as marketing from './marketing';
-
+export * as control from './control';
+export * as shared from './shared';

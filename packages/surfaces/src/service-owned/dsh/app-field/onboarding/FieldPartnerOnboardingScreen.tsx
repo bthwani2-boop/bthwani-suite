@@ -185,7 +185,7 @@ export function FieldPartnerOnboardingScreen({ store, onBack, onStoreChange, onS
           <TextField label="العرض أو الاتفاق المبدئي" value={draft.offer.preliminaryOffer} editable={!readOnly} onChangeText={(value) => updateNestedField('offer', 'preliminaryOffer', value)} />
           <TextField label="ساعات العمل" value={draft.offer.operatingHours} editable={!readOnly} onChangeText={(value) => updateNestedField('offer', 'operatingHours', value)} />
           <TextField label="الجاهزية / التوصيل" value={draft.offer.deliveryReadiness} editable={!readOnly} onChangeText={(value) => updateNestedField('offer', 'deliveryReadiness', value)} />
-          <TextField label="ملاحظة العمولة" value={draft.offer.commissionNote} editable={!readOnly} onChangeText={(value) => updateNestedField('offer', 'commissionNote', value)} />
+          <TextField label="ملاحظة مالية" value={draft.offer.financeNote} editable={!readOnly} onChangeText={(value) => updateNestedField('offer', 'financeNote', value)} />
         </Surface>
       );
     }

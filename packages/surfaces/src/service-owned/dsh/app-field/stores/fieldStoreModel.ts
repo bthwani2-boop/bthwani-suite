@@ -53,7 +53,7 @@ export type FieldOnboardingDraft = {
     preliminaryOffer: string;
     operatingHours: string;
     deliveryReadiness: string;
-    commissionNote: string;
+    financeNote: string;
   };
   review: {
     fieldNotes: string;
@@ -76,7 +76,7 @@ export type FieldStoreFile = {
   stageLabelOverride?: string;
   statusNoteOverride?: string;
   lifecycleNote?: string;
-  commissionLabel: string;
+  financeLabel: string;
   reviewFeedback?: string;
   draft: FieldOnboardingDraft;
 };
@@ -188,7 +188,7 @@ export function createEmptyDraft(overrides?: Partial<FieldOnboardingDraft>): Fie
       preliminaryOffer: '',
       operatingHours: '',
       deliveryReadiness: '',
-      commissionNote: '',
+      financeNote: '',
     },
     review: {
       fieldNotes: '',
@@ -420,7 +420,7 @@ function createSeedStore(overrides: Partial<FieldStoreFile>): FieldStoreFile {
     stageLabelOverride: overrides.stageLabelOverride,
     statusNoteOverride: overrides.statusNoteOverride,
     lifecycleNote: overrides.lifecycleNote,
-    commissionLabel: overrides.commissionLabel ?? '0 ر.س',
+    financeLabel: overrides.financeLabel ?? '0 ر.س',
     reviewFeedback: overrides.reviewFeedback,
     draft: overrides.draft ?? createEmptyDraft(),
   });
@@ -449,7 +449,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       category: 'مقاهٍ ومحمصات',
       location: 'حي الياسمين',
       nextVisitLabel: 'اليوم 5:30 م',
-      commissionLabel: 'بانتظار الإرسال',
+      financeLabel: 'بانتظار الإرسال',
       draft: createEmptyDraft({
         activeSectionId: 'offer',
         basics: {
@@ -486,7 +486,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
           preliminaryOffer: 'خصم أول 3 أشهر + عمولة معيارية',
           operatingHours: '',
           deliveryReadiness: 'جاهز مبدئيًا',
-          commissionNote: 'بانتظار اعتماد نهائي.',
+          financeNote: 'بانتظار اعتماد نهائي.',
         },
         review: {
           fieldNotes: 'تمت مراجعة العرض المبدئي مع المالك.',
@@ -501,7 +501,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       category: 'بوفيهات',
       location: 'الملقا',
       nextVisitLabel: 'غدًا 1:00 م',
-      commissionLabel: 'راجع الملاحظات',
+      financeLabel: 'راجع الملاحظات',
       reviewFeedback: 'معاد للتعديل [TBD]: تحديث صورة الواجهة وتأكيد ساعات العمل.',
       lifecycleNote: 'عاد الملف للمراجعة الميدانية قبل إعادة الإرسال.',
       draft: createEmptyDraft({
@@ -540,7 +540,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
           preliminaryOffer: 'عرض مبدئي تحت المراجعة',
           operatingHours: '',
           deliveryReadiness: 'تحتاج متابعة',
-          commissionNote: '',
+          financeNote: '',
         },
         review: {
           fieldNotes: 'تحتاج مراجعة نهائية قبل إعادة الإرسال.',
@@ -555,7 +555,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       category: 'مخابز',
       location: 'النرجس',
       nextVisitLabel: 'غدًا 10:30 ص',
-      commissionLabel: 'جاهز للإرسال',
+      financeLabel: 'جاهز للإرسال',
       draft: createEmptyDraft({
         activeSectionId: 'review',
         basics: {
@@ -592,7 +592,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
           preliminaryOffer: 'بداية تجريبية بعمولة خفيفة',
           operatingHours: '6 ص - 11 م',
           deliveryReadiness: 'جاهز للتوصيل الخفيف',
-          commissionNote: 'عمولة افتتاحية خفيفة.',
+          financeNote: 'مستحقات افتتاحية خفيفة.',
         },
         review: {
           fieldNotes: 'كل العناصر الأساسية مكتملة والملف جاهز للإرسال.',
@@ -607,7 +607,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       category: 'مقاهٍ',
       location: 'الصحافة',
       nextVisitLabel: 'اليوم 11:20 ص',
-      commissionLabel: 'قيد المراجعة',
+      financeLabel: 'قيد المراجعة',
       lifecycleNote: 'تم الإرسال للمراجعة وينتظر القرار، ولا يوجد إجراء ميداني جديد الآن.',
       draft: createEmptyDraft({
         activeSectionId: 'review',
@@ -645,7 +645,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
           preliminaryOffer: 'الملف المرسل ينتظر مراجعة الشركاء',
           operatingHours: '7 ص - 12 ص',
           deliveryReadiness: 'جاهز للتوصيل',
-          commissionNote: 'بانتظار التثبيت النهائي.',
+          financeNote: 'بانتظار التثبيت النهائي.',
         },
         review: {
           fieldNotes: 'أرسل الملف للمراجعة بعد استكمال كافة المتطلبات.',
@@ -661,7 +661,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       category: 'مواد غذائية',
       location: 'اليرموك',
       nextVisitLabel: 'مكتمل',
-      commissionLabel: '420 ر.س',
+      financeLabel: '420 ر.س',
       lockedStatus: 'offer-approved',
       stageLabelOverride: 'منتهٍ للميداني [TBD]',
       lifecycleNote: 'اعتمد الملف وظهر الشريك للعملاء، وبقي للميداني السجل والحالة والعمولة فقط.',
@@ -701,7 +701,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
           preliminaryOffer: 'اعتماد كامل بعد الظهور للعملاء',
           operatingHours: '9 ص - 11 م',
           deliveryReadiness: 'جاهز',
-          commissionNote: 'تم تثبيت العمولة النهائية.',
+          financeNote: 'تم تثبيت المستحق النهائي.',
         },
         review: {
           fieldNotes: 'أغلق الدور الميداني بعد اكتمال الاعتماد.',

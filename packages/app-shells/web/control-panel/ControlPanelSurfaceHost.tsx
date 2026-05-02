@@ -27,8 +27,8 @@ const hiddenSectionIds = ['community-services', 'partners', 'marketing', 'contro
 const primarySectionIds = [...phaseOneSectionIds, ...hiddenSectionIds] as const;
 const controlSubSectionIds = ['platform', 'administration', 'governance', 'hr'] as const;
 const dshLiveWorkbenchIds = ['orders', 'reassign', 'peakMode', 'arrivalBell'] as const;
-const dshPlannedWorkbenchIds = ['sheinProxy', 'zoneSet'] as const;
-const operationsWorkspaceIds = ['overview', 'orders', 'partners', 'catalogs', 'marketing', 'sheinproxy', 'reassign', 'peak-mode', 'bell', 'zone-set'] as const;
+const dshPlannedWorkbenchIds = ['sheinProxy', 'zoneSet', 'dashboard', 'captain-ops', 'field-ops', 'finance', 'settlements', 'cod', 'refunds', 'issues', 'serviceability', 'guard-status', 'evidence'] as const;
+const operationsWorkspaceIds = ['overview', 'dashboard', 'captain-ops', 'field-ops', 'finance', 'settlements', 'cod', 'refunds', 'issues', 'serviceability', 'guard-status', 'evidence', 'orders', 'partners', 'catalogs', 'marketing', 'sheinproxy', 'reassign', 'peak-mode', 'bell', 'zone-set'] as const;
 
 type ControlPanelSectionId = (typeof primarySectionIds)[number];
 type PhaseOneSectionId = (typeof phaseOneSectionIds)[number];

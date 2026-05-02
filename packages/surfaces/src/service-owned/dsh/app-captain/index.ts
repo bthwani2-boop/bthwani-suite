@@ -1,19 +1,11 @@
 export * from './surface-meta';
 export * from './surface-catalog';
-export * from './entry';
-export * from './orders';
-export { DshCaptainFinanceScreen, DshCaptainCodBalanceScreen } from './finance';
-export type { DshCaptainFinanceScreenProps } from './finance';
-export { DshCaptainProfileScreen, DshCaptainProfileGetScreen, DshCaptainTierInfoScreen, DshCaptainTierEvaluateScreen } from './profile';
-export type { DshCaptainProfileScreenProps } from './profile';
-export {
-  DshCaptainOperationsScreen,
-  DshCaptainChatReadAckScreen,
-  DshCaptainChatSendScreen,
-  DshCaptainSupportDirectoryScreen,
-} from './operations';
-export type { DshCaptainOperationsScreenProps, CaptainSupportScreenId } from './operations';
-export * from './dsh-app-captain-flow';
-export * from './shared';
+export * as entry from './entry';
+export * as orders from './orders';
+export * as finance from './finance';
+export * as profile from './profile';
+export * as operations from './operations';
+export * as dshAppCaptainFlow from './dsh-app-captain-flow';
+export * as shared from './shared';
 
 

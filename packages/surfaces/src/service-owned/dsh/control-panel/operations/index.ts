@@ -11,4 +11,4 @@ export * from './peak-mode';
 export * from './reassign';
 export * from './sheinproxy';
 export * from './zone-set';
-
+export * from './closure-workspaces';
