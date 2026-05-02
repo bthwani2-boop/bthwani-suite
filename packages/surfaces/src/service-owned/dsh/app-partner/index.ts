@@ -4,6 +4,7 @@ export * from './console';
 export * from './entry';
 export * from './orders';
 export * from './inventory';
+export * from './operations';
 export * from './bell';
-export * from './support';
+export * from './shared';
 

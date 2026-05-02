@@ -1,0 +1,26 @@
+export const DSH_PARTNER_OPERATIONAL_FLOW_IDS = [
+  'order-accept',
+  'order-get',
+  'order-handoff',
+  'order-issue-queue',
+  'order-out-for-delivery',
+  'order-prepare',
+  'order-ready',
+  'order-reject',
+  'order-store-delivered',
+  'order-chat-read-ack',
+  'order-chat-send',
+  'order-quick-reply-config',
+  'order-quick-reply-settings',
+  'order-quick-reply-setup',
+  'inventory-adjust',
+  'inventory-update',
+  'items-upsert',
+  'doc-upload',
+  'intake-start',
+  'store-nomination',
+  'video-upload',
+  'auction-status-update',
+] as const;
+
+export type DshPartnerOperationalFlowId = (typeof DSH_PARTNER_OPERATIONAL_FLOW_IDS)[number];

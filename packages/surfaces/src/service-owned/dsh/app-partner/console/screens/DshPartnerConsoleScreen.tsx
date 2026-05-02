@@ -5,6 +5,7 @@ import { Box, Button, Chip, Icon, KeyValueList, ListItem, MobileCommandSectionLi
 import { PartnerDshWalletWorkspace } from '../../../../wlt/app-partner';
 import { InventoryCatalogWorkspaceContent } from '../workspaces/InventoryCatalogWorkspaceContent';
 import { StoreProfileWorkspaceContent } from '../workspaces/StoreProfileWorkspaceContent';
+import type { DshPartnerOperationalFlowId } from '../../shared';
 
 type PartnerHubSection = 'hub' | 'profile' | 'operations' | 'inventory' | 'wallet' | 'analytics' | 'settings' | 'type-switch';
 
@@ -94,7 +95,8 @@ type Props = {
   onOpenSupportDirectory?: () => void;
   onOpenWalletHub?: () => void;
   onOpenBell?: () => void;
-  onOpenSupportScreen?: (screenId: string) => void;
+  onOpenOperationalFlow?: (screenId: DshPartnerOperationalFlowId) => void;
+  onOpenSupportScreen?: (screenId: DshPartnerOperationalFlowId) => void;
 };
 
 const defaultTypeOptions: readonly PartnerTypeOption[] = [
