@@ -5,6 +5,7 @@ import { Box, Button, Chip, Icon, KeyValueList, ListItem, MobileCommandSectionLi
 import { PartnerDshWalletWorkspace } from '../../../../wlt/app-partner';
 import { InventoryCatalogWorkspaceContent } from '../workspaces/InventoryCatalogWorkspaceContent';
 import { StoreProfileWorkspaceContent } from '../workspaces/StoreProfileWorkspaceContent';
+import { DshPartnerCommissionSummaryPanel, DshPartnerFinanceBridgePanel, DshPartnerSettlementSummaryPanel } from '../../finance';
 import type { DshPartnerOperationalFlowId } from '../../shared';
 
 type PartnerHubSection = 'hub' | 'profile' | 'operations' | 'inventory' | 'wallet' | 'analytics' | 'settings' | 'type-switch';
@@ -797,6 +798,8 @@ export function DshPartnerConsoleScreen(props: Props) {
     onOpenSupportDirectory,
     onOpenWalletHub,
     onOpenBell,
+    onOpenOperationalFlow,
+    onOpenSupportScreen,
   } = props;
 
   const { direction } = useDirection();
@@ -814,6 +817,17 @@ export function DshPartnerConsoleScreen(props: Props) {
       ...current,
       [preferenceId]: nextValue,
     }));
+  }
+
+  function openOrderAlerts() {
+    onOpenOperationalFlow?.('order-alerts');
+    onOpenBell?.();
+  }
+
+  function openOperationsDirectory() {
+    onOpenOperationalFlow?.('order-issue-queue');
+    onOpenSupportDirectory?.();
+    onOpenSupportScreen?.('order-issue-queue');
   }
 
   const summaryItems = React.useMemo<readonly SummaryItem[]>(
@@ -873,13 +887,24 @@ export function DshPartnerConsoleScreen(props: Props) {
 
     if (activeSection === 'wallet') {
       return (
-        <PartnerDshWalletWorkspace
-          branchLabel={branchLabel}
-          activeZoneLabel={activeZoneLabel}
-          serviceModes={serviceModes}
-          onBack={() => updateSection('hub')}
-          onOpenExpandedWallet={onOpenWalletHub}
-        />
+        <>
+          <PartnerDshWalletWorkspace
+            branchLabel={branchLabel}
+            activeZoneLabel={activeZoneLabel}
+            serviceModes={serviceModes}
+            onBack={() => updateSection('hub')}
+            onOpenExpandedWallet={onOpenWalletHub}
+          />
+          <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
+            <Surface tone="default" padding={3} gap={3}>
+              <Text role="label">جسر مالي بجوار مساحة WLT</Text>
+              <Text role="bodySm" tone="muted">الملكية التشغيلية للمحفظة تبقى داخل WLT، بينما تعرض هذه اللوحات قراءة ملخصة مرتبطة بالطلبات فقط.</Text>
+            </Surface>
+            <DshPartnerFinanceBridgePanel />
+            <DshPartnerSettlementSummaryPanel />
+            <DshPartnerCommissionSummaryPanel />
+          </MobileScrollView>
+        </>
       );
     }
 
@@ -952,11 +977,11 @@ export function DshPartnerConsoleScreen(props: Props) {
 
       const settingsActionRows = [
         {
-          id: 'notification-center',
-          title: 'فتح مركز الإشعارات',
-          subtitle: 'الانتقال إلى نفس المركز الموحد الذي يفتحه زر الجرس في الهيدر.',
+          id: 'order-alerts',
+          title: 'فتح تنبيهات الطلب',
+          subtitle: 'الانتقال إلى نفس مسار تنبيهات الطلب المرتبط مباشرةً بلوحة الطلبات.',
           icon: 'notifications-outline' as const,
-          onPress: onOpenBell,
+          onPress: openOrderAlerts,
         },
         {
           id: 'branch-scope',
@@ -966,11 +991,11 @@ export function DshPartnerConsoleScreen(props: Props) {
           onPress: onOpenStoreScope,
         },
         {
-          id: 'support',
-          title: 'الدعم',
-          subtitle: 'الوصول السريع للدعم من نفس مساحة الإعدادات عند الحاجة.',
+          id: 'operations-directory',
+          title: 'دليل العمليات',
+          subtitle: 'الوصول إلى المسارات التشغيلية المرتبطة بالمشكلات والتنفيذ من نفس مساحة الإعدادات.',
           icon: 'headset-outline' as const,
-          onPress: onOpenSupportDirectory,
+          onPress: openOperationsDirectory,
         },
       ];
 
@@ -1155,11 +1180,11 @@ export function DshPartnerConsoleScreen(props: Props) {
           }}
         >
           <Button
-            label="الإشعارات"
+            label="تنبيهات الطلب"
             tone="secondary"
             fullWidth={false}
             icon={<Icon name="notifications-outline" size={16} />}
-            onPress={onOpenBell}
+            onPress={openOrderAlerts}
           />
           <Button
             label="اختيار الفرع"
@@ -1169,11 +1194,11 @@ export function DshPartnerConsoleScreen(props: Props) {
             onPress={onOpenStoreScope}
           />
           <Button
-            label="الدعم"
+            label="دليل العمليات"
             tone="secondary"
             fullWidth={false}
             icon={<Icon name="headset-outline" size={16} />}
-            onPress={onOpenSupportDirectory}
+            onPress={openOperationsDirectory}
           />
         </View>
       </Surface>

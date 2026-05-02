@@ -16,7 +16,6 @@ const groups: Array<{
     title: 'التهيئة والامتثال',
     subtitle: 'مهام الإدخال والامتثال غير الموجودة داخل مركز الحساب الأساسي.',
     items: [
-      { id: 'auction-status-update', title: 'Auction status update', subtitle: 'Control auction participation.', badgeLabel: 'Update' },
       { id: 'store-nomination', title: 'ترشيح متجر', subtitle: 'رشح فرعًا جديدًا.', badgeLabel: 'Onboarding' },
       { id: 'doc-upload', title: 'رفع المستندات', subtitle: 'حمّل ملفات الامتثال الخاصة بالفرع.', badgeLabel: 'Compliance' },
       { id: 'intake-start', title: 'بدء الاستقبال', subtitle: 'ابدأ مسار إدخال الفرع.', badgeLabel: 'Onboarding' },
@@ -37,10 +36,10 @@ const groups: Array<{
     ],
   },
   {
-    title: 'المحتوى التسويقي',
-    subtitle: 'المحتوى الذي يحتاج مراجعة أو مرورًا منفصلًا قبل النشر.',
+    title: 'الفيديوهات',
+    subtitle: 'فيديوهات الشريك التي تحتاج مرورًا تشغيليًا واضحًا قبل أي خطوة لاحقة.',
     items: [
-      { id: 'video-upload', title: 'رفع الفيديو التسويقي', subtitle: 'أرسل فيديو قصيرًا ليغذي مراجعة التسويق.', badgeLabel: 'Content' },
+      { id: 'video-upload', title: 'رفع فيديو الشريك', subtitle: 'أرسل فيديو قصيرًا من المسار المخصص للفيديو.', badgeLabel: 'Video' },
     ],
   },
 ];

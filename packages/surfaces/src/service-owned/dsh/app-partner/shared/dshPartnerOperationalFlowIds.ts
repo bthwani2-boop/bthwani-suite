@@ -2,7 +2,10 @@ export const DSH_PARTNER_OPERATIONAL_FLOW_IDS = [
   'order-accept',
   'order-get',
   'order-handoff',
+  'order-alerts',
+  'order-sla-risk',
   'order-issue-queue',
+  'order-issue-required',
   'order-out-for-delivery',
   'order-prepare',
   'order-ready',
@@ -20,6 +23,9 @@ export const DSH_PARTNER_OPERATIONAL_FLOW_IDS = [
   'intake-start',
   'store-nomination',
   'video-upload',
+  'partner-finance-bridge',
+  'partner-settlement-summary',
+  'partner-commission-summary',
   'auction-status-update',
 ] as const;
 

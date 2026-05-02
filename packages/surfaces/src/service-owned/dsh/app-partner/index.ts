@@ -5,6 +5,6 @@ export * from './entry';
 export * from './orders';
 export * from './inventory';
 export * from './operations';
-export * from './bell';
+export * from './finance';
 export * from './shared';
 

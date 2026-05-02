@@ -1,148 +1,148 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "build-control-panel",
-      "type": "shell",
-      "command": "pnpm",
-      "args": [
-        "nx",
-        "build",
-        "control-panel"
-      ],
-      "isBackground": false,
-      "problemMatcher": [
-        "$tsc"
-      ],
-      "group": "build"
-    },
-    {
-      "label": "mobile:app-client:dev",
-      "command": "pnpm nx run app-client:serve",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-client:go",
-      "command": "pnpm nx run app-client:serve-go",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-client:android",
-      "command": "pnpm nx run app-client:android",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-client:config",
-      "command": "pnpm nx run app-client:config",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-partner:dev",
-      "command": "pnpm nx run app-partner:serve",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-partner:go",
-      "command": "pnpm nx run app-partner:serve-go",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-partner:android",
-      "command": "pnpm nx run app-partner:android",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-partner:config",
-      "command": "pnpm nx run app-partner:config",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-captain:dev",
-      "command": "pnpm nx run app-captain:serve",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-captain:go",
-      "command": "pnpm nx run app-captain:serve-go",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-captain:android",
-      "command": "pnpm nx run app-captain:android",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-captain:config",
-      "command": "pnpm nx run app-captain:config",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-field:dev",
-      "command": "pnpm nx run app-field:serve",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-field:go",
-      "command": "pnpm nx run app-field:serve-go",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-field:android",
-      "command": "pnpm nx run app-field:android",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    },
-    {
-      "label": "mobile:app-field:config",
-      "command": "pnpm nx run app-field:config",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      }
-    }
-  ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build-control-panel",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"nx",
+				"build",
+				"control-panel"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "mobile:app-client:dev",
+			"command": "pnpm nx run app-client:serve",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-client:go",
+			"command": "pnpm nx run app-client:serve-go",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-client:android",
+			"command": "pnpm nx run app-client:android",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-client:config",
+			"command": "pnpm nx run app-client:config",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-partner:dev",
+			"command": "pnpm nx run app-partner:serve",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-partner:go",
+			"command": "pnpm nx run app-partner:serve-go",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-partner:android",
+			"command": "pnpm nx run app-partner:android",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-partner:config",
+			"command": "pnpm nx run app-partner:config",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-captain:dev",
+			"command": "pnpm nx run app-captain:serve",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-captain:go",
+			"command": "pnpm nx run app-captain:serve-go",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-captain:android",
+			"command": "pnpm nx run app-captain:android",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-captain:config",
+			"command": "pnpm nx run app-captain:config",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-field:dev",
+			"command": "pnpm nx run app-field:serve",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-field:go",
+			"command": "pnpm nx run app-field:serve-go",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-field:android",
+			"command": "pnpm nx run app-field:android",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "mobile:app-field:config",
+			"command": "pnpm nx run app-field:config",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		}
+	]
 }
