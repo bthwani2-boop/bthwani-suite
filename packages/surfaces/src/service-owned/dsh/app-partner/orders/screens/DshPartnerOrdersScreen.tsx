@@ -371,6 +371,19 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
     [filteredItems, selectedOrderId]
   );
 
+  React.useEffect(() => {
+    if (filteredItems.length === 0) {
+      if (selectedOrderId !== null) {
+        setSelectedOrderId(null);
+      }
+      return;
+    }
+
+    if (!filteredItems.some((item) => item.id === selectedOrderId)) {
+      setSelectedOrderId(filteredItems[0].id);
+    }
+  }, [filteredItems, selectedOrderId]);
+
   const selectedOrderMode = orderMode ?? selectedOrder?.orderMode ?? 'pickup';
   const activeFilterLabel = smartFilters.find((item) => item.id === smartFilter)?.label ?? 'الكل';
 
