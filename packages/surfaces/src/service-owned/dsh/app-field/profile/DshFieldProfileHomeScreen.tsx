@@ -42,7 +42,7 @@ export function DshFieldProfileHomeScreen({
         <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
             <Badge label="DSH" tone="success" />
-            <Badge label="field" tone="brand" />
+            <Badge label="الميداني" tone="brand" />
           </View>
           <Text role="titleMd" style={{ textAlign: 'right' }}>ناصر القحطاني</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
