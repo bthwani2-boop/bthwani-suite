@@ -21,6 +21,17 @@ export function ControlPanelDshCaptainOperationsScreen() {
       description="Availability, active orders, proof review, and COD exceptions in one compact control room."
       badges={['captain', 'ops']}
       metaItems={['availability', 'active orders', 'proof review', 'cod exceptions']}
+      decisionBoard={{
+        title: 'Captain ops board',
+        purpose: 'Keep captain capacity, active orders, proof review, and COD exceptions readable.',
+        primaryDecision: 'Keep the captain active, or hold them for evidence review.',
+        nextAction: 'Open evidence when proof review or COD exceptions are not closed.',
+        blockers: 'Proof review and COD exceptions still block final closure.',
+        ownerSurface: 'operations',
+        evidenceHint: 'active-order proof and COD exception review',
+        routeHint: '/operations?workspace=evidence',
+        decisionTone: 'warning',
+      }}
       primaryAction={{ label: 'Open evidence', href: '/operations?workspace=evidence' }}
       secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
       signals={[
@@ -49,6 +60,17 @@ export function ControlPanelDshFieldOperationsScreen() {
       description="Visits, store activation, geo pin review, and onboarding queue in one control surface."
       badges={['field', 'ops']}
       metaItems={['visits', 'stores', 'geo pin', 'onboarding queue']}
+      decisionBoard={{
+        title: 'Field ops board',
+        purpose: 'Keep visits, onboarding, and geo-pin review in one operational read.',
+        primaryDecision: 'Close the visit, hold onboarding, or fix the geo pin.',
+        nextAction: 'Open evidence for the store or visit cluster needing review.',
+        blockers: 'Activation and geo-pin checks remain open.',
+        ownerSurface: 'operations',
+        evidenceHint: 'visit proof, store activation, and geo-pin evidence',
+        routeHint: '/operations?workspace=evidence',
+        decisionTone: 'warning',
+      }}
       primaryAction={{ label: 'Open visits', href: '/operations?workspace=dashboard' }}
       secondaryAction={{ label: 'Open evidence', href: '/operations?workspace=evidence' }}
       signals={[
@@ -77,6 +99,17 @@ export function ControlPanelDshIssueQueueScreen() {
       description="Problems are grouped by client, partner, captain, and field so escalation stays legible."
       badges={['issues', 'queue']}
       metaItems={['client', 'partner', 'captain', 'field']}
+      decisionBoard={{
+        title: 'Issue queue board',
+        purpose: 'Keep triage oriented to the owning DSH surface, not a generic support pool.',
+        primaryDecision: 'Send the issue to order, partner, captain, or field.',
+        nextAction: 'Open support or dashboard after assigning the issue lane.',
+        blockers: 'Untriaged issues still block a clean handoff.',
+        ownerSurface: 'support',
+        evidenceHint: 'issue queue and linked surface context',
+        routeHint: '/operations?workspace=issues',
+        decisionTone: 'danger',
+      }}
       primaryAction={{ label: 'Open support', href: '/operations?workspace=issues' }}
       secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
       signals={[
@@ -98,6 +131,17 @@ export function ControlPanelDshServiceabilityScreen() {
       description="Zones, fees, store availability, area coverage, and delivery modes remain visible."
       badges={['serviceability']}
       metaItems={['zones', 'fees', 'availability', 'coverage', 'delivery modes']}
+      decisionBoard={{
+        title: 'Serviceability board',
+        purpose: 'Keep zone policy, fee policy, and coverage constraints visible for route decisions.',
+        primaryDecision: 'Approve the zone or keep the route protected.',
+        nextAction: 'Open finance if fee coverage needs a handoff or refinement.',
+        blockers: 'Coverage gaps and store availability still constrain serviceability.',
+        ownerSurface: 'operations',
+        evidenceHint: 'zone policy, fees, and coverage proof',
+        routeHint: '/operations?workspace=serviceability',
+        decisionTone: 'brand',
+      }}
       primaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
       secondaryAction={{ label: 'Open finance', href: '/operations?workspace=finance' }}
       signals={[

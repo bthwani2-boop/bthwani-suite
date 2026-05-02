@@ -14,6 +14,7 @@ import {
   WebSectionCard,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from '../../shared';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import {
   getSampleDshOrder,
@@ -137,6 +138,18 @@ export function ControlPanelDshOrderDetailScreen({
       showHeader={showHeader}
     >
       <div className={styles.stack}>
+        <ControlPanelDshDecisionBoard
+          title="Order detail board"
+          purpose="Keep the order decision, blocker, and next step visible before any handoff."
+          primaryDecision={actionPlan.primaryLabel}
+          nextAction={actionPlan.secondaryLabel}
+          blockers={order.notes}
+          ownerSurface="operations"
+          evidenceHint={`${order.statusLabel} · ${order.captainLabel} · ${order.createdLabel}`}
+          routeHint={ordersHref}
+          decisionTone={order.statusTone === 'success' ? 'best' : 'warning'}
+        />
+
         <WebMissionHeroCard
           badges={[order.id, order.statusLabel, order.eta]}
           eyebrow={dshText.orderDetail.heroEyebrow}

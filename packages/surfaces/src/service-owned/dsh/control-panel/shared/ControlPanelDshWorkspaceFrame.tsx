@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Button, Text } from '@bthwani/ui-kit';
 import { WebControlActionCard, WebControlDisclosureItem, WebMissionHeroCard, WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from './ControlPanelDshDecisionBoard';
 
 type WorkspaceSignal = {
   id: string;
@@ -40,6 +41,17 @@ export type ControlPanelDshWorkspaceFrameProps = {
   signals?: readonly WorkspaceSignal[];
   actions?: readonly WorkspaceAction[];
   disclosures?: readonly WorkspaceDisclosure[];
+  decisionBoard?: {
+    title: string;
+    purpose: string;
+    primaryDecision: string;
+    nextAction: string;
+    blockers: string;
+    ownerSurface: string;
+    evidenceHint: string;
+    routeHint: string;
+    decisionTone?: React.ComponentProps<typeof WebSignalCard>['tone'];
+  };
   footerNote?: string;
 };
 
@@ -54,6 +66,7 @@ export function ControlPanelDshWorkspaceFrame({
   signals = [],
   actions = [],
   disclosures = [],
+  decisionBoard,
   footerNote,
 }: ControlPanelDshWorkspaceFrameProps) {
   return (
@@ -74,6 +87,20 @@ export function ControlPanelDshWorkspaceFrame({
             <WebSignalCard key={signal.id} title={signal.title} value={signal.value} description={signal.description} tone={signal.tone} />
           ))}
         </Box>
+      ) : null}
+
+      {decisionBoard ? (
+        <ControlPanelDshDecisionBoard
+          title={decisionBoard.title}
+          purpose={decisionBoard.purpose}
+          primaryDecision={decisionBoard.primaryDecision}
+          nextAction={decisionBoard.nextAction}
+          blockers={decisionBoard.blockers}
+          ownerSurface={decisionBoard.ownerSurface}
+          evidenceHint={decisionBoard.evidenceHint}
+          routeHint={decisionBoard.routeHint}
+          decisionTone={decisionBoard.decisionTone}
+        />
       ) : null}
 
       {actions.length ? (

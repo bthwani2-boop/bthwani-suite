@@ -9,6 +9,17 @@ export function ControlPanelDshCatalogApprovalScreen() {
       description="Item approval, listing status, price anomaly, and inventory approval stay visible."
       badges={['catalogs', 'approval']}
       metaItems={['item approval', 'listing status', 'price anomaly', 'inventory approval']}
+      decisionBoard={{
+        title: 'Catalog decision board',
+        purpose: 'Keep catalog approvals, list health, and publish gating in one control-room read.',
+        primaryDecision: 'Approve the item, hold it, or send it back for correction.',
+        nextAction: 'Open listing governance for conflicts, duplicates, or price anomalies.',
+        blockers: 'Pending approvals and inventory disagreements still block publish.',
+        ownerSurface: 'catalogs',
+        evidenceHint: 'catalog approval proof plus price health signals',
+        routeHint: '/operations?workspace=catalogs',
+        decisionTone: 'warning',
+      }}
       primaryAction={{ label: 'Open listing governance', href: '/operations?workspace=issues' }}
       secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
       signals={[
@@ -29,6 +40,17 @@ export function ControlPanelDshListingGovernanceScreen() {
       description="Active/inactive listing state, store catalog health, and duplicate/conflict signals stay visible."
       badges={['governance']}
       metaItems={['active', 'inactive', 'health', 'duplicates']}
+      decisionBoard={{
+        title: 'Listing governance board',
+        purpose: 'Keep the final publish gate visible before anything leaves the catalog lane.',
+        primaryDecision: 'Keep, merge, or block the listing before publish.',
+        nextAction: 'Open catalog approval for the selected item or conflict cluster.',
+        blockers: 'Duplicates, conflicts, and health gaps still need review.',
+        ownerSurface: 'catalogs',
+        evidenceHint: 'duplicate/conflict proof and store catalog health',
+        routeHint: '/operations?workspace=catalogs',
+        decisionTone: 'brand',
+      }}
       primaryAction={{ label: 'Open catalog approval', href: '/operations?workspace=catalogs' }}
       secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
       signals={[

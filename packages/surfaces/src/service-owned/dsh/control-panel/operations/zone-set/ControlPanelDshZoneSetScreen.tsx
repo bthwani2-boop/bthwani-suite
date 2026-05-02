@@ -13,6 +13,7 @@ import {
   WebSectionCard,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from '../../shared';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import {
   getDshZoneSetLanes,
@@ -118,6 +119,18 @@ export function ControlPanelDshZoneSetScreen({
       showHeader={showHeader}
     >
       <div className={styles.stack}>
+        <ControlPanelDshDecisionBoard
+          title="Zone set board"
+          purpose="Keep zone policy, fee policy, and coverage constraints readable for route decisions."
+          primaryDecision={summary.reviewZones > 0 ? 'Review the zone set' : 'Keep the current zone policy'}
+          nextAction={summary.reviewZones > 0 ? 'Open policies or support for a route exception' : 'Continue with the current zone map'}
+          blockers={summary.protectedZones > 0 ? 'Protected zones still require review.' : 'No active blocker in zone-set.'}
+          ownerSurface="operations"
+          evidenceHint="zone policy, fee policy, and review counts"
+          routeHint={hubHref}
+          decisionTone={summary.reviewZones > 0 ? 'warning' : 'best'}
+        />
+
         <WebMissionHeroCard
           badges={['/operations?workspace=zone-set', dshText.common.live, `${dshText.zoneSet.signals.reviewZones}: ${summary.reviewZones}`]}
           eyebrow={dshText.zoneSet.heroEyebrow}

@@ -16,6 +16,7 @@ import {
 	useUiText,
 } from '@bthwani/ui-kit';
 import { WebMissionHeroCard, WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from '../../shared';
 import {
 	buildMarketingTickerPlan,
 	createMarketingTickerDraft,
@@ -595,6 +596,18 @@ export function ControlPanelDshMarketingScreen({
 
 	return (
 		<Box gap={4}>
+			<ControlPanelDshDecisionBoard
+				title="Smart signal board"
+				purpose="Keep the currently active notice, audience, priority, and suppression state visible."
+				primaryDecision={primaryPreview?.statusLabel ?? copy.noActiveLabel}
+				nextAction={primaryPreview ? resolveMarketingTickerPlanReasonLabel(locale, primaryPreview) : copy.reasonDraft}
+				blockers={primaryPreview ? resolveMarketingTickerPlanReasonLabel(locale, primaryPreview) : copy.noActiveLabel}
+				ownerSurface="marketing"
+				evidenceHint={`${copy.activeLabel}: ${primaryPreview?.statusLabel ?? copy.noActiveLabel} · ${copy.automaticLabel}: ${counts.automatic}`}
+				routeHint={operationsHref}
+				decisionTone={counts.suppressed > 0 ? 'warning' : 'brand'}
+			/>
+
 			<WebMissionHeroCard
 				dense
 				badges={[

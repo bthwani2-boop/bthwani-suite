@@ -3,6 +3,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Box, Button, Surface, Tabs, Text, TextField, useDirection } from '@bthwani/ui-kit';
+import { ControlPanelDshDecisionBoard } from '../shared';
 import {
   approveMarketingGrowthItem,
   duplicateMarketingGrowthItem,
@@ -212,6 +213,18 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
 
   return (
     <Box gap={4}>
+      <ControlPanelDshDecisionBoard
+        title="Growth command board"
+        purpose="Keep video, promotion, and campaign release decisions visible before publish."
+        primaryDecision={selected ? statusLabel(selected.status) : 'Review growth release'}
+        nextAction={selected ? (selected.status === 'published' ? 'Pause or duplicate the active item' : selected.status === 'pending-marketing' ? 'Approve for release' : 'Send to review') : 'Open the active growth item'}
+        blockers={selected ? selected.highlight || 'No blocker text provided' : 'No active growth item selected.'}
+        ownerSurface="marketing"
+        evidenceHint={selected ? `${selected.family} · ${selected.routeTarget} · ${selected.source}` : 'growth queue proof'}
+        routeHint={selected ? selected.routeTarget : 'home'}
+        decisionTone={selected?.status === 'published' ? 'best' : 'warning'}
+      />
+
       <Surface tone="raised" gap={3}>
         <Text role="caption" style={styles.brandEyebrow}>العروض والفيديوهات الآن مملوكة للتسويق</Text>
         <Text role="titleLg">إغلاق البرومو والفيديوهات والحملات والاشتراك داخل مسار واحد</Text>

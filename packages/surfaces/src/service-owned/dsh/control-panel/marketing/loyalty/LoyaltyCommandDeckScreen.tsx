@@ -12,6 +12,7 @@ import {
   Text,
 } from '@bthwani/ui-kit';
 import { WebMissionHeroCard, WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from '../../shared';
 import {
   loyaltyCommercialLaneItems,
   loyaltyCommercialKeyValues,
@@ -86,6 +87,18 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations', operationsHr
 
   return (
     <Box gap={4}>
+      <ControlPanelDshDecisionBoard
+        title="Loyalty command board"
+        purpose="Keep loyalty, subscription, and coupon decisions close to the active lane."
+        primaryDecision={section === 'builder' ? 'Edit or publish the selected program' : section === 'sync' ? 'Run sync or hold it' : section === 'guardrails' ? 'Approve guardrail changes or stop release' : 'Review the active loyalty lane'}
+        nextAction={section === 'builder' ? 'Open the builder and save the program' : section === 'sync' ? 'Open the sync lane or return to operations' : section === 'guardrails' ? 'Confirm guardrails and keep release protected' : 'Choose the operational lane'}
+        blockers={lastAction}
+        ownerSurface="marketing"
+        evidenceHint={`${resolveLaneTitle(lane)} · ${resolveAudienceLabel(audience)} · ${resolveDeliveryLabel(deliveryMode)}`}
+        routeHint={operationsHref}
+        decisionTone={deliveryMode === 'manual' ? 'warning' : 'brand'}
+      />
+
       <WebMissionHeroCard
         dense
         badges={['الولاء', 'قيمة العميل', 'تحكم مباشر']}

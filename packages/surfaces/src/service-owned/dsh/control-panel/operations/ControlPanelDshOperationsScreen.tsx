@@ -16,6 +16,7 @@ import {
   WebCommandCenterFrame,
   WebSectionCard,
 } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from '../shared';
 import { formatDshWorkbenchSubtitle, useDshControlPanelText, DshScreenState, resolveDshStateCopy } from './shared';
 import styles from './dsh-surface.module.css';
 
@@ -134,6 +135,21 @@ export function ControlPanelDshOperationsScreen({
 
   const heroTitle = activeWorkbench.id === 'overview' ? dshText.hub.rootTitle : activeWorkbench.label;
   const heroSubtitle = formatDshWorkbenchSubtitle(activeWorkbench.description, activeFilter.label, language as 'ar' | 'en');
+  const currentDecision = activeWorkbench.id === 'overview'
+    ? 'Pick the next operational lane'
+    : activeWorkbench.id === 'orders'
+      ? 'Open orders or inspect the selected order'
+      : activeWorkbench.id === 'reassign'
+        ? 'Reassign or keep the current captain'
+        : activeWorkbench.id === 'peak-mode'
+          ? 'Switch the pressure lane or hold'
+          : activeWorkbench.id === 'sheinproxy'
+            ? 'Review manual assignment batch'
+            : activeWorkbench.id === 'arrival-bell'
+              ? 'Resolve arrival and ring states'
+              : 'Review the active workbench';
+  const currentNextAction = activeWorkbench.liveHref ? `Open ${activeWorkbench.label.toLowerCase()}` : activeWorkbench.routeHint;
+  const currentBlocker = activeWorkbench.liveHref ? 'Live route is available; decision is purely operational.' : 'Planned lane still needs closure proof.';
 
   const handleTopFilterSelect = (filterId: string) => {
     const matchedFilter = topFilterItems.find((item) => item.id === filterId);
@@ -219,6 +235,18 @@ export function ControlPanelDshOperationsScreen({
           />
         </div>
       </div>
+
+      <ControlPanelDshDecisionBoard
+        title="Operations decision board"
+        purpose="Keep the current workbench decision, next action, blockers, owner, evidence, and route hint visible."
+        primaryDecision={currentDecision}
+        nextAction={currentNextAction}
+        blockers={currentBlocker}
+        ownerSurface="operations"
+        evidenceHint={`${activeWorkbench.routeHint} and workbench state proof`}
+        routeHint={activeWorkbench.liveHref ?? `/operations?workspace=${activeWorkbench.id}`}
+        decisionTone={activeWorkbench.liveHref ? 'brand' : 'warning'}
+      />
 
       {/* ===== Quick Access Tray ===== */}
       <div className={styles.quickAccessTray} dir={direction}>

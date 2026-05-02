@@ -3,6 +3,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Box, Button, Surface, Tabs, Text, TextField, useDirection } from '@bthwani/ui-kit';
+import { ControlPanelDshDecisionBoard } from '../shared';
 import {
   computeMarketingBannerQuality,
   duplicateMarketingBannerItem,
@@ -150,6 +151,18 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
 
   return (
     <Box gap={4}>
+      <ControlPanelDshDecisionBoard
+        title="Banner command board"
+        purpose="Keep banner publish, readiness, and promotion routing visible as a live decision."
+        primaryDecision={selected ? bannerStatusLabel(selected.status) : 'Review banner readiness'}
+        nextAction={selected ? (selected.status === 'published' ? 'Pause the banner or duplicate it' : 'Publish the selected banner') : 'Open the selected banner'}
+        blockers={selected ? selected.subtitle || 'No blocker text provided' : 'No banner selected.'}
+        ownerSurface="marketing"
+        evidenceHint={selected ? `${selected.audience} · ${selected.actionType} · ${selected.position}` : 'banner readiness proof'}
+        routeHint={selected ? selected.actionTarget : 'DshStoresList'}
+        decisionTone={selected?.status === 'published' ? 'best' : 'warning'}
+      />
+
       <Surface tone="raised" gap={3}>
         <Text role="caption" style={styles.brandEyebrow}>مسار البنر مملوك للتسويق</Text>
         <Text role="titleLg">إغلاق نهائي للبنر في العميل ولوحة التسويق</Text>

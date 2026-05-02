@@ -19,6 +19,7 @@ import {
   WebCommandCenterFrame,
   WebSectionCard,
 } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from '../../shared';
 import { getSheinProxyRequests, type SheinProxyRequest, type SheinProxyRequestStatus } from './sheinproxy-fixtures';
 
 export type ControlPanelDshSheinProxyScreenState = 'ready' | 'loading' | 'empty' | 'offline' | 'disabled' | 'error';
@@ -365,6 +366,18 @@ export function ControlPanelDshSheinProxyScreen({
       onRailItemSelect={(itemId) => setSelectedRequestId(itemId)}
     >
       <Box gap={4}>
+        <ControlPanelDshDecisionBoard
+          title={dshText.sheinProxy.pageTitle}
+          purpose={dshText.sheinProxy.pageDescription}
+          primaryDecision={selectedRequest ? resolveStatusLabel(dshText, selectedRequest.status) : dshText.sheinProxy.stateEmptyTitle}
+          nextAction={selectedRequest ? resolveNextActionLabel(dshText, selectedRequest.status) : dshText.sheinProxy.backToHub}
+          blockers={selectedRequest ? selectedRequest.note : dshText.sheinProxy.stateEmptyDescription}
+          ownerSurface={dshText.common.openGeneralOperations}
+          evidenceHint={selectedRequest ? `${selectedRequest.id} · ${selectedRequest.updated}` : dshText.sheinProxy.tableEmptyDescription}
+          routeHint={selectedRequest ? dshText.sheinProxy.inspectRequest : dshText.sheinProxy.backToHub}
+          decisionTone={selectedRequest ? resolveStatusTone(selectedRequest.status) : 'warning'}
+        />
+
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
           {signalCards.map((signalCard) => (
             <StatCard

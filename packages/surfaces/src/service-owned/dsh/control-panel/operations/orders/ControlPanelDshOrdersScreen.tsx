@@ -10,6 +10,7 @@ import {
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { ControlPanelDshOrderChatScreen } from '../orderchat';
+import { ControlPanelDshDecisionBoard } from '../../shared';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import { ControlPanelDshOrderDetailScreen } from './ControlPanelDshOrderDetailScreen';
 import { getSampleDshOrders } from './order-fixtures';
@@ -144,6 +145,18 @@ export function ControlPanelDshOrdersScreen({
       showHeader={showHeader}
     >
       <div className={styles.stack}>
+        <ControlPanelDshDecisionBoard
+          title="Orders decision board"
+          purpose="Keep queue, detail, and chat decisions on one compact operational surface."
+          primaryDecision={selectedOrder ? `${selectedOrder.id} · ${selectedOrder.statusLabel}` : 'Select an order to continue'}
+          nextAction={selectedOrder ? (overlayMode === 'chat' ? 'Open the chat overlay' : 'Open order detail') : 'Choose an order from the queue'}
+          blockers={selectedOrder ? selectedOrder.statusLabel : 'No selected order'}
+          ownerSurface="operations"
+          evidenceHint="selected order, timeline, and overlay context"
+          routeHint="/operations?workspace=orders"
+          decisionTone={selectedOrder?.statusTone === 'danger' ? 'danger' : selectedOrder?.statusTone === 'success' ? 'best' : 'warning'}
+        />
+
         <WebMissionHeroCard
           badges={['/operations?workspace=orders', dshText.common.live, `${dshText.orders.badgesLabel}: ${orders.length}`]}
           eyebrow={dshText.orders.heroEyebrow}

@@ -17,6 +17,7 @@ import {
   WebPageFrame,
   WebSectionCard,
 } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from '../../../shared';
 import { getSampleDshOrder } from '../../orders/order-fixtures';
 import { useDshControlPanelText } from '../../shared/dshControlPanelText';
 
@@ -242,6 +243,18 @@ export function ControlPanelDshOrderChatScreen({
       showHeader={showHeader}
     >
       <Box gap={4}>
+        <ControlPanelDshDecisionBoard
+          title="Order chat board"
+          purpose="Keep the chat context, resolution state, and next escalation step visible."
+          primaryDecision={isReadOnly ? 'Review only' : 'Send the next operational update'}
+          nextAction={isReadOnly ? 'Return to the order detail screen' : 'Send reply or attachment now'}
+          blockers={isReadOnly ? 'Chat is read-only after delivery.' : composerHint}
+          ownerSurface="operations"
+          evidenceHint={`${resolvedOrder.id} · ${resolvedOrder.statusLabel} · ${resolvedOrder.captainLabel}`}
+          routeHint={orderDetailHref}
+          decisionTone={isReadOnly ? 'best' : composerState === 'error' ? 'danger' : 'warning'}
+        />
+
         <WebMissionHeroCard
           badges={[resolvedOrder.id, resolvedOrder.statusLabel, isReadOnly ? 'مقروء فقط' : 'Live']}
             eyebrow="قناة التواصل"

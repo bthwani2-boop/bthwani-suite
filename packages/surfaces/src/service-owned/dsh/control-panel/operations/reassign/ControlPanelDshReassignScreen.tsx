@@ -14,6 +14,7 @@ import {
   WebPageFrame,
   WebSectionCard,
 } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from '../../shared';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import { getDshReassignCandidates, getDshReassignSummary } from './reassign-fixtures';
 import styles from '../dsh-surface.module.css';
@@ -119,6 +120,18 @@ export function ControlPanelDshReassignScreen({
       showHeader={showHeader}
     >
       <div className={styles.reassignWorkspace}>
+        <ControlPanelDshDecisionBoard
+          title="Reassign board"
+          purpose="Keep reassign decisions short: move, hold, or escalate the case."
+          primaryDecision={hasUrgent ? 'Reassign urgent cases now' : 'Keep the current captain'}
+          nextAction={hasUrgent ? 'Open the candidate lane and confirm a fallback captain' : 'Review the next queued candidate'}
+          blockers={blockedCount > 0 ? 'Blocked cases still need a route decision.' : 'No active blocker in the reassign lane.'}
+          ownerSurface="operations"
+          evidenceHint="candidate list, priority, and fallback captain proof"
+          routeHint={hubHref}
+          decisionTone={hasUrgent ? 'danger' : 'warning'}
+        />
+
         {/* ===== Metrics Strip ===== */}
         <div className={styles.reassignMetricsStrip}>
           <StatCard

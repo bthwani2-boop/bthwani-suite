@@ -9,6 +9,17 @@ export function ControlPanelDshSupportQueueScreen() {
       description="Order issue queue plus client, partner, captain, and field issue lanes stay visible."
       badges={['support', 'queue']}
       metaItems={['orders', 'client', 'partner', 'captain', 'field']}
+      decisionBoard={{
+        title: 'Support triage board',
+        purpose: 'Keep support tied to DSH-linked issues instead of a generic root inbox.',
+        primaryDecision: 'Route the issue to order, partner, captain, or field.',
+        nextAction: 'Open dispute resolution if evidence is missing or contested.',
+        blockers: 'Untriaged and unlinked issues still block support closure.',
+        ownerSurface: 'support',
+        evidenceHint: 'linked issue lane and source surface proof',
+        routeHint: '/operations?workspace=issues',
+        decisionTone: 'danger',
+      }}
       primaryAction={{ label: 'Open issues', href: '/operations?workspace=issues' }}
       secondaryAction={{ label: 'Open dispute resolution', href: '/operations?workspace=disputes' }}
       signals={[
@@ -29,6 +40,17 @@ export function ControlPanelDshDisputeResolutionScreen() {
       description="Evidence, resolution status, and the current step stay visible without any backend mutation."
       badges={['dispute', 'evidence']}
       metaItems={['evidence', 'resolution', 'status']}
+      decisionBoard={{
+        title: 'Dispute decision board',
+        purpose: 'Keep the dispute on a DSH-linked context and not a generic support path.',
+        primaryDecision: 'Accept the evidence or send the case back to the owning surface.',
+        nextAction: 'Open the linked support queue when the dispute needs triage.',
+        blockers: 'Missing evidence or unresolved status still blocks closure.',
+        ownerSurface: 'support',
+        evidenceHint: 'dispute evidence and linked resolution state',
+        routeHint: '/operations?workspace=issues',
+        decisionTone: 'warning',
+      }}
       primaryAction={{ label: 'Open support queue', href: '/operations?workspace=issues' }}
       secondaryAction={{ label: 'Open governance', href: '/operations?workspace=evidence' }}
       signals={[

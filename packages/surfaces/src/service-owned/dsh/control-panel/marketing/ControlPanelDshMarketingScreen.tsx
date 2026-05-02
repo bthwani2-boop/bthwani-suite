@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Surface, Text } from '@bthwani/ui-kit';
 import { WebSegmentedTabs } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from '../shared';
 import {
 	ControlPanelDshMarketingScreen as SmartSignalLayerScreen,
 	type ControlPanelDshMarketingScreenProps as SmartSignalLayerScreenProps,
@@ -38,6 +39,18 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
 
 	return (
 		<Box gap={4}>
+			<ControlPanelDshDecisionBoard
+				title="Marketing operational board"
+				purpose="Keep approval, video review, banner readiness, and promotion release in one compact read."
+				primaryDecision={activeView === 'growth' ? 'Decide release for growth assets' : activeView === 'banners' ? 'Decide banner publish/readiness' : activeView === 'loyalty' ? 'Decide loyalty readiness' : 'Decide signal release'}
+				nextAction={activeView === 'growth' ? 'Open video submissions review' : activeView === 'banners' ? 'Open banner deck' : activeView === 'loyalty' ? 'Open loyalty deck' : 'Open signal layer'}
+				blockers="Release gating and review queues still need signoff."
+				ownerSurface="marketing"
+				evidenceHint="marketing approval proof and view-specific readiness"
+				routeHint={props.operationsHref ?? '/operations'}
+				decisionTone={activeView === 'growth' ? 'warning' : 'brand'}
+			/>
+
 			<WebSegmentedTabs
 				ariaLabel="DSH marketing control view"
 				items={[

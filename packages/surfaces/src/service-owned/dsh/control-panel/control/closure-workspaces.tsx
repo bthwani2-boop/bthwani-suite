@@ -11,6 +11,17 @@ export function ControlPanelDshGovernanceEvidenceScreen() {
       description="A compact evidence matrix for closure state, surface coverage, and guard results."
       badges={['governance', 'evidence']}
       metaItems={['closure state', 'surface coverage', 'guard results']}
+      decisionBoard={{
+        title: 'Evidence closure board',
+        purpose: 'Keep proof gaps visible before a surface is called closed.',
+        primaryDecision: 'Close the evidence gap or leave the surface blocked.',
+        nextAction: 'Open guard status and capture the missing proof.',
+        blockers: 'Missing evidence and UI-flow cleanup still remain.',
+        ownerSurface: 'control',
+        evidenceHint: 'closure items, guard results, and route proof',
+        routeHint: '/operations?workspace=guard-status',
+        decisionTone: 'danger',
+      }}
       primaryAction={{ label: 'Open guard status', href: '/operations?workspace=guard-status' }}
       secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
       signals={[
@@ -39,6 +50,17 @@ export function ControlPanelDshGuardStatusScreen() {
         description="DSH-related guards only, with PASS/WARN/BLOCKED style summaries."
         badges={['guards']}
         metaItems={['PASS', 'WARN', 'BLOCKED']}
+        decisionBoard={{
+          title: 'Guard decision board',
+          purpose: 'Expose guard verdicts with the reason and the next step.',
+          primaryDecision: 'Pass the surface, warn on review, or block it.',
+          nextAction: 'Clear warnings before reopening evidence.',
+          blockers: 'Blocked items and proof gaps remain visible here.',
+          ownerSurface: 'control',
+          evidenceHint: 'guard verdicts and closure-map rows',
+          routeHint: '/operations?workspace=evidence',
+          decisionTone: 'warning',
+        }}
         primaryAction={{ label: 'Open evidence', href: '/operations?workspace=evidence' }}
         secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
         signals={[

@@ -6,6 +6,7 @@ import { Box, Button, Text } from '@bthwani/ui-kit';
 import { WebMissionHeroCard, WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
 import { dshCatalogMetrics, dshCatalogNodes, dshCatalogPipeline } from './catalog';
 import { ControlPanelDshCatalogCategoriesScreen } from './categories';
+import { ControlPanelDshDecisionBoard } from '../shared';
 
 export type ControlPanelDshCatalogScreenProps = {
   hubHref?: string;
@@ -24,6 +25,18 @@ export function ControlPanelDshCatalogScreen({
 
   return (
     <Box gap={4}>
+      <ControlPanelDshDecisionBoard
+        title="Catalog operational board"
+        purpose="Keep approval, quality, and readiness in a compact control-room read."
+        primaryDecision="Approve, hold, or send the item back to the owning surface."
+        nextAction="Open partner review or marketing review for the selected lane."
+        blockers="Price anomalies, duplicates, and inventory gaps remain visible."
+        ownerSurface="catalogs"
+        evidenceHint="catalog approval proof, quality signals, and readiness handoff"
+        routeHint={operationsHref}
+        decisionTone="warning"
+      />
+
       <WebMissionHeroCard
         badges={['DSH', 'Catalog', 'Governance']}
         eyebrow="كتالوج DSH"
@@ -78,6 +91,23 @@ export function ControlPanelDshCatalogScreen({
               />
             </Box>
           ))}
+        </Box>
+      </WebSectionCard>
+
+      <WebSectionCard title="الجاهزية والجودة" description="إشارة سريعة لما إذا كانت البطاقة جاهزة للنشر أو تحتاج إصلاحًا قبل المراجعة النهائية.">
+        <Box gap={2}>
+          <WebSignalCard
+            title="Product/listing quality"
+            value="Tracked"
+            description="الانحرافات والجودة تبقى ظاهرة قبل النشر."
+            tone="brand"
+          />
+          <WebSignalCard
+            title="Partner catalog readiness"
+            value="Open"
+            description="جاهزية الشركاء للنشر النهائي أو الرد تبقى واضحة."
+            tone="warning"
+          />
         </Box>
       </WebSectionCard>
 

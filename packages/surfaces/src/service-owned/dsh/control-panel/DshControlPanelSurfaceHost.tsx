@@ -9,8 +9,8 @@ import { ControlPanelDshClosureDashboardScreen, ControlPanelDshClosureEvidenceSt
 import { ControlPanelDshGovernanceEvidenceScreen, ControlPanelDshGuardStatusScreen } from './control';
 import { ControlPanelDshFinanceScreen, ControlPanelDshSettlementScreen, ControlPanelDshCodReconciliationScreen, ControlPanelDshRefundQueueScreen } from './finance';
 import { ControlPanelDshMarketingApprovalScreen, ControlPanelDshMarketingScreen, ControlPanelDshVideoSubmissionsReviewScreen } from './marketing';
-import { ControlPanelDshOrdersScreen, ControlPanelDshOrderDetailScreen } from './operations/orders';
-import { ControlPanelDshManualAssignmentScreen } from './operations/sheinproxy';
+import { ControlPanelDshOrdersScreen } from './operations/orders';
+import { ControlPanelDshSheinProxyScreen } from './operations/sheinproxy';
 import { ControlPanelDshReassignScreen } from './operations/reassign';
 import { ControlPanelDshPeakModeScreen } from './operations/peak-mode';
 import { ControlPanelDshBellScreen } from './operations/bell';
@@ -106,11 +106,23 @@ function normalizeWorkspace(workspace: DshWorkspaceId) {
     return 'bell' as const;
   }
 
-  if (workspace === 'order-detail' || workspace === 'orderchat') {
-    return 'orders' as const;
-  }
-
   return workspace;
+}
+
+function renderOrdersOverlay(workspace: DshWorkspaceId, orderId?: string) {
+  const selectedOrderId = orderId ?? 'ORD-24020';
+  const overlayMode = workspace === 'orderchat' ? 'chat' : 'detail';
+
+  return (
+    <ControlPanelDshOrdersScreen
+      embedded
+      showHeader={false}
+      hubHref={buildOperationsHref('overview')}
+      operationsHref="/operations"
+      initialSelectedOrderId={selectedOrderId}
+      initialOverlayMode={overlayMode}
+    />
+  );
 }
 
 function OverviewWorkspace() {
@@ -222,16 +234,7 @@ function renderWorkspace(workspace: DshWorkspaceId, orderId?: string, orderOverl
     case 'evidence':
       return <ControlPanelDshGovernanceEvidenceScreen />;
     case 'orders':
-      return orderOverlayMode === 'detail' || orderOverlayMode === 'chat' ? (
-        <ControlPanelDshOrderDetailScreen
-          embedded
-          showHeader={false}
-          hubHref={buildOperationsHref('overview')}
-          operationsHref="/operations"
-          initialSelectedOrderId={orderId ?? null}
-          initialOverlayMode={orderOverlayMode}
-        />
-      ) : (
+      return (
         <ControlPanelDshOrdersScreen
           embedded
           showHeader={false}
@@ -241,6 +244,9 @@ function renderWorkspace(workspace: DshWorkspaceId, orderId?: string, orderOverl
           initialOverlayMode={orderOverlayMode ?? null}
         />
       );
+    case 'order-detail':
+    case 'orderchat':
+      return renderOrdersOverlay(normalizedWorkspace, orderId);
     case 'partners':
       return (
         <Box gap={4}>
@@ -277,9 +283,7 @@ function renderWorkspace(workspace: DshWorkspaceId, orderId?: string, orderOverl
       );
     case 'sheinproxy':
       return (
-        <ControlPanelDshManualAssignmentScreen
-          requestId={orderId ?? 'shein-proxy-001'}
-          stage="detail"
+        <ControlPanelDshSheinProxyScreen
           hubHref={buildOperationsHref('overview')}
           operationsHref="/operations"
           supportHref="/support"
@@ -293,8 +297,6 @@ function renderWorkspace(workspace: DshWorkspaceId, orderId?: string, orderOverl
       return <ControlPanelDshBellScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} ordersHref={buildOperationsHref('orders')} />;
     case 'zone-set':
       return <ControlPanelDshZoneSetScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} ordersHref={buildOperationsHref('orders')} />;
-    case 'order-detail':
-    case 'orderchat':
     case 'arrival-bell':
       return null;
     default:

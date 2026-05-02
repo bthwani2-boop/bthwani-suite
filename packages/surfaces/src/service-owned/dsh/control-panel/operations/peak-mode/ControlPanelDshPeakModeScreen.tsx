@@ -13,6 +13,7 @@ import {
   WebSectionCard,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from '../../shared';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import {
   getDshPeakModePolicies,
@@ -118,6 +119,18 @@ export function ControlPanelDshPeakModeScreen({
       showHeader={showHeader}
     >
       <div className={styles.stack}>
+        <ControlPanelDshDecisionBoard
+          title="Peak mode board"
+          purpose="Keep pressure zones and protected queues visible for the active decision."
+          primaryDecision={summary.pressureZones > 0 ? 'Adjust capacity or hold the lane' : 'Hold the current routing posture'}
+          nextAction={summary.pressureZones > 0 ? 'Open policies or orders to absorb pressure' : 'Stay on the current routing posture'}
+          blockers={summary.protectedQueues > 0 ? 'Protected queues still need special handling.' : 'No active blocker in peak mode.'}
+          ownerSurface="operations"
+          evidenceHint="pressure-zone counts, policies, and lane recommendations"
+          routeHint={hubHref}
+          decisionTone={summary.pressureZones > 0 ? 'warning' : 'best'}
+        />
+
         <WebMissionHeroCard
           badges={['/operations?workspace=peak-mode', dshText.common.live, `${dshText.peakMode.signals.pressureZones}: ${summary.pressureZones}`]}
           eyebrow={dshText.peakMode.heroEyebrow}

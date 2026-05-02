@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Text } from '@bthwani/ui-kit';
 import { WebMissionHeroCard, WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from '../shared';
 import { dshPartnerApprovalLanes, dshPartnerIntakeItems, dshPartnerIntakeMetrics, type DshPartnerIntakeItem, type DshPartnerIntakeQueue } from './workflow';
 import styles from '../operations/dsh-surface.module.css';
 
@@ -94,6 +95,7 @@ export function ControlPanelDshPartnerApprovalsScreen({
 
   const activeItems = queueItems[activeQueue];
   const selectedItem = activeItems.find((item) => item.id === selectedItemId) ?? activeItems[0] ?? queueItems['offer-approval'][0];
+  const decisionState = selectedItem ?? activeItems[0];
 
   React.useEffect(() => {
     if (!activeItems.some((item) => item.id === selectedItemId)) {
@@ -149,6 +151,18 @@ export function ControlPanelDshPartnerApprovalsScreen({
 
   return (
     <Box gap={4}>
+      <ControlPanelDshDecisionBoard
+        title="Partner approval board"
+        purpose="Keep partner intake, document readiness, and handoff routes in one place."
+        primaryDecision={decisionState ? resolvePrimaryActionLabel(decisionState.queue) : 'Review partner intake'}
+        nextAction={decisionState ? resolveSecondaryActionLabel(decisionState.queue) : 'Open the active queue'}
+        blockers={decisionState ? decisionState.note : 'No active partner item selected.'}
+        ownerSurface="partners"
+        evidenceHint="partner intake record, queue state, and handoff proof"
+        routeHint={decisionState ? (decisionState.queue === 'offer-approval' ? operationsHref : decisionState.queue === 'partner-review' ? catalogHref : marketingHref) : operationsHref}
+        decisionTone={decisionState?.queue === 'offer-approval' ? 'warning' : decisionState?.queue === 'marketing-review' ? 'best' : 'brand'}
+      />
+
       <WebMissionHeroCard
         badges={['DSH', 'Partners', 'Field Intake']}
         eyebrow="بوابة الشركاء"

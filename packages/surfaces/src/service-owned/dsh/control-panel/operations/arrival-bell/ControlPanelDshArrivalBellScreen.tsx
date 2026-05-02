@@ -13,6 +13,7 @@ import {
   WebSectionCard,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
+import { ControlPanelDshDecisionBoard } from '../../../shared';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import {
   getDshArrivalBellCaptainLane,
@@ -139,6 +140,18 @@ export function ControlPanelDshArrivalBellScreen({
       showHeader={showHeader}
     >
       <div className={styles.stack}>
+        <ControlPanelDshDecisionBoard
+          title="Arrival bell board"
+          purpose="Keep arrival and ring states tied to the notification decision."
+          primaryDecision={summary.awaitingAcknowledgement > 0 ? 'Resolve acknowledgement' : 'No pending arrival bell cases'}
+          nextAction={summary.awaitingAcknowledgement > 0 ? 'Open the orders workspace and resolve the ring' : 'Return to operations overview'}
+          blockers={summary.blockedRings > 0 ? 'Blocked rings still need attention.' : 'No active blocker in the bell lane.'}
+          ownerSurface="operations"
+          evidenceHint="arrival counts, ring timeline, and acknowledgement state"
+          routeHint={hubHref}
+          decisionTone={summary.blockedRings > 0 ? 'danger' : 'best'}
+        />
+
         <WebMissionHeroCard
           badges={['/operations?workspace=bell', dshText.common.live, `${dshText.arrivalBell.signals.activeArrivals}: ${summary.activeArrivals}`]}
           eyebrow={dshText.arrivalBell.heroEyebrow}

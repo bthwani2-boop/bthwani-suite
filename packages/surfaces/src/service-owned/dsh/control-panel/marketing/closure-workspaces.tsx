@@ -9,6 +9,17 @@ export function ControlPanelDshMarketingApprovalScreen() {
       description="Campaigns and offers stay in a dedicated approval lane before release."
       badges={['marketing', 'approval']}
       metaItems={['campaigns', 'offers', 'release']}
+      decisionBoard={{
+        title: 'Marketing approval board',
+        purpose: 'Keep approval, video review, and release gating visible without a long page.',
+        primaryDecision: 'Approve, send back, or hold for policy review.',
+        nextAction: 'Open video submissions review for the selected lane.',
+        blockers: 'Release gating and unreviewed offers still block launch.',
+        ownerSurface: 'marketing',
+        evidenceHint: 'approval lane proof and release gating',
+        routeHint: '/operations?workspace=marketing',
+        decisionTone: 'warning',
+      }}
       primaryAction={{ label: 'Open video review', href: '/operations?workspace=marketing' }}
       secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
       signals={[
@@ -28,6 +39,17 @@ export function ControlPanelDshVideoSubmissionsReviewScreen() {
       description="Video submissions remain in a review lane before release to the wider surface."
       badges={['video', 'review']}
       metaItems={['submissions', 'review', 'release']}
+      decisionBoard={{
+        title: 'Video review board',
+        purpose: 'Keep video review tied to the release decision instead of a generic summary.',
+        primaryDecision: 'Release the submission or return it to review.',
+        nextAction: 'Open marketing approval for the linked campaign or offer.',
+        blockers: 'Pending review and release gating remain in the lane.',
+        ownerSurface: 'marketing',
+        evidenceHint: 'submission review and release gating proof',
+        routeHint: '/operations?workspace=marketing',
+        decisionTone: 'brand',
+      }}
       primaryAction={{ label: 'Open marketing approval', href: '/operations?workspace=marketing' }}
       secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
       signals={[
