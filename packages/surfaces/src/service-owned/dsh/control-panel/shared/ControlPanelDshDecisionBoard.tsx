@@ -28,14 +28,14 @@ export function ControlPanelDshDecisionBoard({
   return (
     <WebSectionCard title={title} description={purpose}>
       <Box gap={2}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+        <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
           <WebSignalCard title="Primary decision" value={primaryDecision} description="What this screen should decide now." tone={decisionTone} />
           <WebSignalCard title="Next action" value={nextAction} description="The next operational move." tone="warning" />
           <WebSignalCard title="Blockers" value={blockers} description="What still blocks closure or execution." tone="danger" />
           <WebSignalCard title="Owner surface" value={ownerSurface} description="The owning DSH surface for the decision." tone="best" />
-        </div>
+        </Box>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+        <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
           <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
             <Text role="caption" tone="muted">Evidence hint</Text>
             <Text role="bodySm">{evidenceHint}</Text>
@@ -44,7 +44,7 @@ export function ControlPanelDshDecisionBoard({
             <Text role="caption" tone="muted">Route hint</Text>
             <Text role="bodySm">{routeHint}</Text>
           </Box>
-        </div>
+        </Box>
       </Box>
     </WebSectionCard>
   );

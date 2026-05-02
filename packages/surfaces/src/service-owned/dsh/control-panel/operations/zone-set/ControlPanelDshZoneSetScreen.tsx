@@ -4,6 +4,7 @@ import React from 'react';
 import {
   useRouter } from 'next/navigation';
 import { Box,
+  Button,
   StateView,
   Text
 } from '@bthwani/ui-kit';
@@ -91,6 +92,8 @@ export function ControlPanelDshZoneSetScreen({
   const summary = React.useMemo(() => getDshZoneSetSummary(dshText), [dshText]);
   const policies = React.useMemo(() => getDshZoneSetPolicies(dshText), [dshText]);
   const lanes = React.useMemo(() => getDshZoneSetLanes(dshText), [dshText]);
+  const [mode, setMode] = React.useState<'review' | 'activate' | 'block'>('review');
+  const [localNote, setLocalNote] = React.useState('Zone set ready for local review');
 
   if (state !== 'ready') {
     const stateCopy = resolveStateCopy(dshText, state);
@@ -123,13 +126,27 @@ export function ControlPanelDshZoneSetScreen({
           title="Zone set board"
           purpose="Keep zone policy, fee policy, and coverage constraints readable for route decisions."
           primaryDecision={summary.reviewZones > 0 ? 'Review the zone set' : 'Keep the current zone policy'}
-          nextAction={summary.reviewZones > 0 ? 'Open policies or support for a route exception' : 'Continue with the current zone map'}
+          nextAction={summary.reviewZones > 0 ? `Switch to ${mode} and open blocker if needed` : `Keep the ${mode} posture and continue`}
           blockers={summary.protectedZones > 0 ? 'Protected zones still require review.' : 'No active blocker in zone-set.'}
           ownerSurface="operations"
           evidenceHint="zone policy, fee policy, and review counts"
           routeHint={hubHref}
           decisionTone={summary.reviewZones > 0 ? 'warning' : 'best'}
         />
+
+        <WebSectionCard title="Zone actions" description="Move the zone posture locally, review the zone, or open blocker/support.">
+          <Box gap={2}>
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+              <Button label="Review" tone={mode === 'review' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setMode('review')} />
+              <Button label="Activate" tone={mode === 'activate' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setMode('activate')} />
+              <Button label="Block" tone={mode === 'block' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setMode('block')} />
+              <Button label="Review zone" tone="primary" fullWidth={false} onPress={() => setLocalNote(`Reviewing zone set in ${mode} mode`)} />
+              <Button label="Open blocker" tone="secondary" fullWidth={false} onPress={() => setLocalNote(`Open blocker for zone set in ${mode} mode`)} />
+              <Button label="Open support" tone="ghost" fullWidth={false} onPress={() => router.push(supportHref)} />
+            </Box>
+            <Text role="bodySm" tone="muted">{localNote}</Text>
+          </Box>
+        </WebSectionCard>
 
         <WebMissionHeroCard
           badges={['/operations?workspace=zone-set', dshText.common.live, `${dshText.zoneSet.signals.reviewZones}: ${summary.reviewZones}`]}

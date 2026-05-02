@@ -1,62 +1,139 @@
 import React from 'react';
-import { ControlPanelDshWorkspaceFrame } from '../shared';
+import { Box, Button, Text } from '@bthwani/ui-kit';
+import { WebSectionCard } from '@bthwani/ui-kit/web';
+import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../shared';
+
+type PartnerReviewKind = 'activation' | 'documents';
+
+function buildPartnerRows(kind: PartnerReviewKind) {
+  const baseRows = kind === 'activation'
+    ? [
+        { id: 'partner-activation', title: 'Partner activation', status: 'Pending', blocker: 'Activation readiness still needs confirmation.', evidence: 'Activation package proof', tone: 'warning' as const },
+        { id: 'catalog-handoff', title: 'Catalog handoff', status: 'Ready', blocker: 'Catalog handoff must be acknowledged locally.', evidence: 'Catalog handoff proof', tone: 'brand' as const },
+        { id: 'marketing-handoff', title: 'Marketing handoff', status: 'Tracked', blocker: 'Marketing handoff still needs a final route check.', evidence: 'Marketing route proof', tone: 'best' as const },
+      ]
+    : [
+        { id: 'identity-proof', title: 'Identity proof', status: 'Pending', blocker: 'Identity proof is missing or incomplete.', evidence: 'Identity documents', tone: 'warning' as const },
+        { id: 'store-nomination', title: 'Store nomination', status: 'Ready', blocker: 'Store nomination needs a local review.', evidence: 'Store nomination proof', tone: 'brand' as const },
+        { id: 'document-completeness', title: 'Document completeness', status: 'Tracked', blocker: 'The package is close but still needs signoff.', evidence: 'Document completeness proof', tone: 'best' as const },
+      ];
+
+  return baseRows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    status: row.status,
+    ownerSurface: 'partners',
+    blocker: row.blocker,
+    evidence: row.evidence,
+    primaryActionLabel: 'Approve',
+    secondaryActionLabel: 'Request docs',
+    evidenceActionLabel: kind === 'activation' ? 'Open handoff' : 'Open blocker',
+    tone: row.tone,
+  }));
+}
+
+function PartnerReviewBoard({
+  title,
+  purpose,
+  kind,
+}: {
+  title: string;
+  purpose: string;
+  kind: PartnerReviewKind;
+}) {
+  const items = React.useMemo(() => buildPartnerRows(kind), [kind]);
+  const [selectedId, setSelectedId] = React.useState(items[0]?.id ?? null);
+  const [lastAction, setLastAction] = React.useState('Ready for partner review');
+  const selectedItem = items.find((item) => item.id === selectedId) ?? items[0];
+
+  return (
+    <Box gap={4}>
+      <ControlPanelDshWorkspaceFrame
+        eyebrow={kind === 'activation' ? 'Partner activation' : 'Document review'}
+        title={title}
+        description="A local partner control room with selected item state, approval actions, and explicit handoff or blocker routing."
+        badges={['partners', kind]}
+        metaItems={[selectedItem?.status ?? 'Pending', lastAction]}
+        decisionBoard={{
+          title: `${title} board`,
+          purpose,
+          primaryDecision: selectedItem?.status ?? 'Pending',
+          nextAction: lastAction,
+          blockers: selectedItem?.blocker ?? 'Select a partner row.',
+          ownerSurface: 'partners',
+          evidenceHint: selectedItem?.evidence ?? 'partner evidence',
+          routeHint: '/operations?workspace=partners',
+          decisionTone: selectedItem?.tone,
+        }}
+        primaryAction={{ label: 'Open catalog handoff', href: '/operations?workspace=catalogs' }}
+        secondaryAction={{ label: 'Open marketing handoff', href: '/operations?workspace=marketing' }}
+        signals={[
+          { id: `${kind}-pending`, title: 'Pending', value: 'Visible', description: 'Items pending partner review.', tone: 'warning' },
+          { id: `${kind}-ready`, title: 'Ready', value: 'Visible', description: 'Items ready for local action.', tone: 'best' },
+          { id: `${kind}-handoff`, title: 'Handoff', value: 'Tracked', description: 'Selected handoff is explicit.', tone: 'brand' },
+        ]}
+      />
+
+      <ControlPanelDshActionQueue
+        title={kind === 'activation' ? 'Activation queue' : 'Document queue'}
+        purpose="Choose a row, approve or request docs, then open handoff or blocker locally."
+        items={items}
+        selectedId={selectedId}
+        onSelect={setSelectedId}
+        primaryAction={(item) => {
+          setSelectedId(item.id);
+          setLastAction(`Approve: ${item.title}`);
+        }}
+        secondaryAction={(item) => {
+          setSelectedId(item.id);
+          setLastAction(`Request docs: ${item.title}`);
+        }}
+        evidenceAction={(item) => {
+          setSelectedId(item.id);
+          setLastAction(kind === 'activation' ? `Open handoff: ${item.title}` : `Open blocker: ${item.title}`);
+        }}
+      />
+
+      <WebSectionCard
+        title={kind === 'activation' ? 'Partner handoff' : 'Document blocker'}
+        description="Keep the selected item visible while the local handoff or blocker step is triggered."
+      >
+        <Box gap={2}>
+          <Text role="bodySm" tone="muted">
+            {selectedItem ? `${selectedItem.title} · ${selectedItem.evidence}` : 'Select a row to continue.'}
+          </Text>
+          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+            <Button label="Approve" tone="primary" fullWidth={false} onPress={() => selectedItem && setLastAction(`Approve: ${selectedItem.title}`)} />
+            <Button label="Request docs" tone="secondary" fullWidth={false} onPress={() => selectedItem && setLastAction(`Request docs: ${selectedItem.title}`)} />
+            <Button
+              label={kind === 'activation' ? 'Open handoff' : 'Open blocker'}
+              tone="ghost"
+              fullWidth={false}
+              onPress={() => selectedItem && setLastAction(`${kind === 'activation' ? 'Open handoff' : 'Open blocker'}: ${selectedItem.title}`)}
+            />
+          </Box>
+        </Box>
+      </WebSectionCard>
+    </Box>
+  );
+}
 
 export function ControlPanelDshPartnerActivationScreen() {
   return (
-    <ControlPanelDshWorkspaceFrame
-      eyebrow="Partner activation"
+    <PartnerReviewBoard
+      kind="activation"
       title="Partner activation intake"
-      description="Intake review, document review, and activation decision stay in one visible flow."
-      badges={['partners', 'activation']}
-      metaItems={['intake', 'documents', 'decision']}
-      decisionBoard={{
-        title: 'Partner activation board',
-        purpose: 'Keep intake, activation, and document review in a compact control room.',
-        primaryDecision: 'Activate, hold, or return for missing documents.',
-        nextAction: 'Open document review for the selected partner package.',
-        blockers: 'Documents and activation readiness still block final approval.',
-        ownerSurface: 'partners',
-        evidenceHint: 'activation package proof and readiness state',
-        routeHint: '/operations?workspace=partners',
-        decisionTone: 'warning',
-      }}
-      primaryAction={{ label: 'Open document review', href: '/operations?workspace=partners' }}
-      secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
-      signals={[
-        { id: 'intake', title: 'Intake review', value: 'Open', description: 'Partner intake stays visible.', tone: 'brand' },
-        { id: 'documents', title: 'Documents', value: 'Ready', description: 'Document review is explicit.', tone: 'warning' },
-        { id: 'decision', title: 'Activation decision', value: 'Pending', description: 'Activation decision stays legible.', tone: 'best' },
-      ]}
+      purpose="Keep intake, activation, and document review in a compact control room."
     />
   );
 }
 
 export function ControlPanelDshPartnerDocumentReviewScreen() {
   return (
-    <ControlPanelDshWorkspaceFrame
-      eyebrow="Document review"
+    <PartnerReviewBoard
+      kind="documents"
       title="Partner document review"
-      description="Identity, store nomination, and document completeness remain visible."
-      badges={['documents']}
-      metaItems={['identity', 'store nomination', 'completeness']}
-      decisionBoard={{
-        title: 'Document review board',
-        purpose: 'Keep partner readiness tied to the document proof and activation handoff.',
-        primaryDecision: 'Accept the package or request missing proof.',
-        nextAction: 'Open activation once the document bundle is complete.',
-        blockers: 'Missing identity proof or incomplete store nomination still block handoff.',
-        ownerSurface: 'partners',
-        evidenceHint: 'identity proof and document completeness',
-        routeHint: '/operations?workspace=partners',
-        decisionTone: 'brand',
-      }}
-      primaryAction={{ label: 'Open activation', href: '/operations?workspace=partners' }}
-      secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
-      signals={[
-        { id: 'identity', title: 'Identity', value: 'Visible', description: 'Identity proof remains explicit.', tone: 'brand' },
-        { id: 'nomination', title: 'Store nomination', value: 'Visible', description: 'Store nomination stays legible.', tone: 'warning' },
-        { id: 'completeness', title: 'Completeness', value: 'Tracked', description: 'Document completeness remains obvious.', tone: 'best' },
-      ]}
+      purpose="Keep partner readiness tied to the document proof and activation handoff."
     />
   );
 }

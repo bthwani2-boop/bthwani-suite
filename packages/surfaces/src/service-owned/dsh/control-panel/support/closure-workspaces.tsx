@@ -1,65 +1,88 @@
 import React from 'react';
-import { ControlPanelDshWorkspaceFrame } from '../shared';
+import { Box } from '@bthwani/ui-kit';
+import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../shared';
 
-export function ControlPanelDshSupportQueueScreen() {
+type SupportLane = 'order' | 'partner' | 'captain' | 'field';
+
+function buildSupportItems(kind: 'queue' | 'dispute') {
+  const lanes: readonly SupportLane[] = ['order', 'partner', 'captain', 'field'];
+  return lanes.map((lane) => ({
+    id: `${kind}-${lane}`,
+    title: `${lane} ${kind}`,
+    status: lane === 'order' ? 'Open' : 'Ready',
+    ownerSurface: 'support',
+    blocker: kind === 'dispute' ? 'Evidence and ownership must be confirmed.' : 'Assign an owner and choose a linked surface.',
+    evidence: `Linked ${lane} surface proof`,
+    primaryActionLabel: kind === 'dispute' ? 'Resolve locally' : 'Triage',
+    secondaryActionLabel: 'Assign owner',
+    evidenceActionLabel: `Open linked ${lane}`,
+    tone: lane === 'order' ? 'brand' : lane === 'partner' ? 'best' : lane === 'captain' ? 'warning' : 'warning',
+  })) as const;
+}
+
+function SupportQueueBoard({
+  title,
+  purpose,
+  kind,
+}: {
+  title: string;
+  purpose: string;
+  kind: 'queue' | 'dispute';
+}) {
+  const items = buildSupportItems(kind);
+  const [selectedId, setSelectedId] = React.useState(items[0]?.id ?? null);
+  const [note, setNote] = React.useState('Ready for triage');
+  const selected = items.find((item) => item.id === selectedId) ?? items[0];
+
   return (
-    <ControlPanelDshWorkspaceFrame
-      eyebrow="Support queue"
-      title="Cross-surface support queue"
-      description="Order issue queue plus client, partner, captain, and field issue lanes stay visible."
-      badges={['support', 'queue']}
-      metaItems={['orders', 'client', 'partner', 'captain', 'field']}
-      decisionBoard={{
-        title: 'Support triage board',
-        purpose: 'Keep support tied to DSH-linked issues instead of a generic root inbox.',
-        primaryDecision: 'Route the issue to order, partner, captain, or field.',
-        nextAction: 'Open dispute resolution if evidence is missing or contested.',
-        blockers: 'Untriaged and unlinked issues still block support closure.',
-        ownerSurface: 'support',
-        evidenceHint: 'linked issue lane and source surface proof',
-        routeHint: '/operations?workspace=issues',
-        decisionTone: 'danger',
-      }}
-      primaryAction={{ label: 'Open issues', href: '/operations?workspace=issues' }}
-      secondaryAction={{ label: 'Open dispute resolution', href: '/operations?workspace=disputes' }}
-      signals={[
-        { id: 'order-issues', title: 'Order issue queue', value: 'Open', description: 'Orders needing support action stay visible.', tone: 'brand' },
-        { id: 'client-lane', title: 'Client lane', value: 'Ready', description: 'Client issue lane stays separated.', tone: 'best' },
-        { id: 'partner-lane', title: 'Partner lane', value: 'Ready', description: 'Partner issue lane stays separated.', tone: 'brand' },
-        { id: 'field-lane', title: 'Field lane', value: 'Ready', description: 'Field issue lane stays separated.', tone: 'warning' },
-      ]}
-    />
+    <Box gap={4}>
+      <ControlPanelDshActionQueue
+        title={title}
+        purpose={purpose}
+        items={items}
+        selectedId={selectedId}
+        onSelect={(id) => setSelectedId(id)}
+        primaryAction={(item) => { setSelectedId(item.id); setNote(`${item.primaryActionLabel}: ${item.title}`); }}
+        secondaryAction={(item) => { setSelectedId(item.id); setNote(`${item.secondaryActionLabel}: ${item.title}`); }}
+        evidenceAction={(item) => { setSelectedId(item.id); setNote(`${item.evidenceActionLabel}: ${item.title}`); }}
+      />
+
+      <ControlPanelDshWorkspaceFrame
+        eyebrow={kind === 'queue' ? 'Support queue' : 'Dispute resolution'}
+        title={title}
+        description="DSH-linked support queue with triage, assignment, and linked surface resolution."
+        badges={['support', kind]}
+        metaItems={[selected?.status ?? 'Open', note]}
+        decisionBoard={{
+          title: `${title} board`,
+          purpose,
+          primaryDecision: selected?.status ?? 'Open',
+          nextAction: note,
+          blockers: selected?.blocker ?? 'Select an issue lane.',
+          ownerSurface: 'support',
+          evidenceHint: selected?.evidence ?? 'linked surface proof',
+          routeHint: '/operations?workspace=issues',
+          decisionTone: kind === 'dispute' ? 'warning' : 'danger',
+        }}
+        primaryAction={{ label: 'Open issues', href: '/operations?workspace=issues' }}
+        secondaryAction={{ label: 'Open evidence', href: '/operations?workspace=evidence' }}
+        signals={[
+          { id: `${kind}-open`, title: 'Open', value: 'Visible', description: 'Open issue lane.', tone: 'warning' },
+          { id: `${kind}-assigned`, title: 'Assigned', value: 'Local', description: 'Assigned owner lane.', tone: 'best' },
+          { id: `${kind}-linked`, title: 'Linked', value: 'Visible', description: 'Linked surface lane.', tone: 'brand' },
+          { id: `${kind}-escalated`, title: 'Escalated', value: 'Tracked', description: 'Escalation lane.', tone: 'danger' },
+        ]}
+      />
+    </Box>
   );
 }
 
+export function ControlPanelDshSupportQueueScreen() {
+  return <SupportQueueBoard title="Cross-surface support queue" purpose="Keep support tied to DSH-linked issues instead of a generic root inbox." kind="queue" />;
+}
+
 export function ControlPanelDshDisputeResolutionScreen() {
-  return (
-    <ControlPanelDshWorkspaceFrame
-      eyebrow="Dispute resolution"
-      title="Dispute lifecycle"
-      description="Evidence, resolution status, and the current step stay visible without any backend mutation."
-      badges={['dispute', 'evidence']}
-      metaItems={['evidence', 'resolution', 'status']}
-      decisionBoard={{
-        title: 'Dispute decision board',
-        purpose: 'Keep the dispute on a DSH-linked context and not a generic support path.',
-        primaryDecision: 'Accept the evidence or send the case back to the owning surface.',
-        nextAction: 'Open the linked support queue when the dispute needs triage.',
-        blockers: 'Missing evidence or unresolved status still blocks closure.',
-        ownerSurface: 'support',
-        evidenceHint: 'dispute evidence and linked resolution state',
-        routeHint: '/operations?workspace=issues',
-        decisionTone: 'warning',
-      }}
-      primaryAction={{ label: 'Open support queue', href: '/operations?workspace=issues' }}
-      secondaryAction={{ label: 'Open governance', href: '/operations?workspace=evidence' }}
-      signals={[
-        { id: 'evidence', title: 'Evidence', value: 'Visible', description: 'Evidence items remain on the surface.', tone: 'brand' },
-        { id: 'resolution', title: 'Resolution status', value: 'Tracked', description: 'Resolution state stays explicit.', tone: 'warning' },
-        { id: 'lifecycle', title: 'Dispute lifecycle', value: 'Open', description: 'Lifecycle progression remains visible.', tone: 'best' },
-      ]}
-    />
-  );
+  return <SupportQueueBoard title="Dispute lifecycle" purpose="Keep the dispute on a DSH-linked context and not a generic support path." kind="dispute" />;
 }
 
 export default ControlPanelDshSupportQueueScreen;

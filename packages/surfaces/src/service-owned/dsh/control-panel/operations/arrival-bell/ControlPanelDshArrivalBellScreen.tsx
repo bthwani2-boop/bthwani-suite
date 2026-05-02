@@ -4,6 +4,7 @@ import React from 'react';
 import {
   useRouter } from 'next/navigation';
 import { Box,
+  Button,
   StateView,
   Text
 } from '@bthwani/ui-kit';
@@ -112,6 +113,8 @@ export function ControlPanelDshArrivalBellScreen({
   const summary = React.useMemo(() => getDshArrivalBellSummary(dshText), [dshText]);
   const captainLane = React.useMemo(() => getDshArrivalBellCaptainLane(dshText), [dshText]);
   const customerLane = React.useMemo(() => getDshArrivalBellCustomerLane(dshText), [dshText]);
+  const [selectedLane, setSelectedLane] = React.useState<'captain' | 'customer'>('captain');
+  const [localNote, setLocalNote] = React.useState('جاهز للاعتراف بالموجة الحالية');
 
   if (state !== 'ready') {
     const stateCopy = resolveStateCopy(dshText, state);
@@ -144,13 +147,27 @@ export function ControlPanelDshArrivalBellScreen({
           title="Arrival bell board"
           purpose="Keep arrival and ring states tied to the notification decision."
           primaryDecision={summary.awaitingAcknowledgement > 0 ? 'Resolve acknowledgement' : 'No pending arrival bell cases'}
-          nextAction={summary.awaitingAcknowledgement > 0 ? 'Open the orders workspace and resolve the ring' : 'Return to operations overview'}
+          nextAction={summary.awaitingAcknowledgement > 0 ? `Acknowledge the ${selectedLane} lane locally` : 'Return to operations overview'}
           blockers={summary.blockedRings > 0 ? 'Blocked rings still need attention.' : 'No active blocker in the bell lane.'}
           ownerSurface="operations"
           evidenceHint="arrival counts, ring timeline, and acknowledgement state"
           routeHint={hubHref}
           decisionTone={summary.blockedRings > 0 ? 'danger' : 'best'}
         />
+
+        <WebSectionCard title="Bell actions" description="Select a lane, acknowledge it locally, or jump to the linked workspace.">
+          <Box gap={2}>
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+              <Button label="Captain lane" tone={selectedLane === 'captain' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setSelectedLane('captain')} />
+              <Button label="Customer lane" tone={selectedLane === 'customer' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setSelectedLane('customer')} />
+              <Button label="Acknowledge locally" tone="primary" fullWidth={false} onPress={() => setLocalNote(`Acknowledged ${selectedLane} lane locally`)} />
+              <Button label="Open blocker" tone="secondary" fullWidth={false} onPress={() => setLocalNote(`Open blocker for ${selectedLane} lane`)} />
+              <Button label="Open orders" tone="ghost" fullWidth={false} onPress={() => router.push(ordersHref)} />
+              <Button label="Open support" tone="ghost" fullWidth={false} onPress={() => router.push(supportHref)} />
+            </Box>
+            <Text role="bodySm" tone="muted">{localNote}</Text>
+          </Box>
+        </WebSectionCard>
 
         <WebMissionHeroCard
           badges={['/operations?workspace=bell', dshText.common.live, `${dshText.arrivalBell.signals.activeArrivals}: ${summary.activeArrivals}`]}

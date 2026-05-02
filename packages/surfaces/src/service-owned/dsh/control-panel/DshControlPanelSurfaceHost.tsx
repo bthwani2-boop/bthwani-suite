@@ -2,10 +2,9 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, useUiText } from '@bthwani/ui-kit';
+import { Box, Button, useUiText } from '@bthwani/ui-kit';
 import { WebControlActionCard, WebControlDisclosureItem, WebMissionHeroCard, WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
 import { ControlPanelDshCatalogApprovalScreen, ControlPanelDshCatalogScreen, ControlPanelDshListingGovernanceScreen } from './catalogs';
-import { ControlPanelDshClosureDashboardScreen, ControlPanelDshClosureEvidenceStream } from './dashboard';
 import { ControlPanelDshGovernanceEvidenceScreen, ControlPanelDshGuardStatusScreen } from './control';
 import { ControlPanelDshFinanceScreen, ControlPanelDshSettlementScreen, ControlPanelDshCodReconciliationScreen, ControlPanelDshRefundQueueScreen } from './finance';
 import { ControlPanelDshMarketingApprovalScreen, ControlPanelDshMarketingScreen, ControlPanelDshVideoSubmissionsReviewScreen } from './marketing';
@@ -18,7 +17,7 @@ import { ControlPanelDshZoneSetScreen } from './operations/zone-set';
 import { ControlPanelDshCaptainOperationsScreen, ControlPanelDshFieldOperationsScreen, ControlPanelDshIssueQueueScreen, ControlPanelDshServiceabilityScreen } from './operations';
 import { ControlPanelDshPartnerActivationScreen, ControlPanelDshPartnerApprovalsScreen, ControlPanelDshPartnerDocumentReviewScreen } from './partners';
 import { ControlPanelDshSupportQueueScreen, ControlPanelDshDisputeResolutionScreen } from './support';
-import { ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, getDshClosureItemsByStatus } from './shared';
+import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, getDshClosureItemsByStatus } from './shared';
 import { useDshControlPanelText } from './operations/shared/dshControlPanelText';
 
 type DshWorkspaceId =
@@ -195,6 +194,104 @@ function OverviewWorkspace() {
   );
 }
 
+function DashboardWorkspace() {
+  const dashboardItems = React.useMemo(() => (
+    DSH_CROSS_SURFACE_CLOSURE_MAP.slice(0, 6).map((item) => {
+      const tone = item.status === 'closed' ? 'best' : item.status === 'blocked' ? 'danger' : 'warning';
+      return {
+        id: `${item.surfaceId}-${item.area}`,
+        title: `${item.surfaceId} / ${item.title}`,
+        status: item.status.toUpperCase(),
+        ownerSurface: item.surfaceId,
+        blocker: item.description,
+        evidence: item.routeHint,
+        primaryActionLabel: 'Mark reviewed locally',
+        secondaryActionLabel: 'Open blocker',
+        evidenceActionLabel: 'Open evidence',
+        tone,
+      };
+    })
+  ), []);
+  const [selectedItemId, setSelectedItemId] = React.useState(dashboardItems[0]?.id ?? null);
+  const [reviewedIds, setReviewedIds] = React.useState<ReadonlySet<string>>(new Set());
+  const [filter, setFilter] = React.useState<'all' | 'open' | 'blocked'>('all');
+
+  const selectedItems = dashboardItems.filter((item) => {
+    if (filter === 'blocked') {
+      return item.tone === 'danger';
+    }
+    if (filter === 'open') {
+      return item.tone !== 'danger';
+    }
+    return true;
+  });
+  const selectedItem = selectedItems.find((item) => item.id === selectedItemId) ?? selectedItems[0] ?? dashboardItems[0];
+  const reviewedCount = reviewedIds.size;
+
+  return (
+    <Box gap={4}>
+      <ControlPanelDshWorkspaceFrame
+        eyebrow="Dashboard"
+        title="Actionable closure dashboard"
+        description="A compact local control room for evidence routing, blocker review, and reviewed-state transitions."
+        badges={['dashboard', 'closure']}
+        metaItems={[`${reviewedCount} reviewed locally`, `${selectedItems.length} visible rows`]}
+        decisionBoard={{
+          title: 'Dashboard decision board',
+          purpose: 'Keep closure rows selectable and routeable instead of leaving the dashboard as a read-only summary.',
+          primaryDecision: selectedItem ? selectedItem.status : 'Review the dashboard rows',
+          nextAction: filter === 'blocked' ? 'Open blocker or evidence for the selected row.' : 'Mark the selected row reviewed locally.',
+          blockers: selectedItem?.blocker ?? 'Select a dashboard row.',
+          ownerSurface: 'control',
+          evidenceHint: selectedItem?.evidence ?? 'dashboard evidence rows',
+          routeHint: '/operations?workspace=evidence',
+          decisionTone: filter === 'blocked' ? 'danger' : 'warning',
+        }}
+        primaryAction={{ label: 'Open evidence', href: '/operations?workspace=evidence' }}
+        secondaryAction={{ label: 'Open guard status', href: '/operations?workspace=guard-status' }}
+        signals={[
+          { id: 'reviewed', title: 'Reviewed locally', value: String(reviewedCount), description: 'Rows already acknowledged in this surface.', tone: 'best' },
+          { id: 'open', title: 'Open rows', value: String(selectedItems.length), description: 'Selectable closure rows visible now.', tone: 'warning' },
+          { id: 'blocked', title: 'Blocked rows', value: String(DASHBOARD_BLOCKED_COUNT), description: 'Rows that still need blocker attention.', tone: 'danger' },
+        ]}
+      />
+
+      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+        <Button label="All" tone={filter === 'all' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setFilter('all')} />
+        <Button label="Open" tone={filter === 'open' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setFilter('open')} />
+        <Button label="Blocked" tone={filter === 'blocked' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setFilter('blocked')} />
+      </Box>
+
+      <ControlPanelDshActionQueue
+        title="Dashboard evidence queue"
+        purpose="Mark a closure row locally, jump to its blocker, or open the evidence lane."
+        items={selectedItems}
+        selectedId={selectedItemId}
+        onSelect={setSelectedItemId}
+        primaryAction={(item) => setReviewedIds((current) => new Set([...current, item.id]))}
+        secondaryAction={(item) => {
+          setSelectedItemId(item.id);
+          setFilter('blocked');
+        }}
+        evidenceAction={(item) => {
+          setSelectedItemId(item.id);
+          setFilter('open');
+        }}
+      />
+
+      <WebSectionCard title="Route evidence" description="Use direct links for the workspaces that still need a handoff.">
+        <Box gap={2}>
+          <WebControlDisclosureItem id="guard-status" label="Guard status" description="PASS/WARN/BLOCKED rows and local review state." href="/operations?workspace=guard-status" />
+          <WebControlDisclosureItem id="evidence" label="Evidence stream" description="The closure evidence lane for surfaces and route proof." href="/operations?workspace=evidence" />
+          <WebControlDisclosureItem id="orders" label="Orders" description="The operational queue for the selected order." href="/operations?workspace=orders" />
+        </Box>
+      </WebSectionCard>
+    </Box>
+  );
+}
+
+const DASHBOARD_BLOCKED_COUNT = getDshClosureItemsByStatus('blocked').length;
+
 function renderWorkspace(workspace: DshWorkspaceId, orderId?: string, orderOverlayMode?: 'detail' | 'chat') {
   const normalizedWorkspace = normalizeWorkspace(workspace);
 
@@ -202,12 +299,7 @@ function renderWorkspace(workspace: DshWorkspaceId, orderId?: string, orderOverl
     case 'overview':
       return <OverviewWorkspace />;
     case 'dashboard':
-      return (
-        <Box gap={4}>
-          <ControlPanelDshClosureDashboardScreen />
-          <ControlPanelDshClosureEvidenceStream />
-        </Box>
-      );
+      return <DashboardWorkspace />;
     case 'captain-ops':
       return <ControlPanelDshCaptainOperationsScreen />;
     case 'field-ops':

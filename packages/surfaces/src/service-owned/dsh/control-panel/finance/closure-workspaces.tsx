@@ -1,124 +1,142 @@
 import React from 'react';
-import { ControlPanelDshWorkspaceFrame } from '../shared';
+import { Box } from '@bthwani/ui-kit';
+import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../shared';
+
+type FinanceStatus = 'Payable' | 'Pending' | 'Blocked' | 'Disputed';
+
+type FinanceQueueKind = 'settlement' | 'cod' | 'refund';
+
+function buildFinanceRows(kind: FinanceQueueKind) {
+  const labels: readonly FinanceStatus[] = ['Payable', 'Pending', 'Blocked', 'Disputed'];
+  return labels.map((status) => ({
+    id: `${kind}-${status.toLowerCase()}`,
+    title: `${status} ${kind}`,
+    status,
+    ownerSurface: 'finance',
+    blocker:
+      status === 'Payable'
+        ? 'Ready to release after review.'
+        : status === 'Pending'
+          ? 'Needs evidence before release.'
+          : status === 'Blocked'
+            ? 'Blocker or mismatch must be resolved.'
+            : 'Dispute requires a local decision.',
+    evidence: `${kind} ledger row and exception proof`,
+    primaryActionLabel: status === 'Blocked' ? 'Dispute' : 'Release',
+    secondaryActionLabel: status === 'Pending' ? 'Hold' : 'Open blocker',
+    evidenceActionLabel: kind === 'refund' ? 'Open refund case' : 'Open evidence',
+    tone: status === 'Payable' ? 'best' : status === 'Blocked' ? 'danger' : 'warning',
+  })) as const;
+}
+
+function FinanceQueueBoard({
+  title,
+  purpose,
+  kind,
+  onActionLabel,
+}: {
+  title: string;
+  purpose: string;
+  kind: FinanceQueueKind;
+  onActionLabel: string;
+}) {
+  const items = buildFinanceRows(kind);
+  const [selectedId, setSelectedId] = React.useState(items[0]?.id ?? null);
+  const [statusNote, setStatusNote] = React.useState(onActionLabel);
+  const selectedItem = items.find((item) => item.id === selectedId) ?? items[0];
+
+  return (
+    <Box gap={4}>
+      <ControlPanelDshActionQueue
+        title={title}
+        purpose={purpose}
+        items={items}
+        selectedId={selectedId}
+        onSelect={(id) => setSelectedId(id)}
+        primaryAction={(item) => {
+          setSelectedId(item.id);
+          setStatusNote(`${item.primaryActionLabel}: ${item.title}`);
+        }}
+        secondaryAction={(item) => {
+          setSelectedId(item.id);
+          setStatusNote(`${item.secondaryActionLabel}: ${item.title}`);
+        }}
+        evidenceAction={(item) => {
+          setSelectedId(item.id);
+          setStatusNote(`${item.evidenceActionLabel}: ${item.title}`);
+        }}
+      />
+
+      <ControlPanelDshWorkspaceFrame
+        eyebrow={kind.toUpperCase()}
+        title={title}
+        description="Queue-based finance control room with local release, hold, dispute, and evidence actions."
+        badges={['finance', kind]}
+        metaItems={[selectedItem?.status ?? 'Pending', statusNote]}
+        decisionBoard={{
+          title: `${title} board`,
+          purpose,
+          primaryDecision: selectedItem?.status ?? 'Pending',
+          nextAction: statusNote,
+          blockers: selectedItem?.blocker ?? 'Select a finance row.',
+          ownerSurface: 'finance',
+          evidenceHint: selectedItem?.evidence ?? 'finance row evidence',
+          routeHint: '/operations?workspace=finance',
+          decisionTone: selectedItem?.tone,
+        }}
+        primaryAction={{ label: 'Open evidence', href: '/operations?workspace=evidence' }}
+        secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
+        signals={[
+          { id: `${kind}-payable`, title: 'Payable', value: 'Ready', description: 'Release candidate.', tone: 'best' },
+          { id: `${kind}-pending`, title: 'Pending', value: 'Open', description: 'Needs review.', tone: 'warning' },
+          { id: `${kind}-blocked`, title: 'Blocked', value: 'Visible', description: 'Needs blocker review.', tone: 'danger' },
+          { id: `${kind}-disputed`, title: 'Disputed', value: 'Tracked', description: 'Needs exception handling.', tone: 'warning' },
+        ]}
+      />
+    </Box>
+  );
+}
 
 export function ControlPanelDshFinanceScreen() {
   return (
-    <ControlPanelDshWorkspaceFrame
-      eyebrow="Finance"
+    <FinanceQueueBoard
       title="DSH finance overview"
-      description="Partner settlement summary, captain settlement summary, COD reconciliation, refund queue, and commission visibility."
-      badges={['finance', 'settlement']}
-      metaItems={['partner settlement', 'captain settlement', 'cod reconciliation', 'refund queue']}
-      decisionBoard={{
-        title: 'Finance decision board',
-        purpose: 'Separate payable, pending, blocked, and disputed amounts in one read.',
-        primaryDecision: 'Release, hold, or dispute the payout lane.',
-        nextAction: 'Open settlements, COD, or refunds based on the selected risk.',
-        blockers: 'Pending refunds and payout exceptions still block final closure.',
-        ownerSurface: 'finance',
-        evidenceHint: 'settlement summary, COD reconciliation, and refund queue',
-        routeHint: '/operations?workspace=finance',
-        decisionTone: 'warning',
-      }}
-      primaryAction={{ label: 'Open settlements', href: '/operations?workspace=settlements' }}
-      secondaryAction={{ label: 'Open COD', href: '/operations?workspace=cod' }}
-      signals={[
-        { id: 'partner-settlement', title: 'Partner settlement', value: 'Ready', description: 'Settlement summary is visible.', tone: 'brand' },
-        { id: 'captain-settlement', title: 'Captain settlement', value: 'Ready', description: 'Captain payout summary is visible.', tone: 'brand' },
-        { id: 'cod-reconciliation', title: 'COD reconciliation', value: 'Visible', description: 'Collected and pending amounts stay explicit.', tone: 'warning' },
-        { id: 'refund-queue', title: 'Refund queue', value: 'Open', description: 'Refund work items remain in view.', tone: 'warning' },
-      ]}
+      purpose="Separate payable, pending, blocked, and disputed amounts in one read."
+      kind="settlement"
+      onActionLabel="Open settlement lane"
     />
   );
 }
 
 export function ControlPanelDshSettlementScreen() {
   return (
-    <ControlPanelDshWorkspaceFrame
-      eyebrow="Settlement"
+    <FinanceQueueBoard
       title="Partner and captain settlement"
-      description="Pending, approved, and blocked payouts stay visible without runtime mutation."
-      badges={['settlement']}
-      metaItems={['pending', 'approved', 'blocked']}
-      decisionBoard={{
-        title: 'Settlement decision board',
-        purpose: 'Keep partner and captain payout visibility operational, not just summarized.',
-        primaryDecision: 'Payable, pending, blocked, or disputed.',
-        nextAction: 'Open refunds if a payout is disputed or blocked.',
-        blockers: 'Unresolved payout blocks and disputed entries remain visible.',
-        ownerSurface: 'finance',
-        evidenceHint: 'payout visibility and settlement status proof',
-        routeHint: '/operations?workspace=settlements',
-        decisionTone: 'brand',
-      }}
-      primaryAction={{ label: 'Open finance', href: '/operations?workspace=finance' }}
-      secondaryAction={{ label: 'Open refunds', href: '/operations?workspace=refunds' }}
-      signals={[
-        { id: 'partner-payouts', title: 'Partner payouts', value: 'Pending', description: 'Partner payout queue state.', tone: 'brand' },
-        { id: 'captain-payouts', title: 'Captain payouts', value: 'Pending', description: 'Captain payout queue state.', tone: 'brand' },
-        { id: 'approved', title: 'Approved', value: 'Visible', description: 'Approved payout entries remain explicit.', tone: 'best' },
-        { id: 'blocked', title: 'Blocked', value: 'Visible', description: 'Blocked payout items remain obvious.', tone: 'warning' },
-      ]}
+      purpose="Keep partner and captain payout visibility operational, not just summarized."
+      kind="settlement"
+      onActionLabel="Open settlement lane"
     />
   );
 }
 
 export function ControlPanelDshCodReconciliationScreen() {
   return (
-    <ControlPanelDshWorkspaceFrame
-      eyebrow="COD"
+    <FinanceQueueBoard
       title="COD reconciliation"
-      description="Collected, pending, and exception states stay on the surface before settlement."
-      badges={['cod', 'reconciliation']}
-      metaItems={['collected', 'pending', 'exceptions']}
-      decisionBoard={{
-        title: 'COD reconciliation board',
-        purpose: 'Keep collected and pending COD in a single operational read.',
-        primaryDecision: 'Clear cash collection or hold it for exception review.',
-        nextAction: 'Open refunds when COD mismatches land in the exception lane.',
-        blockers: 'Pending cash and mismatch exceptions need a decision.',
-        ownerSurface: 'finance',
-        evidenceHint: 'COD totals, exception rows, and payout handoff',
-        routeHint: '/operations?workspace=cod',
-        decisionTone: 'warning',
-      }}
-      primaryAction={{ label: 'Open finance', href: '/operations?workspace=finance' }}
-      secondaryAction={{ label: 'Open refund queue', href: '/operations?workspace=refunds' }}
-      signals={[
-        { id: 'collected', title: 'COD collected', value: 'Visible', description: 'Collected COD totals stay obvious.', tone: 'best' },
-        { id: 'pending', title: 'COD pending', value: 'Visible', description: 'Pending COD amounts remain explicit.', tone: 'warning' },
-        { id: 'exceptions', title: 'Exceptions', value: 'Summarized', description: 'Exception review remains in the control room.', tone: 'warning' },
-      ]}
+      purpose="Keep collected and pending COD in a single operational read."
+      kind="cod"
+      onActionLabel="Review COD exception"
     />
   );
 }
 
 export function ControlPanelDshRefundQueueScreen() {
   return (
-    <ControlPanelDshWorkspaceFrame
-      eyebrow="Refund queue"
+    <FinanceQueueBoard
       title="Refund handling"
-      description="Pending, refunded, and rejected entries stay visible for control-room review."
-      badges={['refunds']}
-      metaItems={['pending', 'refunded', 'rejected']}
-      decisionBoard={{
-        title: 'Refund decision board',
-        purpose: 'Keep refund handling readable when items move between pending, refunded, and rejected.',
-        primaryDecision: 'Refund, dispute, or reject with evidence.',
-        nextAction: 'Open COD for the source transaction or open finance for payout context.',
-        blockers: 'Pending refund proof and rejected dispute states still block closure.',
-        ownerSurface: 'finance',
-        evidenceHint: 'refund queue and COD linkage',
-        routeHint: '/operations?workspace=refunds',
-        decisionTone: 'danger',
-      }}
-      primaryAction={{ label: 'Open COD', href: '/operations?workspace=cod' }}
-      secondaryAction={{ label: 'Open finance', href: '/operations?workspace=finance' }}
-      signals={[
-        { id: 'refund-pending', title: 'Refund pending', value: 'Open', description: 'Pending refund items remain visible.', tone: 'warning' },
-        { id: 'refunded', title: 'Refunded', value: 'Visible', description: 'Completed refunds are summarized.', tone: 'best' },
-        { id: 'rejected', title: 'Rejected', value: 'Visible', description: 'Rejected or disputed refunds stay legible.', tone: 'danger' },
-      ]}
+      purpose="Keep refund handling readable when items move between pending, refunded, and rejected."
+      kind="refund"
+      onActionLabel="Open refund case"
     />
   );
 }

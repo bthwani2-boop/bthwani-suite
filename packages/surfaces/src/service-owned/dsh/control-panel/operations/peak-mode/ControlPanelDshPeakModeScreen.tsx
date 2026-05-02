@@ -4,6 +4,7 @@ import React from 'react';
 import {
   useRouter } from 'next/navigation';
 import { Box,
+  Button,
   StateView,
   Text
 } from '@bthwani/ui-kit';
@@ -91,6 +92,8 @@ export function ControlPanelDshPeakModeScreen({
   const summary = React.useMemo(() => getDshPeakModeSummary(dshText), [dshText]);
   const policies = React.useMemo(() => getDshPeakModePolicies(dshText), [dshText]);
   const lanes = React.useMemo(() => getDshPeakModePressureLanes(dshText), [dshText]);
+  const [mode, setMode] = React.useState<'hold' | 'absorb' | 'protect'>('hold');
+  const [localNote, setLocalNote] = React.useState('Peak lane is ready for a local decision');
 
   if (state !== 'ready') {
     const stateCopy = resolveStateCopy(dshText, state);
@@ -123,13 +126,26 @@ export function ControlPanelDshPeakModeScreen({
           title="Peak mode board"
           purpose="Keep pressure zones and protected queues visible for the active decision."
           primaryDecision={summary.pressureZones > 0 ? 'Adjust capacity or hold the lane' : 'Hold the current routing posture'}
-          nextAction={summary.pressureZones > 0 ? 'Open policies or orders to absorb pressure' : 'Stay on the current routing posture'}
+          nextAction={summary.pressureZones > 0 ? `Activate ${mode} locally or open orders` : `Keep the ${mode} posture in place`}
           blockers={summary.protectedQueues > 0 ? 'Protected queues still need special handling.' : 'No active blocker in peak mode.'}
           ownerSurface="operations"
           evidenceHint="pressure-zone counts, policies, and lane recommendations"
           routeHint={hubHref}
           decisionTone={summary.pressureZones > 0 ? 'warning' : 'best'}
         />
+
+        <WebSectionCard title="Peak mode actions" description="Flip the local mode, hold capacity, or open the linked blocker path.">
+          <Box gap={2}>
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+              <Button label="Hold" tone={mode === 'hold' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setMode('hold')} />
+              <Button label="Absorb" tone={mode === 'absorb' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setMode('absorb')} />
+              <Button label="Protect" tone={mode === 'protect' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setMode('protect')} />
+              <Button label="Activate local mode" tone="primary" fullWidth={false} onPress={() => setLocalNote(`Activated ${mode} mode locally`)} />
+              <Button label="Open blocker" tone="secondary" fullWidth={false} onPress={() => setLocalNote(`Open blocker for ${mode} mode`)} />
+            </Box>
+            <Text role="bodySm" tone="muted">{localNote}</Text>
+          </Box>
+        </WebSectionCard>
 
         <WebMissionHeroCard
           badges={['/operations?workspace=peak-mode', dshText.common.live, `${dshText.peakMode.signals.pressureZones}: ${summary.pressureZones}`]}
