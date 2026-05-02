@@ -3,23 +3,38 @@ import { useDirection } from '../providers';
 
 const webControlSurfaceCss = `
 .ui-web-control-surface-header {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 18px;
-  padding: 22px;
-  border-radius: 22px;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 16px;
   border: 1px solid rgba(10, 47, 92, 0.08);
   background:
-    linear-gradient(135deg, rgba(10, 47, 92, 0.06) 0%, rgba(255, 80, 13, 0.045) 100%),
+    radial-gradient(circle at top right, rgba(255, 80, 13, 0.09), transparent 24%),
+    linear-gradient(135deg, rgba(10, 47, 92, 0.08) 0%, rgba(255, 80, 13, 0.055) 58%, rgba(255, 255, 255, 0.96) 100%),
     #ffffff;
-  box-shadow: 0 18px 36px rgba(10, 47, 92, 0.06);
+  box-shadow: 0 10px 24px rgba(10, 47, 92, 0.05);
   text-align: start;
+  overflow: hidden;
+}
+
+.ui-web-control-surface-header::after {
+  content: '';
+  position: absolute;
+  inset: auto auto -22% -4%;
+  width: 44%;
+  height: 58%;
+  background: radial-gradient(circle, rgba(10, 47, 92, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
 }
 .ui-web-control-surface-header__main {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
   flex: 1;
 }
@@ -33,10 +48,10 @@ const webControlSurfaceCss = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 10px;
+  padding: 7px 11px;
   border-radius: 999px;
   border: 1px solid rgba(10, 47, 92, 0.1);
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.9);
   color: #0A2F5C;
   font-size: 12px;
   font-weight: 800;
@@ -52,16 +67,18 @@ const webControlSurfaceCss = `
 }
 .ui-web-control-surface-header__title {
   margin: 0;
-  color: #0A2F5C;
-  font-size: clamp(28px, 3vw, 38px);
-  line-height: 1.08;
+  color: #08284f;
+  font-size: 28px;
+  line-height: 1.12;
   font-weight: 900;
+  letter-spacing: 0;
+  max-width: 22ch;
 }
 .ui-web-control-surface-header__description {
-  max-width: 62ch;
-  color: #475569;
+  max-width: 64ch;
+  color: #4a6078;
   font-size: 14px;
-  line-height: 1.8;
+  line-height: 1.85;
 }
 .ui-web-control-surface-header__actions {
   display: flex;
@@ -76,11 +93,11 @@ const webControlSurfaceCss = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  padding: 0 18px;
+  min-height: 40px;
+  padding: 0 14px;
   border-radius: 999px;
   border: 1px solid rgba(10, 47, 92, 0.12);
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8fb 100%);
   color: #0A2F5C;
   text-decoration: none;
   font: inherit;
@@ -96,37 +113,38 @@ const webControlSurfaceCss = `
 }
 .ui-web-control-action-button--primary {
   border-color: #FF500D;
-  background: #FF500D;
+  background: linear-gradient(135deg, #ff6a2f 0%, #FF500D 58%, #e94900 100%);
   color: #ffffff;
-  box-shadow: 0 12px 24px rgba(255, 80, 13, 0.18);
+  box-shadow: 0 8px 18px rgba(255, 80, 13, 0.18);
 }
 .ui-web-control-action-button--secondary {
   border-color: rgba(10, 47, 92, 0.12);
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8fb 100%);
 }
 .ui-web-control-action-card {
   appearance: none;
   box-sizing: border-box;
   display: grid;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   min-width: 0;
-  min-height: 144px;
-  padding: 14px;
-  border-radius: 18px;
-  border: 1px solid rgba(10, 47, 92, 0.1);
-  background: linear-gradient(180deg, #ffffff 0%, rgba(10, 47, 92, 0.02) 100%);
+  min-height: 128px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(243, 247, 251, 0.96) 100%);
   color: inherit;
   text-decoration: none;
   font: inherit;
   cursor: pointer;
   text-align: start;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  box-shadow: 0 6px 16px rgba(10, 47, 92, 0.04);
 }
 .ui-web-control-action-card--primary {
   border-color: rgba(255, 80, 13, 0.22);
-  background: linear-gradient(180deg, rgba(255, 244, 237, 0.95) 0%, #ffffff 100%);
-  box-shadow: 0 10px 24px rgba(255, 80, 13, 0.08);
+  background: linear-gradient(180deg, rgba(255, 244, 237, 0.98) 0%, #ffffff 100%);
+  box-shadow: 0 8px 18px rgba(255, 80, 13, 0.1);
 }
 
 .ui-web-control-action-card__top {
@@ -137,18 +155,19 @@ const webControlSurfaceCss = `
 }
 .ui-web-control-action-card__title {
   color: #0A2F5C;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
+  letter-spacing: 0;
 }
 .ui-web-control-action-card__badge,
 .ui-web-control-disclosure-item__badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 8px;
+  padding: 5px 8px;
   border-radius: 999px;
   border: 1px solid rgba(255, 80, 13, 0.16);
-  background: rgba(255, 80, 13, 0.08);
+  background: linear-gradient(180deg, rgba(255, 239, 231, 0.98) 0%, rgba(255, 226, 211, 0.94) 100%);
   color: #FF500D;
   font-size: 11px;
   font-weight: 800;
@@ -156,9 +175,9 @@ const webControlSurfaceCss = `
 }
 .ui-web-control-action-card__description {
   margin: 0;
-  color: #475569;
+  color: #4d637b;
   font-size: 13px;
-  line-height: 1.7;
+  line-height: 1.8;
 }
 .ui-web-control-action-card__footer {
   display: flex;
@@ -166,9 +185,9 @@ const webControlSurfaceCss = `
   justify-content: space-between;
   gap: 8px;
   margin-top: auto;
-  color: #64748b;
+  color: #5f7389;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
 }
 .ui-web-control-action-card__footer-arrow {
   color: #FF500D;
@@ -184,15 +203,16 @@ const webControlSurfaceCss = `
   width: 100%;
   min-width: 0;
   padding: 12px;
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid rgba(10, 47, 92, 0.08);
-  background: rgba(10, 47, 92, 0.02);
+  background: linear-gradient(180deg, rgba(247, 250, 252, 0.98) 0%, rgba(242, 246, 250, 0.94) 100%);
   color: inherit;
   text-decoration: none;
   font: inherit;
   cursor: pointer;
   text-align: start;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
 }
 .ui-web-control-disclosure-item__text {
   display: grid;
@@ -202,17 +222,17 @@ const webControlSurfaceCss = `
 .ui-web-control-disclosure-item__label {
   color: #0A2F5C;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 900;
 }
 .ui-web-control-disclosure-item__description {
   color: #64748b;
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 @media (max-width: 640px) {
   .ui-web-control-surface-header {
-    padding: 16px;
+    padding: 14px;
   }
 
   .ui-web-control-surface-header__actions {

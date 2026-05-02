@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function DshArrivalBellPage() {
-  redirect('/operations/dsh/bell');
+  redirect('/operations?workspace=bell');
 }

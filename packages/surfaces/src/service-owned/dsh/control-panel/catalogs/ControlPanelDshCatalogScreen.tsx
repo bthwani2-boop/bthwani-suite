@@ -15,10 +15,10 @@ export type ControlPanelDshCatalogScreenProps = {
 };
 
 export function ControlPanelDshCatalogScreen({
-  hubHref = '/operations/dsh',
+  hubHref = '/operations',
   operationsHref = '/operations',
-  partnersHref = '/operations/dsh/partners',
-  marketingHref = '/operations/dsh/marketing',
+  partnersHref = '/operations?workspace=partners',
+  marketingHref = '/operations?workspace=marketing',
 }: ControlPanelDshCatalogScreenProps) {
   const router = useRouter();
 

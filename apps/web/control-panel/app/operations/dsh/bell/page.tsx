@@ -1,5 +1,5 @@
-import { DshControlPanelSurfaceHost } from '@bthwani/app-shells/web/control-panel';
+import { redirect } from 'next/navigation';
 
 export default function DshBellPage() {
-  return <DshControlPanelSurfaceHost workspace="bell" />;
+  redirect('/operations?workspace=bell');
 }

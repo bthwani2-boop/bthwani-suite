@@ -79,8 +79,8 @@ export type ControlPanelDshZoneSetScreenProps = {
 
 export function ControlPanelDshZoneSetScreen({
   state = 'ready',
-  hubHref = '/operations/dsh',
-  ordersHref = '/operations/dsh/orders',
+  hubHref = '/operations',
+  ordersHref = '/operations?workspace=orders',
   supportHref = '/support',
   embedded = false,
   showHeader = true,
@@ -119,7 +119,7 @@ export function ControlPanelDshZoneSetScreen({
     >
       <div className={styles.stack}>
         <WebMissionHeroCard
-          badges={['/operations/dsh/zone-set', dshText.common.live, `${dshText.zoneSet.signals.reviewZones}: ${summary.reviewZones}`]}
+          badges={['/operations?workspace=zone-set', dshText.common.live, `${dshText.zoneSet.signals.reviewZones}: ${summary.reviewZones}`]}
           eyebrow={dshText.zoneSet.heroEyebrow}
           title={dshText.zoneSet.heroTitle}
           description={dshText.zoneSet.heroDescription}

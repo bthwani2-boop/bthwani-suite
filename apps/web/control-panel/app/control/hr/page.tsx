@@ -1,5 +1,5 @@
-import ControlPanelSurfaceHost from '@bthwani/app-shells/web/control-panel/web-entry';
+import { redirect } from 'next/navigation';
 
 export default function ControlHrPage() {
-  return <ControlPanelSurfaceHost section="control" subsection="hr" />;
+  redirect('/control?tab=hr');
 }

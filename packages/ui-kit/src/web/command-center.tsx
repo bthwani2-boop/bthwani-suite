@@ -3,16 +3,18 @@ import { useDirection, useUiLanguage, useUiText } from '../providers';
 
 const webCommandCenterCss = `
 .ui-web-command-center-root {
-  --rail-width: 288px;
+  --rail-width: 292px;
+  --bth-shell-line: rgba(10, 47, 92, 0.1);
   display: grid;
-  gap: 20px;
+  gap: 14px;
   align-content: start;
   min-height: 100vh;
   box-sizing: border-box;
   width: 100%;
   margin: 0;
-  padding: 12px 16px;
-  background: var(--bth-surface, #ffffff) !important;
+  padding: 12px 14px 18px;
+  background:
+    linear-gradient(180deg, #f7f9fc 0%, #eef3f8 100%) !important;
   color: var(--bth-text);
 }
 
@@ -21,16 +23,18 @@ const webCommandCenterCss = `
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  background: var(--bth-surface, #ffffff) !important;
-  box-shadow: none !important;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--bth-shell-line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(246, 249, 252, 0.94) 100%),
+    var(--bth-surface, #ffffff) !important;
+  box-shadow: 0 8px 22px rgba(10, 47, 92, 0.05) !important;
   flex-wrap: wrap;
   position: sticky;
   top: 12px;
   z-index: 30;
-  backdrop-filter: none !important;
+  backdrop-filter: blur(12px) saturate(110%);
 }
 .ui-web-command-strip__top-row,
 .ui-web-command-strip__secondary-row,
@@ -72,14 +76,14 @@ const webCommandCenterCss = `
 .ui-web-command-strip__language,
 .ui-web-command-strip__alert,
 .ui-web-rail-service-list__item {
-  border: 1px solid rgba(10, 47, 92, 0.14);
-  background: #ffffff;
+  border: 1px solid var(--bth-shell-line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 249, 252, 0.9) 100%);
   border-radius: 999px;
   padding: 10px 14px;
   font: inherit;
   color: #0A2F5C;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
 
 .ui-web-command-strip__pill:hover,
@@ -90,23 +94,32 @@ const webCommandCenterCss = `
 .ui-web-command-strip__alert:hover {
   border-color: #FF500D;
   transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(10, 47, 92, 0.08);
 }
 
 .ui-web-command-strip__brand {
-  background: #FF500D;
+  background: linear-gradient(135deg, #ff6a2f 0%, #FF500D 58%, #e94900 100%);
   color: #ffffff;
   border-color: #FF500D;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0;
+  box-shadow: 0 16px 30px rgba(255, 80, 13, 0.24);
 }
 
 .ui-web-command-strip__brand:hover {
-  background: #E64A00;
+  background: linear-gradient(135deg, #ff7340 0%, #FF500D 58%, #db4600 100%);
   border-color: #E64A00;
   transform: translateY(-1px);
 }
 
+.ui-web-command-strip__alert {
+  min-width: 48px;
+  justify-content: center;
+  font-weight: 800;
+}
+
 .ui-web-command-strip__search {
-  min-width: 240px;
+  min-width: 220px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -132,8 +145,9 @@ const webCommandCenterCss = `
 .ui-web-command-strip__filter-chip--active,
 .ui-web-rail-service-list__item--active {
   border-color: #FF500D;
-  background: #FFF4ED;
+  background: linear-gradient(180deg, #fff4ed 0%, #ffe9de 100%);
   color: #0A2F5C;
+  box-shadow: inset 0 0 0 1px rgba(255, 80, 13, 0.08);
 }
 
   .ui-web-command-strip__filter-meta,
@@ -177,7 +191,7 @@ const webCommandCenterCss = `
 
   .ui-web-command-center__workspace {
     display: grid;
-    gap: 24px;
+    gap: 14px;
     align-items: stretch;
     min-height: calc(100vh - 116px);
     direction: ltr;
@@ -211,12 +225,11 @@ const webCommandCenterCss = `
     min-width: 0;
     align-content: start;
     min-height: calc(100vh - 132px);
-    /* allow stage to size naturally and be the single vertical scroller */
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
     padding-inline-end: 6px;
-    margin: 0; /* reset any external margins so grid sizing controls layout */
+    margin: 0;
   }
 
   .ui-web-command-center__rail {
@@ -244,25 +257,25 @@ const webCommandCenterCss = `
     direction: ltr;
   }
 
-  /* Desktop: keep the rail in-flow using sticky positioning inside the reserved grid column
-     so it doesn't overlay the stage content. On narrow screens it becomes static below the stage. */
   .ui-web-command-center__rail {
     position: sticky;
-    top: 84px;
+    top: 78px;
     align-self: start;
-    padding: 16px;
-    border-radius: 16px;
-    border: 1px solid rgba(10, 47, 92, 0.08);
-    background: var(--bth-surface);
-    box-shadow: 0 4px 12px rgba(10, 47, 92, 0.03);
-    backdrop-filter: none;
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid var(--bth-shell-line);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(244, 248, 252, 0.95) 100%),
+      var(--bth-surface);
+    box-shadow: 0 10px 24px rgba(10, 47, 92, 0.05);
+    backdrop-filter: blur(12px) saturate(110%);
     width: var(--rail-width);
     overflow: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
     transition: width 180ms ease;
     z-index: 40;
-    height: calc(100vh - 104px);
+    height: calc(100vh - 96px);
   }
 
   @media (max-width: 900px) {
@@ -277,7 +290,6 @@ const webCommandCenterCss = `
     }
   }
 
-  /* Layout grid ordering: place rail on visual end depending on direction */
   .ui-web-command-center-root[dir="rtl"] .ui-web-command-center__workspace {
     grid-template-columns: minmax(0, 1fr) var(--rail-width);
     grid-template-areas: "stage rail";
@@ -305,7 +317,6 @@ const webCommandCenterCss = `
     display: none;
   }
 
-  /* No manual stage margin required; grid reserves the rail column to avoid jumps */
   .ui-web-command-center-root[dir="rtl"] .ui-web-command-center__stage {
     margin: 0;
   }
@@ -319,13 +330,14 @@ const webCommandCenterCss = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
     margin-inline-end: 8px;
-    background: transparent;
+    background: linear-gradient(180deg, rgba(10, 47, 92, 0.08) 0%, rgba(10, 47, 92, 0.02) 100%);
     color: #0A2F5C;
-    font-weight: 700;
+    font-weight: 800;
+    box-shadow: inset 0 0 0 1px rgba(10, 47, 92, 0.04);
   }
 
   .ui-web-command-center-root[data-rail-collapsed="1"] .ui-web-command-center__rail-item::before {
@@ -345,48 +357,51 @@ const webCommandCenterCss = `
     margin: 0;
     font-size: 15px;
     color: #0A2F5C;
-    font-weight: 800;
-    letter-spacing: -0.2px;
+    font-weight: 900;
+    letter-spacing: 0;
   }
 
   .ui-web-command-center__rail-status {
-    font-size: 11px;
+    font-size: 12px;
     color: #64748b;
-    font-weight: 700;
+    font-weight: 800;
     background: rgba(10, 47, 92, 0.04);
-    padding: 4px 10px;
+    padding: 6px 10px;
     border-radius: 999px;
   }
 
   .ui-web-command-center__rail-nav {
     display: grid;
-    gap: 10px;
+    gap: 8px;
   }
 
   .ui-web-command-center__rail-item {
     display: grid;
     gap: 4px;
     text-align: start;
-    border-radius: 18px;
-    border: 1px solid rgba(10, 47, 92, 0.1);
-    background: #ffffff;
-    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(10, 47, 92, 0.08);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 248, 252, 0.94) 100%);
+    padding: 10px;
     cursor: pointer;
-    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
   }
 
   .ui-web-command-center__rail-item:hover {
     border-color: rgba(255, 80, 13, 0.3);
     transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(10, 47, 92, 0.05);
   }
 
   .ui-web-command-center__rail-item--active {
     border-color: #FF500D;
-    background: #FFF4ED;
+    background: linear-gradient(180deg, rgba(255, 244, 237, 0.98) 0%, rgba(255, 235, 224, 0.92) 100%);
+    box-shadow: 0 8px 18px rgba(255, 80, 13, 0.1);
   }
 
   .ui-web-command-center__rail-item-title {
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 900;
     color: #0A2F5C;
   }
 
@@ -400,12 +415,12 @@ const webCommandCenterCss = `
   .ui-web-command-center__rail-badge {
     display: inline-flex;
     align-self: flex-start;
-    padding: 4px 8px;
+    padding: 5px 9px;
     border-radius: 999px;
-    background: #FFEDD5;
+    background: linear-gradient(180deg, #fff0e6 0%, #ffe2d3 100%);
     color: #0A2F5C;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
   }
 
   .ui-web-rail-service-list {
@@ -436,12 +451,12 @@ const webCommandCenterCss = `
   .ui-web-command-center__rail-toggle {
     appearance: none;
     border: 1px solid rgba(10, 47, 92, 0.08);
-    background: #ffffff;
+    background: linear-gradient(180deg, #ffffff 0%, #f4f8fb 100%);
     padding: 8px 10px;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
     color: #0A2F5C;
-    font-weight: 700;
+    font-weight: 800;
   }
 
   .ui-web-command-center__rail-toggle:hover {
@@ -488,6 +503,38 @@ const webCommandCenterCss = `
     background: linear-gradient(180deg, #FFF4ED 0%, #FFE6D9 100%);
     box-shadow: 0 2px 12px rgba(255, 80, 13, 0.15);
     color: #0A2F5C;
+  }
+
+  .ui-web-segmented-tabs__tab {
+    appearance: none;
+    border: 1px solid rgba(10, 47, 92, 0.08);
+    background: linear-gradient(180deg, #ffffff 0%, #f4f8fb 100%);
+    border-radius: 10px;
+    padding: 8px 12px;
+    min-width: 116px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .ui-web-segmented-tabs__tab:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(10, 47, 92, 0.06);
+  }
+
+  .ui-web-segmented-tabs__label {
+    color: #0A2F5C;
+    font-size: 13px;
+  }
+
+  @media (max-width: 900px) {
+    .ui-web-command-center-root {
+      padding-inline: 12px;
+    }
+
+    .ui-web-command-strip {
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
   }
 
   .ui-web-segmented-tabs__meta {
@@ -766,7 +813,6 @@ const webCommandCenterCss = `
                     type="button"
                     className="ui-web-command-center__rail-toggle"
                     onClick={() => setRailCollapsed((s) => !s)}
-                    aria-expanded={!railCollapsed}
                     aria-controls="ui-web-command-center-rail"
                     title={railCollapsed ? ((panelText as any)?.ui?.railExpandLabel ?? 'Expand sidebar') : ((panelText as any)?.ui?.railCollapseLabel ?? 'Collapse sidebar')}
                   >
@@ -891,7 +937,5 @@ const webCommandCenterCss = `
       </>
     );
   }
-
-
 
 

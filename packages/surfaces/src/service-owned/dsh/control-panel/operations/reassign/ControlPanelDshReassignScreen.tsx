@@ -78,8 +78,8 @@ export type ControlPanelDshReassignScreenProps = {
 
 export function ControlPanelDshReassignScreen({
   state = 'ready',
-  hubHref = '/operations/dsh',
-  ordersHref = '/operations/dsh/orders',
+  hubHref = '/operations',
+  ordersHref = '/operations?workspace=orders',
   supportHref = '/support',
   embedded = false,
   showHeader = true,

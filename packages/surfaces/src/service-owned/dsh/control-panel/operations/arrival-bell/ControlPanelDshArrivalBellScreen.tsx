@@ -100,8 +100,8 @@ export type ControlPanelDshArrivalBellScreenProps = {
 
 export function ControlPanelDshArrivalBellScreen({
   state = 'ready',
-  hubHref = '/operations/dsh',
-  ordersHref = '/operations/dsh/orders',
+  hubHref = '/operations',
+  ordersHref = '/operations?workspace=orders',
   supportHref = '/support',
   embedded = false,
   showHeader = true,
@@ -140,7 +140,7 @@ export function ControlPanelDshArrivalBellScreen({
     >
       <div className={styles.stack}>
         <WebMissionHeroCard
-          badges={['/operations/dsh/arrival-bell', dshText.common.live, `${dshText.arrivalBell.signals.activeArrivals}: ${summary.activeArrivals}`]}
+          badges={['/operations?workspace=bell', dshText.common.live, `${dshText.arrivalBell.signals.activeArrivals}: ${summary.activeArrivals}`]}
           eyebrow={dshText.arrivalBell.heroEyebrow}
           title={dshText.arrivalBell.heroTitle}
           description={dshText.arrivalBell.heroDescription}

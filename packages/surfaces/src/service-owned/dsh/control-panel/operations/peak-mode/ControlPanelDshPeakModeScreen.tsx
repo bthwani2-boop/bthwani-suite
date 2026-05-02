@@ -79,8 +79,8 @@ export type ControlPanelDshPeakModeScreenProps = {
 
 export function ControlPanelDshPeakModeScreen({
   state = 'ready',
-  hubHref = '/operations/dsh',
-  ordersHref = '/operations/dsh/orders',
+  hubHref = '/operations',
+  ordersHref = '/operations?workspace=orders',
   supportHref = '/support',
   embedded = false,
   showHeader = true,
@@ -119,7 +119,7 @@ export function ControlPanelDshPeakModeScreen({
     >
       <div className={styles.stack}>
         <WebMissionHeroCard
-          badges={['/operations/dsh/peak-mode', dshText.common.live, `${dshText.peakMode.signals.pressureZones}: ${summary.pressureZones}`]}
+          badges={['/operations?workspace=peak-mode', dshText.common.live, `${dshText.peakMode.signals.pressureZones}: ${summary.pressureZones}`]}
           eyebrow={dshText.peakMode.heroEyebrow}
           title={dshText.peakMode.heroTitle}
           description={dshText.peakMode.heroDescription}

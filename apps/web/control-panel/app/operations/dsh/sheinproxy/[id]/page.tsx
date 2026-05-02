@@ -1,4 +1,4 @@
-import { DshControlPanelSurfaceHost } from '@bthwani/app-shells/web/control-panel';
+import { redirect } from 'next/navigation';
 
 type DshRoutePageProps = {
   readonly params: Promise<{
@@ -9,5 +9,5 @@ type DshRoutePageProps = {
 export default async function DshSheinProxyOrderPage({ params }: DshRoutePageProps) {
   const { id } = await params;
 
-  return <DshControlPanelSurfaceHost workspace="sheinproxy" orderId={id} />;
+  redirect(`/operations?workspace=sheinproxy&orderId=${encodeURIComponent(id)}`);
 }

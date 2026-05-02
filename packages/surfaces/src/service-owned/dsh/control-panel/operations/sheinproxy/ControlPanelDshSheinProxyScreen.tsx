@@ -144,7 +144,7 @@ function filterRequests(requests: readonly SheinProxyRequest[], filterId: SheinP
 
 export function ControlPanelDshSheinProxyScreen({
   state = 'ready',
-  hubHref = '/operations/dsh',
+  hubHref = '/operations',
   operationsHref = '/operations',
   supportHref = '/support',
 }: ControlPanelDshSheinProxyScreenProps) {

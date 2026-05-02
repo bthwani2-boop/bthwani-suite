@@ -75,7 +75,7 @@ export type ControlPanelDshOrdersScreenProps = {
 
 export function ControlPanelDshOrdersScreen({
   state = 'ready',
-  hubHref = '/operations/dsh',
+  hubHref = '/operations',
   operationsHref = '/operations',
   embedded = false,
   showHeader = true,
@@ -145,7 +145,7 @@ export function ControlPanelDshOrdersScreen({
     >
       <div className={styles.stack}>
         <WebMissionHeroCard
-          badges={['/operations/dsh/orders', dshText.common.live, `${dshText.orders.badgesLabel}: ${orders.length}`]}
+          badges={['/operations?workspace=orders', dshText.common.live, `${dshText.orders.badgesLabel}: ${orders.length}`]}
           eyebrow={dshText.orders.heroEyebrow}
           title={dshText.orders.heroTitle}
           description={dshText.orders.heroDescription}
@@ -205,15 +205,15 @@ export function ControlPanelDshOrdersScreen({
                 embedded
                 showHeader={false}
                 orderId={selectedOrderId}
-                ordersHref="/operations/dsh/orders"
+                ordersHref="/operations?workspace=orders"
               />
             ) : (
               <ControlPanelDshOrderDetailScreen
                 embedded
                 showHeader={false}
                 orderId={selectedOrderId}
-                hubHref="/operations/dsh"
-                ordersHref="/operations/dsh/orders"
+                hubHref="/operations"
+                ordersHref="/operations?workspace=orders"
                 onOpenOrderChat={handleOpenOrderChat}
               />
             )
@@ -225,6 +225,3 @@ export function ControlPanelDshOrdersScreen({
 }
 
 export default ControlPanelDshOrdersScreen;
-
-
-

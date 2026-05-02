@@ -9,5 +9,5 @@ type DshRoutePageProps = {
 export default async function DshSheinProxySchedulePage({ params }: DshRoutePageProps) {
   const { id } = await params;
 
-  redirect(`/operations/dsh/sheinproxy/${id}`);
+  redirect(`/operations?workspace=sheinproxy&orderId=${encodeURIComponent(id)}`);
 }

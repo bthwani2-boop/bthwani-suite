@@ -9,5 +9,5 @@ type DshRoutePageProps = {
 export default async function DshOrderDetailPage({ params }: DshRoutePageProps) {
   const { id } = await params;
 
-  redirect(`/operations/dsh/orders?orderId=${encodeURIComponent(id)}&panel=detail`);
+  redirect(`/operations?workspace=orders&orderId=${encodeURIComponent(id)}&panel=detail`);
 }

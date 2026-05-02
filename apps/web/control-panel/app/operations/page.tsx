@@ -1,5 +1,47 @@
 import { ControlPanelSurfaceHost } from '@bthwani/app-shells/web/control-panel';
 
-export default function OperationsPage() {
-  return <ControlPanelSurfaceHost section="operations" />;
+type OperationsWorkspaceId = 'overview' | 'orders' | 'partners' | 'catalogs' | 'marketing' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'bell' | 'zone-set';
+
+type OperationsPageProps = {
+  readonly searchParams?: Promise<{
+    readonly workspace?: string;
+    readonly orderId?: string;
+    readonly panel?: string;
+  }>;
+};
+
+const operationsWorkspaceIds = new Set<OperationsWorkspaceId>([
+  'overview',
+  'orders',
+  'partners',
+  'catalogs',
+  'marketing',
+  'sheinproxy',
+  'reassign',
+  'peak-mode',
+  'bell',
+  'zone-set',
+]);
+
+export default async function OperationsPage({ searchParams }: OperationsPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const workspaceParam = resolvedSearchParams?.workspace;
+  const operationsWorkspace = workspaceParam && operationsWorkspaceIds.has(workspaceParam as OperationsWorkspaceId)
+    ? (workspaceParam as OperationsWorkspaceId)
+    : 'overview';
+  const operationsOrderId = typeof resolvedSearchParams?.orderId === 'string' ? resolvedSearchParams.orderId : undefined;
+  const operationsOverlayMode = resolvedSearchParams?.panel === 'chat'
+    ? 'chat'
+    : resolvedSearchParams?.panel === 'detail'
+      ? 'detail'
+      : undefined;
+
+  return (
+    <ControlPanelSurfaceHost
+      section="operations"
+      operationsWorkspace={operationsWorkspace}
+      operationsOrderId={operationsOrderId}
+      operationsOverlayMode={operationsOverlayMode}
+    />
+  );
 }

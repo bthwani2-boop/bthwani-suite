@@ -69,7 +69,7 @@ function resolveDeliveryLabel(deliveryMode: 'auto' | 'manual' | 'pinned') {
   return 'مثبت';
 }
 
-export function LoyaltyCommandDeckScreen({ hubHref = '/operations/dsh', operationsHref = '/operations' }: LoyaltyCommandDeckScreenProps) {
+export function LoyaltyCommandDeckScreen({ hubHref = '/operations', operationsHref = '/operations' }: LoyaltyCommandDeckScreenProps) {
   const router = useRouter();
   const [section, setSection] = React.useState<LoyaltyCommandSection>('overview');
   const [lane, setLane] = React.useState<LoyaltyLane>('subscription');

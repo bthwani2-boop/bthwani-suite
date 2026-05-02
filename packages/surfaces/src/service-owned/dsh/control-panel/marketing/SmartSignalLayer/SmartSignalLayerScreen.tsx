@@ -403,7 +403,7 @@ function resolveMarketingCategoryLanes(): ReadonlyArray<MarketingCategoryLane> {
 }
 
 export function ControlPanelDshMarketingScreen({
-	hubHref = '/operations/dsh',
+	hubHref = '/operations',
 	operationsHref = '/operations',
 }: ControlPanelDshMarketingScreenProps) {
 	const router = useRouter();

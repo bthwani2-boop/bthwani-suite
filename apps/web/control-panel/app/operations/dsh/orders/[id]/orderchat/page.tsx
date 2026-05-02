@@ -9,5 +9,5 @@ type DshRoutePageProps = {
 export default async function DshOrderChatPage({ params }: DshRoutePageProps) {
   const { id } = await params;
 
-  redirect(`/operations/dsh/orders?orderId=${encodeURIComponent(id)}&panel=chat`);
+  redirect(`/operations?workspace=orders&orderId=${encodeURIComponent(id)}&panel=chat`);
 }

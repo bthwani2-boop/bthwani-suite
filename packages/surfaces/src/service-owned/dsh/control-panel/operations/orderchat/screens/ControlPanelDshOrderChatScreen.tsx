@@ -118,7 +118,7 @@ export type ControlPanelDshOrderChatScreenProps = {
 
 export function ControlPanelDshOrderChatScreen({
   orderId,
-  ordersHref = '/operations/dsh/orders',
+  ordersHref = '/operations?workspace=orders',
   embedded = false,
   showHeader = true,
 }: ControlPanelDshOrderChatScreenProps) {

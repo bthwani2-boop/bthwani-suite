@@ -1,5 +1,5 @@
-import { DshControlPanelSurfaceHost } from '@bthwani/app-shells/web/control-panel';
+import { redirect } from 'next/navigation';
 
 export default function DshPeakModePage() {
-  return <DshControlPanelSurfaceHost workspace="peak-mode" />;
+  redirect('/operations?workspace=peak-mode');
 }

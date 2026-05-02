@@ -52,12 +52,12 @@ function buildTopFilterItems(text: ReturnType<typeof useDshControlPanelText>) {
 function buildDshWorkbenches(text: ReturnType<typeof useDshControlPanelText>): ReadonlyArray<DshWorkbench> {
   return [
     { id: 'overview', ...text.hub.workbenches.overview },
-    { id: 'orders', ...text.hub.workbenches.orders, liveHref: '/operations/dsh/orders' },
-    { id: 'reassign', ...text.hub.workbenches.reassign, liveHref: '/operations/dsh/reassign' },
-    { id: 'peak-mode', ...text.hub.workbenches.peakMode, liveHref: '/operations/dsh/peak-mode' },
+    { id: 'orders', ...text.hub.workbenches.orders, liveHref: '/operations?workspace=orders' },
+    { id: 'reassign', ...text.hub.workbenches.reassign, liveHref: '/operations?workspace=reassign' },
+    { id: 'peak-mode', ...text.hub.workbenches.peakMode, liveHref: '/operations?workspace=peak-mode' },
     { id: 'zone-set', ...text.hub.workbenches.zoneSet },
     { id: 'sheinproxy', ...text.hub.workbenches.sheinProxy },
-    { id: 'arrival-bell', ...text.hub.workbenches.arrivalBell, liveHref: '/operations/dsh/bell' },
+    { id: 'arrival-bell', ...text.hub.workbenches.arrivalBell, liveHref: '/operations?workspace=bell' },
   ] as const;
 }
 
@@ -68,11 +68,11 @@ function resolveTopFilterWorkbench(filterId: TopFilterId): DshWorkbenchId {
 }
 
 function resolveWorkbenchLiveHref(workbenchId: DshWorkbenchId) {
-  if (workbenchId === 'orders') return '/operations/dsh/orders';
-  if (workbenchId === 'reassign') return '/operations/dsh/reassign';
-  if (workbenchId === 'peak-mode') return '/operations/dsh/peak-mode';
-  if (workbenchId === 'arrival-bell') return '/operations/dsh/bell';
-  if (workbenchId === 'sheinproxy') return '/operations/dsh/sheinproxy';
+  if (workbenchId === 'orders') return '/operations?workspace=orders';
+  if (workbenchId === 'reassign') return '/operations?workspace=reassign';
+  if (workbenchId === 'peak-mode') return '/operations?workspace=peak-mode';
+  if (workbenchId === 'arrival-bell') return '/operations?workspace=bell';
+  if (workbenchId === 'sheinproxy') return '/operations?workspace=sheinproxy';
   return undefined;
 }
 
@@ -208,7 +208,7 @@ export function ControlPanelDshOperationsScreen({
             tone="primary"
             size="sm"
             fullWidth={false}
-            onPress={() => router.push('/operations/dsh/orders')}
+            onPress={() => router.push('/operations?workspace=orders')}
           />
           <Button
             label={dshText.common.openGeneralOperations}

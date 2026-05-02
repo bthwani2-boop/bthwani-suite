@@ -5,7 +5,7 @@ const webPageFrameCss = `
 .ui-web-page-frame-root {
   display: flex;
   justify-content: center;
-  padding: 24px;
+  padding: 18px;
 }
 
 .ui-web-page-frame-root--embedded {
@@ -40,16 +40,16 @@ const webPageFrameCss = `
 .ui-web-page-frame-eyebrow {
   margin: 0;
   font-size: 12px;
-  letter-spacing: 0.6px;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #FF500D;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .ui-web-page-frame-title-block {
   display: grid;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .ui-web-page-frame-title-block--with-eyebrow {
@@ -59,25 +59,28 @@ const webPageFrameCss = `
 .ui-web-page-frame-title {
   margin: 0;
   font-size: 32px;
-  line-height: 1.1;
+  line-height: 1.12;
   color: #0A2F5C;
+  letter-spacing: 0;
 }
 
 .ui-web-page-frame-description {
   margin: 0;
   font-size: 16px;
-  line-height: 1.6;
-  color: #475569;
+  line-height: 1.75;
+  color: #51677e;
 }
 
 .ui-web-mission-hero-card {
   display: grid;
-  gap: 16px;
-  padding: 24px;
-  border-radius: 24px;
-  border: 1px solid rgba(10, 47, 92, 0.12);
-  background: linear-gradient(180deg, #FFF4ED 0%, #FFFFFF 100%);
-  box-shadow: 0 12px 30px rgba(10, 47, 92, 0.08);
+  gap: 12px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background:
+    radial-gradient(circle at top right, rgba(255, 80, 13, 0.08), transparent 25%),
+    linear-gradient(180deg, rgba(255, 244, 237, 0.92) 0%, rgba(255, 255, 255, 0.98) 68%);
+  box-shadow: 0 10px 24px rgba(10, 47, 92, 0.05);
 }
 
 .ui-web-mission-hero-card--dense {
@@ -88,7 +91,7 @@ const webPageFrameCss = `
 .ui-web-mission-hero-card--compact {
   gap: 10px;
   padding: 16px;
-  border-radius: 20px;
+  border-radius: 14px;
 }
 
 .ui-web-mission-hero-card__badge-row,
@@ -105,14 +108,15 @@ const webPageFrameCss = `
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: #FF500D;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .ui-web-mission-hero-card__title {
   margin: 0;
-  font-size: 34px;
+  font-size: 32px;
   line-height: 1.1;
   color: #0A2F5C;
+  letter-spacing: 0;
 }
 
 .ui-web-mission-hero-card--dense .ui-web-mission-hero-card__title {
@@ -126,27 +130,28 @@ const webPageFrameCss = `
 .ui-web-mission-hero-card__description {
   margin: 0;
   font-size: 16px;
-  line-height: 1.65;
-  color: #334155;
+  line-height: 1.78;
+  color: #405468;
 }
 
 .ui-web-mission-hero-card__badge,
 .ui-web-mission-hero-card__meta-chip {
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .ui-web-mission-hero-card__badge {
-  padding: 4px 10px;
-  background: #FFEDD5;
+  padding: 5px 10px;
+  background: linear-gradient(180deg, #ffefe5 0%, #ffe1d0 100%);
   color: #0A2F5C;
+  border: 1px solid rgba(255, 80, 13, 0.08);
 }
 
 .ui-web-mission-hero-card__meta-chip {
-  padding: 6px 10px;
+  padding: 7px 11px;
   border: 1px solid rgba(10, 47, 92, 0.12);
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.82);
   color: #334155;
 }
 
@@ -154,38 +159,39 @@ const webPageFrameCss = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 16px;
-  border-radius: 14px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 999px;
   text-decoration: none;
-  font-weight: 700;
+  font-weight: 800;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .ui-web-mission-hero-card__cta:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(10, 47, 92, 0.12);
+  box-shadow: 0 8px 20px rgba(10, 47, 92, 0.12);
 }
 
 .ui-web-mission-hero-card__cta--secondary {
   border: 1px solid rgba(10, 47, 92, 0.18);
   color: #0A2F5C;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.86);
 }
 
 .ui-web-mission-hero-card__cta--primary {
-  background: #FF500D;
+  background: linear-gradient(135deg, #ff6a2f 0%, #FF500D 58%, #e94900 100%);
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(255, 80, 13, 0.3);
+  box-shadow: 0 8px 18px rgba(255, 80, 13, 0.2);
 }
 
 .ui-web-section-card {
   display: grid;
-  gap: 16px;
-  padding: 20px;
-  border-radius: 24px;
-  border: 1px solid rgba(10, 47, 92, 0.1);
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(10, 47, 92, 0.04);
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 249, 252, 0.96) 100%);
+  box-shadow: 0 8px 20px rgba(10, 47, 92, 0.04);
 }
 
 .ui-web-section-card__header {
@@ -195,78 +201,92 @@ const webPageFrameCss = `
 
 .ui-web-section-card__title {
   margin: 0;
-  font-size: 22px;
+  font-size: 20px;
   color: #0A2F5C;
+  letter-spacing: 0;
 }
 
 .ui-web-section-card__description {
   margin: 0;
   font-size: 15px;
-  line-height: 1.6;
-  color: #475569;
+  line-height: 1.72;
+  color: #556a80;
 }
 
 .ui-web-signal-card {
   display: grid;
-  gap: 10px;
-  padding: 18px;
-  border-radius: 20px;
-  border: 1px solid rgba(10, 47, 92, 0.1);
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(10, 47, 92, 0.04);
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 249, 252, 0.94) 100%);
+  box-shadow: 0 6px 16px rgba(10, 47, 92, 0.04);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .ui-web-signal-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(10, 47, 92, 0.08);
+  box-shadow: 0 8px 18px rgba(10, 47, 92, 0.08);
 }
 
 .ui-web-signal-card--best {
-  border-color: rgba(74, 222, 128, 0.4);
-  background: linear-gradient(180deg, #ECFDF3 0%, #ffffff 100%);
+  border-color: rgba(74, 222, 128, 0.22);
+  background: linear-gradient(180deg, #eefcf4 0%, #ffffff 100%);
 }
 
 .ui-web-signal-card--danger {
-  border-color: rgba(254, 202, 202, 0.6);
-  background: linear-gradient(180deg, #FEF2F2 0%, #ffffff 100%);
+  border-color: rgba(248, 113, 113, 0.24);
+  background: linear-gradient(180deg, #fff4f4 0%, #ffffff 100%);
 }
 
 .ui-web-signal-card--warning {
-  border-color: rgba(254, 243, 199, 0.6);
-  background: linear-gradient(180deg, #FFFBEB 0%, #ffffff 100%);
+  border-color: rgba(251, 191, 36, 0.22);
+  background: linear-gradient(180deg, #fffbef 0%, #ffffff 100%);
 }
 
 .ui-web-signal-card--info {
-  border-color: rgba(219, 234, 254, 0.6);
-  background: linear-gradient(180deg, #EFF6FF 0%, #ffffff 100%);
+  border-color: rgba(96, 165, 250, 0.24);
+  background: linear-gradient(180deg, #f2f8ff 0%, #ffffff 100%);
 }
 
 .ui-web-signal-card--brand {
-  border-color: rgba(255, 237, 213, 0.6);
-  background: linear-gradient(180deg, #FFF4ED 0%, #ffffff 100%);
+  border-color: rgba(255, 80, 13, 0.18);
+  background: linear-gradient(180deg, #fff5ee 0%, #ffffff 100%);
 }
 
 .ui-web-signal-card__title {
   margin: 0;
   font-size: 13px;
-  color: #475569;
-  font-weight: 600;
+  color: #52687f;
+  font-weight: 800;
 }
 
 .ui-web-signal-card__value {
   margin: 0;
-  font-size: 28px;
-  line-height: 1.1;
-  font-weight: 800;
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 900;
   color: #0A2F5C;
+  letter-spacing: 0;
 }
 
 .ui-web-signal-card__description {
   margin: 0;
   font-size: 14px;
-  line-height: 1.6;
-  color: #475569;
+  line-height: 1.72;
+  color: #566c82;
+}
+
+@media (max-width: 640px) {
+  .ui-web-page-frame-root {
+    padding: 18px;
+  }
+
+  .ui-web-mission-hero-card,
+  .ui-web-section-card,
+  .ui-web-signal-card {
+    border-radius: 12px;
+  }
 }
 `;
 
@@ -470,4 +490,3 @@ export function WebSignalCard({
     </>
   );
 }
-
