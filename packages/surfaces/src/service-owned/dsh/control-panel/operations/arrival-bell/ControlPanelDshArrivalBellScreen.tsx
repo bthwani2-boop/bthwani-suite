@@ -14,7 +14,7 @@ import {
   WebSectionCard,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
-import { ControlPanelDshDecisionBoard } from '../../../shared';
+import { ControlPanelDshDecisionBoard } from '../../shared';
 import { useDshControlPanelText } from '../shared/dshControlPanelText';
 import {
   getDshArrivalBellCaptainLane,
