@@ -35,13 +35,13 @@ const FILTER_IDS = ['all', 'under-review', 'estimated', 'offered', 'scheduled', 
 
 type SheinProxyFilterId = (typeof FILTER_IDS)[number];
 
-function resolveStatusTone(status: SheinProxyRequestStatus) {
+function resolveStatusTone(status: SheinProxyRequestStatus): 'brand' | 'best' | 'warning' | 'danger' {
   if (status === 'cancelled') {
     return 'danger' as const;
   }
 
   if (status === 'approved' || status === 'scheduled') {
-    return 'success' as const;
+    return 'best' as const;
   }
 
   if (status === 'offered') {
@@ -49,10 +49,30 @@ function resolveStatusTone(status: SheinProxyRequestStatus) {
   }
 
   if (status === 'estimated') {
-    return 'info' as const;
+    return 'warning' as const;
   }
 
   return 'warning' as const;
+}
+
+function resolveStatusBadgeTone(status: SheinProxyRequestStatus): 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' {
+  if (status === 'cancelled') {
+    return 'danger';
+  }
+
+  if (status === 'approved' || status === 'scheduled') {
+    return 'success';
+  }
+
+  if (status === 'offered') {
+    return 'brand';
+  }
+
+  if (status === 'estimated') {
+    return 'info';
+  }
+
+  return 'default';
 }
 
 function resolveStatusLabel(text: ReturnType<typeof useDshControlPanelText>, status: SheinProxyRequestStatus) {
@@ -271,7 +291,7 @@ export function ControlPanelDshSheinProxyScreen({
       id: 'status',
       header: dshText.sheinProxy.statusLabel,
       renderCell: (row: SheinProxyRequest) => (
-        <Badge label={resolveStatusLabel(dshText, row.status)} tone={resolveStatusTone(row.status)} />
+        <Badge label={resolveStatusLabel(dshText, row.status)} tone={resolveStatusBadgeTone(row.status)} />
       ),
     },
     {
@@ -378,17 +398,18 @@ export function ControlPanelDshSheinProxyScreen({
           decisionTone={selectedRequest ? resolveStatusTone(selectedRequest.status) : 'warning'}
         />
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           {signalCards.map((signalCard) => (
-            <StatCard
-              key={signalCard.label}
-              label={signalCard.label}
-              value={signalCard.value}
-              deltaLabel={signalCard.description}
-              tone={signalCard.tone}
-            />
+            <Box key={signalCard.label} style={{ flexGrow: 1, flexBasis: 240 }}>
+              <StatCard
+                label={signalCard.label}
+                value={signalCard.value}
+                deltaLabel={signalCard.description}
+                tone={signalCard.tone}
+              />
+            </Box>
           ))}
-        </div>
+        </Box>
 
         <WebSectionCard
           title={dshText.sheinProxy.tableTitle}
@@ -404,8 +425,8 @@ export function ControlPanelDshSheinProxyScreen({
           />
         </WebSectionCard>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
-          <div>
+        <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
+          <Box style={{ flexGrow: 1, flexBasis: 320 }}>
             <Box padding={3} gap={2} border radiusToken="xl" background="surfaceRaised">
               <Text role="bodyStrong">{selectedRequest.id}</Text>
               <Text role="bodySm" tone="muted">{`${selectedRequest.customer} · ${selectedRequest.product}`}</Text>
@@ -421,9 +442,9 @@ export function ControlPanelDshSheinProxyScreen({
                 ]}
               />
             </Box>
-          </div>
+          </Box>
 
-          <div>
+          <Box style={{ flexGrow: 1, flexBasis: 320 }}>
             <Box padding={3} gap={2} border radiusToken="xl" background="surfaceRaised">
               <Text role="bodyStrong">{dshText.sheinProxy.pricingTitle}</Text>
               <Text role="bodySm" tone="muted">{selectedRequest.note}</Text>
@@ -468,8 +489,8 @@ export function ControlPanelDshSheinProxyScreen({
                 />
               </Box>
             </Box>
-          </div>
-        </div>
+          </Box>
+        </Box>
       </Box>
     </WebCommandCenterFrame>
   );

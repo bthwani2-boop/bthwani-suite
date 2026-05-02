@@ -5,19 +5,25 @@ import { useRouter } from 'next/navigation';
 import { Box, Button, useUiText } from '@bthwani/ui-kit';
 import { WebControlActionCard, WebControlDisclosureItem, WebMissionHeroCard, WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
 import { ControlPanelDshCatalogApprovalScreen, ControlPanelDshCatalogScreen, ControlPanelDshListingGovernanceScreen } from './catalogs';
+import { ControlPanelDshCatalogCategoriesScreen } from './catalogs/categories';
 import { ControlPanelDshGovernanceEvidenceScreen, ControlPanelDshGuardStatusScreen } from './control';
 import { ControlPanelDshFinanceScreen, ControlPanelDshSettlementScreen, ControlPanelDshCodReconciliationScreen, ControlPanelDshRefundQueueScreen } from './finance';
 import { ControlPanelDshMarketingApprovalScreen, ControlPanelDshMarketingScreen, ControlPanelDshVideoSubmissionsReviewScreen } from './marketing';
+import { BannersCommandDeckScreen as ControlPanelDshBannersCommandDeckScreen } from './marketing/BannersCommandDeckScreen';
+import { GrowthCommandDeckScreen as ControlPanelDshGrowthCommandDeckScreen } from './marketing/GrowthCommandDeckScreen';
+import { LoyaltyCommandDeckScreen as ControlPanelDshLoyaltyCommandDeckScreen } from './marketing/loyalty/LoyaltyCommandDeckScreen';
+import { ControlPanelDshMarketingScreen as ControlPanelDshSmartSignalLayerScreen } from './marketing/SmartSignalLayer/SmartSignalLayerScreen';
 import { ControlPanelDshOrdersScreen } from './operations/orders';
 import { ControlPanelDshSheinProxyScreen } from './operations/sheinproxy';
 import { ControlPanelDshReassignScreen } from './operations/reassign';
 import { ControlPanelDshPeakModeScreen } from './operations/peak-mode';
 import { ControlPanelDshBellScreen } from './operations/bell';
+import { ControlPanelDshArrivalBellScreen } from './operations/arrival-bell';
 import { ControlPanelDshZoneSetScreen } from './operations/zone-set';
 import { ControlPanelDshCaptainOperationsScreen, ControlPanelDshFieldOperationsScreen, ControlPanelDshIssueQueueScreen, ControlPanelDshServiceabilityScreen } from './operations';
 import { ControlPanelDshPartnerActivationScreen, ControlPanelDshPartnerApprovalsScreen, ControlPanelDshPartnerDocumentReviewScreen } from './partners';
 import { ControlPanelDshSupportQueueScreen, ControlPanelDshDisputeResolutionScreen } from './support';
-import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, getDshClosureItemsByStatus } from './shared';
+import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, getDshClosureItemsByStatus, type ControlPanelDshActionQueueItem } from './shared';
 import { useDshControlPanelText } from './operations/shared/dshControlPanelText';
 
 type DshWorkspaceId =
@@ -38,7 +44,12 @@ type DshWorkspaceId =
   | 'orderchat'
   | 'partners'
   | 'catalogs'
+  | 'catalog-categories'
   | 'marketing'
+  | 'banners'
+  | 'growth'
+  | 'loyalty'
+  | 'smart-signal'
   | 'sheinproxy'
   | 'reassign'
   | 'peak-mode'
@@ -46,7 +57,7 @@ type DshWorkspaceId =
   | 'arrival-bell'
   | 'zone-set';
 
-type DshControlPanelSurfaceHostProps = {
+export type DshControlPanelSurfaceHostProps = {
   workspace?: DshWorkspaceId;
   orderId?: string;
   orderOverlayMode?: 'detail' | 'chat';
@@ -74,11 +85,17 @@ const workspaceTabs: readonly WorkspaceTab[] = [
   { id: 'orders', label: 'Orders', description: 'Current queue' },
   { id: 'partners', label: 'Partners', description: 'Activation and docs' },
   { id: 'catalogs', label: 'Catalogs', description: 'Approval and governance' },
+  { id: 'catalog-categories', label: 'Catalog categories', description: 'Category ownership and triage' },
   { id: 'marketing', label: 'Marketing', description: 'Approval and video review' },
+  { id: 'banners', label: 'Banners', description: 'Banner command deck' },
+  { id: 'growth', label: 'Growth', description: 'Growth command deck' },
+  { id: 'loyalty', label: 'Loyalty', description: 'Loyalty and coupon controls' },
+  { id: 'smart-signal', label: 'Smart signal', description: 'Live ticker lane' },
   { id: 'sheinproxy', label: 'Manual assignment', description: 'Platform batch lane' },
   { id: 'reassign', label: 'Reassign', description: 'Re-route orders' },
   { id: 'peak-mode', label: 'Peak mode', description: 'Capacity mode' },
   { id: 'bell', label: 'Bell', description: 'Arrival notifications' },
+  { id: 'arrival-bell', label: 'Arrival bell', description: 'Arrival bell workspace' },
   { id: 'zone-set', label: 'Zone set', description: 'Boundary policy' },
 ];
 
@@ -101,10 +118,6 @@ function buildOperationsHref(
 }
 
 function normalizeWorkspace(workspace: DshWorkspaceId) {
-  if (workspace === 'arrival-bell') {
-    return 'bell' as const;
-  }
-
   return workspace;
 }
 
@@ -196,7 +209,7 @@ function OverviewWorkspace() {
 
 function DashboardWorkspace() {
   const dashboardItems = React.useMemo(() => (
-    DSH_CROSS_SURFACE_CLOSURE_MAP.slice(0, 6).map((item) => {
+    DSH_CROSS_SURFACE_CLOSURE_MAP.map((item) => {
       const tone = item.status === 'closed' ? 'best' : item.status === 'blocked' ? 'danger' : 'warning';
       return {
         id: `${item.surfaceId}-${item.area}`,
@@ -210,7 +223,7 @@ function DashboardWorkspace() {
         evidenceActionLabel: 'Open evidence',
         tone,
       };
-    })
+    }) satisfies readonly ControlPanelDshActionQueueItem[]
   ), []);
   const [selectedItemId, setSelectedItemId] = React.useState(dashboardItems[0]?.id ?? null);
   const [reviewedIds, setReviewedIds] = React.useState<ReadonlySet<string>>(new Set());
@@ -365,6 +378,8 @@ function renderWorkspace(workspace: DshWorkspaceId, orderId?: string, orderOverl
           <ControlPanelDshListingGovernanceScreen />
         </Box>
       );
+    case 'catalog-categories':
+      return <ControlPanelDshCatalogCategoriesScreen />;
     case 'marketing':
       return (
         <Box gap={4}>
@@ -373,6 +388,14 @@ function renderWorkspace(workspace: DshWorkspaceId, orderId?: string, orderOverl
           <ControlPanelDshVideoSubmissionsReviewScreen />
         </Box>
       );
+    case 'banners':
+      return <ControlPanelDshBannersCommandDeckScreen />;
+    case 'growth':
+      return <ControlPanelDshGrowthCommandDeckScreen />;
+    case 'loyalty':
+      return <ControlPanelDshLoyaltyCommandDeckScreen />;
+    case 'smart-signal':
+      return <ControlPanelDshSmartSignalLayerScreen />;
     case 'sheinproxy':
       return (
         <ControlPanelDshSheinProxyScreen
@@ -387,10 +410,10 @@ function renderWorkspace(workspace: DshWorkspaceId, orderId?: string, orderOverl
       return <ControlPanelDshPeakModeScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} ordersHref={buildOperationsHref('orders')} />;
     case 'bell':
       return <ControlPanelDshBellScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} ordersHref={buildOperationsHref('orders')} />;
+    case 'arrival-bell':
+      return <ControlPanelDshArrivalBellScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} ordersHref={buildOperationsHref('orders')} />;
     case 'zone-set':
       return <ControlPanelDshZoneSetScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} ordersHref={buildOperationsHref('orders')} />;
-    case 'arrival-bell':
-      return null;
     default:
       return <OverviewWorkspace />;
   }

@@ -77,8 +77,8 @@ export function ControlPanelDshWorkspaceFrame({
         title={title}
         description={description}
         metaItems={metaItems as string[]}
-        primaryAction={primaryAction ? { label: primaryAction.label, href: primaryAction.href } : undefined}
-        secondaryAction={secondaryAction ? { label: secondaryAction.label, href: secondaryAction.href } : undefined}
+        primaryAction={primaryAction?.href ? { label: primaryAction.label, href: primaryAction.href } : undefined}
+        secondaryAction={secondaryAction?.href ? { label: secondaryAction.label, href: secondaryAction.href } : undefined}
       />
 
       {signals.length ? (
@@ -105,18 +105,19 @@ export function ControlPanelDshWorkspaceFrame({
 
       {actions.length ? (
         <WebSectionCard title="الخطوات السريعة" description="حافظ على الواجهة قصيرة وقرارها واضحًا.">
-          <Box gap={2}>
+          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
             {actions.map((action) => (
-              <WebControlActionCard
-                key={action.id}
-                id={action.id}
-                title={action.label}
-                description={action.description}
-                footerLabel={action.badge ?? 'فتح'}
-                href={action.href}
-                tone={action.tone}
-                onAction={action.onAction}
-              />
+              <Box key={action.id} style={{ flexGrow: 1, flexBasis: 240 }}>
+                <WebControlActionCard
+                  id={action.id}
+                  title={action.label}
+                  description={action.description}
+                  footerLabel={action.badge ?? 'فتح'}
+                  href={action.href}
+                  tone={action.tone}
+                  onAction={action.onAction}
+                />
+              </Box>
             ))}
           </Box>
         </WebSectionCard>

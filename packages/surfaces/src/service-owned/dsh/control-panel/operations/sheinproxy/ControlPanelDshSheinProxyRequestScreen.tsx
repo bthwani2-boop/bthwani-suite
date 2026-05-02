@@ -224,7 +224,7 @@ export function ControlPanelDshSheinProxyRequestScreen({
       embedded={embedded}
       showHeader={showHeader}
     >
-      <div style={{ display: 'grid', gap: '20px', direction: 'rtl', textAlign: 'right' }}>
+      <div style={{ gap: '20px', direction: 'rtl', textAlign: 'right' }}>
         {/* ===== Context Summary Bar ===== */}
         <div style={{
           display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between',
@@ -245,12 +245,12 @@ export function ControlPanelDshSheinProxyRequestScreen({
         </div>
 
         {/* ===== Operational Metrics ===== */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
-          <StatCard label="الفئات" value="3" deltaLabel="SHEIN، عونك، وأخرى" tone="brand" />
-          <StatCard label="العملاء" value={customerCount || '1'} deltaLabel="عدد العملاء في الدفعة" tone="success" />
-          <StatCard label="الكباتن" value={captainCount || '1'} deltaLabel="عدد الكباتن المخصصين" tone="info" />
-          <StatCard label="الخطوة" value={stageMeta.label} deltaLabel={stageMeta.description} tone="warning" />
-        </div>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          <Box style={{ flexGrow: 1, flexBasis: 180 }}><StatCard label="الفئات" value="3" deltaLabel="SHEIN، عونك، وأخرى" tone="brand" /></Box>
+          <Box style={{ flexGrow: 1, flexBasis: 180 }}><StatCard label="العملاء" value={customerCount || '1'} deltaLabel="عدد العملاء في الدفعة" tone="success" /></Box>
+          <Box style={{ flexGrow: 1, flexBasis: 180 }}><StatCard label="الكباتن" value={captainCount || '1'} deltaLabel="عدد الكباتن المخصصين" tone="info" /></Box>
+          <Box style={{ flexGrow: 1, flexBasis: 180 }}><StatCard label="الخطوة" value={stageMeta.label} deltaLabel={stageMeta.description} tone="warning" /></Box>
+        </Box>
 
         {/* ===== Assignment Progress ===== */}
         <CompactStatusStepper

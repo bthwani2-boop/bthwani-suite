@@ -76,6 +76,72 @@ const enDshControlPanelText = {
         routeHint: '/operations/dsh',
         statusLabel: 'Live'
       },
+      dashboard: {
+        label: 'Dashboard',
+        description: 'The closure matrix and evidence rows for the control-panel surface.',
+        routeHint: '/operations?workspace=dashboard',
+        statusLabel: 'Live'
+      },
+      'captain-ops': {
+        label: 'Captain ops',
+        description: 'Captain readiness, proof review, and COD exceptions stay explicit.',
+        routeHint: '/operations?workspace=captain-ops',
+        statusLabel: 'Live'
+      },
+      'field-ops': {
+        label: 'Field ops',
+        description: 'Visits, onboarding, and geo pin review remain visible.',
+        routeHint: '/operations?workspace=field-ops',
+        statusLabel: 'Live'
+      },
+      finance: {
+        label: 'Finance',
+        description: 'Settlement summary and financial control remain visible.',
+        routeHint: '/operations?workspace=finance',
+        statusLabel: 'Live'
+      },
+      settlements: {
+        label: 'Settlements',
+        description: 'Partner and captain payouts stay grouped in one lane.',
+        routeHint: '/operations?workspace=settlements',
+        statusLabel: 'Live'
+      },
+      cod: {
+        label: 'COD',
+        description: 'Collected and pending cash-on-delivery items remain explicit.',
+        routeHint: '/operations?workspace=cod',
+        statusLabel: 'Live'
+      },
+      refunds: {
+        label: 'Refunds',
+        description: 'Refund queue visibility stays available for local review.',
+        routeHint: '/operations?workspace=refunds',
+        statusLabel: 'Live'
+      },
+      issues: {
+        label: 'Issues',
+        description: 'Support and dispute lanes remain ready for escalation.',
+        routeHint: '/operations?workspace=issues',
+        statusLabel: 'Live'
+      },
+      serviceability: {
+        label: 'Serviceability',
+        description: 'Zones, coverage, and delivery constraints remain visible.',
+        routeHint: '/operations?workspace=serviceability',
+        statusLabel: 'Live'
+      },
+      'guard-status': {
+        label: 'Guard status',
+        description: 'PASS/WARN/BLOCKED guard state is visible and reviewable.',
+        routeHint: '/operations?workspace=guard-status',
+        statusLabel: 'Live'
+      },
+      evidence: {
+        label: 'Evidence',
+        description: 'The evidence matrix stays available for closure routing.',
+        routeHint: '/operations?workspace=evidence',
+        statusLabel: 'Live'
+      },
       orders: {
         label: 'Orders',
         description: 'The central orders queue and its related detail surfaces.',
@@ -1014,6 +1080,72 @@ const arDshControlPanelText = {
         label: 'نظرة عامة على DSH',
         description: 'لقطة أولى للحالة والانتقالات الآمنة قبل الدخول في أي مسار فرعي.',
         routeHint: '/operations/dsh',
+        statusLabel: 'حي'
+      },
+      dashboard: {
+        label: 'لوحة الإغلاق',
+        description: 'مصفوفة الإغلاق وصفوف الأدلة لسطح التحكم.',
+        routeHint: '/operations?workspace=dashboard',
+        statusLabel: 'حي'
+      },
+      'captain-ops': {
+        label: 'عمليات القبطان',
+        description: 'جاهزية القبطان ومراجعة الأدلة واستثناءات COD تبقى واضحة.',
+        routeHint: '/operations?workspace=captain-ops',
+        statusLabel: 'حي'
+      },
+      'field-ops': {
+        label: 'عمليات الميدان',
+        description: 'الزيارات والتفعيل ومراجعة النقطة الجغرافية تبقى ظاهرة.',
+        routeHint: '/operations?workspace=field-ops',
+        statusLabel: 'حي'
+      },
+      finance: {
+        label: 'المالية',
+        description: 'ملخص التسوية والرقابة المالية يبقيان ظاهرين.',
+        routeHint: '/operations?workspace=finance',
+        statusLabel: 'حي'
+      },
+      settlements: {
+        label: 'التسويات',
+        description: 'مدفوعات الشركاء والقبطان تبقى في مسار واحد.',
+        routeHint: '/operations?workspace=settlements',
+        statusLabel: 'حي'
+      },
+      cod: {
+        label: 'COD',
+        description: 'العناصر المقبوضة والمعلقة تبقى واضحة للمراجعة.',
+        routeHint: '/operations?workspace=cod',
+        statusLabel: 'حي'
+      },
+      refunds: {
+        label: 'الاستردادات',
+        description: 'قائمة الاستردادات تبقى متاحة للمراجعة المحلية.',
+        routeHint: '/operations?workspace=refunds',
+        statusLabel: 'حي'
+      },
+      issues: {
+        label: 'القضايا',
+        description: 'مسارات الدعم والنزاعات تبقى جاهزة للتصعيد.',
+        routeHint: '/operations?workspace=issues',
+        statusLabel: 'حي'
+      },
+      serviceability: {
+        label: 'قابلية الخدمة',
+        description: 'المناطق والتغطية والقيود التشغيلية تبقى واضحة.',
+        routeHint: '/operations?workspace=serviceability',
+        statusLabel: 'حي'
+      },
+      'guard-status': {
+        label: 'حالة الحارس',
+        description: 'حالة PASS/WARN/BLOCKED تبقى ظاهرة وقابلة للمراجعة.',
+        routeHint: '/operations?workspace=guard-status',
+        statusLabel: 'حي'
+      },
+      evidence: {
+        label: 'الأدلة',
+        description: 'مصفوفة الأدلة تبقى متاحة لتوجيه الإغلاق.',
+        routeHint: '/operations?workspace=evidence',
         statusLabel: 'حي'
       },
       orders: {

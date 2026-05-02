@@ -159,7 +159,7 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
         blockers={selected ? selected.subtitle || 'No blocker text provided' : 'No banner selected.'}
         ownerSurface="marketing"
         evidenceHint={selected ? `${selected.audience} · ${selected.actionType} · ${selected.position}` : 'banner readiness proof'}
-        routeHint={selected ? selected.actionTarget : 'DshStoresList'}
+        routeHint={selected?.actionTarget ?? 'DshStoresList'}
         decisionTone={selected?.status === 'published' ? 'best' : 'warning'}
       />
 

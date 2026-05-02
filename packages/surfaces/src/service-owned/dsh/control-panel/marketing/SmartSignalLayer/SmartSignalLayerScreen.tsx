@@ -600,8 +600,8 @@ export function ControlPanelDshMarketingScreen({
 				title="Smart signal board"
 				purpose="Keep the currently active notice, audience, priority, and suppression state visible."
 				primaryDecision={primaryPreview?.statusLabel ?? copy.noActiveLabel}
-				nextAction={primaryPreview ? resolveMarketingTickerPlanReasonLabel(locale, primaryPreview) : copy.reasonDraft}
-				blockers={primaryPreview ? resolveMarketingTickerPlanReasonLabel(locale, primaryPreview) : copy.noActiveLabel}
+				nextAction={smartPlan.activeEntry?.reason ? resolveMarketingTickerPlanReasonLabel(locale, smartPlan.activeEntry.reason) : copy.reasonDraft}
+				blockers={smartPlan.activeEntry?.reason ? resolveMarketingTickerPlanReasonLabel(locale, smartPlan.activeEntry.reason) : copy.noActiveLabel}
 				ownerSurface="marketing"
 				evidenceHint={`${copy.activeLabel}: ${primaryPreview?.statusLabel ?? copy.noActiveLabel} · ${copy.automaticLabel}: ${counts.automatic}`}
 				routeHint={operationsHref}

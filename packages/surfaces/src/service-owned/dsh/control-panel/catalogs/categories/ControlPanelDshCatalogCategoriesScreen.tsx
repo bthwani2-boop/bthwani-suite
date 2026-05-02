@@ -3,7 +3,7 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
-import { ControlPanelDshActionQueue, ControlPanelDshDecisionBoard } from '../../shared';
+import { ControlPanelDshActionQueue, ControlPanelDshDecisionBoard, type ControlPanelDshActionQueueItem } from '../../shared';
 import { dshCatalogNodes } from '../catalog';
 
 function resolveCategoryOwnerLabel(owner: 'catalog' | 'partner' | 'marketing') {
@@ -33,7 +33,7 @@ export function ControlPanelDshCatalogCategoriesScreen() {
     secondaryActionLabel: 'Approve category',
     evidenceActionLabel: 'Open evidence',
     tone: node.owner === 'catalog' ? 'brand' : node.owner === 'partner' ? 'warning' : 'best',
-  }));
+  })) satisfies readonly ControlPanelDshActionQueueItem[];
   const selectedItem = queueItems.find((item) => item.id === selectedCategoryId) ?? queueItems[0];
 
   return (

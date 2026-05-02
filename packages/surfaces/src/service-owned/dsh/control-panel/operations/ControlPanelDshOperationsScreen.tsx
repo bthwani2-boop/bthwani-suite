@@ -58,7 +58,7 @@ function buildDshWorkbenches(text: ReturnType<typeof useDshControlPanelText>): R
     { id: 'peak-mode', ...text.hub.workbenches.peakMode, liveHref: '/operations?workspace=peak-mode' },
     { id: 'zone-set', ...text.hub.workbenches.zoneSet },
     { id: 'sheinproxy', ...text.hub.workbenches.sheinProxy },
-    { id: 'arrival-bell', ...text.hub.workbenches.arrivalBell, liveHref: '/operations?workspace=bell' },
+    { id: 'arrival-bell', ...text.hub.workbenches.arrivalBell, liveHref: '/operations?workspace=arrival-bell' },
   ] as const;
 }
 
@@ -72,7 +72,7 @@ function resolveWorkbenchLiveHref(workbenchId: DshWorkbenchId) {
   if (workbenchId === 'orders') return '/operations?workspace=orders';
   if (workbenchId === 'reassign') return '/operations?workspace=reassign';
   if (workbenchId === 'peak-mode') return '/operations?workspace=peak-mode';
-  if (workbenchId === 'arrival-bell') return '/operations?workspace=bell';
+  if (workbenchId === 'arrival-bell') return '/operations?workspace=arrival-bell';
   if (workbenchId === 'sheinproxy') return '/operations?workspace=sheinproxy';
   return undefined;
 }

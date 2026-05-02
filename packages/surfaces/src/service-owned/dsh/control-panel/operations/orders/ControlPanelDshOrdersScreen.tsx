@@ -103,6 +103,7 @@ export function ControlPanelDshOrdersScreen({
   }, [initialOverlayMode]);
 
   const selectedOrderLabel = selectedOrderId ?? dshText.orders.openDetail;
+  const selectedOrder = orders.find((order) => order.id === selectedOrderId) ?? null;
   const handleOpenOrderDetail = React.useCallback((orderId: string) => {
     setSelectedOrderId(orderId);
     setOverlayMode('detail');

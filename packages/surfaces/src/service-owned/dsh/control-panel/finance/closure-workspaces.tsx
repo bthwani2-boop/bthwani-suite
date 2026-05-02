@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '@bthwani/ui-kit';
-import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../shared';
+import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame, type ControlPanelDshActionQueueItem } from '../shared';
 
 type FinanceStatus = 'Payable' | 'Pending' | 'Blocked' | 'Disputed';
 
@@ -26,7 +26,7 @@ function buildFinanceRows(kind: FinanceQueueKind) {
     secondaryActionLabel: status === 'Pending' ? 'Hold' : 'Open blocker',
     evidenceActionLabel: kind === 'refund' ? 'Open refund case' : 'Open evidence',
     tone: status === 'Payable' ? 'best' : status === 'Blocked' ? 'danger' : 'warning',
-  })) as const;
+  })) satisfies readonly ControlPanelDshActionQueueItem[];
 }
 
 function FinanceQueueBoard({

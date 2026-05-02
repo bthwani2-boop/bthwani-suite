@@ -28,19 +28,27 @@ export function ControlPanelDshDecisionBoard({
   return (
     <WebSectionCard title={title} description={purpose}>
       <Box gap={2}>
-        <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-          <WebSignalCard title="Primary decision" value={primaryDecision} description="What this screen should decide now." tone={decisionTone} />
-          <WebSignalCard title="Next action" value={nextAction} description="The next operational move." tone="warning" />
-          <WebSignalCard title="Blockers" value={blockers} description="What still blocks closure or execution." tone="danger" />
-          <WebSignalCard title="Owner surface" value={ownerSurface} description="The owning DSH surface for the decision." tone="best" />
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          <Box style={{ flexGrow: 1, flexBasis: 220 }}>
+            <WebSignalCard title="Primary decision" value={primaryDecision} description="What this screen should decide now." tone={decisionTone} />
+          </Box>
+          <Box style={{ flexGrow: 1, flexBasis: 220 }}>
+            <WebSignalCard title="Next action" value={nextAction} description="The next operational move." tone="warning" />
+          </Box>
+          <Box style={{ flexGrow: 1, flexBasis: 220 }}>
+            <WebSignalCard title="Blockers" value={blockers} description="What still blocks closure or execution." tone="danger" />
+          </Box>
+          <Box style={{ flexGrow: 1, flexBasis: 220 }}>
+            <WebSignalCard title="Owner surface" value={ownerSurface} description="The owning DSH surface for the decision." tone="best" />
+          </Box>
         </Box>
 
-        <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-          <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised" style={{ flexGrow: 1, flexBasis: 220 }}>
             <Text role="caption" tone="muted">Evidence hint</Text>
             <Text role="bodySm">{evidenceHint}</Text>
           </Box>
-          <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+          <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised" style={{ flexGrow: 1, flexBasis: 220 }}>
             <Text role="caption" tone="muted">Route hint</Text>
             <Text role="bodySm">{routeHint}</Text>
           </Box>
