@@ -76,7 +76,7 @@ function renderCompletionSection(onOpenProofCapturePress?: () => void) {
   );
 }
 
-export function DshEntryScreen({
+export function DshCaptainEntryScreen({
   state = 'ready',
   onOpenOffersPress,
   onOpenExecutionPress,
@@ -118,3 +118,5 @@ export function DshEntryScreen({
     />
   );
 }
+
+export { DshCaptainEntryScreen as DshEntryScreen };

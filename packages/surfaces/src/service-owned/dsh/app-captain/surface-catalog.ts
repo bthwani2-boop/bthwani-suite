@@ -8,7 +8,7 @@ export const surfaceCatalog = [
   'chat-read-ack',
   'chat-send',
   'cod-balance',
-  'job-reject',
+  'order-offer-reject',
   'order-accept',
   'order-deliver',
   'order-details',
