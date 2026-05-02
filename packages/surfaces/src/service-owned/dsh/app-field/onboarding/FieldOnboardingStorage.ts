@@ -1,6 +1,7 @@
 import { createFieldSeedStores, type FieldStoreFile } from '../stores/dshFieldStoresModel';
 
-const STORAGE_KEY = 'bthwani_app_field_partner_onboarding_v2';
+const STORAGE_KEY = 'bthwani_dsh_app_field_store_onboarding_v3';
+const LEGACY_STORAGE_KEY = 'bthwani_app_field_partner_onboarding_v2';
 
 let fieldStoresMemory: FieldStoreFile[] | null = null;
 
@@ -19,6 +20,14 @@ export function readFieldStoresLocal(): FieldStoreFile[] {
     try {
       const raw = storage.getItem(STORAGE_KEY);
       if (!raw) {
+        const legacyRaw = storage.getItem(LEGACY_STORAGE_KEY);
+        if (legacyRaw) {
+          const parsed = JSON.parse(legacyRaw) as FieldStoreFile[];
+          fieldStoresMemory = parsed;
+          storage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+          return parsed;
+        }
+
         const seed = createFieldSeedStores();
         fieldStoresMemory = seed;
         storage.setItem(STORAGE_KEY, JSON.stringify(seed));

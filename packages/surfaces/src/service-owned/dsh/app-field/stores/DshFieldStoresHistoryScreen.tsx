@@ -1,20 +1,20 @@
 import React from 'react';
 import { Box, Icon, ListItem, MobileScrollView, Surface, TopBar } from '@bthwani/ui-kit';
-import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel, type FieldStoreFile } from '../stores/dshFieldStoresModel';
+import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel, type FieldStoreFile } from './dshFieldStoresModel';
 
-type FieldHistoryScreenProps = {
+type DshFieldStoresHistoryScreenProps = {
   stores: readonly FieldStoreFile[];
   onBack: () => void;
 };
 
-export function FieldHistoryScreen({ stores, onBack }: FieldHistoryScreenProps) {
+export function DshFieldStoresHistoryScreen({ stores, onBack }: DshFieldStoresHistoryScreenProps) {
   return (
     <Box style={{ flex: 1 }} background="background">
       <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 96 }}>
         <TopBar
           variant="secondary"
-          title="السجل"
-          subtitle="آخر حالة لكل ملف انضمام"
+          title="سجل المتاجر"
+          subtitle="آخر حالة لكل متجر مرتبط بالميدان"
           style={{ marginHorizontal: -16, marginTop: -16 }}
           trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }}
         />
@@ -35,4 +35,4 @@ export function FieldHistoryScreen({ stores, onBack }: FieldHistoryScreenProps) 
   );
 }
 
-export default FieldHistoryScreen;
+export default DshFieldStoresHistoryScreen;

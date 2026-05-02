@@ -21,7 +21,7 @@ export function DshFieldProfileScreen({ onBack }: DshFieldProfileScreenProps) {
           <KeyValueList
             items={[
               { label: 'الاسم', value: 'ناصر القحطاني' },
-              { label: 'الدور', value: 'Field Partner Onboarding' },
+              { label: 'الدور', value: 'fieldMember' },
               { label: 'المنطقة', value: 'شمال الرياض' },
               { label: 'بداية الوردية', value: '08:00 ص' },
               { label: 'الملفات النشطة', value: '4', tone: 'brand' },

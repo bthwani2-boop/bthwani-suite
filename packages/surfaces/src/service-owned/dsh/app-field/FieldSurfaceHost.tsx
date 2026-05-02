@@ -1,13 +1,11 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
 import { Box } from '@bthwani/ui-kit';
-import { FieldAccountHomeScreen } from './account/FieldAccountHomeScreen';
-import { FieldHistoryScreen } from './account/FieldHistoryScreen';
 import { DshFieldFinanceScreen } from './finance';
 import { DshFieldStoreOnboardingScreen, readFieldStoresLocal, writeFieldStoresLocal } from './onboarding';
 import { DshFieldStoreVisitScreen, type DshFieldStoreVisitValues } from './visits';
-import { DshFieldStoresScreen } from './stores';
-import { DshFieldProfileScreen } from './profile';
+import { DshFieldProfileHomeScreen, DshFieldProfileScreen } from './profile';
+import { DshFieldStoresHistoryScreen, DshFieldStoresScreen } from './stores';
 import { createManualFieldStore, submitFieldStoreForReview, type FieldStoreFile } from './stores/dshFieldStoresModel';
 
 type FieldRoute =
@@ -182,7 +180,7 @@ export function FieldSurfaceHost() {
 
   if (route.kind === 'account') {
     content = (
-      <FieldAccountHomeScreen
+      <DshFieldProfileHomeScreen
         stores={stores}
         onBack={popRoute}
         onOpenProfile={() => pushRoute({ kind: 'profile' })}
@@ -198,7 +196,7 @@ export function FieldSurfaceHost() {
   }
 
   if (route.kind === 'history') {
-    content = <FieldHistoryScreen stores={stores} onBack={popRoute} />;
+    content = <DshFieldStoresHistoryScreen stores={stores} onBack={popRoute} />;
   }
 
   if (route.kind === 'finance') {

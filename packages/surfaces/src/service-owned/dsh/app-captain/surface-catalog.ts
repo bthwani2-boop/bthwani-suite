@@ -2,8 +2,10 @@ export const surfaceCatalog = [
   'entry',
   'orders-inbox',
   'order-detail',
+  // Compatibility labels kept under the orders flow only.
   'orderchat',
   'bell',
+  // Support/chat labels stay as compatibility terms within orders/operations.
   'support-directory',
   'chat-read-ack',
   'chat-send',

@@ -39,7 +39,7 @@ export function DshFieldStoresScreen({ stores, onOpenStore, onOpenAccount, onCre
       <TopBar
         variant="brand"
         title="بثواني"
-        subtitle="تشغيل الميدان · Field Partner Onboarding"
+        subtitle="تشغيل الميدان · DSH field onboarding"
         locationLabel="الرياض · قائمة المتاجر"
         actions={[
           {
