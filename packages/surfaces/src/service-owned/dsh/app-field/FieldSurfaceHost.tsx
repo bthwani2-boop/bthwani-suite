@@ -6,10 +6,9 @@ import { FieldHistoryScreen } from './account/FieldHistoryScreen';
 import { DshFieldFinanceScreen } from './finance';
 import { DshFieldStoreOnboardingScreen, readFieldStoresLocal, writeFieldStoresLocal } from './onboarding';
 import { DshFieldStoreVisitScreen, type DshFieldStoreVisitValues } from './visits';
-import { FieldSettingsScreen } from './settings/FieldSettingsScreen';
 import { DshFieldStoresScreen } from './stores';
 import { DshFieldProfileScreen } from './profile';
-import { createManualFieldStore, submitFieldStoreForReview, type FieldStoreFile } from './stores/fieldStoreModel';
+import { createManualFieldStore, submitFieldStoreForReview, type FieldStoreFile } from './stores/dshFieldStoresModel';
 
 type FieldRoute =
   | { kind: 'stores' }
@@ -18,8 +17,7 @@ type FieldRoute =
   | { kind: 'account' }
   | { kind: 'profile' }
   | { kind: 'history' }
-  | { kind: 'finance' }
-  | { kind: 'settings' };
+  | { kind: 'finance' };
 
 function isSameRoute(left: FieldRoute, right: FieldRoute) {
   if (left.kind !== right.kind) {
@@ -190,7 +188,6 @@ export function FieldSurfaceHost() {
         onOpenProfile={() => pushRoute({ kind: 'profile' })}
         onOpenHistory={() => pushRoute({ kind: 'history' })}
         onOpenFinance={() => pushRoute({ kind: 'finance' })}
-        onOpenSettings={() => pushRoute({ kind: 'settings' })}
         onLogout={handleLogout}
       />
     );
@@ -206,10 +203,6 @@ export function FieldSurfaceHost() {
 
   if (route.kind === 'finance') {
     content = <DshFieldFinanceScreen stores={stores} onBack={popRoute} />;
-  }
-
-  if (route.kind === 'settings') {
-    content = <FieldSettingsScreen onBack={popRoute} />;
   }
 
   return <Box style={{ flex: 1 }} background="background">{content}</Box>;

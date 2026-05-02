@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Icon, ListItem, MobileScrollView, Surface, Text, TopBar } from '@bthwani/ui-kit';
-import { resolveFieldStoreStatus, type FieldStoreFile } from '../stores/fieldStoreModel';
+import { resolveFieldStoreStatus, type FieldStoreFile } from '../stores/dshFieldStoresModel';
 
 type DshFieldFinanceScreenProps = {
   stores: readonly FieldStoreFile[];
@@ -29,7 +29,7 @@ export function DshFieldFinanceScreen({ stores, onBack }: DshFieldFinanceScreenP
 
         <Surface tone="raised" padding={0} gap={0} radiusToken="xl">
           {eligibleStores.map((store) => (
-            <ListItem key={store.id} title={store.name} subtitle="ملف مكتمل للميدان" meta="اعتماد نهائي" badgeLabel={store.commissionLabel} />
+            <ListItem key={store.id} title={store.name} subtitle="ملف مكتمل للميدان" meta="اعتماد نهائي" badgeLabel={store.financeLabel} />
           ))}
         </Surface>
       </MobileScrollView>

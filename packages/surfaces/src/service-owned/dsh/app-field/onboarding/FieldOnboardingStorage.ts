@@ -1,4 +1,4 @@
-import { createFieldSeedStores, type FieldStoreFile } from '../stores/fieldStoreModel';
+import { createFieldSeedStores, type FieldStoreFile } from '../stores/dshFieldStoresModel';
 
 const STORAGE_KEY = 'bthwani_app_field_partner_onboarding_v2';
 

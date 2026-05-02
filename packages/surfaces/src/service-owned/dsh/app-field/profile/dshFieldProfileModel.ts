@@ -1,1 +1,1 @@
-export * from '../stores/fieldStoreModel';
+export * from '../stores/dshFieldStoresModel';

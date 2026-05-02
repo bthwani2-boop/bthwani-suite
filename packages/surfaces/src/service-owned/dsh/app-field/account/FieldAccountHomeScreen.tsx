@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Badge, Box, Button, Icon, ListItem, MobileScrollView, Surface, Text, TopBar } from '@bthwani/ui-kit';
-import { resolveFieldFilterCounts, type FieldStoreFile } from '../stores/fieldStoreModel';
+import { resolveFieldFilterCounts, type FieldStoreFile } from '../stores/dshFieldStoresModel';
 
 type FieldAccountHomeScreenProps = {
   stores: readonly FieldStoreFile[];
@@ -9,7 +9,6 @@ type FieldAccountHomeScreenProps = {
   onOpenProfile: () => void;
   onOpenHistory: () => void;
   onOpenFinance: () => void;
-  onOpenSettings: () => void;
   onLogout: () => void;
 };
 
@@ -19,7 +18,6 @@ export function FieldAccountHomeScreen({
   onOpenProfile,
   onOpenHistory,
   onOpenFinance,
-  onOpenSettings,
   onLogout,
 }: FieldAccountHomeScreenProps) {
   const counts = React.useMemo(() => resolveFieldFilterCounts(stores), [stores]);
@@ -59,7 +57,6 @@ export function FieldAccountHomeScreen({
           <ListItem title="بيانات الميداني" subtitle="الهوية، التغطية، والوردية الحالية." onPress={onOpenProfile} />
           <ListItem title="السجل" subtitle="ملفات الانضمام التي مررت عليها والحالة الأخيرة لكل ملف." onPress={onOpenHistory} />
           <ListItem title="المالية" subtitle="المستحقات والملخص المالي بعد اكتمال الاعتماد." onPress={onOpenFinance} />
-          <ListItem title="الإعدادات" subtitle="اللغة وتفضيلات الصفحة فقط، بدون تغيير نوع المستخدم." onPress={onOpenSettings} />
         </Surface>
 
         <Button label="تسجيل الخروج" tone="secondary" onPress={onLogout} />

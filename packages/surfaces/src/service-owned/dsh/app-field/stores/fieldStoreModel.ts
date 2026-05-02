@@ -70,7 +70,7 @@ export type FieldStoreFile = {
   category: string;
   location: string;
   nextVisitLabel: string;
-  assignedAgent: string;
+  assignedFieldMember: string;
   lastUpdatedLabel: string;
   lockedStatus?: FieldLeadStatus;
   stageLabelOverride?: string;
@@ -414,7 +414,7 @@ function createSeedStore(overrides: Partial<FieldStoreFile>): FieldStoreFile {
     category: overrides.category ?? 'قيد التحديد',
     location: overrides.location ?? 'الرياض',
     nextVisitLabel: overrides.nextVisitLabel ?? 'اليوم',
-    assignedAgent: overrides.assignedAgent ?? 'ناصر القحطاني',
+    assignedFieldMember: overrides.assignedFieldMember ?? 'ناصر القحطاني',
     lastUpdatedLabel: overrides.lastUpdatedLabel ?? 'اليوم',
     lockedStatus: overrides.lockedStatus,
     stageLabelOverride: overrides.stageLabelOverride,

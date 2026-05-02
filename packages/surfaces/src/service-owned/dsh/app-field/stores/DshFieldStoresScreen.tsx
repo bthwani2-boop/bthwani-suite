@@ -1,8 +1,8 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { Badge, Box, Button, Card, Icon, MobileScrollView, ScreenHeader, SearchField, Text, TopBar } from '@bthwani/ui-kit';
-import { FieldStoreCard } from '../components/FieldStoreCard';
-import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from './fieldStoreModel';
+import { FieldStoreCard } from './FieldStoreCard';
+import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from './dshFieldStoresModel';
 
 type DshFieldStoresScreenProps = {
   stores: readonly FieldStoreFile[];

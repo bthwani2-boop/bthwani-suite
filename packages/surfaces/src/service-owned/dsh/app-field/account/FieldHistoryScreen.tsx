@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Icon, ListItem, MobileScrollView, Surface, TopBar } from '@bthwani/ui-kit';
-import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel, type FieldStoreFile } from '../stores/fieldStoreModel';
+import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel, type FieldStoreFile } from '../stores/dshFieldStoresModel';
 
 type FieldHistoryScreenProps = {
   stores: readonly FieldStoreFile[];

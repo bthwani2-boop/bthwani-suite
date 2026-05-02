@@ -12,7 +12,6 @@ export const DSH_FIELD_BINDING_CONTRACTS: DshFieldBindingContracts = [
   { surfaceId: 'stores', bindingName: 'stores-binding', description: 'Store list and selection bridge.' },
   { surfaceId: 'onboarding', bindingName: 'onboarding-binding', description: 'Draft and review bridge.' },
   { surfaceId: 'visits', bindingName: 'visit-binding', description: 'Visit evidence bridge.' },
-  { surfaceId: 'tasks', bindingName: 'task-binding', description: 'Issue and follow-up bridge.' },
-  { surfaceId: 'finance', bindingName: 'finance-binding', description: 'Commission and payout bridge.' },
+  { surfaceId: 'finance', bindingName: 'finance-binding', description: 'Finance and payout bridge.' },
   { surfaceId: 'profile', bindingName: 'profile-binding', description: 'Profile read bridge.' },
 ] as const;
