@@ -1,0 +1,17 @@
+openapi: 3.1.0
+info:
+  title: BThwani DSH API
+  version: 0.0.0
+  description: >
+    DSH service OpenAPI scaffold for root-service migration.
+    This file is a placeholder contract index only.
+    Do not add endpoint truth until API and contract evidence exists.
+x-bthwani:
+  service: dsh
+  status: SCAFFOLD_TBD
+  migrationPhase: Phase 3 pilot
+  currentImplementationRoot: packages/surfaces/src/service-owned/dsh
+  targetRoot: dsh
+paths: {}
+components:
+  schemas: {}

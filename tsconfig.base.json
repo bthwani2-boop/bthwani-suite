@@ -45,6 +45,42 @@
       "@bthwani/surfaces/composition/*": [
         "./packages/surfaces/src/composition/*"
       ],
+      "@bthwani/dsh/*": [
+        "./packages/surfaces/src/service-owned/dsh/*"
+      ],
+      "@bthwani/wlt/*": [
+        "./packages/surfaces/src/service-owned/wlt/*"
+      ],
+      "@bthwani/knz/*": [
+        "./packages/surfaces/src/service-owned/knz/*"
+      ],
+      "@bthwani/arb/*": [
+        "./packages/surfaces/src/service-owned/arb/*"
+      ],
+      "@bthwani/amn/*": [
+        "./packages/surfaces/src/service-owned/amn/*"
+      ],
+      "@bthwani/esf/*": [
+        "./packages/surfaces/src/service-owned/esf/*"
+      ],
+      "@bthwani/mrf/*": [
+        "./packages/surfaces/src/service-owned/mrf/*"
+      ],
+      "@bthwani/snd/*": [
+        "./packages/surfaces/src/service-owned/snd/*"
+      ],
+      "@bthwani/kwd/*": [
+        "./packages/surfaces/src/service-owned/kwd/*"
+      ],
+      "@bthwani/dsh": [
+        "./dsh/index.ts"
+      ],
+      "@bthwani/app-client/*": [
+        "./apps/mobile/app-client/*"
+      ],
+      "@bthwani/control-panel/*": [
+        "./apps/web/control-panel/*"
+      ],
       "@bthwani/media-fixtures": [
         "./packages/media-fixtures/src/index.ts"
       ],

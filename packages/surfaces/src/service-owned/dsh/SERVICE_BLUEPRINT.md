@@ -74,6 +74,7 @@ It must stay compact, evidence-driven, and phase-aware. Do not add noisy screen 
 |---|---|---|
 | UI / UX / Flow — app-client | CLOSED | Closed with evidence. |
 | UI / UX / Flow — other DSH surfaces | TBD | Must be checked separately. |
+| Root pilot scaffold | ACTIVE | Root `dsh/` scaffold and bridge export exist; implementation remains under packages. |
 | Binding | TBD | Not started as closed truth. |
 | Integration | TBD | Not started as closed truth. |
 | API / Contract | TBD | Not started as closed truth. |
