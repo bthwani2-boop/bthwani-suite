@@ -1,3 +1,2 @@
-export { ClientSurfaceHost as ClientMobileEntry } from './ClientSurfaceHost';
-export { ClientSurfaceHost as default } from './ClientSurfaceHost';
-export * from './ClientSurfaceHost';
+export { default } from '../../../../app-client/shell/mobile-entry';
+export * from '../../../../app-client/shell/mobile-entry';

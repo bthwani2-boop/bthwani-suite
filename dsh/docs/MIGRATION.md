@@ -2,11 +2,9 @@
 
 Status: ACTIVE_MIGRATION_NOTE
 
-This pilot created the root scaffold and the root bridge entrypoint only.
+This pilot now includes a partial frontend slice move into the root service.
 
-No source files were moved.
-
-Next DSH phase must decide whether to move frontend slices from:
+Moved frontend implementation from:
 
 ```text
 packages/surfaces/src/service-owned/dsh
@@ -18,4 +16,6 @@ to:
 dsh/frontend
 ```
 
-That move is forbidden until evidence proves import parity, route and catalog parity, TypeScript safety, and runtime safety.
+`control-panel`, `app-partner`, `app-captain`, and `app-field` now live under `dsh/frontend`.
+`app-client` and `shared` were returned to `packages/surfaces/src/service-owned/dsh` after Expo/Metro runtime evidence showed root-owned resolution breakage.
+Future phases must prove import parity, route and catalog parity, TypeScript safety, and runtime safety before claiming deeper closure.

@@ -1,6 +1,7 @@
 {
-  "name": "@bthwani/ui-kit",
-  "version": "0.1.0",
+  "$schema": "../../tools/schemas/package.schema.json",
+  "name": "@bthwani/ui-kit-compat",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "sideEffects": false,
@@ -9,33 +10,13 @@
   "types": "./src/index.ts",
   "files": [
     "src",
-    "docs",
     "README.md"
   ],
-  "devDependencies": {
-    "@types/react": "^19.2.2",
-    "react": "19.1.0",
-    "react-native": "0.81.0",
-    "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "@expo/vector-icons": "15.1.1",
-    "react": "19.1.0",
-    "react-native": "0.81.0",
-    "tamagui": "2.0.0-rc.41",
-    "@tamagui/config": "2.0.0-rc.41"
-  },
-  "peerDependencies": {
-    "react": "19.1.0",
-    "react-native": "0.81.0",
-    "next": "16.2.2",
-    "tamagui": "2.0.0-rc.41",
-    "@tamagui/config": "2.0.0-rc.41"
-  },
   "exports": {
-    ".": "./src/index.ts",
-    "./web": "./src/web.ts",
-    "./mobile": "./src/mobile.ts",
-    "./next": "./src/next.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
   }
 }

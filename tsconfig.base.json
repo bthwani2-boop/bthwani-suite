@@ -16,10 +16,12 @@
         "./packages/api-types/src/index.ts"
       ],
       "@bthwani/ui-kit": [
+        "./ui-kit/src/index.ts",
         "./packages/ui-kit/src/index.ts"
       ],
       "@bthwani/ui-kit/*": [
-        "./packages/ui-kit/src/*.ts"
+        "./ui-kit/src/*",
+        "./packages/ui-kit/src/*"
       ],
       "@bthwani/app-shells": [
         "./packages/app-shells/index.ts"
@@ -46,10 +48,15 @@
         "./packages/surfaces/src/composition/*"
       ],
       "@bthwani/dsh/*": [
+        "./dsh/frontend/*",
         "./packages/surfaces/src/service-owned/dsh/*"
       ],
       "@bthwani/wlt/*": [
+        "./wlt/*",
         "./packages/surfaces/src/service-owned/wlt/*"
+      ],
+      "@bthwani/wlt": [
+        "./wlt/index.ts"
       ],
       "@bthwani/knz/*": [
         "./packages/surfaces/src/service-owned/knz/*"
@@ -76,9 +83,13 @@
         "./dsh/index.ts"
       ],
       "@bthwani/app-client/*": [
+        "./app-client/*",
+        "./app-client/runtime/*",
         "./apps/mobile/app-client/*"
       ],
       "@bthwani/control-panel/*": [
+        "./control-panel/*",
+        "./control-panel/runtime/*",
         "./apps/web/control-panel/*"
       ],
       "@bthwani/media-fixtures": [

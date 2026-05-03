@@ -1,0 +1,14 @@
+{
+  "$schema": "../tools/schemas/tsconfig.schema.json",
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "strict": true,
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "types": ["react", "react-native"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"]
+}

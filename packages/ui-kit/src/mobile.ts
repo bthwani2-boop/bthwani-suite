@@ -1,2 +1,1 @@
-export { MobileRoot } from './mobile/index';
-export type { MobileRootProps } from './mobile/index';
+export * from '../../../ui-kit/src/mobile';

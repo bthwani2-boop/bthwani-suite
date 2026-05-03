@@ -58,17 +58,20 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
 
-  apps/mobile/app-captain:
+  app-client/runtime:
     dependencies:
       '@bthwani/app-shells':
         specifier: workspace:*
-        version: link:../../../packages/app-shells
+        version: link:../../packages/app-shells
       '@bthwani/ui-kit':
         specifier: workspace:*
-        version: link:../../../packages/ui-kit
+        version: link:../../ui-kit
       expo:
         specifier: ~54.0.0
         version: 54.0.33(@babel/core@7.29.0)(react-native@0.81.0)(react@19.1.0)
+      expo-av:
+        specifier: ~16.0.8
+        version: 16.0.8(expo@54.0.33)(react-native@0.81.0)(react@19.1.0)
       expo-dev-client:
         specifier: ~6.0.20
         version: 6.0.20(expo@54.0.33)
@@ -79,20 +82,17 @@ importers:
         specifier: 0.81.0
         version: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
 
-  apps/mobile/app-client:
+  apps/mobile/app-captain:
     dependencies:
       '@bthwani/app-shells':
         specifier: workspace:*
         version: link:../../../packages/app-shells
       '@bthwani/ui-kit':
         specifier: workspace:*
-        version: link:../../../packages/ui-kit
+        version: link:../../../ui-kit
       expo:
         specifier: ~54.0.0
         version: 54.0.33(@babel/core@7.29.0)(react-native@0.81.0)(react@19.1.0)
-      expo-av:
-        specifier: ~16.0.8
-        version: 16.0.8(expo@54.0.33)(react-native@0.81.0)(react@19.1.0)
       expo-dev-client:
         specifier: ~6.0.20
         version: 6.0.20(expo@54.0.33)
@@ -110,7 +110,7 @@ importers:
         version: link:../../../packages/app-shells
       '@bthwani/ui-kit':
         specifier: workspace:*
-        version: link:../../../packages/ui-kit
+        version: link:../../../ui-kit
       expo:
         specifier: ~54.0.0
         version: 54.0.33(@babel/core@7.29.0)(react-native@0.81.0)(react@19.1.0)
@@ -131,7 +131,7 @@ importers:
         version: link:../../../packages/app-shells
       '@bthwani/ui-kit':
         specifier: workspace:*
-        version: link:../../../packages/ui-kit
+        version: link:../../../ui-kit
       expo:
         specifier: ~54.0.0
         version: 54.0.33(@babel/core@7.29.0)(react-native@0.81.0)(react@19.1.0)
@@ -145,37 +145,6 @@ importers:
         specifier: 0.81.0
         version: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
 
-  apps/web/control-panel:
-    dependencies:
-      '@bthwani/app-shells':
-        specifier: workspace:*
-        version: link:../../../packages/app-shells
-      '@bthwani/ui-kit':
-        specifier: workspace:*
-        version: link:../../../packages/ui-kit
-      next:
-        specifier: 16.2.2
-        version: 16.2.2(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.1.0)(react@19.1.0)
-      react:
-        specifier: 19.1.0
-        version: 19.1.0
-      react-dom:
-        specifier: 19.1.0
-        version: 19.1.0(react@19.1.0)
-      react-native-web:
-        specifier: 0.21.2
-        version: 0.21.2(react-dom@19.1.0)(react@19.1.0)
-    devDependencies:
-      '@types/react':
-        specifier: ^19.2.2
-        version: 19.2.14
-      '@types/react-dom':
-        specifier: ^19.2.2
-        version: 19.2.3(@types/react@19.2.14)
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-
   apps/web/webapp:
     dependencies:
       '@bthwani/app-shells':
@@ -183,7 +152,7 @@ importers:
         version: link:../../../packages/app-shells
       '@bthwani/ui-kit':
         specifier: workspace:*
-        version: link:../../../packages/ui-kit
+        version: link:../../../ui-kit
       next:
         specifier: 16.2.2
         version: 16.2.2(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.1.0)(react@19.1.0)
@@ -214,7 +183,7 @@ importers:
         version: link:../../../packages/app-shells
       '@bthwani/ui-kit':
         specifier: workspace:*
-        version: link:../../../packages/ui-kit
+        version: link:../../../ui-kit
       next:
         specifier: 16.2.2
         version: 16.2.2(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.1.0)(react@19.1.0)
@@ -247,6 +216,37 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
 
+  control-panel/runtime:
+    dependencies:
+      '@bthwani/app-shells':
+        specifier: workspace:*
+        version: link:../../packages/app-shells
+      '@bthwani/ui-kit':
+        specifier: workspace:*
+        version: link:../../ui-kit
+      next:
+        specifier: 16.2.2
+        version: 16.2.2(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.1.0)(react@19.1.0)
+      react:
+        specifier: 19.1.0
+        version: 19.1.0
+      react-dom:
+        specifier: 19.1.0
+        version: 19.1.0(react@19.1.0)
+      react-native-web:
+        specifier: 0.21.2
+        version: 0.21.2(react-dom@19.1.0)(react@19.1.0)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.2.2
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.2.2
+        version: 19.2.3(@types/react@19.2.14)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
   packages/api-clients:
     dependencies:
       '@bthwani/api-types':
@@ -270,7 +270,7 @@ importers:
         version: link:../surfaces
       '@bthwani/ui-kit':
         specifier: workspace:*
-        version: link:../ui-kit
+        version: link:../../ui-kit
 
   packages/media-fixtures: {}
 
@@ -281,9 +281,9 @@ importers:
         version: link:../media-fixtures
       '@bthwani/ui-kit':
         specifier: workspace:*
-        version: link:../ui-kit
+        version: link:../../ui-kit
 
-  packages/ui-kit:
+  ui-kit:
     dependencies:
       '@expo/vector-icons':
         specifier: 15.1.1

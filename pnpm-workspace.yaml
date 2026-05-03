@@ -1,6 +1,12 @@
 packages:
+  - app-client/runtime
+  - control-panel/runtime
+  - ui-kit
   - apps/*
   - apps/*/*
+  - '!apps/mobile/app-client'
+  - '!apps/web/control-panel'
   - services/*
   - packages/*
+  - '!packages/ui-kit'
 nodeLinker: hoisted

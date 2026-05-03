@@ -51,6 +51,11 @@
       "import": "./src/public/control-panel.ts",
       "default": "./src/public/control-panel.ts"
     },
+    "./wlt": {
+      "types": "./src/public/wlt.ts",
+      "import": "./src/public/wlt.ts",
+      "default": "./src/public/wlt.ts"
+    },
     "./webapp": {
       "types": "./src/public/webapp.ts",
       "import": "./src/public/webapp.ts",

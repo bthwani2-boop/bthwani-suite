@@ -191,7 +191,7 @@
         "name": "app-client",
         "type": "app",
         "data": {
-          "root": "apps/mobile/app-client",
+          "root": "app-client",
           "name": "app-client",
           "projectType": "application",
           "tags": [
@@ -252,7 +252,7 @@
             "serve": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-client exec expo start --dev-client --clear"
+                "command": "pnpm --dir app-client/runtime exec expo start --dev-client --clear"
               },
               "configurations": {},
               "parallelism": true
@@ -260,7 +260,7 @@
             "build": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-client exec expo export --platform android"
+                "command": "pnpm --dir app-client/runtime exec expo export --platform android"
               },
               "configurations": {},
               "parallelism": true
@@ -268,7 +268,7 @@
             "serve-go": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-client exec expo start --go --clear"
+                "command": "pnpm --dir app-client/runtime exec expo start --go --clear"
               },
               "configurations": {},
               "parallelism": true
@@ -276,7 +276,7 @@
             "android": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-client exec expo run:android --no-bundler"
+                "command": "pnpm --dir app-client/runtime exec expo run:android --no-bundler"
               },
               "configurations": {},
               "parallelism": true
@@ -284,7 +284,7 @@
             "config": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-client exec expo config --json"
+                "command": "pnpm --dir app-client/runtime exec expo config --json"
               },
               "configurations": {},
               "parallelism": true
@@ -297,7 +297,7 @@
         "name": "control-panel",
         "type": "app",
         "data": {
-          "root": "apps/web/control-panel",
+          "root": "control-panel",
           "name": "control-panel",
           "projectType": "application",
           "tags": [
@@ -343,7 +343,7 @@
             "serve": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/web/control-panel dev"
+                "command": "pnpm --dir control-panel/runtime dev"
               },
               "configurations": {},
               "parallelism": true
@@ -351,7 +351,7 @@
             "build": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/web/control-panel build"
+                "command": "pnpm --dir control-panel/runtime build"
               },
               "configurations": {},
               "parallelism": true
@@ -712,7 +712,7 @@
         "name": "ui-kit",
         "type": "lib",
         "data": {
-          "root": "packages/ui-kit",
+          "root": "ui-kit",
           "name": "ui-kit",
           "projectType": "library",
           "tags": [
@@ -740,7 +740,7 @@
             "typecheck": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm exec tsc -p packages/ui-kit/tsconfig.json --noEmit"
+                "command": "pnpm exec tsc -p ui-kit/tsconfig.json --noEmit"
               },
               "configurations": {},
               "parallelism": true
@@ -771,7 +771,7 @@
             }
           },
           "$schema": "../../node_modules/nx/schemas/project-schema.json",
-          "sourceRoot": "packages/ui-kit/src",
+          "sourceRoot": "ui-kit/src",
           "implicitDependencies": []
         }
       },

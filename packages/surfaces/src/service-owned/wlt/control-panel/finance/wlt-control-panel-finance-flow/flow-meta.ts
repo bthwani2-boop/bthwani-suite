@@ -1,6 +1,1 @@
-export const flowMeta = {
-  id: 'amn-control-panel-operations-flow',
-  owner: 'finance',
-  ownerKind: 'section',
-  placeholder: true,
-} as const;
+export * from '../../../../../../../../wlt/frontend/control-panel/finance/wlt-control-panel-finance-flow/flow-meta';

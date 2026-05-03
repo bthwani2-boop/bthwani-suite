@@ -1,2 +1,2 @@
-export { ControlPanelSurfaceHost as default } from './ControlPanelSurfaceHost';
-export * from './ControlPanelSurfaceHost';
+export { default } from '../../../../control-panel/shell/web-entry';
+export * from '../../../../control-panel/shell/web-entry';

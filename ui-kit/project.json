@@ -1,0 +1,22 @@
+{
+  "name": "ui-kit",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "root": "ui-kit",
+  "sourceRoot": "ui-kit/src",
+  "projectType": "library",
+  "tags": ["scope:shared", "type:ui", "owner:design-system"],
+  "targets": {
+    "typecheck": {
+      "command": "pnpm exec tsc -p ui-kit/tsconfig.json --noEmit"
+    },
+    "build-outputs": {
+      "command": "pwsh -NoProfile -File tools/scripts/WRITE_UI_KIT_OUTPUTS.ps1"
+    },
+    "proof-visual": {
+      "command": "pwsh -NoProfile -File tools/scripts/VERIFY_UI_KIT_VISUAL_PROOF.ps1"
+    },
+    "proof": {
+      "command": "pwsh -NoProfile -File tools/scripts/VERIFY_UI_KIT_PROOF.ps1"
+    }
+  }
+}

@@ -1,23 +1,14 @@
 {
   "$schema": "../../../tools/schemas/package.schema.json",
-  "name": "@bthwani/app-client",
-  "version": "0.0.0",
+  "name": "@bthwani/app-client-bridge",
   "private": true,
   "main": "./index.js",
-  "dependencies": {
-    "@bthwani/app-shells": "workspace:*",
-    "@bthwani/ui-kit": "workspace:*",
-    "expo": "^54.0.0",
-    "expo-av": "~16.0.8",
-    "expo-dev-client": "~6.0.20",
-    "react": "19.1.0",
-    "react-native": "0.81.0"
-  },
   "scripts": {
-    "dev": "expo start --dev-client --clear",
-    "go": "expo start --go --clear",
-    "android": "expo run:android",
-    "config": "expo config --json",
-    "ios": "expo run:ios"
+    "dev": "pnpm --dir ../../../app-client/runtime dev",
+    "go": "pnpm --dir ../../../app-client/runtime go",
+    "android": "pnpm --dir ../../../app-client/runtime android",
+    "config": "pnpm --dir ../../../app-client/runtime config",
+    "ios": "pnpm --dir ../../../app-client/runtime ios",
+    "build": "pnpm --dir ../../../app-client/runtime exec expo export --platform android"
   }
 }

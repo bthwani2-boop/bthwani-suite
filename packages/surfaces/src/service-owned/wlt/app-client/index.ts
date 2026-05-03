@@ -1,5 +1,1 @@
-export * from './surface-meta';
-export * from './surface-catalog';
-export * from './screens';
-
-
+export * from '../../../../../../wlt/frontend/app-client';
