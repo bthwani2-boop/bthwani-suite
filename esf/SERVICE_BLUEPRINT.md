@@ -1,10 +1,19 @@
 # ESF Service Blueprint
 
-Status: TEMPLATE
-Owner root: packages/surfaces/src/service-owned/esf
+Status: ROOTED_UNPROVEN
+Owner root: esf
 Purpose: Single canonical living control file for the ESF service.
 
 This file is intentionally empty of verified implementation facts until evidence exists.
+
+id: esf
+name: ESF
+owner: esf
+public_export_path: esf/index.ts
+screens_matrix: TBD
+flow_matrix: TBD
+evidence_root: TBD
+closure_decision: NOT CLOSED
 
 Do not add noisy generated screen lists, stale paths, or future claims without proof.
 
@@ -15,9 +24,9 @@ Do not add noisy generated screen lists, stale paths, or future claims without p
 | Field | Value |
 |---|---|
 | Service | ESF |
-| Canonical owner root | packages/surfaces/src/service-owned/esf |
-| Current truth file | packages/surfaces/src/service-owned/esf/SERVICE_BLUEPRINT.md |
-| Blueprint status | TEMPLATE |
+| Canonical owner root | esf |
+| Current truth file | esf/SERVICE_BLUEPRINT.md |
+| Blueprint status | ROOTED_UNPROVEN |
 | Last initialized | 2026-04-20 23:46:18 |
 | Evidence root | TBD |
 
@@ -91,7 +100,7 @@ Status: REQUIRED
 
 | Guard | Requirement |
 |---|---|
-| Canonical file | packages/surfaces/src/service-owned/esf/SERVICE_BLUEPRINT.md |
+| Canonical file | esf/SERVICE_BLUEPRINT.md |
 | Before service work | Read this file first |
 | During service work | Do not promote unverified claims |
 | After service work | Update this file or verify that no update is needed |

@@ -3,6 +3,9 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { ROOT, gitLsFiles, runGuard } from './_guard-common.mjs';
 
+const canonicalServices = ['dsh', 'wlt', 'knz', 'arb', 'amn', 'esf', 'mrf', 'snd', 'kwd'];
+const appRoots = ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel', 'webapp', 'website', 'ui-kit'];
+
 function gitChangedFilesRange() {
   try {
     const out = execFileSync('git', ['diff', '--name-only', 'origin/main...HEAD'], { cwd: ROOT, encoding: 'utf8' });
@@ -22,9 +25,16 @@ runGuard({
     const files = changed.length ? changed : gitLsFiles();
     const serviceDirs = new Set();
     for (const f of files) {
-      const m = f.match(/^packages\/surfaces\/src\/service-owned\/([^/]+)\//);
-      if (m) serviceDirs.add(`packages/surfaces/src/service-owned/${m[1]}`);
-      else if (f.includes('apps/')) serviceDirs.add('apps');
+      for (const service of canonicalServices) {
+        if (f === service || f.startsWith(`${service}/`)) {
+          serviceDirs.add(service);
+        }
+      }
+      for (const root of appRoots) {
+        if (f === root || f.startsWith(`${root}/`)) {
+          serviceDirs.add(root);
+        }
+      }
     }
 
     const findings = [];

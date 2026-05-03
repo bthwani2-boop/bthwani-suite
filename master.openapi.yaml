@@ -1,0 +1,16 @@
+openapi: 3.1.0
+info:
+  title: Bthwani Master API Index
+  version: 1.0.0
+  description: Root index of service OpenAPI documents. No endpoints are defined here.
+paths: {}
+x-bthwani-service-contracts:
+  dsh: ./dsh/dsh.openapi.yaml
+  wlt: ./wlt/wlt.openapi.yaml
+  knz: ./knz/knz.openapi.yaml
+  arb: ./arb/arb.openapi.yaml
+  amn: ./amn/amn.openapi.yaml
+  esf: ./esf/esf.openapi.yaml
+  mrf: ./mrf/mrf.openapi.yaml
+  snd: ./snd/snd.openapi.yaml
+  kwd: ./kwd/kwd.openapi.yaml

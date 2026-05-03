@@ -4,7 +4,27 @@ import { parseArgs, createReport, finalize, walkFiles, readText, rel, CODE_EXTEN
 const args = parseArgs();
 const report = createReport('API-BINDING-RUNTIME', 'governance/09_API_BINDING_RUNTIME.md');
 const root = args.root;
-const files = walkFiles(root, { startDirs: ['packages/surfaces/src/service-owned', 'apps'], extensions: CODE_EXTENSIONS });
+const files = walkFiles(root, {
+  startDirs: [
+    'dsh/frontend',
+    'wlt/frontend',
+    'knz/frontend',
+    'arb/frontend',
+    'amn/frontend',
+    'esf/frontend',
+    'mrf/frontend',
+    'snd/frontend',
+    'kwd/frontend',
+    'app-client',
+    'app-partner',
+    'app-captain',
+    'app-field',
+    'control-panel',
+    'webapp',
+    'website',
+  ],
+  extensions: CODE_EXTENSIONS,
+});
 
 const dataHints = /\b(fetch|axios|useQuery|apiClient|ApiClient|queryClient\.|serviceClient\.|httpClient\.|request\(|mutate\(|useMutation|subscribe\()/;
 const stateHints = {
@@ -29,7 +49,7 @@ for (const file of files) {
   }
 }
 
-const contractFiles = walkFiles(root, { startDirs: ['contracts', 'dsh/backend', 'wlt/backend', 'knz/backend', 'arb/backend', 'amn/backend', 'esf/backend', 'mrf/backend', 'snd/backend', 'kwd/backend', 'packages/surfaces/src/service-owned'], extensions: CODE_EXTENSIONS });
+const contractFiles = walkFiles(root, { startDirs: ['contracts', 'dsh/backend', 'wlt/backend', 'knz/backend', 'arb/backend', 'amn/backend', 'esf/backend', 'mrf/backend', 'snd/backend', 'kwd/backend'], extensions: CODE_EXTENSIONS });
 for (const file of contractFiles) {
   const relative = rel(root, file);
   if (!/(contract|schema|api-type|apiTypes)/i.test(relative)) continue;

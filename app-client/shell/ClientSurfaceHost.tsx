@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-	DshHomeApprovedVideoReelsViewer,
-	DshSurfaceHost,
-	type DshCommandTarget,
-	type DshHomeApprovedVideoReelsViewerProps,
-} from '../../dsh/frontend/app-client';
+import { appClientSurfaceRegistry, type DshCommandTarget, type DshHomeApprovedVideoReelsViewerProps } from '../composition';
 
 export type ClientSurfaceHostProps = {
 	renderApprovedVideoReelsViewer?: (props: DshHomeApprovedVideoReelsViewerProps) => React.ReactNode;
@@ -16,16 +11,17 @@ type DshNavigationCommand = {
 };
 
 export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: ClientSurfaceHostProps) {
+	const dsh = appClientSurfaceRegistry.dsh;
 	const [command] = React.useState<DshNavigationCommand>({
 		token: 1,
 		target: 'home',
 	});
 
 	return (
-		<DshSurfaceHost
+		<dsh.SurfaceHost
 			command={command}
 			renderApprovedVideoReelsViewer={(props) =>
-				renderApprovedVideoReelsViewer?.(props) ?? <DshHomeApprovedVideoReelsViewer {...props} />
+				renderApprovedVideoReelsViewer?.(props) ?? <dsh.ApprovedVideoReelsViewer {...props} />
 			}
 		/>
 	);

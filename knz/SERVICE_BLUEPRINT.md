@@ -6,6 +6,15 @@ Purpose: Canonical living control file for the KNZ service.
 
 This file records the root move and preserves compatibility-only status for the old service-owned path.
 
+id: knz
+name: KNZ
+owner: knz
+public_export_path: knz/index.ts
+screens_matrix: TBD
+flow_matrix: TBD
+evidence_root: TBD
+closure_decision: NOT CLOSED
+
 ---
 
 ## 1. Service Identity

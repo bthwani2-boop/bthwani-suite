@@ -15,80 +15,53 @@
       "@bthwani/ui-kit/*": [
         "./ui-kit/src/*"
       ],
-      "@bthwani/surface-mobile": [
-        "./packages/surface-mobile/src/index.tsx"
-      ],
-      "@bthwani/surfaces": [
-        "./packages/surfaces/src/index.ts"
-      ],
-      "@bthwani/surfaces/*": [
-        "./packages/surfaces/src/service-owned/*"
-      ],
-      "@bthwani/surfaces/service-owned/*": [
-        "./packages/surfaces/src/service-owned/*"
-      ],
-      "@bthwani/surfaces/surface-owned/*": [
-        "./packages/surfaces/src/surface-owned/*"
-      ],
-      "@bthwani/surfaces/composition/*": [
-        "./packages/surfaces/src/composition/*"
-      ],
       "@bthwani/dsh/*": [
-        "./dsh/frontend/*",
-        "./packages/surfaces/src/service-owned/dsh/*"
+        "./dsh/*"
       ],
       "@bthwani/wlt/*": [
-        "./wlt/*",
-        "./packages/surfaces/src/service-owned/wlt/*"
+        "./wlt/*"
       ],
       "@bthwani/wlt": [
         "./wlt/index.ts"
       ],
       "@bthwani/knz/*": [
-        "./knz/*",
-        "./packages/surfaces/src/service-owned/knz/*"
+        "./knz/*"
       ],
       "@bthwani/knz": [
         "./knz/index.ts"
       ],
       "@bthwani/arb/*": [
-        "./arb/*",
-        "./packages/surfaces/src/service-owned/arb/*"
+        "./arb/*"
       ],
       "@bthwani/arb": [
         "./arb/index.ts"
       ],
       "@bthwani/amn/*": [
-        "./amn/*",
-        "./packages/surfaces/src/service-owned/amn/*"
+        "./amn/*"
       ],
       "@bthwani/amn": [
         "./amn/index.ts"
       ],
       "@bthwani/esf/*": [
-        "./esf/*",
-        "./packages/surfaces/src/service-owned/esf/*"
+        "./esf/*"
       ],
       "@bthwani/esf": [
         "./esf/index.ts"
       ],
       "@bthwani/mrf/*": [
-        "./mrf/*",
-        "./packages/surfaces/src/service-owned/mrf/*"
+        "./mrf/*"
       ],
       "@bthwani/mrf": [
         "./mrf/index.ts"
       ],
       "@bthwani/snd/*": [
-        "./snd/*",
-        "./packages/surfaces/src/service-owned/snd/*"
+        "./snd/*"
       ],
       "@bthwani/snd": [
         "./snd/index.ts"
       ],
       "@bthwani/kwd/*": [
-        "./kwd/*",
-        "./packages/surfaces/src/service-owned/kwd/*"
+        "./kwd/*"
       ],
       "@bthwani/kwd": [
         "./kwd/index.ts"
@@ -164,11 +137,41 @@
       "@bthwani/website/*": [
         "./website/*"
       ],
-      "@bthwani/media-fixtures": [
-        "./packages/media-fixtures/src/index.ts"
+      "@bthwani/app-client": [
+        "./app-client/composition/index.ts"
       ],
-      "@bthwani/media-fixtures/*": [
-        "./packages/media-fixtures/src/*"
+      "@bthwani/app-client/*": [
+        "./app-client/*",
+        "./app-client/runtime/*"
+      ],
+      "@bthwani/app-partner": [
+        "./app-partner/composition/index.ts"
+      ],
+      "@bthwani/app-partner/*": [
+        "./app-partner/*",
+        "./app-partner/runtime/*"
+      ],
+      "@bthwani/app-captain": [
+        "./app-captain/composition/index.ts"
+      ],
+      "@bthwani/app-captain/*": [
+        "./app-captain/*",
+        "./app-captain/runtime/*"
+      ],
+      "@bthwani/app-field": [
+        "./app-field/composition/index.ts"
+      ],
+      "@bthwani/app-field/*": [
+        "./app-field/*",
+        "./app-field/runtime/*"
+      ],
+      "@bthwani/control-panel": [
+        "./control-panel/shell/index.ts"
+      ],
+      "@bthwani/control-panel/*": [
+        "./control-panel/*",
+        "./control-panel/runtime/*",
+        "./control-panel/shell/*"
       ]
     },
     "resolveJsonModule": true,

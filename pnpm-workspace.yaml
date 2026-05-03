@@ -3,12 +3,20 @@ packages:
   - website
   - webapp/runtime
   - website/runtime
+  - app-client/runtime
   - app-partner/runtime
   - app-captain/runtime
   - app-field/runtime
-  - app-client/runtime
   - control-panel/runtime
   - ui-kit
-  - services/*
+  - dsh
+  - wlt
+  - knz
+  - arb
+  - amn
+  - esf
+  - mrf
+  - snd
+  - kwd
   - packages/*
 nodeLinker: hoisted

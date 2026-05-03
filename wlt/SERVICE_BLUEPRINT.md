@@ -6,6 +6,15 @@ Purpose: Single canonical living control file for the WLT service.
 
 This file records the root service move and keeps unverified runtime claims at TBD.
 
+id: wlt
+name: WLT
+owner: wlt
+public_export_path: wlt/index.ts
+screens_matrix: TBD
+flow_matrix: TBD
+evidence_root: TBD
+closure_decision: NOT CLOSED
+
 Do not add noisy generated screen lists, stale paths, or future claims without proof.
 
 ---

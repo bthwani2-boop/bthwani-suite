@@ -14,6 +14,9 @@ runGuard({
 
     for (const file of files) {
       const full = path.join(ROOT, file);
+      if (!fs.existsSync(full)) {
+        continue;
+      }
       const stat = fs.statSync(full);
       if (stat.size === 0) {
         findings.push({ type: 'ZERO_BYTE_FILE', severity: 'warning', file, reason: 'Tracked file has zero bytes.' });

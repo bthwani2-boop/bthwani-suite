@@ -1,10 +1,19 @@
 # KWD Service Blueprint
 
-Status: TEMPLATE
-Owner root: packages/surfaces/src/service-owned/kwd
+Status: ROOTED_UNPROVEN
+Owner root: kwd
 Purpose: Single canonical living control file for the KWD service.
 
 This file is intentionally empty of verified implementation facts until evidence exists.
+
+id: kwd
+name: KWD
+owner: kwd
+public_export_path: kwd/index.ts
+screens_matrix: TBD
+flow_matrix: TBD
+evidence_root: TBD
+closure_decision: NOT CLOSED
 
 Do not add noisy generated screen lists, stale paths, or future claims without proof.
 
@@ -15,9 +24,9 @@ Do not add noisy generated screen lists, stale paths, or future claims without p
 | Field | Value |
 |---|---|
 | Service | KWD |
-| Canonical owner root | packages/surfaces/src/service-owned/kwd |
-| Current truth file | packages/surfaces/src/service-owned/kwd/SERVICE_BLUEPRINT.md |
-| Blueprint status | TEMPLATE |
+| Canonical owner root | kwd |
+| Current truth file | kwd/SERVICE_BLUEPRINT.md |
+| Blueprint status | ROOTED_UNPROVEN |
 | Last initialized | 2026-04-20 23:46:18 |
 | Evidence root | TBD |
 
@@ -91,7 +100,7 @@ Status: REQUIRED
 
 | Guard | Requirement |
 |---|---|
-| Canonical file | packages/surfaces/src/service-owned/kwd/SERVICE_BLUEPRINT.md |
+| Canonical file | kwd/SERVICE_BLUEPRINT.md |
 | Before service work | Read this file first |
 | During service work | Do not promote unverified claims |
 | After service work | Update this file or verify that no update is needed |
