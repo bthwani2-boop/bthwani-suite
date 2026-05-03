@@ -18,5 +18,4 @@ packages:
   - mrf
   - snd
   - kwd
-  - packages/*
 nodeLinker: hoisted
