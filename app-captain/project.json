@@ -1,0 +1,38 @@
+{
+  "name": "app-captain",
+  "root": "app-captain",
+  "sourceRoot": "app-captain",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir app-captain/runtime exec expo start --dev-client --clear"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir app-captain/runtime exec expo export --platform android"
+      }
+    },
+    "serve-go": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir app-captain/runtime exec expo start --go --clear"
+      }
+    },
+    "android": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir app-captain/runtime exec expo run:android"
+      }
+    },
+    "config": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir app-captain/runtime exec expo config --json"
+      }
+    }
+  }
+}

@@ -1,13 +1,27 @@
-// NOTE (example-only): Placeholder identifiers in this file are examples for development and not runtime secrets. See kdt/merge-run/.../proposed/PROTECTED_TOKENS_ALLOWLIST.md for accepted tokens.
+import React from 'react';
 import { MobileRoot } from '@bthwani/ui-kit/mobile';
-import ClientSurfaceHost from '../shell/mobile-entry';
-import ApprovedVideoReelsViewer from './ApprovedVideoReelsViewer';
+import {
+	DshHomeApprovedVideoReelsViewer,
+	DshSurfaceHost,
+	type DshCommandTarget,
+} from '../../dsh/frontend/app-client';
+
+type DshNavigationCommand = {
+	token: number;
+	target: DshCommandTarget;
+};
 
 export default function App() {
+	const [command] = React.useState<DshNavigationCommand>({
+		token: 1,
+		target: 'home',
+	});
+
 	return (
 		<MobileRoot language="ar" themeMode="light">
-			<ClientSurfaceHost
-				renderApprovedVideoReelsViewer={(props) => <ApprovedVideoReelsViewer {...props} />}
+			<DshSurfaceHost
+				command={command}
+				renderApprovedVideoReelsViewer={(props) => <DshHomeApprovedVideoReelsViewer {...props} />}
 			/>
 		</MobileRoot>
 	);

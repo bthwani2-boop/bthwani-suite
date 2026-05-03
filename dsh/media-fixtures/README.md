@@ -1,8 +1,8 @@
 # DSH Media Fixtures
 
-Status: SCAFFOLD_ONLY
+Status: ACTIVE
 
-Target location for DSH-owned media fixtures.
+Canonical location for DSH-owned seed media fixtures.
 
 Allowed future categories:
 
@@ -15,4 +15,4 @@ documents
 mocks
 ```
 
-No media files were moved in this pilot.
+Seed images now live under `dsh/media-fixtures/assets/seed/dsh/` and are consumed by `@bthwani/media-fixtures` through compatibility paths.

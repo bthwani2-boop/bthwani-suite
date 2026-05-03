@@ -20,13 +20,23 @@ Apps are runtime shells. They should mount navigation, providers, platform runti
 
 | App root | Surface | Allowed ownership | Forbidden ownership |
 | --- | --- | --- | --- |
-| apps/mobile/app-client | app-client | mobile bootstrap, navigation, permissions, surface mount | service logic, local UI system |
-| apps/mobile/app-partner | app-partner | partner shell, navigation, runtime glue | DSH/WLT ownership, local brand components |
-| apps/mobile/app-captain | app-captain | captain shell, device permissions, route mount | order state machine outside surfaces |
-| apps/mobile/app-field | app-field | field shell and route mount | partner/field business logic duplication |
-| apps/web/control-panel | control-panel | Next shell, admin layout mount, auth shell | domain service ownership |
-| apps/web/webapp | webapp | web runtime shell | control-panel operations |
-| apps/web/website | website | marketing shell | live service operations |
+| app-client | app-client | mobile bootstrap, navigation, permissions, surface mount | service logic, local UI system |
+| app-partner | app-partner | partner shell, navigation, runtime glue | DSH/WLT ownership, local brand components |
+| app-captain | app-captain | captain shell, device permissions, route mount | order state machine outside surfaces |
+| app-field | app-field | field shell and route mount | partner/field business logic duplication |
+| control-panel | control-panel | Next shell, admin layout mount, auth shell | domain service ownership |
+| webapp | webapp | web runtime shell | control-panel operations |
+| website | website | marketing shell | live service operations |
+
+## Legacy bridge roots
+
+- `apps/mobile/app-client`
+- `apps/mobile/app-partner`
+- `apps/mobile/app-captain`
+- `apps/mobile/app-field`
+- `apps/web/control-panel`
+- `apps/web/webapp`
+- `apps/web/website`
 
 ## Shell-only allowed work
 

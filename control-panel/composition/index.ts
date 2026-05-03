@@ -1,2 +1,5 @@
-export * from '../../packages/surfaces/src/public/control-panel';
-export * as controlPanelSurfaceOwned from '../../packages/surfaces/src/surface-owned/control-panel';
+export * from '../../dsh/frontend/control-panel';
+export { ControlPanelDshMarketingScreen } from '../../dsh/frontend/control-panel/marketing';
+export { ControlPanelDshPartnerApprovalsScreen } from '../../dsh/frontend/control-panel/partners';
+export { useDshControlPanelText } from '../../dsh/frontend/control-panel/operations/shared';
+export { ControlPanelDshSheinProxyRequestScreen } from '../../dsh/frontend/control-panel/operations/sheinproxy';

@@ -25,8 +25,8 @@ tools/registry/runs/{SESSION_ID}/
 packages/ui-kit
 packages/surfaces
 packages/app-shells
-packages/api-types
-packages/api-clients
+api-types
+api-clients
 services/
 contracts/master/
 apps/mobile/*

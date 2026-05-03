@@ -19,8 +19,8 @@ This file is not a slogan file. It is a control-plane rule file for BThwani. Any
 | `@bthwani/ui-kit` | Design authority | Only public exports from defined entrypoints. |
 | `@bthwani/surfaces` | Surface and service-owned flows | Public entries per surface/service; no deep app imports. |
 | `@bthwani/app-shells` | Shared shell composition | Shell exports only. |
-| `@bthwani/api-types` | API type definitions | Generated/contract-derived types. |
-| `@bthwani/api-clients` | Typed API clients | No UI state; no visual policy. |
+| `backend/contracts.ts` per service | Service contract entrypoint | Generated/contract-derived types live behind service-local backend boundaries. |
+| `backend/client.ts` per service | Typed API clients | No UI state; no visual policy. |
 | `@bthwani/media-fixtures` | Media/test fixtures | Not runtime truth. |
 
 ## Import policy
@@ -30,7 +30,7 @@ Allowed:
 ```ts
 import { Button, Card } from '@bthwani/ui-kit';
 import { DshClientSurface } from '@bthwani/surfaces';
-import { createDshClient } from '@bthwani/api-clients';
+import { dshBackendClient } from '@bthwani/dsh/backend';
 ```
 
 Forbidden unless explicitly allowed by package owner:

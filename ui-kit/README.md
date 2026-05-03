@@ -1,71 +1,53 @@
-# BThwani ui-kit Root Scaffold
+# @bthwani/ui-kit
 
-Status: BRIDGE_READY
-Target owner root: ui-kit
-Current implementation root: packages/ui-kit
-Current truth status: BRIDGED / NOT MOVED
-Migration phase: Phase 3 pilot
+`@bthwani/ui-kit` is the centralized UI authority package for BThwani. It is not treated as a generic component dump; it is the single source of truth for foundational visual language, direction behavior, shared state families, and the base primitives that later screens must consume.
 
----
+## What this hardening pass strengthens
 
-## 1. Decision
+- richer semantic color and surface roles for premium light/dark rendering
+- direction and language-aware helpers that own start/end behavior centrally
+- explicit state catalog for mandatory loading/empty/error/offline/recovery families
+- stronger primitives so spacing, borders, surface tone, and layout direction stay centralized
+- cleaner adoption readiness through `@bthwani/ui-kit` path mapping for the workspace
 
-This folder introduces the root owner for `ui-kit`.
+## Current package layers
 
-It does not move implementation.
+- `foundation` for tokens, themes, direction, and output helpers
+- `providers` for theme, direction, i18n, and portal context
+- `primitives` for base box, surface, text, divider, and scroll primitives
+- `components` for shared buttons, cards, fields, headers, media, overlays, and state shells
+- `mobile` and `web` for platform entrypoints and root shells
+- `next` for the Next.js bridge exports
+- `index` and `locales` for package aggregation and text catalogs
 
-The current implementation remains under:
+## Governance sources
 
-```text
-packages/ui-kit
-```
+- parent authority: [docs/BTH_UI_KIT_SUPREME_BLUEPRINT_2026_AR.md](./docs/BTH_UI_KIT_SUPREME_BLUEPRINT_2026_AR.md)
+- execution plan: [docs/BTH_UI_KIT_SUPREME_EXECUTION_PLAN_2026_AR.md](./docs/BTH_UI_KIT_SUPREME_EXECUTION_PLAN_2026_AR.md)
+- ownership and precedence: [docs/OWNERSHIP_AND_RULES.md](./docs/OWNERSHIP_AND_RULES.md)
+- component constitution: [docs/COMPONENT_CONSTITUTION.md](./docs/COMPONENT_CONSTITUTION.md)
+- accessibility law: [docs/ACCESSIBILITY_LAW.md](./docs/ACCESSIBILITY_LAW.md)
+- token governance: [docs/TOKEN_GOVERNANCE_LAW.md](./docs/TOKEN_GOVERNANCE_LAW.md)
+- pattern promotion: [docs/PATTERN_PROMOTION_CONTRACT.md](./docs/PATTERN_PROMOTION_CONTRACT.md)
+- quality gates and screen entry: [docs/QUALITY_GATES_AND_SCREEN_ENTRY.md](./docs/QUALITY_GATES_AND_SCREEN_ENTRY.md)
 
-The future target root is:
+## Runtime outputs
 
-```text
-ui-kit
-```
+- token output APIs live in the foundation layer
+- theme output APIs live in the foundation layer
+- web root CSS variables are generated from the same theme source consumed by native modes
+- generated proof artifacts, when produced, live under `packages/ui-kit/docs/generated`
 
----
+## Proof stack
 
-## 2. Non-Negotiable Rules
+- generated proof artifacts: `packages/ui-kit/docs/generated`
+- visual regression and interaction proof: `apps/web/website/playwright.config.ts` and `packages/ui-kit/docs/generated`
+- verification targets: `pnpm nx run ui-kit:typecheck`, `pnpm nx run ui-kit:build-outputs`, `pnpm nx run ui-kit:proof`
 
-| Rule | Status |
-|---|---|
-| Do not delete packages/ui-kit yet | REQUIRED |
-| Do not delete existing ui-kit imports | REQUIRED |
-| Bridge files must only re-export packages/ui-kit | REQUIRED |
-| Tamagui remains internal to ui-kit only | REQUIRED |
-| No local design systems outside ui-kit | REQUIRED |
+## Phase boundary note
 
----
+Phase 06 authorizes foundation hardening, primitives, direction, and shared state shells. Generic component folders currently exist in the package, but screen-family promotion and pilot validation surfaces remain blocked until later lawful phases prove retained-screen demand.
 
-## 3. Target Compact Structure
+## Adoption intent
 
-```text
-ui-kit
-└── src
-    ├── index.ts
-    ├── mobile.ts
-    ├── web.ts
-    └── next.ts
-```
-
----
-
-## 4. Current Phase Truth
-
-| Area | Status |
-|---|---|
-| Root scaffold | CREATED |
-| Root source bridge | ACTIVE |
-| Source move | NOT MOVED |
-| Import switch | NOT STARTED |
-| TypeScript | PASS REQUIRED |
-| Runtime impact | NONE EXPECTED |
-
----
-
-## 5. Pilot Scope Guard
-
-This pilot keeps all design-system truth inside `packages/ui-kit` and exposes only root bridge files.
+This package should eliminate local visual drift by making theme, typography, direction, state framing, and baseline building blocks flow from a single shared owner instead of being recreated per surface.

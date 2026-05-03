@@ -17,7 +17,6 @@
   ],
   "scanRoots": [
     "apps",
-    "packages/app-shells",
     "packages/surfaces",
     "packages/ui-kit"
   ],

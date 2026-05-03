@@ -46,8 +46,8 @@ Not allowed:
 When OpenAPI exists:
 
 - OpenAPI is legal contract truth.
-- `packages/api-types` is generated/derived from contract.
-- `packages/api-clients` follows contract.
+- `api-types` is generated/derived from contract.
+- `api-clients` follows contract.
 - services implement contract.
 - runtime verification proves behavior.
 

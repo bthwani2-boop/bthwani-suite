@@ -3,15 +3,24 @@
   "version": "1.0.0",
   "mode": "CHECK_ONLY",
   "nextRoutePatterns": [
-    "^apps/web/[^/]+/app/.*/(page|layout|route|loading|error|not-found|template)\\.(ts|tsx|js|jsx)$",
-    "^apps/web/[^/]+/app/(page|layout|route|loading|error|not-found|template)\\.(ts|tsx|js|jsx)$"
+    "^webapp/runtime/app/.*/(page|layout|route|loading|error|not-found|template)\\.(ts|tsx|js|jsx)$",
+    "^website/runtime/app/.*/(page|layout|route|loading|error|not-found|template)\\.(ts|tsx|js|jsx)$",
+    "^control-panel/runtime/app/.*/(page|layout|route|loading|error|not-found|template)\\.(ts|tsx|js|jsx)$",
+    "^webapp/runtime/app/(page|layout|route|loading|error|not-found|template)\\.(ts|tsx|js|jsx)$",
+    "^website/runtime/app/(page|layout|route|loading|error|not-found|template)\\.(ts|tsx|js|jsx)$",
+    "^control-panel/runtime/app/(page|layout|route|loading|error|not-found|template)\\.(ts|tsx|js|jsx)$"
   ],
   "runtimeNamePatterns": [
     "(SurfaceHost|AppShell|bootstrap|navigation|router|provider|providers|Root|Entry|Host)\\.(ts|tsx|js|jsx|mjs|cjs)$"
   ],
   "rootEntrypointPatterns": [
-    "^apps/mobile/[^/]+/(App|index|main)\\.(ts|tsx|js|jsx)$",
-    "^apps/web/[^/]+/(next\\.config|middleware)\\.(ts|js|mjs|cjs)$"
+    "^app-client/(App|index|main)\\.(ts|tsx|js|jsx)$",
+    "^app-partner/(App|index|main)\\.(ts|tsx|js|jsx)$",
+    "^app-captain/(App|index|main)\\.(ts|tsx|js|jsx)$",
+    "^app-field/(App|index|main)\\.(ts|tsx|js|jsx)$",
+    "^webapp/runtime/(next\\.config|middleware)\\.(ts|js|mjs|cjs)$",
+    "^website/runtime/(next\\.config|middleware)\\.(ts|js|mjs|cjs)$",
+    "^control-panel/runtime/(next\\.config|middleware)\\.(ts|js|mjs|cjs)$"
   ],
   "policy": {
     "guard03ProtectedEntrypointSeverity": "warning"

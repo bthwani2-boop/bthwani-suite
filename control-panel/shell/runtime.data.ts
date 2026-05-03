@@ -1,16 +1,3 @@
-import { amnOperationsFlowMeta, amnServiceMeta, arbOperationsFlowMeta, arbPartnersFlowMeta, arbServiceMeta, arbSupportFlowMeta, dshOperationsFlowMeta, dshServiceMeta, esfCatalogsFlowMeta, esfServiceMeta, knzCatalogsFlowMeta, knzServiceMeta, kwdCatalogsFlowMeta, kwdServiceMeta, mrfCatalogsFlowMeta, mrfServiceMeta, sndCatalogsFlowMeta, sndServiceMeta, wltFinanceFlowMeta, wltServiceMeta } from '../composition';
-const allServiceMetas = [
-  amnServiceMeta,
-  arbServiceMeta,
-  dshServiceMeta,
-  esfServiceMeta,
-  knzServiceMeta,
-  kwdServiceMeta,
-  mrfServiceMeta,
-  sndServiceMeta,
-  wltServiceMeta,
-] as const;
-
 export type ControlPanelRuntimeService = {
   id: string;
   label: string;
@@ -32,69 +19,41 @@ export type ControlPanelRuntimeMission = {
   placeholder: boolean;
 };
 
-const controlPanelServices: ControlPanelRuntimeService[] = allServiceMetas
-  .filter((meta) => meta.surfaceOwnership.includes('control-panel'))
-  .map((meta) => ({
-    id: meta.id,
-    label: meta.id,
-    statusKind: meta.placeholder ? 'reference' : 'live',
-    sections: [...meta.controlPanelSections],
-    placeholder: meta.placeholder,
-  }));
+const controlPanelServices: ControlPanelRuntimeService[] = [
+  { id: 'dsh', label: 'DSH', statusKind: 'live', sections: ['dashboard', 'operations', 'partners', 'marketing', 'control'], placeholder: false },
+  { id: 'arb', label: 'ARB', statusKind: 'live', sections: ['operations', 'partners', 'support'], placeholder: false },
+  { id: 'amn', label: 'AMN', statusKind: 'reference', sections: ['operations', 'support'], placeholder: true },
+  { id: 'wlt', label: 'WLT', statusKind: 'live', sections: ['finance'], placeholder: false },
+  { id: 'knz', label: 'KNZ', statusKind: 'live', sections: ['catalogs'], placeholder: false },
+  { id: 'kwd', label: 'KWD', statusKind: 'reference', sections: ['catalogs'], placeholder: true },
+  { id: 'esf', label: 'ESF', statusKind: 'reference', sections: ['catalogs'], placeholder: true },
+  { id: 'mrf', label: 'MRF', statusKind: 'reference', sections: ['catalogs'], placeholder: true },
+  { id: 'snd', label: 'SND', statusKind: 'reference', sections: ['catalogs'], placeholder: true },
+];
 
-const sectionIds = Array.from(
-  new Set(controlPanelServices.flatMap((service) => service.sections)),
-);
+const controlPanelSections: ControlPanelRuntimeSection[] = [
+  { id: 'dashboard', serviceIds: ['dsh'] },
+  { id: 'operations', serviceIds: ['dsh', 'arb', 'amn'] },
+  { id: 'finance', serviceIds: ['wlt'] },
+  { id: 'catalogs', serviceIds: ['knz', 'kwd', 'esf', 'mrf', 'snd'] },
+  { id: 'support', serviceIds: ['arb', 'amn'] },
+  { id: 'partners', serviceIds: ['dsh', 'arb'] },
+  { id: 'marketing', serviceIds: ['dsh'] },
+  { id: 'control', serviceIds: ['dsh'] },
+  { id: 'community-services', serviceIds: [] },
+];
 
-const controlPanelSections: ControlPanelRuntimeSection[] = sectionIds.map((sectionId) => ({
-  id: sectionId,
-  serviceIds: controlPanelServices
-    .filter((service) => service.sections.includes(sectionId))
-    .map((service) => service.id),
-}));
-
-const allFlowMetas = [
-  amnOperationsFlowMeta,
-  arbOperationsFlowMeta,
-  arbPartnersFlowMeta,
-  arbSupportFlowMeta,
-  dshOperationsFlowMeta,
-  esfCatalogsFlowMeta,
-  knzCatalogsFlowMeta,
-  kwdCatalogsFlowMeta,
-  mrfCatalogsFlowMeta,
-  sndCatalogsFlowMeta,
-  wltFinanceFlowMeta,
-] as const;
-
-function pickFlowMetaForSection(sectionId: string) {
-  const matchingFlowMetas = allFlowMetas.filter((flowMeta) => flowMeta.owner === sectionId);
-
-  const nonPlaceholderFlowMeta = matchingFlowMetas.find((flowMeta) => !flowMeta.placeholder);
-  return nonPlaceholderFlowMeta ?? matchingFlowMetas[0];
-}
-
-const controlPanelMissions: ControlPanelRuntimeMission[] = controlPanelSections.map((sectionEntry) => {
-  const flowMeta = pickFlowMetaForSection(sectionEntry.id);
-
-  if (!flowMeta) {
-    return {
-      sectionId: sectionEntry.id,
-      flowId: 'unmapped',
-      ownerSectionId: sectionEntry.id,
-      dueKind: 'missing',
-      placeholder: true,
-    };
-  }
-
-  return {
-    sectionId: sectionEntry.id,
-    flowId: flowMeta.id,
-    ownerSectionId: flowMeta.owner,
-    dueKind: flowMeta.placeholder ? 'missing' : 'defined',
-    placeholder: flowMeta.placeholder,
-  };
-});
+const controlPanelMissions: ControlPanelRuntimeMission[] = [
+  { sectionId: 'dashboard', flowId: 'dsh-dashboard', ownerSectionId: 'dashboard', dueKind: 'defined', placeholder: false },
+  { sectionId: 'operations', flowId: 'dsh-operations', ownerSectionId: 'operations', dueKind: 'defined', placeholder: false },
+  { sectionId: 'finance', flowId: 'wlt-finance', ownerSectionId: 'finance', dueKind: 'defined', placeholder: false },
+  { sectionId: 'catalogs', flowId: 'knz-catalogs', ownerSectionId: 'catalogs', dueKind: 'defined', placeholder: false },
+  { sectionId: 'support', flowId: 'arb-support', ownerSectionId: 'support', dueKind: 'defined', placeholder: false },
+  { sectionId: 'partners', flowId: 'arb-partners', ownerSectionId: 'partners', dueKind: 'defined', placeholder: false },
+  { sectionId: 'marketing', flowId: 'dsh-marketing', ownerSectionId: 'marketing', dueKind: 'defined', placeholder: false },
+  { sectionId: 'control', flowId: 'dsh-control', ownerSectionId: 'control', dueKind: 'defined', placeholder: false },
+  { sectionId: 'community-services', flowId: 'unmapped', ownerSectionId: 'community-services', dueKind: 'missing', placeholder: true },
+];
 
 export const controlPanelRuntimeData = {
   services: controlPanelServices,

@@ -29,7 +29,7 @@ for (const file of files) {
   }
 }
 
-const contractFiles = walkFiles(root, { startDirs: ['contracts', 'packages/api-types', 'packages/surfaces/src/service-owned'], extensions: CODE_EXTENSIONS });
+const contractFiles = walkFiles(root, { startDirs: ['contracts', 'dsh/backend', 'wlt/backend', 'knz/backend', 'arb/backend', 'amn/backend', 'esf/backend', 'mrf/backend', 'snd/backend', 'kwd/backend', 'packages/surfaces/src/service-owned'], extensions: CODE_EXTENSIONS });
 for (const file of contractFiles) {
   const relative = rel(root, file);
   if (!/(contract|schema|api-type|apiTypes)/i.test(relative)) continue;

@@ -1,2 +1,0 @@
- ERROR  ENOENT: no such file or directory, lstat 'C:\bthwani-suite\apps\mobile\app-client\apps'
-For help, run: pnpm help exec

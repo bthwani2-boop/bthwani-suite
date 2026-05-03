@@ -1,0 +1,38 @@
+{
+  "name": "app-field",
+  "root": "app-field",
+  "sourceRoot": "app-field",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir app-field/runtime exec expo start --dev-client --clear"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir app-field/runtime exec expo export --platform android"
+      }
+    },
+    "serve-go": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir app-field/runtime exec expo start --go --clear"
+      }
+    },
+    "android": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir app-field/runtime exec expo run:android"
+      }
+    },
+    "config": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir app-field/runtime exec expo config --json"
+      }
+    }
+  }
+}

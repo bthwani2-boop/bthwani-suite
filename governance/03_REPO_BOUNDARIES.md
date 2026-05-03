@@ -17,18 +17,18 @@ This file is not a slogan file. It is a control-plane rule file for BThwani. Any
 | Root | Role | May contain policy? |
 |---|---|---|
 | `governance/` | Canonical policy/control plane | Yes |
-| `apps/mobile/app-client` | Client mobile app shell | No, implementation only |
-| `apps/mobile/app-partner` | Partner mobile app shell | No |
-| `apps/mobile/app-captain` | Captain mobile app shell | No |
-| `apps/mobile/app-field` | Field mobile app shell | No |
-| `apps/web/control-panel` | Control panel app shell | No |
-| `apps/web/webapp` | Web app shell | No |
-| `apps/web/website` | Marketing site shell | No |
+| `app-client` | Client mobile app shell | No, implementation only |
+| `app-partner` | Partner mobile app shell | No |
+| `app-captain` | Captain mobile app shell | No |
+| `app-field` | Field mobile app shell | No |
+| `control-panel` | Control panel app shell | No |
+| `webapp` | Web app shell | No |
+| `website` | Marketing site shell | No |
 | `packages/ui-kit` | Design/component authority | Technical source, not governance policy |
 | `packages/surfaces` | Surface/service-owned UI flows | Technical source, not governance policy |
 | `packages/app-shells` | App shell composition | Technical source, not governance policy |
-| `packages/api-types` | Generated/shared API types | Derived from contracts |
-| `packages/api-clients` | API clients | Derived from contracts/runtime binding |
+| `api-types` | Generated/shared API types | Derived from contracts |
+| `api-clients` | API clients | Derived from contracts/runtime binding |
 | `services/*` | Backend/service implementations | Technical source |
 | `contracts/master` | Contract source for public APIs | Contract truth |
 | `tools/guards` | Guard implementation | Derived from governance |
@@ -43,6 +43,16 @@ This file is not a slogan file. It is a control-plane rule file for BThwani. Any
 | `docs/governance` | Legacy/transitional | Must not be active authority. Migrate or remove references. |
 | `kdt/volatile/registry/runs` | Legacy evidence root | Do not create new evidence there. |
 | `governance/governance-legacy` | Retired donor root | Removed after extraction; any reintroduction is archive-only and non-authoritative. |
+
+## Legacy bridge roots
+
+- `apps/mobile/app-client`
+- `apps/mobile/app-partner`
+- `apps/mobile/app-captain`
+- `apps/mobile/app-field`
+- `apps/web/control-panel`
+- `apps/web/webapp`
+- `apps/web/website`
 
 ## Forbidden root behavior
 

@@ -1,0 +1,32 @@
+{
+  "name": "website",
+  "root": "website/runtime",
+  "sourceRoot": "website/runtime",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir website/runtime dev"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir website/runtime build"
+      }
+    },
+    "proof:ui-kit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir website/runtime proof:ui-kit"
+      }
+    },
+    "proof:ui-kit:update": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir website/runtime proof:ui-kit:update"
+      }
+    }
+  }
+}

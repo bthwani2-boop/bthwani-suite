@@ -70,9 +70,9 @@ Do not add noisy screen lists, stale generated names, or unverified future claim
 | Package blueprint | BRIDGED | Old file remains as a pointer only. |
 | Root OpenAPI | SCAFFOLD / TBD | `dsh/dsh.openapi.yaml` exists without fake API truth. |
 | Frontend slice move | PARTIAL / BRIDGED | `app-partner`, `app-captain`, `app-field`, and `control-panel` moved to `dsh/frontend`; `app-client` and `shared` remain package-owned for Metro runtime compatibility. |
-| Backend | TBD | No root backend migration claimed. |
+| Backend | ACTIVE_SCAFFOLD | `dsh/backend/contracts.ts` and `dsh/backend/client.ts` are the service-local backend entrypoints; root `api-types` and `api-clients` bridge to them. |
 | Domain | TBD | No root domain migration claimed. |
-| Media fixtures | TBD | Root media-fixtures folder exists; no service-owned move claimed. |
+| Media fixtures | ACTIVE | Seed media now lives under `dsh/media-fixtures/assets/seed/dsh/` and is resolved by `@bthwani/media-fixtures`. |
 | Full DSH closure | NOT CLOSED | Migration in progress. |
 
 ---

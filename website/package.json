@@ -1,0 +1,26 @@
+{
+  "name": "@bthwani/website",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --dir runtime dev",
+    "build": "pnpm --dir runtime build",
+    "start": "pnpm --dir runtime start",
+    "proof:ui-kit": "pnpm --dir runtime proof:ui-kit",
+    "proof:ui-kit:update": "pnpm --dir runtime proof:ui-kit:update"
+  },
+  "dependencies": {
+    "@bthwani/ui-kit": "workspace:*",
+    "next": "16.2.2",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native-web": "0.21.2"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.11.1",
+    "@playwright/test": "1.58.2",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "axe-core": "4.11.2",
+    "typescript": "5.9.3"
+  }
+}

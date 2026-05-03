@@ -19,8 +19,13 @@
   ],
   "scanRoots": [
     "governance",
-    "apps",
-    "packages/app-shells",
+    "app-client",
+    "app-partner",
+    "app-captain",
+    "app-field",
+    "webapp",
+    "website",
+    "control-panel",
     "packages/surfaces",
     "packages/ui-kit",
     "tools/guards",
@@ -72,11 +77,12 @@
     "^@bthwani/surfaces/(app-client|app-partner|app-captain|app-field|control-panel|webapp|website)$"
   ],
   "allowedAppFiles": [
-    "^apps/[^/]+/[^/]+/App\\.tsx$",
-    "^apps/[^/]+/[^/]+/index\\.(ts|tsx|js|jsx)$",
-    "^apps/[^/]+/[^/]+/app\\.config\\.(ts|js)$",
-    "^apps/web/[^/]+/(next\\.config|middleware|instrumentation)\\.(ts|js|mjs)$",
-    "^apps/web/[^/]+/app/(layout|page)\\.(ts|tsx)$"
+    "^(app-client|app-partner|app-captain|app-field)/App\\.tsx$",
+    "^(app-client|app-partner|app-captain|app-field)/index\\.(ts|tsx|js|jsx)$",
+    "^(app-client|app-partner|app-captain|app-field)/app\\.config\\.(ts|js)$",
+    "^(webapp|website|control-panel/runtime)/(next\\.config|middleware|instrumentation)\\.(ts|js|mjs)$",
+    "^(webapp|website)/(app/(layout|page)\\.(ts|tsx))$",
+    "^control-panel/runtime/app/(layout|page)\\.(ts|tsx)$"
   ],
   "allowedBrandColors": [
     "#0a2f5c",

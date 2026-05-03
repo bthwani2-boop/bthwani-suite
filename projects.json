@@ -453,98 +453,6 @@
           "implicitDependencies": []
         }
       },
-      "api-clients": {
-        "name": "api-clients",
-        "type": "lib",
-        "data": {
-          "root": "packages/api-clients",
-          "name": "api-clients",
-          "projectType": "library",
-          "tags": [
-            "npm:private"
-          ],
-          "metadata": {
-            "targetGroups": {},
-            "js": {
-              "packageName": "@bthwani/api-clients",
-              "packageVersion": "0.1.0",
-              "packageMain": "./src/index.ts",
-              "isInPackageManagerWorkspaces": true
-            }
-          },
-          "targets": {},
-          "sourceRoot": "packages/api-clients/src",
-          "implicitDependencies": []
-        }
-      },
-      "app-shells": {
-        "name": "app-shells",
-        "type": "lib",
-        "data": {
-          "root": "packages/app-shells",
-          "name": "app-shells",
-          "projectType": "library",
-          "tags": [
-            "npm:private"
-          ],
-          "metadata": {
-            "targetGroups": {},
-            "js": {
-              "packageName": "@bthwani/app-shells",
-              "packageVersion": "0.0.0",
-              "packageExports": {
-                ".": "./index.ts",
-                "./mobile": "./mobile/index.ts",
-                "./mobile/client": "./mobile/client/index.ts",
-                "./mobile/client/mobile-entry": "./mobile/client/mobile-entry.tsx",
-                "./mobile/partner": "./mobile/partner/index.ts",
-                "./mobile/partner/mobile-entry": "./mobile/partner/mobile-entry.tsx",
-                "./mobile/captain": "./mobile/captain/index.ts",
-                "./mobile/captain/mobile-entry": "./mobile/captain/mobile-entry.tsx",
-                "./mobile/field": "./mobile/field/index.ts",
-                "./mobile/field/mobile-entry": "./mobile/field/mobile-entry.tsx",
-                "./web": "./web/index.ts",
-                "./web/shared": "./web/shared/index.ts",
-                "./web/control-panel": "./web/control-panel/index.ts",
-                "./web/control-panel/web-entry": "./web/control-panel/web-entry.tsx",
-                "./web/webapp": "./web/webapp/index.ts",
-                "./web/webapp/web-entry": "./web/webapp/web-entry.tsx",
-                "./web/website": "./web/website/index.ts",
-                "./web/website/web-entry": "./web/website/web-entry.tsx"
-              },
-              "packageMain": "./index.ts",
-              "isInPackageManagerWorkspaces": true
-            }
-          },
-          "targets": {},
-          "sourceRoot": "packages/app-shells",
-          "implicitDependencies": []
-        }
-      },
-      "api-types": {
-        "name": "api-types",
-        "type": "lib",
-        "data": {
-          "root": "packages/api-types",
-          "name": "api-types",
-          "projectType": "library",
-          "tags": [
-            "npm:private"
-          ],
-          "metadata": {
-            "targetGroups": {},
-            "js": {
-              "packageName": "@bthwani/api-types",
-              "packageVersion": "0.1.0",
-              "packageMain": "./src/index.ts",
-              "isInPackageManagerWorkspaces": true
-            }
-          },
-          "targets": {},
-          "sourceRoot": "packages/api-types/src",
-          "implicitDependencies": []
-        }
-      },
       "surfaces": {
         "name": "surfaces",
         "type": "lib",
@@ -847,21 +755,11 @@
       "app-captain": [
         {
           "source": "app-captain",
-          "target": "app-shells",
-          "type": "static"
-        },
-        {
-          "source": "app-captain",
           "target": "ui-kit",
           "type": "static"
         }
       ],
       "app-partner": [
-        {
-          "source": "app-partner",
-          "target": "app-shells",
-          "type": "static"
-        },
         {
           "source": "app-partner",
           "target": "ui-kit",
@@ -871,21 +769,11 @@
       "app-client": [
         {
           "source": "app-client",
-          "target": "app-shells",
-          "type": "static"
-        },
-        {
-          "source": "app-client",
           "target": "ui-kit",
           "type": "static"
         }
       ],
       "control-panel": [
-        {
-          "source": "control-panel",
-          "target": "app-shells",
-          "type": "static"
-        },
         {
           "source": "control-panel",
           "target": "ui-kit",
@@ -895,35 +783,10 @@
       "app-field": [
         {
           "source": "app-field",
-          "target": "app-shells",
-          "type": "static"
-        },
-        {
-          "source": "app-field",
           "target": "ui-kit",
           "type": "static"
         }
       ],
-      "api-clients": [
-        {
-          "source": "api-clients",
-          "target": "api-types",
-          "type": "static"
-        }
-      ],
-      "app-shells": [
-        {
-          "source": "app-shells",
-          "target": "surfaces",
-          "type": "static"
-        },
-        {
-          "source": "app-shells",
-          "target": "ui-kit",
-          "type": "static"
-        }
-      ],
-      "api-types": [],
       "surfaces": [
         {
           "source": "surfaces",
@@ -934,22 +797,12 @@
       "website": [
         {
           "source": "website",
-          "target": "app-shells",
-          "type": "static"
-        },
-        {
-          "source": "website",
           "target": "ui-kit",
           "type": "static"
         }
       ],
       "ui-kit": [],
       "webapp": [
-        {
-          "source": "webapp",
-          "target": "app-shells",
-          "type": "static"
-        },
         {
           "source": "webapp",
           "target": "ui-kit",

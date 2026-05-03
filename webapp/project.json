@@ -1,0 +1,20 @@
+{
+  "name": "webapp",
+  "root": "webapp/runtime",
+  "sourceRoot": "webapp/runtime",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir webapp/runtime dev"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir webapp/runtime build"
+      }
+    }
+  }
+}

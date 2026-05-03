@@ -184,7 +184,6 @@ function firstExisting(candidates) {
 
 function resolvePackageImport(spec) {
   const mappings = [
-    ["@bthwani/app-shells", "packages/app-shells"],
     ["@bthwani/surfaces", "packages/surfaces/src"],
     ["@bthwani/ui-kit", "packages/ui-kit/src"],
   ];
@@ -216,9 +215,6 @@ function classifySharedFolder(repoPath) {
   const p = toPosix(repoPath);
 
   if (p.startsWith("apps/")) return "INVALID_APP_SHARED";
-  if (p === "packages/app-shells/shared" || p.startsWith("packages/app-shells/shared/")) return "SHELL_SHARED";
-  if (p === "packages/app-shells/mobile/shared" || p.startsWith("packages/app-shells/mobile/shared/")) return "MOBILE_SHELL_SHARED";
-  if (p === "packages/app-shells/web/shared" || p.startsWith("packages/app-shells/web/shared/")) return "WEB_SHELL_SHARED";
   if (p.startsWith("packages/surfaces/src/service-owned/")) return "SERVICE_SHARED";
   if (p.startsWith("packages/surfaces/src/surface-owned/")) return "SURFACE_SHARED";
   if (p.startsWith("packages/ui-kit/")) return "UI_KIT_INTERNAL_SHARED";
@@ -354,7 +350,7 @@ function main() {
         "INVALID_SHARED_FOLDER_IN_APPS",
         folder.repoPath,
         "apps must remain host/shell only and must not own shared product/infrastructure folders.",
-        "Move app shared code later to app-shells, surfaces, or ui-kit after owner proof."
+        "Move app shared code later to app-local shells, surfaces, or ui-kit after owner proof."
       );
     }
 
@@ -420,7 +416,7 @@ function main() {
           "error",
           "APP_SHELL_SHARED_PRODUCT_OR_DOMAIN_CONTENT",
           repoPath,
-          "app-shells shared folders must not contain service/product content.",
+          "app-local shell shared folders must not contain service/product content.",
           "Move later to surfaces service-owned/surface-owned or ui-kit based on ownership."
         );
       }

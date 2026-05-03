@@ -59,6 +59,7 @@ Do not add noisy generated screen lists, stale paths, or future claims without p
 | API / Contract | TBD | Add only after API/contract evidence exists. |
 | Runtime Vars | TBD | Add only after verified. |
 | Guards | TBD | Add only after verified. |
+| Backend | ACTIVE_SCAFFOLD | `backend/contracts.ts` and `backend/client.ts` exist as service-local backend entrypoints. |
 | Full service closure | NOT CLOSED | Root pilot only; runtime evidence still phase-gated. |
 
 ---
@@ -111,5 +112,4 @@ Status: REQUIRED
 |---|---|---|
 | 2026-04-20 23:46:18 | Empty service blueprint template initialized. | C:\bthwani-suite\tools\registry\runs\APPLY_VERIFY_SERVICE_BLUEPRINT_EMPTY_TEMPLATES_ALL_SERVICES_V2-20260420-234618 |
 | 2026-05-03 06:00:00 | Root service moved to wlt with compatibility bridge. | tools/registry/runs/ROOT_ARCH_WLT_PILOT-TBD |
-
 
