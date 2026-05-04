@@ -15,11 +15,11 @@ export type ControlPanelDshExceptionCommandQueueScreenProps = {
   showHeader?: boolean;
 };
 
-function severityTone(severity: string): 'brand' | 'best' | 'warning' | 'danger' {
+function severityTone(severity: string): 'brand' | 'success' | 'warning' | 'danger' {
   if (severity === 'critical') return 'danger';
   if (severity === 'high') return 'warning';
   if (severity === 'medium') return 'brand';
-  return 'best';
+  return 'success';
 }
 
 export function ControlPanelDshExceptionCommandQueueScreen({

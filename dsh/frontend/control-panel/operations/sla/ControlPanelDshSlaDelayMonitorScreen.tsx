@@ -15,11 +15,11 @@ export type ControlPanelDshSlaDelayMonitorScreenProps = {
   showHeader?: boolean;
 };
 
-function laneTone(label: string): 'brand' | 'best' | 'warning' | 'danger' {
+function laneTone(label: string): 'brand' | 'success' | 'warning' | 'danger' {
   if (label.includes('breach')) return 'danger';
   if (label.includes('delay')) return 'warning';
   if (label.includes('risk')) return 'brand';
-  return 'best';
+  return 'success';
 }
 
 export function ControlPanelDshSlaDelayMonitorScreen({

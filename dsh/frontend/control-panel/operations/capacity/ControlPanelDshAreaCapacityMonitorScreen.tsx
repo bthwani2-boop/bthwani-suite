@@ -86,7 +86,7 @@ export function ControlPanelDshAreaCapacityMonitorScreen({
               <Box key={lane.id} padding={3} gap={1} border radiusToken='xl' background='surfaceRaised'>
                 <Box layoutDirection='row' justify='space-between' align='center' style={{ gap: 12, flexWrap: 'wrap' }}>
                   <Text role='bodyStrong'>{lane.id}</Text>
-                  <Badge label={lane.capacityState} tone={lane.capacityState.includes('high') ? 'danger' : lane.capacityState.includes('tight') ? 'warning' : 'best'} />
+                  <Badge label={lane.capacityState} tone={lane.capacityState.includes('high') ? 'danger' : lane.capacityState.includes('tight') ? 'warning' : 'success'} />
                 </Box>
                 <Text role='bodySm' tone='muted'>{lane.areaBusy} · captain supply low: {lane.captainSupplyLow}</Text>
                 <Box layoutDirection='row' justify='space-between' align='center' style={{ gap: 12, flexWrap: 'wrap' }}>

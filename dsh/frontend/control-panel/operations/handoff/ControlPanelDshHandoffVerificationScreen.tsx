@@ -86,7 +86,7 @@ export function ControlPanelDshHandoffVerificationScreen({
               <Box key={lane.id} padding={3} gap={1} border radiusToken='xl' background='surfaceRaised'>
                 <Box layoutDirection='row' justify='space-between' align='center' style={{ gap: 12, flexWrap: 'wrap' }}>
                   <Text role='bodyStrong'>{lane.title}</Text>
-                  <Badge label={lane.status} tone={lane.status === 'failed verification' ? 'danger' : lane.status === 'pickup verified' ? 'best' : 'brand'} />
+                  <Badge label={lane.status} tone={lane.status === 'failed verification' ? 'danger' : lane.status === 'pickup verified' ? 'success' : 'brand'} />
                 </Box>
                 <Text role='bodySm' tone='muted'>{lane.notes}</Text>
                 <Box layoutDirection='row' justify='space-between' align='center' style={{ gap: 12, flexWrap: 'wrap' }}>

@@ -1,6 +1,9 @@
+import { redirect } from 'next/navigation';
 import ControlPanelSurfaceHost from '../../../shell/web-entry';
-
-type OperationsWorkspaceId = 'overview' | 'dashboard' | 'captain-ops' | 'field-ops' | 'finance' | 'settlements' | 'cod' | 'refunds' | 'issues' | 'serviceability' | 'guard-status' | 'evidence' | 'orders' | 'order-detail' | 'orderchat' | 'dispatch' | 'live-tracking' | 'exceptions' | 'sla' | 'audit' | 'partner-prep' | 'handoff' | 'proof-review' | 'capacity' | 'partners' | 'catalogs' | 'catalog-categories' | 'marketing' | 'banners' | 'growth' | 'loyalty' | 'smart-signal' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'bell' | 'arrival-bell' | 'zone-set';
+import {
+  normalizeOperationsLocation,
+} from '../../../../dsh/frontend/control-panel/operations/operations.registry';
+import type { CanonicalOperationsGroupId } from '../../../../dsh/frontend/control-panel/operations/operations.types';
 
 type OperationsPageProps = {
   readonly searchParams?: Promise<{
@@ -10,59 +13,17 @@ type OperationsPageProps = {
   }>;
 };
 
-const operationsWorkspaceIds = new Set<OperationsWorkspaceId>([
-  'overview',
-  'dashboard',
-  'captain-ops',
-  'field-ops',
-  'finance',
-  'settlements',
-  'cod',
-  'refunds',
-  'issues',
-  'serviceability',
-  'guard-status',
-  'evidence',
-  'orders',
-  'order-detail',
-  'orderchat',
-  'dispatch',
-  'live-tracking',
-  'exceptions',
-  'sla',
-  'audit',
-  'partner-prep',
-  'handoff',
-  'proof-review',
-  'capacity',
-  'partners',
-  'catalogs',
-  'catalog-categories',
-  'marketing',
-  'banners',
-  'growth',
-  'loyalty',
-  'smart-signal',
-  'sheinproxy',
-  'reassign',
-  'peak-mode',
-  'bell',
-  'arrival-bell',
-  'zone-set',
-]);
-
 export default async function OperationsPage({ searchParams }: OperationsPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const workspaceParam = resolvedSearchParams?.workspace;
-  const operationsWorkspace = workspaceParam && operationsWorkspaceIds.has(workspaceParam as OperationsWorkspaceId)
-    ? (workspaceParam as OperationsWorkspaceId)
-    : 'overview';
+  const normalizedLocation = normalizeOperationsLocation(resolvedSearchParams?.workspace, resolvedSearchParams?.panel);
+
+  if (normalizedLocation.kind === 'redirect') {
+    redirect(normalizedLocation.href);
+  }
+
+  const operationsWorkspace: CanonicalOperationsGroupId = normalizedLocation.group;
   const operationsOrderId = typeof resolvedSearchParams?.orderId === 'string' ? resolvedSearchParams.orderId : undefined;
-  const operationsOverlayMode = resolvedSearchParams?.panel === 'chat'
-    ? 'chat'
-    : resolvedSearchParams?.panel === 'detail'
-      ? 'detail'
-      : undefined;
+  const operationsOverlayMode = normalizedLocation.panel;
 
   return (
     <ControlPanelSurfaceHost

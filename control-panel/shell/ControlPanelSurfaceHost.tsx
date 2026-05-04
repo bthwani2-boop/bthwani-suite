@@ -19,6 +19,11 @@ import {
   WebSegmentedTabs,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
+import {
+  buildOperationsHref,
+  type AnyOperationsWorkspaceId,
+  type OperationsPanelId,
+} from '../../dsh/frontend/control-panel/operations';
 import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 
@@ -28,12 +33,10 @@ const primarySectionIds = [...phaseOneSectionIds, ...hiddenSectionIds] as const;
 const controlSubSectionIds = ['platform', 'administration', 'hr'] as const;
 const dshLiveWorkbenchIds = ['orders', 'reassign', 'peakMode', 'arrivalBell'] as const;
 const dshPlannedWorkbenchIds = ['sheinProxy', 'zoneSet', 'dashboard', 'captain-ops', 'field-ops', 'finance', 'settlements', 'cod', 'refunds', 'issues', 'serviceability', 'guard-status', 'evidence', 'dispatch', 'live-tracking', 'exceptions', 'sla', 'audit', 'partner-prep', 'handoff', 'proof-review', 'capacity'] as const;
-const operationsWorkspaceIds = ['overview', 'dashboard', 'captain-ops', 'field-ops', 'finance', 'settlements', 'cod', 'refunds', 'issues', 'serviceability', 'guard-status', 'evidence', 'orders', 'order-detail', 'orderchat', 'dispatch', 'live-tracking', 'exceptions', 'sla', 'audit', 'partner-prep', 'handoff', 'proof-review', 'capacity', 'partners', 'catalogs', 'catalog-categories', 'marketing', 'banners', 'growth', 'loyalty', 'smart-signal', 'sheinproxy', 'reassign', 'peak-mode', 'bell', 'arrival-bell', 'zone-set'] as const;
 
 type ControlPanelSectionId = (typeof primarySectionIds)[number];
 type PhaseOneSectionId = (typeof phaseOneSectionIds)[number];
 type ControlPanelSubSectionId = (typeof controlSubSectionIds)[number];
-type OperationsWorkspaceId = (typeof operationsWorkspaceIds)[number];
 type PrimarySectionHref = `/${ControlPanelSectionId}`;
 type ControlPanelText = ReturnType<typeof useUiText>['controlPanel'];
 type ActionTone = 'primary' | 'secondary';
@@ -113,9 +116,9 @@ function resolveWorkbenchMeta(workbenches: Record<string, WorkbenchMeta>, workbe
 export type ControlPanelSurfaceHostProps = {
   section?: ControlPanelSectionId;
   subsection?: ControlPanelSubSectionId;
-  operationsWorkspace?: OperationsWorkspaceId;
+  operationsWorkspace?: AnyOperationsWorkspaceId;
   operationsOrderId?: string;
-  operationsOverlayMode?: 'detail' | 'chat';
+  operationsOverlayMode?: OperationsPanelId;
 };
 
 const allServiceTabId = 'all-services';
@@ -194,31 +197,6 @@ function countLiveCoverage(serviceIds: readonly string[]) {
     const serviceMeta = controlPanelRuntimeData.services.find((service) => service.id === serviceId);
     return serviceMeta && !serviceMeta.placeholder;
   }).length;
-}
-
-function buildOperationsHref(
-  workspace: OperationsWorkspaceId = 'overview',
-  options?: {
-    orderId?: string;
-    panel?: 'detail' | 'chat';
-  },
-) {
-  const searchParams = new URLSearchParams();
-
-  if (workspace !== 'overview') {
-    searchParams.set('workspace', workspace);
-  }
-
-  if (options?.orderId) {
-    searchParams.set('orderId', options.orderId);
-  }
-
-  if (options?.panel) {
-    searchParams.set('panel', options.panel);
-  }
-
-  const query = searchParams.toString();
-  return query ? `/operations?${query}` : '/operations';
 }
 
 function buildControlHref(subsection?: ControlPanelSubSectionId) {
@@ -641,7 +619,7 @@ export function ControlPanelSurfaceHost({
                 label: 'افتح الكتالوج',
                 description: '',
                 footerLabel: 'فتح',
-                href: buildOperationsHref('catalogs'),
+                href: '/catalogs',
                 badge: 'حي',
                 tone: 'primary',
               },
@@ -681,7 +659,7 @@ export function ControlPanelSurfaceHost({
                   label: 'كتالوج DSH',
                   description: 'إدارة الفئات والمنتجات من المسار الحي المباشر.',
                   footerLabel: 'فتح مباشر',
-                  href: buildOperationsHref('catalogs'),
+                  href: '/catalogs',
                   badge: 'حي',
                   tone: 'primary',
                 },
@@ -690,7 +668,7 @@ export function ControlPanelSurfaceHost({
                   label: 'بوابة الشركاء',
                   description: 'مراجعة الإدخالات قبل انتقالها إلى الكتالوج النهائي.',
                   footerLabel: 'فتح مباشر',
-                  href: buildOperationsHref('partners'),
+                  href: '/partners',
                   badge: 'مراجعة',
                 },
                 {
@@ -698,7 +676,7 @@ export function ControlPanelSurfaceHost({
                   label: 'التسويق',
                   description: 'اعتماد الرسائل والعرض قبل النشر النهائي.',
                   footerLabel: 'فتح مباشر',
-                  href: buildOperationsHref('marketing'),
+                  href: '/marketing',
                   badge: 'اعتماد',
                 },
                 {
@@ -1133,7 +1111,7 @@ export function ControlPanelSurfaceHost({
             title={panelText.surfaceTitles.partners}
             description={panelText.surfaceDescriptions.partners}
           >
-            <ControlPanelDshPartnerApprovalsScreen hubHref="/partners" operationsHref={buildOperationsHref('partners')} />
+            <ControlPanelDshPartnerApprovalsScreen hubHref="/partners" operationsHref="/partners" />
           </WebSectionCard>
         ) : null}
 

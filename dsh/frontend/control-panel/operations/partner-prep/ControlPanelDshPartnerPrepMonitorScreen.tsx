@@ -86,7 +86,7 @@ export function ControlPanelDshPartnerPrepMonitorScreen({
               <Box key={lane.id} padding={3} gap={1} border radiusToken='xl' background='surfaceRaised'>
                 <Box layoutDirection='row' justify='space-between' align='center' style={{ gap: 12, flexWrap: 'wrap' }}>
                   <Text role='bodyStrong'>{lane.title}</Text>
-                  <Badge label={lane.prepTime} tone={lane.prepTime.includes('18') ? 'danger' : lane.prepTime.includes('12') ? 'warning' : 'best'} />
+                  <Badge label={lane.prepTime} tone={lane.prepTime.includes('18') ? 'danger' : lane.prepTime.includes('12') ? 'warning' : 'success'} />
                 </Box>
                 <Text role='bodySm' tone='muted'>{lane.status}</Text>
                 <Box layoutDirection='row' justify='space-between' align='center' style={{ gap: 12, flexWrap: 'wrap' }}>

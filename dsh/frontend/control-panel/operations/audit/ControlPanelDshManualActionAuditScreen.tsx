@@ -15,11 +15,11 @@ export type ControlPanelDshManualActionAuditScreenProps = {
   showHeader?: boolean;
 };
 
-function riskTone(risk: string): 'brand' | 'best' | 'warning' | 'danger' {
+function riskTone(risk: string): 'brand' | 'success' | 'warning' | 'danger' {
   if (risk === 'critical') return 'danger';
   if (risk === 'high') return 'warning';
   if (risk === 'medium') return 'brand';
-  return 'best';
+  return 'success';
 }
 
 export function ControlPanelDshManualActionAuditScreen({

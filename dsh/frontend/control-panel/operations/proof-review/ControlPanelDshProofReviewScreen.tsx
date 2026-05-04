@@ -15,10 +15,10 @@ export type ControlPanelDshProofReviewScreenProps = {
   showHeader?: boolean;
 };
 
-function verificationTone(result: string): 'brand' | 'best' | 'warning' | 'danger' {
+function verificationTone(result: string): 'brand' | 'success' | 'warning' | 'danger' {
   if (result === 'rejected') return 'danger';
   if (result === 'needs-review') return 'warning';
-  if (result === 'accepted') return 'best';
+  if (result === 'accepted') return 'success';
   return 'brand';
 }
 

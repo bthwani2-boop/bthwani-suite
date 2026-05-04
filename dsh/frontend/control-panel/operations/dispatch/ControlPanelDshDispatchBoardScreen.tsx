@@ -15,9 +15,9 @@ export type ControlPanelDshDispatchBoardScreenProps = {
   showHeader?: boolean;
 };
 
-function rowTone(confidence: string): 'brand' | 'best' | 'warning' | 'danger' {
+function rowTone(confidence: string): 'brand' | 'success' | 'warning' | 'danger' {
   const numericConfidence = Number(confidence.replace('%', ''));
-  if (numericConfidence >= 90) return 'best';
+  if (numericConfidence >= 90) return 'success';
   if (numericConfidence >= 80) return 'brand';
   if (numericConfidence >= 70) return 'warning';
   return 'danger';

@@ -3,160 +3,91 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  Badge,
   Box,
   Button,
   StateView,
+  StatCard,
   Text,
   useDirection,
   useUiText,
-  Badge,
-  StatCard,
 } from '@bthwani/ui-kit';
 import {
   WebCommandCenterFrame,
+  WebControlActionCard,
+  WebControlDisclosureItem,
   WebSectionCard,
 } from '@bthwani/ui-kit/web';
 import { ControlPanelDshDecisionBoard } from '../shared';
-import { formatDshWorkbenchSubtitle, useDshControlPanelText, DshScreenState, resolveDshStateCopy } from './shared';
+import {
+  buildOperationsHref,
+  getOperationsGroupMeta,
+  NON_OPERATIONS_SECTION_SHORTCUTS,
+  OPERATIONS_CANONICAL_GROUPS,
+} from './operations.registry';
+import {
+  OPERATIONS_OVERVIEW_ACTIONS,
+  OPERATIONS_PULSE_METRICS,
+  OPERATIONS_TOP_FILTERS,
+} from './operations.fixtures';
+import { resolveOperationsStateCopy, type OperationsViewState } from './operations.state';
+import type { CanonicalOperationsGroupId, OperationsPanelId } from './operations.types';
+import { useDshControlPanelText } from './shared';
 import styles from './dsh-surface.module.css';
-
-type ControlPanelDshOperationsScreenState = DshScreenState;
-
-type DshWorkbenchId =
-  | 'overview'
-  | 'orders'
-  | 'reassign'
-  | 'peak-mode'
-  | 'zone-set'
-  | 'sheinproxy'
-  | 'arrival-bell'
-  | 'dispatch'
-  | 'live-tracking'
-  | 'exceptions'
-  | 'sla'
-  | 'audit'
-  | 'partner-prep'
-  | 'handoff'
-  | 'proof-review'
-  | 'capacity';
-
-type TopFilterId = 'today' | 'queue' | 'peak';
-
-type DshWorkbench = {
-  id: DshWorkbenchId;
-  label: string;
-  description: string;
-  routeHint: string;
-  statusLabel: string;
-  liveHref?: string;
-};
-
-type DshWorkbenchCopy = Pick<DshWorkbench, 'label' | 'description' | 'routeHint' | 'statusLabel'>;
-
-const dshWorkbenchCopyFallback: Record<string, DshWorkbenchCopy> = {
-  dispatch: { label: 'Dispatch', description: 'Assignment and captain board', routeHint: '/operations?workspace=dispatch', statusLabel: 'Preview' },
-  'live-tracking': { label: 'Live tracking', description: 'Event timeline', routeHint: '/operations?workspace=live-tracking', statusLabel: 'Preview' },
-  exceptions: { label: 'Exceptions', description: 'Unified exception queue', routeHint: '/operations?workspace=exceptions', statusLabel: 'Preview' },
-  sla: { label: 'SLA', description: 'Delay monitor', routeHint: '/operations?workspace=sla', statusLabel: 'Preview' },
-  audit: { label: 'Audit', description: 'Manual action audit', routeHint: '/operations?workspace=audit', statusLabel: 'Preview' },
-  'partner-prep': { label: 'Partner prep', description: 'Partner readiness monitor', routeHint: '/operations?workspace=partner-prep', statusLabel: 'Preview' },
-  handoff: { label: 'Handoff', description: 'Pickup and dropoff verification', routeHint: '/operations?workspace=handoff', statusLabel: 'Preview' },
-  'proof-review': { label: 'Proof review', description: 'Proof asset review', routeHint: '/operations?workspace=proof-review', statusLabel: 'Preview' },
-  capacity: { label: 'Capacity', description: 'Area capacity monitor', routeHint: '/operations?workspace=capacity', statusLabel: 'Preview' },
-};
-
-function resolveWorkbenchCopy(text: ReturnType<typeof useDshControlPanelText>, workbenchId: string): DshWorkbenchCopy {
-  const existing = (text.hub.workbenches as unknown as Record<string, DshWorkbenchCopy>)[workbenchId];
-  return existing ?? dshWorkbenchCopyFallback[workbenchId] ?? {
-    label: workbenchId,
-    description: 'Preview workspace',
-    routeHint: `/operations?workspace=${workbenchId}`,
-    statusLabel: 'Preview',
-  };
-}
-
-function buildTopFilterItems(text: ReturnType<typeof useDshControlPanelText>) {
-  return [
-    { id: 'today', label: text.hub.topFilters.today },
-    { id: 'queue', label: text.hub.topFilters.queue },
-    { id: 'peak', label: text.hub.topFilters.peak },
-  ] as const;
-}
-
-function buildDshWorkbenches(text: ReturnType<typeof useDshControlPanelText>): ReadonlyArray<DshWorkbench> {
-  return [
-    { id: 'overview', ...text.hub.workbenches.overview },
-    { id: 'orders', ...text.hub.workbenches.orders, liveHref: '/operations?workspace=orders' },
-    { id: 'reassign', ...text.hub.workbenches.reassign, liveHref: '/operations?workspace=reassign' },
-    { id: 'peak-mode', ...text.hub.workbenches.peakMode, liveHref: '/operations?workspace=peak-mode' },
-    { id: 'zone-set', ...text.hub.workbenches.zoneSet },
-    { id: 'sheinproxy', ...text.hub.workbenches.sheinProxy },
-    { id: 'arrival-bell', ...text.hub.workbenches.arrivalBell, liveHref: '/operations?workspace=arrival-bell' },
-    { id: 'dispatch', ...resolveWorkbenchCopy(text, 'dispatch'), liveHref: '/operations?workspace=dispatch' },
-    { id: 'live-tracking', ...resolveWorkbenchCopy(text, 'live-tracking'), liveHref: '/operations?workspace=live-tracking' },
-    { id: 'exceptions', ...resolveWorkbenchCopy(text, 'exceptions'), liveHref: '/operations?workspace=exceptions' },
-    { id: 'sla', ...resolveWorkbenchCopy(text, 'sla'), liveHref: '/operations?workspace=sla' },
-    { id: 'audit', ...resolveWorkbenchCopy(text, 'audit'), liveHref: '/operations?workspace=audit' },
-    { id: 'partner-prep', ...resolveWorkbenchCopy(text, 'partner-prep'), liveHref: '/operations?workspace=partner-prep' },
-    { id: 'handoff', ...resolveWorkbenchCopy(text, 'handoff'), liveHref: '/operations?workspace=handoff' },
-    { id: 'proof-review', ...resolveWorkbenchCopy(text, 'proof-review'), liveHref: '/operations?workspace=proof-review' },
-    { id: 'capacity', ...resolveWorkbenchCopy(text, 'capacity'), liveHref: '/operations?workspace=capacity' },
-  ] as const;
-}
-
-function resolveTopFilterWorkbench(filterId: TopFilterId): DshWorkbenchId {
-  if (filterId === 'queue') return 'orders';
-  if (filterId === 'peak') return 'peak-mode';
-  return 'overview';
-}
-
-function resolveWorkbenchLiveHref(workbenchId: DshWorkbenchId) {
-  if (workbenchId === 'orders') return '/operations?workspace=orders';
-  if (workbenchId === 'reassign') return '/operations?workspace=reassign';
-  if (workbenchId === 'peak-mode') return '/operations?workspace=peak-mode';
-  if (workbenchId === 'arrival-bell') return '/operations?workspace=arrival-bell';
-  if (workbenchId === 'sheinproxy') return '/operations?workspace=sheinproxy';
-  if (workbenchId === 'dispatch') return '/operations?workspace=dispatch';
-  if (workbenchId === 'live-tracking') return '/operations?workspace=live-tracking';
-  if (workbenchId === 'exceptions') return '/operations?workspace=exceptions';
-  if (workbenchId === 'sla') return '/operations?workspace=sla';
-  if (workbenchId === 'audit') return '/operations?workspace=audit';
-  if (workbenchId === 'partner-prep') return '/operations?workspace=partner-prep';
-  if (workbenchId === 'handoff') return '/operations?workspace=handoff';
-  if (workbenchId === 'proof-review') return '/operations?workspace=proof-review';
-  if (workbenchId === 'capacity') return '/operations?workspace=capacity';
-  return undefined;
-}
-
-function resolveStateCopy(
-  text: ReturnType<typeof useDshControlPanelText>,
-  state: Exclude<ControlPanelDshOperationsScreenState, 'ready'>,
-) {
-  return resolveDshStateCopy(text, state);
-}
-
-function resolveWorkbenchActionLabel(text: ReturnType<typeof useDshControlPanelText>, workbenchId: DshWorkbenchId) {
-  if (workbenchId === 'orders') return text.hub.actions.openOrders;
-  if (workbenchId === 'arrival-bell') return text.hub.actions.openArrivalBell;
-  if (workbenchId === 'reassign') return text.hub.actions.openReassign;
-  if (workbenchId === 'dispatch') return 'Open dispatch';
-  if (workbenchId === 'live-tracking') return 'Open live tracking';
-  if (workbenchId === 'exceptions') return 'Open exceptions';
-  if (workbenchId === 'sla') return 'Open SLA';
-  if (workbenchId === 'audit') return 'Open audit';
-  if (workbenchId === 'partner-prep') return 'Open partner prep';
-  if (workbenchId === 'handoff') return 'Open handoff';
-  if (workbenchId === 'proof-review') return 'Open proof review';
-  if (workbenchId === 'capacity') return 'Open capacity';
-  return text.hub.actions.openPeakMode;
-}
+import { OrdersLane } from './lanes/OrdersLane';
+import { DispatchFleetLane } from './lanes/DispatchFleetLane';
+import { TrackingHandoffLane } from './lanes/TrackingHandoffLane';
+import { ExceptionsSlaLane } from './lanes/ExceptionsSlaLane';
+import { PartnerReadinessLane } from './lanes/PartnerReadinessLane';
+import { ProxySheinAwnakLane } from './lanes/ProxySheinAwnakLane';
+import { AuditEvidenceLane } from './lanes/AuditEvidenceLane';
 
 export type ControlPanelDshOperationsScreenProps = {
-  state?: ControlPanelDshOperationsScreenState;
+  group?: CanonicalOperationsGroupId;
+  orderId?: string;
+  panel?: OperationsPanelId;
+  state?: OperationsViewState;
   fallbackHref?: string;
 };
 
+function resolveTopFilterGroup(filterId: string): CanonicalOperationsGroupId {
+  return OPERATIONS_TOP_FILTERS.find((item) => item.id === filterId)?.group ?? 'overview';
+}
+
+function renderLane(
+  group: CanonicalOperationsGroupId,
+  options: {
+    hubHref: string;
+    orderId?: string;
+    panel?: OperationsPanelId;
+    state?: OperationsViewState;
+  },
+) {
+  switch (group) {
+    case 'orders':
+      return <OrdersLane state={options.state} hubHref={options.hubHref} orderId={options.orderId} panel={options.panel} />;
+    case 'dispatch-fleet':
+      return <DispatchFleetLane state={options.state} hubHref={options.hubHref} />;
+    case 'tracking-handoff':
+      return <TrackingHandoffLane state={options.state} hubHref={options.hubHref} />;
+    case 'exceptions-sla':
+      return <ExceptionsSlaLane state={options.state} hubHref={options.hubHref} />;
+    case 'partner-readiness':
+      return <PartnerReadinessLane state={options.state} hubHref={options.hubHref} />;
+    case 'proxy-shein-awnak':
+      return <ProxySheinAwnakLane state={options.state} hubHref={options.hubHref} />;
+    case 'audit-evidence':
+      return <AuditEvidenceLane state={options.state} hubHref={options.hubHref} />;
+    case 'overview':
+    default:
+      return null;
+  }
+}
+
 export function ControlPanelDshOperationsScreen({
+  group = 'overview',
+  orderId,
+  panel,
   state = 'ready',
   fallbackHref = '/operations',
 }: ControlPanelDshOperationsScreenProps) {
@@ -164,243 +95,149 @@ export function ControlPanelDshOperationsScreen({
   const uiText = useUiText();
   const dshText = useDshControlPanelText();
   const { direction, language } = useDirection();
-  const languageChip = language === 'en' ? dshText.common.enChip : dshText.common.arChip;
-  const topFilterItems = React.useMemo(() => buildTopFilterItems(dshText), [dshText]);
-  const dshWorkbenches = React.useMemo(() => buildDshWorkbenches(dshText), [dshText]);
-  const [activeFilterId, setActiveFilterId] = React.useState<TopFilterId>('today');
-  const [activeWorkbenchId, setActiveWorkbenchId] = React.useState<DshWorkbenchId>('overview');
+  const [activeGroup, setActiveGroup] = React.useState<CanonicalOperationsGroupId>(group);
+  const [activeFilterId, setActiveFilterId] = React.useState<string>('pulse');
   const [refreshCount, setRefreshCount] = React.useState(1);
-  const [alertCount, setAlertCount] = React.useState(1);
+  const [alertCount, setAlertCount] = React.useState(3);
 
-  const activeWorkbench = dshWorkbenches.find((item) => item.id === activeWorkbenchId) ?? dshWorkbenches[0];
-  const activeFilter = topFilterItems.find((item) => item.id === activeFilterId) ?? topFilterItems[0];
-  const plannedWorkbenchCount = dshWorkbenches.filter((item) => !item.liveHref && item.id !== 'overview').length;
-  const liveWorkbenchCount = dshWorkbenches.filter((item) => Boolean(item.liveHref)).length;
-  const liveWorkbenchActions = dshWorkbenches.filter((item) => Boolean(item.liveHref));
+  React.useEffect(() => {
+    setActiveGroup(group);
+  }, [group]);
 
-  const topFilters = topFilterItems.map((item) => ({
-    ...item,
+  const activeGroupMeta = getOperationsGroupMeta(activeGroup);
+  const liveQueueStatus = orderId ? `Order ${orderId}` : 'Orders queue';
+  const languageChip = language === 'en' ? dshText.common.enChip : dshText.common.arChip;
+  const readyForSelection = state === 'ready';
+
+  const topFilters = OPERATIONS_TOP_FILTERS.map((item) => ({
+    id: item.id,
+    label: item.label,
     active: item.id === activeFilterId,
   }));
 
-  const railItems = dshWorkbenches.map((item) => ({
+  const railItems = OPERATIONS_CANONICAL_GROUPS.map((item) => ({
     id: item.id,
     label: item.label,
     description: item.description,
-    active: item.id === activeWorkbenchId,
-    badge: item.id === 'overview' ? dshText.common.live : item.liveHref ? dshText.common.liveNow : dshText.common.planned,
+    active: item.id === activeGroup,
+    badge: item.badge,
   }));
 
-  const readyForSelection = state === 'ready';
-
-  const heroTitle = activeWorkbench.id === 'overview' ? dshText.hub.rootTitle : activeWorkbench.label;
-  const heroSubtitle = formatDshWorkbenchSubtitle(activeWorkbench.description, activeFilter.label, language as 'ar' | 'en');
-  const currentDecision = activeWorkbench.id === 'overview'
-    ? 'Pick the next operational lane'
-    : activeWorkbench.id === 'orders'
-      ? 'Open orders or inspect the selected order'
-      : activeWorkbench.id === 'reassign'
-        ? 'Reassign or keep the current captain'
-        : activeWorkbench.id === 'peak-mode'
-          ? 'Switch the pressure lane or hold'
-          : activeWorkbench.id === 'sheinproxy'
-            ? 'Review manual assignment batch'
-            : activeWorkbench.id === 'arrival-bell'
-              ? 'Resolve arrival and ring states'
-              : 'Review the active workbench';
-  const currentNextAction = activeWorkbench.liveHref ? `Open ${activeWorkbench.label.toLowerCase()}` : activeWorkbench.routeHint;
-  const currentBlocker = activeWorkbench.liveHref ? 'Live route is available; decision is purely operational.' : 'Planned lane still needs closure proof.';
-
-  const handleTopFilterSelect = (filterId: string) => {
-    const matchedFilter = topFilterItems.find((item) => item.id === filterId);
-    if (!matchedFilter) return;
-    setActiveFilterId(matchedFilter.id);
-    setActiveWorkbenchId(resolveTopFilterWorkbench(matchedFilter.id));
-  };
-
-  const handleRailSelect = (workbenchId: string) => {
-    const matchedWorkbench = dshWorkbenches.find((item) => item.id === workbenchId);
-    if (!matchedWorkbench) return;
-    setActiveWorkbenchId(matchedWorkbench.id);
-    const liveHref = resolveWorkbenchLiveHref(matchedWorkbench.id);
-    if (liveHref) {
-      router.push(liveHref);
-      return;
-    }
-    if (matchedWorkbench.id === 'orders' || matchedWorkbench.id === 'sheinproxy') {
-      setActiveFilterId('queue');
-    } else if (matchedWorkbench.id === 'peak-mode') {
-      setActiveFilterId('peak');
-    } else {
-      setActiveFilterId('today');
-    }
-  };
-
-  const handleBrandClick = () => router.push('/dashboard');
-  const handleSearchClick = () => { setActiveFilterId('queue'); setActiveWorkbenchId('orders'); };
-  const handleRefreshClick = () => setRefreshCount((previousValue) => previousValue + 1);
-  const handleAlertClick = () => { setAlertCount(0); setActiveFilterId('queue'); setActiveWorkbenchId('orders'); };
+  const handleGroupChange = React.useCallback((nextGroup: CanonicalOperationsGroupId) => {
+    setActiveGroup(nextGroup);
+    router.push(buildOperationsHref(nextGroup, { orderId, panel }));
+  }, [orderId, panel, router]);
 
   const stageContent = readyForSelection ? (
     <div className={styles.opsWorkspace} dir={direction}>
-      {/* ===== Operational Metrics Strip ===== */}
       <div className={styles.metricsStrip}>
-        <StatCard
-          label={dshText.hub.selectedScopeTitle}
-          value={activeWorkbench.label}
-          tone="brand"
-        />
-        <StatCard
-          label={dshText.hub.plannedRoutesTitle}
-          value={String(plannedWorkbenchCount)}
-          tone="warning"
-        />
-        <StatCard
-          label={dshText.hub.safeTransitionTitle}
-          value={String(liveWorkbenchCount)}
-          tone="success"
-        />
-        <StatCard
-          label={dshText.common.activeAlerts}
-          value={String(alertCount)}
-          tone={alertCount > 0 ? 'danger' : 'default'}
-        />
+        {OPERATIONS_PULSE_METRICS.map((metric) => (
+          <StatCard
+            key={metric.id}
+            label={metric.title}
+            value={metric.value}
+            deltaLabel={metric.description}
+            tone={metric.tone}
+          />
+        ))}
       </div>
 
-      {/* ===== Context Bar (compact hero replacement) ===== */}
       <div className={styles.contextBar}>
         <div className={styles.contextBarMain}>
           <div className={styles.contextBarEyebrow}>
-            <Text role="caption" tone="brand">{dshText.hub.rootEyebrow}</Text>
-            <Badge label={`${dshText.common.period}: ${activeFilter.label}`} tone="brand" />
-            <Badge label={languageChip} tone="info" />
+            <Badge tone="brand" label={languageChip} />
+            <Badge tone="info" label={activeGroupMeta.badge} />
+            <Badge tone="default" label={liveQueueStatus} />
           </div>
-          <Text role="titleMd">{heroTitle}</Text>
-          <Text role="bodySm" tone="muted">{heroSubtitle}</Text>
+          <Text role="titleLg">DSH Operations Control Room</Text>
+          <Text role="bodyLg" tone="muted">
+            A single operations page that monitors order execution end-to-end through lanes, panels, and progressive disclosure instead of scattered workspaces.
+          </Text>
         </div>
+
         <div className={styles.contextBarActions}>
-          <Button
-            label={dshText.hub.actions.openOrders}
-            tone="primary"
-            size="sm"
-            fullWidth={false}
-            onPress={() => router.push('/operations?workspace=orders')}
-          />
-          <Button
-            label={dshText.common.openGeneralOperations}
-            tone="ghost"
-            size="sm"
-            fullWidth={false}
-            onPress={() => router.push(fallbackHref)}
-          />
+          <Button label="Open orders lane" tone="primary" fullWidth={false} onPress={() => handleGroupChange('orders')} />
+          <Button label="Open risk lane" tone="secondary" fullWidth={false} onPress={() => handleGroupChange('exceptions-sla')} />
         </div>
       </div>
 
       <ControlPanelDshDecisionBoard
         title="Operations decision board"
-        purpose="Keep the current workbench decision, next action, blockers, owner, evidence, and route hint visible."
-        primaryDecision={currentDecision}
-        nextAction={currentNextAction}
-        blockers={currentBlocker}
+        purpose="Keep execution decisions inside one control room and route non-operational work to the correct owning sections."
+        primaryDecision={activeGroupMeta.label}
+        nextAction={activeGroup === 'overview' ? 'Choose the next operational lane.' : `Continue inside ${activeGroupMeta.label}.`}
+        blockers={activeGroup === 'audit-evidence' ? 'Visual/runtime proof is still pending.' : 'No separate workspace branching is allowed for this slice.'}
         ownerSurface="operations"
-        evidenceHint={`${activeWorkbench.routeHint} and workbench state proof`}
-        routeHint={activeWorkbench.liveHref ?? `/operations?workspace=${activeWorkbench.id}`}
-        decisionTone={activeWorkbench.liveHref ? 'brand' : 'warning'}
+        evidenceHint={`Canonical group: ${activeGroupMeta.id}`}
+        routeHint={buildOperationsHref(activeGroup, { orderId, panel })}
+        decisionTone={activeGroup === 'exceptions-sla' ? 'danger' : activeGroup === 'orders' ? 'warning' : 'best'}
       />
 
-      {/* ===== Quick Access Tray ===== */}
-      <div className={styles.quickAccessTray} dir={direction}>
-        {liveWorkbenchActions.map((workbench) => (
-          <Button
-            key={workbench.id}
-            label={resolveWorkbenchActionLabel(dshText, workbench.id)}
-            tone="primary"
-            size="sm"
-            fullWidth={false}
-            onPress={() => router.push(workbench.liveHref!)}
-          />
-        ))}
-      </div>
-
-      {/* ===== Workbench Cards Grid ===== */}
       <WebSectionCard
-        title={dshText.hub.workbenchesTitle}
-        description={dshText.hub.workbenchesDescription}
+        title="Control room overview"
+        description="Operational pulse, current risk, next action, live queue status, SLA pressure, and dispatch pressure stay visible at the top."
       >
         <div className={styles.workbenchGrid}>
-          {dshWorkbenches.filter((workbench) => workbench.id !== 'overview').map((workbench) => {
-            const isLive = Boolean(workbench.liveHref);
-            const badgeTone = isLive ? 'success' : 'warning';
-            return (
-              <div key={workbench.id} className={styles.workbenchCard}>
-                <Box
-                  padding={4}
-                  gap={2}
-                  border
-                  radiusToken="xl"
-                  background="surfaceRaised"
-                >
-                  <div className={styles.workbenchCardHeader} dir={direction}>
-                    <Text role="bodyStrong">{workbench.label}</Text>
-                    <Badge
-                      label={isLive ? dshText.common.live : workbench.statusLabel}
-                      tone={badgeTone as 'success' | 'warning'}
-                    />
-                  </div>
-                  <Text role="bodySm" tone="muted">
-                    {workbench.description}
-                  </Text>
-                  <Text role="caption" tone="soft">
-                    {workbench.routeHint}
-                  </Text>
-                  {isLive ? (
-                    <Button
-                      label={resolveWorkbenchActionLabel(dshText, workbench.id)}
-                      tone="primary"
-                      size="sm"
-                      fullWidth={false}
-                      onPress={() => router.push(workbench.liveHref!)}
-                    />
-                  ) : (
-                    <Button
-                      label={dshText.common.planned}
-                      tone="ghost"
-                      size="sm"
-                      fullWidth={false}
-                      disabled
-                    />
-                  )}
-                </Box>
-              </div>
-            );
-          })}
+          {OPERATIONS_OVERVIEW_ACTIONS.map((item) => (
+            <WebControlActionCard
+              key={item.id}
+              id={item.id}
+              title={item.title}
+              description={item.description}
+              footerLabel={item.footerLabel}
+              href={item.href}
+            />
+          ))}
         </div>
       </WebSectionCard>
+
+      <WebSectionCard
+        title="Section shortcuts kept outside operations"
+        description="Finance, catalogs, marketing, and partners remain reachable, but they are no longer primary operations tabs."
+      >
+        <Box gap={2}>
+          {NON_OPERATIONS_SECTION_SHORTCUTS.map((item) => (
+            <WebControlDisclosureItem
+              key={item.id}
+              id={item.id}
+              label={item.label}
+              description={item.description}
+              href={item.href}
+              badge="Section root"
+            />
+          ))}
+        </Box>
+      </WebSectionCard>
+
+      {activeGroup !== 'overview' ? renderLane(activeGroup, { hubHref: fallbackHref, orderId, panel, state }) : null}
     </div>
   ) : (
     <div className={styles.stateContainer}>
-      <StateView
-        {...resolveStateCopy(dshText, state)}
-        onActionPress={() => router.push(fallbackHref)}
-      />
+      <StateView {...resolveOperationsStateCopy(dshText, state)} onActionPress={() => router.push(fallbackHref)} />
     </div>
   );
 
   return (
     <WebCommandCenterFrame
       brandLabel={uiText.controlPanel.brandLabel}
-      surfaceTitle={readyForSelection ? heroTitle : dshText.hub.rootTitle}
-      surfaceSubtitle={readyForSelection ? heroSubtitle : dshText.hub.unavailableTitle}
+      surfaceTitle={readyForSelection ? activeGroupMeta.label : dshText.hub.unavailableTitle}
+      surfaceSubtitle={readyForSelection ? activeGroupMeta.description : dshText.hub.unavailableTitle}
       topFilters={topFilters}
-      onTopFilterSelect={readyForSelection ? handleTopFilterSelect : undefined}
-      onBrandClick={handleBrandClick}
-      onSearchClick={readyForSelection ? handleSearchClick : undefined}
-      onRefreshClick={readyForSelection ? handleRefreshClick : undefined}
-      onAlertClick={readyForSelection ? handleAlertClick : undefined}
-      railTitle={dshText.hub.railTitle}
-      railStatusLabel={readyForSelection ? `${dshText.common.live}: ${liveWorkbenchCount}` : state}
+      onTopFilterSelect={(filterId: string) => {
+        setActiveFilterId(filterId);
+        handleGroupChange(resolveTopFilterGroup(filterId));
+      }}
+      onBrandClick={() => router.push('/dashboard')}
+      onSearchClick={() => handleGroupChange('orders')}
+      onRefreshClick={() => setRefreshCount((value) => value + 1)}
+      onAlertClick={() => {
+        setAlertCount(0);
+        handleGroupChange('exceptions-sla');
+      }}
+      railTitle="Operations lanes"
+      railStatusLabel={`Refresh ${refreshCount} · Alerts ${alertCount}`}
       railItems={railItems}
-      onRailItemSelect={readyForSelection ? handleRailSelect : undefined}
+      onRailItemSelect={(groupId: string) => handleGroupChange(groupId as CanonicalOperationsGroupId)}
     >
       {stageContent}
     </WebCommandCenterFrame>
