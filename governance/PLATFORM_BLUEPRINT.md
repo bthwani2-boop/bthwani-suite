@@ -1366,4 +1366,3 @@ Services own service truth.
 No extra blueprint files.
 No closure without evidence.
 ```
-
