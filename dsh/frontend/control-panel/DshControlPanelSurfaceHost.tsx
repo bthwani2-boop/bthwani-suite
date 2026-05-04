@@ -25,6 +25,7 @@ import { ControlPanelDshPartnerActivationScreen, ControlPanelDshPartnerApprovals
 import { ControlPanelDshSupportQueueScreen, ControlPanelDshDisputeResolutionScreen } from './support';
 import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, getDshClosureItemsByStatus, type ControlPanelDshActionQueueItem } from './shared';
 import { useDshControlPanelText } from './operations/shared/dshControlPanelText';
+import { ControlPanelDshAreaCapacityMonitorScreen, ControlPanelDshDispatchBoardScreen, ControlPanelDshExceptionCommandQueueScreen, ControlPanelDshHandoffVerificationScreen, ControlPanelDshLiveTrackingTimelineScreen, ControlPanelDshManualActionAuditScreen, ControlPanelDshPartnerPrepMonitorScreen, ControlPanelDshProofReviewScreen, ControlPanelDshSlaDelayMonitorScreen } from './operations';
 
 type DshWorkspaceId =
   | 'overview'
@@ -42,6 +43,15 @@ type DshWorkspaceId =
   | 'orders'
   | 'order-detail'
   | 'orderchat'
+  | 'dispatch'
+  | 'live-tracking'
+  | 'exceptions'
+  | 'sla'
+  | 'audit'
+  | 'partner-prep'
+  | 'handoff'
+  | 'proof-review'
+  | 'capacity'
   | 'partners'
   | 'catalogs'
   | 'catalog-categories'
@@ -85,6 +95,15 @@ const workspaceTabs: readonly WorkspaceTab[] = [
   { id: 'orders', label: 'Orders', description: 'Current queue' },
   { id: 'order-detail', label: 'Order detail', description: 'Order detail workspace' },
   { id: 'orderchat', label: 'Order chat', description: 'Order chat workspace' },
+  { id: 'dispatch', label: 'Dispatch', description: 'Assignment and captain board' },
+  { id: 'live-tracking', label: 'Live tracking', description: 'Event timeline' },
+  { id: 'exceptions', label: 'Exceptions', description: 'Unified exception queue' },
+  { id: 'sla', label: 'SLA', description: 'Delay monitor' },
+  { id: 'audit', label: 'Audit', description: 'Manual action audit' },
+  { id: 'partner-prep', label: 'Partner prep', description: 'Partner readiness monitor' },
+  { id: 'handoff', label: 'Handoff', description: 'Pickup and dropoff verification' },
+  { id: 'proof-review', label: 'Proof review', description: 'Proof asset review' },
+  { id: 'capacity', label: 'Capacity', description: 'Area capacity monitor' },
   { id: 'partners', label: 'Partners', description: 'Activation and docs' },
   { id: 'catalogs', label: 'Catalogs', description: 'Approval and governance' },
   { id: 'catalog-categories', label: 'Catalog categories', description: 'Category ownership and triage' },
@@ -354,6 +373,24 @@ function renderWorkspace(workspace: DshWorkspaceId, orderId?: string, orderOverl
     case 'order-detail':
     case 'orderchat':
       return renderOrdersOverlay(normalizedWorkspace, orderId);
+    case 'dispatch':
+      return <ControlPanelDshDispatchBoardScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} />;
+    case 'live-tracking':
+      return <ControlPanelDshLiveTrackingTimelineScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} />;
+    case 'exceptions':
+      return <ControlPanelDshExceptionCommandQueueScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} />;
+    case 'sla':
+      return <ControlPanelDshSlaDelayMonitorScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} />;
+    case 'audit':
+      return <ControlPanelDshManualActionAuditScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} />;
+    case 'partner-prep':
+      return <ControlPanelDshPartnerPrepMonitorScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} />;
+    case 'handoff':
+      return <ControlPanelDshHandoffVerificationScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} />;
+    case 'proof-review':
+      return <ControlPanelDshProofReviewScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} />;
+    case 'capacity':
+      return <ControlPanelDshAreaCapacityMonitorScreen embedded showHeader={false} hubHref={buildOperationsHref('overview')} />;
     case 'partners':
       return (
         <Box gap={4}>

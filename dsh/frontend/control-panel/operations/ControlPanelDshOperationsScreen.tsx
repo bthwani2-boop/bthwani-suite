@@ -29,7 +29,16 @@ type DshWorkbenchId =
   | 'peak-mode'
   | 'zone-set'
   | 'sheinproxy'
-  | 'arrival-bell';
+  | 'arrival-bell'
+  | 'dispatch'
+  | 'live-tracking'
+  | 'exceptions'
+  | 'sla'
+  | 'audit'
+  | 'partner-prep'
+  | 'handoff'
+  | 'proof-review'
+  | 'capacity';
 
 type TopFilterId = 'today' | 'queue' | 'peak';
 
@@ -41,6 +50,30 @@ type DshWorkbench = {
   statusLabel: string;
   liveHref?: string;
 };
+
+type DshWorkbenchCopy = Pick<DshWorkbench, 'label' | 'description' | 'routeHint' | 'statusLabel'>;
+
+const dshWorkbenchCopyFallback: Record<string, DshWorkbenchCopy> = {
+  dispatch: { label: 'Dispatch', description: 'Assignment and captain board', routeHint: '/operations?workspace=dispatch', statusLabel: 'Preview' },
+  'live-tracking': { label: 'Live tracking', description: 'Event timeline', routeHint: '/operations?workspace=live-tracking', statusLabel: 'Preview' },
+  exceptions: { label: 'Exceptions', description: 'Unified exception queue', routeHint: '/operations?workspace=exceptions', statusLabel: 'Preview' },
+  sla: { label: 'SLA', description: 'Delay monitor', routeHint: '/operations?workspace=sla', statusLabel: 'Preview' },
+  audit: { label: 'Audit', description: 'Manual action audit', routeHint: '/operations?workspace=audit', statusLabel: 'Preview' },
+  'partner-prep': { label: 'Partner prep', description: 'Partner readiness monitor', routeHint: '/operations?workspace=partner-prep', statusLabel: 'Preview' },
+  handoff: { label: 'Handoff', description: 'Pickup and dropoff verification', routeHint: '/operations?workspace=handoff', statusLabel: 'Preview' },
+  'proof-review': { label: 'Proof review', description: 'Proof asset review', routeHint: '/operations?workspace=proof-review', statusLabel: 'Preview' },
+  capacity: { label: 'Capacity', description: 'Area capacity monitor', routeHint: '/operations?workspace=capacity', statusLabel: 'Preview' },
+};
+
+function resolveWorkbenchCopy(text: ReturnType<typeof useDshControlPanelText>, workbenchId: string): DshWorkbenchCopy {
+  const existing = (text.hub.workbenches as unknown as Record<string, DshWorkbenchCopy>)[workbenchId];
+  return existing ?? dshWorkbenchCopyFallback[workbenchId] ?? {
+    label: workbenchId,
+    description: 'Preview workspace',
+    routeHint: `/operations?workspace=${workbenchId}`,
+    statusLabel: 'Preview',
+  };
+}
 
 function buildTopFilterItems(text: ReturnType<typeof useDshControlPanelText>) {
   return [
@@ -59,6 +92,15 @@ function buildDshWorkbenches(text: ReturnType<typeof useDshControlPanelText>): R
     { id: 'zone-set', ...text.hub.workbenches.zoneSet },
     { id: 'sheinproxy', ...text.hub.workbenches.sheinProxy },
     { id: 'arrival-bell', ...text.hub.workbenches.arrivalBell, liveHref: '/operations?workspace=arrival-bell' },
+    { id: 'dispatch', ...resolveWorkbenchCopy(text, 'dispatch'), liveHref: '/operations?workspace=dispatch' },
+    { id: 'live-tracking', ...resolveWorkbenchCopy(text, 'live-tracking'), liveHref: '/operations?workspace=live-tracking' },
+    { id: 'exceptions', ...resolveWorkbenchCopy(text, 'exceptions'), liveHref: '/operations?workspace=exceptions' },
+    { id: 'sla', ...resolveWorkbenchCopy(text, 'sla'), liveHref: '/operations?workspace=sla' },
+    { id: 'audit', ...resolveWorkbenchCopy(text, 'audit'), liveHref: '/operations?workspace=audit' },
+    { id: 'partner-prep', ...resolveWorkbenchCopy(text, 'partner-prep'), liveHref: '/operations?workspace=partner-prep' },
+    { id: 'handoff', ...resolveWorkbenchCopy(text, 'handoff'), liveHref: '/operations?workspace=handoff' },
+    { id: 'proof-review', ...resolveWorkbenchCopy(text, 'proof-review'), liveHref: '/operations?workspace=proof-review' },
+    { id: 'capacity', ...resolveWorkbenchCopy(text, 'capacity'), liveHref: '/operations?workspace=capacity' },
   ] as const;
 }
 
@@ -74,6 +116,15 @@ function resolveWorkbenchLiveHref(workbenchId: DshWorkbenchId) {
   if (workbenchId === 'peak-mode') return '/operations?workspace=peak-mode';
   if (workbenchId === 'arrival-bell') return '/operations?workspace=arrival-bell';
   if (workbenchId === 'sheinproxy') return '/operations?workspace=sheinproxy';
+  if (workbenchId === 'dispatch') return '/operations?workspace=dispatch';
+  if (workbenchId === 'live-tracking') return '/operations?workspace=live-tracking';
+  if (workbenchId === 'exceptions') return '/operations?workspace=exceptions';
+  if (workbenchId === 'sla') return '/operations?workspace=sla';
+  if (workbenchId === 'audit') return '/operations?workspace=audit';
+  if (workbenchId === 'partner-prep') return '/operations?workspace=partner-prep';
+  if (workbenchId === 'handoff') return '/operations?workspace=handoff';
+  if (workbenchId === 'proof-review') return '/operations?workspace=proof-review';
+  if (workbenchId === 'capacity') return '/operations?workspace=capacity';
   return undefined;
 }
 
@@ -88,6 +139,15 @@ function resolveWorkbenchActionLabel(text: ReturnType<typeof useDshControlPanelT
   if (workbenchId === 'orders') return text.hub.actions.openOrders;
   if (workbenchId === 'arrival-bell') return text.hub.actions.openArrivalBell;
   if (workbenchId === 'reassign') return text.hub.actions.openReassign;
+  if (workbenchId === 'dispatch') return 'Open dispatch';
+  if (workbenchId === 'live-tracking') return 'Open live tracking';
+  if (workbenchId === 'exceptions') return 'Open exceptions';
+  if (workbenchId === 'sla') return 'Open SLA';
+  if (workbenchId === 'audit') return 'Open audit';
+  if (workbenchId === 'partner-prep') return 'Open partner prep';
+  if (workbenchId === 'handoff') return 'Open handoff';
+  if (workbenchId === 'proof-review') return 'Open proof review';
+  if (workbenchId === 'capacity') return 'Open capacity';
   return text.hub.actions.openPeakMode;
 }
 

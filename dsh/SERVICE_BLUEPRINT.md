@@ -167,7 +167,7 @@ Apps must not own real `dsh` service screens, business/domain logic, reusable UI
 | `DSH-OP-10` | Support | UI flow present in root frontend; proof pending | Customer/admin | app-client / control-panel | NEEDS_UI_FLOW | N/A |
 | `DSH-OP-11` | Rating | UI flow present in root frontend; proof pending | Customer | app-client | NEEDS_UI_FLOW | N/A |
 | `DSH-OP-12` | WLT financial relation | Contract only; root truth not proven here | Financial boundary | wlt | CONTRACT_TBD | N/A |
-| `DSH-OP-13` | Control-panel operations | Control-panel workspace present; proof pending | Admin/Ops | control-panel | NEEDS_EVIDENCE | N/A |
+| `DSH-OP-13` | Control-panel operations | Control-panel command-center UI present; visual/runtime proof pending | Admin/Ops | control-panel | UI_FLOW_PRESENT_NEEDS_VISUAL_RUNTIME_EVIDENCE | N/A |
 
 ### Operation Rules
 
@@ -220,7 +220,7 @@ Actors
 
 | ID | Surface | Screen / Route / Sheet / State | Type | Purpose / CTA | Required States | Owner Path | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|
-| `DSH-INV-TBD` | TBD | TBD | TBD | TBD | loading / empty / error / success / offline / disabled / pending / retry / blocked | TBD | TBD | N/A |
+| `DSH-OPS-COMMAND-CENTER-01` | control-panel / operations | DSH operations command-center UI preview | Screen | Dispatch, exceptions, SLA, audit, partner prep, live tracking, handoff, proof review, capacity | loading / empty / error / offline / disabled / ready | `dsh/frontend/control-panel/DshControlPanelSurfaceHost.tsx` | PRESENT_UI_PREVIEW | N/A |
 
 ### Screen File Model
 
@@ -237,7 +237,7 @@ Actors
 
 | Flow ID | Screen / Route / State | Needed Data | Needed Action | Existing Contract | Required Contract Gap | Status | Evidence |
 |---|---|---|---|---|---|---|---|
-| `DSH-MATRIX-TBD` | TBD | TBD | TBD | `dsh/dsh.openapi.yaml` | TBD | TBD | N/A |
+| `DSH-MATRIX-OPS-UI-01` | control-panel operations command-center preview | dispatch, exceptions, sla, audit, partner-prep, live-tracking, handoff, proof-review, capacity | route navigation only | `dsh/dsh.openapi.yaml` | no API contract yet | PRESENT_UI_PREVIEW | N/A |
 
 ### Screen/API Rules
 
@@ -253,7 +253,7 @@ Actors
 | Gap ID | Gap Type | Affected Flow | Surface / Layer | Expected | Current | Impact | Priority | Closure Type | Target Owner Path | Blocked By | Verification Gate | Evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | `DSH-GAP-ROOT-PARITY` | DUPLICATE_NOISE | Root truth parity | `dsh/` + docs | frontend truth aligned | truth parity evidence pending | medium | medium | MARK_TBD | `dsh/` | evidence | NEEDS_EVIDENCE | N/A |
-| `DSH-GAP-ROUTE-PARITY` | MISSING_ROUTE | Control-panel control/operations | `control-panel/runtime` + `control-panel/shell` | route ids and subsections aligned | governance removed; workspace parity still under proof | medium | high | ADD_ROUTE | `control-panel/` | compile + route evidence | NEEDS_UI_FLOW | N/A |
+| `DSH-GAP-ROUTE-PARITY` | MISSING_ROUTE | Control-panel control/operations | `control-panel/runtime` + `control-panel/shell` | route ids and subsections aligned | route ids, tabs, and render cases now align for the operations command-center UI; visual/runtime proof still pending | medium | high | ADD_ROUTE | `control-panel/` | compile + route evidence | NEEDS_UI_FLOW | N/A |
 | `DSH-GAP-CONTRACT` | MISSING_CONTRACT | All DSH flows | `dsh/dsh.openapi.yaml` | contract-backed flow proof | contract remains scaffold/TBD | high | high | ADD_CONTRACT_OPERATION | `dsh/` | Screen/API Matrix | CONTRACT_TBD | N/A |
 | `DSH-GAP-BACKEND` | MISSING_BACKEND_HANDLER | All DSH flows | `dsh/backend` | backend truth proven | backend scaffold only | high | high | ADD_BACKEND_HANDLER | `dsh/backend/` | implementation evidence | BACKEND_SCAFFOLD_ONLY | N/A |
 | `DSH-GAP-DOMAIN` | MISSING_PERSISTENCE_MODEL | All DSH flows | `dsh/domain` | domain truth proven | domain TBD | medium | medium | ADD_PERSISTENCE_MODEL | `dsh/domain/` | domain evidence | DOMAIN_TBD | N/A |

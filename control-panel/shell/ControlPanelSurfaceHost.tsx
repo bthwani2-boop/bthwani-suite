@@ -27,8 +27,8 @@ const hiddenSectionIds = ['community-services', 'partners', 'marketing', 'contro
 const primarySectionIds = [...phaseOneSectionIds, ...hiddenSectionIds] as const;
 const controlSubSectionIds = ['platform', 'administration', 'hr'] as const;
 const dshLiveWorkbenchIds = ['orders', 'reassign', 'peakMode', 'arrivalBell'] as const;
-const dshPlannedWorkbenchIds = ['sheinProxy', 'zoneSet', 'dashboard', 'captain-ops', 'field-ops', 'finance', 'settlements', 'cod', 'refunds', 'issues', 'serviceability', 'guard-status', 'evidence'] as const;
-const operationsWorkspaceIds = ['overview', 'dashboard', 'captain-ops', 'field-ops', 'finance', 'settlements', 'cod', 'refunds', 'issues', 'serviceability', 'guard-status', 'evidence', 'orders', 'order-detail', 'orderchat', 'partners', 'catalogs', 'catalog-categories', 'marketing', 'banners', 'growth', 'loyalty', 'smart-signal', 'sheinproxy', 'reassign', 'peak-mode', 'bell', 'arrival-bell', 'zone-set'] as const;
+const dshPlannedWorkbenchIds = ['sheinProxy', 'zoneSet', 'dashboard', 'captain-ops', 'field-ops', 'finance', 'settlements', 'cod', 'refunds', 'issues', 'serviceability', 'guard-status', 'evidence', 'dispatch', 'live-tracking', 'exceptions', 'sla', 'audit', 'partner-prep', 'handoff', 'proof-review', 'capacity'] as const;
+const operationsWorkspaceIds = ['overview', 'dashboard', 'captain-ops', 'field-ops', 'finance', 'settlements', 'cod', 'refunds', 'issues', 'serviceability', 'guard-status', 'evidence', 'orders', 'order-detail', 'orderchat', 'dispatch', 'live-tracking', 'exceptions', 'sla', 'audit', 'partner-prep', 'handoff', 'proof-review', 'capacity', 'partners', 'catalogs', 'catalog-categories', 'marketing', 'banners', 'growth', 'loyalty', 'smart-signal', 'sheinproxy', 'reassign', 'peak-mode', 'bell', 'arrival-bell', 'zone-set'] as const;
 
 type ControlPanelSectionId = (typeof primarySectionIds)[number];
 type PhaseOneSectionId = (typeof phaseOneSectionIds)[number];
@@ -80,6 +80,35 @@ type SectionBlueprint = {
   disclosureDescription: string;
   disclosureItems: ReadonlyArray<DisclosureItemView>;
 };
+
+type WorkbenchMeta = {
+  label: string;
+  description: string;
+  routeHint: string;
+  statusLabel: string;
+};
+
+const dshWorkbenchMetaFallback: Record<string, WorkbenchMeta> = {
+  dispatch: { label: 'Dispatch', description: 'Assignment and captain board', routeHint: '/operations?workspace=dispatch', statusLabel: 'Preview' },
+  'live-tracking': { label: 'Live tracking', description: 'Event timeline', routeHint: '/operations?workspace=live-tracking', statusLabel: 'Preview' },
+  exceptions: { label: 'Exceptions', description: 'Unified exception queue', routeHint: '/operations?workspace=exceptions', statusLabel: 'Preview' },
+  sla: { label: 'SLA', description: 'Delay monitor', routeHint: '/operations?workspace=sla', statusLabel: 'Preview' },
+  audit: { label: 'Audit', description: 'Manual action audit', routeHint: '/operations?workspace=audit', statusLabel: 'Preview' },
+  'partner-prep': { label: 'Partner prep', description: 'Partner readiness monitor', routeHint: '/operations?workspace=partner-prep', statusLabel: 'Preview' },
+  handoff: { label: 'Handoff', description: 'Pickup and dropoff verification', routeHint: '/operations?workspace=handoff', statusLabel: 'Preview' },
+  'proof-review': { label: 'Proof review', description: 'Proof asset review', routeHint: '/operations?workspace=proof-review', statusLabel: 'Preview' },
+  capacity: { label: 'Capacity', description: 'Area capacity monitor', routeHint: '/operations?workspace=capacity', statusLabel: 'Preview' },
+};
+
+function resolveWorkbenchMeta(workbenches: Record<string, WorkbenchMeta>, workbenchId: string): WorkbenchMeta {
+  const existingMeta = workbenches[workbenchId];
+  return existingMeta ?? dshWorkbenchMetaFallback[workbenchId] ?? {
+    label: workbenchId,
+    description: 'Preview workspace',
+    routeHint: `/operations?workspace=${workbenchId}`,
+    statusLabel: 'Preview',
+  };
+}
 
 export type ControlPanelSurfaceHostProps = {
   section?: ControlPanelSectionId;
@@ -497,24 +526,30 @@ export function ControlPanelSurfaceHost({
               ],
               quickActionsTitle: 'مسارات',
               quickActionsDescription: 'أزرار سريعة',
-              quickActions: dshLiveWorkbenchIds.map((workbenchId) => ({
-                id: `operations-${workbenchId}`,
-                label: dshText.hub.workbenches[workbenchId].label,
-                description: dshText.hub.workbenches[workbenchId].description,
-                footerLabel: 'فتح مباشر',
-                href: dshText.hub.workbenches[workbenchId].routeHint,
-                badge: 'حي',
-                tone: workbenchId === 'orders' ? 'primary' : 'secondary',
-              })),
+              quickActions: dshLiveWorkbenchIds.map((workbenchId) => {
+                const workbenchMeta = resolveWorkbenchMeta(dshText.hub.workbenches as unknown as Record<string, WorkbenchMeta>, workbenchId);
+                return {
+                  id: `operations-${workbenchId}`,
+                  label: workbenchMeta.label,
+                  description: workbenchMeta.description,
+                  footerLabel: 'فتح مباشر',
+                  href: workbenchMeta.routeHint,
+                  badge: 'حي',
+                  tone: workbenchId === 'orders' ? 'primary' : 'secondary',
+                };
+              }),
               disclosureTitle: 'مسارات أقل أولوية الآن',
               disclosureDescription: 'تظل متاحة بشكل منضبط عبر progressive disclosure.',
-              disclosureItems: dshPlannedWorkbenchIds.map((workbenchId) => ({
-                id: `operations-disclosure-${workbenchId}`,
-                label: dshText.hub.workbenches[workbenchId].label,
-                description: `${dshText.hub.workbenches[workbenchId].description} · ${dshText.hub.workbenches[workbenchId].routeHint}`,
-                href: dshText.hub.workbenches[workbenchId].routeHint,
-                badge: 'قيد التوسعة',
-              })),
+              disclosureItems: dshPlannedWorkbenchIds.map((workbenchId) => {
+                const workbenchMeta = resolveWorkbenchMeta(dshText.hub.workbenches as unknown as Record<string, WorkbenchMeta>, workbenchId);
+                return {
+                  id: `operations-disclosure-${workbenchId}`,
+                  label: workbenchMeta.label,
+                  description: `${workbenchMeta.description} · ${workbenchMeta.routeHint}`,
+                  href: workbenchMeta.routeHint,
+                  badge: 'قيد التوسعة',
+                };
+              }),
             };
           case 'finance':
             return {
