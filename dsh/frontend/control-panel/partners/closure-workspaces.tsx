@@ -62,11 +62,11 @@ function PartnerReviewBoard({
           blockers: selectedItem?.blocker ?? 'Select a partner row.',
           ownerSurface: 'partners',
           evidenceHint: selectedItem?.evidence ?? 'partner evidence',
-          routeHint: '/operations?workspace=partners',
+          routeHint: '/partners',
           decisionTone: selectedItem?.tone,
         }}
-        primaryAction={{ label: 'Open catalog handoff', href: '/operations?workspace=catalogs' }}
-        secondaryAction={{ label: 'Open marketing handoff', href: '/operations?workspace=marketing' }}
+        primaryAction={{ label: 'Open catalog handoff', href: '/catalogs' }}
+        secondaryAction={{ label: 'Open marketing handoff', href: '/marketing' }}
         signals={[
           { id: `${kind}-pending`, title: 'Pending', value: 'Visible', description: 'Items pending partner review.', tone: 'warning' },
           { id: `${kind}-ready`, title: 'Ready', value: 'Visible', description: 'Items ready for local action.', tone: 'best' },

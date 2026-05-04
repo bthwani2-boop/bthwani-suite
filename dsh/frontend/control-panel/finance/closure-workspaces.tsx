@@ -81,7 +81,7 @@ function FinanceQueueBoard({
           blockers: selectedItem?.blocker ?? 'Select a finance row.',
           ownerSurface: 'finance',
           evidenceHint: selectedItem?.evidence ?? 'finance row evidence',
-          routeHint: '/operations?workspace=finance',
+          routeHint: '/finance',
           decisionTone: selectedItem?.tone,
         }}
         primaryAction={{ label: 'Open evidence', href: '/operations?workspace=evidence' }}

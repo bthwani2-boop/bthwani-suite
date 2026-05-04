@@ -78,7 +78,7 @@ export function ControlPanelDshExceptionCommandQueueScreen({
           actions={[
             { id: 'exceptions-audit', label: 'Open audit', description: 'Check the manual action trail before approving the move.', href: '/operations?workspace=audit', badge: 'Trace' },
             { id: 'exceptions-orders', label: 'Open orders', description: 'Compare the exception against the active order queue.', href: '/operations?workspace=orders', badge: 'Queue' },
-            { id: 'exceptions-refunds', label: 'Open refunds', description: 'Jump into the refund queue when compensation is required.', href: '/operations?workspace=refunds', badge: 'Finance' },
+            { id: 'exceptions-refunds', label: 'Open refunds', description: 'Jump into the refund queue when compensation is required.', href: '/finance', badge: 'Finance' },
             { id: 'exceptions-dispatch', label: 'Open dispatch', description: 'Return redispatch cases back to the assignment board.', href: '/operations?workspace=dispatch', badge: 'Recovery' },
           ]}
           disclosures={[

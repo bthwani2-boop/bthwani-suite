@@ -17,7 +17,7 @@ export function ControlPanelDshCatalogApprovalScreen() {
         blockers: 'Pending approvals and inventory disagreements still block publish.',
         ownerSurface: 'catalogs',
         evidenceHint: 'catalog approval proof plus price health signals',
-        routeHint: '/operations?workspace=catalogs',
+        routeHint: '/catalogs',
         decisionTone: 'warning',
       }}
       primaryAction={{ label: 'Open listing governance', href: '/operations?workspace=issues' }}
@@ -48,10 +48,10 @@ export function ControlPanelDshListingGovernanceScreen() {
         blockers: 'Duplicates, conflicts, and health gaps still need review.',
         ownerSurface: 'catalogs',
         evidenceHint: 'duplicate/conflict proof and store catalog health',
-        routeHint: '/operations?workspace=catalogs',
+        routeHint: '/catalogs',
         decisionTone: 'brand',
       }}
-      primaryAction={{ label: 'Open catalog approval', href: '/operations?workspace=catalogs' }}
+      primaryAction={{ label: 'Open catalog approval', href: '/catalogs' }}
       secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
       signals={[
         { id: 'active-listing', title: 'Active listings', value: 'Visible', description: 'Active items remain easy to scan.', tone: 'best' },

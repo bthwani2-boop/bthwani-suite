@@ -97,25 +97,25 @@ const enDshControlPanelText = {
       finance: {
         label: 'Finance',
         description: 'Settlement summary and financial control remain visible.',
-        routeHint: '/operations?workspace=finance',
+        routeHint: '/finance',
         statusLabel: 'Live'
       },
       settlements: {
         label: 'Settlements',
         description: 'Partner and captain payouts stay grouped in one lane.',
-        routeHint: '/operations?workspace=settlements',
+        routeHint: '/finance',
         statusLabel: 'Live'
       },
       cod: {
         label: 'COD',
         description: 'Collected and pending cash-on-delivery items remain explicit.',
-        routeHint: '/operations?workspace=cod',
+        routeHint: '/finance',
         statusLabel: 'Live'
       },
       refunds: {
         label: 'Refunds',
         description: 'Refund queue visibility stays available for local review.',
-        routeHint: '/operations?workspace=refunds',
+        routeHint: '/finance',
         statusLabel: 'Live'
       },
       issues: {
@@ -1103,25 +1103,25 @@ const arDshControlPanelText = {
       finance: {
         label: 'المالية',
         description: 'ملخص التسوية والرقابة المالية يبقيان ظاهرين.',
-        routeHint: '/operations?workspace=finance',
+        routeHint: '/finance',
         statusLabel: 'حي'
       },
       settlements: {
         label: 'التسويات',
         description: 'مدفوعات الشركاء والقبطان تبقى في مسار واحد.',
-        routeHint: '/operations?workspace=settlements',
+        routeHint: '/finance',
         statusLabel: 'حي'
       },
       cod: {
         label: 'COD',
         description: 'العناصر المقبوضة والمعلقة تبقى واضحة للمراجعة.',
-        routeHint: '/operations?workspace=cod',
+        routeHint: '/finance',
         statusLabel: 'حي'
       },
       refunds: {
         label: 'الاستردادات',
         description: 'قائمة الاستردادات تبقى متاحة للمراجعة المحلية.',
-        routeHint: '/operations?workspace=refunds',
+        routeHint: '/finance',
         statusLabel: 'حي'
       },
       issues: {

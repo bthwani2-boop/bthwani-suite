@@ -143,7 +143,7 @@ export function ControlPanelDshServiceabilityScreen() {
         decisionTone: 'brand',
       }}
       primaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
-      secondaryAction={{ label: 'Open finance', href: '/operations?workspace=finance' }}
+      secondaryAction={{ label: 'Open finance', href: '/finance' }}
       signals={[
         { id: 'zones', title: 'Zones', value: 'Defined', description: 'Area boundaries are visible.', tone: 'brand' },
         { id: 'fees', title: 'Fees', value: 'Visible', description: 'Fee visibility stays explicit.', tone: 'best' },

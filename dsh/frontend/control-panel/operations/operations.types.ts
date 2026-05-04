@@ -14,10 +14,6 @@ export type LegacyOperationsWorkspaceId =
   | 'dashboard'
   | 'captain-ops'
   | 'field-ops'
-  | 'finance'
-  | 'settlements'
-  | 'cod'
-  | 'refunds'
   | 'issues'
   | 'serviceability'
   | 'guard-status'
@@ -48,7 +44,21 @@ export type LegacyOperationsWorkspaceId =
   | 'arrival-bell'
   | 'zone-set';
 
-export type AnyOperationsWorkspaceId = CanonicalOperationsGroupId | LegacyOperationsWorkspaceId | 'orders' | 'overview';
+export type LegacySectionRedirectId =
+  | 'finance'
+  | 'settlements'
+  | 'cod'
+  | 'refunds'
+  | 'catalogs'
+  | 'catalog-categories'
+  | 'marketing'
+  | 'banners'
+  | 'growth'
+  | 'loyalty'
+  | 'smart-signal'
+  | 'partners';
+
+export type AnyOperationsWorkspaceId = CanonicalOperationsGroupId | LegacyOperationsWorkspaceId | LegacySectionRedirectId | 'orders' | 'overview';
 
 export type NonOperationsSectionRootId = 'finance' | 'catalogs' | 'marketing' | 'partners';
 

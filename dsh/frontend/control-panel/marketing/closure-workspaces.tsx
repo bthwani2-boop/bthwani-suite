@@ -75,10 +75,10 @@ function MarketingReviewBoard({
           blockers: selectedItem?.blocker ?? 'Select a marketing row.',
           ownerSurface: 'marketing',
           evidenceHint: selectedItem?.evidence ?? 'marketing evidence',
-          routeHint: '/operations?workspace=marketing',
+          routeHint: '/marketing',
           decisionTone: selectedItem?.tone,
         }}
-        primaryAction={{ label: 'Open marketing approval', href: '/operations?workspace=marketing' }}
+        primaryAction={{ label: 'Open marketing approval', href: '/marketing' }}
         secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
         signals={[
           { id: `${kind}-ready`, title: 'Ready', value: 'Visible', description: 'Ready items stay selectable.', tone: 'best' },

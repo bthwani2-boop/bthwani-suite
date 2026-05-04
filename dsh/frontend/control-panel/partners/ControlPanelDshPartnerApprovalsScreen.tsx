@@ -81,8 +81,8 @@ function QueueCard({
 export function ControlPanelDshPartnerApprovalsScreen({
   hubHref = '/operations',
   operationsHref = '/operations',
-  catalogHref = '/operations?workspace=catalogs',
-  marketingHref = '/operations?workspace=marketing',
+  catalogHref = '/catalogs',
+  marketingHref = '/marketing',
 }: ControlPanelDshPartnerApprovalsScreenProps) {
   const router = useRouter();
   const queueItems = React.useMemo(() => ({

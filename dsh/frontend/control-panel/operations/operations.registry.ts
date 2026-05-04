@@ -2,6 +2,7 @@ import type {
   AnyOperationsWorkspaceId,
   CanonicalOperationsGroupId,
   LegacyOperationsWorkspaceId,
+  LegacySectionRedirectId,
   NonOperationsSectionRootId,
   OperationsGroupMeta,
   OperationsNormalizationResult,
@@ -33,16 +34,12 @@ export const NON_OPERATIONS_SECTION_SHORTCUTS: ReadonlyArray<{
   { id: 'partners', label: 'Partners', description: 'Partner management remains in the partners section.', href: '/partners' },
 ] as const;
 
-const LEGACY_TO_CANONICAL_GROUP: Record<LegacyOperationsWorkspaceId | 'orders' | 'overview', CanonicalOperationsGroupId | NonOperationsSectionRootId> = {
+const LEGACY_OPERATIONAL_TO_CANONICAL_GROUP: Record<Exclude<LegacyOperationsWorkspaceId, LegacySectionRedirectId> | 'orders' | 'overview', CanonicalOperationsGroupId> = {
   overview: 'overview',
   orders: 'orders',
   dashboard: 'audit-evidence',
   'captain-ops': 'dispatch-fleet',
   'field-ops': 'partner-readiness',
-  finance: 'finance',
-  settlements: 'finance',
-  cod: 'finance',
-  refunds: 'finance',
   issues: 'exceptions-sla',
   serviceability: 'exceptions-sla',
   'guard-status': 'audit-evidence',
@@ -58,14 +55,6 @@ const LEGACY_TO_CANONICAL_GROUP: Record<LegacyOperationsWorkspaceId | 'orders' |
   handoff: 'tracking-handoff',
   'proof-review': 'tracking-handoff',
   capacity: 'dispatch-fleet',
-  partners: 'partners',
-  catalogs: 'catalogs',
-  'catalog-categories': 'catalogs',
-  marketing: 'marketing',
-  banners: 'marketing',
-  growth: 'marketing',
-  loyalty: 'marketing',
-  'smart-signal': 'marketing',
   sheinproxy: 'proxy-shein-awnak',
   reassign: 'dispatch-fleet',
   'peak-mode': 'dispatch-fleet',
@@ -74,9 +63,22 @@ const LEGACY_TO_CANONICAL_GROUP: Record<LegacyOperationsWorkspaceId | 'orders' |
   'zone-set': 'exceptions-sla',
 };
 
-function isNonOperationsSectionRoot(value: CanonicalOperationsGroupId | NonOperationsSectionRootId): value is NonOperationsSectionRootId {
-  return value === 'finance' || value === 'catalogs' || value === 'marketing' || value === 'partners';
-}
+const LEGACY_SECTION_REDIRECTS: Record<LegacySectionRedirectId, NonOperationsSectionRootId> = {
+  finance: 'finance',
+  settlements: 'finance',
+  cod: 'finance',
+  refunds: 'finance',
+  catalogs: 'catalogs',
+  'catalog-categories': 'catalogs',
+  marketing: 'marketing',
+  banners: 'marketing',
+  growth: 'marketing',
+  loyalty: 'marketing',
+  'smart-signal': 'marketing',
+  partners: 'partners',
+};
+
+type LegacyOperationalWorkspaceId = Exclude<LegacyOperationsWorkspaceId, LegacySectionRedirectId>;
 
 export function coerceOperationsPanel(panel?: string): OperationsPanelId | undefined {
   if (panel === 'detail' || panel === 'chat') {
@@ -111,22 +113,23 @@ export function normalizeOperationsLocation(
     };
   }
 
-  const mapped = LEGACY_TO_CANONICAL_GROUP[workspace as LegacyOperationsWorkspaceId | 'orders' | 'overview'];
+  if (Object.prototype.hasOwnProperty.call(LEGACY_SECTION_REDIRECTS, workspace)) {
+    const section = LEGACY_SECTION_REDIRECTS[workspace as LegacySectionRedirectId];
+    return {
+      kind: 'redirect',
+      sourceWorkspace: workspace as AnyOperationsWorkspaceId,
+      section,
+      href: `/${section}`,
+    };
+  }
+
+  const mapped = LEGACY_OPERATIONAL_TO_CANONICAL_GROUP[workspace as LegacyOperationalWorkspaceId | 'orders' | 'overview'];
   if (!mapped) {
     return {
       kind: 'group',
       group: 'overview',
       sourceWorkspace: workspace as AnyOperationsWorkspaceId,
       panel: resolvedPanel,
-    };
-  }
-
-  if (isNonOperationsSectionRoot(mapped)) {
-    return {
-      kind: 'redirect',
-      sourceWorkspace: workspace as AnyOperationsWorkspaceId,
-      section: mapped,
-      href: `/${mapped}`,
     };
   }
 

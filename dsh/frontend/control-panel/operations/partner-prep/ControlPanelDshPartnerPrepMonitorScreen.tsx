@@ -72,10 +72,10 @@ export function ControlPanelDshPartnerPrepMonitorScreen({
             { id: 'prep-dispatch', label: 'Open dispatch', description: 'Assign the next captain after partner readiness is clear.', href: '/operations?workspace=dispatch', badge: 'Dispatch' },
             { id: 'prep-sla', label: 'Open SLA', description: 'Check whether prep delay is already at risk.', href: '/operations?workspace=sla', badge: 'Delay' },
             { id: 'prep-handoff', label: 'Open handoff', description: 'Move into the captain pickup verification step.', href: '/operations?workspace=handoff', badge: 'Handoff' },
-            { id: 'prep-partners', label: 'Open partners', description: 'Return to partner management for a broader review.', href: '/operations?workspace=partners', badge: 'Partner' },
+            { id: 'prep-partners', label: 'Open partners', description: 'Return to partner management for a broader review.', href: '/partners', badge: 'Partner' },
           ]}
           disclosures={[
-            { id: 'prep-finance', label: 'Partner finance impact', description: 'Handoffs and prep delays can change the partner financial view.', href: '/operations?workspace=finance' },
+            { id: 'prep-finance', label: 'Partner finance impact', description: 'Handoffs and prep delays can change the partner financial view.', href: '/finance' },
             { id: 'prep-pause', label: 'Pause orders', description: 'Visible when the store must stop incoming work for now.', href: '/operations?workspace=partner-prep' },
           ]}
         />

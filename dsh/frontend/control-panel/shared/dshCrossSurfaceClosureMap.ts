@@ -88,7 +88,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     title: 'finance',
     description: 'المالية ظاهرة لكن تحتاج لقطات closure evidence أوضح.',
     evidenceHint: 'finance matrix',
-    routeHint: '/operations?workspace=finance',
+    routeHint: '/finance',
   },
   {
     surfaceId: 'control-panel',
@@ -106,7 +106,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     title: 'catalogs',
     description: 'كتالوج DSH يحتاج evidence قبل أي claim إغلاق.',
     evidenceHint: 'catalog approval proof',
-    routeHint: '/operations?workspace=catalogs',
+    routeHint: '/catalogs',
   },
   {
     surfaceId: 'control-panel',
@@ -115,7 +115,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     title: 'partners',
     description: 'بوابة الشركاء تحتاج evidence قبل وصفها بالمغلقة.',
     evidenceHint: 'partner activation proof',
-    routeHint: '/operations?workspace=partners',
+    routeHint: '/partners',
   },
   {
     surfaceId: 'control-panel',
@@ -124,7 +124,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     title: 'marketing',
     description: 'الموافقات التسويقية تحتاج evidence قبل claim الإغلاق.',
     evidenceHint: 'marketing approval proof',
-    routeHint: '/operations?workspace=marketing',
+    routeHint: '/marketing',
   },
   {
     surfaceId: 'control-panel',

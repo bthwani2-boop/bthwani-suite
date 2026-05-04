@@ -78,7 +78,7 @@ export function ControlPanelDshProofReviewScreen({
           actions={[
             { id: 'proof-handoff', label: 'Open handoff', description: 'Return to pickup or dropoff verification.', href: '/operations?workspace=handoff', badge: 'Handoff' },
             { id: 'proof-exceptions', label: 'Open exceptions', description: 'Route rejected proof into the exception queue.', href: '/operations?workspace=exceptions', badge: 'Escalation' },
-            { id: 'proof-refunds', label: 'Open refunds', description: 'Move into refund handling when proof fails.', href: '/operations?workspace=refunds', badge: 'Finance' },
+            { id: 'proof-refunds', label: 'Open refunds', description: 'Move into refund handling when proof fails.', href: '/finance', badge: 'Finance' },
             { id: 'proof-audit', label: 'Open audit', description: 'Check the manual trail linked to the proof decision.', href: '/operations?workspace=audit', badge: 'Trace' },
           ]}
           disclosures={[

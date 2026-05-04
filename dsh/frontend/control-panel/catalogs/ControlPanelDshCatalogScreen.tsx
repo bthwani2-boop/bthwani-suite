@@ -18,8 +18,8 @@ export type ControlPanelDshCatalogScreenProps = {
 export function ControlPanelDshCatalogScreen({
   hubHref = '/operations',
   operationsHref = '/operations',
-  partnersHref = '/operations?workspace=partners',
-  marketingHref = '/operations?workspace=marketing',
+  partnersHref = '/partners',
+  marketingHref = '/marketing',
 }: ControlPanelDshCatalogScreenProps) {
   const router = useRouter();
 
