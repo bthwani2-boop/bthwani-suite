@@ -210,6 +210,18 @@ function buildControlHref(subsection?: ControlPanelSubSectionId) {
 }
 
 function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPanelText) {
+  const iconMap: Record<string, string> = {
+    dashboard: '⬡',
+    operations: '◈',
+    finance: '⌬',
+    catalogs: '◳',
+    support: '◌',
+    'community-services': '◍',
+    partners: '⌂',
+    marketing: '⌁',
+    control: '⚙',
+  };
+
   return primarySectionIds.map((sectionId) => {
     const href = `/${sectionId}` as PrimarySectionHref;
     const description = isPhaseOneSection(sectionId)
@@ -220,9 +232,13 @@ function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPane
       id: href,
       href,
       label: panelText.surfaceTitles[sectionId],
-      description,
+      icon: iconMap[sectionId] ?? '•',
       active: href === activeHref,
-      badge: href === '/dashboard' ? panelText.ui.openServiceSpace : undefined,
+      children: sectionId === 'control' ? [
+        { id: '/control?tab=platform', label: 'المنصة', href: '/control?tab=platform' },
+        { id: '/control?tab=administration', label: 'الإدارة', href: '/control?tab=administration' },
+        { id: '/control?tab=hr', label: 'الموارد البشرية', href: '/control?tab=hr' },
+      ] : undefined,
     };
   });
 }
@@ -257,7 +273,33 @@ export function ControlPanelSurfaceHost({
   const activeControlSubsection = isControlSection ? subsection : undefined;
   const isAllFilterActive = selectedServiceId === allServiceTabId;
   const shellCopy = resolveShellCopy(panelText, activeSectionId, activeControlSubsection);
-  const railItems = resolveRailItems(activeSectionHref, panelText);
+  const railItems = React.useMemo(() => {
+    const allItems = resolveRailItems(activeSectionHref, panelText);
+    if (isAllFilterActive) return allItems;
+
+    const serviceMeta = controlPanelRuntimeData.services.find((s) => s.id === selectedServiceId);
+    if (!serviceMeta) return allItems;
+
+    return allItems.filter((item) => {
+      const sectionId = item.id.slice(1) as ControlPanelSectionId;
+      return serviceMeta.sections.includes(sectionId);
+    });
+  }, [activeSectionHref, isAllFilterActive, panelText, selectedServiceId]);
+
+  React.useEffect(() => {
+    if (isAllFilterActive) return;
+    const serviceMeta = controlPanelRuntimeData.services.find((s) => s.id === selectedServiceId);
+    if (!serviceMeta) return;
+
+    if (!serviceMeta.sections.includes(activeSectionId)) {
+      const firstAvailableSection = serviceMeta.sections[0];
+      if (firstAvailableSection) {
+        const nextHref = `/${firstAvailableSection}` as PrimarySectionHref;
+        setActiveSectionHref(nextHref);
+        router.push(sectionRouteMap[firstAvailableSection as ControlPanelSectionId]);
+      }
+    }
+  }, [selectedServiceId, isAllFilterActive, activeSectionId, router]);
   const selectedServiceMeta = isAllFilterActive
     ? undefined
     : controlPanelRuntimeData.services.find((service) => service.id === selectedServiceId);
@@ -268,7 +310,6 @@ export function ControlPanelSurfaceHost({
   const sectionServiceNames = sectionServiceIds.map((serviceId) => getServiceLabel(uiText, serviceId));
   const liveCoverageCount = countLiveCoverage(sectionServiceIds);
   const referenceCoverageCount = sectionServiceIds.length - liveCoverageCount;
-  const contextItems = isAllFilterActive ? sectionServiceNames : serviceSectionLabels;
   const scopedSectionUnavailable = !isAllFilterActive && !serviceSections.includes(activeSectionId);
   const readyMissionCount = controlPanelRuntimeData.missions.filter((mission) => !mission.placeholder).length;
   const liveServiceCount = React.useMemo(
@@ -276,66 +317,6 @@ export function ControlPanelSurfaceHost({
     [],
   );
   const referenceServiceCount = controlPanelRuntimeData.services.length - liveServiceCount;
-  const dashboardSectionSnapshots = React.useMemo(
-    () => phaseOneSectionIds.map((sectionId) => {
-      const serviceIds = getSectionServiceIds(sectionId);
-      const missionMeta = controlPanelRuntimeData.missions.find((mission) => mission.sectionId === sectionId);
-
-      return {
-        id: sectionId,
-        title: panelText.surfaceTitles[sectionId],
-        description: panelText.surfaceDescriptions[sectionId],
-        href: sectionRouteMap[sectionId],
-        serviceCount: serviceIds.length,
-        liveCount: countLiveCoverage(serviceIds),
-        missionReady: missionMeta ? !missionMeta.placeholder : false,
-      };
-    }),
-    [panelText.surfaceDescriptions, panelText.surfaceTitles],
-  );
-  const dashboardPriorityQueue = React.useMemo(
-    () => [
-      {
-        id: 'queue-operations',
-        label: panelText.surfaceTitles.operations,
-        note: 'الأولوية الأولى لتثبيت الصفوف الحية والاختناقات قبل أي قراءة لاحقة.',
-        metric: `${dshLiveWorkbenchIds.length} مسارات حية`,
-        href: '/operations',
-      },
-      {
-        id: 'queue-finance',
-        label: panelText.surfaceTitles.finance,
-        note: 'الطبقة المالية يجب أن تقرأ بعد استقرار النبض التشغيلي لا قبله.',
-        metric: `${getSectionServiceIds('finance').length} خدمة مرتبطة`,
-        href: '/finance',
-      },
-      {
-        id: 'queue-catalogs',
-        label: panelText.surfaceTitles.catalogs,
-        note: 'حوكمة النشر والكتالوج تحتاج مساراً واضحاً بعيداً عن ضجيج العمليات.',
-        metric: `${getSectionServiceIds('catalogs').length} خدمة مرتبطة`,
-        href: '/catalogs',
-      },
-      {
-        id: 'queue-control',
-        label: panelText.surfaceTitles.control,
-        note: 'طبقة السيادة والحوكمة تبقى مستقلة بصرياً وأهدأ في لهجتها.',
-        metric: `${controlSubSectionIds.length} محاور داخلية`,
-        href: '/control',
-      },
-    ],
-    [panelText.surfaceTitles],
-  );
-  const dashboardConstellation = React.useMemo(
-    () => controlPanelRuntimeData.services.map((service) => ({
-      id: service.id,
-      label: getServiceLabel(uiText, service.id),
-      sections: service.sections.length,
-      statusLabel: service.placeholder ? panelText.filters.reference : panelText.ui.liveRefreshValue,
-      isReference: service.placeholder,
-    })),
-    [panelText.filters.reference, panelText.ui.liveRefreshValue, uiText],
-  );
   const communityServiceItems = React.useMemo(() => (
     sectionServiceIds.map((serviceId) => {
       const serviceMeta = controlPanelRuntimeData.services.find((service) => service.id === serviceId);
@@ -386,78 +367,95 @@ export function ControlPanelSurfaceHost({
     })
   ), [panelText.filters.reference, panelText.ui.liveRefreshValue, uiText]);
 
-  const dashboardCards = phaseOneSectionIds.map((sectionId) => {
-    const serviceIds = getSectionServiceIds(sectionId);
-
-    return {
-      id: `dashboard-${sectionId}`,
-      label: panelText.surfaceTitles[sectionId],
-      description: '',
-      footerLabel: 'فتح',
-      href: sectionRouteMap[sectionId],
-      badge: `${serviceIds.length} مساحات`,
-      tone: sectionId === 'operations' ? 'primary' : 'secondary',
-    } satisfies SectionActionView;
-  });
+  const dashboardDecisionBoard: ReadonlyArray<SectionActionView> = [
+    {
+      id: 'db-operations',
+      label: 'تثبيت العمليات الحية',
+      description: 'مراجعة الصفوف الحية والاختناقات التشغيلية فوراً.',
+      footerLabel: 'انتقال',
+      href: '/operations',
+      badge: 'أولوية قصوى',
+      tone: 'primary',
+    },
+    {
+      id: 'db-finance',
+      label: 'مراجعة المركز المالي',
+      description: 'التأكد من سلامة التدفقات بعد استقرار النبض التشغيلي.',
+      footerLabel: 'تحليل',
+      href: '/finance',
+      badge: 'منتظم',
+      tone: 'secondary',
+    },
+    {
+      id: 'db-catalogs',
+      label: 'حوكمة المحتوى',
+      description: 'اعتماد النشرات والكتالوجات الجديدة قبل البث.',
+      footerLabel: 'اعتماد',
+      href: '/catalogs',
+      badge: 'انتظار',
+      tone: 'secondary',
+    },
+  ];
 
   const phaseOneBlueprint: SectionBlueprint | null = isPhaseOneSection(activeSectionId)
     ? (() => {
         switch (activeSectionId) {
           case 'dashboard':
             return {
-              eyebrow: panelText.ui.missionEyebrow,
-              title: panelText.surfaceTitles.dashboard,
-              description: 'نظرة مختصرة',
+              eyebrow: 'Executive Pulse',
+              title: 'غرفة القيادة',
+              description: 'نظرة تنفيذية شاملة تركز على القرار التسييري.',
               primaryAction: {
                 id: 'dashboard-primary',
-                label: 'ابدأ من العمليات',
+                label: 'فتح غرفة العمليات',
                 description: '',
                 footerLabel: 'فتح',
                 href: '/operations',
-                badge: 'موصى',
+                badge: 'Next Action',
                 tone: 'primary',
               },
               kpis: [
                 {
-                  id: 'dashboard-core',
-                  title: 'الأقسام الأساسية',
-                  value: String(phaseOneSectionIds.length),
-                  description: 'النطاق المغلق لهذه المرحلة فقط.',
+                  id: 'dashboard-live',
+                  title: 'الخدمات الحية',
+                  value: String(liveServiceCount),
+                  description: 'خدمات متصلة فعلياً وتعمل الآن.',
                   tone: 'brand',
-                },
-                {
-                  id: 'dashboard-services',
-                  title: 'المساحات المتصلة',
-                  value: String(controlPanelRuntimeData.services.length),
-                  description: 'الخدمات الظاهرة في الشريط العلوي.',
                 },
                 {
                   id: 'dashboard-ready',
                   title: 'المسارات الجاهزة',
                   value: String(readyMissionCount),
-                  description: 'مسارات موصولة فعليًا داخل control-panel.',
+                  description: 'مسارات مكتملة الحوكمة.',
                   tone: 'best',
                 },
                 {
                   id: 'dashboard-alerts',
-                  title: 'تحتاج تركيز',
+                  title: 'تنبيهات حرجة',
                   value: String(alertCount),
-                  description: 'إشارات تحتاج قرارًا أسرع من بقية الصفحة.',
+                  description: 'تحتاج تدخل سريع.',
                   tone: alertCount > 0 ? 'danger' : 'neutral',
                 },
               ],
-              quickActionsTitle: 'أساسيات',
-              quickActionsDescription: 'إجراءات سريعة',
-              quickActions: dashboardCards,
-              disclosureTitle: 'أقسام أقل أولوية في Phase 1',
-              disclosureDescription: 'تبقى متاحة لكن لا تنافس القرار الأول.',
-              disclosureItems: hiddenSectionIds.map((sectionId) => ({
-                id: `hidden-${sectionId}`,
-                label: panelText.surfaceTitles[sectionId],
-                description: 'يبقى ظاهرًا داخل الشريط الجانبي مع خفض البروز حتى إغلاق المرحلة الحالية.',
-                href: sectionRouteMap[sectionId],
-                badge: 'خارج النطاق',
-              })),
+              quickActionsTitle: 'Decision Board',
+              quickActionsDescription: 'أهم التحركات الاستراتيجية المطلوبة الآن.',
+              quickActions: dashboardDecisionBoard,
+              disclosureTitle: 'المخاطر والعوائق (Risks & Blockers)',
+              disclosureDescription: 'عناصر قد تؤثر على الأداء إذا لم يتم حسمها.',
+              disclosureItems: [
+                {
+                  id: 'risk-expansion',
+                  label: 'توسع Phase 1',
+                  description: 'بعض الأقسام لا تزال مرجعية وتحتاج ربط تقني إضافي.',
+                  badge: 'مخاطرة منخفضة',
+                },
+                {
+                  id: 'risk-latency',
+                  label: 'زمن الاستجابة',
+                  description: 'مراقبة استجابة الفلاتر عند العمل بكثافة بيانات عالية.',
+                  badge: 'تحت المراقبة',
+                },
+              ],
             };
           case 'operations':
             return {
@@ -773,6 +771,8 @@ export function ControlPanelSurfaceHost({
               disclosureDescription: 'الخدمات الداعمة تبقى مرئية لكن أقل بروزًا من مسار triage الأساسي.',
               disclosureItems: buildServiceDisclosureItems('support'),
             };
+          default:
+            return null;
         }
       })()
     : null;
@@ -780,22 +780,18 @@ export function ControlPanelSurfaceHost({
   return (
     <WebCommandCenterFrame
       brandLabel={panelText.brandLabel}
-      surfaceTitle={shellCopy.title}
-      surfaceSubtitle={shellCopy.description}
-      showHero={false}
+      surfaceTitle="لوحة التحكم"
+      surfaceSubtitle={shellCopy.title}
+      showHero={true}
       topFilters={[
         {
           id: allServiceTabId,
           label: panelText.filters.allServices,
-          metaLabel: panelText.filters.allServicesMeta,
-          icon: '▦',
           active: isAllFilterActive,
         },
         ...controlPanelRuntimeData.services.map((service) => ({
           id: service.id,
           label: getServiceLabel(uiText, service.id),
-          metaLabel: service.placeholder ? panelText.filters.reference : `${service.sections.length}`,
-          icon: serviceIconMap[service.id] ?? '◦',
           active: selectedServiceId === service.id,
         })),
       ]}
@@ -859,163 +855,27 @@ export function ControlPanelSurfaceHost({
             </div>
 
             {isOperationsSection ? (
-              <WebSectionCard
-                title="غرفة العمليات الموحدة"
-                description="المسارات الحية أصبحت تعمل داخل workspace واحدة مستقرة داخل قسم العمليات نفسه، مع بقاء المسارات القديمة قابلة للتحويل التوافقي."
-              >
-                <DshControlPanelSurfaceHost
-                  workspace={operationsWorkspace}
-                  orderId={operationsOrderId}
-                  orderOverlayMode={operationsOverlayMode}
-                />
-              </WebSectionCard>
+              <DshControlPanelSurfaceHost
+                workspace={operationsWorkspace}
+                orderId={operationsOrderId}
+                orderOverlayMode={operationsOverlayMode}
+              />
             ) : null}
 
             {activeSectionId === 'dashboard' ? (
-              <>
-                <section className={styles.dashboardHeroGrid}>
-                  <article className={styles.dashboardHeroCard}>
-                    <div className={styles.dashboardHeroEyebrow}>BThwani Premium Control Room 2026</div>
-                    <h2 className={styles.dashboardHeroTitle}>غرفة قيادة تنفيذية بنبرة هادئة وكثافة قرار أعلى.</h2>
-                    <p className={styles.dashboardHeroDescription}>
-                      هذا السطح لم يعد مجرد overview عام. تم رفعه ليصبح طبقة قيادة تقرأ نبض المنصة،
-                      وتوضح أين يبدأ القرار الآن، وما الذي يجب أن يبقى في الخلفية دون ضوضاء بصرية.
-                    </p>
-                    <div className={styles.dashboardHeroMeta}>
-                      <span className={styles.dashboardHeroMetaChip}>{liveServiceCount} خدمات حية</span>
-                      <span className={styles.dashboardHeroMetaChip}>{referenceServiceCount} مراجع منضبطة</span>
-                      <span className={styles.dashboardHeroMetaChip}>{readyMissionCount} مسارات جاهزة</span>
-                    </div>
-                    <div className={styles.dashboardHeroActions}>
-                      <a
-                        href="/operations"
-                        className={styles.dashboardHeroPrimaryAction}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          router.push('/operations');
-                        }}
-                      >
-                        فتح غرفة العمليات
-                      </a>
-                      <a
-                        href="/control"
-                        className={styles.dashboardHeroSecondaryAction}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          router.push('/control');
-                        }}
-                      >
-                        طبقة التحكم والحوكمة
-                      </a>
-                    </div>
-                  </article>
-
-                  <article className={styles.dashboardSpotlightCard}>
-                    <div className={styles.dashboardSpotlightHeader}>
-                      <span className={styles.dashboardSpotlightEyebrow}>Executive Pulse</span>
-                      <strong className={styles.dashboardSpotlightValue}>{Math.max(liveServiceCount, 1)}/{controlPanelRuntimeData.services.length}</strong>
-                    </div>
-                    <p className={styles.dashboardSpotlightTitle}>نسبة الخدمات الحية الظاهرة داخل control-panel</p>
-                    <p className={styles.dashboardSpotlightDescription}>
-                      القراءة هنا صريحة: ما هو حي فعلاً يملك بروزاً أقوى، وما هو مرجعي يبقى ضمن النظام بدون تضخيم ادعائي.
-                    </p>
-                    <div className={styles.dashboardSpotlightStats}>
-                      <div className={styles.dashboardSpotlightStat}>
-                        <span className={styles.dashboardSpotlightStatLabel}>الأولوية</span>
-                        <strong className={styles.dashboardSpotlightStatValue}>{panelText.surfaceTitles.operations}</strong>
-                      </div>
-                      <div className={styles.dashboardSpotlightStat}>
-                        <span className={styles.dashboardSpotlightStatLabel}>الجاهزية</span>
-                        <strong className={styles.dashboardSpotlightStatValue}>{readyMissionCount}</strong>
-                      </div>
-                      <div className={styles.dashboardSpotlightStat}>
-                        <span className={styles.dashboardSpotlightStatLabel}>التنقل</span>
-                        <strong className={styles.dashboardSpotlightStatValue}>RTL ثابت</strong>
-                      </div>
-                    </div>
-                  </article>
-                </section>
-
-                <section className={styles.dashboardBoardGrid}>
-                  <WebSectionCard
-                    title="مناطق القيادة الأساسية"
-                    description="كل قسم رئيسي يأخذ وزنه التشغيلي الحقيقي بدل التساوي البصري المصطنع."
-                  >
-                    <div className={styles.dashboardSectionBoard}>
-                      {dashboardSectionSnapshots.map((item) => (
-                        <a
-                          key={item.id}
-                          href={item.href}
-                          className={styles.dashboardSectionRow}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            router.push(item.href);
-                          }}
-                        >
-                          <div className={styles.dashboardSectionRowMain}>
-                            <strong className={styles.dashboardSectionRowTitle}>{item.title}</strong>
-                            <span className={styles.dashboardSectionRowDescription}>{item.description}</span>
-                          </div>
-                          <div className={styles.dashboardSectionRowStats}>
-                            <span className={styles.dashboardSectionRowStat}>{item.liveCount}/{item.serviceCount} حي</span>
-                            <span className={styles.dashboardSectionRowBadge}>{item.missionReady ? 'جاهز' : 'مرجعي'}</span>
-                          </div>
-                        </a>
-                      ))}
-                    </div>
-                  </WebSectionCard>
-
-                  <WebSectionCard
-                    title="تسلسل القرار التنفيذي"
-                    description="ترتيب الحركة داخل اللوحة يجب أن يكون واضحاً: تشغيل، ثم مال، ثم حوكمة ونشر، ثم سيادة داخلية."
-                  >
-                    <div className={styles.dashboardPriorityStack}>
-                      {dashboardPriorityQueue.map((item, index) => (
-                        <a
-                          key={item.id}
-                          href={item.href}
-                          className={styles.dashboardPriorityItem}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            router.push(item.href);
-                          }}
-                        >
-                          <span className={styles.dashboardPriorityIndex}>{index + 1}</span>
-                          <div className={styles.dashboardPriorityBody}>
-                            <strong className={styles.dashboardPriorityLabel}>{item.label}</strong>
-                            <span className={styles.dashboardPriorityNote}>{item.note}</span>
-                          </div>
-                          <span className={styles.dashboardPriorityMetric}>{item.metric}</span>
-                        </a>
-                      ))}
-                    </div>
-                  </WebSectionCard>
-                </section>
-
-                <WebSectionCard
-                  title="خريطة المساحات داخل المنظومة"
-                  description="بدلاً من خرائط زخرفية، هذه constellation عملية توضّح وزن كل مساحة وموقعها داخل control-panel."
-                >
-                  <div className={styles.constellationGrid}>
-                    {dashboardConstellation.map((item) => (
-                      <button
-                        key={item.id}
-                        type="button"
-                        className={[
-                          styles.constellationCard,
-                          item.isReference ? styles.constellationCardReference : styles.constellationCardLive,
-                        ].join(' ')}
-                        onClick={() => setSelectedServiceId(item.id)}
-                      >
-                        <span className={styles.constellationCardCode}>{item.label}</span>
-                        <strong className={styles.constellationCardValue}>{item.sections}</strong>
-                        <span className={styles.constellationCardLabel}>أقسام مرتبطة</span>
-                        <span className={styles.constellationCardStatus}>{item.statusLabel}</span>
-                      </button>
-                    ))}
-                  </div>
-                </WebSectionCard>
-              </>
+              <WebSectionCard
+                title="النظرة التنفيذية"
+                description="ملخص استراتيجي لنبض المنصة وغرفة القيادة."
+              >
+                <div className={styles.dashboardHeroCard}>
+                  <div className={styles.dashboardHeroEyebrow}>BThwani Premium Control Room 2026</div>
+                  <h2 className={styles.dashboardHeroTitle}>غرفة قيادة تنفيذية بنبرة هادئة وكثافة قرار أعلى.</h2>
+                  <p className={styles.dashboardHeroDescription}>
+                    هذا السطح لم يعد مجرد overview عام. تم رفعه ليصبح طبقة قيادة تقرأ نبض المنصة،
+                    وتوضح أين يبدأ القرار الآن، وما الذي يجب أن يبقى في الخلفية دون ضوضاء بصرية.
+                  </p>
+                </div>
+              </WebSectionCard>
             ) : null}
 
             {scopedSectionUnavailable ? (
@@ -1088,19 +948,6 @@ export function ControlPanelSurfaceHost({
                   </details>
                 </WebSectionCard>
 
-                <section className={styles.contextPanel}>
-                  <h3 className={styles.contextTitle}>
-                    {isAllFilterActive ? panelText.ui.contextTitleSection : panelText.ui.contextTitleService}
-                  </h3>
-                  <div className={styles.contextList}>
-                    {contextItems.map((item) => (
-                      <span key={item} className={styles.contextChip}>{item}</span>
-                    ))}
-                    {contextItems.length === 0 ? (
-                      <span className={styles.contextChipMuted}>{panelText.ui.noItems}</span>
-                    ) : null}
-                  </div>
-                </section>
               </>
             )}
           </>

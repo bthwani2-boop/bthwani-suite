@@ -260,7 +260,7 @@ export function Text({
 			style={[
 				{
 					...roleStyle,
-					fontWeight: weight ? fontWeights[weight] : roleStyle.fontWeight,
+					fontWeight: weight ? fontWeights[weight] : roleStyle?.fontWeight,
 					color: toneColor,
 					textAlign: resolveTextAlign(direction, align),
 					writingDirection: direction,

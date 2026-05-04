@@ -109,26 +109,20 @@ export function ControlPanelDshOperationsScreen({
   const languageChip = language === 'en' ? dshText.common.enChip : dshText.common.arChip;
   const readyForSelection = state === 'ready';
 
-  const topFilters = OPERATIONS_TOP_FILTERS.map((item) => ({
-    id: item.id,
-    label: item.label,
-    active: item.id === activeFilterId,
-  }));
-
-  const railItems = OPERATIONS_CANONICAL_GROUPS.map((item) => ({
-    id: item.id,
-    label: item.label,
-    description: item.description,
-    active: item.id === activeGroup,
-    badge: item.badge,
-  }));
-
   const handleGroupChange = React.useCallback((nextGroup: CanonicalOperationsGroupId) => {
     setActiveGroup(nextGroup);
     router.push(buildOperationsHref(nextGroup, { orderId, panel }));
   }, [orderId, panel, router]);
 
-  const stageContent = readyForSelection ? (
+  if (state !== 'ready') {
+    return (
+      <div className={styles.stateContainer}>
+        <StateView {...resolveOperationsStateCopy(dshText, state)} onActionPress={() => router.push(fallbackHref)} />
+      </div>
+    );
+  }
+
+  return (
     <div className={styles.opsWorkspace} dir={direction}>
       <div className={styles.metricsStrip}>
         {OPERATIONS_PULSE_METRICS.map((metric) => (
@@ -142,30 +136,11 @@ export function ControlPanelDshOperationsScreen({
         ))}
       </div>
 
-      <div className={styles.contextBar}>
-        <div className={styles.contextBarMain}>
-          <div className={styles.contextBarEyebrow}>
-            <Badge tone="brand" label={languageChip} />
-            <Badge tone="info" label={activeGroupMeta.badge} />
-            <Badge tone="default" label={liveQueueStatus} />
-          </div>
-          <Text role="titleLg">DSH Operations Control Room</Text>
-          <Text role="bodyLg" tone="muted">
-            A single operations page that monitors order execution end-to-end through lanes, panels, and progressive disclosure instead of scattered workspaces.
-          </Text>
-        </div>
-
-        <div className={styles.contextBarActions}>
-          <Button label="Open orders lane" tone="primary" fullWidth={false} onPress={() => handleGroupChange('orders')} />
-          <Button label="Open risk lane" tone="secondary" fullWidth={false} onPress={() => handleGroupChange('exceptions-sla')} />
-        </div>
-      </div>
-
       <ControlPanelDshDecisionBoard
-        title="Operations decision board"
-        purpose="Keep execution decisions inside one control room and route non-operational work to the correct owning sections."
+        title={dshText.hub.decisionBoardTitle ?? "قرار العمليات الحالي"}
+        purpose={activeGroupMeta.description}
         primaryDecision={activeGroupMeta.label}
-        nextAction={activeGroup === 'overview' ? 'Choose the next operational lane.' : `Continue inside ${activeGroupMeta.label}.`}
+        nextAction={activeGroup === 'overview' ? 'اختر مسار العمليات التالي.' : `الاستمرار في ${activeGroupMeta.label}.`}
         blockers={activeGroup === 'audit-evidence' ? 'Visual/runtime proof is still pending.' : 'No separate workspace branching is allowed for this slice.'}
         ownerSurface="operations"
         evidenceHint={`Canonical group: ${activeGroupMeta.id}`}
@@ -173,29 +148,36 @@ export function ControlPanelDshOperationsScreen({
         decisionTone={activeGroup === 'exceptions-sla' ? 'danger' : activeGroup === 'orders' ? 'warning' : 'best'}
       />
 
-      <WebSectionCard
-        title="Control room overview"
-        description="Operational pulse, current risk, next action, live queue status, SLA pressure, and dispatch pressure stay visible at the top."
-      >
-        <div className={styles.workbenchGrid}>
-          {OPERATIONS_OVERVIEW_ACTIONS.map((item) => (
-            <WebControlActionCard
-              key={item.id}
-              id={item.id}
-              title={item.title}
-              description={item.description}
-              footerLabel={item.footerLabel}
-              href={item.href}
-            />
-          ))}
-        </div>
-      </WebSectionCard>
+      {activeGroup === 'overview' && (
+        <WebSectionCard
+          title="مسارات التشغيل"
+          description="ملخص استراتيجي للنبض التشغيلي وحالة المسارات الحية."
+        >
+          <div className={styles.workbenchGrid}>
+            {OPERATIONS_OVERVIEW_ACTIONS.map((item) => (
+              <WebControlActionCard
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                description={item.description}
+                footerLabel={item.footerLabel}
+                href={item.href}
+                tone={item.id === 'ops-orders' ? 'primary' : 'secondary'}
+                onAction={() => router.push(item.href)}
+              />
+            ))}
+          </div>
+        </WebSectionCard>
+      )}
 
-      <WebSectionCard
-        title="Section shortcuts kept outside operations"
-        description="Finance, catalogs, marketing, and partners remain reachable, but they are no longer primary operations tabs."
-      >
-        <Box gap={2}>
+      {activeGroup !== 'overview' ? renderLane(activeGroup, { hubHref: fallbackHref, orderId, panel, state }) : null}
+
+      <details className={styles.disclosure}>
+        <summary className={styles.disclosureSummary}>
+          <span>روابط إضافية</span>
+          <span className={styles.disclosureHint}>اختصارات الأقسام خارج العمليات</span>
+        </summary>
+        <Box gap={2} paddingTop={12}>
           {NON_OPERATIONS_SECTION_SHORTCUTS.map((item) => (
             <WebControlDisclosureItem
               key={item.id}
@@ -203,44 +185,13 @@ export function ControlPanelDshOperationsScreen({
               label={item.label}
               description={item.description}
               href={item.href}
-              badge="Section root"
+              badge="Section"
+              onAction={() => router.push(item.href)}
             />
           ))}
         </Box>
-      </WebSectionCard>
-
-      {activeGroup !== 'overview' ? renderLane(activeGroup, { hubHref: fallbackHref, orderId, panel, state }) : null}
+      </details>
     </div>
-  ) : (
-    <div className={styles.stateContainer}>
-      <StateView {...resolveOperationsStateCopy(dshText, state)} onActionPress={() => router.push(fallbackHref)} />
-    </div>
-  );
-
-  return (
-    <WebCommandCenterFrame
-      brandLabel={uiText.controlPanel.brandLabel}
-      surfaceTitle={readyForSelection ? activeGroupMeta.label : dshText.hub.unavailableTitle}
-      surfaceSubtitle={readyForSelection ? activeGroupMeta.description : dshText.hub.unavailableTitle}
-      topFilters={topFilters}
-      onTopFilterSelect={(filterId: string) => {
-        setActiveFilterId(filterId);
-        handleGroupChange(resolveTopFilterGroup(filterId));
-      }}
-      onBrandClick={() => router.push('/dashboard')}
-      onSearchClick={() => handleGroupChange('orders')}
-      onRefreshClick={() => setRefreshCount((value) => value + 1)}
-      onAlertClick={() => {
-        setAlertCount(0);
-        handleGroupChange('exceptions-sla');
-      }}
-      railTitle="Operations lanes"
-      railStatusLabel={`Refresh ${refreshCount} · Alerts ${alertCount}`}
-      railItems={railItems}
-      onRailItemSelect={(groupId: string) => handleGroupChange(groupId as CanonicalOperationsGroupId)}
-    >
-      {stageContent}
-    </WebCommandCenterFrame>
   );
 }
 

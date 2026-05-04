@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Image, Modal, PanResponder, Pressable, StyleSheet, TouchableWithoutFeedback, View, useWindowDimensions } from 'react-native';
 import { useTheme } from '../providers';

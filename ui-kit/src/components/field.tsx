@@ -1,3 +1,4 @@
+"use client";
 import React, { useMemo, useState } from 'react';
 import { Image, Pressable, ScrollView, Switch as RNSwitch, TextInput, View, type PressableProps, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 import { borders, radius, resolveLogicalPadding, resolveTextAlign, resolveRowDirection, sizes, spacing, type SpacingToken } from '../foundation';

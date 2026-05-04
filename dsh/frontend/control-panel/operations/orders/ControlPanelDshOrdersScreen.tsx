@@ -119,21 +119,99 @@ export function ControlPanelDshOrdersScreen({
     setOverlayMode('detail');
   }, []);
 
-  if (state !== 'ready') {
-    const stateCopy = resolveStateCopy(dshText, state);
+  const content = (
+    <div className={styles.stack}>
+      <ControlPanelDshDecisionBoard
+        title="قرار مسار الطلبات"
+        purpose="إدارة الصف، التفاصيل، والتواصل في مسار عمليات واحد."
+        primaryDecision={selectedOrder ? `${selectedOrder.id} · ${selectedOrder.statusLabel}` : 'اختر طلبًا للمتابعة'}
+        nextAction={selectedOrder ? (overlayMode === 'chat' ? 'فتح نافذة التواصل' : 'فتح تفاصيل الطلب') : 'اختر طلبًا من القائمة'}
+        blockers={selectedOrder ? selectedOrder.statusLabel : 'لا يوجد طلب محدد'}
+        ownerSurface="operations"
+        evidenceHint="selected order, timeline, and overlay context"
+        routeHint="/operations?workspace=orders"
+        decisionTone={selectedOrder?.statusTone === 'danger' ? 'danger' : selectedOrder?.statusTone === 'success' ? 'best' : 'warning'}
+      />
 
-    return (
-      <WebPageFrame
-        eyebrow={dshText.orders.pageEyebrow}
-        title={dshText.orders.pageTitle}
-        description={dshText.orders.pageDescription}
-        maxWidth={1120}
-        embedded={embedded}
-        showHeader={showHeader}
+      <WebMissionHeroCard
+        badges={[dshText.common.live, `${dshText.orders.badgesLabel}: ${orders.length}`]}
+        eyebrow={dshText.orders.heroEyebrow}
+        title={dshText.orders.heroTitle}
+        description={dshText.orders.heroDescription}
+        metaItems={[
+          `${dshText.orders.assignedTitle}: ${assignedCount}`,
+          `${dshText.orders.newTitle}: ${openCount}`,
+          `${dshText.orders.reviewTitle}: ${reviewCount}`,
+        ]}
+        primaryAction={{ label: dshText.common.backToHub, onAction: () => router.push(hubHref) }}
+      />
+
+      <div className={styles.signalGrid}>
+        <WebSignalCard title={dshText.orders.assignedTitle} value={String(assignedCount)} description={dshText.orders.assignedDescription} tone="best" />
+        <WebSignalCard title={dshText.orders.newTitle} value={String(openCount)} description={dshText.orders.newDescription} />
+        <WebSignalCard title={dshText.orders.reviewTitle} value={String(reviewCount)} description={dshText.orders.reviewDescription} />
+      </div>
+
+      <WebSectionCard title={dshText.orders.listTitle} description={dshText.orders.listDescription}>
+        <div className={styles.cardGrid}>
+          {orders.map((order) => (
+            <Box key={order.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
+              <Box layoutDirection="row" justify="space-between" align="center">
+                <Text role="bodyStrong">{order.id}</Text>
+                <Text role="caption" tone={order.statusTone}>
+                  {order.statusLabel}
+                </Text>
+              </Box>
+              <Text role="bodySm" tone="muted">{order.customer}</Text>
+              <Text role="bodySm" tone="muted">{order.route}</Text>
+              <Box layoutDirection="row" justify="space-between" align="center">
+                <Text role="caption" tone="soft">
+                  {dshText.orders.etaPrefix} {order.eta}
+                </Text>
+                <Text role="caption" tone="soft">{order.amount}</Text>
+              </Box>
+              <Text role="caption" tone="soft">{order.destinationLabel}</Text>
+              <Box>
+                <Button
+                  label={dshText.orders.openDetail}
+                  tone="ghost"
+                  onPress={() => handleOpenOrderDetail(order.id)}
+                />
+              </Box>
+            </Box>
+          ))}
+        </div>
+      </WebSectionCard>
+      <SheetFrame
+        visible={!!selectedOrderId}
+        title={selectedOrderId ? `${overlayMode === 'chat' ? 'تواصل الطلب' : dshText.orders.openDetail}: ${selectedOrderLabel}` : dshText.orders.openDetail}
+        onClose={handleCloseSheet}
       >
-        <StateView {...stateCopy} onActionPress={() => router.push(hubHref)} />
-      </WebPageFrame>
-    );
+        {selectedOrderId ? (
+          overlayMode === 'chat' ? (
+            <ControlPanelDshOrderChatScreen
+              embedded
+              showHeader={false}
+              orderId={selectedOrderId}
+              ordersHref="/operations?workspace=orders"
+            />
+          ) : (
+            <ControlPanelDshOrderDetailScreen
+              embedded
+              showHeader={false}
+              orderId={selectedOrderId}
+              hubHref="/operations"
+              ordersHref="/operations?workspace=orders"
+              onOpenOrderChat={handleOpenOrderChat}
+            />
+          )
+        ) : null}
+      </SheetFrame>
+    </div>
+  );
+
+  if (embedded) {
+    return content;
   }
 
   return (
@@ -142,98 +220,9 @@ export function ControlPanelDshOrdersScreen({
       title={dshText.orders.pageTitle}
       description={dshText.orders.pageDescription}
       maxWidth={1120}
-      embedded={embedded}
       showHeader={showHeader}
     >
-      <div className={styles.stack}>
-        <ControlPanelDshDecisionBoard
-          title="Orders decision board"
-          purpose="Keep queue, detail, and chat decisions on one compact operational surface."
-          primaryDecision={selectedOrder ? `${selectedOrder.id} · ${selectedOrder.statusLabel}` : 'Select an order to continue'}
-          nextAction={selectedOrder ? (overlayMode === 'chat' ? 'Open the chat overlay' : 'Open order detail') : 'Choose an order from the queue'}
-          blockers={selectedOrder ? selectedOrder.statusLabel : 'No selected order'}
-          ownerSurface="operations"
-          evidenceHint="selected order, timeline, and overlay context"
-          routeHint="/operations?workspace=orders"
-          decisionTone={selectedOrder?.statusTone === 'danger' ? 'danger' : selectedOrder?.statusTone === 'success' ? 'best' : 'warning'}
-        />
-
-        <WebMissionHeroCard
-          badges={['/operations?workspace=orders', dshText.common.live, `${dshText.orders.badgesLabel}: ${orders.length}`]}
-          eyebrow={dshText.orders.heroEyebrow}
-          title={dshText.orders.heroTitle}
-          description={dshText.orders.heroDescription}
-          metaItems={[
-            `${dshText.orders.assignedTitle}: ${assignedCount}`,
-            `${dshText.orders.newTitle}: ${openCount}`,
-            `${dshText.orders.reviewTitle}: ${reviewCount}`,
-          ]}
-          primaryAction={{ label: dshText.common.backToHub, href: hubHref }}
-          secondaryAction={{ label: dshText.common.operations, href: operationsHref }}
-        />
-
-        <div className={styles.signalGrid}>
-          <WebSignalCard title={dshText.orders.assignedTitle} value={String(assignedCount)} description={dshText.orders.assignedDescription} tone="best" />
-          <WebSignalCard title={dshText.orders.newTitle} value={String(openCount)} description={dshText.orders.newDescription} />
-          <WebSignalCard title={dshText.orders.reviewTitle} value={String(reviewCount)} description={dshText.orders.reviewDescription} />
-        </div>
-
-        <WebSectionCard title={dshText.orders.listTitle} description={dshText.orders.listDescription}>
-          <div className={styles.cardGrid}>
-            {orders.map((order) => (
-              <Box key={order.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-                <Box layoutDirection="row" justify="space-between" align="center">
-                  <Text role="bodyStrong">{order.id}</Text>
-                  <Text role="caption" tone={order.statusTone}>
-                    {order.statusLabel}
-                  </Text>
-                </Box>
-                <Text role="bodySm" tone="muted">{order.customer}</Text>
-                <Text role="bodySm" tone="muted">{order.route}</Text>
-                <Box layoutDirection="row" justify="space-between" align="center">
-                  <Text role="caption" tone="soft">
-                    {dshText.orders.etaPrefix} {order.eta}
-                  </Text>
-                  <Text role="caption" tone="soft">{order.amount}</Text>
-                </Box>
-                <Text role="caption" tone="soft">{order.destinationLabel}</Text>
-                <Box>
-                  <Button
-                    label={dshText.orders.openDetail}
-                    tone="ghost"
-                    onPress={() => handleOpenOrderDetail(order.id)}
-                  />
-                </Box>
-              </Box>
-            ))}
-          </div>
-        </WebSectionCard>
-        <SheetFrame
-          visible={!!selectedOrderId}
-          title={selectedOrderId ? `${overlayMode === 'chat' ? 'تواصل الطلب' : dshText.orders.openDetail}: ${selectedOrderLabel}` : dshText.orders.openDetail}
-          onClose={handleCloseSheet}
-        >
-          {selectedOrderId ? (
-            overlayMode === 'chat' ? (
-              <ControlPanelDshOrderChatScreen
-                embedded
-                showHeader={false}
-                orderId={selectedOrderId}
-                ordersHref="/operations?workspace=orders"
-              />
-            ) : (
-              <ControlPanelDshOrderDetailScreen
-                embedded
-                showHeader={false}
-                orderId={selectedOrderId}
-                hubHref="/operations"
-                ordersHref="/operations?workspace=orders"
-                onOpenOrderChat={handleOpenOrderChat}
-              />
-            )
-          ) : null}
-        </SheetFrame>
-      </div>
+      {content}
     </WebPageFrame>
   );
 }

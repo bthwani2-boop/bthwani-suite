@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, type ReactNode } from 'react';
 import { Modal as RNModal, Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 import { radius, spacing } from '../foundation';
