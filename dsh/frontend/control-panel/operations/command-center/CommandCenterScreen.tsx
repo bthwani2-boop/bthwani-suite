@@ -1,29 +1,23 @@
- 'use client';
+'use client';
 
 import React from 'react';
-import { ControlPanelDshWorkspaceFrame, type ControlPanelDshWorkspaceFrameProps } from '../../shared';
-import { COMMAND_CENTER_PREVIEW } from '../operations.preview-data';
+import { Text, Box } from '@bthwani/ui-kit';
 
-export type CommandCenterScreenProps = {
-  hubHref: string;
-};
+export type CommandCenterScreenProps = { hubHref: string; };
 
 export function CommandCenterScreen({ hubHref }: CommandCenterScreenProps) {
   return (
-    <ControlPanelDshWorkspaceFrame
-      eyebrow="Operations"
-      title="Command center"
-      description="The single entry point for live orders, dispatch, capacity, exceptions, and audit support."
-      badges={['DSH', 'Operations', 'Hub']}
-      metaItems={['Canonical workspace', 'Eight screen folders', 'RTL ready']}
-      primaryAction={{ label: 'Open live orders', href: '/operations?workspace=live-orders' }}
-      secondaryAction={{ label: 'Open dispatch assignment', href: '/operations?workspace=dispatch-assignment' }}
-      signals={COMMAND_CENTER_PREVIEW.signals as NonNullable<ControlPanelDshWorkspaceFrameProps['signals']>}
-      actions={COMMAND_CENTER_PREVIEW.actions as NonNullable<ControlPanelDshWorkspaceFrameProps['actions']>}
-      disclosures={COMMAND_CENTER_PREVIEW.disclosures as NonNullable<ControlPanelDshWorkspaceFrameProps['disclosures']>}
-      decisionBoard={COMMAND_CENTER_PREVIEW.decisionBoard as NonNullable<ControlPanelDshWorkspaceFrameProps['decisionBoard']>}
-      footerNote={`Hub route: ${hubHref}`}
-    />
+    <Box gap={4}>
+      <Box gap={1}>
+        <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>غرفة القيادة</Text>
+        <Text role="bodySm" tone="muted">متابعة الأداء العام والتدخلات السريعة</Text>
+      </Box>
+
+      {/* Operational Pulse Content */}
+      <Box style={{ backgroundColor: 'white', padding: 16, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(10, 47, 92, 0.05)', borderStyle: 'solid' }}>
+        <Text role="bodySm">لا توجد تنبيهات حرجة حالياً. النظام يعمل بكفاءة.</Text>
+      </Box>
+    </Box>
   );
 }
 

@@ -2,9 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, StateView, StatCard, Text, useDirection } from '@bthwani/ui-kit';
-import { WebControlActionCard, WebControlDisclosureItem, WebSectionCard } from '@bthwani/ui-kit/web';
-import { ControlPanelDshDecisionBoard } from '../shared';
+import { StateView, Text, useDirection, Badge, Box } from '@bthwani/ui-kit';
 import {
   buildOperationsHref,
   getOperationsGroupMeta,
@@ -22,6 +20,7 @@ import { PartnerStoresScreen } from './partner-stores/PartnerStoresScreen';
 import { AreaCapacityScreen } from './area-capacity/AreaCapacityScreen';
 import { ExceptionsEscalationsScreen } from './exceptions-escalations/ExceptionsEscalationsScreen';
 import { AuditSupportSlaScreen } from './audit-support-sla/AuditSupportSlaScreen';
+import styles from './dsh-surface.module.css';
 
 export type ControlPanelDshOperationsScreenProps = {
   group?: CanonicalOperationsGroupId;
@@ -40,6 +39,15 @@ const SCREEN_RENDERERS: Record<CanonicalOperationsGroupId, React.ComponentType<{
   'area-capacity': AreaCapacityScreen,
   'exceptions-escalations': ExceptionsEscalationsScreen,
   'audit-support-sla': AuditSupportSlaScreen,
+};
+
+const METRIC_ARABIC: Record<string, string> = {
+  'Open orders': 'الطلبات المفتوحة',
+  'Dispatch risk': 'خطر الإسناد',
+  'Captain cover': 'تغطية الكباتن',
+  'Escalations': 'الاستثناءات',
+  'Area capacity': 'ضغط المناطق',
+  'SLA risk': 'SLA risk',
 };
 
 export function ControlPanelDshOperationsScreen({
@@ -63,86 +71,100 @@ export function ControlPanelDshOperationsScreen({
 
   if (state !== 'ready') {
     return (
-      <div style={{ padding: 24 }} dir={direction}>
+      <div style={{ padding: 24 }} dir="rtl">
         <StateView {...resolveOperationsStateCopy(state)} onActionPress={() => router.push(fallbackHref)} />
       </div>
     );
   }
 
   return (
-    <div dir={direction} style={{ padding: 24 }}>
-      <Box gap={4}>
-        <Box gap={2}>
-          <Text role="bodyStrong">Operations control room</Text>
-          <Text role="bodySm" tone="muted">
-            Choose the canonical screen that owns the current operational decision, then keep the active workspace in view.
+    <div className={styles.cockpitShell} dir="rtl">
+      {/* A) Compact Header Row */}
+      <header className={styles.cockpitHeader}>
+        <div className={styles.cockpitHeaderMain}>
+          <Box gap={1}>
+            <h1>غرفة عمليات DSH</h1>
+            <Text role="bodySm" tone="muted">مراقبة وتنفيذ الطلبات الحية</Text>
+          </Box>
+          <Badge label="Live Pulse" tone="success" style={{ height: 20, fontSize: 10 }} />
+          <Badge label="Preview" tone="warning" style={{ height: 20, fontSize: 10 }} />
+
+          <nav className={styles.cockpitExternalLinks}>
+            {NON_OPERATIONS_SECTION_SHORTCUTS.map(link => (
+              <a key={link.id} href={link.href} onClick={(e) => { e.preventDefault(); router.push(link.href); }}>
+                {link.id === 'finance' ? 'المالية' :
+                 link.id === 'catalogs' ? 'الكتالوجات' :
+                 link.id === 'marketing' ? 'التسويق' : 'الشركاء'}
+              </a>
+            ))}
+          </nav>
+        </div>
+        <div className={styles.cockpitActions}>
+          <button className={styles.cockpitTab} style={{ backgroundColor: '#FF500D', color: 'white' }}>فتح الطلبات الحية</button>
+          <button className={styles.cockpitTab} style={{ border: '1px solid #0A2F5C' }}>إسناد/توزيع</button>
+        </div>
+      </header>
+
+      {/* B) Pulse Strip (Compact Metrics) */}
+      <div className={styles.cockpitPulseStrip}>
+        {OPERATIONS_PULSE_METRICS.slice(0, 6).map((metric) => (
+          <div key={metric.id} className={styles.cockpitMetric}>
+            <span className={styles.cockpitMetricTitle}>{METRIC_ARABIC[metric.title] || metric.title}</span>
+            <span className={styles.cockpitMetricValue}>{metric.value}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* C) Screen Switcher (Compact Tabs) */}
+      <div className={styles.cockpitSwitcher}>
+        {OPERATIONS_CANONICAL_GROUPS.map((item) => {
+          const isSelected = item.id === activeGroup;
+          return (
+            <button
+              key={item.id}
+              className={`${styles.cockpitTab} ${isSelected ? styles.cockpitTabActive : ''}`}
+              onClick={() => {
+                setActiveGroup(item.id);
+                router.push(buildOperationsHref(item.id, { orderId, panel }));
+              }}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* D) Main Cockpit Grid (Cockpit Shell Layout) */}
+      <main className={styles.cockpitMainGrid}>
+        {/* E) Active Screen (Main Panel) */}
+        <section className={styles.cockpitActivePanel}>
+          <div className={styles.cockpitScrollArea}>
+            <ActiveScreen hubHref={hubHref} />
+          </div>
+        </section>
+
+        {/* F) Decision Rail (Side Rail) */}
+        <aside className={styles.cockpitDecisionRail}>
+          <Text role="bodyStrong" style={{ color: '#0A2F5C', fontSize: 15 }}>لوحة قرار العمليات</Text>
+          <Text role="bodySm" tone="muted" style={{ marginTop: 6, lineHeight: 1.4 }}>
+            {activeGroupMeta.description}
           </Text>
-        </Box>
 
-        <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
-          {OPERATIONS_PULSE_METRICS.map((metric) => (
-            <div key={metric.id} style={{ flexGrow: 1, flexBasis: 180 }}>
-                <StatCard
-                  label={metric.title}
-                  value={metric.value}
-                  deltaLabel={metric.description}
-                  tone={metric.tone === 'best' ? 'success' : metric.tone}
-                />
-            </div>
-          ))}
-        </Box>
+          <div className={styles.cockpitQuickActions}>
+            <Text role="bodySm" style={{ fontWeight: 600, marginBottom: 4 }}>إجراءات سريعة</Text>
+            <button className={styles.cockpitActionButton}>
+              {activeGroup === 'command-center' ? 'فتح غرفة القيادة' : `متابعة ${activeGroupMeta.label}`}
+            </button>
+            <button className={`${styles.cockpitActionButton} ${styles.cockpitActionButtonSecondary}`}>
+              توزيع المهام
+            </button>
+          </div>
 
-        <ControlPanelDshDecisionBoard
-          title="Operations hub decision board"
-          purpose={activeGroupMeta.description}
-          primaryDecision={activeGroupMeta.label}
-          nextAction={activeGroup === 'command-center' ? 'Open one of the canonical operational screens.' : `Continue in ${activeGroupMeta.label}.`}
-          blockers={activeGroup === 'audit-support-sla' ? 'Evidence and SLA closure still need proof.' : 'The canonical screen map now replaces the legacy lane model.'}
-          ownerSurface="operations"
-          evidenceHint={`Canonical group: ${activeGroupMeta.id}`}
-          routeHint={hubHref}
-          decisionTone={activeGroup === 'exceptions-escalations' ? 'danger' : activeGroup === 'area-capacity' ? 'warning' : 'brand'}
-        />
-
-        <WebSectionCard title="Screen selector" description="Switch between the eight canonical surfaces. Operations is always one click away.">
-          <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
-            {OPERATIONS_CANONICAL_GROUPS.map((item) => (
-              <div key={item.id} style={{ flexGrow: 1, flexBasis: 250 }}>
-                <WebControlActionCard
-                  id={item.id}
-                  title={item.label}
-                  description={item.description}
-                  footerLabel={item.badge}
-                  href={buildOperationsHref(item.id)}
-                  tone={item.id === activeGroup ? 'primary' : 'secondary'}
-                  onAction={() => {
-                    setActiveGroup(item.id);
-                    router.push(buildOperationsHref(item.id, { orderId, panel }));
-                  }}
-                />
-              </div>
-            ))}
+          <Box style={{ marginTop: 'auto', paddingTop: 20 }}>
+            <Text role="bodySm" tone="muted">BThwani Premium 2026</Text>
           </Box>
-        </WebSectionCard>
-
-        <ActiveScreen hubHref={hubHref} />
-
-        <WebSectionCard title="Secondary shortcuts" description="Non-operations sections remain visible as lightweight exits.">
-          <Box gap={2}>
-            {NON_OPERATIONS_SECTION_SHORTCUTS.map((item) => (
-              <WebControlDisclosureItem
-                key={item.id}
-                id={item.id}
-                label={item.label}
-                description={item.description}
-                href={item.href}
-                badge="Section"
-                onAction={() => router.push(item.href)}
-              />
-            ))}
-          </Box>
-        </WebSectionCard>
-      </Box>
+        </aside>
+      </main>
     </div>
   );
 }

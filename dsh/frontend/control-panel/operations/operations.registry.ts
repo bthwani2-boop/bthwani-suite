@@ -12,15 +12,16 @@ import type {
 export type { AnyOperationsWorkspaceId } from './operations.types';
 
 export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
-  { id: 'command-center', label: 'Command center', description: 'Operational pulse, blockers, and next best action.', badge: 'Hub' },
-  { id: 'live-orders', label: 'Live orders', description: 'Orders queue, detail, chat, and fulfillment interventions.', badge: 'Core' },
-  { id: 'dispatch-assignment', label: 'Dispatch assignment', description: 'Assignment board, captain coverage, and manual reassignment.', badge: 'Live' },
-  { id: 'captain-operations', label: 'Captain operations', description: 'Captain availability, readiness, and coverage pressure.', badge: 'Crew' },
-  { id: 'partner-stores', label: 'Partner stores', description: 'Partner store readiness, prep, and intake pressure.', badge: 'Stores' },
-  { id: 'area-capacity', label: 'Area capacity', description: 'Capacity pressure, reserved windows, and surge controls.', badge: 'Capacity' },
-  { id: 'exceptions-escalations', label: 'Exceptions & escalations', description: 'Exceptions queue, recovery actions, and owner routing.', badge: 'Risk' },
-  { id: 'audit-support-sla', label: 'Audit, support & SLA', description: 'Manual action audit, support bridge, and SLA discipline.', badge: 'Proof' },
+  { id: 'command-center', label: 'غرفة القيادة', description: 'نبض العمليات، المعوقات، وأفضل إجراء تالي.', badge: 'Hub' },
+  { id: 'live-orders', label: 'الطلبات الحية', description: 'قائمة الطلبات، التفاصيل، الدردشة، وتدخلات التنفيذ.', badge: 'Core' },
+  { id: 'dispatch-assignment', label: 'الإسناد والتوزيع', description: 'لوحة الإسناد، تغطية الكباتن، وإعادة الإسناد اليدوي.', badge: 'Live' },
+  { id: 'captain-operations', label: 'تشغيل الكباتن', description: 'توافر الكباتن، الجاهزية، وضغط التغطية.', badge: 'Crew' },
+  { id: 'partner-stores', label: 'المتاجر والشركاء', description: 'جاهزية المتاجر، التحضير، وضغط الاستلام.', badge: 'Stores' },
+  { id: 'area-capacity', label: 'المناطق والسعة', description: 'ضغط السعة، النوافذ المحجوزة، والتحكم في الطفرات.', badge: 'Capacity' },
+  { id: 'exceptions-escalations', label: 'الاستثناءات والتصعيد', description: 'قائمة الاستثناءات، إجراءات التعافي، وتوجيه المالك.', badge: 'Risk' },
+  { id: 'audit-support-sla', label: 'التدقيق والدعم وSLA', description: 'تدقيق الإجراءات اليدوية، جسر الدعم، وانضباط SLA.', badge: 'Proof' },
 ] as const;
+
 
 export const OPERATIONS_CANONICAL_GROUP_IDS = OPERATIONS_CANONICAL_GROUPS.map((group) => group.id) as readonly CanonicalOperationsGroupId[];
 
