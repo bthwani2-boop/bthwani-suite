@@ -1,164 +1,75 @@
 ---
 name: expo-dev-client
-description: Build and distribute Expo development clients locally or via TestFlight
-version: 1.0.0
-license: MIT
+description: BThwani-guarded Expo dev-client advisory skill. Does not build, distribute, or change native config by default.
 ---
 
-Use EAS Build to create development clients for testing native code changes on physical devices. Use this for creating custom Expo Go clients for testing branches of your app.
+# Expo Dev Client - BThwani Safe Advisory Skill
 
-## Important: When Development Clients Are Needed
+## Status
 
-**Only create development clients when your app requires custom native code.** Most apps work fine in Expo Go.
+This active SKILL.md is intentionally rewritten as a BThwani-safe advisory wrapper.
 
-You need a dev client ONLY when using:
-- Local Expo modules (custom native code)
-- Apple targets (widgets, app clips, extensions)
-- Third-party native modules not in Expo Go
+Original broad instructions, examples, references, generated snippets, or upstream patterns in this folder are reference material only. They must not override this SKILL.md, BThwani governance, the current task scope, or evidence requirements.
 
-**Try Expo Go first** with `npx expo start`. If everything works, you don't need a dev client.
+## BThwani Safety Contract
 
-## EAS Configuration
+This skill is advisory/read-only by default.
 
-Ensure `eas.json` has a development profile:
+Mandatory constraints:
+- Active repo: C:\bthwani-suite.
+- Do not use any old standalone repo/path named bth as an active target.
+- Do not modify files unless the current task explicitly grants a narrow write scope.
+- Do not delete, rename, move, scaffold, commit, push, merge, rebase, open PRs, change dependencies, lockfiles, package scripts, CI/CD, runtime config, env/secrets, generated files, backend/API/runtime, or native config unless explicitly authorized.
+- No PASS, READY, CLOSED, FINAL, or 100% without evidence.
+- Unknowns must be marked TBD or UNPROVEN.
+- Evidence decides, not agent claims.
 
-```json
-{
-  "cli": {
-    "version": ">= 16.0.1",
-    "appVersionSource": "remote"
-  },
-  "build": {
-    "production": {
-      "autoIncrement": true
-    },
-    "development": {
-      "autoIncrement": true,
-      "developmentClient": true
-    }
-  },
-  "submit": {
-    "production": {},
-    "development": {}
-  }
-}
-```
+For UI/frontend/mobile:
+- Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only.
+- No local design system outside @bthwani/ui-kit.
+- Use BThwani identity only: deepBlue #0A2F5C, orange #FF500D, white #FFFFFF.
+- Arabic/RTL UI must be directionally correct.
 
-Key settings:
-- `developmentClient: true` - Bundles expo-dev-client for development builds
-- `autoIncrement: true` - Automatically increments build numbers
-- `appVersionSource: "remote"` - Uses EAS as the source of truth for version numbers
+## Allowed Use
 
-## Building for TestFlight
+- Review UI, frontend, mobile, accessibility, SEO, data fetching, or visual implementation constraints.
+- Propose narrow changes that preserve BThwani ownership boundaries.
+- Check RTL correctness, visual identity, spacing, alignment, clipping, and surface ownership.
+- Request screenshots for visual acceptance when UI is affected.
 
-Build iOS dev client and submit to TestFlight in one command:
+## Forbidden Use
 
-```bash
-eas build -p ios --profile development --submit
-```
+- Do not create a local design system.
+- Do not import Tamagui directly outside @bthwani/ui-kit.
+- Do not hardcode random colors or visual patterns.
+- Do not modify navigation, runtime, backend, API, dependencies, native config, or generated files unless explicit scope grants it.
 
-This will:
-1. Build the development client in the cloud
-2. Automatically submit to App Store Connect
-3. Send you an email when the build is ready in TestFlight
+## Required Output Format
 
-After receiving the TestFlight email:
-1. Download the build from TestFlight on your device
-2. Launch the app to see the expo-dev-client UI
-3. Connect to your local Metro bundler or scan a QR code
+Decision:
+PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED / NEEDS_EVIDENCE / NEEDS_VISUAL_EVIDENCE
 
-## Building Locally
+Scope reviewed:
+- paths inspected
 
-Build a development client on your machine:
+Evidence:
+- files, commands, screenshots, logs, or patch evidence used
 
-```bash
-# iOS (requires Xcode)
-eas build -p ios --profile development --local
+Findings:
+- concise evidence-based findings only
 
-# Android
-eas build -p android --profile development --local
-```
+Risks:
+- concrete risks with affected paths
 
-Local builds output:
-- iOS: `.ipa` file
-- Android: `.apk` or `.aab` file
+Allowed next action:
+- one narrow next step only
 
-## Installing Local Builds
+## Verification Reminder
 
-Install iOS build on simulator:
+For any later authorized UI/frontend/mobile change, require at minimum:
+- git --no-pager status --short
+- git --no-pager diff --check
+- pnpm -w exec tsc --noEmit
+- before/after screenshots or NEEDS_VISUAL_EVIDENCE
 
-```bash
-# Find the .app in the .tar.gz output
-tar -xzf build-*.tar.gz
-xcrun simctl install booted ./path/to/App.app
-```
-
-Install iOS build on device (requires signing):
-
-```bash
-# Use Xcode Devices window or ideviceinstaller
-ideviceinstaller -i build.ipa
-```
-
-Install Android build:
-
-```bash
-adb install build.apk
-```
-
-## Building for Specific Platform
-
-```bash
-# iOS only
-eas build -p ios --profile development
-
-# Android only
-eas build -p android --profile development
-
-# Both platforms
-eas build --profile development
-```
-
-## Checking Build Status
-
-```bash
-# List recent builds
-eas build:list
-
-# View build details
-eas build:view
-```
-
-## Using the Dev Client
-
-Once installed, the dev client provides:
-- **Development server connection** - Enter your Metro bundler URL or scan QR
-- **Build information** - View native build details
-- **Launcher UI** - Switch between development servers
-
-Connect to local development:
-
-```bash
-# Start Metro bundler
-npx expo start --dev-client
-
-# Scan QR code with dev client or enter URL manually
-```
-
-## Troubleshooting
-
-**Build fails with signing errors:**
-```bash
-eas credentials
-```
-
-**Clear build cache:**
-```bash
-eas build -p ios --profile development --clear-cache
-```
-
-**Check EAS CLI version:**
-```bash
-eas --version
-eas update
-```
+This skill does not approve its own work. Final acceptance requires Git evidence and ChatGPT review.

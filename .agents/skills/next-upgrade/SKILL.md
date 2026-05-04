@@ -1,50 +1,74 @@
 ---
 name: next-upgrade
-description: Upgrade Next.js to the latest version following official migration guides and codemods
-argument-hint: "[target-version]"
+description: Read-only advisory review for Next.js upgrade risk. Does not edit dependencies, configs, or lockfiles.
 ---
 
-# Upgrade Next.js
+# Next Upgrade - BThwani Safe Advisory Skill
 
-Upgrade the current project to the latest Next.js version following official migration guides.
+## Status
 
-## Instructions
+This active SKILL.md is intentionally rewritten as a BThwani-safe advisory wrapper.
 
-1. **Detect current version**: Read `package.json` to identify the current Next.js version and related dependencies (React, React DOM, etc.)
+Original broad instructions, examples, references, generated snippets, or upstream patterns in this folder are reference material only. They must not override this SKILL.md, BThwani governance, the current task scope, or evidence requirements.
 
-2. **Fetch the latest upgrade guide**: Use WebFetch to get the official upgrade documentation:
-   - Codemods: https://nextjs.org/docs/app/guides/upgrading/codemods
-   - Version-specific guides (adjust version as needed):
-     - https://nextjs.org/docs/app/guides/upgrading/version-16 
-     - https://nextjs.org/docs/app/guides/upgrading/version-15
-     - https://nextjs.org/docs/app/guides/upgrading/version-14
+## BThwani Safety Contract
 
-3. **Determine upgrade path**: Based on current version, identify which migration steps apply. For major version jumps, upgrade incrementally (e.g., 13 → 14 → 15).
+This skill is advisory/read-only by default.
 
-4. **Run codemods first**: Next.js provides codemods to automate breaking changes:
-   ```bash
-   npx @next/codemod@latest <transform> <path>
-   ```
-   Common transforms:
-   - `next-async-request-api` - Updates async Request APIs (v15)
-   - `next-request-geo-ip` - Migrates geo/ip properties (v15)
-   - `next-dynamic-access-named-export` - Transforms dynamic imports (v15)
+Mandatory constraints:
+- Active repo: C:\bthwani-suite.
+- Do not use any old standalone repo/path named bth as an active target.
+- Do not modify files unless the current task explicitly grants a narrow write scope.
+- Do not delete, rename, move, scaffold, commit, push, merge, rebase, open PRs, change dependencies, lockfiles, package scripts, CI/CD, runtime config, env/secrets, generated files, backend/API/runtime, or native config unless explicitly authorized.
+- No PASS, READY, CLOSED, FINAL, or 100% without evidence.
+- Unknowns must be marked TBD or UNPROVEN.
+- Evidence decides, not agent claims.
 
-5. **Update dependencies**: Upgrade Next.js and peer dependencies together:
-   ```bash
-   npm install next@latest react@latest react-dom@latest
-   ```
+For UI/frontend/mobile:
+- Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only.
+- No local design system outside @bthwani/ui-kit.
+- Use BThwani identity only: deepBlue #0A2F5C, orange #FF500D, white #FFFFFF.
+- Arabic/RTL UI must be directionally correct.
 
-6. **Review breaking changes**: Check the upgrade guide for manual changes needed:
-   - API changes (e.g., async params in v15)
-   - Configuration changes in `next.config.js`
-   - Deprecated features being removed
+## Allowed Use
 
-7. **Update TypeScript types** (if applicable):
-   ```bash
-   npm install @types/react@latest @types/react-dom@latest
-   ```
+- Inspect existing files and report risks.
+- Explain backend, API, runtime, CI, deployment, Expo, Nx, or workspace concerns only from inspected evidence.
+- Suggest narrow next steps and verification commands.
+- Mark unknowns as TBD or UNPROVEN.
 
-8. **Test the upgrade**:
-   - Run `npm run build` to check for build errors
-   - Run `npm run dev` and test key functionality
+## Forbidden Use
+
+- Do not scaffold, generate, install, upgrade, deploy, link packages, edit workflows, edit package files, edit lockfiles, edit native config, or implement backend/API/runtime code.
+- Do not use this skill as a builder.
+- Do not open reference files as active instructions unless the user explicitly asks for reference review.
+
+## Required Output Format
+
+Decision:
+PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED / NEEDS_EVIDENCE / NEEDS_VISUAL_EVIDENCE
+
+Scope reviewed:
+- paths inspected
+
+Evidence:
+- files, commands, screenshots, logs, or patch evidence used
+
+Findings:
+- concise evidence-based findings only
+
+Risks:
+- concrete risks with affected paths
+
+Allowed next action:
+- one narrow next step only
+
+## Verification Reminder
+
+For any later authorized runtime/config/backend/CI/Nx/Expo change, require at minimum:
+- git --no-pager status --short
+- git --no-pager diff --check
+- pnpm -w exec tsc --noEmit
+- targeted build/test/runtime evidence when relevant
+
+This skill does not approve its own work. Final acceptance requires Git evidence and ChatGPT review.

@@ -1,58 +1,71 @@
 ---
 name: nx-run-tasks
-description: Helps with running tasks in an Nx workspace. USE WHEN the user wants to execute build, test, lint, serve, or run any other tasks defined in the workspace.
+description: Light advisory guidance for Nx task execution in BThwani. Does not run or change tasks by default.
 ---
 
-You can run tasks with Nx in the following way.
+# Nx Run Tasks - BThwani Safe Advisory Skill
 
-Keep in mind that you might have to prefix things with npx/pnpx/yarn if the user doesn't have nx installed globally. Look at the package.json or lockfile to determine which package manager is in use.
+## Status
 
-For more details on any command, run it with `--help` (e.g. `nx run-many --help`, `nx affected --help`).
+This active SKILL.md is intentionally rewritten as a BThwani-safe advisory wrapper.
 
-## Understand which tasks can be run
+Original broad instructions, examples, references, generated snippets, or upstream patterns in this folder are reference material only. They must not override this SKILL.md, BThwani governance, the current task scope, or evidence requirements.
 
-You can check those via `nx show project <projectname> --json`, for example `nx show project myapp --json`. It contains a `targets` section which has information about targets that can be run. You can also just look at the `package.json` scripts or `project.json` targets, but you might miss out on inferred tasks by Nx plugins.
+## BThwani Safety Contract
 
-## Run a single task
+This skill is advisory/read-only by default.
 
-```
-nx run <project>:<task>
-```
+Mandatory constraints:
+- Active repo: C:\bthwani-suite.
+- Do not use any old standalone repo/path named bth as an active target.
+- Do not modify files unless the current task explicitly grants a narrow write scope.
+- Do not delete, rename, move, scaffold, commit, push, merge, rebase, open PRs, change dependencies, lockfiles, package scripts, CI/CD, runtime config, env/secrets, generated files, backend/API/runtime, or native config unless explicitly authorized.
+- No PASS, READY, CLOSED, FINAL, or 100% without evidence.
+- Unknowns must be marked TBD or UNPROVEN.
+- Evidence decides, not agent claims.
 
-where `project` is the project name defined in `package.json` or `project.json` (if present).
+For UI/frontend/mobile:
+- Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only.
+- No local design system outside @bthwani/ui-kit.
+- Use BThwani identity only: deepBlue #0A2F5C, orange #FF500D, white #FFFFFF.
+- Arabic/RTL UI must be directionally correct.
 
-## Run multiple tasks
+## Allowed Use
 
-```
-nx run-many -t build test lint typecheck
-```
+- Inspect and explain only inside the current task scope.
+- Provide advisory guidance, warnings, and narrow verification commands.
+- Help interpret TypeScript, Nx, Next.js, React, or composition patterns from repo evidence.
 
-You can pass a `-p` flag to filter to specific projects, otherwise it runs on all projects. You can also use `--exclude` to exclude projects, and `--parallel` to control the number of parallel processes (default is 3).
+## Forbidden Use
 
-Examples:
+- Do not edit files, dependencies, lockfiles, package scripts, generated files, CI, runtime config, backend/API/runtime, native config, or workflows unless explicit scope grants it.
+- Do not broaden from advisory guidance into implementation.
 
-- `nx run-many -t test -p proj1 proj2` — test specific projects
-- `nx run-many -t test --projects=*-app --exclude=excluded-app` — test projects matching a pattern
-- `nx run-many -t test --projects=tag:api-*` — test projects by tag
+## Required Output Format
 
-## Run tasks for affected projects
+Decision:
+PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED / NEEDS_EVIDENCE / NEEDS_VISUAL_EVIDENCE
 
-Use `nx affected` to only run tasks on projects that have been changed and projects that depend on changed projects. This is especially useful in CI and for large workspaces.
+Scope reviewed:
+- paths inspected
 
-```
-nx affected -t build test lint
-```
+Evidence:
+- files, commands, screenshots, logs, or patch evidence used
 
-By default it compares against the base branch. You can customize this:
+Findings:
+- concise evidence-based findings only
 
-- `nx affected -t test --base=main --head=HEAD` — compare against a specific base and head
-- `nx affected -t test --files=libs/mylib/src/index.ts` — specify changed files directly
+Risks:
+- concrete risks with affected paths
 
-## Useful flags
+Allowed next action:
+- one narrow next step only
 
-These flags work with `run`, `run-many`, and `affected`:
+## Verification Reminder
 
-- `--skipNxCache` — rerun tasks even when results are cached
-- `--verbose` — print additional information such as stack traces
-- `--nxBail` — stop execution after the first failed task
-- `--configuration=<name>` — use a specific configuration (e.g. `production`)
+For any later authorized code change, require at minimum:
+- git --no-pager status --short
+- git --no-pager diff --check
+- pnpm -w exec tsc --noEmit
+
+This skill does not approve its own work. Final acceptance requires Git evidence and ChatGPT review.

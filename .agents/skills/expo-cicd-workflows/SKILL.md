@@ -1,92 +1,74 @@
 ---
 name: expo-cicd-workflows
-description: Helps understand and write EAS workflow YAML files for Expo projects. Use this skill when the user asks about CI/CD or workflows in an Expo or EAS context, mentions .eas/workflows/, or wants help with EAS build pipelines or deployment automation.
-allowed-tools: "Read,Write,Bash(node:*)"
-version: 1.0.0
-license: MIT License
+description: Read-only advisory review for Expo/EAS CI workflows. Does not edit workflows or deployment configuration.
 ---
 
-# EAS Workflows Skill
+# Expo Cicd Workflows - BThwani Safe Advisory Skill
 
-Help developers write and edit EAS CI/CD workflow YAML files.
+## Status
 
-## Reference Documentation
+This active SKILL.md is intentionally rewritten as a BThwani-safe advisory wrapper.
 
-Fetch these resources before generating or validating workflow files. Use the fetch script (implemented using Node.js) in this skill's `scripts/` directory; it caches responses using ETags for efficiency:
+Original broad instructions, examples, references, generated snippets, or upstream patterns in this folder are reference material only. They must not override this SKILL.md, BThwani governance, the current task scope, or evidence requirements.
 
-```bash
-# Fetch resources
-node {baseDir}/scripts/fetch.js <url>
-```
+## BThwani Safety Contract
 
-1. **JSON Schema** — https://api.expo.dev/v2/workflows/schema
-   - It is NECESSARY to fetch this schema
-   - Source of truth for validation
-   - All job types and their required/optional parameters
-   - Trigger types and configurations
-   - Runner types, VM images, and all enums
+This skill is advisory/read-only by default.
 
-2. **Syntax Documentation** — https://raw.githubusercontent.com/expo/expo/refs/heads/main/docs/pages/eas/workflows/syntax.mdx
-   - Overview of workflow YAML syntax
-   - Examples and English explanations
-   - Expression syntax and contexts
+Mandatory constraints:
+- Active repo: C:\bthwani-suite.
+- Do not use any old standalone repo/path named bth as an active target.
+- Do not modify files unless the current task explicitly grants a narrow write scope.
+- Do not delete, rename, move, scaffold, commit, push, merge, rebase, open PRs, change dependencies, lockfiles, package scripts, CI/CD, runtime config, env/secrets, generated files, backend/API/runtime, or native config unless explicitly authorized.
+- No PASS, READY, CLOSED, FINAL, or 100% without evidence.
+- Unknowns must be marked TBD or UNPROVEN.
+- Evidence decides, not agent claims.
 
-3. **Pre-packaged Jobs** — https://raw.githubusercontent.com/expo/expo/refs/heads/main/docs/pages/eas/workflows/pre-packaged-jobs.mdx
-   - Documentation for supported pre-packaged job types
-   - Job-specific parameters and outputs
+For UI/frontend/mobile:
+- Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only.
+- No local design system outside @bthwani/ui-kit.
+- Use BThwani identity only: deepBlue #0A2F5C, orange #FF500D, white #FFFFFF.
+- Arabic/RTL UI must be directionally correct.
 
-Do not rely on memorized values; these resources evolve as new features are added.
+## Allowed Use
 
-## Workflow File Location
+- Inspect existing files and report risks.
+- Explain backend, API, runtime, CI, deployment, Expo, Nx, or workspace concerns only from inspected evidence.
+- Suggest narrow next steps and verification commands.
+- Mark unknowns as TBD or UNPROVEN.
 
-Workflows live in `.eas/workflows/*.yml` (or `.yaml`).
+## Forbidden Use
 
-## Top-Level Structure
+- Do not scaffold, generate, install, upgrade, deploy, link packages, edit workflows, edit package files, edit lockfiles, edit native config, or implement backend/API/runtime code.
+- Do not use this skill as a builder.
+- Do not open reference files as active instructions unless the user explicitly asks for reference review.
 
-A workflow file has these top-level keys:
+## Required Output Format
 
-- `name` — Display name for the workflow
-- `on` — Triggers that start the workflow (at least one required)
-- `jobs` — Job definitions (required)
-- `defaults` — Shared defaults for all jobs
-- `concurrency` — Control parallel workflow runs
+Decision:
+PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED / NEEDS_EVIDENCE / NEEDS_VISUAL_EVIDENCE
 
-Consult the schema for the full specification of each section.
+Scope reviewed:
+- paths inspected
 
-## Expressions
+Evidence:
+- files, commands, screenshots, logs, or patch evidence used
 
-Use `${{ }}` syntax for dynamic values. The schema defines available contexts:
+Findings:
+- concise evidence-based findings only
 
-- `github.*` — GitHub repository and event information
-- `inputs.*` — Values from `workflow_dispatch` inputs
-- `needs.*` — Outputs and status from dependent jobs
-- `jobs.*` — Job outputs (alternative syntax)
-- `steps.*` — Step outputs within custom jobs
-- `workflow.*` — Workflow metadata
+Risks:
+- concrete risks with affected paths
 
-## Generating Workflows
+Allowed next action:
+- one narrow next step only
 
-When generating or editing workflows:
+## Verification Reminder
 
-1. Fetch the schema to get current job types, parameters, and allowed values
-2. Validate that required fields are present for each job type
-3. Verify job references in `needs` and `after` exist in the workflow
-4. Check that expressions reference valid contexts and outputs
-5. Ensure `if` conditions respect the schema's length constraints
+For any later authorized runtime/config/backend/CI/Nx/Expo change, require at minimum:
+- git --no-pager status --short
+- git --no-pager diff --check
+- pnpm -w exec tsc --noEmit
+- targeted build/test/runtime evidence when relevant
 
-## Validation
-
-After generating or editing a workflow file, validate it against the schema:
-
-```sh
-# Install dependencies if missing
-[ -d "{baseDir}/scripts/node_modules" ] || npm install --prefix {baseDir}/scripts
-
-node {baseDir}/scripts/validate.js <workflow.yml> [workflow2.yml ...]
-```
-
-The validator fetches the latest schema and checks the YAML structure. Fix any reported errors before considering the workflow complete.
-
-## Answering Questions
-
-When users ask about available options (job types, triggers, runner types, etc.), fetch the schema and derive the answer from it rather than relying on potentially outdated information.
+This skill does not approve its own work. Final acceptance requires Git evidence and ChatGPT review.

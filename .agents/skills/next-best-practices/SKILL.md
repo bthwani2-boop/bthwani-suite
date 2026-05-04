@@ -1,153 +1,71 @@
 ---
 name: next-best-practices
-description: Next.js best practices - file conventions, RSC boundaries, data patterns, async APIs, metadata, error handling, route handlers, image/font optimization, bundling
-user-invocable: false
+description: Light advisory guidance for Next.js practices in BThwani. Read-only by default.
 ---
 
-# Next.js Best Practices
+# Next Best Practices - BThwani Safe Advisory Skill
 
-Apply these rules when writing or reviewing Next.js code.
+## Status
 
-## File Conventions
+This active SKILL.md is intentionally rewritten as a BThwani-safe advisory wrapper.
 
-See [file-conventions.md](./file-conventions.md) for:
-- Project structure and special files
-- Route segments (dynamic, catch-all, groups)
-- Parallel and intercepting routes
-- Middleware rename in v16 (middleware → proxy)
+Original broad instructions, examples, references, generated snippets, or upstream patterns in this folder are reference material only. They must not override this SKILL.md, BThwani governance, the current task scope, or evidence requirements.
 
-## RSC Boundaries
+## BThwani Safety Contract
 
-Detect invalid React Server Component patterns.
+This skill is advisory/read-only by default.
 
-See [rsc-boundaries.md](./rsc-boundaries.md) for:
-- Async client component detection (invalid)
-- Non-serializable props detection
-- Server Action exceptions
+Mandatory constraints:
+- Active repo: C:\bthwani-suite.
+- Do not use any old standalone repo/path named bth as an active target.
+- Do not modify files unless the current task explicitly grants a narrow write scope.
+- Do not delete, rename, move, scaffold, commit, push, merge, rebase, open PRs, change dependencies, lockfiles, package scripts, CI/CD, runtime config, env/secrets, generated files, backend/API/runtime, or native config unless explicitly authorized.
+- No PASS, READY, CLOSED, FINAL, or 100% without evidence.
+- Unknowns must be marked TBD or UNPROVEN.
+- Evidence decides, not agent claims.
 
-## Async Patterns
+For UI/frontend/mobile:
+- Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only.
+- No local design system outside @bthwani/ui-kit.
+- Use BThwani identity only: deepBlue #0A2F5C, orange #FF500D, white #FFFFFF.
+- Arabic/RTL UI must be directionally correct.
 
-Next.js 15+ async API changes.
+## Allowed Use
 
-See [async-patterns.md](./async-patterns.md) for:
-- Async `params` and `searchParams`
-- Async `cookies()` and `headers()`
-- Migration codemod
+- Inspect and explain only inside the current task scope.
+- Provide advisory guidance, warnings, and narrow verification commands.
+- Help interpret TypeScript, Nx, Next.js, React, or composition patterns from repo evidence.
 
-## Runtime Selection
+## Forbidden Use
 
-See [runtime-selection.md](./runtime-selection.md) for:
-- Default to Node.js runtime
-- When Edge runtime is appropriate
+- Do not edit files, dependencies, lockfiles, package scripts, generated files, CI, runtime config, backend/API/runtime, native config, or workflows unless explicit scope grants it.
+- Do not broaden from advisory guidance into implementation.
 
-## Directives
+## Required Output Format
 
-See [directives.md](./directives.md) for:
-- `'use client'`, `'use server'` (React)
-- `'use cache'` (Next.js)
+Decision:
+PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED / NEEDS_EVIDENCE / NEEDS_VISUAL_EVIDENCE
 
-## Functions
+Scope reviewed:
+- paths inspected
 
-See [functions.md](./functions.md) for:
-- Navigation hooks: `useRouter`, `usePathname`, `useSearchParams`, `useParams`
-- Server functions: `cookies`, `headers`, `draftMode`, `after`
-- Generate functions: `generateStaticParams`, `generateMetadata`
+Evidence:
+- files, commands, screenshots, logs, or patch evidence used
 
-## Error Handling
+Findings:
+- concise evidence-based findings only
 
-See [error-handling.md](./error-handling.md) for:
-- `error.tsx`, `global-error.tsx`, `not-found.tsx`
-- `redirect`, `permanentRedirect`, `notFound`
-- `forbidden`, `unauthorized` (auth errors)
-- `unstable_rethrow` for catch blocks
+Risks:
+- concrete risks with affected paths
 
-## Data Patterns
+Allowed next action:
+- one narrow next step only
 
-See [data-patterns.md](./data-patterns.md) for:
-- Server Components vs Server Actions vs Route Handlers
-- Avoiding data waterfalls (`Promise.all`, Suspense, preload)
-- Client component data fetching
+## Verification Reminder
 
-## Route Handlers
+For any later authorized code change, require at minimum:
+- git --no-pager status --short
+- git --no-pager diff --check
+- pnpm -w exec tsc --noEmit
 
-See [route-handlers.md](./route-handlers.md) for:
-- `route.ts` basics
-- GET handler conflicts with `page.tsx`
-- Environment behavior (no React DOM)
-- When to use vs Server Actions
-
-## Metadata & OG Images
-
-See [metadata.md](./metadata.md) for:
-- Static and dynamic metadata
-- `generateMetadata` function
-- OG image generation with `next/og`
-- File-based metadata conventions
-
-## Image Optimization
-
-See [image.md](./image.md) for:
-- Always use `next/image` over `<img>`
-- Remote images configuration
-- Responsive `sizes` attribute
-- Blur placeholders
-- Priority loading for LCP
-
-## Font Optimization
-
-See [font.md](./font.md) for:
-- `next/font` setup
-- Google Fonts, local fonts
-- Tailwind CSS integration
-- Preloading subsets
-
-## Bundling
-
-See [bundling.md](./bundling.md) for:
-- Server-incompatible packages
-- CSS imports (not link tags)
-- Polyfills (already included)
-- ESM/CommonJS issues
-- Bundle analysis
-
-## Scripts
-
-See [scripts.md](./scripts.md) for:
-- `next/script` vs native script tags
-- Inline scripts need `id`
-- Loading strategies
-- Google Analytics with `@next/third-parties`
-
-## Hydration Errors
-
-See [hydration-error.md](./hydration-error.md) for:
-- Common causes (browser APIs, dates, invalid HTML)
-- Debugging with error overlay
-- Fixes for each cause
-
-## Suspense Boundaries
-
-See [suspense-boundaries.md](./suspense-boundaries.md) for:
-- CSR bailout with `useSearchParams` and `usePathname`
-- Which hooks require Suspense boundaries
-
-## Parallel & Intercepting Routes
-
-See [parallel-routes.md](./parallel-routes.md) for:
-- Modal patterns with `@slot` and `(.)` interceptors
-- `default.tsx` for fallbacks
-- Closing modals correctly with `router.back()`
-
-## Self-Hosting
-
-See [self-hosting.md](./self-hosting.md) for:
-- `output: 'standalone'` for Docker
-- Cache handlers for multi-instance ISR
-- What works vs needs extra setup
-
-## Debug Tricks
-
-See [debug-tricks.md](./debug-tricks.md) for:
-- MCP endpoint for AI-assisted debugging
-- Rebuild specific routes with `--debug-build-paths`
-
+This skill does not approve its own work. Final acceptance requires Git evidence and ChatGPT review.

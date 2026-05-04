@@ -1,127 +1,74 @@
 ---
 name: link-workspace-packages
-description: 'Link workspace packages in monorepos (npm, yarn, pnpm, bun). USE WHEN: (1) you just created or generated new packages and need to wire up their dependencies, (2) user imports from a sibling package and needs to add it as a dependency, (3) you get resolution errors for workspace packages (@org/*) like "cannot find module", "failed to resolve import", "TS2307", or "cannot resolve". DO NOT patch around with tsconfig paths or manual package.json edits - use the package manager''s workspace commands to fix actual linking.'
+description: Read-only advisory review for workspace package linking. Does not edit package files or lockfiles.
 ---
 
-# Link Workspace Packages
+# Link Workspace Packages - BThwani Safe Advisory Skill
 
-Add dependencies between packages in a monorepo. All package managers support workspaces but with different syntax.
+## Status
 
-## Detect Package Manager
+This active SKILL.md is intentionally rewritten as a BThwani-safe advisory wrapper.
 
-Check whether there's a `packageManager` field in the root-level `package.json`.
+Original broad instructions, examples, references, generated snippets, or upstream patterns in this folder are reference material only. They must not override this SKILL.md, BThwani governance, the current task scope, or evidence requirements.
 
-Alternatively check lockfile in repo root:
+## BThwani Safety Contract
 
-- `pnpm-lock.yaml` → pnpm
-- `yarn.lock` → yarn
-- `bun.lock` / `bun.lockb` → bun
-- `package-lock.json` → npm
+This skill is advisory/read-only by default.
 
-## Workflow
+Mandatory constraints:
+- Active repo: C:\bthwani-suite.
+- Do not use any old standalone repo/path named bth as an active target.
+- Do not modify files unless the current task explicitly grants a narrow write scope.
+- Do not delete, rename, move, scaffold, commit, push, merge, rebase, open PRs, change dependencies, lockfiles, package scripts, CI/CD, runtime config, env/secrets, generated files, backend/API/runtime, or native config unless explicitly authorized.
+- No PASS, READY, CLOSED, FINAL, or 100% without evidence.
+- Unknowns must be marked TBD or UNPROVEN.
+- Evidence decides, not agent claims.
 
-1. Identify consumer package (the one importing)
-2. Identify provider package(s) (being imported)
-3. Add dependency using package manager's workspace syntax
-4. Verify symlinks created in consumer's `node_modules/`
+For UI/frontend/mobile:
+- Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only.
+- No local design system outside @bthwani/ui-kit.
+- Use BThwani identity only: deepBlue #0A2F5C, orange #FF500D, white #FFFFFF.
+- Arabic/RTL UI must be directionally correct.
 
----
+## Allowed Use
 
-## pnpm
+- Inspect existing files and report risks.
+- Explain backend, API, runtime, CI, deployment, Expo, Nx, or workspace concerns only from inspected evidence.
+- Suggest narrow next steps and verification commands.
+- Mark unknowns as TBD or UNPROVEN.
 
-Uses `workspace:` protocol - symlinks only created when explicitly declared.
+## Forbidden Use
 
-```bash
-# From consumer directory
-pnpm add @org/ui --workspace
+- Do not scaffold, generate, install, upgrade, deploy, link packages, edit workflows, edit package files, edit lockfiles, edit native config, or implement backend/API/runtime code.
+- Do not use this skill as a builder.
+- Do not open reference files as active instructions unless the user explicitly asks for reference review.
 
-# Or with --filter from anywhere
-pnpm add @org/ui --filter @org/app --workspace
-```
+## Required Output Format
 
-Result in `package.json`:
+Decision:
+PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED / NEEDS_EVIDENCE / NEEDS_VISUAL_EVIDENCE
 
-```json
-{ "dependencies": { "@org/ui": "workspace:*" } }
-```
+Scope reviewed:
+- paths inspected
 
----
+Evidence:
+- files, commands, screenshots, logs, or patch evidence used
 
-## yarn (v2+/berry)
+Findings:
+- concise evidence-based findings only
 
-Also uses `workspace:` protocol.
+Risks:
+- concrete risks with affected paths
 
-```bash
-yarn workspace @org/app add @org/ui
-```
+Allowed next action:
+- one narrow next step only
 
-Result in `package.json`:
+## Verification Reminder
 
-```json
-{ "dependencies": { "@org/ui": "workspace:^" } }
-```
+For any later authorized runtime/config/backend/CI/Nx/Expo change, require at minimum:
+- git --no-pager status --short
+- git --no-pager diff --check
+- pnpm -w exec tsc --noEmit
+- targeted build/test/runtime evidence when relevant
 
----
-
-## npm
-
-No `workspace:` protocol. npm auto-symlinks workspace packages.
-
-```bash
-npm install @org/ui --workspace @org/app
-```
-
-Result in `package.json`:
-
-```json
-{ "dependencies": { "@org/ui": "*" } }
-```
-
-npm resolves to local workspace automatically during install.
-
----
-
-## bun
-
-Supports `workspace:` protocol (pnpm-compatible).
-
-```bash
-cd packages/app && bun add @org/ui
-```
-
-Result in `package.json`:
-
-```json
-{ "dependencies": { "@org/ui": "workspace:*" } }
-```
-
----
-
-## Examples
-
-**Example 1: pnpm - link ui lib to app**
-
-```bash
-pnpm add @org/ui --filter @org/app --workspace
-```
-
-**Example 2: npm - link multiple packages**
-
-```bash
-npm install @org/data-access @org/ui --workspace @org/dashboard
-```
-
-**Example 3: Debug "Cannot find module"**
-
-1. Check if dependency is declared in consumer's `package.json`
-2. If not, add it using appropriate command above
-3. Run install (`pnpm install`, `npm install`, etc.)
-
-## Notes
-
-- Symlinks appear in `<consumer>/node_modules/@org/<package>`
-- **Hoisting differs by manager:**
-  - npm/bun: hoist shared deps to root `node_modules`
-  - pnpm: no hoisting (strict isolation, prevents phantom deps)
-  - yarn berry: uses Plug'n'Play by default (no `node_modules`)
-- Root `package.json` should have `"private": true` to prevent accidental publish
+This skill does not approve its own work. Final acceptance requires Git evidence and ChatGPT review.
