@@ -25,10 +25,10 @@ import styles from './control-panel-shell.module.css';
 const phaseOneSectionIds = ['dashboard', 'operations', 'finance', 'catalogs', 'support'] as const;
 const hiddenSectionIds = ['community-services', 'partners', 'marketing', 'control'] as const;
 const primarySectionIds = [...phaseOneSectionIds, ...hiddenSectionIds] as const;
-const controlSubSectionIds = ['platform', 'administration', 'governance', 'hr'] as const;
+const controlSubSectionIds = ['platform', 'administration', 'hr'] as const;
 const dshLiveWorkbenchIds = ['orders', 'reassign', 'peakMode', 'arrivalBell'] as const;
 const dshPlannedWorkbenchIds = ['sheinProxy', 'zoneSet', 'dashboard', 'captain-ops', 'field-ops', 'finance', 'settlements', 'cod', 'refunds', 'issues', 'serviceability', 'guard-status', 'evidence'] as const;
-const operationsWorkspaceIds = ['overview', 'dashboard', 'captain-ops', 'field-ops', 'finance', 'settlements', 'cod', 'refunds', 'issues', 'serviceability', 'guard-status', 'evidence', 'orders', 'partners', 'catalogs', 'marketing', 'sheinproxy', 'reassign', 'peak-mode', 'bell', 'zone-set'] as const;
+const operationsWorkspaceIds = ['overview', 'dashboard', 'captain-ops', 'field-ops', 'finance', 'settlements', 'cod', 'refunds', 'issues', 'serviceability', 'guard-status', 'evidence', 'orders', 'order-detail', 'orderchat', 'partners', 'catalogs', 'catalog-categories', 'marketing', 'banners', 'growth', 'loyalty', 'smart-signal', 'sheinproxy', 'reassign', 'peak-mode', 'bell', 'arrival-bell', 'zone-set'] as const;
 
 type ControlPanelSectionId = (typeof primarySectionIds)[number];
 type PhaseOneSectionId = (typeof phaseOneSectionIds)[number];

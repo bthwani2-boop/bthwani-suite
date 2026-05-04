@@ -35,6 +35,17 @@ arb/arb.openapi.yaml
 | Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
+### Blueprint Metadata
+
+id: arb
+name: Reservations
+owner: arb/
+public_export_path: arb/index.ts
+screens_matrix: TBD
+flow_matrix: TBD
+evidence_root: tools/registry/runs/{SESSION_ID}
+closure_decision: NOT CLOSED
+
 ### Service Purpose
 
 خدمة حجوزات مثل الفنادق والصالات والمرافق ومزودي خدمات الحجز: البحث، التوافر، الحجز، العربون/الضمان، التأكيد، الإلغاء، النزاعات، والتسويات.

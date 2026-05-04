@@ -35,6 +35,17 @@ wlt/wlt.openapi.yaml
 | Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
+### Blueprint Metadata
+
+id: wlt
+name: Wallet
+owner: wlt/
+public_export_path: wlt/index.ts
+screens_matrix: TBD
+flow_matrix: TBD
+evidence_root: tools/registry/runs/{SESSION_ID}
+closure_decision: NOT CLOSED
+
 ### Service Purpose
 
 خدمة المحفظة والمسار المالي المركزي: الرصيد، الشحن، الدفع، السداد، التحويل، الإهداء، الاسترداد، التسويات، الدفعات، ledger، reconciliation، exports، والclosures.

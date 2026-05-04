@@ -1,6 +1,6 @@
 import ControlPanelSurfaceHost from '../../../shell/web-entry';
 
-type ControlSubsectionId = 'platform' | 'administration' | 'governance' | 'hr';
+type ControlSubsectionId = 'platform' | 'administration' | 'hr';
 
 type ControlPageProps = {
   readonly searchParams?: Promise<{
@@ -8,7 +8,7 @@ type ControlPageProps = {
   }>;
 };
 
-const controlSubsectionIds = new Set<ControlSubsectionId>(['platform', 'administration', 'governance', 'hr']);
+const controlSubsectionIds = new Set<ControlSubsectionId>(['platform', 'administration', 'hr']);
 
 export default async function ControlPage({ searchParams }: ControlPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;

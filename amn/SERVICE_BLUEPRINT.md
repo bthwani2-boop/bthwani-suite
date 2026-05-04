@@ -35,6 +35,17 @@ amn/amn.openapi.yaml
 | Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
+### Blueprint Metadata
+
+id: amn
+name: Taxi / Passenger Transport
+owner: amn/
+public_export_path: amn/index.ts
+screens_matrix: TBD
+flow_matrix: TBD
+evidence_root: tools/registry/runs/{SESSION_ID}
+closure_decision: NOT CLOSED
+
 ### Service Purpose
 
 خدمة تاكسي ونقل ركاب: طلب مشوار، تحديد وجهة، تكليف كابتن AMN، تتبع، سلامة، إغلاق الرحلة، التقييم، والأثر المالي عبر WLT.

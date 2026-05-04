@@ -2,20 +2,19 @@
 
 Status: ACTIVE_MIGRATION_NOTE
 
-This pilot now includes a partial frontend slice move into the root service.
+`dsh/` is the target and current service root for this parity phase.
 
-Moved frontend implementation from:
-
-```text
-packages/surfaces/src/service-owned/dsh
-```
-
-to:
+Current frontend implementation is rooted under:
 
 ```text
 dsh/frontend
 ```
 
-`control-panel`, `app-partner`, `app-captain`, and `app-field` now live under `dsh/frontend`.
-`app-client` and `shared` were returned to `packages/surfaces/src/service-owned/dsh` after Expo/Metro runtime evidence showed root-owned resolution breakage.
-Future phases must prove import parity, route and catalog parity, TypeScript safety, and runtime safety before claiming deeper closure.
+`app-client`, `app-partner`, `app-captain`, `app-field`, and `control-panel` are currently present under `dsh/frontend`.
+
+`packages/surfaces/src/service-owned/dsh` is not the current source of truth for this root parity slice unless a separate evidence-backed decision restores it.
+
+This migration note does not imply backend, runtime, API, or Expo/Metro closure.
+Those remain `NEEDS_EVIDENCE` until verified in this branch.
+
+Future phases must still prove import parity, route/catalog parity, TypeScript safety, and runtime safety before deeper closure is claimed.

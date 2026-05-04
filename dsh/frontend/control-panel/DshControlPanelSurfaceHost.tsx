@@ -83,6 +83,8 @@ const workspaceTabs: readonly WorkspaceTab[] = [
   { id: 'guard-status', label: 'Guard status', description: 'PASS/WARN/BLOCKED' },
   { id: 'evidence', label: 'Evidence', description: 'Closure evidence matrix' },
   { id: 'orders', label: 'Orders', description: 'Current queue' },
+  { id: 'order-detail', label: 'Order detail', description: 'Order detail workspace' },
+  { id: 'orderchat', label: 'Order chat', description: 'Order chat workspace' },
   { id: 'partners', label: 'Partners', description: 'Activation and docs' },
   { id: 'catalogs', label: 'Catalogs', description: 'Approval and governance' },
   { id: 'catalog-categories', label: 'Catalog categories', description: 'Category ownership and triage' },

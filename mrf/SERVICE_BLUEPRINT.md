@@ -35,6 +35,17 @@ mrf/mrf.openapi.yaml
 | Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
+### Blueprint Metadata
+
+id: mrf
+name: Lost and Found
+owner: mrf/
+public_export_path: mrf/index.ts
+screens_matrix: TBD
+flow_matrix: TBD
+evidence_root: tools/registry/runs/{SESSION_ID}
+closure_decision: NOT CLOSED
+
 ### Service Purpose
 
 خدمة مفقودات ومعثورات: نشر بلاغ مفقود أو معثور، بحث، مطابقة، تواصل آمن، متابعة الحالة، والإشراف.

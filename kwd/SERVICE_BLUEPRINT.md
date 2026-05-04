@@ -35,6 +35,17 @@ kwd/kwd.openapi.yaml
 | Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
+### Blueprint Metadata
+
+id: kwd
+name: Jobs
+owner: kwd/
+public_export_path: kwd/index.ts
+screens_matrix: TBD
+flow_matrix: TBD
+evidence_root: tools/registry/runs/{SESSION_ID}
+closure_decision: NOT CLOSED
+
 ### Service Purpose
 
 خدمة وظائف وفرص عمل: نشر وظائف، بحث وتصفح، تفاصيل، تقديم، متابعة، إدارة طلبات، ومراجعة/إشراف.

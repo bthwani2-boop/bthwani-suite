@@ -35,6 +35,17 @@ snd/snd.openapi.yaml
 | Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
+### Blueprint Metadata
+
+id: snd
+name: Specialized Services
+owner: snd/
+public_export_path: snd/index.ts
+screens_matrix: TBD
+flow_matrix: TBD
+evidence_root: tools/registry/runs/{SESSION_ID}
+closure_decision: NOT CLOSED
+
 ### Service Purpose
 
 خدمة طلب خدمات متخصصة وربط العميل بمزود مناسب: إنشاء طلب، اختيار تخصص، مطابقة مزود، متابعة، تواصل، إغلاق، وإدارة التخصصات.

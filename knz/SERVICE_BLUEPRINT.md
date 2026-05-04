@@ -35,6 +35,17 @@ knz/knz.openapi.yaml
 | Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
+### Blueprint Metadata
+
+id: knz
+name: Open Marketplace
+owner: knz/
+public_export_path: knz/index.ts
+screens_matrix: TBD
+flow_matrix: TBD
+evidence_root: tools/registry/runs/{SESSION_ID}
+closure_decision: NOT CLOSED
+
 ### Service Purpose
 
 سوق مفتوح للجديد والقديم: نشر إعلانات، عرض منتجات، بحث، تصفح، تفاصيل، تواصل آمن، إدارة الإعلانات، الإشراف، البلاغات، والتصنيفات.

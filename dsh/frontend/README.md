@@ -1,10 +1,10 @@
 # DSH Frontend
 
-Status: SCAFFOLD_ONLY
+Status: ROOT_FRONTEND_PARITY_IN_PROGRESS
 
-Target location for DSH service UI slices by app.
+`dsh/frontend` is the service-owned frontend implementation root for the current parity slice.
 
-Allowed future mappings:
+Current implementation is present under:
 
 ```text
 frontend/app-client
@@ -14,10 +14,7 @@ frontend/app-field
 frontend/control-panel
 ```
 
-Current implementation remains under:
+This directory is not a runtime/backend/API closure boundary.
+Any closure claim here still requires evidence.
 
-```text
-packages/surfaces/src/service-owned/dsh
-```
-
-No implementation was moved in this pilot.
+The legacy root under `packages/surfaces/src/service-owned/dsh` is not the current truth source for this parity slice.

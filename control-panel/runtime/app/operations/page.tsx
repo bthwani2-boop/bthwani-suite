@@ -1,6 +1,6 @@
 import ControlPanelSurfaceHost from '../../../shell/web-entry';
 
-type OperationsWorkspaceId = 'overview' | 'dashboard' | 'captain-ops' | 'field-ops' | 'finance' | 'settlements' | 'cod' | 'refunds' | 'issues' | 'serviceability' | 'guard-status' | 'evidence' | 'orders' | 'partners' | 'catalogs' | 'marketing' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'bell' | 'zone-set';
+type OperationsWorkspaceId = 'overview' | 'dashboard' | 'captain-ops' | 'field-ops' | 'finance' | 'settlements' | 'cod' | 'refunds' | 'issues' | 'serviceability' | 'guard-status' | 'evidence' | 'orders' | 'order-detail' | 'orderchat' | 'partners' | 'catalogs' | 'catalog-categories' | 'marketing' | 'banners' | 'growth' | 'loyalty' | 'smart-signal' | 'sheinproxy' | 'reassign' | 'peak-mode' | 'bell' | 'arrival-bell' | 'zone-set';
 
 type OperationsPageProps = {
   readonly searchParams?: Promise<{
@@ -24,13 +24,21 @@ const operationsWorkspaceIds = new Set<OperationsWorkspaceId>([
   'guard-status',
   'evidence',
   'orders',
+  'order-detail',
+  'orderchat',
   'partners',
   'catalogs',
+  'catalog-categories',
   'marketing',
+  'banners',
+  'growth',
+  'loyalty',
+  'smart-signal',
   'sheinproxy',
   'reassign',
   'peak-mode',
   'bell',
+  'arrival-bell',
   'zone-set',
 ]);
 
