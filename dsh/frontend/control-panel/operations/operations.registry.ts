@@ -9,15 +9,17 @@ import type {
   OperationsPanelId,
 } from './operations.types';
 
+export type { AnyOperationsWorkspaceId } from './operations.types';
+
 export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
-  { id: 'overview', label: 'Overview', description: 'Operational pulse, blockers, and next best action.', badge: 'Pulse' },
-  { id: 'orders', label: 'Orders', description: 'Orders queue with detail and chat panels inside the same lane.', badge: 'Core' },
-  { id: 'dispatch-fleet', label: 'Dispatch fleet', description: 'Dispatch board, captains, reassign, capacity, and peak mode.', badge: 'Live' },
-  { id: 'tracking-handoff', label: 'Tracking handoff', description: 'Live tracking, bells, handoff verification, and proof review.', badge: 'Flow' },
-  { id: 'exceptions-sla', label: 'Exceptions SLA', description: 'Exceptions, issues, serviceability, zone set, and recovery actions.', badge: 'Risk' },
-  { id: 'partner-readiness', label: 'Partner readiness', description: 'Partner prep, intake context, field ops, and readiness blockers.', badge: 'Ready' },
-  { id: 'proxy-shein-awnak', label: 'Proxy Shein Awnak', description: 'Manual assignment, estimate, offer, schedule, and follow-up.', badge: 'Proxy' },
-  { id: 'audit-evidence', label: 'Audit evidence', description: 'Manual action audit, guard status, evidence, and closure matrix.', badge: 'Proof' },
+  { id: 'command-center', label: 'Command center', description: 'Operational pulse, blockers, and next best action.', badge: 'Hub' },
+  { id: 'live-orders', label: 'Live orders', description: 'Orders queue, detail, chat, and fulfillment interventions.', badge: 'Core' },
+  { id: 'dispatch-assignment', label: 'Dispatch assignment', description: 'Assignment board, captain coverage, and manual reassignment.', badge: 'Live' },
+  { id: 'captain-operations', label: 'Captain operations', description: 'Captain availability, readiness, and coverage pressure.', badge: 'Crew' },
+  { id: 'partner-stores', label: 'Partner stores', description: 'Partner store readiness, prep, and intake pressure.', badge: 'Stores' },
+  { id: 'area-capacity', label: 'Area capacity', description: 'Capacity pressure, reserved windows, and surge controls.', badge: 'Capacity' },
+  { id: 'exceptions-escalations', label: 'Exceptions & escalations', description: 'Exceptions queue, recovery actions, and owner routing.', badge: 'Risk' },
+  { id: 'audit-support-sla', label: 'Audit, support & SLA', description: 'Manual action audit, support bridge, and SLA discipline.', badge: 'Proof' },
 ] as const;
 
 export const OPERATIONS_CANONICAL_GROUP_IDS = OPERATIONS_CANONICAL_GROUPS.map((group) => group.id) as readonly CanonicalOperationsGroupId[];
@@ -35,32 +37,38 @@ export const NON_OPERATIONS_SECTION_SHORTCUTS: ReadonlyArray<{
 ] as const;
 
 const LEGACY_OPERATIONAL_TO_CANONICAL_GROUP: Record<Exclude<LegacyOperationsWorkspaceId, LegacySectionRedirectId> | 'orders' | 'overview', CanonicalOperationsGroupId> = {
-  overview: 'overview',
-  orders: 'orders',
-  dashboard: 'audit-evidence',
-  'captain-ops': 'dispatch-fleet',
-  'field-ops': 'partner-readiness',
-  issues: 'exceptions-sla',
-  serviceability: 'exceptions-sla',
-  'guard-status': 'audit-evidence',
-  evidence: 'audit-evidence',
-  'order-detail': 'orders',
-  orderchat: 'orders',
-  dispatch: 'dispatch-fleet',
-  'live-tracking': 'tracking-handoff',
-  exceptions: 'exceptions-sla',
-  sla: 'exceptions-sla',
-  audit: 'audit-evidence',
-  'partner-prep': 'partner-readiness',
-  handoff: 'tracking-handoff',
-  'proof-review': 'tracking-handoff',
-  capacity: 'dispatch-fleet',
-  sheinproxy: 'proxy-shein-awnak',
-  reassign: 'dispatch-fleet',
-  'peak-mode': 'dispatch-fleet',
-  bell: 'tracking-handoff',
-  'arrival-bell': 'tracking-handoff',
-  'zone-set': 'exceptions-sla',
+  overview: 'command-center',
+  orders: 'live-orders',
+  dashboard: 'command-center',
+  'dispatch-fleet': 'dispatch-assignment',
+  'tracking-handoff': 'live-orders',
+  'exceptions-sla': 'exceptions-escalations',
+  'partner-readiness': 'partner-stores',
+  'audit-evidence': 'audit-support-sla',
+  'captain-ops': 'captain-operations',
+  'field-ops': 'partner-stores',
+  issues: 'exceptions-escalations',
+  serviceability: 'area-capacity',
+  'guard-status': 'audit-support-sla',
+  evidence: 'audit-support-sla',
+  'order-detail': 'live-orders',
+  orderchat: 'live-orders',
+  dispatch: 'dispatch-assignment',
+  'live-tracking': 'live-orders',
+  exceptions: 'exceptions-escalations',
+  sla: 'exceptions-escalations',
+  audit: 'audit-support-sla',
+  'partner-prep': 'partner-stores',
+  handoff: 'live-orders',
+  'proof-review': 'live-orders',
+  capacity: 'area-capacity',
+  sheinproxy: 'dispatch-assignment',
+  reassign: 'dispatch-assignment',
+  'peak-mode': 'dispatch-assignment',
+  bell: 'live-orders',
+  'arrival-bell': 'live-orders',
+  'zone-set': 'area-capacity',
+  'proxy-shein-awnak': 'dispatch-assignment',
 };
 
 const LEGACY_SECTION_REDIRECTS: Record<LegacySectionRedirectId, NonOperationsSectionRootId> = {
@@ -97,7 +105,7 @@ export function normalizeOperationsLocation(
   if (!workspace || workspace === 'overview') {
     return {
       kind: 'group',
-      group: 'overview',
+      group: 'command-center',
       sourceWorkspace: workspace as AnyOperationsWorkspaceId | undefined,
       panel: resolvedPanel,
     };
@@ -127,7 +135,7 @@ export function normalizeOperationsLocation(
   if (!mapped) {
     return {
       kind: 'group',
-      group: 'overview',
+      group: 'command-center',
       sourceWorkspace: workspace as AnyOperationsWorkspaceId,
       panel: resolvedPanel,
     };
@@ -148,16 +156,17 @@ export function normalizeOperationsLocation(
 }
 
 export function buildOperationsHref(
-  group: CanonicalOperationsGroupId = 'overview',
+  group: AnyOperationsWorkspaceId = 'command-center',
   options?: {
     orderId?: string;
     panel?: OperationsPanelId;
   },
 ) {
+  const normalizedLocation = normalizeOperationsLocation(group, options?.panel);
   const searchParams = new URLSearchParams();
 
-  if (group !== 'overview') {
-    searchParams.set('workspace', group);
+  if (normalizedLocation.kind === 'group' && normalizedLocation.group !== 'command-center') {
+    searchParams.set('workspace', normalizedLocation.group);
   }
 
   if (options?.orderId) {

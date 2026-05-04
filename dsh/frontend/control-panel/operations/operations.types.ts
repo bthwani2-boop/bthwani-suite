@@ -1,17 +1,25 @@
 export type OperationsPanelId = 'detail' | 'chat';
 
 export type CanonicalOperationsGroupId =
+  | 'command-center'
+  | 'live-orders'
+  | 'dispatch-assignment'
+  | 'captain-operations'
+  | 'partner-stores'
+  | 'area-capacity'
+  | 'exceptions-escalations'
+  | 'audit-support-sla';
+
+export type LegacyOperationsWorkspaceId =
   | 'overview'
   | 'orders'
+  | 'dashboard'
   | 'dispatch-fleet'
   | 'tracking-handoff'
   | 'exceptions-sla'
   | 'partner-readiness'
   | 'proxy-shein-awnak'
-  | 'audit-evidence';
-
-export type LegacyOperationsWorkspaceId =
-  | 'dashboard'
+  | 'audit-evidence'
   | 'captain-ops'
   | 'field-ops'
   | 'issues'
@@ -42,7 +50,15 @@ export type LegacyOperationsWorkspaceId =
   | 'peak-mode'
   | 'bell'
   | 'arrival-bell'
-  | 'zone-set';
+  | 'zone-set'
+  | 'live-tracking'
+  | 'handoff'
+  | 'proof-review'
+  | 'capacity'
+  | 'dispatch'
+  | 'exceptions'
+  | 'sla'
+  | 'audit';
 
 export type LegacySectionRedirectId =
   | 'finance'
