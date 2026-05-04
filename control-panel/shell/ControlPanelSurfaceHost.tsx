@@ -243,6 +243,70 @@ function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPane
   });
 }
 
+const SidebarOverrides = () => (
+  <style>{`
+    .ui-web-command-center-root {
+      --rail-width: 72px !important;
+    }
+    .ui-web-command-center__rail {
+      overflow: visible !important;
+      padding: 16px 8px !important;
+      align-items: center;
+    }
+    .ui-web-command-center__rail-item {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      justify-content: center;
+      padding: 0 !important;
+      overflow: visible !important;
+    }
+    .ui-web-command-center__rail-item span:nth-child(2) {
+      position: absolute;
+      right: 100%;
+      margin-right: 8px;
+      opacity: 0;
+      pointer-events: none;
+      background: #0A2F5C;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(10, 47, 92, 0.15);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      transform: translateX(-4px);
+      z-index: 1000;
+    }
+    [dir="rtl"] .ui-web-command-center__rail-item span:nth-child(2) {
+      right: auto;
+      left: 100%;
+      margin-right: 0;
+      margin-left: 8px;
+      transform: translateX(4px);
+    }
+    .ui-web-command-center__rail-item:hover span:nth-child(2) {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .ui-web-command-center__rail-item span:nth-child(3) {
+      display: none !important; /* Hide badge on narrow rail */
+    }
+    .ui-web-command-center__rail-section-title {
+      display: none;
+    }
+    .ui-web-command-center__rail-back {
+      padding: 8px;
+      font-size: 0;
+    }
+    .ui-web-command-center__rail-back::before {
+      content: '←';
+      font-size: 16px;
+    }
+  `}</style>
+);
+
 export function ControlPanelSurfaceHost({
   section,
   subsection,
@@ -458,75 +522,7 @@ export function ControlPanelSurfaceHost({
               ],
             };
           case 'operations':
-            return {
-              eyebrow: 'غرفة القرار',
-              title: panelText.surfaceTitles.operations,
-              description: 'حالة تشغيل',
-              primaryAction: {
-                id: 'operations-primary',
-                label: 'افتح الطلبات',
-                description: '',
-                footerLabel: 'فتح',
-                href: dshText.hub.workbenches.orders.routeHint,
-                badge: 'حي',
-                tone: 'primary',
-              },
-              kpis: [
-                {
-                  id: 'operations-services',
-                  title: 'المساحات المرتبطة',
-                  value: String(sectionServiceIds.length),
-                  description: 'الخدمات التي تظهر هذه الغرفة ضمن control-panel.',
-                  tone: 'brand',
-                },
-                {
-                  id: 'operations-live',
-                  title: 'مسارات حية',
-                  value: String(dshLiveWorkbenchIds.length),
-                  description: 'مهام يمكن فتحها الآن من أول نقرة.',
-                  tone: 'best',
-                },
-                {
-                  id: 'operations-planned',
-                  title: 'توسعات لاحقة',
-                  value: String(dshPlannedWorkbenchIds.length),
-                  description: 'تبقى ظاهرة دون أن تزاحم المسار الحي.',
-                },
-                {
-                  id: 'operations-pressure',
-                  title: 'الضغط الحالي',
-                  value: String(alertCount),
-                  description: 'إشارات مرئية تعود للصفر بعد المراجعة.',
-                  tone: alertCount > 0 ? 'danger' : 'neutral',
-                },
-              ],
-              quickActionsTitle: 'مسارات',
-              quickActionsDescription: 'أزرار سريعة',
-              quickActions: dshLiveWorkbenchIds.map((workbenchId) => {
-                const workbenchMeta = resolveWorkbenchMeta(dshText.hub.workbenches as unknown as Record<string, WorkbenchMeta>, workbenchId);
-                return {
-                  id: `operations-${workbenchId}`,
-                  label: workbenchMeta.label,
-                  description: workbenchMeta.description,
-                  footerLabel: 'فتح مباشر',
-                  href: workbenchMeta.routeHint,
-                  badge: 'حي',
-                  tone: workbenchId === 'orders' ? 'primary' : 'secondary',
-                };
-              }),
-              disclosureTitle: 'مسارات أقل أولوية الآن',
-              disclosureDescription: 'تظل متاحة بشكل منضبط عبر progressive disclosure.',
-              disclosureItems: dshPlannedWorkbenchIds.map((workbenchId) => {
-                const workbenchMeta = resolveWorkbenchMeta(dshText.hub.workbenches as unknown as Record<string, WorkbenchMeta>, workbenchId);
-                return {
-                  id: `operations-disclosure-${workbenchId}`,
-                  label: workbenchMeta.label,
-                  description: `${workbenchMeta.description} · ${workbenchMeta.routeHint}`,
-                  href: workbenchMeta.routeHint,
-                  badge: 'قيد التوسعة',
-                };
-              }),
-            };
+            return null;
           case 'finance':
             return {
               eyebrow: 'مالي',
@@ -778,11 +774,13 @@ export function ControlPanelSurfaceHost({
     : null;
 
   return (
-    <WebCommandCenterFrame
+    <>
+      <SidebarOverrides />
+      <WebCommandCenterFrame
       brandLabel={panelText.brandLabel}
       surfaceTitle="لوحة التحكم"
       surfaceSubtitle={shellCopy.title}
-      showHero={true}
+      showHero={!isOperationsSection}
       topFilters={[
         {
           id: allServiceTabId,
@@ -854,13 +852,6 @@ export function ControlPanelSurfaceHost({
               ))}
             </div>
 
-            {isOperationsSection ? (
-              <DshControlPanelSurfaceHost
-                workspace={operationsWorkspace}
-                orderId={operationsOrderId}
-                orderOverlayMode={operationsOverlayMode}
-              />
-            ) : null}
 
             {activeSectionId === 'dashboard' ? (
               <WebSectionCard
@@ -951,6 +942,14 @@ export function ControlPanelSurfaceHost({
               </>
             )}
           </>
+        ) : null}
+
+        {isOperationsSection ? (
+          <DshControlPanelSurfaceHost
+            workspace={operationsWorkspace}
+            orderId={operationsOrderId}
+            orderOverlayMode={operationsOverlayMode}
+          />
         ) : null}
 
         {activeSectionId === 'partners' ? (
@@ -1095,7 +1094,7 @@ export function ControlPanelSurfaceHost({
           </>
         ) : null}
 
-        {!phaseOneBlueprint && activeSectionId !== 'partners' && activeSectionId !== 'marketing' && !isControlSection && !isCommunityServicesSection ? (
+        {!phaseOneBlueprint && activeSectionId !== 'partners' && activeSectionId !== 'marketing' && !isControlSection && !isCommunityServicesSection && !isOperationsSection ? (
           <WebSectionCard title={shellCopy.title} description={shellCopy.description}>
             <div className={styles.actionGrid}>
               <WebControlActionCard
@@ -1121,6 +1120,7 @@ export function ControlPanelSurfaceHost({
         ) : null}
       </div>
     </WebCommandCenterFrame>
+    </>
   );
 }
 

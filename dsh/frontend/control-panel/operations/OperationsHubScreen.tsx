@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { StateView, Text, useDirection, Badge, Box } from '@bthwani/ui-kit';
+import { StateView, useDirection } from '@bthwani/ui-kit';
 import {
   buildOperationsHref,
   getOperationsGroupMeta,
@@ -78,51 +78,36 @@ export function ControlPanelDshOperationsScreen({
   }
 
   return (
-    <div className={styles.cockpitShell} dir="rtl">
-      {/* A) Compact Header Row */}
-      <header className={styles.cockpitHeader}>
-        <div className={styles.cockpitHeaderMain}>
-          <Box gap={1}>
-            <h1>غرفة عمليات DSH</h1>
-            <Text role="bodySm" tone="muted">مراقبة وتنفيذ الطلبات الحية</Text>
-          </Box>
-          <Badge label="Live Pulse" tone="success" style={{ height: 20, fontSize: 10 }} />
-          <Badge label="Preview" tone="warning" style={{ height: 20, fontSize: 10 }} />
-
-          <nav className={styles.cockpitExternalLinks}>
-            {NON_OPERATIONS_SECTION_SHORTCUTS.map(link => (
-              <a key={link.id} href={link.href} onClick={(e) => { e.preventDefault(); router.push(link.href); }}>
-                {link.id === 'finance' ? 'المالية' :
-                 link.id === 'catalogs' ? 'الكتالوجات' :
-                 link.id === 'marketing' ? 'التسويق' : 'الشركاء'}
-              </a>
-            ))}
-          </nav>
+    <div className={styles.operationsCockpit} dir="rtl">
+      {/* 1. Header Area */}
+      <header className={styles.operationsTopBar}>
+        <div className={styles.operationsTitleBlock}>
+          <h1>عمليات DSH</h1>
+          <p>مراقبة وتنفيذ الطلبات الحية</p>
         </div>
-        <div className={styles.cockpitActions}>
-          <button className={styles.cockpitTab} style={{ backgroundColor: '#FF500D', color: 'white' }}>فتح الطلبات الحية</button>
-          <button className={styles.cockpitTab} style={{ border: '1px solid #0A2F5C' }}>إسناد/توزيع</button>
+        
+        <div className={styles.operationsHeaderActions}>
+          <div className={styles.operationsPulseCompact}>
+            {OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => (
+              <div key={metric.id} className={styles.operationsPulseItem}>
+                <span>{METRIC_ARABIC[metric.title] || metric.title}</span>
+                <span>{metric.value}</span>
+              </div>
+            ))}
+          </div>
+
+
         </div>
       </header>
 
-      {/* B) Pulse Strip (Compact Metrics) */}
-      <div className={styles.cockpitPulseStrip}>
-        {OPERATIONS_PULSE_METRICS.slice(0, 6).map((metric) => (
-          <div key={metric.id} className={styles.cockpitMetric}>
-            <span className={styles.cockpitMetricTitle}>{METRIC_ARABIC[metric.title] || metric.title}</span>
-            <span className={styles.cockpitMetricValue}>{metric.value}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* C) Screen Switcher (Compact Tabs) */}
-      <div className={styles.cockpitSwitcher}>
+      {/* 2. Operations Tabs */}
+      <nav className={styles.operationsTabs}>
         {OPERATIONS_CANONICAL_GROUPS.map((item) => {
           const isSelected = item.id === activeGroup;
           return (
             <button
               key={item.id}
-              className={`${styles.cockpitTab} ${isSelected ? styles.cockpitTabActive : ''}`}
+              className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
               onClick={() => {
                 setActiveGroup(item.id);
                 router.push(buildOperationsHref(item.id, { orderId, panel }));
@@ -132,38 +117,13 @@ export function ControlPanelDshOperationsScreen({
             </button>
           );
         })}
-      </div>
+      </nav>
 
-      {/* D) Main Cockpit Grid (Cockpit Shell Layout) */}
-      <main className={styles.cockpitMainGrid}>
-        {/* E) Active Screen (Main Panel) */}
-        <section className={styles.cockpitActivePanel}>
-          <div className={styles.cockpitScrollArea}>
-            <ActiveScreen hubHref={hubHref} />
-          </div>
-        </section>
-
-        {/* F) Decision Rail (Side Rail) */}
-        <aside className={styles.cockpitDecisionRail}>
-          <Text role="bodyStrong" style={{ color: '#0A2F5C', fontSize: 15 }}>لوحة قرار العمليات</Text>
-          <Text role="bodySm" tone="muted" style={{ marginTop: 6, lineHeight: 1.4 }}>
-            {activeGroupMeta.description}
-          </Text>
-
-          <div className={styles.cockpitQuickActions}>
-            <Text role="bodySm" style={{ fontWeight: 600, marginBottom: 4 }}>إجراءات سريعة</Text>
-            <button className={styles.cockpitActionButton}>
-              {activeGroup === 'command-center' ? 'فتح غرفة القيادة' : `متابعة ${activeGroupMeta.label}`}
-            </button>
-            <button className={`${styles.cockpitActionButton} ${styles.cockpitActionButtonSecondary}`}>
-              توزيع المهام
-            </button>
-          </div>
-
-          <Box style={{ marginTop: 'auto', paddingTop: 20 }}>
-            <Text role="bodySm" tone="muted">BThwani Premium 2026</Text>
-          </Box>
-        </aside>
+      {/* 3. Main Active Area (No side rail) */}
+      <main className={styles.operationsMainPanel}>
+        <div className={styles.operationsInnerScroll}>
+          <ActiveScreen hubHref={hubHref} />
+        </div>
       </main>
     </div>
   );
@@ -174,3 +134,4 @@ export function DshOperationsHubSurface(props: ControlPanelDshOperationsScreenPr
 }
 
 export default ControlPanelDshOperationsScreen;
+
