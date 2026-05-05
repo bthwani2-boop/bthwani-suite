@@ -73,7 +73,6 @@ type ClientOperationKind = 'create' | 'order' | 'delivery' | 'loyalty' | 'subscr
 type ClientOperationCanonicalDestination =
   | 'cart-get'
   | 'tracking'
-  | 'create-order'
   | 'benefits'
   | 'conversation-workspace'
   | 'proxy-workspace'
@@ -175,8 +174,13 @@ const proxyControlIds: ClientOperationScreenId[] = [
 ];
 
 const consolidatedCheckoutScreenIds: ClientOperationScreenId[] = [
+  'booking-create',
   'checkout-gate',
+  'estimate-create',
   'estimate-get',
+  'external-order-create',
+  'gas-refill-order-create',
+  'order-create',
   'pricing-preview',
   'pricing-snapshot-get',
   'promo-apply',
@@ -412,7 +416,7 @@ export function getCanonicalDestination(screenId: ClientOperationScreenId): Clie
     || screenId === 'gas-refill-order-create'
     || screenId === 'estimate-create'
   ) {
-    return 'create-order';
+    return 'cart-get';
   }
 
   return 'operations-screen';
@@ -433,7 +437,6 @@ function primaryLabelByKind(kind: ClientOperationKind) {
 function primaryLabelByCanonicalDestination(destination: ClientOperationCanonicalDestination) {
   if (destination === 'cart-get') return 'فتح تأكيد الطلب';
   if (destination === 'tracking') return 'فتح تتبع الطلب';
-  if (destination === 'create-order') return 'فتح إنشاء الطلب';
   if (destination === 'benefits') return 'فتح المزايا';
   if (destination === 'conversation-workspace') return 'فتح المحادثة';
   if (destination === 'proxy-workspace') return 'فتح سياق الوكالة';
@@ -678,7 +681,9 @@ function createOperationScreen(screenId: ClientOperationScreenId) {
 }
 
 export function DshClientOperationDirectoryScreen({ onOpenScreen }: { onOpenScreen?: (screenId: ClientOperationScreenId) => void }) {
-  const operationScreenCount = clientOperationDirectoryGroups.reduce((sum, group) => sum + group.itemIds.length, 0);
+  const operationScreenCount = clientOperationDirectoryGroups.reduce((sum, group) => (
+    sum + group.itemIds.filter((itemId) => clientOperationDefinitions[itemId].audience === 'client').length
+  ), 0);
 
   return (
     <MobileScrollView padding={4} gap={4}>
@@ -705,8 +710,14 @@ export function DshClientOperationDirectoryScreen({ onOpenScreen }: { onOpenScre
         <Surface key={group.title} tone="raised" gap={3}>
           <SectionHeader title={group.title} subtitle={group.subtitle} />
           {(() => {
-            const visibleItems = group.itemIds.filter((itemId) => clientOperationDefinitions[itemId].standaloneVisible);
-            const consolidatedItems = group.itemIds.filter((itemId) => !clientOperationDefinitions[itemId].standaloneVisible);
+            const visibleItems = group.itemIds.filter((itemId) => {
+              const definition = clientOperationDefinitions[itemId];
+              return definition.audience === 'client' && definition.standaloneVisible;
+            });
+            const consolidatedItems = group.itemIds.filter((itemId) => {
+              const definition = clientOperationDefinitions[itemId];
+              return definition.audience === 'client' && !definition.standaloneVisible;
+            });
             const consolidatedByDestination = consolidatedItems.reduce<Record<string, ClientOperationScreenId[]>>((acc, itemId) => {
               const destination = clientOperationDefinitions[itemId].canonicalDestination;
               acc[destination] = [...(acc[destination] ?? []), itemId];
