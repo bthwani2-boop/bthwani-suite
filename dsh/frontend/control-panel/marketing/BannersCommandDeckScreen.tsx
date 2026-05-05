@@ -77,6 +77,9 @@ function bannerActionTypeLabel(actionType: MarketingBannerActionType) {
 function bannerTargetLabel(target?: string) {
   if (!target) return 'وجهة مخصصة';
   if (target === 'DshStoresList') return 'قائمة المتاجر';
+  if (target.startsWith('store-')) return 'متجر محدد';
+  if (target.startsWith('item-')) return 'منتج محدد';
+  if (target === 'fresh' || target === 'dairy' || target === 'bakery') return 'قسم داخل متجر';
   if (target.includes('restaurant')) return 'فئة المطاعم';
   if (target.includes('subscription')) return 'صفحة الاشتراك';
   return 'وجهة مخصصة';
@@ -106,7 +109,7 @@ function bannerActionExtraLabel(actionType: MarketingBannerActionType) {
 }
 
 function bannerActionExtraHint(actionType: MarketingBannerActionType) {
-  if (actionType === 'store_category') return 'مثال: grocery_vegetables_fruits';
+  if (actionType === 'store_category') return 'مثال: fresh أو dairy أو bakery';
   if (actionType === 'product') return 'مثال: store-1001';
   return 'اختياري';
 }

@@ -117,11 +117,26 @@ const publishedCategoryFixtures = dshCategoryFixtures.filter((category) => publi
 const publishedCategoryListFixtures: PublishedCategoryItem[] = dshCategoryListFixtures;
 
 const publishedPromoCategoryIds = new Set(publishedCategoryFixtures.map((category) => category.id));
-const publishedProductIds = new Set(
-  dshPartnerIntakeItems
-    .filter((item) => item.stage === 'published')
-    .map((item) => item.id),
-);
+
+function hasStoreTarget(storeId?: string) {
+  return typeof storeId === 'string' && dshDiscoveryStores.some((store) => store.id === storeId);
+}
+
+function hasStoreCategoryTarget(storeId?: string, categoryId?: string) {
+  if (!hasStoreTarget(storeId) || typeof categoryId !== 'string') {
+    return false;
+  }
+
+  return (storeItemsByStoreId[storeId] ?? []).some((item) => item.categoryId === categoryId);
+}
+
+function hasProductTarget(storeId?: string, productId?: string) {
+  if (!hasStoreTarget(storeId) || typeof productId !== 'string') {
+    return false;
+  }
+
+  return (storeItemsByStoreId[storeId] ?? []).some((item) => item.id === productId);
+}
 
 function resolvePublishedHomePromos() {
   const applyPublishingRules = (promos: DshHomeGetPromo[]) => promos.filter((promo) => {
@@ -129,8 +144,16 @@ function resolvePublishedHomePromos() {
       return promo.actionTarget ? publishedPromoCategoryIds.has(promo.actionTarget) : false;
     }
 
+    if (promo.actionType === 'store') {
+      return hasStoreTarget(promo.actionTarget);
+    }
+
+    if (promo.actionType === 'store_category') {
+      return hasStoreCategoryTarget(promo.actionTarget, promo.actionExtra);
+    }
+
     if (promo.actionType === 'product') {
-      return promo.actionTarget ? publishedProductIds.has(promo.actionTarget) : false;
+      return hasProductTarget(promo.actionExtra, promo.actionTarget);
     }
 
     return true;
