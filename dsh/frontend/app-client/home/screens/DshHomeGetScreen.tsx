@@ -155,8 +155,8 @@ type DshServiceId = 'dsh' | 'knz' | 'amn' | 'arb' | 'wlt' | 'esf' | 'kwd' | 'mrf
 const serviceDialAnchorLayout: DialAnchorLayout = {
   x: spacing[3],
   y: spacing[14],
-  width: 52,
-  height: 52,
+  width: 46,
+  height: 46,
 };
 
 const serviceDialItems: CategoryDialItem[] = [
@@ -227,9 +227,9 @@ const serviceDialItems: CategoryDialItem[] = [
 
 const serviceLauncherMarkStyles = StyleSheet.create({
   root: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: colorPalette.brandSurface,
     alignItems: 'center',
     justifyContent: 'center',
@@ -241,25 +241,25 @@ const serviceLauncherMarkStyles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    borderRadius: 25,
+    borderRadius: 22,
     borderWidth: 2,
     borderColor: colorPalette.brandStrong,
     borderTopColor: colorPalette.brand,
   },
   needle: {
     position: 'absolute',
-    top: 7,
-    right: 8,
-    width: 6,
-    height: 17,
+    top: 6,
+    right: 7,
+    width: 5,
+    height: 15,
     borderRadius: 999,
     backgroundColor: colorPalette.brandStrong,
     transform: [{ rotate: '24deg' }],
   },
   planeWrap: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colorPalette.white,
@@ -338,7 +338,7 @@ function DshServiceLauncherMark() {
       <View style={serviceLauncherMarkStyles.orbit} />
       <View style={serviceLauncherMarkStyles.needle} />
       <View style={serviceLauncherMarkStyles.planeWrap}>
-        <Icon name="paper-plane" size={14} color={colorPalette.brand} />
+        <Icon name="paper-plane" size={12} color={colorPalette.brand} />
       </View>
     </View>
   );
@@ -1000,7 +1000,8 @@ export function DshHomeGetScreen({
           />
         ) : null}
 
-        <View style={styles.categoriesSelectorSection}>
+        <View style={styles.homeHighlightsPanel}>
+          <View style={styles.categoriesSelectorSection}>
           <View style={styles.categoriesSelectorRow}>
             <View style={styles.fixedIconsContainer}>
               <Pressable style={styles.categorySelectorCard} onPress={() => setShortsVisible(true)}>
@@ -1107,7 +1108,7 @@ export function DshHomeGetScreen({
           </View>
         </View>
 
-        <View style={styles.filtersRow}>
+          <View style={styles.filtersRow}>
           <Pressable
             style={[
               styles.filterChip,
@@ -1233,6 +1234,7 @@ export function DshHomeGetScreen({
             );
           })}
           </ScrollView>
+          </View>
         </View>
 
         <View style={styles.storeListViewport}>
@@ -1774,14 +1776,28 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     alignItems: 'stretch',
     gap: 8,
   },
+  homeHighlightsPanel: {
+    marginTop: spacing[2],
+    marginBottom: spacing[2],
+    padding: spacing[2],
+    borderRadius: 24,
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.line,
+    shadowColor: colorPalette.black,
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
+  },
   categoriesSelectorSection: {
     marginTop: 0,
-    marginBottom: 0,
+    marginBottom: spacing[1],
   },
   categoriesSelectorRow: {
     flexDirection: rowDirection,
     alignItems: 'flex-start',
-    gap: 4,
+    gap: 8,
   },
   categoriesSelectorScroll: {
     flex: 1,
@@ -1919,7 +1935,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     flex: 1,
     minWidth: 168,
     maxWidth: 204,
-    alignSelf: 'flex-start',
+    alignSelf: 'stretch',
   },
   heroPromoContent: {
     flexDirection: rowDirection,
@@ -2050,7 +2066,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     flexDirection: rowDirection,
     alignItems: 'center',
     gap: spacing[1],
-    paddingVertical: 0,
+    paddingVertical: spacing[1],
     paddingHorizontal: 0,
     justifyContent: 'flex-start',
   },
