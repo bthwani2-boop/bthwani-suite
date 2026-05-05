@@ -273,6 +273,7 @@ export function getMarketingBannerKpis() {
     published: items.filter((item) => item.status === 'published').length,
     drafts: items.filter((item) => item.status === 'draft').length,
     live: items.filter((item) => isMarketingBannerLive(item)).length,
+    impressions: items.reduce((sum, item) => sum + item.impressions, 0),
     clicks: items.reduce((sum, item) => sum + item.clicks, 0),
   };
 }

@@ -73,6 +73,10 @@ export type DshHomeGetScreenProps = {
   onOpenOrders?: () => void;
   onOpenTracking?: () => void;
   onOpenStore?: (storeId: string) => void;
+  onPromoClick?: (promoId: string) => void;
+  onPromoImpression?: (promoId: string) => void;
+  onVideoCtaClick?: (itemId: string) => void;
+  onVideoImpression?: (itemId: string) => void;
   onOpenSheinInfo?: () => void;
   sheinInlineVisible?: boolean;
   onCloseSheinInline?: () => void;
@@ -450,6 +454,10 @@ export function DshHomeGetScreen({
   onOpenNotifications,
   onOpenService,
   onOpenStore,
+  onPromoClick,
+  onPromoImpression,
+  onVideoCtaClick,
+  onVideoImpression,
   onOpenSheinInfo,
   approvedVideoShorts = [],
   sheinInlineVisible = false,
@@ -477,6 +485,7 @@ export function DshHomeGetScreen({
   const [followToggles, setFollowToggles] = React.useState<Record<string, boolean>>({});
   const [followCounts, setFollowCounts] = React.useState<Record<string, number>>({});
   const [shortsVisible, setShortsVisible] = React.useState(false);
+  const promoImpressionIdsRef = React.useRef<Set<string>>(new Set());
   const [currentTime, setCurrentTime] = React.useState(() => new Date());
   const [inlineSearchVisible, setInlineSearchVisible] = React.useState(false);
   const [inlineSearchQuery, setInlineSearchQuery] = React.useState('');
@@ -653,6 +662,10 @@ export function DshHomeGetScreen({
 
   const resolveBannerPress = React.useCallback(
     (promo: DshHomeGetPromo) => () => {
+      if (promo.id) {
+        onPromoClick?.(promo.id);
+      }
+
       if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
         const nextHomeContext = resolveHomeCategoryContext(promo.actionTarget);
 
@@ -733,7 +746,7 @@ export function DshHomeGetScreen({
 
       onOpenDiscovery?.();
     },
-    [onOpenBenefits, onOpenDiscovery, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, resolveHomeCategoryContext]
+    [onOpenBenefits, onOpenDiscovery, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onPromoClick, resolveHomeCategoryContext]
   );
 
   const activePromo = resolvedPromos[activePromoIndex % resolvedPromos.length] ?? null;
@@ -741,8 +754,22 @@ export function DshHomeGetScreen({
   const promoTail = activePromo ? activePromo.subtitle.replace(promoDiscount, '').trim() : '';
   const tickerAction = activePromo ? resolveBannerPress(activePromo) : undefined;
 
+  React.useEffect(() => {
+    if (!activePromo?.id || !onPromoImpression) {
+      return;
+    }
+
+    if (promoImpressionIdsRef.current.has(activePromo.id)) {
+      return;
+    }
+
+    promoImpressionIdsRef.current.add(activePromo.id);
+    onPromoImpression(activePromo.id);
+  }, [activePromo?.id, onPromoImpression, resolvedPromos.length]);
+
   const resolveVideoCtaPress = React.useCallback(
     (item: MarketingGrowthRecord) => {
+      onVideoCtaClick?.(item.id);
       setShortsVisible(false);
 
       if (item.routeTarget === 'main_category' || item.routeTarget === 'sub_category') {
@@ -825,7 +852,7 @@ export function DshHomeGetScreen({
 
       onOpenList?.();
     },
-    [onOpenBenefits, onOpenCart, onOpenDiscovery, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, resolveHomeCategoryContext]
+    [onOpenBenefits, onOpenCart, onOpenDiscovery, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onVideoCtaClick, resolveHomeCategoryContext]
   );
 
   const approvedVideoReels = approvedVideoShorts.length > 0 ? approvedVideoShorts : [];
@@ -1370,6 +1397,7 @@ export function DshHomeGetScreen({
               initialIndex: 0,
               onClose: () => setShortsVisible(false),
               onCtaPress: resolveVideoCtaPress,
+              onItemImpression: (item) => onVideoImpression?.(item.id),
             }) ?? (
               <DshHomeApprovedVideoReelsViewer
                 visible={shortsVisible}
@@ -1377,6 +1405,7 @@ export function DshHomeGetScreen({
                 initialIndex={0}
                 onClose={() => setShortsVisible(false)}
                 onCtaPress={resolveVideoCtaPress}
+                onItemImpression={(item) => onVideoImpression?.(item.id)}
               />
             ))
           : null}

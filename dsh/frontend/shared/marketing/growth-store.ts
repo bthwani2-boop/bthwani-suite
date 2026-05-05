@@ -268,6 +268,7 @@ export function getMarketingGrowthKpis() {
     pendingMarketing: pendingMarketing.length,
     subscriptions: live.filter((item) => item.family === 'subscription').length,
     promotions: live.filter((item) => item.family === 'promotion' || item.family === 'campaign').length,
+    impressions: live.reduce((sum, item) => sum + item.impressions, 0),
     clicks: live.reduce((sum, item) => sum + item.clicks, 0),
   };
 }
@@ -384,6 +385,38 @@ export function duplicateMarketingGrowthItem(id: string) {
     title: `${source.title} — نسخة`,
     status: 'draft',
   });
+}
+
+export function recordMarketingGrowthClick(id: string) {
+  const current = getMarketingGrowthItems();
+  const next = current.map((item) => {
+    if (item.id !== id) {
+      return item;
+    }
+
+    return {
+      ...item,
+      clicks: item.clicks + 1,
+    } satisfies MarketingGrowthRecord;
+  });
+
+  setMutableStore(next);
+}
+
+export function recordMarketingGrowthImpression(id: string) {
+  const current = getMarketingGrowthItems();
+  const next = current.map((item) => {
+    if (item.id !== id) {
+      return item;
+    }
+
+    return {
+      ...item,
+      impressions: item.impressions + 1,
+    } satisfies MarketingGrowthRecord;
+  });
+
+  setMutableStore(next);
 }
 
 export function removeMarketingGrowthItem(id: string) {

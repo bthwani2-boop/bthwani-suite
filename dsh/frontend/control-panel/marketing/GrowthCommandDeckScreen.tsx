@@ -223,7 +223,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
         nextAction={selected ? (selected.status === 'published' ? 'Pause or duplicate the active item' : selected.status === 'pending-marketing' ? 'Approve for release' : 'Send to review') : 'Open the active growth item'}
         blockers={selected ? selected.highlight || 'No blocker text provided' : 'No active growth item selected.'}
         ownerSurface="marketing"
-        evidenceHint={selected ? `${selected.family} · ${selected.routeTarget} · ${selected.source}` : 'growth queue proof'}
+        evidenceHint={selected ? `${selected.family} · ${selected.routeTarget} · ${selected.source} · ${selected.impressions} ظهور · ${selected.clicks} نقرات` : 'growth queue proof'}
         routeHint={selected ? selected.routeTarget : 'home'}
         decisionTone={selected?.status === 'published' ? 'best' : 'warning'}
       />
@@ -242,6 +242,8 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
             { label: 'بانتظار الموافقة', value: kpis.pendingMarketing, color: '#f59e0b' },
             { label: 'اشتراكات', value: kpis.subscriptions, color: '#dc2626' },
             { label: 'حملات وبرومو', value: kpis.promotions, color: '#8b5cf6' },
+            { label: 'الظهور', value: kpis.impressions, color: '#7c3aed' },
+            { label: 'النقرات', value: kpis.clicks, color: '#0f766e' },
           ].map((entry) => (
             <View key={entry.label} style={styles.kpiCard}>
               <Text role="caption" tone="muted">{entry.label}</Text>
@@ -309,6 +311,10 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
                       {routeTargetLabel(item.routeTarget)}
                       {' · '}
                       {audienceLabel(item.audience)}
+                    </Text>
+
+                    <Text role="caption" tone="muted">
+                      {item.impressions} ظهور {' · '} {item.clicks} نقرات
                     </Text>
 
                     <View style={[styles.actionsRow, isRtl && styles.rowReverse]}>

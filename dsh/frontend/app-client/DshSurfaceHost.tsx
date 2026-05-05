@@ -27,8 +27,17 @@ import {
   dshDiscoveryStores,
   storeItemsByStoreId,
 } from './stores/fixtures';
-import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../shared/marketing/banner-store';
-import { getLiveMarketingGrowthItems, type MarketingGrowthRecord } from '../shared/marketing/growth-store';
+import {
+  getPublishedMarketingHomePromos,
+  recordMarketingBannerClick,
+  recordMarketingBannerImpression,
+} from '../shared/marketing/banner-store';
+import {
+  getLiveMarketingGrowthItems,
+  recordMarketingGrowthClick,
+  recordMarketingGrowthImpression,
+  type MarketingGrowthRecord,
+} from '../shared/marketing/growth-store';
 import { getDshClientStateMeta, type DshClientState } from './shared/dshClientStateModel';
 // checkout/tracking screens consolidated into checkout/screens
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './categories/fixtures/dshCategoriesFixtures';
@@ -1299,6 +1308,10 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
       onOpenSearch={() => setRoute('search')}
       onOpenOrders={() => setRoute('orders-list')}
       onOpenTracking={() => openTrackedOrder()}
+      onPromoClick={recordMarketingBannerClick}
+      onPromoImpression={recordMarketingBannerImpression}
+      onVideoCtaClick={recordMarketingGrowthClick}
+      onVideoImpression={recordMarketingGrowthImpression}
       onOpenSheinInfo={() => {
         setSheinInlineOpen(true);
         setRoute('home');

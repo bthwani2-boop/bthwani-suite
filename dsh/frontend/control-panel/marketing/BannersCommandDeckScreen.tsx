@@ -17,7 +17,7 @@ import {
   type MarketingBannerAudience,
   type MarketingBannerRecord,
   type MarketingBannerStatus,
-} from './banner-store';
+} from '../../shared/marketing/banner-store';
 
 export type BannersCommandDeckScreenProps = {
   hubHref?: string;
@@ -196,7 +196,7 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
         nextAction={selected ? (selected.status === 'published' ? 'Pause the banner or duplicate it' : 'Publish the selected banner') : 'Open the selected banner'}
         blockers={selected ? selected.subtitle || 'No blocker text provided' : 'No banner selected.'}
         ownerSurface="marketing"
-        evidenceHint={selected ? `${selected.audience} · ${selected.actionType} · ${selected.position}` : 'banner readiness proof'}
+        evidenceHint={selected ? `${selected.audience} · ${selected.actionType} · ${selected.position} · ${selected.impressions} ظهور · ${selected.clicks} نقرات` : 'banner readiness proof'}
         routeHint={selected?.actionTarget ?? 'DshStoresList'}
         decisionTone={selected?.status === 'published' ? 'best' : 'warning'}
       />
@@ -213,6 +213,7 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
             { label: 'إجمالي البنرات', value: kpis.total, color: '#2563eb' },
             { label: 'حي الآن', value: kpis.live, color: '#16a34a' },
             { label: 'مسودات', value: kpis.drafts, color: '#f97316' },
+            { label: 'الظهور', value: kpis.impressions, color: '#7c3aed' },
             { label: 'النقرات', value: kpis.clicks, color: '#dc2626' },
           ].map((entry) => (
             <View key={entry.label} style={styles.kpiCard}>
@@ -285,6 +286,10 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
                       {bannerActionTypeLabel(item.actionType)}
                       {' · '}
                       {bannerTargetLabel(item.actionTarget)}
+                    </Text>
+
+                    <Text role="caption" tone="muted">
+                      {item.impressions} ظهور {' · '} {item.clicks} نقرات
                     </Text>
 
                     <View style={[styles.actionsRow, isRtl && styles.rowReverse]}>

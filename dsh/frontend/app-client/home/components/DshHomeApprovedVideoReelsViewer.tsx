@@ -12,6 +12,7 @@ export type DshHomeApprovedVideoReelsViewerProps = {
   initialIndex?: number;
   onClose: () => void;
   onCtaPress: (item: MarketingGrowthRecord) => void;
+  onItemImpression?: (item: MarketingGrowthRecord) => void;
 };
 
 function resolveMediaUri(uri?: string) {
@@ -69,13 +70,24 @@ export function DshHomeApprovedVideoReelsViewer({
   initialIndex = 0,
   onClose,
   onCtaPress,
+  onItemImpression,
 }: DshHomeApprovedVideoReelsViewerProps) {
   const { height } = useWindowDimensions();
   const safeIndex = clampIndex(initialIndex, items.length);
   const listRef = React.useRef<FlatList<MarketingGrowthRecord>>(null);
+  const impressedIdsRef = React.useRef<Set<string>>(new Set());
+  const onItemImpressionRef = React.useRef(onItemImpression);
   const [activeIndex, setActiveIndex] = React.useState(safeIndex);
   const expoAv = React.useMemo(() => resolveExpoAv(), []);
   const ExpoVideo = expoAv?.Video;
+
+  React.useEffect(() => {
+    onItemImpressionRef.current = onItemImpression;
+  }, [onItemImpression]);
+
+  React.useEffect(() => {
+    impressedIdsRef.current.clear();
+  }, [visible]);
 
   React.useEffect(() => {
     if (!visible) {
@@ -95,12 +107,20 @@ export function DshHomeApprovedVideoReelsViewer({
 
   const viewabilityConfig = React.useMemo(() => ({ itemVisiblePercentThreshold: 80 }), []);
 
-  const handleViewableItemsChanged = React.useRef(({ viewableItems }: { viewableItems: Array<{ index: number | null }> }) => {
+  const handleViewableItemsChanged = React.useRef(({ viewableItems }: { viewableItems: Array<{ index: number | null; item?: MarketingGrowthRecord }> }) => {
     const nextIndex = viewableItems[0]?.index;
+    const nextItem = viewableItems[0]?.item;
 
     if (typeof nextIndex === 'number') {
       setActiveIndex(nextIndex);
     }
+
+    if (!nextItem || impressedIdsRef.current.has(nextItem.id)) {
+      return;
+    }
+
+    impressedIdsRef.current.add(nextItem.id);
+    onItemImpressionRef.current?.(nextItem);
   }).current;
 
   if (!visible) {
