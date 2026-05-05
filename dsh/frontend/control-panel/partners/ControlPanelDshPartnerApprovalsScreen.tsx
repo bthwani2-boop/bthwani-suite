@@ -3,8 +3,9 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Text } from '@bthwani/ui-kit';
-import { WebMissionHeroCard, WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
+import { WebControlDisclosureItem, WebMissionHeroCard, WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
 import { ControlPanelDshDecisionBoard } from '../shared';
+import { DshPartnerPromotionEligibilityScreen } from './DshPartnerPromotionEligibilityScreen';
 import { dshPartnerApprovalLanes, dshPartnerIntakeItems, dshPartnerIntakeMetrics, type DshPartnerIntakeItem, type DshPartnerIntakeQueue } from './workflow';
 import styles from '../operations/dsh-surface.module.css';
 
@@ -41,6 +42,136 @@ function resolveSecondaryActionLabel(queue: DshPartnerIntakeQueue) {
   if (queue === 'offer-approval') return 'افتح الكتالوج';
   if (queue === 'partner-review') return 'افتح التسويق';
   return 'العودة للعمليات';
+}
+
+type PartnerSurfaceLane = {
+  id: string;
+  title: string;
+  sourceLabel: string;
+  reviewLabel: string;
+  downstreamLabel: string;
+  downstreamHref: string;
+  description: string;
+  badgeLabel: string;
+};
+
+const partnerSurfaceLanes: readonly PartnerSurfaceLane[] = [
+  {
+    id: 'partner-entry',
+    title: 'مدخل الشريك والوثائق',
+    sourceLabel: 'app-partner entry + doc-upload + intake-start + store-nomination + video-upload',
+    reviewLabel: 'يمر أولًا عبر partners لالتقاط الطلب والملف قبل أي اعتماد لاحق.',
+    downstreamLabel: 'العمليات',
+    downstreamHref: '/operations',
+    description: 'كل مسار إدخال أو ملف هوية أو فيديو أو ترشيح متجر يدخل من هنا قبل أن يُفكك إلى قرار تشغيلي.',
+    badgeLabel: 'Onboarding',
+  },
+  {
+    id: 'partner-orders',
+    title: 'الطلبات والتسليم',
+    sourceLabel: 'app-partner orders + order-chat + order-alerts + order-sla-risk',
+    reviewLabel: 'شركاء يتحكمون في قبول الطلبات وتغيير الحالة قبل تمريرها للسطح التشغيلي.',
+    downstreamLabel: 'العمليات',
+    downstreamHref: '/operations',
+    description: 'الطلبات، الحوارات، والتنبيهات لا تخرج مباشرة من التطبيق إلى السطح النهائي؛ يجب أن تمر عبر لوحة الشركاء أولًا.',
+    badgeLabel: 'Orders',
+  },
+  {
+    id: 'partner-operations',
+    title: 'العمليات والفريق',
+    sourceLabel: 'app-partner operations + profile + type-switch',
+    reviewLabel: 'تثبيت حالة المتجر، الفريق، ومناطق التغطية قبل تفعيل أي تغيير تشغيلي.',
+    downstreamLabel: 'العمليات',
+    downstreamHref: '/operations',
+    description: 'الملف التشغيلي، التغطية، والحالة التشغيلية تُراجع هنا ثم تنطلق إلى سطح التشغيل المناسب.',
+    badgeLabel: 'Operations',
+  },
+  {
+    id: 'partner-inventory',
+    title: 'المخزون والكتالوج',
+    sourceLabel: 'app-partner inventory + items-upsert + inventory-adjust + inventory-update',
+    reviewLabel: 'أي إضافة أو تعديل في المخزون يمر من partners قبل الكتالوج النهائي.',
+    downstreamLabel: 'الكتالوجات',
+    downstreamHref: '/catalogs',
+    description: 'تحديثات المخزون والمنتجات لا تُعامل كحقيقة نهائية حتى تعبر هذه البوابة.',
+    badgeLabel: 'Catalog',
+  },
+  {
+    id: 'partner-finance',
+    title: 'المحفظة والتسويات',
+    sourceLabel: 'app-partner wallet + partner-finance-bridge + partner-settlement-summary + partner-commission-summary',
+    reviewLabel: 'كل حركة مالية أو تسوية تمر هنا قبل أن تُعرض في المسار المالي المعني.',
+    downstreamLabel: 'المالية',
+    downstreamHref: '/finance',
+    description: 'المستحقات، التسويات، والعمولات تُراجع داخل partners ثم تنتقل للمركز المالي.',
+    badgeLabel: 'Finance',
+  },
+  {
+    id: 'partner-growth',
+    title: 'النمو والتسويق',
+    sourceLabel: 'app-partner analytics + promotion intent + featured requests',
+    reviewLabel: 'العرض أو البانر أو النية الترويجية لا تُرسل مباشرة للتسويق دون أهلية.',
+    downstreamLabel: 'التسويق',
+    downstreamHref: '/marketing',
+    description: 'العروض والظهور والعناصر القابلة للترويج تمر هنا أولًا ثم تتجه إلى التسويق عند الجاهزية.',
+    badgeLabel: 'Marketing',
+  },
+  {
+    id: 'partner-settings',
+    title: 'الإعدادات وتبديل النوع',
+    sourceLabel: 'app-partner settings + notifications + language + service-type switch',
+    reviewLabel: 'الإعدادات والسلوك التشغيلي تُراجع هنا قبل فتح السطح الإداري أو التقني.',
+    downstreamLabel: 'المنصة',
+    downstreamHref: '/platform',
+    description: 'تغييرات التفضيلات والتنبيهات ونوع الخدمة تبقى داخل partners حتى تُوجَّه للمنصة المعنية.',
+    badgeLabel: 'Settings',
+  },
+  {
+    id: 'partner-support',
+    title: 'الإشارات والاعتراضات',
+    sourceLabel: 'order-issue-queue + support handoff + exceptions',
+    reviewLabel: 'أي طلب أو مشكلة تخرج من الشريك يجب أن تُؤرخ هنا قبل التصعيد.',
+    downstreamLabel: 'الدعم',
+    downstreamHref: '/support',
+    description: 'الاعتراضات والتنبيهات ومشاكل الطلبات لا تنتقل مباشرة للدعم دون مرور partners كمرجع قرار.',
+    badgeLabel: 'Support',
+  },
+] as const;
+
+function PartnerSurfaceLaneCard({
+  lane,
+  hubHref,
+  onOpenDownstream,
+}: {
+  lane: PartnerSurfaceLane;
+  hubHref: string;
+  onOpenDownstream: (href: string) => void;
+}) {
+  return (
+    <WebSectionCard title={lane.title} description={lane.description}>
+      <Box gap={3}>
+        <Text role="bodySm" tone="muted">
+          {lane.sourceLabel}
+        </Text>
+        <Text role="bodySm">
+          {lane.reviewLabel}
+        </Text>
+
+        <WebControlDisclosureItem
+          id={lane.id}
+          label="المرور الحاكم"
+          description={lane.reviewLabel}
+          badge={lane.badgeLabel}
+          onAction={() => onOpenDownstream(lane.downstreamHref)}
+        />
+
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          <Button label={`افتح ${lane.downstreamLabel}`} tone="secondary" fullWidth={false} onPress={() => onOpenDownstream(lane.downstreamHref)} />
+          <Button label="ابق في partners" tone="ghost" fullWidth={false} onPress={() => onOpenDownstream(hubHref)} />
+        </Box>
+      </Box>
+    </WebSectionCard>
+  );
 }
 
 function QueueCard({
@@ -185,6 +316,22 @@ export function ControlPanelDshPartnerApprovalsScreen({
         ))}
       </Box>
 
+      <WebSectionCard
+        title="بوابة مسارات app-partner"
+        description="كل ما يخرج من app-partner يمر من partners أولًا ثم ينتقل إلى السطح النهائي بعد قرار الحوكمة المناسب."
+      >
+        <Box gap={3}>
+          {partnerSurfaceLanes.map((lane) => (
+            <PartnerSurfaceLaneCard
+              key={lane.id}
+              lane={lane}
+              hubHref={hubHref}
+              onOpenDownstream={(href) => router.push(href)}
+            />
+          ))}
+        </Box>
+      </WebSectionCard>
+
       <WebSectionCard title="قائمة القرار" description="اختر queue واحدة فقط، ثم افتح العنصر المطلوب من نفس السياق دون تمرير طويل.">
         <Box gap={3}>
           <WebSegmentedTabs
@@ -252,6 +399,10 @@ export function ControlPanelDshPartnerApprovalsScreen({
             </Box>
           ))}
         </Box>
+      </WebSectionCard>
+
+      <WebSectionCard title="أهلية الترويج" description="أهلية الشريك والمتجر قبل تمرير أي عرض إلى التسويق أو البانر النهائي.">
+        <DshPartnerPromotionEligibilityScreen marketingHref={marketingHref} catalogHref={catalogHref} />
       </WebSectionCard>
 
       <WebSectionCard title="المسارات الحية" description="إبقاء العمليات والكتالوج والتسويق في نقرة واحدة دون تكرار CTA داخل كل بطاقة.">
