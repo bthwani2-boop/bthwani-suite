@@ -1,12 +1,6 @@
-# Check scripts location: ensure PowerShell scripts are created under tools/scripts
-# Usage:
-# - For PR checks: pass a file with changed paths (one per line) via -ChangedFilesPath
-#   pwsh -NoProfile -ExecutionPolicy Bypass -File tools/scripts/check-scripts-location.ps1 -ChangedFilesPath changed-files.txt
-# - For a full scan (warn-only): run without -ChangedFilesPath
-
 param(
     [string]$RepoRoot = ".",
-    [string]$AllowedRelative = "tools/scripts",
+    [string[]]$AllowedRelative = @("tools/scripts", "tools/guards"),
     [string]$ChangedFilesPath = ""
 )
 
@@ -14,44 +8,76 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $repoRootFull = (Resolve-Path $RepoRoot).Path
-$allowedRelativeNormalized = $AllowedRelative -replace '\\','/'
+
+function Normalize-RepoPath([string]$PathValue) {
+    return ($PathValue -replace '\\','/').TrimStart('/')
+}
+
+$allowedRoots = @($AllowedRelative | ForEach-Object { Normalize-RepoPath $_ })
+
+$legacyAllowedPatterns = @(
+    '^tools/(APPLY_AGENCY_SKILLS_PHASE1_SAFE_GUARDS|CHECK_AGENCY_AGENTS_DEEP_DIAGNOSIS_V2|generate-dsh-fixture-images)\.ps1$',
+    '^kdt/merge-run/.*/proposed/[^/]+\.ps1$'
+)
+
+function Test-IsAllowedPs1([string]$RelativePath) {
+    $normalized = Normalize-RepoPath $RelativePath
+
+    foreach ($root in $allowedRoots) {
+        if ($normalized -eq $root -or $normalized -like "$root/*") {
+            return $true
+        }
+    }
+
+    foreach ($pattern in $legacyAllowedPatterns) {
+        if ($normalized -match $pattern) {
+            return $true
+        }
+    }
+
+    return $false
+}
 
 $violations = @()
 
 if ($ChangedFilesPath -and (Test-Path $ChangedFilesPath)) {
-    $changed = Get-Content -Path $ChangedFilesPath -ErrorAction Stop | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" }
+    $changed = Get-Content -Path $ChangedFilesPath -ErrorAction Stop |
+        ForEach-Object { $_.Trim() } |
+        Where-Object { $_ -ne "" }
+
     foreach ($f in $changed) {
-        $fNormalized = $f -replace '\\','/'
-        if ($fNormalized -match '\.ps1$') {
-            if (-not ($fNormalized -like "$allowedRelativeNormalized/*")) {
-                $violations += (Join-Path $repoRootFull $f)
-            }
+        $fNormalized = Normalize-RepoPath $f
+        if ($fNormalized -match '\.ps1$' -and -not (Test-IsAllowedPs1 $fNormalized)) {
+            $violations += (Join-Path $repoRootFull $f)
         }
     }
 } else {
-    # Full scan (warn-only)
     $toolsDir = Join-Path $repoRootFull "tools"
     if (-not (Test-Path $toolsDir)) {
         Write-Host "No tools directory found at $toolsDir. Nothing to check."
         exit 0
     }
+
     $all = Get-ChildItem -Path $toolsDir -Recurse -File -Include *.ps1 -ErrorAction SilentlyContinue
     foreach ($it in $all) {
         $rel = $it.FullName.Substring($repoRootFull.Length).TrimStart('\','/')
-        $relNorm = $rel -replace '\\','/'
-        if (-not ($relNorm -like "$allowedRelativeNormalized/*")) {
+        $relNorm = Normalize-RepoPath $rel
+        if (-not (Test-IsAllowedPs1 $relNorm)) {
             $violations += $it.FullName
         }
     }
 }
 
 if ($violations.Count -gt 0) {
-    Write-Host "ERROR: Found PowerShell scripts outside ${AllowedRelative}:"
+    Write-Host "ERROR: Found PowerShell scripts outside allowed roots:"
     $violations | ForEach-Object { Write-Host " - $_" }
     Write-Host ""
-    Write-Host "To fix: move these scripts into $AllowedRelative or update the policy file tools/SCRIPTS_LOCATION_POLICY.md"
+    Write-Host "Allowed roots:"
+    $allowedRoots | ForEach-Object { Write-Host " - $_" }
+    Write-Host ""
+    Write-Host "To fix: move new scripts into tools/scripts or tools/guards, or update tools/SCRIPTS_LOCATION_POLICY.md and this guard intentionally."
     exit 1
-} else {
-    Write-Host "OK: no PS1 files outside $AllowedRelative found in checked set."
-    exit 0
 }
+
+Write-Host "OK: no disallowed PS1 files found in checked set."
+exit 0

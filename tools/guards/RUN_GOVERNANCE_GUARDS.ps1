@@ -83,9 +83,14 @@ foreach ($Guard in $Guards) {
     $Results += $Result
   } else {
     $StdOutText = if (Test-Path -LiteralPath $StdOut) { Get-Content -LiteralPath $StdOut -Raw } else { '' }
-    $WarnMatch = [regex]::Match($StdOutText, 'Warnings:\s*(\d+)')
-    $WarnCount = if ($WarnMatch.Success) { [int]$WarnMatch.Groups[1].Value } elseif ($StdOutText -match '\bWARN\b|PASS_WITH_WARNINGS') { 1 } else { 0 }
-    $Status = if ($Process.ExitCode -ne 0 -or $StdOutText -match '\bFAILED\b') {
+    if ($null -eq $StdOutText) { $StdOutText = '' }
+    $StdErrText = if (Test-Path -LiteralPath $StdErr) { Get-Content -LiteralPath $StdErr -Raw } else { '' }
+    if ($null -eq $StdErrText) { $StdErrText = '' }
+    $CombinedText = ($StdOutText + "`n" + $StdErrText)
+
+    $WarnMatch = [regex]::Match($CombinedText, 'Warnings:\s*(\d+)')
+    $WarnCount = if ($WarnMatch.Success) { [int]$WarnMatch.Groups[1].Value } elseif ($CombinedText -match '\bWARN\b|PASS_WITH_WARNINGS') { 1 } else { 0 }
+    $Status = if ($Process.ExitCode -ne 0 -or $CombinedText -match '\bFAILED\b') {
       'FAIL'
     } elseif ($WarnCount -gt 0) {
       'WARN'
@@ -99,7 +104,7 @@ foreach ($Guard in $Guards) {
       failCount = if ($Status -eq 'FAIL') { 1 } else { 0 }
       warnCount = $WarnCount
       infoCount = 0
-      error = if ($Status -eq 'FAIL') { if ($StdOutText) { $StdOutText.Trim() } else { "Guard did not produce JSON output. ExitCode=$($Process.ExitCode)" } } else { $null }
+      error = if ($Status -eq 'FAIL') { if ($CombinedText.Trim()) { $CombinedText.Trim() } else { "Guard did not produce JSON output. ExitCode=$($Process.ExitCode)" } } else { $null }
     }
   }
 }

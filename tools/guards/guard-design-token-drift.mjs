@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs, createReport, finalize, walkFiles, readText, rel, TEXT_EXTENSIONS, lineNumber, isProbablyGeneratedPath } from './lib/guard-utils.mjs';
 
@@ -6,7 +7,16 @@ const report = createReport('DESIGN-TOKEN-DRIFT', 'governance/08_UI_KIT_AND_BRAN
 const root = args.root;
 const files = walkFiles(root, { startDirs: ['apps', 'packages', 'services'], extensions: TEXT_EXTENSIONS });
 
-const foundationPath = path.join(root, 'packages/ui-kit/src/foundation.ts');
+const foundationCandidates = [
+  path.join(root, 'ui-kit/src/foundation.ts'),
+  path.join(root, 'packages/ui-kit/src/foundation.ts')
+];
+const foundationPath = foundationCandidates.find((candidate) => fs.existsSync(candidate));
+if (!foundationPath) {
+  report.fail('ui-kit/src/foundation.ts', 'Missing canonical ui-kit foundation token file.', 'checked ui-kit/src/foundation.ts and packages/ui-kit/src/foundation.ts');
+  finalize(report, args);
+  process.exit(1);
+}
 const normalizeHex = (value) => value.toUpperCase();
 const allowed = new Set([
   '#0A2F5C',
