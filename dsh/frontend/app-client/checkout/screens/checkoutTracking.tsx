@@ -205,6 +205,22 @@ function normalizeText(value: string) {
   return value.trim().toLowerCase();
 }
 
+function normalizeClientFacingOrderState(clientState: DshClientState): DshClientState {
+  if (
+    clientState === 'quote'
+    || clientState === 'serviceability'
+    || clientState === 'checkout_ready'
+    || clientState === 'payment_pending'
+    || clientState === 'payment_failed'
+    || clientState === 'item_unavailable'
+    || clientState === 'area_unserviceable'
+  ) {
+    return 'order_created';
+  }
+
+  return clientState;
+}
+
 function StageRail({ activeStepId, steps }: { activeStepId: string; steps: JourneyStep[] }) {
   const { theme } = useTheme();
   const activeIndex = Math.max(0, steps.findIndex((step) => step.id === activeStepId));
@@ -858,120 +874,33 @@ function renderCheckoutGate(
   onSecondaryAction?: () => void,
   onRetry?: () => void,
 ) {
-  const { theme } = useTheme();
-  const checkoutStateMeta = getDshClientStateMeta(clientState);
-  const paymentPendingMeta = getDshClientStateMeta('payment_pending');
-  const orderCreatedMeta = getDshClientStateMeta('order_created');
-  const walletVisibilityCopy = getClientWalletVisibilityCopy(checkoutStateMeta);
-  const serviceabilityQuote = buildDefaultServiceabilityQuote(clientState);
-  const addressSnapshot = buildDefaultAddressSnapshot(values);
-  const fulfillmentModeSnapshot = buildDefaultFulfillmentModeSnapshot(clientState);
-  const paymentVisibilityLabel = clientState === 'payment_failed'
-    ? 'متوقف حتى إصلاح الدفع'
-    : checkoutStateMeta.isException
-      ? 'متوقف حتى معالجة الاستثناء'
-      : clientState === 'payment_pending'
-        ? 'قيد المعالجة'
-        : 'جاهز للتقدم';
-  const gateCopy = {
-    title: checkoutStateMeta.title,
-    subtitle: checkoutStateMeta.description,
-    primaryActionLabel: 'متابعة إلى المراجعة',
-    secondaryActionLabel: 'العودة إلى الدعم',
-    sectionTitle: 'ما الذي يثبت الآن؟',
-    sectionSubtitle: 'تسلسل الجاهزية والدفع وإنشاء الطلب يبقى ظاهرًا داخل نفس المسار.',
-  };
+  const effectiveClientState = normalizeClientFacingOrderState(clientState);
+  const effectiveStateMeta = getDshClientStateMeta(effectiveClientState);
 
   return (
     <DshOperationScreen
       state={state}
-      title={gateCopy.title}
-      subtitle={gateCopy.subtitle}
-      primaryActionLabel={gateCopy.primaryActionLabel}
-      secondaryActionLabel={gateCopy.secondaryActionLabel}
+      title="هذه القدرة مدمجة داخل تأكيد الطلب"
+      subtitle="التسعير، فحص التغطية، وتفعيل الدفع لم تعد صفحات مستقلة. تظهر الآن داخل السلة أو كتأكيد طلب مختصر فقط."
+      primaryActionLabel={effectiveClientState === 'order_confirmed' ? 'فتح التتبع' : 'فتح تأكيد الطلب'}
+      secondaryActionLabel="العودة إلى العمليات"
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
       content={
-        <Box gap={3}>
-          <OperationalStatusHero
-            statusLabel={checkoutStateMeta.label}
-            statusTone={clientState === 'payment_pending' ? 'warning' : 'brand'}
-            title={gateCopy.title}
-            summary={gateCopy.subtitle}
-            routeLabel="المسار"
-            routeValue={screenId ?? 'checkout-gate'}
-            nextStepLabel="النتيجة المتوقعة"
-            nextStepValue={paymentPendingMeta.label}
-          />
-          <CompactStatusStepper
-            title="المسار المختصر"
-            subtitle="الجاهزية تسبق الدفع ثم ينتقل الطلب إلى الإنشاء المؤكد."
-            steps={[
-              { id: 'checkout-ready', title: checkoutStateMeta.label, state: 'current' as const },
-              { id: 'payment-pending', title: paymentPendingMeta.label, state: 'next' as const },
-              { id: 'order-created', title: orderCreatedMeta.label, state: 'next' as const },
-            ]}
-          />
-          <KeyValueDetails
-            title={gateCopy.sectionTitle}
-            subtitle={gateCopy.sectionSubtitle}
+        <Surface tone="inset" gap={2}>
+          <Text role="bodyStrong">{screenId ?? 'checkout-gate'}</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            أي دخول مباشر إلى هذه القدرة يعاد تفسيره كجزء مدمج من السلة أو من شاشة إنشاء الطلب القانونية.
+          </Text>
+          <KeyValueList
             items={[
-              { label: 'المسار', value: screenId ?? 'checkout-gate', tone: 'brand' },
-              { label: 'المرحلة الحالية', value: checkoutStateMeta.label, tone: 'brand' },
-              { label: 'المرحلة التالية', value: paymentPendingMeta.label },
-              { label: 'النتيجة المتوقعة', value: orderCreatedMeta.label, tone: 'success' },
+              { label: 'الحالة المعروضة', value: effectiveStateMeta.label, tone: 'brand' },
+              { label: 'المسار القانوني', value: effectiveClientState === 'order_confirmed' ? 'tracking' : 'cart-get' },
+              { label: 'النتيجة', value: effectiveClientState === 'order_confirmed' ? 'الانتقال إلى التتبع' : 'العودة إلى تأكيد الطلب' },
             ]}
           />
-          <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
-            <SectionHeader title="التسعير وقابلية التوصيل" subtitle="يعرض ما إذا كان العنوان مغطى، والمتجر مفتوحًا، والعناصر قابلة للتنفيذ قبل الدفع." />
-            <KeyValueList
-              items={[
-                { label: 'صحة العنوان', value: serviceabilityQuote.address_valid ? 'صحيح' : 'يحتاج مراجعة', tone: serviceabilityQuote.address_valid ? 'success' : 'warning' },
-                { label: 'داخل التغطية', value: serviceabilityQuote.inside_coverage ? 'نعم' : 'لا', tone: serviceabilityQuote.inside_coverage ? 'success' : 'warning' },
-                { label: 'حالة المتجر', value: serviceabilityQuote.store_open ? 'مفتوح' : 'مغلق' },
-                { label: 'توفر العناصر', value: serviceabilityQuote.items_available ? 'متوفرة' : 'غير متوفرة' },
-                { label: 'رسوم التوصيل', value: `${serviceabilityQuote.delivery_fee} ر.ي` },
-                { label: 'انتهاء العرض', value: serviceabilityQuote.quote_expires_at ?? 'غير محدد' },
-              ]}
-            />
-            {serviceabilityQuote.unavailable_reason ? (
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                سبب التعذر الحالي: {formatExceptionReason(serviceabilityQuote.unavailable_reason)}
-                {serviceabilityQuote.fallback_fulfillment_method ? ` · البديل المقترح: ${formatFulfillmentMode(serviceabilityQuote.fallback_fulfillment_method)}` : ''}
-              </Text>
-            ) : null}
-          </Surface>
-          <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
-            <SectionHeader title="العنوان والدفع" subtitle="العنوان النهائي، نافذة التنفيذ، ووضع تفعيل الدفع تبقى ظاهرة في نفس الشاشة." />
-            <KeyValueList
-              items={[
-                { label: 'عنوان التسليم', value: addressSnapshot.address_label, tone: 'brand' },
-                { label: 'الوصف المرجعي', value: addressSnapshot.reverse_lookup_label ?? 'غير متوفر' },
-                { label: 'وضع التنفيذ', value: formatFulfillmentMode(fulfillmentModeSnapshot.mode) },
-                { label: 'السعة الحالية', value: formatCapacityState(fulfillmentModeSnapshot.capacity_state) },
-                { label: 'تفعيل الدفع', value: paymentVisibilityLabel, tone: checkoutStateMeta.isException ? 'warning' : clientState === 'payment_pending' ? 'warning' : 'success' },
-                { label: 'ملاحظات العميل', value: addressSnapshot.delivery_notes ?? 'لا توجد ملاحظات' },
-              ]}
-            />
-          </Surface>
-          {checkoutStateMeta.isException ? (
-            <Surface tone="inset" gap={1} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
-              <Text role="bodyStrong" style={{ textAlign: 'right' }}>متابعة الدعم</Text>
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                هذه الحالة تتطلب متابعة دعم واضحة قبل استكمال أي خطوة لاحقة داخل هذا المسار.
-              </Text>
-            </Surface>
-          ) : null}
-          {walletVisibilityCopy ? (
-            <Surface tone="inset" gap={1} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
-              <Text role="bodyStrong" style={{ textAlign: 'right' }}>{walletVisibilityCopy.title}</Text>
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                {walletVisibilityCopy.description}
-              </Text>
-            </Surface>
-          ) : null}
-        </Box>
+        </Surface>
       }
     />
   );
@@ -999,6 +928,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const [draftMessage, setDraftMessage] = React.useState('');
   const [draftAttachments, setDraftAttachments] = React.useState<OrderChatAttachmentKind[]>([]);
   const [actionBarHeight, setActionBarHeight] = React.useState(0);
+  const effectiveClientState = normalizeClientFacingOrderState(clientState);
   const [lastChatMessage, setLastChatMessage] = React.useState<OrderChatMessage>({
     id: 'chat-captain-1',
     senderLabel: 'الكابتن المكلّف',
@@ -1008,13 +938,14 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     align: 'start',
     attachments: ['camera', 'video', 'voice'],
   });
-  const clientStateMeta = getDshClientStateMeta(clientState);
+  const clientStateMeta = getDshClientStateMeta(effectiveClientState);
   const paymentPendingMeta = getDshClientStateMeta('payment_pending');
   const orderCreatedMeta = getDshClientStateMeta('order_created');
   const orderConfirmedMeta = getDshClientStateMeta('order_confirmed');
-  const isDeliveredState = clientState === 'delivered';
-  const isTrackingJourneyState = clientState === 'tracking_active' || isDeliveredState;
-  const isCheckoutSequenceState = !isTrackingJourneyState;
+  const isDeliveredState = effectiveClientState === 'delivered';
+  const isTrackingJourneyState = effectiveClientState === 'tracking_active' || isDeliveredState;
+  const isOrderCreationState = effectiveClientState === 'order_created' || effectiveClientState === 'order_confirmed';
+  const isCheckoutSequenceState = !isTrackingJourneyState && !isOrderCreationState;
   const note = normalizeText(values.note).length ? values.note : 'لا توجد ملاحظات';
   const phaseIndex = phase === 'route' ? 0 : phase === 'arrived' ? 1 : 2;
   const deliveryStatusLabel = isTrackingJourneyState
@@ -1060,10 +991,8 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         state: index < phaseIndex ? 'done' : index === phaseIndex ? 'current' : 'next',
       }))
     : [
-        { id: 'checkout-ready', title: clientStateMeta.label, state: 'current' as const },
-        { id: 'payment-pending', title: paymentPendingMeta.label, state: 'next' as const },
-        { id: 'order-created', title: orderCreatedMeta.label, state: 'next' as const },
-        { id: 'order-confirmed', title: orderConfirmedMeta.label, state: 'next' as const },
+        { id: 'order-created', title: orderCreatedMeta.label, state: effectiveClientState === 'order_created' ? 'current' as const : 'done' as const },
+        { id: 'order-confirmed', title: orderConfirmedMeta.label, state: effectiveClientState === 'order_confirmed' ? 'current' as const : 'next' as const },
       ];
   const nextStepValue = isTrackingJourneyState
     ? phase === 'route'
@@ -1075,37 +1004,22 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           : onSupport || onNextAction
             ? 'اختر التقييمين ثم أرسل، أو استخدم الدعم والإجراء التالي المتاح.'
             : 'اختر التقييمين ثم أرسل.'
-    : clientState === 'quote'
-      ? 'فحص قابلية التوصيل ثم تثبيت الجاهزية النهائية.'
-      : clientState === 'serviceability'
-        ? 'تثبيت العنوان ثم فتح الدفع الجاهز.'
-    : clientState === 'checkout_ready'
-      ? `${paymentPendingMeta.label} ثم ${orderCreatedMeta.label}`
-      : clientState === 'payment_pending'
-        ? orderCreatedMeta.label
-        : clientState === 'payment_failed'
-          ? 'أعد محاولة الدفع أو اختر مسار دعم واضح.'
-          : clientState === 'item_unavailable'
-            ? 'عدّل السلة أو استخدم البديل المقترح قبل الدفع.'
-        : clientState === 'order_created'
-          ? orderConfirmedMeta.label
-          : clientState === 'order_confirmed'
-            ? 'افتح صفحة التتبع لمتابعة التنفيذ.'
-            : clientStateMeta.description;
+    : isOrderCreationState
+      ? effectiveClientState === 'order_created'
+        ? orderConfirmedMeta.label
+        : 'افتح صفحة التتبع لمتابعة التنفيذ.'
+    : clientStateMeta.description;
   const hasClientReceived = phase === 'received';
   const canSubmitRatings = hasClientReceived && productRating > 0 && captainRating > 0;
   const productRatingLabel = productRating > 0 ? `${productRating}/5` : 'غير محدد';
   const captainRatingLabel = captainRating > 0 ? `${captainRating}/5` : 'غير محدد';
   const compactSteps = journeySteps as Array<{ id: string; title: string; state: 'done' | 'current' | 'next' }>;
-  const serviceabilityQuote = React.useMemo(() => buildDefaultServiceabilityQuote(clientState), [clientState]);
-  const addressSnapshot = React.useMemo(() => buildDefaultAddressSnapshot(values), [values]);
-  const fulfillmentModeSnapshot = React.useMemo(() => buildDefaultFulfillmentModeSnapshot(clientState), [clientState]);
-  const lifecycleStatus = React.useMemo(() => buildDefaultLifecycleStatus(clientState, phase), [clientState, phase]);
-  const eventTimeline = React.useMemo(() => buildDefaultEventTimeline(clientState, timeline, phase), [clientState, timeline, phase]);
-  const proofVisibility = React.useMemo(() => buildDefaultProofOfDelivery(clientState, phase), [clientState, phase]);
+  const lifecycleStatus = React.useMemo(() => buildDefaultLifecycleStatus(effectiveClientState, phase), [effectiveClientState, phase]);
+  const eventTimeline = React.useMemo(() => buildDefaultEventTimeline(effectiveClientState, timeline, phase), [effectiveClientState, timeline, phase]);
+  const proofVisibility = React.useMemo(() => buildDefaultProofOfDelivery(effectiveClientState, phase), [effectiveClientState, phase]);
   const handoffVerification = React.useMemo(() => buildDefaultHandoffVerification(), []);
-  const walletImpactVisibility = React.useMemo(() => buildDefaultWalletImpact(clientState), [clientState]);
-  const exceptionReason = React.useMemo(() => getDefaultExceptionReason(clientState), [clientState]);
+  const walletImpactVisibility = React.useMemo(() => buildDefaultWalletImpact(effectiveClientState), [effectiveClientState]);
+  const exceptionReason = React.useMemo(() => getDefaultExceptionReason(effectiveClientState), [effectiveClientState]);
   const orderDetailsItems = [
     { label: 'عنوان الاستلام', value: values.pickupAddress || 'غير محدد', tone: 'brand' as const },
     { label: 'عنوان التسليم', value: values.dropoffAddress || 'غير محدد' },
@@ -1139,24 +1053,10 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     };
   });
 
-  const primaryActionLabel = isCheckoutSequenceState
-    ? clientState === 'quote'
-      ? 'متابعة فحص التغطية'
-      : clientState === 'serviceability'
-        ? 'تثبيت العنوان'
-      : clientState === 'checkout_ready'
-      ? 'متابعة الدفع'
-      : clientState === 'payment_pending'
-        ? 'تأكيد إنشاء الطلب'
-        : clientState === 'payment_failed'
-          ? 'إعادة محاولة الدفع'
-          : clientState === 'item_unavailable'
-            ? 'مراجعة البدائل'
-        : clientState === 'order_created'
-          ? 'عرض نجاح الطلب'
-          : clientState === 'order_confirmed'
-            ? 'فتح التتبع'
-            : 'متابعة'
+  const primaryActionLabel = isOrderCreationState
+      ? effectiveClientState === 'order_created'
+        ? 'عرض نجاح الطلب'
+        : 'فتح التتبع'
     : phase === 'route'
       ? 'وصل الطلب للعميل'
       : phase === 'arrived'
@@ -1164,7 +1064,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         : ratingsSubmitted
           ? 'تم إرسال التقييمين'
           : 'إرسال التقييمين';
-  const primaryActionDisabled = isCheckoutSequenceState ? false : phase === 'received' && (!canSubmitRatings || ratingsSubmitted);
+  const primaryActionDisabled = isOrderCreationState ? false : phase === 'received' && (!canSubmitRatings || ratingsSubmitted);
   const productHelperText = phase === 'route'
     ? 'سيظهر تقييم المنتج بعد الاستلام.'
     : phase === 'arrived'
@@ -1179,24 +1079,10 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     : ratingsSubmitted
       ? 'تم إرسال التقييمين. يمكنك تعديل الكابتن ثم إعادة الإرسال.'
       : 'اختر تقييم الكابتن من 1 إلى 5 ثم أرسل التقييمين بالأسفل.';
-  const stickyNote = isCheckoutSequenceState
-    ? clientState === 'quote'
-      ? 'يتم تثبيت التسعير أولًا ثم التحقق من العنوان قبل إظهار خطوة الدفع.'
-      : clientState === 'serviceability'
-        ? 'العنوان قيد التحقق. بعد اعتماده تُفتح الجاهزية النهائية للدفع.'
-      : clientState === 'checkout_ready'
-      ? 'راجع تفاصيل الطلب ثم تابع إلى خطوة الدفع التالية.'
-      : clientState === 'payment_pending'
-        ? 'الدفع قيد المعالجة. الإجراء الرئيسي ينقل الطلب إلى حالة الإنشاء المؤكد.'
-        : clientState === 'payment_failed'
-          ? 'يوجد تعذر في الدفع. يمكنك إعادة المحاولة من نفس الشاشة أو استخدام الدعم.'
-          : clientState === 'item_unavailable'
-            ? 'بعض العناصر غير متاحة الآن. راجع البدائل قبل متابعة الدفع.'
-        : clientState === 'order_created'
-          ? 'تم إنشاء الطلب. الإجراء الرئيسي يعرض حالة النجاح قبل فتح التتبع.'
-          : clientState === 'order_confirmed'
-            ? 'تم تأكيد الطلب. الإجراء الرئيسي يفتح التتبع بالحالة المناسبة.'
-            : clientStateMeta.description
+  const stickyNote = isOrderCreationState
+      ? effectiveClientState === 'order_created'
+        ? 'تم إنشاء الطلب. هذه الشاشة مختصرة للتأكيد قبل النجاح ثم التتبع.'
+        : 'تم تأكيد الطلب. الإجراء الرئيسي ينقلك إلى التتبع مباشرة.'
     : phase === 'route'
       ? 'يمكنك تثبيت الوصول من الزر الرئيسي عند وصول الطلب.'
       : phase === 'arrived'
@@ -1204,12 +1090,12 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         : ratingsSubmitted
           ? 'تم حفظ التقييمين ولا توجد خطوة إضافية مطلوبة.'
           : 'لن يتفعّل الإرسال حتى تختار تقييم المنتج والكابتن.';
-  const arrivalBellSummary = !isCheckoutSequenceState && phase !== 'received'
+  const arrivalBellSummary = isTrackingJourneyState && phase !== 'received'
     ? phase === 'route'
       ? 'أيقونة الجرس تبقى داخل الطلب نفسه أثناء الطريق، وتغطي رنة الاقتراب ثم رنة الوصول من دون فتح صفحة مستقلة.'
       : 'جرس الوصول مثبت داخل نفس شاشة الطلب، والمرحلة الحالية تشير إلى أن الكابتن وصل وبقي فقط تثبيت الاستلام.'
     : null;
-  const bellStatusItems = !isCheckoutSequenceState && phase !== 'received'
+  const bellStatusItems = isTrackingJourneyState && phase !== 'received'
     ? [
         { label: 'حالة الجرس', value: phase === 'route' ? 'اقتراب' : 'وصول', tone: phase === 'route' ? 'warning' as const : 'brand' as const },
         { label: 'الرنات الفعالة', value: phase === 'route' ? 'اقتراب + وصول' : 'وصول مثبت' },
@@ -1237,7 +1123,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   };
 
   const handlePrimaryAction = () => {
-    if (isCheckoutSequenceState) {
+    if (isOrderCreationState) {
       onPrimaryAction?.();
       return;
     }
@@ -1281,7 +1167,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     setDraftAttachments([]);
   };
 
-  const secondaryAction = isCheckoutSequenceState
+  const secondaryAction = isOrderCreationState
     ? onBack
       ? { label: 'العودة إلى السلة', onPress: onBack, tone: 'secondary' as const }
       : undefined
@@ -1341,42 +1227,18 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           </Surface>
         ) : null}
 
-        {isCheckoutSequenceState ? (
-          <>
-            <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-              <SectionHeader title="التسعير وقابلية التوصيل" subtitle="فحص العنوان، توفر العناصر، والرسوم قبل متابعة الدفع." />
-              <KeyValueList
-                items={[
-                  { label: 'صحة العنوان', value: serviceabilityQuote.address_valid ? 'صحيح' : 'يحتاج مراجعة', tone: serviceabilityQuote.address_valid ? 'success' : 'warning' },
-                  { label: 'داخل التغطية', value: serviceabilityQuote.inside_coverage ? 'نعم' : 'لا' },
-                  { label: 'حالة المتجر', value: serviceabilityQuote.store_open ? 'مفتوح' : 'مغلق' },
-                  { label: 'توفر العناصر', value: serviceabilityQuote.items_available ? 'متوفرة' : 'غير متوفرة' },
-                  { label: 'رسوم التوصيل', value: `${serviceabilityQuote.delivery_fee} ر.ي` },
-                  { label: 'الوقت المتوقع', value: serviceabilityQuote.eta_dropoff ?? serviceabilityQuote.eta_pickup ?? 'غير محدد' },
-                ]}
-              />
-              {serviceabilityQuote.unavailable_reason ? (
-                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                  سبب التعذر الحالي: {formatExceptionReason(serviceabilityQuote.unavailable_reason)}
-                  {serviceabilityQuote.fallback_fulfillment_method ? ` · البديل: ${formatFulfillmentMode(serviceabilityQuote.fallback_fulfillment_method)}` : ''}
-                </Text>
-              ) : null}
-            </Surface>
-
-            <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-              <SectionHeader title="العنوان والتفعيل" subtitle="حالة العنوان، نمط التنفيذ، وإتاحة الدفع أو التعطيل تبقى ظاهرة للعميل." />
-              <KeyValueList
-                items={[
-                  { label: 'العنوان النهائي', value: addressSnapshot.address_label, tone: 'brand' },
-                  { label: 'الوصف المرجعي', value: addressSnapshot.reverse_lookup_label ?? 'غير متوفر' },
-                  { label: 'نمط التنفيذ', value: formatFulfillmentMode(fulfillmentModeSnapshot.mode) },
-                  { label: 'السعة الحالية', value: formatCapacityState(fulfillmentModeSnapshot.capacity_state) },
-                  { label: 'حجز الفتحة', value: fulfillmentModeSnapshot.slot_reserved_until ?? 'غير محجوز' },
-                  { label: 'وضع المتابعة', value: clientStateMeta.isException ? 'متوقف حتى المعالجة' : clientState === 'payment_pending' ? 'قيد المعالجة' : 'جاهز للمتابعة', tone: clientStateMeta.isException ? 'warning' : clientState === 'payment_pending' ? 'warning' : 'success' },
-                ]}
-              />
-            </Surface>
-          </>
+        {isOrderCreationState ? (
+          <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+            <SectionHeader title="تأكيد الطلب" subtitle="هذه شاشة إنشاء/تأكيد مختصرة فقط، من دون إعادة عرض التسعير أو فحص التغطية أو الدفع." />
+            <KeyValueList
+              items={[
+                { label: 'الحالة الحالية', value: clientStateMeta.label, tone: 'brand' },
+                { label: 'الخطوة التالية', value: effectiveClientState === 'order_created' ? 'عرض نجاح الطلب' : 'فتح التتبع' },
+                { label: 'مرجع التنفيذ', value: `${values.pickupAddress || 'غير محدد'} → ${values.dropoffAddress || 'غير محدد'}` },
+                { label: 'الدعم', value: onSupport ? 'متاح عند الحاجة' : 'غير موصول' },
+              ]}
+            />
+          </Surface>
         ) : (
           <>
             <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
@@ -1801,7 +1663,7 @@ export function DshOrdersListScreen({ items = fallbackOrderListItems, query = ''
 export function DshCreateOrderScreen({
   screenId,
   state = 'ready',
-  clientState = 'checkout_ready',
+  clientState = 'order_created',
   values = defaultCreateOrderValues,
   timeline = [],
   onPrimaryAction,
@@ -1830,16 +1692,15 @@ export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspa
   return (
     <DshOperationScreen
       state={state}
-      title="مساحة تجهيز الطلب"
-      subtitle="مساحة موحدة لتجهيز طلبات التوصيل اليدوية والخارجية والتقديرية قبل إنشاء الطلب."
+      title="قدرة مدمجة داخل تأكيد الطلب"
+      subtitle="التجهيز والتقدير ومراجعة الجاهزية تظهر داخل شاشة تأكيد الطلب أو إنشاء الطلب، وليست صفحة عميل مستقلة."
       content={
         <Surface tone="inset" gap={2}>
-          <Text role="bodyStrong">المسار الحالي</Text>
-          <Text role="bodySm" tone="muted">{screenId}</Text>
-          <Text role="bodySm" tone="muted">هذه شاشة مسار نشط مع تغطية تنفيذية للحالات.</Text>
+          <Text role="bodyStrong">{screenId}</Text>
+          <Text role="bodySm" tone="muted">أي تفاصيل تخص التقدير أو بوابة الإكمال أو العروض الترويجية يجب أن تظهر داخل رحلة تأكيد الطلب القانونية فقط.</Text>
         </Surface>
       }
-      primaryActionLabel="متابعة إنشاء الطلب"
+      primaryActionLabel="فتح تأكيد الطلب"
       secondaryActionLabel="العودة إلى العمليات"
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction ?? onRetry}
@@ -1900,13 +1761,12 @@ export function DshDeliveryManagementHubScreen({ state = 'ready', screenId = 'de
   return (
     <DshOperationScreen
       state={state}
-      title="إدارة التوصيل"
-      subtitle="مساحة لمحاولات التوصيل وإعادة الإسناد والإغلاق وقرارات التتبع المواجهة للعميل."
+      title="قدرة مدمجة داخل التتبع"
+      subtitle="محاولات التوصيل والإغلاق ورموز الإثبات تظهر داخل شاشة تتبع الطلب، وليست رحلة عميل منفصلة."
       content={
         <Surface tone="inset" gap={2}>
-          <Text role="bodyStrong">المسار الحالي</Text>
-          <Text role="bodySm" tone="muted">{screenId}</Text>
-          <Text role="bodySm" tone="muted">هذه شاشة مسار نشط مع تغطية تنفيذية للحالات.</Text>
+          <Text role="bodyStrong">{screenId}</Text>
+          <Text role="bodySm" tone="muted">عناصر ETA والتتبّع ومحاولات التوصيل يجب أن تظل ضمن شاشة التتبع القانونية حتى لا تتكرر نفس بيانات الطلب في أكثر من صفحة.</Text>
         </Surface>
       }
       primaryActionLabel="فتح التتبع"

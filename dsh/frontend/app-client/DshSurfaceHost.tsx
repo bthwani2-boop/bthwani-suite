@@ -3,12 +3,13 @@ import { BackHandler, Platform, View } from 'react-native';
 import { Surface, Text, colorPalette } from '@bthwani/ui-kit';
 import { DshSearchScreen } from './discovery/screens';
 import { DshEntryScreen } from './entry/screens';
+import { DshClientBellScreen } from './bell';
 import { DshAwnakOrderCreateScreen } from './awnak/screens';
 import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './home/screens';
 import { DshMySpaceScreen } from './my_space/screens';
 import { DshNotificationsScreen } from './notifications/screens';
 import { DshBenefitsHubScreen } from './subscriptions/screens';
-import { DshOrdersListScreen, DshCreateOrderScreen, DshIntakeHubScreen, DshOrderSuccessState, DshTrackingScreen, DshDeliveryManagementHubScreen } from './checkout/screens';
+import { DshOrdersListScreen, DshIntakeHubScreen, DshTrackingScreen, DshDeliveryManagementHubScreen } from './checkout/screens';
 import { DshSheinOrderCreateScreen } from './shein/screens';
 import { DshStoreGetScreen, DshStoreItemsScreen } from './stores/screens';
 import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './favorites/screens';
@@ -323,6 +324,39 @@ const initialOrders: HostOrderSummary[] = [
 
 const defaultTrackingOrderId = initialOrders[0]?.id ?? 'dsh-10021';
 
+const checkoutCanonicalTargets: ClientOperationScreenId[] = [
+  'checkout-gate',
+  'estimate-get',
+  'pricing-preview',
+  'pricing-snapshot-get',
+  'promo-apply',
+];
+
+const orderTrackingCanonicalTargets: ClientOperationScreenId[] = [
+  'order-get',
+  'order-status-get',
+  'order-status-update',
+  'order-receipt-get',
+  'delivery-get',
+  'delivery-track-get',
+  'delivery-eta-get',
+  'delivery-attempt-create',
+  'delivery-attempts-list',
+  'delivery-close',
+  'order-proof-code-generate',
+  'order-proof-verify',
+];
+
+const createJourneyTargets: ClientOperationScreenId[] = [
+  'booking-create',
+  'estimate-create',
+  'external-order-create',
+  'gas-refill-order-create',
+  'order-create',
+];
+
+const deliveryManagementInternalTargets: ClientOperationScreenId[] = ['delivery-reassign'];
+
 
 function commandTargetToRoute(target: DshCommandTarget): DshRoute {
   if (target === 'cart-get') {
@@ -340,21 +374,18 @@ function commandTargetToRoute(target: DshCommandTarget): DshRoute {
   }
 
   if (target === 'bell') {
-    return 'tracking';
+    return 'bell';
   }
 
   if (target === 'create-order') {
-    return 'create-order';
+    return 'cart-get';
   }
 
   return 'home';
 }
 
 function operationScreenToRoute(screenId: ClientOperationScreenId): DshRoute {
-  const intakeTargets: ClientOperationScreenId[] = ['booking-create', 'estimate-create', 'external-order-create', 'gas-refill-order-create'];
-  const checkoutTargets: ClientOperationScreenId[] = ['checkout-gate', 'estimate-get', 'pricing-preview', 'pricing-snapshot-get', 'promo-apply'];
   const conversationTargets: ClientOperationScreenId[] = ['chat-read-ack', 'chat-send'];
-  const deliveryManagementTargets: ClientOperationScreenId[] = ['delivery-attempt-create', 'delivery-attempts-list', 'delivery-close', 'delivery-reassign'];
   const subscriptionTargets: ClientOperationScreenId[] = ['subscription-family-get', 'subscription-family-members-get', 'subscription-family-members-post', 'subscription-pro-catalog', 'subscription-sync', 'subscription-tier-get', 'subscription-upgrade-post'];
   const loyaltyTargets: ClientOperationScreenId[] = ['loyalty-points-redeem', 'loyalty-points-client-balance', 'loyalty-points-client-history', 'entitlements-get'];
   const proxyTargets: ClientOperationScreenId[] = ['proxy-request-create', 'proxy-request-approve', 'proxy-request-review', 'proxy-request-reject', 'proxy-request-tracking'];
@@ -364,19 +395,23 @@ function operationScreenToRoute(screenId: ClientOperationScreenId): DshRoute {
   const issueTargets: ClientOperationScreenId[] = ['order-issue-flag'];
   const trustTargets: ClientOperationScreenId[] = ['order-proof-code-generate', 'order-proof-verify', 'order-escrow-hold', 'order-escrow-release'];
 
-  if (intakeTargets.includes(screenId)) {
-    return 'intake-workspace';
+  if (checkoutCanonicalTargets.includes(screenId)) {
+    return 'cart-get';
   }
 
-  if (checkoutTargets.includes(screenId)) {
-    return 'checkout-workspace';
+  if (orderTrackingCanonicalTargets.includes(screenId)) {
+    return 'tracking';
+  }
+
+  if (createJourneyTargets.includes(screenId)) {
+    return 'cart-get';
   }
 
   if (conversationTargets.includes(screenId)) {
     return 'conversation-workspace';
   }
 
-  if (deliveryManagementTargets.includes(screenId)) {
+  if (deliveryManagementInternalTargets.includes(screenId)) {
     return 'delivery-management-workspace';
   }
 
@@ -417,7 +452,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
   const [cartItems, setCartItems] = React.useState<HostCartItem[]>([]);
   const [createOrderValues, setCreateOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
-  const [checkoutClientState, setCheckoutClientState] = React.useState<DshClientState>(hostClientStates.checkoutReady);
+  const [checkoutClientState, setCheckoutClientState] = React.useState<DshClientState>(hostClientStates.orderCreated);
   const [successClientState, setSuccessClientState] = React.useState<DshClientState>(hostClientStates.orderCreated);
   const [trackingClientState, setTrackingClientState] = React.useState<DshClientState>(hostClientStates.trackingActive);
   const [ordersQuery, setOrdersQuery] = React.useState('');
@@ -437,7 +472,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     const nextRoute = commandTargetToRoute(command.target);
 
     if (nextRoute === 'create-order') {
-      setCheckoutClientState(hostClientStates.quote);
+      setCheckoutClientState(hostClientStates.orderCreated);
       setSuccessClientState(hostClientStates.orderCreated);
     }
 
@@ -542,45 +577,19 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     [],
   );
 
-  const checkoutWorkspaceClientState = React.useMemo<DshClientState>(() => {
-    if (selectedOperationScreen === 'estimate-get') {
-      return hostClientStates.quote;
-    }
-
-    if (selectedOperationScreen === 'pricing-preview') {
-      return hostClientStates.serviceability;
-    }
-
-    if (selectedOperationScreen === 'pricing-snapshot-get') {
-      return hostClientStates.areaUnserviceable;
-    }
-
-    if (selectedOperationScreen === 'promo-apply') {
-      return hostClientStates.itemUnavailable;
-    }
-
-    if (selectedOperationScreen === 'checkout-gate') {
-      return hostClientStates.paymentFailed;
-    }
-
-    return hostClientStates.checkoutReady;
-  }, [selectedOperationScreen]);
-
   const handleCreateOrderChange = React.useCallback((field: keyof CreateOrderValues, value: string) => {
     setCreateOrderValues((current) => ({ ...current, [field]: value }));
   }, []);
 
   const openCreateOrderJourney = React.useCallback(() => {
-    setCheckoutClientState(hostClientStates.quote);
-    setSuccessClientState(hostClientStates.orderCreated);
-    setRoute('create-order');
+    setRoute('cart-get');
   }, []);
 
   const openTrackedOrder = React.useCallback((orderId?: string) => {
     const nextOrder = initialOrders.find((order) => order.id === orderId) ?? initialOrders[0];
 
     setSelectedOrderId(nextOrder.id);
-    setTrackingClientState(nextOrder.clientState);
+    setTrackingClientState(hostClientStates.trackingActive);
     setRoute('tracking');
   }, []);
 
@@ -589,42 +598,19 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     setRoute('order-issue-workspace');
   }, []);
 
-  const handleCreateOrderContinue = React.useCallback(() => {
-    if (checkoutClientState === hostClientStates.quote) {
-      setCheckoutClientState(hostClientStates.serviceability);
-      return;
-    }
-
-    if (checkoutClientState === hostClientStates.serviceability) {
-      setCheckoutClientState(hostClientStates.checkoutReady);
-      return;
-    }
-
-    if (checkoutClientState === hostClientStates.checkoutReady) {
-      setCheckoutClientState(hostClientStates.paymentPending);
-      return;
-    }
-
-    if (checkoutClientState === hostClientStates.paymentPending) {
-      setCheckoutClientState(hostClientStates.orderCreated);
-      setSuccessClientState(hostClientStates.orderCreated);
-      setRoute('success');
-      return;
-    }
-
-    if (checkoutClientState === hostClientStates.orderCreated || checkoutClientState === hostClientStates.orderConfirmed) {
-      setSuccessClientState(checkoutClientState);
-      setRoute('success');
-    }
-  }, [checkoutClientState]);
-
-  const handleSuccessNext = React.useCallback(() => {
+  const handleConfirmedOrderExecution = React.useCallback(() => {
     setCheckoutClientState(hostClientStates.orderConfirmed);
     setSuccessClientState(hostClientStates.orderConfirmed);
-    setSelectedOrderId(defaultTrackingOrderId);
-    setTrackingClientState(hostClientStates.trackingActive);
-    setRoute('tracking');
-  }, []);
+    openTrackedOrder();
+  }, [openTrackedOrder]);
+
+  const handleCreateOrderContinue = React.useCallback(() => {
+    openTrackedOrder();
+  }, [openTrackedOrder]);
+
+  const handleSuccessNext = React.useCallback(() => {
+    openTrackedOrder();
+  }, [openTrackedOrder]);
 
   const openOperationDirectory = React.useCallback(() => {
     setRoute('operations-directory');
@@ -637,10 +623,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
 
   const handleOperationPrimaryAction = React.useCallback((screenId: ClientOperationScreenId) => {
     const awnakTargets: ClientOperationScreenId[] = ['awnak-order-create'];
-    const createTargets: ClientOperationScreenId[] = ['booking-create', 'estimate-create', 'external-order-create', 'gas-refill-order-create', 'order-create'];
-    const deliveryTargets: ClientOperationScreenId[] = ['delivery-attempt-create', 'delivery-attempts-list', 'delivery-close', 'delivery-eta-get', 'delivery-get', 'delivery-reassign', 'delivery-track-get', 'order-status-get', 'order-status-update'];
-    const checkoutTargets: ClientOperationScreenId[] = ['checkout-gate', 'estimate-get', 'pricing-preview', 'pricing-snapshot-get', 'promo-apply'];
-    const orderTargets: ClientOperationScreenId[] = ['order-accept', 'order-cancel', 'order-complete', 'order-get', 'order-receipt-get'];
+    const orderTargets: ClientOperationScreenId[] = ['order-accept', 'order-cancel', 'order-complete'];
     const issueTargets: ClientOperationScreenId[] = ['order-issue-flag'];
     const trustTargets: ClientOperationScreenId[] = ['order-proof-code-generate', 'order-proof-verify', 'order-escrow-hold', 'order-escrow-release'];
     const reviewTargets: ClientOperationScreenId[] = ['order-rate', 'review-create'];
@@ -656,28 +639,18 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
       return;
     }
 
-    if (createTargets.includes(screenId)) {
-      if (screenId === 'order-create') {
-        openCreateOrderJourney();
-        return;
-      }
-
-      setRoute('intake-workspace');
+    if (checkoutCanonicalTargets.includes(screenId)) {
+      setRoute('cart-get');
       return;
     }
 
-    if (checkoutTargets.includes(screenId)) {
-      openCreateOrderJourney();
-      return;
-    }
-
-    if (deliveryTargets.includes(screenId)) {
-      if (screenId === 'delivery-attempt-create' || screenId === 'delivery-attempts-list' || screenId === 'delivery-close' || screenId === 'delivery-reassign') {
-        setRoute('delivery-management-workspace');
-        return;
-      }
-
+    if (orderTrackingCanonicalTargets.includes(screenId)) {
       openTrackedOrder();
+      return;
+    }
+
+    if (createJourneyTargets.includes(screenId)) {
+      openCreateOrderJourney();
       return;
     }
 
@@ -692,6 +665,11 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     }
 
     if (trustTargets.includes(screenId)) {
+      if (orderTrackingCanonicalTargets.includes(screenId)) {
+        openTrackedOrder();
+        return;
+      }
+
       setRoute('trust-workspace');
       return;
     }
@@ -824,9 +802,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     ['DshNotificationsScreen', DshNotificationsScreen as unknown],
     ['DshBenefitsHubScreen', DshBenefitsHubScreen as unknown],
     ['DshOrdersListScreen', DshOrdersListScreen as unknown],
-    ['DshCreateOrderScreen', DshCreateOrderScreen as unknown],
     ['DshIntakeHubScreen', DshIntakeHubScreen as unknown],
-    ['DshOrderSuccessState', DshOrderSuccessState as unknown],
     ['DshTrackingScreen', DshTrackingScreen as unknown],
     ['DshDeliveryManagementHubScreen', DshDeliveryManagementHubScreen as unknown],
     ['DshSheinOrderCreateScreen', DshSheinOrderCreateScreen as unknown],
@@ -834,6 +810,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     ['DshStoreItemsScreen', DshStoreItemsScreen as unknown],
     ['DshFavoriteToggleScreen', DshFavoriteToggleScreen as unknown],
     ['DshFavoritesListScreen', DshFavoritesListScreen as unknown],
+    ['DshClientBellScreen', DshClientBellScreen as unknown],
     ['DshCartGetScreen', DshCartGetScreen as unknown],
     ['DshConversationHubScreen', DshConversationHubScreen as unknown],
     ['DshOrderIssueHubScreen', DshOrderIssueHubScreen as unknown],
@@ -964,7 +941,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     );
   }
 
-  if (route === 'cart-get') {
+  if (route === 'cart-get' || route === 'create-order') {
     const cartClientState = cartItems.length > 0 ? hostClientStates.cartReady : hostClientStates.cartEmpty;
     const cartClientStateMeta = getDshClientStateMeta(cartClientState);
 
@@ -992,8 +969,8 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
         statusDescription={cartClientStateMeta.description}
         onOpenStore={() => setRoute('store-get')}
         onOpenService={onOpenService}
-        onOpenOrder={openCreateOrderJourney}
-        onContinue={openCreateOrderJourney}
+        onOpenOrder={handleConfirmedOrderExecution}
+        onContinue={handleConfirmedOrderExecution}
         onRetry={() => setRoute('cart-get')}
       />
       );
@@ -1057,19 +1034,6 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     );
   }
 
-  if (route === 'create-order') {
-    return (
-      <DshCreateOrderScreen
-        clientState={checkoutClientState}
-        values={createOrderValues}
-        timeline={trackingTimeline}
-        onChange={handleCreateOrderChange}
-        onContinue={handleCreateOrderContinue}
-        onBack={() => setRoute('cart-get')}
-      />
-    );
-  }
-
   if (route === 'awnak-order-create') {
     return (
       <DshAwnakOrderCreateScreen
@@ -1090,14 +1054,33 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   /* 'review' route removed — review is shown inline inside the create-order flow. */
 
   if (route === 'checkout-workspace') {
-    // Render the create-order screen inline instead of a separate checkout wrapper
     return (
-      <DshCreateOrderScreen
-        screenId={selectedOperationScreen as 'checkout-gate' | 'estimate-get' | 'pricing-preview' | 'pricing-snapshot-get' | 'promo-apply'}
-          clientState={checkoutWorkspaceClientState}
-        onPrimaryAction={openCreateOrderJourney}
-        onSecondaryAction={openOperationDirectory}
-        onRetry={() => setRoute('checkout-workspace')}
+      <DshCartGetScreen
+        clientState={cartItems.length > 0 ? hostClientStates.cartReady : hostClientStates.cartEmpty}
+        store={{
+          id: activeStore.id,
+          name: activeStore.name,
+          subtitle: activeStore.subtitle,
+          statusLabel: activeStore.statusLabel,
+          ratingLabel: '4.8 / 5 جودة المتجر',
+        }}
+        items={cartItems}
+        activeOrder={{
+          id: cartItems[0]?.id ?? 'cart-preview',
+          title: cartItems[0] ? `تتضمن السلة ${cartItems[0].title}` : 'السلة جاهزة للدفع',
+          subtitle: cartItems[0]
+            ? `عناصر من ${cartItems[0].storeName}`
+            : `عناصر من ${activeStore.name}`,
+          meta: cartItems[0]?.priceLabel ?? 'راجع العناصر وتابع',
+          statusLabel: 'جاهز',
+        }}
+        statusTitle={getDshClientStateMeta(cartItems.length > 0 ? hostClientStates.cartReady : hostClientStates.cartEmpty).label}
+        statusDescription={getDshClientStateMeta(cartItems.length > 0 ? hostClientStates.cartReady : hostClientStates.cartEmpty).description}
+        onOpenStore={() => setRoute('store-get')}
+        onOpenService={onOpenService}
+        onOpenOrder={openCreateOrderJourney}
+        onContinue={openCreateOrderJourney}
+        onRetry={() => setRoute('cart-get')}
       />
     );
   }
@@ -1106,7 +1089,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     return (
       <DshIntakeHubScreen
         screenId={selectedOperationScreen as 'booking-create' | 'estimate-create' | 'external-order-create' | 'gas-refill-order-create'}
-        onPrimaryAction={() => setRoute(selectedOperationScreen === 'estimate-create' ? 'checkout-workspace' : 'create-order')}
+        onPrimaryAction={openCreateOrderJourney}
         onSecondaryAction={openOperationDirectory}
         onRetry={() => setRoute('intake-workspace')}
       />
@@ -1211,10 +1194,6 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     );
   }
 
-  if (route === 'success') {
-    return <DshOrderSuccessState clientState={successClientState} onNext={handleSuccessNext} />;
-  }
-
   if (route === 'operations-directory') {
     return <DshClientOperationDirectoryScreen onOpenScreen={openOperationScreen} />;
   }
@@ -1242,17 +1221,28 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     );
   }
 
-  if (route === 'tracking') {
+  if (route === 'tracking' || route === 'success') {
     return (
       <DshTrackingScreen
         values={createOrderValues}
-        clientState={trackingClientState}
+        clientState={hostClientStates.trackingActive}
         currentStatusLabel={activeTrackedOrder?.statusLabel}
-        timeline={trackingClientState === hostClientStates.trackingActive || trackingClientState === hostClientStates.delivered ? trackingTimeline : []}
+        timeline={trackingTimeline}
         onSupport={openSupportFlow}
         onRetry={() => openTrackedOrder(activeTrackedOrder?.id)}
         onNextAction={() => setRoute('orders-list')}
           onReorder={openCreateOrderJourney}
+      />
+    );
+  }
+
+  if (route === 'bell') {
+    return (
+      <DshClientBellScreen
+        onOpenTracking={() => openTrackedOrder(activeTrackedOrder?.id)}
+        onOpenOrders={() => setRoute('orders-list')}
+        onBack={() => openTrackedOrder(activeTrackedOrder?.id)}
+        onRetry={() => setRoute('bell')}
       />
     );
   }
