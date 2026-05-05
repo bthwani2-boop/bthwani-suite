@@ -7,6 +7,8 @@ export {
 	WebControlSurfaceHeader,
 	WebRailServiceList,
 	WebSegmentedTabs,
+	WebCompactSurfaceHeader,
+	WebSystemSuggestion,
 } from './web/index';
 export {
 	WebDocumentShell,

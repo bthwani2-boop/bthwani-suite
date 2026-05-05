@@ -1,4 +1,4 @@
-﻿export const COMMAND_CENTER_PREVIEW = {
+export const COMMAND_CENTER_PREVIEW = {
   signals: [
     { id: 'command-center-open-orders', title: 'Open orders', value: '128', description: 'Orders moving through the live hub.', tone: 'brand' },
     { id: 'command-center-dispatch-risk', title: 'Dispatch risk', value: '9', description: 'Orders needing manual assignment.', tone: 'warning' },
@@ -27,6 +27,14 @@
     { id: 'command-center-canonical', label: 'Canonical screen map', description: 'Eight folders now represent the active operations model.', href: '/operations?workspace=command-center', badge: 'Map' },
   ] as const,
 };
+
+export const OPERATIONS_PULSE_METRICS = COMMAND_CENTER_PREVIEW.signals.map((signal) => ({
+  id: signal.id,
+  title: signal.title,
+  value: signal.value,
+  description: signal.description,
+  tone: signal.tone,
+}));
 
 export const LIVE_ORDERS_PREVIEW = {
   signals: [

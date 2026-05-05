@@ -2,19 +2,21 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { StateView, useDirection } from '@bthwani/ui-kit';
+import { StateView } from '@bthwani/ui-kit';
 import {
   buildOperationsHref,
   getOperationsGroupMeta,
   NON_OPERATIONS_SECTION_SHORTCUTS,
   OPERATIONS_CANONICAL_GROUPS,
+  resolveOperationsStateCopy,
 } from './operations.registry';
-import { OPERATIONS_PULSE_METRICS } from './operations.fixtures';
-import { resolveOperationsStateCopy, type OperationsViewState } from './operations.state';
-import type { CanonicalOperationsGroupId, OperationsPanelId } from './operations.types';
+import { OPERATIONS_PULSE_METRICS } from './operations.preview-data';
+import type { CanonicalOperationsGroupId, OperationsPanelId, OperationsViewState } from './operations.types';
 import { CommandCenterScreen } from './command-center/CommandCenterScreen';
 import { LiveOrdersScreen } from './live-orders/LiveOrdersScreen';
 import { DispatchAssignmentScreen } from './dispatch-assignment/DispatchAssignmentScreen';
+import { ControlPanelDshSheinProxyScreen } from './sheinproxy/ControlPanelDshSheinProxyScreen';
+import { AwnakScreen } from './awnak/AwnakScreen';
 import { CaptainOperationsScreen } from './captain-operations/CaptainOperationsScreen';
 import { PartnerStoresScreen } from './partner-stores/PartnerStoresScreen';
 import { AreaCapacityScreen } from './area-capacity/AreaCapacityScreen';
@@ -34,6 +36,8 @@ const SCREEN_RENDERERS: Record<CanonicalOperationsGroupId, React.ComponentType<{
   'command-center': CommandCenterScreen,
   'live-orders': LiveOrdersScreen,
   'dispatch-assignment': DispatchAssignmentScreen,
+  sheinproxy: ControlPanelDshSheinProxyScreen,
+  'proxy-shein-awnak': AwnakScreen,
   'captain-operations': CaptainOperationsScreen,
   'partner-stores': PartnerStoresScreen,
   'area-capacity': AreaCapacityScreen,
@@ -58,7 +62,6 @@ export function ControlPanelDshOperationsScreen({
   fallbackHref = '/operations',
 }: ControlPanelDshOperationsScreenProps) {
   const router = useRouter();
-  const { direction } = useDirection();
   const [activeGroup, setActiveGroup] = React.useState<CanonicalOperationsGroupId>(group);
 
   React.useEffect(() => {
@@ -85,7 +88,7 @@ export function ControlPanelDshOperationsScreen({
           <h1>عمليات DSH</h1>
           <p>مراقبة وتنفيذ الطلبات الحية</p>
         </div>
-        
+
         <div className={styles.operationsHeaderActions}>
           <div className={styles.operationsPulseCompact}>
             {OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => (

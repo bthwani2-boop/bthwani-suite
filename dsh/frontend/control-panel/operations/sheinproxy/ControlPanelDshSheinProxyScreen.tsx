@@ -1,498 +1,198 @@
 'use client';
 
-import { useDshControlPanelText } from '../shared/dshControlPanelText';
-
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  Badge,
-  Box,
-  Button,
-  DataTable,
-  KeyValueList,
-  StateView,
-  StatCard,
-  Text,
-  useUiText,
-} from '@bthwani/ui-kit';
-import {
-  WebCommandCenterFrame,
-  WebSectionCard,
-} from '@bthwani/ui-kit/web';
-import { ControlPanelDshDecisionBoard } from '../../shared';
-import { getSheinProxyRequests, type SheinProxyRequest, type SheinProxyRequestStatus } from './sheinproxy-fixtures';
-
-export type ControlPanelDshSheinProxyScreenState = 'ready' | 'loading' | 'empty' | 'offline' | 'disabled' | 'error';
+import { OperationsSuggestionCard } from '../operations.ui';
 
 export type ControlPanelDshSheinProxyScreenProps = {
-  state?: ControlPanelDshSheinProxyScreenState;
   hubHref?: string;
-  operationsHref?: string;
-  supportHref?: string;
 };
 
-const FILTER_IDS = ['all', 'under-review', 'estimated', 'offered', 'scheduled', 'approved', 'cancelled'] as const;
+type SheinProxyItem = {
+  id: string;
+  customer: string;
+  product: string;
+  status: string;
+  updated: string;
+  amount: string;
+  shipping: string;
+  fee: string;
+  total: string;
+  confidence: 'high' | 'medium' | 'low';
+  suggestion: string;
+  reason: string;
+  action: string;
+  secondaryAction?: string;
+  tags?: string[];
+};
 
-type SheinProxyFilterId = (typeof FILTER_IDS)[number];
+const SHEIN_PROXY_ITEMS: readonly SheinProxyItem[] = [
+  {
+    id: 'SPX-2048',
+    customer: 'نورة الفهد',
+    product: 'معطف خفيف',
+    status: 'قيد المراجعة',
+    updated: 'قبل 10 دقائق',
+    amount: '1,280 ريال',
+    shipping: '96 ريال',
+    fee: '110 ريال',
+    total: '1,486 ريال',
+    confidence: 'high',
+    suggestion: 'افتح التقدير أولاً',
+    reason: 'المراجعة الأولى جاهزة والمرجع واضح.',
+    action: 'افحص الطلب',
+    secondaryAction: 'افتح التقدير',
+    tags: ['SHEIN', 'NOW'],
+  },
+  {
+    id: 'SPX-2051',
+    customer: 'مريم خالد',
+    product: 'حقيبة منظمة',
+    status: 'مقدّرة',
+    updated: 'قبل 18 دقيقة',
+    amount: '840 ريال',
+    shipping: '62 ريال',
+    fee: '88 ريال',
+    total: '990 ريال',
+    confidence: 'medium',
+    suggestion: 'انقلها إلى العرض',
+    reason: 'التقدير جاهز والخطوة التالية واضحة.',
+    action: 'افتح العرض',
+    secondaryAction: 'راجع السعر',
+    tags: ['SHEIN'],
+  },
+  {
+    id: 'SPX-2064',
+    customer: 'سعيد حسن',
+    product: 'حذاء تدريب',
+    status: 'تم إرسال العرض',
+    updated: 'قبل 32 دقيقة',
+    amount: '1,620 ريال',
+    shipping: '74 ريال',
+    fee: '125 ريال',
+    total: '1,819 ريال',
+    confidence: 'high',
+    suggestion: 'تابع رد العميل',
+    reason: 'العرض خرج للعميل وينتظر ردًا.',
+    action: 'تابع الطلب',
+    secondaryAction: 'أعد الإرسال',
+    tags: ['AWNAK'],
+  },
+  {
+    id: 'SPX-2072',
+    customer: 'دانا صالح',
+    product: 'طقم محبوك',
+    status: 'مجدولة',
+    updated: 'قبل ساعة',
+    amount: '1,010 ريال',
+    shipping: '55 ريال',
+    fee: '94 ريال',
+    total: '1,159 ريال',
+    confidence: 'medium',
+    suggestion: 'ثبّت نافذة الاستلام',
+    reason: 'الجدولة جاهزة ويجب إبقاء الموعد واضحًا.',
+    action: 'افتح الجدولة',
+    secondaryAction: 'غيّر الموعد',
+    tags: ['SCHEDULE'],
+  },
+] as const;
 
-function resolveStatusTone(status: SheinProxyRequestStatus): 'brand' | 'best' | 'warning' | 'danger' {
-  if (status === 'cancelled') {
-    return 'danger' as const;
-  }
+const STATUS_FILTERS = [
+  'كل الطلبات',
+  'قيد المراجعة',
+  'مقدّرة',
+  'تم إرسال العرض',
+  'مجدولة',
+  'معتمدة',
+  'ملغاة',
+] as const;
 
-  if (status === 'approved' || status === 'scheduled') {
-    return 'best' as const;
-  }
-
-  if (status === 'offered') {
-    return 'brand' as const;
-  }
-
-  if (status === 'estimated') {
-    return 'warning' as const;
-  }
-
-  return 'warning' as const;
-}
-
-function resolveStatusBadgeTone(status: SheinProxyRequestStatus): 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' {
-  if (status === 'cancelled') {
-    return 'danger';
-  }
-
-  if (status === 'approved' || status === 'scheduled') {
-    return 'success';
-  }
-
-  if (status === 'offered') {
-    return 'brand';
-  }
-
-  if (status === 'estimated') {
-    return 'info';
-  }
-
-  return 'default';
-}
-
-function resolveStatusLabel(text: ReturnType<typeof useDshControlPanelText>, status: SheinProxyRequestStatus) {
-  return text.sheinProxy.statusLabels[
-    status === 'under-review'
-      ? 'underReview'
-      : status === 'estimated'
-        ? 'estimated'
-        : status === 'offered'
-          ? 'offered'
-          : status === 'scheduled'
-            ? 'scheduled'
-            : status === 'approved'
-              ? 'approved'
-              : 'cancelled'
-  ];
-}
-
-function resolveNextActionLabel(text: ReturnType<typeof useDshControlPanelText>, status: SheinProxyRequestStatus) {
-  return text.sheinProxy.nextActionLabels[
-    status === 'under-review'
-      ? 'underReview'
-      : status === 'estimated'
-        ? 'estimated'
-        : status === 'offered'
-          ? 'offered'
-          : status === 'scheduled'
-            ? 'scheduled'
-            : status === 'approved'
-              ? 'approved'
-              : 'cancelled'
-  ];
-}
-
-function resolveStateCopy(
-  text: ReturnType<typeof useDshControlPanelText>,
-  state: Exclude<ControlPanelDshSheinProxyScreenState, 'ready'>,
-) {
-  if (state === 'loading') {
-    return {
-      stateId: 'loading' as const,
-      title: text.sheinProxy.stateLoadingTitle,
-      description: text.sheinProxy.stateLoadingDescription,
-      actionLabel: text.sheinProxy.retryLabel,
-    };
-  }
-
-  if (state === 'empty') {
-    return {
-      stateId: 'empty' as const,
-      title: text.sheinProxy.stateEmptyTitle,
-      description: text.sheinProxy.stateEmptyDescription,
-      actionLabel: text.sheinProxy.backToHub,
-    };
-  }
-
-  if (state === 'offline') {
-    return {
-      stateId: 'offline' as const,
-      title: text.sheinProxy.stateOfflineTitle,
-      description: text.sheinProxy.stateOfflineDescription,
-      actionLabel: text.sheinProxy.retryLabel,
-    };
-  }
-
-  if (state === 'disabled') {
-    return {
-      kind: 'warning' as const,
-      title: text.sheinProxy.stateDisabledTitle,
-      description: text.sheinProxy.stateDisabledDescription,
-      actionLabel: text.sheinProxy.backToHub,
-    };
-  }
-
-  return {
-    stateId: 'recoverableError' as const,
-    title: text.sheinProxy.stateErrorTitle,
-    description: text.sheinProxy.stateErrorDescription,
-    actionLabel: text.sheinProxy.retryLabel,
-  };
-}
-
-function filterRequests(requests: readonly SheinProxyRequest[], filterId: SheinProxyFilterId) {
-  if (filterId === 'all') {
-    return requests;
-  }
-
-  return requests.filter((request) => request.status === filterId);
-}
-
-export function ControlPanelDshSheinProxyScreen({
-  state = 'ready',
-  hubHref = '/operations',
-  operationsHref = '/operations',
-  supportHref = '/support',
-}: ControlPanelDshSheinProxyScreenProps) {
+export function ControlPanelDshSheinProxyScreen({ hubHref = '/operations' }: ControlPanelDshSheinProxyScreenProps) {
   const router = useRouter();
-  const uiText = useUiText();
-  const dshText = useDshControlPanelText();
-  const requests = React.useMemo(() => getSheinProxyRequests(), []);
-  const [activeFilterId, setActiveFilterId] = React.useState<SheinProxyFilterId>('all');
-  const [selectedRequestId, setSelectedRequestId] = React.useState<string>(requests[0]?.id ?? '');
-
-  const filteredRequests = React.useMemo(() => filterRequests(requests, activeFilterId), [activeFilterId, requests]);
-  const selectedRequest = React.useMemo(() => {
-    const matchingRequest = filteredRequests.find((request) => request.id === selectedRequestId);
-
-    return matchingRequest ?? filteredRequests[0] ?? requests[0];
-  }, [filteredRequests, requests, selectedRequestId]);
-
-  const liveRequestCount = requests.length;
-  const statusCounts = {
-    all: requests.length,
-    'under-review': requests.filter((request) => request.status === 'under-review').length,
-    estimated: requests.filter((request) => request.status === 'estimated').length,
-    offered: requests.filter((request) => request.status === 'offered').length,
-    scheduled: requests.filter((request) => request.status === 'scheduled').length,
-    approved: requests.filter((request) => request.status === 'approved').length,
-    cancelled: requests.filter((request) => request.status === 'cancelled').length,
-  } as const;
-
-  const readyForSelection = state === 'ready';
-  const activeFilterLabel =
-    activeFilterId === 'all'
-      ? dshText.sheinProxy.allRequestsLabel
-      : resolveStatusLabel(
-          dshText,
-          activeFilterId === 'under-review'
-            ? 'under-review'
-            : activeFilterId === 'estimated'
-              ? 'estimated'
-              : activeFilterId === 'offered'
-                ? 'offered'
-                : activeFilterId === 'scheduled'
-                  ? 'scheduled'
-                  : activeFilterId === 'approved'
-                    ? 'approved'
-                    : 'cancelled',
-        );
-
-  const topFilters = FILTER_IDS.map((filterId) => ({
-    id: filterId,
-    label:
-      filterId === 'all'
-        ? dshText.sheinProxy.allRequestsLabel
-        : resolveStatusLabel(
-            dshText,
-            filterId === 'under-review'
-              ? 'under-review'
-              : filterId === 'estimated'
-                ? 'estimated'
-                : filterId === 'offered'
-                  ? 'offered'
-                  : filterId === 'scheduled'
-                    ? 'scheduled'
-                    : filterId === 'approved'
-                      ? 'approved'
-                      : 'cancelled',
-          ),
-    metaLabel: String(statusCounts[filterId]),
-    active: filterId === activeFilterId,
-  }));
-
-  const railItems = requests.map((request) => ({
-    id: request.id,
-    label: request.id,
-    description: `${request.customer} · ${request.product}`,
-    badge: resolveStatusLabel(dshText, request.status),
-    active: request.id === selectedRequest?.id,
-  }));
-
-  const signalCards = [
-    {
-      label: dshText.sheinProxy.signals.pending,
-      description: dshText.sheinProxy.signals.pendingDescription,
-      value: String(statusCounts['under-review']),
-      tone: 'warning' as const,
-    },
-    {
-      label: dshText.sheinProxy.signals.estimated,
-      description: dshText.sheinProxy.signals.estimatedDescription,
-      value: String(statusCounts.estimated),
-      tone: 'info' as const,
-    },
-    {
-      label: dshText.sheinProxy.signals.offered,
-      description: dshText.sheinProxy.signals.offeredDescription,
-      value: String(statusCounts.offered),
-      tone: 'brand' as const,
-    },
-    {
-      label: dshText.sheinProxy.signals.scheduled,
-      description: dshText.sheinProxy.signals.scheduledDescription,
-      value: String(statusCounts.scheduled),
-      tone: 'success' as const,
-    },
-  ] as const;
-
-  const tableColumns = [
-    {
-      id: 'request',
-      header: dshText.sheinProxy.requestLabel,
-      renderCell: (row: SheinProxyRequest) => (
-        <Box gap={1}>
-          <Text role="bodyStrong">{row.id}</Text>
-          <Text role="caption" tone="soft">{row.product}</Text>
-        </Box>
-      ),
-    },
-    {
-      id: 'customer',
-      header: dshText.sheinProxy.customerLabel,
-      renderCell: (row: SheinProxyRequest) => row.customer,
-    },
-    {
-      id: 'status',
-      header: dshText.sheinProxy.statusLabel,
-      renderCell: (row: SheinProxyRequest) => (
-        <Badge label={resolveStatusLabel(dshText, row.status)} tone={resolveStatusBadgeTone(row.status)} />
-      ),
-    },
-    {
-      id: 'amount',
-      header: dshText.sheinProxy.amountLabel,
-      align: 'end' as const,
-      renderCell: (row: SheinProxyRequest) => row.total,
-    },
-    {
-      id: 'updated',
-      header: dshText.sheinProxy.updatedLabel,
-      align: 'end' as const,
-      renderCell: (row: SheinProxyRequest) => row.updated,
-    },
-    {
-      id: 'action',
-      header: dshText.sheinProxy.nextActionLabel,
-      align: 'end' as const,
-      renderCell: (row: SheinProxyRequest) => (
-        <Button
-          label={dshText.sheinProxy.inspectRequest}
-          size="sm"
-          tone="secondary"
-          fullWidth={false}
-          onPress={() => setSelectedRequestId(row.id)}
-        />
-      ),
-    },
-  ] as const;
-
-  const stateContent = readyForSelection ? null : (
-    <StateView
-      {...resolveStateCopy(dshText, state)}
-      onActionPress={() => {
-        if (state === 'error' || state === 'loading' || state === 'offline') {
-          router.refresh();
-          return;
-        }
-
-        router.push(hubHref);
-      }}
-    />
-  );
-
-  if (!readyForSelection) {
-    return (
-      <WebCommandCenterFrame
-        brandLabel={uiText.controlPanel.brandLabel}
-        surfaceTitle={dshText.sheinProxy.pageTitle}
-        surfaceSubtitle={dshText.sheinProxy.pageDescription}
-        topFilters={topFilters}
-        onTopFilterSelect={(filterId) => setActiveFilterId(filterId as SheinProxyFilterId)}
-        onBrandClick={() => router.push('/dashboard')}
-        onSearchClick={() => router.push(operationsHref)}
-        onRefreshClick={() => router.refresh()}
-        onAlertClick={() => router.push(supportHref)}
-        railTitle={dshText.sheinProxy.tableTitle}
-        railStatusLabel={String(liveRequestCount)}
-        railItems={railItems}
-      >
-        {stateContent}
-      </WebCommandCenterFrame>
-    );
-  }
 
   return (
-    <WebCommandCenterFrame
-      brandLabel={uiText.controlPanel.brandLabel}
-      surfaceTitle={dshText.sheinProxy.pageTitle}
-      surfaceSubtitle={`${dshText.sheinProxy.pageDescription} · ${activeFilterLabel}`}
-      topFilters={topFilters}
-      onTopFilterSelect={(filterId) => {
-        const nextFilterId = filterId as SheinProxyFilterId;
-        setActiveFilterId(nextFilterId);
-        const nextRequests = filterRequests(requests, nextFilterId);
-        setSelectedRequestId(nextRequests[0]?.id ?? requests[0]?.id ?? '');
-      }}
-      onBrandClick={() => router.push('/dashboard')}
-      onSearchClick={() => {
-        setActiveFilterId('under-review');
-        setSelectedRequestId(requests.find((request) => request.status === 'under-review')?.id ?? requests[0]?.id ?? '');
-      }}
-      onRefreshClick={() => router.refresh()}
-      onAlertClick={() => {
-        const targetRequest = requests.find((request) => request.status === 'scheduled') ?? requests[0];
-        setActiveFilterId('scheduled');
-        setSelectedRequestId(targetRequest?.id ?? '');
-      }}
-      railTitle={dshText.sheinProxy.tableTitle}
-      railStatusLabel={String(filteredRequests.length)}
-      railItems={railItems}
-      onRailItemSelect={(itemId) => setSelectedRequestId(itemId)}
-    >
-      <Box gap={4}>
-        <ControlPanelDshDecisionBoard
-          title={dshText.sheinProxy.pageTitle}
-          purpose={dshText.sheinProxy.pageDescription}
-          primaryDecision={selectedRequest ? resolveStatusLabel(dshText, selectedRequest.status) : dshText.sheinProxy.stateEmptyTitle}
-          nextAction={selectedRequest ? resolveNextActionLabel(dshText, selectedRequest.status) : dshText.sheinProxy.backToHub}
-          blockers={selectedRequest ? selectedRequest.note : dshText.sheinProxy.stateEmptyDescription}
-          ownerSurface={dshText.common.openGeneralOperations}
-          evidenceHint={selectedRequest ? `${selectedRequest.id} · ${selectedRequest.updated}` : dshText.sheinProxy.tableEmptyDescription}
-          routeHint={selectedRequest ? dshText.sheinProxy.inspectRequest : dshText.sheinProxy.backToHub}
-          decisionTone={selectedRequest ? resolveStatusTone(selectedRequest.status) : 'warning'}
-        />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', direction: 'rtl' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>شي إن</h2>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(10,47,92,0.1)', background: '#fff', fontSize: '12px', fontWeight: 600, color: '#0A2F5C', cursor: 'pointer' }} onClick={() => router.refresh()}>
+            تحديث
+          </button>
+          <button style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(10,47,92,0.1)', background: '#fff', fontSize: '12px', fontWeight: 600, color: '#0A2F5C', cursor: 'pointer' }} onClick={() => router.push(hubHref)}>
+            العودة إلى القيادة
+          </button>
+        </div>
+      </div>
 
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          {signalCards.map((signalCard) => (
-            <Box key={signalCard.label} style={{ flexGrow: 1, flexBasis: 240 }}>
-              <StatCard
-                label={signalCard.label}
-                value={signalCard.value}
-                deltaLabel={signalCard.description}
-                tone={signalCard.tone}
-              />
-            </Box>
-          ))}
-        </Box>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '12px' }}>
+        {[
+          { label: 'قيد المراجعة', value: '12', color: '#F59E0B' },
+          { label: 'مقدّرة', value: '8', color: '#0A2F5C' },
+          { label: 'العرض المرسل', value: '6', color: '#16A34A' },
+          { label: 'مجدولة', value: '5', color: '#DC2626' },
+        ].map((item) => (
+          <div key={item.label} style={{ padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)' }}>
+            <div style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>{item.label}</div>
+            <div style={{ fontSize: '24px', color: item.color, fontWeight: 800, marginTop: '8px' }}>{item.value}</div>
+          </div>
+        ))}
+      </div>
 
-        <WebSectionCard
-          title={dshText.sheinProxy.tableTitle}
-          description={dshText.sheinProxy.tableDescription}
-        >
-          <DataTable
-            caption={dshText.sheinProxy.tableDescription}
-            emptyTitle={dshText.sheinProxy.tableEmptyTitle}
-            emptyDescription={dshText.sheinProxy.tableEmptyDescription}
-            rows={filteredRequests}
-            rowKey="id"
-            columns={tableColumns}
-          />
-        </WebSectionCard>
+      <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none' }}>
+        {STATUS_FILTERS.map((status, index) => (
+          <span key={status} style={{ padding: '4px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', backgroundColor: index === 0 ? '#FEF3C7' : 'rgba(10,47,92,0.04)', color: index === 0 ? '#D97706' : '#64748B', border: index === 0 ? '1px solid #FDE68A' : '1px solid transparent' }}>
+            {status}
+          </span>
+        ))}
+      </div>
 
-        <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
-          <Box style={{ flexGrow: 1, flexBasis: 320 }}>
-            <Box padding={3} gap={2} border radiusToken="xl" background="surfaceRaised">
-              <Text role="bodyStrong">{selectedRequest.id}</Text>
-              <Text role="bodySm" tone="muted">{`${selectedRequest.customer} · ${selectedRequest.product}`}</Text>
-              <KeyValueList
-                items={[
-                  { label: dshText.sheinProxy.requestLabel, value: selectedRequest.id },
-                  { label: dshText.sheinProxy.customerLabel, value: selectedRequest.customer },
-                  { label: dshText.sheinProxy.productLabel, value: selectedRequest.product },
-                  { label: dshText.sheinProxy.quantityLabel, value: String(selectedRequest.quantity) },
-                  { label: dshText.sheinProxy.statusLabel, value: resolveStatusLabel(dshText, selectedRequest.status) },
-                  { label: dshText.sheinProxy.updatedLabel, value: selectedRequest.updated },
-                  { label: dshText.sheinProxy.nextActionLabel, value: resolveNextActionLabel(dshText, selectedRequest.status) },
-                ]}
-              />
-            </Box>
-          </Box>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {SHEIN_PROXY_ITEMS.map((request) => (
+          <div key={request.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr 1fr', gap: '16px', alignItems: 'start', padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontWeight: 800, color: '#0A2F5C', fontSize: '14px' }}>{request.id}</span>
+                <span style={{ padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, backgroundColor: request.status === 'قيد المراجعة' ? '#FEF3C7' : request.status === 'مجدولة' ? '#FEF2F2' : 'rgba(10,47,92,0.04)', color: request.status === 'قيد المراجعة' ? '#D97706' : request.status === 'مجدولة' ? '#DC2626' : '#64748B' }}>{request.status}</span>
+                {request.tags?.map((tag) => (
+                  <span key={tag} style={{ fontSize: '10px', fontWeight: 700, padding: '1px 6px', borderRadius: '99px', backgroundColor: '#EEF2FF', color: '#4F46E5' }}>{tag}</span>
+                ))}
+              </div>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: '#0A2F5C' }}>{request.customer}</div>
+              <div style={{ fontSize: '11px', color: '#64748B' }}>{request.product}</div>
+              <div style={{ fontSize: '11px', color: '#64748B' }}>آخر تحديث: {request.updated}</div>
+            </div>
 
-          <Box style={{ flexGrow: 1, flexBasis: 320 }}>
-            <Box padding={3} gap={2} border radiusToken="xl" background="surfaceRaised">
-              <Text role="bodyStrong">{dshText.sheinProxy.pricingTitle}</Text>
-              <Text role="bodySm" tone="muted">{selectedRequest.note}</Text>
-              <KeyValueList
-                items={[
-                  { label: dshText.sheinProxy.amountLabel, value: selectedRequest.amount },
-                  { label: dshText.sheinProxy.shippingLabel, value: selectedRequest.shipping },
-                  { label: dshText.sheinProxy.serviceFeeLabel, value: selectedRequest.fee },
-                  { label: dshText.sheinProxy.totalLabel, value: selectedRequest.total, tone: 'success' },
-                  {
-                    label: dshText.sheinProxy.notesLabel,
-                    value: selectedRequest.note,
-                    helperText: resolveNextActionLabel(dshText, selectedRequest.status),
-                  },
-                ]}
-              />
+            <OperationsSuggestionCard
+              title="توصية"
+              label={request.suggestion}
+              reason={request.reason}
+              confidence={request.confidence}
+              actions={(
+                <>
+                  <button style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>{request.action}</button>
+                  {request.secondaryAction && <button style={{ padding: '4px 10px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>{request.secondaryAction}</button>}
+                </>
+              )}
+            />
 
-              <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                <Button
-                  label={dshText.sheinProxy.retryLabel}
-                  tone="ghost"
-                  fullWidth={false}
-                  onPress={() => router.refresh()}
-                />
-                <Button
-                  label={dshText.common.openGeneralOperations}
-                  tone="primary"
-                  fullWidth={false}
-                  onPress={() => router.push(operationsHref)}
-                />
-                <Button
-                  label={dshText.sheinProxy.backToHub}
-                  tone="secondary"
-                  fullWidth={false}
-                  onPress={() => router.push(hubHref)}
-                />
-                <Button
-                  label={dshText.common.openSupport}
-                  tone="secondary"
-                  fullWidth={false}
-                  onPress={() => router.push(supportHref)}
-                />
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
-    </WebCommandCenterFrame>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignSelf: 'center' }}>
+              <button style={{ padding: '8px 12px', backgroundColor: '#0A2F5C', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }} onClick={() => router.push(`${hubHref}?workspace=sheinproxy&requestId=${request.id}`)}>
+                افحص الطلب
+              </button>
+              <button style={{ padding: '8px 12px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }} onClick={() => router.push(`${hubHref}?workspace=dispatch-assignment`)}>
+                الإسناد اليدوي
+              </button>
+              <button style={{ padding: '8px 12px', backgroundColor: '#FEF2F2', color: '#DC2626', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }} onClick={() => router.push('/support')}>
+                تصعيد للدعم
+              </button>
+              <button style={{ padding: '8px 12px', backgroundColor: 'transparent', color: '#64748B', border: '1px solid rgba(10,47,92,0.1)', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }} onClick={() => router.push(`${hubHref}?workspace=proxy-shein-awnak`)}>
+                عرض عونك
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

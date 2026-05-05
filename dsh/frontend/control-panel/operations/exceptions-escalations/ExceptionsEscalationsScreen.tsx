@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { OperationsSuggestionCard } from '../operations.ui';
 
 export type ExceptionsEscalationsScreenProps = { hubHref: string; };
 
@@ -24,16 +25,6 @@ const EXCEPTIONS = [
     suggestion: { label: 'أغلق الاستثناء بعد تأكيد إيقاف الاستقبال', reason: 'الاستقبال موقوف مؤقتاً — لا طلبات جديدة ستصل', confidence: 'medium' as const, action: 'إغلاق الاستثناء', secondary: 'تواصل مع الشريك', auditRequired: false, severity: 'medium' as const },
   },
 ] as const;
-
-function ConfidenceBadge({ level }: { level: 'high' | 'medium' | 'low' }) {
-  const map = {
-    high:   { label: 'ثقة عالية',   bg: '#DCFCE7', color: '#16A34A' },
-    medium: { label: 'ثقة متوسطة', bg: '#FEF3C7', color: '#D97706' },
-    low:    { label: 'ثقة منخفضة', bg: '#FEF2F2', color: '#DC2626' },
-  };
-  const { label, bg, color } = map[level];
-  return <span style={{ fontSize: '10px', fontWeight: 700, padding: '1px 6px', borderRadius: '99px', backgroundColor: bg, color }}>{label}</span>;
-}
 
 export function ExceptionsEscalationsScreen({ hubHref }: ExceptionsEscalationsScreenProps) {
   return (
@@ -69,19 +60,20 @@ export function ExceptionsEscalationsScreen({ hubHref }: ExceptionsEscalationsSc
             </div>
 
             {/* Col 2: System suggestion */}
-            <div style={{ padding: '8px 10px', backgroundColor: 'rgba(10,47,92,0.03)', border: '1px solid rgba(10,47,92,0.07)', borderRadius: '6px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: '#0A2F5C', marginBottom: '2px' }}>توصية النظام: {exc.suggestion.label}</div>
-              <div style={{ fontSize: '11px', color: '#64748B', marginBottom: '4px' }}>السبب: {exc.suggestion.reason}</div>
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <ConfidenceBadge level={exc.suggestion.confidence} />
-                {exc.suggestion.severity === 'critical' && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>خطر حرج</span>}
-                {exc.suggestion.auditRequired && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>يتطلب تدقيق</span>}
-              </div>
-              <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
-                <button style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>{exc.suggestion.action}</button>
-                {exc.suggestion.secondary && <button style={{ padding: '4px 10px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>{exc.suggestion.secondary}</button>}
-              </div>
-            </div>
+            <OperationsSuggestionCard
+              label={exc.suggestion.label}
+              reason={exc.suggestion.reason}
+              confidence={exc.suggestion.confidence}
+              actions={(
+                <>
+                  <button style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>{exc.suggestion.action}</button>
+                  {exc.suggestion.secondary && <button style={{ padding: '4px 10px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>{exc.suggestion.secondary}</button>}
+                </>
+              )}
+            >
+              {exc.suggestion.severity === 'critical' && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>خطر حرج</span>}
+              {exc.suggestion.auditRequired && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>يتطلب تدقيق</span>}
+            </OperationsSuggestionCard>
 
             {/* Col 3: Actions */}
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap', alignSelf: 'center' }}>

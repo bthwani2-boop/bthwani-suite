@@ -243,6 +243,138 @@ const webControlSurfaceCss = `
     width: 100%;
   }
 }
+.ui-web-compact-surface-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid rgba(10, 47, 92, 0.06);
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+.ui-web-compact-surface-header__title-block {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ui-web-compact-surface-header__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0A2F5C;
+}
+.ui-web-compact-surface-header__description {
+  margin: 0;
+  font-size: 13px;
+  color: #64748B;
+}
+.ui-web-compact-surface-header__pulse {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.ui-web-compact-surface-header__pulse-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background-color: rgba(10, 47, 92, 0.04);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0A2F5C;
+}
+.ui-web-compact-surface-header__pulse-item span:first-child {
+  color: #64748B;
+  font-size: 11px;
+}
+.ui-web-system-suggestion {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background-color: rgba(10, 47, 92, 0.03);
+  border-radius: 6px;
+  border: 1px solid rgba(10, 47, 92, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: right;
+  direction: rtl;
+}
+.ui-web-system-suggestion__header {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0A2F5C;
+}
+.ui-web-system-suggestion__reason {
+  font-size: 11px;
+  color: #64748B;
+}
+.ui-web-system-suggestion__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.ui-web-system-suggestion__actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.ui-web-system-suggestion__conf-high {
+  font-size: 10px;
+  font-weight: 700;
+  color: #16A34A;
+  background-color: #DCFCE7;
+  padding: 1px 6px;
+  border-radius: 99px;
+}
+.ui-web-system-suggestion__conf-medium {
+  font-size: 10px;
+  font-weight: 700;
+  color: #D97706;
+  background-color: #FEF3C7;
+  padding: 1px 6px;
+  border-radius: 99px;
+}
+.ui-web-system-suggestion__conf-low {
+  font-size: 10px;
+  font-weight: 700;
+  color: #DC2626;
+  background-color: #FEF2F2;
+  padding: 1px 6px;
+  border-radius: 99px;
+}
+.ui-web-system-suggestion__audit {
+  font-size: 10px;
+  font-weight: 700;
+  color: #DC2626;
+  background-color: #FEF2F2;
+  padding: 1px 6px;
+  border-radius: 99px;
+}
+.ui-web-system-suggestion__btn-primary {
+  padding: 4px 10px;
+  background-color: #FF500D;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ui-web-system-suggestion__btn-secondary {
+  padding: 4px 10px;
+  background-color: #F1F5F9;
+  color: #0A2F5C;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
 `;
 
 function WebControlSurfaceStyles() {
@@ -491,6 +623,97 @@ export function WebControlDisclosureItem({
           {content}
         </button>
       )}
+    </>
+  );
+}
+
+export type WebCompactSurfaceHeaderProps = {
+  title: string;
+  description?: string;
+  metrics?: ReadonlyArray<{ id: string; title: string; value: string }>;
+};
+
+export function WebCompactSurfaceHeader({ title, description, metrics = [] }: WebCompactSurfaceHeaderProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <header className="ui-web-compact-surface-header" dir="rtl">
+        <div className="ui-web-compact-surface-header__title-block">
+          <h1 className="ui-web-compact-surface-header__title">{title}</h1>
+          {description && <p className="ui-web-compact-surface-header__description">{description}</p>}
+        </div>
+        <div className="ui-web-compact-surface-header__pulse">
+          {metrics.map((metric) => (
+            <div key={metric.id} className="ui-web-compact-surface-header__pulse-item">
+              <span>{metric.title}</span>
+              <span>{metric.value}</span>
+            </div>
+          ))}
+        </div>
+      </header>
+    </>
+  );
+}
+
+export type WebSystemSuggestionActionProps = {
+  id: string;
+  label: string;
+  tone?: 'primary' | 'secondary';
+  onAction?: () => void;
+};
+
+export type WebSystemSuggestionProps = {
+  title: string;
+  reason?: string;
+  confidence?: 'high' | 'medium' | 'low';
+  auditTag?: string;
+  primaryAction?: WebSystemSuggestionActionProps;
+  secondaryAction?: WebSystemSuggestionActionProps;
+};
+
+export function WebSystemSuggestion({
+  title,
+  reason,
+  confidence,
+  auditTag,
+  primaryAction,
+  secondaryAction,
+}: WebSystemSuggestionProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <div className="ui-web-system-suggestion">
+        <span className="ui-web-system-suggestion__header">{title}</span>
+        {reason && <span className="ui-web-system-suggestion__reason">{reason}</span>}
+        <div className="ui-web-system-suggestion__meta">
+          {confidence === 'high' && <span className="ui-web-system-suggestion__conf-high">ثقة عالية</span>}
+          {confidence === 'medium' && <span className="ui-web-system-suggestion__conf-medium">ثقة متوسطة</span>}
+          {confidence === 'low' && <span className="ui-web-system-suggestion__conf-low">مراجعة مطلوبة</span>}
+          {auditTag && <span className="ui-web-system-suggestion__audit">{auditTag}</span>}
+        </div>
+        {(primaryAction || secondaryAction) && (
+          <div className="ui-web-system-suggestion__actions">
+            {primaryAction && (
+              <button
+                type="button"
+                className="ui-web-system-suggestion__btn-primary"
+                onClick={primaryAction.onAction}
+              >
+                {primaryAction.label}
+              </button>
+            )}
+            {secondaryAction && (
+              <button
+                type="button"
+                className="ui-web-system-suggestion__btn-secondary"
+                onClick={secondaryAction.onAction}
+              >
+                {secondaryAction.label}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </>
   );
 }

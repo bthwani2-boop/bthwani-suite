@@ -4,7 +4,6 @@ import {
   DshControlPanelSurfaceHost,
   ControlPanelDshMarketingScreen,
   ControlPanelDshPartnerApprovalsScreen,
-  useDshControlPanelText,
 } from '../composition';
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -18,6 +17,8 @@ import {
   WebSectionCard,
   WebSegmentedTabs,
   WebSignalCard,
+  WebCompactSurfaceHeader,
+  WebSystemSuggestion,
 } from '@bthwani/ui-kit/web';
 import {
   buildOperationsHref,
@@ -318,7 +319,6 @@ export function ControlPanelSurfaceHost({
   const { direction } = useDirection();
   const uiText = useUiText();
   const panelText = uiText.controlPanel;
-  const dshText = useDshControlPanelText();
   const [alertCount, setAlertCount] = React.useState(1);
   const [selectedServiceId, setSelectedServiceId] = React.useState<string>(allServiceTabId);
   const [activeSectionHref, setActiveSectionHref] = React.useState<PrimarySectionHref>(() => (
@@ -818,39 +818,53 @@ export function ControlPanelSurfaceHost({
       <div className={styles.stageStack} dir={direction}>
         {phaseOneBlueprint ? (
           <>
-            <WebControlSurfaceHeader
-              chips={[
-                { label: panelText.brandLabel, tone: 'accent' },
-                { label: phaseOneBlueprint.eyebrow, tone: 'brand' },
-                { label: isAllFilterActive ? panelText.filters.allServicesMeta : selectedServiceLabel },
-              ]}
-              title={phaseOneBlueprint.title}
-              description={phaseOneBlueprint.description}
-              actions={[
-                {
-                  id: phaseOneBlueprint.primaryAction.id,
-                  label: phaseOneBlueprint.primaryAction.label,
-                  href: phaseOneBlueprint.primaryAction.href,
-                  onAction: resolveActionHandler(
-                    phaseOneBlueprint.primaryAction.href,
-                    phaseOneBlueprint.primaryAction.onAction,
-                  ),
-                  tone: phaseOneBlueprint.primaryAction.tone,
-                },
-              ]}
-            />
-
-            <div className={styles.metricsStrip}>
-              {phaseOneBlueprint.kpis.map((kpi) => (
-                <WebSignalCard
-                  key={kpi.id}
-                  title={kpi.title}
-                  value={kpi.value}
-                  description={kpi.description}
-                  tone={kpi.tone}
+            {activeSectionId === 'finance' ? (
+              <WebCompactSurfaceHeader
+                title={phaseOneBlueprint.title}
+                description={phaseOneBlueprint.description}
+                metrics={phaseOneBlueprint.kpis.map((kpi) => ({
+                  id: kpi.id,
+                  title: kpi.title,
+                  value: kpi.value,
+                }))}
+              />
+            ) : (
+              <>
+                <WebControlSurfaceHeader
+                  chips={[
+                    { label: panelText.brandLabel, tone: 'accent' },
+                    { label: phaseOneBlueprint.eyebrow, tone: 'brand' },
+                    { label: isAllFilterActive ? panelText.filters.allServicesMeta : selectedServiceLabel },
+                  ]}
+                  title={phaseOneBlueprint.title}
+                  description={phaseOneBlueprint.description}
+                  actions={[
+                    {
+                      id: phaseOneBlueprint.primaryAction.id,
+                      label: phaseOneBlueprint.primaryAction.label,
+                      href: phaseOneBlueprint.primaryAction.href,
+                      onAction: resolveActionHandler(
+                        phaseOneBlueprint.primaryAction.href,
+                        phaseOneBlueprint.primaryAction.onAction,
+                      ),
+                      tone: phaseOneBlueprint.primaryAction.tone,
+                    },
+                  ]}
                 />
-              ))}
-            </div>
+
+                <div className={styles.metricsStrip}>
+                  {phaseOneBlueprint.kpis.map((kpi) => (
+                    <WebSignalCard
+                      key={kpi.id}
+                      title={kpi.title}
+                      value={kpi.value}
+                      description={kpi.description}
+                      tone={kpi.tone}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
 
 
             {activeSectionId === 'dashboard' ? (
@@ -918,25 +932,43 @@ export function ControlPanelSurfaceHost({
                     ))}
                   </div>
 
-                  <details className={styles.disclosure}>
-                    <summary className={styles.disclosureSummary}>
-                      <span>{phaseOneBlueprint.disclosureTitle}</span>
-                      <span className={styles.disclosureHint}>{phaseOneBlueprint.disclosureDescription}</span>
-                    </summary>
-                    <div className={styles.disclosureBody}>
-                      {phaseOneBlueprint.disclosureItems.map((item) => (
-                        <WebControlDisclosureItem
-                          key={item.id}
-                          id={item.id}
-                          label={item.label}
-                          description={item.description}
-                          href={item.href}
-                          badge={item.badge}
-                          onAction={resolveActionHandler(item.href, item.onAction)}
-                        />
-                      ))}
-                    </div>
-                  </details>
+                  {activeSectionId === 'finance' ? (
+                    <WebSystemSuggestion
+                      title="مراجعة مطابقة WLT"
+                      reason="تم اكتشاف حسابات بحاجة إلى تسوية يدوية قبل الإغلاق المالي."
+                      confidence="high"
+                      auditTag="تنبيه مالي"
+                      primaryAction={{
+                        id: 'finance-audit',
+                        label: 'مراجعة التسويات',
+                        onAction: resolveActionHandler(undefined, () => setSelectedServiceId('wlt')),
+                      }}
+                      secondaryAction={{
+                        id: 'finance-ignore',
+                        label: 'تأجيل',
+                      }}
+                    />
+                  ) : (
+                    <details className={styles.disclosure}>
+                      <summary className={styles.disclosureSummary}>
+                        <span>{phaseOneBlueprint.disclosureTitle}</span>
+                        <span className={styles.disclosureHint}>{phaseOneBlueprint.disclosureDescription}</span>
+                      </summary>
+                      <div className={styles.disclosureBody}>
+                        {phaseOneBlueprint.disclosureItems.map((item) => (
+                          <WebControlDisclosureItem
+                            key={item.id}
+                            id={item.id}
+                            label={item.label}
+                            description={item.description}
+                            href={item.href}
+                            badge={item.badge}
+                            onAction={resolveActionHandler(item.href, item.onAction)}
+                          />
+                        ))}
+                      </div>
+                    </details>
+                  )}
                 </WebSectionCard>
 
               </>

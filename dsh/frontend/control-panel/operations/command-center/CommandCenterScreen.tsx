@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { OperationsSuggestionCard } from '../operations.ui';
 
 export type CommandCenterScreenProps = { hubHref: string; };
 
@@ -46,16 +47,6 @@ const QUICK_ACTIONS = [
   { label: 'تصعيد شكوى عميل (تأخير)', time: 'منذ 18 دقيقة', workspace: 'audit-support-sla' },
 ] as const;
 
-function ConfidenceBadge({ level }: { level: 'high' | 'medium' | 'low' }) {
-  const map = {
-    high:   { label: 'ثقة عالية',   bg: '#DCFCE7', color: '#16A34A' },
-    medium: { label: 'ثقة متوسطة', bg: '#FEF3C7', color: '#D97706' },
-    low:    { label: 'ثقة منخفضة', bg: '#FEF2F2', color: '#DC2626' },
-  };
-  const { label, bg, color } = map[level];
-  return <span style={{ fontSize: '10px', fontWeight: 700, padding: '1px 6px', borderRadius: '99px', backgroundColor: bg, color }}>{label}</span>;
-}
-
 export function CommandCenterScreen({ hubHref }: CommandCenterScreenProps) {
   return (
     <div style={{ display: 'grid', gap: '20px', direction: 'rtl' }}>
@@ -85,15 +76,19 @@ export function CommandCenterScreen({ hubHref }: CommandCenterScreenProps) {
           <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0A2F5C', margin: '0 0 12px 0' }}>أعلى توصيات النظام الآن</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {TOP_SUGGESTIONS.map((s, idx) => (
-              <div key={idx} style={{ padding: '10px 12px', backgroundColor: s.risk === 'critical' ? 'rgba(220,38,38,0.03)' : 'rgba(10,47,92,0.03)', border: `1px solid ${s.risk === 'critical' ? '#FECACA' : 'rgba(10,47,92,0.07)'}`, borderRadius: '8px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: '#0A2F5C', marginBottom: '2px' }}>توصية النظام: {s.label}</div>
-                <div style={{ fontSize: '11px', color: '#64748B', marginBottom: '6px' }}>السبب: {s.reason}</div>
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <ConfidenceBadge level={s.confidence} />
-                  {s.risk === 'critical' && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>خطر حرج</span>}
-                  <a href={`${hubHref}${s.href}`} style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' }}>{s.action}</a>
-                </div>
-              </div>
+              <OperationsSuggestionCard
+                key={idx}
+                label={s.label}
+                reason={s.reason}
+                confidence={s.confidence}
+                actions={(
+                  <a href={`${hubHref}${s.href}`} style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' }}>
+                    {s.action}
+                  </a>
+                )}
+              >
+                {s.risk === 'critical' && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>خطر حرج</span>}
+              </OperationsSuggestionCard>
             ))}
           </div>
         </div>

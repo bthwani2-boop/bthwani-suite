@@ -4,6 +4,8 @@ export type CanonicalOperationsGroupId =
   | 'command-center'
   | 'live-orders'
   | 'dispatch-assignment'
+  | 'sheinproxy'
+  | 'proxy-shein-awnak'
   | 'captain-operations'
   | 'partner-stores'
   | 'area-capacity'
@@ -98,3 +100,13 @@ export type OperationsNormalizationResult =
       section: NonOperationsSectionRootId;
       href: `/${NonOperationsSectionRootId}`;
     };
+
+export type OperationsViewState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
+
+export type StateViewCopy = {
+  stateId?: 'loading' | 'empty' | 'offline' | 'recoverableError';
+  kind?: 'warning';
+  title: string;
+  description: string;
+  actionLabel: string;
+};

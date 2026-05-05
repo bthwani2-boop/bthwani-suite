@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { OperationsSuggestionCard } from '../operations.ui';
 
 export type CaptainOperationsScreenProps = { hubHref: string; };
 
@@ -30,16 +31,6 @@ const CAPTAINS = [
     suggestion: { label: 'أخفه من قائمة الإسناد', reason: 'موقوف حالياً — لا يُعرض كخيار توزيع', confidence: 'low' as const, action: 'تصعيد', secondary: 'تحديث الحالة', auditRequired: true },
   },
 ] as const;
-
-function ConfidenceBadge({ level }: { level: 'high' | 'medium' | 'low' }) {
-  const map = {
-    high:   { label: 'ثقة عالية',   bg: '#DCFCE7', color: '#16A34A' },
-    medium: { label: 'ثقة متوسطة', bg: '#FEF3C7', color: '#D97706' },
-    low:    { label: 'ثقة منخفضة', bg: '#FEF2F2', color: '#DC2626' },
-  };
-  const { label, bg, color } = map[level];
-  return <span style={{ fontSize: '10px', fontWeight: 700, padding: '1px 6px', borderRadius: '99px', backgroundColor: bg, color }}>{label}</span>;
-}
 
 export function CaptainOperationsScreen({ hubHref }: CaptainOperationsScreenProps) {
   return (
@@ -73,14 +64,12 @@ export function CaptainOperationsScreen({ hubHref }: CaptainOperationsScreenProp
               <div style={{ fontSize: '11px', color: '#64748B' }}>آخر موقع: {cap.location}</div>
 
               {/* System suggestion */}
-              <div style={{ marginTop: '8px', padding: '8px 10px', backgroundColor: 'rgba(10,47,92,0.03)', border: '1px solid rgba(10,47,92,0.07)', borderRadius: '6px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: '#0A2F5C', marginBottom: '2px' }}>توصية: {cap.suggestion.label}</div>
-                <div style={{ fontSize: '11px', color: '#64748B', marginBottom: '4px' }}>السبب: {cap.suggestion.reason}</div>
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  <ConfidenceBadge level={cap.suggestion.confidence} />
-                  {cap.suggestion.auditRequired && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>يتطلب تدقيق</span>}
-                </div>
-              </div>
+              <OperationsSuggestionCard
+                title="توصية"
+                label={cap.suggestion.label}
+                reason={cap.suggestion.reason}
+                confidence={cap.suggestion.confidence}
+              />
             </div>
 
             {/* Col 2: Performance metrics */}

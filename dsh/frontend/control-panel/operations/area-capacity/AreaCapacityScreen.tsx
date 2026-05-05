@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { OperationsSuggestionCard } from '../operations.ui';
 
 export type AreaCapacityScreenProps = { hubHref: string; };
 
@@ -26,16 +27,6 @@ const AREAS = [
     suggestion: { label: 'يمكن نقل كباتن للشمال', reason: 'الجنوب مستقر ويملك فائضاً يساعد الشمال', confidence: 'medium' as const, action: 'نقل الكباتن', secondary: null, auditRequired: false, risk: 'low' as const },
   },
 ] as const;
-
-function ConfidenceBadge({ level }: { level: 'high' | 'medium' | 'low' }) {
-  const map = {
-    high:   { label: 'ثقة عالية',   bg: '#DCFCE7', color: '#16A34A' },
-    medium: { label: 'ثقة متوسطة', bg: '#FEF3C7', color: '#D97706' },
-    low:    { label: 'ثقة منخفضة', bg: '#FEF2F2', color: '#DC2626' },
-  };
-  const { label, bg, color } = map[level];
-  return <span style={{ fontSize: '10px', fontWeight: 700, padding: '1px 6px', borderRadius: '99px', backgroundColor: bg, color }}>{label}</span>;
-}
 
 export function AreaCapacityScreen({ hubHref }: AreaCapacityScreenProps) {
   return (
@@ -78,18 +69,19 @@ export function AreaCapacityScreen({ hubHref }: AreaCapacityScreenProps) {
             </div>
 
             {/* Col 2: System suggestion */}
-            <div style={{ padding: '8px 10px', backgroundColor: 'rgba(10,47,92,0.03)', border: '1px solid rgba(10,47,92,0.07)', borderRadius: '6px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: '#0A2F5C', marginBottom: '2px' }}>توصية النظام: {area.suggestion.label}</div>
-              <div style={{ fontSize: '11px', color: '#64748B', marginBottom: '4px' }}>السبب: {area.suggestion.reason}</div>
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <ConfidenceBadge level={area.suggestion.confidence} />
-                {area.suggestion.risk === 'critical' && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>خطر حرج</span>}
-              </div>
-              <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
-                <button style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>{area.suggestion.action}</button>
-                {area.suggestion.secondary && <button style={{ padding: '4px 10px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>{area.suggestion.secondary}</button>}
-              </div>
-            </div>
+            <OperationsSuggestionCard
+              label={area.suggestion.label}
+              reason={area.suggestion.reason}
+              confidence={area.suggestion.confidence}
+              actions={(
+                <>
+                  <button style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>{area.suggestion.action}</button>
+                  {area.suggestion.secondary && <button style={{ padding: '4px 10px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>{area.suggestion.secondary}</button>}
+                </>
+              )}
+            >
+              {area.suggestion.risk === 'critical' && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>خطر حرج</span>}
+            </OperationsSuggestionCard>
 
             {/* Col 3: Actions */}
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap', alignSelf: 'center' }}>

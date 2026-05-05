@@ -15,6 +15,8 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
   { id: 'command-center', label: 'غرفة القيادة', description: 'نبض العمليات، المعوقات، وأفضل إجراء تالي.', badge: 'Hub' },
   { id: 'live-orders', label: 'الطلبات الحية', description: 'قائمة الطلبات، التفاصيل، الدردشة، وتدخلات التنفيذ.', badge: 'Core' },
   { id: 'dispatch-assignment', label: 'الإسناد والتوزيع', description: 'لوحة الإسناد، تغطية الكباتن، وإعادة الإسناد اليدوي.', badge: 'Live' },
+  { id: 'sheinproxy', label: 'شي إن', description: 'مسار الإسناد اليدوي لطلبات شي إن والدفعات المرتبطة بها.', badge: 'Manual' },
+  { id: 'proxy-shein-awnak', label: 'عونك', description: 'مسار عونك التشغيلي للدفعات اليدوية ومتابعة الطلبات.', badge: 'Manual' },
   { id: 'captain-operations', label: 'تشغيل الكباتن', description: 'توافر الكباتن، الجاهزية، وضغط التغطية.', badge: 'Crew' },
   { id: 'partner-stores', label: 'المتاجر والشركاء', description: 'جاهزية المتاجر، التحضير، وضغط الاستلام.', badge: 'Stores' },
   { id: 'area-capacity', label: 'المناطق والسعة', description: 'ضغط السعة، النوافذ المحجوزة، والتحكم في الطفرات.', badge: 'Capacity' },
@@ -69,7 +71,7 @@ const LEGACY_OPERATIONAL_TO_CANONICAL_GROUP: Record<Exclude<LegacyOperationsWork
   bell: 'live-orders',
   'arrival-bell': 'live-orders',
   'zone-set': 'area-capacity',
-  'proxy-shein-awnak': 'dispatch-assignment',
+  'proxy-shein-awnak': 'proxy-shein-awnak',
 };
 
 const LEGACY_SECTION_REDIRECTS: Record<LegacySectionRedirectId, NonOperationsSectionRootId> = {
@@ -184,4 +186,41 @@ export function buildOperationsHref(
 
 export function getOperationsGroupMeta(groupId: CanonicalOperationsGroupId) {
   return OPERATIONS_CANONICAL_GROUPS.find((group) => group.id === groupId) ?? OPERATIONS_CANONICAL_GROUPS[0];
+}
+
+const STATE_COPY: Record<Exclude<import('./operations.types').OperationsViewState, 'ready'>, import('./operations.types').StateViewCopy> = {
+  loading: {
+    stateId: 'loading',
+    title: 'Loading operations preview',
+    description: 'The preview workspace is preparing the next operational state.',
+    actionLabel: 'Open operations',
+  },
+  empty: {
+    stateId: 'empty',
+    title: 'Nothing to show yet',
+    description: 'No operational sample is available for the current workspace.',
+    actionLabel: 'Open operations',
+  },
+  error: {
+    stateId: 'recoverableError',
+    title: 'Preview data is unavailable',
+    description: 'The workspace can recover after the next refresh.',
+    actionLabel: 'Open operations',
+  },
+  offline: {
+    stateId: 'offline',
+    title: 'Operations preview is offline',
+    description: 'Restore connectivity or reload the workspace to continue.',
+    actionLabel: 'Open operations',
+  },
+  disabled: {
+    kind: 'warning',
+    title: 'Preview mode is disabled',
+    description: 'The operational preview is hidden until the workspace is ready again.',
+    actionLabel: 'Open operations',
+  },
+};
+
+export function resolveOperationsStateCopy(state: Exclude<import('./operations.types').OperationsViewState, 'ready'>): import('./operations.types').StateViewCopy {
+  return STATE_COPY[state];
 }
