@@ -2,88 +2,104 @@
 
 import React from 'react';
 import { OperationsSuggestionCard } from '../operations.ui';
+import { EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW } from '../operations.preview-data';
+import styles from '../dsh-surface.module.css';
 
 export type ExceptionsEscalationsScreenProps = { hubHref: string; };
 
-const EXCEPTIONS = [
-  {
-    id: 'EXC-8812', type: 'تأخير غير مبرر للطلب', severity: 'عالي',
-    owner: 'نظام الإسناد', start: 'منذ 15 دقيقة', lastAction: 'توجيه تنبيه للكابتن',
-    resolution: 'إعادة إسناد الطلب',
-    suggestion: { label: 'أعد الإسناد لكابتن آخر', reason: '15 دقيقة تأخير — الكابتن الحالي لا يتحرك', confidence: 'high' as const, action: 'إعادة إسناد', secondary: 'تصعيد للمشرف', auditRequired: false, severity: 'high' as const },
-  },
-  {
-    id: 'EXC-8813', type: 'تعطل مركبة كابتن', severity: 'عالي جداً',
-    owner: 'الدعم الفني', start: 'منذ 8 دقائق', lastAction: 'قيد التواصل',
-    resolution: 'إلغاء الإسناد لكابتن بديل',
-    suggestion: { label: 'حوّل للدعم وأسند كابتن بديل فوراً', reason: 'تعطل فعلي — العميل ينتظر وSLA مهدد', confidence: 'high' as const, action: 'تطبيق الإجراء', secondary: 'تصعيد للإدارة', auditRequired: true, severity: 'critical' as const },
-  },
-  {
-    id: 'EXC-8814', type: 'إغلاق متجر مفاجئ', severity: 'متوسط',
-    owner: 'إدارة الشركاء', start: 'منذ 25 دقيقة', lastAction: 'إيقاف مؤقت للاستقبال',
-    resolution: '',
-    suggestion: { label: 'أغلق الاستثناء بعد تأكيد إيقاف الاستقبال', reason: 'الاستقبال موقوف مؤقتاً — لا طلبات جديدة ستصل', confidence: 'medium' as const, action: 'إغلاق الاستثناء', secondary: 'تواصل مع الشريك', auditRequired: false, severity: 'medium' as const },
-  },
-] as const;
+const STATUS_CLASS_NAMES: Record<string, string> = {
+  warning: styles.liveOrdersStatusWarning,
+  danger: styles.liveOrdersStatusDanger,
+  best: styles.liveOrdersStatusBest,
+  brand: styles.liveOrdersStatusBrand,
+};
 
 export function ExceptionsEscalationsScreen({ hubHref }: ExceptionsEscalationsScreenProps) {
+  const preview = EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW;
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', direction: 'rtl', height: '100%' }}>
+    <div className={styles.liveOrdersScreen}>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>الاستثناءات والتصعيد</h2>
-        <button style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(10,47,92,0.1)', background: '#fff', fontSize: '12px', fontWeight: 600, color: '#0A2F5C', cursor: 'pointer' }}>فلاتر مختصرة</button>
+      <div className={styles.liveOrdersHeaderRow}>
+        <h2 className={styles.liveOrdersTitle}>الاستثناءات والتصعيد</h2>
+        <button className={styles.liveOrdersFilterButton}>فلاتر مختصرة</button>
       </div>
 
-      {/* Status pills */}
-      <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none' }}>
-        {['الكل', 'مفتوح', 'قيد المراجعة', 'يحتاج تصعيد', 'مغلق'].map((s, i) => (
-          <span key={i} style={{ padding: '4px 10px', borderRadius: '99px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', backgroundColor: i === 3 ? '#FEF2F2' : i === 1 ? '#FEF3C7' : 'rgba(10,47,92,0.04)', color: i === 3 ? '#DC2626' : i === 1 ? '#D97706' : '#64748B', border: i === 3 ? '1px solid #FECACA' : i === 1 ? '1px solid #FDE68A' : '1px solid transparent', cursor: 'pointer' }}>{s}</span>
-        ))}
+      <div className={styles.liveOrdersSummaryGrid}>
+        <div className={styles.liveOrdersSummaryCard}>
+          <div className={styles.liveOrdersSummaryLabel}>مفتوحة</div>
+          <div className={styles.liveOrdersSummaryValueDanger}>{preview.summary.open}</div>
+        </div>
+        <div className={styles.liveOrdersSummaryCard}>
+          <div className={styles.liveOrdersSummaryLabel}>تصعيد</div>
+          <div className={styles.liveOrdersSummaryValueBrand}>{preview.summary.escalate}</div>
+        </div>
+        <div className={styles.liveOrdersSummaryCard}>
+          <div className={styles.liveOrdersSummaryLabel}>حل</div>
+          <div className={styles.liveOrdersSummaryValueBrand}>{preview.summary.resolve}</div>
+        </div>
+        <div className={styles.liveOrdersSummaryCard}>
+          <div className={styles.liveOrdersSummaryLabel}>إغلاق</div>
+          <div className={styles.liveOrdersSummaryValueBrand}>{preview.summary.close}</div>
+        </div>
       </div>
 
-      {/* Exception cards */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {EXCEPTIONS.map((exc, idx) => (
-          <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr 1fr', gap: '16px', alignItems: 'start', padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)', borderRight: exc.severity === 'عالي جداً' ? '4px solid #DC2626' : exc.severity === 'عالي' ? '4px solid #F59E0B' : '4px solid transparent' }}>
+      <div className={styles.liveOrdersCardsStack}>
+        {preview.exceptions.map((exc) => {
+          const statusClassName = STATUS_CLASS_NAMES[exc.statusTone] ?? STATUS_CLASS_NAMES.brand;
+          const cardClassName = [
+            styles.liveOrdersOrderCard,
+            exc.statusTone === 'danger' ? styles.liveOrdersOrderCardDanger : '',
+            exc.statusTone === 'warning' ? styles.liveOrdersOrderCardWarning : '',
+          ].filter(Boolean).join(' ');
 
-            {/* Col 1: Exception meta */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ fontWeight: 800, color: '#0A2F5C', fontSize: '14px' }}>{exc.id}</span>
-                <span style={{ padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, backgroundColor: exc.severity === 'عالي جداً' ? '#FEF2F2' : exc.severity === 'عالي' ? '#FEF3C7' : 'rgba(10,47,92,0.04)', color: exc.severity === 'عالي جداً' ? '#DC2626' : exc.severity === 'عالي' ? '#D97706' : '#64748B' }}>{exc.severity}</span>
+          return (
+            <div key={exc.id} className={cardClassName}>
+              <div className={styles.liveOrdersOrderMeta}>
+                <div className={styles.liveOrdersOrderTopRow}>
+                  <span className={styles.liveOrdersOrderId}>{exc.id}</span>
+                  <span className={`${styles.liveOrdersOrderStatus} ${statusClassName}`}>{exc.severity}</span>
+                  <span className={styles.liveOrdersRingHint}>{exc.currentOwner}</span>
+                </div>
+                <div className={styles.liveOrdersDestination}>{exc.type}</div>
+                <div className={styles.liveOrdersMetaText}>البداية: {exc.startTime}</div>
+                <div className={styles.liveOrdersNoteText}>آخر إجراء: {exc.lastAction}</div>
+                <div className={styles.liveOrdersNoteText}>{exc.note}</div>
               </div>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#0A2F5C' }}>{exc.type}</div>
-              <div style={{ fontSize: '11px', color: '#64748B' }}>البداية: <span style={{ fontWeight: 600 }}>{exc.start}</span> | المالك: <span style={{ fontWeight: 600 }}>{exc.owner}</span></div>
-              <div style={{ fontSize: '11px', color: '#64748B' }}>آخر إجراء: <span style={{ fontWeight: 600, color: '#0A2F5C' }}>{exc.lastAction}</span></div>
-              {exc.resolution && <div style={{ fontSize: '11px', color: '#16A34A', fontWeight: 700 }}>مقترح: <span style={{ color: '#0A2F5C', fontWeight: 600 }}>{exc.resolution}</span></div>}
+
+              <OperationsSuggestionCard
+                label={exc.suggestedAction}
+                reason={exc.note}
+                confidence={exc.statusTone === 'danger' ? 'high' : exc.statusTone === 'warning' ? 'medium' : 'high'}
+                actions={(
+                  <>
+                    <button className={styles.liveOrdersActionPrimary}>{exc.suggestedAction}</button>
+                    <button className={styles.liveOrdersActionSecondary}>إغلاق</button>
+                  </>
+                )}
+              >
+                <span className={styles.liveOrdersSuggestionChip}>{exc.resolutionPath}</span>
+              </OperationsSuggestionCard>
+
+              <div className={styles.liveOrdersOrderActions}>
+                <div className={styles.liveOrdersTimelineTitle}>مسار الإغلاق</div>
+                <div className={styles.liveOrdersTimelineList}>
+                  <div>• {exc.lastAction}</div>
+                  <div>• {exc.currentOwner}</div>
+                  <div>• {exc.suggestedAction}</div>
+                </div>
+                <div className={styles.liveOrdersPlanWrap}>
+                  <span className={styles.liveOrdersPlanChip}>{exc.resolutionPath}</span>
+                  <span className={styles.liveOrdersPlanChip}>{exc.severity}</span>
+                </div>
+                <div className={styles.liveOrdersActionGrid}>
+                  <button className={styles.liveOrdersActionPrimary}>حل</button>
+                  <button className={styles.liveOrdersActionSecondary}>تصعيد</button>
+                </div>
+              </div>
             </div>
-
-            {/* Col 2: System suggestion */}
-            <OperationsSuggestionCard
-              label={exc.suggestion.label}
-              reason={exc.suggestion.reason}
-              confidence={exc.suggestion.confidence}
-              actions={(
-                <>
-                  <button style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>{exc.suggestion.action}</button>
-                  {exc.suggestion.secondary && <button style={{ padding: '4px 10px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>{exc.suggestion.secondary}</button>}
-                </>
-              )}
-            >
-              {exc.suggestion.severity === 'critical' && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>خطر حرج</span>}
-              {exc.suggestion.auditRequired && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>يتطلب تدقيق</span>}
-            </OperationsSuggestionCard>
-
-            {/* Col 3: Actions */}
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap', alignSelf: 'center' }}>
-              <button style={{ padding: '8px 12px', backgroundColor: '#0A2F5C', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>تطبيق الإجراء</button>
-              <button style={{ padding: '8px 12px', backgroundColor: '#FEF2F2', color: '#DC2626', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>تصعيد للإدارة</button>
-              <button style={{ padding: '8px 12px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>إغلاق الاستثناء</button>
-            </div>
-
-          </div>
-        ))}
+          );
+        })}
       </div>
 
     </div>

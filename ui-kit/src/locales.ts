@@ -40,6 +40,9 @@ export const uiKitLocales = {
 					'community-services': 'الخدمات المجتمعية',
 					partners: 'الشركاء',
 					marketing: 'التسويق',
+					platform: 'المنصة',
+					administration: 'الإدارة',
+					hr: 'الموارد البشرية',
 					control: 'لوحة التحكم',
 				},
 				surfaceDescriptions: {
@@ -51,6 +54,9 @@ export const uiKitLocales = {
 					'community-services': 'خدمات المجتمع ومسارات الدعم.',
 					partners: 'جاهزية الشركاء والتنسيق.',
 					marketing: 'تحكم بالشريط والحملات.',
+					platform: 'ضبط الأدوات وحدود التشغيل التقني.',
+					administration: 'مسارات الإدارة الداخلية وقرارات التشغيل.',
+					hr: 'تشغيل الأشخاص والجاهزية التنظيمية.',
 					control: 'حوكمة وإدارة المنصة.',
 				},
 				marketing: {
@@ -72,8 +78,8 @@ export const uiKitLocales = {
 					descriptions: {
 						default: 'عرض الحالة وإجراء مقترح.',
 						fallback: 'واجهة تحكم مركزية.',
-						controlDefault: 'مجال التحكم الداخلي للمنصة والإدارة والحوكمة والأشخاص.',
-						subsectionFallback: 'قسم فرعي ضمن لوحة التحكم.',
+						controlDefault: 'مجال التشغيل الداخلي للمنصة والإدارة والموارد البشرية.',
+						subsectionFallback: 'قسم فرعي ضمن الغلاف الموحد.',
 					},
 				subSections: {
 					platform: 'المنصة',
@@ -263,6 +269,9 @@ export const uiKitLocales = {
 					'community-services': 'Community Services',
 					partners: 'Partners',
 					marketing: 'Marketing',
+					platform: 'Platform',
+					administration: 'Administration',
+					hr: 'Human Resources',
 					control: 'Control Panel',
 				},
 					surfaceDescriptions: {
@@ -274,6 +283,9 @@ export const uiKitLocales = {
 						'community-services': 'Community services & intake.',
 						partners: 'Partner readiness & coordination.',
 						marketing: 'Ticker & campaigns.',
+						platform: 'Technical tools and operating boundaries.',
+						administration: 'Internal administration paths and decisions.',
+						hr: 'People operations and organizational readiness.',
 						control: 'Platform governance & admin.',
 					},
 				marketing: {
@@ -295,7 +307,7 @@ export const uiKitLocales = {
 						descriptions: {
 							default: 'State summary & suggested action.',
 							fallback: 'Centralized control interface.',
-							controlDefault: 'Internal control domain for the platform, management, governance, and people.',
+							controlDefault: 'Internal operating scope for the platform, administration, and HR.',
 							subsectionFallback: 'Subsection within the control panel.',
 						},
 				subSections: {
@@ -327,8 +339,8 @@ export const uiKitLocales = {
 					contextTitleSection: 'Services linked to the section',
 					contextTitleService: 'Sections linked to the service',
 					noItems: 'No related items currently.',
-						subsectionTitle: 'Control Panel Sections',
-						subsectionDescription: 'Subsections inside centralized shell.',
+						subsectionTitle: 'Main Sections',
+						subsectionDescription: 'Top-level sections inside the unified shell.',
 					fallbackMissionTitle: 'Mission',
 					fallbackMissionDescription: 'No flow.meta directly linked to this section yet.',
 					fallbackDueLabel: 'Not defined in flow.meta',
@@ -341,7 +353,7 @@ export const uiKitLocales = {
 					contextTitle: 'Services Related to Section',
 					liveRefreshValue: 'No live refresh',
 					readingModeValue: 'Reference',
-					railNavigationLabel: 'Control panel sections',
+						railNavigationLabel: 'Primary sections',
 					primaryAction: 'Urgent Processing (1)',
 					secondaryAction: 'Open Operations',
 					secondaryActionDefault: 'Control Panel',

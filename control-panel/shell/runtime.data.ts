@@ -20,7 +20,7 @@ export type ControlPanelRuntimeMission = {
 };
 
 const controlPanelServices: ControlPanelRuntimeService[] = [
-  { id: 'dsh', label: 'DSH', statusKind: 'live', sections: ['dashboard', 'operations', 'partners', 'marketing', 'control'], placeholder: false },
+  { id: 'dsh', label: 'DSH', statusKind: 'live', sections: ['dashboard', 'operations', 'partners', 'marketing', 'platform', 'administration', 'hr'], placeholder: false },
   { id: 'arb', label: 'ARB', statusKind: 'live', sections: ['operations', 'partners', 'support'], placeholder: false },
   { id: 'amn', label: 'AMN', statusKind: 'reference', sections: ['operations', 'support'], placeholder: true },
   { id: 'wlt', label: 'WLT', statusKind: 'live', sections: ['finance'], placeholder: false },
@@ -39,7 +39,9 @@ const controlPanelSections: ControlPanelRuntimeSection[] = [
   { id: 'support', serviceIds: ['arb', 'amn'] },
   { id: 'partners', serviceIds: ['dsh', 'arb'] },
   { id: 'marketing', serviceIds: ['dsh'] },
-  { id: 'control', serviceIds: ['dsh'] },
+  { id: 'platform', serviceIds: ['dsh'] },
+  { id: 'administration', serviceIds: ['dsh'] },
+  { id: 'hr', serviceIds: ['dsh'] },
   { id: 'community-services', serviceIds: [] },
 ];
 
@@ -51,7 +53,9 @@ const controlPanelMissions: ControlPanelRuntimeMission[] = [
   { sectionId: 'support', flowId: 'arb-support', ownerSectionId: 'support', dueKind: 'defined', placeholder: false },
   { sectionId: 'partners', flowId: 'arb-partners', ownerSectionId: 'partners', dueKind: 'defined', placeholder: false },
   { sectionId: 'marketing', flowId: 'dsh-marketing', ownerSectionId: 'marketing', dueKind: 'defined', placeholder: false },
-  { sectionId: 'control', flowId: 'dsh-control', ownerSectionId: 'control', dueKind: 'defined', placeholder: false },
+  { sectionId: 'platform', flowId: 'dsh-platform', ownerSectionId: 'platform', dueKind: 'defined', placeholder: false },
+  { sectionId: 'administration', flowId: 'dsh-administration', ownerSectionId: 'administration', dueKind: 'defined', placeholder: false },
+  { sectionId: 'hr', flowId: 'dsh-hr', ownerSectionId: 'hr', dueKind: 'defined', placeholder: false },
   { sectionId: 'community-services', flowId: 'unmapped', ownerSectionId: 'community-services', dueKind: 'missing', placeholder: true },
 ];
 

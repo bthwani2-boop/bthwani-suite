@@ -14,7 +14,7 @@ export type DshClosureArea =
   | 'control-panel-catalogs'
   | 'control-panel-partners'
   | 'control-panel-marketing'
-  | 'control-panel-control';
+  | 'control-panel-platform';
 
 export type DshCrossSurfaceClosureItem = {
   surfaceId: DshSurfaceId;
@@ -128,12 +128,12 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
   },
   {
     surfaceId: 'control-panel',
-    area: 'control-panel-control',
+    area: 'control-panel-platform',
     status: 'needs-evidence',
-    title: 'control',
-    description: 'طبقة السيادة والحوكمة تحتاج proof matrix نهائية.',
+    title: 'platform',
+    description: 'طبقة المنصة تحتاج proof matrix نهائية.',
     evidenceHint: 'guard status proof',
-    routeHint: '/control',
+    routeHint: '/platform',
   },
 ];
 

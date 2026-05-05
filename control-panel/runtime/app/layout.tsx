@@ -2,7 +2,7 @@
 import '../../../tamagui.generated.css';
 export const metadata = {
   title: 'لوحة التحكم',
-  description: 'Unified control room',
+  description: 'Unified operating room',
 };
 
 import type { ReactNode } from 'react';

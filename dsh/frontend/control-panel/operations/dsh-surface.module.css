@@ -79,7 +79,7 @@
   background-color: #FFFFFF;
   border-bottom: 1px solid rgba(10, 47, 92, 0.08);
   overflow-x: auto;
-  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .operationsTabs::-webkit-scrollbar {
@@ -232,5 +232,258 @@
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+}
+
+/* ===== Live Orders Surface ===== */
+.liveOrdersScreen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  direction: rtl;
+  height: 100%;
+}
+
+.liveOrdersHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.liveOrdersTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0A2F5C;
+}
+
+.liveOrdersFilterButton {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(10,47,92,0.1);
+  background: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0A2F5C;
+  cursor: pointer;
+}
+
+.liveOrdersSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.liveOrdersSummaryCard {
+  padding: 14px 16px;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid rgba(10,47,92,0.08);
+}
+
+.liveOrdersSummaryLabel {
+  font-size: 12px;
+  color: #64748B;
+  font-weight: 600;
+}
+
+.liveOrdersSummaryValueBrand,
+.liveOrdersSummaryValueDanger {
+  font-size: 24px;
+  font-weight: 800;
+  margin-top: 8px;
+}
+
+.liveOrdersSummaryValueBrand {
+  color: #0A2F5C;
+}
+
+.liveOrdersSummaryValueDanger {
+  color: #DC2626;
+}
+
+.liveOrdersSummaryHint {
+  font-size: 12px;
+  color: #0A2F5C;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.liveOrdersCardsStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.liveOrdersOrderCard {
+  display: grid;
+  grid-template-columns: 1.4fr 1.2fr 1fr;
+  gap: 16px;
+  align-items: start;
+  padding: 16px;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid rgba(10,47,92,0.08);
+}
+
+.liveOrdersOrderCardDanger {
+  border-right: 4px solid #DC2626;
+}
+
+.liveOrdersOrderCardWarning {
+  border-right: 4px solid #F59E0B;
+}
+
+.liveOrdersOrderMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.liveOrdersOrderTopRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.liveOrdersOrderId {
+  font-weight: 800;
+  color: #0A2F5C;
+  font-size: 14px;
+}
+
+.liveOrdersOrderStatus {
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.liveOrdersRingHint {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+}
+
+.liveOrdersRingHintDanger {
+  color: #DC2626;
+}
+
+.liveOrdersDestination {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0A2F5C;
+}
+
+.liveOrdersMetaText,
+.liveOrdersNoteText {
+  font-size: 11px;
+  color: #64748B;
+}
+
+.liveOrdersOrderActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: center;
+}
+
+.liveOrdersTimelineTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0A2F5C;
+}
+
+.liveOrdersTimelineList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: #64748B;
+}
+
+.liveOrdersPlanWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.liveOrdersPlanChip {
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 700;
+  background-color: rgba(10,47,92,0.05);
+  color: #0A2F5C;
+}
+
+.liveOrdersActionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.liveOrdersActionPrimary,
+.liveOrdersActionSecondary {
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.liveOrdersActionPrimary {
+  background-color: #0A2F5C;
+  color: #fff;
+  border: none;
+}
+
+.liveOrdersActionSecondary {
+  background-color: transparent;
+  color: #0A2F5C;
+  border: 1px solid rgba(10,47,92,0.1);
+}
+
+.liveOrdersSuggestionChip,
+.liveOrdersAuditChip {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 99px;
+}
+
+.liveOrdersSuggestionChip {
+  color: #0A2F5C;
+  background-color: rgba(10,47,92,0.05);
+}
+
+.liveOrdersAuditChip {
+  color: #DC2626;
+  background-color: #FEF2F2;
+}
+
+.liveOrdersStatusWarning {
+  background-color: #FEF3C7;
+  color: #D97706;
+  border: 1px solid #FDE68A;
+}
+
+.liveOrdersStatusDanger {
+  background-color: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
+}
+
+.liveOrdersStatusBest {
+  background-color: #DCFCE7;
+  color: #16A34A;
+  border: 1px solid #BBF7D0;
+}
+
+.liveOrdersStatusBrand {
+  background-color: rgba(10,47,92,0.04);
+  color: #0A2F5C;
+  border: 1px solid transparent;
 }
 

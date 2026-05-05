@@ -15,7 +15,6 @@ import {
   WebControlDisclosureItem,
   WebControlSurfaceHeader,
   WebSectionCard,
-  WebSegmentedTabs,
   WebSignalCard,
   WebCompactSurfaceHeader,
   WebSystemSuggestion,
@@ -29,15 +28,13 @@ import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 
 const phaseOneSectionIds = ['dashboard', 'operations', 'finance', 'catalogs', 'support'] as const;
-const hiddenSectionIds = ['community-services', 'partners', 'marketing', 'control'] as const;
+const hiddenSectionIds = ['community-services', 'partners', 'marketing', 'platform', 'administration', 'hr'] as const;
 const primarySectionIds = [...phaseOneSectionIds, ...hiddenSectionIds] as const;
-const controlSubSectionIds = ['platform', 'administration', 'hr'] as const;
 const dshLiveWorkbenchIds = ['orders', 'reassign', 'peakMode', 'arrivalBell'] as const;
 const dshPlannedWorkbenchIds = ['sheinProxy', 'zoneSet', 'dashboard', 'captain-ops', 'field-ops', 'issues', 'serviceability', 'guard-status', 'evidence', 'dispatch', 'live-tracking', 'exceptions', 'sla', 'audit', 'partner-prep', 'handoff', 'proof-review', 'capacity'] as const;
 
 type ControlPanelSectionId = (typeof primarySectionIds)[number];
 type PhaseOneSectionId = (typeof phaseOneSectionIds)[number];
-type ControlPanelSubSectionId = (typeof controlSubSectionIds)[number];
 type PrimarySectionHref = `/${ControlPanelSectionId}`;
 type ControlPanelText = ReturnType<typeof useUiText>['controlPanel'];
 type ActionTone = 'primary' | 'secondary';
@@ -116,7 +113,6 @@ function resolveWorkbenchMeta(workbenches: Record<string, WorkbenchMeta>, workbe
 
 export type ControlPanelSurfaceHostProps = {
   section?: ControlPanelSectionId;
-  subsection?: ControlPanelSubSectionId;
   operationsWorkspace?: AnyOperationsWorkspaceId;
   operationsOrderId?: string;
   operationsOverlayMode?: OperationsPanelId;
@@ -144,7 +140,9 @@ const sectionRouteMap: Record<ControlPanelSectionId, PrimarySectionHref> = {
   'community-services': '/community-services',
   partners: '/partners',
   marketing: '/marketing',
-  control: '/control',
+  platform: '/platform',
+  administration: '/administration',
+  hr: '/hr',
 };
 
 const compactSectionDescriptions: Record<PhaseOneSectionId, string> = {
@@ -167,25 +165,10 @@ function getServiceLabel(uiText: ReturnType<typeof useUiText>, serviceId: string
 function resolveShellCopy(
   panelText: ControlPanelText,
   section: ControlPanelSectionId,
-  subsection?: ControlPanelSubSectionId,
 ) {
-  if (section !== 'control') {
-    return {
-      title: panelText.surfaceTitles[section],
-      description: panelText.surfaceDescriptions[section],
-    };
-  }
-
-  if (!subsection) {
-    return {
-      title: panelText.surfaceTitles.control,
-      description: panelText.descriptions.controlDefault,
-    };
-  }
-
   return {
-    title: panelText.subSections[subsection],
-    description: panelText.subSectionDescriptions[subsection],
+    title: panelText.surfaceTitles[section],
+    description: panelText.surfaceDescriptions[section],
   };
 }
 
@@ -200,16 +183,6 @@ function countLiveCoverage(serviceIds: readonly string[]) {
   }).length;
 }
 
-function buildControlHref(subsection?: ControlPanelSubSectionId) {
-  if (!subsection) {
-    return '/control';
-  }
-
-  const searchParams = new URLSearchParams();
-  searchParams.set('tab', subsection);
-  return `/control?${searchParams.toString()}`;
-}
-
 function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPanelText) {
   const iconMap: Record<string, string> = {
     dashboard: '⬡',
@@ -220,7 +193,9 @@ function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPane
     'community-services': '◍',
     partners: '⌂',
     marketing: '⌁',
-    control: '⚙',
+    platform: '⚙',
+    administration: '◐',
+    hr: '◑',
   };
 
   return primarySectionIds.map((sectionId) => {
@@ -235,11 +210,6 @@ function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPane
       label: panelText.surfaceTitles[sectionId],
       icon: iconMap[sectionId] ?? '•',
       active: href === activeHref,
-      children: sectionId === 'control' ? [
-        { id: '/control?tab=platform', label: 'المنصة', href: '/control?tab=platform' },
-        { id: '/control?tab=administration', label: 'الإدارة', href: '/control?tab=administration' },
-        { id: '/control?tab=hr', label: 'الموارد البشرية', href: '/control?tab=hr' },
-      ] : undefined,
     };
   });
 }
@@ -310,7 +280,6 @@ const SidebarOverrides = () => (
 
 export function ControlPanelSurfaceHost({
   section,
-  subsection,
   operationsWorkspace = 'overview',
   operationsOrderId,
   operationsOverlayMode,
@@ -330,13 +299,11 @@ export function ControlPanelSurfaceHost({
   }, [section]);
 
   const activeSectionId = activeSectionHref.slice(1) as ControlPanelSectionId;
-  const isControlSection = activeSectionId === 'control';
   const isOperationsSection = activeSectionId === 'operations';
   const isMarketingSection = activeSectionId === 'marketing';
   const isCommunityServicesSection = activeSectionId === 'community-services';
-  const activeControlSubsection = isControlSection ? subsection : undefined;
   const isAllFilterActive = selectedServiceId === allServiceTabId;
-  const shellCopy = resolveShellCopy(panelText, activeSectionId, activeControlSubsection);
+  const shellCopy = resolveShellCopy(panelText, activeSectionId);
   const railItems = React.useMemo(() => {
     const allItems = resolveRailItems(activeSectionHref, panelText);
     if (isAllFilterActive) return allItems;
@@ -778,7 +745,7 @@ export function ControlPanelSurfaceHost({
       <SidebarOverrides />
       <WebCommandCenterFrame
       brandLabel={panelText.brandLabel}
-      surfaceTitle="لوحة التحكم"
+      surfaceTitle="لوحة القيادة"
       surfaceSubtitle={shellCopy.title}
       showHero={!isOperationsSection}
       topFilters={[
@@ -873,7 +840,7 @@ export function ControlPanelSurfaceHost({
                 description="ملخص استراتيجي لنبض المنصة وغرفة القيادة."
               >
                 <div className={styles.dashboardHeroCard}>
-                  <div className={styles.dashboardHeroEyebrow}>BThwani Premium Control Room 2026</div>
+                  <div className={styles.dashboardHeroEyebrow}>BThwani Premium Command Center 2026</div>
                   <h2 className={styles.dashboardHeroTitle}>غرفة قيادة تنفيذية بنبرة هادئة وكثافة قرار أعلى.</h2>
                   <p className={styles.dashboardHeroDescription}>
                     هذا السطح لم يعد مجرد overview عام. تم رفعه ليصبح طبقة قيادة تقرأ نبض المنصة،
@@ -901,78 +868,58 @@ export function ControlPanelSurfaceHost({
                     tone="primary"
                     onAction={() => setSelectedServiceId(allServiceTabId)}
                   />
-                  <WebControlActionButton
-                    id="state-dashboard"
-                    label="العودة للنظرة العامة"
-                    href="/dashboard"
-                    tone="secondary"
-                    onAction={() => router.push('/dashboard')}
-                  />
-                </div>
-              </section>
-            ) : (
-              <>
-                <WebSectionCard
-                  title={phaseOneBlueprint.quickActionsTitle}
-                  description={phaseOneBlueprint.quickActionsDescription}
-                >
-                  <div className={styles.actionGrid}>
-                    {phaseOneBlueprint.quickActions.map((action) => (
-                      <WebControlActionCard
-                        key={action.id}
-                        id={action.id}
-                        title={action.label}
-                        description={action.description}
-                        footerLabel={action.footerLabel}
-                        href={action.href}
-                        badge={action.badge}
-                        tone={action.tone}
-                        onAction={resolveActionHandler(action.href, action.onAction)}
-                      />
-                    ))}
-                  </div>
-
-                  {activeSectionId === 'finance' ? (
-                    <WebSystemSuggestion
-                      title="مراجعة مطابقة WLT"
-                      reason="تم اكتشاف حسابات بحاجة إلى تسوية يدوية قبل الإغلاق المالي."
-                      confidence="high"
-                      auditTag="تنبيه مالي"
-                      primaryAction={{
-                        id: 'finance-audit',
-                        label: 'مراجعة التسويات',
-                        onAction: resolveActionHandler(undefined, () => setSelectedServiceId('wlt')),
-                      }}
-                      secondaryAction={{
-                        id: 'finance-ignore',
-                        label: 'تأجيل',
-                      }}
+                    <WebControlActionButton
+                      id="state-dashboard"
+                      label="العودة للنظرة العامة"
+                      href="/dashboard"
+                      tone="secondary"
+                      onAction={() => router.push('/dashboard')}
                     />
-                  ) : (
-                    <details className={styles.disclosure}>
-                      <summary className={styles.disclosureSummary}>
-                        <span>{phaseOneBlueprint.disclosureTitle}</span>
-                        <span className={styles.disclosureHint}>{phaseOneBlueprint.disclosureDescription}</span>
-                      </summary>
-                      <div className={styles.disclosureBody}>
-                        {phaseOneBlueprint.disclosureItems.map((item) => (
-                          <WebControlDisclosureItem
-                            key={item.id}
-                            id={item.id}
-                            label={item.label}
-                            description={item.description}
-                            href={item.href}
-                            badge={item.badge}
-                            onAction={resolveActionHandler(item.href, item.onAction)}
-                          />
-                        ))}
-                      </div>
-                    </details>
-                  )}
-                </WebSectionCard>
+                  </div>
+                </section>
+              ) : (
+                <>
+                  <WebSectionCard
+                    title={phaseOneBlueprint.quickActionsTitle}
+                    description={phaseOneBlueprint.quickActionsDescription}
+                  >
+                    <div className={styles.actionGrid}>
+                      {phaseOneBlueprint.quickActions.map((action) => (
+                        <WebControlActionCard
+                          key={action.id}
+                          id={action.id}
+                          title={action.label}
+                          description={action.description}
+                          footerLabel={action.footerLabel}
+                          href={action.href}
+                          badge={action.badge}
+                          tone={action.tone}
+                          onAction={resolveActionHandler(action.href, action.onAction)}
+                        />
+                      ))}
+                    </div>
+                  </WebSectionCard>
 
-              </>
-            )}
+                  <WebSectionCard
+                    title={phaseOneBlueprint.disclosureTitle}
+                    description={phaseOneBlueprint.disclosureDescription}
+                  >
+                    <div className={styles.disclosureBody}>
+                      {phaseOneBlueprint.disclosureItems.map((item) => (
+                        <WebControlDisclosureItem
+                          key={item.id}
+                          id={item.id}
+                          label={item.label}
+                          description={item.description}
+                          href={item.href}
+                          badge={item.badge}
+                          onAction={resolveActionHandler(item.href, item.onAction)}
+                        />
+                      ))}
+                    </div>
+                  </WebSectionCard>
+                </>
+              )}
           </>
         ) : null}
 
@@ -999,48 +946,6 @@ export function ControlPanelSurfaceHost({
             description={panelText.surfaceDescriptions.marketing}
           >
             <ControlPanelDshMarketingScreen hubHref="/marketing" operationsHref="/operations" />
-          </WebSectionCard>
-        ) : null}
-
-        {isControlSection ? (
-          <WebSectionCard
-            title={panelText.ui.subsectionTitle}
-            description={panelText.ui.subsectionDescription}
-          >
-              <WebSegmentedTabs
-                ariaLabel={panelText.ui.subsectionTitle}
-                items={controlSubSectionIds.map((subsectionId) => ({
-                  id: subsectionId,
-                  label: panelText.subSections[subsectionId],
-                  active: activeControlSubsection === subsectionId,
-                }))}
-                onSelect={(subsectionId) => {
-                  if ((controlSubSectionIds as readonly string[]).includes(subsectionId)) {
-                    router.push(buildControlHref(subsectionId as ControlPanelSubSectionId));
-                  }
-                }}
-              />
-              <div className={styles.sectionGrid}>
-                {controlSubSectionIds.map((subsectionId) => {
-                  const href = buildControlHref(subsectionId);
-                  const isActive = subsectionId === activeControlSubsection;
-
-                return (
-                  <a
-                    key={href}
-                    href={href}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      router.push(href);
-                    }}
-                    className={[styles.sectionLink, isActive ? styles.sectionLinkActive : ''].filter(Boolean).join(' ')}
-                  >
-                    <strong className={styles.sectionLinkLabel}>{panelText.subSections[subsectionId]}</strong>
-                    <span className={styles.sectionLinkDescription}>{panelText.subSectionDescriptions[subsectionId]}</span>
-                  </a>
-                );
-              })}
-            </div>
           </WebSectionCard>
         ) : null}
 
@@ -1126,7 +1031,7 @@ export function ControlPanelSurfaceHost({
           </>
         ) : null}
 
-        {!phaseOneBlueprint && activeSectionId !== 'partners' && activeSectionId !== 'marketing' && !isControlSection && !isCommunityServicesSection && !isOperationsSection ? (
+        {!phaseOneBlueprint && activeSectionId !== 'partners' && activeSectionId !== 'marketing' && !isCommunityServicesSection && !isOperationsSection ? (
           <WebSectionCard title={shellCopy.title} description={shellCopy.description}>
             <div className={styles.actionGrid}>
               <WebControlActionCard

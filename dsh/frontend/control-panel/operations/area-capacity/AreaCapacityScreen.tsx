@@ -2,96 +2,98 @@
 
 import React from 'react';
 import { OperationsSuggestionCard } from '../operations.ui';
+import { AREA_CAPACITY_OPERATIONAL_PREVIEW } from '../operations.preview-data';
+import styles from '../dsh-surface.module.css';
 
 export type AreaCapacityScreenProps = { hubHref: string; };
 
-const AREAS = [
-  {
-    id: 'AREA-1', name: 'شمال الرياض', status: 'متأزمة',
-    orders: 124, caps: 30, eta: '45 دقيقة',
-    suggestion: { label: 'فعّل Bonus فوراً', reason: 'عجز 40 كابتن مقابل 124 طلب — خطر إغلاق', confidence: 'high' as const, action: 'تفعيل Bonus Area', secondary: 'إيقاف مؤقت', auditRequired: false, risk: 'critical' as const },
-  },
-  {
-    id: 'AREA-2', name: 'شرق الرياض', status: 'مزدحمة',
-    orders: 85, caps: 25, eta: '30 دقيقة',
-    suggestion: { label: 'قلّل النطاق مؤقتاً', reason: 'ETA مرتفع 30 دقيقة مع انخفاض تغطية الكباتن', confidence: 'medium' as const, action: 'تقليل النطاق', secondary: 'انقل الضغط', auditRequired: false, risk: 'medium' as const },
-  },
-  {
-    id: 'AREA-3', name: 'وسط الرياض', status: 'مستقرة',
-    orders: 42, caps: 50, eta: '15 دقيقة',
-    suggestion: { label: 'لا تدخل مطلوب', reason: 'التغطية ممتازة — الكباتن أكثر من الطلبات', confidence: 'high' as const, action: 'عرض التفاصيل', secondary: null, auditRequired: false, risk: 'low' as const },
-  },
-  {
-    id: 'AREA-4', name: 'جنوب الرياض', status: 'مستقرة',
-    orders: 20, caps: 35, eta: '12 دقيقة',
-    suggestion: { label: 'يمكن نقل كباتن للشمال', reason: 'الجنوب مستقر ويملك فائضاً يساعد الشمال', confidence: 'medium' as const, action: 'نقل الكباتن', secondary: null, auditRequired: false, risk: 'low' as const },
-  },
-] as const;
+const STATUS_CLASS_NAMES: Record<string, string> = {
+  warning: styles.liveOrdersStatusWarning,
+  danger: styles.liveOrdersStatusDanger,
+  best: styles.liveOrdersStatusBest,
+  brand: styles.liveOrdersStatusBrand,
+};
 
 export function AreaCapacityScreen({ hubHref }: AreaCapacityScreenProps) {
+  const preview = AREA_CAPACITY_OPERATIONAL_PREVIEW;
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', direction: 'rtl', height: '100%' }}>
+    <div className={styles.liveOrdersScreen}>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>المناطق والسعة</h2>
-        <button style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(10,47,92,0.1)', background: '#fff', fontSize: '12px', fontWeight: 600, color: '#0A2F5C', cursor: 'pointer' }}>تحديث وتصفية</button>
+      <div className={styles.liveOrdersHeaderRow}>
+        <h2 className={styles.liveOrdersTitle}>المناطق والسعة</h2>
+        <button className={styles.liveOrdersFilterButton}>تحديث وتصفية</button>
       </div>
 
-      {/* KPI row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px' }}>
-        {[
-          { label: 'إجمالي الطلبات', val: '842', color: '#0A2F5C' },
-          { label: 'إجمالي الكباتن', val: '320', color: '#0A2F5C' },
-          { label: 'مناطق مزدحمة', val: '2', color: '#F59E0B', accent: '#F59E0B' },
-          { label: 'مناطق متأزمة', val: '1', color: '#DC2626', accent: '#DC2626' },
-        ].map(({ label, val, color, accent }, i) => (
-          <div key={i} style={{ padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)', borderTop: accent ? `4px solid ${accent}` : undefined }}>
-            <div style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>{label}</div>
-            <div style={{ fontSize: '24px', color, fontWeight: 800, marginTop: '8px' }}>{val}</div>
-          </div>
-        ))}
+      <div className={styles.liveOrdersSummaryGrid}>
+        <div className={styles.liveOrdersSummaryCard}>
+          <div className={styles.liveOrdersSummaryLabel}>حِمل المنطقة</div>
+          <div className={styles.liveOrdersSummaryValueDanger}>{preview.summary.zoneLoad}</div>
+        </div>
+        <div className={styles.liveOrdersSummaryCard}>
+          <div className={styles.liveOrdersSummaryLabel}>المناطق المحمية</div>
+          <div className={styles.liveOrdersSummaryValueBrand}>{preview.summary.protectedZones}</div>
+        </div>
+        <div className={styles.liveOrdersSummaryCard}>
+          <div className={styles.liveOrdersSummaryLabel}>المناطق الحرة</div>
+          <div className={styles.liveOrdersSummaryValueBrand}>{preview.summary.freeZones}</div>
+        </div>
+        <div className={styles.liveOrdersSummaryCard}>
+          <div className={styles.liveOrdersSummaryLabel}>التوصية</div>
+          <div className={styles.liveOrdersSummaryHint}>{preview.summary.recommendation}</div>
+        </div>
       </div>
 
-      {/* Area cards */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
-        {AREAS.map((area, idx) => (
-          <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr 1fr', gap: '16px', alignItems: 'start', padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)', borderRight: area.status === 'متأزمة' ? '4px solid #DC2626' : area.status === 'مزدحمة' ? '4px solid #F59E0B' : '4px solid transparent' }}>
-
-            {/* Col 1: Area meta */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ fontWeight: 800, color: '#0A2F5C', fontSize: '14px' }}>{area.name}</span>
-                <span style={{ fontSize: '11px', color: '#64748B' }}>({area.id})</span>
-                <span style={{ padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, backgroundColor: area.status === 'متأزمة' ? '#FEF2F2' : area.status === 'مزدحمة' ? '#FEF3C7' : 'rgba(10,47,92,0.04)', color: area.status === 'متأزمة' ? '#DC2626' : area.status === 'مزدحمة' ? '#D97706' : '#64748B' }}>{area.status}</span>
+      <div className={styles.liveOrdersCardsStack}>
+        {preview.zones.map((area) => {
+          const statusClassName = STATUS_CLASS_NAMES[area.statusTone] ?? STATUS_CLASS_NAMES.brand;
+          return (
+            <div key={area.id} className={styles.liveOrdersOrderCard}>
+              <div className={styles.liveOrdersOrderMeta}>
+                <div className={styles.liveOrdersOrderTopRow}>
+                  <span className={styles.liveOrdersOrderId}>{area.zone}</span>
+                  <span className={`${styles.liveOrdersOrderStatus} ${statusClassName}`}>{area.zoneLoad}</span>
+                  <span className={styles.liveOrdersRingHint}>{area.recommendation}</span>
+                </div>
+                <div className={styles.liveOrdersDestination}>{area.id}</div>
+                <div className={styles.liveOrdersMetaText}>محمية: {area.protectedZones} | حرة: {area.freeZones}</div>
+                <div className={styles.liveOrdersNoteText}>{area.note}</div>
               </div>
-              <div style={{ fontSize: '12px', color: '#64748B' }}>طلبات: <span style={{ fontWeight: 600, color: '#0A2F5C' }}>{area.orders}</span> | كباتن: <span style={{ fontWeight: 600, color: '#0A2F5C' }}>{area.caps}</span></div>
-              <div style={{ fontSize: '11px', color: '#64748B' }}>متوسط ETA: <span style={{ fontWeight: 600, color: '#0A2F5C' }}>{area.eta}</span></div>
+
+              <OperationsSuggestionCard
+                label={area.recommendation}
+                reason={area.note}
+                confidence={area.statusTone === 'danger' ? 'high' : area.statusTone === 'warning' ? 'medium' : 'high'}
+                actions={(
+                  <>
+                    <button className={styles.liveOrdersActionPrimary}>{area.moveCapacity}</button>
+                    <button className={styles.liveOrdersActionSecondary}>{area.reduceRadius}</button>
+                  </>
+                )}
+              >
+                {area.statusTone === 'danger' && <span className={styles.liveOrdersAuditChip}>خطر حرج</span>}
+                <span className={styles.liveOrdersSuggestionChip}>{area.temporaryStop}</span>
+              </OperationsSuggestionCard>
+
+              <div className={styles.liveOrdersOrderActions}>
+                <div className={styles.liveOrdersTimelineTitle}>إجراء المنطقة</div>
+                <div className={styles.liveOrdersTimelineList}>
+                  <div>• {area.surgeBonus}</div>
+                  <div>• {area.reduceRadius}</div>
+                  <div>• {area.moveCapacity}</div>
+                </div>
+                <div className={styles.liveOrdersPlanWrap}>
+                  <span className={styles.liveOrdersPlanChip}>{area.temporaryStop}</span>
+                  <span className={styles.liveOrdersPlanChip}>{area.protectedZones} محمية</span>
+                </div>
+                <div className={styles.liveOrdersActionGrid}>
+                  <button className={styles.liveOrdersActionPrimary}>تفعيل حافز المنطقة</button>
+                  <button className={styles.liveOrdersActionSecondary}>إيقاف مؤقت</button>
+                </div>
+              </div>
             </div>
-
-            {/* Col 2: System suggestion */}
-            <OperationsSuggestionCard
-              label={area.suggestion.label}
-              reason={area.suggestion.reason}
-              confidence={area.suggestion.confidence}
-              actions={(
-                <>
-                  <button style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>{area.suggestion.action}</button>
-                  {area.suggestion.secondary && <button style={{ padding: '4px 10px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>{area.suggestion.secondary}</button>}
-                </>
-              )}
-            >
-              {area.suggestion.risk === 'critical' && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>خطر حرج</span>}
-            </OperationsSuggestionCard>
-
-            {/* Col 3: Actions */}
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap', alignSelf: 'center' }}>
-              <button style={{ padding: '8px 12px', backgroundColor: '#0A2F5C', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>تفعيل Bonus Area</button>
-              <button style={{ padding: '8px 12px', backgroundColor: '#F59E0B', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>تقليل النطاق</button>
-              <button style={{ padding: '8px 12px', backgroundColor: '#FEF2F2', color: '#DC2626', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>إيقاف مؤقت</button>
-            </div>
-
-          </div>
-        ))}
+          );
+        })}
       </div>
 
     </div>

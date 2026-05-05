@@ -3,144 +3,108 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { OperationsSuggestionCard } from '../operations.ui';
+import { AWNAK_OPERATIONAL_PREVIEW } from '../operations.preview-data';
+import styles from '../dsh-surface.module.css';
 
 export type AwnakScreenProps = {
   hubHref?: string;
 };
 
-type AwnakItem = {
-  id: string;
-  title: string;
-  status: string;
-  updated: string;
-  route: string;
-  confidence: 'high' | 'medium' | 'low';
-  suggestion: string;
-  reason: string;
-  action: string;
-  secondaryAction?: string;
+const STATUS_CLASS_NAMES: Record<string, string> = {
+  warning: styles.liveOrdersStatusWarning,
+  danger: styles.liveOrdersStatusDanger,
+  best: styles.liveOrdersStatusBest,
+  brand: styles.liveOrdersStatusBrand,
 };
-
-const AWNAK_ITEMS: readonly AwnakItem[] = [
-  {
-    id: 'AWN-3101',
-    title: 'دفعة الاستلام المعلق',
-    status: 'جاهز للمراجعة',
-    updated: 'قبل 8 دقائق',
-    route: 'نقطة التشغيل العامة',
-    confidence: 'high',
-    suggestion: 'افتح التقدير اليدوي',
-    reason: 'الدفعة تحتاج قرارًا سريعًا قبل الإرسال.',
-    action: 'راجع الآن',
-    secondaryAction: 'إرسال للدعم',
-  },
-  {
-    id: 'AWN-3104',
-    title: 'طلب متابعة التوصيل',
-    status: 'قيد التأكيد',
-    updated: 'قبل 22 دقيقة',
-    route: 'فريق عونك',
-    confidence: 'medium',
-    suggestion: 'ثبّت الخطوة التالية',
-    reason: 'القرار جاهز لكن التوقيت يحتاج تثبيت.',
-    action: 'ثبّت الخطوة',
-    secondaryAction: 'أجّل',
-  },
-  {
-    id: 'AWN-3108',
-    title: 'تسليم يقترب من الإغلاق',
-    status: 'في المتابعة',
-    updated: 'قبل ساعة',
-    route: 'المشرف المباشر',
-    confidence: 'high',
-    suggestion: 'أغلق بعد التحقق',
-    reason: 'كل الإشارات مكتملة ويمكن الإغلاق بعد التأكيد.',
-    action: 'إغلاق',
-    secondaryAction: 'فتح تفاصيل',
-  },
-] as const;
 
 export function AwnakScreen({ hubHref = '/operations' }: AwnakScreenProps) {
   const router = useRouter();
+  const preview = AWNAK_OPERATIONAL_PREVIEW;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', direction: 'rtl' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>عونك</h2>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(10,47,92,0.1)', background: '#fff', fontSize: '12px', fontWeight: 600, color: '#0A2F5C', cursor: 'pointer' }} onClick={() => router.refresh()}>
+    <div className={styles.liveOrdersScreen}>
+      <div className={styles.liveOrdersHeaderRow}>
+        <h2 className={styles.liveOrdersTitle}>عونك</h2>
+        <div>
+          <button className={styles.liveOrdersFilterButton} onClick={() => router.refresh()}>
             تحديث
           </button>
-          <button style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(10,47,92,0.1)', background: '#fff', fontSize: '12px', fontWeight: 600, color: '#0A2F5C', cursor: 'pointer' }} onClick={() => router.push(hubHref)}>
+          <button className={styles.liveOrdersFilterButton} onClick={() => router.push(hubHref)}>
             العودة إلى القيادة
           </button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '12px' }}>
-        {[
-          { label: 'جاهز للمراجعة', value: '9', color: '#0A2F5C' },
-          { label: 'قيد التأكيد', value: '4', color: '#F59E0B' },
-          { label: 'في المتابعة', value: '6', color: '#16A34A' },
-          { label: 'يحتاج تصعيدًا', value: '2', color: '#DC2626' },
-        ].map((item) => (
-          <div key={item.label} style={{ padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)' }}>
-            <div style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>{item.label}</div>
-            <div style={{ fontSize: '24px', color: item.color, fontWeight: 800, marginTop: '8px' }}>{item.value}</div>
-          </div>
-        ))}
+      <div className={styles.liveOrdersSummaryGrid}>
+        <div className={styles.liveOrdersSummaryCard}>
+          <div className={styles.liveOrdersSummaryLabel}>جاهز للمراجعة</div>
+          <div className={styles.liveOrdersSummaryValueBrand}>{preview.summary.underReview}</div>
+        </div>
+        <div className={styles.liveOrdersSummaryCard}>
+          <div className={styles.liveOrdersSummaryLabel}>قيد التأكيد</div>
+          <div className={styles.liveOrdersSummaryValueDanger}>{preview.summary.confirmed}</div>
+        </div>
+        <div className={styles.liveOrdersSummaryCard}>
+          <div className={styles.liveOrdersSummaryLabel}>في المتابعة</div>
+          <div className={styles.liveOrdersSummaryValueBrand}>{preview.summary.inFollowUp}</div>
+        </div>
+        <div className={styles.liveOrdersSummaryCard}>
+          <div className={styles.liveOrdersSummaryLabel}>يحتاج تصعيدًا</div>
+          <div className={styles.liveOrdersSummaryValueDanger}>{preview.summary.escalationNeeded}</div>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none' }}>
-        {['الكل', 'جاهز', 'قيد التأكيد', 'في المتابعة', 'تصعيد'].map((status, index) => (
-          <span key={status} style={{ padding: '4px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', backgroundColor: index === 0 ? '#FEF3C7' : 'rgba(10,47,92,0.04)', color: index === 0 ? '#D97706' : '#64748B', border: index === 0 ? '1px solid #FDE68A' : '1px solid transparent' }}>
-            {status}
-          </span>
-        ))}
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {AWNAK_ITEMS.map((item) => (
-          <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr 1fr', gap: '16px', alignItems: 'start', padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ fontWeight: 800, color: '#0A2F5C', fontSize: '14px' }}>{item.id}</span>
-                <span style={{ padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, backgroundColor: item.status === 'جاهز للمراجعة' ? '#DCFCE7' : item.status === 'يحتاج تصعيدًا' ? '#FEF2F2' : 'rgba(10,47,92,0.04)', color: item.status === 'جاهز للمراجعة' ? '#16A34A' : item.status === 'يحتاج تصعيدًا' ? '#DC2626' : '#64748B' }}>{item.status}</span>
+      <div className={styles.liveOrdersCardsStack}>
+        {preview.rows.map((item) => {
+          const statusClassName = STATUS_CLASS_NAMES[item.statusTone] ?? STATUS_CLASS_NAMES.brand;
+          return (
+            <div key={item.requestId} className={styles.liveOrdersOrderCard}>
+              <div className={styles.liveOrdersOrderMeta}>
+                <div className={styles.liveOrdersOrderTopRow}>
+                  <span className={styles.liveOrdersOrderId}>{item.requestId}</span>
+                  <span className={`${styles.liveOrdersOrderStatus} ${statusClassName}`}>{item.status}</span>
+                  <span className={styles.liveOrdersRingHint}>{item.workflowState}</span>
+                </div>
+                <div className={styles.liveOrdersDestination}>{item.type}</div>
+                <div className={styles.liveOrdersMetaText}>{item.customer}</div>
+                <div className={styles.liveOrdersNoteText}>المالك: {item.owner} | التخصيص: {item.assignmentStatus}</div>
+                <div className={styles.liveOrdersNoteText}>{item.note}</div>
               </div>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: '#0A2F5C' }}>{item.title}</div>
-              <div style={{ fontSize: '11px', color: '#64748B' }}>المسار: {item.route}</div>
-              <div style={{ fontSize: '11px', color: '#64748B' }}>آخر تحديث: {item.updated}</div>
-            </div>
 
-            <OperationsSuggestionCard
-              title="توصية"
-              label={item.suggestion}
-              reason={item.reason}
-              confidence={item.confidence}
-              actions={(
-                <>
-                  <button style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>{item.action}</button>
-                  {item.secondaryAction && <button style={{ padding: '4px 10px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>{item.secondaryAction}</button>}
-                </>
-              )}
-            />
+              <OperationsSuggestionCard
+                title="توصية"
+                label={item.nextAction}
+                reason={item.note}
+                confidence={item.risk === 'مرتفع' ? 'low' : item.risk === 'متوسط' ? 'medium' : 'high'}
+                actions={(
+                  <>
+                    <button className={styles.liveOrdersActionPrimary}>{item.nextAction}</button>
+                    <button className={styles.liveOrdersActionSecondary}>فتح التفاصيل</button>
+                  </>
+                )}
+              >
+                <span className={styles.liveOrdersSuggestionChip}>{item.risk}</span>
+              </OperationsSuggestionCard>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignSelf: 'center' }}>
-              <button style={{ padding: '8px 12px', backgroundColor: '#0A2F5C', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }} onClick={() => router.push(`${hubHref}?workspace=proxy-shein-awnak`)}>
-                عرض عونك
-              </button>
-              <button style={{ padding: '8px 12px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }} onClick={() => router.push(`${hubHref}?workspace=sheinproxy`)}>
-                عرض شي إن
-              </button>
-              <button style={{ padding: '8px 12px', backgroundColor: '#FEF2F2', color: '#DC2626', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }} onClick={() => router.push('/support')}>
-                تصعيد للدعم
-              </button>
-              <button style={{ padding: '8px 12px', backgroundColor: 'transparent', color: '#64748B', border: '1px solid rgba(10,47,92,0.1)', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }} onClick={() => router.push(`${hubHref}?workspace=dispatch-assignment`)}>
-                الإسناد اليدوي
-              </button>
+              <div className={styles.liveOrdersOrderActions}>
+                <div className={styles.liveOrdersTimelineTitle}>الحالة التشغيلية</div>
+                <div className={styles.liveOrdersTimelineList}>
+                  <div>• {item.assignmentStatus}</div>
+                  <div>• {item.workflowState}</div>
+                  <div>• {item.nextAction}</div>
+                </div>
+                <div className={styles.liveOrdersPlanWrap}>
+                  <span className={styles.liveOrdersPlanChip}>{item.risk}</span>
+                  <span className={styles.liveOrdersPlanChip}>{item.owner}</span>
+                </div>
+                <div className={styles.liveOrdersActionGrid}>
+                  <button className={styles.liveOrdersActionPrimary} onClick={() => router.push(`${hubHref}?workspace=proxy-shein-awnak`)}>عرض عونك</button>
+                  <button className={styles.liveOrdersActionSecondary} onClick={() => router.push(`${hubHref}?workspace=sheinproxy`)}>عرض شي إن</button>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
