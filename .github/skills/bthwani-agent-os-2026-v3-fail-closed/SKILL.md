@@ -1,6 +1,6 @@
 ---
 name: bthwani-agent-os-2026-v3-fail-closed
-description: Score below 100 or unknown means FAIL/BLOCKED.
+description: Score below 100 or unknown means FAIL/BLOCKED; use when enforcing fail-closed scoring or refusing partial claims without proof.
 version: 2026.04.18-v3-additive
 ---
 

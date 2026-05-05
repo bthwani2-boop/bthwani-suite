@@ -152,22 +152,34 @@ function firstExisting(candidates) {
 
 function packageTargetFor(prefix) {
   const mappings = [
-    ["@bthwani/app-shells", "packages/app-shells"],
     ["@bthwani/surfaces", "packages/surfaces/src"],
     ["@bthwani/ui-kit", "packages/ui-kit/src"],
-    ["@bthwani/api-types", "packages/api-types/src"],
-    ["@bthwani/api-clients", "packages/api-clients/src"],
+    ["@bthwani/dsh/backend", "dsh/backend/src"],
+    ["@bthwani/wlt/backend", "wlt/backend/src"],
+    ["@bthwani/knz/backend", "knz/backend/src"],
+    ["@bthwani/arb/backend", "arb/backend/src"],
+    ["@bthwani/amn/backend", "amn/backend/src"],
+    ["@bthwani/esf/backend", "esf/backend/src"],
+    ["@bthwani/mrf/backend", "mrf/backend/src"],
+    ["@bthwani/snd/backend", "snd/backend/src"],
+    ["@bthwani/kwd/backend", "kwd/backend/src"],
   ];
   return mappings.find(([p]) => p === prefix)?.[1] || "";
 }
 
 function resolvePackageImport(spec) {
   const packages = [
-    "@bthwani/app-shells",
     "@bthwani/surfaces",
     "@bthwani/ui-kit",
-    "@bthwani/api-types",
-    "@bthwani/api-clients",
+    "@bthwani/dsh/backend",
+    "@bthwani/wlt/backend",
+    "@bthwani/knz/backend",
+    "@bthwani/arb/backend",
+    "@bthwani/amn/backend",
+    "@bthwani/esf/backend",
+    "@bthwani/mrf/backend",
+    "@bthwani/snd/backend",
+    "@bthwani/kwd/backend",
   ];
 
   for (const pkg of packages) {

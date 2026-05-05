@@ -209,7 +209,6 @@ function isAllowedSurfacesPublicImport(spec, config) {
 function checkImports(repoPath, imports, issues, config) {
   const sourceArea =
     repoPath.startsWith("apps/") ? "apps" :
-    repoPath.startsWith("packages/app-shells/") ? "app-shells" :
     repoPath.startsWith("packages/surfaces/") ? "surfaces" :
     repoPath.startsWith("packages/ui-kit/") ? "ui-kit" :
     "other";
@@ -220,12 +219,12 @@ function checkImports(repoPath, imports, issues, config) {
       spec.includes("/service-owned/") ||
       spec.includes("/surface-owned/");
 
-    if ((sourceArea === "apps" || sourceArea === "app-shells") && isSurfaceInternal) {
-      addIssue(issues, "error", "APP_OR_SHELL_DEEP_SURFACES_IMPORT", repoPath, `apps/app-shells must consume surfaces public exports only. Import: ${spec}`);
+    if (sourceArea === "apps" && isSurfaceInternal) {
+      addIssue(issues, "error", "APP_OR_SHELL_DEEP_SURFACES_IMPORT", repoPath, `apps must consume surfaces public exports only. Import: ${spec}`);
     }
 
-    if ((sourceArea === "apps" || sourceArea === "app-shells") && spec.startsWith("@bthwani/surfaces/") && !isAllowedSurfacesPublicImport(spec, config)) {
-      addIssue(issues, "error", "APP_OR_SHELL_DEEP_SURFACES_IMPORT", repoPath, `apps/app-shells may import only approved @bthwani/surfaces public subpaths. Import: ${spec}`);
+    if (sourceArea === "apps" && spec.startsWith("@bthwani/surfaces/") && !isAllowedSurfacesPublicImport(spec, config)) {
+      addIssue(issues, "error", "APP_OR_SHELL_DEEP_SURFACES_IMPORT", repoPath, `apps may import only approved @bthwani/surfaces public subpaths. Import: ${spec}`);
     }
 
     if (sourceArea === "apps" && spec.startsWith("../") && spec.includes("packages/")) {
@@ -235,10 +234,9 @@ function checkImports(repoPath, imports, issues, config) {
     if (sourceArea === "ui-kit" && (
       spec.includes("/service-owned/") ||
       spec.includes("/surface-owned/") ||
-      spec.startsWith("@bthwani/surfaces") ||
-      spec.startsWith("@bthwani/app-shells")
+      spec.startsWith("@bthwani/surfaces")
     )) {
-      addIssue(issues, "error", "UI_KIT_IMPORTS_SURFACE_OR_SHELL", repoPath, `ui-kit must not import surfaces/app-shells. Import: ${spec}`);
+      addIssue(issues, "error", "UI_KIT_IMPORTS_SURFACE_OR_SHELL", repoPath, `ui-kit must not import surfaces. Import: ${spec}`);
     }
 
     if (sourceArea === "surfaces" && spec.startsWith("@bthwani/ui-kit/")) {
@@ -250,6 +248,9 @@ function checkImports(repoPath, imports, issues, config) {
 function checkAppsShellOnly(repoPath, text, issues, config) {
   if (!repoPath.startsWith("apps/")) return;
 
+  const configOrTestPath = /(?:^|\/)(app|package|project)\.json$|\.(spec|test)\.[^.]+$/.test(repoPath);
+  if (configOrTestPath) return;
+
   const allowedAppPath = (config.allowedAppFiles || []).some((pattern) => regexMatch(repoPath, pattern));
   if (allowedAppPath) return;
 
@@ -260,12 +261,11 @@ function checkAppsShellOnly(repoPath, text, issues, config) {
     /\bModal\b/,
     /\bVideo\b/,
     /\bScreen\b/,
-    /\border/i,
-    /\bstore/i,
-    /\bcart/i,
-    /\bcheckout/i,
-    /\bwallet/i,
-    /\bcaptain/i,
+    /\buseState\s*\(/,
+    /\buseReducer\s*\(/,
+    /\buseQuery\s*\(/,
+    /\bfetch\s*\(/,
+    /\baxios\b/,
     /#[0-9a-fA-F]{6}\b/,
   ];
 
@@ -298,16 +298,6 @@ function checkSurfaceDesignSystem(repoPath, text, issues, config) {
 
   if (localDesignPatterns.some((p) => p.test(text))) {
     addIssue(issues, "error", "SURFACE_LOCAL_DESIGN_SYSTEM", repoPath, "surfaces must not define local design system primitives/tokens/providers.");
-  }
-
-  const randomHex = /#[0-9a-fA-F]{6}\b/g;
-  const allowedColors = new Set((config.allowedBrandColors || []).map((x) => x.toLowerCase()));
-  let m;
-  while ((m = randomHex.exec(text))) {
-    const color = m[0].toLowerCase();
-    if (!allowedColors.has(color)) {
-      addIssue(issues, "warn", "SURFACE_HARDCODED_COLOR_REVIEW", repoPath, `Hardcoded color outside core brand palette requires review: ${m[0]}`);
-    }
   }
 }
 

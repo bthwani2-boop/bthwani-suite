@@ -1,5 +1,7 @@
 # Overlay: violation-audit
 
+<!-- NOTE (example-only): Audit examples may contain BThwani tokens used solely for illustration. -->
+
 ## Load
 
 - `bthwani-violation-audit`

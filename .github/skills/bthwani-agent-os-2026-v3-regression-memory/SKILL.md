@@ -1,6 +1,6 @@
 ---
 name: bthwani-agent-os-2026-v3-regression-memory
-description: Detects repeated failures and regressions.
+description: Detects repeated failures and regressions; use when repeated defects or reopened failures must be tracked and prevented from recurring.
 version: 2026.3.0-additive-evolution
 fail_closed: true
 requires_evidence: true

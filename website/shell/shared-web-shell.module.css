@@ -1,0 +1,45 @@
+.stack {
+  display: grid;
+  gap: 12px;
+}
+
+.mutedParagraph {
+  margin: 0;
+  color: var(--bth-text-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.linkGrid {
+  display: grid;
+  gap: 12px;
+}
+
+.navLink {
+  display: block;
+  padding: 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  border: 1px solid var(--bth-line);
+  background: var(--bth-surface);
+  color: inherit;
+}
+
+.navLinkActive {
+  border-color: var(--bth-brand);
+  background: var(--bth-brand-surface);
+}
+
+.navLabel {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.navDescription {
+  color: var(--bth-text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}

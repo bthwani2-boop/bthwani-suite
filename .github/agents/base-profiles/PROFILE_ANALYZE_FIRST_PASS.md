@@ -1,5 +1,7 @@
 # Base Profile: analyze.first-pass
 
+<!-- NOTE (example-only): This document may include token-like identifiers for ownership or example flows. These are documented examples and not runtime secrets. See kdt/merge-run/.../proposed/PROTECTED_TOKENS_ALLOWLIST.md for accepted tokens and triage evidence. -->
+
 ## Always Load
 
 - `bthwani-task-contracts`

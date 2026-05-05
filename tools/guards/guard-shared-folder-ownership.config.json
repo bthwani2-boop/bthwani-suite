@@ -16,10 +16,23 @@
     ".yaml"
   ],
   "scanRoots": [
-    "apps",
-    "packages/app-shells",
-    "packages/surfaces",
-    "packages/ui-kit"
+    "app-client",
+    "app-partner",
+    "app-captain",
+    "app-field",
+    "webapp",
+    "website",
+    "control-panel",
+    "ui-kit",
+    "dsh",
+    "wlt",
+    "knz",
+    "arb",
+    "amn",
+    "esf",
+    "mrf",
+    "snd",
+    "kwd"
   ],
   "ignore": [
     "(^|/)node_modules(/|$)",

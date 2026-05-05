@@ -1,5 +1,7 @@
 # Overlay: ux-flow-review
 
+<!-- NOTE (example-only): UX flow docs may include identifiers used for examples. These are not secrets. -->
+
 ## Load
 
 - `bthwani-ux-flow-sovereignty`

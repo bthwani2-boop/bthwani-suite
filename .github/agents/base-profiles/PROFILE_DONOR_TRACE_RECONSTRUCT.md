@@ -1,5 +1,7 @@
 # Base Profile: donor.trace-reconstruct
 
+<!-- NOTE (example-only): Document may show ownership tokens or identifiers for tracing examples. They are illustrative; not runtime secrets. See PROTECTED_TOKENS_ALLOWLIST.md for accepted tokens. -->
+
 ## Always Load
 
 - `bthwani-workspace-boundaries`

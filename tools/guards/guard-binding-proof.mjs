@@ -2,6 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, gitLsFiles, runGuard, readTextSafe } from './_guard-common.mjs';
 
+const canonicalServiceRoots = ['dsh/frontend', 'wlt/frontend', 'knz/frontend', 'arb/frontend', 'amn/frontend', 'esf/frontend', 'mrf/frontend', 'snd/frontend', 'kwd/frontend'];
+const appRoots = ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel', 'webapp', 'website'];
+
 runGuard({
   guardId: 'GUARD-08_BINDING_PROOF',
   guardName: 'Binding Proof (API client + runtime evidence)',
@@ -9,7 +12,10 @@ runGuard({
   configPath: 'tools/guards/guard-binding-proof.config.json',
   collect: ({ config }) => {
     const files = gitLsFiles();
-    const screenFiles = files.filter((f) => /Screen\.(tsx|ts|jsx|js)$/.test(f) && f.includes('packages/surfaces/src/service-owned/'));
+    const screenFiles = files.filter((f) => /Screen\.(tsx|ts|jsx|js)$/.test(f) && (
+      canonicalServiceRoots.some((root) => f.startsWith(`${root}/`)) ||
+      appRoots.some((root) => f.startsWith(`${root}/`))
+    ));
     const findings = [];
 
     const evidenceRootBase = path.join(ROOT, 'tools', 'registry', 'runs');

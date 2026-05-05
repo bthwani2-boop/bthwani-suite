@@ -1,0 +1,13 @@
+openapi: 3.1.0
+info:
+  title: BThwani DSH API
+  version: 0.1.0
+x-bthwani-status: CONTRACT_TBD
+x-bthwani:
+  service: dsh
+  migrationPhase: DSH pilot
+  currentImplementationRoot: packages/surfaces/src/service-owned/dsh
+  targetRoot: dsh
+paths: {}
+components:
+  schemas: {}

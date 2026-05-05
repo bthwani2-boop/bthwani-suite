@@ -1,6 +1,6 @@
 ---
 name: bthwani-agent-os-2026-v3-evolution-loop
-description: Adds controlled execution-learning loop to the V3 Agent OS.
+description: Adds controlled execution-learning loop to the V3 Agent OS; use when a governed task needs iterative learning captured without widening scope unsafely.
 version: 2026.3.0-additive-evolution
 fail_closed: true
 requires_evidence: true

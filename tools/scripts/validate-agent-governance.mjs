@@ -7,8 +7,8 @@ const repoRoot = path.resolve(path.dirname(scriptFilePath), '..', '..');
 
 const canonicalAgentPath = path.join(repoRoot, '.github', 'agents', 'bthwani-surface-core-lossless.agent.md');
 const routingIndexPath = path.join(repoRoot, '.github', 'agents', 'AGENT_ROUTING_INDEX.md');
-const checklistPath = path.join(repoRoot, 'docs', 'governance', 'AGENT_UPDATE_VALIDATION_CHECKLIST.md');
-const ledgerPath = path.join(repoRoot, 'docs', 'governance', 'AGENT_CHANGE_LEDGER.md');
+const checklistPath = path.join(repoRoot, 'governance', 'AGENT_UPDATE_VALIDATION_CHECKLIST.md');
+const ledgerPath = path.join(repoRoot, 'governance', 'AGENT_CHANGE_LEDGER.md');
 const skillsRoot = path.join(repoRoot, '.github', 'skills');
 const agentsRoot = path.join(repoRoot, '.github', 'agents');
 

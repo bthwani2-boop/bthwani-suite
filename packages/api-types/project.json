@@ -1,7 +1,0 @@
-{
-  "name": "api-types",
-  "root": "packages/api-types",
-  "sourceRoot": "packages/api-types/src",
-  "projectType": "library",
-  "targets": {}
-}

@@ -6,43 +6,55 @@
     {
       "id": "GOV-SOVEREIGNTY",
       "file": "tools/guards/guard-governance-sovereignty.mjs",
-      "policySource": "governance/00_GOVERNANCE_INDEX.md",
+      "policySource": "governance/00_README.md",
       "checks": ["canonical governance root", "retired docs/governance references", "guard manifest policy linkage"]
+    },
+    {
+      "id": "GOV-BOUNDARIES",
+      "file": "tools/guards/guard-governance-boundaries.mjs",
+      "policySource": "governance/04_ARCHITECTURE_RULES.md",
+      "checks": ["canonical governance file inventory", "package and shell boundaries", "legacy governance reference rules"]
+    },
+    {
+      "id": "GOV-CONTROL-PLANE",
+      "file": "tools/guards/guard-governance-canonical-control-plane.mjs",
+      "policySource": "governance/00_README.md",
+      "checks": ["canonical control-plane files", "retired governance root quarantine", "active retired governance references"]
     },
     {
       "id": "UI-ARCH-BOUNDARY",
       "file": "tools/guards/guard-ui-architecture-boundary.mjs",
-      "policySource": "governance/GUARD_IMPLEMENTATION_MAP.md",
+      "policySource": "governance/08_UI_KIT_AND_BRAND.md",
       "checks": ["Tamagui boundary", "ui-kit public exports", "local design-system import risk"]
     },
     {
       "id": "DESIGN-TOKEN-DRIFT",
       "file": "tools/guards/guard-design-token-drift.mjs",
-      "policySource": "governance/GUARD_IMPLEMENTATION_MAP.md",
+      "policySource": "governance/08_UI_KIT_AND_BRAND.md",
       "checks": ["random hardcoded color drift outside ui-kit", "brand color normalization risk"]
     },
     {
       "id": "SERVICE-CONTRACT-MATRIX",
       "file": "tools/guards/guard-service-contract-matrix.mjs",
-      "policySource": "governance/GUARD_IMPLEMENTATION_MAP.md",
+      "policySource": "governance/10_SERVICE_CLOSURE.md",
       "checks": ["canonical services", "service blueprint presence", "forbidden standalone services"]
     },
     {
       "id": "API-BINDING-RUNTIME",
       "file": "tools/guards/guard-api-binding-runtime.mjs",
-      "policySource": "governance/GUARD_IMPLEMENTATION_MAP.md",
+      "policySource": "governance/09_API_BINDING_RUNTIME.md",
       "checks": ["data-bound screen states", "api/client binding hints", "runtime proof hints"]
     },
     {
       "id": "EVIDENCE-CLOSURE",
       "file": "tools/guards/guard-evidence-closure.mjs",
-      "policySource": "governance/00_GOVERNANCE_INDEX.md",
+      "policySource": "governance/11_EVIDENCE_AND_TRACEABILITY.md",
       "checks": ["no closure claims without evidence", "evidence root", "registry runs"]
     },
     {
       "id": "WORKFLOW-CI-PARITY",
       "file": "tools/guards/guard-workflow-ci-parity.mjs",
-      "policySource": "governance/GUARD_IMPLEMENTATION_MAP.md",
+      "policySource": "governance/13_CI_AND_GATES.md",
       "checks": ["governance baseline workflow", "new guard CI workflow", "security/boundary/check parity"]
     }
   ]

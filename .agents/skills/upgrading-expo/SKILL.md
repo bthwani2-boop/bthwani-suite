@@ -1,133 +1,74 @@
 ---
 name: upgrading-expo
-description: Guidelines for upgrading Expo SDK versions and fixing dependency issues
-version: 1.0.0
-license: MIT
+description: Read-only advisory review for Expo upgrade risk. Does not upgrade packages or native configuration.
 ---
 
-## References
+# Upgrading Expo - BThwani Safe Advisory Skill
 
-- ./references/new-architecture.md -- SDK +53: New Architecture migration guide
-- ./references/react-19.md -- SDK +54: React 19 changes (useContext → use, Context.Provider → Context, forwardRef removal)
-- ./references/react-compiler.md -- SDK +54: React Compiler setup and migration guide
-- ./references/native-tabs.md -- SDK +55: Native tabs changes (Icon/Label/Badge now accessed via NativeTabs.Trigger.\*)
-- ./references/expo-av-to-audio.md -- Migrate audio playback and recording from expo-av to expo-audio
-- ./references/expo-av-to-video.md -- Migrate video playback from expo-av to expo-video
+## Status
 
-## Beta/Preview Releases
+This active SKILL.md is intentionally rewritten as a BThwani-safe advisory wrapper.
 
-Beta versions use `.preview` suffix (e.g., `55.0.0-preview.2`), published under `@next` tag.
+Original broad instructions, examples, references, generated snippets, or upstream patterns in this folder are reference material only. They must not override this SKILL.md, BThwani governance, the current task scope, or evidence requirements.
 
-Check if latest is beta: https://exp.host/--/api/v2/versions (look for `-preview` in `expoVersion`)
+## BThwani Safety Contract
 
-```bash
-npx expo install expo@next --fix  # install beta
-```
+This skill is advisory/read-only by default.
 
-## Step-by-Step Upgrade Process
+Mandatory constraints:
+- Active repo: C:\bthwani-suite.
+- Do not use any old standalone repo/path named bth as an active target.
+- Do not modify files unless the current task explicitly grants a narrow write scope.
+- Do not delete, rename, move, scaffold, commit, push, merge, rebase, open PRs, change dependencies, lockfiles, package scripts, CI/CD, runtime config, env/secrets, generated files, backend/API/runtime, or native config unless explicitly authorized.
+- No PASS, READY, CLOSED, FINAL, or 100% without evidence.
+- Unknowns must be marked TBD or UNPROVEN.
+- Evidence decides, not agent claims.
 
-1. Upgrade Expo and dependencies
+For UI/frontend/mobile:
+- Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only.
+- No local design system outside @bthwani/ui-kit.
+- Use BThwani identity only: deepBlue #0A2F5C, orange #FF500D, white #FFFFFF.
+- Arabic/RTL UI must be directionally correct.
 
-```bash
-npx expo install expo@latest
-npx expo install --fix
-```
+## Allowed Use
 
-2. Run diagnostics: `npx expo-doctor`
+- Inspect existing files and report risks.
+- Explain backend, API, runtime, CI, deployment, Expo, Nx, or workspace concerns only from inspected evidence.
+- Suggest narrow next steps and verification commands.
+- Mark unknowns as TBD or UNPROVEN.
 
-3. Clear caches and reinstall
+## Forbidden Use
 
-```bash
-npx expo export -p ios --clear
-rm -rf node_modules .expo
-watchman watch-del-all
-```
+- Do not scaffold, generate, install, upgrade, deploy, link packages, edit workflows, edit package files, edit lockfiles, edit native config, or implement backend/API/runtime code.
+- Do not use this skill as a builder.
+- Do not open reference files as active instructions unless the user explicitly asks for reference review.
 
-## Breaking Changes Checklist
+## Required Output Format
 
-- Check for removed APIs in release notes
-- Update import paths for moved modules
-- Review native module changes requiring prebuild
-- Test all camera, audio, and video features
-- Verify navigation still works correctly
+Decision:
+PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED / NEEDS_EVIDENCE / NEEDS_VISUAL_EVIDENCE
 
-## Prebuild for Native Changes
+Scope reviewed:
+- paths inspected
 
-**First check if `ios/` and `android/` directories exist in the project.** If neither directory exists, the project uses Continuous Native Generation (CNG) and native projects are regenerated at build time — skip this section and "Clear caches for bare workflow" entirely.
+Evidence:
+- files, commands, screenshots, logs, or patch evidence used
 
-If upgrading requires native changes:
+Findings:
+- concise evidence-based findings only
 
-```bash
-npx expo prebuild --clean
-```
+Risks:
+- concrete risks with affected paths
 
-This regenerates the `ios` and `android` directories. Ensure the project is not a bare workflow app before running this command.
+Allowed next action:
+- one narrow next step only
 
-## Clear caches for bare workflow
+## Verification Reminder
 
-These steps only apply when `ios/` and/or `android/` directories exist in the project:
+For any later authorized runtime/config/backend/CI/Nx/Expo change, require at minimum:
+- git --no-pager status --short
+- git --no-pager diff --check
+- pnpm -w exec tsc --noEmit
+- targeted build/test/runtime evidence when relevant
 
-- Clear the cocoapods cache for iOS: `cd ios && pod install --repo-update`
-- Clear derived data for Xcode: `npx expo run:ios --no-build-cache`
-- Clear the Gradle cache for Android: `cd android && ./gradlew clean`
-
-## Housekeeping
-
-- Review release notes for the target SDK version at https://expo.dev/changelog
-- If using Expo SDK 54 or later, ensure react-native-worklets is installed — this is required for react-native-reanimated to work.
-- Enable React Compiler in SDK 54+ by adding `"experiments": { "reactCompiler": true }` to app.json — it's stable and recommended
-- Delete sdkVersion from `app.json` to let Expo manage it automatically
-- Remove implicit packages from `package.json`: `@babel/core`, `babel-preset-expo`, `expo-constants`.
-- If the babel.config.js only contains 'babel-preset-expo', delete the file
-- If the metro.config.js only contains expo defaults, delete the file
-
-## Deprecated Packages
-
-| Old Package          | Replacement                                          |
-| -------------------- | ---------------------------------------------------- |
-| `expo-av`            | `expo-audio` and `expo-video`                        |
-| `expo-permissions`   | Individual package permission APIs                   |
-| `@expo/vector-icons` | `expo-symbols` (for SF Symbols)                      |
-| `AsyncStorage`       | `expo-sqlite/localStorage/install`                   |
-| `expo-app-loading`   | `expo-splash-screen`                                 |
-| expo-linear-gradient | experimental_backgroundImage + CSS gradients in View |
-
-When migrating deprecated packages, update all code usage before removing the old package. For expo-av, consult the migration references to convert Audio.Sound to useAudioPlayer, Audio.Recording to useAudioRecorder, and Video components to VideoView with useVideoPlayer.
-
-## expo.install.exclude
-
-Check if package.json has excluded packages:
-
-```json
-{
-  "expo": { "install": { "exclude": ["react-native-reanimated"] } }
-}
-```
-
-Exclusions are often workarounds that may no longer be needed after upgrading. Review each one.
-## Removing patches
-
-Check if there are any outdated patches in the `patches/` directory. Remove them if they are no longer needed.
-
-## Postcss
-
-- `autoprefixer` isn't needed in SDK +53. Remove it from dependencies and check `postcss.config.js` or `postcss.config.mjs` to remove it from the plugins list.
-- Use `postcss.config.mjs` in SDK +53.
-
-## Metro
-
-Remove redundant metro config options:
-
-- resolver.unstable_enablePackageExports is enabled by default in SDK +53.
-- `experimentalImportSupport` is enabled by default in SDK +54.
-- `EXPO_USE_FAST_RESOLVER=1` is removed in SDK +54.
-- cjs and mjs extensions are supported by default in SDK +50.
-- Expo webpack is deprecated, migrate to [Expo Router and Metro web](https://docs.expo.dev/router/migrate/from-expo-webpack/).
-
-## Hermes engine v1
-
-Since SDK 55, users can opt-in to use Hermes engine v1 for improved runtime performance. This requires setting `useHermesV1: true` in the `expo-build-properties` config plugin, and may require a specific version of the `hermes-compiler` npm package. Hermes v1 will become a default in some future SDK release.
-
-## New Architecture
-
-The new architecture is enabled by default, the app.json field `"newArchEnabled": true` is no longer needed as it's the default. Expo Go only supports the new architecture as of SDK +53.
+This skill does not approve its own work. Final acceptance requires Git evidence and ChatGPT review.

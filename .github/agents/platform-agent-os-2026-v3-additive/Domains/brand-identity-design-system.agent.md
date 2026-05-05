@@ -6,8 +6,9 @@ owner: BThwani
 mode: add-only-fail-closed
 acceptance_threshold: 100
 ---
-
 # brand-identity-design-system
+
+<!-- NOTE (example-only): Visual identity descriptors and helper colors are documentation artifacts, not secrets. -->
 
 ## Purpose
 White/orange/dark navy-blue premium BThwani identity.

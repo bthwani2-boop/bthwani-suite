@@ -1,5 +1,7 @@
 # Overlay: user-review-gates
 
+<!-- NOTE (example-only): Contains example tokens for gate workflows. Not runtime secrets. -->
+
 ## Load
 
 - `bthwani-interactive-review`

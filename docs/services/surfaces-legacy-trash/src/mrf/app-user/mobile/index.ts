@@ -1,9 +1,0 @@
-export { auto_mrf_claim_create } from './auto_mrf_claim_create';
-export { auto_mrf_claim_get } from './auto_mrf_claim_get';
-export { auto_mrf_home_get } from './auto_mrf_home_get';
-export { auto_mrf_match_get } from './auto_mrf_match_get';
-export { auto_mrf_match_respond } from './auto_mrf_match_respond';
-export { auto_mrf_report_create } from './auto_mrf_report_create';
-export { auto_mrf_report_get } from './auto_mrf_report_get';
-export { auto_mrf_report_update } from './auto_mrf_report_update';
-export { auto_mrf_reports_list } from './auto_mrf_reports_list';

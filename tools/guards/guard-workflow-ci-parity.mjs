@@ -3,7 +3,7 @@ import path from 'node:path';
 import { parseArgs, createReport, finalize, readTextSafe, exists } from './lib/guard-utils.mjs';
 
 const args = parseArgs();
-const report = createReport('WORKFLOW-CI-PARITY', 'governance/GUARD_IMPLEMENTATION_MAP.md');
+const report = createReport('WORKFLOW-CI-PARITY', 'governance/13_CI_AND_GATES.md');
 const root = args.root;
 
 const baseline = '.github/workflows/governance-baseline.yml';

@@ -1,6 +1,6 @@
 ---
 name: bthwani-agent-os-2026-v3-ui-kit-evolution-guard
-description: Protects and improves ui-kit during UI execution.
+description: Protects and improves ui-kit during UI execution; use when UI work may need shared-kit promotion, token discipline, or component hardening.
 version: 2026.3.0-additive-evolution
 fail_closed: true
 requires_evidence: true

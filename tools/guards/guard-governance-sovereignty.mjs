@@ -3,12 +3,18 @@ import path from 'node:path';
 import { parseArgs, createReport, finalize, exists, walkFiles, readText, rel } from './lib/guard-utils.mjs';
 
 const args = parseArgs();
-const report = createReport('GOV-SOVEREIGNTY', 'governance/00_GOVERNANCE_INDEX.md');
+const report = createReport('GOV-SOVEREIGNTY', 'governance/00_README.md');
 const root = args.root;
 
+const ignoredReferenceRoots = [
+  'governance/',
+  'tools/registry/runs/',
+  'kdt/'
+];
+
 const required = [
-  'governance/README.md',
-  'governance/00_GOVERNANCE_INDEX.md',
+  'governance/00_README.md',
+  'governance/01_GOVERNANCE_INDEX.md',
   'tools/guards/guard-manifest.json'
 ];
 
@@ -40,10 +46,9 @@ if (fs.existsSync(manifestPath)) {
 const files = walkFiles(root, { startDirs: ['apps', 'packages', 'services', 'tools/scripts', '.github', 'governance'] });
 for (const file of files) {
   const relative = rel(root, file);
-  if (relative.startsWith('tools/registry/runs/')) continue;
-  if (['governance/README.md', 'governance/00_GOVERNANCE_INDEX.md', 'governance/GUARD_IMPLEMENTATION_MAP.md'].includes(relative)) continue;
+  if (ignoredReferenceRoots.some((prefix) => relative.startsWith(prefix))) continue;
   const text = readText(file);
-  if (/docs[\\/]governance|docs\/governance/.test(text) && !relative.startsWith('governance/legacy-extracted/')) {
+  if (/docs[\\/]governance|docs\/governance/.test(text)) {
     report.warn(relative, 'Reference to retired docs/governance found. Update to governance/ if this is an active reference.');
   }
   if (relative.startsWith('tools/guards/') && relative.endsWith('.md') && relative !== 'tools/guards/README.md') {

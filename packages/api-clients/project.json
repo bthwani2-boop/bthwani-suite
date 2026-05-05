@@ -1,7 +1,0 @@
-{
-  "name": "api-clients",
-  "root": "packages/api-clients",
-  "sourceRoot": "packages/api-clients/src",
-  "projectType": "library",
-  "targets": {}
-}

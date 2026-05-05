@@ -1,89 +1,71 @@
 ---
 name: vercel-composition-patterns
-description:
-  React composition patterns that scale. Use when refactoring components with
-  boolean prop proliferation, building flexible component libraries, or
-  designing reusable APIs. Triggers on tasks involving compound components,
-  render props, context providers, or component architecture. Includes React 19
-  API changes.
-license: MIT
-metadata:
-  author: vercel
-  version: '1.0.0'
+description: Light advisory guidance for React composition in BThwani. Does not refactor by default.
 ---
 
-# React Composition Patterns
+# Vercel Composition Patterns - BThwani Safe Advisory Skill
 
-Composition patterns for building flexible, maintainable React components. Avoid
-boolean prop proliferation by using compound components, lifting state, and
-composing internals. These patterns make codebases easier for both humans and AI
-agents to work with as they scale.
+## Status
 
-## When to Apply
+This active SKILL.md is intentionally rewritten as a BThwani-safe advisory wrapper.
 
-Reference these guidelines when:
+Original broad instructions, examples, references, generated snippets, or upstream patterns in this folder are reference material only. They must not override this SKILL.md, BThwani governance, the current task scope, or evidence requirements.
 
-- Refactoring components with many boolean props
-- Building reusable component libraries
-- Designing flexible component APIs
-- Reviewing component architecture
-- Working with compound components or context providers
+## BThwani Safety Contract
 
-## Rule Categories by Priority
+This skill is advisory/read-only by default.
 
-| Priority | Category                | Impact | Prefix          |
-| -------- | ----------------------- | ------ | --------------- |
-| 1        | Component Architecture  | HIGH   | `architecture-` |
-| 2        | State Management        | MEDIUM | `state-`        |
-| 3        | Implementation Patterns | MEDIUM | `patterns-`     |
-| 4        | React 19 APIs           | MEDIUM | `react19-`      |
+Mandatory constraints:
+- Active repo: C:\bthwani-suite.
+- Do not use any old standalone repo/path named bth as an active target.
+- Do not modify files unless the current task explicitly grants a narrow write scope.
+- Do not delete, rename, move, scaffold, commit, push, merge, rebase, open PRs, change dependencies, lockfiles, package scripts, CI/CD, runtime config, env/secrets, generated files, backend/API/runtime, or native config unless explicitly authorized.
+- No PASS, READY, CLOSED, FINAL, or 100% without evidence.
+- Unknowns must be marked TBD or UNPROVEN.
+- Evidence decides, not agent claims.
 
-## Quick Reference
+For UI/frontend/mobile:
+- Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only.
+- No local design system outside @bthwani/ui-kit.
+- Use BThwani identity only: deepBlue #0A2F5C, orange #FF500D, white #FFFFFF.
+- Arabic/RTL UI must be directionally correct.
 
-### 1. Component Architecture (HIGH)
+## Allowed Use
 
-- `architecture-avoid-boolean-props` - Don't add boolean props to customize
-  behavior; use composition
-- `architecture-compound-components` - Structure complex components with shared
-  context
+- Inspect and explain only inside the current task scope.
+- Provide advisory guidance, warnings, and narrow verification commands.
+- Help interpret TypeScript, Nx, Next.js, React, or composition patterns from repo evidence.
 
-### 2. State Management (MEDIUM)
+## Forbidden Use
 
-- `state-decouple-implementation` - Provider is the only place that knows how
-  state is managed
-- `state-context-interface` - Define generic interface with state, actions, meta
-  for dependency injection
-- `state-lift-state` - Move state into provider components for sibling access
+- Do not edit files, dependencies, lockfiles, package scripts, generated files, CI, runtime config, backend/API/runtime, native config, or workflows unless explicit scope grants it.
+- Do not broaden from advisory guidance into implementation.
 
-### 3. Implementation Patterns (MEDIUM)
+## Required Output Format
 
-- `patterns-explicit-variants` - Create explicit variant components instead of
-  boolean modes
-- `patterns-children-over-render-props` - Use children for composition instead
-  of renderX props
+Decision:
+PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED / NEEDS_EVIDENCE / NEEDS_VISUAL_EVIDENCE
 
-### 4. React 19 APIs (MEDIUM)
+Scope reviewed:
+- paths inspected
 
-> **⚠️ React 19+ only.** Skip this section if using React 18 or earlier.
+Evidence:
+- files, commands, screenshots, logs, or patch evidence used
 
-- `react19-no-forwardref` - Don't use `forwardRef`; use `use()` instead of `useContext()`
+Findings:
+- concise evidence-based findings only
 
-## How to Use
+Risks:
+- concrete risks with affected paths
 
-Read individual rule files for detailed explanations and code examples:
+Allowed next action:
+- one narrow next step only
 
-```
-rules/architecture-avoid-boolean-props.md
-rules/state-context-interface.md
-```
+## Verification Reminder
 
-Each rule file contains:
+For any later authorized code change, require at minimum:
+- git --no-pager status --short
+- git --no-pager diff --check
+- pnpm -w exec tsc --noEmit
 
-- Brief explanation of why it matters
-- Incorrect code example with explanation
-- Correct code example with explanation
-- Additional context and references
-
-## Full Compiled Document
-
-For the complete guide with all rules expanded: `AGENTS.md`
+This skill does not approve its own work. Final acceptance requires Git evidence and ChatGPT review.

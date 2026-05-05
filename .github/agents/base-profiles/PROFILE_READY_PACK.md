@@ -1,5 +1,7 @@
 # Base Profile: ready.pack
 
+<!-- NOTE (example-only): May contain token-like strings used purely for documentation examples. Not runtime secrets. -->
+
 ## Always Load
 
 - `bthwani-unified-experience-review`

@@ -1,5 +1,7 @@
 # Overlay: design-review
 
+<!-- NOTE (example-only): Design overlays may reference BThwani tokens or artifacts for examples. These are illustrative only. -->
+
 ## Load
 
 - `bthwani-design-sovereignty`

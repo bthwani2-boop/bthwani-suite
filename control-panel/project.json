@@ -1,0 +1,20 @@
+{
+  "name": "control-panel",
+  "root": "control-panel",
+  "sourceRoot": "control-panel",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir control-panel/runtime dev"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm --dir control-panel/runtime build"
+      }
+    }
+  }
+}

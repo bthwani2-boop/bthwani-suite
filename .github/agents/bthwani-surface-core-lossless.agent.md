@@ -74,7 +74,7 @@ This agent file is the primary governing surface.
 
 The following paths are part of this agent's managed routing system and operate under its authority:
 
-- `.github/agents/Routing/AGENT_ROUTING_INDEX.md`
+- `.github/agents/AGENT_ROUTING_INDEX.md`
 - `.github/agents/base-profiles/**`
 - `.github/agents/overlays/**`
 - `.github/skills/bthwani-central-ui-kit-compliance`
@@ -108,7 +108,7 @@ The routing index is not a peer policy surface. It is an annex under this agent 
 - `overlay.user-review-gates` -> `.github/agents/overlays/OVERLAY_USER_REVIEW_GATES.md`
 - `overlay.violation-audit` -> `.github/agents/overlays/OVERLAY_VIOLATION_AUDIT.md`
 
-Refer to `.github/agents/Routing/AGENT_ROUTING_INDEX.md` for routing tie-breaks and isolation rules.
+Refer to `.github/agents/AGENT_ROUTING_INDEX.md` for routing tie-breaks and isolation rules.
 
 If uncertain, start with `analyze.first-pass`.
 

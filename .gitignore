@@ -5,6 +5,7 @@ node_modules/
 # Build and cache output
 dist/
 build/
+**/dist-android-check/
 coverage/
 .nx/
 .next/
@@ -36,6 +37,12 @@ tools/analysis/
 # tools/scripts/ # ENABLED_FOR_GOVERNANCE_SCRIPT_TRACKING
 # Local-only media fixture assets
 packages/media-fixtures/assets/
+!packages/media-fixtures/assets/
+packages/media-fixtures/assets/*
+!packages/media-fixtures/assets/seed/
+packages/media-fixtures/assets/seed/*
+!packages/media-fixtures/assets/seed/dsh/
+!packages/media-fixtures/assets/seed/dsh/**
 # Local Python virtual environments
 .venv/
 .tamagui/

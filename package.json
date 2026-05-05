@@ -10,7 +10,7 @@
     "build:mobile-control-panel": "pnpm nx run-many --target=build --projects=control-panel,app-client,app-partner,app-captain,app-field --parallel=5",
     "guard:agent-governance": "node tools/scripts/validate-agent-governance.mjs",
     "guard:i18n-direction": "node tools/scripts/guard-central-i18n-direction.mjs",
-    "guard:i18n-direction:mobile-control-panel": "node tools/scripts/guard-central-i18n-direction.mjs apps/mobile apps/web/control-panel packages",
+    "guard:i18n-direction:mobile-control-panel": "node tools/scripts/guard-central-i18n-direction.mjs app-client app-partner app-captain app-field control-panel webapp website",
     "guard:service-blueprint": "node tools/guards/guard-service-blueprint-completeness.mjs",
     "guard:test-coverage": "node tools/guards/guard-test-coverage-threshold.mjs",
     "guard:binding-proof": "node tools/guards/guard-binding-proof.mjs",

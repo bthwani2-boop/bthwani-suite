@@ -1,190 +1,74 @@
 ---
 name: expo-deployment
-description: Deploying Expo apps to iOS App Store, Android Play Store, web hosting, and API routes
-version: 1.0.0
-license: MIT
+description: Read-only advisory review for Expo deployment risk. Does not deploy, publish, or edit store configuration.
 ---
 
-# Deployment
+# Expo Deployment - BThwani Safe Advisory Skill
 
-This skill covers deploying Expo applications across all platforms using EAS (Expo Application Services).
+## Status
 
-## References
+This active SKILL.md is intentionally rewritten as a BThwani-safe advisory wrapper.
 
-Consult these resources as needed:
+Original broad instructions, examples, references, generated snippets, or upstream patterns in this folder are reference material only. They must not override this SKILL.md, BThwani governance, the current task scope, or evidence requirements.
 
-- ./references/workflows.md -- CI/CD workflows for automated deployments and PR previews
-- ./references/testflight.md -- Submitting iOS builds to TestFlight for beta testing
-- ./references/app-store-metadata.md -- Managing App Store metadata and ASO optimization
-- ./references/play-store.md -- Submitting Android builds to Google Play Store
-- ./references/ios-app-store.md -- iOS App Store submission and review process
+## BThwani Safety Contract
 
-## Quick Start
+This skill is advisory/read-only by default.
 
-### Install EAS CLI
+Mandatory constraints:
+- Active repo: C:\bthwani-suite.
+- Do not use any old standalone repo/path named bth as an active target.
+- Do not modify files unless the current task explicitly grants a narrow write scope.
+- Do not delete, rename, move, scaffold, commit, push, merge, rebase, open PRs, change dependencies, lockfiles, package scripts, CI/CD, runtime config, env/secrets, generated files, backend/API/runtime, or native config unless explicitly authorized.
+- No PASS, READY, CLOSED, FINAL, or 100% without evidence.
+- Unknowns must be marked TBD or UNPROVEN.
+- Evidence decides, not agent claims.
 
-```bash
-npm install -g eas-cli
-eas login
-```
+For UI/frontend/mobile:
+- Screen / Surface / App -> @bthwani/ui-kit public exports -> Tamagui internally inside ui-kit only.
+- No local design system outside @bthwani/ui-kit.
+- Use BThwani identity only: deepBlue #0A2F5C, orange #FF500D, white #FFFFFF.
+- Arabic/RTL UI must be directionally correct.
 
-### Initialize EAS
+## Allowed Use
 
-```bash
-npx eas-cli@latest init
-```
+- Inspect existing files and report risks.
+- Explain backend, API, runtime, CI, deployment, Expo, Nx, or workspace concerns only from inspected evidence.
+- Suggest narrow next steps and verification commands.
+- Mark unknowns as TBD or UNPROVEN.
 
-This creates `eas.json` with build profiles.
+## Forbidden Use
 
-## Build Commands
+- Do not scaffold, generate, install, upgrade, deploy, link packages, edit workflows, edit package files, edit lockfiles, edit native config, or implement backend/API/runtime code.
+- Do not use this skill as a builder.
+- Do not open reference files as active instructions unless the user explicitly asks for reference review.
 
-### Production Builds
+## Required Output Format
 
-```bash
-# iOS App Store build
-npx eas-cli@latest build -p ios --profile production
+Decision:
+PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED / NEEDS_EVIDENCE / NEEDS_VISUAL_EVIDENCE
 
-# Android Play Store build
-npx eas-cli@latest build -p android --profile production
+Scope reviewed:
+- paths inspected
 
-# Both platforms
-npx eas-cli@latest build --profile production
-```
+Evidence:
+- files, commands, screenshots, logs, or patch evidence used
 
-### Submit to Stores
+Findings:
+- concise evidence-based findings only
 
-```bash
-# iOS: Build and submit to App Store Connect
-npx eas-cli@latest build -p ios --profile production --submit
+Risks:
+- concrete risks with affected paths
 
-# Android: Build and submit to Play Store
-npx eas-cli@latest build -p android --profile production --submit
+Allowed next action:
+- one narrow next step only
 
-# Shortcut for iOS TestFlight
-npx testflight
-```
+## Verification Reminder
 
-## Web Deployment
+For any later authorized runtime/config/backend/CI/Nx/Expo change, require at minimum:
+- git --no-pager status --short
+- git --no-pager diff --check
+- pnpm -w exec tsc --noEmit
+- targeted build/test/runtime evidence when relevant
 
-Deploy web apps using EAS Hosting:
-
-```bash
-# Deploy to production
-npx expo export -p web
-npx eas-cli@latest deploy --prod
-
-# Deploy PR preview
-npx eas-cli@latest deploy
-```
-
-## EAS Configuration
-
-Standard `eas.json` for production deployments:
-
-```json
-{
-  "cli": {
-    "version": ">= 16.0.1",
-    "appVersionSource": "remote"
-  },
-  "build": {
-    "production": {
-      "autoIncrement": true,
-      "ios": {
-        "resourceClass": "m-medium"
-      }
-    },
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
-    }
-  },
-  "submit": {
-    "production": {
-      "ios": {
-        "appleId": "your@email.com",
-        "ascAppId": "1234567890"
-      },
-      "android": {
-        "serviceAccountKeyPath": "./google-service-account.json",
-        "track": "internal"
-      }
-    }
-  }
-}
-```
-
-## Platform-Specific Guides
-
-### iOS
-
-- Use `npx testflight` for quick TestFlight submissions
-- Configure Apple credentials via `eas credentials`
-- See ./reference/testflight.md for credential setup
-- See ./reference/ios-app-store.md for App Store submission
-
-### Android
-
-- Set up Google Play Console service account
-- Configure tracks: internal → closed → open → production
-- See ./reference/play-store.md for detailed setup
-
-### Web
-
-- EAS Hosting provides preview URLs for PRs
-- Production deploys to your custom domain
-- See ./reference/workflows.md for CI/CD automation
-
-## Automated Deployments
-
-Use EAS Workflows for CI/CD:
-
-```yaml
-# .eas/workflows/release.yml
-name: Release
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  build-ios:
-    type: build
-    params:
-      platform: ios
-      profile: production
-
-  submit-ios:
-    type: submit
-    needs: [build-ios]
-    params:
-      platform: ios
-      profile: production
-```
-
-See ./reference/workflows.md for more workflow examples.
-
-## Version Management
-
-EAS manages version numbers automatically with `appVersionSource: "remote"`:
-
-```bash
-# Check current versions
-eas build:version:get
-
-# Manually set version
-eas build:version:set -p ios --build-number 42
-```
-
-## Monitoring
-
-```bash
-# List recent builds
-eas build:list
-
-# Check build status
-eas build:view
-
-# View submission status
-eas submit:list
-```
+This skill does not approve its own work. Final acceptance requires Git evidence and ChatGPT review.

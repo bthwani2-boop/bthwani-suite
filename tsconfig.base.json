@@ -9,47 +9,161 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@bthwani/api-clients": [
-        "./packages/api-clients/src/index.ts"
-      ],
-      "@bthwani/api-types": [
-        "./packages/api-types/src/index.ts"
-      ],
       "@bthwani/ui-kit": [
-        "./packages/ui-kit/src/index.ts"
+        "./ui-kit/src/index.ts"
       ],
       "@bthwani/ui-kit/*": [
-        "./packages/ui-kit/src/*.ts"
+        "./ui-kit/src/*"
       ],
-      "@bthwani/app-shells": [
-        "./packages/app-shells/index.ts"
+      "@bthwani/dsh/*": [
+        "./dsh/*"
       ],
-      "@bthwani/app-shells/*": [
-        "./packages/app-shells/*"
+      "@bthwani/wlt/*": [
+        "./wlt/*"
       ],
-      "@bthwani/surface-mobile": [
-        "./packages/surface-mobile/src/index.tsx"
+      "@bthwani/wlt": [
+        "./wlt/index.ts"
       ],
-      "@bthwani/surfaces": [
-        "./packages/surfaces/src/index.ts"
+      "@bthwani/knz/*": [
+        "./knz/*"
       ],
-      "@bthwani/surfaces/*": [
-        "./packages/surfaces/src/service-owned/*"
+      "@bthwani/knz": [
+        "./knz/index.ts"
       ],
-      "@bthwani/surfaces/service-owned/*": [
-        "./packages/surfaces/src/service-owned/*"
+      "@bthwani/arb/*": [
+        "./arb/*"
       ],
-      "@bthwani/surfaces/surface-owned/*": [
-        "./packages/surfaces/src/surface-owned/*"
+      "@bthwani/arb": [
+        "./arb/index.ts"
       ],
-      "@bthwani/surfaces/composition/*": [
-        "./packages/surfaces/src/composition/*"
+      "@bthwani/amn/*": [
+        "./amn/*"
       ],
-      "@bthwani/media-fixtures": [
-        "./packages/media-fixtures/src/index.ts"
+      "@bthwani/amn": [
+        "./amn/index.ts"
       ],
-      "@bthwani/media-fixtures/*": [
-        "./packages/media-fixtures/src/*"
+      "@bthwani/esf/*": [
+        "./esf/*"
+      ],
+      "@bthwani/esf": [
+        "./esf/index.ts"
+      ],
+      "@bthwani/mrf/*": [
+        "./mrf/*"
+      ],
+      "@bthwani/mrf": [
+        "./mrf/index.ts"
+      ],
+      "@bthwani/snd/*": [
+        "./snd/*"
+      ],
+      "@bthwani/snd": [
+        "./snd/index.ts"
+      ],
+      "@bthwani/kwd/*": [
+        "./kwd/*"
+      ],
+      "@bthwani/kwd": [
+        "./kwd/index.ts"
+      ],
+      "@bthwani/dsh": [
+        "./dsh/index.ts"
+      ],
+      "@bthwani/dsh/backend": [
+        "./dsh/backend/client.ts"
+      ],
+      "@bthwani/dsh/backend/*": [
+        "./dsh/backend/*"
+      ],
+      "@bthwani/wlt/backend": [
+        "./wlt/backend/client.ts"
+      ],
+      "@bthwani/wlt/backend/*": [
+        "./wlt/backend/*"
+      ],
+      "@bthwani/knz/backend": [
+        "./knz/backend/client.ts"
+      ],
+      "@bthwani/knz/backend/*": [
+        "./knz/backend/*"
+      ],
+      "@bthwani/arb/backend": [
+        "./arb/backend/client.ts"
+      ],
+      "@bthwani/arb/backend/*": [
+        "./arb/backend/*"
+      ],
+      "@bthwani/amn/backend": [
+        "./amn/backend/client.ts"
+      ],
+      "@bthwani/amn/backend/*": [
+        "./amn/backend/*"
+      ],
+      "@bthwani/esf/backend": [
+        "./esf/backend/client.ts"
+      ],
+      "@bthwani/esf/backend/*": [
+        "./esf/backend/*"
+      ],
+      "@bthwani/mrf/backend": [
+        "./mrf/backend/client.ts"
+      ],
+      "@bthwani/mrf/backend/*": [
+        "./mrf/backend/*"
+      ],
+      "@bthwani/snd/backend": [
+        "./snd/backend/client.ts"
+      ],
+      "@bthwani/snd/backend/*": [
+        "./snd/backend/*"
+      ],
+      "@bthwani/kwd/backend": [
+        "./kwd/backend/client.ts"
+      ],
+      "@bthwani/kwd/backend/*": [
+        "./kwd/backend/*"
+      ],
+      "@bthwani/webapp/*": [
+        "./webapp/*"
+      ],
+      "@bthwani/website/*": [
+        "./website/*"
+      ],
+      "@bthwani/app-client": [
+        "./app-client/composition/index.ts"
+      ],
+      "@bthwani/app-client/*": [
+        "./app-client/*",
+        "./app-client/runtime/*"
+      ],
+      "@bthwani/app-partner": [
+        "./app-partner/composition/index.ts"
+      ],
+      "@bthwani/app-partner/*": [
+        "./app-partner/*",
+        "./app-partner/runtime/*"
+      ],
+      "@bthwani/app-captain": [
+        "./app-captain/composition/index.ts"
+      ],
+      "@bthwani/app-captain/*": [
+        "./app-captain/*",
+        "./app-captain/runtime/*"
+      ],
+      "@bthwani/app-field": [
+        "./app-field/composition/index.ts"
+      ],
+      "@bthwani/app-field/*": [
+        "./app-field/*",
+        "./app-field/runtime/*"
+      ],
+      "@bthwani/control-panel": [
+        "./control-panel/shell/index.ts"
+      ],
+      "@bthwani/control-panel/*": [
+        "./control-panel/*",
+        "./control-panel/runtime/*",
+        "./control-panel/shell/*"
       ]
     },
     "resolveJsonModule": true,

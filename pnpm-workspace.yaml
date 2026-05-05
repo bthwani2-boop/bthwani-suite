@@ -1,6 +1,21 @@
 packages:
-  - apps/*
-  - apps/*/*
-  - services/*
-  - packages/*
+  - webapp
+  - website
+  - webapp/runtime
+  - website/runtime
+  - app-client/runtime
+  - app-partner/runtime
+  - app-captain/runtime
+  - app-field/runtime
+  - control-panel/runtime
+  - ui-kit
+  - dsh
+  - wlt
+  - knz
+  - arb
+  - amn
+  - esf
+  - mrf
+  - snd
+  - kwd
 nodeLinker: hoisted

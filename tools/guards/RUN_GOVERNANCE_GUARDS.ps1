@@ -1,5 +1,8 @@
-Set-Location -LiteralPath "C:\bthwani-suite"
-
+$RepoRoot = (& git rev-parse --show-toplevel 2>$null).Trim()
+if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+  $RepoRoot = (Get-Location).Path
+}
+Set-Location -LiteralPath $RepoRoot
 $ErrorActionPreference = "Stop"
 
 $Mode = "Local"
@@ -19,7 +22,7 @@ for ($i = 0; $i -lt $args.Count; $i++) {
 
 if ($Mode -notin @('Local','CI')) { throw "Invalid -Mode: $Mode" }
 
-$RepoRoot = "C:\bthwani-suite"
+$RepoRoot = (Get-Location).Path
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $SessionId = "GOVERNANCE_GUARDS-$Timestamp"
 $EvidenceRoot = Join-Path $RepoRoot "tools\registry\runs\$SessionId"
@@ -33,6 +36,8 @@ function Log-Line([string]$Message) {
 
 $Guards = @(
   "guard-governance-sovereignty.mjs",
+  "guard-governance-boundaries.mjs",
+  "guard-governance-canonical-control-plane.mjs",
   "guard-ui-architecture-boundary.mjs",
   "guard-design-token-drift.mjs",
   "guard-service-contract-matrix.mjs",
@@ -77,12 +82,29 @@ foreach ($Guard in $Guards) {
     $Result = Get-Content -LiteralPath $JsonOut -Raw | ConvertFrom-Json
     $Results += $Result
   } else {
+    $StdOutText = if (Test-Path -LiteralPath $StdOut) { Get-Content -LiteralPath $StdOut -Raw } else { '' }
+    if ($null -eq $StdOutText) { $StdOutText = '' }
+    $StdErrText = if (Test-Path -LiteralPath $StdErr) { Get-Content -LiteralPath $StdErr -Raw } else { '' }
+    if ($null -eq $StdErrText) { $StdErrText = '' }
+    $CombinedText = ($StdOutText + "`n" + $StdErrText)
+
+    $WarnMatch = [regex]::Match($CombinedText, 'Warnings:\s*(\d+)')
+    $WarnCount = if ($WarnMatch.Success) { [int]$WarnMatch.Groups[1].Value } elseif ($CombinedText -match '\bWARN\b|PASS_WITH_WARNINGS') { 1 } else { 0 }
+    $Status = if ($Process.ExitCode -ne 0 -or $CombinedText -match '\bFAILED\b') {
+      'FAIL'
+    } elseif ($WarnCount -gt 0) {
+      'WARN'
+    } else {
+      'PASS'
+    }
+
     $Results += [pscustomobject]@{
       guardId = $Guard
-      status = "FAIL"
-      failCount = 1
-      warnCount = 0
-      error = "Guard did not produce JSON output. ExitCode=$($Process.ExitCode)"
+      status = $Status
+      failCount = if ($Status -eq 'FAIL') { 1 } else { 0 }
+      warnCount = $WarnCount
+      infoCount = 0
+      error = if ($Status -eq 'FAIL') { if ($CombinedText.Trim()) { $CombinedText.Trim() } else { "Guard did not produce JSON output. ExitCode=$($Process.ExitCode)" } } else { $null }
     }
   }
 }

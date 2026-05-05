@@ -1,6 +1,6 @@
 ---
 name: bthwani-agent-os-2026-v3-wlt-financial-path
-description: Detect financial effects and enforce WLT-only path.
+description: Detect financial effects and enforce WLT-only path; use when money movement, settlement logic, or financial authority boundaries are in scope.
 version: 2026.04.18-v3-additive
 ---
 

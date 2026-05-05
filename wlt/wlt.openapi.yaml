@@ -1,0 +1,7 @@
+openapi: 3.1.0
+info:
+  title: WLT API
+  version: 0.1.0
+  description: Root WLT contract placeholder. Endpoints remain TBD until evidence is added.
+x-bthwani-contract-state: CONTRACT_TBD
+paths: {}
