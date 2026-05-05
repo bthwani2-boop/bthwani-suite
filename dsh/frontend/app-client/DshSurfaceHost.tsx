@@ -28,7 +28,7 @@ import {
   storeItemsByStoreId,
 } from './stores/fixtures';
 import { getPublishedMarketingHomePromos, recordMarketingBannerClick } from '../shared/marketing/banner-store';
-import { getLiveMarketingGrowthItems } from '../shared/marketing/growth-store';
+import { getLiveMarketingGrowthItems, type MarketingGrowthRecord } from '../shared/marketing/growth-store';
 import { getDshClientStateMeta, type DshClientState } from './shared/dshClientStateModel';
 // checkout/tracking screens consolidated into checkout/screens
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './categories/fixtures/dshCategoriesFixtures';
@@ -136,6 +136,37 @@ function hasProductTarget(storeId?: string, productId?: string) {
   }
 
   return (storeItemsByStoreId[storeId] ?? []).some((item) => item.id === productId);
+}
+
+function isMarketingGrowthRouteValid(item: MarketingGrowthRecord): boolean {
+  if (
+    item.routeTarget === 'home'
+    || item.routeTarget === 'search'
+    || item.routeTarget === 'promo-apply'
+    || item.routeTarget === 'subscription'
+    || item.routeTarget === 'subscription-family-get'
+    || item.routeTarget === 'entitlements-get'
+  ) {
+    return true;
+  }
+
+  if (item.routeTarget === 'main_category' || item.routeTarget === 'sub_category') {
+    return item.routeTargetId ? publishedPromoCategoryIds.has(item.routeTargetId) : false;
+  }
+
+  if (item.routeTarget === 'store') {
+    return hasStoreTarget(item.routeTargetId);
+  }
+
+  if (item.routeTarget === 'store_category') {
+    return hasStoreCategoryTarget(item.routeTargetId, item.routeTargetExtra);
+  }
+
+  if (item.routeTarget === 'product') {
+    return hasProductTarget(item.routeTargetExtra, item.routeTargetId);
+  }
+
+  return false;
 }
 
 function resolvePublishedHomePromos() {
@@ -724,7 +755,9 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   );
 
   const liveMarketingPrograms = getLiveMarketingGrowthItems('client');
-  const liveMarketingShorts = liveMarketingPrograms.filter((item) => item.family === 'shorts');
+  const liveMarketingShorts = liveMarketingPrograms
+    .filter((item) => item.family === 'shorts')
+    .filter(isMarketingGrowthRouteValid);
   const subscriptionMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'subscription');
   const promoMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'promotion');
   const campaignMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'campaign');

@@ -116,8 +116,11 @@ function routeTargetPrimaryLabel(target: MarketingGrowthRouteTarget) {
 
 function routeTargetPrimaryHint(target: MarketingGrowthRouteTarget) {
   if (target === 'store') return 'مثال: store-1001';
+  if (target === 'store_category') return 'مثال: store-1001';
   if (target === 'product') return 'مثال: item-apple-1';
-  return 'مثال: grocery أو restaurants';
+  if (target === 'main_category') return 'مثال: restaurants';
+  if (target === 'sub_category') return 'فئة فرعية من home إذا كانت منشورة، وليست قسم متجر';
+  return 'مثال: restaurants';
 }
 
 function routeTargetNeedsPrimaryInput(target: MarketingGrowthRouteTarget) {
@@ -135,7 +138,7 @@ function routeTargetSecondaryLabel(target: MarketingGrowthRouteTarget) {
 }
 
 function routeTargetSecondaryHint(target: MarketingGrowthRouteTarget) {
-  if (target === 'store_category') return 'مثال: grocery_vegetables_fruits';
+  if (target === 'store_category') return 'مثال: fresh / dairy / bakery';
   if (target === 'product') return 'مثال: store-1001';
   return 'معرّف إضافي';
 }
