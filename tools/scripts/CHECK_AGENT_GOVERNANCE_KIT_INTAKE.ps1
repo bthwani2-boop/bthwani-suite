@@ -1,5 +1,8 @@
-Set-Location -LiteralPath "C:\bthwani-suite"
-
+$RepoRoot = (& git rev-parse --show-toplevel 2>$null).Trim()
+if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+  $RepoRoot = (Get-Location).Path
+}
+Set-Location -LiteralPath $RepoRoot
 $ErrorActionPreference = "Stop"
 
 $IssueCode = "CHECK_AGENT_GOVERNANCE_KIT_INTAKE"

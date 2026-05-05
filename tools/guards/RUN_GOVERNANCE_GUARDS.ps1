@@ -1,5 +1,8 @@
-Set-Location -LiteralPath "C:\bthwani-suite"
-
+$RepoRoot = (& git rev-parse --show-toplevel 2>$null).Trim()
+if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+  $RepoRoot = (Get-Location).Path
+}
+Set-Location -LiteralPath $RepoRoot
 $ErrorActionPreference = "Stop"
 
 $Mode = "Local"
@@ -19,7 +22,7 @@ for ($i = 0; $i -lt $args.Count; $i++) {
 
 if ($Mode -notin @('Local','CI')) { throw "Invalid -Mode: $Mode" }
 
-$RepoRoot = "C:\bthwani-suite"
+$RepoRoot = (Get-Location).Path
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $SessionId = "GOVERNANCE_GUARDS-$Timestamp"
 $EvidenceRoot = Join-Path $RepoRoot "tools\registry\runs\$SessionId"

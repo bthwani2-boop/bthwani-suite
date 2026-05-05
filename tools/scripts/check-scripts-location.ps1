@@ -46,7 +46,7 @@ if ($ChangedFilesPath -and (Test-Path $ChangedFilesPath)) {
 }
 
 if ($violations.Count -gt 0) {
-    Write-Host "ERROR: Found PowerShell scripts outside $AllowedRelative:"
+    Write-Host "ERROR: Found PowerShell scripts outside ${AllowedRelative}:"
     $violations | ForEach-Object { Write-Host " - $_" }
     Write-Host ""
     Write-Host "To fix: move these scripts into $AllowedRelative or update the policy file tools/SCRIPTS_LOCATION_POLICY.md"
