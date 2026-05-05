@@ -251,6 +251,15 @@
 | app-client | CLIENT_DISPLAY | `dsh/frontend/app-client/home/screens/DshHomeGetScreen.tsx` | `BannerCarousel` renders from `resolvedPromos`; `resolveBannerPress` routes banner taps; `DshSurfaceHost.tsx` injects published promos | CLIENT_DISPLAY_PROVEN | CLIENT_DISPLAY_PROVEN | keep display proven; runtime source authority remains preview-backed |
 | dsh/media-fixtures | MEDIA_FIXTURE_SOURCE | `dsh/media-fixtures/assets/seed/dsh/banners` | seed banner assets plus `mediaKey` references are consumed through local image helpers only | SEED_ONLY | Runtime Claim Allowed = NO | keep seed-only; no runtime claim |
 
+### 7.2 DSH-CAP-002 Baseline
+
+| Surface | Contextual Role | Counterpart Screen/Section | Evidence | Relationship Type | Decision | Next Action |
+|---|---|---|---|---|---|---|
+| app-partner | STORE_CATALOG_READINESS_SOURCE | `dsh/frontend/app-partner/console/workspaces/StoreProfileWorkspaceContent.tsx`; `dsh/frontend/app-partner/console/workspaces/InventoryCatalogWorkspaceContent.tsx`; `dsh/frontend/app-partner/operations/screens/DshPartnerOperationsDirectoryScreen.tsx` | storeOpen, listingEnabled, catalog-linked inventory rows, and readiness CTA/ops handoff show partner-side readiness for store/catalog lifecycle | STORE_CATALOG_READINESS_SOURCE | PROVEN_SCREEN | keep readiness/availability at the partner source; category authority remains with control-panel catalogs |
+| control-panel partners | STORE_CATEGORY_ELIGIBILITY_CONTROL | `dsh/frontend/control-panel/partners/ControlPanelDshPartnerApprovalsScreen.tsx` -> `DshPartnerPromotionEligibilityScreen.tsx` | approvals hub route plus nested eligibility section cover approval state, operational state, category readiness, and featured eligibility | STORE_CATEGORY_ELIGIBILITY_CONTROL | PROVEN_INTERNAL_SECTION | keep nested under approvals; category mutation/enable-disable stays in control-panel catalogs |
+| control-panel marketing | FEATURED_STORE_CATEGORY_CONTROL | `dsh/frontend/control-panel/marketing/ControlPanelDshMarketingScreen.tsx` -> `BannersCommandDeckScreen.tsx` / `GrowthCommandDeckScreen.tsx` | banner and growth decks target store, main_category, sub_category, store_category, and publish destination metadata for featured/promoted placement | FEATURED_STORE_CATEGORY_CONTROL | PROVEN_SCREEN | keep featured selection in marketing only; do not move category authority out of catalogs |
+| app-client | CLIENT_DISCOVERY_DISPLAY | `dsh/frontend/app-client/home/screens/DshHomeGetScreen.tsx`; `dsh/frontend/app-client/stores/screens/DshStoreGetScreen.tsx` | home promos, category rails, store cards, open-store transitions, and store availability states drive discovery display | CLIENT_DISCOVERY_DISPLAY | CLIENT_DISPLAY_PROVEN | keep display proven; runtime source authority remains preview-backed |
+
 ## 8. Data / Fixture / Runtime Inventory
 
 | Area | Source | Source type | Consumed by | Runtime truth allowed? | Notes |
