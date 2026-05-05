@@ -24,6 +24,10 @@ Lean closure docs:
 - `dsh/docs/DSH_FORENSIC_INVENTORY.md`
 - `dsh/docs/CLOSURE_DECISION_LOG.md`
 
+Current live-code note:
+
+- DSH-CAP-002 received preview-routing hardening in the shared marketing banner-store and control-panel deck, but runtime, API, and visual proof remain unproven.
+
 Rules:
 
 - No extra DSH docs unless a real evidence gap requires one.

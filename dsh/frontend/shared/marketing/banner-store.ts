@@ -3,6 +3,7 @@ type DshHomeGetPromo = {
   readonly title?: string;
   readonly subtitle?: string;
   readonly description?: string;
+  readonly icon?: string;
   readonly imageUrl?: string;
   readonly image?: string;
   readonly href?: string;
@@ -10,9 +11,20 @@ type DshHomeGetPromo = {
   readonly ctaHref?: string;
   readonly badge?: string;
   readonly tone?: string;
-  readonly [key: string]: unknown;
+  readonly actionType?: MarketingBannerActionType;
+  readonly actionTarget?: string;
+  readonly actionExtra?: string;
+  readonly mediaKey?: string;
+  readonly accentColor?: string;
 };
-export type MarketingBannerActionType = NonNullable<DshHomeGetPromo['actionType']>;
+export type MarketingBannerActionType =
+  | 'main_category'
+  | 'sub_category'
+  | 'store'
+  | 'store_category'
+  | 'product'
+  | 'external'
+  | 'subscription';
 export type MarketingBannerAudience = 'home' | 'stores' | 'all';
 export type MarketingBannerStatus = 'draft' | 'published';
 
@@ -88,6 +100,27 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: '2026-04-16T08:00:00.000Z',
   },
   {
+    id: 'marketing-banner-store-category',
+    title: 'فئة داخل متجر',
+    subtitle: 'انتقل مباشرة إلى فئة فرعية داخل متجر نشط',
+    imageUrl: createBannerDataUrl('#7c3aed', '#0f172a', 'فئة داخل متجر', 'دخول مباشر للفئة الفرعية'),
+    mediaKey: 'dsh.banner.home.promo-4.v1',
+    accentColor: '#7c3aed',
+    audience: 'all',
+    status: 'published',
+    actionType: 'store_category',
+    actionTarget: 'store-1001',
+    actionExtra: 'grocery_vegetables_fruits',
+    ctaLabel: 'افتح الفئة',
+    partnerName: 'مطعم القلعة',
+    position: 3,
+    clicks: 31,
+    impressions: 280,
+    scheduleStartHour: 8,
+    scheduleEndHour: 23,
+    updatedAt: '2026-04-16T08:00:00.000Z',
+  },
+  {
     id: 'marketing-banner-stores',
     title: 'متجر مباشر',
     subtitle: 'افتح المتجر ثم تابع إلى القائمة',
@@ -127,6 +160,27 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: '2026-04-16T08:00:00.000Z',
   },
   {
+    id: 'marketing-banner-product',
+    title: 'منتج مباشر',
+    subtitle: 'افتح المنتج الجاهز للتفاعل',
+    imageUrl: createBannerDataUrl('#0ea5e9', '#0f172a', 'منتج مباشر', 'انتقال مباشر إلى المنتج'),
+    mediaKey: 'dsh.banner.home.promo-5.v1',
+    accentColor: '#0ea5e9',
+    audience: 'all',
+    status: 'published',
+    actionType: 'product',
+    actionTarget: 'item-apple-1',
+    actionExtra: 'store-1001',
+    ctaLabel: 'افتح المنتج',
+    partnerName: 'شريك منشور',
+    position: 5,
+    clicks: 18,
+    impressions: 190,
+    scheduleStartHour: 8,
+    scheduleEndHour: 23,
+    updatedAt: '2026-04-16T08:00:00.000Z',
+  },
+  {
     id: 'marketing-banner-draft',
     title: 'فئات الموسم',
     subtitle: 'استكشف الفئات المختارة هذا الأسبوع',
@@ -148,8 +202,10 @@ const seededBanners: MarketingBannerRecord[] = [
 
 const seededBannerMediaKeysById: Record<string, string> = {
   'marketing-banner-hero': 'dsh.banner.home.promo-1.v1',
+  'marketing-banner-store-category': 'dsh.banner.home.promo-4.v1',
   'marketing-banner-stores': 'dsh.banner.home.promo-2.v1',
   'marketing-banner-benefits': 'dsh.banner.home.promo-3.v1',
+  'marketing-banner-product': 'dsh.banner.home.promo-5.v1',
   'marketing-banner-draft': 'dsh.banner.home.promo-4.v1',
 };
 

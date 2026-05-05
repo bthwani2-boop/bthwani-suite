@@ -28,6 +28,7 @@ type BannerDraft = {
   id?: string;
   title: string;
   subtitle: string;
+  mediaKey: string;
   accentColor: string;
   audience: MarketingBannerAudience;
   status: MarketingBannerStatus;
@@ -45,6 +46,7 @@ function createDraft(item?: MarketingBannerRecord | null): BannerDraft {
     id: item?.id,
     title: item?.title ?? '',
     subtitle: item?.subtitle ?? '',
+    mediaKey: item?.mediaKey ?? '',
     accentColor: item?.accentColor ?? '#f97316',
     audience: item?.audience ?? 'all',
     status: item?.status ?? 'draft',
@@ -64,9 +66,12 @@ function bannerStatusLabel(status: MarketingBannerStatus) {
 
 function bannerActionTypeLabel(actionType: MarketingBannerActionType) {
   if (actionType === 'main_category') return 'فئة رئيسية';
-  if (actionType === 'store') return 'متجر محدد';
-  if (actionType === 'subscription') return 'اشتراك';
-  return 'وجهة عامة';
+  if (actionType === 'sub_category') return 'فئة فرعية';
+  if (actionType === 'store') return 'متجر';
+  if (actionType === 'store_category') return 'قسم داخل متجر';
+  if (actionType === 'product') return 'منتج محدد';
+  if (actionType === 'external') return 'وجهة عامة';
+  return 'اشتراك';
 }
 
 function bannerTargetLabel(target?: string) {
@@ -75,6 +80,35 @@ function bannerTargetLabel(target?: string) {
   if (target.includes('restaurant')) return 'فئة المطاعم';
   if (target.includes('subscription')) return 'صفحة الاشتراك';
   return 'وجهة مخصصة';
+}
+
+function bannerActionPrimaryLabel(actionType: MarketingBannerActionType) {
+  if (actionType === 'store_category') return 'معرّف المتجر';
+  if (actionType === 'product') return 'معرّف المنتج';
+  if (actionType === 'store') return 'معرّف المتجر';
+  if (actionType === 'main_category' || actionType === 'sub_category') return 'معرّف الفئة';
+  return 'الوجهة التسويقية';
+}
+
+function bannerActionPrimaryHint(actionType: MarketingBannerActionType) {
+  if (actionType === 'main_category') return 'مثال: restaurants';
+  if (actionType === 'sub_category') return 'مثال: grocery';
+  if (actionType === 'store') return 'مثال: store-1001';
+  if (actionType === 'store_category') return 'مثال: store-1001';
+  if (actionType === 'product') return 'مثال: item-apple-1';
+  return 'مثال: DshStoresList أو shein';
+}
+
+function bannerActionExtraLabel(actionType: MarketingBannerActionType) {
+  if (actionType === 'store_category') return 'معرّف الفئة داخل المتجر';
+  if (actionType === 'product') return 'معرّف المتجر';
+  return 'تفصيل إضافي';
+}
+
+function bannerActionExtraHint(actionType: MarketingBannerActionType) {
+  if (actionType === 'store_category') return 'مثال: grocery_vegetables_fruits';
+  if (actionType === 'product') return 'مثال: store-1001';
+  return 'اختياري';
 }
 
 export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
@@ -113,6 +147,7 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
       id: draft.id,
       title: draft.title,
       subtitle: draft.subtitle,
+      mediaKey: draft.mediaKey,
       accentColor: draft.accentColor,
       audience: draft.audience,
       status: draft.status,
@@ -294,8 +329,11 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
             <Tabs<MarketingBannerActionType>
               items={[
                 { value: 'main_category', label: 'فئة' },
+                { value: 'sub_category', label: 'فئة فرعية' },
                 { value: 'store', label: 'متجر' },
-                { value: 'external', label: 'قائمة' },
+                { value: 'store_category', label: 'قسم متجر' },
+                { value: 'product', label: 'منتج' },
+                { value: 'external', label: 'وجهة عامة' },
                 { value: 'subscription', label: 'اشتراك' },
               ]}
               value={draft.actionType}
@@ -305,13 +343,27 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
 
             <TextField label="عنوان البنر" value={draft.title} onChangeText={(value) => setDraft((current) => ({ ...current, title: value }))} />
             <TextField label="الوصف المختصر" value={draft.subtitle} onChangeText={(value) => setDraft((current) => ({ ...current, subtitle: value }))} />
-            <TextField label="الوجهة التسويقية" value={draft.actionTarget} onChangeText={(value) => setDraft((current) => ({ ...current, actionTarget: value }))} hint="مثال: فئة المطاعم أو متجر مميز أو صفحة اشتراك" />
+            <TextField
+              label={bannerActionPrimaryLabel(draft.actionType)}
+              value={draft.actionTarget}
+              onChangeText={(value) => setDraft((current) => ({ ...current, actionTarget: value }))}
+              hint={bannerActionPrimaryHint(draft.actionType)}
+            />
+            {draft.actionType === 'store_category' || draft.actionType === 'product' ? (
+              <TextField
+                label={bannerActionExtraLabel(draft.actionType)}
+                value={draft.actionExtra}
+                onChangeText={(value) => setDraft((current) => ({ ...current, actionExtra: value }))}
+                hint={bannerActionExtraHint(draft.actionType)}
+              />
+            ) : null}
             <Surface tone="inset" gap={2}>
               <Text role="bodyStrong">المسار الذي سيفتحه البنر</Text>
               <Text role="bodySm" tone="muted">{bannerTargetLabel(draft.actionTarget)} · الربط الفعلي يتم داخليًا بدون لغة تقنية ظاهرة للمستخدم.</Text>
             </Surface>
             <TextField label="اسم الشريك أو المصدر" value={draft.partnerName} onChangeText={(value) => setDraft((current) => ({ ...current, partnerName: value }))} />
             <TextField label="نص زر الإجراء" value={draft.ctaLabel} onChangeText={(value) => setDraft((current) => ({ ...current, ctaLabel: value }))} />
+            <TextField label="مفتاح الوسائط" value={draft.mediaKey} onChangeText={(value) => setDraft((current) => ({ ...current, mediaKey: value }))} hint="مثال: dsh.banner.home.promo-1.v1" />
             <TextField label="لون التمييز" value={draft.accentColor} onChangeText={(value) => setDraft((current) => ({ ...current, accentColor: value }))} hint="مثال: #f97316" />
             <TextField label="الترتيب" value={draft.position} onChangeText={(value) => setDraft((current) => ({ ...current, position: value }))} hint="1 يظهر أولاً" />
             <TextField label="رابط الصورة" value={draft.imageUrl} onChangeText={(value) => setDraft((current) => ({ ...current, imageUrl: value }))} hint="يمكن تركه فارغًا وسيتم توليد معاينة تلقائية" />

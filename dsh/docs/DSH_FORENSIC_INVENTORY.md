@@ -260,6 +260,8 @@
 | control-panel marketing | FEATURED_STORE_CATEGORY_CONTROL | `dsh/frontend/control-panel/marketing/ControlPanelDshMarketingScreen.tsx` -> `BannersCommandDeckScreen.tsx` / `GrowthCommandDeckScreen.tsx` | banner and growth decks target store, main_category, sub_category, store_category, and publish destination metadata for featured/promoted placement | FEATURED_STORE_CATEGORY_CONTROL | PROVEN_SCREEN | keep featured selection in marketing only; do not move category authority out of catalogs |
 | app-client | CLIENT_DISCOVERY_DISPLAY | `dsh/frontend/app-client/home/screens/DshHomeGetScreen.tsx`; `dsh/frontend/app-client/stores/screens/DshStoreGetScreen.tsx` | home promos, category rails, store cards, open-store transitions, and store availability states drive discovery display | CLIENT_DISCOVERY_DISPLAY | CLIENT_DISPLAY_PROVEN | keep display proven; runtime source authority remains preview-backed |
 
+DSH-CAP-002 live-code hardening now shares banner routing and seed data through the shared banner-store plus the control-panel re-export, but runtime authority is still unproven.
+
 ## 8. Data / Fixture / Runtime Inventory
 
 | Area | Source | Source type | Consumed by | Runtime truth allowed? | Notes |
