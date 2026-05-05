@@ -4,11 +4,43 @@ import React from 'react';
 
 export type DispatchAssignmentScreenProps = { hubHref: string; };
 
+const DISPATCH_ITEMS = [
+  {
+    id: '#ORD-9844', store: 'مخبز الورد', eta: '5 د', cap: 'سعد م.', capId: '884',
+    distance: '1.2 كم', reason: 'الأقرب ومتاح', alert: '',
+    suggestion: { label: 'أسند إلى سعد م. الآن', reason: 'الأقرب للمتجر 1.2 كم ومتاح الآن', confidence: 'high' as const, auditRequired: false },
+  },
+  {
+    id: '#ORD-9845', store: 'متجر الرياض', eta: '2 د', cap: 'محمد ع.', capId: '772',
+    distance: '0.8 كم', reason: 'الأفضل تقييماً', alert: '',
+    suggestion: { label: 'تأكيد الإسناد لمحمد ع.', reason: 'الأفضل تقييماً ووقت استجابة أقل', confidence: 'high' as const, auditRequired: false },
+  },
+  {
+    id: '#ORD-9846', store: 'صيدلية النور', eta: '10 د', cap: 'لا يوجد', capId: '-',
+    distance: '-', reason: '-', alert: 'خطر: نقص كباتن',
+    suggestion: { label: 'لا يوجد كابتن — تصعيد فوري', reason: 'المنطقة تعاني من نقص في التغطية', confidence: 'low' as const, auditRequired: true },
+  },
+] as const;
+
+function ConfidenceBadge({ level }: { level: 'high' | 'medium' | 'low' }) {
+  const map = {
+    high:   { label: 'ثقة عالية',   bg: '#DCFCE7', color: '#16A34A' },
+    medium: { label: 'ثقة متوسطة', bg: '#FEF3C7', color: '#D97706' },
+    low:    { label: 'ثقة منخفضة', bg: '#FEF2F2', color: '#DC2626' },
+  };
+  const { label, bg, color } = map[level];
+  return (
+    <span style={{ fontSize: '10px', fontWeight: 700, padding: '1px 6px', borderRadius: '99px', backgroundColor: bg, color }}>
+      {label}
+    </span>
+  );
+}
+
 export function DispatchAssignmentScreen({ hubHref }: DispatchAssignmentScreenProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', direction: 'rtl', height: '100%' }}>
-      
-      {/* Header and Actions */}
+
+      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>الإسناد والتوزيع</h2>
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -16,6 +48,7 @@ export function DispatchAssignmentScreen({ hubHref }: DispatchAssignmentScreenPr
         </div>
       </div>
 
+      {/* KPI row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
         <div style={{ padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)' }}>
           <div style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>طلبات غير مسندة</div>
@@ -31,15 +64,12 @@ export function DispatchAssignmentScreen({ hubHref }: DispatchAssignmentScreenPr
         </div>
       </div>
 
-      {/* Wide Rich Dispatch List */}
+      {/* Order cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
-        {[
-          { id: '#ORD-9844', store: 'مخبز الورد', eta: '5 د', cap: 'سعد م.', capId: '884', distance: '1.2 كم', reason: 'الأقرب ومتاح', alert: 'Audit Required: تأخر في التجاوب' },
-          { id: '#ORD-9845', store: 'متجر الرياض', eta: '2 د', cap: 'محمد ع.', capId: '772', distance: '0.8 كم', reason: 'الأفضل تقييماً', alert: '' },
-          { id: '#ORD-9846', store: 'صيدلية النور', eta: '10 د', cap: 'لا يوجد', capId: '-', distance: '-', reason: '-', alert: 'خطر: نقص كباتن متاحين' },
-        ].map((item, idx) => (
-          <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', alignItems: 'center', padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)', borderRight: item.cap === 'لا يوجد' ? '4px solid #DC2626' : '4px solid transparent' }}>
-            
+        {DISPATCH_ITEMS.map((item, idx) => (
+          <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr 1fr', gap: '16px', alignItems: 'start', padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)', borderRight: item.cap === 'لا يوجد' ? '4px solid #DC2626' : '4px solid transparent' }}>
+
+            {/* Col 1: Order info */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontWeight: 800, color: '#0A2F5C', fontSize: '14px' }}>{item.id}</span>
@@ -49,21 +79,40 @@ export function DispatchAssignmentScreen({ hubHref }: DispatchAssignmentScreenPr
               <div style={{ fontSize: '11px', color: '#64748B' }}>وقت التجهيز المتبقي: {item.eta}</div>
             </div>
 
+            {/* Col 2: Captain + system suggestion inline */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingRight: '16px', borderRight: '1px solid rgba(10,47,92,0.05)' }}>
               <div style={{ fontSize: '11px', color: '#64748B' }}>الكابتن المقترح</div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: item.cap === 'لا يوجد' ? '#DC2626' : '#0A2F5C' }}>{item.cap} <span style={{fontSize:'11px', fontWeight:600}}>{item.capId !== '-' && `(${item.capId})`}</span></div>
-              <div style={{ fontSize: '11px', color: '#64748B' }}>المسافة: <span style={{color:'#0A2F5C', fontWeight:600}}>{item.distance}</span> | سبب التعيين: <span style={{color: item.cap !== 'لا يوجد' ? '#16A34A' : '#64748B', fontWeight:600}}>{item.reason}</span></div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: item.cap === 'لا يوجد' ? '#DC2626' : '#0A2F5C' }}>
+                {item.cap} <span style={{ fontSize: '11px', fontWeight: 600 }}>{item.capId !== '-' && `(${item.capId})`}</span>
+              </div>
+              <div style={{ fontSize: '11px', color: '#64748B' }}>
+                المسافة: <span style={{ color: '#0A2F5C', fontWeight: 600 }}>{item.distance}</span>
+                {item.reason !== '-' && <> | السبب: <span style={{ color: '#16A34A', fontWeight: 600 }}>{item.reason}</span></>}
+              </div>
+
+              {/* ── System Suggestion ── */}
+              <div style={{ marginTop: '8px', padding: '8px 10px', backgroundColor: 'rgba(10,47,92,0.03)', border: '1px solid rgba(10,47,92,0.07)', borderRadius: '6px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#0A2F5C', marginBottom: '2px' }}>توصية النظام: {item.suggestion.label}</div>
+                <div style={{ fontSize: '11px', color: '#64748B', marginBottom: '4px' }}>السبب: {item.suggestion.reason}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                  <ConfidenceBadge level={item.suggestion.confidence} />
+                  {item.suggestion.auditRequired && (
+                    <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>يتطلب تدقيق</span>
+                  )}
+                </div>
+              </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-              <button style={{ padding: '8px 16px', backgroundColor: '#0A2F5C', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', opacity: item.cap === 'لا يوجد' ? 0.5 : 1 }}>تأكيد الإسناد</button>
-              <button style={{ padding: '8px 16px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>إعادة تعيين (تخطي)</button>
+            {/* Col 3: Actions */}
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap', alignSelf: 'center' }}>
+              <button style={{ padding: '8px 16px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', opacity: item.cap === 'لا يوجد' ? 0.5 : 1 }}>تأكيد الإسناد</button>
+              <button style={{ padding: '8px 16px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>إعادة تعيين</button>
             </div>
 
           </div>
         ))}
       </div>
-      
+
     </div>
   );
 }
