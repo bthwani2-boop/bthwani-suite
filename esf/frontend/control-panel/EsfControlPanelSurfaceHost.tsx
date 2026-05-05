@@ -4,9 +4,9 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Text } from '@bthwani/ui-kit';
 import { WebMissionHeroCard, WebSectionCard } from '@bthwani/ui-kit/web';
-import { sectionCatalog } from './catalogs';
-import { sectionMeta } from './catalogs/section-meta';
-import { flowMeta } from './catalogs/esf-control-panel-catalogs-flow/flow-meta';
+import { sectionCatalog } from './community-services';
+import { sectionMeta } from './community-services/section-meta';
+import { flowMeta } from './community-services/esf-control-panel-community-services-flow/flow-meta';
 
 export type EsfControlPanelSurfaceHostProps = {
   hubHref?: string;
@@ -19,19 +19,19 @@ export function EsfControlPanelSurfaceHost({ hubHref = '/dashboard' }: EsfContro
     <Box gap={4}>
       <WebMissionHeroCard
         badges={[sectionMeta.id.toUpperCase(), flowMeta.owner.toUpperCase(), flowMeta.placeholder ? 'Placeholder' : 'Live']}
-        eyebrow="ESF / control-panel / catalogs"
-        title="Community catalog space"
-        description="ESF catalog ownership is now the active route entry for the control-panel catalogs surface."
+        eyebrow="ESF / control-panel / community-services"
+        title="Community services space"
+        description="ESF community-services ownership is now the active route entry for the control-panel community-services surface."
         metaItems={[
           `Section: ${sectionMeta.id}`,
           `Surface: ${sectionMeta.surface}`,
-          `Catalog entries: ${sectionCatalog.length}`,
+          `Community entries: ${sectionCatalog.length}`,
         ]}
         primaryAction={{ label: 'Back to hub', href: hubHref }}
-        secondaryAction={{ label: 'Refresh route', href: '/catalogs' }}
+        secondaryAction={{ label: 'Refresh route', href: '/community-services' }}
       />
 
-      <WebSectionCard title="Catalog definition" description="The section stays anchored to the service-owned catalog structure that ships with ESF.">
+      <WebSectionCard title="Community services definition" description="The section stays anchored to the service-owned community-services structure that ships with ESF.">
         <Box gap={2}>
           <Text role="bodySm" tone="muted">
             Active section: {sectionMeta.id}
@@ -40,11 +40,11 @@ export function EsfControlPanelSurfaceHost({ hubHref = '/dashboard' }: EsfContro
             Flow owner: {flowMeta.owner}
           </Text>
           <Text role="bodySm" tone="muted">
-            Catalog items: {sectionCatalog.join(', ')}
+            Community items: {sectionCatalog.join(', ')}
           </Text>
           <Box layoutDirection="row" gap={2}>
             <Button label="Back to hub" onPress={() => router.push(hubHref)} />
-            <Button label="Open catalogs" tone="secondary" onPress={() => router.push('/catalogs')} />
+            <Button label="Open community services" tone="secondary" onPress={() => router.push('/community-services')} />
           </Box>
         </Box>
       </WebSectionCard>

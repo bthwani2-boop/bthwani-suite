@@ -1,3 +1,3 @@
 export const surfaceCatalog = [
-  'catalogs'
+  'community-services'
 ] as const;

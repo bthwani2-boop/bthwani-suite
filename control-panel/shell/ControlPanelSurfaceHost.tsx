@@ -27,8 +27,8 @@ import {
 import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 
-const phaseOneSectionIds = ['dashboard', 'operations', 'finance', 'catalogs', 'support'] as const;
-const hiddenSectionIds = ['community-services', 'partners', 'marketing', 'platform', 'administration', 'hr'] as const;
+const phaseOneSectionIds = ['dashboard', 'operations', 'finance', 'community-services', 'support'] as const;
+const hiddenSectionIds = ['partners', 'marketing', 'platform', 'administration', 'hr'] as const;
 const primarySectionIds = [...phaseOneSectionIds, ...hiddenSectionIds] as const;
 const dshLiveWorkbenchIds = ['orders', 'reassign', 'peakMode', 'arrivalBell'] as const;
 const dshPlannedWorkbenchIds = ['sheinProxy', 'zoneSet', 'dashboard', 'captain-ops', 'field-ops', 'issues', 'serviceability', 'guard-status', 'evidence', 'dispatch', 'live-tracking', 'exceptions', 'sla', 'audit', 'partner-prep', 'handoff', 'proof-review', 'capacity'] as const;
@@ -135,9 +135,8 @@ const sectionRouteMap: Record<ControlPanelSectionId, PrimarySectionHref> = {
   dashboard: '/dashboard',
   operations: '/operations',
   finance: '/finance',
-  catalogs: '/catalogs',
-  support: '/support',
   'community-services': '/community-services',
+  support: '/support',
   partners: '/partners',
   marketing: '/marketing',
   platform: '/platform',
@@ -149,7 +148,7 @@ const compactSectionDescriptions: Record<PhaseOneSectionId, string> = {
   dashboard: 'نظرة سريعة',
   operations: 'حالة التشغيل',
   finance: 'المركز المالي',
-  catalogs: 'حوكمة الكتالوج',
+  'community-services': 'خدمات المجتمع',
   support: 'دعم قابل للتصعيد',
 };
 
@@ -188,9 +187,8 @@ function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPane
     dashboard: '⌂',
     operations: '◎',
     finance: '¤',
-    catalogs: '▦',
-    support: '☏',
     'community-services': '◌',
+    support: '☏',
     partners: '▣',
     marketing: '📣',
     platform: '⚙',
@@ -354,11 +352,11 @@ export function ControlPanelSurfaceHost({
       tone: 'secondary',
     },
     {
-      id: 'db-catalogs',
-      label: 'حوكمة المحتوى',
-      description: 'اعتماد النشرات والكتالوجات الجديدة قبل البث.',
+      id: 'db-community-services',
+      label: 'خدمات المجتمع',
+      description: 'اعتماد مسارات المجتمع والخدمات الجديدة قبل البث.',
       footerLabel: 'اعتماد',
-      href: '/catalogs',
+      href: '/community-services',
       badge: 'انتظار',
       tone: 'secondary',
     },
@@ -506,43 +504,43 @@ export function ControlPanelSurfaceHost({
               disclosureDescription: 'التحويل بين الخدمات يبقى أقل بروزًا من الإجراء الأول.',
               disclosureItems: buildServiceDisclosureItems('finance'),
             };
-          case 'catalogs':
+          case 'community-services':
             return {
-              eyebrow: 'كتالوج',
-              title: panelText.surfaceTitles.catalogs,
+              eyebrow: 'Community services',
+              title: panelText.surfaceTitles['community-services'],
               description: 'حوكمة مختصرة',
               primaryAction: {
-                id: 'catalogs-primary',
-                label: 'افتح الكتالوج',
+                id: 'community-services-primary',
+                label: 'افتح خدمات المجتمع',
                 description: '',
                 footerLabel: 'فتح',
-                href: '/catalogs',
+                href: '/community-services',
                 badge: 'حي',
                 tone: 'primary',
               },
               kpis: [
                 {
-                  id: 'catalogs-services',
+                  id: 'community-services-services',
                   title: 'المساحات المرتبطة',
                   value: String(sectionServiceIds.length),
-                  description: 'الخدمات التي تستهلك حوكمة الكتالوج من هذا السطح.',
+                  description: 'الخدمات التي تستهلك حوكمة المجتمع من هذا السطح.',
                   tone: 'brand',
                 },
                 {
-                  id: 'catalogs-live',
+                  id: 'community-services-live',
                   title: 'بوابات حية',
                   value: '3',
-                  description: 'كتالوج، شركاء، وتسويق قابلة للفتح مباشرة.',
+                  description: 'خدمات المجتمع، شركاء، وتسويق قابلة للفتح مباشرة.',
                   tone: 'best',
                 },
                 {
-                  id: 'catalogs-ready',
+                  id: 'community-services-ready',
                   title: 'جاهز للتشغيل',
                   value: String(liveCoverageCount),
                   description: 'مساحات يمكن متابعتها الآن دون تكرار الشرح.',
                 },
                 {
-                  id: 'catalogs-reference',
+                  id: 'community-services-reference',
                   title: 'مرجعي',
                   value: String(referenceCoverageCount),
                   description: 'تغطية مرئية أقل بروزًا من القرار الأساسي.',
@@ -552,24 +550,24 @@ export function ControlPanelSurfaceHost({
               quickActionsDescription: 'أزرار',
               quickActions: [
                 {
-                  id: 'catalogs-open',
-                  label: 'كتالوج DSH',
+                  id: 'community-services-open',
+                  label: 'خدمات المجتمع DSH',
                   description: 'إدارة الفئات والمنتجات من المسار الحي المباشر.',
                   footerLabel: 'فتح مباشر',
-                  href: '/catalogs',
+                  href: '/community-services',
                   badge: 'حي',
                   tone: 'primary',
                 },
                 {
-                  id: 'catalogs-partners',
+                  id: 'community-services-partners',
                   label: 'بوابة الشركاء',
-                  description: 'مراجعة الإدخالات قبل انتقالها إلى الكتالوج النهائي.',
+                  description: 'مراجعة الإدخالات قبل انتقالها إلى المسار النهائي.',
                   footerLabel: 'فتح مباشر',
                   href: '/partners',
                   badge: 'مراجعة',
                 },
                 {
-                  id: 'catalogs-marketing',
+                  id: 'community-services-marketing',
                   label: 'التسويق',
                   description: 'اعتماد الرسائل والعرض قبل النشر النهائي.',
                   footerLabel: 'فتح مباشر',
@@ -577,16 +575,16 @@ export function ControlPanelSurfaceHost({
                   badge: 'اعتماد',
                 },
                 {
-                  id: 'catalogs-overview',
+                  id: 'community-services-overview',
                   label: 'العودة للنظرة العامة',
                   description: 'ارجع بسرعة إلى مركز القرار بدل التنقل عبر شاشات وسيطة.',
                   footerLabel: 'فتح القسم',
                   href: '/dashboard',
                 },
               ],
-              disclosureTitle: 'تغطية الكتالوج حسب الخدمة',
+              disclosureTitle: 'تغطية خدمات المجتمع حسب الخدمة',
               disclosureDescription: 'التحويل بين الخدمات يبقى ثانويًا حتى لا ينافس بوابات الحوكمة الأساسية.',
-              disclosureItems: buildServiceDisclosureItems('catalogs'),
+              disclosureItems: buildServiceDisclosureItems('community-services'),
             };
           case 'support':
             return {
