@@ -203,6 +203,73 @@
   gap: 12px;
 }
 
+.controlPanelRailOverrides {
+  min-width: 0;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root) {
+  --rail-width: 212px;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root[data-rail-collapsed='true']) {
+  --rail-width: 64px;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__workspace) {
+  grid-template-columns: var(--rail-width) minmax(0, 1fr) !important;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail) {
+  padding: 14px 12px;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-header) {
+  align-items: center;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-toggle) {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 18px;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-item) {
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 14px;
+  gap: 10px;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-item:hover) {
+  background: rgba(10, 47, 92, 0.04);
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-item--active) {
+  background: rgba(10, 47, 92, 0.08);
+  color: #0A2F5C;
+  border-color: rgba(10, 47, 92, 0.14);
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-item-icon) {
+  width: 26px;
+  height: 26px;
+  font-size: 22px;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root[data-rail-collapsed='true'] .ui-web-command-center__rail-item) {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  justify-content: center;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root[data-rail-collapsed='true'] .ui-web-command-center__rail-item-icon) {
+  width: 28px;
+  height: 28px;
+  font-size: 24px;
+}
+
 .dashboardSectionBoard,
 .dashboardPriorityStack {
   display: grid;

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { OperationsSuggestionCard } from '../operations.ui';
+import styles from '../dsh-surface.module.css';
 
 export type PartnerStoresScreenProps = { hubHref: string; };
 
@@ -30,42 +31,42 @@ const STORES = [
 
 export function PartnerStoresScreen({ hubHref }: PartnerStoresScreenProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', direction: 'rtl', height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', direction: 'rtl', height: '100%', minWidth: 0 }}>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', minWidth: 0 }}>
         <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>المتاجر والشركاء</h2>
         <button style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(10,47,92,0.1)', background: '#fff', fontSize: '12px', fontWeight: 600, color: '#0A2F5C', cursor: 'pointer' }}>فلاتر مختصرة</button>
       </div>
 
       {/* KPI row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px' }}>
+      <div className={styles.operationsSingleRowBlocks}>
         {[
           { label: 'مفتوحة', val: '142', color: '#16A34A' },
           { label: 'مغلقة', val: '38', color: '#64748B' },
           { label: 'متاجر مضغوطة', val: '12', color: '#F59E0B', accent: '#F59E0B' },
           { label: 'تأخير التجهيز', val: '5', color: '#DC2626', accent: '#DC2626' },
         ].map(({ label, val, color, accent }, i) => (
-          <div key={i} style={{ padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)', borderTop: accent ? `4px solid ${accent}` : undefined }}>
-            <div style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>{label}</div>
-            <div style={{ fontSize: '24px', color, fontWeight: 800, marginTop: '8px' }}>{val}</div>
+          <div key={i} className={styles.operationsSingleRowItem} style={{ borderTop: accent ? `4px solid ${accent}` : undefined }}>
+            <div className={styles.operationsCompactCardTitle}>{label}</div>
+            <div style={{ fontSize: '18px', color, fontWeight: 800, lineHeight: 1.1 }}>{val}</div>
           </div>
         ))}
       </div>
 
       {/* Store cards */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '4px' }}>
         {STORES.map((store, idx) => (
-          <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 1fr', gap: '16px', alignItems: 'start', padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)', borderRight: store.status === 'تأخير' ? '4px solid #DC2626' : store.status === 'مضغوط' ? '4px solid #F59E0B' : '4px solid transparent' }}>
+          <div key={idx} className={`${styles.operationsCompactCard} ${store.status === 'تأخير' ? styles.operationsCompactCardDanger : store.status === 'مضغوط' ? styles.operationsCompactCardWarning : ''}`} style={{ gridTemplateColumns: 'minmax(220px, 1.2fr) minmax(240px, 1fr) auto' }}>
 
             {/* Col 1: Store meta */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div className={styles.operationsCompactCardMeta}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span style={{ fontWeight: 800, color: '#0A2F5C', fontSize: '14px' }}>{store.name}</span>
                 <span style={{ fontSize: '11px', color: '#64748B' }}>({store.id})</span>
                 <span style={{ padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, backgroundColor: store.status === 'تأخير' ? '#FEF2F2' : store.status === 'مضغوط' ? '#FEF3C7' : 'rgba(10,47,92,0.04)', color: store.status === 'تأخير' ? '#DC2626' : store.status === 'مضغوط' ? '#D97706' : '#64748B' }}>{store.status}</span>
               </div>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: '#0A2F5C' }}>فرع: {store.branch}</div>
-              <div style={{ fontSize: '11px', color: '#64748B' }}>متوسط التجهيز: {store.prepTime} | طلبات جاهزة: <span style={{ color: store.readyOrders > 2 ? '#DC2626' : '#0A2F5C', fontWeight: 700 }}>{store.readyOrders}</span></div>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: '#0A2F5C', lineHeight: 1.35 }}>فرع: {store.branch}</div>
+              <div style={{ fontSize: '11px', color: '#64748B', lineHeight: 1.35 }}>متوسط التجهيز: {store.prepTime} | طلبات جاهزة: <span style={{ color: store.readyOrders > 2 ? '#DC2626' : '#0A2F5C', fontWeight: 700 }}>{store.readyOrders}</span></div>
             </div>
 
             {/* Col 2: System suggestion */}
@@ -82,10 +83,12 @@ export function PartnerStoresScreen({ hubHref }: PartnerStoresScreenProps) {
             />
 
             {/* Col 3: Actions */}
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap', alignSelf: 'center' }}>
-              <button style={{ padding: '8px 12px', backgroundColor: '#0A2F5C', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>تواصل</button>
-              <button style={{ padding: '8px 12px', backgroundColor: '#FEF2F2', color: '#DC2626', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>إيقاف مؤقت</button>
-              <button style={{ padding: '8px 12px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>توجيه كباتن</button>
+            <div className={styles.operationsCompactCardActions}>
+              <div className={styles.operationsCompactActionRow} style={{ justifyContent: 'flex-end' }}>
+                <button className={styles.operationsCompactActionPrimary}>تواصل</button>
+                <button className={styles.operationsCompactActionSecondary} style={{ color: '#DC2626', borderColor: 'rgba(220,38,38,0.14)' }}>إيقاف مؤقت</button>
+                <button className={styles.operationsCompactActionSecondary}>توجيه كباتن</button>
+              </div>
             </div>
 
           </div>

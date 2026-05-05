@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { OperationsSuggestionCard } from '../operations.ui';
+import styles from '../dsh-surface.module.css';
 
 export type CommandCenterScreenProps = { hubHref: string; };
 
@@ -49,32 +50,32 @@ const QUICK_ACTIONS = [
 
 export function CommandCenterScreen({ hubHref }: CommandCenterScreenProps) {
   return (
-    <div style={{ display: 'grid', gap: '20px', direction: 'rtl' }}>
+    <div className={styles.operationsCompactSurface} style={{ direction: 'rtl' }}>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', minWidth: 0 }}>
         <div>
           <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>نبض العمليات</h2>
           <p style={{ fontSize: '13px', color: '#64748B', margin: '4px 0 0' }}>متابعة الأداء العام والتدخلات السريعة</p>
         </div>
       </div>
 
-      {/* KPI signals */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
+      <div className={styles.operationsSingleRowBlocks}>
         {SIGNALS.map((item, idx) => (
-          <div key={idx} style={{ padding: '16px', borderRadius: '12px', backgroundColor: '#fff', border: '1px solid rgba(10,47,92,0.08)', borderTop: `4px solid ${item.status === 'danger' ? '#DC2626' : item.status === 'warning' ? '#F59E0B' : '#0A2F5C'}` }}>
-            <div style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>{item.label}</div>
-            <div style={{ fontSize: '24px', color: '#0A2F5C', fontWeight: 800, marginTop: '8px' }}>{item.value}</div>
+          <div
+            key={idx}
+            className={styles.operationsSingleRowItem}
+            style={{ borderTop: `4px solid ${item.status === 'danger' ? '#DC2626' : item.status === 'warning' ? '#F59E0B' : '#0A2F5C'}` }}
+          >
+            <div className={styles.operationsCompactCardTitle}>{item.label}</div>
+            <div style={{ fontSize: '18px', color: item.status === 'danger' ? '#DC2626' : item.status === 'warning' ? '#D97706' : '#0A2F5C', fontWeight: 800, lineHeight: 1.1 }}>{item.value}</div>
           </div>
         ))}
       </div>
 
-      {/* Two column: suggestions + quick actions */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-
-        {/* Top system suggestions */}
-        <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0A2F5C', margin: '0 0 12px 0' }}>أعلى توصيات النظام الآن</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '12px' }}>
+        <div className={styles.operationsCompactPanel}>
+          <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>أعلى توصيات النظام الآن</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0 }}>
             {TOP_SUGGESTIONS.map((s, idx) => (
               <OperationsSuggestionCard
                 key={idx}
@@ -82,23 +83,25 @@ export function CommandCenterScreen({ hubHref }: CommandCenterScreenProps) {
                 reason={s.reason}
                 confidence={s.confidence}
                 actions={(
-                  <a href={`${hubHref}${s.href}`} style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' }}>
+                  <a
+                    href={`${hubHref}${s.href}`}
+                    style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' }}
+                  >
                     {s.action}
                   </a>
                 )}
               >
-                {s.risk === 'critical' && <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>خطر حرج</span>}
+                {s.risk === 'critical' ? <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>خطر حرج</span> : null}
               </OperationsSuggestionCard>
             ))}
           </div>
         </div>
 
-        {/* Quick interventions */}
-        <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0A2F5C', margin: '0 0 12px 0' }}>تدخل سريع مطلوب</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div className={styles.operationsCompactPanel}>
+          <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>تدخل سريع مطلوب</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0 }}>
             {QUICK_ACTIONS.map((action, idx) => (
-              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', border: '1px solid rgba(10,47,92,0.05)', borderRadius: '8px', backgroundColor: '#F8FAFC' }}>
+              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', border: '1px solid rgba(10,47,92,0.05)', borderRadius: '8px', backgroundColor: '#F8FAFC', gap: '10px', minWidth: 0 }}>
                 <span style={{ fontSize: '13px', fontWeight: 600, color: '#0A2F5C' }}>{action.label}</span>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <span style={{ fontSize: '11px', color: '#64748B' }}>{action.time}</span>

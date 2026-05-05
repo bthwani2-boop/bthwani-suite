@@ -160,20 +160,72 @@ const webCommandCenterCss = `
   min-height: calc(100vh - 72px);
   grid-template-columns: var(--rail-width) 1fr;
   grid-template-areas: "rail stage";
+  transition: grid-template-columns 0.22s ease;
 }
 
 .ui-web-command-center__rail {
   grid-area: rail;
   background: #fff;
   border-inline-end: 1px solid var(--bth-shell-line);
-  padding: 16px 8px;
+  padding: 14px 10px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   position: sticky;
   top: 72px;
   height: calc(100vh - 72px);
   z-index: 90;
+  overflow: hidden;
+}
+
+.ui-web-command-center__rail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ui-web-command-center__rail-header-main {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ui-web-command-center__rail-navigation-label {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.ui-web-command-center__rail-status-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(10, 47, 92, 0.06);
+  color: var(--bth-deep-blue);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.ui-web-command-center__rail-toggle {
+  appearance: none;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8fb 100%);
+  color: var(--bth-deep-blue);
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(10, 47, 92, 0.06);
 }
 
 .ui-web-command-center__rail-nav {
@@ -186,8 +238,10 @@ const webCommandCenterCss = `
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
+  min-height: 44px;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 14px;
   border: 1px solid transparent;
   background: transparent;
   color: #64748b;
@@ -197,25 +251,48 @@ const webCommandCenterCss = `
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: start;
+  overflow: hidden;
 }
 
 .ui-web-command-center__rail-item:hover {
-  background: rgba(10, 47, 92, 0.03);
+  background: rgba(10, 47, 92, 0.04);
   color: var(--bth-deep-blue);
 }
 
 .ui-web-command-center__rail-item--active {
-  background: rgba(255, 80, 13, 0.06);
+  background: rgba(255, 80, 13, 0.1);
   color: var(--bth-orange);
+  border-color: rgba(255, 80, 13, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
 }
 
 .ui-web-command-center__rail-item-icon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 18px;
+  flex: 0 0 auto;
+}
+
+.ui-web-command-center__rail-item-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.ui-web-command-center__rail-item-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(10, 47, 92, 0.08);
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .ui-web-command-center__rail-back {
@@ -233,7 +310,7 @@ const webCommandCenterCss = `
 }
 
 .ui-web-command-center__rail-section-title {
-  padding: 0 12px 8px;
+  padding: 0;
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
@@ -263,11 +340,50 @@ const webCommandCenterCss = `
   left: 8px;
 }
 
-@media (max-width: 1024px) {
-  --rail-width: 72px;
-  .ui-web-command-center__rail-item span:not(.ui-web-command-center__rail-item-icon) {
-    display: none;
-  }
+.ui-web-command-center-root[data-rail-collapsed="true"] {
+  --rail-width: 64px;
+}
+
+.ui-web-command-center-root[data-rail-collapsed="true"] .ui-web-command-center__rail {
+  padding-inline: 8px;
+  align-items: center;
+}
+
+.ui-web-command-center-root[data-rail-collapsed="true"] .ui-web-command-center__rail-header {
+  width: 100%;
+  justify-content: center;
+}
+
+.ui-web-command-center-root[data-rail-collapsed="true"] .ui-web-command-center__rail-header-main,
+.ui-web-command-center-root[data-rail-collapsed="true"] .ui-web-command-center__rail-section-title,
+.ui-web-command-center-root[data-rail-collapsed="true"] .ui-web-command-center__rail-navigation-label,
+.ui-web-command-center-root[data-rail-collapsed="true"] .ui-web-command-center__rail-status-label,
+.ui-web-command-center-root[data-rail-collapsed="true"] .ui-web-command-center__rail-supplementary {
+  display: none;
+}
+
+.ui-web-command-center-root[data-rail-collapsed="true"] .ui-web-command-center__rail-nav {
+  width: 100%;
+}
+
+.ui-web-command-center-root[data-rail-collapsed="true"] .ui-web-command-center__rail-item {
+  width: 44px;
+  min-height: 44px;
+  margin-inline: auto;
+  padding: 0;
+  border-radius: 14px;
+  justify-content: center;
+}
+
+.ui-web-command-center-root[data-rail-collapsed="true"] .ui-web-command-center__rail-item-text,
+.ui-web-command-center-root[data-rail-collapsed="true"] .ui-web-command-center__rail-item-badge {
+  display: none;
+}
+
+.ui-web-command-center-root[data-rail-collapsed="true"] .ui-web-command-center__rail-item-icon {
+  width: 28px;
+  height: 28px;
+  font-size: 20px;
 }
 `;
 
@@ -442,6 +558,7 @@ export function WebCommandCenterFrame({
 }: WebCommandCenterFrameProps) {
   const { direction } = useDirection();
   const [activeSubStack, setActiveSubStack] = React.useState<WebCommandCenterNavItem | null>(null);
+  const [isRailCollapsed, setIsRailCollapsed] = React.useState(false);
 
   const displayedItems = activeSubStack?.children ?? railItems;
 
@@ -456,7 +573,7 @@ export function WebCommandCenterFrame({
   return (
     <>
       <WebCommandCenterStyles />
-      <main className="ui-web-command-center-root" dir={direction}>
+      <main className="ui-web-command-center-root" dir={direction} data-rail-collapsed={isRailCollapsed ? 'true' : 'false'}>
         <WebCommandStrip
           brandLabel={brandLabel}
           surfaceTitle={surfaceTitle}
@@ -474,20 +591,35 @@ export function WebCommandCenterFrame({
 
         <div className="ui-web-command-center__workspace">
           <aside className="ui-web-command-center__rail">
+            <div className="ui-web-command-center__rail-header">
+              <div className="ui-web-command-center__rail-header-main">
+                <div className="ui-web-command-center__rail-section-title">{activeSubStack ? activeSubStack.label : railTitle}</div>
+                {railNavigationLabel ? <div className="ui-web-command-center__rail-navigation-label">{railNavigationLabel}</div> : null}
+                {railStatusLabel ? <div className="ui-web-command-center__rail-status-label">{railStatusLabel}</div> : null}
+              </div>
+
+              <button
+                type="button"
+                className="ui-web-command-center__rail-toggle"
+                aria-label={isRailCollapsed ? 'فتح الشريط الجانبي' : 'طي الشريط الجانبي'}
+                title={isRailCollapsed ? 'فتح الشريط الجانبي' : 'طي الشريط الجانبي'}
+                onClick={() => setIsRailCollapsed((current) => !current)}
+              >
+                {isRailCollapsed ? '›' : '‹'}
+              </button>
+            </div>
+
             {activeSubStack ? (
-              <>
-                <button
-                  type="button"
-                  className="ui-web-command-center__rail-back"
-                  onClick={() => setActiveSubStack(null)}
-                >
-                  {direction === 'rtl' ? '← عودة' : '← Back'}
-                </button>
-                <div className="ui-web-command-center__rail-section-title">{activeSubStack.label}</div>
-              </>
-            ) : (
-              <div className="ui-web-command-center__rail-section-title">{railTitle}</div>
-            )}
+              <button
+                type="button"
+                className="ui-web-command-center__rail-back"
+                onClick={() => setActiveSubStack(null)}
+                title={direction === 'rtl' ? 'عودة' : 'Back'}
+              >
+                {direction === 'rtl' ? '← عودة' : '← Back'}
+              </button>
+            ) : null}
+
             <nav className="ui-web-command-center__rail-nav">
               {displayedItems.map((item) => (
                 <button
@@ -497,28 +629,23 @@ export function WebCommandCenterFrame({
                     'ui-web-command-center__rail-item',
                     item.active ? 'ui-web-command-center__rail-item--active' : '',
                   ].join(' ')}
+                  aria-current={item.active ? 'page' : undefined}
+                  title={item.description ? `${item.label} — ${item.description}` : item.label}
                   onClick={() => handleItemClick(item)}
                 >
                   <span className="ui-web-command-center__rail-item-icon">
                     {item.icon ?? item.label.charAt(0)}
                   </span>
-                  <span style={{ flex: 1 }}>{item.label}</span>
+                  <span className="ui-web-command-center__rail-item-text">{item.label}</span>
                   {item.badge && (
-                    <span style={{
-                      fontSize: 10,
-                      fontWeight: 800,
-                      padding: '2px 6px',
-                      borderRadius: 6,
-                      background: item.active ? 'var(--bth-orange)' : 'rgba(10, 47, 92, 0.08)',
-                      color: item.active ? '#fff' : '#64748b',
-                    }}>
+                    <span className="ui-web-command-center__rail-item-badge">
                       {item.badge}
                     </span>
                   )}
                 </button>
               ))}
             </nav>
-            {railSupplementary && (
+            {railSupplementary && !isRailCollapsed && (
               <div className="ui-web-command-center__rail-supplementary">{railSupplementary}</div>
             )}
           </aside>

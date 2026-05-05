@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { OperationsSuggestionCard } from '../operations.ui';
+import styles from '../dsh-surface.module.css';
 
 export type CaptainOperationsScreenProps = { hubHref: string; };
 
@@ -51,49 +52,50 @@ export function CaptainOperationsScreen({ hubHref }: CaptainOperationsScreenProp
       {/* Captain cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {CAPTAINS.map((cap, idx) => (
-          <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.8fr 1fr', gap: '16px', alignItems: 'start', padding: '16px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.08)', borderRight: cap.status === 'موقوف' ? '4px solid #DC2626' : cap.status === 'مشغول' ? '4px solid #F59E0B' : cap.status === 'متصل' ? '4px solid #16A34A' : '4px solid transparent' }}>
+          <div key={idx} className={`${styles.operationsCompactCard} ${cap.status === 'موقوف' ? styles.operationsCompactCardDanger : cap.status === 'مشغول' ? styles.operationsCompactCardWarning : ''}`} style={{ gridTemplateColumns: 'minmax(220px, 1.15fr) minmax(240px, 1fr) auto', padding: '10px 12px' }}>
 
             {/* Col 1: Identity + suggestion */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div className={styles.operationsCompactCardMeta}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span style={{ fontWeight: 800, color: '#0A2F5C', fontSize: '14px' }}>{cap.name}</span>
                 <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>{cap.id}</span>
                 <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 700, backgroundColor: cap.status === 'متصل' ? '#DCFCE7' : cap.status === 'موقوف' ? '#FEF2F2' : cap.status === 'مشغول' ? '#FEF3C7' : 'rgba(10,47,92,0.04)', color: cap.status === 'متصل' ? '#16A34A' : cap.status === 'موقوف' ? '#DC2626' : cap.status === 'مشغول' ? '#D97706' : '#64748B' }}>{cap.status}</span>
               </div>
-              <div style={{ fontSize: '12px', color: '#0A2F5C', fontWeight: 600 }}>الطلب الحالي: {cap.current}</div>
-              <div style={{ fontSize: '11px', color: '#64748B' }}>آخر موقع: {cap.location}</div>
-
-              {/* System suggestion */}
-              <OperationsSuggestionCard
-                title="توصية"
-                label={cap.suggestion.label}
-                reason={cap.suggestion.reason}
-                confidence={cap.suggestion.confidence}
-              />
+              <div style={{ fontSize: '12px', color: '#0A2F5C', fontWeight: 600, lineHeight: 1.35 }}>الطلب الحالي: {cap.current}</div>
+              <div style={{ fontSize: '11px', color: '#64748B', lineHeight: 1.35 }}>آخر موقع: {cap.location}</div>
+              <div className={styles.operationsCompactInlineTags}>
+                <span className={styles.operationsCompactTag}>اليوم {cap.today}</span>
+                <span className={styles.operationsCompactTag}>تقييم {cap.performance}</span>
+                <span className={styles.operationsCompactTag}>قبول {cap.accept}</span>
+                <span className={styles.operationsCompactTag}>رفض {cap.rejects}</span>
+                <span className={styles.operationsCompactTag}>شكاوى {cap.complaints}</span>
+              </div>
             </div>
 
-            {/* Col 2: Performance metrics */}
-            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-              {[
-                { label: 'التقييم', val: cap.performance },
-                { label: 'طلبات اليوم', val: String(cap.today) },
-                { label: 'التقاط / تسليم', val: `${cap.pickup} / ${cap.dropoff}` },
-                { label: 'قبول / رفض', val: `${cap.accept} / ${cap.rejects}` },
-                { label: 'شكاوى', val: String(cap.complaints) },
-              ].map(({ label, val }, i) => (
-                <div key={i}>
-                  <div style={{ fontSize: '11px', color: '#64748B', marginBottom: '2px' }}>{label}</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: label === 'شكاوى' && Number(cap.complaints) > 0 ? '#DC2626' : '#0A2F5C' }}>{val}</div>
-                </div>
-              ))}
-            </div>
+            {/* Col 2: System suggestion */}
+            <OperationsSuggestionCard
+              title="توصية النظام"
+              label={cap.suggestion.label}
+              reason={cap.suggestion.reason}
+              confidence={cap.suggestion.confidence}
+              actions={(
+                <>
+                  <button className={styles.operationsCompactActionPrimary}>{cap.suggestion.action}</button>
+                  {cap.suggestion.secondary && <button className={styles.operationsCompactActionSecondary}>{cap.suggestion.secondary}</button>}
+                </>
+              )}
+            >
+              {cap.suggestion.auditRequired && <span className={styles.operationsCompactTag} style={{ color: '#DC2626', backgroundColor: '#FEF2F2' }}>audit</span>}
+            </OperationsSuggestionCard>
 
             {/* Col 3: Actions */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', alignSelf: 'center' }}>
-              <button style={{ padding: '8px 6px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>{cap.suggestion.action}</button>
-              {cap.suggestion.secondary && <button style={{ padding: '8px 6px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>{cap.suggestion.secondary}</button>}
-              <button style={{ padding: '8px 6px', backgroundColor: '#FEF2F2', color: '#DC2626', border: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: 600, cursor: 'pointer', gridColumn: cap.suggestion.secondary ? undefined : '1 / -1' }}>تعطيل مؤقت</button>
-              <button style={{ padding: '8px 6px', backgroundColor: 'transparent', color: '#64748B', border: '1px solid rgba(10,47,92,0.1)', borderRadius: '6px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>تصعيد</button>
+            <div className={styles.operationsCompactCardActions}>
+              <div className={styles.operationsCompactActionRow} style={{ justifyContent: 'flex-end' }}>
+                <button className={styles.operationsCompactActionPrimary}>{cap.suggestion.action}</button>
+                {cap.suggestion.secondary && <button className={styles.operationsCompactActionSecondary}>{cap.suggestion.secondary}</button>}
+                <button className={styles.operationsCompactActionSecondary} style={{ color: '#DC2626', borderColor: 'rgba(220,38,38,0.14)' }}>تعطيل مؤقت</button>
+                <button className={styles.operationsCompactActionSecondary}>تصعيد</button>
+              </div>
             </div>
 
           </div>

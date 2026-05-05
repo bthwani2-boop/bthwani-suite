@@ -185,17 +185,17 @@ function countLiveCoverage(serviceIds: readonly string[]) {
 
 function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPanelText) {
   const iconMap: Record<string, string> = {
-    dashboard: '⬡',
-    operations: '◈',
-    finance: '⌬',
-    catalogs: '◳',
-    support: '◌',
-    'community-services': '◍',
-    partners: '⌂',
-    marketing: '⌁',
+    dashboard: '⌂',
+    operations: '◎',
+    finance: '¤',
+    catalogs: '▦',
+    support: '☏',
+    'community-services': '◌',
+    partners: '▣',
+    marketing: '📣',
     platform: '⚙',
-    administration: '◐',
-    hr: '◑',
+    administration: '⚙',
+    hr: '◐',
   };
 
   return primarySectionIds.map((sectionId) => {
@@ -213,70 +213,6 @@ function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPane
     };
   });
 }
-
-const SidebarOverrides = () => (
-  <style>{`
-    .ui-web-command-center-root {
-      --rail-width: 72px !important;
-    }
-    .ui-web-command-center__rail {
-      overflow: visible !important;
-      padding: 16px 8px !important;
-      align-items: center;
-    }
-    .ui-web-command-center__rail-item {
-      position: relative;
-      width: 44px;
-      height: 44px;
-      justify-content: center;
-      padding: 0 !important;
-      overflow: visible !important;
-    }
-    .ui-web-command-center__rail-item span:nth-child(2) {
-      position: absolute;
-      right: 100%;
-      margin-right: 8px;
-      opacity: 0;
-      pointer-events: none;
-      background: #0A2F5C;
-      color: #fff;
-      padding: 6px 10px;
-      border-radius: 6px;
-      white-space: nowrap;
-      font-size: 13px;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(10, 47, 92, 0.15);
-      transition: opacity 0.15s ease, transform 0.15s ease;
-      transform: translateX(-4px);
-      z-index: 1000;
-    }
-    [dir="rtl"] .ui-web-command-center__rail-item span:nth-child(2) {
-      right: auto;
-      left: 100%;
-      margin-right: 0;
-      margin-left: 8px;
-      transform: translateX(4px);
-    }
-    .ui-web-command-center__rail-item:hover span:nth-child(2) {
-      opacity: 1;
-      transform: translateX(0);
-    }
-    .ui-web-command-center__rail-item span:nth-child(3) {
-      display: none !important; /* Hide badge on narrow rail */
-    }
-    .ui-web-command-center__rail-section-title {
-      display: none;
-    }
-    .ui-web-command-center__rail-back {
-      padding: 8px;
-      font-size: 0;
-    }
-    .ui-web-command-center__rail-back::before {
-      content: '←';
-      font-size: 16px;
-    }
-  `}</style>
-);
 
 export function ControlPanelSurfaceHost({
   section,
@@ -742,7 +678,7 @@ export function ControlPanelSurfaceHost({
 
   return (
     <>
-      <SidebarOverrides />
+      <div className={styles.controlPanelRailOverrides}>
       <WebCommandCenterFrame
       brandLabel={panelText.brandLabel}
       surfaceTitle="لوحة القيادة"
@@ -777,6 +713,7 @@ export function ControlPanelSurfaceHost({
       onRefreshClick={handleRefreshClick}
       onAlertClick={handleAlertClick}
       railTitle={panelText.brandLabel}
+      railNavigationLabel={shellCopy.title}
       railStatusLabel={isAllFilterActive ? panelText.filters.allServices : selectedServiceLabel}
       railItems={railItems}
       railSupplementary={null}
@@ -1057,6 +994,7 @@ export function ControlPanelSurfaceHost({
         ) : null}
       </div>
     </WebCommandCenterFrame>
+    </div>
     </>
   );
 }
