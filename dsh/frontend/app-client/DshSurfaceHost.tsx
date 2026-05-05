@@ -3,7 +3,6 @@ import { BackHandler, Platform, View } from 'react-native';
 import { Surface, Text, colorPalette } from '@bthwani/ui-kit';
 import { DshSearchScreen } from './discovery/screens';
 import { DshEntryScreen } from './entry/screens';
-import { DshClientBellScreen } from './bell';
 import { DshAwnakOrderCreateScreen } from './awnak/screens';
 import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './home/screens';
 import { DshMySpaceScreen } from './my_space/screens';
@@ -104,6 +103,15 @@ type HostOrderSummary = {
   statusLabel: string;
   meta: string;
   clientState: DshClientState;
+};
+
+type HostCartItem = {
+  id: string;
+  title: string;
+  priceLabel?: string;
+  qty: number;
+  storeId: string;
+  storeName: string;
 };
 
 type PublishedCategoryItem = {
@@ -332,7 +340,7 @@ function commandTargetToRoute(target: DshCommandTarget): DshRoute {
   }
 
   if (target === 'bell') {
-    return 'bell';
+    return 'tracking';
   }
 
   if (target === 'create-order') {
@@ -407,6 +415,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   const [route, setRoute] = React.useState<DshRoute>('home');
   const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
   const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
+  const [cartItems, setCartItems] = React.useState<HostCartItem[]>([]);
   const [createOrderValues, setCreateOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
   const [checkoutClientState, setCheckoutClientState] = React.useState<DshClientState>(hostClientStates.checkoutReady);
   const [successClientState, setSuccessClientState] = React.useState<DshClientState>(hostClientStates.orderCreated);
@@ -763,6 +772,40 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     [activeStoreItems, selectedItemId],
   );
 
+  const addItemToHostCart = React.useCallback((
+    item: { id: string; name?: string; title?: string; priceLabel?: string },
+    payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string },
+  ) => {
+    const normalizedQty = Number.isFinite(payload?.quantity) && (payload?.quantity ?? 0) > 0 ? Number(payload?.quantity) : 1;
+    const nextTitle = item.name?.trim() || item.title?.trim() || item.id;
+
+    setCartItems((current) => {
+      const existingIndex = current.findIndex((entry) => entry.id === item.id && entry.storeId === activeStore.id);
+      if (existingIndex === -1) {
+        return [
+          ...current,
+          {
+            id: item.id,
+            title: nextTitle,
+            priceLabel: item.priceLabel,
+            qty: normalizedQty,
+            storeId: activeStore.id,
+            storeName: activeStore.name,
+          },
+        ];
+      }
+
+      return current.map((entry, index) => (
+        index === existingIndex
+          ? {
+              ...entry,
+              qty: entry.qty + normalizedQty,
+            }
+          : entry
+      ));
+    });
+  }, [activeStore.id, activeStore.name]);
+
   const liveMarketingPrograms = getLiveMarketingGrowthItems('client');
   const liveMarketingShorts = liveMarketingPrograms
     .filter((item) => item.family === 'shorts')
@@ -791,7 +834,6 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     ['DshStoreItemsScreen', DshStoreItemsScreen as unknown],
     ['DshFavoriteToggleScreen', DshFavoriteToggleScreen as unknown],
     ['DshFavoritesListScreen', DshFavoritesListScreen as unknown],
-    ['DshClientBellScreen', DshClientBellScreen as unknown],
     ['DshCartGetScreen', DshCartGetScreen as unknown],
     ['DshConversationHubScreen', DshConversationHubScreen as unknown],
     ['DshOrderIssueHubScreen', DshOrderIssueHubScreen as unknown],
@@ -880,6 +922,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
           deliveryModes: activeStoreDeliveryModes,
         }}
         menuItems={activeStoreItems}
+        onAddItemToCart={addItemToHostCart}
         onOpenItems={() => {
           setStoreItemsEntryOrigin('store-get');
           setRoute('store-items');
@@ -922,22 +965,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   }
 
   if (route === 'cart-get') {
-    // Build a cart preview with a few items from the active store so the cart screen
-    // demonstrates a multi-item, interactive experience instead of a single-line preview.
-    const parsePriceLabel = (label?: string) => {
-      if (!label) return 0;
-      const n = Number(String(label).replace(/[^0-9.,-]/g, '').replace(',', '.'));
-      return Number.isFinite(n) ? n : 0;
-    };
-
-    const cartPreviewItems = activeStoreItems.slice(0, 3).map((it) => ({
-      id: it.id,
-      title: it.name,
-      subtitle: it.subtitle,
-      priceValue: Number(it.priceValue ?? parsePriceLabel(it.priceLabel)),
-      qty: 1,
-    }));
-    const cartClientState = cartPreviewItems.length > 0 ? hostClientStates.cartReady : hostClientStates.cartEmpty;
+    const cartClientState = cartItems.length > 0 ? hostClientStates.cartReady : hostClientStates.cartEmpty;
     const cartClientStateMeta = getDshClientStateMeta(cartClientState);
 
     return (
@@ -950,15 +978,14 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
           statusLabel: activeStore.statusLabel,
           ratingLabel: '4.8 / 5 جودة المتجر',
         }}
-        // provide structured items to the cart screen so it can render a true basket
-        items={cartPreviewItems}
+        items={cartItems}
         activeOrder={{
-          id: selectedItem?.id ?? 'cart-preview',
-          title: selectedItem ? `تتضمن السلة ${selectedItem.name}` : 'السلة جاهزة للدفع',
-          subtitle: selectedItem
-            ? `${selectedItem.subtitle} من ${activeStore.name}`
+          id: cartItems[0]?.id ?? 'cart-preview',
+          title: cartItems[0] ? `تتضمن السلة ${cartItems[0].title}` : 'السلة جاهزة للدفع',
+          subtitle: cartItems[0]
+            ? `عناصر من ${cartItems[0].storeName}`
             : `عناصر من ${activeStore.name}`,
-          meta: selectedItem ? (selectedItem.priceLabel ?? 'راجع العناصر وتابع') : 'راجع العناصر وتابع',
+          meta: cartItems[0]?.priceLabel ?? 'راجع العناصر وتابع',
           statusLabel: 'جاهز',
         }}
         statusTitle={cartClientStateMeta.label}
@@ -1222,22 +1249,10 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
         clientState={trackingClientState}
         currentStatusLabel={activeTrackedOrder?.statusLabel}
         timeline={trackingClientState === hostClientStates.trackingActive || trackingClientState === hostClientStates.delivered ? trackingTimeline : []}
-        onBell={() => setRoute('bell')}
         onSupport={openSupportFlow}
         onRetry={() => openTrackedOrder(activeTrackedOrder?.id)}
         onNextAction={() => setRoute('orders-list')}
           onReorder={openCreateOrderJourney}
-      />
-    );
-  }
-
-  if (route === 'bell') {
-    return (
-      <DshClientBellScreen
-        onOpenTracking={() => openTrackedOrder(activeTrackedOrder?.id)}
-        onOpenOrders={() => setRoute('orders-list')}
-        onBack={() => openTrackedOrder(activeTrackedOrder?.id)}
-        onRetry={() => setRoute('bell')}
       />
     );
   }

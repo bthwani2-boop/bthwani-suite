@@ -55,6 +55,10 @@ export type DshStoreGetScreenProps = {
   onOpenItems?: () => void;
   onOpenSearch?: () => void;
   onOpenCart?: () => void;
+  onAddItemToCart?: (
+    item: DshStoreGetMenuItem,
+    payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string }
+  ) => void;
   onOpenBenefits?: () => void;
   onBack?: () => void;
   onRetry?: () => void;
@@ -418,6 +422,7 @@ export function DshStoreGetScreen({
   onOpenItems,
   onOpenSearch,
   onOpenCart,
+  onAddItemToCart,
   onOpenBenefits,
   onBack,
   onRetry,
@@ -964,15 +969,21 @@ export function DshStoreGetScreen({
   }, []);
 
   const handleAddToCart = React.useCallback(() => {
-    if (!pickerItem) {
+    if (!pickerItem || pickerItem.isAvailable === false) {
       return;
     }
+
+    onAddItemToCart?.(pickerItem, {
+      quantity: Number.isFinite(selectedMeasureQty) && selectedMeasureQty > 0 ? selectedMeasureQty : 1,
+      measurementOption: selectedMeasureOption,
+      deliveryMode: selectedMode,
+    });
 
     setAddedItemLabel(normalizeDisplayText(pickerItem!.name));
     closeMeasurementPicker();
     setCartToastVisible(true);
     setCartDecisionVisible(true);
-  }, [pickerItem, closeMeasurementPicker]);
+  }, [pickerItem, closeMeasurementPicker, onAddItemToCart, selectedMeasureOption, selectedMeasureQty, selectedMode]);
 
   const handleGoToCart = React.useCallback(() => {
     setCartDecisionVisible(false);

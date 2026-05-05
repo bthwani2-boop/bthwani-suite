@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Dimensions, I18nManager, Platform, Pressable, View } from 'react-native';
 import {
   Button,
@@ -76,8 +76,11 @@ type PaymentSelection = {
 type CartItem = {
   id: string;
   title: string;
+  priceLabel?: string;
   priceValue?: number;
   qty?: number;
+  storeId?: string;
+  storeName?: string;
 };
 
 type CheckoutActionPayload = {
@@ -151,6 +154,13 @@ const RECOMMENDED_PRODUCTS: RecommendationProduct[] = [
   { id: 'r3', title: 'بطاطس', priceLabel: '250', priceValue: 250 },
 ];
 
+const PREVIEW_FALLBACK_ITEMS: CartItem[] = [
+  { id: 'p1', title: 'دجاج فحم تركي مع التوابع', priceValue: 3000, qty: 1 },
+  { id: 'p2', title: 'كريسبي رول مفرد', priceValue: 1500, qty: 2 },
+  { id: 'p3', title: 'فتة دخن بالقشطة والعسل', priceValue: 1700, qty: 3 },
+  { id: 'p4', title: 'فتة بالقشطة والعسل', priceValue: 1500, qty: 1 },
+];
+
 function formatAmount(value: number) {
   try {
     return new Intl.NumberFormat('ar-YE', { style: 'currency', currency: 'YER' }).format(value);
@@ -161,6 +171,21 @@ function formatAmount(value: number) {
 
 function formatHalalasAmount(value: number) {
   return formatAmount(value / 100);
+}
+
+function resolveCartItemPriceValue(item: CartItem): number {
+  if (typeof item.priceValue === 'number' && Number.isFinite(item.priceValue)) {
+    return item.priceValue;
+  }
+
+  if (typeof item.priceLabel === 'string' && item.priceLabel.trim()) {
+    const normalizedValue = Number(item.priceLabel.replace(/[^\d.]/g, ''));
+    if (Number.isFinite(normalizedValue)) {
+      return normalizedValue;
+    }
+  }
+
+  return 0;
 }
 
 type ExecutionScheduleOption = {
@@ -372,7 +397,7 @@ function RecommendedSection({ onShowAll, onAddProduct }: { onShowAll: () => void
 }
 
 type ItemsTableProps = {
-  items: Array<{ id: string; title: string; priceValue?: number; qty?: number }>;
+  items: CartItem[];
   onOpenDetails: () => void;
 };
 
@@ -426,13 +451,13 @@ function ItemsTable({ items, onOpenDetails }: ItemsTableProps) {
               <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>{item.title}</Text>
             </View>
             <View style={{ flex: 1.3, paddingHorizontal: spacing[1] }}>
-              <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>{formatAmount(item.priceValue ?? 0)}</Text>
+              <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>{formatAmount(resolveCartItemPriceValue(item))}</Text>
             </View>
             <View style={{ flex: 1, paddingHorizontal: spacing[1], alignItems: 'center' }}>
               <Text role="bodySm" style={{ color: TEXT_PRIMARY }}>{item.qty ?? 1}</Text>
             </View>
             <View style={{ flex: 1.3, paddingHorizontal: spacing[1] }}>
-              <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>{formatAmount((item.priceValue ?? 0) * (item.qty ?? 1))}</Text>
+              <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>{formatAmount(resolveCartItemPriceValue(item) * (item.qty ?? 1))}</Text>
             </View>
           </View>
         ))}
@@ -479,13 +504,14 @@ function QuickActionSheet({ visible, meta, value, submitDisabled = false, onChan
 
 export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const [items, setItems] = useState<CartItem[]>(
-    props.items ?? [
-      { id: 'p1', title: 'دجاج فحم تركي مع التوابع', priceValue: 3000, qty: 1 },
-      { id: 'p2', title: 'كريسبي رول مفرد', priceValue: 1500, qty: 2 },
-      { id: 'p3', title: 'فتة دخن بالقشطة والعسل', priceValue: 1700, qty: 3 },
-      { id: 'p4', title: 'فتة بالقشطة والعسل', priceValue: 1500, qty: 1 },
-    ],
+    props.items !== undefined ? props.items : PREVIEW_FALLBACK_ITEMS,
   );
+
+  useEffect(() => {
+    if (props.items !== undefined) {
+      setItems(props.items);
+    }
+  }, [props.items]);
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodKey>('cod');
   const [couponCode, setCouponCode] = useState('');
@@ -528,7 +554,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const walletCreditMeta = useMemo(() => getDshClientStateMeta('wallet_credit_visible'), []);
 
   const subtotalHalalas = useMemo(
-    () => items.reduce((acc, item) => acc + Math.round((item.priceValue ?? 0) * 100) * (item.qty ?? 1), 0),
+    () => items.reduce((acc, item) => acc + Math.round(resolveCartItemPriceValue(item) * 100) * (item.qty ?? 1), 0),
     [items],
   );
   const subtotalAmount = subtotalHalalas / 100;
@@ -1201,9 +1227,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         items={items.map((item) => ({
           id: item.id,
           title: item.title,
-          subtotal: (item.priceValue ?? 0) * (item.qty ?? 1),
+          subtotal: resolveCartItemPriceValue(item) * (item.qty ?? 1),
           qty: item.qty ?? 1,
-          price: item.priceValue ?? 0,
+          price: resolveCartItemPriceValue(item),
         }))}
         onChangeQty={updateItemQty}
         onRemove={removeItem}

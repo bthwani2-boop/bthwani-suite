@@ -128,7 +128,6 @@ export type DshTrackingScreenProps = {
   clientState?: DshClientState;
   currentStatusLabel?: string;
   timeline?: DshTrackingTimelineItem[];
-  onBell?: () => void;
   onSupport?: () => void;
   onRetry?: () => void;
   onNextAction?: () => void;
@@ -984,7 +983,6 @@ type CreateOrderJourneyScreenProps = {
   clientState?: DshClientState;
   onPrimaryAction?: () => void;
   onBack?: () => void;
-  onBell?: () => void;
   onSupport?: () => void;
   onNextAction?: () => void;
   onReorder?: () => void;
@@ -992,7 +990,7 @@ type CreateOrderJourneyScreenProps = {
   currentStatusLabel?: string;
 };
 
-function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', onPrimaryAction, onBack, onBell, onSupport, onNextAction, onReorder, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
+function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', onPrimaryAction, onBack, onSupport, onNextAction, onReorder, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
   const { theme } = useTheme();
   const [phase, setPhase] = React.useState<JourneyPhase>(initialPhase);
   const [productRating, setProductRating] = React.useState(0);
@@ -1206,6 +1204,18 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         : ratingsSubmitted
           ? 'تم حفظ التقييمين ولا توجد خطوة إضافية مطلوبة.'
           : 'لن يتفعّل الإرسال حتى تختار تقييم المنتج والكابتن.';
+  const arrivalBellSummary = !isCheckoutSequenceState && phase !== 'received'
+    ? phase === 'route'
+      ? 'أيقونة الجرس تبقى داخل الطلب نفسه أثناء الطريق، وتغطي رنة الاقتراب ثم رنة الوصول من دون فتح صفحة مستقلة.'
+      : 'جرس الوصول مثبت داخل نفس شاشة الطلب، والمرحلة الحالية تشير إلى أن الكابتن وصل وبقي فقط تثبيت الاستلام.'
+    : null;
+  const bellStatusItems = !isCheckoutSequenceState && phase !== 'received'
+    ? [
+        { label: 'حالة الجرس', value: phase === 'route' ? 'اقتراب' : 'وصول', tone: phase === 'route' ? 'warning' as const : 'brand' as const },
+        { label: 'الرنات الفعالة', value: phase === 'route' ? 'اقتراب + وصول' : 'وصول مثبت' },
+        { label: 'الخطوة التالية', value: phase === 'route' ? 'انتظار وصول الكابتن' : 'تثبيت الاستلام ثم التقييم', tone: 'success' as const },
+      ]
+    : [];
   const runtimeBottomInset = Platform.OS === 'android'
     ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
     : safeArea.comfortable;
@@ -1275,9 +1285,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     ? onBack
       ? { label: 'العودة إلى السلة', onPress: onBack, tone: 'secondary' as const }
       : undefined
-    : phase === 'route' && onBell
-      ? { label: 'جرس الوصول', onPress: onBell, tone: 'secondary' as const }
-      : phase === 'received' && onSupport
+    : phase === 'received' && onSupport
         ? { label: 'الدعم أو الإبلاغ عن مشكلة', onPress: onSupport, tone: 'secondary' as const }
         : onBack
           ? { label: phase === 'route' ? 'تعديل الطلب' : 'العودة', onPress: onBack, tone: 'secondary' as const }
@@ -1314,6 +1322,24 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           subtitle="المعلومات المهمة فقط، بشكل مضغوط وقابل للقراءة."
           items={orderDetailsItems}
         />
+
+        {arrivalBellSummary ? (
+          <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+            <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
+              <View style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: phase === 'route' ? theme.warningSurface : theme.brandSurface }}>
+                <Ionicons name="notifications-outline" size={20} color={phase === 'route' ? theme.warning : theme.brand} />
+              </View>
+              <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+                <Badge label="جرس الوصول" tone={phase === 'route' ? 'warning' : 'brand'} />
+                <Text role="bodyStrong" style={{ textAlign: 'right' }}>الجرس جزء من الطلب نفسه</Text>
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                  {arrivalBellSummary}
+                </Text>
+              </Box>
+            </Box>
+            <KeyValueList items={bellStatusItems} />
+          </Surface>
+        ) : null}
 
         {isCheckoutSequenceState ? (
           <>
@@ -1827,7 +1853,7 @@ export function DshOrderSuccessState({ clientState = 'order_confirmed', onNext }
   return renderOrderSuccess(clientState, onNext);
 }
 
-export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, timeline = [], onBell, onSupport, onRetry, onNextAction, onReorder }: DshTrackingScreenProps) {
+export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, timeline = [], onSupport, onRetry, onNextAction, onReorder }: DshTrackingScreenProps) {
   const trackingStateMeta = getDshClientStateMeta(clientState);
   const fallbackTimeline: DshTrackingTimelineItem[] = timeline.length
     ? timeline
@@ -1862,7 +1888,6 @@ export function DshTrackingScreen({ values = defaultCreateOrderValues, clientSta
       clientState={clientState}
       initialPhase="route"
       currentStatusLabel={currentStatusLabel ?? trackingStateMeta.label}
-      onBell={onBell}
       onSupport={onSupport}
       onNextAction={onNextAction}
       onReorder={onReorder}
