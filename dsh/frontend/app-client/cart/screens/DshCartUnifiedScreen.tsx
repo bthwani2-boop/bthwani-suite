@@ -24,7 +24,7 @@ import {
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../components/DshCartDetails';
 import { getDshClientStateMeta, type DshClientState } from '../../shared/dshClientStateModel';
-import { resolveDshFinanceEventKindForPayment, type DshFinanceEventKind } from '../../shared/finance/dshFinancePreviewModel';
+import { resolveDshFinanceEventKindForPayment, type DshFinanceEventKind } from '../../../shared/finance/dshFinancePreviewModel';
 import useWlt from '../../../../../wlt/frontend/app-client/dsh/hooks/useWlt';
 
 const PAGE_BG = colorPalette.pageBackground;

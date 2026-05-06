@@ -206,45 +206,93 @@ function StageRail({ activeStepId, steps }: { activeStepId: string; steps: Journ
   const activeIndex = Math.max(0, steps.findIndex((step) => step.id === activeStepId));
 
   return (
-    <Box gap={2}>
+    <Box gap={3}>
       {steps.map((step, index) => {
         const isDone = index < activeIndex;
         const isActive = index === activeIndex;
         const indicatorTone = isActive ? theme.brand : isDone ? theme.success : theme.line;
 
         return (
-          <Box key={step.id} layoutDirection="row" gap={2} align="center" style={{ flexDirection: 'row-reverse' }}>
-            <View style={{ width: 24, alignItems: 'center', justifyContent: 'center' }}>
-              <View
+          <Box key={step.id} layoutDirection="row" gap={3} align="center" style={{ flexDirection: 'row-reverse' }}>
+            <Box style={{ width: 32, alignItems: 'center' }}>
+              <Surface
+                tone={isActive ? 'brand' : isDone ? 'success' : 'default'}
+                padding={0}
                 style={{
-                  width: 18,
-                  height: 18,
-                  borderRadius: 9,
+                  width: 28,
+                  height: 28,
+                  borderRadius: 14,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: indicatorTone,
+                  shadowColor: indicatorTone,
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: isActive ? 0.6 : 0,
+                  shadowRadius: 6,
+                  elevation: isActive ? 4 : 0,
                 }}
               >
-                {isDone ? <Ionicons name="checkmark" size={12} color={theme.brandContrast} /> : <Text role="caption" style={{ color: isActive ? theme.brandContrast : theme.text }}>{index + 1}</Text>}
-              </View>
+                {isDone ? (
+                  <Ionicons name="checkmark-sharp" size={16} color={theme.brandContrast} />
+                ) : (
+                  <Text
+                    role="bodyStrong"
+                    style={{
+                      color: isActive ? theme.brandContrast : theme.textSoft,
+                      fontSize: 13,
+                    }}
+                  >
+                    {index + 1}
+                  </Text>
+                )}
+              </Surface>
               {index < steps.length - 1 ? (
-                <View style={{ width: 2, flex: 1, minHeight: 28, marginTop: 4, marginBottom: -4, backgroundColor: isDone ? theme.success : theme.line }} />
+                <View
+                  style={{
+                    width: 2,
+                    flex: 1,
+                    minHeight: 32,
+                    marginTop: 6,
+                    marginBottom: -6,
+                    backgroundColor: isDone ? theme.success : theme.line,
+                    opacity: isDone ? 1 : 0.4,
+                  }}
+                />
               ) : null}
-            </View>
+            </Box>
 
             <Surface
               tone={isActive ? 'brand' : 'raised'}
-              padding={2}
-              gap={0}
+              padding={3}
+              radiusToken="xl"
               style={{
                 flex: 1,
-                borderWidth: 1,
+                borderWidth: isActive ? 1.5 : 1,
                 borderColor: isActive ? theme.brand : theme.line,
                 backgroundColor: isActive ? theme.brandSurface : theme.surfaceRaised,
+                transform: [{ scale: isActive ? 1.02 : 1 }],
               }}
             >
-              <Text role="bodyStrong" style={{ textAlign: 'right' }}>{step.title}</Text>
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{step.detail}</Text>
+              <Box layoutDirection="row" justify="space-between" align="center" style={{ flexDirection: 'row-reverse' }}>
+                <Box gap={0} style={{ flex: 1 }}>
+                  <Text role="titleSm" style={{ textAlign: 'right', color: isActive ? theme.brand : theme.text }}>
+                    {step.title}
+                  </Text>
+                  <Text role="bodySm" tone={isActive ? 'default' : 'muted'} style={{ textAlign: 'right' }}>
+                    {step.detail}
+                  </Text>
+                </Box>
+                {isActive && (
+                  <Box
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 4,
+                      backgroundColor: theme.brand,
+                      marginLeft: 8,
+                    }}
+                  />
+                )}
+              </Box>
             </Surface>
           </Box>
         );
@@ -1125,6 +1173,35 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       />
 
       <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: contentBottomPadding }}>
+        <Surface tone="brand" padding={3} radiusToken="xl" gap={2}>
+          <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
+            <Icon name="flash-outline" size={18} tone="inverse" />
+            <Text role="bodyStrong" tone="inverse" style={{ textAlign: 'right', flex: 1 }}>
+              {phase === 'route' ? 'أسرع طريق عبر الملك فهد متاح الآن' : 'تم تثبيت الوصول في المنطقة التشغيلية'}
+            </Text>
+          </Box>
+        </Surface>
+
+        <Surface tone="raised" radiusToken="xl" style={{ overflow: 'hidden', height: 220, borderWidth: 1, borderColor: theme.line }}>
+          <View style={{ flex: 1, backgroundColor: theme.surfaceInset, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="map-outline" size={48} tone="soft" />
+            <Text role="caption" tone="muted">خريطة المسار الحي (Premium 2026)</Text>
+          </View>
+          <Box
+            style={{
+              position: 'absolute',
+              bottom: 12,
+              right: 12,
+              backgroundColor: theme.brand,
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 12,
+            }}
+          >
+            <Text role="caption" tone="inverse">تتبع مباشر</Text>
+          </Box>
+        </Surface>
+
         <OperationalStatusHero
           statusLabel={deliveryStatusLabel}
           statusTone={phase === 'received' ? 'success' : phase === 'arrived' ? 'brand' : 'warning'}
@@ -1136,16 +1213,20 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           nextStepValue={nextStepValue}
         />
 
-        <CompactStatusStepper
-          title="المسار الحي"
-          subtitle="ثلاث مراحل واضحة دون بطاقات ضخمة أو نصوص مكررة."
-          steps={compactSteps}
-        />
+        <Surface tone="raised" padding={4} radiusToken="xl" gap={4}>
+          <SectionHeader
+            title="المسار الحي"
+            subtitle="نظام تتبع مباشر وفوري لجميع محطات الطلب."
+          />
+          <StageRail activeStepId={phase} steps={deliveryJourneySteps} />
+        </Surface>
 
         <KeyValueDetails
           title="تفاصيل الطلب"
           subtitle="المعلومات المهمة فقط، بشكل مضغوط وقابل للقراءة."
           items={orderDetailsItems}
+          radiusToken="xl"
+          padding={4}
         />
 
         {arrivalBellSummary ? (
