@@ -19,6 +19,7 @@ Allowed decisions:
 
 | Date | Session ID | Scope | Evidence Path | Decision | Remaining Risks | Next Action |
 | --- | --- | --- | --- | --- | --- | --- |
+| 2026-05-06 | DSH_FLOW_016_ACTOR_FLOW_PARITY-20260506-211600 | DSH-FLOW-016 actor flow parity closure | tools/registry/runs/DSH_FLOW_016_ACTOR_FLOW_PARITY-20260506-211600 | PASS_WITH_WARNINGS | visual/runtime/API/backend deferred; parity proven in preview only | proceed to visual/runtime proof by actor flow |
 | 2026-05-06 | DSH_LINK_013_SCREEN_TOPOLOGY_CLOSURE-20260506-180800 | DSH-LINK-013 screen topology and cross-surface linkage closure | tools/registry/runs/DSH_LINK_013_SCREEN_TOPOLOGY_CLOSURE-20260506-180800 | PASS_WITH_WARNINGS | visual/runtime/API/backend deferred; compatibility aliases remain documented; CTA edge graph not yet proven | run DSH-LINK-014 navigation CTA edge graph closure |
 | 2026-05-06 | DSH_STATE_015_SCREEN_STATE_COVERAGE-20260506-210133 | DSH-STATE-015 screen state coverage closure | tools/registry/runs/DSH_STATE_015_SCREEN_STATE_COVERAGE-20260506-210133 | PASS | all active screens handle ready/loading/error/offline; gaps in Field and Control Panel resolved | ready for DSH-FLOW-016 operational flow proof |
 | 2026-05-06 | DSH_LINK_014_NAVIGATION_CTA_EDGE_GRAPH-20260506-183417 | DSH-LINK-014 navigation CTA edge graph closure | tools/registry/runs/DSH_LINK_014_NAVIGATION_CTA_EDGE_GRAPH-20260506-183417 | PASS_WITH_WARNINGS | visual/runtime/API/backend deferred; 4 deferred runtime targets remain | run DSH-STATE-015 state coverage closure |
