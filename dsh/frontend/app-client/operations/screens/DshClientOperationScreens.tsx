@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Chip, KeyValueList, ListItem, MobileScrollView, SectionHeader, StatCard, Surface, Text, TextField } from '@bthwani/ui-kit';
+import { Box, KeyValueList, ListItem, StatCard, Surface, Text, TextField } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../../patterns/screens/DshOperationScreen';
 
 const clientOperationScreenIds = [
@@ -75,9 +75,10 @@ type ClientOperationCanonicalDestination =
   | 'tracking'
   | 'benefits'
   | 'conversation-workspace'
+  | 'order-issue-workspace'
+  | 'orders-list'
   | 'proxy-workspace'
-  | 'service-settings'
-  | 'operations-screen';
+  | 'service-settings';
 
 type ClientOperationGroupId =
   | 'create-checkout'
@@ -98,13 +99,6 @@ type ClientOperationDefinition = {
   canonicalDestination: ClientOperationCanonicalDestination;
   standaloneVisible: boolean;
   consolidationNote?: string;
-};
-
-type ClientOperationDirectoryGroup = {
-  id: ClientOperationGroupId;
-  title: string;
-  subtitle: string;
-  itemIds: ClientOperationScreenId[];
 };
 
 const internalDiagnosticOperationIds: ClientOperationScreenId[] = [
@@ -197,41 +191,10 @@ const consolidatedTrackingScreenIds: ClientOperationScreenId[] = [
   'delivery-attempt-create',
   'delivery-attempts-list',
   'delivery-close',
+  'order-escrow-hold',
+  'order-escrow-release',
   'order-proof-code-generate',
   'order-proof-verify',
-];
-
-const clientOperationDirectoryGroups: ClientOperationDirectoryGroup[] = [
-  {
-    id: 'create-checkout',
-    title: 'الإنشاء والدفع',
-    subtitle: 'الإنشاء والتسعير وضوابط ما قبل الإرسال تبقى في مسار واحد.',
-    itemIds: createCheckoutIds,
-  },
-  {
-    id: 'order-delivery',
-    title: 'الطلب والتحكم بالتوصيل',
-    subtitle: 'التنفيذ والإثبات والحالة والتتبع تبقى معًا.',
-    itemIds: orderDeliveryIds,
-  },
-  {
-    id: 'messaging-reviews',
-    title: 'الرسائل والمراجعة',
-    subtitle: 'المحادثة والتقييم والتغذية الراجعة تبقى قريبة من الطلب النشط.',
-    itemIds: messagingReviewIds,
-  },
-  {
-    id: 'subscription-loyalty',
-    title: 'الاشتراك والولاء',
-    subtitle: 'المزايا والخطط العائلية والترقيات والنقاط والاستحقاقات تبقى ظاهرة.',
-    itemIds: subscriptionLoyaltyIds,
-  },
-  {
-    id: 'proxy-controls',
-    title: 'الوكالة وضوابط الخدمة',
-    subtitle: 'طلبات الوكالة وضوابط الخدمة تبقى خارج مسار التسوق.',
-    itemIds: proxyControlIds,
-  },
 ];
 
 const badgeLabelByKind: Record<ClientOperationKind, string> = {
@@ -385,6 +348,10 @@ export function getCanonicalDestination(screenId: ClientOperationScreenId): Clie
     return 'conversation-workspace';
   }
 
+  if (screenId === 'order-issue-flag') {
+    return 'order-issue-workspace';
+  }
+
   if (
     screenId === 'subscription-family-get'
     || screenId === 'subscription-family-members-get'
@@ -410,7 +377,8 @@ export function getCanonicalDestination(screenId: ClientOperationScreenId): Clie
   }
 
   if (
-    screenId === 'order-create'
+    screenId === 'awnak-order-create'
+    || screenId === 'order-create'
     || screenId === 'booking-create'
     || screenId === 'external-order-create'
     || screenId === 'gas-refill-order-create'
@@ -419,7 +387,21 @@ export function getCanonicalDestination(screenId: ClientOperationScreenId): Clie
     return 'cart-get';
   }
 
-  return 'operations-screen';
+  if (screenId === 'order-rate' || screenId === 'review-create') {
+    return 'tracking';
+  }
+
+  if (
+    screenId === 'order-create'
+    || screenId === 'order-cancel'
+    || screenId === 'order-accept'
+    || screenId === 'order-complete'
+    || screenId === 'reviews-list'
+  ) {
+    return 'orders-list';
+  }
+
+  return 'orders-list';
 }
 
 function primaryLabelByKind(kind: ClientOperationKind) {
@@ -439,9 +421,11 @@ function primaryLabelByCanonicalDestination(destination: ClientOperationCanonica
   if (destination === 'tracking') return 'فتح تتبع الطلب';
   if (destination === 'benefits') return 'فتح المزايا';
   if (destination === 'conversation-workspace') return 'فتح المحادثة';
+  if (destination === 'order-issue-workspace') return 'فتح الدعم';
+  if (destination === 'orders-list') return 'فتح الطلبات';
   if (destination === 'proxy-workspace') return 'فتح سياق الوكالة';
   if (destination === 'service-settings') return 'فتح إعدادات الخدمة';
-  return 'فتح دليل العمليات';
+  return 'فتح الطلبات';
 }
 
 const clientOperationDefinitions: Record<ClientOperationScreenId, ClientOperationDefinition> = Object.fromEntries(
@@ -639,7 +623,7 @@ function OperationScreenView({
           </Surface>
         )}
         primaryActionLabel={primaryLabelByCanonicalDestination(definition.canonicalDestination)}
-        secondaryActionLabel={secondaryActionLabel ?? 'العودة إلى دليل العمليات'}
+        secondaryActionLabel={secondaryActionLabel ?? 'العودة'}
         onPrimaryAction={onPrimaryAction}
         onSecondaryAction={onSecondaryAction}
         onRetry={onRetry}
@@ -666,103 +650,13 @@ function OperationScreenView({
         </Box>
       )}
       primaryActionLabel={primaryActionLabel ?? primaryLabelByKind(definition.kind)}
-      secondaryActionLabel={secondaryActionLabel ?? 'العودة إلى دليل العمليات'}
+      secondaryActionLabel={secondaryActionLabel ?? 'العودة'}
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
     />
   );
 }
-
-function createOperationScreen(screenId: ClientOperationScreenId) {
-  return function GeneratedClientOperationScreen(props: ClientGeneratedOperationScreenProps) {
-    return <OperationScreenView screenId={screenId} {...props} />;
-  };
-}
-
-export function DshClientOperationDirectoryScreen({ onOpenScreen }: { onOpenScreen?: (screenId: ClientOperationScreenId) => void }) {
-  const operationScreenCount = clientOperationDirectoryGroups.reduce((sum, group) => (
-    sum + group.itemIds.filter((itemId) => clientOperationDefinitions[itemId].audience === 'client').length
-  ), 0);
-
-  return (
-    <MobileScrollView padding={4} gap={4}>
-      <Box gap={2}>
-        <Text role="titleLg">مكتبة عمليات عميل DSH</Text>
-        <Text role="bodyMd" tone="muted">
-          مكتبة قدرات داخلية لمسارات عميل DSH المتبقية، ومجمّعة حسب رحلة العميل بدل قائمة fallback مسطحة.
-        </Text>
-      </Box>
-
-      <Surface tone="brand" gap={3}>
-        <StatCard label="القدرات المغطاة" value={String(operationScreenCount)} deltaLabel="مصفوفة عميل داخلية موثقة" tone="info" />
-        <StatCard label="نمط التنقل" value="مجمّع" deltaLabel="الإنشاء، التوصيل، المزايا، الوكالة، الإعدادات" tone="success" />
-      </Surface>
-
-      <Surface tone="inset" gap={2}>
-        <Text role="bodyStrong">ضبط التسربات التشغيلية</Text>
-        <Text role="bodySm" tone="muted">
-          المسارات الداخلية/التشخيصية مثل قبول الطلب، إكماله، الحجز المالي، وإعادة الإسناد لم تعد معروضة داخل هذا الدليل الظاهر للعميل.
-        </Text>
-      </Surface>
-
-      {clientOperationDirectoryGroups.map((group) => (
-        <Surface key={group.title} tone="raised" gap={3}>
-          <SectionHeader title={group.title} subtitle={group.subtitle} />
-          {(() => {
-            const visibleItems = group.itemIds.filter((itemId) => {
-              const definition = clientOperationDefinitions[itemId];
-              return definition.audience === 'client' && definition.standaloneVisible;
-            });
-            const consolidatedItems = group.itemIds.filter((itemId) => {
-              const definition = clientOperationDefinitions[itemId];
-              return definition.audience === 'client' && !definition.standaloneVisible;
-            });
-            const consolidatedByDestination = consolidatedItems.reduce<Record<string, ClientOperationScreenId[]>>((acc, itemId) => {
-              const destination = clientOperationDefinitions[itemId].canonicalDestination;
-              acc[destination] = [...(acc[destination] ?? []), itemId];
-              return acc;
-            }, {});
-
-            return (
-              <Box gap={2}>
-                {Object.entries(consolidatedByDestination).map(([destination, itemIds]) => (
-                  <Surface key={`${group.id}-${destination}`} tone="inset" gap={2}>
-                    <Text role="bodyStrong" style={{ textAlign: 'right' }}>
-                      {destination === 'cart-get'
-                        ? 'هذه القدرات مدمجة داخل شاشة تأكيد الطلب'
-                        : destination === 'tracking'
-                          ? 'هذه القدرات مدمجة داخل شاشة التتبع'
-                          : 'هذه القدرات مدمجة داخل رحلة عميل أخرى'}
-                    </Text>
-                    <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                      لا تظهر هذه العناصر كصفحات عميل مستقلة حتى لا تتكرر نفس رحلة checkout أو tracking.
-                    </Text>
-                    <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', flexDirection: 'row-reverse' }}>
-                      {itemIds.map((itemId) => (
-                        <Chip key={itemId} label={clientOperationDefinitions[itemId].title} tone="brand" />
-                      ))}
-                    </Box>
-                  </Surface>
-                ))}
-
-                {visibleItems.map((itemId) => {
-                  const item = clientOperationDefinitions[itemId];
-
-                  return <ListItem key={itemId} title={item.title} subtitle={item.subtitle} meta={item.stageLabel} badgeLabel={item.badgeLabel} onPress={() => onOpenScreen?.(itemId)} />;
-                })}
-              </Box>
-            );
-          })()}
-        </Surface>
-      ))}
-    </MobileScrollView>
-  );
-}
-
-export const clientOperationScreenRegistry: Record<ClientOperationScreenId, React.ComponentType<ClientGeneratedOperationScreenProps>> = Object.fromEntries(
-  clientOperationScreenIds.map((screenId) => [screenId, createOperationScreen(screenId)]),
-) as Record<ClientOperationScreenId, React.ComponentType<ClientGeneratedOperationScreenProps>>;
 
 type ConversationScreenId = 'chat-read-ack' | 'chat-send';
 
@@ -783,7 +677,7 @@ export function DshConversationHubScreen({ screenId, state = 'ready', onPrimaryA
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
       primaryActionLabel={screenId === 'chat-send' ? 'إرسال رسالة' : 'تأكيد المحادثة'}
-      secondaryActionLabel="العودة إلى دليل العمليات"
+      secondaryActionLabel="العودة إلى الطلبات"
     />
   );
 }
@@ -804,7 +698,7 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
       primaryActionLabel="تثبيت المشكلة"
-      secondaryActionLabel="العودة إلى دليل العمليات"
+      secondaryActionLabel="العودة إلى الطلبات"
     />
   );
 }
@@ -826,29 +720,7 @@ export function DshProxyHubScreen({ screenId, state = 'ready', onPrimaryAction, 
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
       primaryActionLabel={screenId === 'proxy-request-tracking' ? 'فتح التتبع' : screenId === 'proxy-request-reject' ? 'رفض الطلب' : screenId === 'proxy-request-approve' ? 'اعتماد الطلب' : screenId === 'proxy-request-review' ? 'مراجعة الطلب' : 'إنشاء طلب'}
-      secondaryActionLabel="العودة إلى دليل العمليات"
-    />
-  );
-}
-
-type DshTrustHubScreenProps = {
-  screenId: 'order-proof-code-generate' | 'order-proof-verify' | 'order-escrow-hold' | 'order-escrow-release';
-  state?: DshOperationScreenState;
-  onPrimaryAction?: () => void;
-  onSecondaryAction?: () => void;
-  onRetry?: () => void;
-};
-
-export function DshTrustHubScreen({ screenId, state = 'ready', onPrimaryAction, onSecondaryAction, onRetry }: DshTrustHubScreenProps) {
-  return (
-    <OperationScreenView
-      screenId={screenId}
-      state={state}
-      onPrimaryAction={onPrimaryAction}
-      onSecondaryAction={onSecondaryAction}
-      onRetry={onRetry}
-      primaryActionLabel={screenId === 'order-proof-code-generate' ? 'توليد الرمز' : screenId === 'order-proof-verify' ? 'تحقق التسليم' : screenId === 'order-escrow-hold' ? 'تجميد المبلغ' : 'إطلاق المبلغ'}
-      secondaryActionLabel="العودة إلى دليل العمليات"
+      secondaryActionLabel="العودة إلى الطلبات"
     />
   );
 }
@@ -870,7 +742,7 @@ export function DshServiceSettingsHubScreen({ screenId, state = 'ready', onPrima
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
       primaryActionLabel="تأكيد الإعدادات"
-      secondaryActionLabel="العودة إلى دليل العمليات"
+      secondaryActionLabel="العودة للرئيسية"
     />
   );
 }
@@ -891,7 +763,7 @@ export function DshZoneSetScreen({ state = 'ready', onPrimaryAction, onSecondary
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
       primaryActionLabel="تأكيد النطاق"
-      secondaryActionLabel="العودة إلى دليل العمليات"
+      secondaryActionLabel="العودة للرئيسية"
     />
   );
 }
@@ -912,7 +784,7 @@ export function DshListingStatusUpdateScreen({ state = 'ready', onPrimaryAction,
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
       primaryActionLabel="تأكيد حالة الإدراج"
-      secondaryActionLabel="العودة إلى دليل العمليات"
+      secondaryActionLabel="العودة للرئيسية"
     />
   );
 }

@@ -104,25 +104,6 @@ export type DshOrdersListScreenProps = {
   onNextAction?: () => void;
 };
 
-export type DshCreateOrderScreenProps = {
-  screenId?: string;
-  state?: DshOperationScreenState;
-  clientState?: DshClientState;
-  values?: CreateOrderValues;
-  timeline?: DshTrackingTimelineItem[];
-  onChange?: (field: keyof CreateOrderValues, value: string) => void;
-  onPrimaryAction?: () => void;
-  onSecondaryAction?: () => void;
-  onContinue?: () => void;
-  onBack?: () => void;
-  onRetry?: () => void;
-};
-
-export type DshOrderSuccessStateProps = {
-  clientState?: DshClientState;
-  onNext?: () => void;
-};
-
 export type DshTrackingScreenProps = {
   values?: CreateOrderValues;
   clientState?: DshClientState;
@@ -143,7 +124,6 @@ export type DshFlowHubScreenProps = {
 };
 
 export type DshIntakeHubScreenProps = DshFlowHubScreenProps;
-export type DshDeliveryManagementHubScreenProps = DshFlowHubScreenProps;
 
 
 const defaultCreateOrderValues: CreateOrderValues = {
@@ -865,47 +845,6 @@ function buildDefaultWalletImpact(clientState: DshClientState): DshClientWalletI
   return null;
 }
 
-function renderCheckoutGate(
-  screenId?: string,
-  state: DshOperationScreenState = 'ready',
-  clientState: DshClientState = 'checkout_ready',
-  values: CreateOrderValues = defaultCreateOrderValues,
-  onPrimaryAction?: () => void,
-  onSecondaryAction?: () => void,
-  onRetry?: () => void,
-) {
-  const effectiveClientState = normalizeClientFacingOrderState(clientState);
-  const effectiveStateMeta = getDshClientStateMeta(effectiveClientState);
-
-  return (
-    <DshOperationScreen
-      state={state}
-      title="هذه القدرة مدمجة داخل تأكيد الطلب"
-      subtitle="التسعير، فحص التغطية، وتفعيل الدفع لم تعد صفحات مستقلة. تظهر الآن داخل السلة أو كتأكيد طلب مختصر فقط."
-      primaryActionLabel={effectiveClientState === 'order_confirmed' ? 'فتح التتبع' : 'فتح تأكيد الطلب'}
-      secondaryActionLabel="العودة إلى العمليات"
-      onPrimaryAction={onPrimaryAction}
-      onSecondaryAction={onSecondaryAction}
-      onRetry={onRetry}
-      content={
-        <Surface tone="inset" gap={2}>
-          <Text role="bodyStrong">{screenId ?? 'checkout-gate'}</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            أي دخول مباشر إلى هذه القدرة يعاد تفسيره كجزء مدمج من السلة أو من شاشة إنشاء الطلب القانونية.
-          </Text>
-          <KeyValueList
-            items={[
-              { label: 'الحالة المعروضة', value: effectiveStateMeta.label, tone: 'brand' },
-              { label: 'المسار القانوني', value: effectiveClientState === 'order_confirmed' ? 'tracking' : 'cart-get' },
-              { label: 'النتيجة', value: effectiveClientState === 'order_confirmed' ? 'الانتقال إلى التتبع' : 'العودة إلى تأكيد الطلب' },
-            ]}
-          />
-        </Surface>
-      }
-    />
-  );
-}
-
 type CreateOrderJourneyScreenProps = {
   values: CreateOrderValues;
   timeline: DshTrackingTimelineItem[];
@@ -1395,38 +1334,6 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   );
 }
 
-function renderOrderSuccess(clientState: DshClientState = 'order_confirmed', onNext?: () => void) {
-  const successStateMeta = getDshClientStateMeta(clientState);
-  const checkoutReadyMeta = getDshClientStateMeta('checkout_ready');
-  const orderCreatedMeta = getDshClientStateMeta('order_created');
-  const trackingStateMeta = getDshClientStateMeta('tracking_active');
-
-  return (
-    <MobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
-      <OperationalStatusHero
-        statusLabel={successStateMeta.label}
-        statusTone={clientState === 'order_confirmed' ? 'success' : 'brand'}
-        title={successStateMeta.title}
-        summary={successStateMeta.description}
-        nextStepLabel="الإجراء التالي"
-        nextStepValue={trackingStateMeta.label}
-      />
-
-      <CompactStatusStepper
-        title="المسار التالي"
-        subtitle="الطلب خرج من الجاهزية إلى الإنشاء ثم أصبح جاهزًا للتتبع."
-        steps={[
-          { id: 'checkout-ready', title: checkoutReadyMeta.label, state: 'done' as const },
-          { id: 'order-created', title: orderCreatedMeta.label, state: clientState === 'order_created' ? 'current' as const : 'done' as const },
-          { id: 'tracking-active', title: trackingStateMeta.label, state: 'next' as const },
-        ]}
-      />
-
-      <Button label="عرض التتبع" disabled={!onNext} onPress={() => onNext?.()} />
-    </MobileScrollView>
-  );
-}
-
 function renderTracking(
   clientState: DshClientState,
   currentStatusLabel: string,
@@ -1660,34 +1567,6 @@ export function DshOrdersListScreen({ items = fallbackOrderListItems, query = ''
   );
 }
 
-export function DshCreateOrderScreen({
-  screenId,
-  state = 'ready',
-  clientState = 'order_created',
-  values = defaultCreateOrderValues,
-  timeline = [],
-  onPrimaryAction,
-  onSecondaryAction,
-  onContinue,
-  onBack,
-  onRetry,
-}: DshCreateOrderScreenProps) {
-  if (screenId) {
-    return renderCheckoutGate(screenId, state, clientState, values, onPrimaryAction, onSecondaryAction, onRetry);
-  }
-
-  return (
-    <CreateOrderJourneyScreen
-      values={values}
-      timeline={timeline}
-      clientState={clientState}
-      initialPhase="route"
-      onPrimaryAction={onContinue ?? onPrimaryAction}
-      onBack={onBack ?? onSecondaryAction}
-    />
-  );
-}
-
 export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspace', onPrimaryAction, onSecondaryAction, onRetry }: DshIntakeHubScreenProps) {
   return (
     <DshOperationScreen
@@ -1701,17 +1580,12 @@ export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspa
         </Surface>
       }
       primaryActionLabel="فتح تأكيد الطلب"
-      secondaryActionLabel="العودة إلى العمليات"
+      secondaryActionLabel="العودة"
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction ?? onRetry}
       onRetry={onRetry}
     />
   );
-}
-
-
-export function DshOrderSuccessState({ clientState = 'order_confirmed', onNext }: DshOrderSuccessStateProps) {
-  return renderOrderSuccess(clientState, onNext);
 }
 
 export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, timeline = [], onSupport, onRetry, onNextAction, onReorder }: DshTrackingScreenProps) {
@@ -1756,27 +1630,5 @@ export function DshTrackingScreen({ values = defaultCreateOrderValues, clientSta
     />
   );
 }
-
-export function DshDeliveryManagementHubScreen({ state = 'ready', screenId = 'delivery-management-workspace', onPrimaryAction, onSecondaryAction, onRetry }: DshDeliveryManagementHubScreenProps) {
-  return (
-    <DshOperationScreen
-      state={state}
-      title="قدرة مدمجة داخل التتبع"
-      subtitle="محاولات التوصيل والإغلاق ورموز الإثبات تظهر داخل شاشة تتبع الطلب، وليست رحلة عميل منفصلة."
-      content={
-        <Surface tone="inset" gap={2}>
-          <Text role="bodyStrong">{screenId}</Text>
-          <Text role="bodySm" tone="muted">عناصر ETA والتتبّع ومحاولات التوصيل يجب أن تظل ضمن شاشة التتبع القانونية حتى لا تتكرر نفس بيانات الطلب في أكثر من صفحة.</Text>
-        </Surface>
-      }
-      primaryActionLabel="فتح التتبع"
-      secondaryActionLabel="العودة إلى العمليات"
-      onPrimaryAction={onPrimaryAction}
-      onSecondaryAction={onSecondaryAction ?? onRetry}
-      onRetry={onRetry}
-    />
-  );
-}
-
 
 export default {};

@@ -459,11 +459,11 @@ export function DshHomeGetScreen({
   onVideoCtaClick,
   onVideoImpression,
   onOpenSheinInfo,
-  approvedVideoShorts = [],
   sheinInlineVisible = false,
   onCloseSheinInline,
   awnakInlineVisible = false,
   onCloseAwnakInline,
+  approvedVideoShorts = [],
   renderApprovedVideoReelsViewer,
   onRetry,
   onOpenEntry,
@@ -924,20 +924,7 @@ export function DshHomeGetScreen({
       setCategoriesSheetVisible(true);
     });
   }, []);
-
-  React.useEffect(() => {
-    if (sheinInlineVisible) {
-      selectCategoryPage('shein');
-    }
-  }, [selectCategoryPage, sheinInlineVisible]);
-
-  React.useEffect(() => {
-    if (awnakInlineVisible) {
-      selectCategoryPage('awnak');
-    }
-  }, [awnakInlineVisible, selectCategoryPage]);
-
-  return (
+return (
     <View style={styles.screenRoot}>
       {inlineSearchVisible ? (
         <SearchTopBar
@@ -1268,7 +1255,7 @@ export function DshHomeGetScreen({
           <View style={styles.storeListContent}>
             {activeStorePage?.renderMode === 'manual-order' ? (
               <Box gap={3}>
-                {activeStorePage.categoryId === 'shein' ? (
+                {activeStorePage.categoryId === 'shein' && sheinInlineVisible ? (
                   <DshSheinOrderCreateScreen
                     embedded
                     onClose={() => {
@@ -1276,7 +1263,8 @@ export function DshHomeGetScreen({
                       selectCategoryPage('all');
                     }}
                   />
-                ) : activeStorePage.categoryId === 'awnak' ? (
+                ) : null}
+                {activeStorePage.categoryId === 'awnak' && awnakInlineVisible ? (
                   <DshAwnakOrderCreateScreen
                     embedded
                     onClose={() => {
@@ -1285,8 +1273,17 @@ export function DshHomeGetScreen({
                     }}
                   />
                 ) : null}
+                {!sheinInlineVisible && !awnakInlineVisible ? (
+                  <View style={styles.emptyFeed}>
+                    <Text style={styles.emptyFeedEmoji}>🧩</Text>
+                    <Text style={styles.emptyFeedTitle}>هذه الفئة تعرض نموذجًا مدمجًا</Text>
+                    <Text style={styles.emptyFeedText}>افتح شي إن أو عونك مرة أخرى ليظهر النموذج هنا.</Text>
+                  </View>
+                ) : null}
               </Box>
-            ) : activeStorePage?.stores.length ? (
+            ) : null}
+
+            {activeStorePage?.stores.length ? (
               activeStorePage.stores.map((store, index) => {
                 const card: StoreCardPremiumItem = {
                   id: store.id,
