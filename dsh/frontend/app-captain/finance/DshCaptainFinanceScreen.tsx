@@ -29,7 +29,7 @@ function CodBalanceSection({ snapshot = demoSnapshot }: { snapshot?: DshCaptainF
         items={[
           { label: 'المحصّل اليوم', value: snapshot.codBalanceLabel, tone: 'info' },
           { label: 'الإيداع المعلّق', value: snapshot.settlementLabel, tone: 'warning' },
-          { label: 'الفارق', value: '0 SAR', tone: 'success' },
+          { label: 'الفارق', value: '0 ر.س', tone: 'success' },
         ]}
       />
     </Surface>

@@ -37,14 +37,14 @@ const SEEDS: DshFinancePreviewRecord[] = [
     id: 'TXN-001',
     actor: 'client',
     kind: 'client-payment',
-    title: 'Order Payment',
-    subtitle: 'Order #ORD-2026-X1',
-    amountLabel: 'SAR 150.00',
+    title: 'دفع طلب',
+    subtitle: 'طلب رقم #ORD-2026-X1',
+    amountLabel: '150.00 ر.س',
     amountHalalas: 15000,
     tone: 'negative',
-    statusLabel: 'Completed',
+    statusLabel: 'مكتمل',
     statusTone: 'success',
-    timeLabel: 'Today, 10:30 AM',
+    timeLabel: 'اليوم، 10:30 ص',
     sourceOrderId: 'ORD-2026-X1',
   },
   // Partner Settlement
@@ -52,14 +52,14 @@ const SEEDS: DshFinancePreviewRecord[] = [
     id: 'STL-101',
     actor: 'partner',
     kind: 'partner-settlement',
-    title: 'Weekly Settlement',
-    subtitle: 'Cycle #CYC-05-01',
-    amountLabel: 'SAR 4,250.00',
+    title: 'تسوية أسبوعية',
+    subtitle: 'دورة رقم #CYC-05-01',
+    amountLabel: '4,250.00 ر.س',
     amountHalalas: 425000,
     tone: 'positive',
-    statusLabel: 'Transferred',
+    statusLabel: 'تم التحويل',
     statusTone: 'success',
-    timeLabel: 'Yesterday',
+    timeLabel: 'أمس',
     settlementCycleId: 'CYC-05-01',
     sourceStoreId: 'STORE-99',
   },
@@ -68,14 +68,14 @@ const SEEDS: DshFinancePreviewRecord[] = [
     id: 'COD-201',
     actor: 'captain',
     kind: 'cash-on-delivery',
-    title: 'COD Collected',
-    subtitle: 'Order #ORD-2026-X2',
-    amountLabel: 'SAR 210.00',
+    title: 'تحصيل كاش',
+    subtitle: 'طلب رقم #ORD-2026-X2',
+    amountLabel: '210.00 ر.س',
     amountHalalas: 21000,
     tone: 'neutral',
-    statusLabel: 'In Wallet',
+    statusLabel: 'في المحفظة',
     statusTone: 'info',
-    timeLabel: '2 hours ago',
+    timeLabel: 'منذ ساعتين',
     sourceOrderId: 'ORD-2026-X2',
     sourceCaptainId: 'CAP-77',
   },
@@ -84,14 +84,14 @@ const SEEDS: DshFinancePreviewRecord[] = [
     id: 'ERN-202',
     actor: 'captain',
     kind: 'captain-earning',
-    title: 'Delivery Fee',
-    subtitle: 'Order #ORD-2026-X2',
-    amountLabel: 'SAR 15.00',
+    title: 'رسوم توصيل',
+    subtitle: 'طلب رقم #ORD-2026-X2',
+    amountLabel: '15.00 ر.س',
     amountHalalas: 1500,
     tone: 'positive',
-    statusLabel: 'Earned',
+    statusLabel: 'تم الكسب',
     statusTone: 'success',
-    timeLabel: '2 hours ago',
+    timeLabel: 'منذ ساعتين',
     sourceOrderId: 'ORD-2026-X2',
     sourceCaptainId: 'CAP-77',
   },
@@ -100,14 +100,14 @@ const SEEDS: DshFinancePreviewRecord[] = [
     id: 'FLD-301',
     actor: 'field',
     kind: 'field-commission',
-    title: 'Onboarding Commission',
-    subtitle: 'Store #STORE-102',
-    amountLabel: 'SAR 50.00',
+    title: 'عمولة استقطاب',
+    subtitle: 'متجر #STORE-102',
+    amountLabel: '50.00 ر.س',
     amountHalalas: 5000,
     tone: 'positive',
-    statusLabel: 'Verified',
+    statusLabel: 'تم التحقق',
     statusTone: 'success',
-    timeLabel: 'Monday',
+    timeLabel: 'الاثنين',
     sourceStoreId: 'STORE-102',
     sourceFieldAgentId: 'FLD-88',
   },
@@ -116,14 +116,14 @@ const SEEDS: DshFinancePreviewRecord[] = [
     id: 'FLD-302',
     actor: 'field',
     kind: 'field-payout',
-    title: 'Monthly Payout',
-    subtitle: 'April 2026',
-    amountLabel: 'SAR 1,200.00',
+    title: 'صرف شهري',
+    subtitle: 'أبريل 2026',
+    amountLabel: '1,200.00 ر.س',
     amountHalalas: 120000,
     tone: 'negative',
-    statusLabel: 'Paid',
+    statusLabel: 'تم الصرف',
     statusTone: 'success',
-    timeLabel: '1 May 2026',
+    timeLabel: '1 مايو 2026',
     sourceFieldAgentId: 'FLD-88',
   },
 ];
@@ -142,7 +142,7 @@ export function getDshFinanceSummaryForActor(actor: DshFinanceActor) {
 
   return {
     count: records.length,
-    totalLabel: `SAR ${(totalHalalas / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+    totalLabel: `${(totalHalalas / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })} ر.س`,
     totalHalalas,
   };
 }
@@ -151,8 +151,8 @@ export function getDshPartnerSettlementPreview() {
   return {
     records: getDshFinanceRecordsForActor('partner'),
     summary: getDshFinanceSummaryForActor('partner'),
-    nextSettlementLabel: 'SAR 850.25',
-    cycleStatus: 'Active',
+    nextSettlementLabel: '850.25 ر.س',
+    cycleStatus: 'نشطة',
   };
 }
 
@@ -167,18 +167,18 @@ export function getDshCaptainFinancePreview() {
 
   return {
     records,
-    codBalanceLabel: `SAR ${(codBalance / 100).toFixed(2)}`,
-    earningsLabel: `SAR ${(earnings / 100).toFixed(2)}`,
-    settlementLabel: 'SAR 0.00',
-    pendingPayoutLabel: 'SAR 15.00',
-    cycleLabel: 'Current Week',
+    codBalanceLabel: `${(codBalance / 100).toFixed(2)} ر.س`,
+    earningsLabel: `${(earnings / 100).toFixed(2)} ر.س`,
+    settlementLabel: '0.00 ر.س',
+    pendingPayoutLabel: '15.00 ر.س',
+    cycleLabel: 'الأسبوع الحالي',
   };
 }
 
 export function getDshFieldFinancePreview(stores?: string[]) {
   const records = getDshFinanceRecordsForActor('field');
   // If stores provided, filter by sourceStoreId (mock logic)
-  const filteredRecords = stores 
+  const filteredRecords = stores
     ? records.filter(r => !r.sourceStoreId || stores.includes(r.sourceStoreId))
     : records;
 
@@ -188,9 +188,21 @@ export function getDshFieldFinancePreview(stores?: string[]) {
 
   return {
     records: filteredRecords,
-    totalCommissionLabel: `SAR ${(totalCommission / 100).toFixed(2)}`,
+    totalCommissionLabel: `${(totalCommission / 100).toFixed(2)} ر.س`,
     eligibleFilesCount: stores?.length || 12,
-    lastPayoutLabel: 'SAR 1,200.00',
+    lastPayoutLabel: '1,200.00 ر.س',
     lastPayoutDate: '2026-05-01',
   };
+}
+
+export function resolveDshFinanceEventKindForPayment(method: 'cod' | 'wallet' | 'mixed' | 'official-wallets'): DshFinanceEventKind {
+  if (method === 'cod') {
+    return 'cash-on-delivery';
+  }
+
+  if (method === 'wallet' || method === 'mixed' || method === 'official-wallets') {
+    return 'wallet-payment';
+  }
+
+  return 'client-payment';
 }

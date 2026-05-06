@@ -24,6 +24,7 @@ import {
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../components/DshCartDetails';
 import { getDshClientStateMeta, type DshClientState } from '../../shared/dshClientStateModel';
+import { resolveDshFinanceEventKindForPayment, type DshFinanceEventKind } from '../../shared/finance/dshFinancePreviewModel';
 import useWlt from '../../../../../wlt/frontend/app-client/dsh/hooks/useWlt';
 
 const PAGE_BG = colorPalette.pageBackground;
@@ -89,7 +90,7 @@ type CheckoutActionPayload = {
   amountDueOnDeliveryHalalas: number;
   orderTotalHalalas: number;
   summary: string;
-  financeEventKind?: 'client-payment' | 'wallet-payment' | 'cash-on-delivery';
+  financeEventKind: DshFinanceEventKind;
 };
 
 type DshCartUnifiedScreenProps = {
@@ -947,7 +948,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
           orderTotalHalalas: grandTotalHalalas,
           summary: paymentSelection.summary,
-          financeEventKind: paymentSelection.method === 'wallet' ? 'wallet-payment' : 'client-payment',
+          financeEventKind: resolveDshFinanceEventKindForPayment(paymentSelection.method),
         }));
         return;
       } finally {
@@ -961,7 +962,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
       orderTotalHalalas: grandTotalHalalas,
       summary: paymentSelection.summary,
-      financeEventKind: paymentSelection.method === 'cod' ? 'cash-on-delivery' : 'client-payment',
+      financeEventKind: resolveDshFinanceEventKindForPayment(paymentSelection.method),
     }));
   };
 
@@ -982,7 +983,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
       orderTotalHalalas: grandTotalHalalas,
       summary: paymentSelection.summary,
-      financeEventKind: paymentSelection.method === 'cod' ? 'cash-on-delivery' : 'client-payment',
+      financeEventKind: resolveDshFinanceEventKindForPayment(paymentSelection.method),
     };
 
     if (props.onOpenOrder) {
