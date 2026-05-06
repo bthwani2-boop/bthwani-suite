@@ -68,6 +68,7 @@
 - `app-field` هو أوضح سطح من جهة route ownership لأن `FieldSurfaceHost` يستهلك كل شاشاته السبع مباشرة.
 - `app-partner` و `app-captain` يملكان شاشات orphan واضحة يجب عدم حذفها الآن، بل عزلها داخل حزم capability لاحقة.
 - checkout/payment/settlement يظل محكومًا بـ WLT/auth ولا يصلح كبداية closure package أولى.
+- DSH-CLEAN-018 أزال اسمَي export قديمين في app-field وبدّل copy واحدًا يذكر fixtures داخل empty state إلى نص حيّ محايد، من دون تغيير route أو host أو compatibility alias مستخدم.
 
 ## 3. Route / Host Linkage Inventory
 

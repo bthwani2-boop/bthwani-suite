@@ -1345,7 +1345,7 @@ return (
                 <Text style={styles.emptyFeedText}>
                   {inlineSearchQuery.trim()
                     ? 'جرّب تغيير البحث أو انتقل إلى فئة أخرى.'
-                    : 'أضف fixtures لهذه الفئة كي تظهر هنا.'}
+                    : 'أضف متاجر لهذه الفئة كي تظهر هنا.'}
                 </Text>
               </View>
             )}

@@ -121,6 +121,14 @@ Current Decision: PASS_WITH_WARNINGS (Actor Parity Proven in Preview)
 
 UI/UX/Flow remains NOT_CLOSED.
 
+## DSH-CLEAN-018 Dead/Duplicate/Noise Findings
+
+- total duplicate candidates: 2
+- removed: 2 stale field default-alias exports and 1 noisy preview copy block
+- kept: 2 compatibility aliases (`DshCartGetScreen`, `DshInventoryManagementScreen`)
+- remaining retire-later: 0 in this cleanup slice
+- final decision: PASS_WITH_WARNINGS
+
 ## DSH-DATA-017 Preview Data Authority Findings
 
 - **Verdict**: PASS_WITH_WARNINGS
