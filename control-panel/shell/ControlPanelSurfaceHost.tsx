@@ -978,30 +978,7 @@ export function ControlPanelSurfaceHost({
           </>
         ) : null}
 
-        {!phaseOneBlueprint && activeSectionId !== 'partners' && activeSectionId !== 'marketing' && !isCommunityServicesSection && !isOperationsSection ? (
-          <WebSectionCard title={shellCopy.title} description={shellCopy.description}>
-            <div className={styles.actionGrid}>
-              <WebControlActionCard
-                id="fallback-dashboard"
-                title="العودة للنظرة العامة"
-                description="هذا القسم خارج نطاق Phase 1، لذلك تبقى العودة للغرفة الأساسية هي المسار الأول."
-                footerLabel="فتح القسم"
-                href="/dashboard"
-                badge="Phase 1"
-                tone="primary"
-                onAction={() => router.push('/dashboard')}
-              />
-              <WebControlActionCard
-                id="fallback-operations"
-                title="الانتقال للعمليات"
-                description="افتح أقرب مسار تنفيذي حي بدل توسيع هذه الصفحة في هذه المرحلة."
-                footerLabel="فتح القسم"
-                href="/operations"
-                onAction={() => router.push('/operations')}
-              />
-            </div>
-          </WebSectionCard>
-        ) : null}
+
       </div>
     </WebCommandCenterFrame>
     </div>
