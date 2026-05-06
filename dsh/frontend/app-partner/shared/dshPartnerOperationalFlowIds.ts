@@ -28,10 +28,4 @@ export const DSH_PARTNER_OPERATIONAL_FLOW_IDS = [
   'partner-commission-summary',
 ] as const;
 
-// Deprecated/backlog only. Not part of active app-partner UI.
-export const DSH_PARTNER_DEPRECATED_OPERATIONAL_FLOW_IDS = [
-  'auction-status-update',
-] as const;
-
 export type DshPartnerOperationalFlowId = (typeof DSH_PARTNER_OPERATIONAL_FLOW_IDS)[number];
-export type DshPartnerDeprecatedOperationalFlowId = (typeof DSH_PARTNER_DEPRECATED_OPERATIONAL_FLOW_IDS)[number];

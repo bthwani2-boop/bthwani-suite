@@ -129,6 +129,32 @@ UI/UX/Flow remains NOT_CLOSED.
 - remaining retire-later: 0 in this cleanup slice
 - final decision: PASS_WITH_WARNINGS
 
+## DSH-CLEAN-019 Full Noise/Duplicate Enforcement Findings
+
+- total candidates scanned: 1 stale export family plus the current DSH frontend inventory scan
+- removed dead files: 0
+- removed exports/imports: 1 export family removed, 0 imports removed
+- visible noise removed: 0 new visible blocks in this slice
+- duplicate variants resolved: 0
+- compatibility aliases preserved: 2
+- remaining retire-later: 2
+- final decision: PASS_WITH_WARNINGS
+
+## DSH-ARCHIVE-020 Active Frontend Archive Separation
+
+- scanned files: 231 files under `dsh/frontend`
+- archived files: 1
+- removed stale exports/imports: 0
+- removed visible noise blocks: 12 confirmed user-facing `[TBD]` or trial-language strings/labels in active flows
+- kept active screens: `DshHomeGetScreen`, `DshStoreGetScreen`, `ControlPanelDshPartnerApprovalsScreen`, `DshFieldStoreOnboardingScreen`
+- remaining fix-required: 3 (`DshPartnerOperationsDirectoryScreen`, `DshCaptainOperationsScreen`, `DshGasRefillOrderCreateScreen`)
+- final decision: PASS_WITH_WARNINGS
+
+Notes:
+- archived file: `dsh/frontend/app-captain/DshSurfaceHost.tsx` -> `dsh/_archive/frontend/DSH_ARCHIVE_020_ACTIVE_FRONTEND_CLEANUP-20260506-225900/app-captain/DshSurfaceHost.tsx`
+- visible-noise cleanup stayed inside active files only: `dsh/frontend/control-panel/partners/workflow.ts` and `dsh/frontend/app-field/stores/dshFieldStoresModel.ts`
+- no active route screen, compat alias, or legacy fixture was moved in this slice
+
 ## DSH-DATA-017 Preview Data Authority Findings
 
 - **Verdict**: PASS_WITH_WARNINGS

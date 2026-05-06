@@ -248,11 +248,11 @@ export function getFieldRequiredMissingItems(draft: FieldOnboardingDraft) {
   if (!draft.basics.ownerPhone.trim()) missing.push('جوال المالك');
   if (!draft.location.city.trim()) missing.push('المدينة');
   if (!draft.location.zone.trim()) missing.push('النطاق');
-  if (!draft.location.latitude.trim() || !draft.location.longitude.trim() || !draft.location.landmark.trim()) missing.push('الإحداثية GPS [TBD]');
-  if (!draft.photos.storefrontPhotoRef.trim()) missing.push('صورة الواجهة [TBD]');
-  if (!draft.products.featuredProductName.trim()) missing.push('منتج افتتاحي واحد [TBD]');
-  if (!draft.offer.preliminaryOffer.trim()) missing.push('العرض أو الاتفاق المبدئي [TBD]');
-  if (!draft.offer.operatingHours.trim()) missing.push('ساعات العمل [TBD]');
+  if (!draft.location.latitude.trim() || !draft.location.longitude.trim() || !draft.location.landmark.trim()) missing.push('الإحداثية GPS');
+  if (!draft.photos.storefrontPhotoRef.trim()) missing.push('صورة الواجهة');
+  if (!draft.products.featuredProductName.trim()) missing.push('منتج افتتاحي واحد');
+  if (!draft.offer.preliminaryOffer.trim()) missing.push('العرض أو الاتفاق المبدئي');
+  if (!draft.offer.operatingHours.trim()) missing.push('ساعات العمل');
 
   return missing;
 }
@@ -336,7 +336,7 @@ export function resolveFieldStoreLifecycleLabel(store: FieldStoreFile) {
   const status = resolveFieldStoreStatus(store);
 
   if (status === 'offer-approved') {
-    return 'منتهٍ للميداني [TBD]';
+    return 'منتهٍ للميداني';
   }
 
   if (status === 'submitted') {
@@ -634,7 +634,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       location: 'الملقا',
       nextVisitLabel: 'غدًا 1:00 م',
       financeLabel: 'راجع الملاحظات',
-      reviewFeedback: 'معاد للتعديل [TBD]: تحديث صورة الواجهة وتأكيد ساعات العمل.',
+      reviewFeedback: 'معاد للتعديل: تحديث صورة الواجهة وتأكيد ساعات العمل.',
       lifecycleNote: 'عاد الملف للمراجعة الميدانية قبل إعادة الإرسال.',
       draft: createEmptyDraft({
         activeSectionId: 'photos',
@@ -676,7 +676,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
         },
         review: {
           fieldNotes: 'تحتاج مراجعة نهائية قبل إعادة الإرسال.',
-          partnerReviewNote: 'معاد للتعديل [TBD]',
+          partnerReviewNote: 'معاد للتعديل',
         },
         lastSavedLabel: 'اليوم 1:20 م',
       }),
@@ -721,7 +721,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
           sampleCatalogNote: 'المنتج الأول موثق بالكامل.',
         },
         offer: {
-          preliminaryOffer: 'بداية تجريبية بعمولة خفيفة',
+          preliminaryOffer: 'بداية بعمولة خفيفة',
           operatingHours: '6 ص - 11 م',
           deliveryReadiness: 'جاهز للتوصيل الخفيف',
           financeNote: 'مستحقات افتتاحية خفيفة.',
@@ -795,7 +795,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       nextVisitLabel: 'مكتمل',
       financeLabel: '420 ر.س',
       lockedStatus: 'offer-approved',
-      stageLabelOverride: 'منتهٍ للميداني [TBD]',
+      stageLabelOverride: 'منتهٍ للميداني',
       lifecycleNote: 'اعتمد الملف داخل الشركاء وينتظر المراجعة التسويقية النهائية قبل الظهور للعملاء.',
       draft: createEmptyDraft({
         activeSectionId: 'review',

@@ -70,7 +70,7 @@ export const dshPartnerIntakeItems: ReadonlyArray<DshPartnerIntakeItem> = [
     ownerLabel: 'الميداني',
     fieldStatusLabel: 'Offer Pending Approval',
     note: 'المتجر يحتاج اعتماد أو رفض أو تعديل العرض قبل المتابعة.',
-    nextStep: 'التعديل التفصيلي للعرض [TBD] إن لم توجد أداة تحرير مستقلة.',
+    nextStep: 'التعديل التفصيلي للعرض عند الحاجة قبل المتابعة.',
     submittedAt: 'اليوم 10:05',
   },
   {
@@ -82,7 +82,7 @@ export const dshPartnerIntakeItems: ReadonlyArray<DshPartnerIntakeItem> = [
     ownerLabel: 'الميداني',
     fieldStatusLabel: 'Partner Review',
     note: 'المندوب أرسل الطلب بعد فتح نموذج الإضافة، والملف الآن داخل مراجعة الشركاء.',
-    nextStep: 'بعد الموافقة يُولد كود الشريك [TBD] ثم ينتقل للتسويق [TBD].',
+    nextStep: 'بعد الموافقة يُجهز كود الشريك ثم ينتقل الطلب للمراجعة التسويقية.',
     submittedAt: 'اليوم 11:20',
   },
   {
@@ -94,7 +94,7 @@ export const dshPartnerIntakeItems: ReadonlyArray<DshPartnerIntakeItem> = [
     ownerLabel: 'الشركاء',
     fieldStatusLabel: 'Offer Approved',
     note: 'تم اعتماد الشركاء واكتملت جاهزية الإضافة، والطلب ينتظر التسويق النهائي.',
-    nextStep: 'المراجعة التسويقية النهائية [TBD] قبل الإطلاق.',
+    nextStep: 'المراجعة التسويقية النهائية قبل الإطلاق.',
     submittedAt: 'اليوم 12:15',
     canonicalStoreId: 'canonical-store-field-lead-5',
     canonicalProductId: 'canonical-product-field-lead-5-featured',
