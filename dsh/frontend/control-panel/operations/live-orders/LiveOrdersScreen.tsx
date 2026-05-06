@@ -5,7 +5,11 @@ import { OperationsSuggestionCard } from '../operations.ui';
 import { LIVE_ORDERS_OPERATIONAL_PREVIEW } from '../operations.preview-data';
 import styles from '../dsh-surface.module.css';
 
-export type LiveOrdersScreenProps = { hubHref: string; };
+export type LiveOrdersScreenProps = {
+  state?: 'ready' | 'loading' | 'error' | 'empty';
+  hubHref: string;
+  onRetry?: () => void;
+};
 
 const STATUS_CLASS_NAMES: Record<string, string> = {
   warning: styles.liveOrdersStatusWarning,
@@ -14,8 +18,31 @@ const STATUS_CLASS_NAMES: Record<string, string> = {
   brand: styles.liveOrdersStatusBrand,
 };
 
-export function LiveOrdersScreen({ hubHref }: LiveOrdersScreenProps) {
+export function LiveOrdersScreen({ state = 'ready', hubHref, onRetry }: LiveOrdersScreenProps) {
   const preview = LIVE_ORDERS_OPERATIONAL_PREVIEW;
+
+  if (state === 'loading') {
+    return (
+      <div className={styles.liveOrdersScreen} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2 style={{ color: '#0A2F5C' }}>جارٍ تحميل العمليات الحية...</h2>
+          <p style={{ color: '#64748B' }}>نحدث خريطة الطلبات والمسارات الآن.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (state === 'error') {
+    return (
+      <div className={styles.liveOrdersScreen} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+        <div style={{ textAlign: 'center', border: '1px solid rgba(220,38,38,0.2)', padding: '32px', borderRadius: '12px', background: '#FFF1F2' }}>
+          <h2 style={{ color: '#991B1B' }}>خلل في رصد العمليات</h2>
+          <p style={{ color: '#991B1B', marginBottom: '16px' }}>تعذر الاتصال بخادم العمليات المباشرة.</p>
+          <button onClick={onRetry} style={{ padding: '8px 24px', background: '#DC2626', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}>إعادة المحاولة</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.liveOrdersScreen}>

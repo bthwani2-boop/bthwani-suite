@@ -7,10 +7,28 @@ import { dshPartnerIntakeItems, dshPartnerIntakeMetrics } from './workflow';
 import styles from '../operations/dsh-surface.module.css';
 
 export type PartnerIntakeLaneProps = {
+  state?: 'ready' | 'loading' | 'error';
   hubHref: string;
+  onRetry?: () => void;
 };
 
-export function PartnerIntakeLane({ hubHref }: PartnerIntakeLaneProps) {
+export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry }: PartnerIntakeLaneProps) {
+  if (state === 'loading') {
+    return (
+      <div style={{ padding: '40px', textAlign: 'center', color: '#0A2F5C' }}>
+        <h3>جارٍ تحميل طلبات الميدان...</h3>
+      </div>
+    );
+  }
+
+  if (state === 'error') {
+    return (
+      <div style={{ padding: '40px', textAlign: 'center', color: '#DC2626', background: '#FEF2F2', borderRadius: '12px' }}>
+        <h3>تعذر تحميل طلبات الشركاء</h3>
+        <button onClick={onRetry} style={{ marginTop: '12px', padding: '6px 16px', background: '#DC2626', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>إعادة المحاولة</button>
+      </div>
+    );
+  }
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', direction: 'rtl', height: '100%', minWidth: 0 }}>
       

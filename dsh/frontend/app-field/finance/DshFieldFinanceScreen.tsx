@@ -1,14 +1,31 @@
 import React from 'react';
-import { Box, Icon, ListItem, MobileScrollView, Surface, Text, TopBar } from '@bthwani/ui-kit';
+import { Box, Icon, ListItem, MobileScrollView, StateView, Surface, Text, TopBar } from '@bthwani/ui-kit';
 import { getDshFieldFinancePreview } from '../../shared/finance/dshFinancePreviewModel';
 import { resolveFieldStoreStatus, type FieldStoreFile } from '../stores/dshFieldStoresModel';
 
 type DshFieldFinanceScreenProps = {
+  state?: 'ready' | 'loading' | 'error' | 'offline';
   stores: readonly FieldStoreFile[];
   onBack: () => void;
+  onRetry?: () => void;
 };
 
-export function DshFieldFinanceScreen({ stores, onBack }: DshFieldFinanceScreenProps) {
+export function DshFieldFinanceScreen({ state = 'ready', stores, onBack, onRetry }: DshFieldFinanceScreenProps) {
+  if (state === 'loading') {
+    return <StateView stateId="loading" title="جارٍ تحميل البيانات المالية" description="نحسب المستحقات والعمولات للملفات المعتمدة." />;
+  }
+
+  if (state === 'error' || state === 'offline') {
+    return (
+      <StateView
+        stateId={state === 'offline' ? 'offline' : 'recoverableError'}
+        title="تعذر الوصول للبيانات المالية"
+        description="تحقق من الاتصال بالخادم لمراجعة المستحقات الميدانية."
+        actionLabel="إعادة المحاولة"
+        onActionPress={onRetry}
+      />
+    );
+  }
   const eligibleStores = stores.filter((store) => resolveFieldStoreStatus(store) === 'offer-approved');
   const preview = getDshFieldFinancePreview(eligibleStores.map(s => s.id));
 

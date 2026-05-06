@@ -1,19 +1,37 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
-import { Badge, Box, Button, Card, Icon, MobileScrollView, ScreenHeader, SearchField, Text, TopBar } from '@bthwani/ui-kit';
+import { Badge, Box, Button, Card, Icon, MobileScrollView, ScreenHeader, SearchField, StateView, Text, TopBar } from '@bthwani/ui-kit';
 import { FieldStoreCard } from './FieldStoreCard';
 import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from './dshFieldStoresModel';
 
 type DshFieldStoresScreenProps = {
+  state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline';
   stores: readonly FieldStoreFile[];
   onOpenStore: (storeId: string) => void;
   onOpenAccount: () => void;
   onCreateStore: () => void;
+  onRetry?: () => void;
 };
 
-export function DshFieldStoresScreen({ stores, onOpenStore, onOpenAccount, onCreateStore }: DshFieldStoresScreenProps) {
+export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onOpenAccount, onCreateStore, onRetry }: DshFieldStoresScreenProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [activeFilter, setActiveFilter] = React.useState<FieldLeadFilter>('today');
+
+  if (state === 'loading') {
+    return <StateView stateId="loading" title="جارٍ تحميل ملفات الميدان" description="نقوم بمزامنة أحدث بيانات المتجر والمواقع الآن." />;
+  }
+
+  if (state === 'error' || state === 'offline') {
+    return (
+      <StateView
+        stateId={state === 'offline' ? 'offline' : 'recoverableError'}
+        title={state === 'offline' ? 'الاتصال مقطوع' : 'تعذر تحميل القائمة'}
+        description="تأكد من الاتصال بالشبكة ثم حاول التحديث مرة أخرى."
+        actionLabel="إعادة المحاولة"
+        onActionPress={onRetry}
+      />
+    );
+  }
 
   const counts = React.useMemo(() => resolveFieldFilterCounts(stores), [stores]);
 

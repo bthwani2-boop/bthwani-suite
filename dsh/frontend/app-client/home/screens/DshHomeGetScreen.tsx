@@ -67,7 +67,7 @@ export type DshHomeGetScreenProps = {
   onOpenDiscovery?: () => void;
   onOpenStoreCategory?: (storeId: string, categoryId: string) => void;
   onOpenProduct?: (storeId: string, itemId: string) => void;
-  onOpenBenefits?: () => void;
+  onOpenBenefits?: (screenId?: string) => void;
   onOpenFavorites?: () => void;
   onOpenSearch?: () => void;
   onOpenOrders?: () => void;
@@ -736,7 +736,7 @@ export function DshHomeGetScreen({
 
       if (promo.actionType === 'subscription') {
         if (onOpenBenefits) {
-          onOpenBenefits();
+          onOpenBenefits(promo.actionTarget);
           return;
         }
 
@@ -831,7 +831,7 @@ export function DshHomeGetScreen({
       }
 
       if (item.routeTarget === 'subscription' || item.routeTarget === 'subscription-family-get' || item.routeTarget === 'entitlements-get') {
-        onOpenBenefits?.();
+        onOpenBenefits?.(item.routeTarget);
         return;
       }
 

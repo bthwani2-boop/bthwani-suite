@@ -1004,8 +1004,8 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
         setSelectedItemId(itemId);
         setRoute('cart-get');
       }}
-      onOpenBenefits={() => {
-        setSelectedOperationScreen('entitlements-get');
+      onOpenBenefits={(screenId) => {
+        setSelectedOperationScreen(screenId ?? 'entitlements-get');
         setRoute('benefits');
       }}
       onOpenFavorites={() => setRoute('favorites-list')}
