@@ -313,29 +313,20 @@ const initialOrders: HostOrderSummary[] = [
 const defaultTrackingOrderId = initialOrders[0]?.id ?? 'dsh-10021';
 
 function commandTargetToRoute(target: DshCommandTarget): DshRoute {
-  if (target === 'cart-get') {
-    return 'cart-get';
+  switch (target) {
+    case 'cart-get':
+      return 'cart-get';
+    case 'orders-list':
+      return 'orders-list';
+    case 'tracking':
+      return 'tracking';
+    case 'bell':
+      return 'bell';
+    case 'create-order':
+      return 'cart-get';
+    default:
+      return 'orders-list';
   }
-
-
-
-  if (target === 'orders-list') {
-    return 'orders-list';
-  }
-
-  if (target === 'tracking') {
-    return 'tracking';
-  }
-
-  if (target === 'bell') {
-    return 'bell';
-  }
-
-  if (target === 'create-order') {
-    return 'cart-get';
-  }
-
-  return 'home';
 }
 
 export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedVideoReelsViewer }: DshSurfaceHostProps) {
@@ -343,7 +334,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
   const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
   const [cartItems, setCartItems] = React.useState<HostCartItem[]>([]);
-  const [createOrderValues, setCreateOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
+  const [createOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
   const [trackingClientState, setTrackingClientState] = React.useState<DshClientState>(hostClientStates.trackingActive);
   const [ordersQuery, setOrdersQuery] = React.useState('');
   const [storesQuery, setStoresQuery] = React.useState('');

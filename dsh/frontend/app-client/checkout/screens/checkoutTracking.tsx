@@ -115,7 +115,7 @@ export type DshTrackingScreenProps = {
   onReorder?: () => void;
 };
 
-export type DshFlowHubScreenProps = {
+type DshFlowHubScreenProps = {
   screenId?: string;
   state?: DshOperationScreenState;
   onPrimaryAction?: () => void;

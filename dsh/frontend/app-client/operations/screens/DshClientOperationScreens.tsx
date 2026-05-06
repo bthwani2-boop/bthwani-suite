@@ -606,20 +606,16 @@ function OperationScreenView({
       <DshOperationScreen
         state={state}
         title="هذه القدرة مدمجة"
-        subtitle="تظهر ضمن شاشة تأكيد الطلب أو التتبع وليست صفحة مستقلة."
+        subtitle="لا توجد صفحة عميل مستقلة هنا."
         content={(
           <Surface tone="inset" gap={2}>
             <Text role="bodyStrong">{definition.title}</Text>
             <Text role="bodySm" tone="muted">
               {definition.consolidationNote}
             </Text>
-            <KeyValueList
-              items={[
-                { label: 'الوجهة القانونية', value: definition.canonicalDestination, tone: 'brand' },
-                { label: 'المجموعة', value: definition.group },
-                { label: 'المخرج المقصود', value: definition.primaryOutcome },
-              ]}
-            />
+            <Text role="bodySm" tone="muted">
+              الوجهة القانونية: {definition.canonicalDestination}
+            </Text>
           </Surface>
         )}
         primaryActionLabel={primaryLabelByCanonicalDestination(definition.canonicalDestination)}
