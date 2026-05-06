@@ -12,6 +12,8 @@ export type DshPartnerIntakeItem = {
   note: string;
   nextStep: string;
   submittedAt: string;
+  canonicalStoreId?: string;
+  canonicalProductId?: string;
 };
 
 export type DshPartnerIntakeMetric = {
@@ -90,6 +92,8 @@ export const dshPartnerIntakeItems: ReadonlyArray<DshPartnerIntakeItem> = [
     note: 'تم اعتماد الشركاء واكتملت جاهزية الإضافة، والطلب ينتظر التسويق النهائي.',
     nextStep: 'المراجعة التسويقية النهائية [TBD] قبل الإطلاق.',
     submittedAt: 'اليوم 12:15',
+    canonicalStoreId: 'canonical-store-field-lead-5',
+    canonicalProductId: 'canonical-product-field-lead-5-featured',
   },
 ];
 

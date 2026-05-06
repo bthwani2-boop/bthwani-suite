@@ -200,6 +200,14 @@ function QueueCard({
         {item.note}
       </Text>
 
+      {item.canonicalStoreId || item.canonicalProductId ? (
+        <Text role="caption" tone="soft">
+          {item.canonicalStoreId ? `canonicalStoreId: ${item.canonicalStoreId}` : ''}
+          {item.canonicalStoreId && item.canonicalProductId ? ' · ' : ''}
+          {item.canonicalProductId ? `canonicalProductId: ${item.canonicalProductId}` : ''}
+        </Text>
+      ) : null}
+
       <Text role="bodySm">{item.nextStep}</Text>
 
       <Box>

@@ -23,6 +23,10 @@ export type StoreProfileWorkspaceContentProps = {
   activeZoneLabel: string;
   storeOpen: boolean;
   listingEnabled: boolean;
+  canonicalStoreId?: string;
+  sourceRecordId?: string;
+  deliveryReadinessLabel?: string;
+  coverageSummary?: string;
   onOpenStoreScope?: () => void;
 };
 
@@ -100,6 +104,10 @@ export function StoreProfileWorkspaceContent({
   activeZoneLabel,
   storeOpen,
   listingEnabled,
+  canonicalStoreId,
+  sourceRecordId,
+  deliveryReadinessLabel,
+  coverageSummary,
   onOpenStoreScope,
 }: StoreProfileWorkspaceContentProps) {
   const { direction } = useDirection();
@@ -145,6 +153,10 @@ export function StoreProfileWorkspaceContent({
             { label: 'المدير', value: managerLabel },
             { label: 'ساعات اليوم', value: todayHoursLabel },
             { label: 'منطقة التغطية', value: activeZoneLabel },
+            ...(coverageSummary ? [{ label: 'ملخص التغطية', value: coverageSummary }] : []),
+            ...(deliveryReadinessLabel ? [{ label: 'جاهزية التوصيل', value: deliveryReadinessLabel }] : []),
+            ...(sourceRecordId ? [{ label: 'مرجع المصدر', value: sourceRecordId }] : []),
+            ...(canonicalStoreId ? [{ label: 'مرجع الكانوني', value: canonicalStoreId }] : []),
             { label: 'حالة المتجر', value: storeStateLabel, tone: storeOpen ? 'success' : 'warning' },
             { label: 'الظهور في القائمة', value: visibilityLabel, tone: listingEnabled ? 'success' : 'warning' },
           ]}

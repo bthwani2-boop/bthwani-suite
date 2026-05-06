@@ -1,3 +1,4 @@
+import { buildCanonicalPreviewStoreItemsByStoreId } from '../../../shared/catalog/dshStoreProductCardModel';
 import { DshStoreFixtureItem, StoreItemsByStoreId } from './types';
 
 export const storeItemsByStoreId: StoreItemsByStoreId = {
@@ -244,6 +245,8 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       imageUri: 'dsh.product.chicken.v1',
     },
   ],
+
+  ...buildCanonicalPreviewStoreItemsByStoreId(),
 };
 
 

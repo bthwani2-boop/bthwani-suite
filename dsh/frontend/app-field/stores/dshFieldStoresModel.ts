@@ -1,3 +1,5 @@
+import { type DshCanonicalStoreCard } from '../../shared/catalog/dshStoreProductCardModel';
+
 export type FieldStatusTone = 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
 export type FieldLeadSource = 'candidate' | 'manual';
@@ -404,6 +406,64 @@ export function submitFieldStoreForReview(store: FieldStoreFile): FieldStoreFile
       submittedAt: new Date().toISOString(),
     },
   });
+}
+
+export function mapFieldStoreToCanonicalStoreCard(store: FieldStoreFile): DshCanonicalStoreCard {
+  const storeName = store.draft.basics.storeName.trim() || store.name;
+  const categoryLabel = store.draft.classification.mainCategory.trim() || store.category;
+  const subcategoryLabel = store.draft.classification.subCategory.trim() || undefined;
+  const branchLabel = `${store.draft.location.zone.trim() || store.location} • ${store.draft.location.city.trim() || 'الرياض'}`;
+  const locationLabel = store.draft.location.addressLine.trim() || store.location;
+  const operatingHoursLabel = store.draft.offer.operatingHours.trim() || 'غير محدد';
+  const deliveryReadinessLabel = store.draft.offer.deliveryReadiness.trim() || 'غير محدد';
+  const coverageSummary = store.draft.location.coverageSummary.trim() || store.location;
+  const photoRef = store.draft.photos.storefrontPhotoRef.trim() || undefined;
+  const featuredProductName = store.draft.products.featuredProductName.trim();
+  const featuredProductPrice = store.draft.products.featuredProductPrice.trim();
+  const reviewState = resolveFieldStoreStatus(store);
+
+  return {
+    id: `canonical-store-field-${store.id}`,
+    sourceRecordId: store.id,
+    source: 'app-field',
+    publishStage: reviewState === 'offer-approved' ? 'published' : reviewState === 'submitted' ? 'review' : 'draft',
+    storeName,
+    branchLabel,
+    cityLabel: store.draft.location.city.trim() || 'الرياض',
+    categoryLabel,
+    subcategoryLabel,
+    addressLabel: locationLabel,
+    zoneLabel: store.draft.location.zone.trim() || store.location,
+    ownerName: store.draft.basics.ownerName.trim() || undefined,
+    ownerPhone: store.draft.basics.ownerPhone.trim() || undefined,
+    managerName: store.draft.basics.managerName.trim() || undefined,
+    operatingHoursLabel,
+    deliveryReadinessLabel,
+    coverageSummary,
+    latitude: store.draft.location.latitude.trim() || undefined,
+    longitude: store.draft.location.longitude.trim() || undefined,
+    landmark: store.draft.location.landmark.trim() || undefined,
+    storefrontPhotoRef: photoRef,
+    mediaKey: photoRef ? `${photoRef}.media` : undefined,
+    imageUri: photoRef ? `${photoRef}.media` : undefined,
+    statusLabel: resolveFieldStoreStatusLabel(store),
+    statusTone: resolveFieldStoreStatusTone(store),
+    rating: reviewState === 'offer-approved' ? 4.9 : 4.6,
+    distanceLabel: coverageSummary,
+    etaLabel: operatingHoursLabel,
+    deliveryLabel: deliveryReadinessLabel,
+    serviceLabel: store.draft.offer.preliminaryOffer.trim() ? 'توصيل برو' : 'توصيل',
+    deliveryFeeLabel: featuredProductPrice ? `السعر الافتتاحي ${featuredProductPrice} ر.س` : undefined,
+    priceMatchLabel: featuredProductName ? `المنتج الافتتاحي ${featuredProductName}` : undefined,
+    offerLabel: store.draft.offer.preliminaryOffer.trim() || undefined,
+    followerCount: 4200,
+    supportsPickup: true,
+    supportsPartnerDelivery: true,
+    hasBthwaniPro: true,
+    hasNewProducts: Boolean(featuredProductName),
+    hasCouponAvailable: Boolean(store.draft.offer.preliminaryOffer.trim()),
+    canonicalProductId: featuredProductName ? `canonical-product-field-${store.id}-featured` : undefined,
+  };
 }
 
 function createSeedStore(overrides: Partial<FieldStoreFile>): FieldStoreFile {

@@ -1,3 +1,8 @@
+Date: 2026-05-06
+Scope: DSH-CAP-008 store/product card canonical linkage completion
+Decision: PASS_WITH_WARNINGS
+Remaining Risks: visual deferred; runtime/API/backend not implemented; canonical chain is preview/local only
+
 # DSH Closure Decision Log
 
 Status: ACTIVE_CLOSURE_CONTROL

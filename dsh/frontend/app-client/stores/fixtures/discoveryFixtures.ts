@@ -1,3 +1,4 @@
+import { buildCanonicalPreviewDiscoveryStores } from '../../../shared/catalog/dshStoreProductCardModel';
 import { DshDiscoveryStore } from './types';
 
 export const dshDiscoveryStores: DshDiscoveryStore[] = [
@@ -84,6 +85,7 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
     supportsPickup: true,
     supportsPartnerDelivery: true,
   },
+  ...buildCanonicalPreviewDiscoveryStores(),
 ];
 
 

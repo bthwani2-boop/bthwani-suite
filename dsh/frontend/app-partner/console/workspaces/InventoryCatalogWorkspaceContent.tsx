@@ -30,6 +30,11 @@ type InventoryProduct = {
   lowStock: boolean;
   stockCount: number;
   priceLabel: string;
+  sourceRecordId?: string;
+  canonicalStoreId?: string;
+  canonicalProductId?: string;
+  publishStage?: string;
+  source?: string;
 };
 
 export type InventoryCatalogWorkspaceContentProps = {
@@ -141,6 +146,26 @@ const initialProducts: readonly InventoryProduct[] = [
     lowStock: false,
     stockCount: 0,
     priceLabel: '14.75 ر.س',
+  },
+  {
+    id: 'canonical-product-field-lead-5-featured',
+    name: 'علبة تمر فاخر',
+    sku: 'LEAD5-DATES-BOX',
+    gtin: '6280001055001',
+    barcode: '6280001055001',
+    manufacturerCode: 'FIELD-LEAD5-01',
+    categoryLabel: 'عسل وتمور',
+    catalogLinked: true,
+    reviewNeeded: false,
+    available: true,
+    lowStock: false,
+    stockCount: 12,
+    priceLabel: '55 ر.س',
+    sourceRecordId: 'lead-5',
+    canonicalStoreId: 'canonical-store-field-lead-5',
+    canonicalProductId: 'canonical-product-field-lead-5-featured',
+    publishStage: 'review',
+    source: 'app-field',
   },
 ];
 
@@ -411,6 +436,11 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
             { label: 'SKU', value: selectedProduct.sku },
             { label: 'GTIN', value: selectedProduct.gtin },
             { label: 'الباركود', value: selectedProduct.barcode },
+            ...(selectedProduct.sourceRecordId ? [{ label: 'مرجع المصدر', value: selectedProduct.sourceRecordId }] : []),
+            ...(selectedProduct.canonicalStoreId ? [{ label: 'مرجع المتجر الكانوني', value: selectedProduct.canonicalStoreId }] : []),
+            ...(selectedProduct.canonicalProductId ? [{ label: 'مرجع المنتج الكانوني', value: selectedProduct.canonicalProductId }] : []),
+            ...(selectedProduct.publishStage ? [{ label: 'مرحلة النشر', value: selectedProduct.publishStage }] : []),
+            ...(selectedProduct.source ? [{ label: 'المصدر', value: selectedProduct.source }] : []),
             { label: 'الربط المركزي', value: selectedProduct.catalogLinked ? 'مرتبط' : 'يحتاج مطابقة', tone: selectedProduct.catalogLinked ? 'success' : 'warning' },
           ]}
         />

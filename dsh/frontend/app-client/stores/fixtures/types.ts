@@ -25,6 +25,11 @@ export type DshDiscoveryStore = {
   hasCouponAvailable: boolean;
   supportsPickup: boolean;
   supportsPartnerDelivery: boolean;
+  sourceRecordId?: string;
+  canonicalStoreId?: string;
+  canonicalProductId?: string;
+  publishStage?: string;
+  source?: string;
 };
 
 export type MeasurementOption = {
@@ -58,6 +63,11 @@ export type DshStoreFixtureItem = {
   preparationTime?: string;
   mediaKey?: string;
   imageUri?: string;
+  sourceRecordId?: string;
+  canonicalStoreId?: string;
+  canonicalProductId?: string;
+  publishStage?: string;
+  source?: string;
 };
 
 export type StoreItemsByStoreId = Record<string, DshStoreFixtureItem[]>;
