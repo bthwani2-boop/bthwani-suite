@@ -1,4 +1,5 @@
 import React from 'react';
+import { getCanonicalPreviewProductCard, type DshCanonicalProductCard } from '../../../shared/catalog/dshStoreProductCardModel';
 import {
   Box,
   Button,
@@ -55,6 +56,34 @@ type CatalogProductRowProps = {
   selected: boolean;
   onEdit: () => void;
 };
+
+function mapCanonicalPreviewProductToInventoryProduct(product: DshCanonicalProductCard): InventoryProduct {
+  return {
+    id: product.id,
+    name: product.name,
+    sku: product.sku ?? `CANONICAL-${product.sourceRecordId.toUpperCase()}`,
+    gtin: product.gtin ?? product.id,
+    barcode: product.barcode ?? product.gtin ?? product.id,
+    manufacturerCode: product.manufacturerCode ?? `FIELD-${product.sourceRecordId.toUpperCase()}`,
+    categoryLabel: product.categoryLabel,
+    catalogLinked: true,
+    reviewNeeded: product.publishStage !== 'published-preview',
+    available: product.isAvailable,
+    lowStock: typeof product.stockCount === 'number' ? product.stockCount <= 3 : false,
+    stockCount: product.stockCount ?? 0,
+    priceLabel: product.priceLabel,
+    sourceRecordId: product.sourceRecordId,
+    canonicalStoreId: product.canonicalStoreId,
+    canonicalProductId: product.canonicalProductId,
+    publishStage: product.publishStage,
+    source: product.source,
+  };
+}
+
+const canonicalPreviewInventoryProducts: readonly InventoryProduct[] = (() => {
+  const canonicalProduct = getCanonicalPreviewProductCard('canonical-product-field-lead-5-featured');
+  return canonicalProduct ? [mapCanonicalPreviewProductToInventoryProduct(canonicalProduct)] : [];
+})();
 
 const initialProducts: readonly InventoryProduct[] = [
   {
@@ -147,26 +176,7 @@ const initialProducts: readonly InventoryProduct[] = [
     stockCount: 0,
     priceLabel: '14.75 ر.س',
   },
-  {
-    id: 'canonical-product-field-lead-5-featured',
-    name: 'علبة تمر فاخر',
-    sku: 'LEAD5-DATES-BOX',
-    gtin: '6280001055001',
-    barcode: '6280001055001',
-    manufacturerCode: 'FIELD-LEAD5-01',
-    categoryLabel: 'عسل وتمور',
-    catalogLinked: true,
-    reviewNeeded: false,
-    available: true,
-    lowStock: false,
-    stockCount: 12,
-    priceLabel: '55 ر.س',
-    sourceRecordId: 'lead-5',
-    canonicalStoreId: 'canonical-store-field-lead-5',
-    canonicalProductId: 'canonical-product-field-lead-5-featured',
-    publishStage: 'review',
-    source: 'app-field',
-  },
+  ...canonicalPreviewInventoryProducts,
 ];
 
 function MetricTile({ label, value, tone = 'default' }: MetricTileProps) {

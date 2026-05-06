@@ -1,3 +1,5 @@
+import type { DshCanonicalPublishStage, DshCanonicalSource } from '../../shared/catalog/dshStoreProductCardModel';
+
 export type DshPartnerIntakeSource = 'app-field' | 'app-partner';
 export type DshPartnerIntakeQueue = 'offer-approval' | 'partner-review' | 'marketing-review';
 
@@ -14,6 +16,8 @@ export type DshPartnerIntakeItem = {
   submittedAt: string;
   canonicalStoreId?: string;
   canonicalProductId?: string;
+  canonicalStage?: DshCanonicalPublishStage;
+  canonicalSource?: DshCanonicalSource;
 };
 
 export type DshPartnerIntakeMetric = {
@@ -94,6 +98,8 @@ export const dshPartnerIntakeItems: ReadonlyArray<DshPartnerIntakeItem> = [
     submittedAt: 'اليوم 12:15',
     canonicalStoreId: 'canonical-store-field-lead-5',
     canonicalProductId: 'canonical-product-field-lead-5-featured',
+    canonicalStage: 'marketing-review',
+    canonicalSource: 'app-field',
   },
 ];
 

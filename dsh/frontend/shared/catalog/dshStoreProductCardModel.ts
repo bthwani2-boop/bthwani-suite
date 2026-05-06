@@ -1,5 +1,16 @@
-type DshCanonicalSource = 'app-field' | 'app-partner' | 'app-client' | 'manual';
-type DshCanonicalPublishStage = 'draft' | 'review' | 'published';
+export type DshCanonicalSource =
+  | 'app-field'
+  | 'app-partner'
+  | 'control-panel-partners'
+  | 'marketing'
+  | 'app-client'
+  | 'manual';
+export type DshCanonicalPublishStage =
+  | 'field-draft'
+  | 'field-submitted'
+  | 'partner-review'
+  | 'marketing-review'
+  | 'published-preview';
 type DshCardTone = 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
 type DiscoveryStoreFixture = {
@@ -140,11 +151,29 @@ export type DshCanonicalProductCard = {
 const canonicalStoreId = 'canonical-store-field-lead-5';
 const canonicalProductId = 'canonical-product-field-lead-5-featured';
 
+export function normalizeCanonicalPublishStage(stage: DshCanonicalPublishStage | 'draft' | 'review' | 'published' | string | undefined): DshCanonicalPublishStage {
+  switch (stage) {
+    case 'field-draft':
+    case 'field-submitted':
+    case 'partner-review':
+    case 'marketing-review':
+    case 'published-preview':
+      return stage;
+    case 'published':
+      return 'published-preview';
+    case 'review':
+      return 'partner-review';
+    case 'draft':
+    default:
+      return 'field-draft';
+  }
+}
+
 const canonicalStoreCard: DshCanonicalStoreCard = {
   id: canonicalStoreId,
   sourceRecordId: 'lead-5',
   source: 'app-field',
-  publishStage: 'review',
+  publishStage: 'marketing-review',
   storeName: 'تمور النخبة',
   branchLabel: 'اليرموك • الرياض',
   cityLabel: 'الرياض',
@@ -188,11 +217,11 @@ const canonicalProductCard: DshCanonicalProductCard = {
   sourceRecordId: 'lead-5',
   storeId: canonicalStoreId,
   source: 'app-field',
-  publishStage: 'review',
+  publishStage: 'marketing-review',
   name: 'علبة تمر فاخر',
-  subtitle: 'منتج افتتاحي من ملف تمور النخبة',
-  categoryId: 'honey_dates',
-  categoryLabel: 'عسل وتمور',
+  subtitle: 'المنتج الافتتاحي موثق.',
+  categoryId: 'field:مواد غذائية:تمور وهدايا',
+  categoryLabel: 'تمور وهدايا',
   priceLabel: '55 ر.س',
   priceValue: 55,
   measurementType: 'piece',
@@ -210,6 +239,21 @@ const canonicalProductCard: DshCanonicalProductCard = {
   canonicalStoreId,
   canonicalProductId,
 };
+
+export const canonicalPreviewStores: ReadonlyArray<DshCanonicalStoreCard> = [canonicalStoreCard];
+export const canonicalPreviewProducts: ReadonlyArray<DshCanonicalProductCard> = [canonicalProductCard];
+
+export function getCanonicalPreviewStoreCard(id: string) {
+  return canonicalPreviewStores.find((store) => store.id === id);
+}
+
+export function getCanonicalPreviewProductCard(id: string) {
+  return canonicalPreviewProducts.find((product) => product.id === id);
+}
+
+export function getCanonicalPreviewProductForStore(storeId: string) {
+  return canonicalPreviewProducts.find((product) => product.storeId === storeId);
+}
 
 function cloneStringList(values: ReadonlyArray<string> | undefined) {
   return values ? [...values] : undefined;
@@ -280,11 +324,17 @@ export function mapCanonicalProductToStoreFixtureItem(product: DshCanonicalProdu
 }
 
 export function buildCanonicalPreviewDiscoveryStores() {
-  return [mapCanonicalStoreToDiscoveryStore(canonicalStoreCard)];
+  return canonicalPreviewStores.map((store) => mapCanonicalStoreToDiscoveryStore(store));
 }
 
 export function buildCanonicalPreviewStoreItemsByStoreId() {
-  return {
-    [canonicalStoreCard.id]: [mapCanonicalProductToStoreFixtureItem(canonicalProductCard)],
-  };
+  return canonicalPreviewStores.reduce<Record<string, StoreFixtureItem[]>>((result, store) => {
+    const product = getCanonicalPreviewProductForStore(store.id);
+
+    if (product) {
+      result[store.id] = [mapCanonicalProductToStoreFixtureItem(product)];
+    }
+
+    return result;
+  }, {});
 }

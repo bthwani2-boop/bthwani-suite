@@ -1,4 +1,8 @@
-import { type DshCanonicalStoreCard } from '../../shared/catalog/dshStoreProductCardModel';
+import {
+  type DshCanonicalProductCard,
+  type DshCanonicalPublishStage,
+  type DshCanonicalStoreCard,
+} from '../../shared/catalog/dshStoreProductCardModel';
 
 export type FieldStatusTone = 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
@@ -151,6 +155,41 @@ function formatNowLabel() {
   } catch {
     return 'الآن';
   }
+}
+
+function resolveFieldCanonicalPublishStage(store: FieldStoreFile): DshCanonicalPublishStage {
+  const status = resolveFieldStoreStatus(store);
+  const lifecycleNote = store.lifecycleNote?.trim() ?? '';
+
+  if (status === 'submitted') {
+    return lifecycleNote.includes('مراجعة الشركاء') || store.draft.review.partnerReviewNote.trim().length > 0
+      ? 'partner-review'
+      : 'field-submitted';
+  }
+
+  if (status === 'offer-approved') {
+    return lifecycleNote.includes('ظهر الشريك للعملاء') || lifecycleNote.includes('ظهر للعملاء')
+      ? 'published-preview'
+      : 'marketing-review';
+  }
+
+  return 'field-draft';
+}
+
+function formatFieldProductPriceLabel(price: string) {
+  const trimmedPrice = price.trim();
+  return trimmedPrice ? `${trimmedPrice} ر.س` : 'غير محدد';
+}
+
+function parseFieldProductPriceValue(price: string) {
+  const normalizedPrice = Number(price.trim());
+  return Number.isFinite(normalizedPrice) ? normalizedPrice : undefined;
+}
+
+function resolveFieldProductCategoryId(store: FieldStoreFile) {
+  const mainCategory = store.draft.classification.mainCategory.trim();
+  const subCategory = store.draft.classification.subCategory.trim();
+  return `field:${mainCategory || 'general'}:${subCategory || 'general'}`;
 }
 
 export function createEmptyDraft(overrides?: Partial<FieldOnboardingDraft>): FieldOnboardingDraft {
@@ -421,12 +460,13 @@ export function mapFieldStoreToCanonicalStoreCard(store: FieldStoreFile): DshCan
   const featuredProductName = store.draft.products.featuredProductName.trim();
   const featuredProductPrice = store.draft.products.featuredProductPrice.trim();
   const reviewState = resolveFieldStoreStatus(store);
+  const publishStage = resolveFieldCanonicalPublishStage(store);
 
   return {
     id: `canonical-store-field-${store.id}`,
     sourceRecordId: store.id,
     source: 'app-field',
-    publishStage: reviewState === 'offer-approved' ? 'published' : reviewState === 'submitted' ? 'review' : 'draft',
+    publishStage,
     storeName,
     branchLabel,
     cityLabel: store.draft.location.city.trim() || 'الرياض',
@@ -448,7 +488,7 @@ export function mapFieldStoreToCanonicalStoreCard(store: FieldStoreFile): DshCan
     imageUri: photoRef ? `${photoRef}.media` : undefined,
     statusLabel: resolveFieldStoreStatusLabel(store),
     statusTone: resolveFieldStoreStatusTone(store),
-    rating: reviewState === 'offer-approved' ? 4.9 : 4.6,
+    rating: publishStage === 'published-preview' ? 4.9 : 4.6,
     distanceLabel: coverageSummary,
     etaLabel: operatingHoursLabel,
     deliveryLabel: deliveryReadinessLabel,
@@ -463,6 +503,38 @@ export function mapFieldStoreToCanonicalStoreCard(store: FieldStoreFile): DshCan
     hasNewProducts: Boolean(featuredProductName),
     hasCouponAvailable: Boolean(store.draft.offer.preliminaryOffer.trim()),
     canonicalProductId: featuredProductName ? `canonical-product-field-${store.id}-featured` : undefined,
+  };
+}
+
+export function mapFieldStoreToCanonicalProductCard(store: FieldStoreFile): DshCanonicalProductCard | null {
+  const featuredProductName = store.draft.products.featuredProductName.trim();
+
+  if (!featuredProductName) {
+    return null;
+  }
+
+  const priceLabel = formatFieldProductPriceLabel(store.draft.products.featuredProductPrice);
+  const categoryLabel = store.draft.classification.subCategory.trim() || store.draft.classification.mainCategory.trim() || store.category;
+
+  return {
+    id: `canonical-product-field-${store.id}-featured`,
+    sourceRecordId: store.id,
+    storeId: `canonical-store-field-${store.id}`,
+    source: 'app-field',
+    publishStage: resolveFieldCanonicalPublishStage(store),
+    name: featuredProductName,
+    subtitle: store.draft.products.sampleCatalogNote.trim() || undefined,
+    categoryId: resolveFieldProductCategoryId(store),
+    categoryLabel,
+    priceLabel,
+    priceValue: parseFieldProductPriceValue(store.draft.products.featuredProductPrice),
+    measurementType: 'piece',
+    measurementOptions: ['حبة'],
+    isAvailable: true,
+    hasOptions: false,
+    preparationTime: store.draft.offer.deliveryReadiness.trim() || undefined,
+    canonicalStoreId: `canonical-store-field-${store.id}`,
+    canonicalProductId: `canonical-product-field-${store.id}-featured`,
   };
 }
 
@@ -724,7 +796,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       financeLabel: '420 ر.س',
       lockedStatus: 'offer-approved',
       stageLabelOverride: 'منتهٍ للميداني [TBD]',
-      lifecycleNote: 'اعتمد الملف وظهر الشريك للعملاء، وبقي للميداني السجل والحالة والعمولة فقط.',
+      lifecycleNote: 'اعتمد الملف داخل الشركاء وينتظر المراجعة التسويقية النهائية قبل الظهور للعملاء.',
       draft: createEmptyDraft({
         activeSectionId: 'review',
         basics: {

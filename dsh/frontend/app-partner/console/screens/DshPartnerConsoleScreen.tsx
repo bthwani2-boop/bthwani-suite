@@ -3,6 +3,7 @@ import { Pressable, Switch as RNSwitch, View } from 'react-native';
 import { AnalyticsGrowthMarketingWorkspaceContent } from '../workspaces/AnalyticsGrowthMarketingWorkspaceContent';
 import { Box, Button, Chip, Icon, KeyValueList, ListItem, MobileCommandSectionList, MobileScrollView, MobileStickyPrimaryAction, StateView, Surface, Text, TextField, TopBar, useDirection, useTheme } from '@bthwani/ui-kit';
 import { PartnerDshWalletWorkspace } from '../../../../wlt/app-partner';
+import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../../../shared/catalog/dshStoreProductCardModel';
 import { InventoryCatalogWorkspaceContent } from '../workspaces/InventoryCatalogWorkspaceContent';
 import { StoreProfileWorkspaceContent } from '../workspaces/StoreProfileWorkspaceContent';
 import { DshPartnerCommissionSummaryPanel, DshPartnerFinanceBridgePanel, DshPartnerSettlementSummaryPanel } from '../../finance';
@@ -98,6 +99,7 @@ type Props = {
   onOpenBell?: () => void;
   onOpenOperationalFlow?: (screenId: DshPartnerOperationalFlowId) => void;
   onOpenSupportScreen?: (screenId: DshPartnerOperationalFlowId) => void;
+  canonicalStoreId?: string;
 };
 
 const defaultTypeOptions: readonly PartnerTypeOption[] = [
@@ -999,6 +1001,7 @@ export function DshPartnerConsoleScreen(props: Props) {
     onOpenBell,
     onOpenOperationalFlow,
     onOpenSupportScreen,
+    canonicalStoreId,
   } = props;
 
   const { direction } = useDirection();
@@ -1006,6 +1009,18 @@ export function DshPartnerConsoleScreen(props: Props) {
   const [notificationPreferences, setNotificationPreferences] = React.useState<NotificationPreferenceState>(defaultNotificationPreferences);
   const activeSection = section ?? internalSection;
   const updateSection = onSectionChange ?? setInternalSection;
+  const canonicalPreviewStore = React.useMemo(
+    () =>
+      (canonicalStoreId ? getCanonicalPreviewStoreCard(canonicalStoreId) : undefined) ??
+      canonicalPreviewStores.find((store) => store.storeName === storeName),
+    [canonicalStoreId, storeName],
+  );
+  const resolvedStoreName = canonicalPreviewStore?.storeName ?? storeName;
+  const resolvedBranchLabel = canonicalPreviewStore?.branchLabel ?? branchLabel;
+  const resolvedCityLabel = canonicalPreviewStore?.cityLabel ?? cityLabel;
+  const resolvedManagerLabel = canonicalPreviewStore?.managerName ?? managerLabel;
+  const resolvedTodayHoursLabel = canonicalPreviewStore?.operatingHoursLabel ?? todayHoursLabel;
+  const resolvedActiveZoneLabel = canonicalPreviewStore?.zoneLabel ?? activeZoneLabel;
   const enabledNotificationChannelsCount = React.useMemo(
     () => ['orders', 'operations', 'inventory', 'finance', 'marketing', 'system'].filter((key) => notificationPreferences[key as NotificationPreferenceId]).length,
     [notificationPreferences],
@@ -1033,9 +1048,9 @@ export function DshPartnerConsoleScreen(props: Props) {
     () => [
       { id: 'store-status', label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: storeOpen ? 'success' : 'warning' },
       { id: 'active-orders', label: 'الطلبات النشطة', value: String(activeOrdersCount), tone: 'brand' },
-      { id: 'hours', label: 'ساعات العمل', value: todayHoursLabel, tone: 'info' },
+      { id: 'hours', label: 'ساعات العمل', value: resolvedTodayHoursLabel, tone: 'info' },
     ],
-    [activeOrdersCount, storeOpen, todayHoursLabel],
+    [activeOrdersCount, resolvedTodayHoursLabel, storeOpen],
   );
 
   if (state !== 'ready') {
@@ -1057,14 +1072,19 @@ export function DshPartnerConsoleScreen(props: Props) {
       return (
         <HubWorkspaceShell title={sectionCopy.profile.title} description={sectionCopy.profile.description} icon={sectionCopy.profile.icon} onBack={() => updateSection('hub')}>
           <StoreProfileWorkspaceContent
-            storeName={storeName}
-            branchLabel={branchLabel}
-            cityLabel={cityLabel}
-            managerLabel={managerLabel}
-            todayHoursLabel={todayHoursLabel}
-            activeZoneLabel={activeZoneLabel}
+            storeName={resolvedStoreName}
+            branchLabel={resolvedBranchLabel}
+            cityLabel={resolvedCityLabel}
+            managerLabel={resolvedManagerLabel}
+            todayHoursLabel={resolvedTodayHoursLabel}
+            activeZoneLabel={resolvedActiveZoneLabel}
             storeOpen={storeOpen}
             listingEnabled={listingEnabled}
+            canonicalStoreId={canonicalPreviewStore?.id}
+            sourceRecordId={canonicalPreviewStore?.sourceRecordId}
+            deliveryReadinessLabel={canonicalPreviewStore?.deliveryReadinessLabel}
+            coverageSummary={canonicalPreviewStore?.coverageSummary}
+            publishStage={canonicalPreviewStore?.publishStage}
             onOpenStoreScope={onOpenStoreScope}
           />
         </HubWorkspaceShell>
@@ -1273,10 +1293,10 @@ export function DshPartnerConsoleScreen(props: Props) {
       return (
         <HubWorkspaceShell title={sectionCopy.inventory.title} description={sectionCopy.inventory.description} icon={sectionCopy.inventory.icon} onBack={() => updateSection('hub')}>
           <InventoryCatalogWorkspaceContent
-            storeName={storeName}
-            branchLabel={branchLabel}
-            activeZoneLabel={activeZoneLabel}
-            todayHoursLabel={todayHoursLabel}
+            storeName={resolvedStoreName}
+            branchLabel={resolvedBranchLabel}
+            activeZoneLabel={resolvedActiveZoneLabel}
+            todayHoursLabel={resolvedTodayHoursLabel}
           />
         </HubWorkspaceShell>
       );

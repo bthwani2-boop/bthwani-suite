@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Text } from '@bthwani/ui-kit';
 import { WebControlDisclosureItem, WebMissionHeroCard, WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
+import { getCanonicalPreviewProductCard, getCanonicalPreviewStoreCard } from '../../shared/catalog/dshStoreProductCardModel';
 import { ControlPanelDshDecisionBoard } from '../shared';
 import { DshPartnerPromotionEligibilityScreen } from './DshPartnerPromotionEligibilityScreen';
 import { dshPartnerApprovalLanes, dshPartnerIntakeItems, dshPartnerIntakeMetrics, type DshPartnerIntakeItem, type DshPartnerIntakeQueue } from './workflow';
@@ -30,6 +31,21 @@ function resolveQueueTone(queue: DshPartnerIntakeQueue): 'warning' | 'info' | 's
 
 function resolveSourceLabel(source: DshPartnerIntakeItem['source']) {
   return source === 'app-field' ? 'app-field' : 'app-partner';
+}
+
+function resolveCanonicalSourceLabel(source: DshPartnerIntakeItem['canonicalSource']) {
+  if (!source) return 'source TBD';
+  if (source === 'control-panel-partners') return 'partners';
+  return source;
+}
+
+function resolveCanonicalStageLabel(stage: DshPartnerIntakeItem['canonicalStage'] | string | undefined) {
+  if (!stage) return 'stage TBD';
+  if (stage === 'field-draft') return 'field-draft';
+  if (stage === 'field-submitted') return 'field-submitted';
+  if (stage === 'partner-review') return 'partner-review';
+  if (stage === 'marketing-review') return 'marketing-review';
+  return 'published-preview';
 }
 
 function resolvePrimaryActionLabel(queue: DshPartnerIntakeQueue) {
@@ -183,6 +199,18 @@ function QueueCard({
   active: boolean;
   onSelect: () => void;
 }) {
+  const canonicalStore = item.canonicalStoreId ? getCanonicalPreviewStoreCard(item.canonicalStoreId) : undefined;
+  const canonicalProduct = item.canonicalProductId ? getCanonicalPreviewProductCard(item.canonicalProductId) : undefined;
+  const previewStoreLabel = canonicalStore?.storeName ?? '[TBD]';
+  const previewStage = canonicalStore?.publishStage ?? canonicalProduct?.publishStage ?? item.canonicalStage;
+  const previewSource = canonicalStore?.source ?? canonicalProduct?.source ?? item.canonicalSource;
+  const previewMeta = [
+    resolveCanonicalStageLabel(previewStage),
+    canonicalProduct?.name,
+    canonicalProduct?.priceLabel,
+    resolveCanonicalSourceLabel(previewSource),
+  ].filter(Boolean).join(' · ');
+
   return (
     <Box padding={3} gap={2} border radiusToken="xl" background="surfaceRaised" style={{ borderColor: active ? 'rgba(255, 80, 13, 0.35)' : undefined }}>
       <Box layoutDirection="row" justify="space-between" align="center">
@@ -200,13 +228,13 @@ function QueueCard({
         {item.note}
       </Text>
 
-      {item.canonicalStoreId || item.canonicalProductId ? (
-        <Text role="caption" tone="soft">
-          {item.canonicalStoreId ? `canonicalStoreId: ${item.canonicalStoreId}` : ''}
-          {item.canonicalStoreId && item.canonicalProductId ? ' · ' : ''}
-          {item.canonicalProductId ? `canonicalProductId: ${item.canonicalProductId}` : ''}
-        </Text>
-      ) : null}
+      <Text role="caption" tone="soft">
+        {`canonical: ${previewStoreLabel}`}
+      </Text>
+
+      <Text role="caption" tone="soft">
+        {previewMeta || 'canonical: [TBD]'}
+      </Text>
 
       <Text role="bodySm">{item.nextStep}</Text>
 
