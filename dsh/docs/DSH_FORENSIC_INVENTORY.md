@@ -381,3 +381,14 @@ DSH-CAP-002 live-code hardening now shares banner routing and seed data through 
 - لا claim تشغيل حي لأي fixture/seed/localStorage/media source.
 - لا البدء بـ checkout/payment قبل حزمة WLT/auth صريحة.
 - الحزم التالية يجب أن تُبنى من `Top 5` أعلاه، وبالترتيب ما لم يظهر evidence أقوى يبرر خلاف ذلك.
+
+## Audit 010 Current Findings
+- 275 DSH files
+- 57 screen files
+- 0 Tamagui imports
+- 77 UI Kit imports
+- 30 runtime gaps
+- 16 API gaps
+- 15 visual evidence gaps
+- 7 orphan candidates
+- top 5 giant screens

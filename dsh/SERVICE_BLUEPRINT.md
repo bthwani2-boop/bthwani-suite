@@ -383,6 +383,7 @@ No fixture, mock, or seed may be promoted to runtime truth without evidence.
 | Evidence ID | Scope | Result | Path | Notes |
 |---|---|---|---|---|
 | NEEDS_EVIDENCE | Root frontend parity | Pending | `tools/registry/runs/{SESSION_ID}` | Add only verified evidence. |
+| DSH_AUDIT_010 | Deep Local System Audit | FIX_REQUIRED | `tools/registry/runs/DSH_AUDIT_010_DEEP_SYSTEM_DIAGNOSIS-20260506-053242` | Matrix drift cleanup and evidence generation |
 
 ### Current Decision
 

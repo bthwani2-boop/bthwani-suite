@@ -8,9 +8,12 @@ Evidence source:
 - tools\registry\runs\CHECK_DSH_UI_UX_FLOW_SCREEN_MAPPING_V2-20260505-175528
 
 Summary:
-- screen_file_count: 56
+- screen_file_count: 57
 - giant_screen_candidates: 5
+- visual_evidence_gaps: 15
 - tbd_flow_mappings: 19
+
+Note: DSH-CAP-001..009B closed non-visual baseline only. Visual and runtime proof remains missing.
 
 Purpose:
 Single lean matrix for DSH UI/UX/Flow closure. This file replaces separate screen inventory, flow registry, route parity, state coverage, visual RTL plan, and UI kit boundary files.

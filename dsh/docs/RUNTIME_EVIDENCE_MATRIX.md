@@ -35,6 +35,7 @@ Allowed classifications:
 | DSH-RUN-003 | partner operations | dsh/frontend/app-partner | app-partner | fixture/preview TBD | NO | device/simulator runtime + screenshots | N/A | RUNTIME_UNPROVEN | map partner flow |
 | DSH-RUN-004 | captain delivery | dsh/frontend/app-captain | app-captain | fixture/preview TBD | NO | device/simulator runtime + screenshots | N/A | RUNTIME_UNPROVEN | map captain flow |
 | DSH-RUN-005 | backend/domain | dsh/backend + dsh/domain | DSH service | scaffold/TBD | NO | handler/domain/persistence proof | N/A | NOT_CLOSED | do not start before UI/API matrix |
+| DSH-RUN-018 | DSH-CAP-009 payment/settlement | dsh/frontend/shared/finance/dshFinancePreviewModel.ts | client/partner/captain/field | preview | NO | text/tsc proof = PASS_WITH_WARNINGS; visual proof = NEEDS_VISUAL_EVIDENCE; runtime/API/backend = RUNTIME_UNPROVEN | DSH_AUDIT_010_DEEP_SYSTEM_DIAGNOSIS-20260506-053242 | RUNTIME_UNPROVEN | gather visual and runtime proof |
 
 Closure rule:
 Runtime is PASS only when source, provider, happy path, failure path, recovery path, and evidence are proven.

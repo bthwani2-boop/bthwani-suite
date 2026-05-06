@@ -11,6 +11,7 @@ Current contract state:
 - `paths: {}`.
 - No DSH endpoint is accepted yet.
 - No schema is accepted without a proven screen/flow need.
+- Note: CAP-009 payment/settlement does not open API yet; WLT remains preview/local adapter. API will not start until runtime proof exists.
 
 Required rule:
 No OpenAPI edit without a row here proving:
