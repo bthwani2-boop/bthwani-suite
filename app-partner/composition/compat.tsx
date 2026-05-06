@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
-import { DshEntryScreen } from '../../dsh/frontend/app-partner/entry';
-import { PartnerOrdersInboxScreen, PartnerOrderDetailScreen } from '../../dsh/frontend/app-partner/orders';
-import { DshInventoryManagementScreen } from '../../dsh/frontend/app-partner/inventory';
-import { PartnerDshConsoleScreen } from '../../dsh/frontend/app-partner/console';
+import { DshEntryScreen } from '../../dsh/frontend/app-partner/DshPartnerEntryScreen';
+import { PartnerOrdersInboxScreen, PartnerOrderDetailScreen } from '../../dsh/frontend/app-partner/DshPartnerOrdersScreen';
+import { DshInventoryManagementScreen } from '../../dsh/frontend/app-partner/DshPartnerInventoryScreen';
+import { PartnerDshConsoleScreen } from '../../dsh/frontend/app-partner/DshPartnerConsoleScreen';
 
 export type PartnerWalletHubDestination = 'partner_subscription' | 'partner_settlement_summary' | 'partner_payouts';
 

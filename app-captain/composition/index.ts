@@ -1,6 +1,6 @@
 import {
   DshEntryScreen,
-} from '../../dsh/frontend/app-captain/entry';
+} from '../../dsh/frontend/app-captain/DshCaptainEntryScreen';
 import {
   CaptainDeliveryConfirmSheet,
   CaptainPickupConfirmSheet,
@@ -16,14 +16,14 @@ import {
   DshCaptainOrdersListScreen,
   DshCaptainOrdersOffersListScreen,
   DshCaptainProofUploadScreen,
-} from '../../dsh/frontend/app-captain/orders';
+} from '../../dsh/frontend/app-captain/DshCaptainOrdersScreen';
 import {
   DshCaptainSupportDirectoryScreen,
   DshCaptainChatReadAckScreen,
   DshCaptainChatSendScreen,
-} from '../../dsh/frontend/app-captain/operations';
-import { DshCaptainCodBalanceScreen } from '../../dsh/frontend/app-captain/finance';
-import { DshCaptainProfileGetScreen, DshCaptainTierEvaluateScreen, DshCaptainTierInfoScreen } from '../../dsh/frontend/app-captain/profile';
+} from '../../dsh/frontend/app-captain/DshCaptainOperationsScreen';
+import { DshCaptainCodBalanceScreen } from '../../dsh/frontend/app-captain/DshCaptainFinanceScreen';
+import { DshCaptainProfileGetScreen, DshCaptainTierEvaluateScreen, DshCaptainTierInfoScreen } from '../../dsh/frontend/app-captain/DshCaptainProfileScreen';
 
 export const dshCaptain = {
   entry: {

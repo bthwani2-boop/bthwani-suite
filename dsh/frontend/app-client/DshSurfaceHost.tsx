@@ -1,30 +1,32 @@
 import React from 'react';
 import { BackHandler, Platform, View } from 'react-native';
 import { Surface, Text, colorPalette } from '@bthwani/ui-kit';
-import { DshSearchScreen } from './discovery/screens';
-import { DshEntryScreen } from './entry/screens';
-import { DshClientBellScreen } from './bell';
-import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './home/screens';
-import { DshMySpaceScreen } from './my_space/screens';
-import { DshNotificationsScreen } from './notifications/screens';
-import { DshBenefitsHubScreen } from './subscriptions/screens';
-import { DshOrdersListScreen, DshTrackingScreen } from './checkout/screens';
-import { DshStoreGetScreen, DshStoreItemsScreen } from './stores/screens';
-import { DshFavoriteToggleScreen, DshFavoritesListScreen } from './favorites/screens';
-import { DshCartGetScreen } from './cart/screens';
-import { type ClientOperationScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './operations/screens';
-import type { DshHomeApprovedVideoReelsViewerProps } from './home/components/DshHomeApprovedVideoReelsViewer';
+import { DshSearchScreen } from './DshSearchScreen';
+import { DshEntryScreen } from './DshEntryScreen';
+import { DshClientBellScreen } from './DshClientBellScreen';
+import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './DshHomeGetScreen';
+import { DshMySpaceScreen } from './DshMySpaceScreen';
+import { DshNotificationsScreen } from './DshNotificationsScreen';
+import { DshBenefitsHubScreen } from './DshBenefitsHubScreen';
+import { DshOrdersListScreen, DshTrackingScreen } from './checkoutTracking';
+import { DshStoreGetScreen } from './DshStoreGetScreen';
+import { DshStoreItemsScreen } from './DshStoreItemsScreen';
+import { DshFavoriteToggleScreen } from './DshFavoriteToggleScreen';
+import { DshFavoritesListScreen } from './DshFavoritesListScreen';
+import { DshCartGetScreen } from './DshCartUnifiedScreen';
+import { type ClientOperationScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './DshClientOperationScreens';
+import type { DshHomeApprovedVideoReelsViewerProps } from './DshHomeApprovedVideoReelsViewer';
 import {
   dshHomeGetFixturePromos,
   dshHomeGetFixtureStores,
-} from './home/fixtures/dshHomeGetFixtures';
+} from './dshHomeGetFixtures';
 import {
   buildStoreCategories,
   buildStoreDeliveryModes,
   buildStoreTags,
   dshDiscoveryStores,
   storeItemsByStoreId,
-} from './stores/fixtures';
+} from './storeFixtures';
 import {
   getPublishedMarketingHomePromos,
   recordMarketingBannerClick,
@@ -36,9 +38,9 @@ import {
   recordMarketingGrowthImpression,
   type MarketingGrowthRecord,
 } from '../shared/marketing/growth-store';
-import { getDshClientStateMeta, type DshClientState } from './shared/dshClientStateModel';
-// checkout/tracking screens consolidated into checkout/screens
-import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './categories/fixtures/dshCategoriesFixtures';
+import { getDshClientStateMeta, type DshClientState } from './dshClientStateModel';
+// checkout and tracking routes are consolidated in checkoutTracking
+import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './dshCategoriesFixtures';
 import { dshPartnerIntakeItems } from '../shared/partners/workflow';
 
 export type DshRoute =

@@ -1,12 +1,13 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
 import { Box } from '@bthwani/ui-kit';
-import { DshFieldFinanceScreen } from './finance';
-import { DshFieldStoreOnboardingScreen, readFieldStoresLocal, writeFieldStoresLocal } from './onboarding';
-import { DshFieldStoreVisitScreen, type DshFieldStoreVisitValues } from './visits';
-import { DshFieldProfileHomeScreen, DshFieldProfileScreen } from './profile';
-import { DshFieldStoresHistoryScreen, DshFieldStoresScreen } from './stores';
-import { createManualFieldStore, submitFieldStoreForReview, type FieldStoreFile } from './stores/dshFieldStoresModel';
+import { DshFieldFinanceScreen } from './DshFieldFinanceScreen';
+import { DshFieldStoreOnboardingScreen } from './DshFieldStoreOnboardingScreen';
+import { readFieldStoresLocal, writeFieldStoresLocal } from './FieldOnboardingStorage';
+import { DshFieldStoreVisitScreen, type DshFieldStoreVisitValues } from './DshFieldStoreVisitScreen';
+import { DshFieldProfileHomeScreen, DshFieldProfileScreen } from './DshFieldProfileScreen';
+import { DshFieldStoresHistoryScreen, DshFieldStoresScreen } from './DshFieldStoresScreen';
+import { createManualFieldStore, submitFieldStoreForReview, type FieldStoreFile } from './dshFieldStoresModel';
 
 type FieldRoute =
   | { kind: 'stores' }

@@ -1,25 +1,32 @@
 export * from './surface-meta';
 export * from './surface-catalog';
-export * from './awnak/screens';
-export * from './cart/screens';
-export * from './discovery/screens';
-export * from './entry/screens';
-export * from './favorites/screens';
-// gas/screens: DshGasRefillOrderCreateScreen archived (DSH_ARCHIVE_021)
-export * from './bell';
-export * from './home/screens';
-export * from './my_space/screens';
-export * from './notifications/screens';
-export * from './loyalty/screens';
-export * from './checkout/screens';
-// orders folder consolidated into checkout/screens to avoid duplication
-export * from './shein/screens';
-export * from './stores/screens';
-export * from './operations/screens';
-export * from './shared/dshClientStateModel';
-export * from './shared/dshClientBinding.contracts';
+export * from './DshAwnakOrderCreateScreen';
+export * from './DshCartUnifiedScreen';
+export * from './DshSearchScreen';
+export * from './DshEntryScreen';
+export * from './DshFavoriteToggleScreen';
+export * from './DshFavoritesListScreen';
+// gas family archived (DSH_ARCHIVE_021)
+export * from './DshClientBellScreen';
+export * from './DshHomeGetScreen';
+export * from './DshMySpaceScreen';
+export * from './DshMySpaceCommercialScreen';
+export * from './DshMySpaceOrdersScreen';
+export * from './DshNotificationsScreen';
+export * from './DshBenefitsHubScreen';
+export * from './LoyaltyRewardsPage';
+export * from './checkoutTracking';
+// orders flow remains consolidated in checkoutTracking to avoid duplication
+export * from './DshSheinOrderCreateScreen';
+export * from './DshStoreGetScreen';
+export * from './DshStoreItemsScreen';
+export * from './DshClientOperationScreens';
+export * from './SubscriptionsHubScreen';
+export * from './SubscriptionsPage';
+export * from './dshClientStateModel';
+export * from './dshClientBinding.contracts';
 // 'tracking' and 'checkout' families were consolidated; explicit exports removed.
-export { DshHomeApprovedVideoReelsViewer } from './home/components/DshHomeApprovedVideoReelsViewer';
-export type { DshHomeApprovedVideoReelsViewerProps } from './home/components/DshHomeApprovedVideoReelsViewer';
+export { DshHomeApprovedVideoReelsViewer } from './DshHomeApprovedVideoReelsViewer';
+export type { DshHomeApprovedVideoReelsViewerProps } from './DshHomeApprovedVideoReelsViewer';
 export { DshSurfaceHost } from './DshSurfaceHost';
 export type { DshCommandTarget, DshRoute } from './DshSurfaceHost';

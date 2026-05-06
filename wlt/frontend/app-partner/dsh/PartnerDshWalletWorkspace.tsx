@@ -14,7 +14,7 @@ import {
   useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
-import { getDshPartnerSettlementPreview } from '../../../../../dsh/frontend/shared/finance/dshFinancePreviewModel';
+import { getDshPartnerSettlementPreview } from '../../../../dsh/frontend/shared/finance/dshFinancePreviewModel';
 
 type PartnerDshWalletWorkspaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-transactions';
 type PartnerDshWalletActionId = 'expanded-wallet' | 'settlements' | 'report';
@@ -570,5 +570,3 @@ export function PartnerDshWalletWorkspace({
 }
 
 export default PartnerDshWalletWorkspace;
-
-
