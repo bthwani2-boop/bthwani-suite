@@ -91,10 +91,9 @@ export function WebDocumentShell({
   return (
     <html suppressHydrationWarning lang={lang} dir={dir}>
       <head>
-        <script
-          id="language-bootstrap"
-          dangerouslySetInnerHTML={{ __html: buildStoredLanguageBootstrapScript() }}
-        />
+        <Script id="language-bootstrap">
+          {buildStoredLanguageBootstrapScript()}
+        </Script>
         <style>{webRootBodyCss}</style>
         <WebThemeStyle />
       </head>
