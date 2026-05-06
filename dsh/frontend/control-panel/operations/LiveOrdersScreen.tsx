@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { OperationsSuggestionCard } from '../operations.ui';
-import { LIVE_ORDERS_OPERATIONAL_PREVIEW } from '../operations.preview-data';
-import styles from '../dsh-surface.module.css';
+import { OperationsSuggestionCard } from './operations.ui';
+import { LIVE_ORDERS_OPERATIONAL_PREVIEW } from './operations.preview-data';
+import styles from './dsh-surface.module.css';
 
 export type LiveOrdersScreenProps = {
   state?: 'ready' | 'loading' | 'error' | 'empty';

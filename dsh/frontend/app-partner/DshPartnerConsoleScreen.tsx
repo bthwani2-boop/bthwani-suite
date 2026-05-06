@@ -3,7 +3,7 @@ import { Pressable, Switch as RNSwitch, View } from 'react-native';
 import { AnalyticsGrowthMarketingWorkspaceContent } from './AnalyticsGrowthMarketingWorkspaceContent';
 import { Box, Button, Chip, Icon, KeyValueList, ListItem, MobileCommandSectionList, MobileScrollView, MobileStickyPrimaryAction, StateView, Surface, Text, TextField, TopBar, useDirection, useTheme } from '@bthwani/ui-kit';
 import { PartnerDshWalletWorkspace } from '../../../wlt/app-partner';
-import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../shared/catalog/dshStoreProductCardModel';
+import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../shared/dshStoreProductCardModel';
 import { InventoryCatalogWorkspaceContent } from './InventoryCatalogWorkspaceContent';
 import { StoreProfileWorkspaceContent } from './StoreProfileWorkspaceContent';
 import { DshPartnerCommissionSummaryPanel } from './DshPartnerCommissionSummaryPanel';

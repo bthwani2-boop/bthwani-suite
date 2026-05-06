@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { OperationsSuggestionCard } from '../operations.ui';
-import { SHEIN_PROXY_OPERATIONAL_PREVIEW } from '../operations.preview-data';
-import styles from '../dsh-surface.module.css';
+import { OperationsSuggestionCard } from './operations.ui';
+import { SHEIN_PROXY_OPERATIONAL_PREVIEW } from './operations.preview-data';
+import styles from './dsh-surface.module.css';
 
 export type ControlPanelDshSheinProxyScreenProps = {
   hubHref?: string;

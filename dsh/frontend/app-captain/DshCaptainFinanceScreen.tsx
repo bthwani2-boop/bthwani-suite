@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, KeyValueList, MobileScrollView, SectionHeader, StateView, Surface, Text } from '@bthwani/ui-kit';
-import { getDshCaptainFinancePreview } from '../shared/finance/dshFinancePreviewModel';
+import { getDshCaptainFinancePreview } from '../shared/dshFinancePreviewModel';
 import type { DshCaptainFinanceScreenState, DshCaptainFinanceSnapshot } from './dshCaptainFinanceModel';
 
 export type DshCaptainFinanceScreenProps = {

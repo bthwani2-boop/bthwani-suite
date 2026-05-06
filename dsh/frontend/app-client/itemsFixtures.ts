@@ -1,4 +1,4 @@
-import { buildCanonicalPreviewStoreItemsByStoreId } from '../shared/catalog/dshStoreProductCardModel';
+import { buildCanonicalPreviewStoreItemsByStoreId } from '../shared/dshStoreProductCardModel';
 import { DshStoreFixtureItem, StoreItemsByStoreId } from './types';
 
 export const storeItemsByStoreId: StoreItemsByStoreId = {

@@ -1,4 +1,4 @@
-import type { DshCanonicalPublishStage, DshCanonicalSource } from '../../shared/catalog/dshStoreProductCardModel';
+import type { DshCanonicalPublishStage, DshCanonicalSource } from '../../shared/dshStoreProductCardModel';
 
 export type DshPartnerIntakeSource = 'app-field' | 'app-partner';
 export type DshPartnerIntakeQueue = 'offer-approval' | 'partner-review' | 'marketing-review';

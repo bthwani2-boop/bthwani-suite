@@ -1,4 +1,4 @@
-export * from '../../shared/marketing/banner-store';
+export * from '../../shared/banner-store';
 
 
 

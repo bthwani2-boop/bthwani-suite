@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { OperationsSuggestionCard } from '../operations.ui';
-import { DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW } from '../operations.preview-data';
-import styles from '../dsh-surface.module.css';
+import { OperationsSuggestionCard } from './operations.ui';
+import { DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW } from './operations.preview-data';
+import styles from './dsh-surface.module.css';
 
 export type DispatchAssignmentScreenProps = { hubHref: string; };
 

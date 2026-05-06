@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Box, Text, colorPalette } from '@bthwani/ui-kit';
-import type { MarketingGrowthRecord } from '../shared/marketing/growth-store';
+import type { MarketingGrowthRecord } from '../shared/growth-store';
 
 declare const process: { env: { EXPO_PUBLIC_MEDIA_BASE_URL?: string } };
 

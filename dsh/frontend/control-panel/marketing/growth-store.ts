@@ -1,1 +1,1 @@
-export * from '../../shared/marketing/growth-store';
+export * from '../../shared/growth-store';

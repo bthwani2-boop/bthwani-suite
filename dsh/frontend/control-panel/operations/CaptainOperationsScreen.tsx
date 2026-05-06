@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { OperationsSuggestionCard } from '../operations.ui';
-import styles from '../dsh-surface.module.css';
+import { OperationsSuggestionCard } from './operations.ui';
+import styles from './dsh-surface.module.css';
 
 export type CaptainOperationsScreenProps = { hubHref: string; };
 

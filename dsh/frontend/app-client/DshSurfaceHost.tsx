@@ -31,17 +31,17 @@ import {
   getPublishedMarketingHomePromos,
   recordMarketingBannerClick,
   recordMarketingBannerImpression,
-} from '../shared/marketing/banner-store';
+} from '../shared/banner-store';
 import {
   getLiveMarketingGrowthItems,
   recordMarketingGrowthClick,
   recordMarketingGrowthImpression,
   type MarketingGrowthRecord,
-} from '../shared/marketing/growth-store';
+} from '../shared/growth-store';
 import { getDshClientStateMeta, type DshClientState } from './dshClientStateModel';
 // checkout and tracking routes are consolidated in checkoutTracking
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './dshCategoriesFixtures';
-import { dshPartnerIntakeItems } from '../shared/partners/workflow';
+import { dshPartnerIntakeItems } from '../shared/workflow';
 
 export type DshRoute =
   | 'home'

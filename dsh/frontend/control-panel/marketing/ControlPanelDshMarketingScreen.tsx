@@ -5,10 +5,10 @@ import { Box, Text } from '@bthwani/ui-kit';
 import {
   ControlPanelDshMarketingScreen as SmartSignalLayerScreen,
   type ControlPanelDshMarketingScreenProps as SmartSignalLayerScreenProps,
-} from './SmartSignalLayer';
+} from './SmartSignalLayerScreen';
 import { BannersCommandDeckScreen } from './BannersCommandDeckScreen';
 import { GrowthCommandDeckScreen } from './GrowthCommandDeckScreen';
-import { LoyaltyCommandDeckScreen, type LoyaltyCommandDeckScreenProps } from './loyalty';
+import { LoyaltyCommandDeckScreen, type LoyaltyCommandDeckScreenProps } from './LoyaltyCommandDeckScreen';
 import styles from '../operations/dsh-surface.module.css';
 
 export type ControlPanelDshMarketingScreenProps = SmartSignalLayerScreenProps & LoyaltyCommandDeckScreenProps;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { getCanonicalPreviewProductCard, type DshCanonicalProductCard } from '../shared/catalog/dshStoreProductCardModel';
+import { getCanonicalPreviewProductCard, type DshCanonicalProductCard } from '../shared/dshStoreProductCardModel';
 import {
   Box,
   Button,

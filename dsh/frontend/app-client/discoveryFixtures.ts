@@ -1,4 +1,4 @@
-import { buildCanonicalPreviewDiscoveryStores } from '../shared/catalog/dshStoreProductCardModel';
+import { buildCanonicalPreviewDiscoveryStores } from '../shared/dshStoreProductCardModel';
 import { DshDiscoveryStore } from './types';
 
 export const dshDiscoveryStores: DshDiscoveryStore[] = [

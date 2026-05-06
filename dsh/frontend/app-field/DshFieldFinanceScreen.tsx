@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Icon, ListItem, MobileScrollView, StateView, Surface, Text, TopBar } from '@bthwani/ui-kit';
-import { getDshFieldFinancePreview } from '../shared/finance/dshFinancePreviewModel';
+import { getDshFieldFinancePreview } from '../shared/dshFinancePreviewModel';
 import { resolveFieldStoreStatus, type FieldStoreFile } from './dshFieldStoresModel';
 
 type DshFieldFinanceScreenProps = {

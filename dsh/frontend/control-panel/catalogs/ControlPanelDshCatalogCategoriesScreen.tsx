@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Box, Text, Surface, Button } from '@bthwani/ui-kit';
-import { dshCatalogNodes } from '../catalog';
+import { dshCatalogNodes } from './catalog';
 
 function resolveCategoryOwnerLabel(owner: 'catalog' | 'partner' | 'marketing') {
   if (owner === 'partner') return 'الشركاء';
@@ -13,16 +13,22 @@ function resolveCategoryOwnerLabel(owner: 'catalog' | 'partner' | 'marketing') {
 export function ControlPanelDshCatalogCategoriesScreen() {
   const categoryNodes = dshCatalogNodes.filter((node) => node.kind !== 'approved-product');
   const [activeCategoryId, setActiveCategoryId] = React.useState(categoryNodes[0]?.id ?? null);
+  const activeNode = categoryNodes.find((node) => node.id === activeCategoryId);
 
   return (
     <Box gap={4}>
       {/* Executive Command Deck */}
-      <Surface tone="raised" padding={5} gap={4} style={{ borderRadius: '32px', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(20px)', border: '1px solid rgba(10, 47, 92, 0.05)' }}>
+      <Surface
+        tone="raised"
+        padding={5}
+        gap={4}
+        style={{ borderRadius: 32, backgroundColor: 'rgba(255,255,255,0.8)', borderWidth: 1, borderColor: 'rgba(10, 47, 92, 0.05)' }}
+      >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {/* Title on the Right (First in DOM) */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-            <Text role="titleSm" style={{ letterSpacing: '-0.01em', fontWeight: '950', textAlign: 'right' }}>لوحة التحكم في الفئات</Text>
-            <Text role="caption" tone="muted" style={{ fontWeight: '800', letterSpacing: '0.01em', textAlign: 'right' }}>الحوكمة السيادية اللحظية</Text>
+            <Text role="titleSm" style={{ letterSpacing: -0.2, fontWeight: '900', textAlign: 'right' }}>لوحة التحكم في الفئات</Text>
+            <Text role="caption" tone="muted" style={{ fontWeight: '800', letterSpacing: 0.2, textAlign: 'right' }}>الحوكمة السيادية اللحظية</Text>
           </div>
           {/* Status on the Left (Second in DOM) */}
           <div style={{ padding: '6px 16px', backgroundColor: '#0A2F5C', borderRadius: '12px' }}>
@@ -34,50 +40,44 @@ export function ControlPanelDshCatalogCategoriesScreen() {
           {categoryNodes.map((node) => {
             const isActive = node.id === activeCategoryId;
             return (
-              <Surface
-                key={node.id}
-                tone={isActive ? 'brand' : 'inset'}
-                padding={4}
-                gap={2}
-                onPress={() => setActiveCategoryId(node.id)}
-                style={{ 
-                  flexGrow: 1, 
-                  minWidth: 240, 
-                  borderRadius: '24px', 
-                  cursor: 'pointer',
-                  border: isActive ? 'none' : '1px solid rgba(10, 47, 92, 0.05)',
-                  boxShadow: isActive ? '0 12px 32px rgba(10, 47, 92, 0.2)' : 'none',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text role="bodyStrong" tone={isActive ? 'inverse' : 'default'} style={{ textAlign: 'right' }}>{node.label}</Text>
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: isActive ? '#fff' : '#16A34A' }} />
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text role="caption" tone={isActive ? 'inverse' : 'muted'} style={{ fontWeight: '800', textAlign: 'right' }}>{resolveCategoryOwnerLabel(node.owner)}</Text>
-                  <Text role="caption" tone={isActive ? 'inverse' : 'default'} style={{ fontWeight: '900' }}>{node.countLabel}</Text>
-                </div>
-              </Surface>
+              <div key={node.id} onClick={() => setActiveCategoryId(node.id)} style={{ flexGrow: 1, minWidth: 240, cursor: 'pointer' }}>
+                <Surface
+                  tone={isActive ? 'brand' : 'inset'}
+                  padding={4}
+                  gap={2}
+                  style={{
+                    borderRadius: 24,
+                    borderWidth: isActive ? 0 : 1,
+                    borderColor: 'rgba(10, 47, 92, 0.05)',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text role="bodyStrong" tone={isActive ? 'inverse' : 'default'} style={{ textAlign: 'right' }}>{node.label}</Text>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: isActive ? '#fff' : '#16A34A' }} />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text role="caption" tone={isActive ? 'inverse' : 'muted'} style={{ fontWeight: '800', textAlign: 'right' }}>{resolveCategoryOwnerLabel(node.owner)}</Text>
+                    <Text role="caption" tone={isActive ? 'inverse' : 'default'} style={{ fontWeight: '900' }}>{node.countLabel}</Text>
+                  </div>
+                </Surface>
+              </div>
             );
           })}
         </div>
 
         {activeCategoryId && (
-          <Surface tone="inset" padding={5} gap={4} style={{ borderRadius: '24px', border: '1px solid rgba(10, 47, 92, 0.08)', display: 'flex', flexDirection: 'column' }}>
+          <Surface tone="inset" padding={5} gap={4} style={{ borderRadius: 24, borderWidth: 1, borderColor: 'rgba(10, 47, 92, 0.08)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               {/* Node Info on the Right */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <Text role="caption" tone="muted" style={{ fontWeight: '800', textAlign: 'right' }}>ذكاء العقدة المحددة</Text>
-                <Text role="titleSm" style={{ fontWeight: '900', textAlign: 'right' }}>{categoryNodes.find(n => n.id === activeCategoryId)?.label}</Text>
-                <Text role="bodySm" tone="muted" style={{ maxWidth: '400px', textAlign: 'right' }}>{categoryNodes.find(n => n.id === activeCategoryId)?.summary}</Text>
+                <Text role="titleSm" style={{ fontWeight: '900', textAlign: 'right' }}>{activeNode?.label}</Text>
+                <Text role="bodySm" tone="muted" style={{ maxWidth: 400, textAlign: 'right' }}>{activeNode?.summary}</Text>
               </div>
               {/* Actions on the Left */}
               <div style={{ display: 'flex', gap: '8px' }}>
-                <Button label="اعتماد العقدة" style={{ borderRadius: '14px', padding: '10px 24px', fontWeight: '900' }} />
-                <Button label="طلب تعديل" tone="secondary" style={{ borderRadius: '14px', padding: '10px 24px', fontWeight: '900' }} />
+                <Button label="اعتماد العقدة" style={{ borderRadius: 14, paddingVertical: 10, paddingHorizontal: 24 }} />
+                <Button label="طلب تعديل" tone="secondary" style={{ borderRadius: 14, paddingVertical: 10, paddingHorizontal: 24 }} />
               </div>
             </div>
             
@@ -86,7 +86,7 @@ export function ControlPanelDshCatalogCategoriesScreen() {
             <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <Text role="caption" tone="muted" style={{ fontWeight: '700' }}>المرحلة الحالية</Text>
-                <Text role="bodyStrong" style={{ color: '#0A2F5C', textAlign: 'right' }}>{categoryNodes.find(n => n.id === activeCategoryId)?.stage}</Text>
+                <Text role="bodyStrong" style={{ color: '#0A2F5C', textAlign: 'right' }}>{activeNode?.stage}</Text>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <Text role="caption" tone="muted" style={{ fontWeight: '700' }}>سلطة التحكم</Text>

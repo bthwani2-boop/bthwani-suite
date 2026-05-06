@@ -2,7 +2,7 @@ import {
   type DshCanonicalProductCard,
   type DshCanonicalPublishStage,
   type DshCanonicalStoreCard,
-} from '../shared/catalog/dshStoreProductCardModel';
+} from '../shared/dshStoreProductCardModel';
 
 export type FieldStatusTone = 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 

@@ -21,7 +21,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BannerCarousel, Button, Chip, Icon, SearchTopBar, TopBar, StateView, Text, Toast, colorPalette, useDirection, useUiText, ProductCard, type BannerCarouselItem } from '@bthwani/ui-kit';
-import { dshCategoryMeasurementPolicies } from '../shared/catalog/catalog';
+import { dshCategoryMeasurementPolicies } from '../shared/catalog';
 import { formatDshStoreFollowersLabel } from './store-profile';
 import { resolveDshImageSource } from './resolve-image-source';
 import { getDshClientStateMeta, type DshClientState } from './dshClientStateModel';

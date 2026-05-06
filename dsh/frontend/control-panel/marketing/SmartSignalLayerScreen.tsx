@@ -16,7 +16,7 @@ import {
 	useUiText,
 } from '@bthwani/ui-kit';
 import { WebMissionHeroCard, WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
-import { ControlPanelDshDecisionBoard } from '../../shared';
+import { ControlPanelDshDecisionBoard } from '../shared';
 import {
 	buildMarketingTickerPlan,
 	createMarketingTickerDraft,
@@ -41,7 +41,7 @@ import {
 	type MarketingNewsTickerSource,
 	type MarketingNewsTickerStatus,
 } from './news-ticker-store';
-import { dshPartnerIntakeItems } from '../../partners/workflow';
+import { dshPartnerIntakeItems } from '../partners/workflow';
 
 export type ControlPanelDshMarketingScreenProps = {
 	hubHref?: string;

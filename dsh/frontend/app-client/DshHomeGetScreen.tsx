@@ -36,7 +36,7 @@ import {
 } from './DshHomeApprovedVideoReelsViewer';
 import { getDshCategoryIconUrl } from './getDshCategoryIconUrl';
 import { resolveDshImageSource } from './resolve-image-source';
-import type { MarketingGrowthRecord } from '../shared/marketing/growth-store';
+import type { MarketingGrowthRecord } from '../shared/growth-store';
 
 function resolveDshHomeStoreImageSource(imageUri?: string): ImageSourcePropType | undefined {
   return resolveDshImageSource(imageUri);

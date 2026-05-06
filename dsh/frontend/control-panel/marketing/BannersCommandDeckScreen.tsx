@@ -17,7 +17,7 @@ import {
   type MarketingBannerAudience,
   type MarketingBannerRecord,
   type MarketingBannerStatus,
-} from '../../shared/marketing/banner-store';
+} from '../../shared/banner-store';
 
 export type BannersCommandDeckScreenProps = {
   hubHref?: string;

@@ -12,16 +12,16 @@ import {
 } from './operations.registry';
 import { OPERATIONS_PULSE_METRICS } from './operations.preview-data';
 import type { CanonicalOperationsGroupId, OperationsPanelId, OperationsViewState } from './operations.types';
-import { CommandCenterScreen } from './command-center/CommandCenterScreen';
-import { LiveOrdersScreen } from './live-orders/LiveOrdersScreen';
-import { DispatchAssignmentScreen } from './dispatch-assignment/DispatchAssignmentScreen';
-import { ControlPanelDshSheinProxyScreen } from './sheinproxy/ControlPanelDshSheinProxyScreen';
-import { AwnakScreen } from './awnak/AwnakScreen';
-import { CaptainOperationsScreen } from './captain-operations/CaptainOperationsScreen';
-import { PartnerStoresScreen } from './partner-stores/PartnerStoresScreen';
-import { AreaCapacityScreen } from './area-capacity/AreaCapacityScreen';
-import { ExceptionsEscalationsScreen } from './exceptions-escalations/ExceptionsEscalationsScreen';
-import { AuditSupportSlaScreen } from './audit-support-sla/AuditSupportSlaScreen';
+import { CommandCenterScreen } from './CommandCenterScreen';
+import { LiveOrdersScreen } from './LiveOrdersScreen';
+import { DispatchAssignmentScreen } from './DispatchAssignmentScreen';
+import { ControlPanelDshSheinProxyScreen } from './ControlPanelDshSheinProxyScreen';
+import { AwnakScreen } from './AwnakScreen';
+import { CaptainOperationsScreen } from './CaptainOperationsScreen';
+import { PartnerStoresScreen } from './PartnerStoresScreen';
+import { AreaCapacityScreen } from './AreaCapacityScreen';
+import { ExceptionsEscalationsScreen } from './ExceptionsEscalationsScreen';
+import { AuditSupportSlaScreen } from './AuditSupportSlaScreen';
 import styles from './dsh-surface.module.css';
 
 export type ControlPanelDshOperationsScreenProps = {
