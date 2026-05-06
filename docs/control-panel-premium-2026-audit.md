@@ -48,19 +48,10 @@ Control sub-routes:
 - `/control/administration`
 - `/control/hr`
 
-Operations DSH route family:
+Canonical operations route:
 
-- `/operations/dsh`
-- `/operations/dsh/orders`
-- `/operations/dsh/partners`
-- `/operations/dsh/catalogs`
-- `/operations/dsh/marketing`
-- `/operations/dsh/reassign`
-- `/operations/dsh/peak-mode`
-- `/operations/dsh/bell`
-- `/operations/dsh/zone-set`
-- `/operations/dsh/sheinproxy`
-- plus nested order and sheinproxy detail routes
+- `/operations`
+- optional query params handle workspace/detail state, for example `?workspace=live-orders`, `?workspace=sheinproxy`, `?orderId=...`, `?panel=detail`
 
 ## Critical Findings
 
@@ -130,8 +121,8 @@ Design conclusion:
 Some domain responsibilities are not cleanly separated:
 
 - `partners`, `catalogs`, and `marketing` exist as main sections
-- the same topics also exist under `/operations/dsh/*`
-- `orders` lives under DSH, while `/operations` also acts like a routing hub to those same workspaces
+- legacy `operations/dsh/*` aliases were duplicating these sections instead of keeping `/operations` as the single routing surface
+- `orders` used to appear under DSH aliases while `/operations` already acted as the real routing hub
 
 Evidence:
 
