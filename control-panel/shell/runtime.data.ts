@@ -20,7 +20,7 @@ export type ControlPanelRuntimeMission = {
 };
 
 const controlPanelServices: ControlPanelRuntimeService[] = [
-  { id: 'dsh', label: 'DSH', statusKind: 'live', sections: ['dashboard', 'operations', 'partners', 'marketing', 'platform', 'administration', 'hr'], placeholder: false },
+  { id: 'dsh', label: 'DSH', statusKind: 'live', sections: ['dashboard', 'operations', 'catalogs', 'partners', 'marketing', 'platform', 'administration', 'hr'], placeholder: false },
   { id: 'arb', label: 'ARB', statusKind: 'live', sections: ['operations', 'partners', 'support'], placeholder: false },
   { id: 'amn', label: 'AMN', statusKind: 'reference', sections: ['operations', 'support'], placeholder: true },
   { id: 'wlt', label: 'WLT', statusKind: 'live', sections: ['finance'], placeholder: false },
@@ -35,6 +35,7 @@ const controlPanelSections: ControlPanelRuntimeSection[] = [
   { id: 'dashboard', serviceIds: ['dsh'] },
   { id: 'operations', serviceIds: ['dsh', 'arb', 'amn'] },
   { id: 'finance', serviceIds: ['wlt'] },
+  { id: 'catalogs', serviceIds: ['dsh'] },
   { id: 'community-services', serviceIds: ['knz', 'kwd', 'esf', 'mrf', 'snd'] },
   { id: 'support', serviceIds: ['arb', 'amn'] },
   { id: 'partners', serviceIds: ['dsh', 'arb'] },

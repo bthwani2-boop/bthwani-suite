@@ -596,18 +596,6 @@ export function ControlPanelDshMarketingScreen({
 
 	return (
 		<Box gap={4}>
-			<ControlPanelDshDecisionBoard
-				title="Smart signal board"
-				purpose="Keep the currently active notice, audience, priority, and suppression state visible."
-				primaryDecision={primaryPreview?.statusLabel ?? copy.noActiveLabel}
-				nextAction={smartPlan.activeEntry?.reason ? resolveMarketingTickerPlanReasonLabel(locale, smartPlan.activeEntry.reason) : copy.reasonDraft}
-				blockers={smartPlan.activeEntry?.reason ? resolveMarketingTickerPlanReasonLabel(locale, smartPlan.activeEntry.reason) : copy.noActiveLabel}
-				ownerSurface="marketing"
-				evidenceHint={`${copy.activeLabel}: ${primaryPreview?.statusLabel ?? copy.noActiveLabel} · ${copy.automaticLabel}: ${counts.automatic}`}
-				routeHint={operationsHref}
-				decisionTone={counts.suppressed > 0 ? 'warning' : 'brand'}
-			/>
-
 			<WebMissionHeroCard
 				dense
 				badges={[
@@ -616,8 +604,7 @@ export function ControlPanelDshMarketingScreen({
 					primaryPreview?.statusLabel ?? copy.noActiveLabel,
 				]}
 				eyebrow={locale === 'en' ? 'Marketing signal command' : 'غرفة قيادة الإشارات الذكية'}
-				title={locale === 'en' ? 'A cleaner and stronger smart-signal surface' : 'سطح أقوى وأنظف للإشارات الذكية'}
-				description={locale === 'en' ? 'Control all operational and customer-facing alerts from one elegant lane with less noise and clearer priority.' : 'تحكم في الرسائل التشغيلية ورسائل العميل من مسار واحد أنظف بصريًا وأوضح أولويةً وأقل ضجيجًا.'}
+				title={locale === 'en' ? 'Smart-signal command center' : 'غرفة قيادة الإشارات الذكية'}
 				metaItems={[
 					`${copy.activeLabel}: ${primaryPreview?.statusLabel ?? copy.noActiveLabel}`,
 					`${copy.automaticLabel}: ${counts.automatic}`,
@@ -627,20 +614,17 @@ export function ControlPanelDshMarketingScreen({
 				secondaryAction={{ label: marketingCopy.openDashboard, href: hubHref }}
 			/>
 
+
 			<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
 				<WebSignalCard title={copy.totalLabel} value={String(counts.total)} description={copy.planDescription} />
 				<WebSignalCard title={copy.automaticLabel} value={String(counts.automatic)} description={copy.automaticLaneTitle} tone={counts.automatic > 0 ? 'best' : 'neutral'} />
 				<WebSignalCard title={copy.manualLabel} value={String(counts.manual)} description={copy.manualLaneTitle} />
 				<WebSignalCard title={copy.pinnedLabel} value={String(counts.pinned)} description={copy.smartPreviewTitle} />
 			</Box>
-
-			<WebSectionCard title={copy.audienceFocusTitle} description={copy.audienceFocusDescription}>
+			<WebSectionCard title={copy.audienceFocusTitle}>
 				<Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
 					<Surface tone="brand" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 300 }}>
 						<Text role="titleSm" tone="inverse">{copy.smartPreviewTitle}</Text>
-						<Text role="bodySm" tone="inverse" style={{ opacity: 0.92 }}>
-							{copy.smartPreviewDescription}
-						</Text>
 						<Tabs<MarketingNewsTickerAudience>
 							items={audienceTabs}
 							value={audienceFocus}
@@ -662,9 +646,6 @@ export function ControlPanelDshMarketingScreen({
 
 					<Surface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
 						<Text role="titleSm">{locale === 'en' ? 'Category handoff lane' : 'مسار تسليم الفئات للتسويق'}</Text>
-						<Text role="bodySm" tone="muted">
-							{locale === 'en' ? 'Partner-approved items appear here before they reach the client experience.' : 'العناصر المقبولة من الشركاء تظهر هنا قبل أن تُدفع إلى تجربة العميل.'}
-						</Text>
 						<Box gap={2}>
 							{marketingCategoryLanes.length > 0 ? marketingCategoryLanes.map((lane) => (
 								<Box key={lane.categoryLabel} padding={3} gap={2} border radiusToken="xl" background="surfaceInset" borderTone="line">
@@ -691,7 +672,7 @@ export function ControlPanelDshMarketingScreen({
 				</Box>
 			</WebSectionCard>
 
-			<WebSectionCard title={copy.editorTitle} description={copy.editorDescription}>
+			<WebSectionCard title={copy.editorTitle}>
 				<Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
 					<Surface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 340 }}>
 						<Box gap={1}>
@@ -834,7 +815,7 @@ export function ControlPanelDshMarketingScreen({
 				</Box>
 			</WebSectionCard>
 
-			<WebSectionCard title={copy.planTitle} description={copy.planDescription}>
+			<WebSectionCard title={copy.planTitle}>
 				<Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap', alignItems: 'flex-start' }}>
 					<Surface tone="raised" padding={4} gap={2} style={{ flexGrow: 1, minWidth: 300 }}>
 						<Text role="titleSm">{copy.automaticLaneTitle}</Text>

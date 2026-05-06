@@ -2,6 +2,7 @@
 
 import {
   DshControlPanelSurfaceHost,
+  ControlPanelDshCatalogScreen,
   ControlPanelDshMarketingScreen,
   ControlPanelDshPartnerApprovalsScreen,
 } from '../composition';
@@ -28,7 +29,7 @@ import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 
 const phaseOneSectionIds = ['dashboard', 'operations', 'finance', 'community-services', 'support'] as const;
-const hiddenSectionIds = ['partners', 'marketing', 'platform', 'administration', 'hr'] as const;
+const hiddenSectionIds = ['catalogs', 'partners', 'marketing', 'platform', 'administration', 'hr'] as const;
 const primarySectionIds = [...phaseOneSectionIds, ...hiddenSectionIds] as const;
 const dshLiveWorkbenchIds = ['orders', 'reassign', 'peakMode', 'arrivalBell'] as const;
 const dshPlannedWorkbenchIds = ['sheinProxy', 'zoneSet', 'dashboard', 'captain-ops', 'field-ops', 'issues', 'serviceability', 'guard-status', 'evidence', 'dispatch', 'live-tracking', 'exceptions', 'sla', 'audit', 'partner-prep', 'handoff', 'proof-review', 'capacity'] as const;
@@ -138,6 +139,7 @@ const sectionRouteMap: Record<ControlPanelSectionId, PrimarySectionHref> = {
   'community-services': '/community-services',
   support: '/support',
   partners: '/partners',
+  catalogs: '/catalogs',
   marketing: '/marketing',
   platform: '/platform',
   administration: '/administration',
@@ -190,6 +192,7 @@ function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPane
     'community-services': '◌',
     support: '☏',
     partners: '▣',
+    catalogs: '⌗',
     marketing: '📣',
     platform: '⚙',
     administration: '⚙',
@@ -872,6 +875,15 @@ export function ControlPanelSurfaceHost({
             description={panelText.surfaceDescriptions.partners}
           >
             <ControlPanelDshPartnerApprovalsScreen hubHref="/partners" operationsHref="/partners" />
+          </WebSectionCard>
+        ) : null}
+
+        {activeSectionId === 'catalogs' ? (
+          <WebSectionCard
+            title={panelText.surfaceTitles.catalogs}
+            description={panelText.surfaceDescriptions.catalogs}
+          >
+            <ControlPanelDshCatalogScreen />
           </WebSectionCard>
         ) : null}
 

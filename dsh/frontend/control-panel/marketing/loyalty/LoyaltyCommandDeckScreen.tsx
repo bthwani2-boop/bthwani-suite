@@ -12,7 +12,6 @@ import {
   Text,
 } from '@bthwani/ui-kit';
 import { WebMissionHeroCard, WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
-import { ControlPanelDshDecisionBoard } from '../../shared';
 import {
   loyaltyCommercialLaneItems,
   loyaltyCommercialKeyValues,
@@ -87,24 +86,11 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations', operationsHr
 
   return (
     <Box gap={4}>
-      <ControlPanelDshDecisionBoard
-        title="Loyalty command board"
-        purpose="Keep loyalty, subscription, and coupon decisions close to the active lane."
-        primaryDecision={section === 'builder' ? 'Edit or publish the selected program' : section === 'sync' ? 'Run sync or hold it' : section === 'guardrails' ? 'Approve guardrail changes or stop release' : 'Review the active loyalty lane'}
-        nextAction={section === 'builder' ? 'Open the builder and save the program' : section === 'sync' ? 'Open the sync lane or return to operations' : section === 'guardrails' ? 'Confirm guardrails and keep release protected' : 'Choose the operational lane'}
-        blockers={lastAction}
-        ownerSurface="marketing"
-        evidenceHint={`${resolveLaneTitle(lane)} · ${resolveAudienceLabel(audience)} · ${resolveDeliveryLabel(deliveryMode)}`}
-        routeHint={operationsHref}
-        decisionTone={deliveryMode === 'manual' ? 'warning' : 'brand'}
-      />
-
       <WebMissionHeroCard
         dense
         badges={['الولاء', 'قيمة العميل', 'تحكم مباشر']}
         eyebrow="غرفة قيادة الولاء"
         title="واجهة ولاء أرقى وأوضح لاتخاذ القرار"
-        description="تم التخلص من العرض الضعيف والنصوص التقنية لصالح سطح تحكم تجاري عصري ينسق الاشتراك والنقاط والعروض ضمن تجربة أكثر فخامة ووضوحًا."
         metaItems={[
           `عدد المسارات: ${liveLaneCount}`,
           `القيمة الحالية: ${activeSignal.value}`,
@@ -128,7 +114,7 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations', operationsHr
       />
 
       {section === 'overview' ? (
-        <WebSectionCard title="الرؤية التنفيذية" description="تلخيص نظيف وقوي لمسار الولاء الحالي دون ضوضاء تقنية أو تسميات خام.">
+        <WebSectionCard title="الرؤية التنفيذية">
           <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
             <Surface tone="brand" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 300 }}>
               <Text role="titleSm" tone="inverse">{resolveLaneTitle(lane)}</Text>
@@ -168,7 +154,7 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations', operationsHr
       ) : null}
 
       {section === 'builder' ? (
-        <WebSectionCard title="مصمم البرنامج" description="تحرير الرسالة التجارية والجمهور والنشر من مساحة أكثر هدوءًا ووضوحًا وهيمنة على القرار.">
+        <WebSectionCard title="مصمم البرنامج">
           <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
             <Surface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
               <TextField label="اسم البرنامج" value={programName} onChangeText={setProgramName} hint="اسم واضح يتعامل معه فريق التسويق والعمليات" />
@@ -226,7 +212,7 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations', operationsHr
       ) : null}
 
       {section === 'sync' ? (
-        <WebSectionCard title="المزامنة الحية" description="المفاتيح المهمة تظهر هنا بلغة مفهومة وتجارية بدل الأسماء التطويرية المجردة.">
+        <WebSectionCard title="المزامنة الحية">
           <Box gap={3}>
             <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
               <WebSignalCard title="الاشتراك" value="الخطة الأسرية" description="تحديث الخطة والعائلة قبل الإجراء المدفوع" tone="best" />
@@ -251,7 +237,7 @@ export function LoyaltyCommandDeckScreen({ hubHref = '/operations', operationsHr
       ) : null}
 
       {section === 'guardrails' ? (
-        <WebSectionCard title="الضوابط والحماية" description="القرار والجمهور والنشر أصبحوا أوضح بصريًا وأسهل مراجعةً من السابق.">
+        <WebSectionCard title="الضوابط والحماية">
           <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
             <Surface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
               <WebSegmentedTabs

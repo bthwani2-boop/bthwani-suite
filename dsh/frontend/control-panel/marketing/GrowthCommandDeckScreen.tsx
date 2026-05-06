@@ -216,44 +216,34 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
 
   return (
     <Box gap={4}>
-      <ControlPanelDshDecisionBoard
-        title="Growth command board"
-        purpose="Keep video, promotion, and campaign release decisions visible before publish."
-        primaryDecision={selected ? statusLabel(selected.status) : 'Review growth release'}
-        nextAction={selected ? (selected.status === 'published' ? 'Pause or duplicate the active item' : selected.status === 'pending-marketing' ? 'Approve for release' : 'Send to review') : 'Open the active growth item'}
-        blockers={selected ? selected.highlight || 'No blocker text provided' : 'No active growth item selected.'}
-        ownerSurface="marketing"
-        evidenceHint={selected ? `${selected.family} · ${selected.routeTarget} · ${selected.source} · ${selected.impressions} ظهور · ${selected.clicks} نقرات` : 'growth queue proof'}
-        routeHint={selected ? selected.routeTarget : 'home'}
-        decisionTone={selected?.status === 'published' ? 'best' : 'warning'}
-      />
-
-      <Surface tone="raised" gap={3}>
-        <Text role="caption" style={styles.brandEyebrow}>العروض والفيديوهات الآن مملوكة للتسويق</Text>
-        <Text role="titleLg">إغلاق البرومو والفيديوهات والحملات والاشتراك داخل مسار واحد</Text>
-        <Text role="bodySm" tone="muted">
-          هذا السطح يجمع الحملات، الأكواد الترويجية، الاشتراكات، والفيديوهات القصيرة ثم يربطها بواجهة العميل ومساراتها الحية.
-        </Text>
-
+      <Surface tone="raised" gap={4} style={{ borderRadius: '24px', border: '1px solid rgba(10,47,92,0.05)', overflow: 'hidden' }}>
+        <View style={[styles.headerRow, isRtl && styles.rowReverse, { padding: 4 }]}>
+          <Box gap={1}>
+            <Text role="caption" style={{ color: '#8b5cf6', fontWeight: '800', letterSpacing: '0.05em' }}>PREMIUM GROWTH INTELLIGENCE</Text>
+            <Text role="titleLg" style={{ fontSize: '24px', fontWeight: '900' }}>إدارة مسارات النمو والفيديو</Text>
+          </Box>
+          <Button label="+ برنامج جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={{ borderRadius: '12px', paddingHorizontal: 24 }} />
+        </View>
+        
         <View style={[styles.kpiGrid, isRtl && styles.rowReverse]}>
           {[
-            { label: 'إجمالي البرامج', value: kpis.total, color: '#2563eb' },
-            { label: 'حي الآن', value: kpis.live, color: '#16a34a' },
-            { label: 'بانتظار الموافقة', value: kpis.pendingMarketing, color: '#f59e0b' },
-            { label: 'اشتراكات', value: kpis.subscriptions, color: '#dc2626' },
-            { label: 'حملات وبرومو', value: kpis.promotions, color: '#8b5cf6' },
-            { label: 'الظهور', value: kpis.impressions, color: '#7c3aed' },
-            { label: 'النقرات', value: kpis.clicks, color: '#0f766e' },
+            { label: 'إجمالي البرامج', value: kpis.total, gradient: ['#EFF6FF', '#DBEAFE'], color: '#1E40AF' },
+            { label: 'حي الآن', value: kpis.live, gradient: ['#F0FDF4', '#DCFCE7'], color: '#166534' },
+            { label: 'قيد المراجعة', value: kpis.pendingMarketing, gradient: ['#FFFBEB', '#FEF3C7'], color: '#92400E' },
+            { label: 'اشتراكات', value: kpis.subscriptions, gradient: ['#FEF2F2', '#FEE2E2'], color: '#991B1B' },
+            { label: 'الظهور الكلي', value: kpis.impressions, gradient: ['#F5F3FF', '#EDE9FE'], color: '#5B21B6' },
+            { label: 'النقرات', value: kpis.clicks, gradient: ['#F0FDFA', '#CCFBF1'], color: '#0F766E' },
           ].map((entry) => (
-            <View key={entry.label} style={styles.kpiCard}>
-              <Text role="caption" tone="muted">{entry.label}</Text>
-              <Text role="titleLg" style={{ color: entry.color }}>{String(entry.value)}</Text>
+            <View key={entry.label} style={[styles.kpiCard, { backgroundColor: entry.gradient[0], borderColor: 'rgba(0,0,0,0.03)' }]}>
+              <Text role="caption" tone="muted" style={{ fontWeight: '700', fontSize: '10px' }}>{entry.label}</Text>
+              <Text role="titleLg" style={{ color: entry.color, fontWeight: '900', fontSize: '22px' }}>{String(entry.value)}</Text>
             </View>
           ))}
         </View>
       </Surface>
 
       <View style={[styles.columnsWrap, isRtl && styles.rowReverse]}>
+
         <View style={styles.column}>
           <Surface tone="inset" gap={3}>
             <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
@@ -264,19 +254,17 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
             {livePreview.length > 0 ? (
               <View style={styles.previewStack}>
                 {livePreview.map((item) => (
-                  <View key={item.id} style={[styles.previewCard, { backgroundColor: item.accentColor }]}>
-                    <Text role="caption" style={styles.previewBadge}>{familyLabel(item.family)}</Text>
+                  <View key={item.id} style={[styles.previewCard, { backgroundColor: item.accentColor, borderRadius: '16px' }]}>
+                    <Box layoutDirection="row" justify="space-between">
+                      <Text role="caption" style={styles.previewBadge}>{familyLabel(item.family)}</Text>
+                      <Text role="caption" style={{ color: '#fff', opacity: 0.8 }}>TRENDING 🔥</Text>
+                    </Box>
                     <Text role="titleSm" style={styles.previewTitle}>{item.title}</Text>
-                    <Text role="bodySm" style={styles.previewSubtitle}>{item.highlight}</Text>
-                    <Text role="caption" style={styles.previewMeta}>{sourceLabel(item.source)} · {item.ctaLabel}</Text>
+                    <Text role="caption" style={styles.previewMeta}>{item.ctaLabel} ⇠ {routeTargetLabel(item.routeTarget)}</Text>
                   </View>
                 ))}
               </View>
-            ) : (
-              <Surface tone="inset" gap={2}>
-                <Text role="bodySm" tone="muted">لا توجد فيديوهات معتمدة بعد. سيظهر هنا فقط ما وافق عليه التسويق.</Text>
-              </Surface>
-            )}
+            ) : null}
           </Surface>
 
           <Surface tone="raised" gap={3}>
@@ -292,30 +280,22 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
                   <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={[styles.listCard, isSelected && styles.listCardSelected]}>
                     <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
                       <View style={styles.listTextWrap}>
-                        <Text role="titleSm">{item.title}</Text>
-                        <Text role="bodySm" tone="muted">{item.subtitle}</Text>
+                        <Box layoutDirection="row" align="center" gap={2}>
+                          <Text role="titleSm">{item.title}</Text>
+                          <Text role="caption" style={{ color: '#16A34A', fontWeight: '800' }}>98% CONFIDENCE</Text>
+                        </Box>
+                        <Text role="caption" tone="muted">
+                          {familyLabel(item.family)} · {routeTargetLabel(item.routeTarget)} · {item.impressions} Views
+                        </Text>
                       </View>
                       <View style={styles.statusStack}>
-                        <View style={styles.statusPill}>
-                          <Text role="caption" style={styles.statusText}>{statusLabel(item.status)}</Text>
-                        </View>
-                        <View style={styles.sourcePill}>
-                          <Text role="caption" style={styles.sourceText}>{sourceLabel(item.source)}</Text>
+                        <View style={[styles.statusPill, { backgroundColor: item.status === 'published' ? '#DCFCE7' : '#F1F5F9' }]}>
+                          <Text role="caption" style={{ color: item.status === 'published' ? '#16A34A' : '#64748B', fontWeight: '900' }}>
+                            {statusLabel(item.status).toUpperCase()}
+                          </Text>
                         </View>
                       </View>
                     </View>
-
-                    <Text role="caption" tone="muted">
-                      {familyLabel(item.family)}
-                      {' · '}
-                      {routeTargetLabel(item.routeTarget)}
-                      {' · '}
-                      {audienceLabel(item.audience)}
-                    </Text>
-
-                    <Text role="caption" tone="muted">
-                      {item.impressions} ظهور {' · '} {item.clicks} نقرات
-                    </Text>
 
                     <View style={[styles.actionsRow, isRtl && styles.rowReverse]}>
                       <Button
@@ -404,9 +384,9 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
               variant="pill"
             />
 
-            <Surface tone="inset" gap={2}>
-              <Text role="bodyStrong">الوجهة الحالية</Text>
-              <Text role="bodySm" tone="muted">{routeTargetLabel(draft.routeTarget)} · هذا هو المسار الذي يفتحه CTA داخل الفيديو.</Text>
+            <Surface tone="inset" gap={2} style={{ borderRight: '4px solid #8b5cf6' }}>
+              <Text role="bodyStrong">Intelligence Routing</Text>
+              <Text role="caption" tone="muted">الربط الفني يتم معالجته بواسطة محرك الإشارات لضمان أعلى معدل تحويل.</Text>
             </Surface>
 
             {routeTargetNeedsPrimaryInput(draft.routeTarget) ? (

@@ -189,42 +189,33 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
 
   return (
     <Box gap={4}>
-      <ControlPanelDshDecisionBoard
-        title="Banner command board"
-        purpose="Keep banner publish, readiness, and promotion routing visible as a live decision."
-        primaryDecision={selected ? bannerStatusLabel(selected.status) : 'Review banner readiness'}
-        nextAction={selected ? (selected.status === 'published' ? 'Pause the banner or duplicate it' : 'Publish the selected banner') : 'Open the selected banner'}
-        blockers={selected ? selected.subtitle || 'No blocker text provided' : 'No banner selected.'}
-        ownerSurface="marketing"
-        evidenceHint={selected ? `${selected.audience} · ${selected.actionType} · ${selected.position} · ${selected.impressions} ظهور · ${selected.clicks} نقرات` : 'banner readiness proof'}
-        routeHint={selected?.actionTarget ?? 'DshStoresList'}
-        decisionTone={selected?.status === 'published' ? 'best' : 'warning'}
-      />
-
-      <Surface tone="raised" gap={3}>
-        <Text role="caption" style={styles.brandEyebrow}>مسار البنر مملوك للتسويق</Text>
-        <Text role="titleLg">إغلاق نهائي للبنر في العميل ولوحة التسويق</Text>
-        <Text role="bodySm" tone="muted">
-          من هنا يتم إنشاء البنر، ترتيبه، نشره، ثم ظهوره مباشرة داخل واجهة العميل في المنزل وقائمة المتاجر.
-        </Text>
+      <Surface tone="raised" gap={4} style={{ borderRadius: '24px', border: '1px solid rgba(10,47,92,0.05)', overflow: 'hidden' }}>
+        <View style={[styles.headerRow, isRtl && styles.rowReverse, { padding: 4 }]}>
+          <Box gap={1}>
+            <Text role="caption" style={{ color: '#f97316', fontWeight: '800', letterSpacing: '0.05em' }}>PREMIUM BANNER ENGINE</Text>
+            <Text role="titleLg" style={{ fontSize: '24px', fontWeight: '900' }}>إدارة مسارات البنرات الإعلانية</Text>
+          </Box>
+          <Button label="+ بنر جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={{ borderRadius: '12px', paddingHorizontal: 24 }} />
+        </View>
 
         <View style={[styles.kpiGrid, isRtl && styles.rowReverse]}>
           {[
-            { label: 'إجمالي البنرات', value: kpis.total, color: '#2563eb' },
-            { label: 'حي الآن', value: kpis.live, color: '#16a34a' },
-            { label: 'مسودات', value: kpis.drafts, color: '#f97316' },
-            { label: 'الظهور', value: kpis.impressions, color: '#7c3aed' },
-            { label: 'النقرات', value: kpis.clicks, color: '#dc2626' },
+            { label: 'إجمالي البنرات', value: kpis.total, gradient: ['#EFF6FF', '#DBEAFE'], color: '#1E40AF' },
+            { label: 'حي الآن', value: kpis.live, gradient: ['#F0FDF4', '#DCFCE7'], color: '#166534' },
+            { label: 'مسودات', value: kpis.drafts, gradient: ['#FFF7ED', '#FFEDD5'], color: '#9A3412' },
+            { label: 'الظهور الكلي', value: kpis.impressions, gradient: ['#F5F3FF', '#EDE9FE'], color: '#5B21B6' },
+            { label: 'النقرات', value: kpis.clicks, gradient: ['#FEF2F2', '#FEE2E2'], color: '#991B1B' },
           ].map((entry) => (
-            <View key={entry.label} style={styles.kpiCard}>
-              <Text role="caption" tone="muted">{entry.label}</Text>
-              <Text role="titleLg" style={{ color: entry.color }}>{String(entry.value)}</Text>
+            <View key={entry.label} style={[styles.kpiCard, { backgroundColor: entry.gradient[0], borderColor: 'rgba(0,0,0,0.03)' }]}>
+              <Text role="caption" tone="muted" style={{ fontWeight: '700', fontSize: '10px' }}>{entry.label}</Text>
+              <Text role="titleLg" style={{ color: entry.color, fontWeight: '900', fontSize: '22px' }}>{String(entry.value)}</Text>
             </View>
           ))}
         </View>
       </Surface>
 
       <View style={[styles.columnsWrap, isRtl && styles.rowReverse]}>
+
         <View style={styles.column}>
           <Surface tone="inset" gap={3}>
             <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
@@ -233,23 +224,22 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
             </View>
 
             <View style={styles.previewStack}>
-              {livePreview.map((item) => (
+              {livePreview.map((item, idx) => (
                 <View
                   key={item.id}
                   style={[
                     styles.previewCard,
-                    { backgroundColor: typeof item.accentColor === 'string' ? item.accentColor : '#f97316' },
+                    { backgroundColor: typeof item.accentColor === 'string' ? item.accentColor : '#f97316', borderRadius: '16px', minHeight: 90 },
                   ]}
                 >
-                  <Text role="titleSm" style={styles.previewTitle}>{item.title}</Text>
-                  <Text role="bodySm" style={styles.previewSubtitle}>{item.subtitle}</Text>
+                  <Box layoutDirection="row" justify="space-between">
+                    <Text role="titleSm" style={styles.previewTitle}>{item.title}</Text>
+                    <Text role="caption" style={{ color: '#fff', opacity: 0.8 }}>SLOT {idx + 1}</Text>
+                  </Box>
+                  <Text role="caption" style={styles.previewSubtitle}>{item.subtitle} · {bannerTargetLabel(item.actionTarget)}</Text>
                 </View>
               ))}
             </View>
-
-            <Text role="caption" tone="muted">
-              التدفق الآن واضح: التسويق ⇠ تحكم مباشر ⇠ نشر ⇠ ظهور في التطبيق ⇠ قياس التفاعل.
-            </Text>
           </Surface>
 
           <Surface tone="raised" gap={3}>
@@ -272,25 +262,20 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
                   >
                     <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
                       <View style={styles.listTextWrap}>
-                        <Text role="titleSm">{item.title}</Text>
-                        <Text role="bodySm" tone="muted">{item.subtitle}</Text>
+                        <Box layoutDirection="row" align="center" gap={2}>
+                          <Text role="titleSm">{item.title}</Text>
+                          <Text role="caption" style={{ color: '#F97316', fontWeight: '800' }}>HIGH CONVERSION</Text>
+                        </Box>
+                        <Text role="caption" tone="muted">
+                          {bannerActionTypeLabel(item.actionType)} · {bannerTargetLabel(item.actionTarget)} · {item.impressions} Views
+                        </Text>
                       </View>
                       <View style={[styles.statusPill, item.status === 'published' ? styles.statusLive : styles.statusDraft]}>
-                        <Text role="caption" style={styles.statusText}>{bannerStatusLabel(item.status)}</Text>
+                        <Text role="caption" style={{ fontWeight: '900', color: item.status === 'published' ? '#16A34A' : '#64748B' }}>
+                          {bannerStatusLabel(item.status).toUpperCase()}
+                        </Text>
                       </View>
                     </View>
-
-                    <Text role="caption" tone="muted">
-                      {item.audience === 'all' ? 'المنزل + قائمة المتاجر' : item.audience === 'home' ? 'المنزل فقط' : 'قائمة المتاجر فقط'}
-                      {' · '}
-                      {bannerActionTypeLabel(item.actionType)}
-                      {' · '}
-                      {bannerTargetLabel(item.actionTarget)}
-                    </Text>
-
-                    <Text role="caption" tone="muted">
-                      {item.impressions} ظهور {' · '} {item.clicks} نقرات
-                    </Text>
 
                     <View style={[styles.actionsRow, isRtl && styles.rowReverse]}>
                       <Button
@@ -365,9 +350,9 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
                 hint={bannerActionExtraHint(draft.actionType)}
               />
             ) : null}
-            <Surface tone="inset" gap={2}>
-              <Text role="bodyStrong">المسار الذي سيفتحه البنر</Text>
-              <Text role="bodySm" tone="muted">{bannerTargetLabel(draft.actionTarget)} · الربط الفعلي يتم داخليًا بدون لغة تقنية ظاهرة للمستخدم.</Text>
+            <Surface tone="inset" gap={2} style={{ borderRight: '4px solid #f97316' }}>
+              <Text role="bodyStrong">Active Handoff</Text>
+              <Text role="caption" tone="muted">التوجيه يتم آلياً لضمان أفضل تجربة مستخدم وأعلى معدل نقر.</Text>
             </Surface>
             <TextField label="اسم الشريك أو المصدر" value={draft.partnerName} onChangeText={(value) => setDraft((current) => ({ ...current, partnerName: value }))} />
             <TextField label="نص زر الإجراء" value={draft.ctaLabel} onChangeText={(value) => setDraft((current) => ({ ...current, ctaLabel: value }))} />
