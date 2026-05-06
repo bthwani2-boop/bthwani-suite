@@ -121,6 +121,20 @@ Current Decision: PASS_WITH_WARNINGS (Actor Parity Proven in Preview)
 
 UI/UX/Flow remains NOT_CLOSED.
 
+## DSH-DATA-017 Preview Data Authority Findings
+
+- **Verdict**: PASS_WITH_WARNINGS
+- **Summary**: All preview, fixture, and local-state data entities within DSH have been audited for source authority. Conflicting display names and inconsistent currency standards were unified.
+- **Data Authority Map**:
+  - **CANONICAL**: `dsh/frontend/shared/catalog` and `shared/finance`.
+  - **LEGACY_STABLE**: preserved `store-1001`, `item-apple-1` for backward compatibility.
+  - **FIELD_SOURCE**: `app-field` draft records linked to partner workflow.
+- **Integrity Fixes**:
+  - Unified `store-1001` name to 'أسواق العليا الطازجة' in marketing banners.
+  - Standardized currency label to 'ر.س' across all client-side fixtures.
+  - Verified all marketing (Banner/Growth) targets point to valid active entities.
+- **Evidence Path**: `tools/registry/runs/DSH_DATA_017_PREVIEW_DATA_AUTHORITY-20260506-213046`
+
 The first practical closure candidate is:
 - DSH-FLOW-012
 - control-panel operations
