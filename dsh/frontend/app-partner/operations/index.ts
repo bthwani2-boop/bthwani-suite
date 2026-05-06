@@ -1,1 +1,1 @@
-export * from './screens/DshPartnerOperationsDirectoryScreen';
+// operations/screens: DshPartnerOperationsDirectoryScreen archived (DSH_ARCHIVE_021)

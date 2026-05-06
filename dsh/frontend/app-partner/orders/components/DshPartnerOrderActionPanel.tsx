@@ -49,7 +49,7 @@ export function DshPartnerOrderActionPanel({ activeFlowId, onSelectFlow }: DshPa
         ))}
       </Box>
       <Text role="bodySm" tone="muted">
-        كل مسار هنا تشغيلي فقط ولا يضيف backend أو runtime جديد.
+        كل مسار هنا تشغيلي فقط ومحدد ضمن دورة الطلب.
       </Text>
       <Button label="متابعة من داخل الطلب" tone="secondary" onPress={activeFlowId ? () => onSelectFlow?.(activeFlowId) : undefined} />
     </Surface>

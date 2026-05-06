@@ -65,7 +65,7 @@ export function DshPartnerInventoryScreen({ onBack }: DshPartnerInventoryScreenP
         </Text>
       </Surface>
 
-      <MobileStickyPrimaryAction label="إرسال إلى مراجعة الشركاء" helperText="الإجراء محلي ولا ينفذ backend أو API." onPress={() => undefined} />
+      <MobileStickyPrimaryAction label="إرسال إلى مراجعة الشركاء" helperText="الإجراء محلي فقط." onPress={() => undefined} />
     </MobileScrollView>
   );
 }
@@ -73,6 +73,3 @@ export function DshPartnerInventoryScreen({ onBack }: DshPartnerInventoryScreenP
 export { DshPartnerInventoryScreen as DshInventoryManagementScreen };
 
 export default DshPartnerInventoryScreen;
-
-
-

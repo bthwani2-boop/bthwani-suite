@@ -4,7 +4,6 @@ export * from './console';
 export * from './entry';
 export * from './orders';
 export * from './inventory';
-export * from './operations';
+// operations: DshPartnerOperationsDirectoryScreen archived (DSH_ARCHIVE_021)
 export * from './finance';
 export * from './shared';
-

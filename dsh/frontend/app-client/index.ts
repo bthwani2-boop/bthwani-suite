@@ -5,7 +5,7 @@ export * from './cart/screens';
 export * from './discovery/screens';
 export * from './entry/screens';
 export * from './favorites/screens';
-export * from './gas/screens';
+// gas/screens: DshGasRefillOrderCreateScreen archived (DSH_ARCHIVE_021)
 export * from './bell';
 export * from './home/screens';
 export * from './my_space/screens';
@@ -23,4 +23,3 @@ export { DshHomeApprovedVideoReelsViewer } from './home/components/DshHomeApprov
 export type { DshHomeApprovedVideoReelsViewerProps } from './home/components/DshHomeApprovedVideoReelsViewer';
 export { DshSurfaceHost } from './DshSurfaceHost';
 export type { DshCommandTarget, DshRoute } from './DshSurfaceHost';
-

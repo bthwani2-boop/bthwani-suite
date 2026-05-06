@@ -12,7 +12,7 @@ export function DshPartnerVideoSubmissionPanel({ onSelectFlow }: DshPartnerVideo
 
   return (
     <Surface tone="raised" gap={3}>
-      <SectionHeader title="رفع فيديو الشريك" subtitle="هذا panel يجهز مسار الفيديو بوضوح داخل تصنيف الفيديو فقط، من دون منطق نشر أو backend." />
+      <SectionHeader title="رفع فيديو الشريك" subtitle="يجهز مسار الفيديو بوضوح داخل تصنيف الفيديو فقط." />
       <TextField label="عنوان الفيديو" value={videoTitle} onChangeText={setVideoTitle} />
       <TextField label="ملخص الفيديو" value={videoSummary} onChangeText={setVideoSummary} multiline numberOfLines={3} />
       <Text role="bodySm" tone="muted">

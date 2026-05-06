@@ -18,7 +18,7 @@ export function DshPartnerFinanceBridgePanel({ state = defaultFinanceState }: Ds
     <Surface tone="raised" padding={3} gap={3}>
       <Box gap={1}>
         <Text role="label">جسر المالية للشريك</Text>
-        <Text role="bodySm" tone="muted">هذا الجسر يوضح الرصيد والتسويات والعمولة من دون أي wallet mutation.</Text>
+        <Text role="bodySm" tone="muted">هذا الجسر يوضح الرصيد والتسويات والعمولة.</Text>
       </Box>
       <KeyValueList
         items={[

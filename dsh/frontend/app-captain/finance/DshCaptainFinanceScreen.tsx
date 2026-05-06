@@ -98,7 +98,7 @@ export function DshCaptainFinanceScreen({
       <Box gap={2}>
         <Text role="titleLg">المالية</Text>
         <Text role="bodyMd" tone="muted">
-          مالية الكابتن مختصرة إلى الرصيد والأرباح والتسوية من دون أي runtime أو mutation.
+          مالية الكابتن مختصرة إلى الرصيد والأرباح والتسوية.
         </Text>
       </Box>
 

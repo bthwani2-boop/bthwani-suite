@@ -306,7 +306,7 @@ export function AnalyticsGrowthMarketingWorkspaceContent({
 
       <MobileStickyPrimaryAction
         label="إنشاء عرض سريع"
-        helperText="المقترحات محلية وتعمل بدون backend أو API."
+        helperText="المقترحات محلية وتعمل داخل الصفحة فقط."
         onPress={() => setToolMessage('تم فتح إنشاء عرض سريع محليًا.')}
       />
     </Box>

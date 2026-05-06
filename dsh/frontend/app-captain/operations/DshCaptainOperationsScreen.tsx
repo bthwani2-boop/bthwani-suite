@@ -1,6 +1,5 @@
 import React from 'react';
-import { Button, KeyValueList, ListItem, MobileScrollView, SectionHeader, StateView, Surface, Text, TextField } from '@bthwani/ui-kit';
-import type { DshCaptainOperationsScreenState, DshCaptainOperationsSnapshot } from './dshCaptainOperationsModel';
+import { Button, ListItem, MobileScrollView, SectionHeader, Surface, Text, TextField } from '@bthwani/ui-kit';
 
 export type CaptainSupportScreenId =
   | 'chat-read-ack'
@@ -17,109 +16,6 @@ export type CaptainSupportScreenId =
   | 'proof-upload'
   | 'tier-evaluate'
   | 'tier-info';
-
-export type DshCaptainOperationsScreenProps = {
-  section?: 'availability' | 'route-readiness' | 'safety';
-  state?: DshCaptainOperationsScreenState;
-  snapshot?: DshCaptainOperationsSnapshot;
-  onBack?: () => void;
-  onRetry?: () => void;
-};
-
-const demoSnapshot: DshCaptainOperationsSnapshot = {
-  availabilityLabel: 'متاح',
-  routeReadinessLabel: 'جاهز للمسار',
-  safetyLabel: 'سلامة مستقرة',
-};
-
-function AvailabilitySection({ snapshot = demoSnapshot }: { snapshot?: DshCaptainOperationsSnapshot }) {
-  return (
-    <Surface tone="brand" gap={3}>
-      <SectionHeader title="إتاحة الكابتن" subtitle="تشغيل الكابتن نفسه، وليس الطلب." />
-      <KeyValueList
-        items={[
-          { label: 'الحالة', value: snapshot.availabilityLabel, tone: 'success' },
-          { label: 'الاستعداد', value: 'متابعة الطلبات مباشرة' },
-        ]}
-      />
-    </Surface>
-  );
-}
-
-function RouteReadinessSection({ snapshot = demoSnapshot }: { snapshot?: DshCaptainOperationsSnapshot }) {
-  return (
-    <Surface tone="raised" gap={3}>
-      <SectionHeader title="جاهزية المسار" subtitle="تأكد من جاهزية الطريق قبل الإرسال أو التوجيه." />
-      <KeyValueList
-        items={[
-          { label: 'الملخص', value: snapshot.routeReadinessLabel, tone: 'brand' },
-          { label: 'التوجيه', value: 'محدد محليًا' },
-        ]}
-      />
-    </Surface>
-  );
-}
-
-function SafetySection({ snapshot = demoSnapshot }: { snapshot?: DshCaptainOperationsSnapshot }) {
-  return (
-    <Surface tone="raised" gap={3}>
-      <SectionHeader title="السلامة" subtitle="مؤشرات السلامة يجب أن تبقى قصيرة وواضحة." />
-      <Text role="bodySm" tone="muted">
-        {snapshot.safetyLabel}
-      </Text>
-    </Surface>
-  );
-}
-
-function renderOperationsState(state: DshCaptainOperationsScreenState, onRetry?: () => void) {
-  if (state === 'loading') {
-    return <StateView stateId="loading" title="جارٍ تحميل العمليات" description="تبقى الجاهزية ظاهرة عند وصول البيانات." />;
-  }
-
-  if (state === 'empty') {
-    return <StateView stateId="empty" title="لا توجد بيانات تشغيلية" description="أعد التحميل عند توفر إشارات الإتاحة أو السلامة." actionLabel={onRetry ? 'إعادة التحميل' : undefined} onActionPress={onRetry} />;
-  }
-
-  if (state === 'error') {
-    return <StateView stateId="recoverableError" title="تعذر تحميل العمليات" description="حاول مرة أخرى من دون مغادرة مسار التشغيل." actionLabel="إعادة المحاولة" onActionPress={onRetry} />;
-  }
-
-  return null;
-}
-
-export function DshCaptainOperationsScreen({
-  section = 'availability',
-  state = 'ready',
-  snapshot = demoSnapshot,
-  onBack,
-  onRetry,
-}: DshCaptainOperationsScreenProps) {
-  if (state !== 'ready') {
-    return (
-      <MobileScrollView padding={4} gap={4}>
-        {renderOperationsState(state, onRetry)}
-      </MobileScrollView>
-    );
-  }
-
-  return (
-    <MobileScrollView padding={4} gap={4}>
-      <Text role="titleLg">التشغيل</Text>
-      <Text role="bodyMd" tone="muted">
-        جاهزية الكابتن، المسار، والسلامة بدون أي backend أو mutation.
-      </Text>
-
-      {section === 'availability' ? <AvailabilitySection snapshot={snapshot} /> : null}
-      {section === 'route-readiness' ? <RouteReadinessSection snapshot={snapshot} /> : null}
-      {section === 'safety' ? <SafetySection snapshot={snapshot} /> : null}
-
-      {section === 'availability' ? <RouteReadinessSection snapshot={snapshot} /> : null}
-      {section === 'availability' ? <SafetySection snapshot={snapshot} /> : null}
-
-      <Button label="العودة" tone="ghost" onPress={onBack} />
-    </MobileScrollView>
-  );
-}
 
 function SimpleSupportScreen({
   title,
@@ -164,7 +60,6 @@ function SimpleSupportScreen({
       {keyValues?.length ? (
         <Surface tone="raised" gap={3}>
           <SectionHeader title="تفاصيل المسار" subtitle="تبقى فقط التفاصيل اللازمة لإجراء الكابتن الفوري ظاهرة." />
-          <KeyValueList items={keyValues} />
         </Surface>
       ) : null}
 
@@ -289,5 +184,3 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
     </MobileScrollView>
   );
 }
-
-export default DshCaptainOperationsScreen;

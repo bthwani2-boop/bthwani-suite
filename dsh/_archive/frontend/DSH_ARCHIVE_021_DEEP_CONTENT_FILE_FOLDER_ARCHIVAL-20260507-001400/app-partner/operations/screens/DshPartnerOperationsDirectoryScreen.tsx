@@ -82,5 +82,3 @@ export function DshPartnerOperationsDirectoryScreen({ onBack, onOpenScreen }: Ds
 }
 
 export default DshPartnerOperationsDirectoryScreen;
-
-

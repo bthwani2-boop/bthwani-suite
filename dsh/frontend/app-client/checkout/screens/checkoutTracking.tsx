@@ -1537,7 +1537,7 @@ function renderTracking(
 
       {(clientState === 'payment_failed' || clientState === 'area_unserviceable' || clientState === 'item_unavailable') ? (
         <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-          <SectionHeader title="سبب توقف الإكمال" subtitle="توضيح صريح لحالة التسعير/العنوان/توفر العناصر دون ربط backend إضافي." />
+          <SectionHeader title="سبب توقف الإكمال" subtitle="توضيح صريح لحالة التسعير والعنوان وتوفر العناصر." />
           <KeyValueList
             items={[
               { label: 'داخل التغطية', value: serviceabilityQuote.inside_coverage ? 'نعم' : 'لا' },
