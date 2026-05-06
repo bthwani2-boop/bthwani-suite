@@ -14,6 +14,7 @@ import {
   useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
+import { getDshPartnerSettlementPreview } from '../../../../../dsh/frontend/shared/finance/dshFinancePreviewModel';
 
 type PartnerDshWalletWorkspaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-transactions';
 type PartnerDshWalletActionId = 'expanded-wallet' | 'settlements' | 'report';
@@ -57,58 +58,22 @@ type WalletStateCopy = {
   actionLabel?: string;
 };
 
-const workspaceBottomInset = 132;
+const partnerPreview = getDshPartnerSettlementPreview();
 
-const defaultTransactions: readonly PartnerDshWalletTransaction[] = [
-  {
-    id: 'wallet-transaction-1',
-    title: 'تسوية طلب',
-    subtitle: 'تحويل صافي طلب رقم 1042 إلى الحساب التشغيلي.',
-    amountLabel: '+1,280 ر.س',
-    amountTone: 'success',
-    statusLabel: 'تمت',
-    statusTone: 'success',
-    timeLabel: 'اليوم 09:20',
-    icon: 'swap-horizontal-outline',
-    hasDetails: true,
-  },
-  {
-    id: 'wallet-transaction-2',
-    title: 'عمولة منصة',
-    subtitle: 'تجميع عمولات الطلبات النشطة خلال الدورة الحالية.',
-    amountLabel: '-420 ر.س',
-    amountTone: 'warning',
-    statusLabel: 'قيد المراجعة',
-    statusTone: 'warning',
-    timeLabel: 'اليوم 08:05',
-    icon: 'pricetag-outline',
-    hasDetails: true,
-  },
-  {
-    id: 'wallet-transaction-3',
-    title: 'دفعة مستحقة',
-    subtitle: 'دفعة الشريك للدورة الحالية بانتظار التحصيل القادم.',
-    amountLabel: '+3,250 ر.س',
-    amountTone: 'info',
-    statusLabel: 'مستحقة',
-    statusTone: 'info',
-    timeLabel: 'أمس 11:10',
-    icon: 'wallet-outline',
-    hasDetails: true,
-  },
-  {
-    id: 'wallet-transaction-4',
-    title: 'استرداد تعديل',
-    subtitle: 'تسوية فرق تعديل على طلب ملغي قبل الإرسال.',
-    amountLabel: '-85 ر.س',
-    amountTone: 'danger',
-    statusLabel: 'معدّل',
-    statusTone: 'default',
-    timeLabel: 'أمس 07:45',
-    icon: 'refresh-outline',
-    hasDetails: true,
-  },
-];
+const defaultTransactions: readonly PartnerDshWalletTransaction[] = partnerPreview.records.map(r => ({
+  id: r.id,
+  title: r.title,
+  subtitle: r.subtitle,
+  amountLabel: r.amountLabel,
+  amountTone: r.tone === 'positive' ? 'success' : r.tone === 'negative' ? 'danger' : 'info',
+  statusLabel: r.statusLabel,
+  statusTone: r.statusTone === 'success' ? 'success' : r.statusTone === 'warning' ? 'warning' : 'info',
+  timeLabel: r.timeLabel,
+  icon: r.kind === 'partner-settlement' ? 'wallet-outline' : 'swap-horizontal-outline',
+  hasDetails: true,
+}));
+
+const workspaceBottomInset = 132;
 
 function resolveStateCopy(state: Exclude<PartnerDshWalletWorkspaceState, 'ready' | 'no-transactions'>): WalletStateCopy {
   if (state === 'loading') {
@@ -486,9 +451,9 @@ export function PartnerDshWalletWorkspace({
           ملخص مالي سريع
         </Text>
         <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 10 }}>
-          <CompactMetric label="الرصيد المتاح" value="12,480 ر.س" tone="success" />
-          <CompactMetric label="المستحقات" value="3,250 ر.س" tone="warning" />
-          <CompactMetric label="آخر تسوية" value="اليوم 09:20" tone="info" />
+          <CompactMetric label="الرصيد المتاح" value={partnerPreview.summary.totalLabel} tone="success" />
+          <CompactMetric label="المستحقات" value={partnerPreview.nextSettlementLabel} tone="warning" />
+          <CompactMetric label="آخر تسوية" value={partnerPreview.records[0]?.timeLabel ?? 'اليوم'} tone="info" />
         </View>
       </Surface>
 
@@ -503,7 +468,7 @@ export function PartnerDshWalletWorkspace({
             { label: 'التحصيل القادم', value: 'خلال يومين', tone: 'warning' },
             { label: 'مرجع التسوية', value: 'دفعة محلية' },
             { label: 'النطاق المرتبط', value: linkedScopeLabel, tone: 'info' },
-            { label: 'حالة الحساب', value: 'جاهز للتحصيل', tone: 'success' },
+            { label: 'حالة الدورة', value: partnerPreview.cycleStatus, tone: 'success' },
           ]}
         />
       </Surface>

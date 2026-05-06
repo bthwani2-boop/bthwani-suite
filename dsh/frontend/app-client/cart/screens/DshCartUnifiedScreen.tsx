@@ -89,6 +89,7 @@ type CheckoutActionPayload = {
   amountDueOnDeliveryHalalas: number;
   orderTotalHalalas: number;
   summary: string;
+  financeEventKind?: 'client-payment' | 'wallet-payment' | 'cash-on-delivery';
 };
 
 type DshCartUnifiedScreenProps = {
@@ -946,6 +947,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
           orderTotalHalalas: grandTotalHalalas,
           summary: paymentSelection.summary,
+          financeEventKind: paymentSelection.method === 'wallet' ? 'wallet-payment' : 'client-payment',
         }));
         return;
       } finally {
@@ -959,6 +961,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
       orderTotalHalalas: grandTotalHalalas,
       summary: paymentSelection.summary,
+      financeEventKind: paymentSelection.method === 'cod' ? 'cash-on-delivery' : 'client-payment',
     }));
   };
 
@@ -979,6 +982,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
       orderTotalHalalas: grandTotalHalalas,
       summary: paymentSelection.summary,
+      financeEventKind: paymentSelection.method === 'cod' ? 'cash-on-delivery' : 'client-payment',
     };
 
     if (props.onOpenOrder) {

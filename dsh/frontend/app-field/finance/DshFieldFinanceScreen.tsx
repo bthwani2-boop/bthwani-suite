@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Icon, ListItem, MobileScrollView, Surface, Text, TopBar } from '@bthwani/ui-kit';
+import { getDshFieldFinancePreview } from '../../shared/finance/dshFinancePreviewModel';
 import { resolveFieldStoreStatus, type FieldStoreFile } from '../stores/dshFieldStoresModel';
 
 type DshFieldFinanceScreenProps = {
@@ -9,6 +10,7 @@ type DshFieldFinanceScreenProps = {
 
 export function DshFieldFinanceScreen({ stores, onBack }: DshFieldFinanceScreenProps) {
   const eligibleStores = stores.filter((store) => resolveFieldStoreStatus(store) === 'offer-approved');
+  const preview = getDshFieldFinancePreview(eligibleStores.map(s => s.id));
 
   return (
     <Box style={{ flex: 1 }} background="background">
@@ -23,8 +25,16 @@ export function DshFieldFinanceScreen({ stores, onBack }: DshFieldFinanceScreenP
 
         <Surface tone="raised" padding={4} gap={2} radiusToken="xl">
           <Text role="titleMd" style={{ textAlign: 'right' }}>إجمالي المستحقات المالية</Text>
-          <Text role="titleLg" style={{ textAlign: 'right' }}>420 ر.س</Text>
+          <Text role="titleLg" style={{ textAlign: 'right' }}>{preview.totalCommissionLabel}</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>تُعرض فقط الملفات المكتملة للميدان والتي أصبح الشريك فيها معتمدًا.</Text>
+          <KeyValueList 
+            dense
+            items={[
+              { label: 'عدد الملفات المؤهلة', value: String(preview.eligibleFilesCount) },
+              { label: 'آخر دفعة محولة', value: preview.lastPayoutLabel, tone: 'success' },
+              { label: 'تاريخ التحويل', value: preview.lastPayoutDate },
+            ]}
+          />
         </Surface>
 
         <Surface tone="raised" padding={0} gap={0} radiusToken="xl">

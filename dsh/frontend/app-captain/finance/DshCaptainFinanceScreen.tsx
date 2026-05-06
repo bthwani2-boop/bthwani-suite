@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Button, KeyValueList, MobileScrollView, SectionHeader, StateView, Surface, Text } from '@bthwani/ui-kit';
+import { getDshCaptainFinancePreview } from '../../shared/finance/dshFinancePreviewModel';
 import type { DshCaptainFinanceScreenState, DshCaptainFinanceSnapshot } from './dshCaptainFinanceModel';
 
 export type DshCaptainFinanceScreenProps = {
@@ -10,10 +11,14 @@ export type DshCaptainFinanceScreenProps = {
   onRetry?: () => void;
 };
 
+const captainPreview = getDshCaptainFinancePreview();
+
 const demoSnapshot: DshCaptainFinanceSnapshot = {
-  codBalanceLabel: '420 SAR',
-  earningsLabel: '1,260 SAR',
-  settlementLabel: '180 SAR',
+  codBalanceLabel: captainPreview.codBalanceLabel,
+  earningsLabel: captainPreview.earningsLabel,
+  settlementLabel: captainPreview.settlementLabel,
+  pendingPayoutLabel: captainPreview.pendingPayoutLabel,
+  cycleLabel: captainPreview.cycleLabel,
 };
 
 function CodBalanceSection({ snapshot = demoSnapshot }: { snapshot?: DshCaptainFinanceSnapshot }) {
@@ -38,7 +43,8 @@ function EarningsSection({ snapshot = demoSnapshot }: { snapshot?: DshCaptainFin
       <KeyValueList
         items={[
           { label: 'إجمالي الأرباح', value: snapshot.earningsLabel, tone: 'brand' },
-          { label: 'المدفوعات المتوقعة', value: 'أسبوعي' },
+          { label: 'المدفوعات المتوقعة', value: snapshot.pendingPayoutLabel ?? 'أسبوعي' },
+          { label: 'دورة الأرباح', value: snapshot.cycleLabel ?? 'الحالية' },
         ]}
       />
     </Surface>

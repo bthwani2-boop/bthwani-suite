@@ -6,4 +6,6 @@ export type DshCaptainFinanceSnapshot = {
   codBalanceLabel: string;
   earningsLabel: string;
   settlementLabel: string;
+  pendingPayoutLabel?: string;
+  cycleLabel?: string;
 };
