@@ -43,6 +43,7 @@ export type InventoryCatalogWorkspaceContentProps = {
   branchLabel: string;
   activeZoneLabel: string;
   todayHoursLabel: string;
+  canonicalStoreId?: string;
 };
 
 type MetricTileProps = {
@@ -85,99 +86,117 @@ const canonicalPreviewInventoryProducts: readonly InventoryProduct[] = (() => {
   return canonicalProduct ? [mapCanonicalPreviewProductToInventoryProduct(canonicalProduct)] : [];
 })();
 
-const initialProducts: readonly InventoryProduct[] = [
-  {
-    id: 'prod-1',
-    name: 'برغر كلاسيك',
-    sku: 'BL-BRG-001',
-    gtin: '6280001000018',
-    barcode: '6280001000018',
-    manufacturerCode: 'MFR-CL-01',
-    categoryLabel: 'برغر',
-    catalogLinked: true,
-    reviewNeeded: false,
-    available: true,
-    lowStock: false,
-    stockCount: 42,
-    priceLabel: '18.00 ر.س',
-  },
-  {
-    id: 'prod-2',
-    name: 'باول دجاج',
-    sku: 'BL-BWL-014',
-    gtin: '6280001000148',
-    barcode: '6280001000148',
-    manufacturerCode: 'MFR-CH-14',
-    categoryLabel: 'وجبة',
-    catalogLinked: true,
-    reviewNeeded: false,
-    available: true,
-    lowStock: true,
-    stockCount: 3,
-    priceLabel: '24.50 ر.س',
-  },
-  {
-    id: 'prod-3',
-    name: 'بطاطس حارة',
-    sku: 'BL-SID-022',
-    gtin: '6280001000223',
-    barcode: '6280001000223',
-    manufacturerCode: 'MFR-SD-22',
-    categoryLabel: 'إضافات',
-    catalogLinked: false,
-    reviewNeeded: true,
-    available: true,
-    lowStock: false,
-    stockCount: 18,
-    priceLabel: '8.00 ر.س',
-  },
-  {
-    id: 'prod-4',
-    name: 'عصير ليمون',
-    sku: 'BL-DRK-090',
-    gtin: '6280001000902',
-    barcode: '6280001000902',
-    manufacturerCode: 'MFR-DR-90',
-    categoryLabel: 'مشروبات',
-    catalogLinked: true,
-    reviewNeeded: false,
-    available: true,
-    lowStock: true,
-    stockCount: 2,
-    priceLabel: '9.50 ر.س',
-  },
-  {
-    id: 'prod-5',
-    name: 'صوص خاص',
-    sku: 'BL-SAU-003',
-    gtin: '6280001000308',
-    barcode: '6280001000308',
-    manufacturerCode: 'MFR-SA-03',
-    categoryLabel: 'إضافات',
-    catalogLinked: true,
-    reviewNeeded: true,
-    available: true,
-    lowStock: false,
-    stockCount: 9,
-    priceLabel: '2.50 ر.س',
-  },
-  {
-    id: 'prod-6',
-    name: 'سلطة سيزر',
-    sku: 'BL-SLD-044',
-    gtin: '6280001000445',
-    barcode: '6280001000445',
-    manufacturerCode: 'MFR-SL-44',
-    categoryLabel: 'سلطات',
-    catalogLinked: false,
-    reviewNeeded: true,
-    available: false,
-    lowStock: false,
-    stockCount: 0,
-    priceLabel: '14.75 ر.س',
-  },
-  ...canonicalPreviewInventoryProducts,
-];
+function dedupeInventoryProducts(products: ReadonlyArray<InventoryProduct>) {
+  const seenProductIds = new Set<string>();
+  return products.filter((product) => {
+    if (seenProductIds.has(product.id)) {
+      return false;
+    }
+
+    seenProductIds.add(product.id);
+    return true;
+  });
+}
+
+function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
+  const scopedCanonicalProducts = canonicalPreviewInventoryProducts.filter(
+    (product) => !canonicalStoreId || product.canonicalStoreId === canonicalStoreId,
+  );
+
+  return dedupeInventoryProducts([
+    {
+      id: 'prod-1',
+      name: 'برغر كلاسيك',
+      sku: 'BL-BRG-001',
+      gtin: '6280001000018',
+      barcode: '6280001000018',
+      manufacturerCode: 'MFR-CL-01',
+      categoryLabel: 'برغر',
+      catalogLinked: true,
+      reviewNeeded: false,
+      available: true,
+      lowStock: false,
+      stockCount: 42,
+      priceLabel: '18.00 ر.س',
+    },
+    {
+      id: 'prod-2',
+      name: 'باول دجاج',
+      sku: 'BL-BWL-014',
+      gtin: '6280001000148',
+      barcode: '6280001000148',
+      manufacturerCode: 'MFR-CH-14',
+      categoryLabel: 'وجبة',
+      catalogLinked: true,
+      reviewNeeded: false,
+      available: true,
+      lowStock: true,
+      stockCount: 3,
+      priceLabel: '24.50 ر.س',
+    },
+    {
+      id: 'prod-3',
+      name: 'بطاطس حارة',
+      sku: 'BL-SID-022',
+      gtin: '6280001000223',
+      barcode: '6280001000223',
+      manufacturerCode: 'MFR-SD-22',
+      categoryLabel: 'إضافات',
+      catalogLinked: false,
+      reviewNeeded: true,
+      available: true,
+      lowStock: false,
+      stockCount: 18,
+      priceLabel: '8.00 ر.س',
+    },
+    {
+      id: 'prod-4',
+      name: 'عصير ليمون',
+      sku: 'BL-DRK-090',
+      gtin: '6280001000902',
+      barcode: '6280001000902',
+      manufacturerCode: 'MFR-DR-90',
+      categoryLabel: 'مشروبات',
+      catalogLinked: true,
+      reviewNeeded: false,
+      available: true,
+      lowStock: true,
+      stockCount: 2,
+      priceLabel: '9.50 ر.س',
+    },
+    {
+      id: 'prod-5',
+      name: 'صوص خاص',
+      sku: 'BL-SAU-003',
+      gtin: '6280001000308',
+      barcode: '6280001000308',
+      manufacturerCode: 'MFR-SA-03',
+      categoryLabel: 'إضافات',
+      catalogLinked: true,
+      reviewNeeded: true,
+      available: true,
+      lowStock: false,
+      stockCount: 9,
+      priceLabel: '2.50 ر.س',
+    },
+    {
+      id: 'prod-6',
+      name: 'سلطة سيزر',
+      sku: 'BL-SLD-044',
+      gtin: '6280001000445',
+      barcode: '6280001000445',
+      manufacturerCode: 'MFR-SL-44',
+      categoryLabel: 'سلطات',
+      catalogLinked: false,
+      reviewNeeded: true,
+      available: false,
+      lowStock: false,
+      stockCount: 0,
+      priceLabel: '14.75 ر.س',
+    },
+    ...scopedCanonicalProducts,
+  ]);
+}
 
 function MetricTile({ label, value, tone = 'default' }: MetricTileProps) {
   const { theme } = useTheme();
@@ -249,11 +268,15 @@ function CatalogProductRow({ product, selected, onEdit }: CatalogProductRowProps
   );
 }
 
-export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activeZoneLabel, todayHoursLabel }: InventoryCatalogWorkspaceContentProps) {
+export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activeZoneLabel, todayHoursLabel, canonicalStoreId }: InventoryCatalogWorkspaceContentProps) {
   const { direction } = useDirection();
   const [query, setQuery] = React.useState('');
-  const [products, setProducts] = React.useState<InventoryProduct[]>(() => initialProducts.map((product) => ({ ...product })));
-  const [toolMessage, setToolMessage] = React.useState('ابدأ بالبحث أولًا ثم اربط المنتج المعياري من الكتالوج المركزي.');
+  const [products, setProducts] = React.useState<InventoryProduct[]>(() => buildInitialProducts(canonicalStoreId).map((product) => ({ ...product })));
+  const [toolMessage, setToolMessage] = React.useState(
+    canonicalStoreId
+      ? 'ابدأ بالبحث أولًا ثم اربط المنتج المعياري من الكتالوج المركزي. تم تثبيت المنتج canonical مرة واحدة فقط.'
+      : 'ابدأ بالبحث أولًا ثم اربط المنتج المعياري من الكتالوج المركزي.',
+  );
   const [selectedProductId, setSelectedProductId] = React.useState(products[0]?.id ?? null);
   const [draftPrice, setDraftPrice] = React.useState(products[0]?.priceLabel.replace(/[^0-9.]/g, '').trim() ?? '');
   const [draftStock, setDraftStock] = React.useState(String(products[0]?.stockCount ?? 0));
@@ -278,6 +301,10 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
   const selectedProduct = React.useMemo(
     () => products.find((product) => product.id === selectedProductId) ?? products[0] ?? null,
     [products, selectedProductId],
+  );
+  const selectedProductProofLabel = React.useMemo(
+    () => [selectedProduct?.sourceRecordId, selectedProduct?.publishStage, selectedProduct?.source].filter(Boolean).join(' · '),
+    [selectedProduct],
   );
 
   React.useEffect(() => {
@@ -446,6 +473,7 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
             { label: 'SKU', value: selectedProduct.sku },
             { label: 'GTIN', value: selectedProduct.gtin },
             { label: 'الباركود', value: selectedProduct.barcode },
+            ...(selectedProductProofLabel ? [{ label: 'إثبات السلسلة', value: selectedProductProofLabel, tone: 'brand' as const }] : []),
             ...(selectedProduct.sourceRecordId ? [{ label: 'مرجع المصدر', value: selectedProduct.sourceRecordId }] : []),
             ...(selectedProduct.canonicalStoreId ? [{ label: 'مرجع المتجر الكانوني', value: selectedProduct.canonicalStoreId }] : []),
             ...(selectedProduct.canonicalProductId ? [{ label: 'مرجع المنتج الكانوني', value: selectedProduct.canonicalProductId }] : []),

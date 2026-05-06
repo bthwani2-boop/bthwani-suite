@@ -123,7 +123,7 @@ export function StoreProfileWorkspaceContent({
 
   const storeStateLabel = storeOpen ? 'مفتوح الآن' : 'مغلق الآن';
   const visibilityLabel = listingEnabled ? 'مفعّل' : 'موقوف';
-  const canonicalReferenceLabel = [sourceRecordId ?? '[TBD]', publishStage ?? 'stage TBD'].join(' · ');
+  const canonicalReferenceLabel = canonicalStoreId ? 'تم الربط بالمتجر الموحّد.' : undefined;
 
   const onSave = React.useCallback(() => {
     setLastSavedLabel(new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }));
@@ -158,8 +158,9 @@ export function StoreProfileWorkspaceContent({
             { label: 'منطقة التغطية', value: activeZoneLabel },
             ...(coverageSummary ? [{ label: 'ملخص التغطية', value: coverageSummary }] : []),
             ...(deliveryReadinessLabel ? [{ label: 'جاهزية التوصيل', value: deliveryReadinessLabel }] : []),
-            ...(sourceRecordId || publishStage ? [{ label: 'مرجع السلسلة', value: canonicalReferenceLabel }] : []),
-            ...(canonicalStoreId ? [{ label: 'المتجر الكانوني', value: canonicalStoreId }] : []),
+            ...(sourceRecordId ? [{ label: 'مرجع المصدر', value: sourceRecordId }] : []),
+            ...(publishStage ? [{ label: 'مرحلة النشر', value: publishStage }] : []),
+            ...(canonicalReferenceLabel ? [{ label: 'مرجع موحد', value: canonicalReferenceLabel, tone: 'brand' as const }] : []),
             { label: 'حالة المتجر', value: storeStateLabel, tone: storeOpen ? 'success' : 'warning' },
             { label: 'الظهور في القائمة', value: visibilityLabel, tone: listingEnabled ? 'success' : 'warning' },
           ]}

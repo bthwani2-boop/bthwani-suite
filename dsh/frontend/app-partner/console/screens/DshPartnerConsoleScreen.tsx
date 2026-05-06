@@ -1009,18 +1009,16 @@ export function DshPartnerConsoleScreen(props: Props) {
   const [notificationPreferences, setNotificationPreferences] = React.useState<NotificationPreferenceState>(defaultNotificationPreferences);
   const activeSection = section ?? internalSection;
   const updateSection = onSectionChange ?? setInternalSection;
-  const canonicalPreviewStore = React.useMemo(
-    () =>
-      (canonicalStoreId ? getCanonicalPreviewStoreCard(canonicalStoreId) : undefined) ??
-      canonicalPreviewStores.find((store) => store.storeName === storeName),
-    [canonicalStoreId, storeName],
-  );
-  const resolvedStoreName = canonicalPreviewStore?.storeName ?? storeName;
-  const resolvedBranchLabel = canonicalPreviewStore?.branchLabel ?? branchLabel;
-  const resolvedCityLabel = canonicalPreviewStore?.cityLabel ?? cityLabel;
-  const resolvedManagerLabel = canonicalPreviewStore?.managerName ?? managerLabel;
-  const resolvedTodayHoursLabel = canonicalPreviewStore?.operatingHoursLabel ?? todayHoursLabel;
-  const resolvedActiveZoneLabel = canonicalPreviewStore?.zoneLabel ?? activeZoneLabel;
+  const activeCanonicalStore = React.useMemo(() => {
+    const activeCanonicalStoreId = canonicalStoreId ?? canonicalPreviewStores[0]?.id;
+    return activeCanonicalStoreId ? getCanonicalPreviewStoreCard(activeCanonicalStoreId) : undefined;
+  }, [canonicalStoreId]);
+  const resolvedStoreName = activeCanonicalStore?.storeName ?? storeName;
+  const resolvedBranchLabel = activeCanonicalStore?.branchLabel ?? branchLabel;
+  const resolvedCityLabel = activeCanonicalStore?.cityLabel ?? cityLabel;
+  const resolvedManagerLabel = activeCanonicalStore?.managerName ?? managerLabel;
+  const resolvedTodayHoursLabel = activeCanonicalStore?.operatingHoursLabel ?? todayHoursLabel;
+  const resolvedActiveZoneLabel = activeCanonicalStore?.zoneLabel ?? activeZoneLabel;
   const enabledNotificationChannelsCount = React.useMemo(
     () => ['orders', 'operations', 'inventory', 'finance', 'marketing', 'system'].filter((key) => notificationPreferences[key as NotificationPreferenceId]).length,
     [notificationPreferences],
@@ -1080,11 +1078,11 @@ export function DshPartnerConsoleScreen(props: Props) {
             activeZoneLabel={resolvedActiveZoneLabel}
             storeOpen={storeOpen}
             listingEnabled={listingEnabled}
-            canonicalStoreId={canonicalPreviewStore?.id}
-            sourceRecordId={canonicalPreviewStore?.sourceRecordId}
-            deliveryReadinessLabel={canonicalPreviewStore?.deliveryReadinessLabel}
-            coverageSummary={canonicalPreviewStore?.coverageSummary}
-            publishStage={canonicalPreviewStore?.publishStage}
+            canonicalStoreId={activeCanonicalStore?.id}
+            sourceRecordId={activeCanonicalStore?.sourceRecordId}
+            deliveryReadinessLabel={activeCanonicalStore?.deliveryReadinessLabel}
+            coverageSummary={activeCanonicalStore?.coverageSummary}
+            publishStage={activeCanonicalStore?.publishStage}
             onOpenStoreScope={onOpenStoreScope}
           />
         </HubWorkspaceShell>
@@ -1297,6 +1295,7 @@ export function DshPartnerConsoleScreen(props: Props) {
             branchLabel={resolvedBranchLabel}
             activeZoneLabel={resolvedActiveZoneLabel}
             todayHoursLabel={resolvedTodayHoursLabel}
+            canonicalStoreId={activeCanonicalStore?.id}
           />
         </HubWorkspaceShell>
       );

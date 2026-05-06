@@ -101,6 +101,28 @@ type HostCartItem = {
   qty: number;
   storeId: string;
   storeName: string;
+  canonicalStoreId?: string;
+  canonicalProductId?: string;
+  sourceRecordId?: string;
+  publishStage?: string;
+};
+
+type HostCanonicalMetadata = {
+  canonicalStoreId?: string;
+  canonicalProductId?: string;
+  sourceRecordId?: string;
+  publishStage?: string;
+};
+
+type HostCartInputItem = {
+  id: string;
+  name?: string;
+  title?: string;
+  priceLabel?: string;
+  canonicalStoreId?: string;
+  canonicalProductId?: string;
+  sourceRecordId?: string;
+  publishStage?: string;
 };
 
 type PublishedCategoryItem = {
@@ -173,6 +195,27 @@ function isMarketingGrowthRouteValid(item: MarketingGrowthRecord): boolean {
   }
 
   return false;
+}
+
+function getStoreCanonicalMetadata(storeId: string): HostCanonicalMetadata {
+  const store = dshDiscoveryStores.find((entry) => entry.id === storeId);
+  return {
+    canonicalStoreId: store?.canonicalStoreId,
+    sourceRecordId: store?.sourceRecordId,
+    publishStage: store?.publishStage,
+  };
+}
+
+function getProductCanonicalMetadata(storeId: string, productId: string): HostCanonicalMetadata {
+  const storeMetadata = getStoreCanonicalMetadata(storeId);
+  const product = (storeItemsByStoreId[storeId] ?? []).find((entry) => entry.id === productId);
+
+  return {
+    canonicalStoreId: product?.canonicalStoreId ?? storeMetadata.canonicalStoreId,
+    canonicalProductId: product?.canonicalProductId,
+    sourceRecordId: product?.sourceRecordId ?? storeMetadata.sourceRecordId,
+    publishStage: product?.publishStage ?? storeMetadata.publishStage,
+  };
 }
 
 function resolvePublishedHomePromos() {
@@ -330,6 +373,7 @@ function commandTargetToRoute(target: DshCommandTarget): DshRoute {
 }
 
 export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedVideoReelsViewer }: DshSurfaceHostProps) {
+  const initialCanonicalStore = getStoreCanonicalMetadata('store-1001');
   const [route, setRoute] = React.useState<DshRoute>('home');
   const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
   const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
@@ -341,6 +385,8 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   const [itemsQuery, setItemsQuery] = React.useState('');
   const [itemsCategory, setItemsCategory] = React.useState('all');
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
+  const [activeCanonicalStoreId, setActiveCanonicalStoreId] = React.useState<string | undefined>(initialCanonicalStore.canonicalStoreId);
+  const [activeCanonicalProductId, setActiveCanonicalProductId] = React.useState<string | undefined>(undefined);
   const [selectedItemId, setSelectedItemId] = React.useState<string>('');
   const [selectedOrderId, setSelectedOrderId] = React.useState<string>(defaultTrackingOrderId);
   const [favoriteOverrides, setFavoriteOverrides] = React.useState<Record<string, boolean>>({});
@@ -483,11 +529,20 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   );
 
   const addItemToHostCart = React.useCallback((
-    item: { id: string; name?: string; title?: string; priceLabel?: string },
+    item: HostCartInputItem,
     payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string },
   ) => {
     const normalizedQty = Number.isFinite(payload?.quantity) && (payload?.quantity ?? 0) > 0 ? Number(payload?.quantity) : 1;
     const nextTitle = item.name?.trim() || item.title?.trim() || item.id;
+    const canonicalMetadata: HostCanonicalMetadata = {
+      canonicalStoreId: item.canonicalStoreId ?? activeCanonicalStoreId ?? activeStore.canonicalStoreId,
+      canonicalProductId: item.canonicalProductId ?? activeCanonicalProductId,
+      sourceRecordId: item.sourceRecordId ?? activeStore.sourceRecordId,
+      publishStage: item.publishStage ?? activeStore.publishStage,
+    };
+
+    setActiveCanonicalStoreId(canonicalMetadata.canonicalStoreId);
+    setActiveCanonicalProductId(canonicalMetadata.canonicalProductId);
 
     setCartItems((current) => {
       const existingIndex = current.findIndex((entry) => entry.id === item.id && entry.storeId === activeStore.id);
@@ -501,6 +556,10 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
             qty: normalizedQty,
             storeId: activeStore.id,
             storeName: activeStore.name,
+            canonicalStoreId: canonicalMetadata.canonicalStoreId,
+            canonicalProductId: canonicalMetadata.canonicalProductId,
+            sourceRecordId: canonicalMetadata.sourceRecordId,
+            publishStage: canonicalMetadata.publishStage,
           },
         ];
       }
@@ -510,11 +569,15 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
           ? {
               ...entry,
               qty: entry.qty + normalizedQty,
+              canonicalStoreId: entry.canonicalStoreId ?? canonicalMetadata.canonicalStoreId,
+              canonicalProductId: entry.canonicalProductId ?? canonicalMetadata.canonicalProductId,
+              sourceRecordId: entry.sourceRecordId ?? canonicalMetadata.sourceRecordId,
+              publishStage: entry.publishStage ?? canonicalMetadata.publishStage,
             }
           : entry
       ));
     });
-  }, [activeStore.id, activeStore.name]);
+  }, [activeCanonicalProductId, activeCanonicalStoreId, activeStore]);
 
   const liveMarketingPrograms = getLiveMarketingGrowthItems('client');
   const liveMarketingShorts = liveMarketingPrograms
@@ -752,7 +815,10 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
         onOpenCategories={() => setRoute('home')}
         onOpenFavorites={() => setRoute('favorites-list')}
         onOpenResult={(resultId) => {
+          const nextStoreMetadata = getStoreCanonicalMetadata(resultId);
           setActiveStoreId(resultId);
+          setActiveCanonicalStoreId(nextStoreMetadata.canonicalStoreId);
+          setActiveCanonicalProductId(undefined);
           setRoute('store-get');
         }}
         onBack={() => setRoute('home')}
@@ -922,13 +988,19 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
       }}
       onOpenDiscovery={() => setRoute('home')}
       onOpenStoreCategory={(storeId, categoryId) => {
+        const nextStoreMetadata = getStoreCanonicalMetadata(storeId);
         setActiveStoreId(storeId);
+        setActiveCanonicalStoreId(nextStoreMetadata.canonicalStoreId);
+        setActiveCanonicalProductId(undefined);
         setItemsCategory(categoryId);
         setStoreItemsEntryOrigin('home');
         setRoute('store-items');
       }}
       onOpenProduct={(storeId, itemId) => {
+        const nextProductMetadata = getProductCanonicalMetadata(storeId, itemId);
         setActiveStoreId(storeId);
+        setActiveCanonicalStoreId(nextProductMetadata.canonicalStoreId);
+        setActiveCanonicalProductId(nextProductMetadata.canonicalProductId);
         setSelectedItemId(itemId);
         setRoute('cart-get');
       }}
@@ -949,7 +1021,10 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
         setRoute('home');
       }}
       onOpenStore={(storeId) => {
+        const nextStoreMetadata = getStoreCanonicalMetadata(storeId);
         setActiveStoreId(storeId);
+        setActiveCanonicalStoreId(nextStoreMetadata.canonicalStoreId);
+        setActiveCanonicalProductId(undefined);
         setItemsQuery('');
         setItemsCategory('all');
         setSelectedItemId('');

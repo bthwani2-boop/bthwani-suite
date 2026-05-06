@@ -148,6 +148,17 @@ export type DshCanonicalProductCard = {
   canonicalProductId?: string;
 };
 
+export type DshCanonicalPreviewEvidence = {
+  storeId: string;
+  productId: string;
+  sourceRecordId: string;
+  publishStage: DshCanonicalPublishStage;
+  source: DshCanonicalSource;
+  storeName: string;
+  productName: string;
+  priceLabel: string;
+};
+
 const canonicalStoreId = 'canonical-store-field-lead-5';
 const canonicalProductId = 'canonical-product-field-lead-5-featured';
 
@@ -253,6 +264,19 @@ export function getCanonicalPreviewProductCard(id: string) {
 
 export function getCanonicalPreviewProductForStore(storeId: string) {
   return canonicalPreviewProducts.find((product) => product.storeId === storeId);
+}
+
+export function getCanonicalPreviewEvidence(): DshCanonicalPreviewEvidence {
+  return {
+    storeId: canonicalStoreCard.id,
+    productId: canonicalProductCard.id,
+    sourceRecordId: canonicalStoreCard.sourceRecordId,
+    publishStage: canonicalProductCard.publishStage,
+    source: canonicalProductCard.source,
+    storeName: canonicalStoreCard.storeName,
+    productName: canonicalProductCard.name,
+    priceLabel: canonicalProductCard.priceLabel,
+  };
 }
 
 function cloneStringList(values: ReadonlyArray<string> | undefined) {

@@ -263,6 +263,10 @@ export function ControlPanelDshPartnerApprovalsScreen({
   const activeItems = queueItems[activeQueue];
   const selectedItem = activeItems.find((item) => item.id === selectedItemId) ?? activeItems[0] ?? queueItems['offer-approval'][0];
   const decisionState = selectedItem ?? activeItems[0];
+  const selectedCanonicalStore = selectedItem?.canonicalStoreId ? getCanonicalPreviewStoreCard(selectedItem.canonicalStoreId) : undefined;
+  const selectedCanonicalProduct = selectedItem?.canonicalProductId ? getCanonicalPreviewProductCard(selectedItem.canonicalProductId) : undefined;
+  const selectedCanonicalStage = selectedCanonicalStore?.publishStage ?? selectedCanonicalProduct?.publishStage ?? selectedItem?.canonicalStage;
+  const selectedCanonicalSource = selectedCanonicalStore?.source ?? selectedCanonicalProduct?.source ?? selectedItem?.canonicalSource;
 
   React.useEffect(() => {
     if (!activeItems.some((item) => item.id === selectedItemId)) {
@@ -407,6 +411,14 @@ export function ControlPanelDshPartnerApprovalsScreen({
                       <Text role="bodySm">{selectedItem.note}</Text>
                       <Text role="bodySm" tone="muted">{selectedItem.nextStep}</Text>
                       <Text role="caption" tone="soft">{selectedItem.submittedAt} · {resolveSourceLabel(selectedItem.source)}</Text>
+                    </Box>
+
+                    <Box gap={1} padding={2} border radiusToken="lg" background="surfaceDefault">
+                      <Text role="caption" tone="muted">canonical preview</Text>
+                      <Text role="bodySm">المتجر: {selectedCanonicalStore?.storeName ?? '[TBD]'}</Text>
+                      <Text role="bodySm">المنتج: {selectedCanonicalProduct?.name ?? '[TBD]'}</Text>
+                      <Text role="bodySm">السعر: {selectedCanonicalProduct?.priceLabel ?? '[TBD]'}</Text>
+                      <Text role="caption" tone="muted">{resolveCanonicalStageLabel(selectedCanonicalStage)} · {resolveCanonicalSourceLabel(selectedCanonicalSource)}</Text>
                     </Box>
 
                     <Box gap={2}>
