@@ -5,6 +5,7 @@ import {
   View as TamaguiView,
   } from 'tamagui';
 import {
+	StyleSheet,
   type ScrollViewProps,
   type StyleProp,
   type TextProps as RNTextNativeProps,
@@ -115,7 +116,7 @@ export function Box({
 
 	return (
 		<HostView
-			style={[
+			style={StyleSheet.flatten([
 				{
 					paddingTop: spacing[resolvedPaddingY],
 					paddingBottom: spacing[resolvedPaddingY],
@@ -131,7 +132,7 @@ export function Box({
 				},
 				shadowLaw[elevationToken],
 				style
-			]}
+			])}
 		>
 			{children}
 		</HostView>
@@ -145,7 +146,7 @@ export type DividerProps = {
 
 export function Divider({ color, style }: DividerProps) {
 	const { theme } = useTheme();
-	return <HostView style={[{ height: 1, backgroundColor: color ?? theme.line, width: '100%' }, style]} />;
+	return <HostView style={StyleSheet.flatten([{ height: 1, backgroundColor: color ?? theme.line, width: '100%' }, style])} />;
 }
 
 declare const process: { env: { NODE_ENV?: string } };
@@ -257,7 +258,7 @@ export function Text({
 		<HostText
 			allowFontScaling={allowFontScaling}
 			numberOfLines={numberOfLines}
-			style={[
+			style={StyleSheet.flatten([
 				{
 					...roleStyle,
 					fontWeight: weight ? fontWeights[weight] : roleStyle?.fontWeight,
@@ -267,7 +268,7 @@ export function Text({
 					fontFamily: resolveFontFamily(direction, resolvedFamily)
 				},
 				style
-			]}
+			])}
 		>
 			{children}
 		</HostText>
@@ -295,12 +296,12 @@ export function MobileScrollView({
 	return (
 		<HostScrollView
 			{...scrollProps}
-			style={[fill ? { flex: 1 } : undefined, style]}
-			contentContainerStyle={[
+			style={StyleSheet.flatten([fill ? { flex: 1 } : undefined, style])}
+			contentContainerStyle={StyleSheet.flatten([
 				fill ? { flexGrow: 1 } : undefined,
 				{ padding: spacing[padding], gap: spacing[gap] },
 				contentContainerStyle,
-			]}
+			])}
 		>
 			{children}
 		</HostScrollView>

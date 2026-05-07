@@ -1,4 +1,3 @@
-import Script from 'next/script';
 import { type ReactNode } from 'react';
 import { RootProviders, type RootProvidersProps } from '../providers';
 import { buildWebThemeStyleSheet, directionConfig, resolveDirectionFromLanguage, type ThemeMode } from '../foundation';
@@ -40,8 +39,16 @@ function buildStoredLanguageBootstrapScript() {
 }
 
 export function WebThemeStyle() {
-  // Target both the new `data-ui-root` and the legacy `data-bth-root` during staged migration.
-  return <style>{buildWebThemeStyleSheet('[data-ui-root="true"], [data-bth-root="true"]')}</style>;
+  const themeStyles = buildWebThemeStyleSheet('[data-ui-root="true"], [data-bth-root="true"]');
+  const combined = `${webRootBodyCss}\n${themeStyles}`;
+
+  return (
+    <style
+      id="ui-kit-theme-root"
+      suppressHydrationWarning
+      dangerouslySetInnerHTML={{ __html: combined }}
+    />
+  );
 }
 
 export type WebRootLayoutProps = RootProvidersProps & {
@@ -91,10 +98,10 @@ export function WebDocumentShell({
   return (
     <html suppressHydrationWarning lang={lang} dir={dir}>
       <head>
-        <Script id="language-bootstrap">
-          {buildStoredLanguageBootstrapScript()}
-        </Script>
-        <style>{webRootBodyCss}</style>
+        <script
+          id="language-bootstrap"
+          dangerouslySetInnerHTML={{ __html: buildStoredLanguageBootstrapScript() }}
+        />
         <WebThemeStyle />
       </head>
       {children}

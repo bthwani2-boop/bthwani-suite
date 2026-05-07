@@ -568,6 +568,11 @@ export function DshHomeGetScreen({
 
   const resolvedCategories = categories ?? [];
   const resolvedPromos = promos ?? [];
+
+  const cardWidth = (viewportWidth - spacing[6]) * 0.72;
+  const cardHeight = Math.round(cardWidth * 0.88);
+  const itemWidth = cardWidth + spacing[2];
+  const horizontalPadding = Math.max(0, (viewportWidth - cardWidth) / 2 - spacing[1]);
   const resolvedStores = stores ?? [];
   const resolvedRecentOrders = recentOrders ?? [];
 
@@ -1138,17 +1143,22 @@ return (
                 showsHorizontalScrollIndicator={false}
                 onScroll={(e) => {
                   const x = e.nativeEvent.contentOffset.x;
-                  const itemWidth = viewportWidth - spacing[4]; // Approximate width with padding
-                  const index = Math.round(x / itemWidth);
+                  const cardWidth = (viewportWidth - spacing[6]) * 0.72;
+                  const itemWidth = cardWidth + spacing[2];
+                  const contentWidth = (spacing[3] * 2) + resolvedPromos.length * itemWidth;
+                  const scrollableWidth = contentWidth - viewportWidth;
+                  const centerOffset = scrollableWidth > 0 ? scrollableWidth / 2 : 0;
+                  const adjustedX = x - centerOffset;
+                  const index = Math.round(adjustedX / itemWidth);
                   if (index !== activePromoIndex && index >= 0 && index < resolvedPromos.length) {
                     setActivePromoIndex(index);
                   }
                 }}
                 scrollEventThrottle={16}
                 decelerationRate="fast"
-                snapToInterval={viewportWidth - spacing[4]}
+                snapToInterval={itemWidth}
                 snapToAlignment="center"
-                contentContainerStyle={styles.premiumBannerScrollContent}
+                contentContainerStyle={[styles.premiumBannerScrollContent, { paddingHorizontal: horizontalPadding }]}
              >
                {resolvedPromos.map((promo, index) => {
                   const isActive = index === activePromoIndex;
@@ -1158,15 +1168,15 @@ return (
                       onPress={resolveBannerPress(promo)}
                       style={[
                         styles.premiumBannerCard,
-                        { width: viewportWidth - spacing[8] },
+                        { width: cardWidth },
                         isActive && styles.premiumBannerCardActive
                       ]}
                     >
                       <View style={styles.premiumBannerImageWrap}>
                         <Image
-                          source={resolveDshHomeBannerImageSource(promo.imageUrl)}
+                          source={resolveDshHomeBannerImageSource(promo.imageUrl ?? promo.mediaKey)}
                           style={styles.premiumBannerImage}
-                          resizeMode={promo.imageFit || 'cover'}
+                          resizeMode="cover"
                         />
                         <View style={[styles.premiumBannerOverlay, { backgroundColor: promo.accentColor ? `${promo.accentColor}33` : 'rgba(0,0,0,0.1)' }]} />
 
@@ -1578,25 +1588,26 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     },
     premiumBannerSection: {
       marginHorizontal: -spacing[3],
-      marginTop: -spacing[2],
-      marginBottom: spacing[2],
-      height: 440,
+      marginTop: spacing[1],
+      marginBottom: 0,
+      height: 248,
+      paddingHorizontal: spacing[3],
     },
     premiumBannerScrollContent: {
-      paddingHorizontal: spacing[4],
-      gap: spacing[3],
+      gap: spacing[2],
       alignItems: 'center',
+      justifyContent: 'center',
     },
     premiumBannerCard: {
-      height: 400,
-      borderRadius: 32,
+      height: 220,
+      borderRadius: 24,
       overflow: 'hidden',
       backgroundColor: colorPalette.surfaceRaised,
-      elevation: 8,
+      elevation: 6,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 12 },
-      shadowOpacity: 0.15,
-      shadowRadius: 20,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.12,
+      shadowRadius: 16,
       transform: [{ scale: 0.98 }],
     },
     premiumBannerCardActive: {
@@ -1607,24 +1618,28 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     premiumBannerImageWrap: {
       flex: 1,
       position: 'relative',
+      backgroundColor: colorPalette.surfaceRaised,
     },
     premiumBannerImage: {
       ...StyleSheet.absoluteFillObject,
       width: '100%',
       height: '100%',
+      zIndex: 2,
     },
     premiumBannerOverlay: {
       ...StyleSheet.absoluteFillObject,
+      zIndex: 3,
     },
     premiumBannerLogoWrap: {
       position: 'absolute',
-      top: 20,
-      width: 48,
-      height: 48,
-      borderRadius: 24,
+      top: 16,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       backgroundColor: colorPalette.white,
-      padding: 6,
-      elevation: 4,
+      padding: 5,
+      elevation: 6,
+      zIndex: 5,
     },
     premiumBannerLogo: {
       width: '100%',
@@ -1632,11 +1647,12 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     },
     premiumBannerBadge: {
       position: 'absolute',
-      top: 24,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 12,
-      elevation: 4,
+      top: 20,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 10,
+      elevation: 6,
+      zIndex: 5,
     },
     premiumBannerBadgeText: {
       color: colorPalette.white,
@@ -1645,44 +1661,51 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     },
     premiumBannerContent: {
       flex: 1,
-      padding: 24,
-      paddingBottom: 32,
+      padding: 16,
+      paddingBottom: 48,
+      zIndex: 4,
+      justifyContent: 'flex-end',
     },
     premiumBannerTitle: {
       color: colorPalette.white,
-      fontSize: 32,
+      fontSize: 24,
       fontWeight: '900',
-      textShadowColor: 'rgba(0,0,0,0.3)',
+      textShadowColor: 'rgba(0,0,0,0.4)',
       textShadowOffset: { width: 0, height: 2 },
       shadowRadius: 4,
+      lineHeight: 28,
     },
     premiumBannerSubtitle: {
-      color: 'rgba(255,255,255,0.9)',
-      fontSize: 16,
+      color: 'rgba(255,255,255,0.95)',
+      fontSize: 13,
       fontWeight: '600',
-      marginTop: 4,
+      marginTop: 3,
+      textShadowColor: 'rgba(0,0,0,0.3)',
+      textShadowOffset: { width: 0, height: 1 },
+      shadowRadius: 2,
     },
     premiumBannerCta: {
-      marginTop: 20,
-      paddingHorizontal: 20,
-      paddingVertical: 10,
-      borderRadius: 20,
+      marginTop: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 16,
       alignSelf: 'flex-start',
-      elevation: 4,
+      elevation: 5,
+      zIndex: 5,
     },
     premiumBannerCtaText: {
-      fontSize: 14,
+      fontSize: 12,
       fontWeight: '900',
     },
     premiumCarouselControls: {
       position: 'absolute',
-      bottom: 24,
+      bottom: 16,
       left: 0,
       right: 0,
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
-      gap: 16,
+      gap: 12,
     },
     premiumIndicatorRow: {
       flexDirection: 'row',
