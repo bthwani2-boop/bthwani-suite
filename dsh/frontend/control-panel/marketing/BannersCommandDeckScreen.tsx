@@ -16,6 +16,10 @@ import {
   type MarketingBannerRecord,
   type MarketingBannerStatus,
 } from '../../shared/banner-store';
+import { dshCategoryFixtures } from '../../app-client/dshCategoriesFixtures';
+import { dshDiscoveryStores } from '../../app-client/discoveryFixtures';
+import { storeItemsByStoreId } from '../../app-client/itemsFixtures';
+import { resolveDshImageSource } from '../../app-client/resolve-image-source';
 
 export type BannersCommandDeckScreenProps = {
   hubHref?: string;
@@ -41,16 +45,230 @@ type BannerDraft = {
   // Template fields
   templateId: string;
   offerBadgeText: string;
-  offerBadgeTone: string;
+  offerBadgeColor: string;
   partnerLogoUrl: string;
   partnerLogoPosition: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   overlayImageUrl: string;
-  overlayPosition: 'center' | 'bottom' | 'top';
-  textPlacement: 'top' | 'center' | 'bottom';
+  overlayPosition: 'center' | 'bottom' | 'top' | 'fill';
+  titlePlacement: 'top' | 'center' | 'bottom';
   imageFit: 'cover' | 'contain';
+  targetType: SmartBannerTargetType;
 };
 
+type SmartBannerTargetType =
+  | 'home'
+  | 'stores'
+  | 'store'
+  | 'category'
+  | 'subcategory'
+  | 'product'
+  | 'offer'
+  | 'subscription'
+  | 'campaign'
+  | 'tracking'
+  | 'orders'
+  | 'loyalty'
+  | 'custom';
+
+type SmartTargetSummary = {
+  label: string;
+  finalRoute: string;
+  targetLabel: string;
+  targetId: string;
+};
+
+const SMART_TARGET_OPTIONS: Array<{ value: SmartBannerTargetType; label: string; description: string }> = [
+  { value: 'home', label: 'الرئيسية', description: 'يعيد المستخدم إلى واجهة DSH الرئيسية.' },
+  { value: 'stores', label: 'المتاجر', description: 'يفتح قائمة المتاجر أو تجربة التصفح العامة.' },
+  { value: 'store', label: 'متجر', description: 'يربط البنر بمتجر واحد محدد.' },
+  { value: 'category', label: 'فئة', description: 'يربط البنر بفئة رئيسية داخل DSH.' },
+  { value: 'subcategory', label: 'فئة فرعية', description: 'يفتح فئة فرعية بعد اختيار الفئة الأم.' },
+  { value: 'product', label: 'منتج', description: 'يربط البنر بمنتج داخل متجر محدد.' },
+  { value: 'offer', label: 'عرض', description: 'يعرض متجرًا فيه عرض نشط وملفت.' },
+  { value: 'subscription', label: 'اشتراك', description: 'يفتح مسار الاشتراكات والمزايا.' },
+  { value: 'campaign', label: 'حملة', description: 'يفتح وجهة حملات عامة ضمن القناة الحالية.' },
+  { value: 'tracking', label: 'التتبع', description: 'يربط البنر بمسار تتبع الطلب.' },
+  { value: 'orders', label: 'الطلبات', description: 'يربط البنر بقائمة الطلبات.' },
+  { value: 'loyalty', label: 'الولاء', description: 'يفتح سياق الولاء أو الاستحقاقات.' },
+  { value: 'custom', label: 'مخصص', description: 'مسار محدود ومضبوط عندما لا تكفي الخيارات المنظمة.' },
+];
+
+const SUBSCRIPTION_OPTIONS = [
+  { value: 'entitlements-get', label: 'المزايا / entitlements-get' },
+  { value: 'subscription-family-get', label: 'اشتراك العائلة / subscription-family-get' },
+];
+
+function getCategoryOptionLabel(categoryId: string) {
+  return dshCategoryFixtures.find((category) => category.id === categoryId)?.label ?? categoryId;
+}
+
+function getStoreOptionLabel(storeId: string) {
+  return dshDiscoveryStores.find((store) => store.id === storeId)?.name ?? storeId;
+}
+
+function getProductsForStore(storeId: string) {
+  return storeItemsByStoreId[storeId] ?? [];
+}
+
+function deriveSmartTargetType(item?: MarketingBannerRecord | null): SmartBannerTargetType {
+  if (!item) {
+    return 'store';
+  }
+
+  if (item.actionType === 'main_category') {
+    return 'category';
+  }
+
+  if (item.actionType === 'sub_category') {
+    return 'subcategory';
+  }
+
+  if (item.actionType === 'store') {
+    return 'store';
+  }
+
+  if (item.actionType === 'product') {
+    return 'product';
+  }
+
+  if (item.actionType === 'subscription') {
+    return 'subscription';
+  }
+
+  if (item.actionType === 'external') {
+    if (item.actionTarget === 'home') return 'home';
+    if (item.actionTarget === 'stores' || item.actionTarget === 'DshStoresList') return 'stores';
+    if (item.actionTarget === 'offers') return 'offer';
+    if (item.actionTarget === 'tracking') return 'tracking';
+    if (item.actionTarget === 'orders-list' || item.actionTarget === 'orders') return 'orders';
+    if (item.actionTarget === 'entitlements-get' || item.actionTarget === 'loyalty') return 'loyalty';
+    if (item.actionTarget === 'campaign') return 'campaign';
+    return 'custom';
+  }
+
+  return 'custom';
+}
+
+function resolveSmartTargetSummary(
+  targetType: SmartBannerTargetType,
+  draft: BannerDraft,
+): SmartTargetSummary {
+  if (targetType === 'home') {
+    return { label: 'الرئيسية', finalRoute: 'home', targetLabel: 'الصفحة الرئيسية', targetId: 'home' };
+  }
+
+  if (targetType === 'stores') {
+    return { label: 'المتاجر', finalRoute: 'stores', targetLabel: 'قائمة المتاجر', targetId: 'stores' };
+  }
+
+  if (targetType === 'store') {
+    const store = dshDiscoveryStores.find((entry) => entry.id === draft.actionTarget);
+    return {
+      label: 'متجر',
+      finalRoute: `stores/${draft.actionTarget || '—'}`,
+      targetLabel: (store?.name ?? draft.actionTarget) || '—',
+      targetId: draft.actionTarget || '—',
+    };
+  }
+
+  if (targetType === 'category') {
+    const category = dshCategoryFixtures.find((entry) => entry.id === draft.actionTarget);
+    return {
+      label: 'فئة',
+      finalRoute: `categories/${draft.actionTarget || '—'}`,
+      targetLabel: (category?.label ?? draft.actionTarget) || '—',
+      targetId: draft.actionTarget || '—',
+    };
+  }
+
+  if (targetType === 'subcategory') {
+    const category = dshCategoryFixtures.find((entry) => entry.id === draft.actionTarget);
+    const subcategory = category?.subcategories.find((entry) => entry.id === draft.actionExtra);
+    return {
+      label: 'فئة فرعية',
+      finalRoute: `categories/${draft.actionTarget || '—'}/${draft.actionExtra || '—'}`,
+      targetLabel: (subcategory?.label ?? draft.actionExtra) || '—',
+      targetId: `${draft.actionTarget || '—'} / ${draft.actionExtra || '—'}`,
+    };
+  }
+
+  if (targetType === 'product') {
+    const products = getProductsForStore(draft.actionExtra);
+    const product = products.find((entry) => entry.id === draft.actionTarget);
+    return {
+      label: 'منتج',
+      finalRoute: `stores/${draft.actionExtra || '—'}/products/${draft.actionTarget || '—'}`,
+      targetLabel: (product?.name ?? draft.actionTarget) || '—',
+      targetId: `${draft.actionExtra || '—'} / ${draft.actionTarget || '—'}`,
+    };
+  }
+
+  if (targetType === 'offer') {
+    const store = dshDiscoveryStores.find((entry) => entry.id === draft.actionTarget);
+    return {
+      label: 'عرض',
+      finalRoute: `stores/${draft.actionTarget || '—'}`,
+      targetLabel: (store?.name ?? draft.actionTarget) || '—',
+      targetId: draft.actionTarget || '—',
+    };
+  }
+
+  if (targetType === 'subscription') {
+    const option = SUBSCRIPTION_OPTIONS.find((entry) => entry.value === draft.actionTarget);
+    return {
+      label: 'اشتراك',
+      finalRoute: `benefits/${draft.actionTarget || 'entitlements-get'}`,
+      targetLabel: (option?.label ?? draft.actionTarget) || '—',
+      targetId: draft.actionTarget || '—',
+    };
+  }
+
+  if (targetType === 'campaign') {
+    return {
+      label: 'حملة',
+      finalRoute: `campaign/${draft.actionTarget || 'home'}`,
+      targetLabel: draft.actionTarget || 'campaign',
+      targetId: draft.actionTarget || 'campaign',
+    };
+  }
+
+  if (targetType === 'tracking') {
+    return {
+      label: 'تتبع',
+      finalRoute: 'tracking',
+      targetLabel: 'التتبع',
+      targetId: 'tracking',
+    };
+  }
+
+  if (targetType === 'orders') {
+    return {
+      label: 'طلبات',
+      finalRoute: 'orders-list',
+      targetLabel: 'الطلبات',
+      targetId: 'orders-list',
+    };
+  }
+
+  if (targetType === 'loyalty') {
+    return {
+      label: 'ولاء',
+      finalRoute: 'benefits/entitlements-get',
+      targetLabel: 'الولاء / المزايا',
+      targetId: 'entitlements-get',
+    };
+  }
+
+  return {
+    label: 'مخصص',
+    finalRoute: draft.actionTarget || 'custom',
+    targetLabel: draft.actionTarget || 'custom',
+    targetId: draft.actionTarget || 'custom',
+  };
+}
+
 function createDraft(item?: MarketingBannerRecord | null): BannerDraft {
+  const targetType = deriveSmartTargetType(item);
   return {
     id: item?.id,
     title: item?.title ?? '',
@@ -59,8 +277,8 @@ function createDraft(item?: MarketingBannerRecord | null): BannerDraft {
     accentColor: item?.accentColor ?? '#0A2F5C',
     audience: item?.audience ?? 'all',
     status: item?.status ?? 'draft',
-    actionType: item?.actionType ?? 'external',
-    actionTarget: item?.actionTarget ?? 'DshStoresList',
+    actionType: item?.actionType ?? 'store',
+    actionTarget: item?.actionTarget ?? 'store-1001',
     actionExtra: item?.actionExtra ?? '',
     ctaLabel: item?.ctaLabel ?? 'اكتشف الآن',
     partnerName: item?.partnerName ?? '',
@@ -68,13 +286,14 @@ function createDraft(item?: MarketingBannerRecord | null): BannerDraft {
     position: String(item?.position ?? ''),
     templateId: item?.templateId ?? 'default',
     offerBadgeText: item?.offerBadgeText ?? '',
-    offerBadgeTone: item?.offerBadgeTone ?? '#FF500D',
+    offerBadgeColor: item?.offerBadgeColor ?? '#FF500D',
     partnerLogoUrl: item?.partnerLogoUrl ?? '',
     partnerLogoPosition: item?.partnerLogoPosition ?? 'top-left',
     overlayImageUrl: item?.overlayImageUrl ?? '',
     overlayPosition: item?.overlayPosition ?? 'center',
-    textPlacement: item?.textPlacement ?? 'bottom',
+    titlePlacement: item?.titlePlacement ?? 'bottom',
     imageFit: item?.imageFit ?? 'cover',
+    targetType,
   };
 }
 
@@ -94,7 +313,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
   const [items, setItems] = React.useState<MarketingBannerRecord[]>(() => getMarketingBannerItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getMarketingBannerItems()[0]?.id ?? null);
   const selected = React.useMemo(
-    () => items.find((item) => item.id === selectedId) ?? items[0] ?? null,
+    () => (selectedId ? (items.find((item) => item.id === selectedId) ?? null) : null),
     [items, selectedId],
   );
   const [draft, setDraft] = React.useState<BannerDraft>(() => createDraft(selected));
@@ -107,7 +326,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
 
   const kpis = React.useMemo(() => getMarketingBannerKpis(), [items]);
   const quality = React.useMemo(
-    () => computeMarketingBannerQuality({ ...draft, position: Number.parseInt(draft.position, 10) || 0 }),
+    () => computeMarketingBannerQuality({ ...draft, position: Number.parseInt(draft.position, 10) || 0 } as unknown as Partial<MarketingBannerRecord>),
     [draft],
   );
 
@@ -125,7 +344,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     const saved = upsertMarketingBannerItem({
       ...draft,
       position: Number.parseInt(draft.position, 10) || undefined,
-    });
+    } as unknown as Partial<MarketingBannerRecord>);
     refresh();
     setSelectedId(saved.id);
   }
@@ -170,13 +389,90 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     }));
   };
 
+  const firstStoreId = dshDiscoveryStores[0]?.id ?? 'store-1001';
+  const firstCategoryId = dshCategoryFixtures[0]?.id ?? 'restaurants';
+  const firstCategoryWithSubcategories = dshCategoryFixtures.find((category) => category.subcategories.length > 0) ?? dshCategoryFixtures[1];
+  const firstSubcategoryId = firstCategoryWithSubcategories?.subcategories[0]?.id ?? '';
+  const firstProductStoreId = Object.keys(storeItemsByStoreId).find((storeId) => (storeItemsByStoreId[storeId] ?? []).length > 0) ?? firstStoreId;
+  const firstProductId = storeItemsByStoreId[firstProductStoreId]?.[0]?.id ?? '';
+  const firstOfferStoreId = dshDiscoveryStores.find((store) => Boolean(store.isOffer || store.offerLabel))?.id ?? firstStoreId;
+
+  const smartTargetSummary = React.useMemo(
+    () => resolveSmartTargetSummary(draft.targetType, draft),
+    [draft.actionExtra, draft.actionTarget, draft.targetType],
+  );
+
+  const handleSmartTargetTypeChange = React.useCallback((targetType: SmartBannerTargetType) => {
+    setDraft((current) => {
+      const currentStoreIsValid = (storeId: string) => Boolean(dshDiscoveryStores.find((store) => store.id === storeId));
+      const currentCategoryIsValid = (categoryId: string) => Boolean(dshCategoryFixtures.find((category) => category.id === categoryId));
+      const currentSubcategoryIsValid = (categoryId: string, subcategoryId: string) =>
+        Boolean(dshCategoryFixtures.find((category) => category.id === categoryId)?.subcategories.find((subcategory) => subcategory.id === subcategoryId));
+      const currentProductIsValid = (storeId: string, productId: string) => Boolean(getProductsForStore(storeId).find((product) => product.id === productId));
+      const currentOfferStoreIsValid = (storeId: string) => Boolean(dshDiscoveryStores.find((store) => store.id === storeId && Boolean(store.isOffer || store.offerLabel)));
+      const currentSubscriptionIsValid = (route: string) => Boolean(SUBSCRIPTION_OPTIONS.find((option) => option.value === route));
+
+      switch (targetType) {
+        case 'home':
+          return { ...current, targetType, actionType: 'external', actionTarget: 'home', actionExtra: '' };
+        case 'stores':
+          return { ...current, targetType, actionType: 'external', actionTarget: 'stores', actionExtra: '' };
+        case 'store':
+          return { ...current, targetType, actionType: 'store', actionTarget: current.actionType === 'store' && currentStoreIsValid(current.actionTarget) ? current.actionTarget : firstStoreId, actionExtra: '' };
+        case 'category':
+          return { ...current, targetType, actionType: 'main_category', actionTarget: current.actionType === 'main_category' && currentCategoryIsValid(current.actionTarget) ? current.actionTarget : firstCategoryId, actionExtra: '' };
+        case 'subcategory':
+          return {
+            ...current,
+            targetType,
+            actionType: 'sub_category',
+            actionTarget: current.actionType === 'sub_category' && currentCategoryIsValid(current.actionTarget) && currentSubcategoryIsValid(current.actionTarget, current.actionExtra)
+              ? current.actionTarget
+              : firstCategoryWithSubcategories?.id || firstCategoryId,
+            actionExtra: current.actionType === 'sub_category' && currentCategoryIsValid(current.actionTarget) && currentSubcategoryIsValid(current.actionTarget, current.actionExtra)
+              ? current.actionExtra
+              : firstSubcategoryId,
+          };
+        case 'product':
+          {
+            const isCurrentProductSelectionValid = current.actionType === 'product'
+              && currentProductIsValid(current.actionExtra, current.actionTarget);
+
+          return {
+            ...current,
+            targetType,
+            actionType: 'product',
+            actionTarget: isCurrentProductSelectionValid ? current.actionTarget : firstProductId,
+            actionExtra: isCurrentProductSelectionValid ? current.actionExtra : firstProductStoreId,
+          };
+          }
+        case 'offer':
+          return { ...current, targetType, actionType: 'store', actionTarget: current.actionType === 'store' && currentOfferStoreIsValid(current.actionTarget) ? current.actionTarget : firstOfferStoreId, actionExtra: '' };
+        case 'subscription':
+          return { ...current, targetType, actionType: 'subscription', actionTarget: current.actionType === 'subscription' && currentSubscriptionIsValid(current.actionTarget) ? current.actionTarget : 'entitlements-get', actionExtra: '' };
+        case 'campaign':
+          return { ...current, targetType, actionType: 'external', actionTarget: current.actionType === 'external' && current.actionTarget.startsWith('campaign') ? current.actionTarget : 'campaign', actionExtra: '' };
+        case 'tracking':
+          return { ...current, targetType, actionType: 'external', actionTarget: 'tracking', actionExtra: '' };
+        case 'orders':
+          return { ...current, targetType, actionType: 'external', actionTarget: 'orders-list', actionExtra: '' };
+        case 'loyalty':
+          return { ...current, targetType, actionType: 'external', actionTarget: 'entitlements-get', actionExtra: '' };
+        case 'custom':
+        default:
+          return { ...current, targetType, actionType: 'external', actionTarget: current.actionTarget || 'custom-route', actionExtra: '' };
+      }
+    });
+  }, [firstCategoryId, firstCategoryWithSubcategories?.id, firstOfferStoreId, firstProductId, firstProductStoreId, firstStoreId, firstSubcategoryId]);
+
   const BannerPreview = () => (
     <View style={styles.previewContainer}>
       <View style={StyleSheet.flatten([styles.bannerBase, { backgroundColor: draft.accentColor || '#0A2F5C' }])}>
-        {draft.imageUrl ? (
+        {draft.imageUrl || draft.mediaKey ? (
           <Image
-            source={{ uri: draft.imageUrl }}
-            style={StyleSheet.flatten([styles.bannerImage, { resizeMode: draft.imageFit }])}
+            source={resolveDshImageSource(draft.imageUrl || draft.mediaKey)}
+            style={styles.bannerImage}
+            resizeMode={draft.imageFit}
           />
         ) : (
           <View style={[styles.bannerImage, { backgroundColor: draft.accentColor || '#0A2F5C', justifyContent: 'center', alignItems: 'center' }]}>
@@ -186,7 +482,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
         <View style={[styles.bannerOverlay, { backgroundColor: `${draft.accentColor}44` }]} />
 
         {/* Content Layout */}
-        <View style={StyleSheet.flatten([styles.bannerContent, draft.textPlacement === 'top' && { justifyContent: 'flex-start' }, draft.textPlacement === 'center' && { justifyContent: 'center' }])}>
+        <View style={StyleSheet.flatten([styles.bannerContent, draft.titlePlacement === 'top' && { justifyContent: 'flex-start' }, draft.titlePlacement === 'center' && { justifyContent: 'center' }])}>
           <Box gap={1}>
             {draft.partnerName ? <Text style={styles.bannerPartner}>{draft.partnerName}</Text> : null}
             <Text style={styles.bannerTitle} numberOfLines={1}>{draft.title || 'عنوان البنر'}</Text>
@@ -200,7 +496,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
 
         {/* Badge */}
         {draft.offerBadgeText ? (
-          <View style={StyleSheet.flatten([styles.bannerBadge, { backgroundColor: draft.offerBadgeTone || '#FF500D' }, draft.partnerLogoPosition.includes('left') ? { right: 12 } : { left: 12 }])}>
+          <View style={StyleSheet.flatten([styles.bannerBadge, { backgroundColor: draft.offerBadgeColor || '#FF500D' }, draft.offerBadgePosition === 'top-left' ? { left: 20, top: 20 } : { right: 20, top: 20 }])}>
             <Text style={styles.bannerBadgeText}>{draft.offerBadgeText}</Text>
           </View>
         ) : null}
@@ -208,12 +504,12 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
         {/* Logo */}
         {draft.partnerLogoUrl ? (
           <View style={StyleSheet.flatten([styles.partnerLogoWrap,
-            draft.partnerLogoPosition === 'top-left' && { top: 12, left: 12 },
-            draft.partnerLogoPosition === 'top-right' && { top: 12, right: 12 },
-            draft.partnerLogoPosition === 'bottom-left' && { bottom: 12, left: 12 },
-            draft.partnerLogoPosition === 'bottom-right' && { bottom: 12, right: 12 },
+            draft.partnerLogoPosition === 'top-left' && { top: 20, left: 20 },
+            draft.partnerLogoPosition === 'top-right' && { top: 20, right: 20 },
+            draft.partnerLogoPosition === 'bottom-left' && { bottom: 20, left: 20 },
+            draft.partnerLogoPosition === 'bottom-right' && { bottom: 20, right: 20 },
           ])}>
-            <Image source={{ uri: draft.partnerLogoUrl }} style={styles.partnerLogo} resizeMode="contain" />
+            <Image source={resolveDshImageSource(draft.partnerLogoUrl)} style={styles.partnerLogo} resizeMode="contain" />
           </View>
         ) : null}
       </View>
@@ -301,43 +597,164 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <TextField label="نص الشارة العلوية" value={draft.offerBadgeText} onChangeText={(v) => setDraft(c => ({ ...c, offerBadgeText: v }))} />
-            <TextField label="لون الشارة" value={draft.offerBadgeTone} onChangeText={(v) => setDraft(c => ({ ...c, offerBadgeTone: v }))} />
+            <TextField label="لون الشارة" value={draft.offerBadgeColor} onChangeText={(v) => setDraft(c => ({ ...c, offerBadgeColor: v }))} />
           </div>
         </Box>
 
         <View style={styles.divider} />
 
         <Box gap={4}>
-          <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>4. توجيه الجمهور</Text>
+          <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>4. توجيه الجمهور والربط الذكي</Text>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <Box gap={1}>
               <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>نطاق العرض</label>
               <Tabs<MarketingBannerAudience>
                 items={[{ value: 'all', label: 'الجميع' }, { value: 'home', label: 'الرئيسية' }, { value: 'stores', label: 'المتاجر' }]}
                 value={draft.audience}
-                onValueChange={(v) => setDraft(c => ({ ...c, audience: v }))}
+                onValueChange={(v) => setDraft((current) => ({ ...current, audience: v }))}
                 variant="pill"
               />
             </Box>
             <Box gap={1}>
-              <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>نوع الوجهة</label>
-              <Tabs<MarketingBannerActionType>
-                items={[
-                  { value: 'store', label: 'متجر' },
-                  { value: 'product', label: 'منتج' },
-                  { value: 'main_category', label: 'فئة' },
-                  { value: 'subscription', label: 'اشتراك' },
-                ]}
-                value={draft.actionType}
-                onValueChange={(v) => setDraft(c => ({ ...c, actionType: v }))}
+              <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>نوع الوجهة الذكي</label>
+              <Tabs<SmartBannerTargetType>
+                items={SMART_TARGET_OPTIONS.map((option) => ({ value: option.value, label: option.label }))}
+                value={draft.targetType}
+                onValueChange={handleSmartTargetTypeChange}
                 variant="pill"
               />
             </Box>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
-            <TextField label="معرّف الهدف (ID)" value={draft.actionTarget} onChangeText={(v) => setDraft(c => ({ ...c, actionTarget: v }))} />
-            <TextField label="بيانات إضافية" value={draft.actionExtra} onChangeText={(v) => setDraft(c => ({ ...c, actionExtra: v }))} />
-          </div>
+
+          <View style={styles.smartTargetPanel}>
+            {draft.targetType === 'store' && (
+              <Box gap={1}>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>اختر المتجر</label>
+                <Tabs<any>
+                  items={dshDiscoveryStores.map((store) => ({ value: store.id, label: store.name }))}
+                  value={draft.actionTarget}
+                  onValueChange={(v) => setDraft((current) => ({ ...current, actionTarget: v }))}
+                  variant="pill"
+                />
+              </Box>
+            )}
+
+            {draft.targetType === 'offer' && (
+              <Box gap={1}>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>العروض المتاحة</label>
+                <Tabs<any>
+                  items={dshDiscoveryStores.filter((store) => Boolean(store.isOffer || store.offerLabel)).map((store) => ({ value: store.id, label: `${store.name} · ${store.offerLabel || 'عرض'}` }))}
+                  value={draft.actionTarget}
+                  onValueChange={(v) => setDraft((current) => ({ ...current, actionTarget: v }))}
+                  variant="pill"
+                />
+              </Box>
+            )}
+
+            {draft.targetType === 'category' && (
+              <Box gap={1}>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>اختر الفئة</label>
+                <Tabs<any>
+                  items={dshCategoryFixtures.map((category) => ({ value: category.id, label: category.label }))}
+                  value={draft.actionTarget}
+                  onValueChange={(v) => setDraft((current) => ({ ...current, actionTarget: v, actionExtra: '' }))}
+                  variant="pill"
+                />
+              </Box>
+            )}
+
+            {draft.targetType === 'subcategory' && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <Box gap={1}>
+                  <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>الفئة الأم</label>
+                  <Tabs<any>
+                    items={dshCategoryFixtures.filter((category) => category.subcategories.length > 0).map((category) => ({ value: category.id, label: category.label }))}
+                    value={draft.actionTarget}
+                    onValueChange={(v) => setDraft((current) => ({ ...current, actionTarget: v, actionExtra: '' }))}
+                    variant="pill"
+                  />
+                </Box>
+                <Box gap={1}>
+                  <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>الفئة الفرعية</label>
+                  <Tabs<any>
+                    items={(dshCategoryFixtures.find((category) => category.id === draft.actionTarget)?.subcategories ?? []).length
+                      ? (dshCategoryFixtures.find((category) => category.id === draft.actionTarget)?.subcategories ?? []).map((subcategory) => ({ value: subcategory.id, label: subcategory.label }))
+                      : [{ value: '', label: 'اختر فئة أولاً' }]}
+                    value={draft.actionExtra}
+                    onValueChange={(v) => setDraft((current) => ({ ...current, actionExtra: v }))}
+                    variant="pill"
+                  />
+                </Box>
+              </div>
+            )}
+
+            {draft.targetType === 'product' && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <Box gap={1}>
+                  <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>المتجر</label>
+                  <Tabs<any>
+                    items={dshDiscoveryStores.map((store) => ({ value: store.id, label: store.name }))}
+                    value={draft.actionExtra}
+                    onValueChange={(v) => setDraft((current) => ({ ...current, actionExtra: v, actionTarget: '' }))}
+                    variant="pill"
+                  />
+                </Box>
+                <Box gap={1}>
+                  <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>المنتج</label>
+                  <Tabs<any>
+                    items={getProductsForStore(draft.actionExtra).length
+                      ? getProductsForStore(draft.actionExtra).map((product) => ({ value: product.id, label: product.name }))
+                      : [{ value: '', label: 'اختر متجراً أولاً' }]}
+                    value={draft.actionTarget}
+                    onValueChange={(v) => setDraft((current) => ({ ...current, actionTarget: v }))}
+                    variant="pill"
+                  />
+                </Box>
+              </div>
+            )}
+
+            {draft.targetType === 'subscription' && (
+              <Box gap={1}>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>مسار الاشتراك</label>
+                <Tabs<any>
+                  items={SUBSCRIPTION_OPTIONS}
+                  value={draft.actionTarget}
+                  onValueChange={(v) => setDraft((current) => ({ ...current, actionTarget: v }))}
+                  variant="pill"
+                />
+              </Box>
+            )}
+
+            {draft.targetType === 'campaign' && (
+              <TextField
+                label="مسار الحملة"
+                value={draft.actionTarget}
+                onChangeText={(value) => setDraft((current) => ({ ...current, actionTarget: value }))}
+              />
+            )}
+
+            {draft.targetType === 'custom' && (
+              <TextField
+                label="المسار المخصص"
+                value={draft.actionTarget}
+                onChangeText={(value) => setDraft((current) => ({ ...current, actionTarget: value }))}
+              />
+            )}
+
+            {(draft.targetType === 'home' || draft.targetType === 'stores' || draft.targetType === 'tracking' || draft.targetType === 'orders' || draft.targetType === 'loyalty') ? (
+              <Text role="caption" tone="muted" style={{ fontWeight: '700' }}>
+                هذا النوع محدد مسبقًا ولا يحتاج حقول ربط إضافية.
+              </Text>
+            ) : null}
+
+            <View style={styles.smartSummaryCard}>
+              <Text role="caption" style={{ fontWeight: '900', color: '#1E40AF' }}>ملخص الربط النهائي</Text>
+              <Text role="caption" style={{ color: '#1E40AF', marginTop: 4 }}>الوجهة: {smartTargetSummary.label}</Text>
+              <Text role="caption" style={{ color: '#1E40AF', marginTop: 4 }}>المعرف: {smartTargetSummary.targetId}</Text>
+              <Text role="caption" style={{ color: '#1E40AF', marginTop: 4 }}>الاسم: {smartTargetSummary.targetLabel}</Text>
+              <Text role="caption" tone="muted" style={{ fontSize: 10, marginTop: 4 }}>المسار النهائي: {smartTargetSummary.finalRoute}</Text>
+            </View>
+          </View>
         </Box>
 
         <View style={styles.divider} />
@@ -353,9 +770,11 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             />
           </Box>
           <div style={{ display: 'flex', gap: 12 }}>
-             <Button label="حذف البنر" tone="ghost" fullWidth={false} onPress={() => handleDelete(selected!)} style={{ color: '#DC2626' }} />
-             <Button label="تكرار" tone="secondary" fullWidth={false} onPress={() => handleDuplicate(selected!)} />
-             <Button label="حفظ البنر" fullWidth={false} onPress={handleSave} style={{ backgroundColor: '#0A2F5C', paddingHorizontal: 32 }} />
+             <Button label="جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} />
+             <Button label="تكرار" tone="secondary" fullWidth={false} disabled={!selected} onPress={() => selected && handleDuplicate(selected)} />
+             <Button label={selected?.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" fullWidth={false} disabled={!selected} onPress={() => selected && handleToggle(selected)} />
+             <Button label="حذف" tone="ghost" fullWidth={false} disabled={!selected} onPress={() => selected && handleDelete(selected)} style={{ color: '#DC2626' }} />
+             <Button label="حفظ" fullWidth={false} onPress={handleSave} style={{ backgroundColor: '#0A2F5C', paddingHorizontal: 32 }} />
           </div>
         </div>
       </Box>
@@ -497,12 +916,12 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   previewContainer: {
-    width: 280,
+    width: 320,
     alignSelf: 'center',
   },
   bannerBase: {
-    width: 280,
-    height: 350,
+    width: 320,
+    height: 400,
     borderRadius: 32,
     overflow: 'hidden',
     position: 'relative',
@@ -559,6 +978,22 @@ const styles = StyleSheet.create({
   bannerCtaText: {
     fontSize: 11,
     fontWeight: '900',
+  },
+  smartTargetPanel: {
+    backgroundColor: '#F8FAFC',
+    padding: 16,
+    borderRadius: 20,
+    gap: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  smartSummaryCard: {
+    marginTop: 8,
+    padding: 12,
+    backgroundColor: '#EFF6FF',
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#3B82F6',
   },
   bannerBadge: {
     position: 'absolute',
