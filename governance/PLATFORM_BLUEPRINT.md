@@ -1,9 +1,9 @@
 # BThwani Platform Blueprint
 
-> Canonical target path: `C:\bthwani-suite\governance\PLATFORM_BLUEPRINT.md`  
-> Blueprint model: **Two blueprint types only**  
-> Platform blueprint: `governance/PLATFORM_BLUEPRINT.md`  
-> Service blueprint: `{service}/SERVICE_BLUEPRINT.md`  
+> Canonical target path: `C:\bthwani-suite\governance\PLATFORM_BLUEPRINT.md`
+> Blueprint model: **Two blueprint types only**
+> Platform blueprint: `governance/PLATFORM_BLUEPRINT.md`
+> Service blueprint: `{service}/SERVICE_BLUEPRINT.md`
 > API contracts: OpenAPI files only, not blueprint files
 
 ---
@@ -492,18 +492,16 @@ Production ready.
 
 ### 6.8 Contract-to-binding order
 
-The correct order is:
-
-```text
-Flow / Screen Need
-→ Screen/API Matrix
-→ Gap Map
-→ OpenAPI Contract
-→ Generated/typed client or verified typed boundary
-→ Binding Adapter / ViewModel
-→ Screen State
 → Runtime Evidence
-```
+
+### 6.9 Contract-first implementation law
+
+No implementation may bypass the contract-first sequence.
+
+Rules:
+- Contract-first before Go/DB implementation.
+- No Go handler, DB table, migration, or client binding before Screen/API Matrix + Gap Map + OpenAPI approval.
+- No backend/API binding before UI/UX/Flow Closure passes.
 
 ---
 
@@ -754,9 +752,38 @@ Truth
 → Performance / Accessibility
 → Production Readiness
 → Evidence
-```
 
-### 9.2 Service-deep closure rule
+### 9.2 Binding and Closure Law
+
+Rules:
+1. **UI/UX/Flow Closure must pass before backend/API binding.**
+2. **Binding must be a bounded vertical slice**: one screen, one workspace, or one bounded flow chain.
+3. **Stability rule**: Do not bind isolated widgets when the parent screen is unstable.
+4. **Gradual binding**: Do not attempt full-service binding in a single pass.
+
+### 9.3 Local Operating Platform (LOP) Phases
+
+The platform transition follows these phases:
+
+| Phase | Meaning | Readiness Requirement |
+|---|---|---|
+| **LOP-0** | Tool readiness | Tooling Decision (TECH_STACK_LOCK.md) verified locally. |
+| **LOP-1** | Local runtime skeleton | Environment variables, docker-compose.local.yml, and root service entry points. |
+| **LOP-2** | First vertical slice | One screen + one API + one DB table + full flow. |
+| **LOP-3** | Gradual expansion | Scaling to multiple flows and services by evidence. |
+
+### 9.4 Deferred Tooling Rule
+
+The following tools are not part of LOP-1 unless explicit evidence justifies them for the current task:
+- Postman/Newman
+- Redis/Valkey
+- Kubernetes
+- Message broker (RabbitMQ/Kafka)
+- Notification engine
+- Analytics engine
+- MinIO (unless media storage is the primary task)
+
+### 9.5 Service-deep closure rule
 
 Deep closure is service-by-service.
 
@@ -1049,7 +1076,7 @@ C:\bthwani-suite\tools\registry\runs\{SESSION_ID}
 Required handoff ZIP location:
 
 ```text
-C:\bthwani-suite\tools\registry\runs\{SESSION_ID}\_HANDOFF.zip
+C:\bthwani-suite\tools\registry\runs\{SESSION_ID}\{SESSION_ID}.zip
 ```
 
 ### 12.2 Canonical scripts path
@@ -1127,7 +1154,7 @@ nx-projects.txt
 guard outputs
 runtime/build outputs when in scope
 remaining-risks.md
-_HANDOFF.zip
+{SESSION_ID}.zip
 ```
 
 ### 12.7 Traceability requirement

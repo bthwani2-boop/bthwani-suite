@@ -122,7 +122,7 @@ const audienceLabelByLocale: Record<MarketingNewsTickerLocale, Record<MarketingN
 const priorityLabelByLocale: Record<MarketingNewsTickerLocale, Record<MarketingNewsTickerPriority, string>> = {
   ar: {
     critical: 'حرج',
-    high: 'عالي',
+    high: 'عالٍ',
     normal: 'عادي',
     low: 'منخفض',
   },
@@ -153,7 +153,7 @@ const planReasonLabelByLocale: Record<MarketingNewsTickerLocale, Record<Marketin
     cooldown: 'ضمن فترة التهدئة',
     duplicate: 'مكرر',
     draft: 'مسودة',
-    audience: 'غير مطابق للجمهور',
+    audience: 'الجمهور غير مطابق',
   },
   en: {
     'outside-window': 'Outside display window',
@@ -161,6 +161,51 @@ const planReasonLabelByLocale: Record<MarketingNewsTickerLocale, Record<Marketin
     duplicate: 'Duplicate',
     draft: 'Draft',
     audience: 'Audience mismatch',
+  },
+};
+
+const statusLabelByLocale: Record<MarketingNewsTickerLocale, Record<MarketingNewsTickerStatus, string>> = {
+  ar: {
+    draft: 'مسودة',
+    published: 'منشور',
+    paused: 'متوقف',
+    scheduled: 'مجدول',
+  },
+  en: {
+    draft: 'Draft',
+    published: 'Published',
+    paused: 'Paused',
+    scheduled: 'Scheduled',
+  },
+};
+
+const kindLabelByLocale: Record<MarketingNewsTickerLocale, Record<MarketingNewsTickerKind, string>> = {
+  ar: {
+    platform: 'المنصة',
+    order: 'الطلب',
+    promo: 'عرض',
+    partner: 'الشريك',
+  },
+  en: {
+    platform: 'Platform',
+    order: 'Order',
+    promo: 'Promo',
+    partner: 'Partner',
+  },
+};
+
+const targetLabelByLocale: Record<MarketingNewsTickerLocale, Record<string, string>> = {
+  ar: {
+    home: 'الرئيسية',
+    orders: 'الطلبات',
+    tracking: 'التتبع',
+    promo: 'عرض',
+  },
+  en: {
+    home: 'Home',
+    orders: 'Orders',
+    tracking: 'Tracking',
+    promo: 'Promo',
   },
 };
 
@@ -348,9 +393,40 @@ export function toggleMarketingTickerStatus(id: string): MarketingNewsTickerItem
       return entry;
     }
 
+    // Requirement: draft/paused/scheduled -> published, published -> paused
+    const nextStatus: MarketingNewsTickerStatus = entry.status === 'published' ? 'paused' : 'published';
+
     updatedItem = {
       ...entry,
-      status: entry.status === 'published' ? 'draft' : 'published',
+      status: nextStatus,
+    };
+
+    return updatedItem;
+  });
+
+  return updatedItem ? cloneTicker(updatedItem) : null;
+}
+
+export function pauseAllMarketingTickers(): void {
+  store = store.map((entry) => {
+    if (entry.status === 'published' || entry.status === 'scheduled') {
+      return { ...entry, status: 'paused' };
+    }
+    return entry;
+  });
+}
+
+export function toggleMarketingTickerPinned(id: string): MarketingNewsTickerItem | null {
+  let updatedItem: MarketingNewsTickerItem | null = null;
+
+  store = store.map((entry) => {
+    if (entry.id !== id) {
+      return entry;
+    }
+
+    updatedItem = {
+      ...entry,
+      deliveryMode: entry.deliveryMode === 'pinned' ? 'auto' : 'pinned',
     };
 
     return updatedItem;
@@ -520,4 +596,16 @@ export function resolveMarketingTickerPlanReasonLabel(locale: MarketingNewsTicke
   }
 
   return planReasonLabelByLocale[locale][reason];
+}
+
+export function resolveMarketingTickerStatusLabel(locale: MarketingNewsTickerLocale, status: MarketingNewsTickerStatus) {
+  return statusLabelByLocale[locale][status];
+}
+
+export function resolveMarketingTickerKindLabel(locale: MarketingNewsTickerLocale, kind: MarketingNewsTickerKind) {
+  return kindLabelByLocale[locale][kind];
+}
+
+export function resolveMarketingTickerTargetLabel(locale: MarketingNewsTickerLocale, target: string) {
+  return targetLabelByLocale[locale][target] || target;
 }

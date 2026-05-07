@@ -31,6 +31,9 @@ It does not authorize implementation work.
 - AI/Data = Python only when a proven AI/Data requirement exists; otherwise TBD/NEEDS_CONFIRMATION
 - Architecture = Modular Monolith first, Services later by evidence
 
+> [!NOTE]
+> Docker Desktop and Docker Compose are classified as **Local Operating Tooling** (LOP). They are not approved as production architecture targets at this phase.
+
 This is the target stack lock for future planning and controlled migration.
 
 ## 4. Current Branch Reality
@@ -83,6 +86,9 @@ Rules:
 - Do not expand Tamagui usage as part of the target architecture.
 - Do not treat Tamagui as a future target-stack component.
 - Any eventual removal must be planned separately and justified by evidence.
+- Tamagui is allowed only as a current internal `@bthwani/ui-kit` implementation dependency.
+- Apps and services must not import Tamagui directly.
+- Future removal or retention requires evidence.
 
 ## 8. Python AI/Data Decision
 
@@ -103,6 +109,7 @@ Database policy:
 Cache/queue policy:
 
 - Valkey or Redis is the locked cache/queue target.
+- **Target later by evidence**: Redis/Valkey are not required now and are not required for Smart Ticker v1.
 
 Rules:
 
@@ -138,6 +145,13 @@ Before any implementation begins, the following evidence is required:
 
 Without this evidence, implementation remains blocked.
 
+> [!IMPORTANT]
+> This file alone does not authorize implementation. Implementation requires:
+> 1. UI/UX/Flow gate PASS.
+> 2. Screen/API Matrix + Gap Map.
+> 3. OpenAPI Contract approval.
+> 4. Approved vertical slice definition.
+
 ## 12. Forbidden Actions
 
 - Do not edit any implementation file.
@@ -166,3 +180,30 @@ The BThwani target stack is locked as follows:
 
 Current repo reality remains transitional and does not change this decision.
 Tamagui remains a current dependency only, not a target-architecture commitment, and it requires a future removal plan before any elimination is approved.
+
+---
+
+## 14. Tooling Decision Table
+
+This table defines the mandatory local toolset and the repo-level artifacts for the Local Operating Platform (LOP).
+
+| Category | Item | Status | Rule |
+|---|---|---|---|
+| **Required Now** | Docker Desktop | Mandatory | Local Operating Tooling only. |
+| | Go SDK | Mandatory | Backend core development. |
+| | Git | Mandatory | Version control. |
+| | Node.js | Mandatory | Frontend/Tooling runtime. |
+| | pnpm | Mandatory | Package management. |
+| | PowerShell | Mandatory | Scripting and verification. |
+| **Repo-level (when approved)** | `docker-compose.local.yml` | Approved | Local runtime orchestration. |
+| | OpenAPI YAML | Approved | Technical contract source. |
+| | Swagger UI container | Approved | Contract visualization. |
+| | PowerShell verify scripts | Approved | Automation and smoke testing. |
+| **Conditional Later** | PostgreSQL | Conditional | Required for first persisted vertical slice. |
+| | MinIO | Conditional | Required for media/banner storage. |
+| | Redis/Valkey | Conditional | Required for proven cache/queue/pubsub needs. |
+| **Not Now** | Postman / Newman | Forbidden | Do not add to repo or rely on for LOP-1. |
+| | Kubernetes | Forbidden | Production orchestration is out of scope. |
+| | Message Broker | Forbidden | RabbitMQ/Kafka are deferred. |
+| | Notification Engine | Forbidden | Deferred. |
+| | Analytics Engine | Forbidden | Deferred. |

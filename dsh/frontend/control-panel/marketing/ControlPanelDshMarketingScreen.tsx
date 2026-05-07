@@ -16,11 +16,24 @@ import {
   removeMarketingTickerItem,
   createMarketingTickerDraft,
   resolveMarketingTickerPreviewForItem,
+  buildMarketingTickerPlan,
+  resolveMarketingTickerSourceLabel,
+  resolveMarketingTickerAudienceLabel,
+  resolveMarketingTickerPriorityLabel,
+  resolveMarketingTickerDeliveryLabel,
+  resolveMarketingTickerPlanReasonLabel,
+  resolveMarketingTickerStatusLabel,
+  resolveMarketingTickerKindLabel,
+  resolveMarketingTickerTargetLabel,
+  pauseAllMarketingTickers,
+  toggleMarketingTickerPinned,
   type MarketingNewsTickerItem,
   type MarketingNewsTickerAudience,
   type MarketingNewsTickerPriority,
   type MarketingNewsTickerSource,
   type MarketingNewsTickerStatus,
+  type MarketingNewsTickerDeliveryMode,
+  type MarketingNewsTickerKind,
 } from '../../shared/news-ticker-store';
 import { dshPromotionCandidates } from '../../shared/workflow';
 
@@ -41,6 +54,18 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   const refreshTickers = () => setTickers(getMarketingTickerItems());
 
   const editingTicker = editingTickerId ? tickers.find(t => t.id === editingTickerId) : null;
+
+  const [now, setNow] = React.useState(new Date());
+  React.useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const tickerPlan = React.useMemo(() => buildMarketingTickerPlan(now, 'client', tickers), [now, tickers]);
+
+  const localizeTarget = (target: string) => resolveMarketingTickerTargetLabel('ar', target);
+  const localizeStatus = (status: MarketingNewsTickerStatus) => resolveMarketingTickerStatusLabel('ar', status);
+  const localizeKind = (kind: MarketingNewsTickerKind) => resolveMarketingTickerKindLabel('ar', kind);
 
   const PRIMARY_TABS = [
     { id: 'ticker', label: 'الشريط الذكي', icon: '📢' },
@@ -101,192 +126,318 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   const renderActiveLane = () => {
     switch (activeTab) {
       case 'ticker': {
-        const preview = editingTicker
-          ? resolveMarketingTickerPreviewForItem(new Date(), editingTicker, 'ar')
-          : resolveMarketingTickerPreviewForItem(new Date(), tickers[0] || createMarketingTickerDraft(), 'ar');
+        const previewItem = editingTicker || tickerPlan.activeItem;
+        const preview = previewItem ? resolveMarketingTickerPreviewForItem(now, previewItem, 'ar') : null;
 
         return (
           <Box gap={4} style={{ paddingBottom: '32px' }}>
-            {/* A) Top command bar / summary strip & B) Live Preview */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            {/* 1) Top command bar / summary strip */}
+            <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h3 style={{ color: '#0A2F5C', fontSize: '14px', fontWeight: '800', margin: 0 }}>الرسالة النشطة الآن</h3>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => {
+                      const draft = createMarketingTickerDraft();
+                      upsertMarketingTickerItem(draft);
+                      setEditingTickerId(draft.id);
+                      refreshTickers();
+                    }}
+                    style={{ padding: '4px 12px', backgroundColor: '#0A2F5C', color: '#fff', borderRadius: '6px', border: 'none', fontWeight: '700', fontSize: '11px', cursor: 'pointer' }}
+                  >
+                    + إضافة رسالة
+                  </button>
+                  <button
+                    onClick={() => {
+                      pauseAllMarketingTickers();
+                      refreshTickers();
+                    }}
+                    style={{ padding: '4px 12px', backgroundColor: '#FEF2F2', color: '#DC2626', borderRadius: '6px', border: 'none', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}
+                  >
+                    إيقاف الكل
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (editingTickerId) {
+                        const t = tickers.find(x => x.id === editingTickerId);
+                        if (t && t.status !== 'published') {
+                          upsertMarketingTickerItem({ ...t, status: 'published' });
+                          refreshTickers();
+                        }
+                      }
+                    }}
+                    disabled={!editingTickerId || (tickers.find(x => x.id === editingTickerId)?.status === 'published')}
+                    style={{ padding: '4px 12px', backgroundColor: (editingTickerId && tickers.find(x => x.id === editingTickerId)?.status !== 'published') ? '#DCFCE7' : '#F1F5F9', color: (editingTickerId && tickers.find(x => x.id === editingTickerId)?.status !== 'published') ? '#16A34A' : '#94A3B8', borderRadius: '6px', border: 'none', fontSize: '11px', fontWeight: '700', cursor: (editingTickerId && tickers.find(x => x.id === editingTickerId)?.status !== 'published') ? 'pointer' : 'not-allowed' }}
+                  >
+                    تفعيل المحددة
+                  </button>
+                  <div style={{ padding: '4px 12px', backgroundColor: '#F1F5F9', color: '#64748B', borderRadius: '6px', fontSize: '11px', fontWeight: '700' }}>
+                    تم الحفظ تلقائياً
+                  </div>
+                </div>
+              </div>
+              {tickerPlan.activeEntry ? (
+                <div style={{ padding: '12px', backgroundColor: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ backgroundColor: '#DCFCE7', color: '#16A34A', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: '800' }}>مباشر</span>
+                  </div>
+                  <p style={{ fontSize: '14px', fontWeight: '800', color: '#0A2F5C', margin: '0 0 8px 0' }}>{tickerPlan.activeItem?.message}</p>
+                  <div style={{ display: 'flex', gap: '12px', fontSize: '11px', color: '#64748B', flexWrap: 'wrap' }}>
+                    <span>المصدر: {resolveMarketingTickerSourceLabel('ar', tickerPlan.activeItem!.source)}</span>
+                    <span>الجمهور: {resolveMarketingTickerAudienceLabel('ar', tickerPlan.activeItem!.audience)}</span>
+                    <span>الأولوية: {resolveMarketingTickerPriorityLabel('ar', tickerPlan.activeItem!.priority)}</span>
+                    <span>النافذة: {tickerPlan.activeItem!.openHour}:00 - {tickerPlan.activeItem!.closeHour}:00</span>
+                    <span>الوجهة: {localizeTarget(tickerPlan.activeItem!.actionTarget)}</span>
+                  </div>
+                  <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #E2E8F0', fontSize: '11px', color: '#0369A1', fontWeight: '600' }}>
+                    الخطة: {resolveMarketingTickerDeliveryLabel('ar', tickerPlan.activeItem!.deliveryMode)} — مفعلة بنجاح (السبب: {resolveMarketingTickerPlanReasonLabel('ar', tickerPlan.activeEntry.reason)})
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding: '20px', textAlign: 'center', backgroundColor: '#F8FAFC', borderRadius: '8px', border: '1px dashed #CBD5E1' }}>
+                  <p style={{ color: '#64748B', fontSize: '13px', fontWeight: '600', margin: 0 }}>لا توجد رسالة نشطة الآن.</p>
+                </div>
+              )}
+            </div>
+
+            {/* 2) Orange Preview Bar */}
+            <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
+              <h3 style={{ color: '#0A2F5C', fontWeight: '800', fontSize: '14px', margin: '0 0 12px 0' }}>معاينة مباشرة</h3>
+              {preview ? (
+                <div style={{ backgroundColor: '#FF500D', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ fontSize: '10px', fontWeight: '900', backgroundColor: '#fff', color: '#FF500D', padding: '4px 8px', borderRadius: '4px' }}>
+                    {preview.statusLabel}
+                  </span>
+                  <div style={{ flex: 1, overflow: 'hidden' }}>
+                    <p style={{ color: '#fff', fontSize: '13px', fontWeight: '800', whiteSpace: 'nowrap', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                      {preview.message}
+                    </p>
+                  </div>
+                  <span style={{ fontSize: '10px', color: '#fff', opacity: 0.8 }}>← {localizeTarget(previewItem!.actionTarget)}</span>
+                </div>
+              ) : (
+                <div style={{ height: '40px', backgroundColor: '#F1F5F9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                   <p style={{ color: '#94A3B8', fontSize: '12px', margin: 0 }}>لا توجد معاينة متاحة</p>
+                </div>
+              )}
+            </div>
+
+            {/* 3) Message list & 4) Message editor */}
+            <div style={{ display: 'grid', gridTemplateColumns: editingTicker ? '1fr 350px' : '1fr', gap: '20px' }}>
               <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <h3 style={{ color: '#0A2F5C', fontSize: '14px', fontWeight: '800', margin: 0 }}>الرسالة النشطة الآن</h3>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                     <button
-                        onClick={() => {
-                          const draft = createMarketingTickerDraft();
-                          upsertMarketingTickerItem(draft);
-                          setEditingTickerId(draft.id);
+                <h3 style={{ color: '#0A2F5C', fontSize: '14px', fontWeight: '800', margin: '0 0 12px 0' }}>قائمة الرسائل</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {tickers.map(ticker => {
+                    const isPublished = ticker.status === 'published';
+                    const planEntry = tickerPlan.automaticEntries.find(e => e.item.id === ticker.id)
+                                   || tickerPlan.manualEntries.find(e => e.item.id === ticker.id)
+                                   || tickerPlan.suppressedEntries.find(e => e.item.id === ticker.id)
+                                   || (tickerPlan.activeEntry?.item.id === ticker.id ? tickerPlan.activeEntry : undefined);
+                    const isSuppressed = planEntry?.state === 'suppressed';
+
+                    return (
+                      <div key={ticker.id} style={{ padding: '10px', backgroundColor: '#F8FAFC', borderRadius: '8px', border: editingTickerId === ticker.id ? '1px solid #FF500D' : '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box gap={1}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '4px', backgroundColor: isPublished ? '#DCFCE7' : '#F1F5F9', color: isPublished ? '#16A34A' : '#64748B', fontWeight: '800' }}>
+                              {localizeStatus(ticker.status)}
+                            </span>
+                            <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748B' }}>#{ticker.id}</span>
+                            <span style={{ fontSize: '10px', color: '#64748B' }}>{resolveMarketingTickerSourceLabel('ar', ticker.source)}</span>
+                            <span style={{ fontSize: '10px', color: '#64748B' }}>{resolveMarketingTickerAudienceLabel('ar', ticker.audience)}</span>
+                            <span style={{ fontSize: '10px', color: '#64748B' }}>{resolveMarketingTickerPriorityLabel('ar', ticker.priority)}</span>
+                            <span style={{ fontSize: '10px', color: '#64748B' }}>{ticker.openHour}:00-{ticker.closeHour}:00</span>
+                            <span style={{ fontSize: '10px', color: '#64748B' }}>{localizeTarget(ticker.actionTarget)}</span>
+                            {isSuppressed && <span style={{ fontSize: '10px', color: '#DC2626' }}>الكبت: {resolveMarketingTickerPlanReasonLabel('ar', planEntry?.reason)}</span>}
+                          </div>
+                          <p style={{ fontSize: '13px', fontWeight: '700', color: '#0A2F5C', margin: 0 }}>{ticker.message}</p>
+                        </Box>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button onClick={() => {
+                              toggleMarketingTickerStatus(ticker.id);
+                              refreshTickers();
+                            }} style={{ padding: '4px 8px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '4px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
+                            {isPublished ? 'إيقاف' : 'تفعيل'}
+                          </button>
+                          <button onClick={() => setEditingTickerId(ticker.id)} style={{ padding: '4px 8px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '4px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
+                            تعديل
+                          </button>
+                          <button onClick={() => {
+                              toggleMarketingTickerPinned(ticker.id);
+                              refreshTickers();
+                            }} style={{ padding: '4px 8px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '4px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
+                            {ticker.deliveryMode === 'pinned' ? 'إلغاء التثبيت' : 'تثبيت'}
+                          </button>
+                          <button onClick={() => {
+                              removeMarketingTickerItem(ticker.id);
+                              if (editingTickerId === ticker.id) setEditingTickerId(null);
+                              refreshTickers();
+                            }} style={{ padding: '4px 8px', backgroundColor: '#FEF2F2', color: '#DC2626', borderRadius: '4px', border: 'none', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
+                            حذف
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {editingTicker && (
+                <div style={{ padding: '16px', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #FF500D' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <h4 style={{ color: '#0A2F5C', fontWeight: '800', margin: 0 }}>محرر الرسالة</h4>
+                    <button onClick={() => setEditingTickerId(null)} style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', fontSize: '12px' }}>✕ إغلاق</button>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <Box gap={1}>
+                      <label style={{ fontSize: '11px', fontWeight: '800', color: '#64748B' }}>نص الرسالة</label>
+                      <textarea
+                        value={editingTicker.message}
+                        onChange={(e) => {
+                          upsertMarketingTickerItem({ ...editingTicker, message: e.target.value });
                           refreshTickers();
                         }}
-                        style={{ padding: '4px 12px', backgroundColor: '#0A2F5C', color: '#fff', borderRadius: '6px', border: 'none', fontWeight: '700', fontSize: '11px', cursor: 'pointer' }}
-                      >
-                        + إضافة رسالة
-                      </button>
-                      <button onClick={() => { tickers.forEach(t => { if(t.status === 'published') toggleMarketingTickerStatus(t.id); }); refreshTickers(); }} style={{ padding: '4px 12px', backgroundColor: '#FEF2F2', color: '#DC2626', borderRadius: '6px', border: 'none', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
-                        إيقاف الكل
-                      </button>
-                      <button onClick={() => refreshTickers()} style={{ padding: '4px 12px', backgroundColor: '#F1F5F9', color: '#0A2F5C', borderRadius: '6px', border: 'none', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
-                        حفظ
-                      </button>
-                  </div>
-                </div>
-                {tickers.length > 0 ? (
-                  <div style={{ padding: '12px', backgroundColor: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                       <span style={{ backgroundColor: '#DCFCE7', color: '#16A34A', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: '800' }}>مباشر</span>
-                       <button onClick={() => { if(tickers[0].status !== 'published') toggleMarketingTickerStatus(tickers[0].id); refreshTickers(); }} style={{ padding: '2px 8px', backgroundColor: '#DCFCE7', color: '#16A34A', borderRadius: '4px', border: 'none', fontSize: '11px', fontWeight: '800', cursor: 'pointer' }}>تفعيل المحددة</button>
-                    </div>
-                    <p style={{ fontSize: '14px', fontWeight: '800', color: '#0A2F5C', margin: '0 0 8px 0' }}>{tickers[0].message}</p>
-                    <div style={{ display: 'flex', gap: '12px', fontSize: '11px', color: '#64748B', flexWrap: 'wrap' }}>
-                      <span>المصدر: {tickers[0].source}</span>
-                      <span>الجمهور: {tickers[0].audience}</span>
-                      <span>الأولوية: {tickers[0].priority}</span>
-                      <span>النافذة: {tickers[0].openHour}:00 - {tickers[0].closeHour}:00</span>
-                      <span>الوجهة: {tickers[0].actionTarget}</span>
-                    </div>
-                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #E2E8F0', fontSize: '11px', color: '#0369A1', fontWeight: '600' }}>
-                      سبب الاختيار: أعلى أولوية ومطابق لوقت العرض.
-                    </div>
-                  </div>
-                ) : (
-                  <p style={{ color: '#64748B', fontSize: '12px' }}>لا توجد رسائل نشطة حالياً.</p>
-                )}
-              </div>
-
-              <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ color: '#0A2F5C', fontWeight: '800', fontSize: '14px', margin: '0 0 12px 0' }}>معاينة حية (Live Preview)</h3>
-                <div style={{ backgroundColor: '#FF500D', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', marginTop: 'auto', marginBottom: 'auto' }}>
-                   <span style={{ fontSize: '10px', fontWeight: '900', backgroundColor: '#fff', color: '#FF500D', padding: '4px 8px', borderRadius: '4px' }}>
-                     {preview.statusLabel}
-                   </span>
-                   <div style={{ flex: 1, overflow: 'hidden' }}>
-                     <p style={{ color: '#fff', fontSize: '13px', fontWeight: '800', whiteSpace: 'nowrap', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                       {preview.message}
-                     </p>
-                   </div>
-                   <span style={{ fontSize: '10px', color: '#fff', opacity: 0.8 }}>← {editingTicker?.actionTarget || tickers[0]?.actionTarget || 'home'}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* C) Message list & D) Message editor */}
-            <div style={{ display: 'grid', gridTemplateColumns: editingTicker ? '1fr 350px' : '1fr', gap: '20px' }}>
-               <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
-                 <h3 style={{ color: '#0A2F5C', fontSize: '14px', fontWeight: '800', margin: '0 0 12px 0' }}>قائمة الرسائل</h3>
-                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                   {tickers.map(ticker => (
-                     <div key={ticker.id} style={{ padding: '10px', backgroundColor: '#F8FAFC', borderRadius: '8px', border: editingTickerId === ticker.id ? '1px solid #FF500D' : '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                       <Box gap={1}>
-                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                           <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '4px', backgroundColor: ticker.status === 'published' ? '#DCFCE7' : '#F1F5F9', color: ticker.status === 'published' ? '#16A34A' : '#64748B', fontWeight: '800' }}>
-                             {ticker.status === 'published' ? 'منشور' : 'مسودة'}
-                           </span>
-                           <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748B' }}>#{ticker.id}</span>
-                           <span style={{ fontSize: '10px', color: '#64748B' }}>{ticker.source}</span>
-                           <span style={{ fontSize: '10px', color: '#64748B' }}>{ticker.audience}</span>
-                           <span style={{ fontSize: '10px', color: '#64748B' }}>{ticker.priority}</span>
-                           <span style={{ fontSize: '10px', color: '#64748B' }}>{ticker.openHour}:00-{ticker.closeHour}:00</span>
-                           <span style={{ fontSize: '10px', color: '#64748B' }}>{ticker.actionTarget}</span>
-                           {ticker.status !== 'published' && <span style={{ fontSize: '10px', color: '#DC2626' }}>سبب الكبت: غير مفعل</span>}
-                         </div>
-                         <p style={{ fontSize: '13px', fontWeight: '700', color: '#0A2F5C', margin: 0 }}>{ticker.message}</p>
-                       </Box>
-                       <div style={{ display: 'flex', gap: '6px' }}>
-                         <button onClick={() => { toggleMarketingTickerStatus(ticker.id); refreshTickers(); }} style={{ padding: '4px 8px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '4px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
-                           {ticker.status === 'published' ? 'إيقاف' : 'تفعيل'}
-                         </button>
-                         <button onClick={() => setEditingTickerId(ticker.id)} style={{ padding: '4px 8px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '4px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
-                           تعديل
-                         </button>
-                         <button onClick={() => { /* assume pin toggle if we had it, keeping it simple */ }} style={{ padding: '4px 8px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '4px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
-                           تثبيت
-                         </button>
-                         <button onClick={() => { removeMarketingTickerItem(ticker.id); if (editingTickerId === ticker.id) setEditingTickerId(null); refreshTickers(); }} style={{ padding: '4px 8px', backgroundColor: '#FEF2F2', color: '#DC2626', borderRadius: '4px', border: 'none', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
-                           حذف
-                         </button>
-                       </div>
-                     </div>
-                   ))}
-                 </div>
-               </div>
-
-               {editingTicker && (
-                 <div style={{ padding: '16px', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #FF500D' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <h4 style={{ color: '#0A2F5C', fontWeight: '800', margin: 0 }}>محرر الرسالة</h4>
-                      <button onClick={() => setEditingTickerId(null)} style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', fontSize: '12px' }}>✕ إغلاق</button>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        style={{ padding: '8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '12px', minHeight: '50px', fontFamily: 'inherit' }}
+                      />
+                      {editingTicker.message.trim() === '' && <span style={{ color: '#DC2626', fontSize: '10px' }}>يجب ألا يكون النص فارغاً</span>}
+                    </Box>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                       <Box gap={1}>
-                        <label style={{ fontSize: '11px', fontWeight: '800', color: '#64748B' }}>النص</label>
-                        <textarea value={editingTicker.message} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, message: e.target.value }); refreshTickers(); }} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '12px', minHeight: '50px', fontFamily: 'inherit' }} />
+                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>النوع</label>
+                        <select value={editingTicker.kind} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, kind: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                          <option value="platform">{localizeKind('platform')}</option>
+                          <option value="order">{localizeKind('order')}</option>
+                          <option value="promo">{localizeKind('promo')}</option>
+                          <option value="partner">{localizeKind('partner')}</option>
+                        </select>
                       </Box>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                        <Box gap={1}>
-                          <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>المصدر</label>
-                          <select value={editingTicker.source} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, source: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
-                            <option value="marketing">marketing</option><option value="operations">operations</option><option value="system">system</option><option value="customer">customer</option><option value="partner">partner</option>
-                          </select>
-                        </Box>
-                        <Box gap={1}>
-                          <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>الجمهور</label>
-                          <select value={editingTicker.audience} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, audience: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
-                            <option value="all">all</option><option value="home">home</option><option value="order">order</option><option value="client">client</option>
-                          </select>
-                        </Box>
-                        <Box gap={1}>
-                          <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>الأولوية</label>
-                          <select value={editingTicker.priority} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, priority: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
-                            <option value="low">low</option><option value="normal">normal</option><option value="high">high</option><option value="critical">critical</option>
-                          </select>
-                        </Box>
-                        <Box gap={1}>
-                          <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>الوجهة (Target)</label>
-                          <select value={editingTicker.actionTarget} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, actionTarget: e.target.value }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
-                            <option value="home">home</option><option value="orders">orders</option><option value="tracking">tracking</option><option value="promo">promo</option>
-                          </select>
-                        </Box>
-                        <Box gap={1}>
-                          <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>بدء العرض</label>
-                          <input type="number" value={editingTicker.openHour} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, openHour: Number(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }} />
-                        </Box>
-                        <Box gap={1}>
-                          <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>نهاية العرض</label>
-                          <input type="number" value={editingTicker.closeHour} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, closeHour: Number(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }} />
-                        </Box>
-                        <Box gap={1}>
-                          <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>تهدئة (دقائق)</label>
-                          <input type="number" value={editingTicker.cooldownMinutes} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, cooldownMinutes: Number(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }} />
-                        </Box>
-                      </div>
+                      <Box gap={1}>
+                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>الحالة</label>
+                        <select value={editingTicker.status} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, status: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                          <option value="draft">{localizeStatus('draft')}</option>
+                          <option value="published">{localizeStatus('published')}</option>
+                          <option value="paused">{localizeStatus('paused')}</option>
+                          <option value="scheduled">{localizeStatus('scheduled')}</option>
+                        </select>
+                      </Box>
+                      <Box gap={1}>
+                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>المصدر</label>
+                        <select value={editingTicker.source} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, source: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                          <option value="marketing">{resolveMarketingTickerSourceLabel('ar', 'marketing')}</option>
+                          <option value="operations">{resolveMarketingTickerSourceLabel('ar', 'operations')}</option>
+                          <option value="system">{resolveMarketingTickerSourceLabel('ar', 'system')}</option>
+                          <option value="customer">{resolveMarketingTickerSourceLabel('ar', 'customer')}</option>
+                          <option value="partner">{resolveMarketingTickerSourceLabel('ar', 'partner')}</option>
+                        </select>
+                      </Box>
+                      <Box gap={1}>
+                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>الجمهور</label>
+                        <select value={editingTicker.audience} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, audience: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                          <option value="all">{resolveMarketingTickerAudienceLabel('ar', 'all')}</option>
+                          <option value="home">{resolveMarketingTickerAudienceLabel('ar', 'home')}</option>
+                          <option value="order">{resolveMarketingTickerAudienceLabel('ar', 'order')}</option>
+                          <option value="client">{resolveMarketingTickerAudienceLabel('ar', 'client')}</option>
+                        </select>
+                      </Box>
+                      <Box gap={1}>
+                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>الأولوية</label>
+                        <select value={editingTicker.priority} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, priority: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                          <option value="low">{resolveMarketingTickerPriorityLabel('ar', 'low')}</option>
+                          <option value="normal">{resolveMarketingTickerPriorityLabel('ar', 'normal')}</option>
+                          <option value="high">{resolveMarketingTickerPriorityLabel('ar', 'high')}</option>
+                          <option value="critical">{resolveMarketingTickerPriorityLabel('ar', 'critical')}</option>
+                        </select>
+                      </Box>
+                      <Box gap={1}>
+                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>نمط التسليم</label>
+                        <select value={editingTicker.deliveryMode} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, deliveryMode: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                          <option value="auto">{resolveMarketingTickerDeliveryLabel('ar', 'auto')}</option>
+                          <option value="manual">{resolveMarketingTickerDeliveryLabel('ar', 'manual')}</option>
+                          <option value="pinned">{resolveMarketingTickerDeliveryLabel('ar', 'pinned')}</option>
+                        </select>
+                      </Box>
+                      <Box gap={1}>
+                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>بدء العرض</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="23"
+                          value={editingTicker.openHour}
+                          onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, openHour: Number(e.target.value) }); refreshTickers(); }}
+                          style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}
+                        />
+                        {(editingTicker.openHour < 0 || editingTicker.openHour > 23) && <span style={{ color: '#DC2626', fontSize: '9px' }}>بين 0-23</span>}
+                      </Box>
+                      <Box gap={1}>
+                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>نهاية العرض</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="23"
+                          value={editingTicker.closeHour}
+                          onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, closeHour: Number(e.target.value) }); refreshTickers(); }}
+                          style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}
+                        />
+                        {(editingTicker.closeHour < 0 || editingTicker.closeHour > 23) && <span style={{ color: '#DC2626', fontSize: '9px' }}>بين 0-23</span>}
+                      </Box>
+                      <Box gap={1}>
+                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>التهدئة (دقيقة)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editingTicker.cooldownMinutes}
+                          onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, cooldownMinutes: Number(e.target.value) }); refreshTickers(); }}
+                          style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}
+                        />
+                        {editingTicker.cooldownMinutes < 0 && <span style={{ color: '#DC2626', fontSize: '9px' }}>لا يمكن أن يكون سالباً</span>}
+                      </Box>
+                      <Box gap={1}>
+                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>فجوة التكرار</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editingTicker.repeatGapMinutes}
+                          onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, repeatGapMinutes: Number(e.target.value) }); refreshTickers(); }}
+                          style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}
+                        />
+                        {editingTicker.repeatGapMinutes < 0 && <span style={{ color: '#DC2626', fontSize: '9px' }}>لا يمكن أن يكون سالباً</span>}
+                      </Box>
+                      <Box gap={1}>
+                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>وجهة الضغط</label>
+                        <select value={editingTicker.actionTarget} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, actionTarget: e.target.value }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                          <option value="home">{localizeTarget('home')}</option>
+                          <option value="orders">{localizeTarget('orders')}</option>
+                          <option value="tracking">{localizeTarget('tracking')}</option>
+                          <option value="promo">{localizeTarget('promo')}</option>
+                        </select>
+                      </Box>
                     </div>
-                 </div>
-               )}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* E) Rules summary block & F) Order lifecycle mapping */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-              <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
-                <h3 style={{ color: '#0A2F5C', fontSize: '13px', fontWeight: '800', margin: '0 0 8px 0' }}>قواعد التشغيل</h3>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>📌 Pinned أعلى</span>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '12px', color: '#DC2626' }}>🔥 Critical أعلى</span>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>🚫 Audience mismatch suppress</span>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>⏳ Outside window suppress</span>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>⏱️ Cooldown suppress</span>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>🔄 Duplicate suppress</span>
-                </div>
+            {/* 5) Rules summary block */}
+            <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
+              <h3 style={{ color: '#0A2F5C', fontSize: '13px', fontWeight: '800', margin: '0 0 8px 0' }}>قواعد التشغيل</h3>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>📌 مثبت (Pinned) أعلى</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '12px', color: '#DC2626' }}>🔥 حرج (Critical) أعلى</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>🚫 الجمهور غير مطابق</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>⏳ خارج نافذة العرض</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>⏱️ ضمن فترة التهدئة</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>🔄 مكرر</span>
               </div>
-              <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
-                <h3 style={{ color: '#0A2F5C', fontSize: '13px', fontWeight: '800', margin: '0 0 8px 0' }}>ربط الطلبات (Mapping)</h3>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '4px', color: '#475569' }}>تم الاستلام ← tracking</span>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '4px', color: '#475569' }}>قيد التحضير ← tracking / orders</span>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '4px', color: '#475569' }}>في الطريق ← tracking</span>
-                  <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '4px', color: '#475569' }}>تم التسليم ← orders / home</span>
-                </div>
+            </div>
+
+            {/* 6) Order lifecycle mapping */}
+            <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
+              <h3 style={{ color: '#0A2F5C', fontSize: '13px', fontWeight: '800', margin: '0 0 8px 0' }}>ربط الطلبات (Mapping)</h3>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '4px', color: '#475569' }}>تم الاستلام ← التتبع</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '4px', color: '#475569' }}>قيد التحضير ← التتبع / الطلبات</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '4px', color: '#475569' }}>في الطريق ← التتبع</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '4px', color: '#475569' }}>تم التسليم ← الطلبات / الرئيسية</span>
               </div>
             </div>
           </Box>

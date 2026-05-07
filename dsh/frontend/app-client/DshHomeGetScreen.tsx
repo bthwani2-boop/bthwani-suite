@@ -365,29 +365,7 @@ function isWithinOperatingHours(now: Date, openHour: number, closeHour: number) 
   return currentHour >= openHour || currentHour < closeHour;
 }
 
-function resolveTickerBanner(
-  now: Date,
-  recentOrders: DshHomeRecentOrder[],
-  locationLabel: string,
-) {
-  const isOpen = isWithinOperatingHours(now, 8, 23);
-  const tickerLines: string[] = [];
-  const statusLabel = isOpen ? 'مباشر' : 'مغلق';
-
-  if (locationLabel.trim()) {
-    tickerLines.push(`التوصيل إلى ${locationLabel.trim()}`);
-  }
-
-  recentOrders.slice(0, 2).forEach((order, index) => {
-    tickerLines.push(`${index === 0 ? 'الطلب النشط' : 'طلب سابق'}: ${order.subtitle} · ${order.meta}`);
-  });
-
-  return {
-    isOpen,
-    statusLabel,
-    message: tickerLines.length ? tickerLines.join('   •   ') : 'استعرض المتاجر والطلبات النشطة',
-  };
-}
+// Internal resolveTickerBanner removed. Using buildMarketingTickerPlan from store.
 
 /**
  * Internal helper for Category selection items
@@ -968,7 +946,9 @@ export function DshHomeGetScreen({
 
     if (!activeItem) {
       return {
-        ...resolveTickerBanner(currentTime, resolvedRecentOrders, uiText.topBar.location),
+        isOpen: true,
+        statusLabel: currentLanguage === 'ar' ? 'مباشر' : 'Live',
+        message: currentLanguage === 'ar' ? 'استعرض المتاجر والطلبات النشطة' : 'Browse stores and active orders',
         isMarketing: false,
       };
     }
@@ -980,7 +960,7 @@ export function DshHomeGetScreen({
       isMarketing: true,
       actionTarget: activeItem.actionTarget,
     };
-  }, [currentLanguage, currentTime, isTickerHidden, resolvedRecentOrders, uiText.topBar.location]);
+  }, [currentLanguage, currentTime, isTickerHidden]);
 
   const handleTickerAction = React.useCallback(() => {
     if (!tickerState) return;
