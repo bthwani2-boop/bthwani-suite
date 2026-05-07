@@ -22,6 +22,7 @@ import {
 export type BannersCommandDeckScreenProps = {
   hubHref?: string;
   operationsHref?: string;
+  activeSubTab?: string;
 };
 
 type BannerDraft = {
@@ -114,7 +115,7 @@ function bannerActionExtraHint(actionType: MarketingBannerActionType) {
   return 'اختياري';
 }
 
-export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
+export function BannersCommandDeckScreen({ activeSubTab = 'all' }: BannersCommandDeckScreenProps) {
   const { direction } = useDirection();
   const isRtl = direction === 'rtl';
   const [items, setItems] = React.useState<MarketingBannerRecord[]>(() => getMarketingBannerItems());
@@ -135,6 +136,23 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
     () => computeMarketingBannerQuality({ ...draft, position: Number.parseInt(draft.position, 10) || 0 }),
     [draft],
   );
+
+  const qualityFeedback = React.useMemo(() => {
+    const fb = [];
+    if (!draft.title || draft.title.length <= 5) fb.push({ label: 'العنوان قصير جداً', tone: 'warning' });
+    else fb.push({ label: 'العنوان مثالي', tone: 'success' });
+
+    if (!draft.subtitle || draft.subtitle.length <= 10) fb.push({ label: 'الوصف يحتاج تفاصيل أكثر', tone: 'warning' });
+    else fb.push({ label: 'الوصف واضح ومختصر', tone: 'success' });
+
+    if (!draft.imageUrl) fb.push({ label: 'الصورة مفقودة', tone: 'error' });
+    else fb.push({ label: 'تم ضبط الصورة', tone: 'success' });
+
+    if (draft.actionType === 'external') fb.push({ label: 'يفضل استخدام وجهة داخلية للتحويل', tone: 'info' });
+    else fb.push({ label: 'الوجهة ذكية وسريعة', tone: 'success' });
+
+    return fb;
+  }, [draft]);
 
   function refresh() {
     setItems(getMarketingBannerItems());
@@ -181,111 +199,187 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
   }
 
   function handleDelete(item: MarketingBannerRecord) {
+    if (!confirm('هل أنت متأكد من حذف هذا البنر؟')) return;
     removeMarketingBannerItem(item.id);
     refresh();
     const nextItems = getMarketingBannerItems();
     setSelectedId(nextItems[0]?.id ?? null);
   }
 
-  return (
-    <Box gap={4}>
-      <Surface tone="raised" gap={4} style={{ borderRadius: '24px', border: '1px solid rgba(10,47,92,0.05)', overflow: 'hidden' }}>
-        <View style={[styles.headerRow, isRtl && styles.rowReverse, { padding: 4 }]}>
-          <Box gap={1}>
-            <Text role="caption" style={{ color: '#f97316', fontWeight: '800', letterSpacing: '0.05em' }}>PREMIUM BANNER ENGINE</Text>
-            <Text role="titleLg" style={{ fontSize: '24px', fontWeight: '900' }}>إدارة مسارات البنرات الإعلانية</Text>
-          </Box>
-          <Button label="+ بنر جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={{ borderRadius: '12px', paddingHorizontal: 24 }} />
-        </View>
+  const renderContent = () => {
+    if (activeSubTab === 'preview') {
+      return (
+        <Surface tone="inset" gap={4} style={{ padding: 32, alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 24 }}>
+          <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>معاينة تجربة العميل (Mobile Experience)</Text>
+          <View style={{ width: 320, height: 600, backgroundColor: '#fff', borderRadius: 40, borderWidth: 8, borderColor: '#334155', position: 'relative', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
+             {/* Mock App Header */}
+             <div style={{ height: 100, backgroundColor: '#0A2F5C', padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                <div style={{ width: 40, height: 4, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 2, marginBottom: 12 }} />
+                <div style={{ color: '#fff', fontSize: 16, fontWeight: '900' }}>BThwani</div>
+             </div>
 
-        <View style={[styles.kpiGrid, isRtl && styles.rowReverse]}>
-          {[
-            { label: 'إجمالي البنرات', value: kpis.total, gradient: ['#EFF6FF', '#DBEAFE'], color: '#1E40AF' },
-            { label: 'حي الآن', value: kpis.live, gradient: ['#F0FDF4', '#DCFCE7'], color: '#166534' },
-            { label: 'مسودات', value: kpis.drafts, gradient: ['#FFF7ED', '#FFEDD5'], color: '#9A3412' },
-            { label: 'الظهور الكلي', value: kpis.impressions, gradient: ['#F5F3FF', '#EDE9FE'], color: '#5B21B6' },
-            { label: 'النقرات', value: kpis.clicks, gradient: ['#FEF2F2', '#FEE2E2'], color: '#991B1B' },
-          ].map((entry) => (
-            <View key={entry.label} style={[styles.kpiCard, { backgroundColor: entry.gradient[0], borderColor: 'rgba(0,0,0,0.03)' }]}>
-              <Text role="caption" tone="muted" style={{ fontWeight: '700', fontSize: '10px' }}>{entry.label}</Text>
-              <Text role="titleLg" style={{ color: entry.color, fontWeight: '900', fontSize: '22px' }}>{String(entry.value)}</Text>
-            </View>
-          ))}
-        </View>
-      </Surface>
+             <Box gap={4} style={{ padding: 12 }}>
+                {/* THE ACTUAL BANNER PREVIEW */}
+                <div style={{
+                  height: 180,
+                  backgroundColor: draft.accentColor || '#f97316',
+                  borderRadius: 20,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  padding: 16,
+                  color: '#fff',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+                }}>
+                  {draft.imageUrl && (
+                    <img src={draft.imageUrl} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} />
+                  )}
+                  <div style={{ position: 'relative', zIndex: 1 }}>
+                    <div style={{ display: 'inline-block', backgroundColor: 'rgba(255,255,255,0.2)', padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: '800', marginBottom: 4 }}>
+                      {draft.title || 'PROMO'}
+                    </div>
+                    <Text role="titleSm" style={{ color: '#fff', fontWeight: '900', fontSize: 18 }}>{draft.subtitle || 'أضف وصفاً جذاباً للبنر هنا'}</Text>
+                    <div style={{ marginTop: 8, backgroundColor: '#fff', color: draft.accentColor || '#f97316', padding: '4px 12px', borderRadius: 99, alignSelf: 'flex-start', fontSize: 10, fontWeight: '900' }}>
+                      {draft.ctaLabel}
+                    </div>
+                  </div>
+                </div>
 
-      <View style={[styles.columnsWrap, isRtl && styles.rowReverse]}>
+                {/* Mock Feed Content */}
+                <Box gap={2}>
+                   <div style={{ height: 80, backgroundColor: '#F1F5F9', borderRadius: 16, border: '1px dashed #CBD5E1' }} />
+                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
+                      {[1,2,3,4].map(i => <div key={i} style={{ height: 50, backgroundColor: '#F1F5F9', borderRadius: 12 }} />)}
+                   </div>
+                </Box>
+             </Box>
+          </View>
+          <div style={{ marginTop: 20, textAlign: 'center' }}>
+            <Text role="caption" tone="muted">هذه المعاينة تقريبية وتعتمد على قياسات شاشة iPhone 13.</Text>
+          </div>
+        </Surface>
+      );
+    }
 
-        <View style={styles.column}>
-          <Surface tone="inset" gap={3}>
-            <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-              <Text role="titleSm">المعاينة الحية في التطبيق</Text>
-              <Button label="بنر جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} />
-            </View>
-
-            <View style={styles.previewStack}>
-              {livePreview.map((item, idx) => (
-                <View
-                  key={item.id}
-                  style={[
-                    styles.previewCard,
-                    { backgroundColor: typeof item.accentColor === 'string' ? item.accentColor : '#f97316', borderRadius: '16px', minHeight: 90 },
+    if (activeSubTab === 'audience') {
+      return (
+        <Box gap={4}>
+          <Surface tone="raised" gap={6} style={{ padding: 32, borderRadius: 20 }}>
+            <Box gap={1}>
+              <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>ضبط استهداف الجمهور (Audience)</Text>
+              <Text role="caption" tone="muted">حدد من يمكنه رؤية هذا البنر في التطبيق.</Text>
+            </Box>
+            <Box gap={4}>
+              <Box gap={2}>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>الجمهور المستهدف</label>
+                <Tabs<MarketingBannerAudience>
+                  items={[
+                    { value: 'all', label: 'الجميع' },
+                    { value: 'home', label: 'عملاء الرئيسية' },
+                    { value: 'stores', label: 'رواد المتاجر' },
                   ]}
-                >
-                  <Box layoutDirection="row" justify="space-between">
-                    <Text role="titleSm" style={styles.previewTitle}>{item.title}</Text>
-                    <Text role="caption" style={{ color: '#fff', opacity: 0.8 }}>SLOT {idx + 1}</Text>
-                  </Box>
-                  <Text role="caption" style={styles.previewSubtitle}>{item.subtitle} · {bannerTargetLabel(item.actionTarget)}</Text>
-                </View>
-              ))}
-            </View>
+                  value={draft.audience}
+                  onValueChange={(value) => setDraft((current) => ({ ...current, audience: value }))}
+                  variant="pill"
+                />
+              </Box>
+              <Box gap={2}>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>نوع الإجراء البرمجي</label>
+                <Tabs<MarketingBannerActionType>
+                  items={[
+                    { value: 'store', label: 'فتح متجر' },
+                    { value: 'product', label: 'فتح منتج' },
+                    { value: 'main_category', label: 'فئة' },
+                    { value: 'subscription', label: 'اشتراك' },
+                    { value: 'external', label: 'خارجي' },
+                  ]}
+                  value={draft.actionType}
+                  onValueChange={(value) => setDraft((current) => ({ ...current, actionType: value }))}
+                  variant="pill"
+                />
+              </Box>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                <TextField
+                  label={bannerActionPrimaryLabel(draft.actionType)}
+                  value={draft.actionTarget}
+                  onChangeText={(value) => setDraft((current) => ({ ...current, actionTarget: value }))}
+                  hint={bannerActionPrimaryHint(draft.actionType)}
+                />
+                <TextField
+                  label={bannerActionExtraLabel(draft.actionType)}
+                  value={draft.actionExtra}
+                  onChangeText={(value) => setDraft((current) => ({ ...current, actionExtra: value }))}
+                  hint={bannerActionExtraHint(draft.actionType)}
+                />
+              </div>
+            </Box>
+            <div style={{ marginTop: 12, display: 'flex', justifyContent: 'flex-end' }}>
+               <Button label="حفظ وتحديث الاستهداف" onPress={handleSave} />
+            </div>
           </Surface>
+        </Box>
+      );
+    }
 
-          <Surface tone="raised" gap={3}>
+    if (activeSubTab === 'quality') {
+       return (
+         <Surface tone="raised" gap={8} style={{ padding: 40, alignItems: 'center', borderRadius: 24 }}>
+            <Box align="center" gap={1}>
+              <div style={{ width: 120, height: 120, borderRadius: 60, border: `8px solid ${quality >= 80 ? '#16a34a' : '#f97316'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', boxShadow: '0 10px 20px rgba(0,0,0,0.05)' }}>
+                <Text role="titleLg" style={{ fontSize: 32, fontWeight: '900', color: quality >= 80 ? '#16a34a' : '#f97316' }}>{quality}%</Text>
+              </div>
+              <Text role="titleSm" style={{ marginTop: 12, fontWeight: '800' }}>مؤشر جودة المحتوى</Text>
+            </Box>
+
+            <Box gap={3} style={{ width: '100%', maxWidth: 500 }}>
+               {qualityFeedback.map((fb, idx) => (
+                 <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', backgroundColor: fb.tone === 'success' ? '#F0FDF4' : fb.tone === 'warning' ? '#FFFBEB' : '#FEF2F2', borderRadius: 12, border: `1px solid ${fb.tone === 'success' ? '#BBF7D0' : fb.tone === 'warning' ? '#FEF3C7' : '#FECACA'}` }}>
+                    <span style={{ fontSize: 16 }}>{fb.tone === 'success' ? '✅' : fb.tone === 'warning' ? '⚠️' : '❌'}</span>
+                    <Text role="bodySm" style={{ fontWeight: '700', color: fb.tone === 'success' ? '#166534' : fb.tone === 'warning' ? '#92400E' : '#991B1B' }}>{fb.label}</Text>
+                 </div>
+               ))}
+            </Box>
+
+            <Box gap={2} style={{ maxWidth: 500, textAlign: 'center' }}>
+               <Text role="caption" tone="muted">جودة البنر تؤثر بشكل مباشر على نسبة النقر (CTR) وظهورك في نتائج البحث الذكية.</Text>
+            </Box>
+         </Surface>
+       );
+    }
+
+    return (
+      <View style={[styles.columnsWrap, isRtl && styles.rowReverse]}>
+        <View style={styles.column}>
+          <Surface tone="raised" gap={3} style={{ borderRadius: 20 }}>
             <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-              <Text role="titleSm">قائمة البنرات</Text>
-              <Text role="caption" tone="muted">{items.length} عنصر</Text>
+              <Text role="titleSm" style={{ fontWeight: '800' }}>قائمة البنرات</Text>
+              <div style={{ backgroundColor: '#F1F5F9', padding: '2px 8px', borderRadius: 6 }}>
+                <Text role="caption" style={{ fontWeight: '800' }}>{items.length}</Text>
+              </div>
             </View>
-
-            <Box gap={2}>
+            <Box gap={2} style={{ maxHeight: 600, overflowY: 'auto' }}>
               {items.map((item) => {
                 const isSelected = selected?.id === item.id;
                 return (
                   <Pressable
                     key={item.id}
                     onPress={() => setSelectedId(item.id)}
-                    style={[
-                      styles.listCard,
-                      isSelected && styles.listCardSelected,
-                    ]}
+                    style={[styles.listCard, isSelected && styles.listCardSelected]}
                   >
                     <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
                       <View style={styles.listTextWrap}>
-                        <Box layoutDirection="row" align="center" gap={2}>
-                          <Text role="titleSm">{item.title}</Text>
-                          <Text role="caption" style={{ color: '#F97316', fontWeight: '800' }}>HIGH CONVERSION</Text>
-                        </Box>
-                        <Text role="caption" tone="muted">
-                          {bannerActionTypeLabel(item.actionType)} · {bannerTargetLabel(item.actionTarget)} · {item.impressions} Views
-                        </Text>
+                        <Text role="titleSm" style={{ fontWeight: isSelected ? '900' : '700' }}>{item.title}</Text>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                          <span style={{ fontSize: 10, color: '#64748B' }}>{bannerActionTypeLabel(item.actionType)}</span>
+                          <span style={{ width: 3, height: 3, borderRadius: 2, backgroundColor: '#CBD5E1' }} />
+                          <span style={{ fontSize: 10, color: '#64748B' }}>{item.clicks} Clicks</span>
+                        </div>
                       </View>
-                      <View style={[styles.statusPill, item.status === 'published' ? styles.statusLive : styles.statusDraft]}>
-                        <Text role="caption" style={{ fontWeight: '900', color: item.status === 'published' ? '#16A34A' : '#64748B' }}>
-                          {bannerStatusLabel(item.status).toUpperCase()}
-                        </Text>
-                      </View>
-                    </View>
-
-                    <View style={[styles.actionsRow, isRtl && styles.rowReverse]}>
-                      <Button
-                        label={item.status === 'published' ? 'إيقاف' : 'نشر'}
-                        tone="ghost"
-                        fullWidth={false}
-                        onPress={() => handleToggle(item)}
-                      />
-                      <Button label="نسخ" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(item)} />
-                      <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(item)} />
+                      <div style={{ backgroundColor: item.status === 'published' ? '#DCFCE7' : '#F1F5F9', padding: '3px 8px', borderRadius: 6 }}>
+                        <Text role="caption" style={{ fontWeight: '900', fontSize: 9, color: item.status === 'published' ? '#16A34A' : '#64748B' }}>{item.status.toUpperCase()}</Text>
+                      </div>
                     </View>
                   </Pressable>
                 );
@@ -294,107 +388,86 @@ export function BannersCommandDeckScreen(_: BannersCommandDeckScreenProps) {
           </Surface>
         </View>
 
-        <View style={styles.column}>
-          <Surface tone="raised" gap={3}>
-            <Text role="titleSm">تحرير البنر المحدد</Text>
+        <View style={styles.column} style={{ flex: 1.5 }}>
+          <Surface tone="raised" gap={4} style={{ borderRadius: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box gap={0}>
+                <Text role="titleSm" style={{ fontWeight: '900' }}>محرر البنر (Editor)</Text>
+                <Text role="caption" tone="muted">معرّف البنر: {draft.id || 'جديد'}</Text>
+              </Box>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <Button label="تكرار" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(selected!)} />
+                <Button label="حفظ التغييرات" fullWidth={false} onPress={handleSave} />
+              </div>
+            </div>
 
-            <Tabs<MarketingBannerStatus>
-              items={[
-                { value: 'draft', label: 'مسودة' },
-                { value: 'published', label: 'منشور' },
-              ]}
-              value={draft.status}
-              onValueChange={(value) => setDraft((current) => ({ ...current, status: value }))}
-              variant="pill"
-            />
+            <Box gap={4}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <TextField label="العنوان التسويقي" value={draft.title} onChangeText={(v) => setDraft(c => ({ ...c, title: v }))} />
+                <TextField label="اسم الشريك/المصدر" value={draft.partnerName} onChangeText={(v) => setDraft(c => ({ ...c, partnerName: v }))} />
+              </div>
+              <TextField label="الوصف الجذاب" value={draft.subtitle} onChangeText={(v) => setDraft(c => ({ ...c, subtitle: v }))} />
 
-            <Tabs<MarketingBannerAudience>
-              items={[
-                { value: 'all', label: 'الكل' },
-                { value: 'home', label: 'الرئيسية' },
-                { value: 'stores', label: 'المتاجر' },
-              ]}
-              value={draft.audience}
-              onValueChange={(value) => setDraft((current) => ({ ...current, audience: value }))}
-              variant="pill"
-            />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                <TextField label="لون الهوية (Hex)" value={draft.accentColor} onChangeText={(v) => setDraft(c => ({ ...c, accentColor: v }))} />
+                <TextField label="ترتيب الظهور" value={draft.position} onChangeText={(v) => setDraft(c => ({ ...c, position: v }))} />
+                <TextField label="نص الزر (CTA)" value={draft.ctaLabel} onChangeText={(v) => setDraft(c => ({ ...c, ctaLabel: v }))} />
+              </div>
 
-            <Tabs<MarketingBannerActionType>
-              items={[
-                { value: 'main_category', label: 'فئة' },
-                { value: 'sub_category', label: 'فئة فرعية' },
-                { value: 'store', label: 'متجر' },
-                { value: 'store_category', label: 'قسم متجر' },
-                { value: 'product', label: 'منتج' },
-                { value: 'external', label: 'وجهة عامة' },
-                { value: 'subscription', label: 'اشتراك' },
-              ]}
-              value={draft.actionType}
-              onValueChange={(value) => setDraft((current) => ({ ...current, actionType: value }))}
-              variant="pill"
-            />
+              <TextField label="رابط الصورة (URL)" value={draft.imageUrl} onChangeText={(v) => setDraft(c => ({ ...c, imageUrl: v }))} hint="يفضل استخدام صور بنسبة 16:9 بجودة عالية" />
 
-            <TextField label="عنوان البنر" value={draft.title} onChangeText={(value) => setDraft((current) => ({ ...current, title: value }))} />
-            <TextField label="الوصف المختصر" value={draft.subtitle} onChangeText={(value) => setDraft((current) => ({ ...current, subtitle: value }))} />
-            <TextField
-              label={bannerActionPrimaryLabel(draft.actionType)}
-              value={draft.actionTarget}
-              onChangeText={(value) => setDraft((current) => ({ ...current, actionTarget: value }))}
-              hint={bannerActionPrimaryHint(draft.actionType)}
-            />
-            {draft.actionType === 'store_category' || draft.actionType === 'product' ? (
-              <TextField
-                label={bannerActionExtraLabel(draft.actionType)}
-                value={draft.actionExtra}
-                onChangeText={(value) => setDraft((current) => ({ ...current, actionExtra: value }))}
-                hint={bannerActionExtraHint(draft.actionType)}
-              />
-            ) : null}
-            <Surface tone="inset" gap={2} style={{ borderRight: '4px solid #f97316' }}>
-              <Text role="bodyStrong">Active Handoff</Text>
-              <Text role="caption" tone="muted">التوجيه يتم آلياً لضمان أفضل تجربة مستخدم وأعلى معدل نقر.</Text>
-            </Surface>
-            <TextField label="اسم الشريك أو المصدر" value={draft.partnerName} onChangeText={(value) => setDraft((current) => ({ ...current, partnerName: value }))} />
-            <TextField label="نص زر الإجراء" value={draft.ctaLabel} onChangeText={(value) => setDraft((current) => ({ ...current, ctaLabel: value }))} />
-            <TextField label="مفتاح الوسائط" value={draft.mediaKey} onChangeText={(value) => setDraft((current) => ({ ...current, mediaKey: value }))} hint="مثال: dsh.banner.home.promo-1.v1" />
-            <TextField label="لون التمييز" value={draft.accentColor} onChangeText={(value) => setDraft((current) => ({ ...current, accentColor: value }))} hint="مثال: #f97316" />
-            <TextField label="الترتيب" value={draft.position} onChangeText={(value) => setDraft((current) => ({ ...current, position: value }))} hint="1 يظهر أولاً" />
-            <TextField label="رابط الصورة" value={draft.imageUrl} onChangeText={(value) => setDraft((current) => ({ ...current, imageUrl: value }))} hint="يمكن تركه فارغًا وسيتم توليد معاينة تلقائية" />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0' }}>
+                 <Box gap={1}>
+                    <Text role="bodySm" style={{ fontWeight: '800' }}>حالة النشر</Text>
+                    <Text role="caption" tone="muted">{draft.status === 'published' ? 'البنر متاح حالياً للعملاء المستهدفين' : 'البنر في وضع المسودة ولن يظهر للعملاء'}</Text>
+                 </Box>
+                 <Tabs<MarketingBannerStatus>
+                    items={[{ value: 'draft', label: 'مسودة' }, { value: 'published', label: 'نشر مباشر' }]}
+                    value={draft.status}
+                    onValueChange={(v) => setDraft(c => ({ ...current, status: v }))}
+                    variant="pill"
+                 />
+              </div>
 
-            <View>
-              <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-                <Text role="bodySm">جودة البنر</Text>
-                <Text role="bodySm" style={{ color: quality >= 80 ? '#16a34a' : quality >= 60 ? '#f97316' : '#dc2626' }}>
-                  {quality}%
-                </Text>
-              </View>
-              <View style={styles.qualityTrack}>
-                <View
-                  style={[
-                    styles.qualityFill,
-                    {
-                      width: `${quality}%`,
-                      backgroundColor: quality >= 80 ? '#16a34a' : quality >= 60 ? '#f97316' : '#dc2626',
-                    },
-                  ]}
-                />
-              </View>
-            </View>
-
-            <View style={[styles.actionsRow, isRtl && styles.rowReverse]}>
-              <Button label="حفظ البنر" fullWidth={false} onPress={handleSave} />
-              {selected ? (
-                <Button
-                  label={selected.status === 'published' ? 'إيقاف العرض' : 'نشر الآن'}
-                  tone="secondary"
-                  fullWidth={false}
-                  onPress={() => handleToggle(selected)}
-                />
-              ) : null}
-            </View>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <Button label="حذف البنر" tone="ghost" fullWidth={false} onPress={() => handleDelete(selected!)} style={{ color: '#991B1B' }} />
+              </div>
+            </Box>
           </Surface>
         </View>
       </View>
+    );
+  };
+
+  return (
+    <Box gap={4}>
+      <Surface tone="raised" gap={4} style={{ borderRadius: 24, borderWidth: 1, borderColor: 'rgba(10,47,92,0.05)', overflow: 'hidden' }}>
+        <View style={[styles.headerRow, isRtl && styles.rowReverse, { padding: 4 }]}>
+          <Box gap={1}>
+            <Text role="caption" style={{ color: '#FF500D', fontWeight: '800', letterSpacing: 1 }}>BANNER CAROUSEL STUDIO</Text>
+            <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', color: '#0A2F5C' }}>إدارة الحملات والبنرات</Text>
+          </Box>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <Button label="إضافة بنر جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={{ borderRadius: 12, paddingHorizontal: 20, backgroundColor: '#0A2F5C', color: '#fff' }} />
+          </div>
+        </View>
+
+        <View style={[styles.kpiGrid, isRtl && styles.rowReverse]}>
+          {[
+            { label: 'إجمالي البنرات', value: kpis.total, color: '#1E40AF', bg: '#EFF6FF' },
+            { label: 'حي الآن', value: kpis.live, color: '#166534', bg: '#F0FDF4' },
+            { label: 'الظهور الكلي', value: kpis.impressions, color: '#5B21B6', bg: '#F5F3FF' },
+            { label: 'النقرات', value: kpis.clicks, color: '#991B1B', bg: '#FEF2F2' },
+          ].map((entry) => (
+            <View key={entry.label} style={[styles.kpiCard, { backgroundColor: entry.bg }]}>
+              <Text role="caption" tone="muted" style={{ fontWeight: '700', fontSize: 10 }}>{entry.label}</Text>
+              <Text role="titleLg" style={{ color: entry.color, fontWeight: '900', fontSize: 20 }}>{String(entry.value)}</Text>
+            </View>
+          ))}
+        </View>
+      </Surface>
+
+      {renderContent()}
     </Box>
   );
 }

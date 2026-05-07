@@ -888,12 +888,9 @@ export function ControlPanelSurfaceHost({
         ) : null}
 
         {isMarketingSection ? (
-          <WebSectionCard
-            title={panelText.surfaceTitles.marketing}
-            description={panelText.surfaceDescriptions.marketing}
-          >
+          <div style={{ marginTop: 16 }}>
             <ControlPanelDshMarketingScreen hubHref="/marketing" operationsHref="/operations" />
-          </WebSectionCard>
+          </div>
         ) : null}
 
         {isCommunityServicesSection ? (
@@ -987,6 +984,3 @@ export function ControlPanelSurfaceHost({
 }
 
 export default ControlPanelSurfaceHost;
-
-
-

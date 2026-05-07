@@ -216,15 +216,15 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
 
   return (
     <Box gap={4}>
-      <Surface tone="raised" gap={4} style={{ borderRadius: '24px', border: '1px solid rgba(10,47,92,0.05)', overflow: 'hidden' }}>
+      <Surface tone="raised" gap={4} style={{ borderRadius: 24, borderWidth: 1, borderColor: 'rgba(10,47,92,0.05)', overflow: 'hidden' }}>
         <View style={[styles.headerRow, isRtl && styles.rowReverse, { padding: 4 }]}>
           <Box gap={1}>
-            <Text role="caption" style={{ color: '#8b5cf6', fontWeight: '800', letterSpacing: '0.05em' }}>PREMIUM GROWTH INTELLIGENCE</Text>
-            <Text role="titleLg" style={{ fontSize: '24px', fontWeight: '900' }}>إدارة مسارات النمو والفيديو</Text>
+            <Text role="caption" style={{ color: '#8b5cf6', fontWeight: '800', letterSpacing: 0.5 }}>PREMIUM GROWTH INTELLIGENCE</Text>
+            <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900' }}>إدارة مسارات النمو والفيديو</Text>
           </Box>
-          <Button label="+ برنامج جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={{ borderRadius: '12px', paddingHorizontal: 24 }} />
+          <Button label="+ برنامج جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={{ borderRadius: 12, paddingHorizontal: 24 }} />
         </View>
-        
+
         <View style={[styles.kpiGrid, isRtl && styles.rowReverse]}>
           {[
             { label: 'إجمالي البرامج', value: kpis.total, gradient: ['#EFF6FF', '#DBEAFE'], color: '#1E40AF' },
@@ -235,8 +235,8 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
             { label: 'النقرات', value: kpis.clicks, gradient: ['#F0FDFA', '#CCFBF1'], color: '#0F766E' },
           ].map((entry) => (
             <View key={entry.label} style={[styles.kpiCard, { backgroundColor: entry.gradient[0], borderColor: 'rgba(0,0,0,0.03)' }]}>
-              <Text role="caption" tone="muted" style={{ fontWeight: '700', fontSize: '10px' }}>{entry.label}</Text>
-              <Text role="titleLg" style={{ color: entry.color, fontWeight: '900', fontSize: '22px' }}>{String(entry.value)}</Text>
+              <Text role="caption" tone="muted" style={{ fontWeight: '700', fontSize: 10 }}>{entry.label}</Text>
+              <Text role="titleLg" style={{ color: entry.color, fontWeight: '900', fontSize: 22 }}>{String(entry.value)}</Text>
             </View>
           ))}
         </View>
@@ -254,7 +254,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
             {livePreview.length > 0 ? (
               <View style={styles.previewStack}>
                 {livePreview.map((item) => (
-                  <View key={item.id} style={[styles.previewCard, { backgroundColor: item.accentColor, borderRadius: '16px' }]}>
+                  <View key={item.id} style={[styles.previewCard, { backgroundColor: item.accentColor, borderRadius: 16 }]}>
                     <Box layoutDirection="row" justify="space-between">
                       <Text role="caption" style={styles.previewBadge}>{familyLabel(item.family)}</Text>
                       <Text role="caption" style={{ color: '#fff', opacity: 0.8 }}>TRENDING 🔥</Text>
@@ -384,7 +384,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
               variant="pill"
             />
 
-            <Surface tone="inset" gap={2} style={{ borderRight: '4px solid #8b5cf6' }}>
+            <Surface tone="inset" gap={2} style={{ borderRightWidth: 4, borderRightColor: '#8b5cf6' }}>
               <Text role="bodyStrong">Intelligence Routing</Text>
               <Text role="caption" tone="muted">الربط الفني يتم معالجته بواسطة محرك الإشارات لضمان أعلى معدل تحويل.</Text>
             </Surface>

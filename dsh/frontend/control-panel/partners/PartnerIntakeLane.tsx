@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { Box, Button, Text } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
 import { OperationsSuggestionCard } from '../operations/operations.ui';
 import { dshPartnerIntakeItems, dshPartnerIntakeMetrics } from './workflow';
 import styles from '../operations/dsh-surface.module.css';
@@ -15,80 +14,91 @@ export type PartnerIntakeLaneProps = {
 export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry }: PartnerIntakeLaneProps) {
   if (state === 'loading') {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', color: '#0A2F5C' }}>
-        <h3>جارٍ تحميل طلبات الميدان...</h3>
-      </div>
+      <Surface tone="inset" style={{ padding: 40, alignItems: 'center' }}>
+        <Text role="titleSm">جارٍ تحميل طلبات الميدان...</Text>
+      </Surface>
     );
   }
 
   if (state === 'error') {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', color: '#DC2626', background: '#FEF2F2', borderRadius: '12px' }}>
-        <h3>تعذر تحميل طلبات الشركاء</h3>
-        <button onClick={onRetry} style={{ marginTop: '12px', padding: '6px 16px', background: '#DC2626', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>إعادة المحاولة</button>
-      </div>
+      <Surface tone="inset" style={{ padding: 40, alignItems: 'center', backgroundColor: '#FEF2F2' }}>
+        <Text role="titleSm" style={{ color: '#DC2626' }}>تعذر تحميل طلبات الشركاء</Text>
+        <Button label="إعادة المحاولة" tone="secondary" onPress={onRetry} style={{ marginTop: 12 }} />
+      </Surface>
     );
   }
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', direction: 'rtl', height: '100%', minWidth: 0 }}>
-      
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>طلبات الميدان والشركاء</h2>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(10,47,92,0.1)', background: '#fff', fontSize: '12px', fontWeight: 600, color: '#0A2F5C', cursor: 'pointer' }}>تصفية الحالات</button>
-          <button style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(10,47,92,0.1)', background: '#fff', fontSize: '12px', fontWeight: 600, color: '#0A2F5C', cursor: 'pointer' }}>تاريخ الطلبات</button>
+    <Box gap={4} style={{ direction: 'rtl' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box gap={1}>
+          <Text role="caption" style={{ color: '#f97316', fontWeight: '800' }}>PARTNER INTAKE WORKFLOW</Text>
+          <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900' }}>طلبات الميدان والشركاء</Text>
+        </Box>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Button label="تصفية الحالات" tone="secondary" fullWidth={false} style={{ borderRadius: 8 }} />
+          <Button label="تاريخ الطلبات" tone="ghost" fullWidth={false} style={{ borderRadius: 8 }} />
         </div>
       </div>
 
       {/* KPI row */}
-      <div className={styles.operationsSingleRowBlocks}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12 }}>
         {dshPartnerIntakeMetrics.map((metric, i) => (
-          <div key={metric.id} className={styles.operationsSingleRowItem} style={{ borderTop: i === 0 ? `4px solid #FF500D` : undefined }}>
-            <div className={styles.operationsCompactCardTitle}>{metric.label}</div>
-            <div style={{ fontSize: '18px', color: i === 0 ? '#FF500D' : '#0A2F5C', fontWeight: 800, lineHeight: 1.1 }}>{metric.value}</div>
-          </div>
+          <Surface key={metric.id} tone="raised" padding={4} style={{ borderRadius: 16, borderTopWidth: i === 0 ? 4 : 1, borderTopColor: i === 0 ? '#FF500D' : '#E2E8F0' }}>
+            <Text role="caption" tone="muted" style={{ fontWeight: 700 }}>{metric.label}</Text>
+            <Text role="titleLg" style={{ color: i === 0 ? '#FF500D' : '#0A2F5C', fontWeight: 900, fontSize: 20 }}>{metric.value}</Text>
+          </Surface>
         ))}
-        <div className={styles.operationsSingleRowItem}>
-          <div className={styles.operationsCompactCardTitle}>متوسط وقت القرار</div>
-          <div style={{ fontSize: '18px', color: '#16A34A', fontWeight: 800, lineHeight: 1.1 }}>14m</div>
-        </div>
+        <Surface tone="raised" padding={4} style={{ borderRadius: 16 }}>
+          <Text role="caption" tone="muted" style={{ fontWeight: 700 }}>متوسط وقت القرار</Text>
+          <Text role="titleLg" style={{ color: '#16A34A', fontWeight: 900, fontSize: 20 }}>14m</Text>
+        </Surface>
       </div>
 
       {/* Intake Cards */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '4px' }}>
+      <Box gap={3}>
         {dshPartnerIntakeItems.map((item) => {
           const isWarning = item.queue === 'offer-approval';
           const isSuccess = item.queue === 'marketing-review';
-          
+
           return (
-            <div 
-              key={item.id} 
-              className={`${styles.operationsCompactCard} ${isWarning ? styles.operationsCompactCardWarning : ''}`}
-              style={{ gridTemplateColumns: 'minmax(240px, 1.2fr) minmax(300px, 1.5fr) auto' }}
+            <Surface
+              key={item.id}
+              tone="raised"
+              padding={4}
+              style={{
+                borderRadius: 18,
+                borderWidth: 1,
+                borderColor: isWarning ? '#F59E0B' : 'rgba(10,47,92,0.06)',
+                backgroundColor: isWarning ? '#FFFBEB' : '#fff',
+                flexDirection: 'row',
+                gap: 20,
+                alignItems: 'center'
+              }}
             >
               {/* Col 1: Partner Meta */}
-              <div className={styles.operationsCompactCardMeta}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 800, color: '#0A2F5C', fontSize: '14px' }}>{item.storeName}</span>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>({item.id})</span>
-                  <span style={{ 
-                    padding: '2px 8px', 
-                    borderRadius: '6px', 
-                    fontSize: '11px', 
-                    fontWeight: 700, 
-                    backgroundColor: isWarning ? '#FEF3C7' : isSuccess ? '#F0FDF4' : 'rgba(10,47,92,0.04)', 
-                    color: isWarning ? '#D97706' : isSuccess ? '#16A34A' : '#64748B' 
+              <Box gap={1}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <Text role="titleSm" style={{ fontWeight: 800, color: '#0A2F5C' }}>{item.storeName}</Text>
+                  <Text role="caption" tone="muted">({item.id})</Text>
+                  <div style={{
+                    padding: '2px 8px',
+                    borderRadius: 6,
+                    backgroundColor: isWarning ? '#FEF3C7' : isSuccess ? '#F0FDF4' : 'rgba(10,47,92,0.04)',
                   }}>
-                    {item.fieldStatusLabel}
-                  </span>
+                    <Text role="caption" style={{ fontWeight: 900, color: isWarning ? '#D97706' : isSuccess ? '#16A34A' : '#64748B', fontSize: 10 }}>
+                      {item.fieldStatusLabel.toUpperCase()}
+                    </Text>
+                  </div>
                 </div>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#0A2F5C', lineHeight: 1.35 }}>
+                <Text role="bodyStrong" style={{ color: '#0A2F5C', fontSize: 13 }}>
                   {item.categoryLabel} · {item.ownerLabel}
-                </div>
-                <div style={{ fontSize: '11px', color: '#64748B', lineHeight: 1.35 }}>
+                </Text>
+                <Text role="caption" tone="muted">
                   المصدر: {item.source} | أُرسل: {item.submittedAt}
-                </div>
-              </div>
+                </Text>
+              </Box>
 
               {/* Col 2: System Suggestion */}
               <OperationsSuggestionCard
@@ -96,31 +106,32 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry }: Partner
                 reason={item.note}
                 confidence={isWarning ? 'high' : 'medium'}
                 actions={(
-                  <>
-                    <button style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
-                      {item.queue === 'offer-approval' ? 'اعتماد العرض' : item.queue === 'partner-review' ? 'إنشاء الكود' : 'إطلاق نهائي'}
-                    </button>
-                    <button style={{ padding: '4px 10px', backgroundColor: '#F1F5F9', color: '#0A2F5C', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>
-                      تعديل
-                    </button>
-                  </>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <Button
+                      label={item.queue === 'offer-approval' ? 'اعتماد العرض' : item.queue === 'partner-review' ? 'إنشاء الكود' : 'إطلاق نهائي'}
+                      fullWidth={false}
+                      style={{ height: 32, paddingHorizontal: 12, borderRadius: 6 }}
+                    />
+                    <Button
+                      label="تعديل"
+                      tone="secondary"
+                      fullWidth={false}
+                      style={{ height: 32, paddingHorizontal: 12, borderRadius: 6 }}
+                    />
+                  </div>
                 )}
               />
 
               {/* Col 3: Quick Actions */}
-              <div className={styles.operationsCompactCardActions}>
-                <div className={styles.operationsCompactActionRow} style={{ justifyContent: 'flex-end' }}>
-                  <button className={styles.operationsCompactActionPrimary}>تفاصيل</button>
-                  <button className={styles.operationsCompactActionSecondary}>تواصل</button>
-                  <button className={styles.operationsCompactActionSecondary} style={{ color: '#DC2626', borderColor: 'rgba(220,38,38,0.14)' }}>رفض</button>
-                </div>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <Button label="تفاصيل" tone="ghost" fullWidth={false} />
+                <Button label="رفض" tone="ghost" fullWidth={false} />
               </div>
-            </div>
+            </Surface>
           );
         })}
-      </div>
-
-    </div>
+      </Box>
+    </Box>
   );
 }
 

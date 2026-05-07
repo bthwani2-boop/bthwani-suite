@@ -10,6 +10,7 @@ import { DshPartnerCommissionSummaryPanel } from './DshPartnerCommissionSummaryP
 import { DshPartnerFinanceBridgePanel } from './DshPartnerFinanceBridgePanel';
 import { DshPartnerSettlementSummaryPanel } from './DshPartnerSettlementSummaryPanel';
 import type { DshPartnerOperationalFlowId } from './dshPartnerOperationalFlowIds';
+import { dshPromotionCandidates, type DshPromotionCandidate } from '../shared/workflow';
 
 type PartnerHubSection = 'hub' | 'profile' | 'operations' | 'inventory' | 'wallet' | 'analytics' | 'settings' | 'type-switch';
 
@@ -247,50 +248,6 @@ const sectionCopy: Record<Exclude<PartnerHubSection, 'hub'>, { title: string; de
 
 type PromotionIntentState = 'ready' | 'empty' | 'pending' | 'blocked';
 
-type PromotionCandidate = {
-  id: string;
-  kind: 'product' | 'store';
-  title: string;
-  subtitle: string;
-  availability: string;
-  eligibility: 'eligible' | 'review' | 'blocked';
-  status: 'draft' | 'pending' | 'approved' | 'rejected';
-  offerHint: string;
-};
-
-const promotionCandidates: readonly PromotionCandidate[] = [
-  {
-    id: 'product-burger',
-    kind: 'product',
-    title: 'برغر كلاسيك',
-    subtitle: 'منتج عالي الطلب مناسب لعروض الرفع السريع.',
-    availability: 'متاح وبمخزون جيد',
-    eligibility: 'eligible',
-    status: 'draft',
-    offerHint: 'اقترح خصمًا قصيرًا أو باقة مزدوجة.',
-  },
-  {
-    id: 'store-yasmin',
-    kind: 'store',
-    title: 'متجر الياسمين',
-    subtitle: 'فرع جاهز للظهور الترويجي مع نشاط ثابت.',
-    availability: 'جاهز للظهور',
-    eligibility: 'review',
-    status: 'pending',
-    offerHint: 'اربط العرض بوقت الذروة أو حزمة توصيل.',
-  },
-  {
-    id: 'product-dessert',
-    kind: 'product',
-    title: 'حلويات موسمية',
-    subtitle: 'منتج يطلب مراجعة قبل الترويج الواسع.',
-    availability: 'بحاجة لمراجعة',
-    eligibility: 'blocked',
-    status: 'rejected',
-    offerHint: 'أعد ضبط التوفر أو أضف سبب الرفض.',
-  },
-] as const;
-
 function resolvePromotionIntentStateMeta(state: PromotionIntentState) {
   if (state === 'pending') {
     return {
@@ -332,11 +289,23 @@ function PromotionCandidateRow({
   selected,
   onPress,
 }: {
-  item: PromotionCandidate;
+  item: DshPromotionCandidate;
   selected: boolean;
   onPress: () => void;
 }) {
   const tone = item.eligibility === 'eligible' ? 'success' : item.eligibility === 'review' ? 'warning' : 'danger';
+
+  const statusLabel =
+    item.status === 'draft' ? 'مسودة' :
+    item.status === 'partner-review' ? 'قيد الإرسال' :
+    item.status === 'marketing-ready' ? 'معتمد ومؤهل' :
+    'مرفوض';
+
+  const statusTone =
+    item.status === 'marketing-ready' ? 'success' :
+    item.status === 'partner-review' ? 'warning' :
+    item.status === 'marketing-rejected' ? 'danger' :
+    'default';
 
   return (
     <Surface tone="default" padding={3} gap={2} style={{ borderWidth: 1, borderColor: selected ? '#FF500D' : undefined }}>
@@ -353,7 +322,7 @@ function PromotionCandidateRow({
       <Box layoutDirection="row" style={{ flexWrap: 'wrap' }} gap={2}>
         <Chip label={item.kind === 'product' ? 'منتج' : 'متجر'} tone="brand" selected />
         <Chip label={item.eligibility === 'eligible' ? 'مؤهل' : item.eligibility === 'review' ? 'تحت المراجعة' : 'محجوب'} tone={tone} />
-        <Chip label={item.status === 'approved' ? 'معتمد' : item.status === 'pending' ? 'قيد الإرسال' : item.status === 'rejected' ? 'مرفوض' : 'مسودة'} tone={item.status === 'approved' ? 'success' : item.status === 'pending' ? 'warning' : item.status === 'rejected' ? 'danger' : 'default'} />
+        <Chip label={statusLabel} tone={statusTone} />
       </Box>
 
       <Button label={selected ? 'العنصر مفتوح' : 'اختيار العنصر'} tone={selected ? 'secondary' : 'ghost'} fullWidth={false} onPress={onPress} />
@@ -373,12 +342,24 @@ function PromotionIntentWorkspace({
   todayHoursLabel: string;
 }) {
   const { direction } = useDirection();
-  const [selectedId, setSelectedId] = React.useState<string>(promotionCandidates[0]?.id ?? '');
+  const [selectedId, setSelectedId] = React.useState<string>(dshPromotionCandidates[0]?.id ?? '');
   const [offerTitle, setOfferTitle] = React.useState('عرض نهاية الأسبوع');
   const [offerNote, setOfferNote] = React.useState('خصم قصير على المنتجات الأعلى طلبًا مع إبراز واضح.');
   const [actionMessage, setActionMessage] = React.useState('النية الترويجية محلية حتى يتم تسليمها للتسويق.');
 
-  const selectedItem = promotionCandidates.find((item) => item.id === selectedId) ?? promotionCandidates[0];
+  const selectedItem = dshPromotionCandidates.find((item) => item.id === selectedId) ?? dshPromotionCandidates[0];
+
+  const statusLabel =
+    selectedItem?.status === 'draft' ? 'مسودة' :
+    selectedItem?.status === 'partner-review' ? 'قيد الإرسال' :
+    selectedItem?.status === 'marketing-ready' ? 'معتمد ومؤهل' :
+    'مرفوض';
+
+  const statusTone =
+    selectedItem?.status === 'marketing-ready' ? 'success' :
+    selectedItem?.status === 'partner-review' ? 'warning' :
+    selectedItem?.status === 'marketing-rejected' ? 'danger' :
+    'default';
 
   return (
     <Box gap={4}>
@@ -386,7 +367,7 @@ function PromotionIntentWorkspace({
         <Text role="label" tone="muted">نية الترويج من الشريك</Text>
         <Text role="titleSm">اختر منتجًا أو متجرًا قابلًا للترويج ثم جهّز الطلب للتسويق</Text>
         <Text role="bodySm" tone="muted">
-          هذه الشاشة تلتقط intent فقط: اختيار العنصر، وصف العرض، وتحديد حالة الإرسال. البنر النهائي يبقى خارج هذا السطح.
+          هذه الشاشة تلتقط نية الترويج فقط: اختيار العنصر، وصف العرض، وتحديد حالة الإرسال.
         </Text>
 
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap' }} gap={2}>
@@ -400,7 +381,7 @@ function PromotionIntentWorkspace({
       <Surface tone="raised" padding={3} gap={3}>
         <Text role="titleSm">العناصر القابلة للترويج</Text>
         <Box gap={2}>
-          {promotionCandidates.map((item) => (
+          {dshPromotionCandidates.map((item) => (
             <PromotionCandidateRow key={item.id} item={item} selected={item.id === selectedItem?.id} onPress={() => setSelectedId(item.id)} />
           ))}
         </Box>
@@ -414,7 +395,7 @@ function PromotionIntentWorkspace({
             { label: 'العنصر المختار', value: selectedItem?.title ?? 'غير محدد' },
             { label: 'النوع', value: selectedItem?.kind === 'store' ? 'متجر' : 'منتج', tone: 'brand' },
             { label: 'الأهلية', value: selectedItem?.eligibility === 'eligible' ? 'مؤهل' : selectedItem?.eligibility === 'review' ? 'تحت المراجعة' : 'محجوب', tone: selectedItem?.eligibility === 'eligible' ? 'success' : selectedItem?.eligibility === 'review' ? 'warning' : 'danger' },
-            { label: 'الحالة', value: selectedItem?.status === 'approved' ? 'معتمد' : selectedItem?.status === 'pending' ? 'قيد الإرسال' : selectedItem?.status === 'rejected' ? 'مرفوض' : 'مسودة', tone: selectedItem?.status === 'approved' ? 'success' : selectedItem?.status === 'pending' ? 'warning' : selectedItem?.status === 'rejected' ? 'danger' : 'default' },
+            { label: 'الحالة', value: statusLabel, tone: statusTone },
           ]}
         />
 
@@ -429,15 +410,15 @@ function PromotionIntentWorkspace({
         </Surface>
 
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <Button label="submit promotion intent" tone="primary" fullWidth={false} onPress={() => setActionMessage(`تم إرسال النية: ${offerTitle}`)} />
-          <Button label="request featuring" tone="secondary" fullWidth={false} onPress={() => setActionMessage(`طلب إبراز: ${selectedItem?.title ?? 'غير محدد'}`)} />
-          <Button label="mark product for promotion" tone="ghost" fullWidth={false} onPress={() => setActionMessage(`تم وضع العنصر ضمن قائمة الترويج: ${selectedItem?.title ?? 'غير محدد'}`)} />
+          <Button label="تأكيد نية الترويج" tone="primary" fullWidth={false} onPress={() => setActionMessage(`تم إرسال النية: ${offerTitle}`)} />
+          <Button label="طلب إبراز في الرئيسية" tone="secondary" fullWidth={false} onPress={() => setActionMessage(`طلب إبراز: ${selectedItem?.title ?? 'غير محدد'}`)} />
+          <Button label="تمييز المنتج" tone="ghost" fullWidth={false} onPress={() => setActionMessage(`تم وضع العنصر ضمن قائمة الترويج: ${selectedItem?.title ?? 'غير محدد'}`)} />
         </Box>
       </Surface>
 
       <MobileStickyPrimaryAction
-        label="submit promotion intent"
-        helperText="النية الترويجية محلية وتبقى fixture/preview فقط حتى يكتمل الربط التشغيلي."
+        label="إرسال طلب الترويج"
+        helperText="النية الترويجية محلية وتذهب للمراجعة فور إرسالها."
         onPress={() => setActionMessage(`تم إرسال النية: ${offerTitle}`)}
       />
     </Box>
@@ -1435,6 +1416,3 @@ export function DshPartnerConsoleScreen(props: Props) {
 export { DshPartnerConsoleScreen as PartnerDshConsoleScreen };
 
 export default DshPartnerConsoleScreen;
-
-
-

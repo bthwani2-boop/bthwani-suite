@@ -2,18 +2,9 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Chip, KeyValueList, ListItem, MobileStickyPrimaryAction, StateView, Surface, Text, useDirection } from '@bthwani/ui-kit';
 
-type PromotionEligibilityState = 'ready' | 'empty' | 'pending' | 'blocked' | 'loading';
+import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
 
-type PartnerPromotionCandidate = {
-  id: string;
-  storeName: string;
-  categoryLabel: string;
-  approvalState: 'approved' | 'pending' | 'rejected';
-  operationalState: 'active' | 'paused' | 'busy' | 'open' | 'closed';
-  categoryReadiness: 'ready' | 'partial' | 'blocked';
-  featuredEligibility: 'eligible' | 'review' | 'blocked';
-  notes: string;
-};
+type PromotionEligibilityState = 'ready' | 'empty' | 'pending' | 'blocked' | 'loading';
 
 export type DshPartnerPromotionEligibilityScreenProps = {
   marketingHref?: string;
@@ -21,43 +12,23 @@ export type DshPartnerPromotionEligibilityScreenProps = {
   state?: PromotionEligibilityState;
 };
 
-const partnerPromotionCandidates: readonly PartnerPromotionCandidate[] = [
-  {
-    id: 'store-yasmin',
-    storeName: 'متجر الياسمين',
-    categoryLabel: 'منتجات جاهزة للعرض',
-    approvalState: 'approved',
-    operationalState: 'active',
-    categoryReadiness: 'ready',
-    featuredEligibility: 'eligible',
-    notes: 'جاهز للترويج الآن ويمكن تسليمه للتسويق دون مراجعة إضافية.',
-  },
-  {
-    id: 'store-saha',
-    storeName: 'محمصة الساحة',
-    categoryLabel: 'مقاهٍ ومحمصات',
-    approvalState: 'pending',
-    operationalState: 'busy',
-    categoryReadiness: 'partial',
-    featuredEligibility: 'review',
-    notes: 'يحتاج استكمال إشارات الجاهزية قبل الظهور ضمن البانر التالي.',
-  },
-  {
-    id: 'store-wadi',
-    storeName: 'مقهى الوادي',
-    categoryLabel: 'مقاهٍ',
-    approvalState: 'rejected',
-    operationalState: 'paused',
-    categoryReadiness: 'blocked',
-    featuredEligibility: 'blocked',
-    notes: 'محجوب حاليًا حتى تُستكمل الملاحظات التشغيلية والوثائق.',
-  },
-] as const;
-
-function resolveApprovalTone(state: PartnerPromotionCandidate['approvalState']) {
-  if (state === 'approved') return 'success';
-  if (state === 'pending') return 'warning';
+function resolveApprovalTone(state: DshPromotionCandidate['status']) {
+  if (state === 'marketing-ready') return 'success';
+  if (state === 'partner-review' || state === 'draft') return 'warning';
   return 'danger';
+}
+
+function resolveEligibilityTone(state: DshPromotionCandidate['eligibility']) {
+  if (state === 'eligible') return 'success';
+  if (state === 'review') return 'warning';
+  return 'danger';
+}
+
+function resolveStatusLabel(state: DshPromotionCandidate['status']) {
+  if (state === 'draft') return 'وارد من الشريك';
+  if (state === 'partner-review') return 'تحت مراجعة الشركاء';
+  if (state === 'marketing-ready') return 'جاهز للتسويق';
+  return 'مرفوض';
 }
 
 function resolveOperationalTone(state: PartnerPromotionCandidate['operationalState']) {
@@ -86,14 +57,14 @@ export function DshPartnerPromotionEligibilityScreen({
 }: DshPartnerPromotionEligibilityScreenProps) {
   const router = useRouter();
   const { direction } = useDirection();
-  const [selectedId, setSelectedId] = React.useState(partnerPromotionCandidates[0]?.id ?? '');
-  const [actionMessage, setActionMessage] = React.useState('الأهلية هنا محلية وتُستخدم فقط لتوجيه الشريك إلى المسار المناسب.');
+  const [selectedId, setSelectedId] = React.useState(dshPromotionCandidates[0]?.id ?? '');
+  const [actionMessage, setActionMessage] = React.useState('المراجعة الحالية تحدد جاهزية العنصر ليُنشر في قسم التسويق.');
 
-  const selectedItem = partnerPromotionCandidates.find((item) => item.id === selectedId) ?? partnerPromotionCandidates[0];
+  const selectedItem = dshPromotionCandidates.find((item) => item.id === selectedId) ?? dshPromotionCandidates[0];
 
   React.useEffect(() => {
-    if (!partnerPromotionCandidates.some((item) => item.id === selectedId)) {
-      setSelectedId(partnerPromotionCandidates[0]?.id ?? '');
+    if (!dshPromotionCandidates.some((item) => item.id === selectedId)) {
+      setSelectedId(dshPromotionCandidates[0]?.id ?? '');
     }
   }, [selectedId]);
 
@@ -120,29 +91,29 @@ export function DshPartnerPromotionEligibilityScreen({
           جاهزية الشريك للظهور
         </Text>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap' }} gap={2}>
-          <Chip label={selectedItem?.approvalState === 'approved' ? 'معتمد' : selectedItem?.approvalState === 'pending' ? 'قيد المراجعة' : 'مرفوض'} tone={resolveApprovalTone(selectedItem?.approvalState ?? 'pending')} selected />
-          <Chip label={selectedItem?.operationalState === 'active' ? 'نشط' : selectedItem?.operationalState === 'busy' ? 'مشغول' : selectedItem?.operationalState === 'paused' ? 'موقوف' : selectedItem?.operationalState === 'open' ? 'مفتوح' : 'مغلق'} tone={resolveOperationalTone(selectedItem?.operationalState ?? 'paused')} />
-          <Chip label={selectedItem?.categoryReadiness === 'ready' ? 'جاهز للفئة' : selectedItem?.categoryReadiness === 'partial' ? 'جاهزية جزئية' : 'محجوب'} tone={resolveReadinessTone(selectedItem?.categoryReadiness ?? 'partial')} />
-          <Chip label={selectedItem?.featuredEligibility === 'eligible' ? 'قابل للترويج' : selectedItem?.featuredEligibility === 'review' ? 'تحت مراجعة التسويق' : 'غير مؤهل'} tone={resolveFeaturedTone(selectedItem?.featuredEligibility ?? 'review')} />
+          <Chip label={resolveStatusLabel(selectedItem?.status ?? 'draft')} tone={resolveApprovalTone(selectedItem?.status ?? 'draft')} selected />
+          <Chip label={selectedItem?.kind === 'product' ? 'منتج' : 'متجر'} tone="brand" />
+          <Chip label={selectedItem?.eligibility === 'eligible' ? 'مؤهل للظهور' : selectedItem?.eligibility === 'review' ? 'يتطلب تعديل' : 'محجوب'} tone={resolveEligibilityTone(selectedItem?.eligibility ?? 'review')} />
+          <Chip label={selectedItem?.availability} tone="info" />
         </Box>
       </Surface>
 
       <Surface tone="default" padding={3} gap={3}>
         <Box gap={1}>
-          <Text role="bodyStrong">مرشحو الظهور</Text>
+          <Text role="bodyStrong">نوايا الترويج من الشركاء (Intent Queue)</Text>
           <Text role="bodySm" tone="muted">
-            اختر متجرًا أو منتجًا جاهزًا ليمر إلى التسويق بعد تحقق الأهلية فقط.
+            راجع العناصر المؤهلة، وإذا كانت مستوفية للشروط أرسلها إلى التسويق.
           </Text>
         </Box>
 
         <Box gap={2}>
-          {partnerPromotionCandidates.map((item) => (
+          {dshPromotionCandidates.map((item) => (
             <ListItem
               key={item.id}
-              title={item.storeName}
-              subtitle={`${item.categoryLabel} · ${item.notes}`}
-              meta={item.approvalState === 'approved' ? 'جاهز' : item.approvalState === 'pending' ? 'ينتظر' : 'محجوب'}
-              badgeLabel={item.featuredEligibility === 'eligible' ? 'Promo' : item.featuredEligibility === 'review' ? 'Review' : 'Blocked'}
+              title={item.title}
+              subtitle={`${item.subtitle}`}
+              meta={resolveStatusLabel(item.status)}
+              badgeLabel={item.eligibility === 'eligible' ? 'مؤهل' : item.eligibility === 'review' ? 'يُراجع' : 'ممنوع'}
               onPress={() => setSelectedId(item.id)}
             />
           ))}
@@ -154,28 +125,31 @@ export function DshPartnerPromotionEligibilityScreen({
         <KeyValueList
           dense
           items={[
-            { label: 'الشريك/المتجر', value: selectedItem?.storeName ?? 'غير محدد', tone: 'brand' },
-            { label: 'حالة الاعتماد', value: selectedItem?.approvalState === 'approved' ? 'معتمد' : selectedItem?.approvalState === 'pending' ? 'قيد المراجعة' : 'مرفوض', tone: resolveApprovalTone(selectedItem?.approvalState ?? 'pending') },
-            { label: 'الجاهزية التشغيلية', value: selectedItem?.operationalState === 'active' ? 'نشط' : selectedItem?.operationalState === 'busy' ? 'مشغول' : selectedItem?.operationalState === 'paused' ? 'موقوف' : selectedItem?.operationalState === 'open' ? 'مفتوح' : 'مغلق', tone: resolveOperationalTone(selectedItem?.operationalState ?? 'paused') },
-            { label: 'جاهزية الفئة', value: selectedItem?.categoryReadiness === 'ready' ? 'جاهز' : selectedItem?.categoryReadiness === 'partial' ? 'جزئي' : 'محجوب', tone: resolveReadinessTone(selectedItem?.categoryReadiness ?? 'partial') },
-            { label: 'أهلية الترويج', value: selectedItem?.featuredEligibility === 'eligible' ? 'مؤهل' : selectedItem?.featuredEligibility === 'review' ? 'تحت المراجعة' : 'محجوب', tone: resolveFeaturedTone(selectedItem?.featuredEligibility ?? 'review') },
+            { label: 'العنصر', value: selectedItem?.title ?? 'غير محدد', tone: 'brand' },
+            { label: 'النوع', value: selectedItem?.kind === 'product' ? 'منتج' : 'متجر', tone: 'default' },
+            { label: 'حالة الاعتماد', value: resolveStatusLabel(selectedItem?.status ?? 'draft'), tone: resolveApprovalTone(selectedItem?.status ?? 'draft') },
+            { label: 'الجاهزية', value: selectedItem?.eligibility === 'eligible' ? 'مؤهل للتسويق' : selectedItem?.eligibility === 'review' ? 'تحت المراجعة' : 'مرفوض', tone: resolveEligibilityTone(selectedItem?.eligibility ?? 'review') },
+            { label: 'ملاحظة', value: selectedItem?.offerHint ?? '', tone: 'default' },
           ]}
         />
-        <Text role="bodySm" tone="muted">
-          {selectedItem?.notes}
-        </Text>
       </Surface>
 
       <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap' }} gap={2}>
-        <Button label="طلب مراجعة الأهلية" tone="primary" fullWidth={false} onPress={() => setActionMessage(`تم طلب مراجعة الأهلية: ${selectedItem?.storeName ?? 'غير محدد'}`)} />
-        <Button label="فتح التسويق" tone="secondary" fullWidth={false} onPress={() => router.push(marketingHref)} />
-        <Button label="فتح الكتالوج" tone="ghost" fullWidth={false} onPress={() => router.push(catalogHref)} />
+        <Button
+          label={selectedItem?.status === 'marketing-ready' ? 'مُرسل للتسويق' : 'إرسال إلى التسويق'}
+          tone="primary"
+          fullWidth={false}
+          disabled={selectedItem?.status === 'marketing-ready' || selectedItem?.eligibility !== 'eligible'}
+          onPress={() => setActionMessage(`تم تسليم نية الترويج إلى قسم التسويق لجدولتها كبنر.`)}
+        />
+        <Button label="رفض النية" tone="ghost" fullWidth={false} onPress={() => setActionMessage(`تم رفض نية الترويج وإعادتها للشريك.`)} style={{ color: '#991b1b' }} />
       </Box>
 
       <MobileStickyPrimaryAction
-        label="طلب إبراز المتجر"
+        label={selectedItem?.status === 'marketing-ready' ? 'مُرسل للتسويق' : 'إرسال إلى التسويق'}
+        disabled={selectedItem?.status === 'marketing-ready' || selectedItem?.eligibility !== 'eligible'}
         helperText={actionMessage}
-        onPress={() => setActionMessage(`تم إرسال نية الترويج: ${selectedItem?.storeName ?? 'غير محدد'}`)}
+        onPress={() => setActionMessage(`تم تسليم النية إلى قسم التسويق.`)}
       />
     </Box>
   );

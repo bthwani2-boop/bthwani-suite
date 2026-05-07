@@ -25,7 +25,7 @@ export type MarketingBannerActionType =
   | 'product'
   | 'external'
   | 'subscription';
-export type MarketingBannerAudience = 'home' | 'stores' | 'all';
+export type MarketingBannerAudience = 'home' | 'stores' | 'client' | 'all';
 export type MarketingBannerStatus = 'draft' | 'published';
 
 export type MarketingBannerRecord = {
@@ -234,12 +234,12 @@ function setMutableStore(next: MarketingBannerRecord[]) {
 export function computeMarketingBannerQuality(item: Partial<MarketingBannerRecord>): number {
   let score = 0;
 
-  if (item.title?.trim()) score += 20;
-  if (item.subtitle?.trim()) score += 20;
+  if (item.title?.trim() && item.title.length > 5) score += 20;
+  if (item.subtitle?.trim() && item.subtitle.length > 10) score += 20;
   if (item.imageUrl?.trim()) score += 20;
-  if (item.actionType) score += 10;
-  if (!item.actionType || item.actionType === 'subscription' || item.actionTarget?.trim()) score += 15;
-  if (item.ctaLabel?.trim()) score += 10;
+  if (item.actionType && item.actionType !== 'external') score += 15;
+  if (item.actionTarget?.trim()) score += 15;
+  if (item.ctaLabel?.trim()) score += 5;
   if (item.accentColor?.trim()) score += 5;
 
   return Math.min(100, score);

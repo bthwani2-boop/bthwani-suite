@@ -105,3 +105,59 @@ export const dshPartnerApprovalLanes = [
     description: 'بعد الاعتماد النهائي تصبح البطاقة عامة لكل الشركاء.',
   },
 ] as const;
+
+export type DshPromotionIntentStatus = 'draft' | 'partner-review' | 'marketing-ready' | 'marketing-rejected';
+
+export type DshPromotionCandidate = {
+  id: string;
+  kind: 'product' | 'store';
+  title: string;
+  subtitle: string;
+  availability: string;
+  eligibility: 'eligible' | 'review' | 'blocked';
+  status: DshPromotionIntentStatus;
+  offerHint: string;
+};
+
+export const dshPromotionCandidates: ReadonlyArray<DshPromotionCandidate> = [
+  {
+    id: 'product-burger',
+    kind: 'product',
+    title: 'برغر كلاسيك',
+    subtitle: 'منتج عالي الطلب مناسب لعروض الرفع السريع.',
+    availability: 'متاح وبمخزون جيد',
+    eligibility: 'eligible',
+    status: 'draft',
+    offerHint: 'اقترح خصمًا قصيرًا أو باقة مزدوجة.',
+  },
+  {
+    id: 'store-yasmin',
+    kind: 'store',
+    title: 'متجر الياسمين',
+    subtitle: 'فرع جاهز للظهور الترويجي مع نشاط ثابت.',
+    availability: 'جاهز للظهور',
+    eligibility: 'review',
+    status: 'partner-review',
+    offerHint: 'اربط العرض بوقت الذروة أو حزمة توصيل.',
+  },
+  {
+    id: 'product-dessert',
+    kind: 'product',
+    title: 'حلويات موسمية',
+    subtitle: 'منتج يطلب مراجعة قبل الترويج الواسع.',
+    availability: 'بحاجة لمراجعة',
+    eligibility: 'blocked',
+    status: 'marketing-rejected',
+    offerHint: 'أعد ضبط التوفر أو أضف سبب الرفض.',
+  },
+  {
+    id: 'store-olaya',
+    kind: 'store',
+    title: 'فرع العليا',
+    subtitle: 'أداء ممتاز ويستحق الإبراز في الرئيسية.',
+    availability: 'جاهز تماماً',
+    eligibility: 'eligible',
+    status: 'marketing-ready',
+    offerHint: 'توصيل مجاني أو خصم 20%.',
+  }
+];

@@ -1,5 +1,7 @@
 export * from './banner-store';
 export * from './growth-store';
+export * from '../../shared/news-ticker-store';
+export * from '../../shared/news-ticker-fixtures';
 export * from './section-meta';
 export * from './section-catalog';
 export * from './flow-meta';

@@ -37,6 +37,7 @@ import {
 import { getDshCategoryIconUrl } from './getDshCategoryIconUrl';
 import { resolveDshImageSource } from './resolve-image-source';
 import type { MarketingGrowthRecord } from '../shared/growth-store';
+import { getMarketingTickerItems, buildMarketingTickerPlan } from '../shared/news-ticker-store';
 
 function resolveDshHomeStoreImageSource(imageUri?: string): ImageSourcePropType | undefined {
   return resolveDshImageSource(imageUri);
@@ -954,10 +955,20 @@ export function DshHomeGetScreen({
     accentColor: promo.accentColor,
     onPress: resolveBannerPress(promo),
   }));
-  const tickerState = React.useMemo(
-    () => resolveTickerBanner(currentTime, resolvedRecentOrders, uiText.topBar.location),
-    [currentTime, resolvedRecentOrders, uiText.topBar.location]
-  );
+  const tickerState = React.useMemo(() => {
+    const plan = buildMarketingTickerPlan(currentTime, 'home');
+    const activeItem = plan.activeItem;
+
+    if (!activeItem) {
+      return resolveTickerBanner(currentTime, resolvedRecentOrders, uiText.topBar.location);
+    }
+
+    return {
+      isOpen: true, // If it's active in the plan, it's considered open/visible
+      statusLabel: currentLanguage === 'ar' ? 'مباشر' : 'Live',
+      message: activeItem.message,
+    };
+  }, [currentLanguage, currentTime, resolvedRecentOrders, uiText.topBar.location]);
   const openInlineSearch = React.useCallback(() => {
     setInlineSearchVisible(true);
   }, []);
@@ -1034,8 +1045,8 @@ return (
           onTitlePress={handleOpenMySpace}
           locationLabel={uiText.topBar.location}
           locationIcon={<Icon name="location-outline" size={12} color={colorPalette.white} />}
-          contentOffsetY={spacing[2]}
-          actionsOffsetY={spacing[2]}
+          contentOffsetY={spacing[0]}
+          actionsOffsetY={spacing[0]}
           actions={[
             {
               id: 'my-space',
@@ -1082,6 +1093,7 @@ return (
         style={{ flex: 1 }}
         contentContainerStyle={{
           paddingHorizontal: spacing[3],
+          paddingTop: spacing[0],
           paddingBottom: spacing[12],
           flexGrow: 1,
         }}
@@ -1099,7 +1111,7 @@ return (
         ) : bannerItems.length ? (
           <BannerCarousel
             banners={bannerItems}
-            height={184}
+            height={230}
             variant="secondary"
             width={viewportWidth}
             style={styles.bannerCarouselFullBleed}
@@ -1446,9 +1458,12 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     },
     bannerCarouselFullBleed: {
       marginHorizontal: -spacing[3],
+      marginTop: -spacing[2],
+      marginBottom: -spacing[1], // Reduce gap below
+      overflow: 'visible', // Prevent clipping
     },
     homeHighlightsPanel: {
-      marginTop: spacing[3],
+      marginTop: spacing[0],
       marginBottom: spacing[2],
       padding: spacing[3],
       borderRadius: 28,

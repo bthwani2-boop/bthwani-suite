@@ -48,7 +48,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  padding: 8px 14px;
+  padding: 6px 14px;
   background-color: #FFFFFF;
   border-bottom: 1px solid rgba(10, 47, 92, 0.06);
   min-width: 0;
@@ -57,55 +57,55 @@
 .operationsTitleBlock {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   min-width: 0;
 }
 
 .operationsTitleBlock h1 {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
   color: #0A2F5C;
 }
 
 .operationsTitleBlock p {
   margin: 0;
-  font-size: 13px;
+  font-size: 11px;
   color: #64748B;
 }
 
 .operationsPulseCompact {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
 }
 
 .operationsPulseItem {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  gap: 6px;
+  padding: 4px 10px;
   background: #FFFFFF;
   border: 1px solid rgba(10, 47, 92, 0.08);
-  border-radius: 10px;
-  font-size: 13px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 700;
   color: #0A2F5C;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.01);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .operationsPulseItem:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(10, 47, 92, 0.06);
-  border-color: rgba(10, 47, 92, 0.2);
+  box-shadow: 0 2px 8px rgba(10, 47, 92, 0.04);
+  border-color: rgba(10, 47, 92, 0.15);
 }
 
 .operationsPulseItem span:first-child {
   color: #64748B;
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
 }
 
 .operationsPulseValue {
@@ -117,7 +117,7 @@
 .operationsHeaderActions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -129,8 +129,8 @@
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
+  gap: 4px;
+  padding: 4px 14px;
   background-color: #FFFFFF;
   border-bottom: 1px solid rgba(10, 47, 92, 0.08);
   overflow-x: auto;
@@ -738,4 +738,3 @@
   color: #0A2F5C;
   border: 1px solid transparent;
 }
-
