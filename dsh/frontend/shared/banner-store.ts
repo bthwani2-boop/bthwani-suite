@@ -29,6 +29,10 @@ type DshHomeGetPromo = {
   readonly subtitlePlacement?: 'top' | 'center' | 'bottom';
   readonly ctaPlacement?: 'top' | 'center' | 'bottom' | 'left' | 'right';
   readonly imageFit?: 'cover' | 'contain';
+  readonly motionStyle?: MarketingBannerMotionStyle;
+  readonly autoplayEnabled?: boolean;
+  readonly autoplayIntervalMs?: number;
+  readonly pauseOnInteraction?: boolean;
 };
 
 export type MarketingBannerActionType =
@@ -42,6 +46,7 @@ export type MarketingBannerActionType =
 
 export type MarketingBannerAudience = 'home' | 'stores' | 'client' | 'all';
 export type MarketingBannerStatus = 'draft' | 'published';
+export type MarketingBannerMotionStyle = 'slide' | 'soft-parallax' | 'subtle-fade' | 'snap-focus';
 
 export type MarketingBannerRecord = {
   id: string;
@@ -77,6 +82,10 @@ export type MarketingBannerRecord = {
   subtitlePlacement?: 'top' | 'center' | 'bottom';
   ctaPlacement?: 'top' | 'center' | 'bottom' | 'left' | 'right';
   imageFit?: 'cover' | 'contain';
+  motionStyle?: MarketingBannerMotionStyle;
+  autoplayEnabled?: boolean;
+  autoplayIntervalMs?: number;
+  pauseOnInteraction?: boolean;
 };
 
 const STORE_KEY = '__BTHWANI_DSH_MARKETING_BANNERS__';
@@ -148,6 +157,10 @@ const seededBanners: MarketingBannerRecord[] = [
     partnerLogoPosition: 'top-left',
     titlePlacement: 'bottom',
     imageFit: 'cover',
+    motionStyle: 'snap-focus',
+    autoplayEnabled: true,
+    autoplayIntervalMs: 4200,
+    pauseOnInteraction: true,
   },
   {
     id: 'banner-grocery-express',
@@ -174,6 +187,10 @@ const seededBanners: MarketingBannerRecord[] = [
     partnerLogoPosition: 'top-left',
     titlePlacement: 'bottom',
     imageFit: 'cover',
+    motionStyle: 'slide',
+    autoplayEnabled: true,
+    autoplayIntervalMs: 4000,
+    pauseOnInteraction: true,
   },
   {
     id: 'banner-subscription-pro',
@@ -200,6 +217,10 @@ const seededBanners: MarketingBannerRecord[] = [
     partnerLogoPosition: 'top-left',
     titlePlacement: 'center',
     imageFit: 'cover',
+    motionStyle: 'subtle-fade',
+    autoplayEnabled: true,
+    autoplayIntervalMs: 5200,
+    pauseOnInteraction: true,
   },
   {
     id: 'banner-offers-showcase',
@@ -227,6 +248,10 @@ const seededBanners: MarketingBannerRecord[] = [
     partnerLogoPosition: 'top-left',
     titlePlacement: 'center',
     imageFit: 'cover',
+    motionStyle: 'soft-parallax',
+    autoplayEnabled: true,
+    autoplayIntervalMs: 4700,
+    pauseOnInteraction: true,
   },
   {
     id: 'banner-store-exclusive',
@@ -253,6 +278,10 @@ const seededBanners: MarketingBannerRecord[] = [
     partnerLogoPosition: 'top-left',
     titlePlacement: 'bottom',
     imageFit: 'cover',
+    motionStyle: 'slide',
+    autoplayEnabled: true,
+    autoplayIntervalMs: 4300,
+    pauseOnInteraction: true,
   },
   {
     id: 'banner-electronics-offer',
@@ -279,6 +308,10 @@ const seededBanners: MarketingBannerRecord[] = [
     partnerLogoPosition: 'top-left',
     titlePlacement: 'bottom',
     imageFit: 'cover',
+    motionStyle: 'snap-focus',
+    autoplayEnabled: true,
+    autoplayIntervalMs: 4100,
+    pauseOnInteraction: true,
   },
   {
     id: 'banner-sweets-category',
@@ -306,6 +339,10 @@ const seededBanners: MarketingBannerRecord[] = [
     partnerLogoPosition: 'top-left',
     titlePlacement: 'center',
     imageFit: 'cover',
+    motionStyle: 'subtle-fade',
+    autoplayEnabled: true,
+    autoplayIntervalMs: 4600,
+    pauseOnInteraction: true,
   },
   {
     id: 'banner-product-spotlight',
@@ -333,6 +370,10 @@ const seededBanners: MarketingBannerRecord[] = [
     partnerLogoPosition: 'top-left',
     titlePlacement: 'bottom',
     imageFit: 'cover',
+    motionStyle: 'soft-parallax',
+    autoplayEnabled: true,
+    autoplayIntervalMs: 4400,
+    pauseOnInteraction: true,
   },
 ];
 
@@ -414,6 +455,10 @@ export function mapMarketingBannerToPromo(item: MarketingBannerRecord): DshHomeG
     subtitlePlacement: item.subtitlePlacement,
     ctaPlacement: item.ctaPlacement,
     imageFit: item.imageFit,
+    motionStyle: item.motionStyle,
+    autoplayEnabled: item.autoplayEnabled,
+    autoplayIntervalMs: item.autoplayIntervalMs,
+    pauseOnInteraction: item.pauseOnInteraction,
   };
 }
 
@@ -461,6 +506,10 @@ export function upsertMarketingBannerItem(item: Partial<MarketingBannerRecord>) 
     subtitlePlacement: item.subtitlePlacement || existing?.subtitlePlacement,
     ctaPlacement: item.ctaPlacement || existing?.ctaPlacement,
     imageFit: item.imageFit || existing?.imageFit,
+    motionStyle: item.motionStyle || existing?.motionStyle || 'slide',
+    autoplayEnabled: typeof item.autoplayEnabled === 'boolean' ? item.autoplayEnabled : existing?.autoplayEnabled ?? true,
+    autoplayIntervalMs: typeof item.autoplayIntervalMs === 'number' ? item.autoplayIntervalMs : existing?.autoplayIntervalMs ?? 4500,
+    pauseOnInteraction: typeof item.pauseOnInteraction === 'boolean' ? item.pauseOnInteraction : existing?.pauseOnInteraction ?? true,
   };
 
   if (existing) {

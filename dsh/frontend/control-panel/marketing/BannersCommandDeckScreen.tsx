@@ -13,6 +13,7 @@ import {
   upsertMarketingBannerItem,
   type MarketingBannerActionType,
   type MarketingBannerAudience,
+  type MarketingBannerMotionStyle,
   type MarketingBannerRecord,
   type MarketingBannerStatus,
 } from '../../shared/banner-store';
@@ -46,6 +47,7 @@ type BannerDraft = {
   templateId: string;
   offerBadgeText: string;
   offerBadgeColor: string;
+  offerBadgePosition: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   partnerLogoUrl: string;
   partnerLogoPosition: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   overlayImageUrl: string;
@@ -53,6 +55,10 @@ type BannerDraft = {
   titlePlacement: 'top' | 'center' | 'bottom';
   imageFit: 'cover' | 'contain';
   targetType: SmartBannerTargetType;
+  motionStyle: MarketingBannerMotionStyle;
+  autoplayEnabled: boolean;
+  autoplayIntervalMs: string;
+  pauseOnInteraction: boolean;
 };
 
 type SmartBannerTargetType =
@@ -98,6 +104,13 @@ const SMART_TARGET_OPTIONS: Array<{ value: SmartBannerTargetType; label: string;
 const SUBSCRIPTION_OPTIONS = [
   { value: 'entitlements-get', label: 'المزايا الأساسية' },
   { value: 'subscription-family-get', label: 'اشتراك العائلة' },
+];
+
+const BANNER_MOTION_OPTIONS: Array<{ value: MarketingBannerMotionStyle; label: string; description: string }> = [
+  { value: 'slide', label: 'انسياب', description: 'انتقال نظيف وهادئ بين الشرائح.' },
+  { value: 'soft-parallax', label: 'بارالاكس ناعم', description: 'عمق بصري خفيف للصورة أثناء التركيز.' },
+  { value: 'subtle-fade', label: 'تلاشي خفيف', description: 'يبرز البطاقة الفعالة بهدوء بصري.' },
+  { value: 'snap-focus', label: 'تركيز سناب', description: 'تكبير وتركيز بسيط على الشريحة الفعالة.' },
 ];
 
 function normalizeSearchText(value: string) {
@@ -293,6 +306,7 @@ function createDraft(item?: MarketingBannerRecord | null): BannerDraft {
     templateId: item?.templateId ?? 'default',
     offerBadgeText: item?.offerBadgeText ?? '',
     offerBadgeColor: item?.offerBadgeColor ?? '#FF500D',
+    offerBadgePosition: item?.offerBadgePosition ?? 'top-right',
     partnerLogoUrl: item?.partnerLogoUrl ?? '',
     partnerLogoPosition: item?.partnerLogoPosition ?? 'top-left',
     overlayImageUrl: item?.overlayImageUrl ?? '',
@@ -300,6 +314,10 @@ function createDraft(item?: MarketingBannerRecord | null): BannerDraft {
     titlePlacement: item?.titlePlacement ?? 'bottom',
     imageFit: item?.imageFit ?? 'cover',
     targetType,
+    motionStyle: item?.motionStyle ?? 'slide',
+    autoplayEnabled: item?.autoplayEnabled ?? true,
+    autoplayIntervalMs: String(item?.autoplayIntervalMs ?? 4500),
+    pauseOnInteraction: item?.pauseOnInteraction ?? true,
   };
 }
 
@@ -370,6 +388,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     const saved = upsertMarketingBannerItem({
       ...draft,
       position: Number.parseInt(draft.position, 10) || undefined,
+      autoplayIntervalMs: Math.max(2500, Number.parseInt(draft.autoplayIntervalMs, 10) || 4500),
     } as unknown as Partial<MarketingBannerRecord>);
     refresh();
     setSelectedId(saved.id);
@@ -412,6 +431,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
       ctaLabel: tpl.cta,
       title: `عرض ${tpl.label}`,
       subtitle: `استمتع بأفضل تجربة مع ${tpl.label} بأسعار حصرية.`,
+      motionStyle: tpl.id === 'pro' ? 'subtle-fade' : tpl.id === 'tech' ? 'snap-focus' : 'slide',
     }));
   };
 
@@ -681,6 +701,11 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     [subscriptionSearch],
   );
 
+  const previewMotionLabel = React.useMemo(
+    () => BANNER_MOTION_OPTIONS.find((option) => option.value === draft.motionStyle)?.label ?? 'انسياب',
+    [draft.motionStyle],
+  );
+
   const BannerPreview = () => (
     <View style={styles.previewContainer}>
       <View style={StyleSheet.flatten([styles.bannerBase, { backgroundColor: draft.accentColor || '#0A2F5C' }])}>
@@ -695,7 +720,21 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
              <Text style={{ fontSize: 40 }}>{templates.find(t => t.id === draft.templateId)?.icon || '✨'}</Text>
           </View>
         )}
-        <View style={[styles.bannerOverlay, { backgroundColor: `${draft.accentColor}44` }]} />
+        <View
+          style={[
+            styles.bannerOverlay,
+            {
+              backgroundColor:
+                draft.motionStyle === 'subtle-fade'
+                  ? 'rgba(10, 47, 92, 0.28)'
+                  : draft.motionStyle === 'soft-parallax'
+                    ? 'rgba(10, 47, 92, 0.22)'
+                    : `${draft.accentColor}44`,
+            },
+          ]}
+        />
+        <View style={styles.bannerShadeTop} />
+        <View style={styles.bannerShadeBottom} />
 
         {/* Content Layout */}
         <View style={StyleSheet.flatten([styles.bannerContent, draft.titlePlacement === 'top' && { justifyContent: 'flex-start' }, draft.titlePlacement === 'center' && { justifyContent: 'center' }])}>
@@ -728,6 +767,14 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             <Image source={resolveDshImageSource(draft.partnerLogoUrl)} style={styles.partnerLogo} resizeMode="contain" />
           </View>
         ) : null}
+      </View>
+      <View style={styles.previewMetaRow}>
+        <View style={styles.previewMetaPill}>
+          <Text role="caption" style={styles.previewMetaText}>{previewMotionLabel}</Text>
+        </View>
+        <View style={styles.previewMetaPill}>
+          <Text role="caption" style={styles.previewMetaText}>{draft.autoplayEnabled ? `تشغيل تلقائي ${draft.autoplayIntervalMs}ms` : 'تشغيل يدوي'}</Text>
+        </View>
       </View>
       <Text role="caption" tone="muted" style={{ marginTop: 12, textAlign: 'center', fontWeight: '800' }}>معاينة حية (نسبة 4:5)</Text>
     </View>
@@ -820,7 +867,49 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
         <View style={styles.divider} />
 
         <Box gap={4}>
-          <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>4. توجيه الجمهور والربط الذكي</Text>
+          <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>4. حركة البنر</Text>
+          <View style={styles.motionPanel}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 16 }}>
+              <SelectField<MarketingBannerMotionStyle>
+                label="نمط الحركة"
+                value={draft.motionStyle}
+                options={BANNER_MOTION_OPTIONS}
+                onValueChange={(value) => setDraft((current) => ({ ...current, motionStyle: value }))}
+              />
+              <Box gap={1}>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>التشغيل التلقائي</label>
+                <Tabs<boolean>
+                  items={[{ value: true, label: 'مفعل' }, { value: false, label: 'متوقف' }]}
+                  value={draft.autoplayEnabled}
+                  onValueChange={(value) => setDraft((current) => ({ ...current, autoplayEnabled: value }))}
+                  variant="pill"
+                />
+              </Box>
+              <TextField
+                label="الفاصل الزمني بالمللي"
+                value={draft.autoplayIntervalMs}
+                onChangeText={(value) => setDraft((current) => ({ ...current, autoplayIntervalMs: value.replace(/[^0-9]/g, '') }))}
+              />
+            </div>
+            <Box gap={1}>
+              <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>الإيقاف عند التفاعل</label>
+              <Tabs<boolean>
+                items={[{ value: true, label: 'نعم' }, { value: false, label: 'لا' }]}
+                value={draft.pauseOnInteraction}
+                onValueChange={(value) => setDraft((current) => ({ ...current, pauseOnInteraction: value }))}
+                variant="pill"
+              />
+            </Box>
+            <Text role="caption" tone="muted" style={{ fontWeight: '700' }}>
+              تنعكس هذه الإعدادات مباشرة على المعاينة وتنتقل إلى عرض البنر في Home.
+            </Text>
+          </View>
+        </Box>
+
+        <View style={styles.divider} />
+
+        <Box gap={4}>
+          <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>5. توجيه الجمهور والربط الذكي</Text>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <Box gap={1}>
               <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>نطاق العرض</label>
@@ -1184,6 +1273,22 @@ const styles = StyleSheet.create({
   bannerOverlay: {
     ...StyleSheet.absoluteFillObject,
   },
+  bannerShadeTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '46%',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  bannerShadeBottom: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '58%',
+    backgroundColor: 'rgba(3,12,24,0.34)',
+  },
   bannerContent: {
     flex: 1,
     padding: 24,
@@ -1223,6 +1328,33 @@ const styles = StyleSheet.create({
   bannerCtaText: {
     fontSize: 11,
     fontWeight: '900',
+  },
+  previewMetaRow: {
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'center',
+    marginTop: 12,
+    flexWrap: 'wrap',
+  },
+  previewMetaPill: {
+    borderRadius: 999,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  previewMetaText: {
+    color: '#0A2F5C',
+    fontWeight: '800',
+  },
+  motionPanel: {
+    backgroundColor: '#FFF7ED',
+    padding: 16,
+    borderRadius: 20,
+    gap: 16,
+    borderWidth: 1,
+    borderColor: '#FED7AA',
   },
   smartTargetPanel: {
     backgroundColor: '#F8FAFC',

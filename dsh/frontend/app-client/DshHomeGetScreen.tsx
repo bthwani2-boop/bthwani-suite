@@ -134,6 +134,10 @@ export type DshHomeGetPromo = {
   subtitlePlacement?: 'top' | 'center' | 'bottom';
   ctaPlacement?: 'top' | 'center' | 'bottom' | 'left' | 'right';
   imageFit?: 'cover' | 'contain';
+  motionStyle?: 'slide' | 'soft-parallax' | 'subtle-fade' | 'snap-focus';
+  autoplayEnabled?: boolean;
+  autoplayIntervalMs?: number;
+  pauseOnInteraction?: boolean;
 };
 
 export type DshHomeGetStore = {
@@ -584,11 +588,13 @@ export function DshHomeGetScreen({
   const resolvedCategories = categories ?? [];
   const resolvedPromos = promos ?? [];
 
-  const cardWidth = Math.min(Math.round(viewportWidth - spacing[6] * 2), 460);
-  const cardHeight = Math.round(cardWidth * 1.25); // Premium 4:5 ratio
-  const itemGap = spacing[2];
+  const containerWidth = viewportWidth;
+  const sidePeek = Math.max(spacing[3], Math.min(spacing[6], Math.round(containerWidth * 0.08)));
+  const itemGap = Math.max(spacing[1], Math.min(spacing[2], Math.round(containerWidth * 0.025)));
+  const cardWidth = Math.max(272, Math.min(348, Math.round(containerWidth - (sidePeek * 2) - (itemGap * 2))));
+  const cardHeight = Math.round(cardWidth * 1.16);
   const itemWidth = cardWidth + itemGap;
-  const horizontalPadding = Math.max(0, Math.round((viewportWidth - cardWidth) / 2));
+  const horizontalPadding = Math.max(0, Math.round((containerWidth - cardWidth) / 2));
   const resolvedStores = stores ?? [];
   const resolvedRecentOrders = recentOrders ?? [];
 
@@ -602,6 +608,10 @@ export function DshHomeGetScreen({
       image: resolveDshHomeBannerImageSource(promo.imageUrl ?? promo.mediaKey),
     }))
   ), [resolvedPromos]);
+  const [isCarouselUserPaused, setIsCarouselUserPaused] = React.useState(false);
+  const [isCarouselInteractionPaused, setIsCarouselInteractionPaused] = React.useState(false);
+  const interactionResumeTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isCarouselPaused = isCarouselUserPaused || isCarouselInteractionPaused;
 
   const categoryPageIds = React.useMemo(() => ['all', ...categoryItems.map((category) => category.id)], [categoryItems]);
 
@@ -710,10 +720,37 @@ export function DshHomeGetScreen({
     [categoryItems]
   );
 
-  const [isCarouselPaused, setIsCarouselPaused] = React.useState(false);
+  const currentBannerPromo = bannerItems.length ? bannerItems[activePromoIndex % bannerItems.length] ?? null : null;
+  const activePromoMotionStyle = currentBannerPromo?.motionStyle ?? 'slide';
+  const activePromoAutoplayEnabled = currentBannerPromo?.autoplayEnabled ?? true;
+  const activePromoAutoplayIntervalMs = Math.max(2500, currentBannerPromo?.autoplayIntervalMs ?? 4500);
+  const activePromoPauseOnInteraction = currentBannerPromo?.pauseOnInteraction ?? true;
+
+  const clearInteractionResumeTimer = React.useCallback(() => {
+    if (interactionResumeTimeoutRef.current) {
+      clearTimeout(interactionResumeTimeoutRef.current);
+      interactionResumeTimeoutRef.current = null;
+    }
+  }, []);
+
+  const scheduleCarouselResume = React.useCallback(() => {
+    if (!activePromoPauseOnInteraction || isCarouselUserPaused) {
+      return;
+    }
+
+    clearInteractionResumeTimer();
+    interactionResumeTimeoutRef.current = setTimeout(() => {
+      setIsCarouselInteractionPaused(false);
+      interactionResumeTimeoutRef.current = null;
+    }, 2200);
+  }, [activePromoPauseOnInteraction, clearInteractionResumeTimer, isCarouselUserPaused]);
+
+  React.useEffect(() => () => {
+    clearInteractionResumeTimer();
+  }, [clearInteractionResumeTimer]);
 
   React.useEffect(() => {
-    if (bannerItems.length <= 1 || isCarouselPaused) {
+    if (bannerItems.length <= 1 || isCarouselPaused || !activePromoAutoplayEnabled) {
       return;
     }
 
@@ -723,10 +760,10 @@ export function DshHomeGetScreen({
         promoScrollRef.current?.scrollTo({ x: next * itemWidth, animated: true });
         return next;
       });
-    }, 4500);
+    }, activePromoAutoplayIntervalMs);
 
     return () => clearInterval(interval);
-  }, [bannerItems.length, isCarouselPaused, itemWidth]);
+  }, [activePromoAutoplayEnabled, activePromoAutoplayIntervalMs, bannerItems.length, isCarouselPaused, itemWidth]);
 
   React.useEffect(() => {
     if (!bannerItems.length) {
@@ -917,7 +954,7 @@ export function DshHomeGetScreen({
     [activeFilter, onOpenBenefits, onOpenDiscovery, onOpenList, onOpenOrders, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onOpenTracking, onPromoClick, resolveHomeCategoryContext]
   );
 
-  const activePromo = bannerItems.length ? bannerItems[activePromoIndex % bannerItems.length] ?? null : null;
+  const activePromo = currentBannerPromo;
   const promoDiscount = activePromo?.subtitle.match(/\d+%/)?.[0] ?? '';
   const promoTail = activePromo ? activePromo.subtitle.replace(promoDiscount, '').trim() : '';
   const tickerAction = activePromo ? resolveBannerPress(activePromo) : undefined;
@@ -1216,7 +1253,7 @@ return (
             {
               marginLeft: -spacing[3],
               marginRight: -spacing[3],
-              width: viewportWidth,
+              width: containerWidth,
               height: cardHeight + spacing[12],
             },
           ]}>
@@ -1225,17 +1262,28 @@ return (
                 horizontal
                 pagingEnabled={false}
                 showsHorizontalScrollIndicator={false}
-                onScroll={(e) => {
-                  const x = e.nativeEvent.contentOffset.x;
+                directionalLockEnabled
+                decelerationRate="fast"
+                snapToInterval={itemWidth}
+                snapToAlignment="center"
+                disableIntervalMomentum={false}
+                onScrollBeginDrag={() => {
+                  if (activePromoPauseOnInteraction) {
+                    clearInteractionResumeTimer();
+                    setIsCarouselInteractionPaused(true);
+                  }
+                }}
+                onMomentumScrollEnd={(event) => {
+                  const x = event.nativeEvent.contentOffset.x;
                   const index = Math.round(x / itemWidth);
                   if (index !== activePromoIndex && index >= 0 && index < bannerItems.length) {
                     setActivePromoIndex(index);
                   }
+                  scheduleCarouselResume();
                 }}
-                scrollEventThrottle={16}
-                decelerationRate="fast"
-                snapToInterval={itemWidth}
-                snapToAlignment="center"
+                onScrollEndDrag={() => {
+                  scheduleCarouselResume();
+                }}
                 contentContainerStyle={[
                   styles.premiumBannerScrollContent,
                   {
@@ -1246,28 +1294,53 @@ return (
              >
                {bannerItems.map((promo, index) => {
                   const isActive = index === activePromoIndex;
+                  const motionStyle = promo.motionStyle ?? activePromoMotionStyle;
+                  const cardMotionStyle =
+                    motionStyle === 'subtle-fade'
+                      ? { opacity: isActive ? 1 : 0.78, transform: [{ scale: isActive ? 1 : 0.965 }] }
+                      : motionStyle === 'soft-parallax'
+                        ? { transform: [{ scale: isActive ? 1 : 0.97 }] }
+                        : motionStyle === 'snap-focus'
+                          ? { transform: [{ scale: isActive ? 1 : 0.952 }] }
+                          : { transform: [{ scale: isActive ? 1 : 0.972 }] };
+                  const imageMotionStyle =
+                    motionStyle === 'soft-parallax'
+                      ? { transform: [{ scale: isActive ? 1.08 : 1.02 }] }
+                      : motionStyle === 'snap-focus'
+                        ? { transform: [{ scale: isActive ? 1.03 : 1 }] }
+                        : null;
                   return (
                     <Pressable
                       key={promo.id || index}
-                      onPress={resolveBannerPress(promo)}
+                      onPress={() => {
+                        if (activePromoPauseOnInteraction) {
+                          clearInteractionResumeTimer();
+                          setIsCarouselInteractionPaused(true);
+                          scheduleCarouselResume();
+                        }
+                        resolveBannerPress(promo)();
+                      }}
                       style={[
                         styles.premiumBannerCard,
                         { width: cardWidth, marginEnd: index < bannerItems.length - 1 ? itemGap : 0 },
+                        cardMotionStyle,
                         isActive && styles.premiumBannerCardActive
                       ]}
                     >
                       <View style={[styles.premiumBannerImageWrap, { height: cardHeight }]}>
                         <Image
                           source={promo.image}
-                          style={styles.premiumBannerImage}
+                          style={[styles.premiumBannerImage, imageMotionStyle]}
                           resizeMode={promo.imageFit === 'contain' ? 'contain' : 'cover'}
                         />
-                        <View style={[styles.premiumBannerOverlay, { backgroundColor: promo.accentColor ? `${promo.accentColor}33` : 'rgba(0,0,0,0.1)' }]} />
+                        <View style={[styles.premiumBannerOverlay, { backgroundColor: promo.accentColor ? `${promo.accentColor}29` : 'rgba(0,0,0,0.08)' }]} />
+                        <View style={styles.premiumBannerTopGlow} />
+                        <View style={styles.premiumBannerBottomShade} />
 
                         {promo.partnerLogoUrl && (
                           <View style={[
                             styles.premiumBannerLogoWrap,
-                            promo.partnerLogoPosition === 'top-right' ? { right: 20 } : promo.partnerLogoPosition === 'bottom-right' ? { right: 20, bottom: 20, top: undefined } : promo.partnerLogoPosition === 'bottom-left' ? { left: 20, bottom: 20, top: undefined } : { left: 20 }
+                            promo.partnerLogoPosition === 'top-right' ? { right: 18 } : promo.partnerLogoPosition === 'bottom-right' ? { right: 18, bottom: 18, top: undefined } : promo.partnerLogoPosition === 'bottom-left' ? { left: 18, bottom: 18, top: undefined } : { left: 18 }
                           ]}>
                             <Image source={resolveDshHomeBannerImageSource(promo.partnerLogoUrl)} style={styles.premiumBannerLogo} resizeMode="contain" />
                           </View>
@@ -1277,7 +1350,7 @@ return (
                           <View style={[
                             styles.premiumBannerBadge,
                             { backgroundColor: promo.offerBadgeColor || colorPalette.brandStrong },
-                            promo.offerBadgePosition === 'top-left' ? { left: 20, top: 24 } : { right: 20, top: 24 }
+                            promo.offerBadgePosition === 'top-left' ? { left: 18, top: 20 } : { right: 18, top: 20 }
                           ]}>
                             <Text style={styles.premiumBannerBadgeText}>{promo.offerBadgeText}</Text>
                           </View>
@@ -1319,10 +1392,14 @@ return (
                 {bannerItems.length > 1 && (
                   <Pressable
                     style={styles.premiumPauseBtn}
-                    onPress={() => setIsCarouselPaused((current) => !current)}
+                    onPress={() => {
+                      clearInteractionResumeTimer();
+                      setIsCarouselInteractionPaused(false);
+                      setIsCarouselUserPaused((current) => !current);
+                    }}
                   >
                     <Ionicons
-                      name={isCarouselPaused ? 'play-circle' : 'pause-circle'}
+                      name={isCarouselUserPaused ? 'play-circle' : 'pause-circle'}
                       size={20}
                       color={colorPalette.white}
                     />
@@ -1681,7 +1758,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       justifyContent: 'center',
     },
     premiumBannerCard: {
-      borderRadius: 32,
+      borderRadius: 30,
       overflow: 'hidden',
       backgroundColor: colorPalette.surfaceRaised,
       elevation: 6,
@@ -1689,12 +1766,12 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.12,
       shadowRadius: 16,
-      transform: [{ scale: 0.98 }],
     },
     premiumBannerCardActive: {
-      transform: [{ scale: 1 }],
       borderColor: 'rgba(255,255,255,0.2)',
       borderWidth: 1,
+      shadowOpacity: 0.18,
+      shadowRadius: 20,
     },
     premiumBannerImageWrap: {
       flex: 1,
@@ -1711,12 +1788,30 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       ...StyleSheet.absoluteFillObject,
       zIndex: 3,
     },
+    premiumBannerTopGlow: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: '42%',
+      backgroundColor: 'rgba(255,255,255,0.08)',
+      zIndex: 3,
+    },
+    premiumBannerBottomShade: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      height: '60%',
+      backgroundColor: 'rgba(2, 8, 18, 0.4)',
+      zIndex: 3,
+    },
     premiumBannerLogoWrap: {
       position: 'absolute',
       top: 16,
-      width: 44,
-      height: 44,
-      borderRadius: 22,
+      width: 40,
+      height: 40,
+      borderRadius: 20,
       backgroundColor: colorPalette.white,
       padding: 5,
       elevation: 6,
@@ -1730,8 +1825,8 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       position: 'absolute',
       top: 20,
       paddingHorizontal: 10,
-      paddingVertical: 5,
-      borderRadius: 10,
+      paddingVertical: 6,
+      borderRadius: 999,
       elevation: 6,
       zIndex: 5,
     },
@@ -1742,34 +1837,38 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     },
     premiumBannerContent: {
       flex: 1,
-      padding: 20,
-      paddingBottom: 56,
+      paddingHorizontal: 18,
+      paddingTop: 64,
+      paddingBottom: 24,
       zIndex: 4,
       justifyContent: 'flex-end',
     },
     premiumBannerTitle: {
       color: colorPalette.white,
-      fontSize: 24,
+      fontSize: 22,
       fontWeight: '900',
       textShadowColor: 'rgba(0,0,0,0.4)',
       textShadowOffset: { width: 0, height: 2 },
       shadowRadius: 4,
-      lineHeight: 28,
+      lineHeight: 27,
+      textAlign,
     },
     premiumBannerSubtitle: {
       color: 'rgba(255,255,255,0.95)',
-      fontSize: 13,
+      fontSize: 12,
       fontWeight: '600',
-      marginTop: 3,
+      marginTop: 4,
       textShadowColor: 'rgba(0,0,0,0.3)',
       textShadowOffset: { width: 0, height: 1 },
       shadowRadius: 2,
+      lineHeight: 18,
+      textAlign,
     },
     premiumBannerCta: {
       marginTop: 12,
-      paddingHorizontal: 16,
+      paddingHorizontal: 15,
       paddingVertical: 8,
-      borderRadius: 16,
+      borderRadius: 999,
       alignSelf: 'flex-start',
       elevation: 5,
       zIndex: 5,
@@ -1793,21 +1892,22 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     },
     premiumIndicatorRow: {
       flexDirection: 'row',
-      gap: 8,
+      gap: 6,
       alignItems: 'center',
       backgroundColor: 'rgba(0,0,0,0.3)',
-      paddingHorizontal: 12,
+      paddingHorizontal: 10,
       paddingVertical: 6,
-      borderRadius: 20,
+      borderRadius: 999,
     },
     premiumIndicator: {
-      width: 6,
-      height: 6,
-      borderRadius: 3,
+      width: 5,
+      height: 5,
+      borderRadius: 999,
       backgroundColor: 'rgba(255,255,255,0.4)',
     },
     premiumIndicatorActive: {
-      width: 18,
+      width: 16,
+      height: 6,
       backgroundColor: colorPalette.white,
     },
     premiumPauseBtn: {
