@@ -550,6 +550,7 @@ export function DshHomeGetScreen({
 }: DshHomeGetScreenProps) {
   const { direction, language: resolvedLanguage } = useDirection();
   const currentLanguage = resolvedLanguage ?? 'ar';
+  const isRtl = direction === 'rtl';
   const { width: viewportWidth, height: viewportHeight } = useWindowDimensions();
   const { theme } = useTheme();
   const uiText = useUiText();
@@ -583,7 +584,7 @@ export function DshHomeGetScreen({
   const resolvedCategories = categories ?? [];
   const resolvedPromos = promos ?? [];
 
-  const cardWidth = Math.min(Math.round(viewportWidth * 0.86), 420);
+  const cardWidth = Math.min(Math.round(viewportWidth - spacing[6] * 2), 460);
   const cardHeight = Math.round(cardWidth * 1.25); // Premium 4:5 ratio
   const itemGap = spacing[2];
   const itemWidth = cardWidth + itemGap;
@@ -594,6 +595,13 @@ export function DshHomeGetScreen({
   const categoryItems = React.useMemo(() => {
     return resolvedCategories;
   }, [resolvedCategories]);
+
+  const bannerItems = React.useMemo(() => (
+    resolvedPromos.map((promo) => ({
+      ...promo,
+      image: resolveDshHomeBannerImageSource(promo.imageUrl ?? promo.mediaKey),
+    }))
+  ), [resolvedPromos]);
 
   const categoryPageIds = React.useMemo(() => ['all', ...categoryItems.map((category) => category.id)], [categoryItems]);
 
@@ -705,20 +713,39 @@ export function DshHomeGetScreen({
   const [isCarouselPaused, setIsCarouselPaused] = React.useState(false);
 
   React.useEffect(() => {
-    if (resolvedPromos.length <= 1 || isCarouselPaused) {
+    if (bannerItems.length <= 1 || isCarouselPaused) {
       return;
     }
 
     const interval = setInterval(() => {
       setActivePromoIndex((current) => {
-        const next = (current + 1) % resolvedPromos.length;
+        const next = (current + 1) % bannerItems.length;
         promoScrollRef.current?.scrollTo({ x: next * itemWidth, animated: true });
         return next;
       });
     }, 4500);
 
     return () => clearInterval(interval);
-  }, [isCarouselPaused, itemWidth, resolvedPromos]);
+  }, [bannerItems.length, isCarouselPaused, itemWidth]);
+
+  React.useEffect(() => {
+    if (!bannerItems.length) {
+      return;
+    }
+
+    if (activePromoIndex >= bannerItems.length) {
+      setActivePromoIndex(0);
+    }
+  }, [activePromoIndex, bannerItems.length]);
+
+  React.useEffect(() => {
+    if (!bannerItems.length) {
+      return;
+    }
+
+    const nextIndex = Math.min(activePromoIndex, bannerItems.length - 1);
+    promoScrollRef.current?.scrollTo({ x: nextIndex * itemWidth, animated: false });
+  }, [activePromoIndex, bannerItems.length, itemWidth, viewportWidth]);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -850,6 +877,11 @@ export function DshHomeGetScreen({
         }
 
         if (promo.actionTarget === 'offers') {
+          if (promo.actionExtra && onOpenStore) {
+            onOpenStore(promo.actionExtra);
+            return;
+          }
+
           setActiveFilter('offers');
           onOpenDiscovery?.();
           return;
@@ -885,7 +917,7 @@ export function DshHomeGetScreen({
     [activeFilter, onOpenBenefits, onOpenDiscovery, onOpenList, onOpenOrders, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onOpenTracking, onPromoClick, resolveHomeCategoryContext]
   );
 
-  const activePromo = resolvedPromos[activePromoIndex % resolvedPromos.length] ?? null;
+  const activePromo = bannerItems.length ? bannerItems[activePromoIndex % bannerItems.length] ?? null : null;
   const promoDiscount = activePromo?.subtitle.match(/\d+%/)?.[0] ?? '';
   const promoTail = activePromo ? activePromo.subtitle.replace(promoDiscount, '').trim() : '';
   const tickerAction = activePromo ? resolveBannerPress(activePromo) : undefined;
@@ -901,7 +933,7 @@ export function DshHomeGetScreen({
 
     promoImpressionIdsRef.current.add(activePromo.id);
     onPromoImpression(activePromo.id);
-  }, [activePromo?.id, onPromoImpression, resolvedPromos.length]);
+  }, [activePromo?.id, onPromoImpression, bannerItems.length]);
 
   const resolveVideoCtaPress = React.useCallback(
     (item: MarketingGrowthRecord) => {
@@ -992,16 +1024,6 @@ export function DshHomeGetScreen({
   );
 
   const approvedVideoReels = approvedVideoShorts.length > 0 ? approvedVideoShorts : [];
-  // Marketing-driven banner carousel items: promos are the single source of truth for banner content and routing.
-  const bannerItems = resolvedPromos.map((promo) => ({
-    id: promo.id,
-    title: promo.title,
-    subtitle: promo.subtitle,
-    image: resolveDshHomeBannerImageSource(promo.imageUrl ?? promo.mediaKey),
-    imageUrl: promo.imageUrl ?? promo.mediaKey,
-    accentColor: promo.accentColor,
-    onPress: resolveBannerPress(promo),
-  }));
   const [isTickerPaused, setIsTickerPaused] = React.useState(false);
   const [isTickerHidden, setIsTickerHidden] = React.useState(false);
 
@@ -1188,8 +1210,16 @@ return (
                 : 'ابدأ بكتابة اسم متجر أو خدمة أو فئة، وستظهر النتائج مباشرة في نفس الصفحة.'}
             </Text>
           </Surface>
-        ) : resolvedPromos.length ? (
-          <View style={[styles.premiumBannerSection, { marginHorizontal: -spacing[3], width: viewportWidth, height: cardHeight + spacing[12] }]}>
+        ) : bannerItems.length ? (
+          <View style={[
+            styles.premiumBannerSection,
+            {
+              marginLeft: -spacing[3],
+              marginRight: -spacing[3],
+              width: viewportWidth,
+              height: cardHeight + spacing[12],
+            },
+          ]}>
              <ScrollView
                 ref={promoScrollRef}
                 horizontal
@@ -1198,22 +1228,23 @@ return (
                 onScroll={(e) => {
                   const x = e.nativeEvent.contentOffset.x;
                   const index = Math.round(x / itemWidth);
-                  if (index !== activePromoIndex && index >= 0 && index < resolvedPromos.length) {
+                  if (index !== activePromoIndex && index >= 0 && index < bannerItems.length) {
                     setActivePromoIndex(index);
                   }
                 }}
                 scrollEventThrottle={16}
                 decelerationRate="fast"
                 snapToInterval={itemWidth}
-                snapToAlignment="start"
+                snapToAlignment="center"
                 contentContainerStyle={[
                   styles.premiumBannerScrollContent,
                   {
                     paddingHorizontal: horizontalPadding,
+                    flexDirection: 'row',
                   }
                 ]}
              >
-               {resolvedPromos.map((promo, index) => {
+               {bannerItems.map((promo, index) => {
                   const isActive = index === activePromoIndex;
                   return (
                     <Pressable
@@ -1221,13 +1252,13 @@ return (
                       onPress={resolveBannerPress(promo)}
                       style={[
                         styles.premiumBannerCard,
-                        { width: cardWidth, marginEnd: index < resolvedPromos.length - 1 ? itemGap : 0 },
+                        { width: cardWidth, marginEnd: index < bannerItems.length - 1 ? itemGap : 0 },
                         isActive && styles.premiumBannerCardActive
                       ]}
                     >
                       <View style={[styles.premiumBannerImageWrap, { height: cardHeight }]}>
                         <Image
-                          source={resolveDshHomeBannerImageSource(promo.imageUrl ?? promo.mediaKey)}
+                          source={promo.image}
                           style={styles.premiumBannerImage}
                           resizeMode={promo.imageFit === 'contain' ? 'contain' : 'cover'}
                         />
@@ -1273,9 +1304,9 @@ return (
                })}
              </ScrollView>
 
-             <View style={styles.premiumCarouselControls}>
+             <View style={[styles.premiumCarouselControls, isRtl && styles.premiumCarouselControlsRtl]}>
                 <View style={styles.premiumIndicatorRow}>
-                  {resolvedPromos.map((_, i) => (
+                  {bannerItems.map((_, i) => (
                     <View
                       key={i}
                       style={[
@@ -1285,7 +1316,7 @@ return (
                     />
                   ))}
                 </View>
-                {resolvedPromos.length > 1 && (
+                {bannerItems.length > 1 && (
                   <Pressable
                     style={styles.premiumPauseBtn}
                     onPress={() => setIsCarouselPaused((current) => !current)}
@@ -1358,10 +1389,10 @@ return (
                         {activePromo.icon}
                       </Text>
                     </View>
-                    <View style={styles.heroPromoTextWrap}>
-                      <View style={styles.heroPromoBadge}>
-                        <Text role="bodySm" style={styles.heroPromoBadgeText}>
-                          {activePromo.title}
+                        <View style={styles.heroPromoTextWrap}>
+                          <View style={styles.heroPromoBadge}>
+                            <Text role="bodySm" style={styles.heroPromoBadgeText}>
+                              {activePromo.title}
                         </Text>
                       </View>
                       <Text role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
@@ -1640,10 +1671,10 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       elevation: 5,
     },
     premiumBannerSection: {
-      marginHorizontal: -spacing[3],
       marginTop: spacing[1],
       marginBottom: 0,
       paddingHorizontal: 0,
+      alignSelf: 'stretch',
     },
     premiumBannerScrollContent: {
       alignItems: 'center',
@@ -1756,6 +1787,9 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       justifyContent: 'center',
       alignItems: 'center',
       gap: 12,
+    },
+    premiumCarouselControlsRtl: {
+      flexDirection: 'row-reverse',
     },
     premiumIndicatorRow: {
       flexDirection: 'row',
