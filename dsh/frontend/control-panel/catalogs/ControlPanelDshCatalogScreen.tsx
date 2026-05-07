@@ -9,9 +9,9 @@ import {
   CatalogProductMaster,
   CatalogMainCategory,
   CatalogSubCategory,
-  CatalogQuickEntryMode,
-  CatalogFilter
-} from './catalog';
+  CatalogWorkspaceMode,
+  LocalCatalogFilter
+} from './catalog'; // Adjust imports if necessary, ensuring we import what's in catalog.ts
 import styles from '../operations/dsh-surface.module.css';
 
 // --- Types ---
@@ -22,9 +22,8 @@ export type ControlPanelDshCatalogScreenProps = {
   marketingHref?: string;
 };
 
-type LocalCatalogFilter = 'all' | 'master' | 'partner-exception' | 'partner-review' | 'marketing-review' | 'price-conflict' | 'non-matching' | 'category-proposals';
-
-type CatalogWorkspaceMode =
+// Extracted from original file locally
+type WorkspaceMode =
   | 'catalog'
   | 'quick-entry'
   | 'partner-entry'
@@ -33,7 +32,9 @@ type CatalogWorkspaceMode =
   | 'category-mapping'
   | 'media-governance';
 
-// --- Shared Components (Phase 6/7 Abstractions) ---
+type FilterType = 'all' | 'master' | 'partner-exception' | 'partner-review' | 'marketing-review' | 'price-conflict' | 'non-matching' | 'category-proposals';
+
+// --- Shared Components ---
 
 function FilterToken({ label, onRemove }: { label: string, onRemove: () => void }) {
   return (
@@ -88,11 +89,11 @@ export function ControlPanelDshCatalogScreen({
   partnersHref = '/partners',
   marketingHref = '/marketing',
 }: ControlPanelDshCatalogScreenProps) {
-  const [workspaceMode, setWorkspaceMode] = React.useState<CatalogWorkspaceMode>('catalog');
+  const [workspaceMode, setWorkspaceMode] = React.useState<WorkspaceMode>('catalog');
   const [showBulkOps, setShowBulkOps] = React.useState(false);
   const [activeMainCategory, setActiveMainCategory] = React.useState<CatalogMainCategory | null>(null);
   const [activeSubCategory, setActiveSubCategory] = React.useState<CatalogSubCategory | null>(null);
-  const [activeFilter, setActiveFilter] = React.useState<LocalCatalogFilter>('all');
+  const [activeFilter, setActiveFilter] = React.useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedProductId, setSelectedProductId] = React.useState<string | null>(null);
 
@@ -105,7 +106,9 @@ export function ControlPanelDshCatalogScreen({
 
   const selectedProduct = dshCatalogProducts.find(p => p.id === selectedProductId) ?? null;
 
-  const filteredProducts = dshCatalogProducts.filter(p => {
+  const isManualOrderCategory = activeMainCategory?.renderMode === 'manual-order';
+
+  const filteredProducts = isManualOrderCategory ? [] : dshCatalogProducts.filter(p => {
     if (activeMainCategory && p.categoryPath.main !== activeMainCategory.id) return false;
     if (activeSubCategory && p.categoryPath.sub !== activeSubCategory.id) return false;
 
@@ -129,7 +132,7 @@ export function ControlPanelDshCatalogScreen({
     return true;
   });
 
-  const counts: Record<LocalCatalogFilter, number> = {
+  const counts: Record<FilterType, number> = {
     'all': dshCatalogProducts.length,
     'master': dshCatalogProducts.filter(p => p.mediaPolicy === 'catalog-owned-media').length,
     'partner-exception': dshCatalogProducts.filter(p => p.mediaPolicy === 'partner-owned-exception').length,
@@ -140,8 +143,7 @@ export function ControlPanelDshCatalogScreen({
     'category-proposals': 5
   };
 
-  // --- Sub Views ---
-
+  // --- Operational Sub Views (Reused from previous phases but occupying full space) ---
   const renderQuickEntry = () => (
     <Box padding={6} gap={4} style={{ flex: 1, backgroundColor: '#FFFFFF', overflowY: 'auto' }}>
       <Box gap={1}>
@@ -356,126 +358,115 @@ export function ControlPanelDshCatalogScreen({
   return (
     <div className={styles.operationsCockpit} dir="rtl" style={{ height: '100vh', width: '100vw', overflow: 'hidden', display: 'flex', flexDirection: 'column', backgroundColor: '#F8FAFC' }}>
 
-      {/* 1. Ultra Compact Command Bar */}
-      <div style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E2E8F0', padding: '8px 16px', zIndex: 20, flexShrink: 0 }}>
-        <Box style={{ flexDirection: 'row', gap: '12px', alignItems: 'center' }}>
+      {/* 1. TOP BAR (Search, Actions, Filters, Categories) */}
+      <div style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+
+        {/* Row 1: Global Search & Tasks */}
+        <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'row', gap: '12px', alignItems: 'center', borderBottom: '1px solid #F1F5F9' }}>
           <div style={{
             width: '32px', height: '32px', backgroundColor: '#0A2F5C', borderRadius: '8px',
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0
           }}>🗂️</div>
-          <Box style={{ flex: 1 }}>
+
+          <div style={{ width: '300px' }}>
             <SearchField
-              placeholder="بحث بالمنتج، باركود، فئة..."
+              placeholder="بحث شامل بالمنتج، باركود، SKU..."
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
-          </Box>
-          <Box style={{ flexDirection: 'row', gap: '8px' }}>
-            <Button label="🔍 متقدمة" tone="secondary" size="sm" style={{ padding: '6px 12px' }} />
-            <Button label={workspaceMode === 'quick-entry' ? 'إغلاق' : "⚡ سريع"} tone="primary" size="sm" onClick={() => setWorkspaceMode(workspaceMode === 'quick-entry' ? 'catalog' : 'quick-entry')} style={{ padding: '6px 12px' }} />
-          </Box>
-        </Box>
-
-        {/* Dense Smart Filters Row */}
-        <Box style={{ flexDirection: 'row', marginTop: '8px', gap: '8px', alignItems: 'center', flexWrap: 'nowrap', overflowX: 'hidden' }}>
-          <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C', whiteSpace: 'nowrap' }}>طرق عرض:</Text>
-          <div style={{ cursor: 'pointer' }} onClick={() => setActiveFilter('marketing-review')}>
-            <Chip label="مراجعة التسويق" tone={activeFilter === 'marketing-review' ? 'brand' : 'default'} />
-          </div>
-          <div style={{ cursor: 'pointer' }} onClick={() => setActiveFilter('price-conflict')}>
-            <Chip label="تعارضات" tone={activeFilter === 'price-conflict' ? 'brand' : 'default'} />
-          </div>
-          <div style={{ cursor: 'pointer' }} onClick={() => setActiveFilter('non-matching')}>
-            <Chip label="بدون صورة" tone={activeFilter === 'non-matching' ? 'brand' : 'default'} />
-          </div>
-          <div style={{ cursor: 'pointer' }} onClick={() => setActiveFilter('category-proposals')}>
-            <Chip label="مقترحات" tone={activeFilter === 'category-proposals' ? 'brand' : 'default'} />
           </div>
 
-          <Box style={{ flex: 1 }} />
+          <div style={{ flex: 1 }} />
 
-          {/* Active Tokens aligned left logically (opposite end in RTL) */}
-          {(activeMainCategory || activeSubCategory || activeFilter !== 'all' || searchQuery) && (
-            <Box style={{ flexDirection: 'row', gap: '4px', alignItems: 'center' }}>
-               <Text role="caption" tone="muted" style={{ whiteSpace: 'nowrap' }}>النشط:</Text>
-               {activeMainCategory && <FilterToken label={activeMainCategory.label} onRemove={() => handleMainCategorySelect(null)} />}
-               {activeSubCategory && <FilterToken label={activeSubCategory.label} onRemove={() => setActiveSubCategory(null)} />}
-               {activeFilter !== 'all' && <FilterToken label={activeFilter} onRemove={() => setActiveFilter('all')} />}
-               {searchQuery && <FilterToken label={searchQuery} onRemove={() => setSearchQuery('')} />}
-            </Box>
-          )}
-        </Box>
-      </div>
-
-      {/* 2. Main 3-Lane Layout Grid */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
-
-        {/* L1: Tools & Hierarchy Rail (Fixed Width) */}
-        <div style={{ width: '220px', backgroundColor: '#FFFFFF', borderLeft: '1px solid #E2E8F0', overflowY: 'auto', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-
-          <Box style={{ padding: '12px', borderBottom: '1px solid #E2E8F0', gap: '4px' }}>
-            <Text role="caption" style={{ color: '#0A2F5C', marginBottom: '4px', textAlign: 'right', fontWeight: 800 }}>المهام</Text>
-
-            {[
-              { id: 'catalog', label: '📋 استعراض الكتالوج' },
-              { id: 'partner-entry', label: '🤝 إدخال الشريك' },
-              { id: 'field-intake', label: '🕵️ مهام الميدان' },
-              { id: 'duplicate-resolution', label: '⚖️ التكرارات' },
-              { id: 'category-mapping', label: '🔗 ربط الفئات' },
-              { id: 'media-governance', label: '🖼️ حوكمة الميديا' }
-            ].map(menuItem => (
-               <div
-                  key={menuItem.id}
-                  onClick={() => setWorkspaceMode(menuItem.id as CatalogWorkspaceMode)}
-                  style={{ padding: '6px 8px', borderRadius: '6px', backgroundColor: workspaceMode === menuItem.id ? '#E2E8F0' : 'transparent', cursor: 'pointer' }}>
-                  <Text role="caption" style={{fontWeight: workspaceMode === menuItem.id ? 800 : 600, color: workspaceMode === menuItem.id ? '#0A2F5C' : '#64748B', textAlign: 'right'}}>{menuItem.label}</Text>
-               </div>
-            ))}
-          </Box>
-
-          <Box style={{ padding: '12px', opacity: workspaceMode === 'catalog' ? 1 : 0.4, pointerEvents: workspaceMode === 'catalog' ? 'auto' : 'none' }}>
-            <Text role="caption" style={{ color: '#0A2F5C', marginBottom: '8px', textAlign: 'right', fontWeight: 800 }}>الفئات</Text>
-            <div
-              onClick={() => handleMainCategorySelect(null)}
-              style={{ padding: '6px 8px', borderRadius: '6px', backgroundColor: !activeMainCategory && workspaceMode === 'catalog' ? '#E2E8F0' : 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '14px' }}>🌍</span>
-              <Text role="caption" style={{ fontWeight: !activeMainCategory ? 800 : 600, color: !activeMainCategory ? '#0A2F5C' : '#64748B' }}>الكل</Text>
-            </div>
-            {dshCatalogCategories.map(cat => (
-              <div key={cat.id}>
+          {/* Operational Tabs (Tasks) */}
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '4px', backgroundColor: '#F1F5F9', padding: '4px', borderRadius: '8px' }}>
+             {[
+               { id: 'catalog', label: 'الكتالوج' },
+               { id: 'quick-entry', label: 'إدخال سريع' },
+               { id: 'partner-entry', label: 'الشريك' },
+               { id: 'field-intake', label: 'الميدان' },
+               { id: 'duplicate-resolution', label: 'تكرارات' },
+               { id: 'category-mapping', label: 'ربط' },
+               { id: 'media-governance', label: 'ميديا' }
+             ].map(tab => (
                 <div
-                  onClick={() => handleMainCategorySelect(cat)}
-                  style={{ padding: '6px 8px', borderRadius: '6px', backgroundColor: activeMainCategory?.id === cat.id ? '#E2E8F0' : 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '14px' }}>{cat.emojiFallback}</span>
-                    <Text role="caption" style={{ fontWeight: activeMainCategory?.id === cat.id ? 800 : 600, color: activeMainCategory?.id === cat.id ? '#0A2F5C' : '#64748B' }}>{cat.label}</Text>
-                  </div>
-                  {cat.renderMode === 'manual-order' && <span style={{ backgroundColor: '#FEF3C7', color: '#D97706', padding: '2px 4px', borderRadius: '4px', fontSize: '9px', fontWeight: 800 }}>يدوي</span>}
+                  key={tab.id}
+                  onClick={() => { setWorkspaceMode(tab.id as WorkspaceMode); setSelectedProductId(null); }}
+                  style={{
+                    padding: '6px 12px', borderRadius: '4px', cursor: 'pointer',
+                    backgroundColor: workspaceMode === tab.id ? '#FFFFFF' : 'transparent',
+                    boxShadow: workspaceMode === tab.id ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
+                  }}>
+                   <Text role="caption" style={{ fontWeight: workspaceMode === tab.id ? 800 : 600, color: workspaceMode === tab.id ? '#0A2F5C' : '#64748B' }}>{tab.label}</Text>
                 </div>
+             ))}
+          </div>
 
-                {activeMainCategory?.id === cat.id && cat.subcategories.length > 0 && (
-                  <div style={{ paddingRight: '22px', marginTop: '2px', display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                     <div
-                       onClick={() => setActiveSubCategory(null)}
-                       style={{ padding: '4px 6px', borderRadius: '4px', backgroundColor: !activeSubCategory ? '#F1F5F9' : 'transparent', cursor: 'pointer' }}>
-                       <Text role="caption" style={{ fontSize: '10px', fontWeight: !activeSubCategory ? 800 : 600, color: !activeSubCategory ? '#0A2F5C' : '#94A3B8', textAlign: 'right' }}>الكل</Text>
-                     </div>
-                     {cat.subcategories.map(sub => (
-                       <div
-                         key={sub.id}
-                         onClick={() => setActiveSubCategory(sub)}
-                         style={{ padding: '4px 6px', borderRadius: '4px', backgroundColor: activeSubCategory?.id === sub.id ? '#F1F5F9' : 'transparent', cursor: 'pointer' }}>
-                         <Text role="caption" style={{ fontSize: '10px', fontWeight: activeSubCategory?.id === sub.id ? 800 : 600, color: activeSubCategory?.id === sub.id ? '#0A2F5C' : '#94A3B8', textAlign: 'right' }}>{sub.label}</Text>
-                       </div>
-                     ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </Box>
+          <Button label="⚙️ الأعمدة" tone="secondary" size="sm" style={{ padding: '6px 12px' }} />
         </div>
 
-        {/* L2: Workspace Area (Fluid) */}
+        {/* Row 2: Category Selector Rail (Only in catalog mode) */}
+        {workspaceMode === 'catalog' && (
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', padding: '8px 16px', overflowX: 'auto', borderBottom: '1px solid #F1F5F9', alignItems: 'center', whiteSpace: 'nowrap' }}>
+             <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C', marginLeft: '8px' }}>الفئات:</Text>
+
+             <div onClick={() => handleMainCategorySelect(null)} style={{ cursor: 'pointer' }}>
+               <Chip label="الكل" tone={!activeMainCategory ? 'brand' : 'default'} />
+             </div>
+             {dshCatalogCategories.map(cat => (
+               <div key={cat.id} onClick={() => handleMainCategorySelect(cat)} style={{ cursor: 'pointer' }}>
+                 <Chip label={`${cat.emojiFallback} ${cat.label} ${cat.renderMode === 'manual-order' ? '(يدوي)' : ''}`} tone={activeMainCategory?.id === cat.id ? 'brand' : 'default'} />
+               </div>
+             ))}
+          </div>
+        )}
+
+        {/* Row 2.1: Subcategory Selector Rail */}
+        {workspaceMode === 'catalog' && activeMainCategory && activeMainCategory.subcategories.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', padding: '6px 16px', backgroundColor: '#F8FAFC', borderBottom: '1px solid #F1F5F9', alignItems: 'center', whiteSpace: 'nowrap' }}>
+             <div onClick={() => setActiveSubCategory(null)} style={{ cursor: 'pointer' }}>
+               <Text role="caption" style={{ fontWeight: !activeSubCategory ? 800 : 600, color: !activeSubCategory ? '#0A2F5C' : '#64748B', backgroundColor: !activeSubCategory ? '#E2E8F0' : 'transparent', padding: '2px 8px', borderRadius: '12px' }}>الكل</Text>
+             </div>
+             {activeMainCategory.subcategories.map(sub => (
+               <div key={sub.id} onClick={() => setActiveSubCategory(sub)} style={{ cursor: 'pointer' }}>
+                 <Text role="caption" style={{ fontWeight: activeSubCategory?.id === sub.id ? 800 : 600, color: activeSubCategory?.id === sub.id ? '#0A2F5C' : '#64748B', backgroundColor: activeSubCategory?.id === sub.id ? '#E2E8F0' : 'transparent', padding: '2px 8px', borderRadius: '12px' }}>{sub.label}</Text>
+               </div>
+             ))}
+          </div>
+        )}
+
+        {/* Row 3: Operational Filters & Active Tokens */}
+        {workspaceMode === 'catalog' && (
+          <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'row', gap: '8px', alignItems: 'center', flexWrap: 'nowrap', overflowX: 'auto' }}>
+            <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C', whiteSpace: 'nowrap', marginLeft: '4px' }}>فلاتر:</Text>
+
+            {(['all', 'master', 'partner-exception', 'partner-review', 'marketing-review', 'price-conflict', 'non-matching', 'category-proposals'] as FilterType[]).map(f => {
+              const labels: Record<FilterType, string> = {
+                all: 'الكل', 'master': 'مركزية', 'partner-exception': 'استثناء صورة', 'partner-review': 'مراجعة شريك', 'marketing-review': 'مراجعة تسويق', 'price-conflict': 'تعارض سعر', 'non-matching': 'غير مطابق', 'category-proposals': 'مقترحات فئات'
+              };
+              return (
+                <div key={f} onClick={() => setActiveFilter(f)} style={{ cursor: 'pointer' }}>
+                   <Chip label={`${labels[f]} (${counts[f]})`} tone={activeFilter === f ? 'brand' : 'default'} />
+                </div>
+              );
+            })}
+
+            <div style={{ flex: 1, minWidth: '16px' }} />
+
+            {(activeFilter !== 'all' || searchQuery) && (
+              <div style={{ display: 'flex', flexDirection: 'row', gap: '4px', alignItems: 'center' }}>
+                 <Text role="caption" tone="muted" style={{ whiteSpace: 'nowrap' }}>نشط:</Text>
+                 {activeFilter !== 'all' && <FilterToken label={activeFilter} onRemove={() => setActiveFilter('all')} />}
+                 {searchQuery && <FilterToken label={searchQuery} onRemove={() => setSearchQuery('')} />}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* 2. MAIN CONTENT AREA */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+
         {workspaceMode === 'quick-entry' && renderQuickEntry()}
         {workspaceMode === 'partner-entry' && renderPartnerEntry()}
         {workspaceMode === 'field-intake' && renderFieldIntake()}
@@ -483,115 +474,130 @@ export function ControlPanelDshCatalogScreen({
         {workspaceMode === 'category-mapping' && renderCategoryMapping()}
         {workspaceMode === 'media-governance' && renderMediaGovernance()}
 
-        {/* Normal Catalog Table View */}
+        {/* Excel-like Data Grid */}
         {workspaceMode === 'catalog' && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#FFFFFF', minWidth: 0 }}>
 
-            <Box style={{ padding: '8px 12px', borderBottom: '1px solid #E2E8F0', backgroundColor: '#FFFFFF', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-               <Box style={{ flexDirection: 'row', gap: '6px', alignItems: 'center' }}>
-                  <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C' }}>
-                    {activeMainCategory ? activeMainCategory.label : 'الكتالوج الكامل'}
-                    {activeSubCategory ? ` / ${activeSubCategory.label}` : ''}
-                  </Text>
-                  <Text role="caption" tone="muted">({filteredProducts.length} منتج)</Text>
-               </Box>
-               <Box style={{ flexDirection: 'row', gap: '8px' }}>
+            {/* Grid Tools Row (Bulk Ops) */}
+            <div style={{ padding: '8px 16px', borderBottom: '1px solid #E2E8F0', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+               <div style={{ display: 'flex', flexDirection: 'row', gap: '12px', alignItems: 'center' }}>
                   <Button
-                    label="🛠️ تفعيل الـ Bulk"
+                    label="🛠️ تفعيل الـ Bulk Action"
                     tone={showBulkOps ? "brand" : "secondary"}
                     size="sm"
                     onClick={() => setShowBulkOps(!showBulkOps)}
                     style={{ padding: '4px 8px', fontSize: '10px' }}
                   />
-               </Box>
-            </Box>
+                  {showBulkOps && (
+                    <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', alignItems: 'center', marginRight: '16px' }}>
+                      <input type="checkbox" readOnly checked style={{ accentColor: '#0A2F5C' }} />
+                      <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C' }}>1 محدد</Text>
+                      <Button label="💰 تحديث أسعار" tone="secondary" size="sm" style={{ padding: '2px 8px', fontSize: '10px' }} />
+                      <Button label="📦 تحديث توفر" tone="secondary" size="sm" style={{ padding: '2px 8px', fontSize: '10px' }} />
+                      <Button label="🚀 مراجعة" tone="primary" size="sm" style={{ padding: '2px 8px', fontSize: '10px' }} />
+                    </div>
+                  )}
+               </div>
+               <Text role="caption" tone="muted">{filteredProducts.length} نتيجة</Text>
+            </div>
 
-            {showBulkOps && (
-              <Box style={{ padding: '8px 12px', backgroundColor: '#F1F5F9', borderBottom: '1px solid #E2E8F0', flexDirection: 'row', gap: '12px', alignItems: 'center', flexShrink: 0 }}>
-                <input type="checkbox" readOnly checked style={{ accentColor: '#0A2F5C' }} />
-                <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C' }}>14 محدد</Text>
-                <Box style={{ flexDirection: 'row', gap: '4px', marginRight: 'auto' }}>
-                   <Button label="💰 أسعار" tone="secondary" size="sm" style={{ padding: '2px 8px', fontSize: '10px' }} />
-                   <Button label="📦 توفر" tone="secondary" size="sm" style={{ padding: '2px 8px', fontSize: '10px' }} />
-                   <Button label="🚀 مراجعة" tone="primary" size="sm" style={{ padding: '2px 8px', fontSize: '10px' }} />
-                </Box>
-              </Box>
-            )}
-
+            {/* Scrollable Data Table */}
             <div style={{ flex: 1, overflowY: 'auto', backgroundColor: '#FFFFFF' }}>
-               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'right', tableLayout: 'fixed' }}>
-                  <thead style={{ position: 'sticky', top: 0, backgroundColor: '#F8FAFC', zIndex: 10 }}>
-                    <tr>
-                      {showBulkOps && <th style={{ padding: '8px', width: '30px', borderBottom: '1px solid #E2E8F0' }}></th>}
-                      <th style={{ padding: '8px', fontSize: '10px', borderBottom: '1px solid #E2E8F0', color: '#64748B', textAlign: 'right', width: '30%' }}>المنتج</th>
-                      <th style={{ padding: '8px', fontSize: '10px', borderBottom: '1px solid #E2E8F0', color: '#64748B', textAlign: 'right', width: '20%' }}>الفئة</th>
-                      <th style={{ padding: '8px', fontSize: '10px', borderBottom: '1px solid #E2E8F0', color: '#64748B', textAlign: 'right', width: '15%' }}>السعر</th>
-                      <th style={{ padding: '8px', fontSize: '10px', borderBottom: '1px solid #E2E8F0', color: '#64748B', textAlign: 'right', width: '15%' }}>السياسة</th>
-                      <th style={{ padding: '8px', fontSize: '10px', borderBottom: '1px solid #E2E8F0', color: '#64748B', textAlign: 'right', width: '20%' }}>الحالة</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredProducts.map(p => (
-                      <tr
-                        key={p.id}
-                        onClick={() => setSelectedProductId(p.id)}
-                        style={{ cursor: 'pointer', backgroundColor: selectedProductId === p.id ? 'rgba(10,47,92,0.06)' : 'transparent', borderBottom: '1px solid #F1F5F9' }}
-                      >
-                        {showBulkOps && (
-                          <td style={{ padding: '8px' }} onClick={e => e.stopPropagation()}>
-                            <input type="checkbox" style={{ accentColor: '#0A2F5C' }} />
-                          </td>
-                        )}
-                        <td style={{ padding: '8px', textAlign: 'right', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-                          <Box style={{ flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ width: '24px', height: '24px', borderRadius: '4px', backgroundColor: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>
-                              {p.emojiFallback}
-                            </div>
-                            <Box style={{ overflow: 'hidden' }}>
-                              <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C', textAlign: 'right', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{p.name}</Text>
-                              <Text role="caption" tone="muted" style={{ textAlign: 'right', fontSize: '9px', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>GTIN: {p.gtin}</Text>
-                            </Box>
-                          </Box>
-                        </td>
-                        <td style={{ padding: '8px', textAlign: 'right', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-                          <Text role="caption" tone="muted" style={{ textAlign: 'right', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{dshCatalogCategories.find(c => c.id === p.categoryPath.main)?.label}</Text>
-                        </td>
-                        <td style={{ padding: '8px', textAlign: 'right' }}>
-                          <Text role="caption" style={{ color: '#0A2F5C', fontWeight: 700, textAlign: 'right' }}>{p.price} ر.س</Text>
-                        </td>
-                        <td style={{ padding: '8px', textAlign: 'right' }}>
-                          <PolicyBadge mediaPolicy={p.mediaPolicy} />
-                        </td>
-                        <td style={{ padding: '8px', textAlign: 'right' }}>
-                           <span style={{
-                            padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 800, whiteSpace: 'nowrap',
-                            backgroundColor: p.conflictReason ? '#FEE2E2' : p.approvalStage === 'client-visible' ? '#DCFCE7' : '#FEF3C7',
-                            color: p.conflictReason ? '#DC2626' : p.approvalStage === 'client-visible' ? '#16A34A' : '#D97706'
-                          }}>
-                            {p.conflictReason ? 'تعارض' : p.approvalStage === 'client-visible' ? 'نشط' : 'مراجعة'}
-                          </span>
-                        </td>
+               {isManualOrderCategory ? (
+                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '48px', opacity: 0.7 }}>
+                   <div style={{ fontSize: '48px', marginBottom: '16px' }}>🛍️</div>
+                   <Text role="titleMd" style={{ color: '#0A2F5C' }}>فئة الطلب اليدوي</Text>
+                   <Text role="bodySm" tone="muted" style={{ textAlign: 'center', maxWidth: '400px', marginTop: '8px' }}>
+                     المنتجات في هذه الفئة (مثل شي إن، عونك) تُعامل كطلبات مرنة ولا تحتوي على منتجات كتالوج قياسية محددة مسبقاً.
+                   </Text>
+                 </div>
+               ) : (
+                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'right', tableLayout: 'fixed' }}>
+                    <thead style={{ position: 'sticky', top: 0, backgroundColor: '#F1F5F9', zIndex: 10, boxShadow: '0 1px 0 #E2E8F0' }}>
+                      <tr>
+                        {showBulkOps && <th style={{ padding: '6px 12px', width: '36px' }}></th>}
+                        <th style={{ padding: '6px 12px', fontSize: '11px', color: '#64748B', textAlign: 'right', width: '40px' }}>صورة</th>
+                        <th style={{ padding: '6px 12px', fontSize: '11px', color: '#64748B', textAlign: 'right', width: '22%' }}>المنتج</th>
+                        <th style={{ padding: '6px 12px', fontSize: '11px', color: '#64748B', textAlign: 'right', width: '15%' }}>الفئة</th>
+                        <th style={{ padding: '6px 12px', fontSize: '11px', color: '#64748B', textAlign: 'right', width: '12%' }}>SKU/GTIN</th>
+                        <th style={{ padding: '6px 12px', fontSize: '11px', color: '#64748B', textAlign: 'right', width: '12%' }}>السياسة</th>
+                        <th style={{ padding: '6px 12px', fontSize: '11px', color: '#64748B', textAlign: 'right', width: '10%' }}>السعر</th>
+                        <th style={{ padding: '6px 12px', fontSize: '11px', color: '#64748B', textAlign: 'right', width: '12%' }}>الحالة</th>
                       </tr>
-                    ))}
-                    {filteredProducts.length === 0 && (
-                      <tr><td colSpan={showBulkOps ? 6 : 5} style={{ textAlign: 'center', padding: '32px', color: '#94A3B8', fontSize: '12px' }}>لا توجد منتجات مطابقة.</td></tr>
-                    )}
-                  </tbody>
-               </table>
+                    </thead>
+                    <tbody>
+                      {filteredProducts.map(p => (
+                        <tr
+                          key={p.id}
+                          onClick={() => setSelectedProductId(p.id)}
+                          style={{
+                            cursor: 'pointer',
+                            backgroundColor: selectedProductId === p.id ? 'rgba(10,47,92,0.06)' : 'transparent',
+                            borderBottom: '1px solid #E2E8F0'
+                          }}
+                        >
+                          {showBulkOps && (
+                            <td style={{ padding: '6px 12px' }} onClick={e => e.stopPropagation()}>
+                              <input type="checkbox" style={{ accentColor: '#0A2F5C' }} />
+                            </td>
+                          )}
+                          <td style={{ padding: '6px 12px', textAlign: 'right' }}>
+                             <div style={{ width: '24px', height: '24px', borderRadius: '4px', backgroundColor: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', border: '1px solid #E2E8F0' }}>
+                                {p.emojiFallback}
+                             </div>
+                          </td>
+                          <td style={{ padding: '6px 12px', textAlign: 'right', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                             <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C' }}>{p.name}</Text>
+                          </td>
+                          <td style={{ padding: '6px 12px', textAlign: 'right', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                            <Text role="caption" tone="muted" style={{ fontSize: '10px' }}>{dshCatalogCategories.find(c => c.id === p.categoryPath.main)?.label}</Text>
+                          </td>
+                          <td style={{ padding: '6px 12px', textAlign: 'right', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                            <Text role="caption" tone="muted" style={{ fontFamily: 'monospace', fontSize: '10px' }}>{p.sku}</Text>
+                          </td>
+                          <td style={{ padding: '6px 12px', textAlign: 'right' }}>
+                            <PolicyBadge mediaPolicy={p.mediaPolicy} />
+                          </td>
+                          <td style={{ padding: '6px 12px', textAlign: 'right' }}>
+                            <Text role="caption" style={{ color: '#0A2F5C', fontWeight: 700 }}>{p.price} ر.س</Text>
+                          </td>
+                          <td style={{ padding: '6px 12px', textAlign: 'right' }}>
+                             <span style={{
+                              padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 800, whiteSpace: 'nowrap',
+                              backgroundColor: p.conflictReason ? '#FEE2E2' : p.approvalStage === 'client-visible' ? '#DCFCE7' : '#FEF3C7',
+                              color: p.conflictReason ? '#DC2626' : p.approvalStage === 'client-visible' ? '#16A34A' : '#D97706'
+                            }}>
+                              {p.conflictReason ? 'تعارض' : p.approvalStage === 'client-visible' ? 'نشط' : 'مراجعة'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                      {filteredProducts.length === 0 && (
+                        <tr><td colSpan={showBulkOps ? 8 : 7} style={{ textAlign: 'center', padding: '32px', color: '#94A3B8', fontSize: '12px' }}>لا توجد منتجات مطابقة في هذه الفئة/الفلتر.</td></tr>
+                      )}
+                    </tbody>
+                 </table>
+               )}
             </div>
           </div>
         )}
 
-        {/* L3: Right Column Inspector (Fixed Width) */}
-        {workspaceMode === 'catalog' && (
-          <div style={{ width: '320px', backgroundColor: '#FFFFFF', borderRight: '1px solid #E2E8F0', overflowY: 'auto', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-            {selectedProduct ? (
-              <Box gap={3} style={{ padding: '16px' }}>
+        {/* Inspector Slide-out (Only visible when a row is selected) */}
+        {workspaceMode === 'catalog' && selectedProductId && selectedProduct && (
+          <div style={{ width: '340px', backgroundColor: '#FFFFFF', borderRight: '1px solid #E2E8F0', overflowY: 'auto', display: 'flex', flexDirection: 'column', flexShrink: 0, boxShadow: '-4px 0 15px rgba(0,0,0,0.05)', zIndex: 30 }}>
+
+             {/* Inspector Header */}
+             <div style={{ padding: '16px', borderBottom: '1px solid #E2E8F0', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
+                <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>تفاصيل المنتج</Text>
+                <div onClick={() => setSelectedProductId(null)} style={{ cursor: 'pointer', color: '#64748B', fontSize: '18px' }}>✕</div>
+             </div>
+
+             <Box gap={3} style={{ padding: '16px' }}>
                 <Box style={{ flexDirection: 'row', gap: '12px', alignItems: 'center' }}>
                    <div style={{ width: '48px', height: '48px', backgroundColor: '#F8FAFC', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', border: '1px solid #E2E8F0', flexShrink: 0 }}>{selectedProduct.emojiFallback}</div>
                    <Box style={{ flex: 1, gap: '2px' }}>
                       <Text role="caption" style={{ color: '#0A2F5C', fontSize: '14px', fontWeight: 800, textAlign: 'right' }}>{selectedProduct.name}</Text>
-                      <Text role="caption" tone="muted" style={{ textAlign: 'right', fontSize: '10px' }}>GTIN: {selectedProduct.gtin || 'N/A'}</Text>
+                      <Text role="caption" tone="muted" style={{ textAlign: 'right', fontSize: '10px' }}>SKU: {selectedProduct.sku} | GTIN: {selectedProduct.gtin || 'N/A'}</Text>
                    </Box>
                 </Box>
 
@@ -636,15 +642,12 @@ export function ControlPanelDshCatalogScreen({
                    </div>
                 </InspectorTile>
 
-              </Box>
-            ) : (
-              <Box style={{ height: '100%', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-                <div style={{ fontSize: '32px', color: '#E2E8F0', marginBottom: '8px' }}>🔍</div>
-                <Text role="caption" tone="muted" style={{ textAlign: 'center', lineHeight: 1.4 }}>
-                  حدد منتجاً لعرض تفاصيله وأثره في المنصة.
-                </Text>
-              </Box>
-            )}
+                {selectedProduct.conflictReason && (
+                   <InspectorTile title="تنبيه تعارض" warning>
+                      <Text role="caption" style={{ color: '#DC2626' }}>{selectedProduct.conflictReason}</Text>
+                   </InspectorTile>
+                )}
+             </Box>
           </div>
         )}
 
