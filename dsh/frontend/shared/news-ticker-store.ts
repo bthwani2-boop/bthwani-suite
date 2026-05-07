@@ -1,12 +1,14 @@
-import { Platform } from 'react-native'
+import { dshMarketingNewsTickerSeed } from './news-ticker-fixtures';
+
 export type MarketingNewsTickerLocale = 'ar' | 'en';
 
-export type MarketingNewsTickerKind = 'platform' | 'order' | 'promo';
+export type MarketingNewsTickerKind = 'platform' | 'order' | 'promo' | 'partner';
 export type MarketingNewsTickerSeverity = 'info' | 'success' | 'warning' | 'danger';
-export type MarketingNewsTickerStatus = 'draft' | 'published';
+export type MarketingNewsTickerStatus = 'draft' | 'published' | 'paused' | 'scheduled';
 
 export type MarketingNewsTickerItem = {
   id: string;
+  shortLabel?: string;
   message: string;
   kind: MarketingNewsTickerKind;
   severity: MarketingNewsTickerSeverity;
@@ -20,6 +22,7 @@ export type MarketingNewsTickerItem = {
   cooldownMinutes: number;
   repeatGapMinutes: number;
   actionTarget: string;
+  actionPayload?: Record<string, unknown>;
   lastShownAt?: string | null;
 };
 
@@ -30,7 +33,7 @@ export type MarketingNewsTickerPreview = {
   windowLabel: string;
 };
 
-export type MarketingNewsTickerSource = 'operations' | 'customer' | 'marketing' | 'system';
+export type MarketingNewsTickerSource = 'operations' | 'customer' | 'marketing' | 'system' | 'partner';
 export type MarketingNewsTickerAudience = 'all' | 'home' | 'order' | 'stores' | 'client' | 'operations';
 export type MarketingNewsTickerDeliveryMode = 'auto' | 'manual' | 'pinned';
 export type MarketingNewsTickerPriority = 'critical' | 'high' | 'normal' | 'low';
@@ -60,9 +63,10 @@ export type MarketingTickerPlan = {
 };
 
 const sourceRank: Record<MarketingNewsTickerSource, number> = {
-  customer: 4,
-  operations: 3,
-  marketing: 2,
+  customer: 5,
+  operations: 4,
+  marketing: 3,
+  partner: 2,
   system: 1,
 };
 
@@ -84,12 +88,14 @@ const sourceLabelByLocale: Record<MarketingNewsTickerLocale, Record<MarketingNew
     operations: 'العمليات',
     customer: 'العميل',
     marketing: 'التسويق',
+    partner: 'الشريك',
     system: 'النظام',
   },
   en: {
     operations: 'Operations',
     customer: 'Customer',
     marketing: 'Marketing',
+    partner: 'Partner',
     system: 'System',
   },
 };
@@ -158,91 +164,7 @@ const planReasonLabelByLocale: Record<MarketingNewsTickerLocale, Record<Marketin
   },
 };
 
-const marketingNewsTickerSeed: MarketingNewsTickerItem[] = [
-  {
-    id: 'ticker-1',
-    message: 'تمت مراجعة طلبك وسيتم تحديثك في كل مرحلة مهمة.',
-    kind: 'order',
-    severity: 'success',
-    status: 'published',
-    source: 'operations',
-    audience: 'client',
-    deliveryMode: 'auto',
-    priority: 'critical',
-    openHour: 8,
-    closeHour: 23,
-    cooldownMinutes: 25,
-    repeatGapMinutes: 90,
-    actionTarget: 'tracking',
-  },
-  {
-    id: 'ticker-2',
-    message: 'طلبك قيد التحضير الآن، وسنرسل لك التحديث عند انتقاله للمرحلة التالية.',
-    kind: 'order',
-    severity: 'info',
-    status: 'published',
-    source: 'customer',
-    audience: 'client',
-    deliveryMode: 'auto',
-    priority: 'high',
-    openHour: 8,
-    closeHour: 23,
-    cooldownMinutes: 20,
-    repeatGapMinutes: 60,
-    actionTarget: 'orders',
-    lastShownAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'ticker-3',
-    message: 'طلبك في الطريق، ويمكنك متابعة المسار أو التواصل عند الحاجة.',
-    kind: 'order',
-    severity: 'success',
-    status: 'published',
-    source: 'customer',
-    audience: 'client',
-    deliveryMode: 'auto',
-    priority: 'high',
-    openHour: 9,
-    closeHour: 23,
-    cooldownMinutes: 20,
-    repeatGapMinutes: 60,
-    actionTarget: 'tracking',
-  },
-  {
-    id: 'ticker-4',
-    message: 'خصم 20% لمدة 3 ساعات على المطعم المحدد اليوم.',
-    kind: 'promo',
-    severity: 'success',
-    status: 'draft',
-    source: 'marketing',
-    audience: 'client',
-    deliveryMode: 'manual',
-    priority: 'normal',
-    openHour: 9,
-    closeHour: 12,
-    cooldownMinutes: 45,
-    repeatGapMinutes: 180,
-    actionTarget: 'promo',
-  },
-  {
-    id: 'ticker-5',
-    message: 'قد تكون هناك صيانة مجدولة مساء اليوم، مع بقاء المسارات محفوظة للعودة إليها.',
-    kind: 'platform',
-    severity: 'warning',
-    status: 'published',
-    source: 'system',
-    audience: 'all',
-    deliveryMode: 'pinned',
-    priority: 'critical',
-    openHour: 18,
-    closeHour: 23,
-    cooldownMinutes: 60,
-    repeatGapMinutes: 240,
-    actionTarget: 'home',
-  },
-];
-
-let store = marketingNewsTickerSeed.map((item) => ({ ...item }));
+let store = dshMarketingNewsTickerSeed.map((item) => ({ ...item }));
 let nextTickerId = store.length + 1;
 
 function normalizeHour(value: number) {

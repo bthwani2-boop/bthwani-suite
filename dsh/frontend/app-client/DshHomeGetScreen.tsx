@@ -955,20 +955,49 @@ export function DshHomeGetScreen({
     accentColor: promo.accentColor,
     onPress: resolveBannerPress(promo),
   }));
+  const [isTickerPaused, setIsTickerPaused] = React.useState(false);
+  const [isTickerHidden, setIsTickerHidden] = React.useState(false);
+
   const tickerState = React.useMemo(() => {
+    if (isTickerHidden) {
+      return null;
+    }
+
     const plan = buildMarketingTickerPlan(currentTime, 'home');
     const activeItem = plan.activeItem;
 
     if (!activeItem) {
-      return resolveTickerBanner(currentTime, resolvedRecentOrders, uiText.topBar.location);
+      return {
+        ...resolveTickerBanner(currentTime, resolvedRecentOrders, uiText.topBar.location),
+        isMarketing: false,
+      };
     }
 
     return {
-      isOpen: true, // If it's active in the plan, it's considered open/visible
+      isOpen: true,
       statusLabel: currentLanguage === 'ar' ? 'مباشر' : 'Live',
       message: activeItem.message,
+      isMarketing: true,
+      actionTarget: activeItem.actionTarget,
     };
-  }, [currentLanguage, currentTime, resolvedRecentOrders, uiText.topBar.location]);
+  }, [currentLanguage, currentTime, isTickerHidden, resolvedRecentOrders, uiText.topBar.location]);
+
+  const handleTickerAction = React.useCallback(() => {
+    if (!tickerState) return;
+
+    if (tickerState.isMarketing) {
+      setIsTickerPaused(p => !p); // Toggle pause on click
+      if (tickerState.actionTarget === 'orders') {
+        onOpenOrders?.();
+      } else if (tickerState.actionTarget === 'tracking') {
+        onOpenTracking?.();
+      } else if (tickerState.actionTarget === 'promo') {
+        onOpenDiscovery?.(); // Fallback for promo
+      }
+    } else if (tickerAction) {
+      tickerAction();
+    }
+  }, [tickerState, tickerAction, onOpenOrders, onOpenTracking, onOpenDiscovery]);
   const openInlineSearch = React.useCallback(() => {
     setInlineSearchVisible(true);
   }, []);
@@ -1075,10 +1104,12 @@ return (
             },
           ]}
           ticker={{
-            statusLabel: tickerState.statusLabel,
-            message: tickerState.message,
-            onPress: tickerAction,
-            marquee: true,
+            statusLabel: tickerState?.statusLabel ?? '',
+            message: tickerState?.isMarketing
+              ? `${isTickerPaused ? '⏸️' : ''} ${tickerState.message}`
+              : (tickerState?.message ?? ''),
+            onPress: handleTickerAction,
+            marquee: tickerState?.isMarketing ? !isTickerPaused : true,
             marqueeDurationMs: 14000,
             trailingAction: {
               accessibilityLabel: 'الخدمات',
