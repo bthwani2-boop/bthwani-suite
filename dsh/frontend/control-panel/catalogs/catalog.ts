@@ -1,1 +1,239 @@
-export type CatalogMediaPolicy =  | 'catalog-owned-media'  | 'partner-owned-exception'  | 'partner-proposed-review'  | 'marketing-enhancement-required';export type CatalogApprovalStage =  | 'catalog-draft'  | 'catalog-approved'  | 'partner-proposed'  | 'partner-review'  | 'marketing-review'  | 'catalog-adopted'  | 'client-visible';export type CatalogSurfaceAvailability = 'client' | 'partner' | 'marketing' | 'field';export type CatalogQuickEntryMode =  | 'search-name'  | 'barcode-gtin'  | 'csv-excel-batch'  | 'partner-menu-import'  | 'field-suggestion'  | 'duplicate-resolution';export type CatalogSubCategory = {  id: string;  label: string;  subtitle: string;};export type CatalogMainCategory = {  id: string;  label: string;  subtitle: string;  subcategories: CatalogSubCategory[];  emojiFallback: string;  defaultMediaPolicy: CatalogMediaPolicy;};export type CatalogPartnerOverride = {  partnerId: string;  price?: number;  stock?: number;  preparationTime?: string;  isAvailable?: boolean;};export type CatalogProductMaster = {  id: string;  name: string;  sku: string;  gtin?: string;  barcode?: string;  categoryPath: { main: string; sub?: string };  price: number;  mediaPolicy: CatalogMediaPolicy;  approvalStage: CatalogApprovalStage;  surfaces: CatalogSurfaceAvailability[];  imageUri?: string;  emojiFallback?: string;  partnerOverrides?: CatalogPartnerOverride[];  conflictReason?: string;};export const dshCatalogMetrics = {  mainCategories: 13,  subCategories: 24,  approvedProducts: 14500,  pendingPartnerReviews: 42,  pendingMarketingReviews: 18,  priceConflicts: 7,  imageExceptions: 124,} as const;export const dshCatalogCategories: CatalogMainCategory[] = [  {    id: 'restaurants', label: 'المطاعم', subtitle: 'طلب الوجبات والمأكولات الجاهزة', emojiFallback: '🍽️', defaultMediaPolicy: 'partner-owned-exception',    subcategories: []  },  {    id: 'grocery', label: 'مقاضي', subtitle: 'سوبر ماركت مواد غذائية', emojiFallback: '🛒', defaultMediaPolicy: 'catalog-owned-media',    subcategories: [      { id: 'grocery_vegetables_fruits', label: 'خضروات وفواكة', subtitle: 'منتجات طازجة' },      { id: 'grocery_meat_fish_chicken', label: 'لحوم وأسماك ودجاج', subtitle: 'اختيارات بروتينية' },      { id: 'grocery_roasted_spices', label: 'محامص وبهارات', subtitle: 'بهارات وتتبيلات' },      { id: 'grocery_bakeries', label: 'مخابز', subtitle: 'خبز ومعجنات' },      { id: 'grocery_deals_bundle', label: 'باكج عروضات', subtitle: 'سلال مجمعة' },    ]  },  {    id: 'sweets_juices', label: 'حلا وعصائر', subtitle: 'عصائر طازجة وحلويات', emojiFallback: '🧃', defaultMediaPolicy: 'partner-owned-exception',    subcategories: [      { id: 'sweets_juices_fresh', label: 'عصائر طازجة', subtitle: 'عصائر معصورة' },      { id: 'sweets_juices_sweets', label: 'حلويات', subtitle: 'تحليات وكعك' },      { id: 'sweets_juices_icecream', label: 'آيسكريم', subtitle: 'حلويات مجمدة' },    ]  },  {    id: 'anaqati', label: 'أناقتي', subtitle: 'عطور وإكسسوارات', emojiFallback: '👗', defaultMediaPolicy: 'catalog-owned-media',    subcategories: [      { id: 'anaqati_perfumes', label: 'عطور', subtitle: 'اختيارات عطرية' },      { id: 'anaqati_accessories_beauty', label: 'إكسسوارات وأدوات تجميل', subtitle: 'العناية الشخصية' },      { id: 'anaqati_clothing', label: 'ملابس', subtitle: 'ملابس يومية' },    ]  },  { id: 'wani_store', label: 'بثواني ستور', subtitle: 'متجر شامل', emojiFallback: '🏪', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },  { id: 'home_projects', label: 'مشاريع منزلية', subtitle: 'منتجات يدوية', emojiFallback: '🏠', defaultMediaPolicy: 'partner-owned-exception', subcategories: [] },  { id: 'cloud_kitchens', label: 'مطابخ سحابية', subtitle: 'مطابخ مجهزة', emojiFallback: '🍳', defaultMediaPolicy: 'partner-owned-exception', subcategories: [] },  { id: 'awnak', label: 'عونك', subtitle: 'خدمات ومشاوير', emojiFallback: '🤝', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },  { id: 'gas_refill', label: 'تعبئة الغاز', subtitle: 'تعبئة وإصلاح', emojiFallback: '⛽', defaultMediaPolicy: 'catalog-owned-media', subcategories: [    { id: 'gas_refill_refill', label: 'التعبئة', subtitle: 'تعبئة الأسطوانة' },    { id: 'gas_refill_repair', label: 'الإصلاح', subtitle: 'صيانة وفحص' },    { id: 'gas_refill_buy', label: 'شراء تعبئة', subtitle: 'وحدات جديدة' },  ]},  { id: 'shein', label: 'شي ان', subtitle: 'طلبات من شي إن', emojiFallback: '🛍️', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },  { id: 'spare_parts', label: 'قطع غيار', subtitle: 'مستلزمات سيارات', emojiFallback: '🔧', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },  { id: 'honey_dates', label: 'عسل وتمور', subtitle: 'منتجات طبيعية', emojiFallback: '🍯', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },  { id: 'electronics', label: 'إلكترونيات', subtitle: 'أجهزة واكسسوارات', emojiFallback: '📱', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },];export const dshCatalogProducts: CatalogProductMaster[] = [  {    id: 'prd-grocery-apple',    name: 'تفاح رويال غالا طازج 1 كجم',    sku: 'BTH-GRO-FR-001',    gtin: '6281000000012',    categoryPath: { main: 'grocery', sub: 'grocery_vegetables_fruits' },    price: 18.00,    mediaPolicy: 'catalog-owned-media',    approvalStage: 'client-visible',    surfaces: ['client', 'partner', 'marketing', 'field'],    imageUri: 'dsh.product.apple.v1',    emojiFallback: '🍎',  },  {    id: 'prd-grocery-milk',    name: 'حليب عضوي 1.5 لتر',    sku: 'BTH-GRO-DA-002',    gtin: '6281000000029',    categoryPath: { main: 'grocery' },    price: 11.00,    mediaPolicy: 'catalog-owned-media',    approvalStage: 'client-visible',    surfaces: ['client', 'partner', 'marketing'],    imageUri: 'dsh.product.milk.v1',    emojiFallback: '🥛',  },  {    id: 'prd-bakery-bread',    name: 'خبز قمح كامل',    sku: 'BTH-GRO-BK-003',    gtin: '6281000000036',    categoryPath: { main: 'grocery', sub: 'grocery_bakeries' },    price: 7.00,    mediaPolicy: 'catalog-owned-media',    approvalStage: 'client-visible',    surfaces: ['client', 'partner', 'marketing', 'field'],    imageUri: 'dsh.product.bread.v1',    emojiFallback: '🍞',  },  {    id: 'prd-restaurant-chicken',    name: 'دجاج مشوي مع بطاطس',    sku: 'BTH-RES-001',    categoryPath: { main: 'restaurants' },    price: 34.00,    mediaPolicy: 'partner-owned-exception',    approvalStage: 'client-visible',    surfaces: ['client', 'partner', 'marketing'],    imageUri: 'dsh.product.chicken.v1',    emojiFallback: '🍗',    partnerOverrides: [      { partnerId: 'store-1003', price: 34.00, preparationTime: '18-22 دقيقة' }    ]  },  {    id: 'prd-sweets-cake',    name: 'شريحة شوكولاتة',    sku: 'BTH-SWT-001',    categoryPath: { main: 'sweets_juices', sub: 'sweets_juices_sweets' },    price: 14.00,    mediaPolicy: 'partner-proposed-review',    approvalStage: 'marketing-review',    surfaces: ['partner', 'marketing'],    imageUri: 'dsh.product.choco.v1',    emojiFallback: '🍰',  },  {    id: 'prd-conflict-oil',    name: 'زيت طبخ 1.5 لتر',    sku: 'BTH-GRO-005',    gtin: '6281000000043',    categoryPath: { main: 'grocery' },    price: 15.00,    mediaPolicy: 'catalog-owned-media',    approvalStage: 'catalog-adopted',    surfaces: ['partner', 'field'],    emojiFallback: '🛢️',    partnerOverrides: [      { partnerId: 'store-1005', price: 19.50 }    ],    conflictReason: 'تجاوز الشريك السعر المرجعي بنسبة تزيد عن 20%'  },  {    id: 'prd-review-coffee',    name: 'قهوة مختصة برزيلي 250جم',    sku: 'BTH-CAF-002',    categoryPath: { main: 'restaurants' },    price: 65.00,    mediaPolicy: 'marketing-enhancement-required',    approvalStage: 'partner-review',    surfaces: ['partner', 'marketing'],    emojiFallback: '☕',  },];
+export type CatalogMediaPolicy =
+  | 'catalog-owned-media'
+  | 'partner-owned-exception'
+  | 'partner-proposed-review'
+  | 'marketing-enhancement-required';
+
+export type CatalogApprovalStage =
+  | 'catalog-draft'
+  | 'catalog-approved'
+  | 'partner-proposed'
+  | 'partner-review'
+  | 'marketing-review'
+  | 'catalog-adopted'
+  | 'client-visible';
+
+export type CatalogSurfaceAvailability = 'client' | 'partner' | 'marketing' | 'field';
+
+export type CatalogQuickEntryMode =
+  | 'search-name'
+  | 'barcode-gtin'
+  | 'csv-excel-batch'
+  | 'partner-menu-import'
+  | 'field-suggestion'
+  | 'duplicate-resolution';
+
+export type CatalogSubCategory = {
+  id: string;
+  label: string;
+  subtitle: string;
+};
+
+export type CatalogMainCategory = {
+  id: string;
+  label: string;
+  subtitle: string;
+  subcategories: CatalogSubCategory[];
+  emojiFallback: string;
+  defaultMediaPolicy: CatalogMediaPolicy;
+};
+
+export type CatalogPartnerOverride = {
+  partnerId: string;
+  price?: number;
+  stock?: number;
+  preparationTime?: string;
+  isAvailable?: boolean;
+};
+
+export type CatalogCategoryProposal = {
+  id: string;
+  partnerId: string;
+  proposedName: string;
+  status: 'pending' | 'approved' | 'rejected';
+  date: string;
+};
+
+export type CatalogApprovalQueueItem = {
+  id: string;
+  productId: string;
+  stage: CatalogApprovalStage;
+  requestedBy: string;
+};
+
+export type CatalogProductMaster = {
+  id: string;
+  name: string;
+  sku: string;
+  gtin?: string;
+  barcode?: string;
+  measurementUnit?: string;
+  categoryPath: { main: string; sub?: string };
+  price: number;
+  mediaPolicy: CatalogMediaPolicy;
+  approvalStage: CatalogApprovalStage;
+  surfaces: CatalogSurfaceAvailability[];
+  imageUri?: string;
+  emojiFallback?: string;
+  partnerOverrides?: CatalogPartnerOverride[];
+  conflictReason?: string;
+};
+
+export const dshCatalogMetrics = {
+  mainCategories: 13,
+  subCategories: 24,
+  approvedProducts: 14500,
+  pendingPartnerReviews: 42,
+  pendingMarketingReviews: 18,
+  priceConflicts: 7,
+  imageExceptions: 124,
+} as const;
+
+export const dshCatalogCategories: CatalogMainCategory[] = [
+  {
+    id: 'restaurants', label: 'المطاعم', subtitle: 'طلب الوجبات والمأكولات الجاهزة', emojiFallback: '🍽️', defaultMediaPolicy: 'partner-owned-exception',
+    subcategories: []
+  },
+  {
+    id: 'grocery', label: 'مقاضي', subtitle: 'سوبر ماركت مواد غذائية', emojiFallback: '🛒', defaultMediaPolicy: 'catalog-owned-media',
+    subcategories: [
+      { id: 'grocery_vegetables_fruits', label: 'خضروات وفواكة', subtitle: 'منتجات طازجة' },
+      { id: 'grocery_meat_fish_chicken', label: 'لحوم وأسماك ودجاج', subtitle: 'اختيارات بروتينية' },
+      { id: 'grocery_roasted_spices', label: 'محامص وبهارات', subtitle: 'بهارات وتتبيلات' },
+      { id: 'grocery_bakeries', label: 'مخابز', subtitle: 'خبز ومعجنات' },
+      { id: 'grocery_deals_bundle', label: 'باكج عروضات', subtitle: 'سلال مجمعة' },
+    ]
+  },
+  {
+    id: 'sweets_juices', label: 'حلا وعصائر', subtitle: 'عصائر طازجة وحلويات', emojiFallback: '🧃', defaultMediaPolicy: 'partner-owned-exception',
+    subcategories: [
+      { id: 'sweets_juices_fresh', label: 'عصائر طازجة', subtitle: 'عصائر معصورة' },
+      { id: 'sweets_juices_sweets', label: 'حلويات', subtitle: 'تحليات وكعك' },
+      { id: 'sweets_juices_icecream', label: 'آيسكريم', subtitle: 'حلويات مجمدة' },
+    ]
+  },
+  {
+    id: 'anaqati', label: 'أناقتي', subtitle: 'عطور وإكسسوارات', emojiFallback: '👗', defaultMediaPolicy: 'catalog-owned-media',
+    subcategories: [
+      { id: 'anaqati_perfumes', label: 'عطور', subtitle: 'اختيارات عطرية' },
+      { id: 'anaqati_accessories_beauty', label: 'إكسسوارات وأدوات تجميل', subtitle: 'العناية الشخصية' },
+      { id: 'anaqati_clothing', label: 'ملابس', subtitle: 'ملابس يومية' },
+    ]
+  },
+  { id: 'wani_store', label: 'بثواني ستور', subtitle: 'متجر شامل', emojiFallback: '🏪', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },
+  { id: 'home_projects', label: 'مشاريع منزلية', subtitle: 'منتجات يدوية', emojiFallback: '🏠', defaultMediaPolicy: 'partner-owned-exception', subcategories: [] },
+  { id: 'cloud_kitchens', label: 'مطابخ سحابية', subtitle: 'مطابخ مجهزة', emojiFallback: '🍳', defaultMediaPolicy: 'partner-owned-exception', subcategories: [] },
+  { id: 'awnak', label: 'عونك', subtitle: 'خدمات ومشاوير', emojiFallback: '🤝', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },
+  { id: 'gas_refill', label: 'تعبئة الغاز', subtitle: 'تعبئة وإصلاح', emojiFallback: '⛽', defaultMediaPolicy: 'catalog-owned-media', subcategories: [
+    { id: 'gas_refill_refill', label: 'التعبئة', subtitle: 'تعبئة الأسطوانة' },
+    { id: 'gas_refill_repair', label: 'الإصلاح', subtitle: 'صيانة وفحص' },
+    { id: 'gas_refill_buy', label: 'شراء تعبئة', subtitle: 'وحدات جديدة' },
+  ]},
+  { id: 'shein', label: 'شي ان', subtitle: 'طلبات من شي إن', emojiFallback: '🛍️', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },
+  { id: 'spare_parts', label: 'قطع غيار', subtitle: 'مستلزمات سيارات', emojiFallback: '🔧', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },
+  { id: 'honey_dates', label: 'عسل وتمور', subtitle: 'منتجات طبيعية', emojiFallback: '🍯', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },
+  { id: 'electronics', label: 'إلكترونيات', subtitle: 'أجهزة واكسسوارات', emojiFallback: '📱', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },
+];
+
+export const dshCatalogProducts: CatalogProductMaster[] = [
+  {
+    id: 'prd-grocery-apple',
+    name: 'تفاح رويال غالا طازج 1 كجم',
+    sku: 'BTH-GRO-FR-001',
+    gtin: '6281000000012',
+    measurementUnit: '1 كجم',
+    categoryPath: { main: 'grocery', sub: 'grocery_vegetables_fruits' },
+    price: 18.00,
+    mediaPolicy: 'catalog-owned-media',
+    approvalStage: 'client-visible',
+    surfaces: ['client', 'partner', 'marketing', 'field'],
+    imageUri: 'dsh.product.apple.v1',
+    emojiFallback: '🍎',
+  },
+  {
+    id: 'prd-grocery-milk',
+    name: 'حليب عضوي 1.5 لتر',
+    sku: 'BTH-GRO-DA-002',
+    gtin: '6281000000029',
+    measurementUnit: '1.5 لتر',
+    categoryPath: { main: 'grocery' },
+    price: 11.00,
+    mediaPolicy: 'catalog-owned-media',
+    approvalStage: 'client-visible',
+    surfaces: ['client', 'partner', 'marketing'],
+    imageUri: 'dsh.product.milk.v1',
+    emojiFallback: '🥛',
+  },
+  {
+    id: 'prd-bakery-bread',
+    name: 'خبز قمح كامل',
+    sku: 'BTH-GRO-BK-003',
+    gtin: '6281000000036',
+    measurementUnit: '1 حبة',
+    categoryPath: { main: 'grocery', sub: 'grocery_bakeries' },
+    price: 7.00,
+    mediaPolicy: 'catalog-owned-media',
+    approvalStage: 'client-visible',
+    surfaces: ['client', 'partner', 'marketing', 'field'],
+    imageUri: 'dsh.product.bread.v1',
+    emojiFallback: '🍞',
+  },
+  {
+    id: 'prd-restaurant-chicken',
+    name: 'دجاج مشوي مع بطاطس',
+    sku: 'BTH-RES-001',
+    measurementUnit: '1 وجبة',
+    categoryPath: { main: 'restaurants' },
+    price: 34.00,
+    mediaPolicy: 'partner-owned-exception',
+    approvalStage: 'client-visible',
+    surfaces: ['client', 'partner', 'marketing'],
+    imageUri: 'dsh.product.chicken.v1',
+    emojiFallback: '🍗',
+    partnerOverrides: [
+      { partnerId: 'store-1003', price: 34.00, preparationTime: '18-22 دقيقة' }
+    ]
+  },
+  {
+    id: 'prd-sweets-cake',
+    name: 'شريحة شوكولاتة',
+    sku: 'BTH-SWT-001',
+    measurementUnit: '1 شريحة',
+    categoryPath: { main: 'sweets_juices', sub: 'sweets_juices_sweets' },
+    price: 14.00,
+    mediaPolicy: 'partner-proposed-review',
+    approvalStage: 'marketing-review',
+    surfaces: ['partner', 'marketing'],
+    imageUri: 'dsh.product.choco.v1',
+    emojiFallback: '🍰',
+  },
+  {
+    id: 'prd-conflict-oil',
+    name: 'زيت طبخ 1.5 لتر',
+    sku: 'BTH-GRO-005',
+    gtin: '6281000000043',
+    measurementUnit: '1.5 لتر',
+    categoryPath: { main: 'grocery' },
+    price: 15.00,
+    mediaPolicy: 'catalog-owned-media',
+    approvalStage: 'catalog-adopted',
+    surfaces: ['partner', 'field'],
+    emojiFallback: '🛢️',
+    partnerOverrides: [
+      { partnerId: 'store-1005', price: 19.50 }
+    ],
+    conflictReason: 'تجاوز الشريك السعر المرجعي بنسبة تزيد عن 20%'
+  },
+  {
+    id: 'prd-review-coffee',
+    name: 'قهوة مختصة برزيلي 250جم',
+    sku: 'BTH-CAF-002',
+    measurementUnit: '250 جم',
+    categoryPath: { main: 'restaurants' },
+    price: 65.00,
+    mediaPolicy: 'marketing-enhancement-required',
+    approvalStage: 'partner-review',
+    surfaces: ['partner', 'marketing'],
+    emojiFallback: '☕',
+  },
+];
