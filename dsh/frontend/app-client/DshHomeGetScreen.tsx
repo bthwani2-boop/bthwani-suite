@@ -589,10 +589,11 @@ export function DshHomeGetScreen({
   const resolvedPromos = promos ?? [];
 
   const containerWidth = viewportWidth;
-  const sidePeek = Math.max(spacing[3], Math.min(spacing[6], Math.round(containerWidth * 0.08)));
-  const itemGap = Math.max(spacing[1], Math.min(spacing[2], Math.round(containerWidth * 0.025)));
-  const cardWidth = Math.max(272, Math.min(348, Math.round(containerWidth - (sidePeek * 2) - (itemGap * 2))));
-  const cardHeight = Math.round(cardWidth * 1.16);
+  const sidePeek = Math.max(spacing[1], Math.min(spacing[4], Math.round(containerWidth * 0.045)));
+  const itemGap = Math.max(spacing[1], Math.min(spacing[2], Math.round(containerWidth * 0.018)));
+  const baseCardWidth = Math.max(256, Math.min(326, Math.round(containerWidth - (sidePeek * 2) - (itemGap * 2))));
+  const cardWidth = Math.max(220, Math.round(baseCardWidth * 0.84));
+  const cardHeight = Math.max(154, Math.round(cardWidth * 0.74));
   const itemWidth = cardWidth + itemGap;
   const horizontalPadding = Math.max(0, Math.round((containerWidth - cardWidth) / 2));
   const resolvedStores = stores ?? [];
@@ -1254,7 +1255,7 @@ return (
               marginLeft: -spacing[3],
               marginRight: -spacing[3],
               width: containerWidth,
-              height: cardHeight + spacing[12],
+              height: cardHeight + spacing[6],
             },
           ]}>
              <ScrollView
@@ -1361,8 +1362,8 @@ return (
                           promo.titlePlacement === 'center' ? { justifyContent: 'center' } : { justifyContent: 'flex-end' }
                         ]}>
                           <Box gap={1}>
-                             <Text style={styles.premiumBannerTitle}>{promo.title}</Text>
-                             <Text style={styles.premiumBannerSubtitle} numberOfLines={2}>{promo.subtitle}</Text>
+                             <Text style={styles.premiumBannerTitle} numberOfLines={1}>{promo.title}</Text>
+                             <Text style={styles.premiumBannerSubtitle} numberOfLines={1}>{promo.subtitle}</Text>
                           </Box>
 
                           <View style={[styles.premiumBannerCta, { backgroundColor: colorPalette.white }]}>
@@ -1400,7 +1401,7 @@ return (
                   >
                     <Ionicons
                       name={isCarouselUserPaused ? 'play-circle' : 'pause-circle'}
-                      size={20}
+                      size={16}
                       color={colorPalette.white}
                     />
                   </Pressable>
@@ -1758,7 +1759,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       justifyContent: 'center',
     },
     premiumBannerCard: {
-      borderRadius: 30,
+      borderRadius: 24,
       overflow: 'hidden',
       backgroundColor: colorPalette.surfaceRaised,
       elevation: 6,
@@ -1793,7 +1794,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       top: 0,
       left: 0,
       right: 0,
-      height: '42%',
+      height: '36%',
       backgroundColor: 'rgba(255,255,255,0.08)',
       zIndex: 3,
     },
@@ -1802,18 +1803,18 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       left: 0,
       right: 0,
       bottom: 0,
-      height: '60%',
+      height: '54%',
       backgroundColor: 'rgba(2, 8, 18, 0.4)',
       zIndex: 3,
     },
     premiumBannerLogoWrap: {
       position: 'absolute',
-      top: 16,
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      top: 12,
+      width: 32,
+      height: 32,
+      borderRadius: 16,
       backgroundColor: colorPalette.white,
-      padding: 5,
+      padding: 3,
       elevation: 6,
       zIndex: 5,
     },
@@ -1823,69 +1824,69 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     },
     premiumBannerBadge: {
       position: 'absolute',
-      top: 20,
-      paddingHorizontal: 10,
-      paddingVertical: 6,
+      top: 14,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
       borderRadius: 999,
       elevation: 6,
       zIndex: 5,
     },
     premiumBannerBadgeText: {
       color: colorPalette.white,
-      fontSize: 12,
+      fontSize: 11,
       fontWeight: '900',
     },
     premiumBannerContent: {
       flex: 1,
-      paddingHorizontal: 18,
-      paddingTop: 64,
-      paddingBottom: 24,
+      paddingHorizontal: 14,
+      paddingTop: 40,
+      paddingBottom: 14,
       zIndex: 4,
       justifyContent: 'flex-end',
     },
     premiumBannerTitle: {
       color: colorPalette.white,
-      fontSize: 22,
+      fontSize: 17,
       fontWeight: '900',
       textShadowColor: 'rgba(0,0,0,0.4)',
       textShadowOffset: { width: 0, height: 2 },
       shadowRadius: 4,
-      lineHeight: 27,
+      lineHeight: 20,
       textAlign,
     },
     premiumBannerSubtitle: {
       color: 'rgba(255,255,255,0.95)',
-      fontSize: 12,
+      fontSize: 10,
       fontWeight: '600',
-      marginTop: 4,
+      marginTop: 3,
       textShadowColor: 'rgba(0,0,0,0.3)',
       textShadowOffset: { width: 0, height: 1 },
       shadowRadius: 2,
-      lineHeight: 18,
+      lineHeight: 13,
       textAlign,
     },
     premiumBannerCta: {
-      marginTop: 12,
-      paddingHorizontal: 15,
-      paddingVertical: 8,
+      marginTop: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
       borderRadius: 999,
       alignSelf: 'flex-start',
       elevation: 5,
       zIndex: 5,
     },
     premiumBannerCtaText: {
-      fontSize: 12,
+      fontSize: 10,
       fontWeight: '900',
     },
     premiumCarouselControls: {
       position: 'absolute',
-      bottom: 16,
+      bottom: 10,
       left: 0,
       right: 0,
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
-      gap: 12,
+      gap: 10,
     },
     premiumCarouselControlsRtl: {
       flexDirection: 'row-reverse',
@@ -1895,8 +1896,8 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       gap: 6,
       alignItems: 'center',
       backgroundColor: 'rgba(0,0,0,0.3)',
-      paddingHorizontal: 10,
-      paddingVertical: 6,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
       borderRadius: 999,
     },
     premiumIndicator: {
@@ -1906,14 +1907,14 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       backgroundColor: 'rgba(255,255,255,0.4)',
     },
     premiumIndicatorActive: {
-      width: 16,
+      width: 14,
       height: 6,
       backgroundColor: colorPalette.white,
     },
     premiumPauseBtn: {
-      width: 32,
-      height: 32,
-      borderRadius: 16,
+      width: 26,
+      height: 26,
+      borderRadius: 13,
       backgroundColor: 'rgba(0,0,0,0.4)',
       justifyContent: 'center',
       alignItems: 'center',
