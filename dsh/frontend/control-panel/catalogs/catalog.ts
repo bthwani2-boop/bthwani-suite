@@ -36,6 +36,7 @@ export type CatalogMainCategory = {
   subcategories: CatalogSubCategory[];
   emojiFallback: string;
   defaultMediaPolicy: CatalogMediaPolicy;
+  renderMode?: 'stores' | 'manual-order';
 };
 
 export type CatalogPartnerOverride = {
@@ -59,6 +60,12 @@ export type CatalogApprovalQueueItem = {
   productId: string;
   stage: CatalogApprovalStage;
   requestedBy: string;
+};
+
+export type CatalogSmartFilter = {
+  id: string;
+  label: string;
+  count: number;
 };
 
 export type CatalogProductMaster = {
@@ -88,6 +95,22 @@ export const dshCatalogMetrics = {
   priceConflicts: 7,
   imageExceptions: 124,
 } as const;
+
+export const dshCatalogSmartFilters: CatalogSmartFilter[] = [
+  { id: 'all', label: 'الكل', count: 14500 },
+  { id: 'master', label: 'منتجات مركزية', count: 12300 },
+  { id: 'partner-exception', label: 'استثناء صورة', count: 124 },
+  { id: 'partner-review', label: 'مراجعة شريك', count: 42 },
+  { id: 'marketing-review', label: 'مراجعة تسويق', count: 18 },
+  { id: 'price-conflict', label: 'تعارض سعر', count: 7 },
+  { id: 'non-matching', label: 'غير مطابق', count: 3 },
+  { id: 'category-proposals', label: 'مقترحات فئات', count: 5 },
+];
+
+export const dshCatalogApprovalQueues: CatalogApprovalQueueItem[] = [
+  { id: 'q-1', productId: 'prd-sweets-cake', stage: 'marketing-review', requestedBy: 'Partner 1002' },
+  { id: 'q-2', productId: 'prd-review-coffee', stage: 'partner-review', requestedBy: 'Field Agent 3' },
+];
 
 export const dshCatalogCategories: CatalogMainCategory[] = [
   {
@@ -123,13 +146,13 @@ export const dshCatalogCategories: CatalogMainCategory[] = [
   { id: 'wani_store', label: 'بثواني ستور', subtitle: 'متجر شامل', emojiFallback: '🏪', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },
   { id: 'home_projects', label: 'مشاريع منزلية', subtitle: 'منتجات يدوية', emojiFallback: '🏠', defaultMediaPolicy: 'partner-owned-exception', subcategories: [] },
   { id: 'cloud_kitchens', label: 'مطابخ سحابية', subtitle: 'مطابخ مجهزة', emojiFallback: '🍳', defaultMediaPolicy: 'partner-owned-exception', subcategories: [] },
-  { id: 'awnak', label: 'عونك', subtitle: 'خدمات ومشاوير', emojiFallback: '🤝', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },
+  { id: 'awnak', label: 'عونك', subtitle: 'خدمات ومشاوير', emojiFallback: '🤝', defaultMediaPolicy: 'catalog-owned-media', subcategories: [], renderMode: 'manual-order' },
   { id: 'gas_refill', label: 'تعبئة الغاز', subtitle: 'تعبئة وإصلاح', emojiFallback: '⛽', defaultMediaPolicy: 'catalog-owned-media', subcategories: [
     { id: 'gas_refill_refill', label: 'التعبئة', subtitle: 'تعبئة الأسطوانة' },
     { id: 'gas_refill_repair', label: 'الإصلاح', subtitle: 'صيانة وفحص' },
     { id: 'gas_refill_buy', label: 'شراء تعبئة', subtitle: 'وحدات جديدة' },
   ]},
-  { id: 'shein', label: 'شي ان', subtitle: 'طلبات من شي إن', emojiFallback: '🛍️', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },
+  { id: 'shein', label: 'شي ان', subtitle: 'طلبات من شي إن', emojiFallback: '🛍️', defaultMediaPolicy: 'catalog-owned-media', subcategories: [], renderMode: 'manual-order' },
   { id: 'spare_parts', label: 'قطع غيار', subtitle: 'مستلزمات سيارات', emojiFallback: '🔧', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },
   { id: 'honey_dates', label: 'عسل وتمور', subtitle: 'منتجات طبيعية', emojiFallback: '🍯', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },
   { id: 'electronics', label: 'إلكترونيات', subtitle: 'أجهزة واكسسوارات', emojiFallback: '📱', defaultMediaPolicy: 'catalog-owned-media', subcategories: [] },
@@ -147,7 +170,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     mediaPolicy: 'catalog-owned-media',
     approvalStage: 'client-visible',
     surfaces: ['client', 'partner', 'marketing', 'field'],
-    imageUri: 'dsh.product.apple.v1',
+    imageUri: '/dsh/media-fixtures/products/apple.v1.png',
     emojiFallback: '🍎',
   },
   {
@@ -161,7 +184,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     mediaPolicy: 'catalog-owned-media',
     approvalStage: 'client-visible',
     surfaces: ['client', 'partner', 'marketing'],
-    imageUri: 'dsh.product.milk.v1',
+    imageUri: '/dsh/media-fixtures/products/milk.v1.png',
     emojiFallback: '🥛',
   },
   {
@@ -175,8 +198,47 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     mediaPolicy: 'catalog-owned-media',
     approvalStage: 'client-visible',
     surfaces: ['client', 'partner', 'marketing', 'field'],
-    imageUri: 'dsh.product.bread.v1',
+    imageUri: '/dsh/media-fixtures/products/bread.v1.png',
     emojiFallback: '🍞',
+  },
+  {
+    id: 'prd-grocery-yogurt',
+    name: 'زبادي يوناني',
+    sku: 'BTH-GRO-DA-004',
+    measurementUnit: '1 حبة',
+    categoryPath: { main: 'grocery' },
+    price: 8.00,
+    mediaPolicy: 'catalog-owned-media',
+    approvalStage: 'client-visible',
+    surfaces: ['client', 'partner', 'marketing'],
+    imageUri: '/dsh/media-fixtures/products/yogurt.v1.png',
+    emojiFallback: '🥣',
+  },
+  {
+    id: 'prd-grocery-bananas',
+    name: 'موز طازج',
+    sku: 'BTH-GRO-FR-005',
+    measurementUnit: '1 كجم',
+    categoryPath: { main: 'grocery', sub: 'grocery_vegetables_fruits' },
+    price: 12.00,
+    mediaPolicy: 'catalog-owned-media',
+    approvalStage: 'client-visible',
+    surfaces: ['client', 'partner', 'marketing', 'field'],
+    imageUri: '/dsh/media-fixtures/products/bananas.v1.png',
+    emojiFallback: '🍌',
+  },
+  {
+    id: 'prd-bakery-croissant',
+    name: 'كرواسون زبدة',
+    sku: 'BTH-GRO-BK-006',
+    measurementUnit: '1 حبة',
+    categoryPath: { main: 'grocery', sub: 'grocery_bakeries' },
+    price: 9.00,
+    mediaPolicy: 'catalog-owned-media',
+    approvalStage: 'client-visible',
+    surfaces: ['client', 'partner', 'marketing'],
+    imageUri: '/dsh/media-fixtures/products/croissant.v1.png',
+    emojiFallback: '🥐',
   },
   {
     id: 'prd-restaurant-chicken',
@@ -188,11 +250,40 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     mediaPolicy: 'partner-owned-exception',
     approvalStage: 'client-visible',
     surfaces: ['client', 'partner', 'marketing'],
-    imageUri: 'dsh.product.chicken.v1',
+    imageUri: '/dsh/media-fixtures/restaurants/chicken.v1.png',
     emojiFallback: '🍗',
     partnerOverrides: [
       { partnerId: 'store-1003', price: 34.00, preparationTime: '18-22 دقيقة' }
     ]
+  },
+  {
+    id: 'prd-restaurant-pasta',
+    name: 'باستا كريمية',
+    sku: 'BTH-RES-002',
+    measurementUnit: '1 وجبة',
+    categoryPath: { main: 'restaurants' },
+    price: 29.00,
+    mediaPolicy: 'partner-owned-exception',
+    approvalStage: 'client-visible',
+    surfaces: ['client', 'partner', 'marketing'],
+    imageUri: '/dsh/media-fixtures/restaurants/pasta.v1.png',
+    emojiFallback: '🍝',
+    partnerOverrides: [
+      { partnerId: 'store-1003', price: 29.00, preparationTime: '20-25 دقيقة' }
+    ]
+  },
+  {
+    id: 'prd-healthy-salad',
+    name: 'سلطة جاردن',
+    sku: 'BTH-RES-003',
+    measurementUnit: '1 طبق',
+    categoryPath: { main: 'restaurants' },
+    price: 21.00,
+    mediaPolicy: 'partner-owned-exception',
+    approvalStage: 'client-visible',
+    surfaces: ['client', 'partner', 'marketing'],
+    imageUri: '/dsh/media-fixtures/restaurants/salad.v1.png',
+    emojiFallback: '🥗',
   },
   {
     id: 'prd-sweets-cake',
@@ -204,8 +295,22 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     mediaPolicy: 'partner-proposed-review',
     approvalStage: 'marketing-review',
     surfaces: ['partner', 'marketing'],
-    imageUri: 'dsh.product.choco.v1',
+    imageUri: '/dsh/media-fixtures/sweets/choco.v1.png',
     emojiFallback: '🍰',
+  },
+  {
+    id: 'prd-dates-box',
+    name: 'علبة تمر فاخر',
+    sku: 'BTH-DAT-001',
+    gtin: '6280001055001',
+    measurementUnit: '1 علبة',
+    categoryPath: { main: 'honey_dates' },
+    price: 55.00,
+    mediaPolicy: 'catalog-owned-media',
+    approvalStage: 'marketing-review',
+    surfaces: ['partner', 'marketing', 'field'],
+    imageUri: '/dsh/media-fixtures/dates/lead-5.dates-box.v1.png',
+    emojiFallback: '🌴',
   },
   {
     id: 'prd-conflict-oil',
