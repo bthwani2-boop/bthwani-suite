@@ -3,7 +3,7 @@
 import React from 'react';
 import { Box, Button, Surface, Text, Icon } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
-import { dshCatalogMetrics, dshCatalogNodes, dshCatalogPipeline } from './catalog';
+import { dshCatalogMetrics, dshCatalogNodes, dshCatalogPipeline, dshCatalogProducts, DshCatalogProduct } from './catalog';
 import { OperationsSuggestionCard } from '../operations/operations.ui';
 import styles from '../operations/dsh-surface.module.css';
 
@@ -15,6 +15,7 @@ export type ControlPanelDshCatalogScreenProps = {
 };
 
 type CatalogView = 'master' | 'pipeline';
+type CatalogFilter = 'all' | 'categories' | 'master' | 'partner' | 'review' | 'exception' | 'conflict';
 
 export function ControlPanelDshCatalogScreen({
   hubHref = '/operations',
@@ -23,20 +24,35 @@ export function ControlPanelDshCatalogScreen({
   marketingHref = '/marketing',
 }: ControlPanelDshCatalogScreenProps) {
   const [activeTab, setActiveTab] = React.useState<CatalogView>('master');
-  const [selectedNodeId, setSelectedNodeId] = React.useState<string | null>(dshCatalogNodes[0]?.id ?? null);
+  const [activeFilter, setActiveFilter] = React.useState<CatalogFilter>('all');
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [selectedProductId, setSelectedProductId] = React.useState<string | null>(dshCatalogProducts[0]?.id ?? null);
 
-  const selectedNode = dshCatalogNodes.find(n => n.id === selectedNodeId) ?? dshCatalogNodes[0];
+  const selectedProduct = dshCatalogProducts.find(p => p.id === selectedProductId) ?? dshCatalogProducts[0];
+
+  const filteredProducts = dshCatalogProducts.filter(p => {
+    const matchesSearch = p.name.includes(searchQuery) || p.sku.includes(searchQuery);
+    if (!matchesSearch) return false;
+
+    if (activeFilter === 'master') return p.isMaster;
+    if (activeFilter === 'partner') return !p.isMaster;
+    if (activeFilter === 'review') return p.status === 'review';
+    if (activeFilter === 'conflict') return p.status === 'conflict';
+    if (activeFilter === 'exception') return p.mediaPolicy === 'partner-owned-exception';
+    return true;
+  });
 
   const KPIs = [
-    { label: 'طلبات معلقة', value: dshCatalogMetrics.pendingPartnerReviews, trend: '+2', status: 'danger' },
-    { label: 'مراجعة تسويقية', value: dshCatalogMetrics.pendingMarketingReviews, trend: '-1', status: 'warning' },
-    { label: 'الفئات السيادية', value: dshCatalogMetrics.mainCategories, trend: '0', status: 'normal' },
-    { label: 'منتجات نشطة', value: dshCatalogMetrics.approvedProducts, trend: '+12', status: 'normal' },
+    { label: 'المنتجات المركزية', value: dshCatalogMetrics.approvedProducts, trend: '+12', status: 'normal' },
+    { label: 'مراجعة الشركاء', value: dshCatalogMetrics.pendingPartnerReviews, trend: '+2', status: 'danger' },
+    { label: 'تعارضات الأسعار', value: dshCatalogMetrics.priceConflicts, trend: '3', status: 'warning' },
+    { label: 'استثناءات الصور', value: dshCatalogMetrics.imageExceptions, trend: '5', status: 'warning' },
+    { label: 'الفئات النشطة', value: dshCatalogMetrics.mainCategories, trend: '0', status: 'normal' },
   ];
 
   return (
     <div className={styles.operationsCockpit} dir="rtl">
-      {/* 1. Slim Professional Header */}
+      {/* 1. Header */}
       <header className={styles.operationsTopBar}>
         <div className={styles.operationsTitleBlock}>
           <div style={{
@@ -44,8 +60,8 @@ export function ControlPanelDshCatalogScreen({
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px'
           }}>📦</div>
           <div>
-            <h1 style={{ fontSize: '18px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>حوكمة الكتالوجات</h1>
-            <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>النظام السيادي الموحد v2.6</p>
+            <h1 style={{ fontSize: '18px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>Catalog Command Center</h1>
+            <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>حوكمة المنتجات المركزية v3.0 (Simulation)</p>
           </div>
         </div>
 
@@ -62,11 +78,11 @@ export function ControlPanelDshCatalogScreen({
           <button style={{
             padding: '6px 16px', backgroundColor: '#0A2F5C', color: '#fff',
             borderRadius: '8px', border: 'none', fontWeight: 700, fontSize: '13px', cursor: 'pointer'
-          }}>نشر الكتالوج</button>
+          }}>نشر التحديثات</button>
         </div>
       </header>
 
-      {/* 2. Operations-Style Tabs */}
+      {/* 2. Operations Tabs */}
       <nav className={styles.operationsTabs}>
         <button
           className={`${styles.operationsTab} ${activeTab === 'master' ? styles.operationsTabActive : ''}`}
@@ -78,150 +94,207 @@ export function ControlPanelDshCatalogScreen({
         >مسار التوريد</button>
       </nav>
 
-      {/* 3. Main Operational Content */}
+      {/* 3. Main Panel */}
       <main className={styles.operationsMainPanel}>
         <div className={styles.operationsInnerScroll}>
           <div className={styles.operationsCompactSurface}>
 
-            {/* Row 1: Catalog Signals */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-               <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>نبض الكتالوج</h2>
+            {/* Search and Filters */}
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', alignItems: 'center' }}>
+               <div style={{ flex: 1, position: 'relative' }}>
+                 <input
+                   type="text"
+                   placeholder="بحث في آلاف المنتجات (SKU, اسم، فئة)..."
+                   style={{ width: '100%', padding: '10px 16px', borderRadius: '10px', border: '1px solid #E2E8F0', fontSize: '14px' }}
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                 />
+               </div>
+               <div style={{ display: 'flex', gap: '6px' }}>
+                 {(['all', 'master', 'partner', 'review', 'conflict', 'exception'] as CatalogFilter[]).map(f => (
+                   <button
+                     key={f}
+                     onClick={() => setActiveFilter(f)}
+                     style={{
+                       padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 700,
+                       backgroundColor: activeFilter === f ? '#0A2F5C' : '#F8FAFC',
+                       color: activeFilter === f ? '#fff' : '#64748B',
+                       border: '1px solid #E2E8F0'
+                     }}
+                   >
+                     {f === 'all' && 'الكل'}
+                     {f === 'master' && 'مركزي'}
+                     {f === 'partner' && 'شريك'}
+                     {f === 'review' && 'مراجعة'}
+                     {f === 'conflict' && 'تعارض سعر'}
+                     {f === 'exception' && 'استثناء صور'}
+                   </button>
+                 ))}
+               </div>
             </div>
 
-            <div className={styles.operationsSingleRowBlocks}>
-              {KPIs.map((kpi, idx) => (
-                <div
-                  key={idx}
-                  className={styles.operationsSingleRowItem}
-                  style={{ borderTop: `4px solid ${kpi.status === 'danger' ? '#DC2626' : kpi.status === 'warning' ? '#F59E0B' : '#0A2F5C'}` }}
-                >
-                  <div className={styles.operationsCompactCardTitle}>{kpi.label}</div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: kpi.status === 'danger' ? '#DC2626' : '#0A2F5C' }}>{kpi.value}</div>
-                </div>
-              ))}
-            </div>
+            {/* 3-Column Layout */}
+            <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr 380px', gap: '12px', height: 'calc(100vh - 280px)' }}>
 
-            {/* Row 2: Grid Layout */}
-            <div style={{ display: 'grid', gridTemplateColumns: '350px 1fr 350px', gap: '12px' }}>
-
-              {/* Left Panel: Classification Navigator */}
-              <div className={styles.operationsCompactPanel}>
-                <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>هيكل التصنيفات</h3>
+              {/* Column 1: Right (Categories & Policies) */}
+              <div className={styles.operationsCompactPanel} style={{ overflowY: 'auto' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#0A2F5C', marginBottom: '12px' }}>هيكل التصنيفات</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  {dshCatalogNodes.map(node => {
-                    const isActive = node.id === selectedNodeId;
-                    return (
-                      <div
-                        key={node.id}
-                        onClick={() => setSelectedNodeId(node.id)}
-                        style={{
-                          padding: '8px 12px', borderRadius: '8px', cursor: 'pointer',
-                          backgroundColor: isActive ? 'rgba(10,47,92,0.06)' : 'transparent',
-                          border: isActive ? '1px solid rgba(10,47,92,0.1)' : '1px solid transparent',
-                          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                        }}
-                      >
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <span style={{ fontSize: '13px', fontWeight: 700, color: isActive ? '#0A2F5C' : '#64748B' }}>{node.label}</span>
-                          <span style={{ fontSize: '10px', color: '#94A3B8' }}>{node.owner.toUpperCase()}</span>
-                        </div>
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: '#0A2F5C' }}>{node.countLabel}</span>
+                  {dshCatalogNodes.map(node => (
+                    <div key={node.id} style={{ padding: '8px 12px', borderRadius: '8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span>{node.emojiFallback}</span>
+                        <span style={{ fontSize: '13px', fontWeight: 700 }}>{node.label}</span>
                       </div>
-                    );
-                  })}
+                      <span style={{ fontSize: '11px', color: '#94A3B8' }}>{node.countLabel}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ marginTop: '24px', padding: '12px', borderRadius: '12px', backgroundColor: 'rgba(255,80,13,0.05)', border: '1px dashed #FF500D' }}>
+                  <h4 style={{ fontSize: '12px', fontWeight: 800, color: '#FF500D', margin: '0 0 8px 0' }}>سياسة الوسائط (Media Policy)</h4>
+                  <p style={{ fontSize: '11px', color: '#0A2F5C', margin: 0, lineHeight: 1.4 }}>
+                    الافتراضي: <strong>صورة مركزية</strong> من الكتالوج.<br/>
+                    الاستثناء: المطاعم تسمح بصور الشريك بعد مراجعة التسويق.
+                  </p>
+                </div>
+
+                <div style={{ marginTop: '16px' }}>
+                  <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#0A2F5C', marginBottom: '12px' }}>علاقة الأسطح (Surfaces)</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    {[
+                      { l: 'العميل', v: 'المنتج المنشور', i: '📱' },
+                      { l: 'الشريك', v: 'السعر/المخزون', i: '🏪' },
+                      { l: 'التسويق', v: 'حملات ترويجية', i: '📣' },
+                      { l: 'الميداني', v: 'بيانات أولية', i: '📋' },
+                    ].map(s => (
+                      <div key={s.l} style={{ padding: '8px', backgroundColor: '#fff', border: '1px solid #F1F5F9', borderRadius: '8px' }}>
+                        <div style={{ fontSize: '10px', color: '#64748B' }}>{s.i} {s.l}</div>
+                        <div style={{ fontSize: '11px', fontWeight: 800 }}>{s.v}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* Center Panel: Workspace */}
-              <div className={styles.operationsCompactPanel}>
-                {selectedNode && (
+              {/* Column 2: Center (Product List Dense) */}
+              <div className={styles.operationsCompactPanel} style={{ overflowY: 'auto', padding: 0 }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'right' }}>
+                  <thead style={{ position: 'sticky', top: 0, backgroundColor: '#F8FAFC', zIndex: 10 }}>
+                    <tr>
+                      <th style={{ padding: '12px', fontSize: '12px', borderBottom: '1px solid #E2E8F0' }}>المنتج</th>
+                      <th style={{ padding: '12px', fontSize: '12px', borderBottom: '1px solid #E2E8F0' }}>SKU</th>
+                      <th style={{ padding: '12px', fontSize: '12px', borderBottom: '1px solid #E2E8F0' }}>السعر الأساسي</th>
+                      <th style={{ padding: '12px', fontSize: '12px', borderBottom: '1px solid #E2E8F0' }}>الحالة</th>
+                      <th style={{ padding: '12px', fontSize: '12px', borderBottom: '1px solid #E2E8F0' }}>السياسة</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredProducts.map(p => (
+                      <tr
+                        key={p.id}
+                        onClick={() => setSelectedProductId(p.id)}
+                        style={{ cursor: 'pointer', backgroundColor: selectedProductId === p.id ? 'rgba(10,47,92,0.03)' : 'transparent', borderBottom: '1px solid #F1F5F9' }}
+                      >
+                        <td style={{ padding: '10px 12px' }}>
+                          <div style={{ fontWeight: 700, fontSize: '13px' }}>{p.name}</div>
+                          <div style={{ fontSize: '10px', color: '#94A3B8' }}>{p.categoryLabel}</div>
+                        </td>
+                        <td style={{ padding: '10px 12px', fontSize: '11px', color: '#64748B' }}>{p.sku}</td>
+                        <td style={{ padding: '10px 12px', fontSize: '13px', fontWeight: 800 }}>{p.price} ر.س</td>
+                        <td style={{ padding: '10px 12px' }}>
+                          <span style={{
+                            padding: '2px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 800,
+                            backgroundColor: p.status === 'active' ? '#DCFCE7' : p.status === 'conflict' ? '#FEE2E2' : '#FEF3C7',
+                            color: p.status === 'active' ? '#16A34A' : p.status === 'conflict' ? '#DC2626' : '#D97706'
+                          }}>
+                            {p.status === 'active' ? 'نشط' : p.status === 'conflict' ? 'تعارض' : 'مراجعة'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '10px 12px', fontSize: '10px', color: '#0A2F5C' }}>
+                          {p.mediaPolicy === 'catalog-owned-media' ? 'مركزي 🛡️' : 'استثناء 🔓'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Column 3: Left (Inspector) */}
+              <div className={styles.operationsCompactPanel} style={{ borderLeft: 'none', borderRight: '1px solid #E2E8F0', overflowY: 'auto' }}>
+                {selectedProduct ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                           <span style={{ fontSize: '10px', fontWeight: 800, color: '#FF500D', backgroundColor: 'rgba(255,80,13,0.05)', padding: '2px 8px', borderRadius: '4px' }}>{selectedNode.kind === 'main-category' ? 'فئة سيادية' : 'فئة فرعية'}</span>
-                           <span style={{ fontSize: '11px', color: '#94A3B8' }}>ID: {selectedNode.id}</span>
+                      <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>Product Inspector</h2>
+                      <span style={{ fontSize: '10px', color: '#94A3B8' }}>ID: {selectedProduct.id}</span>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center', padding: '12px', borderRadius: '12px', backgroundColor: '#F8FAFC' }}>
+                       <div style={{ width: '60px', height: '60px', backgroundColor: '#E2E8F0', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
+                         {selectedProduct.mediaPolicy === 'catalog-owned-media' ? '📦' : '🥘'}
+                       </div>
+                       <div>
+                         <div style={{ fontSize: '14px', fontWeight: 800 }}>{selectedProduct.name}</div>
+                         <div style={{ fontSize: '12px', color: '#64748B' }}>GTIN: {selectedProduct.gtin || 'N/A'}</div>
+                       </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                       <div style={{ padding: '12px', borderRadius: '8px', border: '1px solid #F1F5F9' }}>
+                         <div style={{ fontSize: '10px', color: '#64748B' }}>Product Master</div>
+                         <div style={{ fontSize: '14px', fontWeight: 800, color: '#0A2F5C' }}>{selectedProduct.price} ر.س</div>
+                       </div>
+                       <div style={{ padding: '12px', borderRadius: '8px', border: '1px solid #F1F5F9', backgroundColor: selectedProduct.partnerOverride ? 'rgba(255,80,13,0.03)' : '#fff' }}>
+                         <div style={{ fontSize: '10px', color: '#64748B' }}>Partner Override</div>
+                         <div style={{ fontSize: '14px', fontWeight: 800, color: '#FF500D' }}>
+                           {selectedProduct.partnerOverride?.price ? `${selectedProduct.partnerOverride.price} ر.س` : 'N/A'}
+                         </div>
+                       </div>
+                    </div>
+
+                    <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#F8FAFC' }}>
+                      <h4 style={{ fontSize: '12px', fontWeight: 800, margin: '0 0 8px 0' }}>Media Ownership Flow</h4>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
+                          <span>المصدر:</span>
+                          <span style={{ fontWeight: 700 }}>{selectedProduct.isMaster ? 'الكتالوج المركزي' : 'إدخال شريك'}</span>
                         </div>
-                        <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>{selectedNode.label}</h2>
-                      </div>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                         <button className={styles.operationsCompactActionSecondary}>سجل التغييرات</button>
-                         <button className={styles.operationsCompactActionPrimary}>إدارة القواعد</button>
-                      </div>
-                    </div>
-
-                    <p style={{ fontSize: '14px', color: '#64748B', lineHeight: 1.6, margin: 0 }}>{selectedNode.summary}</p>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginTop: '8px' }}>
-                      {[
-                        { label: 'سلطة التحكم', value: selectedNode.owner === 'catalog' ? 'الكتالوج المركزي' : 'إدخال خارجي', icon: '🛡️' },
-                        { label: 'مرحلة الاعتماد', value: selectedNode.stage, icon: '🚥' },
-                        { label: 'النزاهة الهيكلية', value: 'تم التحقق', icon: '✓' },
-                        { label: 'المزامنة', value: 'لحظية', icon: '⚡' },
-                      ].map(item => (
-                        <div key={item.label} style={{ padding: '10px', borderRadius: '8px', border: '1px solid rgba(10,47,92,0.05)', backgroundColor: '#F8FAFC' }}>
-                          <div style={{ fontSize: '11px', color: '#64748B', fontWeight: 700 }}>{item.icon} {item.label}</div>
-                          <div style={{ fontSize: '14px', fontWeight: 800, color: '#0A2F5C' }}>{item.value}</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
+                          <span>سياسة العرض:</span>
+                          <span style={{ fontWeight: 700, color: '#0A2F5C' }}>{selectedProduct.mediaPolicy}</span>
                         </div>
-                      ))}
-                    </div>
-
-                    <div style={{ marginTop: '16px' }}>
-                      <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#0A2F5C', marginBottom: '8px' }}>الأصول المرتبطة ({selectedNode.countLabel})</h4>
-                      <div style={{ display: 'grid', gap: '8px' }}>
-                         {[1, 2, 3].map(i => (
-                           <div key={i} className={styles.operationsCompactCard}>
-                             <div className={styles.operationsCompactCardMeta}>
-                               <span className={styles.operationsCompactCardTitle}>منتج نموذجي {i}</span>
-                               <span className={styles.operationsCompactCardText}>SKU: PRD-00{i} • 24.00 ر.س</span>
-                             </div>
-                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                <span className={styles.operationsCompactCardStatus} style={{ backgroundColor: '#DCFCE7', color: '#16A34A' }}>نشط</span>
-                             </div>
-                             <div className={styles.operationsCompactCardActions}>
-                                <button className={styles.operationsCompactActionSecondary}>تحرير</button>
-                             </div>
-                           </div>
-                         ))}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
+                          <span>حالة الصورة:</span>
+                          <span style={{ fontWeight: 700, color: '#16A34A' }}>تم التحقق ✓</span>
+                        </div>
                       </div>
                     </div>
+
+                    <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
+                      <button className={styles.operationsCompactActionPrimary} style={{ flex: 1 }}>تعديل البيانات</button>
+                      <button className={styles.operationsCompactActionSecondary}>سجل التغييرات</button>
+                    </div>
+
+                    <div style={{ marginTop: '12px' }}>
+                      <h3 style={{ fontSize: '13px', fontWeight: 800, color: '#0A2F5C', marginBottom: '8px' }}>تدفق الاعتماد</h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {dshCatalogPipeline.map((step, idx) => {
+                          const isDone = idx < 3; // mock
+                          return (
+                            <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: isDone ? 1 : 0.4 }}>
+                              <div style={{ width: '8px', height: '8px', borderRadius: '4px', backgroundColor: isDone ? '#16A34A' : '#CBD5E1' }} />
+                              <span style={{ fontSize: '11px', fontWeight: 600 }}>{step.title}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#94A3B8', fontSize: '13px' }}>
+                    حدد منتجاً لعرض التفاصيل
                   </div>
                 )}
-              </div>
-
-              {/* Right Panel: Intelligence & Pipeline */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div className={styles.operationsCompactPanel}>
-                  <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>ذكاء الكتالوج (Live)</h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {[
-                      { title: 'تضارب في الأسعار', reason: 'تم اكتشاف 3 حالات شاذة في فئة المقاضي.', confidence: 'high' as const, icon: '⚖️' },
-                      { title: 'تحسين الفئات', reason: 'نقترح دمج فئات المخبوزات والحلويات.', confidence: 'medium' as const, icon: '🧠' },
-                      { title: 'الانتشار التشغيلي', reason: 'زيادة 15% في الطلبات على فئة المطاعم.', confidence: 'high' as const, icon: '📈' },
-                    ].map((insight, i) => (
-                      <OperationsSuggestionCard
-                        key={i}
-                        title={insight.title}
-                        label={insight.icon}
-                        reason={insight.reason}
-                        confidence={insight.confidence}
-                        actions={<button className={styles.operationsCompactActionPrimary} style={{ padding: '2px 8px', fontSize: '10px' }}>اتخاذ إجراء</button>}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className={styles.operationsCompactPanel}>
-                  <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>سجل التدفق السيادي</h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
-                    {dshCatalogPipeline.slice(0, 3).map((step, idx) => (
-                      <div key={idx} style={{ padding: '8px', borderRadius: '6px', border: '1px solid rgba(10,47,92,0.05)', backgroundColor: '#F8FAFC' }}>
-                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#0A2F5C' }}>{step.title}</div>
-                        <div style={{ fontSize: '11px', color: idx === 0 ? '#16A34A' : '#64748B' }}>● {step.statusLabel}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
 
             </div>
@@ -232,6 +305,5 @@ export function ControlPanelDshCatalogScreen({
     </div>
   );
 }
-
 
 export default ControlPanelDshCatalogScreen;

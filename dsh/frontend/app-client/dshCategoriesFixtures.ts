@@ -10,6 +10,7 @@ export type DshCategoryFixture = {
   subtitle: string;
   subcategories: DshCategorySubcategoryFixture[];
   renderMode?: 'stores' | 'manual-order';
+  emojiFallback?: string;
 };
 
 export const dshCategoryFixtures: DshCategoryFixture[] = [
@@ -18,6 +19,7 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
     label: 'المطاعم',
     subtitle: 'طلب الوجبات والمأكولات الجاهزة من المطاعم والكافتيريات',
     subcategories: [],
+    emojiFallback: '🍽️',
   },
   {
     id: 'grocery',
@@ -30,6 +32,7 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
       { id: 'grocery_bakeries', label: 'مخابز', subtitle: 'خبز ومعجنات وخبز يومي' },
       { id: 'grocery_deals_bundle', label: 'باكج عروضات', subtitle: 'سلال مجمعة وعروض موسمية' },
     ],
+    emojiFallback: '🛒',
   },
   {
     id: 'sweets_juices',
@@ -40,6 +43,7 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
       { id: 'sweets_juices_sweets', label: 'حلويات', subtitle: 'تحليات وكعك ومعجنات' },
       { id: 'sweets_juices_icecream', label: 'آيسكريم', subtitle: 'حلويات مجمدة وأحواض' },
     ],
+    emojiFallback: '🧃',
   },
   {
     id: 'anaqati',
@@ -50,24 +54,28 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
       { id: 'anaqati_accessories_beauty', label: 'إكسسوارات وأدوات تجميل', subtitle: 'العناية الشخصية وأدوات الجمال' },
       { id: 'anaqati_clothing', label: 'ملابس', subtitle: 'ملابس وإطلالات يومية' },
     ],
+    emojiFallback: '👗',
   },
   {
     id: 'wani_store',
     label: 'بثواني ستور',
     subtitle: 'متجر شامل للمنتجات المختارة بعناية',
     subcategories: [],
+    emojiFallback: '🏪',
   },
   {
     id: 'home_projects',
     label: 'مشاريع منزلية',
     subtitle: 'منتجات يدوية ومحلية من الأسر المنتجة',
     subcategories: [],
+    emojiFallback: '🏠',
   },
   {
     id: 'cloud_kitchens',
     label: 'مطابخ سحابية',
     subtitle: 'مطابخ مجهزة ووجبات يومية سريعة',
     subcategories: [],
+    emojiFallback: '🍳',
   },
   {
     id: 'awnak',
@@ -75,6 +83,7 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
     subtitle: 'خدمات ومشاوير محلية',
     subcategories: [],
     renderMode: 'manual-order',
+    emojiFallback: '🤝',
   },
   {
     id: 'gas_refill',
@@ -85,6 +94,7 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
       { id: 'gas_refill_repair', label: 'الإصلاح', subtitle: 'صيانة وفحص سلامة' },
       { id: 'gas_refill_buy', label: 'شراء تعبئة', subtitle: 'وحدات جديدة وتبديل' },
     ],
+    emojiFallback: '⛽',
   },
   {
     id: 'shein',
@@ -92,26 +102,31 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
     subtitle: 'طلبات من شي إن (شراء وتوصيل)',
     subcategories: [],
     renderMode: 'manual-order',
+    emojiFallback: '🛍️',
   },
   {
     id: 'spare_parts',
     label: 'قطع غيار',
     subtitle: 'مستلزمات سيارات ودراجات',
     subcategories: [],
+    emojiFallback: '🔧',
   },
   {
     id: 'honey_dates',
     label: 'عسل وتمور',
     subtitle: 'منتجات طبيعية يمنية',
     subcategories: [],
+    emojiFallback: '🍯',
   },
   {
     id: 'electronics',
     label: 'إلكترونيات',
     subtitle: 'أجهزة واكسسوارات إلكترونية',
     subcategories: [],
+    emojiFallback: '📱',
   },
 ];
+
 
 export const dshCategoryListFixtures = dshCategoryFixtures.map((category) => ({
   id: category.id,

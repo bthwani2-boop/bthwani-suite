@@ -94,6 +94,7 @@ export type DshHomeCategory = {
   subtitle?: string;
   countLabel?: string;
   renderMode?: 'stores' | 'manual-order';
+  emojiFallback?: string;
   subcategories?: Array<{
     id: string;
     label: string;
@@ -1132,7 +1133,7 @@ export function DshHomeGetScreen({
       key: category.id,
       title: category.label,
       iconUrl: getDshCategoryIconUrl(category.id),
-      emojiFallback: categoryIconMap[category.id] ?? '📂',
+      emojiFallback: category.emojiFallback ?? categoryIconMap[category.id] ?? '📂',
     }));
   }, [categoryItems]);
 
@@ -1146,7 +1147,7 @@ export function DshHomeGetScreen({
       key: selectedCategoryFixture.id,
       title: selectedCategoryLabel,
       iconUrl: getDshCategoryIconUrl(selectedCategoryFixture.id),
-      emojiFallback: categoryIconMap[selectedCategoryFixture.id] ?? '📂',
+      emojiFallback: selectedCategoryFixture.emojiFallback ?? categoryIconMap[selectedCategoryFixture.id] ?? '📂',
     };
   }, [selectedCategoryFixture, selectedCategoryLabel]);
 
@@ -1474,18 +1475,18 @@ return (
                   }}
                 >
                   {activeHomePromo.imageUrl && (
-                    <Image 
-                      source={resolveDshHomeBannerImageSource(activeHomePromo.imageUrl)} 
-                      style={styles.heroPromoBackground} 
-                      resizeMode="cover" 
+                    <Image
+                      source={resolveDshHomeBannerImageSource(activeHomePromo.imageUrl)}
+                      style={styles.heroPromoBackground}
+                      resizeMode="cover"
                     />
                   )}
                   <View style={styles.heroPromoContent}>
                     {activeHomePromo.thumbnail && (
-                      <Image 
-                        source={resolveDshHomeBannerImageSource(activeHomePromo.thumbnail)} 
-                        style={styles.heroPromoMascot} 
-                        resizeMode="contain" 
+                      <Image
+                        source={resolveDshHomeBannerImageSource(activeHomePromo.thumbnail)}
+                        style={styles.heroPromoMascot}
+                        resizeMode="contain"
                       />
                     )}
                     <View style={styles.heroPromoTextWrap}>

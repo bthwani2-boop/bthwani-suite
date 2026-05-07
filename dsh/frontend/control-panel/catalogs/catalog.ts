@@ -1,5 +1,6 @@
 export type DshCatalogNodeKind = 'main-category' | 'sub-category' | 'approved-product';
 export type DshCatalogApprovalStage = 'catalog-controlled' | 'partner-review' | 'marketing-review' | 'published';
+export type DshMediaPolicy = 'catalog-owned-media' | 'partner-owned-exception' | 'review-required';
 
 export type DshCatalogNode = {
   id: string;
@@ -9,6 +10,27 @@ export type DshCatalogNode = {
   owner: 'catalog' | 'partner' | 'marketing';
   summary: string;
   countLabel: string;
+  iconUrl?: string;
+  emojiFallback?: string;
+};
+
+export type DshCatalogProduct = {
+  id: string;
+  name: string;
+  categoryLabel: string;
+  sku: string;
+  gtin?: string;
+  price: number;
+  oldPrice?: number;
+  status: 'active' | 'review' | 'conflict' | 'draft';
+  mediaPolicy: DshMediaPolicy;
+  isMaster: boolean;
+  partnerOverride?: {
+    price?: number;
+    stock?: number;
+    preparationTime?: string;
+  };
+  imageUri?: string;
 };
 
 export type DshCatalogPipelineStep = {
@@ -32,7 +54,63 @@ export const dshCatalogMetrics = {
   approvedProducts: 28,
   pendingPartnerReviews: 4,
   pendingMarketingReviews: 2,
+  priceConflicts: 3,
+  imageExceptions: 5,
 } as const;
+
+export const dshCatalogProducts: DshCatalogProduct[] = [
+  {
+    id: 'prd-master-001',
+    name: 'أرز بسمتي فاخر 5كجم',
+    categoryLabel: 'المقاضي',
+    sku: 'BTH-GRO-001',
+    gtin: '6281234567890',
+    price: 45.00,
+    status: 'active',
+    mediaPolicy: 'catalog-owned-media',
+    isMaster: true,
+    imageUri: 'catalog/rice-master.jpg',
+  },
+  {
+    id: 'prd-restaurant-001',
+    name: 'مندي دجاج ربع نفر',
+    categoryLabel: 'المطاعم',
+    sku: 'BTH-RES-001',
+    price: 18.00,
+    status: 'active',
+    mediaPolicy: 'partner-owned-exception',
+    isMaster: false,
+    partnerOverride: {
+      price: 20.00,
+      stock: 50,
+      preparationTime: '20 min',
+    },
+    imageUri: 'partner/mandi-custom.jpg',
+  },
+  {
+    id: 'prd-conflict-001',
+    name: 'زيت طبخ 1.5 لتر',
+    categoryLabel: 'المقاضي',
+    sku: 'BTH-GRO-005',
+    price: 15.00,
+    status: 'conflict',
+    mediaPolicy: 'catalog-owned-media',
+    isMaster: true,
+    partnerOverride: {
+      price: 19.50,
+    },
+  },
+  {
+    id: 'prd-review-001',
+    name: 'قهوة مختصة برزيلي 250جم',
+    categoryLabel: 'المقاهي',
+    sku: 'BTH-CAF-002',
+    price: 65.00,
+    status: 'review',
+    mediaPolicy: 'review-required',
+    isMaster: true,
+  },
+];
 
 export const dshCategoryMeasurementPolicies: Readonly<Record<string, DshCatalogMeasurementPolicy>> = {
   fresh: {
@@ -76,6 +154,7 @@ export const dshCatalogNodes: ReadonlyArray<DshCatalogNode> = [
     owner: 'catalog',
     summary: 'فئة رئيسية سيادية تُدار فقط من الكتالوج.',
     countLabel: '6 فروع',
+    emojiFallback: '🍽️',
   },
   {
     id: 'cat-groceries',
@@ -85,6 +164,7 @@ export const dshCatalogNodes: ReadonlyArray<DshCatalogNode> = [
     owner: 'catalog',
     summary: 'الفئات الفرعية تظل تحت الكتالوج حتى لو أُضيفت المنتجات من الحقل.',
     countLabel: '4 فروع',
+    emojiFallback: '🛒',
   },
   {
     id: 'cat-cafes',
@@ -94,6 +174,7 @@ export const dshCatalogNodes: ReadonlyArray<DshCatalogNode> = [
     owner: 'catalog',
     summary: 'تصنيف رئيسي جاهز للمراجعة والتوسعة فقط من لوحة التحكم.',
     countLabel: '3 فروع',
+    emojiFallback: '☕',
   },
   {
     id: 'cat-partner-intake',
@@ -103,6 +184,7 @@ export const dshCatalogNodes: ReadonlyArray<DshCatalogNode> = [
     owner: 'partner',
     summary: 'المنتجات التي وصلت من الشريك وتنتظر اعتماد البوابة الأولى.',
     countLabel: '4 عناصر',
+    emojiFallback: '🤝',
   },
   {
     id: 'cat-marketing-intake',
@@ -112,6 +194,7 @@ export const dshCatalogNodes: ReadonlyArray<DshCatalogNode> = [
     owner: 'marketing',
     summary: 'العناصر التي اجتازت مراجعة الشركاء وتنتظر العرض التسويقي النهائي.',
     countLabel: '2 عنصران',
+    emojiFallback: '📣',
   },
   {
     id: 'cat-published',
@@ -121,6 +204,7 @@ export const dshCatalogNodes: ReadonlyArray<DshCatalogNode> = [
     owner: 'catalog',
     summary: 'كل ما وصل إلى الكتالوج النهائي وظهر لكل الشركاء.',
     countLabel: '28 منتجًا',
+    emojiFallback: '✅',
   },
 ];
 

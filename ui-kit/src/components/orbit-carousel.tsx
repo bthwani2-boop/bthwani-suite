@@ -59,39 +59,47 @@ function OrbitItemCard({ item, isActive }: { item: OrbitCarouselItem; isActive: 
 			style={[
 				styles.itemCard,
 				{
-					backgroundColor: isActive ? theme.brandSurface : theme.surface,
-					borderColor: isActive ? theme.brand : theme.lineStrong,
-					transform: [{ scale: isActive ? 1.12 : 0.95 }],
-					opacity: isActive ? 1 : 0.86,
+					backgroundColor: isActive ? '#FFFFFF' : 'rgba(255, 255, 255, 0.94)',
+					borderColor: isActive ? '#FF500D' : 'rgba(10, 47, 92, 0.1)',
+					borderWidth: isActive ? 3 : 1,
+					transform: [{ scale: isActive ? 1.14 : 1.0 }],
+					opacity: isActive ? 1 : 0.92,
+					shadowColor: isActive ? '#FF500D' : '#000',
+					shadowOpacity: isActive ? 0.2 : 0.05,
 				},
 			]}
 		>
-			{showImage ? (
-				<Image
-					source={{ uri: item.iconUrl ?? undefined }}
-					style={styles.iconSolo}
-					resizeMode="contain"
-					onError={() => setImgFailed(true)}
-				/>
-			) : (
-				<Text role="titleLg" style={styles.iconEmoji}>
-					{item.emojiFallback ?? '📦'}
-				</Text>
-			)}
+			<View style={[styles.iconContainer, isActive && { backgroundColor: 'rgba(255, 80, 13, 0.05)' }]}>
+				{showImage ? (
+					<Image
+						source={{ uri: item.iconUrl ?? undefined }}
+						style={styles.iconSolo}
+						resizeMode="contain"
+						onError={() => setImgFailed(true)}
+					/>
+				) : (
+					<View style={styles.emojiFrame}>
+						<Text role="titleLg" style={styles.iconEmoji}>
+							{item.emojiFallback ?? '📦'}
+						</Text>
+					</View>
+				)}
+			</View>
 			<View
 				style={[
 					styles.itemTitleContainer,
-					{ backgroundColor: isActive ? theme.brandHeaderBackground : theme.brand },
+					{ backgroundColor: isActive ? '#FF500D' : '#0A2F5C' },
 					isActive ? styles.itemTitleContainerActive : null,
 				]}
 			>
-				<Text numberOfLines={2} role="bodySm" tone="inverse" style={[styles.itemTitle, isActive && styles.itemTitleActive]}>
+				<Text numberOfLines={1} role="bodySm" tone="inverse" style={[styles.itemTitle, isActive && styles.itemTitleActive]}>
 					{item.title}
 				</Text>
 			</View>
 		</View>
 	);
 }
+
 
 function OrbitCarouselBase({
 	visible,
@@ -444,51 +452,64 @@ const styles = StyleSheet.create({
 	itemCard: {
 		width: '100%',
 		height: '100%',
-		borderRadius: 20,
+		borderRadius: 24,
 		alignItems: 'center',
-		justifyContent: 'flex-start',
-		paddingHorizontal: 4,
-		paddingTop: 4,
-		paddingBottom: 6,
-		borderWidth: 1,
-		shadowColor: '#000',
-		shadowOpacity: 0.06,
-		shadowRadius: 8,
-		shadowOffset: { width: 0, height: 2 },
-		elevation: 2,
-	},
-	iconSolo: {
-		width: 50,
-		height: 50,
-	},
-	iconEmoji: {
-		fontSize: 30,
-		marginBottom: 2,
-	},
-	itemTitleContainer: {
-		paddingHorizontal: 8,
-		paddingVertical: 5,
-		borderRadius: 16,
-		marginTop: 2,
-		minWidth: 52,
-	},
-	itemTitleContainerActive: {
+		justifyContent: 'center',
+		padding: 2,
 		shadowColor: '#000',
 		shadowOpacity: 0.08,
-		shadowRadius: 4,
+		shadowRadius: 12,
+		shadowOffset: { width: 0, height: 4 },
+		elevation: 3,
+	},
+	iconContainer: {
+		flex: 1,
+		width: '100%',
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: 20,
+	},
+	iconSolo: {
+		width: 48,
+		height: 48,
+	},
+	emojiFrame: {
+		width: 50,
+		height: 50,
+		borderRadius: 16,
+		backgroundColor: 'rgba(10, 47, 92, 0.04)',
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderWidth: 1,
+		borderColor: 'rgba(10, 47, 92, 0.08)',
+	},
+	iconEmoji: {
+		fontSize: 28,
+	},
+	itemTitleContainer: {
+		paddingHorizontal: 10,
+		paddingVertical: 4,
+		borderRadius: 12,
+		marginBottom: 4,
+		minWidth: 64,
+		maxWidth: '92%',
+	},
+	itemTitleContainerActive: {
+		shadowColor: '#FF500D',
+		shadowOpacity: 0.25,
+		shadowRadius: 6,
 		shadowOffset: { width: 0, height: 2 },
-		elevation: 1,
+		elevation: 4,
 	},
 	itemTitle: {
 		fontSize: 10,
-		lineHeight: 13,
-		fontWeight: '700',
+		lineHeight: 12,
+		fontWeight: '800',
 		color: '#FFFFFF',
 		textAlign: 'center',
 	},
 	itemTitleActive: {
 		color: '#FFFFFF',
+		fontSize: 11,
 	},
 });
-
-
