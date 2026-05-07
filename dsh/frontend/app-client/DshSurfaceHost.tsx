@@ -359,6 +359,8 @@ const defaultTrackingOrderId = initialOrders[0]?.id ?? 'dsh-10021';
 
 function commandTargetToRoute(target: DshCommandTarget): DshRoute {
   switch (target) {
+    case 'home':
+      return 'home';
     case 'cart-get':
       return 'cart-get';
     case 'orders-list':
@@ -370,7 +372,7 @@ function commandTargetToRoute(target: DshCommandTarget): DshRoute {
     case 'create-order':
       return 'cart-get';
     default:
-      return 'orders-list';
+      return 'home';
   }
 }
 

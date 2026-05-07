@@ -1149,14 +1149,20 @@ return (
               </View>
 
               {activePromo && (
-                <Pressable style={[styles.heroPromoCard, styles.heroPromoCardInline]} onPress={openInlineSearch}>
+                <Pressable
+                  style={[
+                    styles.heroPromoCard,
+                    styles.heroPromoCardInline,
+                    activePromo.accentColor ? { backgroundColor: activePromo.accentColor } : null,
+                  ]}
+                  onPress={openInlineSearch}
+                >
                   <View style={styles.heroPromoContent}>
                     <View style={styles.heroPromoIconWrap}>
                       <Text role="titleLg" style={styles.heroIcon}>
                         {activePromo.icon}
                       </Text>
                     </View>
-
                     <View style={styles.heroPromoTextWrap}>
                       <View style={styles.heroPromoBadge}>
                         <Text role="bodySm" style={styles.heroPromoBadgeText}>
@@ -1164,10 +1170,10 @@ return (
                         </Text>
                       </View>
                       <Text role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
-                        {promoDiscount}
+                        {promoDiscount || activePromo.subtitle.slice(0, 15)}
                       </Text>
                       <Text role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
-                        {promoTail || 'على أول طلب'}
+                        {promoTail || activePromo.subtitle.slice(15) || 'المزيد من التفاصيل'}
                       </Text>
                     </View>
                   </View>
@@ -1711,5 +1717,3 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
 }
 
 export default DshHomeGetScreen;
-
-
