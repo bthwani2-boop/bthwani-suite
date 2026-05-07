@@ -40,6 +40,7 @@ import {
 } from '../shared/growth-store';
 import { getDshClientStateMeta, type DshClientState } from './dshClientStateModel';
 // checkout and tracking routes are consolidated in checkoutTracking
+import { getPublishedHomePromos } from '../shared/promo-store';
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './dshCategoriesFixtures';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 
@@ -221,32 +222,7 @@ function getProductCanonicalMetadata(storeId: string, productId: string): HostCa
 }
 
 function resolvePublishedHomePromos() {
-  const applyPublishingRules = (promos: DshHomeGetPromo[]) => promos.filter((promo) => {
-    if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
-      return promo.actionTarget ? publishedPromoCategoryIds.has(promo.actionTarget) : false;
-    }
-
-    if (promo.actionType === 'store') {
-      return hasStoreTarget(promo.actionTarget);
-    }
-
-    if (promo.actionType === 'store_category') {
-      return hasStoreCategoryTarget(promo.actionTarget, promo.actionExtra);
-    }
-
-    if (promo.actionType === 'product') {
-      return hasProductTarget(promo.actionExtra, promo.actionTarget);
-    }
-
-    return true;
-  });
-
-  const marketingPromos = applyPublishingRules(getPublishedMarketingHomePromos('all') as DshHomeGetPromo[]);
-  if (marketingPromos.length > 0) {
-    return marketingPromos;
-  }
-
-  return applyPublishingRules(dshHomeGetFixturePromos as DshHomeGetPromo[]);
+  return getPublishedHomePromos();
 }
 
 const initialCreateOrderValues: CreateOrderValues = {
@@ -947,7 +923,8 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   return (
     <DshHomeGetScreen
       categories={dshCategoryListFixtures}
-      promos={resolvePublishedHomePromos() as DshHomeGetPromo[]}
+      promos={getPublishedMarketingHomePromos('all') as DshHomeGetPromo[]}
+      homePromos={getPublishedHomePromos()}
       approvedVideoShorts={liveMarketingShorts}
       stores={dshHomeGetFixtureStores as DshHomeGetStore[]}
       recentOrders={[

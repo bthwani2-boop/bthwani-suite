@@ -37,6 +37,7 @@ import { getDshCategoryIconUrl } from './getDshCategoryIconUrl';
 import { resolveDshImageSource } from './resolve-image-source';
 import type { MarketingGrowthRecord } from '../shared/growth-store';
 import { getMarketingTickerItems, buildMarketingTickerPlan } from '../shared/news-ticker-store';
+import { getPublishedHomePromos, type HomePromoRecord } from '../shared/promo-store';
 
 function resolveDshHomeStoreImageSource(imageUri?: string): ImageSourcePropType | undefined {
   return resolveDshImageSource(imageUri);
@@ -53,6 +54,7 @@ export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
   categories?: DshHomeCategory[];
   promos?: DshHomeGetPromo[];
+  homePromos?: HomePromoRecord[];
   stores?: DshHomeGetStore[];
   recentOrders?: DshHomeRecentOrder[];
   approvedVideoShorts?: MarketingGrowthRecord[];
@@ -551,6 +553,7 @@ export function DshHomeGetScreen({
   renderApprovedVideoReelsViewer,
   onRetry,
   onOpenEntry,
+  homePromos,
 }: DshHomeGetScreenProps) {
   const { direction, language: resolvedLanguage } = useDirection();
   const currentLanguage = resolvedLanguage ?? 'ar';
@@ -587,6 +590,7 @@ export function DshHomeGetScreen({
 
   const resolvedCategories = categories ?? [];
   const resolvedPromos = promos ?? [];
+  const resolvedHomePromos = homePromos ?? getPublishedHomePromos();
 
   const containerWidth = viewportWidth;
   const sidePeek = Math.max(spacing[1], Math.min(spacing[4], Math.round(containerWidth * 0.045)));
@@ -956,6 +960,7 @@ export function DshHomeGetScreen({
   );
 
   const activePromo = currentBannerPromo;
+  const activeHomePromo = resolvedHomePromos[0] ?? null;
   const promoDiscount = activePromo?.subtitle.match(/\d+%/)?.[0] ?? '';
   const promoTail = activePromo ? activePromo.subtitle.replace(promoDiscount, '').trim() : '';
   const tickerAction = activePromo ? resolveBannerPress(activePromo) : undefined;
@@ -1452,33 +1457,49 @@ return (
                 )}
               </View>
 
-              {activePromo && (
+              {activeHomePromo && (
                 <Pressable
-                  style={[
-                    styles.heroPromoCard,
-                    styles.heroPromoCardInline,
-                    activePromo.accentColor ? { backgroundColor: activePromo.accentColor } : null,
-                  ]}
-                  onPress={openInlineSearch}
+                  style={styles.heroPromoCard}
+                  onPress={() => {
+                    const promo = activeHomePromo;
+                    const mockPromo: DshHomeGetPromo = {
+                      id: promo.id,
+                      title: promo.title,
+                      subtitle: promo.subtitle,
+                      icon: '✨',
+                      actionType: (promo.targetType === 'category' ? 'main_category' : promo.targetType) as any,
+                      actionTarget: promo.targetId,
+                    };
+                    resolveBannerPress(mockPromo)();
+                  }}
                 >
+                  {activeHomePromo.imageUrl && (
+                    <Image 
+                      source={resolveDshHomeBannerImageSource(activeHomePromo.imageUrl)} 
+                      style={styles.heroPromoBackground} 
+                      resizeMode="cover" 
+                    />
+                  )}
                   <View style={styles.heroPromoContent}>
-                    <View style={styles.heroPromoIconWrap}>
-                      <Text role="titleLg" style={styles.heroIcon}>
-                        {activePromo.icon}
+                    {activeHomePromo.thumbnail && (
+                      <Image 
+                        source={resolveDshHomeBannerImageSource(activeHomePromo.thumbnail)} 
+                        style={styles.heroPromoMascot} 
+                        resizeMode="contain" 
+                      />
+                    )}
+                    <View style={styles.heroPromoTextWrap}>
+                      <Text style={styles.heroPromoTitle} numberOfLines={1}>
+                        {activeHomePromo.title}
                       </Text>
-                    </View>
-                        <View style={styles.heroPromoTextWrap}>
-                          <View style={styles.heroPromoBadge}>
-                            <Text role="bodySm" style={styles.heroPromoBadgeText}>
-                              {activePromo.title}
+                      <Text style={styles.heroPromoSubtitle} numberOfLines={1}>
+                        {activeHomePromo.subtitle}
+                      </Text>
+                      {activeHomePromo.ctaText && (
+                        <Text style={styles.heroPromoCtaLink}>
+                          {activeHomePromo.ctaText}
                         </Text>
-                      </View>
-                      <Text role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
-                        {promoDiscount || activePromo.subtitle.slice(0, 15)}
-                      </Text>
-                      <Text role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
-                        {promoTail || activePromo.subtitle.slice(15) || 'المزيد من التفاصيل'}
-                      </Text>
+                      )}
                     </View>
                   </View>
                 </Pressable>
@@ -1996,63 +2017,70 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       paddingVertical: 2,
     },
     heroPromoCard: {
-      flex: 1,
-      height: 80,
-      borderRadius: 20,
-      backgroundColor: theme.brandStrong, // Premium Deep Blue
-      padding: 12,
+      flex: 1.2,
+      height: 70, // Further reduced height
+      borderRadius: 12,
+      backgroundColor: colorPalette.white,
+      borderWidth: 1,
+      borderColor: 'rgba(10, 47, 92, 0.12)',
+      paddingHorizontal: 12,
       justifyContent: 'center',
       shadowColor: colorPalette.black,
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      elevation: 4,
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2,
+      marginRight: 8,
+      overflow: 'hidden',
     },
-    heroPromoCardInline: {
-      maxWidth: 180,
+    heroPromoBackground: {
+      ...StyleSheet.absoluteFillObject,
+      width: '100%',
+      height: '100%',
+      opacity: 0.35, // Increased visibility for templates
     },
     heroPromoContent: {
-      flexDirection: rowDirection,
+      flexDirection: 'row',
       alignItems: 'center',
-      gap: 10,
+      gap: 12,
+      zIndex: 2, // Ensure content stays on top of background
     },
-    heroPromoIconWrap: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      backgroundColor: 'rgba(255, 255, 255, 0.15)',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    heroIcon: {
-      fontSize: 24,
+    heroPromoMascot: {
+      width: 45,
+      height: 55,
     },
     heroPromoTextWrap: {
       flex: 1,
-      gap: 1,
-    },
-    heroPromoBadge: {
-      alignSelf: 'flex-start',
-      paddingHorizontal: 6,
-      paddingVertical: 1,
-      borderRadius: 4,
-      backgroundColor: theme.brand,
-      marginBottom: 2,
-    },
-    heroPromoBadgeText: {
-      color: colorPalette.white,
-      fontWeight: '900',
-      fontSize: 9,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingLeft: 4,
     },
     heroPromoTitle: {
-      color: colorPalette.white,
+      color: '#0A2F5C',
       fontWeight: '900',
-      fontSize: 15,
+      fontSize: 14, // Scaled for 70px
       lineHeight: 18,
+      textAlign: 'center',
+      textShadowColor: 'rgba(255,255,255,0.9)',
+      textShadowOffset: { width: 0, height: 1 },
+      shadowRadius: 2,
     },
     heroPromoSubtitle: {
-      color: 'rgba(255, 255, 255, 0.85)',
+      color: '#FF500D',
+      fontSize: 11,
+      fontWeight: '800',
+      marginTop: -1,
+      textAlign: 'center',
+      textShadowColor: 'rgba(255,255,255,0.9)',
+      textShadowOffset: { width: 0, height: 1 },
+      shadowRadius: 2,
+    },
+    heroPromoCtaLink: {
+      color: '#0A2F5C',
       fontSize: 10,
-      fontWeight: '700',
+      fontWeight: '900',
+      marginTop: 1,
+      textDecorationLine: 'underline',
+      textAlign: 'center',
     },
     heroPagerRow: {
       marginTop: 4,

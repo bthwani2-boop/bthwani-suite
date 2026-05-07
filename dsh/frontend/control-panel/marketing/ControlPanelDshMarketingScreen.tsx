@@ -8,6 +8,7 @@ import {
 } from './SmartSignalLayerScreen';
 import { BannersCommandDeckScreen } from './BannersCommandDeckScreen';
 import { GrowthCommandDeckScreen } from './GrowthCommandDeckScreen';
+import { PromosCommandDeckScreen } from './PromosCommandDeckScreen';
 import styles from '../operations/dsh-surface.module.css';
 import {
   getMarketingTickerItems,
@@ -39,7 +40,7 @@ import { dshPromotionCandidates } from '../../shared/workflow';
 
 export type ControlPanelDshMarketingScreenProps = SmartSignalLayerScreenProps;
 
-type MarketingControlView = 'ticker' | 'banners' | 'growth' | 'partners' | 'signals' | 'loyalty';
+type MarketingControlView = 'ticker' | 'banners' | 'promos' | 'growth' | 'partners' | 'signals' | 'loyalty';
 
 export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingScreenProps) {
   const [activeTab, setActiveTab] = React.useState<MarketingControlView>('banners');
@@ -70,6 +71,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   const PRIMARY_TABS = [
     { id: 'ticker', label: 'الشريط الذكي', icon: '📢' },
     { id: 'banners', label: 'البنرات والكارسول', icon: '🖼️' },
+    { id: 'promos', label: 'بروموهات Home', icon: '📱' },
     { id: 'growth', label: 'الفيديو والنمو', icon: '⚡' },
     { id: 'partners', label: 'عروض الشركاء', icon: '🤝' },
     { id: 'loyalty', label: 'الولاء الذكي', icon: '💎' },
@@ -79,6 +81,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   const SECONDARY_TABS: Record<MarketingControlView, { id: string; label: string }[]> = {
     ticker: [],
     banners: [],
+    promos: [],
     growth: [
       { id: 'programs', label: 'البرامج' },
       { id: 'video', label: 'الفيديو' },
@@ -457,6 +460,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       }
       case 'banners':
         return <BannersCommandDeckScreen activeSubTab={activeSubTab} hubHref={props.hubHref} operationsHref={props.operationsHref} />;
+      case 'promos':
+        return <PromosCommandDeckScreen />;
       case 'growth':
         return <GrowthCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
       case 'signals':
