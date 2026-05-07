@@ -682,17 +682,19 @@ export function DshHomeGetScreen({
     [categoryItems]
   );
 
+  const [isCarouselPaused, setIsCarouselPaused] = React.useState(false);
+
   React.useEffect(() => {
-    if (resolvedPromos.length <= 1) {
+    if (resolvedPromos.length <= 1 || isCarouselPaused) {
       return;
     }
 
     const interval = setInterval(() => {
       setActivePromoIndex((current) => (current + 1) % resolvedPromos.length);
-    }, 3800);
+    }, 4500);
 
     return () => clearInterval(interval);
-  }, [resolvedPromos]);
+  }, [resolvedPromos, isCarouselPaused]);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -928,7 +930,7 @@ export function DshHomeGetScreen({
     id: promo.id,
     title: promo.title,
     subtitle: promo.subtitle,
-    image: resolveDshHomeBannerImageSource(promo.mediaKey ?? promo.imageUrl),
+    image: resolveDshHomeBannerImageSource(promo.imageUrl ?? promo.mediaKey),
     imageUrl: promo.imageUrl ?? promo.mediaKey,
     accentColor: promo.accentColor,
     onPress: resolveBannerPress(promo),
@@ -1121,13 +1123,41 @@ return (
             </Text>
           </Surface>
         ) : bannerItems.length ? (
-          <BannerCarousel
-            banners={bannerItems}
-            height={230}
-            variant="secondary"
-            width={viewportWidth}
-            style={styles.bannerCarouselFullBleed}
-          />
+          <View style={{ position: 'relative' }}>
+            <BannerCarousel
+              banners={bannerItems}
+              height={245}
+              variant="secondary"
+              width={viewportWidth}
+              itemWidth={viewportWidth - 48}
+              sidePeeking={20}
+              gap={12}
+              activeStep={activePromoIndex}
+              onStepChange={setActivePromoIndex}
+              style={styles.bannerCarouselFullBleed}
+            />
+            {bannerItems.length > 1 && (
+              <Pressable
+                style={styles.carouselPauseBtn}
+                onPress={() => setIsCarouselPaused(!isCarouselPaused)}
+              >
+                <Text style={styles.carouselPauseText}>
+                  {isCarouselPaused ? '▶️' : '⏸️'}
+                </Text>
+              </Pressable>
+            )}
+            <View style={styles.carouselIndicatorRow}>
+              {bannerItems.map((_, i) => (
+                <View
+                  key={i}
+                  style={[
+                    styles.carouselIndicator,
+                    i === activePromoIndex && styles.carouselIndicatorActive,
+                  ]}
+                />
+              ))}
+            </View>
+          </View>
         ) : null}
 
         <View style={styles.homeHighlightsPanel}>
@@ -1471,8 +1501,42 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     bannerCarouselFullBleed: {
       marginHorizontal: -spacing[3],
       marginTop: -spacing[2],
-      marginBottom: -spacing[1], // Reduce gap below
-      overflow: 'visible', // Prevent clipping
+      marginBottom: spacing[0],
+      overflow: 'visible',
+    },
+    carouselPauseBtn: {
+      position: 'absolute',
+      top: 10,
+      right: 24,
+      backgroundColor: 'rgba(0,0,0,0.3)',
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 10,
+    },
+    carouselPauseText: {
+      fontSize: 12,
+    },
+    carouselIndicatorRow: {
+      position: 'absolute',
+      bottom: 20,
+      left: 0,
+      right: 0,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: 6,
+    },
+    carouselIndicator: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: 'rgba(255,255,255,0.4)',
+    },
+    carouselIndicatorActive: {
+      width: 16,
+      backgroundColor: colorPalette.white,
     },
     homeHighlightsPanel: {
       marginTop: spacing[0],

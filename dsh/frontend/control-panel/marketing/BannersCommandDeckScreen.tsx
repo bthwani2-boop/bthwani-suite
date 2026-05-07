@@ -210,7 +210,7 @@ export function BannersCommandDeckScreen({ activeSubTab = 'all' }: BannersComman
     if (activeSubTab === 'preview') {
       return (
         <Surface tone="inset" gap={4} style={{ padding: 32, alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 24 }}>
-          <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>معاينة تجربة العميل (Mobile Experience)</Text>
+          <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>معاينة تجربة الهاتف</Text>
           <View style={{ width: 320, height: 600, backgroundColor: '#fff', borderRadius: 40, borderWidth: 8, borderColor: '#334155', position: 'relative', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
              {/* Mock App Header */}
              <div style={{ height: 100, backgroundColor: '#0A2F5C', padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
@@ -238,11 +238,11 @@ export function BannersCommandDeckScreen({ activeSubTab = 'all' }: BannersComman
                   )}
                   <div style={{ position: 'relative', zIndex: 1 }}>
                     <div style={{ display: 'inline-block', backgroundColor: 'rgba(255,255,255,0.2)', padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: '800', marginBottom: 4 }}>
-                      {draft.title || 'PROMO'}
+                      {draft.title || 'عرض'}
                     </div>
                     <Text role="titleSm" style={{ color: '#fff', fontWeight: '900', fontSize: 18 }}>{draft.subtitle || 'أضف وصفاً جذاباً للبنر هنا'}</Text>
                     <div style={{ marginTop: 8, backgroundColor: '#fff', color: draft.accentColor || '#f97316', padding: '4px 12px', borderRadius: 99, alignSelf: 'flex-start', fontSize: 10, fontWeight: '900' }}>
-                      {draft.ctaLabel}
+                      {draft.ctaLabel || 'اكتشف الآن'}
                     </div>
                   </div>
                 </div>
@@ -257,7 +257,7 @@ export function BannersCommandDeckScreen({ activeSubTab = 'all' }: BannersComman
              </Box>
           </View>
           <div style={{ marginTop: 20, textAlign: 'center' }}>
-            <Text role="caption" tone="muted">هذه المعاينة تقريبية وتعتمد على قياسات شاشة iPhone 13.</Text>
+            <Text role="caption" tone="muted">هذه المعاينة تقريبية وتعتمد على قياسات شاشة الجوال القياسية.</Text>
           </div>
         </Surface>
       );
@@ -268,12 +268,12 @@ export function BannersCommandDeckScreen({ activeSubTab = 'all' }: BannersComman
         <Box gap={4}>
           <Surface tone="raised" gap={6} style={{ padding: 32, borderRadius: 20 }}>
             <Box gap={1}>
-              <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>ضبط استهداف الجمهور (Audience)</Text>
+              <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>ضبط استهداف الجمهور</Text>
               <Text role="caption" tone="muted">حدد من يمكنه رؤية هذا البنر في التطبيق.</Text>
             </Box>
             <Box gap={4}>
               <Box gap={2}>
-                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>الجمهور المستهدف</label>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>الجمهور المشمول بالعرض</label>
                 <Tabs<MarketingBannerAudience>
                   items={[
                     { value: 'all', label: 'الجميع' },
@@ -330,7 +330,7 @@ export function BannersCommandDeckScreen({ activeSubTab = 'all' }: BannersComman
               <div style={{ width: 120, height: 120, borderRadius: 60, border: `8px solid ${quality >= 80 ? '#16a34a' : '#f97316'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', boxShadow: '0 10px 20px rgba(0,0,0,0.05)' }}>
                 <Text role="titleLg" style={{ fontSize: 32, fontWeight: '900', color: quality >= 80 ? '#16a34a' : '#f97316' }}>{quality}%</Text>
               </div>
-              <Text role="titleSm" style={{ marginTop: 12, fontWeight: '800' }}>مؤشر جودة المحتوى</Text>
+              <Text role="titleSm" style={{ marginTop: 12, fontWeight: '800' }}>مؤشر الجودة</Text>
             </Box>
 
             <Box gap={3} style={{ width: '100%', maxWidth: 500 }}>
@@ -374,11 +374,11 @@ export function BannersCommandDeckScreen({ activeSubTab = 'all' }: BannersComman
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
                           <span style={{ fontSize: 10, color: '#64748B' }}>{bannerActionTypeLabel(item.actionType)}</span>
                           <span style={{ width: 3, height: 3, borderRadius: 2, backgroundColor: '#CBD5E1' }} />
-                          <span style={{ fontSize: 10, color: '#64748B' }}>{item.clicks} Clicks</span>
+                          <span style={{ fontSize: 10, color: '#64748B' }}>{item.clicks} نقرة</span>
                         </div>
                       </View>
                       <div style={{ backgroundColor: item.status === 'published' ? '#DCFCE7' : '#F1F5F9', padding: '3px 8px', borderRadius: 6 }}>
-                        <Text role="caption" style={{ fontWeight: '900', fontSize: 9, color: item.status === 'published' ? '#16A34A' : '#64748B' }}>{item.status.toUpperCase()}</Text>
+                        <Text role="caption" style={{ fontWeight: '900', fontSize: 9, color: item.status === 'published' ? '#16A34A' : '#64748B' }}>{item.status === 'published' ? 'منشور' : 'مسودة'}</Text>
                       </div>
                     </View>
                   </Pressable>
@@ -392,8 +392,8 @@ export function BannersCommandDeckScreen({ activeSubTab = 'all' }: BannersComman
           <Surface tone="raised" gap={4} style={{ borderRadius: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box gap={0}>
-                <Text role="titleSm" style={{ fontWeight: '900' }}>محرر البنر (Editor)</Text>
-                <Text role="caption" tone="muted">معرّف البنر: {draft.id || 'جديد'}</Text>
+                <Text role="titleSm" style={{ fontWeight: '900' }}>تعديل بيانات البنر</Text>
+                <Text role="caption" tone="muted">المعرّف الفرعي: {draft.id || 'جديد'}</Text>
               </Box>
               <div style={{ display: 'flex', gap: 8 }}>
                 <Button label="تكرار" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(selected!)} />
@@ -419,14 +419,14 @@ export function BannersCommandDeckScreen({ activeSubTab = 'all' }: BannersComman
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0' }}>
                  <Box gap={1}>
                     <Text role="bodySm" style={{ fontWeight: '800' }}>حالة النشر</Text>
-                    <Text role="caption" tone="muted">{draft.status === 'published' ? 'البنر متاح حالياً للعملاء المستهدفين' : 'البنر في وضع المسودة ولن يظهر للعملاء'}</Text>
+                    <Text role="caption" tone="muted">{draft.status === 'published' ? 'البنر متاح حالياً للعملاء' : 'البنر في وضع المسودة'}</Text>
                  </Box>
-                 <Tabs<MarketingBannerStatus>
+                  <Tabs<MarketingBannerStatus>
                     items={[{ value: 'draft', label: 'مسودة' }, { value: 'published', label: 'نشر مباشر' }]}
                     value={draft.status}
-                    onValueChange={(v) => setDraft(c => ({ ...current, status: v }))}
+                    onValueChange={(v) => setDraft(c => ({ ...c, status: v }))}
                     variant="pill"
-                 />
+                  />
               </div>
 
               <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
@@ -444,7 +444,7 @@ export function BannersCommandDeckScreen({ activeSubTab = 'all' }: BannersComman
       <Surface tone="raised" gap={4} style={{ borderRadius: 24, borderWidth: 1, borderColor: 'rgba(10,47,92,0.05)', overflow: 'hidden' }}>
         <View style={[styles.headerRow, isRtl && styles.rowReverse, { padding: 4 }]}>
           <Box gap={1}>
-            <Text role="caption" style={{ color: '#FF500D', fontWeight: '800', letterSpacing: 1 }}>BANNER CAROUSEL STUDIO</Text>
+            <Text role="caption" style={{ color: '#FF500D', fontWeight: '800', letterSpacing: 1 }}>استوديو البنرات والكارسول</Text>
             <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', color: '#0A2F5C' }}>إدارة الحملات والبنرات</Text>
           </Box>
           <div style={{ display: 'flex', gap: 12 }}>
