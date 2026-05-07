@@ -1130,41 +1130,111 @@ return (
                 : 'ابدأ بكتابة اسم متجر أو خدمة أو فئة، وستظهر النتائج مباشرة في نفس الصفحة.'}
             </Text>
           </Surface>
-        ) : bannerItems.length ? (
-          <View style={{ position: 'relative' }}>
-            <BannerCarousel
-              banners={bannerItems}
-              height={180}
-              variant="secondary"
-              width={viewportWidth}
-              itemWidth={viewportWidth - 32}
-              sidePeeking={8}
-              gap={12}
-              activeStep={activePromoIndex}
-              onStepChange={setActivePromoIndex}
-              style={styles.bannerCarouselFullBleed}
-            />
-            {bannerItems.length > 1 && (
-              <Pressable
-                style={styles.carouselPauseBtn}
-                onPress={() => setIsCarouselPaused(!isCarouselPaused)}
-              >
-                <Text style={styles.carouselPauseText}>
-                  {isCarouselPaused ? 'تشغيل ▶️' : 'إيقاف ⏸️'}
-                </Text>
-              </Pressable>
-            )}
-            <View style={styles.carouselIndicatorRow}>
-              {bannerItems.map((_, i) => (
-                <View
-                  key={i}
-                  style={[
-                    styles.carouselIndicator,
-                    i === activePromoIndex && styles.carouselIndicatorActive,
-                  ]}
-                />
-              ))}
-            </View>
+        ) : resolvedPromos.length ? (
+          <View style={styles.premiumBannerSection}>
+             <ScrollView
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onScroll={(e) => {
+                  const x = e.nativeEvent.contentOffset.x;
+                  const itemWidth = viewportWidth - spacing[4]; // Approximate width with padding
+                  const index = Math.round(x / itemWidth);
+                  if (index !== activePromoIndex && index >= 0 && index < resolvedPromos.length) {
+                    setActivePromoIndex(index);
+                  }
+                }}
+                scrollEventThrottle={16}
+                decelerationRate="fast"
+                snapToInterval={viewportWidth - spacing[4]}
+                snapToAlignment="center"
+                contentContainerStyle={styles.premiumBannerScrollContent}
+             >
+               {resolvedPromos.map((promo, index) => {
+                  const isActive = index === activePromoIndex;
+                  return (
+                    <Pressable
+                      key={promo.id || index}
+                      onPress={resolveBannerPress(promo)}
+                      style={[
+                        styles.premiumBannerCard,
+                        { width: viewportWidth - spacing[8] },
+                        isActive && styles.premiumBannerCardActive
+                      ]}
+                    >
+                      <View style={styles.premiumBannerImageWrap}>
+                        <Image
+                          source={resolveDshHomeBannerImageSource(promo.imageUrl)}
+                          style={styles.premiumBannerImage}
+                          resizeMode={promo.imageFit || 'cover'}
+                        />
+                        <View style={[styles.premiumBannerOverlay, { backgroundColor: promo.accentColor ? `${promo.accentColor}33` : 'rgba(0,0,0,0.1)' }]} />
+
+                        {promo.partnerLogoUrl && (
+                          <View style={[
+                            styles.premiumBannerLogoWrap,
+                            promo.partnerLogoPosition === 'top-right' ? { right: 16 } : { left: 16 }
+                          ]}>
+                            <Image source={{ uri: promo.partnerLogoUrl }} style={styles.premiumBannerLogo} resizeMode="contain" />
+                          </View>
+                        )}
+
+                        {promo.offerBadgeText && (
+                          <View style={[
+                            styles.premiumBannerBadge,
+                            { backgroundColor: promo.offerBadgeColor || colorPalette.brandStrong },
+                            promo.offerBadgePosition === 'top-left' ? { left: 16 } : { right: 16 }
+                          ]}>
+                            <Text style={styles.premiumBannerBadgeText}>{promo.offerBadgeText}</Text>
+                          </View>
+                        )}
+
+                        <View style={[
+                          styles.premiumBannerContent,
+                          promo.titlePlacement === 'center' ? { justifyContent: 'center' } : { justifyContent: 'flex-end' }
+                        ]}>
+                          <Box gap={1}>
+                             <Text style={styles.premiumBannerTitle}>{promo.title}</Text>
+                             <Text style={styles.premiumBannerSubtitle} numberOfLines={2}>{promo.subtitle}</Text>
+                          </Box>
+
+                          <View style={[styles.premiumBannerCta, { backgroundColor: colorPalette.white }]}>
+                            <Text style={[styles.premiumBannerCtaText, { color: promo.accentColor || colorPalette.brand }]}>
+                              {promo.ctaLabel || 'اكتشف الآن'}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </Pressable>
+                  );
+               })}
+             </ScrollView>
+
+             <View style={styles.premiumCarouselControls}>
+                <View style={styles.premiumIndicatorRow}>
+                  {resolvedPromos.map((_, i) => (
+                    <View
+                      key={i}
+                      style={[
+                        styles.premiumIndicator,
+                        i === activePromoIndex && styles.premiumIndicatorActive,
+                      ]}
+                    />
+                  ))}
+                </View>
+                {resolvedPromos.length > 1 && (
+                  <Pressable
+                    style={styles.premiumPauseBtn}
+                    onPress={() => setIsCarouselPaused(!isCarouselPaused)}
+                  >
+                    <Ionicons
+                      name={isCarouselPaused ? 'play-circle' : 'pause-circle'}
+                      size={20}
+                      color={colorPalette.white}
+                    />
+                  </Pressable>
+                )}
+             </View>
           </View>
         ) : null}
 
@@ -1506,47 +1576,140 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       shadowRadius: 10,
       elevation: 5,
     },
-    bannerCarouselFullBleed: {
+    premiumBannerSection: {
       marginHorizontal: -spacing[3],
       marginTop: -spacing[2],
-      marginBottom: spacing[0],
-      overflow: 'visible',
+      marginBottom: spacing[2],
+      height: 440,
     },
-    carouselPauseBtn: {
-      position: 'absolute',
-      top: 10,
-      right: 24,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      paddingHorizontal: 8,
-      height: 24,
-      borderRadius: 12,
+    premiumBannerScrollContent: {
+      paddingHorizontal: spacing[4],
+      gap: spacing[3],
       alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 10,
     },
-    carouselPauseText: {
-      fontSize: 10,
-      fontWeight: '800',
-      color: colorPalette.white,
+    premiumBannerCard: {
+      height: 400,
+      borderRadius: 32,
+      overflow: 'hidden',
+      backgroundColor: colorPalette.surfaceRaised,
+      elevation: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 12 },
+      shadowOpacity: 0.15,
+      shadowRadius: 20,
+      transform: [{ scale: 0.98 }],
     },
-    carouselIndicatorRow: {
+    premiumBannerCardActive: {
+      transform: [{ scale: 1 }],
+      borderColor: 'rgba(255,255,255,0.2)',
+      borderWidth: 1,
+    },
+    premiumBannerImageWrap: {
+      flex: 1,
+      position: 'relative',
+    },
+    premiumBannerImage: {
+      ...StyleSheet.absoluteFillObject,
+      width: '100%',
+      height: '100%',
+    },
+    premiumBannerOverlay: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    premiumBannerLogoWrap: {
       position: 'absolute',
-      bottom: 20,
+      top: 20,
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: colorPalette.white,
+      padding: 6,
+      elevation: 4,
+    },
+    premiumBannerLogo: {
+      width: '100%',
+      height: '100%',
+    },
+    premiumBannerBadge: {
+      position: 'absolute',
+      top: 24,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 12,
+      elevation: 4,
+    },
+    premiumBannerBadgeText: {
+      color: colorPalette.white,
+      fontSize: 12,
+      fontWeight: '900',
+    },
+    premiumBannerContent: {
+      flex: 1,
+      padding: 24,
+      paddingBottom: 32,
+    },
+    premiumBannerTitle: {
+      color: colorPalette.white,
+      fontSize: 32,
+      fontWeight: '900',
+      textShadowColor: 'rgba(0,0,0,0.3)',
+      textShadowOffset: { width: 0, height: 2 },
+      shadowRadius: 4,
+    },
+    premiumBannerSubtitle: {
+      color: 'rgba(255,255,255,0.9)',
+      fontSize: 16,
+      fontWeight: '600',
+      marginTop: 4,
+    },
+    premiumBannerCta: {
+      marginTop: 20,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 20,
+      alignSelf: 'flex-start',
+      elevation: 4,
+    },
+    premiumBannerCtaText: {
+      fontSize: 14,
+      fontWeight: '900',
+    },
+    premiumCarouselControls: {
+      position: 'absolute',
+      bottom: 24,
       left: 0,
       right: 0,
       flexDirection: 'row',
       justifyContent: 'center',
-      gap: 6,
+      alignItems: 'center',
+      gap: 16,
     },
-    carouselIndicator: {
+    premiumIndicatorRow: {
+      flexDirection: 'row',
+      gap: 8,
+      alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.3)',
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 20,
+    },
+    premiumIndicator: {
       width: 6,
       height: 6,
       borderRadius: 3,
       backgroundColor: 'rgba(255,255,255,0.4)',
     },
-    carouselIndicatorActive: {
-      width: 16,
+    premiumIndicatorActive: {
+      width: 18,
       backgroundColor: colorPalette.white,
+    },
+    premiumPauseBtn: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: 'rgba(0,0,0,0.4)',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     homeHighlightsPanel: {
       marginTop: spacing[0],

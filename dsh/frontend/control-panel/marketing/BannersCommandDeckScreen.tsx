@@ -151,6 +151,25 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     setSelectedId(nextItems[0]?.id ?? null);
   }
 
+  const templates = [
+    { id: 'restaurant', label: 'مطعم', accent: '#E11D48', badge: 'خصم 20%', cta: 'اطلب الآن', icon: '🍔' },
+    { id: 'fashion', label: 'متجر أزياء', accent: '#2563EB', badge: 'وصل حديثاً', cta: 'تسوق الآن', icon: '👗' },
+    { id: 'tech', label: 'إلكترونيات', accent: '#0F172A', badge: 'الأكثر مبيعاً', cta: 'اشترِ الآن', icon: '📱' },
+    { id: 'pro', label: 'اشتراك برو', accent: '#7C3AED', badge: 'شهر مجاني', cta: 'اشترك الآن', icon: '💎' },
+  ];
+
+  const applyTemplate = (tpl: typeof templates[0]) => {
+    setDraft(c => ({
+      ...c,
+      templateId: tpl.id,
+      accentColor: tpl.accent,
+      offerBadgeText: tpl.badge,
+      ctaLabel: tpl.cta,
+      title: `عرض ${tpl.label}`,
+      subtitle: `استمتع بأفضل تجربة مع ${tpl.label} بأسعار حصرية.`,
+    }));
+  };
+
   const BannerPreview = () => (
     <View style={styles.previewContainer}>
       <View style={StyleSheet.flatten([styles.bannerBase, { backgroundColor: draft.accentColor || '#0A2F5C' }])}>
@@ -159,10 +178,14 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             source={{ uri: draft.imageUrl }}
             style={StyleSheet.flatten([styles.bannerImage, { resizeMode: draft.imageFit }])}
           />
-        ) : null}
-        <View style={styles.bannerOverlay} />
+        ) : (
+          <View style={[styles.bannerImage, { backgroundColor: draft.accentColor || '#0A2F5C', justifyContent: 'center', alignItems: 'center' }]}>
+             <Text style={{ fontSize: 40 }}>{templates.find(t => t.id === draft.templateId)?.icon || '✨'}</Text>
+          </View>
+        )}
+        <View style={[styles.bannerOverlay, { backgroundColor: `${draft.accentColor}44` }]} />
 
-        {/* Content Layout based on textPlacement */}
+        {/* Content Layout */}
         <View style={StyleSheet.flatten([styles.bannerContent, draft.textPlacement === 'top' && { justifyContent: 'flex-start' }, draft.textPlacement === 'center' && { justifyContent: 'center' }])}>
           <Box gap={1}>
             {draft.partnerName ? <Text style={styles.bannerPartner}>{draft.partnerName}</Text> : null}
@@ -177,7 +200,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
 
         {/* Badge */}
         {draft.offerBadgeText ? (
-          <View style={StyleSheet.flatten([styles.bannerBadge, { backgroundColor: draft.offerBadgeTone || '#FF500D' }])}>
+          <View style={StyleSheet.flatten([styles.bannerBadge, { backgroundColor: draft.offerBadgeTone || '#FF500D' }, draft.partnerLogoPosition.includes('left') ? { right: 12 } : { left: 12 }])}>
             <Text style={styles.bannerBadgeText}>{draft.offerBadgeText}</Text>
           </View>
         ) : null}
@@ -194,55 +217,73 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
           </View>
         ) : null}
       </View>
-      <Text role="caption" tone="muted" style={{ marginTop: 8, textAlign: 'center' }}>معاينة مباشرة (مقاس 180px)</Text>
+      <Text role="caption" tone="muted" style={{ marginTop: 12, textAlign: 'center', fontWeight: '800' }}>معاينة حية (نسبة 4:5)</Text>
     </View>
   );
 
   const EditorSection = () => (
-    <Surface tone="raised" gap={4} style={{ borderRadius: 24, padding: 20 }}>
-      <Box gap={4}>
+    <Surface tone="raised" gap={4} style={{ borderRadius: 28, padding: 24, borderLeftWidth: 8, borderLeftColor: draft.accentColor }}>
+      <Box gap={6}>
         <View style={styles.editorGrid}>
-          <Box gap={4} style={{ flex: 1 }}>
-            <Text role="titleSm" style={{ fontWeight: '900' }}>محتوى البنر</Text>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <TextField label="العنوان" value={draft.title} onChangeText={(v) => setDraft(c => ({ ...c, title: v }))} />
-              <TextField label="اسم الشريك" value={draft.partnerName} onChangeText={(v) => setDraft(c => ({ ...c, partnerName: v }))} />
-            </div>
-            <TextField label="الوصف" value={draft.subtitle} onChangeText={(v) => setDraft(c => ({ ...c, subtitle: v }))} />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-              <TextField label="نص الزر" value={draft.ctaLabel} onChangeText={(v) => setDraft(c => ({ ...c, ctaLabel: v }))} />
-              <TextField label="لون الهوية" value={draft.accentColor} onChangeText={(v) => setDraft(c => ({ ...c, accentColor: v }))} />
-              <TextField label="الترتيب" value={draft.position} onChangeText={(v) => setDraft(c => ({ ...c, position: v }))} />
-            </div>
+          <Box gap={5} style={{ flex: 1 }}>
+            <Box gap={2}>
+               <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>1. القالب الذكي</Text>
+               <View style={styles.templateRow}>
+                  {templates.map(tpl => (
+                    <Pressable
+                      key={tpl.id}
+                      onPress={() => applyTemplate(tpl)}
+                      style={[styles.templateBtn, draft.templateId === tpl.id && { borderColor: tpl.accent, backgroundColor: `${tpl.accent}11` }]}
+                    >
+                      <Text style={{ fontSize: 20 }}>{tpl.icon}</Text>
+                      <Text style={[styles.templateBtnText, draft.templateId === tpl.id && { color: tpl.accent }]}>{tpl.label}</Text>
+                    </Pressable>
+                  ))}
+               </View>
+            </Box>
+
+            <Box gap={4}>
+               <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>2. المحتوى والنصوص</Text>
+               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                 <TextField label="العنوان الرئيسي" value={draft.title} onChangeText={(v) => setDraft(c => ({ ...c, title: v }))} />
+                 <TextField label="اسم العلامة التجارية" value={draft.partnerName} onChangeText={(v) => setDraft(c => ({ ...c, partnerName: v }))} />
+               </div>
+               <TextField label="الوصف الترويجي" value={draft.subtitle} onChangeText={(v) => setDraft(c => ({ ...c, subtitle: v }))} multiline numberOfLines={2} />
+               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                 <TextField label="نص زر الإجراء" value={draft.ctaLabel} onChangeText={(v) => setDraft(c => ({ ...c, ctaLabel: v }))} />
+                 <TextField label="لون الهوية (HEX)" value={draft.accentColor} onChangeText={(v) => setDraft(c => ({ ...c, accentColor: v }))} />
+                 <TextField label="ترتيب الظهور" value={draft.position} onChangeText={(v) => setDraft(c => ({ ...c, position: v }))} />
+               </div>
+            </Box>
           </Box>
 
           <Box gap={4} style={{ width: 340 }}>
-            <Text role="titleSm" style={{ fontWeight: '900' }}>المعاينة الذكية</Text>
+            <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>معاينة التصميم</Text>
             <BannerPreview />
-            <Box gap={2} style={{ padding: 12, backgroundColor: '#F8FAFC', borderRadius: 12 }}>
-              <Text role="caption" style={{ fontWeight: '800' }}>مؤشر الجودة: {quality}%</Text>
+            <Box gap={2} style={{ padding: 16, backgroundColor: '#F1F5F9', borderRadius: 16 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text role="caption" style={{ fontWeight: '900' }}>مؤشر جودة المحتوى</Text>
+                <Text role="caption" style={{ fontWeight: '900', color: quality > 70 ? '#16A34A' : '#F97316' }}>{quality}%</Text>
+              </View>
               <View style={styles.qualityTrack}><View style={StyleSheet.flatten([styles.qualityFill, { width: `${quality}%`, backgroundColor: quality > 70 ? '#16A34A' : '#F97316' }])} /></View>
+              <Text role="caption" tone="muted" style={{ fontSize: 10 }}>يتم احتساب الجودة بناءً على طول النصوص، وجود الوسائط، ووضوح الإجراء.</Text>
             </Box>
           </Box>
         </View>
 
         <View style={styles.divider} />
 
-        <Box gap={3}>
-          <Text role="titleSm" style={{ fontWeight: '900' }}>الوسائط والقالب</Text>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <TextField label="رابط صورة الخلفية" value={draft.imageUrl} onChangeText={(v) => setDraft(c => ({ ...c, imageUrl: v }))} />
+        <Box gap={4}>
+          <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>3. الوسائط المتقدمة</Text>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
+            <TextField label="رابط صورة الخلفية (أو اترك فارغاً للقالب)" value={draft.imageUrl} onChangeText={(v) => setDraft(c => ({ ...c, imageUrl: v }))} />
             <Box gap={1}>
-              <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>نمط الصورة</label>
-              <Tabs<any> items={[{ value: 'cover', label: 'تغطية' }, { value: 'contain', label: 'احتواء' }]} value={draft.imageFit} onValueChange={(v) => setDraft(c => ({ ...c, imageFit: v }))} variant="pill" />
+              <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>احتواء الصورة</label>
+              <Tabs<any> items={[{ value: 'cover', label: 'كامل' }, { value: 'contain', label: 'مناسب' }]} value={draft.imageFit} onValueChange={(v) => setDraft(c => ({ ...c, imageFit: v }))} variant="pill" />
             </Box>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <TextField label="نص الشارة (خصم/عرض)" value={draft.offerBadgeText} onChangeText={(v) => setDraft(c => ({ ...c, offerBadgeText: v }))} />
-            <TextField label="لون الشارة" value={draft.offerBadgeTone} onChangeText={(v) => setDraft(c => ({ ...c, offerBadgeTone: v }))} />
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <TextField label="رابط الشعار" value={draft.partnerLogoUrl} onChangeText={(v) => setDraft(c => ({ ...c, partnerLogoUrl: v }))} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <TextField label="رابط شعار الشريك" value={draft.partnerLogoUrl} onChangeText={(v) => setDraft(c => ({ ...c, partnerLogoUrl: v }))} />
             <Box gap={1}>
               <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>موقع الشعار</label>
               <Tabs<any>
@@ -258,15 +299,19 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
               />
             </Box>
           </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <TextField label="نص الشارة العلوية" value={draft.offerBadgeText} onChangeText={(v) => setDraft(c => ({ ...c, offerBadgeText: v }))} />
+            <TextField label="لون الشارة" value={draft.offerBadgeTone} onChangeText={(v) => setDraft(c => ({ ...c, offerBadgeTone: v }))} />
+          </div>
         </Box>
 
         <View style={styles.divider} />
 
-        <Box gap={3}>
-          <Text role="titleSm" style={{ fontWeight: '900' }}>الجمهور والوجهة</Text>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <Box gap={4}>
+          <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>4. توجيه الجمهور</Text>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <Box gap={1}>
-              <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>الاستهداف</label>
+              <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>نطاق العرض</label>
               <Tabs<MarketingBannerAudience>
                 items={[{ value: 'all', label: 'الجميع' }, { value: 'home', label: 'الرئيسية' }, { value: 'stores', label: 'المتاجر' }]}
                 value={draft.audience}
@@ -275,7 +320,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
               />
             </Box>
             <Box gap={1}>
-              <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>نوع الإجراء</label>
+              <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>نوع الوجهة</label>
               <Tabs<MarketingBannerActionType>
                 items={[
                   { value: 'store', label: 'متجر' },
@@ -289,28 +334,28 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
               />
             </Box>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <TextField label="معرّف الوجهة الرئيسية" value={draft.actionTarget} onChangeText={(v) => setDraft(c => ({ ...c, actionTarget: v }))} />
-            <TextField label="معرّف إضافي" value={draft.actionExtra} onChangeText={(v) => setDraft(c => ({ ...c, actionExtra: v }))} />
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
+            <TextField label="معرّف الهدف (ID)" value={draft.actionTarget} onChangeText={(v) => setDraft(c => ({ ...c, actionTarget: v }))} />
+            <TextField label="بيانات إضافية" value={draft.actionExtra} onChangeText={(v) => setDraft(c => ({ ...c, actionExtra: v }))} />
           </div>
         </Box>
 
         <View style={styles.divider} />
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8FAFC', padding: 16, borderRadius: 20 }}>
           <Box gap={1}>
-            <Text role="bodySm" style={{ fontWeight: '800' }}>حالة البنر</Text>
+            <Text role="bodySm" style={{ fontWeight: '900' }}>حالة النشر الحالية</Text>
             <Tabs<MarketingBannerStatus>
-              items={[{ value: 'draft', label: 'مسودة' }, { value: 'published', label: 'منشور' }]}
+              items={[{ value: 'draft', label: 'مسودة (داخلي)' }, { value: 'published', label: 'منشور (عام)' }]}
               value={draft.status}
               onValueChange={(v) => setDraft(c => ({ ...c, status: v }))}
               variant="pill"
             />
           </Box>
           <div style={{ display: 'flex', gap: 12 }}>
-             <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(selected!)} style={{ color: '#DC2626' }} />
+             <Button label="حذف البنر" tone="ghost" fullWidth={false} onPress={() => handleDelete(selected!)} style={{ color: '#DC2626' }} />
              <Button label="تكرار" tone="secondary" fullWidth={false} onPress={() => handleDuplicate(selected!)} />
-             <Button label="حفظ التغييرات" fullWidth={false} onPress={handleSave} style={{ backgroundColor: '#0A2F5C' }} />
+             <Button label="حفظ البنر" fullWidth={false} onPress={handleSave} style={{ backgroundColor: '#0A2F5C', paddingHorizontal: 32 }} />
           </div>
         </div>
       </Box>
@@ -318,26 +363,29 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
   );
 
   return (
-    <Box gap={4}>
-      <Surface tone="raised" gap={4} style={{ borderRadius: 24, padding: 20 }}>
+    <Box gap={6}>
+      <Surface tone="raised" gap={4} style={{ borderRadius: 28, padding: 24, backgroundColor: '#fff', elevation: 2 }}>
         <View style={StyleSheet.flatten([styles.headerRow, isRtl && styles.rowReverse])}>
           <Box gap={0}>
-            <Text role="caption" style={{ color: '#FF500D', fontWeight: '800' }}>نظام إدارة المحتوى الإعلاني</Text>
-            <Text role="titleLg" style={{ fontWeight: '900', color: '#0A2F5C' }}>استوديو البنرات</Text>
+            <Text role="caption" style={{ color: colorPalette.brand, fontWeight: '900', letterSpacing: 1 }}>MARKETING OPS CONTROL</Text>
+            <Text role="titleLg" style={{ fontWeight: '900', color: '#0A2F5C', fontSize: 32 }}>استوديو البنرات <Text style={{ color: colorPalette.brand }}>2027</Text></Text>
           </Box>
-          <Button label="إضافة بنر جديد" tone="primary" fullWidth={false} onPress={handleCreateNew} style={{ backgroundColor: '#0A2F5C' }} />
+          <Button label="بنر جديد +" tone="primary" fullWidth={false} onPress={handleCreateNew} style={{ backgroundColor: colorPalette.brandStrong, borderRadius: 16, height: 48 }} />
         </View>
 
         <View style={styles.kpiGrid}>
           {[
-            { label: 'الإجمالي', value: kpis.total, color: '#1E40AF', bg: '#EFF6FF' },
-            { label: 'المنشور', value: kpis.live, color: '#166534', bg: '#F0FDF4' },
-            { label: 'المشاهدات', value: kpis.impressions, color: '#5B21B6', bg: '#F5F3FF' },
-            { label: 'النقرات', value: kpis.clicks, color: '#991B1B', bg: '#FEF2F2' },
+            { label: 'إجمالي البنرات', value: kpis.total, color: '#1E40AF', bg: '#EFF6FF', icon: '📁' },
+            { label: 'البنرات النشطة', value: kpis.live, color: '#166534', bg: '#F0FDF4', icon: '📡' },
+            { label: 'مشاهدات اليوم', value: kpis.impressions, color: '#5B21B6', bg: '#F5F3FF', icon: '👁️' },
+            { label: 'نسبة التفاعل', value: `${((kpis.clicks / (kpis.impressions || 1)) * 100).toFixed(1)}%`, color: '#991B1B', bg: '#FEF2F2', icon: '📈' },
           ].map(k => (
             <View key={k.label} style={StyleSheet.flatten([styles.kpiCard, { backgroundColor: k.bg }])}>
-              <Text role="caption" style={{ fontWeight: '700' }}>{k.label}</Text>
-              <Text role="titleLg" style={{ color: k.color, fontWeight: '900' }}>{k.value}</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text role="caption" style={{ fontWeight: '800', color: '#64748B' }}>{k.label}</Text>
+                <Text>{k.icon}</Text>
+              </View>
+              <Text role="titleLg" style={{ color: k.color, fontWeight: '900', marginTop: 8 }}>{k.value}</Text>
             </View>
           ))}
         </View>
@@ -345,22 +393,22 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
 
       <View style={styles.studioBody}>
         <View style={styles.sidebar}>
-          <Surface tone="raised" gap={3} style={{ borderRadius: 20, padding: 12 }}>
-            <Text role="titleSm" style={{ fontWeight: '800', marginBottom: 8 }}>قائمة البنرات</Text>
-            <Box gap={2}>
+          <Surface tone="raised" gap={4} style={{ borderRadius: 28, padding: 16, backgroundColor: '#fff' }}>
+            <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C', paddingHorizontal: 8 }}>جميع الحملات</Text>
+            <Box gap={3}>
               {items.map(item => (
                 <Pressable
                   key={item.id}
                   onPress={() => setSelectedId(item.id)}
                   style={StyleSheet.flatten([styles.listCard, selectedId === item.id && styles.listCardSelected])}
                 >
-                  <Text role="bodySm" style={{ fontWeight: '800' }} numberOfLines={1}>{item.title}</Text>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                    <Text role="caption" tone="muted">{bannerActionTypeLabel(item.actionType)}</Text>
-                    <Text role="caption" style={{ color: item.status === 'published' ? '#16A34A' : '#64748B', fontWeight: '800' }}>
-                      {item.status === 'published' ? 'منشور' : 'مسودة'}
-                    </Text>
-                  </div>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                    <View style={[styles.statusDot, { backgroundColor: item.status === 'published' ? '#16A34A' : '#94A3B8' }]} />
+                    <Box gap={0} style={{ flex: 1 }}>
+                      <Text role="bodySm" style={{ fontWeight: '900', color: selectedId === item.id ? colorPalette.brandStrong : '#1E293B' }} numberOfLines={1}>{item.title}</Text>
+                      <Text role="caption" tone="muted">{bannerActionTypeLabel(item.actionType)}</Text>
+                    </Box>
+                  </View>
                 </Pressable>
               ))}
             </Box>
@@ -383,50 +431,86 @@ const styles = StyleSheet.create({
   },
   kpiGrid: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 16,
+    marginTop: 8,
   },
   kpiCard: {
     flex: 1,
-    padding: 12,
-    borderRadius: 16,
+    padding: 20,
+    borderRadius: 24,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.05)',
+    borderColor: 'rgba(0,0,0,0.03)',
   },
   studioBody: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 20,
   },
   sidebar: {
-    width: 260,
+    width: 300,
   },
   mainEditor: {
     flex: 1,
   },
   listCard: {
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    padding: 16,
+    borderRadius: 20,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   listCardSelected: {
-    borderColor: '#FF500D',
-    backgroundColor: '#FFF7ED',
+    borderColor: colorPalette.brand,
+    backgroundColor: '#fff',
+    elevation: 4,
+    shadowColor: colorPalette.brand,
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   editorGrid: {
     flexDirection: 'row',
-    gap: 24,
+    gap: 32,
+  },
+  templateRow: {
+    flexDirection: 'row',
+    gap: 12,
+    flexWrap: 'wrap',
+  },
+  templateBtn: {
+    flex: 1,
+    minWidth: 100,
+    padding: 12,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#fff',
+  },
+  templateBtnText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#64748B',
   },
   previewContainer: {
-    width: 320,
+    width: 280,
     alignSelf: 'center',
   },
   bannerBase: {
-    width: 320,
-    height: 180,
-    borderRadius: 24,
+    width: 280,
+    height: 350,
+    borderRadius: 32,
     overflow: 'hidden',
     position: 'relative',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
   },
   bannerImage: {
     position: 'absolute',
@@ -435,48 +519,54 @@ const styles = StyleSheet.create({
   },
   bannerOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.2)',
   },
   bannerContent: {
     flex: 1,
-    padding: 16,
+    padding: 24,
     justifyContent: 'flex-end',
   },
   bannerPartner: {
     color: '#fff',
-    fontSize: 10,
-    fontWeight: '800',
+    fontSize: 12,
+    fontWeight: '900',
     opacity: 0.9,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    shadowRadius: 2,
   },
   bannerTitle: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: '900',
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
   },
   bannerSubtitle: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
-    opacity: 0.9,
+    color: 'rgba(255,255,255,0.95)',
+    fontSize: 14,
+    fontWeight: '700',
+    marginTop: 4,
   },
   bannerCta: {
-    marginTop: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 99,
+    marginTop: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 16,
     alignSelf: 'flex-start',
+    elevation: 4,
   },
   bannerCtaText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '900',
   },
   bannerBadge: {
     position: 'absolute',
-    top: 12,
-    right: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    top: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    elevation: 5,
   },
   bannerBadgeText: {
     color: '#fff',
@@ -485,32 +575,34 @@ const styles = StyleSheet.create({
   },
   partnerLogoWrap: {
     position: 'absolute',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#fff',
-    padding: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 6,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
   },
   partnerLogo: {
     width: '100%',
     height: '100%',
   },
   qualityTrack: {
-    height: 6,
+    height: 8,
     backgroundColor: '#E2E8F0',
-    borderRadius: 3,
+    borderRadius: 4,
     overflow: 'hidden',
-    marginTop: 4,
+    marginTop: 8,
   },
   qualityFill: {
     height: '100%',
   },
   divider: {
     height: 1,
-    backgroundColor: '#E2E8F0',
-    marginVertical: 4,
+    backgroundColor: '#F1F5F9',
+    marginVertical: 8,
   },
 });
 
