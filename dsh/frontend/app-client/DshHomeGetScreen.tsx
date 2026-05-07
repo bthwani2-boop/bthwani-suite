@@ -388,47 +388,135 @@ function resolveTickerBanner(
   };
 }
 
+/**
+ * Internal helper for Category selection items
+ */
+function CategorySelectorItem({
+  label,
+  icon,
+  onPress,
+  isSelected,
+  isHub,
+  isVideo,
+  styles,
+  theme,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  onPress: () => void;
+  isSelected?: boolean;
+  isHub?: boolean;
+  isVideo?: boolean;
+  styles: any;
+  theme: any;
+}) {
+  return (
+    <Pressable style={styles.categorySelectorCard} onPress={onPress}>
+      <View
+        style={[
+          styles.categoryIconContainer,
+          isHub && styles.categoryHubIconContainer,
+          isVideo && styles.videoIconContainer,
+          isSelected && { backgroundColor: theme.brand },
+        ]}
+      >
+        {icon}
+      </View>
+      <View style={[styles.categoryNameContainer, isSelected && styles.categoryNameContainerSelected]}>
+        <Text role="bodySm" style={[styles.categoryName, isSelected && { color: theme.textInverse }]} numberOfLines={1}>
+          {label}
+        </Text>
+      </View>
+    </Pressable>
+  );
+}
+
+/**
+ * Internal helper for Filter Chips
+ */
+function FilterChipItem({
+  label,
+  icon,
+  onPress,
+  isActive,
+  styles,
+  theme,
+}: {
+  label: string;
+  icon?: React.ReactNode;
+  onPress: () => void;
+  isActive: boolean;
+  styles: any;
+  theme: any;
+}) {
+  return (
+    <Pressable
+      style={[
+        styles.filterChip,
+        {
+          backgroundColor: isActive ? theme.brand : theme.surfaceRaised,
+          borderColor: isActive ? theme.brand : 'transparent',
+        },
+      ]}
+      onPress={onPress}
+    >
+      <View style={styles.filterChipContent}>
+        {icon && <View style={styles.filterChipIconWrap}>{icon}</View>}
+        <Text
+          role="bodySm"
+          style={[styles.filterChipLabel, { color: isActive ? theme.textInverse : theme.textMuted }]}
+          numberOfLines={1}
+        >
+          {label}
+        </Text>
+      </View>
+    </Pressable>
+  );
+}
+
 function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>, 'ready'>, onRetry?: () => void) {
-  if (state === 'loading') {
-    return <StateView stateId="loading" />;
-  }
+  const titles = {
+    loading: 'جاري التحميل...',
+    empty: 'لا توجد بيانات عرض بعد',
+    offline: 'أنت غير متصل بالإنترنت',
+    disabled: 'الواجهة الرئيسية موقوفة مؤقتاً',
+    error: 'تعذر تحميل الواجهة الرئيسية',
+  };
 
-  if (state === 'empty') {
-    return (
-      <StateView
-        stateId="empty"
-        title="لا توجد بيانات عرض بعد"
-        description="أعد المحاولة لاستعادة الواجهة الرئيسية واختصاراتها."
-        actionLabel="إعادة المحاولة"
-        onActionPress={onRetry}
-      />
-    );
-  }
-
-  if (state === 'offline') {
-    return <StateView stateId="offline" onActionPress={onRetry} />;
-  }
-
-  if (state === 'disabled') {
-    return (
-      <StateView
-        stateId="warning"
-        title="الواجهة الرئيسية موقوفة مؤقتاً"
-        description="أبقِ المحاولة مرئية حتى تعود هذه الواجهة للخدمة."
-        actionLabel="إعادة المحاولة"
-        onActionPress={onRetry}
-      />
-    );
-  }
+  const descriptions = {
+    loading: 'يرجى الانتظار بينما نقوم بتجهيز تجربتك المخصصة.',
+    empty: 'أعد المحاولة لاستعادة الواجهة الرئيسية واختصاراتها.',
+    offline: 'يرجى التحقق من اتصالك بالشبكة للمتابعة.',
+    disabled: 'أبقِ المحاولة مرئية حتى تعود هذه الواجهة للخدمة.',
+    error: 'أعد المحاولة ثم انتقل إلى الفئات أو الطلبات إذا لزم.',
+  };
 
   return (
     <StateView
-      stateId="recoverableError"
-      title="تعذر تحميل الواجهة الرئيسية"
-      description="أعد المحاولة ثم انتقل إلى الفئات أو الطلبات إذا لزم."
-      actionLabel="إعادة المحاولة"
+      stateId={state === 'offline' ? 'offline' : state === 'loading' ? 'loading' : state === 'disabled' ? 'warning' : 'recoverableError'}
+      title={titles[state === 'error' ? 'error' : state] || titles.error}
+      description={descriptions[state === 'error' ? 'error' : state] || descriptions.error}
+      actionLabel={state !== 'loading' ? 'إعادة المحاولة' : undefined}
       onActionPress={onRetry}
     />
+  );
+}
+
+/**
+ * Empty state helper to reduce redundancy
+ */
+function EmptyFeed({ query, styles }: { query?: string; styles: any }) {
+  const isSearch = Boolean(query?.trim());
+  return (
+    <View style={styles.emptyFeed}>
+      <Text style={styles.emptyFeedEmoji}>{isSearch ? '🔎' : '🍽️'}</Text>
+      <Text role="titleSm" style={styles.emptyFeedTitle}>
+        {isSearch ? 'لا توجد نتائج داخل هذه الفئة' : 'لا توجد متاجر لهذه الفئة بعد'}
+      </Text>
+      <Text role="bodySm" style={styles.emptyFeedText}>
+        {isSearch ? 'جرّب تغيير البحث أو انتقل إلى فئة أخرى.' : 'أضف متاجر لهذه الفئة كي تظهر هنا.'}
+      </Text>
+    </View>
   );
 }
 
@@ -992,7 +1080,11 @@ return (
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingHorizontal: spacing[3], paddingVertical: spacing[0], gap: spacing[0], flexGrow: 1 }}
+        contentContainerStyle={{
+          paddingHorizontal: spacing[3],
+          paddingBottom: spacing[12],
+          flexGrow: 1,
+        }}
         showsVerticalScrollIndicator={false}
       >
         {inlineSearchVisible ? (
@@ -1016,238 +1108,166 @@ return (
 
         <View style={styles.homeHighlightsPanel}>
           <View style={styles.categoriesSelectorSection}>
-          <View style={styles.categoriesSelectorRow}>
-            <View style={styles.fixedIconsContainer}>
-              <Pressable style={styles.categorySelectorCard} onPress={() => setShortsVisible(true)}>
-                <View style={styles.videoIconContainer}>
-                  <Ionicons name="play" size={22} color={colorPalette.brand} />
-                </View>
-                <View style={styles.categoryNameContainer}>
-                  <Text role="bodySm" style={styles.categoryName} numberOfLines={1}>فيديو</Text>
-                </View>
-              </Pressable>
+            <View style={styles.categoriesSelectorRow}>
+              <View style={styles.fixedIconsContainer}>
+                <CategorySelectorItem
+                  isVideo
+                  label="فيديو"
+                  icon={<Ionicons name="play" size={22} color={colorPalette.brand} />}
+                  onPress={() => setShortsVisible(true)}
+                  styles={styles}
+                  theme={theme}
+                />
 
-              <View ref={categoriesAnchorRef} collapsable={false}>
-                <Pressable style={styles.categorySelectorCard} onPress={openCategoriesDial}>
-                  <View style={[styles.categoryIconContainer, styles.categoryHubIconContainer]}>
-                    <CategoryHubIcon />
-                  </View>
-                  <View style={styles.categoryNameContainer}>
-                    <Text role="bodySm" style={styles.categoryName} numberOfLines={1}>الفئات</Text>
-                  </View>
-                </Pressable>
+                <View ref={categoriesAnchorRef} collapsable={false}>
+                  <CategorySelectorItem
+                    isHub
+                    label="الفئات"
+                    icon={<CategoryHubIcon />}
+                    onPress={openCategoriesDial}
+                    styles={styles}
+                    theme={theme}
+                  />
+                </View>
+
+                {selectedCategoryFixture && (
+                  <CategorySelectorItem
+                    isSelected
+                    label={selectedCategoryLabel}
+                    icon={
+                      <CategoryIconImage
+                        uri={null}
+                        emojiFallback={categoryIconMap[selectedCategoryFixture.id] ?? '📂'}
+                        style={styles.categoryIconImage}
+                      />
+                    }
+                    onPress={() => setActiveSubcategoryId(null)}
+                    styles={styles}
+                    theme={theme}
+                  />
+                )}
               </View>
 
-              {selectedCategoryFixture ? (
-                <Pressable
-                  style={styles.categorySelectorCard}
-                  onPress={() => setActiveSubcategoryId(null)}
-                >
-                  <View style={styles.categoryIconContainer}>
-                    <CategoryIconImage
-                      uri={null}
-                      emojiFallback={categoryIconMap[selectedCategoryFixture.id] ?? '📂'}
-                      style={styles.categoryIconImage}
-                    />
-                  </View>
-                  <View style={[styles.categoryNameContainer, styles.categoryNameContainerSelected]}>
-                    <Text role="bodySm" style={styles.categoryName} numberOfLines={1}>
-                      {selectedCategoryLabel}
-                    </Text>
+              {activePromo && (
+                <Pressable style={[styles.heroPromoCard, styles.heroPromoCardInline]} onPress={openInlineSearch}>
+                  <View style={styles.heroPromoContent}>
+                    <View style={styles.heroPromoIconWrap}>
+                      <Text role="titleLg" style={styles.heroIcon}>
+                        {activePromo.icon}
+                      </Text>
+                    </View>
+
+                    <View style={styles.heroPromoTextWrap}>
+                      <View style={styles.heroPromoBadge}>
+                        <Text role="bodySm" style={styles.heroPromoBadgeText}>
+                          {activePromo.title}
+                        </Text>
+                      </View>
+                      <Text role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
+                        {promoDiscount}
+                      </Text>
+                      <Text role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
+                        {promoTail || 'على أول طلب'}
+                      </Text>
+                    </View>
                   </View>
                 </Pressable>
-              ) : null}
+              )}
+
+              {selectedSubcategoryCards.length > 0 && (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  nestedScrollEnabled
+                  contentContainerStyle={styles.categoriesSelectorScrollContent}
+                  style={styles.categoriesSelectorScroll}
+                >
+                  {selectedSubcategoryCards.map((subcategory) => (
+                    <Pressable
+                      key={subcategory.id}
+                      style={[
+                        styles.subcategorySelectorCard,
+                        activeSubcategoryId === subcategory.id && styles.subcategorySelectorCardActive,
+                      ]}
+                      onPress={() => setActiveSubcategoryId(subcategory.id)}
+                    >
+                      <View style={styles.subcategoryIconContainer}>
+                        <Text role="titleSm" style={styles.subcategoryEmoji}>
+                          {subcategory.emoji}
+                        </Text>
+                      </View>
+                      <Text
+                        role="bodySm"
+                        style={[
+                          styles.subcategoryName,
+                          activeSubcategoryId === subcategory.id && styles.subcategoryNameActive,
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {subcategory.title}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              )}
             </View>
-
-            {activePromo ? (
-              <Pressable style={[styles.heroPromoCard, styles.heroPromoCardInline]} onPress={openInlineSearch}>
-                <View style={styles.heroPromoContent}>
-                  <View style={styles.heroPromoIconWrap}>
-                    <Text role="titleLg" style={styles.heroIcon}>
-                      {activePromo.icon}
-                    </Text>
-                  </View>
-
-                  <View style={styles.heroPromoTextWrap}>
-                    <View style={styles.heroPromoBadge}>
-                      <Text role="bodySm" style={styles.heroPromoBadgeText}>
-                        {activePromo.title}
-                      </Text>
-                    </View>
-                    <Text role="titleSm" style={styles.heroPromoTitle} numberOfLines={1}>
-                      {promoDiscount}
-                    </Text>
-                    <Text role="titleSm" style={styles.heroPromoSubtitle} numberOfLines={1}>
-                      {promoTail || 'على أول طلب'}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.heroPagerRow}>
-                  <View style={styles.heroPagerActive} />
-                </View>
-              </Pressable>
-            ) : null}
-
-            {selectedSubcategoryCards.length > 0 ? (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                nestedScrollEnabled
-                decelerationRate="fast"
-                contentContainerStyle={styles.categoriesSelectorScrollContent}
-                style={styles.categoriesSelectorScroll}
-              >
-                {selectedSubcategoryCards.map((subcategory) => (
-                  <Pressable
-                    key={subcategory.id}
-                    style={[
-                      styles.subcategorySelectorCard,
-                      activeSubcategoryId === subcategory.id && styles.subcategorySelectorCardActive,
-                    ]}
-                    onPress={() => setActiveSubcategoryId(subcategory.id)}
-                  >
-                    <View style={styles.subcategoryIconContainer}>
-                      <Text role="titleSm" style={styles.subcategoryEmoji}>
-                        {subcategory.emoji}
-                      </Text>
-                    </View>
-                    <Text role="bodySm" style={[styles.subcategoryName, activeSubcategoryId === subcategory.id && styles.subcategoryNameActive]} numberOfLines={1}>
-                      {subcategory.title}
-                    </Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
-            ) : null}
           </View>
-        </View>
 
           <View style={styles.filtersRow}>
-          <Pressable
-            style={[
-              styles.filterChip,
-              styles.filterChipCategory,
-              {
-                backgroundColor: activeCategoryId === 'all' ? theme.brand : theme.surfaceRaised,
-                borderColor: activeCategoryId === 'all' ? theme.brand : 'transparent',
-              },
-            ]}
-            onPress={() => {
-              selectCategoryPage('all');
-            }}
-          >
-            <View style={styles.filterChipContent}>
-              <View style={styles.filterChipIconWrap}>
-                <Ionicons
-                  name="menu-outline"
-                  size={16}
-                  color={activeCategoryId === 'all' ? theme.textInverse : theme.textMuted}
-                />
-              </View>
-              <Text
-                role="bodySm"
-                style={[
-                  styles.filterChipLabel,
-                  { color: activeCategoryId === 'all' ? theme.textInverse : theme.textMuted },
-                ]}
-                numberOfLines={1}
-              >
-                الكل
-              </Text>
-            </View>
-          </Pressable>
+            <FilterChipItem
+              label="الكل"
+              isActive={activeCategoryId === 'all'}
+              icon={<Ionicons name="menu-outline" size={16} color={activeCategoryId === 'all' ? theme.textInverse : theme.textMuted} />}
+              onPress={() => selectCategoryPage('all')}
+              styles={styles}
+              theme={theme}
+            />
 
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            nestedScrollEnabled
-            decelerationRate="fast"
-            contentContainerStyle={styles.filtersRowScrollContent}
-            style={styles.filtersRowScroll}
-          >
-            {discoveryFilters.filter((filter) => filter.value !== 'all').map((filter) => {
-            const isActive = filter.value === activeFilter;
-            return (
-              <Pressable
-                key={filter.value}
-                style={[
-                  styles.filterChip,
-                  {
-                    backgroundColor: isActive ? theme.brand : theme.surfaceRaised,
-                    borderColor: isActive ? theme.brand : 'transparent',
-                  },
-                ]}
-                onPress={() => setActiveFilter(filter.value)}
-              >
-                <View style={styles.filterChipContent}>
-                  <Ionicons
-                    name={filter.iconName}
-                    size={16}
-                    color={isActive ? theme.textInverse : theme.textMuted}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              nestedScrollEnabled
+              contentContainerStyle={styles.filtersRowScrollContent}
+              style={styles.filtersRowScroll}
+            >
+              {discoveryFilters
+                .filter((filter) => filter.value !== 'all')
+                .map((filter) => (
+                  <FilterChipItem
+                    key={filter.value}
+                    label={filter.label}
+                    isActive={filter.value === activeFilter}
+                    icon={<Ionicons name={filter.iconName} size={16} color={filter.value === activeFilter ? theme.textInverse : theme.textMuted} />}
+                    onPress={() => setActiveFilter(filter.value)}
+                    styles={styles}
+                    theme={theme}
                   />
-                  <Text
-                    role="bodySm"
-                    style={[
-                      styles.filterChipLabel,
-                      { color: isActive ? theme.textInverse : theme.textMuted },
-                    ]}
-                  >
-                    {filter.label}
-                  </Text>
-                </View>
-              </Pressable>
-            );
-          })}
+                ))}
 
-            {allCategoryRailItems.filter((category) => category.id !== 'all').map((category) => {
-            const isActive = category.id === activeCategoryId;
-
-            return (
-              <Pressable
-                key={category.id}
-                style={[
-                  styles.filterChip,
-                  styles.filterChipCategory,
-                  {
-                    backgroundColor: isActive ? theme.brand : theme.surfaceRaised,
-                    borderColor: isActive ? theme.brand : 'transparent',
-                  },
-                ]}
-                onPress={() => {
-                  selectCategoryPage(category.id);
-                  if (category.id === 'awnak') {
-                    onOpenCategory?.('awnak');
-                    return;
-                  }
-
-                  if (category.id === 'shein') {
-                    onOpenSheinInfo?.();
-                  }
-                }}
-              >
-                <View style={styles.filterChipContent}>
-                  <View style={styles.filterChipIconWrap}>
-                    <CategoryIconImage
-                      uri={null}
-                      emojiFallback={category.icon}
-                      style={styles.filterChipIcon}
-                    />
-                  </View>
-                  <Text
-                    role="bodySm"
-                    style={[
-                      styles.filterChipLabel,
-                      { color: isActive ? theme.textInverse : theme.textMuted },
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {category.label}
-                  </Text>
-                </View>
-              </Pressable>
-            );
-          })}
-          </ScrollView>
+              {allCategoryRailItems
+                .filter((category) => category.id !== 'all')
+                .map((category) => (
+                  <FilterChipItem
+                    key={category.id}
+                    label={category.label}
+                    isActive={category.id === activeCategoryId}
+                    icon={
+                      <CategoryIconImage
+                        uri={null}
+                        emojiFallback={category.icon}
+                        style={styles.filterChipIcon}
+                      />
+                    }
+                    onPress={() => {
+                      selectCategoryPage(category.id);
+                      if (category.id === 'awnak') onOpenCategory?.('awnak');
+                      if (category.id === 'shein') onOpenSheinInfo?.();
+                    }}
+                    styles={styles}
+                    theme={theme}
+                  />
+                ))}
+            </ScrollView>
           </View>
         </View>
 
@@ -1273,13 +1293,9 @@ return (
                     }}
                   />
                 ) : null}
-                {!sheinInlineVisible && !awnakInlineVisible ? (
-                  <View style={styles.emptyFeed}>
-                    <Text style={styles.emptyFeedEmoji}>🧩</Text>
-                    <Text style={styles.emptyFeedTitle}>هذه الفئة تعرض نموذجًا مدمجًا</Text>
-                    <Text style={styles.emptyFeedText}>افتح شي إن أو عونك مرة أخرى ليظهر النموذج هنا.</Text>
-                  </View>
-                ) : null}
+                {!sheinInlineVisible && !awnakInlineVisible && (
+                  <EmptyFeed query={inlineSearchQuery} styles={styles} />
+                )}
               </Box>
             ) : null}
 
@@ -1295,10 +1311,7 @@ return (
                   isOpen: store.statusTone === 'open',
                   supportsPickup: true,
                   supportsPartnerDelivery: true,
-                  serviceTokens: [
-                    { label: store.deliveryLabel },
-                    { label: store.serviceLabel },
-                  ],
+                  serviceTokens: [{ label: store.deliveryLabel }, { label: store.serviceLabel }],
                   isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
                   isFollowing: followToggles[store.id] ?? store.isFollowing,
                   followersCount: followCounts[store.id] ?? store.followerCount,
@@ -1336,19 +1349,9 @@ return (
                   />
                 );
               })
-            ) : (
-              <View style={styles.emptyFeed}>
-                <Text style={styles.emptyFeedEmoji}>{inlineSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
-                <Text style={styles.emptyFeedTitle}>
-                  {inlineSearchQuery.trim() ? 'لا توجد نتائج داخل هذه الفئة' : 'لا توجد متاجر لهذه الفئة بعد'}
-                </Text>
-                <Text style={styles.emptyFeedText}>
-                  {inlineSearchQuery.trim()
-                    ? 'جرّب تغيير البحث أو انتقل إلى فئة أخرى.'
-                    : 'أضف متاجر لهذه الفئة كي تظهر هنا.'}
-                </Text>
-              </View>
-            )}
+            ) : activeStorePage?.renderMode !== 'manual-order' ? (
+              <EmptyFeed query={inlineSearchQuery} styles={styles} />
+            ) : null}
           </View>
         </View>
 
@@ -1416,942 +1419,294 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
   const textAlign = resolveTextAlign(direction);
 
   return StyleSheet.create({
-  activeOrderCard: {
-    backgroundColor: theme.surface,
-    borderRadius: 28,
-    borderWidth: 1,
-    borderColor: theme.line,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    gap: 10,
-    shadowColor: colorPalette.black,
-    shadowOpacity: 0.08,
-    shadowRadius: 15,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
-  },
-  activeOrderHeader: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    gap: 8,
-  },
-  activeOrderStatusPill: {
-    backgroundColor: theme.successSurface,
-    borderWidth: 1,
-    borderColor: theme.success,
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  activeOrderStatusText: {
-    color: theme.successText,
-    fontWeight: '800',
-    fontSize: 11,
-  },
-  activeOrderTitle: {
-    color: theme.text,
-    fontWeight: '800',
-    fontSize: 14,
-    flex: 1,
-  },
-  activeOrderMetaRow: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  activeOrderMetaText: {
-    color: theme.textMuted,
-    fontSize: 12,
-    flex: 1,
-    textAlign,
-  },
-  activeOrderEtaText: {
-    color: theme.brand,
-    fontWeight: '800',
-    fontSize: 12,
-  },
-  activeOrderFooterRow: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  activeOrderAction: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: theme.brandSurface,
-    borderWidth: 1,
-    borderColor: colorPalette.borderSubtle,
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  activeOrderActionText: {
-    color: theme.brand,
-    fontWeight: '800',
-    fontSize: 12,
-  },
-  screenRoot: {
-    flex: 1,
-  },
-  brandTopBarOffset: {
-    marginTop: spacing[0],
-  },
-  brandTopBarShell: {
-    marginTop: spacing[0],
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    overflow: 'hidden',
-    paddingTop: spacing[3],
-    paddingBottom: spacing[3],
-    backgroundColor: 'rgba(255, 255, 255, 0.85)', // Glass effect base
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  bannerCarouselFullBleed: {
-    marginHorizontal: -spacing[3],
-  },
-  storeListViewport: {
-    marginTop: spacing[2],
-    width: '100%',
-    overflow: 'hidden',
-    alignSelf: 'stretch',
-  },
-  storeListContent: {
-    width: '100%',
-    gap: spacing[2],
-    alignSelf: 'stretch',
-  },
-  emptyFeed: {
-    borderWidth: 1,
-    borderColor: theme.line,
-    borderRadius: 18,
-    backgroundColor: theme.surface,
-    paddingHorizontal: 16,
-    paddingVertical: 18,
-    gap: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyFeedEmoji: {
-    fontSize: 24,
-    lineHeight: 28,
-  },
-  emptyFeedTitle: {
-    color: colorPalette.brandStrong,
-    fontWeight: '800',
-    fontSize: 14,
-    textAlign,
-  },
-  emptyFeedText: {
-    color: theme.textMuted,
-    fontSize: 12,
-    lineHeight: 18,
-    textAlign,
-  },
-  storeListCard: {
-    width: '100%',
-    alignSelf: 'stretch',
-  },
-  activeOrderStatusLabel: {
-    color: theme.textMuted,
-    fontSize: 11,
-  },
-  recentOrdersSection: {
-    gap: 10,
-  },
-  recentOrdersHeader: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  recentOrdersTitle: {
-    color: colorPalette.brandStrong,
-    fontWeight: '800',
-    fontSize: 14,
-  },
-  recentOrdersSubtitle: {
-    color: theme.textMuted,
-    fontSize: 11,
-    marginTop: 2,
-  },
-  recentOrdersHeaderAction: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: theme.surfaceInset,
-  },
-  recentOrdersHeaderActionText: {
-    color: theme.textMuted,
-    fontWeight: '700',
-    fontSize: 11,
-  },
-  recentOrdersRow: {
-    flexDirection: rowDirection,
-    gap: 10,
-  },
-  recentOrderCard: {
-    width: 212,
-    backgroundColor: theme.surface,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: theme.line,
-    padding: 14,
-    gap: 8,
-    shadowColor: colorPalette.brandStrong,
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
-  },
-  recentOrderCardTop: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  recentOrderBadge: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: theme.brandSurface,
-    borderWidth: 1,
-    borderColor: colorPalette.borderSubtle,
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  recentOrderBadgeText: {
-    color: theme.brand,
-    fontWeight: '800',
-    fontSize: 11,
-  },
-  recentOrderTitle: {
-    color: colorPalette.brandStrong,
-    fontWeight: '800',
-    fontSize: 13,
-    flex: 1,
-    textAlign,
-  },
-  recentOrderSubtitle: {
-    color: theme.textMuted,
-    fontWeight: '700',
-    fontSize: 13,
-    textAlign,
-  },
-  recentOrderMeta: {
-    color: theme.textMuted,
-    fontSize: 11,
-    textAlign,
-  },
-  recentOrderFooter: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  recentOrderStatusPill: {
-    backgroundColor: theme.surfaceInset,
-    borderWidth: 1,
-    borderColor: theme.line,
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  recentOrderStatusText: {
-    color: theme.brand,
-    fontWeight: '700',
-  },
-  recentOrderCTA: {
-    color: theme.brand,
-    fontWeight: '800',
-    fontSize: 12,
-  },
-  shortsOverlay: {
-    flex: 1,
-    backgroundColor: theme.overlay,
-    justifyContent: 'flex-end',
-  },
-  shortsPanel: {
-    backgroundColor: theme.surface,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    paddingHorizontal: 14,
-    paddingTop: 8,
-    paddingBottom: 18,
-    maxHeight: '72%',
-  },
-  shortsHandle: {
-    alignSelf: 'center',
-    width: 44,
-    height: 4,
-    borderRadius: 999,
-    backgroundColor: theme.lineStrong,
-    marginBottom: 10,
-  },
-  shortsHeader: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  shortsTitle: {
-    color: theme.text,
-    fontWeight: '800',
-    flex: 1,
-    textAlign: 'center',
-  },
-  shortsCloseButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: theme.surfaceInset,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  shortsList: {
-    gap: 10,
-    paddingBottom: 10,
-  },
-  shortsCard: {
-    borderRadius: 20,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: theme.line,
-    backgroundColor: colorPalette.surfaceAlt,
-    gap: 10,
-  },
-  shortsCardPromo: {
-    backgroundColor: theme.brandSurface,
-    borderColor: colorPalette.borderSubtle,
-  },
-  shortsCardStore: {
-    backgroundColor: theme.infoSurface,
-    borderColor: theme.info,
-  },
-  shortsCardTracking: {
-    backgroundColor: theme.successSurface,
-    borderColor: theme.success,
-  },
-  shortsCardTopRow: {
-    flexDirection: rowDirection,
-    alignItems: 'flex-start',
-    gap: 10,
-  },
-  shortsPlayBadge: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: theme.brand,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexShrink: 0,
-  },
-  shortsCardTextWrap: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  shortsCardTitle: {
-    color: theme.text,
-    fontWeight: '800',
-    fontSize: 14,
-    textAlign,
-  },
-  shortsCardSubtitle: {
-    color: theme.textMuted,
-    marginTop: 4,
-    fontSize: 12,
-    lineHeight: 17,
-    textAlign,
-  },
-  shortsCardFooter: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  shortsCardFooterText: {
-    color: theme.brand,
-    fontWeight: '700',
-  },
-  carouselStage: {
-    height: 238,
-    borderRadius: 30,
-    backgroundColor: theme.surface,
-    borderWidth: 1,
-    borderColor: theme.line,
-    shadowColor: colorPalette.black,
-    shadowOpacity: 0.05,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3,
-  },
-  carouselDotsRow: {
-    flexDirection: rowDirection,
-    alignSelf: 'center',
-    gap: 9,
-  },
-  carouselDot: {
-    width: 13,
-    height: 13,
-    borderRadius: 6.5,
-    backgroundColor: theme.lineStrong,
-  },
-  carouselDotActive: {
-    width: 34,
-    backgroundColor: theme.brand,
-  },
-  heroRow: {
-    flexDirection: rowDirection,
-    alignItems: 'stretch',
-    gap: 8,
-  },
-  homeHighlightsPanel: {
-    marginTop: spacing[3],
-    marginBottom: spacing[3],
-    padding: spacing[3],
-    borderRadius: 32,
-    backgroundColor: theme.surface,
-    borderWidth: 1,
-    borderColor: theme.line,
-    shadowColor: colorPalette.black,
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 5,
-  },
-  categoriesSelectorSection: {
-    marginTop: 0,
-    marginBottom: spacing[1],
-  },
-  categoriesSelectorRow: {
-    flexDirection: rowDirection,
-    alignItems: 'flex-start',
-    gap: 8,
-  },
-  categoriesSelectorScroll: {
-    flex: 1,
-  },
-  categoriesSelectorScrollContent: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 0,
-  },
-  fixedIconsContainer: {
-    flexDirection: rowDirection,
-    alignItems: 'flex-start',
-    gap: 4,
-    flexShrink: 0,
-  },
-  categorySelectorCard: {
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 0,
-    alignSelf: 'flex-start',
-  },
-  categorySelectorCardActive: {
-    transform: [{ translateY: -1 }],
-  },
-  videoIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
-    backgroundColor: theme.brandSurface,
-    borderWidth: 1,
-    borderColor: colorPalette.borderSubtle,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  categoryIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
-    backgroundColor: theme.surfaceInset,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    marginBottom: 2,
-  },
-  categoryHubIconContainer: {
-    backgroundColor: theme.brandSurface,
-    borderWidth: 1,
-    borderColor: colorPalette.borderSubtle,
-  },
-  categoryIconImage: {
-    width: 42,
-    height: 42,
-    fontSize: 32,
-    lineHeight: 32,
-  },
-  categoryNameContainer: {
-    alignItems: 'center',
-    minHeight: 20,
-  },
-  categoryNameContainerSelected: {
-    backgroundColor: theme.brand,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  categoryName: {
-    color: theme.text,
-    fontWeight: '700',
-    fontSize: 11,
-    textAlign: 'center',
-  },
-  subcategorySelectorCard: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    backgroundColor: theme.surfaceInset,
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    gap: 8,
-    shadowColor: colorPalette.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  subcategorySelectorCardActive: {
-    backgroundColor: colorPalette.brandStrong,
-  },
-  subcategoryIconContainer: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: theme.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  subcategoryEmoji: {
-    fontSize: 16,
-  },
-  subcategoryName: {
-    color: theme.text,
-    fontWeight: '600',
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  subcategoryNameActive: {
-    color: theme.textInverse,
-  },
-  selectorRail: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: spacing[2],
-    paddingVertical: spacing[1],
-    justifyContent: 'flex-start',
-  },
-  heroPromoCard: {
-    flex: 1,
-    minWidth: 200,
-    height: 84,
-    borderRadius: 24,
-    backgroundColor: '#1A1C1E', // Premium Dark Gray/Black
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    justifyContent: 'space-between',
-    shadowColor: colorPalette.black,
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  heroPromoCardInline: {
-    flex: 1,
-    minWidth: 168,
-    maxWidth: 204,
-    alignSelf: 'stretch',
-  },
-  heroPromoContent: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    gap: 10,
-  },
-  heroPromoIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: theme.brandHeaderSurfaceStrong,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  heroPromoTextWrap: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 3,
-  },
-  heroPromoBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
-    backgroundColor: theme.brandHeaderSurface,
-    alignSelf: 'center',
-  },
-  heroPromoBadgeText: {
-    color: theme.textInverse,
-    fontWeight: '800',
-    fontSize: 10,
-    textAlign: 'center',
-  },
-  heroPromoTitle: {
-    color: theme.textInverse,
-    fontWeight: '700',
-    fontSize: 14,
-    lineHeight: 16,
-    textAlign: 'center',
-  },
-  heroPromoSubtitle: {
-    color: theme.surface,
-    fontWeight: '500',
-    textAlign: 'center',
-    fontSize: 11,
-    lineHeight: 13,
-  },
-  heroIcon: {
-    color: theme.textInverse,
-    fontSize: 26,
-    lineHeight: 24,
-  },
-  categoryRail: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 0,
-    paddingTop: 0,
-    paddingBottom: 0,
-    justifyContent: 'flex-start',
-  },
-  categoryRailItem: {
-    minHeight: 42,
-    borderRadius: radius.pill,
-    backgroundColor: theme.surface,
-    borderWidth: 1,
-    borderColor: theme.line,
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[1],
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    gap: 6,
-  },
-  categoryRailItemActive: {
-    backgroundColor: theme.brandSurface,
-    borderColor: theme.brand,
-  },
-  categoryRailIcon: {
-    fontSize: 14,
-  },
-  categoryRailLabel: {
-    color: theme.textMuted,
-    textAlign: 'center',
-  },
-  categoryRailLabelActive: {
-    color: theme.brand,
-  },
-  heroPagerRow: {
-    alignItems: 'center',
-  },
-  heroPagerActive: {
-    width: 18,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: theme.textInverse,
-  },
-  quickActionBottomRow: {
-    flexDirection: rowDirection,
-    alignItems: 'stretch',
-    gap: 8,
-  },
-  quickActionSecondary: {
-    minHeight: 42,
-    borderRadius: 21,
-    backgroundColor: colorPalette.brandStrong,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  quickActionTertiary: {
-    flex: 0.95,
-    borderRadius: 21,
-    backgroundColor: theme.brand,
-    paddingHorizontal: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  quickActionChipContent: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    gap: 6,
-  },
-  quickActionLabel: {
-    color: theme.textInverse,
-    fontWeight: '700',
-    fontSize: 11,
-  },
-  filtersRow: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    gap: spacing[1],
-    paddingVertical: spacing[1],
-    paddingHorizontal: 0,
-    justifyContent: 'flex-start',
-  },
-  filtersRowScroll: {
-    flex: 1,
-  },
-  filtersRowScrollContent: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    gap: spacing[1],
-  },
-  filterChip: {
-    minHeight: sizes.controlSm,
-    borderRadius: radius.pill,
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[2],
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  filterChipCategory: {
-    flexShrink: 0,
-  },
-  filterChipFixed: {
-    flexShrink: 0,
-  },
-  filterChipContent: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    gap: 6,
-  },
-  filterChipIconWrap: {
-    width: 18,
-    height: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  filterChipIcon: {
-    width: 16,
-    height: 16,
-    fontSize: 14,
-    lineHeight: 16,
-  },
-  filterChipLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  storeCard: {
-    borderWidth: 1,
-    borderColor: theme.line,
-    borderRadius: 32,
-    backgroundColor: theme.surface,
-    padding: 16,
-    shadowColor: colorPalette.black,
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 8,
-  },
-  storeCardTopRow: {
-    flexDirection: rowDirection,
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  statusChip: {
-    minHeight: 30,
-    borderRadius: 15,
-    backgroundColor: theme.successSurface,
-    borderWidth: 1.2,
-    borderColor: theme.success,
-    paddingHorizontal: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statusChipClosed: {
-    backgroundColor: theme.dangerSurface,
-    borderColor: theme.danger,
-  },
-  statusChipText: {
-    color: theme.successText,
-    fontWeight: '700',
-  },
-  statusChipTextClosed: {
-    color: theme.dangerText,
-  },
-  storeImageStub: {
-    width: 96,
-    height: 96,
-    borderRadius: 18,
-    backgroundColor: theme.surfaceInset,
-    justifyContent: 'space-between',
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: theme.line,
-  },
-  storeImageOverlayRow: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 4,
-    paddingTop: 4,
-    gap: 4,
-    zIndex: 2,
-  },
-  storeImageCore: {
-    flex: 1,
-    marginHorizontal: 8,
-    marginBottom: 6,
-    borderRadius: 14,
-    backgroundColor: colorPalette.surfaceAlt,
-    opacity: 0.92,
-    overflow: 'hidden',
-  },
-  storeImageCoreGlow: {
-    flex: 1,
-    backgroundColor: theme.brandHeaderSurfaceStrong,
-  },
-  storeBadgeHot: {
-    minHeight: 20,
-    borderRadius: 10,
-    backgroundColor: theme.brand,
-    paddingHorizontal: 7,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  storeBadgeText: {
-    color: theme.textInverse,
-    fontWeight: '800',
-    fontSize: 11,
-  },
-  storeOfferRibbon: {
-    backgroundColor: theme.brand,
-    paddingVertical: 3,
-    paddingHorizontal: 7,
-    borderRadius: 9,
-    alignItems: 'center',
-  },
-  storeOfferRibbonText: {
-    color: theme.textInverse,
-    fontWeight: '700',
-    fontSize: 11,
-  },
-  storeBodyRow: {
-    flexDirection: rowDirection,
-    gap: 12,
-    alignItems: 'flex-start',
-  },
-  favoriteColumn: {
-    width: 42,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: 10,
-  },
-  storeContentColumn: {
-    flex: 1,
-    alignItems: 'flex-end',
-    gap: 4,
-  },
-  storeTitle: {
-    color: theme.text,
-    fontWeight: '800',
-    textAlign,
-    fontSize: 18,
-    lineHeight: 22,
-  },
-  storeAddress: {
-    color: theme.textMuted,
-    textAlign,
-    fontSize: 13,
-    lineHeight: 16,
-  },
-  storeDistanceLine: {
-    color: theme.textMuted,
-    textAlign,
-    fontSize: 13,
-    lineHeight: 16,
-  },
-  storeMetaChipRow: {
-    flexDirection: rowDirection,
-    flexWrap: 'wrap',
-    gap: 6,
-    justifyContent: 'flex-end',
-    marginTop: 2,
-  },
-  metaChip: {
-    minHeight: 28,
-    borderRadius: 14,
-    backgroundColor: theme.surfaceInset,
-    paddingHorizontal: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  metaChipText: {
-    color: theme.textMuted,
-    fontWeight: '700',
-  },
-  metaChipBlue: {
-    backgroundColor: theme.infoSurface,
-  },
-  metaChipBlueText: {
-    color: theme.info,
-    fontWeight: '800',
-  },
-  storeFooterRow: {
-    flexDirection: rowDirection,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    gap: 5,
-    marginTop: 10,
-  },
-  storeScorePill: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: theme.warningSurface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  storeMultiplierPill: {
-    minHeight: 28,
-    borderRadius: 14,
-    backgroundColor: theme.warning,
-    paddingHorizontal: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  storeMultiplierText: {
-    color: theme.warningText,
-    fontWeight: '800',
-  },
-  storeFollowersText: {
-    color: theme.textMuted,
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  storeFollowAdd: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: theme.brand,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  storeFollowAddText: {
-    color: theme.textInverse,
-    fontWeight: '800',
-    fontSize: 11,
-  },
-  storeFollowAdded: {
-    backgroundColor: theme.brand,
-  },
+    screenRoot: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    brandTopBarShell: {
+      marginTop: spacing[0],
+      borderBottomLeftRadius: 24,
+      borderBottomRightRadius: 24,
+      overflow: 'hidden',
+      paddingTop: spacing[3],
+      paddingBottom: spacing[3],
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderWidth: 1,
+      borderColor: 'rgba(0, 0, 0, 0.05)',
+      shadowColor: colorPalette.black,
+      shadowOpacity: 0.1,
+      shadowRadius: 10,
+      elevation: 5,
+    },
+    bannerCarouselFullBleed: {
+      marginHorizontal: -spacing[3],
+    },
+    homeHighlightsPanel: {
+      marginTop: spacing[3],
+      marginBottom: spacing[2],
+      padding: spacing[3],
+      borderRadius: 28,
+      backgroundColor: theme.surface,
+      borderWidth: 1,
+      borderColor: theme.line,
+      shadowColor: colorPalette.black,
+      shadowOpacity: 0.06,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 4,
+    },
+    categoriesSelectorSection: {
+      marginBottom: spacing[1],
+    },
+    categoriesSelectorRow: {
+      flexDirection: rowDirection,
+      alignItems: 'flex-start',
+      gap: 12,
+    },
+    fixedIconsContainer: {
+      flexDirection: rowDirection,
+      alignItems: 'flex-start',
+      gap: 8,
+      flexShrink: 0,
+    },
+    categorySelectorCard: {
+      alignItems: 'center',
+      gap: 4,
+    },
+    videoIconContainer: {
+      width: 56,
+      height: 56,
+      borderRadius: 16,
+      backgroundColor: theme.brandSurface,
+      borderWidth: 1.5,
+      borderColor: colorPalette.brand,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    categoryNameContainer: {
+      alignItems: 'center',
+      minHeight: 18,
+    },
+    categoryName: {
+      color: theme.text,
+      fontWeight: '700',
+      fontSize: 11,
+      textAlign: 'center',
+    },
+    categoryIconContainer: {
+      width: 56,
+      height: 56,
+      borderRadius: 16,
+      backgroundColor: theme.surfaceInset,
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+    },
+    categoryHubIconContainer: {
+      backgroundColor: theme.brandSurface,
+      borderWidth: 1,
+      borderColor: colorPalette.brandStrong,
+    },
+    categoryIconImage: {
+      width: 32,
+      height: 32,
+    },
+    categoryNameContainerSelected: {
+      backgroundColor: theme.brand,
+      borderRadius: 6,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+    },
+    heroPromoCard: {
+      flex: 1,
+      height: 80,
+      borderRadius: 20,
+      backgroundColor: theme.brandStrong, // Premium Deep Blue
+      padding: 12,
+      justifyContent: 'center',
+      shadowColor: colorPalette.black,
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    heroPromoCardInline: {
+      maxWidth: 180,
+    },
+    heroPromoContent: {
+      flexDirection: rowDirection,
+      alignItems: 'center',
+      gap: 10,
+    },
+    heroPromoIconWrap: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    heroIcon: {
+      fontSize: 24,
+    },
+    heroPromoTextWrap: {
+      flex: 1,
+      gap: 1,
+    },
+    heroPromoBadge: {
+      alignSelf: 'flex-start',
+      paddingHorizontal: 6,
+      paddingVertical: 1,
+      borderRadius: 4,
+      backgroundColor: theme.brand,
+      marginBottom: 2,
+    },
+    heroPromoBadgeText: {
+      color: colorPalette.white,
+      fontWeight: '900',
+      fontSize: 9,
+    },
+    heroPromoTitle: {
+      color: colorPalette.white,
+      fontWeight: '900',
+      fontSize: 15,
+      lineHeight: 18,
+    },
+    heroPromoSubtitle: {
+      color: 'rgba(255, 255, 255, 0.85)',
+      fontSize: 10,
+      fontWeight: '700',
+    },
+    heroPagerRow: {
+      marginTop: 4,
+      alignItems: 'center',
+    },
+    heroPagerActive: {
+      width: 12,
+      height: 3,
+      borderRadius: 2,
+      backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    },
+    categoriesSelectorScroll: {
+      flex: 1,
+    },
+    categoriesSelectorScrollContent: {
+      flexDirection: rowDirection,
+      alignItems: 'center',
+      gap: 8,
+    },
+    subcategorySelectorCard: {
+      flexDirection: rowDirection,
+      alignItems: 'center',
+      backgroundColor: theme.surfaceInset,
+      borderRadius: 999,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      gap: 6,
+      borderWidth: 1,
+      borderColor: theme.line,
+    },
+    subcategorySelectorCardActive: {
+      backgroundColor: theme.brand,
+      borderColor: theme.brand,
+    },
+    subcategoryIconContainer: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: theme.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    subcategoryEmoji: {
+      fontSize: 14,
+    },
+    subcategoryName: {
+      color: theme.text,
+      fontWeight: '700',
+      fontSize: 12,
+    },
+    subcategoryNameActive: {
+      color: theme.textInverse,
+    },
+    filtersRow: {
+      flexDirection: rowDirection,
+      alignItems: 'center',
+      gap: spacing[2],
+      paddingVertical: spacing[2],
+    },
+    filtersRowScroll: {
+      flex: 1,
+    },
+    filtersRowScrollContent: {
+      flexDirection: rowDirection,
+      alignItems: 'center',
+      gap: spacing[2],
+    },
+    filterChip: {
+      height: 36,
+      borderRadius: 18,
+      paddingHorizontal: 12,
+      flexDirection: rowDirection,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: theme.line,
+    },
+    filterChipCategory: {
+      paddingRight: 16,
+    },
+    filterChipContent: {
+      flexDirection: rowDirection,
+      alignItems: 'center',
+      gap: 6,
+    },
+    filterChipIconWrap: {
+      width: 18,
+      height: 18,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    filterChipIcon: {
+      width: 16,
+      height: 16,
+    },
+    filterChipLabel: {
+      fontSize: 12,
+      fontWeight: '800',
+    },
+    storeListViewport: {
+      marginTop: spacing[1],
+      flex: 1,
+    },
+    storeListContent: {
+      gap: spacing[3],
+      paddingBottom: spacing[8],
+    },
+    emptyFeed: {
+      borderRadius: 24,
+      backgroundColor: theme.surface,
+      padding: 32,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 12,
+      borderWidth: 1,
+      borderColor: theme.line,
+    },
+    emptyFeedEmoji: {
+      fontSize: 48,
+    },
+    emptyFeedTitle: {
+      color: theme.text,
+      textAlign: 'center',
+    },
+    emptyFeedText: {
+      color: theme.textMuted,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    storeListCard: {
+      width: '100%',
+    },
   });
 }
 
