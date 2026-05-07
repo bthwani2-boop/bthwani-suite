@@ -92,11 +92,11 @@ const sourceLabelByLocale: Record<MarketingNewsTickerLocale, Record<MarketingNew
     system: 'النظام',
   },
   en: {
-    operations: 'Operations',
-    customer: 'Customer',
-    marketing: 'Marketing',
-    partner: 'Partner',
-    system: 'System',
+    operations: 'العمليات',
+    customer: 'العميل',
+    marketing: 'التسويق',
+    partner: 'الشريك',
+    system: 'النظام',
   },
 };
 
@@ -110,12 +110,12 @@ const audienceLabelByLocale: Record<MarketingNewsTickerLocale, Record<MarketingN
     operations: 'العمليات',
   },
   en: {
-    all: 'All',
-    home: 'Home',
-    order: 'Active Order',
-    stores: 'Stores',
-    client: 'Client',
-    operations: 'Operations',
+    all: 'الكل',
+    home: 'الرئيسية',
+    order: 'الطلب النشط',
+    stores: 'المتاجر',
+    client: 'العملاء',
+    operations: 'العمليات',
   },
 };
 
@@ -127,10 +127,10 @@ const priorityLabelByLocale: Record<MarketingNewsTickerLocale, Record<MarketingN
     low: 'منخفض',
   },
   en: {
-    critical: 'Critical',
-    high: 'High',
-    normal: 'Normal',
-    low: 'Low',
+    critical: 'حرج',
+    high: 'عالٍ',
+    normal: 'عادي',
+    low: 'منخفض',
   },
 };
 
@@ -141,9 +141,9 @@ const deliveryLabelByLocale: Record<MarketingNewsTickerLocale, Record<MarketingN
     pinned: 'مثبّت',
   },
   en: {
-    auto: 'Auto',
-    manual: 'Manual',
-    pinned: 'Pinned',
+    auto: 'تلقائي',
+    manual: 'يدوي',
+    pinned: 'مثبّت',
   },
 };
 
@@ -156,11 +156,11 @@ const planReasonLabelByLocale: Record<MarketingNewsTickerLocale, Record<Marketin
     audience: 'الجمهور غير مطابق',
   },
   en: {
-    'outside-window': 'Outside display window',
-    cooldown: 'Within cooldown',
-    duplicate: 'Duplicate',
-    draft: 'Draft',
-    audience: 'Audience mismatch',
+    'outside-window': 'خارج نافذة العرض',
+    cooldown: 'ضمن فترة التهدئة',
+    duplicate: 'مكرر',
+    draft: 'مسودة',
+    audience: 'الجمهور غير مطابق',
   },
 };
 
@@ -172,10 +172,10 @@ const statusLabelByLocale: Record<MarketingNewsTickerLocale, Record<MarketingNew
     scheduled: 'مجدول',
   },
   en: {
-    draft: 'Draft',
-    published: 'Published',
-    paused: 'Paused',
-    scheduled: 'Scheduled',
+    draft: 'مسودة',
+    published: 'منشور',
+    paused: 'متوقف',
+    scheduled: 'مجدول',
   },
 };
 
@@ -187,10 +187,10 @@ const kindLabelByLocale: Record<MarketingNewsTickerLocale, Record<MarketingNewsT
     partner: 'الشريك',
   },
   en: {
-    platform: 'Platform',
-    order: 'Order',
-    promo: 'Promo',
-    partner: 'Partner',
+    platform: 'المنصة',
+    order: 'الطلب',
+    promo: 'عرض',
+    partner: 'الشريك',
   },
 };
 
@@ -202,10 +202,10 @@ const targetLabelByLocale: Record<MarketingNewsTickerLocale, Record<string, stri
     promo: 'عرض',
   },
   en: {
-    home: 'Home',
-    orders: 'Orders',
-    tracking: 'Tracking',
-    promo: 'Promo',
+    home: 'الرئيسية',
+    orders: 'الطلبات',
+    tracking: 'التتبع',
+    promo: 'عرض',
   },
 };
 
@@ -592,10 +592,10 @@ export function resolveMarketingTickerDeliveryLabel(locale: MarketingNewsTickerL
 
 export function resolveMarketingTickerPlanReasonLabel(locale: MarketingNewsTickerLocale, reason?: MarketingTickerPlanReason) {
   if (!reason) {
-    return locale === 'en' ? 'Ready' : 'جاهز';
+    return 'مؤهل';
   }
 
-  return planReasonLabelByLocale[locale][reason];
+  return planReasonLabelByLocale[locale][reason] || planReasonLabelByLocale['ar'][reason];
 }
 
 export function resolveMarketingTickerStatusLabel(locale: MarketingNewsTickerLocale, status: MarketingNewsTickerStatus) {

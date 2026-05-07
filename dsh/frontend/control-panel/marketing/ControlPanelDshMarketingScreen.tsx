@@ -216,8 +216,12 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                   <span style={{ fontSize: '10px', color: '#fff', opacity: 0.8 }}>← {localizeTarget(previewItem!.actionTarget)}</span>
                 </div>
               ) : (
-                <div style={{ height: '40px', backgroundColor: '#F1F5F9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                   <p style={{ color: '#94A3B8', fontSize: '12px', margin: 0 }}>لا توجد معاينة متاحة</p>
+                <div style={{ height: '40px', backgroundColor: '#F1F5F9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 12px' }}>
+                   <p style={{ color: '#94A3B8', fontSize: '12px', margin: 0, fontWeight: '700' }}>
+                     {tickerPlan.suppressedEntries.find(e => e.item.id === (editingTickerId || ''))?.reason
+                        ? `السبب: ${resolveMarketingTickerPlanReasonLabel('ar', tickerPlan.suppressedEntries.find(e => e.item.id === (editingTickerId || ''))?.reason)}`
+                        : 'لا توجد معاينة متاحة أو الرسالة غير مؤهلة للعرض'}
+                   </p>
                 </div>
               )}
             </div>
@@ -236,43 +240,56 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                     const isSuppressed = planEntry?.state === 'suppressed';
 
                     return (
-                      <div key={ticker.id} style={{ padding: '10px', backgroundColor: '#F8FAFC', borderRadius: '8px', border: editingTickerId === ticker.id ? '1px solid #FF500D' : '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box gap={1}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '4px', backgroundColor: isPublished ? '#DCFCE7' : '#F1F5F9', color: isPublished ? '#16A34A' : '#64748B', fontWeight: '800' }}>
+                      <div key={ticker.id} style={{ padding: '12px', backgroundColor: '#F8FAFC', borderRadius: '8px', border: editingTickerId === ticker.id ? '1px solid #FF500D' : '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontSize: '14px', fontWeight: '800', color: '#0A2F5C', margin: '0 0 4px 0', lineHeight: '1.4' }}>{ticker.message}</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '4px', backgroundColor: isPublished ? '#DCFCE7' : '#F1F5F9', color: isPublished ? '#16A34A' : '#64748B', fontWeight: '900' }}>
                               {localizeStatus(ticker.status)}
                             </span>
-                            <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748B' }}>#{ticker.id}</span>
-                            <span style={{ fontSize: '10px', color: '#64748B' }}>{resolveMarketingTickerSourceLabel('ar', ticker.source)}</span>
-                            <span style={{ fontSize: '10px', color: '#64748B' }}>{resolveMarketingTickerAudienceLabel('ar', ticker.audience)}</span>
-                            <span style={{ fontSize: '10px', color: '#64748B' }}>{resolveMarketingTickerPriorityLabel('ar', ticker.priority)}</span>
-                            <span style={{ fontSize: '10px', color: '#64748B' }}>{ticker.openHour}:00-{ticker.closeHour}:00</span>
-                            <span style={{ fontSize: '10px', color: '#64748B' }}>{localizeTarget(ticker.actionTarget)}</span>
-                            {isSuppressed && <span style={{ fontSize: '10px', color: '#DC2626' }}>الكبت: {resolveMarketingTickerPlanReasonLabel('ar', planEntry?.reason)}</span>}
+                            <div style={{ display: 'flex', gap: '6px', fontSize: '10px', color: '#64748B', fontWeight: '600' }}>
+                              <span>#{ticker.id}</span>
+                              <span style={{ opacity: 0.4 }}>|</span>
+                              <span>{resolveMarketingTickerSourceLabel('ar', ticker.source)}</span>
+                              <span style={{ opacity: 0.4 }}>|</span>
+                              <span>{resolveMarketingTickerAudienceLabel('ar', ticker.audience)}</span>
+                              <span style={{ opacity: 0.4 }}>|</span>
+                              <span>{resolveMarketingTickerPriorityLabel('ar', ticker.priority)}</span>
+                              <span style={{ opacity: 0.4 }}>|</span>
+                              <span>{ticker.openHour}:00-{ticker.closeHour}:00</span>
+                              <span style={{ opacity: 0.4 }}>|</span>
+                              <span>{localizeTarget(ticker.actionTarget)}</span>
+                            </div>
+                            {isSuppressed && (
+                              <span style={{ fontSize: '10px', color: '#DC2626', backgroundColor: '#FEF2F2', padding: '2px 6px', borderRadius: '4px', fontWeight: '800' }}>
+                                الكبت: {resolveMarketingTickerPlanReasonLabel('ar', planEntry?.reason)}
+                              </span>
+                            )}
                           </div>
-                          <p style={{ fontSize: '13px', fontWeight: '700', color: '#0A2F5C', margin: 0 }}>{ticker.message}</p>
-                        </Box>
-                        <div style={{ display: 'flex', gap: '6px' }}>
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
                           <button onClick={() => {
                               toggleMarketingTickerStatus(ticker.id);
                               refreshTickers();
-                            }} style={{ padding: '4px 8px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '4px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
+                            }} style={{ padding: '6px 10px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '800', cursor: 'pointer' }}>
                             {isPublished ? 'إيقاف' : 'تفعيل'}
                           </button>
-                          <button onClick={() => setEditingTickerId(ticker.id)} style={{ padding: '4px 8px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '4px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
+                          <button onClick={() => setEditingTickerId(ticker.id)} style={{ padding: '6px 10px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '800', cursor: 'pointer' }}>
                             تعديل
                           </button>
                           <button onClick={() => {
                               toggleMarketingTickerPinned(ticker.id);
                               refreshTickers();
-                            }} style={{ padding: '4px 8px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '4px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
+                            }} style={{ padding: '6px 10px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '800', cursor: 'pointer' }}>
                             {ticker.deliveryMode === 'pinned' ? 'إلغاء التثبيت' : 'تثبيت'}
                           </button>
                           <button onClick={() => {
-                              removeMarketingTickerItem(ticker.id);
-                              if (editingTickerId === ticker.id) setEditingTickerId(null);
-                              refreshTickers();
-                            }} style={{ padding: '4px 8px', backgroundColor: '#FEF2F2', color: '#DC2626', borderRadius: '4px', border: 'none', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>
+                              if (window.confirm('هل أنت متأكد من حذف هذه الرسالة؟')) {
+                                removeMarketingTickerItem(ticker.id);
+                                if (editingTickerId === ticker.id) setEditingTickerId(null);
+                                refreshTickers();
+                              }
+                            }} style={{ padding: '6px 10px', backgroundColor: '#FEF2F2', color: '#DC2626', borderRadius: '6px', border: 'none', fontSize: '11px', fontWeight: '800', cursor: 'pointer' }}>
                             حذف
                           </button>
                         </div>
@@ -421,8 +438,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
               <h3 style={{ color: '#0A2F5C', fontSize: '13px', fontWeight: '800', margin: '0 0 8px 0' }}>قواعد التشغيل</h3>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>📌 مثبت (Pinned) أعلى</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '12px', color: '#DC2626' }}>🔥 حرج (Critical) أعلى</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>📌 مثبت في الأعلى</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '12px', color: '#DC2626' }}>🔥 حرج في الأعلى</span>
                 <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>🚫 الجمهور غير مطابق</span>
                 <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>⏳ خارج نافذة العرض</span>
                 <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>⏱️ ضمن فترة التهدئة</span>
@@ -526,7 +543,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                 سيتم دمج نظام المكافآت والمستويات للعملاء هنا لمنح الشركاء القدرة على بناء ولاء طويل المدى.
               </p>
               <div style={{ padding: '8px 16px', backgroundColor: '#F1F5F9', borderRadius: '8px', color: '#0A2F5C', fontWeight: '700', fontSize: '12px', marginTop: '10px' }}>
-                PLANNED FOR NEXT PHASE
+                مخطط للمرحلة القادمة
               </div>
             </Box>
           </Box>
@@ -555,7 +572,10 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
             🎯
           </div>
           <Box gap={0}>
-            <h1 style={{ letterSpacing: '-0.02em', fontSize: '20px', fontWeight: '900', color: '#0A2F5C' }}>تسويق DSH</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ letterSpacing: '-0.02em', fontSize: '20px', fontWeight: '900', color: '#0A2F5C' }}>تسويق DSH</h1>
+              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>NEEDS_BACKEND_BINDING</span>
+            </div>
             <p style={{ fontWeight: 600, color: '#64748B', fontSize: '11px' }}>إدارة الشريط الذكي، البنرات، النمو، وعروض الشركاء.</p>
           </Box>
         </div>

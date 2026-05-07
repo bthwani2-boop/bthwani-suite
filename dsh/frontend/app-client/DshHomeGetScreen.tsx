@@ -955,10 +955,11 @@ export function DshHomeGetScreen({
 
     return {
       isOpen: true,
-      statusLabel: currentLanguage === 'ar' ? 'مباشر' : 'Live',
+      statusLabel: currentLanguage === 'ar' ? 'مباشر' : 'مباشر',
       message: activeItem.message,
       isMarketing: true,
       actionTarget: activeItem.actionTarget,
+      needsBinding: true,
     };
   }, [currentLanguage, currentTime, isTickerHidden]);
 
@@ -1086,7 +1087,7 @@ return (
           ticker={{
             statusLabel: tickerState?.statusLabel ?? '',
             message: tickerState?.isMarketing
-              ? `${isTickerPaused ? '⏸️' : ''} ${tickerState.message}`
+              ? `${isTickerPaused ? '⏸️' : ''} ${tickerState.message}${tickerState.needsBinding ? ' [NEEDS_BACKEND_BINDING]' : ''}`
               : (tickerState?.message ?? ''),
             onPress: handleTickerAction,
             marquee: tickerState?.isMarketing ? !isTickerPaused : true,
