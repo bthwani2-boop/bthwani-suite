@@ -78,12 +78,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
 
   const SECONDARY_TABS: Record<MarketingControlView, { id: string; label: string }[]> = {
     ticker: [],
-    banners: [
-      { id: 'list', label: 'البنرات' },
-      { id: 'preview', label: 'المعاينة' },
-      { id: 'audience', label: 'الجمهور والوجهة' },
-      { id: 'quality', label: 'الجودة' },
-    ],
+    banners: [],
     growth: [
       { id: 'programs', label: 'البرامج' },
       { id: 'video', label: 'الفيديو' },

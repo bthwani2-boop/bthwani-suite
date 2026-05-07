@@ -103,8 +103,8 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
   {
     id: 'promo-1',
     mediaKey: 'dsh.banner.home.promo-1.v1',
-    title: 'تخفيضات',
-    subtitle: 'خصم 30% على أول طلب',
+    title: 'تخفيضات حصرية',
+    subtitle: 'خصم 30% على طلبك الأول عبر التطبيق',
     icon: '🔥',
     accentColor: brandPalette[500],
     actionType: 'main_category',
@@ -113,8 +113,8 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
   {
     id: 'promo-2',
     mediaKey: 'dsh.banner.home.promo-2.v1',
-    title: 'تتبّع مباشر',
-    subtitle: 'افتح الطلب النشط دون ضياع المسار',
+    title: 'تتبع طلبك',
+    subtitle: 'تابع حالة طلبك مباشرة وبدقة عالية',
     icon: '📍',
     accentColor: infoPalette[600],
     actionType: 'store',
@@ -123,53 +123,13 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
   {
     id: 'promo-3',
     mediaKey: 'dsh.banner.home.promo-3.v1',
-    title: 'الفئات المختارة',
-    subtitle: 'فئات قصيرة ومباشرة من نفس الواجهة',
+    title: 'خضروات طازجة',
+    subtitle: 'أفضل الفواكه والخضروات تصلك لباب المنزل',
     icon: '✨',
     accentColor: dangerPalette[600],
     actionType: 'sub_category',
     actionTarget: 'grocery',
     actionExtra: 'grocery_vegetables_fruits',
-  },
-  {
-    id: 'promo-4',
-    mediaKey: 'dsh.banner.home.promo-4.v1',
-    title: 'متجر مباشر',
-    subtitle: 'افتح المتجر ثم تابع إلى القائمة',
-    icon: '🏪',
-    accentColor: brandPalette[600],
-    actionType: 'store',
-    actionTarget: 'store-1002',
-  },
-  {
-    id: 'promo-5',
-    mediaKey: 'dsh.banner.home.promo-5.v1',
-    title: 'منتج مباشر',
-    subtitle: 'افتح المنتج الجاهز للتفاعل',
-    icon: '📦',
-    accentColor: dangerPalette[600],
-    actionType: 'product',
-    actionTarget: 'item-apple-1',
-    actionExtra: 'store-1001',
-  },
-  {
-    id: 'promo-6',
-    mediaKey: 'dsh.banner.home.promo-6.v1',
-    title: 'قائمة المتاجر',
-    subtitle: 'واجهة تجمع كل المتاجر القريبة',
-    icon: '🛍️',
-    accentColor: successPalette[600],
-    actionType: 'external',
-    actionTarget: 'DshStoresList',
-  },
-  {
-    id: 'promo-7',
-    mediaKey: 'dsh.banner.home.promo-7.v1',
-    title: 'اشتراك مميز',
-    subtitle: 'اعرض فوائد الاشتراك مباشرة',
-    icon: '⭐',
-    accentColor: brandPalette[600],
-    actionType: 'subscription',
   },
 ];
 
@@ -683,5 +643,3 @@ export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
   ...dshDiscoveryStores.map(toDshHomeGetFixtureStore),
   ...dshHomeGetFixtureStoresRaw,
 ];
-
-

@@ -16,6 +16,15 @@ type DshHomeGetPromo = {
   readonly actionExtra?: string;
   readonly mediaKey?: string;
   readonly accentColor?: string;
+  readonly templateId?: string;
+  readonly offerBadgeText?: string;
+  readonly offerBadgeTone?: string;
+  readonly partnerLogoUrl?: string;
+  readonly partnerLogoPosition?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  readonly overlayImageUrl?: string;
+  readonly overlayPosition?: 'center' | 'bottom' | 'top';
+  readonly textPlacement?: 'top' | 'center' | 'bottom';
+  readonly imageFit?: 'cover' | 'contain';
 };
 export type MarketingBannerActionType =
   | 'main_category'
@@ -48,6 +57,15 @@ export type MarketingBannerRecord = {
   scheduleStartHour?: number;
   scheduleEndHour?: number;
   updatedAt: string;
+  templateId?: string;
+  offerBadgeText?: string;
+  offerBadgeTone?: string;
+  partnerLogoUrl?: string;
+  partnerLogoPosition?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  overlayImageUrl?: string;
+  overlayPosition?: 'center' | 'bottom' | 'top';
+  textPlacement?: 'top' | 'center' | 'bottom';
+  imageFit?: 'cover' | 'contain';
 };
 
 const STORE_KEY = '__BTHWANI_DSH_MARKETING_BANNERS__';
@@ -290,6 +308,15 @@ export function mapMarketingBannerToPromo(item: MarketingBannerRecord): DshHomeG
     mediaKey: item.mediaKey,
     imageUrl: item.imageUrl,
     accentColor: item.accentColor,
+    templateId: item.templateId,
+    offerBadgeText: item.offerBadgeText,
+    offerBadgeTone: item.offerBadgeTone,
+    partnerLogoUrl: item.partnerLogoUrl,
+    partnerLogoPosition: item.partnerLogoPosition,
+    overlayImageUrl: item.overlayImageUrl,
+    overlayPosition: item.overlayPosition,
+    textPlacement: item.textPlacement,
+    imageFit: item.imageFit,
   };
 }
 
@@ -324,6 +351,15 @@ export function upsertMarketingBannerItem(item: Partial<MarketingBannerRecord>) 
     scheduleStartHour: typeof item.scheduleStartHour === 'number' ? item.scheduleStartHour : existing?.scheduleStartHour,
     scheduleEndHour: typeof item.scheduleEndHour === 'number' ? item.scheduleEndHour : existing?.scheduleEndHour,
     updatedAt: new Date().toISOString(),
+    templateId: item.templateId || existing?.templateId,
+    offerBadgeText: item.offerBadgeText || existing?.offerBadgeText,
+    offerBadgeTone: item.offerBadgeTone || existing?.offerBadgeTone,
+    partnerLogoUrl: item.partnerLogoUrl || existing?.partnerLogoUrl,
+    partnerLogoPosition: item.partnerLogoPosition || existing?.partnerLogoPosition,
+    overlayImageUrl: item.overlayImageUrl || existing?.overlayImageUrl,
+    overlayPosition: item.overlayPosition || existing?.overlayPosition,
+    textPlacement: item.textPlacement || existing?.textPlacement,
+    imageFit: item.imageFit || existing?.imageFit,
   };
 
   if (existing) {

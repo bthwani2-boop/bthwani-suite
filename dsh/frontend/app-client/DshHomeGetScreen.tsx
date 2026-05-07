@@ -808,11 +808,20 @@ export function DshHomeGetScreen({
           onOpenBenefits(promo.actionTarget);
           return;
         }
-
-        setInlineSearchVisible(true);
+        onOpenDiscovery?.();
         return;
       }
 
+      if (promo.actionType === 'external') {
+        if (promo.actionTarget === 'DshStoresList') {
+          onOpenList?.();
+          return;
+        }
+        onOpenDiscovery?.();
+        return;
+      }
+
+      // Fallback for unknown actions
       onOpenDiscovery?.();
     },
     [onOpenBenefits, onOpenDiscovery, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onPromoClick, resolveHomeCategoryContext]
@@ -1087,9 +1096,8 @@ return (
             },
           ]}
           ticker={{
-            statusLabel: tickerState?.statusLabel ?? '',
             message: tickerState?.isMarketing
-              ? `${isTickerPaused ? '⏸️' : ''} ${tickerState.message}${tickerState.needsBinding ? ' [NEEDS_BACKEND_BINDING]' : ''}`
+              ? `${isTickerPaused ? '⏸️' : ''} ${tickerState.message}`
               : (tickerState?.message ?? ''),
             onPress: handleTickerAction,
             marquee: tickerState?.isMarketing ? !isTickerPaused : true,
@@ -1126,11 +1134,11 @@ return (
           <View style={{ position: 'relative' }}>
             <BannerCarousel
               banners={bannerItems}
-              height={245}
+              height={180}
               variant="secondary"
               width={viewportWidth}
-              itemWidth={viewportWidth - 48}
-              sidePeeking={20}
+              itemWidth={viewportWidth - 32}
+              sidePeeking={8}
               gap={12}
               activeStep={activePromoIndex}
               onStepChange={setActivePromoIndex}
@@ -1142,7 +1150,7 @@ return (
                 onPress={() => setIsCarouselPaused(!isCarouselPaused)}
               >
                 <Text style={styles.carouselPauseText}>
-                  {isCarouselPaused ? '▶️' : '⏸️'}
+                  {isCarouselPaused ? 'تشغيل ▶️' : 'إيقاف ⏸️'}
                 </Text>
               </Pressable>
             )}
@@ -1508,16 +1516,18 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       position: 'absolute',
       top: 10,
       right: 24,
-      backgroundColor: 'rgba(0,0,0,0.3)',
-      width: 28,
-      height: 28,
-      borderRadius: 14,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      paddingHorizontal: 8,
+      height: 24,
+      borderRadius: 12,
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 10,
     },
     carouselPauseText: {
-      fontSize: 12,
+      fontSize: 10,
+      fontWeight: '800',
+      color: colorPalette.white,
     },
     carouselIndicatorRow: {
       position: 'absolute',
