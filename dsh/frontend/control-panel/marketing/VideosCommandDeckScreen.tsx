@@ -10,9 +10,7 @@ import {
   Text,
   TextField,
   useDirection,
-  colorPalette,
   SelectField,
-  SearchField
 } from '@bthwani/ui-kit';
 import {
   getMarketingVideoItems,
@@ -95,11 +93,16 @@ const TARGET_TYPE_OPTIONS: Array<{ value: MarketingVideoTargetType; label: strin
   { value: 'campaign', label: 'حملة', description: 'يفتح وجهة حملات عامة ضمن القناة الحالية.' },
   { value: 'search', label: 'بحث', description: 'يفتح واجهة البحث.' },
   { value: 'custom', label: 'مخصص', description: 'مسار محدود ومضبوط عندما لا تكفي الخيارات المنظمة.' },
+  { value: 'loyalty', label: 'الولاء (منقول)', description: 'يتبع نظام الولاء والاشتراكات.' },
 ];
 
 export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
   const { direction } = useDirection();
   const isRtl = direction === 'rtl';
+
+  // RTL Text styles helper
+  const rtlText = { textAlign: isRtl ? 'right' : 'left', writingDirection: isRtl ? 'rtl' : 'ltr' } as const;
+
   const [items, setItems] = React.useState<MarketingVideoRecord[]>(() => getMarketingVideoItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getMarketingVideoItems()[0]?.id ?? null);
   const selected = React.useMemo(() => (selectedId ? (items.find((item) => item.id === selectedId) ?? null) : null), [items, selectedId]);
@@ -168,26 +171,26 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
     <View style={[styles.root, isRtl && styles.rootRtl]}>
       {/* 1. Header & KPI Strip */}
       <Surface tone="raised" style={styles.headerSurface}>
-        <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-          <Box gap={1} layoutDirection={isRtl ? 'row-reverse' : 'row'}>
-            <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 8, justifyContent: 'flex-start' }]}>
-              <Text role="caption" style={{ color: '#0A2F5C', fontWeight: '900', letterSpacing: 1 }}>استوديو الفيديو DSH v1</Text>
+        <View style={[styles.headerRow]}>
+          <Box gap={1} >
+            <View style={[styles.headerRow, { gap: 8, justifyContent: 'flex-start' }]}>
+              <Text role="caption" style={[{ color: '#0A2F5C', fontWeight: '900', letterSpacing: 1 }, rtlText]}>استوديو الفيديو DSH v1</Text>
               <View style={{ backgroundColor: '#FF500D', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
-                <Text role="caption" style={{ color: '#fff', fontSize: 9, fontWeight: '900' }}>احترافي</Text>
+                <Text role="caption" style={[{ color: '#fff', fontSize: 9, fontWeight: '900' }, rtlText]}>احترافي</Text>
               </View>
             </View>
-            <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', color: '#0A2F5C', textAlign: isRtl ? 'right' : 'left' }}>استوديو الفيديو التسويقي</Text>
+            <Text role="titleLg" style={[{ fontSize: 24, fontWeight: '900', color: '#0A2F5C' }, rtlText]}>استوديو الفيديو التسويقي</Text>
           </Box>
 
-          <View style={[styles.kpiRow, isRtl && styles.rowReverse]}>
+          <View style={[styles.kpiRow]}>
             {[
               { label: 'إجمالي المحتوى', value: kpis.total, color: '#0A2F5C', bg: '#F8FAFC' },
               { label: 'نشط الآن', value: kpis.live, color: '#16A34A', bg: '#DCFCE7' },
               { label: 'قيد المراجعة', value: kpis.review, color: '#D97706', bg: '#FEF3C7' },
             ].map((kpi) => (
-              <View key={kpi.label} style={[styles.kpiPill, { backgroundColor: kpi.bg }, isRtl && styles.rowReverse]}>
-                <Text role="caption" style={{ fontWeight: '800', fontSize: 10, color: '#64748B' }}>{kpi.label}</Text>
-                <Text role="titleMd" style={{ color: kpi.color, fontWeight: '900', fontSize: 16 }}>{String(kpi.value)}</Text>
+              <View key={kpi.label} style={[styles.kpiPill, { backgroundColor: kpi.bg }]}>
+                <Text role="caption" style={[{ fontWeight: '800', fontSize: 10, color: '#64748B' }, rtlText]}>{kpi.label}</Text>
+                <Text role="titleMd" style={[{ color: kpi.color, fontWeight: '900', fontSize: 16 }, rtlText]}>{String(kpi.value)}</Text>
               </View>
             ))}
           </View>
@@ -197,34 +200,34 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
       </Surface>
 
       {/* Main Workspace */}
-      <View style={[styles.workspace, isRtl && styles.rowReverse]}>
+      <View style={[styles.workspace]}>
         {/* Left: List Panel */}
         <Surface tone="raised" style={styles.listPanel}>
-          <View style={[styles.panelHeader, isRtl && styles.rowReverse]}>
-            <Text role="titleSm" style={{ fontWeight: '900' }}>مكتبة المحتوى</Text>
-            <Text role="caption" tone="muted">{items.length} فيديوهات</Text>
+          <View style={[styles.panelHeader]}>
+            <Text role="titleSm" style={[{ fontWeight: '900' }, rtlText]}>مكتبة المحتوى</Text>
+            <Text role="caption" tone="muted" style={rtlText}>{items.length} فيديوهات</Text>
           </View>
           <ScrollView style={styles.listScroll} contentContainerStyle={styles.listContent}>
             {items.map((item) => {
               const isSelected = selected?.id === item.id;
               return (
-                <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={[styles.compactRow, isRtl && styles.rowReverse, isSelected && styles.compactRowSelected]}>
+                <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={[styles.compactRow, isSelected && styles.compactRowSelected]}>
                   <View style={styles.compactPoster}>
                     {item.posterUrl ? <Image source={{ uri: item.posterUrl }} style={styles.compactImage} resizeMode="cover" /> : null}
                   </View>
                   <View style={{ flex: 1, justifyContent: 'center' }}>
-                    <View style={[styles.headerRow, isRtl && styles.rowReverse, { alignItems: 'center' }]}>
-                      <Text role="bodyStrong" numberOfLines={1} style={{ fontSize: 13, color: '#0A2F5C', textAlign: isRtl ? 'right' : 'left' }}>{item.title}</Text>
+                    <View style={[styles.headerRow, { alignItems: 'center' }]}>
+                      <Text role="bodyStrong" numberOfLines={1} style={[{ flex: 1, fontSize: 13, color: '#0A2F5C' }, rtlText]}>{item.title}</Text>
                       <View style={[styles.statusBadge, { backgroundColor: item.status === 'published' ? '#DCFCE7' : '#F1F5F9' }]}>
-                        <Text role="caption" style={{ color: item.status === 'published' ? '#16A34A' : '#64748B', fontWeight: '900', fontSize: 9 }}>{statusLabel(item.status)}</Text>
+                        <Text role="caption" style={[{ color: item.status === 'published' ? '#16A34A' : '#64748B', fontWeight: '900', fontSize: 9 }, rtlText]}>{statusLabel(item.status)}</Text>
                       </View>
                     </View>
-                    <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 6, marginTop: 4, justifyContent: 'flex-start' }]}>
-                      <Text role="caption" style={{ color: '#64748B', fontSize: 10 }}>{item.durationSeconds}ث</Text>
-                      <Text role="caption" style={{ color: '#CBD5E1', fontSize: 10 }}>•</Text>
-                      <Text role="caption" style={{ color: '#64748B', fontSize: 10 }}>{TARGET_TYPE_OPTIONS.find(o => o.value === item.targetType)?.label}</Text>
-                      <Text role="caption" style={{ color: '#CBD5E1', fontSize: 10 }}>•</Text>
-                      <Text role="caption" style={{ color: '#64748B', fontSize: 10 }}>{item.source === 'partner' ? 'شريك' : 'داخلي'}</Text>
+                    <View style={[styles.headerRow, { gap: 6, marginTop: 4, justifyContent: 'flex-start' }]}>
+                      <Text role="caption" style={[{ color: '#64748B', fontSize: 10 }, rtlText]}>{item.durationSeconds}ث</Text>
+                      <Text role="caption" style={[{ color: '#CBD5E1', fontSize: 10 }, rtlText]}>•</Text>
+                      <Text role="caption" style={[{ color: '#64748B', fontSize: 10 }, rtlText]}>{TARGET_TYPE_OPTIONS.find(o => o.value === item.targetType)?.label}</Text>
+                      <Text role="caption" style={[{ color: '#CBD5E1', fontSize: 10 }, rtlText]}>•</Text>
+                      <Text role="caption" style={[{ color: '#64748B', fontSize: 10 }, rtlText]}>{item.source === 'partner' ? 'شريك' : 'داخلي'}</Text>
                     </View>
                   </View>
                 </Pressable>
@@ -235,9 +238,9 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
 
         {/* Center: Editor Panel */}
         <Surface tone="raised" style={styles.editorPanel}>
-          <View style={[styles.panelHeader, isRtl && styles.rowReverse]}>
-            <Text role="titleSm" style={{ fontWeight: '900' }}>محرر الفيديو الذكي</Text>
-            <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 8 }]}>
+          <View style={[styles.panelHeader]}>
+            <Text role="titleSm" style={[{ fontWeight: '900' }, rtlText]}>محرر الفيديو الذكي</Text>
+            <View style={[styles.headerRow, { gap: 8 }]}>
               <Button label="نسخة" tone="ghost" size="sm" onPress={() => selected && handleDuplicate(selected)} disabled={!selected} />
               <Button label="حذف" tone="ghost" size="sm" onPress={() => selected && handleDelete(selected)} disabled={!selected} />
             </View>
@@ -260,14 +263,14 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
           <ScrollView style={styles.editorScroll} contentContainerStyle={styles.editorContent}>
             {activeEditorTab === 'content' && (
               <Box gap={4}>
-                <TextField label="العنوان التسويقي" value={draft.title} onChangeText={(v) => setDraft(d => ({ ...d, title: v }))} placeholder="مثال: خصومات الجمعة البيضاء" />
-                <TextField label="وصف موجز" value={draft.subtitle} onChangeText={(v) => setDraft(d => ({ ...d, subtitle: v }))} placeholder="وصف يظهر أسفل العنوان في المعاينة" />
-                <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 12 }]}>
+                <TextField label="العنوان التسويقي" value={draft.title} onChangeText={(v) => setDraft(d => ({ ...d, title: v }))} placeholder="مثال: خصومات الجمعة البيضاء" style={rtlText} />
+                <TextField label="وصف موجز" value={draft.subtitle} onChangeText={(v) => setDraft(d => ({ ...d, subtitle: v }))} placeholder="وصف يظهر أسفل العنوان في المعاينة" style={rtlText} />
+                <View style={[styles.headerRow, { gap: 12 }]}>
                   <View style={{ flex: 1 }}>
-                    <TextField label="نص الزر (CTA)" value={draft.ctaLabel} onChangeText={(v) => setDraft(d => ({ ...d, ctaLabel: v }))} />
+                    <TextField label="نص الزر (CTA)" value={draft.ctaLabel} onChangeText={(v) => setDraft(d => ({ ...d, ctaLabel: v }))} style={rtlText} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <TextField label="الجملة البارزة" value={draft.highlight} onChangeText={(v) => setDraft(d => ({ ...d, highlight: v }))} />
+                    <TextField label="الجملة البارزة" value={draft.highlight} onChangeText={(v) => setDraft(d => ({ ...d, highlight: v }))} style={rtlText} />
                   </View>
                 </View>
               </Box>
@@ -275,23 +278,23 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
 
             {activeEditorTab === 'media' && (
               <Box gap={4}>
-                <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 12 }]}>
+                <View style={[styles.headerRow, { gap: 12 }]}>
                   <View style={{ flex: 1, direction: 'ltr' }}>
-                    <TextField label="رابط الفيديو (MP4)" value={draft.videoUrl} onChangeText={(v) => setDraft(d => ({ ...d, videoUrl: v }))} placeholder="https://..." />
+                    <TextField label="رابط الفيديو (MP4)" value={draft.videoUrl} onChangeText={(v) => setDraft(d => ({ ...d, videoUrl: v }))} placeholder="https://..." style={{ textAlign: 'left', writingDirection: 'ltr' }} />
                   </View>
                   <View style={{ flex: 1, direction: 'ltr' }}>
-                    <TextField label="رابط الغلاف (Poster)" value={draft.posterUrl} onChangeText={(v) => setDraft(d => ({ ...d, posterUrl: v }))} placeholder="https://..." />
+                    <TextField label="رابط الغلاف (Poster)" value={draft.posterUrl} onChangeText={(v) => setDraft(d => ({ ...d, posterUrl: v }))} placeholder="https://..." style={{ textAlign: 'left', writingDirection: 'ltr' }} />
                   </View>
                 </View>
-                <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 12 }]}>
+                <View style={[styles.headerRow, { gap: 12 }]}>
                   <View style={{ flex: 1 }}>
-                    <TextField label="المدة (ثانية)" value={draft.durationSeconds} onChangeText={(v) => setDraft(d => ({ ...d, durationSeconds: v }))} type="number" />
+                    <TextField label="المدة (ثانية)" value={draft.durationSeconds} onChangeText={(v) => setDraft(d => ({ ...d, durationSeconds: v }))} type="number" style={rtlText} />
                   </View>
                   <View style={{ flex: 1 }} />
                 </View>
                 <Box gap={2}>
-                  <Text role="caption" style={{ fontWeight: '900', color: '#64748B', textAlign: isRtl ? 'right' : 'left' }}>سلوك التشغيل</Text>
-                  <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 8, flexWrap: 'wrap', justifyContent: 'flex-start' }]}>
+                  <Text role="caption" style={[{ fontWeight: '900', color: '#64748B' }, rtlText]}>سلوك التشغيل</Text>
+                  <View style={[styles.headerRow, { gap: 8, flexWrap: 'wrap', justifyContent: 'flex-start' }]}>
                     <Button label={draft.mute ? "صامت ✓" : "صوت"} tone={draft.mute ? "secondary" : "ghost"} fullWidth={false} size="sm" onPress={() => setDraft(d => ({ ...d, mute: !d.mute }))} />
                     <Button label={draft.autoplay ? "تشغيل تلقائي ✓" : "يدوي"} tone={draft.autoplay ? "secondary" : "ghost"} fullWidth={false} size="sm" onPress={() => setDraft(d => ({ ...d, autoplay: !d.autoplay }))} />
                     <Button label={draft.loop ? "تكرار ✓" : "مرة واحدة"} tone={draft.loop ? "secondary" : "ghost"} fullWidth={false} size="sm" onPress={() => setDraft(d => ({ ...d, loop: !d.loop }))} />
@@ -308,7 +311,13 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                   onValueChange={(v) => setDraft(d => ({ ...d, targetType: v as any }))}
                   options={TARGET_TYPE_OPTIONS.map(o => ({ value: o.value, label: o.label }))}
                 />
-                <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: 8 }}>
+                <Surface tone="inset" padding={4} gap={3} style={{ borderRadius: 8 }}>
+                   {draft.targetType === 'home' && (
+                     <Text role="caption" style={[{ color: '#64748B' }, rtlText]}>يعيد توجيه العميل للصفحة الرئيسية بشكل مباشر.</Text>
+                   )}
+                   {draft.targetType === 'stores' && (
+                     <Text role="caption" style={[{ color: '#64748B' }, rtlText]}>يفتح القائمة العامة لاستكشاف المتاجر.</Text>
+                   )}
                    {draft.targetType === 'store' && (
                      <SelectField
                        label="اختر المتجر"
@@ -319,14 +328,30 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                    )}
                    {draft.targetType === 'category' && (
                      <SelectField
-                       label="اختر الفئة"
+                       label="اختر الفئة الرئيسية"
                        value={draft.targetId}
                        onValueChange={(v) => setDraft(d => ({ ...d, targetId: v }))}
                        options={dshCategoryFixtures.map(c => ({ value: c.id, label: c.label }))}
                      />
                    )}
+                   {draft.targetType === 'subcategory' && (
+                     <Box gap={3}>
+                        <SelectField
+                          label="اختر الفئة الرئيسية"
+                          value={draft.targetId}
+                          onValueChange={(v) => setDraft(d => ({ ...d, targetId: v, targetExtra: dshCategoryFixtures.find(c => c.id === v)?.subcategories[0]?.id || '' }))}
+                          options={dshCategoryFixtures.map(c => ({ value: c.id, label: c.label }))}
+                        />
+                        <SelectField
+                          label="اختر الفئة الفرعية"
+                          value={draft.targetExtra}
+                          onValueChange={(v) => setDraft(d => ({ ...d, targetExtra: v }))}
+                          options={(dshCategoryFixtures.find(c => c.id === draft.targetId)?.subcategories || []).map(s => ({ value: s.id, label: s.label }))}
+                        />
+                     </Box>
+                   )}
                    {draft.targetType === 'product' && (
-                     <Box gap={2}>
+                     <Box gap={3}>
                         <SelectField
                           label="اختر متجر المنتج"
                           value={draft.targetExtra}
@@ -337,12 +362,56 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                           label="اختر المنتج"
                           value={draft.targetId}
                           onValueChange={(v) => setDraft(d => ({ ...d, targetId: v }))}
-                          options={getProductsForStore(draft.targetExtra || dshDiscoveryStores[0].id).map(p => ({ value: p.id, label: p.name }))}
+                          options={getProductsForStore(draft.targetExtra || dshDiscoveryStores.find(s => getProductsForStore(s.id).length > 0)?.id || '').map(p => ({ value: p.id, label: p.name }))}
                         />
                      </Box>
                    )}
-                   {['home', 'stores', 'search', 'offer', 'campaign', 'custom'].includes(draft.targetType) && (
-                     <TextField label="معرف الوجهة / الرابط" value={draft.targetId} onChangeText={(v) => setDraft(d => ({ ...d, targetId: v }))} />
+                   {draft.targetType === 'offer' && (
+                     <SelectField
+                       label="اختر متجر العرض"
+                       value={draft.targetId}
+                       onValueChange={(v) => setDraft(d => ({ ...d, targetId: v }))}
+                       options={dshDiscoveryStores.filter(s => s.isOffer || s.offerLabel).map(s => ({ value: s.id, label: s.name + (s.offerLabel ? ` (${s.offerLabel})` : '') }))}
+                     />
+                   )}
+                   {draft.targetType === 'campaign' && (
+                     <SelectField
+                       label="اختر الحملة"
+                       value={draft.targetId}
+                       onValueChange={(v) => setDraft(d => ({ ...d, targetId: v }))}
+                       options={[
+                         { value: 'ramadan-2026', label: 'حملة رمضان 2026' },
+                         { value: 'summer-sale', label: 'تخفيضات الصيف' },
+                         { value: 'back-to-school', label: 'العودة للمدارس' },
+                       ]}
+                     />
+                   )}
+                   {draft.targetType === 'search' && (
+                     <View style={{ direction: 'ltr' }}>
+                       <TextField label="نص البحث الافتراضي" value={draft.targetId} onChangeText={(v) => setDraft(d => ({ ...d, targetId: v }))} style={rtlText} />
+                     </View>
+                   )}
+                   {draft.targetType === 'custom' && (
+                     <View style={{ direction: 'ltr' }}>
+                       <TextField label="المسار المخصص (Route)" value={draft.targetId} onChangeText={(v) => setDraft(d => ({ ...d, targetId: v }))} style={{ textAlign: 'left', writingDirection: 'ltr' }} />
+                     </View>
+                   )}
+                   {draft.targetType === 'loyalty' && (
+                     <Box gap={3}>
+                       <Text role="caption" style={[{ color: '#D97706', backgroundColor: '#FEF3C7', padding: 8, borderRadius: 6, fontWeight: '800' }, rtlText]}>
+                         تنبيه: يجب نقل هذا التوجيه إلى قسم الولاء أو استخدام البنرات بدل الفيديوهات للولاء.
+                       </Text>
+                       <SelectField
+                         label="وجهة الولاء (Legacy)"
+                         value={draft.targetId}
+                         onValueChange={(v) => setDraft(d => ({ ...d, targetId: v }))}
+                         options={[
+                           { value: 'entitlements-get', label: 'المزايا والاستحقاقات' },
+                           { value: 'loyalty-points', label: 'رصيد النقاط' },
+                           { value: 'subscription-family', label: 'الاشتراك العائلي' },
+                         ]}
+                       />
+                     </Box>
                    )}
                 </Surface>
               </Box>
@@ -350,7 +419,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
 
             {activeEditorTab === 'publish' && (
               <Box gap={4}>
-                <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 12 }]}>
+                <View style={[styles.headerRow, { gap: 12 }]}>
                   <View style={{ flex: 1 }}>
                     <SelectField
                       label="المصدر"
@@ -375,12 +444,12 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                     />
                   </View>
                 </View>
-                <TextField label="الترتيب" value={draft.order} onChangeText={(v) => setDraft(d => ({ ...d, order: v }))} type="number" />
+                <TextField label="الترتيب" value={draft.order} onChangeText={(v) => setDraft(d => ({ ...d, order: v }))} type="number" style={rtlText} />
               </Box>
             )}
           </ScrollView>
 
-          <View style={[styles.editorFooter, isRtl && styles.rowReverse]}>
+          <View style={[styles.editorFooter]}>
             <Button label="حفظ التعديلات" tone="primary" fullWidth={false} onPress={handleSave} style={{ borderRadius: 8, paddingHorizontal: 24 }} />
             {selected && (
               <Button
@@ -396,8 +465,8 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
 
         {/* Right: Preview Panel */}
         <Surface tone="inset" style={styles.previewPanel}>
-          <View style={[styles.panelHeader, isRtl && styles.rowReverse]}>
-            <Text role="titleSm" style={{ fontWeight: '900', color: '#fff' }}>المعاينة الحية</Text>
+          <View style={[styles.panelHeader]}>
+            <Text role="titleSm" style={[{ fontWeight: '900', color: '#fff' }, rtlText]}>المعاينة الحية</Text>
           </View>
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <View style={styles.previewFrame}>
@@ -410,33 +479,33 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
               )}
 
               <View style={styles.previewOverlay}>
-                <View style={[styles.previewTopBar, isRtl && styles.rowReverse]}>
-                  <View style={styles.previewBadge}><Text style={styles.previewBadgeText}>{draft.highlight || 'عرض جديد'}</Text></View>
-                  <View style={styles.previewTime}><Text style={styles.previewTimeText}>{draft.durationSeconds} ث</Text></View>
+                <View style={[styles.previewTopBar]}>
+                  <View style={styles.previewBadge}><Text style={[{ color: '#fff', fontSize: 10, fontWeight: '900' }, rtlText]}>{draft.highlight || 'عرض جديد'}</Text></View>
+                  <View style={styles.previewTime}><Text style={[{ color: '#fff', fontSize: 9, fontWeight: '700' }, rtlText]}>{draft.durationSeconds} ث</Text></View>
                 </View>
 
                 <View style={styles.previewBottomContent}>
-                  <Box gap={1} layoutDirection={isRtl ? 'row-reverse' : 'row'}>
-                    <Text role="titleSm" style={{ color: '#fff', fontWeight: '900', textAlign: isRtl ? 'right' : 'left' }}>{draft.title || 'عنوان الفيديو يظهر هنا'}</Text>
-                    <Text role="caption" style={{ color: '#fff', opacity: 0.9, textAlign: isRtl ? 'right' : 'left' }}>{draft.subtitle || 'وصف الفيديو يظهر هنا بشكل مختصر وجذاب'}</Text>
+                  <Box gap={1} >
+                    <Text role="titleSm" style={[{ color: '#fff', fontWeight: '900' }, rtlText]}>{draft.title || 'عنوان الفيديو يظهر هنا'}</Text>
+                    <Text role="caption" style={[{ color: '#fff', opacity: 0.9 }, rtlText]}>{draft.subtitle || 'وصف الفيديو يظهر هنا بشكل مختصر وجذاب'}</Text>
                   </Box>
-                  <View style={[styles.previewCta, isRtl && styles.rowReverse, isRtl && { alignSelf: 'flex-end' }]}>
-                    <Text style={styles.previewCtaText}>{draft.ctaLabel}</Text>
-                    <Text style={{ color: '#0A2F5C', fontSize: 12 }}>{isRtl ? '←' : '→'}</Text>
+                  <View style={[styles.previewCta, isRtl && { alignSelf: 'flex-end' }]}>
+                    <Text style={[{ color: '#0A2F5C', fontWeight: '900', fontSize: 12 }, rtlText]}>{draft.ctaLabel}</Text>
+                    <Text style={[{ color: '#0A2F5C', fontSize: 12 }, rtlText]}>{isRtl ? '←' : '→'}</Text>
                   </View>
                 </View>
               </View>
 
               <View style={styles.previewControls}>
                 <View style={styles.previewProgress} />
-                <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 6, justifyContent: 'flex-start' }]}>
+                <View style={[styles.headerRow, { gap: 6, justifyContent: 'flex-start' }]}>
                   <View style={styles.previewIndicator} />
                   <View style={[styles.previewIndicator, { opacity: 0.3 }]} />
                   <View style={[styles.previewIndicator, { opacity: 0.3 }]} />
                 </View>
               </View>
             </View>
-            <Text role="caption" style={{ color: '#94A3B8', marginTop: 12, textAlign: 'center' }}>{TARGET_TYPE_OPTIONS.find(o => o.value === draft.targetType)?.label} · {draft.targetId}</Text>
+            <Text role="caption" style={[{ color: '#94A3B8', marginTop: 12, textAlign: 'center' }, rtlText]}>{TARGET_TYPE_OPTIONS.find(o => o.value === draft.targetType)?.label} · {draft.targetId}</Text>
           </View>
         </Surface>
       </View>
