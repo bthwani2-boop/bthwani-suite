@@ -161,3 +161,102 @@ export const dshPromotionCandidates: ReadonlyArray<DshPromotionCandidate> = [
     offerHint: 'توصيل مجاني أو خصم 20%.',
   }
 ];
+
+// --- DSH Approval Pipeline SSOT v1 ---
+
+export type ApprovalStage =
+  | 'partner-submitted'
+  | 'field-submitted'
+  | 'partner-review'
+  | 'partner-approved'
+  | 'marketing-review'
+  | 'marketing-approved'
+  | 'catalog-adopted'
+  | 'client-visible'
+  | 'rejected'
+  | 'needs-fix';
+
+export type ApprovalEntityType =
+  | 'product'
+  | 'product-media'
+  | 'category-suggestion'
+  | 'store'
+  | 'partner-offer'
+  | 'video'
+  | 'banner'
+  | 'promo';
+
+export type ApprovalSourceSurface =
+  | 'app-partner'
+  | 'app-field'
+  | 'control-panel-partners'
+  | 'control-panel-marketing'
+  | 'control-panel-catalog'
+  | 'app-client';
+
+export type ApprovalRecord = {
+  id: string;
+  entityType: ApprovalEntityType;
+  source: ApprovalSourceSurface;
+  stage: ApprovalStage;
+  title: string;
+  submittedAt: string;
+  metadata?: any;
+};
+
+export function transitionApprovalStage(current: ApprovalStage, action: 'approve' | 'reject' | 'fix'): ApprovalStage {
+  if (action === 'reject') return 'rejected';
+  if (action === 'fix') return 'needs-fix';
+
+  switch (current) {
+    case 'partner-submitted':
+    case 'field-submitted':
+      return 'partner-review';
+    case 'partner-review':
+      return 'partner-approved';
+    case 'partner-approved':
+      return 'marketing-review';
+    case 'marketing-review':
+      return 'marketing-approved';
+    case 'marketing-approved':
+      return 'catalog-adopted';
+    case 'catalog-adopted':
+      return 'client-visible';
+    default:
+      return current;
+  }
+}
+
+export function resolveNextOwner(stage: ApprovalStage): ApprovalSourceSurface {
+  switch (stage) {
+    case 'partner-submitted':
+    case 'field-submitted':
+    case 'partner-review':
+      return 'control-panel-partners';
+    case 'partner-approved':
+    case 'marketing-review':
+      return 'control-panel-marketing';
+    case 'marketing-approved':
+    case 'catalog-adopted':
+      return 'control-panel-catalog';
+    case 'client-visible':
+      return 'app-client';
+    case 'rejected':
+    case 'needs-fix':
+      return 'app-partner';
+    default:
+      return 'control-panel-partners';
+  }
+}
+
+export function isClientVisible(stage: ApprovalStage): boolean {
+  return stage === 'client-visible';
+}
+
+export function isCatalogOwnedMedia(stage: ApprovalStage): boolean {
+  return stage === 'catalog-adopted' || stage === 'client-visible';
+}
+
+export function isPartnerOwnedException(stage: ApprovalStage, entityType: ApprovalEntityType): boolean {
+  return entityType === 'product-media' && (stage === 'marketing-approved' || stage === 'partner-approved');
+}

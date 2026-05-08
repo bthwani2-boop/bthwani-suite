@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, SectionHeader, Surface, Text, TextField } from '@bthwani/ui-kit';
+import { Button, SectionHeader, Surface, Text, TextField, Chip, Box } from '@bthwani/ui-kit';
+import { ApprovalStage } from '../shared/workflow';
 import type { DshPartnerOperationalFlowId } from './dshPartnerOperationalFlowIds';
 
 export type DshPartnerVideoSubmissionPanelProps = {
@@ -7,12 +8,16 @@ export type DshPartnerVideoSubmissionPanelProps = {
 };
 
 export function DshPartnerVideoSubmissionPanel({ onSelectFlow }: DshPartnerVideoSubmissionPanelProps) {
-  const [videoTitle, setVideoTitle] = React.useState('');
-  const [videoSummary, setVideoSummary] = React.useState('');
+  const [videoTitle, setVideoTitle] = React.useState('تجربة منتج الشريك');
+  const [videoSummary, setVideoSummary] = React.useState('مراجعة سريعة لأداء المنتج في المطبخ.');
+  const videoStage: ApprovalStage = 'partner-review';
 
   return (
     <Surface tone="raised" gap={3}>
-      <SectionHeader title="رفع فيديو الشريك" subtitle="يجهز مسار الفيديو بوضوح داخل تصنيف الفيديو فقط." />
+      <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <SectionHeader title="رفع فيديو الشريك" subtitle="يجهز مسار الفيديو بوضوح داخل تصنيف الفيديو فقط." />
+        <Chip label="قيد المراجعة" tone="warning" />
+      </Box>
       <TextField label="عنوان الفيديو" value={videoTitle} onChangeText={setVideoTitle} />
       <TextField label="ملخص الفيديو" value={videoSummary} onChangeText={setVideoSummary} multiline numberOfLines={3} />
       <Text role="bodySm" tone="muted">

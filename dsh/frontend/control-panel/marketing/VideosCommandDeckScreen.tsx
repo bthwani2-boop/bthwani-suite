@@ -93,7 +93,6 @@ const TARGET_TYPE_OPTIONS: Array<{ value: MarketingVideoTargetType; label: strin
   { value: 'campaign', label: 'حملة', description: 'يفتح وجهة حملات عامة ضمن القناة الحالية.' },
   { value: 'search', label: 'بحث', description: 'يفتح واجهة البحث.' },
   { value: 'custom', label: 'مخصص', description: 'مسار محدود ومضبوط عندما لا تكفي الخيارات المنظمة.' },
-  { value: 'loyalty', label: 'الولاء (منقول)', description: 'يتبع نظام الولاء والاشتراكات.' },
 ];
 
 export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
@@ -396,24 +395,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                        <TextField label="المسار المخصص (Route)" value={draft.targetId} onChangeText={(v) => setDraft(d => ({ ...d, targetId: v }))} style={{ textAlign: 'left', writingDirection: 'ltr' }} />
                      </View>
                    )}
-                   {draft.targetType === 'loyalty' && (
-                     <Box gap={3}>
-                       <Text role="caption" style={[{ color: '#D97706', backgroundColor: '#FEF3C7', padding: 8, borderRadius: 6, fontWeight: '800' }, rtlText]}>
-                         تنبيه: يجب نقل هذا التوجيه إلى قسم الولاء أو استخدام البنرات بدل الفيديوهات للولاء.
-                       </Text>
-                       <SelectField
-                         label="وجهة الولاء (Legacy)"
-                         value={draft.targetId}
-                         onValueChange={(v) => setDraft(d => ({ ...d, targetId: v }))}
-                         options={[
-                           { value: 'entitlements-get', label: 'المزايا والاستحقاقات' },
-                           { value: 'loyalty-points', label: 'رصيد النقاط' },
-                           { value: 'subscription-family', label: 'الاشتراك العائلي' },
-                         ]}
-                       />
-                     </Box>
-                   )}
-                </Surface>
+                 </Surface>
               </Box>
             )}
 
@@ -515,7 +497,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
 
 const styles = StyleSheet.create({
   root: { flex: 1, display: 'flex', flexDirection: 'column', gap: 16, height: '100%' },
-  rootRtl: { direction: 'rtl' },
+  rootRtl: { writingDirection: 'rtl' },
   headerSurface: { borderRadius: 12, padding: 16, borderWidth: 1, borderColor: 'rgba(10,47,92,0.05)', flexShrink: 0 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   rowReverse: { flexDirection: 'row-reverse' },

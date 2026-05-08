@@ -16,6 +16,13 @@ import {
   useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
+import { getPartnerIntakeItems } from '../shared/partner-intake-store';
+import {
+  ApprovalRecord,
+  ApprovalStage,
+  isCatalogOwnedMedia,
+  isPartnerOwnedException
+} from '../shared/workflow';
 
 type InventoryProduct = {
   id: string;
@@ -194,8 +201,109 @@ function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
       stockCount: 0,
       priceLabel: '14.75 ر.س',
     },
+    {
+      id: 'prod-fix-me',
+      name: 'كرواسون زبدة',
+      sku: 'BL-BKR-005',
+      gtin: '6280001000551',
+      barcode: '6280001000551',
+      manufacturerCode: 'MFR-BKR-05',
+      categoryLabel: 'مخبوزات',
+      catalogLinked: true,
+      reviewNeeded: true,
+      available: true,
+      lowStock: false,
+      stockCount: 12,
+      priceLabel: '9.00 ر.س',
+      publishStage: 'needs-fix',
+    },
+    {
+      id: 'prod-rejected',
+      name: 'كيكة العيد',
+      sku: 'BL-SWT-099',
+      gtin: '6280001000995',
+      barcode: '6280001000995',
+      manufacturerCode: 'MFR-SW-99',
+      categoryLabel: 'حلويات',
+      catalogLinked: false,
+      reviewNeeded: false,
+      available: false,
+      lowStock: false,
+      stockCount: 0,
+      priceLabel: '120.00 ر.س',
+      publishStage: 'rejected',
+    },
+    {
+      id: 'prod-pending-mkt',
+      name: 'قهوة مثلجة',
+      sku: 'BL-DRK-102',
+      gtin: '6280001001022',
+      barcode: '6280001001022',
+      manufacturerCode: 'MFR-DR-102',
+      categoryLabel: 'مشروبات',
+      catalogLinked: true,
+      reviewNeeded: true,
+      available: true,
+      lowStock: false,
+      stockCount: 25,
+      priceLabel: '15.00 ر.س',
+      publishStage: 'marketing-review',
+    },
     ...scopedCanonicalProducts,
   ]);
+}
+
+function StatusTimeline({ stage, metadata }: { stage: ApprovalStage; metadata?: any }) {
+  const { direction } = useDirection();
+  const isRtl = direction === 'rtl';
+
+  const steps: { label: string; stages: ApprovalStage[]; tone: any }[] = [
+    { label: 'تم الإرسال', stages: ['partner-submitted', 'field-submitted'], tone: 'default' },
+    { label: 'مراجعة الشركاء', stages: ['partner-review', 'partner-approved'], tone: 'warning' },
+    { label: 'مراجعة التسويق', stages: ['marketing-review', 'marketing-approved'], tone: 'brand' },
+    { label: 'اعتماد الكتالوج', stages: ['catalog-adopted'], tone: 'info' },
+    { label: 'ظاهر للعميل', stages: ['client-visible'], tone: 'success' },
+  ];
+
+  const currentStepIndex = steps.findIndex(s => s.stages.includes(stage));
+  const isRejected = stage === 'rejected';
+  const needsFix = stage === 'needs-fix';
+
+  return (
+    <Box gap={3}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between' }}>
+        {steps.map((step, idx) => {
+          const isPast = idx < currentStepIndex;
+          const isCurrent = idx === currentStepIndex;
+          const dotColor = isPast || isCurrent ? step.tone : 'muted';
+
+          return (
+            <Box key={idx} style={{ alignItems: 'center', flex: 1 }}>
+              <Surface
+                tone={isPast || isCurrent ? step.tone : 'inset'}
+                style={{ width: 12, height: 12, borderRadius: 6 }}
+              />
+              <Text role="caption" tone={isCurrent ? 'default' : 'muted'} style={{ marginTop: 4, fontSize: 8 }}>
+                {step.label}
+              </Text>
+            </Box>
+          );
+        })}
+      </Box>
+
+      {isRejected && (
+        <Surface tone="danger" padding={2}>
+          <Text role="bodySm" tone="danger">⚠️ مرفوض: {metadata?.rejectionReason || 'لم يتم تحديد السبب'}</Text>
+        </Surface>
+      )}
+
+      {needsFix && (
+        <Surface tone="warning" padding={2}>
+          <Text role="bodySm" tone="warning">🛠️ مطلوب تعديل: {metadata?.requiredFix || 'يرجى مراجعة البيانات'}</Text>
+        </Surface>
+      )}
+    </Box>
+  );
 }
 
 function MetricTile({ label, value, tone = 'default' }: MetricTileProps) {
@@ -246,11 +354,14 @@ function CatalogProductRow({ product, selected, onEdit }: CatalogProductRowProps
           <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'} numberOfLines={1}>
             {product.name}
           </Text>
+          {product.publishStage && (
+            <StatusTimeline
+              stage={product.publishStage as ApprovalStage}
+              metadata={getPartnerIntakeItems().find(r => r.id === product.id || r.title.includes(product.name))?.metadata}
+            />
+          )}
           <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'} numberOfLines={2}>
             SKU: {product.sku} · GTIN: {product.gtin} · الباركود: {product.barcode}
-          </Text>
-          <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'} numberOfLines={1}>
-            {product.manufacturerCode} · {product.categoryLabel}
           </Text>
         </Box>
 
@@ -357,9 +468,9 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
   }
 
   return (
-    <Box gap={4}>
+    <Box gap={4} dir="rtl">
       <Surface tone="raised" padding={3} gap={3}>
-        <Text role="label" tone="muted">
+        <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
           الحالة المختصرة
         </Text>
         <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
@@ -371,7 +482,7 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
       </Surface>
 
       <Surface tone="raised" padding={3} gap={3}>
-        <Text role="label" tone="muted">
+        <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
           بحث أولًا
         </Text>
         <SearchField
@@ -381,7 +492,7 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
           placeholder="ابحث باسم المنتج / الباركود / SKU / GTIN"
           hint="ابدأ بالكتالوج المركزي ثم طابق السعر والتوفر والمخزون محليًا."
         />
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', justifyContent: 'flex-start' }} gap={2}>
           <Button
             label="مسح باركود"
             tone="secondary"
@@ -413,18 +524,18 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
       </Surface>
 
       <Surface tone="inset" padding={3} gap={2}>
-        <Text role="bodySm" tone="muted">
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
           {toolMessage}
         </Text>
         {activeBulkTool ? (
-          <Text role="caption" tone="muted">
+          <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
             وضع الإرسال الحالي: {activeBulkTool}
           </Text>
         ) : null}
       </Surface>
 
       <Surface tone="raised" padding={3} gap={3}>
-        <Text role="label" tone="muted">
+        <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
           مسار الإدخال الذكي
         </Text>
         <ListItem title="1. ابحث عن المنتج القياسي" subtitle="ابدأ بـ SKU أو GTIN أو barcode أو الاسم قبل أي إضافة جديدة." badgeLabel="1" meta="Lookup first" />
@@ -434,7 +545,7 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
       </Surface>
 
       <Surface tone="raised" padding={3} gap={3}>
-        <Text role="label" tone="muted">
+        <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
           المنتجات الحالية
         </Text>
         <Box gap={3}>
@@ -463,7 +574,7 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
       </Surface>
 
       <Surface tone="default" padding={3} gap={3}>
-        <Text role="label" tone="muted">
+        <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
           تعديل محلي سريع
         </Text>
         <KeyValueList
@@ -483,23 +594,46 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
           ]}
         />
         <Box gap={3}>
-          <TextField label="السعر" value={draftPrice} onChangeText={setDraftPrice} placeholder="18.00" />
-          <TextField label="المخزون" value={draftStock} onChangeText={setDraftStock} placeholder="42" keyboardType="numeric" />
+          {isCatalogOwnedMedia(selectedProduct.publishStage as ApprovalStage) ? (
+            <Surface tone="info" padding={2}>
+              <Text role="bodySm" tone="info" style={{ textAlign: 'right' }}>ℹ️ يُدار من الكتالوج المركزي (الاسم والصورة مقفلة)</Text>
+            </Surface>
+          ) : isPartnerOwnedException(selectedProduct.publishStage as ApprovalStage, 'product-media') ? (
+            <Surface tone="warning" padding={2}>
+              <Text role="bodySm" tone="warning" style={{ textAlign: 'right' }}>⚠️ صورة خاصة بالشريك وتحتاج مراجعة عند التغيير</Text>
+            </Surface>
+          ) : null}
+
+          <TextField
+            label="الاسم"
+            value={selectedProduct.name}
+            editable={!isCatalogOwnedMedia(selectedProduct.publishStage as ApprovalStage)}
+            onChangeText={() => undefined}
+            style={{ textAlign: 'right' }}
+          />
+          <TextField label="السعر" value={draftPrice} onChangeText={setDraftPrice} placeholder="18.00" style={{ textAlign: 'left' }} dir="ltr" />
+          <TextField label="المخزون" value={draftStock} onChangeText={setDraftStock} placeholder="42" keyboardType="numeric" style={{ textAlign: 'left' }} dir="ltr" />
           <Button
             label={draftAvailable ? 'التوفر: مفعّل' : 'التوفر: موقوف'}
             tone={draftAvailable ? 'success' : 'danger'}
             fullWidth={false}
             onPress={() => setDraftAvailable((current) => !current)}
           />
-          <Button label="تطبيق محلي" tone="secondary" fullWidth={false} onPress={applyDraft} />
+          <Button
+            label="تطبيق محلي"
+            tone="secondary"
+            fullWidth={false}
+            onPress={applyDraft}
+            disabled={selectedProduct.publishStage === 'rejected'}
+          />
         </Box>
       </Surface>
 
       <Surface tone="raised" padding={3} gap={3}>
-        <Text role="label" tone="muted">
+        <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
           الإجراءات الجماعية
         </Text>
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', justifyContent: 'flex-start' }} gap={2}>
           <Button
             label="تحديث أسعار جماعي"
             tone="secondary"
@@ -547,4 +681,3 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
 }
 
 export default InventoryCatalogWorkspaceContent;
-

@@ -16,7 +16,7 @@ export function ControlPanelDshMarketingScreen({
 	const { locale } = useUiText();
 
 	return (
-		<Box gap={4}>
+		<Box gap={4} dir="rtl">
 			<WebMissionHeroCard
 				dense
 				badges={['مباشر', 'تحليل الأداء']}
@@ -30,18 +30,21 @@ export function ControlPanelDshMarketingScreen({
 				secondaryAction={{ label: 'لوحة القيادة', href: hubHref }}
 			/>
 
-			<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+			<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-start' }}>
 				<WebSignalCard title="إجمالي الوصول" value="1.2M" description="معدل وصول الحملات النشطة" tone="best" />
 				<WebSignalCard title="معدل التحويل" value="4.8%" description="متوسط التحويل اليومي" tone="best" />
 				<WebSignalCard title="النقرات النشطة" value="45K" description="نقرات على البنرات الذكية" />
 				<WebSignalCard title="صحة الحملات" value="98%" description="مؤشر استقرار العروض" tone="neutral" />
 			</Box>
 
-			<Surface tone="raised" padding={6} gap={3} style={{ borderRadius: 16, alignItems: 'center', justifyContent: 'center', minHeight: 200, border: '1px dashed rgba(10,47,92,0.1)' }}>
-				<Text role="titleSm" tone="muted">مساحة الرسوم البيانية والتحليلات المتقدمة (Planned for Next Phase)</Text>
-				<Text role="bodySm" tone="muted" style={{ textAlign: 'center', maxWidth: 400 }}>
-					هذه المساحة مخصصة لعرض أداء البنرات، عروض الشركاء، والشريط الذكي بدلاً من تكرار أدوات التحرير المخصصة لها. لا تشمل هذه المساحة أي تبويبات داخلية لمنع التشظي أو تكرار الوظائف.
+			<Surface tone="raised" padding={6} gap={3} style={{ borderRadius: 16, alignItems: 'center', justifyContent: 'center', minHeight: 240, border: '1px dashed rgba(10,47,92,0.1)' }}>
+				<Text role="titleSm" tone="muted" style={{ textAlign: 'center' }}>مساحة الرسوم البيانية والتحليلات المتقدمة</Text>
+				<Text role="bodySm" tone="muted" style={{ textAlign: 'center', maxWidth: 450 }}>
+					هذه المساحة مخصصة لعرض أداء البنرات، عروض الشركاء، والشريط الذكي بدلاً من تكرار أدوات التحرير المخصصة لها.
 				</Text>
+				<Box style={{ backgroundColor: '#F8FAFC', padding: '8px 16px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+					<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>الحالة: جاهز للربط مع BI Service Layer</Text>
+				</Box>
 			</Surface>
 		</Box>
 	);

@@ -102,9 +102,9 @@ const SMART_TARGET_OPTIONS: Array<{ value: SmartBannerTargetType; label: string;
   { value: 'custom', label: 'مخصص', description: 'مسار محدود ومضبوط عندما لا تكفي الخيارات المنظمة.' },
 ];
 
-const SUBSCRIPTION_OPTIONS = [
-  { value: 'entitlements-get', label: 'المزايا الأساسية' },
-  { value: 'subscription-family-get', label: 'اشتراك العائلة' },
+const SUBSCRIPTION_OPTIONS: Array<{ value: string; label: string }> = [
+  // { value: 'entitlements-get', label: 'المزايا الأساسية' },
+  // { value: 'subscription-family-get', label: 'اشتراك العائلة' },
 ];
 
 const BANNER_MOTION_OPTIONS: Array<{ value: MarketingBannerMotionStyle; label: string; description: string }> = [

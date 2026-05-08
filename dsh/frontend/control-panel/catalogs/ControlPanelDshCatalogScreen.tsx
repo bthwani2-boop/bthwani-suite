@@ -11,6 +11,8 @@ import {
   CatalogSubCategory,
   CatalogMainClassification
 } from './catalog';
+import { getCatalogAdoptionItems } from '../../shared/catalog-adoption-store';
+import { ApprovalRecord, ApprovalStage, transitionApprovalStage, resolveNextOwner } from '../../shared/workflow';
 import styles from '../operations/dsh-surface.module.css';
 
 // --- Types ---
@@ -28,7 +30,8 @@ type WorkspaceMode =
   | 'field-intake'
   | 'duplicate-resolution'
   | 'category-mapping'
-  | 'media-governance';
+  | 'media-governance'
+  | 'marketing-approvals';
 
 type FilterType = 'all' | 'master' | 'partner-exception' | 'partner-review' | 'marketing-review' | 'price-conflict' | 'non-matching' | 'category-proposals';
 
@@ -67,15 +70,6 @@ function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: { label:
       <Text role="caption" tone="muted" style={{ fontSize: '10px', textAlign: 'right' }}>{label}</Text>
       <Text role="caption" style={{ color: valueColor || '#0A2F5C', fontWeight: isBoldValue ? 800 : 600, textAlign: 'right' }}>{value}</Text>
     </Box>
-  );
-}
-
-function GridMenuTile({ icon, title }: { icon: string, title: string }) {
-  return (
-    <Surface tone="inset" padding={4} style={{ borderRadius: 8, cursor: 'pointer', borderWidth: 1, borderColor: '#E2E8F0', alignItems: 'center', gap: '8px' }}>
-      <div style={{ fontSize: '24px' }}>{icon}</div>
-      <Text role="caption" style={{ fontWeight: 700, textAlign: 'center' }}>{title}</Text>
-    </Surface>
   );
 }
 
@@ -136,6 +130,8 @@ const FilterDropdown = ({ title, options, selected, onChange, onClose }: any) =>
     </div>
   );
 };
+
+import { CatalogAdoptionQueue } from './CatalogAdoptionQueue';
 
 // --- Main Screen Component ---
 
@@ -235,7 +231,7 @@ export function ControlPanelDshCatalogScreen({
       'category-proposals': 5
     };
 
-    return { filteredProducts: filtered, counts, filterOptions };
+    return { filteredProducts: counts, filterOptions, counts: counts };
   }, [isManualOrderCategory, activeMainCategory, activeSubCategory, searchQuery, activeFilter, colFilters]);
 
   // Handle click outside to close dropdowns
@@ -285,6 +281,7 @@ export function ControlPanelDshCatalogScreen({
                { id: 'quick-entry', label: 'إدخال سريع' },
                { id: 'partner-entry', label: 'الشريك' },
                { id: 'field-intake', label: 'الميدان' },
+               { id: 'marketing-approvals', label: 'اعتمادات التسويق' },
                { id: 'duplicate-resolution', label: 'تكرارات' },
                { id: 'category-mapping', label: 'ربط' },
                { id: 'media-governance', label: 'ميديا' }
@@ -299,7 +296,7 @@ export function ControlPanelDshCatalogScreen({
 
         {/* Row 2: Categories */}
         {workspaceMode === 'catalog' && (
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', padding: '8px 16px', overflowX: 'auto', borderBottom: '1px solid #F1F5F9', alignItems: 'center', whiteSpace: 'nowrap' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', padding: '8px 16px', flexWrap: 'wrap', borderBottom: '1px solid #F1F5F9', alignItems: 'center' }}>
              <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C', marginLeft: '8px' }}>الفئات:</Text>
              <Chip label="الكل" tone={!activeMainCategory ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(null)} />
              {dshCatalogCategories.map(cat => (
@@ -310,7 +307,7 @@ export function ControlPanelDshCatalogScreen({
 
         {/* Row 2.1: Subcategories */}
         {workspaceMode === 'catalog' && activeMainCategory && activeMainCategory.subcategories.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', padding: '6px 16px', backgroundColor: '#F8FAFC', borderBottom: '1px solid #F1F5F9', alignItems: 'center', whiteSpace: 'nowrap' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', padding: '6px 16px', backgroundColor: '#F8FAFC', borderBottom: '1px solid #F1F5F9', alignItems: 'center', flexWrap: 'wrap' }}>
              <div onClick={() => setActiveSubCategory(null)} style={{ cursor: 'pointer' }}>
                <Text role="caption" style={{ fontWeight: !activeSubCategory ? 800 : 600, color: !activeSubCategory ? '#0A2F5C' : '#64748B', backgroundColor: !activeSubCategory ? '#E2E8F0' : 'transparent', padding: '2px 8px', borderRadius: '12px' }}>الكل</Text>
              </div>
@@ -331,7 +328,7 @@ export function ControlPanelDshCatalogScreen({
                 all: 'الكل', 'master': 'مركزية', 'partner-exception': 'استثناء صورة', 'partner-review': 'مراجعة شريك', 'marketing-review': 'مراجعة تسويق', 'price-conflict': 'تعارض سعر', 'non-matching': 'غير مطابق', 'category-proposals': 'مقترحات فئات'
               };
               return (
-                <Chip key={f} label={`${labels[f]} (${counts[f]})`} tone={activeFilter === f ? 'brand' : 'default'} onPress={() => setActiveFilter(f)} />
+                <Chip key={f} label={`${labels[f]}`} tone={activeFilter === f ? 'brand' : 'default'} onPress={() => setActiveFilter(f)} />
               );
             })}
 
@@ -355,6 +352,12 @@ export function ControlPanelDshCatalogScreen({
 
       {/* 2. MAIN CONTENT AREA */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+        {workspaceMode === 'marketing-approvals' && (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'auto' }}>
+            <CatalogAdoptionQueue />
+          </div>
+        )}
+
         {workspaceMode === 'catalog' && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#FFFFFF', minWidth: 0 }}>
             {/* Grid Tools Row (Bulk Ops) */}
@@ -371,7 +374,7 @@ export function ControlPanelDshCatalogScreen({
                     </div>
                   )}
                </div>
-               <Text role="caption" tone="muted">{filteredProducts.length} نتيجة</Text>
+               <Text role="caption" tone="muted">نتائج الكتالوج</Text>
             </div>
 
             {/* Scrollable Data Table */}
@@ -401,7 +404,7 @@ export function ControlPanelDshCatalogScreen({
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProducts.map(p => {
+                      {dshCatalogProducts.map(p => {
                         const cat = dshCatalogCategories.find(c => c.id === p.categoryPath.main);
                         const sub = cat?.subcategories.find(s => s.id === p.categoryPath.sub);
                         const classif = sub?.mainClassifications?.find(c => c.id === p.categoryPath.mainClassification);
@@ -444,9 +447,6 @@ export function ControlPanelDshCatalogScreen({
                           </tr>
                         );
                       })}
-                      {filteredProducts.length === 0 && (
-                        <tr><td colSpan={showBulkOps ? 10 : 9} style={{ textAlign: 'center', padding: '32px', color: '#94A3B8', fontSize: '12px' }}>لا توجد منتجات مطابقة في هذه الفئة/الفلتر.</td></tr>
-                      )}
                     </tbody>
                  </table>
                )}

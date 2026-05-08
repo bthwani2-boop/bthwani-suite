@@ -3,13 +3,30 @@ import type { PartnerOfferRecord } from './partner-offer-store';
 import type { SubscriptionPlan, Entitlement } from './loyalty-store';
 import type { CampaignRecord } from './campaign-store';
 
+export type CommercialSource = {
+  sourceOwner: string;
+  sourceRecordId: string;
+  sourceType: string;
+  approvalStage?: string;
+  conflictStatus?: 'none' | 'warning' | 'blocker';
+  conflictReason?: string;
+};
+
+export type CommercialSourceMap = {
+  [key: string]: CommercialSource;
+};
+
 export type StoreCommercialContext = {
   storeId: string;
   activeOffers: PartnerOfferRecord[];
   activeSubscriptions: SubscriptionPlan[];
   activeEntitlements: Entitlement[];
   activeCampaigns: CampaignRecord[];
-  catalogFeatures?: { priceMatch: boolean };
+  catalogFeatures?: {
+    priceMatch: boolean;
+    hasNewProducts: boolean;
+  };
+  hasUnpublishedNewProducts?: boolean; // For conflict detection
 };
 
 export type CommercialBadge = {
@@ -19,42 +36,83 @@ export type CommercialBadge = {
 };
 
 export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
-  // NOTE: This mapper is the Single Source of Truth (SSOT) for commercial parity.
-  // The client application (DshHomeGetScreen and store card models) should ideally bridge
-  // their fixtures to use this mapper in the future to ensure exactly parity with the Control Plane.
-  // Currently, we use this for UI preview simulation in the Marketing Control Decks.
-
   const badges: CommercialBadge[] = [];
   const notes: string[] = [];
+  const sourceMap: CommercialSourceMap = {};
 
-  // Partner Offers
+  // 1. Partner Offers
   let offerLabel: string | undefined = undefined;
   let hasCouponAvailable = false;
   let deliveryFeeLabel: string | undefined = undefined;
 
-  for (const offer of context.activeOffers) {
+  const visibleOffers = context.activeOffers.filter(offer => offer.status === 'published');
+
+  // Conflict Detection: Unpublished offers trying to show up
+  context.activeOffers.forEach(offer => {
+    if (offer.status !== 'published' && offer.displayBadge) {
+      sourceMap[`offer-${offer.id}`] = {
+        sourceOwner: 'partner-offers',
+        sourceRecordId: offer.id,
+        sourceType: 'offer',
+        approvalStage: offer.status,
+        conflictStatus: 'blocker',
+        conflictReason: 'العرض ليس في حالة النشر (Published) ولكن يطلب الظهور.'
+      };
+    }
+  });
+
+  for (const offer of visibleOffers) {
     if (offer.displayBadge && !offerLabel) {
       offerLabel = offer.displayBadge;
       badges.push({ label: offer.displayBadge, source: 'partner' });
+      sourceMap['offerLabel'] = {
+        sourceOwner: 'partner-offers',
+        sourceRecordId: offer.id,
+        sourceType: 'offer',
+        approvalStage: 'published',
+        conflictStatus: 'none'
+      };
     }
     if (offer.offerType === 'coupon') {
       hasCouponAvailable = true;
       badges.push({ label: 'كوبون متاح', source: 'partner' });
+      sourceMap['hasCouponAvailable'] = {
+        sourceOwner: 'partner-offers',
+        sourceRecordId: offer.id,
+        sourceType: 'coupon',
+        approvalStage: 'published',
+        conflictStatus: 'none'
+      };
     }
     if (offer.offerType === 'free-delivery' && !deliveryFeeLabel) {
       deliveryFeeLabel = 'توصيل مجاني (شريك)';
       badges.push({ label: 'توصيل مجاني', source: 'partner' });
+      sourceMap['deliveryFeeLabel'] = {
+        sourceOwner: 'partner-offers',
+        sourceRecordId: offer.id,
+        sourceType: 'delivery',
+        approvalStage: 'published',
+        conflictStatus: 'none'
+      };
     }
   }
 
-  // Campaigns
+  // 2. Campaigns
   for (const camp of context.activeCampaigns) {
     if (camp.channels?.includes('store-card')) {
-      badges.push({ label: `حملة: ${camp.title}`, source: 'campaign' });
+      const badgeLabel = `حملة: ${camp.title}`;
+      badges.push({ label: badgeLabel, source: 'campaign' });
+      sourceMap[`campaign-${camp.id}`] = {
+        sourceOwner: 'campaign-store',
+        sourceRecordId: camp.id,
+        sourceType: 'campaign',
+        approvalStage: 'published',
+        conflictStatus: 'none'
+      };
     }
   }
 
-  // Loyalty & Subscriptions
+  // 3. Loyalty & Subscriptions
   let hasBthwaniPro = false;
   const subscriptionPackageChips: string[] = [];
 
@@ -62,21 +120,84 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
     hasBthwaniPro = true;
     subscriptionPackageChips.push('بثواني برو', 'توصيل سريع');
     badges.push({ label: '⚡ بثواني برو', source: 'subscription' });
+
+    // Conflict Detection: Pro subscription without entitlement
+    const hasProEntitlement = context.activeEntitlements.some(e => e.type === 'reward' || e.type === 'multiplier');
+    sourceMap['hasBthwaniPro'] = {
+      sourceOwner: 'loyalty-store',
+      sourceRecordId: 'sub-pro',
+      sourceType: 'subscription',
+      approvalStage: 'active',
+      conflictStatus: hasProEntitlement ? 'none' : 'warning',
+      conflictReason: hasProEntitlement ? undefined : 'اشتراك برو فعال ولكن لا توجد استحقاقات (Entitlements) مرتبطة.'
+    };
   }
 
   for (const e of context.activeEntitlements) {
     if (e.type === 'reward') {
       notes.push('يوجد استحقاق مكافأة متاح');
       badges.push({ label: 'مكافأة ولاء', source: 'loyalty' });
+      sourceMap[`entitlement-${e.id}`] = {
+        sourceOwner: 'loyalty-store',
+        sourceRecordId: e.id,
+        sourceType: 'entitlement',
+        approvalStage: 'active',
+        conflictStatus: 'none'
+      };
     }
   }
 
-  // Catalog
+  // 4. Catalog & Features
   let priceMatchLabel: string | undefined = undefined;
   if (context.catalogFeatures?.priceMatch) {
     priceMatchLabel = 'الأسعار مطابقة للكتالوج';
     badges.push({ label: 'تطابق السعر', source: 'catalog' });
+    sourceMap['priceMatchLabel'] = {
+      sourceOwner: 'catalog-sync',
+      sourceRecordId: 'catalog-parity',
+      sourceType: 'feature',
+      conflictStatus: 'none'
+    };
   }
+
+  let hasNewProducts = context.catalogFeatures?.hasNewProducts ?? false;
+  if (hasNewProducts) {
+    sourceMap['hasNewProducts'] = {
+      sourceOwner: 'catalog-adoption',
+      sourceRecordId: 'new-arrivals',
+      sourceType: 'status',
+      conflictStatus: 'none'
+    };
+  }
+
+  // Conflict Detection: New products visible before client-visible (mocked detection)
+  if (context.hasUnpublishedNewProducts) {
+    sourceMap['new-product-leak'] = {
+      sourceOwner: 'catalog-gate',
+      sourceRecordId: 'leak-detection',
+      sourceType: 'security',
+      conflictStatus: 'blocker',
+      conflictReason: 'توجد منتجات جديدة معروضة في التطبيق قبل وصولها إلى مرحلة client-visible.'
+    };
+  }
+
+  // 5. Operational Status
+  sourceMap['supportsPickup'] = {
+    sourceOwner: 'ops-settings',
+    sourceRecordId: 'pickup-config',
+    sourceType: 'service',
+    conflictStatus: 'none'
+  };
+
+  sourceMap['supportsPartnerDelivery'] = {
+    sourceOwner: 'ops-settings',
+    sourceRecordId: 'partner-delivery-config',
+    sourceType: 'service',
+    conflictStatus: 'none'
+  };
+
+  // Final Conflict Analysis
+  const detectedConflicts = Object.values(sourceMap).filter(s => s.conflictStatus && s.conflictStatus !== 'none');
 
   return {
     offerLabel,
@@ -85,8 +206,11 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
     priceMatchLabel,
     hasBthwaniPro,
     subscriptionPackageChips,
-    commercialBadges: badges,
+    hasNewProducts,
+    commercialChips: badges,
     commercialNotes: notes,
+    sourceMap,
+    conflicts: detectedConflicts,
     supportsPickup: true,
     supportsPartnerDelivery: true,
   };
@@ -127,7 +251,7 @@ export function CommercialParityPreview({ features, storeName }: { features: Ret
     React.createElement(
       'div',
       { style: { display: 'flex', gap: '8px', flexWrap: 'wrap' } },
-      features.commercialBadges.map((badge, idx) => {
+      features.commercialChips.map((badge, idx) => {
         const colors = getBadgeColor(badge.source);
         return React.createElement(
           'div',
@@ -136,6 +260,24 @@ export function CommercialParityPreview({ features, storeName }: { features: Ret
           React.createElement('span', { style: { color: colors.fg, fontSize: '8px', opacity: 0.7 } }, `(${getSourceLabel(badge.source)})`)
         );
       })
+    ),
+    // Source Map Debug View
+    React.createElement(
+      'div',
+      { style: { marginTop: '12px', padding: '8px', backgroundColor: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' } },
+      React.createElement('div', { style: { fontSize: '10px', fontWeight: '900', color: '#64748B', marginBottom: '4px' } }, 'خارطة المصادر (SourceMap):'),
+      Object.entries(features.sourceMap).map(([key, src]) => React.createElement(
+        'div',
+        { key, style: { fontSize: '9px', display: 'flex', justifyContent: 'space-between', marginBottom: '2px', color: src.conflictStatus === 'blocker' ? '#DC2626' : '#475569' } },
+        React.createElement('span', null, `${key}:`),
+        React.createElement('span', { style: { fontWeight: '700' } }, `${src.sourceOwner} | ${src.sourceType} | ${src.conflictStatus || 'none'}`)
+      ))
+    ),
+    features.conflicts.length > 0 && React.createElement(
+      'div',
+      { style: { marginTop: '8px', padding: '8px', backgroundColor: '#FEF2F2', borderRadius: '6px', border: '1px solid #FECACA' } },
+      React.createElement('div', { style: { fontSize: '10px', fontWeight: '900', color: '#DC2626', marginBottom: '4px' } }, 'التضاربات المكتشفة:'),
+      features.conflicts.map((c, i) => React.createElement('div', { key: i, style: { fontSize: '9px', color: '#B91C1C' } }, `• [${c.conflictStatus}] ${c.sourceRecordId}: ${c.conflictReason || 'خطأ غير معروف'}`))
     ),
     features.deliveryFeeLabel && React.createElement(
       'div',
@@ -146,11 +288,11 @@ export function CommercialParityPreview({ features, storeName }: { features: Ret
       'div',
       { style: { marginTop: '4px', padding: '8px', backgroundColor: '#F8FAFC', borderRadius: '6px', border: '1px dashed #CBD5E1' } },
       React.createElement('span', { style: { fontSize: '10px', color: '#475569' } }, `⚖️ ${features.priceMatchLabel}`)
-    ),
-    features.commercialNotes.length > 0 && React.createElement(
-      'div',
-      { style: { marginTop: '4px', padding: '8px', backgroundColor: '#FEF2F2', borderRadius: '6px', border: '1px dashed #FECACA' } },
-      features.commercialNotes.map((n, i) => React.createElement('span', { key: i, style: { display: 'block', fontSize: '10px', color: '#DC2626' } }, `⚠️ ${n}`))
     )
   );
 }
+
+export const conflictList = [
+  ['bthwani-pro', 'free-delivery'],
+  ['partner-offer', 'price-match'],
+];

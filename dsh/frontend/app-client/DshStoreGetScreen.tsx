@@ -27,6 +27,7 @@ import { resolveDshImageSource } from './resolve-image-source';
 import { getDshClientStateMeta, type DshClientState } from './dshClientStateModel';
 import { type DshStoreMenuItem as DshStoreGetMenuItem } from './dshStoreTypes';
 import { mapMenuItemToProductCard } from './mapMenuItemToProductCard';
+import { isClientVisible } from '../shared/dshStoreProductCardModel';
 
 // Menu item view-model is shared locally to keep the screen fixture-free.
 
@@ -47,6 +48,7 @@ export type DshStoreGetScreenProps = {
     serviceLabel?: string;
     subscriptionPackageChips?: string[];
     hasBthwaniPro?: boolean;
+    commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
     tags?: string[];
     categories?: Array<{ id: string; label: string; itemCount: number; isPopular?: boolean }>;
     deliveryModes?: Array<{ id: 'delivery' | 'pickup'; name: string; isAvailable: boolean; estimatedTime?: string; fee?: number }>;
@@ -428,6 +430,12 @@ export function DshStoreGetScreen({
   onRetry,
   onSupport,
 }: DshStoreGetScreenProps) {
+  const sm = store?.commercialSourceMap;
+  const isProBlocked = sm?.['hasBthwaniPro']?.conflictStatus === 'blocker';
+  const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictStatus === 'blocker';
+  const isCouponBlocked = sm?.['hasCouponAvailable']?.conflictStatus === 'blocker';
+  const isOfferBlocked = sm?.['offerLabel']?.conflictStatus === 'blocker';
+
   const { direction } = useDirection();
   const uiText = useUiText();
   const storeText = uiText.storeScreen;
@@ -472,7 +480,7 @@ export function DshStoreGetScreen({
   ) : null;
 
   const clientVisibleItems = React.useMemo(
-    () => fallbackMenuItems.filter((item) => item.isAvailable !== false),
+    () => fallbackMenuItems.filter((item) => item.isAvailable !== false && isClientVisible(item.publishStage)),
     [fallbackMenuItems],
   );
 
@@ -1010,7 +1018,7 @@ export function DshStoreGetScreen({
   }
 
   const normalizedFollowersLabel = normalizeFollowersLabel(store.followersCount ?? store.followersLabel, storeText.get.followersSuffix);
-  const normalizedPriceMatchLabel = normalizePriceMatchLabel(store.priceMatchLabel, storeText.get.priceMatch);
+  const normalizedPriceMatchLabel = isPriceMatchBlocked ? undefined : normalizePriceMatchLabel(store.priceMatchLabel, storeText.get.priceMatch);
   const normalizedStoreName = normalizeDisplayText(store.name);
   const normalizedStoreSubtitle = normalizeDisplayText(store.subtitle);
   const normalizedEtaLabel = normalizeDisplayText(store.etaLabel);
@@ -1035,7 +1043,7 @@ export function DshStoreGetScreen({
   const benefitChips = Array.from(
     new Set(
       [
-        store.hasBthwaniPro ? 'بثواني برو' : null,
+        (isProBlocked ? false : store.hasBthwaniPro) ? 'بثواني برو' : null,
         ...(store.subscriptionPackageChips ?? []),
         store.deliveryLabel ?? null,
         store.serviceLabel ?? null,
@@ -2817,4 +2825,3 @@ const styles = StyleSheet.create({
 });
 
 export default DshStoreGetScreen;
-

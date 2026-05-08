@@ -90,7 +90,10 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
     promos: [],
     video: [],
     campaigns: [],
-    partners: [],
+    partners: [
+      { id: 'offers', label: 'العروض' },
+      { id: 'marketing-review', label: 'مراجعة التسويق' },
+    ],
     growth: [],
     signals: [
       { id: 'reach', label: 'الوصول' },
@@ -466,7 +469,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       case 'campaigns':
         return <CampaignsCommandDeckScreen />;
       case 'partners':
-        return <PartnerOffersCommandDeckScreen />;
+        return <PartnerOffersCommandDeckScreen activeSubTab={activeSubTab} />;
       case 'growth':
         return <GrowthCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} setActiveTab={setActiveTab as any} />;
       case 'signals':
@@ -499,7 +502,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
           <Box gap={0}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h1 style={{ letterSpacing: '-0.02em', fontSize: '20px', fontWeight: '900', color: '#0A2F5C' }}>تسويق DSH</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>NEEDS_BACKEND_BINDING</span>
+              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>يتطلب_ربط_خلفي</span>
             </div>
             <p style={{ fontWeight: 600, color: '#64748B', fontSize: '11px' }}>إدارة الشريط الذكي، البنرات، استوديو الفيديو، النمو، والولاء.</p>
           </Box>

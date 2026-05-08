@@ -156,6 +156,37 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       preparationTime: '12-18 دقيقة',
       mediaKey: 'dsh.product.choco.v1',
       imageUri: 'dsh.product.choco.v1',
+      publishStage: 'published-preview'
+    },
+    {
+      id: 'item-hidden-marketing',
+      name: 'منتج في التسويق',
+      subtitle: 'يجب ألا يظهر',
+      priceLabel: '50 ر.س',
+      categoryId: 'fresh',
+      categoryLabel: 'طازج',
+      isAvailable: true,
+      publishStage: 'marketing-review',
+    },
+    {
+      id: 'item-hidden-partner',
+      name: 'منتج في الشريك',
+      subtitle: 'يجب ألا يظهر',
+      priceLabel: '50 ر.س',
+      categoryId: 'fresh',
+      categoryLabel: 'طازج',
+      isAvailable: true,
+      publishStage: 'partner-review',
+    },
+    {
+      id: 'item-visible-client',
+      name: 'منتج مرئي للعميل',
+      subtitle: 'يجب أن يظهر',
+      priceLabel: '50 ر.س',
+      categoryId: 'fresh',
+      categoryLabel: 'طازج',
+      isAvailable: true,
+      publishStage: 'client-visible',
     },
   ],
 
@@ -248,5 +279,3 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 
   ...buildCanonicalPreviewStoreItemsByStoreId(),
 };
-
-

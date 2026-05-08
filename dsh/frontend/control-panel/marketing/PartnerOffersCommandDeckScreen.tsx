@@ -17,8 +17,14 @@ import {
   type PartnerOfferSource,
 } from '../../shared/partner-offer-store';
 import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
+import { getMarketingReviewItems } from '../../shared/marketing-review-store';
+import { ApprovalRecord, ApprovalStage, transitionApprovalStage, resolveNextOwner, isCatalogOwnedMedia, isPartnerOwnedException } from '../../shared/workflow';
 
-export function PartnerOffersCommandDeckScreen() {
+import { MarketingReviewQueue } from './MarketingReviewQueue';
+
+// --- Partner Offers Component ---
+
+export function PartnerOffersCommandDeckScreen({ activeSubTab = 'offers' }: { activeSubTab?: string }) {
   const [items, setItems] = React.useState<PartnerOfferRecord[]>(() => getPartnerOfferItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getPartnerOfferItems()[0]?.id ?? null);
   const selected = React.useMemo(() => items.find(i => i.id === selectedId) ?? null, [items, selectedId]);
@@ -132,10 +138,15 @@ export function PartnerOffersCommandDeckScreen() {
     );
   };
 
+  if (activeSubTab === 'marketing-review') {
+    return <MarketingReviewQueue />;
+  }
+
   return (
-    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px', padding: '16px', boxSizing: 'border-box' }}>
+  return (
+    <Box gap={4} dir="rtl" padding={4} style={{ flex: 1 }}>
       {/* Header & KPIs */}
-      <View style={styles.kpiRow}>
+      <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
         <View style={styles.kpiCard}>
           <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>واردة</Text>
           <Text role="titleLg" style={{ color: '#0A2F5C', textAlign: 'right', width: '100%' }}>{kpis.inbound}</Text>
@@ -156,7 +167,7 @@ export function PartnerOffersCommandDeckScreen() {
           <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>مرفوض</Text>
           <Text role="titleLg" style={{ color: '#DC2626', textAlign: 'right', width: '100%' }}>{kpis.rejected}</Text>
         </View>
-      </View>
+      </Box>
 
       {/* Pipeline Filter */}
       <Surface tone="inset" style={{ padding: 4, borderRadius: 12 }}>
@@ -174,7 +185,7 @@ export function PartnerOffersCommandDeckScreen() {
         />
       </Surface>
 
-      <View style={styles.mainLayout}>
+      <Box layoutDirection="row" gap={4} style={{ flex: 1, flexWrap: 'wrap' }}>
         {/* Offers Table / List */}
         <Surface tone="raised" style={styles.listPanel}>
           <View style={styles.panelHeader}>
@@ -211,7 +222,7 @@ export function PartnerOffersCommandDeckScreen() {
 
           <ScrollView style={styles.scrollView}>
             <Box gap={4} style={{ padding: 16 }}>
-              <div style={inlineStyles.gridContainer}>
+              <View style={inlineStyles.gridContainer}>
                 <TextField label="عنوان العرض" value={draft.title || ''} onChangeText={v => setDraft({ ...draft, title: v })} style={{ textAlign: 'right' }} />
                 <TextField label="اسم الشريك (الشركة)" value={draft.partnerName || ''} onChangeText={v => setDraft({ ...draft, partnerName: v })} style={{ textAlign: 'right' }} />
 
@@ -260,7 +271,7 @@ export function PartnerOffersCommandDeckScreen() {
 
                 <TextField label="تاريخ البدء" value={draft.activeFromDate || ''} onChangeText={v => setDraft({ ...draft, activeFromDate: v })} dir="ltr" style={{ textAlign: 'left' }} />
                 <TextField label="تاريخ الانتهاء" value={draft.activeToDate || ''} onChangeText={v => setDraft({ ...draft, activeToDate: v })} dir="ltr" style={{ textAlign: 'left' }} />
-              </div>
+              </View>
 
               <TextField label="ملاحظات هامش الربح" value={draft.marginRiskNote || ''} onChangeText={v => setDraft({ ...draft, marginRiskNote: v })} hint="ملاحظات داخلية لفريق المالية/التسويق" style={{ textAlign: 'right' }} />
               <TextField label="حملة مرتبطة" value={draft.linkedCampaignId || ''} onChangeText={v => setDraft({ ...draft, linkedCampaignId: v })} dir="ltr" style={{ textAlign: 'left' }} />
@@ -273,8 +284,8 @@ export function PartnerOffersCommandDeckScreen() {
             </Box>
           </ScrollView>
         </Surface>
-      </View>
-    </div>
+      </Box>
+    </Box>
   );
 }
 

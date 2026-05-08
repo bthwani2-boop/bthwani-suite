@@ -44,6 +44,8 @@ function resolveDshHomeStoreImageSource(imageUri?: string): ImageSourcePropType 
   return resolveDshImageSource(imageUri);
 }
 
+import { isClientVisible } from '../shared/dshStoreProductCardModel';
+
 function resolveDshHomeBannerImageSource(imageUrl?: string): ImageSourcePropType | undefined {
   return resolveDshImageSource(imageUrl);
 }
@@ -165,6 +167,8 @@ export type DshHomeGetStore = {
   isFavorite: boolean;
   isFollowing: boolean;
   hasOffer?: boolean;
+  publishStage?: string;
+  commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
 };
 
 export type DshHomeRecentOrder = {
@@ -602,7 +606,7 @@ export function DshHomeGetScreen({
   const cardHeight = Math.max(154, Math.round(cardWidth * 0.74));
   const itemWidth = cardWidth + itemGap;
   const horizontalPadding = Math.max(0, Math.round((containerWidth - cardWidth) / 2));
-  const resolvedStores = stores ?? [];
+  const resolvedStores = (stores ?? []).filter((store) => store.publishStage ? isClientVisible(store.publishStage) : true);
   const resolvedRecentOrders = recentOrders ?? [];
 
   const categoryItems = React.useMemo(() => {
@@ -1642,6 +1646,13 @@ return (
 
             {activeStorePage?.stores.length ? (
               activeStorePage.stores.map((store, index) => {
+                const sm = store.commercialSourceMap;
+                const isOfferBlocked = sm?.['offerLabel']?.conflictStatus === 'blocker';
+                const isProBlocked = sm?.['hasBthwaniPro']?.conflictStatus === 'blocker';
+                const isCouponBlocked = sm?.['hasCouponAvailable']?.conflictStatus === 'blocker';
+                const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictStatus === 'blocker';
+                const isNewProductsBlocked = sm?.['hasNewProducts']?.conflictStatus === 'blocker' || sm?.['new-product-leak']?.conflictStatus === 'blocker';
+
                 const card: StoreCardPremiumItem = {
                   id: store.id,
                   name: store.name,
@@ -1650,19 +1661,22 @@ return (
                   rating: store.rating ?? null,
                   distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
                   isOpen: store.statusTone === 'open',
-                  supportsPickup: true,
-                  supportsPartnerDelivery: true,
-                  serviceTokens: [{ label: store.deliveryLabel }, { label: store.serviceLabel }],
+                  supportsPickup: sm?.['supportsPickup']?.conflictStatus !== 'blocker',
+                  supportsPartnerDelivery: sm?.['supportsPartnerDelivery']?.conflictStatus !== 'blocker',
+                  serviceTokens: [
+                    { label: store.deliveryLabel },
+                    { label: isPriceMatchBlocked ? undefined : store.serviceLabel }
+                  ].filter(t => t.label),
                   isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
                   isFollowing: followToggles[store.id] ?? store.isFollowing,
                   followersCount: followCounts[store.id] ?? store.followerCount,
-                  hasBthwaniPro: store.hasOffer !== false,
-                  subscriptionPackageChips: store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel],
-                  hasNewProducts: store.hasOffer === true,
-                  hasOffer: store.hasOffer,
-                  offerText: store.offerLabel,
+                  hasBthwaniPro: isProBlocked ? false : store.hasBthwaniPro,
+                  subscriptionPackageChips: isProBlocked ? [] : (store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel]),
+                  hasNewProducts: isNewProductsBlocked ? false : store.hasNewProducts,
+                  hasOffer: isOfferBlocked ? false : store.hasOffer,
+                  offerText: isOfferBlocked ? undefined : store.offerLabel,
                   pointsMultiplier: Number.parseInt(store.multiplierLabel.replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
-                  hasCouponAvailable: store.hasOffer === false,
+                  hasCouponAvailable: isCouponBlocked ? false : store.hasCouponAvailable,
                 };
 
                 return (

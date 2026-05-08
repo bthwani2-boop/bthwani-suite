@@ -1,3 +1,6 @@
+import type { ApprovalStage } from './workflow';
+import type { CommercialSourceMap } from './store-card-commercial-map';
+
 export type DshCanonicalSource =
   | 'app-field'
   | 'app-partner'
@@ -40,6 +43,7 @@ type DiscoveryStoreFixture = {
   hasCouponAvailable: boolean;
   supportsPickup: boolean;
   supportsPartnerDelivery: boolean;
+  commercialSourceMap?: CommercialSourceMap;
   sourceRecordId?: string;
   canonicalStoreId?: string;
   canonicalProductId?: string;
@@ -114,6 +118,7 @@ export type DshCanonicalStoreCard = {
   hasBthwaniPro: boolean;
   hasNewProducts: boolean;
   hasCouponAvailable: boolean;
+  commercialSourceMap?: CommercialSourceMap;
   canonicalProductId?: string;
 };
 
@@ -178,6 +183,12 @@ export function normalizeCanonicalPublishStage(stage: DshCanonicalPublishStage |
     default:
       return 'field-draft';
   }
+}
+
+export function isClientVisible(stage: string | undefined): boolean {
+  // Only show elements that have explicitly reached client-visible or the legacy published-preview stage.
+  // We do not show 'marketing-review', 'partner-review', or 'catalog-adopted' (unless internal preview).
+  return stage === 'client-visible' || stage === 'published-preview';
 }
 
 const canonicalStoreCard: DshCanonicalStoreCard = {
@@ -311,6 +322,7 @@ export function mapCanonicalStoreToDiscoveryStore(store: DshCanonicalStoreCard):
     hasCouponAvailable: store.hasCouponAvailable,
     supportsPickup: store.supportsPickup,
     supportsPartnerDelivery: store.supportsPartnerDelivery,
+    commercialSourceMap: store.commercialSourceMap,
     sourceRecordId: store.sourceRecordId,
     canonicalStoreId: store.id,
     canonicalProductId: store.canonicalProductId,
@@ -362,3 +374,8 @@ export function buildCanonicalPreviewStoreItemsByStoreId() {
     return result;
   }, {});
 }
+
+// --- DSH Approval Pipeline SSOT v1 Bridge ---
+export type DshStoreProductCardApprovalState = {
+  stage: ApprovalStage;
+};
