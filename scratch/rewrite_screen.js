@@ -1,4 +1,9 @@
-'use client';
+const fs = require('fs');
+const path = require('path');
+
+const targetFile = 'C:/bthwani-suite/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx';
+
+const content = `'use client';
 
 import React, { useState, useMemo } from 'react';
 import { Box, Button, Surface, Text, SearchField, Chip } from '@bthwani/ui-kit';
@@ -87,7 +92,7 @@ function WatermarkedImage({ src, fallback, size = 32 }: { src?: string, fallback
       {src ? (
         <img src={src} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Product" />
       ) : (
-        <div style={{ fontSize: `${size/2}px` }}>{fallback || '📦'}</div>
+        <div style={{ fontSize: \`\${size/2}px\` }}>{fallback || '📦'}</div>
       )}
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.4, backgroundColor: 'rgba(255,255,255,0.15)' }}>
         <img src={WATERMARK_URL} style={{ width: '80%', height: '80%', objectFit: 'contain' }} alt="Watermark" />
@@ -105,7 +110,7 @@ const FilterDropdown = ({ title, options, selected, onChange, onClose }: any) =>
       <div style={{ padding: '8px', borderBottom: '1px solid #E2E8F0' }}>
         <input
            type="text"
-           placeholder={`بحث في ${title}...`}
+           placeholder={\`بحث في \${title}...\`}
            value={search}
            onChange={e => setSearch(e.target.value)}
            style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid #CBD5E1', outline: 'none', fontSize: '11px', textAlign: 'right' }}
@@ -267,7 +272,7 @@ export function ControlPanelDshCatalogScreen({
   );
 
   return (
-    <div className={styles.operationsCockpit} dir="rtl" style={{ height: '100%', width: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', backgroundColor: '#F8FAFC' }}>
+    <div className={styles.operationsCockpit} dir="rtl" style={{ height: '100vh', width: '100vw', overflow: 'hidden', display: 'flex', flexDirection: 'column', backgroundColor: '#F8FAFC' }}>
 
       {/* 1. TOP BAR */}
       <div style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
@@ -301,9 +306,13 @@ export function ControlPanelDshCatalogScreen({
         {workspaceMode === 'catalog' && (
           <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', padding: '8px 16px', overflowX: 'auto', borderBottom: '1px solid #F1F5F9', alignItems: 'center', whiteSpace: 'nowrap' }}>
              <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C', marginLeft: '8px' }}>الفئات:</Text>
-             <Chip label="الكل" tone={!activeMainCategory ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(null)} />
+             <div onClick={() => handleMainCategorySelect(null)} style={{ cursor: 'pointer' }}>
+               <Chip label="الكل" tone={!activeMainCategory ? 'brand' : 'default'} />
+             </div>
              {dshCatalogCategories.map(cat => (
-               <Chip key={cat.id} label={`${cat.emojiFallback} ${cat.label} ${cat.categoryMode === 'manual-order' ? '(يدوي)' : ''}`} tone={activeMainCategory?.id === cat.id ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(cat)} />
+               <div key={cat.id} onClick={() => handleMainCategorySelect(cat)} style={{ cursor: 'pointer' }}>
+                 <Chip label={\`\${cat.emojiFallback} \${cat.label} \${cat.categoryMode === 'manual-order' ? '(يدوي)' : ''}\`} tone={activeMainCategory?.id === cat.id ? 'brand' : 'default'} />
+               </div>
              ))}
           </div>
         )}
@@ -331,7 +340,9 @@ export function ControlPanelDshCatalogScreen({
                 all: 'الكل', 'master': 'مركزية', 'partner-exception': 'استثناء صورة', 'partner-review': 'مراجعة شريك', 'marketing-review': 'مراجعة تسويق', 'price-conflict': 'تعارض سعر', 'non-matching': 'غير مطابق', 'category-proposals': 'مقترحات فئات'
               };
               return (
-                <Chip key={f} label={`${labels[f]} (${counts[f]})`} tone={activeFilter === f ? 'brand' : 'default'} onPress={() => setActiveFilter(f)} />
+                <div key={f} onClick={() => setActiveFilter(f)} style={{ cursor: 'pointer' }}>
+                   <Chip label={\`\${labels[f]} (\${counts[f]})\`} tone={activeFilter === f ? 'brand' : 'default'} />
+                </div>
               );
             })}
 
@@ -342,9 +353,9 @@ export function ControlPanelDshCatalogScreen({
               <div style={{ display: 'flex', flexDirection: 'row', gap: '4px', alignItems: 'center', backgroundColor: '#F8FAFC', padding: '4px 8px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
                  <Text role="caption" tone="muted" style={{ whiteSpace: 'nowrap', marginLeft: '4px' }}>نشط:</Text>
                  {activeFilter !== 'all' && <FilterToken label={activeFilter} onRemove={() => setActiveFilter('all')} />}
-                 {searchQuery && <FilterToken label={`بحث: ${searchQuery}`} onRemove={() => setSearchQuery('')} />}
+                 {searchQuery && <FilterToken label={\`بحث: \${searchQuery}\`} onRemove={() => setSearchQuery('')} />}
                  {Object.entries(colFilters).map(([k, vals]) =>
-                    vals.map(v => <FilterToken key={`${k}-${v}`} label={`${v}`} onRemove={() => setColFilters(prev => ({...prev, [k]: prev[k].filter(x => x !== v)}))} />)
+                    vals.map(v => <FilterToken key={\`\${k}-\${v}\`} label={\`\${v}\`} onRemove={() => setColFilters(prev => ({...prev, [k]: prev[k].filter(x => x !== v)}))} />)
                  )}
                  <Button label="مسح الكل" tone="secondary" size="sm" onClick={() => { setActiveFilter('all'); setSearchQuery(''); setColFilters({ name: [], category: [], classification: [], sku: [], price: [], policy: [], status: [], source: [], categoryMode: [] }); }} style={{ padding: '2px 6px', fontSize: '10px', height: 'auto', minHeight: '0' }} />
               </div>
@@ -473,8 +484,8 @@ export function ControlPanelDshCatalogScreen({
                 <InspectorTile title="تسلسل الفئة (Hierarchy Path)">
                    <Text role="caption" style={{ fontSize: '10px', color: '#64748B', lineHeight: 1.6, textAlign: 'right' }}>
                      {dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main)?.label || 'غير معروف'}
-                     {selectedProduct.categoryPath.sub && ` > ${dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main)?.subcategories.find(s => s.id === selectedProduct.categoryPath.sub)?.label}`}
-                     {selectedProduct.categoryPath.mainClassification && ` > ${dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main)?.subcategories.find(s => s.id === selectedProduct.categoryPath.sub)?.mainClassifications?.find(c => c.id === selectedProduct.categoryPath.mainClassification)?.label || selectedProduct.categoryPath.mainClassification}`}
+                     {selectedProduct.categoryPath.sub && \` > \${dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main)?.subcategories.find(s => s.id === selectedProduct.categoryPath.sub)?.label}\`}
+                     {selectedProduct.categoryPath.mainClassification && \` > \${dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main)?.subcategories.find(s => s.id === selectedProduct.categoryPath.sub)?.mainClassifications?.find(c => c.id === selectedProduct.categoryPath.mainClassification)?.label || selectedProduct.categoryPath.mainClassification}\`}
                    </Text>
                 </InspectorTile>
 
@@ -490,7 +501,7 @@ export function ControlPanelDshCatalogScreen({
 
                 <InspectorTile title="تجاوزات الشريك (Partner Override)" dashed>
                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                      <MiniInfoBox label="السعر" value={selectedProduct.partnerOverrides?.[0]?.price ? `${selectedProduct.partnerOverrides[0].price} ر.س` : 'مطابق'} valueColor={selectedProduct.partnerOverrides?.[0]?.price ? '#FF500D' : '#0A2F5C'} isBoldValue={!!selectedProduct.partnerOverrides?.[0]?.price} />
+                      <MiniInfoBox label="السعر" value={selectedProduct.partnerOverrides?.[0]?.price ? \`\${selectedProduct.partnerOverrides[0].price} ر.س\` : 'مطابق'} valueColor={selectedProduct.partnerOverrides?.[0]?.price ? '#FF500D' : '#0A2F5C'} isBoldValue={!!selectedProduct.partnerOverrides?.[0]?.price} />
                       <MiniInfoBox label="التوفر" value={selectedProduct.partnerOverrides?.[0]?.isAvailable === false ? 'نفذت' : 'متاح'} />
                    </div>
                 </InspectorTile>
@@ -508,250 +519,13 @@ export function ControlPanelDshCatalogScreen({
              </Box>
           </div>
         )}
-        {workspaceMode === 'quick-entry' && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', padding: '32px' }}>
-             <Box gap={6}>
-                <Box gap={1}>
-                   <Text role="titleLg" style={{ color: '#0A2F5C' }}>مركز الإدخال السريع (Rapid Intake)</Text>
-                   <Text role="body" tone="muted">أضف منتجات جديدة للكتالوج المركزي عبر المسح الضوئي أو البحث الذكي.</Text>
-                </Box>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
-                   <Surface tone="inset" padding={6} style={{ borderRadius: 12, cursor: 'pointer', border: '2px dashed #0A2F5C', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', backgroundColor: '#F0F9FF' }}>
-                      <div style={{ fontSize: '40px' }}>📸</div>
-                      <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>مسح باركود / GTIN</Text>
-                      <Text role="caption" tone="muted" style={{ textAlign: 'center' }}>استخدم الكاميرا أو الماسح الضوئي لإضافة منتج فوراً</Text>
-                   </Surface>
-
-                   <Surface tone="inset" padding={6} style={{ borderRadius: 12, cursor: 'pointer', border: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ fontSize: '40px' }}>🔍</div>
-                      <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>بحث وإضافة سريعة</Text>
-                      <Text role="caption" tone="muted" style={{ textAlign: 'center' }}>البحث في قاعدة بيانات المنتجات العالمية (GS1)</Text>
-                   </Surface>
-
-                   <Surface tone="inset" padding={6} style={{ borderRadius: 12, cursor: 'pointer', border: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ fontSize: '40px' }}>📊</div>
-                      <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>رفع ملف (Excel/CSV)</Text>
-                      <Text role="caption" tone="muted" style={{ textAlign: 'center' }}>استيراد آلاف المنتجات دفعة واحدة عبر قوالب بثواني</Text>
-                   </Surface>
-
-                   <Surface tone="inset" padding={6} style={{ borderRadius: 12, cursor: 'pointer', border: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ fontSize: '40px' }}>🤖</div>
-                      <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>الإدخال المدعوم بالذكاء الاصطناعي</Text>
-                      <Text role="caption" tone="muted" style={{ textAlign: 'center' }}>استخراج البيانات تلقائياً من صور المنتجات أو القوائم</Text>
-                   </Surface>
-                </div>
-
-                <Box gap={3} style={{ marginTop: '20px' }}>
-                   <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>المسودات الأخيرة (Recent Drafts)</Text>
-                   <div style={{ border: '1px solid #F1F5F9', borderRadius: '8px', overflow: 'hidden' }}>
-                      {[1, 2, 3].map(i => (
-                        <div key={i} style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: i < 3 ? '1px solid #F1F5F9' : 'none' }}>
-                           <Box style={{ flexDirection: 'row', gap: '12px', alignItems: 'center' }}>
-                              <div style={{ width: '32px', height: '32px', backgroundColor: '#F8FAFC', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📦</div>
-                              <Text role="caption" style={{ fontWeight: 700 }}>منتج جديد #{1024 + i}</Text>
-                           </Box>
-                           <Chip label="مسودة" tone="default" />
-                        </div>
-                      ))}
-                   </div>
-                </Box>
-             </Box>
-          </div>
-        )}
-
-        {workspaceMode === 'partner-entry' && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', padding: '32px' }}>
-             <Box gap={6}>
-                <Box gap={1}>
-                   <Text role="titleLg" style={{ color: '#0A2F5C' }}>مراجعة تجاوزات الشركاء (Partner Overrides)</Text>
-                   <Text role="body" tone="muted">إدارة طلبات تعديل الأسعار، الصور، والبيانات من قبل المتاجر والشركاء.</Text>
-                </Box>
-
-                <div style={{ display: 'flex', gap: '16px' }}>
-                   <Surface tone="brand" padding={6} style={{ flex: 1, borderRadius: 12, backgroundColor: '#0A2F5C' }}>
-                      <Text role="caption" style={{ color: '#FFFFFF', opacity: 0.8 }}>بانتظار المراجعة</Text>
-                      <Text role="titleLg" style={{ color: '#FFFFFF', fontSize: '32px' }}>42</Text>
-                   </Surface>
-                   <Surface tone="inset" padding={6} style={{ flex: 1, borderRadius: 12, border: '1px solid #E2E8F0' }}>
-                      <Text role="caption" tone="muted">تم اعتمادها اليوم</Text>
-                      <Text role="titleLg" style={{ color: '#16A34A', fontSize: '32px' }}>12</Text>
-                   </Surface>
-                   <Surface tone="inset" padding={6} style={{ flex: 1, borderRadius: 12, border: '1px solid #E2E8F0' }}>
-                      <Text role="caption" tone="muted">تنبيهات تعارض السعر</Text>
-                      <Text role="titleLg" style={{ color: '#DC2626', fontSize: '32px' }}>7</Text>
-                   </Surface>
-                </div>
-
-                 <div style={{ border: '1px solid #E2E8F0', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#FFFFFF' }}>
-                    <div style={{ padding: '12px 16px', backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                       <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C' }}>قائمة الانتظار (Approval Queue)</Text>
-                       <Text role="caption" tone="muted" style={{ fontSize: '10px' }}>3 طلبات معلقة</Text>
-                    </div>
-                    {[
-                       { partner: 'مطعم السعادة', product: 'برجر دجاج كلاسيك', change: 'تعديل سعر (25 -> 28)', time: 'منذ 10 دقائق', status: 'urgent' },
-                       { partner: 'سوبر ماركت الخليج', product: 'حليب كامل الدسم 2 لتر', change: 'صورة جديدة (استثناء)', time: 'منذ ساعة', status: 'pending' },
-                       { partner: 'حلويات ركن القصيم', product: 'معمول بالتمر 1 كجم', change: 'إضافة وصف مخصص', time: 'منذ 3 ساعات', status: 'pending' }
-                    ].map((item, idx) => (
-                       <div key={idx} style={{
-                          padding: '16px 24px',
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          borderBottom: idx < 2 ? '1px solid #F1F5F9' : 'none',
-                          position: 'relative',
-                          backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#FBFCFD'
-                       }}>
-                          {/* Status Indicator Bar */}
-                          <div style={{
-                             position: 'absolute',
-                             right: 0,
-                             top: '15%',
-                             bottom: '15%',
-                             width: '4px',
-                             backgroundColor: item.status === 'urgent' ? '#FF500D' : '#CBD5E1',
-                             borderRadius: '0 4px 4px 0'
-                          }} />
-
-                          <Box gap={1} style={{ flex: 1 }}>
-                             <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C', fontSize: '13px' }}>{item.product}</Text>
-                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                <Text role="caption" tone="muted" style={{ fontSize: '10px' }}>{item.partner}</Text>
-                                <div style={{ width: '3px', height: '3px', borderRadius: '50%', backgroundColor: '#CBD5E1' }} />
-                                <Text role="caption" style={{ fontSize: '10px', color: '#FF500D', fontWeight: 600 }}>{item.change}</Text>
-                             </div>
-                             <Text role="caption" tone="muted" style={{ fontSize: '9px', marginTop: '2px' }}>{item.time}</Text>
-                          </Box>
-
-                          <div style={{ display: 'flex', flexDirection: 'row', gap: '12px', alignItems: 'center' }}>
-                             <Button label="عرض التفاصيل" tone="secondary" size="sm" style={{ padding: '6px 14px', borderRadius: '20px', fontSize: '11px' }} />
-                             <Button label="اعتماد سريع" tone="primary" size="sm" style={{ padding: '6px 14px', borderRadius: '20px', fontSize: '11px' }} />
-                          </div>
-                       </div>
-                    ))}
-                 </div>
-             </Box>
-          </div>
-        )}
-
-        {workspaceMode === 'field-intake' && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', padding: '32px' }}>
-             <Box gap={6}>
-                <Box gap={1}>
-                   <Text role="titleLg" style={{ color: '#0A2F5C' }}>مدخلات الميدان (Field Intelligence)</Text>
-                   <Text role="body" tone="muted">متابعة البيانات والصور المرفوعة من قبل المناديب الميدانيين أثناء الجولات التفقدية.</Text>
-                </Box>
-
-                <Box gap={3}>
-                   <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>آخر التحديثات الميدانية (Live Stream)</Text>
-                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
-                      {[1, 2, 3, 4].map(i => (
-                         <div key={i} style={{ border: '1px solid #E2E8F0', borderRadius: '12px', overflow: 'hidden' }}>
-                            <div style={{ height: '140px', backgroundColor: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>📸</div>
-                            <div style={{ padding: '12px' }}>
-                               <Text role="caption" style={{ fontWeight: 800 }}>صورة منتج جديدة</Text>
-                               <Text role="caption" tone="muted" style={{ fontSize: '10px' }}>عبر المندوب: أحمد علي</Text>
-                               <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <Text role="caption" style={{ color: '#0A2F5C', fontSize: '9px' }}>فرع السليمانية</Text>
-                                  <Chip label="قيد المراجعة" tone="default" />
-                               </div>
-                            </div>
-                         </div>
-                      ))}
-                   </div>
-                </Box>
-             </Box>
-          </div>
-        )}
-
-        {workspaceMode === 'duplicate-resolution' && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF', padding: '48px' }}>
-             <div style={{ fontSize: '80px', marginBottom: '24px' }}>👯‍♂️</div>
-             <Text role="titleLg" style={{ color: '#0A2F5C' }}>محرك حل التكرارات (De-duplication)</Text>
-             <Text role="body" tone="muted" style={{ marginTop: '12px', textAlign: 'center', maxWidth: '500px' }}>
-                يقوم النظام حالياً بتحليل الكتالوج للعثور على المنتجات المتكررة بناءً على الاسم، الـ SKU، والباركود.
-             </Text>
-             <div style={{ marginTop: '32px', padding: '20px', backgroundColor: '#F0F9FF', borderRadius: '12px', border: '1px solid #B9E6FE', width: '100%', maxWidth: '600px' }}>
-                <Box gap={2}>
-                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Text role="caption" style={{ fontWeight: 800, color: '#0369A1' }}>جاري التحليل والربط الذكي...</Text>
-                      <Text role="caption" style={{ fontWeight: 800, color: '#0369A1' }}>85%</Text>
-                   </div>
-                   <div style={{ height: '8px', width: '100%', backgroundColor: '#E0F2FE', borderRadius: '4px', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: '85%', backgroundColor: '#0EA5E9' }} />
-                   </div>
-                   <Text role="caption" tone="muted" style={{ fontSize: '11px', marginTop: '8px' }}>تم العثور على 14 مجموعة محتملة من المنتجات المتكررة.</Text>
-                </Box>
-             </div>
-             <Button label="عرض المجموعات المكتشفة" tone="primary" style={{ marginTop: '24px' }} />
-          </div>
-        )}
-
-        {workspaceMode === 'category-mapping' && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', padding: '32px' }}>
-             <Box gap={6}>
-                <Box gap={1}>
-                   <Text role="titleLg" style={{ color: '#0A2F5C' }}>ربط التصنيفات (Category Mapping)</Text>
-                   <Text role="body" tone="muted">مزامنة شجرة التصنيفات بين الشركاء وبثواني لضمان دقة ظهور المنتجات.</Text>
-                </Box>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
-                   <Box gap={3}>
-                      <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>تصنيفات بثواني (Central)</Text>
-                      <div style={{ border: '1px solid #E2E8F0', borderRadius: '8px', padding: '16px', height: '400px', overflowY: 'auto' }}>
-                         {dshCatalogCategories.map(cat => (
-                            <div key={cat.id} style={{ padding: '8px 12px', borderBottom: '1px solid #F1F5F9', cursor: 'pointer' }}>
-                               <Text role="caption" style={{ fontWeight: 700 }}>{cat.emojiFallback} {cat.label}</Text>
-                            </div>
-                         ))}
-                      </div>
-                   </Box>
-                   <Box gap={3}>
-                      <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>تصنيفات الشركاء (Unmapped)</Text>
-                      <div style={{ border: '1px solid #E2E8F0', borderRadius: '8px', padding: '16px', height: '400px', overflowY: 'auto', backgroundColor: '#F8FAFC' }}>
-                         {[1, 2, 3, 4, 5].map(i => (
-                            <div key={i} style={{ padding: '8px 12px', borderBottom: '1px solid #F1F5F9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                               <Text role="caption">تصنيف خارجي #{100 + i}</Text>
-                               <div style={{ color: '#0A2F5C', fontSize: '18px' }}>↔️</div>
-                            </div>
-                         ))}
-                      </div>
-                   </Box>
-                </div>
-             </Box>
-          </div>
-        )}
-
-        {workspaceMode === 'media-governance' && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', padding: '32px' }}>
-             <Box gap={6}>
-                <Box gap={1}>
-                   <Text role="titleLg" style={{ color: '#0A2F5C' }}>حوكمة الوسائط (Media Governance)</Text>
-                   <Text role="body" tone="muted">إدارة الأصول المرئية، العلامات المائية، والتحقق من جودة صور المنتجات.</Text>
-                </Box>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-                   {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                      <div key={i} style={{ position: 'relative', border: '1px solid #E2E8F0', borderRadius: '12px', overflow: 'hidden', height: '180px' }}>
-                         <div style={{ height: '100%', width: '100%', backgroundColor: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <div style={{ opacity: 0.2, fontSize: '40px' }}>🖼️</div>
-                         </div>
-                         <div style={{ position: 'absolute', top: 8, right: 8 }}>
-                            <Chip label="مركزي" tone="brand" />
-                         </div>
-                         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '8px', backgroundColor: 'rgba(255,255,255,0.9)', borderTop: '1px solid #E2E8F0' }}>
-                            <Text role="caption" style={{ fontSize: '10px', fontWeight: 800 }}>asset_product_{i}.png</Text>
-                         </div>
-                      </div>
-                   ))}
-                </div>
-             </Box>
-          </div>
-        )}
       </div>
     </div>
   );
 }
 
 export default ControlPanelDshCatalogScreen;
+`;
+
+fs.writeFileSync(targetFile, content);
+console.log('Successfully wrote ControlPanelDshCatalogScreen.tsx');
