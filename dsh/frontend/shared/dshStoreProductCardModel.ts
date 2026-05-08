@@ -1,4 +1,9 @@
-import type { ApprovalStage } from './workflow';
+import {
+  ApprovalStage,
+  isClientVisibleStage,
+  isLegacyPublishedPreview,
+  canRenderInClientSurface,
+} from './workflow';
 import type { CommercialSourceMap } from './store-card-commercial-map';
 
 export type DshCanonicalSource =
@@ -8,12 +13,7 @@ export type DshCanonicalSource =
   | 'marketing'
   | 'app-client'
   | 'manual';
-export type DshCanonicalPublishStage =
-  | 'field-draft'
-  | 'field-submitted'
-  | 'partner-review'
-  | 'marketing-review'
-  | 'published-preview';
+export type DshCanonicalPublishStage = ApprovalStage | 'published-preview' | 'field-draft';
 type DshCardTone = 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
 type DiscoveryStoreFixture = {
@@ -169,11 +169,18 @@ const canonicalProductId = 'canonical-product-field-lead-5-featured';
 
 export function normalizeCanonicalPublishStage(stage: DshCanonicalPublishStage | 'draft' | 'review' | 'published' | string | undefined): DshCanonicalPublishStage {
   switch (stage) {
-    case 'field-draft':
+    case 'partner-submitted':
     case 'field-submitted':
     case 'partner-review':
+    case 'partner-approved':
     case 'marketing-review':
+    case 'marketing-approved':
+    case 'catalog-adopted':
+    case 'client-visible':
+    case 'rejected':
+    case 'needs-fix':
     case 'published-preview':
+    case 'field-draft':
       return stage;
     case 'published':
       return 'published-preview';
@@ -185,10 +192,9 @@ export function normalizeCanonicalPublishStage(stage: DshCanonicalPublishStage |
   }
 }
 
+/** @deprecated Use canRenderInClientSurface instead */
 export function isClientVisible(stage: string | undefined): boolean {
-  // Only show elements that have explicitly reached client-visible or the legacy published-preview stage.
-  // We do not show 'marketing-review', 'partner-review', or 'catalog-adopted' (unless internal preview).
-  return stage === 'client-visible' || stage === 'published-preview';
+  return canRenderInClientSurface(stage);
 }
 
 const canonicalStoreCard: DshCanonicalStoreCard = {

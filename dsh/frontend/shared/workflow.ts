@@ -274,12 +274,25 @@ export function resolveNextOwner(stage: ApprovalStage): ApprovalSourceSurface {
   }
 }
 
-export function isClientVisible(stage: ApprovalStage): boolean {
+export function isClientVisibleStage(stage: string | undefined): boolean {
   return stage === 'client-visible';
 }
 
-export function isCatalogOwnedMedia(stage: ApprovalStage): boolean {
-  return stage === 'catalog-adopted' || stage === 'client-visible';
+export function isLegacyPublishedPreview(stage: string | undefined): boolean {
+  return stage === 'published-preview' || stage === 'published';
+}
+
+export function canRenderInClientSurface(stage: string | undefined, entityType?: ApprovalEntityType): boolean {
+  // Strict hardening v2: elements coming from the canonical/approval pipeline MUST have a valid stage.
+  // We no longer allow default visibility if stage is missing for elements intended for client view.
+  if (!stage) return false;
+
+  // Exception for product-media: allows viewing if marketing-approved or partner-approved (partner-owned-exception)
+  if (entityType === 'product-media' && isPartnerOwnedException(stage as ApprovalStage, entityType)) {
+    return true;
+  }
+
+  return isClientVisibleStage(stage) || isLegacyPublishedPreview(stage);
 }
 
 export function isPartnerOwnedException(stage: ApprovalStage, entityType: ApprovalEntityType): boolean {

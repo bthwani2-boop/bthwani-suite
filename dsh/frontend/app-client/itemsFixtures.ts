@@ -20,6 +20,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       preparationTime: '10-15 دقيقة',
       mediaKey: 'dsh.product.apple.v1',
       imageUri: 'dsh.product.apple.v1',
+      publishStage: 'published-preview',
     },
     {
       id: 'item-milk-1',
@@ -37,6 +38,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       preparationTime: '5-10 دقائق',
       mediaKey: 'dsh.product.milk.v1',
       imageUri: 'dsh.product.milk.v1',
+      publishStage: 'published-preview',
     },
     {
       id: 'item-bread-1',
@@ -54,6 +56,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       preparationTime: '10-20 دقيقة',
       mediaKey: 'dsh.product.bread.v1',
       imageUri: 'dsh.product.bread.v1',
+      publishStage: 'published-preview',
     },
     {
       id: 'item-yogurt-1',
@@ -70,6 +73,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       preparationTime: '5-8 دقائق',
       mediaKey: 'dsh.product.yogurt.v1',
       imageUri: 'dsh.product.yogurt.v1',
+      publishStage: 'published-preview',
     },
     {
       id: 'item-bananas-1',
@@ -179,6 +183,16 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       publishStage: 'partner-review',
     },
     {
+      id: 'item-hidden-catalog',
+      name: 'منتج معتمد كتالوج',
+      subtitle: 'يجب ألا يظهر',
+      priceLabel: '50 ر.س',
+      categoryId: 'fresh',
+      categoryLabel: 'طازج',
+      isAvailable: true,
+      publishStage: 'catalog-adopted',
+    },
+    {
       id: 'item-visible-client',
       name: 'منتج مرئي للعميل',
       subtitle: 'يجب أن يظهر',
@@ -230,6 +244,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       preparationTime: '10-14 دقيقة',
       mediaKey: 'dsh.product.roll.v1',
       imageUri: 'dsh.product.roll.v1',
+      publishStage: 'published-preview',
     },
   ],
 

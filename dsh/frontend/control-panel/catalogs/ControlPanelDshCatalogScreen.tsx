@@ -166,6 +166,7 @@ export function ControlPanelDshCatalogScreen({
   const isManualOrderCategory = activeMainCategory?.categoryMode === 'manual-order';
 
   const { filteredProducts, counts, filterOptions } = useMemo(() => {
+    console.log('[CatalogScreen] Recalculating filters...', { searchQuery, activeFilter, activeMainCategory: activeMainCategory?.id });
     let filtered = isManualOrderCategory ? [] : dshCatalogProducts.filter(p => {
       if (activeMainCategory && p.categoryPath.main !== activeMainCategory.id) return false;
       if (activeSubCategory && p.categoryPath.sub !== activeSubCategory.id) return false;
@@ -231,7 +232,7 @@ export function ControlPanelDshCatalogScreen({
       'category-proposals': 5
     };
 
-    return { filteredProducts: counts, filterOptions, counts: counts };
+    return { filteredProducts: filtered, filterOptions, counts: counts };
   }, [isManualOrderCategory, activeMainCategory, activeSubCategory, searchQuery, activeFilter, colFilters]);
 
   // Handle click outside to close dropdowns
@@ -404,7 +405,7 @@ export function ControlPanelDshCatalogScreen({
                       </tr>
                     </thead>
                     <tbody>
-                      {dshCatalogProducts.map(p => {
+                      {filteredProducts.map(p => {
                         const cat = dshCatalogCategories.find(c => c.id === p.categoryPath.main);
                         const sub = cat?.subcategories.find(s => s.id === p.categoryPath.sub);
                         const classif = sub?.mainClassifications?.find(c => c.id === p.categoryPath.mainClassification);

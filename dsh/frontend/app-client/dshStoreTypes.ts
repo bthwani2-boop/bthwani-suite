@@ -23,4 +23,5 @@ export type DshStoreMenuItem = {
   }>;
   imageUri?: string;
   isOffer?: boolean;
+  publishStage?: string;
 };

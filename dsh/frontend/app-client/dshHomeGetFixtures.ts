@@ -46,6 +46,7 @@ export type DshHomeGetFixtureStore = {
   subscriptionPackageChips?: string[];
   hasCouponAvailable?: boolean;
   hasNewProducts?: boolean;
+  publishStage?: string;
 };
 
 function formatDistanceLabel(distanceKm: number) {
@@ -670,12 +671,90 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     hasOffer: true,
     rating: 3.8,
     mediaKey: 'dsh.product.choco.v1',
-
     imageUri: 'dsh.product.choco.v1',
     hasBthwaniPro: false,
     subscriptionPackageChips: ['شراء مباشر', 'مراجعة الطلب'],
     hasCouponAvailable: true,
     hasNewProducts: false,
+    publishStage: 'published-preview',
+  },
+  {
+    id: 'store-test-marketing',
+    name: 'متجر قيد المراجعة التسويقية',
+    address: 'لا يجب أن يظهر للعميل',
+    categoryId: 'restaurants',
+    statusLabel: 'مخفي',
+    statusTone: 'closed',
+    distanceLabel: '0 كم',
+    deliveryLabel: 'مخفي',
+    serviceLabel: 'مخفي',
+    followerCount: 0,
+    multiplierLabel: 'x1',
+    isFavorite: false,
+    isFollowing: false,
+    rating: 0,
+    publishStage: 'marketing-review',
+  },
+  {
+    id: 'store-test-catalog',
+    name: 'متجر معتمد كتالوج',
+    address: 'لا يجب أن يظهر للعميل حتى التفعيل',
+    categoryId: 'restaurants',
+    statusLabel: 'مخفي',
+    statusTone: 'closed',
+    distanceLabel: '0 كم',
+    deliveryLabel: 'مخفي',
+    serviceLabel: 'مخفي',
+    followerCount: 0,
+    multiplierLabel: 'x1',
+    isFavorite: false,
+    isFollowing: false,
+    rating: 0,
+    publishStage: 'catalog-adopted',
+  },
+  {
+    id: 'store-test-visible',
+    name: 'متجر مرئي للعميل (v2)',
+    address: 'يجب أن يظهر بوضوح',
+    categoryId: 'restaurants',
+    statusLabel: 'مفتوح',
+    statusTone: 'open',
+    distanceLabel: '1.0 كم',
+    deliveryLabel: 'توصيل سريع',
+    serviceLabel: 'توصيل برو',
+    followerCount: 500,
+    multiplierLabel: 'x1',
+    isFavorite: false,
+    isFollowing: false,
+    rating: 4.5,
+    publishStage: 'client-visible',
+  },
+  {
+    id: 'store-test-blocked',
+    name: 'متجر بتعارض برمجني (Blocked)',
+    address: 'يجب ألا يظهر فيه أي شارات تجارية',
+    categoryId: 'restaurants',
+    statusLabel: 'مفتوح',
+    statusTone: 'open',
+    distanceLabel: '1.2 كم',
+    deliveryLabel: 'توصيل سريع',
+    serviceLabel: 'توصيل برو',
+    followerCount: 300,
+    multiplierLabel: 'x1',
+    isFavorite: false,
+    isFollowing: false,
+    rating: 4.2,
+    publishStage: 'client-visible',
+    commercialSourceMap: {
+      'hasBthwaniPro': {
+        sourceOwner: 'loyalty-store',
+        sourceRecordId: 'sub-pro',
+        sourceType: 'subscription',
+        approvalStage: 'active',
+        conflictStatus: 'blocker',
+        conflictReason: 'تعارض أمني في الشارات'
+      }
+    }
   },
 ];
 

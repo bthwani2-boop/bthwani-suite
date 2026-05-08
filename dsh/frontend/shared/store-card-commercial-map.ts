@@ -49,49 +49,56 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
 
   // Conflict Detection: Unpublished offers trying to show up
   context.activeOffers.forEach(offer => {
-    if (offer.status !== 'published' && offer.displayBadge) {
+    const isVisible = offer.status === 'published' || offer.status === 'client-visible';
+    if (!isVisible && offer.displayBadge) {
       sourceMap[`offer-${offer.id}`] = {
         sourceOwner: 'partner-offers',
         sourceRecordId: offer.id,
         sourceType: 'offer',
         approvalStage: offer.status,
         conflictStatus: 'blocker',
-        conflictReason: 'العرض ليس في حالة النشر (Published) ولكن يطلب الظهور.'
+        conflictReason: `العرض في حالة (${offer.status}) وغير مسموح بظهوره للعملاء.`
       };
     }
   });
 
   for (const offer of visibleOffers) {
-    if (offer.displayBadge && !offerLabel) {
+    const isOfferBlocked = sourceMap[`offer-${offer.id}`]?.conflictStatus === 'blocker' || sourceMap['offerLabel']?.conflictStatus === 'blocker';
+
+    if (offer.displayBadge && !offerLabel && !isOfferBlocked) {
       offerLabel = offer.displayBadge;
       badges.push({ label: offer.displayBadge, source: 'partner' });
       sourceMap['offerLabel'] = {
         sourceOwner: 'partner-offers',
         sourceRecordId: offer.id,
         sourceType: 'offer',
-        approvalStage: 'published',
+        approvalStage: offer.status,
         conflictStatus: 'none'
       };
     }
-    if (offer.offerType === 'coupon') {
+
+    const isCouponBlocked = sourceMap['hasCouponAvailable']?.conflictStatus === 'blocker';
+    if (offer.offerType === 'coupon' && !isCouponBlocked) {
       hasCouponAvailable = true;
       badges.push({ label: 'كوبون متاح', source: 'partner' });
       sourceMap['hasCouponAvailable'] = {
         sourceOwner: 'partner-offers',
         sourceRecordId: offer.id,
         sourceType: 'coupon',
-        approvalStage: 'published',
+        approvalStage: offer.status,
         conflictStatus: 'none'
       };
     }
-    if (offer.offerType === 'free-delivery' && !deliveryFeeLabel) {
+
+    const isDeliveryBlocked = sourceMap['deliveryFeeLabel']?.conflictStatus === 'blocker';
+    if (offer.offerType === 'free-delivery' && !deliveryFeeLabel && !isDeliveryBlocked) {
       deliveryFeeLabel = 'توصيل مجاني (شريك)';
       badges.push({ label: 'توصيل مجاني', source: 'partner' });
       sourceMap['deliveryFeeLabel'] = {
         sourceOwner: 'partner-offers',
         sourceRecordId: offer.id,
         sourceType: 'delivery',
-        approvalStage: 'published',
+        approvalStage: offer.status,
         conflictStatus: 'none'
       };
     }
@@ -99,7 +106,8 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
 
   // 2. Campaigns
   for (const camp of context.activeCampaigns) {
-    if (camp.channels?.includes('store-card')) {
+    const isCampaignBlocked = sourceMap[`campaign-${camp.id}`]?.conflictStatus === 'blocker';
+    if (camp.channels?.includes('store-card') && !isCampaignBlocked) {
       const badgeLabel = `حملة: ${camp.title}`;
       badges.push({ label: badgeLabel, source: 'campaign' });
       sourceMap[`campaign-${camp.id}`] = {
@@ -116,7 +124,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
   let hasBthwaniPro = false;
   const subscriptionPackageChips: string[] = [];
 
-  if (context.activeSubscriptions.some(s => s.id === 'sub-pro')) {
+  if (context.activeSubscriptions.some(s => s.id === 'sub-pro') && sourceMap['hasBthwaniPro']?.conflictStatus !== 'blocker') {
     hasBthwaniPro = true;
     subscriptionPackageChips.push('بثواني برو', 'توصيل سريع');
     badges.push({ label: '⚡ بثواني برو', source: 'subscription' });
@@ -134,7 +142,8 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
   }
 
   for (const e of context.activeEntitlements) {
-    if (e.type === 'reward') {
+    const isEntitlementBlocked = sourceMap[`entitlement-${e.id}`]?.conflictStatus === 'blocker';
+    if (e.type === 'reward' && !isEntitlementBlocked) {
       notes.push('يوجد استحقاق مكافأة متاح');
       badges.push({ label: 'مكافأة ولاء', source: 'loyalty' });
       sourceMap[`entitlement-${e.id}`] = {
@@ -149,7 +158,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
 
   // 4. Catalog & Features
   let priceMatchLabel: string | undefined = undefined;
-  if (context.catalogFeatures?.priceMatch) {
+  if (context.catalogFeatures?.priceMatch && sourceMap['priceMatchLabel']?.conflictStatus !== 'blocker') {
     priceMatchLabel = 'الأسعار مطابقة للكتالوج';
     badges.push({ label: 'تطابق السعر', source: 'catalog' });
     sourceMap['priceMatchLabel'] = {
@@ -253,6 +262,11 @@ export function CommercialParityPreview({ features, storeName }: { features: Ret
       { style: { display: 'flex', gap: '8px', flexWrap: 'wrap' } },
       features.commercialChips.map((badge, idx) => {
         const colors = getBadgeColor(badge.source);
+        // Safety gate: skip rendering if the source is blocked
+        const sourceKeys = Object.keys(features.sourceMap).filter(k => features.sourceMap[k].sourceType === badge.source || (badge.source === 'partner' && (k.startsWith('offer') || k === 'hasCouponAvailable' || k === 'deliveryFeeLabel')));
+        const isBlocked = sourceKeys.some(k => features.sourceMap[k].conflictStatus === 'blocker');
+        if (isBlocked) return null;
+
         return React.createElement(
           'div',
           { key: idx, style: { display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: colors.bg, padding: '2px 6px', borderRadius: '4px' } },

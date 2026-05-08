@@ -27,7 +27,7 @@ import { resolveDshImageSource } from './resolve-image-source';
 import { getDshClientStateMeta, type DshClientState } from './dshClientStateModel';
 import { type DshStoreMenuItem as DshStoreGetMenuItem } from './dshStoreTypes';
 import { mapMenuItemToProductCard } from './mapMenuItemToProductCard';
-import { isClientVisible } from '../shared/dshStoreProductCardModel';
+import { canRenderInClientSurface } from '../shared/workflow';
 
 // Menu item view-model is shared locally to keep the screen fixture-free.
 
@@ -48,6 +48,7 @@ export type DshStoreGetScreenProps = {
     serviceLabel?: string;
     subscriptionPackageChips?: string[];
     hasBthwaniPro?: boolean;
+    publishStage?: string;
     commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
     tags?: string[];
     categories?: Array<{ id: string; label: string; itemCount: number; isPopular?: boolean }>;
@@ -235,10 +236,16 @@ function resolveStoreOperationalState(statusLabel: string, deliveryLabel?: strin
 }
 
 function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType | undefined {
+  if (!canRenderInClientSurface(item.publishStage, 'product-media')) {
+    return undefined;
+  }
   return resolveDshImageSource(item.imageUri);
 }
 
 function resolveDshStoreCoverImageSource(store?: DshStoreGetScreenProps['store']): ImageSourcePropType | undefined {
+  if (!canRenderInClientSurface(store?.publishStage, 'store')) {
+    return undefined;
+  }
   return resolveDshImageSource(store?.imageUri);
 }
 function getItemEmoji(item: DshStoreGetMenuItem) {
@@ -480,7 +487,7 @@ export function DshStoreGetScreen({
   ) : null;
 
   const clientVisibleItems = React.useMemo(
-    () => fallbackMenuItems.filter((item) => item.isAvailable !== false && isClientVisible(item.publishStage)),
+    () => fallbackMenuItems.filter((item) => item.isAvailable !== false && canRenderInClientSurface(item.publishStage, 'product')),
     [fallbackMenuItems],
   );
 

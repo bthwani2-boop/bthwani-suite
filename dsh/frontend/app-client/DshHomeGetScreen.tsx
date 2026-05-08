@@ -40,11 +40,14 @@ import type { MarketingVideoRecord } from '../shared/video-store';
 import { getMarketingTickerItems, buildMarketingTickerPlan } from '../shared/news-ticker-store';
 import { getPublishedHomePromos, type HomePromoRecord } from '../shared/promo-store';
 
-function resolveDshHomeStoreImageSource(imageUri?: string): ImageSourcePropType | undefined {
+import { canRenderInClientSurface } from '../shared/workflow';
+
+function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string): ImageSourcePropType | undefined {
+  if (!canRenderInClientSurface(publishStage, 'store')) {
+    return undefined;
+  }
   return resolveDshImageSource(imageUri);
 }
-
-import { isClientVisible } from '../shared/dshStoreProductCardModel';
 
 function resolveDshHomeBannerImageSource(imageUrl?: string): ImageSourcePropType | undefined {
   return resolveDshImageSource(imageUrl);
@@ -606,7 +609,7 @@ export function DshHomeGetScreen({
   const cardHeight = Math.max(154, Math.round(cardWidth * 0.74));
   const itemWidth = cardWidth + itemGap;
   const horizontalPadding = Math.max(0, Math.round((containerWidth - cardWidth) / 2));
-  const resolvedStores = (stores ?? []).filter((store) => store.publishStage ? isClientVisible(store.publishStage) : true);
+  const resolvedStores = (stores ?? []).filter((store) => canRenderInClientSurface(store.publishStage, 'store'));
   const resolvedRecentOrders = recentOrders ?? [];
 
   const categoryItems = React.useMemo(() => {
