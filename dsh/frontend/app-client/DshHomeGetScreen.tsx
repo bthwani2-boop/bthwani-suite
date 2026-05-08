@@ -1132,8 +1132,12 @@ export function DshHomeGetScreen({
       id: category.id,
       key: category.id,
       title: category.label,
+      shortLabel: category.shortLabel,
+      subtitle: category.subtitle,
       iconUrl: getDshCategoryIconUrl(category.id),
       emojiFallback: category.emojiFallback ?? categoryIconMap[category.id] ?? '📂',
+      orbitWeight: category.orbitWeight,
+      isManualLike: category.isManualLike,
     }));
   }, [categoryItems]);
 
@@ -1146,8 +1150,12 @@ export function DshHomeGetScreen({
       id: selectedCategoryFixture.id,
       key: selectedCategoryFixture.id,
       title: selectedCategoryLabel,
+      shortLabel: selectedCategoryFixture.shortLabel,
+      subtitle: selectedCategoryFixture.subtitle,
       iconUrl: getDshCategoryIconUrl(selectedCategoryFixture.id),
       emojiFallback: selectedCategoryFixture.emojiFallback ?? categoryIconMap[selectedCategoryFixture.id] ?? '📂',
+      orbitWeight: selectedCategoryFixture.orbitWeight,
+      isManualLike: selectedCategoryFixture.isManualLike,
     };
   }, [selectedCategoryFixture, selectedCategoryLabel]);
 

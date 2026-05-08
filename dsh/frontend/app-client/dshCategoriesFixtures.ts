@@ -7,24 +7,32 @@ export type DshCategorySubcategoryFixture = {
 export type DshCategoryFixture = {
   id: string;
   label: string;
+  shortLabel?: string;
   subtitle: string;
   subcategories: DshCategorySubcategoryFixture[];
   renderMode?: 'stores' | 'manual-order';
   emojiFallback?: string;
+  priority?: number;
+  orbitWeight?: number;
+  isManualLike?: boolean;
 };
 
 export const dshCategoryFixtures: DshCategoryFixture[] = [
   {
     id: 'restaurants',
     label: 'المطاعم',
-    subtitle: 'طلب الوجبات والمأكولات الجاهزة من المطاعم والكافتيريات',
+    shortLabel: 'المطاعم',
+    subtitle: 'طلب الوجبات والمأكولات الجاهزة',
     subcategories: [],
     emojiFallback: '🍽️',
+    priority: 1,
+    orbitWeight: 1.2,
   },
   {
     id: 'grocery',
     label: 'مقاضي',
-    subtitle: 'سوبر ماركت: مواد غذائية وتموينية كل الاحتيجات اليومية',
+    shortLabel: 'مقاضي',
+    subtitle: 'سوبر ماركت ومواد تموينية',
     subcategories: [
       { id: 'grocery_vegetables_fruits', label: 'خضروات وفواكة', subtitle: 'منتجات طازجة ومبردة' },
       { id: 'grocery_meat_fish_chicken', label: 'لحوم وأسماك ودجاج', subtitle: 'اختيارات بروتينية ومبردة' },
@@ -33,10 +41,13 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
       { id: 'grocery_deals_bundle', label: 'باكج عروضات', subtitle: 'سلال مجمعة وعروض موسمية' },
     ],
     emojiFallback: '🛒',
+    priority: 2,
+    orbitWeight: 1.1,
   },
   {
     id: 'sweets_juices',
     label: 'حلا وعصائر',
+    shortLabel: 'حلا',
     subtitle: 'عصائر طازجة وحلويات وآيسكريم',
     subcategories: [
       { id: 'sweets_juices_fresh', label: 'عصائر طازجة', subtitle: 'عصائر معصورة ومخلوطة' },
@@ -44,10 +55,13 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
       { id: 'sweets_juices_icecream', label: 'آيسكريم', subtitle: 'حلويات مجمدة وأحواض' },
     ],
     emojiFallback: '🧃',
+    priority: 3,
+    orbitWeight: 1.0,
   },
   {
     id: 'anaqati',
     label: 'أناقتي',
+    shortLabel: 'أناقتي',
     subtitle: 'عطور، إكسسوارات، وملابس',
     subcategories: [
       { id: 'anaqati_perfumes', label: 'عطور', subtitle: 'اختيارات عطرية وروائح' },
@@ -55,39 +69,55 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
       { id: 'anaqati_clothing', label: 'ملابس', subtitle: 'ملابس وإطلالات يومية' },
     ],
     emojiFallback: '👗',
+    priority: 4,
+    orbitWeight: 0.9,
   },
   {
     id: 'wani_store',
     label: 'بثواني ستور',
-    subtitle: 'متجر شامل للمنتجات المختارة بعناية',
+    shortLabel: 'ستور',
+    subtitle: 'متجر شامل للمنتجات المختارة',
     subcategories: [],
     emojiFallback: '🏪',
+    priority: 5,
+    orbitWeight: 1.0,
   },
   {
     id: 'home_projects',
     label: 'مشاريع منزلية',
-    subtitle: 'منتجات يدوية ومحلية من الأسر المنتجة',
+    shortLabel: 'مشاريع',
+    subtitle: 'منتجات يدوية ومحلية',
     subcategories: [],
     emojiFallback: '🏠',
+    priority: 6,
+    orbitWeight: 0.8,
   },
   {
     id: 'cloud_kitchens',
     label: 'مطابخ سحابية',
-    subtitle: 'مطابخ مجهزة ووجبات يومية سريعة',
+    shortLabel: 'مطابخ',
+    subtitle: 'مطابخ مجهزة ووجبات سريعة',
     subcategories: [],
     emojiFallback: '🍳',
+    priority: 7,
+    orbitWeight: 0.8,
   },
   {
     id: 'awnak',
     label: 'عونك',
+    shortLabel: 'عونك',
     subtitle: 'خدمات ومشاوير محلية',
     subcategories: [],
     renderMode: 'manual-order',
     emojiFallback: '🤝',
+    priority: 8,
+    orbitWeight: 0.7,
+    isManualLike: true,
   },
   {
     id: 'gas_refill',
     label: 'تعبئة الغاز',
+    shortLabel: 'غاز',
     subtitle: 'تعبئة، إصلاح، وشراء',
     subcategories: [
       { id: 'gas_refill_refill', label: 'التعبئة', subtitle: 'تعبئة الأسطوانة والتوصيل' },
@@ -95,35 +125,51 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
       { id: 'gas_refill_buy', label: 'شراء تعبئة', subtitle: 'وحدات جديدة وتبديل' },
     ],
     emojiFallback: '⛽',
+    priority: 9,
+    orbitWeight: 0.7,
+    isManualLike: true,
   },
   {
     id: 'shein',
     label: 'شي ان',
-    subtitle: 'طلبات من شي إن (شراء وتوصيل)',
+    shortLabel: 'شي ان',
+    subtitle: 'طلبات شراء وتوصيل',
     subcategories: [],
     renderMode: 'manual-order',
     emojiFallback: '🛍️',
+    priority: 10,
+    orbitWeight: 0.7,
+    isManualLike: true,
   },
   {
     id: 'spare_parts',
     label: 'قطع غيار',
+    shortLabel: 'قطع غيار',
     subtitle: 'مستلزمات سيارات ودراجات',
     subcategories: [],
     emojiFallback: '🔧',
+    priority: 11,
+    orbitWeight: 0.8,
   },
   {
     id: 'honey_dates',
     label: 'عسل وتمور',
+    shortLabel: 'عسل',
     subtitle: 'منتجات طبيعية يمنية',
     subcategories: [],
     emojiFallback: '🍯',
+    priority: 12,
+    orbitWeight: 0.8,
   },
   {
     id: 'electronics',
     label: 'إلكترونيات',
+    shortLabel: 'إلكترونيات',
     subtitle: 'أجهزة واكسسوارات إلكترونية',
     subcategories: [],
     emojiFallback: '📱',
+    priority: 13,
+    orbitWeight: 0.9,
   },
 ];
 
