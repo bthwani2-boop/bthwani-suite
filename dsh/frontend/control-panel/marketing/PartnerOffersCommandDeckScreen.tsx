@@ -143,7 +143,6 @@ export function PartnerOffersCommandDeckScreen({ activeSubTab = 'offers' }: { ac
   }
 
   return (
-  return (
     <Box gap={4} dir="rtl" padding={4} style={{ flex: 1 }}>
       {/* Header & KPIs */}
       <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>

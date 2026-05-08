@@ -176,7 +176,7 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
                   <Text role="caption" tone="muted" style={{ fontWeight: '800', textAlign: 'right' }}>الإجراء القادم المقترح</Text>
                   <Button
                     label={selectedRec.nextAction}
-                    tone="brand"
+                    tone="primary"
                     onPress={() => {
                       if (setActiveTab) {
                         setActiveTab(selectedRec.actionTargetTab);
