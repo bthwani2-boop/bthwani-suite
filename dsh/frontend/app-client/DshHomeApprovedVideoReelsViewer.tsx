@@ -140,7 +140,7 @@ export function DshHomeApprovedVideoReelsViewer({
               يرفع الشريك الفيديوهات أولًا، ثم تعتمدها التسويق قبل أن تظهر هنا في تطبيق العميل.
             </Text>
           </Box>
-        </View>
+        </Box>
       </Modal>
     );
   }
@@ -223,7 +223,7 @@ export function DshHomeApprovedVideoReelsViewer({
             );
           }}
         />
-      </View>
+      </Box>
     </Modal>
   );
 }

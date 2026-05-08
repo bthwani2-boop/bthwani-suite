@@ -224,7 +224,7 @@ function renderContent(
           )}
         </Box>
       </MobileScrollView>
-    </View>
+    </Box>
   );
 }
 

@@ -1601,7 +1601,7 @@ export function DshStoreGetScreen({
           </Box>
         </Pressable>
       </Modal>
-    </View>
+    </Box>
   );
 }
 

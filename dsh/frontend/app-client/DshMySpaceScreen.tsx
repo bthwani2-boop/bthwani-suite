@@ -213,7 +213,7 @@ export function DshMySpaceScreen({
             </Box>
           </Surface>
       </MobileScrollView>
-    </View>
+    </Box>
   );
 }
 
