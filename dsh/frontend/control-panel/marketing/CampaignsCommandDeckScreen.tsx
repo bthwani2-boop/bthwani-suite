@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { StyleSheet, View, Pressable, ScrollView } from 'react-native';
-import { Box, Button, Surface, Tabs, Text, TextField, useDirection } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Tabs, Text, TextField } from '@bthwani/ui-kit';
 import {
   getCampaignItems,
   getCampaignKpis,
@@ -23,9 +23,6 @@ import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../share
 type EditorTab = 'plan' | 'audience' | 'channels' | 'schedule' | 'impact';
 
 export function CampaignsCommandDeckScreen() {
-  const { direction } = useDirection();
-  const isRtl = direction === 'rtl';
-
   const [items, setItems] = React.useState<CampaignRecord[]>(() => getCampaignItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getCampaignItems()[0]?.id ?? null);
   const selected = React.useMemo(() => items.find(i => i.id === selectedId) ?? null, [items, selectedId]);
@@ -89,13 +86,14 @@ export function CampaignsCommandDeckScreen() {
             value={draft.targetId}
             onChange={(e) => setDraft({ ...draft, targetId: e.target.value })}
             style={inlineStyles.selectInput}
+            dir="rtl"
           >
             <option value="">(تلقائي)</option>
           </select>
         );
       case 'category':
         return (
-          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
+          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput} dir="rtl">
             <option value="">-- اختر الفئة --</option>
             <option value="food">طعام</option>
             <option value="grocery">مقاضي</option>
@@ -104,7 +102,7 @@ export function CampaignsCommandDeckScreen() {
         );
       case 'store':
         return (
-          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
+          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput} dir="rtl">
             <option value="">-- اختر المتجر --</option>
             <option value="store-1">متجر 1</option>
             <option value="store-2">متجر 2</option>
@@ -113,7 +111,7 @@ export function CampaignsCommandDeckScreen() {
         );
       default:
         return (
-          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
+          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput} dir="rtl">
             <option value="">-- غير متاح للنوع المختار --</option>
           </select>
         );
@@ -125,10 +123,10 @@ export function CampaignsCommandDeckScreen() {
       case 'plan':
         return (
           <Box gap={3}>
-            <TextField label="عنوان الحملة" value={draft.title || ''} onChangeText={v => setDraft({ ...draft, title: v })} />
-            <TextField label="الوصف" value={draft.subtitle || ''} onChangeText={v => setDraft({ ...draft, subtitle: v })} />
+            <TextField label="عنوان الحملة" value={draft.title || ''} onChangeText={v => setDraft({ ...draft, title: v })} style={{ textAlign: 'right' }} />
+            <TextField label="الوصف" value={draft.subtitle || ''} onChangeText={v => setDraft({ ...draft, subtitle: v })} style={{ textAlign: 'right' }} />
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>الهدف</Text>
+              <Text role="caption" tone="muted" style={styles.labelTitle}>الهدف</Text>
               <Tabs<CampaignGoal>
                 items={[
                   { value: 'awareness', label: 'توعية' },
@@ -142,7 +140,7 @@ export function CampaignsCommandDeckScreen() {
               />
             </Box>
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>الأولوية</Text>
+              <Text role="caption" tone="muted" style={styles.labelTitle}>الأولوية</Text>
               <Tabs<CampaignPriority>
                 items={[
                   { value: 'low', label: 'منخفضة' },
@@ -161,7 +159,7 @@ export function CampaignsCommandDeckScreen() {
         return (
           <Box gap={3}>
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>الجمهور المستهدف</Text>
+              <Text role="caption" tone="muted" style={styles.labelTitle}>الجمهور المستهدف</Text>
               <Tabs<CampaignAudience>
                 items={[
                   { value: 'all', label: 'الجميع' },
@@ -175,26 +173,27 @@ export function CampaignsCommandDeckScreen() {
               />
             </Box>
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>نوع الوجهة (Target Type)</Text>
+              <Text role="caption" tone="muted" style={styles.labelTitle}>نوع الوجهة</Text>
               <select
                 value={draft.targetType}
                 onChange={(e) => setDraft({ ...draft, targetType: e.target.value as CampaignTargetType, targetId: '' })}
                 style={inlineStyles.selectInput}
+                dir="rtl"
               >
-                <option value="home">الرئيسية (home)</option>
-                <option value="stores">متاجر (stores)</option>
-                <option value="store">متجر محدد (store)</option>
-                <option value="category">فئة (category)</option>
-                <option value="subcategory">فئة فرعية (subcategory)</option>
-                <option value="product">منتج (product)</option>
-                <option value="offer">عرض (offer)</option>
-                <option value="campaign">حملة (campaign)</option>
-                <option value="search">بحث (search)</option>
-                <option value="custom">مخصص (custom)</option>
+                <option value="home">الرئيسية</option>
+                <option value="stores">متاجر</option>
+                <option value="store">متجر محدد</option>
+                <option value="category">فئة</option>
+                <option value="subcategory">فئة فرعية</option>
+                <option value="product">منتج</option>
+                <option value="offer">عرض</option>
+                <option value="campaign">حملة</option>
+                <option value="search">بحث</option>
+                <option value="custom">مخصص</option>
               </select>
             </Box>
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>الوجهة المحددة</Text>
+              <Text role="caption" tone="muted" style={styles.labelTitle}>الوجهة المحددة</Text>
               {renderTargetIdOptions()}
             </Box>
           </Box>
@@ -202,10 +201,17 @@ export function CampaignsCommandDeckScreen() {
       case 'channels':
         return (
           <Box gap={3}>
-            <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>القنوات المستخدمة</Text>
-            <View style={[styles.chipsContainer, isRtl && styles.rowReverse]}>
+            <Text role="caption" tone="muted" style={styles.labelTitle}>القنوات المستخدمة</Text>
+            <View style={styles.chipsContainer}>
               {(['banner', 'promo', 'video', 'ticker', 'store-card'] as CampaignChannel[]).map(ch => {
                 const isActive = draft.channels?.includes(ch);
+                const arabicLabels: Record<string, string> = {
+                  'banner': 'بنر',
+                  'promo': 'عرض ترويجي',
+                  'video': 'فيديو',
+                  'ticker': 'شريط إخباري',
+                  'store-card': 'بطاقة متجر'
+                };
                 return (
                   <Pressable
                     key={ch}
@@ -218,28 +224,29 @@ export function CampaignsCommandDeckScreen() {
                     }}
                     style={[styles.chip, isActive && styles.chipActive]}
                   >
-                    <Text style={[styles.chipText, isActive && styles.chipTextActive]}>{ch}</Text>
+                    <Text style={[styles.chipText, isActive && styles.chipTextActive]}>{arabicLabels[ch] || ch}</Text>
                   </Pressable>
                 );
               })}
             </View>
-            <TextField label="معرف البنر المرتبط (اختياري)" value={draft.linkedBannerId || ''} onChangeText={v => setDraft({ ...draft, linkedBannerId: v })} dir="ltr" />
-            <TextField label="معرف الفيديو المرتبط (اختياري)" value={draft.linkedVideoId || ''} onChangeText={v => setDraft({ ...draft, linkedVideoId: v })} dir="ltr" />
-            <TextField label="معرف عرض الشريك (اختياري)" value={draft.linkedOfferId || ''} onChangeText={v => setDraft({ ...draft, linkedOfferId: v })} dir="ltr" />
-            <TextField label="معرف ميزة الولاء (اختياري)" value={draft.linkedLoyaltyBenefitId || ''} onChangeText={v => setDraft({ ...draft, linkedLoyaltyBenefitId: v })} dir="ltr" />
+            <TextField label="معرف البنر المرتبط (اختياري)" value={draft.linkedBannerId || ''} onChangeText={v => setDraft({ ...draft, linkedBannerId: v })} dir="ltr" style={{ textAlign: 'left' }} />
+            <TextField label="معرف الفيديو المرتبط (اختياري)" value={draft.linkedVideoId || ''} onChangeText={v => setDraft({ ...draft, linkedVideoId: v })} dir="ltr" style={{ textAlign: 'left' }} />
+            <TextField label="معرف عرض الشريك (اختياري)" value={draft.linkedOfferId || ''} onChangeText={v => setDraft({ ...draft, linkedOfferId: v })} dir="ltr" style={{ textAlign: 'left' }} />
+            <TextField label="معرف ميزة الولاء (اختياري)" value={draft.linkedLoyaltyBenefitId || ''} onChangeText={v => setDraft({ ...draft, linkedLoyaltyBenefitId: v })} dir="ltr" style={{ textAlign: 'left' }} />
           </Box>
         );
       case 'schedule':
         return (
           <Box gap={3}>
-            <TextField label="تاريخ البدء" value={draft.startDate || ''} onChangeText={v => setDraft({ ...draft, startDate: v })} hint="مثال: 2026-05-01" dir="ltr" />
-            <TextField label="تاريخ الانتهاء" value={draft.endDate || ''} onChangeText={v => setDraft({ ...draft, endDate: v })} hint="مثال: 2026-06-01" dir="ltr" />
+            <TextField label="تاريخ البدء" value={draft.startDate || ''} onChangeText={v => setDraft({ ...draft, startDate: v })} hint="مثال: 2026-05-01" dir="ltr" style={{ textAlign: 'left' }} />
+            <TextField label="تاريخ الانتهاء" value={draft.endDate || ''} onChangeText={v => setDraft({ ...draft, endDate: v })} hint="مثال: 2026-06-01" dir="ltr" style={{ textAlign: 'left' }} />
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>حالة الحملة</Text>
+              <Text role="caption" tone="muted" style={styles.labelTitle}>حالة الحملة</Text>
               <select
                 value={draft.status}
                 onChange={(e) => setDraft({ ...draft, status: e.target.value as CampaignStatus })}
                 style={inlineStyles.selectInput}
+                dir="rtl"
               >
                 <option value="draft">مسودة</option>
                 <option value="pending">بانتظار الموافقة</option>
@@ -262,16 +269,16 @@ export function CampaignsCommandDeckScreen() {
 
         return (
           <Box gap={3}>
-            <div style={{ backgroundColor: '#F8FAFC', borderRadius: '12px', padding: '16px', border: '1px solid #E2E8F0', marginBottom: '16px' }}>
-              <h4 style={{ color: '#0A2F5C', margin: '0 0 12px 0', fontSize: '13px', fontWeight: '800' }}>مخرجات التأثير (Impact)</h4>
-              <ul style={{ margin: 0, paddingInlineStart: '20px', color: '#475569', fontSize: '12px', lineHeight: '1.8' }}>
+            <div style={inlineStyles.impactBox}>
+              <h4 style={inlineStyles.impactTitle}>مخرجات التأثير</h4>
+              <ul style={inlineStyles.impactList}>
                 <li><strong>الظهور:</strong> ستظهر هذه الحملة في <span style={{ color: '#FF500D' }}>{draft.targetType || 'غير محدد'}</span>.</li>
                 <li><strong>الولاء:</strong> {draft.linkedLoyaltyBenefitId ? 'مرتبط بميزة ولاء فعالة.' : 'غير مرتبط بالولاء.'}</li>
                 <li><strong>الشركاء:</strong> {draft.linkedOfferId ? 'مرتبط بعرض شريك.' : 'غير مرتبط.'}</li>
               </ul>
             </div>
 
-            <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>محاكاة بطاقة المتجر (Store Card Parity)</Text>
+            <Text role="caption" tone="muted" style={styles.labelTitle}>محاكاة بطاقة المتجر</Text>
             <CommercialParityPreview features={features} />
           </Box>
         );
@@ -279,67 +286,75 @@ export function CampaignsCommandDeckScreen() {
     }
   };
 
+  const getStatusArabic = (status: string) => {
+    switch(status) {
+      case 'draft': return 'مسودة';
+      case 'pending': return 'بانتظار الموافقة';
+      case 'published': return 'منشورة';
+      case 'paused': return 'موقوفة';
+      case 'archived': return 'مؤرشفة';
+      default: return status;
+    }
+  };
+
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'}>
-      <Box gap={4} style={{ padding: '24px' }}>
+    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px', padding: '16px', boxSizing: 'border-box' }}>
       {/* KPIs Header */}
-      <View style={[styles.kpiRow, isRtl && styles.rowReverse]}>
+      <View style={styles.kpiRow}>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted">إجمالي الحملات</Text>
-          <Text role="titleLg" style={{ color: '#0A2F5C' }}>{kpis.total}</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>إجمالي الحملات</Text>
+          <Text role="titleLg" style={{ color: '#0A2F5C', textAlign: 'right', width: '100%' }}>{kpis.total}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted">حي الآن</Text>
-          <Text role="titleLg" style={{ color: '#16A34A' }}>{kpis.live}</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>حي الآن</Text>
+          <Text role="titleLg" style={{ color: '#16A34A', textAlign: 'right', width: '100%' }}>{kpis.live}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted">قيد المراجعة</Text>
-          <Text role="titleLg" style={{ color: '#D97706' }}>{items.filter(i => i.status === 'pending').length}</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>قيد المراجعة</Text>
+          <Text role="titleLg" style={{ color: '#D97706', textAlign: 'right', width: '100%' }}>{items.filter(i => i.status === 'pending').length}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted">وصول تجريبي</Text>
-          <Text role="titleLg" style={{ color: '#FF500D' }}>{kpis.impressions}</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>وصول تجريبي</Text>
+          <Text role="titleLg" style={{ color: '#FF500D', textAlign: 'right', width: '100%' }}>{kpis.impressions}</Text>
         </View>
       </View>
 
-      <View style={[styles.mainLayout, isRtl && styles.rowReverse]}>
+      <View style={styles.mainLayout}>
         {/* List Panel */}
         <Surface tone="raised" style={styles.listPanel}>
-          <View style={[styles.listHeader, isRtl && styles.rowReverse]}>
+          <View style={styles.panelHeader}>
             <Text role="titleSm" style={{ color: '#0A2F5C' }}>الحملات ({items.length})</Text>
-            <Button label="+ حملة" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={{ paddingHorizontal: 12, paddingVertical: 4, minHeight: 0 }} />
+            <Button label="+ حملة جديدة" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={styles.smallButton} />
           </View>
-          <ScrollView style={{ maxHeight: 450 }}>
-            <Box gap={2} style={{ padding: 12 }}>
-              {items.map(item => (
-                <Pressable
-                  key={item.id}
-                  style={[styles.rowItem, selectedId === item.id && styles.rowItemSelected, isRtl && styles.rowReverse]}
-                  onPress={() => setSelectedId(item.id)}
-                >
-                  <View style={{ flex: 1, alignItems: isRtl ? 'flex-end' : 'flex-start' }}>
-                    <Text role="bodyStrong" style={{ fontSize: 13, color: '#0A2F5C' }}>{item.title}</Text>
-                    <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
-                      {item.goal} · {item.priority} · {item.channels.length} قنوات
-                    </Text>
-                  </View>
-                  <View style={[styles.statusBadge, item.status === 'published' && styles.statusBadgeActive]}>
-                    <Text style={[styles.statusText, item.status === 'published' && styles.statusTextActive]}>{item.status}</Text>
-                  </View>
-                </Pressable>
-              ))}
-            </Box>
+          <ScrollView style={styles.scrollView} contentContainerStyle={{ padding: 12, gap: 8 }}>
+            {items.map(item => (
+              <Pressable
+                key={item.id}
+                style={[styles.rowItem, selectedId === item.id && styles.rowItemSelected]}
+                onPress={() => setSelectedId(item.id)}
+              >
+                <View style={{ flex: 1, alignItems: 'flex-start' }}>
+                  <Text role="bodyStrong" style={{ fontSize: 13, color: '#0A2F5C', textAlign: 'right' }}>{item.title}</Text>
+                  <Text role="caption" tone="muted" style={{ fontSize: 11, textAlign: 'right' }}>
+                    {item.goal} · {item.priority} · {item.channels.length} قنوات
+                  </Text>
+                </View>
+                <View style={[styles.statusBadge, item.status === 'published' && styles.statusBadgeActive]}>
+                  <Text style={[styles.statusText, item.status === 'published' && styles.statusTextActive]}>{getStatusArabic(item.status)}</Text>
+                </View>
+              </Pressable>
+            ))}
           </ScrollView>
         </Surface>
 
         {/* Editor Panel */}
         <Surface tone="raised" style={styles.editorPanel}>
-          <View style={[styles.editorHeader, isRtl && styles.rowReverse]}>
+          <View style={styles.panelHeader}>
             <Text role="titleSm" style={{ color: '#0A2F5C' }}>{selected ? 'تعديل الحملة' : 'حملة جديدة'}</Text>
             {selected && (
-              <View style={[styles.rowReverse, { gap: 8 }]}>
-                <Button label={selected.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" fullWidth={false} onPress={() => handleToggle(selected.id)} />
-                <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(selected.id)} />
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <Button label={selected.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" fullWidth={false} onPress={() => handleToggle(selected.id)} style={styles.smallButton} />
+                <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(selected.id)} style={styles.smallButtonTextRed} />
               </View>
             )}
           </View>
@@ -357,15 +372,16 @@ export function CampaignsCommandDeckScreen() {
             variant="line"
           />
 
-          <Box gap={4} style={{ padding: 16 }}>
-            {renderEditorContent()}
-            <Box layoutDirection={isRtl ? 'row-reverse' : 'row'} justify="flex-end" style={{ marginTop: 16 }}>
-              <Button label="حفظ التغييرات" onPress={handleSave} style={{ backgroundColor: '#FF500D' }} />
+          <ScrollView style={styles.scrollView}>
+            <Box gap={4} style={{ padding: 16 }}>
+              {renderEditorContent()}
+              <Box layoutDirection="row" justify="flex-end" style={{ marginTop: 16 }}>
+                <Button label="حفظ التغييرات" onPress={handleSave} style={{ backgroundColor: '#FF500D' }} />
+              </Box>
             </Box>
-          </Box>
+          </ScrollView>
         </Surface>
       </View>
-    </Box>
     </div>
   );
 }
@@ -381,50 +397,75 @@ const inlineStyles = {
     fontWeight: '600',
     fontFamily: 'inherit',
     outline: 'none',
-  } as React.CSSProperties
+    textAlign: 'right',
+  } as React.CSSProperties,
+  impactBox: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: '12px',
+    padding: '16px',
+    border: '1px solid #E2E8F0',
+    marginBottom: '16px'
+  },
+  impactTitle: {
+    color: '#0A2F5C',
+    margin: '0 0 12px 0',
+    fontSize: '13px',
+    fontWeight: '800',
+    textAlign: 'right' as const,
+  },
+  impactList: {
+    margin: 0,
+    paddingInlineStart: '20px',
+    color: '#475569',
+    fontSize: '12px',
+    lineHeight: '1.8',
+    textAlign: 'right' as const,
+  }
 };
 
 const styles = StyleSheet.create({
-  rowReverse: {
-    flexDirection: 'row-reverse',
-  },
   kpiRow: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 12,
     flexWrap: 'wrap',
   },
   kpiCard: {
     flex: 1,
-    minWidth: 150,
+    minWidth: 140,
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 12,
+    padding: 12,
     borderWidth: 1,
     borderColor: 'rgba(10,47,92,0.06)',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   mainLayout: {
+    flex: 1,
     flexDirection: 'row',
     gap: 16,
-    alignItems: 'flex-start',
-    flexWrap: 'wrap',
+    alignItems: 'stretch',
   },
   listPanel: {
     flex: 1,
     minWidth: 300,
-    borderRadius: 20,
+    borderRadius: 16,
     borderColor: 'rgba(10,47,92,0.06)',
     borderWidth: 1,
     overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
   },
-  listHeader: {
+  panelHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#fff',
+  },
+  scrollView: {
+    flex: 1,
   },
   rowItem: {
     flexDirection: 'row',
@@ -460,19 +501,12 @@ const styles = StyleSheet.create({
   editorPanel: {
     flex: 2,
     minWidth: 400,
-    borderRadius: 20,
+    borderRadius: 16,
     borderColor: 'rgba(10,47,92,0.06)',
     borderWidth: 1,
     overflow: 'hidden',
-  },
-  editorHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-    backgroundColor: '#fff',
+    display: 'flex',
+    flexDirection: 'column',
   },
   chipsContainer: {
     flexDirection: 'row',
@@ -499,6 +533,21 @@ const styles = StyleSheet.create({
   chipTextActive: {
     color: '#fff',
   },
+  labelTitle: {
+    fontWeight: '800',
+    textAlign: 'right',
+  },
+  smallButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    minHeight: 0,
+  },
+  smallButtonTextRed: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    minHeight: 0,
+    color: '#DC2626',
+  }
 });
 
 export default CampaignsCommandDeckScreen;

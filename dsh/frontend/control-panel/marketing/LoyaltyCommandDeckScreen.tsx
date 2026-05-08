@@ -1,28 +1,20 @@
 'use client';
 
 import React from 'react';
-import { StyleSheet, View, Pressable, ScrollView } from 'react-native';
-import { Box, Button, Surface, Tabs, Text, TextField, useDirection } from '@bthwani/ui-kit';
+import { StyleSheet, View, ScrollView } from 'react-native';
+import { Box, Surface, Tabs, Text } from '@bthwani/ui-kit';
 import {
   getLoyaltyPrograms,
   getSubscriptionPlans,
   getLoyaltyTiers,
   getLoyaltyRewards,
   getEntitlements,
-  type LoyaltyProgram,
-  type LoyaltyTier,
-  type LoyaltyReward,
-  type SubscriptionPlan,
-  type Entitlement,
 } from '../../shared/loyalty-store';
 import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
 
 type LoyaltyTab = 'programs' | 'tiers' | 'rewards' | 'subscriptions' | 'entitlements' | 'earning' | 'redemption';
 
 export function LoyaltyCommandDeckScreen() {
-  const { direction } = useDirection();
-  const isRtl = direction === 'rtl';
-
   const [activeTab, setActiveTab] = React.useState<LoyaltyTab>('programs');
 
   const programs = React.useMemo(() => getLoyaltyPrograms(), []);
@@ -47,9 +39,9 @@ export function LoyaltyCommandDeckScreen() {
           <Box gap={3}>
             {programs.map(p => (
               <Surface key={p.id} tone="raised" style={styles.card}>
-                <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>{p.name}</Text>
-                <Text role="caption" tone="muted">{p.description} · العملة: {p.currencyLabel}</Text>
-                <View style={[styles.badge, { alignSelf: isRtl ? 'flex-end' : 'flex-start', marginTop: 8 }]}>
+                <Text role="bodyStrong" style={{ color: '#0A2F5C', textAlign: 'right' }}>{p.name}</Text>
+                <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{p.description} · العملة: {p.currencyLabel}</Text>
+                <View style={[styles.badge, { alignSelf: 'flex-start', marginTop: 8 }]}>
                   <Text style={styles.badgeText}>نشط</Text>
                 </View>
               </Surface>
@@ -61,11 +53,11 @@ export function LoyaltyCommandDeckScreen() {
           <Box gap={3}>
             {tiers.map(t => (
               <Surface key={t.id} tone="raised" style={styles.card}>
-                <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>المستوى: {t.name}</Text>
                   <Text role="bodyStrong" style={{ color: '#FF500D' }}>{t.minimumPoints} نقطة</Text>
                 </View>
-                <Text role="caption" tone="muted" style={{ marginTop: 4 }}>المزايا: {t.benefits.length ? t.benefits.join('، ') : 'لا يوجد مزايا إضافية'}</Text>
+                <Text role="caption" tone="muted" style={{ marginTop: 4, textAlign: 'right' }}>المزايا: {t.benefits.length ? t.benefits.join('، ') : 'لا يوجد مزايا إضافية'}</Text>
               </Surface>
             ))}
           </Box>
@@ -75,12 +67,12 @@ export function LoyaltyCommandDeckScreen() {
           <Box gap={3}>
             {rewards.map(r => (
               <Surface key={r.id} tone="raised" style={styles.card}>
-                <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>{r.title}</Text>
                   <Text role="bodyStrong" style={{ color: '#FF500D' }}>{r.pointsCost} نقطة</Text>
                 </View>
-                <Text role="caption" tone="muted" style={{ marginTop: 4 }}>نوع المكافأة: كوبون خصم مباشر</Text>
-                <Text role="caption" tone="muted">تنتهي بعد: 30 يوماً من الاسترداد</Text>
+                <Text role="caption" tone="muted" style={{ marginTop: 4, textAlign: 'right' }}>نوع المكافأة: كوبون خصم مباشر</Text>
+                <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>تنتهي بعد: 30 يوماً من الاسترداد</Text>
               </Surface>
             ))}
           </Box>
@@ -90,12 +82,12 @@ export function LoyaltyCommandDeckScreen() {
           <Box gap={3}>
             {subscriptions.map(s => (
               <Surface key={s.id} tone="raised" style={styles.card}>
-                <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>{s.name}</Text>
                   <Text role="bodyStrong" style={{ color: '#16A34A' }}>{s.monthlyFee} ريال / شهرياً</Text>
                 </View>
-                <Text role="caption" tone="muted" style={{ marginTop: 4 }}>المزايا: {s.features.join('، ')}</Text>
-                <View style={[styles.badge, { backgroundColor: '#DCFCE7', alignSelf: isRtl ? 'flex-end' : 'flex-start', marginTop: 8 }]}>
+                <Text role="caption" tone="muted" style={{ marginTop: 4, textAlign: 'right' }}>المزايا: {s.features.join('، ')}</Text>
+                <View style={[styles.badge, { backgroundColor: '#DCFCE7', alignSelf: 'flex-start', marginTop: 8 }]}>
                   <Text style={[styles.badgeText, { color: '#16A34A' }]}>باقة فعالة</Text>
                 </View>
               </Surface>
@@ -110,8 +102,8 @@ export function LoyaltyCommandDeckScreen() {
             ) : (
               entitlements.map(e => (
                 <Surface key={e.id} tone="raised" style={styles.card}>
-                  <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>استحقاق: {e.type}</Text>
-                  <Text role="caption" tone="muted">الحالة: {e.status}</Text>
+                  <Text role="bodyStrong" style={{ color: '#0A2F5C', textAlign: 'right' }}>استحقاق: {e.type}</Text>
+                  <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>الحالة: {e.status}</Text>
                 </Surface>
               ))
             )}
@@ -120,8 +112,8 @@ export function LoyaltyCommandDeckScreen() {
       case 'earning':
         return (
           <Surface tone="raised" style={styles.card}>
-            <Text role="bodyStrong" style={{ color: '#0A2F5C', marginBottom: 8 }}>قواعد الكسب</Text>
-            <ul style={{ paddingInlineStart: 20, color: '#475569', fontSize: 13, margin: 0, lineHeight: 1.8 }}>
+            <Text role="bodyStrong" style={{ color: '#0A2F5C', marginBottom: 8, textAlign: 'right' }}>قواعد الكسب</Text>
+            <ul style={{ paddingInlineStart: 20, color: '#475569', fontSize: 13, margin: 0, lineHeight: 1.8, textAlign: 'right' }}>
               <li><strong>الطلبات:</strong> نقطة واحدة لكل ريال يتم إنفاقه.</li>
               <li><strong>مكافأة الفئة:</strong> مضاعف 1.5x لقسم المقاضي.</li>
               <li><strong>مكافأة الشريك:</strong> 100 نقطة إضافية عند الطلب من الشركاء المميزين.</li>
@@ -131,8 +123,8 @@ export function LoyaltyCommandDeckScreen() {
       case 'redemption':
         return (
           <Surface tone="raised" style={styles.card}>
-            <Text role="bodyStrong" style={{ color: '#0A2F5C', marginBottom: 8 }}>قواعد الاسترداد</Text>
-            <ul style={{ paddingInlineStart: 20, color: '#475569', fontSize: 13, margin: 0, lineHeight: 1.8 }}>
+            <Text role="bodyStrong" style={{ color: '#0A2F5C', marginBottom: 8, textAlign: 'right' }}>قواعد الاسترداد</Text>
+            <ul style={{ paddingInlineStart: 20, color: '#475569', fontSize: 13, margin: 0, lineHeight: 1.8, textAlign: 'right' }}>
               <li><strong>مكافأة الكوبون:</strong> استبدال 1000 نقطة بخصم 10 ريال.</li>
               <li><strong>مكافأة التوصيل:</strong> استبدال 1500 نقطة بتوصيل مجاني لطلب واحد.</li>
               <li><strong>مكافأة الشريك:</strong> منتجات مختارة بأسعار مخفضة حصرياً بالنقاط.</li>
@@ -154,39 +146,38 @@ export function LoyaltyCommandDeckScreen() {
 
     return (
       <Box gap={2} style={styles.previewContainer}>
-        <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>محاكاة بطاقة المتجر</Text>
+        <Text role="caption" tone="muted" style={{ fontWeight: '800', textAlign: 'right' }}>محاكاة بطاقة المتجر</Text>
         <CommercialParityPreview features={features} />
       </Box>
     );
   };
 
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'}>
-      <Box gap={4} style={{ padding: '24px' }}>
+    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px', padding: '16px', boxSizing: 'border-box' }}>
       {/* KPIs */}
-      <View style={[styles.kpiRow, isRtl && styles.rowReverse]}>
+      <View style={styles.kpiRow}>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted">إجمالي الأعضاء</Text>
-          <Text role="titleLg" style={{ color: '#0A2F5C' }}>{kpis.members}</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>إجمالي الأعضاء</Text>
+          <Text role="titleLg" style={{ color: '#0A2F5C', textAlign: 'right', width: '100%' }}>{kpis.members}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted">مشتركي برو</Text>
-          <Text role="titleLg" style={{ color: '#FF500D' }}>{kpis.subscribers}</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>مشتركي برو</Text>
+          <Text role="titleLg" style={{ color: '#FF500D', textAlign: 'right', width: '100%' }}>{kpis.subscribers}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted">المكافآت المتاحة</Text>
-          <Text role="titleLg" style={{ color: '#D97706' }}>{kpis.rewards}</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>المكافآت المتاحة</Text>
+          <Text role="titleLg" style={{ color: '#D97706', textAlign: 'right', width: '100%' }}>{kpis.rewards}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted">معدل التفعيل</Text>
-          <Text role="titleLg" style={{ color: '#16A34A' }}>{kpis.activationRate}</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>معدل التفعيل</Text>
+          <Text role="titleLg" style={{ color: '#16A34A', textAlign: 'right', width: '100%' }}>{kpis.activationRate}</Text>
         </View>
       </View>
 
-      <View style={[styles.mainLayout, isRtl && styles.rowReverse]}>
+      <View style={styles.mainLayout}>
         {/* Main Panel */}
         <Surface tone="raised" style={styles.editorPanel}>
-          <View style={[styles.editorHeader, isRtl && styles.rowReverse]}>
+          <View style={styles.editorHeader}>
             <Text role="titleSm" style={{ color: '#0A2F5C' }}>إدارة الولاء والاشتراكات</Text>
           </View>
 
@@ -205,7 +196,7 @@ export function LoyaltyCommandDeckScreen() {
             variant="line"
           />
 
-          <ScrollView style={{ maxHeight: 500 }}>
+          <ScrollView style={styles.scrollView}>
             <Box gap={4} style={{ padding: 16 }}>
               {renderTabContent()}
             </Box>
@@ -214,26 +205,24 @@ export function LoyaltyCommandDeckScreen() {
 
         {/* Side Panel for Preview */}
         <Surface tone="raised" style={styles.sidePanel}>
-          <View style={[styles.editorHeader, isRtl && styles.rowReverse]}>
+          <View style={styles.editorHeader}>
             <Text role="titleSm" style={{ color: '#0A2F5C' }}>محاكاة التأثير</Text>
           </View>
-          <Box gap={4} style={{ padding: 16 }}>
-            {renderStoreCardPreview()}
-            <Text role="caption" tone="muted" style={{ lineHeight: 20 }}>
-              هذه المحاكاة تعرض الشارات والمزايا التي ترثها المتاجر المؤهلة بناءً على استحقاقات المستخدم أو قواعد الاشتراك الفعالة.
-            </Text>
-          </Box>
+          <ScrollView style={styles.scrollView}>
+            <Box gap={4} style={{ padding: 16 }}>
+              {renderStoreCardPreview()}
+              <Text role="caption" tone="muted" style={{ lineHeight: 20, textAlign: 'right' }}>
+                هذه المحاكاة تعرض الشارات والمزايا التي ترثها المتاجر المؤهلة بناءً على استحقاقات المستخدم أو قواعد الاشتراك الفعالة.
+              </Text>
+            </Box>
+          </ScrollView>
         </Surface>
       </View>
-    </Box>
     </div>
   );
 }
 
 const styles = StyleSheet.create({
-  rowReverse: {
-    flexDirection: 'row-reverse',
-  },
   kpiRow: {
     flexDirection: 'row',
     gap: 12,
@@ -243,33 +232,37 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 120,
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 12,
+    padding: 12,
     borderWidth: 1,
     borderColor: 'rgba(10,47,92,0.06)',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   mainLayout: {
+    flex: 1,
     flexDirection: 'row',
     gap: 16,
-    alignItems: 'flex-start',
-    flexWrap: 'wrap',
+    alignItems: 'stretch',
   },
   editorPanel: {
     flex: 2,
-    minWidth: 450,
-    borderRadius: 20,
+    minWidth: 400,
+    borderRadius: 16,
     borderColor: 'rgba(10,47,92,0.06)',
     borderWidth: 1,
     overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
   },
   sidePanel: {
     flex: 1,
-    minWidth: 300,
-    borderRadius: 20,
+    minWidth: 280,
+    borderRadius: 16,
     borderColor: 'rgba(10,47,92,0.06)',
     borderWidth: 1,
     overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
   },
   editorHeader: {
     flexDirection: 'row',
@@ -279,6 +272,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
     backgroundColor: '#fff',
+  },
+  scrollView: {
+    flex: 1,
   },
   card: {
     padding: 16,

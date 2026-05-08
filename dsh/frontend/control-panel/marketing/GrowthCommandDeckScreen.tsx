@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
-import { Box, Button, Surface, Text, useDirection } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
 import {
   getGrowthRecommendations,
   type GrowthRecommendation,
@@ -17,9 +17,6 @@ export type GrowthCommandDeckScreenProps = {
 };
 
 export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
-  const { direction } = useDirection();
-  const isRtl = direction === 'rtl';
-
   const recommendations = React.useMemo(() => getGrowthRecommendations(), []);
 
   // Aggregate data from independent stores
@@ -43,63 +40,61 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
   };
 
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'}>
-      <Box gap={4} style={{ padding: '24px' }}>
-      <Surface tone="raised" gap={4} style={{ borderRadius: 24, borderWidth: 1, borderColor: 'rgba(10,47,92,0.05)', overflow: 'hidden' }}>
-        <View style={[styles.headerRow, isRtl && styles.rowReverse, { padding: 4 }]}>
+    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px', padding: '16px', boxSizing: 'border-box' }}>
+      <Surface tone="raised" gap={4} style={{ borderRadius: 16, borderWidth: 1, borderColor: 'rgba(10,47,92,0.05)', overflow: 'hidden', padding: 16 }}>
+        <View style={styles.headerRow}>
           <Box gap={1}>
-            <Text role="caption" style={{ color: '#0A2F5C', fontWeight: '800', letterSpacing: 0.5 }}>الذكاء التجاري</Text>
-            <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900' }}>مؤشرات النمو والتوصيات</Text>
+            <Text role="caption" style={{ color: '#0A2F5C', fontWeight: '800', letterSpacing: 0.5, textAlign: 'right' }}>الذكاء التجاري</Text>
+            <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', textAlign: 'right' }}>مؤشرات النمو والتوصيات</Text>
           </Box>
         </View>
 
         {/* Global Overview reading from independent stores */}
-        <View style={[styles.kpiGrid, isRtl && styles.rowReverse]}>
+        <View style={styles.kpiGrid}>
           <View style={[styles.kpiCard, { backgroundColor: '#EFF6FF', borderColor: 'rgba(0,0,0,0.03)' }]}>
-            <Text role="caption" tone="muted" style={{ fontWeight: '700', fontSize: 10 }}>الحملات النشطة</Text>
-            <Text role="titleLg" style={{ color: '#1E40AF', fontWeight: '900', fontSize: 22 }}>{campaignKpis.active}</Text>
+            <Text role="caption" tone="muted" style={{ fontWeight: '700', fontSize: 10, textAlign: 'right', width: '100%' }}>الحملات النشطة</Text>
+            <Text role="titleLg" style={{ color: '#1E40AF', fontWeight: '900', fontSize: 22, textAlign: 'right', width: '100%' }}>{campaignKpis.active}</Text>
           </View>
           <View style={[styles.kpiCard, { backgroundColor: '#F0FDF4', borderColor: 'rgba(0,0,0,0.03)' }]}>
-            <Text role="caption" tone="muted" style={{ fontWeight: '700', fontSize: 10 }}>عروض جاهزة للتسويق</Text>
-            <Text role="titleLg" style={{ color: '#166534', fontWeight: '900', fontSize: 22 }}>{offerKpis.marketingReady}</Text>
+            <Text role="caption" tone="muted" style={{ fontWeight: '700', fontSize: 10, textAlign: 'right', width: '100%' }}>عروض جاهزة للتسويق</Text>
+            <Text role="titleLg" style={{ color: '#166534', fontWeight: '900', fontSize: 22, textAlign: 'right', width: '100%' }}>{offerKpis.marketingReady}</Text>
           </View>
           <View style={[styles.kpiCard, { backgroundColor: '#FFFBEB', borderColor: 'rgba(0,0,0,0.03)' }]}>
-            <Text role="caption" tone="muted" style={{ fontWeight: '700', fontSize: 10 }}>مشتركي الولاء</Text>
-            <Text role="titleLg" style={{ color: '#92400E', fontWeight: '900', fontSize: 22 }}>{loyaltyKpis.subscriptions}</Text>
+            <Text role="caption" tone="muted" style={{ fontWeight: '700', fontSize: 10, textAlign: 'right', width: '100%' }}>مشتركي الولاء</Text>
+            <Text role="titleLg" style={{ color: '#92400E', fontWeight: '900', fontSize: 22, textAlign: 'right', width: '100%' }}>{loyaltyKpis.subscriptions}</Text>
           </View>
         </View>
       </Surface>
 
-      <View style={[styles.columnsWrap, isRtl && styles.rowReverse]}>
-
+      <View style={styles.columnsWrap}>
         {/* Next Best Action / Opportunity Queue */}
         <View style={styles.column}>
-          <Surface tone="inset" gap={3} style={{ flex: 1, minHeight: 400 }}>
-            <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
+          <Surface tone="inset" gap={3} style={styles.columnSurface}>
+            <View style={styles.headerRow}>
               <Text role="titleSm" style={{ color: '#0A2F5C' }}>طابور الفرص والتوصيات</Text>
               <Text role="caption" tone="muted">{recommendations.length} إجراء مقترح</Text>
             </View>
 
-            <ScrollView style={{ maxHeight: 500 }}>
+            <ScrollView style={styles.scrollView}>
               <Box gap={3}>
                 {recommendations.sort((a, b) => b.impactScore - a.impactScore).map((rec) => (
-                  <View key={rec.id} style={[styles.listCard, isRtl && styles.rowReverse]}>
+                  <View key={rec.id} style={styles.listCard}>
                     <View style={{ justifyContent: 'center', alignItems: 'center', width: 40 }}>
                       <Text style={{ fontSize: 24 }}>{renderRecommendationIcon(rec.type)}</Text>
                     </View>
                     <View style={styles.listTextWrap}>
-                      <Box layoutDirection={isRtl ? 'row-reverse' : 'row'} align="center" gap={2}>
-                        <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>{rec.title}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                        <Text role="bodyStrong" style={{ color: '#0A2F5C', flex: 1, textAlign: 'right' }}>{rec.title}</Text>
                         <Text role="caption" style={{ color: getImpactColor(rec.impactScore), fontWeight: '800' }}>
                           تأثير: {rec.impactScore}/10
                         </Text>
-                      </Box>
-                      <Text role="caption" tone="muted" style={{ marginTop: 4, lineHeight: 18 }}>
+                      </View>
+                      <Text role="caption" tone="muted" style={{ marginTop: 4, lineHeight: 18, textAlign: 'right' }}>
                         {rec.description}
                       </Text>
-                      <Box layoutDirection={isRtl ? 'row-reverse' : 'row'} justify="flex-start" style={{ marginTop: 8 }}>
+                      <View style={{ flexDirection: 'row', marginTop: 8 }}>
                         <Button label={rec.actionLabel} tone="secondary" fullWidth={false} style={{ paddingHorizontal: 12, paddingVertical: 4, minHeight: 0 }} />
-                      </Box>
+                      </View>
                     </View>
                   </View>
                 ))}
@@ -110,52 +105,59 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
 
         {/* Risk / Gap Indicators */}
         <View style={styles.column}>
-          <Surface tone="raised" gap={3} style={{ flex: 1 }}>
-            <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
+          <Surface tone="raised" gap={3} style={styles.columnSurface}>
+            <View style={styles.headerRow}>
               <Text role="titleSm" style={{ color: '#0A2F5C' }}>مؤشرات المخاطر والفجوات</Text>
             </View>
-            <Box gap={2}>
-              {recommendations.filter(r => r.type === 'risk' || r.type === 'gap').map(rec => (
-                <View key={rec.id} style={[styles.riskCard, isRtl && styles.rowReverse]}>
-                   <Text style={{ fontSize: 16 }}>{renderRecommendationIcon(rec.type)}</Text>
-                   <Text role="caption" style={{ color: '#475569', flex: 1, textAlign: isRtl ? 'right' : 'left' }}>
-                     {rec.description}
-                   </Text>
-                </View>
-              ))}
-              {recommendations.filter(r => r.type === 'risk' || r.type === 'gap').length === 0 && (
-                <Text role="caption" tone="muted" style={{ textAlign: 'center', padding: 20 }}>لا توجد مخاطر مسجلة حالياً.</Text>
-              )}
-            </Box>
+            <ScrollView style={styles.scrollView}>
+              <Box gap={2}>
+                {recommendations.filter(r => r.type === 'risk' || r.type === 'gap').map(rec => (
+                  <View key={rec.id} style={styles.riskCard}>
+                     <Text style={{ fontSize: 16 }}>{renderRecommendationIcon(rec.type)}</Text>
+                     <Text role="caption" style={{ color: '#475569', flex: 1, textAlign: 'right' }}>
+                       {rec.description}
+                     </Text>
+                  </View>
+                ))}
+                {recommendations.filter(r => r.type === 'risk' || r.type === 'gap').length === 0 && (
+                  <Text role="caption" tone="muted" style={{ textAlign: 'center', padding: 20 }}>لا توجد مخاطر مسجلة حالياً.</Text>
+                )}
+              </Box>
+            </ScrollView>
           </Surface>
         </View>
-
       </View>
-    </Box>
     </div>
   );
 }
 
 const styles = StyleSheet.create({
   columnsWrap: {
+    flex: 1,
     flexDirection: 'row',
     gap: 16,
     alignItems: 'stretch',
-    flexWrap: 'wrap',
   },
   column: {
     flex: 1,
     minWidth: 320,
-    gap: 16,
   },
-  rowReverse: {
-    flexDirection: 'row-reverse',
+  columnSurface: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    borderRadius: 16,
+    padding: 16,
+  },
+  scrollView: {
+    flex: 1,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
+    marginBottom: 8,
   },
   kpiGrid: {
     flexDirection: 'row',
@@ -165,17 +167,18 @@ const styles = StyleSheet.create({
   kpiCard: {
     minWidth: 140,
     flexGrow: 1,
-    borderRadius: 18,
+    borderRadius: 12,
     backgroundColor: '#ffffff',
     borderWidth: 1,
     borderColor: '#e5e7eb',
     paddingHorizontal: 16,
     paddingVertical: 14,
     gap: 6,
+    alignItems: 'flex-start',
   },
   listCard: {
     flexDirection: 'row',
-    borderRadius: 18,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: '#e5e7eb',
     backgroundColor: '#ffffff',
