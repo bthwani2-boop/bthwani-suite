@@ -10,10 +10,12 @@ import {
 import { getCampaignKpis } from '../../shared/campaign-store';
 import { getPartnerOfferKpis } from '../../shared/partner-offer-store';
 import { getLoyaltyKpis } from '../../shared/loyalty-store';
+import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
 
 export type GrowthCommandDeckScreenProps = {
   hubHref?: string;
   operationsHref?: string;
+  setActiveTab?: (tab: string) => void;
 };
 
 export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
@@ -33,10 +35,32 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
     }
   };
 
-  const getImpactColor = (score: number) => {
-    if (score >= 8) return '#DC2626'; // High Priority (Red)
-    if (score >= 6) return '#D97706'; // Medium Priority (Amber)
-    return '#0A2F5C'; // Normal (Brand Blue)
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'critical': return '#DC2626';
+      case 'high': return '#D97706';
+      case 'medium': return '#0284C7';
+      default: return '#0A2F5C';
+    }
+  };
+
+  const getSeverityLabel = (severity: string) => {
+    switch (severity) {
+      case 'critical': return 'حرج';
+      case 'high': return 'مرتفع';
+      case 'medium': return 'متوسط';
+      case 'low': return 'منخفض';
+      default: return severity;
+    }
+  };
+
+  const getConfidenceLabel = (confidence: string) => {
+    switch (confidence) {
+      case 'high': return 'موثوقية عالية';
+      case 'medium': return 'موثوقية متوسطة';
+      case 'low': return 'موثوقية منخفضة';
+      default: return confidence;
+    }
   };
 
   return (
@@ -83,17 +107,35 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
                       <Text style={{ fontSize: 24 }}>{renderRecommendationIcon(rec.type)}</Text>
                     </View>
                     <View style={styles.listTextWrap}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                         <Text role="bodyStrong" style={{ color: '#0A2F5C', flex: 1, textAlign: 'right' }}>{rec.title}</Text>
-                        <Text role="caption" style={{ color: getImpactColor(rec.impactScore), fontWeight: '800' }}>
-                          تأثير: {rec.impactScore}/10
+                        <Text role="caption" style={{ color: getSeverityColor(rec.severity), fontWeight: '800' }}>
+                          أهمية: {getSeverityLabel(rec.severity)}
                         </Text>
                       </View>
                       <Text role="caption" tone="muted" style={{ marginTop: 4, lineHeight: 18, textAlign: 'right' }}>
                         {rec.description}
                       </Text>
-                      <View style={{ flexDirection: 'row', marginTop: 8 }}>
-                        <Button label={rec.actionLabel} tone="secondary" fullWidth={false} style={{ paddingHorizontal: 12, paddingVertical: 4, minHeight: 0 }} />
+                      <View style={{ flexDirection: 'row', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+                        <View style={{ backgroundColor: '#F1F5F9', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                          <Text style={{ fontSize: 10, color: '#475569', fontWeight: '800' }}>المالك: {rec.owner}</Text>
+                        </View>
+                        <View style={{ backgroundColor: '#F1F5F9', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                          <Text style={{ fontSize: 10, color: '#475569', fontWeight: '800' }}>المصدر: {rec.source}</Text>
+                        </View>
+                        <View style={{ backgroundColor: '#F1F5F9', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                          <Text style={{ fontSize: 10, color: '#475569', fontWeight: '800' }}>{getConfidenceLabel(rec.confidence)}</Text>
+                        </View>
+                        <View style={{ backgroundColor: '#F1F5F9', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                          <Text style={{ fontSize: 10, color: '#475569', fontWeight: '800' }}>السطح المتأثر: {rec.affectedSurface}</Text>
+                        </View>
+                      </View>
+                      <View style={{ flexDirection: 'row', marginTop: 12 }}>
+                        <Button label={rec.nextAction} tone="secondary" fullWidth={false} onPress={() => {
+                          if (_.setActiveTab) {
+                            _.setActiveTab(rec.actionTargetTab);
+                          }
+                        }} style={{ paddingHorizontal: 12, paddingVertical: 4, minHeight: 0 }} />
                       </View>
                     </View>
                   </View>
@@ -103,28 +145,50 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
           </Surface>
         </View>
 
-        {/* Risk / Gap Indicators */}
+        {/* Risk / Gap Indicators & Store Card Preview */}
         <View style={styles.column}>
-          <Surface tone="raised" gap={3} style={styles.columnSurface}>
-            <View style={styles.headerRow}>
-              <Text role="titleSm" style={{ color: '#0A2F5C' }}>مؤشرات المخاطر والفجوات</Text>
-            </View>
-            <ScrollView style={styles.scrollView}>
-              <Box gap={2}>
-                {recommendations.filter(r => r.type === 'risk' || r.type === 'gap').map(rec => (
-                  <View key={rec.id} style={styles.riskCard}>
-                     <Text style={{ fontSize: 16 }}>{renderRecommendationIcon(rec.type)}</Text>
-                     <Text role="caption" style={{ color: '#475569', flex: 1, textAlign: 'right' }}>
-                       {rec.description}
-                     </Text>
-                  </View>
-                ))}
-                {recommendations.filter(r => r.type === 'risk' || r.type === 'gap').length === 0 && (
-                  <Text role="caption" tone="muted" style={{ textAlign: 'center', padding: 20 }}>لا توجد مخاطر مسجلة حالياً.</Text>
-                )}
-              </Box>
-            </ScrollView>
-          </Surface>
+          <Box gap={3} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Surface tone="raised" gap={3} style={styles.columnSurface}>
+              <View style={styles.headerRow}>
+                <Text role="titleSm" style={{ color: '#0A2F5C' }}>مؤشرات المخاطر والفجوات</Text>
+              </View>
+              <ScrollView style={{ flex: 1, maxHeight: 200 }}>
+                <Box gap={2}>
+                  {recommendations.filter(r => r.type === 'risk' || r.type === 'gap').map(rec => (
+                    <View key={rec.id} style={styles.riskCard}>
+                       <Text style={{ fontSize: 16 }}>{renderRecommendationIcon(rec.type)}</Text>
+                       <Text role="caption" style={{ color: '#475569', flex: 1, textAlign: 'right' }}>
+                         {rec.description}
+                       </Text>
+                    </View>
+                  ))}
+                  {recommendations.filter(r => r.type === 'risk' || r.type === 'gap').length === 0 && (
+                    <Text role="caption" tone="muted" style={{ textAlign: 'center', padding: 20 }}>لا توجد مخاطر مسجلة حالياً.</Text>
+                  )}
+                </Box>
+              </ScrollView>
+            </Surface>
+
+            <Surface tone="raised" gap={3} style={styles.columnSurface}>
+              <View style={styles.headerRow}>
+                <Text role="titleSm" style={{ color: '#0A2F5C' }}>التحقق التجاري للبطاقات (Parity)</Text>
+              </View>
+              <View style={{ backgroundColor: '#F8FAFC', padding: 12, borderRadius: 12, borderWidth: 1, borderColor: '#E2E8F0' }}>
+                <Text role="caption" tone="muted" style={{ marginBottom: 8, textAlign: 'right' }}>بطاقة متجر بمشاكل تضارب (محاكاة)</Text>
+                <CommercialParityPreview
+                  features={mapStoreCommercialFeatures({
+                    storeId: 'test-store',
+                    activeOffers: [{ id: 'mock', displayBadge: 'خصم 20%', offerType: 'discount' } as any],
+                    activeSubscriptions: [],
+                    activeEntitlements: [],
+                    activeCampaigns: [{ id: 'c1', title: 'عروض الخريف', channels: ['store-card'] } as any],
+                    catalogFeatures: { priceMatch: false }
+                  })}
+                  storeName="محمصة دانكن (اختبار التطابق)"
+                />
+              </View>
+            </Surface>
+          </Box>
         </View>
       </View>
     </div>

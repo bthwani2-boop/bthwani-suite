@@ -213,9 +213,14 @@ export type GrowthRecommendation = {
   type: GrowthRecommendationType;
   title: string;
   description: string;
-  actionLabel: string;
-  actionTarget: string;
-  impactScore: number; // 1 to 10
+  nextAction: string;
+  actionTargetTab: 'partners' | 'campaigns' | 'loyalty' | 'video' | 'ticker';
+  owner: string;
+  source: string;
+  affectedSurface: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  confidence: 'low' | 'medium' | 'high';
+  linkedRecordId?: string;
 };
 
 export function getGrowthRecommendations(): GrowthRecommendation[] {
@@ -223,38 +228,56 @@ export function getGrowthRecommendations(): GrowthRecommendation[] {
     {
       id: 'rec-1',
       type: 'opportunity',
-      title: 'عرض شريك جاهز',
+      title: 'عرض شريك جاهز ولم يدخل حملة',
       description: 'يوجد عرض "خصم 20%" جاهز للتسويق، يمكن ربطه بحملة لزيادة التفاعل.',
-      actionLabel: 'ربط بحملة',
-      actionTarget: 'campaigns',
-      impactScore: 9,
+      nextAction: 'ربط بحملة',
+      actionTargetTab: 'campaigns',
+      owner: 'partner-offers',
+      source: 'marketing-engine',
+      affectedSurface: 'home-feed',
+      severity: 'medium',
+      confidence: 'high',
+      linkedRecordId: 'offer-1',
     },
     {
       id: 'rec-2',
       type: 'gap',
-      title: 'فئة بدون عروض',
-      description: 'فئة "المطاعم" لا تمتلك أي حملة نشطة حالياً رغم كثافة الزيارات.',
-      actionLabel: 'إنشاء حملة',
-      actionTarget: 'campaigns',
-      impactScore: 7,
+      title: 'فيديو جاهز بدون حملة',
+      description: 'فيديو "إطلاق الهوية الجديدة" معتمد لكن لم يتم ربطه بحملة ترويجية.',
+      nextAction: 'إنشاء حملة',
+      actionTargetTab: 'campaigns',
+      owner: 'video-studio',
+      source: 'content-engine',
+      affectedSurface: 'video-feed',
+      severity: 'high',
+      confidence: 'high',
+      linkedRecordId: 'video-launch-2026',
     },
     {
       id: 'rec-3',
       type: 'risk',
-      title: 'تضارب شارات (Badges)',
-      description: 'متجر 101 يعرض شارة توصيل مجاني ولكن العرض موقوف في الكتالوج.',
-      actionLabel: 'مراجعة المتاجر',
-      actionTarget: 'partner-offers',
-      impactScore: 8,
+      title: 'تضارب شارات بطاقة المتجر',
+      description: 'متجر يعرض شارة توصيل مجاني ولكن العرض موقوف في الكتالوج.',
+      nextAction: 'مراجعة عروض الشركاء',
+      actionTargetTab: 'partners',
+      owner: 'catalog-sync',
+      source: 'parity-checker',
+      affectedSurface: 'store-card',
+      severity: 'critical',
+      confidence: 'high',
     },
     {
       id: 'rec-4',
       type: 'opportunity',
-      title: 'تفعيل المشتركين',
-      description: 'يوجد 500 مشترك في باقة برو لم يستخدموا ميزة التوصيل المجاني.',
-      actionLabel: 'تذكير بالميزة',
-      actionTarget: 'loyalty',
-      impactScore: 6,
+      title: 'ميزة بثواني برو معطلة للمشتركين',
+      description: 'يوجد مشتركين في باقة برو لم تفعل لهم الاستحقاقات.',
+      nextAction: 'مراجعة الولاء',
+      actionTargetTab: 'loyalty',
+      owner: 'loyalty-engine',
+      source: 'subscription-sync',
+      affectedSurface: 'checkout',
+      severity: 'high',
+      confidence: 'high',
     }
   ];
 }

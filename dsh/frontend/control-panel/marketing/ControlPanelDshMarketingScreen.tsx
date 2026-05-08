@@ -468,7 +468,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       case 'partners':
         return <PartnerOffersCommandDeckScreen />;
       case 'growth':
-        return <GrowthCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
+        return <GrowthCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} setActiveTab={setActiveTab as any} />;
       case 'signals':
         return <SmartSignalLayerScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
       case 'loyalty':
@@ -530,14 +530,14 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       </header>
 
       {/* 2. Primary Tabs */}
-      <nav className={styles.operationsTabs} style={{ padding: '8px 16px', backgroundColor: '#fff', borderBottom: '1px solid rgba(10,47,92,0.06)' }}>
-        {PRIMARY_TABS.map((tab) => {
-          const isSelected = tab.id === activeTab;
-          return (
-            <button
-              key={tab.id}
-              className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
-              onClick={() => setActiveTab(tab.id)}
+        <nav className={styles.operationsTabs} style={{ padding: '8px 16px', backgroundColor: '#fff', borderBottom: '1px solid rgba(10,47,92,0.06)', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          {PRIMARY_TABS.map((tab) => {
+            const isSelected = tab.id === activeTab;
+            return (
+              <button
+                key={tab.id}
+                className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
+                onClick={() => setActiveTab(tab.id)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
