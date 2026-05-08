@@ -56,7 +56,7 @@ function CompactPartnerIntakeQueue() {
     <Box layoutDirection="row" gap={4} style={{ flex: 1, minHeight: 0 }}>
       <Surface tone="raised" padding={0} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Box padding={3} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }}>
-          <Text role="bodyStrong">طلبات الواردة ({items.length})</Text>
+          <Text role="bodyStrong" style={{ textAlign: 'right' }}>طلبات الواردة ({items.length})</Text>
         </Box>
         <Box style={{ flex: 1 }} padding={2}>
           <Box style={{ overflowY: 'auto', flex: 1 }}>
@@ -84,14 +84,14 @@ function CompactPartnerIntakeQueue() {
           <Box padding={4} gap={4} style={{ flex: 1, overflowY: 'auto' }}>
             <Box layoutDirection="row" justify="space-between" align="center">
               <Box>
-                <Text role="titleSm">{selected.title}</Text>
-                <Text role="caption" tone="muted">المعرف: <Text dir="ltr" style={{ fontWeight: 800 }}>{selected.id}</Text></Text>
+                <Text role="titleSm" style={{ textAlign: 'right' }}>{selected.title}</Text>
+                <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>المعرف: <Text dir="ltr" style={{ fontWeight: 800 }}>{selected.id}</Text></Text>
               </Box>
               <Chip label={getStageMeta(selected.stage).label} tone={getStageMeta(selected.stage).tone as any} selected />
             </Box>
 
             <Surface tone="inset" padding={4} gap={2}>
-              <Text role="caption" tone="muted" style={{ fontWeight: 800 }}>ملخص البيانات</Text>
+              <Text role="caption" tone="muted" style={{ fontWeight: 800, textAlign: 'right' }}>ملخص البيانات</Text>
               <KeyValueList
                 items={[
                   { label: 'المصدر', value: translateOwner(selected.source) },
@@ -138,8 +138,8 @@ export function ControlPanelDshPartnerApprovalsScreen() {
   return (
     <Box dir="rtl" gap={4} padding={4} style={{ height: '100%', overflow: 'hidden' }}>
       <Box>
-        <Text role="titleLg" style={{ fontWeight: 900 }}>بوابة استقبال طلبات الشركاء</Text>
-        <Text role="caption" tone="muted">المراجعة الأولى لكل الوارد من الحقل والشركاء</Text>
+        <Text role="titleLg" style={{ fontWeight: 900, textAlign: 'right' }}>بوابة استقبال طلبات الشركاء</Text>
+        <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>المراجعة الأولى لكل الوارد من الحقل والشركاء</Text>
       </Box>
 
       <Surface tone="raised" padding={2}>

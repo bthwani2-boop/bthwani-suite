@@ -137,8 +137,8 @@ export function MarketingMediaReviewCommandDeckScreen() {
           { label: 'تعارضات', value: kpis.conflicts, tone: 'warning' },
         ].map(k => (
           <Surface key={k.label} tone={k.tone as any} padding={3} style={{ flex: '1 1 120px', borderRadius: '12px' }}>
-            <Text role="caption" style={{ fontWeight: 800 }}>{k.label}</Text>
-            <Text role="titleLg" style={{ fontWeight: 900 }}>{k.value}</Text>
+            <Text role="caption" style={{ fontWeight: 800, textAlign: 'right' }}>{k.label}</Text>
+            <Text role="titleLg" style={{ fontWeight: 900, textAlign: 'right' }}>{k.value}</Text>
           </Surface>
         ))}
       </Box>
@@ -171,8 +171,8 @@ export function MarketingMediaReviewCommandDeckScreen() {
         {/* Left: Review List */}
         <Surface tone="raised" padding={0} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <Box padding={3} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }} layoutDirection="row" justify="space-between" align="center">
-            <Text role="bodyStrong">قائمة المراجعة ({filteredItems.length})</Text>
-            <Text role="caption" tone="muted">مراجعة الصور والمنتجات</Text>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }}>قائمة المراجعة ({filteredItems.length})</Text>
+            <Text role="caption" tone="muted" style={{ textAlign: 'left' }}>مراجعة الصور والمنتجات</Text>
           </Box>
           <Box style={{ flex: 1 }} padding={2}>
             <Box style={{ overflowY: 'auto', flex: 1 }}>
@@ -212,7 +212,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
             <Box gap={3} style={{ overflowY: 'auto', paddingBottom: 20 }}>
               {/* Preview */}
               <Surface padding={4} gap={3}>
-                <Text role="caption" tone="muted" style={{ fontWeight: 700 }}>معاينة الوسيط</Text>
+                <Text role="caption" tone="muted" style={{ fontWeight: 700, textAlign: 'right' }}>معاينة الوسيط</Text>
                 <Surface tone="inset" style={{ height: 160, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                   <Text style={{ fontSize: 48 }}>
                     {selected.entityType === 'product-media' || selected.entityType === 'store' ? '🖼️'
@@ -232,7 +232,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
 
               {/* Inspector Details */}
               <Surface padding={4} gap={2}>
-                <Text role="bodyStrong">تفاصيل المراجعة</Text>
+                <Text role="bodyStrong" style={{ textAlign: 'right' }}>تفاصيل المراجعة</Text>
                 <KeyValueList
                   items={[
                     { label: 'العنوان', value: selected.title },

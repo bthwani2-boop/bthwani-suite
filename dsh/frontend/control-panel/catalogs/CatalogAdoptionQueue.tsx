@@ -61,9 +61,9 @@ export function CatalogAdoptionQueue() {
         <Box gap={2}>
           <Box style={{ flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
             <Text style={{ fontSize: '24px' }}>📦</Text>
-            <Text role="bodyStrong" style={{ color: '#0369A1' }}>بوابة اعتماد الكتالوج الموحد</Text>
+            <Text role="bodyStrong" style={{ color: '#0369A1', textAlign: 'right' }}>بوابة اعتماد الكتالوج الموحد</Text>
           </Box>
-          <Text role="caption" style={{ color: '#0369A1', fontWeight: 600 }}>يتم هنا اعتماد العناصر النهائية والموافقة عليها لتصبح جزءًا من الكتالوج الموحد. لا يظهر للعميل إلا بعد التفعيل النهائي.</Text>
+          <Text role="caption" style={{ color: '#0369A1', fontWeight: 600, textAlign: 'right' }}>يتم هنا اعتماد العناصر النهائية والموافقة عليها لتصبح جزءًا من الكتالوج الموحد. لا يظهر للعميل إلا بعد التفعيل النهائي.</Text>
         </Box>
       </Surface>
 
