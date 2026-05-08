@@ -58,6 +58,8 @@ type VideoDraft = {
   reviewState: 'none' | 'pending' | 'approved' | 'rejected';
 };
 
+type EditorWorkspaceTab = 'content' | 'media' | 'target' | 'publish';
+
 function createDraft(item?: MarketingVideoRecord | null): VideoDraft {
   return {
     id: item?.id,
@@ -93,7 +95,6 @@ const TARGET_TYPE_OPTIONS: Array<{ value: MarketingVideoTargetType; label: strin
   { value: 'campaign', label: 'حملة', description: 'يفتح وجهة حملات عامة ضمن القناة الحالية.' },
   { value: 'search', label: 'بحث', description: 'يفتح واجهة البحث.' },
   { value: 'custom', label: 'مخصص', description: 'مسار محدود ومضبوط عندما لا تكفي الخيارات المنظمة.' },
-  { value: 'loyalty', label: 'الولاء', description: 'ينتقل إلى نظام الولاء.' },
 ];
 
 export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
@@ -103,11 +104,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getMarketingVideoItems()[0]?.id ?? null);
   const selected = React.useMemo(() => (selectedId ? (items.find((item) => item.id === selectedId) ?? null) : null), [items, selectedId]);
   const [draft, setDraft] = React.useState<VideoDraft>(() => createDraft(selected));
-
-  const [storeSearch, setStoreSearch] = React.useState('');
-  const [categorySearch, setCategorySearch] = React.useState('');
-  const [productStoreSearch, setProductStoreSearch] = React.useState('');
-  const [productSearch, setProductSearch] = React.useState('');
+  const [activeEditorTab, setActiveEditorTab] = React.useState<EditorWorkspaceTab>('content');
 
   React.useEffect(() => {
     if (selected) {
@@ -124,6 +121,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
   function handleCreateNew() {
     setSelectedId(null);
     setDraft(createDraft(null));
+    setActiveEditorTab('content');
   }
 
   function handleSave() {
@@ -164,152 +162,153 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
     return 'مسودة';
   };
 
-  const reviewStateLabel = (rs: string) => {
-    if (rs === 'approved') return 'معتمد';
-    if (rs === 'rejected') return 'مرفوض';
-    if (rs === 'pending') return 'معلق';
-    return 'غير مراجع';
-  };
-
-  // Helper for product store selection
   const getProductsForStore = (storeId: string) => storeItemsByStoreId[storeId] ?? [];
 
   return (
-    <Box gap={4}>
-      <Surface tone="raised" gap={4} style={{ borderRadius: 24, padding: 24, borderWidth: 1, borderColor: 'rgba(10,47,92,0.05)' }}>
+    <View style={[styles.root, isRtl && styles.rootRtl]}>
+      {/* 1. Header & KPI Strip */}
+      <Surface tone="raised" style={styles.headerSurface}>
         <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-          <Box gap={1}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Box gap={1} layoutDirection={isRtl ? 'row-reverse' : 'row'}>
+            <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 8, justifyContent: 'flex-start' }]}>
               <Text role="caption" style={{ color: '#0A2F5C', fontWeight: '900', letterSpacing: 1 }}>استوديو الفيديو DSH v1</Text>
               <View style={{ backgroundColor: '#FF500D', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
                 <Text role="caption" style={{ color: '#fff', fontSize: 9, fontWeight: '900' }}>احترافي</Text>
               </View>
             </View>
-            <Text role="titleLg" style={{ fontSize: 28, fontWeight: '900', color: '#0A2F5C' }}>استوديو الفيديو التسويقي</Text>
+            <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', color: '#0A2F5C', textAlign: isRtl ? 'right' : 'left' }}>استوديو الفيديو التسويقي</Text>
           </Box>
-          <Button label="+ فيديو جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={{ borderRadius: 12, paddingHorizontal: 24, height: 48 }} />
-        </View>
 
-        <View style={[styles.kpiGrid, isRtl && styles.rowReverse]}>
-          {[
-            { label: 'إجمالي المحتوى', value: kpis.total, color: '#0A2F5C', bg: '#F8FAFC' },
-            { label: 'نشط الآن', value: kpis.live, color: '#16A34A', bg: '#DCFCE7' },
-            { label: 'قيد المراجعة', value: kpis.review, color: '#D97706', bg: '#FEF3C7' },
-            { label: 'إجمالي الوصول', value: (kpis.impressions / 1000).toFixed(1) + 'K', color: '#0A2F5C', bg: '#F8FAFC' },
-            { label: 'معدل التفاعل', value: kpis.impressions > 0 ? ((kpis.clicks / kpis.impressions) * 100).toFixed(1) + '%' : '0%', color: '#0A2F5C', bg: '#F8FAFC' },
-          ].map((kpi) => (
-            <View key={kpi.label} style={[styles.kpiCard, { backgroundColor: kpi.bg, borderBottomWidth: 3, borderBottomColor: kpi.color + '22' }]}>
-              <Text role="caption" tone="muted" style={{ fontWeight: '800', fontSize: 11 }}>{kpi.label}</Text>
-              <Text role="titleLg" style={{ color: kpi.color, fontWeight: '900', fontSize: 24 }}>{String(kpi.value)}</Text>
-            </View>
-          ))}
+          <View style={[styles.kpiRow, isRtl && styles.rowReverse]}>
+            {[
+              { label: 'إجمالي المحتوى', value: kpis.total, color: '#0A2F5C', bg: '#F8FAFC' },
+              { label: 'نشط الآن', value: kpis.live, color: '#16A34A', bg: '#DCFCE7' },
+              { label: 'قيد المراجعة', value: kpis.review, color: '#D97706', bg: '#FEF3C7' },
+            ].map((kpi) => (
+              <View key={kpi.label} style={[styles.kpiPill, { backgroundColor: kpi.bg }, isRtl && styles.rowReverse]}>
+                <Text role="caption" style={{ fontWeight: '800', fontSize: 10, color: '#64748B' }}>{kpi.label}</Text>
+                <Text role="titleMd" style={{ color: kpi.color, fontWeight: '900', fontSize: 16 }}>{String(kpi.value)}</Text>
+              </View>
+            ))}
+          </View>
+
+          <Button label="+ فيديو جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={{ borderRadius: 8, height: 40 }} />
         </View>
       </Surface>
 
-      <View style={[styles.columnsWrap, isRtl && styles.rowReverse]}>
-        {/* List Column */}
-        <View style={styles.column}>
-          <Surface tone="raised" gap={3} style={{ borderRadius: 20 }}>
-            <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-              <Text role="titleSm" style={{ fontWeight: '900' }}>مكتبة المحتوى</Text>
-              <Text role="caption" tone="muted">{items.length} فيديوهات</Text>
-            </View>
-            <ScrollView style={{ maxHeight: 600 }}>
-              <Box gap={2}>
-                {items.map((item) => {
-                  const isSelected = selected?.id === item.id;
-                  return (
-                    <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={[styles.listCard, isSelected && styles.listCardSelected]}>
-                      <View style={[styles.headerRow, isRtl && styles.rowReverse, { alignItems: 'flex-start' }]}>
-                        <View style={{ width: 70, height: 90, backgroundColor: '#000', borderRadius: 10, overflow: 'hidden', position: 'relative' }}>
-                          {item.posterUrl ? <Image source={{ uri: item.posterUrl }} style={{ width: '100%', height: '100%', opacity: 0.8 }} resizeMode="cover" /> : null}
-                          <View style={{ position: 'absolute', bottom: 4, right: 4, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 4, borderRadius: 2 }}>
-                            <Text role="caption" style={{ color: '#fff', fontSize: 9 }}>{item.durationSeconds} ث</Text>
-                          </View>
-                        </View>
-                        <View style={{ flex: 1, gap: 4 }}>
-                          <Box layoutDirection="row" justify="space-between" align="center">
-                            <Text role="bodyStrong" numberOfLines={1} style={{ fontSize: 15, color: '#0A2F5C' }}>{item.title}</Text>
-                            <View style={[styles.statusPill, { backgroundColor: item.status === 'published' ? '#DCFCE7' : '#F1F5F9' }]}>
-                              <Text role="caption" style={{ color: item.status === 'published' ? '#16A34A' : '#64748B', fontWeight: '900', fontSize: 9 }}>{statusLabel(item.status).toUpperCase()}</Text>
-                            </View>
-                          </Box>
-                          <Text role="caption" tone="muted" numberOfLines={2}>{item.subtitle}</Text>
-                          <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
-                            <View style={styles.metaBadge}><Text style={styles.metaBadgeText}>{item.source === 'partner' ? '🤝 شريك' : '🎨 داخلي'}</Text></View>
-                            <View style={styles.metaBadge}><Text style={styles.metaBadgeText}>📍 {TARGET_TYPE_OPTIONS.find(o => o.value === item.targetType)?.label}</Text></View>
-                            <View style={[styles.metaBadge, { backgroundColor: item.reviewState === 'approved' ? '#ECFDF5' : '#FFF7ED' }]}><Text style={[styles.metaBadgeText, { color: item.reviewState === 'approved' ? '#059669' : '#D97706' }]}>{reviewStateLabel(item.reviewState)}</Text></View>
-                          </View>
-                        </View>
+      {/* Main Workspace */}
+      <View style={[styles.workspace, isRtl && styles.rowReverse]}>
+        {/* Left: List Panel */}
+        <Surface tone="raised" style={styles.listPanel}>
+          <View style={[styles.panelHeader, isRtl && styles.rowReverse]}>
+            <Text role="titleSm" style={{ fontWeight: '900' }}>مكتبة المحتوى</Text>
+            <Text role="caption" tone="muted">{items.length} فيديوهات</Text>
+          </View>
+          <ScrollView style={styles.listScroll} contentContainerStyle={styles.listContent}>
+            {items.map((item) => {
+              const isSelected = selected?.id === item.id;
+              return (
+                <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={[styles.compactRow, isRtl && styles.rowReverse, isSelected && styles.compactRowSelected]}>
+                  <View style={styles.compactPoster}>
+                    {item.posterUrl ? <Image source={{ uri: item.posterUrl }} style={styles.compactImage} resizeMode="cover" /> : null}
+                  </View>
+                  <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <View style={[styles.headerRow, isRtl && styles.rowReverse, { alignItems: 'center' }]}>
+                      <Text role="bodyStrong" numberOfLines={1} style={{ fontSize: 13, color: '#0A2F5C', textAlign: isRtl ? 'right' : 'left' }}>{item.title}</Text>
+                      <View style={[styles.statusBadge, { backgroundColor: item.status === 'published' ? '#DCFCE7' : '#F1F5F9' }]}>
+                        <Text role="caption" style={{ color: item.status === 'published' ? '#16A34A' : '#64748B', fontWeight: '900', fontSize: 9 }}>{statusLabel(item.status)}</Text>
                       </View>
-                      {isSelected && (
-                        <View style={[styles.actionsRow, isRtl && styles.rowReverse, { marginTop: 8, borderTopWidth: 1, borderTopColor: '#E2E8F0', paddingTop: 10 }]}>
-                          <Button label={item.status === 'published' ? 'إيقاف مؤقت' : 'تفعيل النشر'} tone={item.status === 'published' ? 'ghost' : 'secondary'} fullWidth={false} size="sm" onPress={() => handleToggle(item)} />
-                          <Button label="نسخ كمسودة" tone="ghost" fullWidth={false} size="sm" onPress={() => handleDuplicate(item)} />
-                          <Button label="حذف الفيديو" tone="ghost" fullWidth={false} size="sm" onPress={() => handleDelete(item)} style={{ color: '#DC2626' }} />
-                        </View>
-                      )}
-                    </Pressable>
-                  );
-                })}
-              </Box>
-            </ScrollView>
-          </Surface>
-        </View>
+                    </View>
+                    <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 6, marginTop: 4, justifyContent: 'flex-start' }]}>
+                      <Text role="caption" style={{ color: '#64748B', fontSize: 10 }}>{item.durationSeconds}ث</Text>
+                      <Text role="caption" style={{ color: '#CBD5E1', fontSize: 10 }}>•</Text>
+                      <Text role="caption" style={{ color: '#64748B', fontSize: 10 }}>{TARGET_TYPE_OPTIONS.find(o => o.value === item.targetType)?.label}</Text>
+                      <Text role="caption" style={{ color: '#CBD5E1', fontSize: 10 }}>•</Text>
+                      <Text role="caption" style={{ color: '#64748B', fontSize: 10 }}>{item.source === 'partner' ? 'شريك' : 'داخلي'}</Text>
+                    </View>
+                  </View>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </Surface>
 
-        {/* Editor Column */}
-        <View style={styles.column}>
-          <Surface tone="raised" gap={4} style={{ borderRadius: 20 }}>
-            <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-              <Text role="titleSm" style={{ fontWeight: '900' }}>محرر الفيديو الذكي</Text>
-              <View style={{ flexDirection: 'row', gap: 8 }}>
-                <Button label="نسخة" tone="ghost" size="sm" onPress={() => selected && handleDuplicate(selected)} disabled={!selected} />
-                <Button label="حذف" tone="ghost" size="sm" onPress={() => selected && handleDelete(selected)} disabled={!selected} />
-              </View>
+        {/* Center: Editor Panel */}
+        <Surface tone="raised" style={styles.editorPanel}>
+          <View style={[styles.panelHeader, isRtl && styles.rowReverse]}>
+            <Text role="titleSm" style={{ fontWeight: '900' }}>محرر الفيديو الذكي</Text>
+            <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 8 }]}>
+              <Button label="نسخة" tone="ghost" size="sm" onPress={() => selected && handleDuplicate(selected)} disabled={!selected} />
+              <Button label="حذف" tone="ghost" size="sm" onPress={() => selected && handleDelete(selected)} disabled={!selected} />
             </View>
+          </View>
 
-            <Box gap={3}>
-              <TextField label="العنوان التسويقي" value={draft.title} onChangeText={(v) => setDraft(d => ({ ...d, title: v }))} placeholder="مثال: خصومات الجمعة البيضاء" />
-              <TextField label="وصف موجز" value={draft.subtitle} onChangeText={(v) => setDraft(d => ({ ...d, subtitle: v }))} placeholder="وصف يظهر أسفل العنوان في المعاينة" />
+          <View style={{ paddingHorizontal: 16, paddingBottom: 12 }}>
+            <Tabs<EditorWorkspaceTab>
+              items={[
+                { value: 'content', label: 'المحتوى' },
+                { value: 'media', label: 'الوسائط' },
+                { value: 'target', label: 'الوجهة' },
+                { value: 'publish', label: 'النشر' },
+              ]}
+              value={activeEditorTab}
+              onValueChange={setActiveEditorTab}
+              variant="line"
+            />
+          </View>
 
-              <View style={{ flexDirection: 'row', gap: 12 }}>
-                <View style={{ flex: 1 }}>
-                  <TextField label="رابط الفيديو (MP4)" value={draft.videoUrl} onChangeText={(v) => setDraft(d => ({ ...d, videoUrl: v }))} placeholder="https://..." />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <TextField label="رابط الغلاف (Poster)" value={draft.posterUrl} onChangeText={(v) => setDraft(d => ({ ...d, posterUrl: v }))} placeholder="https://..." />
-                </View>
-              </View>
-
-              <View style={{ flexDirection: 'row', gap: 12 }}>
-                <View style={{ flex: 1 }}>
-                  <TextField label="المدة (ثانية)" value={draft.durationSeconds} onChangeText={(v) => setDraft(d => ({ ...d, durationSeconds: v }))} type="number" />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <TextField label="الترتيب" value={draft.order} onChangeText={(v) => setDraft(d => ({ ...d, order: v }))} type="number" />
-                </View>
-              </View>
-
-              <Box gap={2}>
-                <Text role="caption" style={{ fontWeight: '900', color: '#64748B' }}>سلوك التشغيل</Text>
-                <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-                  <Button label={draft.mute ? "صامت ✓" : "صوت"} tone={draft.mute ? "secondary" : "ghost"} fullWidth={false} size="sm" onPress={() => setDraft(d => ({ ...d, mute: !d.mute }))} />
-                  <Button label={draft.autoplay ? "تشغيل تلقائي ✓" : "يدوي"} tone={draft.autoplay ? "secondary" : "ghost"} fullWidth={false} size="sm" onPress={() => setDraft(d => ({ ...d, autoplay: !d.autoplay }))} />
-                  <Button label={draft.loop ? "تكرار ✓" : "مرة واحدة"} tone={draft.loop ? "secondary" : "ghost"} fullWidth={false} size="sm" onPress={() => setDraft(d => ({ ...d, loop: !d.loop }))} />
+          <ScrollView style={styles.editorScroll} contentContainerStyle={styles.editorContent}>
+            {activeEditorTab === 'content' && (
+              <Box gap={4}>
+                <TextField label="العنوان التسويقي" value={draft.title} onChangeText={(v) => setDraft(d => ({ ...d, title: v }))} placeholder="مثال: خصومات الجمعة البيضاء" />
+                <TextField label="وصف موجز" value={draft.subtitle} onChangeText={(v) => setDraft(d => ({ ...d, subtitle: v }))} placeholder="وصف يظهر أسفل العنوان في المعاينة" />
+                <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 12 }]}>
+                  <View style={{ flex: 1 }}>
+                    <TextField label="نص الزر (CTA)" value={draft.ctaLabel} onChangeText={(v) => setDraft(d => ({ ...d, ctaLabel: v }))} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <TextField label="الجملة البارزة" value={draft.highlight} onChangeText={(v) => setDraft(d => ({ ...d, highlight: v }))} />
+                  </View>
                 </View>
               </Box>
+            )}
 
-              <Box gap={2}>
-                <Text role="caption" style={{ fontWeight: '900', color: '#64748B' }}>الوجهة الذكية (Smart Target)</Text>
-                <Tabs<MarketingVideoTargetType>
-                  items={TARGET_TYPE_OPTIONS.map(o => ({ value: o.value, label: o.label }))}
+            {activeEditorTab === 'media' && (
+              <Box gap={4}>
+                <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 12 }]}>
+                  <View style={{ flex: 1, direction: 'ltr' }}>
+                    <TextField label="رابط الفيديو (MP4)" value={draft.videoUrl} onChangeText={(v) => setDraft(d => ({ ...d, videoUrl: v }))} placeholder="https://..." />
+                  </View>
+                  <View style={{ flex: 1, direction: 'ltr' }}>
+                    <TextField label="رابط الغلاف (Poster)" value={draft.posterUrl} onChangeText={(v) => setDraft(d => ({ ...d, posterUrl: v }))} placeholder="https://..." />
+                  </View>
+                </View>
+                <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 12 }]}>
+                  <View style={{ flex: 1 }}>
+                    <TextField label="المدة (ثانية)" value={draft.durationSeconds} onChangeText={(v) => setDraft(d => ({ ...d, durationSeconds: v }))} type="number" />
+                  </View>
+                  <View style={{ flex: 1 }} />
+                </View>
+                <Box gap={2}>
+                  <Text role="caption" style={{ fontWeight: '900', color: '#64748B', textAlign: isRtl ? 'right' : 'left' }}>سلوك التشغيل</Text>
+                  <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 8, flexWrap: 'wrap', justifyContent: 'flex-start' }]}>
+                    <Button label={draft.mute ? "صامت ✓" : "صوت"} tone={draft.mute ? "secondary" : "ghost"} fullWidth={false} size="sm" onPress={() => setDraft(d => ({ ...d, mute: !d.mute }))} />
+                    <Button label={draft.autoplay ? "تشغيل تلقائي ✓" : "يدوي"} tone={draft.autoplay ? "secondary" : "ghost"} fullWidth={false} size="sm" onPress={() => setDraft(d => ({ ...d, autoplay: !d.autoplay }))} />
+                    <Button label={draft.loop ? "تكرار ✓" : "مرة واحدة"} tone={draft.loop ? "secondary" : "ghost"} fullWidth={false} size="sm" onPress={() => setDraft(d => ({ ...d, loop: !d.loop }))} />
+                  </View>
+                </Box>
+              </Box>
+            )}
+
+            {activeEditorTab === 'target' && (
+              <Box gap={4}>
+                <SelectField
+                  label="نوع الوجهة"
                   value={draft.targetType}
-                  onValueChange={(v) => setDraft(d => ({ ...d, targetType: v }))}
-                  variant="pill"
+                  onValueChange={(v) => setDraft(d => ({ ...d, targetType: v as any }))}
+                  options={TARGET_TYPE_OPTIONS.map(o => ({ value: o.value, label: o.label }))}
                 />
-
-                {/* Dynamic Target Selection UI */}
-                <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: 12 }}>
+                <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: 8 }}>
                    {draft.targetType === 'store' && (
                      <SelectField
                        label="اختر المتجر"
@@ -342,83 +341,65 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                         />
                      </Box>
                    )}
-                   {draft.targetType === 'loyalty' && (
-                     <SelectField
-                       label="وجهة الولاء"
-                       value={draft.targetId}
-                       onValueChange={(v) => setDraft(d => ({ ...d, targetId: v }))}
-                       options={[
-                         { value: 'entitlements-get', label: 'المزايا والاستحقاقات' },
-                         { value: 'loyalty-points', label: 'رصيد النقاط' },
-                         { value: 'subscription-family', label: 'الاشتراك العائلي' },
-                       ]}
-                     />
-                   )}
                    {['home', 'stores', 'search', 'offer', 'campaign', 'custom'].includes(draft.targetType) && (
                      <TextField label="معرف الوجهة / الرابط" value={draft.targetId} onChangeText={(v) => setDraft(d => ({ ...d, targetId: v }))} />
                    )}
                 </Surface>
               </Box>
+            )}
 
-              <View style={{ flexDirection: 'row', gap: 12 }}>
-                <View style={{ flex: 1 }}>
-                  <TextField label="نص الزر (CTA)" value={draft.ctaLabel} onChangeText={(v) => setDraft(d => ({ ...d, ctaLabel: v }))} />
+            {activeEditorTab === 'publish' && (
+              <Box gap={4}>
+                <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 12 }]}>
+                  <View style={{ flex: 1 }}>
+                    <SelectField
+                      label="المصدر"
+                      value={draft.source}
+                      onValueChange={(v) => setDraft(d => ({ ...d, source: v as any }))}
+                      options={[
+                        { value: 'marketing', label: 'فريق التسويق' },
+                        { value: 'partner', label: 'الشريك / العلامة التجارية' },
+                      ]}
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <SelectField
+                      label="الجمهور"
+                      value={draft.audience}
+                      onValueChange={(v) => setDraft(d => ({ ...d, audience: v as any }))}
+                      options={[
+                        { value: 'all', label: 'الكل' },
+                        { value: 'client', label: 'واجهة العميل' },
+                        { value: 'operations', label: 'العمليات' },
+                      ]}
+                    />
+                  </View>
                 </View>
-                <View style={{ flex: 1 }}>
-                  <TextField label="الجملة البارزة" value={draft.highlight} onChangeText={(v) => setDraft(d => ({ ...d, highlight: v }))} />
-                </View>
-              </View>
+                <TextField label="الترتيب" value={draft.order} onChangeText={(v) => setDraft(d => ({ ...d, order: v }))} type="number" />
+              </Box>
+            )}
+          </ScrollView>
 
-              <View style={{ flexDirection: 'row', gap: 12 }}>
-                <View style={{ flex: 1 }}>
-                  <SelectField
-                    label="المصدر"
-                    value={draft.source}
-                    onValueChange={(v) => setDraft(d => ({ ...d, source: v as any }))}
-                    options={[
-                      { value: 'marketing', label: 'فريق التسويق' },
-                      { value: 'partner', label: 'الشريك / العلامة التجارية' },
-                    ]}
-                  />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <SelectField
-                    label="الجمهور"
-                    value={draft.audience}
-                    onValueChange={(v) => setDraft(d => ({ ...d, audience: v as any }))}
-                    options={[
-                      { value: 'all', label: 'الكل' },
-                      { value: 'client', label: 'واجهة العميل' },
-                      { value: 'operations', label: 'العمليات' },
-                    ]}
-                  />
-                </View>
-              </View>
+          <View style={[styles.editorFooter, isRtl && styles.rowReverse]}>
+            <Button label="حفظ التعديلات" tone="primary" fullWidth={false} onPress={handleSave} style={{ borderRadius: 8, paddingHorizontal: 24 }} />
+            {selected && (
+              <Button
+                label={selected.status === 'published' ? 'إيقاف العرض' : 'نشر الآن'}
+                tone="secondary"
+                fullWidth={false}
+                onPress={() => handleToggle(selected)}
+                style={{ borderRadius: 8 }}
+              />
+            )}
+          </View>
+        </Surface>
 
-              <View style={[styles.actionsRow, isRtl && styles.rowReverse, { marginTop: 12, borderTopWidth: 1, borderTopColor: '#E2E8F0', paddingTop: 20 }]}>
-                <Button label="حفظ مسودة الفيديو" tone="primary" fullWidth={false} onPress={handleSave} style={{ borderRadius: 10, paddingHorizontal: 32 }} />
-                {selected && (
-                  <Button
-                    label={selected.status === 'published' ? 'إيقاف العرض' : 'نشر الآن'}
-                    tone="secondary"
-                    fullWidth={false}
-                    onPress={() => handleToggle(selected)}
-                    style={{ borderRadius: 10 }}
-                  />
-                )}
-              </View>
-            </Box>
-          </Surface>
-
-          {/* Premium Preview */}
-          <Surface tone="inset" gap={3} style={{ borderRadius: 20, padding: 20, backgroundColor: '#0A2F5C' }}>
-            <Box layoutDirection="row" justify="space-between" align="center">
-              <Text role="caption" style={{ fontWeight: '900', color: '#fff' }}>المعاينة الحية (PREVIEW)</Text>
-              <View style={{ backgroundColor: '#FF500D', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4 }}>
-                <Text role="caption" style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>محاكاة مباشرة</Text>
-              </View>
-            </Box>
-
+        {/* Right: Preview Panel */}
+        <Surface tone="inset" style={styles.previewPanel}>
+          <View style={[styles.panelHeader, isRtl && styles.rowReverse]}>
+            <Text role="titleSm" style={{ fontWeight: '900', color: '#fff' }}>المعاينة الحية</Text>
+          </View>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <View style={styles.previewFrame}>
               {draft.posterUrl ? (
                 <Image source={{ uri: draft.posterUrl }} style={styles.previewImage} resizeMode="cover" />
@@ -429,80 +410,82 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
               )}
 
               <View style={styles.previewOverlay}>
-                <View style={styles.previewTopBar}>
+                <View style={[styles.previewTopBar, isRtl && styles.rowReverse]}>
                   <View style={styles.previewBadge}><Text style={styles.previewBadgeText}>{draft.highlight || 'عرض جديد'}</Text></View>
                   <View style={styles.previewTime}><Text style={styles.previewTimeText}>{draft.durationSeconds} ث</Text></View>
                 </View>
 
                 <View style={styles.previewBottomContent}>
-                  <Box gap={1}>
-                    <Text role="titleSm" style={{ color: '#fff', fontWeight: '900' }}>{draft.title || 'عنوان الفيديو يظهر هنا'}</Text>
-                    <Text role="caption" style={{ color: '#fff', opacity: 0.9 }}>{draft.subtitle || 'وصف الفيديو يظهر هنا بشكل مختصر وجذاب'}</Text>
+                  <Box gap={1} layoutDirection={isRtl ? 'row-reverse' : 'row'}>
+                    <Text role="titleSm" style={{ color: '#fff', fontWeight: '900', textAlign: isRtl ? 'right' : 'left' }}>{draft.title || 'عنوان الفيديو يظهر هنا'}</Text>
+                    <Text role="caption" style={{ color: '#fff', opacity: 0.9, textAlign: isRtl ? 'right' : 'left' }}>{draft.subtitle || 'وصف الفيديو يظهر هنا بشكل مختصر وجذاب'}</Text>
                   </Box>
-                  <View style={styles.previewCta}>
+                  <View style={[styles.previewCta, isRtl && styles.rowReverse, isRtl && { alignSelf: 'flex-end' }]}>
                     <Text style={styles.previewCtaText}>{draft.ctaLabel}</Text>
-                    <Text style={{ color: '#0A2F5C', fontSize: 12 }}>←</Text>
+                    <Text style={{ color: '#0A2F5C', fontSize: 12 }}>{isRtl ? '←' : '→'}</Text>
                   </View>
                 </View>
               </View>
 
               <View style={styles.previewControls}>
                 <View style={styles.previewProgress} />
-                <View style={{ flexDirection: 'row', gap: 6 }}>
+                <View style={[styles.headerRow, isRtl && styles.rowReverse, { gap: 6, justifyContent: 'flex-start' }]}>
                   <View style={styles.previewIndicator} />
                   <View style={[styles.previewIndicator, { opacity: 0.3 }]} />
                   <View style={[styles.previewIndicator, { opacity: 0.3 }]} />
                 </View>
               </View>
             </View>
-
-            <Box gap={1} align="center">
-              <Text role="caption" style={{ color: '#fff', opacity: 0.6, fontSize: 10 }}>الوجهة: {TARGET_TYPE_OPTIONS.find(o => o.value === draft.targetType)?.label} · {draft.targetId}</Text>
-            </Box>
-          </Surface>
-        </View>
+            <Text role="caption" style={{ color: '#94A3B8', marginTop: 12, textAlign: 'center' }}>{TARGET_TYPE_OPTIONS.find(o => o.value === draft.targetType)?.label} · {draft.targetId}</Text>
+          </View>
+        </Surface>
       </View>
-    </Box>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: { flex: 1, display: 'flex', flexDirection: 'column', gap: 16, height: '100%' },
+  rootRtl: { direction: 'rtl' },
+  headerSurface: { borderRadius: 12, padding: 16, borderWidth: 1, borderColor: 'rgba(10,47,92,0.05)', flexShrink: 0 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   rowReverse: { flexDirection: 'row-reverse' },
-  kpiGrid: { flexDirection: 'row', gap: 12, flexWrap: 'wrap' },
-  kpiCard: { minWidth: 130, flexGrow: 1, borderRadius: 16, padding: 16, gap: 6, borderWidth: 1, borderColor: 'rgba(0,0,0,0.03)' },
-  columnsWrap: { flexDirection: 'row', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' },
-  column: { flex: 1, minWidth: 380, gap: 20 },
-  listCard: { borderRadius: 16, borderWidth: 1, borderColor: '#F1F5F9', backgroundColor: '#fff', padding: 12, gap: 10, transition: 'all 0.2s' },
-  listCardSelected: { borderColor: '#0A2F5C', backgroundColor: '#F8FAFC', shadowColor: '#0A2F5C', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 10, elevation: 2 },
-  statusPill: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
-  actionsRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
-  metaBadge: { backgroundColor: '#F1F5F9', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  metaBadgeText: { fontSize: 10, fontWeight: '800', color: '#64748B' },
+  kpiRow: { flexDirection: 'row', gap: 12 },
+  kpiPill: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, flexDirection: 'row', alignItems: 'center', gap: 8 },
 
-  previewFrame: {
-    height: 480,
-    width: '100%',
-    backgroundColor: '#000',
-    borderRadius: 24,
-    overflow: 'hidden',
-    position: 'relative',
-    borderWidth: 8,
-    borderColor: '#1E293B'
-  },
+  workspace: { flex: 1, flexDirection: 'row', gap: 16, overflow: 'hidden' },
+
+  listPanel: { flex: 1, maxWidth: 300, borderRadius: 12, display: 'flex', flexDirection: 'column' },
+  panelHeader: { padding: 16, borderBottomWidth: 1, borderBottomColor: '#F1F5F9', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  listScroll: { flex: 1 },
+  listContent: { padding: 12, gap: 8 },
+
+  compactRow: { flexDirection: 'row', gap: 12, padding: 8, borderRadius: 8, backgroundColor: '#fff', borderWidth: 1, borderColor: '#F1F5F9' },
+  compactRowSelected: { borderColor: '#0A2F5C', backgroundColor: '#F8FAFC' },
+  compactPoster: { width: 40, height: 60, borderRadius: 6, backgroundColor: '#000', overflow: 'hidden' },
+  compactImage: { width: '100%', height: '100%', opacity: 0.8 },
+  statusBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+
+  editorPanel: { flex: 2, borderRadius: 12, display: 'flex', flexDirection: 'column' },
+  editorScroll: { flex: 1 },
+  editorContent: { padding: 16 },
+  editorFooter: { padding: 16, borderTopWidth: 1, borderTopColor: '#F1F5F9', flexDirection: 'row', gap: 12, backgroundColor: '#fff', borderBottomLeftRadius: 12, borderBottomRightRadius: 12, justifyContent: 'flex-start' },
+
+  previewPanel: { flex: 1.5, borderRadius: 12, backgroundColor: '#0A2F5C', display: 'flex', flexDirection: 'column' },
+  previewFrame: { width: 260, height: 460, backgroundColor: '#000', borderRadius: 24, overflow: 'hidden', position: 'relative', borderWidth: 6, borderColor: '#1E293B' },
   previewImage: { width: '100%', height: '100%', opacity: 0.8 },
-  previewOverlay: { position: 'absolute', inset: 0, padding: 24, justifyContent: 'space-between' },
+  previewOverlay: { position: 'absolute', inset: 0, padding: 20, justifyContent: 'space-between' },
   previewTopBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  previewBadge: { backgroundColor: '#FF500D', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-  previewBadgeText: { color: '#fff', fontSize: 11, fontWeight: '900' },
-  previewTime: { backgroundColor: 'rgba(0,0,0,0.5)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
-  previewTimeText: { color: '#fff', fontSize: 10, fontWeight: '700' },
-  previewBottomContent: { gap: 16 },
-  previewCta: { backgroundColor: '#fff', alignSelf: 'flex-start', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  previewCtaText: { color: '#0A2F5C', fontWeight: '900', fontSize: 14 },
-  previewControls: { position: 'absolute', bottom: 12, left: 24, right: 24, gap: 12 },
-  previewProgress: { height: 3, backgroundColor: '#fff', borderRadius: 2, width: '40%' },
-  previewIndicator: { width: 40, height: 2, backgroundColor: '#fff', borderRadius: 1 },
+  previewBadge: { backgroundColor: '#FF500D', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  previewBadgeText: { color: '#fff', fontSize: 10, fontWeight: '900' },
+  previewTime: { backgroundColor: 'rgba(0,0,0,0.5)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
+  previewTimeText: { color: '#fff', fontSize: 9, fontWeight: '700' },
+  previewBottomContent: { gap: 12, display: 'flex', flexDirection: 'column' },
+  previewCta: { backgroundColor: '#fff', alignSelf: 'flex-start', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  previewCtaText: { color: '#0A2F5C', fontWeight: '900', fontSize: 12 },
+  previewControls: { position: 'absolute', bottom: 12, left: 20, right: 20, gap: 8 },
+  previewProgress: { height: 2, backgroundColor: '#fff', borderRadius: 1, width: '40%' },
+  previewIndicator: { width: 30, height: 2, backgroundColor: '#fff', borderRadius: 1 },
 });
 
 export default VideosCommandDeckScreen;
