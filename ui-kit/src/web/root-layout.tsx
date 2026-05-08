@@ -95,15 +95,20 @@ export function WebDocumentShell({
   lang?: string;
   dir?: 'ltr' | 'rtl';
 }) {
+  const themeStyles = buildWebThemeStyleSheet('[data-ui-root="true"], [data-bth-root="true"]');
+  const combinedCss = `${webRootBodyCss}\n${themeStyles}`;
+
+  // NOTE: We use dangerouslySetInnerHTML on the head tag to include the bootstrap script
+  // and initial styles. This bypasses React 19's strict check for <script> tags inside
+  // components while ensuring the script runs synchronously before the first paint.
+  const headHtml = `
+    <script id="language-bootstrap">${buildStoredLanguageBootstrapScript()}</script>
+    <style id="ui-kit-theme-root">${combinedCss}</style>
+  `.trim();
+
   return (
     <html suppressHydrationWarning lang={lang} dir={dir}>
-      <head>
-        <script
-          id="language-bootstrap"
-          dangerouslySetInnerHTML={{ __html: buildStoredLanguageBootstrapScript() }}
-        />
-        <WebThemeStyle />
-      </head>
+      <head suppressHydrationWarning dangerouslySetInnerHTML={{ __html: headHtml }} />
       {children}
     </html>
   );

@@ -2,17 +2,17 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Box, Text, colorPalette } from '@bthwani/ui-kit';
-import type { MarketingGrowthRecord } from '../shared/growth-store';
+import type { MarketingVideoRecord } from '../shared/video-store';
 
 declare const process: { env: { EXPO_PUBLIC_MEDIA_BASE_URL?: string } };
 
 export type DshHomeApprovedVideoReelsViewerProps = {
   visible: boolean;
-  items: MarketingGrowthRecord[];
+  items: MarketingVideoRecord[];
   initialIndex?: number;
   onClose: () => void;
-  onCtaPress: (item: MarketingGrowthRecord) => void;
-  onItemImpression?: (item: MarketingGrowthRecord) => void;
+  onCtaPress: (item: MarketingVideoRecord) => void;
+  onItemImpression?: (item: MarketingVideoRecord) => void;
 };
 
 function resolveMediaUri(uri?: string) {
@@ -74,7 +74,7 @@ export function DshHomeApprovedVideoReelsViewer({
 }: DshHomeApprovedVideoReelsViewerProps) {
   const { height } = useWindowDimensions();
   const safeIndex = clampIndex(initialIndex, items.length);
-  const listRef = React.useRef<FlatList<MarketingGrowthRecord>>(null);
+  const listRef = React.useRef<FlatList<MarketingVideoRecord>>(null);
   const impressedIdsRef = React.useRef<Set<string>>(new Set());
   const onItemImpressionRef = React.useRef(onItemImpression);
   const [activeIndex, setActiveIndex] = React.useState(safeIndex);
@@ -107,7 +107,7 @@ export function DshHomeApprovedVideoReelsViewer({
 
   const viewabilityConfig = React.useMemo(() => ({ itemVisiblePercentThreshold: 80 }), []);
 
-  const handleViewableItemsChanged = React.useRef(({ viewableItems }: { viewableItems: Array<{ index: number | null; item?: MarketingGrowthRecord }> }) => {
+  const handleViewableItemsChanged = React.useRef(({ viewableItems }: { viewableItems: Array<{ index: number | null; item?: MarketingVideoRecord }> }) => {
     const nextIndex = viewableItems[0]?.index;
     const nextItem = viewableItems[0]?.item;
 
@@ -374,4 +374,3 @@ const styles = StyleSheet.create({
 });
 
 export default DshHomeApprovedVideoReelsViewer;
-

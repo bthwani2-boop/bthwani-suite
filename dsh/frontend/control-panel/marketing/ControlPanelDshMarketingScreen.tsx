@@ -8,6 +8,8 @@ import {
 } from './SmartSignalLayerScreen';
 import { BannersCommandDeckScreen } from './BannersCommandDeckScreen';
 import { GrowthCommandDeckScreen } from './GrowthCommandDeckScreen';
+import { VideosCommandDeckScreen } from './VideosCommandDeckScreen';
+import { LoyaltyCommandDeckScreen } from './LoyaltyCommandDeckScreen';
 import { PromosCommandDeckScreen } from './PromosCommandDeckScreen';
 import styles from '../operations/dsh-surface.module.css';
 import {
@@ -40,7 +42,7 @@ import { dshPromotionCandidates } from '../../shared/workflow';
 
 export type ControlPanelDshMarketingScreenProps = SmartSignalLayerScreenProps;
 
-type MarketingControlView = 'ticker' | 'banners' | 'promos' | 'growth' | 'partners' | 'signals' | 'loyalty';
+type MarketingControlView = 'ticker' | 'banners' | 'promos' | 'video' | 'growth' | 'partners' | 'signals' | 'loyalty';
 
 export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingScreenProps) {
   const [activeTab, setActiveTab] = React.useState<MarketingControlView>('banners');
@@ -72,9 +74,10 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
     { id: 'ticker', label: 'الشريط الذكي', icon: '📢' },
     { id: 'banners', label: 'البنرات والكارسول', icon: '🖼️' },
     { id: 'promos', label: 'بروموهات Home', icon: '📱' },
-    { id: 'growth', label: 'الفيديو والنمو', icon: '⚡' },
+    { id: 'video', label: 'استوديو الفيديو', icon: '🎬' },
+    { id: 'growth', label: 'النمو والحملات', icon: '⚡' },
     { id: 'partners', label: 'عروض الشركاء', icon: '🤝' },
-    { id: 'loyalty', label: 'الولاء الذكي', icon: '💎' },
+    { id: 'loyalty', label: 'الولاء والاشتراكات', icon: '💎' },
     { id: 'signals', label: 'الإشارات والقياس', icon: '📊' },
   ] as const;
 
@@ -82,9 +85,9 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
     ticker: [],
     banners: [],
     promos: [],
+    video: [],
     growth: [
       { id: 'programs', label: 'البرامج' },
-      { id: 'video', label: 'الفيديو' },
       { id: 'campaigns', label: 'الحملات' },
     ],
     partners: [
@@ -100,9 +103,9 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       { id: 'health', label: 'الصحة' },
     ],
     loyalty: [
-      { id: 'programs', label: 'البرامج' },
-      { id: 'tiers', label: 'المستويات' },
-      { id: 'rewards', label: 'المكافآت' },
+      { id: 'overview', label: 'نظرة عامة' },
+      { id: 'builder', label: 'المصمم' },
+      { id: 'sync', label: 'المزامنة' },
     ],
   };
 
@@ -462,6 +465,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
         return <BannersCommandDeckScreen activeSubTab={activeSubTab} hubHref={props.hubHref} operationsHref={props.operationsHref} />;
       case 'promos':
         return <PromosCommandDeckScreen />;
+      case 'video':
+        return <VideosCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
       case 'growth':
         return <GrowthCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
       case 'signals':
@@ -534,20 +539,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
         );
       }
       case 'loyalty':
-        return (
-          <Box padding={10} alignItems="center" justifyContent="center" style={{ backgroundColor: '#fff', borderRadius: 12, border: '1px dashed rgba(10,47,92,0.1)', minHeight: '300px' }}>
-            <Box gap={2} alignItems="center">
-              <span style={{ fontSize: '40px' }}>💎</span>
-              <h2 style={{ color: '#0A2F5C', fontSize: '20px', fontWeight: '800' }}>نظام الولاء الذكي</h2>
-              <p style={{ color: '#64748B', fontSize: '14px', textAlign: 'center', maxWidth: '400px' }}>
-                سيتم دمج نظام المكافآت والمستويات للعملاء هنا لمنح الشركاء القدرة على بناء ولاء طويل المدى.
-              </p>
-              <div style={{ padding: '8px 16px', backgroundColor: '#F1F5F9', borderRadius: '8px', color: '#0A2F5C', fontWeight: '700', fontSize: '12px', marginTop: '10px' }}>
-                مخطط للمرحلة القادمة
-              </div>
-            </Box>
-          </Box>
-        );
+        return <LoyaltyCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
       default:
         return null;
     }
@@ -576,7 +568,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
               <h1 style={{ letterSpacing: '-0.02em', fontSize: '20px', fontWeight: '900', color: '#0A2F5C' }}>تسويق DSH</h1>
               <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>NEEDS_BACKEND_BINDING</span>
             </div>
-            <p style={{ fontWeight: 600, color: '#64748B', fontSize: '11px' }}>إدارة الشريط الذكي، البنرات، النمو، وعروض الشركاء.</p>
+            <p style={{ fontWeight: 600, color: '#64748B', fontSize: '11px' }}>إدارة الشريط الذكي، البنرات، استوديو الفيديو، النمو، والولاء.</p>
           </Box>
         </div>
 

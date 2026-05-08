@@ -36,6 +36,7 @@ import {
 import { getDshCategoryIconUrl } from './getDshCategoryIconUrl';
 import { resolveDshImageSource } from './resolve-image-source';
 import type { MarketingGrowthRecord } from '../shared/growth-store';
+import type { MarketingVideoRecord } from '../shared/video-store';
 import { getMarketingTickerItems, buildMarketingTickerPlan } from '../shared/news-ticker-store';
 import { getPublishedHomePromos, type HomePromoRecord } from '../shared/promo-store';
 
@@ -57,7 +58,7 @@ export type DshHomeGetScreenProps = {
   homePromos?: HomePromoRecord[];
   stores?: DshHomeGetStore[];
   recentOrders?: DshHomeRecentOrder[];
-  approvedVideoShorts?: MarketingGrowthRecord[];
+  approvedVideoShorts?: MarketingVideoRecord[];
   onBack?: () => void;
   onOpenEntry?: () => void;
   onOpenMySpace?: () => void;

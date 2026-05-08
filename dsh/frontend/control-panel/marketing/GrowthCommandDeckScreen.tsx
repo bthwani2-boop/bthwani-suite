@@ -43,8 +43,6 @@ type GrowthDraft = {
   highlight: string;
   metricValue: string;
   accentColor: string;
-  videoUrl: string;
-  posterUrl: string;
 };
 
 function createDraft(item?: MarketingGrowthRecord | null): GrowthDraft {
@@ -63,15 +61,11 @@ function createDraft(item?: MarketingGrowthRecord | null): GrowthDraft {
     highlight: item?.highlight ?? '',
     metricValue: item?.metricValue ?? '',
     accentColor: item?.accentColor ?? '#f97316',
-    videoUrl: item?.videoUrl ?? '',
-    posterUrl: item?.posterUrl ?? '',
   };
 }
 
 function familyLabel(family: MarketingGrowthFamily) {
-  if (family === 'subscription') return 'اشتراك';
   if (family === 'promotion') return 'برومو';
-  if (family === 'shorts') return 'شورتات';
   return 'حملة';
 }
 
@@ -100,11 +94,8 @@ function routeTargetLabel(target: MarketingGrowthRouteTarget) {
   if (target === 'store') return 'متجر';
   if (target === 'store_category') return 'متجر + فئة';
   if (target === 'product') return 'منتج';
-  if (target === 'subscription') return 'اشتراك';
   if (target === 'search') return 'بحث';
   if (target === 'promo-apply') return 'تطبيق العروض';
-  if (target === 'subscription-family-get') return 'إدارة الاشتراك';
-  if (target === 'entitlements-get') return 'الاستحقاقات والمزايا';
   return 'الرئيسية';
 }
 
@@ -157,7 +148,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
 
   const kpis = React.useMemo(() => getMarketingGrowthKpis(), [items]);
   const livePreview = React.useMemo(
-    () => getLiveMarketingGrowthItems('client').filter((item) => item.family === 'shorts').slice(0, 4),
+    () => getLiveMarketingGrowthItems('client').slice(0, 4),
     [items]
   );
 
@@ -219,8 +210,8 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
       <Surface tone="raised" gap={4} style={{ borderRadius: 24, borderWidth: 1, borderColor: 'rgba(10,47,92,0.05)', overflow: 'hidden' }}>
         <View style={[styles.headerRow, isRtl && styles.rowReverse, { padding: 4 }]}>
           <Box gap={1}>
-            <Text role="caption" style={{ color: '#8b5cf6', fontWeight: '800', letterSpacing: 0.5 }}>PREMIUM GROWTH INTELLIGENCE</Text>
-            <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900' }}>إدارة مسارات النمو والفيديو</Text>
+            <Text role="caption" style={{ color: '#0A2F5C', fontWeight: '800', letterSpacing: 0.5 }}>النمو الذكي</Text>
+            <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900' }}>إدارة مسارات النمو</Text>
           </Box>
           <Button label="+ برنامج جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={{ borderRadius: 12, paddingHorizontal: 24 }} />
         </View>
@@ -230,7 +221,6 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
             { label: 'إجمالي البرامج', value: kpis.total, gradient: ['#EFF6FF', '#DBEAFE'], color: '#1E40AF' },
             { label: 'حي الآن', value: kpis.live, gradient: ['#F0FDF4', '#DCFCE7'], color: '#166534' },
             { label: 'قيد المراجعة', value: kpis.pendingMarketing, gradient: ['#FFFBEB', '#FEF3C7'], color: '#92400E' },
-            { label: 'اشتراكات', value: kpis.subscriptions, gradient: ['#FEF2F2', '#FEE2E2'], color: '#991B1B' },
             { label: 'الظهور الكلي', value: kpis.impressions, gradient: ['#F5F3FF', '#EDE9FE'], color: '#5B21B6' },
             { label: 'النقرات', value: kpis.clicks, gradient: ['#F0FDFA', '#CCFBF1'], color: '#0F766E' },
           ].map((entry) => (
@@ -257,7 +247,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
                   <View key={item.id} style={[styles.previewCard, { backgroundColor: item.accentColor, borderRadius: 16 }]}>
                     <Box layoutDirection="row" justify="space-between">
                       <Text role="caption" style={styles.previewBadge}>{familyLabel(item.family)}</Text>
-                      <Text role="caption" style={{ color: '#fff', opacity: 0.8 }}>TRENDING 🔥</Text>
+                      <Text role="caption" style={{ color: '#fff', opacity: 0.8 }}>نشط الآن 🔥</Text>
                     </Box>
                     <Text role="titleSm" style={styles.previewTitle}>{item.title}</Text>
                     <Text role="caption" style={styles.previewMeta}>{item.ctaLabel} ⇠ {routeTargetLabel(item.routeTarget)}</Text>
@@ -269,7 +259,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
 
           <Surface tone="raised" gap={3}>
             <View style={[styles.headerRow, isRtl && styles.rowReverse]}>
-              <Text role="titleSm">برامج التسويق الحية</Text>
+              <Text role="titleSm">برامج النمو الحية</Text>
               <Text role="caption" tone="muted">{items.length} عنصر</Text>
             </View>
 
@@ -282,7 +272,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
                       <View style={styles.listTextWrap}>
                         <Box layoutDirection="row" align="center" gap={2}>
                           <Text role="titleSm">{item.title}</Text>
-                          <Text role="caption" style={{ color: '#16A34A', fontWeight: '800' }}>98% CONFIDENCE</Text>
+                          <Text role="caption" style={{ color: '#16A34A', fontWeight: '800' }}>عالي التأثير</Text>
                         </Box>
                         <Text role="caption" tone="muted">
                           {familyLabel(item.family)} · {routeTargetLabel(item.routeTarget)} · {item.impressions} Views
@@ -344,8 +334,6 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
               items={[
                 { value: 'campaign', label: 'حملة' },
                 { value: 'promotion', label: 'برومو' },
-                { value: 'subscription', label: 'اشتراك' },
-                { value: 'shorts', label: 'شورتات' },
               ]}
               value={draft.family}
               onValueChange={(value) => setDraft((current) => ({ ...current, family: value }))}
@@ -355,8 +343,8 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
             <Tabs<MarketingGrowthAudience>
               items={[
                 { value: 'client', label: 'العميل' },
-                { value: 'operations', label: 'العمليات' },
-                { value: 'all', label: 'الكل' },
+                { id: 'operations', label: 'العمليات' },
+                { id: 'all', label: 'الكل' },
               ]}
               value={draft.audience}
               onValueChange={(value) => setDraft((current) => ({ ...current, audience: value }))}
@@ -365,8 +353,6 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
 
             <TextField label="العنوان" value={draft.title} onChangeText={(value) => setDraft((current) => ({ ...current, title: value }))} />
             <TextField label="الوصف" value={draft.subtitle} onChangeText={(value) => setDraft((current) => ({ ...current, subtitle: value }))} />
-            <TextField label="رابط الفيديو" value={draft.videoUrl} onChangeText={(value) => setDraft((current) => ({ ...current, videoUrl: value }))} hint="مثال: /media/shorts/launch.mp4" />
-            <TextField label="صورة الغلاف" value={draft.posterUrl} onChangeText={(value) => setDraft((current) => ({ ...current, posterUrl: value }))} hint="مثال: /media/shorts/launch.jpg" />
 
             <Tabs<MarketingGrowthRouteTarget>
               items={[
@@ -376,7 +362,6 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
                 { value: 'store', label: 'متجر' },
                 { value: 'store_category', label: 'متجر + فئة' },
                 { value: 'product', label: 'منتج' },
-                { value: 'subscription', label: 'اشتراك' },
                 { value: 'search', label: 'بحث' },
               ]}
               value={draft.routeTarget}
@@ -384,9 +369,9 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
               variant="pill"
             />
 
-            <Surface tone="inset" gap={2} style={{ borderRightWidth: 4, borderRightColor: '#8b5cf6' }}>
-              <Text role="bodyStrong">Intelligence Routing</Text>
-              <Text role="caption" tone="muted">الربط الفني يتم معالجته بواسطة محرك الإشارات لضمان أعلى معدل تحويل.</Text>
+            <Surface tone="inset" gap={2} style={{ borderRightWidth: 4, borderRightColor: '#0A2F5C' }}>
+              <Text role="bodyStrong">توجيه ذكي</Text>
+              <Text role="caption" tone="muted">يتم معالجة المسار لضمان أفضل تجربة للمستخدم.</Text>
             </Surface>
 
             {routeTargetNeedsPrimaryInput(draft.routeTarget) ? (
@@ -410,7 +395,7 @@ export function GrowthCommandDeckScreen(_: GrowthCommandDeckScreenProps) {
             <TextField label="نص الزر" value={draft.ctaLabel} onChangeText={(value) => setDraft((current) => ({ ...current, ctaLabel: value }))} />
             <TextField label="الجملة البارزة" value={draft.highlight} onChangeText={(value) => setDraft((current) => ({ ...current, highlight: value }))} />
             <TextField label="المؤشر التجاري" value={draft.metricValue} onChangeText={(value) => setDraft((current) => ({ ...current, metricValue: value }))} />
-            <TextField label="لون التمييز" value={draft.accentColor} onChangeText={(value) => setDraft((current) => ({ ...current, accentColor: value }))} hint="مثال: #8b5cf6" />
+            <TextField label="لون التمييز" value={draft.accentColor} onChangeText={(value) => setDraft((current) => ({ ...current, accentColor: value }))} hint="مثال: #0A2F5C" />
 
             <View style={[styles.actionsRow, isRtl && styles.rowReverse]}>
               <Button label="حفظ البرنامج" fullWidth={false} onPress={handleSave} />
