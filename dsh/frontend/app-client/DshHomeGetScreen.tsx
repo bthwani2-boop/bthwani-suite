@@ -416,13 +416,13 @@ function CategorySelectorItem({
           styles.categoryIconContainer,
           isHub && styles.categoryHubIconContainer,
           isVideo && styles.videoIconContainer,
-          isSelected && { backgroundColor: theme.brand },
+          isSelected && styles.categoryIconContainerSelected,
         ]}
       >
         {icon}
       </View>
-      <View style={[styles.categoryNameContainer, isSelected && styles.categoryNameContainerSelected]}>
-        <Text role="bodySm" style={[styles.categoryName, isSelected && { color: theme.textInverse }]} numberOfLines={1}>
+      <View style={[styles.categoryNameContainer]}>
+        <Text role="bodySm" style={[styles.categoryName, isSelected && { color: theme.brand }]} numberOfLines={1}>
           {label}
         </Text>
       </View>
@@ -453,8 +453,8 @@ function FilterChipItem({
       style={[
         styles.filterChip,
         {
-          backgroundColor: isActive ? theme.brand : theme.surfaceRaised,
-          borderColor: isActive ? theme.brand : 'transparent',
+          backgroundColor: isActive ? theme.brand : 'transparent',
+          borderColor: isActive ? theme.brand : theme.line,
         },
       ]}
       onPress={onPress}
@@ -1424,7 +1424,7 @@ return (
           </View>
         ) : null}
 
-        <View style={styles.homeHighlightsPanel}>
+        <Box gap={0}>
           <View style={styles.categoriesSelectorSection}>
             <View style={styles.categoriesSelectorRow}>
               <View style={styles.fixedIconsContainer}>
@@ -1609,7 +1609,7 @@ return (
                 ))}
             </ScrollView>
           </View>
-        </View>
+        </Box>
 
         <View style={styles.storeListViewport}>
           <View style={styles.storeListContent}>
@@ -1949,22 +1949,8 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       justifyContent: 'center',
       alignItems: 'center',
     },
-    homeHighlightsPanel: {
-      marginTop: spacing[0],
-      marginBottom: spacing[2],
-      padding: spacing[3],
-      borderRadius: 28,
-      backgroundColor: theme.surface,
-      borderWidth: 1,
-      borderColor: theme.line,
-      shadowColor: colorPalette.black,
-      shadowOpacity: 0.06,
-      shadowRadius: 16,
-      shadowOffset: { width: 0, height: 4 },
-      elevation: 4,
-    },
     categoriesSelectorSection: {
-      marginBottom: spacing[1],
+      marginBottom: spacing[1], // Reduced from spacing[2]
     },
     categoriesSelectorRow: {
       flexDirection: rowDirection,
@@ -1982,14 +1968,9 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       gap: 4,
     },
     videoIconContainer: {
-      width: 56,
-      height: 56,
-      borderRadius: 16,
-      backgroundColor: theme.brandSurface,
-      borderWidth: 1.5,
-      borderColor: colorPalette.brand,
-      justifyContent: 'center',
-      alignItems: 'center',
+      backgroundColor: theme.surfaceRaised,
+      borderWidth: 1,
+      borderColor: theme.line,
     },
     categoryNameContainer: {
       alignItems: 'center',
@@ -2002,42 +1983,43 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       textAlign: 'center',
     },
     categoryIconContainer: {
-      width: 56,
-      height: 56,
-      borderRadius: 16,
-      backgroundColor: theme.surfaceInset,
+      width: 54,
+      height: 54,
+      borderRadius: 18,
+      backgroundColor: theme.surfaceRaised,
       alignItems: 'center',
       justifyContent: 'center',
       overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: theme.line,
+    },
+    categoryIconContainerSelected: {
+      backgroundColor: theme.brandSurface,
+      borderColor: theme.brand,
+      borderWidth: 1.5,
     },
     categoryHubIconContainer: {
-      backgroundColor: theme.brandSurface,
+      backgroundColor: theme.surfaceRaised,
       borderWidth: 1,
-      borderColor: colorPalette.brandStrong,
+      borderColor: theme.line,
     },
     categoryIconImage: {
       width: 32,
       height: 32,
     },
     categoryNameContainerSelected: {
-      backgroundColor: theme.brand,
-      borderRadius: 6,
-      paddingHorizontal: 6,
-      paddingVertical: 2,
+      paddingHorizontal: 0,
+      paddingVertical: 0,
     },
     heroPromoCard: {
       flex: 1.2,
-      height: 70, // Further reduced height
-      borderRadius: 12,
+      height: 78, // Adjusted to match launchers total height
+      borderRadius: 18, // Harmonized radius
       backgroundColor: colorPalette.white,
       borderWidth: 1,
-      borderColor: 'rgba(10, 47, 92, 0.12)',
+      borderColor: theme.line,
       paddingHorizontal: 12,
       justifyContent: 'center',
-      shadowColor: colorPalette.black,
-      shadowOpacity: 0.05,
-      shadowRadius: 4,
-      elevation: 2,
       marginRight: 8,
       overflow: 'hidden',
     },
@@ -2147,7 +2129,8 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       flexDirection: rowDirection,
       alignItems: 'center',
       gap: spacing[2],
-      paddingVertical: spacing[2],
+      paddingTop: 0, // Removed top padding
+      paddingBottom: spacing[2], // Reduced from spacing[3]
     },
     filtersRowScroll: {
       flex: 1,
@@ -2158,8 +2141,8 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       gap: spacing[2],
     },
     filterChip: {
-      height: 36,
-      borderRadius: 18,
+      height: 32,
+      borderRadius: 16,
       paddingHorizontal: 12,
       flexDirection: rowDirection,
       alignItems: 'center',
@@ -2190,7 +2173,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       fontWeight: '800',
     },
     storeListViewport: {
-      marginTop: spacing[1],
+      marginTop: 0, // Removed top margin for direct transition
       flex: 1,
     },
     storeListContent: {
