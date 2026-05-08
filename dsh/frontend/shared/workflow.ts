@@ -349,9 +349,13 @@ export function canRenderInClientSurface(
   if (isLegacyPublishedPreview(stage)) return true;
 
   // Exception for product-media: allows viewing before client-visible IF a valid exception policy is set.
-  if (entityType === 'product-media' || entityType === 'banner' || entityType === 'promo') {
+  // Hardened Phase R4: limited to product-media only, and only if marketing-approved or partner-approved.
+  if (entityType === 'product-media') {
     const policy = options?.mediaPolicy;
-    if (policy === 'partner-owned-exception' || policy === 'restaurant-exception') {
+    const isAllowedPolicy = policy === 'partner-owned-exception' || policy === 'restaurant-exception';
+    const isAllowedStage = stage === 'marketing-approved' || stage === 'partner-approved';
+
+    if (isAllowedPolicy && isAllowedStage) {
       return true;
     }
   }
