@@ -167,7 +167,22 @@ export function ControlPanelDshCatalogScreen({
 
   const { filteredProducts, counts, filterOptions } = useMemo(() => {
     console.log('[CatalogScreen] Recalculating filters...', { searchQuery, activeFilter, activeMainCategory: activeMainCategory?.id });
-    let filtered = isManualOrderCategory ? [] : dshCatalogProducts.filter(p => {
+
+    // 1. Base set: filter by Category and Manual Order mode
+    if (isManualOrderCategory) {
+      return {
+        filteredProducts: [] as CatalogProductMaster[],
+        counts: {
+          'all': 0, 'master': 0, 'partner-exception': 0, 'partner-review': 0, 'marketing-review': 0, 'price-conflict': 0, 'non-matching': 0, 'category-proposals': 0
+        },
+        filterOptions: {
+          name: [], category: [], classification: [], sku: [], price: [], policy: [], status: [], source: [], categoryMode: []
+        }
+      };
+    }
+
+    // 2. Initial filter by category and search
+    let products = dshCatalogProducts.filter(p => {
       if (activeMainCategory && p.categoryPath.main !== activeMainCategory.id) return false;
       if (activeSubCategory && p.categoryPath.sub !== activeSubCategory.id) return false;
 
@@ -178,19 +193,29 @@ export function ControlPanelDshCatalogScreen({
         (p.gtin && p.gtin.includes(searchLower)) ||
         (p.barcode && p.barcode.includes(searchLower));
 
-      if (!matchesSearch) return false;
-
-      if (activeFilter === 'master') return p.mediaPolicy === 'catalog-owned-media';
-      if (activeFilter === 'partner-exception') return p.mediaPolicy === 'partner-owned-exception';
-      if (activeFilter === 'partner-review') return p.approvalStage === 'partner-review';
-      if (activeFilter === 'marketing-review') return p.approvalStage === 'marketing-review';
-      if (activeFilter === 'price-conflict') return !!p.conflictReason;
-      if (activeFilter === 'non-matching') return false;
-      if (activeFilter === 'category-proposals') return false;
-
-      return true;
+      return matchesSearch;
     });
 
+    // 3. Dynamic counts for quick filters (based on current category/search)
+    const dynamicCounts = {
+      'all': products.length,
+      'master': products.filter(p => p.mediaPolicy === 'catalog-owned-media').length,
+      'partner-exception': products.filter(p => p.mediaPolicy === 'partner-owned-exception').length,
+      'partner-review': products.filter(p => p.approvalStage === 'partner-review').length,
+      'marketing-review': products.filter(p => p.approvalStage === 'marketing-review').length,
+      'price-conflict': products.filter(p => !!p.conflictReason).length,
+      'non-matching': 0,
+      'category-proposals': 5
+    };
+
+    // 4. Apply Active Quick Filter
+    if (activeFilter === 'master') products = products.filter(p => p.mediaPolicy === 'catalog-owned-media');
+    else if (activeFilter === 'partner-exception') products = products.filter(p => p.mediaPolicy === 'partner-owned-exception');
+    else if (activeFilter === 'partner-review') products = products.filter(p => p.approvalStage === 'partner-review');
+    else if (activeFilter === 'marketing-review') products = products.filter(p => p.approvalStage === 'marketing-review');
+    else if (activeFilter === 'price-conflict') products = products.filter(p => !!p.conflictReason);
+
+    // 5. Apply Column Filters
     const getCatName = (id: string) => dshCatalogCategories.find(c => c.id === id)?.label || 'غير معروف';
     const getClassifName = (p: CatalogProductMaster) => {
        if(!p.categoryPath.mainClassification) return 'عام';
@@ -200,39 +225,29 @@ export function ControlPanelDshCatalogScreen({
        return classif?.label || p.categoryPath.mainClassification;
     };
 
+    if (colFilters.name.length > 0) products = products.filter(p => colFilters.name.includes(p.name));
+    if (colFilters.category.length > 0) products = products.filter(p => colFilters.category.includes(getCatName(p.categoryPath.main)));
+    if (colFilters.classification.length > 0) products = products.filter(p => colFilters.classification.includes(getClassifName(p)));
+    if (colFilters.sku.length > 0) products = products.filter(p => colFilters.sku.includes(p.sku));
+    if (colFilters.price.length > 0) products = products.filter(p => colFilters.price.includes(p.price.toString()));
+    if (colFilters.policy.length > 0) products = products.filter(p => colFilters.policy.includes(p.mediaPolicy));
+    if (colFilters.status.length > 0) products = products.filter(p => colFilters.status.includes(p.conflictReason ? 'تعارض' : p.approvalStage === 'client-visible' ? 'نشط' : 'مراجعة'));
+    if (colFilters.source.length > 0) products = products.filter(p => colFilters.source.includes(p.sourceSurface || 'catalog'));
+
+    // 6. Generate options for column filters from the CURRENT product set
     const filterOptions = {
-       name: Array.from(new Set(filtered.map(p => p.name))),
-       category: Array.from(new Set(filtered.map(p => getCatName(p.categoryPath.main)))),
-       classification: Array.from(new Set(filtered.map(p => getClassifName(p)))),
-       sku: Array.from(new Set(filtered.map(p => p.sku))),
-       price: Array.from(new Set(filtered.map(p => p.price.toString()))),
-       policy: Array.from(new Set(filtered.map(p => p.mediaPolicy))),
-       status: Array.from(new Set(filtered.map(p => p.conflictReason ? 'تعارض' : p.approvalStage === 'client-visible' ? 'نشط' : 'مراجعة'))),
-       source: Array.from(new Set(filtered.map(p => p.sourceSurface || 'catalog'))),
+       name: Array.from(new Set(products.map(p => p.name))),
+       category: Array.from(new Set(products.map(p => getCatName(p.categoryPath.main)))),
+       classification: Array.from(new Set(products.map(p => getClassifName(p)))),
+       sku: Array.from(new Set(products.map(p => p.sku))),
+       price: Array.from(new Set(products.map(p => p.price.toString()))),
+       policy: Array.from(new Set(products.map(p => p.mediaPolicy))),
+       status: Array.from(new Set(products.map(p => p.conflictReason ? 'تعارض' : p.approvalStage === 'client-visible' ? 'نشط' : 'مراجعة'))),
+       source: Array.from(new Set(products.map(p => p.sourceSurface || 'catalog'))),
        categoryMode: ['catalog-based', 'manual-order']
     };
 
-    if (colFilters.name.length > 0) filtered = filtered.filter(p => colFilters.name.includes(p.name));
-    if (colFilters.category.length > 0) filtered = filtered.filter(p => colFilters.category.includes(getCatName(p.categoryPath.main)));
-    if (colFilters.classification.length > 0) filtered = filtered.filter(p => colFilters.classification.includes(getClassifName(p)));
-    if (colFilters.sku.length > 0) filtered = filtered.filter(p => colFilters.sku.includes(p.sku));
-    if (colFilters.price.length > 0) filtered = filtered.filter(p => colFilters.price.includes(p.price.toString()));
-    if (colFilters.policy.length > 0) filtered = filtered.filter(p => colFilters.policy.includes(p.mediaPolicy));
-    if (colFilters.status.length > 0) filtered = filtered.filter(p => colFilters.status.includes(p.conflictReason ? 'تعارض' : p.approvalStage === 'client-visible' ? 'نشط' : 'مراجعة'));
-    if (colFilters.source.length > 0) filtered = filtered.filter(p => colFilters.source.includes(p.sourceSurface || 'catalog'));
-
-    const counts = {
-      'all': dshCatalogProducts.length,
-      'master': dshCatalogProducts.filter(p => p.mediaPolicy === 'catalog-owned-media').length,
-      'partner-exception': dshCatalogProducts.filter(p => p.mediaPolicy === 'partner-owned-exception').length,
-      'partner-review': dshCatalogProducts.filter(p => p.approvalStage === 'partner-review').length,
-      'marketing-review': dshCatalogProducts.filter(p => p.approvalStage === 'marketing-review').length,
-      'price-conflict': dshCatalogProducts.filter(p => !!p.conflictReason).length,
-      'non-matching': 0,
-      'category-proposals': 5
-    };
-
-    return { filteredProducts: filtered, filterOptions, counts: counts };
+    return { filteredProducts: products, counts: dynamicCounts, filterOptions };
   }, [isManualOrderCategory, activeMainCategory, activeSubCategory, searchQuery, activeFilter, colFilters]);
 
   // Handle click outside to close dropdowns
@@ -328,8 +343,9 @@ export function ControlPanelDshCatalogScreen({
               const labels: Record<FilterType, string> = {
                 all: 'الكل', 'master': 'مركزية', 'partner-exception': 'استثناء صورة', 'partner-review': 'مراجعة شريك', 'marketing-review': 'مراجعة تسويق', 'price-conflict': 'تعارض سعر', 'non-matching': 'غير مطابق', 'category-proposals': 'مقترحات فئات'
               };
+              const count = (counts as any)[f] || 0;
               return (
-                <Chip key={f} label={`${labels[f]}`} tone={activeFilter === f ? 'brand' : 'default'} onPress={() => setActiveFilter(f)} />
+                <Chip key={f} label={`${labels[f]} (${count})`} tone={activeFilter === f ? 'brand' : 'default'} onPress={() => setActiveFilter(f)} />
               );
             })}
 

@@ -20,6 +20,10 @@ export function CatalogAdoptionQueue() {
   }, []);
 
   const handleAction = (id: string, action: 'adopt-central' | 'adopt-exception' | 'visible' | 'reject' | 'fix') => {
+    // Phase R2: Unified transition logic via shared store and helpers
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+
     switch (action) {
       case 'adopt-central':
         adoptCatalogCentral(id);
@@ -28,6 +32,7 @@ export function CatalogAdoptionQueue() {
         adoptCatalogException(id);
         break;
       case 'visible':
+        // Specifically using moveApprovalRecordToStage to match activateClientVisible
         activateClientVisible(id);
         break;
       case 'fix':
