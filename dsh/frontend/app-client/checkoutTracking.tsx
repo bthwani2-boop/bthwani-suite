@@ -1,6 +1,5 @@
 import React from 'react';
-import { Dimensions, Platform, Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Dimensions, Platform, Pressable } from 'react-native';
 import {
   Badge,
   Box,
@@ -81,7 +80,7 @@ type OrderChatAttachment = {
   selectedLabel: string;
   detail: string;
   tone: 'brand' | 'info' | 'warning';
-  iconName: React.ComponentProps<typeof Ionicons>['name'];
+  iconName: string;
 };
 
 type OrderChatMessage = {
@@ -232,7 +231,7 @@ function StageRail({ activeStepId, steps }: { activeStepId: string; steps: Journ
                 }}
               >
                 {isDone ? (
-                  <Ionicons name="checkmark-sharp" size={16} color={theme.brandContrast} />
+                  <Icon name="checkmark" size={16} tone="inverse" />
                 ) : (
                   <Text
                     role="bodyStrong"
@@ -349,7 +348,7 @@ function RatingStars({ value, disabled, onChange }: { value: number; disabled?: 
             }}
             style={{ padding: 2 }}
           >
-            <Ionicons name={isSelected ? 'star' : 'star-outline'} size={24} color={isSelected ? theme.warning : theme.textSoft} />
+            <Icon name={isSelected ? 'star' : 'star-outline'} size={24} color={isSelected ? theme.warning : theme.textSoft} />
           </Pressable>
         );
       })}
@@ -513,7 +512,7 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
                   tone={isSelected ? 'primary' : 'secondary'}
                   size="sm"
                   fullWidth={false}
-                  leadingAccessory={<Ionicons name={action.iconName} size={16} color={isSelected ? theme.brandContrast : theme.text} />}
+                  leadingAccessory={<Icon name={action.iconName.replace('-outline', '')} size={16} color={isSelected ? theme.brandContrast : theme.text} />}
                   onPress={() => toggleAttachment(action.kind)}
                   style={{ minWidth: 96 }}
                 />
@@ -1025,7 +1024,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       label: option.label,
       selected,
       disabled: phase === 'received',
-      icon: <Ionicons name={option.iconName} size={16} color={selected ? theme.brandContrast : theme.text} />,
+      icon: <Icon name={option.iconName.replace('-outline', '')} size={16} color={selected ? theme.brandContrast : theme.text} />,
       onPress: () => {
         if (phase === 'received') {
           return;
@@ -1232,9 +1231,9 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         {arrivalBellSummary ? (
           <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
-              <View style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: phase === 'route' ? theme.warningSurface : theme.brandSurface }}>
-                <Ionicons name="notifications-outline" size={20} color={phase === 'route' ? theme.warning : theme.brand} />
-              </View>
+              <Box style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: phase === 'route' ? theme.warningSurface : theme.brandSurface }}>
+                <Icon name="notifications" size={20} color={phase === 'route' ? theme.warning : theme.brand} />
+              </Box>
               <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
                 <Badge label="جرس الوصول" tone={phase === 'route' ? 'warning' : 'brand'} />
                 <Text role="bodyStrong" style={{ textAlign: 'right' }}>الجرس جزء من الطلب نفسه</Text>
@@ -1484,9 +1483,9 @@ function renderTracking(
                 style={{ borderRadius: 18, borderWidth: 1, borderColor, backgroundColor }}
               >
                 <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
-                  <View style={{ width: 28, alignItems: 'center' }}>
-                    <Ionicons name={iconName as any} size={18} color={isActive ? theme.brand : isDone ? theme.success : theme.textSoft} />
-                  </View>
+                  <Box style={{ width: 28, alignItems: 'center' }}>
+                    <Icon name={iconName === 'checkmark' ? 'checkmark' : 'ellipse'} size={18} color={isActive ? theme.brand : isDone ? theme.success : theme.textSoft} />
+                  </Box>
 
                   <Box gap={0} style={{ flex: 1 }}>
                     <Text role="bodyStrong" style={{ textAlign: 'right' }}>{step.title}</Text>

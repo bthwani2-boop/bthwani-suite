@@ -1,6 +1,5 @@
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Pressable, View, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
 import { Box, Icon, MobileScrollView, Surface, Text, TopBar, colorPalette, safeArea, spacing, useTheme } from '@bthwani/ui-kit';
 import { DshOperationScreen } from './DshOperationScreen';
 import { DshMySpaceCommercialScreen } from './DshMySpaceCommercialScreen';
@@ -26,18 +25,16 @@ export type DshMySpaceScreenProps = {
 
 type MySpacePrimaryTab = 'commercial' | 'orders';
 
-type SectionIconName = React.ComponentProps<typeof Ionicons>['name'];
-
 type PrimaryTabConfig = {
   id: MySpacePrimaryTab;
   label: string;
   summary: string;
-  iconName: SectionIconName;
+  iconName: string;
 };
 
 const primaryTabs: PrimaryTabConfig[] = [
-  { id: 'commercial', label: 'العروض والاشتراكات', summary: 'الولاء والمكافآت والاشتراكات والعروض في مساحة واحدة', iconName: 'grid-outline' },
-  { id: 'orders', label: 'طلباتي', summary: 'الطلب والتاريخ والتتبع', iconName: 'bag-outline' },
+  { id: 'commercial', label: 'العروض والاشتراكات', summary: 'الولاء والمكافآت والاشتراكات والعروض في مساحة واحدة', iconName: 'grid' },
+  { id: 'orders', label: 'طلباتي', summary: 'الطلب والتاريخ والتتبع', iconName: 'bag' },
 ];
 
 function MySpacePrimaryRow({
@@ -50,7 +47,7 @@ function MySpacePrimaryRow({
 }: {
   title: string;
   subtitle: string;
-  iconName: SectionIconName;
+  iconName: string;
   selected: boolean;
   onPress: () => void;
   details?: React.ReactNode;
@@ -89,7 +86,7 @@ function MySpacePrimaryRow({
         })}
       >
         <Box layoutDirection="row" align="center" gap={3}>
-          <View
+          <Box
             style={{
               width: 44,
               height: 44,
@@ -101,8 +98,8 @@ function MySpacePrimaryRow({
               justifyContent: 'center',
             }}
           >
-            <Ionicons name={iconName} size={21} color={selected ? theme.brandContrast : theme.brand} />
-          </View>
+            <Icon name={iconName} size={21} tone={selected ? 'inverse' : 'brand'} />
+          </Box>
 
           <Box gap={0} style={{ flex: 1 }}>
             <Text role="bodyStrong">{title}</Text>
@@ -111,9 +108,9 @@ function MySpacePrimaryRow({
             </Text>
           </Box>
 
-          <View style={{ width: 28, alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name={isExpanded ? 'chevron-down' : 'chevron-back'} size={20} color={isExpanded ? theme.brand : theme.textSoft} />
-          </View>
+          <Box style={{ width: 28, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name={isExpanded ? 'chevron-down' : 'chevron-back'} size={20} color={isExpanded ? theme.brand : theme.textSoft} />
+          </Box>
         </Box>
       </Pressable>
 
@@ -178,7 +175,7 @@ export function DshMySpaceScreen({
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <Box flex={1}>
       <TopBar
         variant="surface"
         title="مساحتي"

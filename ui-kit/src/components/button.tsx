@@ -10,7 +10,7 @@ function resolvePressableStyle(style: PressableStyle | undefined, state: Pressab
   return typeof style === 'function' ? style(state) : style;
 }
 
-export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
+export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'brand' | 'warning' | 'info' | 'default';
 
 export type ButtonProps = PressableProps & {
   label: string;
@@ -46,10 +46,14 @@ export function Button({
 
   const toneConfig = {
     primary: { backgroundColor: theme.brand, borderColor: theme.brand, labelColor: theme.brandContrast },
+    brand: { backgroundColor: theme.brand, borderColor: theme.brand, labelColor: theme.brandContrast },
     secondary: { backgroundColor: theme.surface, borderColor: theme.lineStrong, labelColor: theme.text },
     ghost: { backgroundColor: 'transparent', borderColor: 'transparent', labelColor: theme.brand },
     danger: { backgroundColor: theme.danger, borderColor: theme.danger, labelColor: '#FFFFFF' },
     success: { backgroundColor: theme.success, borderColor: theme.success, labelColor: '#FFFFFF' },
+    warning: { backgroundColor: theme.warningSurface, borderColor: theme.warning, labelColor: theme.warningText },
+    info: { backgroundColor: theme.infoSurface, borderColor: theme.info, labelColor: theme.infoText },
+    default: { backgroundColor: theme.surfaceInset, borderColor: theme.line, labelColor: theme.textMuted },
   }[tone];
 
   const sizeConfig = {

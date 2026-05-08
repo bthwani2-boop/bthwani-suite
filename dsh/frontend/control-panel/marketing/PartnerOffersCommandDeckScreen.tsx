@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { StyleSheet, View, Pressable, ScrollView } from 'react-native';
-import { Box, Button, Surface, Tabs, Text, TextField } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Tabs, Text, TextField, Chip, SelectField, ListItem, KeyValueList } from '@bthwani/ui-kit';
 import {
   getPartnerOfferItems,
   getPartnerOfferKpis,
@@ -17,17 +16,14 @@ import {
   type PartnerOfferSource,
 } from '../../shared/partner-offer-store';
 import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
-import { ApprovalRecord, ApprovalStage, transitionApprovalStage, resolveNextOwner, isCatalogOwnedMedia, isPartnerOwnedException } from '../../shared/workflow';
 
-// --- Partner Offers Component ---
-// ملاحظة: مراجعة الصور والمنتجات انتقلت إلى تبويب مستقل: "مراجعة الصور والمنتجات"
-
-export function PartnerOffersCommandDeckScreen({ activeSubTab = 'offers' }: { activeSubTab?: string }) {
+export function PartnerOffersCommandDeckScreen() {
   const [items, setItems] = React.useState<PartnerOfferRecord[]>(() => getPartnerOfferItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getPartnerOfferItems()[0]?.id ?? null);
   const selected = React.useMemo(() => items.find(i => i.id === selectedId) ?? null, [items, selectedId]);
   const [draft, setDraft] = React.useState<Partial<PartnerOfferRecord>>({});
   const [pipelineFilter, setPipelineFilter] = React.useState<PartnerOfferStatus | 'all'>('all');
+  const [searchQuery, setSearchQuery] = React.useState('');
 
   React.useEffect(() => {
     if (selected) {
@@ -77,24 +73,54 @@ export function PartnerOffersCommandDeckScreen({ activeSubTab = 'offers' }: { ac
   };
 
   const setStatus = (id: string, newStatus: PartnerOfferStatus) => {
-    upsertPartnerOfferItem({ ...items.find(i => i.id === id)!, status: newStatus });
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    upsertPartnerOfferItem({ ...item, status: newStatus });
     refresh();
   };
 
   const filteredItems = React.useMemo(() => {
-    if (pipelineFilter === 'all') return items;
-    return items.filter(i => i.status === pipelineFilter);
-  }, [items, pipelineFilter]);
+    let base = items;
+    if (pipelineFilter !== 'all') {
+      base = base.filter(i => i.status === pipelineFilter);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      base = base.filter(i => i.title.toLowerCase().includes(q) || i.partnerName.toLowerCase().includes(q));
+    }
+    return base;
+  }, [items, pipelineFilter, searchQuery]);
 
-  const translateStatus = (status: PartnerOfferStatus) => {
+  const translateStatus = (status: PartnerOfferStatus): { label: string, tone: any } => {
     switch (status) {
-      case 'inbound': return 'واردة';
-      case 'review': return 'مراجعة';
-      case 'marketing-ready': return 'جاهز للتسويق';
-      case 'published': return 'منشور';
-      case 'paused': return 'موقوف';
-      case 'rejected': return 'مرفوض';
-      default: return status;
+      case 'inbound': return { label: 'واردة', tone: 'default' };
+      case 'review': return { label: 'مراجعة', tone: 'warning' };
+      case 'marketing-ready': return { label: 'جاهز للتسويق', tone: 'brand' };
+      case 'published': return { label: 'منشور', tone: 'success' };
+      case 'paused': return { label: 'موقوف', tone: 'danger' };
+      case 'rejected': return { label: 'مرفوض', tone: 'default' };
+      default: return { label: status, tone: 'default' };
+    }
+  };
+
+  const translateOfferType = (type: PartnerOfferType) => {
+    switch (type) {
+      case 'discount': return 'خصم مباشر';
+      case 'free-delivery': return 'توصيل مجاني';
+      case 'bundle': return 'حزمة (Bundle)';
+      case 'buy-x-get-y': return 'اشتر واحصل على';
+      case 'coupon': return 'كوبون';
+      default: return type;
+    }
+  };
+
+  const translateSource = (source: PartnerOfferSource) => {
+    switch (source) {
+      case 'partner': return 'الشريك';
+      case 'field': return 'ميداني';
+      case 'marketing': return 'التسويق';
+      case 'catalog': return 'الكتالوج';
+      default: return source;
     }
   };
 
@@ -102,25 +128,25 @@ export function PartnerOffersCommandDeckScreen({ activeSubTab = 'offers' }: { ac
     if (!selected) return null;
     const s = selected.status;
     return (
-      <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-        {s === 'inbound' && <Button label="قبول للمراجعة" tone="secondary" fullWidth={false} onPress={() => setStatus(selected.id, 'review')} style={styles.smallButton} />}
-        {s === 'review' && <Button label="جاهز للتسويق" tone="secondary" fullWidth={false} onPress={() => approvePartnerOfferItem(selected.id)} style={styles.smallButton} />}
-        {s === 'marketing-ready' && <Button label="نشر الآن" style={{ backgroundColor: '#16A34A', paddingHorizontal: 12, paddingVertical: 6, minHeight: 0 }} fullWidth={false} onPress={() => publishPartnerOfferItem(selected.id)} />}
-        {s === 'published' && <Button label="إيقاف" tone="secondary" fullWidth={false} onPress={() => pausePartnerOfferItem(selected.id)} style={styles.smallButton} />}
-        {s === 'paused' && <Button label="إعادة النشر" style={{ backgroundColor: '#16A34A', paddingHorizontal: 12, paddingVertical: 6, minHeight: 0 }} fullWidth={false} onPress={() => publishPartnerOfferItem(selected.id)} />}
+      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+        {s === 'inbound' && <Button label="قبول للمراجعة" tone="secondary" size="sm" onPress={() => setStatus(selected.id, 'review')} />}
+        {s === 'review' && <Button label="جاهز للتسويق" tone="secondary" size="sm" onPress={() => approvePartnerOfferItem(selected.id)} />}
+        {s === 'marketing-ready' && <Button label="نشر الآن" tone="success" size="sm" onPress={() => publishPartnerOfferItem(selected.id)} />}
+        {s === 'published' && <Button label="إيقاف" tone="danger" size="sm" onPress={() => pausePartnerOfferItem(selected.id)} />}
+        {s === 'paused' && <Button label="إعادة النشر" tone="success" size="sm" onPress={() => publishPartnerOfferItem(selected.id)} />}
 
-        {(s === 'inbound' || s === 'review') && <Button label="رفض" tone="ghost" fullWidth={false} onPress={() => setStatus(selected.id, 'rejected')} style={styles.smallButtonTextRed} />}
+        {(s === 'inbound' || s === 'review') && <Button label="رفض" tone="danger" variant="ghost" size="sm" onPress={() => setStatus(selected.id, 'rejected')} />}
 
-        <Button label="نسخ" tone="ghost" fullWidth={false} onPress={handleDuplicate} style={styles.smallButton} />
-        <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => { removePartnerOfferItem(selected.id); setSelectedId(null); }} style={styles.smallButtonTextRed} />
-      </View>
+        <Button label="نسخ" tone="secondary" variant="ghost" size="sm" onPress={handleDuplicate} />
+        <Button label="حذف" tone="danger" variant="ghost" size="sm" onPress={() => { removePartnerOfferItem(selected.id); setSelectedId(null); }} />
+      </Box>
     );
   };
 
   const renderStoreCardPreview = () => {
     const mockContext = {
       storeId: draft.storeId || 'store-preview',
-      activeOffers: draft.id && draft.status === 'published' ? [draft as PartnerOfferRecord] : [draft as PartnerOfferRecord], // Show preview even if draft
+      activeOffers: draft.id && draft.status === 'published' ? [draft as PartnerOfferRecord] : [draft as PartnerOfferRecord],
       activeSubscriptions: [],
       activeEntitlements: [],
       activeCampaigns: [],
@@ -129,42 +155,34 @@ export function PartnerOffersCommandDeckScreen({ activeSubTab = 'offers' }: { ac
     const features = mapStoreCommercialFeatures(mockContext);
 
     return (
-      <Box gap={2} style={styles.previewContainer}>
-        <Text role="caption" tone="muted" style={{ fontWeight: '800', textAlign: 'right' }}>محاكاة بطاقة المتجر</Text>
+      <Surface tone="inset" padding={4} gap={3}>
+        <Text role="caption" style={{ fontWeight: '800' }}>محاكاة بطاقة المتجر</Text>
         <CommercialParityPreview features={features} storeName={draft.storeLabel || draft.partnerName} />
-      </Box>
+      </Surface>
     );
   };
 
-
   return (
-    <Box gap={4} dir="rtl" padding={4} style={{ flex: 1 }}>
+    <Box dir="rtl" gap={4} padding={4} style={{ height: '100%', overflow: 'hidden' }}>
+
       {/* Header & KPIs */}
       <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
-        <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>واردة</Text>
-          <Text role="titleLg" style={{ color: '#0A2F5C', textAlign: 'right', width: '100%' }}>{kpis.inbound}</Text>
-        </View>
-        <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>مراجعة</Text>
-          <Text role="titleLg" style={{ color: '#D97706', textAlign: 'right', width: '100%' }}>{kpis.review}</Text>
-        </View>
-        <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>جاهز للتسويق</Text>
-          <Text role="titleLg" style={{ color: '#0369A1', textAlign: 'right', width: '100%' }}>{kpis.marketingReady}</Text>
-        </View>
-        <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>منشور</Text>
-          <Text role="titleLg" style={{ color: '#16A34A', textAlign: 'right', width: '100%' }}>{kpis.published}</Text>
-        </View>
-        <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>مرفوض</Text>
-          <Text role="titleLg" style={{ color: '#DC2626', textAlign: 'right', width: '100%' }}>{kpis.rejected}</Text>
-        </View>
+        {[
+          { label: 'واردة', value: kpis.inbound, tone: 'default' },
+          { label: 'مراجعة', value: kpis.review, tone: 'warning' },
+          { label: 'جاهز للتسويق', value: kpis.marketingReady, tone: 'brand' },
+          { label: 'منشور', value: kpis.published, tone: 'success' },
+          { label: 'مرفوض', value: kpis.rejected, tone: 'danger' },
+        ].map(k => (
+          <Surface key={k.label} tone={k.tone as any} padding={3} style={{ flex: '1 1 120px' }}>
+            <Text role="caption" style={{ fontWeight: 800 }}>{k.label}</Text>
+            <Text role="titleLg" style={{ fontWeight: 900 }}>{k.value}</Text>
+          </Surface>
+        ))}
       </Box>
 
       {/* Pipeline Filter */}
-      <Surface tone="inset" style={{ padding: 4, borderRadius: 12 }}>
+      <Surface tone="raised" padding={2}>
         <Tabs<PartnerOfferStatus | 'all'>
           items={[
             { value: 'all', label: 'الكل' },
@@ -179,237 +197,100 @@ export function PartnerOffersCommandDeckScreen({ activeSubTab = 'offers' }: { ac
         />
       </Surface>
 
-      <Box layoutDirection="row" gap={4} style={{ flex: 1, flexWrap: 'wrap' }}>
+      <Box layoutDirection="row" gap={4} style={{ flex: 1, minHeight: 0 }}>
         {/* Offers Table / List */}
-        <Surface tone="raised" style={styles.listPanel}>
-          <View style={styles.panelHeader}>
-            <Text role="titleSm" style={{ color: '#0A2F5C' }}>العروض ({filteredItems.length})</Text>
-            <Button label="+ عرض جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={styles.smallButton} />
-          </View>
-          <ScrollView style={styles.scrollView} contentContainerStyle={{ padding: 12, gap: 8 }}>
-            {filteredItems.map(item => (
-              <Pressable
-                key={item.id}
-                style={[styles.rowItem, selectedId === item.id && styles.rowItemSelected]}
-                onPress={() => setSelectedId(item.id)}
-              >
-                <View style={{ flex: 1, alignItems: 'flex-start' }}>
-                  <Text role="bodyStrong" style={{ fontSize: 13, color: '#0A2F5C', textAlign: 'right' }}>{item.title}</Text>
-                  <Text role="caption" tone="muted" style={{ fontSize: 11, textAlign: 'right' }}>
-                    {item.partnerName} · {item.offerType} · {item.source}
-                  </Text>
-                </View>
-                <View style={[styles.statusBadge, item.status === 'published' && styles.statusBadgeActive]}>
-                  <Text style={[styles.statusText, item.status === 'published' && styles.statusTextActive]}>{translateStatus(item.status)}</Text>
-                </View>
-              </Pressable>
-            ))}
-          </ScrollView>
+        <Surface tone="raised" padding={0} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <Box padding={4} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }} layoutDirection="row" justify="space-between" align="center">
+            <Text role="bodyStrong">العروض ({filteredItems.length})</Text>
+            <Button label="+ عرض جديد" tone="brand" size="sm" onPress={handleCreateNew} />
+          </Box>
+          <Box style={{ flex: 1 }} padding={2}>
+            <Box style={{ overflowY: 'auto', flex: 1 }}>
+              {filteredItems.map(item => {
+                const statusMeta = translateStatus(item.status);
+                const isSelected = item.id === selectedId;
+                return (
+                  <ListItem
+                    key={item.id}
+                    title={item.title}
+                    subtitle={`${item.partnerName} · ${translateOfferType(item.offerType)} · ${translateSource(item.source)}`}
+                    onPress={() => setSelectedId(item.id)}
+                    selected={isSelected}
+                    badgeLabel={statusMeta.label}
+                    badgeTone={statusMeta.tone}
+                  />
+                );
+              })}
+            </Box>
+          </Box>
         </Surface>
 
         {/* Inspector / Editor Panel */}
-        <Surface tone="raised" style={styles.editorPanel}>
-          <View style={styles.panelHeader}>
-            <Text role="titleSm" style={{ color: '#0A2F5C' }}>{selected ? 'مفتش العرض' : 'عرض جديد'}</Text>
+        <Surface tone="raised" padding={0} style={{ flex: 2, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <Box padding={4} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }} layoutDirection="row" justify="space-between" align="center">
+            <Text role="bodyStrong">{selected ? 'مفتش العرض' : 'إنشاء عرض جديد'}</Text>
             {renderActionButtons()}
-          </View>
+          </Box>
 
-          <ScrollView style={styles.scrollView}>
-            <Box gap={4} style={{ padding: 16 }}>
-              <View style={inlineStyles.gridContainer}>
-                <TextField label="عنوان العرض" value={draft.title || ''} onChangeText={v => setDraft({ ...draft, title: v })} style={{ textAlign: 'right' }} />
-                <TextField label="اسم الشريك (الشركة)" value={draft.partnerName || ''} onChangeText={v => setDraft({ ...draft, partnerName: v })} style={{ textAlign: 'right' }} />
+          <Box style={{ overflowY: 'auto', flex: 1 }} padding={4} gap={4}>
+            <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+              <TextField label="عنوان العرض" value={draft.title || ''} onChangeText={v => setDraft({ ...draft, title: v })} />
+              <TextField label="اسم الشريك" value={draft.partnerName || ''} onChangeText={v => setDraft({ ...draft, partnerName: v })} />
 
-                <TextField label="معرف المتجر" value={draft.storeId || ''} onChangeText={v => setDraft({ ...draft, storeId: v })} dir="ltr" style={{ textAlign: 'left' }} />
-                <TextField label="اسم المتجر" value={draft.storeLabel || ''} onChangeText={v => setDraft({ ...draft, storeLabel: v })} style={{ textAlign: 'right' }} />
+              <TextField label="معرف المتجر" value={draft.storeId || ''} onChangeText={v => setDraft({ ...draft, storeId: v })} dir="ltr" />
+              <TextField label="اسم المتجر" value={draft.storeLabel || ''} onChangeText={v => setDraft({ ...draft, storeLabel: v })} />
 
-                <TextField label="معرف المنتج" value={draft.productId || ''} onChangeText={v => setDraft({ ...draft, productId: v })} dir="ltr" style={{ textAlign: 'left' }} />
-                <TextField label="اسم المنتج" value={draft.productLabel || ''} onChangeText={v => setDraft({ ...draft, productLabel: v })} style={{ textAlign: 'right' }} />
+              <TextField label="معرف المنتج" value={draft.productId || ''} onChangeText={v => setDraft({ ...draft, productId: v })} dir="ltr" />
+              <TextField label="اسم المنتج" value={draft.productLabel || ''} onChangeText={v => setDraft({ ...draft, productLabel: v })} />
 
-                <TextField label="التصنيف" value={draft.category || ''} onChangeText={v => setDraft({ ...draft, category: v })} style={{ textAlign: 'right' }} />
-                <TextField label="قيمة العرض" value={draft.valueLabel || ''} onChangeText={v => setDraft({ ...draft, valueLabel: v })} hint="مثال: خصم 20%" style={{ textAlign: 'right' }} />
+              <TextField label="التصنيف" value={draft.category || ''} onChangeText={v => setDraft({ ...draft, category: v })} />
+              <TextField label="قيمة العرض" value={draft.valueLabel || ''} onChangeText={v => setDraft({ ...draft, valueLabel: v })} hint="مثال: خصم 20%" />
 
-                <Box gap={1}>
-                  <Text role="caption" tone="muted" style={styles.labelTitle}>نوع العرض</Text>
-                  <select
-                    value={draft.offerType}
-                    onChange={(e) => setDraft({ ...draft, offerType: e.target.value as PartnerOfferType })}
-                    style={inlineStyles.selectInput}
-                    dir="rtl"
-                  >
-                    <option value="discount">خصم مباشر</option>
-                    <option value="free-delivery">توصيل مجاني</option>
-                    <option value="bundle">حزمة (Bundle)</option>
-                    <option value="buy-x-get-y">اشتر واحصل على</option>
-                    <option value="coupon">كوبون</option>
-                  </select>
-                </Box>
+              <SelectField
+                label="نوع العرض"
+                value={draft.offerType}
+                onValueChange={(v) => setDraft({ ...draft, offerType: v as PartnerOfferType })}
+                options={[
+                  { value: 'discount', label: 'خصم مباشر' },
+                  { value: 'free-delivery', label: 'توصيل مجاني' },
+                  { value: 'bundle', label: 'حزمة (Bundle)' },
+                  { value: 'buy-x-get-y', label: 'اشتر واحصل على' },
+                  { value: 'coupon', label: 'كوبون' },
+                ]}
+              />
 
-                <Box gap={1}>
-                  <Text role="caption" tone="muted" style={styles.labelTitle}>المصدر</Text>
-                  <select
-                    value={draft.source}
-                    onChange={(e) => setDraft({ ...draft, source: e.target.value as PartnerOfferSource })}
-                    style={inlineStyles.selectInput}
-                    dir="rtl"
-                  >
-                    <option value="partner">الشريك</option>
-                    <option value="field">المبيعات الميدانية</option>
-                    <option value="marketing">التسويق</option>
-                    <option value="catalog">الكتالوج</option>
-                  </select>
-                </Box>
+              <SelectField
+                label="المصدر"
+                value={draft.source}
+                onValueChange={(v) => setDraft({ ...draft, source: v as PartnerOfferSource })}
+                options={[
+                  { value: 'partner', label: 'الشريك' },
+                  { value: 'field', label: 'المبيعات الميدانية' },
+                  { value: 'marketing', label: 'التسويق' },
+                  { value: 'catalog', label: 'الكتالوج' },
+                ]}
+              />
 
-                <TextField label="الأهلية" value={draft.eligibility || ''} onChangeText={v => setDraft({ ...draft, eligibility: v })} style={{ textAlign: 'right' }} />
-                <TextField label="شارة العرض" value={draft.displayBadge || ''} onChangeText={v => setDraft({ ...draft, displayBadge: v })} style={{ textAlign: 'right' }} />
+              <TextField label="الأهلية" value={draft.eligibility || ''} onChangeText={v => setDraft({ ...draft, eligibility: v })} />
+              <TextField label="شارة العرض" value={draft.displayBadge || ''} onChangeText={v => setDraft({ ...draft, displayBadge: v })} />
 
-                <TextField label="تاريخ البدء" value={draft.activeFromDate || ''} onChangeText={v => setDraft({ ...draft, activeFromDate: v })} dir="ltr" style={{ textAlign: 'left' }} />
-                <TextField label="تاريخ الانتهاء" value={draft.activeToDate || ''} onChangeText={v => setDraft({ ...draft, activeToDate: v })} dir="ltr" style={{ textAlign: 'left' }} />
-              </View>
-
-              <TextField label="ملاحظات هامش الربح" value={draft.marginRiskNote || ''} onChangeText={v => setDraft({ ...draft, marginRiskNote: v })} hint="ملاحظات داخلية لفريق المالية/التسويق" style={{ textAlign: 'right' }} />
-              <TextField label="حملة مرتبطة" value={draft.linkedCampaignId || ''} onChangeText={v => setDraft({ ...draft, linkedCampaignId: v })} dir="ltr" style={{ textAlign: 'left' }} />
-
-              {renderStoreCardPreview()}
-
-              <Box layoutDirection="row" justify="flex-end" style={{ marginTop: 8 }}>
-                <Button label="حفظ المسودة / التعديلات" onPress={handleSave} style={{ backgroundColor: '#0A2F5C' }} />
-              </Box>
+              <TextField label="تاريخ البدء" value={draft.activeFromDate || ''} onChangeText={v => setDraft({ ...draft, activeFromDate: v })} dir="ltr" />
+              <TextField label="تاريخ الانتهاء" value={draft.activeToDate || ''} onChangeText={v => setDraft({ ...draft, activeToDate: v })} dir="ltr" />
             </Box>
-          </ScrollView>
+
+            <TextField label="ملاحظات هامش الربح" value={draft.marginRiskNote || ''} onChangeText={v => setDraft({ ...draft, marginRiskNote: v })} hint="ملاحظات داخلية للفريق" />
+            <TextField label="حملة مرتبطة" value={draft.linkedCampaignId || ''} onChangeText={v => setDraft({ ...draft, linkedCampaignId: v })} dir="ltr" />
+
+            {renderStoreCardPreview()}
+
+            <Box layoutDirection="row" justify="flex-end" paddingY={4}>
+              <Button label="حفظ التعديلات" tone="brand" onPress={handleSave} />
+            </Box>
+          </Box>
         </Surface>
       </Box>
     </Box>
   );
 }
-
-const inlineStyles = {
-  selectInput: {
-    padding: '8px 12px',
-    borderRadius: '8px',
-    border: '1px solid #CBD5E1',
-    backgroundColor: '#F8FAFC',
-    color: '#0A2F5C',
-    fontSize: '13px',
-    fontWeight: '600',
-    fontFamily: 'inherit',
-    outline: 'none',
-    textAlign: 'right',
-  } as React.CSSProperties,
-  gridContainer: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '16px'
-  } as React.CSSProperties
-};
-
-const styles = StyleSheet.create({
-  kpiRow: {
-    flexDirection: 'row',
-    gap: 12,
-    flexWrap: 'wrap',
-  },
-  kpiCard: {
-    flex: 1,
-    minWidth: 100,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(10,47,92,0.06)',
-    alignItems: 'flex-start',
-  },
-  mainLayout: {
-    flex: 1,
-    flexDirection: 'row',
-    gap: 16,
-    alignItems: 'stretch',
-  },
-  listPanel: {
-    flex: 1,
-    minWidth: 280,
-    borderRadius: 16,
-    borderColor: 'rgba(10,47,92,0.06)',
-    borderWidth: 1,
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  panelHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-    backgroundColor: '#fff',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  rowItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: '#F8FAFC',
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  rowItemSelected: {
-    backgroundColor: '#fff',
-    borderColor: '#FF500D',
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    backgroundColor: '#F1F5F9',
-  },
-  statusBadgeActive: {
-    backgroundColor: '#DCFCE7',
-  },
-  statusText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#64748B',
-  },
-  statusTextActive: {
-    color: '#16A34A',
-  },
-  editorPanel: {
-    flex: 2,
-    minWidth: 400,
-    borderRadius: 16,
-    borderColor: 'rgba(10,47,92,0.06)',
-    borderWidth: 1,
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  previewContainer: {
-    backgroundColor: '#F8FAFC',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-  },
-  labelTitle: {
-    fontWeight: '800',
-    textAlign: 'right',
-  },
-  smallButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    minHeight: 0,
-  },
-  smallButtonTextRed: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    minHeight: 0,
-    color: '#DC2626',
-  }
-});
 
 export default PartnerOffersCommandDeckScreen;

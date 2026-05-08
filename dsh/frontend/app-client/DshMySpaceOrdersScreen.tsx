@@ -1,12 +1,11 @@
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { View } from 'react-native';
 import {
   Badge,
   Box,
   Button,
   colorPalette,
   Chip,
+  Icon,
   KeyValueList,
   OptionRow,
   SectionHeader,
@@ -28,16 +27,16 @@ export type DshMySpaceOrdersScreenProps = {
   onOpenOrders?: () => void;
 };
 
-function resolveOrderIconName(order: DshMySpaceOrder): React.ComponentProps<typeof Ionicons>['name'] {
+function resolveOrderIconName(order: DshMySpaceOrder): string {
   if (order.statusId === 'active') {
-    return 'bicycle-outline';
+    return 'bicycle';
   }
 
   if (order.fulfillmentId === 'pickup') {
-    return 'storefront-outline';
+    return 'storefront';
   }
 
-  return order.statusId === 'completed' ? 'checkmark-circle-outline' : 'time-outline';
+  return order.statusId === 'completed' ? 'checkmark-circle' : 'time';
 }
 
 function resolvePrimaryActionLabel(order: DshMySpaceOrder) {
@@ -104,7 +103,7 @@ function OrderCard({
       }}
     >
       <Box layoutDirection="row" align="center" gap={2}>
-        <View
+        <Box
           style={{
             width: 46,
             height: 46,
@@ -116,8 +115,8 @@ function OrderCard({
             backgroundColor: featured ? theme.brand : theme.brandSurface,
           }}
         >
-          <Ionicons name={iconName} size={20} color={featured ? theme.brandContrast : theme.brand} />
-        </View>
+          <Icon name={iconName} size={20} tone={featured ? 'inverse' : 'brand'} />
+        </Box>
 
         <Box gap={0} style={{ flex: 1 }}>
           <Text role="bodyStrong">{order.title}</Text>

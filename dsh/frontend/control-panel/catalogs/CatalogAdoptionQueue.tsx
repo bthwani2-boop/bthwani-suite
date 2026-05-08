@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Text, Surface, Chip } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, Chip, ListItem } from '@bthwani/ui-kit';
 import {
   getCatalogAdoptionItems,
   adoptCatalogCentral,
@@ -20,7 +20,6 @@ export function CatalogAdoptionQueue() {
   }, []);
 
   const handleAction = (id: string, action: 'adopt-central' | 'adopt-exception' | 'visible' | 'reject' | 'fix') => {
-    // Phase R2: Unified transition logic via shared store and helpers
     const item = items.find(i => i.id === id);
     if (!item) return;
 
@@ -32,7 +31,6 @@ export function CatalogAdoptionQueue() {
         adoptCatalogException(id);
         break;
       case 'visible':
-        // Specifically using moveApprovalRecordToStage to match activateClientVisible
         activateClientVisible(id);
         break;
       case 'fix':
@@ -68,45 +66,30 @@ export function CatalogAdoptionQueue() {
   };
 
   return (
-    <Box gap={4} style={{ padding: '16px', backgroundColor: '#F8FAFC', height: '100%', overflowY: 'auto' }} dir="rtl">
-      <Surface tone="inset" padding={4} style={{ borderRadius: '12px', border: '1px solid #BAE6FD', backgroundColor: '#F0F9FF' }}>
+    <Box dir="rtl" gap={4} padding={4} style={{ backgroundColor: '#F8FAFC', height: '100%', overflowY: 'auto' }}>
+      <Surface tone="brand" padding={3} style={{ borderRadius: '12px', border: '1px solid #BAE6FD', backgroundColor: '#F0F9FF' }}>
         <Box gap={2}>
           <Box style={{ flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
-            <Text style={{ fontSize: '24px' }}>🛡️</Text>
+            <Text style={{ fontSize: '24px' }}>📦</Text>
             <Text role="bodyStrong" style={{ color: '#0369A1' }}>بوابة اعتماد الكتالوج (Catalog Adoption Gate)</Text>
           </Box>
           <Text role="caption" style={{ color: '#0369A1', fontWeight: 600 }}>يتم هنا اعتماد العناصر النهائية والموافقة عليها لتصبح جزءًا من الكتالوج الموحد. لا يظهر للعميل إلا بعد التفعيل (client-visible).</Text>
         </Box>
       </Surface>
 
-      <Box gap={3}>
+      <Box gap={2}>
         {items.filter(i => ['marketing-approved', 'catalog-adopted', 'client-visible', 'needs-fix', 'rejected'].includes(i.stage)).map(item => {
           const sStyle = getStageStyle(item.stage);
-          const policy = item.metadata?.mediaPolicy || (item.entityType === 'product-media' ? 'partner-owned-exception' : 'catalog-owned-media');
-          const trail = item.auditTrail || [];
 
           return (
-            <Surface key={item.id} padding={4} style={{ borderRadius: '12px', border: '1px solid #E2E8F0', backgroundColor: '#FFFFFF' }}>
-              <Box style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-                <Box gap={2} style={{ flex: 1 }}>
-                  <Box style={{ flexDirection: 'row', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>{item.title}</Text>
-                    <Chip label={entityLabel(item.entityType)} tone="default" />
-                    <Chip label={`المصدر: ${item.source}`} tone="default" />
-                  </Box>
-                  <Box style={{ flexDirection: 'row', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <Text role="caption" style={{ backgroundColor: '#F8FAFC', padding: '2px 6px', borderRadius: '4px', border: '1px solid #E2E8F0', fontFamily: 'monospace' }}>{item.id}</Text>
-                    <Text role="caption" style={{ backgroundColor: '#F8FAFC', padding: '2px 6px', borderRadius: '4px', border: '1px solid #E2E8F0', fontWeight: 700, color: typeof policy === 'string' && policy.includes('catalog') ? '#16A34A' : '#D97706' }}>السياسة: {policy}</Text>
-                    <Text role="caption" style={{ backgroundColor: '#F8FAFC', padding: '2px 6px', borderRadius: '4px', border: '1px solid #E2E8F0', color: '#0369A1', fontWeight: 700 }}>التأثير: {item.stage === 'client-visible' ? 'يظهر للعميل' : 'غير مرئي'}</Text>
-                    {trail.length > 0 && (
-                      <Chip label={`سجل: ${trail.length} حركة`} tone="brand" />
-                    )}
-                  </Box>
-                </Box>
-
-                <Box gap={2} style={{ alignItems: 'flex-end', flexShrink: 0 }}>
-                  <Chip label={sStyle.label} tone={sStyle.tone as any} />
-
+            <ListItem
+              key={item.id}
+              title={item.title}
+              subtitle={`${entityLabel(item.entityType)} · المصدر: ${item.source}`}
+              badgeLabel={sStyle.label}
+              badgeTone={sStyle.tone as any}
+              meta={(
+                <Box style={{ alignItems: 'flex-end', gap: '8px' }}>
                   {item.stage === 'marketing-approved' && (
                     <Box style={{ flexDirection: 'row', gap: '4px' }}>
                       <Button label="اعتماد مركزي" tone="primary" size="sm" onClick={() => handleAction(item.id, 'adopt-central')} />

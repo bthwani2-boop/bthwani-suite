@@ -1,6 +1,5 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Pressable } from 'react-native';
 import { Badge, Box, Button, Icon, MobileScrollView, Surface, Text, TopBar } from '@bthwani/ui-kit';
 import { DshOperationScreen } from './DshOperationScreen';
 import { dshNotificationsFixtures } from './dshNotificationsFixtures';
@@ -197,7 +196,7 @@ function renderContent(
   }));
 
   return (
-    <View style={{ flex: 1 }}>
+    <Box flex={1}>
       <TopBar
         variant="surface"
         title="الإشعارات"

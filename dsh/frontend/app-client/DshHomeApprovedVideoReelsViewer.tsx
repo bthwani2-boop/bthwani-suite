@@ -1,7 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { Box, Text, colorPalette } from '@bthwani/ui-kit';
+import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, useWindowDimensions } from 'react-native';
+import { Box, Icon, Text, colorPalette } from '@bthwani/ui-kit';
 import type { MarketingVideoRecord } from '../shared/video-store';
 
 declare const process: { env: { EXPO_PUBLIC_MEDIA_BASE_URL?: string } };
@@ -131,9 +130,9 @@ export function DshHomeApprovedVideoReelsViewer({
     return (
       <Modal visible animationType="slide" presentationStyle="fullScreen" statusBarTranslucent onRequestClose={handleClose}>
         <StatusBar hidden />
-        <View style={styles.emptyContainer}>
+        <Box style={styles.emptyContainer}>
           <Pressable style={styles.closeButton} onPress={handleClose} accessibilityRole="button" accessibilityLabel="إغلاق">
-            <Ionicons name="close" size={20} color={colorPalette.white} />
+            <Icon name="close" size={20} color={colorPalette.white} />
           </Pressable>
           <Box gap={2} style={styles.emptyCard}>
             <Text role="titleSm" style={styles.emptyTitle}>لا توجد فيديوهات معتمدة بعد</Text>
@@ -149,9 +148,9 @@ export function DshHomeApprovedVideoReelsViewer({
   return (
     <Modal visible animationType="slide" presentationStyle="fullScreen" statusBarTranslucent onRequestClose={handleClose}>
       <StatusBar hidden />
-      <View style={styles.container}>
+      <Box style={styles.container}>
         <Pressable style={styles.closeButton} onPress={handleClose} accessibilityRole="button" accessibilityLabel="إغلاق الفيديو">
-          <Ionicons name="close" size={20} color={colorPalette.white} />
+          <Icon name="close" size={20} color={colorPalette.white} />
         </Pressable>
 
         <FlatList
@@ -214,7 +213,7 @@ export function DshHomeApprovedVideoReelsViewer({
                           accessibilityLabel={item.ctaLabel}
                         >
                           <Text role="bodyMd" style={styles.ctaText}>{item.ctaLabel}</Text>
-                          <Ionicons name="arrow-back" size={18} color={colorPalette.white} />
+                          <Icon name="arrow-back" size={18} color={colorPalette.white} />
                         </Pressable>
                       </Box>
                     </View>
