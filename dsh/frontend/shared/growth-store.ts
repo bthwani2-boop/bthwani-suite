@@ -1,4 +1,9 @@
-export type MarketingGrowthFamily = 'campaign' | 'promotion';
+/**
+ * LEGACY COMPATIBILITY:
+ * 'promotion', 'subscription', 'shorts' are marked for migration.
+ * Please use campaign-store.ts or partner-offer-store.ts for new commercial data ownership.
+ */
+export type MarketingGrowthFamily = 'campaign' | /* @deprecated moved to partner-offer-store */ 'promotion' | /* @deprecated moved to loyalty-store */ 'subscription' | /* @deprecated moved to video-store */ 'shorts';
 export type MarketingGrowthSource = 'marketing' | 'partner';
 export type MarketingGrowthStatus = 'draft' | 'pending-marketing' | 'published' | 'paused';
 export type MarketingGrowthAudience = 'all' | 'client' | 'operations';
@@ -8,7 +13,10 @@ export type MarketingGrowthRouteTarget =
   | 'main_category'
   | 'sub_category'
   | 'store'
-  | 'store_category'
+// --- LEGACY COMPATIBILITY EXPORTS ---
+// These are kept strictly for type compatibility across the monolithic application
+// until all older consumers are fully migrated to their new respective stores.
+// DO NOT use these for new commercial features.
   | 'product'
   | 'search';
 
@@ -194,4 +202,59 @@ export function duplicateMarketingGrowthItem(id: string) {
 
 export function removeMarketingGrowthItem(id: string) {
   setMutableStore(getMarketingGrowthItems().filter((item) => item.id !== id));
+}
+
+// --- NEW GROWTH INTELLIGENCE MODELS (PHASE 1) ---
+
+export type GrowthRecommendationType = 'opportunity' | 'gap' | 'risk';
+
+export type GrowthRecommendation = {
+  id: string;
+  type: GrowthRecommendationType;
+  title: string;
+  description: string;
+  actionLabel: string;
+  actionTarget: string;
+  impactScore: number; // 1 to 10
+};
+
+export function getGrowthRecommendations(): GrowthRecommendation[] {
+  return [
+    {
+      id: 'rec-1',
+      type: 'opportunity',
+      title: 'عرض شريك جاهز',
+      description: 'يوجد عرض "خصم 20%" جاهز للتسويق، يمكن ربطه بحملة لزيادة التفاعل.',
+      actionLabel: 'ربط بحملة',
+      actionTarget: 'campaigns',
+      impactScore: 9,
+    },
+    {
+      id: 'rec-2',
+      type: 'gap',
+      title: 'فئة بدون عروض',
+      description: 'فئة "المطاعم" لا تمتلك أي حملة نشطة حالياً رغم كثافة الزيارات.',
+      actionLabel: 'إنشاء حملة',
+      actionTarget: 'campaigns',
+      impactScore: 7,
+    },
+    {
+      id: 'rec-3',
+      type: 'risk',
+      title: 'تضارب شارات (Badges)',
+      description: 'متجر 101 يعرض شارة توصيل مجاني ولكن العرض موقوف في الكتالوج.',
+      actionLabel: 'مراجعة المتاجر',
+      actionTarget: 'partner-offers',
+      impactScore: 8,
+    },
+    {
+      id: 'rec-4',
+      type: 'opportunity',
+      title: 'تفعيل المشتركين',
+      description: 'يوجد 500 مشترك في باقة برو لم يستخدموا ميزة التوصيل المجاني.',
+      actionLabel: 'تذكير بالميزة',
+      actionTarget: 'loyalty',
+      impactScore: 6,
+    }
+  ];
 }

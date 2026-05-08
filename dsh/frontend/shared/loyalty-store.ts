@@ -118,3 +118,83 @@ export function upsertLoyaltyItem(item: Partial<LoyaltyRecord>) {
 export function removeLoyaltyItem(id: string) {
   setMutableStore(getLoyaltyItems().filter((item) => item.id !== id));
 }
+
+// --- NEW COMMERCIAL OWNERSHIP MODELS (PHASE 1) ---
+
+export type LoyaltyProgram = {
+  id: string;
+  name: string;
+  description: string;
+  currencyLabel: string;
+};
+
+export type LoyaltyTier = {
+  id: string;
+  programId: string;
+  name: string;
+  minimumPoints: number;
+  benefits: string[];
+};
+
+export type LoyaltyReward = {
+  id: string;
+  programId: string;
+  title: string;
+  pointsCost: number;
+};
+
+export type SubscriptionPlan = {
+  id: string;
+  name: string;
+  monthlyFee: number;
+  features: string[];
+};
+
+export type Entitlement = {
+  id: string;
+  userId?: string;
+  type: 'tier' | 'subscription' | 'reward';
+  referenceId: string;
+  status: 'active' | 'expired';
+};
+
+export type EarningRule = {
+  id: string;
+  description: string;
+  pointsMultiplier: number;
+};
+
+export type RedemptionRule = {
+  id: string;
+  description: string;
+  pointsValue: number;
+};
+
+export function getLoyaltyPrograms(): LoyaltyProgram[] {
+  return [
+    { id: 'prog-1', name: 'نقاط بثواني', description: 'برنامج الولاء العام للتطبيق', currencyLabel: 'نقطة' }
+  ];
+}
+
+export function getSubscriptionPlans(): SubscriptionPlan[] {
+  return [
+    { id: 'sub-pro', name: 'بثواني برو', monthlyFee: 39, features: ['توصيل مجاني', 'عروض حصرية'] }
+  ];
+}
+
+export function getLoyaltyTiers(): LoyaltyTier[] {
+  return [
+    { id: 'tier-silver', programId: 'prog-1', name: 'فضي', minimumPoints: 0, benefits: [] },
+    { id: 'tier-gold', programId: 'prog-1', name: 'ذهبي', minimumPoints: 1000, benefits: ['دعم سريع'] }
+  ];
+}
+
+export function getLoyaltyRewards(): LoyaltyReward[] {
+  return [
+    { id: 'rew-1', programId: 'prog-1', title: 'كوبون خصم 10 ريال', pointsCost: 1000 }
+  ];
+}
+
+export function getEntitlements(): Entitlement[] {
+  return [];
+}

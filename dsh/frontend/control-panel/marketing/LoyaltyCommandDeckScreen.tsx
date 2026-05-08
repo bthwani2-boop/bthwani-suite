@@ -1,287 +1,310 @@
-"use client";
+'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { StyleSheet, View, Pressable, ScrollView } from 'react-native';
+import { Box, Button, Surface, Tabs, Text, TextField, useDirection } from '@bthwani/ui-kit';
 import {
-  Box,
-  Button,
-  KeyValueList,
-  ListItem,
-  Surface,
-  TextField,
-  Text,
-} from '@bthwani/ui-kit';
-import { WebMissionHeroCard, WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
-import {
-  loyaltyCommercialLaneItems,
-  loyaltyCommercialKeyValues,
-  loyaltyCommercialSignals,
-} from './loyaltyCommerceData';
+  getLoyaltyPrograms,
+  getSubscriptionPlans,
+  getLoyaltyTiers,
+  getLoyaltyRewards,
+  getEntitlements,
+  type LoyaltyProgram,
+  type LoyaltyTier,
+  type LoyaltyReward,
+  type SubscriptionPlan,
+  type Entitlement,
+} from '../../shared/loyalty-store';
+import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
 
-export type LoyaltyCommandDeckScreenProps = {
-  hubHref?: string;
-  operationsHref?: string;
-};
+type LoyaltyTab = 'programs' | 'tiers' | 'rewards' | 'subscriptions' | 'entitlements' | 'earning' | 'redemption';
 
-type LoyaltyCommandSection = 'overview' | 'builder' | 'sync' | 'guardrails';
-type LoyaltyLane = 'subscription' | 'loyalty' | 'coupon';
+export function LoyaltyCommandDeckScreen() {
+  const { direction } = useDirection();
+  const isRtl = direction === 'rtl';
 
-const loyaltySectionTabs: ReadonlyArray<{ id: LoyaltyCommandSection; label: string; metaLabel: string }> = [
-  { id: 'overview', label: 'نظرة عامة', metaLabel: 'الرؤية التنفيذية' },
-  { id: 'builder', label: 'المصمم', metaLabel: 'تحرير مباشر' },
-  { id: 'sync', label: 'المزامنة', metaLabel: 'تشغيل حي' },
-  { id: 'guardrails', label: 'الضوابط', metaLabel: 'حوكمة' },
-];
+  const [activeTab, setActiveTab] = React.useState<LoyaltyTab>('programs');
 
-const loyaltyLaneTabs: ReadonlyArray<{ id: LoyaltyLane; label: string; metaLabel: string }> = [
-  { id: 'subscription', label: 'الاشتراك', metaLabel: 'الخطة والأسرة' },
-  { id: 'loyalty', label: 'النقاط', metaLabel: 'الرصيد والاسترداد' },
-  { id: 'coupon', label: 'الكوبون', metaLabel: 'السعر والعرض' },
-];
+  const programs = React.useMemo(() => getLoyaltyPrograms(), []);
+  const tiers = React.useMemo(() => getLoyaltyTiers(), []);
+  const rewards = React.useMemo(() => getLoyaltyRewards(), []);
+  const subscriptions = React.useMemo(() => getSubscriptionPlans(), []);
+  const entitlements = React.useMemo(() => getEntitlements(), []);
 
-function resolveLaneTitle(lane: LoyaltyLane) {
-  if (lane === 'subscription') return 'غرفة الاشتراك العائلي';
-  if (lane === 'loyalty') return 'غرفة النقاط والولاء';
-  return 'غرفة الكوبونات والعروض';
-}
+  // KPIs Mock
+  const kpis = {
+    members: '15,240',
+    subscribers: '2,840',
+    rewards: rewards.length,
+    entitlementsCount: entitlements.length,
+    activationRate: '12%',
+  };
 
-function resolveLaneDescription(lane: LoyaltyLane, activeDescription: string) {
-  if (lane === 'subscription') {
-    return `من هنا يتم ضبط الخطة، الأسرة، والمزامنة بطريقة تجارية راقية وواضحة. ${activeDescription}`;
-  }
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'programs':
+        return (
+          <Box gap={3}>
+            {programs.map(p => (
+              <Surface key={p.id} tone="raised" style={styles.card}>
+                <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>{p.name}</Text>
+                <Text role="caption" tone="muted">{p.description} · العملة: {p.currencyLabel}</Text>
+                <View style={[styles.badge, { alignSelf: isRtl ? 'flex-end' : 'flex-start', marginTop: 8 }]}>
+                  <Text style={styles.badgeText}>نشط</Text>
+                </View>
+              </Surface>
+            ))}
+          </Box>
+        );
+      case 'tiers':
+        return (
+          <Box gap={3}>
+            {tiers.map(t => (
+              <Surface key={t.id} tone="raised" style={styles.card}>
+                <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>
+                  <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>المستوى: {t.name}</Text>
+                  <Text role="bodyStrong" style={{ color: '#FF500D' }}>{t.minimumPoints} نقطة</Text>
+                </View>
+                <Text role="caption" tone="muted" style={{ marginTop: 4 }}>المزايا: {t.benefits.length ? t.benefits.join('، ') : 'لا يوجد مزايا إضافية'}</Text>
+              </Surface>
+            ))}
+          </Box>
+        );
+      case 'rewards':
+        return (
+          <Box gap={3}>
+            {rewards.map(r => (
+              <Surface key={r.id} tone="raised" style={styles.card}>
+                <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>
+                  <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>{r.title}</Text>
+                  <Text role="bodyStrong" style={{ color: '#FF500D' }}>{r.pointsCost} نقطة</Text>
+                </View>
+                <Text role="caption" tone="muted" style={{ marginTop: 4 }}>نوع المكافأة: كوبون خصم مباشر</Text>
+                <Text role="caption" tone="muted">تنتهي بعد: 30 يوماً من الاسترداد</Text>
+              </Surface>
+            ))}
+          </Box>
+        );
+      case 'subscriptions':
+        return (
+          <Box gap={3}>
+            {subscriptions.map(s => (
+              <Surface key={s.id} tone="raised" style={styles.card}>
+                <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>
+                  <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>{s.name}</Text>
+                  <Text role="bodyStrong" style={{ color: '#16A34A' }}>{s.monthlyFee} ريال / شهرياً</Text>
+                </View>
+                <Text role="caption" tone="muted" style={{ marginTop: 4 }}>المزايا: {s.features.join('، ')}</Text>
+                <View style={[styles.badge, { backgroundColor: '#DCFCE7', alignSelf: isRtl ? 'flex-end' : 'flex-start', marginTop: 8 }]}>
+                  <Text style={[styles.badgeText, { color: '#16A34A' }]}>باقة فعالة</Text>
+                </View>
+              </Surface>
+            ))}
+          </Box>
+        );
+      case 'entitlements':
+        return (
+          <Box gap={3}>
+            {entitlements.length === 0 ? (
+              <Text role="caption" tone="muted" style={{ textAlign: 'center', padding: 20 }}>لا توجد استحقاقات مسجلة حالياً.</Text>
+            ) : (
+              entitlements.map(e => (
+                <Surface key={e.id} tone="raised" style={styles.card}>
+                  <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>استحقاق: {e.type}</Text>
+                  <Text role="caption" tone="muted">الحالة: {e.status}</Text>
+                </Surface>
+              ))
+            )}
+          </Box>
+        );
+      case 'earning':
+        return (
+          <Surface tone="raised" style={styles.card}>
+            <Text role="bodyStrong" style={{ color: '#0A2F5C', marginBottom: 8 }}>قواعد الكسب</Text>
+            <ul style={{ paddingInlineStart: 20, color: '#475569', fontSize: 13, margin: 0, lineHeight: 1.8 }}>
+              <li><strong>الطلبات:</strong> نقطة واحدة لكل ريال يتم إنفاقه.</li>
+              <li><strong>مكافأة الفئة:</strong> مضاعف 1.5x لقسم المقاضي.</li>
+              <li><strong>مكافأة الشريك:</strong> 100 نقطة إضافية عند الطلب من الشركاء المميزين.</li>
+            </ul>
+          </Surface>
+        );
+      case 'redemption':
+        return (
+          <Surface tone="raised" style={styles.card}>
+            <Text role="bodyStrong" style={{ color: '#0A2F5C', marginBottom: 8 }}>قواعد الاسترداد</Text>
+            <ul style={{ paddingInlineStart: 20, color: '#475569', fontSize: 13, margin: 0, lineHeight: 1.8 }}>
+              <li><strong>مكافأة الكوبون:</strong> استبدال 1000 نقطة بخصم 10 ريال.</li>
+              <li><strong>مكافأة التوصيل:</strong> استبدال 1500 نقطة بتوصيل مجاني لطلب واحد.</li>
+              <li><strong>مكافأة الشريك:</strong> منتجات مختارة بأسعار مخفضة حصرياً بالنقاط.</li>
+            </ul>
+          </Surface>
+        );
+    }
+  };
 
-  if (lane === 'loyalty') {
-    return `الرصيد والسجل والاستبدال يظهرون كقيمة تشغيلية حقيقية لا كتلخيص تجميلي ضعيف. ${activeDescription}`;
-  }
+  const renderStoreCardPreview = () => {
+    const mockContext = {
+      storeId: 'store-preview',
+      activeOffers: [],
+      activeSubscriptions: subscriptions.filter(s => s.id === 'sub-pro'),
+      activeEntitlements: entitlements,
+      activeCampaigns: [],
+    };
+    const features = mapStoreCommercialFeatures(mockContext);
 
-  return `العروض والكوبونات تبقى قريبة من السعر والقرار النهائي للعميل مع تحكم أوضح. ${activeDescription}`;
-}
-
-function resolveAudienceLabel(audience: 'all' | 'client' | 'operations') {
-  if (audience === 'client') return 'واجهة العميل';
-  if (audience === 'operations') return 'العمليات';
-  return 'عام';
-}
-
-function resolveDeliveryLabel(deliveryMode: 'auto' | 'manual' | 'pinned') {
-  if (deliveryMode === 'auto') return 'تلقائي';
-  if (deliveryMode === 'manual') return 'يدوي';
-  return 'مثبت';
-}
-
-export function LoyaltyCommandDeckScreen({ hubHref = '/operations', operationsHref = '/operations' }: LoyaltyCommandDeckScreenProps) {
-  const router = useRouter();
-  const [section, setSection] = React.useState<LoyaltyCommandSection>('overview');
-  const [lane, setLane] = React.useState<LoyaltyLane>('subscription');
-  const [programName, setProgramName] = React.useState('برنامج ولاء العميل المميز');
-  const [programMessage, setProgramMessage] = React.useState('تجربة الولاء يجب أن تبقى واضحة وسلسة ومرتبطة بالمسارات الحية فقط.');
-  const [audience, setAudience] = React.useState<'all' | 'client' | 'operations'>('client');
-  const [deliveryMode, setDeliveryMode] = React.useState<'auto' | 'manual' | 'pinned'>('auto');
-  const [lastAction, setLastAction] = React.useState('جاهز للنشر');
-
-  const routeCount = loyaltyCommercialKeyValues.length;
-  const liveLaneCount = loyaltyCommercialLaneItems.length;
-  const activeSignal = loyaltyCommercialSignals.find((signal) => signal.lane === lane) ?? loyaltyCommercialSignals[0];
-  const visibleItems = loyaltyCommercialLaneItems.filter((item) => item.lane === lane || item.lane === 'all');
+    return (
+      <Box gap={2} style={styles.previewContainer}>
+        <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>محاكاة بطاقة المتجر</Text>
+        <CommercialParityPreview features={features} />
+      </Box>
+    );
+  };
 
   return (
-    <Box gap={4}>
-      <WebMissionHeroCard
-        dense
-        badges={['الولاء', 'قيمة العميل', 'تحكم مباشر']}
-        eyebrow="غرفة قيادة الولاء"
-        title="واجهة ولاء أرقى وأوضح لاتخاذ القرار"
-        metaItems={[
-          `عدد المسارات: ${liveLaneCount}`,
-          `القيمة الحالية: ${activeSignal.value}`,
-          `آخر حالة: ${lastAction}`,
-        ]}
-        primaryAction={{ label: 'فتح العمليات', href: hubHref }}
-        secondaryAction={{ label: 'العودة للتسويق', href: operationsHref }}
-      />
+    <div dir={isRtl ? 'rtl' : 'ltr'}>
+      <Box gap={4} style={{ padding: '24px' }}>
+      {/* KPIs */}
+      <View style={[styles.kpiRow, isRtl && styles.rowReverse]}>
+        <View style={styles.kpiCard}>
+          <Text role="caption" tone="muted">إجمالي الأعضاء</Text>
+          <Text role="titleLg" style={{ color: '#0A2F5C' }}>{kpis.members}</Text>
+        </View>
+        <View style={styles.kpiCard}>
+          <Text role="caption" tone="muted">مشتركي برو</Text>
+          <Text role="titleLg" style={{ color: '#FF500D' }}>{kpis.subscribers}</Text>
+        </View>
+        <View style={styles.kpiCard}>
+          <Text role="caption" tone="muted">المكافآت المتاحة</Text>
+          <Text role="titleLg" style={{ color: '#D97706' }}>{kpis.rewards}</Text>
+        </View>
+        <View style={styles.kpiCard}>
+          <Text role="caption" tone="muted">معدل التفعيل</Text>
+          <Text role="titleLg" style={{ color: '#16A34A' }}>{kpis.activationRate}</Text>
+        </View>
+      </View>
 
-      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-        <WebSignalCard title="المسارات النشطة" value={String(liveLaneCount)} description="قنوات ولاء واشتراك تعمل من نفس الغرفة" tone="best" />
-        <WebSignalCard title="نقاط التحكم" value={String(routeCount)} description="مفاتيح قرار واضحة وسريعة القراءة" />
-        <WebSignalCard title="الجمهور" value={resolveAudienceLabel(audience)} description="من يستفيد من العرض الحالي" />
-        <WebSignalCard title="نمط النشر" value={resolveDeliveryLabel(deliveryMode)} description="كيف يتم الدفع نحو الواجهة" />
-      </Box>
+      <View style={[styles.mainLayout, isRtl && styles.rowReverse]}>
+        {/* Main Panel */}
+        <Surface tone="raised" style={styles.editorPanel}>
+          <View style={[styles.editorHeader, isRtl && styles.rowReverse]}>
+            <Text role="titleSm" style={{ color: '#0A2F5C' }}>إدارة الولاء والاشتراكات</Text>
+          </View>
 
-      <WebSegmentedTabs
-        ariaLabel="أقسام الولاء"
-        items={loyaltySectionTabs.map((item) => ({ ...item, active: item.id === section }))}
-        onSelect={(itemId) => setSection(itemId as LoyaltyCommandSection)}
-      />
+          <Tabs<LoyaltyTab>
+            items={[
+              { value: 'programs', label: 'البرامج' },
+              { value: 'tiers', label: 'المستويات' },
+              { value: 'rewards', label: 'المكافآت' },
+              { value: 'subscriptions', label: 'الاشتراكات' },
+              { value: 'entitlements', label: 'الاستحقاقات' },
+              { value: 'earning', label: 'قواعد الكسب' },
+              { value: 'redemption', label: 'قواعد الاسترداد' },
+            ]}
+            value={activeTab}
+            onValueChange={setActiveTab}
+            variant="line"
+          />
 
-      {section === 'overview' ? (
-        <WebSectionCard title="الرؤية التنفيذية">
-          <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
-            <Surface tone="brand" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 300 }}>
-              <Text role="titleSm" tone="inverse">{resolveLaneTitle(lane)}</Text>
-              <Text role="bodySm" tone="inverse" style={{ opacity: 0.92 }}>
-                {resolveLaneDescription(lane, activeSignal.description)}
-              </Text>
-
-              <WebSegmentedTabs
-                ariaLabel="مسارات الولاء"
-                items={loyaltyLaneTabs.map((item) => ({ ...item, active: item.id === lane }))}
-                onSelect={(itemId) => setLane(itemId as LoyaltyLane)}
-              />
-
-              <Box gap={1}>
-                <Text role="bodyStrong" tone="inverse">القيمة الأبرز الآن</Text>
-                <Text role="bodySm" tone="inverse" style={{ opacity: 0.9 }}>{activeSignal.value}</Text>
-                <Text role="bodySm" tone="inverse" style={{ opacity: 0.84 }}>{programMessage}</Text>
-              </Box>
-
-              <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                <Button label="فتح محرر البرنامج" onPress={() => setSection('builder')} fullWidth={false} />
-                <Button label="عرض المزامنة" tone="secondary" onPress={() => setSection('sync')} fullWidth={false} />
-              </Box>
-            </Surface>
-
-            <Surface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
-              <Text role="titleSm">ملخص العقد الحي</Text>
-              <KeyValueList items={loyaltyCommercialKeyValues} />
-              <Box gap={2}>
-                {visibleItems.map((item) => (
-                  <ListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
-                ))}
-              </Box>
-            </Surface>
-          </Box>
-        </WebSectionCard>
-      ) : null}
-
-      {section === 'builder' ? (
-        <WebSectionCard title="مصمم البرنامج">
-          <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
-            <Surface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
-              <TextField label="اسم البرنامج" value={programName} onChangeText={setProgramName} hint="اسم واضح يتعامل معه فريق التسويق والعمليات" />
-              <TextField label="رسالة البرنامج" value={programMessage} onChangeText={setProgramMessage} hint="رسالة قصيرة تظهر القيمة الحقيقية للعرض" />
-
-              <WebSegmentedTabs
-                ariaLabel="اختيار المسار"
-                items={loyaltyLaneTabs.map((item) => ({ ...item, active: item.id === lane }))}
-                onSelect={(itemId) => setLane(itemId as LoyaltyLane)}
-              />
-
-              <WebSegmentedTabs
-                ariaLabel="اختيار الجمهور"
-                items={[
-                  { id: 'client', label: 'واجهة العميل', metaLabel: 'أساسي', active: audience === 'client' },
-                  { id: 'operations', label: 'العمليات', metaLabel: 'داخلي', active: audience === 'operations' },
-                  { id: 'all', label: 'عام', metaLabel: 'موسع', active: audience === 'all' },
-                ]}
-                onSelect={(itemId) => setAudience(itemId as 'all' | 'client' | 'operations')}
-              />
-
-              <WebSegmentedTabs
-                ariaLabel="اختيار النشر"
-                items={[
-                  { id: 'auto', label: 'تلقائي', metaLabel: 'سريع', active: deliveryMode === 'auto' },
-                  { id: 'manual', label: 'يدوي', metaLabel: 'مراجعة', active: deliveryMode === 'manual' },
-                  { id: 'pinned', label: 'مثبت', metaLabel: 'أولوية', active: deliveryMode === 'pinned' },
-                ]}
-                onSelect={(itemId) => setDeliveryMode(itemId as 'auto' | 'manual' | 'pinned')}
-              />
-
-              <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                <Button label="حفظ كمسودة" onPress={() => setLastAction(`تم حفظ ${programName} كمسودة`)} fullWidth={false} />
-                <Button label="نشر الآن" tone="secondary" onPress={() => setLastAction(`تم نشر ${programName}`)} fullWidth={false} />
-                <Button label="إيقاف" tone="ghost" onPress={() => setLastAction(`تم إيقاف ${programName}`)} fullWidth={false} />
-              </Box>
-            </Surface>
-
-            <Surface tone="inset" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 300 }}>
-              <Text role="titleSm">المعاينة التنفيذية</Text>
-              <Surface tone="brand" padding={4} gap={2}>
-                <Text role="titleSm" tone="inverse">{programName}</Text>
-                <Text role="bodySm" tone="inverse" style={{ opacity: 0.92 }}>{programMessage}</Text>
-                <Text role="bodySm" tone="inverse" style={{ opacity: 0.84 }}>
-                  الجمهور: {resolveAudienceLabel(audience)} · النشر: {resolveDeliveryLabel(deliveryMode)}
-                </Text>
-              </Surface>
-
-              <ListItem title="القيمة الرئيسية" subtitle={activeSignal.description} meta={activeSignal.value} badgeLabel="حي" />
-              <ListItem title="المسار الحالي" subtitle={resolveLaneTitle(lane)} meta={resolveAudienceLabel(audience)} badgeLabel="جاهز" />
-              <ListItem title="آخر إجراء" subtitle={lastAction} meta={resolveDeliveryLabel(deliveryMode)} badgeLabel="تشغيل" />
-            </Surface>
-          </Box>
-        </WebSectionCard>
-      ) : null}
-
-      {section === 'sync' ? (
-        <WebSectionCard title="المزامنة الحية">
-          <Box gap={3}>
-            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-              <WebSignalCard title="الاشتراك" value="الخطة الأسرية" description="تحديث الخطة والعائلة قبل الإجراء المدفوع" tone="best" />
-              <WebSignalCard title="النقاط" value="ميزان الولاء" description="الرصيد والاسترداد قبل الدفع" />
-              <WebSignalCard title="العرض" value="تطبيق الكوبون" description="الخصم يظهر داخل مسار السعر" />
-              <WebSignalCard title="الاستحقاقات" value="المزايا الفعلية" description="الرؤية الواضحة للحقوق والمكافآت" />
+          <ScrollView style={{ maxHeight: 500 }}>
+            <Box gap={4} style={{ padding: 16 }}>
+              {renderTabContent()}
             </Box>
+          </ScrollView>
+        </Surface>
 
-            <Surface tone="raised" padding={4} gap={2}>
-              {visibleItems.map((item) => (
-                <ListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
-              ))}
-            </Surface>
-
-            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-              <Button label="تشغيل المزامنة" onPress={() => setLastAction('تمت جدولة المزامنة الآن')} fullWidth={false} />
-              <Button label="فتح العمليات" tone="secondary" onPress={() => router.push(hubHref)} fullWidth={false} />
-              <Button label="العودة للتسويق" tone="ghost" onPress={() => router.push(operationsHref)} fullWidth={false} />
-            </Box>
+        {/* Side Panel for Preview */}
+        <Surface tone="raised" style={styles.sidePanel}>
+          <View style={[styles.editorHeader, isRtl && styles.rowReverse]}>
+            <Text role="titleSm" style={{ color: '#0A2F5C' }}>محاكاة التأثير</Text>
+          </View>
+          <Box gap={4} style={{ padding: 16 }}>
+            {renderStoreCardPreview()}
+            <Text role="caption" tone="muted" style={{ lineHeight: 20 }}>
+              هذه المحاكاة تعرض الشارات والمزايا التي ترثها المتاجر المؤهلة بناءً على استحقاقات المستخدم أو قواعد الاشتراك الفعالة.
+            </Text>
           </Box>
-        </WebSectionCard>
-      ) : null}
-
-      {section === 'guardrails' ? (
-        <WebSectionCard title="الضوابط والحماية">
-          <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
-            <Surface tone="raised" padding={4} gap={3} style={{ flexGrow: 1, minWidth: 320 }}>
-              <WebSegmentedTabs
-                ariaLabel="ضوابط الجمهور"
-                items={[
-                  { id: 'all', label: 'عام', metaLabel: 'واسع', active: audience === 'all' },
-                  { id: 'client', label: 'واجهة العميل', metaLabel: 'أساسي', active: audience === 'client' },
-                  { id: 'operations', label: 'العمليات', metaLabel: 'داخلي', active: audience === 'operations' },
-                ]}
-                onSelect={(itemId) => setAudience(itemId as 'all' | 'client' | 'operations')}
-              />
-
-              <WebSegmentedTabs
-                ariaLabel="ضوابط النشر"
-                items={[
-                  { id: 'auto', label: 'تلقائي', metaLabel: 'افتراضي', active: deliveryMode === 'auto' },
-                  { id: 'manual', label: 'يدوي', metaLabel: 'مراجعة', active: deliveryMode === 'manual' },
-                  { id: 'pinned', label: 'مثبت', metaLabel: 'أولوية', active: deliveryMode === 'pinned' },
-                ]}
-                onSelect={(itemId) => setDeliveryMode(itemId as 'auto' | 'manual' | 'pinned')}
-              />
-
-              <KeyValueList
-                items={[
-                  { label: 'الجمهور', value: resolveAudienceLabel(audience) },
-                  { label: 'نمط النشر', value: resolveDeliveryLabel(deliveryMode) },
-                  { label: 'اسم البرنامج', value: programName },
-                  { label: 'المسار الحالي', value: resolveLaneTitle(lane) },
-                ]}
-              />
-            </Surface>
-
-            <Surface tone="inset" padding={4} gap={2} style={{ flexGrow: 1, minWidth: 300 }}>
-              <Text role="titleSm">فحص الجودة</Text>
-              <ListItem title="هيمنة CTA" subtitle="الإجراء الأساسي الآن ظاهر وواضح بدل التشتت البصري" meta="ممتاز" badgeLabel="UX" />
-              <ListItem title="وضوح القراءة" subtitle="تجميع المعلومات صار أكثر هدوءًا وأقوى هرمية" meta="واضح" badgeLabel="UI" />
-              <ListItem title="اتساق RTL" subtitle="المحاذاة العربية أصبحت طبيعية وأكثر ثقة بصريًا" meta="مصقول" badgeLabel="RTL" />
-              <Button label="تأكيد الضوابط" onPress={() => setLastAction(`تم التحقق: ${resolveAudienceLabel(audience)} / ${resolveDeliveryLabel(deliveryMode)}`)} fullWidth={false} />
-            </Surface>
-          </Box>
-        </WebSectionCard>
-      ) : null}
+        </Surface>
+      </View>
     </Box>
+    </div>
   );
 }
+
+const styles = StyleSheet.create({
+  rowReverse: {
+    flexDirection: 'row-reverse',
+  },
+  kpiRow: {
+    flexDirection: 'row',
+    gap: 12,
+    flexWrap: 'wrap',
+  },
+  kpiCard: {
+    flex: 1,
+    minWidth: 120,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(10,47,92,0.06)',
+    alignItems: 'center',
+  },
+  mainLayout: {
+    flexDirection: 'row',
+    gap: 16,
+    alignItems: 'flex-start',
+    flexWrap: 'wrap',
+  },
+  editorPanel: {
+    flex: 2,
+    minWidth: 450,
+    borderRadius: 20,
+    borderColor: 'rgba(10,47,92,0.06)',
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  sidePanel: {
+    flex: 1,
+    minWidth: 300,
+    borderRadius: 20,
+    borderColor: 'rgba(10,47,92,0.06)',
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  editorHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+    backgroundColor: '#fff',
+  },
+  card: {
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    backgroundColor: '#fff',
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: '#F1F5F9',
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#64748B',
+  },
+  previewContainer: {
+    backgroundColor: '#F8FAFC',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  }
+});
 
 export default LoyaltyCommandDeckScreen;

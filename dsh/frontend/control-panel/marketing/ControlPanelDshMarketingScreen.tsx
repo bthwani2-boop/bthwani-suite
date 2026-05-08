@@ -11,6 +11,8 @@ import { GrowthCommandDeckScreen } from './GrowthCommandDeckScreen';
 import { VideosCommandDeckScreen } from './VideosCommandDeckScreen';
 import { LoyaltyCommandDeckScreen } from './LoyaltyCommandDeckScreen';
 import { PromosCommandDeckScreen } from './PromosCommandDeckScreen';
+import { CampaignsCommandDeckScreen } from './CampaignsCommandDeckScreen';
+import { PartnerOffersCommandDeckScreen } from './PartnerOffersCommandDeckScreen';
 import styles from '../operations/dsh-surface.module.css';
 import {
   getMarketingTickerItems,
@@ -42,7 +44,7 @@ import { dshPromotionCandidates } from '../../shared/workflow';
 
 export type ControlPanelDshMarketingScreenProps = SmartSignalLayerScreenProps;
 
-type MarketingControlView = 'ticker' | 'banners' | 'promos' | 'video' | 'growth' | 'partners' | 'signals' | 'loyalty';
+type MarketingControlView = 'ticker' | 'banners' | 'promos' | 'video' | 'campaigns' | 'partners' | 'loyalty' | 'growth' | 'signals';
 
 export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingScreenProps) {
   const [activeTab, setActiveTab] = React.useState<MarketingControlView>('banners');
@@ -75,9 +77,10 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
     { id: 'banners', label: 'البنرات والكارسول', icon: '🖼️' },
     { id: 'promos', label: 'بروموهات Home', icon: '📱' },
     { id: 'video', label: 'استوديو الفيديو', icon: '🎬' },
-    { id: 'growth', label: 'النمو والحملات', icon: '⚡' },
+    { id: 'campaigns', label: 'الحملات', icon: '🎯' },
     { id: 'partners', label: 'عروض الشركاء', icon: '🤝' },
     { id: 'loyalty', label: 'الولاء والاشتراكات', icon: '💎' },
+    { id: 'growth', label: 'النمو', icon: '⚡' },
     { id: 'signals', label: 'الإشارات والقياس', icon: '📊' },
   ] as const;
 
@@ -86,16 +89,9 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
     banners: [],
     promos: [],
     video: [],
-    growth: [
-      { id: 'programs', label: 'البرامج' },
-      { id: 'campaigns', label: 'الحملات' },
-    ],
-    partners: [
-      { id: 'inbound', label: 'واردة' },
-      { id: 'review', label: 'مراجعة' },
-      { id: 'ready', label: 'جاهز للتسويق' },
-      { id: 'published', label: 'منشور' },
-    ],
+    campaigns: [],
+    partners: [],
+    growth: [],
     signals: [
       { id: 'reach', label: 'الوصول' },
       { id: 'clicks', label: 'النقرات' },
@@ -467,77 +463,14 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
         return <PromosCommandDeckScreen />;
       case 'video':
         return <VideosCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
+      case 'campaigns':
+        return <CampaignsCommandDeckScreen />;
+      case 'partners':
+        return <PartnerOffersCommandDeckScreen />;
       case 'growth':
         return <GrowthCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
       case 'signals':
         return <SmartSignalLayerScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
-      case 'partners': {
-        const readyItems = dshPromotionCandidates.filter((item) => item.status === 'marketing-ready');
-
-        return (
-          <Box gap={4}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '20px' }}>
-              <Box gap={3}>
-                <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '20px' }}>
-                  <h3 style={{ color: '#0A2F5C', fontSize: '16px', fontWeight: '800', marginBottom: '8px' }}>نوايا الترويج الجاهزة للتسويق (Intent Queue)</h3>
-                  <p style={{ color: '#64748B', fontSize: '13px', marginBottom: '16px' }}>العناصر التالية تمت مراجعتها واعتماد أهليتها من قبل الشركاء، وهي جاهزة للتحويل إلى بنرات تسويقية (Handoff).</p>
-
-                  {readyItems.length === 0 ? (
-                    <div style={{ padding: '32px', textAlign: 'center', backgroundColor: '#F8FAFC', borderRadius: '8px', border: '1px dashed #CBD5E1' }}>
-                      <p style={{ color: '#64748B', fontSize: '13px', fontWeight: '600' }}>لا توجد عناصر جاهزة للتسويق حالياً.</p>
-                    </div>
-                  ) : (
-                    <Box gap={2}>
-                      {readyItems.map(item => (
-                        <div key={item.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', backgroundColor: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                          <Box gap={1}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <span style={{ fontSize: '14px', fontWeight: '800', color: '#0A2F5C' }}>{item.title}</span>
-                              <span style={{ backgroundColor: '#DBEAFE', color: '#1D4ED8', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: '800' }}>{item.kind === 'product' ? 'منتج' : 'متجر'}</span>
-                            </div>
-                            <span style={{ fontSize: '12px', color: '#64748B' }}>{item.subtitle}</span>
-                            <span style={{ fontSize: '11px', color: '#0369A1', marginTop: '4px' }}>ملاحظة النية: {item.offerHint}</span>
-                          </Box>
-
-                          <button
-                            onClick={() => {
-                              setActiveTab('banners');
-                              setActiveSubTab('list');
-                            }}
-                            style={{
-                              padding: '8px 16px',
-                              backgroundColor: '#0A2F5C',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '8px',
-                              fontSize: '12px',
-                              fontWeight: '700',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            إنشاء بنر
-                          </button>
-                        </div>
-                      ))}
-                    </Box>
-                  )}
-                </div>
-              </Box>
-
-              <Box gap={3}>
-                <div style={{ backgroundColor: '#F0FDF4', padding: '16px', borderRadius: '12px', border: '1px solid #BBF7D0' }}>
-                  <h4 style={{ color: '#166534', fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>معايير التسليم (Handoff)</h4>
-                  <ul style={{ color: '#166534', fontSize: '12px', paddingInlineStart: '20px', margin: 0, gap: '8px', display: 'flex', flexDirection: 'column' }}>
-                    <li>لا نقوم بتوليد البنر تلقائياً دون تصميم.</li>
-                    <li>العناصر هنا مؤهلة (Eligible) من الناحية التشغيلية.</li>
-                    <li>دور قسم التسويق الآن هو تحويل "النية" إلى "محتوى بصري" عبر Banner Studio.</li>
-                  </ul>
-                </div>
-              </Box>
-            </div>
-          </Box>
-        );
-      }
       case 'loyalty':
         return <LoyaltyCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
       default:
@@ -632,7 +565,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
           padding: '8px 24px',
           backgroundColor: '#F8FAFC',
           borderBottom: '1px solid rgba(10,47,92,0.08)',
-          overflowX: 'auto',
+          flexWrap: 'wrap',
           minHeight: '48px',
         }}>
           {SECONDARY_TABS[activeTab].map((sub) => {
