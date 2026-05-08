@@ -6,7 +6,12 @@ import { PartnerTopologyLane } from './PartnerTopologyLane';
 import { DshPartnerPromotionEligibilityScreen } from './DshPartnerPromotionEligibilityScreen';
 import { dshPartnerIntakeMetrics } from './workflow';
 import { getPartnerIntakeItems } from '../../shared/partner-intake-store';
-import { transitionApprovalStage, resolveNextOwner, ApprovalRecord, ApprovalStage } from '../../shared/workflow';
+import {
+  ApprovalRecord,
+  ApprovalStage,
+  resolveNextOwner,
+  moveApprovalRecordToStage,
+} from '../../shared/workflow';
 import styles from '../operations/dsh-surface.module.css';
 
 export type ControlPanelDshPartnerApprovalsScreenProps = {
@@ -26,20 +31,21 @@ const METRIC_ARABIC: Record<string, string> = {
 function CompactPartnerIntakeQueue() {
   const [items, setItems] = React.useState<ApprovalRecord[]>([]);
 
+  const refresh = () => setItems(getPartnerIntakeItems());
+
   React.useEffect(() => {
-    setItems(getPartnerIntakeItems());
+    refresh();
   }, []);
 
   const handleAction = (id: string, action: 'approve' | 'reject' | 'fix') => {
-    setItems(prev => prev.map(item => {
-      if (item.id === id) {
-        if (action === 'approve') {
-          return { ...item, stage: 'marketing-review' };
-        }
-        return { ...item, stage: transitionApprovalStage(item.stage, action) };
-      }
-      return item;
-    }));
+    if (action === 'approve') {
+      moveApprovalRecordToStage(id, 'marketing-review', 'control-panel-partners', 'قبول للمراجعة التسويقية');
+    } else if (action === 'reject') {
+      moveApprovalRecordToStage(id, 'rejected', 'control-panel-partners', 'رفض');
+    } else if (action === 'fix') {
+      moveApprovalRecordToStage(id, 'needs-fix', 'control-panel-partners', 'طلب تعديل');
+    }
+    refresh();
   };
 
   const getStageStyle = (stage: ApprovalStage) => {
@@ -50,6 +56,9 @@ function CompactPartnerIntakeQueue() {
       case 'needs-fix': return { bg: '#FEF2F2', fg: '#DC2626', label: 'يتطلب تعديل' };
       case 'rejected': return { bg: '#F1F5F9', fg: '#475569', label: 'مرفوض' };
       case 'marketing-review': return { bg: '#DCFCE7', fg: '#16A34A', label: 'مُحوّل للتسويق' };
+      case 'marketing-approved': return { bg: '#DBEAFE', fg: '#1D4ED8', label: 'معتمد تسويقياً' };
+      case 'catalog-adopted': return { bg: '#DCFCE7', fg: '#16A34A', label: 'في الكتالوج' };
+      case 'client-visible': return { bg: '#DCFCE7', fg: '#166534', label: 'ظاهر للعميل' };
       default: return { bg: '#F1F5F9', fg: '#475569', label: stage };
     }
   };
@@ -60,9 +69,13 @@ function CompactPartnerIntakeQueue() {
       case 'product-media': return 'صورة';
       case 'category-suggestion': return 'فئة';
       case 'partner-offer': return 'عرض';
+      case 'store': return 'متجر';
       default: return type;
     }
   };
+
+  const canAct = (stage: ApprovalStage) =>
+    ['partner-submitted', 'field-submitted', 'partner-review'].includes(stage);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px', backgroundColor: '#FAFAFA', minHeight: '100%', direction: 'rtl' }}>
@@ -75,6 +88,7 @@ function CompactPartnerIntakeQueue() {
         {items.map(item => {
           const sStyle = getStageStyle(item.stage);
           const nextOwner = resolveNextOwner(item.stage);
+          const trail = item.auditTrail || [];
 
           return (
             <div key={item.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
@@ -87,9 +101,13 @@ function CompactPartnerIntakeQueue() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#64748B' }}>
                   <span>تاريخ التقديم: {new Date(item.submittedAt).toLocaleDateString('ar-SA')}</span>
                   <span>•</span>
-                  <span>المالك: {nextOwner === 'control-panel-marketing' ? 'التسويق' : nextOwner === 'control-panel-partners' ? 'الشركاء' : nextOwner}</span>
-                  <span>•</span>
-                  <span>السبب: مراجعة أولية</span>
+                  <span>المالك: {nextOwner === 'control-panel-marketing' ? 'التسويق' : nextOwner === 'control-panel-partners' ? 'الشركاء' : nextOwner === 'control-panel-catalog' ? 'الكتالوج' : nextOwner}</span>
+                  {trail.length > 0 && (
+                    <>
+                      <span>•</span>
+                      <span style={{ color: '#0369A1', fontWeight: 700 }}>سجل: {trail.length} حركة</span>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -98,7 +116,7 @@ function CompactPartnerIntakeQueue() {
                   {sStyle.label}
                 </div>
 
-                {['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage) && (
+                {canAct(item.stage) && (
                   <div style={{ display: 'flex', gap: '4px' }}>
                     <button onClick={() => handleAction(item.id, 'approve')} style={{ border: 'none', backgroundColor: '#10B981', color: '#fff', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>قبول للمراجعة التسويقية</button>
                     <button onClick={() => handleAction(item.id, 'fix')} style={{ border: '1px solid #F59E0B', backgroundColor: 'transparent', color: '#F59E0B', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>طلب تعديل</button>

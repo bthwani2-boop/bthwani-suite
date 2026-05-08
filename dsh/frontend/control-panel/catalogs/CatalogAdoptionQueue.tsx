@@ -1,35 +1,42 @@
 import React from 'react';
-import { getCatalogAdoptionItems } from '../../shared/catalog-adoption-store';
+import {
+  getCatalogAdoptionItems,
+  adoptCatalogCentral,
+  adoptCatalogException,
+  activateClientVisible,
+  returnToMarketing,
+  rejectFromCatalog,
+} from '../../shared/catalog-adoption-store';
 import { ApprovalRecord, ApprovalStage } from '../../shared/workflow';
 
 export function CatalogAdoptionQueue() {
   const [items, setItems] = React.useState<ApprovalRecord[]>([]);
 
+  const refresh = () => setItems(getCatalogAdoptionItems());
+
   React.useEffect(() => {
-    setItems(getCatalogAdoptionItems());
+    refresh();
   }, []);
 
   const handleAction = (id: string, action: 'adopt-central' | 'adopt-exception' | 'visible' | 'reject' | 'fix') => {
-    setItems(prev => prev.map(item => {
-      if (item.id === id) {
-        if (action === 'adopt-central') {
-          return { ...item, stage: 'catalog-adopted', metadata: { mediaPolicy: 'catalog-owned-media' } };
-        }
-        if (action === 'adopt-exception') {
-          return { ...item, stage: 'catalog-adopted', metadata: { mediaPolicy: 'partner-owned-exception' } };
-        }
-        if (action === 'visible') {
-          return { ...item, stage: 'client-visible' };
-        }
-        if (action === 'fix') {
-          return { ...item, stage: 'marketing-review' };
-        }
-        if (action === 'reject') {
-          return { ...item, stage: 'rejected' };
-        }
-      }
-      return item;
-    }));
+    switch (action) {
+      case 'adopt-central':
+        adoptCatalogCentral(id);
+        break;
+      case 'adopt-exception':
+        adoptCatalogException(id);
+        break;
+      case 'visible':
+        activateClientVisible(id);
+        break;
+      case 'fix':
+        returnToMarketing(id);
+        break;
+      case 'reject':
+        rejectFromCatalog(id);
+        break;
+    }
+    refresh();
   };
 
   const getStageStyle = (stage: ApprovalStage) => {
@@ -49,6 +56,7 @@ export function CatalogAdoptionQueue() {
       case 'product-media': return 'صورة منتج';
       case 'category-suggestion': return 'فئة';
       case 'partner-offer': return 'عرض شريك';
+      case 'store': return 'متجر';
       default: return type;
     }
   };
@@ -67,6 +75,7 @@ export function CatalogAdoptionQueue() {
         {items.filter(i => ['marketing-approved', 'catalog-adopted', 'client-visible', 'needs-fix', 'rejected'].includes(i.stage)).map(item => {
           const sStyle = getStageStyle(item.stage);
           const policy = item.metadata?.mediaPolicy || (item.entityType === 'product-media' ? 'partner-owned-exception' : 'catalog-owned-media');
+          const trail = item.auditTrail || [];
 
           return (
             <div key={item.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', padding: '16px', borderRadius: '12px', border: '1px solid #E2E8F0', gap: '16px' }}>
@@ -78,8 +87,11 @@ export function CatalogAdoptionQueue() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#64748B', flexWrap: 'wrap' }}>
                   <span style={{ backgroundColor: '#F8FAFC', padding: '2px 6px', borderRadius: '4px', border: '1px solid #E2E8F0', fontFamily: 'monospace' }}>{item.id}</span>
-                  <span style={{ backgroundColor: '#F8FAFC', padding: '2px 6px', borderRadius: '4px', border: '1px solid #E2E8F0', fontWeight: 700, color: policy.includes('catalog') ? '#16A34A' : '#D97706' }}>السياسة: {policy}</span>
+                  <span style={{ backgroundColor: '#F8FAFC', padding: '2px 6px', borderRadius: '4px', border: '1px solid #E2E8F0', fontWeight: 700, color: typeof policy === 'string' && policy.includes('catalog') ? '#16A34A' : '#D97706' }}>السياسة: {policy}</span>
                   <span style={{ backgroundColor: '#F8FAFC', padding: '2px 6px', borderRadius: '4px', border: '1px solid #E2E8F0', color: '#0369A1', fontWeight: 700 }}>التأثير: {item.stage === 'client-visible' ? 'يظهر للعميل' : 'غير مرئي'}</span>
+                  {trail.length > 0 && (
+                    <span style={{ backgroundColor: '#E0F2FE', padding: '2px 6px', borderRadius: '4px', color: '#0369A1', fontWeight: 700 }}>سجل: {trail.length} حركة</span>
+                  )}
                 </div>
               </div>
 

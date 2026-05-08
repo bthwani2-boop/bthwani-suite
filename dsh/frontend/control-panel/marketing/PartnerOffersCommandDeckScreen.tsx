@@ -17,12 +17,10 @@ import {
   type PartnerOfferSource,
 } from '../../shared/partner-offer-store';
 import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
-import { getMarketingReviewItems } from '../../shared/marketing-review-store';
 import { ApprovalRecord, ApprovalStage, transitionApprovalStage, resolveNextOwner, isCatalogOwnedMedia, isPartnerOwnedException } from '../../shared/workflow';
 
-import { MarketingReviewQueue } from './MarketingReviewQueue';
-
 // --- Partner Offers Component ---
+// ملاحظة: مراجعة الصور والمنتجات انتقلت إلى تبويب مستقل: "مراجعة الصور والمنتجات"
 
 export function PartnerOffersCommandDeckScreen({ activeSubTab = 'offers' }: { activeSubTab?: string }) {
   const [items, setItems] = React.useState<PartnerOfferRecord[]>(() => getPartnerOfferItems());
@@ -138,9 +136,6 @@ export function PartnerOffersCommandDeckScreen({ activeSubTab = 'offers' }: { ac
     );
   };
 
-  if (activeSubTab === 'marketing-review') {
-    return <MarketingReviewQueue />;
-  }
 
   return (
     <Box gap={4} dir="rtl" padding={4} style={{ flex: 1 }}>

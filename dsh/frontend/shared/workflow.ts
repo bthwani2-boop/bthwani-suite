@@ -162,7 +162,9 @@ export const dshPromotionCandidates: ReadonlyArray<DshPromotionCandidate> = [
   }
 ];
 
-// --- DSH Approval Pipeline SSOT v1 ---
+// =====================================================================
+// DSH Approval Pipeline SSOT v2 — Shared In-Memory Workflow Store
+// =====================================================================
 
 export type ApprovalStage =
   | 'partner-submitted'
@@ -194,6 +196,26 @@ export type ApprovalSourceSurface =
   | 'control-panel-catalog'
   | 'app-client';
 
+// ── Audit Trail ──────────────────────────────────────────────────────
+
+export type AuditTrailEntry = {
+  at: string;
+  fromStage: ApprovalStage;
+  toStage: ApprovalStage;
+  owner: ApprovalSourceSurface;
+  actionLabel: string;
+};
+
+// ── Typed Metadata ───────────────────────────────────────────────────
+
+export type ApprovalRecordMetadata = {
+  requiredFix?: string;
+  rejectionReason?: string;
+  mediaPolicy?: string;
+};
+
+// ── ApprovalRecord ───────────────────────────────────────────────────
+
 export type ApprovalRecord = {
   id: string;
   entityType: ApprovalEntityType;
@@ -201,8 +223,11 @@ export type ApprovalRecord = {
   stage: ApprovalStage;
   title: string;
   submittedAt: string;
-  metadata?: any;
+  metadata?: ApprovalRecordMetadata;
+  auditTrail?: AuditTrailEntry[];
 };
+
+// ── Stage Transitions ────────────────────────────────────────────────
 
 export function transitionApprovalStage(current: ApprovalStage, action: 'approve' | 'reject' | 'fix'): ApprovalStage {
   if (action === 'reject') return 'rejected';
@@ -259,4 +284,209 @@ export function isCatalogOwnedMedia(stage: ApprovalStage): boolean {
 
 export function isPartnerOwnedException(stage: ApprovalStage, entityType: ApprovalEntityType): boolean {
   return entityType === 'product-media' && (stage === 'marketing-approved' || stage === 'partner-approved');
+}
+
+// =====================================================================
+// Global Shared Approval Store (in-memory, fixture-seeded)
+// =====================================================================
+
+const PARTNER_QUEUE_STAGES: ReadonlyArray<ApprovalStage> = [
+  'partner-submitted', 'field-submitted', 'partner-review', 'partner-approved', 'needs-fix', 'rejected',
+];
+
+const MARKETING_QUEUE_STAGES: ReadonlyArray<ApprovalStage> = [
+  'marketing-review', 'marketing-approved', 'needs-fix',
+];
+
+const CATALOG_QUEUE_STAGES: ReadonlyArray<ApprovalStage> = [
+  'marketing-approved', 'catalog-adopted', 'client-visible', 'needs-fix', 'rejected',
+];
+
+// ── Seed fixtures ────────────────────────────────────────────────────
+
+let _globalStore: ApprovalRecord[] = [
+  // — من بوابة الشركاء (partner-intake) —
+  {
+    id: 'intake-1',
+    entityType: 'product',
+    source: 'app-partner',
+    stage: 'partner-submitted',
+    title: 'منتج جديد من الشريك غير موجود في الكتالوج',
+    submittedAt: new Date(Date.now() - 3600_000 * 48).toISOString(),
+    auditTrail: [],
+  },
+  {
+    id: 'intake-2',
+    entityType: 'category-suggestion',
+    source: 'app-partner',
+    stage: 'partner-review',
+    title: 'اقتراح فئة من الشريك',
+    submittedAt: new Date(Date.now() - 3600_000 * 36).toISOString(),
+    auditTrail: [],
+  },
+  {
+    id: 'intake-3',
+    entityType: 'store',
+    source: 'app-field',
+    stage: 'field-submitted',
+    title: 'منتج/متجر من الميداني',
+    submittedAt: new Date(Date.now() - 3600_000 * 30).toISOString(),
+    auditTrail: [],
+  },
+  {
+    id: 'intake-4',
+    entityType: 'product-media',
+    source: 'app-partner',
+    stage: 'needs-fix',
+    title: 'صورة المنتج غير واضحة',
+    submittedAt: new Date(Date.now() - 3600_000 * 24).toISOString(),
+    metadata: {
+      requiredFix: 'يرجى إعادة تصوير المنتج بإضاءة أفضل وخلفية بيضاء.',
+    },
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 20).toISOString(), fromStage: 'partner-submitted', toStage: 'needs-fix', owner: 'control-panel-partners', actionLabel: 'طلب تعديل' },
+    ],
+  },
+  {
+    id: 'intake-5',
+    entityType: 'partner-offer',
+    source: 'app-partner',
+    stage: 'rejected',
+    title: 'عرض خصم 90%',
+    submittedAt: new Date(Date.now() - 3600_000 * 72).toISOString(),
+    metadata: {
+      rejectionReason: 'نسبة الخصم عالية جداً وتؤثر على هامش الربح المتفق عليه.',
+    },
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 68).toISOString(), fromStage: 'partner-submitted', toStage: 'rejected', owner: 'control-panel-partners', actionLabel: 'رفض' },
+    ],
+  },
+  {
+    id: 'intake-6',
+    entityType: 'product',
+    source: 'app-partner',
+    stage: 'marketing-review',
+    title: 'وجبة غداء عمل — من بوابة الشركاء',
+    submittedAt: new Date(Date.now() - 3600_000 * 18).toISOString(),
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 16).toISOString(), fromStage: 'partner-submitted', toStage: 'partner-review', owner: 'control-panel-partners', actionLabel: 'قبول أولي' },
+      { at: new Date(Date.now() - 3600_000 * 14).toISOString(), fromStage: 'partner-review', toStage: 'marketing-review', owner: 'control-panel-partners', actionLabel: 'تحويل للتسويق' },
+    ],
+  },
+  {
+    id: 'intake-7',
+    entityType: 'product',
+    source: 'app-partner',
+    stage: 'client-visible',
+    title: 'ساندوتش دجاج مشوي',
+    submittedAt: new Date(Date.now() - 3600_000 * 96).toISOString(),
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 90).toISOString(), fromStage: 'partner-submitted', toStage: 'marketing-review', owner: 'control-panel-partners', actionLabel: 'قبول للتسويق' },
+      { at: new Date(Date.now() - 3600_000 * 84).toISOString(), fromStage: 'marketing-review', toStage: 'marketing-approved', owner: 'control-panel-marketing', actionLabel: 'اعتماد تسويقي' },
+      { at: new Date(Date.now() - 3600_000 * 78).toISOString(), fromStage: 'marketing-approved', toStage: 'catalog-adopted', owner: 'control-panel-catalog', actionLabel: 'اعتماد مركزي' },
+      { at: new Date(Date.now() - 3600_000 * 72).toISOString(), fromStage: 'catalog-adopted', toStage: 'client-visible', owner: 'control-panel-catalog', actionLabel: 'تفعيل للعميل' },
+    ],
+  },
+
+  // — من بوابة الكتالوج (catalog-adoption) —
+  {
+    id: 'cat-1',
+    entityType: 'product',
+    source: 'control-panel-marketing',
+    stage: 'catalog-adopted',
+    title: 'عنصر معتمد — في الكتالوج (مسودة)',
+    submittedAt: new Date(Date.now() - 3600_000 * 60).toISOString(),
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 56).toISOString(), fromStage: 'marketing-approved', toStage: 'catalog-adopted', owner: 'control-panel-catalog', actionLabel: 'اعتماد مركزي' },
+    ],
+  },
+  {
+    id: 'cat-2',
+    entityType: 'product',
+    source: 'control-panel-catalog',
+    stage: 'client-visible',
+    title: 'عنصر ظاهر للعميل',
+    submittedAt: new Date(Date.now() - 3600_000 * 120).toISOString(),
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 100).toISOString(), fromStage: 'catalog-adopted', toStage: 'client-visible', owner: 'control-panel-catalog', actionLabel: 'تفعيل للعميل' },
+    ],
+  },
+  {
+    id: 'cat-3',
+    entityType: 'partner-offer',
+    source: 'control-panel-marketing',
+    stage: 'marketing-approved',
+    title: 'عرض ترويجي من التسويق',
+    submittedAt: new Date(Date.now() - 3600_000 * 10).toISOString(),
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 8).toISOString(), fromStage: 'marketing-review', toStage: 'marketing-approved', owner: 'control-panel-marketing', actionLabel: 'اعتماد تسويقي' },
+    ],
+  },
+  {
+    id: 'cat-4',
+    entityType: 'product-media',
+    source: 'control-panel-marketing',
+    stage: 'marketing-approved',
+    title: 'صورة مطعم مخصصة',
+    submittedAt: new Date(Date.now() - 3600_000 * 6).toISOString(),
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 4).toISOString(), fromStage: 'marketing-review', toStage: 'marketing-approved', owner: 'control-panel-marketing', actionLabel: 'اعتماد تسويقي' },
+    ],
+  },
+];
+
+// ── Selectors ────────────────────────────────────────────────────────
+
+export function getAllApprovalRecords(): ApprovalRecord[] {
+  return _globalStore;
+}
+
+export function getPartnerQueueRecords(): ApprovalRecord[] {
+  return _globalStore.filter(r => PARTNER_QUEUE_STAGES.includes(r.stage));
+}
+
+export function getMarketingQueueRecords(): ApprovalRecord[] {
+  return _globalStore.filter(r => MARKETING_QUEUE_STAGES.includes(r.stage));
+}
+
+export function getCatalogQueueRecords(): ApprovalRecord[] {
+  return _globalStore.filter(r => CATALOG_QUEUE_STAGES.includes(r.stage));
+}
+
+export function getClientVisibleRecords(): ApprovalRecord[] {
+  return _globalStore.filter(r => r.stage === 'client-visible');
+}
+
+// ── Mutations ────────────────────────────────────────────────────────
+
+export function upsertApprovalRecord(record: Partial<ApprovalRecord> & { id: string }): void {
+  const idx = _globalStore.findIndex(r => r.id === record.id);
+  if (idx >= 0) {
+    _globalStore = _globalStore.map(r => (r.id === record.id ? { ...r, ...record } : r));
+  } else {
+    _globalStore = [..._globalStore, record as ApprovalRecord];
+  }
+}
+
+export function moveApprovalRecordToStage(
+  id: string,
+  toStage: ApprovalStage,
+  owner: ApprovalSourceSurface,
+  actionLabel: string,
+): void {
+  _globalStore = _globalStore.map(r => {
+    if (r.id !== id) return r;
+    const entry: AuditTrailEntry = {
+      at: new Date().toISOString(),
+      fromStage: r.stage,
+      toStage,
+      owner,
+      actionLabel,
+    };
+    return {
+      ...r,
+      stage: toStage,
+      auditTrail: [...(r.auditTrail || []), entry],
+    };
+  });
 }

@@ -1,27 +1,27 @@
 import React from 'react';
-import { getMarketingReviewItems } from '../../shared/marketing-review-store';
-import { ApprovalRecord, ApprovalStage, transitionApprovalStage, isPartnerOwnedException } from '../../shared/workflow';
+import { getMarketingReviewItems, approveMediaReviewItem, requestMediaFix, rejectMediaReviewItem, sendMediaToCatalog } from '../../shared/marketing-review-store';
+import { ApprovalRecord, ApprovalStage, isPartnerOwnedException } from '../../shared/workflow';
 
 export function MarketingReviewQueue() {
   const [items, setItems] = React.useState<ApprovalRecord[]>([]);
 
+  const refresh = () => setItems(getMarketingReviewItems());
+
   React.useEffect(() => {
-    setItems(getMarketingReviewItems());
+    refresh();
   }, []);
 
   const handleAction = (id: string, action: 'approve' | 'reject' | 'fix' | 'catalog') => {
-    setItems(prev => prev.map(item => {
-      if (item.id === id) {
-        if (action === 'catalog') {
-          return { ...item, stage: 'catalog-adopted' };
-        }
-        if (action === 'approve') {
-          return { ...item, stage: 'marketing-approved' };
-        }
-        return { ...item, stage: transitionApprovalStage(item.stage, action) };
-      }
-      return item;
-    }));
+    if (action === 'approve') {
+      approveMediaReviewItem(id);
+    } else if (action === 'reject') {
+      rejectMediaReviewItem(id);
+    } else if (action === 'fix') {
+      requestMediaFix(id);
+    } else if (action === 'catalog') {
+      sendMediaToCatalog(id);
+    }
+    refresh();
   };
 
   const getStageStyle = (stage: ApprovalStage) => {

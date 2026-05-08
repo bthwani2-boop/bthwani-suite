@@ -13,6 +13,7 @@ import { LoyaltyCommandDeckScreen } from './LoyaltyCommandDeckScreen';
 import { PromosCommandDeckScreen } from './PromosCommandDeckScreen';
 import { CampaignsCommandDeckScreen } from './CampaignsCommandDeckScreen';
 import { PartnerOffersCommandDeckScreen } from './PartnerOffersCommandDeckScreen';
+import { MarketingMediaReviewCommandDeckScreen } from './MarketingMediaReviewCommandDeckScreen';
 import styles from '../operations/dsh-surface.module.css';
 import {
   getMarketingTickerItems,
@@ -44,7 +45,7 @@ import { dshPromotionCandidates } from '../../shared/workflow';
 
 export type ControlPanelDshMarketingScreenProps = SmartSignalLayerScreenProps;
 
-type MarketingControlView = 'ticker' | 'banners' | 'promos' | 'video' | 'campaigns' | 'partners' | 'loyalty' | 'growth' | 'signals';
+type MarketingControlView = 'ticker' | 'banners' | 'promos' | 'video' | 'campaigns' | 'partners' | 'loyalty' | 'growth' | 'signals' | 'media-review';
 
 export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingScreenProps) {
   const [activeTab, setActiveTab] = React.useState<MarketingControlView>('banners');
@@ -79,6 +80,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
     { id: 'video', label: 'استوديو الفيديو', icon: '🎬' },
     { id: 'campaigns', label: 'الحملات', icon: '🎯' },
     { id: 'partners', label: 'عروض الشركاء', icon: '🤝' },
+    { id: 'media-review', label: 'مراجعة الصور والمنتجات', icon: '🔍' },
     { id: 'loyalty', label: 'الولاء والاشتراكات', icon: '💎' },
     { id: 'growth', label: 'النمو', icon: '⚡' },
     { id: 'signals', label: 'الإشارات والقياس', icon: '📊' },
@@ -90,10 +92,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
     promos: [],
     video: [],
     campaigns: [],
-    partners: [
-      { id: 'offers', label: 'العروض' },
-      { id: 'marketing-review', label: 'مراجعة التسويق' },
-    ],
+    partners: [],
+    'media-review': [],
     growth: [],
     signals: [
       { id: 'reach', label: 'الوصول' },
@@ -468,6 +468,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
         return <VideosCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
       case 'campaigns':
         return <CampaignsCommandDeckScreen />;
+      case 'media-review':
+        return <MarketingMediaReviewCommandDeckScreen />;
       case 'partners':
         return <PartnerOffersCommandDeckScreen activeSubTab={activeSubTab} />;
       case 'growth':
