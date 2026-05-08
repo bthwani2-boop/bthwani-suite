@@ -41,8 +41,8 @@ import { getPublishedHomePromos, type HomePromoRecord } from '../shared/promo-st
 
 import { canRenderInClientSurface } from '../shared/workflow';
 
-function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string): ImageSourcePropType | undefined {
-  if (!canRenderInClientSurface(publishStage, 'store')) {
+function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string, mediaPolicy?: string): ImageSourcePropType | undefined {
+  if (!canRenderInClientSurface(publishStage, 'store', { mediaPolicy })) {
     return undefined;
   }
   return resolveDshImageSource(imageUri);
@@ -170,6 +170,7 @@ export type DshHomeGetStore = {
   isFollowing: boolean;
   hasOffer?: boolean;
   publishStage?: string;
+  mediaPolicy?: string;
   commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
 };
 
@@ -605,8 +606,8 @@ export function DshHomeGetScreen({
   }, [onOpenEntry, onOpenMySpace]);
 
   const resolvedCategories = categories ?? [];
-  const resolvedPromos = promos ?? [];
-  const resolvedHomePromos = homePromos ?? getPublishedHomePromos();
+  const resolvedPromos = (promos ?? []).filter(p => canRenderInClientSurface((p as any).publishStage, 'promo', { mediaPolicy: (p as any).mediaPolicy }));
+  const resolvedHomePromos = (homePromos ?? getPublishedHomePromos()).filter(p => canRenderInClientSurface(p.status === 'published' ? 'published-preview' : 'draft', 'promo'));
 
   const containerWidth = viewportWidth;
   const sidePeek = Math.max(spacing[1], Math.min(spacing[4], Math.round(containerWidth * 0.045)));
@@ -616,7 +617,7 @@ export function DshHomeGetScreen({
   const cardHeight = Math.max(154, Math.round(cardWidth * 0.74));
   const itemWidth = cardWidth + itemGap;
   const horizontalPadding = Math.max(0, Math.round((containerWidth - cardWidth) / 2));
-  const resolvedStores = (stores ?? []).filter((store) => canRenderInClientSurface(store.publishStage, 'store'));
+  const resolvedStores = (stores ?? []).filter((store) => canRenderInClientSurface(store.publishStage, 'store', { mediaPolicy: store.mediaPolicy }));
   const resolvedRecentOrders = recentOrders ?? [];
 
   const categoryItems = React.useMemo(() => {
@@ -1659,6 +1660,7 @@ export function DshHomeGetScreen({
                   const isProBlocked = sm?.['hasBthwaniPro']?.conflictStatus === 'blocker';
                   const isCouponBlocked = sm?.['hasCouponAvailable']?.conflictStatus === 'blocker';
                   const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictStatus === 'blocker';
+                  const isDeliveryBlocked = sm?.['deliveryFeeLabel']?.conflictStatus === 'blocker';
                   const isNewProductsBlocked = sm?.['hasNewProducts']?.conflictStatus === 'blocker' || sm?.['new-product-leak']?.conflictStatus === 'blocker';
 
                   const card: StoreCardPremiumItem = {
@@ -1672,7 +1674,7 @@ export function DshHomeGetScreen({
                     supportsPickup: sm?.['supportsPickup']?.conflictStatus !== 'blocker',
                     supportsPartnerDelivery: sm?.['supportsPartnerDelivery']?.conflictStatus !== 'blocker',
                     serviceTokens: [
-                      { label: store.deliveryLabel },
+                      { label: isDeliveryBlocked ? undefined : store.deliveryLabel },
                       { label: isPriceMatchBlocked ? undefined : store.serviceLabel }
                     ].filter(t => t.label),
                     isFavorite: favoriteToggles[store.id] ?? store.isFavorite,

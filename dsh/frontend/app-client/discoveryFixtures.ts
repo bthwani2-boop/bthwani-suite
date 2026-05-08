@@ -176,5 +176,37 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
     supportsPartnerDelivery: true,
     publishStage: 'client-visible',
   },
+  {
+    id: 'store-blocked-badge',
+    name: 'متجر بتعارض بروموشن',
+    subtitle: 'الشارة يجب أن تختفي',
+    statusLabel: 'مفتوح',
+    meta: '15 دقيقة',
+    etaMinutes: 15,
+    distanceKm: 1.5,
+    rating: 4.5,
+    isOffer: true,
+    isFavorite: false,
+    isFollowing: false,
+    imageUri: 'dsh.store.hadda.cover.v1',
+    deliveryLabel: 'سريع',
+    serviceLabel: 'برو',
+    followerCount: 50,
+    multiplierLabel: 'x1',
+    subscriptionPackageChips: [],
+    supportsPickup: true,
+    supportsPartnerDelivery: true,
+    publishStage: 'client-visible',
+    offerLabel: 'خصم وهمي',
+    commercialSourceMap: {
+      'offerLabel': {
+        sourceOwner: 'marketing-hard-gate',
+        sourceRecordId: 'conflict-001',
+        sourceType: 'offer',
+        conflictStatus: 'blocker',
+        conflictReason: 'تعارض مع سياسة العروض الحالية.'
+      }
+    }
+  },
   ...buildCanonicalPreviewDiscoveryStores(),
 ];

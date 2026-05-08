@@ -761,7 +761,7 @@ export function ControlPanelDshCatalogScreen({
           </div>
         )}
       </div>
-    </div>
+    </Box>
   );
 }
 

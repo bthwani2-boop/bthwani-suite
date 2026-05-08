@@ -29,6 +29,7 @@ export type DshDiscoveryStore = {
   canonicalStoreId?: string;
   canonicalProductId?: string;
   publishStage?: string;
+  mediaPolicy?: string;
   source?: string;
 };
 
@@ -67,6 +68,7 @@ export type DshStoreFixtureItem = {
   canonicalStoreId?: string;
   canonicalProductId?: string;
   publishStage?: string;
+  mediaPolicy?: string;
   source?: string;
 };
 

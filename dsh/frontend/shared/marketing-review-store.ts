@@ -49,16 +49,26 @@ function mapToMediaReview(r: ApprovalRecord): MediaReviewRecord {
 // =====================================================================
 
 export function getMediaReviewItems(): MediaReviewRecord[] {
+  const entityTypes: string[] = ['product', 'product-media', 'category-suggestion', 'store'];
+  const stages: string[] = ['marketing-review', 'marketing-approved', 'needs-fix', 'catalog-adopted', 'rejected'];
+
   return getAllApprovalRecords()
     .filter(r =>
-      ['product', 'product-media', 'category-suggestion', 'store'].includes(r.entityType) &&
-      ['marketing-review', 'marketing-approved', 'needs-fix', 'catalog-adopted', 'rejected'].includes(r.stage)
+      entityTypes.indexOf(r.entityType) >= 0 &&
+      stages.indexOf(r.stage) >= 0
     )
     .map(mapToMediaReview);
 }
 
 export function getMediaReviewItem(id: string): MediaReviewRecord | undefined {
-  const r = getAllApprovalRecords().find(it => it.id === id);
+  const records = getAllApprovalRecords();
+  let r: ApprovalRecord | undefined = undefined;
+  for (let i = 0; i < records.length; i++) {
+    if (records[i].id === id) {
+      r = records[i];
+      break;
+    }
+  }
   return r ? mapToMediaReview(r) : undefined;
 }
 

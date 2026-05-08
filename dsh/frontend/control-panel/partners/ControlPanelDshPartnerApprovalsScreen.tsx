@@ -7,6 +7,9 @@ import {
   ApprovalRecord,
   ApprovalStage,
   moveApprovalRecordToStage,
+  translateStage,
+  translateEntityType,
+  translateOwner,
 } from '../../shared/workflow';
 
 // ─────────────────────────────────────────────
@@ -37,14 +40,15 @@ function CompactPartnerIntakeQueue() {
   };
 
   const getStageMeta = (stage: ApprovalStage) => {
+    const label = translateStage(stage);
     switch (stage) {
       case 'partner-submitted':
-      case 'field-submitted': return { tone: 'warning', label: 'مُقدم جديد' };
-      case 'partner-review': return { tone: 'brand', label: 'قيد المراجعة' };
-      case 'needs-fix': return { tone: 'danger', label: 'يتطلب تعديل' };
-      case 'rejected': return { tone: 'default', label: 'مرفوض' };
-      case 'marketing-review': return { tone: 'success', label: 'مُحوّل للتسويق' };
-      default: return { tone: 'default', label: stage };
+      case 'field-submitted': return { tone: 'warning', label };
+      case 'partner-review': return { tone: 'brand', label };
+      case 'needs-fix': return { tone: 'danger', label };
+      case 'rejected': return { tone: 'default', label };
+      case 'marketing-review': return { tone: 'success', label };
+      default: return { tone: 'default', label };
     }
   };
 
@@ -63,7 +67,7 @@ function CompactPartnerIntakeQueue() {
                 <ListItem
                   key={item.id}
                   title={item.title}
-                  subtitle={item.source}
+                  subtitle={translateOwner(item.source)}
                   onPress={() => setSelectedId(item.id)}
                   selected={isSelected}
                   badgeLabel={meta.label}
@@ -90,8 +94,8 @@ function CompactPartnerIntakeQueue() {
               <Text role="caption" tone="muted" style={{ fontWeight: 800 }}>ملخص البيانات</Text>
               <KeyValueList
                 items={[
-                  { label: 'المصدر', value: selected.source },
-                  { label: 'النوع', value: selected.entityType },
+                  { label: 'المصدر', value: translateOwner(selected.source) },
+                  { label: 'النوع', value: translateEntityType(selected.entityType) },
                   { label: 'تاريخ التقديم', value: new Date().toLocaleDateString('ar-SA') },
                 ]}
               />
@@ -134,7 +138,7 @@ export function ControlPanelDshPartnerApprovalsScreen() {
   return (
     <Box dir="rtl" gap={4} padding={4} style={{ height: '100%', overflow: 'hidden' }}>
       <Box>
-        <Text role="titleLg" style={{ fontWeight: 900 }}>بوابة الشركاء (Intake Gate)</Text>
+        <Text role="titleLg" style={{ fontWeight: 900 }}>بوابة استقبال طلبات الشركاء</Text>
         <Text role="caption" tone="muted">المراجعة الأولى لكل الوارد من الحقل والشركاء</Text>
       </Box>
 

@@ -12,7 +12,12 @@ import {
   type MediaReviewRecord,
   type MediaPolicyKind,
 } from '../../shared/marketing-review-store';
-import { ApprovalStage } from '../../shared/workflow';
+import {
+  ApprovalStage,
+  translateStage,
+  translateEntityType,
+  translateOwner,
+} from '../../shared/workflow';
 
 // ─────────────────────────────────────────────
 // Types
@@ -41,27 +46,6 @@ const FILTERS: { id: FilterKind; label: string }[] = [
 // Helpers
 // ─────────────────────────────────────────────
 
-function getStageMeta(stage: ApprovalStage): { text: string; tone: any } {
-  switch (stage) {
-    case 'marketing-review': return { text: 'قيد المراجعة', tone: 'warning' };
-    case 'marketing-approved': return { text: 'معتمد تسويقياً', tone: 'brand' };
-    case 'catalog-adopted': return { text: 'أُرسل للكتالوج', tone: 'success' };
-    case 'needs-fix': return { text: 'يتطلب تعديل', tone: 'danger' };
-    case 'rejected': return { text: 'مرفوض', tone: 'default' };
-    default: return { text: stage, tone: 'default' };
-  }
-}
-
-function entityLabel(type: string): string {
-  switch (type) {
-    case 'product': return 'منتج جديد';
-    case 'product-media': return 'صورة منتج';
-    case 'category-suggestion': return 'فئة مقترحة';
-    case 'store': return 'وسائط متجر';
-    default: return type;
-  }
-}
-
 function policyLabel(p: MediaPolicyKind): string {
   switch (p) {
     case 'catalog-owned-media': return 'وسائط الكتالوج';
@@ -82,12 +66,15 @@ function policyTone(p: MediaPolicyKind): any {
   }
 }
 
-function nextOwnerLabel(owner: string): string {
-  switch (owner) {
-    case 'control-panel-catalog': return 'الكتالوج';
-    case 'control-panel-marketing': return 'التسويق';
-    case 'app-partner': return 'الشريك';
-    default: return owner;
+function getStageMeta(stage: ApprovalStage): { text: string; tone: any } {
+  const text = translateStage(stage);
+  switch (stage) {
+    case 'marketing-review': return { text, tone: 'warning' };
+    case 'marketing-approved': return { text, tone: 'brand' };
+    case 'catalog-adopted': return { text, tone: 'success' };
+    case 'needs-fix': return { text, tone: 'danger' };
+    case 'rejected': return { text, tone: 'default' };
+    default: return { text, tone: 'default' };
   }
 }
 
@@ -208,7 +195,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
                     badgeTone={meta.tone}
                     meta={(
                       <Box layoutDirection="row" gap={1}>
-                        <Chip label={entityLabel(item.entityType)} size="sm" />
+                        <Chip label={translateEntityType(item.entityType)} size="sm" />
                         <Chip label={policyLabel(item.mediaPolicy)} size="sm" tone={policyTone(item.mediaPolicy)} />
                       </Box>
                     )}
@@ -249,10 +236,10 @@ export function MarketingMediaReviewCommandDeckScreen() {
                 <KeyValueList
                   items={[
                     { label: 'العنوان', value: selected.title },
-                    { label: 'النوع', value: entityLabel(selected.entityType) },
-                    { label: 'الحالة', value: getStageMeta(selected.stage).text, tone: getStageMeta(selected.stage).tone },
-                    { label: 'المصدر', value: selected.source },
-                    { label: 'المالك التالي', value: nextOwnerLabel(selected.nextOwner) },
+                    { label: 'النوع', value: translateEntityType(selected.entityType) },
+                    { label: 'الحالة', value: translateStage(selected.stage), tone: getStageMeta(selected.stage).tone },
+                    { label: 'المصدر', value: translateOwner(selected.source) },
+                    { label: 'المالك التالي', value: translateOwner(selected.nextOwner) },
                   ]}
                 />
               </Surface>
@@ -287,7 +274,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
                 {selected.stage === 'needs-fix' && (
                   <Surface tone="warning" padding={3}>
                     <Text role="caption" style={{ fontWeight: 800 }}>في انتظار تعديل الشريك</Text>
-                    <Text role="caption">المالك الحالي: {nextOwnerLabel(selected.nextOwner)}</Text>
+                    <Text role="caption">المالك الحالي: {translateOwner(selected.nextOwner)}</Text>
                   </Surface>
                 )}
 

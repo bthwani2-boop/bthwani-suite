@@ -22,7 +22,10 @@ import {
   ApprovalRecordMetadata,
   ApprovalStage,
   isCatalogOwnedMedia,
-  isPartnerOwnedException
+  isPartnerOwnedException,
+  translateStage,
+  translateEntityType,
+  translateOwner,
 } from '../shared/workflow';
 
 type InventoryProduct = {
@@ -590,8 +593,8 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
             ...(selectedProduct.sourceRecordId ? [{ label: 'مرجع المصدر', value: selectedProduct.sourceRecordId }] : []),
             ...(selectedProduct.canonicalStoreId ? [{ label: 'مرجع المتجر المركزي', value: selectedProduct.canonicalStoreId }] : []),
             ...(selectedProduct.canonicalProductId ? [{ label: 'مرجع المنتج المركزي', value: selectedProduct.canonicalProductId }] : []),
-            ...(selectedProduct.publishStage ? [{ label: 'مرحلة النشر', value: selectedProduct.publishStage }] : []),
-            ...(selectedProduct.source ? [{ label: 'المصدر', value: selectedProduct.source }] : []),
+            ...(selectedProduct.publishStage ? [{ label: 'مرحلة النشر', value: translateStage(selectedProduct.publishStage) }] : []),
+            ...(selectedProduct.source ? [{ label: 'المصدر', value: translateOwner(selectedProduct.source) }] : []),
             { label: 'الربط المركزي', value: selectedProduct.catalogLinked ? 'مرتبط' : 'يحتاج مطابقة', tone: selectedProduct.catalogLinked ? 'success' : 'warning' },
           ]}
         />

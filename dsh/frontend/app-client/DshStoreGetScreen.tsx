@@ -46,7 +46,10 @@ export type DshStoreGetScreenProps = {
     serviceLabel?: string;
     subscriptionPackageChips?: string[];
     hasBthwaniPro?: boolean;
+    offerLabel?: string;
+    hasCouponAvailable?: boolean;
     publishStage?: string;
+    mediaPolicy?: string;
     commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
     tags?: string[];
     categories?: Array<{ id: string; label: string; itemCount: number; isPopular?: boolean }>;
@@ -234,14 +237,14 @@ function resolveStoreOperationalState(statusLabel: string, deliveryLabel?: strin
 }
 
 function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType | undefined {
-  if (!canRenderInClientSurface(item.publishStage, 'product-media')) {
+  if (!canRenderInClientSurface(item.publishStage, 'product-media', { mediaPolicy: (item as any).mediaPolicy })) {
     return undefined;
   }
   return resolveDshImageSource(item.imageUri);
 }
 
 function resolveDshStoreCoverImageSource(store?: DshStoreGetScreenProps['store']): ImageSourcePropType | undefined {
-  if (!canRenderInClientSurface(store?.publishStage, 'store')) {
+  if (!canRenderInClientSurface(store?.publishStage, 'store', { mediaPolicy: store?.mediaPolicy })) {
     return undefined;
   }
   return resolveDshImageSource(store?.imageUri);
@@ -445,6 +448,8 @@ export function DshStoreGetScreen({
   const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictStatus === 'blocker';
   const isCouponBlocked = sm?.['hasCouponAvailable']?.conflictStatus === 'blocker';
   const isOfferBlocked = sm?.['offerLabel']?.conflictStatus === 'blocker';
+  const isDeliveryBlocked = sm?.['deliveryFeeLabel']?.conflictStatus === 'blocker';
+  const isNewProductsBlocked = sm?.['hasNewProducts']?.conflictStatus === 'blocker' || sm?.['new-product-leak']?.conflictStatus === 'blocker';
 
   const { direction } = useDirection();
   const uiText = useUiText();
@@ -490,7 +495,7 @@ export function DshStoreGetScreen({
   ) : null;
 
   const clientVisibleItems = React.useMemo(
-    () => fallbackMenuItems.filter((item) => item.isAvailable !== false && canRenderInClientSurface(item.publishStage, 'product')),
+    () => fallbackMenuItems.filter((item) => item.isAvailable !== false && canRenderInClientSurface(item.publishStage, 'product', { mediaPolicy: (item as any).mediaPolicy })),
     [fallbackMenuItems],
   );
 
@@ -504,11 +509,12 @@ export function DshStoreGetScreen({
   }, []);
 
   const isNewItem = React.useCallback((item: DshStoreGetMenuItem) => {
+    if (isNewProductsBlocked) return false;
     if ((item as any).isNew) return true;
     const s = normalizeDisplayText(item.statusLabel ?? '').toLowerCase();
     if (s.includes('وصل') || s.includes('جديد') || s.includes('حديث')) return true;
     return false;
-  }, []);
+  }, [isNewProductsBlocked]);
 
   const isFavoriteItem = React.useCallback((item: DshStoreGetMenuItem) => {
     if ((item as any).isFavorite || (item as any).isFavorited) return true;
@@ -1054,9 +1060,11 @@ export function DshStoreGetScreen({
     new Set(
       [
         (isProBlocked ? false : store.hasBthwaniPro) ? 'بثواني برو' : null,
-        ...(store.subscriptionPackageChips ?? []),
-        store.deliveryLabel ?? null,
-        store.serviceLabel ?? null,
+        (isOfferBlocked ? false : !!store.offerLabel) ? (store.offerLabel || 'عرض متاح') : null,
+        (isCouponBlocked ? false : !!store.hasCouponAvailable) ? 'كوبون متاح' : null,
+        ...(isProBlocked ? [] : (store.subscriptionPackageChips ?? [])),
+        (isDeliveryBlocked ? null : store.deliveryLabel) ?? null,
+        (isPriceMatchBlocked ? undefined : store.serviceLabel) ?? null,
       ].filter(Boolean) as string[],
     ),
   ).slice(0, 3);

@@ -253,6 +253,53 @@ export function transitionApprovalStage(current: ApprovalStage, action: 'approve
   }
 }
 
+export function translateStage(stage: ApprovalStage | string | undefined): string {
+  if (!stage) return 'غير محدد';
+  switch (stage) {
+    case 'partner-submitted':
+    case 'field-submitted': return 'تم التقديم';
+    case 'partner-review': return 'مراجعة الشركاء';
+    case 'partner-approved': return 'معتمد شريكاً';
+    case 'marketing-review': return 'مراجعة التسويق';
+    case 'marketing-approved': return 'معتمد تسويقياً';
+    case 'catalog-adopted': return 'معتمد في الكتالوج';
+    case 'client-visible': return 'نشط للعميل';
+    case 'needs-fix': return 'يتطلب تعديل';
+    case 'rejected': return 'مرفوض';
+    case 'published':
+    case 'published-preview': return 'منشور (سابق)';
+    default: return stage;
+  }
+}
+
+export function translateEntityType(type: ApprovalEntityType | string | undefined): string {
+  if (!type) return 'غير معروف';
+  switch (type) {
+    case 'product': return 'منتج';
+    case 'product-media': return 'صورة منتج';
+    case 'category-suggestion': return 'اقتراح فئة';
+    case 'store': return 'بيانات متجر';
+    case 'partner-offer': return 'عرض شريك';
+    case 'video': return 'فيديو';
+    case 'banner': return 'إعلان';
+    case 'promo': return 'برومو';
+    default: return type;
+  }
+}
+
+export function translateOwner(owner: ApprovalSourceSurface | string | undefined): string {
+  if (!owner) return 'غير معروف';
+  switch (owner) {
+    case 'app-partner': return 'تطبيق الشريك';
+    case 'app-field': return 'تطبيق الميداني';
+    case 'control-panel-partners': return 'بوابة الشركاء';
+    case 'control-panel-marketing': return 'بوابة التسويق';
+    case 'control-panel-catalog': return 'بوابة الكتالوج';
+    case 'app-client': return 'تطبيق العميل';
+    default: return owner;
+  }
+}
+
 export function resolveNextOwner(stage: ApprovalStage): ApprovalSourceSurface {
   switch (stage) {
     case 'partner-submitted':
@@ -275,6 +322,10 @@ export function resolveNextOwner(stage: ApprovalStage): ApprovalSourceSurface {
   }
 }
 
+export type ClientVisibilityOptions = {
+  mediaPolicy?: string;
+};
+
 export function isClientVisibleStage(stage: string | undefined): boolean {
   return stage === 'client-visible';
 }
@@ -283,17 +334,45 @@ export function isLegacyPublishedPreview(stage: string | undefined): boolean {
   return stage === 'published-preview' || stage === 'published';
 }
 
-export function canRenderInClientSurface(stage: string | undefined, entityType?: ApprovalEntityType): boolean {
-  // Strict hardening v2: elements coming from the canonical/approval pipeline MUST have a valid stage.
-  // We no longer allow default visibility if stage is missing for elements intended for client view.
+export function canRenderInClientSurface(
+  stage: string | undefined,
+  entityType?: ApprovalEntityType,
+  options?: ClientVisibilityOptions
+): boolean {
+  // Strict hardening Phase R3: elements coming from the canonical/approval pipeline MUST have a valid stage.
   if (!stage) return false;
 
-  // Exception for product-media: allows viewing if marketing-approved or partner-approved (partner-owned-exception)
-  if (entityType === 'product-media' && isPartnerOwnedException(stage as ApprovalStage, entityType)) {
-    return true;
+  // client-visible is the gold standard for production.
+  if (isClientVisibleStage(stage)) return true;
+
+  // published-preview / published are legacy bridges for pre-hardened data.
+  if (isLegacyPublishedPreview(stage)) return true;
+
+  // Exception for product-media: allows viewing before client-visible IF a valid exception policy is set.
+  if (entityType === 'product-media' || entityType === 'banner' || entityType === 'promo') {
+    const policy = options?.mediaPolicy;
+    if (policy === 'partner-owned-exception' || policy === 'restaurant-exception') {
+      return true;
+    }
   }
 
-  return isClientVisibleStage(stage) || isLegacyPublishedPreview(stage);
+  // Explicitly deny internal approval stages from client visibility
+  if (
+    stage === 'catalog-adopted' ||
+    stage === 'marketing-review' ||
+    stage === 'marketing-approved' ||
+    stage === 'partner-approved' ||
+    stage === 'partner-review' ||
+    stage === 'partner-submitted' ||
+    stage === 'field-submitted' ||
+    stage === 'needs-fix' ||
+    stage === 'rejected'
+  ) {
+    return false;
+  }
+
+  // default: all other unknown stages are false for client view.
+  return false;
 }
 
 export function isPartnerOwnedException(stage: ApprovalStage, entityType: ApprovalEntityType): boolean {
@@ -589,15 +668,15 @@ export function getAllApprovalRecords(): ApprovalRecord[] {
 }
 
 export function getPartnerQueueRecords(): ApprovalRecord[] {
-  return _globalStore.filter(r => PARTNER_QUEUE_STAGES.includes(r.stage));
+  return _globalStore.filter(r => (PARTNER_QUEUE_STAGES as readonly any[]).indexOf(r.stage) >= 0);
 }
 
 export function getMarketingQueueRecords(): ApprovalRecord[] {
-  return _globalStore.filter(r => MARKETING_QUEUE_STAGES.includes(r.stage));
+  return _globalStore.filter(r => (MARKETING_QUEUE_STAGES as readonly any[]).indexOf(r.stage) >= 0);
 }
 
 export function getCatalogQueueRecords(): ApprovalRecord[] {
-  return _globalStore.filter(r => CATALOG_QUEUE_STAGES.includes(r.stage));
+  return _globalStore.filter(r => (CATALOG_QUEUE_STAGES as readonly any[]).indexOf(r.stage) >= 0);
 }
 
 export function getClientVisibleRecords(): ApprovalRecord[] {
@@ -607,7 +686,13 @@ export function getClientVisibleRecords(): ApprovalRecord[] {
 // ── Mutations ────────────────────────────────────────────────────────
 
 export function upsertApprovalRecord(record: Partial<ApprovalRecord> & { id: string }): void {
-  const idx = _globalStore.findIndex(r => r.id === record.id);
+  let idx = -1;
+  for (let i = 0; i < _globalStore.length; i++) {
+    if (_globalStore[i].id === record.id) {
+      idx = i;
+      break;
+    }
+  }
   if (idx >= 0) {
     _globalStore = _globalStore.map(r => (r.id === record.id ? { ...r, ...record } : r));
   } else {
