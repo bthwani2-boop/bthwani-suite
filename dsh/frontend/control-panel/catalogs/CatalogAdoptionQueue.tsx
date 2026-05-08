@@ -105,8 +105,8 @@ export function CatalogAdoptionQueue() {
                     </Box>
                   )}
                 </Box>
-              </Box>
-            </Surface>
+              )}
+            />
           );
         })}
       </Box>

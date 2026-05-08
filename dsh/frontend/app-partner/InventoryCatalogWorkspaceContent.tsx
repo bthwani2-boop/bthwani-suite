@@ -19,6 +19,7 @@ import {
 import { getPartnerIntakeItems } from '../shared/partner-intake-store';
 import {
   ApprovalRecord,
+  ApprovalRecordMetadata,
   ApprovalStage,
   isCatalogOwnedMedia,
   isPartnerOwnedException
@@ -253,11 +254,11 @@ function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
   ]);
 }
 
-function StatusTimeline({ stage, metadata }: { stage: ApprovalStage; metadata?: any }) {
+function StatusTimeline({ stage, metadata }: { stage: ApprovalStage; metadata?: ApprovalRecordMetadata }) {
   const { direction } = useDirection();
   const isRtl = direction === 'rtl';
 
-  const steps: { label: string; stages: ApprovalStage[]; tone: any }[] = [
+  const steps: { label: string; stages: ApprovalStage[]; tone: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' }[] = [
     { label: 'تم الإرسال', stages: ['partner-submitted', 'field-submitted'], tone: 'default' },
     { label: 'مراجعة الشركاء', stages: ['partner-review', 'partner-approved'], tone: 'warning' },
     { label: 'مراجعة التسويق', stages: ['marketing-review', 'marketing-approved'], tone: 'brand' },

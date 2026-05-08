@@ -206,12 +206,13 @@ export type AuditTrailEntry = {
   actionLabel: string;
 };
 
-// ── Typed Metadata ───────────────────────────────────────────────────
-
 export type ApprovalRecordMetadata = {
   requiredFix?: string;
   rejectionReason?: string;
   mediaPolicy?: string;
+  mediaKey?: string;
+  nextOwner?: string;
+  systemNote?: string;
 };
 
 // ── ApprovalRecord ───────────────────────────────────────────────────
@@ -297,6 +298,10 @@ export function canRenderInClientSurface(stage: string | undefined, entityType?:
 
 export function isPartnerOwnedException(stage: ApprovalStage, entityType: ApprovalEntityType): boolean {
   return entityType === 'product-media' && (stage === 'marketing-approved' || stage === 'partner-approved');
+}
+
+export function isCatalogOwnedMedia(stage: ApprovalStage | string | undefined): boolean {
+  return stage === 'catalog-adopted' || stage === 'client-visible';
 }
 
 // =====================================================================
@@ -398,6 +403,135 @@ let _globalStore: ApprovalRecord[] = [
       { at: new Date(Date.now() - 3600_000 * 84).toISOString(), fromStage: 'marketing-review', toStage: 'marketing-approved', owner: 'control-panel-marketing', actionLabel: 'اعتماد تسويقي' },
       { at: new Date(Date.now() - 3600_000 * 78).toISOString(), fromStage: 'marketing-approved', toStage: 'catalog-adopted', owner: 'control-panel-catalog', actionLabel: 'اعتماد مركزي' },
       { at: new Date(Date.now() - 3600_000 * 72).toISOString(), fromStage: 'catalog-adopted', toStage: 'client-visible', owner: 'control-panel-catalog', actionLabel: 'تفعيل للعميل' },
+    ],
+  },
+
+  // — من بوابة التسويق (marketing-review) —
+  {
+    id: 'mr-001',
+    entityType: 'product-media',
+    source: 'app-partner',
+    stage: 'marketing-review',
+    title: 'صورة برغر كلاسيك — مطعم البيت',
+    submittedAt: new Date(Date.now() - 3600_000 * 2).toISOString(),
+    metadata: {
+      mediaKey: 'media/products/burger-classic-01.jpg',
+      mediaPolicy: 'catalog-owned-media',
+      nextOwner: 'control-panel-catalog',
+      systemNote: 'جودة الصورة مقبولة، تحتاج قص RTL',
+    },
+    auditTrail: [],
+  },
+  {
+    id: 'mr-002',
+    entityType: 'product',
+    source: 'app-partner',
+    stage: 'marketing-review',
+    title: 'منتج جديد: عصير رمان طبيعي',
+    submittedAt: new Date(Date.now() - 3600_000 * 5).toISOString(),
+    metadata: {
+      mediaKey: 'media/products/juice-pomegranate-01.jpg',
+      mediaPolicy: 'catalog-owned-media',
+      nextOwner: 'control-panel-catalog',
+      systemNote: 'منتج جديد يحتاج اعتماد تسويقي قبل الكتالوج',
+    },
+    auditTrail: [],
+  },
+  {
+    id: 'mr-003',
+    entityType: 'product-media',
+    source: 'app-partner',
+    stage: 'marketing-approved',
+    title: 'صورة بيتزا مارغريتا — شريك مطعم',
+    submittedAt: new Date(Date.now() - 3600_000 * 8).toISOString(),
+    metadata: {
+      mediaKey: 'media/products/pizza-margherita-01.jpg',
+      mediaPolicy: 'partner-owned-exception',
+      nextOwner: 'control-panel-catalog',
+      systemNote: 'استثناء شريك: الصورة مرتبطة ببراند المطعم',
+    },
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 6).toISOString(), fromStage: 'marketing-review', toStage: 'marketing-approved', owner: 'control-panel-marketing', actionLabel: 'اعتماد تسويقي' },
+    ],
+  },
+  {
+    id: 'mr-004',
+    entityType: 'category-suggestion',
+    source: 'control-panel-marketing',
+    stage: 'marketing-review',
+    title: 'فئة مقترحة: مأكولات صحية',
+    submittedAt: new Date(Date.now() - 3600_000 * 1).toISOString(),
+    metadata: {
+      mediaKey: 'media/categories/healthy-food-cover.jpg',
+      mediaPolicy: 'catalog-owned-media',
+      nextOwner: 'control-panel-catalog',
+      systemNote: 'فئة جديدة تحتاج موافقة التسويق قبل إنشائها في الكتالوج',
+    },
+    auditTrail: [],
+  },
+  {
+    id: 'mr-005',
+    entityType: 'product-media',
+    source: 'app-partner',
+    stage: 'needs-fix',
+    title: 'صورة سلطة يونانية — دقة منخفضة',
+    submittedAt: new Date(Date.now() - 3600_000 * 12).toISOString(),
+    metadata: {
+      mediaKey: 'media/products/salad-greek-low.jpg',
+      mediaPolicy: 'catalog-owned-media',
+      nextOwner: 'app-partner',
+      systemNote: 'الصورة أقل من 800×600 — يُرجى إعادة الرفع',
+    },
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 10).toISOString(), fromStage: 'marketing-review', toStage: 'needs-fix', owner: 'control-panel-marketing', actionLabel: 'طلب تعديل' },
+    ],
+  },
+  {
+    id: 'mr-006',
+    entityType: 'store',
+    source: 'app-partner',
+    stage: 'marketing-review',
+    title: 'غلاف متجر: مطعم الياسمين',
+    submittedAt: new Date(Date.now() - 3600_000 * 4).toISOString(),
+    metadata: {
+      mediaKey: 'media/stores/yasmin-cover-01.jpg',
+      mediaPolicy: 'restaurant-exception',
+      nextOwner: 'control-panel-catalog',
+      systemNote: 'غلاف متجر — استثناء مطعم، يخضع لسياسة الوسائط الخاصة',
+    },
+    auditTrail: [],
+  },
+  {
+    id: 'mr-007',
+    entityType: 'product-media',
+    source: 'app-partner',
+    stage: 'marketing-review',
+    title: 'تعارض وسائط: صورة مكررة لمنتجين',
+    submittedAt: new Date(Date.now() - 1800_000).toISOString(),
+    metadata: {
+      mediaKey: 'media/products/conflict-duplicate-01.jpg',
+      mediaPolicy: 'media-conflict',
+      nextOwner: 'control-panel-marketing',
+      systemNote: 'نفس الصورة مرتبطة بمنتجين مختلفين — يتطلب حلاً',
+    },
+    auditTrail: [],
+  },
+  {
+    id: 'mr-008',
+    entityType: 'product',
+    source: 'app-partner',
+    stage: 'catalog-adopted',
+    title: 'وجبة عائلية مكتملة — أُرسلت للكتالوج',
+    submittedAt: new Date(Date.now() - 3600_000 * 24).toISOString(),
+    metadata: {
+      mediaKey: 'media/products/family-meal-final.jpg',
+      mediaPolicy: 'catalog-owned-media',
+      nextOwner: 'control-panel-catalog',
+      systemNote: 'مكتمل — ظاهر في الكتالوج',
+    },
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 20).toISOString(), fromStage: 'marketing-review', toStage: 'marketing-approved', owner: 'control-panel-marketing', actionLabel: 'اعتماد تسويقي' },
+      { at: new Date(Date.now() - 3600_000 * 16).toISOString(), fromStage: 'marketing-approved', toStage: 'catalog-adopted', owner: 'control-panel-marketing', actionLabel: 'إرسال للكتالوج' },
     ],
   },
 
