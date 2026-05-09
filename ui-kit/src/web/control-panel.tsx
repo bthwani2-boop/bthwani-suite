@@ -16,12 +16,14 @@ export type WebControlPanelShellProps = {
 
 export function WebControlPanelShell({ children, rail, topBar }: WebControlPanelShellProps) {
   const { direction } = useDirection();
-  
+
   return (
     <Box
       style={{
         width: '100%',
         height: '100vh',
+        minHeight: '100vh',
+        minHeight: '100dvh',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
@@ -31,14 +33,18 @@ export function WebControlPanelShell({ children, rail, topBar }: WebControlPanel
       {topBar}
       <Box
         layoutDirection="row"
-        style={{ flex: 1, overflow: 'hidden' }}
+        style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}
       >
         {rail}
         <Box
           style={{
             flex: 1,
-            overflowY: 'auto',
-            position: 'relative'
+            minWidth: 0,
+            minHeight: 0,
+            overflow: 'hidden',
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column'
           }}
           padding={0}
         >
@@ -86,7 +92,7 @@ export function WebControlPanelTopBar({ title, subtitle, leading, trailing, acti
           {subtitle && <Text role="caption" tone="muted">{subtitle}</Text>}
         </Box>
       </Box>
-      
+
       <Box layoutDirection="row" align="center" gap={4}>
         {actions}
         {trailing && (
@@ -112,20 +118,22 @@ export type WebControlPanelRailProps = {
 
 export function WebControlPanelRail({ children, collapsed, footer }: WebControlPanelRailProps) {
   const { theme } = useTheme();
-  
+
   return (
     <Box
       style={{
         width: collapsed ? 64 : 260,
         backgroundColor: '#0A2F5C',
         height: '100%',
+        minHeight: 0,
         transition: 'width 0.2s ease',
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
         zIndex: 5
       }}
     >
-      <Box style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }} padding={2}>
+      <Box style={{ flex: 1, minHeight: 0, minWidth: 0, overflow: 'hidden' }} padding={2}>
         {children}
       </Box>
       {footer && (
@@ -205,8 +213,8 @@ export function WebControlPanelSignalStrip({ children }: WebControlPanelSignalSt
       gap={3}
       style={{
         width: '100%',
-        flexWrap: 'nowrap',
-        overflowX: 'auto',
+        flexWrap: 'wrap',
+        overflowX: 'hidden',
         paddingBottom: 8
       }}
     >
@@ -227,7 +235,7 @@ export type WebControlPanelKpiTileProps = {
 
 export function WebControlPanelKpiTile({ label, value, trend, icon }: WebControlPanelKpiTileProps) {
   const { theme } = useTheme();
-  
+
   return (
     <Surface
       padding={3}
@@ -425,4 +433,3 @@ export function WebControlPanelEmptyState({ title, description, icon, actionLabe
     </Box>
   );
 }
-

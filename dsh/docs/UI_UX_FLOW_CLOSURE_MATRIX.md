@@ -30,6 +30,13 @@ A DSH UI/UX/Flow row is not CLOSED until it has:
 - runtime evidence or explicit runtime blocker
 - evidence path
 
+Preview-only ownership lock:
+- canonical surfaces are `app-client`, `app-partner`, `app-captain`, `app-field`, `control-panel`
+- preview/runtime labels are `UI_PREVIEW_ONLY`, `NEEDS_BINDING_LATER`, `NEEDS_RUNTIME_EVIDENCE`
+- live dispatch map is allowed only inside `control-panel` operations
+- captain-scoped route/map is allowed only inside `app-captain`
+- no heatmap belongs in `app-client`, `app-partner`, or `app-field`
+
 ## Surface Counts
 
 | Surface | Screen Count | Giant Screen Candidates | Evidence | Decision | Next Action |

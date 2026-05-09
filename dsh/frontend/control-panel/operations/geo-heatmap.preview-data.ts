@@ -1,3 +1,5 @@
+import type { DshSurfaceId } from '../shared';
+
 export type GeoHeatmapZone = {
   id: string;
   name: string;
@@ -10,7 +12,7 @@ export type GeoHeatmapZone = {
   storePressure: 'منخفض' | 'متوسط' | 'مرتفع' | 'حرج';
   recommendedAction: string;
   expectedImpact: string;
-  ownerSurface: string;
+  ownerSurface: DshSurfaceId;
   confidence: 'عالية' | 'متوسطة' | 'منخفضة';
   filterKey: 'orders' | 'captains' | 'stores' | 'sla' | 'peak';
   severity: 'best' | 'warning' | 'danger' | 'brand';
@@ -29,7 +31,7 @@ export const GEO_HEATMAP_ZONES: readonly GeoHeatmapZone[] = [
     storePressure: 'مرتفع',
     recommendedAction: 'انقل كباتن من الجنوب وفعّل حافز المنطقة فورًا',
     expectedImpact: 'خفض التأخير 18٪ خلال 30 دقيقة',
-    ownerSurface: 'operations',
+    ownerSurface: 'control-panel',
     confidence: 'عالية',
     filterKey: 'peak',
     severity: 'danger',
@@ -46,7 +48,7 @@ export const GEO_HEATMAP_ZONES: readonly GeoHeatmapZone[] = [
     storePressure: 'متوسط',
     recommendedAction: 'وسّع الاستقبال مؤقتًا واحتفظ بنطاق ضيق',
     expectedImpact: 'تخفيف الضغط 12٪',
-    ownerSurface: 'operations',
+    ownerSurface: 'control-panel',
     confidence: 'عالية',
     filterKey: 'orders',
     severity: 'warning',
@@ -63,7 +65,7 @@ export const GEO_HEATMAP_ZONES: readonly GeoHeatmapZone[] = [
     storePressure: 'منخفض',
     recommendedAction: 'انقل الفائض إلى الشمال عند الحاجة',
     expectedImpact: 'رفع التغطية للمناطق المضغوطة',
-    ownerSurface: 'operations',
+    ownerSurface: 'control-panel',
     confidence: 'متوسطة',
     filterKey: 'captains',
     severity: 'best',
@@ -80,7 +82,7 @@ export const GEO_HEATMAP_ZONES: readonly GeoHeatmapZone[] = [
     storePressure: 'منخفض',
     recommendedAction: 'حافظ على السعة الحالية وراقب التحويلات',
     expectedImpact: 'استقرار الخدمة مع فائض متاح',
-    ownerSurface: 'operations',
+    ownerSurface: 'control-panel',
     confidence: 'متوسطة',
     filterKey: 'stores',
     severity: 'brand',

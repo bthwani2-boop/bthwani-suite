@@ -16,7 +16,7 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     id: 'command-center',
     label: 'غرفة القيادة',
     description: 'نبض العمليات، المعوقات، وأفضل إجراء تالي.',
-    badge: 'Hub',
+    badge: 'قيادة',
     subGroups: [
       { id: 'overview', label: 'نظرة عامة' },
       { id: 'anomalies', label: 'شواذ النظام' },
@@ -27,7 +27,7 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     id: 'live-orders',
     label: 'الطلبات الحية',
     description: 'قائمة الطلبات، التفاصيل، الدردشة، وتدخلات التنفيذ.',
-    badge: 'Core',
+    badge: 'أساس',
     subGroups: [
       { id: 'all', label: 'الكل' },
       { id: 'unassigned', label: 'غير مسندة' },
@@ -42,7 +42,7 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     id: 'dispatch-assignment',
     label: 'الإسناد والتوزيع',
     description: 'لوحة الإسناد، تغطية الكباتن، وإعادة الإسناد اليدوي.',
-    badge: 'Live',
+    badge: 'مباشر',
     subGroups: [
       { id: 'pending', label: 'غير مسندة' },
       { id: 'captains', label: 'توافر الكباتن' },
@@ -52,14 +52,14 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
   },
   {
     id: 'geo-heatmap',
-    label: 'الخريطة الحرارية',
-    description: 'خريطة ضغط الطلب والسعة مع توصية لكل منطقة.',
-    badge: 'Geo',
+    label: 'خريطة الإسناد الحي',
+    description: 'الطلبات الحية وتمركز الكباتن وضغط المتاجر ومخاطر الالتزام في مشهد واحد.',
+    badge: 'حي',
     subGroups: [
       { id: 'orders', label: 'الطلبات' },
       { id: 'captains', label: 'الكباتن' },
       { id: 'stores', label: 'المتاجر' },
-      { id: 'sla', label: 'SLA' },
+      { id: 'sla', label: 'الالتزام' },
       { id: 'peak', label: 'الذروة' },
     ],
     tertiaryFilters: ['الآن', '١٥ دقيقة', '٣٠ دقيقة', 'خطر عالٍ', 'نقص كباتن', 'ضغط متاجر'],
@@ -68,7 +68,7 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     id: 'sheinproxy',
     label: 'شي إن',
     description: 'مسار الإسناد اليدوي لطلبات شي إن والدفعات المرتبطة بها.',
-    badge: 'Manual',
+    badge: 'يدوي',
     subGroups: [
       { id: 'batches', label: 'الدفعات' },
       { id: 'orders', label: 'الطلبات' },
@@ -79,7 +79,7 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     id: 'proxy-shein-awnak',
     label: 'عونك',
     description: 'مسار عونك التشغيلي للدفعات اليدوية ومتابعة الطلبات.',
-    badge: 'Manual',
+    badge: 'يدوي',
     subGroups: [
       { id: 'active', label: 'نشط' },
       { id: 'completed', label: 'مكتمل' },
@@ -89,7 +89,7 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     id: 'captain-operations',
     label: 'تشغيل الكباتن',
     description: 'توافر الكباتن، الجاهزية، وضغط التغطية.',
-    badge: 'Crew',
+    badge: 'كباتن',
     subGroups: [
       { id: 'availability', label: 'التوافر' },
       { id: 'readiness', label: 'الجاهزية' },
@@ -100,7 +100,7 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     id: 'partner-stores',
     label: 'المتاجر والشركاء',
     description: 'جاهزية المتاجر، التحضير، وضغط الاستلام.',
-    badge: 'Stores',
+    badge: 'متاجر',
     subGroups: [
       { id: 'preparation', label: 'تحت التحضير' },
       { id: 'ready', label: 'جاهز للاستلام' },
@@ -113,7 +113,7 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     id: 'area-capacity',
     label: 'المناطق والسعة',
     description: 'ضغط السعة، النوافذ المحجوزة، والتحكم في الطفرات.',
-    badge: 'Capacity',
+    badge: 'سعة',
     subGroups: [
       { id: 'density', label: 'كثافة المناطق' },
       { id: 'surge', label: 'إدارة الطفرات' },
@@ -126,7 +126,7 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     id: 'exceptions-escalations',
     label: 'الاستثناءات والتصعيد',
     description: 'قائمة الاستثناءات، إجراءات التعافي، وتوجيه المالك.',
-    badge: 'Risk',
+    badge: 'مخاطر',
     subGroups: [
       { id: 'level-1', label: 'مستوى ١' },
       { id: 'level-2', label: 'مستوى ٢' },
@@ -135,13 +135,13 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
   },
   {
     id: 'audit-support-sla',
-    label: 'التدقيق والدعم وSLA',
-    description: 'تدقيق الإجراءات اليدوية، جسر الدعم، وانضباط SLA.',
-    badge: 'Proof',
+    label: 'التدقيق والدعم والالتزام',
+    description: 'تدقيق الإجراءات اليدوية، جسر الدعم، وانضباط الالتزام.',
+    badge: 'التزام',
     subGroups: [
       { id: 'procedures', label: 'إجراءات' },
       { id: 'proofs', label: 'إثباتات' },
-      { id: 'sla', label: 'مقاييس SLA' },
+      { id: 'sla', label: 'مقاييس الالتزام' },
     ]
   },
 ] as const;

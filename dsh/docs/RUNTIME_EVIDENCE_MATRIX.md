@@ -16,6 +16,14 @@ Allowed classifications:
 - runtime truth
 - production-like truth
 
+Preview/runtime binding labels for the current DSH closure program:
+- UI_PREVIEW_ONLY
+- NEEDS_BINDING_LATER
+- NEEDS_RUNTIME_EVIDENCE
+- BLOCKED
+
+Unless runtime evidence is proven later, current DSH UI work must remain preview-only or evidence-later and must not claim runtime truth.
+
 | Runtime ID | Scope | Owner Path | Used By | Data Classification | Runtime Claim Allowed | Required Proof | Evidence | Decision | Next Action |
 |---|---|---|---|---|---|---|---|---|---|
 | DSH-RUN-001 | control-panel operations | dsh/frontend/control-panel | control-panel | preview | NO | local runtime + screenshot + failure path | CHECK_DSH_PHASE_1B_ROUTE_RUNTIME_BASELINE-20260505-172609 | RUNTIME_UNPROVEN | run visual/runtime proof |

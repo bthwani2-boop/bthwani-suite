@@ -12,5 +12,48 @@ export type { WebControlActionButtonProps, WebControlActionCardProps, WebControl
 // Use for: staff operations, admin dashboards, control rooms only.
 export { WebCommandCenterFrame, WebCommandStrip, WebRailServiceList, WebSegmentedTabs, WebControlPanelFrame, WebControlPanelKpiStrip, WebControlPanelWorkspaceTabs, WebControlPanelSubTabs } from './command-center';
 export type { WebCommandCenterFilter, WebCommandCenterFrameProps, WebCommandCenterNavItem, WebCommandStripFilter, WebCommandStripProps, WebRailServiceItem, WebRailServiceListProps, WebSegmentedTabItem, WebSegmentedTabsProps, WebControlPanelFrameProps, WebControlPanelKpiItem, WebControlPanelKpiStripProps, WebControlPanelKpiTone, WebControlPanelWorkspaceTabItem, WebControlPanelWorkspaceTabsProps, WebControlPanelSubTabItem, WebControlPanelSubTabsProps } from './command-center';
-export { WebControlPanelStatusTag, WebControlPanelActionCluster, WebControlPanelDecisionRow, WebControlPanelRecommendation, WebControlPanelInspectorShell } from './control-surface';
-export type { WebControlPanelStatusTone, WebControlPanelStatusTagProps, WebControlPanelActionItem, WebControlPanelActionClusterProps, WebControlPanelDecisionRowRisk, WebControlPanelDecisionRowProps, WebControlPanelRecommendationProps, WebControlPanelInspectorShellProps } from './control-surface';
+export {
+	WebControlPanelViewport,
+	WebControlPanelWorkbench,
+	WebControlPanelDenseHeader,
+	WebControlPanelSplitPane,
+	WebControlPanelMapCanvas,
+	WebControlPanelMiniMapZone,
+	WebControlPanelMapPin,
+	WebControlPanelRouteLine,
+	WebControlPanelLaneTabs,
+	WebControlPanelTertiaryFilters,
+	WebControlPanelQueue,
+	WebControlPanelCompactPager,
+	WebControlPanelStatusTag,
+	WebControlPanelActionCluster,
+	WebControlPanelDecisionRow,
+	WebControlPanelRecommendation,
+	WebControlPanelInspectorShell,
+} from './control-surface';
+export type {
+	WebControlPanelDenseHeaderMetric,
+	WebControlPanelViewportProps,
+	WebControlPanelWorkbenchProps,
+	WebControlPanelDenseHeaderProps,
+	WebControlPanelSplitPaneWidth,
+	WebControlPanelSplitPaneProps,
+	WebControlPanelMapCanvasProps,
+	WebControlPanelMiniMapZoneProps,
+	WebControlPanelMapPinProps,
+	WebControlPanelRouteLineProps,
+	WebControlPanelLaneTabItem,
+	WebControlPanelLaneTabsProps,
+	WebControlPanelTertiaryFilterItem,
+	WebControlPanelTertiaryFiltersProps,
+	WebControlPanelQueueProps,
+	WebControlPanelCompactPagerProps,
+	WebControlPanelStatusTone,
+	WebControlPanelStatusTagProps,
+	WebControlPanelActionItem,
+	WebControlPanelActionClusterProps,
+	WebControlPanelDecisionRowRisk,
+	WebControlPanelDecisionRowProps,
+	WebControlPanelRecommendationProps,
+	WebControlPanelInspectorShellProps,
+} from './control-surface';

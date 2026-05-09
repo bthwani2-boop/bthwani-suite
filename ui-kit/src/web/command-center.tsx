@@ -9,15 +9,20 @@ const webCommandCenterCss = `
   --bth-deep-blue: #0A2F5C;
   --bth-orange: #FF500D;
   display: grid;
+  grid-template-rows: 56px minmax(0, 1fr);
   gap: 0;
   align-content: start;
+  height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
+  min-height: 100dvh;
   box-sizing: border-box;
   width: 100%;
   margin: 0;
   padding: 0;
   background: #f8fafc;
   color: var(--bth-text);
+  overflow: hidden;
   overflow-x: hidden;
 }
 
@@ -27,11 +32,10 @@ const webCommandCenterCss = `
   justify-content: space-between;
   gap: 20px;
   padding: 0 24px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px) saturate(180%);
+  min-width: 0;
+  background: #ffffff;
   border-bottom: 1px solid var(--bth-shell-line);
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 100;
   height: 56px;
 }
@@ -40,6 +44,7 @@ const webCommandCenterCss = `
   display: flex;
   align-items: center;
   gap: 16px;
+  min-width: 0;
   flex-shrink: 0;
 }
 
@@ -53,7 +58,8 @@ const webCommandCenterCss = `
 
 .ui-web-command-strip__search-container {
   flex: 1;
-  max-width: 480px;
+  min-width: 0;
+  max-width: 420px;
   position: relative;
 }
 
@@ -92,6 +98,7 @@ const webCommandCenterCss = `
 
 .ui-web-command-strip__filters {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   background: rgba(10, 47, 92, 0.04);
   padding: 4px;
@@ -124,6 +131,7 @@ const webCommandCenterCss = `
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .ui-web-command-strip__action-btn {
@@ -158,10 +166,12 @@ const webCommandCenterCss = `
 
 .ui-web-command-center__workspace {
   display: grid;
-  min-height: calc(100vh - 56px);
+  min-height: 0;
+  height: 100%;
   grid-template-columns: var(--rail-width) minmax(0, 1fr);
   grid-template-areas: "rail stage";
   transition: grid-template-columns 0.22s ease;
+  overflow: hidden;
 }
 
 .ui-web-command-center-root[dir="rtl"] .ui-web-command-center__workspace {
@@ -177,9 +187,9 @@ const webCommandCenterCss = `
   display: flex;
   flex-direction: column;
   gap: 12px;
-  position: sticky;
-  top: 56px;
-  height: calc(100vh - 56px);
+  position: relative;
+  height: 100%;
+  min-height: 0;
   z-index: 90;
   overflow: hidden;
 }
@@ -238,6 +248,8 @@ const webCommandCenterCss = `
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .ui-web-command-center__rail-item {
@@ -326,9 +338,23 @@ const webCommandCenterCss = `
 
 .ui-web-command-center__stage {
   grid-area: stage;
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 20px;
   background: #f8fafc;
+  height: 100%;
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ui-web-command-center__stage-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -397,17 +423,14 @@ const webCommandCenterCss = `
 /* === ControlPanel: KpiStrip === */
 .ui-web-cp-kpi-strip {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
   padding: 8px 14px;
   background: #FFFFFF;
   border-bottom: 1px solid rgba(10,47,92,0.06);
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overflow: hidden;
 }
-.ui-web-cp-kpi-strip::-webkit-scrollbar { display: none; }
 .ui-web-cp-kpi-item {
   display: flex;
   flex-direction: column;
@@ -437,17 +460,14 @@ const webCommandCenterCss = `
 /* === ControlPanel: WorkspaceTabs === */
 .ui-web-cp-workspace-tabs {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   padding: 10px 14px 8px;
   background: #FFFFFF;
   border-bottom: 1px solid rgba(10,47,92,0.08);
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overflow: hidden;
 }
-.ui-web-cp-workspace-tabs::-webkit-scrollbar { display: none; }
 .ui-web-cp-workspace-tab {
   flex-shrink: 0;
   padding: 8px 18px;
@@ -471,16 +491,14 @@ const webCommandCenterCss = `
 /* === ControlPanel: SubTabs === */
 .ui-web-cp-sub-tabs {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   padding: 8px 14px 10px;
   background: #F8FAFC;
   border-bottom: 1px solid rgba(10,47,92,0.06);
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overflow: hidden;
 }
-.ui-web-cp-sub-tabs::-webkit-scrollbar { display: none; }
 .ui-web-cp-sub-tab {
   padding: 6px 12px;
   border-radius: 999px;
@@ -496,7 +514,7 @@ const webCommandCenterCss = `
 .ui-web-cp-sub-tab:hover { background: rgba(10,47,92,0.03); color: #0A2F5C; }
 .ui-web-cp-sub-tab--active { background: rgba(255, 80, 13, 0.1); color: #FF500D; border-color: rgba(255, 80, 13, 0.22); }
 
-.ui-web-command-center__hero { margin-bottom: 32px; }
+.ui-web-command-center__hero { margin-bottom: 16px; }
 .ui-web-command-center__hero-title {
   font-size: 32px;
   font-weight: 900;
@@ -780,7 +798,7 @@ export function WebCommandCenterFrame({
                 )}
               </div>
             )}
-            {children}
+            <div className="ui-web-command-center__stage-content">{children}</div>
           </section>
         </div>
       </main>

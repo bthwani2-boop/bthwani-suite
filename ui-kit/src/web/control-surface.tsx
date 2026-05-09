@@ -376,6 +376,461 @@ const webControlSurfaceCss = `
   cursor: pointer;
 }
 
+.ui-web-cp-viewport {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ui-web-cp-dense-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: #FFFFFF;
+}
+
+.ui-web-cp-dense-header__main {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.ui-web-cp-dense-header__eyebrow {
+  color: #64748B;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.ui-web-cp-dense-header__title {
+  margin: 0;
+  color: #0A2F5C;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.ui-web-cp-dense-header__description {
+  margin: 0;
+  color: #4d637b;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.ui-web-cp-dense-header__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ui-web-cp-dense-header__metric {
+  display: grid;
+  gap: 2px;
+  min-width: 88px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(10, 47, 92, 0.04);
+}
+
+.ui-web-cp-dense-header__metric-label {
+  color: #64748B;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ui-web-cp-dense-header__metric-value {
+  color: #0A2F5C;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.ui-web-cp-dense-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.ui-web-cp-split-pane {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ui-web-cp-split-pane--narrow {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+}
+
+.ui-web-cp-split-pane--wide {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+}
+
+.ui-web-cp-split-pane--secondary-start {
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+}
+
+.ui-web-cp-split-pane--secondary-start.ui-web-cp-split-pane--narrow {
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+}
+
+.ui-web-cp-split-pane--secondary-start.ui-web-cp-split-pane--wide {
+  grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
+}
+
+.ui-web-cp-split-pane__primary,
+.ui-web-cp-split-pane__secondary {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ui-web-cp-workbench {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ui-web-cp-workbench__body,
+.ui-web-cp-workbench__main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ui-web-cp-lane-tabs,
+.ui-web-cp-tertiary-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.ui-web-cp-lane-tabs__button,
+.ui-web-cp-tertiary-filters__button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 47, 92, 0.1);
+  background: #FFFFFF;
+  color: #64748B;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ui-web-cp-tertiary-filters__button {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.ui-web-cp-lane-tabs__button--active {
+  background: rgba(10, 47, 92, 0.08);
+  color: #0A2F5C;
+  border-color: rgba(10, 47, 92, 0.18);
+}
+
+.ui-web-cp-tertiary-filters__button--active {
+  background: rgba(255, 80, 13, 0.1);
+  color: #FF500D;
+  border-color: rgba(255, 80, 13, 0.22);
+}
+
+.ui-web-cp-lane-tabs__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  min-height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(10, 47, 92, 0.08);
+  color: #0A2F5C;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.ui-web-cp-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.ui-web-cp-queue__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ui-web-cp-queue__title-block {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ui-web-cp-queue__title {
+  margin: 0;
+  color: #0A2F5C;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.ui-web-cp-queue__meta {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ui-web-cp-queue__rows {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ui-web-cp-queue__footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ui-web-cp-compact-pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 32px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: #FFFFFF;
+}
+
+.ui-web-cp-compact-pager__button {
+  appearance: none;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(10, 47, 92, 0.06);
+  color: #0A2F5C;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.ui-web-cp-compact-pager__button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ui-web-cp-compact-pager__summary {
+  color: #0A2F5C;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ui-web-cp-map-canvas {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 320px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 248, 252, 0.96) 100%),
+    #FFFFFF;
+  overflow: hidden;
+}
+
+.ui-web-cp-map-canvas__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(10, 47, 92, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 47, 92, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.ui-web-cp-map-canvas__body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.ui-web-cp-map-canvas__legend {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ui-web-cp-map-zone,
+.ui-web-cp-map-pin {
+  position: absolute;
+  z-index: 1;
+}
+
+.ui-web-cp-map-zone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 47, 92, 0.12);
+  background: rgba(10, 47, 92, 0.08);
+  color: #0A2F5C;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ui-web-cp-map-zone--warning {
+  background: rgba(245, 158, 11, 0.16);
+  border-color: rgba(245, 158, 11, 0.22);
+  color: #B45309;
+}
+
+.ui-web-cp-map-zone--danger {
+  background: rgba(220, 38, 38, 0.14);
+  border-color: rgba(220, 38, 38, 0.2);
+  color: #B91C1C;
+}
+
+.ui-web-cp-map-zone--success {
+  background: rgba(22, 163, 74, 0.14);
+  border-color: rgba(22, 163, 74, 0.2);
+  color: #15803D;
+}
+
+.ui-web-cp-map-pin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 47, 92, 0.12);
+  background: #FFFFFF;
+  color: #0A2F5C;
+  font-size: 11px;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(10, 47, 92, 0.08);
+  cursor: pointer;
+}
+
+.ui-web-cp-map-pin--warning {
+  color: #B45309;
+  border-color: rgba(245, 158, 11, 0.22);
+}
+
+.ui-web-cp-map-pin--danger {
+  color: #B91C1C;
+  border-color: rgba(220, 38, 38, 0.2);
+}
+
+.ui-web-cp-map-pin--success {
+  color: #15803D;
+  border-color: rgba(22, 163, 74, 0.2);
+}
+
+.ui-web-cp-route-line {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ui-web-cp-route-line__path {
+  fill: none;
+  stroke: rgba(10, 47, 92, 0.46);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 6 6;
+}
+
+.ui-web-cp-route-line__path--warning {
+  stroke: rgba(245, 158, 11, 0.8);
+}
+
+.ui-web-cp-route-line__path--danger {
+  stroke: rgba(220, 38, 38, 0.8);
+}
+
+.ui-web-cp-route-line__path--success {
+  stroke: rgba(22, 163, 74, 0.8);
+}
+
+@media (max-width: 960px) {
+  .ui-web-cp-dense-header,
+  .ui-web-cp-split-pane,
+  .ui-web-cp-split-pane--secondary-start,
+  .ui-web-cp-split-pane--secondary-start.ui-web-cp-split-pane--narrow,
+  .ui-web-cp-split-pane--secondary-start.ui-web-cp-split-pane--wide,
+  .ui-web-cp-split-pane--narrow,
+  .ui-web-cp-split-pane--wide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ui-web-cp-dense-header {
+    flex-direction: column;
+  }
+
+  .ui-web-cp-dense-header__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
 /* === ControlPanel: StatusTag / ActionCluster / DecisionRow / Recommendation / InspectorShell === */
 .ui-web-cp-status-tag {
   display: inline-flex;
@@ -464,7 +919,7 @@ const webControlSurfaceCss = `
   appearance: none; border: none; background: transparent;
   color: #64748B; font-size: 18px; cursor: pointer; line-height: 1; padding: 2px 6px;
 }
-.ui-web-cp-inspector-shell__body  { flex: 1; overflow-y: auto; padding: 12px 14px; }
+.ui-web-cp-inspector-shell__body  { flex: 1; min-height: 0; overflow: hidden; padding: 12px 14px; display: grid; align-content: start; gap: 10px; }
 `;
 
 function WebControlSurfaceStyles() {
@@ -809,6 +1264,438 @@ export function WebSystemSuggestion({
 }
 
 // ─── Control Panel Lane Primitives ────────────────────────────────────────────
+
+type WebControlPanelPosition = {
+  top?: number | string;
+  right?: number | string;
+  bottom?: number | string;
+  left?: number | string;
+};
+
+type WebControlPanelMapTone = 'neutral' | 'success' | 'warning' | 'danger';
+
+function joinClassNames(...parts: Array<string | false | null | undefined>) {
+  return parts.filter(Boolean).join(' ');
+}
+
+function resolveCssLength(value?: number | string) {
+  if (typeof value === 'number') {
+    return `${value}px`;
+  }
+
+  return value;
+}
+
+function resolvePositionStyle(position?: WebControlPanelPosition): React.CSSProperties | undefined {
+  if (!position) {
+    return undefined;
+  }
+
+  return {
+    top: resolveCssLength(position.top),
+    right: resolveCssLength(position.right),
+    bottom: resolveCssLength(position.bottom),
+    left: resolveCssLength(position.left),
+  };
+}
+
+export type WebControlPanelViewportProps = {
+  children?: React.ReactNode;
+  className?: string;
+};
+
+export function WebControlPanelViewport({ children, className }: WebControlPanelViewportProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <section className={joinClassNames('ui-web-cp-viewport', className)}>{children}</section>
+    </>
+  );
+}
+
+export type WebControlPanelDenseHeaderMetric = {
+  id: string;
+  label: string;
+  value: string;
+};
+
+export type WebControlPanelDenseHeaderProps = {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  metrics?: ReadonlyArray<WebControlPanelDenseHeaderMetric>;
+  actions?: React.ReactNode;
+};
+
+export function WebControlPanelDenseHeader({
+  eyebrow,
+  title,
+  description,
+  metrics = [],
+  actions,
+}: WebControlPanelDenseHeaderProps) {
+  const { direction } = useDirection();
+
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <header className="ui-web-cp-dense-header" dir={direction}>
+        <div className="ui-web-cp-dense-header__main">
+          {eyebrow ? <span className="ui-web-cp-dense-header__eyebrow">{eyebrow}</span> : null}
+          <h2 className="ui-web-cp-dense-header__title">{title}</h2>
+          {description ? <p className="ui-web-cp-dense-header__description">{description}</p> : null}
+          {metrics.length > 0 ? (
+            <div className="ui-web-cp-dense-header__metrics">
+              {metrics.map((metric) => (
+                <div key={metric.id} className="ui-web-cp-dense-header__metric">
+                  <span className="ui-web-cp-dense-header__metric-label">{metric.label}</span>
+                  <span className="ui-web-cp-dense-header__metric-value">{metric.value}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </div>
+        {actions ? <div className="ui-web-cp-dense-header__actions">{actions}</div> : null}
+      </header>
+    </>
+  );
+}
+
+export type WebControlPanelSplitPaneWidth = 'narrow' | 'regular' | 'wide';
+
+export type WebControlPanelSplitPaneProps = {
+  primary?: React.ReactNode;
+  secondary?: React.ReactNode;
+  secondaryPosition?: 'end' | 'start';
+  secondaryWidth?: WebControlPanelSplitPaneWidth;
+};
+
+export function WebControlPanelSplitPane({
+  primary,
+  secondary,
+  secondaryPosition = 'end',
+  secondaryWidth = 'regular',
+}: WebControlPanelSplitPaneProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <div
+        className={joinClassNames(
+          'ui-web-cp-split-pane',
+          secondaryWidth === 'narrow' && 'ui-web-cp-split-pane--narrow',
+          secondaryWidth === 'wide' && 'ui-web-cp-split-pane--wide',
+          secondaryPosition === 'start' && 'ui-web-cp-split-pane--secondary-start',
+        )}
+      >
+        <div className="ui-web-cp-split-pane__primary">{primary}</div>
+        {secondary ? <div className="ui-web-cp-split-pane__secondary">{secondary}</div> : null}
+      </div>
+    </>
+  );
+}
+
+export type WebControlPanelWorkbenchProps = {
+  header?: React.ReactNode;
+  controls?: React.ReactNode;
+  main?: React.ReactNode;
+  inspector?: React.ReactNode;
+  footer?: React.ReactNode;
+  secondaryPosition?: 'end' | 'start';
+  secondaryWidth?: WebControlPanelSplitPaneWidth;
+};
+
+export function WebControlPanelWorkbench({
+  header,
+  controls,
+  main,
+  inspector,
+  footer,
+  secondaryPosition,
+  secondaryWidth,
+}: WebControlPanelWorkbenchProps) {
+  return (
+    <WebControlPanelViewport>
+      {header}
+      {controls}
+      <div className="ui-web-cp-workbench">
+        <div className="ui-web-cp-workbench__body">
+          <WebControlPanelSplitPane
+            primary={<div className="ui-web-cp-workbench__main">{main}</div>}
+            secondary={inspector}
+            secondaryPosition={secondaryPosition}
+            secondaryWidth={secondaryWidth}
+          />
+        </div>
+      </div>
+      {footer}
+    </WebControlPanelViewport>
+  );
+}
+
+export type WebControlPanelLaneTabItem = {
+  id: string;
+  label: string;
+  badge?: string;
+  active?: boolean;
+};
+
+export type WebControlPanelLaneTabsProps = {
+  items: ReadonlyArray<WebControlPanelLaneTabItem>;
+  onSelect?: (id: string) => void;
+  ariaLabel?: string;
+};
+
+export function WebControlPanelLaneTabs({ items, onSelect, ariaLabel }: WebControlPanelLaneTabsProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <nav className="ui-web-cp-lane-tabs" aria-label={ariaLabel}>
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={joinClassNames('ui-web-cp-lane-tabs__button', item.active && 'ui-web-cp-lane-tabs__button--active')}
+            aria-current={item.active ? 'page' : undefined}
+            onClick={() => onSelect?.(item.id)}
+          >
+            <span>{item.label}</span>
+            {item.badge ? <span className="ui-web-cp-lane-tabs__badge">{item.badge}</span> : null}
+          </button>
+        ))}
+      </nav>
+    </>
+  );
+}
+
+export type WebControlPanelTertiaryFilterItem = WebControlPanelLaneTabItem;
+
+export type WebControlPanelTertiaryFiltersProps = {
+  items: ReadonlyArray<WebControlPanelTertiaryFilterItem>;
+  onSelect?: (id: string) => void;
+  ariaLabel?: string;
+};
+
+export function WebControlPanelTertiaryFilters({
+  items,
+  onSelect,
+  ariaLabel,
+}: WebControlPanelTertiaryFiltersProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <nav className="ui-web-cp-tertiary-filters" aria-label={ariaLabel}>
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={joinClassNames(
+              'ui-web-cp-tertiary-filters__button',
+              item.active && 'ui-web-cp-tertiary-filters__button--active',
+            )}
+            aria-current={item.active ? 'page' : undefined}
+            onClick={() => onSelect?.(item.id)}
+          >
+            {item.label}
+          </button>
+        ))}
+      </nav>
+    </>
+  );
+}
+
+export type WebControlPanelCompactPagerProps = {
+  page: number;
+  totalPages: number;
+  previousLabel?: string;
+  nextLabel?: string;
+  summaryLabel?: string;
+  onPrevious?: () => void;
+  onNext?: () => void;
+};
+
+export function WebControlPanelCompactPager({
+  page,
+  totalPages,
+  previousLabel = 'السابق',
+  nextLabel = 'التالي',
+  summaryLabel,
+  onPrevious,
+  onNext,
+}: WebControlPanelCompactPagerProps) {
+  const safeTotalPages = Math.max(totalPages, 1);
+  const currentPage = Math.min(Math.max(page, 1), safeTotalPages);
+  const resolvedSummary = summaryLabel ?? `صفحة ${currentPage} من ${safeTotalPages}`;
+
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <div className="ui-web-cp-compact-pager">
+        <button
+          type="button"
+          className="ui-web-cp-compact-pager__button"
+          onClick={onPrevious}
+          disabled={currentPage <= 1 || !onPrevious}
+        >
+          {previousLabel}
+        </button>
+        <span className="ui-web-cp-compact-pager__summary">{resolvedSummary}</span>
+        <button
+          type="button"
+          className="ui-web-cp-compact-pager__button"
+          onClick={onNext}
+          disabled={currentPage >= safeTotalPages || !onNext}
+        >
+          {nextLabel}
+        </button>
+      </div>
+    </>
+  );
+}
+
+export type WebControlPanelQueueProps = {
+  title?: string;
+  meta?: string;
+  actions?: React.ReactNode;
+  pager?: React.ReactNode;
+  emptyState?: React.ReactNode;
+  children?: React.ReactNode;
+};
+
+export function WebControlPanelQueue({
+  title,
+  meta,
+  actions,
+  pager,
+  emptyState,
+  children,
+}: WebControlPanelQueueProps) {
+  const hasContent = React.Children.count(children) > 0;
+
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <section className="ui-web-cp-queue">
+        {(title || meta || actions) ? (
+          <div className="ui-web-cp-queue__header">
+            <div className="ui-web-cp-queue__title-block">
+              {title ? <h3 className="ui-web-cp-queue__title">{title}</h3> : null}
+              {meta ? <span className="ui-web-cp-queue__meta">{meta}</span> : null}
+            </div>
+            {actions}
+          </div>
+        ) : null}
+        <div className="ui-web-cp-queue__rows">{hasContent ? children : emptyState}</div>
+        {pager ? <div className="ui-web-cp-queue__footer">{pager}</div> : null}
+      </section>
+    </>
+  );
+}
+
+export type WebControlPanelMapCanvasProps = {
+  children?: React.ReactNode;
+  legend?: React.ReactNode;
+};
+
+export function WebControlPanelMapCanvas({ children, legend }: WebControlPanelMapCanvasProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <section className="ui-web-cp-map-canvas">
+        <div className="ui-web-cp-map-canvas__grid" />
+        {legend ? <div className="ui-web-cp-map-canvas__legend">{legend}</div> : null}
+        <div className="ui-web-cp-map-canvas__body">{children}</div>
+      </section>
+    </>
+  );
+}
+
+export type WebControlPanelMiniMapZoneProps = {
+  label: string;
+  tone?: WebControlPanelMapTone;
+  width?: number | string;
+  height?: number | string;
+  position?: WebControlPanelPosition;
+  onSelect?: () => void;
+};
+
+export function WebControlPanelMiniMapZone({
+  label,
+  tone = 'neutral',
+  width = 96,
+  height = 96,
+  position,
+  onSelect,
+}: WebControlPanelMiniMapZoneProps) {
+  const style: React.CSSProperties = {
+    ...resolvePositionStyle(position),
+    width: resolveCssLength(width),
+    height: resolveCssLength(height),
+  };
+
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <button
+        type="button"
+        className={joinClassNames('ui-web-cp-map-zone', tone !== 'neutral' && `ui-web-cp-map-zone--${tone}`)}
+        style={style}
+        onClick={onSelect}
+      >
+        {label}
+      </button>
+    </>
+  );
+}
+
+export type WebControlPanelMapPinProps = {
+  label: string;
+  tone?: WebControlPanelMapTone;
+  position?: WebControlPanelPosition;
+  onSelect?: () => void;
+};
+
+export function WebControlPanelMapPin({
+  label,
+  tone = 'neutral',
+  position,
+  onSelect,
+}: WebControlPanelMapPinProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <button
+        type="button"
+        className={joinClassNames('ui-web-cp-map-pin', tone !== 'neutral' && `ui-web-cp-map-pin--${tone}`)}
+        style={resolvePositionStyle(position)}
+        onClick={onSelect}
+      >
+        {label}
+      </button>
+    </>
+  );
+}
+
+export type WebControlPanelRouteLineProps = {
+  points: string;
+  tone?: WebControlPanelMapTone;
+};
+
+export function WebControlPanelRouteLine({ points, tone = 'neutral' }: WebControlPanelRouteLineProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <svg className="ui-web-cp-route-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <polyline
+          points={points}
+          className={joinClassNames(
+            'ui-web-cp-route-line__path',
+            tone !== 'neutral' && `ui-web-cp-route-line__path--${tone}`,
+          )}
+        />
+      </svg>
+    </>
+  );
+}
 
 export type WebControlPanelStatusTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 export type WebControlPanelStatusTagProps = { label: string; tone?: WebControlPanelStatusTone };

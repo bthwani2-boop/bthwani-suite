@@ -1,9 +1,25 @@
+import type {
+  DshActor,
+  DshCounterpartLink,
+  DshLifecycleStep,
+  DshRuntimeBindingStatus,
+  DshSurfaceId,
+} from './dshCrossSurfaceClosureMap';
+
 export type DshRecommendationSeverity = 'critical' | 'high' | 'medium' | 'low';
 export type DshRecommendationConfidence = 'high' | 'medium' | 'low';
 
 export type DshUnifiedRecommendation = {
   id: string;
   surface: string;
+  sourceSurface?: DshSurfaceId;
+  affectedSurface?: DshSurfaceId;
+  actor?: DshActor;
+  lifecycleStep?: DshLifecycleStep;
+  entityId?: string;
+  entityLabel?: string;
+  status?: string;
+  risk?: string;
   severity: DshRecommendationSeverity;
   confidence: DshRecommendationConfidence;
   affectedEntity: string;
@@ -14,6 +30,9 @@ export type DshUnifiedRecommendation = {
   expectedImpact: string;
   primaryActionLabel: string;
   secondaryActionLabel: string;
+  counterpartRouteHint?: string;
+  runtimeBindingStatus?: DshRuntimeBindingStatus;
+  counterpartLinks?: readonly DshCounterpartLink[];
 };
 
 export function getDshRecommendationConfidenceLabel(confidence: DshRecommendationConfidence) {

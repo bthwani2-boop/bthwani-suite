@@ -1,9 +1,14 @@
 .stageStack {
   display: grid;
+  grid-template-rows: minmax(0, 1fr);
   gap: 14px;
+  height: 100%;
   direction: inherit;
   text-align: inherit;
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  align-content: stretch;
 }
 
 .sectionLink:hover {
@@ -205,10 +210,18 @@
 
 .controlPanelRailOverrides {
   min-width: 0;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
 }
 
 .controlPanelRailOverrides :global(.ui-web-command-center-root) {
   --rail-width: 212px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .controlPanelRailOverrides :global(.ui-web-command-center-root[data-rail-collapsed='true']) {
@@ -217,10 +230,32 @@
 
 .controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__workspace) {
   grid-template-columns: var(--rail-width) minmax(0, 1fr) !important;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail) {
   padding: 14px 12px;
+  height: 100%;
+  min-height: 0;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-nav) {
+  min-height: 0;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__stage) {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding: 18px 20px;
+}
+
+.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__stage-content) {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-header) {

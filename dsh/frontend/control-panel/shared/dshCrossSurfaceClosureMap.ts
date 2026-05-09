@@ -1,6 +1,60 @@
-export type DshSurfaceId = 'client' | 'partner' | 'captain' | 'field' | 'control-panel';
+export type DshSurfaceId = 'app-client' | 'app-partner' | 'app-captain' | 'app-field' | 'control-panel';
+
+export type DshLegacySurfaceId = 'client' | 'partner' | 'captain' | 'field';
+
+export type DshSurfaceLookupId = DshSurfaceId | DshLegacySurfaceId;
 
 export type DshClosureStatus = 'closed' | 'needs-evidence' | 'needs-ui-flow' | 'blocked';
+
+export type DshRuntimeBindingStatus = 'UI_PREVIEW_ONLY' | 'NEEDS_BINDING_LATER' | 'NEEDS_RUNTIME_EVIDENCE' | 'BLOCKED';
+
+export type DshActor = 'client' | 'partner' | 'captain' | 'field' | 'operator';
+
+export type DshLifecycleStep =
+  | 'discovery'
+  | 'cart'
+  | 'checkout'
+  | 'order-intake'
+  | 'partner-preparation'
+  | 'pickup'
+  | 'delivery'
+  | 'tracking'
+  | 'support'
+  | 'rating'
+  | 'onboarding'
+  | 'visit'
+  | 'operations-monitoring'
+  | 'operations-intervention'
+  | 'finance-review'
+  | 'catalog-governance';
+
+export type DshCounterpartLink = {
+  surfaceId: DshSurfaceId;
+  routeHint: string;
+  label: string;
+  runtimeBindingStatus: DshRuntimeBindingStatus;
+};
+
+export type DshCrossSurfaceSignal = {
+  id: string;
+  sourceSurface: DshSurfaceId;
+  affectedSurface: DshSurfaceId;
+  actor: DshActor;
+  lifecycleStep: DshLifecycleStep;
+  entityId: string;
+  entityLabel: string;
+  status: string;
+  risk: string;
+  owner: string;
+  evidence: string;
+  nextAction: string;
+  expectedImpact: string;
+  primaryActionLabel: string;
+  secondaryActionLabel?: string;
+  counterpartRouteHint: string;
+  runtimeBindingStatus: DshRuntimeBindingStatus;
+  counterpartLinks?: readonly DshCounterpartLink[];
+};
 
 export type DshClosureArea =
   | 'client-order'
@@ -18,8 +72,10 @@ export type DshClosureArea =
 
 export type DshCrossSurfaceClosureItem = {
   surfaceId: DshSurfaceId;
+  actor: DshActor;
   area: DshClosureArea;
   status: DshClosureStatus;
+  runtimeBindingStatus: DshRuntimeBindingStatus;
   title: string;
   description: string;
   evidenceHint: string;
@@ -28,117 +84,162 @@ export type DshCrossSurfaceClosureItem = {
 
 export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[] = [
   {
-    surfaceId: 'client',
+    surfaceId: 'app-client',
+    actor: 'client',
     area: 'client-order',
     status: 'needs-evidence',
-    title: 'client order',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    title: 'رحلة العميل',
     description: 'طلبات العميل الأساسية تحتاج evidence branch قبل أي claim إغلاق.',
     evidenceHint: 'screen and guard proof',
     routeHint: '/app-client/orders',
   },
   {
-    surfaceId: 'partner',
+    surfaceId: 'app-partner',
+    actor: 'partner',
     area: 'partner-order',
     status: 'needs-evidence',
-    title: 'partner order',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    title: 'رحلة الشريك',
     description: 'مسار الشريك الطلبي يحتاج evidence قبل اعتباره مغلقًا.',
     evidenceHint: 'export and route proof',
     routeHint: '/app-partner/orders',
   },
   {
-    surfaceId: 'captain',
+    surfaceId: 'app-captain',
+    actor: 'captain',
     area: 'captain-order',
     status: 'needs-evidence',
-    title: 'captain order',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    title: 'رحلة الكابتن',
     description: 'تحتاج الشهادة الداعمة لإغلاق root exposure بالكامل.',
     evidenceHint: 'root export proof',
     routeHint: '/app-captain/orders',
   },
   {
-    surfaceId: 'field',
+    surfaceId: 'app-field',
+    actor: 'field',
     area: 'field-onboarding',
     status: 'needs-ui-flow',
-    title: 'field onboarding',
+    runtimeBindingStatus: 'NEEDS_BINDING_LATER',
+    title: 'تهيئة الميدان',
     description: 'الفلو الميداني يحتاج إعادة تنظيم خفيفة على مستوى الأسماء والربط.',
     evidenceHint: 'structured flow proof',
     routeHint: '/app-field/stores',
   },
   {
-    surfaceId: 'field',
+    surfaceId: 'app-field',
+    actor: 'field',
     area: 'field-visit',
     status: 'needs-ui-flow',
-    title: 'field visit',
+    runtimeBindingStatus: 'NEEDS_BINDING_LATER',
+    title: 'زيارة ميدانية',
     description: 'الزيارة الميدانية يجب أن تبقى ضمن onboarding/visit flow.',
     evidenceHint: 'visit and geo pin proof',
     routeHint: '/app-field/visits',
   },
   {
     surfaceId: 'control-panel',
+    actor: 'operator',
     area: 'control-panel-operations',
     status: 'needs-evidence',
-    title: 'operations',
+    runtimeBindingStatus: 'UI_PREVIEW_ONLY',
+    title: 'عمليات لوحة التحكم',
     description: 'العمليات تحتاج خريطة إغلاق خاصة قبل اعتباره مقفلاً بالكامل.',
     evidenceHint: 'workspace evidence',
     routeHint: '/operations',
   },
   {
     surfaceId: 'control-panel',
+    actor: 'operator',
     area: 'control-panel-finance',
     status: 'needs-evidence',
-    title: 'finance',
+    runtimeBindingStatus: 'UI_PREVIEW_ONLY',
+    title: 'المالية',
     description: 'المالية ظاهرة لكن تحتاج لقطات closure evidence أوضح.',
     evidenceHint: 'finance matrix',
     routeHint: '/finance',
   },
   {
     surfaceId: 'control-panel',
+    actor: 'operator',
     area: 'control-panel-support',
     status: 'needs-ui-flow',
-    title: 'support',
+    runtimeBindingStatus: 'UI_PREVIEW_ONLY',
+    title: 'الدعم',
     description: 'الدعم يحتاج مسارات issue/dispute وليست صفحات عامة.',
     evidenceHint: 'support queue evidence',
     routeHint: '/operations?workspace=issues',
   },
   {
     surfaceId: 'control-panel',
+    actor: 'operator',
     area: 'control-panel-catalogs',
     status: 'needs-evidence',
-    title: 'catalogs',
+    runtimeBindingStatus: 'UI_PREVIEW_ONLY',
+    title: 'الكتالوجات',
     description: 'كتالوج DSH يحتاج evidence قبل أي claim إغلاق.',
     evidenceHint: 'catalog approval proof',
     routeHint: '/catalogs',
   },
   {
     surfaceId: 'control-panel',
+    actor: 'operator',
     area: 'control-panel-partners',
     status: 'needs-evidence',
-    title: 'partners',
+    runtimeBindingStatus: 'UI_PREVIEW_ONLY',
+    title: 'الشركاء',
     description: 'بوابة الشركاء تحتاج evidence قبل وصفها بالمغلقة.',
     evidenceHint: 'partner activation proof',
     routeHint: '/partners',
   },
   {
     surfaceId: 'control-panel',
+    actor: 'operator',
     area: 'control-panel-marketing',
     status: 'needs-evidence',
-    title: 'marketing',
+    runtimeBindingStatus: 'UI_PREVIEW_ONLY',
+    title: 'التسويق',
     description: 'الموافقات التسويقية تحتاج evidence قبل claim الإغلاق.',
     evidenceHint: 'marketing approval proof',
     routeHint: '/marketing',
   },
   {
     surfaceId: 'control-panel',
+    actor: 'operator',
     area: 'control-panel-platform',
     status: 'needs-evidence',
-    title: 'platform',
+    runtimeBindingStatus: 'NEEDS_BINDING_LATER',
+    title: 'التحكم والمنصة',
     description: 'طبقة المنصة تحتاج proof matrix نهائية.',
     evidenceHint: 'guard status proof',
     routeHint: '/platform',
   },
 ];
 
-export function getDshClosureItemsBySurface(surfaceId: DshSurfaceId) {
-  return DSH_CROSS_SURFACE_CLOSURE_MAP.filter((item) => item.surfaceId === surfaceId);
+export function resolveDshSurfaceId(surfaceId: DshSurfaceLookupId): DshSurfaceId {
+  if (surfaceId === 'client') {
+    return 'app-client';
+  }
+
+  if (surfaceId === 'partner') {
+    return 'app-partner';
+  }
+
+  if (surfaceId === 'captain') {
+    return 'app-captain';
+  }
+
+  if (surfaceId === 'field') {
+    return 'app-field';
+  }
+
+  return surfaceId;
+}
+
+export function getDshClosureItemsBySurface(surfaceId: DshSurfaceLookupId) {
+  const resolvedSurfaceId = resolveDshSurfaceId(surfaceId);
+  return DSH_CROSS_SURFACE_CLOSURE_MAP.filter((item) => item.surfaceId === resolvedSurfaceId);
 }
 
 export function getDshClosureItemsByStatus(status: DshClosureStatus) {
