@@ -2,7 +2,12 @@ import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { Badge, Box, Button, Card, Icon, MobileScrollView, ScreenHeader, SearchField, StateView, Text, TopBar } from '@bthwani/ui-kit';
 import { FieldStoreCard } from './FieldStoreCard';
+import { DSH_FIELD_BINDING_CONTRACTS } from './dshFieldBinding.contracts';
 import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from './dshFieldStoresModel';
+
+function resolveStoresBindingLabel() {
+  return 'جسر قائمة المتاجر';
+}
 
 type DshFieldStoresScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline';
@@ -16,22 +21,6 @@ type DshFieldStoresScreenProps = {
 export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onOpenAccount, onCreateStore, onRetry }: DshFieldStoresScreenProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [activeFilter, setActiveFilter] = React.useState<FieldLeadFilter>('today');
-
-  if (state === 'loading') {
-    return <StateView stateId="loading" title="جارٍ تحميل ملفات الميدان" description="نقوم بمزامنة أحدث بيانات المتجر والمواقع الآن." />;
-  }
-
-  if (state === 'error' || state === 'offline') {
-    return (
-      <StateView
-        stateId={state === 'offline' ? 'offline' : 'recoverableError'}
-        title={state === 'offline' ? 'الاتصال مقطوع' : 'تعذر تحميل القائمة'}
-        description="تأكد من الاتصال بالشبكة ثم حاول التحديث مرة أخرى."
-        actionLabel="إعادة المحاولة"
-        onActionPress={onRetry}
-      />
-    );
-  }
 
   const counts = React.useMemo(() => resolveFieldFilterCounts(stores), [stores]);
 
@@ -52,13 +41,38 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
     });
   }, [activeFilter, searchQuery, stores]);
 
+  const priorityStore = React.useMemo(() => {
+    return filteredStores.find((store) => matchesFieldStoreFilter(store, 'ready'))
+      ?? filteredStores[0]
+      ?? stores.find((store) => matchesFieldStoreFilter(store, 'today'))
+      ?? stores[0];
+  }, [filteredStores, stores]);
+
+  const storesBinding = DSH_FIELD_BINDING_CONTRACTS.find((contract) => contract.surfaceId === 'stores');
+
+  if (state === 'loading') {
+    return <StateView stateId="loading" title="جارٍ تحميل ملفات الميدان" description="نقوم بمزامنة أحدث بيانات المتجر والمواقع الآن." />;
+  }
+
+  if (state === 'error' || state === 'offline') {
+    return (
+      <StateView
+        stateId={state === 'offline' ? 'offline' : 'recoverableError'}
+        title={state === 'offline' ? 'الاتصال مقطوع' : 'تعذر تحميل القائمة'}
+        description="تأكد من الاتصال بالشبكة ثم حاول التحديث مرة أخرى."
+        actionLabel="إعادة المحاولة"
+        onActionPress={onRetry}
+      />
+    );
+  }
+
   return (
     <Box style={{ flex: 1 }} background="background">
       <TopBar
         variant="brand"
         title="بثواني"
-        subtitle="تشغيل الميدان · DSH field onboarding"
-        locationLabel="الرياض · قائمة المتاجر"
+        subtitle="تشغيل الميدان · ملفات المتاجر"
+        locationLabel="الرياض · جولة المتاجر"
         actions={[
           {
             id: 'account',
@@ -76,7 +90,30 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
       />
 
       <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 128 }}>
-        <Card title="تشغيل الميدان اليوم" subtitle="قائمة سريعة للمتاجر والإجراء التالي.">
+        <Card title="خط الميداني الحالي" subtitle="ابدأ ببطاقة متجر واحدة، ثم الزيارة، ثم الإرسال للمراجعة دون أي لوحة عامة خارج نطاقك.">
+          <Box gap={2}>
+            <Text role="bodyStrong">
+              {priorityStore ? `المتجر التالي: ${priorityStore.name}` : 'لا يوجد متجر جاهز الآن'}
+            </Text>
+            <Text role="bodySm" tone="muted">
+              {priorityStore
+                ? `${priorityStore.category} · ${priorityStore.location} · ${priorityStore.nextVisitLabel}`
+                : 'أنشئ ملفًا جديدًا أو وسّع البحث لاستئناف الجولة الميدانية.'}
+            </Text>
+            <Text role="caption" tone="soft">
+              {storesBinding
+                ? `حالة الربط: ${resolveStoresBindingLabel()} · معاينة محلية لقائمة المتاجر والمفاضلة بينها.`
+                : 'حالة الربط: معاينة محلية لقائمة المتاجر.'}
+            </Text>
+            {priorityStore ? (
+              <Button label="فتح المتجر التالي" onPress={() => onOpenStore(priorityStore.id)} />
+            ) : (
+              <Button label="إنشاء ملف جديد" onPress={onCreateStore} />
+            )}
+          </Box>
+        </Card>
+
+        <Card title="مؤشر الملفات اليوم" subtitle="تلخيص سريع للجولة الحالية وحجم المتابعة داخل ملف المتجر فقط.">
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
             <Badge label={`اليوم ${counts.today}`} tone="brand" />
             <Badge label={`جاهز للإضافة ${counts.ready}`} tone="success" />

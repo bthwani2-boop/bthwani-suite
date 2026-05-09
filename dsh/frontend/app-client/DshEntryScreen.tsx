@@ -75,9 +75,9 @@ function renderNonReadyState(
 function renderHero(onStartDelivery?: () => void) {
   return (
     <Card
-      title="ابدأ توصيل DSH"
-      subtitle="مدخل واضح وسريع لاكتشاف المتاجر، مراجعة السلة، أو متابعة الطلبات دون تشتت."
-      footer={<Button label="ابدأ التوصيل" onPress={onStartDelivery} />}
+      title="ابدأ طلبك"
+      subtitle="مسار عميل واحد وواضح: اكتشاف متجر، مراجعة السلة، تأكيد الطلب، ثم متابعة التتبع."
+      footer={<Button label="ابدأ الطلب" onPress={onStartDelivery} />}
     />
   );
 }
@@ -87,12 +87,12 @@ function renderDiscoverySection(onBrowseStores?: () => void) {
     <Box gap={3}>
       <Card
         title="استكشف المتاجر القريبة"
-        subtitle="ابدأ من مسار اكتشاف سريع قبل التوسع في السلة أو الدفع."
+        subtitle="ابدأ من اكتشاف المتاجر والعروض المناسبة قبل الانتقال إلى السلة أو الدفع."
         footer={<Button label="تصفح المتاجر" tone="secondary" onPress={onBrowseStores} />}
       />
       <Card
         title="أكمل من السلة"
-        subtitle="ارجع إلى أول خطوة قابلة للتنفيذ دون فروع إضافية أو ضياع المسار."
+        subtitle="ارجع إلى أول خطوة قابلة للتنفيذ من دون فروع إضافية أو تشتيت خارج رحلة العميل."
       />
     </Box>
   );
@@ -103,11 +103,11 @@ function renderReviewSection(onOpenOrders?: () => void) {
     <Box gap={3}>
       <Card
         title="راجع قبل التأكيد"
-        subtitle="إجراء رئيسي واحد مع مسار رجوع واضح وآمن."
+        subtitle="إجراء رئيسي واحد مع مسار رجوع واضح وآمن قبل تثبيت الطلب."
       />
       <Card
         title="افتح الطلبات النشطة"
-        subtitle="يبقى التتبع والطلبات متاحين دائمًا كمسار ثقة واسترجاع."
+        subtitle="يبقى التتبع والطلبات متاحين دائمًا كمسار ثقة واسترجاع داخل تطبيق العميل فقط."
         footer={<Button label="عرض الطلبات" tone="ghost" onPress={onOpenOrders} />}
       />
     </Box>
@@ -116,8 +116,8 @@ function renderReviewSection(onOpenOrders?: () => void) {
 
 export function DshEntryScreen({
   state = 'ready',
-  title = 'مدخل التوصيل',
-  subtitle = 'المدخل الأساسي لخدمة DSH داخل تطبيق العميل.',
+  title = 'مدخل العميل',
+  subtitle = 'المدخل الأساسي لاكتشاف المتاجر والسلة والطلبات داخل تطبيق العميل فقط.',
   onStartDelivery,
   onBrowseStores,
   onOpenOrders,
@@ -144,12 +144,12 @@ export function DshEntryScreen({
           content: renderReviewSection(onOpenOrders),
         },
         {
-          title: 'ضوابط التدفق',
-          subtitle: 'هذه الشريحة مخصصة حاليًا للواجهة والتجربة والتدفق فقط.',
+          title: 'نطاق العميل',
+          subtitle: 'يبقى هذا السطح محصورًا في رحلة العميل دون أي أسطح تشغيلية أو إدارية موازية.',
           content: (
             <Box>
               <Text role="bodySm" tone="muted">
-                لا يحتوي هذا المسار على ربط API أو تكامل أو منطق runtime في هذه المرحلة.
+                هذا المسار يقتصر على الاكتشاف والسلة والطلبات والتتبع. لا يحتوي على خريطة تشغيلية أو أدوات شريك أو لوحات تحكم إدارية في هذه المرحلة.
               </Text>
             </Box>
           ),

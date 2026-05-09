@@ -34,9 +34,9 @@ function renderHero(state: DshPartnerEntryScreenState, onOpenOrdersBoardPress?: 
     return (
       <StateView
         stateId="empty"
-        title="No partner orders waiting"
-        description="Keep the orders board entry visible so branch operators can restart queue triage without leaving the service shell."
-        actionLabel="Open orders board"
+        title="لا توجد طلبات بانتظار الفرع"
+        description="أبقِ مدخل لوحة الطلبات ظاهرًا حتى يتمكن مشغل الفرع من استئناف الفرز فور وصول أي طلب جديد."
+        actionLabel="فتح لوحة الطلبات"
         onActionPress={onOpenOrdersBoardPress}
       />
     );
@@ -44,9 +44,9 @@ function renderHero(state: DshPartnerEntryScreenState, onOpenOrdersBoardPress?: 
 
   return (
     <Card
-      title="Partner operations entry"
-      subtitle="One focused start point for order triage, workspace actions, store maintenance, and issue review."
-      footer={<Button label="Open orders board" onPress={onOpenOrdersBoardPress} />}
+      title="مدخل تشغيل الفرع"
+      subtitle="نقطة بداية واحدة لفرز الطلبات، تجهيزها، متابعة الصيانة، واحتواء الاستثناءات داخل app-partner فقط."
+      footer={<Button label="فتح لوحة الطلبات" onPress={onOpenOrdersBoardPress} />}
     />
   );
 }
@@ -58,14 +58,14 @@ function renderOrdersSection(
   return (
     <Box gap={3}>
       <Card
-        title="Review partner queue"
-        subtitle="Start from the orders board so the next branch decision stays obvious within seconds."
-        footer={<Button label="View orders board" tone="secondary" onPress={onOpenOrdersBoardPress} />}
+        title="مراجعة صف الطلبات"
+        subtitle="ابدأ من لوحة الطلبات حتى يظل قرار الفرع التالي واضحًا خلال ثوانٍ."
+        footer={<Button label="عرض لوحة الطلبات" tone="secondary" onPress={onOpenOrdersBoardPress} />}
       />
       <Card
-        title="Open order workspace"
-        subtitle="Release, packaging, and handoff actions stay grouped in one order workspace pattern."
-        footer={<Button label="Open workspace" tone="ghost" onPress={onOpenOrderWorkspacePress} />}
+        title="فتح مساحة تجهيز الطلب"
+        subtitle="التجهيز، الجاهزية، والتسليم للكابتن تبقى مجمعة في مساحة طلب واحدة."
+        footer={<Button label="فتح مساحة الطلب" tone="ghost" onPress={onOpenOrderWorkspacePress} />}
       />
     </Box>
   );
@@ -78,14 +78,14 @@ function renderSupportSection(
   return (
     <Box gap={3}>
       <Card
-        title="Store maintenance workspace"
-        subtitle="Availability and branch maintenance stay reachable without displacing the main order flow."
-        footer={<Button label="Open maintenance" tone="secondary" onPress={onOpenMaintenancePress} />}
+        title="مساحة صيانة الفرع"
+        subtitle="التوفر وصيانة الفرع يظلان متاحين من دون إزاحة خط الطلبات الرئيسي."
+        footer={<Button label="فتح الصيانة" tone="secondary" onPress={onOpenMaintenancePress} />}
       />
       <Card
-        title="Order issue queue"
-        subtitle="Escalations and problem orders remain visible as a contained companion queue."
-        footer={<Button label="Open issue queue" tone="ghost" onPress={onOpenIssueQueuePress} />}
+        title="صف استثناءات الطلبات"
+        subtitle="المشكلات والتصعيدات تبقى ظاهرة كصف مرافق محتوى داخل الفرع نفسه."
+        footer={<Button label="فتح صف الاستثناءات" tone="ghost" onPress={onOpenIssueQueuePress} />}
       />
     </Box>
   );
@@ -104,7 +104,7 @@ export function DshPartnerEntryScreen({
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
       <TopBar
         variant="secondary"
-        title="Partner Entry"
+        title="مدخل الشريك"
         style={{ marginHorizontal: -16, marginTop: -16 }}
         trailingAction={backAction ? {
           id: 'back',
@@ -119,22 +119,31 @@ export function DshPartnerEntryScreen({
 
       {state === 'ready' ? (
         <>
-          <Surface tone="raised" padding={3} gap={3}>
-            <Text role="label" tone="muted">
-              Orders and Workspace
+          <Surface tone="brand" padding={3} gap={2}>
+            <Text role="label" tone="soft">
+              نطاق السطح
             </Text>
             <Text role="bodySm" tone="muted">
-              Orders board entry and workspace handoff pattern.
+              هذا المدخل مملوك للفرع الحالي فقط: الطلبات، التجهيز، الصيانة، والاستثناءات. لا يعرض تحليلات عامة أو خريطة تشغيلية خارج تطبيق الشريك.
+            </Text>
+          </Surface>
+
+          <Surface tone="raised" padding={3} gap={3}>
+            <Text role="label" tone="muted">
+              الطلبات ومساحة التنفيذ
+            </Text>
+            <Text role="bodySm" tone="muted">
+              مدخل لوحة الطلبات وتسلسل تجهيز الفرع والتسليم للكابتن.
             </Text>
             {renderOrdersSection(onOpenOrdersBoardPress, onOpenOrderWorkspacePress)}
           </Surface>
 
           <Surface tone="raised" padding={3} gap={3}>
             <Text role="label" tone="muted">
-              Maintenance and Issues
+              الصيانة والاستثناءات
             </Text>
             <Text role="bodySm" tone="muted">
-              Maintenance workspace and issue-queue companion pattern.
+              الصيانة وصف المشكلات يبقيان مرافقين للطلبات بدل أن يتحولا إلى console عام.
             </Text>
             {renderSupportSection(onOpenMaintenancePress, onOpenIssueQueuePress)}
           </Surface>
@@ -142,7 +151,7 @@ export function DshPartnerEntryScreen({
       ) : (
         <Surface tone="raised" padding={3} gap={2}>
           <Text role="bodyMd" tone="muted">
-            Entry state is active. No business logic or network requests are executed here.
+            حالة المدخل نشطة. لا يتم تنفيذ منطق أعمال أو طلبات شبكة هنا.
           </Text>
         </Surface>
       )}
@@ -151,5 +160,3 @@ export function DshPartnerEntryScreen({
 }
 
 export { DshPartnerEntryScreen as DshEntryScreen };
-
-
