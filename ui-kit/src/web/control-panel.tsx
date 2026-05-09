@@ -48,7 +48,6 @@ export function WebControlPanelShell({ children, rail, topBar }: WebControlPanel
     </Box>
   );
 }
-
 /**
  * WebControlPanelTopBar: A high-density command bar at the top.
  */

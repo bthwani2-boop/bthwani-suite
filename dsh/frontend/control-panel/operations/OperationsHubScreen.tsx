@@ -125,7 +125,6 @@ export function ControlPanelDshOperationsScreen({
             </button>
           );
         })}
-      </nav>
 
       {/* 2b. Sub-Tabs - Granular Navigation */}
       {activeGroupMeta.subGroups && (
