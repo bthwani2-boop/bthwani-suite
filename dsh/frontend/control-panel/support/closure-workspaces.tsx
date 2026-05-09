@@ -5,10 +5,10 @@ import {
   WebControlPanelDecisionRow,
   WebControlPanelInspectorShell,
   WebControlPanelRecommendation,
+  WebControlPanelKpiStrip,
   WebControlPanelSubTabs,
   WebControlPanelWorkspaceTabs,
 } from '@bthwani/ui-kit/web';
-import { WebControlSurfaceHeader } from '@bthwani/ui-kit/web';
 import styles from '../operations/dsh-surface.module.css';
 
 type SupportTab = 'queue' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk';
@@ -151,13 +151,45 @@ export function ControlPanelDshSupportHubScreen() {
 
   return (
     <div className={styles.operationsCockpit} dir="rtl">
-      <WebControlSurfaceHeader
-        chips={[{ label: 'دعم DSH', tone: 'brand' }, { label: 'غرفة قيادة', tone: 'accent' }]}
-        title="دعم DSH"
-        description="صفوف دعم، نزاعات، تصعيد، وخطر SLA في غرفة واحدة مضغوطة."
-        actions={[
-          { id: 'queue', label: 'صفوف الدعم', tone: 'primary', onAction: () => setActiveTab('queue') },
-          { id: 'evidence', label: 'الأدلة', tone: 'secondary', onAction: () => setActiveTab('escalation') },
+      <header className={styles.operationsTopBar}>
+        <div className={styles.operationsTitleBlock}>
+          <div className={styles.operationsHeaderIconBox} aria-hidden="true">
+            <div style={{ width: 18, height: 18, border: '2px solid #FFFFFF', borderRadius: 4, position: 'relative' }}>
+              <span style={{ position: 'absolute', top: '50%', left: '50%', width: 8, height: 2, backgroundColor: '#FFFFFF', transform: 'translate(-50%, -50%)' }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>دعم DSH</h1>
+              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>غرفة قيادة</span>
+            </div>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>صفوف دعم، نزاعات، تصعيد، وخطر SLA في غرفة واحدة مضغوطة.</p>
+          </div>
+        </div>
+
+        <div className={styles.operationsHeaderActions}>
+          <div className={styles.operationsPulseCompact}>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>صفوف مفتوحة</span>
+              <span className={styles.commandKpiValue}>١٧</span>
+            </div>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>نزاعات</span>
+              <span className={styles.commandKpiValue} style={{ color: '#D97706' }}>٩</span>
+            </div>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>خطر SLA</span>
+              <span className={styles.commandKpiValue} style={{ color: '#DC2626' }}>٣</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <WebControlPanelKpiStrip
+        items={[
+          { id: 'queue', label: 'صفوف الدعم', value: String(rows.length), tone: 'neutral' },
+          { id: 'selected', label: 'المحدد', value: selectedRow?.id ?? '—', tone: 'warning' },
+          { id: 'owner', label: 'المالك', value: selectedRow?.owner ?? '—', tone: 'success' },
         ]}
       />
 
@@ -172,6 +204,12 @@ export function ControlPanelDshSupportHubScreen() {
         ariaLabel="فلاتر الدعم"
         onSelect={(id) => setActiveSubTab(id)}
       />
+
+      <div className={styles.filterDock}>
+        <span style={{ fontSize: '11px', fontWeight: 800, color: '#64748B' }}>السطح الحالي</span>
+        <span style={{ fontSize: '11px', fontWeight: 800, color: '#0A2F5C' }}>{activeTab === 'queue' ? 'صفوف الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : 'خطر SLA'}</span>
+        <span style={{ fontSize: '11px', color: '#64748B' }}>يتم التصفية عبر التبويبات الفرعية فقط.</span>
+      </div>
 
       <main className={styles.operationsMainPanel}>
         <div className={styles.operationsInnerScroll}>

@@ -398,9 +398,9 @@ const webCommandCenterCss = `
 .ui-web-cp-kpi-strip {
   display: flex;
   flex-wrap: nowrap;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
-  padding: 4px 14px;
+  padding: 8px 14px;
   background: #FFFFFF;
   border-bottom: 1px solid rgba(10,47,92,0.06);
   overflow-x: auto;
@@ -411,22 +411,21 @@ const webCommandCenterCss = `
 .ui-web-cp-kpi-item {
   display: flex;
   flex-direction: column;
-  padding: 4px 10px;
+  padding: 8px 12px;
   background: #FFFFFF;
   border: 1px solid rgba(10,47,92,0.08);
-  border-radius: 8px;
-  min-width: 90px;
+  border-radius: 12px;
+  min-width: 110px;
   flex-shrink: 0;
 }
 .ui-web-cp-kpi-item__label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   color: #64748B;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
 }
 .ui-web-cp-kpi-item__value {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 900;
   color: #0A2F5C;
   line-height: 1.2;
@@ -440,8 +439,8 @@ const webCommandCenterCss = `
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: 4px;
-  padding: 4px 14px;
+  gap: 8px;
+  padding: 10px 14px 8px;
   background: #FFFFFF;
   border-bottom: 1px solid rgba(10,47,92,0.08);
   overflow-x: auto;
@@ -451,13 +450,13 @@ const webCommandCenterCss = `
 .ui-web-cp-workspace-tabs::-webkit-scrollbar { display: none; }
 .ui-web-cp-workspace-tab {
   flex-shrink: 0;
-  padding: 6px 16px;
-  border-radius: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
   font-size: 13px;
   font-weight: 700;
   color: #64748B;
-  background: transparent;
-  border: 1px solid transparent;
+  background: #FFFFFF;
+  border: 1px solid rgba(10,47,92,0.12);
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
@@ -465,17 +464,17 @@ const webCommandCenterCss = `
   align-items: center;
   gap: 6px;
 }
-.ui-web-cp-workspace-tab:hover { background: rgba(10,47,92,0.04); color: #0A2F5C; }
-.ui-web-cp-workspace-tab--active { background: #0A2F5C; color: #FFFFFF; }
-.ui-web-cp-workspace-tab--active:hover { background: #08284F; }
+.ui-web-cp-workspace-tab:hover { background: rgba(10,47,92,0.03); color: #0A2F5C; }
+.ui-web-cp-workspace-tab--active { background: #FF500D; color: #FFFFFF; border-color: #FF500D; box-shadow: 0 8px 18px rgba(255, 80, 13, 0.18); }
+.ui-web-cp-workspace-tab--active:hover { background: #e94900; }
 
 /* === ControlPanel: SubTabs === */
 .ui-web-cp-sub-tabs {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 14px 8px;
-  background: #FFFFFF;
+  padding: 8px 14px 10px;
+  background: #F8FAFC;
   border-bottom: 1px solid rgba(10,47,92,0.06);
   overflow-x: auto;
   scrollbar-width: none;
@@ -483,19 +482,19 @@ const webCommandCenterCss = `
 }
 .ui-web-cp-sub-tabs::-webkit-scrollbar { display: none; }
 .ui-web-cp-sub-tab {
-  padding: 3px 12px;
-  border-radius: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
   color: #64748B;
-  background: rgba(10,47,92,0.03);
-  border: 1px solid transparent;
+  background: #FFFFFF;
+  border: 1px solid rgba(10,47,92,0.08);
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
 }
-.ui-web-cp-sub-tab:hover { background: rgba(10,47,92,0.06); color: #0A2F5C; }
-.ui-web-cp-sub-tab--active { background: rgba(10,47,92,0.1); color: #0A2F5C; border-color: rgba(10,47,92,0.2); }
+.ui-web-cp-sub-tab:hover { background: rgba(10,47,92,0.03); color: #0A2F5C; }
+.ui-web-cp-sub-tab--active { background: rgba(255, 80, 13, 0.1); color: #FF500D; border-color: rgba(255, 80, 13, 0.22); }
 
 .ui-web-command-center__hero { margin-bottom: 32px; }
 .ui-web-command-center__hero-title {

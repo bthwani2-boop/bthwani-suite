@@ -1,11 +1,6 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import {
-  WebControlPanelDecisionRow,
-  WebControlPanelKpiStrip,
-  WebControlPanelWorkspaceTabs,
-  WebControlPanelSubTabs,
-} from '@bthwani/ui-kit/web';
+import { WebControlPanelDecisionRow } from '@bthwani/ui-kit/web';
 import { getPartnerIntakeItems } from '../../shared/partner-intake-store';
 import {
   ApprovalRecord,
@@ -14,6 +9,7 @@ import {
   translateEntityType,
   translateOwner,
 } from '../../shared/workflow';
+import styles from '../operations/dsh-surface.module.css';
 
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix') => void }) {
   const tone = (item.stage === 'marketing-review' || item.stage === 'approved') ? 'success' :
@@ -95,63 +91,99 @@ export function ControlPanelDshPartnerHubScreen() {
   }, [activeTab]);
 
   return (
-    <Box gap={0} style={{ flex: 1 }}>
-      {/* 1. Header Area */}
-      <Box padding={4} background="surface" style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(10,47,92,0.08)' }} layoutDirection="row" justify="space-between" align="center">
-        <Box gap={1}>
-          <Box layoutDirection="row" align="center" gap={2}>
-            <Text role="titleMd" style={{ color: '#0A2F5C', fontWeight: '800' }}>شركاء DSH</Text>
-            <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>مراجعة الشريك</span>
-          </Box>
-          <Text role="caption" tone="muted">حوكمة الشركاء، التغطية، وأهلية الترويج</Text>
-        </Box>
+    <div className={styles.operationsCockpit} dir="rtl">
+      <header className={styles.operationsTopBar}>
+        <div className={styles.operationsTitleBlock}>
+          <div className={styles.operationsHeaderIconBox} aria-hidden="true">
+            <div style={{ width: 18, height: 18, border: '2px solid #FFFFFF', borderRadius: 4, position: 'relative' }}>
+              <span style={{ position: 'absolute', top: '50%', left: '50%', width: 8, height: 2, backgroundColor: '#FFFFFF', transform: 'translate(-50%, -50%)' }} />
+            </div>
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>شركاء DSH</h1>
+              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>مراجعة الشريك</span>
+            </div>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>حوكمة الشركاء، التغطية، وأهلية الترويج</p>
+          </div>
+        </div>
 
-        <WebControlPanelKpiStrip
-          items={[
-            { id: 'active', label: 'شركاء نشطون', value: '١,٢٥٤', tone: 'neutral' },
-            { id: 'pending', label: 'طلبات معلقة', value: '٢٨', tone: 'warning' },
-            { id: 'coverage', label: 'تغطية المناطق', value: '٨٤٪', tone: 'success' }
-          ]}
-        />
-      </Box>
+        <div className={styles.operationsHeaderActions}>
+          <div className={styles.operationsPulseCompact}>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>شركاء نشطون</span>
+              <span className={styles.commandKpiValue}>١,٢٥٤</span>
+            </div>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>طلبات معلقة</span>
+              <span className={styles.commandKpiValue} style={{ color: '#D97706' }}>٢٨</span>
+            </div>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>تغطية المناطق</span>
+              <span className={styles.commandKpiValue} style={{ color: '#16A34A' }}>٨٤٪</span>
+            </div>
+          </div>
+        </div>
+      </header>
 
-      {/* 2. Navigation */}
-      <WebControlPanelWorkspaceTabs
-        items={PRIMARY_TABS.map(t => ({ id: t.id, label: t.label, active: t.id === activeTab }))}
-        onSelect={setActiveTab}
-      />
+      <nav className={styles.navigationCockpit}>
+        {PRIMARY_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            className={`${styles.operationsTab} ${tab.id === activeTab ? styles.operationsTabActive : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
 
       {SECONDARY_TABS[activeTab] && (
-        <WebControlPanelSubTabs
-          items={SECONDARY_TABS[activeTab].map(s => ({ id: s.id, label: s.label, active: s.id === activeSubTab }))}
-          onSelect={setActiveSubTab}
-        />
+        <div className={styles.filterDock}>
+          {SECONDARY_TABS[activeTab].map((s) => (
+            <button
+              key={s.id}
+              onClick={() => setActiveSubTab(s.id)}
+              className={styles.operationsTab}
+              style={{
+                backgroundColor: s.id === activeSubTab ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
+                color: s.id === activeSubTab ? '#FF500D' : '#64748B',
+                borderColor: s.id === activeSubTab ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
+              }}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
       )}
 
-      {/* 3. Content */}
-      <Box padding={4} gap={4} style={{ flex: 1, overflowY: 'auto' }}>
-        {activeTab === 'inbox' && activeSubTab === 'registration' ? (
-          <Box gap={3}>
-            {items.length === 0 ? (
-              <Box padding={8} align="center" background="surfaceRaised" radiusToken="lg">
-                <Text tone="muted">لا توجد طلبات واردة حالياً</Text>
+      <main className={styles.operationsMainPanel}>
+        <div className={styles.operationsInnerScroll}>
+          <Box padding={4} gap={4}>
+            {activeTab === 'inbox' && activeSubTab === 'registration' ? (
+              <Box gap={3}>
+                {items.length === 0 ? (
+                  <Box padding={8} align="center" background="surfaceRaised" radiusToken="lg">
+                    <Text tone="muted">لا توجد طلبات واردة حالياً</Text>
+                  </Box>
+                ) : (
+                  items.map((item) => (
+                    <PartnerApprovalCard key={item.id} item={item} onAction={handleAction} />
+                  ))
+                )}
               </Box>
             ) : (
-              items.map(item => (
-                <PartnerApprovalCard key={item.id} item={item} onAction={handleAction} />
-              ))
+              <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
+                <Box align="center" gap={1}>
+                  <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>هذه اللوحة تعرض الآن صفوف التفعيل والمراجعة</Text>
+                  <Text tone="muted">يمكن التبديل بين التبويبات الفرعية لفرز الطلبات حسب السطح والمراجعة والإسناد.</Text>
+                </Box>
+              </Box>
             )}
           </Box>
-        ) : (
-          <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
-            <Box align="center" gap={1}>
-              <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>هذه اللوحة تعرض الآن صفوف التفعيل والمراجعة</Text>
-              <Text tone="muted">يمكن التبديل بين التبويبات الفرعية لفرز الطلبات حسب السطح والمراجعة والإسناد.</Text>
-            </Box>
-          </Box>
-      )}
-      </Box>
-    </Box>
+        </div>
+      </main>
+    </div>
   );
 }
 
