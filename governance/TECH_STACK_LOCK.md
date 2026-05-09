@@ -207,3 +207,166 @@ This table defines the mandatory local toolset and the repo-level artifacts for 
 | | Message Broker | Forbidden | RabbitMQ/Kafka are deferred. |
 | | Notification Engine | Forbidden | Deferred. |
 | | Analytics Engine | Forbidden | Deferred. |
+
+---
+
+## 15. Screen / UI / UX / Flow / Binding / Integration Baseline
+
+**Governance-only. This section does not authorize implementation.**
+
+Implementation state: `NOT STARTED`. No code, no routes, no dependencies, no runtime changes.
+
+---
+
+### 15.1 Current Structure Discovery Gate
+
+Before any UI / UX / Flow / Binding / Integration work may begin, the following must be proven by reading the repository:
+
+1. Read `pnpm-workspace.yaml` and confirm the active workspace packages.
+2. Read each relevant `package.json` and confirm current framework versions.
+3. Do not assume any path that has not been confirmed in the current branch.
+
+**Forbidden legacy paths — must not be used as active implementation scope:**
+
+```text
+apps/mobile/*
+apps/web/*
+packages/surfaces
+packages/app-shells
+packages/ui-kit
+webapp
+website
+```
+
+**Active verified paths — use only paths confirmed present in `pnpm-workspace.yaml`:**
+
+```text
+webapp/runtime
+website/runtime
+app-client/runtime
+app-partner/runtime
+app-captain/runtime
+app-field/runtime
+control-panel/runtime
+ui-kit
+dsh  |  wlt  |  knz  |  arb  |  amn  |  esf  |  mrf  |  snd  |  kwd
+```
+
+If a path appears in `pnpm-workspace.yaml` but the local directory does not exist, classify it as `STALE_OR_DISABLED_PATH` and exclude it from implementation scope.
+
+---
+
+### 15.2 Screen Flow Binding Integration Contract (SFBIC)
+
+Every screen, navigation change, binding, or integration must have a contract before any implementation is approved. The contract must include:
+
+| Field | Status |
+|---|---|
+| `screenId` | Required |
+| `surface` | Required |
+| `service` | Required or TBD |
+| `ownerPath` | Required |
+| `route` / `routeKey` | Required or N/A |
+| `params` | Required |
+| `entrypoints` | Required or TBD |
+| `exits` | Required or TBD |
+| `permissions` | Required for protected screens |
+| `uiKitDependencies` | Required |
+| `bindingInputs` | Required or TBD |
+| `bindingOutputs` | Required or TBD |
+| `integrationSource` | Required or TBD |
+| `states` | `loading / empty / error / success / offline / disabled` |
+| `rtlContract` | Required |
+| `visualEvidence` | Required when UI changes |
+| `verification` | Required |
+| `status` | `CONFIRMED / GAP / TBD / BLOCKED` |
+
+Unknown fields must be marked `TBD` — they must not be hidden.
+
+---
+
+### 15.3 Merge-Safe Rule
+
+A screen or navigation/binding/integration change must not be merged unless:
+
+- `ownerPath` is known.
+- `route` and `params` are known or explicitly marked `TBD` with documented risk.
+- `entrypoints` and `exits` are known or `TBD` with documented risk.
+- `bindingInputs` and `bindingOutputs` are known or `TBD` with documented risk.
+- `integrationSource` is known or `TBD` with documented risk.
+- All required `states` (loading / empty / error / success / offline / disabled) are addressed.
+- `git diff` is clean and `typecheck` has been run.
+- Visual evidence is provided if the UI changed.
+
+---
+
+### 15.4 AI Agent Safety Rule
+
+This project is built incrementally with AI agent assistance. Any AI agent must follow this sequence:
+
+**Phase A — Inspect only (no edits):**
+
+1. Prove current structure from `pnpm-workspace.yaml`.
+2. Produce a screen inventory.
+3. Produce a flow map.
+4. Produce a binding map.
+5. Produce an integration map.
+6. Produce a risk register (`BLOCKER / HIGH / MEDIUM / LOW`).
+
+**Phase B — Narrow implementation (only after Phase A evidence is reviewed):**
+
+- One screen or one contract file per task.
+- Stay inside the approved scope only.
+- Do not widen scope without a separate explicit approval.
+
+---
+
+### 15.5 Forbidden Actions for UI / UX / Flow / Binding / Integration Work
+
+- No direct imports between screens without a contract.
+- No hardcoded route strings.
+- No untyped or ambiguous params (e.g., `id` instead of `orderId` / `storeId`).
+- No direct binding inside a UI component without an adapter / contract layer.
+- No API / provider / integration logic inside a screen UI component.
+- No local design system outside `ui-kit`.
+- No raw Tamagui imports outside `ui-kit`.
+- No changes to API / runtime / backend during a UI-scoped task.
+- No changes across more than one surface in a single task unless proven necessary and separately approved.
+- No claim of `PASS`, `CLOSED`, or `100%` without documented evidence.
+
+---
+
+### 15.6 Gradual Execution Order
+
+Execution is phased. No phase may start before the previous phase output is reviewed.
+
+| Phase | Name | Scope |
+|---|---|---|
+| 0 | Governance lock | This section in `TECH_STACK_LOCK.md` only. No implementation. |
+| 1 | Read-only audit | Scan workspace structure and package evidence. No edits. |
+| 2 | Screen inventory | List all screen-like files with surface, service, ownerPath. |
+| 3 | Flow map | Document allowed screen-to-screen transitions and entrypoints/exits. |
+| 4 | Binding map | Document data inputs/outputs and state coverage per screen. |
+| 5 | Integration map | Document API/service/provider connections and adapter boundaries. |
+| 6 | Contract template | Create one SFBIC template. Do not fill all screens manually. |
+| 7 | Guard script | Add a read-only guard after Phase 6 output is adopted. |
+| 8 | Narrow UI/UX | One screen only, after contract exists and phases 1–6 are done. |
+| 9 | Verification | `git status`, `git diff --check`, `tsc --noEmit`, screenshot evidence. |
+
+---
+
+### 15.7 Required Evidence Before Any Future Implementation
+
+Any approved implementation task must produce the following before claiming completion:
+
+```powershell
+git --no-pager status --short
+git --no-pager diff --check
+pnpm -w exec tsc --noEmit
+```
+
+Additionally:
+
+- **Screenshot evidence** (before and after) is required for any visible UI change.
+- **Patch/evidence review** is required for navigation, binding, or integration changes.
+- All unknowns must be documented as `TBD` — not omitted.
