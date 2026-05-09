@@ -91,6 +91,17 @@ function toDshHomeGetFixtureStore(store: DshDiscoveryStore): DshHomeGetFixtureSt
   };
 }
 
+function ensureFixtureStorePublishStage(store: DshHomeGetFixtureStore): DshHomeGetFixtureStore {
+  if (store.publishStage) {
+    return store;
+  }
+
+  return {
+    ...store,
+    publishStage: 'published-preview',
+  };
+}
+
 export type DshHomeGetFixtureTickerBanner = {
   id: string;
   openHour: number;
@@ -800,5 +811,5 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 
 export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
   ...dshDiscoveryStores.map(toDshHomeGetFixtureStore),
-  ...dshHomeGetFixtureStoresRaw,
+  ...dshHomeGetFixtureStoresRaw.map(ensureFixtureStorePublishStage),
 ];

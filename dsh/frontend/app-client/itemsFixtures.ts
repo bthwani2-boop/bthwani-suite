@@ -1,8 +1,21 @@
 import { buildCanonicalPreviewStoreItemsByStoreId } from '../shared/dshStoreProductCardModel';
 import { DshStoreFixtureItem, StoreItemsByStoreId } from './types';
 
+function withPublishedPreviewStage(items: DshStoreFixtureItem[]): DshStoreFixtureItem[] {
+  return items.map((item) => {
+    if (item.publishStage) {
+      return item;
+    }
+
+    return {
+      ...item,
+      publishStage: 'published-preview',
+    };
+  });
+}
+
 export const storeItemsByStoreId: StoreItemsByStoreId = {
-  'store-1001': [
+  'store-1001': withPublishedPreviewStage([
     {
       id: 'item-apple-1',
       name: 'تفاح رويال غالا',
@@ -214,9 +227,9 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       mediaPolicy: 'partner-owned-exception',
       imageUri: 'dsh.product.apple.v1',
     },
-  ],
+  ]),
 
-  'store-1002': [
+  'store-1002': withPublishedPreviewStage([
     {
       id: 'item-croissant-1',
       name: 'كرواسون زبدة',
@@ -258,9 +271,9 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       imageUri: 'dsh.product.roll.v1',
       publishStage: 'published-preview',
     },
-  ],
+  ]),
 
-  'store-1003': [
+  'store-1003': withPublishedPreviewStage([
     {
       id: 'item-pasta-1',
       name: 'باستا كريمية',
@@ -302,7 +315,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       mediaKey: 'dsh.product.chicken.v1',
       imageUri: 'dsh.product.chicken.v1',
     },
-  ],
+  ]),
 
   ...buildCanonicalPreviewStoreItemsByStoreId(),
 };

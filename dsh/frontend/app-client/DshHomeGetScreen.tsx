@@ -101,10 +101,13 @@ export type DshHomeGetScreenProps = {
 export type DshHomeCategory = {
   id: string;
   label: string;
+  shortLabel?: string;
   subtitle?: string;
   countLabel?: string;
   renderMode?: 'stores' | 'manual-order';
   emojiFallback?: string;
+  orbitWeight?: number;
+  isManualLike?: boolean;
   subcategories?: Array<{
     id: string;
     label: string;
@@ -113,6 +116,25 @@ export type DshHomeCategory = {
 };
 
 export type DshHomeBannerActionType = 'main_category' | 'sub_category' | 'store' | 'external' | 'store_category' | 'product' | 'subscription';
+
+function normalizeHomePromoActionType(targetType: string): DshHomeBannerActionType | undefined {
+  if (targetType === 'category') {
+    return 'main_category';
+  }
+
+  switch (targetType) {
+    case 'main_category':
+    case 'sub_category':
+    case 'store':
+    case 'external':
+    case 'store_category':
+    case 'product':
+    case 'subscription':
+      return targetType;
+    default:
+      return undefined;
+  }
+}
 
 type DiscoveryFilter = 'all' | 'favorites' | 'nearest' | 'new' | 'offers';
 
@@ -478,7 +500,8 @@ function FilterChipItem({
       border
       onPress={onPress}
       style={{
-        height: 32,
+        minHeight: 36,
+        minWidth: 70,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -748,7 +771,9 @@ export function DshHomeGetScreen({
     () =>
       categoryItems.map((category) => ({
         ...category,
-        icon: categoryIconMap[category.id] ?? '📂',
+        label: category.shortLabel ?? category.label,
+        iconUrl: getDshCategoryIconUrl(category.id),
+        emojiFallback: category.emojiFallback ?? categoryIconMap[category.id] ?? '📂',
       })),
     [categoryItems]
   );
@@ -1502,8 +1527,9 @@ export function DshHomeGetScreen({
                         title: promo.title,
                         subtitle: promo.subtitle,
                         icon: '✨',
-                        actionType: (promo.targetType === 'category' ? 'main_category' : promo.targetType) as any,
+                        actionType: normalizeHomePromoActionType(promo.targetType),
                         actionTarget: promo.targetId,
+                        publishStage: promo.status === 'published' ? 'published-preview' : undefined,
                       };
                       resolveBannerPress(mockPromo)();
                     }}
@@ -1604,7 +1630,6 @@ export function DshHomeGetScreen({
                       isActive={filter.value === activeFilter}
                       icon={<Icon name={filter.iconName} size={16} color={filter.value === activeFilter ? theme.textInverse : theme.textMuted} />}
                       onPress={() => setActiveFilter(filter.value)}
-                      styles={styles}
                       theme={theme}
                     />
                   ))}
@@ -1618,8 +1643,8 @@ export function DshHomeGetScreen({
                       isActive={category.id === activeCategoryId}
                       icon={
                         <CategoryIconImage
-                          uri={null}
-                          emojiFallback={category.icon}
+                          uri={category.iconUrl ?? null}
+                          emojiFallback={category.emojiFallback}
                           style={styles.filterChipIcon}
                         />
                       }
@@ -1628,7 +1653,6 @@ export function DshHomeGetScreen({
                         if (category.id === 'awnak') onOpenCategory?.('awnak');
                         if (category.id === 'shein') onOpenSheinInfo?.();
                       }}
-                      styles={styles}
                       theme={theme}
                     />
                   ))}

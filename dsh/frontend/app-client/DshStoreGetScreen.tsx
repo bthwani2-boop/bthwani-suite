@@ -41,6 +41,7 @@ export type DshStoreGetScreenProps = {
     followersCount?: number;
     followersLabel?: string;
     priceMatchLabel?: string;
+    mediaKey?: string;
     imageUri?: string;
     deliveryLabel?: string;
     serviceLabel?: string;
@@ -48,6 +49,7 @@ export type DshStoreGetScreenProps = {
     hasBthwaniPro?: boolean;
     offerLabel?: string;
     hasCouponAvailable?: boolean;
+    hasNewProducts?: boolean;
     publishStage?: string;
     mediaPolicy?: string;
     commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
@@ -247,7 +249,7 @@ function resolveDshStoreCoverImageSource(store?: DshStoreGetScreenProps['store']
   if (!canRenderInClientSurface(store?.publishStage, 'store', { mediaPolicy: store?.mediaPolicy })) {
     return undefined;
   }
-  return resolveDshImageSource(store?.imageUri);
+  return resolveDshImageSource(store?.imageUri ?? store?.mediaKey);
 }
 function getItemEmoji(item: DshStoreGetMenuItem) {
   return CATEGORY_EMOJI[item.categoryId] ?? '🍽️';
