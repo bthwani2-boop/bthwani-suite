@@ -5,6 +5,7 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelActionCluster,
   WebCompactSurfaceHeader,
+  WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
 import { ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, getDshClosureItemsByStatus, getDshClosureItemsBySurface } from '../shared';
 
@@ -49,8 +50,16 @@ export function ControlPanelDshClosureHubScreen() {
       return <ControlPanelDshClosureEvidenceStream />;
     }
     return (
-      <Box padding={6} alignItems="center" justifyContent="center" style={{ minHeight: '400px' }}>
-        <Text role="titleMd" tone="muted">قريباً: {activeTab} / {activeSubTab}</Text>
+      <Box gap={2}>
+        <WebControlPanelRecommendation
+          title="لوحة الجاهزية"
+          reason={`التبويب الحالي: ${activeTab} · التصفية: ${activeSubTab} · افتح الأدلة أو الحماية لإكمال الإغلاق.`}
+          confidence="medium"
+          auditTag="إغلاق DSH"
+          primaryAction={{ id: 'open-evidence', label: 'فتح الأدلة', onAction: () => setActiveTab('evidence') }}
+          secondaryAction={{ id: 'open-protection', label: 'حالة الحماية', onAction: () => setActiveTab('protection') }}
+        />
+        <Text role="bodySm" tone="muted">يعرض هذا التبويب حالة الإغلاق الحالية بدون أي لوحة قراءة فقط.</Text>
       </Box>
     );
   };
@@ -58,7 +67,7 @@ export function ControlPanelDshClosureHubScreen() {
   return (
     <div className={styles.operationsCockpit} dir="rtl">
       {/* 1. Header Area - Closure Command Deck */}
-      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
+      <header className={styles.operationsTopBar}>
         <div className={styles.operationsTitleBlock}>
           <div style={{
             width: '32px',

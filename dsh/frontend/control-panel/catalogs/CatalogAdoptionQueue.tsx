@@ -57,6 +57,12 @@ export function CatalogAdoptionQueue() {
   };
 
   const pendingCount = items.filter(i => i.stage === 'marketing-approved').length;
+  const badgeToneMap: Record<'default' | 'brand' | 'success' | 'danger', 'neutral' | 'success' | 'warning' | 'danger'> = {
+    default: 'neutral',
+    brand: 'neutral',
+    success: 'success',
+    danger: 'danger',
+  };
 
   return (
     <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -65,7 +71,7 @@ export function CatalogAdoptionQueue() {
         description="اعتماد العناصر النهائية لتصبح جزءًا من الكتالوج. لا يظهر للعميل إلا بعد التفعيل النهائي."
         metrics={[{ id: 'pending', title: 'بانتظار الاعتماد', value: String(pendingCount) }]}
       />
-      <Box gap={2} style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', backgroundColor: '#F8FAFC' } as any}>
+      <Box gap={2} style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', backgroundColor: '#F8FAFC' }}>
         {items.filter(i => ['marketing-approved', 'catalog-adopted', 'client-visible', 'needs-fix', 'rejected'].includes(i.stage)).map(item => {
           const sStyle = getStageStyle(item.stage);
 
@@ -75,7 +81,7 @@ export function CatalogAdoptionQueue() {
               title={item.title}
               subtitle={`${translateEntityType(item.entityType)} · المصدر: ${translateOwner(item.source)}`}
               badgeLabel={sStyle.label}
-              badgeTone={sStyle.tone as any}
+              badgeTone={badgeToneMap[sStyle.tone]}
               meta={
                 <Box style={{ alignItems: 'flex-end', gap: '8px' }}>
                   {item.stage === 'marketing-approved' && (
@@ -88,7 +94,7 @@ export function CatalogAdoptionQueue() {
 
                   {item.stage === 'catalog-adopted' && (
                     <Box style={{ flexDirection: 'row', gap: '4px' }}>
-                      <Button label="تفعيل للعميل 🚀" tone="brand" size="sm" onClick={() => handleAction(item.id, 'visible')} />
+                      <Button label="تفعيل للعميل" tone="brand" size="sm" onClick={() => handleAction(item.id, 'visible')} />
                       <Button label="إعادة" tone="danger" size="sm" onClick={() => handleAction(item.id, 'fix')} />
                     </Box>
                   )}

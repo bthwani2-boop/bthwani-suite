@@ -50,12 +50,12 @@ export function AreaCapacityScreen({ hubHref, subGroup }: AreaCapacityScreenProp
             primaryAction={{
               id: 'bonus',
               label: 'تفعيل الحافز',
-              onAction: () => console.log('Surge Bonus', area.id)
+              onAction: () => console.log('حافز الذروة', area.id)
             }}
             secondaryAction={{
               id: 'stop',
               label: 'إيقاف مؤقت',
-              onAction: () => console.log('Temp Stop', area.id)
+              onAction: () => console.log('إيقاف مؤقت', area.id)
             }}
           />
         ))}

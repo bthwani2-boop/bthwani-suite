@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, Tabs, ListItem, Divider } from '@bthwani/ui-kit';
+import { WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
 import {
   dshCatalogMetrics,
   dshCatalogCategories,
@@ -322,7 +323,7 @@ export function ControlPanelDshCatalogScreen({
   return (
     <Box dir="rtl" gap={0} background="background" style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
       {/* 1. Header Area - Catalog Command Deck */}
-      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
+      <header className={styles.operationsTopBar}>
         <div className={styles.operationsTitleBlock}>
           <div style={{
             width: '32px',
@@ -446,6 +447,17 @@ export function ControlPanelDshCatalogScreen({
           )}
         </div>
       )}
+
+      <Box paddingX={4} paddingBottom={3}>
+        <WebControlPanelRecommendation
+          title="تثبيت حوكمة الكتالوج"
+          reason="الكتالوج يحتوي على استثناءات ومراجعات معلقة، وأفضل خطوة الآن هي تصفية العناصر غير المطابقة قبل فتح التحرير الجماعي."
+          confidence="high"
+          auditTag="كتالوج DSH"
+          primaryAction={{ id: 'open-approvals', label: 'فتح الاعتمادات', onAction: () => setActiveTab('approvals') }}
+          secondaryAction={{ id: 'open-exceptions', label: 'فتح الاستثناءات', onAction: () => setActiveFilter('partner-exception') }}
+        />
+      </Box>
 
       {/* 5. MAIN CONTENT AREA */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
@@ -577,7 +589,7 @@ export function ControlPanelDshCatalogScreen({
         {/* Fallback for other modes */}
         {!(activeTab === 'catalog') && !(activeTab === 'approvals' && activeSubTab === 'marketing') && (
            <div style={{ flex: 1, padding: '32px', backgroundColor: '#FFFFFF' }}>
-              <Text role="titleMd" tone="muted">قريباً: {activeTab} / {activeSubTab}</Text>
+              <Text role="titleMd" tone="muted">يعرض هذا المسار عناصر الكتالوج والحوكمة المرتبطة به مباشرة.</Text>
            </div>
         )}
       </div>

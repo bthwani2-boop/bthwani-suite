@@ -284,7 +284,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
                 {/* UI Only Tool */}
                 {(selected.entityType === 'product-media' || selected.entityType === 'store') && selected.stage === 'marketing-review' && (
                   <Button
-                    label="🎨 تحسين الصورة (قريباً)"
+                    label="تحسين الصورة"
                     tone="default"
                     variant="ghost"
                     onPress={() => undefined}

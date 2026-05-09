@@ -4,12 +4,12 @@ import { Box, Surface, Text } from '@bthwani/ui-kit';
 import styles from '../operations/dsh-surface.module.css';
 
 const TOPOLOGY_LANES = [
-  { id: 'onboarding', title: 'Onboarding', sub: 'مدخل الشريك والوثائق', flow: 'app-partner → intake → operations', load: 'Normal', color: '#16A34A', bg: '#F0FDF4' },
-  { id: 'orders', title: 'Orders', sub: 'الطلبات والتسليم', flow: 'app-partner → orders → operations', load: 'High', color: '#DC2626', bg: '#FEF2F2' },
-  { id: 'catalog', title: 'Catalog', sub: 'المخزون والكتالوج', flow: 'app-partner → inventory → catalogs', load: 'Normal', color: '#16A34A', bg: '#F0FDF4' },
-  { id: 'finance', title: 'Finance', sub: 'المحفظة والتسويات', flow: 'app-partner → wallet → finance', load: 'Normal', color: '#16A34A', bg: '#F0FDF4' },
-  { id: 'marketing', title: 'Marketing', sub: 'النمو والتسويق', flow: 'app-partner → growth → marketing', load: 'Idle', color: '#64748B', bg: '#F1F5F9' },
-  { id: 'support', title: 'Support', sub: 'الإشارات والاعتراضات', flow: 'app-partner → issues → support', load: 'Normal', color: '#16A34A', bg: '#F0FDF4' },
+  { id: 'onboarding', title: 'الاستقبال', sub: 'مدخل الشريك والوثائق', flow: 'الشريك → الاستقبال → العمليات', load: 'طبيعي', color: '#16A34A', bg: '#F0FDF4' },
+  { id: 'orders', title: 'الطلبات', sub: 'الطلبات والتسليم', flow: 'الشريك → الطلبات → العمليات', load: 'مرتفع', color: '#DC2626', bg: '#FEF2F2' },
+  { id: 'catalog', title: 'الكتالوج', sub: 'المخزون والكتالوج', flow: 'الشريك → المخزون → الكتالوجات', load: 'طبيعي', color: '#16A34A', bg: '#F0FDF4' },
+  { id: 'finance', title: 'المالية', sub: 'المحفظة والتسويات', flow: 'الشريك → المحفظة → المالية', load: 'طبيعي', color: '#16A34A', bg: '#F0FDF4' },
+  { id: 'marketing', title: 'التسويق', sub: 'النمو والتسويق', flow: 'الشريك → النمو → التسويق', load: 'خامل', color: '#64748B', bg: '#F1F5F9' },
+  { id: 'support', title: 'الدعم', sub: 'الإشارات والاعتراضات', flow: 'الشريك → المشكلات → الدعم', load: 'طبيعي', color: '#16A34A', bg: '#F0FDF4' },
 ];
 
 export function PartnerTopologyLane() {
@@ -17,7 +17,7 @@ export function PartnerTopologyLane() {
     <Box gap={4} style={{ direction: 'rtl' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box gap={1}>
-          <Text role="caption" style={{ color: '#f97316', fontWeight: '800' }}>PARTNER ECOSYSTEM TOPOLOGY</Text>
+          <Text role="caption" style={{ color: '#f97316', fontWeight: '800' }}>خارطة نظام الشركاء</Text>
           <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900' }}>خارطة مسارات الشركاء</Text>
         </Box>
         <Text role="caption" tone="muted">تكامل السطح التشغيلي الموحد</Text>
@@ -54,8 +54,8 @@ export function PartnerTopologyLane() {
             </div>
 
             <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-              <button style={{ flex: 1, padding: '8px', backgroundColor: '#fff', border: '1px solid #E2E8F0', borderRadius: '8px', fontSize: '11px', fontWeight: 700, color: '#0A2F5C', cursor: 'pointer' }}>تتبع المسار</button>
-              <button style={{ flex: 1, padding: '8px', backgroundColor: '#fff', border: '1px solid #E2E8F0', borderRadius: '8px', fontSize: '11px', fontWeight: 700, color: '#0A2F5C', cursor: 'pointer' }}>الإعدادات</button>
+              <button onClick={() => window.location.assign('/partners')} style={{ flex: 1, padding: '8px', backgroundColor: '#fff', border: '1px solid #E2E8F0', borderRadius: '8px', fontSize: '11px', fontWeight: 700, color: '#0A2F5C', cursor: 'pointer' }}>تتبع المسار</button>
+              <button onClick={() => window.location.assign('/marketing')} style={{ flex: 1, padding: '8px', backgroundColor: '#fff', border: '1px solid #E2E8F0', borderRadius: '8px', fontSize: '11px', fontWeight: 700, color: '#0A2F5C', cursor: 'pointer' }}>الإعدادات</button>
             </div>
           </Surface>
         ))}

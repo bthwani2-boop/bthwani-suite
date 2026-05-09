@@ -52,10 +52,18 @@ export function MarketingReviewQueue() {
     }
   };
 
+  const badgeToneMap: Record<'warning' | 'brand' | 'success' | 'danger' | 'default', 'neutral' | 'success' | 'warning' | 'danger'> = {
+    warning: 'warning',
+    brand: 'neutral',
+    success: 'success',
+    danger: 'danger',
+    default: 'neutral',
+  };
+
   return (
     <Box dir="rtl" gap={4} padding={4} style={{ height: '100%', overflowY: 'auto' }}>
       <Surface tone="info" padding={3} layoutDirection="row" align="center" gap={3}>
-        <Text style={{ fontSize: '20px' }}>🎯</Text>
+        <Text style={{ fontSize: '20px' }}>التسويق</Text>
         <Text role="caption" style={{ fontWeight: 600 }}>مراجعة التسويق: يتم هنا فحص العروض والصور والنصوص وتحويلها إلى الكتالوج النهائي.</Text>
       </Surface>
 
@@ -70,7 +78,7 @@ export function MarketingReviewQueue() {
               title={item.title}
               subtitle={`${entityLabel(item.entityType)} · من: ${item.source}`}
               badgeLabel={meta.label}
-              badgeTone={meta.tone as any}
+              badgeTone={badgeToneMap[meta.tone]}
               meta={(
                 <Box align="flex-end" gap={2}>
                   <Box layoutDirection="row" align="center" gap={2}>
@@ -87,7 +95,7 @@ export function MarketingReviewQueue() {
                     </Box>
                   )}
                   {item.stage === 'marketing-approved' && (
-                    <Button label="إرسال للكتالوج 🚀" size="sm" tone="success" onPress={() => handleAction(item.id, 'catalog')} />
+                    <Button label="إرسال للكتالوج" size="sm" tone="success" onPress={() => handleAction(item.id, 'catalog')} />
                   )}
                 </Box>
               )}

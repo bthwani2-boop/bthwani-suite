@@ -41,7 +41,7 @@ export function PromosCommandDeckScreen() {
   }
 
   function handleSave() {
-    const saved = upsertHomePromoItem({ ...draft, order: 1 } as any);
+    const saved = upsertHomePromoItem({ ...draft, order: 1 });
     const next = getHomePromoItems();
     setItems(next);
     setSelectedId(saved.id);
@@ -136,7 +136,7 @@ export function PromosCommandDeckScreen() {
         {/* Column 3: Insights & Preview (Right) */}
         <Box style={{ width: 240 }} gap={12}>
            <Surface tone="raised" style={{ borderRadius: 16, padding: 12, backgroundColor: '#0A2F5C' }}>
-              <Text style={{ color: '#fff', fontSize: 11, fontWeight: '900', marginBottom: 12 }}>Live Preview</Text>
+              <Text style={{ color: '#fff', fontSize: 11, fontWeight: '900', marginBottom: 12 }}>معاينة مباشرة</Text>
               <View style={{ height: 70, backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8 }}>
                  {draft.imageUrl && <Image source={resolveDshImageSource(draft.imageUrl)} style={{ ...StyleSheet.absoluteFillObject, opacity: 0.4 }} resizeMode="cover" />}
                  <View style={{ width: 40, height: 50, zIndex: 2 }}>
@@ -147,11 +147,11 @@ export function PromosCommandDeckScreen() {
                     <Text style={{ color:'#FF500D', fontSize:9, fontWeight:'800', textAlign:'center' }}>{draft.subtitle || 'الوصف'}</Text>
                  </Box>
               </View>
-              <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 9, marginTop: 12, textAlign: 'center' }}>Real-time rendering accuracy: 100%</Text>
+              <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 9, marginTop: 12, textAlign: 'center' }}>دقة العرض اللحظي: 100%</Text>
            </Surface>
 
             <Surface tone="raised" style={{ flex: 1, borderRadius: 16, padding: 16 }}>
-               <Text style={{ fontWeight: '900', fontSize: 11, color: '#64748B', marginBottom: 12 }}>Insights</Text>
+               <Text style={{ fontWeight: '900', fontSize: 11, color: '#64748B', marginBottom: 12 }}>الرؤى</Text>
                <Box gap={8}>
                   <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: '#F8FAFC' }}>
                      <Text style={{ fontSize: 9, color: '#64748B' }}>الوصول المتوقع</Text>

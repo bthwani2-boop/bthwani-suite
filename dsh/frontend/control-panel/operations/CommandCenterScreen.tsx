@@ -16,7 +16,7 @@ export type CommandCenterScreenProps = { hubHref: string; subGroup?: string; };
 const TOP_SUGGESTIONS = [
   {
     id: 'sug-1',
-    label: 'تكدس شمال الرياض — فعّل Bonus فوراً',
+    label: 'تكدس شمال الرياض — فعّل الحافز فورًا',
     reason: '45 طلب بدون كابتن في منطقة الشمال',
     confidence: 'high' as const,
     action: 'تفعيل وضع الذروة',
@@ -58,12 +58,12 @@ export function CommandCenterScreen({ hubHref, subGroup }: CommandCenterScreenPr
         <p className={styles.sectionSubtitle}>متابعة الأداء العام والتدخلات السريعة</p>
       </div>
 
-      <WebControlPanelKpiStrip
+        <WebControlPanelKpiStrip
         items={OPERATIONS_PULSE_METRICS.map(m => ({
           id: m.id,
           label: m.title,
           value: m.value,
-          tone: m.tone as any
+          tone: m.tone === 'best' ? 'success' : m.tone === 'warning' ? 'warning' : m.tone === 'danger' ? 'danger' : 'neutral',
         }))}
       />
 

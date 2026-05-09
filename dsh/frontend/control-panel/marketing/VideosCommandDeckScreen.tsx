@@ -266,7 +266,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                 <TextField label="وصف موجز" value={draft.subtitle} onChangeText={(v) => setDraft(d => ({ ...d, subtitle: v }))} placeholder="وصف يظهر أسفل العنوان في المعاينة" style={rtlText} />
                 <View style={[styles.headerRow, { gap: 12 }]}>
                   <View style={{ flex: 1 }}>
-                    <TextField label="نص الزر (CTA)" value={draft.ctaLabel} onChangeText={(v) => setDraft(d => ({ ...d, ctaLabel: v }))} style={rtlText} />
+                    <TextField label="نص الزر" value={draft.ctaLabel} onChangeText={(v) => setDraft(d => ({ ...d, ctaLabel: v }))} style={rtlText} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <TextField label="الجملة البارزة" value={draft.highlight} onChangeText={(v) => setDraft(d => ({ ...d, highlight: v }))} style={rtlText} />
@@ -279,7 +279,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
               <Box gap={4}>
                 <View style={[styles.headerRow, { gap: 12 }]}>
                   <View style={{ flex: 1, direction: 'ltr' }}>
-                    <TextField label="رابط الفيديو (MP4)" value={draft.videoUrl} onChangeText={(v) => setDraft(d => ({ ...d, videoUrl: v }))} placeholder="https://..." style={{ textAlign: 'left', writingDirection: 'ltr' }} />
+                    <TextField label="رابط الفيديو" value={draft.videoUrl} onChangeText={(v) => setDraft(d => ({ ...d, videoUrl: v }))} placeholder="https://..." style={{ textAlign: 'left', writingDirection: 'ltr' }} />
                   </View>
                   <View style={{ flex: 1, direction: 'ltr' }}>
                     <TextField label="رابط الغلاف (Poster)" value={draft.posterUrl} onChangeText={(v) => setDraft(d => ({ ...d, posterUrl: v }))} placeholder="https://..." style={{ textAlign: 'left', writingDirection: 'ltr' }} />
@@ -307,7 +307,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                 <SelectField
                   label="نوع الوجهة"
                   value={draft.targetType}
-                  onValueChange={(v) => setDraft(d => ({ ...d, targetType: v as any }))}
+                      onValueChange={(v) => setDraft(d => ({ ...d, targetType: v as MarketingVideoTargetType }))}
                   options={TARGET_TYPE_OPTIONS.map(o => ({ value: o.value, label: o.label }))}
                 />
                 <Surface tone="inset" padding={4} gap={3} style={{ borderRadius: 8 }}>
@@ -392,7 +392,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                    )}
                    {draft.targetType === 'custom' && (
                      <View style={{ direction: 'ltr' }}>
-                       <TextField label="المسار المخصص (Route)" value={draft.targetId} onChangeText={(v) => setDraft(d => ({ ...d, targetId: v }))} style={{ textAlign: 'left', writingDirection: 'ltr' }} />
+                       <TextField label="المسار المخصص" value={draft.targetId} onChangeText={(v) => setDraft(d => ({ ...d, targetId: v }))} style={{ textAlign: 'left', writingDirection: 'ltr' }} />
                      </View>
                    )}
                  </Surface>
@@ -406,7 +406,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                     <SelectField
                       label="المصدر"
                       value={draft.source}
-                      onValueChange={(v) => setDraft(d => ({ ...d, source: v as any }))}
+                      onValueChange={(v) => setDraft(d => ({ ...d, source: v as MarketingVideoSource }))}
                       options={[
                         { value: 'marketing', label: 'فريق التسويق' },
                         { value: 'partner', label: 'الشريك / العلامة التجارية' },
@@ -417,7 +417,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                     <SelectField
                       label="الجمهور"
                       value={draft.audience}
-                      onValueChange={(v) => setDraft(d => ({ ...d, audience: v as any }))}
+                      onValueChange={(v) => setDraft(d => ({ ...d, audience: v as MarketingVideoAudience }))}
                       options={[
                         { value: 'all', label: 'الكل' },
                         { value: 'client', label: 'واجهة العميل' },

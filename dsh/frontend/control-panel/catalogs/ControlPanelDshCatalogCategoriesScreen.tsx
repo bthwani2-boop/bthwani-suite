@@ -48,8 +48,8 @@ export function ControlPanelDshCatalogCategoriesScreen() {
                 <WebControlPanelStatusTag label="مفعلة بالكامل" tone="success" />
                 <WebControlPanelStatusTag label={resolveCategoryOwnerLabel('catalog')} tone="neutral" />
               </div>
-              {(activeNode as any).subtitle && (
-                <span style={{ fontSize: '11px', color: '#64748B', lineHeight: 1.35 }}>{(activeNode as any).subtitle}</span>
+              {activeNode.subtitle && (
+                <span style={{ fontSize: '11px', color: '#64748B', lineHeight: 1.35 }}>{activeNode.subtitle}</span>
               )}
               <span style={{ fontSize: '10px', fontWeight: 800, color: '#64748B' }}>
                 {activeNode.subcategories.length > 0 ? `${activeNode.subcategories.length} فروع` : 'فئة رئيسية'}

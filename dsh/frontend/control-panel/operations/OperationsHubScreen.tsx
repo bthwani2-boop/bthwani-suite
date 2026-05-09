@@ -19,6 +19,7 @@ import type { CanonicalOperationsGroupId, OperationsPanelId, OperationsViewState
 import { CommandCenterScreen } from './CommandCenterScreen';
 import { LiveOrdersScreen } from './LiveOrdersScreen';
 import { DispatchAssignmentScreen } from './DispatchAssignmentScreen';
+import { GeoHeatmapScreen } from './GeoHeatmapScreen';
 import { ControlPanelDshSheinProxyScreen } from './ControlPanelDshSheinProxyScreen';
 import { AwnakScreen } from './AwnakScreen';
 import { CaptainOperationsScreen } from './CaptainOperationsScreen';
@@ -40,6 +41,7 @@ const SCREEN_RENDERERS: Record<CanonicalOperationsGroupId, React.ComponentType<{
   'command-center': CommandCenterScreen,
   'live-orders': LiveOrdersScreen,
   'dispatch-assignment': DispatchAssignmentScreen,
+  'geo-heatmap': GeoHeatmapScreen,
   sheinproxy: ControlPanelDshSheinProxyScreen,
   'proxy-shein-awnak': AwnakScreen,
   'captain-operations': CaptainOperationsScreen,

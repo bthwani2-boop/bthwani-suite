@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, Button, Text } from '@bthwani/ui-kit';
-import { WebControlActionCard, WebControlDisclosureItem, WebMissionHeroCard, WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
+import { Box, Text } from '@bthwani/ui-kit';
+import { WebControlActionCard, WebControlDisclosureItem, WebControlSurfaceHeader, WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
 import { ControlPanelDshDecisionBoard } from './ControlPanelDshDecisionBoard';
+import type { DshUnifiedRecommendation } from './dshRecommendationModel';
 
 type WorkspaceSignal = {
   id: string;
@@ -51,6 +52,7 @@ export type ControlPanelDshWorkspaceFrameProps = {
     evidenceHint: string;
     routeHint: string;
     decisionTone?: React.ComponentProps<typeof WebSignalCard>['tone'];
+    recommendation?: DshUnifiedRecommendation;
   };
   footerNote?: string;
 };
@@ -70,16 +72,26 @@ export function ControlPanelDshWorkspaceFrame({
   footerNote,
 }: ControlPanelDshWorkspaceFrameProps) {
   return (
-    <Box gap={4}>
-      <WebMissionHeroCard
-        badges={badges as string[]}
-        eyebrow={eyebrow}
+    <Box gap={3} dir="rtl">
+      <WebControlSurfaceHeader
+        chips={badges.map((badge, index) => ({ id: `${badge}-${index}`, label: index === 0 ? `${eyebrow} · ${badge}` : badge, tone: index === 0 ? 'brand' : 'accent' }))}
         title={title}
         description={description}
-        metaItems={metaItems as string[]}
-        primaryAction={primaryAction?.href ? { label: primaryAction.label, href: primaryAction.href } : undefined}
-        secondaryAction={secondaryAction?.href ? { label: secondaryAction.label, href: secondaryAction.href } : undefined}
+        actions={[
+          ...(primaryAction ? [{ id: `${title}-primary`, label: primaryAction.label, href: primaryAction.href, onAction: primaryAction.onAction, tone: 'primary' as const }] : []),
+          ...(secondaryAction ? [{ id: `${title}-secondary`, label: secondaryAction.label, href: secondaryAction.href, onAction: secondaryAction.onAction, tone: 'secondary' as const }] : []),
+        ]}
       />
+
+      {metaItems.length ? (
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          {metaItems.map((item) => (
+            <Box key={item} padding={2} border radiusToken="lg" background="surfaceRaised" style={{ flexGrow: 1, flexBasis: 180 }}>
+              <Text role="caption" tone="muted">{item}</Text>
+            </Box>
+          ))}
+        </Box>
+      ) : null}
 
       {signals.length ? (
         <Box gap={2}>
@@ -100,6 +112,7 @@ export function ControlPanelDshWorkspaceFrame({
           evidenceHint={decisionBoard.evidenceHint}
           routeHint={decisionBoard.routeHint}
           decisionTone={decisionBoard.decisionTone}
+          recommendation={decisionBoard.recommendation}
         />
       ) : null}
 

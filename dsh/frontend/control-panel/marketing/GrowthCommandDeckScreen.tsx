@@ -8,6 +8,9 @@ import {
   type GrowthRecommendation,
 } from '../../shared/growth-store';
 import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
+import type { PartnerOfferRecord } from '../../shared/partner-offer-store';
+import type { SubscriptionPlan, Entitlement } from '../../shared/loyalty-store';
+import type { CampaignRecord } from '../../shared/campaign-store';
 
 export type GrowthCommandDeckScreenProps = {
   hubHref?: string;
@@ -64,12 +67,42 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
   const parityContext = React.useMemo(() => ({
     storeId: 'preview-store-1',
     activeOffers: [
-      { id: 'off-1', title: 'خصم 20%', displayBadge: 'خصم 20%', status: 'published', offerType: 'discount' },
-      { id: 'off-2', title: 'توصيل مجاني', displayBadge: 'توصيل مجاني', status: 'draft', offerType: 'free-delivery' }
-    ] as any,
-    activeSubscriptions: [{ id: 'sub-pro' }] as any,
-    activeEntitlements: [] as any,
-    activeCampaigns: [] as any,
+      {
+        id: 'off-1',
+        title: 'خصم 20%',
+        partnerName: 'شريك نمو',
+        storeId: 'store-preview-1',
+        storeLabel: 'المتجر التجريبي',
+        productId: '',
+        productLabel: '',
+        category: 'العروض',
+        offerType: 'discount',
+        status: 'published',
+        source: 'marketing',
+        valueLabel: '20%',
+        eligibility: 'الكل',
+        displayBadge: 'خصم 20%',
+      },
+      {
+        id: 'off-2',
+        title: 'توصيل مجاني',
+        partnerName: 'شريك نمو',
+        storeId: 'store-preview-1',
+        storeLabel: 'المتجر التجريبي',
+        productId: '',
+        productLabel: '',
+        category: 'العروض',
+        offerType: 'free-delivery',
+        status: 'draft',
+        source: 'marketing',
+        valueLabel: 'توصيل مجاني',
+        eligibility: 'الكل',
+        displayBadge: 'توصيل مجاني',
+      },
+    ] as PartnerOfferRecord[],
+    activeSubscriptions: [{ id: 'sub-pro', name: 'اشتراك برو', monthlyFee: 0, features: [] }] as SubscriptionPlan[],
+    activeEntitlements: [{ id: 'ent-1', type: 'reward', referenceId: 'sub-pro', status: 'active' }] as Entitlement[],
+    activeCampaigns: [] as CampaignRecord[],
     catalogFeatures: { priceMatch: true }
   }), []);
 
@@ -87,7 +120,7 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
 
       <Surface tone="inset" gap={3} style={{ borderRadius: 16, padding: 16, backgroundColor: '#F8FAFC' }}>
         <Box gap={1}>
-          <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>معاينة تطابق البيانات التجارية (Commercial Parity)</Text>
+          <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>معاينة التوافق التجاري</Text>
           <Text role="caption" tone="muted">يتم فحص مصادر البيانات لضمان عدم ظهور شارات بدون تصريح أو تضارب بين الحملات.</Text>
         </Box>
         <CommercialParityPreview features={parityFeatures} storeName="متجر النخبة (معاينة)" />

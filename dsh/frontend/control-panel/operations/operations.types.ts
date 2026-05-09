@@ -4,6 +4,7 @@ export type CanonicalOperationsGroupId =
   | 'command-center'
   | 'live-orders'
   | 'dispatch-assignment'
+  | 'geo-heatmap'
   | 'sheinproxy'
   | 'proxy-shein-awnak'
   | 'captain-operations'
@@ -85,12 +86,15 @@ export type OperationsSubGroupMeta = {
   label: string;
 };
 
+export type OperationsTertiaryFilterId = 'الآن' | '١٥ دقيقة' | '٣٠ دقيقة' | 'خطر عالٍ' | 'نقص كباتن' | 'ضغط متاجر';
+
 export type OperationsGroupMeta = {
   id: CanonicalOperationsGroupId;
   label: string;
   description: string;
   badge: string;
   subGroups?: readonly OperationsSubGroupMeta[];
+  tertiaryFilters?: readonly OperationsTertiaryFilterId[];
 };
 
 export type OperationsNormalizationResult =

@@ -831,8 +831,8 @@ export function WebControlPanelActionCluster({ primary, secondary }: WebControlP
     <>
       <WebControlSurfaceStyles />
       <div className="ui-web-cp-action-cluster">
-        {primary && <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primary.onAction}>{primary.label}</button>}
-        {secondary && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={secondary.onAction}>{secondary.label}</button>}
+        {primary?.onAction && <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primary.onAction}>{primary.label}</button>}
+        {secondary?.onAction && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={secondary.onAction}>{secondary.label}</button>}
       </div>
     </>
   );
@@ -879,8 +879,8 @@ export function WebControlPanelDecisionRow({
           </div>
         )}
         <div className="ui-web-cp-action-cluster">
-          {primaryAction && <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primaryAction.onAction}>{primaryAction.label}</button>}
-          {secondaryAction && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={secondaryAction.onAction}>{secondaryAction.label}</button>}
+          {primaryAction?.onAction && <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primaryAction.onAction}>{primaryAction.label}</button>}
+          {secondaryAction?.onAction && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={secondaryAction.onAction}>{secondaryAction.label}</button>}
           {onInspect && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={onInspect} aria-label="فتح التفاصيل">►</button>}
         </div>
       </div>
@@ -909,10 +909,10 @@ export function WebControlPanelRecommendation({ title, reason, confidence, audit
           {auditTag && <span className="ui-web-system-suggestion__audit">{auditTag}</span>}
         </div>
         {reason && <span className="ui-web-cp-recommendation__reason">{reason}</span>}
-        {(primaryAction || secondaryAction) && (
+        {(primaryAction?.onAction || secondaryAction?.onAction) && (
           <div className="ui-web-cp-recommendation__actions">
-            {primaryAction && <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primaryAction.onAction}>{primaryAction.label}</button>}
-            {secondaryAction && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={secondaryAction.onAction}>{secondaryAction.label}</button>}
+            {primaryAction?.onAction && <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primaryAction.onAction}>{primaryAction.label}</button>}
+            {secondaryAction?.onAction && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={secondaryAction.onAction}>{secondaryAction.label}</button>}
           </div>
         )}
       </div>

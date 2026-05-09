@@ -28,7 +28,7 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
       statusTone={tone === 'danger' ? 'danger' : tone === 'success' ? 'success' : tone === 'warning' ? 'warning' : 'neutral'}
       risk={tone === 'danger' ? 'danger' : tone === 'warning' ? 'warning' : 'neutral'}
       recommendation="مراجعة المستندات"
-      reason="البيانات المرفوعة مكتملة وتطابق المعايير الأولية لشبكة BThwani."
+      reason="البيانات المرفوعة مكتملة وتطابق المعايير الأولية لمنصة بثواني."
       sla={translateEntityType(item.entityType)}
       primaryAction={['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage) ? {
         label: 'قبول للمراجعة',
@@ -41,7 +41,6 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
         label: 'رفض',
         onAction: () => onAction(item.id, 'reject')
       }}
-      onInspect={() => {}}
     />
   );
 }
@@ -144,14 +143,13 @@ export function ControlPanelDshPartnerHubScreen() {
             )}
           </Box>
         ) : (
-          <Box padding={12} align="center" background="surfaceRaised" radiusToken="lg" gap={4}>
-            <Text style={{ fontSize: '48px' }}>🚧</Text>
+          <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
             <Box align="center" gap={1}>
-              <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>هذه اللوحة قيد التجهيز</Text>
-              <Text tone="muted">سيتم تفعيل مسار العمل لـ {activeTab} قريباً بنفس نمط غرفة العمليات.</Text>
+              <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>هذه اللوحة تعرض الآن صفوف التفعيل والمراجعة</Text>
+              <Text tone="muted">يمكن التبديل بين التبويبات الفرعية لفرز الطلبات حسب السطح والمراجعة والإسناد.</Text>
             </Box>
           </Box>
-        )}
+      )}
       </Box>
     </Box>
   );

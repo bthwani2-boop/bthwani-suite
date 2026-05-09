@@ -3,6 +3,7 @@ import {
   WebControlPanelDecisionRow,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
+import type { DshUnifiedRecommendation } from './dshRecommendationModel';
 
 export type ControlPanelDshActionQueueItem = {
   id: string;
@@ -15,6 +16,7 @@ export type ControlPanelDshActionQueueItem = {
   secondaryActionLabel: string;
   evidenceActionLabel: string;
   tone?: 'best' | 'warning' | 'danger' | 'brand';
+  recommendation?: DshUnifiedRecommendation;
 };
 
 export type ControlPanelDshActionQueueProps = {
@@ -68,7 +70,6 @@ export function ControlPanelDshActionQueue({
 }: ControlPanelDshActionQueueProps) {
   return (
     <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0 }}>
-      {/* Queue header */}
       <div style={QUEUE_HEADER_STYLE}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <span style={{ fontSize: '14px', fontWeight: 800, color: '#0A2F5C' }}>{title}</span>
@@ -82,7 +83,6 @@ export function ControlPanelDshActionQueue({
         </button>
       </div>
 
-      {/* Empty state */}
       {!items.length ? (
         <div style={EMPTY_STYLE}>{emptyLabel}</div>
       ) : (
@@ -103,7 +103,6 @@ export function ControlPanelDshActionQueue({
                   gap: '4px',
                 }}
               >
-                {/* Decision row — single primary action, no duplication */}
                 <WebControlPanelDecisionRow
                   entityId={item.id}
                   entityLabel={`${item.title} — ${item.ownerSurface}`}
@@ -117,12 +116,12 @@ export function ControlPanelDshActionQueue({
                   onInspect={() => onSelect(item.id)}
                 />
 
-                {/* System recommendation — only shown when selected */}
                 {isSelected && (
                   <WebControlPanelRecommendation
-                    title="توصية النظام"
-                    reason="جاهز للتنفيذ بناءً على مراجعة المعايير الآلية."
-                    confidence="high"
+                    title="توصية النظام الموحدة"
+                    reason={item.recommendation ? `لماذا؟ ${item.recommendation.reason} · ما الدليل؟ ${item.recommendation.evidence} · ما الأثر المتوقع؟ ${item.recommendation.expectedImpact}` : 'جاهز للتنفيذ بناءً على مراجعة المعايير الآلية.'}
+                    confidence={item.recommendation?.confidence ?? 'high'}
+                    auditTag={item.recommendation ? `${item.recommendation.owner} · ${item.recommendation.surface}` : 'DSH'}
                     primaryAction={{ id: 'evidence', label: item.evidenceActionLabel, onAction: (e) => { (e as unknown as Event & { stopPropagation: () => void })?.stopPropagation?.(); evidenceAction(item); } }}
                   />
                 )}

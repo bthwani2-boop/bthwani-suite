@@ -19,6 +19,7 @@ import {
   type CampaignTargetType,
 } from '../../shared/campaign-store';
 import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
+import type { Entitlement } from '../../shared/loyalty-store';
 
 type EditorTab = 'plan' | 'audience' | 'channels' | 'schedule' | 'impact';
 
@@ -262,7 +263,7 @@ export function CampaignsCommandDeckScreen() {
           storeId: 'store-preview',
           activeOffers: [],
           activeSubscriptions: [],
-          activeEntitlements: draft.linkedLoyaltyBenefitId ? [{ id: 'mock', type: 'reward', referenceId: draft.linkedLoyaltyBenefitId, status: 'active' }] as any : [],
+          activeEntitlements: draft.linkedLoyaltyBenefitId ? [{ id: 'mock', type: 'reward', referenceId: draft.linkedLoyaltyBenefitId, status: 'active' } as Entitlement] : [],
           activeCampaigns: [draft as CampaignRecord],
         };
         const features = mapStoreCommercialFeatures(mockContext);

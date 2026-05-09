@@ -73,10 +73,17 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   const localizeStatus = (status: MarketingNewsTickerStatus) => resolveMarketingTickerStatusLabel('ar', status);
   const localizeKind = (kind: MarketingNewsTickerKind) => resolveMarketingTickerKindLabel('ar', kind);
 
+  const coerceTickerKind = (value: string): MarketingNewsTickerKind => (value === 'platform' || value === 'order' || value === 'promo' || value === 'partner' ? value : 'platform');
+  const coerceTickerStatus = (value: string): MarketingNewsTickerStatus => (value === 'draft' || value === 'published' || value === 'paused' || value === 'scheduled' ? value : 'draft');
+  const coerceTickerSource = (value: string): MarketingNewsTickerSource => (value === 'marketing' || value === 'operations' || value === 'system' || value === 'customer' || value === 'partner' ? value : 'marketing');
+  const coerceTickerAudience = (value: string): MarketingNewsTickerAudience => (value === 'all' || value === 'home' || value === 'order' || value === 'client' || value === 'stores' || value === 'operations' ? value : 'all');
+  const coerceTickerPriority = (value: string): MarketingNewsTickerPriority => (value === 'low' || value === 'normal' || value === 'high' || value === 'critical' ? value : 'normal');
+  const coerceTickerDelivery = (value: string): MarketingNewsTickerDeliveryMode => (value === 'auto' || value === 'manual' || value === 'pinned' ? value : 'auto');
+
   const PRIMARY_TABS = [
     { id: 'ticker', label: 'الشريط الذكي', icon: '' },
     { id: 'banners', label: 'البنرات والكارسول', icon: '' },
-    { id: 'promos', label: 'بروموهات Home', icon: '' },
+    { id: 'promos', label: 'بروموهات الرئيسية', icon: '' },
     { id: 'video', label: 'استوديو الفيديو', icon: '' },
     { id: 'campaigns', label: 'الحملات', icon: '' },
     { id: 'partners', label: 'عروض الشركاء', icon: '' },
@@ -316,7 +323,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                       <Box gap={1}>
                         <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>النوع</label>
-                        <select value={editingTicker.kind} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, kind: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <select value={editingTicker.kind} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, kind: coerceTickerKind(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
                           <option value="platform">{localizeKind('platform')}</option>
                           <option value="order">{localizeKind('order')}</option>
                           <option value="promo">{localizeKind('promo')}</option>
@@ -325,7 +332,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                       </Box>
                       <Box gap={1}>
                         <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>الحالة</label>
-                        <select value={editingTicker.status} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, status: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <select value={editingTicker.status} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, status: coerceTickerStatus(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
                           <option value="draft">{localizeStatus('draft')}</option>
                           <option value="published">{localizeStatus('published')}</option>
                           <option value="paused">{localizeStatus('paused')}</option>
@@ -334,7 +341,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                       </Box>
                       <Box gap={1}>
                         <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>المصدر</label>
-                        <select value={editingTicker.source} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, source: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <select value={editingTicker.source} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, source: coerceTickerSource(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
                           <option value="marketing">{resolveMarketingTickerSourceLabel('ar', 'marketing')}</option>
                           <option value="operations">{resolveMarketingTickerSourceLabel('ar', 'operations')}</option>
                           <option value="system">{resolveMarketingTickerSourceLabel('ar', 'system')}</option>
@@ -344,7 +351,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                       </Box>
                       <Box gap={1}>
                         <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>الجمهور</label>
-                        <select value={editingTicker.audience} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, audience: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <select value={editingTicker.audience} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, audience: coerceTickerAudience(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
                           <option value="all">{resolveMarketingTickerAudienceLabel('ar', 'all')}</option>
                           <option value="home">{resolveMarketingTickerAudienceLabel('ar', 'home')}</option>
                           <option value="order">{resolveMarketingTickerAudienceLabel('ar', 'order')}</option>
@@ -353,7 +360,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                       </Box>
                       <Box gap={1}>
                         <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>الأولوية</label>
-                        <select value={editingTicker.priority} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, priority: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <select value={editingTicker.priority} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, priority: coerceTickerPriority(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
                           <option value="low">{resolveMarketingTickerPriorityLabel('ar', 'low')}</option>
                           <option value="normal">{resolveMarketingTickerPriorityLabel('ar', 'normal')}</option>
                           <option value="high">{resolveMarketingTickerPriorityLabel('ar', 'high')}</option>
@@ -362,7 +369,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                       </Box>
                       <Box gap={1}>
                         <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>نمط التسليم</label>
-                        <select value={editingTicker.deliveryMode} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, deliveryMode: e.target.value as any }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <select value={editingTicker.deliveryMode} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, deliveryMode: coerceTickerDelivery(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
                           <option value="auto">{resolveMarketingTickerDeliveryLabel('ar', 'auto')}</option>
                           <option value="manual">{resolveMarketingTickerDeliveryLabel('ar', 'manual')}</option>
                           <option value="pinned">{resolveMarketingTickerDeliveryLabel('ar', 'pinned')}</option>
@@ -468,7 +475,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       case 'partners':
         return <PartnerOffersCommandDeckScreen activeSubTab={activeSubTab} />;
       case 'growth':
-        return <GrowthCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} setActiveTab={setActiveTab as any} />;
+        return <GrowthCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} setActiveTab={(tab) => setActiveTab(tab as MarketingControlView)} />;
       case 'signals':
         return <SmartSignalLayerScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
       case 'loyalty':
@@ -481,7 +488,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   return (
     <div className={styles.operationsCockpit} dir="rtl">
       {/* 1. Header Area - Marketing Command Deck */}
-      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
+      <header className={styles.operationsTopBar}>
         <div className={styles.operationsTitleBlock}>
           <div style={{
             width: '32px',
@@ -494,7 +501,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
             fontSize: '16px',
             boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
           }}>
-            🎯
+            ت
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

@@ -45,8 +45,16 @@ export function ControlPanelDshControlHubScreen() {
       return <ControlPanelDshGuardStatusScreen />;
     }
     return (
-      <Box padding={6} alignItems="center" justifyContent="center" style={{ minHeight: '400px' }}>
-        <Text role="titleMd" tone="muted">قريباً: {activeTab} / {activeSubTab}</Text>
+      <Box gap={2}>
+        <WebControlPanelRecommendation
+          title="لوحة الحماية"
+          reason={`التبويب الحالي: ${activeTab} · التصفية: ${activeSubTab} · افتح الأدلة أو الحواجز للمتابعة.`}
+          confidence="medium"
+          auditTag="حماية DSH"
+          primaryAction={{ id: 'open-evidence', label: 'فتح الدليل', onAction: () => setActiveTab('evidence') }}
+          secondaryAction={{ id: 'open-guards', label: 'حالة الحواجز', onAction: () => setActiveTab('guards') }}
+        />
+        <Text role="bodySm" tone="muted">يعرض هذا التبويب مسار الحماية الحالي بشكل تنفيذي وليس كلوحة قراءة فقط.</Text>
       </Box>
     );
   };
@@ -54,7 +62,7 @@ export function ControlPanelDshControlHubScreen() {
   return (
     <div className={styles.operationsCockpit} dir="rtl">
       {/* 1. Header Area - Control Command Deck */}
-      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
+      <header className={styles.operationsTopBar}>
         <div className={styles.operationsTitleBlock}>
           <div style={{
             width: '32px',

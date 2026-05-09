@@ -30,9 +30,12 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     badge: 'Core',
     subGroups: [
       { id: 'all', label: 'الكل' },
-      { id: 'active', label: 'نشطة' },
+      { id: 'unassigned', label: 'غير مسندة' },
       { id: 'delayed', label: 'متأخرة' },
-      { id: 'issues', label: 'تحتاج تدخل' },
+      { id: 'pickup-proof', label: 'إثبات الاستلام' },
+      { id: 'delivery-proof', label: 'إثبات التسليم' },
+      { id: 'exceptions', label: 'الاستثناءات' },
+      { id: 'audit', label: 'التدقيق' },
     ]
   },
   {
@@ -41,10 +44,25 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     description: 'لوحة الإسناد، تغطية الكباتن، وإعادة الإسناد اليدوي.',
     badge: 'Live',
     subGroups: [
-      { id: 'pending', label: 'بانتظار الإسناد' },
-      { id: 'manual', label: 'إسناد يدوي' },
-      { id: 'backlog', label: 'المتراكم' },
+      { id: 'pending', label: 'غير مسندة' },
+      { id: 'captains', label: 'توافر الكباتن' },
+      { id: 'partner-readiness', label: 'جاهزية الشريك' },
+      { id: 'surge', label: 'الذروة' },
     ]
+  },
+  {
+    id: 'geo-heatmap',
+    label: 'الخريطة الحرارية',
+    description: 'خريطة ضغط الطلب والسعة مع توصية لكل منطقة.',
+    badge: 'Geo',
+    subGroups: [
+      { id: 'orders', label: 'الطلبات' },
+      { id: 'captains', label: 'الكباتن' },
+      { id: 'stores', label: 'المتاجر' },
+      { id: 'sla', label: 'SLA' },
+      { id: 'peak', label: 'الذروة' },
+    ],
+    tertiaryFilters: ['الآن', '١٥ دقيقة', '٣٠ دقيقة', 'خطر عالٍ', 'نقص كباتن', 'ضغط متاجر'],
   },
   {
     id: 'sheinproxy',
@@ -87,6 +105,8 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
       { id: 'preparation', label: 'تحت التحضير' },
       { id: 'ready', label: 'جاهز للاستلام' },
       { id: 'delays', label: 'تأخيرات' },
+      { id: 'readiness', label: 'الجاهزية' },
+      { id: 'pressure', label: 'الضغط' },
     ]
   },
   {
@@ -98,6 +118,8 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
       { id: 'density', label: 'كثافة المناطق' },
       { id: 'surge', label: 'إدارة الطفرات' },
       { id: 'windows', label: 'نوافذ الخدمة' },
+      { id: 'captains', label: 'الكباتن' },
+      { id: 'stores', label: 'المتاجر' },
     ]
   },
   {
@@ -132,10 +154,10 @@ export const NON_OPERATIONS_SECTION_SHORTCUTS: ReadonlyArray<{
   description: string;
   href: `/${NonOperationsSectionRootId}`;
 }> = [
-  { id: 'finance', label: 'Finance', description: 'Financial truth remains in the finance section.', href: '/finance' },
-  { id: 'catalogs', label: 'Catalogs', description: 'Catalog governance remains in the catalogs section.', href: '/catalogs' },
-  { id: 'marketing', label: 'Marketing', description: 'Marketing and growth remain in the marketing section.', href: '/marketing' },
-  { id: 'partners', label: 'Partners', description: 'Partner management remains in the partners section.', href: '/partners' },
+  { id: 'finance', label: 'المالية', description: 'الحقائق المالية تبقى في قسم المالية.', href: '/finance' },
+  { id: 'catalogs', label: 'الكتالوجات', description: 'حوكمة الكتالوج تبقى في قسم الكتالوجات.', href: '/catalogs' },
+  { id: 'marketing', label: 'التسويق', description: 'التسويق والنمو يبقيان في قسم التسويق.', href: '/marketing' },
+  { id: 'partners', label: 'الشركاء', description: 'إدارة الشركاء تبقى في قسم الشركاء.', href: '/partners' },
 ] as const;
 
 const LEGACY_OPERATIONAL_TO_CANONICAL_GROUP: Record<Exclude<LegacyOperationsWorkspaceId, LegacySectionRedirectId> | 'orders' | 'overview', CanonicalOperationsGroupId> = {
@@ -170,6 +192,8 @@ const LEGACY_OPERATIONAL_TO_CANONICAL_GROUP: Record<Exclude<LegacyOperationsWork
   bell: 'live-orders',
   'arrival-bell': 'live-orders',
   'zone-set': 'area-capacity',
+  'live-map-capacity': 'geo-heatmap',
+  'geo-heatmap': 'geo-heatmap',
   'proxy-shein-awnak': 'proxy-shein-awnak',
 };
 
@@ -290,32 +314,32 @@ export function getOperationsGroupMeta(groupId: CanonicalOperationsGroupId) {
 const STATE_COPY: Record<Exclude<import('./operations.types').OperationsViewState, 'ready'>, import('./operations.types').StateViewCopy> = {
   loading: {
     stateId: 'loading',
-    title: 'Loading operations preview',
-    description: 'The preview workspace is preparing the next operational state.',
-    actionLabel: 'Open operations',
+    title: 'جارٍ تحميل معاينة العمليات',
+    description: 'تجهّز مساحة المعاينة الحالة التشغيلية التالية.',
+    actionLabel: 'فتح العمليات',
   },
   empty: {
     stateId: 'empty',
-    title: 'Nothing to show yet',
-    description: 'No operational sample is available for the current workspace.',
-    actionLabel: 'Open operations',
+    title: 'لا يوجد محتوى بعد',
+    description: 'لا توجد عينة تشغيلية متاحة لمساحة العمل الحالية.',
+    actionLabel: 'فتح العمليات',
   },
   error: {
     stateId: 'recoverableError',
-    title: 'Preview data is unavailable',
-    description: 'The workspace can recover after the next refresh.',
-    actionLabel: 'Open operations',
+    title: 'بيانات المعاينة غير متاحة',
+    description: 'يمكن أن تتعافى مساحة العمل بعد التحديث التالي.',
+    actionLabel: 'فتح العمليات',
   },
   offline: {
     stateId: 'offline',
-    title: 'Operations preview is offline',
-    description: 'Restore connectivity or reload the workspace to continue.',
-    actionLabel: 'Open operations',
+    title: 'معاينة العمليات غير متصلة',
+    description: 'أعد الاتصال أو حدّث مساحة العمل للمتابعة.',
+    actionLabel: 'فتح العمليات',
   },
   disabled: {
     kind: 'warning',
-    title: 'Preview mode is disabled',
-    description: 'The operational preview is hidden until the workspace is ready again.',
+    title: 'تم تعطيل وضع المعاينة',
+    description: 'تظل المعاينة التشغيلية مخفية حتى تصبح مساحة العمل جاهزة مرة أخرى.',
     actionLabel: 'Open operations',
   },
 };

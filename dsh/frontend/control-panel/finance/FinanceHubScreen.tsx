@@ -4,9 +4,9 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
   StateView,
-  Box,
 } from '@bthwani/ui-kit';
 import {
+  WebControlSurfaceHeader,
   WebControlPanelKpiStrip,
   WebControlPanelWorkspaceTabs,
   WebControlPanelSubTabs,
@@ -24,7 +24,6 @@ import {
   ControlPanelDshRefundQueueScreen,
   ControlPanelDshRiskAuditScreen,
 } from './closure-workspaces';
-import { WltDshFinanceControlPanelContent } from '../../../../wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview';
 import styles from '../operations/dsh-surface.module.css';
 import fStyles from './finance-surface.module.css';
 
@@ -36,24 +35,14 @@ export type ControlPanelDshFinanceScreenProps = {
   fallbackHref?: string;
 };
 
-const PlaceholderScreen = ({ title }: { title: string }) => (
-  <Box padding={6} gap={4} alignItems="center" justifyContent="center" className={fStyles.compactPlaceholder}>
-    <StateView
-      stateId="empty"
-      title={title}
-      description="هذه اللوحة قيد التطوير حالياً لتقديم تجربة مالية متكاملة."
-    />
-  </Box>
-);
-
 const SCREEN_RENDERERS: Record<CanonicalFinanceGroupId, React.ComponentType<{ hubHref: string; subGroup?: string }>> = {
-  overview: WltDshFinanceControlPanelContent,
+  overview: ControlPanelDshFinanceScreen,
   settlements: ControlPanelDshSettlementScreen,
   'cod-reconciliation': ControlPanelDshCodReconciliationScreen,
   refunds: ControlPanelDshRefundQueueScreen,
-  ledger: () => <PlaceholderScreen title="دفتر الأستاذ العام" />,
-  payouts: () => <PlaceholderScreen title="إدارة المدفوعات" />,
-  'tax-compliance': () => <PlaceholderScreen title="الضرائب والامتثال" />,
+  ledger: ControlPanelDshFinanceScreen,
+  payouts: ControlPanelDshFinanceScreen,
+  'tax-compliance': ControlPanelDshFinanceScreen,
   'risk-audit': ControlPanelDshRiskAuditScreen,
 };
 
@@ -95,73 +84,54 @@ export function ControlPanelDshFinanceHubScreen({
 
   return (
     <div className={`${fStyles.financeCockpit} ${fStyles.noScroll}`} dir="rtl">
-      {/* 1. Header Area - Finance Command Deck */}
-      <header className={fStyles.financeTopBar}>
-        <div className={fStyles.financeTitleBlock}>
-          <div className={fStyles.financeHeaderIcon}>
-            <div className={fStyles.financeIconInner} />
-          </div>
-          <div>
-            <div className={fStyles.financeTitleRow}>
-              <h1 className={fStyles.financeTitle}>مالية DSH</h1>
-              <span className={fStyles.financeBadge}>مراجعة مالية</span>
-            </div>
-            <p className={fStyles.financeSubtitle}>مراقبة التدفقات المالية والتسويات المركزية</p>
-          </div>
-        </div>
+      <WebControlSurfaceHeader
+        chips={[{ label: 'مالية DSH', tone: 'brand' }, { label: 'غرفة قيادة', tone: 'accent' }]}
+        title="مالية DSH"
+        description="التسويات، مطابقة COD، الاستردادات، المدفوعات، والرقابة المالية في مساحة واحدة مضغوطة."
+        actions={[
+          { id: 'settlements', label: 'التسويات', tone: 'primary', onAction: () => router.push(buildFinanceHref('settlements', { panel })) },
+          { id: 'audit', label: 'التدقيق', tone: 'secondary', onAction: () => router.push(buildFinanceHref('risk-audit', { panel })) },
+        ]}
+      />
 
-        <div className={fStyles.financeHeaderActions}>
-          <WebControlPanelKpiStrip
-            items={[
-              { id: 'income', label: 'إجمالي الدخل', value: '١,٢٥٤,٠٠٠ ر.س', tone: 'success' },
-              { id: 'pending', label: 'تسويات معلقة', value: '١٤', tone: 'warning' },
-              { id: 'risk', label: 'خطر التدفق', value: 'منخفض', tone: 'success' }
-            ]}
-          />
-        </div>
-      </header>
+      <WebControlPanelKpiStrip
+        items={[
+          { id: 'income', label: 'إجمالي التدفقات', value: '١,٢٥٤,٠٠٠ ر.س', tone: 'success' },
+          { id: 'pending', label: 'عناصر معلقة', value: '١٤', tone: 'warning' },
+          { id: 'risk', label: 'المخاطر المالية', value: 'منخفض', tone: 'success' },
+        ]}
+      />
 
-      {/* 2. Finance Tabs - Main Navigation */}
-      <div className={fStyles.financeNavWrapper}>
-        <WebControlPanelWorkspaceTabs
-          items={FINANCE_CANONICAL_GROUPS.map((item) => ({
-            id: item.id,
-            label: item.label,
-            active: item.id === activeGroup,
+      <WebControlPanelWorkspaceTabs
+        items={FINANCE_CANONICAL_GROUPS.map((item) => ({
+          id: item.id,
+          label: item.label,
+          active: item.id === activeGroup,
+        }))}
+        onSelect={(id) => {
+          const groupId = id as CanonicalFinanceGroupId;
+          setActiveGroup(groupId);
+          setActiveSubGroup(undefined);
+          router.push(buildFinanceHref(groupId, { panel }));
+        }}
+        ariaLabel="أقسام المالية الرئيسية"
+      />
+
+      {activeGroupMeta.subGroups ? (
+        <WebControlPanelSubTabs
+          items={activeGroupMeta.subGroups.map((sub) => ({
+            id: sub.id,
+            label: sub.label,
+            active: (activeSubGroup ?? activeGroupMeta.subGroups?.[0]?.id) === sub.id,
           }))}
-          onSelect={(id) => {
-            const groupId = id as CanonicalFinanceGroupId;
-            setActiveGroup(groupId);
-            setActiveSubGroup(undefined);
-            router.push(buildFinanceHref(groupId, { panel }));
-          }}
-          ariaLabel="أقسام المالية الرئيسية"
+          onSelect={setActiveSubGroup}
+          ariaLabel="التبويبات الفرعية"
         />
-      </div>
+      ) : null}
 
-      {/* 2b. Sub-Tabs - Granular Navigation */}
-      {activeGroupMeta.subGroups && (
-        <div className={fStyles.financeSubNavWrapper}>
-          <WebControlPanelSubTabs
-            items={activeGroupMeta.subGroups.map((sub) => ({
-              id: sub.id,
-              label: sub.label,
-              active: (activeSubGroup ?? activeGroupMeta.subGroups?.[0]?.id) === sub.id,
-            }))}
-            onSelect={setActiveSubGroup}
-            ariaLabel="تبويبات التمويل الفرعية"
-          />
-        </div>
-      )}
-
-      {/* 3. Main Active Area */}
       <main className={`${fStyles.financeMainPanel} ${fStyles.noScroll}`}>
         <div className={`${fStyles.financeInnerScroll} ${fStyles.noScroll}`}>
-          {activeGroup === 'overview' ? (
-            <WltDshFinanceControlPanelContent hideHeader />
-          ) : (
-            <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
-          )}
+          <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
         </div>
       </main>
     </div>
