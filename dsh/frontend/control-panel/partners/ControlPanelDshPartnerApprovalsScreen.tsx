@@ -1,11 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Box, Button, Surface, Text, Chip, Tabs, ListItem, KeyValueList } from '@bthwani/ui-kit';
+import { Box, Text } from '@bthwani/ui-kit';
 import { getPartnerIntakeItems } from '../../shared/partner-intake-store';
 import {
   ApprovalRecord,
-  ApprovalStage,
   moveApprovalRecordToStage,
   translateStage,
   translateEntityType,
@@ -13,22 +12,92 @@ import {
 } from '../../shared/workflow';
 
 import styles from '../operations/dsh-surface.module.css';
+import { OperationsSuggestionCard } from '../operations/operations.ui';
 
 // ─────────────────────────────────────────────
 // Sub-components
 // ─────────────────────────────────────────────
 
+function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix') => void }) {
+  const meta = {
+    label: translateStage(item.stage),
+    tone: (item.stage === 'marketing-review' || item.stage === 'approved') ? 'success' :
+          (item.stage === 'needs-fix') ? 'danger' :
+          (item.stage === 'partner-submitted' || item.stage === 'field-submitted') ? 'warning' : 'brand'
+  };
+
+  const statusClassName = meta.tone === 'success' ? styles.liveOrdersStatusBest :
+                         meta.tone === 'warning' ? styles.liveOrdersStatusWarning :
+                         meta.tone === 'danger' ? styles.liveOrdersStatusDanger : styles.liveOrdersStatusBrand;
+
+  const cardClassName = [
+    styles.liveOrdersOrderCard,
+    meta.tone === 'danger' ? styles.liveOrdersOrderCardDanger : '',
+    meta.tone === 'warning' ? styles.liveOrdersOrderCardWarning : '',
+  ].filter(Boolean).join(' ');
+
+  return (
+    <div className={cardClassName}>
+      <div className={styles.liveOrdersOrderMeta}>
+        <div className={styles.liveOrdersOrderTopRow}>
+          <span className={styles.liveOrdersOrderId}>{item.id}</span>
+          <span className={`${styles.liveOrdersOrderStatus} ${statusClassName}`}>{meta.label}</span>
+          <span className={styles.liveOrdersRingHint}>{translateEntityType(item.entityType)}</span>
+        </div>
+        <div className={styles.liveOrdersDestination}>{item.title}</div>
+        <div className={styles.liveOrdersMetaText}>المصدر: {translateOwner(item.source)}</div>
+        <div className={styles.liveOrdersNoteText}>تاريخ التقديم: {new Date().toLocaleDateString('ar-SA')}</div>
+      </div>
+
+      <OperationsSuggestionCard
+        label="توصية النظام: مراجعة المستندات"
+        reason="البيانات المرفوعة مكتملة وتطابق المعايير الأولية لشبكة BThwani."
+        confidence="high"
+        actions={(
+          <div className={styles.liveOrdersActionGrid}>
+            {['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage) && (
+              <>
+                <button className={styles.liveOrdersActionPrimary} onClick={() => onAction(item.id, 'approve')}>قبول للمراجعة</button>
+                <button className={styles.liveOrdersActionSecondary} onClick={() => onAction(item.id, 'fix')}>طلب تعديل</button>
+              </>
+            )}
+            {item.stage === 'marketing-review' && (
+              <button className={styles.liveOrdersActionPrimary} disabled style={{ opacity: 0.6 }}>في انتظار التسويق</button>
+            )}
+          </div>
+        )}
+      >
+        <span className={styles.liveOrdersSuggestionChip}>جاهز للمعالجة</span>
+      </OperationsSuggestionCard>
+
+      <div className={styles.liveOrdersOrderActions}>
+        <div className={styles.liveOrdersTimelineTitle}>المسار الزمني للطلب</div>
+        <div className={styles.liveOrdersTimelineList}>
+          <div>• استلام البيانات</div>
+          <div>• التحقق من المصدر</div>
+          <div>• في انتظار القرار</div>
+        </div>
+        <div className={styles.liveOrdersPlanWrap}>
+          <span className={styles.liveOrdersPlanChip}>مراجعة قانونية</span>
+          <span className={styles.liveOrdersPlanChip}>أهلية الترويج</span>
+        </div>
+        <div className={styles.liveOrdersActionGrid} style={{ marginTop: 'auto' }}>
+           <button className={styles.liveOrdersActionSecondary} onClick={() => onAction(item.id, 'reject')}>رفض</button>
+           <button className={styles.liveOrdersActionSecondary}>عرض السجل</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CompactPartnerIntakeQueue() {
   const [items, setItems] = React.useState<ApprovalRecord[]>([]);
-  const [selectedId, setSelectedId] = React.useState<string | null>(null);
 
   const refresh = () => setItems(getPartnerIntakeItems());
 
   React.useEffect(() => {
     refresh();
   }, []);
-
-  const selected = React.useMemo(() => items.find(i => i.id === selectedId) ?? null, [items, selectedId]);
 
   const handleAction = (id: string, action: 'approve' | 'reject' | 'fix') => {
     if (action === 'approve') {
@@ -41,92 +110,25 @@ function CompactPartnerIntakeQueue() {
     refresh();
   };
 
-  const getStageMeta = (stage: ApprovalStage) => {
-    const label = translateStage(stage);
-    switch (stage) {
-      case 'partner-submitted':
-      case 'field-submitted': return { tone: 'warning', label };
-      case 'partner-review': return { tone: 'brand', label };
-      case 'needs-fix': return { tone: 'danger', label };
-      case 'rejected': return { tone: 'default', label };
-      case 'marketing-review': return { tone: 'success', label };
-      default: return { tone: 'default', label };
-    }
-  };
-
   return (
-    <Box layoutDirection="row" gap={4} style={{ flex: 1, minHeight: 0 }}>
-      <Surface tone="raised" padding={0} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid rgba(10,47,92,0.08)', borderRadius: '12px' }}>
-        <Box padding={3} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)', backgroundColor: '#F8FAFC' }}>
-          <Text role="bodyStrong" style={{ textAlign: 'right', color: '#0A2F5C' }}>الطلبات الواردة ({items.length})</Text>
-        </Box>
-        <Box style={{ flex: 1 }} padding={2}>
-          <Box style={{ overflowY: 'auto', flex: 1 }}>
-            {items.map(item => {
-              const meta = getStageMeta(item.stage);
-              const isSelected = item.id === selectedId;
-              return (
-                <ListItem
-                  key={item.id}
-                  title={item.title}
-                  subtitle={translateOwner(item.source)}
-                  onPress={() => setSelectedId(item.id)}
-                  selected={isSelected}
-                  badgeLabel={meta.label}
-                  badgeTone={meta.tone as any}
-                />
-              );
-            })}
-          </Box>
-        </Box>
-      </Surface>
+    <div className={styles.liveOrdersScreen}>
+      <div className={styles.liveOrdersHeaderRow}>
+        <h2 className={styles.liveOrdersTitle}>قائمة طلبات الشركاء ({items.length})</h2>
+        <button className={styles.liveOrdersFilterButton}>تحديث القائمة</button>
+      </div>
 
-      <Surface tone="raised" style={{ flex: 2, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)' }}>
-        {selected ? (
-          <Box padding={4} gap={4} style={{ flex: 1, overflowY: 'auto' }}>
-            <Box layoutDirection="row" justify="space-between" align="center">
-              <Box>
-                <Text role="titleSm" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>{selected.title}</Text>
-                <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>المعرف: <Text dir="ltr" style={{ fontWeight: 800 }}>{selected.id}</Text></Text>
-              </Box>
-              <Chip label={getStageMeta(selected.stage).label} tone={getStageMeta(selected.stage).tone as any} selected />
-            </Box>
-
-            <Surface tone="inset" padding={4} gap={2} style={{ backgroundColor: '#F8FAFC', borderRadius: '10px' }}>
-              <Text role="caption" tone="muted" style={{ fontWeight: 800, textAlign: 'right' }}>ملخص البيانات</Text>
-              <KeyValueList
-                items={[
-                  { label: 'المصدر', value: translateOwner(selected.source) },
-                  { label: 'النوع', value: translateEntityType(selected.entityType) },
-                  { label: 'تاريخ التقديم', value: new Date().toLocaleDateString('ar-SA') },
-                ]}
-              />
-            </Surface>
-
-            {['partner-submitted', 'field-submitted', 'partner-review'].includes(selected.stage) && (
-              <Box gap={3}>
-                <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>الإجراءات المتاحة</Text>
-                <Box layoutDirection="row" gap={2}>
-                  <Button style={{ flex: 2 }} label="قبول للمراجعة التسويقية" tone="brand" onPress={() => handleAction(selected.id, 'approve')} />
-                  <Button style={{ flex: 1 }} label="طلب تعديل" tone="warning" onPress={() => handleAction(selected.id, 'fix')} />
-                  <Button style={{ flex: 1 }} label="رفض" tone="danger" onPress={() => handleAction(selected.id, 'reject')} />
-                </Box>
-              </Box>
-            )}
-
-            {selected.stage === 'marketing-review' && (
-              <Surface tone="success" padding={3} style={{ borderRadius: '10px', borderLeftWidth: 4, borderLeftColor: '#16A34A' }}>
-                <Text role="caption" style={{ fontWeight: 800 }}>تم تحويل الطلب لفريق التسويق للمراجعة النهائية بنجاح.</Text>
-              </Surface>
-            )}
-          </Box>
+      <div className={styles.liveOrdersCardsStack}>
+        {items.length === 0 ? (
+          <div style={{ padding: '40px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+            <Text tone="muted">لا توجد طلبات واردة حالياً</Text>
+          </div>
         ) : (
-          <Box style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text tone="muted">يرجى اختيار طلب لمراجعته</Text>
-          </Box>
+          items.map(item => (
+            <PartnerApprovalCard key={item.id} item={item} onAction={handleAction} />
+          ))
         )}
-      </Surface>
-    </Box>
+      </div>
+    </div>
   );
 }
 
@@ -134,24 +136,51 @@ function CompactPartnerIntakeQueue() {
 // Main Screen
 // ─────────────────────────────────────────────
 
-export function ControlPanelDshPartnerApprovalsScreen() {
-  const [activeTab, setActiveTab] = React.useState<'inbox' | 'promotion' | 'topology'>('inbox');
+export function ControlPanelDshPartnerHubScreen() {
+  const [activeTab, setActiveTab] = React.useState<string>('inbox');
+  const [activeSubTab, setActiveSubTab] = React.useState<string>('registration');
 
-  const TABS = [
+  const PRIMARY_TABS = [
     { id: 'inbox', label: 'الوارد الجديد' },
-    { id: 'promotion', label: 'أهلية الترويج' },
+    { id: 'eligibility', label: 'أهلية الترويج' },
     { id: 'topology', label: 'مسارات الخدمة' },
-  ] as const;
-
-  const PULSE_METRICS = [
-    { label: 'طلبات جديدة', value: '12', color: '#0A2F5C' },
-    { label: 'قيد المراجعة', value: '5', color: '#D97706' },
-    { label: 'مكتمل', value: '140', color: '#16A34A' },
+    { id: 'contracts', label: 'إدارة العقود والامتثال' },
   ];
+
+  const SECONDARY_TABS: Record<string, { id: string; label: string }[]> = {
+    inbox: [
+      { id: 'registration', label: 'طلبات التسجيل' },
+      { id: 'modifications', label: 'تعديل البيانات' },
+      { id: 'complaints', label: 'شكاوى الشركاء' },
+    ],
+    eligibility: [
+      { id: 'promotions', label: 'العروض الترويجية' },
+      { id: 'loyalty', label: 'برامج الولاء' },
+    ],
+  };
+
+  React.useEffect(() => {
+    if (SECONDARY_TABS[activeTab]?.length > 0) {
+      setActiveSubTab(SECONDARY_TABS[activeTab][0].id);
+    } else {
+      setActiveSubTab('');
+    }
+  }, [activeTab]);
+
+  const renderContent = () => {
+    if (activeTab === 'inbox' && activeSubTab === 'registration') {
+      return <CompactPartnerIntakeQueue />;
+    }
+    return (
+      <Box padding={6} alignItems="center" justifyContent="center" style={{ minHeight: '400px' }}>
+        <Text role="titleMd" tone="muted">قريباً: {activeTab} / {activeSubTab}</Text>
+      </Box>
+    );
+  };
 
   return (
     <div className={styles.operationsCockpit} dir="rtl">
-      {/* 1. Header Area - Partner Hub */}
+      {/* 1. Header Area - Partners Command Deck */}
       <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
         <div className={styles.operationsTitleBlock}>
           <div style={{
@@ -170,56 +199,75 @@ export function ControlPanelDshPartnerApprovalsScreen() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>شركاء DSH</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#DCFCE7', color: '#16A34A', borderRadius: '4px', fontWeight: '800' }}>استقبال نشط</span>
+              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>مراجعة الشريك</span>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>إدارة قبول الشركاء وحوكمة البيانات الموردة</p>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>حوكمة الشركاء، التغطية، وأهلية الترويج</p>
           </div>
         </div>
 
         <div className={styles.operationsHeaderActions}>
           <div className={styles.operationsPulseCompact}>
-            {PULSE_METRICS.map((metric) => (
-              <div key={metric.label} className={styles.commandKpi}>
-                <span className={styles.commandKpiLabel}>{metric.label}</span>
-                <span className={styles.commandKpiValue} style={{ color: metric.color }}>{metric.value}</span>
+            {[
+              { label: 'شركاء نشطون', value: '١,٢٥٤' },
+              { label: 'طلبات معلقة', value: '٢٨' },
+              { label: 'تغطية المناطق', value: '٨٤٪' }
+            ].map((m) => (
+              <div key={m.label} className={styles.commandKpi}>
+                <span className={styles.commandKpiLabel}>{m.label}</span>
+                <span className={styles.commandKpiValue}>{m.value}</span>
               </div>
             ))}
           </div>
         </div>
       </header>
 
-      {/* 2. Cockpit Navigation */}
+      {/* 2. Primary Tabs */}
       <nav className={styles.navigationCockpit}>
-        {TABS.map((tab) => {
-          const isSelected = tab.id === activeTab;
-          return (
-            <button
-              key={tab.id}
-              className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
-              onClick={() => setActiveTab(tab.id as any)}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
+        {PRIMARY_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            className={`${styles.operationsTab} ${tab.id === activeTab ? styles.operationsTabActive : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </nav>
 
-      {/* 3. Main Panel */}
+      {/* 3. Secondary Tabs */}
+      {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
+        <div className={styles.filterDock} style={{ padding: '4px 14px', minHeight: '36px', backgroundColor: '#F8FAFC' }}>
+          {SECONDARY_TABS[activeTab].map((sub) => (
+            <button
+              key={sub.id}
+              onClick={() => setActiveSubTab(sub.id)}
+              className={styles.operationsTab}
+              style={{
+                padding: '4px 12px',
+                fontSize: '12px',
+                backgroundColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
+                color: sub.id === activeSubTab ? '#FF500D' : '#64748B',
+                borderColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
+              }}
+            >
+              {sub.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* 4. Main Panel */}
       <main className={styles.operationsMainPanel}>
         <div className={styles.operationsInnerScroll}>
-          <Box style={{ padding: '16px', flex: 1, minHeight: 0 }}>
-            {activeTab === 'inbox' ? (
-              <CompactPartnerIntakeQueue />
-            ) : (
-              <Box align="center" justify="center" style={{ flex: 1, padding: '40px' }}>
-                <Text tone="muted">هذا الجزء قيد التطوير المتقدم...</Text>
-              </Box>
-            )}
-          </Box>
+          {renderContent()}
         </div>
       </main>
     </div>
   );
+}
+
+export function ControlPanelDshPartnerApprovalsScreen() {
+  return <ControlPanelDshPartnerHubScreen />;
 }
 
 export default ControlPanelDshPartnerApprovalsScreen;

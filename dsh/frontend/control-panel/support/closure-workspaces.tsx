@@ -35,52 +35,8 @@ function SupportQueueBoard({
   const [note, setNote] = React.useState('جاهز للفرز');
   const selected = items.find((item) => item.id === selectedId) ?? items[0];
 
-  const PULSE_METRICS = [
-    { label: 'مفتوح', value: '8', color: '#D97706' },
-    { label: 'قيد الحل', value: '14', color: '#0A2F5C' },
-    { label: 'متجاوز SLA', value: '2', color: '#DC2626' },
-  ];
-
   return (
     <div className={styles.operationsCockpit} dir="rtl">
-      {/* 1. Header Area */}
-      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
-        <div className={styles.operationsTitleBlock}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            backgroundColor: '#0A2F5C',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '16px',
-            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
-          }}>
-            📞
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>دعم DSH</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF2F2', color: '#DC2626', borderRadius: '4px', fontWeight: '800' }}>تصعيد نشط</span>
-            </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>إدارة التذاكر والنزاعات المرتبطة بالعمليات</p>
-          </div>
-        </div>
-
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
-            {PULSE_METRICS.map((metric) => (
-              <div key={metric.label} className={styles.commandKpi}>
-                <span className={styles.commandKpiLabel}>{metric.label}</span>
-                <span className={styles.commandKpiValue} style={{ color: metric.color }}>{metric.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </header>
-
-      {/* 2. Main Panel */}
       <main className={styles.operationsMainPanel}>
         <div className={styles.operationsInnerScroll}>
           <Box gap={4} style={{ padding: '16px' }}>
@@ -128,12 +84,154 @@ function SupportQueueBoard({
   );
 }
 
+export function ControlPanelDshSupportHubScreen() {
+  const [activeTab, setActiveTab] = React.useState<string>('queue');
+  const [activeSubTab, setActiveSubTab] = React.useState<string>('order');
+
+  const PRIMARY_TABS = [
+    { id: 'queue', label: 'صفوف الدعم' },
+    { id: 'disputes', label: 'حل النزاعات' },
+    { id: 'feedback', label: 'الآراء والملاحظات' },
+    { id: 'intelligence', label: 'الذكاء والدعم التنبؤي' },
+  ];
+
+  const SECONDARY_TABS: Record<string, { id: string; label: string }[]> = {
+    queue: [
+      { id: 'order', label: 'دعم الطلبات' },
+      { id: 'partner', label: 'دعم الشركاء' },
+      { id: 'captain', label: 'دعم الكباتن' },
+      { id: 'field', label: 'دعم الميدان' },
+    ],
+    disputes: [
+      { id: 'active', label: 'نزاعات نشطة' },
+      { id: 'review', label: 'تحت المراجعة' },
+      { id: 'closed', label: 'الأرشيف' },
+    ],
+    feedback: [
+      { id: 'clients', label: 'العملاء' },
+      { id: 'partners', label: 'الشركاء' },
+    ],
+  };
+
+  React.useEffect(() => {
+    if (SECONDARY_TABS[activeTab]?.length > 0) {
+      setActiveSubTab(SECONDARY_TABS[activeTab][0].id);
+    } else {
+      setActiveSubTab('');
+    }
+  }, [activeTab]);
+
+  const renderContent = () => {
+    if (activeTab === 'queue' || activeTab === 'disputes') {
+      return (
+        <SupportQueueBoard
+          title={activeTab === 'queue' ? 'صف دعم عابر للأسطح' : 'دورة حياة النزاع'}
+          purpose={activeTab === 'queue' ? 'ابقِ الدعم مرتبطًا بالمشكلات المتعلقة بـ DSH.' : 'ابقِ النزاع في سياق مرتبط بـ DSH.'}
+          kind={activeTab === 'queue' ? 'queue' : 'dispute'}
+        />
+      );
+    }
+    return (
+      <Box padding={6} alignItems="center" justifyContent="center" style={{ minHeight: '400px' }}>
+        <Text role="titleMd" tone="muted">قريباً: {activeTab} / {activeSubTab}</Text>
+      </Box>
+    );
+  };
+
+  return (
+    <div className={styles.operationsCockpit} dir="rtl">
+      {/* 1. Header Area - Support Command Deck */}
+      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
+        <div className={styles.operationsTitleBlock}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            backgroundColor: '#0A2F5C',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '16px',
+            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
+          }}>
+            🎧
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>دعم DSH</h1>
+              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#DCFCE7', color: '#16A34A', borderRadius: '4px', fontWeight: '800' }}>مباشر</span>
+            </div>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>إدارة المشكلات، النزاعات، وجودة التجربة</p>
+          </div>
+        </div>
+
+        <div className={styles.operationsHeaderActions}>
+          <div className={styles.operationsPulseCompact}>
+            {[
+              { label: 'تذاكر مفتوحة', value: '٤٢' },
+              { label: 'نزاعات معلقة', value: '١٨' },
+              { label: 'متوسط الحل', value: '١٤ دقيقة' }
+            ].map((m) => (
+              <div key={m.label} className={styles.commandKpi}>
+                <span className={styles.commandKpiLabel}>{m.label}</span>
+                <span className={styles.commandKpiValue}>{m.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {/* 2. Primary Tabs */}
+      <nav className={styles.navigationCockpit}>
+        {PRIMARY_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            className={`${styles.operationsTab} ${tab.id === activeTab ? styles.operationsTabActive : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* 3. Secondary Tabs */}
+      {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
+        <div className={styles.filterDock} style={{ padding: '4px 14px', minHeight: '36px', backgroundColor: '#F8FAFC' }}>
+          {SECONDARY_TABS[activeTab].map((sub) => (
+            <button
+              key={sub.id}
+              onClick={() => setActiveSubTab(sub.id)}
+              className={styles.operationsTab}
+              style={{
+                padding: '4px 12px',
+                fontSize: '12px',
+                backgroundColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
+                color: sub.id === activeSubTab ? '#FF500D' : '#64748B',
+                borderColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
+              }}
+            >
+              {sub.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* 4. Main Panel */}
+      <main className={styles.operationsMainPanel}>
+        <div className={styles.operationsInnerScroll}>
+          {renderContent()}
+        </div>
+      </main>
+    </div>
+  );
+}
+
 export function ControlPanelDshSupportQueueScreen() {
-  return <SupportQueueBoard title="صف دعم عابر للأسطح" purpose="ابقِ الدعم مرتبطًا بالمشكلات المتعلقة بـ DSH بدلاً من صندوق وارد جذري عام." kind="queue" />;
+  return <ControlPanelDshSupportHubScreen />;
 }
 
 export function ControlPanelDshDisputeResolutionScreen() {
-  return <SupportQueueBoard title="دورة حياة النزاع" purpose="ابقِ النزاع في سياق مرتبط بـ DSH وليس مسار دعم عام." kind="dispute" />;
+  return <ControlPanelDshSupportHubScreen />;
 }
 
 export default ControlPanelDshSupportQueueScreen;

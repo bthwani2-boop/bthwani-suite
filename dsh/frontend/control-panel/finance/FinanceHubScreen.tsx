@@ -86,45 +86,6 @@ export function ControlPanelDshFinanceHubScreen({
 
   return (
     <div className={`${styles.operationsCockpit} ${fStyles.financeCockpit} ${fStyles.noScroll}`} dir="rtl">
-      {/* 1. Header Area - Finance Command Deck */}
-      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
-        <div className={styles.operationsTitleBlock}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            backgroundColor: '#0A2F5C',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '16px',
-            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
-          }}>
-            💰
-          </div>
-          <div>
-            <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>مالية DSH</h1>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>مراقبة التدفقات المالية والتسويات</p>
-          </div>
-        </div>
-
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
-            <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>إجمالي الدخل</span>
-              <span className={styles.commandKpiValue} style={{ color: '#16A34A' }}>٤,٩٨٢,٥٠ ر.س</span>
-            </div>
-            <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>إجمالي الصرف</span>
-              <span className={styles.commandKpiValue} style={{ color: '#DC2626' }}>١,٤٣٥,٠٠ ر.س</span>
-            </div>
-            <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>الصافي</span>
-              <span className={styles.commandKpiValue} style={{ color: '#0A2F5C' }}>٣,٥٤٧,٥٠ ر.س</span>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* 2. Finance Tabs - Main Navigation */}
       <nav className={`${styles.navigationCockpit} ${fStyles.noScroll}`}>

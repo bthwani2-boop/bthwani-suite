@@ -141,13 +141,54 @@ export function ControlPanelDshCatalogScreen({
   partnersHref = '/partners',
   marketingHref = '/marketing',
 }: ControlPanelDshCatalogScreenProps) {
-  const [workspaceMode, setWorkspaceMode] = useState<WorkspaceMode>('catalog');
+  const [activeTab, setActiveTab] = useState<string>('catalog');
+  const [activeSubTab, setActiveSubTab] = useState<string>('');
   const [showBulkOps, setShowBulkOps] = useState(false);
   const [activeMainCategory, setActiveMainCategory] = useState<CatalogMainCategory | null>(null);
   const [activeSubCategory, setActiveSubCategory] = useState<CatalogSubCategory | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+
+  const PRIMARY_TABS = [
+    { id: 'catalog', label: 'الكتالوج' },
+    { id: 'intake', label: 'الاستلام والإدخال' },
+    { id: 'approvals', label: 'الاعتمادات والجودة' },
+    { id: 'mapping', label: 'الربط والحوكمة' },
+  ];
+
+  const SECONDARY_TABS: Record<string, { id: string; label: string }[]> = {
+    catalog: [
+      { id: 'all', label: 'الكل' },
+      { id: 'master', label: 'المركزية' },
+      { id: 'exceptions', label: 'الاستثناءات' },
+    ],
+    intake: [
+      { id: 'quick', label: 'إدخال سريع' },
+      { id: 'partner', label: 'بوابة الشريك' },
+      { id: 'field', label: 'المسح الميداني' },
+    ],
+    approvals: [
+      { id: 'marketing', label: 'اعتمادات التسويق' },
+      { id: 'quality', label: 'مراجعة الجودة' },
+      { id: 'pricing', label: 'تعارض الأسعار' },
+    ],
+    mapping: [
+      { id: 'categories', label: 'ربط الفئات' },
+      { id: 'duplicates', label: 'معالجة التكرارات' },
+      { id: 'media', label: 'حوكمة الميديا' },
+    ],
+  };
+
+  React.useEffect(() => {
+    if (SECONDARY_TABS[activeTab]?.length > 0) {
+      setActiveSubTab(SECONDARY_TABS[activeTab][0].id);
+    } else {
+      setActiveSubTab('');
+    }
+  }, [activeTab]);
+
+  const workspaceMode = activeTab; // Bridge for existing logic
 
   // Column Filters
   const [colFilters, setColFilters] = useState<Record<string, string[]>>({
@@ -280,69 +321,50 @@ export function ControlPanelDshCatalogScreen({
 
   return (
     <Box dir="rtl" gap={0} background="background" style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
-      {/* 1. Header Area - Catalog Control Room */}
-      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
-        <div className={styles.operationsTitleBlock}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            backgroundColor: '#0A2F5C',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '16px',
-            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
-          }}>
-            🗂️
-          </div>
-          <div>
-            <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>كتالوج DSH</h1>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>حوكمة الخدمات، المنتجات، والتصنيفات المركزية</p>
-          </div>
-        </div>
 
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
-             {[
-               { label: 'الفئات', value: dshCatalogMetrics.mainCategories },
-               { label: 'المنتجات', value: dshCatalogMetrics.approvedProducts },
-               { label: 'مراجعة شريك', value: dshCatalogMetrics.pendingPartnerReviews },
-               { label: 'تعارض سعر', value: dshCatalogMetrics.priceConflicts }
-             ].map((m, idx) => (
-               <div key={idx} className={styles.commandKpi} style={{ minWidth: '90px', padding: '4px 10px' }}>
-                 <span className={styles.commandKpiLabel}>{m.label}</span>
-                 <span className={styles.commandKpiValue} style={{ fontSize: '14px' }}>{m.value.toLocaleString()}</span>
-               </div>
-             ))}
-          </div>
-        </div>
-      </header>
-
-      {/* 2. Workspace Tabs - Navigation Cockpit */}
+      {/* 2. Primary Tabs - Navigation Cockpit */}
       <nav className={styles.navigationCockpit}>
-        {[
-          { id: 'catalog', label: 'الكتالوج', icon: '📦' },
-          { id: 'quick-entry', label: 'إدخال سريع', icon: '⚡' },
-          { id: 'partner-entry', label: 'الشريك', icon: '🤝' },
-          { id: 'field-intake', label: 'الميدان', icon: '📍' },
-          { id: 'marketing-approvals', label: 'اعتمادات التسويق', icon: '🎯' },
-          { id: 'duplicate-resolution', label: 'تكرارات', icon: '👯' },
-          { id: 'category-mapping', label: 'ربط', icon: '🔗' },
-          { id: 'media-governance', label: 'ميديا', icon: '🖼️' }
-        ].map(t => {
-          const isSelected = workspaceMode === t.id;
+        {PRIMARY_TABS.map((tab) => {
+          const isSelected = tab.id === activeTab;
           return (
             <button
-              key={t.id}
+              key={tab.id}
               className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
-              onClick={() => { setWorkspaceMode(t.id as WorkspaceMode); setSelectedProductId(null); }}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setSelectedProductId(null);
+              }}
             >
-              {t.label}
+              {tab.label}
             </button>
           );
         })}
       </nav>
+
+      {/* 3. Secondary Tabs - Sub-Navigation Dock */}
+      {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
+        <div className={styles.filterDock} style={{ padding: '4px 14px', minHeight: '36px', backgroundColor: '#F8FAFC' }}>
+          {SECONDARY_TABS[activeTab].map((sub) => {
+            const isSelected = sub.id === activeSubTab;
+            return (
+              <button
+                key={sub.id}
+                onClick={() => setActiveSubTab(sub.id)}
+                className={styles.operationsTab}
+                style={{
+                  padding: '4px 12px',
+                  fontSize: '12px',
+                  backgroundColor: isSelected ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
+                  color: isSelected ? '#FF500D' : '#64748B',
+                  borderColor: isSelected ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
+                }}
+              >
+                {sub.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* 3. Filter Dock & Tools */}
       <div className={styles.filterDock}>
@@ -387,13 +409,13 @@ export function ControlPanelDshCatalogScreen({
 
       {/* 5. MAIN CONTENT AREA */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
-        {workspaceMode === 'marketing-approvals' && (
+        {activeTab === 'approvals' && activeSubTab === 'marketing' && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'auto' }}>
             <CatalogAdoptionQueue />
           </div>
         )}
 
-        {workspaceMode === 'catalog' && (
+        {activeTab === 'catalog' && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#FFFFFF', minWidth: 0 }}>
             {/* Scrollable Data Table */}
             <div style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', backgroundColor: '#FFFFFF' }}>
@@ -468,8 +490,8 @@ export function ControlPanelDshCatalogScreen({
           </div>
         )}
 
-        {/* 6. Inspector Panel */}
-        {workspaceMode === 'catalog' && selectedProductId && selectedProduct && (
+        {/* Inspector Panel */}
+        {activeTab === 'catalog' && selectedProductId && selectedProduct && (
           <div className={styles.inspectorPanel} style={{ width: '320px' }}>
              <Box padding={3} background="surfaceRaised" style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }} layoutDirection="row" justify="space-between" align="center">
                 <Text role="bodyStrong" style={{ fontSize: '14px' }}>تفاصيل المنتج</Text>
@@ -513,9 +535,9 @@ export function ControlPanelDshCatalogScreen({
         )}
 
         {/* Fallback for other modes */}
-        {workspaceMode !== 'catalog' && workspaceMode !== 'marketing-approvals' && (
+        {!(activeTab === 'catalog') && !(activeTab === 'approvals' && activeSubTab === 'marketing') && (
            <div style={{ flex: 1, padding: '32px', backgroundColor: '#FFFFFF' }}>
-              <Text role="titleMd" tone="muted">قريباً: {workspaceMode}</Text>
+              <Text role="titleMd" tone="muted">قريباً: {activeTab} / {activeSubTab}</Text>
            </div>
         )}
       </div>

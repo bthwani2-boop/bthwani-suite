@@ -1,9 +1,145 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import { WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
-import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, getDshClosureItemsByStatus } from '../shared';
+import { WebSectionCard, WebSegmentedTabs } from '@bthwani/ui-kit/web';
+import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame, getDshClosureItemsByStatus } from '../shared';
 
 type GuardFilter = 'pass' | 'warn' | 'blocked';
+
+export function ControlPanelDshControlHubScreen() {
+  const [activeTab, setActiveTab] = React.useState<string>('governance');
+  const [activeSubTab, setActiveSubTab] = React.useState<string>('all');
+
+  const PRIMARY_TABS = [
+    { id: 'governance', label: 'تدقيق الحوكمة' },
+    { id: 'guards', label: 'حالة الحماية' },
+    { id: 'audit', label: 'سجل العمليات' },
+    { id: 'security', label: 'الأمن والوصول' },
+  ];
+
+  const SECONDARY_TABS: Record<string, { id: string; label: string }[]> = {
+    governance: [
+      { id: 'all', label: 'الكل' },
+      { id: 'pending', label: 'بانتظار التدقيق' },
+      { id: 'approved', label: 'معتمد' },
+    ],
+    guards: [
+      { id: 'pass', label: 'PASS' },
+      { id: 'warn', label: 'WARN' },
+      { id: 'blocked', label: 'BLOCKED' },
+    ],
+  };
+
+  React.useEffect(() => {
+    if (SECONDARY_TABS[activeTab]?.length > 0) {
+      setActiveSubTab(SECONDARY_TABS[activeTab][0].id);
+    } else {
+      setActiveSubTab('');
+    }
+  }, [activeTab]);
+
+  const renderContent = () => {
+    if (activeTab === 'governance') {
+      return <ControlPanelDshGovernanceEvidenceScreen />;
+    }
+    if (activeTab === 'guards') {
+      return <ControlPanelDshGuardStatusScreen />;
+    }
+    return (
+      <Box padding={6} alignItems="center" justifyContent="center" style={{ minHeight: '400px' }}>
+        <Text role="titleMd" tone="muted">قريباً: {activeTab} / {activeSubTab}</Text>
+      </Box>
+    );
+  };
+
+  return (
+    <div className={styles.operationsCockpit} dir="rtl">
+      {/* 1. Header Area - Control Command Deck */}
+      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
+        <div className={styles.operationsTitleBlock}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            backgroundColor: '#0A2F5C',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '16px',
+            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
+          }}>
+            🛡️
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>حوكمة DSH</h1>
+              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>مستوى الأمان: عالٍ</span>
+            </div>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>إدارة معايير الحماية، الحوكمة، وسجلات التدقيق المركزية</p>
+          </div>
+        </div>
+
+        <div className={styles.operationsHeaderActions}>
+          <div className={styles.operationsPulseCompact}>
+            {[
+              { label: 'حواجز مفعلة', value: '١٢' },
+              { label: 'تنبيهات أمنية', value: '٠', tone: 'success' },
+              { label: 'سجلات اليوم', value: '١,٤٠٠' }
+            ].map((m) => (
+              <div key={m.label} className={styles.commandKpi}>
+                <span className={styles.commandKpiLabel}>{m.label}</span>
+                <span className={styles.commandKpiValue} style={m.tone === 'success' ? { color: '#16A34A' } : {}}>{m.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {/* 2. Primary Tabs */}
+      <nav className={styles.navigationCockpit}>
+        {PRIMARY_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            className={`${styles.operationsTab} ${tab.id === activeTab ? styles.operationsTabActive : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* 3. Secondary Tabs */}
+      {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
+        <div className={styles.filterDock} style={{ padding: '4px 14px', minHeight: '36px', backgroundColor: '#F8FAFC' }}>
+          {SECONDARY_TABS[activeTab].map((sub) => (
+            <button
+              key={sub.id}
+              onClick={() => setActiveSubTab(sub.id)}
+              className={styles.operationsTab}
+              style={{
+                padding: '4px 12px',
+                fontSize: '12px',
+                backgroundColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
+                color: sub.id === activeSubTab ? '#FF500D' : '#64748B',
+                borderColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
+              }}
+            >
+              {sub.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* 4. Main Panel */}
+      <main className={styles.operationsMainPanel}>
+        <div className={styles.operationsInnerScroll}>
+          {renderContent()}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+import styles from '../operations/dsh-surface.module.css';
 
 export function ControlPanelDshGovernanceEvidenceScreen() {
   return (
@@ -68,7 +204,7 @@ export function ControlPanelDshGuardStatusScreen() {
       primaryActionLabel: 'Mark reviewed locally',
       secondaryActionLabel: 'Open blocker',
       evidenceActionLabel: 'Open evidence',
-      tone: item.status === 'closed' ? 'best' : item.status === 'blocked' ? 'danger' : 'warning',
+      tone: item.status === 'closed' ? 'best' : item.status === 'blocked' ? 'danger' : item.status === 'needs-evidence' ? 'warning' : 'warning',
     } as const;
   });
 
@@ -122,23 +258,9 @@ export function ControlPanelDshGuardStatusScreen() {
           secondaryAction={() => setActiveFilter('blocked')}
           evidenceAction={() => setActiveFilter('warn')}
         />
-        <Box gap={2}>
-          {DSH_CROSS_SURFACE_CLOSURE_MAP.slice(0, 3).map((item) => (
-            <WebSignalCard
-              key={`${item.surfaceId}-${item.area}`}
-              title={`${item.surfaceId} / ${item.title}`}
-              value={item.status.toUpperCase()}
-              description={item.description}
-              tone={item.status === 'closed' ? 'best' : item.status === 'blocked' ? 'danger' : 'warning'}
-            />
-          ))}
-        </Box>
-        <Text role="bodySm" tone="muted">
-          Guard summaries remain UI-only and do not touch backend state.
-        </Text>
       </WebSectionCard>
     </Box>
   );
 }
 
-export default ControlPanelDshGovernanceEvidenceScreen;
+export default ControlPanelDshControlHubScreen;

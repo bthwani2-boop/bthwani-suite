@@ -24,6 +24,7 @@ import {
   type WltDshFinancePreviewRecord,
 } from '../../shared/finance/dshFinancePreview';
 import styles from '../../../../dsh/frontend/control-panel/operations/dsh-surface.module.css';
+import { OperationsSuggestionCard } from '../../../../dsh/frontend/control-panel/operations/operations.ui';
 
 const PREVIEW_NOTICE =
   'هذا عرض تجريبي للهيكل المالي فقط — لا يمثّل بيانات حقيقية ولا تسويات فعلية ولا دفعات منفّذة. العقد: CONTRACT_TBD.';
@@ -41,42 +42,66 @@ function PreviewBanner() {
   );
 }
 
-function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
-  const amountTone = record.tone === 'positive' ? 'success'
-    : record.tone === 'negative' ? 'error'
-    : 'info';
+function FinanceRecordCard({ record }: { record: WltDshFinancePreviewRecord }) {
+  const statusClassName = record.statusTone === 'success' ? styles.liveOrdersStatusBest :
+                         record.statusTone === 'warning' ? styles.liveOrdersStatusWarning :
+                         record.statusTone === 'error' ? styles.liveOrdersStatusDanger : styles.liveOrdersStatusBrand;
+
+  const cardClassName = [
+    styles.liveOrdersOrderCard,
+    record.statusTone === 'error' ? styles.liveOrdersOrderCardDanger : '',
+    record.statusTone === 'warning' ? styles.liveOrdersOrderCardWarning : '',
+  ].filter(Boolean).join(' ');
 
   return (
-    <Surface tone="raised" padding={3} gap={2} style={{ border: '1px solid rgba(0,0,0,0.05)', borderRadius: '10px' }}>
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12 }}>
-        <View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
-          <Text role="bodyStrong" style={{ textAlign: 'right', color: '#0A2F5C' }} numberOfLines={1}>
-            {record.title}
-          </Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>
-            {record.subtitle}
-          </Text>
-          <Text role="caption" tone="soft" style={{ textAlign: 'right', fontSize: '9px' }}>
-            {record.timeLabel}
-          </Text>
-        </View>
-        <View style={{ alignItems: 'flex-start', gap: 5, flexShrink: 0 }}>
-          <Text role="bodyStrong" tone={amountTone} style={{ textAlign: 'left', fontWeight: '900' }}>
-            {record.amountLabel}
-          </Text>
-          <Badge label={record.statusLabel} tone={record.statusTone} />
-        </View>
-      </View>
-    </Surface>
+    <div className={cardClassName}>
+      <div className={styles.liveOrdersOrderMeta}>
+        <div className={styles.liveOrdersOrderTopRow}>
+          <span className={styles.liveOrdersOrderId}>{record.id}</span>
+          <span className={`${styles.liveOrdersOrderStatus} ${statusClassName}`}>{record.statusLabel}</span>
+          <span className={styles.liveOrdersRingHint}>{record.timeLabel}</span>
+        </div>
+        <div className={styles.liveOrdersDestination}>{record.title}</div>
+        <div className={styles.liveOrdersMetaText}>{record.subtitle}</div>
+        <div className={styles.liveOrdersNoteText} style={{ fontWeight: 800, color: record.tone === 'positive' ? '#16A34A' : record.tone === 'negative' ? '#DC2626' : '#0A2F5C' }}>
+          المبلغ: {record.amountLabel}
+        </div>
+      </div>
+
+      <OperationsSuggestionCard
+        label="توصية النظام: مطابقة المعاملة"
+        reason="المعاملة تتوافق مع سجلات البوابة البنكية والطلبات المرتبطة."
+        confidence="high"
+        actions={(
+          <div className={styles.liveOrdersActionGrid}>
+            <button className={styles.liveOrdersActionPrimary}>تسوية فورية</button>
+            <button className={styles.liveOrdersActionSecondary}>تدقيق يدوي</button>
+          </div>
+        )}
+      >
+        <span className={styles.liveOrdersSuggestionChip}>تم التحقق</span>
+      </OperationsSuggestionCard>
+
+      <div className={styles.liveOrdersOrderActions}>
+        <div className={styles.liveOrdersTimelineTitle}>الحالة المالية</div>
+        <div className={styles.liveOrdersTimelineList}>
+          <div>• استلام الدفعة</div>
+          <div>• بانتظار المقاصة</div>
+        </div>
+        <div className={styles.liveOrdersActionGrid} style={{ marginTop: 'auto' }}>
+           <button className={styles.liveOrdersActionSecondary}>تفاصيل السجل</button>
+        </div>
+      </div>
+    </div>
   );
 }
 
 function RecordList({ records }: { records: WltDshFinancePreviewRecord[] }) {
   if (records.length === 0) return null;
   return (
-    <Box gap={2}>
-      {records.map((r) => <RecordRow key={r.id} record={r} />)}
-    </Box>
+    <div className={styles.liveOrdersCardsStack}>
+      {records.map((r) => <FinanceRecordCard key={r.id} record={r} />)}
+    </div>
   );
 }
 
@@ -90,16 +115,18 @@ function SectionBlock({
   emptyLabel: string;
 }) {
   return (
-    <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: '12px', border: '1px solid rgba(10,47,92,0.06)' }}>
-      <Text role="label" tone="muted" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>
+    <Box gap={3} style={{ marginBottom: '16px' }}>
+      <Text role="label" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C', fontSize: '14px' }}>
         {title}
       </Text>
       {records.length === 0 ? (
-        <StateView stateId="empty" title={emptyLabel} description="" />
+        <div style={{ padding: '24px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+          <Text tone="muted">{emptyLabel}</Text>
+        </div>
       ) : (
         <RecordList records={records} />
       )}
-    </Surface>
+    </Box>
   );
 }
 
@@ -110,8 +137,8 @@ function ClientPaymentBreakdown({ records }: { records: WltDshFinancePreviewReco
   const refundRecords = records.filter((r) => r.kind === 'refund-adjustment');
 
   return (
-    <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: '12px', border: '1px solid rgba(10,47,92,0.06)' }}>
-      <Text role="label" tone="muted" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>
+    <Box gap={4} style={{ marginBottom: '16px' }}>
+      <Text role="label" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C', fontSize: '14px' }}>
         مدفوعات العملاء — تفصيل
       </Text>
       {walletRecords.length > 0 && (
@@ -139,9 +166,11 @@ function ClientPaymentBreakdown({ records }: { records: WltDshFinancePreviewReco
         </Box>
       )}
       {records.length === 0 && (
-        <StateView stateId="empty" title="لا توجد مدفوعات عملاء" description="" />
+        <div style={{ padding: '24px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+           <Text tone="muted">لا توجد مدفوعات عملاء</Text>
+        </div>
       )}
-    </Surface>
+    </Box>
   );
 }
 
@@ -150,8 +179,8 @@ function CaptainFinanceBreakdown({ records }: { records: WltDshFinancePreviewRec
   const earningRecords = records.filter((r) => r.kind === 'captain-earning');
 
   return (
-    <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: '12px', border: '1px solid rgba(10,47,92,0.06)' }}>
-      <Text role="label" tone="muted" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>
+    <Box gap={3} style={{ marginBottom: '16px' }}>
+      <Text role="label" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C', fontSize: '14px' }}>
         مالية الكابتن — تفصيل
       </Text>
       {codRecords.length > 0 && (
@@ -167,9 +196,11 @@ function CaptainFinanceBreakdown({ records }: { records: WltDshFinancePreviewRec
         </Box>
       )}
       {records.length === 0 && (
-        <StateView stateId="empty" title="لا توجد بيانات كابتن" description="" />
+        <div style={{ padding: '24px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+           <Text tone="muted">لا توجد بيانات كابتن</Text>
+        </div>
       )}
-    </Surface>
+    </Box>
   );
 }
 
@@ -178,8 +209,8 @@ function FieldFinanceDetail({ records }: { records: WltDshFinancePreviewRecord[]
   const payoutRecords = records.filter((r) => r.kind === 'field-payout');
 
   return (
-    <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: '12px', border: '1px solid rgba(10,47,92,0.06)' }}>
-      <Text role="label" tone="muted" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>
+    <Box gap={3} style={{ marginBottom: '16px' }}>
+      <Text role="label" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C', fontSize: '14px' }}>
         مالية الميدانيين — تفصيل
       </Text>
       {commissionRecords.length > 0 && (
@@ -194,7 +225,7 @@ function FieldFinanceDetail({ records }: { records: WltDshFinancePreviewRecord[]
           <RecordList records={payoutRecords} />
         </Box>
       )}
-    </Surface>
+    </Box>
   );
 }
 
@@ -218,7 +249,7 @@ export function WltDshFinanceControlPanelContent({
     <Box style={{ padding: '16px', flex: 1 }} gap={4}>
       <PreviewBanner />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '16px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <ClientPaymentBreakdown records={preview.clientRecords} />
 
         <SectionBlock
@@ -237,15 +268,13 @@ export function WltDshFinanceControlPanelContent({
           emptyLabel="لا توجد بيانات"
         />
 
-        <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: '12px', border: '1px solid rgba(10,47,92,0.06)' }}>
-          <Text role="label" tone="muted" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>
+        <Box gap={3} style={{ marginBottom: '16px' }}>
+          <Text role="label" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C', fontSize: '14px' }}>
             مطابقة التسويات — Export Preview
           </Text>
-          <StateView
-            kind="warning"
-            title="مطابقة التسويات — معطّلة"
-            description="هذه الخاصية تحتاج ربطًا بـ API حقيقي لم يُعرَّف بعد."
-          />
+          <div style={{ padding: '20px', backgroundColor: '#FFFBEB', borderRadius: '12px', border: '1px solid #FEF3C7' }}>
+             <Text role="bodySm" style={{ color: '#92400E', fontWeight: '700', textAlign: 'right' }}>مطابقة التسويات — معطّلة: هذه الخاصية تحتاج ربطًا بـ API حقيقي لم يُعرَّف بعد.</Text>
+          </div>
           <Button
             label={showReconciliation ? 'إخفاء سجلات المطابقة' : 'عرض سجلات المطابقة التجريبية'}
             tone="secondary"
@@ -260,11 +289,13 @@ export function WltDshFinanceControlPanelContent({
                   لا توجد سجلات مطابقة
                 </Text>
               ) : (
-                reconciliationRecords.map((r) => <RecordRow key={r.id} record={r} />)
+                <div className={styles.liveOrdersCardsStack}>
+                  {reconciliationRecords.map((r) => <FinanceRecordCard key={r.id} record={r} />)}
+                </div>
               )}
             </Box>
           )}
-        </Surface>
+        </Box>
       </div>
     </Box>
   );
