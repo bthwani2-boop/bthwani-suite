@@ -23,6 +23,7 @@
     "guard:protected-tokens": "node tools/guards/guard-bthwani-protected-tokens.mjs",
     "guard:tamagui-law": "node tools/guards/guard-tamagui-governance-law.mjs",
     "guard:tamagui-import-boundary": "node tools/guards/guard-tamagui-import-boundary.mjs",
+    "lint": "eslint . --max-warnings 0",
     "tamagui:version": "tamagui --version",
     "tamagui:build": "tamagui build",
     "tamagui:check": "pnpm run tamagui:version && pnpm run tamagui:build"
@@ -37,10 +38,15 @@
     }
   },
   "devDependencies": {
-    "@expo/ngrok": "^4.1.0",
-    "@tamagui/cli": "2.0.0-rc.41",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.2",
+    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/parser": "^8.24.1",
+    "babel-plugin-react-compiler": "19.1.0-rc.2",
+    "eslint": "^9.20.1",
+    "eslint-config-next": "16.2.2",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-compiler": "19.1.0-rc.2",
+    "eslint-plugin-react-hooks": "^5.1.0",
     "expo": "~54.0.0",
     "next": "16.2.2",
     "nx": "22.3.3",
