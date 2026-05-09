@@ -302,20 +302,20 @@ export function CampaignsCommandDeckScreen() {
       {/* KPIs Header */}
       <View style={styles.kpiRow}>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>إجمالي الحملات</Text>
-          <Text role="titleLg" style={{ color: '#0A2F5C', textAlign: 'right', width: '100%' }}>{kpis.total}</Text>
+          <Text role="caption" style={{ fontWeight: '800', color: '#64748B', textAlign: 'right', width: '100%' }}>إجمالي الحملات</Text>
+          <Text role="titleLg" style={{ color: '#0A2F5C', textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.total}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>حي الآن</Text>
-          <Text role="titleLg" style={{ color: '#16A34A', textAlign: 'right', width: '100%' }}>{kpis.live}</Text>
+          <Text role="caption" style={{ fontWeight: '800', color: '#64748B', textAlign: 'right', width: '100%' }}>حي الآن</Text>
+          <Text role="titleLg" style={{ color: '#16A34A', textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.live}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>قيد المراجعة</Text>
-          <Text role="titleLg" style={{ color: '#D97706', textAlign: 'right', width: '100%' }}>{items.filter(i => i.status === 'pending').length}</Text>
+          <Text role="caption" style={{ fontWeight: '800', color: '#64748B', textAlign: 'right', width: '100%' }}>قيد المراجعة</Text>
+          <Text role="titleLg" style={{ color: '#D97706', textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{items.filter(i => i.status === 'pending').length}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>وصول تجريبي</Text>
-          <Text role="titleLg" style={{ color: '#FF500D', textAlign: 'right', width: '100%' }}>{kpis.impressions}</Text>
+          <Text role="caption" style={{ fontWeight: '800', color: '#64748B', textAlign: 'right', width: '100%' }}>وصول تجريبي</Text>
+          <Text role="titleLg" style={{ color: '#FF500D', textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.impressions}</Text>
         </View>
       </View>
 

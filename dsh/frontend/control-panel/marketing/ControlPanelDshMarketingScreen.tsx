@@ -74,16 +74,16 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   const localizeKind = (kind: MarketingNewsTickerKind) => resolveMarketingTickerKindLabel('ar', kind);
 
   const PRIMARY_TABS = [
-    { id: 'ticker', label: 'الشريط الذكي', icon: '📢' },
-    { id: 'banners', label: 'البنرات والكارسول', icon: '🖼️' },
-    { id: 'promos', label: 'بروموهات Home', icon: '📱' },
-    { id: 'video', label: 'استوديو الفيديو', icon: '🎬' },
-    { id: 'campaigns', label: 'الحملات', icon: '🎯' },
-    { id: 'partners', label: 'عروض الشركاء', icon: '🤝' },
-    { id: 'media-review', label: 'مراجعة الصور والمنتجات', icon: '🔍' },
-    { id: 'loyalty', label: 'الولاء والاشتراكات', icon: '💎' },
-    { id: 'growth', label: 'النمو', icon: '⚡' },
-    { id: 'signals', label: 'الإشارات والقياس', icon: '📊' },
+    { id: 'ticker', label: 'الشريط الذكي', icon: '' },
+    { id: 'banners', label: 'البنرات والكارسول', icon: '' },
+    { id: 'promos', label: 'بروموهات Home', icon: '' },
+    { id: 'video', label: 'استوديو الفيديو', icon: '' },
+    { id: 'campaigns', label: 'الحملات', icon: '' },
+    { id: 'partners', label: 'عروض الشركاء', icon: '' },
+    { id: 'media-review', label: 'مراجعة الصور والمنتجات', icon: '' },
+    { id: 'loyalty', label: 'الولاء والاشتراكات', icon: '' },
+    { id: 'growth', label: 'النمو', icon: '' },
+    { id: 'signals', label: 'الإشارات والقياس', icon: '' },
   ] as const;
 
   const SECONDARY_TABS: Record<MarketingControlView, { id: string; label: string }[]> = {
@@ -438,12 +438,12 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
               <h3 style={{ color: '#0A2F5C', fontSize: '13px', fontWeight: '800', margin: '0 0 8px 0' }}>قواعد التشغيل</h3>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>📌 مثبت في الأعلى</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '12px', color: '#DC2626' }}>🔥 حرج في الأعلى</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>🚫 الجمهور غير مطابق</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>⏳ خارج نافذة العرض</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>⏱️ ضمن فترة التهدئة</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>🔄 مكرر</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>مثبت في الأعلى</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '12px', color: '#DC2626' }}>حرج في الأعلى</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>الجمهور غير مطابق</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>خارج نافذة العرض</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>ضمن فترة التهدئة</span>
+                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>مكرر</span>
               </div>
             </div>
 
@@ -504,20 +504,20 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>تسويق DSH</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>يتطلب_ربط_خلفي</span>
+              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>اعتماد الأداء</span>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>إدارة الشريط الذكي، البنرات، والنمو الاستراتيجي</p>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>حوكمة المحتوى التسويقي والنمو الاستراتيجي</p>
           </div>
         </div>
 
         <div className={styles.operationsHeaderActions}>
           <div className={styles.operationsPulseCompact}>
             {PULSE_METRICS.map((metric) => (
-              <div key={metric.label} className={styles.commandKpi} style={{ minWidth: '90px', padding: '4px 10px' }}>
+              <div key={metric.label} className={styles.commandKpi}>
                 <span className={styles.commandKpiLabel}>{metric.label}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span className={styles.commandKpiValue} style={{ fontSize: '14px' }}>{metric.value}</span>
-                  <span className={`${styles.commandKpiTrend} ${metric.trendTone === 'success' ? styles.toneSuccess : metric.trendTone === 'warning' ? styles.toneWarning : styles.toneInfo}`} style={{ fontSize: '8px' }}>
+                  <span className={styles.commandKpiValue}>{metric.value}</span>
+                  <span className={`${styles.commandKpiTrend} ${metric.trendTone === 'success' ? styles.toneSuccess : metric.trendTone === 'warning' ? styles.toneWarning : styles.toneInfo}`}>
                     {metric.trend}
                   </span>
                 </div>
@@ -537,7 +537,6 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
               className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <span>{tab.icon}</span>
               {tab.label}
             </button>
           );

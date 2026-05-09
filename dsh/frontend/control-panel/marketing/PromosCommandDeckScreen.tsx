@@ -58,17 +58,15 @@ export function PromosCommandDeckScreen() {
     <Box style={{ padding: 12, height: 560, overflow: 'hidden' }}>
       {/* Header Bar */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, borderBottomWidth: 1, borderBottomColor: '#F1F5F9', paddingBottom: 8 }}>
-         <Box flexDirection="row" gap={4} alignItems="center">
-            <Text style={{ fontWeight: '900', fontSize: 18, color: '#0A2F5C' }}>Marketing Studio</Text>
-            <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, backgroundColor: '#E0E7FF' }}>
-               <Text style={{ fontSize: 10, fontWeight: '900', color: '#4338CA' }}>PROMOS v1</Text>
-            </View>
+         <Box gap={0}>
+            <Text role="caption" style={{ color: '#0A2F5C', fontWeight: '900', letterSpacing: 0.5 }}>إدارة البروموهات والظهور</Text>
+            <Text role="titleLg" style={{ fontWeight: '900', color: '#0A2F5C', fontSize: 18 }}>استوديو البروموهات</Text>
          </Box>
-         <Button label="+ برومو جديد" onPress={() => { setSelectedId(null); setDraft(createDraft(null)); }} tone="primary" size="sm" style={{ width: 120 }} />
+         <Button label="+ برومو جديد" onPress={() => { setSelectedId(null); setDraft(createDraft(null)); }} tone="secondary" size="sm" style={{ width: 120 }} />
       </View>
 
       <View style={{ flexDirection: 'row', gap: 16, flex: 1 }}>
-        
+
         {/* Column 1: Selection Rail (Left) */}
         <Surface tone="raised" style={{ width: 180, borderRadius: 14, overflow: 'hidden', backgroundColor: '#F8FAFC' }}>
            <View style={{ padding: 8, backgroundColor: '#F1F5F9' }}>
@@ -76,11 +74,11 @@ export function PromosCommandDeckScreen() {
            </View>
            <ScrollView showsVerticalScrollIndicator={false}>
               {items.map(item => (
-                <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={{ 
-                  padding: 12, 
+                <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={{
+                  padding: 12,
                   backgroundColor: selectedId === item.id ? '#0A2F5C' : 'transparent',
-                  borderBottomWidth: 1, 
-                  borderBottomColor: '#F1F5F9' 
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#F1F5F9'
                 }}>
                    <Text style={{ fontSize: 11, fontWeight: '800', color: selectedId === item.id ? '#fff' : '#1E293B' }} numberOfLines={1}>{item.title || 'بدون عنوان'}</Text>
                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
@@ -151,26 +149,26 @@ export function PromosCommandDeckScreen() {
               </View>
               <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 9, marginTop: 12, textAlign: 'center' }}>Real-time rendering accuracy: 100%</Text>
            </Surface>
-           
-           <Surface tone="raised" style={{ flex: 1, borderRadius: 16, padding: 16 }}>
-              <Text style={{ fontWeight: '900', fontSize: 11, color: '#64748B', marginBottom: 12 }}>Insights</Text>
-              <Box gap={8}>
-                 <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: '#F8FAFC' }}>
-                    <Text style={{ fontSize: 9, color: '#64748B' }}>الوصول المتوقع</Text>
-                    <Text style={{ fontSize: 14, fontWeight: '900', color: '#0A2F5C' }}>12,500 مستخدم</Text>
-                 </View>
-                 <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: '#F8FAFC' }}>
-                    <Text style={{ fontSize: 9, color: '#64748B' }}>جاهزية الربط</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                       <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: draft.targetId ? '#16A34A' : '#EF4444' }} />
-                       <Text style={{ fontSize: 10, fontWeight: '800' }}>{draft.targetId ? 'جاهز تقنياً' : 'مطلوب وجهة'}</Text>
-                    </View>
-                 </View>
-              </Box>
-              <Box style={{ marginTop: 'auto' }}>
-                 <Text style={{ fontSize: 9, color: '#94A3B8', textAlign: 'center' }}>آخر مزامنة: الآن</Text>
-              </Box>
-           </Surface>
+
+            <Surface tone="raised" style={{ flex: 1, borderRadius: 16, padding: 16 }}>
+               <Text style={{ fontWeight: '900', fontSize: 11, color: '#64748B', marginBottom: 12 }}>Insights</Text>
+               <Box gap={8}>
+                  <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: '#F8FAFC' }}>
+                     <Text style={{ fontSize: 9, color: '#64748B' }}>الوصول المتوقع</Text>
+                     <Text style={{ fontSize: 14, fontWeight: '900', color: '#0A2F5C' }}>12,500 مستخدم</Text>
+                  </View>
+                  <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: '#F8FAFC' }}>
+                     <Text style={{ fontSize: 9, color: '#64748B' }}>جاهزية الربط</Text>
+                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: draft.targetId ? '#16A34A' : '#EF4444' }} />
+                        <Text style={{ fontSize: 10, fontWeight: '800' }}>{draft.targetId ? 'جاهز تقنياً' : 'مطلوب وجهة'}</Text>
+                     </View>
+                  </View>
+               </Box>
+               <Box style={{ marginTop: 'auto' }}>
+                  <Text style={{ fontSize: 9, color: '#94A3B8', textAlign: 'center' }}>آخر مزامنة: الآن</Text>
+               </Box>
+            </Surface>
         </Box>
       </View>
     </Box>

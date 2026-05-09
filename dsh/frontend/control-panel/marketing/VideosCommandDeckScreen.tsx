@@ -183,11 +183,11 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
 
           <View style={[styles.kpiRow]}>
             {[
-              { label: 'إجمالي المحتوى', value: kpis.total, color: '#0A2F5C', bg: '#F8FAFC' },
-              { label: 'نشط الآن', value: kpis.live, color: '#16A34A', bg: '#DCFCE7' },
-              { label: 'قيد المراجعة', value: kpis.review, color: '#D97706', bg: '#FEF3C7' },
+              { label: 'إجمالي المحتوى', value: kpis.total, color: '#0A2F5C', bg: '#fff' },
+              { label: 'نشط الآن', value: kpis.live, color: '#16A34A', bg: '#fff' },
+              { label: 'قيد المراجعة', value: kpis.review, color: '#D97706', bg: '#fff' },
             ].map((kpi) => (
-              <View key={kpi.label} style={[styles.kpiPill, { backgroundColor: kpi.bg }]}>
+              <View key={kpi.label} style={[styles.kpiPill, { backgroundColor: kpi.bg, borderWidth: 1, borderColor: 'rgba(10,47,92,0.08)' }]}>
                 <Text role="caption" style={[{ fontWeight: '800', fontSize: 10, color: '#64748B' }, rtlText]}>{kpi.label}</Text>
                 <Text role="titleMd" style={[{ color: kpi.color, fontWeight: '900', fontSize: 16 }, rtlText]}>{String(kpi.value)}</Text>
               </View>
@@ -456,7 +456,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                 <Image source={{ uri: draft.posterUrl }} style={styles.previewImage} resizeMode="cover" />
               ) : (
                 <View style={[styles.previewImage, { backgroundColor: '#1E293B', justifyContent: 'center', alignItems: 'center' }]}>
-                  <Text style={{ fontSize: 40 }}>🎬</Text>
+                  <Text style={{ fontSize: 12, color: '#94A3B8', fontWeight: '800' }}>مساحة معاينة الفيديو</Text>
                 </View>
               )}
 

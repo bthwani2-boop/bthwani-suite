@@ -26,10 +26,10 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
 
   const renderRecommendationIcon = (type: GrowthRecommendation['type']) => {
     switch (type) {
-      case 'opportunity': return '💡';
-      case 'gap': return '🎯';
-      case 'risk': return '⚠️';
-      default: return '📌';
+      case 'opportunity': return '';
+      case 'gap': return '';
+      case 'risk': return '';
+      default: return '';
     }
   };
 

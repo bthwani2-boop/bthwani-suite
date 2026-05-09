@@ -338,7 +338,6 @@ export function ControlPanelDshCatalogScreen({
               className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
               onClick={() => { setWorkspaceMode(t.id as WorkspaceMode); setSelectedProductId(null); }}
             >
-              <span>{t.icon}</span>
               {t.label}
             </button>
           );

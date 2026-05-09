@@ -157,20 +157,20 @@ export function LoyaltyCommandDeckScreen() {
       {/* KPIs */}
       <View style={styles.kpiRow}>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>إجمالي الأعضاء</Text>
-          <Text role="titleLg" style={{ color: '#0A2F5C', textAlign: 'right', width: '100%' }}>{kpis.members}</Text>
+          <Text role="caption" style={{ fontWeight: '800', color: '#64748B', textAlign: 'right', width: '100%' }}>إجمالي الأعضاء</Text>
+          <Text role="titleLg" style={{ color: '#0A2F5C', textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.members}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>مشتركي برو</Text>
-          <Text role="titleLg" style={{ color: '#FF500D', textAlign: 'right', width: '100%' }}>{kpis.subscribers}</Text>
+          <Text role="caption" style={{ fontWeight: '800', color: '#64748B', textAlign: 'right', width: '100%' }}>مشتركي برو</Text>
+          <Text role="titleLg" style={{ color: '#FF500D', textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.subscribers}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>المكافآت المتاحة</Text>
-          <Text role="titleLg" style={{ color: '#D97706', textAlign: 'right', width: '100%' }}>{kpis.rewards}</Text>
+          <Text role="caption" style={{ fontWeight: '800', color: '#64748B', textAlign: 'right', width: '100%' }}>المكافآت المتاحة</Text>
+          <Text role="titleLg" style={{ color: '#D97706', textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.rewards}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>معدل التفعيل</Text>
-          <Text role="titleLg" style={{ color: '#16A34A', textAlign: 'right', width: '100%' }}>{kpis.activationRate}</Text>
+          <Text role="caption" style={{ fontWeight: '800', color: '#64748B', textAlign: 'right', width: '100%' }}>معدل التفعيل</Text>
+          <Text role="titleLg" style={{ color: '#16A34A', textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.activationRate}</Text>
         </View>
       </View>
 

@@ -130,15 +130,15 @@ export function MarketingMediaReviewCommandDeckScreen() {
       {/* ── KPI Strip ─────────────────────── */}
       <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
         {[
-          { label: 'قيد المراجعة', value: kpis.pending, tone: 'warning' },
-          { label: 'معتمد تسويقياً', value: kpis.approved, tone: 'brand' },
-          { label: 'يتطلب تعديل', value: kpis.needsFix, tone: 'danger' },
-          { label: 'جاهز للكتالوج', value: kpis.catalogReady, tone: 'success' },
-          { label: 'تعارضات', value: kpis.conflicts, tone: 'warning' },
+          { label: 'قيد المراجعة', value: kpis.pending, color: '#D97706' },
+          { label: 'معتمد تسويقياً', value: kpis.approved, color: '#0A2F5C' },
+          { label: 'يتطلب تعديل', value: kpis.needsFix, color: '#DC2626' },
+          { label: 'جاهز للكتالوج', value: kpis.catalogReady, color: '#16A34A' },
+          { label: 'تعارضات', value: kpis.conflicts, color: '#D97706' },
         ].map(k => (
-          <Surface key={k.label} tone={k.tone as any} padding={3} style={{ flex: '1 1 120px', borderRadius: '12px' }}>
-            <Text role="caption" style={{ fontWeight: 800, textAlign: 'right' }}>{k.label}</Text>
-            <Text role="titleLg" style={{ fontWeight: 900, textAlign: 'right' }}>{k.value}</Text>
+          <Surface key={k.label} tone="raised" padding={3} style={{ flex: '1 1 120px', borderRadius: '10px', borderLeftWidth: 3, borderLeftColor: k.color }}>
+            <Text role="caption" style={{ fontWeight: 800, textAlign: 'right', color: '#64748B' }}>{k.label}</Text>
+            <Text role="titleSm" style={{ fontWeight: 900, textAlign: 'right', color: k.color, marginTop: 4, fontSize: 18 }}>{k.value}</Text>
           </Surface>
         ))}
       </Box>
@@ -213,13 +213,8 @@ export function MarketingMediaReviewCommandDeckScreen() {
               {/* Preview */}
               <Surface padding={4} gap={3}>
                 <Text role="caption" tone="muted" style={{ fontWeight: 700, textAlign: 'right' }}>معاينة الوسيط</Text>
-                <Surface tone="inset" style={{ height: 160, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                  <Text style={{ fontSize: 48 }}>
-                    {selected.entityType === 'product-media' || selected.entityType === 'store' ? '🖼️'
-                      : selected.entityType === 'product' ? '📦'
-                      : selected.entityType === 'category-suggestion' ? '🗂️'
-                      : '📁'}
-                  </Text>
+                <Surface tone="inset" style={{ height: 160, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', backgroundColor: '#F8FAFC' }}>
+                  <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>معاينة المحتوى</Text>
                 </Surface>
                 {selected.mediaKey && (
                   <Box dir="ltr" padding={2} style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '6px' }}>
@@ -259,16 +254,16 @@ export function MarketingMediaReviewCommandDeckScreen() {
 
                 {selected.stage === 'marketing-review' && (
                   <Box gap={2}>
-                    <Button label="اعتماد تسويقي ✓" tone="brand" onPress={() => handleApprove(selected.id)} />
+                    <Button label="اعتماد تسويقي" tone="brand" onPress={() => handleApprove(selected.id)} />
                     <Box layoutDirection="row" gap={2}>
-                      <Button style={{ flex: 1 }} label="طلب تعديل ✏️" tone="warning" onPress={() => handleFix(selected.id)} />
-                      <Button style={{ flex: 1 }} label="رفض ✕" tone="danger" onPress={() => handleReject(selected.id)} />
+                      <Button style={{ flex: 1 }} label="طلب تعديل" tone="warning" onPress={() => handleFix(selected.id)} />
+                      <Button style={{ flex: 1 }} label="رفض" tone="danger" onPress={() => handleReject(selected.id)} />
                     </Box>
                   </Box>
                 )}
 
                 {selected.stage === 'marketing-approved' && (
-                  <Button label="إرسال للكتالوج 🚀" tone="success" onPress={() => handleCatalog(selected.id)} />
+                  <Button label="إرسال للكتالوج" tone="success" onPress={() => handleCatalog(selected.id)} />
                 )}
 
                 {selected.stage === 'needs-fix' && (

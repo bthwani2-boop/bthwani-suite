@@ -168,15 +168,15 @@ export function PartnerOffersCommandDeckScreen() {
       {/* Header & KPIs */}
       <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
         {[
-          { label: 'واردة', value: kpis.inbound, tone: 'default' },
-          { label: 'مراجعة', value: kpis.review, tone: 'warning' },
-          { label: 'جاهز للتسويق', value: kpis.marketingReady, tone: 'brand' },
-          { label: 'منشور', value: kpis.published, tone: 'success' },
-          { label: 'مرفوض', value: kpis.rejected, tone: 'danger' },
+          { label: 'واردة', value: kpis.inbound, color: '#0A2F5C' },
+          { label: 'مراجعة', value: kpis.review, color: '#D97706' },
+          { label: 'جاهز للتسويق', value: kpis.marketingReady, color: '#0A2F5C' },
+          { label: 'منشور', value: kpis.published, color: '#16A34A' },
+          { label: 'مرفوض', value: kpis.rejected, color: '#64748B' },
         ].map(k => (
-          <Surface key={k.label} tone={k.tone as any} padding={3} style={{ flex: '1 1 120px' }}>
-            <Text role="caption" style={{ fontWeight: 800 }}>{k.label}</Text>
-            <Text role="titleLg" style={{ fontWeight: 900 }}>{k.value}</Text>
+          <Surface key={k.label} tone="raised" padding={3} style={{ flex: '1 1 120px', borderRadius: 10, borderLeftWidth: 3, borderLeftColor: k.color }}>
+            <Text role="caption" style={{ fontWeight: 800, color: '#64748B' }}>{k.label}</Text>
+            <Text role="titleSm" style={{ fontWeight: 900, color: k.color, marginTop: 4, fontSize: 18 }}>{k.value}</Text>
           </Surface>
         ))}
       </Box>

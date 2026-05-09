@@ -418,10 +418,10 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
   }
 
   const templates = [
-    { id: 'restaurant', label: 'مطعم', accent: '#E11D48', badge: 'خصم 20%', cta: 'اطلب الآن', icon: '🍔' },
-    { id: 'fashion', label: 'متجر أزياء', accent: '#2563EB', badge: 'وصل حديثاً', cta: 'تسوق الآن', icon: '👗' },
-    { id: 'tech', label: 'إلكترونيات', accent: '#0F172A', badge: 'الأكثر مبيعاً', cta: 'اشترِ الآن', icon: '📱' },
-    { id: 'pro', label: 'اشتراك برو', accent: '#7C3AED', badge: 'شهر مجاني', cta: 'اشترك الآن', icon: '💎' },
+    { id: 'restaurant', label: 'مطعم', accent: '#E11D48', badge: 'خصم 20%', cta: 'اطلب الآن', icon: '' },
+    { id: 'fashion', label: 'متجر أزياء', accent: '#2563EB', badge: 'وصل حديثاً', cta: 'تسوق الآن', icon: '' },
+    { id: 'tech', label: 'إلكترونيات', accent: '#0F172A', badge: 'الأكثر مبيعاً', cta: 'اشترِ الآن', icon: '' },
+    { id: 'pro', label: 'اشتراك برو', accent: '#7C3AED', badge: 'شهر مجاني', cta: 'اشترك الآن', icon: '' },
   ];
 
   const applyTemplate = (tpl: typeof templates[0]) => {
@@ -1077,25 +1077,22 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
       <Surface tone="raised" gap={3} style={styles.headerPanel}>
         <View style={StyleSheet.flatten([styles.headerRow, isRtl && styles.rowReverse])}>
           <Box gap={0}>
-            <Text role="caption" style={{ color: colorPalette.brand, fontWeight: '900', letterSpacing: 1 }}>إدارة التسويق الذكية</Text>
-            <Text role="titleLg" style={{ fontWeight: '900', color: '#0A2F5C', fontSize: 28 }}>استوديو البنرات <Text style={{ color: colorPalette.brand }}>٢٠٢٧</Text></Text>
+            <Text role="caption" style={{ color: colorPalette.brand, fontWeight: '900', letterSpacing: 0.5 }}>لوحة إدارة المحتوى الإعلاني</Text>
+            <Text role="titleLg" style={{ fontWeight: '900', color: '#0A2F5C', fontSize: 24 }}>استوديو البنرات</Text>
           </Box>
-          <Button label="بنر جديد +" tone="primary" fullWidth={false} onPress={handleCreateNew} style={{ backgroundColor: colorPalette.brandStrong, borderRadius: 14, height: 42 }} />
+          <Button label="إضافة بنر جديد" tone="primary" fullWidth={false} onPress={handleCreateNew} style={{ backgroundColor: colorPalette.brandStrong, borderRadius: 10, height: 38 }} />
         </View>
 
         <View style={styles.kpiGrid}>
           {[
-            { label: 'إجمالي البنرات', value: kpis.total, color: '#1E40AF', bg: '#EFF6FF', icon: '📁' },
-            { label: 'البنرات النشطة', value: kpis.live, color: '#166534', bg: '#F0FDF4', icon: '📡' },
-            { label: 'مشاهدات اليوم', value: kpis.impressions, color: '#5B21B6', bg: '#F5F3FF', icon: '👁️' },
-            { label: 'نسبة التفاعل', value: `${((kpis.clicks / (kpis.impressions || 1)) * 100).toFixed(1)}%`, color: '#991B1B', bg: '#FEF2F2', icon: '📈' },
+            { label: 'إجمالي البنرات', value: kpis.total, color: '#0A2F5C', bg: '#fff' },
+            { label: 'البنرات النشطة', value: kpis.live, color: '#16A34A', bg: '#fff' },
+            { label: 'مشاهدات اليوم', value: kpis.impressions, color: '#0A2F5C', bg: '#fff' },
+            { label: 'نسبة التفاعل', value: `${((kpis.clicks / (kpis.impressions || 1)) * 100).toFixed(1)}%`, color: '#FF500D', bg: '#fff' },
           ].map(k => (
             <View key={k.label} style={StyleSheet.flatten([styles.kpiCard, { backgroundColor: k.bg }])}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text role="caption" style={{ fontWeight: '800', color: '#64748B' }}>{k.label}</Text>
-                <Text>{k.icon}</Text>
-              </View>
-              <Text role="titleSm" style={{ color: k.color, fontWeight: '900', marginTop: 6 }}>{k.value}</Text>
+              <Text role="caption" style={{ fontWeight: '800', color: '#64748B' }}>{k.label}</Text>
+              <Text role="titleSm" style={{ color: k.color, fontWeight: '900', marginTop: 4, fontSize: 18 }}>{k.value}</Text>
             </View>
           ))}
         </View>
