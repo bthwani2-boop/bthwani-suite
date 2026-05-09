@@ -426,3 +426,4 @@ export function WebControlPanelEmptyState({ title, description, icon, actionLabe
     </Box>
   );
 }
+

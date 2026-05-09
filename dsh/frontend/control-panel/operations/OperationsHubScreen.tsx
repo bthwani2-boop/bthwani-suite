@@ -126,7 +126,7 @@ export function ControlPanelDshOperationsScreen({
           );
         })}
       </nav>
-      
+
       {/* 2b. Sub-Tabs - Granular Navigation */}
       {activeGroupMeta.subGroups && (
         <nav className={styles.subNavigationCockpit}>
@@ -160,3 +160,4 @@ export function DshOperationsHubSurface(props: ControlPanelDshOperationsScreenPr
 }
 
 export default ControlPanelDshOperationsScreen;
+
