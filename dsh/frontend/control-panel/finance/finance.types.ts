@@ -17,6 +17,7 @@ export interface FinanceGroupMeta {
   label: string;
   description: string;
   badge?: string;
+  subGroups?: readonly { id: string; label: string }[];
 }
 
 export type FinanceNormalizationResult =

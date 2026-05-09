@@ -17,9 +17,11 @@ import {
 } from './closure-workspaces';
 import { WltDshFinanceControlPanelContent } from '../../../../wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview';
 import styles from '../operations/dsh-surface.module.css';
+import fStyles from './finance-surface.module.css';
 
 export type ControlPanelDshFinanceScreenProps = {
   group?: CanonicalFinanceGroupId;
+  subGroup?: string;
   panel?: FinancePanelId;
   state?: FinanceViewState;
   fallbackHref?: string;
@@ -35,7 +37,7 @@ const PlaceholderScreen = ({ title }: { title: string }) => (
   </Box>
 );
 
-const SCREEN_RENDERERS: Record<CanonicalFinanceGroupId, React.ComponentType<{ hubHref: string }>> = {
+const SCREEN_RENDERERS: Record<CanonicalFinanceGroupId, React.ComponentType<{ hubHref: string; subGroup?: string }>> = {
   overview: WltDshFinanceControlPanelContent as any,
   settlements: ControlPanelDshSettlementScreen as any,
   'cod-reconciliation': ControlPanelDshCodReconciliationScreen as any,
@@ -48,16 +50,22 @@ const SCREEN_RENDERERS: Record<CanonicalFinanceGroupId, React.ComponentType<{ hu
 
 export function ControlPanelDshFinanceHubScreen({
   group = 'overview',
+  subGroup,
   panel,
   state = 'ready',
   fallbackHref = '/finance',
 }: ControlPanelDshFinanceScreenProps) {
   const router = useRouter();
   const [activeGroup, setActiveGroup] = React.useState<CanonicalFinanceGroupId>(group);
+  const [activeSubGroup, setActiveSubGroup] = React.useState<string | undefined>(subGroup);
 
   React.useEffect(() => {
     setActiveGroup(group);
   }, [group]);
+
+  React.useEffect(() => {
+    setActiveSubGroup(subGroup);
+  }, [subGroup]);
 
   const activeGroupMeta = getFinanceGroupMeta(activeGroup);
   const hubHref = buildFinanceHref(activeGroup, { panel });
@@ -65,7 +73,7 @@ export function ControlPanelDshFinanceHubScreen({
 
   if (state !== 'ready') {
     return (
-      <div style={{ padding: 24 }} dir="rtl">
+      <div style={{ padding: 24 }} dir="rtl" className={fStyles.noScroll}>
         <StateView
            stateId="loading"
            title="جاري تحميل البيانات المالية"
@@ -77,7 +85,7 @@ export function ControlPanelDshFinanceHubScreen({
   }
 
   return (
-    <div className={styles.operationsCockpit} dir="rtl">
+    <div className={`${styles.operationsCockpit} ${fStyles.financeCockpit} ${fStyles.noScroll}`} dir="rtl">
       {/* 1. Header Area - Finance Command Deck */}
       <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
         <div className={styles.operationsTitleBlock}>
@@ -118,8 +126,8 @@ export function ControlPanelDshFinanceHubScreen({
         </div>
       </header>
 
-      {/* 2. Finance Tabs - Navigation */}
-      <nav className={styles.navigationCockpit}>
+      {/* 2. Finance Tabs - Main Navigation */}
+      <nav className={`${styles.navigationCockpit} ${fStyles.noScroll}`}>
         {FINANCE_CANONICAL_GROUPS.map((item) => {
           const isSelected = item.id === activeGroup;
           return (
@@ -128,6 +136,7 @@ export function ControlPanelDshFinanceHubScreen({
               className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
               onClick={() => {
                 setActiveGroup(item.id);
+                setActiveSubGroup(undefined);
                 router.push(buildFinanceHref(item.id, { panel }));
               }}
             >
@@ -137,13 +146,31 @@ export function ControlPanelDshFinanceHubScreen({
         })}
       </nav>
 
+      {/* 2b. Sub-Tabs - Granular Navigation */}
+      {activeGroupMeta.subGroups && (
+        <nav className={`${fStyles.subNavigationCockpit} ${fStyles.noScroll}`}>
+          {activeGroupMeta.subGroups.map((sub) => {
+            const isSelected = (activeSubGroup || activeGroupMeta.subGroups?.[0]?.id) === sub.id;
+            return (
+              <button
+                key={sub.id}
+                className={`${fStyles.financeSubTab} ${isSelected ? fStyles.financeSubTabActive : ''}`}
+                onClick={() => setActiveSubGroup(sub.id)}
+              >
+                {sub.label}
+              </button>
+            );
+          })}
+        </nav>
+      )}
+
       {/* 3. Main Active Area */}
-      <main className={styles.operationsMainPanel}>
-        <div className={styles.operationsInnerScroll}>
+      <main className={`${styles.operationsMainPanel} ${fStyles.financeMainPanel} ${fStyles.noScroll}`}>
+        <div className={`${styles.operationsInnerScroll} ${fStyles.financeInnerScroll} ${fStyles.noScroll}`}>
           {activeGroup === 'overview' ? (
             <WltDshFinanceControlPanelContent hideHeader />
           ) : (
-            <ActiveScreen hubHref={hubHref} />
+            <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
           )}
         </div>
       </main>

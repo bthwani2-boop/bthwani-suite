@@ -108,11 +108,6 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
     ],
   };
 
-  const PULSE_METRICS = [
-    { label: 'الوصول', value: '1.2M', trend: '+12%', trendTone: 'success' },
-    { label: 'البنرات', value: '3/5', trend: 'متاح', trendTone: 'info' },
-    { label: 'التحويل', value: '4.8%', trend: '+0.4%', trendTone: 'success' },
-  ];
 
   // Set default sub-tab when primary tab changes
   React.useEffect(() => {
@@ -485,47 +480,6 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
 
   return (
     <div className={styles.operationsCockpit} dir="rtl">
-      {/* 1. Header Area - Marketing Command Deck */}
-      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
-        <div className={styles.operationsTitleBlock}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            backgroundColor: '#0A2F5C',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '16px',
-            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
-          }}>
-            🎯
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>تسويق DSH</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>اعتماد الأداء</span>
-            </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>حوكمة المحتوى التسويقي والنمو الاستراتيجي</p>
-          </div>
-        </div>
-
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
-            {PULSE_METRICS.map((metric) => (
-              <div key={metric.label} className={styles.commandKpi}>
-                <span className={styles.commandKpiLabel}>{metric.label}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span className={styles.commandKpiValue}>{metric.value}</span>
-                  <span className={`${styles.commandKpiTrend} ${metric.trendTone === 'success' ? styles.toneSuccess : metric.trendTone === 'warning' ? styles.toneWarning : styles.toneInfo}`}>
-                    {metric.trend}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </header>
 
       {/* 2. Primary Tabs - Navigation Cockpit */}
       <nav className={styles.navigationCockpit}>

@@ -538,23 +538,7 @@ export function ControlPanelSurfaceHost({
 
             {activeSectionId === 'dashboard' ? (
               <>
-                <WebSectionCard
-                  title="النظرة التنفيذية"
-                  description="ملخص استراتيجي لنبض المنصة وغرفة القيادة."
-                >
-                  <div className={styles.dashboardHeroCard}>
-                    <div className={styles.dashboardHeroEyebrow}>BThwani Premium Command Center 2026</div>
-                    <h2 className={styles.dashboardHeroTitle}>غرفة قيادة تنفيذية بنبرة هادئة وكثافة قرار أعلى.</h2>
-                    <p className={styles.dashboardHeroDescription}>
-                      هذا السطح لم يعد مجرد overview عام. تم رفعه ليصبح طبقة قيادة تقرأ نبض المنصة،
-                      وتوضح أين يبدأ القرار الآن، وما الذي يجب أن يبقى في الخلفية دون ضوضاء بصرية.
-                    </p>
-                  </div>
-                </WebSectionCard>
-
-                <div style={{ marginTop: 16 }}>
-                  <ControlPanelDshClosureDashboardScreen />
-                </div>
+            {/* Removed redundant Dashboard Hero and Readiness Matrix */}
               </>
             ) : null}
 

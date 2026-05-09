@@ -214,108 +214,114 @@ export function WltDshFinanceControlPanelContent({
     (r) => r.kind === 'reconciliation-export',
   );
 
+  const content = (
+    <Box style={{ padding: '16px', flex: 1 }} gap={4}>
+      <PreviewBanner />
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '16px' }}>
+        <ClientPaymentBreakdown records={preview.clientRecords} />
+
+        <SectionBlock
+          title="تسويات الشركاء"
+          records={preview.partnerRecords}
+          emptyLabel="لا توجد تسويات شركاء"
+        />
+
+        <CaptainFinanceBreakdown records={preview.captainRecords} />
+
+        <FieldFinanceDetail records={preview.fieldRecords} />
+
+        <SectionBlock
+          title="عمولة المنصة والاسترداد"
+          records={preview.platformRecords.filter((r) => r.kind !== 'reconciliation-export')}
+          emptyLabel="لا توجد بيانات"
+        />
+
+        <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: '12px', border: '1px solid rgba(10,47,92,0.06)' }}>
+          <Text role="label" tone="muted" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>
+            مطابقة التسويات — Export Preview
+          </Text>
+          <StateView
+            kind="warning"
+            title="مطابقة التسويات — معطّلة"
+            description="هذه الخاصية تحتاج ربطًا بـ API حقيقي لم يُعرَّف بعد."
+          />
+          <Button
+            label={showReconciliation ? 'إخفاء سجلات المطابقة' : 'عرض سجلات المطابقة التجريبية'}
+            tone="secondary"
+            fullWidth={false}
+            size="sm"
+            onPress={() => setShowReconciliation((v) => !v)}
+          />
+          {showReconciliation && (
+            <Box gap={2}>
+              {reconciliationRecords.length === 0 ? (
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                  لا توجد سجلات مطابقة
+                </Text>
+              ) : (
+                reconciliationRecords.map((r) => <RecordRow key={r.id} record={r} />)
+              )}
+            </Box>
+          )}
+        </Surface>
+      </div>
+    </Box>
+  );
+
+  if (hideHeader) {
+    return content;
+  }
+
   return (
     <div className={styles.operationsCockpit} dir="rtl">
       {/* 1. Header Area - Finance Command Deck */}
-      {!hideHeader && (
-        <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
-          <div className={styles.operationsTitleBlock}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              backgroundColor: '#0A2F5C',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '16px',
-              boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
-            }}>
-              💰
-            </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>مالية DSH</h1>
-                <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>CONTRACT_TBD</span>
-              </div>
-              <p style={{ fontSize: '10px', fontWeight: 600 }}>مراقبة التدفقات المالية والتسويات المركزية</p>
-            </div>
+      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
+        <div className={styles.operationsTitleBlock}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            backgroundColor: '#0A2F5C',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '16px',
+            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
+          }}>
+            💰
           </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>مالية DSH</h1>
+              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>CONTRACT_TBD</span>
+            </div>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>مراقبة التدفقات المالية والتسويات المركزية</p>
+          </div>
+        </div>
 
-          <div className={styles.operationsHeaderActions}>
-            <div className={styles.operationsPulseCompact}>
-               <div className={styles.commandKpi}>
-                  <span className={styles.commandKpiLabel}>إجمالي الدخل</span>
-                  <span className={styles.commandKpiValue} style={{ color: '#16A34A' }}>{preview.totalInflowLabel}</span>
-               </div>
-               <div className={styles.commandKpi}>
-                  <span className={styles.commandKpiLabel}>إجمالي الصرف</span>
-                  <span className={styles.commandKpiValue} style={{ color: '#DC2626' }}>{preview.totalOutflowLabel}</span>
-               </div>
-               <div className={styles.commandKpi}>
-                  <span className={styles.commandKpiLabel}>الصافي</span>
-                  <span className={styles.commandKpiValue} style={{ color: '#0A2F5C' }}>{preview.netLabel}</span>
-               </div>
-            </div>
+        <div className={styles.operationsHeaderActions}>
+          <div className={styles.operationsPulseCompact}>
+             <div className={styles.commandKpi}>
+                <span className={styles.commandKpiLabel}>إجمالي الدخل</span>
+                <span className={styles.commandKpiValue} style={{ color: '#16A34A' }}>{preview.totalInflowLabel}</span>
+             </div>
+             <div className={styles.commandKpi}>
+                <span className={styles.commandKpiLabel}>إجمالي الصرف</span>
+                <span className={styles.commandKpiValue} style={{ color: '#DC2626' }}>{preview.totalOutflowLabel}</span>
+             </div>
+             <div className={styles.commandKpi}>
+                <span className={styles.commandKpiLabel}>الصافي</span>
+                <span className={styles.commandKpiValue} style={{ color: '#0A2F5C' }}>{preview.netLabel}</span>
+             </div>
           </div>
-        </header>
-      )}
+        </div>
+      </header>
 
       {/* 2. Content Area */}
-      <main className={hideHeader ? '' : styles.operationsMainPanel}>
-        <div className={hideHeader ? '' : styles.operationsInnerScroll}>
-          <Box style={{ padding: '16px', flex: 1 }} gap={4}>
-            <PreviewBanner />
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '16px' }}>
-              <ClientPaymentBreakdown records={preview.clientRecords} />
-
-              <SectionBlock
-                title="تسويات الشركاء"
-                records={preview.partnerRecords}
-                emptyLabel="لا توجد تسويات شركاء"
-              />
-
-              <CaptainFinanceBreakdown records={preview.captainRecords} />
-
-              <FieldFinanceDetail records={preview.fieldRecords} />
-
-              <SectionBlock
-                title="عمولة المنصة والاسترداد"
-                records={preview.platformRecords.filter((r) => r.kind !== 'reconciliation-export')}
-                emptyLabel="لا توجد بيانات"
-              />
-
-              <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: '12px', border: '1px solid rgba(10,47,92,0.06)' }}>
-                <Text role="label" tone="muted" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>
-                  مطابقة التسويات — Export Preview
-                </Text>
-                <StateView
-                  kind="warning"
-                  title="مطابقة التسويات — معطّلة"
-                  description="هذه الخاصية تحتاج ربطًا بـ API حقيقي لم يُعرَّف بعد."
-                />
-                <Button
-                  label={showReconciliation ? 'إخفاء سجلات المطابقة' : 'عرض سجلات المطابقة التجريبية'}
-                  tone="secondary"
-                  fullWidth={false}
-                  size="sm"
-                  onPress={() => setShowReconciliation((v) => !v)}
-                />
-                {showReconciliation && (
-                  <Box gap={2}>
-                    {reconciliationRecords.length === 0 ? (
-                      <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                        لا توجد سجلات مطابقة
-                      </Text>
-                    ) : (
-                      reconciliationRecords.map((r) => <RecordRow key={r.id} record={r} />)
-                    )}
-                  </Box>
-                )}
-              </Surface>
-            </div>
-          </Box>
+      <main className={styles.operationsMainPanel}>
+        <div className={styles.operationsInnerScroll}>
+          {content}
         </div>
       </main>
     </div>
