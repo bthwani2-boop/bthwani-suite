@@ -20,7 +20,7 @@ import {
   WebControlPanelWorkbench,
 } from '@bthwani/ui-kit/web';
 import { GEO_HEATMAP_ZONES, type GeoHeatmapZone } from './geo-heatmap.preview-data';
-import { type DshLifecycleStep, type DshSurfaceId, type DshUnifiedRecommendation } from '../shared';
+import { translateDshRuntimeBindingStatus, type DshLifecycleStep, type DshSurfaceId, type DshUnifiedRecommendation } from '../shared';
 import styles from './dsh-surface.module.css';
 
 const SUB_TABS = [
@@ -419,7 +419,7 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
                 </Box>
                 <Box padding={2} border radiusToken="lg" background="surfaceRaised">
                   <Text role="caption" tone="muted">حالة الربط</Text>
-                  <Text role="bodySm">{selectedRecommendation?.runtimeBindingStatus ?? 'UI_PREVIEW_ONLY'}</Text>
+                  <Text role="bodySm">{translateDshRuntimeBindingStatus(selectedRecommendation?.runtimeBindingStatus ?? 'UI_PREVIEW_ONLY')}</Text>
                 </Box>
                 <Box padding={2} border radiusToken="lg" background="surfaceRaised">
                   <Text role="caption" tone="muted">الدليل</Text>

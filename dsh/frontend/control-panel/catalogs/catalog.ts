@@ -138,7 +138,7 @@ export const dshCatalogApprovalQueues: CatalogApprovalQueueItem[] = [
 
 export const dshCatalogCategories: CatalogMainCategory[] = [
   {
-    id: 'restaurants', label: 'المطاعم', subtitle: 'طلب الوجبات والمأكولات الجاهزة', emojiFallback: '🍽️', defaultMediaPolicy: 'partner-owned-exception',
+    id: 'restaurants', label: 'المطاعم', subtitle: 'طلب الوجبات والمأكولات الجاهزة', emojiFallback: 'ط', defaultMediaPolicy: 'partner-owned-exception',
     categoryMode: 'catalog-based',
     subcategories: [
       {
@@ -152,7 +152,7 @@ export const dshCatalogCategories: CatalogMainCategory[] = [
     ]
   },
   {
-    id: 'grocery', label: 'مقاضي', subtitle: 'سوبر ماركت مواد غذائية', emojiFallback: '🛒', defaultMediaPolicy: 'catalog-owned-media',
+    id: 'grocery', label: 'مقاضي', subtitle: 'سوبر ماركت مواد غذائية', emojiFallback: 'م', defaultMediaPolicy: 'catalog-owned-media',
     categoryMode: 'catalog-based',
     subcategories: [
       { id: 'grocery_dairy', label: 'ألبان', subtitle: 'منتجات الألبان والأجبان' },
@@ -162,7 +162,7 @@ export const dshCatalogCategories: CatalogMainCategory[] = [
     ]
   },
   {
-    id: 'sweets_juices', label: 'حلا وعصائر', subtitle: 'عصائر طازجة وحلويات', emojiFallback: '🧃', defaultMediaPolicy: 'partner-owned-exception',
+    id: 'sweets_juices', label: 'حلا وعصائر', subtitle: 'عصائر طازجة وحلويات', emojiFallback: 'ح', defaultMediaPolicy: 'partner-owned-exception',
     categoryMode: 'catalog-based',
     subcategories: [
       { id: 'cake', label: 'كيك', subtitle: 'كيك ومخبوزات' },
@@ -171,7 +171,7 @@ export const dshCatalogCategories: CatalogMainCategory[] = [
     ]
   },
   {
-    id: 'honey_dates', label: 'عسل وتمور', subtitle: 'منتجات طبيعية', emojiFallback: '🍯', defaultMediaPolicy: 'catalog-owned-media',
+    id: 'honey_dates', label: 'عسل وتمور', subtitle: 'منتجات طبيعية', emojiFallback: 'ع', defaultMediaPolicy: 'catalog-owned-media',
     categoryMode: 'catalog-based',
     subcategories: [
       { id: 'honey', label: 'عسل', subtitle: 'عسل طبيعي' },
@@ -180,7 +180,7 @@ export const dshCatalogCategories: CatalogMainCategory[] = [
     ]
   },
   {
-    id: 'electronics', label: 'إلكترونيات', subtitle: 'أجهزة واكسسوارات', emojiFallback: '📱', defaultMediaPolicy: 'catalog-owned-media',
+    id: 'electronics', label: 'إلكترونيات', subtitle: 'أجهزة واكسسوارات', emojiFallback: 'إ', defaultMediaPolicy: 'catalog-owned-media',
     categoryMode: 'catalog-based',
     subcategories: [
       { id: 'phones', label: 'جوالات', subtitle: 'أجهزة الجوال' },
@@ -188,7 +188,7 @@ export const dshCatalogCategories: CatalogMainCategory[] = [
     ]
   },
   {
-    id: 'spare_parts', label: 'قطع غيار', subtitle: 'مستلزمات سيارات', emojiFallback: '🔧', defaultMediaPolicy: 'catalog-owned-media',
+    id: 'spare_parts', label: 'قطع غيار', subtitle: 'مستلزمات سيارات', emojiFallback: 'ق', defaultMediaPolicy: 'catalog-owned-media',
     categoryMode: 'catalog-based',
     subcategories: [
       { id: 'oils', label: 'زيوت', subtitle: 'زيوت محركات' },
@@ -196,8 +196,8 @@ export const dshCatalogCategories: CatalogMainCategory[] = [
       { id: 'tires', label: 'إطارات', subtitle: 'كفرات' }
     ]
   },
-  { id: 'awnak', label: 'عونك', subtitle: 'خدمات ومشاوير', emojiFallback: '🤝', defaultMediaPolicy: 'catalog-owned-media', subcategories: [], renderMode: 'manual-order', categoryMode: 'manual-order' },
-  { id: 'shein', label: 'شي ان', subtitle: 'طلبات من شي إن', emojiFallback: '🛍️', defaultMediaPolicy: 'catalog-owned-media', subcategories: [], renderMode: 'manual-order', categoryMode: 'manual-order' }
+  { id: 'awnak', label: 'عونك', subtitle: 'خدمات ومشاوير', emojiFallback: 'ع', defaultMediaPolicy: 'catalog-owned-media', subcategories: [], renderMode: 'manual-order', categoryMode: 'manual-order' },
+  { id: 'shein', label: 'شي ان', subtitle: 'طلبات من شي إن', emojiFallback: 'ش', defaultMediaPolicy: 'catalog-owned-media', subcategories: [], renderMode: 'manual-order', categoryMode: 'manual-order' }
 ];
 
 export const dshCatalogProducts: CatalogProductMaster[] = [
@@ -214,7 +214,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     sourceSurface: 'catalog',
     surfaces: ['client', 'partner', 'marketing', 'field'],
     imageUri: '/dsh/media-fixtures/products/apple.v1.png',
-    emojiFallback: '🍎',
+    emojiFallback: 'ت',
   },
   {
     id: 'prd-grocery-milk',
@@ -229,7 +229,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     sourceSurface: 'field',
     surfaces: ['client', 'partner', 'marketing'],
     imageUri: '/dsh/media-fixtures/products/milk.v1.png',
-    emojiFallback: '🥛',
+    emojiFallback: 'ح',
   },
   {
     id: 'prd-grocery-bread',
@@ -243,7 +243,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     sourceSurface: 'catalog',
     surfaces: ['client', 'partner'],
     imageUri: '/dsh/media-fixtures/products/bread.v1.png',
-    emojiFallback: '🍞',
+    emojiFallback: 'خ',
   },
   {
     id: 'prd-restaurant-chicken',
@@ -257,7 +257,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     sourceSurface: 'partner',
     surfaces: ['client', 'partner', 'marketing'],
     imageUri: '/dsh/media-fixtures/restaurants/chicken.v1.png',
-    emojiFallback: '🍗',
+    emojiFallback: 'د',
     partnerOverrides: [
       { partnerId: 'store-1003', price: 34.00, preparationTime: '18-22 دقيقة' }
     ]
@@ -273,7 +273,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     approvalStage: 'marketing-review',
     sourceSurface: 'partner',
     surfaces: ['partner', 'marketing'],
-    emojiFallback: '🍔',
+    emojiFallback: 'ب',
     partnerOverrides: [
       { partnerId: 'store-1004', price: 25.00 }
     ]
@@ -289,7 +289,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     approvalStage: 'client-visible',
     sourceSurface: 'partner',
     surfaces: ['client', 'partner'],
-    emojiFallback: '🍝',
+    emojiFallback: 'ب',
   },
   {
     id: 'prd-sweets-cake',
@@ -303,7 +303,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     sourceSurface: 'partner',
     surfaces: ['partner', 'marketing'],
     imageUri: '/dsh/media-fixtures/sweets/choco.v1.png',
-    emojiFallback: '🍰',
+    emojiFallback: 'ش',
   },
   {
     id: 'prd-sweets-juice',
@@ -316,7 +316,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     approvalStage: 'client-visible',
     sourceSurface: 'partner',
     surfaces: ['client', 'partner'],
-    emojiFallback: '🧃',
+    emojiFallback: 'ع',
   },
   {
     id: 'prd-dates-box',
@@ -331,7 +331,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     sourceSurface: 'catalog',
     surfaces: ['partner', 'marketing', 'field'],
     imageUri: '/dsh/media-fixtures/dates/lead-5.dates-box.v1.png',
-    emojiFallback: '🌴',
+    emojiFallback: 'ت',
   },
   {
     id: 'prd-honey-jar',
@@ -344,7 +344,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     approvalStage: 'client-visible',
     sourceSurface: 'catalog',
     surfaces: ['client', 'partner'],
-    emojiFallback: '🍯',
+    emojiFallback: 'ع',
   },
   {
     id: 'prd-electronics-iphone',
@@ -358,7 +358,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     approvalStage: 'client-visible',
     sourceSurface: 'catalog',
     surfaces: ['client', 'partner', 'marketing'],
-    emojiFallback: '📱',
+    emojiFallback: 'ج',
   },
   {
     id: 'prd-electronics-charger',
@@ -371,7 +371,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     approvalStage: 'client-visible',
     sourceSurface: 'catalog',
     surfaces: ['client', 'partner'],
-    emojiFallback: '🔌',
+    emojiFallback: 'ش',
   },
   {
     id: 'prd-spare-oil',
@@ -384,7 +384,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     approvalStage: 'client-visible',
     sourceSurface: 'catalog',
     surfaces: ['client', 'partner'],
-    emojiFallback: '🛢️',
+    emojiFallback: 'ز',
   },
   {
     id: 'prd-spare-battery',
@@ -397,6 +397,6 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     approvalStage: 'client-visible',
     sourceSurface: 'catalog',
     surfaces: ['client', 'partner'],
-    emojiFallback: '🔋',
+    emojiFallback: 'ب',
   }
 ];

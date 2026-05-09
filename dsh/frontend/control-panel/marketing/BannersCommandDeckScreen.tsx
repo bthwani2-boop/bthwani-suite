@@ -85,6 +85,8 @@ type SmartTargetSummary = {
 
 type SmartTargetStoreFilter = 'all' | 'offers' | 'favorites' | 'available';
 type EditorWorkspaceTab = 'content' | 'media' | 'target';
+type BannerImageFit = BannerDraft['imageFit'];
+type BannerLogoPosition = BannerDraft['partnerLogoPosition'];
 
 const SMART_TARGET_OPTIONS: Array<{ value: SmartBannerTargetType; label: string; description: string }> = [
   { value: 'home', label: 'الرئيسية', description: 'يعيد المستخدم إلى واجهة DSH الرئيسية.' },
@@ -112,6 +114,18 @@ const BANNER_MOTION_OPTIONS: Array<{ value: MarketingBannerMotionStyle; label: s
   { value: 'soft-parallax', label: 'بارالاكس ناعم', description: 'عمق بصري خفيف للصورة أثناء التركيز.' },
   { value: 'subtle-fade', label: 'تلاشي خفيف', description: 'يبرز البطاقة الفعالة بهدوء بصري.' },
   { value: 'snap-focus', label: 'تركيز سناب', description: 'تكبير وتركيز بسيط على الشريحة الفعالة.' },
+];
+
+const IMAGE_FIT_TAB_ITEMS: Array<{ value: BannerImageFit; label: string }> = [
+  { value: 'cover', label: 'كامل' },
+  { value: 'contain', label: 'مناسب' },
+];
+
+const LOGO_POSITION_TAB_ITEMS: Array<{ value: BannerLogoPosition; label: string }> = [
+  { value: 'top-left', label: 'أعلى يسار' },
+  { value: 'top-right', label: 'أعلى يمين' },
+  { value: 'bottom-left', label: 'أسفل يسار' },
+  { value: 'bottom-right', label: 'أسفل يمين' },
 ];
 
 function normalizeSearchText(value: string) {
@@ -719,7 +733,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
           />
         ) : (
           <View style={[styles.bannerImage, { backgroundColor: draft.accentColor || '#0A2F5C', justifyContent: 'center', alignItems: 'center' }]}>
-             <Text style={{ fontSize: 40 }}>{templates.find(t => t.id === draft.templateId)?.icon || '✨'}</Text>
+             <Text style={{ fontSize: 40 }}>{templates.find(t => t.id === draft.templateId)?.label.slice(0, 1) || 'ب'}</Text>
           </View>
         )}
         <View
@@ -838,7 +852,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
               <TextField label="صورة الخلفية" value={draft.imageUrl} onChangeText={(v) => setDraft(c => ({ ...c, imageUrl: v }))} />
               <Box gap={1}>
                 <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>احتواء الصورة</label>
-                <Tabs<any> items={[{ value: 'cover', label: 'كامل' }, { value: 'contain', label: 'مناسب' }]} value={draft.imageFit} onValueChange={(v) => setDraft(c => ({ ...c, imageFit: v }))} variant="pill" />
+                <Tabs<BannerImageFit> items={IMAGE_FIT_TAB_ITEMS} value={draft.imageFit} onValueChange={(v) => setDraft(c => ({ ...c, imageFit: v }))} variant="pill" />
               </Box>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -848,13 +862,8 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Box gap={1}>
                 <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>موقع الشعار</label>
-                <Tabs<any>
-                  items={[
-                    { value: 'top-left', label: 'أعلى يسار' },
-                    { value: 'top-right', label: 'أعلى يمين' },
-                    { value: 'bottom-left', label: 'أسفل يسار' },
-                    { value: 'bottom-right', label: 'أسفل يمين' },
-                  ]}
+                <Tabs<BannerLogoPosition>
+                  items={LOGO_POSITION_TAB_ITEMS}
                   value={draft.partnerLogoPosition}
                   onValueChange={(v) => setDraft(c => ({ ...c, partnerLogoPosition: v }))}
                   variant="pill"

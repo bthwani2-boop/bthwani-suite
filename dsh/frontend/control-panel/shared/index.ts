@@ -3,6 +3,7 @@ export {
 	getDshClosureItemsByStatus,
 	getDshClosureItemsBySurface,
 	resolveDshSurfaceId,
+	translateDshRuntimeBindingStatus,
 	type DshActor,
 	type DshClosureArea,
 	type DshClosureStatus,

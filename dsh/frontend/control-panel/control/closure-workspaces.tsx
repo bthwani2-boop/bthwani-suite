@@ -75,7 +75,7 @@ export function ControlPanelDshControlHubScreen() {
             fontSize: '16px',
             boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
           }}>
-            🛡️
+            ح
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

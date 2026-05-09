@@ -12,6 +12,7 @@ import {
   WebControlPanelStatusTag,
   WebControlPanelWorkbench,
 } from '@bthwani/ui-kit/web';
+import { translateDshRuntimeBindingStatus } from '../shared';
 
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
 
@@ -182,7 +183,7 @@ export function DshPartnerPromotionEligibilityScreen({
             <WebControlPanelStatusTag label={resolveStatusLabel(selectedItem?.status ?? 'draft')} tone={resolveApprovalTone(selectedItem?.status ?? 'draft')} />
             <WebControlPanelStatusTag label={selectedItem?.kind === 'product' ? 'منتج' : 'متجر'} tone="info" />
             <WebControlPanelStatusTag label={resolveEligibilityLabel(selectedItem?.eligibility ?? 'review')} tone={resolveEligibilityTone(selectedItem?.eligibility ?? 'review')} />
-            <WebControlPanelStatusTag label="UI_PREVIEW_ONLY" tone="neutral" />
+            <WebControlPanelStatusTag label={translateDshRuntimeBindingStatus('UI_PREVIEW_ONLY')} tone="neutral" />
           </Box>
 
           <WebControlPanelQueue

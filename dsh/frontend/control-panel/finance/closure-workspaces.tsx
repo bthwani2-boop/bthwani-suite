@@ -2,13 +2,16 @@ import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import {
   WebControlPanelActionCluster,
+  WebControlPanelCompactPager,
   WebControlPanelDecisionRow,
+  WebControlPanelDenseHeader,
   WebControlPanelInspectorShell,
+  WebControlPanelQueue,
   WebControlPanelRecommendation,
-  WebControlPanelKpiStrip,
+  WebControlPanelStatusTag,
+  WebControlPanelWorkbench,
 } from '@bthwani/ui-kit/web';
-import styles from '../operations/dsh-surface.module.css';
-import type { DshUnifiedRecommendation } from '../shared';
+import { translateDshRuntimeBindingStatus, type DshUnifiedRecommendation } from '../shared';
 
 type FinanceSurface = 'overview' | 'settlements' | 'cod-reconciliation' | 'refunds' | 'payouts' | 'ledger' | 'risk-audit';
 
@@ -99,6 +102,54 @@ const FINANCE_ROWS: Record<FinanceSurface, ReadonlyArray<FinanceRow>> = {
   ],
 };
 
+function resolveSurfaceLabel(surface: FinanceSurface) {
+  if (surface === 'overview') return 'النظرة العامة';
+  if (surface === 'settlements') return 'التسويات';
+  if (surface === 'cod-reconciliation') return 'مطابقة الدفع عند الاستلام';
+  if (surface === 'refunds') return 'الاستردادات';
+  if (surface === 'payouts') return 'المدفوعات';
+  if (surface === 'ledger') return 'دفتر الأستاذ';
+  return 'المخاطر والتدقيق';
+}
+
+function resolveSurfaceDescription(surface: FinanceSurface) {
+  if (surface === 'overview') return 'ملخص مالي مضغوط يوضح أهم الصفوف الحرجة والاستحقاقات الحالية.';
+  if (surface === 'settlements') return 'غرفة مراجعة واعتماد التسويات للشركاء والكباتن.';
+  if (surface === 'cod-reconciliation') return 'مطابقة الدفع عند الاستلام، الفوارق النقدية، والتحقيقات المفتوحة.';
+  if (surface === 'refunds') return 'صف الاستردادات والنزاعات وما يرتبط بها من مراجعات.';
+  if (surface === 'payouts') return 'إطلاق المدفوعات ومراقبة التعارضات قبل التحويل.';
+  if (surface === 'ledger') return 'القيود اليومية وميزان المراجعة في غرفة عمل واحدة.';
+  return 'مراقبة المخاطر المالية والتدقيق قبل إغلاق اليوم المالي.';
+}
+
+function resolveRowTone(row: FinanceRow) {
+  if (row.risk === 'danger') {
+    return 'danger' as const;
+  }
+
+  if (row.risk === 'warning') {
+    return 'warning' as const;
+  }
+
+  return 'success' as const;
+}
+
+function resolveRisk(row: FinanceRow) {
+  if (row.risk === 'danger') {
+    return 'danger' as const;
+  }
+
+  if (row.risk === 'warning') {
+    return 'warning' as const;
+  }
+
+  return 'neutral' as const;
+}
+
+function resolveFinanceRowSelection(rows: ReadonlyArray<FinanceRow>, selectedId: string) {
+  return rows.find((row) => row.id === selectedId) ?? rows[0];
+}
+
 function toUnifiedRecommendation(surface: FinanceSurface, row: FinanceRow): DshUnifiedRecommendation {
   return {
     id: row.id,
@@ -151,112 +202,88 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
 
     return baseRows;
   }, [surface, subGroup]);
-  const selectedRow = rows.find((row) => row.id === selectedId) ?? rows[0];
+  const selectedRow = resolveFinanceRowSelection(rows, selectedId);
+  const selectedRecommendation = selectedRow ? toUnifiedRecommendation(surface, selectedRow) : undefined;
+  const criticalCount = rows.filter((row) => row.risk === 'danger').length;
+  const warningCount = rows.filter((row) => row.risk === 'warning').length;
 
   React.useEffect(() => {
     setSelectedId(rows[0]?.id ?? '');
-  }, [surface]);
+  }, [rows, surface]);
 
   return (
-    <div className={styles.operationsCockpit} dir="rtl">
-      <header className={styles.operationsTopBar}>
-        <div className={styles.operationsTitleBlock}>
-          <div className={styles.operationsHeaderIconBox} aria-hidden="true">
-            <div style={{ width: 18, height: 18, border: '2px solid #FFFFFF', borderRadius: 4, position: 'relative' }}>
-              <span style={{ position: 'absolute', top: '50%', left: '50%', width: 8, height: 2, backgroundColor: '#FFFFFF', transform: 'translate(-50%, -50%)' }} />
-            </div>
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>مالية DSH</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>غرفة قيادة</span>
-            </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>التسويات، COD، الاستردادات، والمخاطر المالية في غرفة واحدة مضغوطة.</p>
-          </div>
-        </div>
-
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
-            <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>الصفوف</span>
-              <span className={styles.commandKpiValue}>{rows.length}</span>
-            </div>
-            <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>المحدد</span>
-              <span className={styles.commandKpiValue} style={{ fontSize: '12px' }}>{selectedRow?.id ?? '—'}</span>
-            </div>
-            <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>المالك</span>
-              <span className={styles.commandKpiValue} style={{ fontSize: '12px' }}>{selectedRow?.owner ?? '—'}</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <WebControlPanelKpiStrip
-        items={[
-          { id: 'surface', label: 'المساحة', value: surface === 'overview' ? 'النظرة العامة' : surface === 'settlements' ? 'التسويات' : surface === 'cod-reconciliation' ? 'مطابقة COD' : surface === 'refunds' ? 'الاستردادات' : surface === 'payouts' ? 'المدفوعات' : surface === 'ledger' ? 'دفتر الأستاذ' : 'المخاطر والتدقيق', tone: 'neutral' },
-          { id: 'count', label: 'الصفوف المعروضة', value: String(rows.length), tone: 'success' },
-          { id: 'focus', label: 'التركيز', value: selectedRow?.owner ?? '—', tone: 'warning' },
-        ]}
-      />
-
-      <div className={styles.filterDock}>
-        <span style={{ fontSize: '11px', fontWeight: 800, color: '#64748B' }}>سطح مالي مضغوط</span>
-        <span style={{ fontSize: '11px', fontWeight: 800, color: '#0A2F5C' }}>{surface === 'overview' ? 'النظرة العامة' : surface === 'settlements' ? 'التسويات' : surface === 'cod-reconciliation' ? 'مطابقة COD' : surface === 'refunds' ? 'الاستردادات' : surface === 'payouts' ? 'المدفوعات' : surface === 'ledger' ? 'دفتر الأستاذ' : 'المخاطر والتدقيق'}</span>
-        <span style={{ fontSize: '11px', color: '#64748B' }}>{subGroup ? `الفلتر: ${subGroup}` : 'الواجهة متروكة للكثافة والتنفيذ فقط.'}</span>
-      </div>
-
-      <main className={styles.operationsMainPanel}>
-        <div className={styles.operationsInnerScroll}>
-          <Box gap={3} className={styles.operationsGridTwoCol}>
-            <Box gap={2} className={styles.operationsCompactPanel}>
-              <Text role="titleSm">صفوف {surface === 'overview' ? 'النظرة العامة' : surface === 'settlements' ? 'التسويات' : surface === 'cod-reconciliation' ? 'مطابقة COD' : surface === 'refunds' ? 'الاستردادات' : surface === 'payouts' ? 'المدفوعات' : surface === 'ledger' ? 'دفتر الأستاذ' : 'المخاطر والتدقيق'}</Text>
-              <div style={{ display: 'grid', gap: '8px' }}>
-                {rows.map((row) => (
-                  <WebControlPanelDecisionRow
-                    key={row.id}
-                    entityId={row.id}
-                    entityLabel={`${row.owner} · ${row.amount}`}
-                    status={row.status}
-                    statusTone={row.risk === 'danger' ? 'danger' : row.risk === 'warning' ? 'warning' : 'success'}
-                    risk={row.risk === 'danger' ? 'danger' : row.risk === 'warning' ? 'warning' : 'neutral'}
-                    recommendation={row.recommendation}
-                    reason={row.evidence}
-                    sla={`SLA ${row.sla} · الإجراء التالي ${row.nextAction}`}
-                    primaryAction={{ id: `${row.id}-primary`, label: row.primaryActionLabel, onAction: () => setSelectedId(row.id) }}
-                    secondaryAction={{ id: `${row.id}-secondary`, label: row.secondaryActionLabel, onAction: () => setSelectedId(row.id) }}
-                    onInspect={() => setSelectedId(row.id)}
-                  />
-                ))}
-              </div>
-            </Box>
-
-            <WebControlPanelInspectorShell title={`تفاصيل ${selectedRow?.id ?? ''}`}>
-              <Box gap={2}>
-                <Text role="bodySm">المالك: {selectedRow?.owner}</Text>
-                <Text role="bodySm">القيمة: {selectedRow?.amount}</Text>
-                <Text role="bodySm">الحالة: {selectedRow?.status}</Text>
-                <Text role="bodySm">الدليل: {selectedRow?.evidence}</Text>
-                <Text role="bodySm">الإجراء التالي: {selectedRow?.nextAction}</Text>
-                <WebControlPanelRecommendation
-                  title="توصية مالية"
-                  reason={selectedRow ? `لماذا؟ ${selectedRow.recommendation} · ما الدليل؟ ${selectedRow.evidence}` : 'اختر صفًا.'}
-                  confidence={selectedRow?.risk === 'danger' ? 'high' : 'medium'}
-                  auditTag={selectedRow?.owner ?? 'finance'}
-                  primaryAction={selectedRow ? { id: `${selectedRow.id}-a`, label: selectedRow.primaryActionLabel } : undefined}
-                  secondaryAction={selectedRow ? { id: `${selectedRow.id}-b`, label: selectedRow.secondaryActionLabel } : undefined}
-                />
-                <WebControlPanelActionCluster
-                  primary={{ id: 'approve', label: 'تنفيذ الآن' }}
-                  secondary={{ id: 'evidence', label: 'فتح الأدلة' }}
-                />
-              </Box>
-            </WebControlPanelInspectorShell>
+    <WebControlPanelWorkbench
+      header={
+        <WebControlPanelDenseHeader
+          eyebrow="المالية"
+          title={`غرفة قيادة ${resolveSurfaceLabel(surface)}`}
+          description={resolveSurfaceDescription(surface)}
+          metrics={[
+            { id: 'rows-count', label: 'الصفوف المعروضة', value: String(rows.length) },
+            { id: 'critical-count', label: 'المخاطر الحرجة', value: String(criticalCount) },
+            { id: 'warning-count', label: 'تحتاج متابعة', value: String(warningCount) },
+          ]}
+        />
+      }
+      main={
+        <Box gap={3}>
+          <Box gap={2} layoutDirection="row" wrap>
+            <WebControlPanelStatusTag label={resolveSurfaceLabel(surface)} tone="info" />
+            <WebControlPanelStatusTag label={subGroup ? `الفلتر ${subGroup}` : 'كل الصفوف'} tone="neutral" />
+            <WebControlPanelStatusTag label={selectedRow?.owner ?? 'لا يوجد تحديد'} tone={selectedRow ? resolveRowTone(selectedRow) : 'neutral'} />
+            <WebControlPanelStatusTag label={translateDshRuntimeBindingStatus('NEEDS_BINDING_LATER')} tone="warning" />
           </Box>
-        </div>
-      </main>
-    </div>
+
+          <WebControlPanelQueue
+            title={`صف ${resolveSurfaceLabel(surface)}`}
+            meta="كل صف مالي يحتفظ بقرار واحد واضح: مراجعة، اعتماد، أو فتح الأدلة قبل أي حركة لاحقة."
+            pager={<WebControlPanelCompactPager page={1} totalPages={1} summaryLabel="المشهد الحالي" />}
+          >
+            {rows.slice(0, 5).map((row) => (
+              <WebControlPanelDecisionRow
+                key={row.id}
+                entityId={row.id}
+                entityLabel={`${row.owner} · ${row.amount}`}
+                status={row.status}
+                statusTone={resolveRowTone(row)}
+                risk={resolveRisk(row)}
+                recommendation={row.recommendation}
+                reason={row.evidence}
+                sla={`زمن الالتزام ${row.sla} · الإجراء التالي ${row.nextAction}`}
+                primaryAction={{ id: `${row.id}-primary`, label: row.primaryActionLabel, onAction: () => setSelectedId(row.id) }}
+                secondaryAction={{ id: `${row.id}-secondary`, label: row.secondaryActionLabel, onAction: () => setSelectedId(row.id) }}
+                onInspect={() => setSelectedId(row.id)}
+              />
+            ))}
+          </WebControlPanelQueue>
+        </Box>
+      }
+      inspector={
+        <WebControlPanelInspectorShell title={`تفاصيل ${selectedRow?.id ?? ''}`}>
+          <Box gap={2}>
+            <Text role="bodySm">المالك: {selectedRow?.owner}</Text>
+            <Text role="bodySm">القيمة: {selectedRow?.amount}</Text>
+            <Text role="bodySm">الحالة: {selectedRow?.status}</Text>
+            <Text role="bodySm">الدليل: {selectedRow?.evidence}</Text>
+            <Text role="bodySm">الإجراء التالي: {selectedRow?.nextAction}</Text>
+
+            <WebControlPanelRecommendation
+              title="توصية مالية"
+              reason={selectedRow ? `لماذا؟ ${selectedRow.recommendation} · ما الدليل؟ ${selectedRow.evidence}` : 'اختر صفًا.'}
+              confidence={selectedRecommendation?.confidence ?? 'medium'}
+              auditTag="NEEDS_BINDING_LATER"
+              primaryAction={selectedRow ? { id: `${selectedRow.id}-recommendation-primary`, label: selectedRow.primaryActionLabel } : undefined}
+              secondaryAction={selectedRow ? { id: `${selectedRow.id}-recommendation-secondary`, label: selectedRow.secondaryActionLabel } : undefined}
+            />
+
+            <WebControlPanelActionCluster
+              primary={{ id: 'finance-primary', label: selectedRow?.primaryActionLabel ?? 'تنفيذ الآن' }}
+              secondary={{ id: 'finance-secondary', label: selectedRow?.secondaryActionLabel ?? 'فتح الأدلة' }}
+            />
+          </Box>
+        </WebControlPanelInspectorShell>
+      }
+    />
   );
 }
 

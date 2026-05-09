@@ -51,15 +51,6 @@ const SCREEN_RENDERERS: Record<CanonicalOperationsGroupId, React.ComponentType<{
   'audit-support-sla': AuditSupportSlaScreen,
 };
 
-const METRIC_ARABIC: Record<string, string> = {
-  'Open orders': 'الطلبات المفتوحة',
-  'Dispatch risk': 'خطر الإسناد',
-  'Captain cover': 'تغطية الكباتن',
-  'Escalations': 'الاستثناءات',
-  'Area capacity': 'ضغط المناطق',
-  'SLA risk': 'SLA risk',
-};
-
 export function ControlPanelDshOperationsScreen({
   group = 'command-center',
   orderId,
@@ -89,7 +80,7 @@ export function ControlPanelDshOperationsScreen({
 
   const kpiItems = OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => ({
     id: metric.id,
-    label: METRIC_ARABIC[metric.title] || metric.title,
+    label: metric.title,
     value: String(metric.value),
     tone: (metric.tone as 'neutral' | 'success' | 'warning' | 'danger' | undefined) ?? 'neutral',
   }));
@@ -111,7 +102,7 @@ export function ControlPanelDshOperationsScreen({
       {/* 1. Header — Identity + KPI Strip */}
       <header className={styles.operationsTopBar}>
         <div className={styles.operationsTitleBlock}>
-          <div className={styles.operationsHeaderIconBox}>⚙️</div>
+          <div className={styles.operationsHeaderIconBox}>ع</div>
           <div>
             <h1>عمليات DSH</h1>
             <p>مراقبة وتنفيذ الطلبات الحية</p>

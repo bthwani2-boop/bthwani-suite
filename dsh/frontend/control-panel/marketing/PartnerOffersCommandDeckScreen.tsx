@@ -91,7 +91,9 @@ export function PartnerOffersCommandDeckScreen() {
     return base;
   }, [items, pipelineFilter, searchQuery]);
 
-  const translateStatus = (status: PartnerOfferStatus): { label: string, tone: any } => {
+  type OfferTone = 'default' | 'warning' | 'brand' | 'success' | 'danger';
+
+  const translateStatus = (status: PartnerOfferStatus): { label: string, tone: OfferTone } => {
     switch (status) {
       case 'inbound': return { label: 'واردة', tone: 'default' };
       case 'review': return { label: 'مراجعة', tone: 'warning' };
@@ -107,7 +109,7 @@ export function PartnerOffersCommandDeckScreen() {
     switch (type) {
       case 'discount': return 'خصم مباشر';
       case 'free-delivery': return 'توصيل مجاني';
-      case 'bundle': return 'حزمة (Bundle)';
+      case 'bundle': return 'حزمة';
       case 'buy-x-get-y': return 'اشتر واحصل على';
       case 'coupon': return 'كوبون';
       default: return type;

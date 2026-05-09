@@ -13,6 +13,7 @@ import {
   WebControlPanelStatusTag,
   WebControlPanelWorkbench,
 } from '@bthwani/ui-kit/web';
+import { translateDshRuntimeBindingStatus } from '../shared';
 import { getMarketingReviewItems, approveMediaReviewItem, requestMediaFix, rejectMediaReviewItem, sendMediaToCatalog } from '../../shared/marketing-review-store';
 import { ApprovalRecord, ApprovalStage, isPartnerOwnedException, resolveNextOwner, translateEntityType, translateOwner, translateStage } from '../../shared/workflow';
 
@@ -172,7 +173,7 @@ export function MarketingReviewQueue() {
             <WebControlPanelStatusTag label={getStageMeta(selectedItem?.stage ?? 'marketing-review').label} tone={resolveTone(selectedItem?.stage ?? 'marketing-review')} />
             <WebControlPanelStatusTag label={selectedItem ? translateEntityType(selectedItem.entityType) : 'غير محدد'} tone="info" />
             <WebControlPanelStatusTag label={selectedItem ? resolvePolicyLabel(selectedItem) : 'سياسة غير محددة'} tone="neutral" />
-            <WebControlPanelStatusTag label="UI_PREVIEW_ONLY" tone="neutral" />
+            <WebControlPanelStatusTag label={translateDshRuntimeBindingStatus('UI_PREVIEW_ONLY')} tone="neutral" />
           </Box>
 
           <WebControlPanelQueue

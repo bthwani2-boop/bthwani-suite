@@ -38,7 +38,7 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry }: Partner
     <Box gap={6} style={{ direction: 'rtl' }}>
       <Box layoutDirection="row" justify="space-between" align="center">
         <Box gap={1}>
-          <Text role="caption" style={{ color: '#f97316', fontWeight: '800' }}>PARTNER INTAKE WORKFLOW</Text>
+          <Text role="caption" style={{ color: '#f97316', fontWeight: '800' }}>مسار استقبال الشركاء</Text>
           <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', color: '#0A2F5C' }}>طلبات الميدان والشركاء</Text>
         </Box>
       </Box>
@@ -52,7 +52,7 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry }: Partner
             value: m.value,
             tone: i === 0 ? 'warning' : 'neutral' as const
           })),
-          { id: 'decision-time', label: 'متوسط وقت القرار', value: '14m', tone: 'success' }
+          { id: 'decision-time', label: 'متوسط وقت القرار', value: '١٤ د', tone: 'success' }
         ]}
       />
 

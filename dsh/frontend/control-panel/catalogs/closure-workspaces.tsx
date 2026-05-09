@@ -4,29 +4,29 @@ import { ControlPanelDshWorkspaceFrame } from '../shared';
 export function ControlPanelDshCatalogApprovalScreen() {
   return (
     <ControlPanelDshWorkspaceFrame
-      eyebrow="Catalog approval"
-      title="Catalog approval and price health"
-      description="Item approval, listing status, price anomaly, and inventory approval stay visible."
-      badges={['catalogs', 'approval']}
-      metaItems={['item approval', 'listing status', 'price anomaly', 'inventory approval']}
+      eyebrow="اعتماد الكتالوج"
+      title="اعتماد العناصر وصحة الأسعار"
+      description="يبقى اعتماد العناصر، حالة الإدراج، شذوذ الأسعار، واعتماد المخزون ظاهرًا داخل المسار نفسه."
+      badges={['الكتالوج', 'الاعتماد']}
+      metaItems={['اعتماد العناصر', 'حالة الإدراج', 'شذوذ الأسعار', 'اعتماد المخزون']}
       decisionBoard={{
-        title: 'Catalog decision board',
-        purpose: 'Keep catalog approvals, list health, and publish gating in one control-room read.',
-        primaryDecision: 'Approve the item, hold it, or send it back for correction.',
-        nextAction: 'Open listing governance for conflicts, duplicates, or price anomalies.',
-        blockers: 'Pending approvals and inventory disagreements still block publish.',
+        title: 'لوحة قرار الكتالوج',
+        purpose: 'تحافظ على الاعتمادات وصحة الإدراج وبوابة النشر في قراءة تشغيلية واحدة.',
+        primaryDecision: 'اعتمد العنصر أو علّقه أو أعده للتصحيح.',
+        nextAction: 'افتح حوكمة الإدراج لمراجعة التعارضات والتكرارات وشذوذ الأسعار.',
+        blockers: 'الاعتمادات المعلقة وتعارضات المخزون ما زالت تمنع النشر.',
         ownerSurface: 'catalogs',
-        evidenceHint: 'catalog approval proof plus price health signals',
+        evidenceHint: 'دليل اعتماد الكتالوج مع إشارات صحة الأسعار',
         routeHint: '/catalogs',
         decisionTone: 'warning',
       }}
-      primaryAction={{ label: 'Open listing governance', href: '/operations?workspace=issues' }}
-      secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
+      primaryAction={{ label: 'افتح حوكمة الإدراج', href: '/operations?workspace=issues' }}
+      secondaryAction={{ label: 'افتح لوحة المتابعة', href: '/operations?workspace=dashboard' }}
       signals={[
-        { id: 'item-approval', title: 'Item approval', value: 'Ready', description: 'Approval queue is visible.', tone: 'brand' },
-        { id: 'listing-status', title: 'Listing status', value: 'Visible', description: 'Active and inactive items are legible.', tone: 'best' },
-        { id: 'price-anomaly', title: 'Price anomaly', value: 'Reviewed', description: 'Anomaly signals remain explicit.', tone: 'warning' },
-        { id: 'inventory-approval', title: 'Inventory approval', value: 'Open', description: 'Inventory approval queue is clear.', tone: 'warning' },
+        { id: 'item-approval', title: 'اعتماد العناصر', value: 'جاهز', description: 'صف الاعتماد ظاهر وواضح.', tone: 'brand' },
+        { id: 'listing-status', title: 'حالة الإدراج', value: 'ظاهر', description: 'العناصر النشطة وغير النشطة مقروءة بوضوح.', tone: 'best' },
+        { id: 'price-anomaly', title: 'شذوذ الأسعار', value: 'مراجع', description: 'إشارات الشذوذ ما زالت صريحة.', tone: 'warning' },
+        { id: 'inventory-approval', title: 'اعتماد المخزون', value: 'مفتوح', description: 'صف اعتماد المخزون واضح على السطح.', tone: 'warning' },
       ]}
     />
   );
@@ -35,29 +35,29 @@ export function ControlPanelDshCatalogApprovalScreen() {
 export function ControlPanelDshListingGovernanceScreen() {
   return (
     <ControlPanelDshWorkspaceFrame
-      eyebrow="Listing governance"
-      title="Catalog listing governance"
-      description="Active/inactive listing state, store catalog health, and duplicate/conflict signals stay visible."
-      badges={['governance']}
-      metaItems={['active', 'inactive', 'health', 'duplicates']}
+      eyebrow="حوكمة الإدراج"
+      title="حوكمة إدراج الكتالوج"
+      description="تبقى حالة الإدراج النشط وغير النشط وصحة كتالوج المتجر وإشارات التكرار والتعارض ظاهرة."
+      badges={['الحوكمة']}
+      metaItems={['نشط', 'غير نشط', 'الصحة', 'التكرارات']}
       decisionBoard={{
-        title: 'Listing governance board',
-        purpose: 'Keep the final publish gate visible before anything leaves the catalog lane.',
-        primaryDecision: 'Keep, merge, or block the listing before publish.',
-        nextAction: 'Open catalog approval for the selected item or conflict cluster.',
-        blockers: 'Duplicates, conflicts, and health gaps still need review.',
+        title: 'لوحة حوكمة الإدراج',
+        purpose: 'تحافظ على بوابة النشر النهائية ظاهرة قبل خروج أي عنصر من مسار الكتالوج.',
+        primaryDecision: 'أبقِ الإدراج أو ادمجه أو احجبه قبل النشر.',
+        nextAction: 'افتح اعتماد الكتالوج للعنصر المحدد أو مجموعة التعارض.',
+        blockers: 'التكرارات والتعارضات وفجوات الصحة ما زالت تحتاج مراجعة.',
         ownerSurface: 'catalogs',
-        evidenceHint: 'duplicate/conflict proof and store catalog health',
+        evidenceHint: 'دليل التكرار أو التعارض مع صحة كتالوج المتجر',
         routeHint: '/catalogs',
         decisionTone: 'brand',
       }}
-      primaryAction={{ label: 'Open catalog approval', href: '/catalogs' }}
-      secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
+      primaryAction={{ label: 'افتح اعتماد الكتالوج', href: '/catalogs' }}
+      secondaryAction={{ label: 'افتح لوحة المتابعة', href: '/operations?workspace=dashboard' }}
       signals={[
-        { id: 'active-listing', title: 'Active listings', value: 'Visible', description: 'Active items remain easy to scan.', tone: 'best' },
-        { id: 'inactive-listing', title: 'Inactive listings', value: 'Visible', description: 'Inactive items remain legible.', tone: 'warning' },
-        { id: 'catalog-health', title: 'Store catalog health', value: 'Checked', description: 'Catalog health stays on the surface.', tone: 'brand' },
-        { id: 'duplicate-conflict', title: 'Duplicate/conflict', value: 'Tracked', description: 'Signals are visible for escalation.', tone: 'warning' },
+        { id: 'active-listing', title: 'الإدراجات النشطة', value: 'ظاهر', description: 'العناصر النشطة ما زالت سهلة المسح.', tone: 'best' },
+        { id: 'inactive-listing', title: 'الإدراجات غير النشطة', value: 'ظاهر', description: 'العناصر غير النشطة ما زالت مقروءة.', tone: 'warning' },
+        { id: 'catalog-health', title: 'صحة كتالوج المتجر', value: 'مفحوصة', description: 'تبقى صحة الكتالوج على السطح مباشرة.', tone: 'brand' },
+        { id: 'duplicate-conflict', title: 'التكرار والتعارض', value: 'مرصود', description: 'الإشارات ظاهرة للتصعيد عند الحاجة.', tone: 'warning' },
       ]}
     />
   );

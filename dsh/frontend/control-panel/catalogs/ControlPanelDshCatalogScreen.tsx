@@ -36,6 +36,28 @@ type WorkspaceMode =
 
 type FilterType = 'all' | 'master' | 'partner-exception' | 'partner-review' | 'marketing-review' | 'price-conflict' | 'non-matching' | 'category-proposals';
 
+type CatalogFilterColumnId = keyof typeof initialColumnFilters;
+
+type FilterDropdownProps = {
+  title: string;
+  options: readonly string[];
+  selected: readonly string[];
+  onChange: (nextValues: string[]) => void;
+  onClose: () => void;
+};
+
+const initialColumnFilters = {
+  name: [],
+  category: [],
+  classification: [],
+  sku: [],
+  price: [],
+  policy: [],
+  status: [],
+  source: [],
+  categoryMode: [],
+} satisfies Record<string, string[]>;
+
 // --- Shared Components ---
 
 function FilterToken({ label, onRemove }: { label: string, onRemove: () => void }) {
@@ -77,23 +99,25 @@ function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: { label:
 const WATERMARK_URL = '/dsh/media-fixtures/assets/seed/dsh/logo.png';
 
 function WatermarkedImage({ src, fallback, size = 32 }: { src?: string, fallback?: string, size?: number }) {
+  const fallbackLabel = 'ص';
+
   return (
     <Surface tone="inset" padding={0} border radiusToken="xs" style={{ width: size, height: size, position: 'relative', overflow: 'hidden', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
       {src ? (
-        <img src={src} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Product" />
+        <img src={src} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="صورة المنتج" />
       ) : (
-        <Text style={{ fontSize: `${size/2}px` }}>{fallback || '📦'}</Text>
+        <Text style={{ fontSize: `${size/2}px` }}>{fallbackLabel}</Text>
       )}
       <Box style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', alignItems: 'center', justifyContent: 'center', opacity: 0.4, backgroundColor: 'rgba(255,255,255,0.15)' }}>
-        <img src={WATERMARK_URL} style={{ width: '80%', height: '80%', objectFit: 'contain' }} alt="Watermark" />
+        <img src={WATERMARK_URL} style={{ width: '80%', height: '80%', objectFit: 'contain' }} alt="شعار المنصة" />
       </Box>
     </Surface>
   );
 }
 
-const FilterDropdown = ({ title, options, selected, onChange, onClose }: any) => {
+const FilterDropdown = ({ title, options, selected, onChange, onClose }: FilterDropdownProps) => {
   const [search, setSearch] = useState('');
-  const filteredOptions = options.filter((o: string) => o.toLowerCase().includes(search.toLowerCase()));
+  const filteredOptions = options.filter((option) => option.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <Surface tone="raised" padding={2} gap={2} style={{ position: 'absolute', top: '100%', right: 0, zIndex: 50, width: 200, marginTop: 4 }}>
@@ -109,14 +133,14 @@ const FilterDropdown = ({ title, options, selected, onChange, onClose }: any) =>
            <Box padding={2} align="center">
              <Text role="caption" tone="muted">لا توجد نتائج</Text>
            </Box>
-        ) : filteredOptions.map((opt: string) => (
+        ) : filteredOptions.map((opt) => (
           <Box key={opt} layoutDirection="row" align="center" gap={2} paddingY={1} style={{ cursor: 'pointer' }}>
             <input
               type="checkbox"
               checked={selected.includes(opt)}
               onChange={(e) => {
                 if (e.target.checked) onChange([...selected, opt]);
-                else onChange(selected.filter((s: string) => s !== opt));
+                else onChange(selected.filter((selectedOption) => selectedOption !== opt));
               }}
               style={{ accentColor: '#0A2F5C' }}
             />
@@ -192,10 +216,8 @@ export function ControlPanelDshCatalogScreen({
   const workspaceMode = activeTab; // Bridge for existing logic
 
   // Column Filters
-  const [colFilters, setColFilters] = useState<Record<string, string[]>>({
-    name: [], category: [], classification: [], sku: [], price: [], policy: [], status: [], source: [], categoryMode: []
-  });
-  const [openFilterCol, setOpenFilterCol] = useState<string | null>(null);
+  const [colFilters, setColFilters] = useState<Record<CatalogFilterColumnId, string[]>>(initialColumnFilters);
+  const [openFilterCol, setOpenFilterCol] = useState<CatalogFilterColumnId | null>(null);
 
   // Handlers
   const handleMainCategorySelect = (cat: CatalogMainCategory | null) => {
@@ -208,8 +230,6 @@ export function ControlPanelDshCatalogScreen({
   const isManualOrderCategory = activeMainCategory?.categoryMode === 'manual-order';
 
   const { filteredProducts, counts, filterOptions } = useMemo(() => {
-    console.log('[CatalogScreen] Recalculating filters...', { searchQuery, activeFilter, activeMainCategory: activeMainCategory?.id });
-
     // 1. Base set: filter by Category and Manual Order mode
     if (isManualOrderCategory) {
       return {
@@ -218,7 +238,7 @@ export function ControlPanelDshCatalogScreen({
           'all': 0, 'master': 0, 'partner-exception': 0, 'partner-review': 0, 'marketing-review': 0, 'price-conflict': 0, 'non-matching': 0, 'category-proposals': 0
         },
         filterOptions: {
-          name: [], category: [], classification: [], sku: [], price: [], policy: [], status: [], source: [], categoryMode: []
+          ...initialColumnFilters
         }
       };
     }
@@ -301,7 +321,7 @@ export function ControlPanelDshCatalogScreen({
 
   const activeColFiltersCount = Object.values(colFilters).flat().length;
 
-  const renderColHeader = (colId: string, title: string, width?: string) => (
+  const renderColHeader = (colId: CatalogFilterColumnId, title: string, width?: string) => (
     <th style={{ padding: '6px 12px', fontSize: '11px', color: '#64748B', textAlign: 'right', width, position: 'relative' }}>
        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '4px', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); setOpenFilterCol(openFilterCol === colId ? null : colId); }}>
           <span>{title}</span>
@@ -309,11 +329,10 @@ export function ControlPanelDshCatalogScreen({
        </div>
        {openFilterCol === colId && (
          <FilterDropdown
-            column={colId}
             title={title}
             options={filterOptions[colId as keyof typeof filterOptions] || []}
             selected={colFilters[colId]}
-            onChange={(val: string[]) => setColFilters(prev => ({ ...prev, [colId]: val }))}
+          onChange={(val) => setColFilters(prev => ({ ...prev, [colId]: val }))}
             onClose={() => setOpenFilterCol(null)}
          />
        )}
@@ -340,10 +359,10 @@ export function ControlPanelDshCatalogScreen({
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>كتالوج DSH</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#DCFCE7', color: '#16A34A', borderRadius: '4px', fontWeight: '800' }}>مباشر</span>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>كتالوج المنصة</h1>
+              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#DCFCE7', color: '#16A34A', borderRadius: '4px', fontWeight: '800' }}>جاهز للمراجعة</span>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>إدارة المنتجات، الفئات، والتوافر العابر للأسطح</p>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>إدارة المنتجات والفئات ومخاطر التبني عبر الأسطح من دون ضجيج تشغيلي زائد.</p>
           </div>
         </div>
 
@@ -410,7 +429,7 @@ export function ControlPanelDshCatalogScreen({
       {/* 3. Filter Dock & Tools */}
       <div className={styles.filterDock}>
         <Box style={{ width: 300 }}>
-          <SearchField placeholder="بحث شامل بالمنتج، باركود، SKU..." value={searchQuery} onChangeText={setSearchQuery} />
+          <SearchField placeholder="بحث شامل بالمنتج أو الباركود أو المعرف..." value={searchQuery} onChangeText={setSearchQuery} />
         </Box>
 
         {workspaceMode === 'catalog' && (
@@ -418,7 +437,7 @@ export function ControlPanelDshCatalogScreen({
             <Text role="caption" style={{ fontWeight: 800, color: '#64748B' }}>الفئة:</Text>
             <Chip label="الكل" size="sm" tone={!activeMainCategory ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(null)} selected={!activeMainCategory} />
             {dshCatalogCategories.map(cat => (
-              <Chip key={cat.id} label={`${cat.emojiFallback} ${cat.label}`} size="sm" tone={activeMainCategory?.id === cat.id ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(cat)} selected={activeMainCategory?.id === cat.id} />
+              <Chip key={cat.id} label={cat.label} size="sm" tone={activeMainCategory?.id === cat.id ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(cat)} selected={activeMainCategory?.id === cat.id} />
             ))}
           </div>
         )}
@@ -442,7 +461,7 @@ export function ControlPanelDshCatalogScreen({
 
           {(activeFilter !== 'all' || searchQuery || activeColFiltersCount > 0) && (
              <div style={{ display: 'flex', gap: '4px', alignItems: 'center', marginRight: 'auto' }}>
-                <Button label="مسح الكل" tone="secondary" size="xs" onPress={() => { setActiveFilter('all'); setSearchQuery(''); setColFilters({ name: [], category: [], classification: [], sku: [], price: [], policy: [], status: [], source: [], categoryMode: [] }); }} />
+               <Button label="مسح الكل" tone="secondary" size="xs" onPress={() => { setActiveFilter('all'); setSearchQuery(''); setColFilters(initialColumnFilters); }} />
              </div>
           )}
         </div>
@@ -473,7 +492,6 @@ export function ControlPanelDshCatalogScreen({
             <div style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', backgroundColor: '#FFFFFF' }}>
                {isManualOrderCategory ? (
                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '48px', opacity: 0.7 }}>
-                   <div style={{ fontSize: '48px', marginBottom: '16px' }}>🛍️</div>
                    <Text role="titleMd" style={{ color: '#0A2F5C' }}>فئة الطلب اليدوي</Text>
                    <Text role="bodySm" tone="muted" style={{ textAlign: 'center', maxWidth: '400px', marginTop: '8px' }}>
                      المنتجات في هذه الفئة (مثل شي إن، عونك) تُعامل كطلبات مرنة ولا تحتوي على منتجات كتالوج قياسية محددة مسبقاً.
@@ -488,7 +506,7 @@ export function ControlPanelDshCatalogScreen({
                         {renderColHeader('name', 'المنتج', '20%')}
                         {renderColHeader('category', 'الفئة', '12%')}
                         {renderColHeader('classification', 'التصنيف', '10%')}
-                        {renderColHeader('sku', 'SKU/GTIN', '15%')}
+                        {renderColHeader('sku', 'المعرف / الباركود', '15%')}
                         {renderColHeader('price', 'السعر', '8%')}
                         {renderColHeader('policy', 'السياسة', '10%')}
                         {renderColHeader('status', 'الحالة', '10%')}
@@ -554,7 +572,7 @@ export function ControlPanelDshCatalogScreen({
                    <WatermarkedImage src={selectedProduct.imageUri} fallback={selectedProduct.emojiFallback} size={48} />
                    <Box style={{ flex: 1 }} gap={0}>
                       <Text role="bodyStrong" style={{ fontSize: '13px' }}>{selectedProduct.name}</Text>
-                      <Text role="caption" tone="muted" style={{ fontSize: '10px' }}>SKU: {selectedProduct.sku}</Text>
+                     <Text role="caption" tone="muted" style={{ fontSize: '10px' }}>المعرف: {selectedProduct.sku}</Text>
                    </Box>
                 </Box>
 

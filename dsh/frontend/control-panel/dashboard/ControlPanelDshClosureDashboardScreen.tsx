@@ -80,7 +80,7 @@ export function ControlPanelDshClosureHubScreen() {
             fontSize: '16px',
             boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
           }}>
-            🏁
+            إ
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -96,7 +96,7 @@ export function ControlPanelDshClosureHubScreen() {
             {[
               { label: 'مكتمل', value: '٨٢٪', tone: 'success' },
               { label: 'بانتظار دليل', value: '١٤' },
-              { label: 'توقف (Blocker)', value: '٣', tone: 'danger' }
+              { label: 'معطّل', value: '٣', tone: 'danger' }
             ].map((m) => (
               <div key={m.label} className={styles.commandKpi}>
                 <span className={styles.commandKpiLabel}>{m.label}</span>

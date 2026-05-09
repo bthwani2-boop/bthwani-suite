@@ -42,6 +42,8 @@ const FILTERS: { id: FilterKind; label: string }[] = [
   { id: 'catalog-ready', label: 'جاهزة للكتالوج' },
 ];
 
+type MarketingTone = 'default' | 'warning' | 'brand' | 'success' | 'danger';
+
 // ─────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────
@@ -56,7 +58,7 @@ function policyLabel(p: MediaPolicyKind): string {
   }
 }
 
-function policyTone(p: MediaPolicyKind): any {
+function policyTone(p: MediaPolicyKind): MarketingTone {
   switch (p) {
     case 'catalog-owned-media': return 'success';
     case 'partner-owned-exception': return 'warning';
@@ -66,7 +68,7 @@ function policyTone(p: MediaPolicyKind): any {
   }
 }
 
-function getStageMeta(stage: ApprovalStage): { text: string; tone: any } {
+function getStageMeta(stage: ApprovalStage): { text: string; tone: MarketingTone } {
   const text = translateStage(stage);
   switch (stage) {
     case 'marketing-review': return { text, tone: 'warning' };
@@ -276,7 +278,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
                 {(selected.stage === 'catalog-adopted' || selected.stage === 'rejected') && (
                   <Surface tone="inset" padding={3}>
                     <Text role="caption" style={{ fontWeight: 800 }}>
-                      {selected.stage === 'catalog-adopted' ? '✅ تم الإرسال للكتالوج بنجاح' : '❌ العنصر مرفوض'}
+                      {selected.stage === 'catalog-adopted' ? 'تم الإرسال للكتالوج بنجاح' : 'العنصر مرفوض'}
                     </Text>
                   </Surface>
                 )}
@@ -296,7 +298,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
               {/* ownership notice */}
               <Box padding={3} style={{ backgroundColor: 'rgba(3,105,161,0.05)', borderRadius: '12px', borderLeftWidth: 4, borderLeftColor: '#0369A1' }}>
                 <Text role="caption" style={{ color: '#0369A1', lineHeight: 1.6 }}>
-                  📌 ملاحظة: الاعتماد التسويقي هو خطوة وسيطة. النشر الفعلي يتم عبر فريق الكتالوج لضمان الجودة المركزية.
+                  ملاحظة: الاعتماد التسويقي هو خطوة وسيطة. النشر الفعلي يتم عبر فريق الكتالوج لضمان الجودة المركزية.
                 </Text>
               </Box>
             </Box>

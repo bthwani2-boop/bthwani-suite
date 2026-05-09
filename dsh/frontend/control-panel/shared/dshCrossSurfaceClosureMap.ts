@@ -8,6 +8,21 @@ export type DshClosureStatus = 'closed' | 'needs-evidence' | 'needs-ui-flow' | '
 
 export type DshRuntimeBindingStatus = 'UI_PREVIEW_ONLY' | 'NEEDS_BINDING_LATER' | 'NEEDS_RUNTIME_EVIDENCE' | 'BLOCKED';
 
+export function translateDshRuntimeBindingStatus(status: DshRuntimeBindingStatus): string {
+  switch (status) {
+    case 'UI_PREVIEW_ONLY':
+      return 'معاينة واجهة فقط';
+    case 'NEEDS_BINDING_LATER':
+      return 'يحتاج ربطًا لاحقًا';
+    case 'NEEDS_RUNTIME_EVIDENCE':
+      return 'يحتاج دليل تشغيل';
+    case 'BLOCKED':
+      return 'محجوب';
+    default:
+      return status;
+  }
+}
+
 export type DshActor = 'client' | 'partner' | 'captain' | 'field' | 'operator';
 
 export type DshLifecycleStep =

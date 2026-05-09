@@ -30,12 +30,16 @@ type SupportRow = {
   secondaryActionLabel: string;
 };
 
+function resolveCommitmentLabel() {
+  return 'خطر الالتزام';
+}
+
 const PRIMARY_TABS: ReadonlyArray<{ id: SupportTab; label: string }> = [
   { id: 'queue', label: 'صفوف الدعم' },
   { id: 'disputes', label: 'النزاعات' },
   { id: 'feedback', label: 'الآراء' },
   { id: 'escalation', label: 'التصعيد' },
-  { id: 'sla-risk', label: 'خطر SLA' },
+  { id: 'sla-risk', label: resolveCommitmentLabel() },
 ];
 
 const SECONDARY_TABS: Record<SupportTab, ReadonlyArray<{ id: SupportLane | 'الكل'; label: string }>> = {
@@ -163,7 +167,7 @@ export function ControlPanelDshSupportHubScreen() {
               <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>دعم DSH</h1>
               <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>غرفة قيادة</span>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>صفوف دعم، نزاعات، تصعيد، وخطر SLA في غرفة واحدة مضغوطة.</p>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>صفوف دعم، نزاعات، تصعيد، وخطر الالتزام في غرفة واحدة مضغوطة.</p>
           </div>
         </div>
 
@@ -178,7 +182,7 @@ export function ControlPanelDshSupportHubScreen() {
               <span className={styles.commandKpiValue} style={{ color: '#D97706' }}>٩</span>
             </div>
             <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>خطر SLA</span>
+              <span className={styles.commandKpiLabel}>{resolveCommitmentLabel()}</span>
               <span className={styles.commandKpiValue} style={{ color: '#DC2626' }}>٣</span>
             </div>
           </div>
@@ -207,7 +211,7 @@ export function ControlPanelDshSupportHubScreen() {
 
       <div className={styles.filterDock}>
         <span style={{ fontSize: '11px', fontWeight: 800, color: '#64748B' }}>السطح الحالي</span>
-        <span style={{ fontSize: '11px', fontWeight: 800, color: '#0A2F5C' }}>{activeTab === 'queue' ? 'صفوف الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : 'خطر SLA'}</span>
+        <span style={{ fontSize: '11px', fontWeight: 800, color: '#0A2F5C' }}>{activeTab === 'queue' ? 'صفوف الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : resolveCommitmentLabel()}</span>
         <span style={{ fontSize: '11px', color: '#64748B' }}>يتم التصفية عبر التبويبات الفرعية فقط.</span>
       </div>
 
@@ -215,7 +219,7 @@ export function ControlPanelDshSupportHubScreen() {
         <div className={styles.operationsInnerScroll}>
           <Box gap={3} className={styles.operationsGridTwoCol}>
             <Box gap={2} className={styles.operationsCompactPanel}>
-              <Text role="titleSm">صفوف {activeTab === 'queue' ? 'الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : 'خطر SLA'}</Text>
+              <Text role="titleSm">صفوف {activeTab === 'queue' ? 'الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : resolveCommitmentLabel()}</Text>
               <div style={{ display: 'grid', gap: '8px' }}>
                 {rows.map((row) => (
                   <WebControlPanelDecisionRow
@@ -227,7 +231,7 @@ export function ControlPanelDshSupportHubScreen() {
                     risk={row.severity === 'danger' ? 'danger' : row.severity === 'warning' ? 'warning' : 'neutral'}
                     recommendation={row.recommendation}
                     reason={row.blocker}
-                    sla={`SLA ${row.slaAge} · المالك ${row.owner}`}
+                    sla={`زمن الالتزام ${row.slaAge} · المالك ${row.owner}`}
                     primaryAction={{ id: `${row.id}-primary`, label: row.primaryActionLabel, onAction: () => setSelectedId(row.id) }}
                     secondaryAction={{ id: `${row.id}-secondary`, label: row.secondaryActionLabel, onAction: () => setSelectedId(row.id) }}
                     onInspect={() => setSelectedId(row.id)}
