@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Box, Text } from '@bthwani/ui-kit';
 
 export type OperationsConfidenceLevel = 'high' | 'medium' | 'low';
 
@@ -39,6 +40,9 @@ export type OperationsSuggestionCardProps = {
   actions?: React.ReactNode;
 };
 
+/**
+ * @deprecated Use WebControlPanelRecommendation or WebControlPanelDecisionRow from @bthwani/ui-kit/web
+ */
 export function OperationsSuggestionCard({
   title = 'توصية النظام',
   label,
@@ -48,57 +52,30 @@ export function OperationsSuggestionCard({
   actions,
 }: OperationsSuggestionCardProps) {
   return (
-    <div
+    <Box
+      gap={2}
       style={{
         marginTop: '4px',
-        padding: '6px 8px',
+        padding: '12px',
         backgroundColor: 'rgba(10,47,92,0.03)',
-        border: '1px solid rgba(10,47,92,0.07)',
-        borderRadius: '8px',
-        display: 'grid',
-        gap: '4px',
+        border: '1px solid rgba(10,47,92,0.08)',
+        borderRadius: '12px',
+        flex: 1,
         minWidth: 0,
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '8px',
-          flexWrap: 'wrap',
-          minWidth: 0,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexWrap: 'wrap' }}>
-          <div style={{ fontSize: '11px', fontWeight: 800, color: '#0A2F5C', lineHeight: 1.25, whiteSpace: 'nowrap' }}>
-            {title}:
-          </div>
-          <div style={{ fontSize: '12px', fontWeight: 700, color: '#0A2F5C', lineHeight: 1.35, minWidth: 0 }}>
-            {label}
-          </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+          <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C', whiteSpace: 'nowrap' }}>{title}:</Text>
+          <Text role="bodyStrong" style={{ color: '#0A2F5C', flex: 1, minWidth: 0 }}>{label}</Text>
         </div>
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <ConfidenceBadge level={confidence} />
           {children}
         </div>
       </div>
-      <div
-        style={{
-          fontSize: '11px',
-          color: '#64748B',
-          lineHeight: 1.4,
-          display: '-webkit-box',
-          WebkitLineClamp: 2 as unknown as number,
-          WebkitBoxOrient: 'vertical' as const,
-          overflow: 'hidden',
-        }}
-      >
-        السبب: {reason}
-      </div>
-      {actions ? (
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '0' }}>{actions}</div>
-      ) : null}
-    </div>
+      <Text role="caption" tone="muted" style={{ lineHeight: '1.4' }}>السبب: {reason}</Text>
+      {actions && <div style={{ marginTop: 4 }}>{actions}</div>}
+    </Box>
   );
 }

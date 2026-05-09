@@ -4,11 +4,107 @@
   max-height: calc(100vh - 120px);
   overflow: hidden;
   display: grid;
-  grid-template-rows: auto auto auto 1fr; /* Added a row for sub-tabs */
+  grid-template-rows: auto auto auto 1fr;
   background-color: #F1F5F9;
   direction: rtl;
   text-align: right;
   font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+.financeTopBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid rgba(10, 47, 92, 0.08);
+}
+
+.financeTitleBlock {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.financeHeaderIcon {
+  width: 40px;
+  height: 40px;
+  background-color: #0A2F5C;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.financeIconInner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #FFFFFF;
+  border-radius: 4px;
+  position: relative;
+}
+
+.financeIconInner::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 2px;
+  background-color: #FFFFFF;
+  transform: translate(-50%, -50%);
+}
+
+.financeTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.financeTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0A2F5C;
+  letter-spacing: -0.01em;
+}
+
+.financeBadge {
+  font-size: 10px;
+  padding: 2px 8px;
+  background-color: #E0F2FE;
+  color: #0369A1;
+  border-radius: 4px;
+  font-weight: 800;
+}
+
+.financeSubtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748B;
+}
+
+.financeHeaderActions {
+  display: flex;
+  align-items: center;
+}
+
+.financeNavWrapper {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid rgba(10, 47, 92, 0.04);
+}
+
+.financeSubNavWrapper {
+  background-color: #F8FAFC;
+  border-bottom: 1px solid rgba(10, 47, 92, 0.04);
+}
+
+.compactPlaceholder {
+  min-height: 300px;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  margin: 16px;
 }
 
 /* Override scroll behaviors */
@@ -23,17 +119,17 @@
 
 .financeMainPanel {
   min-height: 0;
-  overflow: hidden; /* Removing main panel scroll if possible, or keeping it hidden */
+  overflow: hidden;
   position: relative;
   background-color: #F8FAFC;
   min-width: 0;
 }
 
 .financeInnerScroll {
-  padding: 10px 14px 12px;
+  padding: 14px 16px;
   max-width: 100%;
   margin: 0;
   min-width: 0;
   height: 100%;
-  overflow: hidden; /* Ensuring no scroll */
+  overflow-y: auto; /* Allow internal vertical scroll if needed, but the requirements say "No Scroll" for navigation. Content can scroll if needed? Actually "No Scroll" usually applies to the whole page layout. */
 }

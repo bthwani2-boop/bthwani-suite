@@ -13,107 +13,30 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useDirection, useUiText } from '@bthwani/ui-kit';
 import {
-  WebControlActionButton,
-  WebControlActionCard,
   WebCommandCenterFrame,
-  WebControlDisclosureItem,
-  WebControlSurfaceHeader,
-  WebSectionCard,
   WebSignalCard,
-  WebCompactSurfaceHeader,
-  WebSystemSuggestion,
 } from '@bthwani/ui-kit/web';
 import {
-  buildOperationsHref,
   type AnyOperationsWorkspaceId,
   type OperationsPanelId,
 } from '../../dsh/frontend/control-panel/operations';
+import type {
+  CanonicalFinanceGroupId,
+  FinancePanelId,
+} from '../../dsh/frontend/control-panel/finance/finance.types';
 import { controlPanelRuntimeData } from './runtime.data';
 import styles from './control-panel-shell.module.css';
 
 const phaseOneSectionIds = ['dashboard', 'operations', 'finance', 'community-services', 'support'] as const;
 const hiddenSectionIds = ['catalogs', 'partners', 'marketing', 'platform', 'administration', 'hr'] as const;
 const primarySectionIds = [...phaseOneSectionIds, ...hiddenSectionIds] as const;
-const dshLiveWorkbenchIds = ['orders', 'reassign', 'peakMode', 'arrivalBell'] as const;
-const dshPlannedWorkbenchIds = ['sheinProxy', 'zoneSet', 'dashboard', 'captain-ops', 'field-ops', 'issues', 'serviceability', 'guard-status', 'evidence', 'dispatch', 'live-tracking', 'exceptions', 'sla', 'audit', 'partner-prep', 'handoff', 'proof-review', 'capacity'] as const;
 
 type ControlPanelSectionId = (typeof primarySectionIds)[number];
 type PhaseOneSectionId = (typeof phaseOneSectionIds)[number];
 type PrimarySectionHref = `/${ControlPanelSectionId}`;
 type ControlPanelText = ReturnType<typeof useUiText>['controlPanel'];
-type ActionTone = 'primary' | 'secondary';
 type SignalTone = React.ComponentProps<typeof WebSignalCard>['tone'];
 
-type SectionActionView = {
-  id: string;
-  label: string;
-  description: string;
-  footerLabel: string;
-  href?: string;
-  badge?: string;
-  tone?: ActionTone;
-  onAction?: () => void;
-};
-
-type DisclosureItemView = {
-  id: string;
-  label: string;
-  description: string;
-  href?: string;
-  badge?: string;
-  onAction?: () => void;
-};
-
-type KpiView = {
-  id: string;
-  title: string;
-  value: string;
-  description: string;
-  tone?: SignalTone;
-};
-
-type SectionBlueprint = {
-  eyebrow: string;
-  title: string;
-  description: string;
-  primaryAction: SectionActionView;
-  kpis: ReadonlyArray<KpiView>;
-  quickActionsTitle: string;
-  quickActionsDescription: string;
-  quickActions: ReadonlyArray<SectionActionView>;
-  disclosureTitle: string;
-  disclosureDescription: string;
-  disclosureItems: ReadonlyArray<DisclosureItemView>;
-};
-
-type WorkbenchMeta = {
-  label: string;
-  description: string;
-  routeHint: string;
-  statusLabel: string;
-};
-
-const dshWorkbenchMetaFallback: Record<string, WorkbenchMeta> = {
-  dispatch: { label: 'Dispatch', description: 'Assignment and captain board', routeHint: '/operations?workspace=dispatch', statusLabel: 'Preview' },
-  'live-tracking': { label: 'Live tracking', description: 'Event timeline', routeHint: '/operations?workspace=live-tracking', statusLabel: 'Preview' },
-  exceptions: { label: 'Exceptions', description: 'Unified exception queue', routeHint: '/operations?workspace=exceptions', statusLabel: 'Preview' },
-  sla: { label: 'SLA', description: 'Delay monitor', routeHint: '/operations?workspace=sla', statusLabel: 'Preview' },
-  audit: { label: 'Audit', description: 'Manual action audit', routeHint: '/operations?workspace=audit', statusLabel: 'Preview' },
-  'partner-prep': { label: 'Partner prep', description: 'Partner readiness monitor', routeHint: '/operations?workspace=partner-prep', statusLabel: 'Preview' },
-  handoff: { label: 'Handoff', description: 'Pickup and dropoff verification', routeHint: '/operations?workspace=handoff', statusLabel: 'Preview' },
-  'proof-review': { label: 'Proof review', description: 'Proof asset review', routeHint: '/operations?workspace=proof-review', statusLabel: 'Preview' },
-  capacity: { label: 'Capacity', description: 'Area capacity monitor', routeHint: '/operations?workspace=capacity', statusLabel: 'Preview' },
-};
-
-function resolveWorkbenchMeta(workbenches: Record<string, WorkbenchMeta>, workbenchId: string): WorkbenchMeta {
-  const existingMeta = workbenches[workbenchId];
-  return existingMeta ?? dshWorkbenchMetaFallback[workbenchId] ?? {
-    label: workbenchId,
-    description: 'Preview workspace',
-    routeHint: `/operations?workspace=${workbenchId}`,
-    statusLabel: 'Preview',
-  };
-}
 export type ControlPanelSurfaceHostProps = {
   section?: ControlPanelSectionId;
   operationsWorkspace?: AnyOperationsWorkspaceId;
@@ -124,17 +47,6 @@ export type ControlPanelSurfaceHostProps = {
 };
 
 const allServiceTabId = 'all-services';
-const serviceIconMap: Record<string, string> = {
-  dsh: '◈',
-  knz: '⌂',
-  amn: '◍',
-  arb: '⌁',
-  wlt: '◳',
-  kwd: '⌘',
-  esf: '◌',
-  mrf: '◰',
-  snd: '◔',
-};
 
 const sectionRouteMap: Record<ControlPanelSectionId, PrimarySectionHref> = {
   dashboard: '/dashboard',
@@ -244,7 +156,6 @@ export function ControlPanelSurfaceHost({
   const activeSectionId = activeSectionHref.slice(1) as ControlPanelSectionId;
   const isOperationsSection = activeSectionId === 'operations';
   const isMarketingSection = activeSectionId === 'marketing';
-  const isCommunityServicesSection = activeSectionId === 'community-services';
   const isAllFilterActive = selectedServiceId === allServiceTabId;
   const shellCopy = resolveShellCopy(panelText, activeSectionId);
   const railItems = React.useMemo(() => {
@@ -278,37 +189,6 @@ export function ControlPanelSurfaceHost({
     ? undefined
     : controlPanelRuntimeData.services.find((service) => service.id === selectedServiceId);
   const selectedServiceLabel = selectedServiceMeta ? getServiceLabel(uiText, selectedServiceMeta.id) : panelText.filters.allServices;
-  const serviceSections = selectedServiceMeta?.sections ?? [];
-  const serviceSectionLabels = serviceSections.map((sectionId) => panelText.surfaceTitles[sectionId as ControlPanelSectionId] ?? sectionId);
-  const sectionServiceIds = getSectionServiceIds(activeSectionId);
-  const sectionServiceNames = sectionServiceIds.map((serviceId) => getServiceLabel(uiText, serviceId));
-  const liveCoverageCount = countLiveCoverage(sectionServiceIds);
-  const referenceCoverageCount = sectionServiceIds.length - liveCoverageCount;
-  const scopedSectionUnavailable = !isAllFilterActive && !serviceSections.includes(activeSectionId);
-  const readyMissionCount = controlPanelRuntimeData.missions.filter((mission) => !mission.placeholder).length;
-  const liveServiceCount = React.useMemo(
-    () => controlPanelRuntimeData.services.filter((service) => !service.placeholder).length,
-    [],
-  );
-  const referenceServiceCount = controlPanelRuntimeData.services.length - liveServiceCount;
-  const communityServiceItems = React.useMemo(() => (
-    sectionServiceIds.map((serviceId) => {
-      const serviceMeta = controlPanelRuntimeData.services.find((service) => service.id === serviceId);
-
-      return {
-        id: `community-${serviceId}`,
-        label: getServiceLabel(uiText, serviceId),
-        description: serviceMeta?.placeholder ? 'مرجع' : 'متصل',
-        badge: serviceMeta?.placeholder ? panelText.filters.reference : panelText.ui.liveRefreshValue,
-        onAction: () => setSelectedServiceId(serviceId),
-      } satisfies DisclosureItemView;
-    })
-  ), [panelText.filters.reference, panelText.ui.liveRefreshValue, sectionServiceIds, uiText]);
-
-  const resolveActionHandler = React.useCallback(
-    (href?: string, onAction?: () => void) => onAction ?? (href ? () => router.push(href) : undefined),
-    [router],
-  );
 
   const handleBrandClick = React.useCallback(() => {
     setSelectedServiceId(allServiceTabId);
@@ -326,52 +206,6 @@ export function ControlPanelSurfaceHost({
     setSelectedServiceId(allServiceTabId);
     setAlertCount(0);
   }, []);
-
-  const buildServiceDisclosureItems = React.useCallback((sectionId: PhaseOneSectionId) => (
-    getSectionServiceIds(sectionId).map((serviceId) => {
-      const serviceMeta = controlPanelRuntimeData.services.find((service) => service.id === serviceId);
-
-      return {
-        id: `${sectionId}-${serviceId}`,
-        label: getServiceLabel(uiText, serviceId),
-        description: serviceMeta?.placeholder ? 'مرجع' : 'متصل',
-        badge: serviceMeta?.placeholder ? panelText.filters.reference : panelText.ui.liveRefreshValue,
-        onAction: () => setSelectedServiceId(serviceId),
-      } satisfies DisclosureItemView;
-    })
-  ), [panelText.filters.reference, panelText.ui.liveRefreshValue, uiText]);
-
-  const dashboardDecisionBoard: ReadonlyArray<SectionActionView> = [
-    {
-      id: 'db-operations',
-      label: 'تثبيت العمليات الحية',
-      description: 'مراجعة الصفوف الحية والاختناقات التشغيلية فوراً.',
-      footerLabel: 'انتقال',
-      href: '/operations',
-      badge: 'أولوية قصوى',
-      tone: 'primary',
-    },
-    {
-      id: 'db-finance',
-      label: 'مراجعة المركز المالي',
-      description: 'التأكد من سلامة التدفقات بعد استقرار النبض التشغيلي.',
-      footerLabel: 'تحليل',
-      href: '/finance',
-      badge: 'منتظم',
-      tone: 'secondary',
-    },
-    {
-      id: 'db-community-services',
-      label: 'خدمات المجتمع',
-      description: 'اعتماد مسارات المجتمع والخدمات الجديدة قبل البث.',
-      footerLabel: 'اعتماد',
-      href: '/community-services',
-      badge: 'انتظار',
-      tone: 'secondary',
-    },
-  ];
-
-  const phaseOneBlueprint = null;
 
   return (
     <>
@@ -418,18 +252,14 @@ export function ControlPanelSurfaceHost({
     >
       <div className={styles.stageStack} dir={direction}>
         {activeSectionId === 'dashboard' ? (
-          <div style={{ marginTop: 16 }}>
-             <ControlPanelDshClosureDashboardScreen />
-          </div>
+          <ControlPanelDshClosureDashboardScreen />
         ) : null}
 
         {activeSectionId === 'finance' ? (
-          <div style={{ marginTop: 16 }}>
-            <ControlPanelDshFinanceHubScreen
-              group={financeWorkspace as any}
-              panel={financePanel as any}
-            />
-          </div>
+          <ControlPanelDshFinanceHubScreen
+            group={financeWorkspace as CanonicalFinanceGroupId}
+            panel={financePanel as FinancePanelId}
+          />
         ) : null}
 
         {isOperationsSection ? (
@@ -441,30 +271,20 @@ export function ControlPanelSurfaceHost({
         ) : null}
 
         {activeSectionId === 'partners' ? (
-          <div style={{ marginTop: 16 }}>
-            <ControlPanelDshPartnerApprovalsScreen hubHref="/partners" operationsHref="/partners" />
-          </div>
+          <ControlPanelDshPartnerApprovalsScreen hubHref="/partners" operationsHref="/partners" />
         ) : null}
 
         {activeSectionId === 'catalogs' ? (
-          <div style={{ marginTop: 16 }}>
-            <ControlPanelDshCatalogScreen />
-          </div>
+          <ControlPanelDshCatalogScreen />
         ) : null}
 
         {isMarketingSection ? (
-          <div style={{ marginTop: 16 }}>
-            <ControlPanelDshMarketingScreen hubHref="/marketing" operationsHref="/operations" />
-          </div>
+          <ControlPanelDshMarketingScreen hubHref="/marketing" operationsHref="/operations" />
         ) : null}
 
         {activeSectionId === 'support' ? (
-          <div style={{ marginTop: 16 }}>
-            <ControlPanelDshSupportQueueScreen />
-          </div>
+          <ControlPanelDshSupportQueueScreen />
         ) : null}
-
-
       </div>
     </WebCommandCenterFrame>
     </div>

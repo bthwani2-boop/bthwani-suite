@@ -1,22 +1,21 @@
 'use client';
 
 import React from 'react';
-import { OperationsSuggestionCard } from './operations.ui';
+import {
+  WebControlPanelKpiStrip,
+  WebControlPanelRecommendation,
+  WebControlPanelDecisionRow,
+} from '@bthwani/ui-kit/web';
+import {
+  OPERATIONS_PULSE_METRICS,
+} from './operations.preview-data';
 import styles from './dsh-surface.module.css';
 
 export type CommandCenterScreenProps = { hubHref: string; subGroup?: string; };
 
-const SIGNALS = [
-  { label: 'الطلبات المفتوحة', value: '1,240', status: 'normal' },
-  { label: 'خطر الإسناد', value: '32', status: 'danger' },
-  { label: 'تغطية الكباتن', value: '88%', status: 'warning' },
-  { label: 'الاستثناءات', value: '12', status: 'danger' },
-  { label: 'ضغط المناطق', value: 'مرتفع', status: 'warning' },
-  { label: 'خطر SLA', value: '4%', status: 'normal' },
-] as const;
-
 const TOP_SUGGESTIONS = [
   {
+    id: 'sug-1',
     label: 'تكدس شمال الرياض — فعّل Bonus فوراً',
     reason: '45 طلب بدون كابتن في منطقة الشمال',
     confidence: 'high' as const,
@@ -25,6 +24,7 @@ const TOP_SUGGESTIONS = [
     risk: 'critical' as const,
   },
   {
+    id: 'sug-2',
     label: '32 طلب بدون إسناد — تدخّل الآن',
     reason: 'قائمة الإسناد تتراكم وكباتن متاحون غير مستغلين',
     confidence: 'high' as const,
@@ -33,6 +33,7 @@ const TOP_SUGGESTIONS = [
     risk: 'high' as const,
   },
   {
+    id: 'sug-3',
     label: '12 استثناء مفتوح — راجع قائمة الإسناد',
     reason: 'استثناءات بدون مالك تزيد من خطر خرق SLA',
     confidence: 'medium' as const,
@@ -43,76 +44,73 @@ const TOP_SUGGESTIONS = [
 ] as const;
 
 const QUICK_ACTIONS = [
-  { label: 'إعادة إسناد 12 طلب متأخر', time: 'منذ 5 دقائق', workspace: 'dispatch-assignment' },
-  { label: 'تواصل مع المتجر رقم 402', time: 'منذ 12 دقيقة', workspace: 'partner-stores' },
-  { label: 'تصعيد شكوى عميل (تأخير)', time: 'منذ 18 دقيقة', workspace: 'audit-support-sla' },
+  { id: 'QA-1', label: 'إعادة إسناد 12 طلب متأخر', time: 'منذ 5 دقائق', workspace: 'dispatch-assignment' },
+  { id: 'QA-2', label: 'تواصل مع المتجر رقم 402', time: 'منذ 12 دقيقة', workspace: 'partner-stores' },
+  { id: 'QA-3', label: 'تصعيد شكوى عميل (تأخير)', time: 'منذ 18 دقيقة', workspace: 'audit-support-sla' },
 ] as const;
 
 export function CommandCenterScreen({ hubHref, subGroup }: CommandCenterScreenProps) {
   return (
-    <div className={styles.operationsCompactSurface} style={{ direction: 'rtl' }}>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-        <div>
-          <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>نبض العمليات</h2>
-          <p style={{ fontSize: '13px', color: '#64748B', margin: '4px 0 0' }}>متابعة الأداء العام والتدخلات السريعة</p>
-        </div>
+    <div className={styles.operationsCockpitContent} dir="rtl">
+      {/* 1. Operations Pulse - High Level Metrics */}
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>نبض العمليات</h2>
+        <p className={styles.sectionSubtitle}>متابعة الأداء العام والتدخلات السريعة</p>
       </div>
 
-      <div className={styles.operationsSingleRowBlocks}>
-        {SIGNALS.map((item, idx) => (
-          <div
-            key={idx}
-            className={styles.operationsSingleRowItem}
-            style={{ borderTop: `4px solid ${item.status === 'danger' ? '#DC2626' : item.status === 'warning' ? '#F59E0B' : '#0A2F5C'}` }}
-          >
-            <div className={styles.operationsCompactCardTitle}>{item.label}</div>
-            <div style={{ fontSize: '18px', color: item.status === 'danger' ? '#DC2626' : item.status === 'warning' ? '#D97706' : '#0A2F5C', fontWeight: 800, lineHeight: 1.1 }}>{item.value}</div>
-          </div>
-        ))}
-      </div>
+      <WebControlPanelKpiStrip
+        items={OPERATIONS_PULSE_METRICS.map(m => ({
+          id: m.id,
+          label: m.title,
+          value: m.value,
+          tone: m.tone as any
+        }))}
+      />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '12px' }}>
+      <div className={styles.operationsGridTwoCol}>
+        {/* 2. Top System Recommendations */}
         <div className={styles.operationsCompactPanel}>
-          <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>أعلى توصيات النظام الآن</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0 }}>
-            {TOP_SUGGESTIONS.map((s, idx) => (
-              <OperationsSuggestionCard
-                key={idx}
-                label={s.label}
+          <h3 className={styles.panelTitle}>أعلى توصيات النظام الآن</h3>
+          <div className={styles.stackSmall}>
+            {TOP_SUGGESTIONS.map((s) => (
+              <WebControlPanelRecommendation
+                key={s.id}
+                title={s.label}
                 reason={s.reason}
                 confidence={s.confidence}
-                actions={(
-                  <a
-                    href={`${hubHref}${s.href}`}
-                    style={{ padding: '4px 10px', backgroundColor: '#FF500D', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' }}
-                  >
-                    {s.action}
-                  </a>
-                )}
-              >
-                {s.risk === 'critical' ? <span style={{ fontSize: '10px', fontWeight: 700, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '1px 6px', borderRadius: '99px' }}>خطر حرج</span> : null}
-              </OperationsSuggestionCard>
+                auditTag={s.risk === 'critical' ? 'خطر حرج' : undefined}
+                primaryAction={{
+                  id: `action-${s.id}`,
+                  label: s.action,
+                  onAction: () => window.location.href = `${hubHref}${s.href}`
+                }}
+              />
             ))}
           </div>
         </div>
 
+        {/* 3. Urgent Interventions */}
         <div className={styles.operationsCompactPanel}>
-          <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0A2F5C', margin: 0 }}>تدخل سريع مطلوب</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0 }}>
-            {QUICK_ACTIONS.map((action, idx) => (
-              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', border: '1px solid rgba(10,47,92,0.05)', borderRadius: '8px', backgroundColor: '#F8FAFC', gap: '10px', minWidth: 0 }}>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: '#0A2F5C' }}>{action.label}</span>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>{action.time}</span>
-                  <a href={`${hubHref}?workspace=${action.workspace}`} style={{ padding: '4px 8px', backgroundColor: '#0A2F5C', color: '#fff', borderRadius: '4px', fontSize: '11px', fontWeight: 600, textDecoration: 'none' }}>انتقل</a>
-                </div>
-              </div>
+          <h3 className={styles.panelTitle}>تدخل سريع مطلوب</h3>
+          <div className={styles.stackSmall}>
+            {QUICK_ACTIONS.map((action) => (
+              <WebControlPanelDecisionRow
+                key={action.id}
+                entityId={action.id}
+                entityLabel={action.label}
+                sla={action.time}
+                status="مطلوب"
+                statusTone="warning"
+                primaryAction={{
+                  id: `go-${action.id}`,
+                  label: 'انتقل',
+                  onAction: () => window.location.href = `${hubHref}?workspace=${action.workspace}`
+                }}
+              />
             ))}
           </div>
         </div>
       </div>
-
     </div>
   );
 }

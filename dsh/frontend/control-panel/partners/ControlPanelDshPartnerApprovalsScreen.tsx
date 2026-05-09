@@ -1,7 +1,11 @@
-'use client';
-
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
+import {
+  WebControlPanelDecisionRow,
+  WebControlPanelKpiStrip,
+  WebControlPanelWorkspaceTabs,
+  WebControlPanelSubTabs,
+} from '@bthwani/ui-kit/web';
 import { getPartnerIntakeItems } from '../../shared/partner-intake-store';
 import {
   ApprovalRecord,
@@ -11,86 +15,40 @@ import {
   translateOwner,
 } from '../../shared/workflow';
 
-import styles from '../operations/dsh-surface.module.css';
-import { OperationsSuggestionCard } from '../operations/operations.ui';
-
-// ─────────────────────────────────────────────
-// Sub-components
-// ─────────────────────────────────────────────
-
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix') => void }) {
-  const meta = {
-    label: translateStage(item.stage),
-    tone: (item.stage === 'marketing-review' || item.stage === 'approved') ? 'success' :
-          (item.stage === 'needs-fix') ? 'danger' :
-          (item.stage === 'partner-submitted' || item.stage === 'field-submitted') ? 'warning' : 'brand'
-  };
-
-  const statusClassName = meta.tone === 'success' ? styles.liveOrdersStatusBest :
-                         meta.tone === 'warning' ? styles.liveOrdersStatusWarning :
-                         meta.tone === 'danger' ? styles.liveOrdersStatusDanger : styles.liveOrdersStatusBrand;
-
-  const cardClassName = [
-    styles.liveOrdersOrderCard,
-    meta.tone === 'danger' ? styles.liveOrdersOrderCardDanger : '',
-    meta.tone === 'warning' ? styles.liveOrdersOrderCardWarning : '',
-  ].filter(Boolean).join(' ');
+  const tone = (item.stage === 'marketing-review' || item.stage === 'approved') ? 'success' :
+               (item.stage === 'needs-fix') ? 'danger' :
+               (item.stage === 'partner-submitted' || item.stage === 'field-submitted') ? 'warning' : 'neutral';
 
   return (
-    <div className={cardClassName}>
-      <div className={styles.liveOrdersOrderMeta}>
-        <div className={styles.liveOrdersOrderTopRow}>
-          <span className={styles.liveOrdersOrderId}>{item.id}</span>
-          <span className={`${styles.liveOrdersOrderStatus} ${statusClassName}`}>{meta.label}</span>
-          <span className={styles.liveOrdersRingHint}>{translateEntityType(item.entityType)}</span>
-        </div>
-        <div className={styles.liveOrdersDestination}>{item.title}</div>
-        <div className={styles.liveOrdersMetaText}>المصدر: {translateOwner(item.source)}</div>
-        <div className={styles.liveOrdersNoteText}>تاريخ التقديم: {new Date().toLocaleDateString('ar-SA')}</div>
-      </div>
-
-      <OperationsSuggestionCard
-        label="توصية النظام: مراجعة المستندات"
-        reason="البيانات المرفوعة مكتملة وتطابق المعايير الأولية لشبكة BThwani."
-        confidence="high"
-        actions={(
-          <div className={styles.liveOrdersActionGrid}>
-            {['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage) && (
-              <>
-                <button className={styles.liveOrdersActionPrimary} onClick={() => onAction(item.id, 'approve')}>قبول للمراجعة</button>
-                <button className={styles.liveOrdersActionSecondary} onClick={() => onAction(item.id, 'fix')}>طلب تعديل</button>
-              </>
-            )}
-            {item.stage === 'marketing-review' && (
-              <button className={styles.liveOrdersActionPrimary} disabled style={{ opacity: 0.6 }}>في انتظار التسويق</button>
-            )}
-          </div>
-        )}
-      >
-        <span className={styles.liveOrdersSuggestionChip}>جاهز للمعالجة</span>
-      </OperationsSuggestionCard>
-
-      <div className={styles.liveOrdersOrderActions}>
-        <div className={styles.liveOrdersTimelineTitle}>المسار الزمني للطلب</div>
-        <div className={styles.liveOrdersTimelineList}>
-          <div>• استلام البيانات</div>
-          <div>• التحقق من المصدر</div>
-          <div>• في انتظار القرار</div>
-        </div>
-        <div className={styles.liveOrdersPlanWrap}>
-          <span className={styles.liveOrdersPlanChip}>مراجعة قانونية</span>
-          <span className={styles.liveOrdersPlanChip}>أهلية الترويج</span>
-        </div>
-        <div className={styles.liveOrdersActionGrid} style={{ marginTop: 'auto' }}>
-           <button className={styles.liveOrdersActionSecondary} onClick={() => onAction(item.id, 'reject')}>رفض</button>
-           <button className={styles.liveOrdersActionSecondary}>عرض السجل</button>
-        </div>
-      </div>
-    </div>
+    <WebControlPanelDecisionRow
+      entityId={item.id}
+      entityLabel={item.title}
+      status={translateStage(item.stage)}
+      statusTone={tone === 'danger' ? 'danger' : tone === 'success' ? 'success' : tone === 'warning' ? 'warning' : 'neutral'}
+      risk={tone === 'danger' ? 'danger' : tone === 'warning' ? 'warning' : 'neutral'}
+      recommendation="مراجعة المستندات"
+      reason="البيانات المرفوعة مكتملة وتطابق المعايير الأولية لشبكة BThwani."
+      sla={translateEntityType(item.entityType)}
+      primaryAction={['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage) ? {
+        label: 'قبول للمراجعة',
+        onAction: () => onAction(item.id, 'approve')
+      } : undefined}
+      secondaryAction={['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage) ? {
+        label: 'طلب تعديل',
+        onAction: () => onAction(item.id, 'fix')
+      } : {
+        label: 'رفض',
+        onAction: () => onAction(item.id, 'reject')
+      }}
+      onInspect={() => {}}
+    />
   );
 }
 
-function CompactPartnerIntakeQueue() {
+export function ControlPanelDshPartnerHubScreen() {
+  const [activeTab, setActiveTab] = React.useState<string>('inbox');
+  const [activeSubTab, setActiveSubTab] = React.useState<string>('registration');
   const [items, setItems] = React.useState<ApprovalRecord[]>([]);
 
   const refresh = () => setItems(getPartnerIntakeItems());
@@ -109,36 +67,6 @@ function CompactPartnerIntakeQueue() {
     }
     refresh();
   };
-
-  return (
-    <div className={styles.liveOrdersScreen}>
-      <div className={styles.liveOrdersHeaderRow}>
-        <h2 className={styles.liveOrdersTitle}>قائمة طلبات الشركاء ({items.length})</h2>
-        <button className={styles.liveOrdersFilterButton}>تحديث القائمة</button>
-      </div>
-
-      <div className={styles.liveOrdersCardsStack}>
-        {items.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
-            <Text tone="muted">لا توجد طلبات واردة حالياً</Text>
-          </div>
-        ) : (
-          items.map(item => (
-            <PartnerApprovalCard key={item.id} item={item} onAction={handleAction} />
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// Main Screen
-// ─────────────────────────────────────────────
-
-export function ControlPanelDshPartnerHubScreen() {
-  const [activeTab, setActiveTab] = React.useState<string>('inbox');
-  const [activeSubTab, setActiveSubTab] = React.useState<string>('registration');
 
   const PRIMARY_TABS = [
     { id: 'inbox', label: 'الوارد الجديد' },
@@ -167,116 +95,65 @@ export function ControlPanelDshPartnerHubScreen() {
     }
   }, [activeTab]);
 
-  const renderContent = () => {
-    return (
-      <div className={styles.liveOrdersScreen}>
-        <div className={styles.liveOrdersHeaderRow}>
-          <h2 className={styles.liveOrdersTitle}>
-            {PRIMARY_TABS.find(t => t.id === activeTab)?.label} — {SECONDARY_TABS[activeTab]?.find(s => s.id === activeSubTab)?.label || 'عام'}
-          </h2>
-          <button className={styles.liveOrdersFilterButton}>تصفية المخرجات</button>
-        </div>
-
-        {activeTab === 'inbox' && activeSubTab === 'registration' ? (
-          <CompactPartnerIntakeQueue />
-        ) : (
-          <div className={styles.liveOrdersCardsStack}>
-            <div style={{ padding: '60px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🚧</div>
-              <Text role="titleSm" style={{ color: '#0A2F5C', marginBottom: '8px' }}>هذه اللوحة قيد التجهيز</Text>
-              <Text tone="muted">سيتم تفعيل مسار العمل لـ {activeTab} قريباً بنفس نمط غرفة العمليات.</Text>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
-    <div className={styles.operationsCockpit} dir="rtl">
-      {/* 1. Header Area - Partners Command Deck */}
-      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
-        <div className={styles.operationsTitleBlock}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            backgroundColor: '#0A2F5C',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '16px',
-            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
-          }}>
-            🤝
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>شركاء DSH</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>مراجعة الشريك</span>
-            </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>حوكمة الشركاء، التغطية، وأهلية الترويج</p>
-          </div>
-        </div>
+    <Box gap={0} style={{ flex: 1 }}>
+      {/* 1. Header Area */}
+      <Box padding={4} background="surface" style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(10,47,92,0.08)' }} layoutDirection="row" justify="space-between" align="center">
+        <Box gap={1}>
+          <Box layoutDirection="row" align="center" gap={2}>
+            <Text role="titleMd" style={{ color: '#0A2F5C', fontWeight: '800' }}>شركاء DSH</Text>
+            <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>مراجعة الشريك</span>
+          </Box>
+          <Text role="caption" tone="muted">حوكمة الشركاء، التغطية، وأهلية الترويج</Text>
+        </Box>
 
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
-            {[
-              { label: 'شركاء نشطون', value: '١,٢٥٤' },
-              { label: 'طلبات معلقة', value: '٢٨' },
-              { label: 'تغطية المناطق', value: '٨٤٪' }
-            ].map((m) => (
-              <div key={m.label} className={styles.commandKpi}>
-                <span className={styles.commandKpiLabel}>{m.label}</span>
-                <span className={styles.commandKpiValue}>{m.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </header>
+        <WebControlPanelKpiStrip
+          items={[
+            { id: 'active', label: 'شركاء نشطون', value: '١,٢٥٤', tone: 'neutral' },
+            { id: 'pending', label: 'طلبات معلقة', value: '٢٨', tone: 'warning' },
+            { id: 'coverage', label: 'تغطية المناطق', value: '٨٤٪', tone: 'success' }
+          ]}
+        />
+      </Box>
 
-      {/* 2. Primary Tabs */}
-      <nav className={styles.navigationCockpit}>
-        {PRIMARY_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            className={`${styles.operationsTab} ${tab.id === activeTab ? styles.operationsTabActive : ''}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
+      {/* 2. Navigation */}
+      <WebControlPanelWorkspaceTabs
+        items={PRIMARY_TABS.map(t => ({ id: t.id, label: t.label, active: t.id === activeTab }))}
+        onSelect={setActiveTab}
+      />
 
-      {/* 3. Secondary Tabs */}
-      {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
-        <div className={styles.filterDock} style={{ padding: '4px 14px', minHeight: '36px', backgroundColor: '#F8FAFC' }}>
-          {SECONDARY_TABS[activeTab].map((sub) => (
-            <button
-              key={sub.id}
-              onClick={() => setActiveSubTab(sub.id)}
-              className={styles.operationsTab}
-              style={{
-                padding: '4px 12px',
-                fontSize: '12px',
-                backgroundColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
-                color: sub.id === activeSubTab ? '#FF500D' : '#64748B',
-                borderColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
-              }}
-            >
-              {sub.label}
-            </button>
-          ))}
-        </div>
+      {SECONDARY_TABS[activeTab] && (
+        <WebControlPanelSubTabs
+          items={SECONDARY_TABS[activeTab].map(s => ({ id: s.id, label: s.label, active: s.id === activeSubTab }))}
+          onSelect={setActiveSubTab}
+        />
       )}
 
-      {/* 4. Main Panel */}
-      <main className={styles.operationsMainPanel}>
-        <div className={styles.operationsInnerScroll}>
-          {renderContent()}
-        </div>
-      </main>
-    </div>
+      {/* 3. Content */}
+      <Box padding={4} gap={4} style={{ flex: 1, overflowY: 'auto' }}>
+        {activeTab === 'inbox' && activeSubTab === 'registration' ? (
+          <Box gap={3}>
+            {items.length === 0 ? (
+              <Box padding={8} align="center" background="surfaceRaised" radiusToken="lg">
+                <Text tone="muted">لا توجد طلبات واردة حالياً</Text>
+              </Box>
+            ) : (
+              items.map(item => (
+                <PartnerApprovalCard key={item.id} item={item} onAction={handleAction} />
+              ))
+            )}
+          </Box>
+        ) : (
+          <Box padding={12} align="center" background="surfaceRaised" radiusToken="lg" gap={4}>
+            <Text style={{ fontSize: '48px' }}>🚧</Text>
+            <Box align="center" gap={1}>
+              <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>هذه اللوحة قيد التجهيز</Text>
+              <Text tone="muted">سيتم تفعيل مسار العمل لـ {activeTab} قريباً بنفس نمط غرفة العمليات.</Text>
+            </Box>
+          </Box>
+        )}
+      </Box>
+    </Box>
   );
 }
 

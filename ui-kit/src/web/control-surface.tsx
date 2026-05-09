@@ -823,7 +823,7 @@ export function WebControlPanelStatusTag({ label, tone = 'neutral' }: WebControl
 
 export type WebControlPanelActionItem = { id: string; label: string; onAction?: () => void };
 export type WebControlPanelActionClusterProps = {
-  primary: WebControlPanelActionItem;
+  primary?: WebControlPanelActionItem;
   secondary?: WebControlPanelActionItem;
 };
 export function WebControlPanelActionCluster({ primary, secondary }: WebControlPanelActionClusterProps) {
@@ -831,7 +831,7 @@ export function WebControlPanelActionCluster({ primary, secondary }: WebControlP
     <>
       <WebControlSurfaceStyles />
       <div className="ui-web-cp-action-cluster">
-        <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primary.onAction}>{primary.label}</button>
+        {primary && <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primary.onAction}>{primary.label}</button>}
         {secondary && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={secondary.onAction}>{secondary.label}</button>}
       </div>
     </>
@@ -848,7 +848,7 @@ export type WebControlPanelDecisionRowProps = {
   recommendation?: string;
   reason?: string;
   sla?: string;
-  primaryAction: WebControlPanelActionItem;
+  primaryAction?: WebControlPanelActionItem;
   secondaryAction?: WebControlPanelActionItem;
   onInspect?: () => void;
 };
@@ -879,7 +879,7 @@ export function WebControlPanelDecisionRow({
           </div>
         )}
         <div className="ui-web-cp-action-cluster">
-          <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primaryAction.onAction}>{primaryAction.label}</button>
+          {primaryAction && <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primaryAction.onAction}>{primaryAction.label}</button>}
           {secondaryAction && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={secondaryAction.onAction}>{secondaryAction.label}</button>}
           {onInspect && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={onInspect} aria-label="فتح التفاصيل">►</button>}
         </div>
