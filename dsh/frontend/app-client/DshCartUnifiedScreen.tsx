@@ -246,14 +246,17 @@ type ExecutionSchedulePickerProps = {
 };
 
 function ExecutionSchedulePicker({ dateOptions, timeOptions, selectedDate, selectedTime, onDateChange, onTimeChange }: ExecutionSchedulePickerProps) {
+  const isRTL = I18nManager.isRTL;
   const resolvedDate = dateOptions.find((option) => option.value === selectedDate) ?? dateOptions[0];
   const resolvedTime = timeOptions.find((option) => option.value === selectedTime) ?? timeOptions[0];
 
   return (
-    <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: 16 }}>
-      <Box gap={2}>
-        <Text role="bodySm" style={{ fontWeight: '700' }}>التاريخ</Text>
-        <Box flexDirection="row" flexWrap="wrap" gap={2}>
+    <Surface tone="default" padding={2} gap={1} style={{ backgroundColor: SURFACE_SOFT, borderColor: BORDER_SOFT }}>
+      <View style={{ gap: spacing[1] }}>
+        <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700' }}>
+          التاريخ
+        </Text>
+        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: spacing[1] }}>
           {dateOptions.map((option) => (
             <Chip
               key={option.value}
@@ -263,12 +266,14 @@ function ExecutionSchedulePicker({ dateOptions, timeOptions, selectedDate, selec
               onPress={() => onDateChange(option.value)}
             />
           ))}
-        </Box>
-      </Box>
+        </View>
+      </View>
 
-      <Box gap={2}>
-        <Text role="bodySm" style={{ fontWeight: '700' }}>الوقت</Text>
-        <Box flexDirection="row" flexWrap="wrap" gap={2}>
+      <View style={{ gap: spacing[1] }}>
+        <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700' }}>
+          الوقت
+        </Text>
+        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: spacing[1] }}>
           {timeOptions.map((option) => (
             <Chip
               key={option.value}
@@ -278,12 +283,12 @@ function ExecutionSchedulePicker({ dateOptions, timeOptions, selectedDate, selec
               onPress={() => onTimeChange(option.value)}
             />
           ))}
-        </Box>
-      </Box>
+        </View>
+      </View>
 
       {resolvedDate && resolvedTime ? (
-        <Surface tone="brand" padding={2} style={{ borderRadius: 12 }}>
-          <Text role="caption" style={{ color: colorPalette.white }}>
+        <Surface tone="default" padding={1} gap={0} style={{ backgroundColor: SURFACE_WARM, borderColor: SURFACE_WARM_BORDER }}>
+          <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '600' }}>
             سيتم تنفيذ الطلب {resolvedDate.fullLabel} عند {resolvedTime.fullLabel}
           </Text>
         </Surface>
@@ -293,115 +298,208 @@ function ExecutionSchedulePicker({ dateOptions, timeOptions, selectedDate, selec
 }
 
 function PromoBanner({ onPress }: { onPress: () => void }) {
+  const isRTL = I18nManager.isRTL;
+
   return (
     <Surface
-      tone="brand"
-      padding={3}
-      style={{ borderRadius: 20 }}
+      tone="default"
+      padding={2}
+      style={{
+        backgroundColor: SURFACE_WARM,
+        borderWidth: 1,
+        borderColor: SURFACE_WARM_BORDER,
+        borderRadius: 16,
+        paddingHorizontal: spacing[2],
+        paddingVertical: spacing[1],
+        minHeight: 60,
+      }}
     >
-      <Box flexDirection="row" alignItems="center" gap={3}>
-        <Box flex={1}>
-          <Text role="bodyStrong" style={{ color: colorPalette.white }}>
-            بثواني برو
+      <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', minHeight: 36 }}>
+        <View style={{ width: 96, alignItems: 'center' }}>
+          <Button
+            label="اشترك الآن"
+            size="sm"
+            fullWidth={false}
+            onPress={onPress}
+            style={{ minWidth: 92, minHeight: 36, backgroundColor: ACCENT_BLUE, borderColor: ACCENT_BLUE, borderRadius: 18 }}
+          />
+        </View>
+
+        <View style={{ flex: 1, paddingHorizontal: spacing[2], alignItems: 'center', justifyContent: 'center' }}>
+          <Text role="bodyMd" style={{ color: TEXT_PRIMARY, textAlign: 'center', lineHeight: 18 }}>
+            اشترك بخدمة بثواني برو لا ستفاده من افضل العروض
           </Text>
-          <Text role="caption" style={{ color: colorPalette.white, opacity: 0.9 }}>
-            اشترك الآن للحصول على توصيل مجاني وعروض حصرية.
-          </Text>
-        </Box>
-        <Button label="اشترك" size="sm" tone="secondary" onPress={onPress} />
-      </Box>
+        </View>
+
+        <View style={{ width: 24, alignItems: 'center' }}>
+          <Icon name="ribbon-outline" size={14} color={ACCENT_ORANGE} />
+        </View>
+      </View>
     </Surface>
   );
 }
 
+type RecommendationCardProps = {
+  title: string;
+  price: string;
+  onPress: () => void;
+};
+
 function RecommendationCard({ title, price, onPress }: RecommendationCardProps) {
   return (
-    <Surface
-      tone="raised"
-      padding={3}
-      gap={2}
-      style={{ width: 140, borderRadius: 20 }}
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`أضف ${title} إلى السلة`}
+      onPress={onPress}
+      style={({ pressed }) => [{ width: 132, borderRadius: 18, overflow: 'hidden', backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, opacity: pressed ? 0.92 : 1 }]}
     >
-      <Box height={80} backgroundColor="surfaceSecondary" alignItems="center" justifyContent="center" style={{ borderRadius: 16 }}>
-        <Icon name="fast-food-outline" size={32} color={colorPalette.brand} />
-      </Box>
-      <Box gap={1}>
-        <Text role="bodyStrong" numberOfLines={1}>{title}</Text>
-        <Text role="caption" tone="brand" style={{ fontWeight: '700' }}>{price}</Text>
-      </Box>
-      <Button label="أضف" size="sm" tone="secondary" onPress={onPress} />
-    </Surface>
+      <View style={{ height: 96, backgroundColor: SURFACE_SOFT, position: 'relative', justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: colorPalette.white, shadowColor: colorPalette.black, shadowOpacity: 0.06, shadowRadius: 8, elevation: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colorPalette.brandSoft }} />
+        </View>
+
+        <View style={{ position: 'absolute', bottom: 6, left: 6, borderRadius: 8, backgroundColor: ACCENT_ORANGE, paddingHorizontal: 8, paddingVertical: 3 }}>
+          <Text role="bodySm" style={{ color: colorPalette.white, fontWeight: '700' }}>
+            {price}
+          </Text>
+        </View>
+      </View>
+
+      <View style={{ paddingHorizontal: spacing[2], paddingTop: spacing[1], paddingBottom: spacing[1], gap: spacing[0] }}>
+        <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>
+          {title}
+        </Text>
+        <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'center' }}>
+          أضفه مباشرة إلى السلة
+        </Text>
+      </View>
+    </Pressable>
   );
 }
 
 function RecommendedSection({ onShowAll, onAddProduct }: { onShowAll: () => void; onAddProduct: (product: RecommendationProduct) => void }) {
+  const isRTL = I18nManager.isRTL;
+
   return (
-    <Box gap={2}>
-      <Box flexDirection="row" justifyContent="space-between" alignItems="center">
-        <Text role="bodyStrong">قد يعجبك أيضاً</Text>
-        <Button label="عرض الكل" tone="ghost" size="sm" onPress={onShowAll} />
-      </Box>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing[3], paddingRight: spacing[4] }}>
+    <Surface tone="default" padding={2} gap={1} style={{ backgroundColor: SURFACE_SOFT, borderColor: BORDER_SOFT }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Button label="عرض الكل" tone="ghost" size="sm" fullWidth={false} onPress={onShowAll} />
+        <Text role="bodyMd" style={{ color: TEXT_PRIMARY, fontWeight: '600' }}>
+          قد تعجبك هذه المنتجات أيضاً
+        </Text>
+      </View>
+
+      <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[1], overflow: 'hidden', paddingTop: spacing[0] }}>
         {RECOMMENDED_PRODUCTS.map((product) => (
           <RecommendationCard key={product.id} title={product.title} price={product.priceLabel} onPress={() => onAddProduct(product)} />
         ))}
-      </ScrollView>
-    </Box>
+      </View>
+    </Surface>
   );
 }
+
+type ItemsTableProps = {
+  items: CartItem[];
+  onOpenDetails: () => void;
+};
 
 function ItemsTable({ items, onOpenDetails }: ItemsTableProps) {
   return (
     <Card
       title="تفاصيل السلة"
       subtitle={`عناصر: ${items.length}`}
-      footer={items.length > 0 ? (
-        <Button label="تعديل السلة" tone="secondary" size="sm" onPress={onOpenDetails} />
-      ) : undefined}
+      padding={2}
+      gap={1}
+      footer={(
+        <Button
+          label="فتح التفاصيل"
+          tone="secondary"
+          size="sm"
+          fullWidth={false}
+          disabled={items.length === 0}
+          onPress={onOpenDetails}
+        />
+      )}
     >
       {items.length === 0 ? (
-        <Box padding={4} alignItems="center" gap={1}>
-          <Text role="bodyStrong">السلة فارغة</Text>
-          <Text role="caption" tone="muted">أضف منتجات من المتجر للبدء.</Text>
-        </Box>
+        <Surface tone="default" padding={2} gap={1} style={{ backgroundColor: SURFACE_SOFT, borderColor: BORDER_SOFT }}>
+          <Text role="bodyMd" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>
+            السلة فارغة الآن.
+          </Text>
+          <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'center' }}>
+            أضف منتجًا من المقترحات أو ارجع إلى المتجر لتعبئة السلة.
+          </Text>
+        </Surface>
       ) : (
-        <Box gap={2}>
-          {items.map((item) => (
-            <Box key={item.id} flexDirection="row" justifyContent="space-between" alignItems="center">
-              <Box flex={1}>
-                <Text role="bodyStrong">{item.title}</Text>
-                <Text role="caption" tone="muted">{item.qty ?? 1} × {formatAmount(resolveCartItemPriceValue(item))}</Text>
-              </Box>
-              <Text role="bodyStrong" tone="brand">
-                {formatAmount(resolveCartItemPriceValue(item) * (item.qty ?? 1))}
-              </Text>
-            </Box>
-          ))}
-        </Box>
+      <View style={{ borderWidth: 1, borderColor: BORDER_SOFT, borderRadius: 16, overflow: 'hidden', backgroundColor: colorPalette.surfacePrimary }}>
+        <View style={{ flexDirection: 'row-reverse', backgroundColor: SURFACE_SOFT, borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0] }}>
+          <View style={{ flex: 3, paddingHorizontal: spacing[1] }}>
+            <Text role="bodySm" style={{ fontWeight: '700', color: TEXT_PRIMARY, textAlign: 'right' }}>المنتج</Text>
+          </View>
+          <View style={{ flex: 1.3, paddingHorizontal: spacing[1] }}>
+            <Text role="bodySm" style={{ fontWeight: '700', color: TEXT_PRIMARY, textAlign: 'center' }}>السعر</Text>
+          </View>
+          <View style={{ flex: 1, paddingHorizontal: spacing[1] }}>
+            <Text role="bodySm" style={{ fontWeight: '700', color: TEXT_PRIMARY, textAlign: 'center' }}>الكمية</Text>
+          </View>
+          <View style={{ flex: 1.3, paddingHorizontal: spacing[1] }}>
+            <Text role="bodySm" style={{ fontWeight: '700', color: TEXT_PRIMARY, textAlign: 'center' }}>الإجمالي</Text>
+          </View>
+        </View>
+
+        {items.map((item) => (
+          <View key={item.id} style={{ flexDirection: 'row-reverse', alignItems: 'center', borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0] }}>
+            <View style={{ flex: 3, paddingHorizontal: spacing[1] }}>
+              <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>{item.title}</Text>
+            </View>
+            <View style={{ flex: 1.3, paddingHorizontal: spacing[1] }}>
+              <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>{formatAmount(resolveCartItemPriceValue(item))}</Text>
+            </View>
+            <View style={{ flex: 1, paddingHorizontal: spacing[1], alignItems: 'center' }}>
+              <Text role="bodySm" style={{ color: TEXT_PRIMARY }}>{item.qty ?? 1}</Text>
+            </View>
+            <View style={{ flex: 1.3, paddingHorizontal: spacing[1] }}>
+              <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>{formatAmount(resolveCartItemPriceValue(item) * (item.qty ?? 1))}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
       )}
     </Card>
   );
 }
 
+type QuickActionSheetProps = {
+  visible: boolean;
+  meta: QuickActionMeta | null;
+  value: string;
+  submitDisabled?: boolean;
+  onChangeValue: (value: string) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+};
+
 function QuickActionSheet({ visible, meta, value, submitDisabled = false, onChangeValue, onClose, onSubmit }: QuickActionSheetProps) {
-  if (!meta) return null;
+  if (!meta) {
+    return null;
+  }
 
   return (
     <SheetFrame visible={visible} onClose={onClose} title={meta.title}>
-      <Box gap={4} padding={3}>
+      <View style={{ gap: spacing[2] }}>
         <TextField
           value={value}
           onChangeText={onChangeValue}
           placeholder={meta.placeholder}
           multiline={meta.multiline}
-          style={meta.multiline ? { minHeight: 120 } : undefined}
+          style={meta.multiline ? { minHeight: 112, textAlignVertical: 'top' } : undefined}
         />
-        {meta.helper && <Text role="caption" tone="muted">{meta.helper}</Text>}
-        <Box flexDirection="row" gap={3}>
-          <Button label={meta.saveLabel} tone="brand" style={{ flex: 1 }} disabled={submitDisabled} onPress={onSubmit} />
-          <Button label="إلغاء" tone="secondary" style={{ flex: 1 }} onPress={onClose} />
-        </Box>
-      </Box>
+        {meta.helper ? <Text role="caption" style={{ color: TEXT_SECONDARY }}>{meta.helper}</Text> : null}
+        <View style={{ flexDirection: 'row-reverse', gap: spacing[2] }}>
+          <Button label={meta.saveLabel} fullWidth={false} disabled={submitDisabled} onPress={onSubmit} style={{ flex: 1, backgroundColor: ACCENT_ORANGE, borderColor: ACCENT_ORANGE }} />
+          <Button label="إلغاء" tone="secondary" fullWidth={false} onPress={onClose} style={{ flex: 1 }} />
+        </View>
+      </View>
     </SheetFrame>
   );
 }
@@ -446,6 +544,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const checkoutAction = props.onContinue ?? props.onOpenOrder;
   const canEditOrder = Boolean(props.onOpenStore ?? props.onOpenOrder ?? props.onContinue);
   const backAction = props.onOpenStore ?? props.onRetry ?? props.onExit;
+  const isRTL = I18nManager.isRTL;
   const quickActionMeta = quickActionKey ? QUICK_ACTION_META[quickActionKey] : null;
   const hasWltServiceRoute = typeof props.onOpenService === 'function';
   const clientState = useMemo<DshClientState>(
@@ -474,7 +573,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const formattedWalletBalance = formatAmount(walletBalance / 100);
   const formattedWalletShortfall = formatHalalasAmount(walletShortfallHalalas);
   const canCheckout = items.length > 0;
-  const resolvedFooterHeight = footerHeight > 0 ? footerHeight : 80;
+  const androidSystemBottomInset = Platform.OS === 'android'
+    ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
+    : safeArea.comfortable;
+  const footerSafePadding = androidSystemBottomInset + spacing[2];
+  const resolvedFooterHeight = footerHeight > 0 ? footerHeight : sizes.controlMd + footerSafePadding + spacing[4];
+  const actionBarBottomPadding = resolvedFooterHeight + spacing[2];
 
   const updateItemQty = (id: string, qty: number) => {
     if (qty <= 0) {
@@ -491,6 +595,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   const showNotice = (title: string, description?: string, tone: ScreenNotice['tone'] = 'info') => {
     setNotice({ title, description, tone });
+  };
+
+  const dismissNotice = () => {
+    setNotice(null);
   };
 
   const openWltService = (mode: 'wallet-topup' | 'official-wallets') => {
@@ -685,6 +793,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           { label: 'من المحفظة', value: formatHalalasAmount(0), tone: 'muted' },
           { label: 'عند الاستلام', value: formatHalalasAmount(grandTotalHalalas), tone: 'brand' },
         ],
+        helperText: paymentMethod === 'cod' ? 'لا يستخدم رصيد المحفظة.' : undefined,
+        helperTone: 'info',
         onSelect: () => setPaymentMethod('cod'),
       },
       {
@@ -693,11 +803,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         description: 'ادفع كامل الطلب من رصيد WLT الداخلي.',
         selected: paymentMethod === 'wallet',
         disabled: walletPending || !canUseWalletFull,
-        statusLabel: paymentMethod === 'wallet' ? 'محدد' : walletPending ? 'قيد التحقق' : canUseWalletFull ? 'جاهز الآن' : 'يتطلب إجراء',
-        statusTone: paymentMethod === 'wallet' ? 'brand' : walletPending ? 'info' : canUseWalletFull ? 'success' : 'warning',
+        statusLabel: paymentMethod === 'wallet' ? 'محدد' : walletPending ? 'قيد التحقق' : !walletLinked ? 'يتطلب إجراء' : walletBalance <= 0 ? 'يتطلب إجراء' : canUseWalletFull ? 'جاهز الآن' : 'يتطلب إجراء',
+        statusTone: paymentMethod === 'wallet' ? 'brand' : walletPending ? 'info' : !walletLinked || walletBalance <= 0 ? 'warning' : canUseWalletFull ? 'success' : 'warning',
         amountRows: canUseWalletFull
           ? [
               { label: 'من المحفظة', value: formatHalalasAmount(grandTotalHalalas), tone: 'brand' },
+              { label: 'عند الاستلام', value: formatHalalasAmount(0), tone: 'muted' },
             ]
           : walletLinked
             ? [
@@ -706,7 +817,18 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               ]
             : [
                 { label: 'إجمالي الطلب', value: formattedGrandTotal, tone: 'brand' },
+                { label: 'حالة المحفظة', value: 'غير مرتبطة', tone: 'muted' },
               ],
+        helperText: canUseWalletFull
+          ? 'الرصيد يكفي للدفع الكامل.'
+          : walletPending
+            ? 'جاري التحقق من حالة الربط والرصيد...'
+          : !walletLinked
+            ? (hasWltServiceRoute ? 'اربط محفظتك أولًا عبر WLT.' : 'مسار شحن المحفظة غير موصول بعد داخل المضيف الحالي.')
+            : walletBalance <= 0
+              ? 'لا يوجد رصيد متاح الآن.'
+              : `المتبقي للشحن ${formattedWalletShortfall}.`,
+        helperTone: canUseWalletFull ? 'success' : 'info',
         action: canUseWalletFull
           ? undefined
           : {
@@ -725,15 +847,61 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         description: 'استخدم الرصيد المتاح وادفع المتبقي عند الاستلام.',
         selected: paymentMethod === 'mixed',
         disabled: walletPending || !canUseMixedPayment,
-        statusLabel: paymentMethod === 'mixed' ? 'محدد' : canUseMixedPayment ? 'جاهز الآن' : 'غير ضروري',
-        statusTone: canUseMixedPayment ? (paymentMethod === 'mixed' ? 'brand' : 'info') : 'info',
+        statusLabel: paymentMethod === 'mixed' ? 'محدد' : walletPending ? 'قيد التحقق' : canUseMixedPayment ? 'جاهز الآن' : !walletLinked ? 'يتطلب إجراء' : walletBalance <= 0 ? 'يتطلب إجراء' : 'غير ضروري',
+        statusTone: walletPending ? 'info' : canUseMixedPayment ? (paymentMethod === 'mixed' ? 'brand' : 'info') : !walletLinked || walletBalance <= 0 ? 'warning' : 'info',
         amountRows: canUseMixedPayment
           ? [
               { label: 'من المحفظة', value: formattedWalletBalance, tone: 'brand' },
               { label: 'عند الاستلام', value: formatHalalasAmount(grandTotalHalalas - walletBalance), tone: 'brand' },
             ]
-          : [],
+          : [
+              { label: 'من المحفظة', value: walletLinked ? formattedWalletBalance : formatHalalasAmount(0), tone: 'muted' },
+              { label: 'عند الاستلام', value: formattedGrandTotal, tone: 'brand' },
+            ],
+        helperText: canUseMixedPayment
+          ? `من المحفظة ${formattedWalletBalance}، وعند الاستلام ${formatHalalasAmount(grandTotalHalalas - walletBalance)}.`
+          : walletPending
+            ? 'جاري التحقق من رصيد المحفظة...'
+          : !walletLinked
+            ? (hasWltServiceRoute ? 'افتح WLT لربط المحفظة.' : 'مسار شحن المحفظة غير موصول بعد داخل المضيف الحالي.')
+            : walletBalance <= 0
+              ? 'لا يوجد رصيد للدفع المدمج.'
+              : 'الرصيد يكفي للدفع الكامل من المحفظة.',
+        helperTone: 'info',
+        action: canUseMixedPayment || walletBalance >= grandTotalHalalas
+          ? undefined
+          : {
+              label: !walletLinked ? 'فتح WLT' : 'شحن الرصيد',
+              tone: 'secondary',
+              onPress: !walletLinked
+                ? (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void linkWalletInline())
+                : (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void topUpWalletInline(walletShortfallHalalas)),
+              disabled: walletPending,
+            },
         onSelect: canUseMixedPayment ? () => setPaymentMethod('mixed') : undefined,
+      },
+      {
+        id: 'official-wallets',
+        title: 'الدفع عبر المحافظ الرسمية',
+        description: 'اختر محفظة رسمية وأكمل عبر WLT.',
+        selected: paymentMethod === 'official-wallets',
+        disabled: !hasWltServiceRoute,
+        statusLabel: hasWltServiceRoute ? (paymentMethod === 'official-wallets' ? 'محدد' : 'مسار خارجي') : 'غير موصول',
+        statusTone: paymentMethod === 'official-wallets' ? 'brand' : 'info',
+        amountRows: [
+          { label: 'إجمالي الطلب', value: formattedGrandTotal, tone: 'brand' },
+        ],
+        helperText: hasWltServiceRoute
+          ? 'خيار مستقل عن رصيد المحفظة الداخلي.'
+          : 'هذا الخيار يحتاج ربط مسار المحافظ الرسمية داخل المضيف الحالي.',
+        helperTone: 'info',
+        action: {
+          label: hasWltServiceRoute ? (walletLinked ? 'اختيار محفظة رسمية' : 'فتح WLT') : 'المسار غير موصول',
+          tone: 'secondary',
+          onPress: hasWltServiceRoute ? () => openWltService('official-wallets') : undefined,
+          disabled: !hasWltServiceRoute,
+        },
+        onSelect: hasWltServiceRoute ? () => setPaymentMethod('official-wallets') : undefined,
       },
     ];
   }, [canUseMixedPayment, canUseWalletFull, formattedGrandTotal, formattedWalletBalance, formattedWalletShortfall, grandTotalHalalas, hasWltServiceRoute, paymentMethod, topUpWalletInline, walletBalance, walletHydrated, walletLinked, walletRefreshing, walletShortfallHalalas]);
@@ -799,6 +967,11 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   };
 
   const handleEditPress = () => {
+    if (!canEditOrder) {
+      showNotice('تعديل الطلب غير متاح الآن', 'زر التعديل يحتاج مسار رجوع أو تحرير موصول داخل المضيف.', 'info');
+      return;
+    }
+
     if (props.onOpenStore) {
       props.onOpenStore();
       return;
@@ -834,12 +1007,41 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   };
 
   const applyQuickAction = () => {
-    if (!quickActionKey) return;
+    if (!quickActionKey) {
+      return;
+    }
+
     const trimmedValue = quickActionDraft.trim();
-    if (quickActionKey === 'coupon') setCouponCode(trimmedValue);
-    if (quickActionKey === 'address') setPickupAddr(trimmedValue || 'العنوان غير محدد بعد');
-    if (quickActionKey === 'note') setNote(trimmedValue || 'لا يوجد ملاحظة');
-    if (quickActionKey === 'extra') setExtraRequest(trimmedValue);
+
+    if (quickActionKey === 'coupon') {
+      setCouponCode(trimmedValue);
+      showNotice(
+        trimmedValue ? 'تم حفظ القسيمة' : 'أزلت القسيمة المحلية',
+        trimmedValue ? `القسيمة الحالية: ${trimmedValue}` : 'لن يتم إرسال أي قسيمة مع الطلب الحالي.',
+        'success',
+      );
+    }
+
+    if (quickActionKey === 'address') {
+      setPickupAddr(trimmedValue || 'العنوان غير محدد بعد');
+      showNotice('تم تحديث العنوان', trimmedValue || 'تم حفظ العنوان كحالة غير محددة حتى يتم إدخاله لاحقًا.', 'success');
+    }
+
+    if (quickActionKey === 'note') {
+      const nextNote = trimmedValue || 'لا يوجد ملاحظة';
+      setNote(nextNote);
+      showNotice('تم تحديث الملاحظة', nextNote, 'success');
+    }
+
+    if (quickActionKey === 'extra') {
+      setExtraRequest(trimmedValue);
+      showNotice(
+        trimmedValue ? 'تم حفظ الطلب الإضافي' : 'لا يوجد طلب إضافي محفوظ',
+        trimmedValue || 'يمكنك إضافة طلب إضافي لاحقًا عند الحاجة.',
+        'success',
+      );
+    }
+
     setQuickActionKey(null);
     setQuickActionDraft('');
   };
@@ -865,17 +1067,20 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     showNotice('الاشتراك جاهز UI فقط', 'زر الاشتراك واضح وفعال، لكن تفعيل الميزة يحتاج ربطًا لاحقًا خارج هذا النطاق.', 'info');
   };
 
-  const actionBarBottomPadding = resolvedFooterHeight + spacing[2];
-
   return (
-    <Box dir="rtl" flex={1} backgroundColor="pageBackground">
+    <View style={{ flex: 1, backgroundColor: PAGE_BG }}>
       <TopBar
         variant="secondary"
         title="تأكيد الطلب"
+        titleSlot={(
+          <Text style={{ color: TEXT_PRIMARY, fontSize: 17, fontWeight: '900', lineHeight: 20, maxWidth: '100%', flexShrink: 1, minWidth: 0, textAlign: 'center' }} numberOfLines={1}>
+            تأكيد الطلب
+          </Text>
+        )}
         actions={[
           {
             id: 'clear-cart',
-            icon: <Icon name="trash-outline" size={20} color={colorPalette.brand} />,
+            icon: <Icon name="trash-outline" size={20} color={ACCENT_BLUE} />,
             accessibilityLabel: 'تفريغ السلة',
             disabled: !items.length,
             onPress: () => {
@@ -884,50 +1089,60 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             },
           },
         ]}
-        onBack={handleBackPress}
+        trailingAction={{
+          id: 'exit-checkout',
+          icon: <Icon name="arrow-back" size={24} color={ACCENT_ORANGE} />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'الرجوع',
+          onPress: handleBackPress,
+        }}
       />
 
-      <MobileScrollView fill padding={3} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
+      <MobileScrollView fill padding={1} gap={1} contentContainerStyle={{ paddingBottom: spacing[2] }}>
         <PromoBanner onPress={handleSubscribePress} />
 
-        <Card title="الخيارات السريعة" subtitle="القسيمة والعنوان والملاحظات">
-          <Box gap={2}>
+        <Card title="الخيارات السريعة" subtitle="القسيمة والعنوان والملاحظات" padding={2} gap={1}>
+          <View style={{ gap: spacing[1] }}>
             <OptionRow
               title="هل لديك قسيمة تخفيض؟"
               subtitle={couponCode ? `القسيمة الحالية: ${couponCode}` : 'أدخل رمز التخفيض إن وجد'}
               actionLabel={couponCode ? 'تعديل' : 'إضافة'}
               onAction={() => openQuickAction('coupon')}
+              style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
             />
             <OptionRow
               title="عنوان التوصيل"
               subtitle={pickupAddr}
               actionLabel="تغيير"
               onAction={() => openQuickAction('address')}
+              style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
             />
             <OptionRow
               title="ملاحظات الطلب"
               subtitle={note}
               actionLabel={note === 'لا يوجد ملاحظة' ? 'إضافة' : 'تعديل'}
               onAction={() => openQuickAction('note')}
+              style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
             />
             <OptionRow
               title="طلب إضافي على الطريق"
               subtitle={extraRequest || 'مثال: بسبس أو ماء من أي ماركت على طريق الكابتن'}
               actionLabel={extraRequest ? 'تعديل' : 'إضافة'}
               onAction={() => openQuickAction('extra')}
+              style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
             />
-          </Box>
+          </View>
         </Card>
 
-        <Card title="وقت التنفيذ" subtitle="اختر وقت تنفيذ الطلب">
-          <Box gap={3}>
+        <Card title="وقت التنفيذ" subtitle="اختر وقت تنفيذ الطلب" padding={2} gap={1}>
+          <View style={{ gap: spacing[1] }}>
             <SegmentedControl
               options={[
                 { value: 'now', label: 'الآن' },
                 { value: 'later', label: 'في وقت لاحق' },
               ]}
               value={scheduling}
-              onValueChange={(nextValue: any) => {
+              onValueChange={(nextValue) => {
                 setScheduling(nextValue);
                 if (nextValue === 'later') {
                   setScheduledDate((current) => current || (executionScheduleOptions.dateOptions[0]?.value ?? ''));
@@ -935,9 +1150,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                 }
               }}
               size="sm"
+              style={{ backgroundColor: SURFACE_SOFT, borderColor: BORDER_SOFT, padding: spacing[0] }}
             />
             {scheduling === 'now' ? (
-              <Text role="caption" tone="muted">
+              <Text role="caption" style={{ color: TEXT_SECONDARY }}>
                 سيتم تنفيذ الطلب مباشرة بعد اعتماد السلة.
               </Text>
             ) : (
@@ -950,16 +1166,18 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                 onTimeChange={setScheduledTime}
               />
             )}
-          </Box>
+          </View>
         </Card>
 
-        <Card title="قرار الدفع" subtitle="اختر ما سيحدث ماليًا">
+        <Card title="قرار الدفع" subtitle="اختر ما سيحدث ماليًا" padding={1} gap={1}>
           <PaymentDecisionList items={paymentDecisionOptions} />
         </Card>
 
         <RecommendedSection onShowAll={handleShowAllRecommendations} onAddProduct={handleAddRecommendedProduct} />
 
         <SummaryCard
+          padding={2}
+          gap={1}
           items={[
             { label: 'حالة السلة', value: clientStateMeta.label },
             { label: 'الإجمالي', value: formattedSubtotal },
@@ -968,43 +1186,26 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           totalLabel="الإجمالي الكلي"
           totalValue={formattedGrandTotal}
         />
-        <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
+        <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
           {clientStateMeta.description}
         </Text>
 
         <ItemsTable items={items} onOpenDetails={() => setCartDetailsVisible(true)} />
-        <Box style={{ height: actionBarBottomPadding }} />
+        <View style={{ height: actionBarBottomPadding }} />
       </MobileScrollView>
 
-      <Surface
-        tone="raised"
-        padding={3}
-        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, borderTopWidth: 1, borderColor: colorPalette.borderSubtle, zIndex: 5, elevation: 8 }}
+      <View
         onLayout={(event) => setFooterHeight(event.nativeEvent.layout.height)}
+        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[2], paddingTop: spacing[1], paddingBottom: footerSafePadding, backgroundColor: colorPalette.surfacePrimary, borderTopWidth: 1, borderColor: BORDER_SOFT, zIndex: 5, elevation: 8 }}
       >
-        <Box flexDirection="row" gap={3}>
-          <Button
-            label="تنفيذ الطلب"
-            tone="brand"
-            size="md"
-            style={{ flex: 1 }}
-            disabled={!canCheckout || checkoutLoading}
-            loading={checkoutLoading}
-            onPress={handleCheckoutPress}
-          />
-          <Button
-            label="تعديل السلة"
-            tone="secondary"
-            size="md"
-            style={{ flex: 1 }}
-            disabled={!canEditOrder}
-            onPress={handleEditPress}
-          />
-        </Box>
-      </Surface>
+        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[1] }}>
+          <Button label="تنفيذ الطلب" size="md" fullWidth={false} disabled={!canCheckout || checkoutLoading} loading={checkoutLoading} onPress={handleCheckoutPress} style={{ flex: 1, minHeight: 46, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY, borderRadius: 16 }} />
+          <Button label="تعديل الطلب" tone="secondary" size="md" fullWidth={false} disabled={!canEditOrder} onPress={handleEditPress} style={{ flex: 1, minHeight: 46, backgroundColor: CTA_SECONDARY, borderColor: BORDER_SOFT, borderRadius: 16 }} />
+        </View>
+      </View>
 
       <QuickActionSheet
-        visible={Boolean(quickActionKey)}
+        visible={Boolean(quickActionMeta)}
         meta={quickActionMeta}
         value={quickActionDraft}
         submitDisabled={quickActionKey === 'coupon' ? quickActionDraft.trim().length === 0 : false}
@@ -1021,7 +1222,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         title={notice?.title ?? ''}
         description={notice?.description}
         tone={notice?.tone ?? 'info'}
-        onDismiss={() => setNotice(null)}
+        onDismiss={dismissNotice}
       />
 
       <DshCartDetails
@@ -1042,7 +1243,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           handleCheckoutPress();
         }}
       />
-    </Box>
+    </View>
   );
 }
 

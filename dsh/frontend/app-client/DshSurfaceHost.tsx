@@ -16,11 +16,9 @@ import { DshFavoritesListScreen } from './DshFavoritesListScreen';
 import { DshCartGetScreen } from './DshCartUnifiedScreen';
 import { type ClientOperationScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './DshClientOperationScreens';
 import type { DshHomeApprovedVideoReelsViewerProps } from './DshHomeApprovedVideoReelsViewer';
-import type { DshDiscoveryStore } from './types';
 import {
-  dshHomeGetNormalizedFixturePromos,
+  dshHomeGetFixturePromos,
   dshHomeGetFixtureStores,
-  type DshHomeGetFixtureStore,
 } from './dshHomeGetFixtures';
 import {
   buildStoreCategories,
@@ -151,22 +149,8 @@ const publishedCategoryListFixtures: PublishedCategoryItem[] = dshCategoryListFi
 
 const publishedPromoCategoryIds = new Set(publishedCategoryFixtures.map((category) => category.id));
 
-function findHostStore(storeId: string): DshDiscoveryStore | null {
-  const discoveryStore = dshDiscoveryStores.find((store) => store.id === storeId);
-  if (discoveryStore) {
-    return discoveryStore;
-  }
-
-  const homeFixtureStore = dshHomeGetFixtureStores.find((store) => store.id === storeId);
-  if (homeFixtureStore) {
-    return coerceHomeFixtureStoreToDiscoveryStore(homeFixtureStore);
-  }
-
-  return null;
-}
-
 function hasStoreTarget(storeId?: string) {
-  return typeof storeId === 'string' && findHostStore(storeId) !== null;
+  return typeof storeId === 'string' && dshDiscoveryStores.some((store) => store.id === storeId);
 }
 
 function hasStoreCategoryTarget(storeId?: string, categoryId?: string) {
@@ -217,55 +201,12 @@ function isMarketingGrowthRouteValid(item: MarketingGrowthRecord): boolean {
 }
 
 function getStoreCanonicalMetadata(storeId: string): HostCanonicalMetadata {
-  const store = findHostStore(storeId);
+  const store = dshDiscoveryStores.find((entry) => entry.id === storeId);
   return {
     canonicalStoreId: store?.canonicalStoreId,
     sourceRecordId: store?.sourceRecordId,
     publishStage: store?.publishStage,
   };
-}
-
-function parseHostDistanceLabel(distanceLabel?: string): number {
-  const distanceValue = Number.parseFloat((distanceLabel ?? '').replace(/[^\d.]/g, ''));
-  return Number.isFinite(distanceValue) ? distanceValue : 0;
-}
-
-function coerceHomeFixtureStoreToDiscoveryStore(store: DshHomeGetFixtureStore): DshDiscoveryStore {
-  return {
-    id: store.id,
-    name: store.name,
-    subtitle: store.address,
-    statusLabel: store.statusLabel,
-    meta: `${store.distanceLabel} · ${store.deliveryLabel}`,
-    etaMinutes: 0,
-    distanceKm: parseHostDistanceLabel(store.distanceLabel),
-    rating: store.rating ?? 0,
-    isOffer: Boolean(store.hasOffer || store.offerLabel),
-    isFavorite: store.isFavorite,
-    isFollowing: store.isFollowing,
-    mediaKey: store.mediaKey,
-    imageUri: store.imageUri ?? store.mediaKey ?? '',
-    deliveryLabel: store.deliveryLabel,
-    serviceLabel: store.serviceLabel,
-    followerCount: store.followerCount,
-    multiplierLabel: store.multiplierLabel,
-    subscriptionPackageChips: store.subscriptionPackageChips ?? [],
-    offerLabel: store.offerLabel,
-    hasBthwaniPro: Boolean(store.hasBthwaniPro),
-    hasNewProducts: Boolean(store.hasNewProducts),
-    hasCouponAvailable: Boolean(store.hasCouponAvailable),
-    supportsPickup: false,
-    supportsPartnerDelivery: true,
-    commercialSourceMap: store.commercialSourceMap,
-    sourceRecordId: store.sourceRecordId,
-    canonicalStoreId: store.canonicalStoreId,
-    publishStage: store.publishStage,
-    mediaPolicy: store.mediaPolicy,
-  };
-}
-
-function resolveHostStore(storeId: string): DshDiscoveryStore {
-  return findHostStore(storeId) ?? dshDiscoveryStores[0];
 }
 
 function getProductCanonicalMetadata(storeId: string, productId: string): HostCanonicalMetadata {
@@ -549,34 +490,12 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     openTrackedOrder();
   }, [openTrackedOrder]);
 
-  const activateStoreContext = React.useCallback((storeId?: string) => {
-    if (!storeId) {
-      return false;
-    }
-
-    const nextStore = findHostStore(storeId);
-    if (!nextStore) {
-      return false;
-    }
-
-    const nextStoreMetadata = getStoreCanonicalMetadata(storeId);
-    setActiveStoreId(nextStore.id);
-    setActiveCanonicalStoreId(nextStoreMetadata.canonicalStoreId ?? nextStore.canonicalStoreId);
-    setActiveCanonicalProductId(undefined);
-    return true;
-  }, []);
-
-  const activeStore = React.useMemo(() => resolveHostStore(activeStoreId), [activeStoreId]);
+  const activeStore = React.useMemo(
+    () => dshDiscoveryStores.find((store) => store.id === activeStoreId) ?? dshDiscoveryStores[0],
+    [activeStoreId],
+  );
 
   const activeStoreItems = React.useMemo(() => storeItemsByStoreId[activeStore.id] ?? [], [activeStore.id]);
-  const activeStoreItemsWithVisibility = React.useMemo(
-    () => activeStoreItems.map((item) => ({
-      ...item,
-      publishStage: item.publishStage ?? activeStore.publishStage,
-      mediaPolicy: item.mediaPolicy ?? activeStore.mediaPolicy,
-    })),
-    [activeStore, activeStoreItems],
-  );
 
   const activeStoreCategories = React.useMemo(() => buildStoreCategories(activeStoreItems), [activeStoreItems]);
 
@@ -647,10 +566,6 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   const subscriptionMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'subscription');
   const promoMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'promotion');
   const campaignMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'campaign');
-  const homeBannerPromos = React.useMemo(() => {
-    const marketingPromos = getPublishedMarketingHomePromos('all');
-    return marketingPromos.length > 0 ? marketingPromos : dshHomeGetNormalizedFixturePromos;
-  }, []);
 
   // Sanity check: if any imported screen component is undefined, show a clear error
   const importedScreens: Array<[string, unknown]> = [
@@ -744,23 +659,16 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
           deliveryFeeLabel: activeStore.deliveryFeeLabel ?? 'رسوم التوصيل 12 ر.ي',
           followersCount: activeStore.followerCount,
           priceMatchLabel: activeStore.priceMatchLabel ?? 'الأسعار مطابقة للمطعم',
-          mediaKey: activeStore.mediaKey,
           imageUri: activeStore.imageUri,
           deliveryLabel: activeStore.deliveryLabel,
           serviceLabel: activeStore.serviceLabel,
           subscriptionPackageChips: activeStore.subscriptionPackageChips,
           hasBthwaniPro: activeStore.hasBthwaniPro,
-          offerLabel: activeStore.offerLabel,
-          hasCouponAvailable: activeStore.hasCouponAvailable,
-          hasNewProducts: activeStore.hasNewProducts,
-          publishStage: activeStore.publishStage,
-          mediaPolicy: activeStore.mediaPolicy,
-          commercialSourceMap: activeStore.commercialSourceMap,
           tags: activeStoreTags,
           categories: activeStoreCategories,
           deliveryModes: activeStoreDeliveryModes,
         }}
-        menuItems={activeStoreItemsWithVisibility}
+        menuItems={activeStoreItems}
         onAddItemToCart={addItemToHostCart}
         onOpenItems={() => {
           setStoreItemsEntryOrigin('store-get');
@@ -887,12 +795,10 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
         onOpenCategories={() => setRoute('home')}
         onOpenFavorites={() => setRoute('favorites-list')}
         onOpenResult={(resultId) => {
-          if (!activateStoreContext(resultId)) {
-            return;
-          }
-
-          setSelectedItemId('');
-          setItemsCategory('all');
+          const nextStoreMetadata = getStoreCanonicalMetadata(resultId);
+          setActiveStoreId(resultId);
+          setActiveCanonicalStoreId(nextStoreMetadata.canonicalStoreId);
+          setActiveCanonicalProductId(undefined);
           setRoute('store-get');
         }}
         onBack={() => setRoute('home')}
@@ -1016,8 +922,8 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
 
   return (
     <DshHomeGetScreen
-      categories={dshCategoryFixtures}
-      promos={homeBannerPromos}
+      categories={dshCategoryListFixtures}
+      promos={getPublishedMarketingHomePromos('all') as DshHomeGetPromo[]}
       homePromos={getPublishedHomePromos()}
       approvedVideoShorts={liveMarketingShorts}
       stores={dshHomeGetFixtureStores as DshHomeGetStore[]}
@@ -1063,24 +969,18 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
       }}
       onOpenDiscovery={() => setRoute('home')}
       onOpenStoreCategory={(storeId, categoryId) => {
-        if (!activateStoreContext(storeId)) {
-          return;
-        }
-
+        const nextStoreMetadata = getStoreCanonicalMetadata(storeId);
+        setActiveStoreId(storeId);
+        setActiveCanonicalStoreId(nextStoreMetadata.canonicalStoreId);
+        setActiveCanonicalProductId(undefined);
         setItemsCategory(categoryId);
-        setSelectedItemId('');
         setStoreItemsEntryOrigin('home');
         setRoute('store-items');
       }}
       onOpenProduct={(storeId, itemId) => {
-        const nextStore = findHostStore(storeId);
-        if (!nextStore) {
-          return;
-        }
-
         const nextProductMetadata = getProductCanonicalMetadata(storeId, itemId);
-        setActiveStoreId(nextStore.id);
-        setActiveCanonicalStoreId(nextProductMetadata.canonicalStoreId ?? nextStore.canonicalStoreId);
+        setActiveStoreId(storeId);
+        setActiveCanonicalStoreId(nextProductMetadata.canonicalStoreId);
         setActiveCanonicalProductId(nextProductMetadata.canonicalProductId);
         setSelectedItemId(itemId);
         setRoute('cart-get');
@@ -1102,10 +1002,14 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
         setRoute('home');
       }}
       onOpenStore={(storeId) => {
-        if (!activateStoreContext(storeId)) {
+        if (!hasStoreTarget(storeId)) {
           return;
         }
 
+        const nextStoreMetadata = getStoreCanonicalMetadata(storeId);
+        setActiveStoreId(storeId);
+        setActiveCanonicalStoreId(nextStoreMetadata.canonicalStoreId);
+        setActiveCanonicalProductId(undefined);
         setItemsQuery('');
         setItemsCategory('all');
         setSelectedItemId('');

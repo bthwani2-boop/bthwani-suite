@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
 
@@ -41,8 +42,8 @@ import { getPublishedHomePromos, type HomePromoRecord } from '../shared/promo-st
 
 import { canRenderInClientSurface } from '../shared/workflow';
 
-function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string, mediaPolicy?: string): ImageSourcePropType | undefined {
-  if (!canRenderInClientSurface(publishStage, 'store', { mediaPolicy })) {
+function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string): ImageSourcePropType | undefined {
+  if (!canRenderInClientSurface(publishStage, 'store')) {
     return undefined;
   }
   return resolveDshImageSource(imageUri);
@@ -52,9 +53,27 @@ function resolveDshHomeBannerImageSource(imageUrl?: string): ImageSourcePropType
   return resolveDshImageSource(imageUrl);
 }
 
-function parseDistanceLabel(distanceLabel?: string): number | null {
-  const value = Number.parseFloat((distanceLabel ?? '').replace(/[^\d.]/g, ''));
-  return Number.isFinite(value) ? value : null;
+function normalizeHomePromoActionType(targetType: string): DshHomeBannerActionType | undefined {
+  if (targetType === 'category') {
+    return 'main_category';
+  }
+
+  switch (targetType) {
+    case 'main_category':
+    case 'sub_category':
+    case 'store':
+    case 'external':
+    case 'store_category':
+    case 'product':
+    case 'subscription':
+      return targetType;
+    default:
+      return undefined;
+  }
+}
+
+function resolveHomePromoPublishStage(status: HomePromoRecord['status']) {
+  return status === 'published' ? 'published-preview' : 'draft';
 }
 
 type CategoryDialItem = OrbitCarouselItem;
@@ -101,13 +120,10 @@ export type DshHomeGetScreenProps = {
 export type DshHomeCategory = {
   id: string;
   label: string;
-  shortLabel?: string;
   subtitle?: string;
   countLabel?: string;
   renderMode?: 'stores' | 'manual-order';
   emojiFallback?: string;
-  orbitWeight?: number;
-  isManualLike?: boolean;
   subcategories?: Array<{
     id: string;
     label: string;
@@ -116,25 +132,6 @@ export type DshHomeCategory = {
 };
 
 export type DshHomeBannerActionType = 'main_category' | 'sub_category' | 'store' | 'external' | 'store_category' | 'product' | 'subscription';
-
-function normalizeHomePromoActionType(targetType: string): DshHomeBannerActionType | undefined {
-  if (targetType === 'category') {
-    return 'main_category';
-  }
-
-  switch (targetType) {
-    case 'main_category':
-    case 'sub_category':
-    case 'store':
-    case 'external':
-    case 'store_category':
-    case 'product':
-    case 'subscription':
-      return targetType;
-    default:
-      return undefined;
-  }
-}
 
 type DiscoveryFilter = 'all' | 'favorites' | 'nearest' | 'new' | 'offers';
 
@@ -173,8 +170,6 @@ export type DshHomeGetPromo = {
   autoplayEnabled?: boolean;
   autoplayIntervalMs?: number;
   pauseOnInteraction?: boolean;
-  publishStage?: string;
-  mediaPolicy?: string;
 };
 
 export type DshHomeGetStore = {
@@ -195,14 +190,10 @@ export type DshHomeGetStore = {
   multiplierLabel: string;
   subscriptionPackageChips?: string[];
   offerLabel?: string;
-  hasBthwaniPro?: boolean;
   isFavorite: boolean;
   isFollowing: boolean;
   hasOffer?: boolean;
-  hasCouponAvailable?: boolean;
-  hasNewProducts?: boolean;
   publishStage?: string;
-  mediaPolicy?: string;
   commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
 };
 
@@ -331,12 +322,12 @@ const serviceLauncherMarkStyles = StyleSheet.create({
   },
 });
 
-const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; iconName: string }> = [
-  { value: 'all', label: 'الكل', iconName: 'menu' },
+const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; iconName: React.ComponentProps<typeof Ionicons>['name'] }> = [
+  { value: 'all', label: 'الكل', iconName: 'reorder-three-outline' },
   { value: 'favorites', label: 'المفضلة', iconName: 'heart-outline' },
-  { value: 'nearest', label: 'الأقرب', iconName: 'locate' },
-  { value: 'new', label: 'الجديدة', iconName: 'sparkles' },
-  { value: 'offers', label: 'العروض', iconName: 'pricetags' },
+  { value: 'nearest', label: 'الأقرب', iconName: 'locate-outline' },
+  { value: 'new', label: 'الجديدة', iconName: 'sparkles-outline' },
+  { value: 'offers', label: 'العروض', iconName: 'pricetag-outline' },
 ];
 
 const categoryIconMap: Record<string, string> = {
@@ -399,19 +390,19 @@ function CategoryIconImage({
 
 function DshServiceLauncherMark() {
   return (
-    <Box style={serviceLauncherMarkStyles.root}>
-      <Box style={serviceLauncherMarkStyles.orbit} />
-      <Box style={serviceLauncherMarkStyles.needle} />
-      <Box style={serviceLauncherMarkStyles.planeWrap}>
+    <View style={serviceLauncherMarkStyles.root}>
+      <View style={serviceLauncherMarkStyles.orbit} />
+      <View style={serviceLauncherMarkStyles.needle} />
+      <View style={serviceLauncherMarkStyles.planeWrap}>
         <Icon name="paper-plane" size={12} color={colorPalette.brand} />
-      </Box>
-    </Box>
+      </View>
+    </View>
   );
 }
 
 function CategoryHubIcon() {
   return (
-    <Icon name="grid-outline" size={22} color={colorPalette.brand} />
+    <Ionicons name="grid-outline" size={22} color={colorPalette.brand} />
   );
 }
 
@@ -437,6 +428,7 @@ function CategorySelectorItem({
   isSelected,
   isHub,
   isVideo,
+  styles,
   theme,
 }: {
   label: string;
@@ -445,33 +437,27 @@ function CategorySelectorItem({
   isSelected?: boolean;
   isHub?: boolean;
   isVideo?: boolean;
+  styles: any;
   theme: any;
 }) {
   return (
-    <Box align="center" gap={1}>
-      <Surface
-        tone={isSelected ? 'brand' : 'raised'}
-        padding={0}
-        border
-        radiusToken="md"
-        onPress={onPress}
-        style={{
-          width: 54,
-          height: 54,
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderColor: isSelected ? theme.brand : theme.line,
-          backgroundColor: isSelected ? theme.brandSurface : (isHub || isVideo) ? theme.surfaceRaised : theme.surfaceRaised,
-        }}
+    <Pressable style={styles.categorySelectorCard} onPress={onPress}>
+      <View
+        style={[
+          styles.categoryIconContainer,
+          isHub && styles.categoryHubIconContainer,
+          isVideo && styles.videoIconContainer,
+          isSelected && styles.categoryIconContainerSelected,
+        ]}
       >
         {icon}
-      </Surface>
-      <Box style={{ minHeight: 18, alignItems: 'center' }}>
-        <Text role="bodySm" align="center" style={{ fontWeight: '700', fontSize: 11, color: isSelected ? theme.brand : theme.text }} numberOfLines={1}>
+      </View>
+      <View style={[styles.categoryNameContainer]}>
+        <Text role="bodySm" style={[styles.categoryName, isSelected && { color: theme.brand }]} numberOfLines={1}>
           {label}
         </Text>
-      </Box>
-    </Box>
+      </View>
+    </Pressable>
   );
 }
 
@@ -483,42 +469,38 @@ function FilterChipItem({
   icon,
   onPress,
   isActive,
+  styles,
   theme,
 }: {
   label: string;
   icon?: React.ReactNode;
   onPress: () => void;
   isActive: boolean;
+  styles: any;
   theme: any;
 }) {
   return (
-    <Surface
-      tone={isActive ? 'brand' : 'default'}
-      paddingX={3}
-      paddingY={1}
-      radiusToken="full"
-      border
+    <Pressable
+      style={[
+        styles.filterChip,
+        {
+          backgroundColor: isActive ? theme.brand : 'transparent',
+          borderColor: isActive ? theme.brand : theme.line,
+        },
+      ]}
       onPress={onPress}
-      style={{
-        minHeight: 36,
-        minWidth: 70,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderColor: isActive ? theme.brand : theme.line,
-      }}
     >
-      <Box layoutDirection="row" align="center" gap={1.5}>
-        {icon && <Box style={{ width: 18, height: 18, alignItems: 'center', justifyContent: 'center' }}>{icon}</Box>}
+      <View style={styles.filterChipContent}>
+        {icon && <View style={styles.filterChipIconWrap}>{icon}</View>}
         <Text
           role="bodySm"
-          style={{ fontWeight: '800', fontSize: 12, color: isActive ? theme.textInverse : theme.textMuted }}
+          style={[styles.filterChipLabel, { color: isActive ? theme.textInverse : theme.textMuted }]}
           numberOfLines={1}
         >
           {label}
         </Text>
-      </Box>
-    </Surface>
+      </View>
+    </Pressable>
   );
 }
 
@@ -639,8 +621,10 @@ export function DshHomeGetScreen({
   }, [onOpenEntry, onOpenMySpace]);
 
   const resolvedCategories = categories ?? [];
-  const resolvedPromos = (promos ?? []).filter((promo) => canRenderInClientSurface(promo.publishStage, 'promo', { mediaPolicy: promo.mediaPolicy }));
-  const resolvedHomePromos = (homePromos ?? getPublishedHomePromos()).filter(p => canRenderInClientSurface(p.status === 'published' ? 'published-preview' : 'draft', 'promo'));
+  const resolvedPromos = promos ?? [];
+  const resolvedHomePromos = (homePromos ?? getPublishedHomePromos()).filter((promo) => (
+    canRenderInClientSurface(resolveHomePromoPublishStage(promo.status), 'promo')
+  ));
 
   const containerWidth = viewportWidth;
   const sidePeek = Math.max(spacing[1], Math.min(spacing[4], Math.round(containerWidth * 0.045)));
@@ -650,7 +634,7 @@ export function DshHomeGetScreen({
   const cardHeight = Math.max(154, Math.round(cardWidth * 0.74));
   const itemWidth = cardWidth + itemGap;
   const horizontalPadding = Math.max(0, Math.round((containerWidth - cardWidth) / 2));
-  const resolvedStores = (stores ?? []).filter((store) => canRenderInClientSurface(store.publishStage, 'store', { mediaPolicy: store.mediaPolicy }));
+  const resolvedStores = (stores ?? []).filter((store) => canRenderInClientSurface(store.publishStage, 'store'));
   const resolvedRecentOrders = recentOrders ?? [];
 
   const categoryItems = React.useMemo(() => {
@@ -684,12 +668,11 @@ export function DshHomeGetScreen({
       }
 
       if (activeFilter === 'nearest') {
-        const distanceKm = parseDistanceLabel(store.distanceLabel);
-        return distanceKm !== null && distanceKm <= 2.5;
+        return store.distanceLabel === '1.8 كم' || store.distanceLabel === '2.1 كم';
       }
 
       if (activeFilter === 'new') {
-        return Boolean(store.hasNewProducts);
+        return Boolean(store.hasOffer);
       }
 
       if (activeFilter === 'offers') {
@@ -771,9 +754,7 @@ export function DshHomeGetScreen({
     () =>
       categoryItems.map((category) => ({
         ...category,
-        label: category.shortLabel ?? category.label,
-        iconUrl: getDshCategoryIconUrl(category.id),
-        emojiFallback: category.emojiFallback ?? categoryIconMap[category.id] ?? '📂',
+        icon: categoryIconMap[category.id] ?? '📂',
       })),
     [categoryItems]
   );
@@ -1228,9 +1209,8 @@ export function DshHomeGetScreen({
       setCategoriesSheetVisible(true);
     });
   }, []);
-
-  return (
-    <Box dir="rtl" style={styles.screenRoot}>
+return (
+    <View style={styles.screenRoot}>
       {inlineSearchVisible ? (
         <SearchTopBar
           value={inlineSearchQuery}
@@ -1238,8 +1218,8 @@ export function DshHomeGetScreen({
           onClose={closeInlineSearch}
           variant="main"
           autoFocus
-          placeholder="ابحث عن متجر أو فئة..."
-          hint="بحث سريع في المتاجر والخدمات المتاحة حالياً."
+          placeholder="ابحث عن متجر أو فئة داخل الواجهة الحالية"
+          hint="بحث عام سريع داخل التجربة الحالية للوصول إلى المتاجر والمسارات بدون مغادرة الصفحة."
           style={styles.brandTopBarShell}
         />
       ) : (
@@ -1296,522 +1276,525 @@ export function DshHomeGetScreen({
         />
       )}
 
-      <Box style={{ flex: 1 }}>
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{
-            paddingHorizontal: spacing[3],
-            paddingTop: spacing[0],
-            paddingBottom: spacing[12],
-            flexGrow: 1,
-          }}
-          showsVerticalScrollIndicator={false}
-        >
-          {inlineSearchVisible ? (
-            <Surface tone="raised" padding={3} gap={2} style={{ borderRadius: '16px' }}>
-              <Text role="bodyStrong">نتائج البحث المحلي</Text>
-              <Text role="caption" tone="muted">
-                {inlineSearchQuery.trim()
-                  ? `جاري التصفية حسب: ${inlineSearchQuery}`
-                  : 'ابدأ بكتابة اسم متجر أو خدمة للوصول السريع.'}
-              </Text>
-            </Surface>
-          ) : bannerItems.length ? (
-            <Box style={[
-              styles.premiumBannerSection,
-              {
-                marginLeft: -spacing[3],
-                marginRight: -spacing[3],
-                width: containerWidth,
-                height: cardHeight + spacing[6],
-              },
-            ]}>
-              <ScrollView
-                  ref={promoScrollRef}
-                  horizontal
-                  pagingEnabled={false}
-                  showsHorizontalScrollIndicator={false}
-                  directionalLockEnabled
-                  decelerationRate="fast"
-                  snapToInterval={itemWidth}
-                  snapToAlignment="center"
-                  disableIntervalMomentum={false}
-                  onScrollBeginDrag={() => {
-                    if (activePromoPauseOnInteraction) {
-                      clearInteractionResumeTimer();
-                      setIsCarouselInteractionPaused(true);
-                    }
-                  }}
-                  onMomentumScrollEnd={(event) => {
-                    const x = event.nativeEvent.contentOffset.x;
-                    const index = Math.round(x / itemWidth);
-                    if (index !== activePromoIndex && index >= 0 && index < bannerItems.length) {
-                      setActivePromoIndex(index);
-                    }
-                    scheduleCarouselResume();
-                  }}
-                  onScrollEndDrag={() => {
-                    scheduleCarouselResume();
-                  }}
-                  contentContainerStyle={[
-                    styles.premiumBannerScrollContent,
-                    {
-                      paddingHorizontal: horizontalPadding,
-                      flexDirection: 'row',
-                    }
-                  ]}
-              >
-                {bannerItems.map((promo, index) => {
-                    const isActive = index === activePromoIndex;
-                    const motionStyle = promo.motionStyle ?? activePromoMotionStyle;
-                    const cardMotionStyle =
-                      motionStyle === 'subtle-fade'
-                        ? { opacity: isActive ? 1 : 0.78, transform: [{ scale: isActive ? 1 : 0.965 }] }
-                        : motionStyle === 'soft-parallax'
-                          ? { transform: [{ scale: isActive ? 1 : 0.97 }] }
-                          : motionStyle === 'snap-focus'
-                            ? { transform: [{ scale: isActive ? 1 : 0.952 }] }
-                            : { transform: [{ scale: isActive ? 1 : 0.972 }] };
-                    const imageMotionStyle =
-                      motionStyle === 'soft-parallax'
-                        ? { transform: [{ scale: isActive ? 1.08 : 1.02 }] }
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingHorizontal: spacing[3],
+          paddingTop: spacing[0],
+          paddingBottom: spacing[12],
+          flexGrow: 1,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {inlineSearchVisible ? (
+          <Surface tone="raised" padding={3} gap={2}>
+            <Text role="titleSm">نتائج البحث داخل الواجهة الحالية</Text>
+            <Text role="bodySm" tone="muted">
+              {inlineSearchQuery.trim()
+                ? `يتم الآن تصفية المتاجر والمسارات المتاحة حسب: ${inlineSearchQuery}`
+                : 'ابدأ بكتابة اسم متجر أو خدمة أو فئة، وستظهر النتائج مباشرة في نفس الصفحة.'}
+            </Text>
+          </Surface>
+        ) : bannerItems.length ? (
+          <View style={[
+            styles.premiumBannerSection,
+            {
+              marginLeft: -spacing[3],
+              marginRight: -spacing[3],
+              width: containerWidth,
+              height: cardHeight + spacing[6],
+            },
+          ]}>
+             <ScrollView
+                ref={promoScrollRef}
+                horizontal
+                pagingEnabled={false}
+                showsHorizontalScrollIndicator={false}
+                directionalLockEnabled
+                decelerationRate="fast"
+                snapToInterval={itemWidth}
+                snapToAlignment="center"
+                disableIntervalMomentum={false}
+                onScrollBeginDrag={() => {
+                  if (activePromoPauseOnInteraction) {
+                    clearInteractionResumeTimer();
+                    setIsCarouselInteractionPaused(true);
+                  }
+                }}
+                onMomentumScrollEnd={(event) => {
+                  const x = event.nativeEvent.contentOffset.x;
+                  const index = Math.round(x / itemWidth);
+                  if (index !== activePromoIndex && index >= 0 && index < bannerItems.length) {
+                    setActivePromoIndex(index);
+                  }
+                  scheduleCarouselResume();
+                }}
+                onScrollEndDrag={() => {
+                  scheduleCarouselResume();
+                }}
+                contentContainerStyle={[
+                  styles.premiumBannerScrollContent,
+                  {
+                    paddingHorizontal: horizontalPadding,
+                    flexDirection: 'row',
+                  }
+                ]}
+             >
+               {bannerItems.map((promo, index) => {
+                  const isActive = index === activePromoIndex;
+                  const motionStyle = promo.motionStyle ?? activePromoMotionStyle;
+                  const cardMotionStyle =
+                    motionStyle === 'subtle-fade'
+                      ? { opacity: isActive ? 1 : 0.78, transform: [{ scale: isActive ? 1 : 0.965 }] }
+                      : motionStyle === 'soft-parallax'
+                        ? { transform: [{ scale: isActive ? 1 : 0.97 }] }
                         : motionStyle === 'snap-focus'
-                          ? { transform: [{ scale: isActive ? 1.03 : 1 }] }
-                          : null;
-                    return (
-                      <Pressable
-                        key={promo.id || index}
-                        onPress={() => {
-                          if (activePromoPauseOnInteraction) {
-                            clearInteractionResumeTimer();
-                            setIsCarouselInteractionPaused(true);
-                            scheduleCarouselResume();
-                          }
-                          resolveBannerPress(promo)();
-                        }}
-                        style={[
-                          styles.premiumBannerCard,
-                          { width: cardWidth, marginEnd: index < bannerItems.length - 1 ? itemGap : 0 },
-                          cardMotionStyle,
-                          isActive && styles.premiumBannerCardActive
-                        ]}
-                      >
-                        <Box style={[styles.premiumBannerImageWrap, { height: cardHeight }]}>
-                          <Image
-                            source={promo.image}
-                            style={[styles.premiumBannerImage, imageMotionStyle]}
-                            resizeMode={promo.imageFit === 'contain' ? 'contain' : 'cover'}
-                          />
-                          <Box style={[styles.premiumBannerOverlay, { backgroundColor: promo.accentColor ? `${promo.accentColor}29` : 'rgba(0,0,0,0.08)' }]} />
-                          <Box style={styles.premiumBannerTopGlow} />
-                          <Box style={styles.premiumBannerBottomShade} />
-
-                          {promo.partnerLogoUrl && (
-                            <Box style={[
-                              styles.premiumBannerLogoWrap,
-                              promo.partnerLogoPosition === 'top-right' ? { right: 18 } : promo.partnerLogoPosition === 'bottom-right' ? { right: 18, bottom: 18, top: undefined } : promo.partnerLogoPosition === 'bottom-left' ? { left: 18, bottom: 18, top: undefined } : { left: 18 }
-                            ]}>
-                              <Image source={resolveDshHomeBannerImageSource(promo.partnerLogoUrl)} style={styles.premiumBannerLogo} resizeMode="contain" />
-                            </Box>
-                          )}
-
-                          {promo.offerBadgeText && (
-                            <Box style={[
-                              styles.premiumBannerBadge,
-                              { backgroundColor: promo.offerBadgeColor || colorPalette.brandStrong },
-                              promo.offerBadgePosition === 'top-left' ? { left: 18, top: 20 } : { right: 18, top: 20 }
-                            ]}>
-                              <Text style={styles.premiumBannerBadgeText}>{promo.offerBadgeText}</Text>
-                            </Box>
-                          )}
-
-                          <Box style={[
-                            styles.premiumBannerContent,
-                            promo.titlePlacement === 'center' ? { justifyContent: 'center' } : { justifyContent: 'flex-end' }
-                          ]}>
-                            <Box gap={1}>
-                                <Text style={styles.premiumBannerTitle} numberOfLines={1}>{promo.title}</Text>
-                                <Text style={styles.premiumBannerSubtitle} numberOfLines={1}>{promo.subtitle}</Text>
-                            </Box>
-
-                            <Box style={[styles.premiumBannerCta, { backgroundColor: colorPalette.white }]}>
-                              <Text style={[styles.premiumBannerCtaText, { color: promo.accentColor || colorPalette.brand }]}>
-                                {promo.ctaLabel || 'اكتشف الآن'}
-                              </Text>
-                            </Box>
-                          </Box>
-                        </Box>
-                      </Pressable>
-                    );
-                })}
-              </ScrollView>
-
-              <Box style={[styles.premiumCarouselControls, isRtl && styles.premiumCarouselControlsRtl]}>
-                  <Box style={styles.premiumIndicatorRow}>
-                    {bannerItems.map((_, i) => (
-                      <Box
-                        key={i}
-                        style={[
-                          styles.premiumIndicator,
-                          i === activePromoIndex && styles.premiumIndicatorActive,
-                        ]}
-                      />
-                    ))}
-                  </Box>
-                  {bannerItems.length > 1 && (
+                          ? { transform: [{ scale: isActive ? 1 : 0.952 }] }
+                          : { transform: [{ scale: isActive ? 1 : 0.972 }] };
+                  const imageMotionStyle =
+                    motionStyle === 'soft-parallax'
+                      ? { transform: [{ scale: isActive ? 1.08 : 1.02 }] }
+                      : motionStyle === 'snap-focus'
+                        ? { transform: [{ scale: isActive ? 1.03 : 1 }] }
+                        : null;
+                  return (
                     <Pressable
-                      style={styles.premiumPauseBtn}
+                      key={promo.id || index}
                       onPress={() => {
-                        clearInteractionResumeTimer();
-                        setIsCarouselInteractionPaused(false);
-                        setIsCarouselUserPaused((current) => !current);
+                        if (activePromoPauseOnInteraction) {
+                          clearInteractionResumeTimer();
+                          setIsCarouselInteractionPaused(true);
+                          scheduleCarouselResume();
+                        }
+                        resolveBannerPress(promo)();
                       }}
+                      style={[
+                        styles.premiumBannerCard,
+                        { width: cardWidth, marginEnd: index < bannerItems.length - 1 ? itemGap : 0 },
+                        cardMotionStyle,
+                        isActive && styles.premiumBannerCardActive
+                      ]}
                     >
-                      <Icon
-                        name={isCarouselUserPaused ? 'play' : 'pause'}
-                        size={16}
-                        color={colorPalette.white}
-                      />
-                    </Pressable>
-                  )}
-              </Box>
-            </Box>
-          ) : null}
-
-          <Box gap={0}>
-            <Box style={styles.categoriesSelectorSection}>
-              <Box style={styles.categoriesSelectorRow}>
-                <Box style={styles.fixedIconsContainer}>
-                  <CategorySelectorItem
-                    isVideo
-                    label="فيديو"
-                    icon={<Icon name="play" size={22} color={colorPalette.brand} />}
-                    onPress={() => setShortsVisible(true)}
-                    theme={theme}
-                  />
-
-                  <Box ref={categoriesAnchorRef}>
-                    <CategorySelectorItem
-                      isHub
-                      label="الفئات"
-                      icon={<CategoryHubIcon />}
-                      onPress={openCategoriesDial}
-                      theme={theme}
-                    />
-                  </Box>
-
-                  {selectedCategoryFixture && (
-                    <CategorySelectorItem
-                      isSelected
-                      label={selectedCategoryLabel}
-                      icon={
-                        <CategoryIconImage
-                          uri={null}
-                          emojiFallback={categoryIconMap[selectedCategoryFixture.id] ?? '📂'}
-                          style={styles.categoryIconImage}
+                      <View style={[styles.premiumBannerImageWrap, { height: cardHeight }]}>
+                        <Image
+                          source={promo.image}
+                          style={[styles.premiumBannerImage, imageMotionStyle]}
+                          resizeMode={promo.imageFit === 'contain' ? 'contain' : 'cover'}
                         />
-                      }
-                      onPress={() => setActiveSubcategoryId(null)}
-                      theme={theme}
-                    />
-                  )}
-                </Box>
+                        <View style={[styles.premiumBannerOverlay, { backgroundColor: promo.accentColor ? `${promo.accentColor}29` : 'rgba(0,0,0,0.08)' }]} />
+                        <View style={styles.premiumBannerTopGlow} />
+                        <View style={styles.premiumBannerBottomShade} />
 
-                {activeHomePromo && (
+                        {promo.partnerLogoUrl && (
+                          <View style={[
+                            styles.premiumBannerLogoWrap,
+                            promo.partnerLogoPosition === 'top-right' ? { right: 18 } : promo.partnerLogoPosition === 'bottom-right' ? { right: 18, bottom: 18, top: undefined } : promo.partnerLogoPosition === 'bottom-left' ? { left: 18, bottom: 18, top: undefined } : { left: 18 }
+                          ]}>
+                            <Image source={resolveDshHomeBannerImageSource(promo.partnerLogoUrl)} style={styles.premiumBannerLogo} resizeMode="contain" />
+                          </View>
+                        )}
+
+                        {promo.offerBadgeText && (
+                          <View style={[
+                            styles.premiumBannerBadge,
+                            { backgroundColor: promo.offerBadgeColor || colorPalette.brandStrong },
+                            promo.offerBadgePosition === 'top-left' ? { left: 18, top: 20 } : { right: 18, top: 20 }
+                          ]}>
+                            <Text style={styles.premiumBannerBadgeText}>{promo.offerBadgeText}</Text>
+                          </View>
+                        )}
+
+                        <View style={[
+                          styles.premiumBannerContent,
+                          promo.titlePlacement === 'center' ? { justifyContent: 'center' } : { justifyContent: 'flex-end' }
+                        ]}>
+                          <Box gap={1}>
+                             <Text style={styles.premiumBannerTitle} numberOfLines={1}>{promo.title}</Text>
+                             <Text style={styles.premiumBannerSubtitle} numberOfLines={1}>{promo.subtitle}</Text>
+                          </Box>
+
+                          <View style={[styles.premiumBannerCta, { backgroundColor: colorPalette.white }]}>
+                            <Text style={[styles.premiumBannerCtaText, { color: promo.accentColor || colorPalette.brand }]}>
+                              {promo.ctaLabel || 'اكتشف الآن'}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </Pressable>
+                  );
+               })}
+             </ScrollView>
+
+             <View style={[styles.premiumCarouselControls, isRtl && styles.premiumCarouselControlsRtl]}>
+                <View style={styles.premiumIndicatorRow}>
+                  {bannerItems.map((_, i) => (
+                    <View
+                      key={i}
+                      style={[
+                        styles.premiumIndicator,
+                        i === activePromoIndex && styles.premiumIndicatorActive,
+                      ]}
+                    />
+                  ))}
+                </View>
+                {bannerItems.length > 1 && (
                   <Pressable
-                    style={styles.heroPromoCard}
+                    style={styles.premiumPauseBtn}
                     onPress={() => {
-                      const promo = activeHomePromo;
-                      const mockPromo: DshHomeGetPromo = {
-                        id: promo.id,
-                        title: promo.title,
-                        subtitle: promo.subtitle,
-                        icon: '✨',
-                        actionType: normalizeHomePromoActionType(promo.targetType),
-                        actionTarget: promo.targetId,
-                        publishStage: promo.status === 'published' ? 'published-preview' : undefined,
-                      };
-                      resolveBannerPress(mockPromo)();
+                      clearInteractionResumeTimer();
+                      setIsCarouselInteractionPaused(false);
+                      setIsCarouselUserPaused((current) => !current);
                     }}
                   >
-                    {activeHomePromo.imageUrl && (
-                      <Image
-                        source={resolveDshHomeBannerImageSource(activeHomePromo.imageUrl)}
-                        style={styles.heroPromoBackground}
-                        resizeMode="cover"
-                      />
-                    )}
-                    <Box style={styles.heroPromoContent}>
-                      {activeHomePromo.thumbnail && (
-                        <Image
-                          source={resolveDshHomeBannerImageSource(activeHomePromo.thumbnail)}
-                          style={styles.heroPromoMascot}
-                          resizeMode="contain"
-                        />
-                      )}
-                      <Box style={styles.heroPromoTextWrap}>
-                        <Text style={styles.heroPromoTitle} numberOfLines={1}>
-                          {activeHomePromo.title}
-                        </Text>
-                        <Text style={styles.heroPromoSubtitle} numberOfLines={1}>
-                          {activeHomePromo.subtitle}
-                        </Text>
-                        {activeHomePromo.ctaText && (
-                          <Text style={styles.heroPromoCtaLink}>
-                            {activeHomePromo.ctaText}
-                          </Text>
-                        )}
-                      </Box>
-                    </Box>
+                    <Ionicons
+                      name={isCarouselUserPaused ? 'play-circle' : 'pause-circle'}
+                      size={16}
+                      color={colorPalette.white}
+                    />
                   </Pressable>
                 )}
+             </View>
+          </View>
+        ) : null}
 
-                {selectedSubcategoryCards.length > 0 && (
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    nestedScrollEnabled
-                    contentContainerStyle={styles.categoriesSelectorScrollContent}
-                    style={styles.categoriesSelectorScroll}
-                  >
-                    {selectedSubcategoryCards.map((subcategory) => (
-                      <Pressable
-                        key={subcategory.id}
-                        style={[
-                          styles.subcategorySelectorCard,
-                          activeSubcategoryId === subcategory.id && styles.subcategorySelectorCardActive,
-                        ]}
-                        onPress={() => setActiveSubcategoryId(subcategory.id)}
-                      >
-                        <Box style={styles.subcategoryIconContainer}>
-                          <Text role="titleSm" style={styles.subcategoryEmoji}>
-                            {subcategory.emoji}
-                          </Text>
-                        </Box>
-                        <Text
-                          role="bodySm"
-                          style={[
-                            styles.subcategoryName,
-                            activeSubcategoryId === subcategory.id && styles.subcategoryNameActive,
-                          ]}
-                          numberOfLines={1}
-                        >
-                          {subcategory.title}
+        <Box gap={0}>
+          <View style={styles.categoriesSelectorSection}>
+            <View style={styles.categoriesSelectorRow}>
+              <View style={styles.fixedIconsContainer}>
+                <CategorySelectorItem
+                  isVideo
+                  label="فيديو"
+                  icon={<Ionicons name="play" size={22} color={colorPalette.brand} />}
+                  onPress={() => setShortsVisible(true)}
+                  styles={styles}
+                  theme={theme}
+                />
+
+                <View ref={categoriesAnchorRef} collapsable={false}>
+                  <CategorySelectorItem
+                    isHub
+                    label="الفئات"
+                    icon={<CategoryHubIcon />}
+                    onPress={openCategoriesDial}
+                    styles={styles}
+                    theme={theme}
+                  />
+                </View>
+
+                {selectedCategoryFixture && (
+                  <CategorySelectorItem
+                    isSelected
+                    label={selectedCategoryLabel}
+                    icon={
+                      <CategoryIconImage
+                        uri={null}
+                        emojiFallback={categoryIconMap[selectedCategoryFixture.id] ?? '📂'}
+                        style={styles.categoryIconImage}
+                      />
+                    }
+                    onPress={() => setActiveSubcategoryId(null)}
+                    styles={styles}
+                    theme={theme}
+                  />
+                )}
+              </View>
+
+              {activeHomePromo && (
+                <Pressable
+                  style={styles.heroPromoCard}
+                  onPress={() => {
+                    const promo = activeHomePromo;
+                    const mockPromo: DshHomeGetPromo = {
+                      id: promo.id,
+                      title: promo.title,
+                      subtitle: promo.subtitle,
+                      icon: '✨',
+                      actionType: normalizeHomePromoActionType(promo.targetType),
+                      actionTarget: promo.targetId,
+                      publishStage: resolveHomePromoPublishStage(promo.status),
+                    };
+                    resolveBannerPress(mockPromo)();
+                  }}
+                >
+                  {activeHomePromo.imageUrl && (
+                    <Image
+                      source={resolveDshHomeBannerImageSource(activeHomePromo.imageUrl)}
+                      style={styles.heroPromoBackground}
+                      resizeMode="cover"
+                    />
+                  )}
+                  <View style={styles.heroPromoContent}>
+                    {activeHomePromo.thumbnail && (
+                      <Image
+                        source={resolveDshHomeBannerImageSource(activeHomePromo.thumbnail)}
+                        style={styles.heroPromoMascot}
+                        resizeMode="contain"
+                      />
+                    )}
+                    <View style={styles.heroPromoTextWrap}>
+                      <Text style={styles.heroPromoTitle} numberOfLines={1}>
+                        {activeHomePromo.title}
+                      </Text>
+                      <Text style={styles.heroPromoSubtitle} numberOfLines={1}>
+                        {activeHomePromo.subtitle}
+                      </Text>
+                      {activeHomePromo.ctaText && (
+                        <Text style={styles.heroPromoCtaLink}>
+                          {activeHomePromo.ctaText}
                         </Text>
-                      </Pressable>
-                    ))}
-                  </ScrollView>
+                      )}
+                    </View>
+                  </View>
+                </Pressable>
+              )}
+
+              {selectedSubcategoryCards.length > 0 && (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  nestedScrollEnabled
+                  contentContainerStyle={styles.categoriesSelectorScrollContent}
+                  style={styles.categoriesSelectorScroll}
+                >
+                  {selectedSubcategoryCards.map((subcategory) => (
+                    <Pressable
+                      key={subcategory.id}
+                      style={[
+                        styles.subcategorySelectorCard,
+                        activeSubcategoryId === subcategory.id && styles.subcategorySelectorCardActive,
+                      ]}
+                      onPress={() => setActiveSubcategoryId(subcategory.id)}
+                    >
+                      <View style={styles.subcategoryIconContainer}>
+                        <Text role="titleSm" style={styles.subcategoryEmoji}>
+                          {subcategory.emoji}
+                        </Text>
+                      </View>
+                      <Text
+                        role="bodySm"
+                        style={[
+                          styles.subcategoryName,
+                          activeSubcategoryId === subcategory.id && styles.subcategoryNameActive,
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {subcategory.title}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              )}
+            </View>
+          </View>
+
+          <View style={styles.filtersRow}>
+            <FilterChipItem
+              label="الكل"
+              isActive={activeCategoryId === 'all'}
+              icon={<Ionicons name="menu-outline" size={16} color={activeCategoryId === 'all' ? theme.textInverse : theme.textMuted} />}
+              onPress={() => selectCategoryPage('all')}
+              styles={styles}
+              theme={theme}
+            />
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              nestedScrollEnabled
+              contentContainerStyle={styles.filtersRowScrollContent}
+              style={styles.filtersRowScroll}
+            >
+              {discoveryFilters
+                .filter((filter) => filter.value !== 'all')
+                .map((filter) => (
+                  <FilterChipItem
+                    key={filter.value}
+                    label={filter.label}
+                    isActive={filter.value === activeFilter}
+                    icon={<Ionicons name={filter.iconName} size={16} color={filter.value === activeFilter ? theme.textInverse : theme.textMuted} />}
+                    onPress={() => setActiveFilter(filter.value)}
+                    styles={styles}
+                    theme={theme}
+                  />
+                ))}
+
+              {allCategoryRailItems
+                .filter((category) => category.id !== 'all')
+                .map((category) => (
+                  <FilterChipItem
+                    key={category.id}
+                    label={category.label}
+                    isActive={category.id === activeCategoryId}
+                    icon={
+                      <CategoryIconImage
+                        uri={null}
+                        emojiFallback={category.icon}
+                        style={styles.filterChipIcon}
+                      />
+                    }
+                    onPress={() => {
+                      selectCategoryPage(category.id);
+                      if (category.id === 'awnak') onOpenCategory?.('awnak');
+                      if (category.id === 'shein') onOpenSheinInfo?.();
+                    }}
+                    styles={styles}
+                    theme={theme}
+                  />
+                ))}
+            </ScrollView>
+          </View>
+        </Box>
+
+        <View style={styles.storeListViewport}>
+          <View style={styles.storeListContent}>
+            {activeStorePage?.renderMode === 'manual-order' ? (
+              <Box gap={3}>
+                {activeStorePage.categoryId === 'shein' && sheinInlineVisible ? (
+                  <DshSheinOrderCreateScreen
+                    embedded
+                    onClose={() => {
+                      onCloseSheinInline?.();
+                      selectCategoryPage('all');
+                    }}
+                  />
+                ) : null}
+                {activeStorePage.categoryId === 'awnak' && awnakInlineVisible ? (
+                  <DshAwnakOrderCreateScreen
+                    embedded
+                    onClose={() => {
+                      onCloseAwnakInline?.();
+                      selectCategoryPage('all');
+                    }}
+                  />
+                ) : null}
+                {!sheinInlineVisible && !awnakInlineVisible && (
+                  <EmptyFeed query={inlineSearchQuery} styles={styles} />
                 )}
               </Box>
-            </Box>
+            ) : null}
 
-            <Box style={styles.filtersRow}>
-              <FilterChipItem
-                label="الكل"
-                isActive={activeCategoryId === 'all'}
-                icon={<Icon name="menu" size={16} color={activeCategoryId === 'all' ? theme.textInverse : theme.textMuted} />}
-                onPress={() => selectCategoryPage('all')}
-                theme={theme}
+            {activeStorePage?.stores.length ? (
+              activeStorePage.stores.map((store, index) => {
+                const sm = store.commercialSourceMap;
+                const isOfferBlocked = sm?.['offerLabel']?.conflictStatus === 'blocker';
+                const isProBlocked = sm?.['hasBthwaniPro']?.conflictStatus === 'blocker';
+                const isCouponBlocked = sm?.['hasCouponAvailable']?.conflictStatus === 'blocker';
+                const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictStatus === 'blocker';
+                const isNewProductsBlocked = sm?.['hasNewProducts']?.conflictStatus === 'blocker' || sm?.['new-product-leak']?.conflictStatus === 'blocker';
+
+                const card: StoreCardPremiumItem = {
+                  id: store.id,
+                  name: store.name,
+                  subtitle: store.address,
+                  image: resolveDshHomeStoreImageSource(store.imageUri ?? store.mediaKey),
+                  rating: store.rating ?? null,
+                  distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
+                  isOpen: store.statusTone === 'open',
+                  supportsPickup: sm?.['supportsPickup']?.conflictStatus !== 'blocker',
+                  supportsPartnerDelivery: sm?.['supportsPartnerDelivery']?.conflictStatus !== 'blocker',
+                  serviceTokens: [
+                    { label: store.deliveryLabel },
+                    { label: isPriceMatchBlocked ? undefined : store.serviceLabel }
+                  ].filter(t => t.label),
+                  isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
+                  isFollowing: followToggles[store.id] ?? store.isFollowing,
+                  followersCount: followCounts[store.id] ?? store.followerCount,
+                  hasBthwaniPro: isProBlocked ? false : store.hasBthwaniPro,
+                  subscriptionPackageChips: isProBlocked ? [] : (store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel]),
+                  hasNewProducts: isNewProductsBlocked ? false : store.hasNewProducts,
+                  hasOffer: isOfferBlocked ? false : store.hasOffer,
+                  offerText: isOfferBlocked ? undefined : store.offerLabel,
+                  pointsMultiplier: Number.parseInt(store.multiplierLabel.replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
+                  hasCouponAvailable: isCouponBlocked ? false : store.hasCouponAvailable,
+                };
+
+                return (
+                  <StoreCardPremium
+                    key={store.id}
+                    item={card}
+                    style={styles.storeListCard}
+                    onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
+                    onToggleFavorite={(id) => {
+                      setFavoriteToggles((current) => ({
+                        ...current,
+                        [id]: !(current[id] ?? store.isFavorite),
+                      }));
+                    }}
+                    onToggleFollow={(id) => {
+                      const isFollowing = followToggles[id] ?? store.isFollowing;
+                      const baseCount = followCounts[id] ?? store.followerCount;
+                      setFollowToggles((current) => ({ ...current, [id]: !isFollowing }));
+                      setFollowCounts((current) => ({
+                        ...current,
+                        [id]: isFollowing ? Math.max(0, baseCount - 1) : baseCount + 1,
+                      }));
+                    }}
+                    onPressSubscriptionChip={openInlineSearch}
+                  />
+                );
+              })
+            ) : activeStorePage?.renderMode !== 'manual-order' ? (
+              <EmptyFeed query={inlineSearchQuery} styles={styles} />
+            ) : null}
+          </View>
+        </View>
+
+        <CategoryOrbitCarousel
+          visible={categoriesSheetVisible}
+          anchorLayout={categoriesDialLayout}
+          items={categoriesDialItems}
+          onClose={() => setCategoriesSheetVisible(false)}
+          onSelect={(item) => {
+            selectCategoryPage(item.key);
+            setCategoriesSheetVisible(false);
+            if (item.key === 'awnak') {
+              onOpenCategory?.('awnak');
+              return;
+            }
+
+            if (item.key === 'shein') {
+              onOpenSheinInfo?.();
+            }
+          }}
+        />
+
+        <ServiceOrbitCarousel
+          visible={serviceDialVisible}
+          anchorLayout={serviceDialAnchorLayout}
+          items={serviceDialItems}
+          onClose={() => setServiceDialVisible(false)}
+          onSelect={(item) => {
+            setServiceDialVisible(false);
+
+            if (item.key === 'dsh') {
+              return;
+            }
+
+            onOpenService?.(item.key as DshServiceId);
+          }}
+        />
+
+        {shortsVisible
+          ? (renderApprovedVideoReelsViewer?.({
+              visible: shortsVisible,
+              items: approvedVideoReels,
+              initialIndex: 0,
+              onClose: () => setShortsVisible(false),
+              onCtaPress: resolveVideoCtaPress,
+              onItemImpression: (item) => onVideoImpression?.(item.id),
+            }) ?? (
+              <DshHomeApprovedVideoReelsViewer
+                visible={shortsVisible}
+                items={approvedVideoReels}
+                initialIndex={0}
+                onClose={() => setShortsVisible(false)}
+                onCtaPress={resolveVideoCtaPress}
+                onItemImpression={(item) => onVideoImpression?.(item.id)}
               />
-
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                nestedScrollEnabled
-                contentContainerStyle={styles.filtersRowScrollContent}
-                style={styles.filtersRowScroll}
-              >
-                {discoveryFilters
-                  .filter((filter) => filter.value !== 'all')
-                  .map((filter) => (
-                    <FilterChipItem
-                      key={filter.value}
-                      label={filter.label}
-                      isActive={filter.value === activeFilter}
-                      icon={<Icon name={filter.iconName} size={16} color={filter.value === activeFilter ? theme.textInverse : theme.textMuted} />}
-                      onPress={() => setActiveFilter(filter.value)}
-                      theme={theme}
-                    />
-                  ))}
-
-                {allCategoryRailItems
-                  .filter((category) => category.id !== 'all')
-                  .map((category) => (
-                    <FilterChipItem
-                      key={category.id}
-                      label={category.label}
-                      isActive={category.id === activeCategoryId}
-                      icon={
-                        <CategoryIconImage
-                          uri={category.iconUrl ?? null}
-                          emojiFallback={category.emojiFallback}
-                          style={styles.filterChipIcon}
-                        />
-                      }
-                      onPress={() => {
-                        selectCategoryPage(category.id);
-                        if (category.id === 'awnak') onOpenCategory?.('awnak');
-                        if (category.id === 'shein') onOpenSheinInfo?.();
-                      }}
-                      theme={theme}
-                    />
-                  ))}
-              </ScrollView>
-            </Box>
-          </Box>
-
-          <Box style={styles.storeListViewport}>
-            <Box style={styles.storeListContent}>
-              {activeStorePage?.renderMode === 'manual-order' ? (
-                <Box gap={3}>
-                  {activeStorePage.categoryId === 'shein' && sheinInlineVisible ? (
-                    <DshSheinOrderCreateScreen
-                      embedded
-                      onClose={() => {
-                        onCloseSheinInline?.();
-                        selectCategoryPage('all');
-                      }}
-                    />
-                  ) : null}
-                  {activeStorePage.categoryId === 'awnak' && awnakInlineVisible ? (
-                    <DshAwnakOrderCreateScreen
-                      embedded
-                      onClose={() => {
-                        onCloseAwnakInline?.();
-                        selectCategoryPage('all');
-                      }}
-                    />
-                  ) : null}
-                  {!sheinInlineVisible && !awnakInlineVisible && (
-                    <EmptyFeed query={inlineSearchQuery} styles={styles} />
-                  )}
-                </Box>
-              ) : null}
-
-              {activeStorePage?.stores.length ? (
-                activeStorePage.stores.map((store, index) => {
-                  const sm = store.commercialSourceMap;
-                  const isOfferBlocked = sm?.['offerLabel']?.conflictStatus === 'blocker';
-                  const isProBlocked = sm?.['hasBthwaniPro']?.conflictStatus === 'blocker';
-                  const isCouponBlocked = sm?.['hasCouponAvailable']?.conflictStatus === 'blocker';
-                  const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictStatus === 'blocker';
-                  const isDeliveryBlocked = sm?.['deliveryFeeLabel']?.conflictStatus === 'blocker';
-                  const isNewProductsBlocked = sm?.['hasNewProducts']?.conflictStatus === 'blocker' || sm?.['new-product-leak']?.conflictStatus === 'blocker';
-
-                  const card: StoreCardPremiumItem = {
-                    id: store.id,
-                    name: store.name,
-                    subtitle: store.address,
-                    image: resolveDshHomeStoreImageSource(store.imageUri ?? store.mediaKey, store.publishStage, store.mediaPolicy),
-                    rating: store.rating ?? null,
-                    distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
-                    isOpen: store.statusTone === 'open',
-                    supportsPickup: sm?.['supportsPickup']?.conflictStatus !== 'blocker',
-                    supportsPartnerDelivery: sm?.['supportsPartnerDelivery']?.conflictStatus !== 'blocker',
-                    serviceTokens: [
-                      { label: isDeliveryBlocked ? undefined : store.deliveryLabel },
-                      { label: isPriceMatchBlocked ? undefined : store.serviceLabel }
-                    ].filter(t => t.label),
-                    isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
-                    isFollowing: followToggles[store.id] ?? store.isFollowing,
-                    followersCount: followCounts[store.id] ?? store.followerCount,
-                    hasBthwaniPro: isProBlocked ? false : store.hasBthwaniPro,
-                    subscriptionPackageChips: isProBlocked ? [] : (store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel]),
-                    hasNewProducts: isNewProductsBlocked ? false : store.hasNewProducts,
-                    hasOffer: isOfferBlocked ? false : store.hasOffer,
-                    offerText: isOfferBlocked ? undefined : store.offerLabel,
-                    pointsMultiplier: Number.parseInt(store.multiplierLabel.replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
-                    hasCouponAvailable: isCouponBlocked ? false : store.hasCouponAvailable,
-                  };
-
-                  return (
-                    <StoreCardPremium
-                      key={store.id}
-                      item={card}
-                      style={styles.storeListCard}
-                      onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
-                      onToggleFavorite={(id) => {
-                        setFavoriteToggles((current) => ({
-                          ...current,
-                          [id]: !(current[id] ?? store.isFavorite),
-                        }));
-                      }}
-                      onToggleFollow={(id) => {
-                        const isFollowing = followToggles[id] ?? store.isFollowing;
-                        const baseCount = followCounts[id] ?? store.followerCount;
-                        setFollowToggles((current) => ({ ...current, [id]: !isFollowing }));
-                        setFollowCounts((current) => ({
-                          ...current,
-                          [id]: isFollowing ? Math.max(0, baseCount - 1) : baseCount + 1,
-                        }));
-                      }}
-                      onPressSubscriptionChip={openInlineSearch}
-                    />
-                  );
-                })
-              ) : activeStorePage?.renderMode !== 'manual-order' ? (
-                <EmptyFeed query={inlineSearchQuery} styles={styles} />
-              ) : null}
-            </Box>
-          </Box>
-
-          <CategoryOrbitCarousel
-            visible={categoriesSheetVisible}
-            anchorLayout={categoriesDialLayout}
-            items={categoriesDialItems}
-            onClose={() => setCategoriesSheetVisible(false)}
-            onSelect={(item) => {
-              selectCategoryPage(item.key);
-              setCategoriesSheetVisible(false);
-              if (item.key === 'awnak') {
-                onOpenCategory?.('awnak');
-                return;
-              }
-
-              if (item.key === 'shein') {
-                onOpenSheinInfo?.();
-              }
-            }}
-          />
-
-          <ServiceOrbitCarousel
-            visible={serviceDialVisible}
-            anchorLayout={serviceDialAnchorLayout}
-            items={serviceDialItems}
-            onClose={() => setServiceDialVisible(false)}
-            onSelect={(item) => {
-              setServiceDialVisible(false);
-
-              if (item.key === 'dsh') {
-                return;
-              }
-
-              onOpenService?.(item.key as DshServiceId);
-            }}
-          />
-
-          {shortsVisible
-            ? (renderApprovedVideoReelsViewer?.({
-                visible: shortsVisible,
-                items: approvedVideoReels,
-                initialIndex: 0,
-                onClose: () => setShortsVisible(false),
-                onCtaPress: resolveVideoCtaPress,
-                onItemImpression: (item) => onVideoImpression?.(item.id),
-              }) ?? (
-                <DshHomeApprovedVideoReelsViewer
-                  visible={shortsVisible}
-                  items={approvedVideoReels}
-                  initialIndex={0}
-                  onClose={() => setShortsVisible(false)}
-                  onCtaPress={resolveVideoCtaPress}
-                  onItemImpression={(item) => onVideoImpression?.(item.id)}
-                />
-              ))
-            : null}
-        </ScrollView>
-      </Box>
-    </Box>
+            ))
+          : null}
+      </ScrollView>
+    </View>
   );
 }
 
