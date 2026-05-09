@@ -9,7 +9,7 @@ import {
 import { WltDshFinanceControlPanelContent } from '../../wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { useDirection, useUiText } from '@bthwani/ui-kit';
+import { useDirection, useUiText, Box, Button } from '@bthwani/ui-kit';
 import {
   WebControlActionButton,
   WebControlActionCard,
@@ -20,6 +20,15 @@ import {
   WebSignalCard,
   WebCompactSurfaceHeader,
   WebSystemSuggestion,
+  WebControlPanelShell,
+  WebControlPanelTopBar,
+  WebControlPanelRail,
+  WebControlPanelStage,
+  WebControlPanelSectionHeader,
+  WebControlPanelSignalStrip,
+  WebControlPanelKpiTile,
+  WebControlPanelCommandCard,
+  WebControlPanelDecisionQueue,
 } from '@bthwani/ui-kit/web';
 import {
   buildOperationsHref,
@@ -431,37 +440,37 @@ export function ControlPanelSurfaceHost({
           case 'finance':
             return {
               eyebrow: 'مالي',
-              title: panelText.surfaceTitles.finance,
-              description: 'مراجعة التدفقات المالية — عرض تجريبي',
+              title: 'غرفة التحكم المالي',
+              description: 'مراقبة التدفقات والتسويات في وضع preview فقط.',
               primaryAction: {
                 id: 'finance-primary',
-                label: 'تركيز WLT',
+                label: 'فتح المطابقة',
                 description: '',
-                footerLabel: 'تصفية',
-                badge: 'موصى',
+                footerLabel: 'انتقال',
+                badge: 'Preview',
                 tone: 'primary',
                 onAction: () => setSelectedServiceId('wlt'),
               },
               kpis: [
                 {
                   id: 'finance-services',
-                  title: 'المساحات المرتبطة',
+                  title: 'مرتبطة',
                   value: String(sectionServiceIds.length),
-                  description: 'كل مساحة تحمل مسارًا ماليًا داخل اللوحة.',
+                  description: 'مسارات التحكم المالي المتصلة بهذا السطح.',
                   tone: 'brand',
                 },
                 {
                   id: 'finance-live',
-                  title: 'جاهز للتشغيل',
+                  title: 'حية الآن',
                   value: String(liveCoverageCount),
-                  description: 'مسارات يمكن التركيز عليها الآن دون قفزات إضافية.',
+                  description: 'مسارات يمكن قراءتها فوراً دون قفزات إضافية.',
                   tone: 'best',
                 },
                 {
                   id: 'finance-reference',
-                  title: 'مرجعي',
+                  title: 'مرجعية',
                   value: String(referenceCoverageCount),
-                  description: 'مسارات تبقى ظاهرة بدون ادعاء جاهزية أعلى من الواقع.',
+                  description: 'مسارات محفوظة كمرجع بلا ادعاء تشغيل.',
                 },
               ],
               quickActionsTitle: '',
@@ -604,201 +613,167 @@ export function ControlPanelSurfaceHost({
     : null;
 
   return (
-    <>
-      <div className={styles.controlPanelRailOverrides}>
-      <WebCommandCenterFrame
-      brandLabel={panelText.brandLabel}
-      surfaceTitle="لوحة القيادة"
-      surfaceSubtitle={shellCopy.title}
-      showHero={!isOperationsSection}
-      topFilters={[
-        {
-          id: allServiceTabId,
-          label: panelText.filters.allServices,
-          active: isAllFilterActive,
-        },
-        ...controlPanelRuntimeData.services.map((service) => ({
-          id: service.id,
-          label: getServiceLabel(uiText, service.id),
-          active: selectedServiceId === service.id,
-        })),
-      ]}
-      onTopFilterSelect={setSelectedServiceId}
-      onRailItemSelect={(itemId) => {
-        const matchedSection = primarySectionIds.find((sectionId) => `/${sectionId}` === itemId);
-
-        if (!matchedSection) {
-          return;
-        }
-
-        const nextHref = `/${matchedSection}` as PrimarySectionHref;
-        setActiveSectionHref(nextHref);
-        router.push(sectionRouteMap[matchedSection]);
-      }}
-      onBrandClick={handleBrandClick}
-      onSearchClick={handleSearchClick}
-      onRefreshClick={handleRefreshClick}
-      onAlertClick={handleAlertClick}
-      railTitle={panelText.brandLabel}
-      railNavigationLabel={shellCopy.title}
-      railStatusLabel={isAllFilterActive ? panelText.filters.allServices : selectedServiceLabel}
-      railItems={railItems}
-      railSupplementary={null}
-      alertCountLabel={String(alertCount)}
+    <WebControlPanelShell
+      topBar={
+        <WebControlPanelTopBar
+          title={panelText.brandLabel}
+          subtitle={shellCopy.title}
+          actions={
+            <Box layoutDirection="row" gap={2}>
+              {controlPanelRuntimeData.services.map((service) => (
+                <Button
+                  key={service.id}
+                  label={getServiceLabel(uiText, service.id)}
+                  tone={selectedServiceId === service.id ? 'brand' : 'secondary'}
+                  size="sm"
+                  onAction={() => setSelectedServiceId(service.id)}
+                />
+              ))}
+              <Button
+                label={panelText.filters.allServices}
+                tone={isAllFilterActive ? 'brand' : 'secondary'}
+                size="sm"
+                onAction={() => setSelectedServiceId(allServiceTabId)}
+              />
+            </Box>
+          }
+          trailing={
+            <Box layoutDirection="row" gap={3} align="center">
+              <WebControlActionButton id="search" label="🔍" onAction={handleSearchClick} />
+              <WebControlActionButton id="refresh" label="↻" onAction={handleRefreshClick} />
+              <WebControlActionButton id="alerts" label={`🔔 ${alertCount}`} onAction={handleAlertClick} tone={alertCount > 0 ? 'primary' : 'secondary'} />
+            </Box>
+          }
+        />
+      }
+      rail={
+        <WebControlPanelRail>
+          <Box gap={1}>
+            {railItems.map((item) => (
+              <Button
+                key={item.id}
+                label={item.label}
+                tone={item.active ? 'brand' : 'secondary'}
+                onAction={() => {
+                  const matchedSection = primarySectionIds.find((sectionId) => `/${sectionId}` === item.id);
+                  if (matchedSection) {
+                    const nextHref = `/${matchedSection}` as PrimarySectionHref;
+                    setActiveSectionHref(nextHref);
+                    router.push(sectionRouteMap[matchedSection]);
+                  }
+                }}
+                style={{
+                  justifyContent: 'flex-start',
+                  backgroundColor: item.active ? 'rgba(255, 80, 13, 0.15)' : 'transparent',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  textAlign: direction === 'rtl' ? 'right' : 'left'
+                }}
+              />
+            ))}
+          </Box>
+        </WebControlPanelRail>
+      }
     >
-      <div className={styles.stageStack} dir={direction}>
-        {phaseOneBlueprint ? (
-          <>
-            {activeSectionId === 'finance' ? (
-              <WebCompactSurfaceHeader
+      <WebControlPanelStage>
+        <div className={styles.stageStack} dir={direction}>
+          {phaseOneBlueprint ? (
+            <>
+              <WebControlPanelSectionHeader
                 title={phaseOneBlueprint.title}
                 description={phaseOneBlueprint.description}
-                metrics={phaseOneBlueprint.kpis.map((kpi) => ({
-                  id: kpi.id,
-                  title: kpi.title,
-                  value: kpi.value,
-                }))}
-              />
-            ) : (
-              <>
-                <WebControlSurfaceHeader
-                  chips={[
-                    { label: panelText.brandLabel, tone: 'accent' },
-                    { label: phaseOneBlueprint.eyebrow, tone: 'brand' },
-                    { label: isAllFilterActive ? panelText.filters.allServicesMeta : selectedServiceLabel },
-                  ]}
-                  title={phaseOneBlueprint.title}
-                  description={phaseOneBlueprint.description}
-                  actions={[
-                    {
-                      id: phaseOneBlueprint.primaryAction.id,
-                      label: phaseOneBlueprint.primaryAction.label,
-                      href: phaseOneBlueprint.primaryAction.href,
-                      onAction: resolveActionHandler(
-                        phaseOneBlueprint.primaryAction.href,
-                        phaseOneBlueprint.primaryAction.onAction,
-                      ),
-                      tone: phaseOneBlueprint.primaryAction.tone,
-                    },
-                  ]}
-                />
-
-                <div className={styles.metricsStrip}>
-                  {phaseOneBlueprint.kpis.map((kpi) => (
-                    <WebSignalCard
-                      key={kpi.id}
-                      title={kpi.title}
-                      value={kpi.value}
-                      description={kpi.description}
-                      tone={kpi.tone}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-
-
-            {activeSectionId === 'dashboard' ? (
-              <WebSectionCard
-                title="النظرة التنفيذية"
-                description="ملخص استراتيجي لنبض المنصة وغرفة القيادة."
-              >
-                <div className={styles.dashboardHeroCard}>
-                  <div className={styles.dashboardHeroEyebrow}>BThwani Premium Command Center 2026</div>
-                  <h2 className={styles.dashboardHeroTitle}>غرفة قيادة تنفيذية بنبرة هادئة وكثافة قرار أعلى.</h2>
-                  <p className={styles.dashboardHeroDescription}>
-                    هذا السطح لم يعد مجرد overview عام. تم رفعه ليصبح طبقة قيادة تقرأ نبض المنصة،
-                    وتوضح أين يبدأ القرار الآن، وما الذي يجب أن يبقى في الخلفية دون ضوضاء بصرية.
-                  </p>
-                </div>
-              </WebSectionCard>
-            ) : null}
-
-            {scopedSectionUnavailable ? (
-              <section className={styles.statePanel}>
-                <h2 className={styles.stateTitle}>الخدمة المختارة لا تغطي هذا القسم</h2>
-                <p className={styles.stateDescription}>
-                  بدّل إلى خدمة مناسبة أو أعد العرض إلى كل المساحات حتى لا تبقى الصفحة فارغة بسبب فلتر غير مطابق.
-                </p>
-                <div className={styles.contextList}>
-                  {sectionServiceNames.map((serviceName) => (
-                    <span key={serviceName} className={styles.contextChip}>{serviceName}</span>
-                  ))}
-                </div>
-                <div className={styles.stateActions}>
-                  <WebControlActionButton
-                    id="state-reset"
-                    label="عرض كل المساحات"
-                    tone="primary"
-                    onAction={() => setSelectedServiceId(allServiceTabId)}
+                actions={
+                  <Button
+                    label={phaseOneBlueprint.primaryAction.label}
+                    tone="brand"
+                    onAction={resolveActionHandler(
+                      phaseOneBlueprint.primaryAction.href,
+                      phaseOneBlueprint.primaryAction.onAction,
+                    )}
                   />
-                    <WebControlActionButton
-                      id="state-dashboard"
-                      label="العودة للنظرة العامة"
-                      href="/dashboard"
-                      tone="secondary"
-                      onAction={() => router.push('/dashboard')}
-                    />
+                }
+              />
+
+              <WebControlPanelSignalStrip>
+                {phaseOneBlueprint.kpis.map((kpi) => (
+                  <WebControlPanelKpiTile
+                    key={kpi.id}
+                    label={kpi.title}
+                    value={kpi.value}
+                    icon={kpi.id.includes('alerts') ? 'alert-circle' : 'activity'}
+                    trend={kpi.tone === 'best' ? { value: '12%', positive: true } : undefined}
+                  />
+                ))}
+              </WebControlPanelSignalStrip>
+
+              {activeSectionId === 'dashboard' ? (
+                <WebSectionCard
+                  title="النظرة التنفيذية"
+                  description="ملخص استراتيجي لنبض المنصة وغرفة القيادة."
+                >
+                  <div className={styles.dashboardHeroCard}>
+                    <div className={styles.dashboardHeroEyebrow}>BThwani Premium Command Center 2026</div>
+                    <h2 className={styles.dashboardHeroTitle}>غرفة قيادة تنفيذية بنبرة هادئة وكثافة قرار أعلى.</h2>
+                    <p className={styles.dashboardHeroDescription}>
+                      هذا السطح لم يعد مجرد overview عام. تم رفعه ليصبح طبقة قيادة تقرأ نبض المنصة،
+                      وتوضح أين يبدأ القرار الآن، وما الذي يجب أن يبقى في الخلفية دون ضوضاء بصرية.
+                    </p>
                   </div>
-                </section>
+                </WebSectionCard>
+              ) : null}
+
+              {scopedSectionUnavailable ? (
+                <WebControlPanelEmptyState
+                  title="الخدمة المختارة لا تغطي هذا القسم"
+                  description="بدّل إلى خدمة مناسبة أو أعد العرض إلى كل المساحات حتى لا تبقى الصفحة فارغة بسبب فلتر غير مطابق."
+                  icon="alert-circle"
+                  actionLabel="عرض كل المساحات"
+                  onAction={() => setSelectedServiceId(allServiceTabId)}
+                />
               ) : (
                 <>
                   {phaseOneBlueprint.quickActions.length > 0 ? (
-                    <WebSectionCard
-                      title={phaseOneBlueprint.quickActionsTitle}
-                      description={phaseOneBlueprint.quickActionsDescription}
-                    >
-                      <div className={styles.actionGrid}>
+                    <Box gap={4}>
+                      <WebControlPanelSectionHeader title={phaseOneBlueprint.quickActionsTitle} />
+                      <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
                         {phaseOneBlueprint.quickActions.map((action) => (
-                          <WebControlActionCard
+                          <WebControlPanelCommandCard
                             key={action.id}
-                            id={action.id}
                             title={action.label}
                             description={action.description}
-                            footerLabel={action.footerLabel}
-                            href={action.href}
+                            icon={action.tone === 'primary' ? 'zap' : 'layers'}
                             badge={action.badge}
-                            tone={action.tone}
-                            onAction={resolveActionHandler(action.href, action.onAction)}
+                            onPress={resolveActionHandler(action.href, action.onAction)}
                           />
                         ))}
-                      </div>
-                    </WebSectionCard>
+                      </Box>
+                    </Box>
                   ) : null}
 
                   {phaseOneBlueprint.disclosureItems.length > 0 ? (
-                    <WebSectionCard
-                      title={phaseOneBlueprint.disclosureTitle}
-                      description={phaseOneBlueprint.disclosureDescription}
-                    >
-                      <div className={styles.disclosureBody}>
-                        {phaseOneBlueprint.disclosureItems.map((item) => (
-                          <WebControlDisclosureItem
-                            key={item.id}
-                            id={item.id}
-                            label={item.label}
-                            description={item.description}
-                            href={item.href}
-                            badge={item.badge}
-                            onAction={resolveActionHandler(item.href, item.onAction)}
-                          />
-                        ))}
-                      </div>
-                    </WebSectionCard>
+                    <Box gap={4} style={{ marginTop: 24 }}>
+                      <WebControlPanelSectionHeader title={phaseOneBlueprint.disclosureTitle} />
+                      <WebControlPanelDecisionQueue
+                        title="Blockers & Risks"
+                        items={phaseOneBlueprint.disclosureItems.map(item => ({
+                          id: item.id,
+                          title: item.label,
+                          meta: item.description,
+                          status: item.badge || 'Pending',
+                        }))}
+                      />
+                    </Box>
                   ) : null}
                 </>
               )}
-          </>
-        ) : null}
+            </>
+          ) : null}
 
-        {activeSectionId === 'finance' ? (
-          <WebSectionCard
-            title="عرض WLT المالي التجريبي"
-            description="هذا عرض تجريبي — لا توجد عمليات مالية حقيقية. العقد: CONTRACT_TBD."
-          >
-            <WltDshFinanceControlPanelContent />
-          </WebSectionCard>
-        ) : null}
+          {activeSectionId === 'finance' ? (
+            <div className={styles.financeSurfaceSlot}>
+              <WltDshFinanceControlPanelContent />
+            </div>
+          ) : null}
 
         {isOperationsSection ? (
           <DshControlPanelSurfaceHost
@@ -827,7 +802,7 @@ export function ControlPanelSurfaceHost({
         ) : null}
 
         {isMarketingSection ? (
-          <div style={{ marginTop: 16 }}>
+          <div className={styles.marketingSurfaceSlot}>
             <ControlPanelDshMarketingScreen hubHref="/marketing" operationsHref="/operations" />
           </div>
         ) : null}
@@ -915,10 +890,9 @@ export function ControlPanelSurfaceHost({
         ) : null}
 
 
-      </div>
-    </WebCommandCenterFrame>
-    </div>
-    </>
+        </div>
+      </WebControlPanelStage>
+    </WebControlPanelShell>
   );
 }
 

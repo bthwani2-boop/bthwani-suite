@@ -118,6 +118,16 @@ export {
 	WebCommandStrip,
 	WebRailServiceList,
 	WebSegmentedTabs,
+	WebControlPanelShell,
+	WebControlPanelTopBar,
+	WebControlPanelRail,
+	WebControlPanelStage,
+	WebControlPanelSectionHeader,
+	WebControlPanelSignalStrip,
+	WebControlPanelKpiTile,
+	WebControlPanelCommandCard,
+	WebControlPanelDecisionQueue,
+	WebControlPanelEmptyState
 } from './web/index';
 export type {
 	WebCommandCenterFilter,
@@ -129,6 +139,16 @@ export type {
 	WebRailServiceListProps,
 	WebSegmentedTabItem,
 	WebSegmentedTabsProps,
+	WebControlPanelShellProps,
+	WebControlPanelTopBarProps,
+	WebControlPanelRailProps,
+	WebControlPanelStageProps,
+	WebControlPanelSectionHeaderProps,
+	WebControlPanelSignalStripProps,
+	WebControlPanelKpiTileProps,
+	WebControlPanelCommandCardProps,
+	WebControlPanelDecisionQueueProps,
+	WebControlPanelEmptyStateProps
 } from './web/index';
 export {
 	WebMissionHeroCard,

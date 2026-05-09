@@ -9,6 +9,16 @@ export {
 	WebSegmentedTabs,
 	WebCompactSurfaceHeader,
 	WebSystemSuggestion,
+	WebControlPanelShell,
+	WebControlPanelTopBar,
+	WebControlPanelRail,
+	WebControlPanelStage,
+	WebControlPanelSectionHeader,
+	WebControlPanelSignalStrip,
+	WebControlPanelKpiTile,
+	WebControlPanelCommandCard,
+	WebControlPanelDecisionQueue,
+	WebControlPanelEmptyState
 } from './web/index';
 export {
 	WebDocumentShell,
