@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { StateView, Box } from '@bthwani/ui-kit';
+import { WebControlPanelSubTabs } from '@bthwani/ui-kit/web';
 import {
   buildFinanceHref,
   getFinanceGroupMeta,
@@ -149,20 +150,15 @@ export function ControlPanelDshFinanceHubScreen({
 
       {/* 2b. Sub-Tabs - Granular Navigation */}
       {activeGroupMeta.subGroups && (
-        <nav className={`${fStyles.subNavigationCockpit} ${fStyles.noScroll}`}>
-          {activeGroupMeta.subGroups.map((sub) => {
-            const isSelected = (activeSubGroup || activeGroupMeta.subGroups?.[0]?.id) === sub.id;
-            return (
-              <button
-                key={sub.id}
-                className={`${fStyles.financeSubTab} ${isSelected ? fStyles.financeSubTabActive : ''}`}
-                onClick={() => setActiveSubGroup(sub.id)}
-              >
-                {sub.label}
-              </button>
-            );
-          })}
-        </nav>
+        <WebControlPanelSubTabs
+          items={activeGroupMeta.subGroups.map((sub) => ({
+            id: sub.id,
+            label: sub.label,
+            active: (activeSubGroup ?? activeGroupMeta.subGroups?.[0]?.id) === sub.id,
+          }))}
+          onSelect={setActiveSubGroup}
+          ariaLabel="تبويبات التمويل الفرعية"
+        />
       )}
 
       {/* 3. Main Active Area */}

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Button, Text } from '@bthwani/ui-kit';
-import { WebSectionCard } from '@bthwani/ui-kit/web';
+import { Box } from '@bthwani/ui-kit';
+import { WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
 import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../shared';
 
 type PartnerReviewKind = 'activation' | 'documents';
@@ -8,14 +8,14 @@ type PartnerReviewKind = 'activation' | 'documents';
 function buildPartnerRows(kind: PartnerReviewKind) {
   const baseRows = kind === 'activation'
     ? [
-        { id: 'partner-activation', title: 'Partner activation', status: 'Pending', blocker: 'Activation readiness still needs confirmation.', evidence: 'Activation package proof', tone: 'warning' as const },
-        { id: 'catalog-handoff', title: 'Catalog handoff', status: 'Ready', blocker: 'Catalog handoff must be acknowledged locally.', evidence: 'Catalog handoff proof', tone: 'brand' as const },
-        { id: 'marketing-handoff', title: 'Marketing handoff', status: 'Tracked', blocker: 'Marketing handoff still needs a final route check.', evidence: 'Marketing route proof', tone: 'best' as const },
+        { id: 'partner-activation', title: 'تفعيل الشريك', status: 'معلق', blocker: 'جاهزية التفعيل تحتاج تأكيداً.', evidence: 'دليل حزمة التفعيل', tone: 'warning' as const },
+        { id: 'catalog-handoff', title: 'تسليم الكتالوج', status: 'جاهز', blocker: 'تسليم الكتالوج يجب الإقرار به محلياً.', evidence: 'دليل تسليم الكتالوج', tone: 'brand' as const },
+        { id: 'marketing-handoff', title: 'تسليم التسويق', status: 'متابَع', blocker: 'تسليم التسويق لا يزال يحتاج فحص مسار نهائي.', evidence: 'دليل مسار التسويق', tone: 'best' as const },
       ]
     : [
-        { id: 'identity-proof', title: 'Identity proof', status: 'Pending', blocker: 'Identity proof is missing or incomplete.', evidence: 'Identity documents', tone: 'warning' as const },
-        { id: 'store-nomination', title: 'Store nomination', status: 'Ready', blocker: 'Store nomination needs a local review.', evidence: 'Store nomination proof', tone: 'brand' as const },
-        { id: 'document-completeness', title: 'Document completeness', status: 'Tracked', blocker: 'The package is close but still needs signoff.', evidence: 'Document completeness proof', tone: 'best' as const },
+        { id: 'identity-proof', title: 'إثبات الهوية', status: 'معلق', blocker: 'دليل الهوية ناقص أو غير مكتمل.', evidence: 'وثائق الهوية', tone: 'warning' as const },
+        { id: 'store-nomination', title: 'ترشيح المتجر', status: 'جاهز', blocker: 'ترشيح المتجر يحتاج مراجعة محلية.', evidence: 'دليل ترشيح المتجر', tone: 'brand' as const },
+        { id: 'document-completeness', title: 'اكتمال الوثائق', status: 'متابَع', blocker: 'الحزمة قريبة من الاكتمال لكنها تحتاج توقيعاً.', evidence: 'دليل اكتمال الوثائق', tone: 'best' as const },
       ];
 
   return baseRows.map((row) => ({
@@ -25,9 +25,9 @@ function buildPartnerRows(kind: PartnerReviewKind) {
     ownerSurface: 'partners',
     blocker: row.blocker,
     evidence: row.evidence,
-    primaryActionLabel: 'Approve',
-    secondaryActionLabel: 'Request docs',
-    evidenceActionLabel: kind === 'activation' ? 'Open handoff' : 'Open blocker',
+    primaryActionLabel: 'اعتماد',
+    secondaryActionLabel: 'طلب وثائق',
+    evidenceActionLabel: kind === 'activation' ? 'فتح التسليم' : 'فتح العائق',
     tone: row.tone,
   }));
 }
@@ -43,77 +43,71 @@ function PartnerReviewBoard({
 }) {
   const items = React.useMemo(() => buildPartnerRows(kind), [kind]);
   const [selectedId, setSelectedId] = React.useState(items[0]?.id ?? null);
-  const [lastAction, setLastAction] = React.useState('Ready for partner review');
+  const [lastAction, setLastAction] = React.useState('جاهز لمراجعة الشريك');
   const selectedItem = items.find((item) => item.id === selectedId) ?? items[0];
 
   return (
     <Box gap={4}>
       <ControlPanelDshWorkspaceFrame
-        eyebrow={kind === 'activation' ? 'Partner activation' : 'Document review'}
+        eyebrow={kind === 'activation' ? 'تفعيل الشريك' : 'مراجعة الوثائق'}
         title={title}
-        description="A local partner control room with selected item state, approval actions, and explicit handoff or blocker routing."
+        description="غرفة تحكم شريك محلية مع حالة العنصر المحدد وإجراءات الاعتماد وتوجيه التسليم أو العائق الصريح."
         badges={['partners', kind]}
-        metaItems={[selectedItem?.status ?? 'Pending', lastAction]}
+        metaItems={[selectedItem?.status ?? 'معلق', lastAction]}
         decisionBoard={{
-          title: `${title} board`,
+          title: `لوحة ${title}`,
           purpose,
-          primaryDecision: selectedItem?.status ?? 'Pending',
+          primaryDecision: selectedItem?.status ?? 'معلق',
           nextAction: lastAction,
-          blockers: selectedItem?.blocker ?? 'Select a partner row.',
+          blockers: selectedItem?.blocker ?? 'اختر صف شريك.',
           ownerSurface: 'partners',
-          evidenceHint: selectedItem?.evidence ?? 'partner evidence',
+          evidenceHint: selectedItem?.evidence ?? 'دليل الشريك',
           routeHint: '/partners',
           decisionTone: selectedItem?.tone,
         }}
-        primaryAction={{ label: 'Open catalog handoff', href: '/catalogs' }}
-        secondaryAction={{ label: 'Open marketing handoff', href: '/marketing' }}
+        primaryAction={{ label: 'فتح تسليم الكتالوج', href: '/catalogs' }}
+        secondaryAction={{ label: 'فتح تسليم التسويق', href: '/marketing' }}
         signals={[
-          { id: `${kind}-pending`, title: 'Pending', value: 'Visible', description: 'Items pending partner review.', tone: 'warning' },
-          { id: `${kind}-ready`, title: 'Ready', value: 'Visible', description: 'Items ready for local action.', tone: 'best' },
-          { id: `${kind}-handoff`, title: 'Handoff', value: 'Tracked', description: 'Selected handoff is explicit.', tone: 'brand' },
+          { id: `${kind}-pending`, title: 'معلق', value: 'مرئي', description: 'العناصر المعلقة لمراجعة الشريك.', tone: 'warning' },
+          { id: `${kind}-ready`, title: 'جاهز', value: 'مرئي', description: 'العناصر الجاهزة للإجراء المحلي.', tone: 'best' },
+          { id: `${kind}-handoff`, title: 'تسليم', value: 'متابَع', description: 'التسليم المحدد صريح.', tone: 'brand' },
         ]}
       />
 
       <ControlPanelDshActionQueue
-        title={kind === 'activation' ? 'Activation queue' : 'Document queue'}
-        purpose="Choose a row, approve or request docs, then open handoff or blocker locally."
+        title={kind === 'activation' ? 'صف التفعيل' : 'صف الوثائق'}
+        purpose="اختر صفاً، اعتمد أو اطلب وثائق، ثم افتح التسليم أو العائق محلياً."
         items={items}
         selectedId={selectedId}
         onSelect={setSelectedId}
         primaryAction={(item) => {
           setSelectedId(item.id);
-          setLastAction(`Approve: ${item.title}`);
+          setLastAction(`اعتماد: ${item.title}`);
         }}
         secondaryAction={(item) => {
           setSelectedId(item.id);
-          setLastAction(`Request docs: ${item.title}`);
+          setLastAction(`طلب وثائق: ${item.title}`);
         }}
         evidenceAction={(item) => {
           setSelectedId(item.id);
-          setLastAction(kind === 'activation' ? `Open handoff: ${item.title}` : `Open blocker: ${item.title}`);
+          setLastAction(kind === 'activation' ? `فتح التسليم: ${item.title}` : `فتح العائق: ${item.title}`);
         }}
       />
 
-      <WebSectionCard
-        title={kind === 'activation' ? 'Partner handoff' : 'Document blocker'}
-        description="Keep the selected item visible while the local handoff or blocker step is triggered."
-      >
-        <Box gap={2}>
-          <Text role="bodySm" tone="muted">
-            {selectedItem ? `${selectedItem.title} · ${selectedItem.evidence}` : 'Select a row to continue.'}
-          </Text>
-          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <Button label="Approve" tone="primary" fullWidth={false} onPress={() => selectedItem && setLastAction(`Approve: ${selectedItem.title}`)} />
-            <Button label="Request docs" tone="secondary" fullWidth={false} onPress={() => selectedItem && setLastAction(`Request docs: ${selectedItem.title}`)} />
-            <Button
-              label={kind === 'activation' ? 'Open handoff' : 'Open blocker'}
-              tone="ghost"
-              fullWidth={false}
-              onPress={() => selectedItem && setLastAction(`${kind === 'activation' ? 'Open handoff' : 'Open blocker'}: ${selectedItem.title}`)}
-            />
-          </Box>
-        </Box>
-      </WebSectionCard>
+      <WebControlPanelRecommendation
+        title={kind === 'activation' ? 'تسليم الشريك' : 'عائق الوثيقة'}
+        reason={selectedItem ? `${selectedItem.title} · ${selectedItem.evidence}` : 'اختر صفاً للمتابعة.'}
+        primaryAction={selectedItem ? {
+          id: 'approve',
+          label: 'اعتماد',
+          onAction: () => selectedItem && setLastAction(`اعتماد: ${selectedItem.title}`),
+        } : undefined}
+        secondaryAction={selectedItem ? {
+          id: 'request-docs',
+          label: 'طلب وثائق',
+          onAction: () => selectedItem && setLastAction(`طلب وثائق: ${selectedItem.title}`),
+        } : undefined}
+      />
     </Box>
   );
 }
@@ -122,8 +116,8 @@ export function ControlPanelDshPartnerActivationScreen() {
   return (
     <PartnerReviewBoard
       kind="activation"
-      title="Partner activation intake"
-      purpose="Keep intake, activation, and document review in a compact control room."
+      title="استقبال تفعيل الشريك"
+      purpose="إبقاء الاستقبال والتفعيل ومراجعة الوثائق في غرفة تحكم مضغوطة."
     />
   );
 }
@@ -132,8 +126,8 @@ export function ControlPanelDshPartnerDocumentReviewScreen() {
   return (
     <PartnerReviewBoard
       kind="documents"
-      title="Partner document review"
-      purpose="Keep partner readiness tied to the document proof and activation handoff."
+      title="مراجعة وثائق الشريك"
+      purpose="إبقاء جاهزية الشريك مرتبطة بدليل الوثيقة وتسليم التفعيل."
     />
   );
 }

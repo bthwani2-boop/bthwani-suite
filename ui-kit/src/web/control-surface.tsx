@@ -375,6 +375,96 @@ const webControlSurfaceCss = `
   font-weight: 600;
   cursor: pointer;
 }
+
+/* === ControlPanel: StatusTag / ActionCluster / DecisionRow / Recommendation / InspectorShell === */
+.ui-web-cp-status-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ui-web-cp-status-tag--neutral { background: rgba(10,47,92,0.06); color: #0A2F5C; }
+.ui-web-cp-status-tag--success { background: #DCFCE7; color: #16A34A; }
+.ui-web-cp-status-tag--warning { background: #FEF3C7; color: #D97706; }
+.ui-web-cp-status-tag--danger  { background: #FEF2F2; color: #DC2626; }
+.ui-web-cp-status-tag--info    { background: #E0F2FE; color: #0369A1; }
+
+.ui-web-cp-action-cluster { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.ui-web-cp-action-cluster__primary {
+  padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
+  background: #0A2F5C; color: #FFFFFF; border: none; cursor: pointer; white-space: nowrap;
+  transition: background 0.15s ease;
+}
+.ui-web-cp-action-cluster__primary:hover { background: #08284F; }
+.ui-web-cp-action-cluster__secondary {
+  padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
+  background: transparent; color: #0A2F5C; border: 1px solid rgba(10,47,92,0.12);
+  cursor: pointer; white-space: nowrap; transition: border-color 0.15s ease;
+}
+.ui-web-cp-action-cluster__secondary:hover { border-color: rgba(10,47,92,0.24); }
+
+.ui-web-cp-decision-row {
+  display: grid;
+  grid-template-columns: minmax(200px, 1.2fr) minmax(180px, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  background: #FFFFFF;
+  border: 1px solid rgba(10,47,92,0.08);
+  border-radius: 10px;
+  min-width: 0;
+}
+.ui-web-cp-decision-row--danger  { border-inline-start: 3px solid #DC2626; }
+.ui-web-cp-decision-row--warning { border-inline-start: 3px solid #F59E0B; }
+.ui-web-cp-decision-row__meta { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ui-web-cp-decision-row__headline { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ui-web-cp-decision-row__id    { font-size: 13px; font-weight: 800; color: #0A2F5C; }
+.ui-web-cp-decision-row__title { font-size: 12px; font-weight: 700; color: #0A2F5C; line-height: 1.35; }
+.ui-web-cp-decision-row__text  { font-size: 11px; color: #64748B; line-height: 1.35; }
+.ui-web-cp-decision-row__sla   { font-size: 10px; font-weight: 800; color: #64748B; }
+.ui-web-cp-decision-row__rec   { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ui-web-cp-decision-row__rec-label  { font-size: 11px; font-weight: 700; color: #0A2F5C; }
+.ui-web-cp-decision-row__rec-reason { font-size: 11px; color: #64748B; line-height: 1.35; }
+
+.ui-web-cp-recommendation {
+  padding: 8px 12px;
+  background: rgba(10,47,92,0.03);
+  border: 1px solid rgba(10,47,92,0.07);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  direction: rtl;
+  text-align: right;
+}
+.ui-web-cp-recommendation__header {
+  font-size: 12px; font-weight: 700; color: #0A2F5C;
+  display: flex; align-items: center; gap: 6px;
+}
+.ui-web-cp-recommendation__reason { font-size: 11px; color: #64748B; line-height: 1.4; }
+.ui-web-cp-recommendation__actions { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+
+.ui-web-cp-inspector-shell {
+  display: flex; flex-direction: column;
+  background: #FFFFFF;
+  border-inline-start: 1px solid rgba(10,47,92,0.08);
+  height: 100%; min-width: 0;
+}
+.ui-web-cp-inspector-shell__header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(10,47,92,0.08); gap: 8px;
+}
+.ui-web-cp-inspector-shell__title  { font-size: 14px; font-weight: 800; color: #0A2F5C; margin: 0; }
+.ui-web-cp-inspector-shell__close  {
+  appearance: none; border: none; background: transparent;
+  color: #64748B; font-size: 18px; cursor: pointer; line-height: 1; padding: 2px 6px;
+}
+.ui-web-cp-inspector-shell__body  { flex: 1; overflow-y: auto; padding: 12px 14px; }
 `;
 
 function WebControlSurfaceStyles() {
@@ -713,6 +803,134 @@ export function WebSystemSuggestion({
             )}
           </div>
         )}
+      </div>
+    </>
+  );
+}
+
+// ─── Control Panel Lane Primitives ────────────────────────────────────────────
+
+export type WebControlPanelStatusTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
+export type WebControlPanelStatusTagProps = { label: string; tone?: WebControlPanelStatusTone };
+export function WebControlPanelStatusTag({ label, tone = 'neutral' }: WebControlPanelStatusTagProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <span className={`ui-web-cp-status-tag ui-web-cp-status-tag--${tone}`}>{label}</span>
+    </>
+  );
+}
+
+export type WebControlPanelActionItem = { id: string; label: string; onAction?: () => void };
+export type WebControlPanelActionClusterProps = {
+  primary: WebControlPanelActionItem;
+  secondary?: WebControlPanelActionItem;
+};
+export function WebControlPanelActionCluster({ primary, secondary }: WebControlPanelActionClusterProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <div className="ui-web-cp-action-cluster">
+        <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primary.onAction}>{primary.label}</button>
+        {secondary && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={secondary.onAction}>{secondary.label}</button>}
+      </div>
+    </>
+  );
+}
+
+export type WebControlPanelDecisionRowRisk = 'danger' | 'warning' | 'neutral';
+export type WebControlPanelDecisionRowProps = {
+  entityId: string;
+  entityLabel?: string;
+  status?: string;
+  statusTone?: WebControlPanelStatusTone;
+  risk?: WebControlPanelDecisionRowRisk;
+  recommendation?: string;
+  reason?: string;
+  sla?: string;
+  primaryAction: WebControlPanelActionItem;
+  secondaryAction?: WebControlPanelActionItem;
+  onInspect?: () => void;
+};
+export function WebControlPanelDecisionRow({
+  entityId, entityLabel, status, statusTone = 'neutral', risk = 'neutral',
+  recommendation, reason, sla, primaryAction, secondaryAction, onInspect,
+}: WebControlPanelDecisionRowProps) {
+  const rowClass = ['ui-web-cp-decision-row',
+    risk === 'danger' ? 'ui-web-cp-decision-row--danger' : '',
+    risk === 'warning' ? 'ui-web-cp-decision-row--warning' : '',
+  ].filter(Boolean).join(' ');
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <div className={rowClass}>
+        <div className="ui-web-cp-decision-row__meta">
+          <div className="ui-web-cp-decision-row__headline">
+            <span className="ui-web-cp-decision-row__id">{entityId}</span>
+            {status && <WebControlPanelStatusTag label={status} tone={statusTone} />}
+          </div>
+          {entityLabel && <span className="ui-web-cp-decision-row__title">{entityLabel}</span>}
+          {sla && <span className="ui-web-cp-decision-row__sla">{sla}</span>}
+        </div>
+        {(recommendation || reason) && (
+          <div className="ui-web-cp-decision-row__rec">
+            {recommendation && <span className="ui-web-cp-decision-row__rec-label">{recommendation}</span>}
+            {reason && <span className="ui-web-cp-decision-row__rec-reason">{reason}</span>}
+          </div>
+        )}
+        <div className="ui-web-cp-action-cluster">
+          <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primaryAction.onAction}>{primaryAction.label}</button>
+          {secondaryAction && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={secondaryAction.onAction}>{secondaryAction.label}</button>}
+          {onInspect && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={onInspect} aria-label="فتح التفاصيل">►</button>}
+        </div>
+      </div>
+    </>
+  );
+}
+
+export type WebControlPanelRecommendationProps = {
+  title: string;
+  reason?: string;
+  confidence?: 'high' | 'medium' | 'low';
+  auditTag?: string;
+  primaryAction?: WebControlPanelActionItem;
+  secondaryAction?: WebControlPanelActionItem;
+};
+export function WebControlPanelRecommendation({ title, reason, confidence, auditTag, primaryAction, secondaryAction }: WebControlPanelRecommendationProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <div className="ui-web-cp-recommendation">
+        <div className="ui-web-cp-recommendation__header">
+          <span>{title}</span>
+          {confidence === 'high' && <span className="ui-web-system-suggestion__conf-high">ثقة عالية</span>}
+          {confidence === 'medium' && <span className="ui-web-system-suggestion__conf-medium">ثقة متوسطة</span>}
+          {confidence === 'low' && <span className="ui-web-system-suggestion__conf-low">مراجعة مطلوبة</span>}
+          {auditTag && <span className="ui-web-system-suggestion__audit">{auditTag}</span>}
+        </div>
+        {reason && <span className="ui-web-cp-recommendation__reason">{reason}</span>}
+        {(primaryAction || secondaryAction) && (
+          <div className="ui-web-cp-recommendation__actions">
+            {primaryAction && <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primaryAction.onAction}>{primaryAction.label}</button>}
+            {secondaryAction && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={secondaryAction.onAction}>{secondaryAction.label}</button>}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+export type WebControlPanelInspectorShellProps = { title: string; onClose?: () => void; children?: React.ReactNode };
+export function WebControlPanelInspectorShell({ title, onClose, children }: WebControlPanelInspectorShellProps) {
+  return (
+    <>
+      <WebControlSurfaceStyles />
+      <div className="ui-web-cp-inspector-shell">
+        <div className="ui-web-cp-inspector-shell__header">
+          <h2 className="ui-web-cp-inspector-shell__title">{title}</h2>
+          {onClose && <button type="button" className="ui-web-cp-inspector-shell__close" onClick={onClose} aria-label="إغلاق">×</button>}
+        </div>
+        <div className="ui-web-cp-inspector-shell__body">{children}</div>
       </div>
     </>
   );

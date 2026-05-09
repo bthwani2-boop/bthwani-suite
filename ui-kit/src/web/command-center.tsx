@@ -26,14 +26,14 @@ const webCommandCenterCss = `
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 12px 24px;
+  padding: 0 24px;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 1px solid var(--bth-shell-line);
   position: sticky;
   top: 0;
   z-index: 100;
-  height: 72px;
+  height: 56px;
 }
 
 .ui-web-command-strip__identity {
@@ -48,6 +48,7 @@ const webCommandCenterCss = `
   font-weight: 800;
   color: var(--bth-deep-blue);
   letter-spacing: -0.02em;
+  cursor: pointer;
 }
 
 .ui-web-command-strip__search-container {
@@ -157,10 +158,15 @@ const webCommandCenterCss = `
 
 .ui-web-command-center__workspace {
   display: grid;
-  min-height: calc(100vh - 72px);
-  grid-template-columns: var(--rail-width) 1fr;
+  min-height: calc(100vh - 56px);
+  grid-template-columns: var(--rail-width) minmax(0, 1fr);
   grid-template-areas: "rail stage";
   transition: grid-template-columns 0.22s ease;
+}
+
+.ui-web-command-center-root[dir="rtl"] .ui-web-command-center__workspace {
+  grid-template-columns: var(--rail-width) minmax(0, 1fr);
+  grid-template-areas: "rail stage";
 }
 
 .ui-web-command-center__rail {
@@ -172,8 +178,8 @@ const webCommandCenterCss = `
   flex-direction: column;
   gap: 12px;
   position: sticky;
-  top: 72px;
-  height: calc(100vh - 72px);
+  top: 56px;
+  height: calc(100vh - 56px);
   z-index: 90;
   overflow: hidden;
 }
@@ -322,6 +328,8 @@ const webCommandCenterCss = `
   grid-area: stage;
   padding: 24px;
   background: #f8fafc;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .ui-web-command-strip__alert-badge {
@@ -385,16 +393,128 @@ const webCommandCenterCss = `
   height: 28px;
   font-size: 20px;
 }
+
+/* === ControlPanel: KpiStrip === */
+.ui-web-cp-kpi-strip {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 14px;
+  background: #FFFFFF;
+  border-bottom: 1px solid rgba(10,47,92,0.06);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.ui-web-cp-kpi-strip::-webkit-scrollbar { display: none; }
+.ui-web-cp-kpi-item {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  background: #FFFFFF;
+  border: 1px solid rgba(10,47,92,0.08);
+  border-radius: 8px;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+.ui-web-cp-kpi-item__label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ui-web-cp-kpi-item__value {
+  font-size: 14px;
+  font-weight: 900;
+  color: #0A2F5C;
+  line-height: 1.2;
+}
+.ui-web-cp-kpi-item--danger .ui-web-cp-kpi-item__value { color: #DC2626; }
+.ui-web-cp-kpi-item--warning .ui-web-cp-kpi-item__value { color: #D97706; }
+.ui-web-cp-kpi-item--success .ui-web-cp-kpi-item__value { color: #16A34A; }
+
+/* === ControlPanel: WorkspaceTabs === */
+.ui-web-cp-workspace-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 14px;
+  background: #FFFFFF;
+  border-bottom: 1px solid rgba(10,47,92,0.08);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.ui-web-cp-workspace-tabs::-webkit-scrollbar { display: none; }
+.ui-web-cp-workspace-tab {
+  flex-shrink: 0;
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748B;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ui-web-cp-workspace-tab:hover { background: rgba(10,47,92,0.04); color: #0A2F5C; }
+.ui-web-cp-workspace-tab--active { background: #0A2F5C; color: #FFFFFF; }
+.ui-web-cp-workspace-tab--active:hover { background: #08284F; }
+
+/* === ControlPanel: SubTabs === */
+.ui-web-cp-sub-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px 8px;
+  background: #FFFFFF;
+  border-bottom: 1px solid rgba(10,47,92,0.06);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.ui-web-cp-sub-tabs::-webkit-scrollbar { display: none; }
+.ui-web-cp-sub-tab {
+  padding: 3px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+  background: rgba(10,47,92,0.03);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.ui-web-cp-sub-tab:hover { background: rgba(10,47,92,0.06); color: #0A2F5C; }
+.ui-web-cp-sub-tab--active { background: rgba(10,47,92,0.1); color: #0A2F5C; border-color: rgba(10,47,92,0.2); }
+
+.ui-web-command-center__hero { margin-bottom: 32px; }
+.ui-web-command-center__hero-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: #0A2F5C;
+  margin: 0;
+}
+.ui-web-command-center__hero-subtitle {
+  color: #64748b;
+  font-size: 16px;
+  margin: 8px 0 0;
+}
 `;
 
 
 function WebCommandCenterStyles() {
-  return <style>{webControlSurfaceCss + webCommandCenterCss}</style>;
+  return <style>{webCommandCenterCss}</style>;
 }
-
-const webControlSurfaceCss = `
-/* Reusing some existing styles if needed, but the main ones are in webCommandCenterCss */
-`;
 
 export type WebCommandCenterFilter = {
   id: string;
@@ -460,7 +580,7 @@ export function WebCommandStrip({
       <WebCommandCenterStyles />
       <header className="ui-web-command-strip" dir={direction}>
         <div className="ui-web-command-strip__identity">
-          <div className="ui-web-command-strip__surface-title" onClick={onBrandClick} style={{ cursor: 'pointer' }}>
+          <div className="ui-web-command-strip__surface-title" onClick={onBrandClick}>
             {surfaceTitle}
           </div>
           <div className="ui-web-command-strip__filters">
@@ -493,7 +613,7 @@ export function WebCommandStrip({
 
         <div className="ui-web-command-strip__actions">
           <button type="button" className="ui-web-command-strip__action-btn" onClick={onAlertClick}>
-            🔔
+            ⊙
             {parseInt(alertCountLabel) > 0 && <span className="ui-web-command-strip__alert-badge" />}
           </button>
           <button type="button" className="ui-web-command-strip__action-btn" onClick={onRefreshClick}>
@@ -605,7 +725,9 @@ export function WebCommandCenterFrame({
                 title={isRailCollapsed ? 'فتح الشريط الجانبي' : 'طي الشريط الجانبي'}
                 onClick={() => setIsRailCollapsed((current) => !current)}
               >
-                {isRailCollapsed ? '›' : '‹'}
+                {direction === 'rtl'
+                  ? (isRailCollapsed ? '‹' : '›')
+                  : (isRailCollapsed ? '›' : '‹')}
               </button>
             </div>
 
@@ -652,14 +774,10 @@ export function WebCommandCenterFrame({
 
           <section className="ui-web-command-center__stage">
             {showHero && (
-              <div style={{ marginBottom: 32 }}>
-                <h1 style={{ fontSize: 32, fontWeight: 900, color: '#0A2F5C', margin: 0 }}>
-                  {surfaceTitle}
-                </h1>
+              <div className="ui-web-command-center__hero">
+                <h1 className="ui-web-command-center__hero-title">{surfaceTitle}</h1>
                 {surfaceSubtitle && (
-                  <p style={{ color: '#64748b', fontSize: 16, margin: '8px 0 0' }}>
-                    {surfaceSubtitle}
-                  </p>
+                  <p className="ui-web-command-center__hero-subtitle">{surfaceSubtitle}</p>
                 )}
               </div>
             )}
@@ -751,3 +869,83 @@ export function WebRailServiceList({
 }
 
 
+// ─── Control Panel Lane Primitives ────────────────────────────────────────────
+
+/** Alias — WebCommandCenterFrame as the ControlPanel root shell. */
+export const WebControlPanelFrame = WebCommandCenterFrame;
+export type WebControlPanelFrameProps = WebCommandCenterFrameProps;
+
+export type WebControlPanelKpiTone = 'neutral' | 'success' | 'warning' | 'danger';
+export type WebControlPanelKpiItem = { id: string; label: string; value: string; tone?: WebControlPanelKpiTone };
+export type WebControlPanelKpiStripProps = { items: ReadonlyArray<WebControlPanelKpiItem> };
+export function WebControlPanelKpiStrip({ items }: WebControlPanelKpiStripProps) {
+  return (
+    <>
+      <WebCommandCenterStyles />
+      <div className="ui-web-cp-kpi-strip">
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className={['ui-web-cp-kpi-item', item.tone && item.tone !== 'neutral' ? `ui-web-cp-kpi-item--${item.tone}` : ''].filter(Boolean).join(' ')}
+          >
+            <span className="ui-web-cp-kpi-item__label">{item.label}</span>
+            <span className="ui-web-cp-kpi-item__value">{item.value}</span>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+export type WebControlPanelWorkspaceTabItem = { id: string; label: string; badge?: string; active?: boolean };
+export type WebControlPanelWorkspaceTabsProps = {
+  items: ReadonlyArray<WebControlPanelWorkspaceTabItem>;
+  onSelect?: (id: string) => void;
+  ariaLabel?: string;
+};
+export function WebControlPanelWorkspaceTabs({ items, onSelect, ariaLabel }: WebControlPanelWorkspaceTabsProps) {
+  return (
+    <>
+      <WebCommandCenterStyles />
+      <nav className="ui-web-cp-workspace-tabs" aria-label={ariaLabel}>
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={['ui-web-cp-workspace-tab', item.active ? 'ui-web-cp-workspace-tab--active' : ''].filter(Boolean).join(' ')}
+            aria-current={item.active ? 'page' : undefined}
+            onClick={() => onSelect?.(item.id)}
+          >
+            {item.label}{item.badge && <span>{item.badge}</span>}
+          </button>
+        ))}
+      </nav>
+    </>
+  );
+}
+
+export type WebControlPanelSubTabItem = { id: string; label: string; active?: boolean };
+export type WebControlPanelSubTabsProps = {
+  items: ReadonlyArray<WebControlPanelSubTabItem>;
+  onSelect?: (id: string) => void;
+  ariaLabel?: string;
+};
+export function WebControlPanelSubTabs({ items, onSelect, ariaLabel }: WebControlPanelSubTabsProps) {
+  return (
+    <>
+      <WebCommandCenterStyles />
+      <nav className="ui-web-cp-sub-tabs" aria-label={ariaLabel}>
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={['ui-web-cp-sub-tab', item.active ? 'ui-web-cp-sub-tab--active' : ''].filter(Boolean).join(' ')}
+            onClick={() => onSelect?.(item.id)}
+          >
+            {item.label}
+          </button>
+        ))}
+      </nav>
+    </>
+  );
+}

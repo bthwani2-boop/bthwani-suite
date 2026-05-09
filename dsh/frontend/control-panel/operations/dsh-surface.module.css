@@ -1,47 +1,19 @@
 /* ===== DSH Cockpit Viewport Layout ===== */
 .operationsCockpit {
-  min-height: calc(100vh - 120px);
-  max-height: calc(100vh - 120px);
+  min-height: var(--dsh-cockpit-height, calc(100vh - 120px));
+  max-height: var(--dsh-cockpit-height, calc(100vh - 120px));
   overflow: hidden;
   display: grid;
-  grid-template-rows: auto auto auto 1fr; /* Added row for sub-tabs */
+  grid-template-rows: auto auto auto 1fr;
   background-color: #F1F5F9;
   direction: rtl;
   text-align: right;
   font-family: 'Outfit', 'Inter', sans-serif;
 }
 
-.premiumGlass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
-}
+/* ControlPanel identity: deepBlue #0A2F5C / orange #FF500D / white #FFFFFF
+   No glass, no glow, no purple — control room is clarity, not decoration */
 
-.intelligenceGlow {
-  position: relative;
-}
-
-.intelligenceGlow::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  bottom: -2px;
-  left: -2px;
-  background: linear-gradient(45deg, #FF500D, #0A2F5C, #8b5cf6);
-  border-radius: inherit;
-  z-index: -1;
-  opacity: 0.15;
-  filter: blur(8px);
-  animation: pulseGlow 4s infinite alternate;
-}
-
-@keyframes pulseGlow {
-  0% { opacity: 0.1; }
-  100% { opacity: 0.3; }
-}
 
 .operationsTopBar {
   display: flex;
@@ -63,14 +35,16 @@
 
 .operationsTitleBlock h1 {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
   color: #0A2F5C;
+  letter-spacing: -0.01em;
 }
 
 .operationsTitleBlock p {
   margin: 0;
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 600;
   color: #64748B;
 }
 
@@ -153,6 +127,28 @@
   border-radius: 4px;
   display: inline-block;
   width: fit-content;
+}
+
+.operationsHeaderIconBox {
+  width: 32px;
+  height: 32px;
+  background-color: #0A2F5C;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(10, 47, 92, 0.2);
+  flex-shrink: 0;
+}
+
+.commandKpiCompact {
+  min-width: 100px;
+  padding: 4px 10px;
+}
+
+.commandKpiValueCompact {
+  font-size: 14px;
 }
 
 .toneSuccess { background: #DCFCE7; color: #16A34A; }
@@ -345,11 +341,11 @@
 }
 
 .operationsCompactCardDanger {
-  border-right: 4px solid #DC2626;
+  border-inline-start: 4px solid #DC2626;
 }
 
 .operationsCompactCardWarning {
-  border-right: 4px solid #F59E0B;
+  border-inline-start: 4px solid #F59E0B;
 }
 
 .operationsCompactCardMeta {
@@ -516,7 +512,7 @@
 
 .inspectorPanel {
   background: #FFFFFF;
-  border-right: 1px solid rgba(10, 47, 92, 0.1);
+  border-inline-end: 1px solid rgba(10, 47, 92, 0.1);
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
@@ -636,11 +632,11 @@
 }
 
 .liveOrdersOrderCardDanger {
-  border-right: 4px solid #DC2626;
+  border-inline-start: 4px solid #DC2626;
 }
 
 .liveOrdersOrderCardWarning {
-  border-right: 4px solid #F59E0B;
+  border-inline-start: 4px solid #F59E0B;
 }
 
 .liveOrdersOrderMeta {

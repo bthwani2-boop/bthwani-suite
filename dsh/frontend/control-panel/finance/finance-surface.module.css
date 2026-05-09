@@ -11,40 +11,6 @@
   font-family: 'Outfit', 'Inter', sans-serif;
 }
 
-.subNavigationCockpit {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 4px 14px 10px;
-  background-color: #fff;
-  border-bottom: 1px solid rgba(10, 47, 92, 0.08);
-  overflow: hidden; /* No scrolling */
-}
-
-.financeSubTab {
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #64748B;
-  background: rgba(10, 47, 92, 0.03);
-  border: 1px solid transparent;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.financeSubTab:hover {
-  background-color: rgba(10, 47, 92, 0.06);
-  color: #0A2F5C;
-}
-
-.financeSubTabActive {
-  background-color: rgba(10, 47, 92, 0.1);
-  color: #0A2F5C;
-  border-color: rgba(10, 47, 92, 0.2);
-}
-
 /* Override scroll behaviors */
 .noScroll {
   overflow: hidden !important;

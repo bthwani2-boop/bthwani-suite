@@ -4,9 +4,13 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { StateView } from '@bthwani/ui-kit';
 import {
+  WebControlPanelKpiStrip,
+  WebControlPanelWorkspaceTabs,
+  WebControlPanelSubTabs,
+} from '@bthwani/ui-kit/web';
+import {
   buildOperationsHref,
   getOperationsGroupMeta,
-  NON_OPERATIONS_SECTION_SHORTCUTS,
   OPERATIONS_CANONICAL_GROUPS,
   resolveOperationsStateCopy,
 } from './operations.registry';
@@ -81,70 +85,63 @@ export function ControlPanelDshOperationsScreen({
     );
   }
 
+  const kpiItems = OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => ({
+    id: metric.id,
+    label: METRIC_ARABIC[metric.title] || metric.title,
+    value: String(metric.value),
+    tone: (metric.tone as 'neutral' | 'success' | 'warning' | 'danger' | undefined) ?? 'neutral',
+  }));
+
+  const tabItems = OPERATIONS_CANONICAL_GROUPS.map((item) => ({
+    id: item.id,
+    label: item.label,
+    active: item.id === activeGroup,
+  }));
+
+  const subTabItems = activeGroupMeta.subGroups?.map((sub) => ({
+    id: sub.id,
+    label: sub.label,
+    active: (activeSubGroup || activeGroupMeta.subGroups?.[0]?.id) === sub.id,
+  }));
+
   return (
     <div className={styles.operationsCockpit} dir="rtl">
-      {/* 1. Header Area - Compact Command Center */}
-      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
+      {/* 1. Header — Identity + KPI Strip */}
+      <header className={styles.operationsTopBar}>
         <div className={styles.operationsTitleBlock}>
-          <div style={{ width: '32px', height: '32px', backgroundColor: '#0A2F5C', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)' }}>
-            ⚙️
-          </div>
+          <div className={styles.operationsHeaderIconBox}>⚙️</div>
           <div>
-            <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>عمليات DSH</h1>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>مراقبة وتنفيذ الطلبات الحية</p>
+            <h1>عمليات DSH</h1>
+            <p>مراقبة وتنفيذ الطلبات الحية</p>
           </div>
         </div>
-
         <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
-            {OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => (
-              <div key={metric.id} className={styles.commandKpi} style={{ minWidth: '100px', padding: '4px 10px' }}>
-                <span className={styles.commandKpiLabel}>{METRIC_ARABIC[metric.title] || metric.title}</span>
-                <span className={styles.commandKpiValue} style={{ fontSize: '14px' }}>{metric.value}</span>
-              </div>
-            ))}
-          </div>
+          <WebControlPanelKpiStrip items={kpiItems} />
         </div>
       </header>
 
-      {/* 2. Operations Tabs - Cockpit Navigation */}
-      <nav className={styles.navigationCockpit}>
-        {OPERATIONS_CANONICAL_GROUPS.map((item) => {
-          const isSelected = item.id === activeGroup;
-          return (
-            <button
-              key={item.id}
-              className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
-              onClick={() => {
-                setActiveGroup(item.id);
-                setActiveSubGroup(undefined);
-                router.push(buildOperationsHref(item.id, { orderId, panel }));
-              }}
-            >
-              {item.label}
-            </button>
-          );
-        })}
+      {/* 2. Primary Navigation */}
+      <WebControlPanelWorkspaceTabs
+        items={tabItems}
+        ariaLabel="أقسام العمليات"
+        onSelect={(id) => {
+          const groupId = id as CanonicalOperationsGroupId;
+          setActiveGroup(groupId);
+          setActiveSubGroup(undefined);
+          router.push(buildOperationsHref(groupId, { orderId, panel }));
+        }}
+      />
 
-      {/* 2b. Sub-Tabs - Granular Navigation */}
-      {activeGroupMeta.subGroups && (
-        <nav className={styles.subNavigationCockpit}>
-          {activeGroupMeta.subGroups.map((sub) => {
-            const isSelected = (activeSubGroup || activeGroupMeta.subGroups?.[0]?.id) === sub.id;
-            return (
-              <button
-                key={sub.id}
-                className={`${styles.operationsSubTab} ${isSelected ? styles.operationsSubTabActive : ''}`}
-                onClick={() => setActiveSubGroup(sub.id)}
-              >
-                {sub.label}
-              </button>
-            );
-          })}
-        </nav>
+      {/* 2b. Sub-Navigation */}
+      {subTabItems && subTabItems.length > 0 && (
+        <WebControlPanelSubTabs
+          items={subTabItems}
+          ariaLabel="تصفية فرعية"
+          onSelect={(id) => setActiveSubGroup(id)}
+        />
       )}
 
-      {/* 3. Main Active Area */}
+      {/* 3. Main Workspace */}
       <main className={styles.operationsMainPanel}>
         <div className={styles.operationsInnerScroll}>
           <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
@@ -159,4 +156,3 @@ export function DshOperationsHubSurface(props: ControlPanelDshOperationsScreenPr
 }
 
 export default ControlPanelDshOperationsScreen;
-

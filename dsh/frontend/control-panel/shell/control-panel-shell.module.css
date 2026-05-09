@@ -1,0 +1,7 @@
+.shell {
+  --dsh-cockpit-height: calc(100vh - 56px);
+}
+
+.shell :global(.ui-web-command-center__stage) {
+  padding: 0;
+}

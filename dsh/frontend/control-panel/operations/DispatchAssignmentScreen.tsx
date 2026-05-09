@@ -1,102 +1,58 @@
 'use client';
 
 import React from 'react';
-import { OperationsSuggestionCard } from './operations.ui';
+import {
+  WebControlPanelKpiStrip,
+  WebControlPanelDecisionRow,
+} from '@bthwani/ui-kit/web';
 import { DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW } from './operations.preview-data';
 import styles from './dsh-surface.module.css';
 
-export type DispatchAssignmentScreenProps = { hubHref: string; subGroup?: string; };
+export type DispatchAssignmentScreenProps = { hubHref: string; subGroup?: string };
 
-const STATUS_CLASS_NAMES: Record<string, string> = {
-  warning: styles.liveOrdersStatusWarning,
-  danger: styles.liveOrdersStatusDanger,
-  best: styles.liveOrdersStatusBest,
-  brand: styles.liveOrdersStatusBrand,
+const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
+  warning: 'warning',
+  danger: 'danger',
+  best: 'success',
+  brand: 'neutral',
 };
 
-export function DispatchAssignmentScreen({ hubHref, subGroup }: DispatchAssignmentScreenProps) {
+export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenProps) {
   const preview = DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW;
 
+  const summaryKpi = [
+    { id: 'waiting', label: 'بانتظار الإسناد', value: String(preview.summary.waitingAssignment), tone: 'danger' as const },
+    { id: 'captains', label: 'كباتن متاحون', value: String(preview.summary.availableCaptains), tone: 'success' as const },
+    { id: 'ready', label: 'جاهزون للاستلام', value: String(preview.summary.readyForPickup), tone: 'neutral' as const },
+  ];
+
   return (
-    <div className={styles.liveOrdersScreen}>
+    <div className={styles.liveOrdersScreen} dir="rtl">
+      {/* KPI summary strip */}
+      <WebControlPanelKpiStrip items={summaryKpi} />
 
-      <div className={styles.liveOrdersHeaderRow}>
-        <h2 className={styles.liveOrdersTitle}>الإسناد والتوزيع</h2>
-        <div>
-          <button className={styles.liveOrdersFilterButton}>تحديث النظام</button>
-        </div>
-      </div>
-
-      <div className={styles.liveOrdersSummaryGrid}>
-        <div className={styles.liveOrdersSummaryCard}>
-          <div className={styles.liveOrdersSummaryLabel}>طلبات بانتظار الإسناد</div>
-          <div className={styles.liveOrdersSummaryValueDanger}>{preview.summary.waitingAssignment}</div>
-        </div>
-        <div className={styles.liveOrdersSummaryCard}>
-          <div className={styles.liveOrdersSummaryLabel}>كباتن متاحون</div>
-          <div className={styles.liveOrdersSummaryValueBrand}>{preview.summary.availableCaptains}</div>
-        </div>
-        <div className={styles.liveOrdersSummaryCard}>
-          <div className={styles.liveOrdersSummaryLabel}>جاهزون للاستلام</div>
-          <div className={styles.liveOrdersSummaryValueBrand}>{preview.summary.readyForPickup}</div>
-        </div>
-      </div>
-
+      {/* Decision rows — duplicate buttons eliminated, one primary action per row */}
       <div className={styles.liveOrdersCardsStack}>
         {preview.rows.map((item) => {
-          const statusClassName = STATUS_CLASS_NAMES[item.statusTone] ?? STATUS_CLASS_NAMES.brand;
-          const cardClassName = [
-            styles.liveOrdersOrderCard,
-            item.statusTone === 'danger' ? styles.liveOrdersOrderCardDanger : '',
-            item.statusTone === 'warning' ? styles.liveOrdersOrderCardWarning : '',
-          ].filter(Boolean).join(' ');
-
+          const tone = TONE_MAP[item.statusTone] ?? 'neutral';
+          const confidenceTone = item.confidence === 'ثقة عالية' ? 'high' : item.confidence === 'ثقة منخفضة' ? 'low' : 'medium';
           return (
-            <div key={item.id} className={cardClassName}>
-              <div className={styles.liveOrdersOrderMeta}>
-                <div className={styles.liveOrdersOrderTopRow}>
-                  <span className={styles.liveOrdersOrderId}>{item.id}</span>
-                  <span className={`${styles.liveOrdersOrderStatus} ${statusClassName}`}>{item.status}</span>
-                  <span className={styles.liveOrdersRingHint}>{item.readyForPickup}</span>
-                </div>
-                <div className={styles.liveOrdersDestination}>{item.captain}</div>
-                <div className={styles.liveOrdersMetaText}>المسافة: {item.distance} | زمن الاستلام: {item.pickupEta} | زمن التسليم: {item.dropoffEta}</div>
-                <div className={styles.liveOrdersNoteText}>{item.note}</div>
-              </div>
-
-              <OperationsSuggestionCard
-                label={item.recommendation}
-                reason={item.blocker}
-                confidence={item.confidence === 'ثقة عالية' ? 'high' : item.confidence === 'ثقة منخفضة' ? 'low' : 'medium'}
-                actions={(
-                  <>
-                    <button className={styles.liveOrdersActionPrimary}>تأكيد الإسناد</button>
-                    <button className={styles.liveOrdersActionSecondary}>إعادة تعيين</button>
-                  </>
-                )}
-              >
-                <span className={styles.liveOrdersSuggestionChip}>{item.readyForPickup}</span>
-              </OperationsSuggestionCard>
-
-              <div className={styles.liveOrdersOrderActions}>
-                <div className={styles.liveOrdersTimelineTitle}>ملاحظة التوزيع</div>
-                <div className={styles.liveOrdersTimelineList}>
-                  {item.actionPlans.map((plan) => <div key={plan}>• {plan}</div>)}
-                </div>
-                <div className={styles.liveOrdersPlanWrap}>
-                  <span className={styles.liveOrdersPlanChip}>المسافة {item.distance}</span>
-                  <span className={styles.liveOrdersPlanChip}>{item.blocker}</span>
-                </div>
-                <div className={styles.liveOrdersActionGrid}>
-                  <button className={styles.liveOrdersActionPrimary}>تأكيد الإسناد</button>
-                  <button className={styles.liveOrdersActionSecondary}>إعادة تعيين</button>
-                </div>
-              </div>
-            </div>
+            <WebControlPanelDecisionRow
+              key={item.id}
+              entityId={item.id}
+              entityLabel={`الكابتن: ${item.captain} | المسافة: ${item.distance}`}
+              status={item.status}
+              statusTone={tone}
+              risk={tone === 'danger' ? 'danger' : tone === 'warning' ? 'warning' : 'neutral'}
+              recommendation={item.recommendation}
+              reason={item.blocker}
+              sla={`استلام: ${item.pickupEta} | تسليم: ${item.dropoffEta}`}
+              primaryAction={{ id: 'confirm', label: 'تأكيد الإسناد' }}
+              secondaryAction={{ id: 'reset', label: 'إعادة تعيين' }}
+            />
           );
         })}
       </div>
-
     </div>
   );
 }

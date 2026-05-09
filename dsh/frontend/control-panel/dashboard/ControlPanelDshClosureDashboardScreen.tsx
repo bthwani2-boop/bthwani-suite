@@ -1,6 +1,11 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import { WebSectionCard, WebControlDisclosureItem } from '@bthwani/ui-kit/web';
+import {
+  WebControlDisclosureItem,
+  WebControlPanelKpiStrip,
+  WebControlPanelActionCluster,
+  WebCompactSurfaceHeader,
+} from '@bthwani/ui-kit/web';
 import { ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, getDshClosureItemsByStatus, getDshClosureItemsBySurface } from '../shared';
 
 export function ControlPanelDshClosureHubScreen() {
@@ -152,39 +157,38 @@ export function ControlPanelDshClosureDashboardScreen() {
   } as const;
 
   return (
-    <Box gap={4}>
-      <div className={styles.operationsPulseCompact} style={{ justifyContent: 'flex-start', borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '16px' }}>
-        {[
-          { id: 'surface-client', title: 'العميل', value: String(surfaceCounts.client), tone: 'brand' },
-          { id: 'surface-partner', title: 'الشريك', value: String(surfaceCounts.partner), tone: 'brand' },
-          { id: 'surface-captain', title: 'الكابتن', value: String(surfaceCounts.captain), tone: 'warning' },
-          { id: 'surface-field', title: 'الميدان', value: String(surfaceCounts.field), tone: 'warning' },
-          { id: 'surface-control', title: 'لوحة التحكم', value: String(surfaceCounts['control-panel']), tone: 'best' },
-        ].map((s) => (
-          <div key={s.id} className={styles.commandKpi} style={{ flex: 1, minWidth: '120px' }}>
-            <span className={styles.commandKpiLabel}>{s.title}</span>
-            <span className={styles.commandKpiValue} style={s.tone === 'best' ? { color: '#16A34A' } : s.tone === 'warning' ? { color: '#D97706' } : {}}>{s.value}</span>
+    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <WebControlPanelKpiStrip items={[
+        { id: 'surface-client', label: 'العميل', value: String(surfaceCounts.client) },
+        { id: 'surface-partner', label: 'الشريك', value: String(surfaceCounts.partner) },
+        { id: 'surface-captain', label: 'الكابتن', value: String(surfaceCounts.captain), tone: 'warning' },
+        { id: 'surface-field', label: 'الميدان', value: String(surfaceCounts.field), tone: 'warning' },
+        { id: 'surface-control', label: 'لوحة التحكم', value: String(surfaceCounts['control-panel']), tone: 'success' },
+      ]} />
+      <div style={{ padding: '0 14px 8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', backgroundColor: '#FFFFFF', border: '1px solid rgba(10,47,92,0.08)', borderRadius: '10px', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: '#0A2F5C' }}>مصفوفة جاهزية DSH</span>
+            <span style={{ fontSize: '11px', color: '#64748B', lineHeight: 1.35 }}>لقطة واحدة توضح ما هو مغلق، وما يحتاج أدلة، وما يحتاج مسارات واجهة قبل الخروج النهائي.</span>
           </div>
-        ))}
+          <WebControlPanelActionCluster
+            primary={{ id: 'evidence', label: 'فتح الأدلة' }}
+            secondary={{ id: 'protection', label: 'حالة الحماية' }}
+          />
+        </div>
       </div>
-
-      <WebSectionCard
-        title="مصفوفة جاهزية DSH"
-        description="لقطة واحدة توضح ما هو مغلق، وما يحتاج أدلة (Evidence)، وما يحتاج مسارات واجهة (UI flow) قبل الخروج النهائي."
-      >
-        <Box layoutDirection="row" gap={2}>
-           <Button label="فتح الأدلة" tone="primary" size="sm" />
-           <Button label="حالة الحماية" tone="secondary" size="sm" />
-        </Box>
-      </WebSectionCard>
-    </Box>
+    </div>
   );
 }
 
 export function ControlPanelDshClosureEvidenceStream() {
   return (
-    <WebSectionCard title="تدفق أدلة الإغلاق" description="كل عنصر يمثل وحدة إغلاق يمكن توجيهها لمساحة العمل المناسبة.">
-      <Box gap={2}>
+    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column' }}>
+      <WebCompactSurfaceHeader
+        title="تدفق أدلة الإغلاق"
+        description="كل عنصر يمثل وحدة إغلاق يمكن توجيهها لمساحة العمل المناسبة."
+      />
+      <div style={{ padding: '8px 14px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
         {DSH_CROSS_SURFACE_CLOSURE_MAP.map((item) => (
           <WebControlDisclosureItem
             key={`${item.surfaceId}-${item.area}`}
@@ -195,11 +199,11 @@ export function ControlPanelDshClosureEvidenceStream() {
             href={item.routeHint}
           />
         ))}
-      </Box>
-      <Text role="bodySm" tone="muted">
+      </div>
+      <div style={{ padding: '0 14px 8px', fontSize: '11px', color: '#94A3B8' }}>
         هذه اللوحة للعرض فقط ولا تقوم بتغيير حالة النظام الفعلية.
-      </Text>
-    </WebSectionCard>
+      </div>
+    </div>
   );
 }
 
