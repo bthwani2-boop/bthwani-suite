@@ -206,12 +206,13 @@ export type AuditTrailEntry = {
   actionLabel: string;
 };
 
-// ── Typed Metadata ───────────────────────────────────────────────────
-
 export type ApprovalRecordMetadata = {
   requiredFix?: string;
   rejectionReason?: string;
   mediaPolicy?: string;
+  mediaKey?: string;
+  nextOwner?: string;
+  systemNote?: string;
 };
 
 // ── ApprovalRecord ───────────────────────────────────────────────────
@@ -252,6 +253,53 @@ export function transitionApprovalStage(current: ApprovalStage, action: 'approve
   }
 }
 
+export function translateStage(stage: ApprovalStage | string | undefined): string {
+  if (!stage) return 'غير محدد';
+  switch (stage) {
+    case 'partner-submitted':
+    case 'field-submitted': return 'تم التقديم';
+    case 'partner-review': return 'مراجعة الشركاء';
+    case 'partner-approved': return 'معتمد شريكاً';
+    case 'marketing-review': return 'مراجعة التسويق';
+    case 'marketing-approved': return 'معتمد تسويقياً';
+    case 'catalog-adopted': return 'معتمد في الكتالوج';
+    case 'client-visible': return 'نشط للعميل';
+    case 'needs-fix': return 'يتطلب تعديل';
+    case 'rejected': return 'مرفوض';
+    case 'published':
+    case 'published-preview': return 'منشور (سابق)';
+    default: return stage;
+  }
+}
+
+export function translateEntityType(type: ApprovalEntityType | string | undefined): string {
+  if (!type) return 'غير معروف';
+  switch (type) {
+    case 'product': return 'منتج';
+    case 'product-media': return 'صورة منتج';
+    case 'category-suggestion': return 'اقتراح فئة';
+    case 'store': return 'بيانات متجر';
+    case 'partner-offer': return 'عرض شريك';
+    case 'video': return 'فيديو';
+    case 'banner': return 'إعلان';
+    case 'promo': return 'برومو';
+    default: return type;
+  }
+}
+
+export function translateOwner(owner: ApprovalSourceSurface | string | undefined): string {
+  if (!owner) return 'غير معروف';
+  switch (owner) {
+    case 'app-partner': return 'تطبيق الشريك';
+    case 'app-field': return 'تطبيق الميداني';
+    case 'control-panel-partners': return 'بوابة الشركاء';
+    case 'control-panel-marketing': return 'بوابة التسويق';
+    case 'control-panel-catalog': return 'بوابة الكتالوج';
+    case 'app-client': return 'تطبيق العميل';
+    default: return owner;
+  }
+}
+
 export function resolveNextOwner(stage: ApprovalStage): ApprovalSourceSurface {
   switch (stage) {
     case 'partner-submitted':
@@ -274,6 +322,10 @@ export function resolveNextOwner(stage: ApprovalStage): ApprovalSourceSurface {
   }
 }
 
+export type ClientVisibilityOptions = {
+  mediaPolicy?: string;
+};
+
 export function isClientVisibleStage(stage: string | undefined): boolean {
   return stage === 'client-visible';
 }
@@ -282,21 +334,57 @@ export function isLegacyPublishedPreview(stage: string | undefined): boolean {
   return stage === 'published-preview' || stage === 'published';
 }
 
-export function canRenderInClientSurface(stage: string | undefined, entityType?: ApprovalEntityType): boolean {
-  // Strict hardening v2: elements coming from the canonical/approval pipeline MUST have a valid stage.
-  // We no longer allow default visibility if stage is missing for elements intended for client view.
+export function canRenderInClientSurface(
+  stage: string | undefined,
+  entityType?: ApprovalEntityType,
+  options?: ClientVisibilityOptions
+): boolean {
+  // Strict hardening Phase R3: elements coming from the canonical/approval pipeline MUST have a valid stage.
   if (!stage) return false;
 
-  // Exception for product-media: allows viewing if marketing-approved or partner-approved (partner-owned-exception)
-  if (entityType === 'product-media' && isPartnerOwnedException(stage as ApprovalStage, entityType)) {
-    return true;
+  // client-visible is the gold standard for production.
+  if (isClientVisibleStage(stage)) return true;
+
+  // published-preview / published are legacy bridges for pre-hardened data.
+  if (isLegacyPublishedPreview(stage)) return true;
+
+  // Exception for product-media: allows viewing before client-visible IF a valid exception policy is set.
+  // Hardened Phase R4: limited to product-media only, and only if marketing-approved or partner-approved.
+  if (entityType === 'product-media') {
+    const policy = options?.mediaPolicy;
+    const isAllowedPolicy = policy === 'partner-owned-exception' || policy === 'restaurant-exception';
+    const isAllowedStage = stage === 'marketing-approved' || stage === 'partner-approved';
+
+    if (isAllowedPolicy && isAllowedStage) {
+      return true;
+    }
   }
 
-  return isClientVisibleStage(stage) || isLegacyPublishedPreview(stage);
+  // Explicitly deny internal approval stages from client visibility
+  if (
+    stage === 'catalog-adopted' ||
+    stage === 'marketing-review' ||
+    stage === 'marketing-approved' ||
+    stage === 'partner-approved' ||
+    stage === 'partner-review' ||
+    stage === 'partner-submitted' ||
+    stage === 'field-submitted' ||
+    stage === 'needs-fix' ||
+    stage === 'rejected'
+  ) {
+    return false;
+  }
+
+  // default: all other unknown stages are false for client view.
+  return false;
 }
 
 export function isPartnerOwnedException(stage: ApprovalStage, entityType: ApprovalEntityType): boolean {
   return entityType === 'product-media' && (stage === 'marketing-approved' || stage === 'partner-approved');
+}
+
+export function isCatalogOwnedMedia(stage: ApprovalStage | string | undefined): boolean {
+  return stage === 'catalog-adopted' || stage === 'client-visible';
 }
 
 // =====================================================================
@@ -401,6 +489,135 @@ let _globalStore: ApprovalRecord[] = [
     ],
   },
 
+  // — من بوابة التسويق (marketing-review) —
+  {
+    id: 'mr-001',
+    entityType: 'product-media',
+    source: 'app-partner',
+    stage: 'marketing-review',
+    title: 'صورة برغر كلاسيك — مطعم البيت',
+    submittedAt: new Date(Date.now() - 3600_000 * 2).toISOString(),
+    metadata: {
+      mediaKey: 'media/products/burger-classic-01.jpg',
+      mediaPolicy: 'catalog-owned-media',
+      nextOwner: 'control-panel-catalog',
+      systemNote: 'جودة الصورة مقبولة، تحتاج قص RTL',
+    },
+    auditTrail: [],
+  },
+  {
+    id: 'mr-002',
+    entityType: 'product',
+    source: 'app-partner',
+    stage: 'marketing-review',
+    title: 'منتج جديد: عصير رمان طبيعي',
+    submittedAt: new Date(Date.now() - 3600_000 * 5).toISOString(),
+    metadata: {
+      mediaKey: 'media/products/juice-pomegranate-01.jpg',
+      mediaPolicy: 'catalog-owned-media',
+      nextOwner: 'control-panel-catalog',
+      systemNote: 'منتج جديد يحتاج اعتماد تسويقي قبل الكتالوج',
+    },
+    auditTrail: [],
+  },
+  {
+    id: 'mr-003',
+    entityType: 'product-media',
+    source: 'app-partner',
+    stage: 'marketing-approved',
+    title: 'صورة بيتزا مارغريتا — شريك مطعم',
+    submittedAt: new Date(Date.now() - 3600_000 * 8).toISOString(),
+    metadata: {
+      mediaKey: 'media/products/pizza-margherita-01.jpg',
+      mediaPolicy: 'partner-owned-exception',
+      nextOwner: 'control-panel-catalog',
+      systemNote: 'استثناء شريك: الصورة مرتبطة ببراند المطعم',
+    },
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 6).toISOString(), fromStage: 'marketing-review', toStage: 'marketing-approved', owner: 'control-panel-marketing', actionLabel: 'اعتماد تسويقي' },
+    ],
+  },
+  {
+    id: 'mr-004',
+    entityType: 'category-suggestion',
+    source: 'control-panel-marketing',
+    stage: 'marketing-review',
+    title: 'فئة مقترحة: مأكولات صحية',
+    submittedAt: new Date(Date.now() - 3600_000 * 1).toISOString(),
+    metadata: {
+      mediaKey: 'media/categories/healthy-food-cover.jpg',
+      mediaPolicy: 'catalog-owned-media',
+      nextOwner: 'control-panel-catalog',
+      systemNote: 'فئة جديدة تحتاج موافقة التسويق قبل إنشائها في الكتالوج',
+    },
+    auditTrail: [],
+  },
+  {
+    id: 'mr-005',
+    entityType: 'product-media',
+    source: 'app-partner',
+    stage: 'needs-fix',
+    title: 'صورة سلطة يونانية — دقة منخفضة',
+    submittedAt: new Date(Date.now() - 3600_000 * 12).toISOString(),
+    metadata: {
+      mediaKey: 'media/products/salad-greek-low.jpg',
+      mediaPolicy: 'catalog-owned-media',
+      nextOwner: 'app-partner',
+      systemNote: 'الصورة أقل من 800×600 — يُرجى إعادة الرفع',
+    },
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 10).toISOString(), fromStage: 'marketing-review', toStage: 'needs-fix', owner: 'control-panel-marketing', actionLabel: 'طلب تعديل' },
+    ],
+  },
+  {
+    id: 'mr-006',
+    entityType: 'store',
+    source: 'app-partner',
+    stage: 'marketing-review',
+    title: 'غلاف متجر: مطعم الياسمين',
+    submittedAt: new Date(Date.now() - 3600_000 * 4).toISOString(),
+    metadata: {
+      mediaKey: 'media/stores/yasmin-cover-01.jpg',
+      mediaPolicy: 'restaurant-exception',
+      nextOwner: 'control-panel-catalog',
+      systemNote: 'غلاف متجر — استثناء مطعم، يخضع لسياسة الوسائط الخاصة',
+    },
+    auditTrail: [],
+  },
+  {
+    id: 'mr-007',
+    entityType: 'product-media',
+    source: 'app-partner',
+    stage: 'marketing-review',
+    title: 'تعارض وسائط: صورة مكررة لمنتجين',
+    submittedAt: new Date(Date.now() - 1800_000).toISOString(),
+    metadata: {
+      mediaKey: 'media/products/conflict-duplicate-01.jpg',
+      mediaPolicy: 'media-conflict',
+      nextOwner: 'control-panel-marketing',
+      systemNote: 'نفس الصورة مرتبطة بمنتجين مختلفين — يتطلب حلاً',
+    },
+    auditTrail: [],
+  },
+  {
+    id: 'mr-008',
+    entityType: 'product',
+    source: 'app-partner',
+    stage: 'catalog-adopted',
+    title: 'وجبة عائلية مكتملة — أُرسلت للكتالوج',
+    submittedAt: new Date(Date.now() - 3600_000 * 24).toISOString(),
+    metadata: {
+      mediaKey: 'media/products/family-meal-final.jpg',
+      mediaPolicy: 'catalog-owned-media',
+      nextOwner: 'control-panel-catalog',
+      systemNote: 'مكتمل — ظاهر في الكتالوج',
+    },
+    auditTrail: [
+      { at: new Date(Date.now() - 3600_000 * 20).toISOString(), fromStage: 'marketing-review', toStage: 'marketing-approved', owner: 'control-panel-marketing', actionLabel: 'اعتماد تسويقي' },
+      { at: new Date(Date.now() - 3600_000 * 16).toISOString(), fromStage: 'marketing-approved', toStage: 'catalog-adopted', owner: 'control-panel-marketing', actionLabel: 'إرسال للكتالوج' },
+    ],
+  },
+
   // — من بوابة الكتالوج (catalog-adoption) —
   {
     id: 'cat-1',
@@ -455,15 +672,15 @@ export function getAllApprovalRecords(): ApprovalRecord[] {
 }
 
 export function getPartnerQueueRecords(): ApprovalRecord[] {
-  return _globalStore.filter(r => PARTNER_QUEUE_STAGES.includes(r.stage));
+  return _globalStore.filter(r => (PARTNER_QUEUE_STAGES as readonly any[]).indexOf(r.stage) >= 0);
 }
 
 export function getMarketingQueueRecords(): ApprovalRecord[] {
-  return _globalStore.filter(r => MARKETING_QUEUE_STAGES.includes(r.stage));
+  return _globalStore.filter(r => (MARKETING_QUEUE_STAGES as readonly any[]).indexOf(r.stage) >= 0);
 }
 
 export function getCatalogQueueRecords(): ApprovalRecord[] {
-  return _globalStore.filter(r => CATALOG_QUEUE_STAGES.includes(r.stage));
+  return _globalStore.filter(r => (CATALOG_QUEUE_STAGES as readonly any[]).indexOf(r.stage) >= 0);
 }
 
 export function getClientVisibleRecords(): ApprovalRecord[] {
@@ -473,7 +690,13 @@ export function getClientVisibleRecords(): ApprovalRecord[] {
 // ── Mutations ────────────────────────────────────────────────────────
 
 export function upsertApprovalRecord(record: Partial<ApprovalRecord> & { id: string }): void {
-  const idx = _globalStore.findIndex(r => r.id === record.id);
+  let idx = -1;
+  for (let i = 0; i < _globalStore.length; i++) {
+    if (_globalStore[i].id === record.id) {
+      idx = i;
+      break;
+    }
+  }
   if (idx >= 0) {
     _globalStore = _globalStore.map(r => (r.id === record.id ? { ...r, ...record } : r));
   } else {

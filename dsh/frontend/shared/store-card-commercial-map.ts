@@ -124,7 +124,8 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
   let hasBthwaniPro = false;
   const subscriptionPackageChips: string[] = [];
 
-  if (context.activeSubscriptions.some(s => s.id === 'sub-pro') && sourceMap['hasBthwaniPro']?.conflictStatus !== 'blocker') {
+  const isProBlocked = sourceMap['hasBthwaniPro']?.conflictStatus === 'blocker';
+  if (context.activeSubscriptions.some(s => s.id === 'sub-pro') && !isProBlocked) {
     hasBthwaniPro = true;
     subscriptionPackageChips.push('بثواني برو', 'توصيل سريع');
     badges.push({ label: '⚡ بثواني برو', source: 'subscription' });
@@ -158,7 +159,8 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
 
   // 4. Catalog & Features
   let priceMatchLabel: string | undefined = undefined;
-  if (context.catalogFeatures?.priceMatch && sourceMap['priceMatchLabel']?.conflictStatus !== 'blocker') {
+  const isPriceMatchBlocked = sourceMap['priceMatchLabel']?.conflictStatus === 'blocker';
+  if (context.catalogFeatures?.priceMatch && !isPriceMatchBlocked) {
     priceMatchLabel = 'الأسعار مطابقة للكتالوج';
     badges.push({ label: 'تطابق السعر', source: 'catalog' });
     sourceMap['priceMatchLabel'] = {
@@ -208,6 +210,16 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
   // Final Conflict Analysis
   const detectedConflicts = Object.values(sourceMap).filter(s => s.conflictStatus && s.conflictStatus !== 'none');
 
+  // Phase R3 Gate: Strictly filter commercialChips based on sourceMap blockers
+  const filteredCommercialChips = badges.filter(badge => {
+    const sourceKeys = Object.keys(sourceMap).filter(k =>
+      sourceMap[k].sourceType === badge.source ||
+      (badge.source === 'partner' && (k.startsWith('offer') || k === 'hasCouponAvailable' || k === 'deliveryFeeLabel'))
+    );
+    const isBlocked = sourceKeys.some(k => sourceMap[k].conflictStatus === 'blocker');
+    return !isBlocked;
+  });
+
   return {
     offerLabel,
     hasCouponAvailable,
@@ -216,7 +228,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
     hasBthwaniPro,
     subscriptionPackageChips,
     hasNewProducts,
-    commercialChips: badges,
+    commercialChips: filteredCommercialChips,
     commercialNotes: notes,
     sourceMap,
     conflicts: detectedConflicts,
@@ -254,7 +266,7 @@ export function CommercialParityPreview({ features, storeName }: { features: Ret
     React.createElement(
       'div',
       { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
-      React.createElement('span', { style: { fontSize: '14px', fontWeight: '800', color: '#0A2F5C' } }, storeName || 'اسم المتجر الافتراضي'),
+      React.createElement('span', { style: { fontSize: '14px', fontWeight: '800', color: '#0A2F5C' } }, storeName || 'اسم المتجر'),
       features.offerLabel && React.createElement('span', { style: { backgroundColor: '#FF500D', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: '800' } }, features.offerLabel)
     ),
     React.createElement(
@@ -275,23 +287,12 @@ export function CommercialParityPreview({ features, storeName }: { features: Ret
         );
       })
     ),
-    // Source Map Debug View
-    React.createElement(
-      'div',
-      { style: { marginTop: '12px', padding: '8px', backgroundColor: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' } },
-      React.createElement('div', { style: { fontSize: '10px', fontWeight: '900', color: '#64748B', marginBottom: '4px' } }, 'خارطة المصادر (SourceMap):'),
-      Object.entries(features.sourceMap).map(([key, src]) => React.createElement(
-        'div',
-        { key, style: { fontSize: '9px', display: 'flex', justifyContent: 'space-between', marginBottom: '2px', color: src.conflictStatus === 'blocker' ? '#DC2626' : '#475569' } },
-        React.createElement('span', null, `${key}:`),
-        React.createElement('span', { style: { fontWeight: '700' } }, `${src.sourceOwner} | ${src.sourceType} | ${src.conflictStatus || 'none'}`)
-      ))
-    ),
+    // Conflicts View (Now strictly Arabic)
     features.conflicts.length > 0 && React.createElement(
       'div',
       { style: { marginTop: '8px', padding: '8px', backgroundColor: '#FEF2F2', borderRadius: '6px', border: '1px solid #FECACA' } },
       React.createElement('div', { style: { fontSize: '10px', fontWeight: '900', color: '#DC2626', marginBottom: '4px' } }, 'التضاربات المكتشفة:'),
-      features.conflicts.map((c, i) => React.createElement('div', { key: i, style: { fontSize: '9px', color: '#B91C1C' } }, `• [${c.conflictStatus}] ${c.sourceRecordId}: ${c.conflictReason || 'خطأ غير معروف'}`))
+      features.conflicts.map((c, i) => React.createElement('div', { key: i, style: { fontSize: '9px', color: '#B91C1C' } }, `• [${c.conflictStatus === 'blocker' ? 'محجوب' : 'تنبيه'}] ${c.conflictReason || 'تعارض في البيانات'}`))
     ),
     features.deliveryFeeLabel && React.createElement(
       'div',

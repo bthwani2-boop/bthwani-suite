@@ -193,8 +193,8 @@ export function normalizeCanonicalPublishStage(stage: DshCanonicalPublishStage |
 }
 
 /** @deprecated Use canRenderInClientSurface instead */
-export function isClientVisible(stage: string | undefined): boolean {
-  return canRenderInClientSurface(stage);
+export function isClientVisible(stage: string | undefined, entityType?: any, mediaPolicy?: string): boolean {
+  return canRenderInClientSurface(stage, entityType, { mediaPolicy });
 }
 
 const canonicalStoreCard: DshCanonicalStoreCard = {

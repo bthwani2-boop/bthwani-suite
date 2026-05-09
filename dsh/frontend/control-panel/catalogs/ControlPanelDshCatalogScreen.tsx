@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Box, Button, Surface, Text, SearchField, Chip } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, Tabs, ListItem, Divider } from '@bthwani/ui-kit';
 import {
   dshCatalogMetrics,
   dshCatalogCategories,
@@ -39,10 +39,10 @@ type FilterType = 'all' | 'master' | 'partner-exception' | 'partner-review' | 'm
 
 function FilterToken({ label, onRemove }: { label: string, onRemove: () => void }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#E2E8F0', padding: '2px 8px', borderRadius: '12px' }}>
-      <Text role="caption" style={{ color: '#0A2F5C', fontWeight: 700 }}>{label}</Text>
-      <div onClick={onRemove} style={{ cursor: 'pointer', color: '#64748B', fontSize: '12px', lineHeight: 1 }}>✖</div>
-    </div>
+    <Surface tone="raised" paddingX={2} paddingY={0.5} radiusToken="full" layoutDirection="row" align="center" gap={1}>
+      <Text role="caption" style={{ fontWeight: 700 }}>{label}</Text>
+      <Button label="✕" tone="secondary" size="sm" onPress={onRemove} style={{ minWidth: 0, padding: 0, background: 'transparent', border: 'none' }} />
+    </Surface>
   );
 }
 
@@ -77,16 +77,16 @@ const WATERMARK_URL = '/dsh/media-fixtures/assets/seed/dsh/logo.png';
 
 function WatermarkedImage({ src, fallback, size = 32 }: { src?: string, fallback?: string, size?: number }) {
   return (
-    <div style={{ width: size, height: size, borderRadius: '4px', backgroundColor: '#F8FAFC', position: 'relative', overflow: 'hidden', border: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <Surface tone="inset" padding={0} border radiusToken="xs" style={{ width: size, height: size, position: 'relative', overflow: 'hidden', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
       {src ? (
         <img src={src} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Product" />
       ) : (
-        <div style={{ fontSize: `${size/2}px` }}>{fallback || '📦'}</div>
+        <Text style={{ fontSize: `${size/2}px` }}>{fallback || '📦'}</Text>
       )}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.4, backgroundColor: 'rgba(255,255,255,0.15)' }}>
+      <Box style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', alignItems: 'center', justifyContent: 'center', opacity: 0.4, backgroundColor: 'rgba(255,255,255,0.15)' }}>
         <img src={WATERMARK_URL} style={{ width: '80%', height: '80%', objectFit: 'contain' }} alt="Watermark" />
-      </div>
-    </div>
+      </Box>
+    </Surface>
   );
 }
 
@@ -95,21 +95,21 @@ const FilterDropdown = ({ title, options, selected, onChange, onClose }: any) =>
   const filteredOptions = options.filter((o: string) => o.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div style={{ position: 'absolute', top: '100%', right: 0, backgroundColor: '#fff', border: '1px solid #E2E8F0', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', zIndex: 50, width: '200px', display: 'flex', flexDirection: 'column', marginTop: '4px' }} onClick={e => e.stopPropagation()}>
-      <div style={{ padding: '8px', borderBottom: '1px solid #E2E8F0' }}>
-        <input
-           type="text"
-           placeholder={`بحث في ${title}...`}
-           value={search}
-           onChange={e => setSearch(e.target.value)}
-           style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid #CBD5E1', outline: 'none', fontSize: '11px', textAlign: 'right' }}
+    <Surface tone="raised" padding={2} gap={2} style={{ position: 'absolute', top: '100%', right: 0, zIndex: 50, width: 200, marginTop: 4 }}>
+      <Box padding={1} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }}>
+        <SearchField
+          placeholder={`بحث في ${title}...`}
+          value={search}
+          onChangeText={setSearch}
         />
-      </div>
-      <div style={{ maxHeight: '150px', overflowY: 'auto', padding: '4px 0', textAlign: 'right' }}>
+      </Box>
+      <Box style={{ maxHeight: 150, overflowY: 'auto' }}>
         {filteredOptions.length === 0 ? (
-           <div style={{ padding: '8px', textAlign: 'center', color: '#94A3B8', fontSize: '11px' }}>لا توجد نتائج</div>
+           <Box padding={2} align="center">
+             <Text role="caption" tone="muted">لا توجد نتائج</Text>
+           </Box>
         ) : filteredOptions.map((opt: string) => (
-          <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 8px', cursor: 'pointer', fontSize: '11px', color: '#0A2F5C', flexDirection: 'row-reverse' }}>
+          <Box key={opt} layoutDirection="row" align="center" gap={2} paddingY={1} style={{ cursor: 'pointer' }}>
             <input
               type="checkbox"
               checked={selected.includes(opt)}
@@ -119,15 +119,15 @@ const FilterDropdown = ({ title, options, selected, onChange, onClose }: any) =>
               }}
               style={{ accentColor: '#0A2F5C' }}
             />
-            {opt}
-          </label>
+            <Text role="caption" style={{ flex: 1, textAlign: 'right' }}>{opt}</Text>
+          </Box>
         ))}
-      </div>
-      <div style={{ padding: '8px', borderTop: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse' }}>
-         <Button label="تطبيق" tone="primary" size="sm" onClick={onClose} style={{ padding: '2px 8px', fontSize: '10px' }} />
-         <Button label="مسح" tone="secondary" size="sm" onClick={() => { onChange([]); onClose(); }} style={{ padding: '2px 8px', fontSize: '10px' }} />
-      </div>
-    </div>
+      </Box>
+      <Box layoutDirection="row" justify="space-between" style={{ borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.05)', paddingTop: 8 }}>
+         <Button label="تطبيق" tone="brand" size="sm" onPress={onClose} />
+         <Button label="مسح" tone="secondary" size="sm" onPress={() => { onChange([]); onClose(); }} />
+      </Box>
+    </Surface>
   );
 };
 
@@ -279,93 +279,87 @@ export function ControlPanelDshCatalogScreen({
   );
 
   return (
-    <div className={styles.operationsCockpit} dir="rtl" style={{ height: '100%', width: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', backgroundColor: '#F8FAFC' }}>
+    <Box dir="rtl" gap={0} background="background" style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
 
-      {/* 1. TOP BAR */}
-      <div style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-
+      <Surface tone="default" padding={0} border={false} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }}>
         {/* Row 1: Search & Tabs */}
-        <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'row', gap: '12px', alignItems: 'center', borderBottom: '1px solid #F1F5F9' }}>
-          <div style={{ width: '32px', height: '32px', backgroundColor: '#0A2F5C', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>🗂️</div>
-          <div style={{ width: '300px' }}>
+        <Box padding={2} layoutDirection="row" gap={3} align="center" style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.02)' }}>
+          <Surface tone="brand" padding={1} radiusToken="sm">
+            <Text style={{ fontSize: '16px' }}>🗂️</Text>
+          </Surface>
+          <Box style={{ width: 300 }}>
             <SearchField placeholder="بحث شامل بالمنتج، باركود، SKU..." value={searchQuery} onChangeText={setSearchQuery} />
-          </div>
-          <div style={{ flex: 1 }} />
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '4px', backgroundColor: '#F1F5F9', padding: '4px', borderRadius: '8px' }}>
-             {[
-               { id: 'catalog', label: 'الكتالوج' },
-               { id: 'quick-entry', label: 'إدخال سريع' },
-               { id: 'partner-entry', label: 'الشريك' },
-               { id: 'field-intake', label: 'الميدان' },
-               { id: 'marketing-approvals', label: 'اعتمادات التسويق' },
-               { id: 'duplicate-resolution', label: 'تكرارات' },
-               { id: 'category-mapping', label: 'ربط' },
-               { id: 'media-governance', label: 'ميديا' }
-             ].map(tab => (
-                <div key={tab.id} onClick={() => { setWorkspaceMode(tab.id as WorkspaceMode); setSelectedProductId(null); }} style={{ padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', backgroundColor: workspaceMode === tab.id ? '#FFFFFF' : 'transparent', boxShadow: workspaceMode === tab.id ? '0 1px 2px rgba(0,0,0,0.05)' : 'none' }}>
-                   <Text role="caption" style={{ fontWeight: workspaceMode === tab.id ? 800 : 600, color: workspaceMode === tab.id ? '#0A2F5C' : '#64748B' }}>{tab.label}</Text>
-                </div>
-             ))}
-          </div>
-          <Button label="⚙️ إعدادات الأعمدة" tone="secondary" size="sm" onClick={() => {}} style={{ padding: '6px 12px' }} />
-        </div>
+          </Box>
+          <Box style={{ flex: 1 }} />
+          <Tabs
+            items={[
+              { id: 'catalog', label: 'الكتالوج' },
+              { id: 'quick-entry', label: 'إدخال سريع' },
+              { id: 'partner-entry', label: 'الشريك' },
+              { id: 'field-intake', label: 'الميدان' },
+              { id: 'marketing-approvals', label: 'اعتمادات التسويق' },
+              { id: 'duplicate-resolution', label: 'تكرارات' },
+              { id: 'category-mapping', label: 'ربط' },
+              { id: 'media-governance', label: 'ميديا' }
+            ].map(t => ({ ...t, value: t.id }))}
+            value={workspaceMode}
+            onValueChange={(v) => { setWorkspaceMode(v as WorkspaceMode); setSelectedProductId(null); }}
+          />
+          <Button label="إعدادات الأعمدة" tone="secondary" size="sm" onPress={() => {}} />
+        </Box>
 
         {/* Row 2: Categories */}
         {workspaceMode === 'catalog' && (
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', padding: '8px 16px', flexWrap: 'wrap', borderBottom: '1px solid #F1F5F9', alignItems: 'center' }}>
-             <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C', marginLeft: '8px' }}>الفئات:</Text>
-             <Chip label="الكل" tone={!activeMainCategory ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(null)} />
+          <Box layoutDirection="row" gap={2} padding={2} style={{ flexWrap: 'wrap', borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.02)', alignItems: 'center' }}>
+             <Text role="caption" style={{ fontWeight: 800, marginLeft: 8 }}>الفئات:</Text>
+             <Chip label="الكل" tone={!activeMainCategory ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(null)} selected={!activeMainCategory} />
              {dshCatalogCategories.map(cat => (
-               <Chip key={cat.id} label={`${cat.emojiFallback} ${cat.label} ${cat.categoryMode === 'manual-order' ? '(يدوي)' : ''}`} tone={activeMainCategory?.id === cat.id ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(cat)} />
+               <Chip key={cat.id} label={`${cat.emojiFallback} ${cat.label} ${cat.categoryMode === 'manual-order' ? '(يدوي)' : ''}`} tone={activeMainCategory?.id === cat.id ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(cat)} selected={activeMainCategory?.id === cat.id} />
              ))}
-          </div>
+          </Box>
         )}
 
         {/* Row 2.1: Subcategories */}
         {workspaceMode === 'catalog' && activeMainCategory && activeMainCategory.subcategories.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', padding: '6px 16px', backgroundColor: '#F8FAFC', borderBottom: '1px solid #F1F5F9', alignItems: 'center', flexWrap: 'wrap' }}>
-             <div onClick={() => setActiveSubCategory(null)} style={{ cursor: 'pointer' }}>
-               <Text role="caption" style={{ fontWeight: !activeSubCategory ? 800 : 600, color: !activeSubCategory ? '#0A2F5C' : '#64748B', backgroundColor: !activeSubCategory ? '#E2E8F0' : 'transparent', padding: '2px 8px', borderRadius: '12px' }}>الكل</Text>
-             </div>
+          <Box layoutDirection="row" gap={2} paddingX={3} paddingY={1} background="surfaceInset" style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.02)', alignItems: 'center', flexWrap: 'wrap' }}>
+             <Chip label="الكل" size="sm" tone={!activeSubCategory ? 'brand' : 'default'} onPress={() => setActiveSubCategory(null)} selected={!activeSubCategory} />
              {activeMainCategory.subcategories.map(sub => (
-               <div key={sub.id} onClick={() => setActiveSubCategory(sub)} style={{ cursor: 'pointer' }}>
-                 <Text role="caption" style={{ fontWeight: activeSubCategory?.id === sub.id ? 800 : 600, color: activeSubCategory?.id === sub.id ? '#0A2F5C' : '#64748B', backgroundColor: activeSubCategory?.id === sub.id ? '#E2E8F0' : 'transparent', padding: '2px 8px', borderRadius: '12px' }}>{sub.label}</Text>
-               </div>
+               <Chip key={sub.id} label={sub.label} size="sm" tone={activeSubCategory?.id === sub.id ? 'brand' : 'default'} onPress={() => setActiveSubCategory(sub)} selected={activeSubCategory?.id === sub.id} />
              ))}
-          </div>
+          </Box>
         )}
 
         {/* Row 3: Quick Filters & Active Chips */}
         {workspaceMode === 'catalog' && (
-          <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'row', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C', whiteSpace: 'nowrap', marginLeft: '4px' }}>فلاتر سريعة:</Text>
+          <Box padding={2} layoutDirection="row" gap={2} align="center" style={{ flexWrap: 'wrap' }}>
+            <Text role="caption" style={{ fontWeight: 800, whiteSpace: 'nowrap', marginLeft: 4 }}>فلاتر سريعة:</Text>
             {(['all', 'master', 'partner-exception', 'partner-review', 'marketing-review', 'price-conflict', 'non-matching', 'category-proposals'] as FilterType[]).map(f => {
               const labels: Record<FilterType, string> = {
                 all: 'الكل', 'master': 'مركزية', 'partner-exception': 'استثناء صورة', 'partner-review': 'مراجعة شريك', 'marketing-review': 'مراجعة تسويق', 'price-conflict': 'تعارض سعر', 'non-matching': 'غير مطابق', 'category-proposals': 'مقترحات فئات'
               };
               const count = (counts as any)[f] || 0;
               return (
-                <Chip key={f} label={`${labels[f]} (${count})`} tone={activeFilter === f ? 'brand' : 'default'} onPress={() => setActiveFilter(f)} />
+                <Chip key={f} label={`${labels[f]} (${count})`} tone={activeFilter === f ? 'brand' : 'default'} onPress={() => setActiveFilter(f)} selected={activeFilter === f} />
               );
             })}
 
-            <div style={{ flex: 1, minWidth: '16px' }} />
+            <Box style={{ flex: 1, minWidth: 16 }} />
 
             {/* Active Chips Bar */}
             {(activeFilter !== 'all' || searchQuery || activeColFiltersCount > 0) && (
-              <div style={{ display: 'flex', flexDirection: 'row', gap: '4px', alignItems: 'center', backgroundColor: '#F8FAFC', padding: '4px 8px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                 <Text role="caption" tone="muted" style={{ whiteSpace: 'nowrap', marginLeft: '4px' }}>نشط:</Text>
+              <Surface tone="inset" padding={1} radiusToken="sm" layoutDirection="row" gap={1} align="center">
+                 <Text role="caption" tone="muted" style={{ whiteSpace: 'nowrap', marginLeft: 4 }}>نشط:</Text>
                  {activeFilter !== 'all' && <FilterToken label={activeFilter} onRemove={() => setActiveFilter('all')} />}
                  {searchQuery && <FilterToken label={`بحث: ${searchQuery}`} onRemove={() => setSearchQuery('')} />}
                  {Object.entries(colFilters).map(([k, vals]) =>
                     vals.map(v => <FilterToken key={`${k}-${v}`} label={`${v}`} onRemove={() => setColFilters(prev => ({...prev, [k]: prev[k].filter(x => x !== v)}))} />)
                  )}
-                 <Button label="مسح الكل" tone="secondary" size="sm" onClick={() => { setActiveFilter('all'); setSearchQuery(''); setColFilters({ name: [], category: [], classification: [], sku: [], price: [], policy: [], status: [], source: [], categoryMode: [] }); }} style={{ padding: '2px 6px', fontSize: '10px', height: 'auto', minHeight: '0' }} />
-              </div>
+                 <Button label="مسح الكل" tone="secondary" size="sm" onPress={() => { setActiveFilter('all'); setSearchQuery(''); setColFilters({ name: [], category: [], classification: [], sku: [], price: [], policy: [], status: [], source: [], categoryMode: [] }); }} style={{ height: 24, paddingX: 2 }} />
+              </Surface>
             )}
-          </div>
+          </Box>
         )}
-      </div>
+      </Surface>
 
       {/* 2. MAIN CONTENT AREA */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
@@ -474,16 +468,16 @@ export function ControlPanelDshCatalogScreen({
         {/* 3. Inspector Slide-out */}
         {workspaceMode === 'catalog' && selectedProductId && selectedProduct && (
           <div style={{ width: '340px', backgroundColor: '#FFFFFF', borderRight: '1px solid #E2E8F0', overflowY: 'auto', display: 'flex', flexDirection: 'column', flexShrink: 0, boxShadow: '-4px 0 15px rgba(0,0,0,0.05)', zIndex: 30 }}>
-             <div style={{ padding: '16px', borderBottom: '1px solid #E2E8F0', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
-                <Text role="bodyStrong" style={{ color: '#0A2F5C' }}>تفاصيل المنتج</Text>
-                <div onClick={() => setSelectedProductId(null)} style={{ cursor: 'pointer', color: '#64748B', fontSize: '18px' }}>✕</div>
-             </div>
-             <Box gap={3} style={{ padding: '16px' }}>
-                <Box style={{ flexDirection: 'row', gap: '12px', alignItems: 'center' }}>
+             <Box padding={4} background="surfaceRaised" style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }} layoutDirection="row" justify="space-between" align="center">
+                <Text role="bodyStrong">تفاصيل المنتج</Text>
+                <Button label="✕" tone="secondary" size="sm" onPress={() => setSelectedProductId(null)} />
+             </Box>
+             <Box gap={3} padding={4}>
+                <Box layoutDirection="row" gap={3} align="center">
                    <WatermarkedImage src={selectedProduct.imageUri} fallback={selectedProduct.emojiFallback} size={48} />
-                   <Box style={{ flex: 1, gap: '2px' }}>
-                      <Text role="caption" style={{ color: '#0A2F5C', fontSize: '14px', fontWeight: 800, textAlign: 'right' }}>{selectedProduct.name}</Text>
-                      <Text role="caption" tone="muted" style={{ textAlign: 'right', fontSize: '10px' }}>SKU: {selectedProduct.sku}</Text>
+                   <Box style={{ flex: 1 }} gap={1}>
+                      <Text role="bodyStrong">{selectedProduct.name}</Text>
+                      <Text role="caption" tone="muted">SKU: {selectedProduct.sku}</Text>
                    </Box>
                 </Box>
 
@@ -767,7 +761,7 @@ export function ControlPanelDshCatalogScreen({
           </div>
         )}
       </div>
-    </div>
+    </Box>
   );
 }
 

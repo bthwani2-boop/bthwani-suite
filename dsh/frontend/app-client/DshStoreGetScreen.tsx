@@ -14,13 +14,11 @@ import {
   Share,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
   View,
   type GestureResponderEvent,
   type ImageSourcePropType,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { BannerCarousel, Button, Chip, Icon, SearchTopBar, TopBar, StateView, Text, Toast, colorPalette, useDirection, useUiText, ProductCard, type BannerCarouselItem } from '@bthwani/ui-kit';
+import { BannerCarousel, Button, Chip, Icon, SearchTopBar, TopBar, StateView, Text, Toast, colorPalette, useDirection, useUiText, ProductCard, Box, Surface, type BannerCarouselItem } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../shared/catalog';
 import { formatDshStoreFollowersLabel } from './store-profile';
 import { resolveDshImageSource } from './resolve-image-source';
@@ -48,7 +46,10 @@ export type DshStoreGetScreenProps = {
     serviceLabel?: string;
     subscriptionPackageChips?: string[];
     hasBthwaniPro?: boolean;
+    offerLabel?: string;
+    hasCouponAvailable?: boolean;
     publishStage?: string;
+    mediaPolicy?: string;
     commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
     tags?: string[];
     categories?: Array<{ id: string; label: string; itemCount: number; isPopular?: boolean }>;
@@ -75,12 +76,12 @@ type DshStoreOperationalState = Extract<DshClientState, 'store_open' | 'store_cl
 function getDeliveryModes(storeText: ReturnType<typeof useUiText>['storeScreen']): Array<{
   id: DeliveryMode;
   label: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: string;
 }> {
   return [
     { id: 'store_delivery', label: storeText.get.storeDelivery, icon: 'storefront-outline' },
     { id: 'pickup', label: storeText.get.pickup, icon: 'bag-handle-outline' },
-    { id: 'delivery', label: storeText.get.platformDelivery, icon: 'bicycle-outline' },
+    { id: 'delivery', label: storeText.get.platformDelivery, icon: 'bicycle' },
   ];
 }
 
@@ -236,14 +237,14 @@ function resolveStoreOperationalState(statusLabel: string, deliveryLabel?: strin
 }
 
 function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType | undefined {
-  if (!canRenderInClientSurface(item.publishStage, 'product-media')) {
+  if (!canRenderInClientSurface(item.publishStage, 'product-media', { mediaPolicy: (item as any).mediaPolicy })) {
     return undefined;
   }
   return resolveDshImageSource(item.imageUri);
 }
 
 function resolveDshStoreCoverImageSource(store?: DshStoreGetScreenProps['store']): ImageSourcePropType | undefined {
-  if (!canRenderInClientSurface(store?.publishStage, 'store')) {
+  if (!canRenderInClientSurface(store?.publishStage, 'store', { mediaPolicy: store?.mediaPolicy })) {
     return undefined;
   }
   return resolveDshImageSource(store?.imageUri);
@@ -345,16 +346,17 @@ function renderNonReadyState(
   );
 }
 
-function IconActionButton({ icon, onPress }: { icon: keyof typeof Ionicons.glyphMap; onPress?: () => void }) {
+function IconActionButton({ icon, onPress }: { icon: string; onPress?: () => void }) {
   return (
-    <TouchableOpacity
-      style={styles.iconButton}
+    <Surface
+      tone="raised"
+      padding={2}
+      radiusToken="full"
       onPress={onPress}
-      activeOpacity={0.8}
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center' }}
     >
-      <Ionicons name={icon} size={20} color={stylesTokens.dark} />
-    </TouchableOpacity>
+      <Icon name={icon} size={20} color={colorPalette.text} />
+    </Surface>
   );
 }
 
@@ -365,27 +367,31 @@ function ModePill({
   onPress,
 }: {
   label: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: string;
   active: boolean;
   onPress?: () => void;
 }) {
   return (
-    <TouchableOpacity
-      style={[styles.modePill, active && styles.modePillActive]}
+    <Surface
+      tone={active ? 'brand' : 'default'}
+      paddingX={3}
+      paddingY={1}
+      radiusToken="full"
+      border
       onPress={onPress}
-      activeOpacity={0.85}
+      style={{ minWidth: 80, height: 32, alignItems: 'center', justifyContent: 'center' }}
     >
-      <View style={[styles.modePillInner, active && styles.modePillInnerActive]}>
-        <Text style={[styles.modePillLabel, active && styles.modePillLabelActive]} numberOfLines={1}>
+      <Box layoutDirection="row" align="center" gap={1.5}>
+        <Text role="bodySm" style={{ color: active ? colorPalette.brand : colorPalette.textMuted }} numberOfLines={1}>
           {label}
         </Text>
-        <Ionicons
+        <Icon
           name={icon}
           size={18}
-          color={active ? stylesTokens.orange : stylesTokens.muted}
+          color={active ? colorPalette.brand : colorPalette.textMuted}
         />
-      </View>
-    </TouchableOpacity>
+      </Box>
+    </Surface>
   );
 }
 
@@ -442,6 +448,8 @@ export function DshStoreGetScreen({
   const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictStatus === 'blocker';
   const isCouponBlocked = sm?.['hasCouponAvailable']?.conflictStatus === 'blocker';
   const isOfferBlocked = sm?.['offerLabel']?.conflictStatus === 'blocker';
+  const isDeliveryBlocked = sm?.['deliveryFeeLabel']?.conflictStatus === 'blocker';
+  const isNewProductsBlocked = sm?.['hasNewProducts']?.conflictStatus === 'blocker' || sm?.['new-product-leak']?.conflictStatus === 'blocker';
 
   const { direction } = useDirection();
   const uiText = useUiText();
@@ -487,7 +495,7 @@ export function DshStoreGetScreen({
   ) : null;
 
   const clientVisibleItems = React.useMemo(
-    () => fallbackMenuItems.filter((item) => item.isAvailable !== false && canRenderInClientSurface(item.publishStage, 'product')),
+    () => fallbackMenuItems.filter((item) => item.isAvailable !== false && canRenderInClientSurface(item.publishStage, 'product', { mediaPolicy: (item as any).mediaPolicy })),
     [fallbackMenuItems],
   );
 
@@ -501,11 +509,12 @@ export function DshStoreGetScreen({
   }, []);
 
   const isNewItem = React.useCallback((item: DshStoreGetMenuItem) => {
+    if (isNewProductsBlocked) return false;
     if ((item as any).isNew) return true;
     const s = normalizeDisplayText(item.statusLabel ?? '').toLowerCase();
     if (s.includes('وصل') || s.includes('جديد') || s.includes('حديث')) return true;
     return false;
-  }, []);
+  }, [isNewProductsBlocked]);
 
   const isFavoriteItem = React.useCallback((item: DshStoreGetMenuItem) => {
     if ((item as any).isFavorite || (item as any).isFavorited) return true;
@@ -1051,9 +1060,11 @@ export function DshStoreGetScreen({
     new Set(
       [
         (isProBlocked ? false : store.hasBthwaniPro) ? 'بثواني برو' : null,
-        ...(store.subscriptionPackageChips ?? []),
-        store.deliveryLabel ?? null,
-        store.serviceLabel ?? null,
+        (isOfferBlocked ? false : !!store.offerLabel) ? (store.offerLabel || 'عرض متاح') : null,
+        (isCouponBlocked ? false : !!store.hasCouponAvailable) ? 'كوبون متاح' : null,
+        ...(isProBlocked ? [] : (store.subscriptionPackageChips ?? [])),
+        (isDeliveryBlocked ? null : store.deliveryLabel) ?? null,
+        (isPriceMatchBlocked ? undefined : store.serviceLabel) ?? null,
       ].filter(Boolean) as string[],
     ),
   ).slice(0, 3);
@@ -1193,272 +1204,203 @@ export function DshStoreGetScreen({
   }, [benefitChips, changeCategory, firstNewItem, firstOfferItem, firstVisibleItem, menuItems, normalizedFollowersLabel, normalizedPriceMatchLabel, openStoreItemPreview, resolveFeaturePress, store, storeText]);
 
   return (
-    <View style={styles.screen}>
+    <Box dir="rtl" style={styles.screen}>
       {headerSearchVisible ? (
         <SearchTopBar
           value={headerSearchQuery}
           onChangeText={setHeaderSearchQuery}
-          onClose={closeInlineSearch}
-          variant="secondary"
+          onClose={closeHeaderSearch}
+          variant="main"
           autoFocus
-          placeholder={`ابحث داخل ${normalizedStoreName}`}
-          hint={`بحث محلي داخل ${normalizedStoreName} فقط للوصول السريع إلى الأصناف.`}
+          placeholder="ابحث في المتجر..."
+          hint="بحث سريع في منتجات المتجر الحالية."
         />
       ) : (
         <TopBar
-          variant="secondary"
+          variant="main"
+          layoutMode="default"
           title={normalizedStoreName}
-          titleSlot={(
-            <Text style={[styles.storeHeaderTitle, isRTL && styles.textAlignRight]} numberOfLines={1}>
-              {normalizedStoreName}
-            </Text>
-          )}
+          subtitle={normalizedStoreSubtitle}
+          onBack={onBack}
           actions={[
             {
               id: 'share',
-              icon: <Icon name="share-social-outline" size={20} color={stylesTokens.dark} />,
+              icon: <Icon name="share-social-outline" size={20} color={colorPalette.white} />,
               accessibilityLabel: 'مشاركة المتجر',
               onPress: handleStoreShare,
             },
             {
               id: 'cart',
-              icon: <Icon name="cart-outline" size={20} color={stylesTokens.dark} />,
+              icon: <Icon name="cart-outline" size={20} color={colorPalette.white} />,
               accessibilityLabel: 'السلة',
               onPress: onOpenCart ?? onOpenItems,
             },
             {
               id: 'search',
-              icon: <Icon name="search-outline" size={20} color={stylesTokens.dark} />,
+              icon: <Icon name="search-outline" size={20} color={colorPalette.white} />,
               accessibilityLabel: 'بحث',
-              onPress: openInlineSearch,
+              onPress: openHeaderSearch,
             },
           ]}
-          trailingAction={{
-            id: 'back',
-            icon: <Icon name="arrow-back" size={24} color={colorPalette.brand ?? stylesTokens.orange} />,
-            mirrorInRtl: true,
-            accessibilityLabel: 'رجوع',
-            onPress: onBack,
-          }}
         />
       )}
 
-        <View style={styles.feedSection}>
-          <Animated.View style={[styles.feedList, { opacity: transitionAnim, transform: [{ scale: transitionAnim }] }]} {...panResponder.panHandlers}>
-            <Animated.FlatList
-              ref={(r) => { listRef.current = r as unknown as FlatList<DshStoreGetMenuItem> | null; }}
-              data={visibleItems as DshStoreGetMenuItem[]}
-              keyExtractor={(item) => (item as DshStoreGetMenuItem).id}
-              ListHeaderComponent={
-                <>
-                  <View style={[styles.heroIdentityRow, isRTL && styles.rowReverse]}>
-                    <View style={styles.heroAvatar}>
-                      <Ionicons name="storefront-outline" size={24} color={stylesTokens.orange} />
-                      {storeCoverImageSource ? <Image source={storeCoverImageSource} style={styles.heroAvatarImage} /> : null}
-                    </View>
+      <Box style={styles.feedSection}>
+        <Animated.View style={[styles.feedList, { opacity: transitionAnim, transform: [{ scale: transitionAnim }] }]} {...panResponder.panHandlers}>
+          <Animated.FlatList
+            ref={(r) => { listRef.current = r as unknown as FlatList<DshStoreGetMenuItem> | null; }}
+            data={visibleItems as DshStoreGetMenuItem[]}
+            keyExtractor={(item) => (item as DshStoreGetMenuItem).id}
+            ListHeaderComponent={
+              <Box gap={3} paddingBottom={3}>
+                <Surface tone="raised" padding={3} gap={3} style={{ borderRadius: 24 }}>
+                  <Box flexDirection="row" gap={3} alignItems="center">
+                    <Box style={styles.heroAvatar}>
+                      {storeCoverImageSource ? (
+                        <Image source={storeCoverImageSource} style={styles.heroAvatarImage} />
+                      ) : (
+                        <Icon name="storefront-outline" size={24} color={colorPalette.brand} />
+                      )}
+                    </Box>
 
-                    <View style={[styles.heroIdentityContent, isRTL && styles.heroIdentityContentRTL]}>
-                      <View style={[styles.heroTopRow, isRTL && styles.rowReverse]}>
-                        <View style={[styles.heroTitleInfo, isRTL && styles.heroTitleInfoRTL]}>
-                          <Text style={[styles.heroInlineName, isRTL && styles.textAlignRight]} numberOfLines={1}>
+                    <Box flex={1} gap={1}>
+                      <Box flexDirection="row" justifyContent="space-between" alignItems="flex-start">
+                        <Box flex={1}>
+                          <Text role="bodyStrong" style={[isRTL && styles.textAlignRight]} numberOfLines={1}>
                             {normalizedStoreName}
                           </Text>
-                          <Text style={[styles.heroInlineSubtitle, isRTL && styles.textAlignRight]} numberOfLines={1}>
+                          <Text role="caption" tone="muted" style={[isRTL && styles.textAlignRight]} numberOfLines={1}>
                             {normalizedStoreSubtitle}
                           </Text>
-                        </View>
+                        </Box>
+                        <Chip label={getStatusLabel(store?.statusLabel || '', storeText)} tone="success" variant="solid" />
+                      </Box>
 
-                        <View style={styles.heroBadgePrimary}>
-                          <Text style={styles.heroBadgePrimaryText}>{getStatusLabel(store.statusLabel, storeText)}</Text>
-                        </View>
-                      </View>
-
-                      <View style={[styles.heroCompactMetaRow, isRTL && styles.rowReverse]}>
+                      <Box flexDirection="row" gap={2} marginTop={1}>
                         {normalizedFollowersLabel ? (
-                          <TouchableOpacity
-                            style={[styles.topMetaChip, styles.followMetaChip, isFollowingStore && styles.followMetaChipActive]}
-                            activeOpacity={0.85}
+                          <Button
+                            label={normalizedFollowersLabel}
+                            tone={isFollowingStore ? 'brand' : 'secondary'}
+                            size="sm"
                             onPress={() => setIsFollowingStore((prev) => !prev)}
-                            accessibilityRole="button"
-                            accessibilityLabel={isFollowingStore ? 'تمت المتابعة' : 'متابعة المتجر'}
-                          >
-                            <Ionicons
-                              name={isFollowingStore ? 'checkmark' : 'add'}
-                              size={9}
-                              color={isFollowingStore ? stylesTokens.white : stylesTokens.orange}
-                            />
-                            <Text style={[styles.topMetaChipText, isFollowingStore && styles.followMetaChipTextActive]} numberOfLines={1}>
-                              {normalizedFollowersLabel}
-                            </Text>
-                          </TouchableOpacity>
+                            icon={<Icon name={isFollowingStore ? 'checkmark' : 'person-add-outline'} size={12} />}
+                          />
                         ) : null}
-                        <View style={styles.topMetaChip}>
-                          <Ionicons name="time-outline" size={9} color={stylesTokens.orange} />
-                          <Text style={styles.topMetaChipText} numberOfLines={1}>{normalizedEtaLabel}</Text>
-                        </View>
-                        <View style={styles.topMetaChip}>
-                          <Ionicons name="star" size={9} color={stylesTokens.warning} />
-                          <Text style={styles.topMetaChipText} numberOfLines={1}>{storeText.get.ratingValue}</Text>
-                        </View>
-                      </View>
+                        <Chip label={normalizedEtaLabel} tone="brand" icon={<Icon name="time-outline" size={12} />} />
+                        <Chip label={storeText.get.ratingValue} tone="warning" icon={<Icon name="star" size={12} />} />
+                      </Box>
 
                       {benefitChips.length ? (
-                        <View style={styles.subscriptionBlock}>
-                          <View style={[styles.tagRow, isRTL && styles.rowReverse]}>
-                            {benefitChips.map((chip) => {
-                              const isPrimaryBenefit = chip.includes('برو') || chip.includes('مجاني');
-                              return (
-                                <View key={`${store.id}-${chip}`} style={[styles.tagChip, isPrimaryBenefit && styles.tagChipAccent]}>
-                                  <Ionicons
-                                    name={isPrimaryBenefit ? 'sparkles-outline' : 'checkmark-circle-outline'}
-                                    size={9}
-                                    color={isPrimaryBenefit ? stylesTokens.white : stylesTokens.orange}
-                                  />
-                                  <Text style={[styles.tagChipText, isPrimaryBenefit && styles.tagChipTextAccent]} numberOfLines={1}>{chip}</Text>
-                                </View>
-                              );
-                            })}
-                          </View>
-                        </View>
+                        <Box flexDirection="row" flexWrap="wrap" gap={1} marginTop={1}>
+                          {benefitChips.map((chip) => {
+                            const isPrimary = chip.includes('برو') || chip.includes('مجاني');
+                            return (
+                              <Chip
+                                key={chip}
+                                label={chip}
+                                tone={isPrimary ? 'brand' : 'neutral'}
+                                size="sm"
+                                icon={<Icon name={isPrimary ? 'sparkles-outline' : 'checkmark-circle-outline'} size={10} />}
+                              />
+                            );
+                          })}
+                        </Box>
                       ) : null}
-                    </View>
-                  </View>
+                    </Box>
+                  </Box>
 
-                  <View style={styles.deliveryControlCluster}>
-                    {showOperationalNotice ? (
-                      <View
-                        style={[
-                          styles.storeStateNotice,
-                          operationalState === 'area_unserviceable' ? styles.storeStateNoticeDanger : styles.storeStateNoticeWarning,
-                        ]}
-                      >
-                        <View style={styles.storeStateNoticeCopy}>
-                          <Text style={[styles.storeStateNoticeTitle, isRTL && styles.textAlignRight]}>{operationalStateMeta.title}</Text>
-                          <Text style={[styles.storeStateNoticeDescription, isRTL && styles.textAlignRight]}>
-                            {operationalStateMeta.description}
-                          </Text>
-                        </View>
-                        {onSupport ? (
-                          <View style={styles.storeStateNoticeAction}>
-                            <Button label={supportActionLabel} tone="secondary" onPress={onSupport} />
-                          </View>
-                        ) : null}
-                      </View>
-                    ) : null}
+                  {showOperationalNotice && operationalStateMeta && (
+                    <Surface tone={operationalState === 'area_unserviceable' ? 'danger' : 'warning'} padding={3} gap={2} style={{ borderRadius: 18 }}>
+                      <Text role="bodyStrong">{operationalStateMeta.title}</Text>
+                      <Text role="bodySm" tone="muted">{operationalStateMeta.description}</Text>
+                      {onSupport && <Button label={supportActionLabel} tone="secondary" size="sm" onPress={onSupport} />}
+                    </Surface>
+                  )}
 
-                    <View style={styles.modeStripWrapInline}>
-                      <View style={[styles.modeStrip, isRTL && styles.rowReverse]}>
-                        {deliveryModes.map((mode) => (
-                          <ModePill
-                            key={mode.id}
-                            label={mode.label}
-                            icon={mode.icon}
-                            active={selectedMode === mode.id}
-                            onPress={() => setSelectedMode(mode.id)}
-                          />
-                        ))}
-                      </View>
-                    </View>
+                  <Box style={styles.modeStripWrapInline}>
+                    <Box style={styles.modeStrip} flexDirection="row" gap={1}>
+                      {deliveryModes.map((mode) => (
+                        <Button
+                          key={mode.id}
+                          label={mode.label}
+                          tone={selectedMode === mode.id ? 'brand' : 'ghost'}
+                          size="sm"
+                          style={{ flex: 1 }}
+                          onPress={() => setSelectedMode(mode.id)}
+                          icon={<Icon name={mode.icon as any} size={16} />}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
 
-                    {smartRailItems.length ? (
-                      <BannerCarousel
-                        banners={smartRailItems}
-                        width={viewportWidth}
-                        height={108}
-                        variant="secondary"
-                        fullBleed
-                        itemWidth={Math.round(viewportWidth * 0.58)}
-                        itemGap={12}
-                        style={styles.smartRailSection}
-                      />
-                    ) : null}
-                  </View>
+                  {smartRailItems.length ? (
+                    <BannerCarousel
+                      banners={smartRailItems}
+                      width={viewportWidth - spacing[6]}
+                      height={108}
+                      variant="secondary"
+                      fullBleed
+                      itemWidth={Math.round(viewportWidth * 0.58)}
+                      itemGap={12}
+                    />
+                  ) : null}
+                </Surface>
 
-                  <View style={styles.sectionBlock}>
-                    <ScrollView
-                      horizontal
-                      ref={(r) => { chipsScrollRef.current = r; }}
-                      onLayout={(e) => setChipsContainerWidth(e.nativeEvent.layout.width)}
-                      showsHorizontalScrollIndicator={false}
-                      nestedScrollEnabled
-                      decelerationRate="fast"
-                      contentContainerStyle={[styles.categoryRow, isRTL && styles.rowReverse]}
-                    >
-                      {categories.map((category) => {
-                        const selected = selectedCategory === category.id;
-                        return (
-                          <View
-                            key={category.id}
-                            onLayout={(e) => {
-                              chipLayoutsRef.current[category.id] = {
-                                x: e.nativeEvent.layout.x,
-                                width: e.nativeEvent.layout.width,
-                              };
-                            }}
-                          >
-                            <Chip
-                              label={`${normalizeDisplayText(category.label)} ${CATEGORY_ICON[category.id] ?? '•'}`}
-                              selected={selected}
-                              tone="brand"
-                              onPress={() => changeCategory(category.id)}
-                            />
-                          </View>
-                        );
-                      })}
-                    </ScrollView>
-                  </View>
-                </>
-              }
-              renderItem={({ item, index }) => {
-                const inputRange = [(index - 1) * SNAP_INTERVAL, index * SNAP_INTERVAL, (index + 1) * SNAP_INTERVAL];
-                const scale = scrollY.interpolate({ inputRange, outputRange: [0.986, 1, 0.986], extrapolate: 'clamp' });
-                const translateY = scrollY.interpolate({ inputRange, outputRange: [8, 0, 8], extrapolate: 'clamp' });
-                const opacity = scrollY.interpolate({ inputRange, outputRange: [0.9, 1, 0.9], extrapolate: 'clamp' });
-
-                return (
-                  <Animated.View style={[{ transform: [{ scale }, { translateY }], opacity, marginBottom: CARD_GAP }]}
-                    pointerEvents="box-none"
+                <Box style={styles.sectionBlock}>
+                  <ScrollView
+                    horizontal
+                    ref={(r) => { chipsScrollRef.current = r; }}
+                    onLayout={(e) => setChipsContainerWidth(e.nativeEvent.layout.width)}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.categoryRow}
                   >
-                    {
-                      (() => {
-                        return (
-                          <MenuItemCard
-                            key={item.id}
-                            item={item}
-                            partnerImageSource={storeCoverImageSource}
-                            onAddPress={(anchor) => openMeasurementPicker(item, anchor ?? { x: 32, y: 360 })}
-                            onImagePress={openImagePreview}
-                            onFavoritePress={() => handleToggleFavorite(item.id)}
-                            isFavorited={favoriteIds.has(item.id)}
-                          />
-                        );
-                      })()
-                    }
-                  </Animated.View>
-                );
-              }}
-              showsVerticalScrollIndicator={false}
-              snapToInterval={SNAP_INTERVAL}
-              decelerationRate="fast"
-              onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
-              scrollEventThrottle={16}
-              contentContainerStyle={{ paddingBottom: 28 }}
-              ListEmptyComponent={
-                <View style={styles.emptyFeed}>
-                  <Text style={styles.emptyFeedEmoji}>{headerSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
-                  <Text style={styles.emptyFeedTitle}>
-                    {headerSearchQuery.trim() ? 'لا توجد نتائج داخل هذا المتجر' : storeText.get.emptyCategoryTitle}
-                  </Text>
-                  <Text style={styles.emptyFeedText}>
-                    {headerSearchQuery.trim()
-                      ? `جرّب البحث باسم منتج أو قسم آخر داخل ${normalizedStoreName}.`
-                      : storeText.get.emptyCategoryDescription}
-                  </Text>
-                </View>
-              }
-            />
-          </Animated.View>
-        </View>
+                    {categories.map((category) => (
+                      <Chip
+                        key={category.id}
+                        label={`${normalizeDisplayText(category.label)} ${CATEGORY_ICON[category.id] ?? '•'}`}
+                        selected={selectedCategory === category.id}
+                        tone="brand"
+                        onPress={() => changeCategory(category.id)}
+                      />
+                    ))}
+                  </ScrollView>
+                </Box>
+              </Box>
+            }
+            renderItem={({ item, index }) => (
+              <Animated.View style={{ marginBottom: CARD_GAP }} pointerEvents="box-none">
+                <MenuItemCard
+                  item={item}
+                  partnerImageSource={storeCoverImageSource}
+                  onAddPress={(anchor) => openMeasurementPicker(item, anchor ?? { x: 32, y: 360 })}
+                  onImagePress={openImagePreview}
+                  onFavoritePress={() => handleToggleFavorite(item.id)}
+                  isFavorited={favoriteIds.has(item.id)}
+                />
+              </Animated.View>
+            )}
+            showsVerticalScrollIndicator={false}
+            snapToInterval={SNAP_INTERVAL}
+            decelerationRate="fast"
+            onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
+            scrollEventThrottle={16}
+            contentContainerStyle={{ paddingBottom: 28 }}
+            ListEmptyComponent={
+              <Surface tone="inset" padding={4} alignItems="center" gap={2} style={{ borderRadius: 24 }}>
+                <Text style={{ fontSize: 40 }}>{headerSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
+                <Text role="bodyStrong">
+                  {headerSearchQuery.trim() ? 'لا توجد نتائج داخل هذا المتجر' : storeText.get.emptyCategoryTitle}
+                </Text>
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>
+                  {headerSearchQuery.trim()
+                    ? `جرّب البحث باسم منتج أو قسم آخر داخل ${normalizedStoreName}.`
+                    : storeText.get.emptyCategoryDescription}
+                </Text>
+              </Surface>
+            }
+          />
+        </Animated.View>
+      </Box>
 
       <Toast
         visible={cartToastVisible}
@@ -1483,12 +1425,11 @@ export function DshStoreGetScreen({
         </Pressable>
       </Modal>
       <Modal visible={Boolean(previewItem)} transparent animationType="fade" onRequestClose={closeImagePreview}>
-        <View style={styles.previewOverlay}>
+        <Box style={styles.previewOverlay}>
           <Pressable style={styles.previewBackdrop} onPress={closeImagePreview} />
-          <View style={styles.previewWrap} pointerEvents="box-none">
+          <Box style={styles.previewWrap} pointerEvents="box-none">
             {previewPeekItem ? (
               (() => {
-                // choose the appropriate offset node for the preview-peek transform
                 const stageX = previewPeekSign === 1 ? stageOffsetPosX : stageOffsetNegX;
                 const stageY = previewPeekSign === 1 ? stageOffsetPosY : stageOffsetNegY;
                 const stageTranslateX = Animated.add(previewDrag.x, stageX);
@@ -1506,40 +1447,28 @@ export function DshStoreGetScreen({
                       { position: 'absolute', left: 0, right: 0, zIndex: 1, opacity: stageOpacity, transform: previewPeekType === 'category' ? [{ translateX: stageTranslateX }] : [{ translateY: stageTranslateY }] },
                     ]}
                   >
-                    <View style={styles.previewImageWrap} pointerEvents="box-none">
+                    <Box style={styles.previewImageWrap} pointerEvents="box-none">
                       {previewPartnerBadge}
-
                       <Text style={styles.previewEmoji}>{getItemEmoji(previewPeekItem)}</Text>
-
                       <Image
                         source={resolveDshStoreMenuItemImageSource(previewPeekItem)}
                         style={styles.previewImage}
                       />
-
-                      {
-                        (() => {
-                          const overlayColor = getOverlayColor(normalizeDisplayText(previewPeekItem.name), 0.86);
-                          return (
-                            <View style={[styles.previewDetailsBox, { backgroundColor: overlayColor, flexDirection: isRTL ? 'row-reverse' : 'row' }]} pointerEvents="box-none">
-                              <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]}>
-                                {store ? <Text style={[styles.previewStoreName, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizedStoreName}</Text> : null}
-                                <Text style={[styles.previewDetailsTitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.name)}</Text>
-                                {previewPeekItem.subtitle ? <Text style={[styles.previewDetailsSubtitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.subtitle)}</Text> : null}
-
-                                <View style={[styles.previewDetailsMetaRow, isRTL ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }]}>
-                                  {previewPeekItem.priceLabel ? <Text style={[styles.previewDetailsPrice, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.priceLabel)}</Text> : null}
-                                  {previewPeekItem.discountLabel ? <Text style={[styles.previewDetailsDiscount, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.discountLabel)}</Text> : null}
-                                </View>
-                              </View>
-
-                              <View style={[styles.previewDetailsFavoriteButton, { opacity: 0.95 }]}>
-                                <Ionicons name={favoriteIds.has(previewPeekItem.id) ? 'heart' : 'heart-outline'} size={18} color={stylesTokens.orange} />
-                              </View>
-                            </View>
-                          );
-                        })()
-                      }
-                    </View>
+                      <Surface
+                        tone="raised"
+                        padding={3}
+                        gap={1}
+                        style={[styles.previewDetailsBox, { backgroundColor: getOverlayColor(normalizeDisplayText(previewPeekItem.name), 0.86) }]}
+                      >
+                        <Box flex={1}>
+                          <Text role="bodyStrong" numberOfLines={1}>{normalizeDisplayText(previewPeekItem.name)}</Text>
+                          <Text role="caption" tone="muted" numberOfLines={1}>{normalizeDisplayText(previewPeekItem.subtitle || '')}</Text>
+                          <Box flexDirection="row" gap={2} marginTop={1}>
+                            <Text role="bodyStrong" tone="brand">{normalizeDisplayText(previewPeekItem.priceLabel || '')}</Text>
+                          </Box>
+                        </Box>
+                      </Surface>
+                    </Box>
                   </Animated.View>
                 );
               })()
@@ -1561,139 +1490,118 @@ export function DshStoreGetScreen({
                 ]}
                 collapsable={false}
               >
-                <View style={styles.previewImageWrap} pointerEvents="box-none">
-                  <View style={styles.previewSwipeLayer} {...previewPanResponder.panHandlers} />
-
+                <Box style={styles.previewImageWrap} pointerEvents="box-none">
+                  <Box style={styles.previewSwipeLayer} {...previewPanResponder.panHandlers} />
                   {previewPartnerBadge}
-
                   <Text style={styles.previewEmoji}>{getItemEmoji(previewItem!)}</Text>
-
                   <Image
                     source={resolveDshStoreMenuItemImageSource(previewItem!)}
                     style={styles.previewImage}
                   />
-
-                  {
-                    (() => {
-                      const overlayColor = getOverlayColor(normalizeDisplayText(previewItem!.name), 0.86);
-                      return (
-                        <View style={[styles.previewDetailsBox, { backgroundColor: overlayColor, flexDirection: isRTL ? 'row-reverse' : 'row' }]} pointerEvents="box-none">
-                          <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]} pointerEvents="none">
-                            {store ? <Text style={[styles.previewStoreName, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizedStoreName}</Text> : null}
-                            <Text style={[styles.previewDetailsTitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.name)}</Text>
-                            {previewItem!.subtitle ? <Text style={[styles.previewDetailsSubtitle, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.subtitle)}</Text> : null}
-
-                            <View style={[styles.previewDetailsMetaRow, isRTL ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }]}>
-                              {previewItem!.priceLabel ? <Text style={[styles.previewDetailsPrice, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.priceLabel)}</Text> : null}
-                              {previewItem!.discountLabel ? <Text style={[styles.previewDetailsDiscount, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.discountLabel)}</Text> : null}
-                            </View>
-                          </View>
-
-                          <TouchableOpacity style={styles.previewDetailsFavoriteButton} activeOpacity={0.9} onPress={handlePreviewFavoritePress}>
-                            <Ionicons name={favoriteIds.has(previewItem!.id) ? 'heart' : 'heart-outline'} size={18} color={stylesTokens.orange} />
-                          </TouchableOpacity>
-
-                          <TouchableOpacity
-                            style={[styles.menuActionBadge, styles.previewActionButton]}
-                            activeOpacity={0.85}
-                            onPress={() => handlePreviewAddToCart()}
-                          >
-                            <Ionicons name="cart-outline" size={18} color={stylesTokens.white} />
-                            <View style={styles.menuActionPlusBadge}>
-                              <Ionicons name="add" size={10} color={stylesTokens.orange} />
-                            </View>
-                          </TouchableOpacity>
-                        </View>
-                      );
-                    })()
-                  }
-                </View>
+                  <Surface
+                    tone="raised"
+                    padding={3}
+                    gap={2}
+                    style={[styles.previewDetailsBox, { backgroundColor: getOverlayColor(normalizeDisplayText(previewItem!.name), 0.86) }]}
+                  >
+                    <Box flex={1}>
+                      <Text role="bodyStrong" numberOfLines={1}>{normalizeDisplayText(previewItem!.name)}</Text>
+                      <Text role="caption" tone="muted" numberOfLines={1}>{normalizeDisplayText(previewItem!.subtitle || '')}</Text>
+                      <Box flexDirection="row" gap={2} marginTop={1}>
+                        <Text role="bodyStrong" tone="brand">{normalizeDisplayText(previewItem!.priceLabel || '')}</Text>
+                        {previewItem!.discountLabel && (
+                          <Chip label={normalizeDisplayText(previewItem!.discountLabel)} tone="danger" size="sm" />
+                        )}
+                      </Box>
+                    </Box>
+                    <Box flexDirection="row" gap={2} alignItems="center">
+                      <Button
+                        tone="secondary"
+                        size="sm"
+                        onPress={handlePreviewFavoritePress}
+                        icon={<Icon name={favoriteIds.has(previewItem!.id) ? 'heart' : 'heart-outline'} size={18} color={colorPalette.brand} />}
+                      />
+                      <Button
+                        tone="brand"
+                        size="sm"
+                        label="أضف للسلة"
+                        onPress={() => handlePreviewAddToCart()}
+                        icon={<Icon name="cart-outline" size={18} />}
+                      />
+                    </Box>
+                  </Surface>
+                </Box>
               </Animated.View>
             ) : null}
-          </View>
-        </View>
+          </Box>
+        </Box>
       </Modal>
 
       <Modal visible={Boolean(pickerItem)} transparent animationType="fade" onRequestClose={closeMeasurementPicker}>
         <Pressable style={styles.measureOverlay} onPress={closeMeasurementPicker}>
-          <View style={[styles.measurePopoverWrap, { top: measurePopoverTop }]} pointerEvents="box-none">
-            <View style={styles.measurePopoverDock}>
-              <View style={styles.measureOriginBubble}>
-                <Ionicons name="cart-outline" size={18} color={stylesTokens.white} />
-                <View style={styles.measureOriginPlusBadge}>
-                  <Ionicons name="add" size={10} color={stylesTokens.orange} />
-                </View>
-              </View>
-
-              <Pressable style={styles.measurePopoverCard} onPress={(event) => event.stopPropagation()}>
+          <Box style={[styles.measurePopoverWrap, { top: measurePopoverTop }]} pointerEvents="box-none">
+            <Box style={styles.measurePopoverDock}>
+              <Surface tone="raised" padding={3} gap={3} style={styles.measurePopoverCard}>
                 {pickerItem ? (
                   <>
-                    <View style={styles.measurePopoverHeader}>
-                      <Text style={styles.measureSheetTitle}>{normalizeDisplayText(pickerItem!.name)}</Text>
-                    </View>
+                    <Box gap={1}>
+                      <Text role="title">{normalizeDisplayText(pickerItem!.name)}</Text>
+                      <Text role="caption" tone="muted">{resolveMeasurementLabel(pickerItem!)}</Text>
+                    </Box>
 
-                    <View style={styles.measureOptionsGrid}>
+                    <Box flexDirection="row" flexWrap="wrap" gap={2}>
                       {activeMeasurementOptions.map((option) => {
                         const selected = selectedMeasureOption === option;
-                        const optionPrice = formatCurrencyValue(resolveMeasurementUnitPrice(pickerItem!, option));
                         return (
-                          <TouchableOpacity
+                          <Chip
                             key={option}
-                            style={[styles.measureOptionChip, selected && styles.measureOptionChipActive]}
-                            activeOpacity={0.88}
+                            label={`${option} - ${formatCurrencyValue(resolveMeasurementUnitPrice(pickerItem!, option))}`}
+                            selected={selected}
+                            tone="brand"
                             onPress={() => setSelectedMeasureOption(option)}
-                          >
-                            <Text style={[styles.measureOptionText, selected && styles.measureOptionTextActive]}>{option}</Text>
-                            <Text style={[styles.measureOptionPriceText, selected && styles.measureOptionPriceTextActive]}>{optionPrice}</Text>
-                          </TouchableOpacity>
+                          />
                         );
                       })}
-                    </View>
+                    </Box>
 
-                    <View style={styles.measureQtyRow}>
-                      <TouchableOpacity
-                        style={styles.measureQtyGhostButton}
-                        activeOpacity={0.85}
+                    <Box flexDirection="row" alignItems="center" justifyContent="center" gap={4}>
+                      <Button
+                        tone="secondary"
+                        size="sm"
+                        icon={<Icon name="remove" size={18} />}
                         onPress={() => setSelectedMeasureQty((current) => Math.max(1, current - 1))}
-                      >
-                        <Ionicons name="remove" size={18} color={stylesTokens.muted} />
-                      </TouchableOpacity>
-
-                      <View style={styles.measureQtyValuePill}>
-                        <Text style={styles.measureQtyValueText}>{selectedMeasureQty}</Text>
-                      </View>
-
-                      <TouchableOpacity
-                        style={styles.measureQtyPrimaryButton}
-                        activeOpacity={0.9}
+                      />
+                      <Box paddingHorizontal={4}>
+                        <Text role="bodyStrong" style={{ fontSize: 18 }}>{selectedMeasureQty}</Text>
+                      </Box>
+                      <Button
+                        tone="secondary"
+                        size="sm"
+                        icon={<Icon name="add" size={18} />}
                         onPress={() => setSelectedMeasureQty((current) => current + 1)}
-                      >
-                        <Ionicons name="add" size={18} color={stylesTokens.white} />
-                      </TouchableOpacity>
-                    </View>
+                      />
+                    </Box>
 
-                    <View style={styles.measureFooterBar}>
-                      <View style={styles.measurePriceValueBox}>
-                        <Text style={styles.measurePriceValueText}>{formatCurrencyValue(selectedMeasureTotalPrice || selectedMeasureUnitPrice)}</Text>
-                      </View>
-
-                      <TouchableOpacity
-                        style={styles.measureConfirmButton}
-                        activeOpacity={0.9}
+                    <Box flexDirection="row" gap={2} marginTop={2}>
+                      <Box flex={1}>
+                        <Text role="caption" tone="muted">الإجمالي</Text>
+                        <Text role="title" tone="brand">{formatCurrencyValue(selectedMeasureTotalPrice || selectedMeasureUnitPrice)}</Text>
+                      </Box>
+                      <Button
+                        label="تأكيد الإضافة"
+                        tone="brand"
                         onPress={handleAddToCart}
-                      >
-                        <Text style={styles.measureConfirmText}>أضف للسلة</Text>
-                        <Ionicons name="cart-outline" size={16} color={stylesTokens.white} />
-                      </TouchableOpacity>
-                    </View>
+                        icon={<Icon name="cart-outline" size={18} />}
+                      />
+                    </Box>
                   </>
                 ) : null}
-              </Pressable>
-            </View>
-          </View>
+              </Surface>
+            </Box>
+          </Box>
         </Pressable>
       </Modal>
-    </View>
+    </Box>
   );
 }
 

@@ -19,9 +19,13 @@ import {
 import { getPartnerIntakeItems } from '../shared/partner-intake-store';
 import {
   ApprovalRecord,
+  ApprovalRecordMetadata,
   ApprovalStage,
   isCatalogOwnedMedia,
-  isPartnerOwnedException
+  isPartnerOwnedException,
+  translateStage,
+  translateEntityType,
+  translateOwner,
 } from '../shared/workflow';
 
 type InventoryProduct = {
@@ -253,11 +257,11 @@ function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
   ]);
 }
 
-function StatusTimeline({ stage, metadata }: { stage: ApprovalStage; metadata?: any }) {
+function StatusTimeline({ stage, metadata }: { stage: ApprovalStage; metadata?: ApprovalRecordMetadata }) {
   const { direction } = useDirection();
   const isRtl = direction === 'rtl';
 
-  const steps: { label: string; stages: ApprovalStage[]; tone: any }[] = [
+  const steps: { label: string; stages: ApprovalStage[]; tone: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' }[] = [
     { label: 'تم الإرسال', stages: ['partner-submitted', 'field-submitted'], tone: 'default' },
     { label: 'مراجعة الشركاء', stages: ['partner-review', 'partner-approved'], tone: 'warning' },
     { label: 'مراجعة التسويق', stages: ['marketing-review', 'marketing-approved'], tone: 'brand' },
@@ -281,7 +285,8 @@ function StatusTimeline({ stage, metadata }: { stage: ApprovalStage; metadata?: 
             <Box key={idx} style={{ alignItems: 'center', flex: 1 }}>
               <Surface
                 tone={isPast || isCurrent ? step.tone : 'inset'}
-                style={{ width: 12, height: 12, borderRadius: 6 }}
+                radiusToken="full"
+                style={{ width: 12, height: 12 }}
               />
               <Text role="caption" tone={isCurrent ? 'default' : 'muted'} style={{ marginTop: 4, fontSize: 8 }}>
                 {step.label}
@@ -318,7 +323,7 @@ function MetricTile({ label, value, tone = 'default' }: MetricTileProps) {
   }[tone];
 
   return (
-    <Surface tone="default" padding={3} gap={1} style={{ flex: 1, minWidth: 118, borderWidth: 1, borderColor }}>
+    <Surface tone="default" padding={3} gap={1} border style={{ flex: 1, minWidth: 118, borderColor }}>
       <Text role="caption" tone="muted" numberOfLines={1}>
         {label}
       </Text>
@@ -340,8 +345,8 @@ function CatalogProductRow({ product, selected, onEdit }: CatalogProductRowProps
       tone="default"
       padding={3}
       gap={2}
+      border
       style={{
-        borderWidth: 1,
         borderColor: selected ? theme.brand : theme.line,
       }}
     >
@@ -538,10 +543,10 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
         <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
           مسار الإدخال الذكي
         </Text>
-        <ListItem title="1. ابحث عن المنتج القياسي" subtitle="ابدأ بـ SKU أو GTIN أو barcode أو الاسم قبل أي إضافة جديدة." badgeLabel="1" meta="Lookup first" />
-        <ListItem title="2. اختر المنتج من الكتالوج المركزي" subtitle="طابق القالب المعياري قبل تنفيذ أي تعديل محلي." badgeLabel="2" meta="Central catalog" />
-        <ListItem title="3. عدّل السعر والتوفر والمخزون" subtitle="الشريك يضبط السعر أو التوفر أو الكمية فقط، لا يكرر اسم المنتج أو صورته." badgeLabel="3" meta="Local edit" />
-        <ListItem title="4. راجع ثم انشر" subtitle="راجع المخرجات قبل حفظ الدفعة أو نشرها على المتجر." badgeLabel="4" meta="Publish" />
+        <ListItem title="1. ابحث عن المنتج القياسي" subtitle="ابدأ بـ SKU أو GTIN أو الباركود أو الاسم قبل أي إضافة جديدة." badgeLabel="1" meta="البحث أولاً" />
+        <ListItem title="2. اختر المنتج من الكتالوج المركزي" subtitle="طابق القالب المعياري قبل تنفيذ أي تعديل محلي." badgeLabel="2" meta="الكتالوج المركزي" />
+        <ListItem title="3. عدّل السعر والتوفر والمخزون" subtitle="الشريك يضبط السعر أو التوفر أو الكمية فقط، لا يكرر اسم المنتج أو صورته." badgeLabel="3" meta="تعديل محلي" />
+        <ListItem title="4. راجع ثم انشر" subtitle="راجع المخرجات قبل حفظ الدفعة أو نشرها على المتجر." badgeLabel="4" meta="نشر" />
       </Surface>
 
       <Surface tone="raised" padding={3} gap={3}>
@@ -565,7 +570,7 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
             <StateView
               stateId="empty"
               title="لا توجد نتائج مطابقة"
-              description="جرّب اسم المنتج أو SKU أو GTIN أو barcode مختلفًا."
+              description="جرّب اسم المنتج أو SKU أو GTIN أو الباركود مختلفًا."
               actionLabel="إعادة ضبط البحث"
               onActionPress={() => setQuery('')}
             />
@@ -581,15 +586,15 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
           dense
           items={[
             { label: 'المنتج', value: selectedProduct.name },
-            { label: 'SKU', value: selectedProduct.sku },
-            { label: 'GTIN', value: selectedProduct.gtin },
+            { label: 'الرمز (SKU)', value: selectedProduct.sku },
+            { label: 'الرمز العالمي (GTIN)', value: selectedProduct.gtin },
             { label: 'الباركود', value: selectedProduct.barcode },
             ...(selectedProductProofLabel ? [{ label: 'إثبات السلسلة', value: selectedProductProofLabel, tone: 'brand' as const }] : []),
             ...(selectedProduct.sourceRecordId ? [{ label: 'مرجع المصدر', value: selectedProduct.sourceRecordId }] : []),
-            ...(selectedProduct.canonicalStoreId ? [{ label: 'مرجع المتجر الكانوني', value: selectedProduct.canonicalStoreId }] : []),
-            ...(selectedProduct.canonicalProductId ? [{ label: 'مرجع المنتج الكانوني', value: selectedProduct.canonicalProductId }] : []),
-            ...(selectedProduct.publishStage ? [{ label: 'مرحلة النشر', value: selectedProduct.publishStage }] : []),
-            ...(selectedProduct.source ? [{ label: 'المصدر', value: selectedProduct.source }] : []),
+            ...(selectedProduct.canonicalStoreId ? [{ label: 'مرجع المتجر المركزي', value: selectedProduct.canonicalStoreId }] : []),
+            ...(selectedProduct.canonicalProductId ? [{ label: 'مرجع المنتج المركزي', value: selectedProduct.canonicalProductId }] : []),
+            ...(selectedProduct.publishStage ? [{ label: 'مرحلة النشر', value: translateStage(selectedProduct.publishStage) }] : []),
+            ...(selectedProduct.source ? [{ label: 'المصدر', value: translateOwner(selectedProduct.source) }] : []),
             { label: 'الربط المركزي', value: selectedProduct.catalogLinked ? 'مرتبط' : 'يحتاج مطابقة', tone: selectedProduct.catalogLinked ? 'success' : 'warning' },
           ]}
         />
@@ -641,10 +646,10 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
             onPress={() => setToolMessage('تم فتح مسار تحديث الأسعار الجماعي محليًا.')}
           />
           <Button
-            label="استيراد Excel/CSV"
+            label="استيراد جداول (Excel/CSV)"
             tone="secondary"
             fullWidth={false}
-            onPress={() => setToolMessage('تم فتح مسار الاستيراد Excel / CSV محليًا.')}
+            onPress={() => setToolMessage('تم فتح مسار الاستيراد محليًا.')}
           />
           <Button
             label="مراجعة المنتجات غير المطابقة"
@@ -665,11 +670,12 @@ export function InventoryCatalogWorkspaceContent({ storeName, branchLabel, activ
             items={[
               { label: 'نوع العملية', value: activeBulkTool },
               { label: 'الفرع', value: branchLabel },
-              { label: 'ساعات اليوم', value: todayHoursLabel },
+              { label: 'ساعات العمل', value: todayHoursLabel },
             ]}
           />
         ) : null}
       </Surface>
+
 
       <MobileStickyPrimaryAction
         label={publishLabel}

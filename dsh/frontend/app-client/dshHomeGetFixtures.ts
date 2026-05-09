@@ -753,6 +753,30 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
         approvalStage: 'active',
         conflictStatus: 'blocker',
         conflictReason: 'تعارض أمني في الشارات'
+      },
+      'offerLabel': {
+        sourceOwner: 'marketing-store',
+        sourceRecordId: 'offer-123',
+        sourceType: 'offer',
+        approvalStage: 'approved',
+        conflictStatus: 'blocker',
+        conflictReason: 'تعارض في العروض'
+      },
+      'deliveryFeeLabel': {
+        sourceOwner: 'logistics-store',
+        sourceRecordId: 'del-456',
+        sourceType: 'delivery',
+        approvalStage: 'active',
+        conflictStatus: 'blocker',
+        conflictReason: 'تعارض في التوصيل'
+      },
+      'hasCouponAvailable': {
+        sourceOwner: 'marketing-store',
+        sourceRecordId: 'coupon-789',
+        sourceType: 'partner',
+        approvalStage: 'active',
+        conflictStatus: 'blocker',
+        conflictReason: 'تعارض في الكوبونات'
       }
     }
   },

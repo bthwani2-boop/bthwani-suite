@@ -202,6 +202,18 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
       isAvailable: true,
       publishStage: 'client-visible',
     },
+    {
+      id: 'item-exception-visible',
+      name: 'منتج استثناء شريك',
+      subtitle: 'يظهر بسبب سياسة الوسائط بالرغم من أنه في المراجعة',
+      priceLabel: '60 ر.س',
+      categoryId: 'fresh',
+      categoryLabel: 'طازج',
+      isAvailable: true,
+      publishStage: 'marketing-review',
+      mediaPolicy: 'partner-owned-exception',
+      imageUri: 'dsh.product.apple.v1',
+    },
   ],
 
   'store-1002': [
