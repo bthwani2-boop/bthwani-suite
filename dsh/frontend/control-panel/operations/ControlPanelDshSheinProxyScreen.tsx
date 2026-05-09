@@ -8,6 +8,7 @@ import styles from './dsh-surface.module.css';
 
 export type ControlPanelDshSheinProxyScreenProps = {
   hubHref?: string;
+  subGroup?: string;
 };
 
 const STATUS_CLASS_NAMES: Record<string, string> = {
@@ -17,7 +18,7 @@ const STATUS_CLASS_NAMES: Record<string, string> = {
   brand: styles.liveOrdersStatusBrand,
 };
 
-export function ControlPanelDshSheinProxyScreen({ hubHref = '/operations' }: ControlPanelDshSheinProxyScreenProps) {
+export function ControlPanelDshSheinProxyScreen({ hubHref = '/operations', subGroup }: ControlPanelDshSheinProxyScreenProps) {
   const router = useRouter();
   const preview = SHEIN_PROXY_OPERATIONAL_PREVIEW;
 

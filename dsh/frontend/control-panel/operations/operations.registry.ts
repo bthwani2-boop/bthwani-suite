@@ -12,18 +12,117 @@ import type {
 export type { AnyOperationsWorkspaceId } from './operations.types';
 
 export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
-  { id: 'command-center', label: 'غرفة القيادة', description: 'نبض العمليات، المعوقات، وأفضل إجراء تالي.', badge: 'Hub' },
-  { id: 'live-orders', label: 'الطلبات الحية', description: 'قائمة الطلبات، التفاصيل، الدردشة، وتدخلات التنفيذ.', badge: 'Core' },
-  { id: 'dispatch-assignment', label: 'الإسناد والتوزيع', description: 'لوحة الإسناد، تغطية الكباتن، وإعادة الإسناد اليدوي.', badge: 'Live' },
-  { id: 'sheinproxy', label: 'شي إن', description: 'مسار الإسناد اليدوي لطلبات شي إن والدفعات المرتبطة بها.', badge: 'Manual' },
-  { id: 'proxy-shein-awnak', label: 'عونك', description: 'مسار عونك التشغيلي للدفعات اليدوية ومتابعة الطلبات.', badge: 'Manual' },
-  { id: 'captain-operations', label: 'تشغيل الكباتن', description: 'توافر الكباتن، الجاهزية، وضغط التغطية.', badge: 'Crew' },
-  { id: 'partner-stores', label: 'المتاجر والشركاء', description: 'جاهزية المتاجر، التحضير، وضغط الاستلام.', badge: 'Stores' },
-  { id: 'area-capacity', label: 'المناطق والسعة', description: 'ضغط السعة، النوافذ المحجوزة، والتحكم في الطفرات.', badge: 'Capacity' },
-  { id: 'exceptions-escalations', label: 'الاستثناءات والتصعيد', description: 'قائمة الاستثناءات، إجراءات التعافي، وتوجيه المالك.', badge: 'Risk' },
-  { id: 'audit-support-sla', label: 'التدقيق والدعم وSLA', description: 'تدقيق الإجراءات اليدوية، جسر الدعم، وانضباط SLA.', badge: 'Proof' },
+  {
+    id: 'command-center',
+    label: 'غرفة القيادة',
+    description: 'نبض العمليات، المعوقات، وأفضل إجراء تالي.',
+    badge: 'Hub',
+    subGroups: [
+      { id: 'overview', label: 'نظرة عامة' },
+      { id: 'anomalies', label: 'شواذ النظام' },
+      { id: 'recommendations', label: 'توصيات ذكية' },
+    ]
+  },
+  {
+    id: 'live-orders',
+    label: 'الطلبات الحية',
+    description: 'قائمة الطلبات، التفاصيل، الدردشة، وتدخلات التنفيذ.',
+    badge: 'Core',
+    subGroups: [
+      { id: 'all', label: 'الكل' },
+      { id: 'active', label: 'نشطة' },
+      { id: 'delayed', label: 'متأخرة' },
+      { id: 'issues', label: 'تحتاج تدخل' },
+    ]
+  },
+  {
+    id: 'dispatch-assignment',
+    label: 'الإسناد والتوزيع',
+    description: 'لوحة الإسناد، تغطية الكباتن، وإعادة الإسناد اليدوي.',
+    badge: 'Live',
+    subGroups: [
+      { id: 'pending', label: 'بانتظار الإسناد' },
+      { id: 'manual', label: 'إسناد يدوي' },
+      { id: 'backlog', label: 'المتراكم' },
+    ]
+  },
+  {
+    id: 'sheinproxy',
+    label: 'شي إن',
+    description: 'مسار الإسناد اليدوي لطلبات شي إن والدفعات المرتبطة بها.',
+    badge: 'Manual',
+    subGroups: [
+      { id: 'batches', label: 'الدفعات' },
+      { id: 'orders', label: 'الطلبات' },
+      { id: 'errors', label: 'أخطاء الربط' },
+    ]
+  },
+  {
+    id: 'proxy-shein-awnak',
+    label: 'عونك',
+    description: 'مسار عونك التشغيلي للدفعات اليدوية ومتابعة الطلبات.',
+    badge: 'Manual',
+    subGroups: [
+      { id: 'active', label: 'نشط' },
+      { id: 'completed', label: 'مكتمل' },
+    ]
+  },
+  {
+    id: 'captain-operations',
+    label: 'تشغيل الكباتن',
+    description: 'توافر الكباتن، الجاهزية، وضغط التغطية.',
+    badge: 'Crew',
+    subGroups: [
+      { id: 'availability', label: 'التوافر' },
+      { id: 'readiness', label: 'الجاهزية' },
+      { id: 'performance', label: 'الأداء' },
+    ]
+  },
+  {
+    id: 'partner-stores',
+    label: 'المتاجر والشركاء',
+    description: 'جاهزية المتاجر، التحضير، وضغط الاستلام.',
+    badge: 'Stores',
+    subGroups: [
+      { id: 'preparation', label: 'تحت التحضير' },
+      { id: 'ready', label: 'جاهز للاستلام' },
+      { id: 'delays', label: 'تأخيرات' },
+    ]
+  },
+  {
+    id: 'area-capacity',
+    label: 'المناطق والسعة',
+    description: 'ضغط السعة، النوافذ المحجوزة، والتحكم في الطفرات.',
+    badge: 'Capacity',
+    subGroups: [
+      { id: 'density', label: 'كثافة المناطق' },
+      { id: 'surge', label: 'إدارة الطفرات' },
+      { id: 'windows', label: 'نوافذ الخدمة' },
+    ]
+  },
+  {
+    id: 'exceptions-escalations',
+    label: 'الاستثناءات والتصعيد',
+    description: 'قائمة الاستثناءات، إجراءات التعافي، وتوجيه المالك.',
+    badge: 'Risk',
+    subGroups: [
+      { id: 'level-1', label: 'مستوى ١' },
+      { id: 'level-2', label: 'مستوى ٢' },
+      { id: 'critical', label: 'حرج جداً' },
+    ]
+  },
+  {
+    id: 'audit-support-sla',
+    label: 'التدقيق والدعم وSLA',
+    description: 'تدقيق الإجراءات اليدوية، جسر الدعم، وانضباط SLA.',
+    badge: 'Proof',
+    subGroups: [
+      { id: 'procedures', label: 'إجراءات' },
+      { id: 'proofs', label: 'إثباتات' },
+      { id: 'sla', label: 'مقاييس SLA' },
+    ]
+  },
 ] as const;
-
 
 export const OPERATIONS_CANONICAL_GROUP_IDS = OPERATIONS_CANONICAL_GROUPS.map((group) => group.id) as readonly CanonicalOperationsGroupId[];
 

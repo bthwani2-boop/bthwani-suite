@@ -8,6 +8,7 @@ import styles from './dsh-surface.module.css';
 export type LiveOrdersScreenProps = {
   state?: 'ready' | 'loading' | 'error' | 'empty';
   hubHref: string;
+  subGroup?: string;
   onRetry?: () => void;
 };
 
@@ -18,7 +19,7 @@ const STATUS_CLASS_NAMES: Record<string, string> = {
   brand: styles.liveOrdersStatusBrand,
 };
 
-export function LiveOrdersScreen({ state = 'ready', hubHref, onRetry }: LiveOrdersScreenProps) {
+export function LiveOrdersScreen({ state = 'ready', hubHref, subGroup, onRetry }: LiveOrdersScreenProps) {
   const preview = LIVE_ORDERS_OPERATIONAL_PREVIEW;
 
   if (state === 'loading') {

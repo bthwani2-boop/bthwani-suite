@@ -152,21 +152,32 @@ export function ControlPanelDshClosureDashboardScreen() {
   } as const;
 
   return (
-    <ControlPanelDshWorkspaceFrame
-      eyebrow="لوحة الإغلاق"
-      title="مصفوفة جاهزية DSH"
-      description="لقطة واحدة توضح ما هو مغلق، وما يحتاج أدلة (Evidence)، وما يحتاج مسارات واجهة (UI flow) قبل الخروج النهائي."
-      badges={['DSH', 'إغلاق', 'جاهزية']}
-      primaryAction={{ label: 'فتح الأدلة', href: '/control?tab=governance' }}
-      secondaryAction={{ label: 'حالة الحماية', href: '/operations?workspace=guard-status' }}
-      signals={[
-        { id: 'surface-client', title: 'العميل', value: String(surfaceCounts.client), description: 'عناصر إغلاق العميل', tone: 'brand' },
-        { id: 'surface-partner', title: 'الشريك', value: String(surfaceCounts.partner), description: 'عناصر إغلاق الشريك', tone: 'brand' },
-        { id: 'surface-captain', title: 'الكابتن', value: String(surfaceCounts.captain), description: 'عناصر إغلاق الكابتن', tone: 'warning' },
-        { id: 'surface-field', title: 'الميدان', value: String(surfaceCounts.field), description: 'عناصر إغلاق الميدان', tone: 'warning' },
-        { id: 'surface-control', title: 'لوحة التحكم', value: String(surfaceCounts['control-panel']), description: 'عناصر إغلاق اللوحة', tone: 'best' },
-      ]}
-    />
+    <Box gap={4}>
+      <div className={styles.operationsPulseCompact} style={{ justifyContent: 'flex-start', borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '16px' }}>
+        {[
+          { id: 'surface-client', title: 'العميل', value: String(surfaceCounts.client), tone: 'brand' },
+          { id: 'surface-partner', title: 'الشريك', value: String(surfaceCounts.partner), tone: 'brand' },
+          { id: 'surface-captain', title: 'الكابتن', value: String(surfaceCounts.captain), tone: 'warning' },
+          { id: 'surface-field', title: 'الميدان', value: String(surfaceCounts.field), tone: 'warning' },
+          { id: 'surface-control', title: 'لوحة التحكم', value: String(surfaceCounts['control-panel']), tone: 'best' },
+        ].map((s) => (
+          <div key={s.id} className={styles.commandKpi} style={{ flex: 1, minWidth: '120px' }}>
+            <span className={styles.commandKpiLabel}>{s.title}</span>
+            <span className={styles.commandKpiValue} style={s.tone === 'best' ? { color: '#16A34A' } : s.tone === 'warning' ? { color: '#D97706' } : {}}>{s.value}</span>
+          </div>
+        ))}
+      </div>
+
+      <WebSectionCard
+        title="مصفوفة جاهزية DSH"
+        description="لقطة واحدة توضح ما هو مغلق، وما يحتاج أدلة (Evidence)، وما يحتاج مسارات واجهة (UI flow) قبل الخروج النهائي."
+      >
+        <Box layoutDirection="row" gap={2}>
+           <Button label="فتح الأدلة" tone="primary" size="sm" />
+           <Button label="حالة الحماية" tone="secondary" size="sm" />
+        </Box>
+      </WebSectionCard>
+    </Box>
   );
 }
 

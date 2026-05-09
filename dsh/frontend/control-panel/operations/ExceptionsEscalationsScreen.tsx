@@ -5,7 +5,7 @@ import { OperationsSuggestionCard } from './operations.ui';
 import { EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW } from './operations.preview-data';
 import styles from './dsh-surface.module.css';
 
-export type ExceptionsEscalationsScreenProps = { hubHref: string; };
+export type ExceptionsEscalationsScreenProps = { hubHref: string; subGroup?: string; };
 
 const STATUS_CLASS_NAMES: Record<string, string> = {
   warning: styles.liveOrdersStatusWarning,
@@ -14,7 +14,7 @@ const STATUS_CLASS_NAMES: Record<string, string> = {
   brand: styles.liveOrdersStatusBrand,
 };
 
-export function ExceptionsEscalationsScreen({ hubHref }: ExceptionsEscalationsScreenProps) {
+export function ExceptionsEscalationsScreen({ hubHref, subGroup }: ExceptionsEscalationsScreenProps) {
   const preview = EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW;
 
   return (

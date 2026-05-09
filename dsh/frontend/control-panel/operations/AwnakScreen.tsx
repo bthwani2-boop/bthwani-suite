@@ -8,6 +8,7 @@ import styles from './dsh-surface.module.css';
 
 export type AwnakScreenProps = {
   hubHref?: string;
+  subGroup?: string;
 };
 
 const STATUS_CLASS_NAMES: Record<string, string> = {
@@ -17,7 +18,7 @@ const STATUS_CLASS_NAMES: Record<string, string> = {
   brand: styles.liveOrdersStatusBrand,
 };
 
-export function AwnakScreen({ hubHref = '/operations' }: AwnakScreenProps) {
+export function AwnakScreen({ hubHref = '/operations', subGroup }: AwnakScreenProps) {
   const router = useRouter();
   const preview = AWNAK_OPERATIONAL_PREVIEW;
 

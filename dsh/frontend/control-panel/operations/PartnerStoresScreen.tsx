@@ -4,7 +4,7 @@ import React from 'react';
 import { OperationsSuggestionCard } from './operations.ui';
 import styles from './dsh-surface.module.css';
 
-export type PartnerStoresScreenProps = { hubHref: string; };
+export type PartnerStoresScreenProps = { hubHref: string; subGroup?: string; };
 
 const STORES = [
   {
@@ -29,7 +29,7 @@ const STORES = [
   },
 ] as const;
 
-export function PartnerStoresScreen({ hubHref }: PartnerStoresScreenProps) {
+export function PartnerStoresScreen({ hubHref, subGroup }: PartnerStoresScreenProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', direction: 'rtl', height: '100%', minWidth: 0 }}>
 

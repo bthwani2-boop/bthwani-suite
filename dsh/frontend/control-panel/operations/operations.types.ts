@@ -80,11 +80,17 @@ export type AnyOperationsWorkspaceId = CanonicalOperationsGroupId | LegacyOperat
 
 export type NonOperationsSectionRootId = 'finance' | 'catalogs' | 'marketing' | 'partners';
 
+export type OperationsSubGroupMeta = {
+  id: string;
+  label: string;
+};
+
 export type OperationsGroupMeta = {
   id: CanonicalOperationsGroupId;
   label: string;
   description: string;
   badge: string;
+  subGroups?: readonly OperationsSubGroupMeta[];
 };
 
 export type OperationsNormalizationResult =

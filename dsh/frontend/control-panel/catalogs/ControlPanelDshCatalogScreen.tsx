@@ -321,6 +321,46 @@ export function ControlPanelDshCatalogScreen({
 
   return (
     <Box dir="rtl" gap={0} background="background" style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
+      {/* 1. Header Area - Catalog Command Deck */}
+      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
+        <div className={styles.operationsTitleBlock}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            backgroundColor: '#0A2F5C',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '16px',
+            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
+          }}>
+            ⌗
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>كتالوج DSH</h1>
+              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#DCFCE7', color: '#16A34A', borderRadius: '4px', fontWeight: '800' }}>مباشر</span>
+            </div>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>إدارة المنتجات، الفئات، والتوافر العابر للأسطح</p>
+          </div>
+        </div>
+
+        <div className={styles.operationsHeaderActions}>
+          <div className={styles.operationsPulseCompact}>
+            {[
+              { label: 'إجمالي المنتجات', value: '١٤,٥٨٢' },
+              { label: 'بانتظار اعتماد', value: '١٢٤' },
+              { label: 'تعارضات النشاط', value: '٨', tone: 'danger' }
+            ].map((m) => (
+              <div key={m.label} className={styles.commandKpi}>
+                <span className={styles.commandKpiLabel}>{m.label}</span>
+                <span className={styles.commandKpiValue} style={m.tone === 'danger' ? { color: '#DC2626' } : {}}>{m.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
 
       {/* 2. Primary Tabs - Navigation Cockpit */}
       <nav className={styles.navigationCockpit}>

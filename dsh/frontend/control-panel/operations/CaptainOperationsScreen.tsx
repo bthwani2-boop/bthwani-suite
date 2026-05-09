@@ -4,7 +4,7 @@ import React from 'react';
 import { OperationsSuggestionCard } from './operations.ui';
 import styles from './dsh-surface.module.css';
 
-export type CaptainOperationsScreenProps = { hubHref: string; };
+export type CaptainOperationsScreenProps = { hubHref: string; subGroup?: string; };
 
 const CAPTAINS = [
   {
@@ -33,7 +33,7 @@ const CAPTAINS = [
   },
 ] as const;
 
-export function CaptainOperationsScreen({ hubHref }: CaptainOperationsScreenProps) {
+export function CaptainOperationsScreen({ hubHref, subGroup }: CaptainOperationsScreenProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', direction: 'rtl', height: '100%' }}>
 

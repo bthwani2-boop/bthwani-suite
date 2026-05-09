@@ -86,6 +86,46 @@ export function ControlPanelDshFinanceHubScreen({
 
   return (
     <div className={`${styles.operationsCockpit} ${fStyles.financeCockpit} ${fStyles.noScroll}`} dir="rtl">
+      {/* 1. Header Area - Finance Command Deck */}
+      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
+        <div className={styles.operationsTitleBlock}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            backgroundColor: '#0A2F5C',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '16px',
+            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
+          }}>
+            💰
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>مالية DSH</h1>
+              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>مراجعة مالية</span>
+            </div>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>مراقبة التدفقات المالية والتسويات المركزية</p>
+          </div>
+        </div>
+
+        <div className={styles.operationsHeaderActions}>
+          <div className={styles.operationsPulseCompact}>
+            {[
+              { label: 'إجمالي الدخل', value: '١,٢٥٤,٠٠٠ ر.س', tone: 'success' },
+              { label: 'تسويات معلقة', value: '١٤' },
+              { label: 'خطر التدفق', value: 'منخفض', tone: 'success' }
+            ].map((m) => (
+              <div key={m.label} className={styles.commandKpi}>
+                <span className={styles.commandKpiLabel}>{m.label}</span>
+                <span className={styles.commandKpiValue} style={m.tone === 'success' ? { color: '#16A34A' } : {}}>{m.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
 
       {/* 2. Finance Tabs - Main Navigation */}
       <nav className={`${styles.navigationCockpit} ${fStyles.noScroll}`}>

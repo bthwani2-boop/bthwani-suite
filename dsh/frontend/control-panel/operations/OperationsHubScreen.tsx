@@ -32,7 +32,7 @@ export type ControlPanelDshOperationsScreenProps = {
   fallbackHref?: string;
 };
 
-const SCREEN_RENDERERS: Record<CanonicalOperationsGroupId, React.ComponentType<{ hubHref: string }>> = {
+const SCREEN_RENDERERS: Record<CanonicalOperationsGroupId, React.ComponentType<{ hubHref: string; subGroup?: string }>> = {
   'command-center': CommandCenterScreen,
   'live-orders': LiveOrdersScreen,
   'dispatch-assignment': DispatchAssignmentScreen,
@@ -63,6 +63,7 @@ export function ControlPanelDshOperationsScreen({
 }: ControlPanelDshOperationsScreenProps) {
   const router = useRouter();
   const [activeGroup, setActiveGroup] = React.useState<CanonicalOperationsGroupId>(group);
+  const [activeSubGroup, setActiveSubGroup] = React.useState<string | undefined>(undefined);
 
   React.useEffect(() => {
     setActiveGroup(group);
@@ -116,6 +117,7 @@ export function ControlPanelDshOperationsScreen({
               className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
               onClick={() => {
                 setActiveGroup(item.id);
+                setActiveSubGroup(undefined);
                 router.push(buildOperationsHref(item.id, { orderId, panel }));
               }}
             >
@@ -124,11 +126,29 @@ export function ControlPanelDshOperationsScreen({
           );
         })}
       </nav>
+      
+      {/* 2b. Sub-Tabs - Granular Navigation */}
+      {activeGroupMeta.subGroups && (
+        <nav className={styles.subNavigationCockpit}>
+          {activeGroupMeta.subGroups.map((sub) => {
+            const isSelected = (activeSubGroup || activeGroupMeta.subGroups?.[0]?.id) === sub.id;
+            return (
+              <button
+                key={sub.id}
+                className={`${styles.operationsSubTab} ${isSelected ? styles.operationsSubTabActive : ''}`}
+                onClick={() => setActiveSubGroup(sub.id)}
+              >
+                {sub.label}
+              </button>
+            );
+          })}
+        </nav>
+      )}
 
       {/* 3. Main Active Area */}
       <main className={styles.operationsMainPanel}>
         <div className={styles.operationsInnerScroll}>
-          <ActiveScreen hubHref={hubHref} />
+          <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
         </div>
       </main>
     </div>

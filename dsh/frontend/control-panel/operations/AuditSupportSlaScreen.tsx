@@ -5,7 +5,7 @@ import { OperationsSuggestionCard } from './operations.ui';
 import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from './operations.preview-data';
 import styles from './dsh-surface.module.css';
 
-export type AuditSupportSlaScreenProps = { hubHref: string; };
+export type AuditSupportSlaScreenProps = { hubHref: string; subGroup?: string; };
 
 const STATUS_CLASS_NAMES: Record<string, string> = {
   warning: styles.liveOrdersStatusWarning,
@@ -14,7 +14,7 @@ const STATUS_CLASS_NAMES: Record<string, string> = {
   brand: styles.liveOrdersStatusBrand,
 };
 
-export function AuditSupportSlaScreen({ hubHref }: AuditSupportSlaScreenProps) {
+export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScreenProps) {
   const preview = AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW;
 
   return (

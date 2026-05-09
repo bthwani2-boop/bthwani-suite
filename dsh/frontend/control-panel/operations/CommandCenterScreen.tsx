@@ -4,7 +4,7 @@ import React from 'react';
 import { OperationsSuggestionCard } from './operations.ui';
 import styles from './dsh-surface.module.css';
 
-export type CommandCenterScreenProps = { hubHref: string; };
+export type CommandCenterScreenProps = { hubHref: string; subGroup?: string; };
 
 const SIGNALS = [
   { label: 'الطلبات المفتوحة', value: '1,240', status: 'normal' },
@@ -48,7 +48,7 @@ const QUICK_ACTIONS = [
   { label: 'تصعيد شكوى عميل (تأخير)', time: 'منذ 18 دقيقة', workspace: 'audit-support-sla' },
 ] as const;
 
-export function CommandCenterScreen({ hubHref }: CommandCenterScreenProps) {
+export function CommandCenterScreen({ hubHref, subGroup }: CommandCenterScreenProps) {
   return (
     <div className={styles.operationsCompactSurface} style={{ direction: 'rtl' }}>
 

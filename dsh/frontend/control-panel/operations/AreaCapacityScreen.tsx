@@ -5,7 +5,7 @@ import { OperationsSuggestionCard } from './operations.ui';
 import { AREA_CAPACITY_OPERATIONAL_PREVIEW } from './operations.preview-data';
 import styles from './dsh-surface.module.css';
 
-export type AreaCapacityScreenProps = { hubHref: string; };
+export type AreaCapacityScreenProps = { hubHref: string; subGroup?: string; };
 
 const STATUS_CLASS_NAMES: Record<string, string> = {
   warning: styles.liveOrdersStatusWarning,
@@ -14,7 +14,7 @@ const STATUS_CLASS_NAMES: Record<string, string> = {
   brand: styles.liveOrdersStatusBrand,
 };
 
-export function AreaCapacityScreen({ hubHref }: AreaCapacityScreenProps) {
+export function AreaCapacityScreen({ hubHref, subGroup }: AreaCapacityScreenProps) {
   const preview = AREA_CAPACITY_OPERATIONAL_PREVIEW;
 
   return (
