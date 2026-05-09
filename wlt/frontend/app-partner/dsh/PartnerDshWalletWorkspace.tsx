@@ -14,7 +14,7 @@ import {
   useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
-import { getDshPartnerSettlementPreview } from '../../../../dsh/frontend/shared/dshFinancePreviewModel';
+import { getWltPartnerSettlementPreview } from '../../shared/finance/dshFinancePreview';
 
 type PartnerDshWalletWorkspaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-transactions';
 type PartnerDshWalletActionId = 'expanded-wallet' | 'settlements' | 'report';
@@ -58,7 +58,7 @@ type WalletStateCopy = {
   actionLabel?: string;
 };
 
-const partnerPreview = getDshPartnerSettlementPreview();
+const partnerPreview = getWltPartnerSettlementPreview();
 
 const defaultTransactions: readonly PartnerDshWalletTransaction[] = partnerPreview.records.map(r => ({
   id: r.id,

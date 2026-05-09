@@ -6,6 +6,7 @@ import {
   ControlPanelDshMarketingScreen,
   ControlPanelDshPartnerApprovalsScreen,
 } from '../composition';
+import { WltDshFinanceControlPanelContent } from '../../wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useDirection, useUiText } from '@bthwani/ui-kit';
@@ -431,7 +432,7 @@ export function ControlPanelSurfaceHost({
             return {
               eyebrow: 'مالي',
               title: panelText.surfaceTitles.finance,
-              description: 'عرض مالي',
+              description: 'مراجعة التدفقات المالية — عرض تجريبي',
               primaryAction: {
                 id: 'finance-primary',
                 label: 'تركيز WLT',
@@ -462,50 +463,13 @@ export function ControlPanelSurfaceHost({
                   value: String(referenceCoverageCount),
                   description: 'مسارات تبقى ظاهرة بدون ادعاء جاهزية أعلى من الواقع.',
                 },
-                {
-                  id: 'finance-links',
-                  title: 'مخارج سريعة',
-                  value: '2',
-                  description: 'عودة مباشرة للنظرة العامة أو الدعم.',
-                },
               ],
-              quickActionsTitle: 'إجراءات',
-              quickActionsDescription: 'أزرار',
-              quickActions: [
-                {
-                  id: 'finance-focus-wlt',
-                  label: 'تركيز على WLT',
-                  description: 'فلترة الصفحة إلى المسار المالي الموصى به الآن.',
-                  footerLabel: 'تصفية فورية',
-                  badge: 'مباشر',
-                  tone: 'primary',
-                  onAction: () => setSelectedServiceId('wlt'),
-                },
-                {
-                  id: 'finance-overview',
-                  label: 'العودة للنظرة العامة',
-                  description: 'انتقال سريع لإعادة ترتيب الأولويات قبل الحسم التالي.',
-                  footerLabel: 'فتح القسم',
-                  href: '/dashboard',
-                },
-                {
-                  id: 'finance-support',
-                  label: 'تنسيق الدعم',
-                  description: 'افتح الدعم عندما يحتاج القرار المالي إلى استعادة تجربة العميل.',
-                  footerLabel: 'فتح القسم',
-                  href: '/support',
-                },
-                {
-                  id: 'finance-operations',
-                  label: 'العودة للعمليات',
-                  description: 'اربط القرار المالي بمسار التنفيذ المباشر بدون مغادرة الشريط الحاكم.',
-                  footerLabel: 'فتح القسم',
-                  href: '/operations',
-                },
-              ],
-              disclosureTitle: 'تغطية مالية حسب الخدمة',
-              disclosureDescription: 'التحويل بين الخدمات يبقى أقل بروزًا من الإجراء الأول.',
-              disclosureItems: buildServiceDisclosureItems('finance'),
+              quickActionsTitle: '',
+              quickActionsDescription: '',
+              quickActions: [],
+              disclosureTitle: '',
+              disclosureDescription: '',
+              disclosureItems: [],
             };
           case 'community-services':
             return {
@@ -625,51 +589,13 @@ export function ControlPanelSurfaceHost({
                   description: 'إشارة مختصرة تحافظ على أولوية الدعم واضحة.',
                   tone: alertCount > 0 ? 'danger' : 'neutral',
                 },
-                {
-                  id: 'support-recovery',
-                  title: 'مخرج آمن',
-                  value: '2',
-                  description: 'عودة سريعة للنظرة العامة أو العمليات.',
-                },
               ],
-              quickActionsTitle: 'إجراءات',
-              quickActionsDescription: 'أزرار سريعة',
-              quickActions: [
-                {
-                  id: 'support-orders',
-                  label: 'طلبات قابلة للتصعيد',
-                  description: 'افتح الصف التشغيلي الأقرب للحسم بدل التدرج عبر صفحات وصفية.',
-                  footerLabel: 'فتح مباشر',
-                  href: buildOperationsHref('orders'),
-                  badge: 'حي',
-                  tone: 'primary',
-                },
-                {
-                  id: 'support-arb',
-                  label: 'حصر العرض على ARB',
-                  description: 'تركيز الصفحة على المساحة الأنسب حاليًا للدعم.',
-                  footerLabel: 'تصفية فورية',
-                  badge: 'مباشر',
-                  onAction: () => setSelectedServiceId('arb'),
-                },
-                {
-                  id: 'support-operations',
-                  label: 'العودة للعمليات',
-                  description: 'انتقال سريع إذا احتاج التصعيد إلى قرار تشغيلي أولًا.',
-                  footerLabel: 'فتح القسم',
-                  href: '/operations',
-                },
-                {
-                  id: 'support-overview',
-                  label: 'العودة للنظرة العامة',
-                  description: 'استخدمها عندما تحتاج إعادة ترتيب الأولويات قبل المتابعة.',
-                  footerLabel: 'فتح القسم',
-                  href: '/dashboard',
-                },
-              ],
-              disclosureTitle: 'تغطية الدعم حسب الخدمة',
-              disclosureDescription: 'الخدمات الداعمة تبقى مرئية لكن أقل بروزًا من مسار triage الأساسي.',
-              disclosureItems: buildServiceDisclosureItems('support'),
+              quickActionsTitle: '',
+              quickActionsDescription: '',
+              quickActions: [],
+              disclosureTitle: '',
+              disclosureDescription: '',
+              disclosureItems: [],
             };
           default:
             return null;
@@ -817,48 +743,61 @@ export function ControlPanelSurfaceHost({
                 </section>
               ) : (
                 <>
-                  <WebSectionCard
-                    title={phaseOneBlueprint.quickActionsTitle}
-                    description={phaseOneBlueprint.quickActionsDescription}
-                  >
-                    <div className={styles.actionGrid}>
-                      {phaseOneBlueprint.quickActions.map((action) => (
-                        <WebControlActionCard
-                          key={action.id}
-                          id={action.id}
-                          title={action.label}
-                          description={action.description}
-                          footerLabel={action.footerLabel}
-                          href={action.href}
-                          badge={action.badge}
-                          tone={action.tone}
-                          onAction={resolveActionHandler(action.href, action.onAction)}
-                        />
-                      ))}
-                    </div>
-                  </WebSectionCard>
+                  {phaseOneBlueprint.quickActions.length > 0 ? (
+                    <WebSectionCard
+                      title={phaseOneBlueprint.quickActionsTitle}
+                      description={phaseOneBlueprint.quickActionsDescription}
+                    >
+                      <div className={styles.actionGrid}>
+                        {phaseOneBlueprint.quickActions.map((action) => (
+                          <WebControlActionCard
+                            key={action.id}
+                            id={action.id}
+                            title={action.label}
+                            description={action.description}
+                            footerLabel={action.footerLabel}
+                            href={action.href}
+                            badge={action.badge}
+                            tone={action.tone}
+                            onAction={resolveActionHandler(action.href, action.onAction)}
+                          />
+                        ))}
+                      </div>
+                    </WebSectionCard>
+                  ) : null}
 
-                  <WebSectionCard
-                    title={phaseOneBlueprint.disclosureTitle}
-                    description={phaseOneBlueprint.disclosureDescription}
-                  >
-                    <div className={styles.disclosureBody}>
-                      {phaseOneBlueprint.disclosureItems.map((item) => (
-                        <WebControlDisclosureItem
-                          key={item.id}
-                          id={item.id}
-                          label={item.label}
-                          description={item.description}
-                          href={item.href}
-                          badge={item.badge}
-                          onAction={resolveActionHandler(item.href, item.onAction)}
-                        />
-                      ))}
-                    </div>
-                  </WebSectionCard>
+                  {phaseOneBlueprint.disclosureItems.length > 0 ? (
+                    <WebSectionCard
+                      title={phaseOneBlueprint.disclosureTitle}
+                      description={phaseOneBlueprint.disclosureDescription}
+                    >
+                      <div className={styles.disclosureBody}>
+                        {phaseOneBlueprint.disclosureItems.map((item) => (
+                          <WebControlDisclosureItem
+                            key={item.id}
+                            id={item.id}
+                            label={item.label}
+                            description={item.description}
+                            href={item.href}
+                            badge={item.badge}
+                            onAction={resolveActionHandler(item.href, item.onAction)}
+                          />
+                        ))}
+                      </div>
+                    </WebSectionCard>
+                  ) : null}
                 </>
               )}
           </>
+        ) : null}
+
+        {activeSectionId === 'finance' ? (
+          <WebSectionCard
+            title="عرض WLT المالي التجريبي"
+            description="هذا عرض تجريبي — لا توجد عمليات مالية حقيقية. العقد: CONTRACT_TBD."
+          >
+            <WltDshFinanceControlPanelContent />
+          </WebSectionCard>
         ) : null}
 
         {isOperationsSection ? (

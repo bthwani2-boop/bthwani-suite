@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, KeyValueList, MobileScrollView, SectionHeader, StateView, Surface, Text } from '@bthwani/ui-kit';
-import { getDshCaptainFinancePreview } from '../shared/dshFinancePreviewModel';
+import { getWltCaptainFinancePreview } from '../../../wlt/frontend/shared/finance/dshFinancePreview';
 import type { DshCaptainFinanceScreenState, DshCaptainFinanceSnapshot } from './dshCaptainFinanceModel';
 
 export type DshCaptainFinanceScreenProps = {
@@ -11,7 +11,7 @@ export type DshCaptainFinanceScreenProps = {
   onRetry?: () => void;
 };
 
-const captainPreview = getDshCaptainFinancePreview();
+const captainPreview = getWltCaptainFinancePreview();
 
 const demoSnapshot: DshCaptainFinanceSnapshot = {
   codBalanceLabel: captainPreview.codBalanceLabel,

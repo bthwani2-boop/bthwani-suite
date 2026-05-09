@@ -24,7 +24,7 @@ import {
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from './DshCartDetails';
 import { getDshClientStateMeta, type DshClientState } from './dshClientStateModel';
-import { resolveDshFinanceEventKindForPayment, type DshFinanceEventKind } from '../shared/dshFinancePreviewModel';
+import { resolveWltDshFinanceEventKindForPaymentMethod, type WltDshFinanceEventKind } from '../../../wlt/frontend/shared/finance/dshFinancePreview';
 import useWlt from '../../../wlt/frontend/app-client/dsh/hooks/useWlt';
 
 const PAGE_BG = colorPalette.pageBackground;
@@ -90,7 +90,7 @@ type CheckoutActionPayload = {
   amountDueOnDeliveryHalalas: number;
   orderTotalHalalas: number;
   summary: string;
-  financeEventKind: DshFinanceEventKind;
+  financeEventKind: WltDshFinanceEventKind;
 };
 
 export type DshCartUnifiedScreenProps = {
@@ -948,7 +948,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
           orderTotalHalalas: grandTotalHalalas,
           summary: paymentSelection.summary,
-          financeEventKind: resolveDshFinanceEventKindForPayment(paymentSelection.method),
+          financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
         }));
         return;
       } finally {
@@ -962,7 +962,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
       orderTotalHalalas: grandTotalHalalas,
       summary: paymentSelection.summary,
-      financeEventKind: resolveDshFinanceEventKindForPayment(paymentSelection.method),
+      financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
     }));
   };
 
@@ -983,7 +983,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
       orderTotalHalalas: grandTotalHalalas,
       summary: paymentSelection.summary,
-      financeEventKind: resolveDshFinanceEventKindForPayment(paymentSelection.method),
+      financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
     };
 
     if (props.onOpenOrder) {

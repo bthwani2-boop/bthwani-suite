@@ -32,7 +32,11 @@ wlt/wlt.openapi.yaml
 | OpenAPI Contract | `wlt/wlt.openapi.yaml` |
 | Public Export Path | `wlt/index.ts` |
 | Current Decision | `NOT CLOSED` |
-| Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
+| Current Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
+| Phase F1 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
+| Phase F2 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
+| Phase F3 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
+| Phase F4 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
 ### Blueprint Metadata
@@ -106,7 +110,7 @@ closure_decision: NOT CLOSED
 | `app-partner` | Partner: أرباح، دفعات، تسويات، دفتر، محفظة حسب الصلاحيات. | runtime / shell / composition only | TBD | N/A |
 | `app-captain` | Captain: أرباح، رصيد، استلام دفعات، تسويات، سداد/محفظة حسب الصلاحيات. | runtime / shell / composition only | TBD | N/A |
 | `app-field` | Field Agent: رصيد، دفعات، سداد، محفظة أو مستحقات حسب الصلاحيات. | runtime / shell / composition only | TBD | N/A |
-| `control-panel` | Finance/Admin: إدارة ومراقبة مالية فقط، لا قناة مالية مستقلة. | runtime / shell / composition only | TBD | N/A |
+| `control-panel` | Finance/Admin: إدارة ومراقبة مالية فقط، لا قناة مالية مستقلة. | WLT finance preview bound to /finance route (F4) — preview/fixture only | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` | N/A |
 
 ### Owned Capabilities
 
@@ -143,7 +147,7 @@ closure_decision: NOT CLOSED
 | `app-partner` | app owns shell/composition only | Partner: أرباح، دفعات، تسويات، دفتر، محفظة حسب الصلاحيات. | TBD | N/A |
 | `app-captain` | app owns shell/composition only | Captain: أرباح، رصيد، استلام دفعات، تسويات، سداد/محفظة حسب الصلاحيات. | TBD | N/A |
 | `app-field` | app owns shell/composition only | Field Agent: رصيد، دفعات، سداد، محفظة أو مستحقات حسب الصلاحيات. | TBD | N/A |
-| `control-panel` | app owns shell/composition only | Finance/Admin: إدارة ومراقبة مالية فقط، لا قناة مالية مستقلة. | TBD | N/A |
+| `control-panel` | app owns shell/composition only | Finance/Admin: إدارة ومراقبة مالية فقط، لا قناة مالية مستقلة. | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` | N/A |
 
 ### App/Shell Rule
 
@@ -382,6 +386,10 @@ No fixture, mock, or seed may be promoted to runtime truth without evidence.
 | Evidence ID | Scope | Result | Path | Notes |
 |---|---|---|---|---|
 | TBD | TBD | TBD | `tools/registry/runs/{SESSION_ID}` | Add only verified evidence. |
+| WLT-EVD-F2-CP | Client payment preview binding (F2) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/app-client/dsh/WltDshClientPaymentPreview.tsx` | preview/fixture only |
+| WLT-EVD-F3-CAPTAIN | Captain finance preview (F3) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/app-captain/dsh/WltDshCaptainFinancePreview.tsx` | preview/fixture only |
+| WLT-EVD-F3-FIELD | Field finance preview (F3) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/app-field/dsh/WltDshFieldFinancePreview.tsx` | preview/fixture only |
+| WLT-EVD-F4-CP | Control-panel finance preview enhanced + bound to /finance (F4) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview.tsx` | preview/fixture only; WltDshFinanceControlPanelContent bound in ControlPanelSurfaceHost |
 
 ### Current Decision
 
@@ -395,6 +403,59 @@ NOT CLOSED
 - API contract may be scaffold/TBD.
 - Binding, Integration, Runtime, Backend, Security, Observability, Testing, Performance, Accessibility, and Production Readiness remain `TBD` unless evidence says otherwise.
 - No financial behavior may bypass WLT.
+
+### Phase F1 Evidence Record (2026-05-09)
+
+| Item | File | Status |
+| --- | --- | --- |
+| WLT-owned DSH finance preview model created | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| Deep cross-package import removed from PartnerDshWalletWorkspace | `wlt/frontend/app-partner/dsh/PartnerDshWalletWorkspace.tsx` | `BOUNDARY_FIXED` |
+| Arabic label for selected state | `wlt/frontend/app-client/dsh/DshWltPaymentOptionsRow.tsx` | `FIXED` |
+| Control-panel finance preview component added | `wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| TSC result | pnpm -w exec tsc --noEmit | `PASS` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+| All amounts | integer halalas, no float | `ENFORCED` |
+
+Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
+
+### Phase F2 Evidence Record (2026-05-09)
+
+| Item | File | Status |
+| --- | --- | --- |
+| WLT payment options preview component created | `wlt/frontend/app-client/dsh/WltDshClientPaymentPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| WLT model extended: WltDshPaymentMethod, WltDshPaymentPreviewState, payment option helpers | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| DSH checkout uses WLT-owned finance event kind resolver | `dsh/frontend/app-client/DshCartUnifiedScreen.tsx` | `BOUNDARY_FIXED` |
+| TSC result | `pnpm -w exec tsc --noEmit` | `PASS` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+
+Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
+
+### Phase F3 Evidence Record (2026-05-09)
+
+| Item | File | Status |
+| --- | --- | --- |
+| WLT captain finance preview component created | `wlt/frontend/app-captain/dsh/WltDshCaptainFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| WLT field finance preview component created | `wlt/frontend/app-field/dsh/WltDshFieldFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| WLT model extended: WltCaptainFinanceSnapshot, WltPartnerFinanceSnapshot, WltFieldFinanceSnapshot | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| DSH captain finance screen uses WLT-owned preview | `dsh/frontend/app-captain/DshCaptainFinanceScreen.tsx` | `BOUNDARY_FIXED` |
+| DSH field finance screen uses WLT-owned preview | `dsh/frontend/app-field/DshFieldFinanceScreen.tsx` | `BOUNDARY_FIXED` |
+| TSC result | `pnpm -w exec tsc --noEmit` | `PASS` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+
+Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
+
+### Phase F4 Evidence Record (2026-05-09)
+
+| Item | File | Status |
+| --- | --- | --- |
+| Control-panel finance preview enhanced: client wallet/COD breakdown, captain COD/earnings, field commission/payout | `wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| WltDshFinanceControlPanelContent exported and bound to /finance route | `control-panel/shell/ControlPanelSurfaceHost.tsx` | `UI_PREVIEW_FOUNDATION` |
+| Finance route confirmed: /finance → section="finance" → WltDshFinanceControlPanelContent | `control-panel/runtime/app/finance/page.tsx` | `ROUTE_CONFIRMED_PREVIEW_ONLY` |
+| TSC result | `pnpm -w exec tsc --noEmit` | `PASS` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+| Real finance blocked until | contract / backend / security / audit / idempotency / ledger | `BLOCKED` |
+
+Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
 
 ### Single Next Action
 

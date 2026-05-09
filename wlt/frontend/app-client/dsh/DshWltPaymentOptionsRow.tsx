@@ -19,7 +19,7 @@ type DshWltPaymentOptionProps = {
 };
 
 export function DshWltPaymentOption({ title, subtitle, selected, meta, onPress }: DshWltPaymentOptionProps) {
-  return <ListItem title={title} subtitle={subtitle} meta={selected ? 'Selected' : meta} onPress={onPress} />;
+  return <ListItem title={title} subtitle={subtitle} meta={selected ? 'محدد' : meta} onPress={onPress} />;
 }
 
 export function PaymentOptionItem({ opt, selected, onPress }: { opt: Opt; selected: boolean; onPress?: () => void }) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Icon, ListItem, MobileScrollView, StateView, Surface, Text, TopBar } from '@bthwani/ui-kit';
-import { getDshFieldFinancePreview } from '../shared/dshFinancePreviewModel';
+import { getWltFieldFinancePreview } from '../../../wlt/frontend/shared/finance/dshFinancePreview';
 import { resolveFieldStoreStatus, type FieldStoreFile } from './dshFieldStoresModel';
 
 type DshFieldFinanceScreenProps = {
@@ -27,7 +27,7 @@ export function DshFieldFinanceScreen({ state = 'ready', stores, onBack, onRetry
     );
   }
   const eligibleStores = stores.filter((store) => resolveFieldStoreStatus(store) === 'offer-approved');
-  const preview = getDshFieldFinancePreview(eligibleStores.map(s => s.id));
+  const preview = getWltFieldFinancePreview(eligibleStores.map(s => s.id));
 
   return (
     <Box style={{ flex: 1 }} background="background">
@@ -44,7 +44,7 @@ export function DshFieldFinanceScreen({ state = 'ready', stores, onBack, onRetry
           <Text role="titleMd" style={{ textAlign: 'right' }}>إجمالي المستحقات المالية</Text>
           <Text role="titleLg" style={{ textAlign: 'right' }}>{preview.totalCommissionLabel}</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>تُعرض فقط الملفات المكتملة للميدان والتي أصبح الشريك فيها معتمدًا.</Text>
-          <KeyValueList 
+          <KeyValueList
             dense
             items={[
               { label: 'عدد الملفات المؤهلة', value: String(preview.eligibleFilesCount) },

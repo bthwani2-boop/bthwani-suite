@@ -73,6 +73,7 @@ closure_decision: ROOT_TRUTH_PARITY_IN_PROGRESS
 - `@bthwani/ui-kit` primitives, tokens, themes, direction, shared states, or reusable design authority.
 - Other services' internal files, private routes, domain logic, data models, or contracts.
 - Financial effects outside WLT.
+- Financial data models or preview finance fixtures (these are owned by `wlt/frontend/shared/finance/`).
 
 ### Allowed Dependencies
 
@@ -166,7 +167,7 @@ Apps must not own real `dsh` service screens, business/domain logic, reusable UI
 | `DSH-OP-09` | Tracking | UI flow present in root frontend; proof pending | Customer | app-client | NEEDS_UI_FLOW | N/A |
 | `DSH-OP-10` | Support | UI flow present in root frontend; proof pending | Customer/admin | app-client / control-panel | NEEDS_UI_FLOW | N/A |
 | `DSH-OP-11` | Rating | UI flow present in root frontend; proof pending | Customer | app-client | NEEDS_UI_FLOW | N/A |
-| `DSH-OP-12` | WLT financial relation | Contract only; root truth not proven here | Financial boundary | wlt | CONTRACT_TBD | N/A |
+| `DSH-OP-12` | WLT financial relation | DSH checkout and finance screens consume WLT-owned preview model; finance event kinds resolved via WLT resolver. No real API. No real payment. | Financial boundary | wlt | `CONTRACT_TBD / UI_PREVIEW_BOUND` | N/A |
 | `DSH-OP-13` | Control-panel operations | Control-panel command-center UI present; visual/runtime proof pending | Admin/Ops | control-panel | UI_FLOW_PRESENT_NEEDS_VISUAL_RUNTIME_EVIDENCE | N/A |
 
 ### Operation Rules
@@ -384,6 +385,7 @@ No fixture, mock, or seed may be promoted to runtime truth without evidence.
 |---|---|---|---|---|
 | NEEDS_EVIDENCE | Root frontend parity | Pending | `tools/registry/runs/{SESSION_ID}` | Add only verified evidence. |
 | DSH_AUDIT_010 | Deep Local System Audit | FIX_REQUIRED | `tools/registry/runs/DSH_AUDIT_010_DEEP_SYSTEM_DIAGNOSIS-20260506-053242` | Matrix drift cleanup and evidence generation |
+| DSH-EVD-F2-F3-WLT-BIND | DSH screens bound to WLT finance model (F2–F3, 2026-05-09) | `UI_PREVIEW_FOUNDATION` | `dsh/frontend/app-client/DshCartUnifiedScreen.tsx`, `dsh/frontend/app-captain/DshCaptainFinanceScreen.tsx`, `dsh/frontend/app-field/DshFieldFinanceScreen.tsx` | preview/fixture only — DSH consumes WLT model, no financial data ownership in DSH |
 
 ### Current Decision
 
