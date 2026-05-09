@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, useWindowDimensions, type ImageSourcePropType } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
 
 import {
   Box,
@@ -50,6 +50,11 @@ function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string
 
 function resolveDshHomeBannerImageSource(imageUrl?: string): ImageSourcePropType | undefined {
   return resolveDshImageSource(imageUrl);
+}
+
+function parseDistanceLabel(distanceLabel?: string): number | null {
+  const value = Number.parseFloat((distanceLabel ?? '').replace(/[^\d.]/g, ''));
+  return Number.isFinite(value) ? value : null;
 }
 
 type CategoryDialItem = OrbitCarouselItem;
@@ -146,6 +151,8 @@ export type DshHomeGetPromo = {
   autoplayEnabled?: boolean;
   autoplayIntervalMs?: number;
   pauseOnInteraction?: boolean;
+  publishStage?: string;
+  mediaPolicy?: string;
 };
 
 export type DshHomeGetStore = {
@@ -166,9 +173,12 @@ export type DshHomeGetStore = {
   multiplierLabel: string;
   subscriptionPackageChips?: string[];
   offerLabel?: string;
+  hasBthwaniPro?: boolean;
   isFavorite: boolean;
   isFollowing: boolean;
   hasOffer?: boolean;
+  hasCouponAvailable?: boolean;
+  hasNewProducts?: boolean;
   publishStage?: string;
   mediaPolicy?: string;
   commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
@@ -606,7 +616,7 @@ export function DshHomeGetScreen({
   }, [onOpenEntry, onOpenMySpace]);
 
   const resolvedCategories = categories ?? [];
-  const resolvedPromos = (promos ?? []).filter(p => canRenderInClientSurface((p as any).publishStage, 'promo', { mediaPolicy: (p as any).mediaPolicy }));
+  const resolvedPromos = (promos ?? []).filter((promo) => canRenderInClientSurface(promo.publishStage, 'promo', { mediaPolicy: promo.mediaPolicy }));
   const resolvedHomePromos = (homePromos ?? getPublishedHomePromos()).filter(p => canRenderInClientSurface(p.status === 'published' ? 'published-preview' : 'draft', 'promo'));
 
   const containerWidth = viewportWidth;
@@ -651,11 +661,12 @@ export function DshHomeGetScreen({
       }
 
       if (activeFilter === 'nearest') {
-        return store.distanceLabel === '1.8 كم' || store.distanceLabel === '2.1 كم';
+        const distanceKm = parseDistanceLabel(store.distanceLabel);
+        return distanceKm !== null && distanceKm <= 2.5;
       }
 
       if (activeFilter === 'new') {
-        return Boolean(store.hasOffer);
+        return Boolean(store.hasNewProducts);
       }
 
       if (activeFilter === 'offers') {
@@ -1667,7 +1678,7 @@ export function DshHomeGetScreen({
                     id: store.id,
                     name: store.name,
                     subtitle: store.address,
-                    image: resolveDshHomeStoreImageSource(store.mediaKey),
+                    image: resolveDshHomeStoreImageSource(store.imageUri ?? store.mediaKey, store.publishStage, store.mediaPolicy),
                     rating: store.rating ?? null,
                     distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
                     isOpen: store.statusTone === 'open',

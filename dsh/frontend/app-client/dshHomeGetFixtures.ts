@@ -20,6 +20,8 @@ export type DshHomeGetFixturePromo = {
   actionExtra?: string;
   imageUrl?: string;
   accentColor?: string;
+  publishStage?: string;
+  mediaPolicy?: string;
 };
 
 export type DshHomeGetFixtureStore = {
@@ -47,6 +49,10 @@ export type DshHomeGetFixtureStore = {
   hasCouponAvailable?: boolean;
   hasNewProducts?: boolean;
   publishStage?: string;
+  mediaPolicy?: string;
+  sourceRecordId?: string;
+  canonicalStoreId?: string;
+  commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
 };
 
 function formatDistanceLabel(distanceKm: number) {
@@ -77,6 +83,11 @@ function toDshHomeGetFixtureStore(store: DshDiscoveryStore): DshHomeGetFixtureSt
     subscriptionPackageChips: store.subscriptionPackageChips,
     hasCouponAvailable: store.hasCouponAvailable,
     hasNewProducts: store.hasNewProducts,
+    publishStage: store.publishStage,
+    mediaPolicy: store.mediaPolicy,
+    sourceRecordId: store.sourceRecordId,
+    canonicalStoreId: store.canonicalStoreId,
+    commercialSourceMap: store.commercialSourceMap,
   };
 }
 
@@ -173,6 +184,11 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
     actionTarget: 'subscription-family-get',
   },
 ];
+
+export const dshHomeGetNormalizedFixturePromos: DshHomeGetFixturePromo[] = dshHomeGetFixturePromos.map((promo) => ({
+  ...promo,
+  publishStage: promo.publishStage ?? 'published-preview',
+}));
 
 export const dshHomeGetFixtureProducts: DshHomeGetFixtureProduct[] = [
   {

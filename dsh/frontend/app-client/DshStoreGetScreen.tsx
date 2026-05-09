@@ -237,7 +237,7 @@ function resolveStoreOperationalState(statusLabel: string, deliveryLabel?: strin
 }
 
 function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType | undefined {
-  if (!canRenderInClientSurface(item.publishStage, 'product-media', { mediaPolicy: (item as any).mediaPolicy })) {
+  if (!canRenderInClientSurface(item.publishStage, 'product-media', { mediaPolicy: item.mediaPolicy })) {
     return undefined;
   }
   return resolveDshImageSource(item.imageUri);
@@ -495,7 +495,7 @@ export function DshStoreGetScreen({
   ) : null;
 
   const clientVisibleItems = React.useMemo(
-    () => fallbackMenuItems.filter((item) => item.isAvailable !== false && canRenderInClientSurface(item.publishStage, 'product', { mediaPolicy: (item as any).mediaPolicy })),
+    () => fallbackMenuItems.filter((item) => item.isAvailable !== false && canRenderInClientSurface(item.publishStage, 'product', { mediaPolicy: item.mediaPolicy })),
     [fallbackMenuItems],
   );
 
@@ -1209,7 +1209,7 @@ export function DshStoreGetScreen({
         <SearchTopBar
           value={headerSearchQuery}
           onChangeText={setHeaderSearchQuery}
-          onClose={closeHeaderSearch}
+          onClose={closeInlineSearch}
           variant="main"
           autoFocus
           placeholder="ابحث في المتجر..."
@@ -1239,7 +1239,7 @@ export function DshStoreGetScreen({
               id: 'search',
               icon: <Icon name="search-outline" size={20} color={colorPalette.white} />,
               accessibilityLabel: 'بحث',
-              onPress: openHeaderSearch,
+              onPress: openInlineSearch,
             },
           ]}
         />

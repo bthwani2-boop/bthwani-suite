@@ -16,9 +16,11 @@ import { DshFavoritesListScreen } from './DshFavoritesListScreen';
 import { DshCartGetScreen } from './DshCartUnifiedScreen';
 import { type ClientOperationScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './DshClientOperationScreens';
 import type { DshHomeApprovedVideoReelsViewerProps } from './DshHomeApprovedVideoReelsViewer';
+import type { DshDiscoveryStore } from './types';
 import {
-  dshHomeGetFixturePromos,
+  dshHomeGetNormalizedFixturePromos,
   dshHomeGetFixtureStores,
+  type DshHomeGetFixtureStore,
 } from './dshHomeGetFixtures';
 import {
   buildStoreCategories,
@@ -207,6 +209,59 @@ function getStoreCanonicalMetadata(storeId: string): HostCanonicalMetadata {
     sourceRecordId: store?.sourceRecordId,
     publishStage: store?.publishStage,
   };
+}
+
+function parseHostDistanceLabel(distanceLabel?: string): number {
+  const distanceValue = Number.parseFloat((distanceLabel ?? '').replace(/[^\d.]/g, ''));
+  return Number.isFinite(distanceValue) ? distanceValue : 0;
+}
+
+function coerceHomeFixtureStoreToDiscoveryStore(store: DshHomeGetFixtureStore): DshDiscoveryStore {
+  return {
+    id: store.id,
+    name: store.name,
+    subtitle: store.address,
+    statusLabel: store.statusLabel,
+    meta: `${store.distanceLabel} · ${store.deliveryLabel}`,
+    etaMinutes: 0,
+    distanceKm: parseHostDistanceLabel(store.distanceLabel),
+    rating: store.rating ?? 0,
+    isOffer: Boolean(store.hasOffer || store.offerLabel),
+    isFavorite: store.isFavorite,
+    isFollowing: store.isFollowing,
+    mediaKey: store.mediaKey,
+    imageUri: store.imageUri ?? store.mediaKey ?? '',
+    deliveryLabel: store.deliveryLabel,
+    serviceLabel: store.serviceLabel,
+    followerCount: store.followerCount,
+    multiplierLabel: store.multiplierLabel,
+    subscriptionPackageChips: store.subscriptionPackageChips ?? [],
+    offerLabel: store.offerLabel,
+    hasBthwaniPro: Boolean(store.hasBthwaniPro),
+    hasNewProducts: Boolean(store.hasNewProducts),
+    hasCouponAvailable: Boolean(store.hasCouponAvailable),
+    supportsPickup: false,
+    supportsPartnerDelivery: true,
+    commercialSourceMap: store.commercialSourceMap,
+    sourceRecordId: store.sourceRecordId,
+    canonicalStoreId: store.canonicalStoreId,
+    publishStage: store.publishStage,
+    mediaPolicy: store.mediaPolicy,
+  };
+}
+
+function resolveHostStore(storeId: string): DshDiscoveryStore {
+  const discoveryStore = dshDiscoveryStores.find((store) => store.id === storeId);
+  if (discoveryStore) {
+    return discoveryStore;
+  }
+
+  const homeFixtureStore = dshHomeGetFixtureStores.find((store) => store.id === storeId);
+  if (homeFixtureStore) {
+    return coerceHomeFixtureStoreToDiscoveryStore(homeFixtureStore);
+  }
+
+  return dshDiscoveryStores[0];
 }
 
 function getProductCanonicalMetadata(storeId: string, productId: string): HostCanonicalMetadata {
@@ -490,12 +545,17 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
     openTrackedOrder();
   }, [openTrackedOrder]);
 
-  const activeStore = React.useMemo(
-    () => dshDiscoveryStores.find((store) => store.id === activeStoreId) ?? dshDiscoveryStores[0],
-    [activeStoreId],
-  );
+  const activeStore = React.useMemo(() => resolveHostStore(activeStoreId), [activeStoreId]);
 
   const activeStoreItems = React.useMemo(() => storeItemsByStoreId[activeStore.id] ?? [], [activeStore.id]);
+  const activeStoreItemsWithVisibility = React.useMemo(
+    () => activeStoreItems.map((item) => ({
+      ...item,
+      publishStage: item.publishStage ?? activeStore.publishStage,
+      mediaPolicy: item.mediaPolicy ?? activeStore.mediaPolicy,
+    })),
+    [activeStore, activeStoreItems],
+  );
 
   const activeStoreCategories = React.useMemo(() => buildStoreCategories(activeStoreItems), [activeStoreItems]);
 
@@ -566,6 +626,10 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   const subscriptionMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'subscription');
   const promoMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'promotion');
   const campaignMarketingProgram = liveMarketingPrograms.find((item) => item.family === 'campaign');
+  const homeBannerPromos = React.useMemo(() => {
+    const marketingPromos = getPublishedMarketingHomePromos('all');
+    return marketingPromos.length > 0 ? marketingPromos : dshHomeGetNormalizedFixturePromos;
+  }, []);
 
   // Sanity check: if any imported screen component is undefined, show a clear error
   const importedScreens: Array<[string, unknown]> = [
@@ -664,11 +728,17 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
           serviceLabel: activeStore.serviceLabel,
           subscriptionPackageChips: activeStore.subscriptionPackageChips,
           hasBthwaniPro: activeStore.hasBthwaniPro,
+          offerLabel: activeStore.offerLabel,
+          hasCouponAvailable: activeStore.hasCouponAvailable,
+          hasNewProducts: activeStore.hasNewProducts,
+          publishStage: activeStore.publishStage,
+          mediaPolicy: activeStore.mediaPolicy,
+          commercialSourceMap: activeStore.commercialSourceMap,
           tags: activeStoreTags,
           categories: activeStoreCategories,
           deliveryModes: activeStoreDeliveryModes,
         }}
-        menuItems={activeStoreItems}
+        menuItems={activeStoreItemsWithVisibility}
         onAddItemToCart={addItemToHostCart}
         onOpenItems={() => {
           setStoreItemsEntryOrigin('store-get');
@@ -923,7 +993,7 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   return (
     <DshHomeGetScreen
       categories={dshCategoryListFixtures}
-      promos={getPublishedMarketingHomePromos('all') as DshHomeGetPromo[]}
+      promos={homeBannerPromos}
       homePromos={getPublishedHomePromos()}
       approvedVideoShorts={liveMarketingShorts}
       stores={dshHomeGetFixtureStores as DshHomeGetStore[]}

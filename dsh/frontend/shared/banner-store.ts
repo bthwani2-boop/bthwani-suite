@@ -33,6 +33,8 @@ type DshHomeGetPromo = {
   readonly autoplayEnabled?: boolean;
   readonly autoplayIntervalMs?: number;
   readonly pauseOnInteraction?: boolean;
+  readonly publishStage?: string;
+  readonly mediaPolicy?: string;
 };
 
 export type MarketingBannerActionType =
@@ -459,6 +461,7 @@ export function mapMarketingBannerToPromo(item: MarketingBannerRecord): DshHomeG
     autoplayEnabled: item.autoplayEnabled,
     autoplayIntervalMs: item.autoplayIntervalMs,
     pauseOnInteraction: item.pauseOnInteraction,
+    publishStage: item.status === 'published' ? 'published-preview' : 'draft',
   };
 }
 

@@ -25,6 +25,7 @@ export type DshDiscoveryStore = {
   hasCouponAvailable: boolean;
   supportsPickup: boolean;
   supportsPartnerDelivery: boolean;
+  commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
   sourceRecordId?: string;
   canonicalStoreId?: string;
   canonicalProductId?: string;
@@ -73,4 +74,3 @@ export type DshStoreFixtureItem = {
 };
 
 export type StoreItemsByStoreId = Record<string, DshStoreFixtureItem[]>;
-
