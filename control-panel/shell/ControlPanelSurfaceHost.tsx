@@ -619,7 +619,7 @@ export function ControlPanelSurfaceHost({
           title={panelText.brandLabel}
           subtitle={shellCopy.title}
           actions={
-            <Box layoutDirection="row" gap={2}>
+            <Box layoutDirection="row" gap={2} style={{ flexDirection: 'row' }}>
               {controlPanelRuntimeData.services.map((service) => (
                 <Button
                   key={service.id}
@@ -638,7 +638,7 @@ export function ControlPanelSurfaceHost({
             </Box>
           }
           trailing={
-            <Box layoutDirection="row" gap={3} align="center">
+            <Box layoutDirection="row" gap={3} align="center" style={{ flexDirection: 'row' }}>
               <WebControlActionButton id="search" label="🔍" onAction={handleSearchClick} />
               <WebControlActionButton id="refresh" label="↻" onAction={handleRefreshClick} />
               <WebControlActionButton id="alerts" label={`🔔 ${alertCount}`} onAction={handleAlertClick} tone={alertCount > 0 ? 'primary' : 'secondary'} />
@@ -663,11 +663,11 @@ export function ControlPanelSurfaceHost({
                   }
                 }}
                 style={{
+                  flexDirection: 'row',
                   justifyContent: 'flex-start',
                   backgroundColor: item.active ? 'rgba(255, 80, 13, 0.15)' : 'transparent',
                   color: '#FFFFFF',
-                  border: 'none',
-                  textAlign: direction === 'rtl' ? 'right' : 'left'
+                  border: 'none'
                 }}
               />
             ))}
@@ -676,7 +676,7 @@ export function ControlPanelSurfaceHost({
       }
     >
       <WebControlPanelStage>
-        <div className={styles.stageStack} dir={direction}>
+        <div className={styles.stageStack}>
           {phaseOneBlueprint ? (
             <>
               <WebControlPanelSectionHeader
@@ -735,7 +735,7 @@ export function ControlPanelSurfaceHost({
                   {phaseOneBlueprint.quickActions.length > 0 ? (
                     <Box gap={4}>
                       <WebControlPanelSectionHeader title={phaseOneBlueprint.quickActionsTitle} />
-                      <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
+                      <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
                         {phaseOneBlueprint.quickActions.map((action) => (
                           <WebControlPanelCommandCard
                             key={action.id}

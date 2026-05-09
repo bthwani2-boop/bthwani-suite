@@ -16,28 +16,35 @@ export type WebControlPanelShellProps = {
 
 export function WebControlPanelShell({ children, rail, topBar }: WebControlPanelShellProps) {
   const { direction } = useDirection();
-  
+
   return (
-    <Box 
-      style={{ 
-        width: '100%', 
-        height: '100vh', 
+    <Box
+      // @ts-ignore
+      dir={direction}
+      style={{
+        width: '100%',
+        height: '100vh',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#F8FAFC' 
+        backgroundColor: '#F8FAFC'
       }}
     >
       {topBar}
-      <Box 
-        layoutDirection="row" 
-        style={{ flex: 1, overflow: 'hidden' }}
+      <Box
+        layoutDirection="row"
+        style={{
+          flex: 1,
+          overflow: 'hidden',
+          // Override automatic Box row-reverse to avoid double flip when dir={direction} is present
+          flexDirection: 'row'
+        }}
       >
         {rail}
-        <Box 
-          style={{ 
-            flex: 1, 
-            overflowY: 'auto', 
+        <Box
+          style={{
+            flex: 1,
+            overflowY: 'auto',
             position: 'relative'
           }}
           padding={0}
@@ -65,17 +72,19 @@ export function WebControlPanelTopBar({ title, subtitle, leading, trailing, acti
   const isRtl = direction === 'rtl';
 
   return (
-    <Surface 
-      tone="default" 
-      padding={3} 
+    <Surface
+      tone="default"
+      padding={3}
       radiusToken="none"
       border={false}
-      style={{ 
+      // @ts-ignore
+      dir={direction}
+      style={{
         borderBottom: '1px solid rgba(10, 47, 92, 0.08)',
         zIndex: 10,
         height: 56,
         display: 'flex',
-        flexDirection: isRtl ? 'row-reverse' : 'row',
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between'
       }}
@@ -87,7 +96,7 @@ export function WebControlPanelTopBar({ title, subtitle, leading, trailing, acti
           {subtitle && <Text role="caption" tone="muted">{subtitle}</Text>}
         </Box>
       </Box>
-      
+
       <Box layoutDirection="row" align="center" gap={4}>
         {actions}
         {trailing && (
@@ -112,13 +121,16 @@ export type WebControlPanelRailProps = {
 };
 
 export function WebControlPanelRail({ children, collapsed, footer }: WebControlPanelRailProps) {
+  const { direction } = useDirection();
   const { theme } = useTheme();
-  
+
   return (
-    <Box 
-      style={{ 
-        width: collapsed ? 64 : 260, 
-        backgroundColor: '#0A2F5C', 
+    <Box
+      // @ts-ignore
+      dir={direction}
+      style={{
+        width: collapsed ? 64 : 260,
+        backgroundColor: '#0A2F5C',
         height: '100%',
         transition: 'width 0.2s ease',
         display: 'flex',
@@ -148,11 +160,11 @@ export type WebControlPanelStageProps = {
 
 export function WebControlPanelStage({ children, maxWidth = '100%' }: WebControlPanelStageProps) {
   return (
-    <Box 
-      padding={6} 
+    <Box
+      padding={6}
       gap={6}
-      style={{ 
-        width: '100%', 
+      style={{
+        width: '100%',
         maxWidth: maxWidth,
         margin: '0 auto',
         minHeight: '100%'
@@ -177,17 +189,19 @@ export function WebControlPanelSectionHeader({ title, description, actions }: We
   const isRtl = direction === 'rtl';
 
   return (
-    <Box 
-      layoutDirection="row" 
-      justify="space-between" 
+    <Box
+      layoutDirection="row"
+      justify="space-between"
       align="flex-end"
-      style={{ width: '100%', marginBottom: 12 }}
+      // @ts-ignore
+      dir={direction}
+      style={{ width: '100%', marginBottom: 12, flexDirection: 'row' }}
     >
-      <Box gap={1} style={{ textAlign: isRtl ? 'right' : 'left' }}>
+      <Box gap={1}>
         <Text role="headingSm" weight="black" tone="default">{title}</Text>
         {description && <Text role="bodySm" tone="muted">{description}</Text>}
       </Box>
-      {actions && <Box layoutDirection="row" gap={2}>{actions}</Box>}
+      {actions && <Box layoutDirection="row" gap={2} style={{ flexDirection: 'row' }}>{actions}</Box>}
     </Box>
   );
 }
@@ -201,14 +215,15 @@ export type WebControlPanelSignalStripProps = {
 
 export function WebControlPanelSignalStrip({ children }: WebControlPanelSignalStripProps) {
   return (
-    <Box 
-      layoutDirection="row" 
-      gap={3} 
-      style={{ 
-        width: '100%', 
-        flexWrap: 'nowrap', 
+    <Box
+      layoutDirection="row"
+      gap={3}
+      style={{
+        width: '100%',
+        flexWrap: 'nowrap',
         overflowX: 'auto',
-        paddingBottom: 8
+        paddingBottom: 8,
+        flexDirection: 'row'
       }}
     >
       {children}
@@ -228,13 +243,15 @@ export type WebControlPanelKpiTileProps = {
 
 export function WebControlPanelKpiTile({ label, value, trend, icon }: WebControlPanelKpiTileProps) {
   const { theme } = useTheme();
-  
+
   return (
-    <Surface 
-      padding={3} 
+    <Surface
+      padding={3}
       radiusToken="lg"
-      style={{ 
-        minWidth: 180, 
+      // @ts-ignore
+      dir={useDirection().direction}
+      style={{
+        minWidth: 180,
         flex: 1,
         border: '1px solid rgba(10, 47, 92, 0.05)',
         background: '#FFFFFF'
@@ -246,9 +263,9 @@ export function WebControlPanelKpiTile({ label, value, trend, icon }: WebControl
           <Text role="headingSm" weight="black">{value}</Text>
         </Box>
         {icon && (
-          <Box 
-            padding={2} 
-            radiusToken="md" 
+          <Box
+            padding={2}
+            radiusToken="md"
             style={{ backgroundColor: 'rgba(10, 47, 92, 0.04)' }}
           >
             <Icon name={icon} size={18} tone="brand" />
@@ -256,10 +273,10 @@ export function WebControlPanelKpiTile({ label, value, trend, icon }: WebControl
         )}
       </Box>
       {trend && (
-        <Box layoutDirection="row" align="center" gap={1} style={{ marginTop: 8 }}>
-          <Text 
-            role="caption" 
-            weight="bold" 
+        <Box layoutDirection="row" align="center" gap={1} style={{ marginTop: 8, flexDirection: 'row' }}>
+          <Text
+            role="caption"
+            weight="bold"
             style={{ color: trend.positive ? '#16A34A' : '#DC2626' }}
           >
             {trend.positive ? '↑' : '↓'} {trend.value}
@@ -284,11 +301,11 @@ export type WebControlPanelCommandCardProps = {
 
 export function WebControlPanelCommandCard({ title, description, icon, onPress, badge }: WebControlPanelCommandCardProps) {
   return (
-    <Surface 
-      padding={4} 
+    <Surface
+      padding={4}
       radiusToken="xl"
-      style={{ 
-        flex: 1, 
+      style={{
+        flex: 1,
         minWidth: 280,
         cursor: onPress ? 'pointer' : 'default',
         transition: 'transform 0.15s ease, box-shadow 0.15s ease',
@@ -299,20 +316,22 @@ export function WebControlPanelCommandCard({ title, description, icon, onPress, 
       // @ts-ignore
       hoverStyle={{ transform: 'translateY(-2px)', boxShadow: '0 12px 24px rgba(10, 47, 92, 0.08)' }}
       onPress={onPress}
+      // @ts-ignore
+      dir={useDirection().direction}
     >
-      <Box layoutDirection="row" justify="space-between" align="flex-start">
-        <Box 
-          padding={3} 
-          radiusToken="lg" 
+      <Box layoutDirection="row" justify="space-between" align="flex-start" style={{ flexDirection: 'row' }}>
+        <Box
+          padding={3}
+          radiusToken="lg"
           style={{ backgroundColor: 'rgba(255, 80, 13, 0.08)' }}
         >
           <Icon name={icon} size={24} tone="accent" />
         </Box>
         {badge && (
-          <Box 
-            paddingX={2} 
-            paddingY={1} 
-            radiusToken="full" 
+          <Box
+            paddingX={2}
+            paddingY={1}
+            radiusToken="full"
             style={{ backgroundColor: '#FF500D' }}
           >
             <Text role="caption" weight="black" style={{ color: '#FFFFFF', fontSize: 10 }}>{badge}</Text>
@@ -347,9 +366,11 @@ export function WebControlPanelDecisionQueue({ title, items }: WebControlPanelDe
   const isRtl = direction === 'rtl';
 
   return (
-    <Surface 
-      padding={0} 
-      radiusToken="xl" 
+    <Surface
+      padding={0}
+      radiusToken="xl"
+      // @ts-ignore
+      dir={direction}
       style={{ width: '100%', overflow: 'hidden', border: '1px solid rgba(10, 47, 92, 0.08)' }}
     >
       <Box padding={4} style={{ backgroundColor: '#F1F5F9', borderBottom: '1px solid rgba(10, 47, 92, 0.05)' }}>
@@ -358,17 +379,17 @@ export function WebControlPanelDecisionQueue({ title, items }: WebControlPanelDe
       <Box>
         {items.map((item, index) => (
           <React.Fragment key={item.id}>
-            <Box 
-              padding={4} 
-              layoutDirection="row" 
-              justify="space-between" 
-              align="center"
-              style={{ 
-                backgroundColor: '#FFFFFF',
-                flexDirection: isRtl ? 'row-reverse' : 'row'
-              }}
-            >
-              <Box gap={1} style={{ textAlign: isRtl ? 'right' : 'left' }}>
+              <Box
+                padding={4}
+                layoutDirection="row"
+                justify="space-between"
+                align="center"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  flexDirection: 'row'
+                }}
+              >
+                <Box gap={1}>
                 <Text role="labelMd" weight="bold">{item.title}</Text>
                 <Text role="caption" tone="muted">{item.meta} • {item.status}</Text>
               </Box>
@@ -404,9 +425,9 @@ export type WebControlPanelEmptyStateProps = {
 export function WebControlPanelEmptyState({ title, description, icon, actionLabel, onAction }: WebControlPanelEmptyStateProps) {
   return (
     <Box padding={10} align="center" gap={4} style={{ width: '100%', minHeight: 400, justifyContent: 'center' }}>
-      <Box 
-        padding={6} 
-        radiusToken="full" 
+      <Box
+        padding={6}
+        radiusToken="full"
         style={{ backgroundColor: 'rgba(10, 47, 92, 0.03)', marginBottom: 12 }}
       >
         <Icon name={icon} size={64} tone="soft" />
@@ -416,10 +437,10 @@ export function WebControlPanelEmptyState({ title, description, icon, actionLabe
         <Text role="bodyMd" tone="muted">{description}</Text>
       </Box>
       {actionLabel && (
-        <Button 
-          label={actionLabel} 
-          tone="brand" 
-          onAction={onAction} 
+        <Button
+          label={actionLabel}
+          tone="brand"
+          onAction={onAction}
           style={{ marginTop: 12 }}
         />
       )}
