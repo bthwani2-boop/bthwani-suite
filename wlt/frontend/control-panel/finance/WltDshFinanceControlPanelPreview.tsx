@@ -10,12 +10,8 @@
 import React from 'react';
 import { View } from 'react-native';
 import {
-  Badge,
   Box,
   Button,
-  Icon,
-  KeyValueList,
-  StateView,
   Surface,
   Text,
 } from '@bthwani/ui-kit';
@@ -33,7 +29,6 @@ function PreviewBanner() {
   return (
     <Surface tone="inset" padding={3} style={{ backgroundColor: '#FFFBEB', borderColor: '#FEF3C7', borderLeftWidth: 4, borderLeftColor: '#D97706', borderRadius: '8px' }}>
       <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-start', gap: 10 }}>
-        <Icon name="information-circle-outline" size={18} tone="muted" />
         <Text role="bodySm" tone="muted" style={{ flex: 1, textAlign: 'right', lineHeight: 20, color: '#92400E', fontWeight: '700' }}>
           {PREVIEW_NOTICE}
         </Text>

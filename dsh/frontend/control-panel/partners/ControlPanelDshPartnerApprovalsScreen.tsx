@@ -168,13 +168,27 @@ export function ControlPanelDshPartnerHubScreen() {
   }, [activeTab]);
 
   const renderContent = () => {
-    if (activeTab === 'inbox' && activeSubTab === 'registration') {
-      return <CompactPartnerIntakeQueue />;
-    }
     return (
-      <Box padding={6} alignItems="center" justifyContent="center" style={{ minHeight: '400px' }}>
-        <Text role="titleMd" tone="muted">قريباً: {activeTab} / {activeSubTab}</Text>
-      </Box>
+      <div className={styles.liveOrdersScreen}>
+        <div className={styles.liveOrdersHeaderRow}>
+          <h2 className={styles.liveOrdersTitle}>
+            {PRIMARY_TABS.find(t => t.id === activeTab)?.label} — {SECONDARY_TABS[activeTab]?.find(s => s.id === activeSubTab)?.label || 'عام'}
+          </h2>
+          <button className={styles.liveOrdersFilterButton}>تصفية المخرجات</button>
+        </div>
+
+        {activeTab === 'inbox' && activeSubTab === 'registration' ? (
+          <CompactPartnerIntakeQueue />
+        ) : (
+          <div className={styles.liveOrdersCardsStack}>
+            <div style={{ padding: '60px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🚧</div>
+              <Text role="titleSm" style={{ color: '#0A2F5C', marginBottom: '8px' }}>هذه اللوحة قيد التجهيز</Text>
+              <Text tone="muted">سيتم تفعيل مسار العمل لـ {activeTab} قريباً بنفس نمط غرفة العمليات.</Text>
+            </div>
+          </div>
+        )}
+      </div>
     );
   };
 

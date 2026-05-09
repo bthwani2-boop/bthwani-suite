@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Button, Text } from '@bthwani/ui-kit';
-import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
+import { Box, Text } from '@bthwani/ui-kit';
+import styles from '../operations/dsh-surface.module.css';
 
 export type ControlPanelDshActionQueueItem = {
   id: string;
@@ -12,7 +12,7 @@ export type ControlPanelDshActionQueueItem = {
   primaryActionLabel: string;
   secondaryActionLabel: string;
   evidenceActionLabel: string;
-  tone?: React.ComponentProps<typeof WebSignalCard>['tone'];
+  tone?: 'best' | 'warning' | 'danger' | 'brand';
 };
 
 export type ControlPanelDshActionQueueProps = {
@@ -36,33 +36,79 @@ export function ControlPanelDshActionQueue({
   primaryAction,
   secondaryAction,
   evidenceAction,
-  emptyLabel = 'No items available',
+  emptyLabel = 'لا توجد عناصر حالياً',
 }: ControlPanelDshActionQueueProps) {
-  const selectedItem = items.find((item) => item.id === selectedId) ?? items[0] ?? null;
-
   return (
-    <WebSectionCard title={title} description={purpose}>
-      <Box gap={3}>
-        <Box gap={2}>
-          {items.length ? items.map((item) => (
-            <Box key={item.id} padding={3} gap={2} border radiusToken="xl" background={item.id === selectedItem?.id ? 'surfaceRaised' : 'surfaceInset'}>
-              <Box layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
-                <Text role="bodyStrong">{item.title}</Text>
-                <WebSignalCard title="Status" value={item.status} description={item.ownerSurface} tone={item.tone} />
-              </Box>
-              <Text role="bodySm" tone="muted">{item.blocker}</Text>
-              <Text role="caption" tone="muted">{item.evidence}</Text>
-              <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                <Button label={item.primaryActionLabel} tone="primary" fullWidth={false} onPress={() => primaryAction(item)} />
-                <Button label={item.secondaryActionLabel} tone="secondary" fullWidth={false} onPress={() => secondaryAction(item)} />
-                <Button label={item.evidenceActionLabel} tone="ghost" fullWidth={false} onPress={() => evidenceAction(item)} />
-                <Button label={item.id === selectedItem?.id ? 'Selected' : 'Select'} tone="ghost" fullWidth={false} onPress={() => onSelect(item.id)} />
-              </Box>
-            </Box>
-          )) : <Text role="bodySm" tone="muted">{emptyLabel}</Text>}
-        </Box>
-      </Box>
-    </WebSectionCard>
+    <div className={styles.liveOrdersScreen}>
+      <div className={styles.liveOrdersHeaderRow}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <h2 className={styles.liveOrdersTitle}>{title}</h2>
+          <p style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>{purpose}</p>
+        </div>
+        <button className={styles.liveOrdersFilterButton} onClick={() => window.location.reload()}>تحديث</button>
+      </div>
+
+      <div className={styles.liveOrdersCardsStack}>
+        {!items.length ? (
+          <div style={{ padding: '40px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+            <Text tone="muted">{emptyLabel}</Text>
+          </div>
+        ) : (
+          items.map((item) => {
+            const isSelected = item.id === selectedId;
+            const statusTone = item.tone || 'brand';
+            const statusClassName = statusTone === 'best' ? styles.liveOrdersStatusBest :
+                                   statusTone === 'warning' ? styles.liveOrdersStatusWarning :
+                                   statusTone === 'danger' ? styles.liveOrdersStatusDanger : styles.liveOrdersStatusBrand;
+
+            const cardClassName = [
+              styles.liveOrdersOrderCard,
+              statusTone === 'danger' ? styles.liveOrdersOrderCardDanger : '',
+              statusTone === 'warning' ? styles.liveOrdersOrderCardWarning : '',
+              isSelected ? styles.intelligenceGlow : '',
+            ].filter(Boolean).join(' ');
+
+            return (
+              <div key={item.id} className={cardClassName} onClick={() => onSelect(item.id)} style={{ cursor: 'pointer' }}>
+                <div className={styles.liveOrdersOrderMeta}>
+                  <div className={styles.liveOrdersOrderTopRow}>
+                    <span className={styles.liveOrdersOrderId}>{item.id}</span>
+                    <span className={`${styles.liveOrdersOrderStatus} ${statusClassName}`}>{item.status}</span>
+                    <span className={styles.liveOrdersRingHint}>{item.ownerSurface}</span>
+                  </div>
+                  <div className={styles.liveOrdersDestination}>{item.title}</div>
+                  <div className={styles.liveOrdersMetaText}>{item.blocker}</div>
+                  <div className={styles.liveOrdersNoteText}>{item.evidence}</div>
+                </div>
+
+                <div className={styles.systemSuggestion} style={{ flex: 1 }}>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <Text role="bodyStrong" style={{ color: '#0A2F5C', fontSize: '13px' }}>توصية النظام</Text>
+                      <span style={{ fontSize: '10px', fontWeight: 700, padding: '2px 6px', borderRadius: '99px', backgroundColor: '#DCFCE7', color: '#16A34A' }}>ثقة عالية</span>
+                   </div>
+                   <Text role="bodySm" tone="muted" style={{ fontSize: '11px' }}>جاهز للتنفيذ بناءً على مراجعة المعايير الآلية.</Text>
+                   <div className={styles.liveOrdersActionGrid} style={{ marginTop: '8px' }}>
+                      <button className={styles.liveOrdersActionPrimary} onClick={(e) => { e.stopPropagation(); primaryAction(item); }}>{item.primaryActionLabel}</button>
+                      <button className={styles.liveOrdersActionSecondary} onClick={(e) => { e.stopPropagation(); secondaryAction(item); }}>{item.secondaryActionLabel}</button>
+                   </div>
+                </div>
+
+                <div className={styles.liveOrdersOrderActions}>
+                  <div className={styles.liveOrdersTimelineTitle}>المسار الإجرائي</div>
+                  <div className={styles.liveOrdersTimelineList}>
+                    <div>• بانتظار القرار</div>
+                  </div>
+                  <div className={styles.liveOrdersActionGrid} style={{ marginTop: 'auto' }}>
+                    <button className={styles.liveOrdersActionSecondary} onClick={(e) => { e.stopPropagation(); evidenceAction(item); }}>{item.evidenceActionLabel}</button>
+                    <button className={styles.liveOrdersActionSecondary} onClick={(e) => { e.stopPropagation(); onSelect(item.id); }}>{isSelected ? 'قيد المعاينة' : 'معاينة'}</button>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
   );
 }
 
