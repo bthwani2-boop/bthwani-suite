@@ -5,8 +5,10 @@ import {
   ControlPanelDshCatalogScreen,
   ControlPanelDshMarketingScreen,
   ControlPanelDshPartnerApprovalsScreen,
+  ControlPanelDshSupportQueueScreen,
+  ControlPanelDshClosureDashboardScreen,
+  ControlPanelDshFinanceHubScreen,
 } from '../composition';
-import { WltDshFinanceControlPanelContent } from '../../wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useDirection, useUiText } from '@bthwani/ui-kit';
@@ -112,12 +114,13 @@ function resolveWorkbenchMeta(workbenches: Record<string, WorkbenchMeta>, workbe
     statusLabel: 'Preview',
   };
 }
-
 export type ControlPanelSurfaceHostProps = {
   section?: ControlPanelSectionId;
   operationsWorkspace?: AnyOperationsWorkspaceId;
   operationsOrderId?: string;
   operationsOverlayMode?: OperationsPanelId;
+  financeWorkspace?: string;
+  financePanel?: string;
 };
 
 const allServiceTabId = 'all-services';
@@ -221,6 +224,8 @@ export function ControlPanelSurfaceHost({
   operationsWorkspace = 'overview',
   operationsOrderId,
   operationsOverlayMode,
+  financeWorkspace,
+  financePanel,
 }: ControlPanelSurfaceHostProps) {
   const router = useRouter();
   const { direction } = useDirection();
@@ -426,177 +431,10 @@ export function ControlPanelSurfaceHost({
                 },
               ],
             };
+          case 'finance':
+          case 'support':
           case 'operations':
             return null;
-          case 'finance':
-            return {
-              eyebrow: 'مالي',
-              title: panelText.surfaceTitles.finance,
-              description: 'مراجعة التدفقات المالية — عرض تجريبي',
-              primaryAction: {
-                id: 'finance-primary',
-                label: 'تركيز WLT',
-                description: '',
-                footerLabel: 'تصفية',
-                badge: 'موصى',
-                tone: 'primary',
-                onAction: () => setSelectedServiceId('wlt'),
-              },
-              kpis: [
-                {
-                  id: 'finance-services',
-                  title: 'المساحات المرتبطة',
-                  value: String(sectionServiceIds.length),
-                  description: 'كل مساحة تحمل مسارًا ماليًا داخل اللوحة.',
-                  tone: 'brand',
-                },
-                {
-                  id: 'finance-live',
-                  title: 'جاهز للتشغيل',
-                  value: String(liveCoverageCount),
-                  description: 'مسارات يمكن التركيز عليها الآن دون قفزات إضافية.',
-                  tone: 'best',
-                },
-                {
-                  id: 'finance-reference',
-                  title: 'مرجعي',
-                  value: String(referenceCoverageCount),
-                  description: 'مسارات تبقى ظاهرة بدون ادعاء جاهزية أعلى من الواقع.',
-                },
-              ],
-              quickActionsTitle: '',
-              quickActionsDescription: '',
-              quickActions: [],
-              disclosureTitle: '',
-              disclosureDescription: '',
-              disclosureItems: [],
-            };
-          case 'community-services':
-            return {
-              eyebrow: 'Community services',
-              title: panelText.surfaceTitles['community-services'],
-              description: 'حوكمة مختصرة',
-              primaryAction: {
-                id: 'community-services-primary',
-                label: 'افتح خدمات المجتمع',
-                description: '',
-                footerLabel: 'فتح',
-                href: '/community-services',
-                badge: 'حي',
-                tone: 'primary',
-              },
-              kpis: [
-                {
-                  id: 'community-services-services',
-                  title: 'المساحات المرتبطة',
-                  value: String(sectionServiceIds.length),
-                  description: 'الخدمات التي تستهلك حوكمة المجتمع من هذا السطح.',
-                  tone: 'brand',
-                },
-                {
-                  id: 'community-services-live',
-                  title: 'بوابات حية',
-                  value: '3',
-                  description: 'خدمات المجتمع، شركاء، وتسويق قابلة للفتح مباشرة.',
-                  tone: 'best',
-                },
-                {
-                  id: 'community-services-ready',
-                  title: 'جاهز للتشغيل',
-                  value: String(liveCoverageCount),
-                  description: 'مساحات يمكن متابعتها الآن دون تكرار الشرح.',
-                },
-                {
-                  id: 'community-services-reference',
-                  title: 'مرجعي',
-                  value: String(referenceCoverageCount),
-                  description: 'تغطية مرئية أقل بروزًا من القرار الأساسي.',
-                },
-              ],
-              quickActionsTitle: 'مفاتيح',
-              quickActionsDescription: 'أزرار',
-              quickActions: [
-                {
-                  id: 'community-services-open',
-                  label: 'خدمات المجتمع DSH',
-                  description: 'إدارة الفئات والمنتجات من المسار الحي المباشر.',
-                  footerLabel: 'فتح مباشر',
-                  href: '/community-services',
-                  badge: 'حي',
-                  tone: 'primary',
-                },
-                {
-                  id: 'community-services-partners',
-                  label: 'بوابة الشركاء',
-                  description: 'مراجعة الإدخالات قبل انتقالها إلى المسار النهائي.',
-                  footerLabel: 'فتح مباشر',
-                  href: '/partners',
-                  badge: 'مراجعة',
-                },
-                {
-                  id: 'community-services-marketing',
-                  label: 'التسويق',
-                  description: 'اعتماد الرسائل والعرض قبل النشر النهائي.',
-                  footerLabel: 'فتح مباشر',
-                  href: '/marketing',
-                  badge: 'اعتماد',
-                },
-                {
-                  id: 'community-services-overview',
-                  label: 'العودة للنظرة العامة',
-                  description: 'ارجع بسرعة إلى مركز القرار بدل التنقل عبر شاشات وسيطة.',
-                  footerLabel: 'فتح القسم',
-                  href: '/dashboard',
-                },
-              ],
-              disclosureTitle: 'تغطية خدمات المجتمع حسب الخدمة',
-              disclosureDescription: 'التحويل بين الخدمات يبقى ثانويًا حتى لا ينافس بوابات الحوكمة الأساسية.',
-              disclosureItems: buildServiceDisclosureItems('community-services'),
-            };
-          case 'support':
-            return {
-              eyebrow: 'استعادة تجربة العميل',
-              title: panelText.surfaceTitles.support,
-              description: 'دعم مختصر',
-              primaryAction: {
-                id: 'support-primary',
-                label: 'ابدأ من الطلبات',
-                description: '',
-                footerLabel: 'فتح',
-                href: buildOperationsHref('orders'),
-                badge: 'حي',
-                tone: 'primary',
-              },
-              kpis: [
-                {
-                  id: 'support-services',
-                  title: 'المساحات المرتبطة',
-                  value: String(sectionServiceIds.length),
-                  description: 'خدمات يمكن ربط الدعم بها من هذا السطح.',
-                  tone: 'brand',
-                },
-                {
-                  id: 'support-live',
-                  title: 'جاهز للتصعيد',
-                  value: String(liveCoverageCount),
-                  description: 'مسارات يمكن تحويل التركيز إليها الآن.',
-                  tone: 'best',
-                },
-                {
-                  id: 'support-pressure',
-                  title: 'تصعيدات مرئية',
-                  value: String(alertCount),
-                  description: 'إشارة مختصرة تحافظ على أولوية الدعم واضحة.',
-                  tone: alertCount > 0 ? 'danger' : 'neutral',
-                },
-              ],
-              quickActionsTitle: '',
-              quickActionsDescription: '',
-              quickActions: [],
-              disclosureTitle: '',
-              disclosureDescription: '',
-              disclosureItems: [],
-            };
           default:
             return null;
         }
@@ -699,19 +537,25 @@ export function ControlPanelSurfaceHost({
 
 
             {activeSectionId === 'dashboard' ? (
-              <WebSectionCard
-                title="النظرة التنفيذية"
-                description="ملخص استراتيجي لنبض المنصة وغرفة القيادة."
-              >
-                <div className={styles.dashboardHeroCard}>
-                  <div className={styles.dashboardHeroEyebrow}>BThwani Premium Command Center 2026</div>
-                  <h2 className={styles.dashboardHeroTitle}>غرفة قيادة تنفيذية بنبرة هادئة وكثافة قرار أعلى.</h2>
-                  <p className={styles.dashboardHeroDescription}>
-                    هذا السطح لم يعد مجرد overview عام. تم رفعه ليصبح طبقة قيادة تقرأ نبض المنصة،
-                    وتوضح أين يبدأ القرار الآن، وما الذي يجب أن يبقى في الخلفية دون ضوضاء بصرية.
-                  </p>
+              <>
+                <WebSectionCard
+                  title="النظرة التنفيذية"
+                  description="ملخص استراتيجي لنبض المنصة وغرفة القيادة."
+                >
+                  <div className={styles.dashboardHeroCard}>
+                    <div className={styles.dashboardHeroEyebrow}>BThwani Premium Command Center 2026</div>
+                    <h2 className={styles.dashboardHeroTitle}>غرفة قيادة تنفيذية بنبرة هادئة وكثافة قرار أعلى.</h2>
+                    <p className={styles.dashboardHeroDescription}>
+                      هذا السطح لم يعد مجرد overview عام. تم رفعه ليصبح طبقة قيادة تقرأ نبض المنصة،
+                      وتوضح أين يبدأ القرار الآن، وما الذي يجب أن يبقى في الخلفية دون ضوضاء بصرية.
+                    </p>
+                  </div>
+                </WebSectionCard>
+
+                <div style={{ marginTop: 16 }}>
+                  <ControlPanelDshClosureDashboardScreen />
                 </div>
-              </WebSectionCard>
+              </>
             ) : null}
 
             {scopedSectionUnavailable ? (
@@ -792,12 +636,12 @@ export function ControlPanelSurfaceHost({
         ) : null}
 
         {activeSectionId === 'finance' ? (
-          <WebSectionCard
-            title="عرض WLT المالي التجريبي"
-            description="هذا عرض تجريبي — لا توجد عمليات مالية حقيقية. العقد: CONTRACT_TBD."
-          >
-            <WltDshFinanceControlPanelContent />
-          </WebSectionCard>
+          <div style={{ marginTop: 16 }}>
+            <ControlPanelDshFinanceHubScreen
+              group={financeWorkspace as any}
+              panel={financePanel as any}
+            />
+          </div>
         ) : null}
 
         {isOperationsSection ? (
@@ -809,21 +653,15 @@ export function ControlPanelSurfaceHost({
         ) : null}
 
         {activeSectionId === 'partners' ? (
-          <WebSectionCard
-            title={panelText.surfaceTitles.partners}
-            description={panelText.surfaceDescriptions.partners}
-          >
+          <div style={{ marginTop: 16 }}>
             <ControlPanelDshPartnerApprovalsScreen hubHref="/partners" operationsHref="/partners" />
-          </WebSectionCard>
+          </div>
         ) : null}
 
         {activeSectionId === 'catalogs' ? (
-          <WebSectionCard
-            title={panelText.surfaceTitles.catalogs}
-            description={panelText.surfaceDescriptions.catalogs}
-          >
+          <div style={{ marginTop: 16 }}>
             <ControlPanelDshCatalogScreen />
-          </WebSectionCard>
+          </div>
         ) : null}
 
         {isMarketingSection ? (
@@ -832,86 +670,10 @@ export function ControlPanelSurfaceHost({
           </div>
         ) : null}
 
-        {isCommunityServicesSection ? (
-          <>
-            <WebControlSurfaceHeader
-              chips={[
-                { label: shellCopy.title, tone: 'brand' },
-                { label: `${liveCoverageCount} حي`, tone: 'accent' },
-                { label: `${referenceCoverageCount} مرجعي`, tone: 'neutral' },
-              ]}
-              title={shellCopy.title}
-              description={shellCopy.description}
-              actions={[
-                { label: 'فتح الدعم', href: '/support', tone: 'primary' },
-                { label: 'فتح العمليات', href: '/operations', tone: 'secondary' },
-              ]}
-            />
-
-            <div className={styles.metricsStrip}>
-              <WebSignalCard
-                title="الخدمات المتصلة"
-                value={String(sectionServiceIds.length)}
-                description="الخدمات التي تظهر داخل هذا القسم من الشريط العلوي والحوكمة المشتركة."
-                tone="brand"
-              />
-              <WebSignalCard
-                title="المسارات الحية"
-                value={String(liveCoverageCount)}
-                description="خدمات متصلة فعليًا ويمكن تثبيت تركيزها من نفس الصفحة."
-                tone="best"
-              />
-              <WebSignalCard
-                title="المراجع المؤجلة"
-                value={String(referenceCoverageCount)}
-                description="تظل مرئية كمرجع بدون تضخيم route depth قبل الجاهزية."
-              />
-            </div>
-
-            <WebSectionCard
-              title="مساحات الخدمة المتصلة"
-              description="اختر خدمة مرتبطة بهذا القسم أو ثبت تركيزها من الشريط العلوي بدل الوقوع في fallback عام."
-            >
-              <div className={styles.disclosureBody}>
-                {communityServiceItems.map((item) => (
-                  <WebControlDisclosureItem
-                    key={item.id}
-                    id={item.id}
-                    label={item.label}
-                    description={item.description}
-                    badge={item.badge}
-                    onAction={item.onAction}
-                  />
-                ))}
-              </div>
-            </WebSectionCard>
-
-            <WebSectionCard
-              title="أقرب المسارات الحية"
-              description="بدل فتح صفحة فارغة، انتقل مباشرة إلى أقرب مساحة تشغيل أو دعم مرتبطة بهذا القسم."
-            >
-              <div className={styles.actionGrid}>
-                <WebControlActionCard
-                  id="community-support"
-                  title="الدعم"
-                  description="افتح مسار الدعم عندما تكون الخدمة المجتمعية بحاجة إلى تصعيد أو متابعة مباشرة."
-                  footerLabel="فتح القسم"
-                  href="/support"
-                  badge="حي"
-                  tone="primary"
-                  onAction={() => router.push('/support')}
-                />
-                <WebControlActionCard
-                  id="community-operations"
-                  title="العمليات"
-                  description="ارجع إلى مسار العمليات إذا كانت الحالة تحتاج قرارًا تشغيليًا سريعًا من نفس الغرفة."
-                  footerLabel="فتح القسم"
-                  href="/operations"
-                  onAction={() => router.push('/operations')}
-                />
-              </div>
-            </WebSectionCard>
-          </>
+        {activeSectionId === 'support' ? (
+          <div style={{ marginTop: 16 }}>
+            <ControlPanelDshSupportQueueScreen />
+          </div>
         ) : null}
 
 

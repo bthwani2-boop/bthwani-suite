@@ -18,24 +18,18 @@ export function ControlPanelDshClosureDashboardScreen() {
 
   return (
     <ControlPanelDshWorkspaceFrame
-      eyebrow="DSH closure dashboard"
-      title="DSH closure matrix"
-      description="لقطة واحدة توضح ما هو مغلق، وما يحتاج evidence، وما يحتاج UI flow قبل الخروج النهائي."
-      badges={['DSH', 'closure', 'dashboard']}
-      metaItems={[
-        `closed: ${countByStatus('closed')}`,
-        `needs-evidence: ${countByStatus('needs-evidence')}`,
-        `needs-ui-flow: ${countByStatus('needs-ui-flow')}`,
-        `blocked: ${countByStatus('blocked')}`,
-      ]}
-      primaryAction={{ label: 'Open evidence', href: '/control?tab=governance' }}
-      secondaryAction={{ label: 'Open guard status', href: '/operations?workspace=guard-status' }}
+      eyebrow="لوحة الإغلاق"
+      title="مصفوفة جاهزية DSH"
+      description="لقطة واحدة توضح ما هو مغلق، وما يحتاج أدلة (Evidence)، وما يحتاج مسارات واجهة (UI flow) قبل الخروج النهائي."
+      badges={['DSH', 'إغلاق', 'جاهزية']}
+      primaryAction={{ label: 'فتح الأدلة', href: '/control?tab=governance' }}
+      secondaryAction={{ label: 'حالة الحماية', href: '/operations?workspace=guard-status' }}
       signals={[
-        { id: 'surface-client', title: 'client', value: String(surfaceCounts.client), description: 'client order closure items', tone: 'best' },
-        { id: 'surface-partner', title: 'partner', value: String(surfaceCounts.partner), description: 'partner order closure items', tone: 'best' },
-        { id: 'surface-captain', title: 'captain', value: String(surfaceCounts.captain), description: 'captain order closure items', tone: 'warning' },
-        { id: 'surface-field', title: 'field', value: String(surfaceCounts.field), description: 'field onboarding and visit items', tone: 'warning' },
-        { id: 'surface-control', title: 'control-panel', value: String(surfaceCounts['control-panel']), description: 'control room closure items', tone: 'brand' },
+        { id: 'surface-client', title: 'العميل', value: String(surfaceCounts.client), description: 'عناصر إغلاق العميل', tone: 'brand' },
+        { id: 'surface-partner', title: 'الشريك', value: String(surfaceCounts.partner), description: 'عناصر إغلاق الشريك', tone: 'brand' },
+        { id: 'surface-captain', title: 'الكابتن', value: String(surfaceCounts.captain), description: 'عناصر إغلاق الكابتن', tone: 'warning' },
+        { id: 'surface-field', title: 'الميدان', value: String(surfaceCounts.field), description: 'عناصر إغلاق الميدان', tone: 'warning' },
+        { id: 'surface-control', title: 'لوحة التحكم', value: String(surfaceCounts['control-panel']), description: 'عناصر إغلاق اللوحة', tone: 'best' },
       ]}
     />
   );
@@ -43,7 +37,7 @@ export function ControlPanelDshClosureDashboardScreen() {
 
 export function ControlPanelDshClosureEvidenceStream() {
   return (
-    <WebSectionCard title="Closure evidence stream" description="Each item is a closure unit that can be routed to the right workspace.">
+    <WebSectionCard title="تدفق أدلة الإغلاق" description="كل عنصر يمثل وحدة إغلاق يمكن توجيهها لمساحة العمل المناسبة.">
       <Box gap={2}>
         {DSH_CROSS_SURFACE_CLOSURE_MAP.map((item) => (
           <WebControlDisclosureItem
@@ -57,7 +51,7 @@ export function ControlPanelDshClosureEvidenceStream() {
         ))}
       </Box>
       <Text role="bodySm" tone="muted">
-        The dashboard stays read-only and does not mutate runtime state.
+        هذه اللوحة للعرض فقط ولا تقوم بتغيير حالة النظام الفعلية.
       </Text>
     </WebSectionCard>
   );

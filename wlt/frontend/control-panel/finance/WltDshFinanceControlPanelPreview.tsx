@@ -15,26 +15,25 @@ import {
   Button,
   Icon,
   KeyValueList,
-  MobileScrollView,
   StateView,
   Surface,
   Text,
-  TopBar,
 } from '@bthwani/ui-kit';
 import {
   getWltControlPanelFinancePreview,
   type WltDshFinancePreviewRecord,
 } from '../../shared/finance/dshFinancePreview';
+import styles from '../../../../dsh/frontend/control-panel/operations/dsh-surface.module.css';
 
 const PREVIEW_NOTICE =
   'هذا عرض تجريبي للهيكل المالي فقط — لا يمثّل بيانات حقيقية ولا تسويات فعلية ولا دفعات منفّذة. العقد: CONTRACT_TBD.';
 
 function PreviewBanner() {
   return (
-    <Surface tone="inset" padding={3}>
+    <Surface tone="inset" padding={3} style={{ backgroundColor: '#FFFBEB', borderColor: '#FEF3C7', borderLeftWidth: 4, borderLeftColor: '#D97706', borderRadius: '8px' }}>
       <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-start', gap: 10 }}>
         <Icon name="information-circle-outline" size={18} tone="muted" />
-        <Text role="bodySm" tone="muted" style={{ flex: 1, textAlign: 'right', lineHeight: 20 }}>
+        <Text role="bodySm" tone="muted" style={{ flex: 1, textAlign: 'right', lineHeight: 20, color: '#92400E', fontWeight: '700' }}>
           {PREVIEW_NOTICE}
         </Text>
       </View>
@@ -48,21 +47,21 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
     : 'info';
 
   return (
-    <Surface tone="raised" padding={3} gap={2}>
+    <Surface tone="raised" padding={3} gap={2} style={{ border: '1px solid rgba(0,0,0,0.05)', borderRadius: '10px' }}>
       <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12 }}>
         <View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
-          <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>
+          <Text role="bodyStrong" style={{ textAlign: 'right', color: '#0A2F5C' }} numberOfLines={1}>
             {record.title}
           </Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>
             {record.subtitle}
           </Text>
-          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+          <Text role="caption" tone="soft" style={{ textAlign: 'right', fontSize: '9px' }}>
             {record.timeLabel}
           </Text>
         </View>
         <View style={{ alignItems: 'flex-start', gap: 5, flexShrink: 0 }}>
-          <Text role="bodyStrong" tone={amountTone} style={{ textAlign: 'left' }}>
+          <Text role="bodyStrong" tone={amountTone} style={{ textAlign: 'left', fontWeight: '900' }}>
             {record.amountLabel}
           </Text>
           <Badge label={record.statusLabel} tone={record.statusTone} />
@@ -91,8 +90,8 @@ function SectionBlock({
   emptyLabel: string;
 }) {
   return (
-    <Surface tone="raised" padding={3} gap={3}>
-      <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+    <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: '12px', border: '1px solid rgba(10,47,92,0.06)' }}>
+      <Text role="label" tone="muted" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>
         {title}
       </Text>
       {records.length === 0 ? (
@@ -111,31 +110,31 @@ function ClientPaymentBreakdown({ records }: { records: WltDshFinancePreviewReco
   const refundRecords = records.filter((r) => r.kind === 'refund-adjustment');
 
   return (
-    <Surface tone="raised" padding={3} gap={3}>
-      <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+    <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: '12px', border: '1px solid rgba(10,47,92,0.06)' }}>
+      <Text role="label" tone="muted" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>
         مدفوعات العملاء — تفصيل
       </Text>
       {walletRecords.length > 0 && (
         <Box gap={2}>
-          <Text role="caption" tone="info" style={{ textAlign: 'right' }}>دفع بالمحفظة</Text>
+          <Text role="caption" tone="info" style={{ textAlign: 'right', fontWeight: '800' }}>دفع بالمحفظة</Text>
           <RecordList records={walletRecords} />
         </Box>
       )}
       {codRecords.length > 0 && (
         <Box gap={2}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>دفع عند الاستلام (COD)</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right', fontWeight: '800' }}>دفع عند الاستلام (COD)</Text>
           <RecordList records={codRecords} />
         </Box>
       )}
       {directRecords.length > 0 && (
         <Box gap={2}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>مدفوعات مباشرة</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right', fontWeight: '800' }}>مدفوعات مباشرة</Text>
           <RecordList records={directRecords} />
         </Box>
       )}
       {refundRecords.length > 0 && (
         <Box gap={2}>
-          <Text role="caption" tone="warning" style={{ textAlign: 'right' }}>استردادات</Text>
+          <Text role="caption" tone="warning" style={{ textAlign: 'right', fontWeight: '800' }}>استردادات</Text>
           <RecordList records={refundRecords} />
         </Box>
       )}
@@ -151,30 +150,25 @@ function CaptainFinanceBreakdown({ records }: { records: WltDshFinancePreviewRec
   const earningRecords = records.filter((r) => r.kind === 'captain-earning');
 
   return (
-    <Surface tone="raised" padding={3} gap={3}>
-      <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+    <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: '12px', border: '1px solid rgba(10,47,92,0.06)' }}>
+      <Text role="label" tone="muted" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>
         مالية الكابتن — تفصيل
       </Text>
       {codRecords.length > 0 && (
         <Box gap={2}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>رصيد COD المحصّل</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right', fontWeight: '800' }}>رصيد COD المحصّل</Text>
           <RecordList records={codRecords} />
         </Box>
       )}
       {earningRecords.length > 0 && (
         <Box gap={2}>
-          <Text role="caption" tone="success" style={{ textAlign: 'right' }}>أرباح التوصيل</Text>
+          <Text role="caption" tone="success" style={{ textAlign: 'right', fontWeight: '800' }}>أرباح التوصيل</Text>
           <RecordList records={earningRecords} />
         </Box>
       )}
       {records.length === 0 && (
         <StateView stateId="empty" title="لا توجد بيانات كابتن" description="" />
       )}
-      <StateView
-        kind="warning"
-        title="تسوية الكابتن مقفلة — CONTRACT_TBD"
-        description="لا يمكن تحويل COD أو صرف أرباح حتى يُربط الـ API المالي."
-      />
     </Surface>
   );
 }
@@ -184,30 +178,22 @@ function FieldFinanceDetail({ records }: { records: WltDshFinancePreviewRecord[]
   const payoutRecords = records.filter((r) => r.kind === 'field-payout');
 
   return (
-    <Surface tone="raised" padding={3} gap={3}>
-      <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+    <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: '12px', border: '1px solid rgba(10,47,92,0.06)' }}>
+      <Text role="label" tone="muted" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>
         مالية الميدانيين — تفصيل
       </Text>
       {commissionRecords.length > 0 && (
         <Box gap={2}>
-          <Text role="caption" tone="success" style={{ textAlign: 'right' }}>عمولات الاستقطاب</Text>
+          <Text role="caption" tone="success" style={{ textAlign: 'right', fontWeight: '800' }}>عمولات الاستقطاب</Text>
           <RecordList records={commissionRecords} />
         </Box>
       )}
       {payoutRecords.length > 0 && (
         <Box gap={2}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>سجل الصرف</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right', fontWeight: '800' }}>سجل الصرف</Text>
           <RecordList records={payoutRecords} />
         </Box>
       )}
-      {records.length === 0 && (
-        <StateView stateId="empty" title="لا توجد بيانات ميدانيين" description="" />
-      )}
-      <StateView
-        kind="warning"
-        title="صرف الميداني مقفل — CONTRACT_TBD"
-        description="لا يمكن إجراء صرف عمولة حتى يُربط الـ API المالي."
-      />
     </Surface>
   );
 }
@@ -216,7 +202,11 @@ export type WltDshFinanceControlPanelPreviewProps = {
   onBack?: () => void;
 };
 
-export function WltDshFinanceControlPanelContent() {
+export function WltDshFinanceControlPanelContent({
+  hideHeader = false
+}: {
+  hideHeader?: boolean
+} = {}) {
   const preview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
   const [showReconciliation, setShowReconciliation] = React.useState(false);
 
@@ -225,104 +215,115 @@ export function WltDshFinanceControlPanelContent() {
   );
 
   return (
-    <Box gap={4}>
-      <PreviewBanner />
+    <div className={styles.operationsCockpit} dir="rtl">
+      {/* 1. Header Area - Finance Command Deck */}
+      {!hideHeader && (
+        <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
+          <div className={styles.operationsTitleBlock}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              backgroundColor: '#0A2F5C',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '16px',
+              boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
+            }}>
+              💰
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>مالية DSH</h1>
+                <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>CONTRACT_TBD</span>
+              </div>
+              <p style={{ fontSize: '10px', fontWeight: 600 }}>مراقبة التدفقات المالية والتسويات المركزية</p>
+            </div>
+          </div>
 
-      <Surface tone="raised" padding={3} gap={3}>
-        <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-          الملخص المالي الإجمالي
-        </Text>
-        <KeyValueList
-          dense
-          items={[
-            { label: 'إجمالي الدخل', value: preview.totalInflowLabel, tone: 'success' },
-            { label: 'إجمالي الصرف', value: preview.totalOutflowLabel, tone: 'error' },
-            { label: 'الصافي', value: preview.netLabel, tone: 'info' },
-            { label: 'حالة العقد', value: preview.contractState, tone: 'warning' },
-          ]}
-        />
-        <StateView
-          kind="warning"
-          title="الإجراءات المالية الحقيقية مقفلة"
-          description="جميع الأرقام أعلاه تجريبية. لا يمكن إجراء أي عملية مالية حقيقية حتى يُرفع وضع CONTRACT_TBD."
-        />
-      </Surface>
+          <div className={styles.operationsHeaderActions}>
+            <div className={styles.operationsPulseCompact}>
+               <div className={styles.commandKpi}>
+                  <span className={styles.commandKpiLabel}>إجمالي الدخل</span>
+                  <span className={styles.commandKpiValue} style={{ color: '#16A34A' }}>{preview.totalInflowLabel}</span>
+               </div>
+               <div className={styles.commandKpi}>
+                  <span className={styles.commandKpiLabel}>إجمالي الصرف</span>
+                  <span className={styles.commandKpiValue} style={{ color: '#DC2626' }}>{preview.totalOutflowLabel}</span>
+               </div>
+               <div className={styles.commandKpi}>
+                  <span className={styles.commandKpiLabel}>الصافي</span>
+                  <span className={styles.commandKpiValue} style={{ color: '#0A2F5C' }}>{preview.netLabel}</span>
+               </div>
+            </div>
+          </div>
+        </header>
+      )}
 
-      <ClientPaymentBreakdown records={preview.clientRecords} />
+      {/* 2. Content Area */}
+      <main className={hideHeader ? '' : styles.operationsMainPanel}>
+        <div className={hideHeader ? '' : styles.operationsInnerScroll}>
+          <Box style={{ padding: '16px', flex: 1 }} gap={4}>
+            <PreviewBanner />
 
-      <SectionBlock
-        title="تسويات الشركاء"
-        records={preview.partnerRecords}
-        emptyLabel="لا توجد تسويات شركاء"
-      />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '16px' }}>
+              <ClientPaymentBreakdown records={preview.clientRecords} />
 
-      <CaptainFinanceBreakdown records={preview.captainRecords} />
+              <SectionBlock
+                title="تسويات الشركاء"
+                records={preview.partnerRecords}
+                emptyLabel="لا توجد تسويات شركاء"
+              />
 
-      <FieldFinanceDetail records={preview.fieldRecords} />
+              <CaptainFinanceBreakdown records={preview.captainRecords} />
 
-      <SectionBlock
-        title="عمولة المنصة والاسترداد"
-        records={preview.platformRecords.filter((r) => r.kind !== 'reconciliation-export')}
-        emptyLabel="لا توجد بيانات"
-      />
+              <FieldFinanceDetail records={preview.fieldRecords} />
 
-      <Surface tone="raised" padding={3} gap={3}>
-        <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-          مطابقة التسويات — Export Preview
-        </Text>
-        <StateView
-          kind="warning"
-          title="مطابقة التسويات — معطّلة"
-          description="هذه الخاصية تحتاج ربطًا بـ API حقيقي لم يُعرَّف بعد. يبقى العقد CONTRACT_TBD."
-        />
-        <Button
-          label={showReconciliation ? 'إخفاء سجلات المطابقة' : 'عرض سجلات المطابقة التجريبية'}
-          tone="ghost"
-          fullWidth={false}
-          onPress={() => setShowReconciliation((v) => !v)}
-        />
-        {showReconciliation && (
-          <Box gap={2}>
-            {reconciliationRecords.length === 0 ? (
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                لا توجد سجلات مطابقة
-              </Text>
-            ) : (
-              reconciliationRecords.map((r) => <RecordRow key={r.id} record={r} />)
-            )}
+              <SectionBlock
+                title="عمولة المنصة والاسترداد"
+                records={preview.platformRecords.filter((r) => r.kind !== 'reconciliation-export')}
+                emptyLabel="لا توجد بيانات"
+              />
+
+              <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: '12px', border: '1px solid rgba(10,47,92,0.06)' }}>
+                <Text role="label" tone="muted" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C' }}>
+                  مطابقة التسويات — Export Preview
+                </Text>
+                <StateView
+                  kind="warning"
+                  title="مطابقة التسويات — معطّلة"
+                  description="هذه الخاصية تحتاج ربطًا بـ API حقيقي لم يُعرَّف بعد."
+                />
+                <Button
+                  label={showReconciliation ? 'إخفاء سجلات المطابقة' : 'عرض سجلات المطابقة التجريبية'}
+                  tone="secondary"
+                  fullWidth={false}
+                  size="sm"
+                  onPress={() => setShowReconciliation((v) => !v)}
+                />
+                {showReconciliation && (
+                  <Box gap={2}>
+                    {reconciliationRecords.length === 0 ? (
+                      <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                        لا توجد سجلات مطابقة
+                      </Text>
+                    ) : (
+                      reconciliationRecords.map((r) => <RecordRow key={r.id} record={r} />)
+                    )}
+                  </Box>
+                )}
+              </Surface>
+            </div>
           </Box>
-        )}
-      </Surface>
-
-      <PreviewBanner />
-    </Box>
+        </div>
+      </main>
+    </div>
   );
 }
 
-export function WltDshFinanceControlPanelPreview({
-  onBack,
-}: WltDshFinanceControlPanelPreviewProps) {
-  return (
-    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 120 }}>
-      <TopBar
-        variant="secondary"
-        title="لوحة المالية — DSH × WLT"
-        style={{ marginHorizontal: -16, marginTop: -16 }}
-        trailingAction={
-          onBack
-            ? {
-                id: 'back',
-                icon: <Icon name="arrow-back" size={24} tone="brand" />,
-                mirrorInRtl: true,
-                accessibilityLabel: 'رجوع',
-                onPress: onBack,
-              }
-            : undefined
-        }
-      />
-      <WltDshFinanceControlPanelContent />
-    </MobileScrollView>
-  );
+export function WltDshFinanceControlPanelPreview() {
+  return <WltDshFinanceControlPanelContent />;
 }
 
 export default WltDshFinanceControlPanelPreview;
