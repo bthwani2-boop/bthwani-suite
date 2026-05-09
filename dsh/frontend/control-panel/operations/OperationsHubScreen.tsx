@@ -82,29 +82,32 @@ export function ControlPanelDshOperationsScreen({
 
   return (
     <div className={styles.operationsCockpit} dir="rtl">
-      {/* 1. Header Area */}
-      <header className={styles.operationsTopBar}>
+      {/* 1. Header Area - Compact Command Center */}
+      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
         <div className={styles.operationsTitleBlock}>
-          <h1>عمليات DSH</h1>
-          <p>مراقبة وتنفيذ الطلبات الحية</p>
+          <div style={{ width: '32px', height: '32px', backgroundColor: '#0A2F5C', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)' }}>
+            ⚙️
+          </div>
+          <div>
+            <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>عمليات DSH</h1>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>مراقبة وتنفيذ الطلبات الحية</p>
+          </div>
         </div>
 
         <div className={styles.operationsHeaderActions}>
           <div className={styles.operationsPulseCompact}>
             {OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => (
-              <div key={metric.id} className={styles.operationsPulseItem}>
-                <span>{METRIC_ARABIC[metric.title] || metric.title}</span>
-                <span>{metric.value}</span>
+              <div key={metric.id} className={styles.commandKpi} style={{ minWidth: '100px', padding: '4px 10px' }}>
+                <span className={styles.commandKpiLabel}>{METRIC_ARABIC[metric.title] || metric.title}</span>
+                <span className={styles.commandKpiValue} style={{ fontSize: '14px' }}>{metric.value}</span>
               </div>
             ))}
           </div>
-
-
         </div>
       </header>
 
-      {/* 2. Operations Tabs */}
-      <nav className={styles.operationsTabs}>
+      {/* 2. Operations Tabs - Cockpit Navigation */}
+      <nav className={styles.navigationCockpit}>
         {OPERATIONS_CANONICAL_GROUPS.map((item) => {
           const isSelected = item.id === activeGroup;
           return (
@@ -122,7 +125,7 @@ export function ControlPanelDshOperationsScreen({
         })}
       </nav>
 
-      {/* 3. Main Active Area (No side rail) */}
+      {/* 3. Main Active Area */}
       <main className={styles.operationsMainPanel}>
         <div className={styles.operationsInnerScroll}>
           <ActiveScreen hubHref={hubHref} />
@@ -137,4 +140,3 @@ export function DshOperationsHubSurface(props: ControlPanelDshOperationsScreenPr
 }
 
 export default ControlPanelDshOperationsScreen;
-

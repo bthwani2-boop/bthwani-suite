@@ -485,46 +485,39 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
 
   return (
     <div className={styles.operationsCockpit} dir="rtl">
-      {/* 1. Header Area - Compact & Professional */}
-      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`} style={{ padding: '4px 16px' }}>
+      {/* 1. Header Area - Marketing Command Deck */}
+      <header className={`${styles.operationsTopBar} ${styles.premiumGlass}`}>
         <div className={styles.operationsTitleBlock}>
           <div style={{
-            width: '36px',
-            height: '36px',
+            width: '32px',
+            height: '32px',
             backgroundColor: '#0A2F5C',
-            borderRadius: '10px',
+            borderRadius: '8px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '18px',
+            fontSize: '16px',
             boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
           }}>
             🎯
           </div>
-          <Box gap={0}>
+          <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ letterSpacing: '-0.02em', fontSize: '20px', fontWeight: '900', color: '#0A2F5C' }}>تسويق DSH</h1>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>تسويق DSH</h1>
               <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>يتطلب_ربط_خلفي</span>
             </div>
-            <p style={{ fontWeight: 600, color: '#64748B', fontSize: '11px' }}>إدارة الشريط الذكي، البنرات، استوديو الفيديو، النمو، والولاء.</p>
-          </Box>
+            <p style={{ fontSize: '10px', fontWeight: 600 }}>إدارة الشريط الذكي، البنرات، والنمو الاستراتيجي</p>
+          </div>
         </div>
 
         <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact} style={{ gap: '8px' }}>
+          <div className={styles.operationsPulseCompact}>
             {PULSE_METRICS.map((metric) => (
-              <div key={metric.label} className={styles.operationsPulseItem} style={{ padding: '4px 10px', borderRadius: '8px' }}>
-                <span style={{ fontSize: '10px' }}>{metric.label}</span>
+              <div key={metric.label} className={styles.commandKpi} style={{ minWidth: '90px', padding: '4px 10px' }}>
+                <span className={styles.commandKpiLabel}>{metric.label}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span className={styles.operationsPulseValue} style={{ fontSize: '12px' }}>{metric.value}</span>
-                  <span style={{
-                    fontSize: '9px',
-                    padding: '1px 4px',
-                    borderRadius: '3px',
-                    backgroundColor: metric.trendTone === 'success' ? '#DCFCE7' : metric.trendTone === 'warning' ? '#FEF3C7' : '#E0F2FE',
-                    color: metric.trendTone === 'success' ? '#16A34A' : metric.trendTone === 'warning' ? '#D97706' : '#0369A1',
-                    fontWeight: 800
-                  }}>
+                  <span className={styles.commandKpiValue} style={{ fontSize: '14px' }}>{metric.value}</span>
+                  <span className={`${styles.commandKpiTrend} ${metric.trendTone === 'success' ? styles.toneSuccess : metric.trendTone === 'warning' ? styles.toneWarning : styles.toneInfo}`} style={{ fontSize: '8px' }}>
                     {metric.trend}
                   </span>
                 </div>
@@ -534,24 +527,15 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
         </div>
       </header>
 
-      {/* 2. Primary Tabs */}
-        <nav className={styles.operationsTabs} style={{ padding: '8px 16px', backgroundColor: '#fff', borderBottom: '1px solid rgba(10,47,92,0.06)', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-          {PRIMARY_TABS.map((tab) => {
-            const isSelected = tab.id === activeTab;
-            return (
-              <button
-                key={tab.id}
-                className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
-                onClick={() => setActiveTab(tab.id)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 16px',
-                fontSize: '13px',
-                borderRadius: '8px',
-                transition: 'all 0.2s ease'
-              }}
+      {/* 2. Primary Tabs - Navigation Cockpit */}
+      <nav className={styles.navigationCockpit}>
+        {PRIMARY_TABS.map((tab) => {
+          const isSelected = tab.id === activeTab;
+          return (
+            <button
+              key={tab.id}
+              className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
+              onClick={() => setActiveTab(tab.id)}
             >
               <span>{tab.icon}</span>
               {tab.label}
@@ -560,56 +544,26 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
         })}
       </nav>
 
-      {/* 3. Secondary Tabs */}
+      {/* 3. Secondary Tabs - Sub-Navigation Dock */}
       {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: '24px',
-          padding: '8px 24px',
-          backgroundColor: '#F8FAFC',
-          borderBottom: '1px solid rgba(10,47,92,0.08)',
-          flexWrap: 'wrap',
-          minHeight: '48px',
-        }}>
+        <div className={styles.filterDock} style={{ padding: '4px 14px', minHeight: '36px', backgroundColor: '#F8FAFC' }}>
           {SECONDARY_TABS[activeTab].map((sub) => {
             const isSelected = sub.id === activeSubTab;
             return (
-              <div
+              <button
                 key={sub.id}
                 onClick={() => setActiveSubTab(sub.id)}
+                className={styles.operationsTab}
                 style={{
-                  cursor: 'pointer',
-                  padding: '8px 4px',
-                  position: 'relative',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minWidth: '60px',
+                  padding: '4px 12px',
+                  fontSize: '12px',
+                  backgroundColor: isSelected ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
+                  color: isSelected ? '#FF500D' : '#64748B',
+                  borderColor: isSelected ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
                 }}
               >
-                <span style={{
-                  fontSize: '13px',
-                  fontWeight: isSelected ? 800 : 600,
-                  color: isSelected ? '#FF500D' : '#64748B',
-                  whiteSpace: 'nowrap',
-                  transition: 'color 0.2s ease',
-                }}>
-                  {sub.label}
-                </span>
-                {isSelected && (
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: '3px',
-                    backgroundColor: '#FF500D',
-                    borderRadius: '3px 3px 0 0'
-                  }} />
-                )}
-              </div>
+                {sub.label}
+              </button>
             );
           })}
         </div>
