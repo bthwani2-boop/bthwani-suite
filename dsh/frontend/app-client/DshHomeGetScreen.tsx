@@ -1686,7 +1686,7 @@ return (
                   id: store.id,
                   name: store.name,
                   subtitle: store.address,
-                  image: resolveDshHomeStoreImageSource(store.imageUri ?? store.mediaKey),
+                  image: resolveDshHomeStoreImageSource(store.imageUri ?? store.mediaKey, store.publishStage),
                   rating: store.rating ?? null,
                   distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
                   isOpen: store.statusTone === 'open',
