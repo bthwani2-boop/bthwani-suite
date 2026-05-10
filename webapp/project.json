@@ -1,7 +1,7 @@
 {
   "name": "webapp",
-  "root": "webapp/runtime",
-  "sourceRoot": "webapp/runtime",
+  "root": "webapp",
+  "sourceRoot": "webapp",
   "projectType": "application",
   "targets": {
     "serve": {
