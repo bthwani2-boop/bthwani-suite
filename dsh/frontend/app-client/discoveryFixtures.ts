@@ -1,6 +1,16 @@
 import { buildCanonicalPreviewDiscoveryStores } from '../shared/dshStoreProductCardModel';
 import { DshDiscoveryStore } from './types';
 
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ */
+export const dshDiscoveryStoresDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  timezoneSemantics: 'not_applicable',
+} as const;
+
 export const dshDiscoveryStores: DshDiscoveryStore[] = [
   {
     id: 'store-1001',

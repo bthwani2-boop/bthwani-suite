@@ -7,6 +7,16 @@ export type DshNotificationFixture = {
   actionTarget: 'benefits' | 'tracking' | 'orders-list' | 'search';
 };
 
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ */
+export const dshNotificationsFixturesDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  timezoneSemantics: 'preview-only local display / not runtime UTC source',
+} as const;
+
 export const dshNotificationsFixtures: DshNotificationFixture[] = [
   {
     id: 'notif-1',
