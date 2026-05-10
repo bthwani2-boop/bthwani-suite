@@ -3,6 +3,8 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  Box,
+  Text,
   StateView,
 } from '@bthwani/ui-kit';
 import {

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { StateView } from '@bthwani/ui-kit';
+import { Box, StateView, Text } from '@bthwani/ui-kit';
 import {
   WebControlPanelWorkbench,
   WebControlPanelDenseHeader,

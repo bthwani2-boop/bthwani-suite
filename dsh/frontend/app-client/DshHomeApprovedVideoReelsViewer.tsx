@@ -4,7 +4,6 @@ import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWind
 import { Box, Text, colorPalette } from '@bthwani/ui-kit';
 import type { MarketingVideoRecord } from '../shared/video-store';
 
-declare const process: { env: { EXPO_PUBLIC_MEDIA_BASE_URL?: string } };
 
 export type DshHomeApprovedVideoReelsViewerProps = {
   visible: boolean;
