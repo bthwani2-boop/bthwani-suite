@@ -9,8 +9,8 @@ const webControlSurfaceCss = `
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
-  padding: 18px;
+  gap: 10px;
+  padding: 14px;
   border-radius: 16px;
   border: 1px solid rgba(10, 47, 92, 0.08);
   background:
@@ -247,16 +247,19 @@ const webControlSurfaceCss = `
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 12px;
   background-color: #FFFFFF;
   border-bottom: 1px solid rgba(10, 47, 92, 0.06);
   border-radius: 12px;
-  margin-bottom: 12px;
+  margin: 0;
 }
 .ui-web-compact-surface-header__title-block {
   display: flex;
   align-items: center;
   gap: 16px;
+  min-width: 0;
 }
 .ui-web-compact-surface-header__title {
   margin: 0;
@@ -271,8 +274,9 @@ const webControlSurfaceCss = `
 }
 .ui-web-compact-surface-header__pulse {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
 }
 .ui-web-compact-surface-header__pulse-item {
   display: flex;
@@ -379,7 +383,7 @@ const webControlSurfaceCss = `
 .ui-web-cp-viewport {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   height: 100%;
   min-width: 0;
@@ -391,8 +395,8 @@ const webControlSurfaceCss = `
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: 10px;
+  padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid rgba(10, 47, 92, 0.08);
   background: #FFFFFF;
@@ -429,14 +433,14 @@ const webControlSurfaceCss = `
 .ui-web-cp-dense-header__metrics {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .ui-web-cp-dense-header__metric {
   display: grid;
   gap: 2px;
   min-width: 88px;
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-radius: 10px;
   background: rgba(10, 47, 92, 0.04);
 }
@@ -465,7 +469,7 @@ const webControlSurfaceCss = `
 .ui-web-cp-split-pane {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   min-width: 0;
   min-height: 0;
@@ -502,7 +506,7 @@ const webControlSurfaceCss = `
 .ui-web-cp-workbench {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
   min-width: 0;
   min-height: 0;
@@ -513,7 +517,7 @@ const webControlSurfaceCss = `
 .ui-web-cp-workbench__main {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
   min-width: 0;
   min-height: 0;
@@ -911,7 +915,7 @@ const webControlSurfaceCss = `
 }
 .ui-web-cp-inspector-shell__header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-bottom: 1px solid rgba(10,47,92,0.08); gap: 8px;
 }
 .ui-web-cp-inspector-shell__title  { font-size: 14px; font-weight: 800; color: #0A2F5C; margin: 0; }
@@ -919,7 +923,7 @@ const webControlSurfaceCss = `
   appearance: none; border: none; background: transparent;
   color: #64748B; font-size: 18px; cursor: pointer; line-height: 1; padding: 2px 6px;
 }
-.ui-web-cp-inspector-shell__body  { flex: 1; min-height: 0; overflow: hidden; padding: 12px 14px; display: grid; align-content: start; gap: 10px; }
+.ui-web-cp-inspector-shell__body  { flex: 1; min-height: 0; overflow: hidden; padding: 10px 12px; display: grid; align-content: start; gap: 10px; }
 `;
 
 function WebControlSurfaceStyles() {

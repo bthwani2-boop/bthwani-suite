@@ -1,5 +1,17 @@
 import { dshMarketingNewsTickerSeed } from './news-ticker-fixtures';
 
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ */
+export const newsTickerStoreDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'preview-only local display / not runtime UTC source',
+  moneySemantics: 'not_applicable',
+} as const;
+
 export type MarketingNewsTickerLocale = 'ar' | 'en';
 
 export type MarketingNewsTickerKind = 'platform' | 'order' | 'promo' | 'partner';
