@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Pressable, StyleSheet, View, Image, ScrollView } from 'react-native';
+import { Pressable, StyleSheet, View, Image } from 'react-native';
 import {
   Box,
   Button,
@@ -12,6 +12,7 @@ import {
   useDirection,
   SelectField,
 } from '@bthwani/ui-kit';
+import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getMarketingVideoItems,
   getMarketingVideoKpis,
@@ -57,6 +58,8 @@ type VideoDraft = {
 };
 
 type EditorWorkspaceTab = 'content' | 'media' | 'target' | 'publish';
+
+const videosPageSize = 5;
 
 function createDraft(item?: MarketingVideoRecord | null): VideoDraft {
   return {
@@ -107,6 +110,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
   const selected = React.useMemo(() => (selectedId ? (items.find((item) => item.id === selectedId) ?? null) : null), [items, selectedId]);
   const [draft, setDraft] = React.useState<VideoDraft>(() => createDraft(selected));
   const [activeEditorTab, setActiveEditorTab] = React.useState<EditorWorkspaceTab>('content');
+  const [videosPage, setVideosPage] = React.useState(1);
 
   React.useEffect(() => {
     if (selected) {
@@ -115,6 +119,29 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
   }, [selected]);
 
   const kpis = React.useMemo(() => getMarketingVideoKpis(), [items]);
+
+  const totalPages = Math.max(1, Math.ceil(items.length / videosPageSize));
+  const visibleItems = React.useMemo(() => {
+    const startIndex = (videosPage - 1) * videosPageSize;
+    return items.slice(startIndex, startIndex + videosPageSize);
+  }, [items, videosPage]);
+
+  React.useEffect(() => {
+    setVideosPage((currentPage) => Math.min(currentPage, totalPages));
+  }, [totalPages]);
+
+  React.useEffect(() => {
+    if (!selectedId) {
+      return;
+    }
+
+    const selectedIndex = items.findIndex((item) => item.id === selectedId);
+    if (selectedIndex < 0) {
+      return;
+    }
+
+    setVideosPage(Math.floor(selectedIndex / videosPageSize) + 1);
+  }, [items, selectedId]);
 
   function refresh() {
     setItems(getMarketingVideoItems());
@@ -206,8 +233,8 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
             <Text role="titleSm" style={[{ fontWeight: '900' }, rtlText]}>مكتبة المحتوى</Text>
             <Text role="caption" tone="muted" style={rtlText}>{items.length} فيديوهات</Text>
           </View>
-          <ScrollView style={styles.listScroll} contentContainerStyle={styles.listContent}>
-            {items.map((item) => {
+          <Box gap={2} style={styles.listBody}>
+            {visibleItems.map((item) => {
               const isSelected = selected?.id === item.id;
               return (
                 <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={[styles.compactRow, isSelected && styles.compactRowSelected]}>
@@ -232,7 +259,14 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                 </Pressable>
               );
             })}
-          </ScrollView>
+            <WebControlPanelCompactPager
+              page={videosPage}
+              totalPages={totalPages}
+              summaryLabel={`عرض ${visibleItems.length} من ${items.length} فيديوهات`}
+              onPrevious={videosPage > 1 ? () => setVideosPage((currentPage) => currentPage - 1) : undefined}
+              onNext={videosPage < totalPages ? () => setVideosPage((currentPage) => currentPage + 1) : undefined}
+            />
+          </Box>
         </Surface>
 
         {/* Center: Editor Panel */}
@@ -240,8 +274,10 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
           <View style={[styles.panelHeader]}>
             <Text role="titleSm" style={[{ fontWeight: '900' }, rtlText]}>محرر الفيديو الذكي</Text>
             <View style={[styles.headerRow, { gap: 8 }]}>
+              {selected ? <Button label={selected.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" size="sm" onPress={() => handleToggle(selected)} /> : null}
               <Button label="نسخة" tone="ghost" size="sm" onPress={() => selected && handleDuplicate(selected)} disabled={!selected} />
               <Button label="حذف" tone="ghost" size="sm" onPress={() => selected && handleDelete(selected)} disabled={!selected} />
+              <Button label="حفظ" tone="primary" size="sm" onPress={handleSave} />
             </View>
           </View>
 
@@ -259,7 +295,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
             />
           </View>
 
-          <ScrollView style={styles.editorScroll} contentContainerStyle={styles.editorContent}>
+          <Box gap={4} style={styles.editorContent}>
             {activeEditorTab === 'content' && (
               <Box gap={4}>
                 <TextField label="العنوان التسويقي" value={draft.title} onChangeText={(v) => setDraft(d => ({ ...d, title: v }))} placeholder="مثال: خصومات الجمعة البيضاء" style={rtlText} />
@@ -429,20 +465,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                 <TextField label="الترتيب" value={draft.order} onChangeText={(v) => setDraft(d => ({ ...d, order: v }))} type="number" style={rtlText} />
               </Box>
             )}
-          </ScrollView>
-
-          <View style={[styles.editorFooter]}>
-            <Button label="حفظ التعديلات" tone="primary" fullWidth={false} onPress={handleSave} style={{ borderRadius: 8, paddingHorizontal: 24 }} />
-            {selected && (
-              <Button
-                label={selected.status === 'published' ? 'إيقاف العرض' : 'نشر الآن'}
-                tone="secondary"
-                fullWidth={false}
-                onPress={() => handleToggle(selected)}
-                style={{ borderRadius: 8 }}
-              />
-            )}
-          </View>
+          </Box>
         </Surface>
 
         {/* Right: Preview Panel */}
@@ -508,8 +531,7 @@ const styles = StyleSheet.create({
 
   listPanel: { flex: 1, maxWidth: 300, borderRadius: 12, display: 'flex', flexDirection: 'column' },
   panelHeader: { padding: 16, borderBottomWidth: 1, borderBottomColor: '#F1F5F9', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  listScroll: { flex: 1 },
-  listContent: { padding: 12, gap: 8 },
+  listBody: { flex: 1, minHeight: 0, padding: 12, gap: 8 },
 
   compactRow: { flexDirection: 'row', gap: 12, padding: 8, borderRadius: 8, backgroundColor: '#fff', borderWidth: 1, borderColor: '#F1F5F9' },
   compactRowSelected: { borderColor: '#0A2F5C', backgroundColor: '#F8FAFC' },
@@ -518,9 +540,7 @@ const styles = StyleSheet.create({
   statusBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
 
   editorPanel: { flex: 2, borderRadius: 12, display: 'flex', flexDirection: 'column' },
-  editorScroll: { flex: 1 },
-  editorContent: { padding: 16 },
-  editorFooter: { padding: 16, borderTopWidth: 1, borderTopColor: '#F1F5F9', flexDirection: 'row', gap: 12, backgroundColor: '#fff', borderBottomLeftRadius: 12, borderBottomRightRadius: 12, justifyContent: 'flex-start' },
+  editorContent: { flex: 1, minHeight: 0, padding: 16 },
 
   previewPanel: { flex: 1.5, borderRadius: 12, backgroundColor: '#0A2F5C', display: 'flex', flexDirection: 'column' },
   previewFrame: { width: 260, height: 460, backgroundColor: '#000', borderRadius: 24, overflow: 'hidden', position: 'relative', borderWidth: 6, borderColor: '#1E293B' },

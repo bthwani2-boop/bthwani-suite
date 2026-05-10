@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, Text, ListItem } from '@bthwani/ui-kit';
-import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
+import { WebCompactSurfaceHeader, WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getCatalogAdoptionItems,
   adoptCatalogCentral,
@@ -13,12 +13,29 @@ import { ApprovalRecord, ApprovalStage, translateStage, translateEntityType, tra
 
 export function CatalogAdoptionQueue() {
   const [items, setItems] = React.useState<ApprovalRecord[]>([]);
+  const [page, setPage] = React.useState(1);
+
+  const pageSize = 5;
 
   const refresh = () => setItems(getCatalogAdoptionItems());
 
   React.useEffect(() => {
     refresh();
   }, []);
+
+  const eligibleItems = React.useMemo(
+    () => items.filter((item) => ['marketing-approved', 'catalog-adopted', 'client-visible', 'needs-fix', 'rejected'].includes(item.stage)),
+    [items],
+  );
+  const totalPages = Math.max(1, Math.ceil(eligibleItems.length / pageSize));
+  const visibleItems = React.useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return eligibleItems.slice(startIndex, startIndex + pageSize);
+  }, [eligibleItems, page]);
+
+  React.useEffect(() => {
+    setPage((currentPage) => Math.min(currentPage, totalPages));
+  }, [totalPages]);
 
   const handleAction = (id: string, action: 'adopt-central' | 'adopt-exception' | 'visible' | 'reject' | 'fix') => {
     const item = items.find(i => i.id === id);
@@ -71,8 +88,8 @@ export function CatalogAdoptionQueue() {
         description="اعتماد العناصر النهائية لتصبح جزءًا من الكتالوج. لا يظهر للعميل إلا بعد التفعيل النهائي."
         metrics={[{ id: 'pending', title: 'بانتظار الاعتماد', value: String(pendingCount) }]}
       />
-      <Box gap={2} style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', backgroundColor: '#F8FAFC' }}>
-        {items.filter(i => ['marketing-approved', 'catalog-adopted', 'client-visible', 'needs-fix', 'rejected'].includes(i.stage)).map(item => {
+      <Box gap={2} style={{ flex: 1, minHeight: 0, padding: '12px 14px', backgroundColor: '#F8FAFC' }}>
+        {visibleItems.map(item => {
           const sStyle = getStageStyle(item.stage);
 
           return (
@@ -103,6 +120,14 @@ export function CatalogAdoptionQueue() {
             />
           );
         })}
+
+        <WebControlPanelCompactPager
+          page={page}
+          totalPages={totalPages}
+          summaryLabel={`عرض ${visibleItems.length} من ${eligibleItems.length} عناصر`}
+          onPrevious={page > 1 ? () => setPage((currentPage) => currentPage - 1) : undefined}
+          onNext={page < totalPages ? () => setPage((currentPage) => currentPage + 1) : undefined}
+        />
       </Box>
     </div>
   );

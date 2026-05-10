@@ -71,6 +71,9 @@ export type DshStoreFixtureItem = {
   publishStage?: string;
   mediaPolicy?: string;
   source?: string;
+  isNew?: boolean;
+  isFavorite?: boolean;
+  isFavorited?: boolean;
 };
 
 export type StoreItemsByStoreId = Record<string, DshStoreFixtureItem[]>;

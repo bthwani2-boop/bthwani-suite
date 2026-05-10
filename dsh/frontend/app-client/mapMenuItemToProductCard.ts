@@ -1,4 +1,4 @@
-import type { DshStoreMenuItem } from './dshStoreTypes';
+import type { DshStoreFixtureItem as DshStoreMenuItem } from './types';
 import type { ProductCardProps } from '@bthwani/ui-kit';
 import { resolveDshImageSource } from './resolve-image-source';
 

@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Box, Button, Surface, Tabs, Text, TextField, Chip, SelectField, ListItem, KeyValueList } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, KeyValueList } from '@bthwani/ui-kit';
+import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getPartnerOfferItems,
   getPartnerOfferKpis,
@@ -17,6 +18,10 @@ import {
 } from '../../shared/partner-offer-store';
 import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
 
+type PartnerOfferEditorSection = 'details' | 'governance' | 'preview';
+
+const partnerOffersPageSize = 5;
+
 export function PartnerOffersCommandDeckScreen() {
   const [items, setItems] = React.useState<PartnerOfferRecord[]>(() => getPartnerOfferItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getPartnerOfferItems()[0]?.id ?? null);
@@ -24,6 +29,8 @@ export function PartnerOffersCommandDeckScreen() {
   const [draft, setDraft] = React.useState<Partial<PartnerOfferRecord>>({});
   const [pipelineFilter, setPipelineFilter] = React.useState<PartnerOfferStatus | 'all'>('all');
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [offersPage, setOffersPage] = React.useState(1);
+  const [editorSection, setEditorSection] = React.useState<PartnerOfferEditorSection>('details');
 
   React.useEffect(() => {
     if (selected) {
@@ -56,12 +63,14 @@ export function PartnerOffersCommandDeckScreen() {
   const refresh = () => setItems(getPartnerOfferItems());
 
   const handleCreateNew = () => {
+    setEditorSection('details');
     setSelectedId(null);
   };
 
   const handleSave = () => {
     const saved = upsertPartnerOfferItem(draft);
     refresh();
+    setEditorSection('details');
     setSelectedId(saved.id);
   };
 
@@ -69,6 +78,7 @@ export function PartnerOffersCommandDeckScreen() {
     if (!selected) return;
     const saved = upsertPartnerOfferItem({ ...selected, id: undefined, title: `${selected.title} — نسخة`, status: 'inbound' });
     refresh();
+    setEditorSection('details');
     setSelectedId(saved.id);
   };
 
@@ -90,6 +100,37 @@ export function PartnerOffersCommandDeckScreen() {
     }
     return base;
   }, [items, pipelineFilter, searchQuery]);
+
+  const offersTotalPages = Math.max(1, Math.ceil(filteredItems.length / partnerOffersPageSize));
+  const visibleItems = React.useMemo(() => {
+    const startIndex = (offersPage - 1) * partnerOffersPageSize;
+    return filteredItems.slice(startIndex, startIndex + partnerOffersPageSize);
+  }, [filteredItems, offersPage]);
+
+  React.useEffect(() => {
+    setOffersPage((currentPage) => Math.min(currentPage, offersTotalPages));
+  }, [offersTotalPages]);
+
+  React.useEffect(() => {
+    setOffersPage(1);
+  }, [pipelineFilter, searchQuery]);
+
+  React.useEffect(() => {
+    if (selectedId === null) {
+      return;
+    }
+
+    if (filteredItems.length === 0) {
+      setSelectedId(null);
+      return;
+    }
+
+    if (filteredItems.some((item) => item.id === selectedId)) {
+      return;
+    }
+
+    setSelectedId(filteredItems[0].id);
+  }, [filteredItems, selectedId]);
 
   type OfferTone = 'default' | 'warning' | 'brand' | 'success' | 'danger';
 
@@ -164,6 +205,86 @@ export function PartnerOffersCommandDeckScreen() {
     );
   };
 
+  const renderEditorContent = () => {
+    if (editorSection === 'details') {
+      return (
+        <Box gap={4}>
+          <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+            <TextField label="عنوان العرض" value={draft.title || ''} onChangeText={v => setDraft({ ...draft, title: v })} />
+            <TextField label="اسم الشريك" value={draft.partnerName || ''} onChangeText={v => setDraft({ ...draft, partnerName: v })} />
+
+            <TextField label="معرف المتجر" value={draft.storeId || ''} onChangeText={v => setDraft({ ...draft, storeId: v })} dir="ltr" />
+            <TextField label="اسم المتجر" value={draft.storeLabel || ''} onChangeText={v => setDraft({ ...draft, storeLabel: v })} />
+
+            <TextField label="معرف المنتج" value={draft.productId || ''} onChangeText={v => setDraft({ ...draft, productId: v })} dir="ltr" />
+            <TextField label="اسم المنتج" value={draft.productLabel || ''} onChangeText={v => setDraft({ ...draft, productLabel: v })} />
+          </Box>
+        </Box>
+      );
+    }
+
+    if (editorSection === 'governance') {
+      return (
+        <Box gap={4}>
+          <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+            <TextField label="التصنيف" value={draft.category || ''} onChangeText={v => setDraft({ ...draft, category: v })} />
+            <TextField label="قيمة العرض" value={draft.valueLabel || ''} onChangeText={v => setDraft({ ...draft, valueLabel: v })} hint="مثال: خصم 20%" />
+
+            <SelectField
+              label="نوع العرض"
+              value={draft.offerType}
+              onValueChange={(v) => setDraft({ ...draft, offerType: v as PartnerOfferType })}
+              options={[
+                { value: 'discount', label: 'خصم مباشر' },
+                { value: 'free-delivery', label: 'توصيل مجاني' },
+                { value: 'bundle', label: 'حزمة (Bundle)' },
+                { value: 'buy-x-get-y', label: 'اشتر واحصل على' },
+                { value: 'coupon', label: 'كوبون' },
+              ]}
+            />
+
+            <SelectField
+              label="المصدر"
+              value={draft.source}
+              onValueChange={(v) => setDraft({ ...draft, source: v as PartnerOfferSource })}
+              options={[
+                { value: 'partner', label: 'الشريك' },
+                { value: 'field', label: 'المبيعات الميدانية' },
+                { value: 'marketing', label: 'التسويق' },
+                { value: 'catalog', label: 'الكتالوج' },
+              ]}
+            />
+
+            <TextField label="الأهلية" value={draft.eligibility || ''} onChangeText={v => setDraft({ ...draft, eligibility: v })} />
+            <TextField label="شارة العرض" value={draft.displayBadge || ''} onChangeText={v => setDraft({ ...draft, displayBadge: v })} />
+
+            <TextField label="تاريخ البدء" value={draft.activeFromDate || ''} onChangeText={v => setDraft({ ...draft, activeFromDate: v })} dir="ltr" />
+            <TextField label="تاريخ الانتهاء" value={draft.activeToDate || ''} onChangeText={v => setDraft({ ...draft, activeToDate: v })} dir="ltr" />
+          </Box>
+
+          <TextField label="ملاحظات هامش الربح" value={draft.marginRiskNote || ''} onChangeText={v => setDraft({ ...draft, marginRiskNote: v })} hint="ملاحظات داخلية للفريق" />
+          <TextField label="حملة مرتبطة" value={draft.linkedCampaignId || ''} onChangeText={v => setDraft({ ...draft, linkedCampaignId: v })} dir="ltr" />
+        </Box>
+      );
+    }
+
+    const statusMeta = draft.status ? translateStatus(draft.status) : { label: 'مسودة جديدة', tone: 'default' as OfferTone };
+
+    return (
+      <Box gap={4}>
+        <KeyValueList
+          items={[
+            { label: 'حالة العرض', value: statusMeta.label },
+            { label: 'نوع العرض', value: draft.offerType ? translateOfferType(draft.offerType) : 'غير محدد' },
+            { label: 'المصدر', value: draft.source ? translateSource(draft.source) : 'غير محدد' },
+            { label: 'مدة التفعيل', value: draft.activeFromDate && draft.activeToDate ? `${draft.activeFromDate} → ${draft.activeToDate}` : 'غير محددة' },
+          ]}
+        />
+        {renderStoreCardPreview()}
+      </Box>
+    );
+  };
+
   return (
     <Box dir="rtl" gap={4} padding={4} style={{ height: '100%', overflow: 'hidden' }}>
 
@@ -206,9 +327,20 @@ export function PartnerOffersCommandDeckScreen() {
             <Text role="bodyStrong">العروض ({filteredItems.length})</Text>
             <Button label="+ عرض جديد" tone="brand" size="sm" onPress={handleCreateNew} />
           </Box>
-          <Box style={{ flex: 1 }} padding={2}>
-            <Box style={{ overflowY: 'auto', flex: 1 }}>
-              {filteredItems.map(item => {
+          <Box padding={3} gap={3}>
+            <TextField
+              label="بحث سريع"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="ابحث بالعنوان أو اسم الشريك"
+            />
+          </Box>
+          <Box style={{ flex: 1, minHeight: 0 }} padding={2} gap={2}>
+            {visibleItems.length === 0 ? (
+              <Surface tone="inset" padding={4} style={{ alignItems: 'center', justifyContent: 'center' }}>
+                <Text role="bodySm" tone="muted">لا توجد عروض تطابق الفلاتر الحالية.</Text>
+              </Surface>
+            ) : visibleItems.map(item => {
                 const statusMeta = translateStatus(item.status);
                 const isSelected = item.id === selectedId;
                 return (
@@ -216,14 +348,24 @@ export function PartnerOffersCommandDeckScreen() {
                     key={item.id}
                     title={item.title}
                     subtitle={`${item.partnerName} · ${translateOfferType(item.offerType)} · ${translateSource(item.source)}`}
-                    onPress={() => setSelectedId(item.id)}
+                    onPress={() => {
+                      setEditorSection('details');
+                      setSelectedId(item.id);
+                    }}
                     selected={isSelected}
                     badgeLabel={statusMeta.label}
                     badgeTone={statusMeta.tone}
                   />
                 );
               })}
-            </Box>
+
+            <WebControlPanelCompactPager
+              page={offersPage}
+              totalPages={offersTotalPages}
+              summaryLabel={`عرض ${visibleItems.length} من ${filteredItems.length} عروض`}
+              onPrevious={offersPage > 1 ? () => setOffersPage((currentPage) => currentPage - 1) : undefined}
+              onNext={offersPage < offersTotalPages ? () => setOffersPage((currentPage) => currentPage + 1) : undefined}
+            />
           </Box>
         </Surface>
 
@@ -234,58 +376,23 @@ export function PartnerOffersCommandDeckScreen() {
             {renderActionButtons()}
           </Box>
 
-          <Box style={{ overflowY: 'auto', flex: 1 }} padding={4} gap={4}>
-            <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
-              <TextField label="عنوان العرض" value={draft.title || ''} onChangeText={v => setDraft({ ...draft, title: v })} />
-              <TextField label="اسم الشريك" value={draft.partnerName || ''} onChangeText={v => setDraft({ ...draft, partnerName: v })} />
+          <Box paddingX={4} paddingTop={3}>
+            <Tabs<PartnerOfferEditorSection>
+              items={[
+                { value: 'details', label: 'الأساسيات' },
+                { value: 'governance', label: 'الحوكمة' },
+                { value: 'preview', label: 'المعاينة' },
+              ]}
+              value={editorSection}
+              onValueChange={setEditorSection}
+              variant="pill"
+            />
+          </Box>
 
-              <TextField label="معرف المتجر" value={draft.storeId || ''} onChangeText={v => setDraft({ ...draft, storeId: v })} dir="ltr" />
-              <TextField label="اسم المتجر" value={draft.storeLabel || ''} onChangeText={v => setDraft({ ...draft, storeLabel: v })} />
+          <Box style={{ flex: 1, minHeight: 0 }} padding={4} gap={4}>
+            {renderEditorContent()}
 
-              <TextField label="معرف المنتج" value={draft.productId || ''} onChangeText={v => setDraft({ ...draft, productId: v })} dir="ltr" />
-              <TextField label="اسم المنتج" value={draft.productLabel || ''} onChangeText={v => setDraft({ ...draft, productLabel: v })} />
-
-              <TextField label="التصنيف" value={draft.category || ''} onChangeText={v => setDraft({ ...draft, category: v })} />
-              <TextField label="قيمة العرض" value={draft.valueLabel || ''} onChangeText={v => setDraft({ ...draft, valueLabel: v })} hint="مثال: خصم 20%" />
-
-              <SelectField
-                label="نوع العرض"
-                value={draft.offerType}
-                onValueChange={(v) => setDraft({ ...draft, offerType: v as PartnerOfferType })}
-                options={[
-                  { value: 'discount', label: 'خصم مباشر' },
-                  { value: 'free-delivery', label: 'توصيل مجاني' },
-                  { value: 'bundle', label: 'حزمة (Bundle)' },
-                  { value: 'buy-x-get-y', label: 'اشتر واحصل على' },
-                  { value: 'coupon', label: 'كوبون' },
-                ]}
-              />
-
-              <SelectField
-                label="المصدر"
-                value={draft.source}
-                onValueChange={(v) => setDraft({ ...draft, source: v as PartnerOfferSource })}
-                options={[
-                  { value: 'partner', label: 'الشريك' },
-                  { value: 'field', label: 'المبيعات الميدانية' },
-                  { value: 'marketing', label: 'التسويق' },
-                  { value: 'catalog', label: 'الكتالوج' },
-                ]}
-              />
-
-              <TextField label="الأهلية" value={draft.eligibility || ''} onChangeText={v => setDraft({ ...draft, eligibility: v })} />
-              <TextField label="شارة العرض" value={draft.displayBadge || ''} onChangeText={v => setDraft({ ...draft, displayBadge: v })} />
-
-              <TextField label="تاريخ البدء" value={draft.activeFromDate || ''} onChangeText={v => setDraft({ ...draft, activeFromDate: v })} dir="ltr" />
-              <TextField label="تاريخ الانتهاء" value={draft.activeToDate || ''} onChangeText={v => setDraft({ ...draft, activeToDate: v })} dir="ltr" />
-            </Box>
-
-            <TextField label="ملاحظات هامش الربح" value={draft.marginRiskNote || ''} onChangeText={v => setDraft({ ...draft, marginRiskNote: v })} hint="ملاحظات داخلية للفريق" />
-            <TextField label="حملة مرتبطة" value={draft.linkedCampaignId || ''} onChangeText={v => setDraft({ ...draft, linkedCampaignId: v })} dir="ltr" />
-
-            {renderStoreCardPreview()}
-
-            <Box layoutDirection="row" justify="flex-end" paddingY={4}>
+            <Box layoutDirection="row" justify="flex-end" paddingY={4} style={{ marginTop: 'auto' }}>
               <Button label="حفظ التعديلات" tone="brand" onPress={handleSave} />
             </Box>
           </Box>

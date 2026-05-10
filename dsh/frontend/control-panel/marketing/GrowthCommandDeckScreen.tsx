@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
+import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getGrowthRecommendations,
   type GrowthRecommendation,
@@ -18,14 +19,43 @@ export type GrowthCommandDeckScreenProps = {
   setActiveTab?: (tab: string) => void;
 };
 
+const growthRecommendationsPageSize = 5;
+
 export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab }: GrowthCommandDeckScreenProps) {
   const recommendations = React.useMemo(() => getGrowthRecommendations(), []);
   const [selectedRecId, setSelectedRecId] = React.useState<string | null>(recommendations[0]?.id || null);
+  const [recommendationsPage, setRecommendationsPage] = React.useState(1);
+  const sortedRecommendations = React.useMemo(
+    () => [...recommendations].sort((a, b) => b.severity === 'critical' ? 1 : -1),
+    [recommendations]
+  );
+  const totalPages = Math.max(1, Math.ceil(sortedRecommendations.length / growthRecommendationsPageSize));
+  const visibleRecommendations = React.useMemo(() => {
+    const startIndex = (recommendationsPage - 1) * growthRecommendationsPageSize;
+    return sortedRecommendations.slice(startIndex, startIndex + growthRecommendationsPageSize);
+  }, [recommendationsPage, sortedRecommendations]);
 
   const selectedRec = React.useMemo(
     () => recommendations.find(r => r.id === selectedRecId),
     [selectedRecId, recommendations]
   );
+
+  React.useEffect(() => {
+    setRecommendationsPage((currentPage) => Math.min(currentPage, totalPages));
+  }, [totalPages]);
+
+  React.useEffect(() => {
+    if (!selectedRecId) {
+      return;
+    }
+
+    const selectedIndex = sortedRecommendations.findIndex((item) => item.id === selectedRecId);
+    if (selectedIndex < 0) {
+      return;
+    }
+
+    setRecommendationsPage(Math.floor(selectedIndex / growthRecommendationsPageSize) + 1);
+  }, [selectedRecId, sortedRecommendations]);
 
   const renderRecommendationIcon = (type: GrowthRecommendation['type']) => {
     switch (type) {
@@ -135,9 +165,8 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
               <Text role="caption" tone="muted">{recommendations.length} توصية</Text>
             </View>
 
-            <ScrollView style={styles.scrollView}>
-              <Box gap={3}>
-                {recommendations.sort((a, b) => b.severity === 'critical' ? 1 : -1).map((rec) => (
+            <Box gap={3} style={styles.queueBody}>
+                {visibleRecommendations.map((rec) => (
                   <View
                     key={rec.id}
                     style={{
@@ -163,8 +192,14 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
                     </Box>
                   </View>
                 ))}
-              </Box>
-            </ScrollView>
+                <WebControlPanelCompactPager
+                  page={recommendationsPage}
+                  totalPages={totalPages}
+                  summaryLabel={`عرض ${visibleRecommendations.length} من ${recommendations.length} توصيات`}
+                  onPrevious={recommendationsPage > 1 ? () => setRecommendationsPage((currentPage) => currentPage - 1) : undefined}
+                  onNext={recommendationsPage < totalPages ? () => setRecommendationsPage((currentPage) => currentPage + 1) : undefined}
+                />
+            </Box>
           </Surface>
         </Box>
 
@@ -239,8 +274,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
   },
-  scrollView: {
+  queueBody: {
     flex: 1,
+    minHeight: 0,
   },
   headerRow: {
     flexDirection: 'row',

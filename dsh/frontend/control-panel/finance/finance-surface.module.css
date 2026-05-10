@@ -96,10 +96,18 @@
 }
 
 .financeSubNavWrapper {
+.financeShellOverrides {
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  min-height: 100%;
+  max-height: none;
+}
   background-color: #F8FAFC;
   border-bottom: 1px solid rgba(10, 47, 92, 0.04);
 }
 
+.financeLoadingState {
+  padding: 24px;
+}
 .compactPlaceholder {
   min-height: 300px;
   background-color: #FFFFFF;
@@ -114,6 +122,30 @@
 }
 
 .noScroll::-webkit-scrollbar {
+.financeKpiWarning {
+  color: #D97706;
+}
+.financeKpiSuccess {
+  color: #16A34A;
+}
+.financeContextDock {
+  padding: 4px 14px;
+  background-color: #F8FAFC;
+}
+.financeContextLabel {
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748B;
+}
+.financeContextValue {
+  font-size: 11px;
+  font-weight: 800;
+  color: #0A2F5C;
+}
+.financeContextDescription {
+  font-size: 11px;
+  color: #64748B;
+}
   display: none !important;
 }
 

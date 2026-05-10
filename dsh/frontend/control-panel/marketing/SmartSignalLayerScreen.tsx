@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Box, Surface, Text, useUiText } from '@bthwani/ui-kit';
-import { WebMissionHeroCard, WebSignalCard } from '@bthwani/ui-kit/web';
+import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
+import { WebSignalCard } from '@bthwani/ui-kit/web';
 
 export type ControlPanelDshMarketingScreenProps = {
 	hubHref?: string;
@@ -13,22 +13,31 @@ export function ControlPanelDshMarketingScreen({
 	hubHref = '/',
 	operationsHref = '/operations',
 }: ControlPanelDshMarketingScreenProps) {
-	const { locale } = useUiText();
-
 	return (
 		<Box gap={4} dir="rtl">
-			<WebMissionHeroCard
-				dense
-				badges={['مباشر', 'تحليل الأداء']}
-				eyebrow={locale === 'en' ? 'Marketing signal command' : 'غرفة قيادة الإشارات الذكية'}
-				title={locale === 'en' ? 'Smart-signal command center' : 'غرفة قيادة الإشارات الذكية'}
-				metaItems={[
-					'تحديث حي للبيانات',
-					'جاهزية النظام: 100%',
-				]}
-				primaryAction={{ label: 'العمليات', href: operationsHref }}
-				secondaryAction={{ label: 'لوحة القيادة', href: hubHref }}
-			/>
+			<Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16, border: '1px solid rgba(10,47,92,0.08)' }}>
+				<Box gap={1}>
+					<Text role="caption" tone="muted" style={{ fontWeight: '900' }}>غرفة قيادة الإشارات الذكية</Text>
+					<Text role="titleMd" style={{ color: '#0A2F5C', fontWeight: '900' }}>لوحة الإشارات التسويقية</Text>
+					<Text role="bodySm" tone="muted">طبقة مضغوطة لمراقبة الوصول والتحويل وصحة الحملات من دون بطاقات هبوط أو hero تسويقية.</Text>
+				</Box>
+
+				<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+					<Surface tone="inset" padding={2} style={{ borderRadius: 10 }}>
+						<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>التحديث</Text>
+						<Text role="bodySm" style={{ color: '#0A2F5C', fontWeight: '900' }}>محلي داخل سطح التحكم</Text>
+					</Surface>
+					<Surface tone="inset" padding={2} style={{ borderRadius: 10 }}>
+						<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>التركيز الحالي</Text>
+						<Text role="bodySm" style={{ color: '#0A2F5C', fontWeight: '900' }}>إشارات الأداء والتوصيات</Text>
+					</Surface>
+				</Box>
+
+				<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+					<Button label="العمليات" tone="primary" size="sm" href={operationsHref} />
+					<Button label="لوحة القيادة" tone="secondary" size="sm" href={hubHref} />
+				</Box>
+			</Surface>
 
 			<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-start' }}>
 				<WebSignalCard title="إجمالي الوصول" value="1.2M" description="معدل وصول الحملات النشطة" tone="best" />
@@ -37,13 +46,19 @@ export function ControlPanelDshMarketingScreen({
 				<WebSignalCard title="صحة الحملات" value="98%" description="مؤشر استقرار العروض" tone="neutral" />
 			</Box>
 
-			<Surface tone="raised" padding={6} gap={3} style={{ borderRadius: 16, alignItems: 'center', justifyContent: 'center', minHeight: 240, border: '1px dashed rgba(10,47,92,0.1)' }}>
-				<Text role="titleSm" tone="muted" style={{ textAlign: 'center' }}>مساحة الرسوم البيانية والتحليلات المتقدمة</Text>
-				<Text role="bodySm" tone="muted" style={{ textAlign: 'center', maxWidth: 450 }}>
-					هذه المساحة مخصصة لعرض أداء البنرات، عروض الشركاء، والشريط الذكي بدلاً من تكرار أدوات التحرير المخصصة لها.
-				</Text>
-				<Box style={{ backgroundColor: '#F8FAFC', padding: '8px 16px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-					<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>الحالة: جاهز للربط مع BI Service Layer</Text>
+			<Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16, border: '1px solid rgba(10,47,92,0.08)' }}>
+				<Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '900' }}>ملخص التحليلات والتوصيات</Text>
+				<Text role="bodySm" tone="muted">هذه الطبقة تعرض القراءة التشغيلية المجمعة للبنرات، عروض الشركاء، والشريط الذكي من دون تكرار شاشات التحرير نفسها.</Text>
+
+				<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+					<Surface tone="inset" padding={3} style={{ borderRadius: 12, minWidth: 180 }}>
+						<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>الأثر المتوقع</Text>
+						<Text role="bodySm" style={{ color: '#0A2F5C', fontWeight: '900' }}>تركيز قرارات التسويق على الإشارات الأعلى تأثيرًا</Text>
+					</Surface>
+					<Surface tone="inset" padding={3} style={{ borderRadius: 12, minWidth: 180 }}>
+						<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>الخطوة التالية</Text>
+						<Text role="bodySm" style={{ color: '#0A2F5C', fontWeight: '900' }}>راجع الحملة أو العرض الذي يحتاج قرارًا فوريًا</Text>
+					</Surface>
 				</Box>
 			</Surface>
 		</Box>

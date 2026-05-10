@@ -1,8 +1,9 @@
 "use client";
 
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, View, Image } from 'react-native';
+import { Pressable, StyleSheet, View, Image } from 'react-native';
 import { Box, Button, SearchField, SelectField, Surface, Tabs, Text, TextField, useDirection, colorPalette } from '@bthwani/ui-kit';
+import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   computeMarketingBannerQuality,
   duplicateMarketingBannerItem,
@@ -361,6 +362,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
   const isRtl = direction === 'rtl';
   const [items, setItems] = React.useState<MarketingBannerRecord[]>(() => getMarketingBannerItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getMarketingBannerItems()[0]?.id ?? null);
+  const [bannersPage, setBannersPage] = React.useState(1);
   const selected = React.useMemo(
     () => (selectedId ? (items.find((item) => item.id === selectedId) ?? null) : null),
     [items, selectedId],
@@ -389,6 +391,28 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     () => computeMarketingBannerQuality({ ...draft, position: Number.parseInt(draft.position, 10) || 0 } as unknown as Partial<MarketingBannerRecord>),
     [draft],
   );
+  const totalPages = Math.max(1, Math.ceil(items.length / 5));
+  const visibleItems = React.useMemo(() => {
+    const startIndex = (bannersPage - 1) * 5;
+    return items.slice(startIndex, startIndex + 5);
+  }, [bannersPage, items]);
+
+  React.useEffect(() => {
+    setBannersPage((currentPage) => Math.min(currentPage, totalPages));
+  }, [totalPages]);
+
+  React.useEffect(() => {
+    if (!selectedId) {
+      return;
+    }
+
+    const selectedIndex = items.findIndex((item) => item.id === selectedId);
+    if (selectedIndex < 0) {
+      return;
+    }
+
+    setBannersPage(Math.floor(selectedIndex / 5) + 1);
+  }, [items, selectedId]);
 
   function refresh() {
     const nextItems = getMarketingBannerItems();
@@ -1109,7 +1133,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
 
       <View style={styles.studioBody}>
         <Surface tone="raised" gap={3} style={styles.previewColumn}>
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.columnScrollContent}>
+          <Box gap={3} style={styles.columnBody}>
             <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>المعاينة والحركة</Text>
             <BannerPreview />
             <Box gap={2} style={styles.qualityPanel}>
@@ -1153,19 +1177,19 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
                 />
               </Box>
             </View>
-          </ScrollView>
+          </Box>
         </Surface>
 
         <Surface tone="raised" gap={3} style={styles.editorColumn}>
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.columnScrollContent}>
+          <Box gap={3} style={styles.columnBody}>
             <EditorSection />
-          </ScrollView>
+          </Box>
         </Surface>
 
         <Surface tone="raised" gap={3} style={styles.sidebarColumn}>
           <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C', paddingHorizontal: 4 }}>جميع الحملات</Text>
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.sidebarScrollContent}>
-            {items.map(item => (
+          <Box gap={3} style={styles.sidebarBody}>
+            {visibleItems.map(item => (
               <Pressable
                 key={item.id}
                 onPress={() => setSelectedId(item.id)}
@@ -1180,7 +1204,14 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
                 </View>
               </Pressable>
             ))}
-          </ScrollView>
+            <WebControlPanelCompactPager
+              page={bannersPage}
+              totalPages={totalPages}
+              summaryLabel={`عرض ${visibleItems.length} من ${items.length} بنرات`}
+              onPrevious={bannersPage > 1 ? () => setBannersPage((currentPage) => currentPage - 1) : undefined}
+              onNext={bannersPage < totalPages ? () => setBannersPage((currentPage) => currentPage + 1) : undefined}
+            />
+          </Box>
         </Surface>
       </View>
     </Box>
@@ -1243,11 +1274,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     minHeight: 0,
   },
-  columnScrollContent: {
+  columnBody: {
+    flex: 1,
+    minHeight: 0,
     gap: 12,
     paddingBottom: 4,
   },
-  sidebarScrollContent: {
+  sidebarBody: {
+    flex: 1,
+    minHeight: 0,
     gap: 10,
     paddingTop: 4,
     paddingBottom: 4,

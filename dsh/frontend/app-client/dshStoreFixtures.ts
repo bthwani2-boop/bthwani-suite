@@ -8,7 +8,23 @@ export const dshStoreFixturesDataContract = {
   timezoneSemantics: 'not_applicable',
 } as const;
 
-export * from './types';
-export * from './discoveryFixtures';
-export * from './itemsFixtures';
-export * from './builders';
+export type {
+  DshDiscoveryStore,
+  DshStoreFixtureItem,
+  MeasurementOption,
+  StoreItemsByStoreId,
+} from './types';
+export {
+  buildStoreCategories,
+  buildStoreDeliveryModes,
+  buildStoreTags,
+  buildersDataContract,
+} from './builders';
+export {
+  dshDiscoveryStores,
+  dshDiscoveryStoresDataContract,
+} from './discoveryFixtures';
+export {
+  itemsFixturesDataContract,
+  storeItemsByStoreId,
+} from './itemsFixtures';

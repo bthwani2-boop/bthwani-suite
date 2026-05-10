@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, Tabs, ListItem, Divider } from '@bthwani/ui-kit';
-import { WebControlPanelRecommendation, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
+import { WebControlPanelCompactPager, WebControlPanelRecommendation, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import {
   dshCatalogMetrics,
   dshCatalogCategories,
@@ -38,6 +38,8 @@ type WorkspaceMode =
 type FilterType = 'all' | 'master' | 'partner-exception' | 'partner-review' | 'marketing-review' | 'price-conflict' | 'non-matching' | 'category-proposals';
 
 type CatalogFilterColumnId = keyof typeof initialColumnFilters;
+
+const catalogPageSize = 5;
 
 type FilterDropdownProps = {
   title: string;
@@ -175,6 +177,7 @@ export function ControlPanelDshCatalogScreen({
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [catalogPage, setCatalogPage] = useState(1);
 
   const PRIMARY_TABS = [
     { id: 'catalog', label: 'الكتالوج' },
@@ -321,6 +324,19 @@ export function ControlPanelDshCatalogScreen({
   }, []);
 
   const activeColFiltersCount = Object.values(colFilters).flat().length;
+  const catalogTotalPages = Math.max(1, Math.ceil(filteredProducts.length / catalogPageSize));
+  const visibleProducts = useMemo(() => {
+    const startIndex = (catalogPage - 1) * catalogPageSize;
+    return filteredProducts.slice(startIndex, startIndex + catalogPageSize);
+  }, [catalogPage, filteredProducts]);
+
+  React.useEffect(() => {
+    setCatalogPage(1);
+  }, [activeMainCategory, activeSubCategory, activeFilter, activeTab, activeSubTab, searchQuery, colFilters]);
+
+  React.useEffect(() => {
+    setCatalogPage((currentPage) => Math.min(currentPage, catalogTotalPages));
+  }, [catalogTotalPages]);
 
   const renderColHeader = (colId: CatalogFilterColumnId, title: string, width?: string) => (
     <th style={{ padding: '6px 12px', fontSize: '11px', color: '#64748B', textAlign: 'right', width, position: 'relative' }}>
@@ -486,15 +502,14 @@ export function ControlPanelDshCatalogScreen({
       {/* 5. MAIN CONTENT AREA */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
         {activeTab === 'approvals' && activeSubTab === 'marketing' && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'auto' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'hidden', minHeight: 0 }}>
             <CatalogAdoptionQueue />
           </div>
         )}
 
         {activeTab === 'catalog' && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#FFFFFF', minWidth: 0 }}>
-            {/* Scrollable Data Table */}
-            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', backgroundColor: '#FFFFFF' }}>
+            <div style={{ flex: 1, minHeight: 0, backgroundColor: '#FFFFFF' }}>
                {isManualOrderCategory ? (
                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '48px', opacity: 0.7 }}>
                    <Text role="titleMd" style={{ color: '#0A2F5C' }}>فئة الطلب اليدوي</Text>
@@ -518,7 +533,7 @@ export function ControlPanelDshCatalogScreen({
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProducts.map(p => {
+                      {visibleProducts.map(p => {
                         const cat = dshCatalogCategories.find(c => c.id === p.categoryPath.main);
                         const sub = cat?.subcategories.find(s => s.id === p.categoryPath.sub);
                         const classif = sub?.mainClassifications?.find(c => c.id === p.categoryPath.mainClassification);
@@ -571,6 +586,18 @@ export function ControlPanelDshCatalogScreen({
                  </table>
                )}
             </div>
+
+            {!isManualOrderCategory ? (
+              <div style={{ padding: '10px 16px 12px', borderTop: '1px solid #E2E8F0', backgroundColor: '#FFFFFF' }}>
+                <WebControlPanelCompactPager
+                  page={catalogPage}
+                  totalPages={catalogTotalPages}
+                  summaryLabel={`عرض ${visibleProducts.length} من ${filteredProducts.length} منتجات`}
+                  onPrevious={catalogPage > 1 ? () => setCatalogPage((currentPage) => currentPage - 1) : undefined}
+                  onNext={catalogPage < catalogTotalPages ? () => setCatalogPage((currentPage) => currentPage + 1) : undefined}
+                />
+              </div>
+            ) : null}
           </div>
         )}
 

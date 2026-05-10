@@ -26,7 +26,7 @@ import {
   buildStoreTags,
   dshDiscoveryStores,
   storeItemsByStoreId,
-} from './storeFixtures';
+} from './dshStoreFixtures';
 import {
   getPublishedMarketingHomePromos,
   recordMarketingBannerClick,

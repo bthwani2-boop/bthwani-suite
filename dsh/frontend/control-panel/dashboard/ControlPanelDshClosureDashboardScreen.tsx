@@ -7,7 +7,7 @@ import {
   WebCompactSurfaceHeader,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import { ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, getDshClosureItemsByStatus, getDshClosureItemsBySurface } from '../shared';
+import { ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, DSH_CROSS_SURFACE_JOURNEYS, getDshClosureItemsByStatus, getDshClosureItemsBySurface } from '../shared';
 
 export function ControlPanelDshClosureHubScreen() {
   const [activeTab, setActiveTab] = React.useState<string>('readiness');
@@ -184,6 +184,22 @@ export function ControlPanelDshClosureDashboardScreen() {
             primary={{ id: 'evidence', label: 'فتح الأدلة' }}
             secondary={{ id: 'protection', label: 'حالة الحماية' }}
           />
+        </div>
+      </div>
+
+      <div style={{ padding: '0 14px' }}>
+        <Text role="titleSm" style={{ marginBottom: '8px' }}>إشارات عابرة للأسطح</Text>
+        <div style={{ display: 'grid', gap: '8px' }}>
+          {DSH_CROSS_SURFACE_JOURNEYS.map((journey) => (
+            <WebControlPanelRecommendation
+              key={journey.id}
+              title={journey.entityLabel}
+              reason={journey.reason}
+              confidence={journey.confidence}
+              auditTag={journey.lifecycleStep}
+              primaryAction={{ id: journey.id, label: journey.primaryActionLabel }}
+            />
+          ))}
         </div>
       </div>
     </div>

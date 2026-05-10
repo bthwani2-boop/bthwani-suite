@@ -1,8 +1,9 @@
 "use client";
 
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, View, Image } from 'react-native';
-import { Box, Button, SelectField, Surface, Text, TextField, useDirection } from '@bthwani/ui-kit';
+import { Pressable, StyleSheet, View, Image } from 'react-native';
+import { Box, Button, SelectField, Surface, Tabs, Text, TextField } from '@bthwani/ui-kit';
+import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getHomePromoItems,
   upsertHomePromoItem,
@@ -15,14 +16,23 @@ import { dshDiscoveryStores } from '../../app-client/discoveryFixtures';
 import { storeItemsByStoreId } from '../../app-client/itemsFixtures';
 import { resolveDshImageSource } from '../../app-client/resolve-image-source';
 
+type PromoEditorSection = 'identity' | 'logic' | 'media';
+
+const promoPageSize = 5;
+
 export function PromosCommandDeckScreen() {
-  const { direction } = useDirection();
   const [items, setItems] = React.useState<HomePromoRecord[]>(() => getHomePromoItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getHomePromoItems()[0]?.id ?? null);
   const selected = React.useMemo(() => items.find(i => i.id === selectedId) ?? null, [items, selectedId]);
   const [draft, setDraft] = React.useState(createDraft(selected));
+   const [promoPage, setPromoPage] = React.useState(1);
+   const [editorSection, setEditorSection] = React.useState<PromoEditorSection>('identity');
 
   React.useEffect(() => { setDraft(createDraft(selected)); }, [selected]);
+
+   const refresh = React.useCallback(() => {
+      setItems(getHomePromoItems());
+   }, []);
 
   function createDraft(item?: HomePromoRecord | null) {
     return {
@@ -45,7 +55,31 @@ export function PromosCommandDeckScreen() {
     const next = getHomePromoItems();
     setItems(next);
     setSelectedId(saved.id);
+      setEditorSection('identity');
   }
+
+   const totalPages = Math.max(1, Math.ceil(items.length / promoPageSize));
+   const visibleItems = React.useMemo(() => {
+      const startIndex = (promoPage - 1) * promoPageSize;
+      return items.slice(startIndex, startIndex + promoPageSize);
+   }, [items, promoPage]);
+
+   React.useEffect(() => {
+      setPromoPage((currentPage) => Math.min(currentPage, totalPages));
+   }, [totalPages]);
+
+   React.useEffect(() => {
+      if (items.length === 0) {
+         setSelectedId(null);
+         return;
+      }
+
+      if (selectedId && items.some((item) => item.id === selectedId)) {
+         return;
+      }
+
+      setSelectedId(items[0].id);
+   }, [items, selectedId]);
 
   const getTargetOptions = () => {
     if (draft.targetType === 'store') return dshDiscoveryStores.map(s => ({ value: s.id, label: s.name }));
@@ -54,15 +88,53 @@ export function PromosCommandDeckScreen() {
     return [{ value: 'home', label: 'الرئيسية' }];
   };
 
+   const renderEditorSection = () => {
+      if (editorSection === 'identity') {
+         return (
+            <Box gap={6}>
+               <Text style={{ fontSize: 11, fontWeight: '900', color: '#0A2F5C' }}>1. الهوية والمحتوى</Text>
+               <TextField label="العنوان الرئيسي" value={draft.title} onChangeText={t => setDraft(d => ({ ...d, title: t }))} />
+               <TextField label="الوصف الجذاب" value={draft.subtitle} onChangeText={t => setDraft(d => ({ ...d, subtitle: t }))} />
+               <View style={{ flexDirection: 'row', gap: 12 }}>
+                  <TextField style={{ flex: 1 }} label="نص الزر" value={draft.ctaText} onChangeText={t => setDraft(d => ({ ...d, ctaText: t }))} />
+                  <TextField style={{ flex: 1 }} label="لون التمييز" value={draft.accentColor} onChangeText={t => setDraft(d => ({ ...d, accentColor: t }))} />
+               </View>
+            </Box>
+         );
+      }
+
+      if (editorSection === 'logic') {
+         return (
+            <Box gap={6}>
+               <Text style={{ fontSize: 11, fontWeight: '900', color: '#0A2F5C' }}>2. قواعد الربط الذكي</Text>
+               <View style={{ flexDirection: 'row', gap: 12 }}>
+                  <SelectField style={{ flex: 1 }} label="نوع الوجهة" value={draft.targetType} onValueChange={v => setDraft(d => ({ ...d, targetType: v }))} options={[{value:'store',label:'متجر'},{value:'category',label:'فئة'},{value:'product',label:'منتج'}]} />
+                  <SelectField style={{ flex: 1 }} label="الوجهة المحددة" value={draft.targetId} onValueChange={(v,o) => setDraft(d => ({ ...d, targetId: v, targetLabel: o?.label??'' }))} options={getTargetOptions()} />
+               </View>
+            </Box>
+         );
+      }
+
+      return (
+         <Box gap={6}>
+            <Text style={{ fontSize: 11, fontWeight: '900', color: '#0A2F5C' }}>3. الوسائط</Text>
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+               <TextField style={{ flex: 1 }} label="خلفية القالب" value={draft.imageUrl} onChangeText={t => setDraft(d => ({ ...d, imageUrl: t }))} />
+               <TextField style={{ flex: 1 }} label="أيقونة الشخصية" value={draft.thumbnail} onChangeText={t => setDraft(d => ({ ...d, thumbnail: t }))} />
+            </View>
+         </Box>
+      );
+   };
+
   return (
-    <Box style={{ padding: 12, height: 560, overflow: 'hidden' }}>
+      <Box style={{ padding: 12, height: '100%', overflow: 'hidden' }}>
       {/* Header Bar */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, borderBottomWidth: 1, borderBottomColor: '#F1F5F9', paddingBottom: 8 }}>
          <Box gap={0}>
             <Text role="caption" style={{ color: '#0A2F5C', fontWeight: '900', letterSpacing: 0.5 }}>إدارة البروموهات والظهور</Text>
             <Text role="titleLg" style={{ fontWeight: '900', color: '#0A2F5C', fontSize: 18 }}>استوديو البروموهات</Text>
          </Box>
-         <Button label="+ برومو جديد" onPress={() => { setSelectedId(null); setDraft(createDraft(null)); }} tone="secondary" size="sm" style={{ width: 120 }} />
+             <Button label="+ برومو جديد" onPress={() => { setSelectedId(null); setDraft(createDraft(null)); setEditorSection('identity'); }} tone="secondary" size="sm" style={{ width: 120 }} />
       </View>
 
       <View style={{ flexDirection: 'row', gap: 16, flex: 1 }}>
@@ -72,8 +144,8 @@ export function PromosCommandDeckScreen() {
            <View style={{ padding: 8, backgroundColor: '#F1F5F9' }}>
               <Text style={{ fontSize: 10, fontWeight: '900', color: '#64748B' }}>العروض النشطة</Text>
            </View>
-           <ScrollView showsVerticalScrollIndicator={false}>
-              {items.map(item => (
+           <Box style={{ flex: 1, minHeight: 0 }}>
+              {visibleItems.map(item => (
                 <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={{
                   padding: 12,
                   backgroundColor: selectedId === item.id ? '#0A2F5C' : 'transparent',
@@ -87,50 +159,47 @@ export function PromosCommandDeckScreen() {
                    </View>
                 </Pressable>
               ))}
-           </ScrollView>
+              <Box padding={2}>
+                <WebControlPanelCompactPager
+                  page={promoPage}
+                  totalPages={totalPages}
+                  summaryLabel={`عرض ${visibleItems.length} من ${items.length}`}
+                  onPrevious={promoPage > 1 ? () => setPromoPage((currentPage) => currentPage - 1) : undefined}
+                  onNext={promoPage < totalPages ? () => setPromoPage((currentPage) => currentPage + 1) : undefined}
+                />
+              </Box>
+           </Box>
         </Surface>
 
         {/* Column 2: Compact Form Studio (Center) */}
         <Box style={{ flex: 1 }} gap={12}>
-           <Surface tone="raised" style={{ flex: 1, borderRadius: 16, padding: 16 }}>
-              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 16 }}>
-                 {/* Row 1: Identity */}
-                 <Box gap={6}>
-                    <Text style={{ fontSize: 11, fontWeight: '900', color: '#0A2F5C' }}>1. الهوية والمحتوى</Text>
-                    <TextField label="العنوان الرئيسي" value={draft.title} onChangeText={t => setDraft(d => ({ ...d, title: t }))} />
-                    <TextField label="الوصف الجذاب" value={draft.subtitle} onChangeText={t => setDraft(d => ({ ...d, subtitle: t }))} />
-                    <View style={{ flexDirection: 'row', gap: 12 }}>
-                       <TextField style={{ flex: 1 }} label="نص الزر" value={draft.ctaText} onChangeText={t => setDraft(d => ({ ...d, ctaText: t }))} />
-                       <TextField style={{ flex: 1 }} label="لون التمييز" value={draft.accentColor} onChangeText={t => setDraft(d => ({ ...d, accentColor: t }))} />
+           <Surface tone="raised" style={{ flex: 1, borderRadius: 16, padding: 16, overflow: 'hidden' }}>
+              <Box gap={12} style={{ flex: 1, minHeight: 0 }}>
+                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                    <Text style={{ fontSize: 11, fontWeight: '900', color: '#64748B' }}>استوديو التحرير</Text>
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                      <Button label="حذف" onPress={() => { if (!selectedId) return; removeHomePromoItem(selectedId); refresh(); }} tone="danger" variant="ghost" size="sm" />
+                      <Button label={draft.status === 'published' ? 'إيقاف' : 'نشر'} onPress={() => setDraft(d => ({ ...d, status: d.status === 'published' ? 'draft' : 'published' }))} tone="secondary" size="sm" />
+                      <Button label="حفظ" onPress={handleSave} tone="primary" size="sm" />
                     </View>
-                 </Box>
+                 </View>
 
-                 {/* Row 2: Logic */}
-                 <Box gap={6}>
-                    <Text style={{ fontSize: 11, fontWeight: '900', color: '#0A2F5C' }}>2. قواعد الربط الذكي</Text>
-                    <View style={{ flexDirection: 'row', gap: 12 }}>
-                       <SelectField style={{ flex: 1 }} label="نوع الوجهة" value={draft.targetType} onValueChange={v => setDraft(d => ({ ...d, targetType: v }))} options={[{value:'store',label:'متجر'},{value:'category',label:'فئة'},{value:'product',label:'منتج'}]} />
-                       <SelectField style={{ flex: 1 }} label="الوجهة المحددة" value={draft.targetId} onValueChange={(v,o) => setDraft(d => ({ ...d, targetId: v, targetLabel: o?.label??'' }))} options={getTargetOptions()} />
-                    </View>
-                 </Box>
+                 <Tabs<PromoEditorSection>
+                    items={[
+                      { value: 'identity', label: 'الهوية' },
+                      { value: 'logic', label: 'الربط' },
+                      { value: 'media', label: 'الوسائط' },
+                    ]}
+                    value={editorSection}
+                    onValueChange={setEditorSection}
+                    variant="pill"
+                 />
 
-                 {/* Row 3: Media */}
-                 <Box gap={6}>
-                    <Text style={{ fontSize: 11, fontWeight: '900', color: '#0A2F5C' }}>3. الوسائط</Text>
-                    <View style={{ flexDirection: 'row', gap: 12 }}>
-                       <TextField style={{ flex: 1 }} label="خلفية القالب" value={draft.imageUrl} onChangeText={t => setDraft(d => ({ ...d, imageUrl: t }))} />
-                       <TextField style={{ flex: 1 }} label="أيقونة الشخصية" value={draft.thumbnail} onChangeText={t => setDraft(d => ({ ...d, thumbnail: t }))} />
-                    </View>
+                 <Box gap={16} style={{ flex: 1, minHeight: 0 }}>
+                    {renderEditorSection()}
                  </Box>
-              </ScrollView>
+              </Box>
            </Surface>
-
-           {/* Sticky Actions Bar */}
-           <View style={{ flexDirection: 'row', gap: 10, paddingVertical: 4 }}>
-              <Button label="حذف" onPress={() => { removeHomePromoItem(selectedId!); refresh(); }} tone="danger" style={{ flex: 0.3 }} />
-              <Button label={draft.status === 'published' ? 'إيقاف النشر' : 'تفعيل ونشر'} onPress={() => setDraft(d => ({ ...d, status: d.status === 'published' ? 'draft' : 'published' }))} tone="secondary" style={{ flex: 0.7 }} />
-              <Button label="حفظ التغييرات" onPress={handleSave} tone="primary" style={{ flex: 1 }} />
-           </View>
         </Box>
 
         {/* Column 3: Insights & Preview (Right) */}
@@ -147,7 +216,7 @@ export function PromosCommandDeckScreen() {
                     <Text style={{ color:'#FF500D', fontSize:9, fontWeight:'800', textAlign:'center' }}>{draft.subtitle || 'الوصف'}</Text>
                  </Box>
               </View>
-              <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 9, marginTop: 12, textAlign: 'center' }}>دقة العرض اللحظي: 100%</Text>
+              <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 9, marginTop: 12, textAlign: 'center' }}>معاينة محلية داخل غرفة التحكم</Text>
            </Surface>
 
             <Surface tone="raised" style={{ flex: 1, borderRadius: 16, padding: 16 }}>

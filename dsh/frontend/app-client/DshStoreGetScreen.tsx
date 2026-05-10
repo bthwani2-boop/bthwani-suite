@@ -25,7 +25,7 @@ import { dshCategoryMeasurementPolicies } from '../shared/catalog';
 import { formatDshStoreFollowersLabel } from './store-profile';
 import { resolveDshImageSource } from './resolve-image-source';
 import { getDshClientStateMeta, type DshClientState } from './dshClientStateModel';
-import { type DshStoreMenuItem as DshStoreGetMenuItem } from './dshStoreTypes';
+import { type DshStoreFixtureItem as DshStoreGetMenuItem } from './types';
 import { mapMenuItemToProductCard } from './mapMenuItemToProductCard';
 import { canRenderInClientSurface } from '../shared/workflow';
 

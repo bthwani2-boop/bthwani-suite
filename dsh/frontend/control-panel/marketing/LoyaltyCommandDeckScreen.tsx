@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Box, Surface, Tabs, Text } from '@bthwani/ui-kit';
 import {
   getLoyaltyPrograms,
@@ -196,11 +196,9 @@ export function LoyaltyCommandDeckScreen() {
             variant="line"
           />
 
-          <ScrollView style={styles.scrollView}>
-            <Box gap={4} style={{ padding: 16 }}>
-              {renderTabContent()}
-            </Box>
-          </ScrollView>
+          <Box gap={4} style={styles.panelBody}>
+            {renderTabContent()}
+          </Box>
         </Surface>
 
         {/* Side Panel for Preview */}
@@ -208,14 +206,12 @@ export function LoyaltyCommandDeckScreen() {
           <View style={styles.editorHeader}>
             <Text role="titleSm" style={{ color: '#0A2F5C' }}>محاكاة التأثير</Text>
           </View>
-          <ScrollView style={styles.scrollView}>
-            <Box gap={4} style={{ padding: 16 }}>
-              {renderStoreCardPreview()}
-              <Text role="caption" tone="muted" style={{ lineHeight: 20, textAlign: 'right' }}>
-                هذه المحاكاة تعرض الشارات والمزايا التي ترثها المتاجر المؤهلة بناءً على استحقاقات المستخدم أو قواعد الاشتراك الفعالة.
-              </Text>
-            </Box>
-          </ScrollView>
+          <Box gap={4} style={styles.panelBody}>
+            {renderStoreCardPreview()}
+            <Text role="caption" tone="muted" style={{ lineHeight: 20, textAlign: 'right' }}>
+              هذه المحاكاة تعرض الشارات والمزايا التي ترثها المتاجر المؤهلة بناءً على استحقاقات المستخدم أو قواعد الاشتراك الفعالة.
+            </Text>
+          </Box>
         </Surface>
       </View>
     </div>
@@ -273,8 +269,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F1F5F9',
     backgroundColor: '#fff',
   },
-  scrollView: {
+  panelBody: {
     flex: 1,
+    minHeight: 0,
+    padding: 16,
   },
   card: {
     padding: 16,

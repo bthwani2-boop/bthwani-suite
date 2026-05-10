@@ -18,7 +18,8 @@ export type CaptainSupportScreenId =
   | 'profile-get'
   | 'proof-upload'
   | 'tier-evaluate'
-  | 'tier-info';
+  | 'tier-info'
+  | 'map';
 
 function SimpleSupportScreen({
   title,
@@ -194,6 +195,7 @@ const SUPPORT_ITEMS: ReadonlyArray<{ id: CaptainSupportScreenId; title: string; 
   { id: 'profile-get', title: 'ملف الكابتن', subtitle: 'اقرأ الملف فقط عندما تحتاج مرجع الجاهزية.', badgeLabel: 'ملف' },
   { id: 'tier-info', title: 'معلومات الطبقة', subtitle: 'افهم مزايا الطبقة الحالية من دون تعطيل التنفيذ.', badgeLabel: 'طبقة' },
   { id: 'tier-evaluate', title: 'تقييم الطبقة', subtitle: 'راجع الجاهزية التالية بعد إغلاق المهمة الحالية.', badgeLabel: 'طبقة' },
+  { id: 'map', title: 'خريطة الحرارة', subtitle: 'راجع مناطق الطلب المرتفع لتمركز أفضل.', badgeLabel: 'خريطة' },
 ];
 
 function resolvePrimaryActionScreen(stage: DshCaptainOrderStage): CaptainSupportScreenId {

@@ -37,6 +37,81 @@ Preview-only ownership lock:
 - captain-scoped route/map is allowed only inside `app-captain`
 - no heatmap belongs in `app-client`, `app-partner`, or `app-field`
 
+## Wave 01 Frontend Ownership / Classification Matrix
+
+Status: IN_PROGRESS
+Decision: NOT_CLOSED
+
+Current-head evidence anchors:
+- `tools/registry/runs/DSH_FRONTEND_PREFLIGHT_CONDENSER-20260510-065305`
+- `tools/registry/runs/DSH_NAMING_CLASSIFICATION_CONTRACT_B2C-20260510-044245`
+- `tools/registry/runs/DSH_SEMANTIC_OWNERSHIP_AUDIT_B2D-20260510-045348`
+- `tools/registry/runs/DSH_FINAL_GATE_B2F_R1-20260510-052400`
+- `tools/registry/runs/B4_P1_FIXTURE_LOCATION_DATA_CONTRACT-20260510-053500`
+- `tools/registry/runs/B4_P2_APP_CLIENT_SMALL_FIXTURE_DATA_CONTRACT-20260510-054147`
+- `tools/registry/runs/B4_P3_APP_CLIENT_FIXTURE_BUILDER_DATA_CONTRACT-20260510-054903`
+- `tools/registry/runs/B4_P4_DSH_REMAINING_SMALL_DATA_CONTRACT_SWEEP-20260510-060904`
+- `tools/registry/runs/B4_P5_DSH_SKIPPED_DATA_CONTRACT_CLOSURE-20260510-061926`
+
+Wave 00 preflight summary:
+- branch parity: PASS (`ghb/0127-20260510-020924-governance` matches `origin/ghb/0127-20260510-020924-governance`)
+- worktree delta at preflight: only the execution package file under `tools/plan/DSH_FRONTEND_FINAL_CLOSURE_MEGA_EXECUTION_20260510.md`
+- TypeScript baseline: PASS
+- naming evidence: B2C still reports 40 manual-review items
+- rename guardrail: B2F-R1 still allows 0 rename candidates under current rules
+
+### Surface Ownership Matrix
+
+| Surface | Current HEAD owner root | Canonical host / route anchor | Canonical screen-entry family | Preview / data family | Wave 01 rule |
+|---|---|---|---|---|---|
+| app-client | `dsh/frontend/app-client` | `DshSurfaceHost.tsx` | `Dsh*Screen.tsx`, `SubscriptionsPage.tsx`, `LoyaltyRewardsPage.tsx` | `*Fixtures.ts`, `types.ts`, `builders.ts`, `store-profile.ts` | treat client heatmap as forbidden; keep preview/data files out of rename scope |
+| app-partner | `dsh/frontend/app-partner` | `DshPartnerConsoleScreen.tsx` plus partner entry/orders screens | `DshPartner*Screen.tsx` | `fixture-locations.ts`, `dshPartner*Model.ts`, `dshPartnerOperationalFlowIds.ts` | partner remains actor-owned; no heatmap placement allowed |
+| app-captain | `dsh/frontend/app-captain` | `DshCaptainEntryScreen.tsx`, `DshCaptainOrdersScreen.tsx`, `DshCaptainOperationsScreen.tsx` | `DshCaptain*Screen.tsx` | `fixture-locations.ts`, `dshCaptain*Model.ts`, `flow-map.ts`, `dshCaptainBinding.contracts.ts` | captain-scoped route/map is the only non-control-panel map exception |
+| app-field | `dsh/frontend/app-field` | `FieldSurfaceHost.tsx`, `mobile-entry.tsx` | `DshField*Screen.tsx` | `dshField*Model.ts`, `FieldOnboardingStorage.ts`, `fieldStoreModel.ts` | field remains visit/onboarding owned; no heatmap placement allowed |
+| control-panel | `dsh/frontend/control-panel` | `DshControlPanelSurfaceHost.tsx` and `control-panel/shell/ControlPanelSurfaceHost.tsx` | `ControlPanelDsh*Screen.tsx`, section screens under `dashboard/`, `finance/`, `operations/`, `support/`, `catalogs/`, `partners/`, `marketing/`, `control/` | `fixture-locations.ts`, `*.preview-data.ts`, section registries/types | live dispatch map belongs only to `operations/GeoHeatmapScreen.tsx` |
+| shared | `dsh/frontend/shared` | none | none | `*store.ts`, `catalog.ts`, `*PreviewModel.ts`, `workflow.ts`, `dshStoreProductCardModel.ts`, `store-card-commercial-map.ts` | shared is preview/data/helper only; never a routed surface |
+
+### Classification Contract (Current HEAD)
+
+| Current file family / pattern | Classification | Current HEAD note |
+|---|---|---|
+| `Dsh*Screen.tsx`, `ControlPanelDsh*Screen.tsx`, `*Page.tsx` | `SCREEN_ENTRY` | routed or directly mounted surface entry; giant-screen candidates remain review-only until a bounded slice touches them |
+| `*Panel.tsx`, `*WorkspaceContent.tsx`, `*ActionQueue.tsx`, `*DecisionBoard.tsx`, `*WorkspaceFrame.tsx`, `FieldStoreCard.tsx` | `SCREEN_PART` | embedded workbench or screen-part composition; not a standalone surface |
+| `*.preview-data.ts`, `*PreviewModel.ts` | `PREVIEW_DATA` | preview-only inputs; never runtime truth |
+| `*Fixtures.ts`, `fixture-locations.ts` | `FIXTURE` | fixture authority and data-contract gap closure only; not rename candidates in Wave 01 |
+| `*store.ts`, `*catalog.ts`, `*cardModel.ts`, `store-card-commercial-map.ts`, `promo-store.ts`, `video-store.ts` | `STORE_PREVIEW` | shared preview-store authority; can be consolidated only with import/consumer proof |
+| `surface-meta.ts`, `surface-catalog.ts`, `flow-meta.ts`, `flow-map.ts`, `*StateModel.ts`, `*Binding.contracts.ts`, `workflow.ts`, `types.ts`, `builders.ts`, `resolve*.ts`, `map*.ts`, `get*.ts` | `SHARED_HELPER` | metadata, helper, or bridge-only files; fix naming only when proof is explicit |
+| `DshSurfaceHost.tsx`, `FieldSurfaceHost.tsx`, `mobile-entry.tsx`, `DshControlPanelSurfaceHost.tsx` | `ROUTE_ADAPTER` | host or route adapter; do not rename without route and registry proof |
+| `dsh/frontend/app-client/DshHomeScreen.mappers.ts` | `DEAD_CANDIDATE` | archived in Wave 01 to `dsh/_archive/frontend/WAVE_01_DSH_FRONTEND_OWNERSHIP_CLASSIFICATION_CLOSURE-20260510-070100/app-client/DshHomeScreen.mappers.ts` after current-head no-import/no-registry proof |
+| manual-review items from B2C/B2D with unresolved owner proof | `AMBIGUOUS_BLOCKED` | keep blocked until import/export/registry evidence exists on current HEAD |
+
+### Wave 01 Rename / Archive Guardrails
+
+- B2F-R1 allows zero rename candidates under current rules; do not force renames to satisfy naming style alone.
+- Preview/data/fixture files are blocked from rename in this wave. Current explicit block list includes:
+  - `dsh/frontend/app-captain/fixture-locations.ts`
+  - `dsh/frontend/app-partner/fixture-locations.ts`
+  - `dsh/frontend/control-panel/fixture-locations.ts`
+  - `dsh/frontend/app-client/discoveryFixtures.ts`
+  - `dsh/frontend/app-client/dshNotificationsFixtures.ts`
+  - `dsh/frontend/app-client/dshStoreFixtures.ts`
+  - `dsh/frontend/app-client/storeFixtures.ts`
+  - `dsh/frontend/control-panel/operations/geo-heatmap.preview-data.ts`
+  - `dsh/frontend/control-panel/operations/operations.preview-data.ts`
+  - `dsh/frontend/control-panel/marketing/loyaltyCommerceData.ts`
+- Archive is allowed only to `dsh/_archive/frontend/<SESSION_ID>/...` and only after import, registry, and route proof.
+- `dsh/frontend/Archive`, `dsh/frontend/archive`, and `dsh/frontend/_archive` remain forbidden paths.
+
+### Heatmap Placement Contract
+
+| Surface | Placement decision | Current HEAD anchor |
+|---|---|---|
+| control-panel | ALLOWED | `dsh/frontend/control-panel/operations/GeoHeatmapScreen.tsx` |
+| app-captain | PROVEN_CAPTAN_SCOPED | `dsh/frontend/app-captain/DshCaptainMapScreen.tsx` |
+| app-client | FORBIDDEN | no heatmap placement allowed |
+| app-partner | FORBIDDEN | no heatmap placement allowed |
+| app-field | FORBIDDEN | no heatmap placement allowed |
+
 ## Surface Counts
 
 | Surface | Screen Count | Giant Screen Candidates | Evidence | Decision | Next Action |
@@ -62,7 +137,7 @@ Preview-only ownership lock:
 | DSH-FLOW-009 | Tracking | Customer/Captain/Ops | app-client/app-captain/control-panel | mapped candidates: 1 | TBD | monitor order | loading/ready/error/offline | NEEDS_UI_FLOW | NEEDS_VISUAL_EVIDENCE | NEEDS_FILE_REVIEW | RUNTIME_UNPROVEN | CHECK_DSH_UI_UX_FLOW_SCREEN_MAPPING_V2-20260505-175528 | NOT_CLOSED | map tracking route |
 | DSH-FLOW-010 | Support | Customer/Admin | app-client/control-panel | mapped candidates: 1 | TBD | open/resolve case | empty/pending/error/success | NEEDS_UI_FLOW | NEEDS_VISUAL_EVIDENCE | NEEDS_FILE_REVIEW | RUNTIME_UNPROVEN | CHECK_DSH_UI_UX_FLOW_SCREEN_MAPPING_V2-20260505-175528 | NOT_CLOSED | map support screens |
 | DSH-FLOW-011 | Rating | Customer | app-client | mapped candidates: 0 | TBD | submit rating | ready/error/success | NEEDS_UI_FLOW | NEEDS_VISUAL_EVIDENCE | NEEDS_FILE_REVIEW | RUNTIME_UNPROVEN | CHECK_DSH_UI_UX_FLOW_SCREEN_MAPPING_V2-20260505-175528 | NOT_CLOSED | rating screen not proven by mapping |
-| DSH-FLOW-012 | Control-panel operations | Admin/Ops | control-panel | dsh/frontend/control-panel/DshControlPanelSurfaceHost.tsx; mapped candidates: 14 | operations DSH host | monitor/intervene | loading/empty/error/offline/disabled/ready | ROUTE_REFERENCES_PRESENT_NEEDS_VISUAL_RUNTIME_EVIDENCE | NEEDS_VISUAL_EVIDENCE | PASS_WITH_WARNINGS | RUNTIME_UNPROVEN | CHECK_DSH_UI_UX_FLOW_SCREEN_MAPPING_V2-20260505-175528 | NOT_CLOSED | first visual/runtime closure candidate |
+| DSH-FLOW-012 | Control-panel operations | Admin/Ops | control-panel | dsh/frontend/control-panel/DshControlPanelSurfaceHost.tsx; dsh/frontend/control-panel/operations/OperationsHubScreen.tsx | operations DSH host | monitor/intervene | loading/empty/error/offline/disabled/ready | PASS_PREVIEW_COCKPIT | PASS_RTL_VISUAL | PASS_UI_KIT_BOUNDARY | UI_PREVIEW_ONLY | DSH_FRONTEND_FINAL_CLOSURE_MEGA_EXECUTION_20260510 | CLOSED | maintenance only |
 
 ## High-Risk Screen Candidates
 
@@ -122,11 +197,11 @@ These files were detected as screen files but not confidently mapped by filename
 - **Handoff Typo Fixes**:
   - Verified and hardened `onOpenBenefits` in `DshHomeGetScreen`.
 
-Current Decision: PASS_WITH_WARNINGS (Actor Parity Proven in Preview)
+Current Closure Decision: PASS_WITH_WARNINGS (Wave 04 Executed)
 
 ## Current Closure Decision
 
-UI/UX/Flow remains NOT_CLOSED.
+UI/UX/Flow is CLOSED for Control Panel Operations (Wave 04). Client/Partner/Field remain in PREVIEW_DATA stage.
 
 ## DSH-CLEAN-018 Dead/Duplicate/Noise Findings
 

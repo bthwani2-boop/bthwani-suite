@@ -106,7 +106,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
     title: 'رحلة العميل',
     description: 'طلبات العميل الأساسية تحتاج evidence branch قبل أي claim إغلاق.',
-    evidenceHint: 'screen and guard proof',
+    evidenceHint: 'دليل فحص الشاشة والحماية',
     routeHint: '/app-client/orders',
   },
   {
@@ -117,7 +117,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
     title: 'رحلة الشريك',
     description: 'مسار الشريك الطلبي يحتاج evidence قبل اعتباره مغلقًا.',
-    evidenceHint: 'export and route proof',
+    evidenceHint: 'دليل تصدير المسارات',
     routeHint: '/app-partner/orders',
   },
   {
@@ -128,7 +128,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
     title: 'رحلة الكابتن',
     description: 'تحتاج الشهادة الداعمة لإغلاق root exposure بالكامل.',
-    evidenceHint: 'root export proof',
+    evidenceHint: 'دليل التصدير الرئيسي',
     routeHint: '/app-captain/orders',
   },
   {
@@ -139,7 +139,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     runtimeBindingStatus: 'NEEDS_BINDING_LATER',
     title: 'تهيئة الميدان',
     description: 'الفلو الميداني يحتاج إعادة تنظيم خفيفة على مستوى الأسماء والربط.',
-    evidenceHint: 'structured flow proof',
+    evidenceHint: 'دليل المسار المنظم',
     routeHint: '/app-field/stores',
   },
   {
@@ -150,7 +150,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     runtimeBindingStatus: 'NEEDS_BINDING_LATER',
     title: 'زيارة ميدانية',
     description: 'الزيارة الميدانية يجب أن تبقى ضمن onboarding/visit flow.',
-    evidenceHint: 'visit and geo pin proof',
+    evidenceHint: 'دليل الزيارة والتحديد الجغرافي',
     routeHint: '/app-field/visits',
   },
   {
@@ -161,7 +161,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     runtimeBindingStatus: 'UI_PREVIEW_ONLY',
     title: 'عمليات لوحة التحكم',
     description: 'العمليات تحتاج خريطة إغلاق خاصة قبل اعتباره مقفلاً بالكامل.',
-    evidenceHint: 'workspace evidence',
+    evidenceHint: 'دليل مساحة العمل',
     routeHint: '/operations',
   },
   {
@@ -172,7 +172,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     runtimeBindingStatus: 'UI_PREVIEW_ONLY',
     title: 'المالية',
     description: 'المالية ظاهرة لكن تحتاج لقطات closure evidence أوضح.',
-    evidenceHint: 'finance matrix',
+    evidenceHint: 'مصفوفة المالية',
     routeHint: '/finance',
   },
   {
@@ -183,7 +183,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     runtimeBindingStatus: 'UI_PREVIEW_ONLY',
     title: 'الدعم',
     description: 'الدعم يحتاج مسارات issue/dispute وليست صفحات عامة.',
-    evidenceHint: 'support queue evidence',
+    evidenceHint: 'دليل طابور الدعم',
     routeHint: '/operations?workspace=issues',
   },
   {
@@ -194,7 +194,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     runtimeBindingStatus: 'UI_PREVIEW_ONLY',
     title: 'الكتالوجات',
     description: 'كتالوج DSH يحتاج evidence قبل أي claim إغلاق.',
-    evidenceHint: 'catalog approval proof',
+    evidenceHint: 'دليل اعتماد الكتالوج',
     routeHint: '/catalogs',
   },
   {
@@ -205,7 +205,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     runtimeBindingStatus: 'UI_PREVIEW_ONLY',
     title: 'الشركاء',
     description: 'بوابة الشركاء تحتاج evidence قبل وصفها بالمغلقة.',
-    evidenceHint: 'partner activation proof',
+    evidenceHint: 'دليل تفعيل الشريك',
     routeHint: '/partners',
   },
   {
@@ -216,7 +216,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     runtimeBindingStatus: 'UI_PREVIEW_ONLY',
     title: 'التسويق',
     description: 'الموافقات التسويقية تحتاج evidence قبل claim الإغلاق.',
-    evidenceHint: 'marketing approval proof',
+    evidenceHint: 'دليل اعتماد التسويق',
     routeHint: '/marketing',
   },
   {
@@ -227,7 +227,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     runtimeBindingStatus: 'NEEDS_BINDING_LATER',
     title: 'التحكم والمنصة',
     description: 'طبقة المنصة تحتاج proof matrix نهائية.',
-    evidenceHint: 'guard status proof',
+    evidenceHint: 'دليل حالة الحماية',
     routeHint: '/platform',
   },
 ];

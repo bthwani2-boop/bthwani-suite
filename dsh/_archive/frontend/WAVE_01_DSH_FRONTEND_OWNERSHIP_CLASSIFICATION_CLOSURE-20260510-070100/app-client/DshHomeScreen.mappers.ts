@@ -1,12 +1,12 @@
-import { dshDiscoveryStores } from './discoveryFixtures';
+import { dshDiscoveryStores } from '../../../../frontend/app-client/discoveryFixtures';
 import { colorPalette } from '@bthwani/ui-kit';
 import type {
   DshHomeCategory,
   DshHomeGetPromo,
   DshHomeGetStore,
   DshHomeRecentOrder,
-} from './DshHomeGetScreen';
-import { dshCategoryFixtures } from './dshCategoriesFixtures';
+} from '../../../../frontend/app-client/DshHomeGetScreen';
+import { dshCategoryFixtures } from '../../../../frontend/app-client/dshCategoriesFixtures';
 
 export type DshHomeScreenState =
   | 'ready'

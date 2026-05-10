@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { StyleSheet, View, Pressable, ScrollView } from 'react-native';
+import { StyleSheet, View, Pressable } from 'react-native';
 import { Box, Button, Surface, Tabs, Text, TextField } from '@bthwani/ui-kit';
+import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getCampaignItems,
   getCampaignKpis,
@@ -23,16 +24,19 @@ import type { Entitlement } from '../../shared/loyalty-store';
 
 type EditorTab = 'plan' | 'audience' | 'channels' | 'schedule' | 'impact';
 
+const campaignsPageSize = 5;
+
 export function CampaignsCommandDeckScreen() {
   const [items, setItems] = React.useState<CampaignRecord[]>(() => getCampaignItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getCampaignItems()[0]?.id ?? null);
   const selected = React.useMemo(() => items.find(i => i.id === selectedId) ?? null, [items, selectedId]);
   const [draft, setDraft] = React.useState<Partial<CampaignRecord>>({});
   const [editorTab, setEditorTab] = React.useState<EditorTab>('plan');
+  const [campaignsPage, setCampaignsPage] = React.useState(1);
 
   React.useEffect(() => {
     if (selected) {
-      setDraft({ ...selected });
+			setDraft({ ...selected, placement: selected.placement === 'hero' ? 'banner' : selected.placement });
     } else {
       setDraft({
         title: '',
@@ -42,7 +46,7 @@ export function CampaignsCommandDeckScreen() {
         goal: 'awareness',
         audience: 'all',
         channels: [],
-        placement: 'hero',
+        placement: 'banner',
         targetType: 'home',
         targetId: '',
         startDate: '',
@@ -54,6 +58,29 @@ export function CampaignsCommandDeckScreen() {
   const kpis = React.useMemo(() => getCampaignKpis(), [items]);
 
   const refresh = () => setItems(getCampaignItems());
+
+  const totalPages = Math.max(1, Math.ceil(items.length / campaignsPageSize));
+  const visibleItems = React.useMemo(() => {
+    const startIndex = (campaignsPage - 1) * campaignsPageSize;
+    return items.slice(startIndex, startIndex + campaignsPageSize);
+  }, [campaignsPage, items]);
+
+  React.useEffect(() => {
+    setCampaignsPage((currentPage) => Math.min(currentPage, totalPages));
+  }, [totalPages]);
+
+  React.useEffect(() => {
+    if (items.length === 0) {
+      setSelectedId(null);
+      return;
+    }
+
+    if (selectedId && items.some((item) => item.id === selectedId)) {
+      return;
+    }
+
+    setSelectedId(items[0].id);
+  }, [items, selectedId]);
 
   const handleCreateNew = () => {
     setSelectedId(null);
@@ -69,6 +96,15 @@ export function CampaignsCommandDeckScreen() {
   const handleToggle = (id: string) => {
     toggleCampaignStatus(id);
     refresh();
+  };
+
+  const handleDuplicate = (id: string) => {
+    const duplicated = duplicateCampaignItem(id);
+    refresh();
+    if (duplicated) {
+      setSelectedId(duplicated.id);
+      setEditorTab('plan');
+    }
   };
 
   const handleDelete = (id: string) => {
@@ -327,8 +363,8 @@ export function CampaignsCommandDeckScreen() {
             <Text role="titleSm" style={{ color: '#0A2F5C' }}>الحملات ({items.length})</Text>
             <Button label="+ حملة جديدة" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={styles.smallButton} />
           </View>
-          <ScrollView style={styles.scrollView} contentContainerStyle={{ padding: 12, gap: 8 }}>
-            {items.map(item => (
+          <Box gap={2} style={{ flex: 1, minHeight: 0, padding: 12 }}>
+            {visibleItems.map(item => (
               <Pressable
                 key={item.id}
                 style={[styles.rowItem, selectedId === item.id && styles.rowItemSelected]}
@@ -345,19 +381,26 @@ export function CampaignsCommandDeckScreen() {
                 </View>
               </Pressable>
             ))}
-          </ScrollView>
+            <WebControlPanelCompactPager
+				page={campaignsPage}
+				totalPages={totalPages}
+				summaryLabel={`عرض ${visibleItems.length} من ${items.length} حملات`}
+				onPrevious={campaignsPage > 1 ? () => setCampaignsPage((currentPage) => currentPage - 1) : undefined}
+				onNext={campaignsPage < totalPages ? () => setCampaignsPage((currentPage) => currentPage + 1) : undefined}
+			/>
+          </Box>
         </Surface>
 
         {/* Editor Panel */}
         <Surface tone="raised" style={styles.editorPanel}>
           <View style={styles.panelHeader}>
             <Text role="titleSm" style={{ color: '#0A2F5C' }}>{selected ? 'تعديل الحملة' : 'حملة جديدة'}</Text>
-            {selected && (
-              <View style={{ flexDirection: 'row', gap: 8 }}>
-                <Button label={selected.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" fullWidth={false} onPress={() => handleToggle(selected.id)} style={styles.smallButton} />
-                <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(selected.id)} style={styles.smallButtonTextRed} />
-              </View>
-            )}
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              {selected ? <Button label="نسخ" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(selected.id)} style={styles.smallButton} /> : null}
+              {selected ? <Button label={selected.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" fullWidth={false} onPress={() => handleToggle(selected.id)} style={styles.smallButton} /> : null}
+              {selected ? <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(selected.id)} style={styles.smallButtonTextRed} /> : null}
+              <Button label="حفظ" onPress={handleSave} tone="primary" fullWidth={false} style={styles.smallButtonPrimary} />
+            </View>
           </View>
 
           <Tabs<EditorTab>
@@ -373,14 +416,9 @@ export function CampaignsCommandDeckScreen() {
             variant="line"
           />
 
-          <ScrollView style={styles.scrollView}>
-            <Box gap={4} style={{ padding: 16 }}>
-              {renderEditorContent()}
-              <Box layoutDirection="row" justify="flex-end" style={{ marginTop: 16 }}>
-                <Button label="حفظ التغييرات" onPress={handleSave} style={{ backgroundColor: '#FF500D' }} />
-              </Box>
-            </Box>
-          </ScrollView>
+          <Box gap={4} style={{ padding: 16, flex: 1, minHeight: 0 }}>
+            {renderEditorContent()}
+          </Box>
         </Surface>
       </View>
     </div>
@@ -465,9 +503,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F1F5F9',
     backgroundColor: '#fff',
   },
-  scrollView: {
-    flex: 1,
-  },
   rowItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -548,6 +583,12 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     minHeight: 0,
     color: '#DC2626',
+  },
+  smallButtonPrimary: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    minHeight: 0,
+    backgroundColor: '#0A2F5C',
   }
 });
 
