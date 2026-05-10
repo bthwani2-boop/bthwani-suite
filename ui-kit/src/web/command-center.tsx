@@ -624,11 +624,11 @@ export function WebCommandStrip({
         </div>
 
         <div className="ui-web-command-strip__actions">
-          <button type="button" className="ui-web-command-strip__action-btn" onClick={onAlertClick}>
+          <button type="button" className="ui-web-command-strip__action-btn" onClick={onAlertClick} aria-label="التنبيهات">
             ⊙
             {parseInt(alertCountLabel) > 0 && <span className="ui-web-command-strip__alert-badge" />}
           </button>
-          <button type="button" className="ui-web-command-strip__action-btn" onClick={onRefreshClick}>
+          <button type="button" className="ui-web-command-strip__action-btn" onClick={onRefreshClick} aria-label="تحديث">
             ↻
           </button>
           <button type="button" className="ui-web-command-strip__action-btn" onClick={resolvedLanguageClick}>

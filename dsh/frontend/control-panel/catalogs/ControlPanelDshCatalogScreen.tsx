@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, Tabs, ListItem, Divider } from '@bthwani/ui-kit';
 import { WebControlPanelRecommendation, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import {
@@ -64,7 +65,7 @@ function FilterToken({ label, onRemove }: { label: string, onRemove: () => void 
   return (
     <Surface tone="raised" paddingX={2} paddingY={0.5} radiusToken="full" layoutDirection="row" align="center" gap={1}>
       <Text role="caption" style={{ fontWeight: 700 }}>{label}</Text>
-      <Button label="✕" tone="secondary" size="sm" onPress={onRemove} style={{ minWidth: 0, padding: 0, background: 'transparent', border: 'none' }} />
+      <Button label="✕" accessibilityLabel="إزالة" tone="secondary" size="sm" onPress={onRemove} style={{ minWidth: 0, padding: 0, background: 'transparent', border: 'none' }} />
     </Surface>
   );
 }
@@ -104,12 +105,12 @@ function WatermarkedImage({ src, fallback, size = 32 }: { src?: string, fallback
   return (
     <Surface tone="inset" padding={0} border radiusToken="xs" style={{ width: size, height: size, position: 'relative', overflow: 'hidden', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
       {src ? (
-        <img src={src} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="صورة المنتج" />
+        <Image src={src} fill style={{ objectFit: 'cover' }} alt="صورة المنتج" />
       ) : (
         <Text style={{ fontSize: `${size/2}px` }}>{fallbackLabel}</Text>
       )}
       <Box style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', alignItems: 'center', justifyContent: 'center', opacity: 0.4, backgroundColor: 'rgba(255,255,255,0.15)' }}>
-        <img src={WATERMARK_URL} style={{ width: '80%', height: '80%', objectFit: 'contain' }} alt="شعار المنصة" />
+        <Image src={WATERMARK_URL} width={size * 0.8} height={size * 0.8} style={{ objectFit: 'contain' }} alt="شعار المنصة" />
       </Box>
     </Surface>
   );
@@ -348,7 +349,7 @@ export function ControlPanelDshCatalogScreen({
       {/* 1. Header Area - Catalog Command Deck */}
       <header className={styles.operationsTopBar}>
         <div className={styles.operationsTitleBlock}>
-          <div style={{
+          <div aria-hidden="true" style={{
             width: '32px',
             height: '32px',
             backgroundColor: '#0A2F5C',
@@ -522,7 +523,15 @@ export function ControlPanelDshCatalogScreen({
                         const sub = cat?.subcategories.find(s => s.id === p.categoryPath.sub);
                         const classif = sub?.mainClassifications?.find(c => c.id === p.categoryPath.mainClassification);
                         return (
-                          <tr key={p.id} onClick={() => setSelectedProductId(p.id)} className={selectedProductId === p.id ? styles.selected : ''}>
+                          <tr
+                            key={p.id}
+                            onClick={() => setSelectedProductId(p.id)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setSelectedProductId(p.id); e.preventDefault(); } }}
+                            className={selectedProductId === p.id ? styles.selected : ''}
+                            role="button"
+                            tabIndex={0}
+                            aria-pressed={selectedProductId === p.id}
+                          >
                             {showBulkOps && (
                               <td onClick={e => e.stopPropagation()}>
                                 <input type="checkbox" style={{ accentColor: '#0A2F5C' }} />
@@ -570,7 +579,7 @@ export function ControlPanelDshCatalogScreen({
           <div className={styles.inspectorPanel} style={{ width: '320px' }}>
              <Box padding={3} background="surfaceRaised" style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }} layoutDirection="row" justify="space-between" align="center">
                 <Text role="bodyStrong" style={{ fontSize: '14px' }}>تفاصيل المنتج</Text>
-                <Button label="✕" tone="secondary" size="xs" onPress={() => setSelectedProductId(null)} />
+                <Button label="✕" accessibilityLabel="إغلاق" tone="secondary" size="xs" onPress={() => setSelectedProductId(null)} />
              </Box>
              <Box gap={3} padding={3}>
                 <Box layoutDirection="row" gap={3} align="center">

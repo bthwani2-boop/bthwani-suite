@@ -1,7 +1,24 @@
-// NOTE (example-only): UI text and layout placeholders may include governance tokens for documentation; these are not runtime secrets. See kdt/merge-run/.../proposed/PROTECTED_TOKENS_ALLOWLIST.md.
-export const metadata = {
-  title: 'لوحة التحكم',
-  description: 'Unified operating room',
+import { Inter } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+
+export const metadata: Metadata = {
+  title: 'لوحة التحكم | BThwani',
+  description: 'Unified operational command center for BThwani platform.',
+  robots: 'noindex, nofollow',
+  openGraph: {
+    title: 'BThwani Control Panel',
+    description: 'Unified operational command center.',
+    type: 'website',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 import type { ReactNode } from 'react';
@@ -10,7 +27,9 @@ import { WebRootLayout } from '@bthwani/ui-kit/next';
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <WebRootLayout appName="control-panel" language="ar" themeMode="light">
-      {children}
+      <div className={inter.className} style={{ height: '100%' }}>
+        {children}
+      </div>
     </WebRootLayout>
   );
 }
