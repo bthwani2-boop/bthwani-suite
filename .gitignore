@@ -35,14 +35,7 @@ tools/registry/runs/
 tools/analysis/
 # Local-only scripts
 # tools/scripts/ # ENABLED_FOR_GOVERNANCE_SCRIPT_TRACKING
-# Local-only media fixture assets
-packages/media-fixtures/assets/
-!packages/media-fixtures/assets/
-packages/media-fixtures/assets/*
-!packages/media-fixtures/assets/seed/
-packages/media-fixtures/assets/seed/*
-!packages/media-fixtures/assets/seed/dsh/
-!packages/media-fixtures/assets/seed/dsh/**
+
 # Local Python virtual environments
 .venv/
 .tamagui/
