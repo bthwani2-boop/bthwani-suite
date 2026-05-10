@@ -59,7 +59,7 @@ const seededLoyaltyItems: LoyaltyRecord[] = [
     ctaLabel: 'عرض النقاط',
     highlight: 'عرض محدود',
     metricValue: '١٥,٠٠٠ مستفيد',
-    accentColor: '#8b5cf6',
+    accentColor: '#0A2F5C',
     impressions: 45000,
     clicks: 5200,
   }

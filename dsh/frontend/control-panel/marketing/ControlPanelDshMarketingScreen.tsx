@@ -14,7 +14,7 @@ import { PromosCommandDeckScreen } from './PromosCommandDeckScreen';
 import { CampaignsCommandDeckScreen } from './CampaignsCommandDeckScreen';
 import { PartnerOffersCommandDeckScreen } from './PartnerOffersCommandDeckScreen';
 import { MarketingMediaReviewCommandDeckScreen } from './MarketingMediaReviewCommandDeckScreen';
-import styles from '../operations/dsh-surface.module.css';
+import styles from '../shared/control-panel-surface.module.css';
 import {
   getMarketingTickerItems,
   upsertMarketingTickerItem,
@@ -134,10 +134,10 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
         return (
           <Box gap={4} style={{ paddingBottom: '32px' }}>
             {/* 1) Top command bar / summary strip */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <h3 style={{ color: '#0A2F5C', fontSize: '14px', fontWeight: '800', margin: 0 }}>الرسالة النشطة الآن</h3>
-                <div style={{ display: 'flex', gap: '8px' }}>
+            <Box background="surface" radiusToken="lg" border={{ width: 1, color: 'rgba(10,47,92,0.08)' }} padding={4}>
+              <Box layoutDirection="row" justify="space-between" align="center" marginBottom={3}>
+                <Text role="titleXs" tone="brand" style={{ fontWeight: '800' }}>الرسالة النشطة الآن</Text>
+                <Box layoutDirection="row" gap={2}>
                   <button
                     onClick={() => {
                       const draft = createMarketingTickerDraft();
@@ -145,7 +145,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                       setEditingTickerId(draft.id);
                       refreshTickers();
                     }}
-                    style={{ padding: '4px 12px', backgroundColor: '#0A2F5C', color: '#fff', borderRadius: '6px', border: 'none', fontWeight: '700', fontSize: '11px', cursor: 'pointer' }}
+                    className={styles.surfaceTabActive}
+                    style={{ padding: '4px 12px', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
                   >
                     + إضافة رسالة
                   </button>
@@ -486,10 +487,10 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   };
 
   return (
-    <div className={styles.operationsCockpit} dir="rtl">
+    <div className={styles.surfaceCockpit} dir="rtl">
       {/* 1. Header Area - Marketing Command Deck */}
-      <header className={styles.operationsTopBar}>
-        <div className={styles.operationsTitleBlock}>
+      <header className={styles.surfaceTopBar}>
+        <div className={styles.surfaceTitleBlock}>
           <div style={{
             width: '32px',
             height: '32px',
@@ -499,21 +500,24 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '16px',
+            color: '#FFFFFF',
             boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
           }}>
             ت
           </div>
-          <div>
+          <Box gap={0}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>تسويق DSH</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>اعتماد الأداء</span>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>تسويق DSH</h1>
+              <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
+                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: '9px' }}>اعتماد الأداء</Text>
+              </Box>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>حوكمة المحتوى التسويقي والنمو الاستراتيجي</p>
-          </div>
+            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>حوكمة المحتوى التسويقي والنمو الاستراتيجي</p>
+          </Box>
         </div>
 
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
+        <div className={styles.surfaceHeaderActions}>
+          <div className={styles.surfacePulseCompact}>
             {[
               { label: 'الوصول اليومي', value: '١٢٤,٥٠٠', trend: '+١٢٪', trendTone: 'success' },
               { label: 'نسبة النقر', value: '٣.٨٪', trend: '-٠.٥٪', trendTone: 'warning' },
@@ -523,7 +527,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                 <span className={styles.commandKpiLabel}>{metric.label}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span className={styles.commandKpiValue}>{metric.value}</span>
-                  <span className={`${styles.commandKpiTrend} ${metric.trendTone === 'success' ? styles.toneSuccess : metric.trendTone === 'warning' ? styles.toneWarning : styles.toneInfo}`}>
+                  <span style={{ fontSize: '10px', fontWeight: 800, color: metric.trendTone === 'success' ? '#16A34A' : '#D97706' }}>
                     {metric.trend}
                   </span>
                 </div>
@@ -534,13 +538,13 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       </header>
 
       {/* 2. Primary Tabs - Navigation Cockpit */}
-      <nav className={styles.navigationCockpit}>
+      <nav className={styles.navigationDock}>
         {PRIMARY_TABS.map((tab) => {
           const isSelected = tab.id === activeTab;
           return (
             <button
               key={tab.id}
-              className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
+              className={`${styles.surfaceTab} ${isSelected ? styles.surfaceTabActive : ''}`}
               onClick={() => setActiveTab(tab.id)}
             >
               {tab.label}
@@ -558,7 +562,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
               <button
                 key={sub.id}
                 onClick={() => setActiveSubTab(sub.id)}
-                className={styles.operationsTab}
+                className={styles.surfaceTab}
                 style={{
                   padding: '4px 12px',
                   fontSize: '12px',
@@ -575,8 +579,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       )}
 
       {/* 4. Content Area */}
-      <main className={styles.operationsMainPanel}>
-        <div className={styles.operationsInnerScroll}>
+      <main className={styles.surfaceMainPanel}>
+        <div className={styles.surfaceInnerScroll}>
           {renderActiveLane()}
         </div>
       </main>

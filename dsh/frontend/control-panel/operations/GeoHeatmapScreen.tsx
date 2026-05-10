@@ -21,7 +21,6 @@ import {
 } from '@bthwani/ui-kit/web';
 import { GEO_HEATMAP_ZONES, type GeoHeatmapZone } from './geo-heatmap.preview-data';
 import { translateDshRuntimeBindingStatus, type DshLifecycleStep, type DshSurfaceId, type DshUnifiedRecommendation } from '../shared';
-import styles from './dsh-surface.module.css';
 
 const SUB_TABS = [
   { id: 'orders', label: 'الطلبات', affectedSurface: 'app-client' as const, lifecycleStep: 'tracking' as const },

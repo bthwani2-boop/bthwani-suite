@@ -1,15 +1,17 @@
-import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
-import { WebControlPanelDecisionRow } from '@bthwani/ui-kit/web';
+import {
+  WebControlPanelDenseHeader,
+  WebControlPanelLaneTabs,
+  WebControlPanelSubTabs,
+  WebControlPanelDecisionRow,
+} from '@bthwani/ui-kit/web';
 import { getPartnerIntakeItems } from '../../shared/workflow';
 import {
   ApprovalRecord,
   moveApprovalRecordToStage,
   translateStage,
   translateEntityType,
-  translateOwner,
 } from '../../shared/workflow';
-import styles from '../operations/dsh-surface.module.css';
+import styles from '../shared/control-panel-surface.module.css';
 
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix') => void }) {
   const tone = (item.stage === 'marketing-review' || item.stage === 'approved') ? 'success' :
@@ -27,13 +29,16 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
       reason="البيانات المرفوعة مكتملة وتطابق المعايير الأولية لمنصة بثواني."
       sla={translateEntityType(item.entityType)}
       primaryAction={['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage) ? {
+        id: 'approve',
         label: 'قبول للمراجعة',
         onAction: () => onAction(item.id, 'approve')
       } : undefined}
       secondaryAction={['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage) ? {
+        id: 'fix',
         label: 'طلب تعديل',
         onAction: () => onAction(item.id, 'fix')
       } : {
+        id: 'reject',
         label: 'رفض',
         onAction: () => onAction(item.id, 'reject')
       }}
@@ -64,21 +69,21 @@ export function ControlPanelDshPartnerHubScreen() {
   };
 
   const PRIMARY_TABS = [
-    { id: 'inbox', label: 'الوارد الجديد' },
-    { id: 'eligibility', label: 'أهلية الترويج' },
-    { id: 'topology', label: 'مسارات الخدمة' },
-    { id: 'contracts', label: 'إدارة العقود والامتثال' },
+    { id: 'inbox', label: 'الوارد الجديد', active: activeTab === 'inbox' },
+    { id: 'eligibility', label: 'أهلية الترويج', active: activeTab === 'eligibility' },
+    { id: 'topology', label: 'مسارات الخدمة', active: activeTab === 'topology' },
+    { id: 'contracts', label: 'إدارة العقود والامتثال', active: activeTab === 'contracts' },
   ];
 
-  const SECONDARY_TABS: Record<string, { id: string; label: string }[]> = {
+  const SECONDARY_TABS: Record<string, { id: string; label: string; active?: boolean }[]> = {
     inbox: [
-      { id: 'registration', label: 'طلبات التسجيل' },
-      { id: 'modifications', label: 'تعديل البيانات' },
-      { id: 'complaints', label: 'شكاوى الشركاء' },
+      { id: 'registration', label: 'طلبات التسجيل', active: activeSubTab === 'registration' },
+      { id: 'modifications', label: 'تعديل البيانات', active: activeSubTab === 'modifications' },
+      { id: 'complaints', label: 'شكاوى الشركاء', active: activeSubTab === 'complaints' },
     ],
     eligibility: [
-      { id: 'promotions', label: 'العروض الترويجية' },
-      { id: 'loyalty', label: 'برامج الولاء' },
+      { id: 'promotions', label: 'العروض الترويجية', active: activeSubTab === 'promotions' },
+      { id: 'loyalty', label: 'برامج الولاء', active: activeSubTab === 'loyalty' },
     ],
   };
 
@@ -91,74 +96,73 @@ export function ControlPanelDshPartnerHubScreen() {
   }, [activeTab]);
 
   return (
-    <div className={styles.operationsCockpit} dir="rtl">
-      <header className={styles.operationsTopBar}>
-        <div className={styles.operationsTitleBlock}>
-          <div className={styles.operationsHeaderIconBox} aria-hidden="true">
-            <div style={{ width: 18, height: 18, border: '2px solid #FFFFFF', borderRadius: 4, position: 'relative' }}>
-              <span style={{ position: 'absolute', top: '50%', left: '50%', width: 8, height: 2, backgroundColor: '#FFFFFF', transform: 'translate(-50%, -50%)' }} />
-            </div>
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>شركاء DSH</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>مراجعة الشريك</span>
-            </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>حوكمة الشركاء، التغطية، وأهلية الترويج</p>
-          </div>
+    <div className={styles.surfaceCockpit} dir="rtl">
+      <header className={styles.surfaceTopBar}>
+        <div className={styles.surfaceTitleBlock}>
+          <Box
+            width={32}
+            height={32}
+            background="brand"
+            radiusToken="sm"
+            align="center"
+            justify="center"
+            aria-hidden="true"
+          >
+            <Box
+              width={18}
+              height={18}
+              border={{ width: 2, color: 'white' }}
+              radiusToken="xs"
+              align="center"
+              justify="center"
+            >
+              <Box width={10} height={2} background="white" />
+            </Box>
+          </Box>
+          <Box gap={0}>
+            <Box layoutDirection="row" align="center" gap={2}>
+              <Text role="titleSm" tone="brand" style={{ letterSpacing: '-0.01em', fontWeight: 800 }}>شركاء DSH</Text>
+              <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
+                 <Text role="caption" tone="brandAlt" style={{ fontWeight: 800, fontSize: '9px' }}>مراجعة الشريك</Text>
+              </Box>
+            </Box>
+            <Text role="caption" tone="muted" style={{ fontWeight: 600 }}>حوكمة الشركاء، التغطية، وأهلية الترويج</Text>
+          </Box>
         </div>
 
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
+        <div className={styles.surfaceHeaderActions}>
+          <div className={styles.surfacePulseCompact}>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>شركاء نشطون</span>
               <span className={styles.commandKpiValue}>١,٢٥٤</span>
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>طلبات معلقة</span>
-              <span className={styles.commandKpiValue} style={{ color: '#D97706' }}>٢٨</span>
+              <span className={styles.commandKpiValue} style={{ color: 'var(--color-brand-alt)' }}>٢٨</span>
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>تغطية المناطق</span>
-              <span className={styles.commandKpiValue} style={{ color: '#16A34A' }}>٨٤٪</span>
+              <span className={styles.commandKpiValue} style={{ color: 'var(--color-success)' }}>٨٤٪</span>
             </div>
           </div>
         </div>
       </header>
 
-      <nav className={styles.navigationCockpit}>
-        {PRIMARY_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            className={`${styles.operationsTab} ${tab.id === activeTab ? styles.operationsTabActive : ''}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <nav className={styles.navigationDock}>
+        <WebControlPanelLaneTabs items={PRIMARY_TABS} onSelect={(id) => setActiveTab(id)} />
       </nav>
 
-      {SECONDARY_TABS[activeTab] && (
-        <div className={styles.filterDock}>
-          {SECONDARY_TABS[activeTab].map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setActiveSubTab(s.id)}
-              className={styles.operationsTab}
-              style={{
-                backgroundColor: s.id === activeSubTab ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
-                color: s.id === activeSubTab ? '#FF500D' : '#64748B',
-                borderColor: s.id === activeSubTab ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
-              }}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className={styles.filterDock}>
+        {SECONDARY_TABS[activeTab] && (
+          <WebControlPanelSubTabs
+            items={SECONDARY_TABS[activeTab]}
+            onSelect={(id) => setActiveSubTab(id)}
+          />
+        )}
+      </div>
 
-      <main className={styles.operationsMainPanel}>
-        <div className={styles.operationsInnerScroll}>
+      <main className={styles.surfaceMainPanel}>
+        <div className={styles.surfaceInnerScroll}>
           <Box padding={4} gap={4}>
             {activeTab === 'inbox' && activeSubTab === 'registration' ? (
               <Box gap={3}>
@@ -175,7 +179,7 @@ export function ControlPanelDshPartnerHubScreen() {
             ) : (
               <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
                 <Box align="center" gap={1}>
-                  <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>هذه اللوحة تعرض الآن صفوف التفعيل والمراجعة</Text>
+                  <Text role="titleSm" tone="brand" style={{ fontWeight: '800' }}>هذه اللوحة تعرض الآن صفوف التفعيل والمراجعة</Text>
                   <Text tone="muted">يمكن التبديل بين التبويبات الفرعية لفرز الطلبات حسب السطح والمراجعة والإسناد.</Text>
                 </Box>
               </Box>

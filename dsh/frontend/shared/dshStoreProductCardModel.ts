@@ -208,7 +208,7 @@ export function normalizeCanonicalPublishStage(stage: DshCanonicalPublishStage |
 }
 
 /** @deprecated Use canRenderInClientSurface instead */
-export function isClientVisible(stage: string | undefined, entityType?: any, mediaPolicy?: string): boolean {
+export function isClientVisible(stage: string | undefined, entityType?: string, mediaPolicy?: string): boolean {
   return canRenderInClientSurface(stage, entityType, { mediaPolicy });
 }
 

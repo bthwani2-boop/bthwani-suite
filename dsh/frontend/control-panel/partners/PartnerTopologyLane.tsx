@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Surface, Text } from '@bthwani/ui-kit';
-import styles from '../operations/dsh-surface.module.css';
+import styles from '../shared/control-panel-surface.module.css';
 
 const TOPOLOGY_LANES = [
   { id: 'onboarding', title: 'الاستقبال', sub: 'مدخل الشريك والوثائق', flow: 'الشريك → الاستقبال → العمليات', load: 'طبيعي', color: '#16A34A', bg: '#F0FDF4' },

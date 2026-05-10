@@ -6,7 +6,8 @@ import {
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
 import { EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW } from './operations.preview-data';
-import styles from './dsh-surface.module.css';
+import { Box } from '@bthwani/ui-kit';
+import styles from '../shared/control-panel-surface.module.css';
 
 export type ExceptionsEscalationsScreenProps = { hubHref: string; subGroup?: string; };
 
@@ -28,14 +29,14 @@ export function ExceptionsEscalationsScreen({ hubHref, subGroup }: ExceptionsEsc
   ];
 
   return (
-    <div className={styles.liveOrdersScreen} dir="rtl">
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>الاستثناءات والتصعيد</h2>
+    <div className={styles.surfaceCockpitContent} dir="rtl">
+      <div className={styles.surfaceSectionHeader}>
+        <h2 className={styles.surfaceSectionTitle}>الاستثناءات والتصعيد</h2>
       </div>
 
       <WebControlPanelKpiStrip items={summaryKpi} />
 
-      <div className={styles.liveOrdersCardsStack}>
+      <Box gap={2} style={{ display: 'grid' }}>
         {preview.exceptions.map((exc) => (
           <WebControlPanelDecisionRow
             key={exc.id}
@@ -59,7 +60,7 @@ export function ExceptionsEscalationsScreen({ hubHref, subGroup }: ExceptionsEsc
             }}
           />
         ))}
-      </div>
+      </Box>
     </div>
   );
 }

@@ -7,7 +7,8 @@ import {
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
 import { AWNAK_OPERATIONAL_PREVIEW } from './operations.preview-data';
-import styles from './dsh-surface.module.css';
+import { Box } from '@bthwani/ui-kit';
+import styles from '../shared/control-panel-surface.module.css';
 
 export type AwnakScreenProps = {
   hubHref?: string;
@@ -33,14 +34,14 @@ export function AwnakScreen({ hubHref = '/operations', subGroup }: AwnakScreenPr
   ];
 
   return (
-    <div className={styles.liveOrdersScreen} dir="rtl">
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>عونك</h2>
+    <div className={styles.surfaceCockpitContent} dir="rtl">
+      <div className={styles.surfaceSectionHeader}>
+        <h2 className={styles.surfaceSectionTitle}>عونك</h2>
       </div>
 
       <WebControlPanelKpiStrip items={summaryKpi} />
 
-      <div className={styles.liveOrdersCardsStack}>
+      <Box gap={2} style={{ display: 'grid' }}>
         {preview.rows.map((item) => (
           <WebControlPanelDecisionRow
             key={item.requestId}
@@ -64,7 +65,7 @@ export function AwnakScreen({ hubHref = '/operations', subGroup }: AwnakScreenPr
             }}
           />
         ))}
-      </div>
+      </Box>
     </div>
   );
 }

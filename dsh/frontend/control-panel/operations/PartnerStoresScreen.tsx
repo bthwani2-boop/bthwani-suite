@@ -5,7 +5,8 @@ import {
   WebControlPanelDecisionRow,
   WebControlPanelKpiStrip,
 } from '@bthwani/ui-kit/web';
-import styles from './dsh-surface.module.css';
+import { Box } from '@bthwani/ui-kit';
+import styles from '../shared/control-panel-surface.module.css';
 
 export type PartnerStoresScreenProps = { hubHref: string; subGroup?: string; };
 
@@ -38,9 +39,9 @@ const STORES = [
 
 export function PartnerStoresScreen({ hubHref, subGroup }: PartnerStoresScreenProps) {
   return (
-    <div className={styles.liveOrdersScreen} dir="rtl">
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>المتاجر والشركاء</h2>
+    <div className={styles.surfaceCockpitContent} dir="rtl">
+      <div className={styles.surfaceSectionHeader}>
+        <h2 className={styles.surfaceSectionTitle}>المتاجر والشركاء</h2>
       </div>
 
       <WebControlPanelKpiStrip
@@ -52,7 +53,7 @@ export function PartnerStoresScreen({ hubHref, subGroup }: PartnerStoresScreenPr
         ]}
       />
 
-      <div className={styles.liveOrdersCardsStack}>
+      <Box gap={2} style={{ display: 'grid' }}>
         {STORES.map((store) => (
           <WebControlPanelDecisionRow
             key={store.id}
@@ -76,7 +77,7 @@ export function PartnerStoresScreen({ hubHref, subGroup }: PartnerStoresScreenPr
             } : undefined}
           />
         ))}
-      </div>
+      </Box>
     </div>
   );
 }

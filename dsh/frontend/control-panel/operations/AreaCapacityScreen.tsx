@@ -6,7 +6,8 @@ import {
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
 import { AREA_CAPACITY_OPERATIONAL_PREVIEW } from './operations.preview-data';
-import styles from './dsh-surface.module.css';
+import { Box } from '@bthwani/ui-kit';
+import styles from '../shared/control-panel-surface.module.css';
 
 export type AreaCapacityScreenProps = { hubHref: string; subGroup?: string; };
 
@@ -28,14 +29,14 @@ export function AreaCapacityScreen({ hubHref, subGroup }: AreaCapacityScreenProp
   ];
 
   return (
-    <div className={styles.liveOrdersScreen} dir="rtl">
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>المناطق والسعة</h2>
+    <div className={styles.surfaceCockpitContent} dir="rtl">
+      <div className={styles.surfaceSectionHeader}>
+        <h2 className={styles.surfaceSectionTitle}>المناطق والسعة</h2>
       </div>
 
       <WebControlPanelKpiStrip items={summaryKpi} />
 
-      <div className={styles.liveOrdersCardsStack}>
+      <Box gap={2} style={{ display: 'grid' }}>
         {preview.zones.map((area) => (
           <WebControlPanelDecisionRow
             key={area.id}
@@ -59,7 +60,7 @@ export function AreaCapacityScreen({ hubHref, subGroup }: AreaCapacityScreenProp
             }}
           />
         ))}
-      </div>
+      </Box>
     </div>
   );
 }

@@ -28,7 +28,7 @@ import { PartnerStoresScreen } from './PartnerStoresScreen';
 import { AreaCapacityScreen } from './AreaCapacityScreen';
 import { ExceptionsEscalationsScreen } from './ExceptionsEscalationsScreen';
 import { AuditSupportSlaScreen } from './AuditSupportSlaScreen';
-import styles from './dsh-surface.module.css';
+import styles from '../shared/control-panel-surface.module.css';
 
 export type ControlPanelDshOperationsScreenProps = {
   group?: CanonicalOperationsGroupId;
@@ -97,37 +97,65 @@ export function ControlPanelDshOperationsScreen({
   }));
 
   return (
-    <WebControlPanelWorkbench className={styles.operationsCockpit}>
-      <WebControlPanelDenseHeader
-        title="عمليات DSH"
-        description="مراقبة وتنفيذ الطلبات الحية"
-        metrics={kpiItems}
-      />
+    <div className={styles.surfaceCockpit} dir="rtl">
+      <header className={styles.surfaceTopBar}>
+        <div className={styles.surfaceTitleBlock}>
+          <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
+            <div style={{ width: 18, height: 18, border: '2px solid #FFFFFF', borderRadius: 4, position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '50%', left: '50%', width: 10, height: 2, backgroundColor: '#FFFFFF', transform: 'translate(-50%, -50%)' }} />
+            </div>
+          </div>
+          <Box gap={0}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>عمليات DSH</h1>
+              <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
+                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: '9px' }}>غرفة قيادة</Text>
+              </Box>
+            </div>
+            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>مراقبة وتنفيذ الطلبات الحية</p>
+          </Box>
+        </div>
 
-      <WebControlPanelLaneTabs
-        items={tabItems}
-        onSelect={(id) => {
-          const groupId = id as CanonicalOperationsGroupId;
-          setActiveGroup(groupId);
-          setActiveSubGroup(undefined);
-          router.push(buildOperationsHref(groupId, { orderId, panel }));
-        }}
-      />
+        <div className={styles.surfaceHeaderActions}>
+          <div className={styles.surfacePulseCompact}>
+            {kpiItems.map((m) => (
+              <div key={m.label} className={styles.commandKpi}>
+                <span className={styles.commandKpiLabel}>{m.label}</span>
+                <span className={styles.commandKpiValue}>{m.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
 
-      {subTabItems && subTabItems.length > 0 && (
-        <WebControlPanelSubTabs
-          items={subTabItems}
-          ariaLabel="تصفية فرعية"
-          onSelect={(id) => setActiveSubGroup(id)}
+      <nav className={styles.navigationDock}>
+        <WebControlPanelLaneTabs
+          items={tabItems}
+          onSelect={(id) => {
+            const groupId = id as CanonicalOperationsGroupId;
+            setActiveGroup(groupId);
+            setActiveSubGroup(undefined);
+            router.push(buildOperationsHref(groupId, { orderId, panel }));
+          }}
         />
-      )}
+      </nav>
 
-      <main className={styles.operationsMainPanel}>
-        <div className={styles.operationsInnerScroll}>
+      <div className={styles.filterDock} style={{ backgroundColor: '#F8FAFC' }}>
+        {subTabItems && subTabItems.length > 0 && (
+          <WebControlPanelSubTabs
+            items={subTabItems}
+            ariaLabel="تصفية فرعية"
+            onSelect={(id) => setActiveSubGroup(id)}
+          />
+        )}
+      </div>
+
+      <main className={styles.surfaceMainPanel}>
+        <div className={styles.surfaceInnerScroll}>
           <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
         </div>
       </main>
-    </WebControlPanelWorkbench>
+    </div>
   );
 }
 

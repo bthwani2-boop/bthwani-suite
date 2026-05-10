@@ -1,12 +1,38 @@
-export * from '../../dsh/frontend/control-panel';
 export {
-	ControlPanelDshCatalogScreen,
-	ControlPanelDshCatalogApprovalScreen,
-	ControlPanelDshListingGovernanceScreen,
-} from '../../dsh/frontend/control-panel/catalogs';
-export { ControlPanelDshMarketingScreen } from '../../dsh/frontend/control-panel/marketing';
-export { ControlPanelDshPartnerApprovalsScreen } from '../../dsh/frontend/control-panel/partners';
-export { ControlPanelDshSupportQueueScreen } from '../../dsh/frontend/control-panel/support';
-export { ControlPanelDshClosureDashboardScreen } from '../../dsh/frontend/control-panel/dashboard';
-export { ControlPanelDshSheinProxyScreen } from '../../dsh/frontend/control-panel/operations';
-export { ControlPanelDshFinanceHubScreen } from '../../dsh/frontend/control-panel/finance';
+  DSH_SURFACE_META,
+  DSH_SURFACE_CATALOG,
+  DshControlPanelSurfaceHost,
+  type DshControlPanelSurfaceHostProps,
+  ControlPanelDshClosureDashboardScreen,
+  ControlPanelDshClosureEvidenceStream,
+  ControlPanelDshFinanceHubScreen,
+  ControlPanelDshFinanceScreen,
+  ControlPanelDshSettlementScreen,
+  ControlPanelDshCodReconciliationScreen,
+  ControlPanelDshRefundQueueScreen,
+  ControlPanelDshRiskAuditScreen,
+  ControlPanelDshCatalogScreen,
+  ControlPanelDshCatalogApprovalScreen,
+  ControlPanelDshListingGovernanceScreen,
+  ControlPanelDshCatalogCategoriesScreen,
+  ControlPanelDshSupportQueueScreen,
+  ControlPanelDshDisputeResolutionScreen,
+  ControlPanelDshPartnerApprovalsScreen,
+  ControlPanelDshPartnerActivationScreen,
+  ControlPanelDshPartnerDocumentReviewScreen,
+  ControlPanelDshOperationsScreen,
+  DshOperationsHubSurface,
+  buildOperationsHref,
+  coerceOperationsPanel,
+  normalizeOperationsLocation,
+  ControlPanelDshMarketingScreen,
+  ControlPanelDshMarketingApprovalScreen,
+  ControlPanelDshVideoSubmissionsReviewScreen,
+  ControlPanelDshControlHubScreen,
+  ControlPanelDshGovernanceEvidenceScreen,
+  ControlPanelDshGuardStatusScreen,
+  DSH_CROSS_SURFACE_CLOSURE_MAP,
+  ControlPanelDshActionQueue,
+  ControlPanelDshDecisionBoard,
+  ControlPanelDshWorkspaceFrame,
+} from '../../dsh/frontend/control-panel';

@@ -1,4 +1,4 @@
-declare const process: any;
+declare const process: { env: Record<string, string | undefined> };
 
 export function resolveDevMediaUrl(path: string): string | null {
   const trimmedPath = path.trim();

@@ -6,7 +6,8 @@ import {
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
 import { LIVE_ORDERS_OPERATIONAL_PREVIEW } from './operations.preview-data';
-import styles from './dsh-surface.module.css';
+import { Box } from '@bthwani/ui-kit';
+import styles from '../shared/control-panel-surface.module.css';
 
 export type LiveOrdersScreenProps = {
   state?: 'ready' | 'loading' | 'error' | 'empty';
@@ -27,7 +28,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
 
   if (state === 'loading') {
     return (
-      <div className={styles.liveOrdersScreen} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+      <div className={styles.surfaceInnerScroll} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
         <p style={{ color: '#64748B', fontSize: '13px' }}>جارٍ تحميل العمليات الحية...</p>
       </div>
     );
@@ -35,7 +36,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
 
   if (state === 'error') {
     return (
-      <div className={styles.liveOrdersScreen} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+      <div className={styles.surfaceInnerScroll} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
         <div style={{ textAlign: 'center', border: '1px solid rgba(220,38,38,0.2)', padding: '24px', borderRadius: '10px', background: '#FFF1F2' }}>
           <p style={{ color: '#991B1B', fontSize: '13px', marginBottom: '12px' }}>تعذر الاتصال بخادم العمليات المباشرة.</p>
           <button onClick={onRetry} style={{ padding: '6px 18px', background: '#DC2626', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, fontSize: '12px' }}>إعادة المحاولة</button>
@@ -51,12 +52,12 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   ];
 
   return (
-    <div className={styles.liveOrdersScreen} dir="rtl">
+    <div className={styles.surfaceCockpitContent} dir="rtl">
       {/* KPI summary strip */}
       <WebControlPanelKpiStrip items={summaryKpi} />
 
       {/* Decision rows — one action cluster per row, no duplicate buttons */}
-      <div className={styles.liveOrdersCardsStack}>
+      <Box gap={2} style={{ display: 'grid' }}>
         {preview.rows.map((order) => (
           <WebControlPanelDecisionRow
             key={order.id}
@@ -72,7 +73,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
             secondaryAction={order.suggestion.secondary ? { id: 'secondary', label: order.suggestion.secondary } : undefined}
           />
         ))}
-      </div>
+      </Box>
     </div>
   );
 }

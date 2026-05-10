@@ -225,7 +225,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'subscription_premium',
     offerBadgeText: 'أسبوع مجاني',
-    offerBadgeColor: '#8b5cf6',
+    offerBadgeColor: '#0A2F5C',
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.product.pasta.v1',
     partnerLogoPosition: 'top-left',

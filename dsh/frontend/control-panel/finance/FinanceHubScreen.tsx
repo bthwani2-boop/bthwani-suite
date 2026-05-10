@@ -23,7 +23,7 @@ import {
   ControlPanelDshRiskAuditScreen,
 } from './closure-workspaces';
 
-import fStyles from './finance-surface.module.css';
+import styles from '../shared/control-panel-surface.module.css';
 
 export type ControlPanelDshFinanceScreenProps = {
   group?: CanonicalFinanceGroupId;
@@ -69,7 +69,7 @@ export function ControlPanelDshFinanceHubScreen({
 
   if (state !== 'ready') {
     return (
-      <div dir="rtl" className={`${fStyles.noScroll} ${fStyles.financeLoadingState}`}>
+      <div dir="rtl" className={styles.surfaceMainPanel} style={{ padding: '24px' }}>
         <StateView
            stateId="loading"
            title="جاري تحميل البيانات المالية"
@@ -81,74 +81,76 @@ export function ControlPanelDshFinanceHubScreen({
   }
 
   return (
-    <div className={`${fStyles.financeCockpit} ${fStyles.financeShellOverrides}`} dir="rtl">
-      <header className={fStyles.financeTopBar}>
-        <div className={fStyles.financeTitleBlock}>
-          <div className={fStyles.financeHeaderIcon} aria-hidden="true">
-            <div className={fStyles.financeIconInner} />
-          </div>
-          <div>
-            <div className={fStyles.financeTitleRow}>
-              <h1 className={fStyles.financeTitle}>مالية DSH</h1>
-              <span className={fStyles.financeBadge}>غرفة قيادة</span>
+    <div className={styles.surfaceCockpit} dir="rtl">
+      <header className={styles.surfaceTopBar}>
+        <div className={styles.surfaceTitleBlock}>
+          <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
+            <div style={{ width: 18, height: 18, border: '2px solid #FFFFFF', borderRadius: 4, position: 'relative' }}>
+               <span style={{ position: 'absolute', top: 4, left: 4, width: 6, height: 6, backgroundColor: '#FFFFFF', borderRadius: 1 }} />
             </div>
-            <p className={fStyles.financeSubtitle}>التسويات، مطابقة COD، الاستردادات، المدفوعات، والرقابة المالية في مساحة واحدة مضغوطة</p>
           </div>
+          <Box gap={0}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>مالية DSH</h1>
+              <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
+                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: '9px' }}>غرفة قيادة</Text>
+              </Box>
+            </div>
+            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>التسويات، مطابقة COD، الاستردادات، والرقابة المالية</p>
+          </Box>
         </div>
 
-        <div className={fStyles.financeHeaderActions}>
-          <div className={fStyles.financePulseCompact}>
-            <div className={fStyles.financeKpi}>
-              <span className={fStyles.financeKpiLabel}>إجمالي التدفقات</span>
-              <span className={fStyles.financeKpiValue}>١,٢٥٤,٠٠٠ ر.س</span>
+        <div className={styles.surfaceHeaderActions}>
+          <div className={styles.surfacePulseCompact}>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>إجمالي التدفقات</span>
+              <span className={styles.commandKpiValue}>١,٢٥٤,٠٠٠ ر.س</span>
             </div>
-            <div className={fStyles.financeKpi}>
-              <span className={fStyles.financeKpiLabel}>عناصر معلقة</span>
-              <span className={`${fStyles.financeKpiValue} ${fStyles.financeKpiWarning}`}>١٤</span>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>عناصر معلقة</span>
+              <span className={styles.commandKpiValue} style={{ color: '#FF500D' }}>١٤</span>
             </div>
-            <div className={fStyles.financeKpi}>
-              <span className={fStyles.financeKpiLabel}>المخاطر المالية</span>
-              <span className={`${fStyles.financeKpiValue} ${fStyles.financeKpiSuccess}`}>منخفض</span>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>المخاطر</span>
+              <span className={styles.commandKpiValue} style={{ color: '#16A34A' }}>منخفض</span>
             </div>
           </div>
         </div>
       </header>
 
-      <WebControlPanelWorkspaceTabs
-        items={FINANCE_CANONICAL_GROUPS.map((item) => ({
-          id: item.id,
-          label: item.label,
-          active: item.id === activeGroup,
-        }))}
-        onSelect={(id) => {
-          const groupId = id as CanonicalFinanceGroupId;
-          setActiveGroup(groupId);
-          setActiveSubGroup(undefined);
-          router.push(buildFinanceHref(groupId, { panel }));
-        }}
-        ariaLabel="أقسام المالية الرئيسية"
-      />
+      <nav className={styles.navigationDock}>
+        <WebControlPanelWorkspaceTabs
+          items={FINANCE_CANONICAL_GROUPS.map((item) => ({
+            id: item.id,
+            label: item.label,
+            active: item.id === activeGroup,
+          }))}
+          onSelect={(id) => {
+            const groupId = id as CanonicalFinanceGroupId;
+            setActiveGroup(groupId);
+            setActiveSubGroup(undefined);
+            router.push(buildFinanceHref(groupId, { panel }));
+          }}
+          ariaLabel="أقسام المالية الرئيسية"
+        />
+      </nav>
 
       {activeGroupMeta.subGroups ? (
-        <WebControlPanelSubTabs
-          items={activeGroupMeta.subGroups.map((sub) => ({
-            id: sub.id,
-            label: sub.label,
-            active: (activeSubGroup ?? activeGroupMeta.subGroups?.[0]?.id) === sub.id,
-          }))}
-          onSelect={setActiveSubGroup}
-          ariaLabel="التبويبات الفرعية"
-        />
+        <div className={styles.filterDock} style={{ backgroundColor: '#F8FAFC' }}>
+          <WebControlPanelSubTabs
+            items={activeGroupMeta.subGroups.map((sub) => ({
+              id: sub.id,
+              label: sub.label,
+              active: (activeSubGroup ?? activeGroupMeta.subGroups?.[0]?.id) === sub.id,
+            }))}
+            onSelect={setActiveSubGroup}
+            ariaLabel="التبويبات الفرعية"
+          />
+        </div>
       ) : null}
 
-      <div className={fStyles.financeContextDock}>
-        <span className={fStyles.financeContextLabel}>السطح الحالي</span>
-        <span className={fStyles.financeContextValue}>{activeGroupMeta.label}</span>
-        <span className={fStyles.financeContextDescription}>{activeGroupMeta.description}</span>
-      </div>
-
-      <main className={fStyles.financeMainPanel}>
-        <div className={fStyles.financeInnerScroll}>
+      <main className={styles.surfaceMainPanel}>
+        <div className={styles.surfaceInnerScroll}>
           <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
         </div>
       </main>

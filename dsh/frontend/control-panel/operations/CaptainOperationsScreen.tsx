@@ -5,7 +5,8 @@ import {
   WebControlPanelDecisionRow,
   WebControlPanelKpiStrip,
 } from '@bthwani/ui-kit/web';
-import styles from './dsh-surface.module.css';
+import { Box } from '@bthwani/ui-kit';
+import styles from '../shared/control-panel-surface.module.css';
 
 export type CaptainOperationsScreenProps = { hubHref: string; subGroup?: string; };
 
@@ -42,9 +43,9 @@ const CAPTAINS = [
 
 export function CaptainOperationsScreen({ hubHref, subGroup }: CaptainOperationsScreenProps) {
   return (
-    <div className={styles.liveOrdersScreen} dir="rtl">
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>تشغيل الكباتن</h2>
+    <div className={styles.surfaceCockpitContent} dir="rtl">
+      <div className={styles.surfaceSectionHeader}>
+        <h2 className={styles.surfaceSectionTitle}>تشغيل الكباتن</h2>
       </div>
 
       <WebControlPanelKpiStrip
@@ -56,7 +57,7 @@ export function CaptainOperationsScreen({ hubHref, subGroup }: CaptainOperations
         ]}
       />
 
-      <div className={styles.liveOrdersCardsStack}>
+      <Box gap={2} style={{ display: 'grid' }}>
         {CAPTAINS.map((cap) => (
           <WebControlPanelDecisionRow
             key={cap.id}
@@ -80,7 +81,7 @@ export function CaptainOperationsScreen({ hubHref, subGroup }: CaptainOperations
             } : undefined}
           />
         ))}
-      </div>
+      </Box>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { Box, Text } from '@bthwani/ui-kit';
 import { WebControlActionCard, WebControlDisclosureItem, WebControlPanelKpiStrip, WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
 import { ControlPanelDshDecisionBoard } from './ControlPanelDshDecisionBoard';
 import type { DshUnifiedRecommendation } from './dshRecommendationModel';
-import styles from '../operations/dsh-surface.module.css';
+import styles from '../shared/control-panel-surface.module.css';
 
 type WorkspaceSignal = {
   id: string;
@@ -73,25 +73,27 @@ export function ControlPanelDshWorkspaceFrame({
   footerNote,
 }: ControlPanelDshWorkspaceFrameProps) {
   return (
-    <div className={styles.operationsCockpit} dir="rtl">
-      <header className={styles.operationsTopBar}>
-        <div className={styles.operationsTitleBlock}>
-          <div className={styles.operationsHeaderIconBox} aria-hidden="true">
+    <div className={styles.surfaceCockpit} dir="rtl">
+      <header className={styles.surfaceTopBar}>
+        <div className={styles.surfaceTitleBlock}>
+          <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
             <div style={{ width: 18, height: 18, border: '2px solid #FFFFFF', borderRadius: 4, position: 'relative' }}>
               <span style={{ position: 'absolute', top: '50%', left: '50%', width: 8, height: 2, backgroundColor: '#FFFFFF', transform: 'translate(-50%, -50%)' }} />
             </div>
           </div>
-          <div>
+          <Box gap={0}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>{title}</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>{badges[0] ?? 'DSH'}</span>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>{title}</h1>
+              <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
+                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: '9px' }}>{badges[0] ?? 'DSH'}</Text>
+              </Box>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>{description}</p>
-          </div>
+            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>{description}</p>
+          </Box>
         </div>
 
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
+        <div className={styles.surfaceHeaderActions}>
+          <div className={styles.surfacePulseCompact}>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>المجال</span>
               <span className={styles.commandKpiValue} style={{ fontSize: '12px' }}>{eyebrow}</span>
@@ -126,9 +128,9 @@ export function ControlPanelDshWorkspaceFrame({
         </div>
       ) : null}
 
-      <main className={styles.operationsMainPanel}>
-        <div className={styles.operationsInnerScroll}>
-          <Box gap={3} className={styles.operationsCockpitContent}>
+      <main className={styles.surfaceMainPanel}>
+        <div className={styles.surfaceInnerScroll}>
+          <Box gap={3}>
             {signals.length ? (
               <Box gap={2}>
                 {signals.map((signal) => (

@@ -9,7 +9,7 @@ import {
 import {
   OPERATIONS_PULSE_METRICS,
 } from './operations.preview-data';
-import styles from './dsh-surface.module.css';
+import styles from '../shared/control-panel-surface.module.css';
 
 export type CommandCenterScreenProps = { hubHref: string; subGroup?: string; };
 
@@ -53,18 +53,18 @@ export function CommandCenterScreen({ hubHref, subGroup }: CommandCenterScreenPr
   const router = useRouter();
 
   return (
-    <div className={styles.operationsCockpitContent} dir="rtl">
+    <div className={styles.surfaceCockpitContent} dir="rtl">
       {/* 1. Header — Compact Title */}
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>نبض العمليات</h2>
-        <p className={styles.sectionSubtitle}>متابعة الأداء العام والتدخلات السريعة</p>
+      <div className={styles.surfaceSectionHeader}>
+        <h2 className={styles.surfaceSectionTitle}>نبض العمليات</h2>
+        <p className={styles.surfaceSectionSubtitle}>متابعة الأداء العام والتدخلات السريعة</p>
       </div>
 
-      <div className={styles.operationsGridTwoCol}>
+      <div className={styles.surfaceGridTwoCol}>
         {/* 2. Top System Recommendations */}
-        <div className={styles.operationsCompactPanel}>
-          <h3 className={styles.panelTitle}>أعلى توصيات النظام الآن</h3>
-          <div className={styles.stackSmall}>
+        <div className={styles.surfaceCompactPanel}>
+          <h3 className={styles.surfacePanelTitle}>أعلى توصيات النظام الآن</h3>
+          <div className={styles.surfaceStackSmall}>
             {TOP_SUGGESTIONS.map((s) => (
               <WebControlPanelRecommendation
                 key={s.id}
@@ -83,9 +83,9 @@ export function CommandCenterScreen({ hubHref, subGroup }: CommandCenterScreenPr
         </div>
 
         {/* 3. Urgent Interventions */}
-        <div className={styles.operationsCompactPanel}>
-          <h3 className={styles.panelTitle}>تدخل سريع مطلوب</h3>
-          <div className={styles.stackSmall}>
+        <div className={styles.surfaceCompactPanel}>
+          <h3 className={styles.surfacePanelTitle}>تدخل سريع مطلوب</h3>
+          <div className={styles.surfaceStackSmall}>
             {QUICK_ACTIONS.map((action) => (
               <WebControlPanelDecisionRow
                 key={action.id}

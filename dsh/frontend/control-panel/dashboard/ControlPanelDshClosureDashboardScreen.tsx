@@ -9,6 +9,8 @@ import {
 } from '@bthwani/ui-kit/web';
 import { ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, DSH_CROSS_SURFACE_JOURNEYS, getDshClosureItemsByStatus, getDshClosureItemsBySurface } from '../shared';
 
+import styles from '../shared/control-panel-surface.module.css';
+
 export function ControlPanelDshClosureHubScreen() {
   const [activeTab, setActiveTab] = React.useState<string>('readiness');
   const [activeSubTab, setActiveSubTab] = React.useState<string>('all');
@@ -65,34 +67,39 @@ export function ControlPanelDshClosureHubScreen() {
   };
 
   return (
-    <div className={styles.operationsCockpit} dir="rtl">
+    <div className={styles.surfaceCockpit} dir="rtl">
       {/* 1. Header Area - Closure Command Deck */}
-      <header className={styles.operationsTopBar}>
-        <div className={styles.operationsTitleBlock}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            backgroundColor: '#0A2F5C',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '16px',
-            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
-          }}>
-            إ
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>إغلاق DSH</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#DCFCE7', color: '#16A34A', borderRadius: '4px', fontWeight: '800' }}>مرحلة الجاهزية</span>
+      <header className={styles.surfaceTopBar}>
+        <div className={styles.surfaceTitleBlock}>
+          <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
+            <div style={{
+              width: '18px',
+              height: '18px',
+              border: '2px solid #FFFFFF',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 900,
+              fontSize: '12px',
+              color: '#FFFFFF'
+            }}>
+              إ
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>حوكمة الإغلاق النهائي ومصفوفة الجاهزية العابرة للأسطح</p>
           </div>
+          <Box gap={0}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>إغلاق DSH</h1>
+              <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
+                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: '9px' }}>مرحلة الجاهزية</Text>
+              </Box>
+            </div>
+            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>حوكمة الإغلاق النهائي ومصفوفة الجاهزية العابرة للأسطح</p>
+          </Box>
         </div>
 
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
+        <div className={styles.surfaceHeaderActions}>
+          <div className={styles.surfacePulseCompact}>
             {[
               { label: 'مكتمل', value: '١٠٠٪', tone: 'success' },
               { label: 'بانتظار دليل', value: '٠', tone: 'success' },
@@ -100,7 +107,7 @@ export function ControlPanelDshClosureHubScreen() {
             ].map((m) => (
               <div key={m.label} className={styles.commandKpi}>
                 <span className={styles.commandKpiLabel}>{m.label}</span>
-                <span className={styles.commandKpiValue} style={m.tone === 'success' ? { color: '#16A34A' } : m.tone === 'danger' ? { color: '#DC2626' } : {}}>{m.value}</span>
+                <span className={styles.commandKpiValue} style={{ color: '#16A34A' }}>{m.value}</span>
               </div>
             ))}
           </div>
@@ -108,11 +115,11 @@ export function ControlPanelDshClosureHubScreen() {
       </header>
 
       {/* 2. Primary Tabs */}
-      <nav className={styles.navigationCockpit}>
+      <nav className={styles.navigationDock}>
         {PRIMARY_TABS.map((tab) => (
           <button
             key={tab.id}
-            className={`${styles.operationsTab} ${tab.id === activeTab ? styles.operationsTabActive : ''}`}
+            className={`${styles.surfaceTab} ${tab.id === activeTab ? styles.surfaceTabActive : ''}`}
             onClick={() => setActiveTab(tab.id)}
           >
             {tab.label}
@@ -122,15 +129,13 @@ export function ControlPanelDshClosureHubScreen() {
 
       {/* 3. Secondary Tabs */}
       {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
-        <div className={styles.filterDock} style={{ padding: '4px 14px', minHeight: '36px', backgroundColor: '#F8FAFC' }}>
+        <div className={styles.filterDock} style={{ backgroundColor: '#F8FAFC' }}>
           {SECONDARY_TABS[activeTab].map((sub) => (
             <button
               key={sub.id}
               onClick={() => setActiveSubTab(sub.id)}
-              className={styles.operationsTab}
+              className={styles.surfaceTab}
               style={{
-                padding: '4px 12px',
-                fontSize: '12px',
                 backgroundColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
                 color: sub.id === activeSubTab ? '#FF500D' : '#64748B',
                 borderColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
@@ -143,8 +148,8 @@ export function ControlPanelDshClosureHubScreen() {
       )}
 
       {/* 4. Main Panel */}
-      <main className={styles.operationsMainPanel}>
-        <div className={styles.operationsInnerScroll}>
+      <main className={styles.surfaceMainPanel}>
+        <div className={styles.surfaceInnerScroll}>
           <Box padding={4}>
             {renderContent()}
           </Box>
@@ -153,8 +158,6 @@ export function ControlPanelDshClosureHubScreen() {
     </div>
   );
 }
-
-import styles from '../operations/dsh-surface.module.css';
 
 function getSurfaceLabel(id: string) {
   switch (id) {

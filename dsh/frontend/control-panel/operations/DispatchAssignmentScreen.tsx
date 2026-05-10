@@ -6,7 +6,8 @@ import {
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
 import { DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW } from './operations.preview-data';
-import styles from './dsh-surface.module.css';
+import { Box } from '@bthwani/ui-kit';
+import styles from '../shared/control-panel-surface.module.css';
 
 export type DispatchAssignmentScreenProps = { hubHref: string; subGroup?: string };
 
@@ -27,15 +28,14 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
   ];
 
   return (
-    <div className={styles.liveOrdersScreen} dir="rtl">
+    <div className={styles.surfaceCockpitContent} dir="rtl">
       {/* KPI summary strip */}
       <WebControlPanelKpiStrip items={summaryKpi} />
 
       {/* Decision rows — duplicate buttons eliminated, one primary action per row */}
-      <div className={styles.liveOrdersCardsStack}>
+      <Box gap={2} style={{ display: 'grid' }}>
         {preview.rows.map((item) => {
           const tone = TONE_MAP[item.statusTone] ?? 'neutral';
-          const confidenceTone = item.confidence === 'ثقة عالية' ? 'high' : item.confidence === 'ثقة منخفضة' ? 'low' : 'medium';
           return (
             <WebControlPanelDecisionRow
               key={item.id}
@@ -52,7 +52,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
             />
           );
         })}
-      </div>
+      </Box>
     </div>
   );
 }

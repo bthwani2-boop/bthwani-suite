@@ -39,7 +39,7 @@ function mapToMediaReview(r: ApprovalRecord): MediaReviewRecord {
     ...r,
     mediaKey: r.metadata?.mediaKey,
     mediaPolicy: (r.metadata?.mediaPolicy as MediaPolicyKind) || 'catalog-owned-media',
-    nextOwner: (r.metadata?.nextOwner as any) || 'control-panel-catalog',
+    nextOwner: (r.metadata?.nextOwner as MediaReviewRecord['nextOwner']) || 'control-panel-catalog',
     systemNote: r.metadata?.systemNote || r.metadata?.requiredFix || r.metadata?.rejectionReason,
   };
 }
