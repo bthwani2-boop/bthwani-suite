@@ -40,16 +40,22 @@
 }
 
 .dashboardHeroCard {
+  --gradient-side: right;
   background:
-    radial-gradient(circle at top right, rgba(255, 80, 13, 0.12), transparent 26%),
+    radial-gradient(circle at top var(--gradient-side), rgba(255, 80, 13, 0.12), transparent 26%),
     linear-gradient(135deg, rgba(10, 47, 92, 0.96) 0%, rgba(12, 48, 93, 0.98) 62%, rgba(21, 73, 136, 0.94) 100%);
   color: #ffffff;
+}
+
+:global([dir="rtl"]) .dashboardHeroCard {
+  --gradient-side: left;
 }
 
 .dashboardHeroCard::after {
   content: '';
   position: absolute;
-  inset: auto -8% -28% auto;
+  inset-block-end: -28%;
+  inset-inline-end: -8%;
   width: 240px;
   height: 240px;
   border-radius: 999px;
@@ -58,10 +64,15 @@
 }
 
 .dashboardSpotlightCard {
+  --gradient-side: left;
   align-content: start;
   background:
-    radial-gradient(circle at top left, rgba(10, 47, 92, 0.08), transparent 22%),
+    radial-gradient(circle at top var(--gradient-side), rgba(10, 47, 92, 0.08), transparent 22%),
     linear-gradient(180deg, rgba(255, 244, 237, 0.96) 0%, rgba(255, 255, 255, 0.98) 100%);
+}
+
+:global([dir="rtl"]) .dashboardSpotlightCard {
+  --gradient-side: right;
 }
 
 .dashboardHeroEyebrow,

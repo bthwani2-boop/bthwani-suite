@@ -49,6 +49,11 @@ const webCommandCenterCss = `
 }
 
 .ui-web-command-strip__surface-title {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-family: inherit;
   font-size: 18px;
   font-weight: 800;
   color: var(--bth-deep-blue);
@@ -85,15 +90,10 @@ const webCommandCenterCss = `
 .ui-web-command-strip__search-icon {
   position: absolute;
   top: 50%;
-  left: 14px;
+  inset-inline-start: 14px;
   transform: translateY(-50%);
   color: #64748b;
   font-size: 18px;
-}
-
-.ui-web-command-center-root[dir="rtl"] .ui-web-command-strip__search-icon {
-  left: auto;
-  right: 14px;
 }
 
 .ui-web-command-strip__filters {
@@ -361,17 +361,12 @@ const webCommandCenterCss = `
 .ui-web-command-strip__alert-badge {
   position: absolute;
   top: 8px;
-  right: 8px;
+  inset-inline-end: 8px;
   width: 8px;
   height: 8px;
   background: var(--bth-orange);
   border-radius: 50%;
   border: 2px solid #fff;
-}
-
-.ui-web-command-center-root[dir="rtl"] .ui-web-command-strip__alert-badge {
-  right: auto;
-  left: 8px;
 }
 
 .ui-web-command-center-root[data-rail-collapsed="true"] {
@@ -597,9 +592,9 @@ export function WebCommandStrip({
       <WebCommandCenterStyles />
       <header className="ui-web-command-strip" dir={direction}>
         <div className="ui-web-command-strip__identity">
-          <div className="ui-web-command-strip__surface-title" onClick={onBrandClick}>
+          <button type="button" className="ui-web-command-strip__surface-title" onClick={onBrandClick}>
             {surfaceTitle}
-          </div>
+          </button>
           <div className="ui-web-command-strip__filters">
             {filters.map((filter) => (
               <button

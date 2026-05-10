@@ -8,6 +8,7 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelSubTabs,
   WebControlPanelWorkspaceTabs,
+  WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
 import styles from '../operations/dsh-surface.module.css';
 
@@ -158,14 +159,14 @@ export function ControlPanelDshSupportHubScreen() {
       <header className={styles.operationsTopBar}>
         <div className={styles.operationsTitleBlock}>
           <div className={styles.operationsHeaderIconBox} aria-hidden="true">
-            <div style={{ width: 18, height: 18, border: '2px solid #FFFFFF', borderRadius: 4, position: 'relative' }}>
-              <span style={{ position: 'absolute', top: '50%', left: '50%', width: 8, height: 2, backgroundColor: '#FFFFFF', transform: 'translate(-50%, -50%)' }} />
+            <div style={{ width: 18, height: 18, border: '2px solid var(--bth-deep-blue, #0A2F5C)', borderRadius: 4, position: 'relative', background: '#FFFFFF' }}>
+              <span style={{ position: 'absolute', top: '50%', insetInlineStart: '50%', width: 8, height: 2, backgroundColor: 'var(--bth-deep-blue, #0A2F5C)', transform: 'translate(50%, -50%)' }} />
             </div>
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>دعم DSH</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#FEF3C7', color: '#D97706', borderRadius: '4px', fontWeight: '800' }}>غرفة قيادة</span>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: 'var(--bth-deep-blue, #0A2F5C)' }}>دعم DSH</h1>
+              <WebControlPanelStatusTag label="غرفة قيادة" tone="warning" />
             </div>
             <p style={{ fontSize: '10px', fontWeight: 600 }}>صفوف دعم، نزاعات، تصعيد، وخطر الالتزام في غرفة واحدة مضغوطة.</p>
           </div>
@@ -179,11 +180,11 @@ export function ControlPanelDshSupportHubScreen() {
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>نزاعات</span>
-              <span className={styles.commandKpiValue} style={{ color: '#D97706' }}>٩</span>
+              <span className={`${styles.commandKpiValue} ${styles.liveOrdersStatusWarning}`} style={{ background: 'transparent', border: 'none', padding: 0 }}>٩</span>
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>{resolveCommitmentLabel()}</span>
-              <span className={styles.commandKpiValue} style={{ color: '#DC2626' }}>٣</span>
+              <span className={`${styles.commandKpiValue} ${styles.liveOrdersStatusDanger}`} style={{ background: 'transparent', border: 'none', padding: 0 }}>٣</span>
             </div>
           </div>
         </div>
@@ -210,9 +211,9 @@ export function ControlPanelDshSupportHubScreen() {
       />
 
       <div className={styles.filterDock}>
-        <span style={{ fontSize: '11px', fontWeight: 800, color: '#64748B' }}>السطح الحالي</span>
-        <span style={{ fontSize: '11px', fontWeight: 800, color: '#0A2F5C' }}>{activeTab === 'queue' ? 'صفوف الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : resolveCommitmentLabel()}</span>
-        <span style={{ fontSize: '11px', color: '#64748B' }}>يتم التصفية عبر التبويبات الفرعية فقط.</span>
+        <Text role="caption" tone="muted">السطح الحالي</Text>
+        <Text role="caption" style={{ fontWeight: 800, color: 'var(--bth-deep-blue, #0A2F5C)' }}>{activeTab === 'queue' ? 'صفوف الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : resolveCommitmentLabel()}</Text>
+        <Text role="caption" tone="muted">يتم التصفية عبر التبويبات الفرعية فقط.</Text>
       </div>
 
       <main className={styles.operationsMainPanel}>

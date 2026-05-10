@@ -298,7 +298,7 @@ const webControlSurfaceCss = `
   display: flex;
   flex-direction: column;
   gap: 3px;
-  text-align: right;
+  text-align: start;
   direction: rtl;
 }
 .ui-web-system-suggestion__header {
@@ -1293,9 +1293,9 @@ function resolvePositionStyle(position?: WebControlPanelPosition): React.CSSProp
 
   return {
     top: resolveCssLength(position.top),
-    right: resolveCssLength(position.right),
+    insetInlineEnd: resolveCssLength(position.right),
     bottom: resolveCssLength(position.bottom),
-    left: resolveCssLength(position.left),
+    insetInlineStart: resolveCssLength(position.left),
   };
 }
 

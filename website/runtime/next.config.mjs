@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    reactCompiler: true,
-  },
   transpilePackages: ['@bthwani/ui-kit', '@bthwani/surfaces'],
   turbopack: {
     resolveAlias: {

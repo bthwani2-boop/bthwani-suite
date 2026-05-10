@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, Tabs, ListItem, Divider } from '@bthwani/ui-kit';
-import { WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
+import { WebControlPanelRecommendation, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import {
   dshCatalogMetrics,
   dshCatalogCategories,
@@ -323,10 +323,14 @@ export function ControlPanelDshCatalogScreen({
 
   const renderColHeader = (colId: CatalogFilterColumnId, title: string, width?: string) => (
     <th style={{ padding: '6px 12px', fontSize: '11px', color: '#64748B', textAlign: 'right', width, position: 'relative' }}>
-       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '4px', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); setOpenFilterCol(openFilterCol === colId ? null : colId); }}>
-          <span>{title}</span>
+       <button
+          type="button"
+          style={{ appearance: 'none', border: 'none', background: 'transparent', padding: 0, font: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '4px', cursor: 'pointer' }}
+          onClick={(e) => { e.stopPropagation(); setOpenFilterCol(openFilterCol === colId ? null : colId); }}
+       >
+          <span style={{ color: '#64748B' }}>{title}</span>
           <span style={{ color: colFilters[colId]?.length > 0 ? '#FF500D' : '#CBD5E1', fontSize: '10px' }}>▼</span>
-       </div>
+       </button>
        {openFilterCol === colId && (
          <FilterDropdown
             title={title}
@@ -359,8 +363,8 @@ export function ControlPanelDshCatalogScreen({
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em' }}>كتالوج المنصة</h1>
-              <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#DCFCE7', color: '#16A34A', borderRadius: '4px', fontWeight: '800' }}>جاهز للمراجعة</span>
+              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: 'var(--bth-deep-blue, #0A2F5C)' }}>كتالوج المنصة</h1>
+              <WebControlPanelStatusTag label="جاهز للمراجعة" tone="success" />
             </div>
             <p style={{ fontSize: '10px', fontWeight: 600 }}>إدارة المنتجات والفئات ومخاطر التبني عبر الأسطح من دون ضجيج تشغيلي زائد.</p>
           </div>
@@ -546,9 +550,10 @@ export function ControlPanelDshCatalogScreen({
                               <PolicyBadge mediaPolicy={p.mediaPolicy} />
                             </td>
                             <td>
-                               <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 800, whiteSpace: 'nowrap', backgroundColor: p.conflictReason ? '#FEE2E2' : p.approvalStage === 'client-visible' ? '#DCFCE7' : '#FEF3C7', color: p.conflictReason ? '#DC2626' : p.approvalStage === 'client-visible' ? '#16A34A' : '#D97706' }}>
-                                {p.conflictReason ? 'تعارض' : p.approvalStage === 'client-visible' ? 'نشط' : 'مراجعة'}
-                              </span>
+                               <WebControlPanelStatusTag
+                                 label={p.conflictReason ? 'تعارض' : p.approvalStage === 'client-visible' ? 'نشط' : 'مراجعة'}
+                                 tone={p.conflictReason ? 'danger' : p.approvalStage === 'client-visible' ? 'success' : 'warning'}
+                               />
                             </td>
                           </tr>
                         );
