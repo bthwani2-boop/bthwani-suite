@@ -141,6 +141,9 @@ type StorePagerPage = {
   stores: DshHomeGetStore[];
 };
 
+type DshHomeGetStyles = ReturnType<typeof createStyles>;
+type DshHomeTheme = ReturnType<typeof useTheme>['theme'];
+
 export type DshHomeGetPromo = {
   id: string;
   title: string;
@@ -437,8 +440,8 @@ function CategorySelectorItem({
   isSelected?: boolean;
   isHub?: boolean;
   isVideo?: boolean;
-  styles: any;
-  theme: any;
+  styles: DshHomeGetStyles;
+  theme: DshHomeTheme;
 }) {
   return (
     <Pressable style={styles.categorySelectorCard} onPress={onPress}>
@@ -476,8 +479,8 @@ function FilterChipItem({
   icon?: React.ReactNode;
   onPress: () => void;
   isActive: boolean;
-  styles: any;
-  theme: any;
+  styles: DshHomeGetStyles;
+  theme: DshHomeTheme;
 }) {
   return (
     <Pressable
@@ -535,7 +538,7 @@ function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>,
 /**
  * Empty state helper to reduce redundancy
  */
-function EmptyFeed({ query, styles }: { query?: string; styles: any }) {
+function EmptyFeed({ query, styles }: { query?: string; styles: DshHomeGetStyles }) {
   const isSearch = Boolean(query?.trim());
   return (
     <View style={styles.emptyFeed}>

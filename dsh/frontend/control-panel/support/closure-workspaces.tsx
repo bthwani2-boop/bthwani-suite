@@ -159,18 +159,18 @@ export function ControlPanelDshSupportHubScreen() {
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
-            <div style={{ width: 18, height: 18, border: '2px solid #FFFFFF', borderRadius: 4, position: 'relative' }}>
-              <div style={{ position: 'absolute', top: '50%', left: '50%', width: 10, height: 2, backgroundColor: '#FFFFFF', transform: 'translate(-50%, -50%)' }} />
+            <div className={styles.surfaceHeaderGlyph}>
+              <div className={styles.surfaceHeaderGlyphMinus} />
             </div>
           </div>
           <Box gap={0}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>دعم DSH</h1>
-              <Box paddingX={1.5} paddingY={0.5} background="warning" radiusToken="xs">
-                 <Text role="caption" style={{ color: '#FFFFFF', fontWeight: 800, fontSize: '9px' }}>غرفة قيادة</Text>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle}>دعم DSH</h1>
+              <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
+                <span className={styles.surfaceHeaderBadgeTextInverse}>غرفة قيادة</span>
               </Box>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>صفوف دعم، نزاعات، تصعيد، وخطر الالتزام</p>
+            <p className={styles.surfaceHeaderSubtitle}>صفوف دعم، نزاعات، تصعيد، وخطر الالتزام</p>
           </Box>
         </div>
 
@@ -182,11 +182,11 @@ export function ControlPanelDshSupportHubScreen() {
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>نزاعات</span>
-              <span className={styles.commandKpiValue} style={{ color: '#FF500D' }}>٩</span>
+              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueAlert}`}>٩</span>
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>{resolveCommitmentLabel()}</span>
-              <span className={styles.commandKpiValue} style={{ color: '#DC2626' }}>٣</span>
+              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueDanger}`}>٣</span>
             </div>
           </div>
         </div>
@@ -208,7 +208,7 @@ export function ControlPanelDshSupportHubScreen() {
         />
       </nav>
 
-      <div className={styles.filterDock} style={{ backgroundColor: '#F8FAFC' }}>
+      <div className={`${styles.filterDock} ${styles.filterDockTint}`}>
         <WebControlPanelSubTabs
           items={SECONDARY_TABS[activeTab].map((tab) => ({ id: tab.id, label: tab.label, active: tab.id === activeSubTab }))}
           ariaLabel="فلاتر الدعم"
@@ -218,8 +218,8 @@ export function ControlPanelDshSupportHubScreen() {
 
       <main className={styles.surfaceMainPanel}>
         <div className={styles.surfaceInnerScroll}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '20px', height: '100%' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', minHeight: 0, overflowY: 'auto' }}>
+          <div className={styles.surfaceSplitGrid}>
+            <div className={styles.surfaceListColumn}>
               <Text role="titleSm">صفوف {activeTab === 'queue' ? 'الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : resolveCommitmentLabel()}</Text>
               <Box gap={2}>
                   {rows.map((row) => (
@@ -241,10 +241,10 @@ export function ControlPanelDshSupportHubScreen() {
                 </Box>
               </div>
 
-              <div style={{ backgroundColor: '#FFFFFF', borderRight: '1px solid #E2E8F0', padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', overflowY: 'auto' }}>
+              <div className={styles.surfaceInspectorPanel}>
                 <Text role="titleSm">تفاصيل {selectedRow?.id ?? ''}</Text>
                 <Box gap={2}>
-                  <div style={{ padding: '8px', backgroundColor: '#F8FAFC', borderRadius: '6px' }}>
+                  <div className={styles.surfaceInspectorMeta}>
                     <Text role="caption" tone="muted">السطح: {selectedRow?.surface}</Text>
                     <Text role="caption" tone="muted">المالك: {selectedRow?.owner}</Text>
                     <Text role="caption" tone="muted">العائق: {selectedRow?.blocker}</Text>

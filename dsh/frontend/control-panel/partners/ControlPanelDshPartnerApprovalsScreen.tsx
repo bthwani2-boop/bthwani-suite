@@ -1,3 +1,5 @@
+import React from 'react';
+import { Box, Text } from '@bthwani/ui-kit';
 import {
   WebControlPanelDenseHeader,
   WebControlPanelLaneTabs,
@@ -99,34 +101,19 @@ export function ControlPanelDshPartnerHubScreen() {
     <div className={styles.surfaceCockpit} dir="rtl">
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
-          <Box
-            width={32}
-            height={32}
-            background="brand"
-            radiusToken="sm"
-            align="center"
-            justify="center"
-            aria-hidden="true"
-          >
-            <Box
-              width={18}
-              height={18}
-              border={{ width: 2, color: 'white' }}
-              radiusToken="xs"
-              align="center"
-              justify="center"
-            >
-              <Box width={10} height={2} background="white" />
-            </Box>
-          </Box>
+          <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
+            <div className={styles.surfaceHeaderGlyph}>
+              <div className={styles.surfaceHeaderGlyphMinus} />
+            </div>
+          </div>
           <Box gap={0}>
-            <Box layoutDirection="row" align="center" gap={2}>
-              <Text role="titleSm" tone="brand" style={{ letterSpacing: '-0.01em', fontWeight: 800 }}>شركاء DSH</Text>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle}>شركاء DSH</h1>
               <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
-                 <Text role="caption" tone="brandAlt" style={{ fontWeight: 800, fontSize: '9px' }}>مراجعة الشريك</Text>
+                <span className={styles.surfaceHeaderBadgeText}>مراجعة الشريك</span>
               </Box>
-            </Box>
-            <Text role="caption" tone="muted" style={{ fontWeight: 600 }}>حوكمة الشركاء، التغطية، وأهلية الترويج</Text>
+            </div>
+            <p className={styles.surfaceHeaderSubtitle}>حوكمة الشركاء، التغطية، وأهلية الترويج</p>
           </Box>
         </div>
 
@@ -138,11 +125,11 @@ export function ControlPanelDshPartnerHubScreen() {
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>طلبات معلقة</span>
-              <span className={styles.commandKpiValue} style={{ color: 'var(--color-brand-alt)' }}>٢٨</span>
+              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueAlert}`}>٢٨</span>
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>تغطية المناطق</span>
-              <span className={styles.commandKpiValue} style={{ color: 'var(--color-success)' }}>٨٤٪</span>
+              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>٨٤٪</span>
             </div>
           </div>
         </div>

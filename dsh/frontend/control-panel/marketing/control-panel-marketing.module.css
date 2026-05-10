@@ -1,0 +1,438 @@
+.marketingStack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 32px;
+}
+
+.surfaceCard {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  border: 1px solid rgba(10, 47, 92, 0.08);
+  padding: 16px;
+}
+
+.surfaceCardTitle {
+  margin: 0 0 12px 0;
+  color: #0A2F5C;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.surfaceCardTitleCompact {
+  margin: 0 0 8px 0;
+  color: #0A2F5C;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.cardHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #CBD5E1;
+  background-color: #FFFFFF;
+  color: #0A2F5C;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.actionButtonPrimary {
+  background-color: #FF500D;
+  border-color: #FF500D;
+  color: #FFFFFF;
+}
+
+.actionButtonDanger {
+  background-color: #FEF2F2;
+  border-color: #FECACA;
+  color: #DC2626;
+}
+
+.actionButtonSuccess {
+  background-color: #DCFCE7;
+  border-color: #BBF7D0;
+  color: #166534;
+}
+
+.actionButtonDisabled {
+  background-color: #F1F5F9;
+  border-color: #E2E8F0;
+  color: #94A3B8;
+  cursor: not-allowed;
+}
+
+.statusNote {
+  padding: 4px 12px;
+  border-radius: 6px;
+  background-color: #F1F5F9;
+  color: #64748B;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.activeTickerCard {
+  padding: 12px;
+  background-color: #F8FAFC;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+}
+
+.cardMetaRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.liveBadge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: #DCFCE7;
+  color: #166534;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.messageText {
+  margin: 0 0 8px 0;
+  color: #0A2F5C;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.metaWrap {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: #64748B;
+  font-size: 11px;
+}
+
+.planNote {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #E2E8F0;
+  color: #0A2F5C;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.emptyState {
+  padding: 20px;
+  text-align: center;
+  background-color: #F8FAFC;
+  border-radius: 8px;
+  border: 1px dashed #CBD5E1;
+}
+
+.emptyStateText {
+  margin: 0;
+  color: #64748B;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.previewBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #FF500D;
+}
+
+.previewStatus {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #FFFFFF;
+  color: #FF500D;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.previewContent {
+  flex: 1;
+  overflow: hidden;
+}
+
+.previewMessage {
+  margin: 0;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.previewTarget {
+  color: #FFFFFF;
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.previewPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background-color: #F1F5F9;
+}
+
+.previewPlaceholderText {
+  margin: 0;
+  color: #94A3B8;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.editorGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.editorGridWithSidebar {
+  grid-template-columns: minmax(0, 1fr) 350px;
+}
+
+.listStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tickerRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  background-color: #F8FAFC;
+}
+
+.tickerRowActive {
+  border-color: #FF500D;
+}
+
+.tickerRowBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.tickerMetaLine {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.statusChip {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.statusChipSuccess {
+  background-color: #DCFCE7;
+  color: #166534;
+}
+
+.statusChipNeutral {
+  background-color: #F1F5F9;
+  color: #64748B;
+}
+
+.metaChipRow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  color: #64748B;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.metaSeparator {
+  opacity: 0.4;
+}
+
+.suppressedChip {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: #FEF2F2;
+  color: #DC2626;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.tickerActions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.editorCardAccent {
+  border-color: #FF500D;
+}
+
+.editorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.editorTitle {
+  margin: 0;
+  color: #0A2F5C;
+  font-weight: 800;
+}
+
+.closeButton {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #64748B;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.formStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fieldLabel {
+  color: #64748B;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.fieldLabelLarge {
+  font-size: 11px;
+}
+
+.fieldControl {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #E2E8F0;
+  background-color: #FFFFFF;
+  color: #0A2F5C;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.fieldControlCompact {
+  padding: 6px;
+  font-size: 11px;
+}
+
+.fieldTextarea {
+  min-height: 50px;
+  resize: vertical;
+}
+
+.fieldError {
+  color: #DC2626;
+  font-size: 10px;
+}
+
+.fieldErrorSmall {
+  font-size: 9px;
+}
+
+.chipRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ruleChip {
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  background-color: #F8FAFC;
+  color: #475569;
+  font-size: 11px;
+}
+
+.ruleChipDanger {
+  border-color: #FECACA;
+  background-color: #FEF2F2;
+  color: #DC2626;
+}
+
+.mappingChip {
+  border-radius: 4px;
+}
+
+.headerLetter {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.subTabDock {
+  min-height: 36px;
+  padding: 4px 14px;
+}
+
+.subTabButton {
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+.selectedSubTab {
+  background-color: rgba(255, 80, 13, 0.1);
+  color: #FF500D;
+  border-color: rgba(255, 80, 13, 0.2);
+}
+
+.metricToneSuccess {
+  color: #16A34A;
+}
+
+.metricToneWarning {
+  color: #D97706;
+}
+
+@media (max-width: 960px) {
+  .editorGridWithSidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}

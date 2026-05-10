@@ -73,7 +73,7 @@ export function ControlPanelDshOperationsScreen({
 
   if (state !== 'ready') {
     return (
-      <div style={{ padding: 24 }} dir="rtl">
+      <div className={styles.surfaceStatePadding} dir="rtl">
         <StateView {...resolveOperationsStateCopy(state)} onActionPress={() => router.push(fallbackHref)} />
       </div>
     );
@@ -101,18 +101,18 @@ export function ControlPanelDshOperationsScreen({
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
-            <div style={{ width: 18, height: 18, border: '2px solid #FFFFFF', borderRadius: 4, position: 'relative' }}>
-              <div style={{ position: 'absolute', top: '50%', left: '50%', width: 10, height: 2, backgroundColor: '#FFFFFF', transform: 'translate(-50%, -50%)' }} />
+            <div className={styles.surfaceHeaderGlyph}>
+              <div className={styles.surfaceHeaderGlyphMinus} />
             </div>
           </div>
           <Box gap={0}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>عمليات DSH</h1>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle}>عمليات DSH</h1>
               <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
-                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: '9px' }}>غرفة قيادة</Text>
+                <span className={styles.surfaceHeaderBadgeText}>غرفة قيادة</span>
               </Box>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>مراقبة وتنفيذ الطلبات الحية</p>
+            <p className={styles.surfaceHeaderSubtitle}>مراقبة وتنفيذ الطلبات الحية</p>
           </Box>
         </div>
 
@@ -140,7 +140,7 @@ export function ControlPanelDshOperationsScreen({
         />
       </nav>
 
-      <div className={styles.filterDock} style={{ backgroundColor: '#F8FAFC' }}>
+      <div className={`${styles.filterDock} ${styles.filterDockTint}`}>
         {subTabItems && subTabItems.length > 0 && (
           <WebControlPanelSubTabs
             items={subTabItems}

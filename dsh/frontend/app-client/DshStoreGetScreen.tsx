@@ -492,7 +492,7 @@ export function DshStoreGetScreen({
   );
 
   const isOfferItem = React.useCallback((item: DshStoreGetMenuItem) => {
-    if ((item as any).isOffer) return true;
+    if (item.isOffer) return true;
     if (item.discountLabel) return true;
     if (item.oldPriceLabel && item.priceLabel) return true;
     const d = normalizeDisplayText(item.discountLabel ?? '').toLowerCase();
@@ -501,14 +501,14 @@ export function DshStoreGetScreen({
   }, []);
 
   const isNewItem = React.useCallback((item: DshStoreGetMenuItem) => {
-    if ((item as any).isNew) return true;
+    if (item.isNew) return true;
     const s = normalizeDisplayText(item.statusLabel ?? '').toLowerCase();
     if (s.includes('وصل') || s.includes('جديد') || s.includes('حديث')) return true;
     return false;
   }, []);
 
   const isFavoriteItem = React.useCallback((item: DshStoreGetMenuItem) => {
-    if ((item as any).isFavorite || (item as any).isFavorited) return true;
+    if (item.isFavorite || item.isFavorited) return true;
     const s = normalizeDisplayText(item.statusLabel ?? '').toLowerCase();
     if (s.includes('مفضل') || s.includes('مفضلة')) return true;
     // fallback: check tags or category label

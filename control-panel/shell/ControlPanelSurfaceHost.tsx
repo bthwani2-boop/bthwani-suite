@@ -109,7 +109,7 @@ function resolveRailItems(activeHref: PrimarySectionHref, panelText: ControlPane
     support: '☏',
     partners: '▣',
     catalogs: '⌗',
-    marketing: '📣',
+    marketing: '▤',
     platform: '⚙',
     administration: '⚙',
     hr: '◐',

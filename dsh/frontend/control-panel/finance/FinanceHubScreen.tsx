@@ -71,7 +71,7 @@ export function ControlPanelDshFinanceHubScreen({
 
   if (state !== 'ready') {
     return (
-      <div dir="rtl" className={styles.surfaceMainPanel} style={{ padding: '24px' }}>
+      <div dir="rtl" className={`${styles.surfaceMainPanel} ${styles.surfaceStatePadding}`}>
         <StateView
            stateId="loading"
            title="جاري تحميل البيانات المالية"
@@ -87,18 +87,18 @@ export function ControlPanelDshFinanceHubScreen({
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
-            <div style={{ width: 18, height: 18, border: '2px solid #FFFFFF', borderRadius: 4, position: 'relative' }}>
-               <span style={{ position: 'absolute', top: 4, left: 4, width: 6, height: 6, backgroundColor: '#FFFFFF', borderRadius: 1 }} />
+            <div className={styles.surfaceHeaderGlyph}>
+              <span className={styles.surfaceHeaderGlyphDot} />
             </div>
           </div>
           <Box gap={0}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>مالية DSH</h1>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle}>مالية DSH</h1>
               <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
-                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: '9px' }}>غرفة قيادة</Text>
+                <span className={styles.surfaceHeaderBadgeText}>غرفة قيادة</span>
               </Box>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>التسويات، مطابقة COD، الاستردادات، والرقابة المالية</p>
+            <p className={styles.surfaceHeaderSubtitle}>التسويات، مطابقة COD، الاستردادات، والرقابة المالية</p>
           </Box>
         </div>
 
@@ -110,11 +110,11 @@ export function ControlPanelDshFinanceHubScreen({
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>عناصر معلقة</span>
-              <span className={styles.commandKpiValue} style={{ color: '#FF500D' }}>١٤</span>
+              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueAlert}`}>١٤</span>
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>المخاطر</span>
-              <span className={styles.commandKpiValue} style={{ color: '#16A34A' }}>منخفض</span>
+              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>منخفض</span>
             </div>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function ControlPanelDshFinanceHubScreen({
       </nav>
 
       {activeGroupMeta.subGroups ? (
-        <div className={styles.filterDock} style={{ backgroundColor: '#F8FAFC' }}>
+        <div className={`${styles.filterDock} ${styles.filterDockTint}`}>
           <WebControlPanelSubTabs
             items={activeGroupMeta.subGroups.map((sub) => ({
               id: sub.id,

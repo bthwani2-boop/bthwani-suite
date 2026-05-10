@@ -15,6 +15,7 @@ import { CampaignsCommandDeckScreen } from './CampaignsCommandDeckScreen';
 import { PartnerOffersCommandDeckScreen } from './PartnerOffersCommandDeckScreen';
 import { MarketingMediaReviewCommandDeckScreen } from './MarketingMediaReviewCommandDeckScreen';
 import styles from '../shared/control-panel-surface.module.css';
+import marketingStyles from './control-panel-marketing.module.css';
 import {
   getMarketingTickerItems,
   upsertMarketingTickerItem,
@@ -130,14 +131,15 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       case 'ticker': {
         const previewItem = editingTicker || tickerPlan.activeItem;
         const preview = previewItem ? resolveMarketingTickerPreviewForItem(now, previewItem, 'ar') : null;
+        const selectedTicker = editingTickerId ? tickers.find((item) => item.id === editingTickerId) : undefined;
+        const canPublishSelected = Boolean(selectedTicker && selectedTicker.status !== 'published');
 
         return (
-          <Box gap={4} style={{ paddingBottom: '32px' }}>
-            {/* 1) Top command bar / summary strip */}
-            <Box background="surface" radiusToken="lg" border={{ width: 1, color: 'rgba(10,47,92,0.08)' }} padding={4}>
-              <Box layoutDirection="row" justify="space-between" align="center" marginBottom={3}>
-                <Text role="titleXs" tone="brand" style={{ fontWeight: '800' }}>الرسالة النشطة الآن</Text>
-                <Box layoutDirection="row" gap={2}>
+          <div className={marketingStyles.marketingStack}>
+            <div className={marketingStyles.surfaceCard}>
+              <div className={marketingStyles.cardHeaderRow}>
+                <Text role="titleXs" tone="brand">الرسالة النشطة الآن</Text>
+                <div className={marketingStyles.actionRow}>
                   <button
                     onClick={() => {
                       const draft = createMarketingTickerDraft();
@@ -145,8 +147,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                       setEditingTickerId(draft.id);
                       refreshTickers();
                     }}
-                    className={styles.surfaceTabActive}
-                    style={{ padding: '4px 12px', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                    className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonPrimary}`}
                   >
                     + إضافة رسالة
                   </button>
@@ -155,72 +156,68 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                       pauseAllMarketingTickers();
                       refreshTickers();
                     }}
-                    style={{ padding: '4px 12px', backgroundColor: '#FEF2F2', color: '#DC2626', borderRadius: '6px', border: 'none', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}
+                    className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonDanger}`}
                   >
                     إيقاف الكل
                   </button>
                   <button
                     onClick={() => {
-                      if (editingTickerId) {
-                        const t = tickers.find(x => x.id === editingTickerId);
-                        if (t && t.status !== 'published') {
-                          upsertMarketingTickerItem({ ...t, status: 'published' });
+                      if (selectedTicker && selectedTicker.status !== 'published') {
+                        upsertMarketingTickerItem({ ...selectedTicker, status: 'published' });
                           refreshTickers();
-                        }
                       }
                     }}
-                    disabled={!editingTickerId || (tickers.find(x => x.id === editingTickerId)?.status === 'published')}
-                    style={{ padding: '4px 12px', backgroundColor: (editingTickerId && tickers.find(x => x.id === editingTickerId)?.status !== 'published') ? '#DCFCE7' : '#F1F5F9', color: (editingTickerId && tickers.find(x => x.id === editingTickerId)?.status !== 'published') ? '#16A34A' : '#94A3B8', borderRadius: '6px', border: 'none', fontSize: '11px', fontWeight: '700', cursor: (editingTickerId && tickers.find(x => x.id === editingTickerId)?.status !== 'published') ? 'pointer' : 'not-allowed' }}
+                    disabled={!canPublishSelected}
+                    className={`${marketingStyles.actionButton} ${canPublishSelected ? marketingStyles.actionButtonSuccess : marketingStyles.actionButtonDisabled}`}
                   >
                     تفعيل المحددة
                   </button>
-                  <div style={{ padding: '4px 12px', backgroundColor: '#F1F5F9', color: '#64748B', borderRadius: '6px', fontSize: '11px', fontWeight: '700' }}>
+                  <div className={marketingStyles.statusNote}>
                     تم الحفظ تلقائياً
                   </div>
-                </Box>
-              </Box>
+                </div>
+              </div>
               {tickerPlan.activeEntry ? (
-                <div style={{ padding: '12px', backgroundColor: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ backgroundColor: '#DCFCE7', color: '#16A34A', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: '800' }}>مباشر</span>
+                <div className={marketingStyles.activeTickerCard}>
+                  <div className={marketingStyles.cardMetaRow}>
+                    <span className={marketingStyles.liveBadge}>مباشر</span>
                   </div>
-                  <p style={{ fontSize: '14px', fontWeight: '800', color: '#0A2F5C', margin: '0 0 8px 0' }}>{tickerPlan.activeItem?.message}</p>
-                  <div style={{ display: 'flex', gap: '12px', fontSize: '11px', color: '#64748B', flexWrap: 'wrap' }}>
+                  <p className={marketingStyles.messageText}>{tickerPlan.activeItem?.message}</p>
+                  <div className={marketingStyles.metaWrap}>
                     <span>المصدر: {resolveMarketingTickerSourceLabel('ar', tickerPlan.activeItem!.source)}</span>
                     <span>الجمهور: {resolveMarketingTickerAudienceLabel('ar', tickerPlan.activeItem!.audience)}</span>
                     <span>الأولوية: {resolveMarketingTickerPriorityLabel('ar', tickerPlan.activeItem!.priority)}</span>
                     <span>النافذة: {tickerPlan.activeItem!.openHour}:00 - {tickerPlan.activeItem!.closeHour}:00</span>
                     <span>الوجهة: {localizeTarget(tickerPlan.activeItem!.actionTarget)}</span>
                   </div>
-                  <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #E2E8F0', fontSize: '11px', color: '#0369A1', fontWeight: '600' }}>
+                  <div className={marketingStyles.planNote}>
                     الخطة: {resolveMarketingTickerDeliveryLabel('ar', tickerPlan.activeItem!.deliveryMode)} — مفعلة بنجاح (السبب: {resolveMarketingTickerPlanReasonLabel('ar', tickerPlan.activeEntry.reason)})
                   </div>
                 </div>
               ) : (
-                <div style={{ padding: '20px', textAlign: 'center', backgroundColor: '#F8FAFC', borderRadius: '8px', border: '1px dashed #CBD5E1' }}>
-                  <p style={{ color: '#64748B', fontSize: '13px', fontWeight: '600', margin: 0 }}>لا توجد رسالة نشطة الآن.</p>
+                <div className={marketingStyles.emptyState}>
+                  <p className={marketingStyles.emptyStateText}>لا توجد رسالة نشطة الآن.</p>
                 </div>
               )}
-            </Box>
+            </div>
 
-            {/* 2) Orange Preview Bar */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
-              <h3 style={{ color: '#0A2F5C', fontWeight: '800', fontSize: '14px', margin: '0 0 12px 0' }}>معاينة مباشرة</h3>
+            <div className={marketingStyles.surfaceCard}>
+              <h3 className={marketingStyles.surfaceCardTitle}>معاينة مباشرة</h3>
               {preview ? (
-                <div style={{ backgroundColor: '#FF500D', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '10px', fontWeight: '900', backgroundColor: '#fff', color: '#FF500D', padding: '4px 8px', borderRadius: '4px' }}>
+                <div className={marketingStyles.previewBanner}>
+                  <span className={marketingStyles.previewStatus}>
                     {preview.statusLabel}
                   </span>
-                  <div style={{ flex: 1, overflow: 'hidden' }}>
-                    <p style={{ color: '#fff', fontSize: '13px', fontWeight: '800', whiteSpace: 'nowrap', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                  <div className={marketingStyles.previewContent}>
+                    <p className={marketingStyles.previewMessage}>
                       {preview.message}
                     </p>
                   </div>
-                  <span style={{ fontSize: '10px', color: '#fff', opacity: 0.8 }}>← {localizeTarget(previewItem!.actionTarget)}</span>
+                  <span className={marketingStyles.previewTarget}>← {localizeTarget(previewItem!.actionTarget)}</span>
                 </div>
               ) : (
-                <div style={{ height: '40px', backgroundColor: '#F1F5F9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 12px' }}>
-                   <p style={{ color: '#94A3B8', fontSize: '12px', margin: 0, fontWeight: '700' }}>
+                <div className={marketingStyles.previewPlaceholder}>
+                   <p className={marketingStyles.previewPlaceholderText}>
                      {tickerPlan.suppressedEntries.find(e => e.item.id === (editingTickerId || ''))?.reason
                         ? `السبب: ${resolveMarketingTickerPlanReasonLabel('ar', tickerPlan.suppressedEntries.find(e => e.item.id === (editingTickerId || ''))?.reason)}`
                         : 'لا توجد معاينة متاحة أو الرسالة غير مؤهلة للعرض'}
@@ -229,11 +226,10 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
               )}
             </div>
 
-            {/* 3) Message list & 4) Message editor */}
-            <div style={{ display: 'grid', gridTemplateColumns: editingTicker ? '1fr 350px' : '1fr', gap: '20px' }}>
-              <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
-                <h3 style={{ color: '#0A2F5C', fontSize: '14px', fontWeight: '800', margin: '0 0 12px 0' }}>قائمة الرسائل</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className={`${marketingStyles.editorGrid} ${editingTicker ? marketingStyles.editorGridWithSidebar : ''}`}>
+              <div className={marketingStyles.surfaceCard}>
+                <h3 className={marketingStyles.surfaceCardTitle}>قائمة الرسائل</h3>
+                <div className={marketingStyles.listStack}>
                   {tickers.map(ticker => {
                     const isPublished = ticker.status === 'published';
                     const planEntry = tickerPlan.automaticEntries.find(e => e.item.id === ticker.id)
@@ -243,47 +239,47 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                     const isSuppressed = planEntry?.state === 'suppressed';
 
                     return (
-                      <div key={ticker.id} style={{ padding: '12px', backgroundColor: '#F8FAFC', borderRadius: '8px', border: editingTickerId === ticker.id ? '1px solid #FF500D' : '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
-                        <div style={{ flex: 1 }}>
-                          <p style={{ fontSize: '14px', fontWeight: '800', color: '#0A2F5C', margin: '0 0 4px 0', lineHeight: '1.4' }}>{ticker.message}</p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '4px', backgroundColor: isPublished ? '#DCFCE7' : '#F1F5F9', color: isPublished ? '#16A34A' : '#64748B', fontWeight: '900' }}>
+                      <div key={ticker.id} className={`${marketingStyles.tickerRow} ${editingTickerId === ticker.id ? marketingStyles.tickerRowActive : ''}`}>
+                        <div className={marketingStyles.tickerRowBody}>
+                          <p className={marketingStyles.messageText}>{ticker.message}</p>
+                          <div className={marketingStyles.tickerMetaLine}>
+                            <span className={`${marketingStyles.statusChip} ${isPublished ? marketingStyles.statusChipSuccess : marketingStyles.statusChipNeutral}`}>
                               {localizeStatus(ticker.status)}
                             </span>
-                            <div style={{ display: 'flex', gap: '6px', fontSize: '10px', color: '#64748B', fontWeight: '600' }}>
+                            <div className={marketingStyles.metaChipRow}>
                               <span>#{ticker.id}</span>
-                              <span style={{ opacity: 0.4 }}>|</span>
+                              <span className={marketingStyles.metaSeparator}>|</span>
                               <span>{resolveMarketingTickerSourceLabel('ar', ticker.source)}</span>
-                              <span style={{ opacity: 0.4 }}>|</span>
+                              <span className={marketingStyles.metaSeparator}>|</span>
                               <span>{resolveMarketingTickerAudienceLabel('ar', ticker.audience)}</span>
-                              <span style={{ opacity: 0.4 }}>|</span>
+                              <span className={marketingStyles.metaSeparator}>|</span>
                               <span>{resolveMarketingTickerPriorityLabel('ar', ticker.priority)}</span>
-                              <span style={{ opacity: 0.4 }}>|</span>
+                              <span className={marketingStyles.metaSeparator}>|</span>
                               <span>{ticker.openHour}:00-{ticker.closeHour}:00</span>
-                              <span style={{ opacity: 0.4 }}>|</span>
+                              <span className={marketingStyles.metaSeparator}>|</span>
                               <span>{localizeTarget(ticker.actionTarget)}</span>
                             </div>
                             {isSuppressed && (
-                              <span style={{ fontSize: '10px', color: '#DC2626', backgroundColor: '#FEF2F2', padding: '2px 6px', borderRadius: '4px', fontWeight: '800' }}>
+                              <span className={marketingStyles.suppressedChip}>
                                 الكبت: {resolveMarketingTickerPlanReasonLabel('ar', planEntry?.reason)}
                               </span>
                             )}
                           </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                        <div className={marketingStyles.tickerActions}>
                           <button onClick={() => {
                               toggleMarketingTickerStatus(ticker.id);
                               refreshTickers();
-                            }} style={{ padding: '6px 10px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '800', cursor: 'pointer' }}>
+                            }} className={marketingStyles.actionButton}>
                             {isPublished ? 'إيقاف' : 'تفعيل'}
                           </button>
-                          <button onClick={() => setEditingTickerId(ticker.id)} style={{ padding: '6px 10px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '800', cursor: 'pointer' }}>
+                          <button onClick={() => setEditingTickerId(ticker.id)} className={marketingStyles.actionButton}>
                             تعديل
                           </button>
                           <button onClick={() => {
                               toggleMarketingTickerPinned(ticker.id);
                               refreshTickers();
-                            }} style={{ padding: '6px 10px', backgroundColor: '#fff', color: '#0A2F5C', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '11px', fontWeight: '800', cursor: 'pointer' }}>
+                            }} className={marketingStyles.actionButton}>
                             {ticker.deliveryMode === 'pinned' ? 'إلغاء التثبيت' : 'تثبيت'}
                           </button>
                           <button onClick={() => {
@@ -292,7 +288,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                                 if (editingTickerId === ticker.id) setEditingTickerId(null);
                                 refreshTickers();
                               }
-                            }} style={{ padding: '6px 10px', backgroundColor: '#FEF2F2', color: '#DC2626', borderRadius: '6px', border: 'none', fontSize: '11px', fontWeight: '800', cursor: 'pointer' }}>
+                            }} className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonDanger}`}>
                             حذف
                           </button>
                         </div>
@@ -303,28 +299,30 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
               </div>
 
               {editingTicker && (
-                <div style={{ padding: '16px', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #FF500D' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <h4 style={{ color: '#0A2F5C', fontWeight: '800', margin: 0 }}>محرر الرسالة</h4>
-                    <button onClick={() => setEditingTickerId(null)} style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', fontSize: '12px' }}>✕ إغلاق</button>
+                <div className={`${marketingStyles.surfaceCard} ${marketingStyles.editorCardAccent}`}>
+                  <div className={marketingStyles.editorHeader}>
+                    <h4 className={marketingStyles.editorTitle}>محرر الرسالة</h4>
+                    <button onClick={() => setEditingTickerId(null)} className={marketingStyles.closeButton}>إغلاق</button>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div className={marketingStyles.formStack}>
                     <Box gap={1}>
-                      <label style={{ fontSize: '11px', fontWeight: '800', color: '#64748B' }}>نص الرسالة</label>
+                      <label className={`${marketingStyles.fieldLabel} ${marketingStyles.fieldLabelLarge}`}>نص الرسالة</label>
                       <textarea
+                        aria-label="نص الرسالة"
+                        title="نص الرسالة"
                         value={editingTicker.message}
                         onChange={(e) => {
                           upsertMarketingTickerItem({ ...editingTicker, message: e.target.value });
                           refreshTickers();
                         }}
-                        style={{ padding: '8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '12px', minHeight: '50px', fontFamily: 'inherit' }}
+                        className={`${marketingStyles.fieldControl} ${marketingStyles.fieldTextarea}`}
                       />
-                      {editingTicker.message.trim() === '' && <span style={{ color: '#DC2626', fontSize: '10px' }}>يجب ألا يكون النص فارغاً</span>}
+                      {editingTicker.message.trim() === '' && <span className={marketingStyles.fieldError}>يجب ألا يكون النص فارغاً</span>}
                     </Box>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <div className={marketingStyles.formGrid}>
                       <Box gap={1}>
-                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>النوع</label>
-                        <select value={editingTicker.kind} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, kind: coerceTickerKind(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <label className={marketingStyles.fieldLabel}>النوع</label>
+                        <select aria-label="نوع الرسالة" title="نوع الرسالة" value={editingTicker.kind} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, kind: coerceTickerKind(e.target.value) }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                           <option value="platform">{localizeKind('platform')}</option>
                           <option value="order">{localizeKind('order')}</option>
                           <option value="promo">{localizeKind('promo')}</option>
@@ -332,8 +330,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                         </select>
                       </Box>
                       <Box gap={1}>
-                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>الحالة</label>
-                        <select value={editingTicker.status} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, status: coerceTickerStatus(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <label className={marketingStyles.fieldLabel}>الحالة</label>
+                        <select aria-label="حالة الرسالة" title="حالة الرسالة" value={editingTicker.status} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, status: coerceTickerStatus(e.target.value) }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                           <option value="draft">{localizeStatus('draft')}</option>
                           <option value="published">{localizeStatus('published')}</option>
                           <option value="paused">{localizeStatus('paused')}</option>
@@ -341,8 +339,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                         </select>
                       </Box>
                       <Box gap={1}>
-                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>المصدر</label>
-                        <select value={editingTicker.source} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, source: coerceTickerSource(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <label className={marketingStyles.fieldLabel}>المصدر</label>
+                        <select aria-label="مصدر الرسالة" title="مصدر الرسالة" value={editingTicker.source} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, source: coerceTickerSource(e.target.value) }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                           <option value="marketing">{resolveMarketingTickerSourceLabel('ar', 'marketing')}</option>
                           <option value="operations">{resolveMarketingTickerSourceLabel('ar', 'operations')}</option>
                           <option value="system">{resolveMarketingTickerSourceLabel('ar', 'system')}</option>
@@ -351,8 +349,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                         </select>
                       </Box>
                       <Box gap={1}>
-                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>الجمهور</label>
-                        <select value={editingTicker.audience} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, audience: coerceTickerAudience(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <label className={marketingStyles.fieldLabel}>الجمهور</label>
+                        <select aria-label="الجمهور" title="الجمهور" value={editingTicker.audience} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, audience: coerceTickerAudience(e.target.value) }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                           <option value="all">{resolveMarketingTickerAudienceLabel('ar', 'all')}</option>
                           <option value="home">{resolveMarketingTickerAudienceLabel('ar', 'home')}</option>
                           <option value="order">{resolveMarketingTickerAudienceLabel('ar', 'order')}</option>
@@ -360,8 +358,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                         </select>
                       </Box>
                       <Box gap={1}>
-                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>الأولوية</label>
-                        <select value={editingTicker.priority} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, priority: coerceTickerPriority(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <label className={marketingStyles.fieldLabel}>الأولوية</label>
+                        <select aria-label="الأولوية" title="الأولوية" value={editingTicker.priority} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, priority: coerceTickerPriority(e.target.value) }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                           <option value="low">{resolveMarketingTickerPriorityLabel('ar', 'low')}</option>
                           <option value="normal">{resolveMarketingTickerPriorityLabel('ar', 'normal')}</option>
                           <option value="high">{resolveMarketingTickerPriorityLabel('ar', 'high')}</option>
@@ -369,62 +367,70 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                         </select>
                       </Box>
                       <Box gap={1}>
-                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>نمط التسليم</label>
-                        <select value={editingTicker.deliveryMode} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, deliveryMode: coerceTickerDelivery(e.target.value) }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <label className={marketingStyles.fieldLabel}>نمط التسليم</label>
+                        <select aria-label="نمط التسليم" title="نمط التسليم" value={editingTicker.deliveryMode} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, deliveryMode: coerceTickerDelivery(e.target.value) }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                           <option value="auto">{resolveMarketingTickerDeliveryLabel('ar', 'auto')}</option>
                           <option value="manual">{resolveMarketingTickerDeliveryLabel('ar', 'manual')}</option>
                           <option value="pinned">{resolveMarketingTickerDeliveryLabel('ar', 'pinned')}</option>
                         </select>
                       </Box>
                       <Box gap={1}>
-                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>بدء العرض</label>
+                        <label className={marketingStyles.fieldLabel}>بدء العرض</label>
                         <input
+                          aria-label="بدء العرض"
+                          title="بدء العرض"
                           type="number"
                           min="0"
                           max="23"
                           value={editingTicker.openHour}
                           onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, openHour: Number(e.target.value) }); refreshTickers(); }}
-                          style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}
+                          className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}
                         />
-                        {(editingTicker.openHour < 0 || editingTicker.openHour > 23) && <span style={{ color: '#DC2626', fontSize: '9px' }}>بين 0-23</span>}
+                        {(editingTicker.openHour < 0 || editingTicker.openHour > 23) && <span className={`${marketingStyles.fieldError} ${marketingStyles.fieldErrorSmall}`}>بين 0-23</span>}
                       </Box>
                       <Box gap={1}>
-                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>نهاية العرض</label>
+                        <label className={marketingStyles.fieldLabel}>نهاية العرض</label>
                         <input
+                          aria-label="نهاية العرض"
+                          title="نهاية العرض"
                           type="number"
                           min="0"
                           max="23"
                           value={editingTicker.closeHour}
                           onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, closeHour: Number(e.target.value) }); refreshTickers(); }}
-                          style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}
+                          className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}
                         />
-                        {(editingTicker.closeHour < 0 || editingTicker.closeHour > 23) && <span style={{ color: '#DC2626', fontSize: '9px' }}>بين 0-23</span>}
+                        {(editingTicker.closeHour < 0 || editingTicker.closeHour > 23) && <span className={`${marketingStyles.fieldError} ${marketingStyles.fieldErrorSmall}`}>بين 0-23</span>}
                       </Box>
                       <Box gap={1}>
-                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>التهدئة (دقيقة)</label>
+                        <label className={marketingStyles.fieldLabel}>التهدئة (دقيقة)</label>
                         <input
+                          aria-label="التهدئة بالدقائق"
+                          title="التهدئة بالدقائق"
                           type="number"
                           min="0"
                           value={editingTicker.cooldownMinutes}
                           onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, cooldownMinutes: Number(e.target.value) }); refreshTickers(); }}
-                          style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}
+                          className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}
                         />
-                        {editingTicker.cooldownMinutes < 0 && <span style={{ color: '#DC2626', fontSize: '9px' }}>لا يمكن أن يكون سالباً</span>}
+                        {editingTicker.cooldownMinutes < 0 && <span className={`${marketingStyles.fieldError} ${marketingStyles.fieldErrorSmall}`}>لا يمكن أن يكون سالباً</span>}
                       </Box>
                       <Box gap={1}>
-                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>فجوة التكرار</label>
+                        <label className={marketingStyles.fieldLabel}>فجوة التكرار</label>
                         <input
+                          aria-label="فجوة التكرار بالدقائق"
+                          title="فجوة التكرار بالدقائق"
                           type="number"
                           min="0"
                           value={editingTicker.repeatGapMinutes}
                           onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, repeatGapMinutes: Number(e.target.value) }); refreshTickers(); }}
-                          style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}
+                          className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}
                         />
-                        {editingTicker.repeatGapMinutes < 0 && <span style={{ color: '#DC2626', fontSize: '9px' }}>لا يمكن أن يكون سالباً</span>}
+                        {editingTicker.repeatGapMinutes < 0 && <span className={`${marketingStyles.fieldError} ${marketingStyles.fieldErrorSmall}`}>لا يمكن أن يكون سالباً</span>}
                       </Box>
                       <Box gap={1}>
-                        <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B' }}>وجهة الضغط</label>
-                        <select value={editingTicker.actionTarget} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, actionTarget: e.target.value }); refreshTickers(); }} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '11px' }}>
+                        <label className={marketingStyles.fieldLabel}>وجهة الضغط</label>
+                        <select aria-label="وجهة الضغط" title="وجهة الضغط" value={editingTicker.actionTarget} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, actionTarget: e.target.value }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                           <option value="home">{localizeTarget('home')}</option>
                           <option value="orders">{localizeTarget('orders')}</option>
                           <option value="tracking">{localizeTarget('tracking')}</option>
@@ -437,30 +443,28 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
               )}
             </div>
 
-            {/* 5) Rules summary block */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
-              <h3 style={{ color: '#0A2F5C', fontSize: '13px', fontWeight: '800', margin: '0 0 8px 0' }}>قواعد التشغيل</h3>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>مثبت في الأعلى</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '12px', color: '#DC2626' }}>حرج في الأعلى</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>الجمهور غير مطابق</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>خارج نافذة العرض</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>ضمن فترة التهدئة</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', color: '#475569' }}>مكرر</span>
+            <div className={marketingStyles.surfaceCard}>
+              <h3 className={marketingStyles.surfaceCardTitleCompact}>قواعد التشغيل</h3>
+              <div className={marketingStyles.chipRow}>
+                <span className={marketingStyles.ruleChip}>مثبت في الأعلى</span>
+                <span className={`${marketingStyles.ruleChip} ${marketingStyles.ruleChipDanger}`}>حرج في الأعلى</span>
+                <span className={marketingStyles.ruleChip}>الجمهور غير مطابق</span>
+                <span className={marketingStyles.ruleChip}>خارج نافذة العرض</span>
+                <span className={marketingStyles.ruleChip}>ضمن فترة التهدئة</span>
+                <span className={marketingStyles.ruleChip}>مكرر</span>
               </div>
             </div>
 
-            {/* 6) Order lifecycle mapping */}
-            <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>
-              <h3 style={{ color: '#0A2F5C', fontSize: '13px', fontWeight: '800', margin: '0 0 8px 0' }}>ربط الطلبات (Mapping)</h3>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '4px', color: '#475569' }}>تم الاستلام ← التتبع</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '4px', color: '#475569' }}>قيد التحضير ← التتبع / الطلبات</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '4px', color: '#475569' }}>في الطريق ← التتبع</span>
-                <span style={{ fontSize: '11px', padding: '4px 8px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '4px', color: '#475569' }}>تم التسليم ← الطلبات / الرئيسية</span>
+            <div className={marketingStyles.surfaceCard}>
+              <h3 className={marketingStyles.surfaceCardTitleCompact}>ربط الطلبات (Mapping)</h3>
+              <div className={marketingStyles.chipRow}>
+                <span className={`${marketingStyles.ruleChip} ${marketingStyles.mappingChip}`}>تم الاستلام ← التتبع</span>
+                <span className={`${marketingStyles.ruleChip} ${marketingStyles.mappingChip}`}>قيد التحضير ← التتبع / الطلبات</span>
+                <span className={`${marketingStyles.ruleChip} ${marketingStyles.mappingChip}`}>في الطريق ← التتبع</span>
+                <span className={`${marketingStyles.ruleChip} ${marketingStyles.mappingChip}`}>تم التسليم ← الطلبات / الرئيسية</span>
               </div>
             </div>
-          </Box>
+          </div>
         );
       }
       case 'banners':
@@ -491,28 +495,17 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       {/* 1. Header Area - Marketing Command Deck */}
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            backgroundColor: '#0A2F5C',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '16px',
-            color: '#FFFFFF',
-            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
-          }}>
-            ت
+          <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
+            <span className={marketingStyles.headerLetter}>ت</span>
           </div>
           <Box gap={0}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>تسويق DSH</h1>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle}>تسويق DSH</h1>
               <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
-                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: '9px' }}>اعتماد الأداء</Text>
+                <span className={styles.surfaceHeaderBadgeText}>اعتماد الأداء</span>
               </Box>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>حوكمة المحتوى التسويقي والنمو الاستراتيجي</p>
+            <p className={styles.surfaceHeaderSubtitle}>حوكمة المحتوى التسويقي والنمو الاستراتيجي</p>
           </Box>
         </div>
 
@@ -525,9 +518,9 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
             ].map((metric) => (
               <div key={metric.label} className={styles.commandKpi}>
                 <span className={styles.commandKpiLabel}>{metric.label}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div className={styles.commandKpiTrend}>
                   <span className={styles.commandKpiValue}>{metric.value}</span>
-                  <span style={{ fontSize: '10px', fontWeight: 800, color: metric.trendTone === 'success' ? '#16A34A' : '#D97706' }}>
+                  <span className={`${styles.commandKpiTrendValue} ${metric.trendTone === 'success' ? marketingStyles.metricToneSuccess : marketingStyles.metricToneWarning}`}>
                     {metric.trend}
                   </span>
                 </div>
@@ -555,21 +548,14 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
 
       {/* 3. Secondary Tabs - Sub-Navigation Dock */}
       {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
-        <div className={styles.filterDock} style={{ padding: '4px 14px', minHeight: '36px', backgroundColor: '#F8FAFC' }}>
+        <div className={`${styles.filterDock} ${styles.filterDockTint} ${marketingStyles.subTabDock}`}>
           {SECONDARY_TABS[activeTab].map((sub) => {
             const isSelected = sub.id === activeSubTab;
             return (
               <button
                 key={sub.id}
                 onClick={() => setActiveSubTab(sub.id)}
-                className={styles.surfaceTab}
-                style={{
-                  padding: '4px 12px',
-                  fontSize: '12px',
-                  backgroundColor: isSelected ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
-                  color: isSelected ? '#FF500D' : '#64748B',
-                  borderColor: isSelected ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
-                }}
+                className={`${styles.surfaceTab} ${marketingStyles.subTabButton} ${isSelected ? marketingStyles.selectedSubTab : ''}`}
               >
                 {sub.label}
               </button>

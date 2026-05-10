@@ -1473,7 +1473,7 @@ function renderTracking(
             const isDone = step.done;
             const backgroundColor = isActive ? theme.brandSurface : isDone ? theme.successSurface : theme.surfaceRaised;
             const borderColor = isActive ? theme.brand : theme.line;
-            const iconName = isDone ? 'checkmark' : isActive ? 'ellipse' : 'ellipse-outline';
+            const iconName: React.ComponentProps<typeof Ionicons>['name'] = isDone ? 'checkmark' : isActive ? 'ellipse' : 'ellipse-outline';
 
             return (
               <Surface
@@ -1485,7 +1485,7 @@ function renderTracking(
               >
                 <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
                   <View style={{ width: 28, alignItems: 'center' }}>
-                    <Ionicons name={iconName as any} size={18} color={isActive ? theme.brand : isDone ? theme.success : theme.textSoft} />
+                    <Ionicons name={iconName} size={18} color={isActive ? theme.brand : isDone ? theme.success : theme.textSoft} />
                   </View>
 
                   <Box gap={0} style={{ flex: 1 }}>
