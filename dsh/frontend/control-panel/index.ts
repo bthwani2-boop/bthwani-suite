@@ -1,5 +1,5 @@
-export { DSH_SURFACE_META } from './surface-meta';
-export { DSH_SURFACE_CATALOG } from './surface-catalog';
+export { surfaceMeta as DSH_SURFACE_META } from './surface-meta';
+export { surfaceCatalog as DSH_SURFACE_CATALOG } from './surface-catalog';
 export { DshControlPanelSurfaceHost } from './DshControlPanelSurfaceHost';
 export type { DshControlPanelSurfaceHostProps } from './DshControlPanelSurfaceHost';
 export { ControlPanelDshClosureDashboardScreen, ControlPanelDshClosureEvidenceStream } from './dashboard';

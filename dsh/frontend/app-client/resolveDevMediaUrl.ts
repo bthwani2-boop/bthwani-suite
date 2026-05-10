@@ -1,4 +1,4 @@
-declare const process: { env: Record<string, string | undefined> };
+/* process.env access managed by runtime/metro polyfills */
 
 export function resolveDevMediaUrl(path: string): string | null {
   const trimmedPath = path.trim();

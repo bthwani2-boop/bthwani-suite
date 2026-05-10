@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box } from '@bthwani/ui-kit';
+import { Box, Text } from '@bthwani/ui-kit';
 import {
   ControlPanelDshMarketingScreen as SmartSignalLayerScreen,
   type ControlPanelDshMarketingScreenProps as SmartSignalLayerScreenProps,
@@ -177,8 +177,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                   <div style={{ padding: '4px 12px', backgroundColor: '#F1F5F9', color: '#64748B', borderRadius: '6px', fontSize: '11px', fontWeight: '700' }}>
                     تم الحفظ تلقائياً
                   </div>
-                </div>
-              </div>
+                </Box>
+              </Box>
               {tickerPlan.activeEntry ? (
                 <div style={{ padding: '12px', backgroundColor: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -201,7 +201,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                   <p style={{ color: '#64748B', fontSize: '13px', fontWeight: '600', margin: 0 }}>لا توجد رسالة نشطة الآن.</p>
                 </div>
               )}
-            </div>
+            </Box>
 
             {/* 2) Orange Preview Bar */}
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)', padding: '16px' }}>

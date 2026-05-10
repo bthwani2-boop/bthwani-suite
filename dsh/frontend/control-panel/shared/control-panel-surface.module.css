@@ -197,7 +197,7 @@
 @media (max-width: 1024px) {
   .surfaceGridTwoCol {
     grid-template-columns: 1fr;
-    overflow-y: auto;
+    /* mobile-only scroll handled by viewport if needed; no nested scroll in shared surface */
   }
 }
 

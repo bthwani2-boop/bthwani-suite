@@ -1025,4 +1025,4 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
   );
 }
 
-export default DshSurfaceHost;
+export { DshSurfaceHost };
