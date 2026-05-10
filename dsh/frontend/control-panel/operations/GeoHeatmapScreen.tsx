@@ -320,7 +320,7 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
                 <Box gap={1} layoutDirection="row" wrap>
                   <WebControlPanelStatusTag label="الطلب والسعة" tone="info" />
                   <WebControlPanelStatusTag label="مخاطر الالتزام" tone="warning" />
-                  <WebControlPanelStatusTag label="توصيات Preview فقط" tone="neutral" />
+                  <WebControlPanelStatusTag label="معاينة فقط" tone="neutral" />
                 </Box>
               }
             >
@@ -332,10 +332,9 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
               ) : null}
               {visibleZones.map((zone) => {
                 const layout = ZONE_LAYOUT[zone.id];
+                if (!layout) return null;
 
-                if (!layout) {
-                  return null;
-                }
+                const isSelected = zone.id === selectedZoneId;
 
                 return (
                   <React.Fragment key={zone.id}>
@@ -347,18 +346,44 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
                       position={{ top: layout.zone.top, right: layout.zone.right }}
                       onSelect={() => setSelectedZoneId(zone.id)}
                     />
-                    <WebControlPanelMapPin
-                      label={resolveMapPinLabel(zone, activeSubTab as GeoSubTabId)}
-                      tone={zone.severity === 'danger' ? 'danger' : zone.severity === 'warning' ? 'warning' : 'success'}
-                      position={
-                        activeSubTab === 'orders'
-                          ? layout.order
-                          : activeSubTab === 'captains'
-                            ? layout.captain
-                            : layout.store
-                      }
-                      onSelect={() => setSelectedZoneId(zone.id)}
-                    />
+                    {/* Always show at least one pin for every visible zone */}
+                    {!isSelected && (
+                      <WebControlPanelMapPin
+                        label={resolveMapPinLabel(zone, activeSubTab as GeoSubTabId)}
+                        tone={zone.severity === 'danger' ? 'danger' : zone.severity === 'warning' ? 'warning' : 'success'}
+                        position={
+                          activeSubTab === 'orders'
+                            ? layout.order
+                            : activeSubTab === 'captains'
+                              ? layout.captain
+                              : layout.store
+                        }
+                        onSelect={() => setSelectedZoneId(zone.id)}
+                      />
+                    )}
+                    {/* For the selected zone, show all three pins to represent "Live Dispatch" context */}
+                    {isSelected && (
+                      <>
+                        <WebControlPanelMapPin
+                          label={`${zone.demandOrders} طلب`}
+                          tone="info"
+                          position={layout.order}
+                          onSelect={() => setSelectedZoneId(zone.id)}
+                        />
+                        <WebControlPanelMapPin
+                          label={`${zone.activeCaptains} كابتن`}
+                          tone="brand"
+                          position={layout.captain}
+                          onSelect={() => setSelectedZoneId(zone.id)}
+                        />
+                        <WebControlPanelMapPin
+                          label={`ضغط ${zone.storePressure}`}
+                          tone="warning"
+                          position={layout.store}
+                          onSelect={() => setSelectedZoneId(zone.id)}
+                        />
+                      </>
+                    )}
                   </React.Fragment>
                 );
               })}
@@ -435,7 +460,7 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
                 title="التوصية الحالية"
                 reason={selectedRecommendation ? `${selectedRecommendation.reason} · ${selectedRecommendation.evidence}` : 'اختر منطقة لعرض التوصية.'}
                 confidence={selectedRecommendation?.confidence ?? 'medium'}
-                auditTag={selectedRecommendation?.runtimeBindingStatus ?? 'UI_PREVIEW_ONLY'}
+                auditTag={translateDshRuntimeBindingStatus(selectedRecommendation?.runtimeBindingStatus ?? 'UI_PREVIEW_ONLY')}
                 primaryAction={selectedRecommendation ? { id: `${selectedRecommendation.id}-primary`, label: selectedRecommendation.primaryActionLabel, onAction: () => setSelectedZoneId(selectedZone?.id ?? '') } : undefined}
                 secondaryAction={selectedRecommendation ? { id: `${selectedRecommendation.id}-secondary`, label: selectedRecommendation.secondaryActionLabel, onAction: () => setSelectedZoneId(selectedZone?.id ?? '') } : undefined}
               />
@@ -446,8 +471,10 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
               />
 
               <Box gap={1}>
+                <WebControlPanelStatusTag label={`مخاطر الالتقاط ${selectedZone?.delayedPickups ?? 0}`} tone={(selectedZone?.delayedPickups ?? 0) > 0 ? 'danger' : 'success'} />
                 <WebControlPanelStatusTag label={`الالتزام ${selectedZone?.slaRisk ?? 'منخفض'}`} tone={selectedZone?.slaRisk === 'حرج' ? 'danger' : selectedZone?.slaRisk === 'مرتفع' ? 'warning' : 'success'} />
                 <WebControlPanelStatusTag label={`ضغط المتاجر ${selectedZone?.storePressure ?? 'منخفض'}`} tone={selectedZone?.storePressure === 'حرج' || selectedZone?.storePressure === 'مرتفع' ? 'warning' : 'success'} />
+                <WebControlPanelStatusTag label={`فجوة السعة ${selectedZone?.supplyDemandGap ?? 0}`} tone={(selectedZone?.supplyDemandGap ?? 0) > 5 ? 'danger' : 'info'} />
                 <WebControlPanelStatusTag label={`المرشح ${activeFilter}`} tone="info" />
               </Box>
             </Box>

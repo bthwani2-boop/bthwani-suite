@@ -5,110 +5,105 @@ import { Box, Text } from '@bthwani/ui-kit';
 import {
   WebControlPanelMapCanvas,
   WebControlPanelMapPin,
-  WebControlPanelMiniMapZone,
   WebControlPanelRouteLine,
   WebControlPanelStatusTag,
+  WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
-import { GEO_HEATMAP_ZONES } from '../control-panel/operations/geo-heatmap.preview-data';
 
-const ZONE_LAYOUT: Record<string, {
-  zone: { top: string; right: string; width: string; height: string };
-  order: { top: string; right: string };
-  captain: { top: string; right: string };
-  store: { top: string; right: string };
-  routePoints: string;
-}> = {
-  'N-01': {
-    zone: { top: '7%', right: '8%', width: '28%', height: '28%' },
-    order: { top: '18%', right: '18%' },
-    captain: { top: '31%', right: '33%' },
-    store: { top: '42%', right: '11%' },
-    routePoints: '82,22 68,33 86,46',
-  },
-  'E-02': {
-    zone: { top: '24%', right: '42%', width: '24%', height: '24%' },
-    order: { top: '34%', right: '49%' },
-    captain: { top: '44%', right: '62%' },
-    store: { top: '55%', right: '45%' },
-    routePoints: '54,36 40,46 58,58',
-  },
-  'C-03': {
-    zone: { top: '42%', right: '22%', width: '20%', height: '20%' },
-    order: { top: '49%', right: '29%' },
-    captain: { top: '58%', right: '38%' },
-    store: { top: '67%', right: '24%' },
-    routePoints: '73,52 61,59 75,68',
-  },
-  'S-04': {
-    zone: { top: '60%', right: '56%', width: '22%', height: '22%' },
-    order: { top: '68%', right: '62%' },
-    captain: { top: '76%', right: '73%' },
-    store: { top: '84%', right: '58%' },
-    routePoints: '41,70 28,77 43,86',
-  },
-};
+import styles from './captain-map.module.css';
 
 export function DshCaptainMapScreen() {
-  const [selectedZoneId, setSelectedZoneId] = React.useState(GEO_HEATMAP_ZONES[0]?.id ?? '');
-  const selectedZone = GEO_HEATMAP_ZONES.find((z) => z.id === selectedZoneId) ?? GEO_HEATMAP_ZONES[0];
-  const selectedZoneLayout = selectedZone ? ZONE_LAYOUT[selectedZone.id] : undefined;
+  const [taskStage, setTaskStage] = React.useState<'to-store' | 'to-customer' | 'proof'>('to-store');
+
+  const taskData = {
+    'to-store': {
+      title: 'التوجه للمتجر',
+      description: 'استلم الطلب من بيك إن بريستو (فرع التحلية)',
+      pins: [
+        { id: 'store', label: 'المتجر (نقطة الاستلام)', tone: 'brand' as const, pos: { top: '30%', right: '40%' } },
+        { id: 'captain', label: 'موقعك الحالي', tone: 'info' as const, pos: { top: '70%', right: '60%' } },
+      ],
+      route: '60,70 50,50 40,30',
+      action: 'تأكيد الوصول للمتجر',
+    },
+    'to-customer': {
+      title: 'التوصيل للعميل',
+      description: 'سلم الطلب في فيلا ١٢، شارع التحلية',
+      pins: [
+        { id: 'customer', label: 'العميل (نقطة التسليم)', tone: 'success' as const, pos: { top: '20%', right: '20%' } },
+        { id: 'captain', label: 'موقعك الحالي', tone: 'info' as const, pos: { top: '30%', right: '40%' } },
+      ],
+      route: '40,30 30,25 20,20',
+      action: 'تأكيد الوصول للعميل',
+    },
+    'proof': {
+      title: 'إثبات التسليم',
+      description: 'يرجى رفع صورة إثبات التسليم لإغلاق الطلب',
+      pins: [
+        { id: 'customer', label: 'موقع العميل', tone: 'success' as const, pos: { top: '20%', right: '20%' } },
+        { id: 'captain', label: 'موقعك (عند العميل)', tone: 'info' as const, pos: { top: '22%', right: '22%' } },
+      ],
+      route: '',
+      action: 'رفع الإثبات الآن',
+    },
+  };
+
+  const currentTask = taskData[taskStage];
 
   return (
-    <Box gap={3} padding={4} dir="rtl">
+    <Box padding={4} className={styles.captainMapContainer}>
       <Box gap={1}>
-        <Text role="titleLg">خريطة الكابتن</Text>
-        <Text role="bodySm" tone="muted">عرض حي لمناطق الطلبات المرتفعة وتوافر الكباتن.</Text>
+        <Text role="titleLg">خريطة المهمة</Text>
+        <Text role="bodySm" tone="muted">عرض المسار الحالي والوجهة القادمة.</Text>
       </Box>
 
-      <WebControlPanelMapCanvas
-        legend={
-          <Box gap={1} layoutDirection="row" wrap>
-            <WebControlPanelStatusTag label="طلب مرتفع" tone="danger" />
-            <WebControlPanelStatusTag label="مستقر" tone="success" />
-          </Box>
-        }
-      >
-        {selectedZoneLayout ? (
-          <WebControlPanelRouteLine
-            points={selectedZoneLayout.routePoints}
-            tone={selectedZone?.severity === 'danger' ? 'danger' : selectedZone?.severity === 'warning' ? 'warning' : 'success'}
-          />
-        ) : null}
-        {GEO_HEATMAP_ZONES.map((zone) => {
-          const layout = ZONE_LAYOUT[zone.id];
-          if (!layout) return null;
+      <div className={styles.captainMapCanvasWrapper}>
+        <WebControlPanelMapCanvas
+          legend={
+            <Box gap={1} layoutDirection="row" wrap>
+              <WebControlPanelStatusTag label="موقعك" tone="info" />
+              <WebControlPanelStatusTag label="الوجهة" tone="brand" />
+              <WebControlPanelStatusTag label="العميل" tone="success" />
+            </Box>
+          }
+        >
+          {currentTask.route && (
+            <WebControlPanelRouteLine
+              points={currentTask.route}
+              tone="brand"
+            />
+          )}
+          {currentTask.pins.map((pin) => (
+            <WebControlPanelMapPin
+              key={pin.id}
+              label={pin.label}
+              tone={pin.tone}
+              position={pin.pos}
+            />
+          ))}
+        </WebControlPanelMapCanvas>
+      </div>
 
-          return (
-            <React.Fragment key={zone.id}>
-              <WebControlPanelMiniMapZone
-                label={zone.name}
-                tone={zone.severity === 'danger' ? 'danger' : zone.severity === 'warning' ? 'warning' : 'success'}
-                width={layout.zone.width}
-                height={layout.zone.height}
-                position={{ top: layout.zone.top, right: layout.zone.right }}
-                onSelect={() => setSelectedZoneId(zone.id)}
-              />
-              <WebControlPanelMapPin
-                label={`${zone.demandOrders} طلب`}
-                tone={zone.severity === 'danger' ? 'danger' : zone.severity === 'warning' ? 'warning' : 'success'}
-                position={layout.order}
-                onSelect={() => setSelectedZoneId(zone.id)}
-              />
-            </React.Fragment>
-          );
-        })}
-      </WebControlPanelMapCanvas>
-
-      {selectedZone && (
-        <Box padding={3} border radiusToken="lg" background="surfaceRaised" gap={2}>
-          <Text role="bodyStrong">{selectedZone.name}</Text>
-          <Text role="bodySm" tone="muted">{selectedZone.recommendedAction}</Text>
-          <Box layoutDirection="row" gap={2}>
-            <WebControlPanelStatusTag label={`الطلبات: ${selectedZone.demandOrders}`} tone="info" />
-            <WebControlPanelStatusTag label={`الكباتن: ${selectedZone.activeCaptains}`} tone="brand" />
-          </Box>
+      <div className={styles.captainTaskInspector}>
+        <Box layoutDirection="row" justifyContent="space-between" alignItems="center">
+          <Text role="bodyStrong">{currentTask.title}</Text>
+          <WebControlPanelStatusTag label="مهمة نشطة" tone="brand" />
         </Box>
-      )}
+        <Text role="bodySm" tone="muted">{currentTask.description}</Text>
+
+        <WebControlPanelActionCluster
+          primary={{
+            id: 'next-stage',
+            label: currentTask.action,
+            onAction: () => {
+              if (taskStage === 'to-store') setTaskStage('to-customer');
+              else if (taskStage === 'to-customer') setTaskStage('proof');
+              else setTaskStage('to-store');
+            }
+          }}
+          secondary={{ id: 'contact', label: 'اتصال بالدعم' }}
+        />
+      </div>
     </Box>
   );
 }

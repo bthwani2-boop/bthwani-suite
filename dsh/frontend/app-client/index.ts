@@ -57,10 +57,10 @@ export type {
 	DshNotificationsScreenProps,
 } from './DshNotificationsScreen';
 export { DshNotificationsScreen } from './DshNotificationsScreen';
-export type { DshBenefitsHubScreenProps } from './DshBenefitsHubScreen';
-export { DshBenefitsHubScreen } from './DshBenefitsHubScreen';
-export type { LoyaltyRewardsPageProps } from './LoyaltyRewardsPage';
-export { LoyaltyRewardsPage } from './LoyaltyRewardsPage';
+export type { DshBenefitsHubScreenProps } from './SubscriptionsHubScreen';
+export { DshBenefitsHubScreen } from './SubscriptionsHubScreen';
+export type { DshLoyaltyRewardsScreenProps } from './DshLoyaltyRewardsScreen';
+export { DshLoyaltyRewardsScreen } from './DshLoyaltyRewardsScreen';
 export type {
 	DshIntakeHubScreenProps,
 	DshOrdersListScreenProps,
@@ -94,8 +94,8 @@ export {
 	DshZoneSetScreen,
 	getCanonicalDestination,
 } from './DshClientOperationScreens';
-export type { SubscriptionsPageProps } from './SubscriptionsPage';
-export { SubscriptionsPage } from './SubscriptionsPage';
+export type { DshSubscriptionsScreenProps } from './DshSubscriptionsScreen';
+export { DshSubscriptionsScreen } from './DshSubscriptionsScreen';
 export type {
 	DshClientState,
 	DshClientStateGroup,

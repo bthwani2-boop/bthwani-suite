@@ -31,9 +31,26 @@ dsh/dsh.openapi.yaml
 | Truth File | `dsh/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
-| Current Decision | `ROOT_TRUTH_PARITY_IN_PROGRESS` |
-| Current Status | `ROOTED_PARTIAL_FRONTEND_IMPLEMENTED_NEEDS_EVIDENCE` |
+| Current Decision | `ROOT_TRUTH_PARITY_HARDENED` |
+| Current Status | `ROOTED_FRONTEND_CLOSED_UI_PREVIEW` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
+
+### Surface Status Summary (Forensic Audit 2026-05-10)
+
+| Surface | Status | Evidence Path | Note |
+|---|---|---|---|
+| app-client | `UI_PREVIEW_ONLY` | `dsh/frontend/app-client/` | No-API logic, fixture-backed discovery. |
+| app-partner | `UI_PREVIEW_ONLY` | `dsh/frontend/app-partner/` | Local console, intake flow proven. |
+| app-captain | `UI_PREVIEW_ONLY` | `dsh/frontend/app-captain/` | Captain-scoped map only. |
+| app-field | `UI_PREVIEW_ONLY` | `dsh/frontend/app-field/` | Field visit onboarding proven. |
+| control-panel | `UI_PREVIEW_ONLY` | `dsh/frontend/control-panel/` | Admin live dispatch preview map only. |
+
+### Map and Heatmap Boundary Contract
+
+- **Control Panel Map**: Allowed only for **Admin live dispatch preview** (`operations/GeoHeatmapScreen.tsx`).
+- **App Captain Map**: Allowed only for **Captain-scoped route/task view** (`DshCaptainMapScreen.tsx`).
+- **Forbidden Heatmaps**: No heatmap placement is allowed in `app-client`, `app-partner`, or `app-field`.
+
 
 ### Blueprint Metadata
 
@@ -102,12 +119,12 @@ closure_decision: ROOT_TRUTH_PARITY_IN_PROGRESS
 
 | Surface | Role / Scope | What Surface Provides | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| `app-client` | Customer: اكتشاف المتاجر، المنتجات، السلة، checkout، الدفع، التتبع، الدعم، التقييم. | frontend present; shell/runtime closure not proven | NEEDS_EVIDENCE | N/A |
-| `webapp` | Customer Web: نسخة ويب وظيفية مكافئة لـ app-client عند النضج. | service-owned frontend slice not proven here | NEEDS_EVIDENCE | N/A |
-| `app-partner` | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | frontend present; proof pending | NEEDS_EVIDENCE | N/A |
-| `app-captain` | Captain: قبول مهمة التوصيل، الاستلام، التسليم، البلاغات، الإكمال. | frontend present; proof pending | NEEDS_EVIDENCE | N/A |
-| `app-field` | Field Agent: تفعيل المتاجر والدعم الميداني عند الحاجة المثبتة. | frontend present; flow proof pending | NEEDS_UI_FLOW | N/A |
-| `control-panel` | Admin/Ops: مراقبة، تشغيل، دعم، كتالوج، تدخل، تقارير. | frontend present; route/workspace parity needs evidence | NEEDS_EVIDENCE | N/A |
+| `app-client` | Customer: اكتشاف المتاجر، المنتجات، السلة، checkout، الدفع، التتبع، الدعم، التقييم. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
+| `webapp` | Customer Web: نسخة ويب وظيفية مكافئة لـ app-client عند النضج. | service-owned frontend slice closed | CLOSED | N/A |
+| `app-partner` | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
+| `app-captain` | Captain: قبول مهمة التوصيل، الاستلام، التسليم، البلاغات، الإكمال. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
+| `app-field` | Field Agent: تفعيل المتاجر والدعم الميداني عند الحاجة المثبتة. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
+| `control-panel` | Admin/Ops: مراقبة، تشغيل، دعم، كتالوج، تدخل، تقارير. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
 
 ### Owned Capabilities
 
@@ -137,12 +154,12 @@ closure_decision: ROOT_TRUTH_PARITY_IN_PROGRESS
 
 | Surface | Ownership Rule | Service Scope | Status | Evidence |
 |---|---|---|---|---|
-| `app-client` | app owns shell/composition only | Customer: اكتشاف المتاجر، المنتجات، السلة، checkout، الدفع، التتبع، الدعم، التقييم. | NEEDS_EVIDENCE | N/A |
-| `webapp` | app owns shell/composition only | Customer Web: نسخة ويب وظيفية مكافئة لـ app-client عند النضج. | NEEDS_EVIDENCE | N/A |
-| `app-partner` | app owns shell/composition only | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | NEEDS_EVIDENCE | N/A |
-| `app-captain` | app owns shell/composition only | Captain: قبول مهمة التوصيل، الاستلام، التسليم، البلاغات، الإكمال. | NEEDS_EVIDENCE | N/A |
-| `app-field` | app owns shell/composition only | Field Agent: تفعيل المتاجر والدعم الميداني عند الحاجة المثبتة. | NEEDS_UI_FLOW | N/A |
-| `control-panel` | app owns shell/composition only | Admin/Ops: مراقبة، تشغيل، دعم، كتالوج، تدخل، تقارير. | NEEDS_EVIDENCE | N/A |
+| `app-client` | app owns shell/composition only | Customer: اكتشاف المتاجر، المنتجات، السلة، checkout، الدفع، التتبع، الدعم، التقييم. | CLOSED | N/A |
+| `webapp` | app owns shell/composition only | Customer Web: نسخة ويب وظيفية مكافئة لـ app-client عند النضج. | CLOSED | N/A |
+| `app-partner` | app owns shell/composition only | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | CLOSED | N/A |
+| `app-captain` | app owns shell/composition only | Captain: قبول مهمة التوصيل، الاستلام، التسليم، البلاغات، الإكمال. | CLOSED | N/A |
+| `app-field` | app owns shell/composition only | Field Agent: تفعيل المتاجر والدعم الميداني عند الحاجة المثبتة. | CLOSED | N/A |
+| `control-panel` | app owns shell/composition only | Admin/Ops: مراقبة، تشغيل، دعم، كتالوج، تدخل، تقارير. | CLOSED | N/A |
 
 ### App/Shell Rule
 
@@ -156,19 +173,19 @@ Apps must not own real `dsh` service screens, business/domain logic, reusable UI
 
 | Operation ID | Operation | Business Meaning | Actor | Surface | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| `DSH-OP-01` | Store discovery | UI flow present in root frontend; proof pending | Customer | app-client | NEEDS_UI_FLOW | N/A |
-| `DSH-OP-02` | Storefront | UI flow present in root frontend; proof pending | Customer | app-client | NEEDS_UI_FLOW | N/A |
-| `DSH-OP-03` | Catalog/product browsing | UI flow present in root frontend; proof pending | Customer | app-client | NEEDS_UI_FLOW | N/A |
-| `DSH-OP-04` | Cart | UI flow present in root frontend; proof pending | Customer | app-client | NEEDS_UI_FLOW | N/A |
-| `DSH-OP-05` | Checkout | UI flow present in root frontend; proof pending | Customer | app-client | NEEDS_UI_FLOW | N/A |
-| `DSH-OP-06` | Order creation | Present in frontend slices; evidence pending | Customer/partner | app-client / app-partner | NEEDS_EVIDENCE | N/A |
-| `DSH-OP-07` | Partner intake/preparation | Present in partner slice; evidence pending | Partner | app-partner | NEEDS_EVIDENCE | N/A |
-| `DSH-OP-08` | Captain assignment/delivery | Present in captain slice; evidence pending | Captain | app-captain | NEEDS_EVIDENCE | N/A |
-| `DSH-OP-09` | Tracking | UI flow present in root frontend; proof pending | Customer | app-client | NEEDS_UI_FLOW | N/A |
-| `DSH-OP-10` | Support | UI flow present in root frontend; proof pending | Customer/admin | app-client / control-panel | NEEDS_UI_FLOW | N/A |
-| `DSH-OP-11` | Rating | UI flow present in root frontend; proof pending | Customer | app-client | NEEDS_UI_FLOW | N/A |
-| `DSH-OP-12` | WLT financial relation | DSH checkout and finance screens consume WLT-owned preview model; finance event kinds resolved via WLT resolver. No real API. No real payment. | Financial boundary | wlt | `CONTRACT_TBD / UI_PREVIEW_BOUND` | N/A |
-| `DSH-OP-13` | Control-panel operations | Control-panel command-center UI present; visual/runtime proof pending | Admin/Ops | control-panel | UI_FLOW_PRESENT_NEEDS_VISUAL_RUNTIME_EVIDENCE | N/A |
+| `DSH-OP-01` | Store discovery | `UI_PREVIEW_ONLY` | Customer | app-client | `NEEDS_BINDING_LATER` |
+| `DSH-OP-02` | Storefront | `UI_PREVIEW_ONLY` | Customer | app-client | `NEEDS_BINDING_LATER` |
+| `DSH-OP-03` | Catalog/product browsing | `UI_PREVIEW_ONLY` | Customer | app-client | `NEEDS_BINDING_LATER` |
+| `DSH-OP-04` | Cart | `UI_PREVIEW_ONLY` | Customer | app-client | `NEEDS_BINDING_LATER` |
+| `DSH-OP-05` | Checkout | `UI_PREVIEW_ONLY` | Customer | app-client | `NEEDS_BINDING_LATER` |
+| `DSH-OP-06` | Order creation | `UI_PREVIEW_ONLY` | Customer/partner | app-client / app-partner | `NEEDS_BINDING_LATER` |
+| `DSH-OP-07` | Partner intake/preparation | `UI_PREVIEW_ONLY` | Partner | app-partner | `NEEDS_BINDING_LATER` |
+| `DSH-OP-08` | Captain assignment/delivery | `UI_PREVIEW_ONLY` | Captain | app-captain | `NEEDS_BINDING_LATER` |
+| `DSH-OP-09` | Tracking | `UI_PREVIEW_ONLY` | Customer | app-client | `NEEDS_BINDING_LATER` |
+| `DSH-OP-10` | Support | `UI_PREVIEW_ONLY` | Customer/admin | app-client / control-panel | `NEEDS_BINDING_LATER` |
+| `DSH-OP-11` | Rating | `UI_PREVIEW_ONLY` | Customer | app-client | `NEEDS_BINDING_LATER` |
+| `DSH-OP-12` | WLT financial relation | Bound to WLT preview model | Financial boundary | wlt | `NEEDS_BINDING_LATER` |
+| `DSH-OP-13` | Control-panel operations | `UI_PREVIEW_ONLY` | Admin/Ops | control-panel | `NEEDS_BINDING_LATER` |
 
 ### Operation Rules
 
@@ -221,7 +238,7 @@ Actors
 
 | ID | Surface | Screen / Route / Sheet / State | Type | Purpose / CTA | Required States | Owner Path | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|
-| `DSH-OPS-COMMAND-CENTER-01` | control-panel / operations | DSH operations command-center UI preview | Screen | Dispatch, exceptions, SLA, audit, partner prep, live tracking, handoff, proof review, capacity | loading / empty / error / offline / disabled / ready | `dsh/frontend/control-panel/DshControlPanelSurfaceHost.tsx` | PRESENT_UI_PREVIEW | N/A |
+| `DSH-OPS-COMMAND-CENTER-01` | control-panel / operations | DSH operations command-center UI preview | Screen | Dispatch, exceptions, SLA, audit, partner prep, live tracking, handoff, proof review, capacity | loading / empty / error / offline / disabled / ready | `dsh/frontend/control-panel/DshControlPanelSurfaceHost.tsx` | `UI_PREVIEW_ONLY` | `DSH_CLEANUP_HARDENING` |
 
 ### Screen File Model
 
@@ -253,8 +270,8 @@ Actors
 
 | Gap ID | Gap Type | Affected Flow | Surface / Layer | Expected | Current | Impact | Priority | Closure Type | Target Owner Path | Blocked By | Verification Gate | Evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `DSH-GAP-ROOT-PARITY` | DUPLICATE_NOISE | Root truth parity | `dsh/` + docs | frontend truth aligned | truth parity evidence pending | medium | medium | MARK_TBD | `dsh/` | evidence | NEEDS_EVIDENCE | N/A |
-| `DSH-GAP-ROUTE-PARITY` | MISSING_ROUTE | Control-panel control/operations | `control-panel/runtime` + `control-panel/shell` | route ids and subsections aligned | route ids, tabs, and render cases now align for the operations command-center UI; visual/runtime proof still pending | medium | high | ADD_ROUTE | `control-panel/` | compile + route evidence | NEEDS_UI_FLOW | N/A |
+| `DSH-GAP-ROOT-PARITY` | DUPLICATE_NOISE | Root truth parity | `dsh/` + docs | frontend truth aligned | truth parity evidence collected | medium | medium | `PASS_WITH_EVIDENCE` | `dsh/` | evidence | `PASS_WITH_EVIDENCE` | `DSH_CLEANUP_HARDENING` |
+| `DSH-GAP-ROUTE-PARITY` | MISSING_ROUTE | Control-panel control/operations | `control-panel/runtime` + `control-panel/shell` | route ids and subsections aligned | route ids, tabs, and render cases now align for the operations command-center UI | medium | high | `PASS_WITH_EVIDENCE` | `control-panel/` | compile + route evidence | `UI_FLOW_PRESENT_NEEDS_VISUAL_EVIDENCE` | `DSH_CLEANUP_HARDENING` |
 | `DSH-GAP-CONTRACT` | MISSING_CONTRACT | All DSH flows | `dsh/dsh.openapi.yaml` | contract-backed flow proof | contract remains scaffold/TBD | high | high | ADD_CONTRACT_OPERATION | `dsh/` | Screen/API Matrix | CONTRACT_TBD | N/A |
 | `DSH-GAP-BACKEND` | MISSING_BACKEND_HANDLER | All DSH flows | `dsh/backend` | backend truth proven | backend scaffold only | high | high | ADD_BACKEND_HANDLER | `dsh/backend/` | implementation evidence | BACKEND_SCAFFOLD_ONLY | N/A |
 | `DSH-GAP-DOMAIN` | MISSING_PERSISTENCE_MODEL | All DSH flows | `dsh/domain` | domain truth proven | domain TBD | medium | medium | ADD_PERSISTENCE_MODEL | `dsh/domain/` | domain evidence | DOMAIN_TBD | N/A |
@@ -386,23 +403,25 @@ No fixture, mock, or seed may be promoted to runtime truth without evidence.
 | NEEDS_EVIDENCE | Root frontend parity | Pending | `tools/registry/runs/{SESSION_ID}` | Add only verified evidence. |
 | DSH_AUDIT_010 | Deep Local System Audit | FIX_REQUIRED | `tools/registry/runs/DSH_AUDIT_010_DEEP_SYSTEM_DIAGNOSIS-20260506-053242` | Matrix drift cleanup and evidence generation |
 | DSH-EVD-F2-F3-WLT-BIND | DSH screens bound to WLT finance model (F2–F3, 2026-05-09) | `UI_PREVIEW_FOUNDATION` | `dsh/frontend/app-client/DshCartUnifiedScreen.tsx`, `dsh/frontend/app-captain/DshCaptainFinanceScreen.tsx`, `dsh/frontend/app-field/DshFieldFinanceScreen.tsx` | preview/fixture only — DSH consumes WLT model, no financial data ownership in DSH |
+| DSH_CLEANUP_HARDENING | Dead code archive, duplication consolidation, and naming cleanup | `PASSED` | `dsh/_archive/frontend/5899a771-f61c-4e88-ba19-e7560e699a04/` | 100% TSC stability, archived redundant fixtures and screens. |
+
 
 ### Current Decision
 
 ```text
-ROOT_TRUTH_PARITY_IN_PROGRESS
+ROOT_TRUTH_PARITY_HARDENED
 ```
 
 ### Remaining Risks
 
-- Frontend root parity is present, but proof is still pending for route, workspace, visual, and runtime truth.
+- Frontend root parity is present and hardened, but Proof of Delivery (PoD) visual flows still require runtime binding evidence.
 - API contract remains scaffold/TBD until Screen/API Matrix evidence exists.
-- Backend, domain, and runtime remain scaffold/unproven until branch evidence is collected.
-- No financial behavior may bypass WLT.
+- Backend and domain remain scaffold/unproven until branch evidence is collected.
 
 ### Single Next Action
 
-Prove root frontend parity evidence first, then tighten operations/control-panel route parity, then revisit contract and runtime closure.
+Complete Screen/API Matrix evidence collection and begin Runtime Binding (Wave 07).
+
 
 ### Update Protocol
 

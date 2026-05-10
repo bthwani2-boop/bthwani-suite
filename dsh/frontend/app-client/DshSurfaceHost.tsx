@@ -7,7 +7,7 @@ import { DshClientBellScreen } from './DshClientBellScreen';
 import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './DshHomeGetScreen';
 import { DshMySpaceScreen } from './DshMySpaceScreen';
 import { DshNotificationsScreen } from './DshNotificationsScreen';
-import { DshBenefitsHubScreen } from './DshBenefitsHubScreen';
+import { DshBenefitsHubScreen } from './SubscriptionsHubScreen';
 import { DshOrdersListScreen, DshTrackingScreen } from './checkoutTracking';
 import { DshStoreGetScreen } from './DshStoreGetScreen';
 import { DshStoreItemsScreen } from './DshStoreItemsScreen';

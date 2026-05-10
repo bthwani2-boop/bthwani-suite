@@ -634,7 +634,7 @@ export function WebCommandStrip({
           <button type="button" className="ui-web-command-strip__action-btn" onClick={resolvedLanguageClick}>
             {resolvedLanguageLabel}
           </button>
-          <div className="ui-web-command-strip__user-profile" title="User Profile" />
+          <div className="ui-web-command-strip__user-profile" title="ملف المستخدم" />
         </div>
       </header>
     </>
@@ -748,7 +748,7 @@ export function WebCommandCenterFrame({
                 type="button"
                 className="ui-web-command-center__rail-back"
                 onClick={() => setActiveSubStack(null)}
-                title={direction === 'rtl' ? 'عودة' : 'Back'}
+                title="عودة"
               >
                 {direction === 'rtl' ? '← عودة' : '← Back'}
               </button>

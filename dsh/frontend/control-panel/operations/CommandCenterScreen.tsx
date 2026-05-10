@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  WebControlPanelKpiStrip,
   WebControlPanelRecommendation,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
@@ -50,22 +50,15 @@ const QUICK_ACTIONS = [
 ] as const;
 
 export function CommandCenterScreen({ hubHref, subGroup }: CommandCenterScreenProps) {
+  const router = useRouter();
+
   return (
     <div className={styles.operationsCockpitContent} dir="rtl">
-      {/* 1. Operations Pulse - High Level Metrics */}
+      {/* 1. Header — Compact Title */}
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>نبض العمليات</h2>
         <p className={styles.sectionSubtitle}>متابعة الأداء العام والتدخلات السريعة</p>
       </div>
-
-        <WebControlPanelKpiStrip
-        items={OPERATIONS_PULSE_METRICS.map(m => ({
-          id: m.id,
-          label: m.title,
-          value: m.value,
-          tone: m.tone === 'best' ? 'success' : m.tone === 'warning' ? 'warning' : m.tone === 'danger' ? 'danger' : 'neutral',
-        }))}
-      />
 
       <div className={styles.operationsGridTwoCol}>
         {/* 2. Top System Recommendations */}
@@ -82,7 +75,7 @@ export function CommandCenterScreen({ hubHref, subGroup }: CommandCenterScreenPr
                 primaryAction={{
                   id: `action-${s.id}`,
                   label: s.action,
-                  onAction: () => window.location.href = `${hubHref}${s.href}`
+                  onAction: () => router.push(`${hubHref}${s.href}`)
                 }}
               />
             ))}
@@ -104,7 +97,7 @@ export function CommandCenterScreen({ hubHref, subGroup }: CommandCenterScreenPr
                 primaryAction={{
                   id: `go-${action.id}`,
                   label: 'انتقل',
-                  onAction: () => window.location.href = `${hubHref}?workspace=${action.workspace}`
+                  onAction: () => router.push(`${hubHref}?workspace=${action.workspace}`)
                 }}
               />
             ))}

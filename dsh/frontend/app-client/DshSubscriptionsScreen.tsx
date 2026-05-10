@@ -15,7 +15,7 @@ import {
 } from '@bthwani/ui-kit';
 import { subscriptionHeroCopy, subscriptionPlanCards, type SubscriptionPlanCard } from './subscriptionsCommercialDeck';
 
-export type SubscriptionsPageProps = {
+export type DshSubscriptionsScreenProps = {
   compact?: boolean;
 };
 
@@ -66,7 +66,7 @@ function SubscriptionPlanTile({
   );
 }
 
-export function SubscriptionsPage({ compact = false }: SubscriptionsPageProps) {
+export function DshSubscriptionsScreen({ compact = false }: DshSubscriptionsScreenProps) {
   const { theme } = useTheme();
   const initialCurrentPlanId = subscriptionPlanCards.find((plan) => plan.current)?.id ?? 'weekly';
   const [currentPlanId, setCurrentPlanId] = React.useState(initialCurrentPlanId);
@@ -180,4 +180,4 @@ export function SubscriptionsPage({ compact = false }: SubscriptionsPageProps) {
   );
 }
 
-export default SubscriptionsPage;
+export default DshSubscriptionsScreen;

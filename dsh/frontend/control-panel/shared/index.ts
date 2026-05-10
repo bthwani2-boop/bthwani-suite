@@ -15,7 +15,7 @@ export {
 	type DshRuntimeBindingStatus,
 	type DshSurfaceId,
 	type DshSurfaceLookupId,
-} from './dshCrossSurfaceClosureMap';
+} from '../../shared/dshCrossSurfaceClosureMap';
 export { ControlPanelDshDecisionBoard, type ControlPanelDshDecisionBoardProps } from './ControlPanelDshDecisionBoard';
 export { ControlPanelDshActionQueue, type ControlPanelDshActionQueueItem, type ControlPanelDshActionQueueProps } from './ControlPanelDshActionQueue';
 export { ControlPanelDshWorkspaceFrame, type ControlPanelDshWorkspaceFrameProps } from './ControlPanelDshWorkspaceFrame';

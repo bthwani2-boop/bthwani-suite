@@ -4,7 +4,7 @@ import type {
   DshLifecycleStep,
   DshRuntimeBindingStatus,
   DshSurfaceId,
-} from './dshCrossSurfaceClosureMap';
+} from '../../shared/dshCrossSurfaceClosureMap';
 
 export type DshRecommendationSeverity = 'critical' | 'high' | 'medium' | 'low';
 export type DshRecommendationConfidence = 'high' | 'medium' | 'low';

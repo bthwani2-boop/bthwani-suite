@@ -64,7 +64,7 @@ Wave 00 preflight summary:
 
 | Surface | Current HEAD owner root | Canonical host / route anchor | Canonical screen-entry family | Preview / data family | Wave 01 rule |
 |---|---|---|---|---|---|
-| app-client | `dsh/frontend/app-client` | `DshSurfaceHost.tsx` | `Dsh*Screen.tsx`, `SubscriptionsPage.tsx`, `LoyaltyRewardsPage.tsx` | `*Fixtures.ts`, `types.ts`, `builders.ts`, `store-profile.ts` | treat client heatmap as forbidden; keep preview/data files out of rename scope |
+| app-client | `dsh/frontend/app-client` | `DshSurfaceHost.tsx` | `Dsh*Screen.tsx` | `*Fixtures.ts`, `types.ts`, `builders.ts`, `store-profile.ts` | treat client heatmap as forbidden; keep preview/data files out of rename scope |
 | app-partner | `dsh/frontend/app-partner` | `DshPartnerConsoleScreen.tsx` plus partner entry/orders screens | `DshPartner*Screen.tsx` | `fixture-locations.ts`, `dshPartner*Model.ts`, `dshPartnerOperationalFlowIds.ts` | partner remains actor-owned; no heatmap placement allowed |
 | app-captain | `dsh/frontend/app-captain` | `DshCaptainEntryScreen.tsx`, `DshCaptainOrdersScreen.tsx`, `DshCaptainOperationsScreen.tsx` | `DshCaptain*Screen.tsx` | `fixture-locations.ts`, `dshCaptain*Model.ts`, `flow-map.ts`, `dshCaptainBinding.contracts.ts` | captain-scoped route/map is the only non-control-panel map exception |
 | app-field | `dsh/frontend/app-field` | `FieldSurfaceHost.tsx`, `mobile-entry.tsx` | `DshField*Screen.tsx` | `dshField*Model.ts`, `FieldOnboardingStorage.ts`, `fieldStoreModel.ts` | field remains visit/onboarding owned; no heatmap placement allowed |
@@ -101,6 +101,8 @@ Wave 00 preflight summary:
   - `dsh/frontend/control-panel/marketing/loyaltyCommerceData.ts`
 - Archive is allowed only to `dsh/_archive/frontend/<SESSION_ID>/...` and only after import, registry, and route proof.
 - `dsh/frontend/Archive`, `dsh/frontend/archive`, and `dsh/frontend/_archive` remain forbidden paths.
+- **DSH_CLEANUP_HARDENING Archive**: `dsh/_archive/frontend/5899a771-f61c-4e88-ba19-e7560e699a04/` (storeFixtures, DshBenefitsHubScreen, partner-intake-store).
+
 
 ### Heatmap Placement Contract
 
@@ -155,15 +157,16 @@ These files were detected as screen files but not confidently mapped by filename
 
 | Surface | File | Size Bytes | Candidate Flow | Decision | Next Action |
 |---|---|---:|---|---|---|
-| app-client | dsh\frontend\app-client\bell\screens\DshClientBellScreen.tsx | 8110 | TBD | NEEDS_REVIEW | classify manually |
-| app-client | dsh\frontend\app-client\entry\screens\DshEntryScreen.tsx | 4803 | TBD | NEEDS_REVIEW | classify manually |
-| app-client | dsh\frontend\app-client\favorites\screens\DshFavoritesListScreen.tsx | 2027 | TBD | NEEDS_REVIEW | classify manually |
-| app-client | dsh\frontend\app-client\favorites\screens\DshFavoriteToggleScreen.tsx | 3560 | TBD | NEEDS_REVIEW | classify manually |
-| app-client | dsh\frontend\app-client\loyalty\screens\DshBenefitsHubScreen.tsx | 170 | TBD | NEEDS_REVIEW | classify manually |
-| app-client | dsh\frontend\app-client\my_space\screens\DshMySpaceCommercialScreen.tsx | 13133 | TBD | NEEDS_REVIEW | classify manually |
-| app-client | dsh\frontend\app-client\my_space\screens\DshMySpaceScreen.tsx | 7035 | TBD | NEEDS_REVIEW | classify manually |
-| app-client | dsh\frontend\app-client\notifications\screens\DshNotificationsScreen.tsx | 7181 | TBD | NEEDS_REVIEW | classify manually |
-| app-client | dsh\frontend\app-client\subscriptions\screens\SubscriptionsHubScreen.tsx | 1303 | TBD | NEEDS_REVIEW | classify manually |
+| app-client | dsh\frontend\app-client\DshClientBellScreen.tsx | 8110 | SCREEN_ENTRY | `UI_PREVIEW_ONLY` | classify manually |
+| app-client | dsh\frontend\app-client\DshEntryScreen.tsx | 4803 | SCREEN_ENTRY | `UI_PREVIEW_ONLY` | classify manually |
+| app-client | dsh\frontend\app-client\DshFavoritesListScreen.tsx | 2027 | SCREEN_ENTRY | `UI_PREVIEW_ONLY` | classify manually |
+| app-client | dsh\frontend\app-client\DshFavoriteToggleScreen.tsx | 3560 | SCREEN_ENTRY | `UI_PREVIEW_ONLY` | classify manually |
+| app-client | dsh\frontend\app-client\DshLoyaltyRewardsScreen.tsx | 2698 | SCREEN_ENTRY | `UI_PREVIEW_ONLY` | classify manually |
+| app-client | dsh\frontend\app-client\DshSubscriptionsScreen.tsx | 6871 | SCREEN_ENTRY | `UI_PREVIEW_ONLY` | classify manually |
+| app-client | dsh\frontend\app-client\DshMySpaceCommercialScreen.tsx | 13133 | SCREEN_ENTRY | `UI_PREVIEW_ONLY` | classify manually |
+| app-client | dsh\frontend\app-client\DshMySpaceScreen.tsx | 7035 | SCREEN_ENTRY | `UI_PREVIEW_ONLY` | classify manually |
+| app-client | dsh\frontend\app-client\DshNotificationsScreen.tsx | 7181 | SCREEN_ENTRY | `UI_PREVIEW_ONLY` | classify manually |
+| app-client | dsh\frontend\app-client\SubscriptionsHubScreen.tsx | 1303 | SCREEN_ENTRY | `UI_PREVIEW_ONLY` | classify manually |
 | app-field | dsh\frontend\app-field\finance\DshFieldFinanceScreen.tsx | 1981 | TBD | NEEDS_REVIEW | classify manually |
 | app-field | dsh\frontend\app-field\onboarding\DshFieldStoreOnboardingScreen.tsx | 16387 | TBD | NEEDS_REVIEW | classify manually |
 | app-field | dsh\frontend\app-field\profile\DshFieldProfileScreen.tsx | 1472 | TBD | NEEDS_REVIEW | classify manually |

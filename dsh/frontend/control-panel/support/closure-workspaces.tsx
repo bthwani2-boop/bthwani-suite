@@ -10,8 +10,7 @@ import {
   WebControlPanelWorkspaceTabs,
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
-// TEMP_LAYOUT_REUSE: Reusing shared cockpit layout from operations while finalizing support-specific surface
-import styles from '../operations/dsh-surface.module.css';
+import sStyles from './support-surface.module.css';
 
 type SupportTab = 'queue' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk';
 type SupportLane = 'الطلبات' | 'الشركاء' | 'الكباتن' | 'الميدان';
@@ -156,12 +155,12 @@ export function ControlPanelDshSupportHubScreen() {
   const selectedRow = rows.find((row) => row.id === selectedId) ?? rows[0] ?? SUPPORT_ROWS[0];
 
   return (
-    <div className={styles.operationsCockpit} dir="rtl">
-      <header className={styles.operationsTopBar}>
-        <div className={styles.operationsTitleBlock}>
-          <div className={styles.operationsHeaderIconBox} aria-hidden="true">
-            <div className={styles.supportCompactIcon}>
-              <div className={styles.supportCompactIconLine} />
+    <div className={sStyles.supportCockpit} dir="rtl">
+      <header className={sStyles.supportTopBar}>
+        <div className={sStyles.supportTitleBlock}>
+          <div className={sStyles.supportHeaderIconBox} aria-hidden="true">
+            <div className={sStyles.supportCompactIcon}>
+              <div className={sStyles.supportCompactIconLine} />
             </div>
           </div>
           <div>
@@ -173,19 +172,19 @@ export function ControlPanelDshSupportHubScreen() {
           </div>
         </div>
 
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
-            <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>صفوف مفتوحة</span>
-              <span className={styles.commandKpiValue}>١٧</span>
+        <div className={sStyles.supportHeaderActions}>
+          <div className={sStyles.supportPulseCompact}>
+            <div className={sStyles.supportKpi}>
+              <span className={sStyles.supportKpiLabel}>صفوف مفتوحة</span>
+              <span className={sStyles.supportKpiValue}>١٧</span>
             </div>
-            <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>نزاعات</span>
-              <span className={`${styles.commandKpiValue} ${styles.liveOrdersStatusWarning}`}>٩</span>
+            <div className={sStyles.supportKpi}>
+              <span className={sStyles.supportKpiLabel}>نزاعات</span>
+              <span className={`${sStyles.supportKpiValue} ${sStyles.supportStatusWarning}`}>٩</span>
             </div>
-            <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>{resolveCommitmentLabel()}</span>
-              <span className={`${styles.commandKpiValue} ${styles.liveOrdersStatusDanger}`}>٣</span>
+            <div className={sStyles.supportKpi}>
+              <span className={sStyles.supportKpiLabel}>{resolveCommitmentLabel()}</span>
+              <span className={`${sStyles.supportKpiValue} ${sStyles.supportStatusDanger}`}>٣</span>
             </div>
           </div>
         </div>
@@ -211,15 +210,15 @@ export function ControlPanelDshSupportHubScreen() {
         onSelect={(id) => setActiveSubTab(id)}
       />
 
-      <div className={styles.filterDock}>
+      <div className={sStyles.supportFilterDock}>
         <Text role="caption" tone="muted">السطح الحالي</Text>
         <Text role="caption" tone="brand" weight="black">{activeTab === 'queue' ? 'صفوف الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : resolveCommitmentLabel()}</Text>
         <Text role="caption" tone="muted">يتم التصفية عبر التبويبات الفرعية فقط.</Text>
       </div>
 
-      <main className={styles.operationsMainPanel}>
-        <Box padding={4} gap={3} className={styles.operationsGridTwoCol}>
-          <Box gap={2} className={styles.operationsCompactPanel}>
+      <main className={sStyles.supportMainPanel}>
+        <Box padding={4} gap={3} className={sStyles.supportGridTwoCol}>
+          <Box gap={2} className={sStyles.supportCompactPanel}>
             <Text role="titleSm">صفوف {activeTab === 'queue' ? 'الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : resolveCommitmentLabel()}</Text>
             <Box gap={2}>
                 {rows.map((row) => (

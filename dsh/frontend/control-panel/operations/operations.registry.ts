@@ -340,7 +340,7 @@ const STATE_COPY: Record<Exclude<import('./operations.types').OperationsViewStat
     kind: 'warning',
     title: 'تم تعطيل وضع المعاينة',
     description: 'تظل المعاينة التشغيلية مخفية حتى تصبح مساحة العمل جاهزة مرة أخرى.',
-    actionLabel: 'Open operations',
+    actionLabel: 'فتح العمليات',
   },
 };
 

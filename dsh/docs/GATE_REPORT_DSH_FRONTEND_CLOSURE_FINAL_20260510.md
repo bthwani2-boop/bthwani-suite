@@ -15,10 +15,11 @@ This report confirms the successful completion of the **DSH Frontend Final Closu
 | **06** | Final Gate | **PASSED** | TSC clean (project scoped) |
 
 ## 3. TECHNICAL DEBT REMEDIATION
-- **Consolidated Fixtures:** `storeFixtures.ts` merged into `dshStoreFixtures.ts`.
-- **Unified Models:** `dshStoreTypes.ts` merged into `types.ts` (app-client).
+- **Consolidated Fixtures:** `storeFixtures.ts` archived; core types moved to `shared/dshStoreProductCardModel.ts`.
+- **Unified Models:** `app-client/types.ts` now re-exports from `shared`.
 - **Arabicization:** Visible DSH terms in shared maps and dashboards translated to Arabic.
-- **Archival:** Dead content moved to `dsh/_archive/frontend/20260510-083111/`.
+- **Archival:** Dead content moved to `dsh/_archive/frontend/5899a771-f61c-4e88-ba19-e7560e699a04/`.
+
 
 ## 4. GOVERNANCE COMPLIANCE
 - **No-Scroll Policy:** Enforced across all Control Panel surfaces.

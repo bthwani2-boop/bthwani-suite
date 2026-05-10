@@ -1,7 +1,7 @@
 import React from 'react';
 import { DshOperationScreen, type DshOperationScreenProps } from './DshOperationScreen';
-import { LoyaltyRewardsPage } from './LoyaltyRewardsPage';
-import { SubscriptionsPage } from './SubscriptionsPage';
+import { DshLoyaltyRewardsScreen } from './DshLoyaltyRewardsScreen';
+import { DshSubscriptionsScreen } from './DshSubscriptionsScreen';
 
 export type DshBenefitsHubScreenProps = Omit<DshOperationScreenProps, 'title' | 'subtitle'> & {
   screenId?: string;
@@ -28,10 +28,10 @@ export function DshBenefitsHubScreen({
   }
 
   if (isLoyaltyScreen) {
-    return <LoyaltyRewardsPage />;
+    return <DshLoyaltyRewardsScreen />;
   }
 
-  return <SubscriptionsPage />;
+  return <DshSubscriptionsScreen />;
 }
 
 export default DshBenefitsHubScreen;

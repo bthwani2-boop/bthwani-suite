@@ -2,11 +2,11 @@ import React from 'react';
 import { Box, Card, KeyValueList, SectionHeader, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { loyaltyRewardsFixture } from './loyaltyCommercialDeck';
 
-export type LoyaltyRewardsPageProps = {
+export type DshLoyaltyRewardsScreenProps = {
   compact?: boolean;
 };
 
-export function LoyaltyRewardsPage({ compact = false }: LoyaltyRewardsPageProps) {
+export function DshLoyaltyRewardsScreen({ compact = false }: DshLoyaltyRewardsScreenProps) {
   const { theme } = useTheme();
   const { metrics, sections } = loyaltyRewardsFixture;
 
@@ -96,4 +96,4 @@ export function LoyaltyRewardsPage({ compact = false }: LoyaltyRewardsPageProps)
   );
 }
 
-export default LoyaltyRewardsPage;
+export default DshLoyaltyRewardsScreen;

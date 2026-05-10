@@ -16,7 +16,7 @@ export type DshCanonicalSource =
 export type DshCanonicalPublishStage = ApprovalStage | 'published-preview' | 'field-draft';
 type DshCardTone = 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
-type DiscoveryStoreFixture = {
+export type DshDiscoveryStore = {
   id: string;
   name: string;
   subtitle: string;
@@ -48,10 +48,19 @@ type DiscoveryStoreFixture = {
   canonicalStoreId?: string;
   canonicalProductId?: string;
   publishStage?: string;
+  mediaPolicy?: string;
   source?: string;
 };
 
-type StoreFixtureItem = {
+
+export type MeasurementOption = {
+  id: string;
+  label: string;
+  multiplier?: number;
+  unit?: string;
+};
+
+export type DshStoreFixtureItem = {
   id: string;
   name: string;
   subtitle?: string;
@@ -62,7 +71,7 @@ type StoreFixtureItem = {
   oldPriceValue?: number;
   measurementType?: 'piece' | 'weight' | 'portion';
   measurementOptions?: string[];
-  measurementOptionObjects?: Array<{ id: string; label: string; multiplier?: number; unit?: string }>;
+  measurementOptionObjects?: MeasurementOption[];
   categoryId: string;
   categoryLabel: string;
   statusLabel?: string;
@@ -76,7 +85,13 @@ type StoreFixtureItem = {
   canonicalProductId?: string;
   publishStage?: string;
   source?: string;
+  isNew?: boolean;
+  isFavorite?: boolean;
+  isFavorited?: boolean;
 };
+
+export type StoreItemsByStoreId = Record<string, DshStoreFixtureItem[]>;
+
 
 export type DshCanonicalStoreCard = {
   id: string;
@@ -300,7 +315,7 @@ function cloneStringList(values: ReadonlyArray<string> | undefined) {
   return values ? [...values] : undefined;
 }
 
-export function mapCanonicalStoreToDiscoveryStore(store: DshCanonicalStoreCard): DiscoveryStoreFixture {
+export function mapCanonicalStoreToDiscoveryStore(store: DshCanonicalStoreCard): DshDiscoveryStore {
   return {
     id: store.id,
     name: store.storeName,
@@ -370,7 +385,7 @@ export function buildCanonicalPreviewDiscoveryStores() {
 }
 
 export function buildCanonicalPreviewStoreItemsByStoreId() {
-  return canonicalPreviewStores.reduce<Record<string, StoreFixtureItem[]>>((result, store) => {
+  return canonicalPreviewStores.reduce<Record<string, DshStoreFixtureItem[]>>((result, store) => {
     const product = getCanonicalPreviewProductForStore(store.id);
 
     if (product) {

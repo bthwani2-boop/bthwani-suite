@@ -22,7 +22,7 @@ import {
   ControlPanelDshRefundQueueScreen,
   ControlPanelDshRiskAuditScreen,
 } from './closure-workspaces';
-import styles from '../operations/dsh-surface.module.css';
+
 import fStyles from './finance-surface.module.css';
 
 export type ControlPanelDshFinanceScreenProps = {
@@ -81,34 +81,34 @@ export function ControlPanelDshFinanceHubScreen({
   }
 
   return (
-    <div className={`${styles.operationsCockpit} ${fStyles.financeShellOverrides}`} dir="rtl">
-      <header className={styles.operationsTopBar}>
-        <div className={styles.operationsTitleBlock}>
-          <div className={styles.operationsHeaderIconBox} aria-hidden="true">
+    <div className={`${fStyles.financeCockpit} ${fStyles.financeShellOverrides}`} dir="rtl">
+      <header className={fStyles.financeTopBar}>
+        <div className={fStyles.financeTitleBlock}>
+          <div className={fStyles.financeHeaderIcon} aria-hidden="true">
             <div className={fStyles.financeIconInner} />
           </div>
           <div>
             <div className={fStyles.financeTitleRow}>
-              <h1>مالية DSH</h1>
+              <h1 className={fStyles.financeTitle}>مالية DSH</h1>
               <span className={fStyles.financeBadge}>غرفة قيادة</span>
             </div>
             <p className={fStyles.financeSubtitle}>التسويات، مطابقة COD، الاستردادات، المدفوعات، والرقابة المالية في مساحة واحدة مضغوطة</p>
           </div>
         </div>
 
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
-            <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>إجمالي التدفقات</span>
-              <span className={styles.commandKpiValue}>١,٢٥٤,٠٠٠ ر.س</span>
+        <div className={fStyles.financeHeaderActions}>
+          <div className={fStyles.financePulseCompact}>
+            <div className={fStyles.financeKpi}>
+              <span className={fStyles.financeKpiLabel}>إجمالي التدفقات</span>
+              <span className={fStyles.financeKpiValue}>١,٢٥٤,٠٠٠ ر.س</span>
             </div>
-            <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>عناصر معلقة</span>
-              <span className={`${styles.commandKpiValue} ${fStyles.financeKpiWarning}`}>١٤</span>
+            <div className={fStyles.financeKpi}>
+              <span className={fStyles.financeKpiLabel}>عناصر معلقة</span>
+              <span className={`${fStyles.financeKpiValue} ${fStyles.financeKpiWarning}`}>١٤</span>
             </div>
-            <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>المخاطر المالية</span>
-              <span className={`${styles.commandKpiValue} ${fStyles.financeKpiSuccess}`}>منخفض</span>
+            <div className={fStyles.financeKpi}>
+              <span className={fStyles.financeKpiLabel}>المخاطر المالية</span>
+              <span className={`${fStyles.financeKpiValue} ${fStyles.financeKpiSuccess}`}>منخفض</span>
             </div>
           </div>
         </div>
@@ -141,14 +141,14 @@ export function ControlPanelDshFinanceHubScreen({
         />
       ) : null}
 
-      <div className={`${styles.filterDock} ${fStyles.financeContextDock}`}>
+      <div className={fStyles.financeContextDock}>
         <span className={fStyles.financeContextLabel}>السطح الحالي</span>
         <span className={fStyles.financeContextValue}>{activeGroupMeta.label}</span>
         <span className={fStyles.financeContextDescription}>{activeGroupMeta.description}</span>
       </div>
 
-      <main className={`${styles.operationsMainPanel} ${fStyles.financeMainPanel}`}>
-        <div className={`${styles.operationsInnerScroll} ${fStyles.financeInnerScroll}`}>
+      <main className={fStyles.financeMainPanel}>
+        <div className={fStyles.financeInnerScroll}>
           <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
         </div>
       </main>

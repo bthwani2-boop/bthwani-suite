@@ -140,10 +140,8 @@ export {
 } from './news-ticker-store';
 
 // --- DSH Approval Pipeline SSOT v1 ---
-export {
-	getPartnerIntakeItems,
-	partnerIntakeRecords,
-} from './partner-intake-store';
+// partner-intake-store was consolidated into workflow.ts
+
 export type {
 	MediaPolicyKind,
 	MediaReviewRecord,

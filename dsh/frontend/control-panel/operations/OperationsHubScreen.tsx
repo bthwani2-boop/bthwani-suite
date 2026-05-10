@@ -4,8 +4,9 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { StateView } from '@bthwani/ui-kit';
 import {
-  WebControlPanelKpiStrip,
-  WebControlPanelWorkspaceTabs,
+  WebControlPanelWorkbench,
+  WebControlPanelDenseHeader,
+  WebControlPanelLaneTabs,
   WebControlPanelSubTabs,
 } from '@bthwani/ui-kit/web';
 import {
@@ -79,10 +80,8 @@ export function ControlPanelDshOperationsScreen({
   }
 
   const kpiItems = OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => ({
-    id: metric.id,
     label: metric.title,
     value: String(metric.value),
-    tone: (metric.tone as 'neutral' | 'success' | 'warning' | 'danger' | undefined) ?? 'neutral',
   }));
 
   const tabItems = OPERATIONS_CANONICAL_GROUPS.map((item) => ({
@@ -98,25 +97,15 @@ export function ControlPanelDshOperationsScreen({
   }));
 
   return (
-    <div className={styles.operationsCockpit} dir="rtl">
-      {/* 1. Header — Identity + KPI Strip */}
-      <header className={styles.operationsTopBar}>
-        <div className={styles.operationsTitleBlock}>
-          <div className={styles.operationsHeaderIconBox}>ع</div>
-          <div>
-            <h1>عمليات DSH</h1>
-            <p>مراقبة وتنفيذ الطلبات الحية</p>
-          </div>
-        </div>
-        <div className={styles.operationsHeaderActions}>
-          <WebControlPanelKpiStrip items={kpiItems} />
-        </div>
-      </header>
+    <WebControlPanelWorkbench className={styles.operationsCockpit}>
+      <WebControlPanelDenseHeader
+        title="عمليات DSH"
+        description="مراقبة وتنفيذ الطلبات الحية"
+        metrics={kpiItems}
+      />
 
-      {/* 2. Primary Navigation */}
-      <WebControlPanelWorkspaceTabs
+      <WebControlPanelLaneTabs
         items={tabItems}
-        ariaLabel="أقسام العمليات"
         onSelect={(id) => {
           const groupId = id as CanonicalOperationsGroupId;
           setActiveGroup(groupId);
@@ -125,7 +114,6 @@ export function ControlPanelDshOperationsScreen({
         }}
       />
 
-      {/* 2b. Sub-Navigation */}
       {subTabItems && subTabItems.length > 0 && (
         <WebControlPanelSubTabs
           items={subTabItems}
@@ -134,13 +122,12 @@ export function ControlPanelDshOperationsScreen({
         />
       )}
 
-      {/* 3. Main Workspace */}
       <main className={styles.operationsMainPanel}>
         <div className={styles.operationsInnerScroll}>
           <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
         </div>
       </main>
-    </div>
+    </WebControlPanelWorkbench>
   );
 }
 

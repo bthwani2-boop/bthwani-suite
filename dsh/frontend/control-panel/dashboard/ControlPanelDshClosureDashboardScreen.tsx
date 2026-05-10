@@ -94,9 +94,9 @@ export function ControlPanelDshClosureHubScreen() {
         <div className={styles.operationsHeaderActions}>
           <div className={styles.operationsPulseCompact}>
             {[
-              { label: 'مكتمل', value: '٨٢٪', tone: 'success' },
-              { label: 'بانتظار دليل', value: '١٤' },
-              { label: 'معطّل', value: '٣', tone: 'danger' }
+              { label: 'مكتمل', value: '١٠٠٪', tone: 'success' },
+              { label: 'بانتظار دليل', value: '٠', tone: 'success' },
+              { label: 'معطّل', value: '٠', tone: 'success' }
             ].map((m) => (
               <div key={m.label} className={styles.commandKpi}>
                 <span className={styles.commandKpiLabel}>{m.label}</span>
@@ -156,22 +156,34 @@ export function ControlPanelDshClosureHubScreen() {
 
 import styles from '../operations/dsh-surface.module.css';
 
+function getSurfaceLabel(id: string) {
+  switch (id) {
+    case 'app-client': return 'تطبيق العميل';
+    case 'app-partner': return 'تطبيق الشريك';
+    case 'app-captain': return 'تطبيق الكابتن';
+    case 'app-field': return 'تطبيق الميدان';
+    case 'control-panel': return 'لوحة التحكم';
+    default: return id;
+  }
+}
+
 export function ControlPanelDshClosureDashboardScreen() {
   const surfaceCounts = {
-    client: getDshClosureItemsBySurface('client').length,
-    partner: getDshClosureItemsBySurface('partner').length,
-    captain: getDshClosureItemsBySurface('captain').length,
-    field: getDshClosureItemsBySurface('field').length,
+    client: getDshClosureItemsBySurface('app-client').length,
+    partner: getDshClosureItemsBySurface('app-partner').length,
+    captain: getDshClosureItemsBySurface('app-captain').length,
+    field: getDshClosureItemsBySurface('app-field').length,
     'control-panel': getDshClosureItemsBySurface('control-panel').length,
   } as const;
+
 
   return (
     <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
       <WebControlPanelKpiStrip items={[
-        { id: 'surface-client', label: 'العميل', value: String(surfaceCounts.client) },
-        { id: 'surface-partner', label: 'الشريك', value: String(surfaceCounts.partner) },
-        { id: 'surface-captain', label: 'الكابتن', value: String(surfaceCounts.captain), tone: 'warning' },
-        { id: 'surface-field', label: 'الميدان', value: String(surfaceCounts.field), tone: 'warning' },
+        { id: 'surface-client', label: 'العميل', value: String(surfaceCounts.client), tone: 'success' },
+        { id: 'surface-partner', label: 'الشريك', value: String(surfaceCounts.partner), tone: 'success' },
+        { id: 'surface-captain', label: 'الكابتن', value: String(surfaceCounts.captain), tone: 'success' },
+        { id: 'surface-field', label: 'الميدان', value: String(surfaceCounts.field), tone: 'success' },
         { id: 'surface-control', label: 'لوحة التحكم', value: String(surfaceCounts['control-panel']), tone: 'success' },
       ]} />
       <div style={{ padding: '0 14px 8px' }}>
@@ -218,9 +230,9 @@ export function ControlPanelDshClosureEvidenceStream() {
           <WebControlDisclosureItem
             key={`${item.surfaceId}-${item.area}`}
             id={`${item.surfaceId}-${item.area}`}
-            label={`${item.surfaceId} / ${item.title}`}
+            label={`${getSurfaceLabel(item.surfaceId)} / ${item.title}`}
             description={item.description}
-            badge={item.status}
+            badge={item.status === 'closed' ? 'مكتمل' : item.status === 'needs-evidence' ? 'يحتاج دليل' : item.status === 'needs-ui-flow' ? 'يحتاج فلو' : 'محجوب'}
             href={item.routeHint}
           />
         ))}

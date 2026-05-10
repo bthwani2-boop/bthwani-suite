@@ -16,11 +16,11 @@ import {
   useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
-import { getPartnerIntakeItems } from '../shared/partner-intake-store';
 import {
   ApprovalRecord,
   ApprovalRecordMetadata,
   ApprovalStage,
+  getPartnerQueueRecords,
   isCatalogOwnedMedia,
   isPartnerOwnedException,
   translateStage,
@@ -362,7 +362,7 @@ function CatalogProductRow({ product, selected, onEdit }: CatalogProductRowProps
           {product.publishStage && (
             <StatusTimeline
               stage={product.publishStage as ApprovalStage}
-              metadata={getPartnerIntakeItems().find(r => r.id === product.id || r.title.includes(product.name))?.metadata}
+              metadata={getPartnerQueueRecords().find(r => r.id === product.id || r.title.includes(product.name))?.metadata}
             />
           )}
           <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'} numberOfLines={2}>

@@ -97,7 +97,7 @@ export const uiKitLocales = {
 					defaultTitle: 'النظرة العامة',
 					searchPlaceholder: 'بحث عن أمر سريع',
 					refreshLabel: 'تحديث',
-					languageLabel: 'EN',
+					languageLabel: 'الإنجليزية',
 					alertCountLabel: '1',
 					missionEyebrow: 'الأولوية الموصى بها الآن',
 					serviceLabel: 'المساحة',
