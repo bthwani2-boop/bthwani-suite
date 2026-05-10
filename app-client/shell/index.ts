@@ -1,3 +1,2 @@
-export { ClientSurfaceHost } from './ClientSurfaceHost';
-export { default } from './mobile-entry';
-export * from './mobile-entry';
+export { ClientSurfaceHost, type ClientSurfaceHostProps } from './ClientSurfaceHost';
+export { ClientMobileEntry } from './mobile-entry';

@@ -675,6 +675,11 @@ export function getPartnerQueueRecords(): ApprovalRecord[] {
   return _globalStore.filter(r => (PARTNER_QUEUE_STAGES as readonly any[]).indexOf(r.stage) >= 0);
 }
 
+export function getPartnerIntakeItems(): ApprovalRecord[] {
+  return getPartnerQueueRecords();
+}
+
+
 export function getMarketingQueueRecords(): ApprovalRecord[] {
   return _globalStore.filter(r => (MARKETING_QUEUE_STAGES as readonly any[]).indexOf(r.stage) >= 0);
 }

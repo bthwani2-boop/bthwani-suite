@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import { WebControlPanelDecisionRow } from '@bthwani/ui-kit/web';
-import { getPartnerIntakeItems } from '../../shared/partner-intake-store';
+import { getPartnerIntakeItems } from '../../shared/workflow';
 import {
   ApprovalRecord,
   moveApprovalRecordToStage,

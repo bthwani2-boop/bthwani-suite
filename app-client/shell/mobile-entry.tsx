@@ -1,3 +1,2 @@
-export { ClientSurfaceHost as ClientMobileEntry } from './ClientSurfaceHost';
-export { ClientSurfaceHost as default } from './ClientSurfaceHost';
-export * from './ClientSurfaceHost';
+import { ClientSurfaceHost } from './ClientSurfaceHost';
+export { ClientSurfaceHost as ClientMobileEntry };
