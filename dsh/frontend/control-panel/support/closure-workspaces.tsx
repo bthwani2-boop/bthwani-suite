@@ -10,6 +10,7 @@ import {
   WebControlPanelWorkspaceTabs,
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
+// TEMP_LAYOUT_REUSE: Reusing shared cockpit layout from operations while finalizing support-specific surface
 import styles from '../operations/dsh-surface.module.css';
 
 type SupportTab = 'queue' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk';
@@ -159,16 +160,16 @@ export function ControlPanelDshSupportHubScreen() {
       <header className={styles.operationsTopBar}>
         <div className={styles.operationsTitleBlock}>
           <div className={styles.operationsHeaderIconBox} aria-hidden="true">
-            <div style={{ width: 18, height: 18, border: '2px solid var(--bth-deep-blue, #0A2F5C)', borderRadius: 4, position: 'relative', background: '#FFFFFF' }}>
-              <span style={{ position: 'absolute', top: '50%', insetInlineStart: '50%', width: 8, height: 2, backgroundColor: 'var(--bth-deep-blue, #0A2F5C)', transform: 'translate(50%, -50%)' }} />
+            <div className={styles.supportCompactIcon}>
+              <div className={styles.supportCompactIconLine} />
             </div>
           </div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: 'var(--bth-deep-blue, #0A2F5C)' }}>دعم DSH</h1>
+            <Box layoutDirection="row" align="center" gap={2}>
+              <Text role="titleSm" tone="brand">دعم DSH</Text>
               <WebControlPanelStatusTag label="غرفة قيادة" tone="warning" />
-            </div>
-            <p style={{ fontSize: '10px', fontWeight: 600 }}>صفوف دعم، نزاعات، تصعيد، وخطر الالتزام في غرفة واحدة مضغوطة.</p>
+            </Box>
+            <Text role="caption" weight="bold">صفوف دعم، نزاعات، تصعيد، وخطر الالتزام في غرفة واحدة مضغوطة.</Text>
           </div>
         </div>
 
@@ -180,11 +181,11 @@ export function ControlPanelDshSupportHubScreen() {
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>نزاعات</span>
-              <span className={`${styles.commandKpiValue} ${styles.liveOrdersStatusWarning}`} style={{ background: 'transparent', border: 'none', padding: 0 }}>٩</span>
+              <span className={`${styles.commandKpiValue} ${styles.liveOrdersStatusWarning}`}>٩</span>
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>{resolveCommitmentLabel()}</span>
-              <span className={`${styles.commandKpiValue} ${styles.liveOrdersStatusDanger}`} style={{ background: 'transparent', border: 'none', padding: 0 }}>٣</span>
+              <span className={`${styles.commandKpiValue} ${styles.liveOrdersStatusDanger}`}>٣</span>
             </div>
           </div>
         </div>
@@ -212,16 +213,15 @@ export function ControlPanelDshSupportHubScreen() {
 
       <div className={styles.filterDock}>
         <Text role="caption" tone="muted">السطح الحالي</Text>
-        <Text role="caption" style={{ fontWeight: 800, color: 'var(--bth-deep-blue, #0A2F5C)' }}>{activeTab === 'queue' ? 'صفوف الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : resolveCommitmentLabel()}</Text>
+        <Text role="caption" tone="brand" weight="black">{activeTab === 'queue' ? 'صفوف الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : resolveCommitmentLabel()}</Text>
         <Text role="caption" tone="muted">يتم التصفية عبر التبويبات الفرعية فقط.</Text>
       </div>
 
       <main className={styles.operationsMainPanel}>
-        <div className={styles.operationsInnerScroll}>
-          <Box gap={3} className={styles.operationsGridTwoCol}>
-            <Box gap={2} className={styles.operationsCompactPanel}>
-              <Text role="titleSm">صفوف {activeTab === 'queue' ? 'الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : resolveCommitmentLabel()}</Text>
-              <div style={{ display: 'grid', gap: '8px' }}>
+        <Box padding={4} gap={3} className={styles.operationsGridTwoCol}>
+          <Box gap={2} className={styles.operationsCompactPanel}>
+            <Text role="titleSm">صفوف {activeTab === 'queue' ? 'الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : resolveCommitmentLabel()}</Text>
+            <Box gap={2}>
                 {rows.map((row) => (
                   <WebControlPanelDecisionRow
                     key={row.id}
@@ -238,7 +238,7 @@ export function ControlPanelDshSupportHubScreen() {
                     onInspect={() => setSelectedId(row.id)}
                   />
                 ))}
-              </div>
+              </Box>
             </Box>
 
             <WebControlPanelInspectorShell title={`تفاصيل ${selectedRow?.id ?? ''}`}>
@@ -263,7 +263,6 @@ export function ControlPanelDshSupportHubScreen() {
               </Box>
             </WebControlPanelInspectorShell>
           </Box>
-        </div>
       </main>
     </div>
   );

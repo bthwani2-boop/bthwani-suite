@@ -53,6 +53,23 @@
   font-size: 20px;
 }
 
+.supportCompactIcon {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #0A2F5C;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FFFFFF;
+}
+
+.supportCompactIconLine {
+  width: 8px;
+  height: 2px;
+  background-color: #0A2F5C;
+}
+
 .operationsHeaderActions {
   display: flex;
   align-items: center;
