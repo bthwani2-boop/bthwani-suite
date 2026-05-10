@@ -10,7 +10,7 @@ import {
   removeHomePromoItem,
   toggleHomePromoStatus,
   type HomePromoRecord,
-} from '../../shared/promo-store';
+} from '../../shared/promo.preview-store';
 import { dshCategoryFixtures } from '../../app-client/dshCategoriesFixtures';
 import { dshDiscoveryStores } from '../../app-client/discoveryFixtures';
 import { storeItemsByStoreId } from '../../app-client/itemsFixtures';

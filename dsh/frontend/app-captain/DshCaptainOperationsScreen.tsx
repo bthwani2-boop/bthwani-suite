@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button, ListItem, MobileScrollView, SectionHeader, Surface, Text, TextField } from '@bthwani/ui-kit';
-import type { DshCaptainOrderStage } from './dshCaptainOrdersModel';
-import type { DshCaptainProfileSnapshot } from './dshCaptainProfileModel';
+import type { DshCaptainOrderStage } from './captain-orders.preview-data';
+import type { DshCaptainProfileSnapshot } from './captain-profile.preview-data';
 import { dshCaptainFlowMap, type DshCaptainFlowKey } from './flow-map';
 
 export type CaptainSupportScreenId =

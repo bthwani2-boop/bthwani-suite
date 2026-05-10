@@ -1,4 +1,4 @@
-import type { MarketingNewsTickerItem } from './news-ticker-store';
+import type { MarketingNewsTickerItem } from './news-ticker.preview-store';
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.

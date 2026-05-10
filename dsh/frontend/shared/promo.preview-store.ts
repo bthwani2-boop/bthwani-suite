@@ -1,5 +1,5 @@
 
-import { MarketingBannerActionType } from './banner-store';
+import { MarketingBannerActionType } from './banner.preview-store';
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.

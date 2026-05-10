@@ -7,11 +7,11 @@ import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getGrowthRecommendations,
   type GrowthRecommendation,
-} from '../../shared/growth-store';
+} from '../../shared/growth.preview-store';
 import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
-import type { PartnerOfferRecord } from '../../shared/partner-offer-store';
-import type { SubscriptionPlan, Entitlement } from '../../shared/loyalty-store';
-import type { CampaignRecord } from '../../shared/campaign-store';
+import type { PartnerOfferRecord } from '../../shared/partner-offer.preview-store';
+import type { SubscriptionPlan, Entitlement } from '../../shared/loyalty.preview-store';
+import type { CampaignRecord } from '../../shared/campaign.preview-store';
 
 export type GrowthCommandDeckScreenProps = {
   hubHref?: string;

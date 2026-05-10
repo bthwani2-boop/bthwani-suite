@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Icon, ListItem, MobileScrollView, StateView, Surface, Text, TopBar } from '@bthwani/ui-kit';
 import { getWltFieldFinancePreview } from '../../../wlt/frontend/shared/finance/dshFinancePreview';
-import { resolveFieldStoreStatus, type FieldStoreFile } from './dshFieldStoresModel';
+import { resolveFieldStoreStatus, type FieldStoreFile } from './field-stores.preview-data';
 
 type DshFieldFinanceScreenProps = {
   state?: 'ready' | 'loading' | 'error' | 'offline';

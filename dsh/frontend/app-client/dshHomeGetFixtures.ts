@@ -786,7 +786,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
     publishStage: 'client-visible',
     commercialSourceMap: {
       'hasBthwaniPro': {
-        sourceOwner: 'loyalty-store',
+        sourceOwner: 'loyalty.preview-store',
         sourceRecordId: 'sub-pro',
         sourceType: 'subscription',
         approvalStage: 'active',

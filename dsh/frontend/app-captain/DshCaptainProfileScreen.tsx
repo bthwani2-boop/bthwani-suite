@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, KeyValueList, MobileScrollView, SectionHeader, StateView, Surface, Text } from '@bthwani/ui-kit';
-import type { DshCaptainProfileScreenState, DshCaptainProfileSnapshot } from './dshCaptainProfileModel';
+import type { DshCaptainProfileScreenState, DshCaptainProfileSnapshot } from './captain-profile.preview-data';
 
 export type DshCaptainProfileScreenProps = {
   section?: 'profile-get' | 'tier-info' | 'tier-evaluate';

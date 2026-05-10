@@ -23,7 +23,7 @@ import {
   type PaymentDecisionOption,
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from './DshCartDetails';
-import { getDshClientStateMeta, type DshClientState } from './dshClientStateModel';
+import { getDshClientStateMeta, type DshClientState } from './client-state.preview-data';
 import { resolveWltDshFinanceEventKindForPaymentMethod, type WltDshFinanceEventKind } from '../../../wlt/frontend/shared/finance/dshFinancePreview';
 import useWlt from '../../../wlt/frontend/app-client/dsh/hooks/useWlt';
 

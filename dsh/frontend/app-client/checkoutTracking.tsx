@@ -29,7 +29,7 @@ import {
   useTheme,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from './DshOperationScreen';
-import { getDshClientStateMeta, type DshClientState } from './dshClientStateModel';
+import { getDshClientStateMeta, type DshClientState } from './client-state.preview-data';
 import type {
   DshClientAddressSnapshot,
   DshClientDeliveryLifecycleStatus,

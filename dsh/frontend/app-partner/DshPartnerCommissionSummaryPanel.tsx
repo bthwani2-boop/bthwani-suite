@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, ListItem, Surface, Text } from '@bthwani/ui-kit';
-import type { DshPartnerCommissionSummary } from './dshPartnerFinanceModel';
+import type { DshPartnerCommissionSummary } from './partner-finance.preview-data';
 
 const defaultCommissionItems: DshPartnerCommissionSummary[] = [
   { mode: 'pickup', rateLabel: '0%', notesLabel: 'الاستلام الذاتي بلا عمولة تشغيل.' },

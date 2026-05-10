@@ -41,7 +41,7 @@ import {
   type MarketingNewsTickerStatus,
   type MarketingNewsTickerDeliveryMode,
   type MarketingNewsTickerKind,
-} from '../../shared/news-ticker-store';
+} from '../../shared/news-ticker.preview-store';
 import { dshPromotionCandidates } from '../../shared/workflow';
 
 export type ControlPanelDshMarketingScreenProps = SmartSignalLayerScreenProps;

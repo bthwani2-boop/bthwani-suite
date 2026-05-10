@@ -47,15 +47,15 @@ export type {
 	DshPartnerOrderConversationMessage,
 	DshPartnerOrderConversationMode,
 	DshPartnerOrderConversationVisibility,
-} from './dshPartnerOrderConversationModel';
-export { shouldShowDshPartnerOrderConversation } from './dshPartnerOrderConversationModel';
+} from './partner-order-conversation.preview-data';
+export { shouldShowDshPartnerOrderConversation } from './partner-order-conversation.preview-data';
 export type { DshPartnerOrderAlertsPanelProps } from './DshPartnerOrderAlertsPanel';
 export { DshPartnerOrderAlertsPanel } from './DshPartnerOrderAlertsPanel';
 export type {
 	DshPartnerOrderAlertId,
 	DshPartnerOrderAlertItem,
 	DshPartnerOrderAlertStatus,
-} from './dshPartnerOrderAlertModel';
+} from './partner-order-alert.preview-data';
 export type {
 	DshInventoryManagementScreenProps,
 	DshPartnerInventoryScreenProps,
@@ -72,7 +72,7 @@ export type {
 	DshPartnerFinanceBridgeState,
 	DshPartnerFinanceMode,
 	DshPartnerSettlementSummary,
-} from './dshPartnerFinanceModel';
+} from './partner-finance.preview-data';
 export type { DshPartnerFinanceBridgePanelProps } from './DshPartnerFinanceBridgePanel';
 export { DshPartnerFinanceBridgePanel } from './DshPartnerFinanceBridgePanel';
 export type { DshPartnerSettlementSummaryPanelProps } from './DshPartnerSettlementSummaryPanel';

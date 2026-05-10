@@ -29,7 +29,7 @@ import {
   type FieldOnboardingDraft,
   type FieldOnboardingSectionId,
   type FieldStoreFile,
-} from './dshFieldStoresModel';
+} from './field-stores.preview-data';
 
 type DshFieldStoreOnboardingScreenProps = {
   store: FieldStoreFile;

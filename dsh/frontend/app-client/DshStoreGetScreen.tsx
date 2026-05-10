@@ -24,7 +24,7 @@ import { BannerCarousel, Button, Chip, Icon, SearchTopBar, TopBar, StateView, Te
 import { dshCategoryMeasurementPolicies } from '../shared/catalog';
 import { formatDshStoreFollowersLabel } from './store-profile';
 import { resolveDshImageSource } from './resolve-image-source';
-import { getDshClientStateMeta, type DshClientState } from './dshClientStateModel';
+import { getDshClientStateMeta, type DshClientState } from './client-state.preview-data';
 import { type DshStoreFixtureItem as DshStoreGetMenuItem } from './types';
 import { mapMenuItemToProductCard } from './mapMenuItemToProductCard';
 import { canRenderInClientSurface } from '../shared/workflow';

@@ -12,7 +12,7 @@ import {
   sendMediaToCatalog,
   type MediaReviewRecord,
   type MediaPolicyKind,
-} from '../../shared/marketing-review-store';
+} from '../../shared/marketing-review.preview-store';
 import {
   ApprovalStage,
   translateStage,

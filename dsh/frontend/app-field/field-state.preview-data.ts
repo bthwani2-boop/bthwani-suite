@@ -1,4 +1,4 @@
-import type { FieldLeadStatus, FieldOnboardingDraft, FieldStoreFile } from './dshFieldStoresModel';
+import type { FieldLeadStatus, FieldOnboardingDraft, FieldStoreFile } from './field-stores.preview-data';
 
 export type DshFieldSurfaceId = 'stores' | 'onboarding' | 'visits' | 'finance' | 'profile';
 

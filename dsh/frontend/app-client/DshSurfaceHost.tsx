@@ -31,16 +31,16 @@ import {
   getPublishedMarketingHomePromos,
   recordMarketingBannerClick,
   recordMarketingBannerImpression,
-} from '../shared/banner-store';
+} from '../shared/banner.preview-store';
 import {
   getLiveMarketingGrowthItems,
   recordMarketingGrowthClick,
   recordMarketingGrowthImpression,
   type MarketingGrowthRecord,
-} from '../shared/growth-store';
-import { getDshClientStateMeta, type DshClientState } from './dshClientStateModel';
+} from '../shared/growth.preview-store';
+import { getDshClientStateMeta, type DshClientState } from './client-state.preview-data';
 // checkout and tracking routes are consolidated in checkoutTracking
-import { getPublishedHomePromos } from '../shared/promo-store';
+import { getPublishedHomePromos } from '../shared/promo.preview-store';
 import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './dshCategoriesFixtures';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 

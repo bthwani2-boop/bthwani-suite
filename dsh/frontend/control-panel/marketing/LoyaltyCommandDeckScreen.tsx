@@ -9,7 +9,7 @@ import {
   getLoyaltyTiers,
   getLoyaltyRewards,
   getEntitlements,
-} from '../../shared/loyalty-store';
+} from '../../shared/loyalty.preview-store';
 import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
 
 type LoyaltyTab = 'programs' | 'tiers' | 'rewards' | 'subscriptions' | 'entitlements' | 'earning' | 'redemption';

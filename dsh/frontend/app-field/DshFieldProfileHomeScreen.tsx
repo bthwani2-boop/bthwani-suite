@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Badge, Box, Button, Icon, ListItem, MobileScrollView, Surface, Text, TopBar } from '@bthwani/ui-kit';
-import { resolveFieldFilterCounts, type FieldStoreFile } from './dshFieldStoresModel';
+import { resolveFieldFilterCounts, type FieldStoreFile } from './field-stores.preview-data';
 
 type DshFieldProfileHomeScreenProps = {
   stores: readonly FieldStoreFile[];

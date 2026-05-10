@@ -24,7 +24,7 @@ import type {
   DshCaptainOrderProofStatus,
   DshCaptainOrderStage,
   DshCaptainOrdersScreenState,
-} from './dshCaptainOrdersModel';
+} from './captain-orders.preview-data';
 
 export type DshCaptainOrderDetailSummary = {
   orderId: DshCaptainOrderId;

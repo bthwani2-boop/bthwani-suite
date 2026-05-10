@@ -1,7 +1,7 @@
 import React from 'react';
-import type { PartnerOfferRecord } from './partner-offer-store';
-import type { SubscriptionPlan, Entitlement } from './loyalty-store';
-import type { CampaignRecord } from './campaign-store';
+import type { PartnerOfferRecord } from './partner-offer.preview-store';
+import type { SubscriptionPlan, Entitlement } from './loyalty.preview-store';
+import type { CampaignRecord } from './campaign.preview-store';
 
 export type CommercialSource = {
   sourceOwner: string;
@@ -111,7 +111,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
       const badgeLabel = `حملة: ${camp.title}`;
       badges.push({ label: badgeLabel, source: 'campaign' });
       sourceMap[`campaign-${camp.id}`] = {
-        sourceOwner: 'campaign-store',
+        sourceOwner: 'campaign.preview-store',
         sourceRecordId: camp.id,
         sourceType: 'campaign',
         approvalStage: 'published',
@@ -133,7 +133,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
     // Conflict Detection: Pro subscription without entitlement
     const hasProEntitlement = context.activeEntitlements.some(e => e.type === 'reward' || e.type === 'multiplier');
     sourceMap['hasBthwaniPro'] = {
-      sourceOwner: 'loyalty-store',
+      sourceOwner: 'loyalty.preview-store',
       sourceRecordId: 'sub-pro',
       sourceType: 'subscription',
       approvalStage: 'active',
@@ -148,7 +148,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
       notes.push('يوجد استحقاق مكافأة متاح');
       badges.push({ label: 'مكافأة ولاء', source: 'loyalty' });
       sourceMap[`entitlement-${e.id}`] = {
-        sourceOwner: 'loyalty-store',
+        sourceOwner: 'loyalty.preview-store',
         sourceRecordId: e.id,
         sourceType: 'entitlement',
         approvalStage: 'active',

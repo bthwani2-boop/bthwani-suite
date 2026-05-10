@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import { WebSectionCard, WebSignalCard, WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
-import { type DshUnifiedRecommendation, getDshRecommendationSeverityLabel } from './dshRecommendationModel';
+import { type DshUnifiedRecommendation, getDshRecommendationSeverityLabel } from './recommendation.preview-data';
 
 export type ControlPanelDshDecisionBoardProps = {
   title: string;

@@ -35,10 +35,10 @@ import {
 } from './DshHomeApprovedVideoReelsViewer';
 import { getDshCategoryIconUrl } from './getDshCategoryIconUrl';
 import { resolveDshImageSource } from './resolve-image-source';
-import type { MarketingGrowthRecord } from '../shared/growth-store';
-import type { MarketingVideoRecord } from '../shared/video-store';
-import { getMarketingTickerItems, buildMarketingTickerPlan } from '../shared/news-ticker-store';
-import { getPublishedHomePromos, type HomePromoRecord } from '../shared/promo-store';
+import type { MarketingGrowthRecord } from '../shared/growth.preview-store';
+import type { MarketingVideoRecord } from '../shared/video.preview-store';
+import { getMarketingTickerItems, buildMarketingTickerPlan } from '../shared/news-ticker.preview-store';
+import { getPublishedHomePromos, type HomePromoRecord } from '../shared/promo.preview-store';
 
 import { canRenderInClientSurface } from '../shared/workflow';
 
@@ -1385,7 +1385,7 @@ return (
                           resizeMode={promo.imageFit === 'contain' ? 'contain' : 'cover'}
                         />
                         <View style={[styles.premiumBannerOverlay, { backgroundColor: promo.accentColor ? `${promo.accentColor}29` : 'rgba(0,0,0,0.08)' }]} />
-                        <View style={styles.premiumBannerTopGlow} />
+                        <View style={styles.bannerBrandAccentLine} />
                         <View style={styles.premiumBannerBottomShade} />
 
                         {promo.partnerLogoUrl && (
@@ -1866,7 +1866,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       ...StyleSheet.absoluteFillObject,
       zIndex: 3,
     },
-    premiumBannerTopGlow: {
+    bannerBrandAccentLine: {
       position: 'absolute',
       top: 0,
       left: 0,

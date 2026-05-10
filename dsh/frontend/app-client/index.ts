@@ -101,13 +101,13 @@ export type {
 	DshClientStateGroup,
 	DshClientStateMeta,
 	DshClientStateVisibility,
-} from './dshClientStateModel';
+} from './client-state.preview-data';
 export {
 	getDshClientStateMeta,
 	isDshClientExceptionState,
 	isDshClientTerminalState,
 	isDshClientWalletVisibleState,
-} from './dshClientStateModel';
+} from './client-state.preview-data';
 export type {
 	DshClientAddressSnapshot,
 	DshClientBindingError,

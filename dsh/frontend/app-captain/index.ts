@@ -40,7 +40,7 @@ export type {
 	DshCaptainOrderProofStatus,
 	DshCaptainOrdersScreenState,
 	DshCaptainOrderStage,
-} from './dshCaptainOrdersModel';
+} from './captain-orders.preview-data';
 export type { DshCaptainFinanceScreenProps } from './DshCaptainFinanceScreen';
 export {
 	DshCaptainCodBalanceScreen,
@@ -50,7 +50,7 @@ export type {
 	DshCaptainFinanceScreenState,
 	DshCaptainFinanceSection,
 	DshCaptainFinanceSnapshot,
-} from './dshCaptainFinanceModel';
+} from './captain-finance.preview-data';
 export type { DshCaptainProfileScreenProps } from './DshCaptainProfileScreen';
 export {
 	DshCaptainProfileGetScreen,
@@ -62,7 +62,7 @@ export type {
 	DshCaptainProfileScreenState,
 	DshCaptainProfileSection,
 	DshCaptainProfileSnapshot,
-} from './dshCaptainProfileModel';
+} from './captain-profile.preview-data';
 export type { CaptainSupportScreenId } from './DshCaptainOperationsScreen';
 export {
 	DshCaptainChatReadAckScreen,
@@ -80,13 +80,13 @@ export type {
 	DshCaptainState,
 	DshCaptainStateGroup,
 	DshCaptainStateMeta,
-} from './dshCaptainStateModel';
+} from './captain-state.preview-data';
 export {
 	getDshCaptainStateMeta,
 	isDshCaptainFinanceState,
 	isDshCaptainOrderState,
 	isDshCaptainTerminalState,
-} from './dshCaptainStateModel';
+} from './captain-state.preview-data';
 export type {
 	DshCaptainFinanceSnapshot,
 	DshCaptainOperationsSnapshot,

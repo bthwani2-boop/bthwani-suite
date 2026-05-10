@@ -11,7 +11,7 @@ export type {
 	FieldSectionSummary,
 	FieldStatusTone,
 	FieldStoreFile,
-} from './dshFieldStoresModel';
+} from './field-stores.preview-data';
 export {
 	createEmptyDraft,
 	createFieldSeedStores,
@@ -37,7 +37,7 @@ export {
 	submitFieldStoreForReview,
 	syncFieldStoreFromDraft,
 	touchFieldStoreDraft,
-} from './dshFieldStoresModel';
+} from './field-stores.preview-data';
 export { DshFieldStoreOnboardingScreen } from './DshFieldStoreOnboardingScreen';
 export {
 	readFieldStoresLocal,
@@ -58,7 +58,7 @@ export type {
 	DshFieldStateModel,
 	DshFieldSurfaceId,
 	DshFieldSurfaceState,
-} from './dshFieldStateModel';
+} from './field-state.preview-data';
 export type {
 	DshFieldBindingContract,
 	DshFieldBindingContracts,

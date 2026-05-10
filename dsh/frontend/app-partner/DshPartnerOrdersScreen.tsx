@@ -16,7 +16,7 @@ import {
 } from '@bthwani/ui-kit';
 import { DshPartnerOrderAlertsPanel } from './DshPartnerOrderAlertsPanel';
 import { DshPartnerOrderConversationPanel } from './DshPartnerOrderConversationPanel';
-import type { DshPartnerOrderConversationMode } from './dshPartnerOrderConversationModel';
+import type { DshPartnerOrderConversationMode } from './partner-order-conversation.preview-data';
 
 type PartnerOrderStatus = 'new' | 'needs_accept' | 'preparing' | 'ready' | 'handoff' | 'delivering' | 'completed' | 'cancelled';
 type PartnerOrderPriority = 'high' | 'normal' | 'low';

@@ -19,7 +19,7 @@ export type {
 	MarketingBannerMotionStyle,
 	MarketingBannerRecord,
 	MarketingBannerStatus,
-} from './banner-store';
+} from './banner.preview-store';
 export {
 	bannerStoreDataContract,
 	computeMarketingBannerQuality,
@@ -34,7 +34,7 @@ export {
 	removeMarketingBannerItem,
 	toggleMarketingBannerStatus,
 	upsertMarketingBannerItem,
-} from './banner-store';
+} from './banner.preview-store';
 
 export type {
 	GrowthRecommendation,
@@ -45,7 +45,7 @@ export type {
 	MarketingGrowthRouteTarget,
 	MarketingGrowthSource,
 	MarketingGrowthStatus,
-} from './growth-store';
+} from './growth.preview-store';
 export {
 	approveMarketingGrowthItem,
 	duplicateMarketingGrowthItem,
@@ -59,7 +59,7 @@ export {
 	submitMarketingGrowthItem,
 	toggleMarketingGrowthStatus,
 	upsertMarketingGrowthItem,
-} from './growth-store';
+} from './growth.preview-store';
 
 export type {
 	ApprovalEntityType,
@@ -116,7 +116,7 @@ export type {
 	MarketingTickerPlanLane,
 	MarketingTickerPlanReason,
 	MarketingTickerPlanState,
-} from './news-ticker-store';
+} from './news-ticker.preview-store';
 export {
 	buildMarketingTickerPlan,
 	createMarketingTickerDraft,
@@ -137,7 +137,7 @@ export {
 	toggleMarketingTickerPinned,
 	toggleMarketingTickerStatus,
 	upsertMarketingTickerItem,
-} from './news-ticker-store';
+} from './news-ticker.preview-store';
 
 // --- DSH Approval Pipeline SSOT v1 ---
 // partner-intake-store was consolidated into workflow.ts
@@ -145,7 +145,7 @@ export {
 export type {
 	MediaPolicyKind,
 	MediaReviewRecord,
-} from './marketing-review-store';
+} from './marketing-review.preview-store';
 export {
 	approveMediaReviewItem,
 	getMarketingReviewItems,
@@ -156,7 +156,7 @@ export {
 	requestMediaFix,
 	sendMediaToCatalog,
 	upsertMediaReviewItem,
-} from './marketing-review-store';
+} from './marketing-review.preview-store';
 export {
 	activateClientVisible,
 	adoptCatalogCentral,
@@ -166,4 +166,4 @@ export {
 	getClientVisibleItems,
 	rejectFromCatalog,
 	returnToMarketing,
-} from './catalog-adoption-store';
+} from './catalog-adoption.preview-store';

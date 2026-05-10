@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button, KeyValueList, MobileScrollView, SectionHeader, StateView, Surface, Text } from '@bthwani/ui-kit';
 import { getWltCaptainFinancePreview } from '../../../wlt/frontend/shared/finance/dshFinancePreview';
-import type { DshCaptainFinanceScreenState, DshCaptainFinanceSnapshot } from './dshCaptainFinanceModel';
+import type { DshCaptainFinanceScreenState, DshCaptainFinanceSnapshot } from './captain-finance.preview-data';
 
 export type DshCaptainFinanceScreenProps = {
   section?: 'cod-balance' | 'earnings' | 'settlement';

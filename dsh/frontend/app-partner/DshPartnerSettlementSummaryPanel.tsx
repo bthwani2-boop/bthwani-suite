@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, ListItem, Surface, Text } from '@bthwani/ui-kit';
-import type { DshPartnerSettlementSummary } from './dshPartnerFinanceModel';
+import type { DshPartnerSettlementSummary } from './partner-finance.preview-data';
 
 const defaultSettlements: DshPartnerSettlementSummary[] = [
   { id: 'settlement-1', title: 'تسوية الأسبوع الحالي', amountLabel: '1,240 ر.س', statusLabel: 'بانتظار الصرف', dateLabel: 'الخميس 02 مايو' },

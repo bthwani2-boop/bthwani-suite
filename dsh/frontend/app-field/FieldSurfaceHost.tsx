@@ -7,7 +7,7 @@ import { readFieldStoresLocal, writeFieldStoresLocal } from './FieldOnboardingSt
 import { DshFieldStoreVisitScreen, type DshFieldStoreVisitValues } from './DshFieldStoreVisitScreen';
 import { DshFieldProfileHomeScreen, DshFieldProfileScreen } from './DshFieldProfileScreen';
 import { DshFieldStoresHistoryScreen, DshFieldStoresScreen } from './DshFieldStoresScreen';
-import { createManualFieldStore, submitFieldStoreForReview, type FieldStoreFile } from './dshFieldStoresModel';
+import { createManualFieldStore, submitFieldStoreForReview, type FieldStoreFile } from './field-stores.preview-data';
 
 type FieldRoute =
   | { kind: 'stores' }

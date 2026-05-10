@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions, type StyleProp, type ViewStyle } from 'react-native';
 import { Box, Text, colorPalette } from '@bthwani/ui-kit';
-import type { MarketingVideoRecord } from '../shared/video-store';
+import type { MarketingVideoRecord } from '../shared/video.preview-store';
 
 
 export type DshHomeApprovedVideoReelsViewerProps = {
@@ -51,8 +51,20 @@ function applyAlpha(hex: string, alpha: number) {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
+type ExpoVideoProps = {
+  source: { uri: string };
+  style?: StyleProp<ViewStyle>;
+  resizeMode?: 'cover' | 'contain' | 'stretch';
+  shouldPlay?: boolean;
+  isLooping?: boolean;
+  isMuted?: boolean;
+  useNativeControls?: boolean;
+  usePoster?: boolean;
+  posterSource?: { uri: string };
+};
+
 type ExpoAvModule = {
-  Video?: React.ComponentType<any>;
+  Video?: React.ComponentType<ExpoVideoProps>;
 };
 
 function resolveExpoAv(): ExpoAvModule | null {

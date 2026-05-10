@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, KeyValueList, Surface, Text } from '@bthwani/ui-kit';
-import type { DshPartnerFinanceBridgeState } from './dshPartnerFinanceModel';
+import type { DshPartnerFinanceBridgeState } from './partner-finance.preview-data';
 
 const defaultFinanceState: DshPartnerFinanceBridgeState = {
   partnerBalanceLabel: '3,420 ر.س',

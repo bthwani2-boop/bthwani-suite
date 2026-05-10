@@ -1,4 +1,4 @@
-import type { DshUnifiedRecommendation } from './dshRecommendationModel';
+import type { DshUnifiedRecommendation } from './recommendation.preview-data';
 
 /**
  * UI_PREVIEW_ONLY: Cross-surface journey closure examples.

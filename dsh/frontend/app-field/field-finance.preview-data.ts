@@ -7,7 +7,7 @@ export type {
 	FieldSectionSummary,
 	FieldStatusTone,
 	FieldStoreFile,
-} from './dshFieldStoresModel';
+} from './field-stores.preview-data';
 export {
 	createEmptyDraft,
 	createFieldSeedStores,
@@ -33,4 +33,4 @@ export {
 	submitFieldStoreForReview,
 	syncFieldStoreFromDraft,
 	touchFieldStoreDraft,
-} from './dshFieldStoresModel';
+} from './field-stores.preview-data';

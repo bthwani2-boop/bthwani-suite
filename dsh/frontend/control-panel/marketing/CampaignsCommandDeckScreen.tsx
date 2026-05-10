@@ -18,9 +18,9 @@ import {
   type CampaignChannel,
   type CampaignPriority,
   type CampaignTargetType,
-} from '../../shared/campaign-store';
+} from '../../shared/campaign.preview-store';
 import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
-import type { Entitlement } from '../../shared/loyalty-store';
+import type { Entitlement } from '../../shared/loyalty.preview-store';
 
 type EditorTab = 'plan' | 'audience' | 'channels' | 'schedule' | 'impact';
 
