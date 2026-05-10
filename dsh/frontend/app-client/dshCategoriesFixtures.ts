@@ -17,6 +17,18 @@ export type DshCategoryFixture = {
   isManualLike?: boolean;
 };
 
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ */
+export const dshCategoriesFixturesDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'not_applicable',
+  moneySemantics: 'not_applicable',
+} as const;
+
 export const dshCategoryFixtures: DshCategoryFixture[] = [
   {
     id: 'restaurants',

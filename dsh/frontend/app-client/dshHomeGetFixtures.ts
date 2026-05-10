@@ -2,6 +2,18 @@ import { dshDiscoveryStores } from './discoveryFixtures';
 import type { DshDiscoveryStore } from './types';
 import { brandPalette, dangerPalette, infoPalette, successPalette } from '@bthwani/ui-kit';
 
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ */
+export const dshHomeGetFixturesDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'preview-only local display / not runtime UTC source',
+  moneySemantics: 'preview-only display values / not accounting source',
+} as const;
+
 export type DshHomeGetFixtureProduct = {
   id: string;
   name: string;

@@ -41,6 +41,18 @@ export type DshMySpaceOrder = {
   needsReview?: boolean;
 };
 
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ */
+export const dshMySpaceOrdersFixtureDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'preview-only local display / not runtime UTC source',
+  moneySemantics: 'preview-only display values / not accounting source',
+} as const;
+
 export const dshMySpaceOrderMetrics: DshMySpaceOrderMetric[] = [
   {
     label: 'الطلبات هذا الشهر',
@@ -167,4 +179,3 @@ export const dshMySpaceOrdersFixture: DshMySpaceOrder[] = [
     statusTrailLabel: 'جاهز الآن',
   },
 ];
-

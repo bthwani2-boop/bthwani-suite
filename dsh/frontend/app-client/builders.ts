@@ -1,5 +1,17 @@
 import { DshStoreFixtureItem, StoreItemsByStoreId, DshDiscoveryStore } from './types';
 
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ */
+export const buildersDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'preview-only local display / not runtime UTC source',
+  moneySemantics: 'preview-only display values / not accounting source',
+} as const;
+
 export function buildStoreCategories(items: DshStoreFixtureItem[]) {
   const uniqueCategories = Array.from(
     new Map(items.map((item) => [item.categoryId, item.categoryLabel])).entries(),

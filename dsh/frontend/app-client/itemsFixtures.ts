@@ -1,6 +1,18 @@
 import { buildCanonicalPreviewStoreItemsByStoreId } from '../shared/dshStoreProductCardModel';
 import { DshStoreFixtureItem, StoreItemsByStoreId } from './types';
 
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ */
+export const itemsFixturesDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'preview-only local display / not runtime UTC source',
+  moneySemantics: 'preview-only display values / not accounting source',
+} as const;
+
 function withPublishedPreviewStage(items: DshStoreFixtureItem[]): DshStoreFixtureItem[] {
   return items.map((item) => {
     if (item.publishStage) {
