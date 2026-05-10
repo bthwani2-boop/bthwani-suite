@@ -3,6 +3,18 @@
  * 'promotion', 'subscription', 'shorts' are marked for migration.
  * Please use campaign-store.ts or partner-offer-store.ts for new commercial data ownership.
  */
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ */
+export const growthStoreDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'not_applicable',
+  moneySemantics: 'not_applicable',
+} as const;
+
 export type MarketingGrowthFamily = 'campaign' | /* @deprecated moved to partner-offer-store */ 'promotion' | /* @deprecated moved to loyalty-store */ 'subscription' | /* @deprecated moved to video-store */ 'shorts';
 export type MarketingGrowthSource = 'marketing' | 'partner';
 export type MarketingGrowthStatus = 'draft' | 'pending-marketing' | 'published' | 'paused';

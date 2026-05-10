@@ -1,6 +1,18 @@
 
 import { MarketingBannerActionType } from './banner-store';
 
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ */
+export const promoStoreDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'preview-only local display / not runtime UTC source',
+  moneySemantics: 'not_applicable',
+} as const;
+
 export type HomePromoRecord = {
   id: string;
   title: string;
@@ -89,7 +101,7 @@ export function upsertHomePromoItem(item: Partial<HomePromoRecord>) {
   const current = getHomePromoItems();
   const existing = item.id ? current.find((entry) => entry.id === item.id) : undefined;
   const nextId = item.id ?? `home-promo-${Date.now()}`;
-  
+
   const nextEntry: HomePromoRecord = {
     id: nextId,
     title: item.title || existing?.title || 'برومو جديد',

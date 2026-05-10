@@ -1,5 +1,17 @@
 import type { Phase12FixtureLocation } from '../types';
 
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ */
+export const dshAppCaptainFixtureLocationsDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'preview-only local display / not runtime UTC source',
+  moneySemantics: 'not_applicable',
+} as const;
+
 export const dshAppCaptainFixtureLocations: Phase12FixtureLocation[] = [
   {
     candidateId: 'dsh_captain_offers_list',

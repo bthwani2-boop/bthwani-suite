@@ -1,3 +1,15 @@
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ */
+export const videoStoreDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'not_applicable',
+  moneySemantics: 'not_applicable',
+} as const;
+
 export type MarketingVideoStatus = 'published' | 'draft' | 'review' | 'paused';
 export type MarketingVideoAudience = 'all' | 'client' | 'operations';
 export type MarketingVideoSource = 'marketing' | 'partner';

@@ -1,5 +1,17 @@
 import type { DshSurfaceId } from '../shared';
 
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ */
+export const geoHeatmapPreviewDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'not_applicable',
+  moneySemantics: 'not_applicable',
+} as const;
+
 export type GeoHeatmapZone = {
   id: string;
   name: string;

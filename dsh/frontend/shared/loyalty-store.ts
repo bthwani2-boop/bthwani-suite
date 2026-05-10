@@ -1,3 +1,15 @@
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ */
+export const loyaltyStoreDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'not_applicable',
+  moneySemantics: 'preview-only display values / not accounting source',
+} as const;
+
 export type LoyaltyStatus = 'active' | 'draft' | 'paused' | 'archived';
 export type LoyaltyAudience = 'all' | 'client' | 'operations';
 export type LoyaltyLane = 'subscription' | 'loyalty' | 'coupon';

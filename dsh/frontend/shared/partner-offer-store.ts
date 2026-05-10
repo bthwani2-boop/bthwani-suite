@@ -1,3 +1,15 @@
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ */
+export const partnerOfferStoreDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'preview-only local display / not runtime UTC source',
+  moneySemantics: 'preview-only display values / not accounting source',
+} as const;
+
 export type PartnerOfferType = 'discount' | 'free-delivery' | 'bundle' | 'buy-x-get-y' | 'coupon';
 export type PartnerOfferStatus = 'inbound' | 'review' | 'marketing-ready' | 'published' | 'rejected' | 'paused';
 export type PartnerOfferSource = 'partner' | 'field' | 'marketing' | 'catalog';

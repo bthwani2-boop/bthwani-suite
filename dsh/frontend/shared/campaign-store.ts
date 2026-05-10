@@ -1,3 +1,15 @@
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ */
+export const campaignStoreDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'preview-only local display / not runtime UTC source',
+  moneySemantics: 'not_applicable',
+} as const;
+
 export type CampaignStatus = 'draft' | 'pending' | 'published' | 'paused' | 'archived';
 export type CampaignGoal = 'awareness' | 'conversion' | 'retention' | 'acquisition';
 export type CampaignAudience = 'all' | 'client' | 'operations' | 'targeted';

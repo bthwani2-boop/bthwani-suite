@@ -1,3 +1,15 @@
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ */
+export const operationsPreviewDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'preview-only local display / not runtime UTC source',
+  moneySemantics: 'preview-only display values / not accounting source',
+} as const;
+
 export const OPERATIONS_PULSE_METRICS = [
   { id: 'command-center-open-orders', title: 'الطلبات المفتوحة', value: '128', description: 'الطلبات التي تتحرك داخل غرفة العمليات.', tone: 'brand' },
   { id: 'command-center-dispatch-risk', title: 'مخاطر الإسناد', value: '9', description: 'طلبات تحتاج إسنادًا يدويًا الآن.', tone: 'warning' },
