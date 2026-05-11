@@ -24,6 +24,15 @@ Lean closure docs:
 - `dsh/docs/DSH_FORENSIC_INVENTORY.md`
 - `dsh/docs/CLOSURE_DECISION_LOG.md`
 
+Mobile closure docs:
+
+- `dsh/docs/DSH_MOBILE_APPS_FINAL_CLOSURE.md`
+- `dsh/docs/DSH_MOBILE_APPS_FINAL_CLOSURE_RUNBOOK.md`
+- `dsh/docs/dsh-client-final-classification.csv`
+- `dsh/docs/dsh-partner-final-classification.csv`
+- `dsh/docs/dsh-captain-final-classification.csv`
+- `dsh/docs/dsh-field-final-classification.csv`
+
 Current live-code note:
 
 - DSH-CAP-002 received preview-routing hardening in the shared marketing banner-store and control-panel deck, but runtime, API, and visual proof remain unproven.

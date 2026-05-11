@@ -31,18 +31,18 @@ dsh/dsh.openapi.yaml
 | Truth File | `dsh/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
-| Current Decision | `DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3_CLOSED` |
-| Current Status | `FRONTEND_STANDARDIZED_CLOSED` |
-| Evidence Root | `tools/registry/runs/DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3_FIX_REQUIRED-20260511-035800` |
+| Current Decision | `DSH_MOBILE_APPS_FINAL_CLOSURE_GATE_CLOSED_PREVIEW_ONLY` |
+| Current Status | `MOBILE_PREVIEW_CLOSURE_COMPLETED` |
+| Evidence Root | `tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555` |
 
 ### Surface Status Summary (Forensic Audit 2026-05-10)
 
 | Surface | Status | Evidence Path | Note |
 |---|---|---|---|
 | app-client | `UI_PREVIEW_ONLY` | `dsh/frontend/app-client/` | No-API logic, fixture-backed discovery. |
-| app-partner | `UI_PREVIEW_ONLY` | `dsh/frontend/app-partner/` | Partner gate evidence in progress; do not treat as CLOSED until DSH partner P6 passes. |
-| app-captain | `UI_PREVIEW_ONLY` | `dsh/frontend/app-captain/` | Captain-scoped map only. |
-| app-field | `UI_PREVIEW_ONLY` | `dsh/frontend/app-field/` | Field visit onboarding proven. |
+| app-partner | `UI_PREVIEW_ONLY` | `dsh/frontend/app-partner/` | Partner mobile gate closed; wallet, settlement, and commission copy now routes through WLT bridge helpers. |
+| app-captain | `UI_PREVIEW_ONLY` | `dsh/frontend/app-captain/` | Captain-scoped map only; finance chrome now resolves through WLT bridge helpers. |
+| app-field | `UI_PREVIEW_ONLY` | `dsh/frontend/app-field/` | Field visit onboarding proven; finance preview remains WLT-owned through the field bridge. |
 | control-panel | `UI_PREVIEW_ONLY` | `dsh/frontend/control-panel/` | Admin live dispatch preview map only. |
 
 ### Map and Heatmap Boundary Contract
@@ -60,8 +60,8 @@ owner: dsh/
 public_export_path: dsh/index.ts
 screens_matrix: NEEDS_EVIDENCE
 flow_matrix: NEEDS_EVIDENCE
-evidence_root: tools/registry/runs/DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3_FIX_REQUIRED-20260511-035800
-closure_decision: DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3_CLOSED
+evidence_root: tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555
+closure_decision: DSH_MOBILE_APPS_FINAL_CLOSURE_GATE_CLOSED_PREVIEW_ONLY
 
 ### Service Purpose
 
@@ -172,7 +172,7 @@ The app-client DSH checkout boundary may consume WLT only through a public bridg
 | --- | --- | --- | --- | --- |
 | `app-client` | Customer: اكتشاف المتاجر، المنتجات، السلة، checkout، الدفع، التتبع، الدعم، التقييم. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
 | `webapp` | Customer Web: نسخة ويب وظيفية مكافئة لـ app-client عند النضج. | service-owned frontend slice closed | CLOSED | N/A |
-| `app-partner` | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | frontend standardized; UI_PREVIEW_ONLY | GATE_PENDING | DSH partner P6 gate pending |
+| `app-partner` | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | frontend standardized; UI_PREVIEW_ONLY | CLOSED | `tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555` |
 | `app-captain` | Captain: قبول مهمة التوصيل، الاستلام، التسليم، البلاغات، الإكمال. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
 | `app-field` | Field Agent: تفعيل المتاجر والدعم الميداني عند الحاجة المثبتة. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
 | `control-panel` | Admin/Ops: مراقبة، تشغيل، دعم، كتالوج، تدخل، تقارير. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
@@ -207,7 +207,7 @@ The app-client DSH checkout boundary may consume WLT only through a public bridg
 |---|---|---|---|---|
 | `app-client` | app owns shell/composition only | Customer: اكتشاف المتاجر، المنتجات، السلة، checkout، الدفع، التتبع، الدعم، التقييم. | CLOSED | N/A |
 | `webapp` | app owns shell/composition only | Customer Web: نسخة ويب وظيفية مكافئة لـ app-client عند النضج. | CLOSED | N/A |
-| `app-partner` | app owns shell/composition only | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | GATE_PENDING | DSH partner P6 gate pending |
+| `app-partner` | app owns shell/composition only | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | CLOSED | `tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555` |
 | `app-captain` | app owns shell/composition only | Captain: قبول مهمة التوصيل، الاستلام، التسليم، البلاغات، الإكمال. | CLOSED | N/A |
 | `app-field` | app owns shell/composition only | Field Agent: تفعيل المتاجر والدعم الميداني عند الحاجة المثبتة. | CLOSED | N/A |
 | `control-panel` | app owns shell/composition only | Admin/Ops: مراقبة، تشغيل، دعم، كتالوج، تدخل، تقارير. | CLOSED | N/A |
@@ -456,23 +456,24 @@ No fixture, mock, or seed may be promoted to runtime truth without evidence.
 | DSH-EVD-F2-F3-WLT-BIND | DSH screens bound to WLT finance model (F2–F3, 2026-05-09) | `UI_PREVIEW_FOUNDATION` | `dsh/frontend/app-client/DshCartUnifiedScreen.tsx`, `dsh/frontend/app-captain/DshCaptainFinanceScreen.tsx`, `dsh/frontend/app-field/DshFieldFinanceScreen.tsx` | preview/fixture only — DSH consumes WLT model, no financial data ownership in DSH |
 | DSH_CLEANUP_HARDENING | Dead code archive, duplication consolidation, and naming cleanup | `PASSED` | `dsh/_archive/frontend/5899a771-f61c-4e88-ba19-e7560e699a04/` | 100% TSC stability, archived redundant fixtures and screens. |
 | DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3 | Final cleanup of index, preferences data, ghost types, and WLT bridge consolidation | `PASSED` | `tools/registry/runs/DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3_FIX_REQUIRED-20260511-035800` | Zero-gap standardization of app-client surface. |
+| DSH_MOBILE_APPS_FINAL_CLOSURE_GATE | Partner, captain, and field mobile closure plus app-field public API hardening | `PASSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555` | No remaining `UNPROVEN` mobile registry rows; WLT owns the remaining wallet/finance copy used inside partner and captain host surfaces. |
 
 
 ### Current Decision
 
 ```text
-ROOT_TRUTH_PARITY_HARDENED
+DSH_MOBILE_APPS_FINAL_CLOSURE_GATE_CLOSED_PREVIEW_ONLY
 ```
 
 ### Remaining Risks
 
-- Frontend root parity is present and hardened, but Proof of Delivery (PoD) visual flows still require runtime binding evidence.
+- Mobile frontend closure is complete for preview-only scope, but runtime and visual proof still require active app sessions.
 - API contract remains scaffold/TBD until Screen/API Matrix evidence exists.
 - Backend and domain remain scaffold/unproven until branch evidence is collected.
 
 ### Single Next Action
 
-Complete Screen/API Matrix evidence collection and begin Runtime Binding (Wave 07).
+Collect runtime and visual smoke evidence only when a mobile runtime session is available.
 
 
 ### Update Protocol
@@ -517,7 +518,7 @@ Canonical DSH partner screens:
 `PartnerHomeScreen`, `PartnerEntryScreen`, `StoreProfileScreen`, `OperationsScreen`, `OrdersInboxScreen`, `OrderDetailScreen`, `OrderIssueScreen`, `InventoryCatalogScreen`, `PromotionsScreen`, `NotificationsScreen`, `PartnerSettingsScreen`, `PartnerSupportScreen`.
 
 WLT-owned DSH partner bridge:
-`wlt/frontend/app-partner/dsh/index.ts`, `WltDshPartnerBridge.tsx`, `wlt-dsh-partner.parts.tsx`, `wlt-dsh-partner.adapter.ts`, `wlt-dsh-partner.contract.ts`, `wlt-dsh-partner.preview-data.ts`, `wlt-dsh-partner.types.ts`, `useWltDshPartnerWalletPreview.ts`.
+`wlt/frontend/app-partner/dsh/index.ts`, `WltDshPartnerBridge.tsx`, `wlt-dsh-partner.parts.tsx`, `wlt-dsh-partner.adapter.ts`, `wlt-dsh-partner.ui-copy.ts`, `wlt-dsh-partner.contract.ts`, `wlt-dsh-partner.preview-data.ts`, `wlt-dsh-partner.types.ts`, `useWltDshPartnerWalletPreview.ts`.
 
 Archived finance remnants:
 Dead DSH-owned wallet/finance preview files must move to `dsh/_archive/frontend/**` once they are proven unreferenced.

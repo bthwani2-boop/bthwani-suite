@@ -671,12 +671,12 @@ export function DshStoreGetScreen({
   const changeCategory = React.useCallback((newId: string) => {
     if (newId === selectedCategory) return;
     Animated.sequence([
-      Animated.timing(transitionAnim, { toValue: 0.96, duration: 120, useNativeDriver: true }),
+      Animated.timing(transitionAnim, { toValue: 0.96, duration: 120, useNativeDriver: false }),
     ]).start(() => {
       setSelectedCategory(newId);
       // ensure list resets to top of new section
       try { listRef.current?.scrollToOffset({ offset: 0, animated: false }); } catch {}
-      Animated.timing(transitionAnim, { toValue: 1, duration: 260, useNativeDriver: true }).start();
+      Animated.timing(transitionAnim, { toValue: 1, duration: 260, useNativeDriver: false }).start();
       // subtle haptic
       try { Vibration.vibrate(8); } catch {}
       scrollChipIntoView(newId);
@@ -780,7 +780,7 @@ export function DshStoreGetScreen({
       onPanResponderGrant: () => {
         previewDrag.stopAnimation();
         // subtle lift when grabbing
-        Animated.spring(previewScale, { toValue: 1.04, useNativeDriver: true, friction: 6, tension: 100 }).start();
+        Animated.spring(previewScale, { toValue: 1.04, useNativeDriver: false, friction: 6, tension: 100 }).start();
         previewRotate.setValue(0);
       },
       onPanResponderMove: (_evt, gestureState) => {
@@ -853,14 +853,14 @@ export function DshStoreGetScreen({
           const speedAdj = Math.min(260, Math.abs(vx) * 300);
           const outDuration = Math.max(120, Math.floor(base - speedAdj));
 
-          Animated.timing(previewDrag.x, { toValue: offX, duration: outDuration, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start(() => {
+          Animated.timing(previewDrag.x, { toValue: offX, duration: outDuration, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start(() => {
             try { movePreviewByCategoryOffset(dirOffset); } catch {}
             // place new card off-screen on opposite side and slide in quickly
             previewDrag.setValue({ x: -offX, y: 0 });
             Animated.parallel([
-              Animated.timing(previewDrag.x, { toValue: 0, duration: Math.max(180, Math.floor(280 - speedAdj / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-              Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 6, tension: 90 }),
-              Animated.timing(previewRotate, { toValue: 0, duration: 180, useNativeDriver: true }),
+              Animated.timing(previewDrag.x, { toValue: 0, duration: Math.max(180, Math.floor(280 - speedAdj / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: false }),
+              Animated.spring(previewScale, { toValue: 1, useNativeDriver: false, friction: 6, tension: 90 }),
+              Animated.timing(previewRotate, { toValue: 0, duration: 180, useNativeDriver: false }),
             ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch {} });
             try { Vibration.vibrate(8); } catch {}
           });
@@ -871,13 +871,13 @@ export function DshStoreGetScreen({
           const speedAdjY = Math.min(220, Math.abs(vy) * 300);
           const outDurationY = Math.max(120, Math.floor(base - speedAdjY));
 
-          Animated.timing(previewDrag.y, { toValue: offY, duration: outDurationY, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start(() => {
+          Animated.timing(previewDrag.y, { toValue: offY, duration: outDurationY, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start(() => {
             movePreviewByItemOffset(dirOffset);
             previewDrag.setValue({ x: 0, y: -offY });
             Animated.parallel([
-              Animated.timing(previewDrag.y, { toValue: 0, duration: Math.max(160, Math.floor(240 - speedAdjY / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-              Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 6, tension: 90 }),
-              Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
+              Animated.timing(previewDrag.y, { toValue: 0, duration: Math.max(160, Math.floor(240 - speedAdjY / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: false }),
+              Animated.spring(previewScale, { toValue: 1, useNativeDriver: false, friction: 6, tension: 90 }),
+              Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: false }),
             ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch {} });
             try { Vibration.vibrate(6); } catch {}
           });
@@ -901,17 +901,17 @@ export function DshStoreGetScreen({
         } else {
           // gentle return to center
           Animated.parallel([
-            Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: true, friction: 7, tension: 90 }),
-            Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 8, tension: 90 }),
-            Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
+            Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: false, friction: 7, tension: 90 }),
+            Animated.spring(previewScale, { toValue: 1, useNativeDriver: false, friction: 8, tension: 90 }),
+            Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: false }),
           ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch {} });
         }
       },
       onPanResponderTerminate: () => {
         Animated.parallel([
-          Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: true, friction: 7, tension: 90 }),
-          Animated.spring(previewScale, { toValue: 1, useNativeDriver: true, friction: 8, tension: 90 }),
-          Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: true }),
+          Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: false, friction: 7, tension: 90 }),
+          Animated.spring(previewScale, { toValue: 1, useNativeDriver: false, friction: 8, tension: 90 }),
+          Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: false }),
         ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch {} });
       },
       onPanResponderTerminationRequest: () => false,
@@ -1245,7 +1245,7 @@ export function DshStoreGetScreen({
 
         <View style={styles.feedSection}>
           <Animated.View style={[styles.feedList, { opacity: transitionAnim, transform: [{ scale: transitionAnim }] }]} {...panResponder.panHandlers}>
-            <Animated.FlatList
+            <FlatList
               ref={(r) => { listRef.current = r as unknown as FlatList<DshStoreGetMenuItem> | null; }}
               data={visibleItems as DshStoreGetMenuItem[]}
               keyExtractor={(item) => (item as DshStoreGetMenuItem).id}
@@ -1440,7 +1440,9 @@ export function DshStoreGetScreen({
               showsVerticalScrollIndicator={false}
               snapToInterval={SNAP_INTERVAL}
               decelerationRate="fast"
-              onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
+              onScroll={(event) => {
+                scrollY.setValue(event.nativeEvent.contentOffset.y);
+              }}
               scrollEventThrottle={16}
               contentContainerStyle={{ paddingBottom: 28 }}
               ListEmptyComponent={

@@ -130,8 +130,8 @@ export const dshFieldScreenRegistry = [
     surfaceId: 'app-field',
     ownerKind: 'integration',
     ownerId: 'wlt.dsh',
-    serviceId: 'dsh',
-    linkedServiceId: 'wlt',
+    serviceId: 'wlt',
+    linkedServiceId: 'dsh',
     ownerPath: 'dsh/frontend/app-field/screens/DshFieldFinanceScreen.tsx',
     componentName: 'DshFieldFinanceScreen',
     screenKind: 'FLOW_STEP',
@@ -140,7 +140,7 @@ export const dshFieldScreenRegistry = [
     analytics: { screenView: 'field_dsh_finance_overview_view' },
     fallbackRouteId: 'dsh-field-account',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'field.wlt.dsh.finance.bridge',
@@ -158,6 +158,6 @@ export const dshFieldScreenRegistry = [
     analytics: { screenView: 'field_wlt_dsh_finance_bridge_view' },
     fallbackRouteId: 'dsh-field-finance',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
 ] as const satisfies readonly DshFieldScreenRegistryItem[];

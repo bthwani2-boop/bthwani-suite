@@ -42,7 +42,7 @@ export const dshCaptainScreenRegistry = [
     deepLinkPath: '/captain/dsh',
     fallbackRouteId: 'dsh-captain-home',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.entry',
@@ -59,7 +59,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_entry_view' },
     fallbackRouteId: 'dsh-captain-home',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.orders.inbox',
@@ -76,7 +76,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_orders_inbox_view' },
     fallbackRouteId: 'dsh-captain-entry',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.orders.detail',
@@ -93,7 +93,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_order_detail_view' },
     fallbackRouteId: 'dsh-captain-inbox',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.orders.chat',
@@ -110,7 +110,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_order_chat_view' },
     fallbackRouteId: 'dsh-captain-detail',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.orders.bell',
@@ -127,7 +127,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_bell_view' },
     fallbackRouteId: 'dsh-captain-inbox',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.support.directory',
@@ -144,7 +144,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_support_directory_view' },
     fallbackRouteId: 'dsh-captain-home',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.support.workspace',
@@ -161,7 +161,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_support_workspace_view' },
     fallbackRouteId: 'dsh-captain-support-directory',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.account.root',
@@ -178,7 +178,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_account_root_view' },
     fallbackRouteId: 'dsh-captain-home',
     releaseCriticality: 'P2',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.account.profile',
@@ -195,15 +195,16 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_account_profile_view' },
     fallbackRouteId: 'dsh-captain-account',
     releaseCriticality: 'P2',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.account.finance',
     routeId: 'dsh-captain-account-finance',
     surfaceId: 'app-captain',
-    ownerKind: 'service',
-    ownerId: 'dsh',
-    serviceId: 'dsh',
+    ownerKind: 'integration',
+    ownerId: 'wlt.dsh',
+    serviceId: 'wlt',
+    linkedServiceId: 'dsh',
     ownerPath: 'dsh/frontend/app-captain/screens/DshCaptainFinanceScreen.tsx',
     componentName: 'DshCaptainCodBalanceScreen',
     screenKind: 'FLOW_STEP',
@@ -212,7 +213,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_account_finance_view' },
     fallbackRouteId: 'dsh-captain-account',
     releaseCriticality: 'P2',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.account.orders',
@@ -229,7 +230,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_account_orders_view' },
     fallbackRouteId: 'dsh-captain-account',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.account.docs',
@@ -246,7 +247,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_account_docs_view' },
     fallbackRouteId: 'dsh-captain-account',
     releaseCriticality: 'P2',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.account.shifts',
@@ -263,7 +264,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_account_shifts_view' },
     fallbackRouteId: 'dsh-captain-account',
     releaseCriticality: 'P2',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.dsh.account.support',
@@ -280,7 +281,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_account_support_view' },
     fallbackRouteId: 'dsh-captain-account',
     releaseCriticality: 'P2',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'captain.wlt.dsh.finance.bridge',
@@ -298,6 +299,6 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_wlt_dsh_finance_bridge_view' },
     fallbackRouteId: 'dsh-captain-account-finance',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
 ] as const satisfies readonly DshCaptainScreenRegistryItem[];

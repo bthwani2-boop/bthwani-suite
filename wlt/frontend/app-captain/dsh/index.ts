@@ -7,6 +7,10 @@ export {
   wltDshCaptainFinanceSections,
   wltDshCaptainPreviewData,
 } from './wlt-dsh-captain.preview-data';
+export { wltDshCaptainUiCopy } from './wlt-dsh-captain.ui-copy';
+export type {
+  WltDshCaptainUiCopy,
+} from './wlt-dsh-captain.ui-copy';
 export type {
   WltDshCaptainBridgeSection,
   WltDshCaptainBridgeState,

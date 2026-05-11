@@ -41,7 +41,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_home_dashboard_view' },
     fallbackRouteId: 'dsh-partner-home',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'partner.dsh.entry.status',
@@ -58,7 +58,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_entry_status_view' },
     fallbackRouteId: 'dsh-partner-home',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'partner.dsh.store.profile',
@@ -75,7 +75,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_store_profile_view' },
     fallbackRouteId: 'dsh-partner-home',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'partner.dsh.operations.control',
@@ -92,7 +92,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_operations_control_view' },
     fallbackRouteId: 'dsh-partner-home',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'partner.dsh.orders.inbox',
@@ -109,7 +109,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_orders_inbox_view' },
     fallbackRouteId: 'dsh-partner-home',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'partner.dsh.order.detail',
@@ -126,7 +126,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_order_detail_view' },
     fallbackRouteId: 'dsh-partner-orders',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'partner.dsh.order.issue',
@@ -143,7 +143,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_order_issue_view' },
     fallbackRouteId: 'dsh-partner-orders',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'partner.dsh.inventory.catalog',
@@ -160,7 +160,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_inventory_catalog_view' },
     fallbackRouteId: 'dsh-partner-home',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'partner.dsh.promotions.intent',
@@ -177,7 +177,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_promotions_intent_view' },
     fallbackRouteId: 'dsh-partner-home',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'partner.dsh.notifications.list',
@@ -194,7 +194,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_notifications_list_view' },
     fallbackRouteId: 'dsh-partner-home',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'partner.dsh.settings.preferences',
@@ -211,7 +211,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_settings_preferences_view' },
     fallbackRouteId: 'dsh-partner-home',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'partner.dsh.support.center',
@@ -228,7 +228,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_support_center_view' },
     fallbackRouteId: 'dsh-partner-home',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
   {
     screenId: 'partner.wlt.dsh.wallet.bridge',
@@ -246,6 +246,6 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_wlt_dsh_wallet_bridge_view' },
     fallbackRouteId: 'dsh-partner-home',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'VERIFIED',
   },
 ] as const satisfies readonly DshPartnerScreenRegistryItem[];

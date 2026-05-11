@@ -18,6 +18,11 @@ import {
   useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
+import {
+  getWltDshPartnerCommissionLabel,
+  getWltDshPartnerOperationalModeCommission,
+  wltDshPartnerUiCopy,
+} from '../../../../wlt/frontend/app-partner/dsh/wlt-dsh-partner.ui-copy';
 import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../../shared/dshStoreProductCardModel';
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
 import { WltDshPartnerBridge } from '../../../../wlt/frontend/app-partner/dsh';
@@ -78,9 +83,9 @@ type NotificationPreferenceId =
 type NotificationPreferenceState = Record<NotificationPreferenceId, boolean>;
 
 const defaultOperationalModes: readonly PartnerOperationalMode[] = [
-  { id: 'pickup', title: 'استلم بنفسك', subtitle: 'استلام من الفرع مباشرة.', commission: '0%', enabled: true },
-  { id: 'delivery', title: 'توصيل المتجر', subtitle: 'قناة توصيل داخلية.', commission: '8%', enabled: true },
-  { id: 'scheduled', title: 'توصيل بثواني', subtitle: 'جدولة سريعة عند الحاجة.', commission: '15%', enabled: false },
+  { id: 'pickup', title: 'استلم بنفسك', subtitle: 'استلام من الفرع مباشرة.', commission: getWltDshPartnerOperationalModeCommission('pickup'), enabled: true },
+  { id: 'delivery', title: 'توصيل المتجر', subtitle: 'قناة توصيل داخلية.', commission: getWltDshPartnerOperationalModeCommission('delivery'), enabled: true },
+  { id: 'scheduled', title: 'توصيل بثواني', subtitle: 'جدولة سريعة عند الحاجة.', commission: getWltDshPartnerOperationalModeCommission('scheduled'), enabled: false },
 ] as const;
 
 const defaultTeamMembers: readonly PartnerTeamMember[] = [
@@ -143,8 +148,8 @@ const hubNavigationItems: readonly HubNavigationItem[] = [
   },
   {
     id: 'wallet',
-    title: 'المحفظة والحسابات المالية',
-    description: 'الرصيد، المستحقات، التسويات، وآخر حركة.',
+    title: wltDshPartnerUiCopy.walletSectionTitle,
+    description: wltDshPartnerUiCopy.walletSectionDescription,
     icon: 'wallet-outline',
     kind: 'section',
     section: 'wallet',
@@ -184,8 +189,8 @@ const sectionCopy: Record<Exclude<PartnerHubSection, 'hub'>, { title: string; de
     icon: 'cube-outline',
   },
   wallet: {
-    title: 'المحفظة والحسابات المالية',
-    description: 'الرصيد، المستحقات، التسويات، وآخر حركة.',
+    title: wltDshPartnerUiCopy.walletSectionTitle,
+    description: wltDshPartnerUiCopy.walletSectionDescription,
     icon: 'wallet-outline',
   },
   analytics: {
@@ -617,7 +622,7 @@ function OperationsModeRow({
         <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 4, marginEnd: 10 }}>
           <Chip label={mode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={mode.enabled ? 'success' : 'warning'} />
           <Text role="caption" tone="muted">
-            {`عمولة ${mode.commission}`}
+            {getWltDshPartnerCommissionLabel(mode.commission)}
           </Text>
         </View>
 
@@ -737,7 +742,7 @@ function OperationsPanel({
             <Chip label={selectedMode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={selectedMode.enabled ? 'success' : 'warning'} />
           </View>
           <Text role="caption" tone="muted" align="start">
-            {`عمولة ${selectedMode.commission}`}
+            {getWltDshPartnerCommissionLabel(selectedMode.commission)}
           </Text>
           <Text role="bodySm" tone="muted" align="start">
             تفاصيل هذا الوضع تظهر داخل نفس الصفحة فقط، ويمكن تبديل حالته محليًا دون أي route جديد.
@@ -1027,8 +1032,8 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
         },
         {
           id: 'finance' as const,
-          title: 'التسويات والتنبيهات المالية',
-          subtitle: 'المستحقات، التسويات، والتنبيهات ذات الأثر المالي.',
+          title: wltDshPartnerUiCopy.financeNotificationTitle,
+          subtitle: wltDshPartnerUiCopy.financeNotificationSubtitle,
           icon: 'wallet-outline' as const,
           value: notificationPreferences.finance,
         },

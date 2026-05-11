@@ -16,6 +16,7 @@ try {
   // fallback is already a zero-insets function
 }
 import { Badge, Box, Button, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme } from '@bthwani/ui-kit';
+import { wltDshCaptainUiCopy } from '../../../wlt/frontend/app-captain/dsh/wlt-dsh-captain.ui-copy';
 import { DshEntryScreen } from './screens/DshCaptainEntryScreen';
 import {
   CaptainDeliveryConfirmSheet,
@@ -157,7 +158,6 @@ const compactOrderChatSeed: CompactOrderChatMessage[] = [
 ];
 
 const captainDisplayName = 'الكابتن عبدالله السبيعي';
-const captainWalletBalanceLabel = '348 ر.س';
 
 const availabilityStatusMeta: Record<
   CaptainAvailabilityStatus,
@@ -558,7 +558,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       { label: 'الاسم', value: <Badge label={captainDisplayName} tone="brand" /> },
       { label: 'النوع', value: <Badge label="DSH" tone="success" /> },
       { label: 'الحالة', value: <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} /> },
-      { label: 'المحفظة', value: <Badge label={captainWalletBalanceLabel} tone="success" /> },
+      { label: wltDshCaptainUiCopy.summaryLabel, value: <Badge label={wltDshCaptainUiCopy.walletBalanceLabel} tone="success" /> },
       { label: 'التقييم', value: <Badge label="4.9 / 5" tone="info" /> },
       { label: 'المستوى', value: <Badge label="Elite 3" tone="brand" /> },
       { label: 'الطلب النشط', value: <Badge label={inboxState === 'delivered' ? 'لا يوجد' : `#${activeOrderDisplayId}`} tone="default" /> },
@@ -573,10 +573,10 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
         onPress: () => openCaptainAccountSection('account-profile'),
       },
       {
-        title: 'المالية',
-        subtitle: 'المحفظة والأرباح والتسويات في صفحة واحدة.',
+        title: wltDshCaptainUiCopy.financeTitle,
+        subtitle: wltDshCaptainUiCopy.financeSubtitle,
         meta: 'فتح',
-        badgeLabel: 'مالي',
+        badgeLabel: wltDshCaptainUiCopy.financeBadgeLabel,
         onPress: () => openCaptainAccountSection('account-finance'),
       },
       {
@@ -753,7 +753,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     <TopBar
       variant="brand"
       title={captainDisplayName}
-      locationLabel={`المحفظة · ${captainWalletBalanceLabel}`}
+      locationLabel={wltDshCaptainUiCopy.topBarLocationLabel}
       locationIcon={<Icon name="wallet-outline" size={14} color={theme.brandContrast} />}
       actions={[
         {
@@ -773,7 +773,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
         {
           id: 'wallet',
           icon: <Icon name="wallet-outline" size={20} color={theme.brandContrast} />,
-          accessibilityLabel: 'المحفظة',
+          accessibilityLabel: wltDshCaptainUiCopy.walletAccessibilityLabel,
           onPress: () => openCaptainSupportScreen('cod-balance'),
         },
       ]}

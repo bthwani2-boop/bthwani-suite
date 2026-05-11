@@ -1,6 +1,7 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
 import { Box, Button, Icon, Surface, Text, TopBar, useTheme } from '@bthwani/ui-kit';
+import { wltDshPartnerUiCopy } from '../../../wlt/frontend/app-partner/dsh/wlt-dsh-partner.ui-copy';
 import type {
   DshPartnerRoute,
   DshPartnerSurfaceProps,
@@ -115,10 +116,10 @@ function PartnerWalletHubSheet({
 
   return (
     <Surface tone="raised" padding={5} gap={4} radiusToken="xl" border={false} style={{ margin: 16 }}>
-      <Text role="titleMd">المحفظة</Text>
-      <Button onPress={() => onNavigate('partner_subscription')}>الاشتراك</Button>
-      <Button onPress={() => onNavigate('partner_settlement_summary')}>ملخص التسويات</Button>
-      <Button onPress={onClose}>إغلاق</Button>
+      <Text role="titleMd">{wltDshPartnerUiCopy.walletHubTitle}</Text>
+      <Button onPress={() => onNavigate('partner_subscription')}>{wltDshPartnerUiCopy.walletSubscriptionLabel}</Button>
+      <Button onPress={() => onNavigate('partner_settlement_summary')}>{wltDshPartnerUiCopy.walletSettlementSummaryLabel}</Button>
+      <Button onPress={onClose}>{wltDshPartnerUiCopy.walletCloseLabel}</Button>
     </Surface>
   );
 }
