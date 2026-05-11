@@ -44,6 +44,7 @@ Unless runtime evidence is proven later, current DSH UI work must remain preview
 | DSH-RUN-004 | captain delivery | dsh/frontend/app-captain | app-captain | fixture/preview TBD | NO | device/simulator runtime + screenshots | N/A | RUNTIME_UNPROVEN | map captain flow |
 | DSH-RUN-005 | backend/domain | dsh/backend + dsh/domain | DSH service | scaffold/TBD | NO | handler/domain/persistence proof | N/A | NOT_CLOSED | do not start before UI/API matrix |
 | DSH-RUN-018 | DSH-CAP-009 payment/settlement | dsh/frontend/shared/finance/dshFinancePreviewModel.ts | client/partner/captain/field | preview | NO | text/tsc proof = PASS_WITH_WARNINGS; visual proof = NEEDS_VISUAL_EVIDENCE; runtime/API/backend = RUNTIME_UNPROVEN | DSH_AUDIT_010_DEEP_SYSTEM_DIAGNOSIS-20260506-053242 | RUNTIME_UNPROVEN | gather visual and runtime proof |
+| DSH-RUN-019 | Mobile Apps Preview Closure | dsh/frontend/app-client, app-partner, app-captain, app-field | mobile apps | preview | NO | registry/classification closure; public export hardening; WLT boundary verification | DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555 | RUNTIME_UNPROVEN | preview registry is closed, but runtime smoke was SKIPPED |
 
 Closure rule:
 Runtime is PASS only when source, provider, happy path, failure path, recovery path, and evidence are proven.

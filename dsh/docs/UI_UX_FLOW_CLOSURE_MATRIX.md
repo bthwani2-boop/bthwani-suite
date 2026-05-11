@@ -139,7 +139,7 @@ Wave 00 preflight summary:
 | DSH-FLOW-009 | Tracking | Customer/Captain/Ops | app-client/app-captain/control-panel | mapped candidates: 1 | TBD | monitor order | loading/ready/error/offline | NEEDS_UI_FLOW | NEEDS_VISUAL_EVIDENCE | NEEDS_FILE_REVIEW | RUNTIME_UNPROVEN | CHECK_DSH_UI_UX_FLOW_SCREEN_MAPPING_V2-20260505-175528 | NOT_CLOSED | map tracking route |
 | DSH-FLOW-010 | Support | Customer/Admin | app-client/control-panel | mapped candidates: 1 | TBD | open/resolve case | empty/pending/error/success | NEEDS_UI_FLOW | NEEDS_VISUAL_EVIDENCE | NEEDS_FILE_REVIEW | RUNTIME_UNPROVEN | CHECK_DSH_UI_UX_FLOW_SCREEN_MAPPING_V2-20260505-175528 | NOT_CLOSED | map support screens |
 | DSH-FLOW-011 | Rating | Customer | app-client | mapped candidates: 0 | TBD | submit rating | ready/error/success | NEEDS_UI_FLOW | NEEDS_VISUAL_EVIDENCE | NEEDS_FILE_REVIEW | RUNTIME_UNPROVEN | CHECK_DSH_UI_UX_FLOW_SCREEN_MAPPING_V2-20260505-175528 | NOT_CLOSED | rating screen not proven by mapping |
-| DSH-FLOW-012 | Control-panel operations | Admin/Ops | control-panel | dsh/frontend/control-panel/DshControlPanelSurfaceHost.tsx; dsh/frontend/control-panel/operations/OperationsHubScreen.tsx | operations DSH host | monitor/intervene | loading/empty/error/offline/disabled/ready | PASS_PREVIEW_COCKPIT | PASS_RTL_VISUAL | PASS_UI_KIT_BOUNDARY | UI_PREVIEW_ONLY | DSH_FRONTEND_FINAL_CLOSURE_MEGA_EXECUTION_20260510 | CLOSED | maintenance only |
+| DSH-FLOW-012 | Control-panel operations | Admin/Ops | control-panel | dsh/frontend/control-panel/DshControlPanelSurfaceHost.tsx; dsh/frontend/control-panel/operations/OperationsHubScreen.tsx | operations DSH host | monitor/intervene | loading/empty/error/offline/disabled/ready | PASS_PREVIEW_COCKPIT | PASS_RTL_VISUAL | PASS_UI_KIT_BOUNDARY | UI_PREVIEW_ONLY | DSH_FRONTEND_FINAL_CLOSURE_MEGA_EXECUTION_20260510 | CLOSED_PREVIEW_ONLY | maintenance only |
 
 ## High-Risk Screen Candidates
 
@@ -204,7 +204,7 @@ Current Closure Decision: PASS_WITH_WARNINGS (Wave 04 Executed)
 
 ## Current Closure Decision
 
-UI/UX/Flow is CLOSED for Control Panel Operations (Wave 04). Client/Partner/Field remain in PREVIEW_DATA stage.
+UI/UX/Flow is CLOSED_PREVIEW_ONLY for Control Panel Operations (Wave 04). Client/Partner/Field remain in PREVIEW_DATA stage. Full service closure is BLOCKED until runtime truth is proven.
 
 ## DSH-CLEAN-018 Dead/Duplicate/Noise Findings
 

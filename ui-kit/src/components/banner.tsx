@@ -49,8 +49,6 @@ export function BannerCarousel({
   fullBleed = false,
   itemWidth,
   itemGap,
-  autoPlayInterval = DEFAULT_AUTO_PLAY_INTERVAL_MS,
-  resumeAfterMs = DEFAULT_RESUME_AFTER_MS,
   onBannerPress,
   style,
 }: BannerCarouselProps) {
@@ -63,20 +61,9 @@ export function BannerCarousel({
   const isPeekSecondary = isSecondary && !fullBleed;
 
   const resolvedWidth = widthProp ?? measuredWidth ?? windowWidth;
-  const isRtl = direction === 'rtl';
   const count = banners.length;
-  const loopedBanners = React.useMemo(
-    () => (count > 1 ? [banners[count - 1], ...banners, banners[0]] : banners),
-    [banners, count],
-  );
-  const loopedCount = loopedBanners.length;
-
-  const listRef = React.useRef<FlatList<BannerCarouselItem>>(null);
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const [activeIndex, setActiveIndex] = React.useState(0);
-  const activeIndexRef = React.useRef(count > 1 ? 1 : 0);
-  const autoplayTimerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
-  const resumeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const defaultSecondaryInset = isPeekSecondary ? CARD_INSET : 0;
   const defaultSecondaryGap = isPeekSecondary ? ITEM_GAP : 0;
@@ -87,10 +74,6 @@ export function BannerCarousel({
   const decelerationRate = isSecondary ? 'normal' : 'fast';
   const snapAlignment = isSecondary ? 'center' : 'start';
   const styles = React.useMemo(() => createStyles(theme, isCompactSecondary), [theme, isCompactSecondary]);
-  const snapOffsets = React.useMemo(
-    () => Array.from({ length: loopedCount }, (_, index) => index * snapInterval),
-    [loopedCount, snapInterval],
-  );
 
   const toRealIndex = React.useCallback(
     (loopedIndex: number) => {
@@ -98,143 +81,28 @@ export function BannerCarousel({
         return 0;
       }
 
-      if (loopedIndex <= 0) {
-        return count - 1;
-      }
-
-      if (loopedIndex >= loopedCount - 1) {
-        return 0;
-      }
-
-      return loopedIndex - 1;
+      return clamp(loopedIndex, 0, count - 1);
     },
-    [count, loopedCount],
+    [count],
   );
-
-  const jumpToLoopedIndex = React.useCallback(
-    (nextLoopedIndex: number) => {
-      const offset = nextLoopedIndex * snapInterval;
-      activeIndexRef.current = nextLoopedIndex;
-      listRef.current?.scrollToOffset({ offset, animated: false });
-    },
-    [snapInterval],
-  );
-
-  const clearResumeTimer = React.useCallback(() => {
-    if (resumeTimerRef.current) {
-      clearTimeout(resumeTimerRef.current);
-      resumeTimerRef.current = null;
-    }
-  }, []);
-
-  const stopAutoplay = React.useCallback(() => {
-    if (autoplayTimerRef.current) {
-      clearInterval(autoplayTimerRef.current);
-      autoplayTimerRef.current = null;
-    }
-  }, []);
-
-  const startAutoplay = React.useCallback(() => {
-    stopAutoplay();
-
-    if (count <= 1 || autoPlayInterval <= 0) {
-      return;
-    }
-
-    autoplayTimerRef.current = setInterval(() => {
-      const current = activeIndexRef.current;
-      const next = isRtl
-        ? (current - 1 + loopedCount) % loopedCount
-        : (current + 1) % loopedCount;
-
-      activeIndexRef.current = next;
-      setActiveIndex(toRealIndex(next));
-
-      const offset = snapOffsets[next] ?? next * snapInterval;
-      listRef.current?.scrollToOffset({ offset, animated: true });
-    }, autoPlayInterval);
-  }, [autoPlayInterval, count, isRtl, loopedCount, snapInterval, snapOffsets, stopAutoplay, toRealIndex]);
-
-  React.useEffect(() => {
-    startAutoplay();
-
-    return () => {
-      stopAutoplay();
-      clearResumeTimer();
-    };
-  }, [clearResumeTimer, startAutoplay, stopAutoplay]);
-
-  React.useEffect(() => {
-    if (resolvedWidth <= 0) {
-      return;
-    }
-
-    const current = activeIndexRef.current;
-    const offset = snapOffsets[current] ?? current * snapInterval;
-    listRef.current?.scrollToOffset({ offset, animated: false });
-  }, [resolvedWidth, snapOffsets, snapInterval]);
-
-  const pauseAutoplay = React.useCallback(() => {
-    stopAutoplay();
-    clearResumeTimer();
-
-    if (count <= 1 || autoPlayInterval <= 0) {
-      return;
-    }
-
-    resumeTimerRef.current = setTimeout(() => {
-      startAutoplay();
-    }, resumeAfterMs);
-  }, [autoPlayInterval, clearResumeTimer, count, resumeAfterMs, startAutoplay, stopAutoplay]);
 
   const computeIndex = React.useCallback(
-    (offsetX: number) => clamp(Math.round(offsetX / snapInterval), 0, Math.max(0, loopedCount - 1)),
-    [loopedCount, snapInterval],
+    (offsetX: number) => clamp(Math.round(offsetX / snapInterval), 0, Math.max(0, count - 1)),
+    [count, snapInterval],
   );
 
   const onMomentumScrollEnd = React.useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const next = computeIndex(event.nativeEvent.contentOffset.x);
-
-      if (count > 1) {
-        if (next <= 0) {
-          jumpToLoopedIndex(loopedCount - 2);
-          setActiveIndex(count - 1);
-          clearResumeTimer();
-
-          if (autoPlayInterval > 0) {
-            startAutoplay();
-          }
-
-          return;
-        }
-
-        if (next >= loopedCount - 1) {
-          jumpToLoopedIndex(1);
-          setActiveIndex(0);
-          clearResumeTimer();
-
-          if (autoPlayInterval > 0) {
-            startAutoplay();
-          }
-
-          return;
-        }
-      }
-
-      activeIndexRef.current = next;
       setActiveIndex(toRealIndex(next));
-      clearResumeTimer();
-
-      if (count > 1 && autoPlayInterval > 0) {
-        startAutoplay();
-      }
     },
-    [autoPlayInterval, clearResumeTimer, computeIndex, count, jumpToLoopedIndex, loopedCount, startAutoplay, toRealIndex],
+    [computeIndex, toRealIndex],
   );
 
-  const onScroll = React.useMemo(
-    () => Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: true }),
+  const onScroll = React.useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      scrollX.setValue(event.nativeEvent.contentOffset.x);
+    },
     [scrollX],
   );
 
@@ -316,7 +184,6 @@ export function BannerCarousel({
               item.onPress?.();
               onBannerPress?.(item);
             }}
-            onTouchStart={pauseAutoplay}
           >
             <Animated.View
               style={[
@@ -420,7 +287,7 @@ export function BannerCarousel({
         </View>
       );
     },
-    [height, onBannerPress, pauseAutoplay, resolvedItemWidth, scrollX, snapInterval, styles, theme],
+    [height, onBannerPress, resolvedItemWidth, scrollX, snapInterval, styles, theme],
   );
 
   const handleLayout = React.useCallback(
@@ -441,10 +308,9 @@ export function BannerCarousel({
 
   return (
     <View onLayout={handleLayout} style={[styles.root, { width: widthProp ?? '100%', height: height + (isSecondary ? (isCompactSecondary ? spacing[2] : spacing[4]) : 0) }, style]}>
-      <Animated.FlatList
-        ref={listRef}
+      <FlatList
         horizontal
-        data={loopedBanners}
+        data={banners}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         showsHorizontalScrollIndicator={false}
@@ -458,7 +324,7 @@ export function BannerCarousel({
           paddingVertical: isSecondary ? (isCompactSecondary ? spacing[0] : spacing[1]) : 0,
           flexDirection: 'row',
         }}
-        initialScrollIndex={count > 1 ? 1 : 0}
+        initialScrollIndex={0}
         getItemLayout={(_: unknown, index: number) => ({
           length: snapInterval,
           offset: index * snapInterval,
@@ -467,9 +333,6 @@ export function BannerCarousel({
         onScroll={onScroll}
         scrollEventThrottle={16}
         onMomentumScrollEnd={onMomentumScrollEnd}
-        onScrollBeginDrag={pauseAutoplay}
-        onTouchStart={pauseAutoplay}
-        onTouchEnd={pauseAutoplay}
       />
 
       {count > 1 ? (
