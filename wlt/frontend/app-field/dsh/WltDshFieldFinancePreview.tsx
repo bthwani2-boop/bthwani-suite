@@ -20,10 +20,10 @@ import {
   TopBar,
 } from '@bthwani/ui-kit';
 import {
-  getWltFieldFinanceSnapshot,
   type WltDshFinancePreviewRecord,
   type WltFieldFinanceSnapshot,
 } from '../../shared/finance/dshFinancePreview';
+import { useWltDshFieldFinancePreview } from './useWltDshFieldFinancePreview';
 
 const PREVIEW_NOTICE =
   'هذا عرض تجريبي فقط — لا يوجد صرف عمولة حقيقي ولا تحويل فعلي حتى يُرفع وضع CONTRACT_TBD.';
@@ -91,30 +91,33 @@ function CommissionSummary({ snapshot }: { snapshot: WltFieldFinanceSnapshot }) 
   );
 }
 
-function CommissionRecords({ records }: { records: WltDshFinancePreviewRecord[] }) {
-  const commissions = records.filter((r) => r.kind === 'field-commission');
-  const payouts = records.filter((r) => r.kind === 'field-payout');
-
+function CommissionRecords({
+  commissionRecords,
+  payoutRecords,
+}: {
+  commissionRecords: readonly WltDshFinancePreviewRecord[];
+  payoutRecords: readonly WltDshFinancePreviewRecord[];
+}) {
   return (
     <>
-      {commissions.length > 0 && (
+      {commissionRecords.length > 0 && (
         <Surface tone="raised" padding={3} gap={3}>
           <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
             عمولات الاستقطاب
           </Text>
           <Box gap={2}>
-            {commissions.map((r) => <RecordRow key={r.id} record={r} />)}
+            {commissionRecords.map((r) => <RecordRow key={r.id} record={r} />)}
           </Box>
         </Surface>
       )}
 
-      {payouts.length > 0 && (
+      {payoutRecords.length > 0 && (
         <Surface tone="raised" padding={3} gap={3}>
           <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
             سجل الصرف
           </Text>
           <Box gap={2}>
-            {payouts.map((r) => <RecordRow key={r.id} record={r} />)}
+            {payoutRecords.map((r) => <RecordRow key={r.id} record={r} />)}
           </Box>
         </Surface>
       )}
@@ -131,10 +134,11 @@ export function WltDshFieldFinancePreview({
   storeIds,
   onBack,
 }: WltDshFieldFinancePreviewProps) {
-  const snapshot = React.useMemo(
-    () => getWltFieldFinanceSnapshot(storeIds),
-    [storeIds],
-  );
+  const {
+    snapshot,
+    commissionRecords,
+    payoutRecords,
+  } = useWltDshFieldFinancePreview(storeIds);
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 120 }}>
@@ -159,7 +163,7 @@ export function WltDshFieldFinancePreview({
 
       <CommissionSummary snapshot={snapshot} />
 
-      <CommissionRecords records={snapshot.records} />
+      <CommissionRecords commissionRecords={commissionRecords} payoutRecords={payoutRecords} />
 
       <Surface tone="inset" padding={3} gap={2}>
         <Text role="label" tone="muted" style={{ textAlign: 'right' }}>

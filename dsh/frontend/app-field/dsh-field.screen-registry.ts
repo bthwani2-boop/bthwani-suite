@@ -1,13 +1,15 @@
 import type { DshFieldRouteId } from './dsh-field.routes';
 
+export type DshFieldRegistryRouteId = DshFieldRouteId | 'wlt-dsh-field-finance-bridge';
+
 export type DshFieldScreenRegistryItem = {
   readonly screenId: string;
-  readonly routeId: DshFieldRouteId;
+  readonly routeId: DshFieldRegistryRouteId;
   readonly surfaceId: 'app-field';
   readonly ownerKind: 'app' | 'service' | 'integration';
   readonly ownerId: 'app-field' | 'dsh' | 'wlt.dsh';
   readonly serviceId?: 'dsh' | 'wlt';
-  readonly linkedServiceId?: 'wlt';
+  readonly linkedServiceId?: 'dsh' | 'wlt';
   readonly ownerPath: string;
   readonly componentName: string;
   readonly screenKind: 'TAB_ROOT' | 'SCREEN_ENTRY' | 'FLOW_STEP' | 'MODAL' | 'SHEET';
@@ -138,6 +140,24 @@ export const dshFieldScreenRegistry = [
     analytics: { screenView: 'field_dsh_finance_overview_view' },
     fallbackRouteId: 'dsh-field-account',
     releaseCriticality: 'P1',
-    status: 'VERIFIED',
+    status: 'UNPROVEN',
+  },
+  {
+    screenId: 'field.wlt.dsh.finance.bridge',
+    routeId: 'wlt-dsh-field-finance-bridge',
+    surfaceId: 'app-field',
+    ownerKind: 'integration',
+    ownerId: 'wlt.dsh',
+    serviceId: 'wlt',
+    linkedServiceId: 'dsh',
+    ownerPath: 'wlt/frontend/app-field/dsh/WltDshFieldBridge.tsx',
+    componentName: 'WltDshFieldBridge',
+    screenKind: 'FLOW_STEP',
+    flowId: 'dsh.field.finance',
+    requiredStates: ['loading', 'empty', 'error', 'success', 'offline', 'blocked'],
+    analytics: { screenView: 'field_wlt_dsh_finance_bridge_view' },
+    fallbackRouteId: 'dsh-field-finance',
+    releaseCriticality: 'P1',
+    status: 'UNPROVEN',
   },
 ] as const satisfies readonly DshFieldScreenRegistryItem[];

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Icon, KeyValueList, ListItem, MobileScrollView, StateView, Surface, Text, TopBar } from '@bthwani/ui-kit';
-import { getWltFieldFinancePreview } from '../../../../wlt/frontend/shared/finance/dshFinancePreview';
+import { StateView } from '@bthwani/ui-kit';
+import { WltDshFieldBridge } from '../../../../wlt/frontend/app-field/dsh';
 import { resolveFieldStoreStatus, type FieldStoreFile } from '../data/field-stores.preview-data';
 
 type DshFieldFinanceScreenProps = {
@@ -26,42 +26,12 @@ export function DshFieldFinanceScreen({ state = 'ready', stores, onBack, onRetry
       />
     );
   }
-  const eligibleStores = stores.filter((store) => resolveFieldStoreStatus(store) === 'offer-approved');
-  const preview = getWltFieldFinancePreview(eligibleStores.map(s => s.id));
 
-  return (
-    <Box style={{ flex: 1 }} background="background">
-      <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 96 }}>
-        <TopBar
-          variant="secondary"
-          title="المالية"
-          subtitle="عرض المستحقات المالية بعد اكتمال الاعتماد فقط"
-          style={{ marginHorizontal: -16, marginTop: -16 }}
-          trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }}
-        />
+  const eligibleStoreIds = stores
+    .filter((store) => resolveFieldStoreStatus(store) === 'offer-approved')
+    .map((store) => store.id);
 
-        <Surface tone="raised" padding={4} gap={2} radiusToken="xl">
-          <Text role="titleMd" style={{ textAlign: 'right' }}>إجمالي المستحقات المالية</Text>
-          <Text role="titleLg" style={{ textAlign: 'right' }}>{preview.totalCommissionLabel}</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>تُعرض فقط الملفات المكتملة للميدان والتي أصبح الشريك فيها معتمدًا.</Text>
-          <KeyValueList
-            dense
-            items={[
-              { label: 'عدد الملفات المؤهلة', value: String(preview.eligibleFilesCount) },
-              { label: 'آخر دفعة محولة', value: preview.lastPayoutLabel, tone: 'success' },
-              { label: 'تاريخ التحويل', value: preview.lastPayoutDate },
-            ]}
-          />
-        </Surface>
-
-        <Surface tone="raised" padding={0} gap={0} radiusToken="xl">
-          {eligibleStores.map((store) => (
-            <ListItem key={store.id} title={store.name} subtitle="ملف مكتمل للميدان" meta="اعتماد نهائي" badgeLabel={store.financeLabel} />
-          ))}
-        </Surface>
-      </MobileScrollView>
-    </Box>
-  );
+  return <WltDshFieldBridge storeIds={eligibleStoreIds} onBack={onBack} />;
 }
 
 export default DshFieldFinanceScreen;
