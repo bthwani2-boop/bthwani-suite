@@ -19,9 +19,9 @@ import {
   type MarketingBannerStatus,
 } from '../../shared/banner.preview-store';
 import { dshCategoryFixtures } from '../../app-client/data/categories.preview-data';
-import { dshDiscoveryStores } from '../../app-client/discoveryFixtures';
-import { storeItemsByStoreId } from '../../app-client/itemsFixtures';
-import { resolveDshImageSource } from '../../app-client/resolve-image-source';
+import { dshDiscoveryStores } from '../../app-client/data/discovery.preview-data';
+import { storeItemsByStoreId } from '../../app-client/data/items.preview-data';
+import { resolveDshImageSource } from '../../app-client/shared/resolve-image-source';
 
 export type BannersCommandDeckScreenProps = {
   hubHref?: string;
