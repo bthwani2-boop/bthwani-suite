@@ -1,97 +1,48 @@
-export { surfaceMeta } from './surface-meta';
-export { surfaceCatalog } from './surface-catalog';
+/**
+ * DSH Captain App Public API
+ *
+ * This file defines the clean, intentional public API for the DSH captain surface.
+ * Only components and types required by app-captain composition/shell are exported here.
+ */
+
+// Core Surface & Host
+export { DshCaptainSurface } from './DshCaptainSurface';
+
+/**
+ * Compatibility alias for DshCaptainSurface.
+ * @deprecated Use DshCaptainSurface instead.
+ */
+export { DshCaptainSurface as DshSurfaceHost } from './DshCaptainSurface';
+
+// Public Types required by Composition/Shell
 export type {
-	DshEntryScreenProps,
-	DshEntryScreenState,
-} from './DshCaptainEntryScreen';
-export {
-	DshCaptainEntryScreen,
-	DshEntryScreen,
-} from './DshCaptainEntryScreen';
-export type {
-	DshCaptainOrderDetailSummary,
-	DshCaptainOrdersScreenProps,
-} from './DshCaptainOrdersScreen';
-export {
-	CaptainDeliveryConfirmSheet,
-	CaptainOrderDetailScreen,
-	CaptainOrdersInboxScreen,
-	CaptainPickupConfirmSheet,
-	DshCaptainBellScreen,
-	DshCaptainOrderAcceptScreen,
-	DshCaptainOrderChatScreen,
-	DshCaptainOrderDeliverScreen,
-	DshCaptainOrderDetailsScreen,
-	DshCaptainOrderGetScreen,
-	DshCaptainOrderOfferRejectScreen,
-	DshCaptainOrderPickupScreen,
-	DshCaptainOrdersListScreen,
-	DshCaptainOrdersOffersListScreen,
-	DshCaptainOrdersScreen,
-	DshCaptainProofUploadScreen,
-	DshCaptainJobRejectScreen,
-} from './DshCaptainOrdersScreen';
-export type {
-	DshCaptainOrderAction,
-	DshCaptainOrderBellItem,
-	DshCaptainOrderId,
-	DshCaptainOrderMessage,
-	DshCaptainOrderMode,
-	DshCaptainOrderProofStatus,
-	DshCaptainOrdersScreenState,
-	DshCaptainOrderStage,
-} from './captain-orders.preview-data';
-export type { DshCaptainFinanceScreenProps } from './DshCaptainFinanceScreen';
-export {
-	DshCaptainCodBalanceScreen,
-	DshCaptainFinanceScreen,
-} from './DshCaptainFinanceScreen';
-export type {
-	DshCaptainFinanceScreenState,
-	DshCaptainFinanceSection,
-	DshCaptainFinanceSnapshot,
-} from './captain-finance.preview-data';
-export type { DshCaptainProfileScreenProps } from './DshCaptainProfileScreen';
-export {
-	DshCaptainProfileGetScreen,
-	DshCaptainProfileScreen,
-	DshCaptainTierEvaluateScreen,
-	DshCaptainTierInfoScreen,
-} from './DshCaptainProfileScreen';
-export type {
-	DshCaptainProfileScreenState,
-	DshCaptainProfileSection,
-	DshCaptainProfileSnapshot,
-} from './captain-profile.preview-data';
-export type { CaptainSupportScreenId } from './DshCaptainOperationsScreen';
-export {
-	DshCaptainChatReadAckScreen,
-	DshCaptainChatSendScreen,
-	DshCaptainSupportDirectoryScreen,
-} from './DshCaptainOperationsScreen';
-export { DshCaptainMapScreen } from './DshCaptainMapScreen';
-export { flowMeta } from './flow-meta';
-export type {
-	DshCaptainFlowKey,
-	DshCaptainFlowNode,
-} from './flow-map';
-export { dshCaptainFlowMap } from './flow-map';
-export type {
+	DshCaptainCommandTarget,
+	DshCaptainNavigationCommand,
+	DshCaptainRoute,
+	DshCaptainSurfaceProps,
+	DshSurfaceHostProps,
 	DshCaptainState,
 	DshCaptainStateGroup,
 	DshCaptainStateMeta,
-} from './captain-state.preview-data';
-export {
-	getDshCaptainStateMeta,
-	isDshCaptainFinanceState,
-	isDshCaptainOrderState,
-	isDshCaptainTerminalState,
-} from './captain-state.preview-data';
-export type {
 	DshCaptainFinanceSnapshot,
 	DshCaptainOperationsSnapshot,
 	DshCaptainOrderActionPayload,
 	DshCaptainOrderSnapshot,
 	DshCaptainProfileSnapshot,
 	DshCaptainProofPayload,
-} from './dshCaptainBinding.contracts';
+} from './dsh-captain.types';
+
+// Routing & Registry
+export { dshCaptainRoutes } from './dsh-captain.routes';
+export type {
+	DshCaptainLegacyRoute,
+	DshCaptainRouteId,
+	DshCaptainRouteRecord,
+} from './dsh-captain.routes';
+
+export { dshCaptainScreenRegistry } from './dsh-captain.screen-registry';
+export type { DshCaptainScreenRegistryItem } from './dsh-captain.screen-registry';
+
+// --- End of Public API ---
+// Internal screens, parts, and data are hidden from the public index
+// to enforce strict architectural boundaries.

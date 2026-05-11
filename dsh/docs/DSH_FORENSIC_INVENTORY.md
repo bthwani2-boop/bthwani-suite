@@ -65,7 +65,7 @@
 
 - DSH يملك حضورًا حيًا واضحًا عبر خمسة أسطح، لكن الحقيقة التشغيلية ليست موزعة بالتساوي بينها.
 - `app-client` و `control-panel` يحملان أكبر كثافة سلوكية، لكن كليهما مليء بمصادر preview وfixture.
-- `app-field` هو أوضح سطح من جهة route ownership لأن `FieldSurfaceHost` يستهلك كل شاشاته السبع مباشرة.
+- `app-field` هو أوضح سطح من جهة route ownership لأن `DshFieldSurface` يستهلك كل شاشاته السبع مباشرة.
 - `app-partner` و `app-captain` يملكان شاشات orphan واضحة يجب عدم حذفها الآن، بل عزلها داخل حزم capability لاحقة.
 - checkout/payment/settlement يظل محكومًا بـ WLT/auth ولا يصلح كبداية closure package أولى.
 - DSH-CLEAN-018 أزال اسمَي export قديمين في app-field وبدّل copy واحدًا يذكر fixtures داخل empty state إلى نص حيّ محايد، من دون تغيير route أو host أو compatibility alias مستخدم.
@@ -77,7 +77,7 @@
 | app-client | `app-client/composition/index.ts -> app-client/shell/ClientSurfaceHost.tsx -> dsh/frontend/app-client/DshSurfaceHost.tsx` | `dsh/frontend/app-client/DshSurfaceHost.tsx` | client DSH routes owned inside one host surface | أعلى كثافة route evidence داخل الخدمة |
 | app-partner | `app-partner/composition/index.ts -> app-partner/shell/PartnerSurfaceHost.tsx` | `app-partner/shell/PartnerSurfaceHost.tsx` | partner DSH routes تمر عبر composition barrel رفيع ثم host واحد مباشر | composition بقي barrel فقط مثل التطبيقات الشقيقة |
 | app-captain | `app-captain/composition/index.ts -> app-captain/shell/CaptainSurfaceHost.tsx` | `app-captain/shell/CaptainSurfaceHost.tsx` | captain route ownership مثبت من shell | شاشة operations المستقلة لا يظهر استهلاكها الحي |
-| app-field | `app-field/shell/FieldSurfaceHost.tsx -> dsh/frontend/app-field/FieldSurfaceHost.tsx` | `dsh/frontend/app-field/FieldSurfaceHost.tsx` | field consumes all seven screen files مباشرة | أوضح سطح من ناحية direct render evidence |
+| app-field | `app-field/shell/FieldSurfaceHost.tsx -> dsh/frontend/app-field/DshFieldSurface.tsx` | `dsh/frontend/app-field/DshFieldSurface.tsx` | field consumes all seven screen files مباشرة | أوضح سطح من ناحية direct render evidence |
 | control-panel dashboard | `control-panel/runtime/app/page.tsx -> control-panel/shell/web-entry.tsx -> control-panel/shell/ControlPanelSurfaceHost.tsx` | `control-panel/runtime/app/page.tsx` | default dashboard/control-panel entry حي | يثبت section-level entry وليس runtime closure |
 | control-panel operations | `control-panel/runtime/app/operations/page.tsx -> dsh/frontend/control-panel/DshControlPanelSurfaceHost.tsx -> OperationsHubScreen` | `dsh/frontend/control-panel/DshControlPanelSurfaceHost.tsx` | operations root حي ومطبع group routing | hub يوزع العمل إلى 10 workspaces رئيسية |
 | control-panel marketing | `control-panel/runtime/app/marketing/page.tsx -> control-panel/shell/web-entry.tsx -> section=marketing` | `dsh/frontend/control-panel/marketing/ControlPanelDshMarketingScreen.tsx` | marketing section root حي | داخله 4 decks مثبتة بالاستهلاك المباشر |
@@ -134,13 +134,13 @@
 
 | Surface | File | Bytes | Consumed / Referenced | Proven host or reference | Candidate flow | Related / mirror surfaces | Data source type | State / signal markers | Risk | Decision / next action |
 | --- | --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- |
-| app-field | `dsh/frontend/app-field/finance/DshFieldFinanceScreen.tsx` | 1981 | ACTIVE_CONSUMED | `FieldSurfaceHost.tsx` direct render proof | Field finance | app-field only; no confirmed cross-surface mirror | local/props | ready summary state | no financial backend proof | keep; package with field profile |
-| app-field | `dsh/frontend/app-field/onboarding/DshFieldStoreOnboardingScreen.tsx` | 16387 | ACTIVE_CONSUMED | `FieldSurfaceHost.tsx` direct render proof | Field store onboarding | app-field primary; control-panel partner/catalog readiness adjacent | localStorage + seed fallback | draft/stepper states | local persistence is not runtime truth | keep; package with field onboarding |
-| app-field | `dsh/frontend/app-field/profile/DshFieldProfileHomeScreen.tsx` | 3126 | ACTIVE_CONSUMED | `FieldSurfaceHost.tsx` direct render proof | Field profile home | app-field only; no confirmed cross-surface mirror | props-driven | ready navigation state | UI-only summary | keep |
-| app-field | `dsh/frontend/app-field/profile/DshFieldProfileScreen.tsx` | 1472 | ACTIVE_CONSUMED | `FieldSurfaceHost.tsx` direct render proof | Field profile detail | app-field only; no confirmed cross-surface mirror | props-driven | ready detail state | no backend sync proof | keep |
-| app-field | `dsh/frontend/app-field/stores/DshFieldStoresHistoryScreen.tsx` | 1544 | ACTIVE_CONSUMED | `FieldSurfaceHost.tsx` direct render proof | Field visit history | app-field only; no confirmed cross-surface mirror | props-driven | history list state | history truth unproven | keep |
-| app-field | `dsh/frontend/app-field/stores/DshFieldStoresScreen.tsx` | 5465 | ACTIVE_CONSUMED | `FieldSurfaceHost.tsx` direct render proof | Field stores list | app-field primary; control-panel partner/catalog readiness adjacent | local/props | ready/list states | no backend sync proof | keep |
-| app-field | `dsh/frontend/app-field/visits/DshFieldStoreVisitScreen.tsx` | 6295 | ACTIVE_CONSUMED | `FieldSurfaceHost.tsx` direct render proof | Field store visit | app-field primary; control-panel partner/catalog readiness adjacent | local form state | form/submit states | visit sync unproven | keep |
+| app-field | `dsh/frontend/app-field/screens/DshFieldFinanceScreen.tsx` | 1981 | ACTIVE_CONSUMED | `DshFieldSurface.tsx` direct render proof | Field finance | app-field only; no confirmed cross-surface mirror | local/props | ready summary state | no financial backend proof | keep; package with field profile |
+| app-field | `dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx` | 16387 | ACTIVE_CONSUMED | `DshFieldSurface.tsx` direct render proof | Field store onboarding | app-field primary; control-panel partner/catalog readiness adjacent | localStorage + seed fallback | draft/stepper states | local persistence is not runtime truth | keep; package with field onboarding |
+| app-field | `dsh/frontend/app-field/screens/DshFieldProfileHomeScreen.tsx` | 3126 | ACTIVE_CONSUMED | `DshFieldSurface.tsx` direct render proof | Field profile home | app-field only; no confirmed cross-surface mirror | props-driven | ready navigation state | UI-only summary | keep |
+| app-field | `dsh/frontend/app-field/screens/DshFieldProfileScreen.tsx` | 1472 | ACTIVE_CONSUMED | `DshFieldSurface.tsx` direct render proof | Field profile detail | app-field only; no confirmed cross-surface mirror | props-driven | ready detail state | no backend sync proof | keep |
+| app-field | `dsh/frontend/app-field/screens/DshFieldStoresHistoryScreen.tsx` | 1544 | ACTIVE_CONSUMED | `DshFieldSurface.tsx` direct render proof | Field visit history | app-field only; no confirmed cross-surface mirror | props-driven | history list state | history truth unproven | keep |
+| app-field | `dsh/frontend/app-field/screens/DshFieldStoresScreen.tsx` | 5465 | ACTIVE_CONSUMED | `DshFieldSurface.tsx` direct render proof | Field stores list | app-field primary; control-panel partner/catalog readiness adjacent | local/props | ready/list states | no backend sync proof | keep |
+| app-field | `dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx` | 6295 | ACTIVE_CONSUMED | `DshFieldSurface.tsx` direct render proof | Field store visit | app-field primary; control-panel partner/catalog readiness adjacent | local form state | form/submit states | visit sync unproven | keep |
 
 ### control-panel
 
@@ -174,7 +174,7 @@
 | app-client | 19 | 14 | 3 | 1 | 1 | 6 | `dsh/frontend/app-client/DshSurfaceHost.tsx` | mostly fixture/seed-driven | أعلى كثافة features وأعلى خطر اختلاط active مع preview |
 | app-partner | 5 | 4 | 0 | 0 | 1 | 3 | `app-partner/shell/PartnerSurfaceHost.tsx` + compat bridge | UI-heavy, backend unproven | console/orders حية، operations directory يتيم حتى الآن |
 | app-captain | 5 | 4 | 0 | 0 | 1 | 3 | `app-captain/shell/CaptainSurfaceHost.tsx` | UI-heavy, lifecycle unproven | orders/profile/finance حية، operations المستقلة يتيمة |
-| app-field | 7 | 7 | 0 | 0 | 0 | 4 | `dsh/frontend/app-field/FieldSurfaceHost.tsx` | local persistence, not runtime truth | أوضح direct ownership بين كل الأسطح |
+| app-field | 7 | 7 | 0 | 0 | 0 | 4 | `dsh/frontend/app-field/DshFieldSurface.tsx` | local persistence, not runtime truth | أوضح direct ownership بين كل الأسطح |
 | control-panel | 20 | 20 | 0 | 0 | 0 | 3 | `control-panel/shell/ControlPanelSurfaceHost.tsx` + section routes | mostly preview/control data | route ownership واضح لكن الحقيقة التشغيلية غير مغلقة |
 
 ## 6. Component / Block Inventory
@@ -194,7 +194,7 @@
 | 11 | app-captain | Captain finance block | `DshCaptainFinanceScreen.tsx` | COD/balance style surfaces | local state |
 | 12 | app-captain | Captain profile block | `DshCaptainProfileScreen.tsx` | هوية الكابتن وبياناته | props |
 | 13 | app-field | Field stores list block | `DshFieldStoresScreen.tsx` | نقطة البداية للرحلات الميدانية | props / local |
-| 14 | app-field | Field onboarding block | `DshFieldStoreOnboardingScreen.tsx`, `FieldOnboardingStorage.ts` | onboarding draft capture | localStorage + seed |
+| 14 | app-field | Field onboarding block | `screens/DshFieldStoreOnboardingScreen.tsx`, `data/field-onboarding.storage.ts` | onboarding draft capture | localStorage + seed |
 | 15 | app-field | Field visit block | `DshFieldStoreVisitScreen.tsx` | capture visit and notes | local form state |
 | 16 | app-field | Field profile / history / finance cluster | profile, history, finance screens | round-trip continuity للمندوب | props / local |
 | 17 | control-panel | Operations hub and canonical workspaces | `OperationsHubScreen.tsx`, `operations.registry.ts` | غرفة التشغيل المركزية | preview operations data |
@@ -273,7 +273,7 @@ DSH-CAP-002 live-code hardening now shares banner routing and seed data through 
 | Growth store | `dsh/frontend/shared/marketing/growth-store.ts` | seed + preview store | growth deck and client promo surfaces | NO | live/pending هنا store semantics فقط |
 | Smart signal fixtures | `dsh/frontend/control-panel/marketing/SmartSignalLayer/news-ticker-fixtures.ts` | fixture | signal layer | NO | ticker/signal demo evidence فقط |
 | Operations workspace data | `dsh/frontend/control-panel/operations/operations.preview-data.ts` | preview data | operations hub and its workspaces | NO | control-room visualization فقط |
-| Field onboarding storage | `dsh/frontend/app-field/onboarding/FieldOnboardingStorage.ts` | localStorage + seed fallback | field onboarding flow | NO | local persistence لا يساوي backend sync |
+| Field onboarding storage | `dsh/frontend/app-field/data/field-onboarding.storage.ts` | localStorage + seed fallback | field onboarding flow | NO | local persistence لا يساوي backend sync |
 | Seed media assets | `dsh/media-fixtures/assets/seed/dsh/*` | seed media | client home/store visuals | NO | 20 asset files + README within media-fixtures tree |
 | WLT dependency | `wlt/frontend/app-client/dsh/useWltDshWalletPreview.ts` | runtime dependency path | checkout/payment-adjacent client flow | PARTIAL | يثبت dependency path لا اكتمال checkout |
 | OpenAPI contract file | `dsh/dsh.openapi.yaml` | contract source | future API binding | NO for runtime | وجود العقد لا يثبت implementation |
@@ -332,7 +332,7 @@ DSH-CAP-002 live-code hardening now shares banner routing and seed data through 
 | app-client | `DshSurfaceHost.tsx` direct renders home, entry, store, cart, notifications, favorites, benefits, bell, awnak, shein, my-space | client active surface is real and route-owned | keep app-client surface active |
 | app-partner | `app-partner/shell/PartnerSurfaceHost.tsx` مع exports محلية للشاشات والsheets | partner root screens are active عبر host واحد مباشر مع composition barrel رفيع | keep partner surface active |
 | app-captain | `app-captain/composition/index.ts` + `CaptainSurfaceHost.tsx` import entry, orders, finance, profile | captain root screens are active; standalone operations file remains outside live proof | keep captain surface active; keep orphan classification on operations file |
-| app-field | `FieldSurfaceHost.tsx` directly renders all seven field screens | field surface has full direct ownership proof | keep app-field surface fully active |
+| app-field | `DshFieldSurface.tsx` directly renders all seven field screens | field surface has full direct ownership proof | keep app-field surface fully active |
 | control-panel | runtime app routes + `DshControlPanelSurfaceHost.tsx` + `ControlPanelDshMarketingScreen.tsx` + `OperationsHubScreen.tsx` + `ControlPanelDshCatalogScreen.tsx` | control-panel sections and nested workspaces are actively consumed | keep control-panel sections and workspace screens active |
 
 ### B) Unused / Orphan Candidates

@@ -1,61 +1,33 @@
 import {
-  DshEntryScreen,
-} from '../../dsh/frontend/app-captain/DshCaptainEntryScreen';
-import {
-  CaptainDeliveryConfirmSheet,
-  CaptainPickupConfirmSheet,
-  CaptainOrderDetailScreen,
-  DshCaptainOrderChatScreen,
-  DshCaptainBellScreen,
-  CaptainOrdersInboxScreen,
-  DshCaptainOrderAcceptScreen,
-  DshCaptainOrderDeliverScreen,
-  DshCaptainOrderDetailsScreen,
-  DshCaptainOrderGetScreen,
-  DshCaptainOrderPickupScreen,
-  DshCaptainOrdersListScreen,
-  DshCaptainOrdersOffersListScreen,
-  DshCaptainProofUploadScreen,
-} from '../../dsh/frontend/app-captain/DshCaptainOrdersScreen';
-import {
-  DshCaptainSupportDirectoryScreen,
-  DshCaptainChatReadAckScreen,
-  DshCaptainChatSendScreen,
-} from '../../dsh/frontend/app-captain/DshCaptainOperationsScreen';
-import { DshCaptainCodBalanceScreen } from '../../dsh/frontend/app-captain/DshCaptainFinanceScreen';
-import { DshCaptainProfileGetScreen, DshCaptainTierEvaluateScreen, DshCaptainTierInfoScreen } from '../../dsh/frontend/app-captain/DshCaptainProfileScreen';
+  DshCaptainSurface,
+  type DshCaptainCommandTarget,
+  type DshCaptainNavigationCommand,
+  type DshCaptainSurfaceProps,
+} from '../../dsh/frontend/app-captain';
 
-export const dshCaptain = {
-  entry: {
-    DshEntryScreen,
-  },
-  orders: {
-    CaptainDeliveryConfirmSheet,
-    CaptainPickupConfirmSheet,
-    CaptainOrderDetailScreen,
-    DshCaptainOrderChatScreen,
-    DshCaptainBellScreen,
-    CaptainOrdersInboxScreen,
-  },
-  operations: {
-    DshCaptainSupportDirectoryScreen,
-    DshCaptainChatReadAckScreen,
-    DshCaptainChatSendScreen,
-    DshCaptainOrderAcceptScreen,
-    DshCaptainOrderDeliverScreen,
-    DshCaptainOrderDetailsScreen,
-    DshCaptainOrderGetScreen,
-    DshCaptainOrderPickupScreen,
-    DshCaptainOrdersListScreen,
-    DshCaptainOrdersOffersListScreen,
-    DshCaptainProofUploadScreen,
-  },
-  finance: {
-    DshCaptainCodBalanceScreen,
-  },
-  profile: {
-    DshCaptainProfileGetScreen,
-    DshCaptainTierEvaluateScreen,
-    DshCaptainTierInfoScreen,
-  },
+export type AppCaptainServiceId = 'dsh';
+
+export type AppCaptainServiceRegistryEntry = {
+  readonly SurfaceHost: typeof DshCaptainSurface;
+};
+
+export const appCaptainServiceLabels = {
+  dsh: 'Delivery & Shopping',
 } as const;
+
+export const appCaptainSurfaceRegistry = {
+  dsh: {
+    SurfaceHost: DshCaptainSurface,
+  },
+} as const satisfies Record<AppCaptainServiceId, AppCaptainServiceRegistryEntry>;
+
+export function getServiceLabels() {
+  return appCaptainServiceLabels;
+}
+
+export function useServiceLabels() {
+  return appCaptainServiceLabels;
+}
+
+export { DshCaptainSurface, DshCaptainSurface as DshSurfaceHost };
+export type { DshCaptainCommandTarget, DshCaptainNavigationCommand, DshCaptainSurfaceProps };

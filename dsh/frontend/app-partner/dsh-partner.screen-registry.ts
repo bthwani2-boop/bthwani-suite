@@ -1,6 +1,10 @@
-export type PartnerScreenRegistryItem = {
+import type { DshPartnerRouteId } from './dsh-partner.routes';
+
+export type DshPartnerRegistryRouteId = DshPartnerRouteId | 'wlt-dsh-partner-wallet-bridge';
+
+export type DshPartnerScreenRegistryItem = {
   readonly screenId: string;
-  readonly routeId: string;
+  readonly routeId: DshPartnerRegistryRouteId;
   readonly surfaceId: 'app-partner';
   readonly ownerKind: 'service' | 'integration';
   readonly ownerId: 'dsh' | 'wlt.dsh';
@@ -12,7 +16,7 @@ export type PartnerScreenRegistryItem = {
   readonly flowId?: string;
   readonly requiredStates: readonly ('loading' | 'empty' | 'error' | 'success' | 'offline' | 'disabled' | 'retry' | 'blocked')[];
   readonly analytics: { readonly screenView: string; readonly primaryEvents?: readonly string[] };
-  readonly fallbackRouteId?: string;
+  readonly fallbackRouteId?: DshPartnerRouteId;
   readonly releaseCriticality: 'P0' | 'P1' | 'P2';
   readonly status: 'TBD' | 'UNPROVEN' | 'VERIFIED' | 'CLOSED' | 'DEPRECATED';
 };
@@ -29,7 +33,7 @@ export const dshPartnerScreenRegistry = [
     ownerKind: 'service',
     ownerId: 'dsh',
     serviceId: 'dsh',
-    ownerPath: 'dsh/frontend/app-partner/DshPartnerSurface.tsx',
+    ownerPath: 'dsh/frontend/app-partner/screens/PartnerHubScreen.tsx',
     componentName: 'PartnerHomeScreen',
     screenKind: 'TAB_ROOT',
     flowId: 'dsh.partner.dashboard',
@@ -80,7 +84,7 @@ export const dshPartnerScreenRegistry = [
     ownerKind: 'service',
     ownerId: 'dsh',
     serviceId: 'dsh',
-    ownerPath: 'dsh/frontend/app-partner/DshPartnerSurface.tsx',
+    ownerPath: 'dsh/frontend/app-partner/screens/PartnerHubScreen.tsx',
     componentName: 'OperationsScreen',
     screenKind: 'SCREEN_ENTRY',
     flowId: 'dsh.partner.operations',
@@ -199,7 +203,7 @@ export const dshPartnerScreenRegistry = [
     ownerKind: 'service',
     ownerId: 'dsh',
     serviceId: 'dsh',
-    ownerPath: 'dsh/frontend/app-partner/DshPartnerSurface.tsx',
+    ownerPath: 'dsh/frontend/app-partner/screens/PartnerHubScreen.tsx',
     componentName: 'PartnerSettingsScreen',
     screenKind: 'SCREEN_ENTRY',
     flowId: 'dsh.partner.settings',
@@ -244,4 +248,4 @@ export const dshPartnerScreenRegistry = [
     releaseCriticality: 'P0',
     status: 'UNPROVEN',
   },
-] as const satisfies readonly PartnerScreenRegistryItem[];
+] as const satisfies readonly DshPartnerScreenRegistryItem[];

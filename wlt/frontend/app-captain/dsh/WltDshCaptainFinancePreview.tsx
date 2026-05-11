@@ -20,13 +20,12 @@ import {
   Text,
   TopBar,
 } from '@bthwani/ui-kit';
-import {
-  getWltCaptainFinanceSnapshot,
-  getWltDshFinanceRecordsForActor,
-  type WltCaptainFinanceSection,
-  type WltCaptainFinanceSnapshot,
-  type WltDshFinancePreviewRecord,
+import type {
+  WltCaptainFinanceSection,
+  WltCaptainFinanceSnapshot,
+  WltDshFinancePreviewRecord,
 } from '../../shared/finance/dshFinancePreview';
+import { useWltDshCaptainFinancePreview } from './useWltDshCaptainFinancePreview';
 
 const PREVIEW_NOTICE =
   'هذا عرض تجريبي فقط — لا يوجد تسوية حقيقية ولا صرف فعلي حتى يُرفع وضع CONTRACT_TBD.';
@@ -74,11 +73,7 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
   );
 }
 
-function CodBalanceSection({ snapshot }: { snapshot: WltCaptainFinanceSnapshot }) {
-  const records = getWltDshFinanceRecordsForActor('captain').filter(
-    (r) => r.kind === 'cash-on-delivery',
-  );
-
+function CodBalanceSection({ snapshot, records }: { snapshot: WltCaptainFinanceSnapshot; records: readonly WltDshFinancePreviewRecord[] }) {
   return (
     <Surface tone="raised" padding={3} gap={3}>
       <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
@@ -107,11 +102,7 @@ function CodBalanceSection({ snapshot }: { snapshot: WltCaptainFinanceSnapshot }
   );
 }
 
-function EarningsSection({ snapshot }: { snapshot: WltCaptainFinanceSnapshot }) {
-  const records = getWltDshFinanceRecordsForActor('captain').filter(
-    (r) => r.kind === 'captain-earning',
-  );
-
+function EarningsSection({ snapshot, records }: { snapshot: WltCaptainFinanceSnapshot; records: readonly WltDshFinancePreviewRecord[] }) {
   return (
     <Surface tone="raised" padding={3} gap={3}>
       <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
@@ -167,8 +158,13 @@ export function WltDshCaptainFinancePreview({
   section = 'cod-balance',
   onBack,
 }: WltDshCaptainFinancePreviewProps) {
-  const snapshot = React.useMemo(() => getWltCaptainFinanceSnapshot(), []);
-  const [activeSection, setActiveSection] = React.useState<WltCaptainFinanceSection>(section);
+  const {
+    snapshot,
+    records,
+    activeSection,
+    setActiveSection,
+    availableSections,
+  } = useWltDshCaptainFinancePreview(section);
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 120 }}>
@@ -196,7 +192,7 @@ export function WltDshCaptainFinancePreview({
           القسم الحالي
         </Text>
         <View style={{ flexDirection: 'row-reverse', gap: 8, flexWrap: 'wrap' }}>
-          {(['cod-balance', 'earnings', 'settlement'] as WltCaptainFinanceSection[]).map((s) => (
+          {availableSections.map((s) => (
             <Button
               key={s}
               label={s === 'cod-balance' ? 'رصيد COD' : s === 'earnings' ? 'الأرباح' : 'التسوية'}
@@ -209,8 +205,8 @@ export function WltDshCaptainFinancePreview({
         </View>
       </Surface>
 
-      {activeSection === 'cod-balance' && <CodBalanceSection snapshot={snapshot} />}
-      {activeSection === 'earnings' && <EarningsSection snapshot={snapshot} />}
+      {activeSection === 'cod-balance' && <CodBalanceSection snapshot={snapshot} records={records} />}
+      {activeSection === 'earnings' && <EarningsSection snapshot={snapshot} records={records} />}
       {activeSection === 'settlement' && <SettlementSection snapshot={snapshot} />}
 
       <PreviewBanner />

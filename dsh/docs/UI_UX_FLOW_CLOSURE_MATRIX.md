@@ -65,9 +65,9 @@ Wave 00 preflight summary:
 | Surface | Current HEAD owner root | Canonical host / route anchor | Canonical screen-entry family | Preview / data family | Wave 01 rule |
 |---|---|---|---|---|---|
 | app-client | `dsh/frontend/app-client` | `DshSurfaceHost.tsx` | `Dsh*Screen.tsx` | `*Fixtures.ts`, `types.ts`, `builders.ts`, `store-profile.ts` | treat client heatmap as forbidden; keep preview/data files out of rename scope |
-| app-partner | `dsh/frontend/app-partner` | `DshPartnerSurface.tsx` plus partner entry/orders screens | `DshPartner*Screen.tsx` | `fixture-locations.ts`, `dshPartner*Model.ts`, `dshPartnerOperationalFlowIds.ts` | partner remains actor-owned; no heatmap placement allowed |
+| app-partner | `dsh/frontend/app-partner` | `DshPartnerSurface.tsx` plus partner entry/orders screens | `DshPartner*Screen.tsx` | `data/*.preview-data.ts`, `dsh-partner.types.ts`, `contracts/dsh-partner-binding.contracts.ts` | partner remains actor-owned; no heatmap placement allowed |
 | app-captain | `dsh/frontend/app-captain` | `DshCaptainEntryScreen.tsx`, `DshCaptainOrdersScreen.tsx`, `DshCaptainOperationsScreen.tsx` | `DshCaptain*Screen.tsx` | `fixture-locations.ts`, `dshCaptain*Model.ts`, `flow-map.ts`, `dshCaptainBinding.contracts.ts` | captain-scoped route/map is the only non-control-panel map exception |
-| app-field | `dsh/frontend/app-field` | `FieldSurfaceHost.tsx`, `mobile-entry.tsx` | `DshField*Screen.tsx` | `dshField*Model.ts`, `FieldOnboardingStorage.ts`, `fieldStoreModel.ts` | field remains visit/onboarding owned; no heatmap placement allowed |
+| app-field | `dsh/frontend/app-field` | `DshFieldSurface.tsx`, `mobile-entry.tsx` | `DshField*Screen.tsx` | `data/*.preview-data.ts`, `data/field-onboarding.storage.ts`, `contracts/dsh-field-binding.contracts.ts` | field remains visit/onboarding owned; no heatmap placement allowed |
 | control-panel | `dsh/frontend/control-panel` | `DshControlPanelSurfaceHost.tsx` and `control-panel/shell/ControlPanelSurfaceHost.tsx` | `ControlPanelDsh*Screen.tsx`, section screens under `dashboard/`, `finance/`, `operations/`, `support/`, `catalogs/`, `partners/`, `marketing/`, `control/` | `fixture-locations.ts`, `*.preview-data.ts`, section registries/types | live dispatch map belongs only to `operations/GeoHeatmapScreen.tsx` |
 | shared | `dsh/frontend/shared` | none | none | `*store.ts`, `catalog.ts`, `*PreviewModel.ts`, `workflow.ts`, `dshStoreProductCardModel.ts`, `store-card-commercial-map.ts` | shared is preview/data/helper only; never a routed surface |
 
@@ -81,7 +81,7 @@ Wave 00 preflight summary:
 | `*Fixtures.ts`, `fixture-locations.ts` | `FIXTURE` | fixture authority and data-contract gap closure only; not rename candidates in Wave 01 |
 | `*store.ts`, `*catalog.ts`, `*cardModel.ts`, `store-card-commercial-map.ts`, `promo-store.ts`, `video-store.ts` | `STORE_PREVIEW` | shared preview-store authority; can be consolidated only with import/consumer proof |
 | `surface-meta.ts`, `surface-catalog.ts`, `flow-meta.ts`, `flow-map.ts`, `*StateModel.ts`, `*Binding.contracts.ts`, `workflow.ts`, `types.ts`, `builders.ts`, `resolve*.ts`, `map*.ts`, `get*.ts` | `SHARED_HELPER` | metadata, helper, or bridge-only files; fix naming only when proof is explicit |
-| `DshSurfaceHost.tsx`, `FieldSurfaceHost.tsx`, `mobile-entry.tsx`, `DshControlPanelSurfaceHost.tsx` | `ROUTE_ADAPTER` | host or route adapter; do not rename without route and registry proof |
+| `DshSurfaceHost.tsx`, `DshFieldSurface.tsx`, `mobile-entry.tsx`, `DshControlPanelSurfaceHost.tsx` | `ROUTE_ADAPTER` | host or route adapter; do not rename without route and registry proof |
 | `dsh/frontend/app-client/DshHomeScreen.mappers.ts` | `DEAD_CANDIDATE` | archived in Wave 01 to `dsh/_archive/frontend/WAVE_01_DSH_FRONTEND_OWNERSHIP_CLASSIFICATION_CLOSURE-20260510-070100/app-client/DshHomeScreen.mappers.ts` after current-head no-import/no-registry proof |
 | manual-review items from B2C/B2D with unresolved owner proof | `AMBIGUOUS_BLOCKED` | keep blocked until import/export/registry evidence exists on current HEAD |
 
@@ -237,7 +237,7 @@ UI/UX/Flow is CLOSED for Control Panel Operations (Wave 04). Client/Partner/Fiel
 
 Notes:
 - archived file: `dsh/frontend/app-captain/DshSurfaceHost.tsx` -> `dsh/_archive/frontend/DSH_ARCHIVE_020_ACTIVE_FRONTEND_CLEANUP-20260506-225900/app-captain/DshSurfaceHost.tsx`
-- visible-noise cleanup stayed inside active files only: `dsh/frontend/control-panel/partners/workflow.ts` and `dsh/frontend/app-field/stores/dshFieldStoresModel.ts`
+- visible-noise cleanup stayed inside active files only: `dsh/frontend/control-panel/partners/workflow.ts` and `dsh/frontend/app-field/data/field-stores.preview-data.ts`
 - no active route screen, compat alias, or legacy fixture was moved in this slice
 
 ## DSH-DATA-017 Preview Data Authority Findings

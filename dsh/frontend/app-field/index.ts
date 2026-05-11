@@ -29,13 +29,13 @@ export { dshFieldScreenRegistry } from './dsh-field.screen-registry';
 export type { DshFieldScreenRegistryItem } from './dsh-field.screen-registry';
 
 // Legacy compatibility exports kept intentionally until all namespace consumers move to DshFieldSurface.
-export { DshFieldStoresScreen } from './DshFieldStoresScreen';
-export { DshFieldStoresHistoryScreen } from './DshFieldStoresHistoryScreen';
-export { DshFieldStoreOnboardingScreen } from './DshFieldStoreOnboardingScreen';
-export { DshFieldStoreVisitScreen } from './DshFieldStoreVisitScreen';
-export { DshFieldFinanceScreen } from './DshFieldFinanceScreen';
-export { DshFieldProfileScreen } from './DshFieldProfileScreen';
-export { DshFieldProfileHomeScreen } from './DshFieldProfileHomeScreen';
+export { DshFieldStoresScreen } from './screens/DshFieldStoresScreen';
+export { DshFieldStoresHistoryScreen } from './screens/DshFieldStoresHistoryScreen';
+export { DshFieldStoreOnboardingScreen } from './screens/DshFieldStoreOnboardingScreen';
+export { DshFieldStoreVisitScreen } from './screens/DshFieldStoreVisitScreen';
+export { DshFieldFinanceScreen } from './screens/DshFieldFinanceScreen';
+export { DshFieldProfileScreen } from './screens/DshFieldProfileScreen';
+export { DshFieldProfileHomeScreen } from './screens/DshFieldProfileHomeScreen';
 
 export type {
 	FieldLeadFilter,
@@ -46,7 +46,7 @@ export type {
 	FieldSectionSummary,
 	FieldStatusTone,
 	FieldStoreFile,
-} from './field-stores.preview-data';
+} from './data/field-stores.preview-data';
 
 export {
 	createEmptyDraft,
@@ -73,12 +73,12 @@ export {
 	submitFieldStoreForReview,
 	syncFieldStoreFromDraft,
 	touchFieldStoreDraft,
-} from './field-stores.preview-data';
+} from './data/field-stores.preview-data';
 
 export {
 	readFieldStoresLocal,
 	writeFieldStoresLocal,
-} from './FieldOnboardingStorage';
+} from './data/field-onboarding.storage';
 
 export type {
 	DshFieldStoreVisitErrors,
@@ -86,17 +86,17 @@ export type {
 	DshFieldStoreVisitState,
 	DshFieldStoreVisitValues,
 	DshFieldVisitEvidenceItem,
-} from './DshFieldStoreVisitScreen';
+} from './screens/DshFieldStoreVisitScreen';
 
 export type {
 	DshFieldStateModel,
 	DshFieldSurfaceId,
 	DshFieldSurfaceState,
-} from './field-state.preview-data';
+} from './data/field-state.preview-data';
 
 export type {
 	DshFieldBindingContract,
 	DshFieldBindingContracts,
-} from './dshFieldBinding.contracts';
+} from './contracts/dsh-field-binding.contracts';
 
-export { DSH_FIELD_BINDING_CONTRACTS } from './dshFieldBinding.contracts';
+export { DSH_FIELD_BINDING_CONTRACTS } from './contracts/dsh-field-binding.contracts';

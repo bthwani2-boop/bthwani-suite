@@ -1,0 +1,25 @@
+import {
+  getWltCaptainFinanceSnapshot,
+  getWltDshFinanceRecordsForActor,
+  type WltCaptainFinanceSection,
+} from '../../shared/finance/dshFinancePreview';
+import { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
+import type { WltDshCaptainBridgeState } from './wlt-dsh-captain.types';
+
+export const wltDshCaptainFinanceSections = [
+  'cod-balance',
+  'earnings',
+  'settlement',
+] as const satisfies readonly WltCaptainFinanceSection[];
+
+export const wltDshCaptainPreviewData = {
+  contract: wltDshCaptainBridgeDataContract,
+  finance: {
+    snapshot: getWltCaptainFinanceSnapshot(),
+    records: getWltDshFinanceRecordsForActor('captain'),
+    sections: wltDshCaptainFinanceSections,
+    defaultSection: 'cod-balance',
+  },
+} as const satisfies WltDshCaptainBridgeState & {
+  contract: typeof wltDshCaptainBridgeDataContract;
+};

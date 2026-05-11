@@ -30,6 +30,21 @@ export const DSH_PARTNER_OPERATIONAL_FLOW_IDS = [
 
 export type DshPartnerOperationalFlowId = (typeof DSH_PARTNER_OPERATIONAL_FLOW_IDS)[number];
 
+export type DshPartnerRoute =
+  | 'home'
+  | 'entry'
+  | 'inbox'
+  | 'detail'
+  | 'bell'
+  | 'support-directory'
+  | 'support-screen'
+  | 'inventory-management';
+
+export type DshPartnerSurfaceProps = {
+  initialRoute?: DshPartnerRoute;
+  initialOrderId?: string;
+};
+
 export type PartnerHubSection = 'hub' | 'profile' | 'operations' | 'inventory' | 'wallet' | 'analytics' | 'settings';
 
 export type PartnerDshSurfaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';

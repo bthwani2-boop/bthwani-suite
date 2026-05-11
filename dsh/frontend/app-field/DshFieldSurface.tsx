@@ -1,19 +1,19 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
 import { Box } from '@bthwani/ui-kit';
-import { DshFieldFinanceScreen } from './DshFieldFinanceScreen';
-import { DshFieldProfileHomeScreen } from './DshFieldProfileHomeScreen';
-import { DshFieldProfileScreen } from './DshFieldProfileScreen';
-import { DshFieldStoreOnboardingScreen } from './DshFieldStoreOnboardingScreen';
-import { DshFieldStoreVisitScreen, type DshFieldStoreVisitValues } from './DshFieldStoreVisitScreen';
-import { DshFieldStoresHistoryScreen } from './DshFieldStoresHistoryScreen';
-import { DshFieldStoresScreen } from './DshFieldStoresScreen';
-import { readFieldStoresLocal, writeFieldStoresLocal } from './FieldOnboardingStorage';
+import { DshFieldFinanceScreen } from './screens/DshFieldFinanceScreen';
+import { DshFieldProfileHomeScreen } from './screens/DshFieldProfileHomeScreen';
+import { DshFieldProfileScreen } from './screens/DshFieldProfileScreen';
+import { DshFieldStoreOnboardingScreen } from './screens/DshFieldStoreOnboardingScreen';
+import { DshFieldStoreVisitScreen, type DshFieldStoreVisitValues } from './screens/DshFieldStoreVisitScreen';
+import { DshFieldStoresHistoryScreen } from './screens/DshFieldStoresHistoryScreen';
+import { DshFieldStoresScreen } from './screens/DshFieldStoresScreen';
+import { readFieldStoresLocal, writeFieldStoresLocal } from './data/field-onboarding.storage';
 import {
   createManualFieldStore,
   submitFieldStoreForReview,
   type FieldStoreFile,
-} from './field-stores.preview-data';
+} from './data/field-stores.preview-data';
 import type { DshFieldNavigationCommand, DshFieldRouteState, DshFieldSurfaceProps } from './dsh-field.types';
 
 function isSameRoute(left: DshFieldRouteState, right: DshFieldRouteState) {

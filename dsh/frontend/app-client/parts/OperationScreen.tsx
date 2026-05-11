@@ -50,6 +50,8 @@ export function DshOperationScreen({
   onTertiaryAction,
   onRetry,
 }: DshOperationScreenProps) {
+  const hasActions = Boolean(primaryActionLabel || secondaryActionLabel || tertiaryActionLabel);
+
   if (state !== 'ready') {
     return renderNonReadyState(state, onRetry);
   }
@@ -63,14 +65,16 @@ export function DshOperationScreen({
 
       {content}
 
-      <Surface tone="inset" gap={3}>
-        <SectionHeader title="الإجراء" subtitle="زر رئيسي واحد مع مسار رجوع صغير وواضح." />
-        <Box gap={2}>
-          {primaryActionLabel ? <Button label={primaryActionLabel} onPress={onPrimaryAction} /> : null}
-          {secondaryActionLabel ? <Button label={secondaryActionLabel} tone="secondary" onPress={onSecondaryAction} /> : null}
-          {tertiaryActionLabel ? <Button label={tertiaryActionLabel} tone="ghost" onPress={onTertiaryAction} /> : null}
-        </Box>
-      </Surface>
+      {hasActions ? (
+        <Surface tone="inset" gap={3}>
+          <SectionHeader title="الإجراء" subtitle="زر رئيسي واحد مع مسار رجوع صغير وواضح." />
+          <Box gap={2}>
+            {primaryActionLabel ? <Button label={primaryActionLabel} onPress={onPrimaryAction} /> : null}
+            {secondaryActionLabel ? <Button label={secondaryActionLabel} tone="secondary" onPress={onSecondaryAction} /> : null}
+            {tertiaryActionLabel ? <Button label={tertiaryActionLabel} tone="ghost" onPress={onTertiaryAction} /> : null}
+          </Box>
+        </Surface>
+      ) : null}
     </MobileScrollView>
   );
 }
