@@ -1,32 +1,33 @@
 import React from 'react';
 import { BackHandler, Platform, View } from 'react-native';
 import { Surface, Text, colorPalette } from '@bthwani/ui-kit';
-import { DshSearchScreen } from './DshSearchScreen';
-import { DshEntryScreen } from './DshEntryScreen';
-import { DshClientBellScreen } from './DshClientBellScreen';
-import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './DshHomeGetScreen';
-import { DshMySpaceScreen } from './DshMySpaceScreen';
-import { DshNotificationsScreen } from './DshNotificationsScreen';
-import { DshBenefitsHubScreen } from './SubscriptionsHubScreen';
-import { DshOrdersListScreen, DshTrackingScreen } from './checkoutTracking';
-import { DshStoreGetScreen } from './DshStoreGetScreen';
-import { DshStoreItemsScreen } from './DshStoreItemsScreen';
-import { DshFavoriteToggleScreen } from './DshFavoriteToggleScreen';
-import { DshFavoritesListScreen } from './DshFavoritesListScreen';
-import { DshCartGetScreen } from './DshCartUnifiedScreen';
-import { type ClientOperationScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './DshClientOperationScreens';
-import type { DshHomeApprovedVideoReelsViewerProps } from './DshHomeApprovedVideoReelsViewer';
+import { DshSearchScreen } from './screens/SearchScreen';
+import { DshEntryScreen } from './screens/EntryScreen';
+import { DshClientBellScreen } from './screens/BellScreen';
+import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './screens/HomeScreen';
+import { DshMySpaceScreen } from './screens/MySpaceScreen';
+import { DshNotificationsScreen } from './screens/NotificationsScreen';
+import { DshBenefitsHubScreen } from './screens/BenefitsScreen';
+import { PreferencesScreen } from './screens/PreferencesScreen';
+import { DshOrdersListScreen, DshTrackingScreen } from './screens/OrdersTrackingScreens';
+import { DshStoreGetScreen } from './screens/StoreScreen';
+import { DshStoreItemsScreen } from './screens/StoreItemsScreen';
+import { DshFavoriteToggleScreen } from './screens/FavoriteToggleScreen';
+import { DshFavoritesListScreen } from './screens/FavoritesScreen';
+import { DshCartGetScreen } from './screens/CartScreen';
+import { type ClientOperationScreenId, DshConversationHubScreen, DshOrderIssueHubScreen, DshProxyHubScreen, DshServiceSettingsHubScreen, DshZoneSetScreen, DshListingStatusUpdateScreen } from './screens/OperationScreens';
+import type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
 import {
   dshHomeGetFixturePromos,
   dshHomeGetFixtureStores,
-} from './dshHomeGetFixtures';
+} from './data/home.preview-data';
 import {
   buildStoreCategories,
   buildStoreDeliveryModes,
   buildStoreTags,
   dshDiscoveryStores,
   storeItemsByStoreId,
-} from './dshStoreFixtures';
+} from './data/store.preview-data';
 import {
   getPublishedMarketingHomePromos,
   recordMarketingBannerClick,
@@ -38,16 +39,17 @@ import {
   recordMarketingGrowthImpression,
   type MarketingGrowthRecord,
 } from '../shared/growth.preview-store';
-import { getDshClientStateMeta, type DshClientState } from './client-state.preview-data';
+import { getDshClientStateMeta, type DshClientState } from './data/client-state.preview-data';
 // checkout and tracking routes are consolidated in checkoutTracking
 import { getPublishedHomePromos } from '../shared/promo.preview-store';
-import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './dshCategoriesFixtures';
+import { dshCategoryFixtures, dshCategoryListFixtures, getDshCategoryFixture } from './data/categories.preview-data';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 
 export type DshRoute =
   | 'home'
   | 'entry'
   | 'my-space'
+  | 'preferences'
   | 'notifications'
   | 'store-items'
   | 'cart-get'
@@ -623,10 +625,20 @@ export function DshSurfaceHost({ command, onExit, onOpenService, renderApprovedV
           badgeLabel: item.family === 'subscription' ? 'اشتراك' : item.family === 'promotion' ? 'برومو' : item.family === 'shorts' ? 'شورتات' : 'حملة',
         }))}
         onOpenOrders={() => setRoute('orders-list')}
+        onOpenPreferences={() => setRoute('preferences')}
         onOpenTracking={() => openTrackedOrder()}
         onRepeatOrder={openCreateOrderJourney}
         onBack={() => setRoute('home')}
         onRetry={() => setRoute('my-space')}
+      />
+    );
+  }
+
+  if (route === 'preferences') {
+    return (
+      <PreferencesScreen
+        onBack={() => setRoute('my-space')}
+        onRetry={() => setRoute('preferences')}
       />
     );
   }

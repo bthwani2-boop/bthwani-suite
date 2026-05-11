@@ -17,7 +17,7 @@
 - `app-field/shell/**`
 - `control-panel/composition/**`, `control-panel/shell/**`, `control-panel/runtime/app/**`
 - `dsh/media-fixtures/**`
-- `wlt/frontend/app-client/dsh/hooks/useWlt.ts`
+- `wlt/frontend/app-client/dsh/useWltDshWalletPreview.ts`
 
 قواعد الإثبات المستخدمة هنا:
 
@@ -275,7 +275,7 @@ DSH-CAP-002 live-code hardening now shares banner routing and seed data through 
 | Operations workspace data | `dsh/frontend/control-panel/operations/operations.preview-data.ts` | preview data | operations hub and its workspaces | NO | control-room visualization فقط |
 | Field onboarding storage | `dsh/frontend/app-field/onboarding/FieldOnboardingStorage.ts` | localStorage + seed fallback | field onboarding flow | NO | local persistence لا يساوي backend sync |
 | Seed media assets | `dsh/media-fixtures/assets/seed/dsh/*` | seed media | client home/store visuals | NO | 20 asset files + README within media-fixtures tree |
-| WLT dependency | `wlt/frontend/app-client/dsh/hooks/useWlt.ts` | runtime dependency path | checkout/payment-adjacent client flow | PARTIAL | يثبت dependency path لا اكتمال checkout |
+| WLT dependency | `wlt/frontend/app-client/dsh/useWltDshWalletPreview.ts` | runtime dependency path | checkout/payment-adjacent client flow | PARTIAL | يثبت dependency path لا اكتمال checkout |
 | OpenAPI contract file | `dsh/dsh.openapi.yaml` | contract source | future API binding | NO for runtime | وجود العقد لا يثبت implementation |
 | Backend tree | `dsh/backend/**` | scaffold/backend source | none proven end-to-end | NO | scaffold presence only |
 | Domain tree | `dsh/domain/**` | domain source | none proven end-to-end | NO | minimal domain footprint |

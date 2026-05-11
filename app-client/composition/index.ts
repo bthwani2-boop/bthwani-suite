@@ -1,6 +1,6 @@
 import {
   DshHomeApprovedVideoReelsViewer,
-  DshSurfaceHost,
+  DshClientSurface,
   type DshCommandTarget,
   type DshHomeApprovedVideoReelsViewerProps,
 } from '../../dsh/frontend/app-client';
@@ -8,7 +8,7 @@ import {
 export type AppClientServiceId = 'dsh';
 
 export type AppClientServiceRegistryEntry = {
-  readonly SurfaceHost: typeof DshSurfaceHost;
+  readonly SurfaceHost: typeof DshClientSurface;
   readonly ApprovedVideoReelsViewer: typeof DshHomeApprovedVideoReelsViewer;
 };
 
@@ -18,7 +18,7 @@ export const appClientServiceLabels = {
 
 export const appClientSurfaceRegistry = {
   dsh: {
-    SurfaceHost: DshSurfaceHost,
+    SurfaceHost: DshClientSurface,
     ApprovedVideoReelsViewer: DshHomeApprovedVideoReelsViewer,
   },
 } as const satisfies Record<AppClientServiceId, AppClientServiceRegistryEntry>;
@@ -31,5 +31,5 @@ export function useServiceLabels() {
   return appClientServiceLabels;
 }
 
-export { DshSurfaceHost, DshHomeApprovedVideoReelsViewer };
+export { DshClientSurface, DshClientSurface as DshSurfaceHost, DshHomeApprovedVideoReelsViewer };
 export type { DshCommandTarget, DshHomeApprovedVideoReelsViewerProps };

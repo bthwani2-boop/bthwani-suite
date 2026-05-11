@@ -67,6 +67,56 @@ closure_decision: ROOT_TRUTH_PARITY_IN_PROGRESS
 
 خدمة التسوق والتوصيل: المتاجر، المنتجات، السلة، الدفع عبر WLT، الطلب، تجهيز الشريك، التوصيل، التتبع، الدعم، والتقييم.
 
+<!-- DSH_CLIENT_APP_SCOPE_STANDARDIZATION:start -->
+## DSH Client App-Scope Standardization
+
+This section standardizes how DSH closes inside `app-client` as a service-owned customer surface while preserving app-shell ownership and WLT financial ownership.
+
+### Scope Rings
+
+1. `dsh/frontend/app-client/**`
+2. `wlt/frontend/app-client/dsh/**`
+3. `wlt/frontend/shared/finance/**`
+4. `app-client/composition/**`
+5. `app-client/shell/**`
+6. `dsh/frontend/shared/**`
+
+### Ownership Rules
+
+- No service named `core` exists in this surface.
+- App-owned screens use `ownerKind: 'app'` and `ownerId: 'app-client'`.
+- DSH-owned screens use `ownerKind: 'service'`, `ownerId: 'dsh'`, and `serviceId: 'dsh'`.
+- WLT-owned DSH integration uses `ownerKind: 'integration'`, `ownerId: 'wlt.dsh'`, `serviceId: 'wlt'`, and `linkedServiceId: 'dsh'`.
+- WLT owns money semantics and wallet semantics.
+- DSH owns store, cart, checkout intent, order, delivery, tracking, support, and DSH-only delivery preferences.
+
+### Canonical Client Structure
+
+```text
+dsh/frontend/app-client/
+├─ index.ts
+├─ DshClientSurface.tsx
+├─ dsh-client.routes.ts
+├─ dsh-client.screen-registry.ts
+├─ dsh-client.types.ts
+├─ screens/
+├─ parts/
+├─ data/
+└─ shared/
+```
+
+### WLT DSH Bridge
+
+The app-client DSH checkout boundary may consume WLT only through a public bridge/contract path. Preview-only payment values must remain explicitly non-accounting and non-runtime.
+
+### Current Standardization Status
+
+- `DshClientSurface` is introduced as the new app-client-facing surface boundary with `DshSurfaceHost` compatibility preserved.
+- `dsh-client.routes.ts` and `dsh-client.screen-registry.ts` are introduced as the passive route/screen metadata layer.
+- `PreferencesScreen` is introduced for DSH-only delivery preferences and is distinct from legacy `service-settings` flow semantics.
+- WLT bridge standardization remains in progress until all DSH cart/payment consumers use the public bridge boundary consistently.
+<!-- DSH_CLIENT_APP_SCOPE_STANDARDIZATION:end -->
+
 ---
 
 ## 2. Ownership and Boundaries

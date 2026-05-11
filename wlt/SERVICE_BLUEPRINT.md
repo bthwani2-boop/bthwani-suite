@@ -410,7 +410,7 @@ NOT CLOSED
 | --- | --- | --- |
 | WLT-owned DSH finance preview model created | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
 | Deep cross-package import removed from PartnerDshWalletWorkspace | `wlt/frontend/app-partner/dsh/PartnerDshWalletWorkspace.tsx` | `BOUNDARY_FIXED` |
-| Arabic label for selected state | `wlt/frontend/app-client/dsh/DshWltPaymentOptionsRow.tsx` | `FIXED` |
+| Arabic label for selected state | `wlt/frontend/app-client/dsh/WltDshPaymentOptionsRow.tsx` | `FIXED` |
 | Control-panel finance preview component added | `wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
 | TSC result | pnpm -w exec tsc --noEmit | `PASS` |
 | OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |

@@ -26,7 +26,7 @@ import {
   type MarketingVideoSource,
   type MarketingVideoTargetType,
 } from '../../shared/video.preview-store';
-import { dshCategoryFixtures } from '../../app-client/dshCategoriesFixtures';
+import { dshCategoryFixtures } from '../../app-client/data/categories.preview-data';
 import { dshDiscoveryStores } from '../../app-client/discoveryFixtures';
 import { storeItemsByStoreId } from '../../app-client/itemsFixtures';
 

@@ -1,5 +1,1 @@
-export const surfaceMeta = {
-  id: 'app-client',
-  owner: 'dsh',
-  placeholder: false,
-} as const;
+export { surfaceMeta } from './data/surface-meta.preview-data';

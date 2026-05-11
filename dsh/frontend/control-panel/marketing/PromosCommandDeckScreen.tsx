@@ -11,7 +11,7 @@ import {
   toggleHomePromoStatus,
   type HomePromoRecord,
 } from '../../shared/promo.preview-store';
-import { dshCategoryFixtures } from '../../app-client/dshCategoriesFixtures';
+import { dshCategoryFixtures } from '../../app-client/data/categories.preview-data';
 import { dshDiscoveryStores } from '../../app-client/discoveryFixtures';
 import { storeItemsByStoreId } from '../../app-client/itemsFixtures';
 import { resolveDshImageSource } from '../../app-client/resolve-image-source';

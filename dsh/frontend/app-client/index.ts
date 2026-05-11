@@ -158,7 +158,20 @@ export type {
 	DshClientWalletVisibility,
 } from './dshClientBinding.contracts';
 // 'tracking' and 'checkout' families were consolidated; explicit exports removed.
-export { DshHomeApprovedVideoReelsViewer } from './DshHomeApprovedVideoReelsViewer';
-export type { DshHomeApprovedVideoReelsViewerProps } from './DshHomeApprovedVideoReelsViewer';
-export { DshSurfaceHost } from './DshSurfaceHost';
-export type { DshCommandTarget, DshRoute } from './DshSurfaceHost';
+export { DshHomeApprovedVideoReelsViewer } from './parts/ApprovedVideoReelsViewer';
+export type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
+export { DshClientSurface, DshSurfaceHost } from './DshClientSurface';
+export type {
+	DshClientSurfaceProps,
+	DshCommandTarget,
+	DshRoute,
+	DshSurfaceHostProps,
+} from './dsh-client.types';
+export { dshClientRoutes } from './dsh-client.routes';
+export type {
+	DshClientLegacyRoute,
+	DshClientRouteId,
+	DshClientRouteRecord,
+} from './dsh-client.routes';
+export { dshClientScreenRegistry } from './dsh-client.screen-registry';
+export type { DshClientScreenRegistryItem } from './dsh-client.screen-registry';

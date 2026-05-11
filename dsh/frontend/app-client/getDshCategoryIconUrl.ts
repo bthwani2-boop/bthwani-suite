@@ -1,19 +1,4 @@
-import { resolveDevMediaUrl } from './resolveDevMediaUrl';
-
-export const DSH_CATEGORY_ICONS_PATH = 'categories/dsh';
-
-const ICON_CACHE_VERSION = 6;
-
-export function getDshCategoryIconUrl(categoryId: string): string | null {
-  if (!categoryId?.trim()) {
-    return null;
-  }
-
-  const url = resolveDevMediaUrl(`${DSH_CATEGORY_ICONS_PATH}/${categoryId.trim()}.png`);
-
-  if (!url) {
-    return null;
-  }
-
-  return `${url}?v=${ICON_CACHE_VERSION}`;
-}
+export {
+  DSH_CATEGORY_ICONS_PATH,
+  getDshCategoryIconUrl,
+} from './shared/get-dsh-category-icon-url';
