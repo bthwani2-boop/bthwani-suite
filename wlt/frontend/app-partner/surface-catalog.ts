@@ -1,1 +1,1 @@
-export const surfaceCatalog = ['partner-dsh-wallet-workspace'] as const;
+export const surfaceCatalog = ['partner-dsh-wallet-bridge'] as const;

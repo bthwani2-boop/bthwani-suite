@@ -1,0 +1,27 @@
+// UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+export const dshPartnerOrderConversationPreviewDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'not_applicable',
+  moneySemantics: 'not_applicable',
+} as const;
+
+export type DshPartnerOrderConversationMode = 'pickup' | 'store_delivery' | 'platform_delivery';
+
+export type DshPartnerOrderConversationMessage = {
+  id: string;
+  authorLabel: string;
+  body: string;
+  timestampLabel: string;
+  acknowledged?: boolean;
+};
+
+export type DshPartnerOrderConversationVisibility = 'enabled' | 'disabled-for-mode';
+
+export function shouldShowDshPartnerOrderConversation(
+  mode: DshPartnerOrderConversationMode
+): DshPartnerOrderConversationVisibility {
+  return mode === 'platform_delivery' ? 'disabled-for-mode' : 'enabled';
+}

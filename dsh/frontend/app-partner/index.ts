@@ -1,88 +1,12 @@
-export { surfaceMeta } from './surface-meta';
-export { surfaceCatalog } from './surface-catalog';
-export {
-	DshPartnerConsoleScreen,
-	PartnerDshConsoleScreen,
-} from './DshPartnerConsoleScreen';
-export type { StoreProfileWorkspaceContentProps } from './StoreProfileWorkspaceContent';
-export { StoreProfileWorkspaceContent } from './StoreProfileWorkspaceContent';
-export type { InventoryCatalogWorkspaceContentProps } from './InventoryCatalogWorkspaceContent';
-export { InventoryCatalogWorkspaceContent } from './InventoryCatalogWorkspaceContent';
-export type { AnalyticsGrowthMarketingWorkspaceContentProps } from './AnalyticsGrowthMarketingWorkspaceContent';
-export { AnalyticsGrowthMarketingWorkspaceContent } from './AnalyticsGrowthMarketingWorkspaceContent';
 export type {
-	DshEntryScreenProps,
-	DshEntryScreenState,
-	DshPartnerEntryScreenProps,
-	DshPartnerEntryScreenState,
-} from './DshPartnerEntryScreen';
-export {
-	DshEntryScreen,
-	DshPartnerEntryScreen,
-} from './DshPartnerEntryScreen';
-export type {
-	PartnerOrderDetailScreenProps,
-	PartnerOrderDetailScreenState,
-	PartnerOrderDetailSummary,
-	PartnerOrderItem,
-	PartnerOrdersHomeScreenProps,
-	PartnerOrdersHomeScreenState,
-	PartnerOrdersInboxListItem,
-	PartnerOrdersInboxScreenProps,
-	PartnerOrdersInboxScreenState,
-} from './DshPartnerOrdersScreen';
-export {
-	DshPartnerOrdersScreen,
-	PartnerOrderDetailScreen,
-	PartnerOrdersHomeScreen,
-	PartnerOrdersInboxScreen,
-} from './DshPartnerOrdersScreen';
-export type { DshPartnerOrderActionPanelProps } from './DshPartnerOrderActionPanel';
-export { DshPartnerOrderActionPanel } from './DshPartnerOrderActionPanel';
-export type { DshPartnerOrderIssuePanelProps } from './DshPartnerOrderIssuePanel';
-export { DshPartnerOrderIssuePanel } from './DshPartnerOrderIssuePanel';
-export type { DshPartnerOrderConversationPanelProps } from './DshPartnerOrderConversationPanel';
-export { DshPartnerOrderConversationPanel } from './DshPartnerOrderConversationPanel';
-export type {
-	DshPartnerOrderConversationMessage,
-	DshPartnerOrderConversationMode,
-	DshPartnerOrderConversationVisibility,
-} from './partner-order-conversation.preview-data';
-export { shouldShowDshPartnerOrderConversation } from './partner-order-conversation.preview-data';
-export type { DshPartnerOrderAlertsPanelProps } from './DshPartnerOrderAlertsPanel';
-export { DshPartnerOrderAlertsPanel } from './DshPartnerOrderAlertsPanel';
-export type {
-	DshPartnerOrderAlertId,
-	DshPartnerOrderAlertItem,
-	DshPartnerOrderAlertStatus,
-} from './partner-order-alert.preview-data';
-export type {
-	DshInventoryManagementScreenProps,
-	DshPartnerInventoryScreenProps,
-} from './DshPartnerInventoryScreen';
-export {
-	DshInventoryManagementScreen,
-	DshPartnerInventoryScreen,
-} from './DshPartnerInventoryScreen';
-export type { DshPartnerInventoryActionPanelProps } from './DshPartnerInventoryActionPanel';
-export { DshPartnerInventoryActionPanel } from './DshPartnerInventoryActionPanel';
-// operations: DshPartnerOperationsDirectoryScreen archived (DSH_ARCHIVE_021)
-export type {
-	DshPartnerCommissionSummary,
-	DshPartnerFinanceBridgeState,
-	DshPartnerFinanceMode,
-	DshPartnerSettlementSummary,
-} from './partner-finance.preview-data';
-export type { DshPartnerFinanceBridgePanelProps } from './DshPartnerFinanceBridgePanel';
-export { DshPartnerFinanceBridgePanel } from './DshPartnerFinanceBridgePanel';
-export type { DshPartnerSettlementSummaryPanelProps } from './DshPartnerSettlementSummaryPanel';
-export { DshPartnerSettlementSummaryPanel } from './DshPartnerSettlementSummaryPanel';
-export type { DshPartnerCommissionSummaryPanelProps } from './DshPartnerCommissionSummaryPanel';
-export { DshPartnerCommissionSummaryPanel } from './DshPartnerCommissionSummaryPanel';
-export type { DshPartnerOperationalFlowId } from './dshPartnerOperationalFlowIds';
-export { DSH_PARTNER_OPERATIONAL_FLOW_IDS } from './dshPartnerOperationalFlowIds';
-export type { DshPartnerOnboardingActionPanelProps } from './DshPartnerOnboardingActionPanel';
-export { DshPartnerOnboardingActionPanel } from './DshPartnerOnboardingActionPanel';
-export type { DshPartnerVideoSubmissionPanelProps } from './DshPartnerVideoSubmissionPanel';
-export { DshPartnerVideoSubmissionPanel } from './DshPartnerVideoSubmissionPanel';
-export { flowMeta } from './flow-meta';
+	DshPartnerHubSurfaceProps,
+	DshPartnerOperationalFlowId,
+	PartnerDshSurfaceState,
+	PartnerHubSection,
+} from './dsh-partner.types';
+export { DshPartnerSurface } from './DshPartnerSurface';
+export type { DshPartnerRoute, DshPartnerSurfaceProps } from './DshPartnerSurface';
+export type { DshPartnerRouteId, DshPartnerRouteRecord } from './dsh-partner.routes';
+export { dshPartnerRoutes } from './dsh-partner.routes';
+export type { PartnerScreenRegistryItem as DshPartnerScreenRegistryItem } from './dsh-partner.screen-registry';
+export { dshPartnerScreenRegistry } from './dsh-partner.screen-registry';

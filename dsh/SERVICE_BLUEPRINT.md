@@ -40,7 +40,7 @@ dsh/dsh.openapi.yaml
 | Surface | Status | Evidence Path | Note |
 |---|---|---|---|
 | app-client | `UI_PREVIEW_ONLY` | `dsh/frontend/app-client/` | No-API logic, fixture-backed discovery. |
-| app-partner | `UI_PREVIEW_ONLY` | `dsh/frontend/app-partner/` | Local console, intake flow proven. |
+| app-partner | `UI_PREVIEW_ONLY` | `dsh/frontend/app-partner/` | Partner gate evidence in progress; do not treat as CLOSED until DSH partner P6 passes. |
 | app-captain | `UI_PREVIEW_ONLY` | `dsh/frontend/app-captain/` | Captain-scoped map only. |
 | app-field | `UI_PREVIEW_ONLY` | `dsh/frontend/app-field/` | Field visit onboarding proven. |
 | control-panel | `UI_PREVIEW_ONLY` | `dsh/frontend/control-panel/` | Admin live dispatch preview map only. |
@@ -172,7 +172,7 @@ The app-client DSH checkout boundary may consume WLT only through a public bridg
 | --- | --- | --- | --- | --- |
 | `app-client` | Customer: اكتشاف المتاجر، المنتجات، السلة، checkout، الدفع، التتبع، الدعم، التقييم. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
 | `webapp` | Customer Web: نسخة ويب وظيفية مكافئة لـ app-client عند النضج. | service-owned frontend slice closed | CLOSED | N/A |
-| `app-partner` | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
+| `app-partner` | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | frontend standardized; UI_PREVIEW_ONLY | GATE_PENDING | DSH partner P6 gate pending |
 | `app-captain` | Captain: قبول مهمة التوصيل، الاستلام، التسليم، البلاغات، الإكمال. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
 | `app-field` | Field Agent: تفعيل المتاجر والدعم الميداني عند الحاجة المثبتة. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
 | `control-panel` | Admin/Ops: مراقبة، تشغيل، دعم، كتالوج، تدخل، تقارير. | frontend closed; UI_PREVIEW_ONLY | CLOSED | N/A |
@@ -207,7 +207,7 @@ The app-client DSH checkout boundary may consume WLT only through a public bridg
 |---|---|---|---|---|
 | `app-client` | app owns shell/composition only | Customer: اكتشاف المتاجر، المنتجات، السلة، checkout، الدفع، التتبع، الدعم، التقييم. | CLOSED | N/A |
 | `webapp` | app owns shell/composition only | Customer Web: نسخة ويب وظيفية مكافئة لـ app-client عند النضج. | CLOSED | N/A |
-| `app-partner` | app owns shell/composition only | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | CLOSED | N/A |
+| `app-partner` | app owns shell/composition only | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | GATE_PENDING | DSH partner P6 gate pending |
 | `app-captain` | app owns shell/composition only | Captain: قبول مهمة التوصيل، الاستلام، التسليم، البلاغات، الإكمال. | CLOSED | N/A |
 | `app-field` | app owns shell/composition only | Field Agent: تفعيل المتاجر والدعم الميداني عند الحاجة المثبتة. | CLOSED | N/A |
 | `control-panel` | app owns shell/composition only | Admin/Ops: مراقبة، تشغيل، دعم، كتالوج، تدخل، تقارير. | CLOSED | N/A |
@@ -486,3 +486,50 @@ Complete Screen/API Matrix evidence collection and begin Runtime Binding (Wave 0
 7. Update this file only with verified service-specific truth.
 8. Do not duplicate platform-wide rules here.
 9. Do not claim `CLOSED` unless all applicable gates pass.
+
+<!-- DSH_PARTNER_APP_SCOPE_STANDARDIZATION:start -->
+## DSH Partner App-Scope Standardization
+
+Scope: DSH partner only.
+
+Ownership:
+- DSH owns partner delivery operations: store profile, operations, orders, order issues, inventory, promotions, notifications, settings, and support.
+- WLT owns wallet, balance, settlements, payouts, commission, and money semantics.
+- ARB is not part of `dsh/frontend/app-partner`.
+- No service named `core`.
+
+Canonical structure:
+
+```text
+dsh/frontend/app-partner/
+├─ index.ts
+├─ DshPartnerSurface.tsx
+├─ dsh-partner.routes.ts
+├─ dsh-partner.screen-registry.ts
+├─ dsh-partner.types.ts
+├─ screens/
+├─ parts/
+├─ data/
+└─ shared/
+```
+
+Canonical DSH partner screens:
+`PartnerHomeScreen`, `PartnerEntryScreen`, `StoreProfileScreen`, `OperationsScreen`, `OrdersInboxScreen`, `OrderDetailScreen`, `OrderIssueScreen`, `InventoryCatalogScreen`, `PromotionsScreen`, `NotificationsScreen`, `PartnerSettingsScreen`, `PartnerSupportScreen`.
+
+WLT-owned DSH partner bridge:
+`wlt/frontend/app-partner/dsh/index.ts`, `WltDshPartnerBridge.tsx`, `wlt-dsh-partner.parts.tsx`, `wlt-dsh-partner.adapter.ts`, `wlt-dsh-partner.contract.ts`, `wlt-dsh-partner.preview-data.ts`, `wlt-dsh-partner.types.ts`, `useWltDshPartnerWalletPreview.ts`.
+
+Archived finance remnants:
+Dead DSH-owned wallet/finance preview files must move to `dsh/_archive/frontend/**` once they are proven unreferenced.
+
+Gates:
+- no `export *`
+- no `serviceId: 'core'`
+- no Tamagui outside `ui-kit`
+- no DSH-owned wallet/finance screen
+- no ARB route in DSH partner surface
+- all scoped files classified once
+- `git --no-pager diff --check`
+- `pnpm -w exec tsc --noEmit`
+
+<!-- DSH_PARTNER_APP_SCOPE_STANDARDIZATION:end -->

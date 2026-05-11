@@ -132,9 +132,9 @@ Execution:
    timezoneSemantics حسب وجود الوقت
    moneySemantics='preview-only display values / not accounting source' للملفات المالية
 3) افحص:
-   DshPartnerWalletPreview.tsx
-   DshPartnerFinanceBridgePanel.tsx
-   partner-finance.preview-data.ts
+   parts/PartnerWalletPreview.tsx
+   parts/PartnerFinanceBridgePanel.tsx
+   data/partnerFinancePreviewData.ts
    أي settlement/commission/balance/payout في DSH.
 4) إذا الملف DSH-owned ويعرض wallet/balance/settlement:
    - لا تغير UI.
@@ -208,9 +208,9 @@ Forbidden screens inside DSH:
 Execution:
 1) Preflight git + diff-check + tsc.
 2) Create folders screens/parts/data/shared.
-3) Convert DshPartnerConsoleScreen role:
-   - If it is the current real surface, create DshPartnerSurface.tsx as the public surface.
-   - Preserve DshPartnerConsoleScreen as internal/compat only if required.
+3) Convert DshPartnerHubSurface role:
+   - Keep DshPartnerSurface.tsx as the public surface.
+   - Preserve DshPartnerConsoleScreen as compat shim only if required.
    - Do not break app-partner/composition.
 4) Create dsh-partner.routes.ts with route IDs:
    dsh-partner-home, dsh-partner-entry, dsh-partner-store-profile, dsh-partner-operations, dsh-partner-orders, dsh-partner-order-detail, dsh-partner-order-issue, dsh-partner-inventory, dsh-partner-promotions, dsh-partner-notifications, dsh-partner-settings, dsh-partner-support.
@@ -241,7 +241,7 @@ moves.csv, import-updates.csv, routes-registry-audit.txt, screen-registry-audit.
 نفّذ DSH_PARTNER_P3_PUBLIC_API_PLACEHOLDER_CLEANUP فقط داخل C:\bthwani-suite.
 
 Goal:
-تنظيف dsh/frontend/app-partner/index.ts وapp-partner/composition/index.ts وapp-partner/composition/compat.tsx من export-star والbarrel الواسع والplaceholder noise، بدون كسر التشغيل.
+تنظيف dsh/frontend/app-partner/index.ts وapp-partner/composition/index.ts وapp-partner/shell/PartnerSurfaceHost.tsx من export-star والbarrel الواسع والplaceholder noise، بدون كسر التشغيل.
 
 Allowed scope:
 - dsh/frontend/app-partner/index.ts
@@ -271,7 +271,7 @@ Execution:
    - أي compatibility export يجب توثيقه بتعليق قصير.
 3) app-partner/composition/index.ts:
    - استبدل export * من compat بتصديرات صريحة.
-4) app-partner/composition/compat.tsx:
+4) app-partner/shell/PartnerSurfaceHost.tsx:
    - افحص placeholders.
    - أي placeholder له route حقيقي يجب تحويله إلى شاشة/part أو إزالته إذا dead/unreferenced.
    - أي placeholder ضروري مؤقتًا يصنف COMPAT_PLACEHOLDER_PENDING_REMOVAL.

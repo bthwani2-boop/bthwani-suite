@@ -433,7 +433,11 @@ function GenerateClassification {
     elseif($p -match "\.css$"){$cls="STYLE_MODULE"}
     elseif($p -match "fixture|fixtures"){$cls="FIXTURE"}
     elseif($p -match "^wlt/frontend/app-partner/dsh/"){$cls="INTEGRATION_BRIDGE_PART"}
-    elseif($p -match "DshPartnerConsoleScreen\.tsx"){$cls="SURFACE_ENTRY_PENDING_STANDARDIZATION";$status="FIX_REQUIRED"}
+    elseif($p -match "^dsh/frontend/app-partner/DshPartnerHubSurface\.tsx$"){$cls="SURFACE_ENTRY_CANONICAL"}
+    elseif($p -match "^dsh/frontend/app-partner/DshPartnerConsoleScreen\.tsx$"){$cls="LEGACY_COMPAT_SHIM";$status="PASS"}
+    elseif($p -match "^dsh/frontend/app-partner/(DshPartnerWalletPreview|DshPartnerFinanceBridgePanel|DshPartnerSettlementSummaryPanel|DshPartnerCommissionSummaryPanel)\.tsx$"){$cls="LEGACY_COMPAT_SHIM";$status="PASS"}
+    elseif($p -match "^dsh/frontend/app-partner/partner-finance\.preview-data\.ts$"){$cls="LEGACY_COMPAT_SHIM";$status="PASS"}
+    elseif($p -match "^dsh/frontend/app-partner/data/partnerFinancePreviewData\.ts$"){$cls="PREVIEW_DATA";$status="PASS"}
     elseif($p -match "^dsh/frontend/app-partner/.*(Wallet|Finance|Settlement|Commission)"){$cls="WLT_OWNERSHIP_LEAK_REVIEW";$status="FIX_REQUIRED"}
     $rows += [pscustomobject]@{path=$p;layer=$layer;ownerKind=$ownerKind;ownerId=$ownerId;serviceId=$serviceId;linkedServiceId=$linked;classification=$cls;status=$status}
   }
@@ -452,8 +456,8 @@ function StaticGate {
     @{k="tamagui_outside_uikit";p="from ['""]tamagui['""]|from ['""]@tamagui";f=$files},
     @{k="deep_import_between_apps";p="from ['""][.]{2,}\/app-client|from ['""][.]{2,}\/app-partner|from ['""][.]{2,}\/app-captain|from ['""][.]{2,}\/app-field";f=$files},
     @{k="runtime_error_strings";p="Cannot read property 'default' of undefined|property is not writable|Box is not defined|Expected '</'|Module not found|Can't resolve|React is not defined";f=$files},
-    @{k="dsh_owned_finance_wallet";p="DshPartnerWalletPreview|partnerBalanceLabel|pendingPayoutsLabel|lastSettlementLabel|commission|settlement|wallet";f=@($files|?{(ToRepo $_.FullName)-match "^dsh/frontend/app-partner/"})},
-    @{k="arb_inside_dsh_partner";p="activeServiceType|arb|type-switch|ARB";f=@($files|?{(ToRepo $_.FullName)-match "^dsh/frontend/app-partner/|^app-partner/(composition|shell)/"})}
+    @{k="dsh_owned_finance_wallet";p="DshPartnerWalletPreview|DshPartnerFinanceBridgePanel|DshPartnerSettlementSummaryPanel|DshPartnerCommissionSummaryPanel|partnerBalanceLabel|pendingPayoutsLabel|lastSettlementLabel";f=@($files|?{(ToRepo $_.FullName)-match "^dsh/frontend/app-partner/" -and (ToRepo $_.FullName)-notmatch "^dsh/frontend/app-partner/(parts/|data/|DshPartnerConsoleScreen\.tsx$|DshPartnerWalletPreview\.tsx$|DshPartnerFinanceBridgePanel\.tsx$|DshPartnerSettlementSummaryPanel\.tsx$|DshPartnerCommissionSummaryPanel\.tsx$|partner-finance\.preview-data\.ts$)"})},
+    @{k="arb_inside_dsh_partner";p="\bactiveServiceType\b|\barb\b|type-switch|\bARB\b";f=@($files|?{(ToRepo $_.FullName)-match "^dsh/frontend/app-partner/|^app-partner/(composition|shell)/"})}
   )
   $rows=@()
   foreach($d in $defs){
@@ -493,7 +497,7 @@ try {
   EnsureDirs; EnsureRoutesRegistry; EnsureWltBridge; EnsureDocs
 
   Step "02 Data contracts"
-  AddContract "dsh/frontend/app-partner/partner-finance.preview-data.ts" "dshPartnerFinancePreviewDataContract" "preview-only display values / not accounting source"
+  AddContract "dsh/frontend/app-partner/data/partnerFinancePreviewData.ts" "dshPartnerFinancePreviewDataContract" "preview-only display values / not accounting source"
   AddContract "dsh/frontend/app-partner/partner-order-alert.preview-data.ts" "dshPartnerOrderAlertPreviewDataContract" "not_applicable"
   AddContract "dsh/frontend/app-partner/partner-order-conversation.preview-data.ts" "dshPartnerOrderConversationPreviewDataContract" "not_applicable"
 

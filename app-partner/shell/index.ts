@@ -1,3 +1,2 @@
-export { PartnerSurfaceHost } from './PartnerSurfaceHost';
+export { PartnerSurfaceHost, type PartnerSurfaceHostProps } from './PartnerSurfaceHost';
 export { default } from './mobile-entry';
-export * from './mobile-entry';
