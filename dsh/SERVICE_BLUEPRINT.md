@@ -31,9 +31,9 @@ dsh/dsh.openapi.yaml
 | Truth File | `dsh/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
-| Current Decision | `ROOT_TRUTH_PARITY_HARDENED` |
-| Current Status | `ROOTED_FRONTEND_CLOSED_UI_PREVIEW` |
-| Evidence Root | `tools/registry/runs/{SESSION_ID}` |
+| Current Decision | `DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3_CLOSED` |
+| Current Status | `FRONTEND_STANDARDIZED_CLOSED` |
+| Evidence Root | `tools/registry/runs/DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3_FIX_REQUIRED-20260511-035800` |
 
 ### Surface Status Summary (Forensic Audit 2026-05-10)
 
@@ -60,8 +60,8 @@ owner: dsh/
 public_export_path: dsh/index.ts
 screens_matrix: NEEDS_EVIDENCE
 flow_matrix: NEEDS_EVIDENCE
-evidence_root: tools/registry/runs/{SESSION_ID}
-closure_decision: ROOT_TRUTH_PARITY_IN_PROGRESS
+evidence_root: tools/registry/runs/DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3_FIX_REQUIRED-20260511-035800
+closure_decision: DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3_CLOSED
 
 ### Service Purpose
 
@@ -113,8 +113,9 @@ The app-client DSH checkout boundary may consume WLT only through a public bridg
 
 - `DshClientSurface` is introduced as the new app-client-facing surface boundary with `DshSurfaceHost` compatibility preserved.
 - `dsh-client.routes.ts` and `dsh-client.screen-registry.ts` are introduced as the passive route/screen metadata layer.
-- `PreferencesScreen` is introduced for DSH-only delivery preferences and is distinct from legacy `service-settings` flow semantics.
-- WLT bridge standardization remains in progress until all DSH cart/payment consumers use the public bridge boundary consistently.
+- `PreferencesScreen` is introduced for DSH-only delivery preferences with extracted `preferences.preview-data.ts`.
+- WLT bridge standardization is complete with consolidation into `wlt-dsh-client.parts.tsx`.
+- Public API in `dsh/frontend/app-client/index.ts` is trimmed to essential exports only.
 <!-- DSH_CLIENT_APP_SCOPE_STANDARDIZATION:end -->
 
 ---
@@ -454,6 +455,7 @@ No fixture, mock, or seed may be promoted to runtime truth without evidence.
 | DSH_AUDIT_010 | Deep Local System Audit | FIX_REQUIRED | `tools/registry/runs/DSH_AUDIT_010_DEEP_SYSTEM_DIAGNOSIS-20260506-053242` | Matrix drift cleanup and evidence generation |
 | DSH-EVD-F2-F3-WLT-BIND | DSH screens bound to WLT finance model (F2–F3, 2026-05-09) | `UI_PREVIEW_FOUNDATION` | `dsh/frontend/app-client/DshCartUnifiedScreen.tsx`, `dsh/frontend/app-captain/DshCaptainFinanceScreen.tsx`, `dsh/frontend/app-field/DshFieldFinanceScreen.tsx` | preview/fixture only — DSH consumes WLT model, no financial data ownership in DSH |
 | DSH_CLEANUP_HARDENING | Dead code archive, duplication consolidation, and naming cleanup | `PASSED` | `dsh/_archive/frontend/5899a771-f61c-4e88-ba19-e7560e699a04/` | 100% TSC stability, archived redundant fixtures and screens. |
+| DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3 | Final cleanup of index, preferences data, ghost types, and WLT bridge consolidation | `PASSED` | `tools/registry/runs/DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3_FIX_REQUIRED-20260511-035800` | Zero-gap standardization of app-client surface. |
 
 
 ### Current Decision

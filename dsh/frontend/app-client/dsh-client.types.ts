@@ -44,8 +44,6 @@ export type {
 	DshClientBindingError,
 	DshClientCartLine,
 	DshClientCartSnapshot,
-	DshClientOrderBindingSnapshot,
-	DshClientStoreBindingSnapshot,
 	DshClientTrackingTimelineItem,
 	DshClientWalletImpactVisibility,
 	DshClientWalletVisibility,
