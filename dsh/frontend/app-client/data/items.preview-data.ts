@@ -1,5 +1,5 @@
-import { buildCanonicalPreviewStoreItemsByStoreId } from '../shared/dshStoreProductCardModel';
-import type { DshStoreFixtureItem, StoreItemsByStoreId } from '../types';
+import { buildCanonicalPreviewStoreItemsByStoreId } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreFixtureItem, StoreItemsByStoreId } from '../dsh-client.types';
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source

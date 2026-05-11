@@ -1,35 +1,44 @@
-export { surfaceMeta } from './surface-meta';
-export { surfaceCatalog } from './surface-catalog';
+export { surfaceMeta } from './data/surface-meta.preview-data';
+export { surfaceCatalog } from './data/surface-catalog.preview-data';
+
+// Screens
+export { DshAwnakOrderCreateScreen } from './parts/AwnakOrderCreateScreen';
 export type {
 	DshAwnakOrderCreateScreenProps,
 	DshAwnakOrderCreateScreenState,
-} from './DshAwnakOrderCreateScreen';
-export { DshAwnakOrderCreateScreen } from './DshAwnakOrderCreateScreen';
-export type { DshCartUnifiedScreenProps } from './DshCartUnifiedScreen';
+} from './parts/AwnakOrderCreateScreen';
+
 export {
 	DshCartGetScreen,
 	DshCartUnifiedScreen,
-} from './DshCartUnifiedScreen';
+} from './screens/CartScreen';
+export type { DshCartUnifiedScreenProps } from './screens/CartScreen';
+
+export { DshSearchScreen } from './screens/SearchScreen';
 export type {
 	DshSearchResult,
 	DshSearchScreenProps,
-} from './DshSearchScreen';
-export { DshSearchScreen } from './DshSearchScreen';
+} from './screens/SearchScreen';
+
+export { DshEntryScreen } from './screens/EntryScreen';
 export type {
 	DshEntryScreenProps,
 	DshEntryScreenState,
-} from './DshEntryScreen';
-export { DshEntryScreen } from './DshEntryScreen';
-export type { DshFavoriteToggleScreenProps } from './DshFavoriteToggleScreen';
-export { DshFavoriteToggleScreen } from './DshFavoriteToggleScreen';
+} from './screens/EntryScreen';
+
+export { DshFavoriteToggleScreen } from './screens/FavoriteToggleScreen';
+export type { DshFavoriteToggleScreenProps } from './screens/FavoriteToggleScreen';
+
+export { DshFavoritesListScreen } from './screens/FavoritesScreen';
 export type {
 	DshFavoritesListItem,
 	DshFavoritesListScreenProps,
-} from './DshFavoritesListScreen';
-export { DshFavoritesListScreen } from './DshFavoritesListScreen';
-// gas family archived (DSH_ARCHIVE_021)
-export type { DshClientBellScreenProps } from './DshClientBellScreen';
-export { DshClientBellScreen } from './DshClientBellScreen';
+} from './screens/FavoritesScreen';
+
+export { DshClientBellScreen } from './screens/BellScreen';
+export type { DshClientBellScreenProps } from './screens/BellScreen';
+
+export { DshHomeGetScreen } from './screens/HomeScreen';
 export type {
 	DshHomeBannerActionType,
 	DshHomeCategory,
@@ -37,54 +46,62 @@ export type {
 	DshHomeGetScreenProps,
 	DshHomeGetStore,
 	DshHomeRecentOrder,
-} from './DshHomeGetScreen';
-export { DshHomeGetScreen } from './DshHomeGetScreen';
+} from './screens/HomeScreen';
+
+export { DshMySpaceScreen } from './screens/MySpaceScreen';
 export type {
 	DshMySpaceItem,
 	DshMySpaceScreenProps,
-} from './DshMySpaceScreen';
-export { DshMySpaceScreen } from './DshMySpaceScreen';
+} from './screens/MySpaceScreen';
+
+export { DshMySpaceCommercialScreen } from './parts/MySpaceCommercialScreen';
 export type {
 	DshMySpaceCommercialProgram,
 	DshMySpaceCommercialScreenProps,
-} from './DshMySpaceCommercialScreen';
-export { DshMySpaceCommercialScreen } from './DshMySpaceCommercialScreen';
-export type { DshMySpaceOrdersScreenProps } from './DshMySpaceOrdersScreen';
-export { DshMySpaceOrdersScreen } from './DshMySpaceOrdersScreen';
+} from './parts/MySpaceCommercialScreen';
+
+export { DshMySpaceOrdersScreen } from './parts/MySpaceOrdersScreen';
+export type { DshMySpaceOrdersScreenProps } from './parts/MySpaceOrdersScreen';
+
+export { DshNotificationsScreen } from './screens/NotificationsScreen';
 export type {
 	DshNotificationActionTarget,
 	DshNotificationItem,
 	DshNotificationsScreenProps,
-} from './DshNotificationsScreen';
-export { DshNotificationsScreen } from './DshNotificationsScreen';
-export type { DshBenefitsHubScreenProps } from './SubscriptionsHubScreen';
-export { DshBenefitsHubScreen } from './SubscriptionsHubScreen';
-export type { DshLoyaltyRewardsScreenProps } from './DshLoyaltyRewardsScreen';
-export { DshLoyaltyRewardsScreen } from './DshLoyaltyRewardsScreen';
-export type {
-	DshIntakeHubScreenProps,
-	DshOrdersListScreenProps,
-	DshTrackingScreenProps,
-} from './checkoutTracking';
+} from './screens/NotificationsScreen';
+
+export { DshBenefitsHubScreen } from './screens/BenefitsScreen';
+export type { DshBenefitsHubScreenProps } from './screens/BenefitsScreen';
+
+export { DshLoyaltyRewardsScreen } from './parts/LoyaltyRewardsScreen';
+export type { DshLoyaltyRewardsScreenProps } from './parts/LoyaltyRewardsScreen';
+
 export {
 	DshIntakeHubScreen,
 	DshOrdersListScreen,
 	DshTrackingScreen,
-} from './checkoutTracking';
-// orders flow remains consolidated in checkoutTracking to avoid duplication
+} from './screens/OrdersTrackingScreens';
+export type {
+	DshIntakeHubScreenProps,
+	DshOrdersListScreenProps,
+	DshTrackingScreenProps,
+} from './screens/OrdersTrackingScreens';
+
+export { DshSheinOrderCreateScreen } from './parts/SheinOrderCreateScreen';
 export type {
 	DshSheinOrderCreateScreenProps,
 	DshSheinOrderCreateScreenState,
-} from './DshSheinOrderCreateScreen';
-export { DshSheinOrderCreateScreen } from './DshSheinOrderCreateScreen';
-export type { DshStoreGetScreenProps } from './DshStoreGetScreen';
-export { DshStoreGetScreen } from './DshStoreGetScreen';
+} from './parts/SheinOrderCreateScreen';
+
+export { DshStoreGetScreen } from './screens/StoreScreen';
+export type { DshStoreGetScreenProps } from './screens/StoreScreen';
+
+export { DshStoreItemsScreen } from './screens/StoreItemsScreen';
 export type {
 	DshStoreItem,
 	DshStoreItemsScreenProps,
-} from './DshStoreItemsScreen';
-export { DshStoreItemsScreen } from './DshStoreItemsScreen';
-export type { ClientOperationScreenId } from './DshClientOperationScreens';
+} from './screens/StoreItemsScreen';
+
 export {
 	DshConversationHubScreen,
 	DshListingStatusUpdateScreen,
@@ -93,21 +110,26 @@ export {
 	DshServiceSettingsHubScreen,
 	DshZoneSetScreen,
 	getCanonicalDestination,
-} from './DshClientOperationScreens';
-export type { DshSubscriptionsScreenProps } from './DshSubscriptionsScreen';
-export { DshSubscriptionsScreen } from './DshSubscriptionsScreen';
-export type {
-	DshClientState,
-	DshClientStateGroup,
-	DshClientStateMeta,
-	DshClientStateVisibility,
-} from './client-state.preview-data';
+} from './screens/OperationScreens';
+export type { ClientOperationScreenId } from './screens/OperationScreens';
+
+export { DshSubscriptionsScreen } from './parts/SubscriptionsScreen';
+export type { DshSubscriptionsScreenProps } from './parts/SubscriptionsScreen';
+
+// Data & Shared
 export {
 	getDshClientStateMeta,
 	isDshClientExceptionState,
 	isDshClientTerminalState,
 	isDshClientWalletVisibleState,
-} from './client-state.preview-data';
+} from './data/client-state.preview-data';
+export type {
+	DshClientState,
+	DshClientStateGroup,
+	DshClientStateMeta,
+	DshClientStateVisibility,
+} from './data/client-state.preview-data';
+
 export type {
 	DshClientAddressSnapshot,
 	DshClientBindingError,
@@ -156,10 +178,11 @@ export type {
 	DshClientTrackingTimelineItem,
 	DshClientWalletImpactVisibility,
 	DshClientWalletVisibility,
-} from './dshClientBinding.contracts';
-// 'tracking' and 'checkout' families were consolidated; explicit exports removed.
+} from './contracts/dsh-client-binding.contracts';
+
 export { DshHomeApprovedVideoReelsViewer } from './parts/ApprovedVideoReelsViewer';
 export type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
+
 export { DshClientSurface, DshSurfaceHost } from './DshClientSurface';
 export type {
 	DshClientSurfaceProps,
@@ -167,11 +190,13 @@ export type {
 	DshRoute,
 	DshSurfaceHostProps,
 } from './dsh-client.types';
+
 export { dshClientRoutes } from './dsh-client.routes';
 export type {
 	DshClientLegacyRoute,
 	DshClientRouteId,
 	DshClientRouteRecord,
 } from './dsh-client.routes';
+
 export { dshClientScreenRegistry } from './dsh-client.screen-registry';
 export type { DshClientScreenRegistryItem } from './dsh-client.screen-registry';

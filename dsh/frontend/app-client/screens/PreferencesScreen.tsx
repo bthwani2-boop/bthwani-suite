@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Box, Icon, MobileScrollView, Surface, Text, TopBar, safeArea, spacing } from '@bthwani/ui-kit';
-import { DshOperationScreen } from '../DshOperationScreen';
+import { DshOperationScreen } from '../parts/OperationScreen';
 
 type DshPreferencesScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 

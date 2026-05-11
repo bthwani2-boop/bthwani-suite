@@ -13,7 +13,7 @@ export type {
 	DshStoreFixtureItem,
 	MeasurementOption,
 	StoreItemsByStoreId,
-} from '../types';
+} from '../dsh-client.types';
 export {
 	buildStoreCategories,
 	buildStoreDeliveryModes,

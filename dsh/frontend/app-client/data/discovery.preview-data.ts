@@ -1,5 +1,5 @@
-import { buildCanonicalPreviewDiscoveryStores } from '../shared/dshStoreProductCardModel';
-import type { DshDiscoveryStore } from '../types';
+import { buildCanonicalPreviewDiscoveryStores } from '../../shared/dshStoreProductCardModel';
+import type { DshDiscoveryStore } from '../dsh-client.types';
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
