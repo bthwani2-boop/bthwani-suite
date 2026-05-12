@@ -1,1 +1,1 @@
-export type { DshFieldStoreVisitErrors, DshFieldStoreVisitState, DshFieldStoreVisitValues, DshFieldVisitEvidenceItem } from '../screens/DshFieldStoreVisitScreen';
+export type { DshFieldStoreVisitErrors, DshFieldStoreVisitState, DshFieldStoreVisitValues, DshFieldVisitEvidenceItem } from '../types/DshFieldStoreVisitTypes';
