@@ -1,4 +1,4 @@
 ui-kit/src/components/header.tsx:738: trailing whitespace.
-+              
++
 ui-kit/src/components/header.tsx:758: trailing whitespace.
-+              <Pressable 
++              <Pressable
