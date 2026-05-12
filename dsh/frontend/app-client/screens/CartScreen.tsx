@@ -292,7 +292,7 @@ function ExecutionSchedulePicker({ dateOptions, timeOptions, selectedDate, selec
       {resolvedDate && resolvedTime ? (
         <Surface tone="default" padding={1} gap={0} style={{ backgroundColor: SURFACE_WARM, borderColor: SURFACE_WARM_BORDER }}>
           <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '600' }}>
-            سيتم تنفيذ الطلب {resolvedDate.fullLabel} عند {resolvedTime.fullLabel}
+            موعد تنفيذ الطلب: {resolvedDate.fullLabel} عند {resolvedTime.fullLabel}
           </Text>
         </Surface>
       ) : null}
@@ -330,7 +330,7 @@ function PromoBanner({ onPress }: { onPress: () => void }) {
 
         <View style={{ flex: 1, paddingHorizontal: spacing[2], alignItems: 'center', justifyContent: 'center' }}>
           <Text role="bodyMd" style={{ color: TEXT_PRIMARY, textAlign: 'center', lineHeight: 18 }}>
-            اشترك بخدمة بثواني برو لا ستفاده من افضل العروض
+            اشترك بخدمة بثواني برو للاستفادة من أفضل العروض
           </Text>
         </View>
 
@@ -409,13 +409,13 @@ type ItemsTableProps = {
 function ItemsTable({ items, onOpenDetails }: ItemsTableProps) {
   return (
     <Card
-      title="تفاصيل السلة"
+      title="مراجعة السلة قبل التنفيذ"
       subtitle={`عناصر: ${items.length}`}
       padding={2}
       gap={1}
       footer={(
         <Button
-          label="فتح التفاصيل"
+          label="مراجعة التفاصيل"
           tone="secondary"
           size="sm"
           fullWidth={false}
@@ -427,10 +427,10 @@ function ItemsTable({ items, onOpenDetails }: ItemsTableProps) {
       {items.length === 0 ? (
         <Surface tone="default" padding={2} gap={1} style={{ backgroundColor: SURFACE_SOFT, borderColor: BORDER_SOFT }}>
           <Text role="bodyMd" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>
-            السلة فارغة الآن.
+            السلة فارغة الآن
           </Text>
           <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'center' }}>
-            أضف منتجًا من المقترحات أو ارجع إلى المتجر لتعبئة السلة.
+            أضف منتجات من المتجر أو من المقترحات حتى يظهر ملخص الطلب هنا.
           </Text>
         </Surface>
       ) : (

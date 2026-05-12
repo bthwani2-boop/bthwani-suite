@@ -29,7 +29,7 @@ function formatAmount(value: number, currency: string) {
 	}
 }
 
-export function DshCartDetails({ visible, onClose, items, currency = 'SAR', onChangeQty, onRemove, onCheckout }: DshCartDetailsProps) {
+export function DshCartDetails({ visible, onClose, items, currency = 'YER', onChangeQty, onRemove, onCheckout }: DshCartDetailsProps) {
 	const total = items.reduce((sum, item) => sum + (item.subtotal ?? item.price * item.qty), 0);
 
 	function updateItemQty(itemId: string, nextQty: number) {
@@ -42,7 +42,7 @@ export function DshCartDetails({ visible, onClose, items, currency = 'SAR', onCh
 	}
 
 	return (
-		<SheetFrame visible={visible} onClose={onClose} title={`تفاصيل السلة — ${formatAmount(total, currency)}`}>
+		<SheetFrame visible={visible} onClose={onClose} title={`مراجعة السلة — ${formatAmount(total, currency)}`}>
 			<View style={{ gap: spacing[2] }}>
 				<FlatList
 					data={items}
@@ -51,8 +51,8 @@ export function DshCartDetails({ visible, onClose, items, currency = 'SAR', onCh
 					contentContainerStyle={{ gap: spacing[1] }}
 					ListEmptyComponent={(
 						<Surface tone="default" gap={1} style={{ backgroundColor: colorPalette.surfaceSecondary, borderColor: colorPalette.borderSubtle }}>
-							<Text role="bodyMd" align="center">لا توجد عناصر في السلة حتى الآن.</Text>
-							<Text role="bodySm" tone="muted" align="center">أضف منتجات جديدة لتتمكن من مراجعة الكميات والإجماليات هنا.</Text>
+							<Text role="bodyMd" align="center">لا توجد عناصر في السلة حتى الآن</Text>
+							<Text role="bodySm" tone="muted" align="center">أضف منتجات جديدة حتى تتمكن من مراجعة الكميات والإجماليات قبل التنفيذ.</Text>
 						</Surface>
 					)}
 					renderItem={({ item }) => (
@@ -107,11 +107,11 @@ export function DshCartDetails({ visible, onClose, items, currency = 'SAR', onCh
 				/>
 
 				<Surface tone="default" gap={1} style={{ backgroundColor: colorPalette.surfaceSecondary, borderColor: colorPalette.borderSubtle }}>
-					<Text role="bodyMd">إجمالي الطلب</Text>
+					<Text role="bodyMd">إجمالي السلة</Text>
 					<Text role="titleSm">{formatAmount(total, currency)}</Text>
 					<View style={{ flexDirection: 'row-reverse', gap: spacing[2], flexWrap: 'wrap' }}>
 						<Button
-							label="تنفيذ الطلب"
+							label="تأكيد الطلب"
 							fullWidth={false}
 							disabled={!onCheckout || items.length === 0}
 							onPress={() => onCheckout?.()}
