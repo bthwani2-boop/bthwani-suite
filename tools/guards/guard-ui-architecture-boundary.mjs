@@ -1,10 +1,12 @@
-import { parseArgs, createReport, finalize, walkFiles, readText, rel, CODE_EXTENSIONS, lineNumber } from './lib/guard-utils.mjs';
+import path from 'node:path';
+import { parseArgs, createReport, finalize, walkFiles, readText, readJson, rel, CODE_EXTENSIONS, lineNumber } from './lib/guard-utils.mjs';
 
 const args = parseArgs();
 const report = createReport('UI-ARCH-BOUNDARY', 'governance/08_UI_KIT_AND_BRAND.md');
 const root = args.root;
+const config = readJson(path.join(root, 'tools/guards/guard-ui-architecture-boundary.config.json'));
 const files = walkFiles(root, {
-  startDirs: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel', 'webapp', 'website', 'ui-kit', 'dsh', 'wlt', 'knz', 'arb', 'amn', 'esf', 'mrf', 'snd', 'kwd'],
+  startDirs: config.scanRoots,
   extensions: CODE_EXTENSIONS,
 });
 
@@ -37,6 +39,10 @@ for (const file of files) {
 
   if (!relative.startsWith('ui-kit/') && /(const|let)\s+(colors|tokens|theme)\s*=\s*\{/.test(text)) {
     report.warn(relative, 'Potential local design-system tokens/theme object outside ui-kit. Verify ownership.');
+  }
+
+  if (!relative.startsWith('ui-kit/') && /createTamagui|createTokens|TamaguiProvider/.test(text)) {
+    report.fail(relative, 'Local Tamagui or token system detected outside ui-kit.');
   }
 }
 

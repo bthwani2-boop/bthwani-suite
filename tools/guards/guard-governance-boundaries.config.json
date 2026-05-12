@@ -1,235 +1,71 @@
 {
-  "$schema": "https://bthwani.local/schemas/governance-boundaries-guard.schema.json",
-  "version": "1.1.1",
-  "evidenceRoot": "tools/registry/runs",
-  "failOnError": true,
-  "modeDecision": "BOUNDARY_ERRORS_FAIL_LEGACY_WARN_ONLY",
-  "extensions": [
-    ".ts",
-    ".tsx",
-    ".js",
-    ".jsx",
-    ".mjs",
-    ".cjs",
-    ".md",
-    ".json",
-    ".jsonc",
-    ".yml",
-    ".yaml"
+  "version": "2.0.0",
+  "requiredGuardFiles": [
+    "tools/guards/README.md",
+    "tools/guards/GUARDS_CATALOG.md",
+    "tools/guards/RUN_GOVERNANCE_GUARDS.ps1",
+    "tools/guards/RUN_AGENT_GUARDS.ps1",
+    "tools/guards/guard-manifest.json",
+    "tools/guards/_guard-common.mjs",
+    "tools/guards/lib/guard-utils.mjs"
   ],
-  "scanRoots": [
-    "governance",
-    "app-client",
-    "app-partner",
-    "app-captain",
-    "app-field",
-    "webapp",
-    "website",
-    "control-panel",
-    "ui-kit",
-    "tools/guards",
-    "tools/scripts",
-    ".github"
+  "allowedDirectories": [
+    "lib"
   ],
-  "ignore": [
-    "(^|/)node_modules(/|$)",
-    "(^|/)dist(/|$)",
-    "(^|/)build(/|$)",
-    "(^|/)coverage(/|$)",
-    "(^|/)\\.next(/|$)",
-    "(^|/)\\.expo(/|$)",
-    "^tools/registry/runs/",
-    "\\.map$",
-    "\\.lock$"
+  "allowContextPatterns": [
+    "legacy",
+    "Legacy",
+    "retired",
+    "Retired",
+    "historical",
+    "Historical",
+    "forbidden",
+    "Forbidden",
+    "deleted",
+    "Deleted",
+    "do not",
+    "Do not",
+    "remove",
+    "Remove",
+    "not active",
+    "inactive"
   ],
-  "requiredGovernanceFiles": [
-    "governance/00_README.md",
-    "governance/01_GOVERNANCE_INDEX.md",
-    "governance/02_PLATFORM_SSOT.md",
-    "governance/03_REPO_BOUNDARIES.md",
-    "governance/04_ARCHITECTURE_RULES.md",
-    "governance/05_PACKAGE_BOUNDARIES.md",
-    "governance/06_APPS_AND_SHELLS.md",
-    "governance/07_SURFACES_AND_SERVICES.md",
-    "governance/08_UI_KIT_AND_BRAND.md",
-    "governance/09_API_BINDING_RUNTIME.md",
-    "governance/10_SERVICE_CLOSURE.md",
-    "governance/11_EVIDENCE_AND_TRACEABILITY.md",
-    "governance/12_TESTING_AND_PRODUCTION_READINESS.md",
-    "governance/13_CI_AND_GATES.md",
-    "governance/14_GUARDS_CATALOG.md",
-    "governance/16_SECURITY_AND_SECRETS.md",
-    "governance/17_CLEANUP_AND_DEPRECATION.md",
-    "governance/18_BRANCH_AND_CHECKPOINTS.md",
-    "governance/19_CONTROL_PANEL_AND_OPERATING_MODEL.md",
-    "governance/20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md",
-    "governance/22_DSH_GOLDEN_SLICE.md",
-    "governance/23_WARNINGS_AND_FALSE_POSITIVES.md",
-    "governance/24_TRACEABILITY_AND_ROADMAP.md",
-    "governance/99_LEGACY_MERGE_LEDGER.md"
-  ],
-  "expectedGovernanceFiles": [],
-  "allowedSurfacesPublicImports": [
-    "^@bthwani/surfaces/(app-client|app-partner|app-captain|app-field|control-panel|webapp|website)$"
-  ],
-  "allowedAppFiles": [
-    "^(app-client|app-partner|app-captain|app-field)/App\\.tsx$",
-    "^(app-client|app-partner|app-captain|app-field)/index\\.(ts|tsx|js|jsx)$",
-    "^(app-client|app-partner|app-captain|app-field)/app\\.config\\.(ts|js)$",
-    "^(webapp|website|control-panel/runtime)/(next\\.config|middleware|instrumentation)\\.(ts|js|mjs)$",
-    "^(webapp|website)/(app/(layout|page)\\.(ts|tsx))$",
-    "^control-panel/runtime/app/(layout|page)\\.(ts|tsx)$"
-  ],
-  "allowedBrandColors": [
-    "#0a2f5c",
-    "#ff500d",
-    "#ffffff"
-  ],
-  "legacyRules": [
+  "forbiddenLineRules": [
     {
-      "code": "APP_USER_LEGACY",
-      "severity": "warn",
-      "pattern": "\\bapp-user\\b",
-      "flags": "i",
-      "detail": "Legacy app-user token detected. Canonical app is app-client. Warning here; dedicated legacy guard/cleanup handles blocking.",
-      "allowPathPatterns": [
-        "^governance/",
-        "^tools/guards/"
-      ],
-      "warnPathPatterns": [
-        "^\\.github/",
-        "^governance/archive/legacy-extracted/",
-        "^packages/"
-      ],
-      "allowLinePatterns": [
-        "legacy",
-        "Legacy",
-        "forbidden",
-        "Forbidden",
-        "canonical",
-        "Canonical",
-        "Replace",
-        "replacement",
-        "retirement",
-        "Retirement",
-        "detected",
-        "Detected",
-        "token",
-        "Token"
-      ]
+      "code": "RETIRED_GITHUB_SKILLS_REF",
+      "pattern": "\\.github/skills",
+      "severity": "error",
+      "detail": "Retired .github/skills reference detected in active guard source."
     },
     {
-      "code": "MCPW_LEGACY",
-      "severity": "warn",
-      "pattern": "\\bmcpw\\b",
-      "flags": "i",
-      "detail": "Legacy mcpw token detected. Canonical surface is control-panel. Warning here; dedicated legacy guard/cleanup handles blocking.",
-      "allowPathPatterns": [
-        "^governance/",
-        "^tools/guards/"
-      ],
-      "warnPathPatterns": [
-        "^\\.github/",
-        "^governance/archive/legacy-extracted/",
-        "^packages/"
-      ],
-      "allowLinePatterns": [
-        "legacy",
-        "Legacy",
-        "forbidden",
-        "Forbidden",
-        "canonical",
-        "Canonical",
-        "Replace",
-        "replacement",
-        "retirement",
-        "Retirement",
-        "detected",
-        "Detected",
-        "token",
-        "Token"
-      ]
+      "code": "RETIRED_GITHUB_AGENTS_REF",
+      "pattern": "\\.github/agents",
+      "severity": "error",
+      "detail": "Retired .github/agents reference detected in active guard source."
     },
     {
-      "code": "OLD_EVIDENCE_ROOT",
-      "severity": "warn",
-      "pattern": "kdt/volatile/registry/runs|kdt\\\\volatile\\\\registry\\\\runs",
-      "flags": "i",
-      "detail": "Legacy evidence root detected. Canonical root is tools/registry/runs. Warning here; dedicated legacy guard/cleanup handles blocking.",
-      "allowPathPatterns": [
-        "^governance/",
-        "^tools/guards/"
-      ],
-      "warnPathPatterns": [
-        "^\\.github/",
-        "^governance/archive/legacy-extracted/",
-        "^packages/"
-      ],
-      "allowLinePatterns": [
-        "legacy",
-        "Legacy",
-        "forbidden",
-        "Forbidden",
-        "canonical",
-        "Canonical",
-        "Replace",
-        "replacement",
-        "retirement",
-        "Retirement",
-        "detected",
-        "Detected",
-        "root",
-        "Root"
-      ]
+      "code": "RETIRED_OPENCODE_SKILLS_REF",
+      "pattern": "\\.opencode/skills",
+      "severity": "error",
+      "detail": "Retired .opencode/skills reference detected in active guard source."
     },
     {
-      "code": "OLD_ACTIVE_BTH_PATH",
-      "severity": "warn",
-      "pattern": "C:\\\\\\\\bth(?!wani)|C:/bth(?!wani)|(^|[\\\\/])bth([\\\\/]|$)",
-      "flags": "i",
-      "detail": "Old standalone bth repo/path detected. bthwani/BThwani/@bthwani/bthwani-suite are allowed. Warning here; dedicated legacy guard/cleanup handles blocking.",
-      "allowPathPatterns": [
-        "^governance/",
-        "^tools/guards/"
-      ],
-      "warnPathPatterns": [
-        "^\\.github/",
-        "^governance/archive/legacy-extracted/",
-        "^packages/"
-      ],
-      "allowLinePatterns": [
-        "bthwani",
-        "BThwani",
-        "@bthwani",
-        "bthwani-suite",
-        "legacy",
-        "Legacy",
-        "forbidden",
-        "Forbidden",
-        "canonical",
-        "Canonical",
-        "detected",
-        "Detected"
-      ]
+      "code": "LEGACY_HANDOFF_ZIP",
+      "pattern": "_HANDOFF\\.zip",
+      "severity": "error",
+      "detail": "Legacy _HANDOFF.zip rule detected in active guard source."
     },
     {
-      "code": "NPM_COMMAND_REVIEW",
-      "severity": "warn",
-      "pattern": "\\bnpm install\\b|\\bnpm run\\b",
-      "flags": "i",
-      "detail": "npm command detected. pnpm is canonical unless this is documentation of a forbidden pattern.",
-      "allowPathPatterns": [
-        "^governance/",
-        "^tools/guards/"
-      ],
-      "allowLinePatterns": [
-        "pnpm",
-        "not npm",
-        "no npm",
-        "ممنوع",
-        "forbidden",
-        "Forbidden"
-      ]
+      "code": "NPMX_USAGE",
+      "pattern": "\\bnpx\\b",
+      "severity": "error",
+      "detail": "npx reference detected in active guard source."
+    },
+    {
+      "code": "LEGACY_ACTIVE_PATH",
+      "pattern": "(^|[^A-Za-z0-9_])(apps/|packages/)",
+      "severity": "error",
+      "detail": "Legacy active path detected in active guard source."
     }
   ]
 }

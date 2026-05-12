@@ -1,61 +1,161 @@
 {
-  "version": "1.0.0",
-  "owner": "BThwani Governance",
-  "policy_source_rule": "governance is sovereign text; tools/guards is executable enforcement only",
+  "version": "2.0.0",
+  "owner": "tools/guards",
+  "policy_source_rule": "governance/ and .agents/ own policy text; tools/guards executes verification only",
   "guards": [
     {
-      "id": "GOV-SOVEREIGNTY",
-      "file": "tools/guards/guard-governance-sovereignty.mjs",
-      "policySource": "governance/00_README.md",
-      "checks": ["canonical governance root", "retired docs/governance references", "guard manifest policy linkage"]
-    },
-    {
-      "id": "GOV-BOUNDARIES",
+      "id": "GUARD_GOVERNANCE_BOUNDARIES",
       "file": "tools/guards/guard-governance-boundaries.mjs",
-      "policySource": "governance/04_ARCHITECTURE_RULES.md",
-      "checks": ["canonical governance file inventory", "package and shell boundaries", "legacy governance reference rules"]
+      "config": "tools/guards/guard-governance-boundaries.config.json",
+      "ownerPolicy": [
+        "governance/03_REPO_BOUNDARIES.md",
+        "governance/14_GUARDS_CATALOG.md"
+      ],
+      "purpose": "validate tools/guards file/config/manifest alignment and block legacy refs inside active guard sources",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ]
     },
     {
-      "id": "GOV-CONTROL-PLANE",
-      "file": "tools/guards/guard-governance-canonical-control-plane.mjs",
-      "policySource": "governance/00_README.md",
-      "checks": ["canonical control-plane files", "retired governance root quarantine", "active retired governance references"]
+      "id": "GUARD_AGENT_GLOBAL_AUTHORITY",
+      "file": "tools/guards/guard-agent-global-authority.mjs",
+      "config": "tools/guards/guard-agent-global-authority.config.json",
+      "ownerPolicy": [
+        "AGENTS.md",
+        ".agents/AUTHORITY_BOUNDARY.md",
+        ".agents/UPDATE_POLICY.md"
+      ],
+      "purpose": "validate .agents authority roots, required files, legacy-agent-root retirement, and adapter hygiene",
+      "runners": [
+        "agent",
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ]
     },
     {
-      "id": "UI-ARCH-BOUNDARY",
+      "id": "GUARD_UI_ARCHITECTURE_BOUNDARY",
       "file": "tools/guards/guard-ui-architecture-boundary.mjs",
-      "policySource": "governance/08_UI_KIT_AND_BRAND.md",
-      "checks": ["Tamagui boundary", "ui-kit public exports", "local design-system import risk"]
+      "config": "tools/guards/guard-ui-architecture-boundary.config.json",
+      "ownerPolicy": [
+        "governance/08_UI_KIT_AND_BRAND.md"
+      ],
+      "purpose": "block direct Tamagui imports outside ui-kit and block deep ui-kit source imports",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ]
     },
     {
-      "id": "DESIGN-TOKEN-DRIFT",
+      "id": "GUARD_DESIGN_TOKEN_DRIFT",
       "file": "tools/guards/guard-design-token-drift.mjs",
-      "policySource": "governance/08_UI_KIT_AND_BRAND.md",
-      "checks": ["random hardcoded color drift outside ui-kit", "brand color normalization risk"]
+      "ownerPolicy": [
+        "governance/08_UI_KIT_AND_BRAND.md"
+      ],
+      "purpose": "report hardcoded non-brand hex colors outside ui-kit",
+      "runners": [
+        "governance"
+      ],
+      "mode": "advisory",
+      "outputs": [
+        "json",
+        "md"
+      ]
     },
     {
-      "id": "SERVICE-CONTRACT-MATRIX",
+      "id": "GUARD_SERVICE_CONTRACT_MATRIX",
       "file": "tools/guards/guard-service-contract-matrix.mjs",
-      "policySource": "governance/10_SERVICE_CLOSURE.md",
-      "checks": ["canonical services", "service blueprint presence", "forbidden standalone services"]
+      "config": "tools/guards/guard-service-contract-matrix.config.json",
+      "ownerPolicy": [
+        "governance/10_SERVICE_CLOSURE.md"
+      ],
+      "purpose": "verify canonical service roots carry SERVICE_BLUEPRINT.md and service OpenAPI files",
+      "runners": [
+        "governance"
+      ],
+      "mode": "advisory",
+      "outputs": [
+        "json",
+        "md"
+      ]
     },
     {
-      "id": "API-BINDING-RUNTIME",
+      "id": "GUARD_API_BINDING_RUNTIME",
       "file": "tools/guards/guard-api-binding-runtime.mjs",
-      "policySource": "governance/09_API_BINDING_RUNTIME.md",
-      "checks": ["data-bound screen states", "api/client binding hints", "runtime proof hints"]
+      "ownerPolicy": [
+        "governance/09_API_BINDING_RUNTIME.md"
+      ],
+      "purpose": "report data-bound screens that appear to miss explicit state coverage or contract hints",
+      "runners": [
+        "governance"
+      ],
+      "mode": "advisory",
+      "outputs": [
+        "json",
+        "md"
+      ]
     },
     {
-      "id": "EVIDENCE-CLOSURE",
-      "file": "tools/guards/guard-evidence-closure.mjs",
-      "policySource": "governance/11_EVIDENCE_AND_TRACEABILITY.md",
-      "checks": ["no closure claims without evidence", "evidence root", "registry runs"]
+      "id": "GUARD_EVIDENCE_REGISTRY_RUNS_HYGIENE",
+      "file": "tools/guards/guard-evidence-registry-runs-hygiene.mjs",
+      "config": "tools/guards/guard-evidence-registry-runs-hygiene.config.json",
+      "ownerPolicy": [
+        "governance/11_EVIDENCE_AND_TRACEABILITY.md"
+      ],
+      "purpose": "report evidence runs missing required files or using legacy zip naming",
+      "runners": [
+        "governance"
+      ],
+      "mode": "advisory",
+      "outputs": [
+        "json",
+        "md"
+      ]
     },
     {
-      "id": "WORKFLOW-CI-PARITY",
+      "id": "GUARD_WORKFLOW_CI_PARITY",
       "file": "tools/guards/guard-workflow-ci-parity.mjs",
-      "policySource": "governance/13_CI_AND_GATES.md",
-      "checks": ["governance baseline workflow", "new guard CI workflow", "security/boundary/check parity"]
+      "ownerPolicy": [
+        "governance/13_CI_AND_GATES.md"
+      ],
+      "purpose": "verify governance workflows still invoke the active guard runners",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ]
+    },
+    {
+      "id": "GUARD_SECRET_SCAN",
+      "file": "tools/guards/guard-secret-scan.mjs",
+      "config": "tools/guards/guard-secret-scan.config.json",
+      "ownerPolicy": [
+        "governance/16_SECURITY_AND_SECRETS.md"
+      ],
+      "purpose": "scan tracked text files for obvious secret patterns",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ]
     }
   ]
 }

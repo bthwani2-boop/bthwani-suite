@@ -8,6 +8,7 @@ const root = args.root;
 
 const baseline = '.github/workflows/governance-baseline.yml';
 const guardWorkflow = '.github/workflows/governance-guards.yml';
+const allWorkflowText = exists(root, guardWorkflow) ? readTextSafe(path.join(root, guardWorkflow)) : '';
 
 if (!exists(root, baseline)) {
   report.fail(baseline, 'Governance baseline workflow is missing.');
@@ -23,7 +24,7 @@ if (!exists(root, baseline)) {
 if (!exists(root, guardWorkflow)) {
   report.warn(guardWorkflow, 'Governance guards workflow is missing. Install this package or wire the runner into CI.');
 } else {
-  const text = readTextSafe(path.join(root, guardWorkflow));
+  const text = allWorkflowText;
   if (!text.includes('RUN_GOVERNANCE_GUARDS.ps1')) {
     report.fail(guardWorkflow, 'Governance guards workflow must invoke RUN_GOVERNANCE_GUARDS.ps1.');
   }
@@ -32,12 +33,8 @@ if (!exists(root, guardWorkflow)) {
   }
 }
 
-const packageJson = path.join(root, 'package.json');
-if (fs.existsSync(packageJson)) {
-  const text = readTextSafe(packageJson);
-  if (!text.includes('guard:agent-governance') || !text.includes('guard:i18n-direction')) {
-    report.warn('package.json', 'Existing package scripts may not expose all current guards. This package does not change package.json automatically.');
-  }
+if (fs.existsSync(path.join(root, 'tools/guards/RUN_AGENT_GUARDS.ps1')) && !allWorkflowText.includes('RUN_AGENT_GUARDS.ps1')) {
+  report.warn(guardWorkflow, 'Agent guard runner exists locally but is not referenced by governance-guards workflow.');
 }
 
 finalize(report, args);

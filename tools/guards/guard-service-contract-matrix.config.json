@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "canonicalServices": [
+    "dsh",
+    "wlt",
+    "knz",
+    "arb",
+    "amn",
+    "esf",
+    "mrf",
+    "snd",
+    "kwd"
+  ]
+}

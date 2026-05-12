@@ -6,7 +6,7 @@ const args = parseArgs();
 const report = createReport('DESIGN-TOKEN-DRIFT', 'governance/08_UI_KIT_AND_BRAND.md');
 const root = args.root;
 const files = walkFiles(root, {
-  startDirs: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel', 'webapp', 'website', 'ui-kit', 'dsh', 'wlt', 'knz', 'arb', 'amn', 'esf', 'mrf', 'snd', 'kwd'],
+  startDirs: ['app-client/runtime', 'app-partner/runtime', 'app-captain/runtime', 'app-field/runtime', 'control-panel/runtime', 'webapp/runtime', 'website/runtime', 'ui-kit', 'dsh', 'wlt', 'knz', 'arb', 'amn', 'esf', 'mrf', 'snd', 'kwd'],
   extensions: TEXT_EXTENSIONS,
 });
 

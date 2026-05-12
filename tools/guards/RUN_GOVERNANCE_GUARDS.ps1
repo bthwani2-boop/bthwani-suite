@@ -1,156 +1,233 @@
+param(
+  [ValidateSet('Local', 'CI')]
+  [string]$Mode = 'Local',
+
+  [ValidateSet('Governance', 'Agent')]
+  [string]$Profile = 'Governance',
+
+  [switch]$FailOnWarning
+)
+
+$ErrorActionPreference = 'Stop'
+
 $RepoRoot = (& git rev-parse --show-toplevel 2>$null).Trim()
 if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
   $RepoRoot = (Get-Location).Path
 }
 Set-Location -LiteralPath $RepoRoot
-$ErrorActionPreference = "Stop"
 
-$Mode = "Local"
-$FailOnWarning = $false
-for ($i = 0; $i -lt $args.Count; $i++) {
-  switch -Regex ($args[$i]) {
-    '^-Mode$' {
-      if (($i + 1) -ge $args.Count) { throw "-Mode requires Local or CI." }
-      $Mode = $args[$i + 1]
-      $i++
-      continue
-    }
-    '^-FailOnWarning$' { $FailOnWarning = $true; continue }
-    default { throw "Unknown argument: $($args[$i])" }
-  }
+$ManifestPath = Join-Path $RepoRoot 'tools\guards\guard-manifest.json'
+if (-not (Test-Path -LiteralPath $ManifestPath)) {
+  throw "Missing manifest: $ManifestPath"
 }
 
-if ($Mode -notin @('Local','CI')) { throw "Invalid -Mode: $Mode" }
+$Manifest = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
+$RunnerKey = $Profile.ToLowerInvariant()
+$AllEntries = @($Manifest.guards)
+$Entries = @($AllEntries | Where-Object { $_.runners -contains $RunnerKey })
 
-$RepoRoot = (Get-Location).Path
-$Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$SessionId = "GOVERNANCE_GUARDS-$Timestamp"
+if ($Entries.Count -eq 0) {
+  throw "No guards declared for runner profile '$Profile'."
+}
+
+$SessionPrefix = if ($Profile -eq 'Agent') { 'AGENT_GUARDS' } else { 'GOVERNANCE_GUARDS' }
+$Timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+$SessionId = "$SessionPrefix-$Timestamp"
 $EvidenceRoot = Join-Path $RepoRoot "tools\registry\runs\$SessionId"
-New-Item -ItemType Directory -Force -Path $EvidenceRoot | Out-Null
+New-Item -ItemType Directory -Path $EvidenceRoot -Force | Out-Null
 
-$CommandLog = Join-Path $EvidenceRoot "command-log.txt"
+$CommandLog = Join-Path $EvidenceRoot 'commands.log'
 function Log-Line([string]$Message) {
   $line = "$(Get-Date -Format o) $Message"
   $line | Tee-Object -FilePath $CommandLog -Append | Out-Host
 }
 
-$Guards = @(
-  "guard-governance-sovereignty.mjs",
-  "guard-governance-boundaries.mjs",
-  "guard-governance-canonical-control-plane.mjs",
-  "guard-ui-architecture-boundary.mjs",
-  "guard-design-token-drift.mjs",
-  "guard-service-contract-matrix.mjs",
-  "guard-api-binding-runtime.mjs",
-  "guard-evidence-closure.mjs",
-  "guard-workflow-ci-parity.mjs"
-)
+function Validate-Manifest {
+  $errors = New-Object System.Collections.Generic.List[string]
+  $ids = @{}
+  $files = @{}
+
+  foreach ($entry in $AllEntries) {
+    if ([string]::IsNullOrWhiteSpace($entry.id)) {
+      $errors.Add('Manifest entry missing id.')
+      continue
+    }
+    if ($ids.ContainsKey($entry.id)) {
+      $errors.Add("Duplicate guard id in manifest: $($entry.id)")
+    } else {
+      $ids[$entry.id] = $true
+    }
+
+    if ([string]::IsNullOrWhiteSpace($entry.file)) {
+      $errors.Add("Manifest entry $($entry.id) missing file path.")
+      continue
+    }
+    if ($files.ContainsKey($entry.file)) {
+      $errors.Add("Duplicate manifest file entry: $($entry.file)")
+    } else {
+      $files[$entry.file] = $true
+    }
+
+    $GuardPath = Join-Path $RepoRoot $entry.file
+    if (-not (Test-Path -LiteralPath $GuardPath)) {
+      $errors.Add("Manifest entry $($entry.id) points to missing guard file: $($entry.file)")
+    }
+
+    if ($entry.PSObject.Properties.Name -contains 'config' -and -not [string]::IsNullOrWhiteSpace($entry.config)) {
+      $ConfigPath = Join-Path $RepoRoot $entry.config
+      if (-not (Test-Path -LiteralPath $ConfigPath)) {
+        $errors.Add("Manifest entry $($entry.id) points to missing config file: $($entry.config)")
+      }
+    }
+
+    $OwnerPolicies = @()
+    if ($entry.ownerPolicy -is [System.Array]) { $OwnerPolicies = @($entry.ownerPolicy) }
+    elseif ($null -ne $entry.ownerPolicy) { $OwnerPolicies = @([string]$entry.ownerPolicy) }
+
+    if ($OwnerPolicies.Count -eq 0) {
+      $errors.Add("Manifest entry $($entry.id) has no ownerPolicy.")
+    }
+
+    foreach ($policy in $OwnerPolicies) {
+      $PolicyPath = Join-Path $RepoRoot $policy
+      if (-not (Test-Path -LiteralPath $PolicyPath)) {
+        $errors.Add("Manifest entry $($entry.id) points to missing owner policy: $policy")
+      }
+    }
+  }
+
+  $GuardFiles = Get-ChildItem -LiteralPath (Join-Path $RepoRoot 'tools\guards') -File -Filter 'guard-*.mjs' | Select-Object -ExpandProperty FullName
+  foreach ($guardFile in $GuardFiles) {
+    $relative = $guardFile.Substring($RepoRoot.Length + 1).Replace('\', '/')
+    if (-not $files.ContainsKey($relative)) {
+      $errors.Add("Guard file has no manifest entry: $relative")
+    }
+  }
+
+  $ConfigFiles = Get-ChildItem -LiteralPath (Join-Path $RepoRoot 'tools\guards') -File | Where-Object { $_.Name -like 'guard-*.config.json' -or $_.Name -like 'config-*.json' }
+  $ManifestConfigs = @{}
+  foreach ($entry in $AllEntries) {
+    if ($entry.PSObject.Properties.Name -contains 'config' -and -not [string]::IsNullOrWhiteSpace($entry.config)) {
+      $ManifestConfigs[$entry.config.Replace('\','/')] = $true
+    }
+  }
+  foreach ($configFile in $ConfigFiles) {
+    $relative = $configFile.FullName.Substring($RepoRoot.Length + 1).Replace('\', '/')
+    if (-not $ManifestConfigs.ContainsKey($relative)) {
+      $errors.Add("Config file is orphaned from manifest: $relative")
+    }
+  }
+
+  if ($errors.Count -gt 0) {
+    $errors | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'manifest-validation-errors.txt')
+    throw "Manifest validation failed. See $EvidenceRoot\manifest-validation-errors.txt"
+  }
+}
+
+Validate-Manifest
 
 Log-Line "SessionId=$SessionId"
+Log-Line "Profile=$Profile"
 Log-Line "Mode=$Mode"
 Log-Line "FailOnWarning=$FailOnWarning"
 
-& git --no-pager status --short 2>&1 | Set-Content -LiteralPath (Join-Path $EvidenceRoot "git-status.txt") -Encoding UTF8
-& git --no-pager diff --check 2>&1 | Set-Content -LiteralPath (Join-Path $EvidenceRoot "diff-check.txt") -Encoding UTF8
+& git --no-pager status --short 2>&1 | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'git-status.txt') -Encoding UTF8
+& git --no-pager diff --check 2>&1 | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'git-diff-check.txt') -Encoding UTF8
 
-$Results = @()
-foreach ($Guard in $Guards) {
-  $GuardPath = Join-Path $RepoRoot "tools\guards\$Guard"
-  if (-not (Test-Path -LiteralPath $GuardPath)) {
-    $Results += [pscustomobject]@{
-      guardId = $Guard
-      status = "FAIL"
-      failCount = 1
-      warnCount = 0
-      error = "Guard file missing"
-    }
-    Log-Line "MISSING $Guard"
-    continue
-  }
+$Results = New-Object System.Collections.Generic.List[object]
 
-  $BaseName = [System.IO.Path]::GetFileNameWithoutExtension($Guard)
+foreach ($entry in $Entries) {
+  $GuardPath = Join-Path $RepoRoot $entry.file
+  $BaseName = [System.IO.Path]::GetFileNameWithoutExtension($entry.file)
   $JsonOut = Join-Path $EvidenceRoot "$BaseName.json"
   $MdOut = Join-Path $EvidenceRoot "$BaseName.md"
   $StdOut = Join-Path $EvidenceRoot "$BaseName.stdout.txt"
   $StdErr = Join-Path $EvidenceRoot "$BaseName.stderr.txt"
 
-  Log-Line "RUN node $Guard"
-  $Process = Start-Process -FilePath "node" -ArgumentList @($GuardPath, "--root", $RepoRoot, "--mode", $Mode, "--json-out", $JsonOut, "--md-out", $MdOut) -NoNewWindow -Wait -PassThru -RedirectStandardOutput $StdOut -RedirectStandardError $StdErr
-  Log-Line "EXIT $Guard code=$($Process.ExitCode)"
+  Log-Line "RUN node $($entry.file)"
+  $Process = Start-Process -FilePath 'node' `
+    -ArgumentList @($GuardPath, '--root', $RepoRoot, '--mode', $Mode, '--json-out', $JsonOut, '--md-out', $MdOut) `
+    -NoNewWindow -Wait -PassThru `
+    -RedirectStandardOutput $StdOut `
+    -RedirectStandardError $StdErr
+  Log-Line "EXIT $($entry.file) code=$($Process.ExitCode)"
 
   if (Test-Path -LiteralPath $JsonOut) {
     $Result = Get-Content -LiteralPath $JsonOut -Raw | ConvertFrom-Json
-    $Results += $Result
+    $Results.Add([pscustomobject]@{
+      id = $entry.id
+      file = $entry.file
+      status = $Result.status
+      failCount = $Result.failCount
+      warnCount = $Result.warnCount
+      infoCount = $Result.infoCount
+      policy = ($entry.ownerPolicy -join '; ')
+    })
   } else {
-    $StdOutText = if (Test-Path -LiteralPath $StdOut) { Get-Content -LiteralPath $StdOut -Raw } else { '' }
-    if ($null -eq $StdOutText) { $StdOutText = '' }
-    $StdErrText = if (Test-Path -LiteralPath $StdErr) { Get-Content -LiteralPath $StdErr -Raw } else { '' }
-    if ($null -eq $StdErrText) { $StdErrText = '' }
-    $CombinedText = ($StdOutText + "`n" + $StdErrText)
-
-    $WarnMatch = [regex]::Match($CombinedText, 'Warnings:\s*(\d+)')
-    $WarnCount = if ($WarnMatch.Success) { [int]$WarnMatch.Groups[1].Value } elseif ($CombinedText -match '\bWARN\b|PASS_WITH_WARNINGS') { 1 } else { 0 }
-    $Status = if ($Process.ExitCode -ne 0 -or $CombinedText -match '\bFAILED\b') {
-      'FAIL'
-    } elseif ($WarnCount -gt 0) {
-      'WARN'
-    } else {
-      'PASS'
-    }
-
-    $Results += [pscustomobject]@{
-      guardId = $Guard
-      status = $Status
-      failCount = if ($Status -eq 'FAIL') { 1 } else { 0 }
-      warnCount = $WarnCount
+    $Results.Add([pscustomobject]@{
+      id = $entry.id
+      file = $entry.file
+      status = 'FAIL'
+      failCount = 1
+      warnCount = 0
       infoCount = 0
-      error = if ($Status -eq 'FAIL') { if ($CombinedText.Trim()) { $CombinedText.Trim() } else { "Guard did not produce JSON output. ExitCode=$($Process.ExitCode)" } } else { $null }
-    }
+      policy = ($entry.ownerPolicy -join '; ')
+    })
   }
 }
 
 $FailCount = @($Results | Where-Object { $_.status -eq 'FAIL' }).Count
 $WarnCount = @($Results | Where-Object { $_.status -eq 'WARN' }).Count
-$FinalStatus = if ($FailCount -gt 0) { "FAIL" } elseif ($WarnCount -gt 0) { "PASS_WITH_WARNINGS" } else { "PASS" }
-if ($FailOnWarning -and $WarnCount -gt 0 -and $FailCount -eq 0) { $FinalStatus = "FAIL" }
+$FinalStatus = if ($FailCount -gt 0) { 'FAIL' } elseif ($WarnCount -gt 0) { 'WARN' } else { 'PASS' }
+if ($FailOnWarning -and $WarnCount -gt 0 -and $FailCount -eq 0) {
+  $FinalStatus = 'FAIL'
+}
 
-$Summary = @"
-status: $FinalStatus
-recommendation: $(if ($FinalStatus -eq 'PASS') { 'READY_FOR_PATCH_REVIEW_OR_PR_GATE' } elseif ($FinalStatus -eq 'PASS_WITH_WARNINGS') { 'REVIEW_WARNINGS_BEFORE_PR' } else { 'FIX_REQUIRED' })
-session_id: $SessionId
-repo: $RepoRoot
-mode: $Mode
-evidence_root: $EvidenceRoot
-handoff_zip: $EvidenceRoot\$SessionId.zip
-guards_total: $($Guards.Count)
-guards_fail: $FailCount
-guards_warn: $WarnCount
-"@
-$Summary | Set-Content -LiteralPath (Join-Path $EvidenceRoot "summary.txt") -Encoding UTF8
+$ZipPath = Join-Path $EvidenceRoot "$SessionId.zip"
+$SummaryMd = @(
+  "# $Profile Guards Run",
+  "",
+  "- status: $FinalStatus",
+  "- session_id: $SessionId",
+  "- mode: $Mode",
+  "- evidence_root: $EvidenceRoot",
+  "- zip: $ZipPath",
+  "- guards_total: $($Entries.Count)",
+  "- guards_fail: $FailCount",
+  "- guards_warn: $WarnCount",
+  "",
+  "| Guard ID | Status | File | Owner policy |",
+  "|---|---|---|---|"
+)
+foreach ($result in $Results) {
+  $SummaryMd += "| $($result.id) | $($result.status) | $($result.file) | $($result.policy) |"
+}
+$SummaryMd += ""
+$SummaryMd | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'SUMMARY.md') -Encoding UTF8
 
 $Evidence = [ordered]@{
   status = $FinalStatus
-  recommendation = if ($FinalStatus -eq 'PASS') { 'READY_FOR_PATCH_REVIEW_OR_PR_GATE' } elseif ($FinalStatus -eq 'PASS_WITH_WARNINGS') { 'REVIEW_WARNINGS_BEFORE_PR' } else { 'FIX_REQUIRED' }
+  profile = $Profile
   session_id = $SessionId
   repo = $RepoRoot
   mode = $Mode
   evidence_root = $EvidenceRoot
-  handoff_zip = "$EvidenceRoot\$SessionId.zip"
-  guards_total = $Guards.Count
+  zip = (Join-Path $EvidenceRoot "$SessionId.zip")
+  guards_total = $Entries.Count
   guards_fail = $FailCount
   guards_warn = $WarnCount
   results = $Results
 }
-$Evidence | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $EvidenceRoot "evidence.json") -Encoding UTF8
+$Evidence | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'evidence.json') -Encoding UTF8
 
-$ZipPath = Join-Path $EvidenceRoot "$SessionId.zip"
 if (Test-Path -LiteralPath $ZipPath) { Remove-Item -LiteralPath $ZipPath -Force }
-Compress-Archive -Path (Join-Path $EvidenceRoot "*") -DestinationPath $ZipPath -Force
+Compress-Archive -Path (Join-Path $EvidenceRoot '*') -DestinationPath $ZipPath -Force
 
 Write-Host ""
 Write-Host "status: $FinalStatus"
+Write-Host "profile: $Profile"
 Write-Host "evidence_root: $EvidenceRoot"
-Write-Host "handoff_zip: $ZipPath"
+Write-Host "zip: $ZipPath"
 Write-Host "guards_fail: $FailCount"
 Write-Host "guards_warn: $WarnCount"
 

@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "scanRoots": [
+    "app-client/runtime",
+    "app-partner/runtime",
+    "app-captain/runtime",
+    "app-field/runtime",
+    "control-panel/runtime",
+    "webapp/runtime",
+    "website/runtime",
+    "ui-kit",
+    "dsh",
+    "wlt",
+    "knz",
+    "arb",
+    "amn",
+    "esf",
+    "mrf",
+    "snd",
+    "kwd"
+  ],
+  "allowLocalDesignHints": [
+    "legacy",
+    "deprecated",
+    "example"
+  ]
+}

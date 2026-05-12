@@ -1,8 +1,0 @@
-{
-  "guard": "GUARD-17_SERVICE_BLUEPRINT_COVERAGE",
-  "version": "1.0.0",
-  "mode": "CHECK_ONLY",
-  "policy": {
-    "defaultSeverity": "warning"
-  }
-}

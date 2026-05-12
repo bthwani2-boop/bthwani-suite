@@ -1,12 +1,37 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import { execFileSync } from 'node:child_process';
 
 export const TEXT_EXTENSIONS = new Set([
-  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.json', '.md', '.mdx', '.yml', '.yaml', '.toml', '.css', '.scss'
+  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.json', '.md', '.mdx', '.yml', '.yaml', '.toml', '.css', '.scss', '.txt', '.ps1'
 ]);
 
 export const CODE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs']);
+
+export const CURRENT_ACTIVE_START_DIRS = [
+  'governance',
+  '.agents',
+  'tools/guards',
+  '.github/workflows',
+  'app-client/runtime',
+  'app-partner/runtime',
+  'app-captain/runtime',
+  'app-field/runtime',
+  'control-panel/runtime',
+  'webapp/runtime',
+  'website/runtime',
+  'ui-kit',
+  'dsh',
+  'wlt',
+  'knz',
+  'arb',
+  'amn',
+  'esf',
+  'mrf',
+  'snd',
+  'kwd'
+];
 
 const DEFAULT_SKIP_SEGMENTS = new Set([
   '.git', 'node_modules', 'dist', 'build', 'coverage', '.next', '.expo', '.turbo', '.nx', 'android', 'ios'
@@ -14,7 +39,7 @@ const DEFAULT_SKIP_SEGMENTS = new Set([
 
 export function parseArgs(argv = process.argv.slice(2)) {
   const args = { root: process.cwd(), jsonOut: '', mdOut: '', mode: 'local' };
-  for (let i = 0; i < argv.length; i++) {
+  for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     if (token === '--root') args.root = argv[++i];
     else if (token === '--json-out') args.jsonOut = argv[++i];
@@ -42,6 +67,10 @@ export function readText(filePath) {
   return fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, '');
 }
 
+export function readJson(filePath) {
+  return JSON.parse(readText(filePath));
+}
+
 export function readTextSafe(filePath) {
   try { return readText(filePath); } catch { return ''; }
 }
@@ -52,24 +81,34 @@ export function writeFileSafe(filePath, content) {
   fs.writeFileSync(filePath, content, 'utf8');
 }
 
+export function gitTrackedFiles(root) {
+  const output = execFileSync('git', ['ls-files'], {
+    cwd: root,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  return output.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+}
+
 function shouldSkip(absPath, root) {
   const relative = rel(root, absPath);
   if (!relative || relative === '.') return false;
   const parts = relative.split('/');
   if (parts.some((part) => DEFAULT_SKIP_SEGMENTS.has(part))) return true;
-  if (relative.startsWith('tools/registry/runs/')) return true;
-  return false;
+  return relative.startsWith('tools/registry/runs/');
 }
 
 export function walkFiles(root, options = {}) {
-  const startDirs = options.startDirs ?? ['apps', 'packages', 'services', 'governance', 'tools', '.github', 'contracts'];
+  const startDirs = options.startDirs ?? CURRENT_ACTIVE_START_DIRS;
   const extensions = options.extensions ?? TEXT_EXTENSIONS;
   const files = [];
+
   for (const dir of startDirs) {
     const abs = path.join(root, dir);
     if (!fs.existsSync(abs)) continue;
     walk(abs);
   }
+
   return files;
 
   function walk(current) {
@@ -114,6 +153,7 @@ export function finalize(report, args) {
     issues: report.issues,
     generatedAt: new Date().toISOString(),
   };
+
   writeFileSafe(args.jsonOut, JSON.stringify(output, null, 2));
   writeFileSafe(args.mdOut, toMarkdown(output));
   console.log(`${report.guardId}: ${status} (fail=${failCount}, warn=${warnCount})`);
@@ -126,7 +166,7 @@ function toMarkdown(output) {
   lines.push(`# ${output.guardId}`);
   lines.push('');
   lines.push(`status: ${output.status}`);
-  lines.push(`policySource: ${output.policySource}`);
+  lines.push(`policySource: ${Array.isArray(output.policySource) ? output.policySource.join(', ') : output.policySource}`);
   lines.push(`failCount: ${output.failCount}`);
   lines.push(`warnCount: ${output.warnCount}`);
   lines.push('');

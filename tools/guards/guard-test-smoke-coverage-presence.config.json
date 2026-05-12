@@ -1,8 +1,0 @@
-{
-  "guard": "GUARD-22_TEST_SMOKE_COVERAGE_PRESENCE",
-  "version": "1.0.0",
-  "mode": "CHECK_ONLY",
-  "policy": {
-    "defaultSeverity": "warning"
-  }
-}
