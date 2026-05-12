@@ -31,19 +31,19 @@ dsh/dsh.openapi.yaml
 | Truth File | `dsh/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
-| Current Decision | `DSH_MOBILE_APPS_FINAL_CLOSURE_GATE_CLOSED_PREVIEW_ONLY` |
-| Current Status | `MOBILE_PREVIEW_CLOSURE_COMPLETED` |
-| Evidence Root | `tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555` |
+| Current Decision | `DSH_FINAL_REALITY_LOCK_CLOSED_PREVIEW_ONLY` |
+| Current Status | `NEEDS_VISUAL_EVIDENCE` |
+| Evidence Root | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
-### Surface Status Summary (Forensic Audit 2026-05-10)
+### Surface Status Summary (Reality Lock 2026-05-12)
 
 | Surface | Status | Evidence Path | Note |
 |---|---|---|---|
-| app-client | `UI_PREVIEW_ONLY` | `dsh/frontend/app-client/` | No-API logic, fixture-backed discovery. |
-| app-partner | `UI_PREVIEW_ONLY` | `dsh/frontend/app-partner/` | Partner mobile gate closed; wallet, settlement, and commission copy now routes through WLT bridge helpers. |
-| app-captain | `UI_PREVIEW_ONLY` | `dsh/frontend/app-captain/` | Captain-scoped map only; finance chrome now resolves through WLT bridge helpers. |
-| app-field | `UI_PREVIEW_ONLY` | `dsh/frontend/app-field/` | Field visit onboarding proven; finance preview remains WLT-owned through the field bridge. |
-| control-panel | `UI_PREVIEW_ONLY` | `dsh/frontend/control-panel/` | Admin live dispatch preview map only. |
+| app-client | `UI_PREVIEW_ONLY` | `dsh/frontend/app-client/` | Scoped preview closure only; discovery, storefront, cart, checkout, tracking, support, and rating still require visual/runtime proof. |
+| app-partner | `UI_PREVIEW_ONLY` | `dsh/frontend/app-partner/` | Scoped preview closure only; inbox, preparation, promotions, support, and WLT bridge remain preview-backed. |
+| app-captain | `UI_PREVIEW_ONLY` | `dsh/frontend/app-captain/` | Scoped preview closure only; assignment, pickup/dropoff, map, support, and finance bridge remain preview-backed. |
+| app-field | `UI_PREVIEW_ONLY` | `dsh/frontend/app-field/` | Scoped preview closure only; stores, onboarding, visit, history, profile, and finance bridge remain preview-backed. |
+| control-panel | `UI_PREVIEW_ONLY` | `dsh/frontend/control-panel/` | Scoped preview closure only; operations, marketing, partner eligibility, and finance preview remain preview-backed. |
 
 ### Map and Heatmap Boundary Contract
 
@@ -58,10 +58,10 @@ id: dsh
 name: Delivery & Shopping
 owner: dsh/
 public_export_path: dsh/index.ts
-screens_matrix: NEEDS_EVIDENCE
-flow_matrix: NEEDS_EVIDENCE
-evidence_root: tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555
-closure_decision: DSH_MOBILE_APPS_FINAL_CLOSURE_GATE_CLOSED_PREVIEW_ONLY
+screens_matrix: NEEDS_VISUAL_EVIDENCE
+flow_matrix: NEEDS_VISUAL_EVIDENCE
+evidence_root: tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336
+closure_decision: DSH_FINAL_REALITY_LOCK_CLOSED_PREVIEW_ONLY
 
 ### Service Purpose
 
@@ -111,7 +111,7 @@ The app-client DSH checkout boundary may consume WLT only through a public bridg
 
 ### Current Standardization Status
 
-- `DshClientSurface` is introduced as the new app-client-facing surface boundary with `DshSurfaceHost` compatibility preserved.
+- `DshClientSurface` is the app-client-facing surface boundary, with legacy host compatibility preserved at the app-shell route layer.
 - `dsh-client.routes.ts` and `dsh-client.screen-registry.ts` are introduced as the passive route/screen metadata layer.
 - `PreferencesScreen` is introduced for DSH-only delivery preferences with extracted `preferences.preview-data.ts`.
 - WLT bridge standardization is complete with consolidation into `wlt-dsh-client.parts.tsx`.
@@ -170,12 +170,12 @@ The app-client DSH checkout boundary may consume WLT only through a public bridg
 
 | Surface | Role / Scope | What Surface Provides | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| `app-client` | Customer: اكتشاف المتاجر، المنتجات، السلة، checkout، الدفع، التتبع، الدعم، التقييم. | frontend closed; UI_PREVIEW_ONLY | CLOSED_PREVIEW_ONLY | N/A |
-| `webapp` | Customer Web: نسخة ويب وظيفية مكافئة لـ app-client عند النضج. | service-owned frontend slice closed | CLOSED_PREVIEW_ONLY | N/A |
-| `app-partner` | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | frontend standardized; UI_PREVIEW_ONLY | CLOSED_PREVIEW_ONLY | `tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555` |
-| `app-captain` | Captain: قبول مهمة التوصيل، الاستلام، التسليم، البلاغات، الإكمال. | frontend closed; UI_PREVIEW_ONLY | CLOSED_PREVIEW_ONLY | N/A |
-| `app-field` | Field Agent: تفعيل المتاجر والدعم الميداني عند الحاجة المثبتة. | frontend closed; UI_PREVIEW_ONLY | CLOSED_PREVIEW_ONLY | N/A |
-| `control-panel` | Admin/Ops: مراقبة، تشغيل، دعم، كتالوج، تدخل، تقارير. | frontend closed; UI_PREVIEW_ONLY | CLOSED_PREVIEW_ONLY | N/A |
+| `app-client` | Customer: اكتشاف المتاجر، المنتجات، السلة، checkout، الدفع، التتبع، الدعم، التقييم. | scoped preview closure only; `UI_PREVIEW_ONLY` | `CLOSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
+| `webapp` | Customer Web: نسخة ويب وظيفية مكافئة لـ app-client عند النضج. | parity target only; no current webapp proof in this reality lock | `NEEDS_BINDING_LATER` | N/A |
+| `app-partner` | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | scoped preview closure only; `UI_PREVIEW_ONLY` | `CLOSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
+| `app-captain` | Captain: قبول مهمة التوصيل، الاستلام، التسليم، البلاغات، الإكمال. | scoped preview closure only; `UI_PREVIEW_ONLY` | `CLOSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
+| `app-field` | Field Agent: تفعيل المتاجر والدعم الميداني عند الحاجة المثبتة. | scoped preview closure only; `UI_PREVIEW_ONLY` | `CLOSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
+| `control-panel` | Admin/Ops: مراقبة، تشغيل، دعم، كتالوج، تدخل، تقارير. | scoped preview closure only; `UI_PREVIEW_ONLY` | `CLOSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
 ### Owned Capabilities
 
@@ -205,12 +205,12 @@ The app-client DSH checkout boundary may consume WLT only through a public bridg
 
 | Surface | Ownership Rule | Service Scope | Status | Evidence |
 |---|---|---|---|---|
-| `app-client` | app owns shell/composition only | Customer: اكتشاف المتاجر، المنتجات، السلة، checkout، الدفع، التتبع، الدعم، التقييم. | CLOSED_PREVIEW_ONLY | N/A |
-| `webapp` | app owns shell/composition only | Customer Web: نسخة ويب وظيفية مكافئة لـ app-client عند النضج. | CLOSED_PREVIEW_ONLY | N/A |
-| `app-partner` | app owns shell/composition only | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | CLOSED_PREVIEW_ONLY | `tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555` |
-| `app-captain` | app owns shell/composition only | Captain: قبول مهمة التوصيل، الاستلام، التسليم، البلاغات، الإكمال. | CLOSED_PREVIEW_ONLY | N/A |
-| `app-field` | app owns shell/composition only | Field Agent: تفعيل المتاجر والدعم الميداني عند الحاجة المثبتة. | CLOSED_PREVIEW_ONLY | N/A |
-| `control-panel` | app owns shell/composition only | Admin/Ops: مراقبة، تشغيل، دعم، كتالوج، تدخل، تقارير. | CLOSED_PREVIEW_ONLY | N/A |
+| `app-client` | app owns shell/composition only | Customer: اكتشاف المتاجر، المنتجات، السلة، checkout، الدفع، التتبع، الدعم، التقييم. | `CLOSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
+| `webapp` | app owns shell/composition only | Customer Web: نسخة ويب وظيفية مكافئة لـ app-client عند النضج. | `NEEDS_BINDING_LATER` | N/A |
+| `app-partner` | app owns shell/composition only | Partner/Store: الطلبات، القبول/الرفض، التحضير، الجاهزية، الكتالوج، المشاكل. | `CLOSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
+| `app-captain` | app owns shell/composition only | Captain: قبول مهمة التوصيل، الاستلام، التسليم، البلاغات، الإكمال. | `CLOSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
+| `app-field` | app owns shell/composition only | Field Agent: تفعيل المتاجر والدعم الميداني عند الحاجة المثبتة. | `CLOSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
+| `control-panel` | app owns shell/composition only | Admin/Ops: مراقبة، تشغيل، دعم، كتالوج، تدخل، تقارير. | `CLOSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
 ### App/Shell Rule
 
@@ -375,11 +375,11 @@ All payments, fees, commissions, discounts, refunds, settlements, compensation, 
 
 | Gate | Status | Required Proof | Evidence | Notes |
 |---|---|---|---|---|
-| UI / UX / Flow | `TBD` | Surface coverage, states, RTL, purpose/CTA, no ownership breach | N/A | No UI-first closure. |
-| Binding | `TBD` | Typed client/boundary, actual usage, TypeScript PASS | N/A | First Binding must be small. |
-| Integration | `TBD` | Approved contract/event/public interface | N/A | No deep/private integration. |
-| Runtime | `TBD` | Runtime mode, provider, happy/failure/recovery path proof | N/A | Fixture/mock/seed is not runtime truth. |
-| Backend | `TBD` | handler/service/data/security proof | N/A | Not implied by OpenAPI. |
+| UI / UX / Flow | `NEEDS_VISUAL_EVIDENCE` | Surface coverage, states, RTL, purpose/CTA, no ownership breach | `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md` | Current live routes are frozen, but trusted screenshots are still missing. |
+| Binding | `NEEDS_BINDING_LATER` | Typed client/boundary, actual usage, TypeScript PASS | `dsh/docs/SCREEN_API_MATRIX.md` | Freeze first; runtime binding remains later work. |
+| Integration | `NOT_READY_FOR_API` | Approved contract/event/public interface | `dsh/docs/SCREEN_API_MATRIX.md` | No contract work starts before current freeze exits the visual gate. |
+| Runtime | `RUNTIME_UNPROVEN` | Runtime mode, provider, happy/failure/recovery path proof | `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` | Fixture/mock/seed is not runtime truth. |
+| Backend | `NOT_READY_FOR_API` | handler/service/data/security proof | `dsh/dsh.openapi.yaml`; `dsh/backend/src/contracts.ts` | Backend and domain remain scaffold-only in this phase. |
 | Production Readiness | `BLOCKED` | builds, security, observability, tests, rollback, evidence pack | N/A | No GO without all criteria. |
 
 ### Runtime Truth Classification
@@ -414,10 +414,10 @@ No fixture, mock, or seed may be promoted to runtime truth without evidence.
 | Area | Status | Minimum Proof | Evidence |
 |---|---|---|---|
 | Observability | `TBD` | signals/logs/metrics for P0 flows when enabled | N/A |
-| TypeScript | `TBD` | `pnpm -w exec tsc --noEmit` | N/A |
+| TypeScript | `PASS` | `pnpm -w exec tsc --noEmit` | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336/tsc-noemit.txt` |
 | Unit/Component | `TBD` | scope-based tests where applicable | N/A |
 | Integration/E2E | `TBD` | critical path proof where applicable | N/A |
-| Visual/RTL | `TBD` | screenshot/visual proof for UI changes | N/A |
+| Visual/RTL | `NEEDS_VISUAL_EVIDENCE` | screenshot/visual proof for UI changes | `tools/registry/runs/DSH_VISUAL_RUNTIME_SMOKE-20260512-023336` |
 | Accessibility | `TBD` | WCAG 2.2 floor where applicable | N/A |
 | Performance | `TBD` | no material regression for enabled flows | N/A |
 
@@ -452,28 +452,30 @@ No fixture, mock, or seed may be promoted to runtime truth without evidence.
 | Evidence ID | Scope | Result | Path | Notes |
 |---|---|---|---|---|
 | NEEDS_EVIDENCE | Root frontend parity | Pending | `tools/registry/runs/{SESSION_ID}` | Add only verified evidence. |
+| DSH_FINAL_REALITY_LOCK | Current-branch truth reconciliation for preview-only scope | `CLOSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` | Truth files, vocabulary, live-file CSVs, and current-branch blockers were reconciled without promoting runtime/API/backend claims. |
+| DSH_VISUAL_RUNTIME_SMOKE | Current-branch visual/runtime smoke gate | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/DSH_VISUAL_RUNTIME_SMOKE-20260512-023336` | Existing screenshots found in older evidence packs were partial and not accepted as current-branch proof. |
 | DSH_AUDIT_010 | Deep Local System Audit | FIX_REQUIRED | `tools/registry/runs/DSH_AUDIT_010_DEEP_SYSTEM_DIAGNOSIS-20260506-053242` | Matrix drift cleanup and evidence generation |
-| DSH-EVD-F2-F3-WLT-BIND | DSH screens bound to WLT finance model (F2–F3, 2026-05-09) | `UI_PREVIEW_FOUNDATION` | `dsh/frontend/app-client/DshCartUnifiedScreen.tsx`, `dsh/frontend/app-captain/DshCaptainFinanceScreen.tsx`, `dsh/frontend/app-field/DshFieldFinanceScreen.tsx` | preview/fixture only — DSH consumes WLT model, no financial data ownership in DSH |
-| DSH_CLEANUP_HARDENING | Dead code archive, duplication consolidation, and naming cleanup | `PASSED` | `dsh/_archive/frontend/5899a771-f61c-4e88-ba19-e7560e699a04/` | 100% TSC stability, archived redundant fixtures and screens. |
-| DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3 | Final cleanup of index, preferences data, ghost types, and WLT bridge consolidation | `PASSED` | `tools/registry/runs/DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3_FIX_REQUIRED-20260511-035800` | Zero-gap standardization of app-client surface. |
-| DSH_MOBILE_APPS_FINAL_CLOSURE_GATE | Partner, captain, and field mobile closure plus app-field public API hardening | `PASSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555` | No remaining `UNPROVEN` mobile registry rows; WLT owns the remaining wallet/finance copy used inside partner and captain host surfaces. |
+| DSH-EVD-F2-F3-WLT-BIND | DSH screens bound to WLT finance model (F2–F3, 2026-05-09) | `UI_PREVIEW_FOUNDATION` | `dsh/frontend/app-client/screens/CartScreen.tsx`, `dsh/frontend/app-captain/screens/DshCaptainFinanceScreen.tsx`, `dsh/frontend/app-field/screens/DshFieldFinanceScreen.tsx` | preview/fixture only — DSH consumes WLT model, no financial data ownership in DSH |
+| DSH_CLEANUP_HARDENING | Dead code archive, duplication consolidation, and naming cleanup | `PASSED` | `dsh/_archive/frontend/5899a771-f61c-4e88-ba19-e7560e699a04/` | Archived redundant fixtures and screens; current reality lock revalidated truth separately. |
+| DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3 | Final cleanup of index, preferences data, ghost types, and WLT bridge consolidation | `PASSED` | `tools/registry/runs/DSH_CLIENT_APP_SCOPE_STANDARDIZATION_R3_FIX_REQUIRED-20260511-035800` | App-client surface cleanup and WLT bridge consolidation were completed; runtime proof remains separate. |
+| DSH_MOBILE_APPS_FINAL_CLOSURE_GATE | Partner, captain, and field mobile closure plus app-field public API hardening | `PASSED_PREVIEW_ONLY` | `tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555` | Mobile registries were closed for preview-only scope; runtime smoke was skipped in that gate. |
 
 
 ### Current Decision
 
 ```text
-DSH_MOBILE_APPS_FINAL_CLOSURE_GATE_CLOSED_PREVIEW_ONLY
+DSH_FINAL_REALITY_LOCK_CLOSED_PREVIEW_ONLY
 ```
 
 ### Remaining Risks
 
-- Mobile frontend closure is complete for preview-only scope, but runtime and visual proof still require active app sessions.
-- API contract remains scaffold/TBD until Screen/API Matrix evidence exists.
-- Backend and domain remain scaffold/unproven until branch evidence is collected.
+- Preview-only mobile and control-panel scope is frozen, but trusted current-branch screenshots are still missing.
+- API contract remains `CONTRACT_TBD` until the visual gate is cleared and the Screen/API freeze exits with evidence.
+- Backend, domain, and WLT ledger runtime remain unproven and intentionally out of scope for this phase.
 
 ### Single Next Action
 
-Collect runtime and visual smoke evidence only when a mobile runtime session is available.
+Attach trusted current-branch screenshots for the five active DSH surfaces, or keep the service at `NEEDS_VISUAL_EVIDENCE` without promoting API/runtime closure language.
 
 
 ### Update Protocol

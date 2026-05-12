@@ -23,6 +23,10 @@ Lean closure docs:
 - `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md`
 - `dsh/docs/DSH_FORENSIC_INVENTORY.md`
 - `dsh/docs/CLOSURE_DECISION_LOG.md`
+- `dsh/docs/DSH_PHASE_3R_SCREEN_GAP_INVENTORY.md`
+- `dsh/docs/DSH_PHASE_3R_OPERATING_LOGIC_MODEL.md`
+- `dsh/docs/DSH_PHASE_3R_MANUAL_DESIGN_WORK_ORDER.md`
+- `dsh/docs/DSH_PHASE_3R_PREVIEW_SCENARIOS.md`
 
 Mobile closure docs:
 

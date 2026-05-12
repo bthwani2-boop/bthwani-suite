@@ -19,7 +19,7 @@ tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555
 - `dsh/frontend/app-partner/dsh-partner.screen-registry.ts`, `dsh/frontend/app-captain/dsh-captain.screen-registry.ts`, and `dsh/frontend/app-field/dsh-field.screen-registry.ts` were closed until no `UNPROVEN` rows remained across the four targeted mobile registries.
 - Remaining partner and captain wallet/finance copy that still lived inside DSH host surfaces was moved behind WLT-owned helpers at `wlt/frontend/app-partner/dsh/wlt-dsh-partner.ui-copy.ts` and `wlt/frontend/app-captain/dsh/wlt-dsh-captain.ui-copy.ts`.
 - WLT bridge metadata for partner, captain, and field remains explicit with `ownerId: 'wlt.dsh'`, `serviceId: 'wlt'`, and `linkedServiceId: 'dsh'`.
-- Final classification is live-file based for partner, captain, and field. Client classification remains the existing app-client closure reference.
+- Final classification is live-file based for client, partner, captain, and field.
 - No backend, API, OpenAPI, dependency, route-semantics, label/value, or media changes were introduced in this gate.
 
 ## Gate Summary
@@ -43,4 +43,4 @@ tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555
 
 ## Decision
 
-This gate closes the local preview-only mobile scope for DSH under the current repository state. Runtime and visual proof remain separate evidence tracks and were not claimed here.
+This gate closes the local preview-only mobile scope for DSH under the current repository state. Runtime and visual proof remain separate evidence tracks and were not claimed here. The current branch reality lock keeps this gate as a preview-only baseline and does not promote it to runtime truth.
