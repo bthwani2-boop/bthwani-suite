@@ -37,7 +37,11 @@ import { getDshCategoryIconUrl } from '../shared/get-dsh-category-icon-url';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
 import type { MarketingGrowthRecord } from '../../shared/growth.preview-store';
 import type { MarketingVideoRecord } from '../../shared/video.preview-store';
-import { getMarketingTickerItems, buildMarketingTickerPlan } from '../../shared/news-ticker.preview-store';
+import {
+  getMarketingTickerItems,
+  buildMarketingTickerPlan,
+  type MarketingNewsTickerItem,
+} from '../../shared/news-ticker.preview-store';
 import { getPublishedHomePromos, type HomePromoRecord } from '../../shared/promo.preview-store';
 
 import { canRenderInClientSurface } from '../../shared/workflow';
@@ -196,6 +200,9 @@ export type DshHomeGetStore = {
   isFavorite: boolean;
   isFollowing: boolean;
   hasOffer?: boolean;
+  hasBthwaniPro?: boolean;
+  hasNewProducts?: boolean;
+  hasCouponAvailable?: boolean;
   publishStage?: string;
   commercialSourceMap?: import('../../shared/store-card-commercial-map').CommercialSourceMap;
 };
@@ -417,6 +424,19 @@ function isWithinOperatingHours(now: Date, openHour: number, closeHour: number) 
   }
 
   return currentHour >= openHour || currentHour < closeHour;
+}
+
+function dedupeMarketingTickerItems(items: ReadonlyArray<MarketingNewsTickerItem>) {
+  const seenIds = new Set<string>();
+
+  return items.filter((item) => {
+    if (seenIds.has(item.id)) {
+      return false;
+    }
+
+    seenIds.add(item.id);
+    return true;
+  });
 }
 
 // Internal resolveTickerBanner removed. Using buildMarketingTickerPlan from store.
@@ -757,6 +777,7 @@ export function DshHomeGetScreen({
     () =>
       categoryItems.map((category) => ({
         ...category,
+        iconUrl: getDshCategoryIconUrl(category.id),
         icon: categoryIconMap[category.id] ?? '📂',
       })),
     [categoryItems]
@@ -1112,8 +1133,21 @@ export function DshHomeGetScreen({
       return null;
     }
 
-    const plan = buildMarketingTickerPlan(currentTime, 'home');
-    const activeItem = plan.activeItem;
+    const homeTickerItems = getMarketingTickerItems('home');
+    const previewTickerItems = dedupeMarketingTickerItems([
+      ...homeTickerItems,
+      ...getMarketingTickerItems('client'),
+    ]).map((item) => (
+      item.audience === 'client'
+        ? { ...item, audience: 'all' as const }
+        : item
+    ));
+
+    const homePlan = buildMarketingTickerPlan(currentTime, 'home', homeTickerItems);
+    const previewPlan = buildMarketingTickerPlan(currentTime, 'all', previewTickerItems);
+    const suppressedPreviewItem =
+      previewPlan.suppressedEntries.find((entry) => entry.item.status === 'published')?.item ?? null;
+    const activeItem = homePlan.activeItem ?? previewPlan.activeItem ?? suppressedPreviewItem;
 
     if (!activeItem) {
       return {
@@ -1124,9 +1158,13 @@ export function DshHomeGetScreen({
       };
     }
 
+    const isSuppressedPreview = !homePlan.activeItem && !previewPlan.activeItem && Boolean(suppressedPreviewItem);
+
     return {
       isOpen: true,
-      statusLabel: currentLanguage === 'ar' ? 'مباشر' : 'مباشر',
+      statusLabel: isSuppressedPreview
+        ? (currentLanguage === 'ar' ? 'معاينة' : 'Preview')
+        : (currentLanguage === 'ar' ? 'مباشر' : 'Live'),
       message: activeItem.message,
       isMarketing: true,
       actionTarget: activeItem.actionTarget,
@@ -1168,12 +1206,9 @@ export function DshHomeGetScreen({
       id: category.id,
       key: category.id,
       title: category.label,
-      shortLabel: category.shortLabel,
       subtitle: category.subtitle,
       iconUrl: getDshCategoryIconUrl(category.id),
       emojiFallback: category.emojiFallback ?? categoryIconMap[category.id] ?? '📂',
-      orbitWeight: category.orbitWeight,
-      isManualLike: category.isManualLike,
     }));
   }, [categoryItems]);
 
@@ -1186,12 +1221,9 @@ export function DshHomeGetScreen({
       id: selectedCategoryFixture.id,
       key: selectedCategoryFixture.id,
       title: selectedCategoryLabel,
-      shortLabel: selectedCategoryFixture.shortLabel,
       subtitle: selectedCategoryFixture.subtitle,
       iconUrl: getDshCategoryIconUrl(selectedCategoryFixture.id),
       emojiFallback: selectedCategoryFixture.emojiFallback ?? categoryIconMap[selectedCategoryFixture.id] ?? '📂',
-      orbitWeight: selectedCategoryFixture.orbitWeight,
-      isManualLike: selectedCategoryFixture.isManualLike,
     };
   }, [selectedCategoryFixture, selectedCategoryLabel]);
 
@@ -1206,12 +1238,29 @@ export function DshHomeGetScreen({
     [selectedSubcategories]
   );
 
+  const fallbackCategoriesDialLayout = React.useMemo<DialAnchorLayout>(() => ({
+    x: isRtl ? Math.max(spacing[3], viewportWidth - spacing[3] - 54) : spacing[3],
+    y: spacing[14],
+    width: 54,
+    height: 54,
+  }), [isRtl, viewportWidth]);
+
   const openCategoriesDial = React.useCallback(() => {
-    categoriesAnchorRef.current?.measureInWindow((x, y, width, height) => {
-      setCategoriesDialLayout({ x, y, width, height });
+    const openSheet = (layout?: DialAnchorLayout | null) => {
+      setCategoriesDialLayout(layout ?? fallbackCategoriesDialLayout);
       setCategoriesSheetVisible(true);
+    };
+
+    if (!categoriesAnchorRef.current?.measureInWindow) {
+      openSheet();
+      return;
+    }
+
+    categoriesAnchorRef.current.measureInWindow((x, y, width, height) => {
+      const hasValidLayout = [x, y, width, height].every((value) => Number.isFinite(value)) && width > 0 && height > 0;
+      openSheet(hasValidLayout ? { x, y, width, height } : fallbackCategoriesDialLayout);
     });
-  }, []);
+  }, [fallbackCategoriesDialLayout]);
 return (
     <View style={styles.screenRoot}>
       {inlineSearchVisible ? (
@@ -1264,8 +1313,9 @@ return (
             },
           ]}
           ticker={{
+            statusLabel: tickerState?.statusLabel ?? (currentLanguage === 'ar' ? 'مباشر' : 'Live'),
             message: tickerState?.isMarketing
-              ? `${isTickerPaused ? '⏸️' : ''} ${tickerState.message}`
+              ? `${isTickerPaused ? '⏸️ ' : ''}${tickerState.message}`
               : (tickerState?.message ?? ''),
             onPress: handleTickerAction,
             marquee: tickerState?.isMarketing ? !isTickerPaused : true,
@@ -1490,8 +1540,8 @@ return (
                     label={selectedCategoryLabel}
                     icon={
                       <CategoryIconImage
-                        uri={null}
-                        emojiFallback={categoryIconMap[selectedCategoryFixture.id] ?? '📂'}
+                        uri={activeCategoryDialItem?.iconUrl ?? null}
+                        emojiFallback={activeCategoryDialItem?.emojiFallback ?? categoryIconMap[selectedCategoryFixture.id] ?? '📂'}
                         style={styles.categoryIconImage}
                       />
                     }
@@ -1514,7 +1564,6 @@ return (
                       icon: '✨',
                       actionType: normalizeHomePromoActionType(promo.targetType),
                       actionTarget: promo.targetId,
-                      publishStage: resolveHomePromoPublishStage(promo.status),
                     };
                     resolveBannerPress(mockPromo)();
                   }}
@@ -1630,7 +1679,7 @@ return (
                     isActive={category.id === activeCategoryId}
                     icon={
                       <CategoryIconImage
-                        uri={null}
+                        uri={category.iconUrl ?? null}
                         emojiFallback={category.icon}
                         style={styles.filterChipIcon}
                       />
@@ -1742,41 +1791,6 @@ return (
           </View>
         </View>
 
-        <CategoryOrbitCarousel
-          visible={categoriesSheetVisible}
-          anchorLayout={categoriesDialLayout}
-          items={categoriesDialItems}
-          onClose={() => setCategoriesSheetVisible(false)}
-          onSelect={(item) => {
-            selectCategoryPage(item.key);
-            setCategoriesSheetVisible(false);
-            if (item.key === 'awnak') {
-              onOpenCategory?.('awnak');
-              return;
-            }
-
-            if (item.key === 'shein') {
-              onOpenSheinInfo?.();
-            }
-          }}
-        />
-
-        <ServiceOrbitCarousel
-          visible={serviceDialVisible}
-          anchorLayout={serviceDialAnchorLayout}
-          items={serviceDialItems}
-          onClose={() => setServiceDialVisible(false)}
-          onSelect={(item) => {
-            setServiceDialVisible(false);
-
-            if (item.key === 'dsh') {
-              return;
-            }
-
-            onOpenService?.(item.key as DshServiceId);
-          }}
-        />
-
         {shortsVisible
           ? (renderApprovedVideoReelsViewer?.({
               visible: shortsVisible,
@@ -1797,6 +1811,41 @@ return (
             ))
           : null}
       </ScrollView>
+
+      <CategoryOrbitCarousel
+        visible={categoriesSheetVisible}
+        anchorLayout={categoriesDialLayout}
+        items={categoriesDialItems}
+        onClose={() => setCategoriesSheetVisible(false)}
+        onSelect={(item) => {
+          selectCategoryPage(item.key);
+          setCategoriesSheetVisible(false);
+          if (item.key === 'awnak') {
+            onOpenCategory?.('awnak');
+            return;
+          }
+
+          if (item.key === 'shein') {
+            onOpenSheinInfo?.();
+          }
+        }}
+      />
+
+      <ServiceOrbitCarousel
+        visible={serviceDialVisible}
+        anchorLayout={serviceDialAnchorLayout}
+        items={serviceDialItems}
+        onClose={() => setServiceDialVisible(false)}
+        onSelect={(item) => {
+          setServiceDialVisible(false);
+
+          if (item.key === 'dsh') {
+            return;
+          }
+
+          onOpenService?.(item.key as DshServiceId);
+        }}
+      />
     </View>
   );
 }
@@ -1809,6 +1858,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     screenRoot: {
       flex: 1,
       backgroundColor: theme.background,
+      position: 'relative',
     },
     brandTopBarShell: {
       marginTop: spacing[0],

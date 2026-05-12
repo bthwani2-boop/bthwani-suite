@@ -39,6 +39,7 @@ import {
 import {
   recordMarketingBannerClick,
   recordMarketingBannerImpression,
+  getPublishedMarketingHomePromos,
 } from '../shared/banner.preview-store';
 import {
   getLiveMarketingGrowthItems,
@@ -889,7 +890,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   return (
     <DshHomeGetScreen
       categories={dshCategoryListFixtures as any}
-      promos={getPublishedHomePromos() as any}
+      promos={getPublishedMarketingHomePromos('home') as DshHomeGetPromo[]}
       homePromos={getPublishedHomePromos()}
       approvedVideoShorts={liveMarketingShorts}
       stores={dshHomeGetFixtureStores as any}

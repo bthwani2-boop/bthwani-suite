@@ -1,7 +1,7 @@
 import React from 'react';
 import { SearchField } from './field';
 import { Icon } from './icons';
-import { Pressable, ScrollView, StatusBar, View, type StyleProp, type ViewStyle } from 'react-native';
+import { AccessibilityInfo, Animated, Easing, Pressable, ScrollView, StatusBar, View, type StyleProp, type ViewStyle } from 'react-native';
 import { radius, resolveRowDirection, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Badge, Button } from './button';
@@ -252,11 +252,40 @@ export type NewsTickerBarProps = {
   };
 };
 
+function useReduceMotionEnabled() {
+  const [reduceMotionEnabled, setReduceMotionEnabled] = React.useState(false);
 
-export function NewsTickerBar({ statusLabel, message, onPress, variant = 'default', trailingAction }: NewsTickerBarProps) {
+  React.useEffect(() => {
+    let active = true;
+
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then((enabled) => {
+        if (active) {
+          setReduceMotionEnabled(enabled);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setReduceMotionEnabled(false);
+        }
+      });
+
+    const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotionEnabled);
+
+    return () => {
+      active = false;
+      subscription.remove();
+    };
+  }, []);
+
+  return reduceMotionEnabled;
+}
+
+export function NewsTickerBar({ statusLabel, message, onPress, variant = 'default', marquee = false, marqueeDurationMs = 18000, trailingAction }: NewsTickerBarProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const isBrand = variant === 'brand' || variant === 'main';
+  const reducedMotionEnabled = useReduceMotionEnabled();
   const badgeTone = isBrand ? 'default' : 'info';
   const messageTone = isBrand ? 'inverse' : 'default';
   const messageLines = isBrand ? 1 : 2;
@@ -264,7 +293,9 @@ export function NewsTickerBar({ statusLabel, message, onPress, variant = 'defaul
   const horizontalPadding = isBrand ? spacing[1] : spacing[4];
   const actionButtonSize = isBrand ? 56 : 38;
   const trailingActionInset = -spacing[3];
-  const tickerPaddingEnd = trailingAction ? Math.max(spacing[1], Math.ceil(actionButtonSize * 0.25)) : horizontalPadding;
+  const tickerPaddingEnd = trailingAction
+    ? horizontalPadding + Math.max(spacing[2], actionButtonSize - Math.abs(trailingActionInset))
+    : horizontalPadding;
   const badgeStyle = isBrand
     ? {
         backgroundColor: theme.brandHeaderSurfaceStrong,
@@ -273,8 +304,69 @@ export function NewsTickerBar({ statusLabel, message, onPress, variant = 'defaul
         paddingVertical: spacing[0],
       }
     : undefined;
+  const marqueeTranslateX = React.useRef(new Animated.Value(0)).current;
+  const [viewportWidth, setViewportWidth] = React.useState(0);
+  const [copyWidth, setCopyWidth] = React.useState(0);
+  const marqueeGap = isBrand ? spacing[2] : spacing[4];
+  const estimatedCopyWidth = React.useMemo(
+    () => Math.max(viewportWidth + spacing[6], Math.round(message.trim().length * (isBrand ? 10.5 : 9))),
+    [isBrand, message, viewportWidth],
+  );
+  const effectiveCopyWidth = copyWidth > 0 ? copyWidth : estimatedCopyWidth;
+  const marqueeDistance = effectiveCopyWidth > 0 ? effectiveCopyWidth + marqueeGap : 0;
+  const shouldMarquee = marquee && !reducedMotionEnabled && viewportWidth > 0 && marqueeDistance > 0 && (effectiveCopyWidth > viewportWidth || message.length > 18);
+  const marqueeCopyCount = shouldMarquee ? Math.max(2, Math.ceil((viewportWidth + marqueeDistance) / marqueeDistance)) : 1;
+  const marqueeStartOffset = direction === 'rtl' ? -marqueeDistance : 0;
+  const marqueeEndOffset = direction === 'rtl' ? 0 : -marqueeDistance;
 
-  // RN native marquee is disabled until a stable non-crashing implementation is added.
+  React.useEffect(() => {
+    marqueeTranslateX.stopAnimation();
+    marqueeTranslateX.setValue(0);
+    setViewportWidth(0);
+    setCopyWidth(0);
+  }, [direction, marquee, marqueeTranslateX, message]);
+
+  React.useEffect(() => {
+    if (!shouldMarquee) {
+      marqueeTranslateX.stopAnimation();
+      marqueeTranslateX.setValue(marqueeStartOffset);
+      return undefined;
+    }
+
+    marqueeTranslateX.setValue(marqueeStartOffset);
+
+    const loop = Animated.loop(
+      Animated.timing(marqueeTranslateX, {
+        toValue: marqueeEndOffset,
+        duration: marqueeDurationMs,
+        easing: Easing.linear,
+        useNativeDriver: false,
+        isInteraction: false,
+      }),
+      { resetBeforeIteration: true },
+    );
+
+    loop.start();
+
+    return () => {
+      loop.stop();
+      marqueeTranslateX.stopAnimation();
+      marqueeTranslateX.setValue(marqueeStartOffset);
+    };
+  }, [marqueeDurationMs, marqueeEndOffset, marqueeStartOffset, marqueeTranslateX, shouldMarquee]);
+
+  const measurementNode = (
+    <View
+      pointerEvents="none"
+      onLayout={(event) => setCopyWidth(event.nativeEvent.layout.width)}
+      style={{ position: 'absolute', opacity: 0, left: 0, top: 0 }}
+    >
+      <Text role="bodySm" tone={messageTone} numberOfLines={1} style={{ flexShrink: 0 }}>
+        {message}
+      </Text>
+    </View>
+  );
+
   return (
     <Pressable
       accessibilityRole={onPress ? 'button' : 'text'}
@@ -296,10 +388,24 @@ export function NewsTickerBar({ statusLabel, message, onPress, variant = 'defaul
     >
       <View style={{ flexDirection: resolveRowDirection(direction), gap: spacing[0], alignItems: 'center' }}>
         <Badge label={statusLabel} tone={badgeTone} style={badgeStyle} />
-        <View style={{ flex: 1, minWidth: 0, overflow: 'hidden', justifyContent: 'center' }}>
-          <Text role="bodySm" tone={messageTone} numberOfLines={messageLines} style={{ flex: 1, minWidth: 0 }}>
-            {message}
-          </Text>
+        <View style={{ flex: 1, minWidth: 0, overflow: 'hidden', justifyContent: 'center' }} onLayout={(event) => setViewportWidth(event.nativeEvent.layout.width)}>
+          {measurementNode}
+          {shouldMarquee ? (
+            <Animated.View style={{ flexDirection: 'row', alignItems: 'center', transform: [{ translateX: marqueeTranslateX }] }}>
+              {Array.from({ length: marqueeCopyCount }).map((_, index) => (
+                <View key={`${statusLabel}-${index}`} style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0 }}>
+                  <Text role="bodySm" tone={messageTone} numberOfLines={1} style={{ flexShrink: 0 }}>
+                    {message}
+                  </Text>
+                  {index < marqueeCopyCount - 1 ? <View style={{ width: marqueeGap }} /> : null}
+                </View>
+              ))}
+            </Animated.View>
+          ) : (
+            <Text role="bodySm" tone={messageTone} numberOfLines={messageLines} style={{ flex: 1, minWidth: 0 }}>
+              {message}
+            </Text>
+          )}
         </View>
       </View>
       {trailingAction ? (

@@ -1,212 +1,270 @@
 "use client";
-import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, Image, Modal, Pressable, ScrollView, StyleSheet, TouchableWithoutFeedback, View, useWindowDimensions } from 'react-native';
+import React from 'react';
+import { Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { colorPalette, radius, resolveTextAlign, spacing } from '../foundation';
+import { useDirection } from '../providers';
 import { Text } from '../primitives';
 
+export type OrbitAnchorLayout = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type OrbitCarouselPlacement = 'bottom-sheet';
+
 export type OrbitCarouselItem = {
-	id: string;
-	key: string;
-	title: string;
-	shortLabel?: string;
-	subtitle?: string;
-	iconUrl: string | null;
-	emojiFallback?: string;
+  id: string;
+  key: string;
+  title: string;
+  shortLabel?: string;
+  subtitle?: string;
+  iconUrl: string | null;
+  emojiFallback?: string;
 };
 
 export type OrbitCarouselProps = {
-	visible: boolean;
-	items: OrbitCarouselItem[];
-	onClose: () => void;
-	onSelect: (item: OrbitCarouselItem) => void;
+  visible: boolean;
+  items: OrbitCarouselItem[];
+  onClose: () => void;
+  onSelect: (item: OrbitCarouselItem) => void;
+  anchorLayout?: OrbitAnchorLayout | null;
+  placement?: OrbitCarouselPlacement;
 };
 
-/**
- * LIGHT BENTO HUB (Pure & Comfortable)
- * A minimalist, airy category selector focused on clarity and ease of use.
- */
 function BentoCategoryTile({
-	item,
-	index,
-	onPress,
+  item,
+  onPress,
 }: {
-	item: OrbitCarouselItem;
-	index: number;
-	onPress: () => void;
+  item: OrbitCarouselItem;
+  onPress: () => void;
 }) {
-	const scaleAnim = useRef(new Animated.Value(0.95)).current;
-	const opacityAnim = useRef(new Animated.Value(0)).current;
+  const { direction } = useDirection();
+  const titleAlign = resolveTextAlign(direction);
 
-	useEffect(() => {
-		Animated.parallel([
-			Animated.timing(opacityAnim, {
-				toValue: 1,
-				duration: 350,
-				delay: index * 30,
-				useNativeDriver: true,
-			}),
-			Animated.spring(scaleAnim, {
-				toValue: 1,
-				friction: 9,
-				tension: 40,
-				delay: index * 30,
-				useNativeDriver: true,
-			}),
-		]).start();
-	}, []);
+  return (
+    <View style={styles.tileSlot}>
+      <Pressable onPress={onPress} style={({ pressed }) => [styles.tilePressable, { opacity: pressed ? 0.94 : 1 }]}>
+        <View style={styles.tileCard}>
+          <View style={styles.tileIconBox}>
+            {item.iconUrl ? (
+              <Image source={{ uri: item.iconUrl }} style={styles.tileIcon} resizeMode="contain" />
+            ) : (
+              <Text role="titleLg" style={styles.tileEmoji}>{item.emojiFallback || '📦'}</Text>
+            )}
+          </View>
 
-	return (
-		<Animated.View style={[styles.tileSlot, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
-			<Pressable onPress={onPress} style={styles.tilePressable}>
-				<View style={styles.tileCard}>
-					<View style={styles.tileIconBox}>
-						{item.iconUrl ? (
-							<Image source={{ uri: item.iconUrl }} style={styles.tileIcon} resizeMode="contain" />
-						) : (
-							<Text style={styles.tileEmoji}>{item.emojiFallback || '📦'}</Text>
-						)}
-					</View>
-
-					<View style={styles.tileTextContent}>
-						<Text numberOfLines={1} style={styles.tileTitle}>{item.title}</Text>
-					</View>
-				</View>
-			</Pressable>
-		</Animated.View>
-	);
+          <View style={styles.tileTextContent}>
+            <Text role="bodySm" numberOfLines={2} align={titleAlign} style={styles.tileTitle}>
+              {item.shortLabel ?? item.title}
+            </Text>
+          </View>
+        </View>
+      </Pressable>
+    </View>
+  );
 }
 
 function OrbitCarouselBase({
-	visible,
-	items,
-	onClose,
-	onSelect,
+  visible,
+  items,
+  onClose,
+  onSelect,
+  anchorLayout,
 }: OrbitCarouselProps) {
-	const { height: screenHeight } = useWindowDimensions();
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const contentY = useRef(new Animated.Value(40)).current;
+  const { direction } = useDirection();
+  const { height: screenHeight, width: screenWidth } = useWindowDimensions();
+  const textAlign = resolveTextAlign(direction);
+  const contentTopInset = React.useMemo(() => {
+    const anchorBottom = anchorLayout ? anchorLayout.y + anchorLayout.height : spacing[14];
+    return Math.max(spacing[6], Math.min(screenHeight * 0.28, anchorBottom + spacing[4]));
+  }, [anchorLayout, screenHeight]);
+  const maxHeight = Math.max(280, screenHeight - contentTopInset - spacing[5]);
+  const contentWidth = Math.min(screenWidth - spacing[6], 560);
 
-	useEffect(() => {
-		if (visible) {
-			Animated.parallel([
-				Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
-				Animated.spring(contentY, { toValue: 0, friction: 10, tension: 40, useNativeDriver: true }),
-			]).start();
-		} else {
-			Animated.parallel([
-				Animated.timing(fadeAnim, { toValue: 0, duration: 250, useNativeDriver: true }),
-				Animated.timing(contentY, { toValue: 40, duration: 250, useNativeDriver: true }),
-			]).start();
-		}
-	}, [visible]);
+  if (!visible) {
+    return null;
+  }
 
-	if (!visible) return null;
+  return (
+    <View pointerEvents="box-none" style={styles.portalRoot}>
+      <Pressable accessibilityRole="button" accessibilityLabel="إغلاق قائمة الفئات" onPress={onClose} style={styles.backdropPressable}>
+        <View style={styles.backdrop} />
+      </Pressable>
 
-	return (
-		<Modal transparent visible={visible} animationType="none" onRequestClose={onClose}>
-			<View style={styles.root}>
-				<TouchableWithoutFeedback onPress={onClose}>
-					<Animated.View style={[styles.backdrop, { opacity: fadeAnim }]} />
-				</TouchableWithoutFeedback>
+      <View
+        accessibilityViewIsModal
+        importantForAccessibility="yes"
+        style={[
+          styles.hubContainer,
+          {
+            width: contentWidth,
+            maxHeight,
+          },
+        ]}
+      >
+        <View style={[styles.hubHeader, { alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }]}>
+          <View style={styles.headerLine} />
+          <Text role="titleMd" align={textAlign} style={styles.hubHeaderTitle}>
+            كل التصنيفات
+          </Text>
+          <Text role="bodySm" align={textAlign} style={styles.hubHeaderSubtitle}>
+            تصفح الفئات المتاحة واختر المسار المناسب مباشرة.
+          </Text>
+        </View>
 
-				<Animated.View
-					style={[
-						styles.hubContainer,
-						{
-							opacity: fadeAnim,
-							transform: [{ translateY: contentY }],
-							maxHeight: screenHeight * 0.8,
-						}
-					]}
-				>
-					<View style={styles.hubHeader}>
-						<View style={styles.headerLine} />
-						<Text style={styles.hubHeaderTitle}>كل التصنيفات</Text>
-						<Text style={styles.hubHeaderSubtitle}>تصفح الفئات المتاحة لخدمتك</Text>
-					</View>
+        <ScrollView
+          contentContainerStyle={styles.gridContent}
+          showsVerticalScrollIndicator={false}
+          bounces
+        >
+          <View style={styles.bentoGrid}>
+            {items.map((item) => (
+              <BentoCategoryTile
+                key={item.id}
+                item={item}
+                onPress={() => {
+                  onSelect(item);
+                  onClose();
+                }}
+              />
+            ))}
+          </View>
+        </ScrollView>
 
-					<ScrollView
-						contentContainerStyle={styles.gridContent}
-						showsVerticalScrollIndicator={false}
-						bounces={true}
-					>
-						<View style={styles.bentoGrid}>
-							{items.map((item, index) => (
-								<BentoCategoryTile
-									key={item.id}
-									item={item}
-									index={index}
-									onPress={() => {
-										onSelect(item);
-										onClose();
-									}}
-								/>
-							))}
-						</View>
-					</ScrollView>
-
-					<View style={styles.hubFooter}>
-						<Pressable style={styles.closeBtn} onPress={onClose}>
-							<Text style={styles.closeBtnText}>إغلاق</Text>
-						</Pressable>
-					</View>
-				</Animated.View>
-			</View>
-		</Modal>
-	);
+        <View style={styles.hubFooter}>
+          <Pressable style={({ pressed }) => [styles.closeBtn, { opacity: pressed ? 0.94 : 1 }]} onPress={onClose}>
+            <Text role="bodySm" style={styles.closeBtnText}>إغلاق</Text>
+          </Pressable>
+        </View>
+      </View>
+    </View>
+  );
 }
 
-export function OrbitCarousel(props: OrbitCarouselProps) { return <OrbitCarouselBase {...props} />; }
-export function CategoryOrbitCarousel(props: Omit<OrbitCarouselProps, 'placement'>) { return <OrbitCarouselBase {...props} />; }
-export function ServiceOrbitCarousel(props: Omit<OrbitCarouselProps, 'placement'>) { return <OrbitCarouselBase {...props} />; }
+export function OrbitCarousel(props: OrbitCarouselProps) {
+  return <OrbitCarouselBase {...props} />;
+}
+
+export function CategoryOrbitCarousel(props: Omit<OrbitCarouselProps, 'placement'>) {
+  return <OrbitCarouselBase {...props} placement="bottom-sheet" />;
+}
+
+export function ServiceOrbitCarousel(props: Omit<OrbitCarouselProps, 'placement'>) {
+  return <OrbitCarouselBase {...props} placement="bottom-sheet" />;
+}
 
 const styles = StyleSheet.create({
-	root: { flex: 1, justifyContent: 'flex-end', alignItems: 'center' },
-	backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.4)' },
-	hubContainer: {
-		width: '94%',
-		backgroundColor: '#FFFFFF',
-		borderTopLeftRadius: 36,
-		borderTopRightRadius: 36,
-		borderBottomLeftRadius: 36,
-		borderBottomRightRadius: 36,
-		overflow: 'hidden',
-		marginBottom: 20,
-		paddingBottom: 8,
-		shadowColor: '#000',
-		shadowOpacity: 0.12,
-		shadowRadius: 20,
-		elevation: 15,
-	},
-	hubHeader: { paddingVertical: 20, paddingHorizontal: 24, alignItems: 'center' },
-	headerLine: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#F0F0F0', marginBottom: 12 },
-	hubHeaderTitle: { color: '#1A1A1A', fontSize: 20, fontWeight: '800' },
-	hubHeaderSubtitle: { color: '#888888', fontSize: 13, marginTop: 4, fontWeight: '500' },
-	gridContent: { paddingHorizontal: 16, paddingBottom: 20 },
-	bentoGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-	tileSlot: { width: '31.5%', aspectRatio: 0.9, marginBottom: 10 },
-	tilePressable: { flex: 1 },
-	tileCard: {
-		flex: 1,
-		borderRadius: 20,
-		backgroundColor: '#F8F9FA',
-		padding: 12,
-		alignItems: 'center',
-		justifyContent: 'center',
-		borderWidth: 1,
-		borderColor: '#F0F0F0',
-	},
-	tileIconBox: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-	tileIcon: { width: 44, height: 44 },
-	tileEmoji: { fontSize: 32 },
-	tileTextContent: { alignItems: 'center', marginTop: 6 },
-	tileTitle: { color: '#333333', fontSize: 12, fontWeight: '700', textAlign: 'center' },
-	hubFooter: { paddingHorizontal: 20, paddingVertical: 12 },
-	closeBtn: {
-		height: 50,
-		borderRadius: 16,
-		backgroundColor: '#F5F5F5',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	closeBtnText: { color: '#666666', fontSize: 15, fontWeight: '600' },
+  portalRoot: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    zIndex: 400,
+  },
+  backdropPressable: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(10, 47, 92, 0.36)',
+  },
+  hubContainer: {
+    backgroundColor: colorPalette.white,
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    borderColor: colorPalette.line,
+    overflow: 'hidden',
+    marginBottom: spacing[5],
+    shadowColor: colorPalette.black,
+    shadowOpacity: 0.16,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 16,
+  },
+  hubHeader: {
+    paddingTop: spacing[5],
+    paddingBottom: spacing[3],
+    paddingHorizontal: spacing[5],
+    gap: spacing[1],
+  },
+  headerLine: {
+    alignSelf: 'center',
+    width: 42,
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: colorPalette.brand,
+    marginBottom: spacing[1],
+  },
+  hubHeaderTitle: {
+    color: colorPalette.brandStrong,
+    width: '100%',
+  },
+  hubHeaderSubtitle: {
+    color: colorPalette.inkMuted,
+    width: '100%',
+  },
+  gridContent: {
+    paddingHorizontal: spacing[4],
+    paddingBottom: spacing[4],
+  },
+  bentoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  tileSlot: {
+    width: '31.5%',
+    aspectRatio: 0.9,
+    marginBottom: spacing[2],
+  },
+  tilePressable: {
+    flex: 1,
+  },
+  tileCard: {
+    flex: 1,
+    borderRadius: radius.lg,
+    backgroundColor: colorPalette.white,
+    paddingHorizontal: spacing[2],
+    paddingVertical: spacing[3],
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colorPalette.brandSurface,
+  },
+  tileIconBox: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tileIcon: {
+    width: 44,
+    height: 44,
+  },
+  tileEmoji: {
+    fontSize: 30,
+  },
+  tileTextContent: {
+    alignItems: 'center',
+    marginTop: spacing[1],
+  },
+  tileTitle: {
+    color: colorPalette.brandStrong,
+  },
+  hubFooter: {
+    paddingHorizontal: spacing[4],
+    paddingBottom: spacing[4],
+  },
+  closeBtn: {
+    height: 48,
+    borderRadius: radius.lg,
+    backgroundColor: colorPalette.brandSurface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colorPalette.brand,
+  },
+  closeBtnText: {
+    color: colorPalette.brandStrong,
+  },
 });
