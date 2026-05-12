@@ -719,14 +719,6 @@ Set-Location -LiteralPath "C:\bthwani-suite"
 exit $LASTEXITCODE
 '@
 
-$CopilotInstructions = @'
-When the user sends exactly "ghb", run only:
-powershell -NoProfile -ExecutionPolicy Bypass -File "C:\bthwani-suite\tools\GHB_CHECKPOINT_VERIFY.ps1"
-
-Do not manually recreate the workflow.
-Do not merge, promote, open PRs, delete branches, force push, or modify main/stable unless explicitly requested after the script recommendation.
-'@
-
 try {
     Write-Log "START repair ghb tools"
     if (-not (Test-Path -LiteralPath $RepoRoot -PathType Container)) { throw "Repo root not found: $RepoRoot" }
@@ -735,7 +727,6 @@ try {
     Write-TextFileClean -Path (Join-Path $RepoRoot 'tools\GHB_CHECKPOINT_VERIFY.ps1') -Content $GhbScript
     Write-TextFileClean -Path (Join-Path $RepoRoot 'tools\DIAGNOSE_GHB_CHECKPOINT_VERIFY.ps1') -Content $DiagnoseScript
     Write-TextFileClean -Path (Join-Path $RepoRoot 'tools\ghb.ps1') -Content $WrapperScript
-    Write-TextFileClean -Path (Join-Path $RepoRoot '.github\copilot-instructions.md') -Content $CopilotInstructions
 
     $parserTokens = $null
     $parserErrors = $null

@@ -29,9 +29,7 @@
     "ui-kit",
     "tools/guards",
     "tools/scripts",
-    ".github",
-    ".agents",
-    ".cursor"
+    ".github"
   ],
   "ignore": [
     "(^|/)node_modules(/|$)",
@@ -60,7 +58,6 @@
     "governance/12_TESTING_AND_PRODUCTION_READINESS.md",
     "governance/13_CI_AND_GATES.md",
     "governance/14_GUARDS_CATALOG.md",
-    "governance/15_AGENT_AND_AI_EXECUTION.md",
     "governance/16_SECURITY_AND_SECRETS.md",
     "governance/17_CLEANUP_AND_DEPRECATION.md",
     "governance/18_BRANCH_AND_CHECKPOINTS.md",
@@ -101,8 +98,6 @@
       ],
       "warnPathPatterns": [
         "^\\.github/",
-        "^\\.agents/",
-        "^\\.cursor/",
         "^governance/archive/legacy-extracted/",
         "^packages/"
       ],
@@ -135,8 +130,6 @@
       ],
       "warnPathPatterns": [
         "^\\.github/",
-        "^\\.agents/",
-        "^\\.cursor/",
         "^governance/archive/legacy-extracted/",
         "^packages/"
       ],
@@ -169,8 +162,6 @@
       ],
       "warnPathPatterns": [
         "^\\.github/",
-        "^\\.agents/",
-        "^\\.cursor/",
         "^governance/archive/legacy-extracted/",
         "^packages/"
       ],
@@ -203,8 +194,6 @@
       ],
       "warnPathPatterns": [
         "^\\.github/",
-        "^\\.agents/",
-        "^\\.cursor/",
         "^governance/archive/legacy-extracted/",
         "^packages/"
       ],

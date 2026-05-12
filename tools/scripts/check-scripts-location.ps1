@@ -16,7 +16,7 @@ function Normalize-RepoPath([string]$PathValue) {
 $allowedRoots = @($AllowedRelative | ForEach-Object { Normalize-RepoPath $_ })
 
 $legacyAllowedPatterns = @(
-    '^tools/(APPLY_AGENCY_SKILLS_PHASE1_SAFE_GUARDS|CHECK_AGENCY_AGENTS_DEEP_DIAGNOSIS_V2|generate-dsh-fixture-images)\.ps1$',
+    '^tools/(generate-dsh-fixture-images)\.ps1$',
     '^kdt/merge-run/.*/proposed/[^/]+\.ps1$'
 )
 

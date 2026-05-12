@@ -1,9 +1,0 @@
-{
-  "guard": "GUARD-12_DUPLICATE_DOCS_AGENT_SKILL_CONTENT",
-  "version": "1.0.0",
-  "mode": "CHECK_ONLY",
-  "policy": {
-    "defaultSeverity": "warning"
-  },
-  "minNormalizedLength": 40
-}

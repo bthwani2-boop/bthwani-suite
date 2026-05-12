@@ -9,7 +9,6 @@ const requiredFiles = [
   'governance/01_GOVERNANCE_INDEX.md',
   'governance/11_EVIDENCE_AND_TRACEABILITY.md',
   'governance/14_GUARDS_CATALOG.md',
-  'governance/15_AGENT_AND_AI_EXECUTION.md',
   'governance/99_LEGACY_MERGE_LEDGER.md'
 ];
 

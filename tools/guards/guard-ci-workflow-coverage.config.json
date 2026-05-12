@@ -7,9 +7,7 @@
   },
   "requiredGuardScripts": [
     "guard-empty-placeholder-zero-byte-files.mjs",
-    "guard-duplicate-docs-agent-skill-content.mjs",
     "guard-governance-ssot-conflict.mjs",
-    "guard-agent-skill-registry-ownership.mjs",
     "guard-ci-workflow-coverage.mjs",
     "guard-package-exports-completeness.mjs",
     "guard-service-blueprint-coverage.mjs",

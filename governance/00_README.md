@@ -79,7 +79,6 @@ Legacy files are **not** active policy after this package is applied. Legacy is 
 | Testing and production readiness | `12_TESTING_AND_PRODUCTION_READINESS.md` |
 | CI and gates | `13_CI_AND_GATES.md` |
 | Guards | `14_GUARDS_CATALOG.md` |
-| AI / agent execution | `15_AGENT_AND_AI_EXECUTION.md` |
 | Security and secrets | `16_SECURITY_AND_SECRETS.md` |
 | Cleanup and deprecation | `17_CLEANUP_AND_DEPRECATION.md` |
 | Branches and checkpoints | `18_BRANCH_AND_CHECKPOINTS.md` |
@@ -94,8 +93,7 @@ Legacy files are **not** active policy after this package is applied. Legacy is 
 
 ## Root file types
 
-- Canonical authority files are `00`, `01`, `02`, `03`, `04`, `05`, `06`, `07`, `08`, `09`, `10`, `11`, `12`, `13`, `14`, `15`, `16`, `17`, `18`, `19`, `20`, `22`, `23`, `24`, and `99`.
-- `AGENT_CHANGE_LEDGER.md` and `AGENT_UPDATE_VALIDATION_CHECKLIST.md` are support files owned by `15_AGENT_AND_AI_EXECUTION.md`.
+- Canonical authority files are `00`, `01`, `02`, `03`, `04`, `05`, `06`, `07`, `08`, `09`, `10`, `11`, `12`, `13`, `14`, `16`, `17`, `18`, `19`, `20`, `22`, `23`, `24`, and `99`.
 - No separate authority file should recreate runtime observability or service blueprint law outside `09_API_BINDING_RUNTIME.md` and `10_SERVICE_CLOSURE.md`.
 
 ## Anti-drift law

@@ -17,6 +17,11 @@ Set-Location -LiteralPath "C:\bthwani-suite"
 powershell -NoProfile -ExecutionPolicy Bypass -File ".\tools\guards\RUN_GOVERNANCE_GUARDS.ps1"
 ```
 
+## الفهرس التنفيذي
+
+- `guard-manifest.json` هو الفهرس التنفيذي الرسمي للحراس.
+- `GUARDS_CATALOG.md` في هذا المجلد هو دليل تشغيل مختصر مشتق، وليس مصدر سياسة بديل.
+
 ## القرارات
 
 - `PASS`: لا توجد مخالفات مؤكدة.
