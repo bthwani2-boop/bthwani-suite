@@ -291,15 +291,15 @@ export function NewsTickerBar({ statusLabel, message, onPress, variant = 'defaul
   const messageLines = isBrand ? 1 : 2;
   const verticalPadding = isBrand ? spacing[0] : spacing[2];
   const horizontalPadding = isBrand ? spacing[1] : spacing[4];
-  const actionButtonSize = isBrand ? 56 : 38;
-  const trailingActionInset = -spacing[3];
+  const actionButtonSize = isBrand ? 48 : 38;
+  const trailingActionInset = spacing[1];
   const tickerPaddingEnd = trailingAction
-    ? horizontalPadding + Math.max(spacing[2], actionButtonSize - Math.abs(trailingActionInset))
+    ? horizontalPadding + Math.max(spacing[2], actionButtonSize + trailingActionInset)
     : horizontalPadding;
   const badgeStyle = isBrand
     ? {
         backgroundColor: theme.brandHeaderSurfaceStrong,
-        borderColor: theme.brandHeaderSurfaceStrong,
+        borderColor: theme.brandHeaderStroke,
         paddingHorizontal: spacing[1],
         paddingVertical: spacing[0],
       }
@@ -566,12 +566,12 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
   function resolveActionBoxSize(action: TopBarAction, isBackAction = action.id === 'back') {
     const actionSize = action.size ?? (isBackAction && !isMain ? 'lg' : 'md');
     if (actionSize === 'lg') {
-      return isMain ? 36 : 42;
+      return isMain ? 32 : 42;
     }
     if (actionSize === 'sm') {
-      return isMain ? 32 : 36;
+      return isMain ? 28 : 36;
     }
-    return isMain ? 34 : 40;
+    return isMain ? 30 : 40;
   }
 
   const leadingClusterWidth = actions.length
@@ -609,9 +609,9 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
     ? {
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
-        overflow: 'hidden',
-        paddingTop: useRelaxedMain ? spacing[1] : spacing[0],
-        paddingBottom: useRelaxedMain ? spacing[1] : spacing[0],
+        overflow: 'visible',
+        paddingTop: useRelaxedMain ? spacing[10] : spacing[8],
+        paddingBottom: useRelaxedMain ? spacing[2] : spacing[1],
         shadowColor: '#020617',
         shadowOpacity: 0.14,
         shadowRadius: 14,
@@ -745,8 +745,8 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
             </View>
           ) : null}
         </View>
-        <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>
-          <View style={[{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }, isMain && actionsOffsetY ? { transform: [{ translateY: actionsOffsetY }] } : null]}>
+        <View style={{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }}>
+          <View style={[{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }, isMain && actionsOffsetY ? { transform: [{ translateY: actionsOffsetY }] } : null]}>
             {actions.map(renderAction)}
           </View>
           {trailingAction ? renderAction(trailingAction) : null}

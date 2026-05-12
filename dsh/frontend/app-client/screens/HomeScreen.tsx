@@ -1285,6 +1285,7 @@ return (
           locationIcon={<Icon name="location-outline" size={12} color={colorPalette.white} />}
           contentOffsetY={spacing[0]}
           actionsOffsetY={spacing[0]}
+          style={styles.brandTopBarShell}
           actions={[
             {
               id: 'my-space',
@@ -1864,16 +1865,18 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       marginTop: spacing[0],
       borderBottomLeftRadius: 24,
       borderBottomRightRadius: 24,
-      overflow: 'hidden',
-      paddingTop: spacing[3],
-      paddingBottom: spacing[3],
+      overflow: 'visible',
+      paddingTop: spacing[0], // Let TopBar handle paddingTop for status bar
+      paddingBottom: spacing[2],
       backgroundColor: colorPalette.brand,
       borderWidth: 0,
       borderColor: 'transparent',
       shadowColor: colorPalette.black,
-      shadowOpacity: 0.1,
-      shadowRadius: 10,
-      elevation: 5,
+      shadowOpacity: 0.12,
+      shadowRadius: 8,
+      elevation: 4,
+      borderBottomWidth: 1,
+      borderBottomColor: 'rgba(255,255,255,0.1)',
     },
     premiumBannerSection: {
       marginTop: spacing[1],
@@ -2052,7 +2055,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     categoriesSelectorRow: {
       flexDirection: rowDirection,
       alignItems: 'flex-start',
-      gap: 12,
+      gap: 16, // Increased for 2026 airiness
     },
     fixedIconsContainer: {
       flexDirection: rowDirection,
@@ -2080,15 +2083,19 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       textAlign: 'center',
     },
     categoryIconContainer: {
-      width: 54,
-      height: 54,
-      borderRadius: 18,
+      width: 56,
+      height: 56,
+      borderRadius: 20, // More premium rounded corner
       backgroundColor: theme.surfaceRaised,
       alignItems: 'center',
       justifyContent: 'center',
       overflow: 'hidden',
-      borderWidth: 1,
-      borderColor: theme.line,
+      borderWidth: 0.5,
+      borderColor: 'rgba(0,0,0,0.05)',
+      shadowColor: colorPalette.black,
+      shadowOpacity: 0.08,
+      shadowRadius: 12,
+      elevation: 2,
     },
     categoryIconContainerSelected: {
       backgroundColor: theme.brandSurface,
@@ -2235,14 +2242,14 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       gap: spacing[2],
     },
     filterChip: {
-      height: 32,
-      borderRadius: 16,
-      paddingHorizontal: 12,
+      height: 34,
+      borderRadius: 12, // Soft geometric look for 2026
+      paddingHorizontal: 14,
       flexDirection: rowDirection,
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 1,
-      borderColor: theme.line,
+      borderColor: 'rgba(0,0,0,0.08)',
     },
     filterChipCategory: {
       paddingRight: 16,
@@ -2264,7 +2271,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     },
     filterChipLabel: {
       fontSize: 12,
-      fontWeight: '800',
+      fontWeight: '700', // Refined from 800 for better legibility
     },
     storeListViewport: {
       marginTop: 0, // Removed top margin for direct transition
