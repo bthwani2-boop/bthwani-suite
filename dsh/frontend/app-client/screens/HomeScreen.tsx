@@ -654,7 +654,7 @@ export function DshHomeGetScreen({
   const itemGap = Math.max(spacing[1], Math.min(spacing[2], Math.round(containerWidth * 0.018)));
   const baseCardWidth = Math.max(256, Math.min(326, Math.round(containerWidth - (sidePeek * 2) - (itemGap * 2))));
   const cardWidth = Math.max(220, Math.round(baseCardWidth * 0.84));
-  const cardHeight = Math.max(154, Math.round(cardWidth * 0.74));
+  const cardHeight = Math.max(160, Math.round(cardWidth * 0.78));
   const itemWidth = cardWidth + itemGap;
   const horizontalPadding = Math.max(0, Math.round((containerWidth - cardWidth) / 2));
   const resolvedStores = (stores ?? []).filter((store) => canRenderInClientSurface(store.publishStage, 'store'));
@@ -1867,9 +1867,9 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       overflow: 'hidden',
       paddingTop: spacing[3],
       paddingBottom: spacing[3],
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderWidth: 1,
-      borderColor: 'rgba(0, 0, 0, 0.05)',
+      backgroundColor: colorPalette.brand,
+      borderWidth: 0,
+      borderColor: 'transparent',
       shadowColor: colorPalette.black,
       shadowOpacity: 0.1,
       shadowRadius: 10,
@@ -2034,7 +2034,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       backgroundColor: 'rgba(255,255,255,0.4)',
     },
     premiumIndicatorActive: {
-      width: 14,
+      width: 18,
       height: 6,
       backgroundColor: colorPalette.white,
     },
@@ -2110,11 +2110,11 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     },
     heroPromoCard: {
       flex: 1.2,
-      height: 78, // Adjusted to match launchers total height
-      borderRadius: 18, // Harmonized radius
-      backgroundColor: colorPalette.white,
+      height: 82, // Slightly taller for better presence
+      borderRadius: 16, // Harmonized radius for 2026
+      backgroundColor: '#0A2F5C',
       borderWidth: 1,
-      borderColor: theme.line,
+      borderColor: 'rgba(255,255,255,0.1)',
       paddingHorizontal: 12,
       justifyContent: 'center',
       marginRight: 8,
@@ -2143,12 +2143,12 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       paddingLeft: 4,
     },
     heroPromoTitle: {
-      color: '#0A2F5C',
+      color: colorPalette.white,
       fontWeight: '900',
-      fontSize: 14, // Scaled for 70px
+      fontSize: 14,
       lineHeight: 18,
       textAlign: 'center',
-      textShadowColor: 'rgba(255,255,255,0.9)',
+      textShadowColor: 'rgba(0,0,0,0.2)',
       textShadowOffset: { width: 0, height: 1 },
       shadowRadius: 2,
     },
@@ -2158,12 +2158,9 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       fontWeight: '800',
       marginTop: -1,
       textAlign: 'center',
-      textShadowColor: 'rgba(255,255,255,0.9)',
-      textShadowOffset: { width: 0, height: 1 },
-      shadowRadius: 2,
     },
     heroPromoCtaLink: {
-      color: '#0A2F5C',
+      color: 'rgba(255,255,255,0.8)',
       fontSize: 10,
       fontWeight: '900',
       marginTop: 1,
@@ -2274,7 +2271,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       flex: 1,
     },
     storeListContent: {
-      gap: spacing[3],
+      gap: spacing[4], // Increased for balanced 2026 hierarchy
       paddingBottom: spacing[8],
     },
     emptyFeed: {
