@@ -1,0 +1,14 @@
+{
+  "mcp": {
+    "nx-mcp": {
+      "type": "local",
+      "command": [
+        "pnpm",
+        "exec",
+        "nx",
+        "mcp"
+      ],
+      "enabled": true
+    }
+  }
+}

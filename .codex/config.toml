@@ -1,0 +1,4 @@
+[mcp_servers.nx-mcp]
+command = "pnpm"
+args = ["exec", "nx", "mcp"]
+

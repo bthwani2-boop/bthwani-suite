@@ -12,7 +12,7 @@
 
 ## BTH Token Rename & Alias Policy
 
-- Any rename, refactor, cleanup, or normalization involving tokens containing `Bth`, `bth`, or `BTH` must follow [.github/agents/platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md](.github/agents/platform-agent-os-2026-v3-additive/Policies/bth.token.rename.alias.policy.md).
+- Any rename, refactor, cleanup, or normalization involving tokens containing `Bth`, `bth`, or `BTH` must follow [.agents/UPDATE_POLICY.md#bth-token-rename-and-alias-rule](.agents/UPDATE_POLICY.md#bth-token-rename-and-alias-rule).
 - Work file-by-file only; never run blind global replace.
 - Treat public, shared, brand, package, repo, live dependency, or ambiguous tokens as proposal-only unless an explicit compatibility plan exists.
 
@@ -62,15 +62,22 @@ kwd
 
 Do not use legacy nested app/package roots from older layouts as active mutation targets unless the current branch proves them active.
 
+Global agent source:
+
+- `.agents/`
+
 Use these project-owned skills when relevant:
 
-- `.github/skills/bthwani-current-workspace-authority/SKILL.md`
-- `.github/skills/bthwani-agent-governance-execution/SKILL.md`
-- `.github/skills/bthwani-local-evidence-pack/SKILL.md`
-- `.github/skills/bthwani-ui-kit-surface-contract/SKILL.md`
-- `.github/skills/bthwani-screen-flow-binding-contract/SKILL.md`
-- `.github/skills/bthwani-go-backend-target-boundary/SKILL.md`
-- `.github/skills/bthwani-dsh-ui-kit-golden-slice/SKILL.md`
+- `.agents/skills/bthwani-current-workspace-authority/SKILL.md`
+- `.agents/skills/bthwani-agent-governance-execution/SKILL.md`
+- `.agents/skills/bthwani-local-evidence-pack/SKILL.md`
+- `.agents/skills/bthwani-ui-kit-surface-contract/SKILL.md`
+- `.agents/skills/bthwani-screen-flow-binding-contract/SKILL.md`
+- `.agents/skills/bthwani-go-backend-target-boundary/SKILL.md`
+- `.agents/skills/bthwani-dsh-ui-kit-golden-slice/SKILL.md`
+- `.agents/skills/nx-workspace/SKILL.md`
+- `.agents/skills/nx-generate/SKILL.md`
+- `.agents/skills/nx-run-tasks/SKILL.md`
 
 Core laws:
 
