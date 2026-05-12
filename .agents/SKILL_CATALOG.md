@@ -1,5 +1,4 @@
 # BThwani Skill Catalog
-
 | Skill | Purpose | Inputs | Outputs |
 | --- | --- | --- | --- |
 | `bthwani-current-workspace-authority` | confirm active roots and block stale paths | task scope, `pnpm-workspace.yaml`, branch | workspace truth decision |
@@ -14,6 +13,4 @@
 | `nx-workspace` | inspect Nx workspace truth | `pnpm-workspace.yaml`, `nx.json` | active project guidance |
 | `nx-generate` | review generator impact safely | generator intent, target root | advisory scaffolding decision |
 | `nx-run-tasks` | run verification through Nx | project, target, flags | task output and verification status |
-
 All skills require evidence before any acceptance claim.
-
