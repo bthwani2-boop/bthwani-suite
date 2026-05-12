@@ -185,7 +185,7 @@ Both `@nx/js/typescript` and `@nx/vite/plugin` auto-detect `vue-tsc` when instal
 
 1. `pnpm add -wD eslint@^9 eslint-plugin-vue vue-eslint-parser @vue/eslint-config-typescript @typescript-eslint/parser @nx/eslint-plugin typescript-eslint`
 2. Create root `eslint.config.mjs`
-3. Then `npx nx add @nx/eslint`
+3. Then `pnpm nx add @nx/eslint`
 
 ### Vue ESLint Config Pattern
 

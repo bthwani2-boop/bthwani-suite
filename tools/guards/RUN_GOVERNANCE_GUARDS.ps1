@@ -121,7 +121,7 @@ session_id: $SessionId
 repo: $RepoRoot
 mode: $Mode
 evidence_root: $EvidenceRoot
-handoff_zip: $EvidenceRoot\_HANDOFF.zip
+handoff_zip: $EvidenceRoot\$SessionId.zip
 guards_total: $($Guards.Count)
 guards_fail: $FailCount
 guards_warn: $WarnCount
@@ -135,7 +135,7 @@ $Evidence = [ordered]@{
   repo = $RepoRoot
   mode = $Mode
   evidence_root = $EvidenceRoot
-  handoff_zip = "$EvidenceRoot\_HANDOFF.zip"
+  handoff_zip = "$EvidenceRoot\$SessionId.zip"
   guards_total = $Guards.Count
   guards_fail = $FailCount
   guards_warn = $WarnCount
@@ -143,7 +143,7 @@ $Evidence = [ordered]@{
 }
 $Evidence | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $EvidenceRoot "evidence.json") -Encoding UTF8
 
-$ZipPath = Join-Path $EvidenceRoot "_HANDOFF.zip"
+$ZipPath = Join-Path $EvidenceRoot "$SessionId.zip"
 if (Test-Path -LiteralPath $ZipPath) { Remove-Item -LiteralPath $ZipPath -Force }
 Compress-Archive -Path (Join-Path $EvidenceRoot "*") -DestinationPath $ZipPath -Force
 

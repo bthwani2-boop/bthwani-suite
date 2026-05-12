@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Governance Control Plane`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
+**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** GOVERNANCE_CANONICAL, GOVERNANCE_CONTROL_PLANE_STANDARD, GOVERNANCE_CLOSURE_STANDARD
 
@@ -22,15 +22,23 @@ This folder is the canonical governance control plane for BThwani. It defines ho
 C:\bthwani-suite
 governance/
 tools/registry/runs/{SESSION_ID}/
-packages/ui-kit
-packages/surfaces
-packages/app-shells
-api-types
-api-clients
-services/
-contracts/master/
-apps/mobile/*
-apps/web/*
+app-client/
+app-partner/
+app-captain/
+app-field/
+control-panel/
+webapp/
+website/
+ui-kit/
+dsh/
+wlt/
+knz/
+arb/
+amn/
+esf/
+mrf/
+snd/
+kwd/
 ```
 
 ## Authority order
@@ -48,7 +56,7 @@ Legacy files are **not** active policy after this package is applied. Legacy is 
 
 - Active local repo: `C:\bthwani-suite`.
 - Canonical remote: `bthwani2-boop/bthwani-suite`.
-- Canonical stack: Node.js, TypeScript, pnpm, Nx, React, React Native, Expo Dev Client, Next.js, NestJS.
+- Current frontend/tooling stack: Node.js, TypeScript, pnpm, Nx, React, React Native, Expo Dev Client, Next.js. Target backend stack: Go per `TECH_STACK_LOCK.md`; do not assume NestJS unless current repo evidence explicitly requires it.
 - Canonical architecture ladder: Screen / Surface / App → `@bthwani/ui-kit` public exports → Tamagui internally inside ui-kit only.
 - Canonical visual identity: `#0A2F5C` deepBlue, `#FF500D` orange, `#FFFFFF` white.
 - Canonical language contract: Arabic/RTL correctness is mandatory where Arabic UI exists.

@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Repository Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
+**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** DOCS_GOVERNANCE_* policies, GOVERNANCE_CONTROL_PLANE_STANDARD, ARCHITECTURE_LOCK
 
@@ -24,13 +24,9 @@ This file is not a slogan file. It is a control-plane rule file for BThwani. Any
 | `control-panel` | Control panel app shell | No |
 | `webapp` | Web app shell | No |
 | `website` | Marketing site shell | No |
-| `packages/ui-kit` | Design/component authority | Technical source, not governance policy |
-| `packages/surfaces` | Surface/service-owned UI flows | Technical source, not governance policy |
-| `packages/app-shells` | App shell composition | Technical source, not governance policy |
-| `api-types` | Generated/shared API types | Derived from contracts |
-| `api-clients` | API clients | Derived from contracts/runtime binding |
-| `services/*` | Backend/service implementations | Technical source |
-| `contracts/master` | Contract source for public APIs | Contract truth |
+| `ui-kit` | Design/component authority | Technical source, not governance policy |
+| `<service>/frontend` | Service-owned surface flows | Technical source, not governance policy |
+| `<service>/backend` | Service-local contracts and typed clients | Derived from contracts/runtime binding |
 | `tools/guards` | Guard implementation | Derived from governance |
 | `tools/registry/runs` | Evidence output | Evidence only |
 | `.github/workflows` | CI implementation | Derived from governance |
@@ -46,13 +42,9 @@ This file is not a slogan file. It is a control-plane rule file for BThwani. Any
 
 ## Legacy bridge roots
 
-- `apps/mobile/app-client`
-- `apps/mobile/app-partner`
-- `apps/mobile/app-captain`
-- `apps/mobile/app-field`
-- `apps/web/control-panel`
-- `apps/web/webapp`
-- `apps/web/website`
+- legacy nested mobile app roots from earlier layouts
+- legacy nested web app roots from earlier layouts
+- legacy packages-based UI/surface/app-shell roots from earlier layouts
 
 ## Forbidden root behavior
 
@@ -78,9 +70,9 @@ git ls-files --others --exclude-standard
 Plus targeted scans:
 
 ```powershell
-rg "from ['\"]tamagui['\"]" apps packages/surfaces
+rg "from ['\"]tamagui['\"]" app-client app-partner app-captain app-field control-panel webapp website dsh wlt knz arb amn esf mrf snd kwd
 rg "docs/governance|kdt/volatile|governance-legacy" .
-rg "export \*" packages/ui-kit/src packages/surfaces/src
+rg "export \*" ui-kit/src dsh/frontend
 ```
 
 ## Deletion and movement rule

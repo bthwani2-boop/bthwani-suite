@@ -6,20 +6,20 @@ const args = parseArgs();
 const report = createReport('SERVICE-CONTRACT-MATRIX', 'governance/10_SERVICE_CLOSURE.md');
 const root = args.root;
 const canonicalServices = ['dsh', 'wlt', 'knz', 'arb', 'amn', 'esf', 'mrf', 'snd', 'kwd'];
-const servicesRoot = path.join(root, 'packages/surfaces/src/service-owned');
+const legacyServicesRoot = path.join(root, 'packages', 'surfaces', 'src', 'service-owned');
 const governedTemplateServices = ['demo-service'];
 const forbiddenStandalone = ['exchangeprice', 'hr'];
 
-if (fs.existsSync(servicesRoot)) {
-  const present = fs.readdirSync(servicesRoot, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
+if (fs.existsSync(legacyServicesRoot)) {
+  const present = fs.readdirSync(legacyServicesRoot, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
   for (const name of forbiddenStandalone) {
     if (present.includes(name)) {
-      report.fail(`packages/surfaces/src/service-owned/${name}`, `${name} must not exist as a standalone canonical service.`);
+      report.fail(`legacy-nested-surface-root/${name}`, `${name} must not exist as a standalone canonical service.`);
     }
   }
   for (const name of present) {
     if (!canonicalServices.includes(name) && !governedTemplateServices.includes(name) && !name.startsWith('_')) {
-      report.warn(`packages/surfaces/src/service-owned/${name}`, 'Legacy compatibility-only service folder found. Canonical truth now lives at the root service folder.');
+      report.warn(`legacy-nested-surface-root/${name}`, 'Legacy compatibility-only service folder found. Canonical truth now lives at the root service folder.');
     }
   }
 }

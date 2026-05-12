@@ -311,9 +311,9 @@ export async function GET() {
 [OpenNext](https://open-next.js.org/) adapts Next.js for AWS Lambda, Cloudflare Workers, etc.
 
 ```bash
-npx create-sst@latest
+pnpm dlx create-sst@latest
 # or
-npx @opennextjs/aws build
+pnpm dlx @opennextjs/aws build
 ```
 
 Supports:

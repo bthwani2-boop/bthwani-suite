@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Evidence Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
+**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** 18_EVIDENCE_PACK_STANDARD, EVIDENCE_AND_CLOSURE_GATES, PATCH_REVIEW_PROTOCOL, GOVERNANCE_FINALIZATION_PROTOCOL
 
@@ -37,7 +37,7 @@ git-diff-check-before.txt
 git-diff-check-after.txt
 untracked-before.txt
 untracked-after.txt
-_HANDOFF.zip
+{SESSION_ID}.zip
 ```
 
 ### Required when TypeScript/runtime can be affected
@@ -127,7 +127,7 @@ A task cannot pass if:
 - untracked files are unexplained,
 - staged changes are unreviewed,
 - UI screenshots are missing for UI work,
-- evidence pack lacks `_HANDOFF.zip` when a script writes under registry runs.
+- evidence pack lacks `{SESSION_ID}.zip` when a script writes under registry runs.
 
 ## Final governance closure gates
 

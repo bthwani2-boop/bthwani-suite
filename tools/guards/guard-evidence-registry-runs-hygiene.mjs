@@ -146,8 +146,7 @@ function main() {
     const files = fs.readdirSync(runPath, { withFileTypes: true }).filter((entry) => entry.isFile());
     const names = new Set(files.map((entry) => entry.name));
 
-    const hasGenericHandoff = names.has('_HANDOFF.zip');
-    const hasNamedHandoff = names.has(`${runName}_HANDOFF.zip`) || files.some((entry) => entry.name.endsWith('_HANDOFF.zip') && entry.name !== '_HANDOFF.zip');
+    const hasSessionZip = names.has(`${runName}.zip`);
     const hasSummary = names.has('SUMMARY.md') || names.has('summary.txt');
     const hasStatus = names.has('status.txt');
     const hasEvidenceJson = names.has('evidence.json');
@@ -162,13 +161,10 @@ function main() {
       });
     };
 
-    if (!hasGenericHandoff) add('MISSING_GENERIC_HANDOFF_ZIP', config.policy?.missingGenericHandoffSeverity ?? 'warning', 'Run does not contain _HANDOFF.zip.');
-    if (!hasNamedHandoff) add('MISSING_NAMED_HANDOFF_ZIP', config.policy?.missingNamedHandoffSeverity ?? 'warning', 'Run does not contain SESSION_ID_HANDOFF.zip or equivalent named handoff.');
+    if (!hasSessionZip) add('MISSING_SESSION_ZIP', config.policy?.missingNamedHandoffSeverity ?? 'warning', 'Run does not contain {SESSION_ID}.zip.');
     if (!hasSummary) add('MISSING_SUMMARY', config.policy?.missingSummarySeverity ?? 'warning', 'Run does not contain SUMMARY.md or summary.txt.');
     if (!hasStatus) add('MISSING_STATUS', config.policy?.missingStatusSeverity ?? 'warning', 'Run does not contain status.txt.');
     if (!hasEvidenceJson) add('MISSING_EVIDENCE_JSON', config.policy?.missingEvidenceJsonSeverity ?? 'warning', 'Run does not contain evidence.json.');
-    if (hasGenericHandoff && !hasNamedHandoff) add('AMBIGUOUS_GENERIC_HANDOFF_ONLY', config.policy?.ambiguousGenericHandoffOnlySeverity ?? 'warning', 'Only generic _HANDOFF.zip exists; upload confusion risk remains.');
-
     for (const entry of files) {
       const full = path.join(runPath, entry.name);
       if (fs.statSync(full).size === 0) {
@@ -226,20 +222,18 @@ CHECK-only. Warning-first. No evidence files were modified.
     no_rename: true,
   }, null, 2), 'utf8');
 
-  const handoffZip = path.join(evidenceRoot, '_HANDOFF.zip');
-  const namedZip = path.join(evidenceRoot, `${path.basename(evidenceRoot)}_HANDOFF.zip`);
+  const evidenceZip = path.join(evidenceRoot, `${path.basename(evidenceRoot)}.zip`);
   const files = fs.readdirSync(evidenceRoot)
-    .filter((name) => !name.endsWith('_HANDOFF.zip') && name !== '_HANDOFF.zip')
+    .filter((name) => name !== path.basename(evidenceZip))
     .map((name) => path.join(evidenceRoot, name));
 
-  makeZip(handoffZip, files);
-  fs.copyFileSync(handoffZip, namedZip);
+  makeZip(evidenceZip, files);
 
   console.log('');
   console.log('GUARD-10 Evidence / Registry Runs Hygiene Guard complete.');
   console.log(`Decision: ${decision}`);
   console.log(`EvidenceRoot: ${evidenceRoot}`);
-  console.log(`HandoffZip: ${handoffZip}`);
+  console.log(`EvidenceZip: ${evidenceZip}`);
   console.log(`RunsScanned: ${runs.length}`);
   console.log(`Findings: ${findings.length}`);
   console.log(`Errors: ${errors.length}`);

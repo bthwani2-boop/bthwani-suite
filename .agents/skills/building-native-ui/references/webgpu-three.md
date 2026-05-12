@@ -497,8 +497,8 @@ npm install <packages> --legacy-peer-deps
 WebGPU requires a custom build:
 
 ```bash
-npx expo prebuild
-npx expo run:ios
+pnpm exec expo prebuild
+pnpm exec expo run:ios
 ```
 
 **Note:** WebGPU does NOT work in Expo Go.

@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Mutable Policy Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
+**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** PLATFORM_OPERATING_MODEL mutable policy law, provider control-plane notes
 

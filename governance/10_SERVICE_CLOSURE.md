@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Service Closure Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
+**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** 10_SERVICE_CLOSURE_PROTOCOL, GOVERNANCE_CLOSURE_STANDARD, GOVERNANCE_CLOSEOUT_ROADMAP, SERVICE_BLUEPRINT patterns, PLATFORM_BLUEPRINT, operation catalog standards
 
@@ -78,10 +78,10 @@ Every canonical service should have a living blueprint before closure. The bluep
 ### Blueprint location
 
 ```text
-packages/surfaces/src/service-owned/<service>/SERVICE_BLUEPRINT.md
+<service>/SERVICE_BLUEPRINT.md
 ```
 
-or another approved service-owned canonical path if the repo structure evolves with evidence.
+or another approved root-service canonical path if the repo structure evolves with evidence.
 
 ### Required blueprint sections
 

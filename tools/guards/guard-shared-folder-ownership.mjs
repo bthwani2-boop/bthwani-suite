@@ -8,7 +8,7 @@
  * - counts import consumers
  * - identifies shared misuse risk
  * - writes evidence under tools/registry/runs
- * - creates _HANDOFF.zip when PowerShell Compress-Archive is available
+ * - creates a session-named ZIP when PowerShell Compress-Archive is available
  *
  * No external npm dependencies.
  */
@@ -255,14 +255,14 @@ function unique(values) {
 function createHandoffZip(evidenceRoot) {
   const script = `
 $Root = "${evidenceRoot.replace(/"/g, '""')}"
-$ZipPath = Join-Path $Root "_HANDOFF.zip"
+$ZipPath = Join-Path $Root ((Split-Path $Root -Leaf) + ".zip")
 if (Test-Path -LiteralPath $ZipPath) { Remove-Item -LiteralPath $ZipPath -Force }
-$Items = Get-ChildItem -LiteralPath $Root -Force | Where-Object { $_.Name -ne "_HANDOFF.zip" }
+$Items = Get-ChildItem -LiteralPath $Root -Force | Where-Object { $_.Name -ne ((Split-Path $Root -Leaf) + ".zip") }
 if ($Items) { Compress-Archive -Path $Items.FullName -DestinationPath $ZipPath -Force }
 `;
   try {
     execFileSync("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script], { stdio: "ignore" });
-    return path.join(evidenceRoot, "_HANDOFF.zip");
+    return path.join(evidenceRoot, `${path.basename(evidenceRoot)}.zip`);
   } catch {
     return "";
   }
@@ -593,7 +593,7 @@ ${issueCodes}
 - shared-remediation-queue.csv
 - import-resolution-report.csv
 - shared-risk-report.json
-- _HANDOFF.zip
+- {SESSION_ID}.zip
 
 ## Rule
 
@@ -625,7 +625,7 @@ Use the remediation queue to plan small fixes only after owner/consumer proof.
       "shared-remediation-queue.csv",
       "import-resolution-report.csv",
       "shared-risk-report.json",
-      "_HANDOFF.zip",
+      `${path.basename(evidenceRoot)}.zip`,
     ],
   };
   writeFile(path.join(evidenceRoot, "evidence.json"), `${JSON.stringify(evidence, null, 2)}\n`);
@@ -646,7 +646,7 @@ Use the remediation queue to plan small fixes only after owner/consumer proof.
   console.log(`- ${path.join(evidenceRoot, "SUMMARY.md")}`);
   console.log(`- ${path.join(evidenceRoot, "status.txt")}`);
   console.log(`- ${path.join(evidenceRoot, "shared-risk-report.csv")}`);
-  console.log(`- ${path.join(evidenceRoot, "_HANDOFF.zip")}`);
+  console.log(`- ${path.join(evidenceRoot, `${path.basename(evidenceRoot)}.zip`)}`);
 
   process.exit(decision === "BLOCKED_BY_INVALID_SHARED_STRUCTURE" && config.failOnError ? 1 : 0);
 }

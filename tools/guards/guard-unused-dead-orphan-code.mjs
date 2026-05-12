@@ -8,7 +8,7 @@
  * - identifies orphan files, orphan screens, unconsumed public exports, duplicate candidates
  * - creates remediation queues without deleting or modifying product code
  * - writes evidence under tools/registry/runs
- * - creates _HANDOFF.zip when PowerShell is available
+ * - creates a session-named ZIP when PowerShell is available
  *
  * No external npm dependencies.
  */
@@ -299,14 +299,14 @@ function addRisk(risks, severity, code, repoPath, detail, recommendation, eviden
 function createHandoffZip(evidenceRoot) {
   const script = `
 $Root = "${evidenceRoot.replace(/"/g, '""')}"
-$ZipPath = Join-Path $Root "_HANDOFF.zip"
+$ZipPath = Join-Path $Root ((Split-Path $Root -Leaf) + ".zip")
 if (Test-Path -LiteralPath $ZipPath) { Remove-Item -LiteralPath $ZipPath -Force }
-$Items = Get-ChildItem -LiteralPath $Root -Force | Where-Object { $_.Name -ne "_HANDOFF.zip" }
+$Items = Get-ChildItem -LiteralPath $Root -Force | Where-Object { $_.Name -ne ((Split-Path $Root -Leaf) + ".zip") }
 if ($Items) { Compress-Archive -Path $Items.FullName -DestinationPath $ZipPath -Force }
 `;
   try {
     execFileSync("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script], { stdio: "ignore" });
-    return path.join(evidenceRoot, "_HANDOFF.zip");
+    return path.join(evidenceRoot, `${path.basename(evidenceRoot)}.zip`);
   } catch {
     return "";
   }
@@ -563,7 +563,7 @@ ${riskCodes}
 - dead-code-remediation-queue.csv
 - unresolved-imports-report.csv
 - unused-orphan-risk-report.json
-- _HANDOFF.zip
+- {SESSION_ID}.zip
 
 ## Rule
 
@@ -598,7 +598,7 @@ No file may be deleted from this report without zero-reference proof, runtime/ro
       "dead-code-remediation-queue.csv",
       "unresolved-imports-report.csv",
       "unused-orphan-risk-report.json",
-      "_HANDOFF.zip",
+      `${path.basename(evidenceRoot)}.zip`,
     ],
   };
   writeFile(path.join(evidenceRoot, "evidence.json"), `${JSON.stringify(evidence, null, 2)}\n`);
@@ -619,7 +619,7 @@ No file may be deleted from this report without zero-reference proof, runtime/ro
   console.log(`- ${path.join(evidenceRoot, "SUMMARY.md")}`);
   console.log(`- ${path.join(evidenceRoot, "status.txt")}`);
   console.log(`- ${path.join(evidenceRoot, "dead-code-remediation-queue.csv")}`);
-  console.log(`- ${path.join(evidenceRoot, "_HANDOFF.zip")}`);
+  console.log(`- ${path.join(evidenceRoot, `${path.basename(evidenceRoot)}.zip`)}`);
 
   process.exit(decision === "BLOCKED_BY_DEAD_CODE_HIGH_RISK" && config.failOnError ? 1 : 0);
 }

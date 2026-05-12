@@ -5,7 +5,7 @@ Always ship to TestFlight first. Internal testers, then external testers, then A
 ## Submit
 
 ```bash
-npx testflight
+pnpm dlx testflight
 ```
 
 That's it. One command builds and submits to TestFlight.
@@ -19,7 +19,7 @@ EXPO_APPLE_ID=you@email.com
 EXPO_APPLE_TEAM_ID=XXXXXXXXXX
 ```
 
-The CLI prints your Team ID when you run `npx testflight`. Copy it.
+The CLI prints your Team ID when you run `pnpm dlx testflight`. Copy it.
 
 ## Why TestFlight First
 

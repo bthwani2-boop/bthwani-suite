@@ -1,0 +1,13 @@
+.github/skills/bthwani-agent-governance-execution/SKILL.md
+.github/skills/bthwani-current-workspace-authority/SKILL.md
+.github/skills/bthwani-dsh-ui-kit-golden-slice/SKILL.md
+.github/skills/bthwani-go-backend-target-boundary/SKILL.md
+.github/skills/bthwani-local-evidence-pack/SKILL.md
+.github/skills/bthwani-screen-flow-binding-contract/SKILL.md
+.github/skills/bthwani-ui-kit-surface-contract/SKILL.md
+LOCAL_CHANGE_DIFF_CHECK.txt
+LOCAL_CHANGE_DIFF_STAT.txt
+LOCAL_CHANGE_NAME_STATUS.txt
+LOCAL_CHANGE_REVIEW.patch
+LOCAL_CHANGE_STATUS.txt
+LOCAL_CHANGE_UNTRACKED_FILES.txt

@@ -76,7 +76,7 @@ eas submit -p ios --latest
 eas submit -p ios --id BUILD_ID
 
 # Quick TestFlight submission
-npx testflight
+pnpm dlx testflight
 ```
 
 ## App Store Connect Configuration

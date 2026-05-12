@@ -1887,7 +1887,7 @@ tools\registry\runs\UNIFIED_BASELINE_READINESS-YYYYMMDD-HHMMSS\
   UNIFIED_BASELINE_READINESS-YYYYMMDD-HHMMSS.zip
 ```
 
-The ZIP file must use the session folder name exactly, not `_HANDOFF.zip`.
+The ZIP file must use the session folder name exactly, not the legacy handoff zip pattern.
 
 ---
 
@@ -2225,7 +2225,7 @@ The ZIP must be named exactly:
 {SESSION_ID}.zip
 ```
 
-Not `_HANDOFF.zip`.
+Not the legacy handoff zip pattern.
 
 ---
 

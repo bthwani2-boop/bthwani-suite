@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Package Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
+**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** 03_PACKAGE_BOUNDARY_CONTRACT, UI Kit public entrypoint cleanup, package boundary guardrails
 
@@ -38,7 +38,7 @@ Forbidden unless explicitly allowed by package owner:
 ```ts
 import { XStack } from 'tamagui'; // outside ui-kit
 import { Something } from '@bthwani/ui-kit/src/internal/...';
-import { DshStoreCard } from '../../packages/surfaces/src/...';
+import { DshStoreCard } from '../../<service>/frontend/...';
 ```
 
 ## Export policy
@@ -77,8 +77,8 @@ Minimum package boundary change evidence:
 ```powershell
 pnpm -w exec tsc --noEmit
 git --no-pager diff --check
-rg "from ['\"]tamagui['\"]" apps packages/surfaces
-rg "export \*" packages/ui-kit/src packages/surfaces/src
+rg "from ['\"]tamagui['\"]" app-client app-partner app-captain app-field control-panel webapp website dsh wlt knz arb amn esf mrf snd kwd
+rg "export \*" ui-kit/src dsh/frontend
 ```
 
 ## Consumer impact note

@@ -138,17 +138,13 @@ function finishGuard({ evidenceRoot, decision, summary, evidence }) {
   fs.writeFileSync(path.join(evidenceRoot, 'SUMMARY.md'), summary, 'utf8');
   fs.writeFileSync(path.join(evidenceRoot, 'status.txt'), `${decision}\n`, 'utf8');
   fs.writeFileSync(path.join(evidenceRoot, 'evidence.json'), JSON.stringify(evidence, null, 2), 'utf8');
-  const handoffZip = path.join(evidenceRoot, '_HANDOFF.zip');
-  const namedZip = path.join(evidenceRoot, `${path.basename(evidenceRoot)}_HANDOFF.zip`);
-  for (const target of [handoffZip, namedZip]) {
-    if (fs.existsSync(target)) fs.rmSync(target, { force: true });
-  }
+  const evidenceZip = path.join(evidenceRoot, `${path.basename(evidenceRoot)}.zip`);
+  if (fs.existsSync(evidenceZip)) fs.rmSync(evidenceZip, { force: true });
   const files = fs.readdirSync(evidenceRoot)
-    .filter((name) => !name.endsWith('_HANDOFF.zip') && name !== '_HANDOFF.zip')
+    .filter((name) => name !== path.basename(evidenceZip))
     .map((name) => path.join(evidenceRoot, name));
-  makeZip(handoffZip, files);
-  fs.copyFileSync(handoffZip, namedZip);
-  return { handoffZip, namedZip };
+  makeZip(evidenceZip, files);
+  return { evidenceZip, handoffZip: evidenceZip, namedZip: evidenceZip };
 }
 
 function makeEvidenceRoot(prefix) {
@@ -192,8 +188,7 @@ function main() {
     for (const run of runDirs) {
       const runRoot = path.join(runsRoot, run);
       const files = fs.readdirSync(runRoot).filter((name) => fs.statSync(path.join(runRoot, name)).isFile());
-      const hasHandoff = files.includes('_HANDOFF.zip');
-      const hasNamedHandoff = files.includes(`${run}_HANDOFF.zip`);
+      const hasEvidenceZip = files.includes(`${run}.zip`);
       const hasSummary = files.some((name) => /^summary\.(txt|md)$/i.test(name) || name === 'SUMMARY.md');
       const hasStatus = files.includes('status.txt');
       const hasEvidenceJson = files.includes('evidence.json');
@@ -203,8 +198,7 @@ function main() {
         run,
         file_count: files.length,
         zip_count: zipCount,
-        has_handoff_zip: String(hasHandoff),
-        has_named_handoff_zip: String(hasNamedHandoff),
+        has_session_zip: String(hasEvidenceZip),
         has_summary: String(hasSummary),
         has_status: String(hasStatus),
         has_evidence_json: String(hasEvidenceJson),
@@ -212,15 +206,14 @@ function main() {
 
       const severity = config.policy?.evidenceHygieneSeverity ?? 'warning';
 
-      if (!hasHandoff) findings.push({ type: 'MISSING_HANDOFF_ZIP', severity, run, path: toPosix(path.relative(ROOT, runRoot)), reason: 'Run folder lacks _HANDOFF.zip.' });
-      if (!hasNamedHandoff) findings.push({ type: 'MISSING_NAMED_HANDOFF_ZIP', severity, run, path: toPosix(path.relative(ROOT, runRoot)), reason: 'Run folder lacks SESSION_ID_HANDOFF.zip. This can cause upload confusion.' });
+      if (!hasEvidenceZip) findings.push({ type: 'MISSING_SESSION_ZIP', severity, run, path: toPosix(path.relative(ROOT, runRoot)), reason: 'Run folder lacks {SESSION_ID}.zip.' });
       if (!hasSummary) findings.push({ type: 'MISSING_SUMMARY', severity, run, path: toPosix(path.relative(ROOT, runRoot)), reason: 'Run folder lacks SUMMARY.md or summary.txt.' });
       if (!hasStatus) findings.push({ type: 'MISSING_STATUS', severity, run, path: toPosix(path.relative(ROOT, runRoot)), reason: 'Run folder lacks status.txt.' });
       if (!hasEvidenceJson) findings.push({ type: 'MISSING_EVIDENCE_JSON', severity, run, path: toPosix(path.relative(ROOT, runRoot)), reason: 'Run folder lacks evidence.json.' });
     }
   }
 
-  writeCsv(path.join(evidenceRoot, 'registry-runs-inventory.csv'), inventory, ['run','file_count','zip_count','has_handoff_zip','has_named_handoff_zip','has_summary','has_status','has_evidence_json']);
+  writeCsv(path.join(evidenceRoot, 'registry-runs-inventory.csv'), inventory, ['run','file_count','zip_count','has_session_zip','has_summary','has_status','has_evidence_json']);
   writeCsv(path.join(evidenceRoot, 'evidence-hygiene-findings.csv'), findings, ['type','severity','run','path','reason']);
   writeCsv(path.join(evidenceRoot, 'issues.csv'), findings, ['type','severity','run','path','reason']);
 
@@ -251,7 +244,7 @@ CHECK-only.
 No deletion of evidence.
 No movement of evidence.
 No registry rewrite.
-Future runs must produce both _HANDOFF.zip and SESSION_ID_HANDOFF.zip to avoid upload confusion.
+Future runs must produce one ZIP named exactly after SESSION_ID.
 `;
 
   const zip = finishGuard({

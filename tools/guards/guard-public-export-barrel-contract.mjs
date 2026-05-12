@@ -284,7 +284,7 @@ No CI connection.
         decision,
         repo: ROOT,
         evidence_root: evidenceRoot,
-        handoff_zip: path.join(evidenceRoot, '_HANDOFF.zip'),
+        evidence_zip: path.join(evidenceRoot, `${path.basename(evidenceRoot)}.zip`),
         guard: 'GUARD-04_PUBLIC_EXPORT_BARREL_CONTRACT',
         guard_version: '1.0.0',
         public_files: publicFiles.length,
@@ -304,18 +304,18 @@ No CI connection.
     'utf8',
   );
 
-  const handoffZip = path.join(evidenceRoot, '_HANDOFF.zip');
+  const evidenceZip = path.join(evidenceRoot, `${path.basename(evidenceRoot)}.zip`);
   const files = fs
     .readdirSync(evidenceRoot)
-    .filter((name) => name !== '_HANDOFF.zip')
+    .filter((name) => name !== path.basename(evidenceZip))
     .map((name) => path.join(evidenceRoot, name));
-  makeZip(handoffZip, files);
+  makeZip(evidenceZip, files);
 
   console.log('');
   console.log('GUARD-04 Public Export / Barrel Contract Guard complete.');
   console.log(`Decision: ${decision}`);
   console.log(`EvidenceRoot: ${evidenceRoot}`);
-  console.log(`HandoffZip: ${handoffZip}`);
+  console.log(`EvidenceZip: ${evidenceZip}`);
   console.log(`PublicFiles: ${publicFiles.length}`);
   console.log(`BarrelFiles: ${barrelFiles.length}`);
   console.log(`ExportStarFindings: ${exportStarFindings.length}`);

@@ -1277,9 +1277,9 @@ return (
       ) : (
         <TopBar
           variant="main"
-          layoutMode="default"
+          layoutMode="luxury-command"
           title={uiText.topBar.brandName}
-          subtitle={uiText.topBar.brandTagline}
+          subtitle="ابحث عن متجر أو خدمة..."
           onTitlePress={handleOpenMySpace}
           locationLabel={uiText.topBar.location}
           locationIcon={<Icon name="location-outline" size={12} color={colorPalette.white} />}
@@ -1313,6 +1313,13 @@ return (
               onPress: openInlineSearch,
             },
           ]}
+          trailingAction={{
+            id: 'services',
+            accessibilityLabel: 'الخدمات',
+            onPress: openServiceDial,
+            icon: <DshServiceLauncherMark />,
+            size: 'lg',
+          }}
           ticker={{
             statusLabel: tickerState?.statusLabel ?? (currentLanguage === 'ar' ? 'مباشر' : 'Live'),
             message: tickerState?.isMarketing
@@ -1321,11 +1328,6 @@ return (
             onPress: handleTickerAction,
             marquee: tickerState?.isMarketing ? !isTickerPaused : true,
             marqueeDurationMs: 14000,
-            trailingAction: {
-              accessibilityLabel: 'الخدمات',
-              onPress: openServiceDial,
-              icon: <DshServiceLauncherMark />,
-            },
           }}
         />
       )}
@@ -1863,11 +1865,11 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     },
     brandTopBarShell: {
       marginTop: spacing[0],
-      borderBottomLeftRadius: 24,
-      borderBottomRightRadius: 24,
+      borderBottomLeftRadius: 28,
+      borderBottomRightRadius: 28,
       overflow: 'visible',
-      paddingTop: spacing[0], // Let TopBar handle paddingTop for status bar
-      paddingBottom: spacing[2],
+      paddingTop: spacing[0],
+      paddingBottom: spacing[1],
       backgroundColor: colorPalette.brand,
       borderWidth: 0,
       borderColor: 'transparent',

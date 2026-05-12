@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Architecture Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
+**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** ARCHITECTURE_LOCK, ARCHITECTURE_GUARDRAILS, SURFACES_OWNERSHIP_CONTRACT, SCREEN_FILE_MODEL_CONTRACT
 
@@ -24,9 +24,9 @@ For domain UI:
 
 ```text
 app shell
-→ packages/app-shells
-→ packages/surfaces public entry
-→ service-owned or surface-owned implementation
+→ `<surface>/shell` and `<surface>/runtime`
+→ `<service>/frontend/<surface>` public entry
+→ service-owned or shared implementation
 → @bthwani/ui-kit
 ```
 
@@ -34,13 +34,12 @@ app shell
 
 | Lane | Path | Owns | Must not own |
 |---|---|---|---|
-| App shell | `apps/*` | bootstrapping, navigation mount, platform runtime | design system, service logic, reusable domain UI |
-| App shells package | `packages/app-shells` | shared shell composition | domain business logic |
-| Surface-owned | `packages/surfaces/src/surface-owned/*` | shared surface experiences | service-specific workflow |
-| Service-owned | `packages/surfaces/src/service-owned/<service>/<surface>` | service vertical flow | global shell or unrelated service |
-| UI Kit | `packages/ui-kit` | tokens, primitives, reusable components | service business rules |
-| API types/clients | `packages/api-*` | typed contracts/clients | UI behavior |
-| Services | `services/*` | backend domain implementation | UI policy |
+| App shell | `app-client|app-partner|app-captain|app-field|control-panel|webapp|website` | bootstrapping, navigation mount, platform runtime | design system, service logic, reusable domain UI |
+| Service frontend | `<service>/frontend/<surface>` | service vertical flow and cross-screen UX | global shell or unrelated service |
+| Service shared frontend | `<service>/frontend/shared` | shared service-specific UI/state glue | cross-service reusable design system |
+| UI Kit | `ui-kit` | tokens, primitives, reusable components | service business rules |
+| Service backend | `<service>/backend` | typed contracts/clients and service API adapters | UI behavior |
+| Service domain | `<service>/domain` | service domain rules and models | UI policy |
 
 ## Service-owned vs surface-owned
 

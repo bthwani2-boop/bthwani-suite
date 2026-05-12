@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `AI Workflow Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
+**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** 14_AGENT_EXECUTION_RULES, AI_EXECUTION_GOVERNANCE, AGENT_CHANGE_LEDGER_POLICY, AGENT_UPDATE_VALIDATION_CHECKLIST, BTHWANI_GUIDE, MASTER_EXECUTION_PLAYBOOK
 
@@ -63,7 +63,7 @@ Scripts are allowed when more deterministic than prompt-only execution. Write-ca
 - DryRun/Apply behavior when risky,
 - backup/rollback note,
 - evidence output,
-- `_HANDOFF.zip` if writing to registry runs.
+- `{SESSION_ID}.zip` if writing to registry runs.
 
 ## Patch handoff
 

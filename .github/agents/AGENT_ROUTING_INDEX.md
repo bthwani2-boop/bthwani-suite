@@ -35,8 +35,8 @@ After selecting the base profile, apply only relevant overlays:
 
 ## Governance References
 
-- `governance/AGENT_GOVERNANCE_POLICY.md`
-- `governance/AGENT_CHANGE_LEDGER_POLICY.md`
+- `governance/15_AGENT_AND_AI_EXECUTION.md`
+- `governance/AGENT_CHANGE_LEDGER.md`
 - `.github/agents/AGENT_ROUTING_INDEX.md`
 
 ## Anti-Drift Rules

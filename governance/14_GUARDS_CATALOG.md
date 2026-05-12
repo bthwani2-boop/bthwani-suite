@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Guard Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
+**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** GOVERNANCE_GUARD_CATALOG, GUARDRAILS_INDEX, GUARD_* files, WARNING_CLASSIFICATION_POLICY
 
@@ -36,7 +36,7 @@ id | domain | purpose | severity | mode | owner file | evidence | remediation | 
 | GUARD_10_API_BINDING_RUNTIME | runtime | contract→client→surface→runtime chain | BLOCKING for runtime closure | Binding matrix and runtime evidence | 09,10 |
 | GUARD_11_WLT_FINANCIAL_OWNER | finance | WLT-only money truth | BLOCKING | No money mutation outside WLT | 02,07,20 |
 | GUARD_12_VAR_POLICY | runtime policy | mutable VAR/provider control | BLOCKING for mutable policy | No hardcoded mutable operational policy | 20 |
-| GUARD_13_EVIDENCE_PACK | evidence | evidence pack shape | BLOCKING | Required evidence files and _HANDOFF.zip | 11 |
+| GUARD_13_EVIDENCE_PACK | evidence | evidence pack shape | BLOCKING | Required evidence files and `{SESSION_ID}.zip` | 11 |
 | GUARD_14_BRANCH_CHECKPOINT | git | branch/checkpoint readiness | BLOCKING | branch reality captured | 18 |
 | GUARD_15_SECURITY_SECRETS | security | secrets/PII/auth/security | BLOCKING | No secrets; security evidence | 16 |
 | GUARD_16_TESTING_READINESS | quality | testing and readiness | BLOCKING when applicable | Type/test/build/runtime evidence | 12 |

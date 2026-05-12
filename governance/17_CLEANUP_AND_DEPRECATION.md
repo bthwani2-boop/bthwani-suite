@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Cleanup Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
+**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** CLEANUP_AND_DEPRECATION_POLICY, DOCS_GOVERNANCE_DELETION_* plans, GOVERNANCE_CLEANUP_CANDIDATES, GOVERNANCE_CANDIDATE_RESOLUTION_MATRIX
 

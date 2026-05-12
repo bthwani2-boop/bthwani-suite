@@ -44,17 +44,22 @@ If donor evidence conflicts with current target reality, the live target repo wi
 
 Live implementation lanes:
 
-- `C:\Users\b\Documents\GitHub\bthwani-suite\packages\app-shells`
-- `C:\Users\b\Documents\GitHub\bthwani-suite\packages\surfaces`
+- `C:\bthwani-suite\dsh\frontend`
+- `C:\bthwani-suite\app-client`
+- `C:\bthwani-suite\app-partner`
+- `C:\bthwani-suite\app-captain`
+- `C:\bthwani-suite\app-field`
+- `C:\bthwani-suite\control-panel`
 
 Central reusable lane when pressure is proven:
 
-- `C:\Users\b\Documents\GitHub\bthwani-suite\packages\ui-kit`
+- `C:\bthwani-suite\ui-kit`
 
 Read-only intelligence lanes:
 
-- `C:\Users\b\Documents\GitHub\bthwani-suite\docs\services`
-- `C:\Users\b\Documents\GitHub\bthwani-suite\docs\services\surfaces-legacy-trash`
+- `C:\bthwani-suite\docs`
+- `C:\bthwani-suite\dsh\docs`
+- `C:\bthwani-suite\dsh\_archive`
 - frozen donor repo `bthfinal`
 
 ## Routing Law
@@ -143,8 +148,8 @@ For implementation work:
 
 Any update to agent or skill governance files must follow:
 
-- governance/AGENT_GOVERNANCE_POLICY.md
-- governance/AGENT_CHANGE_LEDGER_POLICY.md
+- governance/15_AGENT_AND_AI_EXECUTION.md
+- governance/AGENT_CHANGE_LEDGER.md
 
 This file is the canonical thin routing kernel for surface work.
 Detailed laws, specialized procedures, repeated patterns, and workflow contracts belong in skills, base profiles, and overlays.

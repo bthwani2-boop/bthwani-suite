@@ -27,3 +27,61 @@
 - The `nx-generate` skill handles generator discovery internally - don't call nx_docs just to look up generator syntax
 
 <!-- nx configuration end-->
+
+<!-- BTHWANI_CURRENT_AGENT_CONTRACT_START -->
+
+## BThwani current agent contract
+
+This repo is `bthwani-suite`. The active local root is:
+
+```text
+C:\bthwani-suite
+```
+
+Read `pnpm-workspace.yaml` before choosing paths. Current workspace roots are flat:
+
+```text
+webapp/runtime
+website/runtime
+app-client/runtime
+app-partner/runtime
+app-captain/runtime
+app-field/runtime
+control-panel/runtime
+ui-kit
+dsh
+wlt
+knz
+arb
+amn
+esf
+mrf
+snd
+kwd
+```
+
+Do not use legacy nested app/package roots from older layouts as active mutation targets unless the current branch proves them active.
+
+Use these project-owned skills when relevant:
+
+- `.github/skills/bthwani-current-workspace-authority/SKILL.md`
+- `.github/skills/bthwani-agent-governance-execution/SKILL.md`
+- `.github/skills/bthwani-local-evidence-pack/SKILL.md`
+- `.github/skills/bthwani-ui-kit-surface-contract/SKILL.md`
+- `.github/skills/bthwani-screen-flow-binding-contract/SKILL.md`
+- `.github/skills/bthwani-go-backend-target-boundary/SKILL.md`
+- `.github/skills/bthwani-dsh-ui-kit-golden-slice/SKILL.md`
+
+Core laws:
+
+- GitHub is read-only unless the user explicitly requests write actions.
+- Use PowerShell for local execution.
+- Do not use the npm shim for local tool execution; prefer `pnpm exec` or `pnpm dlx` only when required.
+- Evidence root is `tools/registry/runs/{SESSION_ID}`.
+- New registry ZIPs must be named `{SESSION_ID}.zip`, not the legacy handoff zip pattern.
+- Backend target is Go unless current repo evidence explicitly says otherwise.
+- UI architecture: Screen / Surface / App -> `@bthwani/ui-kit` public exports -> Tamagui internally inside ui-kit only.
+- Arabic/RTL UI must be directionally correct: icon+text cluster on the right, action/chevron opposite, right-aligned text, safe spacing, no clipping.
+- Do not claim `PASS`, `CLOSED`, `FINAL`, or `100%` without Git diff, verification, and evidence.
+
+<!-- BTHWANI_CURRENT_AGENT_CONTRACT_END -->

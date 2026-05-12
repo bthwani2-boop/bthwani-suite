@@ -23,4 +23,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ".\tools\guards\RUN_GOVERNAN
 - `WARN`: توجد مخاطر أو نواقص تحتاج مراجعة.
 - `FAIL`: توجد مخالفة مؤكدة يجب إصلاحها.
 
-كل تشغيل يكتب evidence داخل `tools/registry/runs/...` وينتج `_HANDOFF.zip`.
+كل تشغيل يكتب evidence داخل `tools/registry/runs/...` وينتج ملف ZIP باسم `SESSION_ID` نفسه.

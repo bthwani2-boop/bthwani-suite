@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `App Shell Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
+**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** 04_APPS_SHELL_ONLY_CONTRACT, APPROVED_SURFACE_NAMING, platform app roots
 
@@ -30,13 +30,8 @@ Apps are runtime shells. They should mount navigation, providers, platform runti
 
 ## Legacy bridge roots
 
-- `apps/mobile/app-client`
-- `apps/mobile/app-partner`
-- `apps/mobile/app-captain`
-- `apps/mobile/app-field`
-- `apps/web/control-panel`
-- `apps/web/webapp`
-- `apps/web/website`
+- legacy nested mobile app roots from earlier layouts
+- legacy nested web app roots from earlier layouts
 
 ## Shell-only allowed work
 

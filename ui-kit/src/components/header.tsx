@@ -547,7 +547,7 @@ export type TopBarProps = {
   ticker?: NewsTickerBarProps;
   tabs?: TabsProps<string>;
   variant?: TopBarVariant;
-  layoutMode?: 'default' | 'balanced-secondary' | 'relaxed-main';
+  layoutMode?: 'default' | 'balanced-secondary' | 'relaxed-main' | 'luxury-command';
   contentOffsetY?: number;
   actionsOffsetY?: number;
   style?: StyleProp<ViewStyle>;
@@ -559,14 +559,15 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
   const isMain = isMainHeaderVariant(variant);
   const useBalancedSecondary = !isMain && layoutMode === 'balanced-secondary';
   const useRelaxedMain = isMain && layoutMode === 'relaxed-main';
-  const resolvedContentOffsetY = contentOffsetY || (isMain ? (useRelaxedMain ? spacing[1] : spacing[0]) : spacing[1]);
+  const isLuxury = isMain && layoutMode === 'luxury-command';
+  const resolvedContentOffsetY = contentOffsetY || (isMain ? (isLuxury ? spacing[0] : (useRelaxedMain ? spacing[1] : spacing[0])) : spacing[1]);
   const titleTone = isMain ? 'inverse' : 'default';
   const titleAlign = direction === 'rtl' ? 'end' : 'start';
 
   function resolveActionBoxSize(action: TopBarAction, isBackAction = action.id === 'back') {
     const actionSize = action.size ?? (isBackAction && !isMain ? 'lg' : 'md');
     if (actionSize === 'lg') {
-      return isMain ? 32 : 42;
+      return isMain ? (isLuxury ? 44 : 32) : 42;
     }
     if (actionSize === 'sm') {
       return isMain ? 28 : 36;
@@ -610,8 +611,8 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
         overflow: 'visible',
-        paddingTop: useRelaxedMain ? spacing[10] : spacing[8],
-        paddingBottom: useRelaxedMain ? spacing[2] : spacing[1],
+        paddingTop: isLuxury ? spacing[10] : (useRelaxedMain ? spacing[10] : spacing[8]),
+        paddingBottom: isLuxury ? spacing[2] : (useRelaxedMain ? spacing[2] : spacing[1]),
         shadowColor: '#020617',
         shadowOpacity: 0.14,
         shadowRadius: 14,
@@ -726,31 +727,72 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
   return (
     <Surface tone="brandHeader" border={false} padding={1} gap={0} style={[surfaceStyle, style]}>
       <StatusBar animated barStyle="light-content" backgroundColor={theme.brandHeaderStatusBar} />
-      <View style={contentRowStyle}>
-        <View style={{ flex: 1, gap: useRelaxedMain ? spacing[1] : spacing[0], alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-          <Pressable
-            accessibilityRole={onTitlePress ? 'button' : 'text'}
-            accessibilityLabel={titleAccessibilityLabel ?? title}
-            disabled={!onTitlePress}
-            hitSlop={8}
-            onPress={onTitlePress}
-            style={({ pressed }) => [{ opacity: pressed && onTitlePress ? 0.98 : 1 }]}
-          >
-            {mainTitleInline}
-          </Pressable>
-          {locationLabel ? (
-            <View style={[{ flexDirection: resolveRowDirection(direction), gap: spacing[1], alignItems: 'center' }, isMain ? { alignSelf: direction === 'rtl' ? 'flex-end' : 'flex-start', paddingHorizontal: spacing[2], paddingVertical: spacing[0], borderRadius: radius.pill, backgroundColor: theme.brandHeaderSurfaceStrong, borderWidth: 1, borderColor: theme.brandHeaderStroke } : null]}>
-              {locationIcon}
-              <Text role="bodySm" tone="inverse" numberOfLines={1} align={titleAlign} style={isMain ? { opacity: 0.96 } : undefined}>{locationLabel}</Text>
+      <View style={isLuxury ? { flexDirection: 'column', gap: spacing[3], paddingHorizontal: spacing[4] } : contentRowStyle}>
+        {isLuxury ? (
+          <>
+            {/* Row 1: Profile | Logo | Notifications + Cart */}
+            <View style={{ flexDirection: resolveRowDirection(direction), justifyContent: 'space-between', alignItems: 'center', minHeight: 32 }}>
+              <View style={{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }}>
+                {actions.filter(a => a.id === 'my-space').map(renderAction)}
+              </View>
+
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <Pressable
+                  accessibilityRole={onTitlePress ? 'button' : 'text'}
+                  accessibilityLabel={titleAccessibilityLabel ?? title}
+                  disabled={!onTitlePress}
+                  onPress={onTitlePress}
+                  style={({ pressed }) => [{ opacity: pressed && onTitlePress ? 0.8 : 1 }]}
+                >
+                  <Text role="titleMd" tone="inverse" numberOfLines={1} align="center">{title}</Text>
+                </Pressable>
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }}>
+                {actions.filter(a => a.id === 'notifications' || a.id === 'cart').map(renderAction)}
+              </View>
             </View>
-          ) : null}
-        </View>
-        <View style={{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }}>
-          <View style={[{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }, isMain && actionsOffsetY ? { transform: [{ translateY: actionsOffsetY }] } : null]}>
-            {actions.map(renderAction)}
-          </View>
-          {trailingAction ? renderAction(trailingAction) : null}
-        </View>
+
+            {/* Row 2: Search Bar + Services Button */}
+            <View style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[2], minHeight: 44 }}>
+              <Pressable
+                onPress={actions.find(a => a.id === 'search')?.onPress}
+                style={({ pressed }) => [{ flex: 1, height: 40, borderRadius: 20, backgroundColor: theme.brandHeaderSurfaceStrong, borderWidth: 1, borderColor: theme.brandHeaderStroke, flexDirection: resolveRowDirection(direction), alignItems: 'center', paddingHorizontal: spacing[3], gap: spacing[2], opacity: pressed ? 0.9 : 1 }]}
+              >
+                <Icon name="search-outline" size={18} color={theme.inverse} style={{ opacity: 0.7 }} />
+                <Text role="bodySm" tone="inverse" style={{ opacity: 0.7, flex: 1 }}>{subtitle || 'ابحث هنا...'}</Text>
+              </Pressable>
+              {trailingAction ? renderAction({ ...trailingAction, size: 'lg' }) : null}
+            </View>
+          </>
+        ) : (
+          <>
+            <View style={{ flex: 1, gap: useRelaxedMain ? spacing[1] : spacing[0], alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+              <Pressable
+                accessibilityRole={onTitlePress ? 'button' : 'text'}
+                accessibilityLabel={titleAccessibilityLabel ?? title}
+                disabled={!onTitlePress}
+                hitSlop={8}
+                onPress={onTitlePress}
+                style={({ pressed }) => [{ opacity: pressed && onTitlePress ? 0.98 : 1 }]}
+              >
+                {mainTitleInline}
+              </Pressable>
+              {locationLabel ? (
+                <View style={[{ flexDirection: resolveRowDirection(direction), gap: spacing[1], alignItems: 'center' }, isMain ? { alignSelf: direction === 'rtl' ? 'flex-end' : 'flex-start', paddingHorizontal: spacing[2], paddingVertical: spacing[0], borderRadius: radius.pill, backgroundColor: theme.brandHeaderSurfaceStrong, borderWidth: 1, borderColor: theme.brandHeaderStroke } : null]}>
+                  {locationIcon}
+                  <Text role="bodySm" tone="inverse" numberOfLines={1} align={titleAlign} style={isMain ? { opacity: 0.96 } : undefined}>{locationLabel}</Text>
+                </View>
+              ) : null}
+            </View>
+            <View style={{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }}>
+              <View style={[{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }, isMain && actionsOffsetY ? { transform: [{ translateY: actionsOffsetY }] } : null]}>
+                {actions.map(renderAction)}
+              </View>
+              {trailingAction ? renderAction(trailingAction) : null}
+            </View>
+          </>
+        )}
       </View>
       {isMain && ticker ? (
         <View style={{ marginTop: -spacing[1], overflow: 'visible' }}>

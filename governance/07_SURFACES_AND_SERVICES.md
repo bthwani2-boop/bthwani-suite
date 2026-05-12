@@ -3,7 +3,7 @@
 **Status:** Canonical Governance Payload v2
 **Owner:** `Service/Surface Governance`
 **Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
+**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
 **Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
 **Legacy families promoted here:** SURFACES_OWNERSHIP_CONTRACT, APPROVED_SURFACE_NAMING, PLATFORM_BLUEPRINT, ARCHITECTURE_LOCK
 
@@ -16,13 +16,13 @@ This file is not a slogan file. It is a control-plane rule file for BThwani. Any
 
 | Surface | Canonical path concept | Primary package owner | Closure evidence |
 | --- | --- | --- | --- |
-| app-client | `packages/surfaces/src/service-owned/<service>/app-client` or `surface-owned/app-client` | surfaces + app shell | screens, states, routes, visual evidence, API binding |
-| app-partner | `packages/surfaces/src/service-owned/<service>/app-partner` | surfaces + app shell | orders/ops/account evidence |
-| app-captain | `packages/surfaces/src/service-owned/<service>/app-captain` | surfaces + app shell | assignment/trip/state evidence |
-| app-field | `packages/surfaces/src/service-owned/<service>/app-field` | surfaces + app shell | field workflow evidence |
-| control-panel | `packages/surfaces/src/service-owned/<service>/control-panel` | surfaces + web shell | control room evidence |
-| webapp | `packages/surfaces/src/service-owned/<service>/webapp` | surfaces + web shell | web runtime evidence |
-| website | `packages/surfaces/src/surface-owned/website` | surface-owned | marketing/content evidence |
+| app-client | `<service>/frontend/app-client` | service frontend + app shell | screens, states, routes, visual evidence, API binding |
+| app-partner | `<service>/frontend/app-partner` | service frontend + app shell | orders/ops/account evidence |
+| app-captain | `<service>/frontend/app-captain` | service frontend + app shell | assignment/trip/state evidence |
+| app-field | `<service>/frontend/app-field` | service frontend + app shell | field workflow evidence |
+| control-panel | `<service>/frontend/control-panel` | service frontend + web shell | control room evidence |
+| webapp | `<service>/frontend/webapp` | service frontend + web shell | web runtime evidence |
+| website | `website` plus service-fed content when approved | website shell | marketing/content evidence |
 
 ## Service registry
 
