@@ -2,15 +2,6 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Cleanup Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** CLEANUP_AND_DEPRECATION_POLICY, DOCS_GOVERNANCE_DELETION_* plans, GOVERNANCE_CLEANUP_CANDIDATES, GOVERNANCE_CANDIDATE_RESOLUTION_MATRIX
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Cleanup law
 
@@ -51,15 +42,15 @@ Deletion is allowed only when all are true:
 - working tree unrelated changes are either excluded from the decision or restored,
 - active guards pass with zero failures.
 
-## Legacy governance handling
+## Historical and superseded governance handling
 
-Legacy governance must not stay active next to canonical governance. Allowed outcomes:
+Historical or superseded governance material must not stay active next to canonical governance. Allowed outcomes:
 
 1. fully accounted in `99_LEGACY_MERGE_LEDGER.md`,
-2. archived under a clearly non-active archive path,
+2. retained as explicit reference-only material while an owner gap exists,
 3. deleted after evidence proves no required information remains only there.
 
-For legacy governance retirement, deletion proof must include:
+For retirement of historical governance material, deletion proof must include:
 
 - source file inventory,
 - target/replacement matrix,
@@ -69,7 +60,7 @@ For legacy governance retirement, deletion proof must include:
 - evidence root,
 - final decision.
 
-Deletion of a legacy governance root must be a dedicated cleanup decision, not an accidental side effect of unrelated UI, service, or CI work.
+Deletion of historical governance material must be a dedicated cleanup decision, not an accidental side effect of unrelated UI, service, or CI work.
 
 ## Deprecation requirements
 
@@ -88,7 +79,7 @@ For deprecated APIs/components/docs:
 - deleting untracked files without inventory,
 - moving package roots without consumer scan,
 - removing aliases in same step as public rename,
-- deleting legacy before ledger coverage.
+- deleting historical material before ledger coverage.
 
 ## Candidate resolution law
 
@@ -98,7 +89,7 @@ Cleanup candidates must be classified before action:
 |---|---|---|
 | `DUPLICATE` | same rule appears in more than one place | merge into canonical owner in narrow batch |
 | `CONTRADICTION` | rules conflict or drift | escalate to owner and resolve explicitly |
-| `TRANSITIONAL_REFERENCE_ONLY` | historical or donor evidence only | archive or retain read-only until deletion gate passes |
+| `TRANSITIONAL_REFERENCE_ONLY` | historical evidence only | archive or retain read-only until deletion gate passes |
 | `REMOVAL_CANDIDATE` | no longer needed after proof | delete only after readiness checklist passes |
 | `TBD` | evidence incomplete | block deletion/merge |
 

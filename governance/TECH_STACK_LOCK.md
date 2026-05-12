@@ -226,7 +226,7 @@ Before any UI / UX / Flow / Binding / Integration work may begin, the following 
 2. Read each relevant `package.json` and confirm current framework versions.
 3. Do not assume any path that has not been confirmed in the current branch.
 
-**Forbidden legacy paths — must not be used as active implementation scope:**
+**Retired path patterns — must not be used as active implementation scope:**
 
 ```text
 apps/mobile/*
@@ -300,73 +300,30 @@ A screen or navigation/binding/integration change must not be merged unless:
 
 ---
 
-### 15.4 AI Agent Safety Rule
+### 15.4 Execution Boundary
 
-This project is built incrementally with AI agent assistance. Any AI agent must follow this sequence:
+This file is a governance decision file. It locks stack and scope; it does not define agent prompts, tool skills, or implementation choreography.
 
-**Phase A — Inspect only (no edits):**
-
-1. Prove current structure from `pnpm-workspace.yaml`.
-2. Produce a screen inventory.
-3. Produce a flow map.
-4. Produce a binding map.
-5. Produce an integration map.
-6. Produce a risk register (`BLOCKER / HIGH / MEDIUM / LOW`).
-
-**Phase B — Narrow implementation (only after Phase A evidence is reviewed):**
-
-- One screen or one contract file per task.
-- Stay inside the approved scope only.
-- Do not widen scope without a separate explicit approval.
+- `governance/` decides stack, scope, and acceptance.
+- `15_AGENT_AND_AI_EXECUTION.md` owns agent-execution boundaries.
+- `.agents/` owns operational agent instructions and adapters.
+- `tools/guards/` verifies the policy programmatically.
+- Historical operating material belongs in `99_LEGACY_MERGE_LEDGER.md` or evidence packs, not here.
 
 ---
 
-### 15.5 Forbidden Actions for UI / UX / Flow / Binding / Integration Work
+### 15.5 Future Implementation Minimum Evidence
 
-- No direct imports between screens without a contract.
-- No hardcoded route strings.
-- No untyped or ambiguous params (e.g., `id` instead of `orderId` / `storeId`).
-- No direct binding inside a UI component without an adapter / contract layer.
-- No API / provider / integration logic inside a screen UI component.
-- No local design system outside `ui-kit`.
-- No raw Tamagui imports outside `ui-kit`.
-- No changes to API / runtime / backend during a UI-scoped task.
-- No changes across more than one surface in a single task unless proven necessary and separately approved.
-- No claim of `PASS`, `CLOSED`, or `100%` without documented evidence.
+Any future implementation task that relies on this lock must:
 
----
+- prove current roots from `pnpm-workspace.yaml`,
+- prove current framework/package versions from the active branch,
+- keep scope narrow and explicit,
+- document unknowns as `TBD`,
+- avoid direct screen-to-screen imports without a contract,
+- avoid raw Tamagui imports outside `ui-kit`,
+- avoid backend/runtime changes during a UI-only task,
+- provide `git --no-pager status --short` and `git --no-pager diff --check`,
+- provide applicable type/build/runtime/visual evidence for the changed scope.
 
-### 15.6 Gradual Execution Order
-
-Execution is phased. No phase may start before the previous phase output is reviewed.
-
-| Phase | Name | Scope |
-|---|---|---|
-| 0 | Governance lock | This section in `TECH_STACK_LOCK.md` only. No implementation. |
-| 1 | Read-only audit | Scan workspace structure and package evidence. No edits. |
-| 2 | Screen inventory | List all screen-like files with surface, service, ownerPath. |
-| 3 | Flow map | Document allowed screen-to-screen transitions and entrypoints/exits. |
-| 4 | Binding map | Document data inputs/outputs and state coverage per screen. |
-| 5 | Integration map | Document API/service/provider connections and adapter boundaries. |
-| 6 | Contract template | Create one SFBIC template. Do not fill all screens manually. |
-| 7 | Guard script | Add a read-only guard after Phase 6 output is adopted. |
-| 8 | Narrow UI/UX | One screen only, after contract exists and phases 1–6 are done. |
-| 9 | Verification | `git status`, `git diff --check`, `tsc --noEmit`, screenshot evidence. |
-
----
-
-### 15.7 Required Evidence Before Any Future Implementation
-
-Any approved implementation task must produce the following before claiming completion:
-
-```powershell
-git --no-pager status --short
-git --no-pager diff --check
-pnpm -w exec tsc --noEmit
-```
-
-Additionally:
-
-- **Screenshot evidence** (before and after) is required for any visible UI change.
-- **Patch/evidence review** is required for navigation, binding, or integration changes.
-- All unknowns must be documented as `TBD` — not omitted.
+No implementation task may claim completion from this file alone.

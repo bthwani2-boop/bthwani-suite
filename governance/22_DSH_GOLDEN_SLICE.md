@@ -2,15 +2,6 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `DSH Service Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** 11_DSH_GOLDEN_SLICE_PROTOCOL, BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Purpose
 

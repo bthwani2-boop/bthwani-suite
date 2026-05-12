@@ -2,15 +2,6 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Evidence Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** 18_EVIDENCE_PACK_STANDARD, EVIDENCE_AND_CLOSURE_GATES, PATCH_REVIEW_PROTOCOL, GOVERNANCE_FINALIZATION_PROTOCOL
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Core evidence law
 
@@ -27,16 +18,14 @@ tools/registry/runs/{SESSION_ID}/
 ### Always required after code/doc changes
 
 ```text
-SUMMARY.md or summary.txt
+SUMMARY.md
 evidence.json
 commands.log
-git-branch-current.txt
-git-status-before.txt
-git-status-after.txt
-git-diff-check-before.txt
-git-diff-check-after.txt
-untracked-before.txt
-untracked-after.txt
+git-status.txt
+git-diff-stat.txt
+git-diff-name-status.txt
+git-diff-check.txt
+untracked-files.txt
 {SESSION_ID}.zip
 ```
 
@@ -71,8 +60,8 @@ merge-base.txt
 
 ```json
 {
-  "issueCode": "GOVERNANCE_DEEPENING",
-  "sessionId": "GOVERNANCE_DEEPENING-YYYYMMDD-HHMMSS",
+  "issueCode": "GOVERNANCE_REVIEW",
+  "sessionId": "GOVERNANCE_REVIEW-YYYYMMDD-HHMMSS",
   "repo": "C:\\bthwani-suite",
   "branch": "...",
   "commitSha": "...",
@@ -112,7 +101,7 @@ git --no-pager status --short > LOCAL_CHANGE_STATUS.txt
 git --no-pager diff --stat > LOCAL_CHANGE_DIFF_STAT.txt
 git --no-pager diff --name-status > LOCAL_CHANGE_NAME_STATUS.txt
 git --no-pager diff --check > LOCAL_CHANGE_DIFF_CHECK.txt
-git --no-pager diff -- . > LOCAL_CHANGE_REVIEW.patch
+git --no-pager diff --binary > LOCAL_CHANGE_REVIEW.patch
 git ls-files --others --exclude-standard > LOCAL_CHANGE_UNTRACKED_FILES.txt
 ```
 
@@ -127,7 +116,7 @@ A task cannot pass if:
 - untracked files are unexplained,
 - staged changes are unreviewed,
 - UI screenshots are missing for UI work,
-- evidence pack lacks `{SESSION_ID}.zip` when a script writes under registry runs.
+- evidence pack lacks `{SESSION_ID}.zip` when a task writes under registry runs.
 
 ## Final governance closure gates
 
@@ -135,8 +124,8 @@ Governance work may be called closed only when all applicable gates are proven:
 
 - git status is understood,
 - `git --no-pager diff --check` passes,
-- `pnpm -w exec tsc --noEmit` passes,
-- active governance guards pass with zero failures,
+- `pnpm -w exec tsc --noEmit` passes when TypeScript or config changed,
+- active governance guards pass when the task changed a guard-owned rule or verification path,
 - no active implementation path depends on retired governance roots,
 - evidence pack exists under `tools/registry/runs/{SESSION_ID}/`,
 - decision vocabulary is one of the canonical values in this file,

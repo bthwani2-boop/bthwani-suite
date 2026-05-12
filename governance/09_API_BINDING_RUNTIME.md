@@ -2,15 +2,6 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `API Runtime Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** 12_API_BINDING_RUNTIME_PROTOCOL, API_CONTRACT_POLICY, FLOW_API_BINDING_RUNTIME_GUARDRAILS, LOCAL_PRODUCTION_READINESS, runtime verification requirements
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Contract source
 
@@ -51,13 +42,13 @@ When OpenAPI exists:
 - services implement contract.
 - runtime verification proves behavior.
 
-## NestJS backend contract
+## Backend contract source
 
-NestJS services must expose or feed contract generation consistently. Controller DTOs, validation, auth decorators, and OpenAPI schemas must not drift silently.
+Go is the target backend per `TECH_STACK_LOCK.md`. If a current branch still contains Node, NestJS, or another backend stack, treat it as current-branch reality only. It does not become canonical backend policy without governance evidence.
 
 Minimum backend evidence for API change:
 
-- changed controller/service path,
+- changed handler/service path,
 - contract diff,
 - type generation or typecheck,
 - integration/contract test,

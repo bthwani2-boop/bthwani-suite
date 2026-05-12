@@ -2,19 +2,10 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Design System Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** 07_UI_KIT_AUTHORITY_CONTRACT, UI_UX_GUARDRAILS, DIRECTION_I18N_OWNERSHIP
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Design authority
 
-`@bthwani/ui-kit` is the only central design authority. Screens, surfaces, and apps consume public exports only. Tamagui may be used internally inside ui-kit, not directly in apps/surfaces.
+`@bthwani/ui-kit` is the only central design authority. Screens, surfaces, and apps consume public exports only. Tamagui direct imports are allowed only inside `ui-kit` and the root build adapter `tamagui.build.ts` when present. `TamaguiProvider` ownership stays inside ui-kit.
 
 ## Brand DNA
 
@@ -95,7 +86,7 @@ Any UI change must include:
 ## Closure checklist for this file
 
 - [ ] Every rule above has exactly one owner file.
-- [ ] Any derived script/guard points back to this file and not to legacy.
+- [ ] Any derived script/guard points back to this file or its owner file.
 - [ ] Evidence exists for any claim of compliance.
 - [ ] No local app/surface/package silently overrides this file.
 - [ ] Any exception is documented with owner, expiry, risk, and rollback.

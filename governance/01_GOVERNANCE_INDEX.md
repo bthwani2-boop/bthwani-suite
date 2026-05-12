@@ -2,15 +2,6 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Governance Control Plane`
-**Canonical repo:** `C:\bthwani-suite`
-**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** 00_GOVERNANCE_INDEX, GOVERNANCE_REORGANIZATION_LEDGER, GOVERNANCE_CONSOLIDATION_DECISION_MATRIX
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Reading order
 
@@ -19,9 +10,11 @@ This file is not a slogan file. It is a control-plane rule file for BThwani. Any
 3. `07_SURFACES_AND_SERVICES.md` — services and surfaces.
 4. `04_ARCHITECTURE_RULES.md` — ownership and direction.
 5. `11_EVIDENCE_AND_TRACEABILITY.md` — proof requirements.
-6. Domain file for the current task.
-7. `14_GUARDS_CATALOG.md` — enforcement mapping.
-8. `99_LEGACY_MERGE_LEDGER.md` — source accounting.
+6. `PLATFORM_BLUEPRINT.md` — cross-owner execution sequence and baseline program when the task spans multiple owner files or platform continuation.
+7. Domain file for the current task.
+8. `15_AGENT_AND_AI_EXECUTION.md` — agent-execution boundary, when automation or adapters are in scope.
+9. `14_GUARDS_CATALOG.md` — enforcement mapping.
+10. `99_LEGACY_MERGE_LEDGER.md` — historical source accounting.
 
 ## File classification
 
@@ -40,7 +33,7 @@ This file is not a slogan file. It is a control-plane rule file for BThwani. Any
 |---|---|
 | `Canonical` | Must be followed unless superseded with evidence and governance update. |
 | `Current` | Exists now but may not be correct. |
-| `Legacy` | Historical/donor source only. |
+| `Historical` | Historical/donor source only. |
 | `Derived` | Generated from canonical source; cannot override it. |
 | `Transitional` | Temporarily tolerated with expiry and owner. |
 | `TBD` | Unknown; cannot be implemented as truth. |
@@ -53,7 +46,7 @@ Every rule must have one owner file. If two files appear to govern the same thin
 1. More specific domain owner wins.
 2. If conflict is cross-domain, `02_PLATFORM_SSOT.md` decides platform facts.
 3. Evidence procedure conflicts are decided by `11_EVIDENCE_AND_TRACEABILITY.md`.
-4. Update `99_LEGACY_MERGE_LEDGER.md` when the conflict came from legacy.
+4. Update `99_LEGACY_MERGE_LEDGER.md` when the conflict came from historical source accounting.
 
 ## Required cross-links
 
@@ -88,7 +81,7 @@ Every file must have exactly one active classification at a time.
 
 ## Active authority set
 
-The canonical authority set contains 24 files only:
+The canonical authority set contains 25 numbered authority files plus two active support files:
 
 ```text
 00_README.md
@@ -106,6 +99,7 @@ The canonical authority set contains 24 files only:
 12_TESTING_AND_PRODUCTION_READINESS.md
 13_CI_AND_GATES.md
 14_GUARDS_CATALOG.md
+15_AGENT_AND_AI_EXECUTION.md
 16_SECURITY_AND_SECRETS.md
 17_CLEANUP_AND_DEPRECATION.md
 18_BRANCH_AND_CHECKPOINTS.md
@@ -117,6 +111,15 @@ The canonical authority set contains 24 files only:
 99_LEGACY_MERGE_LEDGER.md
 ```
 
+Active governance support files:
+
+```text
+TECH_STACK_LOCK.md
+PLATFORM_BLUEPRINT.md
+```
+
+`PLATFORM_BLUEPRINT.md` is a cross-owner execution blueprint. It sequences the owner files; it does not replace them.
+
 Standalone runtime-observability authority is absorbed into `09_API_BINDING_RUNTIME.md`.
 Standalone service-blueprint authority is absorbed into `10_SERVICE_CLOSURE.md`.
 
@@ -126,9 +129,11 @@ Standalone service-blueprint authority is absorbed into `10_SERVICE_CLOSURE.md`.
 governance/
   00_README.md
   01_GOVERNANCE_INDEX.md
+  PLATFORM_BLUEPRINT.md
+  TECH_STACK_LOCK.md
   ...
   24_TRACEABILITY_AND_ROADMAP.md
   99_LEGACY_MERGE_LEDGER.md
 ```
 
-The legacy donor folder `governance/governance-legacy` is not part of the active control plane. After extraction is complete it should be removed. Any future reintroduction is archive-only and excluded from active policy.
+Historical merge accounting belongs in `99_LEGACY_MERGE_LEDGER.md`, not in daily governance owner files.

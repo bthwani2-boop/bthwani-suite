@@ -2,35 +2,26 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Package Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** 03_PACKAGE_BOUNDARY_CONTRACT, UI Kit public entrypoint cleanup, package boundary guardrails
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Package role matrix
 
-| Package | Role | Public API rule |
+| Boundary | Role | Public API rule |
 |---|---|---|
 | `@bthwani/ui-kit` | Design authority | Only public exports from defined entrypoints. |
-| `@bthwani/surfaces` | Surface and service-owned flows | Public entries per surface/service; no deep app imports. |
-| `@bthwani/app-shells` | Shared shell composition | Shell exports only. |
-| `backend/contracts.ts` per service | Service contract entrypoint | Generated/contract-derived types live behind service-local backend boundaries. |
-| `backend/client.ts` per service | Typed API clients | No UI state; no visual policy. |
-| `@bthwani/media-fixtures` | Media/test fixtures | Not runtime truth. |
+| `<service>/frontend/<surface>` public entrypoint | Service-owned surface flow | Export stable surface entry; no deep imports into another app/runtime. |
+| `<service>/frontend/shared` | Service-local shared UI/state glue | Shared within one service only. |
+| `<service>/backend/contracts.ts` | Service contract entrypoint | Generated or contract-derived types stay behind service-local backend boundaries. |
+| `<service>/backend/client.ts` | Typed API clients | No UI state; no visual policy. |
+| service-local fixture roots such as `dsh/media-fixtures` | Media/test fixtures | Not runtime truth. |
 
 ## Import policy
 
 Allowed:
 
-```ts
-import { Button, Card } from '@bthwani/ui-kit';
-import { DshClientSurface } from '@bthwani/surfaces';
-import { dshBackendClient } from '@bthwani/dsh/backend';
+```text
+@bthwani/ui-kit
+<service>/frontend/<surface> public entrypoint
+<service>/backend/client typed client
 ```
 
 Forbidden unless explicitly allowed by package owner:
@@ -38,7 +29,7 @@ Forbidden unless explicitly allowed by package owner:
 ```ts
 import { XStack } from 'tamagui'; // outside ui-kit
 import { Something } from '@bthwani/ui-kit/src/internal/...';
-import { DshStoreCard } from '../../<service>/frontend/...';
+import { DshStoreCard } from '../../other-service/frontend/...';
 ```
 
 ## Export policy

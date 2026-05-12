@@ -2,19 +2,33 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Legacy Accounting Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Execution branch context:** runtime-detected from Git; do not hardcode branch truth.
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** GOVERNANCE_REORGANIZATION_LEDGER, GOVERNANCE_DEEP_DEDUP_ANALYSIS_MATRIX, all legacy files
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Ledger purpose
 
 This file proves that legacy governance input was inventoried and mapped to canonical owner files. It does not mean every legacy sentence was copied verbatim. It means each source file has an owner decision, and the canonical package carries forward the enforceable rules, matrices, and protocols without keeping legacy as active authority.
+
+## 2026-05-13 blueprint merge correction
+
+A later user-directed review found that the earlier cleanup classification for `PLATFORM_BLUEPRINT.md` and `BTHWANI_DSH_BASELINE_READINESS_GUARDS_ADDENDUM.md` was too aggressive.
+
+The corrected active-state decision is:
+
+| File | Corrected decision | Active owner after correction |
+|---|---|---|
+| `PLATFORM_BLUEPRINT.md` | retained as an active governance support blueprint and rewritten as the single merged execution sequence file | `PLATFORM_BLUEPRINT.md` plus `02`, `03`, `10`, `11`, `12`, `14`, `15`, `22`, `24`, and `TECH_STACK_LOCK.md` |
+| `BTHWANI_DSH_BASELINE_READINESS_GUARDS_ADDENDUM.md` | merged into `PLATFORM_BLUEPRINT.md` and removed as a duplicate support source | `PLATFORM_BLUEPRINT.md`, `22_DSH_GOLDEN_SLICE.md`, `12_TESTING_AND_PRODUCTION_READINESS.md`, `14_GUARDS_CATALOG.md` |
+
+## 2026-05-13 governance cleanup v1
+
+This cleanup initially classified duplicated baseline/prompt-style governance files for removal or redistribution. The `PLATFORM_BLUEPRINT.md` and `BTHWANI_DSH_BASELINE_READINESS_GUARDS_ADDENDUM.md` rows below are superseded by the blueprint merge correction above.
+
+| File | Decision | Active owner after cleanup |
+|---|---|---|
+| `PLATFORM_BLUEPRINT.md` | removed from active governance | `02_PLATFORM_SSOT.md`, `03_REPO_BOUNDARIES.md`, `07_SURFACES_AND_SERVICES.md`, `10_SERVICE_CLOSURE.md`, `11_EVIDENCE_AND_TRACEABILITY.md`, `19_CONTROL_PANEL_AND_OPERATING_MODEL.md` |
+| `BTHWANI_FINAL_MERGED_ENGINEERING_BASELINE_V1.md` | removed from active governance | numbered owner files plus `TECH_STACK_LOCK.md` |
+| `BTHWANI_DSH_BASELINE_READINESS_GUARDS_ADDENDUM.md` | removed from active governance | `22_DSH_GOLDEN_SLICE.md`, `12_TESTING_AND_PRODUCTION_READINESS.md`, `14_GUARDS_CATALOG.md` |
+| `TAMAGUI_INTEGRATION_LAW.md` | merged into active owner and removed | `08_UI_KIT_AND_BRAND.md` |
+| `15_AGENT_AND_AI_EXECUTION.md` | added as missing canonical owner for agent-execution boundaries | `15_AGENT_AND_AI_EXECUTION.md` |
 
 ## Source inventory summary
 
