@@ -106,12 +106,12 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
         {/* Metrics Overlay (Bottom-Left of Image) */}
         <View style={styles.imageMetricsOverlay}>
           <View style={styles.imageMetricItem}>
-            <Icon name="star" size={12} color="#FFD700" />
+            <Icon name="star" size={10} color="#FFD700" />
             <Text style={styles.imageMetricText}>{item.rating?.toFixed(1) || '4.5'}</Text>
           </View>
           <View style={styles.imageMetricDivider} />
           <View style={styles.imageMetricItem}>
-            <Icon name="people" size={12} color="#FFF" />
+            <Icon name="people" size={10} color="#FFF" />
             <Text style={styles.imageMetricText}>
               {item.followersCount ? `${(item.followersCount / 1000).toFixed(0)}k` : '11k'}
             </Text>
@@ -245,14 +245,17 @@ const styles = StyleSheet.create({
   imageMetricsOverlay: {
     position: 'absolute',
     bottom: 8,
-    left: 8,
+    left: 5,
     flexDirection: 'row',
-    backgroundColor: 'rgba(10, 47, 92, 0.8)',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    alignItems: 'center',
+    backgroundColor: 'rgba(10, 47, 92, 0.85)',
+    borderRadius: 6,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    gap: 4,
+    maxWidth: 66, // Prevents overlap with the logo circle on the right while staying clear of the left corner curve
   },
   imageMetricItem: {
     flexDirection: 'row',
@@ -260,9 +263,10 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   imageMetricText: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '800',
     color: '#FFF',
+    fontFamily: 'Outfit-Bold',
   },
   imageMetricDivider: {
     width: 1,
