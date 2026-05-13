@@ -2,7 +2,6 @@ export type DshClientRouteId =
   | 'dsh-home'
   | 'dsh-entry'
   | 'dsh-my-space'
-  | 'dsh-preferences'
   | 'dsh-notifications'
   | 'dsh-store-items'
   | 'dsh-cart'
@@ -27,7 +26,6 @@ export type DshClientLegacyRoute =
   | 'home'
   | 'entry'
   | 'my-space'
-  | 'preferences'
   | 'notifications'
   | 'store-items'
   | 'cart-get'
@@ -59,7 +57,6 @@ export const dshClientRoutes = [
   { routeId: 'dsh-home', legacyRoute: 'home', screenId: 'client.dsh.home.feed', ownerPath: 'dsh/frontend/app-client/screens/HomeScreen.tsx' },
   { routeId: 'dsh-entry', legacyRoute: 'entry', screenId: 'client.dsh.entry', ownerPath: 'dsh/frontend/app-client/screens/EntryScreen.tsx' },
   { routeId: 'dsh-my-space', legacyRoute: 'my-space', screenId: 'client.dsh.my-space.home', ownerPath: 'dsh/frontend/app-client/screens/MySpaceScreen.tsx' },
-  { routeId: 'dsh-preferences', legacyRoute: 'preferences', screenId: 'client.dsh.preferences.delivery', ownerPath: 'dsh/frontend/app-client/screens/PreferencesScreen.tsx' },
   { routeId: 'dsh-notifications', legacyRoute: 'notifications', screenId: 'client.dsh.notifications.list', ownerPath: 'dsh/frontend/app-client/screens/NotificationsScreen.tsx' },
   { routeId: 'dsh-store-items', legacyRoute: 'store-items', screenId: 'client.dsh.store.items', ownerPath: 'dsh/frontend/app-client/screens/StoreItemsScreen.tsx' },
   { routeId: 'dsh-cart', legacyRoute: 'cart-get', screenId: 'client.dsh.cart.review', ownerPath: 'dsh/frontend/app-client/screens/CartScreen.tsx' },

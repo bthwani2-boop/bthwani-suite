@@ -8,7 +8,6 @@ import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './
 import { DshMySpaceScreen } from './screens/MySpaceScreen';
 import { DshNotificationsScreen } from './screens/NotificationsScreen';
 import { DshBenefitsHubScreen } from './screens/BenefitsScreen';
-import { PreferencesScreen } from './screens/PreferencesScreen';
 import { DshOrdersListScreen, DshTrackingScreen } from './screens/OrdersTrackingScreens';
 import { DshStoreGetScreen } from './screens/StoreScreen';
 import { DshStoreItemsScreen } from './screens/StoreItemsScreen';
@@ -582,20 +581,10 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           badgeLabel: item.family === 'subscription' ? 'اشتراك' : item.family === 'promotion' ? 'برومو' : item.family === 'shorts' ? 'شورتات' : 'حملة',
         }))}
         onOpenOrders={() => setRoute('orders-list')}
-        onOpenPreferences={() => setRoute('preferences')}
         onOpenTracking={() => openTrackedOrder()}
         onRepeatOrder={openCreateOrderJourney}
         onBack={() => setRoute('home')}
         onRetry={() => setRoute('my-space')}
-      />
-    );
-  }
-
-  if (route === 'preferences') {
-    return (
-      <PreferencesScreen
-        onBack={() => setRoute('my-space')}
-        onRetry={() => setRoute('preferences')}
       />
     );
   }
