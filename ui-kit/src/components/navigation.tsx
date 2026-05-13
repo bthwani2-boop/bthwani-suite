@@ -171,12 +171,12 @@ export function ModernPremiumHeader({
         <Pressable
           onPress={onLocationPress}
           hitSlop={16}
-          style={[styles.locationContainer, { backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: 4 }]}
+          style={styles.locationContainer}
         >
-          <Text role="caption" style={styles.deliveryToText}>التوصيل إلى</Text>
+          <Text style={styles.brandText}>بثواني</Text>
           <View style={[styles.locationBadge, { flexDirection: rowDirection }]}>
-            <Icon name="location" size={12} color={colorPalette.white} />
-            <Text role="bodyStrong" style={styles.locationText} numberOfLines={1}>{locationLabel ?? 'حدد الموقع'}</Text>
+            <Icon name="location" size={10} color={colorPalette.white} />
+            <Text role="caption" style={[styles.locationText, { fontSize: 11 }]} numberOfLines={1}>{locationLabel ?? 'حدد الموقع'}</Text>
           </View>
         </Pressable>
 
@@ -310,8 +310,8 @@ const styles = StyleSheet.create({
     backgroundColor: colorPalette.brand,
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    paddingTop: 32, // Reduced from 40 to compact the header
-    paddingBottom: 4,
+    paddingTop: 12, // Compacted further as per user request
+    paddingBottom: 2,
     paddingHorizontal: 16,
     gap: 0,
     marginBottom: spacing[1],
@@ -325,8 +325,17 @@ const styles = StyleSheet.create({
   headerTopRow: {
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 42,
-    marginTop: 14, // Reduced from 18 to compact the header
+    height: 40,
+    marginTop: 4, // Compacted further
+  },
+  brandText: {
+    color: colorPalette.white,
+    fontSize: 17,
+    fontWeight: '950',
+    letterSpacing: -0.8,
+    textShadowColor: 'rgba(0,0,0,0.25)',
+    textShadowOffset: { width: 0, height: 1.5 },
+    textShadowRadius: 3,
   },
   locationContainer: {
     flex: 1,
