@@ -48,3 +48,6 @@ tools/registry/runs/*
 !tools/registry/runs/README.md
 !tools/registry/runs/_published/
 !tools/registry/runs/_published/**
+
+.claude/worktrees
+.claude/settings.local.json

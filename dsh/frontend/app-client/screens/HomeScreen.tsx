@@ -1260,8 +1260,8 @@ return (
           cartCount={cartCount}
           searchPlaceholder="ماذا تريد أن تطلب اليوم؟"
           tickerMessage={tickerState?.message ?? ''}
-          tickerStatus={tickerState?.statusLabel ?? (currentLanguage === 'ar' ? 'مباشر' : 'Live')}
           onTickerPress={handleTickerAction}
+          onLocationPress={() => onOpenBenefits?.('address-picker')}
           direction={isRtl ? 'rtl' : 'ltr'}
         />
       )}
@@ -2231,7 +2231,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       flex: 1,
     },
     storeListContent: {
-      gap: spacing[3], // tightened to ~12px between store cards
+      gap: spacing[2], // Adjusted to 8px for a clean distance between cards
       paddingBottom: spacing[8],
     },
     emptyFeed: {

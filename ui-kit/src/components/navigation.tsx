@@ -32,6 +32,7 @@ export type ModernPremiumHeaderProps = {
   tickerMessage?: string;
   tickerStatus?: string;
   onTickerPress?: () => void;
+  onLocationPress?: () => void;
   direction?: Direction;
 };
 
@@ -140,8 +141,10 @@ export function ModernPremiumHeader({
   tickerMessage,
   tickerStatus,
   onTickerPress,
+  onLocationPress,
   direction = 'rtl',
 }: ModernPremiumHeaderProps) {
+  const insets = useSafeAreaInsets();
   const rowDirection = resolveRowDirection(direction);
 
   return (
@@ -165,13 +168,17 @@ export function ModernPremiumHeader({
           />
         </View>
 
-        <View style={styles.locationContainer}>
+        <Pressable
+          onPress={onLocationPress}
+          hitSlop={16}
+          style={[styles.locationContainer, { backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: 4 }]}
+        >
           <Text role="caption" style={styles.deliveryToText}>التوصيل إلى</Text>
           <View style={[styles.locationBadge, { flexDirection: rowDirection }]}>
             <Icon name="location" size={12} color={colorPalette.white} />
             <Text role="bodyStrong" style={styles.locationText} numberOfLines={1}>{locationLabel ?? 'حدد الموقع'}</Text>
           </View>
-        </View>
+        </Pressable>
 
         <Pressable onPress={onProfilePress} style={styles.profileAvatar}>
           <Icon name="person" size={20} color={colorPalette.brand} />
@@ -303,11 +310,11 @@ const styles = StyleSheet.create({
     backgroundColor: colorPalette.brand,
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    paddingTop: 12, // Much smaller because it's inside SafeAreaView
-    paddingBottom: spacing[1],
+    paddingTop: 40, // MASSIVE shift to ensure visibility (original was 12)
+    paddingBottom: 4,
     paddingHorizontal: 16,
-    gap: spacing[1],
-    marginBottom: spacing[2],
+    gap: 0,
+    marginBottom: spacing[1],
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.15,
@@ -319,6 +326,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     height: 42,
+    marginTop: 18, // Shifted down by additional 8px (total 18px from safe area padding)
   },
   locationContainer: {
     flex: 1,
