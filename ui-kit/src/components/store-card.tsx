@@ -71,25 +71,31 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
       onPress={onPress}
       style={[styles.card, { backgroundColor: theme.surface }]}
     >
-      {/* Top-Left Status Badge (Absolute) */}
+      {/* Top-Left Status Pill (Absolute - Premium Orb Edition) */}
       <View style={styles.absoluteStatusBadge}>
         <View style={[styles.statusBadge, { backgroundColor: item.isOpen ? '#F0FFF4' : '#FFF5F5' }]}>
-          <View style={[styles.dot, { backgroundColor: item.isOpen ? theme.success : theme.danger }]} />
+          <View style={[styles.statusOrb, { backgroundColor: item.isOpen ? theme.success : theme.danger }]}>
+            <Ionicons
+              name={item.isOpen ? 'checkmark' : 'remove'}
+              size={8}
+              color="#FFF"
+            />
+          </View>
           <Text style={[styles.statusText, { color: item.isOpen ? theme.success : theme.danger }]}>
             {item.isOpen ? 'مفتوح' : 'مغلق'}
           </Text>
         </View>
       </View>
 
-      {/* Bottom-Left Favorite Button (Absolute) */}
+      {/* Bottom-Left Favorite Button (Container-less Action) */}
       <TouchableOpacity
         onPress={onFavoritePress}
-        hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+        hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
         style={styles.absoluteFavoriteButton}
       >
         <Ionicons
           name={item.isFavorite ? 'heart' : 'heart-outline'}
-          size={24}
+          size={26}
           color={item.isFavorite ? ORANGE : theme.textMuted}
         />
       </TouchableOpacity>
@@ -134,7 +140,7 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
           {/* Row 2: Location & Badges */}
           <View style={styles.locationBadgeRow}>
             <View style={styles.locationCluster}>
-              <Ionicons name="location-sharp" size={14} color={ORANGE} />
+              <Ionicons name="location-sharp" size={11} color={ORANGE} />
               <Text style={styles.addressText} numberOfLines={1}>
                 {item.locationLabel || item.subtitle || 'الرياض'}
               </Text>
@@ -153,12 +159,12 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
         {/* Row 3: Metrics Ribbon (Only Distance/Time) */}
         <View style={[styles.metricsRibbon, { backgroundColor: theme.surfaceSecondary }]}>
           <View style={styles.metricItem}>
-            <Ionicons name="navigate-outline" size={14} color={theme.textMuted} />
+            <Ionicons name="navigate-outline" size={10} color={theme.textMuted} />
             <Text style={styles.metaText}>{item.distanceKm?.toFixed(1) || '2.1'} كم</Text>
           </View>
           <View style={styles.metricDivider} />
           <View style={styles.metricItem}>
-            <Ionicons name="time-outline" size={14} color={theme.textMuted} />
+            <Ionicons name="time-outline" size={10} color={theme.textMuted} />
             <Text style={styles.metaText}>{item.deliveryTimeLabel || '25-35 د'}</Text>
           </View>
         </View>
@@ -295,17 +301,11 @@ const styles = StyleSheet.create({
     bottom: 12,
     left: 14,
     zIndex: 30,
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#FFF',
+    width: 44,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
+    // Background and shadow removed for clean look
   },
   textContent: {
     flex: 1,
@@ -336,19 +336,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   storeName: {
-    fontSize: 18,
+    fontSize: 19, // Primary: Prominent & Dominant
     fontWeight: '800',
     color: '#0A2F5C',
     textAlign: 'right',
     fontFamily: 'Outfit-Bold',
-    marginBottom: 2,
+    marginBottom: 0,
   },
   addressText: {
-    fontSize: 14,
-    color: '#4A5568', // Improved contrast for readability
+    fontSize: 11, // Even smaller and quieter
+    color: '#718096',
     textAlign: 'right',
     fontFamily: 'Outfit-Regular',
-    marginBottom: 4,
+    marginTop: -1,
   },
   locationBadgeRow: {
     flexDirection: 'row-reverse',
@@ -375,10 +375,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statusText: {
-    color: '#FFF',
-    fontSize: 12,
+    fontSize: 11, // Smaller for clean hierarchy
     fontWeight: '700',
     fontFamily: 'Outfit-Bold',
+    marginRight: 2,
+  },
+  statusOrb: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 2,
   },
   dot: {
     width: 6,
@@ -387,8 +395,8 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   metaText: {
-    fontSize: 13,
-    color: '#555', // Darker for better contrast
+    fontSize: 10, // Tertiary: Smallest possible for high-density elegance
+    color: '#718096',
     fontFamily: 'Outfit-Medium',
   },
   deliveryBadgeText: {
