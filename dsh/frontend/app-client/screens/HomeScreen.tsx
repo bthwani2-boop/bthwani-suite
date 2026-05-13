@@ -1308,7 +1308,7 @@ return (
         contentContainerStyle={{
           paddingHorizontal: spacing[3],
           paddingTop: spacing[0],
-          paddingBottom: 120,
+          paddingBottom: 150,
           flexGrow: 1,
         }}
         showsVerticalScrollIndicator={false}
@@ -1833,7 +1833,7 @@ return (
         items={[
           { id: 'home', label: 'الرئيسية', icon: 'home-outline', activeIcon: 'home' },
           { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', activeIcon: 'receipt' },
-          { id: 'wallet', label: 'محفظتي', icon: 'wallet-outline', activeIcon: 'wallet' },
+          { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
           { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
         ]}
       />

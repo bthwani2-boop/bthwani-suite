@@ -1,9 +1,21 @@
 import React from 'react';
-import { View, Pressable, StyleSheet, useWindowDimensions, Animated, Easing } from 'react-native';
+import { Animated, Easing, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { colorPalette, resolveRowDirection, type Direction } from '../foundation';
 import { Surface, Text } from '../primitives';
 import { Icon } from './icons';
-import { Badge } from './button';
-import { colorPalette, spacing, radius, type Direction, resolveRowDirection } from '../foundation';
+
+// Dynamic safe-area insets loader
+let useSafeAreaInsets: () => { top: number; bottom: number; left: number; right: number } = () => ({ top: 0, bottom: 0, left: 0, right: 0 });
+try {
+  // eslint-disable-next-line no-eval
+  const r: any = eval('require');
+  const safe = r('react-native-safe-area-context');
+  if (safe && typeof safe.useSafeAreaInsets === 'function') {
+    useSafeAreaInsets = safe.useSafeAreaInsets;
+  }
+} catch (err) {
+  // fallback is zero
+}
 
 // ----- Modern Premium Header -----
 
@@ -30,15 +42,14 @@ function SmartNewsTicker({ message, status, isRtl, onPress }: { message: string,
 
   React.useEffect(() => {
     if (containerWidth > 0 && textWidth > 0) {
-      // Logic: Move from one side to the other.
-      // User requested "From Left to Right".
-      // In RTL, that's actually the natural flow of a ticker (entering from left, moving right).
-      const startValue = -textWidth;
-      const endValue = containerWidth;
+      // Loop: Start from one side and move to the other
+      const startValue = isRtl ? -textWidth : containerWidth;
+      const endValue = isRtl ? containerWidth : -textWidth;
 
       translateX.setValue(startValue);
 
-      const duration = (containerWidth + textWidth) * 25; // Speed adjustment
+      // Duration depends on total distance to maintain speed
+      const duration = (containerWidth + textWidth) * 45; // Slower for readability
 
       const animation = Animated.loop(
         Animated.timing(translateX, {
@@ -52,7 +63,7 @@ function SmartNewsTicker({ message, status, isRtl, onPress }: { message: string,
       animation.start();
       return () => animation.stop();
     }
-  }, [containerWidth, textWidth]);
+  }, [containerWidth, textWidth, isRtl]);
 
   return (
     <Pressable
@@ -64,7 +75,7 @@ function SmartNewsTicker({ message, status, isRtl, onPress }: { message: string,
         <Text role="label" style={styles.tickerStatusText}>{status ?? 'مباشر'}</Text>
       </View>
       <View style={styles.tickerScrollContainer}>
-        <Animated.View style={{ transform: [{ translateX }] }}>
+        <Animated.View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', transform: [{ translateX }] }}>
           <Text
             role="bodySm"
             style={styles.tickerMessage}
@@ -73,9 +84,10 @@ function SmartNewsTicker({ message, status, isRtl, onPress }: { message: string,
           >
             {message}
           </Text>
+          {/* Spacer for loop gap */}
+          <View style={{ width: 100 }} />
         </Animated.View>
       </View>
-      <Icon name="chevron-forward" size={14} color="rgba(255,255,255,0.6)" mirrored={isRtl} />
     </Pressable>
   );
 }
@@ -104,6 +116,10 @@ export function ModernPremiumHeader({
       <View style={[styles.headerTopRow, { flexDirection: rowDirection }]}>
         <View style={[styles.actionCluster, { flexDirection: rowDirection }]}>
           <HeaderIconButton
+            icon="search-outline"
+            onPress={onSearchPress}
+          />
+          <HeaderIconButton
             icon="notifications-outline"
             onPress={onNotificationsPress}
             badge={notificationCount > 0 ? notificationCount : undefined}
@@ -124,17 +140,11 @@ export function ModernPremiumHeader({
         </View>
 
         <Pressable onPress={onProfilePress} style={styles.profileAvatar}>
-          <Icon name="person" size={22} color={colorPalette.brand} />
+          <Icon name="person" size={20} color={colorPalette.brand} />
         </Pressable>
       </View>
 
-      {/* Row 2: Search Bar */}
-      <Pressable onPress={onSearchPress} style={[styles.searchBarWrapper, { flexDirection: rowDirection }]}>
-        <Icon name="search-outline" size={20} color="rgba(255,255,255,0.7)" />
-        <Text style={styles.searchText}>{searchPlaceholder ?? 'ابحث عن متجر، مطعم، خدمة...'}</Text>
-      </Pressable>
-
-      {/* Row 3: Animated News Ticker */}
+      {/* Row 2: Animated News Ticker */}
       {tickerMessage && (
         <SmartNewsTicker
           message={tickerMessage}
@@ -150,7 +160,7 @@ export function ModernPremiumHeader({
 function HeaderIconButton({ icon, onPress, badge }: { icon: any; onPress?: () => void; badge?: number }) {
   return (
     <Pressable onPress={onPress} style={styles.headerIconButton}>
-      <Icon name={icon} size={24} color={colorPalette.white} />
+      <Icon name={icon} size={22} color={colorPalette.white} />
       {badge !== undefined && badge > 0 && (
         <View style={styles.iconBadge} />
       )}
@@ -182,17 +192,21 @@ export function BottomNavBar({
   onLauncherPress,
   direction = 'rtl',
 }: BottomNavBarProps) {
+  const insets = useSafeAreaInsets();
+  const bottomPadding = Math.max(insets.bottom, Platform.OS === 'android' ? 44 : 12);
   const { width } = useWindowDimensions();
   const rowDirection = resolveRowDirection(direction);
 
+  // Height strategy: base height 64 + safe area
+  const totalHeight = 64 + bottomPadding;
+
   // Split items to place launcher in middle
-  // We assume 4 items total for a balanced look
   const leftItems = items.slice(0, 2);
   const rightItems = items.slice(2, 4);
 
   return (
-    <View style={[styles.navContainer, { width }]}>
-      <Surface tone="default" style={styles.navSurface}>
+    <View style={[styles.navContainer, { width, height: totalHeight }]}>
+      <Surface tone="raised" style={[styles.navSurface, { height: totalHeight, paddingBottom: bottomPadding }]}>
         <View style={[styles.navContent, { flexDirection: rowDirection }]}>
           {leftItems.map((item) => (
             <NavButton
@@ -203,7 +217,11 @@ export function BottomNavBar({
             />
           ))}
 
-          <View style={styles.launcherPlaceholder} />
+          <View style={styles.launcherPlaceholder}>
+            <Pressable onPress={onLauncherPress} style={styles.launcherButtonArea}>
+              <Text role="caption" style={styles.launcherLabel}>الخدمات</Text>
+            </Pressable>
+          </View>
 
           {rightItems.map((item) => (
             <NavButton
@@ -219,7 +237,7 @@ export function BottomNavBar({
       {/* Floating Center Launcher */}
       <Pressable onPress={onLauncherPress} style={styles.floatingLauncher}>
         <View style={styles.launcherInner}>
-          <Icon name="grid" size={28} color={colorPalette.white} />
+          <Icon name="grid" size={24} color={colorPalette.white} />
         </View>
       </Pressable>
     </View>
@@ -231,12 +249,13 @@ function NavButton({ item, isActive, onPress }: { item: NavItem; isActive: boole
     <Pressable onPress={onPress} style={styles.navButton}>
       <Icon
         name={isActive ? item.activeIcon : item.icon}
-        size={24}
+        size={22}
         color={isActive ? colorPalette.brand : colorPalette.textMuted}
       />
       <Text
         role="caption"
         style={[styles.navLabel, { color: isActive ? colorPalette.brand : colorPalette.textMuted }]}
+        numberOfLines={1}
       >
         {item.label}
       </Text>
@@ -249,35 +268,35 @@ function NavButton({ item, isActive, onPress }: { item: NavItem; isActive: boole
 const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: colorPalette.brand,
-    borderBottomLeftRadius: 36,
-    borderBottomRightRadius: 36,
-    paddingTop: 58,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    paddingTop: 12, // Much smaller because it's inside SafeAreaView
     paddingBottom: 8,
     paddingHorizontal: 16,
-    gap: 12,
+    gap: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 12,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
     zIndex: 100,
   },
   headerTopRow: {
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 50,
+    height: 42,
   },
   locationContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
   },
   deliveryToText: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 10,
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 9,
     fontWeight: '700',
-    marginBottom: 2,
+    marginBottom: 0,
   },
   locationBadge: {
     alignItems: 'center',
@@ -286,79 +305,61 @@ const styles = StyleSheet.create({
   locationText: {
     color: colorPalette.white,
     fontWeight: '900',
-    fontSize: 15,
+    fontSize: 14,
   },
   actionCluster: {
     alignItems: 'center',
-    gap: 8,
+    gap: 4, // Slightly tighter for 3 icons
   },
   headerIconButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    width: 34, // Slightly smaller to fit 3
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
   },
   iconBadge: {
     position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: '#FF3B30', // Pure Red for visibility
-    minWidth: 10,
-    height: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
+    top: -1,
+    right: -1,
+    backgroundColor: '#FF3B30',
+    minWidth: 7,
+    height: 7,
+    borderRadius: 4,
+    borderWidth: 1,
     borderColor: colorPalette.brand,
-    paddingHorizontal: 2,
-  },
-  iconBadgeText: {
-    color: colorPalette.white,
-    fontSize: 10,
-    fontWeight: '900',
   },
   profileAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: colorPalette.white,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: 'rgba(255,255,255,0.3)',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   searchBarWrapper: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 16,
-    height: 48,
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    // Hidden by default in ModernPremiumHeader but kept styles for expand logic if needed
+    display: 'none',
   },
   searchText: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 13,
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 12,
     fontWeight: '600',
     flex: 1,
     textAlign: 'right',
   },
   tickerBar: {
-    backgroundColor: 'rgba(0,0,0,0.15)',
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    backgroundColor: 'rgba(0,0,0,0.12)',
+    borderRadius: 10,
+    height: 24,
+    paddingHorizontal: 8,
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
     overflow: 'hidden',
   },
   tickerScrollContainer: {
@@ -367,84 +368,105 @@ const styles = StyleSheet.create({
   },
   tickerStatusBadge: {
     backgroundColor: '#FF500D',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 5,
+    zIndex: 10,
   },
   tickerStatusText: {
     color: colorPalette.white,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '900',
   },
   tickerMessage: {
     color: colorPalette.white,
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: 11,
+    paddingHorizontal: 4,
   },
   navContainer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    height: 100, // Total height including floating button
     zIndex: 1000,
   },
   navSurface: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     backgroundColor: colorPalette.white,
-    shadowColor: '#0A2F5C',
-    shadowOffset: { width: 0, height: -8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 24,
-    elevation: 30,
-    paddingBottom: 12,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0A2F5C',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 16,
+      },
+    }),
   },
   navContent: {
     flex: 1,
-    paddingHorizontal: 8, // Reduced to reach edges better
+    paddingHorizontal: 8,
     alignItems: 'center',
     justifyContent: 'space-around',
+    flexDirection: 'row',
   },
   navButton: {
     alignItems: 'center',
-    gap: 4,
+    justifyContent: 'center',
     flex: 1,
+    height: 56,
+    gap: 2,
   },
   navLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '800',
+    textAlign: 'center',
+    width: '100%',
   },
   launcherPlaceholder: {
-    width: 72,
+    width: 64,
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  launcherButtonArea: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  launcherLabel: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: colorPalette.brand,
+    textAlign: 'center',
   },
   floatingLauncher: {
     position: 'absolute',
-    top: 0,
+    top: -12,
     alignSelf: 'center',
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#0A2F5C',
-    padding: 5,
+    padding: 3,
     shadowColor: '#0A2F5C',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.35,
-    shadowRadius: 15,
-    elevation: 15,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 20,
+    zIndex: 1001,
   },
   launcherInner: {
     flex: 1,
-    borderRadius: 31,
+    borderRadius: 25,
     backgroundColor: '#FF500D',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2.5,
-    borderColor: 'rgba(255,255,255,0.25)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
 });
