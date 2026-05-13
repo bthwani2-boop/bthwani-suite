@@ -1,5 +1,5 @@
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
 
 import {
@@ -340,7 +340,7 @@ const serviceLauncherMarkStyles = StyleSheet.create({
   },
 });
 
-const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; iconName: React.ComponentProps<typeof Ionicons>['name'] }> = [
+const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; iconName: string }> = [
   { value: 'all', label: 'الكل', iconName: 'reorder-three-outline' },
   { value: 'favorites', label: 'المفضلة', iconName: 'heart-outline' },
   { value: 'nearest', label: 'الأقرب', iconName: 'locate-outline' },
@@ -420,7 +420,7 @@ function DshServiceLauncherMark() {
 
 function CategoryHubIcon() {
   return (
-    <Ionicons name="grid-outline" size={22} color={colorPalette.brand} />
+    <Icon name="grid-outline" size={22} color={colorPalette.brand} />
   );
 }
 
@@ -1711,24 +1711,13 @@ return (
                   <StoreCardPremium
                     key={store.id}
                     item={card}
-                    style={styles.storeListCard}
                     onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
-                    onToggleFavorite={(id) => {
+                    onFavoritePress={() => {
                       setFavoriteToggles((current) => ({
                         ...current,
-                        [id]: !(current[id] ?? store.isFavorite),
+                        [store.id]: !(current[store.id] ?? store.isFavorite),
                       }));
                     }}
-                    onToggleFollow={(id) => {
-                      const isFollowing = followToggles[id] ?? store.isFollowing;
-                      const baseCount = followCounts[id] ?? store.followerCount;
-                      setFollowToggles((current) => ({ ...current, [id]: !isFollowing }));
-                      setFollowCounts((current) => ({
-                        ...current,
-                        [id]: isFollowing ? Math.max(0, baseCount - 1) : baseCount + 1,
-                      }));
-                    }}
-                    onPressSubscriptionChip={openInlineSearch}
                   />
                 );
               })
@@ -2241,7 +2230,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       flex: 1,
     },
     storeListContent: {
-      gap: spacing[2], // Adjusted to 8px for a clean distance between cards
+      gap: spacing[1], // Adjusted to 4px for a clean, tight distance between cards
       paddingBottom: spacing[8],
     },
     emptyFeed: {

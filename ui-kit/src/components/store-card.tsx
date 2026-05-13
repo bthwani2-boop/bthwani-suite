@@ -4,10 +4,10 @@ import {
   Text,
   Image,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   Dimensions,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from './icons';
 import { useTheme } from '../providers';
 
 /**
@@ -66,16 +66,15 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
   const { theme } = useTheme();
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.95}
+    <Pressable
       onPress={onPress}
-      style={[styles.card, { backgroundColor: theme.surface }]}
+      style={({ pressed }) => [styles.card, { backgroundColor: theme.surface, opacity: pressed ? 0.92 : 1 }]}
     >
-      {/* Top-Left Status Pill (Absolute - Premium Orb Edition) */}
+      {/* Top-Left Status Pill (Absolute) */}
       <View style={styles.absoluteStatusBadge}>
         <View style={[styles.statusBadge, { backgroundColor: item.isOpen ? '#F0FFF4' : '#FFF5F5' }]}>
           <View style={[styles.statusOrb, { backgroundColor: item.isOpen ? theme.success : theme.danger }]}>
-            <Ionicons
+            <Icon
               name={item.isOpen ? 'checkmark' : 'remove'}
               size={8}
               color="#FFF"
@@ -87,18 +86,18 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
         </View>
       </View>
 
-      {/* Bottom-Left Favorite Button (Container-less Action) */}
-      <TouchableOpacity
+      {/* Favorite Button (Absolute) */}
+      <Pressable
         onPress={onFavoritePress}
         hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
         style={styles.absoluteFavoriteButton}
       >
-        <Ionicons
+        <Icon
           name={item.isFavorite ? 'heart' : 'heart-outline'}
           size={26}
           color={item.isFavorite ? ORANGE : theme.textMuted}
         />
-      </TouchableOpacity>
+      </Pressable>
 
       {/* Image Area (Right side in RTL) */}
       <View style={styles.imageContainer}>
@@ -107,12 +106,12 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
         {/* Metrics Overlay (Bottom-Left of Image) */}
         <View style={styles.imageMetricsOverlay}>
           <View style={styles.imageMetricItem}>
-            <Ionicons name="star" size={12} color="#FFD700" />
+            <Icon name="star" size={12} color="#FFD700" />
             <Text style={styles.imageMetricText}>{item.rating?.toFixed(1) || '4.5'}</Text>
           </View>
           <View style={styles.imageMetricDivider} />
           <View style={styles.imageMetricItem}>
-            <Ionicons name="people" size={12} color="#FFF" />
+            <Icon name="people" size={12} color="#FFF" />
             <Text style={styles.imageMetricText}>
               {item.followersCount ? `${(item.followersCount / 1000).toFixed(0)}k` : '11k'}
             </Text>
@@ -129,18 +128,17 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
 
       {/* Content Area (Left side in RTL) */}
       <View style={styles.contentContainer}>
+        {/* Row 1 & 2: Name + Location/Badges */}
         <View style={styles.textContent}>
-          {/* Row 1: Name */}
           <View style={styles.headerRow}>
             <Text style={styles.storeName} numberOfLines={1}>
               {item.name}
             </Text>
           </View>
 
-          {/* Row 2: Location & Badges */}
           <View style={styles.locationBadgeRow}>
             <View style={styles.locationCluster}>
-              <Ionicons name="location-sharp" size={11} color={ORANGE} />
+              <Icon name="location-sharp" size={11} color={ORANGE} />
               <Text style={styles.addressText} numberOfLines={1}>
                 {item.locationLabel || item.subtitle || 'الرياض'}
               </Text>
@@ -149,22 +147,23 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
             <View style={styles.badgeCluster}>
               {item.isPopular && (
                 <View style={[styles.statusBadge, { backgroundColor: '#FFF5F0' }]}>
-                  <Ionicons name="flame" size={10} color={ORANGE} />
-                  <Text style={[styles.statusText, { color: ORANGE, fontSize: 11 }]}>رائج</Text>
+                  <Icon name="flame" size={10} color={ORANGE} />
+                  <Text style={[styles.statusText, { color: ORANGE }]}>رائج</Text>
                 </View>
               )}
             </View>
           </View>
+        </View>
 
-        {/* Row 3: Metrics Ribbon (Only Distance/Time) */}
+        {/* Row 3: Metrics Ribbon */}
         <View style={[styles.metricsRibbon, { backgroundColor: theme.surfaceSecondary }]}>
           <View style={styles.metricItem}>
-            <Ionicons name="navigate-outline" size={10} color={theme.textMuted} />
+            <Icon name="navigate-outline" size={10} color={theme.textMuted} />
             <Text style={styles.metaText}>{item.distanceKm?.toFixed(1) || '2.1'} كم</Text>
           </View>
           <View style={styles.metricDivider} />
           <View style={styles.metricItem}>
-            <Ionicons name="time-outline" size={10} color={theme.textMuted} />
+            <Icon name="time-outline" size={10} color={theme.textMuted} />
             <Text style={styles.metaText}>{item.deliveryTimeLabel || '25-35 د'}</Text>
           </View>
         </View>
@@ -173,23 +172,23 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
         <View style={styles.servicesRow}>
           {item.supportsPartnerDelivery && (
             <View style={styles.serviceIconWrap}>
-              <Ionicons name="bicycle-outline" size={14} color={DARK_BLUE} />
+              <Icon name="bicycle-outline" size={14} color={DARK_BLUE} />
               <Text style={styles.serviceMiniText}>توصيل</Text>
             </View>
           )}
           {item.supportsPickup && (
             <View style={styles.serviceIconWrap}>
-              <Ionicons name="walk-outline" size={14} color={DARK_BLUE} />
+              <Icon name="walk-outline" size={14} color={DARK_BLUE} />
               <Text style={styles.serviceMiniText}>استلم</Text>
             </View>
           )}
           <View style={styles.serviceIconWrap}>
-            <Ionicons name="flash-outline" size={14} color={ORANGE} />
+            <Icon name="flash-outline" size={14} color={ORANGE} />
             <Text style={[styles.serviceMiniText, { color: ORANGE }]}>ثواني</Text>
           </View>
         </View>
 
-        {/* Row 5: Promo Chips (Max 4) */}
+        {/* Row 5: Promo Chips */}
         <View style={styles.promoRow}>
           {item.hasBthwaniPro && (
             <View style={[styles.promoChip, styles.promoChipPro]}>
@@ -213,8 +212,7 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
           )}
         </View>
       </View>
-    </View>
-  </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -232,7 +230,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
     marginHorizontal: 16,
-    marginBottom: 16,
+    marginBottom: 10,
   },
   imageContainer: {
     width: IMAGE_SIZE,
@@ -375,7 +373,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statusText: {
-    fontSize: 11, // Smaller for clean hierarchy
+    fontSize: 9, // Smaller for clean hierarchy
     fontWeight: '700',
     fontFamily: 'Outfit-Bold',
     marginRight: 2,
@@ -395,7 +393,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   metaText: {
-    fontSize: 10, // Tertiary: Smallest possible for high-density elegance
+    fontSize: 9, // Tertiary: Smallest possible for high-density elegance
     color: '#718096',
     fontFamily: 'Outfit-Medium',
   },
@@ -444,7 +442,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   serviceMiniText: {
-    fontSize: 11,
+    fontSize: 9,
     fontWeight: '600',
     color: DARK_BLUE,
   },

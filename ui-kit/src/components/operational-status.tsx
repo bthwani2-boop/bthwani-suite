@@ -1,5 +1,5 @@
 import React from 'react';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import {
   Dimensions,
   Platform,
@@ -591,6 +591,3 @@ export function StickyActionBar({ primaryAction, secondaryAction, note, onHeight
     </View>
   );
 }
-
-
-

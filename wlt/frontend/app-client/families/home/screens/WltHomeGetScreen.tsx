@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, amountToArabicText, useI18n } from '@bthwani/ui-kit';
 import { financeProviders } from '../../../../shared/finance/providers';
 

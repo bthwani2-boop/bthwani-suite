@@ -1,5 +1,5 @@
 import React from 'react';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { type StyleProp, type TextStyle } from 'react-native';
 import { useDirection, useTheme } from '../providers';
 
@@ -35,4 +35,3 @@ export function Icon({ name, size = 20, tone = 'default', color, mirrored = fals
 
   return <Ionicons name={name} size={size} color={resolvedColor} style={[shouldMirror ? { transform: [{ scaleX: -1 }] } : undefined, style]} />;
 }
-

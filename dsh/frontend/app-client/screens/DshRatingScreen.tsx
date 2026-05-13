@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, View, TextInput } from 'react-native';
 
@@ -91,8 +91,8 @@ export function DshRatingScreen({
 
   return (
     <Surface style={styles.root}>
-      <TopBar 
-        title="تقييم التجربة" 
+      <TopBar
+        title="تقييم التجربة"
         onBack={onBack}
         rightAction={onSkip ? { icon: 'close-outline', onPress: onSkip } : undefined}
       />
@@ -118,10 +118,10 @@ export function DshRatingScreen({
             ))}
           </View>
           <Text role="titleMd" style={styles.ratingLabel}>
-            {rating === 1 ? 'ضعيف جداً' : 
-             rating === 2 ? 'ضعيف' : 
-             rating === 3 ? 'مقبول' : 
-             rating === 4 ? 'جيد' : 
+            {rating === 1 ? 'ضعيف جداً' :
+             rating === 2 ? 'ضعيف' :
+             rating === 3 ? 'مقبول' :
+             rating === 4 ? 'جيد' :
              rating === 5 ? 'ممتاز' : 'اضغط للتقييم'}
           </Text>
         </Box>
@@ -150,7 +150,7 @@ export function DshRatingScreen({
           >
             <Text role="titleMd" style={styles.submitButtonText}>إرسال التقييم</Text>
           </Pressable>
-          
+
           <Pressable style={styles.skipButton} onPress={onSkip}>
             <Text role="bodyMd" style={styles.skipButtonText}>تخطي الآن</Text>
           </Pressable>
