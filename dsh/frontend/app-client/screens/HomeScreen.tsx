@@ -121,6 +121,8 @@ export type DshHomeGetScreenProps = {
   onCloseAwnakInline?: () => void;
   renderApprovedVideoReelsViewer?: (props: DshHomeApprovedVideoReelsViewerProps) => React.ReactNode;
   onRetry?: () => void;
+  notificationCount?: number;
+  cartCount?: number;
 };
 
 export type DshHomeCategory = {
@@ -611,6 +613,8 @@ export function DshHomeGetScreen({
   onRetry,
   onOpenEntry,
   homePromos,
+  notificationCount = 5,
+  cartCount = 2,
 }: DshHomeGetScreenProps) {
   const { direction, language: resolvedLanguage } = useDirection();
   const currentLanguage = resolvedLanguage ?? 'ar';
@@ -1285,6 +1289,9 @@ return (
           onNotificationsPress={onOpenNotifications}
           onProfilePress={handleOpenMySpace}
           onLauncherPress={openServiceDial}
+          notificationCount={notificationCount}
+          cartCount={cartCount}
+          searchPlaceholder="ماذا تريد أن تطلب اليوم؟"
           tickerMessage={
             tickerState?.isMarketing
               ? `${isTickerPaused ? '⏸️ ' : ''}${tickerState.message}`
