@@ -235,12 +235,12 @@ const styles = StyleSheet.create({
     bottom: 8,
     left: 8,
     flexDirection: 'row',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 8,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    alignItems: 'center',
-    gap: 4,
+    backgroundColor: 'rgba(10, 47, 92, 0.75)', // Dark Blue with transparency
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   imageMetricItem: {
     flexDirection: 'row',
@@ -259,8 +259,8 @@ const styles = StyleSheet.create({
   },
   logoTemplateContainer: {
     position: 'absolute',
-    bottom: -6,
-    right: -6,
+    bottom: -4,
+    right: -4,
     width: LOGO_SIZE + 18,
     height: LOGO_SIZE + 18,
     borderRadius: (LOGO_SIZE + 18) / 2,
@@ -268,6 +268,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 6,
+    borderWidth: 2,
+    borderColor: '#FFF',
   },
   logoOverlay: {
     width: LOGO_SIZE,
@@ -284,7 +291,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 6,
     justifyContent: 'space-between',
   },
   headerRow: {
@@ -293,7 +300,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   storeName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '800',
     color: DARK_BLUE,
     flex: 1,

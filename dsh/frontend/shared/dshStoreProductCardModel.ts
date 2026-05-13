@@ -50,6 +50,7 @@ export type DshDiscoveryStore = {
   publishStage?: string;
   mediaPolicy?: string;
   source?: string;
+  logoImageUri?: string;
 };
 
 
@@ -349,6 +350,7 @@ export function mapCanonicalStoreToDiscoveryStore(store: DshCanonicalStoreCard):
     canonicalProductId: store.canonicalProductId,
     publishStage: store.publishStage,
     source: store.source,
+    logoImageUri: store.imageUri?.replace('cover', 'logo'),
   };
 }
 

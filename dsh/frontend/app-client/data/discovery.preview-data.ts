@@ -40,6 +40,7 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
 		supportsPickup: true,
 		supportsPartnerDelivery: true,
 		publishStage: 'published-preview',
+		logoImageUri: 'dsh.store.hadda.logo.v1',
 	},
 	{
 		id: 'store-1002',
@@ -68,6 +69,7 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
 		supportsPickup: true,
 		supportsPartnerDelivery: true,
 		publishStage: 'published-preview',
+		logoImageUri: 'dsh.store.hittin.logo.v1',
 	},
 	{
 		id: 'store-1003',
@@ -97,6 +99,7 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
 		supportsPickup: true,
 		supportsPartnerDelivery: true,
 		publishStage: 'published-preview',
+		logoImageUri: 'dsh.store.malqa.logo.v1',
 	},
 	{
 		id: 'store-hidden-marketing',

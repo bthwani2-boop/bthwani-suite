@@ -105,6 +105,7 @@ function toDshHomeGetFixtureStore(store: DshDiscoveryStore): DshHomeGetFixtureSt
 		sourceRecordId: store.sourceRecordId,
 		canonicalStoreId: store.canonicalStoreId,
 		commercialSourceMap: store.commercialSourceMap,
+		logoImageUri: store.logoImageUri,
 	};
 }
 
