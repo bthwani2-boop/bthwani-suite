@@ -18,9 +18,9 @@ import { useTheme } from '../providers';
 
 // --- Constants ---
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const IMAGE_SIZE = 132;
-const LOGO_SIZE = 32;
-const CARD_RADIUS = 20;
+const IMAGE_SIZE = 108;
+const LOGO_SIZE = 42;
+const CARD_RADIUS = 16;
 const DARK_BLUE = '#0A2F5C';
 const ORANGE = '#FF500D';
 const GOLD = '#FFD700';
@@ -211,6 +211,7 @@ const styles = StyleSheet.create({
     borderRadius: CARD_RADIUS,
     flexDirection: 'row-reverse',
     overflow: 'hidden',
+    alignSelf: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
@@ -260,9 +261,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -6,
     right: -6,
-    width: LOGO_SIZE + 20,
-    height: LOGO_SIZE + 20,
-    borderRadius: (LOGO_SIZE + 20) / 2,
+    width: LOGO_SIZE + 18,
+    height: LOGO_SIZE + 18,
+    borderRadius: (LOGO_SIZE + 18) / 2,
     backgroundColor: ORANGE,
     alignItems: 'center',
     justifyContent: 'center',
