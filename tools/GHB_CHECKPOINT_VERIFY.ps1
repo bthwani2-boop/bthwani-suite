@@ -88,7 +88,10 @@ function Invoke-External {
     $cmdText = "$FilePath $($Arguments -join ' ')"
     if (-not [string]::IsNullOrWhiteSpace($StepName)) { Add-CommandLog "STEP: $StepName" }
     Add-CommandLog "RUN: $cmdText"
-    $output = @(& $FilePath @Arguments 2>&1)
+    $output = & {
+        $ErrorActionPreference = 'Continue'
+        @(& $FilePath @Arguments 2>&1)
+    }
     $exitCode = $LASTEXITCODE
     foreach ($line in $output) { Add-CommandLog "OUT: $([string]$line)" }
     Add-CommandLog "EXIT($exitCode): $cmdText"
