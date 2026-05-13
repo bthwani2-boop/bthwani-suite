@@ -13,7 +13,9 @@ export type DshCaptainRoute =
   | 'orderchat'
   | 'bell'
   | 'support-directory'
-  | 'support-screen';
+  | 'support-screen'
+  | 'pickup-dropoff'
+  | 'pod-submission';
 
 export type DshCaptainCommandTarget =
   | 'home'
@@ -23,7 +25,9 @@ export type DshCaptainCommandTarget =
   | 'orderchat'
   | 'bell'
   | 'support-directory'
-  | 'account-orders';
+  | 'account-orders'
+  | 'pickup-dropoff'
+  | 'pod-submission';
 
 export type DshCaptainNavigationCommand = {
   token: number;

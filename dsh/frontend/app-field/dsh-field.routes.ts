@@ -7,7 +7,8 @@ export type DshFieldRouteId =
   | 'dsh-field-account'
   | 'dsh-field-profile'
   | 'dsh-field-history'
-  | 'dsh-field-finance';
+  | 'dsh-field-finance'
+  | 'dsh-field-readiness-escalation';
 
 export type DshFieldLegacyRoute = DshFieldRoute;
 
@@ -60,5 +61,11 @@ export const dshFieldRoutes = [
     legacyRoute: 'finance',
     screenId: 'field.dsh.finance.overview',
     ownerPath: 'dsh/frontend/app-field/screens/DshFieldFinanceScreen.tsx',
+  },
+  {
+    routeId: 'dsh-field-readiness-escalation',
+    legacyRoute: 'readiness-escalation',
+    screenId: 'field.dsh.store.readiness-escalation',
+    ownerPath: 'dsh/frontend/app-field/screens/DshFieldReadinessEscalationScreen.tsx',
   },
 ] as const satisfies readonly DshFieldRouteRecord[];

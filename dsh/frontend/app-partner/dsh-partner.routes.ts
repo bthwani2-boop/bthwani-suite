@@ -12,7 +12,8 @@ export type DshPartnerRouteId =
   | 'dsh-partner-promotions'
   | 'dsh-partner-notifications'
   | 'dsh-partner-settings'
-  | 'dsh-partner-support';
+  | 'dsh-partner-support'
+  | 'dsh-partner-order-rejection';
 
 export type DshPartnerLegacyRoute = DshPartnerRoute;
 
@@ -36,4 +37,5 @@ export const dshPartnerRoutes = [
   { routeId: 'dsh-partner-notifications', legacyRoute: 'bell', screenId: 'partner.dsh.notifications.list', ownerPath: 'dsh/frontend/app-partner/screens/OperationScreens.tsx' },
   { routeId: 'dsh-partner-settings', legacyRoute: 'home', screenId: 'partner.dsh.settings.preferences', ownerPath: 'dsh/frontend/app-partner/screens/PartnerHubScreen.tsx' },
   { routeId: 'dsh-partner-support', legacyRoute: 'support-directory', screenId: 'partner.dsh.support.center', ownerPath: 'dsh/frontend/app-partner/screens/PartnerSupportScreen.tsx' },
+  { routeId: 'dsh-partner-order-rejection', legacyRoute: 'order-rejection', screenId: 'partner.dsh.order.rejection', ownerPath: 'dsh/frontend/app-partner/screens/DshPartnerOrderRejectionScreen.tsx' },
 ] as const satisfies readonly DshPartnerRouteRecord[];

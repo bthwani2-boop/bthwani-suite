@@ -38,7 +38,8 @@ export type DshPartnerRoute =
   | 'bell'
   | 'support-directory'
   | 'support-screen'
-  | 'inventory-management';
+  | 'inventory-management'
+  | 'order-rejection';
 
 export type DshPartnerSurfaceProps = {
   initialRoute?: DshPartnerRoute;

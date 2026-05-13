@@ -15,7 +15,9 @@ export type DshCaptainRouteId =
   | 'dsh-captain-order-chat'
   | 'dsh-captain-bell'
   | 'dsh-captain-support-directory'
-  | 'dsh-captain-support-screen';
+  | 'dsh-captain-support-screen'
+  | 'dsh-captain-pickup-dropoff'
+  | 'dsh-captain-pod-submission';
 
 export type DshCaptainLegacyRoute = DshCaptainRoute;
 
@@ -42,4 +44,6 @@ export const dshCaptainRoutes = [
   { routeId: 'dsh-captain-bell', legacyRoute: 'bell', screenId: 'captain.dsh.orders.bell', ownerPath: 'dsh/frontend/app-captain/screens/DshCaptainOrdersScreen.tsx' },
   { routeId: 'dsh-captain-support-directory', legacyRoute: 'support-directory', screenId: 'captain.dsh.support.directory', ownerPath: 'dsh/frontend/app-captain/screens/DshCaptainOperationsScreen.tsx' },
   { routeId: 'dsh-captain-support-screen', legacyRoute: 'support-screen', screenId: 'captain.dsh.support.workspace', ownerPath: 'dsh/frontend/app-captain/DshCaptainSurface.tsx' },
+  { routeId: 'dsh-captain-pickup-dropoff', legacyRoute: 'pickup-dropoff', screenId: 'captain.dsh.orders.pickup-dropoff', ownerPath: 'dsh/frontend/app-captain/screens/DshCaptainPickupDropoffScreen.tsx' },
+  { routeId: 'dsh-captain-pod-submission', legacyRoute: 'pod-submission', screenId: 'captain.dsh.orders.pod-submission', ownerPath: 'dsh/frontend/app-captain/screens/DshCaptainPoDSubmissionScreen.tsx' },
 ] as const satisfies readonly DshCaptainRouteRecord[];
