@@ -18,8 +18,8 @@ import { useTheme } from '../providers';
 
 // --- Constants ---
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const IMAGE_SIZE = 108;
-const LOGO_SIZE = 42;
+const IMAGE_SIZE = 114; // Slightly increased to prevent text clipping
+const LOGO_SIZE = 38;
 const CARD_RADIUS = 16;
 const DARK_BLUE = '#0A2F5C';
 const ORANGE = '#FF500D';
@@ -71,6 +71,29 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
       onPress={onPress}
       style={[styles.card, { backgroundColor: theme.surface }]}
     >
+      {/* Top-Left Status Badge (Absolute) */}
+      <View style={styles.absoluteStatusBadge}>
+        <View style={[styles.statusBadge, { backgroundColor: item.isOpen ? '#F0FFF4' : '#FFF5F5' }]}>
+          <View style={[styles.dot, { backgroundColor: item.isOpen ? theme.success : theme.danger }]} />
+          <Text style={[styles.statusText, { color: item.isOpen ? theme.success : theme.danger }]}>
+            {item.isOpen ? 'مفتوح' : 'مغلق'}
+          </Text>
+        </View>
+      </View>
+
+      {/* Bottom-Left Favorite Button (Absolute) */}
+      <TouchableOpacity
+        onPress={onFavoritePress}
+        hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+        style={styles.absoluteFavoriteButton}
+      >
+        <Ionicons
+          name={item.isFavorite ? 'heart' : 'heart-outline'}
+          size={24}
+          color={item.isFavorite ? ORANGE : theme.textMuted}
+        />
+      </TouchableOpacity>
+
       {/* Image Area (Right side in RTL) */}
       <View style={styles.imageContainer}>
         <Image source={item.image} style={styles.mainImage} />
@@ -78,12 +101,12 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
         {/* Metrics Overlay (Bottom-Left of Image) */}
         <View style={styles.imageMetricsOverlay}>
           <View style={styles.imageMetricItem}>
-            <Ionicons name="star" size={10} color={GOLD} />
+            <Ionicons name="star" size={12} color="#FFD700" />
             <Text style={styles.imageMetricText}>{item.rating?.toFixed(1) || '4.5'}</Text>
           </View>
           <View style={styles.imageMetricDivider} />
           <View style={styles.imageMetricItem}>
-            <Ionicons name="people" size={10} color="#FFF" />
+            <Ionicons name="people" size={12} color="#FFF" />
             <Text style={styles.imageMetricText}>
               {item.followersCount ? `${(item.followersCount / 1000).toFixed(0)}k` : '11k'}
             </Text>
@@ -100,59 +123,43 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
 
       {/* Content Area (Left side in RTL) */}
       <View style={styles.contentContainer}>
-        {/* Row 1: Name & Heart */}
-        <View style={styles.headerRow}>
-          <Text style={styles.storeName} numberOfLines={1}>
-            {item.name}
-          </Text>
-          <TouchableOpacity
-            onPress={onFavoritePress}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            style={styles.favoriteButton}
-          >
-            <Ionicons
-              name={item.isFavorite ? 'heart' : 'heart-outline'}
-              size={18}
-              color={item.isFavorite ? ORANGE : theme.textMuted}
-            />
-          </TouchableOpacity>
-        </View>
-
-        {/* Row 2: Location & Badges */}
-        <View style={styles.locationBadgeRow}>
-          <View style={styles.locationCluster}>
-            <Ionicons name="location-sharp" size={10} color={ORANGE} />
-            <Text style={styles.locationText} numberOfLines={1}>
-              {item.locationLabel || item.subtitle || 'الرياض'}
+        <View style={styles.textContent}>
+          {/* Row 1: Name */}
+          <View style={styles.headerRow}>
+            <Text style={styles.storeName} numberOfLines={1}>
+              {item.name}
             </Text>
           </View>
 
-          <View style={styles.badgeCluster}>
-            {item.isPopular && (
-              <View style={[styles.statusBadge, { backgroundColor: '#FFF5F0' }]}>
-                <Ionicons name="flame" size={8} color={ORANGE} />
-                <Text style={[styles.badgeText, { color: ORANGE }]}>رائج</Text>
-              </View>
-            )}
-            <View style={[styles.statusBadge, { backgroundColor: item.isOpen ? '#F0FFF4' : '#FFF5F5' }]}>
-              <View style={[styles.dot, { backgroundColor: item.isOpen ? theme.success : theme.danger }]} />
-              <Text style={[styles.badgeText, { color: item.isOpen ? theme.success : theme.danger }]}>
-                {item.isOpen ? 'مفتوح' : 'مغلق'}
+          {/* Row 2: Location & Badges */}
+          <View style={styles.locationBadgeRow}>
+            <View style={styles.locationCluster}>
+              <Ionicons name="location-sharp" size={14} color={ORANGE} />
+              <Text style={styles.addressText} numberOfLines={1}>
+                {item.locationLabel || item.subtitle || 'الرياض'}
               </Text>
             </View>
+
+            <View style={styles.badgeCluster}>
+              {item.isPopular && (
+                <View style={[styles.statusBadge, { backgroundColor: '#FFF5F0' }]}>
+                  <Ionicons name="flame" size={10} color={ORANGE} />
+                  <Text style={[styles.statusText, { color: ORANGE, fontSize: 11 }]}>رائج</Text>
+                </View>
+              )}
+            </View>
           </View>
-        </View>
 
         {/* Row 3: Metrics Ribbon (Only Distance/Time) */}
         <View style={[styles.metricsRibbon, { backgroundColor: theme.surfaceSecondary }]}>
           <View style={styles.metricItem}>
-            <Ionicons name="navigate-outline" size={10} color={theme.textMuted} />
-            <Text style={styles.metricText}>{item.distanceKm?.toFixed(1) || '2.1'} كم</Text>
+            <Ionicons name="navigate-outline" size={14} color={theme.textMuted} />
+            <Text style={styles.metaText}>{item.distanceKm?.toFixed(1) || '2.1'} كم</Text>
           </View>
           <View style={styles.metricDivider} />
           <View style={styles.metricItem}>
-            <Ionicons name="time-outline" size={10} color={theme.textMuted} />
-            <Text style={styles.metricText}>{item.deliveryTimeLabel || '25-35 د'}</Text>
+            <Ionicons name="time-outline" size={14} color={theme.textMuted} />
+            <Text style={styles.metaText}>{item.deliveryTimeLabel || '25-35 د'}</Text>
           </View>
         </View>
 
@@ -200,7 +207,8 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
           )}
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
+  </TouchableOpacity>
   );
 };
 
@@ -235,12 +243,12 @@ const styles = StyleSheet.create({
     bottom: 8,
     left: 8,
     flexDirection: 'row',
-    backgroundColor: 'rgba(10, 47, 92, 0.75)', // Dark Blue with transparency
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    backgroundColor: 'rgba(10, 47, 92, 0.8)',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   imageMetricItem: {
     flexDirection: 'row',
@@ -261,26 +269,53 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -4,
     right: -4,
-    width: LOGO_SIZE + 18,
-    height: LOGO_SIZE + 18,
-    borderRadius: (LOGO_SIZE + 18) / 2,
+    width: LOGO_SIZE + 8, // More compact
+    height: LOGO_SIZE + 8,
+    borderRadius: (LOGO_SIZE + 8) / 2,
     backgroundColor: ORANGE,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 10,
+    zIndex: 20, // Ensure it's above the rating ribbon
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 6,
-    borderWidth: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 5,
+    borderWidth: 1,
     borderColor: '#FFF',
+  },
+  absoluteStatusBadge: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    zIndex: 30,
+  },
+  absoluteFavoriteButton: {
+    position: 'absolute',
+    bottom: 12,
+    left: 14,
+    zIndex: 30,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  textContent: {
+    flex: 1,
+    justifyContent: 'space-between',
   },
   logoOverlay: {
     width: LOGO_SIZE,
     height: LOGO_SIZE,
     borderRadius: LOGO_SIZE / 2,
-    borderWidth: 2,
+    borderWidth: 1, // Slimmer internal border
     overflow: 'hidden',
     backgroundColor: '#FFF',
   },
@@ -290,8 +325,9 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingRight: 12,
+    paddingLeft: 45, // Leave space for absolute Status and Favorite actions
+    paddingVertical: 8,
     justifyContent: 'space-between',
   },
   headerRow: {
@@ -300,15 +336,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   storeName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
-    color: DARK_BLUE,
-    flex: 1,
+    color: '#0A2F5C',
     textAlign: 'right',
-    marginRight: 8,
+    fontFamily: 'Outfit-Bold',
+    marginBottom: 2,
   },
-  favoriteButton: {
-    padding: 2,
+  addressText: {
+    fontSize: 14,
+    color: '#4A5568', // Improved contrast for readability
+    textAlign: 'right',
+    fontFamily: 'Outfit-Regular',
+    marginBottom: 4,
   },
   locationBadgeRow: {
     flexDirection: 'row-reverse',
@@ -320,29 +360,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  locationText: {
-    fontSize: 11,
-    color: '#666',
-    marginRight: 4,
-    textAlign: 'right',
-  },
   badgeCluster: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: 4,
   },
   statusBadge: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    paddingHorizontal: 6,
+    paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
-    gap: 4,
+    alignSelf: 'flex-start',
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  statusText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '700',
+    fontFamily: 'Outfit-Bold',
   },
   dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 4,
+  },
+  metaText: {
+    fontSize: 13,
+    color: '#555', // Darker for better contrast
+    fontFamily: 'Outfit-Medium',
+  },
+  deliveryBadgeText: {
+    fontSize: 13,
+    color: ORANGE,
+    fontWeight: '700',
+    fontFamily: 'Outfit-Bold',
   },
   badgeText: {
     fontSize: 9,
@@ -363,7 +416,7 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   metricText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
     color: DARK_BLUE,
   },
@@ -375,7 +428,7 @@ const styles = StyleSheet.create({
   servicesRow: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: 12,
+    gap: 16, // More space between services
   },
   serviceIconWrap: {
     flexDirection: 'row-reverse',
@@ -383,14 +436,15 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   serviceMiniText: {
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '600',
     color: DARK_BLUE,
   },
   promoRow: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: 6,
+    gap: 8, // Increased gap for better separation
+    marginTop: 4,
   },
   promoChip: {
     paddingHorizontal: 8,
@@ -401,12 +455,12 @@ const styles = StyleSheet.create({
     backgroundColor: DARK_BLUE,
   },
   promoChipTextPro: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: '800',
     color: '#FFF',
   },
   promoChipText: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: '700',
   },
 });
