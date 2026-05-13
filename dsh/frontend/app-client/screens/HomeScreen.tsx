@@ -12,7 +12,9 @@ import {
   type StoreCardPremiumItem,
   Surface,
   Text,
-  TopBar,
+  ModernPremiumHeader,
+  BottomNavBar,
+  type NavItem,
   colorPalette,
   radius,
   resolveRowDirection,
@@ -1275,60 +1277,22 @@ return (
           style={styles.brandTopBarShell}
         />
       ) : (
-        <TopBar
-          variant="main"
-          layoutMode="luxury-command"
+        <ModernPremiumHeader
           title={uiText.topBar.brandName}
-          subtitle="ابحث عن متجر أو خدمة..."
-          onTitlePress={handleOpenMySpace}
           locationLabel={uiText.topBar.location}
-          locationIcon={<Icon name="location-outline" size={12} color={colorPalette.white} />}
-          contentOffsetY={spacing[0]}
-          actionsOffsetY={spacing[0]}
-          style={styles.brandTopBarShell}
-          actions={[
-            {
-              id: 'my-space',
-              icon: <Icon name="person" size={20} color={colorPalette.white} />,
-              size: 'lg',
-              accessibilityLabel: 'مساحتي',
-              onPress: handleOpenMySpace,
-            },
-            {
-              id: 'notifications',
-              icon: <Icon name="notifications-outline" size={24} color={colorPalette.white} />,
-              accessibilityLabel: 'الإشعارات',
-              onPress: onOpenNotifications,
-            },
-            {
-              id: 'cart',
-              icon: <Icon name="cart-outline" size={24} color={colorPalette.white} />,
-              accessibilityLabel: 'السلة',
-              onPress: onOpenCart,
-            },
-            {
-              id: 'search',
-              icon: <Icon name="search-outline" size={24} color={colorPalette.white} />,
-              accessibilityLabel: 'بحث',
-              onPress: openInlineSearch,
-            },
-          ]}
-          trailingAction={{
-            id: 'services',
-            accessibilityLabel: 'الخدمات',
-            onPress: openServiceDial,
-            icon: <DshServiceLauncherMark />,
-            size: 'lg',
-          }}
-          ticker={{
-            statusLabel: tickerState?.statusLabel ?? (currentLanguage === 'ar' ? 'مباشر' : 'Live'),
-            message: tickerState?.isMarketing
+          onSearchPress={openInlineSearch}
+          onCartPress={onOpenCart}
+          onNotificationsPress={onOpenNotifications}
+          onProfilePress={handleOpenMySpace}
+          onLauncherPress={openServiceDial}
+          tickerMessage={
+            tickerState?.isMarketing
               ? `${isTickerPaused ? '⏸️ ' : ''}${tickerState.message}`
-              : (tickerState?.message ?? ''),
-            onPress: handleTickerAction,
-            marquee: tickerState?.isMarketing ? !isTickerPaused : true,
-            marqueeDurationMs: 14000,
-          }}
+              : (tickerState?.message ?? '')
+          }
+          tickerStatus={tickerState?.statusLabel ?? (currentLanguage === 'ar' ? 'مباشر' : 'Live')}
+          onTickerPress={handleTickerAction}
+          direction={isRtl ? 'rtl' : 'ltr'}
         />
       )}
 
@@ -1337,7 +1301,7 @@ return (
         contentContainerStyle={{
           paddingHorizontal: spacing[3],
           paddingTop: spacing[0],
-          paddingBottom: spacing[12],
+          paddingBottom: 120,
           flexGrow: 1,
         }}
         showsVerticalScrollIndicator={false}
@@ -1848,6 +1812,23 @@ return (
 
           onOpenService?.(item.key as DshServiceId);
         }}
+      />
+
+      <BottomNavBar
+        activeId="home"
+        onSelect={(id) => {
+          if (id === 'orders') onOpenTracking?.();
+          if (id === 'wallet') onOpenEntry?.();
+          if (id === 'profile') onOpenMySpace?.();
+        }}
+        onLauncherPress={openServiceDial}
+        direction={isRtl ? 'rtl' : 'ltr'}
+        items={[
+          { id: 'home', label: 'الرئيسية', icon: 'home-outline', activeIcon: 'home' },
+          { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', activeIcon: 'receipt' },
+          { id: 'wallet', label: 'محفظتي', icon: 'wallet-outline', activeIcon: 'wallet' },
+          { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+        ]}
       />
     </View>
   );

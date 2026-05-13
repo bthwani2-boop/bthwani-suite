@@ -30,3 +30,5 @@ export { MobileWorkspaceHeader, NewsTickerBar, ScreenHeader, SearchTopBar, Secti
 export type { MobileWorkspaceHeaderProps, NewsTickerBarProps, ScreenHeaderProps, SearchTopBarProps, SectionHeaderProps, TabItem, TabsProps, TopBarAction, TopBarProps, TopBarVariant } from './header';
 export { IconButton } from './icon-button';
 export type { IconButtonProps } from './icon-button';
+export { ModernPremiumHeader, BottomNavBar } from './navigation';
+export type { ModernPremiumHeaderProps, NavItem, BottomNavBarProps } from './navigation';
