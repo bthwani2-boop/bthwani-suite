@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     backgroundColor: colorPalette.brand,
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    paddingTop: 40, // MASSIVE shift to ensure visibility (original was 12)
+    paddingTop: 32, // Reduced from 40 to compact the header
     paddingBottom: 4,
     paddingHorizontal: 16,
     gap: 0,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     height: 42,
-    marginTop: 18, // Shifted down by additional 8px (total 18px from safe area padding)
+    marginTop: 14, // Reduced from 18 to compact the header
   },
   locationContainer: {
     flex: 1,
