@@ -208,6 +208,11 @@ export type DshHomeGetStore = {
   hasCouponAvailable?: boolean;
   publishStage?: string;
   commercialSourceMap?: import('../../shared/store-card-commercial-map').CommercialSourceMap;
+  // PREMIUM 2026 ENHANCEMENTS
+  locationLabel?: string;
+  deliveryTimeLabel?: string;
+  isPopular?: boolean;
+  logoImageUri?: string;
 };
 
 export type DshHomeRecentOrder = {
@@ -1677,7 +1682,7 @@ return (
                   subtitle: store.address,
                   image: resolveDshHomeStoreImageSource(store.imageUri ?? store.mediaKey, store.publishStage),
                   rating: store.rating ?? null,
-                  distanceKm: Number.parseFloat(store.distanceLabel.replace(/[^\d.]/g, '')) || null,
+                  distanceKm: Number.parseFloat((store.distanceLabel || '').replace(/[^\d.]/g, '')) || null,
                   isOpen: store.statusTone === 'open',
                   supportsPickup: sm?.['supportsPickup']?.conflictStatus !== 'blocker',
                   supportsPartnerDelivery: sm?.['supportsPartnerDelivery']?.conflictStatus !== 'blocker',
@@ -1689,12 +1694,17 @@ return (
                   isFollowing: followToggles[store.id] ?? store.isFollowing,
                   followersCount: followCounts[store.id] ?? store.followerCount,
                   hasBthwaniPro: isProBlocked ? false : store.hasBthwaniPro,
-                  subscriptionPackageChips: isProBlocked ? [] : (store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel]),
+                  subscriptionPackageChips: isProBlocked ? [] : (store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel].filter(Boolean) as string[]),
                   hasNewProducts: isNewProductsBlocked ? false : store.hasNewProducts,
                   hasOffer: isOfferBlocked ? false : store.hasOffer,
                   offerText: isOfferBlocked ? undefined : store.offerLabel,
-                  pointsMultiplier: Number.parseInt(store.multiplierLabel.replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
+                  pointsMultiplier: Number.parseInt((store.multiplierLabel || '').replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
                   hasCouponAvailable: isCouponBlocked ? false : store.hasCouponAvailable,
+                  // PREMIUM 2026
+                  locationLabel: store.locationLabel,
+                  deliveryTimeLabel: store.deliveryTimeLabel,
+                  isPopular: store.isPopular,
+                  logoImage: resolveDshHomeStoreImageSource(store.logoImageUri, store.publishStage),
                 };
 
                 return (

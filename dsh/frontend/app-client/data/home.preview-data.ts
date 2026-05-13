@@ -65,6 +65,11 @@ export type DshHomeGetFixtureStore = {
 	sourceRecordId?: string;
 	canonicalStoreId?: string;
 	commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
+	// PREMIUM 2026
+	locationLabel?: string;
+	deliveryTimeLabel?: string;
+	isPopular?: boolean;
+	logoImageUri?: string;
 };
 
 function formatDistanceLabel(distanceKm: number) {
@@ -301,21 +306,21 @@ export const dshHomeGetFixtureProducts: DshHomeGetFixtureProduct[] = [
 export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 	{
 		id: 'store-2001',
-		name: 'سوبر ماركت النور',
-		address: 'حي النصر، شارع الستين',
+		name: 'برجر هاوس',
+		address: 'حي العليا، شارع الستين',
 		categoryId: 'grocery',
 		statusLabel: 'مفتوح',
 		statusTone: 'open',
-		distanceLabel: '2.9 كم',
+		distanceLabel: '2.1 كم',
 		deliveryLabel: 'توصيل سريع',
 		serviceLabel: 'توصيل برو',
-		followerCount: 7600,
+		followerCount: 11000,
 		multiplierLabel: 'x2',
-		offerLabel: 'خصم 10%',
+		offerLabel: 'خصم 20%',
 		isFavorite: false,
 		isFollowing: true,
 		hasOffer: true,
-		rating: 2.8,
+		rating: 4.8,
 		mediaKey: 'dsh.store.hadda.cover.v1',
 
 		imageUri: 'dsh.store.hadda.cover.v1',
@@ -323,6 +328,11 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['توصيل سريع', 'عروض يومية'],
 		hasCouponAvailable: true,
 		hasNewProducts: true,
+		// PREMIUM 2026
+		locationLabel: 'حي العليا • الرياض',
+		deliveryTimeLabel: '25-35 د',
+		isPopular: true,
+		logoImageUri: 'dsh.store.malqa.cover.v1',
 	},
 	{
 		id: 'store-2002',
@@ -343,10 +353,14 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		mediaKey: 'dsh.store.hittin.cover.v1',
 
 		imageUri: 'dsh.store.hittin.cover.v1',
-		hasBthwaniPro: true,
-		subscriptionPackageChips: ['توصيل مجاني', 'مقاضي يومية'],
+		hasBthwaniPro: false, // NO PRO
+		subscriptionPackageChips: [],
 		hasCouponAvailable: false,
 		hasNewProducts: false,
+		// ADAPTIVE PREVIEW
+		locationLabel: 'باب اليمن • صنعاء',
+		deliveryTimeLabel: '15-25 د',
+		isPopular: false,
 	},
 	{
 		id: 'store-2101',
