@@ -35,57 +35,92 @@ export type ModernPremiumHeaderProps = {
   direction?: Direction;
 };
 
-function SmartNewsTicker({ message, status, isRtl, onPress }: { message: string, status?: string, isRtl: boolean, onPress?: () => void }) {
+function SmartNewsTicker({ message, status, onPress }: { message: string, status?: string, onPress?: () => void }) {
   const translateX = React.useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = React.useState(0);
-  const [textWidth, setTextWidth] = React.useState(0);
+  const [trackWidth, setTrackWidth] = React.useState(0);
+  const loopGap = 72;
+  const hasMeasurements = containerWidth > 0 && trackWidth > 0;
+  const distance = hasMeasurements ? containerWidth + trackWidth : 0;
 
   React.useEffect(() => {
-    if (containerWidth > 0 && textWidth > 0) {
-      // Loop: Start from one side and move to the other
-      const startValue = isRtl ? -textWidth : containerWidth;
-      const endValue = isRtl ? containerWidth : -textWidth;
+    translateX.stopAnimation();
 
-      translateX.setValue(startValue);
-
-      // Duration depends on total distance to maintain speed
-      const duration = (containerWidth + textWidth) * 45; // Slower for readability
-
-      const animation = Animated.loop(
-        Animated.timing(translateX, {
-          toValue: endValue,
-          duration,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        })
-      );
-
-      animation.start();
-      return () => animation.stop();
+    if (!hasMeasurements) {
+      translateX.setValue(0);
+      return undefined;
     }
-  }, [containerWidth, textWidth, isRtl]);
+
+    translateX.setValue(-distance);
+
+    const animation = Animated.loop(
+      Animated.timing(translateX, {
+        toValue: distance,
+        duration: 12000,
+        easing: Easing.linear,
+        useNativeDriver: false,
+        isInteraction: false,
+      }),
+      { resetBeforeIteration: true },
+    );
+
+    animation.start();
+
+    return () => {
+      animation.stop();
+      translateX.stopAnimation();
+      translateX.setValue(-distance);
+    };
+  }, [distance, hasMeasurements, message, translateX]);
 
   return (
     <Pressable
       onPress={onPress}
       style={styles.tickerBar}
-      onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
     >
       <View style={styles.tickerStatusBadge}>
         <Text role="label" style={styles.tickerStatusText}>{status ?? 'مباشر'}</Text>
       </View>
-      <View style={styles.tickerScrollContainer}>
-        <Animated.View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', transform: [{ translateX }] }}>
+      <View style={styles.tickerScrollContainer} onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}>
+        <View
+          pointerEvents="none"
+          onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
+          style={styles.tickerMeasurement}
+        >
+          <View style={styles.tickerTrack}>
+            <Text role="bodySm" style={styles.tickerMessage} numberOfLines={1}>
+              {message}
+            </Text>
+            <View style={{ width: loopGap }} />
+            <Text role="bodySm" style={styles.tickerMessage} numberOfLines={1}>
+              {message}
+            </Text>
+          </View>
+        </View>
+        <Animated.View
+          style={[
+            styles.tickerTrack,
+            {
+              opacity: hasMeasurements ? 1 : 0,
+              transform: [{ translateX }],
+            },
+          ]}
+        >
           <Text
             role="bodySm"
             style={styles.tickerMessage}
-            onLayout={(e) => setTextWidth(e.nativeEvent.layout.width)}
             numberOfLines={1}
           >
             {message}
           </Text>
-          {/* Spacer for loop gap */}
-          <View style={{ width: 100 }} />
+          <View style={{ width: loopGap }} />
+          <Text
+            role="bodySm"
+            style={styles.tickerMessage}
+            numberOfLines={1}
+          >
+            {message}
+          </Text>
         </Animated.View>
       </View>
     </Pressable>
@@ -107,7 +142,6 @@ export function ModernPremiumHeader({
   onTickerPress,
   direction = 'rtl',
 }: ModernPremiumHeaderProps) {
-  const isRtl = direction === 'rtl';
   const rowDirection = resolveRowDirection(direction);
 
   return (
@@ -149,7 +183,6 @@ export function ModernPremiumHeader({
         <SmartNewsTicker
           message={tickerMessage}
           status={tickerStatus}
-          isRtl={isRtl}
           onPress={onTickerPress}
         />
       )}
@@ -365,6 +398,16 @@ const styles = StyleSheet.create({
   tickerScrollContainer: {
     flex: 1,
     overflow: 'hidden',
+  },
+  tickerMeasurement: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    opacity: 0,
+  },
+  tickerTrack: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   tickerStatusBadge: {
     backgroundColor: '#FF500D',

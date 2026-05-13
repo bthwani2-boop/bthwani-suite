@@ -42,7 +42,6 @@ import type { MarketingVideoRecord } from '../../shared/video.preview-store';
 import {
   getMarketingTickerItems,
   buildMarketingTickerPlan,
-  type MarketingNewsTickerItem,
 } from '../../shared/news-ticker.preview-store';
 import { getPublishedHomePromos, type HomePromoRecord } from '../../shared/promo.preview-store';
 
@@ -428,19 +427,6 @@ function isWithinOperatingHours(now: Date, openHour: number, closeHour: number) 
   }
 
   return currentHour >= openHour || currentHour < closeHour;
-}
-
-function dedupeMarketingTickerItems(items: ReadonlyArray<MarketingNewsTickerItem>) {
-  const seenIds = new Set<string>();
-
-  return items.filter((item) => {
-    if (seenIds.has(item.id)) {
-      return false;
-    }
-
-    seenIds.add(item.id);
-    return true;
-  });
 }
 
 // Internal resolveTickerBanner removed. Using buildMarketingTickerPlan from store.
@@ -1131,7 +1117,6 @@ export function DshHomeGetScreen({
   );
 
   const approvedVideoReels = approvedVideoShorts.length > 0 ? approvedVideoShorts : [];
-  const [isTickerPaused, setIsTickerPaused] = React.useState(false);
   const [isTickerHidden, setIsTickerHidden] = React.useState(false);
 
   const tickerState = React.useMemo(() => {
@@ -1139,21 +1124,8 @@ export function DshHomeGetScreen({
       return null;
     }
 
-    const homeTickerItems = getMarketingTickerItems('home');
-    const previewTickerItems = dedupeMarketingTickerItems([
-      ...homeTickerItems,
-      ...getMarketingTickerItems('client'),
-    ]).map((item) => (
-      item.audience === 'client'
-        ? { ...item, audience: 'all' as const }
-        : item
-    ));
-
-    const homePlan = buildMarketingTickerPlan(currentTime, 'home', homeTickerItems);
-    const previewPlan = buildMarketingTickerPlan(currentTime, 'all', previewTickerItems);
-    const suppressedPreviewItem =
-      previewPlan.suppressedEntries.find((entry) => entry.item.status === 'published')?.item ?? null;
-    const activeItem = homePlan.activeItem ?? previewPlan.activeItem ?? suppressedPreviewItem;
+    const clientPlan = buildMarketingTickerPlan(currentTime, 'client', getMarketingTickerItems());
+    const activeItem = clientPlan.activeItem;
 
     if (!activeItem) {
       return {
@@ -1164,13 +1136,9 @@ export function DshHomeGetScreen({
       };
     }
 
-    const isSuppressedPreview = !homePlan.activeItem && !previewPlan.activeItem && Boolean(suppressedPreviewItem);
-
     return {
       isOpen: true,
-      statusLabel: isSuppressedPreview
-        ? (currentLanguage === 'ar' ? 'معاينة' : 'Preview')
-        : (currentLanguage === 'ar' ? 'مباشر' : 'Live'),
+      statusLabel: currentLanguage === 'ar' ? 'مباشر' : 'Live',
       message: activeItem.message,
       isMarketing: true,
       actionTarget: activeItem.actionTarget,
@@ -1182,7 +1150,6 @@ export function DshHomeGetScreen({
     if (!tickerState) return;
 
     if (tickerState.isMarketing) {
-      setIsTickerPaused(p => !p); // Toggle pause on click
       if (tickerState.actionTarget === 'orders') {
         onOpenOrders?.();
       } else if (tickerState.actionTarget === 'tracking') {
@@ -1292,11 +1259,7 @@ return (
           notificationCount={notificationCount}
           cartCount={cartCount}
           searchPlaceholder="ماذا تريد أن تطلب اليوم؟"
-          tickerMessage={
-            tickerState?.isMarketing
-              ? `${isTickerPaused ? '⏸️ ' : ''}${tickerState.message}`
-              : (tickerState?.message ?? '')
-          }
+          tickerMessage={tickerState?.message ?? ''}
           tickerStatus={tickerState?.statusLabel ?? (currentLanguage === 'ar' ? 'مباشر' : 'Live')}
           onTickerPress={handleTickerAction}
           direction={isRtl ? 'rtl' : 'ltr'}
