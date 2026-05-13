@@ -1832,7 +1832,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       borderBottomColor: 'rgba(255,255,255,0.1)',
     },
     premiumBannerSection: {
-      marginTop: spacing[1],
+      marginTop: spacing[0],
       marginBottom: 0,
       paddingHorizontal: 0,
       alignSelf: 'stretch',
@@ -2231,7 +2231,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       flex: 1,
     },
     storeListContent: {
-      gap: spacing[4], // Increased for balanced 2026 hierarchy
+      gap: spacing[3], // tightened to ~12px between store cards
       paddingBottom: spacing[8],
     },
     emptyFeed: {

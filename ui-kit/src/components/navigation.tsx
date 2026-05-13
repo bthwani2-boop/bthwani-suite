@@ -1,6 +1,6 @@
 import React from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { colorPalette, resolveRowDirection, type Direction } from '../foundation';
+import { colorPalette, resolveRowDirection, type Direction, spacing, withAlpha } from '../foundation';
 import { Surface, Text } from '../primitives';
 import { Icon } from './icons';
 
@@ -304,9 +304,10 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
     paddingTop: 12, // Much smaller because it's inside SafeAreaView
-    paddingBottom: 8,
+    paddingBottom: spacing[1],
     paddingHorizontal: 16,
-    gap: 8,
+    gap: spacing[1],
+    marginBottom: spacing[2],
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.15,
@@ -386,7 +387,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   tickerBar: {
-    backgroundColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: withAlpha(colorPalette.brand, 0.08),
     borderRadius: 10,
     height: 24,
     paddingHorizontal: 8,
