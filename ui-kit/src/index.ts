@@ -1,4 +1,22 @@
 export {
+	bthwaniAppearanceModes,
+	bthwaniAppearancePaletteByMode,
+	bthwaniAppearanceTokensByMode,
+	defaultBThwaniAppearanceMode,
+	getBThwaniAppearanceThemeMode,
+	getBThwaniAppearanceTokens,
+	getBThwaniGlassRecipe,
+	resolveBThwaniAppearanceMode,
+} from './appearance';
+export type {
+	BThwaniAppearanceMode,
+	BThwaniAppearancePalette,
+	BThwaniAppearanceShadow,
+	BThwaniAppearanceTokens,
+	BThwaniGlassRecipe,
+	BThwaniGlassRole,
+} from './appearance';
+export {
 	amountToArabicText,
 	buildWebThemeStyleSheet,
 	nativeThemeOutputs,
@@ -74,6 +92,7 @@ export {
 	type UiTextCatalogStringLeafShape,
 } from './foundation';
 export {
+	BThwaniAppearanceProvider,
 	ROOT_DEFAULTS,
 	PortalHost,
 	PortalLayer,
@@ -81,6 +100,8 @@ export {
 	DirectionProvider,
 	ThemeProvider,
 	UiKitProvider,
+	useBThwaniAppearance,
+	useBThwaniAppearanceContext,
 	useDirection,
 	useDirectionContext,
 	useI18n,
@@ -90,6 +111,7 @@ export {
 	useUiText,
 } from './providers';
 export type {
+	BThwaniAppearanceProviderProps,
 	PortalLayerProps,
 	RootConfig,
 	RootProvidersProps,
@@ -187,6 +209,7 @@ export type {
 } from './MobileCommandCenter';
 export {
 	AmountInput,
+	AppearanceOptionCard,
 	AppEmptyState,
 	AppErrorState,
 	AppLoadingState,
@@ -253,6 +276,10 @@ export {
 	Button,
 	DirectionalIcon,
 	ErrorBoundary,
+	GlassActionButton,
+	GlassCard,
+	GlassChip,
+	GlassHeroOverlay,
 	Loading,
 	PaymentMethodList,
 	PaymentDecisionCard,
@@ -265,6 +292,7 @@ export {
 } from './components';
 export type {
 	AmountInputProps,
+	AppearanceOptionCardProps,
 	AppEmptyStateProps,
 	AppErrorStateProps,
 	AppLoadingStateProps,
@@ -299,6 +327,10 @@ export type {
 	DialogProps,
 	DialogTone,
 	DeferredReviewBlockProps,
+	GlassActionButtonProps,
+	GlassCardProps,
+	GlassChipProps,
+	GlassHeroOverlayProps,
 	HighlightsRailItem,
 	HighlightsRailProps,
 	IconName,

@@ -1,5 +1,7 @@
 export { Badge, Button, Chip } from './button';
 export type { BadgeProps, ButtonProps, ButtonTone, ChipProps } from './button';
+export { AppearanceOptionCard, GlassActionButton, GlassCard, GlassChip, GlassHeroOverlay } from './appearance';
+export type { AppearanceOptionCardProps, GlassActionButtonProps, GlassCardProps, GlassChipProps, GlassHeroOverlayProps } from './appearance';
 export { CartSummary } from './display/CartSummary';
 export type { CartSummaryProps } from './display/CartSummary';
 export { AttachmentPicker, Card, DashboardShell, DetailScreenShell, ProductCard, ServiceHubShell, ServiceTileCard, StatCard } from './card';

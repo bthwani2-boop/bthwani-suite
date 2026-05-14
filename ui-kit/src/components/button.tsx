@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
 import { borders, radius, resolveRowDirection, sizes, spacing } from '../foundation';
-import { useDirection, useTheme } from '../providers';
+import { useBThwaniAppearance, useDirection, useTheme } from '../providers';
 import { Text } from '../primitives';
 
 type PressableStyle = StyleProp<ViewStyle> | ((state: PressableStateCallbackType) => StyleProp<ViewStyle>);
@@ -10,7 +10,7 @@ function resolvePressableStyle(style: PressableStyle | undefined, state: Pressab
   return typeof style === 'function' ? style(state) : style;
 }
 
-export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'brand' | 'warning' | 'info' | 'default';
+export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'brand' | 'warning' | 'info' | 'default' | 'glass' | 'glassStrong';
 
 export type ButtonProps = PressableProps & {
   label: string;
@@ -40,20 +40,33 @@ export function Button({
 }: ButtonProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
+  const { tokens: appearanceTokens } = useBThwaniAppearance();
   const resolvedDisabled = disabled || loading;
   const resolvedLeadingAccessory = leadingAccessory ?? (icon && iconPosition === 'leading' ? icon : null);
   const resolvedTrailingAccessory = trailingAccessory ?? (icon && iconPosition === 'trailing' ? icon : null);
 
   const toneConfig = {
-    primary: { backgroundColor: theme.brand, borderColor: theme.brand, labelColor: theme.brandContrast },
-    brand: { backgroundColor: theme.brand, borderColor: theme.brand, labelColor: theme.brandContrast },
-    secondary: { backgroundColor: theme.surface, borderColor: theme.lineStrong, labelColor: theme.text },
-    ghost: { backgroundColor: 'transparent', borderColor: 'transparent', labelColor: theme.brand },
-    danger: { backgroundColor: theme.danger, borderColor: theme.danger, labelColor: '#FFFFFF' },
-    success: { backgroundColor: theme.success, borderColor: theme.success, labelColor: '#FFFFFF' },
-    warning: { backgroundColor: theme.warningSurface, borderColor: theme.warning, labelColor: theme.warningText },
-    info: { backgroundColor: theme.infoSurface, borderColor: theme.info, labelColor: theme.infoText },
-    default: { backgroundColor: theme.surfaceInset, borderColor: theme.line, labelColor: theme.textMuted },
+    primary: { backgroundColor: theme.brand, borderColor: theme.brand, labelColor: theme.brandContrast, shadowStyle: undefined },
+    brand: { backgroundColor: theme.brand, borderColor: theme.brand, labelColor: theme.brandContrast, shadowStyle: undefined },
+    secondary: { backgroundColor: theme.surface, borderColor: theme.lineStrong, labelColor: theme.text, shadowStyle: undefined },
+    ghost: { backgroundColor: 'transparent', borderColor: 'transparent', labelColor: theme.brand, shadowStyle: undefined },
+    danger: { backgroundColor: theme.danger, borderColor: theme.danger, labelColor: '#FFFFFF', shadowStyle: undefined },
+    success: { backgroundColor: theme.success, borderColor: theme.success, labelColor: '#FFFFFF', shadowStyle: undefined },
+    warning: { backgroundColor: theme.warningSurface, borderColor: theme.warning, labelColor: theme.warningText, shadowStyle: undefined },
+    info: { backgroundColor: theme.infoSurface, borderColor: theme.info, labelColor: theme.infoText, shadowStyle: undefined },
+    default: { backgroundColor: theme.surfaceInset, borderColor: theme.line, labelColor: theme.textMuted, shadowStyle: undefined },
+    glass: {
+      backgroundColor: appearanceTokens.actionBackground,
+      borderColor: appearanceTokens.glassBorder,
+      labelColor: appearanceTokens.glassText,
+      shadowStyle: appearanceTokens.shadowSoft,
+    },
+    glassStrong: {
+      backgroundColor: appearanceTokens.actionSelectedBackground,
+      borderColor: appearanceTokens.actionSelectedBackground,
+      labelColor: theme.brandContrast,
+      shadowStyle: appearanceTokens.shadowPremium,
+    },
   }[tone];
 
   const sizeConfig = {
@@ -81,6 +94,7 @@ export function Button({
           flexDirection: resolveRowDirection(direction),
           gap: spacing[2],
         },
+        toneConfig.shadowStyle,
         resolvePressableStyle(style, { pressed } as PressableStateCallbackType),
       ]}
       {...rest}
@@ -139,12 +153,14 @@ export function Badge({ label, tone = 'default', style }: BadgeProps) {
 export type ChipProps = {
   label: string;
   selected?: boolean;
-  tone?: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+  tone?: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' | 'glass' | 'glassStrong';
   onPress?: () => void;
 };
 
 export function Chip({ label, selected = false, tone = 'default', onPress }: ChipProps) {
   const { theme } = useTheme();
+  const { tokens: appearanceTokens } = useBThwaniAppearance();
+  const isGlassTone = tone === 'glass' || tone === 'glassStrong';
   const toneScheme = {
     default: { accent: theme.lineStrong, surface: theme.surface, label: theme.text, selectedSurface: theme.surfaceInset, selectedLabel: theme.text },
     brand: { accent: theme.brand, surface: theme.surface, label: theme.brand, selectedSurface: theme.brand, selectedLabel: theme.brandContrast },
@@ -152,6 +168,20 @@ export function Chip({ label, selected = false, tone = 'default', onPress }: Chi
     warning: { accent: theme.warning, surface: theme.surface, label: theme.warning, selectedSurface: theme.warningSurface, selectedLabel: theme.warning },
     danger: { accent: theme.danger, surface: theme.surface, label: theme.danger, selectedSurface: theme.dangerSurface, selectedLabel: theme.danger },
     info: { accent: theme.info, surface: theme.surface, label: theme.info, selectedSurface: theme.infoSurface, selectedLabel: theme.info },
+    glass: {
+      accent: appearanceTokens.glassBorder,
+      surface: appearanceTokens.chipBackground,
+      label: appearanceTokens.glassText,
+      selectedSurface: appearanceTokens.chipSelectedBackground,
+      selectedLabel: appearanceTokens.textPrimary,
+    },
+    glassStrong: {
+      accent: appearanceTokens.accent,
+      surface: appearanceTokens.glassSurfaceStrong,
+      label: appearanceTokens.glassText,
+      selectedSurface: appearanceTokens.actionSelectedBackground,
+      selectedLabel: theme.brandContrast,
+    },
   }[tone];
 
   return (
@@ -166,7 +196,7 @@ export function Chip({ label, selected = false, tone = 'default', onPress }: Chi
           paddingVertical: spacing[2],
           borderRadius: radius.pill,
           borderWidth: 1,
-          borderColor: selected ? toneScheme.accent : theme.line,
+          borderColor: selected ? toneScheme.accent : isGlassTone ? appearanceTokens.glassBorder : theme.line,
           backgroundColor: selected ? toneScheme.selectedSurface : toneScheme.surface,
           opacity: pressed ? 0.9 : 1,
         },
@@ -178,4 +208,3 @@ export function Chip({ label, selected = false, tone = 'default', onPress }: Chi
     </Pressable>
   );
 }
-

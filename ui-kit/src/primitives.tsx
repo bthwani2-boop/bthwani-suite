@@ -13,7 +13,7 @@ import {
   type ViewProps,
   type ViewStyle,
 } from 'react-native';
-import { useDirection, useTheme } from './providers';
+import { useBThwaniAppearance, useDirection, useTheme } from './providers';
 import {
 	borders,
 	fontWeights,
@@ -151,9 +151,11 @@ export function Divider({ color, style }: DividerProps) {
 
 declare const process: { env: { NODE_ENV?: string } };
 
-type SurfaceVariant = 'default' | 'raised' | 'inset' | 'brandHeader' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+type BaseSurfaceVariant = 'default' | 'raised' | 'inset' | 'brandHeader' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+type GlassSurfaceVariant = 'glass' | 'glassStrong';
+type SurfaceVariant = BaseSurfaceVariant | GlassSurfaceVariant;
 
-const surfaceToneLaw: Record<SurfaceVariant, { background: BoxBackground; borderTone: BoxBorderTone; elevationToken: ElevationToken }> = {
+const surfaceToneLaw: Record<BaseSurfaceVariant, { background: BoxBackground; borderTone: BoxBorderTone; elevationToken: ElevationToken }> = {
 	default: { background: 'surface', borderTone: 'line', elevationToken: 'flat' },
 	raised: { background: 'surfaceRaised', borderTone: 'lineStrong', elevationToken: 'raised' },
 	inset: { background: 'surfaceInset', borderTone: 'line', elevationToken: 'flat' },
@@ -200,6 +202,43 @@ export function Surface({
 	layoutDirection,
 	style
 }: SurfaceProps) {
+	const { tokens: appearanceTokens } = useBThwaniAppearance();
+
+	if (tone === 'glass' || tone === 'glassStrong') {
+		const glassStyle = tone === 'glassStrong'
+			? {
+					backgroundColor: appearanceTokens.glassSurfaceStrong,
+					...appearanceTokens.shadowPremium,
+				}
+			: {
+					backgroundColor: appearanceTokens.glassSurface,
+					...appearanceTokens.shadowSoft,
+				};
+
+		return (
+			<Box
+				padding={padding}
+				paddingX={paddingX}
+				paddingY={paddingY}
+				gap={gap}
+				radiusToken={radiusToken}
+				border={false}
+				align={align}
+				layoutDirection={layoutDirection}
+				style={StyleSheet.flatten([
+					{
+						borderWidth: border ? borders[borderToken] : 0,
+						borderColor: appearanceTokens.glassBorder,
+					},
+					glassStyle,
+					style,
+				])}
+			>
+				{children}
+			</Box>
+		);
+	}
+
 	const toneConfig = surfaceToneLaw[tone];
 	if ((process.env.NODE_ENV ?? '') !== 'production' && !(tone in surfaceToneLaw)) {
 		// eslint-disable-next-line no-console
