@@ -1,5 +1,5 @@
-import React from 'react';
-import { Ionicons } from '@expo/vector-icons';
+import * as React from 'react';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { type StyleProp, type TextStyle } from 'react-native';
 import { useDirection, useTheme } from '../providers';
 

@@ -1,7 +1,6 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import React from 'react';
+import * as React from 'react';
 import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions, type StyleProp, type ViewStyle } from 'react-native';
-import { Box, Text, colorPalette } from '@bthwani/ui-kit';
+import { Box, Icon, Text, colorPalette } from '@bthwani/ui-kit';
 import type { MarketingVideoRecord } from '../shared/video.preview-store';
 
 export type DshHomeApprovedVideoReelsViewerProps = {
@@ -143,7 +142,7 @@ export function DshHomeApprovedVideoReelsViewer({
 				<StatusBar hidden />
 				<View style={styles.emptyContainer}>
 					<Pressable style={styles.closeButton} onPress={handleClose} accessibilityRole="button" accessibilityLabel="إغلاق">
-						<Ionicons name="close" size={20} color={colorPalette.white} />
+						<Icon name="close" size={20} color={colorPalette.white} />
 					</Pressable>
 					<Box gap={2} style={styles.emptyCard}>
 						<Text role="titleSm" style={styles.emptyTitle}>لا توجد فيديوهات معتمدة بعد</Text>
@@ -161,7 +160,7 @@ export function DshHomeApprovedVideoReelsViewer({
 			<StatusBar hidden />
 			<View style={styles.container}>
 				<Pressable style={styles.closeButton} onPress={handleClose} accessibilityRole="button" accessibilityLabel="إغلاق الفيديو">
-					<Ionicons name="close" size={20} color={colorPalette.white} />
+					<Icon name="close" size={20} color={colorPalette.white} />
 				</Pressable>
 
 				<FlatList
@@ -224,7 +223,7 @@ export function DshHomeApprovedVideoReelsViewer({
 													accessibilityLabel={item.ctaLabel}
 												>
 													<Text role="bodyMd" style={styles.ctaText}>{item.ctaLabel}</Text>
-													<Ionicons name="arrow-back" size={18} color={colorPalette.white} />
+													<Icon name="arrow-back" size={18} color={colorPalette.white} />
 												</Pressable>
 											</Box>
 										</View>

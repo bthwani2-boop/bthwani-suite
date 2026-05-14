@@ -52,6 +52,7 @@ function SmartNewsTicker({ message, status, onPress }: { message: string, status
       return undefined;
     }
 
+    let isSubscribed = true;
     translateX.setValue(-distance);
 
     const animation = Animated.loop(
@@ -59,15 +60,22 @@ function SmartNewsTicker({ message, status, onPress }: { message: string, status
         toValue: distance,
         duration: 12000,
         easing: Easing.linear,
-        useNativeDriver: false,
+        useNativeDriver: true,
         isInteraction: false,
       }),
       { resetBeforeIteration: true },
     );
 
-    animation.start();
+    const interactionPromise = import('react-native').then(({ InteractionManager }) => {
+      InteractionManager.runAfterInteractions(() => {
+        if (isSubscribed) {
+          animation.start();
+        }
+      });
+    });
 
     return () => {
+      isSubscribed = false;
       animation.stop();
       translateX.stopAnimation();
       translateX.setValue(-distance);

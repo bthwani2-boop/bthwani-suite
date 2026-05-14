@@ -1,4 +1,4 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
+// Removed Ionicons import
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
@@ -89,7 +89,7 @@ export function DshCheckoutIntentScreen({
             <Text role="titleMd" style={styles.sectionTitle}>عنوان التوصيل</Text>
           </View>
           <View style={[styles.addressCard, { flexDirection: isRtl ? 'row' : 'row-reverse' }]}>
-            <Ionicons name="location" size={24} color={colorPalette.orange} style={styles.sectionIcon} />
+            <Icon name="location" size={24} color={colorPalette.orange} style={styles.sectionIcon} />
             <View style={styles.addressInfo}>
               <Text role="bodyMd" style={styles.addressText} numberOfLines={2}>{address}</Text>
             </View>
@@ -99,7 +99,7 @@ export function DshCheckoutIntentScreen({
         {/* Section: ETA Preview */}
         <Box padding={spacing[4]} backgroundColor={colorPalette.lightSurface} margin={spacing[4]} borderRadius={radius.md}>
           <View style={[styles.etaRow, { flexDirection: isRtl ? 'row' : 'row-reverse' }]}>
-            <Ionicons name="time-outline" size={20} color={colorPalette.deepBlue} />
+            <Icon name="time-outline" size={20} color={colorPalette.deepBlue} />
             <Text role="bodyMd" style={styles.etaText}>الوقت المتوقع للوصول: <Text role="titleSm" style={{ color: colorPalette.orange }}>{eta}</Text></Text>
           </View>
         </Box>
@@ -125,7 +125,7 @@ export function DshCheckoutIntentScreen({
                   <Text role="bodyMd" style={[styles.paymentLabel, method.isSelected && { color: colorPalette.deepBlue }]}>
                     {method.label}
                   </Text>
-                  <Ionicons name={method.icon as any} size={24} color={method.isSelected ? colorPalette.deepBlue : colorPalette.deepBlueLighter} />
+                  <Icon name={method.icon as any} size={24} color={method.isSelected ? colorPalette.deepBlue : colorPalette.deepBlueLighter} />
                 </View>
               </Pressable>
             ))}

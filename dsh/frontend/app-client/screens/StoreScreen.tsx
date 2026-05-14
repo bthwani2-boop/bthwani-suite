@@ -19,7 +19,7 @@ import {
   type GestureResponderEvent,
   type ImageSourcePropType,
 } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
+// Removed Ionicons import
 import { BannerCarousel, Button, Chip, Icon, SearchTopBar, TopBar, StateView, Text, Toast, colorPalette, useDirection, useUiText, ProductCard, type BannerCarouselItem } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../shared/catalog';
 import { formatDshStoreFollowersLabel } from '../shared/store-profile';
@@ -70,12 +70,10 @@ export type DshStoreGetScreenProps = {
 
 type DeliveryMode = 'delivery' | 'pickup' | 'store_delivery';
 
-type DshStoreOperationalState = Extract<DshClientState, 'store_open' | 'store_closed' | 'area_unserviceable'>;
-
 function getDeliveryModes(storeText: ReturnType<typeof useUiText>['storeScreen']): Array<{
   id: DeliveryMode;
   label: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: string;
 }> {
   return [
     { id: 'store_delivery', label: storeText.get.storeDelivery, icon: 'storefront-outline' },
@@ -345,7 +343,7 @@ function renderNonReadyState(
   );
 }
 
-function IconActionButton({ icon, onPress }: { icon: keyof typeof Ionicons.glyphMap; onPress?: () => void }) {
+function IconActionButton({ icon, onPress }: { icon: string; onPress?: () => void }) {
   return (
     <TouchableOpacity
       style={styles.iconButton}
@@ -353,7 +351,7 @@ function IconActionButton({ icon, onPress }: { icon: keyof typeof Ionicons.glyph
       activeOpacity={0.8}
       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
     >
-      <Ionicons name={icon} size={20} color={stylesTokens.dark} />
+      <Icon name={icon as any} size={20} color={stylesTokens.dark} />
     </TouchableOpacity>
   );
 }
@@ -365,7 +363,7 @@ function ModePill({
   onPress,
 }: {
   label: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: string;
   active: boolean;
   onPress?: () => void;
 }) {
@@ -379,8 +377,8 @@ function ModePill({
         <Text style={[styles.modePillLabel, active && styles.modePillLabelActive]} numberOfLines={1}>
           {label}
         </Text>
-        <Ionicons
-          name={icon}
+        <Icon
+          name={icon as any}
           size={18}
           color={active ? stylesTokens.orange : stylesTokens.muted}
         />
@@ -1253,7 +1251,7 @@ export function DshStoreGetScreen({
                 <>
                   <View style={[styles.heroIdentityRow, isRTL && styles.rowReverse]}>
                     <View style={styles.heroAvatar}>
-                      <Ionicons name="storefront-outline" size={24} color={stylesTokens.orange} />
+                      <Icon name="storefront-outline" size={24} color={stylesTokens.orange} />
                       {storeCoverImageSource ? <Image source={storeCoverImageSource} style={styles.heroAvatarImage} /> : null}
                     </View>
 
@@ -1282,7 +1280,7 @@ export function DshStoreGetScreen({
                             accessibilityRole="button"
                             accessibilityLabel={isFollowingStore ? 'تمت المتابعة' : 'متابعة المتجر'}
                           >
-                            <Ionicons
+                            <Icon
                               name={isFollowingStore ? 'checkmark' : 'add'}
                               size={9}
                               color={isFollowingStore ? stylesTokens.white : stylesTokens.orange}
@@ -1293,11 +1291,11 @@ export function DshStoreGetScreen({
                           </TouchableOpacity>
                         ) : null}
                         <View style={styles.topMetaChip}>
-                          <Ionicons name="time-outline" size={9} color={stylesTokens.orange} />
+                          <Icon name="time-outline" size={9} color={stylesTokens.orange} />
                           <Text style={styles.topMetaChipText} numberOfLines={1}>{normalizedEtaLabel}</Text>
                         </View>
                         <View style={styles.topMetaChip}>
-                          <Ionicons name="star" size={9} color={stylesTokens.warning} />
+                          <Icon name="star" size={9} color={stylesTokens.warning} />
                           <Text style={styles.topMetaChipText} numberOfLines={1}>{storeText.get.ratingValue}</Text>
                         </View>
                       </View>
@@ -1309,7 +1307,7 @@ export function DshStoreGetScreen({
                               const isPrimaryBenefit = chip.includes('برو') || chip.includes('مجاني');
                               return (
                                 <View key={`${store.id}-${chip}`} style={[styles.tagChip, isPrimaryBenefit && styles.tagChipAccent]}>
-                                  <Ionicons
+                                  <Icon
                                     name={isPrimaryBenefit ? 'sparkles-outline' : 'checkmark-circle-outline'}
                                     size={9}
                                     color={isPrimaryBenefit ? stylesTokens.white : stylesTokens.orange}
@@ -1535,7 +1533,7 @@ export function DshStoreGetScreen({
                               </View>
 
                               <View style={[styles.previewDetailsFavoriteButton, { opacity: 0.95 }]}>
-                                <Ionicons name={favoriteIds.has(previewPeekItem.id) ? 'heart' : 'heart-outline'} size={18} color={stylesTokens.orange} />
+                                <Icon name={favoriteIds.has(previewPeekItem.id) ? 'heart' : 'heart-outline'} size={18} color={stylesTokens.orange} />
                               </View>
                             </View>
                           );
@@ -1592,7 +1590,7 @@ export function DshStoreGetScreen({
                           </View>
 
                           <TouchableOpacity style={styles.previewDetailsFavoriteButton} activeOpacity={0.9} onPress={handlePreviewFavoritePress}>
-                            <Ionicons name={favoriteIds.has(previewItem!.id) ? 'heart' : 'heart-outline'} size={18} color={stylesTokens.orange} />
+                            <Icon name={favoriteIds.has(previewItem!.id) ? 'heart' : 'heart-outline'} size={18} color={stylesTokens.orange} />
                           </TouchableOpacity>
 
                           <TouchableOpacity
@@ -1600,9 +1598,9 @@ export function DshStoreGetScreen({
                             activeOpacity={0.85}
                             onPress={() => handlePreviewAddToCart()}
                           >
-                            <Ionicons name="cart-outline" size={18} color={stylesTokens.white} />
+                            <Icon name="cart-outline" size={18} color={stylesTokens.white} />
                             <View style={styles.menuActionPlusBadge}>
-                              <Ionicons name="add" size={10} color={stylesTokens.orange} />
+                              <Icon name="add" size={10} color={stylesTokens.orange} />
                             </View>
                           </TouchableOpacity>
                         </View>
@@ -1621,9 +1619,9 @@ export function DshStoreGetScreen({
           <View style={[styles.measurePopoverWrap, { top: measurePopoverTop }]} pointerEvents="box-none">
             <View style={styles.measurePopoverDock}>
               <View style={styles.measureOriginBubble}>
-                <Ionicons name="cart-outline" size={18} color={stylesTokens.white} />
+                <Icon name="cart-outline" size={18} color={stylesTokens.white} />
                 <View style={styles.measureOriginPlusBadge}>
-                  <Ionicons name="add" size={10} color={stylesTokens.orange} />
+                  <Icon name="add" size={10} color={stylesTokens.orange} />
                 </View>
               </View>
 
@@ -1658,7 +1656,7 @@ export function DshStoreGetScreen({
                         activeOpacity={0.85}
                         onPress={() => setSelectedMeasureQty((current) => Math.max(1, current - 1))}
                       >
-                        <Ionicons name="remove" size={18} color={stylesTokens.muted} />
+                        <Icon name="remove" size={18} color={stylesTokens.muted} />
                       </TouchableOpacity>
 
                       <View style={styles.measureQtyValuePill}>
@@ -1670,7 +1668,7 @@ export function DshStoreGetScreen({
                         activeOpacity={0.9}
                         onPress={() => setSelectedMeasureQty((current) => current + 1)}
                       >
-                        <Ionicons name="add" size={18} color={stylesTokens.white} />
+                        <Icon name="add" size={18} color={stylesTokens.white} />
                       </TouchableOpacity>
                     </View>
 
@@ -1685,7 +1683,7 @@ export function DshStoreGetScreen({
                         onPress={handleAddToCart}
                       >
                         <Text style={styles.measureConfirmText}>أضف للسلة</Text>
-                        <Ionicons name="cart-outline" size={16} color={stylesTokens.white} />
+                        <Icon name="cart-outline" size={16} color={stylesTokens.white} />
                       </TouchableOpacity>
                     </View>
                   </>

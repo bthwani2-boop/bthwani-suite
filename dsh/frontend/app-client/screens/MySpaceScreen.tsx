@@ -1,4 +1,4 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
+// Removed Ionicons import
 import React from 'react';
 import {
   Pressable,
@@ -368,7 +368,7 @@ function MySpacePrimaryRow({
               justifyContent: 'center',
             }}
           >
-            <Ionicons name={iconName} size={21} color={selected ? theme.brandContrast : theme.brand} />
+            <Icon name={iconName as any} size={21} color={selected ? theme.brandContrast : theme.brand} />
           </View>
 
           <Box gap={0} style={{ flex: 1 }}>
@@ -379,7 +379,7 @@ function MySpacePrimaryRow({
           </Box>
 
           <View style={{ width: 28, alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name={isExpanded ? 'chevron-down' : 'chevron-back'} size={20} color={isExpanded ? theme.brand : theme.textSoft} />
+            <Icon name={isExpanded ? 'chevron-down' : 'chevron-back'} size={20} color={isExpanded ? theme.brand : theme.textSoft} />
           </View>
         </Box>
       </Pressable>
@@ -644,7 +644,7 @@ function OrderCard({
             backgroundColor: featured ? theme.brand : theme.brandSurface,
           }}
         >
-          <Ionicons name={iconName} size={20} color={featured ? theme.brandContrast : theme.brand} />
+          <Icon name={iconName as any} size={20} color={featured ? theme.brandContrast : theme.brand} />
         </View>
 
         <Box gap={0} style={{ flex: 1 }}>
@@ -931,8 +931,8 @@ function MySpaceAddressesSection() {
       <Surface tone="raised" padding={2} gap={2}>
         <SectionHeader title="العناوين المحفوظة" subtitle="أضف أو عدل مواقع التوصيل المتكررة." />
         <Box gap={1}>
-          <OptionRow title="المنزل" subtitle="حي النزهة، شارع الأمير نايف" icon={<Ionicons name="home-outline" size={20} />} />
-          <OptionRow title="العمل" subtitle="برج الفيصلية، الطابق 12" icon={<Ionicons name="business-outline" size={20} />} />
+          <OptionRow title="المنزل" subtitle="حي النزهة، شارع الأمير نايف" icon={<Icon name="home-outline" size={20} />} />
+          <OptionRow title="العمل" subtitle="برج الفيصلية، الطابق 12" icon={<Icon name="business-outline" size={20} />} />
         </Box>
         <Button label="إضافة عنوان جديد" tone="secondary" />
       </Surface>
@@ -946,7 +946,7 @@ function MySpaceLocationSection() {
       <Surface tone="raised" padding={2} gap={2}>
         <SectionHeader title="الموقع الميداني" subtitle="تحديث موقعك الحالي لضمان دقة التوصيل." />
         <Surface tone="inset" padding={3} style={{ alignItems: 'center', justifyContent: 'center', height: 120, borderRadius: 20 }}>
-          <Ionicons name="map" size={40} color={colorPalette.brand} />
+          <Icon name="map" size={40} color={colorPalette.brand} />
           <Text role="bodySm" tone="muted" style={{ marginTop: 8 }}>خارطة الموقع قيد التحميل...</Text>
         </Surface>
         <Button label="تحديث الموقع الحالي" tone="brand" />

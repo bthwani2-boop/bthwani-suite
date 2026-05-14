@@ -1,4 +1,4 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
+// Removed Ionicons import
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, View, TextInput } from 'react-native';
 
@@ -99,7 +99,7 @@ export function DshRatingScreen({
       <ScrollView contentContainerStyle={styles.content}>
         <Box padding={spacing[4]} alignItems="center">
           <View style={styles.headerIcon}>
-            <Ionicons name="star" size={48} color={colorPalette.orange} />
+            <Icon name="star" size={48} color={colorPalette.orange} />
           </View>
           <Text role="titleLg" style={styles.title}>كيف كانت تجربتك مع {storeName}؟</Text>
           <Text role="bodyMd" style={styles.subtitle}>رأيك يساعدنا في تحسين جودة الخدمة المقدمة لك.</Text>
@@ -109,7 +109,7 @@ export function DshRatingScreen({
           <View style={[styles.starsContainer, { flexDirection: isRtl ? 'row-reverse' : 'row' }]}>
             {[1, 2, 3, 4, 5].map((item) => (
               <Pressable key={item} onPress={() => handleRatingPress(item)} style={styles.starPressable}>
-                <Ionicons
+                <Icon
                   name={rating >= item ? 'star' : 'star-outline'}
                   size={40}
                   color={rating >= item ? colorPalette.orange : colorPalette.deepBlueLighter}

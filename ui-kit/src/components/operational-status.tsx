@@ -1,5 +1,4 @@
 import React from 'react';
-import { Ionicons } from '@expo/vector-icons';
 import {
   Dimensions,
   Platform,
@@ -19,6 +18,7 @@ import {
 import { useDirection, useTheme } from '../providers';
 import { Surface, Text, type SurfaceTone } from '../primitives';
 import { Badge, Button, type BadgeProps, type ButtonTone } from './button';
+import { Icon } from './icons';
 import { SectionHeader } from './header';
 import { KeyValueList, type KeyValueItem } from './list';
 
@@ -159,7 +159,7 @@ export function CompactStatusStepper({ title, subtitle, steps }: CompactStatusSt
                   }}
                 >
                   {isDone ? (
-                    <Ionicons name="checkmark" size={16} color={theme.success} />
+                    <Icon name="checkmark" size={16} color={theme.success} />
                   ) : (
                     <Text role="label" tone={isCurrent ? 'brand' : 'soft'}>
                       {index + 1}
@@ -393,7 +393,7 @@ export function OrderLinkedChat({
               opacity: canSend ? (pressed ? 0.9 : 1) : 0.45,
             })}
           >
-            <Ionicons
+            <Icon
               name={isRtl ? 'paper-plane' : 'paper-plane-outline'}
               size={18}
               color={canSend ? theme.brand : theme.textSoft}
@@ -485,7 +485,7 @@ export function DeferredReviewBlock({
                   onPress={() => onChange?.(score)}
                   style={{ padding: 2 }}
                 >
-                  <Ionicons
+                  <Icon
                     name={selected ? 'star' : 'star-outline'}
                     size={24}
                     color={selected ? theme.warning : theme.textSoft}

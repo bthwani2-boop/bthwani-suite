@@ -1,9 +1,9 @@
 import React, { memo, useMemo } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, View, type GestureResponderEvent, type ImageSourcePropType, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { radius, resolveRowDirection, resolveTextAlign, spacing, type SpacingToken } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Badge, Button } from './button';
+import { Icon } from './icons';
 import { Surface, Text, type SurfaceTone } from '../primitives';
 import { StateView } from './state';
 
@@ -524,7 +524,7 @@ export const ProductCard = memo(function ProductCard({
               onPress={onFavorite}
               style={styles.favoriteButton}
             >
-              <Ionicons
+              <Icon
                 name={isFavorited ? 'heart' : 'heart-outline'}
                 size={18}
                 color={isFavorited ? theme.danger : theme.textMuted}
@@ -547,7 +547,7 @@ export const ProductCard = memo(function ProductCard({
 
           {preparationTime ? (
             <View style={styles.timingRow}>
-              <Ionicons name="time-outline" size={14} color={theme.textMuted} />
+              <Icon name="time-outline" size={14} color={theme.textMuted} />
               <Text role="bodySm" style={styles.prep} numberOfLines={1}>
                 {preparationTime}
               </Text>
@@ -620,9 +620,9 @@ export const ProductCard = memo(function ProductCard({
             onPress={(event: GestureResponderEvent) => onAdd({ x: event.nativeEvent.pageX, y: event.nativeEvent.pageY })}
             style={styles.actionBadge}
           >
-            <Ionicons name="cart-outline" size={18} color={theme.textInverse} />
+            <Icon name="cart-outline" size={18} color={theme.textInverse} />
             <View style={styles.actionPlusBadge}>
-              <Ionicons name="add" size={8} color={theme.text} />
+              <Icon name="add" size={8} color={theme.text} />
             </View>
           </Pressable>
         ) : null}
