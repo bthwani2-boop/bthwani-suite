@@ -1356,9 +1356,9 @@ function DshStoreGetScreenContent({
                       {/* Identity Section (Logo + Info) */}
                       <View style={styles.heroIdentitySection}>
                         <View style={styles.heroLogoWrap}>
-                          <Image 
-                            source={storeLogoImageSource || resolveDshImageSource('dsh.brand.logo.v1')} 
-                            style={styles.heroLogoImage} 
+                          <Image
+                            source={storeLogoImageSource || resolveDshImageSource('dsh.brand.logo.v1')}
+                            style={styles.heroLogoImage}
                           />
                         </View>
                         <View style={styles.heroInfoCluster}>
