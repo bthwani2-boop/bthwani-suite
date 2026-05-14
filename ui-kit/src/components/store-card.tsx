@@ -70,19 +70,29 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
       onPress={onPress}
       style={({ pressed }) => [styles.card, { backgroundColor: theme.surface, opacity: pressed ? 0.92 : 1 }]}
     >
-      {/* Top-Left Status Pill (Absolute) */}
+      {/* Top-Left Status Icon (Absolute) */}
       <View style={styles.absoluteStatusBadge}>
-        <View style={[styles.statusBadge, { backgroundColor: item.isOpen ? '#F0FFF4' : '#FFF5F5' }]}>
-          <View style={[styles.statusOrb, { backgroundColor: item.isOpen ? theme.success : theme.danger }]}>
-            <Icon
-              name={item.isOpen ? 'checkmark' : 'remove'}
-              size={8}
-              color="#FFF"
-            />
+        <View style={{ width: 28, height: 28, justifyContent: 'center', alignItems: 'center' }}>
+          <Icon
+            name={item.isOpen ? 'lock-open' : 'lock-closed'}
+            size={24}
+            color={item.isOpen ? theme.success : theme.danger}
+          />
+          <View style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            backgroundColor: item.isOpen ? theme.success : theme.danger,
+            borderRadius: 6,
+            width: 12,
+            height: 12,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderWidth: 1.5,
+            borderColor: theme.surface,
+          }}>
+            <Icon name={item.isOpen ? 'checkmark' : 'remove'} size={7} color="#FFF" />
           </View>
-          <Text style={[styles.statusText, { color: item.isOpen ? theme.success : theme.danger }]}>
-            {item.isOpen ? 'مفتوح' : 'مغلق'}
-          </Text>
         </View>
       </View>
 
@@ -155,8 +165,8 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
           </View>
         </View>
 
-        {/* Row 3: Metrics Ribbon */}
-        <View style={[styles.metricsRibbon, { backgroundColor: theme.surfaceSecondary }]}>
+        {/* Row 3: Metrics Ribbon (Clean, No Background) */}
+        <View style={styles.metricsRibbon}>
           <View style={styles.metricItem}>
             <Icon name="navigate-outline" size={10} color={theme.textMuted} />
             <Text style={styles.metaText}>{item.distanceKm?.toFixed(1) || '2.1'} كم</Text>
@@ -297,17 +307,18 @@ const styles = StyleSheet.create({
     top: 10,
     left: 10,
     zIndex: 30,
+    width: 44,
+    alignItems: 'center',
   },
   absoluteFavoriteButton: {
     position: 'absolute',
     bottom: 12,
-    left: 14,
+    left: 10, // Aligned with status icon above
     zIndex: 30,
     width: 44,
     height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    // Background and shadow removed for clean look
   },
   textContent: {
     flex: 1,
