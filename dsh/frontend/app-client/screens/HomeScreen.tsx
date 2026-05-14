@@ -1322,24 +1322,31 @@ return (
                     />
                   )}
                   <View style={styles.heroPromoContent}>
-                    {activeHomePromo.thumbnail && (
-                      <Image
-                        source={resolveDshHomeBannerImageSource(activeHomePromo.thumbnail)}
-                        style={styles.heroPromoMascot}
-                        resizeMode="contain"
-                      />
-                    )}
+                    <View style={styles.heroPromoIconContainer}>
+                      {activeHomePromo.thumbnail ? (
+                        <Image
+                          source={resolveDshHomeBannerImageSource(activeHomePromo.thumbnail)}
+                          style={styles.heroPromoMascot}
+                          resizeMode="contain"
+                        />
+                      ) : (
+                        <Icon name="ribbon-outline" size={32} color="#D4AF37" />
+                      )}
+                    </View>
                     <View style={styles.heroPromoTextWrap}>
                       <Text style={styles.heroPromoTitle} numberOfLines={1}>
-                        {activeHomePromo.title}
+                        بثواني برو
                       </Text>
                       <Text style={styles.heroPromoSubtitle} numberOfLines={1}>
                         {activeHomePromo.subtitle}
                       </Text>
                       {activeHomePromo.ctaText && (
-                        <Text style={styles.heroPromoCtaLink}>
-                          {activeHomePromo.ctaText}
-                        </Text>
+                        <View style={styles.heroPromoCtaButton}>
+                          <Text style={styles.heroPromoCtaText}>
+                            {activeHomePromo.ctaText}
+                          </Text>
+                          <Icon name="chevron-back" size={10} color="white" />
+                        </View>
                       )}
                     </View>
                   </View>
@@ -1811,7 +1818,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     categoriesSelectorRow: {
       flexDirection: rowDirection,
       alignItems: 'flex-start',
-      gap: 16, // Increased for 2026 airiness
+      gap: 4, // Further reduced to minimize space as requested
     },
     fixedIconsContainer: {
       flexDirection: rowDirection,
@@ -1872,63 +1879,81 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       paddingVertical: 0,
     },
     heroPromoCard: {
-      flex: 1.2,
-      height: 82, // Slightly taller for better presence
-      borderRadius: 16, // Harmonized radius for 2026
-      backgroundColor: '#0A2F5C',
+      flex: 1.6,
+      height: 74, // Matches the height of CategorySelectorItem (56 icon + 4 gap + 14 text)
+      borderRadius: 18,
+      backgroundColor: '#FDFCFB',
       borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.1)',
+      borderColor: '#F0E9E0',
       paddingHorizontal: 12,
       justifyContent: 'center',
-      marginRight: 8,
       overflow: 'hidden',
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
     },
     heroPromoBackground: {
       ...StyleSheet.absoluteFillObject,
       width: '100%',
       height: '100%',
-      opacity: 0.35, // Increased visibility for templates
+      opacity: 0.03,
     },
     heroPromoContent: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
-      zIndex: 2, // Ensure content stays on top of background
+      gap: 10,
+      zIndex: 2,
+    },
+    heroPromoIconContainer: {
+      width: 44,
+      height: 44,
+      borderRadius: 12,
+      backgroundColor: 'rgba(212, 175, 55, 0.08)',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     heroPromoMascot: {
-      width: 45,
-      height: 55,
+      width: 36,
+      height: 36,
     },
     heroPromoTextWrap: {
       flex: 1,
-      alignItems: 'center',
+      alignItems: 'flex-end',
       justifyContent: 'center',
-      paddingLeft: 4,
+      gap: 1, // Tight vertical spacing to prevent distortion
     },
     heroPromoTitle: {
-      color: colorPalette.white,
+      color: '#0A2F5C',
       fontWeight: '900',
-      fontSize: 14,
+      fontSize: 15, // Slightly larger for prominence
       lineHeight: 18,
-      textAlign: 'center',
-      textShadowColor: 'rgba(0,0,0,0.2)',
-      textShadowOffset: { width: 0, height: 1 },
-      shadowRadius: 2,
+      textAlign: 'right',
     },
     heroPromoSubtitle: {
-      color: '#FF500D',
-      fontSize: 11,
-      fontWeight: '800',
-      marginTop: -1,
-      textAlign: 'center',
+      color: '#717171',
+      fontSize: 9,
+      fontWeight: '700',
+      marginTop: 0,
+      textAlign: 'right',
+      marginBottom: 2,
     },
-    heroPromoCtaLink: {
-      color: 'rgba(255,255,255,0.8)',
-      fontSize: 10,
+    heroPromoCtaButton: {
+      backgroundColor: '#FF500D',
+      flexDirection: 'row-reverse',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      height: 22, // Fixed height for consistency
+      borderRadius: 8,
+      gap: 3,
+    },
+    heroPromoCtaText: {
+      color: colorPalette.white,
+      fontSize: 9,
       fontWeight: '900',
-      marginTop: 1,
-      textDecorationLine: 'underline',
-      textAlign: 'center',
     },
     heroPagerRow: {
       marginTop: 4,
