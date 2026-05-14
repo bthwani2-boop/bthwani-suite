@@ -1,5 +1,4 @@
-import React from 'react';
-import { Ionicons } from '@expo/vector-icons';
+import * as React from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
 
 import {
@@ -570,6 +569,8 @@ function EmptyFeed({ query, styles }: { query?: string; styles: DshHomeGetStyles
   );
 }
 
+const ACTIVE_PROMO_INTERVAL_MS = 5000;
+
 export function DshHomeGetScreen({
   state = 'ready',
   categories,
@@ -623,7 +624,7 @@ export function DshHomeGetScreen({
   const [activeCategoryId, setActiveCategoryId] = React.useState<string>('all');
   const [activeSubcategoryId, setActiveSubcategoryId] = React.useState<string | null>(null);
   const [activePromoIndex, setActivePromoIndex] = React.useState(0);
-  const promoScrollRef = React.useRef<React.ElementRef<typeof ScrollView> | null>(null);
+
   const [favoriteToggles, setFavoriteToggles] = React.useState<Record<string, boolean>>({});
   const [followToggles, setFollowToggles] = React.useState<Record<string, boolean>>({});
   const [followCounts, setFollowCounts] = React.useState<Record<string, number>>({});
@@ -650,11 +651,11 @@ export function DshHomeGetScreen({
 
   const containerWidth = viewportWidth;
   const sidePeek = Math.max(spacing[1], Math.min(spacing[4], Math.round(containerWidth * 0.045)));
-  const itemGap = Math.max(spacing[1], Math.min(spacing[2], Math.round(containerWidth * 0.018)));
-  const baseCardWidth = Math.max(256, Math.min(326, Math.round(containerWidth - (sidePeek * 2) - (itemGap * 2))));
+  const resolvedItemGap = Math.max(spacing[1], Math.min(spacing[2], Math.round(containerWidth * 0.018)));
+  const baseCardWidth = Math.max(256, Math.min(326, Math.round(containerWidth - (sidePeek * 2) - (resolvedItemGap * 2))));
   const cardWidth = Math.max(220, Math.round(baseCardWidth * 0.84));
   const cardHeight = Math.max(160, Math.round(cardWidth * 0.78));
-  const itemWidth = cardWidth + itemGap;
+  const itemWidth = cardWidth + resolvedItemGap;
   const horizontalPadding = Math.max(0, Math.round((containerWidth - cardWidth) / 2));
   const resolvedStores = (stores ?? []).filter((store) => canRenderInClientSurface(store.publishStage, 'store'));
   const resolvedRecentOrders = recentOrders ?? [];
@@ -662,26 +663,6 @@ export function DshHomeGetScreen({
   const categoryItems = React.useMemo(() => {
     return resolvedCategories;
   }, [resolvedCategories]);
-
-  const bannerItems = React.useMemo<BannerCarouselItem[]>(() => (
-    resolvedPromos.map((promo) => ({
-      id: promo.id,
-      title: promo.title,
-      subtitle: promo.subtitle,
-      badge: promo.offerBadgeText,
-      cta: promo.ctaLabel,
-      image: resolveDshHomeBannerImageSource(promo.imageUrl ?? promo.mediaKey),
-      accentColor: promo.accentColor,
-      onPress: () => {
-        if (onPromoClick) onPromoClick(promo.id);
-        resolveBannerPress(promo)();
-      },
-    }))
-  ), [resolvedPromos, onPromoClick, resolveBannerPress]);
-  const [isCarouselUserPaused, setIsCarouselUserPaused] = React.useState(false);
-  const [isCarouselInteractionPaused, setIsCarouselInteractionPaused] = React.useState(false);
-  const interactionResumeTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isCarouselPaused = isCarouselUserPaused || isCarouselInteractionPaused;
 
   const categoryPageIds = React.useMemo(() => ['all', ...categoryItems.map((category) => category.id)], [categoryItems]);
 
@@ -791,69 +772,6 @@ export function DshHomeGetScreen({
     [categoryItems]
   );
 
-  const currentBannerPromo = bannerItems.length ? bannerItems[activePromoIndex % bannerItems.length] ?? null : null;
-  const activePromoMotionStyle = currentBannerPromo?.motionStyle ?? 'slide';
-  const activePromoAutoplayEnabled = currentBannerPromo?.autoplayEnabled ?? true;
-  const activePromoAutoplayIntervalMs = Math.max(2500, currentBannerPromo?.autoplayIntervalMs ?? 4500);
-  const activePromoPauseOnInteraction = currentBannerPromo?.pauseOnInteraction ?? true;
-
-  const clearInteractionResumeTimer = React.useCallback(() => {
-    if (interactionResumeTimeoutRef.current) {
-      clearTimeout(interactionResumeTimeoutRef.current);
-      interactionResumeTimeoutRef.current = null;
-    }
-  }, []);
-
-  const scheduleCarouselResume = React.useCallback(() => {
-    if (!activePromoPauseOnInteraction || isCarouselUserPaused) {
-      return;
-    }
-
-    clearInteractionResumeTimer();
-    interactionResumeTimeoutRef.current = setTimeout(() => {
-      setIsCarouselInteractionPaused(false);
-      interactionResumeTimeoutRef.current = null;
-    }, 2200);
-  }, [activePromoPauseOnInteraction, clearInteractionResumeTimer, isCarouselUserPaused]);
-
-  React.useEffect(() => () => {
-    clearInteractionResumeTimer();
-  }, [clearInteractionResumeTimer]);
-
-  React.useEffect(() => {
-    if (bannerItems.length <= 1 || isCarouselPaused || !activePromoAutoplayEnabled) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setActivePromoIndex((current) => {
-        const next = (current + 1) % bannerItems.length;
-        promoScrollRef.current?.scrollTo({ x: next * itemWidth, animated: true });
-        return next;
-      });
-    }, activePromoAutoplayIntervalMs);
-
-    return () => clearInterval(interval);
-  }, [activePromoAutoplayEnabled, activePromoAutoplayIntervalMs, bannerItems.length, isCarouselPaused, itemWidth]);
-
-  React.useEffect(() => {
-    if (!bannerItems.length) {
-      return;
-    }
-
-    if (activePromoIndex >= bannerItems.length) {
-      setActivePromoIndex(0);
-    }
-  }, [activePromoIndex, bannerItems.length]);
-
-  React.useEffect(() => {
-    if (!bannerItems.length) {
-      return;
-    }
-
-    const nextIndex = Math.min(activePromoIndex, bannerItems.length - 1);
-    promoScrollRef.current?.scrollTo({ x: nextIndex * itemWidth, animated: false });
-  }, [activePromoIndex, bannerItems.length, itemWidth, viewportWidth]);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -1025,6 +943,23 @@ export function DshHomeGetScreen({
     [activeFilter, onOpenBenefits, onOpenDiscovery, onOpenList, onOpenOrders, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onOpenTracking, onPromoClick, resolveHomeCategoryContext]
   );
 
+  const bannerItems = React.useMemo<BannerCarouselItem[]>(() => (
+    resolvedPromos.map((promo) => ({
+      id: promo.id,
+      title: promo.title,
+      subtitle: promo.subtitle,
+      badge: promo.offerBadgeText,
+      cta: promo.ctaLabel,
+      image: resolveDshHomeBannerImageSource(promo.imageUrl ?? promo.mediaKey),
+      accentColor: promo.accentColor,
+      onPress: () => {
+        if (onPromoClick) onPromoClick(promo.id);
+        resolveBannerPress(promo)();
+      },
+    }))
+  ), [resolvedPromos, onPromoClick, resolveBannerPress]);
+
+  const currentBannerPromo = bannerItems.length ? bannerItems[activePromoIndex % bannerItems.length] ?? null : null;
   const activePromo = currentBannerPromo;
   const activeHomePromo = resolvedHomePromos[0] ?? null;
   const promoDiscount = activePromo?.subtitle.match(/\d+%/)?.[0] ?? '';
@@ -1307,7 +1242,9 @@ return (
             variant="secondary"
             height={cardHeight + spacing[6]}
             fullBleed={false}
-            autoPlayInterval={activePromoIntervalMs}
+            autoPlayInterval={ACTIVE_PROMO_INTERVAL_MS}
+            itemGap={resolvedItemGap}
+            onIndexChange={setActivePromoIndex}
             onBannerPress={(item) => {
               if (onPromoClick) onPromoClick(item.id);
             }}
@@ -1318,7 +1255,6 @@ return (
             }}
           />
         ) : null}
-        ) : null}
 
         <Box gap={0}>
           <View style={styles.categoriesSelectorSection}>
@@ -1327,7 +1263,7 @@ return (
                 <CategorySelectorItem
                   isVideo
                   label="فيديو"
-                  icon={<Ionicons name="play" size={22} color={colorPalette.brand} />}
+                  icon={<Icon name="play" size={22} color={colorPalette.brand} />}
                   onPress={() => setShortsVisible(true)}
                   styles={styles}
                   theme={theme}
@@ -1453,7 +1389,7 @@ return (
             <FilterChipItem
               label="الكل"
               isActive={activeCategoryId === 'all'}
-              icon={<Ionicons name="menu-outline" size={16} color={activeCategoryId === 'all' ? theme.textInverse : theme.textMuted} />}
+              icon={<Icon name="menu-outline" size={16} color={activeCategoryId === 'all' ? theme.textInverse : theme.textMuted} />}
               onPress={() => selectCategoryPage('all')}
               styles={styles}
               theme={theme}
@@ -1473,7 +1409,7 @@ return (
                     key={filter.value}
                     label={filter.label}
                     isActive={filter.value === activeFilter}
-                    icon={<Ionicons name={filter.iconName} size={16} color={filter.value === activeFilter ? theme.textInverse : theme.textMuted} />}
+                    icon={<Icon name={filter.iconName as any} size={16} color={filter.value === activeFilter ? theme.textInverse : theme.textMuted} />}
                     onPress={() => setActiveFilter(filter.value)}
                     styles={styles}
                     theme={theme}

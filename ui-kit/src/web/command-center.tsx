@@ -175,8 +175,8 @@ const webCommandCenterCss = `
 }
 
 .ui-web-command-center-root[dir="rtl"] .ui-web-command-center__workspace {
-  grid-template-columns: var(--rail-width) minmax(0, 1fr);
-  grid-template-areas: "rail stage";
+  grid-template-columns: minmax(0, 1fr) var(--rail-width);
+  grid-template-areas: "stage rail";
 }
 
 .ui-web-command-center__rail {
@@ -750,7 +750,7 @@ export function WebCommandCenterFrame({
                 onClick={() => setActiveSubStack(null)}
                 title="عودة"
               >
-                {direction === 'rtl' ? '← عودة' : '← Back'}
+                {direction === 'rtl' ? '→ عودة' : '← Back'}
               </button>
             ) : null}
 

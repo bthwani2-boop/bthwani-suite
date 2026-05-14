@@ -1,5 +1,5 @@
-import React from 'react';
-import { Animated, FlatList, Pressable, StyleSheet, View, useWindowDimensions, type ImageSourcePropType, type NativeScrollEvent, type NativeSyntheticEvent, type StyleProp, type ViewStyle } from 'react-native';
+import * as React from 'react';
+import { Animated, FlatList, Pressable, StyleSheet, View, useWindowDimensions, InteractionManager, type ImageSourcePropType, type NativeScrollEvent, type NativeSyntheticEvent, type StyleProp, type ViewStyle } from 'react-native';
 import { radius, resolveRowDirection, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Text } from '../primitives';
@@ -28,6 +28,7 @@ export type BannerCarouselProps = {
   itemGap?: number;
   autoPlayInterval?: number;
   resumeAfterMs?: number;
+  onIndexChange?: (index: number) => void;
   onBannerPress?: (item: BannerCarouselItem) => void;
   style?: StyleProp<ViewStyle>;
 };
@@ -41,17 +42,22 @@ function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
-export function BannerCarousel({
-  banners,
-  variant = 'main',
-  width: widthProp,
-  height = 172,
-  fullBleed = false,
-  itemWidth,
-  itemGap,
-  onBannerPress,
-  style,
-}: BannerCarouselProps) {
+export function BannerCarousel(props: BannerCarouselProps) {
+  const {
+    banners,
+    variant = 'main',
+    width: widthProp,
+    height = 172,
+    fullBleed = false,
+    itemWidth,
+    itemGap,
+    autoPlayInterval,
+    resumeAfterMs,
+    onIndexChange,
+    onBannerPress,
+    style,
+  } = props;
+
   const { direction } = useDirection();
   const { theme } = useTheme();
   const { width: windowWidth } = useWindowDimensions();
@@ -60,20 +66,80 @@ export function BannerCarousel({
   const isCompactSecondary = isSecondary && height <= 104;
   const isPeekSecondary = isSecondary && !fullBleed;
 
-  const resolvedWidth = widthProp ?? measuredWidth ?? windowWidth;
-  const count = banners.length;
   const scrollX = React.useRef(new Animated.Value(0)).current;
+  const flatListRef = React.useRef<FlatList>(null);
   const [activeIndex, setActiveIndex] = React.useState(0);
+  const [isInteracting, setIsInteracting] = React.useState(false);
+  const interactionTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const resolvedWidth = widthProp ?? measuredWidth ?? windowWidth;
+  const count = banners?.length ?? 0;
 
   const defaultSecondaryInset = isPeekSecondary ? CARD_INSET : 0;
   const defaultSecondaryGap = isPeekSecondary ? ITEM_GAP : 0;
-  const resolvedItemWidth = itemWidth ?? Math.max(0, resolvedWidth - defaultSecondaryInset);
-  const resolvedItemGap = itemGap ?? defaultSecondaryGap;
-  const snapInterval = resolvedItemWidth + resolvedItemGap;
+
+  // Explicitly resolve layout tokens
+  const finalItemGap = (typeof itemGap === 'number') ? itemGap : defaultSecondaryGap;
+  const finalItemWidth = (typeof itemWidth === 'number') ? itemWidth : Math.max(0, resolvedWidth - defaultSecondaryInset);
+  const snapInterval = finalItemWidth + finalItemGap;
+
   const horizontalPadding = isSecondary ? Math.max(0, resolvedWidth / 2 - snapInterval / 2) : 0;
   const decelerationRate = isSecondary ? 'normal' : 'fast';
   const snapAlignment = isSecondary ? 'center' : 'start';
   const styles = React.useMemo(() => createStyles(theme, isCompactSecondary), [theme, isCompactSecondary]);
+
+  // Handle programmatic scrolling in a dedicated effect to avoid "property is not writable"
+  React.useEffect(() => {
+    if (count > 1 && !isInteracting) {
+      const timeout = setTimeout(() => {
+        InteractionManager.runAfterInteractions(() => {
+          if (flatListRef.current && typeof (flatListRef.current as any).scrollToIndex === 'function') {
+            try {
+              flatListRef.current.scrollToIndex({
+                index: activeIndex,
+                animated: true,
+              });
+            } catch (err) {
+              // Ignore scrolling errors during mount/unmount
+            }
+          }
+        });
+      }, 0);
+      return () => clearTimeout(timeout);
+    }
+    return undefined;
+  }, [activeIndex, isInteracting, count]);
+
+  // --- Autoplay Timer ---
+  React.useEffect(() => {
+    if (count <= 1 || !autoPlayInterval || isInteracting) {
+      return undefined;
+    }
+
+    const intervalId = setInterval(() => {
+      const nextIndex = (activeIndex + 1) % count;
+      setActiveIndex(nextIndex);
+      if (onIndexChange) onIndexChange(nextIndex);
+    }, autoPlayInterval);
+
+    return () => clearInterval(intervalId);
+  }, [count, autoPlayInterval, isInteracting, activeIndex, onIndexChange]);
+
+  const onScrollBeginDrag = React.useCallback(() => {
+    setIsInteracting(true);
+    if (interactionTimerRef.current) {
+      clearTimeout(interactionTimerRef.current);
+    }
+  }, []);
+
+  const onScrollEndDrag = React.useCallback(() => {
+    if (interactionTimerRef.current) {
+      clearTimeout(interactionTimerRef.current);
+    }
+    interactionTimerRef.current = setTimeout(() => {
+      setIsInteracting(false);
+    }, resumeAfterMs ?? DEFAULT_RESUME_AFTER_MS);
+  }, [resumeAfterMs]);
 
   const toRealIndex = React.useCallback(
     (loopedIndex: number) => {
@@ -94,7 +160,9 @@ export function BannerCarousel({
   const onMomentumScrollEnd = React.useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const next = computeIndex(event.nativeEvent.contentOffset.x);
-      setActiveIndex(toRealIndex(next));
+      const realIndex = toRealIndex(next);
+      setActiveIndex(realIndex);
+      onIndexChange?.(realIndex);
     },
     [computeIndex, toRealIndex],
   );
@@ -179,7 +247,7 @@ export function BannerCarousel({
       return (
         <View style={[styles.itemWrap, { width: snapInterval, height }]}>
           <Pressable
-            style={{ width: resolvedItemWidth, height }}
+            style={{ width: finalItemWidth, height }}
             onPress={() => {
               item.onPress?.();
               onBannerPress?.(item);
@@ -190,7 +258,7 @@ export function BannerCarousel({
                 styles.card,
                 isSecondary ? styles.cardSecondary : styles.cardMain,
                 {
-                  width: resolvedItemWidth,
+                  width: finalItemWidth,
                   height,
                   backgroundColor: cardBackground,
                 },
@@ -287,7 +355,7 @@ export function BannerCarousel({
         </View>
       );
     },
-    [height, onBannerPress, resolvedItemWidth, scrollX, snapInterval, styles, theme],
+    [height, onBannerPress, finalItemWidth, scrollX, snapInterval, styles, theme],
   );
 
   const handleLayout = React.useCallback(
@@ -309,6 +377,7 @@ export function BannerCarousel({
   return (
     <View onLayout={handleLayout} style={[styles.root, { width: widthProp ?? '100%', height: height + (isSecondary ? (isCompactSecondary ? spacing[2] : spacing[4]) : 0) }, style]}>
       <FlatList
+        ref={flatListRef}
         horizontal
         data={banners}
         keyExtractor={keyExtractor}
@@ -333,6 +402,8 @@ export function BannerCarousel({
         onScroll={onScroll}
         scrollEventThrottle={16}
         onMomentumScrollEnd={onMomentumScrollEnd}
+        onScrollBeginDrag={onScrollBeginDrag}
+        onScrollEndDrag={onScrollEndDrag}
       />
 
       {count > 1 ? (

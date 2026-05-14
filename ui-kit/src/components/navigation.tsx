@@ -4,17 +4,17 @@ import { colorPalette, resolveRowDirection, type Direction, spacing, withAlpha }
 import { Surface, Text } from '../primitives';
 import { Icon } from './icons';
 
-// Dynamic safe-area insets loader
+// Dynamic safe-area insets loader with robust fallbacks
 let useSafeAreaInsets: () => { top: number; bottom: number; left: number; right: number } = () => ({ top: 0, bottom: 0, left: 0, right: 0 });
 try {
-  // eslint-disable-next-line no-eval
-  const r: any = eval('require');
-  const safe = r('react-native-safe-area-context');
-  if (safe && typeof safe.useSafeAreaInsets === 'function') {
-    useSafeAreaInsets = safe.useSafeAreaInsets;
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const safe = require('react-native-safe-area-context');
+  const loader = safe?.useSafeAreaInsets || (safe?.default && safe.default.useSafeAreaInsets);
+  if (typeof loader === 'function') {
+    useSafeAreaInsets = loader;
   }
 } catch (err) {
-  // fallback is zero
+  // Safe Area Context might not be linked, use zero fallbacks
 }
 
 // ----- Modern Premium Header -----
