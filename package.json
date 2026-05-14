@@ -21,7 +21,7 @@
     "precommit:fast": "pnpm -w exec tsc --noEmit && node tools/guards/guard-empty-placeholder-zero-byte-files.mjs && node tools/guards/guard-typescript-strictness.mjs",
     "guard:protected-tokens": "node tools/guards/guard-bthwani-protected-tokens.mjs",
     "guard:tamagui-law": "node tools/guards/guard-tamagui-governance-law.mjs",
-    "guard:tamagui-import-boundary": "node tools/guards/guard-tamagui-import-boundary.mjs",
+    "guard:tamagui-import-boundary": "node tools/guards/guard-ui-architecture-boundary.mjs",
     "lint": "eslint . --max-warnings 0",
     "tamagui:version": "tamagui --version",
     "tamagui:build": "tamagui build",

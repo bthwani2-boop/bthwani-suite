@@ -1,0 +1,1034 @@
+نفّذ هذا الطلب داخل C:\bthwani-suite على الفرع الحالي:
+ghb/0140-20260514-202147-dsh
+
+نفّذ إغلاقًا نهائيًا مرحليًا ومثبتًا بالأدلة لكل ما تبقى من BThwani Appearance System، بدقة عالية، وبمنهجية تقنية حقيقية، بدون قفز، بدون تعميم عشوائي، وبدون ادعاء PASS/CLOSED/100% قبل الأدلة.
+
+المهمة:
+إغلاق نظام المظهر والألوان والـ Dark Glass / Light Premium لكل منصة BThwani من الألف إلى الياء:
+- app-client
+- app-partner
+- app-captain
+- app-field
+- control-panel
+- webapp
+- website
+- dsh
+- wlt
+- knz
+- arb
+- amn
+- esf
+- mrf
+- snd
+- kwd
+- كل service-owned visible surfaces
+- كل الشاشات والصفحات والمكونات الظاهرة للمستخدم
+- أي شاشة/صفحة/Surface/Component جديد مستقبلًا
+
+السياق التشخيصي الملزم:
+التنفيذ الحالي جزئي وليس PASS.
+المشاكل المثبتة:
+1. app-client مربوط جزئيًا لكن MobileRoot ما يزال themeMode="light" في مواضع.
+2. app-client/shell/appearance يستخدم syncThemeMode=false، ما قد يفصل useTheme عن appearanceMode.
+3. كثير من المكونات ما تزال تعتمد useTheme/colorPalette/hardcoded colors بطريقة تكسر darkGlass.
+4. ProductCard يحتوي hardcoded colors ويمنع ظهور rim-light الفاخر.
+5. MySpaceScreen يحتوي نصًا قديمًا يقول إن darkGlass مفعّل على شاشة المتجر فقط.
+6. StoreScreen يستخدم appearance tokens جزئيًا لكنه لم يغلق rim-light والقراءة والتباين.
+7. app-partner/app-captain/app-field غير مغلقة.
+8. control-panel/webapp/website غير مغلقة.
+9. الخدمات غير dsh لم تُغلق.
+10. لا توجد screenshots كافية لإثبات الإغلاق البصري.
+
+القاعدة المعمارية غير القابلة للكسر:
+Screen / Surface / App
+→ @bthwani/ui-kit public exports
+→ Tamagui internally inside ui-kit only.
+
+الممنوع العام:
+- ممنوع direct Tamagui خارج @bthwani/ui-kit.
+- ممنوع local design system.
+- ممنوع local tokens أو local palettes.
+- ممنوع hardcoded random colors داخل screens/surfaces/apps إذا يوجد token مناسب.
+- ممنوع global replace أعمى.
+- ممنوع redesign شامل لكل شاشة.
+- ممنوع تعديل backend/API/contracts/runtime.
+- ممنوع تغيير routing/flows إلا بأضيق حد لازم لإظهار المظهر أو إصلاح كسر واضح.
+- ممنوع استخدام أو ذكر أي repo/path قديم باسم bth؛ الريبو الحالي فقط C:\bthwani-suite.
+- ممنوع إضافة dependency إلا ضمن سياسة التخزين المحددة لاحقًا.
+- ممنوع ادعاء DONE/PASS/CLOSED/100% بدون Git evidence + TypeScript + screenshots.
+
+تعريف المظهرين النهائي:
+
+A) Light Premium / فاتح أبيض
+- الافتراضي في كل المنصة.
+- كل شيء فاتح افتراضيًا.
+- الخلفيات white/off-white/warm neutrals.
+- البطاقات والأسطح الأساسية فاتحة وواضحة.
+- النصوص الأساسية deepBlue #0A2F5C أو tokens مشتقة منه.
+- CTA والحالة المختارة orange #FF500D بجرعة محدودة.
+- لا تجعل أي شاشة glass افتراضيًا في الوضع الفاتح.
+- أي Glass في الفاتح لا يقرره الوكيل. يحدده الإنسان/المطور أثناء مراجعة شاشة بعينها.
+- المسموح فقط rim-light خفيف جدًا من tokens الرسمية إذا كان لا يحول السطح إلى glass كامل.
+
+B) Dark Glass / داكن زجاجي
+- كل المنصة تتحول إلى dark premium.
+- ليس كل عنصر glass كثيف.
+- المطلوب:
+  dark everywhere + role-based dark premium/glass surfaces.
+- الشاشات التجارية والبصرية تستخدم glass/rim-light أكثر.
+- الشاشات الوظيفية والجداول والنماذج تستخدم dark premium readable surfaces.
+- لوحة التحكم تكون dark premium تحليلية ومقروءة، لا glass مزعج.
+- ممنوع black flat theme.
+- ممنوع نص داكن على خلفية داكنة.
+- ممنوع white cards صلبة داخل darkGlass.
+- ممنوع glass فوق glass.
+- ممنوع ضعف تباين.
+
+تعريف Premium Glass Rim-light:
+- إطار ضوئي شفاف وناعم يعطي العناصر عمقًا وفخامة.
+- في Light Premium: خفيف جدًا كلمعة راقية.
+- في Dark Glass: أوضح كـ rim-light زجاجي ناعم يبرز الطبقات.
+- يجب أن يأتي من @bthwani/ui-kit tokens/roles/variants:
+  glassBorder
+  borderStrong
+  rimLightSubtle
+  rimLightStrong
+  shadowSoft
+  shadowPremium
+  glassSurface
+  glassSurfaceStrong
+  أو equivalent قائم.
+- ممنوع glow مبالغ.
+- ممنوع حدود برتقالية ثقيلة.
+- ممنوع blur ثقيل أو dependency جديدة للـ blur.
+
+==================================================
+PHASE 0 — Discovery / تشخيص قبل أي تعديل
+==================================================
+
+افحص قبل أي تعديل:
+
+جذور التطبيقات:
+- app-client/runtime/App.tsx
+- app-partner/runtime/App.tsx
+- app-captain/runtime/App.tsx
+- app-field/runtime/App.tsx
+- control-panel/runtime/app/layout.tsx
+- webapp/runtime/app/layout.tsx
+- website/runtime/app/layout.tsx
+
+مصادر UI Kit:
+- ui-kit/src/foundation.ts
+- ui-kit/src/appearance.ts
+- ui-kit/src/providers.tsx
+- ui-kit/src/primitives.tsx
+- ui-kit/src/components/card.tsx
+- ui-kit/src/components/button.tsx
+- ui-kit/src/components/appearance.tsx
+- ui-kit/src/components/index.ts
+- ui-kit/src/index.ts
+- أي ملفات tokens/theme/provider/next/mobile مرتبطة
+
+شاشات app-client الحالية:
+- dsh/frontend/app-client/DshClientSurface.tsx
+- dsh/frontend/app-client/screens/MySpaceScreen.tsx
+- dsh/frontend/app-client/screens/StoreScreen.tsx
+- dsh/frontend/app-client/screens/StoreItemsScreen.tsx
+- dsh/frontend/app-client/screens/CartScreen.tsx
+- dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx
+- dsh/frontend/app-client/screens/OperationScreens.tsx
+- أي شاشة app-client مرئية أخرى
+
+الخدمات والسطوح:
+- dsh
+- wlt
+- knz
+- arb
+- amn
+- esf
+- mrf
+- snd
+- kwd
+
+ابحث نصيًا عن:
+- themeMode="light"
+- syncThemeMode={false}
+- useTheme()
+- useBThwaniAppearance()
+- BThwaniAppearanceProvider
+- defaultBThwaniAppearanceMode
+- lightPremium
+- darkGlass
+- colorPalette
+- rawColorPalettes
+- semanticColorRoles
+- '#000'
+- '#000000'
+- '#fff'
+- '#FFFFFF'
+- '#f3f4f6'
+- '#fed7aa'
+- '#fef2f2'
+- '#dc2626'
+- rgba(255
+- backgroundColor:
+- borderColor:
+- shadowColor:
+- المظهر
+- فاتح أبيض
+- داكن زجاجي
+
+افحص تقرير color drift إن وجد:
+tools/registry/runs/*/color-drift-report.md
+
+إذا لم يوجد التقرير:
+- لا تتوقف.
+- نفّذ scan محدود للألوان hardcoded المؤثرة.
+- لا تنشئ تقريرًا طويلًا إلا إذا كان ضروريًا.
+- اعرض فقط الألوان التي تكسر light/dark أو تخالف tokens.
+
+قبل أي تعديل اعرض:
+- الملفات التي ستلمسها.
+- سبب لمس كل ملف.
+- هل التغيير color foundation أو component contract أو bridge أو screen fix أو app adoption.
+- هل تحتاج dependency تخزين لأي تطبيق.
+- المخاطر المحتملة.
+إذا احتجت تغييرًا خارج النطاق، توقف واكتب BLOCKED للمرحلة المعنية فقط.
+
+==================================================
+PHASE 0.5 — Color System Foundation Gate
+==================================================
+
+الهدف:
+تصحيح نظام الألوان قبل إصلاح الشاشات حتى لا يكون darkGlass ترقيعًا فوق light/hardcoded colors.
+
+المبدأ:
+Deep Blue #0A2F5C
+Orange #FF500D
+White #FFFFFF
+
+هي brand anchors فقط، وليست قيدًا حرفيًا يجعل كل ألوان المنصة ثلاثة ألوان فقط.
+
+المطلوب داخل @bthwani/ui-kit:
+1. أنشئ أو حسّن نظام ألوان theme-aware يدعم صراحة:
+   - lightThemeColors
+   - darkThemeColors
+   أو naming قائم equivalent بشرط وضوح قيم light/dark لكل role.
+
+2. يجب توفير أو تحسين roles عامة مثل:
+   - pageBackground
+   - surfacePrimary
+   - surfaceSecondary
+   - surfaceRaised
+   - surfaceInset
+   - textPrimary
+   - textSecondary
+   - textMuted
+   - borderSubtle
+   - borderStrong
+   - accentBlue
+   - accentOrange
+   - ctaPrimary
+   - ctaSecondary
+   - success
+   - warning
+   - danger
+   - info
+   - overlay
+   - focusRing
+   - disabledSurface
+   - disabledInk
+   - glassSurface
+   - glassSurfaceStrong
+   - glassBorder
+   - rimLightSubtle
+   - rimLightStrong
+   - shadowSoft
+   - shadowPremium
+
+3. Light theme:
+   - white/warm neutrals كأساس.
+   - deepBlue للنصوص والهوية والعناوين.
+   - orange للـ CTA والتأكيد بجرعة محدودة.
+   - rim-light خفيف جدًا.
+   - لا glass افتراضيًا إلا بقرار تصميم بشري.
+
+4. Dark theme:
+   - لا تستخدم #0A2F5C كخلفية عامة عمياء إذا جعل الشاشة ثقيلة.
+   - اشتق navy/ink درجات أعمق وأنظف.
+   - النصوص white/near-white.
+   - orange accent محدود وواضح.
+   - rim-light أوضح وناعم.
+   - لا تجعل dark mode مجرد inversion.
+   - لا black flat theme.
+
+5. أنشئ palette مشتقة ومنظمة:
+   - navy/deepBlue درجات متعددة للخلفيات الثقيلة والـ headers.
+   - orange/coral/peach درجات للـ CTA/highlights.
+   - warm neutral/surface درجات للخلفيات والكروت.
+   - success/warning/danger/info للمعنى فقط.
+
+6. امنع الألوان البعيدة:
+   - purple
+   - pink
+   - cyan
+   - harsh random blue
+   - random green/red/yellow
+   إلا إذا كانت semantic أو data visualization ومبررة.
+
+7. أي لون جديد يجب أن يكون داخل:
+   - ui-kit tokens
+   - semantic roles
+   - appearance roles
+   وليس hardcoded داخل screen/surface/app.
+
+8. لا تعمل global replace أعمى.
+كل استبدال يجب أن يكون semantic:
+- نص → textPrimary/textSecondary/textMuted
+- خلفية → pageBackground/surface*
+- حدود → borderSubtle/borderStrong/glassBorder/rimLight
+- CTA → ctaPrimary/accentOrange
+- حالة → success/warning/danger/info
+- زجاج/حافة → glass*/rimLight*/shadowPremium
+
+الممنوع:
+- ممنوع الالتزام الأعمى بثلاثة ألوان فقط.
+- ممنوع جعل كل شيء #0A2F5C / #FF500D / #FFFFFF.
+- ممنوع random colors.
+- ممنوع local palettes.
+- ممنوع تعديل dependencies أو lockfiles.
+- ممنوع redesign كامل أو refactor معماري.
+
+Acceptance:
+- يوجد lightThemeColors/darkThemeColors أو equivalent واضح.
+- كل role مهم له مقابل light/dark.
+- orange لا يطغى.
+- deepBlue يستخدم بذكاء.
+- dark mode ليس inversion.
+- contrast للنصوص والأزرار والبطاقات والحدود مقبول.
+- TypeScript يمر.
+
+لا تنتقل إلى Phase 0.6 قبل إغلاق هذه المرحلة.
+
+==================================================
+PHASE 0.6 — Component State Color Contract
+==================================================
+
+الهدف:
+بناء نظام ألوان كامل لكل مكونات BThwani وحالاتها، وليس فقط palette عامة. يجب أن يكون الناتج فخمًا، فاخرًا، جذابًا، جميلًا، مريحًا بصريًا، عمليًا، ومقروءًا في lightPremium و darkGlass.
+
+المبدأ:
+الألوان الأساسية brand anchors فقط. المطلوب نظام مشتق ومنظم:
+- غني بدون فوضى.
+- فاخر بدون ثقل.
+- جذاب بدون صراخ بصري.
+- مريح بدون بهتان.
+- عملي بدون ألوان عشوائية.
+
+يجب أن تكون كل ألوان المكونات theme-aware ولها مقابل light/dark.
+
+المطلوب تغطيته داخل @bthwani/ui-kit semantic/component tokens:
+
+1) Buttons:
+- primary
+- secondary
+- tertiary/ghost
+- outline
+- destructive
+- success/confirm
+- disabled
+- pressed
+- hover للويب
+- focus
+- loading
+- text/icon/border/background لكل حالة
+
+قاعدة الأزرار:
+- لا تجعل كل الأزرار orange.
+- لا تجعل كل الأزرار deepBlue.
+- Primary CTA:
+  - deepBlue عند الحاجة لهدوء وفخامة وتحكم.
+  - orange عند CTA تجاري/شراء/طلب/تأكيد مهم.
+  - orange محدود ولا يطغى.
+- Secondary = surface واضح + border ناعم + text قوي.
+- Ghost = خفيف بلا خلفية ثقيلة.
+- Destructive = danger semantic فقط، لا orange.
+- Disabled = neutral muted.
+- Pressed/Focus/Loading = مشتقة من token، لا opacity عشوائي.
+
+2) Cards / Surfaces:
+- default card
+- elevated card
+- selected card
+- highlighted card
+- disabled card
+- interactive card
+- store/product/order/service/dashboard cards
+- glass card
+- dark premium card
+- rim-light border
+- shadowSoft
+- shadowPremium
+
+3) Inputs / Forms:
+- input background
+- border default/focus/error
+- placeholder
+- label
+- helper text
+- disabled surface/text
+- validation success/warning/error
+- field group background
+- form section surface
+
+4) Navigation:
+- top header
+- secondary header
+- bottom tab
+- sidebar/control-panel nav
+- active/inactive item
+- hover/pressed item
+- badge counter
+- nav icon/text active/inactive
+- divider/border
+
+5) Badges / Chips / Tags:
+- neutral
+- brand
+- offer/promo
+- pro/premium
+- selected/unselected
+- disabled
+- status success/warning/danger/info
+- glass chip
+- dark chip
+
+6) Alerts / Toasts / Banners:
+- info
+- success
+- warning
+- danger
+- promotion
+- empty-state hint
+- offline
+- loading
+- recoverable error
+- background/border/title/body/icon
+
+7) Lists / Rows:
+- default row
+- pressed row
+- selected row
+- disabled row
+- divider
+- trailing action
+- chevron/icon
+- row title/subtitle/meta
+- destructive swipe/action
+- success/action-confirm row
+
+8) Overlays:
+- modal backdrop
+- modal surface
+- sheet background
+- popover
+- tooltip
+- floating action surface
+- skeleton/loading shimmer
+- translucent overlay
+- hero overlay
+- dark glass overlay
+- light subtle overlay
+
+9) Commerce-specific:
+- price
+- old price
+- discount
+- delivery fee
+- rating
+- favorite icon active/inactive
+- cart indicator
+- availability open/closed
+- busy/unavailable
+- sponsored/promo marker
+- offer ribbon
+- store logo ring
+- product image frame
+- delivery option selected/unselected
+- BThwani Pro badge
+
+10) Control Panel:
+- KPI cards
+- chart surfaces
+- chart grid
+- chart axes
+- table header
+- table rows
+- selected/hover rows
+- filters
+- tabs
+- risk/health/operational status
+- action toolbar
+- analytics panels
+- empty table
+- warning panels
+- audit/change indicators
+
+Charts:
+إذا احتاجت الرسوم أكثر من لون:
+- لا تستخدم random purple/pink/cyan كزينة.
+- أنشئ dataViz tokens منظمة، هادئة، accessible، ومبررة للتحليل فقط.
+- يجب أن تكون منسجمة مع هوية BThwani وليست landing page صاخبة.
+
+Quality / Luxury Visual Contract:
+كل token يجب أن يخدم:
+- وضوح.
+- فخامة.
+- راحة بصرية.
+- تباين صحيح.
+- هوية BThwani.
+- معنى semantic.
+- عمق زجاجي/rim-light.
+- تحليل وتشغيل في control-panel.
+
+الممنوع:
+- ممنوع hardcoded colors داخل screens/surfaces/apps إذا يوجد token مناسب.
+- ممنوع purple/pink/cyan/random blue كزينة.
+- ممنوع تحويل كل شيء للثلاثة ألوان فقط.
+- ممنوع استخدام orange كخطر/destructive.
+- ممنوع استخدام success/warning/danger/info للزينة.
+- ممنوع opacity عشوائي بلا token.
+- ممنوع glass border/glow مبالغ.
+- ممنوع chart palette صاخبة.
+- ممنوع local component color maps خارج ui-kit.
+
+Implementation:
+1. راجع tokens الحالية في ui-kit.
+2. حدد component-state gaps.
+3. أضف أو حسّن component color roles في ui-kit فقط.
+4. اربط Button/Card/Surface/Input/Chip/Badge/Toast/List/Navigation/ProductCard/ControlPanel components بهذه tokens حسب المتاح.
+5. لا تنشئ redesign كامل.
+6. لا تغيّر API العام إلا عند الضرورة.
+7. لا تعمل global replace أعمى.
+8. أي استبدال داخل screens/surfaces/apps يجب أن يكون بسبب لون hardcoded يكسر light/dark أو يخالف component token واضح.
+
+Acceptance:
+- يوجد component-state color contract واضح داخل ui-kit.
+- كل component token له light/dark value.
+- الأزرار ليست كلها orange أو كلها deepBlue.
+- ProductCard/Store/Card/Chip/Button يمكنها استهلاك ألوان صحيحة.
+- Control-panel tokens مهنية وليست landing-style.
+- Commerce tokens تغطي price/discount/rating/favorite/cart/availability.
+- darkGlass مقروء ومريح وليس black flat.
+- lightPremium نظيف ومريح وليس أبيض ميت.
+- rim-light فاخر وناعم في الثيمين.
+- TypeScript يمر.
+- لا dependency changes.
+
+لا تنتقل إلى ProductCard أو StoreScreen قبل إغلاق هذه المرحلة.
+
+==================================================
+PHASE 1 — إصلاح Theme Bridge الحالي قبل التعميم
+==================================================
+
+الهدف:
+إصلاح سبب تشوه الخطوط في darkGlass داخل app-client قبل تعميم النظام.
+
+المطلوب:
+1. أصلح انفصال appearanceMode عن themeMode.
+2. لا تترك MobileRoot على themeMode="light" عندما يكون mode = darkGlass.
+3. لا تترك BThwaniAppearanceProvider يعمل مع syncThemeMode=false إذا كان ذلك يسبب انفصال useTheme عن appearance.
+4. اجعل source of truth للمظهر واحدًا في app-client.
+5. useTheme() و useBThwaniAppearance() يجب أن ينتجا ألوانًا متوافقة في darkGlass.
+6. default = lightPremium.
+7. التخزين يبقى عبر AsyncStorage الموجود في app-client فقط.
+8. لا تضف dependency جديدة في هذه المرحلة.
+
+خيارات التنفيذ المقبولة:
+- رفع state للمظهر إلى root wrapper قبل MobileRoot وتمرير themeMode ديناميكيًا:
+  lightPremium → themeMode="light"
+  darkGlass → themeMode="dark"
+- أو استخدام آلية رسمية داخل ui-kit تجعل BThwaniAppearanceProvider يزامن themeMode.
+- أو إصلاح syncThemeMode بشكل آمن إذا كان public API يدعمه.
+
+الممنوع:
+- لا تجعل AppClientAppearanceProvider wrapper داخليًا لا يؤثر على MobileRoot.
+- لا تترك useTheme في light بينما appearance في darkGlass.
+- لا تنشئ theme provider محلي ينافس ui-kit.
+- لا تكسر language="ar" ولا RTL ولا safe-area.
+
+Acceptance:
+- app-client عند darkGlass لا يبقى root theme light.
+- useTheme و appearance tokens لا يتعارضان.
+- لا تظهر نصوص light/dark مختلطة بسبب provider.
+- TypeScript يمر.
+
+==================================================
+PHASE 2 — إصلاح ui-kit ProductCard + Rim-light
+==================================================
+
+المطلوب:
+1. راجع ui-kit/src/components/card.tsx.
+2. استخدم roles الناتجة من Phase 0.5 و Phase 0.6.
+3. أزل/استبدل hardcoded colors المؤثرة:
+   - '#000'
+   - '#000000'
+   - '#f3f4f6'
+   - '#fed7aa'
+   - '#fef2f2'
+   - '#dc2626'
+   - rgba(255,255,255,...)
+   - أي background/border/shadow ثابت يكسر darkGlass.
+4. اجعل ProductCard يستهلك theme/appearance/component tokens.
+5. أضف rim-light:
+   - lightPremium = خفيف جدًا.
+   - darkGlass = واضح وناعم.
+6. لا تغيّر API العام إلا إذا كان ضروريًا.
+7. لا تجعل ProductCard كله glass في lightPremium.
+8. في darkGlass:
+   - background = dark premium/glass حسب role.
+   - logo/favorite/add badges لا تبقى white hardcoded.
+   - discount chip لا يبقى light red hardcoded إذا كسر dark.
+   - text readable.
+   - favorite/add badges readable.
+
+Acceptance:
+- ProductCard لا يحتوي hardcoded colors تكسر darkGlass.
+- rim-light ظاهر من tokens.
+- lightPremium نظيف.
+- darkGlass مقروء وفخم.
+- TypeScript يمر.
+
+==================================================
+PHASE 3 — إصلاح MySpaceScreen / تبويب المظهر
+==================================================
+
+المطلوب:
+1. في dsh/frontend/app-client/screens/MySpaceScreen.tsx:
+   - غيّر نص darkGlass القديم.
+   - النص الجديد:
+     "مظهر داكن فاخر يطبّق على التطبيق كاملًا، مع حواف زجاجية وطبقات واضحة بدون إزعاج بصري."
+2. اجعل تبويب "المظهر" يدعم light/dark بدون تشوه.
+3. استخدم AppearanceOptionCard إن كان مناسبًا.
+4. إن لم يناسب، استخدم Surface/Card/Text/Button الرسمية.
+5. أزل hardcoded colors التي تكسر darkGlass أو اربطها بـ tokens.
+6. أصلح فقط:
+   - النصوص غير المقروءة.
+   - الخلفيات المتعارضة.
+   - البطاقات البيضاء داخل darkGlass.
+   - rim-light في cards المهمة.
+   - RTL cluster.
+7. لا تعيد تصميم MySpace من الصفر.
+
+Acceptance:
+- حسابي/المظهر صحيح في light.
+- حسابي/المظهر صحيح في darkGlass.
+- لا نص قديم يقول إن darkGlass للمتجر فقط.
+- لا تشوه خطوط.
+- لا بطاقة بيضاء صلبة داخل darkGlass.
+- TypeScript يمر.
+
+==================================================
+PHASE 4 — إصلاح StoreScreen / Golden Slice
+==================================================
+
+المطلوب:
+1. في dsh/frontend/app-client/screens/StoreScreen.tsx:
+   - راجع appearanceChrome.
+   - كل لون يجب أن يأتي من roles الناتجة من Phase 0.5/0.6.
+   - ممنوع colorPalette أو hardcoded hex إذا كان يكسر light/dark.
+   - أصلح overlay/text/card/chips/action colors.
+   - أظهر rim-light واضحًا وناعمًا.
+2. Store hero:
+   - darkGlass = hero dark premium + glass chips + rim-light.
+   - lightPremium = فاتح عام، ولا glass إلا الموجود/المحدد مسبقًا.
+3. delivery options:
+   - صف واحد فقط.
+   - توصيل المتجر
+   - استلم بنفسك
+   - توصيل بثواني
+   - بثواني برو badge/ميزة فقط وليس خيار توصيل.
+4. ProductCard يرث إصلاح Phase 2.
+5. لا black flat.
+6. لا text dark on dark.
+7. لا border أبيض قاسٍ.
+8. لا glass زائد.
+9. لا clipping/overflow.
+10. RTL صحيح:
+   - النص العربي يمين.
+   - icon/text في نفس cluster.
+   - لا space-between يفصلهم.
+
+Acceptance:
+- StoreScreen lightPremium صحيح.
+- StoreScreen darkGlass صحيح.
+- rim-light ظاهر.
+- لا تشوه خطوط.
+- لا تكرار delivery options.
+- TypeScript يمر.
+
+==================================================
+PHASE 5 — Gate بصري قبل التعميم
+==================================================
+
+بعد Phases 0.5–4 شغّل:
+
+git --no-pager status --short
+git --no-pager diff --stat
+git --no-pager diff --name-status
+git --no-pager diff --check
+pnpm -w exec tsc --noEmit
+
+ثم اطلب screenshots:
+1. app-client حسابي/المظهر light.
+2. app-client حسابي/المظهر dark.
+3. app-client StoreScreen light.
+4. app-client StoreScreen dark.
+5. MySpace dark.
+6. ProductCard dark داخل قائمة منتجات.
+
+لا تنتقل إلى Phase 6 حتى:
+- TypeScript PASS.
+- diff check PASS.
+- screenshots تثبت سلامة الخطوط.
+- screenshots تثبت ظهور rim-light.
+- screenshots تثبت غياب التشوهات الواضحة.
+
+إذا لم تتوفر screenshots:
+اكتب NEEDS_VISUAL_EVIDENCE ولا تدّعِ CLOSED.
+
+==================================================
+PHASE 6 — تعميم نفس Bridge على باقي تطبيقات الموبايل
+==================================================
+
+بعد PASS بصري على app-client فقط، نفّذ بالتتابع:
+
+A) app-partner
+B) app-captain
+C) app-field
+
+لكل تطبيق:
+1. افحص root App.tsx و shell/mobile-entry.
+2. أضف Appearance adapter بنفس النمط المصحح.
+3. لا تترك MobileRoot themeMode="light" عند darkGlass.
+4. أضف حسابي/المظهر إن وجد.
+5. إذا لا توجد شاشة حساب/إعدادات:
+   - أنشئ أضيق شاشة/قسم باسم "المظهر" أو "الإعدادات".
+   - لا تنشئ حساب وهمي كامل.
+   - لا تضف profile وهمي.
+6. استخدم AsyncStorage فقط إذا مطلوب:
+   pnpm --filter @bthwani/app-partner add @react-native-async-storage/async-storage@3.0.2
+   pnpm --filter @bthwani/app-captain add @react-native-async-storage/async-storage@3.0.2
+   pnpm --filter @bthwani/app-field add @react-native-async-storage/async-storage@3.0.2
+7. لا تستخدم pnpm -w add.
+8. لا تضف dependency إلا للتطبيق الذي يحتاجها فعليًا.
+9. طبّق darkGlass حسب القاعدة:
+   - وظيفي = dark premium readable.
+   - بصري/تجاري = glass/rim-light حسب role.
+10. لا تعيد تصميم الشاشات.
+11. أصلح فقط الخلفية/النص/card/border/RTL.
+
+Acceptance لكل تطبيق:
+- root provider صحيح.
+- themeMode لا يبقى light عند darkGlass.
+- تبويب/قسم المظهر موجود.
+- الاختيار محفوظ.
+- lightPremium فاتح.
+- darkGlass داكن مقروء.
+- لا local design system.
+- TypeScript يمر قبل الانتقال للتطبيق التالي.
+
+==================================================
+PHASE 7 — control-panel
+==================================================
+
+المطلوب:
+1. افحص control-panel/runtime/app/layout.tsx.
+2. لا تترك WebRootLayout themeMode="light" عند darkGlass.
+3. أنشئ client-safe appearance provider/bridge.
+4. استخدم localStorage مع SSR/client boundary.
+5. أضف الحساب/الإعدادات → المظهر.
+6. إن لم توجد صفحة إعدادات:
+   - أنشئ أضيق settings route/section للمظهر فقط.
+   - لا تغيّر IA بشكل واسع.
+7. darkGlass:
+   - dark premium readable.
+   - الجداول والنماذج ليست glass كثيف.
+   - KPI/cards/summary panels يمكن أن تستخدم rim-light خفيف.
+   - charts تستخدم dataViz tokens.
+   - لا black flat.
+   - لا text dark on dark.
+   - لا white cards.
+8. lightPremium:
+   - لوحة فاتحة واضحة ومهنية.
+9. لا تكسر sidebar/navigation/layout.
+10. لا تكسر Next/SSR.
+
+Acceptance:
+- control-panel يدعم light/dark.
+- localStorage آمن.
+- tables/forms/charts مقروءة.
+- لا glass مزعج.
+- TypeScript يمر.
+
+==================================================
+PHASE 8 — webapp / website
+==================================================
+
+Split strategy:
+لا تخترع حسابًا كبيرًا في webapp/website إذا غير موجود، لكن يجب أن يكون المظهر قابلًا للاستهلاك والتفعيل.
+
+webapp:
+1. افحص layout/root.
+2. أضف appearance bridge آمن.
+3. إن وجد حساب/إعدادات، أضف "المظهر".
+4. إن لم يوجد:
+   - أضف أضيق settings/toggle surface منطقي.
+   - أو header/footer toggle صغير غير مزعج إذا كان مناسبًا.
+5. localStorage آمن.
+6. lightPremium/darkGlass ينعكسان على الصفحات.
+7. لا تكسر SSR/client boundary.
+
+website:
+1. افحص إن كان landing عام فقط.
+2. لا تضف toggle مزعج في منتصف landing.
+3. إن وجد header/footer مناسب، أضف toggle بسيط.
+4. إن لم يوجد مكان مناسب، أضف mechanism آمن واكتب DEFERRED لواجهة التبديل مع السبب.
+5. website pages يجب ألا تكسر darkGlass إذا تم تفعيله.
+6. لا تخترع account flow.
+
+Acceptance:
+- webapp DONE أو BLOCKED/DEFERRED مثبت.
+- website DONE أو DEFERRED مثبت.
+- لا ضجيج بصري.
+- TypeScript يمر.
+
+==================================================
+PHASE 9 — الخدمات والسطوح service-owned
+==================================================
+
+راجع:
+- dsh
+- wlt
+- knz
+- arb
+- amn
+- esf
+- mrf
+- snd
+- kwd
+
+لكل خدمة:
+1. حدّد هل لديها visible surface.
+2. إذا لا:
+   - وثّق NO_VISIBLE_SURFACE.
+   - لا تعدّل عشوائيًا.
+3. إذا نعم:
+   - أي screen/surface يستهلك provider/tokens من الأعلى.
+   - لا local theme.
+   - لا hardcoded colors تكسر darkGlass.
+   - لا direct Tamagui.
+   - lightPremium فاتح.
+   - darkGlass dark premium/glass حسب role.
+4. لا تجعل التنفيذ محصورًا في dsh.
+5. أصلح أي service-owned screen مستخدمة داخل apps/web.
+
+Acceptance:
+- كل service إما DONE أو NO_VISIBLE_SURFACE أو BLOCKED مثبت.
+- لا hardcoded colors مؤثرة.
+- لا local design system.
+- TypeScript يمر.
+
+==================================================
+PHASE 10 — Future Screens Contract
+==================================================
+
+أضف أضيق توثيق مناسب داخل repo أو governance/dev docs:
+
+أي شاشة/صفحة/Surface/Component جديد يجب أن:
+- يدعم lightPremium و darkGlass من البداية.
+- يستهلك provider/source الرسمي.
+- يستخدم @bthwani/ui-kit public exports فقط.
+- لا يستخدم local tokens أو local palettes.
+- لا يستخدم direct Tamagui خارج ui-kit.
+- لا يستخدم hardcoded colors.
+- يكون RTL-correct.
+- لا يحتوي text dark on dark.
+- لا يحتوي white card داخل darkGlass.
+- يتبع rim-light policy.
+- يستخدم component-state color tokens.
+- يمر TypeScript و diff check.
+أي شاشة جديدة لا تدعم المظهرين من البداية تعتبر غير مكتملة ولا تُقبل كـ DONE.
+
+لا تنشئ docs طويلة إذا يوجد مكان حوكمة مناسب. أضف أضيق توثيق ممكن.
+
+==================================================
+PHASE 11 — Final Verification
+==================================================
+
+بعد كل المراحل شغّل:
+
+git --no-pager status --short
+git --no-pager diff --stat
+git --no-pager diff --name-status
+git --no-pager diff --check
+pnpm -w exec tsc --noEmit
+
+ثم شغّل إذا كانت scripts موجودة:
+pnpm run guard:tamagui-import-boundary
+pnpm run guard:i18n-direction:mobile-control-panel
+
+لا تدّعِ نجاح guard إذا لم يتم تشغيله فعليًا.
+
+افحص:
+- لا direct Tamagui خارج ui-kit.
+- لا local design system.
+- لا local theme system مكرر.
+- لا hardcoded colors مؤثرة.
+- لا duplicate providers غير ضروري.
+- لا duplicate "المظهر".
+- لا source of truth مكرر.
+- لا text dark on dark.
+- لا white cards داخل darkGlass.
+- لا reset للثيم بعد إعادة فتح التطبيق.
+- لا TypeScript errors.
+- لا diff whitespace errors.
+- لا backend/API/contracts changes.
+
+==================================================
+PHASE 12 — Visual Evidence Required
+==================================================
+
+اطلب screenshots بعد التشغيل:
+
+app-client:
+1. حسابي/المظهر light.
+2. حسابي/المظهر dark.
+3. StoreScreen light.
+4. StoreScreen dark.
+5. MySpace dark.
+6. ProductCard dark.
+
+app-partner:
+7. حساب/مظهر light/dark.
+8. شاشة وظيفية dark.
+
+app-captain:
+9. حساب/مظهر light/dark.
+10. شاشة مهمة/طلب dark.
+
+app-field:
+11. حساب/مظهر light/dark.
+12. شاشة زيارة/نموذج dark.
+
+control-panel:
+13. الحساب/المظهر light.
+14. الحساب/المظهر dark.
+15. جدول/نموذج dark.
+16. dashboard/cards/charts dark.
+
+webapp:
+17. صفحة رئيسية/وظيفية light/dark.
+
+website:
+18. صفحة ظاهرة light/dark أو DEFERRED موثق.
+
+services:
+19. dsh visible screen dark.
+20. أي service-owned visible screen من غير dsh إن وجد.
+
+لا تدّعِ CLOSED/100% بدون الأدلة البصرية.
+
+==================================================
+FINAL ACCEPTANCE CRITERIA
+==================================================
+
+اكتب DONE فقط إذا:
+- Color System Foundation Gate PASS.
+- Component State Color Contract PASS.
+- lightThemeColors/darkThemeColors أو equivalent واضح.
+- Buttons/cards/inputs/navigation/badges/chips/alerts/lists/overlays/commerce/control-panel لها tokens theme-aware.
+- لا توجد component colors محلية مكررة داخل screens/surfaces/apps.
+- الألوان فخمة، فاخرة، جذابة، جميلة، ومريحة بصريًا، بلا ضجيج أو بهتان.
+- Phase 1 أصلحت theme bridge.
+- MobileRoot/WebRootLayout لم تعد ثابتة light عند darkGlass.
+- syncThemeMode أو بديله لم يعد يسبب انفصال useTheme عن appearance.
+- ProductCard يدعم darkGlass وrim-light.
+- MySpaceScreen لا يحتوي نصًا قديمًا أو تشوهًا في dark.
+- StoreScreen يظهر rim-light ويقرأ darkGlass صح.
+- app-client PASS بصريًا.
+- app-partner PASS.
+- app-captain PASS.
+- app-field PASS.
+- control-panel PASS.
+- webapp PASS أو DEFERRED مثبت فقط في نقطة UI toggle وليس readiness.
+- website PASS أو DEFERRED مثبت فقط إذا لا يوجد مكان مناسب للـ toggle.
+- كل services إما DONE أو NO_VISIBLE_SURFACE أو BLOCKED مثبت.
+- lightPremium فاتح افتراضيًا في كل شيء.
+- darkGlass داكن مضبوط في كل شيء.
+- الشاشات الوظيفية مقروءة.
+- الشاشات التجارية تظهر glass/rim-light حسب role.
+- اختيار المستخدم محفوظ لكل surface يحتاج حفظًا.
+- لا source of truth مكرر.
+- لا duplicate provider غير ضروري.
+- لا duplicate "المظهر".
+- لا local design system.
+- لا direct Tamagui خارج ui-kit.
+- لا hardcoded random colors مؤثرة.
+- أي لون متبقٍ خارج tokens موثق ومبرر.
+- لا backend/API/contracts changes.
+- diff check PASS.
+- TypeScript PASS.
+- screenshots مطلوبة تم طلبها.
+- لا تدّعي 100% قبل مراجعة screenshots.
+
+اكتب BLOCKED إذا:
+- لا يمكن إصلاح theme bridge بدون تغيير ui-kit عميق.
+- لا يمكن بناء color/component contract بدون كسر API جوهري.
+- لا يمكن حفظ الاختيار بدون dependency غير مصرح بها.
+- فشل TypeScript بسبب التعديل.
+- احتجت تغيير backend/API/contracts.
+- احتجت إعادة تصميم routing جذري.
+- لم تستطع تحديد مالك surface.
+- darkGlass غير مقروء في شاشة وظيفية بدون إعادة تصميم كبيرة.
+- لم تحصل على visual evidence.
+
+المخرجات النهائية:
+- DONE / BLOCKED / NEEDS_VISUAL_EVIDENCE.
+- جدول لكل سطح:
+  app-client
+  app-partner
+  app-captain
+  app-field
+  control-panel
+  webapp
+  website
+  dsh
+  wlt
+  knz
+  arb
+  amn
+  esf
+  mrf
+  snd
+  kwd
+
+لكل سطح اذكر:
+- الحالة.
+- الملفات المعدلة.
+- مكان provider/state.
+- مكان التخزين.
+- مكان "المظهر".
+- هل light/dark يعمل.
+- هل توجد screenshots مطلوبة.
+
+كذلك اعرض:
+- هل تم تعديل ui-kit؟ ولماذا؟
+- color roles الجديدة/المعدلة.
+- component-state tokens الجديدة/المعدلة.
+- هل تمت إضافة AsyncStorage؟ وأين ولماذا؟
+- نتائج أوامر التحقق.
+- قائمة screenshots المطلوبة.
+- أي DEFERRED/NO_VISIBLE_SURFACE/BLOCKED مع السبب.
+
+نفّذ هذا الطلب تنفيذًا كاملًا وجذريًا من الألف إلى الياء داخل النطاق المحدد، ولا تتوقف إلا بعد إغلاقه بالأدلة، بصفر فجوات، صفر نقص، صفر تكرار، صفر أخطاء، وبدون الانتقال لأي مهمة أخرى.

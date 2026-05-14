@@ -26,7 +26,7 @@ function MobileRootFrame({ children }: { children: ReactNode }) {
 }
 
 export function MobileRoot({ children, appearanceMode, ...rootProps }: MobileRootProps) {
-  const resolvedThemeMode = appearanceMode ? getBThwaniAppearanceThemeMode(appearanceMode) : rootProps.themeMode;
+  const resolvedThemeMode = rootProps.themeMode ?? (appearanceMode ? getBThwaniAppearanceThemeMode(appearanceMode) : undefined);
   const content = appearanceMode
     ? (
       <BThwaniAppearanceProvider mode={appearanceMode} syncThemeMode={false}>

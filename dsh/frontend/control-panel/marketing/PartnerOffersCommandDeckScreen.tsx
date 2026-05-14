@@ -213,10 +213,10 @@ export function PartnerOffersCommandDeckScreen() {
             <TextField label="عنوان العرض" value={draft.title || ''} onChangeText={v => setDraft({ ...draft, title: v })} />
             <TextField label="اسم الشريك" value={draft.partnerName || ''} onChangeText={v => setDraft({ ...draft, partnerName: v })} />
 
-            <TextField label="معرف المتجر" value={draft.storeId || ''} onChangeText={v => setDraft({ ...draft, storeId: v })} dir="ltr" />
+            <TextField label="معرف المتجر" value={draft.storeId || ''} onChangeText={v => setDraft({ ...draft, storeId: v })} style={{ textAlign: 'left' }} />
             <TextField label="اسم المتجر" value={draft.storeLabel || ''} onChangeText={v => setDraft({ ...draft, storeLabel: v })} />
 
-            <TextField label="معرف المنتج" value={draft.productId || ''} onChangeText={v => setDraft({ ...draft, productId: v })} dir="ltr" />
+            <TextField label="معرف المنتج" value={draft.productId || ''} onChangeText={v => setDraft({ ...draft, productId: v })} style={{ textAlign: 'left' }} />
             <TextField label="اسم المنتج" value={draft.productLabel || ''} onChangeText={v => setDraft({ ...draft, productLabel: v })} />
           </Box>
         </Box>
@@ -258,12 +258,12 @@ export function PartnerOffersCommandDeckScreen() {
             <TextField label="الأهلية" value={draft.eligibility || ''} onChangeText={v => setDraft({ ...draft, eligibility: v })} />
             <TextField label="شارة العرض" value={draft.displayBadge || ''} onChangeText={v => setDraft({ ...draft, displayBadge: v })} />
 
-            <TextField label="تاريخ البدء" value={draft.activeFromDate || ''} onChangeText={v => setDraft({ ...draft, activeFromDate: v })} dir="ltr" />
-            <TextField label="تاريخ الانتهاء" value={draft.activeToDate || ''} onChangeText={v => setDraft({ ...draft, activeToDate: v })} dir="ltr" />
+            <TextField label="تاريخ البدء" value={draft.activeFromDate || ''} onChangeText={v => setDraft({ ...draft, activeFromDate: v })} style={{ textAlign: 'left' }} />
+            <TextField label="تاريخ الانتهاء" value={draft.activeToDate || ''} onChangeText={v => setDraft({ ...draft, activeToDate: v })} style={{ textAlign: 'left' }} />
           </Box>
 
           <TextField label="ملاحظات هامش الربح" value={draft.marginRiskNote || ''} onChangeText={v => setDraft({ ...draft, marginRiskNote: v })} hint="ملاحظات داخلية للفريق" />
-          <TextField label="حملة مرتبطة" value={draft.linkedCampaignId || ''} onChangeText={v => setDraft({ ...draft, linkedCampaignId: v })} dir="ltr" />
+          <TextField label="حملة مرتبطة" value={draft.linkedCampaignId || ''} onChangeText={v => setDraft({ ...draft, linkedCampaignId: v })} style={{ textAlign: 'left' }} />
         </Box>
       );
     }

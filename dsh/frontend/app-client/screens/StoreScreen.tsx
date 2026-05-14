@@ -520,32 +520,32 @@ function DshStoreGetScreenContent({
   const [favoriteIds, setFavoriteIds] = React.useState<Set<string>>(new Set());
 
   const appearanceChrome = React.useMemo(() => ({
-    accent: tokens.accent,
-    actionBackground: isDarkGlass ? tokens.glassSurfaceStrong : tokens.glassSurface,
-    actionBorder: tokens.glassBorder,
-    actionIcon: tokens.glassText,
+    accent: tokens.colors.accentOrange,
+    actionBackground: isDarkGlass ? tokens.components.commerce.deliveryIdleSurface : tokens.glassSurfaceStrong,
+    actionBorder: isDarkGlass ? tokens.components.commerce.deliveryIdleBorder : tokens.borderStrong,
+    actionIcon: tokens.textPrimary,
     activeActionBackground: tokens.actionSelectedBackground,
-    activeActionBorder: tokens.accent,
-    activeActionIcon: isDarkGlass ? theme.brandContrast : tokens.accent,
-    cardBackground: isDarkGlass ? tokens.surfaceRaised : theme.surface,
-    cardBorder: isDarkGlass ? tokens.glassBorder : theme.line,
-    labelText: isDarkGlass ? tokens.glassMutedText : theme.textMuted,
-    modalBorder: isDarkGlass ? tokens.glassBorder : theme.line,
-    modalSurface: isDarkGlass ? tokens.surfaceRaised : theme.surface,
-    overlay: isDarkGlass ? tokens.heroOverlayStrong : stylesTokens.overlay,
-    overlaySoft: isDarkGlass ? tokens.heroOverlay : stylesTokens.overlaySoft,
-    primaryText: isDarkGlass ? tokens.glassText : theme.text,
+    activeActionBorder: tokens.components.commerce.deliverySelectedBorder,
+    activeActionIcon: tokens.components.commerce.deliverySelectedText,
+    cardBackground: isDarkGlass ? tokens.colors.surfaceRaised : tokens.colors.surfacePrimary,
+    cardBorder: isDarkGlass ? tokens.colors.glassBorder : tokens.colors.borderSubtle,
+    labelText: tokens.colors.textMuted,
+    modalBorder: tokens.components.overlays.modalBorder,
+    modalSurface: tokens.components.overlays.modalSurface,
+    overlay: tokens.components.overlays.modalBackdrop,
+    overlaySoft: isDarkGlass ? tokens.colors.overlaySoft : stylesTokens.overlaySoft,
+    primaryText: tokens.colors.textPrimary,
     promoBackground: isDarkGlass ? tokens.promoCardBackground : tokens.promoCardBackground,
     screenBackground: tokens.appBackground,
-    secondaryText: isDarkGlass ? tokens.textSecondary : theme.textMuted,
-    selectionBackground: isDarkGlass ? tokens.actionSelectedBackground : tokens.chipSelectedBackground,
-    selectionText: isDarkGlass ? theme.brandContrast : tokens.accent,
-    statusBadgeBackground: isDarkGlass ? tokens.glassSurfaceStrong : theme.success,
-    statusBadgeBorder: isDarkGlass ? tokens.glassBorder : theme.success,
+    secondaryText: tokens.colors.textSecondary,
+    selectionBackground: isDarkGlass ? tokens.components.commerce.deliverySelectedSurface : tokens.chipSelectedBackground,
+    selectionText: isDarkGlass ? tokens.components.commerce.deliverySelectedText : tokens.colors.accentOrange,
+    statusBadgeBackground: isDarkGlass ? tokens.glassSurfaceStrong : tokens.components.badges.success.backgroundColor,
+    statusBadgeBorder: isDarkGlass ? tokens.glassBorder : tokens.components.badges.success.borderColor,
     statusDot: theme.success,
-    strongSurface: isDarkGlass ? tokens.glassSurfaceStrong : tokens.surface,
-    subtleSurface: isDarkGlass ? tokens.glassSurface : theme.surfaceRaised,
-    heroOverlay: isDarkGlass ? tokens.heroOverlayStrong : tokens.heroOverlayStrong,
+    strongSurface: isDarkGlass ? tokens.glassSurfaceStrong : tokens.colors.surfacePrimary,
+    subtleSurface: isDarkGlass ? tokens.glassSurface : tokens.colors.surfaceRaised,
+    heroOverlay: tokens.components.overlays.heroOverlay,
   }), [isDarkGlass, theme, tokens]);
 
   const handleToggleFavorite = React.useCallback((id: string) => {
@@ -576,7 +576,16 @@ function DshStoreGetScreenContent({
   }, [store]);
   const fallbackMenuItems = React.useMemo<DshStoreGetMenuItem[]>(() => menuItems ?? [], [menuItems]);
   const previewPartnerBadge = storeLogoImageSource ? (
-    <View style={styles.previewPartnerBadge} pointerEvents="none">
+    <View
+      style={[
+        styles.previewPartnerBadge,
+        {
+          backgroundColor: isDarkGlass ? tokens.glassSurfaceStrong : stylesTokens.whiteOverlay,
+          borderColor: isDarkGlass ? tokens.glassBorder : colorPalette.borderSubtle,
+        },
+      ]}
+      pointerEvents="none"
+    >
       <Image source={storeLogoImageSource} style={styles.previewPartnerBadgeImage} resizeMode="cover" />
     </View>
   ) : null;
@@ -1344,7 +1353,15 @@ function DshStoreGetScreenContent({
 
                       {/* Identity Section (Logo + Info) */}
                       <View style={styles.heroIdentitySection}>
-                        <View style={styles.heroLogoWrap}>
+                        <View
+                          style={[
+                            styles.heroLogoWrap,
+                            {
+                              backgroundColor: isDarkGlass ? appearanceChrome.modalSurface : stylesTokens.whiteOverlay,
+                              borderColor: isDarkGlass ? tokens.colors.rimLightStrong : 'rgba(255,255,255,0.45)',
+                            },
+                          ]}
+                        >
                           <Image
                             source={storeLogoImageSource || resolveDshImageSource('dsh.brand.logo.v1')}
                             style={styles.heroLogoImage}

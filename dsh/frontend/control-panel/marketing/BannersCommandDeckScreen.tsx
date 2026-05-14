@@ -804,7 +804,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             draft.partnerLogoPosition === 'bottom-left' && { bottom: 20, left: 20 },
             draft.partnerLogoPosition === 'bottom-right' && { bottom: 20, right: 20 },
           ])}>
-            <Image source={resolveDshImageSource(draft.partnerLogoUrl)} style={styles.partnerLogo} resizeMode="contain" />
+            <Image source={resolveDshImageSource(draft.partnerLogoUrl)} style={styles.partnerLogo as ImageStyle} resizeMode="contain" />
           </View>
         ) : null}
       </View>
@@ -1098,8 +1098,8 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
           <Button label="جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} />
           <Button label="تكرار" tone="secondary" fullWidth={false} disabled={!selected} onPress={() => selected && handleDuplicate(selected)} />
           <Button label={selected?.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" fullWidth={false} disabled={!selected} onPress={() => selected && handleToggle(selected)} />
-          <Button label="حذف" tone="ghost" fullWidth={false} disabled={!selected} onPress={() => selected && handleDelete(selected)} style={{ color: '#DC2626' }} />
-          <Button label="حفظ" fullWidth={false} onPress={handleSave} style={{ backgroundColor: '#0A2F5C', paddingHorizontal: 24 }} />
+          <Button label="حذف" tone="danger" fullWidth={false} disabled={!selected} onPress={() => selected && handleDelete(selected)} />
+          <Button label="حفظ" tone="primary" fullWidth={false} onPress={handleSave} style={{ paddingHorizontal: 24 }} />
         </View>
       </View>
     </Box>
@@ -1154,10 +1154,10 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
               <View style={styles.motionInlineGrid}>
                 <Box gap={1}>
                   <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>التشغيل التلقائي</label>
-                  <Tabs<boolean>
-                    items={[{ value: true, label: 'مفعل' }, { value: false, label: 'متوقف' }]}
-                    value={draft.autoplayEnabled}
-                    onValueChange={(value) => setDraft((current) => ({ ...current, autoplayEnabled: value }))}
+                  <Tabs
+                    items={[{ value: 'true', label: 'مفعل' }, { value: 'false', label: 'متوقف' }]}
+                    value={draft.autoplayEnabled ? 'true' : 'false'}
+                    onValueChange={(value) => setDraft((current) => ({ ...current, autoplayEnabled: value === 'true' }))}
                     variant="pill"
                   />
                 </Box>
@@ -1169,10 +1169,10 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
               </View>
               <Box gap={1}>
                 <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>الإيقاف عند التفاعل</label>
-                <Tabs<boolean>
-                  items={[{ value: true, label: 'نعم' }, { value: false, label: 'لا' }]}
-                  value={draft.pauseOnInteraction}
-                  onValueChange={(value) => setDraft((current) => ({ ...current, pauseOnInteraction: value }))}
+                <Tabs
+                  items={[{ value: 'true', label: 'نعم' }, { value: 'false', label: 'لا' }]}
+                  value={draft.pauseOnInteraction ? 'true' : 'false'}
+                  onValueChange={(value) => setDraft((current) => ({ ...current, pauseOnInteraction: value === 'true' }))}
                   variant="pill"
                 />
               </Box>
@@ -1220,8 +1220,8 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
 
 const styles = StyleSheet.create({
   workspaceRoot: {
-    height: 'calc(100vh - 168px)',
-    maxHeight: 'calc(100vh - 168px)',
+    height: '100%',
+    maxHeight: '100%',
     overflow: 'hidden',
   },
   headerPanel: {
@@ -1234,6 +1234,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  rowReverse: {
+    flexDirection: 'row-reverse',
   },
   kpiGrid: {
     flexDirection: 'row',

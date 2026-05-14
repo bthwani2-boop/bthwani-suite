@@ -7,6 +7,7 @@ import {
   getBThwaniAppearanceStorageKey,
   getBThwaniAppearanceThemeMode,
   isBThwaniAppearanceMode,
+  syncBThwaniAppearanceCookie,
   type BThwaniAppearanceMode,
 } from '@bthwani/ui-kit';
 
@@ -72,6 +73,7 @@ export function WebsiteAppearanceProvider({ children }: { children: React.ReactN
 
   React.useEffect(() => {
     syncWebAppearance(mode);
+    syncBThwaniAppearanceCookie('website', mode);
   }, [mode]);
 
   const setMode = React.useCallback((nextMode: BThwaniAppearanceMode) => {
@@ -82,6 +84,8 @@ export function WebsiteAppearanceProvider({ children }: { children: React.ReactN
     } catch {
       // Keep the in-memory appearance active even if persistence fails.
     }
+
+    syncBThwaniAppearanceCookie('website', nextMode);
   }, []);
 
   const value = React.useMemo<WebsiteAppearanceContextValue>(() => ({

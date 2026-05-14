@@ -173,7 +173,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
               <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>معاينة المحتوى</Text>
             </Surface>
             {selected.mediaKey ? (
-              <Box dir="ltr" padding={2} style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '6px' }}>
+              <Box padding={2} style={{ direction: 'ltr', backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '6px' }}>
                 <Text style={{ fontSize: 10, fontFamily: 'monospace', wordBreak: 'break-all' }}>
                   {selected.mediaKey}
                 </Text>

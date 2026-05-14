@@ -7,6 +7,7 @@ import {
   getBThwaniAppearanceStorageKey,
   getBThwaniAppearanceThemeMode,
   isBThwaniAppearanceMode,
+  syncBThwaniAppearanceCookie,
   type BThwaniAppearanceMode,
 } from '@bthwani/ui-kit';
 
@@ -75,6 +76,7 @@ export function ControlPanelAppearanceProvider({ children }: { children: React.R
 
   React.useEffect(() => {
     syncWebAppearance(mode);
+    syncBThwaniAppearanceCookie('control-panel', mode);
   }, [mode]);
 
   const setMode = React.useCallback((nextMode: BThwaniAppearanceMode) => {
@@ -85,6 +87,8 @@ export function ControlPanelAppearanceProvider({ children }: { children: React.R
     } catch {
       // Keep the in-memory appearance active even if persistence fails.
     }
+
+    syncBThwaniAppearanceCookie('control-panel', nextMode);
   }, []);
 
   const value = React.useMemo<ControlPanelAppearanceContextValue>(() => ({

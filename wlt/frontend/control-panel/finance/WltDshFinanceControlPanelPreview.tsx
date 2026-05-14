@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Box,
   Text,
+  useTheme,
 } from '@bthwani/ui-kit';
 import {
   WebControlPanelDecisionRow,
@@ -41,13 +42,15 @@ function SectionBlock({
   records: WltDshFinancePreviewRecord[];
   emptyLabel: string;
 }) {
+  const { theme } = useTheme();
+
   return (
     <Box gap={3}>
-      <Text role="label" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C', fontSize: '14px' }}>
+      <Text role="label" style={{ textAlign: 'right', fontWeight: '900', color: theme.text, fontSize: '14px' }}>
         {title}
       </Text>
       {records.length === 0 ? (
-        <div style={{ padding: '24px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid rgba(10,47,92,0.08)' }}>
+        <div style={{ padding: '24px', textAlign: 'center', backgroundColor: theme.surface, borderRadius: '12px', border: `1px solid ${theme.line}` }}>
           <Text tone="muted">{emptyLabel}</Text>
         </div>
       ) : (
@@ -60,10 +63,11 @@ function SectionBlock({
 }
 
 function BreakdownSection({ title, label, records }: { title: string; label: string; records: WltDshFinancePreviewRecord[] }) {
+  const { theme } = useTheme();
   if (records.length === 0) return null;
   return (
     <Box gap={2}>
-      <Text role="caption" style={{ textAlign: 'right', fontWeight: '800', color: '#64748B' }}>{label}</Text>
+      <Text role="caption" style={{ textAlign: 'right', fontWeight: '800', color: theme.textMuted }}>{label}</Text>
       <Box gap={2}>
         {records.map((r) => <FinanceRecordCard key={r.id} record={r} />)}
       </Box>
@@ -76,6 +80,7 @@ export function WltDshFinanceControlPanelContent({
 }: {
   hideHeader?: boolean
 } = {}) {
+  const { theme } = useTheme();
   const preview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
 
   const content = (
@@ -89,7 +94,7 @@ export function WltDshFinanceControlPanelContent({
 
       <Box gap={6}>
         <Box gap={4}>
-          <Text role="label" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C', fontSize: '14px' }}>
+          <Text role="label" style={{ textAlign: 'right', fontWeight: '900', color: theme.text, fontSize: '14px' }}>
             مدفوعات العملاء — تفصيل
           </Text>
           <BreakdownSection title="مدفوعات العملاء" label="دفع بالمحفظة" records={preview.clientRecords.filter(r => r.kind === 'wallet-payment')} />
@@ -103,7 +108,7 @@ export function WltDshFinanceControlPanelContent({
         />
 
         <Box gap={4}>
-          <Text role="label" style={{ textAlign: 'right', fontWeight: '900', color: '#0A2F5C', fontSize: '14px' }}>
+          <Text role="label" style={{ textAlign: 'right', fontWeight: '900', color: theme.text, fontSize: '14px' }}>
             مالية الكابتن — تفصيل
           </Text>
           <BreakdownSection title="مالية الكابتن" label="أرباح التوصيل" records={preview.captainRecords.filter(r => r.kind === 'captain-earning')} />

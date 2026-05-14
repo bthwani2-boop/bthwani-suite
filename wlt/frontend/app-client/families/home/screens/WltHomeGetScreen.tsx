@@ -1,10 +1,11 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, amountToArabicText, useI18n } from '@bthwani/ui-kit';
+import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, amountToArabicText, useBThwaniAppearance, useI18n } from '@bthwani/ui-kit';
 import { financeProviders } from '../../../../shared/finance/providers';
 
 export const WltHomeGetScreen: React.FC = () => {
   const { t } = useI18n();
+  const { tokens } = useBThwaniAppearance();
 
   const tr = (key: string, fallback?: string) => {
     const v = t(key);
@@ -73,7 +74,7 @@ export const WltHomeGetScreen: React.FC = () => {
             onPress={openTopup}
             fullWidth={false}
             size="md"
-            leadingAccessory={<Icon name="add-outline" size={18} color="#fff" />}
+            leadingAccessory={<Icon name="add-outline" size={18} color={tokens.components.buttons.primary.default.iconColor} />}
             style={{ width: 220, marginTop: 8, alignSelf: 'center' }}
           />
         </View>

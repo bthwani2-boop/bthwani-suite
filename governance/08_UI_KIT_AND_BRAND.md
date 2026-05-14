@@ -59,6 +59,10 @@ Banner/Ticker
 
 Service-specific composition can live in surfaces but must use ui-kit primitives.
 
+## Appearance system contract
+
+Every new screen, page, surface, or visible component is incomplete unless it supports both `lightPremium` and `darkGlass` from day one. The implementation must consume the official appearance/provider source, use `@bthwani/ui-kit` public exports only, avoid local palettes/tokens/theme layers, avoid hardcoded colors when an official role exists, stay RTL-correct, avoid dark text on dark backgrounds and white solid cards inside `darkGlass`, and follow the official rim-light policy. TypeScript and diff-check must pass before the surface can be accepted as done.
+
 ## Visual evidence gate
 
 Any UI change must include:

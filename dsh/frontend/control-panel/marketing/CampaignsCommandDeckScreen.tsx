@@ -266,17 +266,17 @@ export function CampaignsCommandDeckScreen() {
                 );
               })}
             </View>
-            <TextField label="معرف البنر المرتبط (اختياري)" value={draft.linkedBannerId || ''} onChangeText={v => setDraft({ ...draft, linkedBannerId: v })} dir="ltr" style={{ textAlign: 'left' }} />
-            <TextField label="معرف الفيديو المرتبط (اختياري)" value={draft.linkedVideoId || ''} onChangeText={v => setDraft({ ...draft, linkedVideoId: v })} dir="ltr" style={{ textAlign: 'left' }} />
-            <TextField label="معرف عرض الشريك (اختياري)" value={draft.linkedOfferId || ''} onChangeText={v => setDraft({ ...draft, linkedOfferId: v })} dir="ltr" style={{ textAlign: 'left' }} />
-            <TextField label="معرف ميزة الولاء (اختياري)" value={draft.linkedLoyaltyBenefitId || ''} onChangeText={v => setDraft({ ...draft, linkedLoyaltyBenefitId: v })} dir="ltr" style={{ textAlign: 'left' }} />
+            <TextField label="معرف البنر المرتبط (اختياري)" value={draft.linkedBannerId || ''} onChangeText={v => setDraft({ ...draft, linkedBannerId: v })} style={{ textAlign: 'left' }} />
+            <TextField label="معرف الفيديو المرتبط (اختياري)" value={draft.linkedVideoId || ''} onChangeText={v => setDraft({ ...draft, linkedVideoId: v })} style={{ textAlign: 'left' }} />
+            <TextField label="معرف عرض الشريك (اختياري)" value={draft.linkedOfferId || ''} onChangeText={v => setDraft({ ...draft, linkedOfferId: v })} style={{ textAlign: 'left' }} />
+            <TextField label="معرف ميزة الولاء (اختياري)" value={draft.linkedLoyaltyBenefitId || ''} onChangeText={v => setDraft({ ...draft, linkedLoyaltyBenefitId: v })} style={{ textAlign: 'left' }} />
           </Box>
         );
       case 'schedule':
         return (
           <Box gap={3}>
-            <TextField label="تاريخ البدء" value={draft.startDate || ''} onChangeText={v => setDraft({ ...draft, startDate: v })} hint="مثال: 2026-05-01" dir="ltr" style={{ textAlign: 'left' }} />
-            <TextField label="تاريخ الانتهاء" value={draft.endDate || ''} onChangeText={v => setDraft({ ...draft, endDate: v })} hint="مثال: 2026-06-01" dir="ltr" style={{ textAlign: 'left' }} />
+            <TextField label="تاريخ البدء" value={draft.startDate || ''} onChangeText={v => setDraft({ ...draft, startDate: v })} hint="مثال: 2026-05-01" style={{ textAlign: 'left' }} />
+            <TextField label="تاريخ الانتهاء" value={draft.endDate || ''} onChangeText={v => setDraft({ ...draft, endDate: v })} hint="مثال: 2026-06-01" style={{ textAlign: 'left' }} />
             <Box gap={1}>
               <Text role="caption" tone="muted" style={styles.labelTitle}>حالة الحملة</Text>
               <select

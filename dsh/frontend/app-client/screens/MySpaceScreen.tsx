@@ -330,7 +330,7 @@ const mySpaceAppearanceOptions: Array<{
     mode: 'darkGlass',
     title: 'داكن زجاجي',
     description: 'تجربة داكنة زجاجية فاخرة للتصفح والتسوق',
-    helper: 'يُفعَّل الآن على شاشة المتجر فقط مع بطاقات وشرائح وأزرار بزجاج داكن مقروء.',
+    helper: 'مظهر داكن فاخر يطبّق على التطبيق كاملًا، مع حواف زجاجية وطبقات واضحة بدون إزعاج بصري.',
   },
 ];
 
@@ -1084,7 +1084,9 @@ function MySpaceAppearanceSection({
 
                   <GlassHeroOverlay strength={selected ? 'strong' : 'default'} style={{ padding: spacing[3], gap: spacing[1] }}>
                     <Text role="bodyStrong" style={{ textAlign: 'right' }}>
-                      {option.mode === 'lightPremium' ? 'فاتح أبيض = قاعدة فاتحة مع لمسات زجاجية مختارة.' : 'داكن زجاجي = أساس داكن زجاجي كامل للمتجر.'}
+                      {option.mode === 'lightPremium'
+                        ? 'فاتح أبيض = قاعدة فاتحة مع لمسات زجاجية مختارة.'
+                        : 'مظهر داكن فاخر يطبّق على التطبيق كاملًا، مع حواف زجاجية وطبقات واضحة بدون إزعاج بصري.'}
                     </Text>
                     <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
                       {selected ? 'هذا هو الوضع النشط حاليًا.' : 'اضغط للتفعيل الفوري وحفظ الاختيار.'}

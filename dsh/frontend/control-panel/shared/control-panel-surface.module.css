@@ -7,7 +7,7 @@
   overflow: hidden;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
-  background-color: #F1F5F9;
+  background-color: var(--bth-background);
   direction: rtl;
   text-align: right;
   font-family: 'Outfit', 'Inter', sans-serif;
@@ -19,8 +19,8 @@
   align-items: center;
   gap: 12px;
   padding: 8px 20px;
-  background-color: #FFFFFF;
-  border-bottom: 1px solid rgba(10, 47, 92, 0.08);
+  background-color: var(--bth-surface);
+  border-bottom: 1px solid var(--bth-line);
   flex-shrink: 0;
 }
 
@@ -38,7 +38,7 @@
   margin: 0;
   font-size: 20px;
   font-weight: 800;
-  color: #0A2F5C;
+  color: var(--bth-text);
   letter-spacing: -0.01em;
 }
 
@@ -46,13 +46,13 @@
   margin: 0;
   font-size: 12px;
   font-weight: 600;
-  color: #64748B;
+  color: var(--bth-text-muted);
 }
 
 .surfaceHeaderIconBox {
   width: 40px;
   height: 40px;
-  background-color: #0A2F5C;
+  background-color: var(--bth-brand-header-background);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -63,7 +63,7 @@
 .surfaceHeaderGlyph {
   width: 18px;
   height: 18px;
-  border: 2px solid #FFFFFF;
+  border: 2px solid var(--bth-text-inverse);
   border-radius: 4px;
   position: relative;
 }
@@ -74,7 +74,7 @@
   left: 50%;
   width: 10px;
   height: 2px;
-  background-color: #FFFFFF;
+  background-color: var(--bth-text-inverse);
   transform: translate(-50%, -50%);
 }
 
@@ -84,7 +84,7 @@
   left: 4px;
   width: 6px;
   height: 6px;
-  background-color: #FFFFFF;
+  background-color: var(--bth-text-inverse);
   border-radius: 1px;
 }
 
@@ -98,7 +98,7 @@
   margin: 0;
   font-size: 18px;
   letter-spacing: -0.01em;
-  color: #0A2F5C;
+  color: var(--bth-text);
   font-weight: 800;
 }
 
@@ -106,17 +106,17 @@
   margin: 0;
   font-size: 10px;
   font-weight: 600;
-  color: #64748B;
+  color: var(--bth-text-muted);
 }
 
 .surfaceHeaderBadgeText {
-  color: #FF500D;
+  color: var(--bth-brand);
   font-size: 9px;
   font-weight: 800;
 }
 
 .surfaceHeaderBadgeTextInverse {
-  color: #FFFFFF;
+  color: var(--bth-text-inverse);
   font-size: 9px;
   font-weight: 800;
 }
@@ -131,7 +131,7 @@
   min-height: 0;
   overflow: hidden;
   position: relative;
-  background-color: #F8FAFC;
+  background-color: var(--bth-background-alt);
 }
 
 .surfaceInnerScroll {
@@ -157,8 +157,8 @@
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  background-color: #fff;
-  border-bottom: 1px solid rgba(10, 47, 92, 0.08);
+  background-color: var(--bth-surface);
+  border-bottom: 1px solid var(--bth-line);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -168,14 +168,14 @@
   flex-wrap: wrap;
   gap: 8px;
   padding: 10px 14px;
-  background: #FFFFFF;
-  border-bottom: 1px solid rgba(10, 47, 92, 0.08);
+  background: var(--bth-surface);
+  border-bottom: 1px solid var(--bth-line);
   align-items: center;
   flex-shrink: 0;
 }
 
 .filterDockTint {
-  background-color: #F8FAFC;
+  background-color: var(--bth-surface-inset);
 }
 
 .surfaceTab {
@@ -184,7 +184,7 @@
   border-radius: 8px;
   font-size: 12px;
   font-weight: 700;
-  color: #64748B;
+  color: var(--bth-text-muted);
   background: transparent;
   border: 1px solid transparent;
   cursor: pointer;
@@ -196,22 +196,22 @@
 }
 
 .surfaceTab:hover {
-  background-color: rgba(10, 47, 92, 0.04);
-  color: #0A2F5C;
+  background-color: var(--bth-surface-inset);
+  color: var(--bth-text);
 }
 
 .surfaceTabActive {
-  background-color: #0A2F5C;
-  color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(10, 47, 92, 0.15);
+  background-color: var(--bth-brand-header-background);
+  color: var(--bth-text-inverse);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
 }
 
 .commandKpi {
   display: flex;
   flex-direction: column;
   padding: 6px 10px;
-  background: #FFFFFF;
-  border: 1px solid rgba(10, 47, 92, 0.08);
+  background: var(--bth-surface);
+  border: 1px solid var(--bth-line);
   border-radius: 8px;
   min-width: 100px;
 }
@@ -219,14 +219,14 @@
 .commandKpiLabel {
   font-size: 10px;
   font-weight: 800;
-  color: #64748B;
+  color: var(--bth-text-muted);
   margin-bottom: 2px;
 }
 
 .commandKpiValue {
   font-size: 16px;
   font-weight: 900;
-  color: #0A2F5C;
+  color: var(--bth-text);
   line-height: 1;
 }
 
@@ -277,13 +277,13 @@
   margin: 0;
   font-size: 18px;
   font-weight: 800;
-  color: #0A2F5C;
+  color: var(--bth-text);
 }
 
 .surfaceSectionSubtitle {
   margin: 2px 0 0;
   font-size: 12px;
-  color: #64748B;
+  color: var(--bth-text-muted);
 }
 
 .surfaceGridTwoCol {
@@ -306,8 +306,8 @@
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  background-color: #FFFFFF;
-  border: 1px solid rgba(10, 47, 92, 0.08);
+  background-color: var(--bth-surface);
+  border: 1px solid var(--bth-line);
   border-radius: 12px;
   min-height: 0;
   max-height: 100%;
@@ -317,7 +317,7 @@
   margin: 0;
   font-size: 14px;
   font-weight: 800;
-  color: #0A2F5C;
+  color: var(--bth-text);
   flex-shrink: 0;
 }
 
@@ -343,8 +343,8 @@
 }
 
 .surfaceInspectorPanel {
-  background-color: #FFFFFF;
-  border-right: 1px solid #E2E8F0;
+  background-color: var(--bth-surface);
+  border-right: 1px solid var(--bth-line);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -353,7 +353,7 @@
 
 .surfaceInspectorMeta {
   padding: 8px;
-  background-color: #F8FAFC;
+  background-color: var(--bth-surface-inset);
   border-radius: 6px;
 }
 

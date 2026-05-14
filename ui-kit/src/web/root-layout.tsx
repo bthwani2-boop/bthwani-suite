@@ -3,6 +3,7 @@ import { RootProviders, type RootProvidersProps } from '../providers';
 import { buildWebThemeStyleSheet, directionConfig, resolveDirectionFromLanguage, type ThemeMode } from '../foundation';
 import {
   defaultBThwaniAppearanceMode,
+  getBThwaniAppearanceCookieKey,
   getBThwaniAppearanceStorageKey,
   getBThwaniAppearanceThemeMode,
 } from '../appearance';
@@ -29,6 +30,7 @@ body.bth-web-root-body, body.ui-web-root-body, html, #__next {
 
 function buildStoredLanguageBootstrapScript(appName: string | undefined, defaultThemeMode: ThemeMode) {
   const appearanceStorageKey = getBThwaniAppearanceStorageKey(appName ?? 'global');
+  const appearanceCookieKey = getBThwaniAppearanceCookieKey(appName ?? 'global');
   const defaultAppearanceThemeMode = getBThwaniAppearanceThemeMode(defaultBThwaniAppearanceMode);
   const fallbackThemeMode = defaultThemeMode === 'dark' || defaultThemeMode === 'high-contrast'
     ? defaultThemeMode
@@ -47,11 +49,21 @@ function buildStoredLanguageBootstrapScript(appName: string | undefined, default
 
   try {
     var appearanceKey = '${appearanceStorageKey}';
+    var appearanceCookieKey = '${appearanceCookieKey}';
     var storedAppearanceMode = window.localStorage ? window.localStorage.getItem(appearanceKey) : null;
+    var cookieAppearanceMode = null;
+    if (typeof document.cookie === 'string' && document.cookie.length > 0) {
+      var cookiePrefix = appearanceCookieKey + '=';
+      var cookieEntry = document.cookie.split('; ').find(function (entry) { return entry.indexOf(cookiePrefix) === 0; });
+      cookieAppearanceMode = cookieEntry ? cookieEntry.slice(cookiePrefix.length) : null;
+    }
+    var appearanceMode = storedAppearanceMode === 'lightPremium' || storedAppearanceMode === 'darkGlass'
+      ? storedAppearanceMode
+      : cookieAppearanceMode;
     var resolvedThemeMode = '${fallbackThemeMode}';
-    if (storedAppearanceMode === 'lightPremium') {
+    if (appearanceMode === 'lightPremium') {
       resolvedThemeMode = 'light';
-    } else if (storedAppearanceMode === 'darkGlass') {
+    } else if (appearanceMode === 'darkGlass') {
       resolvedThemeMode = 'dark';
     }
 

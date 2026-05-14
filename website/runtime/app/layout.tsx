@@ -1,5 +1,6 @@
 import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -23,12 +24,22 @@ export const metadata: Metadata = {
 };
 
 import type { ReactNode } from 'react';
-import { WebRootLayout } from '@bthwani/ui-kit/next';
+import {
+  defaultBThwaniAppearanceMode,
+  getBThwaniAppearanceCookieKey,
+  getBThwaniAppearanceThemeMode,
+  isBThwaniAppearanceMode,
+  WebRootLayout,
+} from '@bthwani/ui-kit/next';
 import { WebsiteAppearanceProvider } from '../../shell/appearance';
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const cookieStore = await cookies();
+  const seededMode = cookieStore.get(getBThwaniAppearanceCookieKey('website'))?.value;
+  const appearanceMode = isBThwaniAppearanceMode(seededMode) ? seededMode : defaultBThwaniAppearanceMode;
+
   return (
-    <WebRootLayout appName="website" language="ar" themeMode="light">
+    <WebRootLayout appName="website" language="ar" themeMode={getBThwaniAppearanceThemeMode(appearanceMode)}>
       <WebsiteAppearanceProvider>
         <div className={inter.className}>
           {children}

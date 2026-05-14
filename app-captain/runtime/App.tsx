@@ -1,3 +1,4 @@
+import { getBThwaniAppearanceThemeMode } from '@bthwani/ui-kit';
 import { MobileRoot } from '@bthwani/ui-kit/mobile';
 import { AppCaptainAppearanceProvider, useAppCaptainAppearance } from '../shell/appearance';
 import CaptainSurfaceHost from '../shell/mobile-entry';
@@ -6,7 +7,7 @@ function AppCaptainRuntimeRoot() {
 	const { mode } = useAppCaptainAppearance();
 
 	return (
-		<MobileRoot language="ar" themeMode="light" appearanceMode={mode}>
+		<MobileRoot language="ar" themeMode={getBThwaniAppearanceThemeMode(mode)} appearanceMode={mode}>
 			<CaptainSurfaceHost />
 		</MobileRoot>
 	);
