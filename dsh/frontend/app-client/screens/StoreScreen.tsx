@@ -570,25 +570,20 @@ function DshStoreGetScreenContent({
 
   const storeCoverImageSource = React.useMemo(() => {
     if (!store) return undefined;
-    // Force burger cover for Al Olaya to match design parity 100%
-    if (store.name?.includes('العليا') || store.id === 'store-1001') {
-      return resolveDshImageSource('dsh.store.hittin.cover.v1');
-    }
-    return resolveDshStoreCoverImageSource(store);
+    // Global Rule: Square frame always uses store cover image
+    return resolveDshImageSource(store.imageUri);
   }, [store]);
 
   const storeLogoImageSource = React.useMemo(() => {
     if (!store) return undefined;
-    // Force circular burger logo for Al Olaya to match design parity 100%
-    if (store.name?.includes('العليا') || store.id === 'store-1001') {
-      return resolveDshImageSource('dsh.store.hittin.logo.v1');
-    }
-    return resolveDshImageSource(store.logoImageUri || store.imageUri);
+    // Global Rule: Circular frame always uses store logo image
+    // Fallback to brand logo only if store logo is missing, never use cover image
+    return resolveDshImageSource(store.logoImageUri) || resolveDshImageSource('dsh.brand.logo.v1');
   }, [store]);
   const fallbackMenuItems = React.useMemo<DshStoreGetMenuItem[]>(() => menuItems ?? [], [menuItems]);
-  const previewPartnerBadge = storeCoverImageSource ? (
+  const previewPartnerBadge = storeLogoImageSource ? (
     <View style={styles.previewPartnerBadge} pointerEvents="none">
-      <Image source={storeCoverImageSource} style={styles.previewPartnerBadgeImage} resizeMode="cover" />
+      <Image source={storeLogoImageSource} style={styles.previewPartnerBadgeImage} resizeMode="cover" />
     </View>
   ) : null;
 
@@ -1530,7 +1525,7 @@ function DshStoreGetScreenContent({
                           <MenuItemCard
                             key={item.id}
                             item={item}
-                            partnerImageSource={storeCoverImageSource}
+                            partnerImageSource={storeLogoImageSource}
                             onAddPress={(anchor) => openMeasurementPicker(item, anchor ?? { x: 32, y: 360 })}
                             onImagePress={openImagePreview}
                             onFavoritePress={() => handleToggleFavorite(item.id)}
@@ -2762,19 +2757,29 @@ const styles = StyleSheet.create({
   },
   previewPartnerBadge: {
     position: 'absolute',
-    top: 18,
-    left: 18,
-    width: 44,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: stylesTokens.whiteOverlay,
+    top: 20,
+    left: 20,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: 'rgba(255,255,255,0.98)',
     borderWidth: 1,
-    borderColor: stylesTokens.line,
+    borderColor: '#f3f4f6',
     zIndex: 8,
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 2,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.15,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   previewPartnerBadgeImage: {
     width: '100%',
