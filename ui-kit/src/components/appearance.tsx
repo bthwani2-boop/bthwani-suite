@@ -113,7 +113,7 @@ export function AppearanceOptionCard({
               {previewSummary}
             </Text>
             <Text role="bodySm" style={{ color: preview.glassMutedText }}>
-              No app adoption in this phase.
+              Official foundation shared across current and future surfaces.
             </Text>
           </GlassHeroOverlay>
           <View style={{ flexDirection: rowDirection, gap: spacing[2] }}>

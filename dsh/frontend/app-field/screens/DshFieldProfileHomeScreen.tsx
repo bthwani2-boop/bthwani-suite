@@ -1,10 +1,31 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Badge, Box, Button, Icon, ListItem, MobileScrollView, Surface, Text, TopBar } from '@bthwani/ui-kit';
+import { AppearanceOptionCard, Badge, Box, Button, Icon, ListItem, MobileScrollView, Surface, Text, TopBar } from '@bthwani/ui-kit';
+import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { resolveFieldFilterCounts, type FieldStoreFile } from '../data/field-stores.preview-data';
+
+const fieldAppearanceOptions: ReadonlyArray<{
+  mode: BThwaniAppearanceMode;
+  title: string;
+  description: string;
+}> = [
+  {
+    mode: 'lightPremium',
+    title: 'فاتح أبيض',
+    description: 'واجهة فاتحة واضحة، والزجاج يظهر فقط فيما يحدده المطور أثناء مراجعة الشاشات',
+  },
+  {
+    mode: 'darkGlass',
+    title: 'داكن زجاجي',
+    description: 'مظهر داكن فاخر مع حواف زجاجية وطبقات واضحة بدون إزعاج بصري',
+  },
+] as const;
 
 type DshFieldProfileHomeScreenProps = {
   stores: readonly FieldStoreFile[];
+  appearanceHydrated: boolean;
+  appearanceMode: BThwaniAppearanceMode;
+  onAppearanceModeChange: (mode: BThwaniAppearanceMode) => void;
   onBack: () => void;
   onOpenProfile: () => void;
   onOpenHistory: () => void;
@@ -14,6 +35,9 @@ type DshFieldProfileHomeScreenProps = {
 
 export function DshFieldProfileHomeScreen({
   stores,
+  appearanceHydrated,
+  appearanceMode,
+  onAppearanceModeChange,
   onBack,
   onOpenProfile,
   onOpenHistory,
@@ -53,6 +77,31 @@ export function DshFieldProfileHomeScreen({
             <Badge label={`مرسل ${counts.submitted}`} tone="info" />
             <Badge label={`مالية جاهزة ${counts.done}`} tone="success" />
           </View>
+        </Surface>
+
+        <Surface tone="raised" padding={3} gap={3} radiusToken="xl">
+          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+            المظهر
+          </Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            {appearanceHydrated
+              ? 'يتم حفظ اختيار المظهر محليًا واستعادته عند فتح تطبيق الميدان.'
+              : 'جارٍ استعادة اختيار المظهر المحفوظ...'}
+          </Text>
+          <Box gap={3}>
+            {fieldAppearanceOptions.map((option) => (
+              <AppearanceOptionCard
+                key={option.mode}
+                title={option.title}
+                description={option.description}
+                mode={option.mode}
+                modeLabel={option.mode === 'lightPremium' ? 'Light Premium' : 'Dark Glass'}
+                statusLabel={appearanceMode === option.mode ? 'مفعّل الآن' : 'اضغط للتفعيل'}
+                selected={appearanceMode === option.mode}
+                onPress={() => onAppearanceModeChange(option.mode)}
+              />
+            ))}
+          </Box>
         </Surface>
 
         <Surface tone="raised" padding={0} gap={0} radiusToken="xl">

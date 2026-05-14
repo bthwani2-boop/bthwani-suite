@@ -25,6 +25,7 @@ import type {
   FinancePanelId,
 } from '../../dsh/frontend/control-panel/finance/finance.types';
 import { controlPanelRuntimeData } from './runtime.data';
+import { ControlPanelAppearanceScreen } from './ControlPanelAppearanceScreen';
 import styles from './control-panel-shell.module.css';
 
 const phaseOneSectionIds = ['dashboard', 'operations', 'finance', 'community-services', 'support'] as const;
@@ -284,6 +285,10 @@ export function ControlPanelSurfaceHost({
 
         {activeSectionId === 'support' ? (
           <ControlPanelDshSupportQueueScreen />
+        ) : null}
+
+        {activeSectionId === 'platform' ? (
+          <ControlPanelAppearanceScreen />
         ) : null}
       </div>
     </WebCommandCenterFrame>

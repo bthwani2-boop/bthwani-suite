@@ -74,9 +74,9 @@ export function CatalogAdoptionQueue() {
   };
 
   const pendingCount = items.filter(i => i.stage === 'marketing-approved').length;
-  const badgeToneMap: Record<'default' | 'brand' | 'success' | 'danger', 'neutral' | 'success' | 'warning' | 'danger'> = {
-    default: 'neutral',
-    brand: 'neutral',
+  const badgeToneMap: Record<'default' | 'brand' | 'success' | 'danger', 'default' | 'success' | 'warning' | 'danger'> = {
+    default: 'default',
+    brand: 'default',
     success: 'success',
     danger: 'danger',
   };

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
+import { useAppFieldAppearance } from '../../../app-field/shell/appearance';
 import { Box } from '@bthwani/ui-kit';
 import { DshFieldFinanceScreen } from './screens/DshFieldFinanceScreen';
 import { DshFieldProfileHomeScreen } from './screens/DshFieldProfileHomeScreen';
@@ -45,6 +46,11 @@ function resolveCommandRoute(command?: DshFieldNavigationCommand): DshFieldRoute
 }
 
 export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) {
+  const {
+    hydrated: appearanceHydrated,
+    mode: appearanceMode,
+    setMode: setAppearanceMode,
+  } = useAppFieldAppearance();
   const [stores, setStores] = React.useState<FieldStoreFile[]>(() => readFieldStoresLocal());
   const [routeStack, setRouteStack] = React.useState<DshFieldRouteState[]>([{ kind: 'stores' }]);
   const [visitValues, setVisitValues] = React.useState<Record<string, DshFieldStoreVisitValues>>({});
@@ -221,6 +227,9 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
     content = (
       <DshFieldProfileHomeScreen
         stores={stores}
+        appearanceHydrated={appearanceHydrated}
+        appearanceMode={appearanceMode}
+        onAppearanceModeChange={setAppearanceMode}
         onBack={popRoute}
         onOpenProfile={() => pushRoute({ kind: 'profile' })}
         onOpenHistory={() => pushRoute({ kind: 'history' })}

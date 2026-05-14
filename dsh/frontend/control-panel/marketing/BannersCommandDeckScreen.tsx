@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Pressable, StyleSheet, View, Image } from 'react-native';
+import { Pressable, StyleSheet, View, Image, type ImageStyle, type ViewStyle } from 'react-native';
 import { Box, Button, SearchField, SelectField, Surface, Tabs, Text, TextField, useDirection, colorPalette } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
@@ -752,11 +752,11 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
         {draft.imageUrl || draft.mediaKey ? (
           <Image
             source={resolveDshImageSource(draft.imageUrl || draft.mediaKey)}
-            style={styles.bannerImage}
+            style={styles.bannerImage as ImageStyle}
             resizeMode={draft.imageFit}
           />
         ) : (
-          <View style={[styles.bannerImage, { backgroundColor: draft.accentColor || '#0A2F5C', justifyContent: 'center', alignItems: 'center' }]}>
+          <View style={[styles.bannerImageLayer as ViewStyle, { backgroundColor: draft.accentColor || '#0A2F5C', justifyContent: 'center', alignItems: 'center' }]}>
              <Text style={{ fontSize: 40 }}>{templates.find(t => t.id === draft.templateId)?.label.slice(0, 1) || 'ب'}</Text>
           </View>
         )}
@@ -1355,7 +1355,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
-  },
+  } as ImageStyle,
+  bannerImageLayer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  } as ViewStyle,
   bannerOverlay: {
     ...StyleSheet.absoluteFillObject,
   },

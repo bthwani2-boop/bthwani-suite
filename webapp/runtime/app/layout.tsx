@@ -22,13 +22,16 @@ export const viewport: Viewport = {
 
 import type { ReactNode } from 'react';
 import { WebRootLayout } from '@bthwani/ui-kit/next';
+import { WebAppAppearanceProvider } from '../../shell/appearance';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <WebRootLayout appName="webapp" language="ar" themeMode="light">
-      <div className={inter.className}>
-        {children}
-      </div>
+      <WebAppAppearanceProvider>
+        <div className={inter.className}>
+          {children}
+        </div>
+      </WebAppAppearanceProvider>
     </WebRootLayout>
   );
 }

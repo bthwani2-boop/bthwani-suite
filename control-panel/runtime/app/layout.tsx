@@ -23,13 +23,16 @@ export const viewport: Viewport = {
 
 import type { ReactNode } from 'react';
 import { WebRootLayout } from '@bthwani/ui-kit/next';
+import { ControlPanelAppearanceProvider } from '../../shell/appearance';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <WebRootLayout appName="control-panel" language="ar" themeMode="light">
-      <div className={inter.className} style={{ height: '100%' }}>
-        {children}
-      </div>
+      <ControlPanelAppearanceProvider>
+        <div className={inter.className} style={{ height: '100%' }}>
+          {children}
+        </div>
+      </ControlPanelAppearanceProvider>
     </WebRootLayout>
   );
 }

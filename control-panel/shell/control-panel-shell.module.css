@@ -17,6 +17,11 @@
   overflow: hidden;
 }
 
+.appearanceStack {
+  display: grid;
+  gap: 16px;
+}
+
 .sectionLink:hover {
   transform: translateY(-1px);
 }

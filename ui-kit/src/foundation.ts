@@ -712,6 +712,7 @@ export const highContrastTheme: SemanticTheme = {
 	surface: '#000000',
 	surfaceRaised: '#0A0A0A',
 	surfaceInset: '#000000',
+	surfaceSecondary: withAlpha('#FFD60A', 0.18),
 	line: '#FFFFFF',
 	lineStrong: '#FFFFFF',
 	text: '#FFFFFF',
@@ -936,4 +937,3 @@ export function amountToArabicText(n: number, t: (key: string) => string): strin
 
 	return inner(n);
 }
-

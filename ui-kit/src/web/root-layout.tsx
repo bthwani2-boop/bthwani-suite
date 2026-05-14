@@ -1,10 +1,15 @@
 import { type ReactNode } from 'react';
 import { RootProviders, type RootProvidersProps } from '../providers';
 import { buildWebThemeStyleSheet, directionConfig, resolveDirectionFromLanguage, type ThemeMode } from '../foundation';
+import {
+  defaultBThwaniAppearanceMode,
+  getBThwaniAppearanceStorageKey,
+  getBThwaniAppearanceThemeMode,
+} from '../appearance';
 
 const webRootBodyCss = `
 html {
-  color-scheme: light;
+  color-scheme: var(--bth-color-scheme, light);
   background: var(--bth-background);
   height: 100%;
   min-height: 100vh;
@@ -22,17 +27,50 @@ body.bth-web-root-body, body.ui-web-root-body, html, #__next {
 }
 `;
 
-function buildStoredLanguageBootstrapScript() {
+function buildStoredLanguageBootstrapScript(appName: string | undefined, defaultThemeMode: ThemeMode) {
+  const appearanceStorageKey = getBThwaniAppearanceStorageKey(appName ?? 'global');
+  const defaultAppearanceThemeMode = getBThwaniAppearanceThemeMode(defaultBThwaniAppearanceMode);
+  const fallbackThemeMode = defaultThemeMode === 'dark' || defaultThemeMode === 'high-contrast'
+    ? defaultThemeMode
+    : defaultAppearanceThemeMode;
+
   return `
 (function () {
   try {
     var key = '${directionConfig.languageStorageKey}';
     var stored = window.localStorage ? window.localStorage.getItem(key) : null;
-    if (stored !== 'ar' && stored !== 'en') {
-      return;
+    if (stored === 'ar' || stored === 'en') {
+      document.documentElement.lang = stored;
+      document.documentElement.dir = stored === 'ar' ? 'rtl' : 'ltr';
     }
-    document.documentElement.lang = stored;
-    document.documentElement.dir = stored === 'ar' ? 'rtl' : 'ltr';
+  } catch (error) {}
+
+  try {
+    var appearanceKey = '${appearanceStorageKey}';
+    var storedAppearanceMode = window.localStorage ? window.localStorage.getItem(appearanceKey) : null;
+    var resolvedThemeMode = '${fallbackThemeMode}';
+    if (storedAppearanceMode === 'lightPremium') {
+      resolvedThemeMode = 'light';
+    } else if (storedAppearanceMode === 'darkGlass') {
+      resolvedThemeMode = 'dark';
+    }
+
+    document.documentElement.setAttribute('data-bth-root', 'true');
+    document.documentElement.setAttribute('data-bth-theme', resolvedThemeMode);
+    document.documentElement.setAttribute('data-ui-theme', resolvedThemeMode);
+    document.documentElement.style.colorScheme = resolvedThemeMode === 'dark' ? 'dark' : 'light';
+
+    var syncBody = function () {
+      if (!document.body) {
+        return;
+      }
+      document.body.setAttribute('data-bth-root', 'true');
+      document.body.setAttribute('data-bth-theme', resolvedThemeMode);
+      document.body.setAttribute('data-ui-theme', resolvedThemeMode);
+    };
+
+    syncBody();
+    document.addEventListener('DOMContentLoaded', syncBody, { once: true });
   } catch (error) {}
 })();
 `.trim();
@@ -79,7 +117,9 @@ export function WebRootBody({
       className="ui-web-root-body"
       data-ui-app={appName}
       data-ui-root="true"
+      data-bth-root="true"
       data-ui-theme={themeMode}
+      data-bth-theme={themeMode}
     >
       {children}
     </body>
@@ -88,12 +128,16 @@ export function WebRootBody({
 
 export function WebDocumentShell({
   children,
+  appName,
   lang = directionConfig.defaultLanguage,
   dir = resolveDirectionFromLanguage(directionConfig.defaultLanguage),
+  themeMode = 'light',
 }: {
   children: ReactNode;
+  appName?: string;
   lang?: string;
   dir?: 'ltr' | 'rtl';
+  themeMode?: ThemeMode;
 }) {
   const themeStyles = buildWebThemeStyleSheet('[data-ui-root="true"], [data-bth-root="true"]');
   const combinedCss = `${webRootBodyCss}\n${themeStyles}`;
@@ -102,12 +146,20 @@ export function WebDocumentShell({
   // and initial styles. This bypasses React 19's strict check for <script> tags inside
   // components while ensuring the script runs synchronously before the first paint.
   const headHtml = `
-    <script id="language-bootstrap">${buildStoredLanguageBootstrapScript()}</script>
+    <script id="language-bootstrap">${buildStoredLanguageBootstrapScript(appName, themeMode)}</script>
     <style id="ui-kit-theme-root">${combinedCss}</style>
   `.trim();
 
   return (
-    <html suppressHydrationWarning lang={lang} dir={dir}>
+    <html
+      suppressHydrationWarning
+      lang={lang}
+      dir={dir}
+      data-ui-app={appName}
+      data-bth-root="true"
+      data-bth-theme={themeMode}
+      data-ui-theme={themeMode}
+    >
       <head suppressHydrationWarning dangerouslySetInnerHTML={{ __html: headHtml }} />
       {children}
     </html>
@@ -120,11 +172,17 @@ export function WebRootLayout({ children, appName, ...rootProps }: WebRootLayout
     lang: rootProps.language,
     dir: resolveDirectionFromLanguage(rootProps.language),
   });
+  const resolvedThemeMode = rootProps.themeMode ?? 'light';
 
   return (
-    <WebDocumentShell lang={webRootMetadata.lang} dir={webRootMetadata.dir}>
-      <WebRootBody appName={webRootMetadata.appName} themeMode={rootProps.themeMode}>
-        <RootProviders {...rootProps}>{children}</RootProviders>
+    <WebDocumentShell
+      appName={webRootMetadata.appName}
+      lang={webRootMetadata.lang}
+      dir={webRootMetadata.dir}
+      themeMode={resolvedThemeMode}
+    >
+      <WebRootBody appName={webRootMetadata.appName} themeMode={resolvedThemeMode}>
+        <RootProviders {...rootProps} themeMode={resolvedThemeMode}>{children}</RootProviders>
       </WebRootBody>
     </WebDocumentShell>
   );

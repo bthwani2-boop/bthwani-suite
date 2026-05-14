@@ -23,7 +23,6 @@ import {
 // Removed Ionicons import
 import {
   BannerCarousel,
-  BThwaniAppearanceProvider,
   Button,
   Chip,
   GlassHeroOverlay,
@@ -473,12 +472,7 @@ type DshStoreGetScreenContentProps = DshStoreGetScreenProps & {
 
 export function DshStoreGetScreen(props: DshStoreGetScreenProps) {
   const appearanceMode = props.appearanceMode ?? 'lightPremium';
-
-  return (
-    <BThwaniAppearanceProvider mode={appearanceMode}>
-      <DshStoreGetScreenContent {...props} appearanceMode={appearanceMode} />
-    </BThwaniAppearanceProvider>
-  );
+  return <DshStoreGetScreenContent {...props} appearanceMode={appearanceMode} />;
 }
 
 function DshStoreGetScreenContent({

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BackHandler, Platform, Pressable, Switch as RNSwitch } from 'react-native';
+import { useAppCaptainAppearance } from '../../../app-captain/shell/appearance';
 
 // Dynamic safe-area insets loader: avoids hard import so Metro won't fail when
 // `react-native-safe-area-context` isn't installed in some environments.
@@ -15,7 +16,8 @@ try {
 } catch (err) {
   // fallback is already a zero-insets function
 }
-import { Badge, Box, Button, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme } from '@bthwani/ui-kit';
+import { AppearanceOptionCard, Badge, Box, Button, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme } from '@bthwani/ui-kit';
+import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { wltDshCaptainUiCopy } from '../../../wlt/frontend/app-captain/dsh/wlt-dsh-captain.ui-copy';
 import { DshEntryScreen } from './screens/DshCaptainEntryScreen';
 import {
@@ -159,6 +161,23 @@ const compactOrderChatSeed: CompactOrderChatMessage[] = [
 
 const captainDisplayName = 'الكابتن عبدالله السبيعي';
 
+const captainAppearanceOptions: ReadonlyArray<{
+  mode: BThwaniAppearanceMode;
+  title: string;
+  description: string;
+}> = [
+  {
+    mode: 'lightPremium',
+    title: 'فاتح أبيض',
+    description: 'واجهة فاتحة واضحة، والزجاج يظهر فقط فيما يحدده المطور أثناء مراجعة الشاشات',
+  },
+  {
+    mode: 'darkGlass',
+    title: 'داكن زجاجي',
+    description: 'مظهر داكن فاخر مع حواف زجاجية وطبقات واضحة بدون إزعاج بصري',
+  },
+] as const;
+
 const availabilityStatusMeta: Record<
   CaptainAvailabilityStatus,
   {
@@ -264,6 +283,11 @@ function CompactOrderChatBubble({ message }: { message: CompactOrderChatMessage 
 
 export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
   const { theme } = useTheme();
+  const {
+    hydrated: appearanceHydrated,
+    mode: appearanceMode,
+    setMode: setAppearanceMode,
+  } = useAppCaptainAppearance();
   const insets = useSafeAreaInsets();
   const [activeServiceType, setActiveServiceType] = React.useState<CaptainServiceType>('dsh');
   const [route, setRoute] = React.useState<DshCaptainRoute>(() => getRouteForCommandTarget(command.target));
@@ -700,10 +724,36 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     return renderCaptainAccountShell(
       'الإعدادات والدعم',
       'اللغة والإشعارات والمساندة المختصرة',
-      <Surface tone="raised" padding={0} gap={0} radiusToken="xl">
-        <ListItem title="الإعدادات" subtitle="اللغة، الإشعارات، والتفضيلات المحلية." meta="جاهز" />
-        <ListItem title="الدعم" subtitle="قنوات المساندة والتصعيد المختصر." meta="جاهز" />
-      </Surface>
+      <Box gap={3}>
+        <Surface tone="raised" padding={3} gap={3} radiusToken="xl">
+          <Text role="label" tone="muted" align="end">
+            المظهر
+          </Text>
+          <Text role="bodySm" tone="muted" align="end">
+            {appearanceHydrated
+              ? 'يتم حفظ اختيار المظهر محليًا واستعادته عند فتح تطبيق الكابتن.'
+              : 'جارٍ استعادة اختيار المظهر المحفوظ...'}
+          </Text>
+          <Box gap={3}>
+            {captainAppearanceOptions.map((option) => (
+              <AppearanceOptionCard
+                key={option.mode}
+                title={option.title}
+                description={option.description}
+                mode={option.mode}
+                modeLabel={option.mode === 'lightPremium' ? 'Light Premium' : 'Dark Glass'}
+                statusLabel={appearanceMode === option.mode ? 'مفعّل الآن' : 'اضغط للتفعيل'}
+                selected={appearanceMode === option.mode}
+                onPress={() => setAppearanceMode(option.mode)}
+              />
+            ))}
+          </Box>
+        </Surface>
+        <Surface tone="raised" padding={0} gap={0} radiusToken="xl">
+          <ListItem title="الإعدادات" subtitle="اللغة، الإشعارات، والتفضيلات المحلية." meta="جاهز" />
+          <ListItem title="الدعم" subtitle="قنوات المساندة والتصعيد المختصر." meta="جاهز" />
+        </Surface>
+      </Box>
     );
   };
 

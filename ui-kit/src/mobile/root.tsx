@@ -1,9 +1,11 @@
 import React, { type ReactNode } from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
-import { RootProviders, type RootProvidersProps, useTheme } from '../providers';
+import { getBThwaniAppearanceThemeMode, type BThwaniAppearanceMode } from '../appearance';
+import { BThwaniAppearanceProvider, RootProviders, type RootProvidersProps, useTheme } from '../providers';
 
 export type MobileRootProps = RootProvidersProps & {
   children: ReactNode;
+  appearanceMode?: BThwaniAppearanceMode;
 };
 
 function MobileRootFrame({ children }: { children: ReactNode }) {
@@ -23,10 +25,19 @@ function MobileRootFrame({ children }: { children: ReactNode }) {
   );
 }
 
-export function MobileRoot({ children, ...rootProps }: MobileRootProps) {
+export function MobileRoot({ children, appearanceMode, ...rootProps }: MobileRootProps) {
+  const resolvedThemeMode = appearanceMode ? getBThwaniAppearanceThemeMode(appearanceMode) : rootProps.themeMode;
+  const content = appearanceMode
+    ? (
+      <BThwaniAppearanceProvider mode={appearanceMode} syncThemeMode={false}>
+        <MobileRootFrame>{children}</MobileRootFrame>
+      </BThwaniAppearanceProvider>
+    )
+    : <MobileRootFrame>{children}</MobileRootFrame>;
+
   return (
-    <RootProviders {...rootProps}>
-      <MobileRootFrame>{children}</MobileRootFrame>
+    <RootProviders {...rootProps} themeMode={resolvedThemeMode}>
+      {content}
     </RootProviders>
   );
 }

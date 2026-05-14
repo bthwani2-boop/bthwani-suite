@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, Switch as RNSwitch, View } from 'react-native';
 import {
+  AppearanceOptionCard,
   Box,
   Button,
   Chip,
@@ -18,11 +19,13 @@ import {
   useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
+import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import {
   getWltDshPartnerCommissionLabel,
   getWltDshPartnerOperationalModeCommission,
   wltDshPartnerUiCopy,
 } from '../../../../wlt/frontend/app-partner/dsh/wlt-dsh-partner.ui-copy';
+import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
 import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../../shared/dshStoreProductCardModel';
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
 import { WltDshPartnerBridge } from '../../../../wlt/frontend/app-partner/dsh';
@@ -113,6 +116,23 @@ const defaultNotificationPreferences: NotificationPreferenceState = {
   dailyDigest: false,
   priorityOnly: false,
 };
+
+const partnerAppearanceOptions: ReadonlyArray<{
+  mode: BThwaniAppearanceMode;
+  title: string;
+  description: string;
+}> = [
+  {
+    mode: 'lightPremium',
+    title: 'فاتح أبيض',
+    description: 'واجهة فاتحة واضحة، والزجاج يظهر فقط فيما يحدده المطور أثناء مراجعة الشاشات',
+  },
+  {
+    mode: 'darkGlass',
+    title: 'داكن زجاجي',
+    description: 'مظهر داكن فاخر مع حواف زجاجية وطبقات واضحة بدون إزعاج بصري',
+  },
+] as const;
 
 const hubNavigationItems: readonly HubNavigationItem[] = [
   {
@@ -890,6 +910,11 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
   } = props;
 
   const { direction } = useDirection();
+  const {
+    hydrated: appearanceHydrated,
+    mode: appearanceMode,
+    setMode: setAppearanceMode,
+  } = useAppPartnerAppearance();
   const [internalSection, setInternalSection] = React.useState<PartnerHubSection>('hub');
   const [notificationPreferences, setNotificationPreferences] = React.useState<NotificationPreferenceState>(defaultNotificationPreferences);
   const activeSection = section ?? internalSection;
@@ -1101,6 +1126,31 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
       return (
         <HubSectionShell title={sectionCopy.settings.title} description={sectionCopy.settings.description} icon={sectionCopy.settings.icon} onBack={() => updateSection('hub')}>
           <Box gap={4}>
+            <Surface tone="raised" padding={3} gap={3}>
+              <Text role="label" tone="muted">
+                المظهر
+              </Text>
+              <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
+                {appearanceHydrated
+                  ? 'يتم حفظ اختيار المظهر محليًا واستعادته عند فتح مساحة الشريك.'
+                  : 'جارٍ استعادة اختيار المظهر المحفوظ...'}
+              </Text>
+              <Box gap={3}>
+                {partnerAppearanceOptions.map((option) => (
+                  <AppearanceOptionCard
+                    key={option.mode}
+                    title={option.title}
+                    description={option.description}
+                    mode={option.mode}
+                    modeLabel={option.mode === 'lightPremium' ? 'Light Premium' : 'Dark Glass'}
+                    statusLabel={appearanceMode === option.mode ? 'مفعّل الآن' : 'اضغط للتفعيل'}
+                    selected={appearanceMode === option.mode}
+                    onPress={() => setAppearanceMode(option.mode)}
+                  />
+                ))}
+              </Box>
+            </Surface>
+
             <Surface tone="raised" padding={3} gap={3}>
               <Text role="label" tone="muted">
                 التفضيلات الحالية

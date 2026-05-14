@@ -1,11 +1,14 @@
 export {
 	bthwaniAppearanceModes,
+	bthwaniAppearanceStorageKeySuffix,
 	bthwaniAppearancePaletteByMode,
 	bthwaniAppearanceTokensByMode,
 	defaultBThwaniAppearanceMode,
+	getBThwaniAppearanceStorageKey,
 	getBThwaniAppearanceThemeMode,
 	getBThwaniAppearanceTokens,
 	getBThwaniGlassRecipe,
+	isBThwaniAppearanceMode,
 	resolveBThwaniAppearanceMode,
 } from './appearance';
 export type {

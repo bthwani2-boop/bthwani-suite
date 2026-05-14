@@ -2,7 +2,6 @@ import { withAlpha, type ThemeMode } from './foundation';
 
 // lightPremium = base light + selective glass.
 // darkGlass = full dark glass foundation.
-// No application adopts these modes in this phase.
 export type BThwaniAppearanceMode = 'lightPremium' | 'darkGlass';
 
 export type BThwaniGlassRole = 'surface' | 'surfaceStrong' | 'heroOverlay';
@@ -77,6 +76,16 @@ export type BThwaniGlassRecipe = {
 export const bthwaniAppearanceModes = Object.freeze(['lightPremium', 'darkGlass'] as const);
 
 export const defaultBThwaniAppearanceMode: BThwaniAppearanceMode = 'lightPremium';
+export const bthwaniAppearanceStorageKeySuffix = 'appearance-mode';
+
+export function isBThwaniAppearanceMode(value: string | null | undefined): value is BThwaniAppearanceMode {
+  return value === 'lightPremium' || value === 'darkGlass';
+}
+
+export function getBThwaniAppearanceStorageKey(appName = 'global') {
+  const normalizedAppName = appName.trim() || 'global';
+  return `@bthwani/${normalizedAppName}/${bthwaniAppearanceStorageKeySuffix}`;
+}
 
 const successColor = '#16A34A';
 const warningColor = '#D97706';

@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { WebPageFrame, WebSectionCard } from '@bthwani/ui-kit/web';
 import styles from './shared-web-shell.module.css';
 
@@ -29,6 +30,17 @@ export function WebAppSurfaceHost(_props: WebAppSurfaceHostProps) {
               {item}
             </p>
           ))}
+        </div>
+      </WebSectionCard>
+      <WebSectionCard
+        title="الإعدادات"
+        description="مدخل ضيق للمظهر فقط بدون إنشاء مساحة حساب كاملة."
+      >
+        <div className={styles.linkGrid}>
+          <Link href="/settings" className={styles.navLink}>
+            <span className={styles.navLabel}>المظهر</span>
+            <span className={styles.navDescription}>اختر بين Light Premium و Dark Glass مع حفظ محلي.</span>
+          </Link>
         </div>
       </WebSectionCard>
     </WebPageFrame>

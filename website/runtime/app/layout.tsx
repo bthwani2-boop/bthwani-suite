@@ -24,13 +24,16 @@ export const metadata: Metadata = {
 
 import type { ReactNode } from 'react';
 import { WebRootLayout } from '@bthwani/ui-kit/next';
+import { WebsiteAppearanceProvider } from '../../shell/appearance';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <WebRootLayout appName="website" language="ar" themeMode="light">
-      <div className={inter.className}>
-        {children}
-      </div>
+      <WebsiteAppearanceProvider>
+        <div className={inter.className}>
+          {children}
+        </div>
+      </WebsiteAppearanceProvider>
     </WebRootLayout>
   );
 }

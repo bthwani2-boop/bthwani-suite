@@ -1049,7 +1049,7 @@ function MySpaceAppearanceSection({
         <Box gap={1} style={{ alignItems: 'flex-end' }}>
           <Text role="titleSm">المظهر</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            اختر بين الوضع الفاتح الأبيض والوضع الداكن الزجاجي. يتم تطبيق الاختيار الآن على شاشة تفاصيل المتجر فقط.
+            اختر بين الوضع الفاتح الأبيض والوضع الداكن الزجاجي. يتم تطبيق الاختيار الآن على سطح العميل الحالي بالكامل.
           </Text>
           <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
             {appearanceHydrated ? 'يتم حفظ اختيارك محليًا واستعادته عند فتح التطبيق.' : 'جارٍ استعادة اختيارك المحفوظ...'}
