@@ -51,6 +51,7 @@ import { getPublishedHomePromos } from '../shared/promo.preview-store';
 import { dshCategoryFixtures, dshCategoryListFixtures } from './data/categories.preview-data';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 import type { DshClientSurfaceProps, DshCommandTarget, DshRoute } from './dsh-client.types';
+import { useAppClientAppearance } from '../../../app-client/shell/appearance';
 
 type CreateOrderValues = {
   pickupAddress: string;
@@ -317,6 +318,7 @@ function commandTargetToRoute(target: DshCommandTarget): DshRoute {
 }
 
 export function DshClientSurface({ command, onExit, onOpenService, renderApprovedVideoReelsViewer }: DshClientSurfaceProps) {
+  const { hydrated: appearanceHydrated, mode: appearanceMode, setMode: setAppearanceMode } = useAppClientAppearance();
   const initialCanonicalStore = getStoreCanonicalMetadata('store-1001');
   const [route, setRoute] = React.useState<DshRoute>('home');
   const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
@@ -573,6 +575,8 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   if (route === 'my-space') {
     return (
       <DshMySpaceScreen
+        appearanceHydrated={appearanceHydrated}
+        appearanceMode={appearanceMode}
         marketingPrograms={liveMarketingPrograms.map((item) => ({
           id: item.id,
           title: item.title,
@@ -580,6 +584,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           meta: item.routeTarget,
           badgeLabel: item.family === 'subscription' ? 'اشتراك' : item.family === 'promotion' ? 'برومو' : item.family === 'shorts' ? 'شورتات' : 'حملة',
         }))}
+        onAppearanceModeChange={setAppearanceMode}
         onOpenOrders={() => setRoute('orders-list')}
         onOpenTracking={() => openTrackedOrder()}
         onRepeatOrder={openCreateOrderJourney}
@@ -608,6 +613,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   if (route === 'store-get') {
     return (
       <DshStoreGetScreen
+        appearanceMode={appearanceMode}
         store={{
           id: activeStore.id,
           name: activeStore.name,

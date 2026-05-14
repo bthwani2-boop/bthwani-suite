@@ -6,6 +6,7 @@
   "main": "./index.js",
   "dependencies": {
     "@bthwani/ui-kit": "workspace:*",
+    "@react-native-async-storage/async-storage": "3.0.2",
     "expo": "^54.0.0",
     "expo-av": "~16.0.8",
     "expo-dev-client": "~6.0.20",

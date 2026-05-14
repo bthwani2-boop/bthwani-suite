@@ -10,11 +10,17 @@ import {
 } from 'react-native';
 import {
   Badge,
+  BThwaniAppearanceProvider,
+  type BThwaniAppearanceMode,
   Box,
   Button,
   Card,
   Checkbox,
   Chip,
+  GlassActionButton,
+  GlassCard,
+  GlassChip,
+  GlassHeroOverlay,
   Icon,
   KeyValueList,
   MobileScrollView,
@@ -272,8 +278,11 @@ export type DshMySpaceItem = {
 };
 
 export type DshMySpaceScreenProps = {
+  appearanceHydrated?: boolean;
+  appearanceMode?: BThwaniAppearanceMode;
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
   marketingPrograms?: DshMySpaceItem[];
+  onAppearanceModeChange?: (mode: BThwaniAppearanceMode) => void;
   onOpenOrders?: () => void;
   onOpenTracking?: () => void;
   onRepeatOrder?: () => void;
@@ -281,7 +290,7 @@ export type DshMySpaceScreenProps = {
   onRetry?: () => void;
 };
 
-type MySpacePrimaryTab = 'orders' | 'wallet' | 'loyalty' | 'subscriptions' | 'addresses' | 'location' | 'identity' | 'commercial' | 'preferences';
+type MySpacePrimaryTab = 'orders' | 'wallet' | 'loyalty' | 'subscriptions' | 'addresses' | 'location' | 'identity' | 'commercial' | 'appearance' | 'preferences';
 
 type SectionIconName = any; // Avoid strict Ionicons name match for compatibility
 
@@ -301,7 +310,28 @@ const primaryTabs: PrimaryTabConfig[] = [
   { id: 'location', label: 'الموقع الحالي', summary: 'تحديد وتحديث موقعك الميداني', iconName: 'map-outline' },
   { id: 'identity', label: 'الملف الشخصي', summary: 'البيانات الشخصية والأمان', iconName: 'person-outline' },
   { id: 'commercial', label: 'العروض الترويجية', summary: 'الحملات والخصومات المباشرة', iconName: 'megaphone-outline' },
+  { id: 'appearance', label: 'المظهر', summary: 'فاتح أبيض أو داكن زجاجي', iconName: 'color-palette-outline' },
   { id: 'preferences', label: 'تفضيلات التوصيل', summary: 'إعدادات خاصة بالتسليم والاستبدال', iconName: 'options-outline' },
+];
+
+const mySpaceAppearanceOptions: Array<{
+  description: string;
+  helper: string;
+  mode: BThwaniAppearanceMode;
+  title: string;
+}> = [
+  {
+    mode: 'lightPremium',
+    title: 'فاتح أبيض',
+    description: 'واجهة واضحة مع لمسات زجاجية في العروض والمتاجر',
+    helper: 'الخلفية تبقى فاتحة، مع استخدام الزجاج بشكل انتقائي داخل التجربة المميزة.',
+  },
+  {
+    mode: 'darkGlass',
+    title: 'داكن زجاجي',
+    description: 'تجربة داكنة زجاجية فاخرة للتصفح والتسوق',
+    helper: 'يُفعَّل الآن على شاشة المتجر فقط مع بطاقات وشرائح وأزرار بزجاج داكن مقروء.',
+  },
 ];
 
 interface MySpacePrimaryRowProps {
@@ -1004,9 +1034,85 @@ function MySpacePreferencesSection() {
   );
 }
 
+function MySpaceAppearanceSection({
+  appearanceHydrated = false,
+  appearanceMode = 'lightPremium',
+  onAppearanceModeChange,
+}: {
+  appearanceHydrated?: boolean;
+  appearanceMode?: BThwaniAppearanceMode;
+  onAppearanceModeChange?: (mode: BThwaniAppearanceMode) => void;
+}) {
+  return (
+    <Box gap={2}>
+      <Surface tone="raised" padding={2} gap={2}>
+        <Box gap={1} style={{ alignItems: 'flex-end' }}>
+          <Text role="titleSm">المظهر</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            اختر بين الوضع الفاتح الأبيض والوضع الداكن الزجاجي. يتم تطبيق الاختيار الآن على شاشة تفاصيل المتجر فقط.
+          </Text>
+          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+            {appearanceHydrated ? 'يتم حفظ اختيارك محليًا واستعادته عند فتح التطبيق.' : 'جارٍ استعادة اختيارك المحفوظ...'}
+          </Text>
+        </Box>
+      </Surface>
+
+      {mySpaceAppearanceOptions.map((option) => {
+        const selected = appearanceMode === option.mode;
+
+        return (
+          <BThwaniAppearanceProvider key={option.mode} mode={option.mode}>
+            <GlassCard
+              emphasis={selected ? 'strong' : 'subtle'}
+              onPress={() => onAppearanceModeChange?.(option.mode)}
+              padding={3}
+              gap={3}
+              title={option.title}
+              subtitle={option.description}
+              footer={(
+                <Box gap={2}>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: spacing[2] }}>
+                    <GlassChip
+                      label={selected ? 'مفعّل الآن' : 'جاهز للتفعيل'}
+                      selected={selected}
+                      emphasis={selected ? 'strong' : 'subtle'}
+                    />
+                    <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                      {option.helper}
+                    </Text>
+                  </View>
+
+                  <GlassHeroOverlay strength={selected ? 'strong' : 'default'} style={{ padding: spacing[3], gap: spacing[1] }}>
+                    <Text role="bodyStrong" style={{ textAlign: 'right' }}>
+                      {option.mode === 'lightPremium' ? 'فاتح أبيض = قاعدة فاتحة مع لمسات زجاجية مختارة.' : 'داكن زجاجي = أساس داكن زجاجي كامل للمتجر.'}
+                    </Text>
+                    <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                      {selected ? 'هذا هو الوضع النشط حاليًا.' : 'اضغط للتفعيل الفوري وحفظ الاختيار.'}
+                    </Text>
+                  </GlassHeroOverlay>
+
+                  <GlassActionButton
+                    disabled={selected || !onAppearanceModeChange}
+                    emphasis={selected ? 'strong' : 'subtle'}
+                    label={selected ? 'المظهر الحالي' : 'اختيار هذا المظهر'}
+                    onPress={() => onAppearanceModeChange?.(option.mode)}
+                  />
+                </Box>
+              )}
+            />
+          </BThwaniAppearanceProvider>
+        );
+      })}
+    </Box>
+  );
+}
+
 function renderPrimarySectionContent(
   section: MySpacePrimaryTab,
+  appearanceHydrated: boolean,
+  appearanceMode: BThwaniAppearanceMode,
   marketingPrograms: DshMySpaceItem[],
+  onAppearanceModeChange?: (mode: BThwaniAppearanceMode) => void,
   onOpenOrders?: () => void,
   onOpenTracking?: () => void,
   onRepeatOrder?: () => void,
@@ -1049,6 +1155,16 @@ function renderPrimarySectionContent(
     return <MySpaceIdentitySection />;
   }
 
+  if (section === 'appearance') {
+    return (
+      <MySpaceAppearanceSection
+        appearanceHydrated={appearanceHydrated}
+        appearanceMode={appearanceMode}
+        onAppearanceModeChange={onAppearanceModeChange}
+      />
+    );
+  }
+
   if (section === 'preferences') {
     return <MySpacePreferencesSection />;
   }
@@ -1057,8 +1173,11 @@ function renderPrimarySectionContent(
 }
 
 export function DshMySpaceScreen({
+  appearanceHydrated = false,
+  appearanceMode = 'lightPremium',
   state = 'ready',
   marketingPrograms = [],
+  onAppearanceModeChange,
   onOpenOrders,
   onOpenTracking,
   onRepeatOrder,
@@ -1118,7 +1237,10 @@ export function DshMySpaceScreen({
                   section.id === activePrimaryTab ? (
                     renderPrimarySectionContent(
                       activePrimaryTab,
+                      appearanceHydrated,
+                      appearanceMode,
                       marketingPrograms,
+                      onAppearanceModeChange,
                       onOpenOrders,
                       onOpenTracking,
                       onRepeatOrder
