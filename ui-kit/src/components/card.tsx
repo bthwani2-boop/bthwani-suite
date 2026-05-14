@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, View, type GestureResponderEvent, type ImageSourcePropType, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 import { radius, resolveRowDirection, resolveTextAlign, spacing, type SpacingToken } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Badge, Button } from './button';

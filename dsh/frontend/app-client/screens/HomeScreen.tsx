@@ -1,8 +1,10 @@
 import React from 'react';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 import { Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
 
 import {
+  BannerCarousel,
+  type BannerCarouselItem,
   Box,
   CategoryOrbitCarousel,
   Icon,
@@ -661,12 +663,21 @@ export function DshHomeGetScreen({
     return resolvedCategories;
   }, [resolvedCategories]);
 
-  const bannerItems = React.useMemo(() => (
+  const bannerItems = React.useMemo<BannerCarouselItem[]>(() => (
     resolvedPromos.map((promo) => ({
-      ...promo,
+      id: promo.id,
+      title: promo.title,
+      subtitle: promo.subtitle,
+      badge: promo.offerBadgeText,
+      cta: promo.ctaLabel,
       image: resolveDshHomeBannerImageSource(promo.imageUrl ?? promo.mediaKey),
+      accentColor: promo.accentColor,
+      onPress: () => {
+        if (onPromoClick) onPromoClick(promo.id);
+        resolveBannerPress(promo)();
+      },
     }))
-  ), [resolvedPromos]);
+  ), [resolvedPromos, onPromoClick, resolveBannerPress]);
   const [isCarouselUserPaused, setIsCarouselUserPaused] = React.useState(false);
   const [isCarouselInteractionPaused, setIsCarouselInteractionPaused] = React.useState(false);
   const interactionResumeTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1291,165 +1302,22 @@ return (
             </Text>
           </Surface>
         ) : bannerItems.length ? (
-          <View style={[
-            styles.premiumBannerSection,
-            {
+          <BannerCarousel
+            banners={bannerItems}
+            variant="secondary"
+            height={cardHeight + spacing[6]}
+            fullBleed={false}
+            autoPlayInterval={activePromoIntervalMs}
+            onBannerPress={(item) => {
+              if (onPromoClick) onPromoClick(item.id);
+            }}
+            style={{
               marginLeft: -spacing[3],
               marginRight: -spacing[3],
               width: containerWidth,
-              height: cardHeight + spacing[6],
-            },
-          ]}>
-             <ScrollView
-                ref={promoScrollRef}
-                horizontal
-                pagingEnabled={false}
-                showsHorizontalScrollIndicator={false}
-                directionalLockEnabled
-                decelerationRate="fast"
-                snapToInterval={itemWidth}
-                snapToAlignment="center"
-                disableIntervalMomentum={false}
-                onScrollBeginDrag={() => {
-                  if (activePromoPauseOnInteraction) {
-                    clearInteractionResumeTimer();
-                    setIsCarouselInteractionPaused(true);
-                  }
-                }}
-                onMomentumScrollEnd={(event) => {
-                  const x = event.nativeEvent.contentOffset.x;
-                  const index = Math.round(x / itemWidth);
-                  if (index !== activePromoIndex && index >= 0 && index < bannerItems.length) {
-                    setActivePromoIndex(index);
-                  }
-                  scheduleCarouselResume();
-                }}
-                onScrollEndDrag={() => {
-                  scheduleCarouselResume();
-                }}
-                contentContainerStyle={[
-                  styles.premiumBannerScrollContent,
-                  {
-                    paddingHorizontal: horizontalPadding,
-                    flexDirection: 'row',
-                  }
-                ]}
-             >
-               {bannerItems.map((promo, index) => {
-                  const isActive = index === activePromoIndex;
-                  const motionStyle = promo.motionStyle ?? activePromoMotionStyle;
-                  const cardMotionStyle =
-                    motionStyle === 'subtle-fade'
-                      ? { opacity: isActive ? 1 : 0.78, transform: [{ scale: isActive ? 1 : 0.965 }] }
-                      : motionStyle === 'soft-parallax'
-                        ? { transform: [{ scale: isActive ? 1 : 0.97 }] }
-                        : motionStyle === 'snap-focus'
-                          ? { transform: [{ scale: isActive ? 1 : 0.952 }] }
-                          : { transform: [{ scale: isActive ? 1 : 0.972 }] };
-                  const imageMotionStyle =
-                    motionStyle === 'soft-parallax'
-                      ? { transform: [{ scale: isActive ? 1.08 : 1.02 }] }
-                      : motionStyle === 'snap-focus'
-                        ? { transform: [{ scale: isActive ? 1.03 : 1 }] }
-                        : null;
-                  return (
-                    <Pressable
-                      key={promo.id || index}
-                      onPress={() => {
-                        if (activePromoPauseOnInteraction) {
-                          clearInteractionResumeTimer();
-                          setIsCarouselInteractionPaused(true);
-                          scheduleCarouselResume();
-                        }
-                        resolveBannerPress(promo)();
-                      }}
-                      style={[
-                        styles.premiumBannerCard,
-                        { width: cardWidth, marginEnd: index < bannerItems.length - 1 ? itemGap : 0 },
-                        cardMotionStyle,
-                        isActive && styles.premiumBannerCardActive
-                      ]}
-                    >
-                      <View style={[styles.premiumBannerImageWrap, { height: cardHeight }]}>
-                        <Image
-                          source={promo.image}
-                          style={[styles.premiumBannerImage, imageMotionStyle]}
-                          resizeMode={promo.imageFit === 'contain' ? 'contain' : 'cover'}
-                        />
-                        <View style={[styles.premiumBannerOverlay, { backgroundColor: promo.accentColor ? `${promo.accentColor}29` : 'rgba(0,0,0,0.08)' }]} />
-                        <View style={styles.bannerBrandAccentLine} />
-                        <View style={styles.premiumBannerBottomShade} />
-
-                        {promo.partnerLogoUrl && (
-                          <View style={[
-                            styles.premiumBannerLogoWrap,
-                            promo.partnerLogoPosition === 'top-right' ? { right: 18 } : promo.partnerLogoPosition === 'bottom-right' ? { right: 18, bottom: 18, top: undefined } : promo.partnerLogoPosition === 'bottom-left' ? { left: 18, bottom: 18, top: undefined } : { left: 18 }
-                          ]}>
-                            <Image source={resolveDshHomeBannerImageSource(promo.partnerLogoUrl)} style={styles.premiumBannerLogo} resizeMode="contain" />
-                          </View>
-                        )}
-
-                        {promo.offerBadgeText && (
-                          <View style={[
-                            styles.premiumBannerBadge,
-                            { backgroundColor: promo.offerBadgeColor || colorPalette.brandStrong },
-                            promo.offerBadgePosition === 'top-left' ? { left: 18, top: 20 } : { right: 18, top: 20 }
-                          ]}>
-                            <Text style={styles.premiumBannerBadgeText}>{promo.offerBadgeText}</Text>
-                          </View>
-                        )}
-
-                        <View style={[
-                          styles.premiumBannerContent,
-                          promo.titlePlacement === 'center' ? { justifyContent: 'center' } : { justifyContent: 'flex-end' }
-                        ]}>
-                          <Box gap={1}>
-                             <Text style={styles.premiumBannerTitle} numberOfLines={1}>{promo.title}</Text>
-                             <Text style={styles.premiumBannerSubtitle} numberOfLines={1}>{promo.subtitle}</Text>
-                          </Box>
-
-                          <View style={[styles.premiumBannerCta, { backgroundColor: colorPalette.white }]}>
-                            <Text style={[styles.premiumBannerCtaText, { color: promo.accentColor || colorPalette.brand }]}>
-                              {promo.ctaLabel || 'اكتشف الآن'}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                    </Pressable>
-                  );
-               })}
-             </ScrollView>
-
-             <View style={[styles.premiumCarouselControls, isRtl && styles.premiumCarouselControlsRtl]}>
-                <View style={styles.premiumIndicatorRow}>
-                  {bannerItems.map((_, i) => (
-                    <View
-                      key={i}
-                      style={[
-                        styles.premiumIndicator,
-                        i === activePromoIndex && styles.premiumIndicatorActive,
-                      ]}
-                    />
-                  ))}
-                </View>
-                {bannerItems.length > 1 && (
-                  <Pressable
-                    style={styles.premiumPauseBtn}
-                    onPress={() => {
-                      clearInteractionResumeTimer();
-                      setIsCarouselInteractionPaused(false);
-                      setIsCarouselUserPaused((current) => !current);
-                    }}
-                  >
-                    <Ionicons
-                      name={isCarouselUserPaused ? 'play-circle' : 'pause-circle'}
-                      size={16}
-                      color={colorPalette.white}
-                    />
-                  </Pressable>
-                )}
-             </View>
-          </View>
+            }}
+          />
+        ) : null}
         ) : null}
 
         <Box gap={0}>

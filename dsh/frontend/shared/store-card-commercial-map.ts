@@ -260,52 +260,119 @@ export function CommercialParityPreview({ features, storeName }: { features: Ret
     }
   };
 
+  // Limit chips to max 2 to match StoreCardPremium logic
+  const visibleChips = features.commercialChips.slice(0, 2);
+
   return React.createElement(
     'div',
-    { style: { backgroundColor: '#fff', borderRadius: '12px', padding: '16px', border: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', gap: '8px' } },
+    {
+      style: {
+        backgroundColor: '#fff',
+        borderRadius: '12px',
+        padding: '12px',
+        border: '1px solid #E2E8F0',
+        display: 'flex',
+        flexDirection: 'row-reverse', // RTL Layout
+        gap: '12px',
+        minHeight: '98px',
+        position: 'relative',
+        overflow: 'hidden'
+      }
+    },
+    // Right Side: Image Section (Placeholder)
     React.createElement(
       'div',
-      { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
-      React.createElement('span', { style: { fontSize: '14px', fontWeight: '800', color: '#0A2F5C' } }, storeName || 'اسم المتجر'),
-      features.offerLabel && React.createElement('span', { style: { backgroundColor: '#FF500D', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: '800' } }, features.offerLabel)
+      {
+        style: {
+          width: '74px',
+          height: '74px',
+          borderRadius: '8px',
+          backgroundColor: '#F1F5F9',
+          position: 'relative',
+          flexShrink: 0
+        }
+      },
+      // Status Badge (Absolute on image)
+      features.offerLabel && React.createElement(
+        'div',
+        {
+          style: {
+            position: 'absolute',
+            top: '-4px',
+            right: '-4px',
+            backgroundColor: '#FF500D',
+            color: '#fff',
+            padding: '2px 6px',
+            borderRadius: '4px',
+            fontSize: '9px',
+            fontWeight: '900',
+            zIndex: 10,
+            boxShadow: '0 2px 4px rgba(255, 80, 13, 0.2)'
+          }
+        },
+        features.offerLabel
+      ),
+      // Image Glyph Placeholder
+      React.createElement('div', { style: { width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', opacity: 0.2 } }, '🏪')
     ),
-    React.createElement(
-      'div',
-      { style: { display: 'flex', gap: '8px', flexWrap: 'wrap' } },
-      features.commercialChips.map((badge, idx) => {
-        const colors = getBadgeColor(badge.source);
-        // Safety gate: skip rendering if the source is blocked
-        const sourceKeys = Object.keys(features.sourceMap).filter(k => features.sourceMap[k].sourceType === badge.source || (badge.source === 'partner' && (k.startsWith('offer') || k === 'hasCouponAvailable' || k === 'deliveryFeeLabel')));
-        const isBlocked = sourceKeys.some(k => features.sourceMap[k].conflictStatus === 'blocker');
-        if (isBlocked) return null;
 
-        return React.createElement(
-          'div',
-          { key: idx, style: { display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: colors.bg, padding: '2px 6px', borderRadius: '4px' } },
-          React.createElement('span', { style: { color: colors.fg, fontSize: '10px', fontWeight: '800' } }, badge.label),
-          React.createElement('span', { style: { color: colors.fg, fontSize: '8px', opacity: 0.7 } }, `(${getSourceLabel(badge.source)})`)
-        );
-      })
+    // Left Side: Content Section
+    React.createElement(
+      'div',
+      { style: { flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'right' } },
+      React.createElement('div', { style: { fontSize: '13px', fontWeight: '800', color: '#0A2F5C' } }, storeName || 'اسم المتجر'),
+      React.createElement('div', { style: { fontSize: '10px', color: '#64748B', fontWeight: '600' } }, 'توصيل سريع • بثواني برو'),
+
+      // Metadata Row (Rating / ETA)
+      React.createElement(
+        'div',
+        { style: { display: 'flex', flexDirection: 'row-reverse', gap: '8px', marginTop: '2px' } },
+        React.createElement('span', { style: { fontSize: '9px', fontWeight: '800', color: '#D97706' } }, '★ 4.9'),
+        React.createElement('span', { style: { fontSize: '9px', color: '#64748B' } }, '18 دقيقة')
+      ),
+
+      // Commercial Chips (Max 2)
+      React.createElement(
+        'div',
+        { style: { display: 'flex', flexDirection: 'row-reverse', gap: '6px', flexWrap: 'wrap', marginTop: 'auto' } },
+        visibleChips.map((badge, idx) => {
+          const colors = getBadgeColor(badge.source);
+          return React.createElement(
+            'div',
+            { key: idx, style: { display: 'flex', alignItems: 'center', gap: '3px', backgroundColor: colors.bg, padding: '2px 6px', borderRadius: '4px' } },
+            React.createElement('span', { style: { color: colors.fg, fontSize: '9px', fontWeight: '800' } }, badge.label),
+            React.createElement('span', { style: { color: colors.fg, fontSize: '7px', opacity: 0.6 } }, `(${getSourceLabel(badge.source).split(' ')[1] || '—'})`)
+          );
+        })
+      )
     ),
-    // Conflicts View (Now strictly Arabic)
+
+    // Favorite Icon Placeholder (Top Left in RTL)
+    React.createElement('div', { style: { position: 'absolute', top: '12px', left: '12px', fontSize: '14px', opacity: 0.1 } }, '♡'),
+
+    // Conflict Alert Overlay
     features.conflicts.length > 0 && React.createElement(
       'div',
-      { style: { marginTop: '8px', padding: '8px', backgroundColor: '#FEF2F2', borderRadius: '6px', border: '1px solid #FECACA' } },
-      React.createElement('div', { style: { fontSize: '10px', fontWeight: '900', color: '#DC2626', marginBottom: '4px' } }, 'التضاربات المكتشفة:'),
-      features.conflicts.map((c, i) => React.createElement('div', { key: i, style: { fontSize: '9px', color: '#B91C1C' } }, `• [${c.conflictStatus === 'blocker' ? 'محجوب' : 'تنبيه'}] ${c.conflictReason || 'تعارض في البيانات'}`))
-    ),
-    features.deliveryFeeLabel && React.createElement(
-      'div',
-      { style: { marginTop: '8px', padding: '8px', backgroundColor: '#F0FDF4', borderRadius: '6px', border: '1px dashed #BBF7D0' } },
-      React.createElement('span', { style: { fontSize: '10px', color: '#166534' } }, `🚚 ${features.deliveryFeeLabel}`)
-    ),
-    features.priceMatchLabel && React.createElement(
-      'div',
-      { style: { marginTop: '4px', padding: '8px', backgroundColor: '#F8FAFC', borderRadius: '6px', border: '1px dashed #CBD5E1' } },
-      React.createElement('span', { style: { fontSize: '10px', color: '#475569' } }, `⚖️ ${features.priceMatchLabel}`)
+      {
+        style: {
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: 'rgba(254, 242, 242, 0.95)',
+          padding: '4px 8px',
+          borderTop: '1px solid #FECACA',
+          fontSize: '8px',
+          color: '#DC2626',
+          fontWeight: '700',
+          textAlign: 'center'
+        }
+      },
+      `⚠️ تضارب نشط: ${features.conflicts[0].conflictReason}`
     )
   );
 }
+
 
 export const conflictList = [
   ['bthwani-pro', 'free-delivery'],
