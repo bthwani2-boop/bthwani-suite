@@ -43,7 +43,7 @@ const CAPTAINS = [
 
 export function CaptainOperationsScreen({ hubHref, subGroup }: CaptainOperationsScreenProps) {
   return (
-    <div className={styles.surfaceCockpitContent} dir="rtl">
+    <div className={styles.surfaceCockpitContent}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>تشغيل الكباتن</h2>
       </div>
@@ -57,7 +57,7 @@ export function CaptainOperationsScreen({ hubHref, subGroup }: CaptainOperations
         ]}
       />
 
-      <Box gap={2} style={{ display: 'grid' }}>
+      <Box gap={2} style={{}}>
         {CAPTAINS.map((cap) => (
           <WebControlPanelDecisionRow
             key={cap.id}

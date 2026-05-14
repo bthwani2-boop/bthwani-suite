@@ -23,7 +23,7 @@ export function PartnerTopologyLane() {
         <Text role="caption" tone="muted">تكامل السطح التشغيلي الموحد</Text>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+      <div style={{  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
         {TOPOLOGY_LANES.map((lane) => (
           <Surface key={lane.id} tone="raised" gap={3} style={{ borderRadius: 20, padding: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

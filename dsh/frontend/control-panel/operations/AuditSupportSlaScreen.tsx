@@ -29,14 +29,14 @@ export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScre
   ];
 
   return (
-    <div className={styles.surfaceCockpitContent} dir="rtl">
+    <div className={styles.surfaceCockpitContent}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>التدقيق والدعم وSLA</h2>
       </div>
 
       <WebControlPanelKpiStrip items={summaryKpi} />
 
-      <Box gap={2} style={{ display: 'grid' }}>
+      <Box gap={2} style={{}}>
         {preview.audits.map((item) => (
           <WebControlPanelDecisionRow
             key={item.id}

@@ -361,7 +361,7 @@ export function ControlPanelDshCatalogScreen({
   );
 
   return (
-    <div className={styles.surfaceCockpit} dir="rtl">
+    <div className={styles.surfaceCockpit}>
       {/* 1. Header Area - Catalog Command Deck */}
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
@@ -622,7 +622,7 @@ export function ControlPanelDshCatalogScreen({
                     </InspectorTile>
 
                     <InspectorTile title="الحالة">
-                       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '4px' }}>
+                       <div style={{  gridTemplateColumns: '1fr', gap: '4px' }}>
                           <MiniInfoBox label="العميل" value={selectedProduct.approvalStage === 'client-visible' ? 'مرئي' : 'مخفي'} valueColor={selectedProduct.approvalStage === 'client-visible' ? '#16A34A' : '#64748B'} isBoldValue />
                           <MiniInfoBox label="الشريك" value="متاح" />
                        </div>

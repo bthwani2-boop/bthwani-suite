@@ -209,7 +209,7 @@ export function PartnerOffersCommandDeckScreen() {
     if (editorSection === 'details') {
       return (
         <Box gap={4}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+          <div style={{  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
             <TextField label="عنوان العرض" value={draft.title || ''} onChangeText={v => setDraft({ ...draft, title: v })} />
             <TextField label="اسم الشريك" value={draft.partnerName || ''} onChangeText={v => setDraft({ ...draft, partnerName: v })} />
 
@@ -226,7 +226,7 @@ export function PartnerOffersCommandDeckScreen() {
     if (editorSection === 'governance') {
       return (
         <Box gap={4}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+          <div style={{  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
             <TextField label="التصنيف" value={draft.category || ''} onChangeText={v => setDraft({ ...draft, category: v })} />
             <TextField label="قيمة العرض" value={draft.valueLabel || ''} onChangeText={v => setDraft({ ...draft, valueLabel: v })} hint="مثال: خصم 20%" />
 
@@ -374,7 +374,7 @@ export function PartnerOffersCommandDeckScreen() {
             {renderActionButtons()}
           </Box>
 
-          <Box paddingX={4} paddingTop={3}>
+          <Box style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 12 }}>
             <Tabs<PartnerOfferEditorSection>
               items={[
                 { value: 'details', label: 'الأساسيات' },

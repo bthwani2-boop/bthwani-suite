@@ -1,4 +1,7 @@
 {
+  "permissions": {
+    "allow": ["Bash(*)", "PowerShell(*)"]
+  },
   "extraKnownMarketplaces": {
     "nx-claude-plugins": {
       "source": {

@@ -73,7 +73,7 @@ export function ControlPanelDshWorkspaceFrame({
   footerNote,
 }: ControlPanelDshWorkspaceFrameProps) {
   return (
-    <div className={styles.surfaceCockpit} dir="rtl">
+    <div className={styles.surfaceCockpit}>
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">

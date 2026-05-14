@@ -34,14 +34,14 @@ export function AwnakScreen({ hubHref = '/operations', subGroup }: AwnakScreenPr
   ];
 
   return (
-    <div className={styles.surfaceCockpitContent} dir="rtl">
+    <div className={styles.surfaceCockpitContent}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>عونك</h2>
       </div>
 
       <WebControlPanelKpiStrip items={summaryKpi} />
 
-      <Box gap={2} style={{ display: 'grid' }}>
+      <Box gap={2} style={{}}>
         {preview.rows.map((item) => (
           <WebControlPanelDecisionRow
             key={item.requestId}

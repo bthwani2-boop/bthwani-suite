@@ -491,7 +491,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   };
 
   return (
-    <div className={styles.surfaceCockpit} dir="rtl">
+    <div className={styles.surfaceCockpit}>
       {/* 1. Header Area - Marketing Command Deck */}
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>

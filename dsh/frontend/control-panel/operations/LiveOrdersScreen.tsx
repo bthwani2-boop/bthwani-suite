@@ -52,12 +52,12 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   ];
 
   return (
-    <div className={styles.surfaceCockpitContent} dir="rtl">
+    <div className={styles.surfaceCockpitContent}>
       {/* KPI summary strip */}
       <WebControlPanelKpiStrip items={summaryKpi} />
 
       {/* Decision rows — one action cluster per row, no duplicate buttons */}
-      <Box gap={2} style={{ display: 'grid' }}>
+      <Box gap={2} style={{}}>
         {preview.rows.map((order) => (
           <WebControlPanelDecisionRow
             key={order.id}

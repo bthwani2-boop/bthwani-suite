@@ -21,7 +21,7 @@ export function ControlPanelDshCatalogCategoriesScreen() {
   const activeNode = categoryNodes.find((node) => node.id === activeCategoryId);
 
   return (
-    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       <WebCompactSurfaceHeader
         title="حوكمة الفئات"
         description="مراجعة عقدة الفئة والموافقة على التعديلات"

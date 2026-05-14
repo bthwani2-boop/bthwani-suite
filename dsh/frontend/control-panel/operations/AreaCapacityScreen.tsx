@@ -29,14 +29,14 @@ export function AreaCapacityScreen({ hubHref, subGroup }: AreaCapacityScreenProp
   ];
 
   return (
-    <div className={styles.surfaceCockpitContent} dir="rtl">
+    <div className={styles.surfaceCockpitContent}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>المناطق والسعة</h2>
       </div>
 
       <WebControlPanelKpiStrip items={summaryKpi} />
 
-      <Box gap={2} style={{ display: 'grid' }}>
+      <Box gap={2}>
         {preview.zones.map((area) => (
           <WebControlPanelDecisionRow
             key={area.id}

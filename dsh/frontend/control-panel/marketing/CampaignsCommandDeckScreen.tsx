@@ -123,14 +123,14 @@ export function CampaignsCommandDeckScreen() {
             value={draft.targetId}
             onChange={(e) => setDraft({ ...draft, targetId: e.target.value })}
             style={inlineStyles.selectInput}
-            dir="rtl"
+           
           >
             <option value="">(تلقائي)</option>
           </select>
         );
       case 'category':
         return (
-          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput} dir="rtl">
+          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
             <option value="">-- اختر الفئة --</option>
             <option value="food">طعام</option>
             <option value="grocery">مقاضي</option>
@@ -139,7 +139,7 @@ export function CampaignsCommandDeckScreen() {
         );
       case 'store':
         return (
-          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput} dir="rtl">
+          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
             <option value="">-- اختر المتجر --</option>
             <option value="store-1">متجر 1</option>
             <option value="store-2">متجر 2</option>
@@ -148,7 +148,7 @@ export function CampaignsCommandDeckScreen() {
         );
       default:
         return (
-          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput} dir="rtl">
+          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
             <option value="">-- غير متاح للنوع المختار --</option>
           </select>
         );
@@ -215,7 +215,7 @@ export function CampaignsCommandDeckScreen() {
                 value={draft.targetType}
                 onChange={(e) => setDraft({ ...draft, targetType: e.target.value as CampaignTargetType, targetId: '' })}
                 style={inlineStyles.selectInput}
-                dir="rtl"
+               
               >
                 <option value="home">الرئيسية</option>
                 <option value="stores">متاجر</option>
@@ -283,7 +283,7 @@ export function CampaignsCommandDeckScreen() {
                 value={draft.status}
                 onChange={(e) => setDraft({ ...draft, status: e.target.value as CampaignStatus })}
                 style={inlineStyles.selectInput}
-                dir="rtl"
+               
               >
                 <option value="draft">مسودة</option>
                 <option value="pending">بانتظار الموافقة</option>
@@ -335,7 +335,7 @@ export function CampaignsCommandDeckScreen() {
   };
 
   return (
-    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px', padding: '16px', boxSizing: 'border-box' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px', padding: '16px', boxSizing: 'border-box' }}>
       {/* KPIs Header */}
       <View style={styles.kpiRow}>
         <View style={styles.kpiCard}>

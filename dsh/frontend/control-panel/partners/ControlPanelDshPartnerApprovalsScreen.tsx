@@ -16,7 +16,7 @@ import {
 import styles from '../shared/control-panel-surface.module.css';
 
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix') => void }) {
-  const tone = (item.stage === 'marketing-review' || item.stage === 'approved') ? 'success' :
+  const tone = (item.stage === 'marketing-review' || item.stage === 'marketing-approved') ? 'success' :
                (item.stage === 'needs-fix') ? 'danger' :
                (item.stage === 'partner-submitted' || item.stage === 'field-submitted') ? 'warning' : 'neutral';
 
@@ -98,7 +98,7 @@ export function ControlPanelDshPartnerHubScreen() {
   }, [activeTab]);
 
   return (
-    <div className={styles.surfaceCockpit} dir="rtl">
+    <div className={styles.surfaceCockpit}>
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">

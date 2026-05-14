@@ -155,7 +155,7 @@ export function ControlPanelDshSupportHubScreen() {
   const selectedRow = rows.find((row) => row.id === selectedId) ?? rows[0] ?? SUPPORT_ROWS[0];
 
   return (
-    <div className={styles.surfaceCockpit} dir="rtl">
+    <div className={styles.surfaceCockpit}>
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">

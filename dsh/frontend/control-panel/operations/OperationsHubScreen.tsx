@@ -73,7 +73,7 @@ export function ControlPanelDshOperationsScreen({
 
   if (state !== 'ready') {
     return (
-      <div className={styles.surfaceStatePadding} dir="rtl">
+      <div className={styles.surfaceStatePadding}>
         <StateView {...resolveOperationsStateCopy(state)} onActionPress={() => router.push(fallbackHref)} />
       </div>
     );
@@ -97,7 +97,7 @@ export function ControlPanelDshOperationsScreen({
   }));
 
   return (
-    <div className={styles.surfaceCockpit} dir="rtl">
+    <div className={styles.surfaceCockpit}>
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">

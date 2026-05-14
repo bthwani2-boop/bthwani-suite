@@ -39,7 +39,7 @@ const STORES = [
 
 export function PartnerStoresScreen({ hubHref, subGroup }: PartnerStoresScreenProps) {
   return (
-    <div className={styles.surfaceCockpitContent} dir="rtl">
+    <div className={styles.surfaceCockpitContent}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>المتاجر والشركاء</h2>
       </div>
@@ -53,7 +53,7 @@ export function PartnerStoresScreen({ hubHref, subGroup }: PartnerStoresScreenPr
         ]}
       />
 
-      <Box gap={2} style={{ display: 'grid' }}>
+      <Box gap={2} style={{}}>
         {STORES.map((store) => (
           <WebControlPanelDecisionRow
             key={store.id}

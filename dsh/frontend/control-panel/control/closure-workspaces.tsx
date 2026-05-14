@@ -61,7 +61,7 @@ export function ControlPanelDshControlHubScreen() {
   };
 
   return (
-    <div className={styles.surfaceCockpit} dir="rtl">
+    <div className={styles.surfaceCockpit}>
       {/* 1. Header Area - Control Command Deck */}
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>

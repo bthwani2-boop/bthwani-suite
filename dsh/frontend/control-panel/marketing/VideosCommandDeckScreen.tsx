@@ -194,7 +194,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
   const getProductsForStore = (storeId: string) => storeItemsByStoreId[storeId] ?? [];
 
   return (
-    <View style={[styles.root, isRtl && styles.rootRtl]}>
+    <View style={[styles.root, isRtl ? styles.rootRtl : null]}>
       {/* 1. Header & KPI Strip */}
       <Surface tone="raised" style={styles.headerSurface}>
         <View style={[styles.headerRow]}>
@@ -323,7 +323,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                 </View>
                 <View style={[styles.headerRow, { gap: 12 }]}>
                   <View style={{ flex: 1 }}>
-                    <TextField label="المدة (ثانية)" value={draft.durationSeconds} onChangeText={(v) => setDraft(d => ({ ...d, durationSeconds: v }))} type="number" style={rtlText} />
+                    <TextField label="المدة (ثانية)" value={draft.durationSeconds} onChangeText={(v) => setDraft(d => ({ ...d, durationSeconds: v }))} style={rtlText} />
                   </View>
                   <View style={{ flex: 1 }} />
                 </View>
@@ -462,7 +462,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                     />
                   </View>
                 </View>
-                <TextField label="الترتيب" value={draft.order} onChangeText={(v) => setDraft(d => ({ ...d, order: v }))} type="number" style={rtlText} />
+                <TextField label="الترتيب" value={draft.order} onChangeText={(v) => setDraft(d => ({ ...d, order: v }))} style={rtlText} />
               </Box>
             )}
           </Box>
@@ -494,7 +494,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                     <Text role="titleSm" style={[{ color: '#fff', fontWeight: '900' }, rtlText]}>{draft.title || 'عنوان الفيديو يظهر هنا'}</Text>
                     <Text role="caption" style={[{ color: '#fff', opacity: 0.9 }, rtlText]}>{draft.subtitle || 'وصف الفيديو يظهر هنا بشكل مختصر وجذاب'}</Text>
                   </Box>
-                  <View style={[styles.previewCta, isRtl && { alignSelf: 'flex-end' }]}>
+                  <View style={[styles.previewCta, isRtl ? { alignSelf: 'flex-end' } : null]}>
                     <Text style={[{ color: '#0A2F5C', fontWeight: '900', fontSize: 12 }, rtlText]}>{draft.ctaLabel}</Text>
                     <Text style={[{ color: '#0A2F5C', fontSize: 12 }, rtlText]}>{isRtl ? '←' : '→'}</Text>
                   </View>
@@ -520,7 +520,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
 
 const styles = StyleSheet.create({
   root: { flex: 1, display: 'flex', flexDirection: 'column', gap: 16, height: '100%' },
-  rootRtl: { writingDirection: 'rtl' },
+  rootRtl: { direction: 'rtl' },
   headerSurface: { borderRadius: 12, padding: 16, borderWidth: 1, borderColor: 'rgba(10,47,92,0.05)', flexShrink: 0 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   rowReverse: { flexDirection: 'row-reverse' },

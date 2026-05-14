@@ -855,12 +855,12 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
       {activeEditorTab === 'content' ? (
         <View style={styles.editorCard}>
           <Box gap={3}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <TextField label="العنوان الرئيسي" value={draft.title} onChangeText={(v) => setDraft(c => ({ ...c, title: v }))} />
               <TextField label="اسم العلامة" value={draft.partnerName} onChangeText={(v) => setDraft(c => ({ ...c, partnerName: v }))} />
             </div>
             <TextField label="الوصف الترويجي" value={draft.subtitle} onChangeText={(v) => setDraft(c => ({ ...c, subtitle: v }))} multiline numberOfLines={2} />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+            <div style={{  gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
               <TextField label="نص الزر" value={draft.ctaLabel} onChangeText={(v) => setDraft(c => ({ ...c, ctaLabel: v }))} />
               <TextField label="لون الهوية" value={draft.accentColor} onChangeText={(v) => setDraft(c => ({ ...c, accentColor: v }))} />
               <TextField label="ترتيب الظهور" value={draft.position} onChangeText={(v) => setDraft(c => ({ ...c, position: v }))} />
@@ -872,18 +872,18 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
       {activeEditorTab === 'media' ? (
         <View style={styles.editorCard}>
           <Box gap={3}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 12 }}>
+            <div style={{  gridTemplateColumns: '1.6fr 1fr', gap: 12 }}>
               <TextField label="صورة الخلفية" value={draft.imageUrl} onChangeText={(v) => setDraft(c => ({ ...c, imageUrl: v }))} />
               <Box gap={1}>
                 <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>احتواء الصورة</label>
                 <Tabs<BannerImageFit> items={IMAGE_FIT_TAB_ITEMS} value={draft.imageFit} onValueChange={(v) => setDraft(c => ({ ...c, imageFit: v }))} variant="pill" />
               </Box>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <TextField label="رابط الشعار" value={draft.partnerLogoUrl} onChangeText={(v) => setDraft(c => ({ ...c, partnerLogoUrl: v }))} />
               <TextField label="نص الشارة" value={draft.offerBadgeText} onChangeText={(v) => setDraft(c => ({ ...c, offerBadgeText: v }))} />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Box gap={1}>
                 <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>موقع الشعار</label>
                 <Tabs<BannerLogoPosition>
@@ -902,7 +902,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
       {activeEditorTab === 'target' ? (
         <View style={styles.editorCard}>
           <Box gap={4}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Box gap={1}>
                 <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>نطاق العرض</label>
                 <Tabs<MarketingBannerAudience>
@@ -976,7 +976,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             )}
 
             {draft.targetType === 'subcategory' && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <Box gap={2}>
                   <SearchField label="ابحث في الفئات الأم" value={subcategoryParentSearch} onChangeText={setSubcategoryParentSearch} />
                   <SelectField
@@ -1001,7 +1001,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             )}
 
             {draft.targetType === 'product' && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <Box gap={2}>
                   <SearchField label="ابحث في المتاجر" value={productStoreSearch} onChangeText={setProductStoreSearch} />
                 <SelectField

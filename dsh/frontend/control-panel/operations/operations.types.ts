@@ -54,6 +54,8 @@ export type LegacyOperationsWorkspaceId =
   | 'bell'
   | 'arrival-bell'
   | 'zone-set'
+  | 'live-map-capacity'
+  | 'geo-heatmap'
   | 'live-tracking'
   | 'handoff'
   | 'proof-review'

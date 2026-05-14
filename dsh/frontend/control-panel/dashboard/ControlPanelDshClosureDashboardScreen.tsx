@@ -67,7 +67,7 @@ export function ControlPanelDshClosureHubScreen() {
   };
 
   return (
-    <div className={styles.surfaceCockpit} dir="rtl">
+    <div className={styles.surfaceCockpit}>
       {/* 1. Header Area - Closure Command Deck */}
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
@@ -181,7 +181,7 @@ export function ControlPanelDshClosureDashboardScreen() {
 
 
   return (
-    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
       <WebControlPanelKpiStrip items={[
         { id: 'surface-client', label: 'العميل', value: String(surfaceCounts.client), tone: 'success' },
         { id: 'surface-partner', label: 'الشريك', value: String(surfaceCounts.partner), tone: 'success' },
@@ -204,7 +204,7 @@ export function ControlPanelDshClosureDashboardScreen() {
 
       <div style={{ padding: '0 14px' }}>
         <Text role="titleSm" style={{ marginBottom: 8 }}>إشارات عابرة للأسطح</Text>
-        <div style={{ display: 'grid', gap: '8px' }}>
+        <div style={{  gap: '8px' }}>
           {DSH_CROSS_SURFACE_JOURNEYS.map((journey) => (
             <WebControlPanelRecommendation
               key={journey.id}
@@ -223,7 +223,7 @@ export function ControlPanelDshClosureDashboardScreen() {
 
 export function ControlPanelDshClosureEvidenceStream() {
   return (
-    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       <WebCompactSurfaceHeader
         title="تدفق أدلة الإغلاق"
         description="كل عنصر يمثل وحدة إغلاق يمكن توجيهها لمساحة العمل المناسبة."

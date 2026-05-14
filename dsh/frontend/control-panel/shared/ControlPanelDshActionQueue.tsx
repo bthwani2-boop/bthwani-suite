@@ -69,7 +69,7 @@ export function ControlPanelDshActionQueue({
   emptyLabel = 'لا توجد عناصر حالياً',
 }: ControlPanelDshActionQueueProps) {
   return (
-    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0 }}>
       <div style={QUEUE_HEADER_STYLE}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <span style={{ fontSize: '14px', fontWeight: 800, color: '#0A2F5C' }}>{title}</span>
@@ -111,8 +111,8 @@ export function ControlPanelDshActionQueue({
                   risk={tone === 'danger' ? 'danger' : tone === 'warning' ? 'warning' : 'neutral'}
                   recommendation={item.blocker}
                   reason={item.evidence}
-                  primaryAction={{ id: 'primary', label: item.primaryActionLabel, onAction: (e) => { (e as unknown as Event & { stopPropagation: () => void })?.stopPropagation?.(); primaryAction(item); } }}
-                  secondaryAction={{ id: 'secondary', label: item.secondaryActionLabel, onAction: (e) => { (e as unknown as Event & { stopPropagation: () => void })?.stopPropagation?.(); secondaryAction(item); } }}
+                  primaryAction={{ id: 'primary', label: item.primaryActionLabel, onAction: () => { primaryAction(item); } }}
+                  secondaryAction={{ id: 'secondary', label: item.secondaryActionLabel, onAction: () => { secondaryAction(item); } }}
                   onInspect={() => onSelect(item.id)}
                 />
 
@@ -122,7 +122,7 @@ export function ControlPanelDshActionQueue({
                     reason={item.recommendation ? `لماذا؟ ${item.recommendation.reason} · ما الدليل؟ ${item.recommendation.evidence} · ما الأثر المتوقع؟ ${item.recommendation.expectedImpact}` : 'جاهز للتنفيذ بناءً على مراجعة المعايير الآلية.'}
                     confidence={item.recommendation?.confidence ?? 'high'}
                     auditTag={item.recommendation ? `${item.recommendation.owner} · ${item.recommendation.surface}` : 'DSH'}
-                    primaryAction={{ id: 'evidence', label: item.evidenceActionLabel, onAction: (e) => { (e as unknown as Event & { stopPropagation: () => void })?.stopPropagation?.(); evidenceAction(item); } }}
+                    primaryAction={{ id: 'evidence', label: item.evidenceActionLabel, onAction: () => { evidenceAction(item); } }}
                   />
                 )}
               </div>

@@ -153,7 +153,7 @@ export function LoyaltyCommandDeckScreen() {
   };
 
   return (
-    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px', padding: '16px', boxSizing: 'border-box' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px', padding: '16px', boxSizing: 'border-box' }}>
       {/* KPIs */}
       <View style={styles.kpiRow}>
         <View style={styles.kpiCard}>

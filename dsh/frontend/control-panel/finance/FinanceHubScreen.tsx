@@ -71,7 +71,7 @@ export function ControlPanelDshFinanceHubScreen({
 
   if (state !== 'ready') {
     return (
-      <div dir="rtl" className={`${styles.surfaceMainPanel} ${styles.surfaceStatePadding}`}>
+      <div className={`${styles.surfaceMainPanel} ${styles.surfaceStatePadding}`}>
         <StateView
            stateId="loading"
            title="جاري تحميل البيانات المالية"
@@ -83,7 +83,7 @@ export function ControlPanelDshFinanceHubScreen({
   }
 
   return (
-    <div className={styles.surfaceCockpit} dir="rtl">
+    <div className={styles.surfaceCockpit}>
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">

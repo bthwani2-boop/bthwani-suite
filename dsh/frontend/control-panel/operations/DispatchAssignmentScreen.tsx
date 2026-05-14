@@ -28,12 +28,12 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
   ];
 
   return (
-    <div className={styles.surfaceCockpitContent} dir="rtl">
+    <div className={styles.surfaceCockpitContent}>
       {/* KPI summary strip */}
       <WebControlPanelKpiStrip items={summaryKpi} />
 
       {/* Decision rows — duplicate buttons eliminated, one primary action per row */}
-      <Box gap={2} style={{ display: 'grid' }}>
+      <Box gap={2} style={{}}>
         {preview.rows.map((item) => {
           const tone = TONE_MAP[item.statusTone] ?? 'neutral';
           return (

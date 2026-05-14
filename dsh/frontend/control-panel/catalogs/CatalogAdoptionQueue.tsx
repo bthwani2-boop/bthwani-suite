@@ -82,7 +82,7 @@ export function CatalogAdoptionQueue() {
   };
 
   return (
-    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <WebCompactSurfaceHeader
         title="اعتماد الكتالوج الموحد"
         description="اعتماد العناصر النهائية لتصبح جزءًا من الكتالوج. لا يظهر للعميل إلا بعد التفعيل النهائي."

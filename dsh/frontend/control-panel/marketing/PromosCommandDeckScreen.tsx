@@ -109,7 +109,7 @@ export function PromosCommandDeckScreen() {
                <Text style={{ fontSize: 11, fontWeight: '900', color: '#0A2F5C' }}>2. قواعد الربط الذكي</Text>
                <View style={{ flexDirection: 'row', gap: 12 }}>
                   <SelectField style={{ flex: 1 }} label="نوع الوجهة" value={draft.targetType} onValueChange={v => setDraft(d => ({ ...d, targetType: v }))} options={[{value:'store',label:'متجر'},{value:'category',label:'فئة'},{value:'product',label:'منتج'}]} />
-                  <SelectField style={{ flex: 1 }} label="الوجهة المحددة" value={draft.targetId} onValueChange={(v,o) => setDraft(d => ({ ...d, targetId: v, targetLabel: o?.label??'' }))} options={getTargetOptions()} />
+                  <SelectField style={{ flex: 1 }} label="الوجهة المحددة" value={draft.targetId} onValueChange={v => setDraft(d => ({ ...d, targetId: v, targetLabel: getTargetOptions().find(o => o.value === v)?.label ?? '' }))} options={getTargetOptions()} />
                </View>
             </Box>
          );

@@ -179,7 +179,7 @@ export function DshPartnerPromotionEligibilityScreen({
       }
       main={
         <Box gap={3}>
-          <Box gap={2} layoutDirection="row" wrap>
+          <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
             <WebControlPanelStatusTag label={resolveStatusLabel(selectedItem?.status ?? 'draft')} tone={resolveApprovalTone(selectedItem?.status ?? 'draft')} />
             <WebControlPanelStatusTag label={selectedItem?.kind === 'product' ? 'منتج' : 'متجر'} tone="info" />
             <WebControlPanelStatusTag label={resolveEligibilityLabel(selectedItem?.eligibility ?? 'review')} tone={resolveEligibilityTone(selectedItem?.eligibility ?? 'review')} />

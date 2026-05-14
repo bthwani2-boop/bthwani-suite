@@ -53,7 +53,7 @@ export function CommandCenterScreen({ hubHref, subGroup }: CommandCenterScreenPr
   const router = useRouter();
 
   return (
-    <div className={styles.surfaceCockpitContent} dir="rtl">
+    <div className={styles.surfaceCockpitContent}>
       {/* 1. Header — Compact Title */}
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>نبض العمليات</h2>

@@ -284,7 +284,7 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
   const selectedZoneLayout = selectedZone ? ZONE_LAYOUT[selectedZone.id] : undefined;
 
   return (
-    <Box gap={3} dir="rtl">
+    <Box gap={3}>
       <WebControlPanelWorkbench
         header={
           <WebControlPanelDenseHeader
@@ -316,7 +316,7 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
           <Box gap={3}>
             <WebControlPanelMapCanvas
               legend={
-                <Box gap={1} layoutDirection="row" wrap>
+                <Box gap={1} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
                   <WebControlPanelStatusTag label="الطلب والسعة" tone="info" />
                   <WebControlPanelStatusTag label="مخاطر الالتزام" tone="warning" />
                   <WebControlPanelStatusTag label="معاينة فقط" tone="neutral" />
@@ -365,13 +365,13 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
                       <>
                         <WebControlPanelMapPin
                           label={`${zone.demandOrders} طلب`}
-                          tone="info"
+                          tone="neutral"
                           position={layout.order}
                           onSelect={() => setSelectedZoneId(zone.id)}
                         />
                         <WebControlPanelMapPin
                           label={`${zone.activeCaptains} كابتن`}
-                          tone="brand"
+                          tone="success"
                           position={layout.captain}
                           onSelect={() => setSelectedZoneId(zone.id)}
                         />
