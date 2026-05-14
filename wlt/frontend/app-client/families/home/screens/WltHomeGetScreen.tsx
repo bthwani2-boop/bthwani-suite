@@ -1,7 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, amountToArabicText, useI18n } from '@bthwani/ui-kit';
+import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, amountToArabicText, useI18n } from '@bthwani/ui-kit';
 import { financeProviders } from '../../../../shared/finance/providers';
 
 export const WltHomeGetScreen: React.FC = () => {
@@ -74,7 +73,7 @@ export const WltHomeGetScreen: React.FC = () => {
             onPress={openTopup}
             fullWidth={false}
             size="md"
-            leadingAccessory={<Ionicons name="add" size={18} color="#fff" />}
+            leadingAccessory={<Icon name="add-outline" size={18} color="#fff" />}
             style={{ width: 220, marginTop: 8, alignSelf: 'center' }}
           />
         </View>

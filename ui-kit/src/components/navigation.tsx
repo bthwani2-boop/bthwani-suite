@@ -52,30 +52,25 @@ function SmartNewsTicker({ message, status, onPress }: { message: string, status
       return undefined;
     }
 
-    let isSubscribed = true;
     translateX.setValue(-distance);
 
+    // useNativeDriver MUST be false: marquee translateX animations call
+    // __makeNative() which invokes findNodeHandle on a Fabric node that
+    // may not be attached yet, causing "property is not writable" crash.
     const animation = Animated.loop(
       Animated.timing(translateX, {
         toValue: distance,
         duration: 12000,
         easing: Easing.linear,
-        useNativeDriver: true,
+        useNativeDriver: false,
         isInteraction: false,
       }),
       { resetBeforeIteration: true },
     );
 
-    const interactionPromise = import('react-native').then(({ InteractionManager }) => {
-      InteractionManager.runAfterInteractions(() => {
-        if (isSubscribed) {
-          animation.start();
-        }
-      });
-    });
+    animation.start();
 
     return () => {
-      isSubscribed = false;
       animation.stop();
       translateX.stopAnimation();
       translateX.setValue(-distance);

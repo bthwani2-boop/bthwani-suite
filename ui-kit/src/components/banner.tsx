@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Animated, FlatList, Pressable, StyleSheet, View, useWindowDimensions, InteractionManager, type ImageSourcePropType, type NativeScrollEvent, type NativeSyntheticEvent, type StyleProp, type ViewStyle } from 'react-native';
+import { Animated, FlatList, Pressable, StyleSheet, View, useWindowDimensions, type ImageSourcePropType, type NativeScrollEvent, type NativeSyntheticEvent, type StyleProp, type ViewStyle } from 'react-native';
 import { radius, resolveRowDirection, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Text } from '../primitives';
@@ -88,27 +88,29 @@ export function BannerCarousel(props: BannerCarouselProps) {
   const snapAlignment = isSecondary ? 'center' : 'start';
   const styles = React.useMemo(() => createStyles(theme, isCompactSecondary), [theme, isCompactSecondary]);
 
-  // Handle programmatic scrolling in a dedicated effect to avoid "property is not writable"
+  // Programmatic scroll: use scrollToOffset (not scrollToIndex) to avoid
+  // dispatchCommand on an uncommitted Fabric native node ("property is not writable").
+  // requestAnimationFrame defers until after the render commit, making it safe.
   React.useEffect(() => {
-    if (count > 1 && !isInteracting) {
-      const timeout = setTimeout(() => {
-        InteractionManager.runAfterInteractions(() => {
-          if (flatListRef.current && typeof (flatListRef.current as any).scrollToIndex === 'function') {
-            try {
-              flatListRef.current.scrollToIndex({
-                index: activeIndex,
-                animated: true,
-              });
-            } catch (err) {
-              // Ignore scrolling errors during mount/unmount
-            }
-          }
-        });
-      }, 0);
-      return () => clearTimeout(timeout);
+    if (count <= 1 || isInteracting) {
+      return undefined;
     }
-    return undefined;
-  }, [activeIndex, isInteracting, count]);
+
+    const rafId = requestAnimationFrame(() => {
+      const list = flatListRef.current;
+      if (!list) return;
+      try {
+        list.scrollToOffset({
+          offset: activeIndex * snapInterval,
+          animated: true,
+        });
+      } catch (_err) {
+        // Ignore — component may have unmounted between raf and execution
+      }
+    });
+
+    return () => cancelAnimationFrame(rafId);
+  }, [activeIndex, isInteracting, count, snapInterval]);
 
   // --- Autoplay Timer ---
   React.useEffect(() => {
