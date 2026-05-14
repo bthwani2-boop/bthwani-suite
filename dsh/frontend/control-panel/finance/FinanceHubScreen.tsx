@@ -94,7 +94,7 @@ export function ControlPanelDshFinanceHubScreen({
           <Box gap={0}>
             <div className={styles.surfaceHeaderTextRow}>
               <h1 className={styles.surfaceHeaderTitle}>مالية DSH</h1>
-              <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
+              <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
                 <span className={styles.surfaceHeaderBadgeText}>غرفة قيادة</span>
               </Box>
             </div>

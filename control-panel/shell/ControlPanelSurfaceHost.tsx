@@ -271,7 +271,7 @@ export function ControlPanelSurfaceHost({
         ) : null}
 
         {activeSectionId === 'partners' ? (
-          <ControlPanelDshPartnerApprovalsScreen hubHref="/partners" operationsHref="/partners" />
+          <ControlPanelDshPartnerApprovalsScreen />
         ) : null}
 
         {activeSectionId === 'catalogs' ? (

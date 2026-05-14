@@ -577,6 +577,7 @@ export type SemanticTheme = {
 	surface: string;
 	surfaceRaised: string;
 	surfaceInset: string;
+	surfaceSecondary: string;
 	line: string;
 	lineStrong: string;
 	text: string;
@@ -621,6 +622,7 @@ export const lightTheme: SemanticTheme = {
 	surface: surfaceContainerRoles.surface,
 	surfaceRaised: surfaceContainerRoles.surfaceRaised,
 	surfaceInset: surfaceContainerRoles.surfaceInset,
+	surfaceSecondary: brandColorRoles.brandSoft,
 	line: surfaceContainerRoles.line,
 	lineStrong: surfaceContainerRoles.lineStrong,
 	text: colorPalette.ink,
@@ -665,6 +667,7 @@ export const darkTheme: SemanticTheme = {
 	surface: '#111827',
 	surfaceRaised: '#182232',
 	surfaceInset: '#0B1324',
+	surfaceSecondary: withAlpha('#FF500D', 0.16),
 	line: '#22304A',
 	lineStrong: '#334155',
 	text: '#F8FAFC',

@@ -11,10 +11,13 @@ const nextConfig = {
   turbopack: {
     resolveAlias: {
       'react-native': 'react-native-web',
-      '@expo/vector-icons': shellShimPath('expo-vector-icons.tsx'),
+      '@expo/vector-icons$': shellShimPath('expo-vector-icons.tsx'),
       '@expo/vector-icons/Ionicons': shellShimPath('expo-vector-icons.tsx'),
+      '@expo/vector-icons/build/Ionicons': shellShimPath('expo-vector-icons.tsx'),
       '@expo/vector-icons/MaterialIcons': shellShimPath('expo-vector-icons.tsx'),
+      '@expo/vector-icons/build/MaterialIcons': shellShimPath('expo-vector-icons.tsx'),
       '@expo/vector-icons/MaterialCommunityIcons': shellShimPath('expo-vector-icons.tsx'),
+      '@expo/vector-icons/build/MaterialCommunityIcons': shellShimPath('expo-vector-icons.tsx'),
       '@expo/vector-icons/FontAwesome': shellShimPath('expo-vector-icons.tsx'),
       '@expo/vector-icons/FontAwesome5': shellShimPath('expo-vector-icons.tsx'),
       '@expo/vector-icons/FontAwesome6': shellShimPath('expo-vector-icons.tsx'),
@@ -30,6 +33,7 @@ const nextConfig = {
       'expo-modules-core': shellShimPath('expo-modules-core.ts'),
       'expo-modules-core/src/index': shellShimPath('expo-modules-core.ts'),
       'expo-modules-core/src/index.ts': shellShimPath('expo-modules-core.ts'),
+      'react-native-safe-area-context': shellShimPath('react-native-safe-area-context.tsx'),
     },
     resolveExtensions: [
       '.web.tsx',
@@ -63,10 +67,13 @@ const nextConfig = {
     config.resolve.alias = {
       ...(config.resolve.alias ?? {}),
       'react-native': 'react-native-web',
-      '@expo/vector-icons': shellShimPath('expo-vector-icons.tsx'),
+      '@expo/vector-icons$': shellShimPath('expo-vector-icons.tsx'),
       '@expo/vector-icons/Ionicons': shellShimPath('expo-vector-icons.tsx'),
+      '@expo/vector-icons/build/Ionicons': shellShimPath('expo-vector-icons.tsx'),
       '@expo/vector-icons/MaterialIcons': shellShimPath('expo-vector-icons.tsx'),
+      '@expo/vector-icons/build/MaterialIcons': shellShimPath('expo-vector-icons.tsx'),
       '@expo/vector-icons/MaterialCommunityIcons': shellShimPath('expo-vector-icons.tsx'),
+      '@expo/vector-icons/build/MaterialCommunityIcons': shellShimPath('expo-vector-icons.tsx'),
       '@expo/vector-icons/FontAwesome': shellShimPath('expo-vector-icons.tsx'),
       '@expo/vector-icons/FontAwesome5': shellShimPath('expo-vector-icons.tsx'),
       '@expo/vector-icons/FontAwesome6': shellShimPath('expo-vector-icons.tsx'),
@@ -82,6 +89,7 @@ const nextConfig = {
       'expo-modules-core': shellShimPath('expo-modules-core.ts'),
       'expo-modules-core/src/index': shellShimPath('expo-modules-core.ts'),
       'expo-modules-core/src/index.ts': shellShimPath('expo-modules-core.ts'),
+      'react-native-safe-area-context': shellShimPath('react-native-safe-area-context.tsx'),
     };
 
     config.module = config.module ?? {};

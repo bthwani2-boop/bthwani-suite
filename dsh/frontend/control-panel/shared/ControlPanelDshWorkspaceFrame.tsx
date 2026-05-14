@@ -84,8 +84,8 @@ export function ControlPanelDshWorkspaceFrame({
           <Box gap={0}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>{title}</h1>
-              <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
-                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: '9px' }}>{badges[0] ?? 'DSH'}</Text>
+              <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
+                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: 9 }}>{badges[0] ?? 'DSH'}</Text>
               </Box>
             </div>
             <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>{description}</p>

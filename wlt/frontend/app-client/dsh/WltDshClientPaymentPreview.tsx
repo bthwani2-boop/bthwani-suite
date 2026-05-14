@@ -58,7 +58,7 @@ function PaymentOptionCard({
   isSelected: boolean;
   isAvailable: boolean;
   availabilityLabel: string;
-  availabilityTone: 'success' | 'warning' | 'info' | 'error';
+  availabilityTone: 'success' | 'warning' | 'info' | 'danger';
   onSelect: (id: WltDshPaymentMethod) => void;
 }) {
   const { theme } = useTheme();
@@ -102,7 +102,7 @@ function PaymentOptionCard({
 function PaymentStateSummary({ state }: { state: WltDshPaymentPreviewState }) {
   const statusTone = state.feedbackTone === 'success' ? 'success'
     : state.feedbackTone === 'warning' ? 'warning'
-    : state.feedbackTone === 'error' ? 'error'
+    : state.feedbackTone === 'error' ? 'danger'
     : 'info';
 
   return (
@@ -190,7 +190,7 @@ export function WltDshClientPaymentPreview({
               isSelected={method === opt.id}
               isAvailable={opt.isAvailable}
               availabilityLabel={opt.availabilityLabel}
-              availabilityTone={opt.availabilityTone}
+              availabilityTone={opt.availabilityTone === 'error' ? 'danger' : opt.availabilityTone}
               onSelect={handleSelect}
             />
           ))}

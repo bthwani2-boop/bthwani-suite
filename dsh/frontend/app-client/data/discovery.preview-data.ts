@@ -1,5 +1,4 @@
-import { buildCanonicalPreviewDiscoveryStores } from '../../shared/dshStoreProductCardModel';
-import type { DshDiscoveryStore } from '../dsh-client.types';
+import { buildCanonicalPreviewDiscoveryStores, type DshDiscoveryStore } from '../../shared/dshStoreProductCardModel';
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
@@ -119,6 +118,9 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
 		followerCount: 0,
 		multiplierLabel: 'x0',
 		subscriptionPackageChips: [],
+		hasBthwaniPro: false,
+		hasNewProducts: false,
+		hasCouponAvailable: false,
 		supportsPickup: false,
 		supportsPartnerDelivery: false,
 		publishStage: 'marketing-review',
@@ -141,6 +143,9 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
 		followerCount: 0,
 		multiplierLabel: 'x0',
 		subscriptionPackageChips: [],
+		hasBthwaniPro: false,
+		hasNewProducts: false,
+		hasCouponAvailable: false,
 		supportsPickup: false,
 		supportsPartnerDelivery: false,
 		publishStage: 'partner-review',
@@ -163,6 +168,9 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
 		followerCount: 0,
 		multiplierLabel: 'x0',
 		subscriptionPackageChips: [],
+		hasBthwaniPro: false,
+		hasNewProducts: false,
+		hasCouponAvailable: false,
 		supportsPickup: false,
 		supportsPartnerDelivery: false,
 		publishStage: 'catalog-adopted',
@@ -185,6 +193,9 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
 		followerCount: 100,
 		multiplierLabel: 'x1',
 		subscriptionPackageChips: [],
+		hasBthwaniPro: false,
+		hasNewProducts: false,
+		hasCouponAvailable: false,
 		supportsPickup: true,
 		supportsPartnerDelivery: true,
 		publishStage: 'client-visible',
@@ -207,6 +218,9 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
 		followerCount: 50,
 		multiplierLabel: 'x1',
 		subscriptionPackageChips: [],
+		hasBthwaniPro: false,
+		hasNewProducts: false,
+		hasCouponAvailable: false,
 		supportsPickup: true,
 		supportsPartnerDelivery: true,
 		publishStage: 'client-visible',

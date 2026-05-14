@@ -90,8 +90,8 @@ export function ControlPanelDshClosureHubScreen() {
           <Box gap={0}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>إغلاق DSH</h1>
-              <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
-                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: '9px' }}>مرحلة الجاهزية</Text>
+              <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
+                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: 9 }}>مرحلة الجاهزية</Text>
               </Box>
             </div>
             <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>حوكمة الإغلاق النهائي ومصفوفة الجاهزية العابرة للأسطح</p>
@@ -203,12 +203,12 @@ export function ControlPanelDshClosureDashboardScreen() {
       </div>
 
       <div style={{ padding: '0 14px' }}>
-        <Text role="titleSm" style={{ marginBottom: '8px' }}>إشارات عابرة للأسطح</Text>
+        <Text role="titleSm" style={{ marginBottom: 8 }}>إشارات عابرة للأسطح</Text>
         <div style={{ display: 'grid', gap: '8px' }}>
           {DSH_CROSS_SURFACE_JOURNEYS.map((journey) => (
             <WebControlPanelRecommendation
               key={journey.id}
-              title={journey.entityLabel}
+              title={journey.entityLabel ?? journey.id}
               reason={journey.reason}
               confidence={journey.confidence}
               auditTag={journey.lifecycleStep}

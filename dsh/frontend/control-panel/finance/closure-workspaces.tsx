@@ -227,7 +227,7 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
       }
       main={
         <Box gap={3}>
-          <Box gap={2} layoutDirection="row" wrap>
+          <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
             <WebControlPanelStatusTag label={resolveSurfaceLabel(surface)} tone="info" />
             <WebControlPanelStatusTag label={subGroup ? `الفلتر ${subGroup}` : 'كل الصفوف'} tone="neutral" />
             <WebControlPanelStatusTag label={selectedRow?.owner ?? 'لا يوجد تحديد'} tone={selectedRow ? resolveRowTone(selectedRow) : 'neutral'} />

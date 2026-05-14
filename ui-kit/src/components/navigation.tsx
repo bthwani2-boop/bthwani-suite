@@ -293,11 +293,11 @@ function NavButton({ item, isActive, onPress }: { item: NavItem; isActive: boole
       <Icon
         name={isActive ? item.activeIcon : item.icon}
         size={22}
-        color={isActive ? colorPalette.brand : colorPalette.textMuted}
+        color={isActive ? colorPalette.brand : colorPalette.inkMuted}
       />
       <Text
         role="caption"
-        style={[styles.navLabel, { color: isActive ? colorPalette.brand : colorPalette.textMuted }]}
+        style={[styles.navLabel, { color: isActive ? colorPalette.brand : colorPalette.inkMuted }]}
         numberOfLines={1}
       >
         {item.label}
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   brandText: {
     color: colorPalette.white,
     fontSize: 17,
-    fontWeight: '950',
+    fontWeight: '900',
     letterSpacing: -0.8,
     textShadowColor: 'rgba(0,0,0,0.25)',
     textShadowOffset: { width: 0, height: 1.5 },

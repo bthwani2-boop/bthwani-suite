@@ -65,9 +65,9 @@ const initialColumnFilters = {
 
 function FilterToken({ label, onRemove }: { label: string, onRemove: () => void }) {
   return (
-    <Surface tone="raised" paddingX={2} paddingY={0.5} radiusToken="full" layoutDirection="row" align="center" gap={1}>
+    <Surface tone="raised" paddingX={2} paddingY={1} radiusToken="pill" layoutDirection="row" align="center" gap={1}>
       <Text role="caption" style={{ fontWeight: 700 }}>{label}</Text>
-      <Button label="✕" accessibilityLabel="إزالة" tone="secondary" size="sm" onPress={onRemove} style={{ minWidth: 0, padding: 0, background: 'transparent', border: 'none' }} />
+      <Button label="✕" accessibilityLabel="إزالة" tone="secondary" size="sm" onPress={onRemove} style={{ minWidth: 0, padding: 0, backgroundColor: 'transparent', borderWidth: 0 }} />
     </Surface>
   );
 }
@@ -75,7 +75,7 @@ function FilterToken({ label, onRemove }: { label: string, onRemove: () => void 
 function PolicyBadge({ mediaPolicy }: { mediaPolicy: string }) {
   const isCentral = mediaPolicy === 'catalog-owned-media';
   return (
-    <Text role="caption" style={{ fontWeight: 700, color: isCentral ? '#16A34A' : '#D97706', whiteSpace: 'nowrap' }}>
+    <Text role="caption" numberOfLines={1} style={{ fontWeight: '700', color: isCentral ? '#16A34A' : '#D97706' }}>
       {isCentral ? 'مركزي' : 'شريك'}
     </Text>
   );
@@ -83,8 +83,8 @@ function PolicyBadge({ mediaPolicy }: { mediaPolicy: string }) {
 
 function InspectorTile({ title, children, dashed = false, warning = false }: { title: string, children: React.ReactNode, dashed?: boolean, warning?: boolean }) {
   return (
-    <Box gap={2} style={{ padding: '12px', backgroundColor: warning ? '#FEF2F2' : dashed ? '#FFFFFF' : '#F8FAFC', borderRadius: '8px', borderWidth: 1, borderColor: warning ? '#FECACA' : dashed ? '#CBD5E1' : '#E2E8F0', borderStyle: dashed ? 'dashed' : 'solid' }}>
-       <Text role="caption" style={{ fontWeight: 800, color: warning ? '#DC2626' : '#0A2F5C' }}>{title}</Text>
+    <Box gap={2} style={{ padding: 12, backgroundColor: warning ? '#FEF2F2' : dashed ? '#FFFFFF' : '#F8FAFC', borderRadius: 8, borderWidth: 1, borderColor: warning ? '#FECACA' : dashed ? '#CBD5E1' : '#E2E8F0', borderStyle: dashed ? 'dashed' : 'solid' }}>
+       <Text role="caption" style={{ fontWeight: '800', color: warning ? '#DC2626' : '#0A2F5C' }}>{title}</Text>
        {children}
     </Box>
   );
@@ -93,8 +93,8 @@ function InspectorTile({ title, children, dashed = false, warning = false }: { t
 function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: { label: string, value: string | React.ReactNode, valueColor?: string, isBoldValue?: boolean }) {
   return (
     <Box gap={0}>
-      <Text role="caption" tone="muted" style={{ fontSize: '10px', textAlign: 'right' }}>{label}</Text>
-      <Text role="caption" style={{ color: valueColor || '#0A2F5C', fontWeight: isBoldValue ? 800 : 600, textAlign: 'right' }}>{value}</Text>
+      <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right' }}>{label}</Text>
+      <Text role="caption" style={{ color: valueColor || '#0A2F5C', fontWeight: isBoldValue ? '800' : '600', textAlign: 'right' }}>{value}</Text>
     </Box>
   );
 }
@@ -109,7 +109,7 @@ function WatermarkedImage({ src, fallback, size = 32 }: { src?: string, fallback
       {src ? (
         <Image src={src} fill style={{ objectFit: 'cover' }} alt="صورة المنتج" />
       ) : (
-        <Text style={{ fontSize: `${size/2}px` }}>{fallbackLabel}</Text>
+        <Text style={{ fontSize: size / 2 }}>{fallbackLabel}</Text>
       )}
       <Box style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', alignItems: 'center', justifyContent: 'center', opacity: 0.4, backgroundColor: 'rgba(255,255,255,0.15)' }}>
         <Image src={WATERMARK_URL} width={size * 0.8} height={size * 0.8} style={{ objectFit: 'contain' }} alt="شعار المنصة" />
@@ -131,13 +131,13 @@ const FilterDropdown = ({ title, options, selected, onChange, onClose }: FilterD
           onChangeText={setSearch}
         />
       </Box>
-      <Box style={{ maxHeight: 150, overflowY: 'auto' }}>
+      <Box style={{ maxHeight: 150 }}>
         {filteredOptions.length === 0 ? (
            <Box padding={2} align="center">
              <Text role="caption" tone="muted">لا توجد نتائج</Text>
            </Box>
         ) : filteredOptions.map((opt) => (
-          <Box key={opt} layoutDirection="row" align="center" gap={2} paddingY={1} style={{ cursor: 'pointer' }}>
+          <Box key={opt} layoutDirection="row" align="center" gap={2} paddingY={1}>
             <input
               type="checkbox"
               checked={selected.includes(opt)}
@@ -346,7 +346,7 @@ export function ControlPanelDshCatalogScreen({
           onClick={(e) => { e.stopPropagation(); setOpenFilterCol(openFilterCol === colId ? null : colId); }}
        >
           <span style={{ color: '#64748B' }}>{title}</span>
-          <span style={{ color: colFilters[colId]?.length > 0 ? '#FF500D' : '#CBD5E1', fontSize: '10px' }}>▼</span>
+          <span style={{ color: colFilters[colId]?.length > 0 ? '#FF500D' : '#CBD5E1', fontSize: 10 }}>▼</span>
        </button>
        {openFilterCol === colId && (
          <FilterDropdown
@@ -365,28 +365,23 @@ export function ControlPanelDshCatalogScreen({
       {/* 1. Header Area - Catalog Command Deck */}
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
-          <div aria-hidden="true" style={{
-            width: '32px',
-            height: '32px',
-            backgroundColor: '#0A2F5C',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '16px',
-            color: '#FFFFFF',
-            boxShadow: '0 4px 12px rgba(10, 47, 92, 0.2)'
-          }}>
-            ⌗
-          </div>
+          <Box
+            radiusToken="sm"
+            elevationToken="raised"
+            align="center"
+            justify="center"
+            style={{ width: 32, height: 32, backgroundColor: '#0A2F5C' }}
+          >
+            <Text style={{ color: '#FFFFFF', fontSize: 16 }}>⌗</Text>
+          </Box>
           <Box gap={0}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>كتالوج DSH</h1>
-              <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
-                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: '9px' }}>حوكمة الماستر</Text>
+              <h1 style={{ fontSize: 18, letterSpacing: -0.18, color: '#0A2F5C', fontWeight: '800' }}>كتالوج DSH</h1>
+              <Box paddingX={1} paddingY={1} background="brandSurface" radiusToken="xs">
+                 <Text role="caption" style={{ color: '#FF500D', fontWeight: '800', fontSize: 9 }}>حوكمة الماستر</Text>
               </Box>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>إدارة المنتجات والفئات ومخاطر التبني عبر الأسطح</p>
+            <p style={{ fontSize: 10, fontWeight: '600', color: '#64748B' }}>إدارة المنتجات والفئات ومخاطر التبني عبر الأسطح</p>
           </Box>
         </div>
 
@@ -459,9 +454,9 @@ export function ControlPanelDshCatalogScreen({
         {workspaceMode === 'catalog' && (
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <Text role="caption" style={{ fontWeight: 800, color: '#64748B' }}>الفئة:</Text>
-            <Chip label="الكل" size="sm" tone={!activeMainCategory ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(null)} selected={!activeMainCategory} />
+            <Chip label="الكل" tone={!activeMainCategory ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(null)} selected={!activeMainCategory} />
             {dshCatalogCategories.map(cat => (
-              <Chip key={cat.id} label={cat.label} size="sm" tone={activeMainCategory?.id === cat.id ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(cat)} selected={activeMainCategory?.id === cat.id} />
+              <Chip key={cat.id} label={cat.label} tone={activeMainCategory?.id === cat.id ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(cat)} selected={activeMainCategory?.id === cat.id} />
             ))}
           </div>
         )}
@@ -479,13 +474,13 @@ export function ControlPanelDshCatalogScreen({
                 all: 'الكل', 'master': 'مركزية', 'partner-exception': 'استثناء صورة', 'partner-review': 'مراجعة شريك', 'marketing-review': 'مراجعة تسويق', 'price-conflict': 'تعارض سعر'
               };
               return (
-                <Chip key={f} label={labels[f]} size="sm" tone={activeFilter === f ? 'brand' : 'default'} onPress={() => setActiveFilter(f)} selected={activeFilter === f} />
+                <Chip key={f} label={labels[f]} tone={activeFilter === f ? 'brand' : 'default'} onPress={() => setActiveFilter(f)} selected={activeFilter === f} />
               );
           })}
 
           {(activeFilter !== 'all' || searchQuery || activeColFiltersCount > 0) && (
              <div style={{ display: 'flex', gap: '4px', alignItems: 'center', marginRight: 'auto' }}>
-               <Button label="مسح الكل" tone="secondary" size="xs" onPress={() => { setActiveFilter('all'); setSearchQuery(''); setColFilters(initialColumnFilters); }} />
+               <Button label="مسح الكل" tone="secondary" size="sm" onPress={() => { setActiveFilter('all'); setSearchQuery(''); setColFilters(initialColumnFilters); }} />
              </div>
           )}
         </div>
@@ -518,7 +513,7 @@ export function ControlPanelDshCatalogScreen({
                    {isManualOrderCategory ? (
                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '48px', opacity: 0.7 }}>
                        <Text role="titleMd" style={{ color: '#0A2F5C' }}>فئة الطلب اليدوي</Text>
-                       <Text role="bodySm" tone="muted" style={{ textAlign: 'center', maxWidth: '400px', marginTop: '8px' }}>
+                       <Text role="bodySm" tone="muted" style={{ textAlign: 'center', maxWidth: 400, marginTop: 8 }}>
                          المنتجات في هذه الفئة (مثل شي إن، عونك) تُعامل كطلبات مرنة ولا تحتوي على منتجات كتالوج قياسية محددة مسبقاً.
                        </Text>
                      </div>
@@ -561,13 +556,13 @@ export function ControlPanelDshCatalogScreen({
                                      <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C' }}>{p.name}</Text>
                                   </td>
                                   <td style={{ padding: '8px' }}>
-                                    <Text role="caption" tone="muted" style={{ fontSize: '10px' }}>{cat?.label}</Text>
+                                    <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{cat?.label}</Text>
                                   </td>
                                   <td style={{ padding: '8px' }}>
-                                    <Text role="caption" tone="muted" style={{ fontSize: '10px' }}>{classif?.label || 'عام'}</Text>
+                                    <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{classif?.label || 'عام'}</Text>
                                   </td>
                                   <td style={{ padding: '8px' }}>
-                                    <Text role="caption" tone="muted" style={{ fontFamily: 'monospace', fontSize: '10px' }}>{p.sku}</Text>
+                                    <Text role="caption" tone="muted" style={{ fontFamily: 'monospace', fontSize: 10 }}>{p.sku}</Text>
                                   </td>
                                   <td style={{ padding: '8px' }}>
                                     <Text role="caption" style={{ color: '#0A2F5C', fontWeight: 700 }}>{p.price}</Text>
@@ -593,9 +588,10 @@ export function ControlPanelDshCatalogScreen({
                 {!isManualOrderCategory ? (
                   <div style={{ padding: '10px 16px 12px', borderTop: '1px solid #E2E8F0', backgroundColor: '#FFFFFF' }}>
                     <WebControlPanelCompactPager
-                      currentPage={catalogPage}
+                      page={catalogPage}
                       totalPages={catalogTotalPages}
-                      onPageChange={setCatalogPage}
+                      onPrevious={() => setCatalogPage(p => Math.max(1, p - 1))}
+                      onNext={() => setCatalogPage(p => Math.min(catalogTotalPages, p + 1))}
                     />
                   </div>
                 ) : null}
@@ -604,22 +600,22 @@ export function ControlPanelDshCatalogScreen({
 
             {/* Inspector Panel */}
             {activeTab === 'catalog' && selectedProductId && selectedProduct && (
-              <div style={{ width: '320px', borderRight: '1px solid #E2E8F0', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: 320, borderRight: '1px solid #E2E8F0', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
                  <Box padding={3} background="surfaceRaised" style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }} layoutDirection="row" justify="space-between" align="center">
-                    <Text role="bodyStrong" style={{ fontSize: '14px' }}>تفاصيل المنتج</Text>
-                    <Button label="✕" accessibilityLabel="إغلاق" tone="secondary" size="xs" onPress={() => setSelectedProductId(null)} />
+                    <Text role="bodyStrong" style={{ fontSize: 14 }}>تفاصيل المنتج</Text>
+                    <Button label="✕" accessibilityLabel="إغلاق" tone="secondary" size="sm" onPress={() => setSelectedProductId(null)} />
                  </Box>
-                 <Box gap={3} padding={3} style={{ flex: 1, overflowY: 'auto' }}>
+                 <Box gap={3} padding={3} style={{ flex: 1 }}>
                     <Box layoutDirection="row" gap={3} align="center">
                        <WatermarkedImage src={selectedProduct.imageUri} size={48} />
                        <Box style={{ flex: 1 }} gap={0}>
-                          <Text role="bodyStrong" style={{ fontSize: '13px' }}>{selectedProduct.name}</Text>
-                         <Text role="caption" tone="muted" style={{ fontSize: '10px' }}>المعرف: {selectedProduct.sku}</Text>
+                          <Text role="bodyStrong" style={{ fontSize: 13 }}>{selectedProduct.name}</Text>
+                         <Text role="caption" tone="muted" style={{ fontSize: 10 }}>المعرف: {selectedProduct.sku}</Text>
                        </Box>
                     </Box>
 
                     <InspectorTile title="تسلسل الفئة (Path)">
-                       <Text role="caption" style={{ fontSize: '10px', color: '#64748B', lineHeight: 1.4, textAlign: 'right' }}>
+                       <Text role="caption" style={{ fontSize: 10, color: '#64748B', lineHeight: 14, textAlign: 'right' }}>
                          {dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main)?.label || 'غير معروف'}
                          {selectedProduct.categoryPath.sub && ` > ${dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main)?.subcategories.find(s => s.id === selectedProduct.categoryPath.sub)?.label}`}
                        </Text>
@@ -634,13 +630,13 @@ export function ControlPanelDshCatalogScreen({
 
                     {selectedProduct.conflictReason && (
                        <InspectorTile title="تعارض" warning>
-                          <Text role="caption" style={{ color: '#DC2626', fontSize: '10px' }}>{selectedProduct.conflictReason}</Text>
+                          <Text role="caption" style={{ color: '#DC2626', fontSize: 10 }}>{selectedProduct.conflictReason}</Text>
                        </InspectorTile>
                     )}
 
                     <Box gap={2} style={{ marginTop: 'auto' }}>
-                       <Button label="اعتماد التغييرات" tone="primary" size="sm" block />
-                       <Button label="طلب مراجعة تسويق" tone="secondary" size="sm" block />
+                       <Button label="اعتماد التغييرات" tone="primary" size="sm" fullWidth />
+                       <Button label="طلب مراجعة تسويق" tone="secondary" size="sm" fullWidth />
                     </Box>
                  </Box>
               </div>

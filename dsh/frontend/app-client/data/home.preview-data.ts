@@ -333,7 +333,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		locationLabel: 'حي العليا • الرياض',
 		deliveryTimeLabel: '25-35 د',
 		isPopular: true,
-		logoImageUri: 'dsh.store.malqa.cover.v1',
+		logoImageUri: 'dsh.store.hadda.logo.v1',
 	},
 	{
 		id: 'store-2002',
@@ -362,6 +362,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		locationLabel: 'باب اليمن • صنعاء',
 		deliveryTimeLabel: '15-25 د',
 		isPopular: false,
+		logoImageUri: 'dsh.store.hittin.logo.v1',
 	},
 	{
 		id: 'store-2101',
@@ -387,6 +388,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['عصائر طازجة', 'حلويات'],
 		hasCouponAvailable: true,
 		hasNewProducts: true,
+		logoImageUri: 'dsh.store.malqa.logo.v1',
 	},
 	{
 		id: 'store-2102',
@@ -411,6 +413,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['حلويات', 'آيسكريم'],
 		hasCouponAvailable: false,
 		hasNewProducts: false,
+		logoImageUri: 'dsh.store.hadda.logo.v1',
 	},
 	{
 		id: 'store-2201',
@@ -436,6 +439,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['عطور', 'ملابس'],
 		hasCouponAvailable: true,
 		hasNewProducts: true,
+		logoImageUri: 'dsh.brand.logo.v1',
 	},
 	{
 		id: 'store-2202',
@@ -460,6 +464,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['إكسسوارات', 'تجميل'],
 		hasCouponAvailable: false,
 		hasNewProducts: false,
+		logoImageUri: 'dsh.brand.logo.v1',
 	},
 	{
 		id: 'store-2301',
@@ -485,6 +490,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['منتجات مختارة', 'أولوية'],
 		hasCouponAvailable: true,
 		hasNewProducts: true,
+		logoImageUri: 'dsh.brand.logo.v1',
 	},
 	{
 		id: 'store-2401',
@@ -509,6 +515,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['أسر منتجة', 'منتجات منزلية'],
 		hasCouponAvailable: false,
 		hasNewProducts: true,
+		logoImageUri: 'dsh.brand.logo.v1',
 	},
 	{
 		id: 'store-2501',
@@ -534,6 +541,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['تعبئة', 'إصلاح'],
 		hasCouponAvailable: false,
 		hasNewProducts: false,
+		logoImageUri: 'dsh.brand.logo.v1',
 	},
 	{
 		id: 'store-2601',
@@ -558,6 +566,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['قطع غيار', 'إكسسوارات'],
 		hasCouponAvailable: false,
 		hasNewProducts: true,
+		logoImageUri: 'dsh.brand.logo.v1',
 	},
 	{
 		id: 'store-2701',
@@ -583,6 +592,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['عسل', 'تمور'],
 		hasCouponAvailable: true,
 		hasNewProducts: false,
+		logoImageUri: 'dsh.brand.logo.v1',
 	},
 	{
 		id: 'store-2801',
@@ -607,6 +617,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['إلكترونيات', 'إكسسوارات'],
 		hasCouponAvailable: false,
 		hasNewProducts: true,
+		logoImageUri: 'dsh.brand.logo.v1',
 	},
 	{
 		id: 'store-2901',
@@ -632,6 +643,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['وجبات يومية', 'جاهز الآن'],
 		hasCouponAvailable: true,
 		hasNewProducts: true,
+		logoImageUri: 'dsh.store.malqa.logo.v1',
 	},
 	{
 		id: 'store-2902',
@@ -656,6 +668,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['سندويشات', 'وجبات سريعة'],
 		hasCouponAvailable: false,
 		hasNewProducts: false,
+		logoImageUri: 'dsh.store.hadda.logo.v1',
 	},
 	{
 		id: 'store-2903',
@@ -681,6 +694,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['سلطات', 'خيارات خفيفة'],
 		hasCouponAvailable: true,
 		hasNewProducts: true,
+		logoImageUri: 'dsh.store.hittin.logo.v1',
 	},
 	{
 		id: 'store-3001',
@@ -706,6 +720,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		subscriptionPackageChips: ['مسار مباشر', 'تسليم سريع'],
 		hasCouponAvailable: false,
 		hasNewProducts: false,
+		logoImageUri: 'dsh.brand.logo.v1',
 	},
 	{
 		id: 'store-3002',
@@ -731,6 +746,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 		hasCouponAvailable: true,
 		hasNewProducts: false,
 		publishStage: 'published-preview',
+		logoImageUri: 'dsh.brand.logo.v1',
 	},
 	{
 		id: 'store-test-marketing',

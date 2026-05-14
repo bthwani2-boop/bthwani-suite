@@ -88,7 +88,7 @@ export function CatalogAdoptionQueue() {
         description="اعتماد العناصر النهائية لتصبح جزءًا من الكتالوج. لا يظهر للعميل إلا بعد التفعيل النهائي."
         metrics={[{ id: 'pending', title: 'بانتظار الاعتماد', value: String(pendingCount) }]}
       />
-      <Box gap={2} style={{ flex: 1, minHeight: 0, padding: '12px 14px', backgroundColor: '#F8FAFC' }}>
+      <Box gap={2} style={{ flex: 1, minHeight: 0, paddingVertical: 12, paddingHorizontal: 14, backgroundColor: '#F8FAFC' }}>
         {visibleItems.map(item => {
           const sStyle = getStageStyle(item.stage);
 
@@ -100,19 +100,19 @@ export function CatalogAdoptionQueue() {
               badgeLabel={sStyle.label}
               badgeTone={badgeToneMap[sStyle.tone]}
               meta={
-                <Box style={{ alignItems: 'flex-end', gap: '8px' }}>
+                <Box style={{ alignItems: 'flex-end', gap: 8 }}>
                   {item.stage === 'marketing-approved' && (
                     <Box style={{ flexDirection: 'row', gap: '4px' }}>
-                      <Button label="اعتماد مركزي" tone="primary" size="sm" onClick={() => handleAction(item.id, 'adopt-central')} />
-                      <Button label="استثناء شريك" tone="secondary" size="sm" onClick={() => handleAction(item.id, 'adopt-exception')} />
-                      <Button label="إعادة" tone="danger" size="sm" onClick={() => handleAction(item.id, 'fix')} />
+                      <Button label="اعتماد مركزي" tone="primary" size="sm" onPress={() => handleAction(item.id, 'adopt-central')} />
+                      <Button label="استثناء شريك" tone="secondary" size="sm" onPress={() => handleAction(item.id, 'adopt-exception')} />
+                      <Button label="إعادة" tone="danger" size="sm" onPress={() => handleAction(item.id, 'fix')} />
                     </Box>
                   )}
 
                   {item.stage === 'catalog-adopted' && (
                     <Box style={{ flexDirection: 'row', gap: '4px' }}>
-                      <Button label="تفعيل للعميل" tone="brand" size="sm" onClick={() => handleAction(item.id, 'visible')} />
-                      <Button label="إعادة" tone="danger" size="sm" onClick={() => handleAction(item.id, 'fix')} />
+                      <Button label="تفعيل للعميل" tone="brand" size="sm" onPress={() => handleAction(item.id, 'visible')} />
+                      <Button label="إعادة" tone="danger" size="sm" onPress={() => handleAction(item.id, 'fix')} />
                     </Box>
                   )}
                 </Box>

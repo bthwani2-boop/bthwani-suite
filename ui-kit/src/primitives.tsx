@@ -170,6 +170,8 @@ export type SurfaceTone = SurfaceVariant;
 export type SurfaceProps = {
 	children?: React.ReactNode;
 	padding?: SpacingToken;
+	paddingX?: SpacingToken;
+	paddingY?: SpacingToken;
 	gap?: SpacingToken;
 	radiusToken?: RadiusToken;
 	elevationToken?: ElevationToken;
@@ -177,12 +179,16 @@ export type SurfaceProps = {
 	border?: boolean;
 	borderToken?: BorderToken;
 	borderTone?: 'line' | 'lineStrong' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+	align?: ViewStyle['alignItems'];
+	layoutDirection?: 'column' | 'row';
 	style?: StyleProp<ViewStyle>;
 };
 
 export function Surface({
 	children,
 	padding = 5,
+	paddingX,
+	paddingY,
 	gap = 3,
 	radiusToken = 'xl',
 	elevationToken,
@@ -190,6 +196,8 @@ export function Surface({
 	border = true,
 	borderToken = 'hairline',
 	borderTone,
+	align,
+	layoutDirection,
 	style
 }: SurfaceProps) {
 	const toneConfig = surfaceToneLaw[tone];
@@ -201,6 +209,8 @@ export function Surface({
 	return (
 		<Box
 			padding={padding}
+			paddingX={paddingX}
+			paddingY={paddingY}
 			gap={gap}
 			radiusToken={radiusToken}
 			elevationToken={elevationToken ?? toneConfig.elevationToken}
@@ -208,6 +218,8 @@ export function Surface({
 			border={border}
 			borderToken={borderToken}
 			borderTone={borderTone ?? toneConfig.borderTone}
+			align={align}
+			layoutDirection={layoutDirection}
 			style={style}
 		>
 			{children}

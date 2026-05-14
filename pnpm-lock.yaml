@@ -24,6 +24,12 @@ importers:
         specifier: 2.0.0-rc.41
         version: 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
     devDependencies:
+      '@types/react':
+        specifier: 19.2.14
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: 19.2.3
+        version: 19.2.3(@types/react@19.2.14)
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.24.1
         version: 8.59.2(@typescript-eslint/parser@8.59.2)(eslint@9.39.4)(typescript@5.9.3)
@@ -68,7 +74,7 @@ importers:
         version: 19.1.0(react@19.1.0)
       react-native:
         specifier: 0.81.0
-        version: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+        version: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -89,7 +95,7 @@ importers:
         version: 19.1.0
       react-native:
         specifier: 0.81.0
-        version: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+        version: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
 
   app-client/runtime:
     dependencies:
@@ -105,12 +111,15 @@ importers:
       expo-dev-client:
         specifier: ~6.0.20
         version: 6.0.20(expo@54.0.33)
+      expo-modules-core:
+        specifier: 3.0.29
+        version: 3.0.29(react-native@0.81.0)(react@19.1.0)
       react:
         specifier: 19.1.0
         version: 19.1.0
       react-native:
         specifier: 0.81.0
-        version: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+        version: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
 
   app-field/runtime:
     dependencies:
@@ -128,7 +137,7 @@ importers:
         version: 19.1.0
       react-native:
         specifier: 0.81.0
-        version: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+        version: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
 
   app-partner/runtime:
     dependencies:
@@ -146,7 +155,7 @@ importers:
         version: 19.1.0
       react-native:
         specifier: 0.81.0
-        version: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+        version: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
 
   control-panel/runtime:
     dependencies:
@@ -167,10 +176,10 @@ importers:
         version: 0.21.2(react-dom@19.1.0)(react@19.1.0)
     devDependencies:
       '@types/react':
-        specifier: ^19.2.2
+        specifier: ^19.2.14
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19.2.2
+        specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.14)
       typescript:
         specifier: 5.9.3
@@ -1447,7 +1456,7 @@ packages:
       progress: 2.0.3
       prompts: 2.4.2
       qrcode-terminal: 0.11.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
       require-from-string: 2.0.2
       requireg: 0.2.2
       resolve: 1.22.11
@@ -1538,7 +1547,7 @@ packages:
     dependencies:
       chalk: 4.1.2
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
 
   /@expo/env@2.0.11:
     resolution: {integrity: sha512-xV+ps6YCW7XIPVUwFVCRN2nox09dnRwy8uIjwHWTODu0zFw4kp4omnVkl0OOjuu2XOe7tdgAHxikrkJt9xB/7Q==}
@@ -1709,7 +1718,7 @@ packages:
     dependencies:
       expo-font: 14.0.11(expo@54.0.33)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
 
   /@expo/ws-tunnel@1.0.6:
     resolution: {integrity: sha512-nDRbLmSrJar7abvUjp3smDwH8HcbZcoOEa5jVPUv9/9CajgmWw20JNRwTuBRzWIWIkEJDkz20GoNA+tSwUqk0Q==}
@@ -1754,7 +1763,7 @@ packages:
     dependencies:
       '@floating-ui/core': 1.7.5
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     dev: false
 
   /@floating-ui/utils@0.2.11:
@@ -2643,23 +2652,6 @@ packages:
       nullthrows: 1.1.1
       react: 19.1.0
       react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
-    dev: false
-
-  /@react-native/virtualized-lists@0.81.0(react-native@0.81.0)(react@19.1.0):
-    resolution: {integrity: sha512-p14QC5INHkbMZ96158sUxkSwN6zp138W11G+CRGoLJY4Q9WRJBCe7wHR5Owyy3XczQXrIih/vxAXwgYeZ2XByg==}
-    engines: {node: '>= 20.19.4'}
-    peerDependencies:
-      '@types/react': ^19.1.0
-      react: 19.1.0
-      react-native: 0.81.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-    dependencies:
-      invariant: 2.2.4
-      nullthrows: 1.1.1
-      react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
 
   /@rtsao/scc@1.1.0:
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
@@ -2770,7 +2762,7 @@ packages:
       '@tamagui/text': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/use-controllable-state': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -2907,7 +2899,7 @@ packages:
       '@tamagui/use-presence': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -2934,7 +2926,7 @@ packages:
       '@tamagui/core': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/use-presence': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
       react-native-reanimated: 4.3.0(react-native-worklets@0.8.1)(react-native@0.81.0)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
@@ -2965,7 +2957,7 @@ packages:
       '@tamagui/stacks': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/text': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -3024,7 +3016,7 @@ packages:
       '@tamagui/stacks': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -3056,7 +3048,7 @@ packages:
       '@tamagui/use-previous': 2.0.0-rc.41(react@19.1.0)
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -3252,7 +3244,7 @@ packages:
       react-native: 0.81.0
     dependencies:
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     dev: false
 
   /@tamagui/context-menu@2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0):
@@ -3295,7 +3287,7 @@ packages:
       '@tamagui/use-event': 2.0.0-rc.41(react@19.1.0)
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -3345,7 +3337,7 @@ packages:
       '@tamagui/use-direction': 2.0.0-rc.41(react@19.1.0)
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -3411,7 +3403,7 @@ packages:
       '@tamagui/use-controllable-state': 2.0.0-rc.41(react@19.1.0)
       '@tamagui/z-index-stack': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -3463,7 +3455,7 @@ packages:
     dependencies:
       '@tamagui/compose-refs': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     dev: false
 
   /@tamagui/elements@2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0):
@@ -3503,7 +3495,7 @@ packages:
       '@floating-ui/react-native': 0.10.9(react-native@0.81.0)(react@19.1.0)
       '@tamagui/use-event': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - react-dom
     dev: false
@@ -3731,7 +3723,7 @@ packages:
       '@tamagui/stacks': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/use-controllable-state': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -3756,7 +3748,7 @@ packages:
       '@tamagui/helpers': 2.0.0-rc.41(react-native@0.81.0)(react@19.1.0)
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -3794,7 +3786,7 @@ packages:
       '@tamagui/core': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -3829,7 +3821,7 @@ packages:
       '@tamagui/text': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -3868,7 +3860,7 @@ packages:
       '@tamagui/text': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -3894,7 +3886,7 @@ packages:
       '@tamagui/native': 2.0.0-rc.41(react-native@0.81.0)(react@19.1.0)
       '@tamagui/stacks': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4010,7 +4002,7 @@ packages:
         optional: true
     dependencies:
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     dev: false
 
   /@tamagui/normalize-css-color@2.0.0-rc.41:
@@ -4050,7 +4042,7 @@ packages:
       '@tamagui/z-index-stack': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
       react-freeze: 1.0.4(react@19.1.0)
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4081,7 +4073,7 @@ packages:
       '@tamagui/start-transition': 2.0.0-rc.41(react@19.1.0)
       '@tamagui/use-controllable-state': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4113,7 +4105,7 @@ packages:
       '@tamagui/z-index-stack': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4141,7 +4133,7 @@ packages:
       '@tamagui/helpers': 2.0.0-rc.41(react-native@0.81.0)(react@19.1.0)
       '@tamagui/stacks': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4208,7 +4200,7 @@ packages:
       '@tamagui/use-previous': 2.0.0-rc.41(react@19.1.0)
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4230,7 +4222,7 @@ packages:
       react-native: 0.81.0
     dependencies:
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4303,7 +4295,7 @@ packages:
       '@tamagui/stacks': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4353,7 +4345,7 @@ packages:
       '@tamagui/z-index-stack': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4445,7 +4437,7 @@ packages:
       '@tamagui/use-keyboard-visible': 2.0.0-rc.41(react-native@0.81.0)(react@19.1.0)
       '@tamagui/z-index-stack': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4525,7 +4517,7 @@ packages:
       '@tamagui/use-debounce': 2.0.0-rc.41(react@19.1.0)
       '@tamagui/use-direction': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4549,7 +4541,7 @@ packages:
     dependencies:
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4574,7 +4566,7 @@ packages:
       '@tamagui/core': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/stacks': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4635,7 +4627,7 @@ packages:
       '@tamagui/label': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/use-previous': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4669,7 +4661,7 @@ packages:
       '@tamagui/use-controllable-state': 2.0.0-rc.41(react@19.1.0)
       '@tamagui/use-previous': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4706,7 +4698,7 @@ packages:
       '@tamagui/use-direction': 2.0.0-rc.41(react@19.1.0)
       '@tamagui/web': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4847,7 +4839,7 @@ packages:
       '@tamagui/use-controllable-state': 2.0.0-rc.41(react@19.1.0)
       '@tamagui/visually-hidden': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -4917,7 +4909,7 @@ packages:
       '@tamagui/text': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/use-controllable-state': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -5039,7 +5031,7 @@ packages:
       react-native: 0.81.0
     dependencies:
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     dev: false
 
   /@tamagui/use-presence@2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0):
@@ -5081,7 +5073,7 @@ packages:
     dependencies:
       '@tamagui/constants': 2.0.0-rc.41(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     dev: false
 
   /@tamagui/v2-toast@2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0):
@@ -5107,7 +5099,7 @@ packages:
       '@tamagui/use-controllable-state': 2.0.0-rc.41(react@19.1.0)
       '@tamagui/visually-hidden': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -5166,7 +5158,7 @@ packages:
       '@tamagui/use-force-update': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt
@@ -7071,7 +7063,7 @@ packages:
       expo: 54.0.33(@babel/core@7.29.0)(react-native@0.81.0)(react@19.1.0)
       expo-constants: 18.0.13(expo@54.0.33)(react-native@0.81.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -7088,7 +7080,7 @@ packages:
     dependencies:
       expo: 54.0.33(@babel/core@7.29.0)(react-native@0.81.0)(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     dev: false
 
   /expo-constants@18.0.13(expo@54.0.33)(react-native@0.81.0):
@@ -7100,7 +7092,7 @@ packages:
       '@expo/config': 12.0.13
       '@expo/env': 2.0.11
       expo: 54.0.33(@babel/core@7.29.0)(react-native@0.81.0)(react@19.1.0)
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -7156,7 +7148,7 @@ packages:
       react-native: 0.81.0
     dependencies:
       expo: 54.0.33(@babel/core@7.29.0)(react-native@0.81.0)(react@19.1.0)
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
 
   /expo-font@14.0.11(expo@54.0.33)(react-native@0.81.0)(react@19.1.0):
     resolution: {integrity: sha512-ga0q61ny4s/kr4k8JX9hVH69exVSIfcIc19+qZ7gt71Mqtm7xy2c6kwsPTCyhBW2Ro5yXTT8EaZOpuRi35rHbg==}
@@ -7168,7 +7160,7 @@ packages:
       expo: 54.0.33(@babel/core@7.29.0)(react-native@0.81.0)(react@19.1.0)
       fontfaceobserver: 2.3.0
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
 
   /expo-json-utils@0.15.0:
     resolution: {integrity: sha512-duRT6oGl80IDzH2LD2yEFWNwGIC2WkozsB6HF3cDYNoNNdUvFk6uN3YiwsTsqVM/D0z6LEAQ01/SlYvN+Fw0JQ==}
@@ -7213,7 +7205,7 @@ packages:
     dependencies:
       invariant: 2.2.4
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
 
   /expo-server@1.0.5:
     resolution: {integrity: sha512-IGR++flYH70rhLyeXF0Phle56/k4cee87WeQ4mamS+MkVAVP+dDlOHf2nN06Z9Y2KhU0Gp1k+y61KkghF7HdhA==}
@@ -7264,7 +7256,7 @@ packages:
       expo-modules-core: 3.0.29(react-native@0.81.0)(react@19.1.0)
       pretty-format: 29.7.0
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
       react-refresh: 0.14.2
       whatwg-url-without-unicode: 8.0.0-3
     transitivePeerDependencies:
@@ -9846,7 +9838,7 @@ packages:
       react-native: 0.81.0
     dependencies:
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     dev: false
 
   /react-native-reanimated@4.3.0(react-native-worklets@0.8.1)(react-native@0.81.0)(react@19.1.0):
@@ -9857,7 +9849,7 @@ packages:
       react-native-worklets: 0.8.x
     dependencies:
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
       react-native-is-edge-to-edge: 1.3.1(react-native@0.81.0)(react@19.1.0)
       react-native-worklets: 0.8.1(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react-native@0.81.0)(react@19.1.0)
       semver: 7.7.4
@@ -9904,7 +9896,7 @@ packages:
       '@react-native/metro-config': 0.85.0(@babel/core@7.29.0)
       convert-source-map: 2.0.0
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
       semver: 7.7.4
     transitivePeerDependencies:
       - supports-color
@@ -9930,61 +9922,6 @@ packages:
       '@react-native/normalize-colors': 0.81.0
       '@react-native/virtualized-lists': 0.81.0(@types/react@19.2.14)(react-native@0.81.0)(react@19.1.0)
       '@types/react': 19.2.14
-      abort-controller: 3.0.0
-      anser: 1.4.10
-      ansi-regex: 5.0.1
-      babel-jest: 29.7.0(@babel/core@7.29.0)
-      babel-plugin-syntax-hermes-parser: 0.29.1
-      base64-js: 1.5.1
-      commander: 12.1.0
-      flow-enums-runtime: 0.0.6
-      glob: 7.2.3
-      invariant: 2.2.4
-      jest-environment-node: 29.7.0
-      memoize-one: 5.2.1
-      metro-runtime: 0.83.5
-      metro-source-map: 0.83.5
-      nullthrows: 1.1.1
-      pretty-format: 29.7.0
-      promise: 8.3.0
-      react: 19.1.0
-      react-devtools-core: 6.1.5
-      react-refresh: 0.14.2
-      regenerator-runtime: 0.13.11
-      scheduler: 0.26.0
-      semver: 7.7.4
-      stacktrace-parser: 0.1.11
-      whatwg-fetch: 3.6.20
-      ws: 6.2.3
-      yargs: 17.7.2
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@react-native-community/cli'
-      - '@react-native/metro-config'
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-    dev: false
-
-  /react-native@0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0):
-    resolution: {integrity: sha512-RDWhewHGsAa5uZpwIxnJNiv5tW2y6/DrQUjEBdAHPzGMwuMTshern2s4gZaWYeRU3SQguExVddCjiss9IBhxqA==}
-    engines: {node: '>= 20.19.4'}
-    hasBin: true
-    peerDependencies:
-      '@types/react': ^19.1.0
-      react: 19.1.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-    dependencies:
-      '@jest/create-cache-key-function': 29.7.0
-      '@react-native/assets-registry': 0.81.0
-      '@react-native/codegen': 0.81.0(@babel/core@7.29.0)
-      '@react-native/community-cli-plugin': 0.81.0(@react-native/metro-config@0.85.0)
-      '@react-native/gradle-plugin': 0.81.0
-      '@react-native/js-polyfills': 0.81.0
-      '@react-native/normalize-colors': 0.81.0
-      '@react-native/virtualized-lists': 0.81.0(react-native@0.81.0)(react@19.1.0)
       abort-controller: 3.0.0
       anser: 1.4.10
       ansi-regex: 5.0.1
@@ -10725,7 +10662,7 @@ packages:
       '@tamagui/visually-hidden': 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
       '@tamagui/z-index-stack': 2.0.0-rc.41(react@19.1.0)
       react: 19.1.0
-      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(react@19.1.0)
+      react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
     transitivePeerDependencies:
       - '@react-native-menu/menu'
       - burnt

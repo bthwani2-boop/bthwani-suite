@@ -5,10 +5,13 @@ const nextConfig = {
   turbopack: {
     resolveAlias: {
       'react-native': 'react-native-web',
-      '@expo/vector-icons': '../shell/shims/expo-vector-icons.tsx',
+      '@expo/vector-icons$': '../shell/shims/expo-vector-icons.tsx',
       '@expo/vector-icons/Ionicons': '../shell/shims/expo-vector-icons.tsx',
+      '@expo/vector-icons/build/Ionicons': '../shell/shims/expo-vector-icons.tsx',
       '@expo/vector-icons/MaterialIcons': '../shell/shims/expo-vector-icons.tsx',
+      '@expo/vector-icons/build/MaterialIcons': '../shell/shims/expo-vector-icons.tsx',
       '@expo/vector-icons/MaterialCommunityIcons': '../shell/shims/expo-vector-icons.tsx',
+      '@expo/vector-icons/build/MaterialCommunityIcons': '../shell/shims/expo-vector-icons.tsx',
       '@expo/vector-icons/FontAwesome': '../shell/shims/expo-vector-icons.tsx',
       '@expo/vector-icons/FontAwesome5': '../shell/shims/expo-vector-icons.tsx',
       '@expo/vector-icons/FontAwesome6': '../shell/shims/expo-vector-icons.tsx',
@@ -22,6 +25,7 @@ const nextConfig = {
       '@expo/vector-icons/Zocial': '../shell/shims/expo-vector-icons.tsx',
       'expo-font': '../shell/shims/expo-font.ts',
       'expo-modules-core': '../shell/shims/expo-modules-core.ts',
+      'react-native-safe-area-context': '../shell/shims/react-native-safe-area-context.tsx',
     },
     resolveExtensions: [
       '.web.tsx',
@@ -55,10 +59,13 @@ const nextConfig = {
     config.resolve.alias = {
       ...(config.resolve.alias ?? {}),
       'react-native': 'react-native-web',
-      '@expo/vector-icons': '../shell/shims/expo-vector-icons.tsx',
+      '@expo/vector-icons$': '../shell/shims/expo-vector-icons.tsx',
       '@expo/vector-icons/Ionicons': '../shell/shims/expo-vector-icons.tsx',
+      '@expo/vector-icons/build/Ionicons': '../shell/shims/expo-vector-icons.tsx',
       '@expo/vector-icons/MaterialIcons': '../shell/shims/expo-vector-icons.tsx',
+      '@expo/vector-icons/build/MaterialIcons': '../shell/shims/expo-vector-icons.tsx',
       '@expo/vector-icons/MaterialCommunityIcons': '../shell/shims/expo-vector-icons.tsx',
+      '@expo/vector-icons/build/MaterialCommunityIcons': '../shell/shims/expo-vector-icons.tsx',
       '@expo/vector-icons/FontAwesome': '../shell/shims/expo-vector-icons.tsx',
       '@expo/vector-icons/FontAwesome5': '../shell/shims/expo-vector-icons.tsx',
       '@expo/vector-icons/FontAwesome6': '../shell/shims/expo-vector-icons.tsx',
@@ -72,6 +79,7 @@ const nextConfig = {
       '@expo/vector-icons/Zocial': '../shell/shims/expo-vector-icons.tsx',
       'expo-font': '../shell/shims/expo-font.ts',
       'expo-modules-core': '../shell/shims/expo-modules-core.ts',
+      'react-native-safe-area-context': '../shell/shims/react-native-safe-area-context.tsx',
     };
 
     config.module = config.module ?? {};

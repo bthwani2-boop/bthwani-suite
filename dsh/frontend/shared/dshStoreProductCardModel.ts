@@ -89,6 +89,7 @@ export type DshStoreFixtureItem = {
   isNew?: boolean;
   isFavorite?: boolean;
   isFavorited?: boolean;
+  mediaPolicy?: string;
 };
 
 export type StoreItemsByStoreId = Record<string, DshStoreFixtureItem[]>;
@@ -210,7 +211,7 @@ export function normalizeCanonicalPublishStage(stage: DshCanonicalPublishStage |
 
 /** @deprecated Use canRenderInClientSurface instead */
 export function isClientVisible(stage: string | undefined, entityType?: string, mediaPolicy?: string): boolean {
-  return canRenderInClientSurface(stage, entityType, { mediaPolicy });
+  return canRenderInClientSurface(stage, entityType as any, { mediaPolicy });
 }
 
 const canonicalStoreCard: DshCanonicalStoreCard = {
@@ -354,7 +355,7 @@ export function mapCanonicalStoreToDiscoveryStore(store: DshCanonicalStoreCard):
   };
 }
 
-export function mapCanonicalProductToStoreFixtureItem(product: DshCanonicalProductCard): StoreFixtureItem {
+export function mapCanonicalProductToStoreFixtureItem(product: DshCanonicalProductCard): DshStoreFixtureItem {
   return {
     id: product.id,
     name: product.name,

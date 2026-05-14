@@ -208,6 +208,7 @@ function normalizeDisplayText(value?: string) {
     .trim();
 }
 
+type DshStoreOperationalState = 'area_unserviceable' | 'store_closed' | 'store_open';
 function resolveStoreOperationalState(statusLabel: string, deliveryLabel?: string, serviceLabel?: string): DshStoreOperationalState {
   const normalized = [statusLabel, deliveryLabel, serviceLabel]
     .filter(Boolean)
@@ -490,7 +491,7 @@ export function DshStoreGetScreen({
   );
 
   const isOfferItem = React.useCallback((item: DshStoreGetMenuItem) => {
-    if (item.isOffer) return true;
+    if ((item as any).isOffer) return true;
     if (item.discountLabel) return true;
     if (item.oldPriceLabel && item.priceLabel) return true;
     const d = normalizeDisplayText(item.discountLabel ?? '').toLowerCase();

@@ -539,7 +539,7 @@ export function toggleMarketingBannerStatus(id: string) {
   const current = getMarketingBannerItems();
   const next = current.map((item) => {
     if (item.id !== id) return item;
-    return { ...item, status: item.status === 'published' ? 'draft' : 'published', updatedAt: new Date().toISOString() };
+    return { ...item, status: (item.status === 'published' ? 'draft' : 'published') as MarketingBannerStatus, updatedAt: new Date().toISOString() };
   });
   setMutableStore(next);
   return next.find((item) => item.id === id) ?? null;

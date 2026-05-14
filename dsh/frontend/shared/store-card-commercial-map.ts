@@ -49,7 +49,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
 
   // Conflict Detection: Unpublished offers trying to show up
   context.activeOffers.forEach(offer => {
-    const isVisible = offer.status === 'published' || offer.status === 'client-visible';
+    const isVisible = offer.status === 'published';
     if (!isVisible && offer.displayBadge) {
       sourceMap[`offer-${offer.id}`] = {
         sourceOwner: 'partner-offers',
@@ -131,7 +131,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
     badges.push({ label: '⚡ بثواني برو', source: 'subscription' });
 
     // Conflict Detection: Pro subscription without entitlement
-    const hasProEntitlement = context.activeEntitlements.some(e => e.type === 'reward' || e.type === 'multiplier');
+    const hasProEntitlement = context.activeEntitlements.some(e => e.type === 'reward' || e.type === 'subscription');
     sourceMap['hasBthwaniPro'] = {
       sourceOwner: 'loyalty.preview-store',
       sourceRecordId: 'sub-pro',

@@ -19,7 +19,7 @@ config.resolver.unstable_enableSymlinks = true;
 // In pnpm workspaces this causes double-resolution where Metro finds both the
 // hoisted root copy and the nested .pnpm copy, leading to split module graphs
 // and ESM/CJS interop breakage (the 'default' of undefined error).
-config.resolver.disableHierarchicalLookup = true;
+config.resolver.disableHierarchicalLookup = false;
 
 // Force Metro to use the `main` field (CJS) instead of the `exports` map.
 // @expo/vector-icons ships pure-ESM files via the `module`/`exports` fields.
@@ -29,8 +29,8 @@ config.resolver.disableHierarchicalLookup = true;
 config.resolver.unstable_enablePackageExports = false;
 
 config.resolver.blockList = [
-	/.*\\.next\\/.*/,
-	/.*\\.turbo\\/.*/,
+	/.*\.next\/.*/,
+	/.*\.turbo\/.*/,
 	/.*\/tools\/registry\/runs\/.*/,
 	/.*\/build\/cache\/.*/,
 ];

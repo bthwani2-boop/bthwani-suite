@@ -41,8 +41,6 @@ function BentoCategoryTile({
   onPress: () => void;
 }) {
   const { direction } = useDirection();
-  const titleAlign = resolveTextAlign(direction);
-
   return (
     <View style={styles.tileSlot}>
       <Pressable onPress={onPress} style={({ pressed }) => [styles.tilePressable, { opacity: pressed ? 0.94 : 1 }]}>
@@ -56,7 +54,7 @@ function BentoCategoryTile({
           </View>
 
           <View style={styles.tileTextContent}>
-            <Text role="bodySm" numberOfLines={2} align={titleAlign} style={styles.tileTitle}>
+            <Text role="bodySm" numberOfLines={2} align="center" style={styles.tileTitle}>
               {item.shortLabel ?? item.title}
             </Text>
           </View>
@@ -75,7 +73,6 @@ function OrbitCarouselBase({
 }: OrbitCarouselProps) {
   const { direction } = useDirection();
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
-  const textAlign = resolveTextAlign(direction);
   const contentTopInset = React.useMemo(() => {
     const anchorBottom = anchorLayout ? anchorLayout.y + anchorLayout.height : spacing[14];
     return Math.max(spacing[6], Math.min(screenHeight * 0.28, anchorBottom + spacing[4]));
@@ -106,10 +103,10 @@ function OrbitCarouselBase({
       >
         <View style={[styles.hubHeader, { alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }]}>
           <View style={styles.headerLine} />
-          <Text role="titleMd" align={textAlign} style={styles.hubHeaderTitle}>
+          <Text role="titleMd" align="start" style={styles.hubHeaderTitle}>
             كل التصنيفات
           </Text>
-          <Text role="bodySm" align={textAlign} style={styles.hubHeaderSubtitle}>
+          <Text role="bodySm" align="start" style={styles.hubHeaderSubtitle}>
             تصفح الفئات المتاحة واختر المسار المناسب مباشرة.
           </Text>
         </View>

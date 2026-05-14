@@ -1,3 +1,4 @@
+import React from 'react';
 import { Dimensions, Platform, Pressable, View } from 'react-native';
 // Removed Ionicons import
 import {
@@ -1224,8 +1225,6 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           title="تفاصيل الطلب"
           subtitle="المعلومات المهمة فقط، بشكل مضغوط وقابل للقراءة."
           items={orderDetailsItems}
-          radiusToken="xl"
-          padding={4}
         />
 
         {arrivalBellSummary ? (

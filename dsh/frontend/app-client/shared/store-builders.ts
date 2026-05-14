@@ -1,4 +1,4 @@
-import { DshDiscoveryStore, DshStoreFixtureItem } from '../types';
+import { DshDiscoveryStore, DshStoreFixtureItem } from '../../shared/dshStoreProductCardModel';
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source

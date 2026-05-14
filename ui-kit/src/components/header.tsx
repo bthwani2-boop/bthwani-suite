@@ -759,7 +759,7 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
                 onPress={actions.find(a => a.id === 'search')?.onPress}
                 style={({ pressed }) => [{ flex: 1, height: 40, borderRadius: 20, backgroundColor: theme.brandHeaderSurfaceStrong, borderWidth: 1, borderColor: theme.brandHeaderStroke, flexDirection: resolveRowDirection(direction), alignItems: 'center', paddingHorizontal: spacing[3], gap: spacing[2], opacity: pressed ? 0.9 : 1 }]}
               >
-                <Icon name="search-outline" size={18} color={theme.inverse} style={{ opacity: 0.7 }} />
+                <Icon name="search-outline" size={18} color={theme.textInverse} style={{ opacity: 0.7 }} />
                 <Text role="bodySm" tone="inverse" style={{ opacity: 0.7, flex: 1 }}>{subtitle || 'ابحث هنا...'}</Text>
               </Pressable>
               {trailingAction ? renderAction({ ...trailingAction, size: 'lg' }) : null}

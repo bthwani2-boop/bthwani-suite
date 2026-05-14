@@ -26,5 +26,3 @@ export function ClientSurfaceHost({ renderApprovedVideoReelsViewer }: ClientSurf
 		/>
 	);
 }
-
-export { ClientSurfaceHost };

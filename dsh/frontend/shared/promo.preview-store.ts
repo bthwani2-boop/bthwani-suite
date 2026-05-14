@@ -137,7 +137,7 @@ export function toggleHomePromoStatus(id: string) {
   const current = getHomePromoItems();
   const next = current.map((item) => {
     if (item.id !== id) return item;
-    return { ...item, status: item.status === 'published' ? 'draft' : 'published', updatedAt: new Date().toISOString() };
+    return { ...item, status: (item.status === 'published' ? 'draft' : 'published') as HomePromoRecord['status'], updatedAt: new Date().toISOString() };
   });
   setMutableStore(next);
 }

@@ -169,7 +169,7 @@ export function MarketingReviewQueue() {
       }
       main={
         <Box gap={3}>
-          <Box gap={2} layoutDirection="row" wrap>
+          <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
             <WebControlPanelStatusTag label={getStageMeta(selectedItem?.stage ?? 'marketing-review').label} tone={resolveTone(selectedItem?.stage ?? 'marketing-review')} />
             <WebControlPanelStatusTag label={selectedItem ? translateEntityType(selectedItem.entityType) : 'غير محدد'} tone="info" />
             <WebControlPanelStatusTag label={selectedItem ? resolvePolicyLabel(selectedItem) : 'سياسة غير محددة'} tone="neutral" />
