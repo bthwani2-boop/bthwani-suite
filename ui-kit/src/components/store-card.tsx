@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { Icon } from './icons';
-import { useTheme } from '../providers';
+import { useBThwaniAppearance, useTheme } from '../providers';
 
 /**
  * STORE_CARD_PREMIUM_2026: MASTERPIECE EDITION
@@ -64,11 +64,15 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
   onFavoritePress,
 }) => {
   const { theme } = useTheme();
+  const { tokens, mode } = useBThwaniAppearance();
+  const pc = tokens.components.commerce.productCard;
+  const bdg = tokens.components.badges;
+  const isDark = mode === 'darkGlass';
 
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.card, { backgroundColor: theme.surface, opacity: pressed ? 0.92 : 1 }]}
+      style={({ pressed }) => [styles.card, { backgroundColor: pc.backgroundColor, borderWidth: 1, borderColor: pc.rimLightColor, opacity: pressed ? 0.92 : 1 }]}
     >
       {/* Top-Left Status Icon (Absolute) */}
       <View style={styles.absoluteStatusBadge}>
@@ -141,7 +145,7 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
         {/* Row 1 & 2: Name + Location/Badges */}
         <View style={styles.textContent}>
           <View style={styles.headerRow}>
-            <Text style={styles.storeName} numberOfLines={1}>
+            <Text style={[styles.storeName, { color: pc.titleColor }]} numberOfLines={1}>
               {item.name}
             </Text>
           </View>
@@ -149,16 +153,16 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
           <View style={styles.locationBadgeRow}>
             <View style={styles.locationCluster}>
               <Icon name="location-sharp" size={11} color={ORANGE} />
-              <Text style={styles.addressText} numberOfLines={1}>
+              <Text style={[styles.addressText, { color: tokens.textSecondary }]} numberOfLines={1}>
                 {item.locationLabel || item.subtitle || 'الرياض'}
               </Text>
             </View>
 
             <View style={styles.badgeCluster}>
               {item.isPopular && (
-                <View style={[styles.statusBadge, { backgroundColor: '#FFF5F0' }]}>
-                  <Icon name="flame" size={10} color={ORANGE} />
-                  <Text style={[styles.statusText, { color: ORANGE }]}>رائج</Text>
+                <View style={[styles.statusBadge, { backgroundColor: bdg.brand.backgroundColor, borderWidth: 1, borderColor: bdg.brand.borderColor }]}>
+                  <Icon name="flame" size={10} color={bdg.brand.iconColor} />
+                  <Text style={[styles.statusText, { color: bdg.brand.textColor }]}>رائج</Text>
                 </View>
               )}
             </View>
@@ -169,12 +173,12 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
         <View style={styles.metricsRibbon}>
           <View style={styles.metricItem}>
             <Icon name="navigate-outline" size={10} color={theme.textMuted} />
-            <Text style={styles.metaText}>{item.distanceKm?.toFixed(1) || '2.1'} كم</Text>
+            <Text style={[styles.metaText, { color: tokens.textMuted }]}>{item.distanceKm?.toFixed(1) || '2.1'} كم</Text>
           </View>
           <View style={styles.metricDivider} />
           <View style={styles.metricItem}>
             <Icon name="time-outline" size={10} color={theme.textMuted} />
-            <Text style={styles.metaText}>{item.deliveryTimeLabel || '25-35 د'}</Text>
+            <Text style={[styles.metaText, { color: tokens.textMuted }]}>{item.deliveryTimeLabel || '25-35 د'}</Text>
           </View>
         </View>
 
@@ -182,14 +186,14 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
         <View style={styles.servicesRow}>
           {item.supportsPartnerDelivery && (
             <View style={styles.serviceIconWrap}>
-              <Icon name="bicycle-outline" size={14} color={DARK_BLUE} />
-              <Text style={styles.serviceMiniText}>توصيل</Text>
+              <Icon name="bicycle-outline" size={14} color={tokens.textSecondary} />
+              <Text style={[styles.serviceMiniText, { color: tokens.textSecondary }]}>توصيل</Text>
             </View>
           )}
           {item.supportsPickup && (
             <View style={styles.serviceIconWrap}>
-              <Icon name="walk-outline" size={14} color={DARK_BLUE} />
-              <Text style={styles.serviceMiniText}>استلم</Text>
+              <Icon name="walk-outline" size={14} color={tokens.textSecondary} />
+              <Text style={[styles.serviceMiniText, { color: tokens.textSecondary }]}>استلم</Text>
             </View>
           )}
           <View style={styles.serviceIconWrap}>
@@ -201,23 +205,23 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
         {/* Row 5: Promo Chips */}
         <View style={styles.promoRow}>
           {item.hasBthwaniPro && (
-            <View style={[styles.promoChip, styles.promoChipPro]}>
-              <Text style={styles.promoChipTextPro}>برو</Text>
+            <View style={[styles.promoChip, { backgroundColor: isDark ? tokens.glassSurfaceStrong : '#0A2F5C', borderWidth: isDark ? 1 : 0, borderColor: isDark ? tokens.glassBorder : 'transparent' }]}>
+              <Text style={[styles.promoChipTextPro, { color: isDark ? tokens.textPrimary : '#FFF' }]}>برو</Text>
             </View>
           )}
           {item.hasOffer && (
-            <View style={[styles.promoChip, { backgroundColor: '#F0FFF4' }]}>
-              <Text style={[styles.promoChipText, { color: theme.success }]}>مجاني</Text>
+            <View style={[styles.promoChip, { backgroundColor: bdg.success.backgroundColor, borderWidth: 1, borderColor: bdg.success.borderColor }]}>
+              <Text style={[styles.promoChipText, { color: bdg.success.textColor }]}>مجاني</Text>
             </View>
           )}
           {item.pointsMultiplier && item.pointsMultiplier > 1 && (
-            <View style={[styles.promoChip, { backgroundColor: '#EBF8FF' }]}>
-              <Text style={[styles.promoChipText, { color: '#2B6CB0' }]}>{item.pointsMultiplier}x نقاط</Text>
+            <View style={[styles.promoChip, { backgroundColor: bdg.info.backgroundColor, borderWidth: 1, borderColor: bdg.info.borderColor }]}>
+              <Text style={[styles.promoChipText, { color: bdg.info.textColor }]}>{item.pointsMultiplier}x نقاط</Text>
             </View>
           )}
           {item.hasCouponAvailable && (
-            <View style={[styles.promoChip, { backgroundColor: '#FFF5F0' }]}>
-              <Text style={[styles.promoChipText, { color: ORANGE }]}>كوبون</Text>
+            <View style={[styles.promoChip, { backgroundColor: bdg.promo.backgroundColor, borderWidth: 1, borderColor: bdg.promo.borderColor }]}>
+              <Text style={[styles.promoChipText, { color: bdg.promo.textColor }]}>كوبون</Text>
             </View>
           )}
         </View>

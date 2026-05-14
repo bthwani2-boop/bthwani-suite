@@ -1,6 +1,7 @@
 import React from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { colorPalette, resolveRowDirection, type Direction, spacing, withAlpha } from '../foundation';
+import { useBThwaniAppearance } from '../providers';
 import { Surface, Text } from '../primitives';
 import { Icon } from './icons';
 
@@ -149,9 +150,13 @@ export function ModernPremiumHeader({
 }: ModernPremiumHeaderProps) {
   const insets = useSafeAreaInsets();
   const rowDirection = resolveRowDirection(direction);
+  const { tokens, mode } = useBThwaniAppearance();
+  const isDark = mode === 'darkGlass';
+  const navTokens = tokens.components.navigation;
+  const headerBg = isDark ? navTokens.headerSurface : colorPalette.brand;
 
   return (
-    <View style={styles.headerContainer}>
+    <View style={[styles.headerContainer, { backgroundColor: headerBg }]}>
       {/* Row 1: Actions | Location | Profile */}
       <View style={[styles.headerTopRow, { flexDirection: rowDirection }]}>
         <View style={[styles.actionCluster, { flexDirection: rowDirection }]}>
@@ -239,6 +244,9 @@ export function BottomNavBar({
   const bottomPadding = Math.max(insets.bottom, Platform.OS === 'android' ? 44 : 12);
   const { width } = useWindowDimensions();
   const rowDirection = resolveRowDirection(direction);
+  const { tokens, mode } = useBThwaniAppearance();
+  const isDark = mode === 'darkGlass';
+  const navTokens = tokens.components.navigation;
 
   // Height strategy: base height 64 + safe area
   const totalHeight = 64 + bottomPadding;
@@ -249,7 +257,7 @@ export function BottomNavBar({
 
   return (
     <View style={[styles.navContainer, { width, height: totalHeight }]}>
-      <Surface tone="raised" style={[styles.navSurface, { height: totalHeight, paddingBottom: bottomPadding }]}>
+      <Surface tone="raised" style={[styles.navSurface, { height: totalHeight, paddingBottom: bottomPadding, backgroundColor: navTokens.navSurface }]}>
         <View style={[styles.navContent, { flexDirection: rowDirection }]}>
           {leftItems.map((item) => (
             <NavButton
@@ -262,7 +270,7 @@ export function BottomNavBar({
 
           <View style={styles.launcherPlaceholder}>
             <Pressable onPress={onLauncherPress} style={styles.launcherButtonArea}>
-              <Text role="caption" style={styles.launcherLabel}>الخدمات</Text>
+              <Text role="caption" style={[styles.launcherLabel, { color: tokens.accent }]}>الخدمات</Text>
             </Pressable>
           </View>
 
@@ -278,7 +286,7 @@ export function BottomNavBar({
       </Surface>
 
       {/* Floating Center Launcher */}
-      <Pressable onPress={onLauncherPress} style={styles.floatingLauncher}>
+      <Pressable onPress={onLauncherPress} style={[styles.floatingLauncher, isDark ? { backgroundColor: tokens.glassSurfaceStrong } : null]}>
         <View style={styles.launcherInner}>
           <Icon name="grid" size={24} color={colorPalette.white} />
         </View>
@@ -288,16 +296,20 @@ export function BottomNavBar({
 }
 
 function NavButton({ item, isActive, onPress }: { item: NavItem; isActive: boolean; onPress: () => void }) {
+  const { tokens } = useBThwaniAppearance();
+  const activeColor = tokens.accent;
+  const inactiveColor = tokens.components.navigation.navInactiveText;
+
   return (
     <Pressable onPress={onPress} style={styles.navButton}>
       <Icon
         name={isActive ? item.activeIcon : item.icon}
         size={22}
-        color={isActive ? colorPalette.brand : colorPalette.inkMuted}
+        color={isActive ? activeColor : inactiveColor}
       />
       <Text
         role="caption"
-        style={[styles.navLabel, { color: isActive ? colorPalette.brand : colorPalette.inkMuted }]}
+        style={[styles.navLabel, { color: isActive ? activeColor : inactiveColor }]}
         numberOfLines={1}
       >
         {item.label}
