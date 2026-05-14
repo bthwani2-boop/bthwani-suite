@@ -178,10 +178,10 @@ export function PartnerOffersCommandDeckScreen() {
         {s === 'published' && <Button label="إيقاف" tone="danger" size="sm" onPress={() => pausePartnerOfferItem(selected.id)} />}
         {s === 'paused' && <Button label="إعادة النشر" tone="success" size="sm" onPress={() => publishPartnerOfferItem(selected.id)} />}
 
-        {(s === 'inbound' || s === 'review') && <Button label="رفض" tone="danger" variant="ghost" size="sm" onPress={() => setStatus(selected.id, 'rejected')} />}
+        {(s === 'inbound' || s === 'review') && <Button label="رفض" tone="danger" size="sm" onPress={() => setStatus(selected.id, 'rejected')} />}
 
-        <Button label="نسخ" tone="secondary" variant="ghost" size="sm" onPress={handleDuplicate} />
-        <Button label="حذف" tone="danger" variant="ghost" size="sm" onPress={() => { removePartnerOfferItem(selected.id); setSelectedId(null); }} />
+        <Button label="نسخ" tone="ghost" size="sm" onPress={handleDuplicate} />
+        <Button label="حذف" tone="danger" size="sm" onPress={() => { removePartnerOfferItem(selected.id); setSelectedId(null); }} />
       </Box>
     );
   };
@@ -193,7 +193,7 @@ export function PartnerOffersCommandDeckScreen() {
       activeSubscriptions: [],
       activeEntitlements: [],
       activeCampaigns: [],
-      catalogFeatures: { priceMatch: true },
+      catalogFeatures: { priceMatch: true, hasNewProducts: false },
     };
     const features = mapStoreCommercialFeatures(mockContext);
 
@@ -209,7 +209,7 @@ export function PartnerOffersCommandDeckScreen() {
     if (editorSection === 'details') {
       return (
         <Box gap={4}>
-          <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
             <TextField label="عنوان العرض" value={draft.title || ''} onChangeText={v => setDraft({ ...draft, title: v })} />
             <TextField label="اسم الشريك" value={draft.partnerName || ''} onChangeText={v => setDraft({ ...draft, partnerName: v })} />
 
@@ -218,7 +218,7 @@ export function PartnerOffersCommandDeckScreen() {
 
             <TextField label="معرف المنتج" value={draft.productId || ''} onChangeText={v => setDraft({ ...draft, productId: v })} style={{ textAlign: 'left' }} />
             <TextField label="اسم المنتج" value={draft.productLabel || ''} onChangeText={v => setDraft({ ...draft, productLabel: v })} />
-          </Box>
+          </div>
         </Box>
       );
     }
@@ -226,7 +226,7 @@ export function PartnerOffersCommandDeckScreen() {
     if (editorSection === 'governance') {
       return (
         <Box gap={4}>
-          <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
             <TextField label="التصنيف" value={draft.category || ''} onChangeText={v => setDraft({ ...draft, category: v })} />
             <TextField label="قيمة العرض" value={draft.valueLabel || ''} onChangeText={v => setDraft({ ...draft, valueLabel: v })} hint="مثال: خصم 20%" />
 
@@ -260,7 +260,7 @@ export function PartnerOffersCommandDeckScreen() {
 
             <TextField label="تاريخ البدء" value={draft.activeFromDate || ''} onChangeText={v => setDraft({ ...draft, activeFromDate: v })} style={{ textAlign: 'left' }} />
             <TextField label="تاريخ الانتهاء" value={draft.activeToDate || ''} onChangeText={v => setDraft({ ...draft, activeToDate: v })} style={{ textAlign: 'left' }} />
-          </Box>
+          </div>
 
           <TextField label="ملاحظات هامش الربح" value={draft.marginRiskNote || ''} onChangeText={v => setDraft({ ...draft, marginRiskNote: v })} hint="ملاحظات داخلية للفريق" />
           <TextField label="حملة مرتبطة" value={draft.linkedCampaignId || ''} onChangeText={v => setDraft({ ...draft, linkedCampaignId: v })} style={{ textAlign: 'left' }} />
@@ -286,7 +286,7 @@ export function PartnerOffersCommandDeckScreen() {
   };
 
   return (
-    <Box dir="rtl" gap={4} padding={4} style={{ height: '100%', overflow: 'hidden' }}>
+    <Box gap={4} padding={4} style={{ height: '100%', overflow: 'hidden' }}>
 
       {/* Header & KPIs */}
       <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
@@ -297,7 +297,7 @@ export function PartnerOffersCommandDeckScreen() {
           { label: 'منشور', value: kpis.published, color: '#16A34A' },
           { label: 'مرفوض', value: kpis.rejected, color: '#64748B' },
         ].map(k => (
-          <Surface key={k.label} tone="raised" padding={3} style={{ flex: '1 1 120px', borderRadius: 10, borderLeftWidth: 3, borderLeftColor: k.color }}>
+          <Surface key={k.label} tone="raised" padding={3} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 120, borderRadius: 10, borderLeftWidth: 3, borderLeftColor: k.color }}>
             <Text role="caption" style={{ fontWeight: 800, color: '#64748B' }}>{k.label}</Text>
             <Text role="titleSm" style={{ fontWeight: 900, color: k.color, marginTop: 4, fontSize: 18 }}>{k.value}</Text>
           </Surface>
@@ -342,7 +342,6 @@ export function PartnerOffersCommandDeckScreen() {
               </Surface>
             ) : visibleItems.map(item => {
                 const statusMeta = translateStatus(item.status);
-                const isSelected = item.id === selectedId;
                 return (
                   <ListItem
                     key={item.id}
@@ -352,7 +351,6 @@ export function PartnerOffersCommandDeckScreen() {
                       setEditorSection('details');
                       setSelectedId(item.id);
                     }}
-                    selected={isSelected}
                     badgeLabel={statusMeta.label}
                     badgeTone={statusMeta.tone}
                   />

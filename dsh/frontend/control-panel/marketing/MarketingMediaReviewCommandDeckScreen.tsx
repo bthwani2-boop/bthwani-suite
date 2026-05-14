@@ -173,8 +173,8 @@ export function MarketingMediaReviewCommandDeckScreen() {
               <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>معاينة المحتوى</Text>
             </Surface>
             {selected.mediaKey ? (
-              <Box padding={2} style={{ direction: 'ltr', backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '6px' }}>
-                <Text style={{ fontSize: 10, fontFamily: 'monospace', wordBreak: 'break-all' }}>
+              <Box padding={2} style={{ direction: 'ltr', backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: 6 }}>
+                <Text style={{ fontSize: 10, fontFamily: 'monospace' }}>
                   {selected.mediaKey}
                 </Text>
               </Box>
@@ -208,7 +208,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
             ) : null}
           </Surface>
 
-          <Box padding={3} style={{ backgroundColor: 'rgba(3,105,161,0.05)', borderRadius: '12px', borderLeftWidth: 4, borderLeftColor: '#0369A1' }}>
+          <Box padding={3} style={{ backgroundColor: 'rgba(3,105,161,0.05)', borderRadius: 12, borderLeftWidth: 4, borderLeftColor: '#0369A1' }}>
             <Text role="caption" style={{ color: '#0369A1', lineHeight: 1.6 }}>
               ملاحظة: الاعتماد التسويقي هو خطوة وسيطة. النشر الفعلي يتم عبر فريق الكتالوج لضمان الجودة المركزية.
             </Text>
@@ -254,8 +254,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
           {(selected.entityType === 'product-media' || selected.entityType === 'store') && selected.stage === 'marketing-review' ? (
             <Button
               label="تحسين الصورة"
-              tone="default"
-              variant="ghost"
+              tone="ghost"
               onPress={() => undefined}
               disabled
             />
@@ -266,7 +265,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
   };
 
   return (
-    <Box dir="rtl" gap={4} style={{ height: '100%', overflow: 'hidden' }}>
+    <Box gap={4} style={{ height: '100%', overflow: 'hidden' }}>
 
       {/* ── KPI Strip ─────────────────────── */}
       <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
@@ -277,7 +276,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
           { label: 'جاهز للكتالوج', value: kpis.catalogReady, color: '#16A34A' },
           { label: 'تعارضات', value: kpis.conflicts, color: '#D97706' },
         ].map(k => (
-          <Surface key={k.label} tone="raised" padding={3} style={{ flex: '1 1 120px', borderRadius: '10px', borderLeftWidth: 3, borderLeftColor: k.color }}>
+          <Surface key={k.label} tone="raised" padding={3} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 120, borderRadius: 10, borderLeftWidth: 3, borderLeftColor: k.color }}>
             <Text role="caption" style={{ fontWeight: 800, textAlign: 'right', color: '#64748B' }}>{k.label}</Text>
             <Text role="titleSm" style={{ fontWeight: 900, textAlign: 'right', color: k.color, marginTop: 4, fontSize: 18 }}>{k.value}</Text>
           </Surface>
@@ -322,7 +321,6 @@ export function MarketingMediaReviewCommandDeckScreen() {
               </Box>
             ) : visibleItems.map(item => {
                 const meta = getStageMeta(item.stage);
-                const isSelected = item.id === selectedId;
                 return (
                   <ListItem
                     key={item.id}
@@ -332,13 +330,12 @@ export function MarketingMediaReviewCommandDeckScreen() {
                       setInspectorSection('preview');
                       setSelectedId(item.id);
                     }}
-                    selected={isSelected}
                     badgeLabel={meta.text}
                     badgeTone={meta.tone}
                     meta={(
                       <Box layoutDirection="row" gap={1}>
-                        <Chip label={translateEntityType(item.entityType)} size="sm" />
-                        <Chip label={policyLabel(item.mediaPolicy)} size="sm" tone={policyTone(item.mediaPolicy)} />
+                        <Chip label={translateEntityType(item.entityType)} />
+                        <Chip label={policyLabel(item.mediaPolicy)} tone={policyTone(item.mediaPolicy)} />
                       </Box>
                     )}
                   />
@@ -370,7 +367,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
               </Box>
             </Box>
           ) : (
-            <Surface tone="raised" style={{ height: 300, alignItems: 'center', justifyContent: 'center', borderRadius: '16px' }}>
+            <Surface tone="raised" style={{ height: 300, alignItems: 'center', justifyContent: 'center', borderRadius: 16 }}>
               <Text tone="muted">يرجى اختيار عنصر للمراجعة</Text>
             </Surface>
           )}

@@ -138,7 +138,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
           <div className={marketingStyles.marketingStack}>
             <div className={marketingStyles.surfaceCard}>
               <div className={marketingStyles.cardHeaderRow}>
-                <Text role="titleXs" tone="brand">الرسالة النشطة الآن</Text>
+                <Text role="labelLg" tone="brand">الرسالة النشطة الآن</Text>
                 <div className={marketingStyles.actionRow}>
                   <button
                     onClick={() => {
@@ -478,13 +478,13 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       case 'media-review':
         return <MarketingMediaReviewCommandDeckScreen />;
       case 'partners':
-        return <PartnerOffersCommandDeckScreen activeSubTab={activeSubTab} />;
+        return <PartnerOffersCommandDeckScreen />;
       case 'growth':
         return <GrowthCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} setActiveTab={(tab) => setActiveTab(tab as MarketingControlView)} />;
       case 'signals':
         return <SmartSignalLayerScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
       case 'loyalty':
-        return <LoyaltyCommandDeckScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
+        return <LoyaltyCommandDeckScreen />;
       default:
         return null;
     }
@@ -501,7 +501,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
           <Box gap={0}>
             <div className={styles.surfaceHeaderTextRow}>
               <h1 className={styles.surfaceHeaderTitle}>تسويق DSH</h1>
-              <Box paddingX={1.5} paddingY={0.5} background="brandAlt" radiusToken="xs">
+              <Box paddingX={2} paddingY={1} background="brandSurface" radiusToken="xs">
                 <span className={styles.surfaceHeaderBadgeText}>اعتماد الأداء</span>
               </Box>
             </div>

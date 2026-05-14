@@ -133,13 +133,13 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
     activeSubscriptions: [{ id: 'sub-pro', name: 'اشتراك برو', monthlyFee: 0, features: [] }] as SubscriptionPlan[],
     activeEntitlements: [{ id: 'ent-1', type: 'reward', referenceId: 'sub-pro', status: 'active' }] as Entitlement[],
     activeCampaigns: [] as CampaignRecord[],
-    catalogFeatures: { priceMatch: true }
+    catalogFeatures: { priceMatch: true, hasNewProducts: false }
   }), []);
 
   const parityFeatures = React.useMemo(() => mapStoreCommercialFeatures(parityContext), [parityContext]);
 
   return (
-    <Box gap={4} dir="rtl" padding={4} style={{ flex: 1 }}>
+    <Box gap={4} padding={4} style={{ flex: 1 }}>
       <Surface tone="raised" gap={2} style={{ borderRadius: 16, borderWidth: 1, borderColor: 'rgba(10,47,92,0.05)', padding: 16 }}>
         <Box gap={1}>
           <Text role="caption" style={{ color: '#0A2F5C', fontWeight: '800', letterSpacing: 0.5, textAlign: 'right' }}>مركز ذكاء النمو</Text>
@@ -210,12 +210,12 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
               <Surface tone="raised" gap={4} style={styles.columnSurface}>
                 <View style={styles.headerRow}>
                   <Text role="titleSm" style={{ color: '#0A2F5C' }}>تفاصيل التوصية</Text>
-                  <Text role="caption" style={{ backgroundColor: '#F1F5F9', padding: '2px 8px', borderRadius: 4, fontWeight: '800' }}>{selectedRec.id}</Text>
+                  <Text role="caption" style={{ backgroundColor: '#F1F5F9', paddingVertical: 2, paddingHorizontal: 8, borderRadius: 4, fontWeight: '800' }}>{selectedRec.id}</Text>
                 </View>
 
                 <Box gap={2}>
                   <Text role="titleMd" style={{ color: '#0A2F5C', fontWeight: '900', textAlign: 'right' }}>{selectedRec.title}</Text>
-                  <Text role="body" tone="muted" style={{ lineHeight: 22, textAlign: 'right' }}>{selectedRec.description}</Text>
+                  <Text role="bodyMd" tone="muted" style={{ lineHeight: 22, textAlign: 'right' }}>{selectedRec.description}</Text>
                 </Box>
 
                 <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: 12 }}>
@@ -257,7 +257,7 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
             </Box>
           ) : (
             <Surface tone="inset" style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 16 }}>
-              <Text role="body" tone="muted">اختر توصية لعرض التفاصيل</Text>
+              <Text role="bodyMd" tone="muted">اختر توصية لعرض التفاصيل</Text>
             </Surface>
           )}
         </Box>

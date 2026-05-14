@@ -178,7 +178,7 @@ export function PromosCommandDeckScreen() {
                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
                     <Text style={{ fontSize: 11, fontWeight: '900', color: '#64748B' }}>استوديو التحرير</Text>
                     <View style={{ flexDirection: 'row', gap: 8 }}>
-                      <Button label="حذف" onPress={() => { if (!selectedId) return; removeHomePromoItem(selectedId); refresh(); }} tone="danger" variant="ghost" size="sm" />
+                      <Button label="حذف" onPress={() => { if (!selectedId) return; removeHomePromoItem(selectedId); refresh(); }} tone="danger" size="sm" />
                       <Button label={draft.status === 'published' ? 'إيقاف' : 'نشر'} onPress={() => setDraft(d => ({ ...d, status: d.status === 'published' ? 'draft' : 'published' }))} tone="secondary" size="sm" />
                       <Button label="حفظ" onPress={handleSave} tone="primary" size="sm" />
                     </View>
