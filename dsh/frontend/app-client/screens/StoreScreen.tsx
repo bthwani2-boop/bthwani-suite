@@ -53,6 +53,18 @@ export type DshStoreGetScreenProps = {
     tags?: string[];
     categories?: Array<{ id: string; label: string; itemCount: number; isPopular?: boolean }>;
     deliveryModes?: Array<{ id: 'delivery' | 'pickup'; name: string; isAvailable: boolean; estimatedTime?: string; fee?: number }>;
+    // PREMIUM 2026 ENHANCEMENTS (Synced from DshHomeGetStore)
+    rating?: number;
+    distanceLabel?: string;
+    multiplierLabel?: string;
+    offerLabel?: string;
+    hasOffer?: boolean;
+    hasNewProducts?: boolean;
+    hasCouponAvailable?: boolean;
+    locationLabel?: string;
+    deliveryTimeLabel?: string;
+    isPopular?: boolean;
+    logoImageUri?: string;
   };
   menuItems?: DshStoreGetMenuItem[];
   onOpenItems?: () => void;
@@ -478,6 +490,7 @@ export function DshStoreGetScreen({
   const deliveryModes = React.useMemo(() => getDeliveryModes(storeText), [storeText]);
 
   const storeCoverImageSource = React.useMemo(() => (store ? resolveDshStoreCoverImageSource(store) : undefined), [store]);
+  const storeLogoImageSource = React.useMemo(() => (store ? (store.logoImageUri ? { uri: store.logoImageUri } : resolveDshStoreCoverImageSource(store)) : undefined), [store]);
   const fallbackMenuItems = React.useMemo<DshStoreGetMenuItem[]>(() => menuItems ?? [], [menuItems]);
   const previewPartnerBadge = storeCoverImageSource ? (
     <View style={styles.previewPartnerBadge} pointerEvents="none">
@@ -1193,7 +1206,7 @@ export function DshStoreGetScreen({
 
   return (
     <View style={styles.screen}>
-      {headerSearchVisible ? (
+      {headerSearchVisible && (
         <SearchTopBar
           value={headerSearchQuery}
           onChangeText={setHeaderSearchQuery}
@@ -1202,43 +1215,6 @@ export function DshStoreGetScreen({
           autoFocus
           placeholder={`ابحث داخل ${normalizedStoreName}`}
           hint={`بحث محلي داخل ${normalizedStoreName} فقط للوصول السريع إلى الأصناف.`}
-        />
-      ) : (
-        <TopBar
-          variant="secondary"
-          title={normalizedStoreName}
-          titleSlot={(
-            <Text style={[styles.storeHeaderTitle, isRTL && styles.textAlignRight]} numberOfLines={1}>
-              {normalizedStoreName}
-            </Text>
-          )}
-          actions={[
-            {
-              id: 'share',
-              icon: <Icon name="share-social-outline" size={20} color={stylesTokens.dark} />,
-              accessibilityLabel: 'مشاركة المتجر',
-              onPress: handleStoreShare,
-            },
-            {
-              id: 'cart',
-              icon: <Icon name="cart-outline" size={20} color={stylesTokens.dark} />,
-              accessibilityLabel: 'السلة',
-              onPress: onOpenCart ?? onOpenItems,
-            },
-            {
-              id: 'search',
-              icon: <Icon name="search-outline" size={20} color={stylesTokens.dark} />,
-              accessibilityLabel: 'بحث',
-              onPress: openInlineSearch,
-            },
-          ]}
-          trailingAction={{
-            id: 'back',
-            icon: <Icon name="arrow-back" size={24} color={colorPalette.brand ?? stylesTokens.orange} />,
-            mirrorInRtl: true,
-            accessibilityLabel: 'رجوع',
-            onPress: onBack,
-          }}
         />
       )}
 
@@ -1250,114 +1226,135 @@ export function DshStoreGetScreen({
               keyExtractor={(item) => (item as DshStoreGetMenuItem).id}
               ListHeaderComponent={
                 <>
-                  <View style={[styles.heroIdentityRow, isRTL && styles.rowReverse]}>
-                    <View style={styles.heroAvatar}>
-                      <Icon name="storefront-outline" size={24} color={stylesTokens.orange} />
-                      {storeCoverImageSource ? <Image source={storeCoverImageSource} style={styles.heroAvatarImage} /> : null}
-                    </View>
+                  <View style={styles.heroPremiumWrap}>
+                    <View style={styles.heroCoverWrap}>
+                      {storeCoverImageSource ? <Image source={storeCoverImageSource} style={styles.heroCoverImage} /> : <View style={styles.heroCoverPlaceholder} />}
+                      <View style={styles.heroCoverOverlay} />
 
-                    <View style={[styles.heroIdentityContent, isRTL && styles.heroIdentityContentRTL]}>
-                      <View style={[styles.heroTopRow, isRTL && styles.rowReverse]}>
-                        <View style={[styles.heroTitleInfo, isRTL && styles.heroTitleInfoRTL]}>
-                          <Text style={[styles.heroInlineName, isRTL && styles.textAlignRight]} numberOfLines={1}>
-                            {normalizedStoreName}
-                          </Text>
-                          <Text style={[styles.heroInlineSubtitle, isRTL && styles.textAlignRight]} numberOfLines={1}>
-                            {normalizedStoreSubtitle}
-                          </Text>
-                        </View>
-
-                        <View style={styles.heroBadgePrimary}>
-                          <Text style={styles.heroBadgePrimaryText}>{getStatusLabel(store.statusLabel, storeText)}</Text>
-                        </View>
-                      </View>
-
-                      <View style={[styles.heroCompactMetaRow, isRTL && styles.rowReverse]}>
-                        {normalizedFollowersLabel ? (
-                          <TouchableOpacity
-                            style={[styles.topMetaChip, styles.followMetaChip, isFollowingStore && styles.followMetaChipActive]}
-                            activeOpacity={0.85}
-                            onPress={() => setIsFollowingStore((prev) => !prev)}
-                            accessibilityRole="button"
-                            accessibilityLabel={isFollowingStore ? 'تمت المتابعة' : 'متابعة المتجر'}
-                          >
-                            <Icon
-                              name={isFollowingStore ? 'checkmark' : 'add'}
-                              size={9}
-                              color={isFollowingStore ? stylesTokens.white : stylesTokens.orange}
-                            />
-                            <Text style={[styles.topMetaChipText, isFollowingStore && styles.followMetaChipTextActive]} numberOfLines={1}>
-                              {normalizedFollowersLabel}
-                            </Text>
+                      {/* Top Overlay Actions */}
+                      <View style={styles.heroTopActions}>
+                        <View style={styles.heroTopActionsLeft}>
+                          <TouchableOpacity style={styles.heroActionCircle} activeOpacity={0.7} onPress={handleStoreShare}>
+                            <Icon name="share-outline" size={20} color={stylesTokens.white} />
                           </TouchableOpacity>
-                        ) : null}
-                        <View style={styles.topMetaChip}>
-                          <Icon name="time-outline" size={9} color={stylesTokens.orange} />
-                          <Text style={styles.topMetaChipText} numberOfLines={1}>{normalizedEtaLabel}</Text>
+                          <TouchableOpacity style={styles.heroActionCircle} activeOpacity={0.7} onPress={onOpenCart ?? onOpenItems}>
+                            <Icon name="cart-outline" size={20} color={stylesTokens.white} />
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.heroActionCircle} activeOpacity={0.7} onPress={openInlineSearch}>
+                            <Icon name="search-outline" size={20} color={stylesTokens.white} />
+                          </TouchableOpacity>
                         </View>
-                        <View style={styles.topMetaChip}>
-                          <Icon name="star" size={9} color={stylesTokens.warning} />
-                          <Text style={styles.topMetaChipText} numberOfLines={1}>{storeText.get.ratingValue}</Text>
+                        <View style={styles.heroTopActionsRight}>
+                          <TouchableOpacity style={styles.heroActionCircle} activeOpacity={0.7} onPress={onBack}>
+                            <Icon name="arrow-back" size={24} color={stylesTokens.white} mirrorInRtl />
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.heroActionCircle} activeOpacity={0.7}>
+                            <Icon name="scan-outline" size={20} color={stylesTokens.white} />
+                          </TouchableOpacity>
                         </View>
                       </View>
 
-                      {benefitChips.length ? (
-                        <View style={styles.subscriptionBlock}>
-                          <View style={[styles.tagRow, isRTL && styles.rowReverse]}>
-                            {benefitChips.map((chip) => {
-                              const isPrimaryBenefit = chip.includes('برو') || chip.includes('مجاني');
-                              return (
-                                <View key={`${store.id}-${chip}`} style={[styles.tagChip, isPrimaryBenefit && styles.tagChipAccent]}>
-                                  <Icon
-                                    name={isPrimaryBenefit ? 'sparkles-outline' : 'checkmark-circle-outline'}
-                                    size={9}
-                                    color={isPrimaryBenefit ? stylesTokens.white : stylesTokens.orange}
-                                  />
-                                  <Text style={[styles.tagChipText, isPrimaryBenefit && styles.tagChipTextAccent]} numberOfLines={1}>{chip}</Text>
-                                </View>
-                              );
-                            })}
+                      {/* Identity Section (Logo + Info) */}
+                      <View style={styles.heroIdentitySection}>
+                        <View style={styles.heroLogoWrap}>
+                          <Image source={storeLogoImageSource ?? storeCoverImageSource} style={styles.heroLogoImage} />
+                        </View>
+                        <View style={styles.heroInfoCluster}>
+                          <Text style={styles.heroNameText} numberOfLines={2}>{normalizedStoreName}</Text>
+                          <View style={styles.heroLocationRow}>
+                            <Icon name="location-sharp" size={16} color={stylesTokens.white} />
+                            <Text style={styles.heroLocationText}>{store.locationLabel || 'حي العليا، الرياض'}</Text>
+                          </View>
+                          <View style={[styles.heroStatusBadge, { backgroundColor: '#2E7D32' }]}>
+                            <View style={styles.heroStatusDot} />
+                            <Text style={styles.heroStatusText}>مفتوح</Text>
                           </View>
                         </View>
-                      ) : null}
+                      </View>
+
+                      <View style={styles.heroGridsLayer}>
+                        {/* ROW 1: Metrics (4 Items) */}
+                        <View style={styles.heroFeatureGrid}>
+                          <View style={styles.heroFeatureChip}>
+                            <Icon name="people-outline" size={18} color={ORANGE} />
+                            <Text style={styles.heroFeatureValue} numberOfLines={1}>{normalizedFollowersLabel || '11 ألف'}</Text>
+                            <Text style={styles.heroFeatureLabel}>ثقة المجتمع</Text>
+                          </View>
+
+                          <View style={styles.heroFeatureChip}>
+                            <Icon name="time-outline" size={18} color={ORANGE} />
+                            <Text style={styles.heroFeatureValue} numberOfLines={1}>{store.deliveryTimeLabel || normalizedEtaLabel}</Text>
+                            <Text style={styles.heroFeatureLabel}>متوسط التوصيل</Text>
+                          </View>
+
+                          <View style={styles.heroFeatureChip}>
+                            <Icon name="star" size={18} color={GOLD} />
+                            <Text style={styles.heroFeatureValue} numberOfLines={1}>{store.rating?.toFixed(1) || '5.0'}</Text>
+                            <Text style={styles.heroFeatureLabel}>تقييم المتجر</Text>
+                          </View>
+
+                          {store.hasBthwaniPro && (
+                            <View style={[styles.heroFeatureChip, { backgroundColor: 'rgba(10, 47, 92, 0.7)' }]}>
+                              <Icon name="sparkles" size={18} color={GOLD} />
+                              <Text style={styles.heroFeatureValue} numberOfLines={1}>بثواني برو</Text>
+                              <Text style={styles.heroFeatureLabel}>تجربة مميزة</Text>
+                            </View>
+                          )}
+                        </View>
+
+                        {/* ROW 2: Delivery Options (3 Items) */}
+                        <View style={styles.heroDeliveryGrid}>
+                          {deliveryModes.map((mode) => {
+                            const active = selectedMode === mode.id;
+                            let subtitle = '';
+                            if (mode.id === 'delivery') subtitle = 'توصيل الطلب';
+                            if (mode.id === 'pickup') subtitle = 'جاهز للاستلام';
+                            if (mode.id === 'flash') subtitle = 'توصيل سريع';
+
+                            return (
+                              <TouchableOpacity
+                                key={mode.id}
+                                style={[styles.heroDeliveryChip, active && styles.heroDeliveryChipActive]}
+                                onPress={() => setSelectedMode(mode.id)}
+                                activeOpacity={0.8}
+                              >
+                                <View style={styles.heroDeliveryChipTextContent}>
+                                  <Text style={[styles.heroDeliveryChipTitle, active && styles.heroDeliveryChipTitleActive]} numberOfLines={1}>
+                                    {mode.label}
+                                  </Text>
+                                  <Text style={styles.heroDeliveryChipSubtitle} numberOfLines={1}>{subtitle}</Text>
+                                </View>
+                                <Icon name={mode.icon} size={22} color={active ? ORANGE : stylesTokens.white} />
+                              </TouchableOpacity>
+                            );
+                          })}
+                        </View>
+                      </View>
                     </View>
                   </View>
 
-                  <View style={styles.deliveryControlCluster}>
-                    {showOperationalNotice ? (
-                      <View
-                        style={[
-                          styles.storeStateNotice,
-                          operationalState === 'area_unserviceable' ? styles.storeStateNoticeDanger : styles.storeStateNoticeWarning,
-                        ]}
-                      >
-                        <View style={styles.storeStateNoticeCopy}>
-                          <Text style={[styles.storeStateNoticeTitle, isRTL && styles.textAlignRight]}>{operationalStateMeta.title}</Text>
-                          <Text style={[styles.storeStateNoticeDescription, isRTL && styles.textAlignRight]}>
-                            {operationalStateMeta.description}
-                          </Text>
+                  {showOperationalNotice ? (
+                    <View
+                      style={[
+                        styles.storeStateNotice,
+                        operationalState === 'area_unserviceable' ? styles.storeStateNoticeDanger : styles.storeStateNoticeWarning,
+                        { marginHorizontal: 16, marginTop: 16, marginBottom: 8 }
+                      ]}
+                    >
+                      <View style={styles.storeStateNoticeCopy}>
+                        <Text style={[styles.storeStateNoticeTitle, isRTL && styles.textAlignRight]}>{operationalStateMeta.title}</Text>
+                        <Text style={[styles.storeStateNoticeDescription, isRTL && styles.textAlignRight]}>
+                          {operationalStateMeta.description}
+                        </Text>
+                      </View>
+                      {onSupport ? (
+                        <View style={styles.storeStateNoticeAction}>
+                          <Button label={supportActionLabel} tone="secondary" onPress={onSupport} />
                         </View>
-                        {onSupport ? (
-                          <View style={styles.storeStateNoticeAction}>
-                            <Button label={supportActionLabel} tone="secondary" onPress={onSupport} />
-                          </View>
-                        ) : null}
-                      </View>
-                    ) : null}
-
-                    <View style={styles.modeStripWrapInline}>
-                      <View style={[styles.modeStrip, isRTL && styles.rowReverse]}>
-                        {deliveryModes.map((mode) => (
-                          <ModePill
-                            key={mode.id}
-                            label={mode.label}
-                            icon={mode.icon}
-                            active={selectedMode === mode.id}
-                            onPress={() => setSelectedMode(mode.id)}
-                          />
-                        ))}
-                      </View>
+                      ) : null}
                     </View>
+                  ) : null}
+
 
                     {smartRailItems.length ? (
                       <BannerCarousel
@@ -1371,7 +1368,6 @@ export function DshStoreGetScreen({
                         style={styles.smartRailSection}
                       />
                     ) : null}
-                  </View>
 
                   <View style={styles.sectionBlock}>
                     <ScrollView
@@ -1727,6 +1723,10 @@ const stylesTokens = {
   whiteOverlay: hexToRgba(colorPalette.white, 0.96),
 };
 
+const DARK_BLUE = '#0A2F5C';
+const ORANGE = '#FF500D';
+const GOLD = '#FFD700';
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -1956,14 +1956,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 10,
   },
-  followMetaChip: {
-    backgroundColor: colorPalette.brandSoft,
-    borderColor: colorPalette.brand,
-  },
-  followMetaChipActive: {
-    backgroundColor: colorPalette.brand,
-    borderColor: colorPalette.brand,
-  },
   followMetaChipTextActive: {
     color: stylesTokens.orange,
   },
@@ -1989,6 +1981,247 @@ const styles = StyleSheet.create({
     color: stylesTokens.dark,
     fontSize: 12,
     fontWeight: '800',
+  },
+
+  // PREMIUM HERO 2026
+  heroPremiumWrap: {
+    marginBottom: 20,
+    backgroundColor: stylesTokens.white,
+    borderRadius: 32,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: colorPalette.brandStrong,
+        shadowOpacity: 0.15,
+        shadowRadius: 20,
+        shadowOffset: { width: 0, height: 10 },
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  heroCoverWrap: {
+    height: 480,
+    width: '100%',
+    position: 'relative',
+    backgroundColor: stylesTokens.dark,
+  },
+  heroCoverImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  heroCoverPlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#333',
+  },
+  heroCoverOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  heroTopActions: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    zIndex: 100,
+  },
+  heroTopActionsLeft: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  heroTopActionsRight: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  heroActionCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backdropFilter: 'blur(10px)',
+  },
+  heroIdentitySection: {
+    position: 'absolute',
+    top: 100,
+    right: 20,
+    left: 20,
+    flexDirection: 'row-reverse',
+    alignItems: 'flex-start',
+    gap: 16,
+    zIndex: 50,
+  },
+  heroLogoWrap: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: stylesTokens.white,
+    borderWidth: 5,
+    borderColor: 'rgba(255,255,255,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowRadius: 15,
+        shadowOffset: { width: 0, height: 8 },
+      },
+      android: {
+        elevation: 12,
+      },
+    }),
+  },
+  heroLogoImage: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    resizeMode: 'contain',
+  },
+  heroInfoCluster: {
+    flex: 1,
+    alignItems: 'flex-end',
+    gap: 6,
+    paddingTop: 10,
+  },
+  heroNameText: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: stylesTokens.white,
+    fontFamily: 'Outfit-Bold',
+    textAlign: 'right',
+    lineHeight: 38,
+    textShadowColor: 'rgba(0, 0, 0, 0.6)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+  },
+  heroLocationRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 6,
+  },
+  heroLocationText: {
+    fontSize: 16,
+    color: stylesTokens.white,
+    fontFamily: 'Outfit-Medium',
+    fontWeight: '700',
+  },
+  heroStatusBadge: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginTop: 4,
+  },
+  heroStatusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#00C853',
+  },
+  heroStatusText: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: stylesTokens.white,
+    fontFamily: 'Outfit-Bold',
+  },
+
+  heroGridsLayer: {
+    position: 'absolute',
+    bottom: 24,
+    left: 16,
+    right: 16,
+    gap: 10,
+  },
+  heroFeatureGrid: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 8,
+  },
+  heroFeatureChip: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    paddingVertical: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    gap: 4,
+    height: 85,
+  },
+  heroFeatureTextCenter: {
+    alignItems: 'center',
+  },
+  heroFeatureValue: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: stylesTokens.white,
+    textAlign: 'center',
+    fontFamily: 'Outfit-Bold',
+  },
+  heroFeatureLabel: {
+    fontSize: 10,
+    color: 'rgba(255, 255, 255, 0.7)',
+    textAlign: 'center',
+    fontWeight: '700',
+    fontFamily: 'Outfit-Medium',
+  },
+
+  heroDeliveryGrid: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 8,
+  },
+  heroDeliveryChip: {
+    flex: 1,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    paddingVertical: 14,
+    paddingHorizontal: 10,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    gap: 8,
+    height: 70,
+  },
+  heroDeliveryChipActive: {
+    borderColor: ORANGE,
+    backgroundColor: 'rgba(255, 80, 13, 0.15)',
+    borderWidth: 1.5,
+  },
+  heroDeliveryChipTextContent: {
+    alignItems: 'flex-end',
+    gap: 1,
+    flex: 1,
+  },
+  heroDeliveryChipTitle: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: stylesTokens.white,
+    textAlign: 'right',
+    fontFamily: 'Outfit-Bold',
+  },
+  heroDeliveryChipTitleActive: {
+    color: ORANGE,
+  },
+  heroDeliveryChipSubtitle: {
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.6)',
+    textAlign: 'right',
+    fontWeight: '700',
+    fontFamily: 'Outfit-Medium',
   },
 
   heroIdentityRow: {
@@ -2213,33 +2446,17 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
   modeStrip: {
-    backgroundColor: stylesTokens.light,
-    borderWidth: 1,
-    borderColor: stylesTokens.line,
-    borderRadius: 999,
+    backgroundColor: colorPalette.surfaceInset,
+    borderRadius: 16,
     padding: 4,
-    gap: 6,
     flexDirection: 'row',
-    ...Platform.select({
-      ios: {
-        shadowColor: stylesTokens.orange,
-        shadowOpacity: 0.18,
-        shadowRadius: 8,
-        shadowOffset: { width: 0, height: 2 },
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
+    height: 54,
   },
   modePill: {
     flex: 1,
-    borderRadius: 999,
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: 'transparent',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modePillActive: {
     backgroundColor: stylesTokens.white,
