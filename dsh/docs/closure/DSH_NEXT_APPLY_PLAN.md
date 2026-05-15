@@ -1,8 +1,8 @@
-# DSH Next Apply Plan — After Loop 3
+# DSH Next Apply Plan — After Loop 5
 
 Status: NEEDS_NEXT_LOOP
-Current loop: 4 (DONE_LOCAL)
-Next loop: 5 — Organize After Coverage
+Current loop: 5 (DONE_LOCAL)
+Next loop: 6 — Visual Review Readiness
 Date: 2026-05-15
 
 ---
