@@ -656,6 +656,19 @@ function DshStoreGetScreenContent({
   // tighter rotation range for a premium subtle feel
   const previewRotateDeg = previewRotate.interpolate({ inputRange: [-200, 200], outputRange: ['-6deg', '6deg'], extrapolate: 'clamp' });
 
+  const [isFollowing, setIsFollowing] = React.useState(false);
+  const [followerCount, setFollowerCount] = React.useState(11200);
+
+  const toggleFollow = () => {
+    setIsFollowing(!isFollowing);
+    setFollowerCount(prev => isFollowing ? prev - 1 : prev + 1);
+  };
+
+  const formatFollowers = (count: number) => {
+    if (count >= 1000) return `${(count / 1000).toFixed(1)} ألف`;
+    return count.toString();
+  };
+
   // Preview peek (next card) shown while dragging
   const [previewPeekItem, setPreviewPeekItem] = React.useState<DshStoreGetMenuItem | null>(null);
   const [previewPeekType, setPreviewPeekType] = React.useState<'category' | 'item' | null>(null);
@@ -1383,29 +1396,33 @@ function DshStoreGetScreenContent({
                       <View style={styles.heroGridsLayer}>
                         {/* ROW 1: Metrics (4 Items) */}
                         <View style={styles.heroFeatureGrid}>
-                          <View style={[styles.heroFeatureChip, { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.cardBorder }]}>
-                            <Icon name="people-outline" size={18} color={appearanceChrome.accent} />
-                            <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{normalizedFollowersLabel || '11 ألف'}</Text>
-                            <Text style={[styles.heroFeatureLabel, { color: appearanceChrome.labelText }]}>ثقة المجتمع</Text>
-                          </View>
+                          <TouchableOpacity
+                            style={[styles.heroFeatureChip, { backgroundColor: isFollowing ? appearanceChrome.strongSurface : appearanceChrome.subtleSurface, borderColor: isFollowing ? ORANGE : appearanceChrome.cardBorder }]}
+                            onPress={toggleFollow}
+                            activeOpacity={0.7}
+                          >
+                            <Icon name={isFollowing ? "person-check" : "people-outline"} size={15} color={isFollowing ? ORANGE : appearanceChrome.accent} />
+                            <Text style={[styles.heroFeatureValue, { color: isFollowing ? ORANGE : appearanceChrome.primaryText }]} numberOfLines={1}>{formatFollowers(followerCount)}</Text>
+                            <Text style={[styles.heroFeatureLabel, { color: isFollowing ? ORANGE : appearanceChrome.labelText }]}>{isFollowing ? 'متابع' : 'متابعة'}</Text>
+                          </TouchableOpacity>
 
                           <View style={[styles.heroFeatureChip, { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.cardBorder }]}>
-                            <Icon name="time-outline" size={18} color={appearanceChrome.accent} />
+                            <Icon name="time-outline" size={15} color={appearanceChrome.accent} />
                             <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{store.deliveryTimeLabel || normalizedEtaLabel}</Text>
-                            <Text style={[styles.heroFeatureLabel, { color: appearanceChrome.labelText }]}>متوسط التوصيل</Text>
+                            <Text style={[styles.heroFeatureLabel, { color: appearanceChrome.labelText }]}>توصيل</Text>
                           </View>
 
                           <View style={[styles.heroFeatureChip, { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.cardBorder }]}>
-                            <Icon name="star" size={18} color={appearanceChrome.accent} />
+                            <Icon name="star" size={15} color={appearanceChrome.accent} />
                             <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{store.rating?.toFixed(1) || '5.0'}</Text>
-                            <Text style={[styles.heroFeatureLabel, { color: appearanceChrome.labelText }]}>تقييم المتجر</Text>
+                            <Text style={[styles.heroFeatureLabel, { color: appearanceChrome.labelText }]}>تقييم</Text>
                           </View>
 
                           {store.hasBthwaniPro && (
                             <View style={[styles.heroFeatureChip, { backgroundColor: appearanceChrome.strongSurface, borderColor: appearanceChrome.cardBorder }]}>
-                              <Icon name="sparkles" size={18} color={appearanceChrome.accent} />
+                              <Icon name="sparkles" size={15} color={appearanceChrome.accent} />
                               <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]} numberOfLines={1}>بثواني برو</Text>
-                              <Text style={[styles.heroFeatureLabel, { color: appearanceChrome.labelText }]}>تجربة مميزة</Text>
+                              <Text style={[styles.heroFeatureLabel, { color: appearanceChrome.labelText }]}>برو</Text>
                             </View>
                           )}
                         </View>
@@ -1435,12 +1452,12 @@ function DshStoreGetScreenContent({
                               >
                                 <View style={styles.heroDeliveryChipTextContent}>
                                   <Text style={[styles.heroDeliveryChipTitle, { color: active ? appearanceChrome.activeActionIcon : appearanceChrome.primaryText }, active && styles.heroDeliveryChipTitleActive]} numberOfLines={1}>
-                                    {mode.label}
+                                    {mode.label.replace('توصيل ', '').replace('استلم بنفسك', 'استلام')}
                                   </Text>
-                                  <Text style={[styles.heroDeliveryChipSubtitle, { color: active ? appearanceChrome.activeActionIcon : appearanceChrome.labelText }]} numberOfLines={1}>{subtitle}</Text>
+                                  <Text style={[styles.heroDeliveryChipSubtitle, { color: active ? appearanceChrome.activeActionIcon : appearanceChrome.labelText }]} numberOfLines={1}>{subtitle.replace('من أسطول المتجر', 'المتجر').replace('جاهز للاستلام', 'استلام').replace('توصيل بثواني', 'بثواني')}</Text>
                                 </View>
-                                <Icon name={mode.icon} size={22} color={active ? appearanceChrome.activeActionIcon : appearanceChrome.actionIcon} />
-                              </TouchableOpacity>
+                                  <Icon name={mode.icon} size={18} color={active ? appearanceChrome.activeActionIcon : appearanceChrome.actionIcon} />
+                                </TouchableOpacity>
                             );
                           })}
                         </View>
@@ -2263,25 +2280,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
-    gap: 4,
-    height: 85,
+    gap: 3,
+    height: 72,
   },
   heroFeatureTextCenter: {
     alignItems: 'center',
   },
   heroFeatureValue: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '900',
     color: stylesTokens.white,
     textAlign: 'center',
     fontFamily: 'Outfit-Bold',
   },
   heroFeatureLabel: {
-    fontSize: 10,
+    fontSize: 9,
     color: 'rgba(255, 255, 255, 0.7)',
     textAlign: 'center',
     fontWeight: '700',
@@ -2299,13 +2316,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.55)',
-    paddingVertical: 14,
-    paddingHorizontal: 10,
-    borderRadius: 24,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 22,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
-    gap: 8,
-    height: 70,
+    gap: 6,
+    height: 58,
   },
   heroDeliveryChipActive: {
     borderColor: ORANGE,
@@ -2318,7 +2335,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   heroDeliveryChipTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '900',
     color: stylesTokens.white,
     textAlign: 'right',
@@ -2328,7 +2345,7 @@ const styles = StyleSheet.create({
     color: ORANGE,
   },
   heroDeliveryChipSubtitle: {
-    fontSize: 11,
+    fontSize: 9.5,
     color: 'rgba(255, 255, 255, 0.6)',
     textAlign: 'right',
     fontWeight: '700',
