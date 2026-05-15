@@ -226,20 +226,28 @@ function createProductCardStyles(
     },
     partnerTile: {
       position: 'absolute',
-      bottom: 0,
-      right: 0,
-      width: 64,
-      height: 52,
-      backgroundColor: theme.surface,
-      borderTopLeftRadius: 32,
-      borderBottomRightRadius: 18,
-      borderWidth: 1,
-      borderColor: productColors.favoriteBorder,
+      bottom: -10,
+      right: -10,
+      width: 66,
+      height: 66,
+      backgroundColor: '#FF500D',
+      borderRadius: 33,
+      borderWidth: 2,
+      borderColor: '#FFFFFF',
       zIndex: 6,
       overflow: 'hidden',
       justifyContent: 'center',
       alignItems: 'center',
       ...productColors.partnerTileShadow,
+    },
+    partnerTileImageContainer: {
+      width: 54,
+      height: 54,
+      borderRadius: 27,
+      backgroundColor: '#FFFFFF',
+      overflow: 'hidden',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     partnerTileImage: {
       width: '100%',
@@ -529,7 +537,9 @@ export const ProductCard = memo(function ProductCard({
 
           {resolvedPartnerSource ? (
             <View style={styles.partnerTile}>
-              <Image source={resolvedPartnerSource} style={styles.partnerTileImage} resizeMode="contain" />
+              <View style={styles.partnerTileImageContainer}>
+                <Image source={resolvedPartnerSource} style={styles.partnerTileImage} resizeMode="contain" />
+              </View>
             </View>
           ) : null}
         </View>

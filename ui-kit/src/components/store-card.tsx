@@ -19,7 +19,7 @@ import { useBThwaniAppearance, useTheme } from '../providers';
 // --- Constants ---
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const IMAGE_SIZE = 114; // Slightly increased to prevent text clipping
-const LOGO_SIZE = 38;
+const LOGO_SIZE = 54;
 const CARD_RADIUS = 16;
 const DARK_BLUE = '#0A2F5C';
 const ORANGE = '#FF500D';
@@ -289,21 +289,21 @@ const styles = StyleSheet.create({
   },
   logoTemplateContainer: {
     position: 'absolute',
-    bottom: -4,
-    right: -4,
-    width: LOGO_SIZE + 8, // More compact
-    height: LOGO_SIZE + 8,
-    borderRadius: (LOGO_SIZE + 8) / 2,
+    bottom: -10,
+    right: -10,
+    width: LOGO_SIZE + 12,
+    height: LOGO_SIZE + 12,
+    borderRadius: (LOGO_SIZE + 12) / 2,
     backgroundColor: ORANGE,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 20, // Ensure it's above the rating ribbon
+    zIndex: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 3,
     elevation: 5,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#FFF',
   },
   absoluteStatusBadge: {
