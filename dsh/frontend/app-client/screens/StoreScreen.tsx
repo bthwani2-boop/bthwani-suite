@@ -1395,37 +1395,36 @@ function DshStoreGetScreenContent({
 
                       <View style={styles.heroGridsLayer}>
                         {/* ROW 1: Metrics (4 Items) */}
-                        <View style={styles.heroFeatureGrid}>
-                          <TouchableOpacity
-                            style={[styles.heroFeatureChip, { backgroundColor: isFollowing ? appearanceChrome.strongSurface : appearanceChrome.subtleSurface, borderColor: isFollowing ? ORANGE : appearanceChrome.cardBorder }]}
-                            onPress={toggleFollow}
-                            activeOpacity={0.7}
-                          >
-                            <Icon name={isFollowing ? "person-check" : "people-outline"} size={15} color={isFollowing ? ORANGE : appearanceChrome.accent} />
-                            <Text style={[styles.heroFeatureValue, { color: isFollowing ? ORANGE : appearanceChrome.primaryText }]} numberOfLines={1}>{formatFollowers(followerCount)}</Text>
-                            <Text style={[styles.heroFeatureLabel, { color: isFollowing ? ORANGE : appearanceChrome.labelText }]}>{isFollowing ? 'متابع' : 'متابعة'}</Text>
-                          </TouchableOpacity>
+                          <View style={styles.heroFeatureGrid}>
+                            <TouchableOpacity
+                              style={[styles.heroFeatureChip, isFollowing && styles.heroFeatureChipActiveActive]}
+                              onPress={toggleFollow}
+                              activeOpacity={0.7}
+                            >
+                              <Icon name={isFollowing ? "person-check" : "people-outline"} size={13} color={isFollowing ? ORANGE : '#FFF'} />
+                              <Text style={[styles.heroFeatureValue, isFollowing && { color: ORANGE }]}>{formatFollowers(followerCount)}</Text>
+                              <Text style={[styles.heroFeatureLabel, isFollowing && { color: ORANGE }]}>{isFollowing ? 'متابع' : 'متابعة'}</Text>
+                            </TouchableOpacity>
 
-                          <View style={[styles.heroFeatureChip, { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.cardBorder }]}>
-                            <Icon name="time-outline" size={15} color={appearanceChrome.accent} />
-                            <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{store.deliveryTimeLabel || normalizedEtaLabel}</Text>
-                            <Text style={[styles.heroFeatureLabel, { color: appearanceChrome.labelText }]}>توصيل</Text>
-                          </View>
-
-                          <View style={[styles.heroFeatureChip, { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.cardBorder }]}>
-                            <Icon name="star" size={15} color={appearanceChrome.accent} />
-                            <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{store.rating?.toFixed(1) || '5.0'}</Text>
-                            <Text style={[styles.heroFeatureLabel, { color: appearanceChrome.labelText }]}>تقييم</Text>
-                          </View>
-
-                          {store.hasBthwaniPro && (
-                            <View style={[styles.heroFeatureChip, { backgroundColor: appearanceChrome.strongSurface, borderColor: appearanceChrome.cardBorder }]}>
-                              <Icon name="sparkles" size={15} color={appearanceChrome.accent} />
-                              <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]} numberOfLines={1}>بثواني برو</Text>
-                              <Text style={[styles.heroFeatureLabel, { color: appearanceChrome.labelText }]}>برو</Text>
+                            <View style={styles.heroFeatureChip}>
+                              <Icon name="time-outline" size={13} color="#FFF" />
+                              <Text style={styles.heroFeatureValue}>{store.deliveryTimeLabel || normalizedEtaLabel}</Text>
+                              <Text style={styles.heroFeatureLabel}>توصيل</Text>
                             </View>
-                          )}
-                        </View>
+
+                            <View style={styles.heroFeatureChip}>
+                              <Icon name="star" size={13} color="#FFD700" />
+                              <Text style={styles.heroFeatureValue}>{store.rating?.toFixed(1) || '5.0'}</Text>
+                              <Text style={styles.heroFeatureLabel}>تقييم</Text>
+                            </View>
+
+                            {store.hasBthwaniPro && (
+                              <View style={[styles.heroFeatureChip, { borderColor: ORANGE, borderWidth: 0.8 }]}>
+                                <Icon name="sparkles" size={13} color={ORANGE} />
+                                <Text style={[styles.heroFeatureValue, { color: ORANGE }]}>برو</Text>
+                              </View>
+                            )}
+                          </View>
 
                         {/* ROW 2: Delivery Options (3 Items) */}
                         <View style={styles.heroDeliveryGrid}>
@@ -1451,18 +1450,17 @@ function DshStoreGetScreenContent({
                                 key={mode.id}
                                 style={[
                                   styles.heroDeliveryChip,
-                                  active && styles.heroDeliveryChipActive,
-                                  { backgroundColor: active ? ORANGE : 'rgba(0, 0, 0, 0.55)', borderColor: active ? ORANGE : 'rgba(255, 255, 255, 0.2)' }
+                                  active ? styles.heroDeliveryChipActive : styles.heroDeliveryChipInactive
                                 ]}
                                 onPress={() => setSelectedMode(mode.id)}
                                 activeOpacity={0.8}
                               >
                                 <View style={[styles.heroDeliveryChipTextContent, { justifyContent: 'center' }]}>
-                                  <Text style={[styles.heroDeliveryChipTitle, { color: active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.9)' }, active && styles.heroDeliveryChipTitleActive]} numberOfLines={1}>
+                                  <Text style={[styles.heroDeliveryChipTitle, { color: active ? ORANGE : '#FFF' }]} numberOfLines={1}>
                                     {title}
                                   </Text>
                                 </View>
-                                  <Icon name={mode.icon} size={18} color={active ? appearanceChrome.activeActionIcon : appearanceChrome.actionIcon} />
+                                  <Icon name={mode.icon} size={15} color={active ? ORANGE : 'rgba(255, 255, 255, 0.7)'} />
                                 </TouchableOpacity>
                             );
                           })}
@@ -2281,28 +2279,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  heroFeatureChip: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    gap: 3,
-    height: 72,
-  },
-  heroFeatureTextCenter: {
-    alignItems: 'center',
-  },
-  heroFeatureValue: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: stylesTokens.white,
-    textAlign: 'center',
-    fontFamily: 'Outfit-Bold',
-  },
+   heroFeatureChip: {
+     flex: 1,
+     alignItems: 'center',
+     justifyContent: 'center',
+     backgroundColor: 'rgba(255, 255, 255, 0.08)',
+     paddingVertical: 4,
+     borderRadius: 12,
+     borderWidth: 0.5,
+     borderColor: 'rgba(255, 255, 255, 0.15)',
+     gap: 1,
+     height: 48,
+   },
+   heroFeatureChipActiveActive: {
+     backgroundColor: 'rgba(255, 80, 13, 0.15)',
+     borderColor: ORANGE,
+     borderWidth: 0.8,
+   },
+   heroFeatureTextCenter: {
+     alignItems: 'center',
+   },
+   heroFeatureValue: {
+     fontSize: 11.5,
+     fontWeight: '700',
+     color: '#FFF',
+     textAlign: 'center',
+     fontFamily: 'Outfit-Bold',
+   },
+   heroFeatureLabel: {
+     fontSize: 10,
+     color: 'rgba(255, 255, 255, 0.7)',
+     textAlign: 'center',
+     fontFamily: 'Outfit-Regular',
+   },
   heroFeatureLabel: {
     fontSize: 9,
     color: 'rgba(255, 255, 255, 0.7)',
@@ -2321,29 +2330,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.55)',
-    paddingVertical: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    paddingVertical: 6,
     paddingHorizontal: 8,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 12,
+    borderWidth: 0.5,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
     gap: 4,
-    height: 58,
+    height: 48,
   },
   heroDeliveryChipActive: {
-    borderColor: ORANGE,
     backgroundColor: 'rgba(255, 80, 13, 0.15)',
-    borderWidth: 1.5,
+    borderColor: ORANGE,
+    borderWidth: 0.8,
+  },
+  heroDeliveryChipInactive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   heroDeliveryChipTextContent: {
-    alignItems: 'flex-end',
-    gap: 1,
     flex: 1,
   },
   heroDeliveryChipTitle: {
-    fontSize: 12.5,
-    fontWeight: '900',
-    color: stylesTokens.white,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFF',
     textAlign: 'right',
     fontFamily: 'Outfit-Bold',
   },
