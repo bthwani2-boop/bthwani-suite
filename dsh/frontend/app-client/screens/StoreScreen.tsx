@@ -495,7 +495,7 @@ function DshStoreGetScreenContent({
   const storeText = uiText.storeScreen;
   const isDarkGlass = appearanceMode === 'darkGlass' || themeMode === 'dark';
   const isRTL = direction === 'rtl';
-  const viewportWidth = Dimensions.get('window').width;
+  const { width: viewportWidth } = Dimensions.get('window');
   const [selectedMode, setSelectedMode] = React.useState<DeliveryMode>('store_delivery');
   const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
   const [pickerItem, setPickerItem] = React.useState<DshStoreGetMenuItem | null>(null);
@@ -547,7 +547,6 @@ function DshStoreGetScreenContent({
     });
   }, []);
 
-  const openImagePreview = React.useCallback((item: DshStoreGetMenuItem) => setPreviewItem(item), []);
   const closeImagePreview = React.useCallback(() => setPreviewItem(null), []);
 
   const deliveryModes = React.useMemo(() => getDeliveryModes(storeText), [storeText]);
@@ -635,65 +634,41 @@ function DshStoreGetScreenContent({
    const listRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const [stickyThreshold, setStickyThreshold] = React.useState(1000);
+
   const horizontalScrollX = React.useRef(0);
   const isSyncingHorizontal = React.useRef(false);
-  const previewDrag = React.useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
-  const previewScale = React.useRef(new Animated.Value(1)).current;
-  const previewRotate = React.useRef(new Animated.Value(0)).current; // degrees-ish proxy
-  // tighter rotation range for a premium subtle feel
-  const previewRotateDeg = previewRotate.interpolate({ inputRange: [-200, 200], outputRange: ['-6deg', '6deg'], extrapolate: 'clamp' });
 
-  // Preview peek (next card) shown while dragging
-  const [previewPeekItem, setPreviewPeekItem] = React.useState<DshStoreGetMenuItem | null>(null);
-  const [previewPeekType, setPreviewPeekType] = React.useState<'category' | 'item' | null>(null);
-  const [previewPeekSign, setPreviewPeekSign] = React.useState<number>(1);
 
-  const STAGE_OFFSET_X = Dimensions.get('window').width + 220;
-  const stageOffsetPosX = React.useRef(new Animated.Value(STAGE_OFFSET_X)).current;
-  const stageOffsetNegX = React.useRef(new Animated.Value(-STAGE_OFFSET_X)).current;
+  // Preview carousel state
+  const previewListRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
+  const [previewActiveIndex, setPreviewActiveIndex] = React.useState(-1);
+  const previewScrollX = React.useRef(new Animated.Value(0)).current;
+  const previewAnim = React.useRef(new Animated.Value(0)).current;
 
-  const STAGE_OFFSET_Y = Dimensions.get('window').height * 0.6;
-  const stageOffsetPosY = React.useRef(new Animated.Value(STAGE_OFFSET_Y)).current;
-  const stageOffsetNegY = React.useRef(new Animated.Value(-STAGE_OFFSET_Y)).current;
-
-  // Throttle & prefetch helpers to avoid heavy work on every move event
-  const lastPreviewPeekUpdateRef = React.useRef<number>(0);
-  const PREVIEW_PEEK_THROTTLE_MS = 90; // ms between preview-peek updates
-  const prefetchedUrisRef = React.useRef<Record<string, boolean>>({});
-  const previewPeekIdRef = React.useRef<string | null>(null);
-
-  const trySetPreviewPeek = React.useCallback((nextPreview: DshStoreGetMenuItem | null, type: 'category' | 'item' | null, sign: number) => {
-    const now = Date.now();
-    if (!nextPreview) {
-      previewPeekIdRef.current = null;
-      try { setPreviewPeekItem(null); setPreviewPeekType(null); setPreviewPeekSign(1); } catch { /* noop */ }
-      return;
-    }
-
-    if (previewPeekIdRef.current === nextPreview.id && previewPeekType === type) {
-      return; // already staged
-    }
-
-    if (now - lastPreviewPeekUpdateRef.current < PREVIEW_PEEK_THROTTLE_MS) {
-      return; // throttle frequent moves
-    }
-
-    lastPreviewPeekUpdateRef.current = now;
-
-    const uri = nextPreview.imageUri;
-    if (uri && !prefetchedUrisRef.current[uri]) {
-      // mark as prefetched to avoid repeating
-      prefetchedUrisRef.current[uri] = true;
-      // prefetch asynchronously then set the preview peek (don't await on main thread)
-      Image.prefetch(uri).finally(() => {
-        previewPeekIdRef.current = nextPreview.id;
-        try { setPreviewPeekItem(nextPreview); setPreviewPeekType(type); setPreviewPeekSign(sign); } catch { /* noop */ }
-      });
+  React.useEffect(() => {
+    if (previewItem) {
+      Animated.spring(previewAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+        tension: 50,
+        friction: 8,
+      }).start();
     } else {
-      previewPeekIdRef.current = nextPreview.id;
-      try { setPreviewPeekItem(nextPreview); setPreviewPeekType(type); setPreviewPeekSign(sign); } catch { /* noop */ }
+      previewAnim.setValue(0);
     }
-  }, [previewPeekType]);
+  }, [previewItem, previewAnim]);
+
+  const PREVIEW_ITEM_WIDTH = viewportWidth * 0.82;
+  const PREVIEW_ITEM_GAP = 12;
+  const PREVIEW_SNAP_INTERVAL = PREVIEW_ITEM_WIDTH + PREVIEW_ITEM_GAP;
+
+  const openImagePreview = React.useCallback((item: DshStoreGetMenuItem) => {
+    const index = previewItems.findIndex((i) => i.id === item.id);
+    if (index !== -1) {
+      setPreviewActiveIndex(index);
+      setPreviewItem(item);
+    }
+  }, [previewItems]);
 
   const chipsScrollRef = React.useRef<ScrollView | null>(null);
   const chipLayoutsRef = React.useRef<Record<string, { x: number; width: number }>>({});
@@ -773,6 +748,9 @@ function DshStoreGetScreenContent({
     });
   }, [clientVisibleItems, headerSearchQuery, isFavoriteItem, isNewItem, isOfferItem, favoriteIds]);
 
+  const visibleItems = React.useMemo(() => resolveItemsForCategory(selectedCategory), [resolveItemsForCategory, selectedCategory]);
+  const previewItems = visibleItems;
+
   const changeCategory = React.useCallback((newId: string) => {
     if (newId === selectedCategory) return;
     setSelectedCategory(newId);
@@ -814,209 +792,93 @@ function DshStoreGetScreenContent({
     [categories, selectedCategory, isRTL, changeCategory]
   );
 
-  React.useEffect(() => {
-    previewDrag.setValue({ x: 0, y: 0 });
-  }, [previewDrag, previewItem?.id]);
+  const renderPreviewItem = React.useCallback(({ item, index }: { item: DshStoreGetMenuItem, index: number }) => {
+    const inputRange = [
+      (index - 1) * PREVIEW_SNAP_INTERVAL,
+      index * PREVIEW_SNAP_INTERVAL,
+      (index + 1) * PREVIEW_SNAP_INTERVAL,
+    ];
 
-  const visibleItems = React.useMemo(() => resolveItemsForCategory(selectedCategory), [resolveItemsForCategory, selectedCategory]);
-  const previewItems = visibleItems;
-  const previewCurrentIndex = React.useMemo(() => {
-    if (!previewItem) return -1;
-    return previewItems.findIndex((item) => item.id === previewItem.id);
-  }, [previewItem, previewItems]);
+    const scale = previewScrollX.interpolate({
+      inputRange,
+      outputRange: [0.94, 1, 0.94],
+      extrapolate: 'clamp',
+    });
 
-  const movePreviewByItemOffset = React.useCallback((offset: number) => {
-    if (!previewItem || previewCurrentIndex === -1 || !previewItems.length) {
-      return;
-    }
+    const opacity = previewScrollX.interpolate({
+      inputRange,
+      outputRange: [0.7, 1, 0.7],
+      extrapolate: 'clamp',
+    });
 
-    const nextIndex = Math.max(0, Math.min(previewItems.length - 1, previewCurrentIndex + offset));
-    if (nextIndex === previewCurrentIndex) {
-      return;
-    }
-
-    const nextItem = previewItems[nextIndex];
-    setPreviewItem(nextItem);
-  }, [previewCurrentIndex, previewItem, previewItems]);
-
-  const movePreviewByCategoryOffset = React.useCallback((offset: number) => {
-    if (!categories.length) {
-      return;
-    }
-
-    const currentIndex = categories.findIndex((category) => category.id === selectedCategory);
-    if (currentIndex === -1) {
-      return;
-    }
-
-    const nextIndex = Math.max(0, Math.min(categories.length - 1, currentIndex + offset));
-    if (nextIndex === currentIndex) {
-      return;
-    }
-
-    const nextCategoryId = categories[nextIndex].id;
-    changeCategory(nextCategoryId);
-
-    const nextCategoryItems = resolveItemsForCategory(nextCategoryId);
-    if (nextCategoryItems.length) {
-      setPreviewItem(nextCategoryItems[0]);
-    }
-  }, [categories, changeCategory, resolveItemsForCategory, selectedCategory]);
-
-  const previewPanResponder = React.useMemo(() =>
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => false,
-      onStartShouldSetPanResponderCapture: () => false,
-      onMoveShouldSetPanResponder: (_evt, gestureState) => {
-        const { dx, dy } = gestureState;
-        return Math.abs(dx) > 10 || Math.abs(dy) > 10;
-      },
-      onMoveShouldSetPanResponderCapture: (_evt, gestureState) => {
-        const { dx, dy } = gestureState;
-        return Math.abs(dx) > 10 || Math.abs(dy) > 10;
-      },
-      onPanResponderGrant: () => {
-        previewDrag.stopAnimation();
-        // subtle lift when grabbing
-        Animated.spring(previewScale, { toValue: 1.04, useNativeDriver: false, friction: 6, tension: 100 }).start();
-        previewRotate.setValue(0);
-      },
-      onPanResponderMove: (_evt, gestureState) => {
-        // more responsive movement multiplier for quicker feedback
-        const dampX = gestureState.dx * 0.36;
-        const dampY = gestureState.dy * 0.36;
-        previewDrag.setValue({ x: dampX, y: dampY });
-        // smaller, smoother rotation mapping
-        previewRotate.setValue(gestureState.dx * 0.045);
-
-        // preview-peek logic: reveal the next card immediately while dragging
-        const { dx, dy } = gestureState;
-        const absDx = Math.abs(dx);
-        const absDy = Math.abs(dy);
-
-        // horizontal preview peek
-        if (absDx >= absDy && absDx > 8) {
-          const toLeft = dx < 0;
-          const currentCatIndex = categories.findIndex((c) => c.id === selectedCategory);
-          let candidateCatIndex = currentCatIndex;
-          if (isRTL) {
-            candidateCatIndex = dx < 0 ? Math.max(currentCatIndex - 1, 0) : Math.min(currentCatIndex + 1, categories.length - 1);
-          } else {
-            candidateCatIndex = dx < 0 ? Math.min(currentCatIndex + 1, categories.length - 1) : Math.max(currentCatIndex - 1, 0);
-          }
-
-          if (candidateCatIndex !== currentCatIndex) {
-            const nextCategoryItems = resolveItemsForCategory(categories[candidateCatIndex].id);
-              if (nextCategoryItems.length) {
-              const nextPreview = nextCategoryItems[0];
-              trySetPreviewPeek(nextPreview, 'category', toLeft ? 1 : -1);
-            } else {
-              // clear the preview peek if there is no candidate
-              trySetPreviewPeek(null, null, 1);
-            }
-          } else if (previewPeekItem) {
-            setPreviewPeekItem(null);
-            setPreviewPeekType(null);
-          }
-
-        // vertical preview peek
-        } else if (absDy > absDx && absDy > 8) {
-          if (previewCurrentIndex !== -1) {
-            const toUp = dy < 0;
-            const candidateItemIndex = Math.max(0, Math.min(previewItems.length - 1, previewCurrentIndex + (toUp ? 1 : -1)));
-            if (candidateItemIndex !== previewCurrentIndex) {
-              const nextPreview = previewItems[candidateItemIndex];
-              trySetPreviewPeek(nextPreview, 'item', toUp ? 1 : -1);
-            } else {
-              trySetPreviewPeek(null, null, 1);
-            }
-          }
-        } else {
-          // clear if movement is not directional enough
-          trySetPreviewPeek(null, null, 1);
+    return (
+      <Animated.View style={[
+        styles.previewCard,
+        {
+          width: PREVIEW_ITEM_WIDTH,
+          marginHorizontal: PREVIEW_ITEM_GAP / 2,
+          backgroundColor: appearanceChrome.modalSurface,
+          borderColor: appearanceChrome.modalBorder,
+          borderWidth: 1,
+          opacity,
+          transform: [{ scale }]
         }
-      },
-      onPanResponderRelease: (_evt, gestureState) => {
-        const { dx, dy, vx, vy } = gestureState;
-        const absDx = Math.abs(dx);
-        const absDy = Math.abs(dy);
-        // lower distance threshold and lower velocity threshold for snappier reactions
-        const threshold = Math.max(36, Dimensions.get('window').width * 0.06);
-        const velocityThreshold = 0.55; // quick flick sensitivity (easier to trigger)
-        const isHorizontal = absDx >= absDy;
+      ]}>
+        <View style={styles.previewImageWrap} pointerEvents="box-none">
+          {storeLogoImageSource ? (
+            <View style={styles.previewPartnerBadge} pointerEvents="none">
+              <View style={styles.previewPartnerBadgeImageContainer}>
+                <Image source={storeLogoImageSource} style={styles.previewPartnerBadgeImage} resizeMode="contain" />
+              </View>
+            </View>
+          ) : null}
 
-        const performCategorySwipe = (dirOffset: number, offX: number) => {
-          // adapt animation duration to flick velocity for faster, smoother feel
-          const base = 320;
-          const speedAdj = Math.min(260, Math.abs(vx) * 300);
-          const outDuration = Math.max(120, Math.floor(base - speedAdj));
+          <TouchableOpacity
+            style={[styles.previewDetailsFavoriteButton, { position: 'absolute', top: 0, right: 0, zIndex: 12 }]}
+            onPress={() => handleToggleFavorite(item.id)}
+          >
+            <Icon name={favoriteIds.has(item.id) ? 'heart' : 'heart-outline'} size={18} color="#FF500D" />
+          </TouchableOpacity>
 
-          Animated.timing(previewDrag.x, { toValue: offX, duration: outDuration, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start(() => {
-            try { movePreviewByCategoryOffset(dirOffset); } catch { /* noop */ }
-            // place new card off-screen on opposite side and slide in quickly
-            previewDrag.setValue({ x: -offX, y: 0 });
-            Animated.parallel([
-              Animated.timing(previewDrag.x, { toValue: 0, duration: Math.max(180, Math.floor(280 - speedAdj / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: false }),
-              Animated.spring(previewScale, { toValue: 1, useNativeDriver: false, friction: 6, tension: 90 }),
-              Animated.timing(previewRotate, { toValue: 0, duration: 180, useNativeDriver: false }),
-            ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch { /* noop */ } });
-            try { Vibration.vibrate(8); } catch { /* noop */ }
-          });
-        };
+          <TouchableOpacity
+            style={[styles.previewActionButton, { position: 'absolute', bottom: 0, left: 0, zIndex: 12 }]}
+            onPress={() => {
+              openMeasurementPicker(item, { x: 200, y: 420 });
+              closeImagePreview();
+            }}
+          >
+            <View style={{ position: 'relative' }}>
+              <Icon name="cart-outline" size={19} color="#FFFFFF" />
+              <View style={styles.previewActionPlusBadge}>
+                <Icon name="add" size={8} color="#FF500D" />
+              </View>
+            </View>
+          </TouchableOpacity>
 
-        const performItemSwipe = (dirOffset: number, offY: number) => {
-          const base = 260;
-          const speedAdjY = Math.min(220, Math.abs(vy) * 300);
-          const outDurationY = Math.max(120, Math.floor(base - speedAdjY));
+          <Text style={styles.previewEmoji}>{getItemEmoji(item)}</Text>
 
-          Animated.timing(previewDrag.y, { toValue: offY, duration: outDurationY, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start(() => {
-            movePreviewByItemOffset(dirOffset);
-            previewDrag.setValue({ x: 0, y: -offY });
-            Animated.parallel([
-              Animated.timing(previewDrag.y, { toValue: 0, duration: Math.max(160, Math.floor(240 - speedAdjY / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: false }),
-              Animated.spring(previewScale, { toValue: 1, useNativeDriver: false, friction: 6, tension: 90 }),
-              Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: false }),
-            ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch { /* noop */ } });
-            try { Vibration.vibrate(6); } catch { /* noop */ }
-          });
-        };
+          <Image
+            source={resolveDshStoreMenuItemImageSource(item)}
+            style={styles.previewImage}
+          />
 
-        if (isHorizontal && (absDx > threshold || Math.abs(vx) > velocityThreshold)) {
-          // horizontal swipe: detect logical category offset mapping
-          const toLeft = dx < 0;
-          const offX = (toLeft ? -1 : 1) * (Dimensions.get('window').width + 220);
-          // map to movePreviewByCategoryOffset same as before
-          if (isRTL) {
-            // RTL mapping preserves earlier logic
-            performCategorySwipe(toLeft ? -1 : 1, offX);
-          } else {
-            performCategorySwipe(toLeft ? 1 : -1, offX);
-          }
-        } else if (!isHorizontal && (absDy > threshold || Math.abs(vy) > velocityThreshold)) {
-          const toUp = dy < 0;
-          const offY = (toUp ? -1 : 1) * (Dimensions.get('window').height * 0.6);
-          performItemSwipe(toUp ? 1 : -1, offY);
-        } else {
-          // gentle return to center
-          Animated.parallel([
-            Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: false, friction: 7, tension: 90 }),
-            Animated.spring(previewScale, { toValue: 1, useNativeDriver: false, friction: 8, tension: 90 }),
-            Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: false }),
-          ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch { /* noop */ } });
-        }
-      },
-      onPanResponderTerminate: () => {
-        Animated.parallel([
-          Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: false, friction: 7, tension: 90 }),
-          Animated.spring(previewScale, { toValue: 1, useNativeDriver: false, friction: 8, tension: 90 }),
-          Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: false }),
-        ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch { /* noop */ } });
-      },
-      onPanResponderTerminationRequest: () => false,
-      onShouldBlockNativeResponder: () => true,
-    }),
-    [isRTL, movePreviewByCategoryOffset, movePreviewByItemOffset, previewDrag, categories, selectedCategory, previewItems, previewCurrentIndex, previewRotate, previewScale, resolveItemsForCategory, previewPeekItem, trySetPreviewPeek]
-  );
+          <View style={[styles.previewDetailsBox, { backgroundColor: 'rgba(255, 255, 255, 0.85)', borderColor: 'rgba(255, 255, 255, 0.3)', borderTopWidth: 1, flexDirection: isRTL ? 'row-reverse' : 'row' }]} pointerEvents="box-none">
+            <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]}>
+              <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap' }}>
+                <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{normalizeDisplayText(item.name)}</Text>
+                {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>· {normalizedStoreName}</Text> : null}
+              </View>
+              <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap', marginTop: 2 }}>
+                {item.priceLabel ? <Text style={[styles.previewDetailsPrice, { color: appearanceChrome.primaryText }]}>{normalizeDisplayText(item.priceLabel)}</Text> : null}
+                {item.discountLabel ? <Text style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>{normalizeDisplayText(item.discountLabel)}</Text> : null}
+                {item.subtitle ? <Text style={[styles.previewDetailsSubtitle, { color: appearanceChrome.secondaryText }]}>· {normalizeDisplayText(item.subtitle)}</Text> : null}
+              </View>
+            </View>
+          </View>
+        </View>
+      </Animated.View>
+    );
+  }, [previewScrollX, PREVIEW_SNAP_INTERVAL, PREVIEW_ITEM_WIDTH, PREVIEW_ITEM_GAP, appearanceChrome, storeLogoImageSource, favoriteIds, isRTL, store, normalizedStoreName, handleToggleFavorite, openMeasurementPicker, closeImagePreview]);
 
   const activeMeasurementOptions = React.useMemo(
     () => (pickerItem ? resolveMeasurementOptions(pickerItem) : []),
@@ -1614,7 +1476,7 @@ function DshStoreGetScreenContent({
                         );
                       })}
                     </ScrollView>
-                  </View>
+                    </View>
                   </View>
                 </>
               }
@@ -1768,155 +1630,49 @@ function DshStoreGetScreenContent({
       <Modal visible={Boolean(previewItem)} transparent animationType="fade" onRequestClose={closeImagePreview}>
         <View style={[styles.previewOverlay, { backgroundColor: appearanceChrome.overlay }]}>
           <Pressable style={styles.previewBackdrop} onPress={closeImagePreview} />
-          <View style={styles.previewWrap} pointerEvents="box-none">
-            {previewPeekItem ? (
-              (() => {
-                // choose the appropriate offset node for the preview-peek transform
-                const stageX = previewPeekSign === 1 ? stageOffsetPosX : stageOffsetNegX;
-                const stageY = previewPeekSign === 1 ? stageOffsetPosY : stageOffsetNegY;
-                const stageTranslateX = Animated.add(previewDrag.x, stageX);
-                const stageTranslateY = Animated.add(previewDrag.y, stageY);
-                const stageOpacity = previewPeekType === 'category'
-                  ? previewDrag.x.interpolate({ inputRange: previewPeekSign === 1 ? [-24, 0] : [0, 24], outputRange: [1, 0], extrapolate: 'clamp' })
-                  : previewDrag.y.interpolate({ inputRange: previewPeekSign === 1 ? [-24, 0] : [0, 24], outputRange: [1, 0], extrapolate: 'clamp' });
-
-                return (
-                  <Animated.View
-                    pointerEvents="none"
-                    collapsable={false}
-                    style={[
-                      styles.previewCard,
-                      { backgroundColor: appearanceChrome.modalSurface, borderColor: appearanceChrome.modalBorder, borderWidth: 1 },
-                      { position: 'absolute', left: 0, right: 0, zIndex: 1, opacity: stageOpacity, transform: previewPeekType === 'category' ? [{ translateX: stageTranslateX }] : [{ translateY: stageTranslateY }] },
-                    ]}
-                  >
-                    <View style={styles.previewImageWrap} pointerEvents="box-none">
-                      {previewPartnerBadge}
-
-                      <TouchableOpacity
-                        style={[styles.previewDetailsFavoriteButton, { position: 'absolute', top: 0, right: 0, zIndex: 12 }]}
-                        onPress={handlePreviewFavoritePress}
-                      >
-                        <Icon name={favoriteIds.has(previewPeekItem.id) ? 'heart' : 'heart-outline'} size={18} color="#FF500D" />
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={[styles.previewActionButton, { position: 'absolute', bottom: 0, left: 0, zIndex: 12 }]}
-                        onPress={handlePreviewAddToCart}
-                      >
-                        <View style={{ position: 'relative' }}>
-                          <Icon name="cart-outline" size={19} color="#FFFFFF" />
-                          <View style={styles.previewActionPlusBadge}>
-                            <Icon name="add" size={8} color="#FF500D" />
-                          </View>
-                        </View>
-                      </TouchableOpacity>
-
-                      <Text style={styles.previewEmoji}>{getItemEmoji(previewPeekItem)}</Text>
-
-                      <Image
-                        source={resolveDshStoreMenuItemImageSource(previewPeekItem)}
-                        style={styles.previewImage}
-                      />
-
-                      {
-                        (() => {
-                          const overlayColor = getOverlayColor(normalizeDisplayText(previewPeekItem.name), 0.86);
-                          return (
-                            <View style={[styles.previewDetailsBox, { backgroundColor: 'rgba(255, 255, 255, 0.85)', borderColor: 'rgba(255, 255, 255, 0.3)', borderTopWidth: 1, flexDirection: isRTL ? 'row-reverse' : 'row' }]} pointerEvents="box-none">
-                              <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]}>
-                                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap' }}>
-                                  <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.name)}</Text>
-                                  {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>· {normalizedStoreName}</Text> : null}
-                                </View>
-                                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap', marginTop: 2 }}>
-                                  {previewPeekItem.priceLabel ? <Text style={[styles.previewDetailsPrice, { color: appearanceChrome.primaryText }]}>{normalizeDisplayText(previewPeekItem.priceLabel)}</Text> : null}
-                                  {previewPeekItem.discountLabel ? <Text style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>{normalizeDisplayText(previewPeekItem.discountLabel)}</Text> : null}
-                                  {previewPeekItem.subtitle ? <Text style={[styles.previewDetailsSubtitle, { color: appearanceChrome.secondaryText }]}>· {normalizeDisplayText(previewPeekItem.subtitle)}</Text> : null}
-                                </View>
-                              </View>
-                            </View>
-                          );
-                        })()
-                      }
-                    </View>
-                  </Animated.View>
-                );
-              })()
-            ) : null}
-
-            {previewItem ? (
-              <Animated.View
-                style={[
-                  styles.previewCard,
-                  { backgroundColor: appearanceChrome.modalSurface, borderColor: appearanceChrome.modalBorder, borderWidth: 1 },
-                  {
-                    transform: [
-                      { translateX: previewDrag.x },
-                      { translateY: previewDrag.y },
-                      { rotate: previewRotateDeg },
-                      { scale: previewScale },
-                    ],
-                    zIndex: 2,
-                  },
-                ]}
-                collapsable={false}
-              >
-                <View style={styles.previewImageWrap} pointerEvents="box-none">
-                  <View style={styles.previewSwipeLayer} {...previewPanResponder.panHandlers} />
-
-                  {previewPartnerBadge}
-
-                  <TouchableOpacity
-                    style={[styles.previewDetailsFavoriteButton, { position: 'absolute', top: 0, right: 0, zIndex: 12 }]}
-                    onPress={handlePreviewFavoritePress}
-                  >
-                    <Icon name={favoriteIds.has(previewItem!.id) ? 'heart' : 'heart-outline'} size={18} color="#FF500D" />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.previewActionButton, { position: 'absolute', bottom: 0, left: 0, zIndex: 12 }]}
-                    onPress={handlePreviewAddToCart}
-                  >
-                    <View style={{ position: 'relative' }}>
-                      <Icon name="cart-outline" size={19} color="#FFFFFF" />
-                      <View style={styles.previewActionPlusBadge}>
-                        <Icon name="add" size={8} color="#FF500D" />
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-
-                  <Text style={styles.previewEmoji}>{getItemEmoji(previewItem!)}</Text>
-
-                  <Image
-                    source={resolveDshStoreMenuItemImageSource(previewItem!)}
-                    style={styles.previewImage}
-                  />
-
-                  {
-                    (() => {
-                      const overlayColor = getOverlayColor(normalizeDisplayText(previewItem!.name), 0.86);
-                      return (
-                        <View style={[styles.previewDetailsBox, { backgroundColor: 'rgba(255, 255, 255, 0.85)', borderColor: 'rgba(255, 255, 255, 0.3)', borderTopWidth: 1, flexDirection: isRTL ? 'row-reverse' : 'row' }]} pointerEvents="box-none">
-                          <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]} pointerEvents="none">
-                            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap' }}>
-                              <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{normalizeDisplayText(previewItem!.name)}</Text>
-                              {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>· {normalizedStoreName}</Text> : null}
-                            </View>
-                            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap', marginTop: 2 }}>
-                              {previewItem!.priceLabel ? <Text style={[styles.previewDetailsPrice, { color: appearanceChrome.primaryText }]}>{normalizeDisplayText(previewItem!.priceLabel)}</Text> : null}
-                              {previewItem!.discountLabel ? <Text style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>{normalizeDisplayText(previewItem!.discountLabel)}</Text> : null}
-                              {previewItem!.subtitle ? <Text style={[styles.previewDetailsSubtitle, { color: appearanceChrome.secondaryText }]}>· {normalizeDisplayText(previewItem!.subtitle)}</Text> : null}
-                            </View>
-                          </View>
-                        </View>
-                      );
-                    })()
-                  }
-                </View>
-              </Animated.View>
-            ) : null}
-          </View>
+          <Animated.View
+            style={[
+              styles.previewWrap,
+              {
+                opacity: previewAnim,
+                transform: [{ scale: previewAnim.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1] }) }]
+              }
+            ]}
+            pointerEvents="box-none"
+          >
+            <Animated.FlatList
+              ref={previewListRef}
+              data={previewItems}
+              renderItem={renderPreviewItem}
+              keyExtractor={(item) => `preview-${item.id}`}
+              horizontal
+              inverted={isRTL}
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={PREVIEW_SNAP_INTERVAL}
+              snapToAlignment="center"
+              decelerationRate="fast"
+              onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { x: previewScrollX } } }],
+                { useNativeDriver: true }
+              )}
+              contentContainerStyle={{
+                paddingHorizontal: (viewportWidth - PREVIEW_ITEM_WIDTH) / 2 - PREVIEW_ITEM_GAP / 2,
+              }}
+              initialScrollIndex={previewActiveIndex !== -1 ? previewActiveIndex : 0}
+              getItemLayout={(_, index) => ({
+                length: PREVIEW_SNAP_INTERVAL,
+                offset: PREVIEW_SNAP_INTERVAL * index,
+                index,
+              })}
+              onMomentumScrollEnd={(e) => {
+                const index = Math.round(e.nativeEvent.contentOffset.x / PREVIEW_SNAP_INTERVAL);
+                if (index >= 0 && index < previewItems.length) {
+                  setPreviewActiveIndex(index);
+                  setPreviewItem(previewItems[index]);
+                }
+              }}
+            />
+          </Animated.View>
         </View>
       </Modal>
 
@@ -2497,7 +2253,7 @@ const styles = StyleSheet.create({
     backgroundColor: stylesTokens.overlay,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 18,
+    paddingHorizontal: 0,
   },
   previewBackdrop: {
     ...StyleSheet.absoluteFillObject,
@@ -2506,11 +2262,12 @@ const styles = StyleSheet.create({
   previewWrap: {
     width: '100%',
     alignItems: 'center',
+    justifyContent: 'center',
     position: 'relative',
     zIndex: 1,
+    height: 480,
   },
   previewCard: {
-    width: '100%',
     maxWidth: 760,
     borderRadius: 16,
     position: 'relative',
