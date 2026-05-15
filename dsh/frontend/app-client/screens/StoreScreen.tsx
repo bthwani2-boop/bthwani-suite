@@ -1457,11 +1457,10 @@ function DshStoreGetScreenContent({
                                 onPress={() => setSelectedMode(mode.id)}
                                 activeOpacity={0.8}
                               >
-                                <View style={styles.heroDeliveryChipTextContent}>
-                                  <Text style={[styles.heroDeliveryChipTitle, { color: active ? appearanceChrome.activeActionIcon : appearanceChrome.primaryText }, active && styles.heroDeliveryChipTitleActive]} numberOfLines={1}>
+                                <View style={[styles.heroDeliveryChipTextContent, { justifyContent: 'center' }]}>
+                                  <Text style={[styles.heroDeliveryChipTitle, { color: active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.9)' }, active && styles.heroDeliveryChipTitleActive]} numberOfLines={1}>
                                     {title}
                                   </Text>
-                                  <Text style={[styles.heroDeliveryChipSubtitle, { color: active ? appearanceChrome.activeActionIcon : appearanceChrome.labelText }]} numberOfLines={1}>{subtitle}</Text>
                                 </View>
                                   <Icon name={mode.icon} size={18} color={active ? appearanceChrome.activeActionIcon : appearanceChrome.actionIcon} />
                                 </TouchableOpacity>
@@ -2328,7 +2327,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
-    gap: 6,
+    gap: 4,
     height: 58,
   },
   heroDeliveryChipActive: {
@@ -2342,7 +2341,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   heroDeliveryChipTitle: {
-    fontSize: 14,
+    fontSize: 12.5,
     fontWeight: '900',
     color: stylesTokens.white,
     textAlign: 'right',
