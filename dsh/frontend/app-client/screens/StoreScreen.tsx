@@ -1384,15 +1384,15 @@ function DshStoreGetScreenContent({
                         })}
                       </View>
 
-                      <View style={styles.heroTopActions} pointerEvents="box-none">
-                        <View style={[styles.heroTopActionsLeft, isRTL && styles.rowReverse]} pointerEvents="box-none">
+                      <View style={[styles.heroTopActions, isRTL && styles.rowReverse]} pointerEvents="box-none">
+                        <View style={styles.heroTopActionsLeft} pointerEvents="box-none">
                           <TouchableOpacity
                             style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
                             activeOpacity={0.7}
-                            onPress={handleStoreShare}
+                            onPress={openInlineSearch}
                             hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
                           >
-                            <Icon name="share-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
+                            <Icon name="search-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
@@ -1402,15 +1402,16 @@ function DshStoreGetScreenContent({
                           >
                             <Icon name="cart-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
                           </TouchableOpacity>
-                          <TouchableOpacity
-                            style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
-                            activeOpacity={0.7}
-                            onPress={openInlineSearch}
-                            hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
-                          >
-                            <Icon name="search-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
-                          </TouchableOpacity>
                         </View>
+
+                        <TouchableOpacity
+                          style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
+                          activeOpacity={0.7}
+                          onPress={handleStoreShare}
+                          hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
+                        >
+                          <Icon name="share-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
+                        </TouchableOpacity>
                       </View>
 
                       {/* Sticky Header Overlay */}
@@ -1420,8 +1421,8 @@ function DshStoreGetScreenContent({
                           styles.stickyHeaderContent,
                           {
                             opacity: scrollY.interpolate({
-                              inputRange: [200, 300],
-                              outputRange: [0, 1],
+                              inputRange: [200, 300, Math.max(301, stickyThreshold - 80), Math.max(302, stickyThreshold - 20)],
+                              outputRange: [0, 1, 1, 0],
                               extrapolate: 'clamp',
                             }),
                             backgroundColor: appearanceChrome.modalSurface,
@@ -1670,25 +1671,26 @@ function DshStoreGetScreenContent({
             />
           </Animated.View>
 
-          {/* Sticky Categories Overlay */}
+          {/* Premium Glass Sticky Categories Overlay - Docked at 0 */}
           <Animated.View
             style={[
               styles.stickyCategoriesOverlay,
               {
-                backgroundColor: appearanceChrome.screenBackground,
+                backgroundColor: isDarkGlass ? 'rgba(22, 22, 28, 0.94)' : 'rgba(255, 255, 255, 0.94)',
                 borderBottomColor: appearanceChrome.modalBorder,
                 transform: [{
                   translateY: scrollY.interpolate({
-                    inputRange: [0, Math.max(1, stickyThreshold - (Platform.OS === 'ios' ? 100 : 70))],
-                    outputRange: [stickyThreshold, Platform.OS === 'ios' ? 100 : 70],
+                    inputRange: [0, Math.max(1, stickyThreshold)],
+                    outputRange: [stickyThreshold, 0],
                     extrapolate: 'clamp',
                   })
                 }],
                 opacity: scrollY.interpolate({
-                  inputRange: [stickyThreshold - 150, stickyThreshold - 50],
+                  inputRange: [stickyThreshold - 120, stickyThreshold - 20],
                   outputRange: [0, 1],
                   extrapolate: 'clamp',
-                })
+                }),
+                paddingTop: Platform.OS === 'ios' ? 48 : 28, // Respecting status bar while docked at 0
               }
             ]}
             pointerEvents="box-none"
@@ -2100,10 +2102,9 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   heroTopActionsLeft: {
-    flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 4,
+    alignItems: 'center',
+    gap: 12,
   },
   heroActionCircle: {
     width: 44,
@@ -2434,15 +2435,15 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 90,
-    paddingTop: 12,
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    elevation: 4,
+    zIndex: 110,
+    paddingTop: 8,
+    paddingBottom: 10,
+    borderBottomWidth: 1.5,
+    elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
   },
   stickyCategoriesContent: {
     width: '100%',
