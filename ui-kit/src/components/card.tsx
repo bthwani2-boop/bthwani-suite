@@ -296,7 +296,7 @@ function createProductCardStyles(
       flex: 1,
       minWidth: 0,
       justifyContent: 'flex-start',
-      gap: 4,
+      gap: 6,
       alignItems: alignItemsDirection,
       marginEnd: 0,
       paddingVertical: 8,
@@ -306,7 +306,7 @@ function createProductCardStyles(
       width: '100%',
       minHeight: 0,
       justifyContent: 'flex-start',
-      gap: 0,
+      gap: 2,
       alignItems: alignItemsDirection,
       flexShrink: 1,
     },
@@ -325,10 +325,10 @@ function createProductCardStyles(
       textAlign,
     },
     timingRow: {
-      marginTop: 2,
+      marginTop: 0,
       flexDirection: rowDirection,
       alignItems: 'center',
-      justifyContent: 'flex-end',
+      justifyContent: 'flex-start',
       alignSelf: 'flex-end',
       gap: 4,
       flexWrap: 'wrap',
@@ -341,7 +341,7 @@ function createProductCardStyles(
     commerceZone: {
       width: '100%',
       justifyContent: 'flex-start',
-      gap: 2,
+      gap: 4,
       alignItems: alignItemsDirection,
       marginTop: 'auto',
       flexShrink: 1,
@@ -350,9 +350,9 @@ function createProductCardStyles(
       marginTop: 0,
       flexDirection: rowDirection,
       alignItems: 'center',
-      justifyContent: 'flex-end',
+      justifyContent: 'flex-start',
       alignSelf: 'flex-end',
-      gap: 4,
+      gap: 6,
       flexWrap: 'wrap',
       maxWidth: '100%',
     },
@@ -367,13 +367,7 @@ function createProductCardStyles(
       fontWeight: '700',
       textDecorationLine: 'line-through',
     },
-    discountRow: {
-      marginTop: 1,
-      width: '100%',
-      flexDirection: rowDirection,
-      justifyContent: 'flex-start',
-      alignItems: 'center',
-    },
+
     discountChip: {
       backgroundColor: productColors.discountSurface,
       borderRadius: 999,
@@ -386,7 +380,7 @@ function createProductCardStyles(
       fontWeight: '900',
     },
     chipRow: {
-      marginTop: 2,
+      marginTop: 0,
       width: '100%',
       flexDirection: rowDirection,
       flexWrap: 'wrap',
@@ -584,17 +578,14 @@ export const ProductCard = memo(function ProductCard({
                 {oldPriceLabel}
               </Text>
             ) : null}
-          </View>
-
-          {discountLabel ? (
-            <View style={styles.discountRow}>
+            {discountLabel ? (
               <View style={styles.discountChip}>
                 <Text role="label" style={styles.discountText} numberOfLines={1}>
                   {discountLabel}
                 </Text>
               </View>
-            </View>
-          ) : null}
+            ) : null}
+          </View>
 
           <View style={styles.chipRow}>
             {statusLabel ? (
