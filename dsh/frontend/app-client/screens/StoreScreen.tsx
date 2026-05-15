@@ -1326,7 +1326,7 @@ function DshStoreGetScreenContent({
               keyExtractor={(item) => (item as DshStoreGetMenuItem).id}
               ListHeaderComponent={
                 <>
-                  <View style={[styles.heroPremiumWrap, { backgroundColor: appearanceChrome.cardBackground, borderWidth: 1, borderColor: appearanceChrome.cardBorder }]}>
+                  <View style={[styles.heroPremiumWrap, { backgroundColor: appearanceChrome.cardBackground }]}>
                     <View style={[styles.heroCoverWrap, { backgroundColor: appearanceChrome.cardBackground }]}>
                       {storeCoverImageSource ? <Image source={storeCoverImageSource} style={styles.heroCoverImage} /> : <View style={styles.heroCoverPlaceholder} />}
                       <GlassHeroOverlay strength={isDarkGlass ? 'strong' : 'default'} style={[styles.heroCoverOverlay, { backgroundColor: appearanceChrome.heroOverlay }]} />
@@ -1481,7 +1481,7 @@ function DshStoreGetScreenContent({
                         fullBleed
                         itemWidth={Math.round(viewportWidth * 0.58)}
                         itemGap={12}
-                        style={styles.smartRailSection}
+                        style={[styles.smartRailSection, { marginHorizontal: 12 }]}
                       />
                     ) : null}
 
@@ -1527,7 +1527,7 @@ function DshStoreGetScreenContent({
                 const opacity = scrollY.interpolate({ inputRange, outputRange: [0.9, 1, 0.9], extrapolate: 'clamp' });
 
                 return (
-                  <Animated.View style={[{ transform: [{ scale }, { translateY }], opacity, marginBottom: CARD_GAP }]}
+                  <Animated.View style={[{ transform: [{ scale }, { translateY }], opacity, marginBottom: CARD_GAP, marginHorizontal: 12 }]}
                     pointerEvents="box-none"
                   >
                     {
@@ -2108,21 +2108,8 @@ const styles = StyleSheet.create({
 
   // PREMIUM HERO 2026
   heroPremiumWrap: {
-    marginBottom: 20,
     backgroundColor: stylesTokens.white,
-    borderRadius: 32,
     overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: colorPalette.brandStrong,
-        shadowOpacity: 0.15,
-        shadowRadius: 20,
-        shadowOffset: { width: 0, height: 10 },
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
   },
   heroCoverWrap: {
     height: 480,
@@ -2146,7 +2133,7 @@ const styles = StyleSheet.create({
   },
   heroTopActions: {
     position: 'absolute',
-    top: 50,
+    top: 32,
     left: 20,
     right: 20,
     flexDirection: 'row',
@@ -2170,6 +2157,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backdropFilter: 'blur(10px)',
+    opacity: 0.85,
   },
   heroIdentitySection: {
     position: 'absolute',
@@ -2525,7 +2513,6 @@ const styles = StyleSheet.create({
   },
   smartRailSection: {
     marginTop: 0,
-    marginHorizontal: -12,
     marginBottom: -6,
   },
   subscriptionBlock: {
@@ -2605,7 +2592,7 @@ const styles = StyleSheet.create({
 
   sectionBlock: {
     marginTop: 0,
-    paddingHorizontal: 0,
+    paddingHorizontal: 12,
     width: '100%',
   },
   categoryRow: {
@@ -2650,12 +2637,9 @@ const styles = StyleSheet.create({
   feedSection: {
     flex: 1,
     minHeight: 0,
-    marginTop: 2,
-    paddingHorizontal: 12,
   },
   feedList: {
     flex: 1,
-    gap: 2,
   },
 
   menuCard: {
@@ -3140,6 +3124,7 @@ const styles = StyleSheet.create({
     borderColor: stylesTokens.line,
     borderRadius: 18,
     backgroundColor: stylesTokens.light,
+    marginHorizontal: 12,
   },
   emptyFeedEmoji: {
     fontSize: 40,
