@@ -521,6 +521,15 @@ export const ProductCard = memo(function ProductCard({
             <View style={styles.imagePlaceholder} />
           )}
 
+          {onImagePress ? (
+            <Pressable
+              style={styles.imagePressable}
+              onPress={onImagePress}
+              accessibilityRole="button"
+              accessibilityLabel={title}
+            />
+          ) : null}
+
           {onFavorite ? (
             <Pressable
               hitSlop={8}
