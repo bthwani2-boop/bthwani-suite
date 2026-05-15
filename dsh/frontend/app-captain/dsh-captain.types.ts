@@ -15,7 +15,8 @@ export type DshCaptainRoute =
   | 'support-directory'
   | 'support-screen'
   | 'pickup-dropoff'
-  | 'pod-submission';
+  | 'pod-submission'
+  | 'map';
 
 export type DshCaptainCommandTarget =
   | 'home'

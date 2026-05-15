@@ -17,6 +17,9 @@ export type DshEntryScreenState = DshPartnerEntryScreenState;
 
 export type PartnerEntryScreenProps = {
   state?: DshPartnerEntryScreenState;
+  // ML-017: partner store availability toggle — signals ops and dispatch whether store accepts orders
+  isStoreAvailable?: boolean;
+  onToggleStoreAvailability?: (available: boolean) => void;
   onOpenOrdersBoardPress?: () => void;
   onOpenOrderDetailPress?: () => void;
   onOpenMaintenancePress?: () => void;
@@ -93,6 +96,8 @@ function renderSupportSection(
 
 export function PartnerEntryScreen({
   state = 'ready',
+  isStoreAvailable = false,
+  onToggleStoreAvailability,
   onOpenOrdersBoardPress,
   onOpenOrderDetailPress,
   onOpenMaintenancePress,
@@ -119,6 +124,14 @@ export function PartnerEntryScreen({
 
       {state === 'ready' ? (
         <>
+          <Surface tone={isStoreAvailable ? 'success' : 'raised'} padding={3} gap={2}>
+            <Text role="titleSm">{isStoreAvailable ? 'المتجر مفتوح ويستقبل الطلبات' : 'المتجر مغلق حالياً'}</Text>
+            <Button
+              label={isStoreAvailable ? 'إغلاق المتجر مؤقتاً' : 'فتح المتجر لاستقبال الطلبات'}
+              tone={isStoreAvailable ? 'danger' : 'primary'}
+              onPress={() => onToggleStoreAvailability?.(!isStoreAvailable)}
+            />
+          </Surface>
           <Surface tone="brand" padding={3} gap={2}>
             <Text role="label" tone="soft">
               نطاق السطح

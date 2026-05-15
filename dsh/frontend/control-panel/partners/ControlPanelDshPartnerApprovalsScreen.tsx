@@ -15,10 +15,14 @@ import {
 } from '../../shared/workflow';
 import styles from '../shared/control-panel-surface.module.css';
 
-function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix') => void }) {
+// ML-001: approval action extended to include final ops activation step for marketing-approved records
+function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {
   const tone = (item.stage === 'marketing-review' || item.stage === 'marketing-approved') ? 'success' :
                (item.stage === 'needs-fix') ? 'danger' :
                (item.stage === 'partner-submitted' || item.stage === 'field-submitted') ? 'warning' : 'neutral';
+
+  const isAwaitingActivation = item.stage === 'marketing-approved';
+  const isAwaitingReview = ['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage);
 
   return (
     <WebControlPanelDecisionRow
@@ -27,15 +31,21 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
       status={translateStage(item.stage)}
       statusTone={tone === 'danger' ? 'danger' : tone === 'success' ? 'success' : tone === 'warning' ? 'warning' : 'neutral'}
       risk={tone === 'danger' ? 'danger' : tone === 'warning' ? 'warning' : 'neutral'}
-      recommendation="مراجعة المستندات"
-      reason="البيانات المرفوعة مكتملة وتطابق المعايير الأولية لمنصة بثواني."
+      recommendation={isAwaitingActivation ? 'جاهز للتفعيل النهائي' : 'مراجعة المستندات'}
+      reason={isAwaitingActivation
+        ? 'اجتاز الشريك مراحل التسجيل والمراجعة التسويقية. القرار النهائي بيد الأوبريشن.'
+        : 'البيانات المرفوعة مكتملة وتطابق المعايير الأولية لمنصة بثواني.'}
       sla={translateEntityType(item.entityType)}
-      primaryAction={['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage) ? {
+      primaryAction={isAwaitingActivation ? {
+        id: 'activate',
+        label: 'تفعيل الشريك',
+        onAction: () => onAction(item.id, 'activate')
+      } : isAwaitingReview ? {
         id: 'approve',
         label: 'قبول للمراجعة',
         onAction: () => onAction(item.id, 'approve')
       } : undefined}
-      secondaryAction={['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage) ? {
+      secondaryAction={isAwaitingReview ? {
         id: 'fix',
         label: 'طلب تعديل',
         onAction: () => onAction(item.id, 'fix')
@@ -59,9 +69,12 @@ export function ControlPanelDshPartnerHubScreen() {
     refresh();
   }, []);
 
-  const handleAction = (id: string, action: 'approve' | 'reject' | 'fix') => {
+  const handleAction = (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => {
     if (action === 'approve') {
       moveApprovalRecordToStage(id, 'marketing-review', 'control-panel-partners', 'قبول للمراجعة التسويقية');
+    } else if (action === 'activate') {
+      // ML-001: final ops activation — transitions marketing-approved partner to catalog-adopted (store goes live)
+      moveApprovalRecordToStage(id, 'catalog-adopted', 'control-panel-partners', 'تفعيل الشريك');
     } else if (action === 'reject') {
       moveApprovalRecordToStage(id, 'rejected', 'control-panel-partners', 'رفض');
     } else if (action === 'fix') {

@@ -12,6 +12,9 @@ export type DshEntryScreenState = 'ready' | 'loading' | 'empty';
 
 export type DshEntryScreenProps = {
 	state?: DshEntryScreenState;
+	// ML-026: captain availability toggle — signals to dispatch whether captain accepts offers
+	isAvailable?: boolean;
+	onToggleAvailability?: (available: boolean) => void;
 	onOpenOffersPress?: () => void;
 	onOpenExecutionPress?: () => void;
 	onOpenProofCapturePress?: () => void;
@@ -52,6 +55,8 @@ function renderCompletionSection(onOpenProofCapturePress?: () => void) {
 
 export function DshCaptainEntryScreen({
 	state = 'ready',
+	isAvailable = false,
+	onToggleAvailability,
 	onOpenOffersPress,
 	onOpenExecutionPress,
 	onOpenProofCapturePress,
@@ -63,6 +68,14 @@ export function DshCaptainEntryScreen({
 			subtitle="مدخل أحادي الغرض لعمليات تسليم app-captain وأول خطوة إرسال بنفس البنية البصرية المستخدمة في تطبيق العميل."
 			content={
 				<Box gap={3}>
+					<Surface tone={isAvailable ? 'success' : 'raised'} gap={2}>
+						<Text role="titleSm">{isAvailable ? 'أنت متاح لاستقبال العروض' : 'أنت غير متاح حالياً'}</Text>
+						<Button
+							label={isAvailable ? 'إيقاف الاستقبال' : 'بدء الاستقبال'}
+							tone={isAvailable ? 'danger' : 'primary'}
+							onPress={() => onToggleAvailability?.(!isAvailable)}
+						/>
+					</Surface>
 					{renderOffersSection(onOpenOffersPress, onOpenExecutionPress)}
 					{renderCompletionSection(onOpenProofCapturePress)}
 				</Box>

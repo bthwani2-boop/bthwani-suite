@@ -18,7 +18,8 @@ import {
 import { DshOperationScreen } from '../parts/OperationScreen';
 
 export type DshCaptainPickupDropoffScreenProps = {
-  mode: 'pickup' | 'arrival' | 'dropoff';
+  // ML-029: added 'out-for-delivery' and 'navigating-to-dropoff' in-transit states
+  mode: 'pickup' | 'arrival' | 'dropoff' | 'out-for-delivery' | 'navigating-to-dropoff';
   orderId: string;
   storeName: string;
   customerName: string;
@@ -80,6 +81,31 @@ export function DshCaptainPickupDropoffScreen({
         'تسليم الطلب للعميل مباشرة',
         'التأكد من استلام المبلغ (في حال الدفع النقدي)',
         'شكر العميل وطلب تقييم الخدمة',
+      ],
+    },
+    // ML-029: in-transit states between pickup confirmation and dropoff arrival
+    'out-for-delivery': {
+      title: 'في طريقك للتسليم',
+      subtitle: 'الطلب معك وأنت في الطريق للعميل.',
+      badge: 'في التوصيل',
+      targetLabel: 'العميل',
+      targetValue: customerName,
+      cta: 'تأكيد الوصول للموقع',
+      checklist: [
+        'اتبع المسار المحدد لأسرع وصول',
+        'تواصل مع العميل إذا لزم الأمر',
+      ],
+    },
+    'navigating-to-dropoff': {
+      title: 'التنقل للموقع',
+      subtitle: 'أنت في طريقك لنقطة تسليم العميل.',
+      badge: 'في التنقل',
+      targetLabel: 'الوجهة',
+      targetValue: address,
+      cta: 'وصلت إلى الموقع',
+      checklist: [
+        'تحقق من دقة العنوان',
+        'أبلغ العميل باقتراب وصولك',
       ],
     },
   }[mode];

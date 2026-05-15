@@ -9,6 +9,7 @@ import {
   KeyValueList,
   MobileScrollView,
   SectionHeader,
+  StateView,
   StickyActionBar,
   Surface,
   Text,
@@ -31,12 +32,17 @@ import {
   type FieldStoreFile,
 } from '../data/field-stores.preview-data';
 
+// ML-005: added activated/exit states so field knows when onboarding is complete
+export type DshFieldStoreOnboardingScreenState = 'onboarding' | 'activated' | 'exit';
+
 type DshFieldStoreOnboardingScreenProps = {
   store: FieldStoreFile;
+  screenState?: DshFieldStoreOnboardingScreenState;
   onBack: () => void;
   onStoreChange: (updater: (store: FieldStoreFile) => FieldStoreFile) => void;
   onSaveDraft: () => void;
   onSubmitReview: () => void;
+  onActivationComplete?: () => void;
 };
 
 function updateDraftSection<T extends keyof FieldOnboardingDraft>(draft: FieldOnboardingDraft, key: T, value: FieldOnboardingDraft[T]) {
@@ -46,7 +52,36 @@ function updateDraftSection<T extends keyof FieldOnboardingDraft>(draft: FieldOn
   };
 }
 
-export function DshFieldStoreOnboardingScreen({ store, onBack, onStoreChange, onSaveDraft, onSubmitReview }: DshFieldStoreOnboardingScreenProps) {
+export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding', onBack, onStoreChange, onSaveDraft, onSubmitReview, onActivationComplete }: DshFieldStoreOnboardingScreenProps) {
+  if (screenState === 'activated') {
+    return (
+      <Surface style={{ flex: 1 }}>
+        <TopBar title="تم تفعيل المتجر" onBack={onBack} />
+        <StateView
+          stateId="success"
+          title="تم تفعيل المتجر بنجاح"
+          description="اكتمل تسجيل المتجر وتمت الموافقة من قِبل الأوبريشن. يمكن المتابعة للمتجر التالي."
+          actionLabel="إنهاء"
+          onActionPress={onActivationComplete ?? onBack}
+        />
+      </Surface>
+    );
+  }
+
+  if (screenState === 'exit') {
+    return (
+      <Surface style={{ flex: 1 }}>
+        <TopBar title="الخروج" onBack={onBack} />
+        <StateView
+          stateId="empty"
+          title="لم يكتمل التسجيل بعد"
+          description="يمكنك العودة لاحقاً لإكمال الملف. تم حفظ المسودة."
+          actionLabel="رجوع"
+          onActionPress={onBack}
+        />
+      </Surface>
+    );
+  }
   const readOnly = isFieldStoreReadOnly(store);
   const draft = store.draft;
   const activeSectionId = draft.activeSectionId;

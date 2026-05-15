@@ -16,7 +16,9 @@ import {
 } from '@bthwani/ui-kit';
 
 export type DshCheckoutIntentScreenProps = {
-  state?: 'ready' | 'loading' | 'error' | 'disabled' | 'blocked';
+  // ML-006: added 'order-created' confirmation state
+  state?: 'ready' | 'loading' | 'error' | 'disabled' | 'blocked' | 'order-created';
+  onViewOrder?: () => void;
   address?: string;
   subtotal?: string;
   deliveryFee?: string;
@@ -47,6 +49,7 @@ export function DshCheckoutIntentScreen({
   onSelectPaymentMethod,
   onChangeAddress,
   onRetry,
+  onViewOrder,
 }: DshCheckoutIntentScreenProps) {
   const { direction } = useDirection();
   const isRtl = direction === 'rtl';
@@ -57,6 +60,21 @@ export function DshCheckoutIntentScreen({
       <Surface style={styles.root}>
         <TopBar title="تأكيد الطلب" onBack={onBack} />
         <StateView stateId="loading" title="جاري التحقق من التوفر..." description="نحن نتأكد من إمكانية التوصيل لموقعك حالياً." />
+      </Surface>
+    );
+  }
+
+  if (state === 'order-created') {
+    return (
+      <Surface style={styles.root}>
+        <TopBar title="تم إنشاء الطلب" onBack={onBack} />
+        <StateView
+          stateId="success"
+          title="تم تأكيد طلبك بنجاح"
+          description="سيتم إعلامك عند قبول المتجر للطلب وبدء التحضير."
+          actionLabel="تتبع الطلب"
+          onActionPress={onViewOrder}
+        />
       </Surface>
     );
   }

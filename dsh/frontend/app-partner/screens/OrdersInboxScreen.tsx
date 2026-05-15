@@ -18,7 +18,8 @@ import { DshPartnerOrderAlertsPanel } from '../parts/PartnerOrderAlertsPanel';
 import { DshPartnerOrderConversationPanel } from '../parts/PartnerOrderConversationPanel';
 import type { DshPartnerOrderConversationMode } from '../data/partner-order-conversation.preview-data';
 
-type PartnerOrderStatus = 'new' | 'needs_accept' | 'preparing' | 'ready' | 'handoff' | 'delivering' | 'completed' | 'cancelled';
+// ML-018: added preparation_started; ML-019: preparing already present — distinguishing start vs in-progress
+type PartnerOrderStatus = 'new' | 'needs_accept' | 'preparation_started' | 'preparing' | 'ready' | 'handoff' | 'delivering' | 'completed' | 'cancelled';
 type PartnerOrderPriority = 'high' | 'normal' | 'low';
 type OrderHubAction = 'accept' | 'details' | 'prepare' | 'ready' | 'handoff' | 'issue' | 'delivering';
 type SmartFilterId = 'all' | 'needs_accept' | 'preparing' | 'ready' | 'handoff' | 'delivering' | 'issues' | 'completed';
@@ -209,6 +210,7 @@ const demoOrders: readonly PartnerOrderItem[] = [
 function resolveStatusLabel(status: PartnerOrderStatus) {
   if (status === 'new') return 'جديدة';
   if (status === 'needs_accept') return 'تحتاج قبول';
+  if (status === 'preparation_started') return 'بدأ التحضير';
   if (status === 'preparing') return 'قيد التحضير';
   if (status === 'ready') return 'جاهزة';
   if (status === 'handoff') return 'تسليم للكابتن';
@@ -219,7 +221,7 @@ function resolveStatusLabel(status: PartnerOrderStatus) {
 
 function resolveStatusTone(status: PartnerOrderStatus): 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' {
   if (status === 'needs_accept' || status === 'new') return 'warning';
-  if (status === 'preparing' || status === 'delivering') return 'info';
+  if (status === 'preparation_started' || status === 'preparing' || status === 'delivering') return 'info';
   if (status === 'ready' || status === 'completed') return 'success';
   if (status === 'handoff') return 'brand';
   return 'danger';
@@ -239,7 +241,7 @@ function resolvePriorityTone(priority: PartnerOrderPriority): 'default' | 'brand
 
 function resolveOrderAction(status: PartnerOrderStatus): OrderHubAction {
   if (status === 'new' || status === 'needs_accept') return 'accept';
-  if (status === 'preparing') return 'prepare';
+  if (status === 'preparation_started' || status === 'preparing') return 'prepare';
   if (status === 'ready') return 'ready';
   if (status === 'handoff') return 'handoff';
   if (status === 'delivering') return 'delivering';
@@ -308,7 +310,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
   const summary = React.useMemo(() => ({
     active: items.filter((item) => item.status !== 'completed' && item.status !== 'cancelled').length,
     urgent: items.filter((item) => item.urgent || item.priority === 'high').length,
-    needsAction: items.filter((item) => item.status === 'needs_accept' || item.status === 'preparing' || item.status === 'ready' || item.status === 'handoff').length,
+    needsAction: items.filter((item) => item.status === 'needs_accept' || item.status === 'preparation_started' || item.status === 'preparing' || item.status === 'ready' || item.status === 'handoff').length,
     issues: items.filter((item) => item.issueRequired || item.status === 'cancelled').length,
   }), [items]);
 
@@ -598,10 +600,12 @@ export type PartnerOrdersInboxScreenProps = {
   onCloseSearch?: () => void;
   onOpenOrder?: (orderId: string) => void;
   onOpenNextOrder?: (orderId: string) => void;
+  // ML-020: explicit mark-ready callback — triggered when partner confirms order ready for pickup
+  onMarkReady?: (orderId: string) => void;
   onRetry?: () => void;
 };
 
-export function PartnerOrdersInboxScreen({ state = 'ready', items, searchMode, onCloseSearch, onOpenOrder, onOpenNextOrder, onRetry }: PartnerOrdersInboxScreenProps) {
+export function PartnerOrdersInboxScreen({ state = 'ready', items, searchMode, onCloseSearch, onOpenOrder, onOpenNextOrder, onMarkReady, onRetry }: PartnerOrdersInboxScreenProps) {
   return (
     <DshPartnerOrdersScreen
       state={state}
@@ -611,6 +615,10 @@ export function PartnerOrdersInboxScreen({ state = 'ready', items, searchMode, o
       onOpenOrderAction={(actionId, orderId) => {
         if (actionId === 'details') {
           onOpenOrder?.(orderId);
+          return;
+        }
+        if (actionId === 'ready') {
+          onMarkReady?.(orderId);
           return;
         }
         onOpenNextOrder?.(orderId);
