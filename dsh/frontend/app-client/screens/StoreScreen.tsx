@@ -2168,6 +2168,9 @@ const styles = StyleSheet.create({
   contentBlock: {
     width: '100%',
     overflow: 'hidden',
+    marginTop: -80,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
 
   smartRailSection: {
