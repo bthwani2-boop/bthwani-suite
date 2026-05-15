@@ -564,19 +564,14 @@ function DshStoreGetScreenContent({
     // Fallback to brand logo only if store logo is missing, never use cover image
     return resolveDshImageSource(store.logoImageUri) || resolveDshImageSource('dsh.brand.logo.v1');
   }, [store]);
+
   const fallbackMenuItems = React.useMemo<DshStoreGetMenuItem[]>(() => menuItems ?? [], [menuItems]);
+
   const previewPartnerBadge = storeLogoImageSource ? (
-    <View
-      style={[
-        styles.previewPartnerBadge,
-        {
-          backgroundColor: isDarkGlass ? tokens.glassSurfaceStrong : stylesTokens.whiteOverlay,
-          borderColor: isDarkGlass ? tokens.glassBorder : colorPalette.borderSubtle,
-        },
-      ]}
-      pointerEvents="none"
-    >
-      <Image source={storeLogoImageSource} style={styles.previewPartnerBadgeImage} resizeMode="cover" />
+    <View style={styles.previewPartnerBadge} pointerEvents="none">
+      <View style={styles.previewPartnerBadgeImageContainer}>
+        <Image source={storeLogoImageSource} style={styles.previewPartnerBadgeImage} resizeMode="contain" />
+      </View>
     </View>
   ) : null;
 
@@ -1798,6 +1793,25 @@ function DshStoreGetScreenContent({
                     <View style={styles.previewImageWrap} pointerEvents="box-none">
                       {previewPartnerBadge}
 
+                      <TouchableOpacity
+                        style={[styles.previewDetailsFavoriteButton, { position: 'absolute', top: 0, right: 0, zIndex: 12 }]}
+                        onPress={handlePreviewFavoritePress}
+                      >
+                        <Icon name={favoriteIds.has(previewPeekItem.id) ? 'heart' : 'heart-outline'} size={18} color="#FF500D" />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[styles.previewActionButton, { position: 'absolute', bottom: 0, left: 0, zIndex: 12 }]}
+                        onPress={handlePreviewAddToCart}
+                      >
+                        <View style={{ position: 'relative' }}>
+                          <Icon name="cart-outline" size={19} color="#FFFFFF" />
+                          <View style={styles.previewActionPlusBadge}>
+                            <Icon name="add" size={8} color="#FF500D" />
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+
                       <Text style={styles.previewEmoji}>{getItemEmoji(previewPeekItem)}</Text>
 
                       <Image
@@ -1819,10 +1833,6 @@ function DshStoreGetScreenContent({
                                   {previewPeekItem.priceLabel ? <Text style={[styles.previewDetailsPrice, { color: appearanceChrome.primaryText }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.priceLabel)}</Text> : null}
                                   {previewPeekItem.discountLabel ? <Text style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.discountLabel)}</Text> : null}
                                 </View>
-                              </View>
-
-                              <View style={[styles.previewDetailsFavoriteButton, { opacity: 0.95, backgroundColor: appearanceChrome.modalSurface, borderColor: appearanceChrome.modalBorder }]}>
-                                <Icon name={favoriteIds.has(previewPeekItem.id) ? 'heart' : 'heart-outline'} size={18} color={appearanceChrome.accent} />
                               </View>
                             </View>
                           );
@@ -1856,6 +1866,25 @@ function DshStoreGetScreenContent({
 
                   {previewPartnerBadge}
 
+                  <TouchableOpacity
+                    style={[styles.previewDetailsFavoriteButton, { position: 'absolute', top: 0, right: 0, zIndex: 12 }]}
+                    onPress={handlePreviewFavoritePress}
+                  >
+                    <Icon name={favoriteIds.has(previewItem!.id) ? 'heart' : 'heart-outline'} size={18} color="#FF500D" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.previewActionButton, { position: 'absolute', bottom: 0, left: 0, zIndex: 12 }]}
+                    onPress={handlePreviewAddToCart}
+                  >
+                    <View style={{ position: 'relative' }}>
+                      <Icon name="cart-outline" size={19} color="#FFFFFF" />
+                      <View style={styles.previewActionPlusBadge}>
+                        <Icon name="add" size={8} color="#FF500D" />
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+
                   <Text style={styles.previewEmoji}>{getItemEmoji(previewItem!)}</Text>
 
                   <Image
@@ -1878,21 +1907,6 @@ function DshStoreGetScreenContent({
                               {previewItem!.discountLabel ? <Text style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.discountLabel)}</Text> : null}
                             </View>
                           </View>
-
-                          <TouchableOpacity style={[styles.previewDetailsFavoriteButton, { backgroundColor: appearanceChrome.modalSurface, borderColor: appearanceChrome.modalBorder }]} activeOpacity={0.9} onPress={handlePreviewFavoritePress}>
-                            <Icon name={favoriteIds.has(previewItem!.id) ? 'heart' : 'heart-outline'} size={18} color={appearanceChrome.accent} />
-                          </TouchableOpacity>
-
-                          <TouchableOpacity
-                            style={[styles.menuActionBadge, styles.previewActionButton, { backgroundColor: appearanceChrome.activeActionBackground }]}
-                            activeOpacity={0.85}
-                            onPress={() => handlePreviewAddToCart()}
-                          >
-                            <Icon name="cart-outline" size={18} color={isDarkGlass ? theme.brandContrast : stylesTokens.white} />
-                            <View style={styles.menuActionPlusBadge}>
-                              <Icon name="add" size={10} color={appearanceChrome.accent} />
-                            </View>
-                          </TouchableOpacity>
                         </View>
                       );
                     })()
@@ -2523,29 +2537,38 @@ const styles = StyleSheet.create({
   },
   previewPartnerBadge: {
     position: 'absolute',
-    top: 20,
-    left: 20,
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: 'rgba(255,255,255,0.98)',
-    borderWidth: 1,
-    borderColor: '#f3f4f6',
-    zIndex: 8,
+    bottom: -10,
+    right: -10,
+    width: 66,
+    height: 66,
+    borderRadius: 33,
+    backgroundColor: '#FF500D',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    zIndex: 10,
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOpacity: 0.15,
+        shadowOpacity: 0.25,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 4 },
       },
       android: {
-        elevation: 4,
+        elevation: 6,
       },
     }),
+  },
+  previewPartnerBadgeImageContainer: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   previewPartnerBadgeImage: {
     width: '100%',
@@ -2611,20 +2634,45 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   previewDetailsFavoriteButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 36,
+    height: 36,
+    borderBottomLeftRadius: 24,
+    borderTopRightRadius: 18,
     backgroundColor: stylesTokens.white,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colorPalette.borderSubtle,
     zIndex: 3,
     elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
   },
   previewActionButton: {
+    width: 44,
+    height: 36,
+    borderTopRightRadius: 24,
+    borderBottomLeftRadius: 18,
+    backgroundColor: '#FF500D',
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 3,
     elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  previewActionPlusBadge: {
+    position: 'absolute',
+    top: -3,
+    left: -5,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 5,
+    width: 10,
+    height: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   previewDetailsMetaRow: {
     marginTop: 4,
