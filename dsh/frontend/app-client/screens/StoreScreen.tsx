@@ -1365,13 +1365,14 @@ function DshStoreGetScreenContent({
                       </View>
 
                       {/* Identity Section (Logo + Info) */}
+                      {/* Identity Section (Logo + Info) */}
                       <View style={styles.heroIdentitySection}>
                         <View
                           style={[
                             styles.heroLogoWrap,
                             {
-                              backgroundColor: isDarkGlass ? appearanceChrome.modalSurface : stylesTokens.whiteOverlay,
-                              borderColor: isDarkGlass ? tokens.colors.rimLightStrong : 'rgba(255,255,255,0.45)',
+                              backgroundColor: isDarkGlass ? appearanceChrome.modalSurface : stylesTokens.white,
+                              borderColor: ORANGE, // Premium Brand Border
                             },
                           ]}
                         >
@@ -1383,67 +1384,64 @@ function DshStoreGetScreenContent({
                         <View style={styles.heroInfoCluster}>
                           <Text style={styles.heroNameText} numberOfLines={2}>{normalizedStoreName}</Text>
                           <View style={styles.heroLocationRow}>
-                            <Icon name="location-sharp" size={16} color={appearanceChrome.actionIcon} />
-                            <Text style={styles.heroLocationText}>{store.locationLabel || 'حي العليا، الرياض'}</Text>
-                          </View>
-                          <View style={[styles.heroStatusBadge, { backgroundColor: appearanceChrome.statusBadgeBackground, borderWidth: 1, borderColor: appearanceChrome.statusBadgeBorder }]}>
-                            <View style={[styles.heroStatusDot, { backgroundColor: appearanceChrome.statusDot }]} />
-                            <Text style={styles.heroStatusText}>{store?.statusLabel || 'مفتوح'}</Text>
+                            <Icon name="location-sharp" size={14} color={ORANGE} />
+                            <Text style={styles.heroLocationText}>{store.locationLabel || 'حي العليا · الرياض'}</Text>
                           </View>
                         </View>
                       </View>
 
                       <View style={styles.heroGridsLayer}>
-                        {/* ROW 1: Metrics (4 Items) */}
-                          <View style={styles.heroFeatureGrid}>
-                            <TouchableOpacity
-                              style={[styles.heroFeatureChip, isFollowing && styles.heroFeatureChipActiveActive]}
-                              onPress={toggleFollow}
-                              activeOpacity={0.7}
-                            >
-                              <Icon name={isFollowing ? "person-check" : "people-outline"} size={13} color={isFollowing ? ORANGE : '#FFF'} />
-                              <Text style={[styles.heroFeatureValue, isFollowing && { color: ORANGE }]}>{formatFollowers(followerCount)}</Text>
-                              <Text style={[styles.heroFeatureLabel, isFollowing && { color: ORANGE }]}>{isFollowing ? 'متابع' : 'متابعة'}</Text>
-                            </TouchableOpacity>
-
-                            <View style={styles.heroFeatureChip}>
-                              <Icon name="time-outline" size={13} color="#FFF" />
-                              <Text style={styles.heroFeatureValue}>{store.deliveryTimeLabel || normalizedEtaLabel}</Text>
-                              <Text style={styles.heroFeatureLabel}>توصيل</Text>
-                            </View>
-
-                            <View style={styles.heroFeatureChip}>
-                              <Icon name="star" size={13} color="#FFD700" />
-                              <Text style={styles.heroFeatureValue}>{store.rating?.toFixed(1) || '5.0'}</Text>
-                              <Text style={styles.heroFeatureLabel}>تقييم</Text>
-                            </View>
-
-                            {store.hasBthwaniPro && (
-                              <View style={[styles.heroFeatureChip, { borderColor: ORANGE, borderWidth: 0.8 }]}>
-                                <Icon name="sparkles" size={13} color={ORANGE} />
-                                <Text style={[styles.heroFeatureValue, { color: ORANGE }]}>برو</Text>
-                              </View>
-                            )}
+                        {/* ROW 1: Metrics & Badges (High Density 2026 Grid) */}
+                        <View style={styles.heroFeatureGrid}>
+                          {/* Rating */}
+                          <View style={styles.heroFeatureChip}>
+                            <Icon name="star" size={12} color={GOLD} />
+                            <Text style={styles.heroFeatureValue}>{store.rating?.toFixed(1) || '5.0'}</Text>
                           </View>
 
-                        {/* ROW 2: Delivery Options (3 Items) */}
+                          {/* Time */}
+                          <View style={styles.heroFeatureChip}>
+                            <Icon name="time-outline" size={12} color="#FFF" />
+                            <Text style={styles.heroFeatureValue}>{store.deliveryTimeLabel || normalizedEtaLabel}</Text>
+                          </View>
+
+                          {/* Distance */}
+                          <View style={styles.heroFeatureChip}>
+                            <Icon name="navigate-outline" size={12} color="#FFF" />
+                            <Text style={styles.heroFeatureValue}>{store.distanceLabel || '2.1 كم'}</Text>
+                          </View>
+
+                          {/* Pro Badge */}
+                          {store.hasBthwaniPro && (
+                            <View style={[styles.heroFeatureChip, styles.heroBadgePro]}>
+                              <Text style={styles.heroBadgeText}>برو</Text>
+                            </View>
+                          )}
+
+                          {/* Free Badge / Offer */}
+                          {(store.hasOffer || store.offerLabel) && (
+                            <View style={[styles.heroFeatureChip, styles.heroBadgeFree]}>
+                              <Text style={styles.heroBadgeText}>{store.offerLabel || 'مجاني'}</Text>
+                            </View>
+                          )}
+
+                          {/* Multiplier / 2x Points */}
+                          {(store.multiplierLabel) && (
+                            <View style={[styles.heroFeatureChip, styles.heroBadgePoints]}>
+                              <Text style={styles.heroBadgeText}>{store.multiplierLabel}</Text>
+                            </View>
+                          )}
+                        </View>
+
+                        {/* ROW 2: Delivery Mode Selectors (RTL Clustered) */}
                         <View style={styles.heroDeliveryGrid}>
                           {deliveryModes.map((mode) => {
                             const active = selectedMode === mode.id;
-
                             let title = mode.label;
-                            let subtitle = '';
 
-                            if (mode.id === 'store_delivery') {
-                              title = 'توصيل المتجر';
-                              subtitle = 'من أسطول المتجر';
-                            } else if (mode.id === 'pickup') {
-                              title = 'استلم بنفسك';
-                              subtitle = 'جاهز للاستلام';
-                            } else if (mode.id === 'delivery') {
-                              title = 'توصيل بثواني';
-                              subtitle = 'أسرع توصيل';
-                            }
+                            if (mode.id === 'store_delivery') title = 'توصيل المتجر';
+                            else if (mode.id === 'pickup') title = 'استلم بنفسك';
+                            else if (mode.id === 'delivery') title = 'توصيل بثواني';
 
                             return (
                               <TouchableOpacity
@@ -1455,13 +1453,13 @@ function DshStoreGetScreenContent({
                                 onPress={() => setSelectedMode(mode.id)}
                                 activeOpacity={0.8}
                               >
-                                <View style={[styles.heroDeliveryChipTextContent, { justifyContent: 'center' }]}>
-                                  <Text style={[styles.heroDeliveryChipTitle, { color: active ? ORANGE : '#FFF' }]} numberOfLines={1}>
+                                <View style={styles.heroDeliveryContent}>
+                                  <Text style={[styles.heroDeliveryTitle, { color: active ? ORANGE : '#FFF' }]} numberOfLines={1}>
                                     {title}
                                   </Text>
-                                </View>
                                   <Icon name={mode.icon} size={15} color={active ? ORANGE : 'rgba(255, 255, 255, 0.7)'} />
-                                </TouchableOpacity>
+                                </View>
+                              </TouchableOpacity>
                             );
                           })}
                         </View>
@@ -2182,137 +2180,155 @@ const styles = StyleSheet.create({
   },
   heroIdentitySection: {
     position: 'absolute',
-    top: 100,
+    top: 110,
     right: 20,
     left: 20,
     flexDirection: 'row-reverse',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: 16,
     zIndex: 50,
   },
   heroLogoWrap: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
     backgroundColor: stylesTokens.white,
-    borderWidth: 5,
-    borderColor: 'rgba(255,255,255,0.4)',
+    borderWidth: 3,
+    borderColor: ORANGE,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOpacity: 0.3,
-        shadowRadius: 15,
-        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.25,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 6 },
       },
       android: {
-        elevation: 12,
+        elevation: 10,
       },
     }),
   },
   heroLogoImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   heroInfoCluster: {
     flex: 1,
     alignItems: 'flex-end',
-    gap: 6,
-    paddingTop: 10,
+    gap: 4,
   },
   heroNameText: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '900',
     color: stylesTokens.white,
     fontFamily: 'Outfit-Bold',
     textAlign: 'right',
-    lineHeight: 38,
-    textShadowColor: 'rgba(0, 0, 0, 0.6)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
+    lineHeight: 34,
+    textShadowColor: 'rgba(0, 0, 0, 0.4)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   heroLocationRow: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   heroLocationText: {
-    fontSize: 16,
-    color: stylesTokens.white,
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.9)',
     fontFamily: 'Outfit-Medium',
     fontWeight: '700',
   },
-  heroStatusBadge: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginTop: 4,
-  },
-  heroStatusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#00C853',
-  },
-  heroStatusText: {
-    fontSize: 15,
-    fontWeight: '900',
-    color: stylesTokens.white,
-    fontFamily: 'Outfit-Bold',
-  },
-
   heroGridsLayer: {
     position: 'absolute',
     bottom: 24,
     left: 16,
     right: 16,
-    gap: 10,
+    gap: 12,
   },
   heroFeatureGrid: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 6,
+    flexWrap: 'wrap',
+  },
+  heroFeatureChip: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: 0.5,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    gap: 4,
+    minHeight: 28,
+  },
+  heroFeatureValue: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FFF',
+    fontFamily: 'Outfit-Bold',
+  },
+  heroBadgePro: {
+    backgroundColor: DARK_BLUE,
+    borderColor: 'transparent',
+  },
+  heroBadgeFree: {
+    backgroundColor: 'rgba(0, 200, 83, 0.85)', // Success Green
+    borderColor: 'transparent',
+  },
+  heroBadgePoints: {
+    backgroundColor: 'rgba(66, 153, 225, 0.85)', // Info Blue
+    borderColor: 'transparent',
+  },
+  heroBadgeText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#FFF',
+    fontFamily: 'Outfit-Bold',
+  },
+  heroDeliveryGrid: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
     gap: 8,
   },
-   heroFeatureChip: {
-     flex: 1,
-     alignItems: 'center',
-     justifyContent: 'center',
-     backgroundColor: 'rgba(255, 255, 255, 0.08)',
-     paddingVertical: 4,
-     borderRadius: 12,
-     borderWidth: 0.5,
-     borderColor: 'rgba(255, 255, 255, 0.15)',
-     gap: 1,
-     height: 48,
-   },
-   heroFeatureChipActiveActive: {
-     backgroundColor: 'rgba(255, 80, 13, 0.15)',
-     borderColor: ORANGE,
-     borderWidth: 0.8,
-   },
-   heroFeatureTextCenter: {
-     alignItems: 'center',
-   },
-   heroFeatureValue: {
-     fontSize: 11.5,
-     fontWeight: '700',
-     color: '#FFF',
-     textAlign: 'center',
-     fontFamily: 'Outfit-Bold',
-   },
-   heroFeatureLabel: {
-     fontSize: 10,
-     color: 'rgba(255, 255, 255, 0.7)',
-     textAlign: 'center',
-     fontFamily: 'Outfit-Regular',
-   },
-  heroFeatureLabel: {
+  heroDeliveryChip: {
+    flex: 1,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    overflow: 'hidden',
+  },
+  heroDeliveryChipActive: {
+    backgroundColor: 'rgba(255, 80, 13, 0.2)',
+    borderColor: ORANGE,
+  },
+  heroDeliveryChipInactive: {
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  heroDeliveryContent: {
+    flex: 1,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingHorizontal: 8,
+  },
+  heroDeliveryTitle: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FFF',
+    textAlign: 'right',
+    fontFamily: 'Outfit-Bold',
+  },
+ureLabel: {
     fontSize: 9,
     color: 'rgba(255, 255, 255, 0.7)',
     textAlign: 'center',
