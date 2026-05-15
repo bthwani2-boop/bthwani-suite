@@ -27,6 +27,7 @@ export type BannerCarouselProps = {
   itemWidth?: number;
   itemGap?: number;
   autoPlayInterval?: number;
+  autoPlayDirection?: 'forward' | 'backward';
   resumeAfterMs?: number;
   onIndexChange?: (index: number) => void;
   onBannerPress?: (item: BannerCarouselItem) => void;
@@ -52,6 +53,7 @@ export function BannerCarousel(props: BannerCarouselProps) {
     itemWidth,
     itemGap,
     autoPlayInterval,
+    autoPlayDirection = 'forward',
     resumeAfterMs,
     onIndexChange,
     onBannerPress,
@@ -119,7 +121,8 @@ export function BannerCarousel(props: BannerCarouselProps) {
     }
 
     const intervalId = setInterval(() => {
-      const nextIndex = (activeIndex + 1) % count;
+      const step = autoPlayDirection === 'backward' ? -1 : 1;
+      const nextIndex = (activeIndex + step + count) % count;
       setActiveIndex(nextIndex);
       if (onIndexChange) onIndexChange(nextIndex);
     }, autoPlayInterval);

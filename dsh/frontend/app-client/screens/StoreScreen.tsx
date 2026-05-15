@@ -1547,9 +1547,11 @@ function DshStoreGetScreenContent({
                       <BannerCarousel
                         banners={smartRailItems}
                         width={viewportWidth}
-                        height={132}
+                        height={142}
                         variant="secondary"
                         fullBleed
+                        autoPlayInterval={4000}
+                        autoPlayDirection="backward"
                         itemWidth={Math.round(viewportWidth * 0.62)}
                         itemGap={12}
                         style={styles.smartRailSection}
