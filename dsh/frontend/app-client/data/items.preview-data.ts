@@ -299,6 +299,8 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			name: 'لفافة قرفة',
 			subtitle: 'طبقات طرية مع صوص خفيف',
 			priceLabel: '12 ر.س',
+			oldPriceLabel: '15 ر.س',
+			discountLabel: 'خصم 20%',
 			categoryId: 'bakery',
 			categoryLabel: 'مخبوزات',
 			isAvailable: true,
