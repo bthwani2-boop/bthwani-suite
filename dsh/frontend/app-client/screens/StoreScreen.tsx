@@ -1411,7 +1411,7 @@ function DshStoreGetScreenContent({
                   ) : null}
 
 
-                  <View style={[styles.contentBlock, { backgroundColor: appearanceChrome.identityDockBackground }]}>
+                  <View style={styles.contentBlock}>
                     {/* Luxury Store Card */}
                     <View style={styles.heroLuxuryCard}>
                       {/* ROW 1: Identity Cluster */}
