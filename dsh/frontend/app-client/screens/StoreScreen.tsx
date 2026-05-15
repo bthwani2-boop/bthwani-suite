@@ -2168,7 +2168,7 @@ const styles = StyleSheet.create({
   contentBlock: {
     width: '100%',
     overflow: 'hidden',
-    marginTop: -80,
+    marginTop: -140,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
