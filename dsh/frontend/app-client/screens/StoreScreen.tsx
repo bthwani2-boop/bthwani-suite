@@ -483,7 +483,8 @@ function DshStoreGetScreenContent({
     cbWashColor: isDarkGlass ? 'rgba(22, 22, 28, 0.82)' : 'rgba(255, 255, 255, 0.88)',
     heroFadeRGB: isDarkGlass ? '22, 22, 28' : '255, 255, 255',
     heroFadeMaxAlpha: isDarkGlass ? 0.82 : 0.88,
-    seamSoftenerColor: isDarkGlass ? 'rgba(22, 22, 28, 0.45)' : 'rgba(255, 255, 255, 0.65)',
+    // REVERSE FEATHER GRADIENT (Metrics Row Transition)
+    metricsFeatherColor: isDarkGlass ? tokens.colors.surfaceRaised : stylesTokens.white,
   }), [isDarkGlass, tokens]);
 
   const handleToggleFavorite = React.useCallback((id: string) => {
@@ -1437,8 +1438,15 @@ function DshStoreGetScreenContent({
 
                       {/* ROW 2: Metrics Chips */}
                       <View style={[styles.heroLuxuryMetricsRow, { position: 'relative' }]}>
-                        {/* Seam Softener Strip */}
-                        <View style={[styles.seamSoftenerStrip, { backgroundColor: appearanceChrome.seamSoftenerColor }]} pointerEvents="none" />
+                        {/* Reverse Feather Gradient Blend (Multi-Band) */}
+                        <View style={styles.metricsRowReverseFeather} pointerEvents="none">
+                          {Array.from({ length: 40 }, (_, i) => {
+                            const t = i / 39;
+                            const alpha = Math.pow(t, 1.5) * appearanceChrome.heroFadeMaxAlpha;
+                            const bg = `rgba(${appearanceChrome.heroFadeRGB}, ${alpha.toFixed(3)})`;
+                            return <View key={i} style={[styles.metricsRowReverseFeatherBand, { bottom: `${(t * 100).toFixed(2)}%` as DimensionValue, backgroundColor: bg }]} />;
+                          })}
+                        </View>
 
                         {store.hasBthwaniPro && (
                           <View style={[styles.heroFeatureChip, styles.heroBadgePro]}>
@@ -1990,14 +1998,19 @@ const styles = StyleSheet.create({
     gap: 8,
     flexWrap: 'wrap',
   },
-  seamSoftenerStrip: {
+  metricsRowReverseFeather: {
     position: 'absolute',
-    top: -6,
-    bottom: -10,
-    left: -20,
-    right: -20,
-    borderRadius: 16,
+    top: -16,
+    bottom: -32,
+    left: -32,
+    right: -32,
     zIndex: -1,
+  },
+  metricsRowReverseFeatherBand: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
   },
   heroLuxuryDeliveryRow: {
     flexDirection: 'row-reverse',
