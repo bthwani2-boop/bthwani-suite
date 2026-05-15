@@ -521,9 +521,9 @@ function DshStoreGetScreenContent({
 
   const appearanceChrome = React.useMemo(() => ({
     accent: tokens.colors.accentOrange,
-    actionBackground: isDarkGlass ? tokens.components.commerce.deliveryIdleSurface : tokens.glassSurfaceStrong,
-    actionBorder: isDarkGlass ? tokens.components.commerce.deliveryIdleBorder : tokens.borderStrong,
-    actionIcon: tokens.textPrimary,
+    actionBackground: isDarkGlass ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.85)',
+    actionBorder: isDarkGlass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.05)',
+    actionIcon: isDarkGlass ? tokens.colors.white : tokens.colors.ink,
     activeActionBackground: tokens.actionSelectedBackground,
     activeActionBorder: tokens.components.commerce.deliverySelectedBorder,
     activeActionIcon: tokens.components.commerce.deliverySelectedText,
@@ -543,6 +543,7 @@ function DshStoreGetScreenContent({
     statusBadgeBackground: isDarkGlass ? tokens.glassSurfaceStrong : tokens.components.badges.success.backgroundColor,
     statusBadgeBorder: isDarkGlass ? tokens.glassBorder : tokens.components.badges.success.borderColor,
     statusDot: theme.success,
+    statusDotClosed: theme.danger,
     strongSurface: isDarkGlass ? tokens.glassSurfaceStrong : tokens.colors.surfacePrimary,
     subtleSurface: isDarkGlass ? tokens.glassSurface : tokens.colors.surfaceRaised,
     heroOverlay: tokens.components.overlays.heroOverlay,
@@ -1317,7 +1318,8 @@ function DshStoreGetScreenContent({
       <StatusBar
         animated
         barStyle={isDarkGlass ? 'light-content' : 'dark-content'}
-        backgroundColor={appearanceChrome.screenBackground}
+        backgroundColor="transparent"
+        translucent
       />
       {headerSearchVisible && (
         <SearchTopBar
@@ -1333,7 +1335,12 @@ function DshStoreGetScreenContent({
 
         <View style={styles.feedSection}>
           <Animated.View style={[styles.feedList, { opacity: transitionAnim, transform: [{ scale: transitionAnim }] }]} {...panResponder.panHandlers}>
-            <FlatList
+            <Animated.FlatList
+              onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                { useNativeDriver: true }
+              )}
+              scrollEventThrottle={16}
               ref={(r) => { listRef.current = r as unknown as FlatList<DshStoreGetMenuItem> | null; }}
               data={visibleItems as DshStoreGetMenuItem[]}
               keyExtractor={(item) => (item as DshStoreGetMenuItem).id}
@@ -1341,7 +1348,34 @@ function DshStoreGetScreenContent({
                 <>
                   <View style={[styles.heroPremiumWrap, { backgroundColor: appearanceChrome.cardBackground }]}>
                     <View style={[styles.heroCoverWrap, { backgroundColor: appearanceChrome.cardBackground }]}>
-                      {storeCoverImageSource ? <Image source={storeCoverImageSource} style={styles.heroCoverImage} /> : <View style={styles.heroCoverPlaceholder} />}
+                      {storeCoverImageSource ? (
+                        <Animated.Image
+                          source={storeCoverImageSource}
+                          style={[
+                            styles.heroCoverImage,
+                            {
+                              transform: [
+                                {
+                                  scale: scrollY.interpolate({
+                                    inputRange: [-200, 0, 480],
+                                    outputRange: [1.3, 1, 1.1],
+                                    extrapolate: 'clamp',
+                                  }),
+                                },
+                                {
+                                  translateY: scrollY.interpolate({
+                                    inputRange: [-200, 0, 480],
+                                    outputRange: [-60, 0, 80],
+                                    extrapolate: 'clamp',
+                                  }),
+                                },
+                              ],
+                            }
+                          ]}
+                        />
+                      ) : (
+                        <View style={styles.heroCoverPlaceholder} />
+                      )}
                       <GlassHeroOverlay strength={isDarkGlass ? 'strong' : 'default'} style={[styles.heroCoverOverlay, { backgroundColor: appearanceChrome.heroOverlay }]} />
 
                       {/* Top Overlay Actions */}
@@ -1359,20 +1393,40 @@ function DshStoreGetScreenContent({
                         </View>
                         <View style={styles.heroTopActionsRight}>
                           <TouchableOpacity style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackground, borderColor: appearanceChrome.actionBorder, borderWidth: 1 }]} activeOpacity={0.7}>
-                            <Icon name="scan-outline" size={20} color={appearanceChrome.actionIcon} />
+                            <Icon name="expand-outline" size={20} color={appearanceChrome.actionIcon} />
                           </TouchableOpacity>
                         </View>
                       </View>
 
                       {/* Identity Section (Logo + Info) */}
                       {/* Identity Section (Logo + Info) */}
-                      <View style={styles.heroIdentitySection}>
+                      <Animated.View
+                        style={[
+                          styles.heroIdentitySection,
+                          {
+                            opacity: scrollY.interpolate({
+                              inputRange: [0, 200],
+                              outputRange: [1, 0],
+                              extrapolate: 'clamp',
+                            }),
+                            transform: [
+                              {
+                                translateY: scrollY.interpolate({
+                                  inputRange: [0, 200],
+                                  outputRange: [0, -40],
+                                  extrapolate: 'clamp',
+                                }),
+                              }
+                            ]
+                          }
+                        ]}
+                      >
                         <View
                           style={[
                             styles.heroLogoWrap,
                             {
-                              backgroundColor: isDarkGlass ? appearanceChrome.modalSurface : stylesTokens.white,
-                              borderColor: ORANGE, // Premium Brand Border
+                              backgroundColor: stylesTokens.white,
+                              borderColor: ORANGE,
                             },
                           ]}
                         >
@@ -1382,13 +1436,53 @@ function DshStoreGetScreenContent({
                           />
                         </View>
                         <View style={styles.heroInfoCluster}>
-                          <Text style={styles.heroNameText} numberOfLines={2}>{normalizedStoreName}</Text>
+                          <Text style={styles.heroNameText} numberOfLines={1}>{normalizedStoreName}</Text>
                           <View style={styles.heroLocationRow}>
                             <Icon name="location-sharp" size={14} color={ORANGE} />
-                            <Text style={styles.heroLocationText}>{store.locationLabel || 'حي العليا · الرياض'}</Text>
+                            <Text style={styles.heroLocationText} numberOfLines={1}>{store.locationLabel || 'حي العليا · الرياض'}</Text>
+                          </View>
+
+                          {/* Store Status Badge (Open/Closed) */}
+                          <View style={[
+                            styles.heroStatusBadge,
+                            {
+                              backgroundColor: operationalState === 'store_open' ? 'rgba(0, 200, 83, 0.15)' : 'rgba(255, 59, 48, 0.15)',
+                              borderColor: operationalState === 'store_open' ? 'rgba(0, 200, 83, 0.3)' : 'rgba(255, 59, 48, 0.3)',
+                            }
+                          ]}>
+                            <View style={[
+                              styles.heroStatusDot,
+                              { backgroundColor: operationalState === 'store_open' ? appearanceChrome.statusDot : appearanceChrome.statusDotClosed }
+                            ]} />
+                            <Text style={[
+                              styles.heroStatusText,
+                              { color: operationalState === 'store_open' ? '#00C853' : '#FF3B30' }
+                            ]}>
+                              {operationalState === 'store_open' ? 'مفتوح الآن' : 'مغلق الآن'}
+                            </Text>
                           </View>
                         </View>
-                      </View>
+                      </Animated.View>
+
+                      {/* Sticky Header Overlay */}
+                      <Animated.View
+                        style={[
+                          styles.stickyHeaderContent,
+                          {
+                            opacity: scrollY.interpolate({
+                              inputRange: [200, 300],
+                              outputRange: [0, 1],
+                              extrapolate: 'clamp',
+                            }),
+                            backgroundColor: appearanceChrome.modalSurface,
+                            borderColor: appearanceChrome.modalBorder,
+                          }
+                        ]}
+                      >
+                        <Text style={[styles.stickyHeaderTitle, { color: appearanceChrome.primaryText }]}>
+                          {normalizedStoreName}
+                        </Text>
+                      </Animated.View>
 
                       <View style={styles.heroGridsLayer}>
                         {/* ROW 1: Metrics & Badges (High Density 2026 Grid) */}
@@ -2172,11 +2266,20 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
     justifyContent: 'center',
     alignItems: 'center',
-    backdropFilter: 'blur(10px)',
-    opacity: 0.85,
+    borderWidth: 1,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.12,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 3 },
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   heroIdentitySection: {
     position: 'absolute',
@@ -2237,10 +2340,31 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   heroLocationText: {
-    fontSize: 14,
+    fontSize: 13,
     color: 'rgba(255, 255, 255, 0.9)',
     fontFamily: 'Outfit-Medium',
     fontWeight: '700',
+  },
+  heroStatusBadge: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    alignSelf: 'flex-end',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    gap: 6,
+    marginTop: 4,
+  },
+  heroStatusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  heroStatusText: {
+    fontSize: 10.5,
+    fontWeight: '900',
+    fontFamily: 'Outfit-Bold',
   },
   heroGridsLayer: {
     position: 'absolute',
@@ -2328,54 +2452,24 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontFamily: 'Outfit-Bold',
   },
-ureLabel: {
-    fontSize: 9,
-    color: 'rgba(255, 255, 255, 0.7)',
-    textAlign: 'center',
-    fontWeight: '700',
-    fontFamily: 'Outfit-Medium',
-  },
-
-  heroDeliveryGrid: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 8,
-  },
-  heroDeliveryChip: {
-    flex: 1,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
+  stickyHeaderContent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 90,
+    paddingTop: 44,
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    borderRadius: 12,
-    borderWidth: 0.5,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
-    gap: 4,
-    height: 48,
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    zIndex: 100,
   },
-  heroDeliveryChipActive: {
-    backgroundColor: 'rgba(255, 80, 13, 0.15)',
-    borderColor: ORANGE,
-    borderWidth: 0.8,
-  },
-  heroDeliveryChipInactive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  heroDeliveryChipTextContent: {
-    flex: 1,
-  },
-  heroDeliveryChipTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#FFF',
-    textAlign: 'right',
+  stickyHeaderTitle: {
+    fontSize: 17,
+    fontWeight: '800',
     fontFamily: 'Outfit-Bold',
   },
-  heroDeliveryChipTitleActive: {
-    color: ORANGE,
-  },
+
   heroDeliveryChipSubtitle: {
     fontSize: 9.5,
     color: 'rgba(255, 255, 255, 0.6)',
