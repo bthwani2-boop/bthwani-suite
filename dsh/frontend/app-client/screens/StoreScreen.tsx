@@ -1491,10 +1491,10 @@ function DshStoreGetScreenContent({
                       <BannerCarousel
                         banners={smartRailItems}
                         width={viewportWidth}
-                        height={108}
+                        height={132}
                         variant="secondary"
                         fullBleed
-                        itemWidth={Math.round(viewportWidth * 0.58)}
+                        itemWidth={Math.round(viewportWidth * 0.62)}
                         itemGap={12}
                         style={styles.smartRailSection}
                       />
