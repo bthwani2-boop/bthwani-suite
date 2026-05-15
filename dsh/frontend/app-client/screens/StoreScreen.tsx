@@ -1823,15 +1823,16 @@ function DshStoreGetScreenContent({
                         (() => {
                           const overlayColor = getOverlayColor(normalizeDisplayText(previewPeekItem.name), 0.86);
                           return (
-                            <View style={[styles.previewDetailsBox, { backgroundColor: isDarkGlass ? appearanceChrome.strongSurface : overlayColor, borderColor: appearanceChrome.modalBorder, borderWidth: 1, flexDirection: isRTL ? 'row-reverse' : 'row' }]} pointerEvents="box-none">
+                            <View style={[styles.previewDetailsBox, { backgroundColor: 'rgba(255, 255, 255, 0.85)', borderColor: 'rgba(255, 255, 255, 0.3)', borderTopWidth: 1, flexDirection: isRTL ? 'row-reverse' : 'row' }]} pointerEvents="box-none">
                               <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]}>
-                                {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizedStoreName}</Text> : null}
-                                <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.name)}</Text>
-                                {previewPeekItem.subtitle ? <Text style={[styles.previewDetailsSubtitle, { color: appearanceChrome.secondaryText }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.subtitle)}</Text> : null}
-
-                                <View style={[styles.previewDetailsMetaRow, isRTL ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }]}>
-                                  {previewPeekItem.priceLabel ? <Text style={[styles.previewDetailsPrice, { color: appearanceChrome.primaryText }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.priceLabel)}</Text> : null}
-                                  {previewPeekItem.discountLabel ? <Text style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.discountLabel)}</Text> : null}
+                                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap' }}>
+                                  <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{normalizeDisplayText(previewPeekItem.name)}</Text>
+                                  {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>· {normalizedStoreName}</Text> : null}
+                                </View>
+                                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap', marginTop: 2 }}>
+                                  {previewPeekItem.priceLabel ? <Text style={[styles.previewDetailsPrice, { color: appearanceChrome.primaryText }]}>{normalizeDisplayText(previewPeekItem.priceLabel)}</Text> : null}
+                                  {previewPeekItem.discountLabel ? <Text style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>{normalizeDisplayText(previewPeekItem.discountLabel)}</Text> : null}
+                                  {previewPeekItem.subtitle ? <Text style={[styles.previewDetailsSubtitle, { color: appearanceChrome.secondaryText }]}>· {normalizeDisplayText(previewPeekItem.subtitle)}</Text> : null}
                                 </View>
                               </View>
                             </View>
@@ -1896,15 +1897,16 @@ function DshStoreGetScreenContent({
                     (() => {
                       const overlayColor = getOverlayColor(normalizeDisplayText(previewItem!.name), 0.86);
                       return (
-                        <View style={[styles.previewDetailsBox, { backgroundColor: isDarkGlass ? appearanceChrome.strongSurface : overlayColor, borderColor: appearanceChrome.modalBorder, borderWidth: 1, flexDirection: isRTL ? 'row-reverse' : 'row' }]} pointerEvents="box-none">
+                        <View style={[styles.previewDetailsBox, { backgroundColor: 'rgba(255, 255, 255, 0.85)', borderColor: 'rgba(255, 255, 255, 0.3)', borderTopWidth: 1, flexDirection: isRTL ? 'row-reverse' : 'row' }]} pointerEvents="box-none">
                           <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]} pointerEvents="none">
-                            {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizedStoreName}</Text> : null}
-                            <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.name)}</Text>
-                            {previewItem!.subtitle ? <Text style={[styles.previewDetailsSubtitle, { color: appearanceChrome.secondaryText }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.subtitle)}</Text> : null}
-
-                            <View style={[styles.previewDetailsMetaRow, isRTL ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }]}>
-                              {previewItem!.priceLabel ? <Text style={[styles.previewDetailsPrice, { color: appearanceChrome.primaryText }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.priceLabel)}</Text> : null}
-                              {previewItem!.discountLabel ? <Text style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent }, isRTL && styles.textAlignRight]} numberOfLines={1}>{normalizeDisplayText(previewItem!.discountLabel)}</Text> : null}
+                            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap' }}>
+                              <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{normalizeDisplayText(previewItem!.name)}</Text>
+                              {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>· {normalizedStoreName}</Text> : null}
+                            </View>
+                            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap', marginTop: 2 }}>
+                              {previewItem!.priceLabel ? <Text style={[styles.previewDetailsPrice, { color: appearanceChrome.primaryText }]}>{normalizeDisplayText(previewItem!.priceLabel)}</Text> : null}
+                              {previewItem!.discountLabel ? <Text style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>{normalizeDisplayText(previewItem!.discountLabel)}</Text> : null}
+                              {previewItem!.subtitle ? <Text style={[styles.previewDetailsSubtitle, { color: appearanceChrome.secondaryText }]}>· {normalizeDisplayText(previewItem!.subtitle)}</Text> : null}
                             </View>
                           </View>
                         </View>
@@ -2584,18 +2586,27 @@ const styles = StyleSheet.create({
   },
   previewDetailsBox: {
     position: 'absolute',
-    left: 18,
-    right: 18,
-    bottom: 18,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    minHeight: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-    zIndex: 6,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingLeft: 48,
+    paddingRight: 62,
+    paddingTop: 10,
+    paddingBottom: 12,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    zIndex: 1,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: -4 },
+      },
+      android: {
+        elevation: 10,
+      },
+    }),
   },
   previewDetailsContent: {
     flex: 1,
@@ -2626,7 +2637,6 @@ const styles = StyleSheet.create({
     color: stylesTokens.red,
     fontSize: 12,
     fontWeight: '900',
-    marginTop: 6,
   },
   previewDetailsPrice: {
     color: stylesTokens.dark,
@@ -2675,7 +2685,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   previewDetailsMetaRow: {
-    marginTop: 4,
+    marginTop: 2,
     flexDirection: 'row',
     gap: 8,
     alignItems: 'center',
