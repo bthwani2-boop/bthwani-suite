@@ -226,14 +226,15 @@ function createProductCardStyles(
     },
     partnerTile: {
       position: 'absolute',
-      top: 8,
-      left: 8,
-      width: 42,
-      height: 42,
-      backgroundColor: productColors.partnerTileBackground,
-      borderRadius: 21,
+      bottom: 0,
+      right: 0,
+      width: 64,
+      height: 52,
+      backgroundColor: theme.surface,
+      borderTopLeftRadius: 32,
+      borderBottomRightRadius: 18,
       borderWidth: 1,
-      borderColor: productColors.partnerTileBorder,
+      borderColor: productColors.favoriteBorder,
       zIndex: 6,
       overflow: 'hidden',
       justifyContent: 'center',
@@ -264,15 +265,16 @@ function createProductCardStyles(
     },
     favoriteButton: {
       position: 'absolute',
-      bottom: 8,
-      end: 8,
-      width: 34,
-      height: 34,
-      borderRadius: 17,
-      backgroundColor: productColors.favoriteSurface,
+      top: 0,
+      right: 0,
+      width: 36,
+      height: 36,
+      backgroundColor: theme.surface,
+      borderBottomLeftRadius: 24,
+      borderTopRightRadius: 18,
       justifyContent: 'center',
       alignItems: 'center',
-      borderWidth: 1,
+      borderWidth: 0.8,
       borderColor: productColors.favoriteBorder,
       zIndex: 3,
     },
@@ -413,22 +415,23 @@ function createProductCardStyles(
       fontWeight: '700',
     },
     actionRail: {
-      width: 44,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingTop: 6,
-      paddingLeft: 8,
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      zIndex: 10,
     },
     actionRailRTL: {
-      alignItems: 'center',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      zIndex: 10,
     },
     actionBadge: {
-      width: 36,
+      width: 44,
       height: 36,
-      borderRadius: 18,
-      backgroundColor: productColors.actionSurface,
-      borderWidth: 1,
-      borderColor: productColors.actionBorder,
+      borderTopRightRadius: 24,
+      borderBottomLeftRadius: 18,
+      backgroundColor: '#FF500D',
       justifyContent: 'center',
       alignItems: 'center',
       position: 'relative',
@@ -510,24 +513,6 @@ export const ProductCard = memo(function ProductCard({
             <View style={styles.imagePlaceholder} />
           )}
 
-          {resolvedPartnerSource ? (
-            <View style={styles.partnerTile}>
-              <Image source={resolvedPartnerSource} style={styles.partnerTileImage} resizeMode="cover" />
-            </View>
-          ) : null}
-
-          {emoji ? <Text role="titleLg" style={styles.emoji}>{emoji}</Text> : null}
-
-          {onImagePress ? (
-            <Pressable
-              accessibilityRole="imagebutton"
-              accessibilityLabel={`${title} · معاينة الصورة`}
-              hitSlop={8}
-              onPress={onImagePress}
-              style={styles.imagePressable}
-            />
-          ) : null}
-
           {onFavorite ? (
             <Pressable
               hitSlop={8}
@@ -537,9 +522,15 @@ export const ProductCard = memo(function ProductCard({
               <Icon
                 name={isFavorited ? 'heart' : 'heart-outline'}
                 size={18}
-                color={isFavorited ? productColors.favoriteActive : productColors.favoriteInactive}
+                color={isFavorited ? productColors.favoriteActive : '#0A2F5C'}
               />
             </Pressable>
+          ) : null}
+
+          {resolvedPartnerSource ? (
+            <View style={styles.partnerTile}>
+              <Image source={resolvedPartnerSource} style={styles.partnerTileImage} resizeMode="contain" />
+            </View>
           ) : null}
         </View>
       </View>
@@ -630,9 +621,11 @@ export const ProductCard = memo(function ProductCard({
             onPress={(event: GestureResponderEvent) => onAdd({ x: event.nativeEvent.pageX, y: event.nativeEvent.pageY })}
             style={styles.actionBadge}
           >
-            <Icon name="cart-outline" size={18} color={productColors.actionIcon} />
-            <View style={styles.actionPlusBadge}>
-              <Icon name="add" size={8} color={productColors.actionPlusIcon} />
+            <View style={{ position: 'relative' }}>
+              <Icon name="cart-outline" size={19} color="#FFFFFF" />
+              <View style={{ position: 'absolute', top: -3, left: -5, backgroundColor: '#FFFFFF', borderRadius: 5, width: 10, height: 10, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="add" size={8} color="#FF500D" />
+              </View>
             </View>
           </Pressable>
         ) : null}
