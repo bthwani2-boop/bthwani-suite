@@ -554,22 +554,8 @@ function DshStoreGetScreenContent({
     identityDockBorder: isDarkGlass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.3)',
     milkySurfaceWash: isDarkGlass ? 'rgba(28, 28, 30, 0.75)' : 'rgba(255, 255, 255, 0.88)',
     echoAmbientOpacity: isDarkGlass ? 0.45 : 0.65,
-    echoImageOpacity: isDarkGlass ? 0.28 : 0.88,
-    cbBands: (() => {
-      const N = 120;
-      const tgt0 = 0.05;
-      const tgtN = isDarkGlass ? 0.55 : 0.82;
-      const stp = (tgtN - tgt0) / N;
-      const rgb = isDarkGlass ? '22,22,28' : '255,252,247';
-      return Array.from({ length: N }, (_, i) => {
-        const prevRem = 1 - (tgt0 + i * stp);
-        const alpha = Math.max(0, Math.min(0.99, stp / prevRem));
-        return {
-          top: `${((i / N) * 100).toFixed(3)}%` as const,
-          color: `rgba(${rgb},${alpha.toFixed(5)})`,
-        };
-      });
-    })(),
+    echoImageOpacity: isDarkGlass ? 0.62 : 0.72,
+    cbWashColor: isDarkGlass ? 'rgba(22,22,28,0.06)' : 'rgba(255,252,247,0.10)',
   }), [isDarkGlass, theme, tokens]);
 
   const handleToggleFavorite = React.useCallback((id: string) => {
@@ -1349,15 +1335,10 @@ function DshStoreGetScreenContent({
           <Image
             source={storeCoverImageSource}
             style={[styles.cbImage, { opacity: appearanceChrome.echoImageOpacity }]}
-            blurRadius={3}
+            blurRadius={2}
             resizeMode="cover"
           />
-          {appearanceChrome.cbBands.map((band, i) => (
-            <View
-              key={i}
-              style={[styles.cbBandBase, { top: band.top, backgroundColor: band.color }]}
-            />
-          ))}
+          <View style={[styles.cbMilkyWash, { backgroundColor: appearanceChrome.cbWashColor }]} />
         </View>
       ) : null}
       {headerSearchVisible && (
@@ -1416,6 +1397,17 @@ function DshStoreGetScreenContent({
                         <View style={styles.heroCoverPlaceholder} />
                       )}
                       <GlassHeroOverlay strength={isDarkGlass ? 'strong' : 'default'} style={[styles.heroCoverOverlay, { backgroundColor: appearanceChrome.heroOverlay }]} />
+
+                      <View style={styles.heroCoverFade} pointerEvents="none">
+                        {Array.from({ length: 120 }, (_, i) => {
+                          const t = i / 119;
+                          const alpha = t * t * (isDarkGlass ? 0.22 : 0.22);
+                          const bg = isDarkGlass
+                            ? `rgba(0,0,0,${alpha.toFixed(3)})`
+                            : `rgba(248,248,248,${alpha.toFixed(3)})`;
+                          return <View key={i} style={[styles.heroCoverFadeBand, { top: `${(t * 100).toFixed(2)}%`, backgroundColor: bg }]} />;
+                        })}
+                      </View>
 
                       <View style={styles.heroTopActions}>
                         <View style={styles.heroTopActionsLeft}>
@@ -3446,7 +3438,18 @@ const styles = StyleSheet.create({
   cbImage: {
     ...StyleSheet.absoluteFillObject,
   },
-  cbBandBase: {
+  cbMilkyWash: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  heroCoverFade: {
+    position: 'absolute',
+    top: 80,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    overflow: 'hidden',
+  },
+  heroCoverFadeBand: {
     position: 'absolute',
     left: 0,
     right: 0,
