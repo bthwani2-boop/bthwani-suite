@@ -531,7 +531,7 @@ function DshStoreGetScreenContent({
   );
 
   const isOfferItem = React.useCallback((item: DshStoreGetMenuItem) => {
-    if ((item as any).isOffer) return true;
+    if ((item as Record<string, unknown>).isOffer) return true;
     if (item.discountLabel) return true;
     if (item.oldPriceLabel && item.priceLabel) return true;
     const d = normalizeDisplayText(item.discountLabel ?? '').toLowerCase();
@@ -956,7 +956,7 @@ function DshStoreGetScreenContent({
       onPanResponderTerminationRequest: () => false,
       onShouldBlockNativeResponder: () => true,
     }),
-    [isRTL, movePreviewByCategoryOffset, movePreviewByItemOffset, previewDrag, categories, selectedCategory, previewItems, previewCurrentIndex, previewRotate, previewScale, resolveItemsForCategory]
+    [isRTL, movePreviewByCategoryOffset, movePreviewByItemOffset, previewDrag, categories, selectedCategory, previewItems, previewCurrentIndex, previewRotate, previewScale, resolveItemsForCategory, previewPeekItem, trySetPreviewPeek]
   );
 
   const activeMeasurementOptions = React.useMemo(
@@ -1219,7 +1219,7 @@ function DshStoreGetScreenContent({
       }));
 
     return [...storeDriven, ...productDriven].slice(0, 15);
-  }, [benefitChips, changeCategory, firstNewItem, firstOfferItem, firstVisibleItem, menuItems, normalizedFollowersLabel, normalizedPriceMatchLabel, openStoreItemPreview, resolveFeaturePress, store, storeText]);
+  }, [benefitChips, changeCategory, firstNewItem, firstOfferItem, firstVisibleItem, menuItems, openStoreItemPreview, resolveFeaturePress, store, storeText]);
 
   if (state !== 'ready') {
     return <View style={[styles.blockingState, { backgroundColor: appearanceChrome.screenBackground }]}>{renderNonReadyState(state, storeText, onRetry)}</View>;
@@ -1413,7 +1413,7 @@ function DshStoreGetScreenContent({
 
                   <View style={[styles.contentBlock, { backgroundColor: appearanceChrome.identityDockBackground }]}>
                     {/* Luxury Store Card */}
-                    <View style={[styles.heroLuxuryCard, { backgroundColor: appearanceChrome.identityDockBackground }]}>
+                    <View style={styles.heroLuxuryCard}>
                       {/* ROW 1: Identity Cluster */}
                       <View style={styles.heroLuxuryIdentityRow}>
                         <View style={styles.heroLuxuryInfo}>
@@ -1474,9 +1474,6 @@ function DshStoreGetScreenContent({
                         })}
                       </View>
                     </View>
-
-                    {/* Divider between card and carousel */}
-                    <View style={[styles.contentDivider, { backgroundColor: appearanceChrome.cardBorder }]} />
 
                     {smartRailItems.length ? (
                       <BannerCarousel
@@ -1967,7 +1964,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit-Bold',
   },
   heroLuxuryCard: {
-    padding: 16,
+    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 0,
     gap: 16,
   },
   heroLuxuryIdentityRow: {
@@ -2170,12 +2169,9 @@ const styles = StyleSheet.create({
     width: '100%',
     overflow: 'hidden',
   },
-  contentDivider: {
-    height: StyleSheet.hairlineWidth,
-    marginHorizontal: 16,
-  },
+
   smartRailSection: {
-    marginTop: 0,
+    marginTop: 12,
     marginBottom: -6,
   },
   modePill: {
