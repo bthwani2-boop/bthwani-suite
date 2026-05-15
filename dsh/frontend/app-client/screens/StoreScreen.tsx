@@ -479,8 +479,10 @@ function DshStoreGetScreenContent({
     actionBorderGlass: isDarkGlass ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.12)',
     identityDockBackground: isDarkGlass ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.88)',
     identityDockBorder: isDarkGlass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.3)',
-    echoImageOpacity: isDarkGlass ? 0.62 : 0.72,
-    cbWashColor: isDarkGlass ? 'rgba(22,22,28,0.06)' : 'rgba(255,252,247,0.10)',
+    echoImageOpacity: isDarkGlass ? 0.6 : 1,
+    cbWashColor: isDarkGlass ? 'rgba(22, 22, 28, 0.82)' : 'rgba(255, 255, 255, 0.88)',
+    heroFadeRGB: isDarkGlass ? '22, 22, 28' : '255, 255, 255',
+    heroFadeMaxAlpha: isDarkGlass ? 0.82 : 0.88,
   }), [isDarkGlass, tokens]);
 
   const handleToggleFavorite = React.useCallback((id: string) => {
@@ -1247,8 +1249,8 @@ function DshStoreGetScreenContent({
         <View style={styles.cbContainer} pointerEvents="none">
           <Image
             source={storeCoverImageSource}
-            style={[styles.cbImage, { opacity: appearanceChrome.echoImageOpacity }]}
-            blurRadius={2}
+            style={[styles.cbImage, { opacity: appearanceChrome.echoImageOpacity, transform: [{ scale: 1.1 }] }]}
+            blurRadius={3}
             resizeMode="cover"
           />
           <View style={[styles.cbMilkyWash, { backgroundColor: appearanceChrome.cbWashColor }]} />
@@ -1279,8 +1281,8 @@ function DshStoreGetScreenContent({
               keyExtractor={(item) => (item as DshStoreGetMenuItem).id}
               ListHeaderComponent={
                 <>
-                  <View style={[styles.heroPremiumWrap, { backgroundColor: appearanceChrome.cardBackground }]}>
-                    <View style={[styles.heroCoverWrap, { backgroundColor: appearanceChrome.cardBackground }]}>
+                  <View style={[styles.heroPremiumWrap, { backgroundColor: 'transparent' }]}>
+                    <View style={[styles.heroCoverWrap, { backgroundColor: 'transparent' }]}>
                       {storeCoverImageSource ? (
                         <Animated.Image
                           source={storeCoverImageSource}
@@ -1314,10 +1316,8 @@ function DshStoreGetScreenContent({
                       <View style={styles.heroCoverFade} pointerEvents="none">
                         {Array.from({ length: 120 }, (_, i) => {
                           const t = i / 119;
-                          const alpha = t * t * (isDarkGlass ? 0.22 : 0.22);
-                          const bg = isDarkGlass
-                            ? `rgba(0,0,0,${alpha.toFixed(3)})`
-                            : `rgba(248,248,248,${alpha.toFixed(3)})`;
+                          const alpha = Math.pow(t, 1.5) * appearanceChrome.heroFadeMaxAlpha;
+                          const bg = `rgba(${appearanceChrome.heroFadeRGB}, ${alpha.toFixed(3)})`;
                           return <View key={i} style={[styles.heroCoverFadeBand, { top: `${(t * 100).toFixed(2)}%` as DimensionValue, backgroundColor: bg }]} />;
                         })}
                       </View>
@@ -1897,14 +1897,14 @@ const styles = StyleSheet.create({
 
   // PREMIUM HERO 2026
   heroPremiumWrap: {
-    backgroundColor: stylesTokens.white,
+    backgroundColor: 'transparent',
     overflow: 'hidden',
   },
   heroCoverWrap: {
     height: 480,
     width: '100%',
     position: 'relative',
-    backgroundColor: stylesTokens.dark,
+    backgroundColor: 'transparent',
   },
   heroCoverImage: {
     width: '100%',
@@ -2674,10 +2674,10 @@ const styles = StyleSheet.create({
   },
   heroCoverFade: {
     position: 'absolute',
-    top: 80,
     bottom: 0,
     left: 0,
     right: 0,
+    height: 160,
     overflow: 'hidden',
   },
   heroCoverFadeBand: {
