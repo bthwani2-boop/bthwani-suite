@@ -132,10 +132,10 @@ export type {
 } from './providers';
 export {
 	MobileRoot,
-} from './mobile/index';
+} from './mobile';
 export type {
 	MobileRootProps,
-} from './mobile/index';
+} from './mobile';
 export {
 	WebDocumentShell,
 	WebRootBody,

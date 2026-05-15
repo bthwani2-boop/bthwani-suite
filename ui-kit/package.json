@@ -35,7 +35,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./web": "./src/web.ts",
-    "./mobile": "./src/mobile.ts",
+    "./mobile": "./src/mobile.tsx",
     "./next": "./src/next.ts"
   }
 }

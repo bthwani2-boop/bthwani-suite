@@ -1597,6 +1597,7 @@ return (
       <BottomNavBar
         activeId="home"
         onSelect={(id) => {
+          if (id === 'favorites') onOpenFavorites?.();
           if (id === 'orders') onOpenTracking?.();
           if (id === 'wallet') onOpenEntry?.();
           if (id === 'profile') onOpenMySpace?.();
@@ -1604,7 +1605,7 @@ return (
         onLauncherPress={openServiceDial}
         direction={isRtl ? 'rtl' : 'ltr'}
         items={[
-          { id: 'home', label: 'الرئيسية', icon: 'home-outline', activeIcon: 'home' },
+          { id: 'favorites', label: 'المفضلة', icon: 'heart-outline', activeIcon: 'heart' },
           { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', activeIcon: 'receipt' },
           { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
           { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
