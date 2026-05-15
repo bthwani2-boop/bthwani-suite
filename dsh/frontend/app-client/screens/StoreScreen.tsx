@@ -526,8 +526,8 @@ function DshStoreGetScreenContent({
     strongSurface: isDarkGlass ? tokens.glassSurfaceStrong : tokens.colors.surfacePrimary,
     subtleSurface: isDarkGlass ? tokens.glassSurface : tokens.colors.surfaceRaised,
     heroOverlay: tokens.components.overlays.heroOverlay,
-    actionBackgroundGlass: isDarkGlass ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255, 255, 255, 0.9)',
-    actionBorderGlass: isDarkGlass ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.12)',
+    actionBackgroundGlass: isDarkGlass ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255, 255, 255, 0.45)',
+    actionBorderGlass: isDarkGlass ? 'rgba(255, 255, 255, 0.22)' : 'rgba(0, 0, 0, 0.12)',
     identityDockBackground: isDarkGlass ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.88)',
     identityDockBorder: isDarkGlass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.3)',
     echoImageOpacity: isDarkGlass ? 0.6 : 1,
@@ -637,8 +637,11 @@ function DshStoreGetScreenContent({
   const CARD_GAP = 2;
   const SNAP_INTERVAL = CARD_HEIGHT + CARD_GAP;
 
-  const listRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
+   const listRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
   const scrollY = React.useRef(new Animated.Value(0)).current;
+  const [stickyThreshold, setStickyThreshold] = React.useState(1000);
+  const horizontalScrollX = React.useRef(0);
+  const isSyncingHorizontal = React.useRef(false);
   const previewDrag = React.useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const previewScale = React.useRef(new Animated.Value(1)).current;
   const previewRotate = React.useRef(new Animated.Value(0)).current; // degrees-ish proxy
@@ -708,10 +711,24 @@ function DshStoreGetScreenContent({
     const targetX = Math.max(0, layout.x - centerOffset);
     try {
       chipsScrollRef.current.scrollTo({ x: targetX, animated: true });
+      stickyChipsScrollRef.current?.scrollTo({ x: targetX, animated: true });
     } catch {
       // ignore
     }
   }, [chipsContainerWidth]);
+
+  const stickyChipsScrollRef = React.useRef<ScrollView | null>(null);
+  const syncHorizontalScroll = (x: number, source: 'main' | 'sticky') => {
+    if (isSyncingHorizontal.current) return;
+    isSyncingHorizontal.current = true;
+    horizontalScrollX.current = x;
+    if (source === 'main') {
+      stickyChipsScrollRef.current?.scrollTo({ x, animated: false });
+    } else {
+      chipsScrollRef.current?.scrollTo({ x, animated: false });
+    }
+    setTimeout(() => { isSyncingHorizontal.current = false; }, 16);
+  };
 
   const resolveItemsForCategory = React.useCallback((categoryId: string) => {
     const scopedItems = (() => {
@@ -1367,12 +1384,13 @@ function DshStoreGetScreenContent({
                         })}
                       </View>
 
-                      <View style={styles.heroTopActions}>
-                        <View style={styles.heroTopActionsLeft}>
+                      <View style={styles.heroTopActions} pointerEvents="box-none">
+                        <View style={[styles.heroTopActionsLeft, isRTL && styles.rowReverse]} pointerEvents="box-none">
                           <TouchableOpacity
                             style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
                             activeOpacity={0.7}
                             onPress={handleStoreShare}
+                            hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
                           >
                             <Icon name="share-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
                           </TouchableOpacity>
@@ -1380,6 +1398,7 @@ function DshStoreGetScreenContent({
                             style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
                             activeOpacity={0.7}
                             onPress={onOpenCart ?? onOpenItems}
+                            hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
                           >
                             <Icon name="cart-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
                           </TouchableOpacity>
@@ -1387,22 +1406,16 @@ function DshStoreGetScreenContent({
                             style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
                             activeOpacity={0.7}
                             onPress={openInlineSearch}
+                            hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
                           >
                             <Icon name="search-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
-                          </TouchableOpacity>
-                        </View>
-                        <View style={styles.heroTopActionsRight}>
-                          <TouchableOpacity
-                            style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
-                            activeOpacity={0.7}
-                          >
-                            <Icon name="expand-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
                           </TouchableOpacity>
                         </View>
                       </View>
 
                       {/* Sticky Header Overlay */}
                       <Animated.View
+                        pointerEvents="box-none"
                         style={[
                           styles.stickyHeaderContent,
                           {
@@ -1543,15 +1556,20 @@ function DshStoreGetScreenContent({
                       />
                     ) : null}
 
-                   <View style={[styles.sectionHeader, { paddingHorizontal: 16, marginTop: 16, marginBottom: 8 }]}>
-                     <Text style={[styles.sectionTitle, { color: appearanceChrome.primaryText }]}>قائمة الأصناف</Text>
-                   </View>
+                    <View
+                      onLayout={(e) => setStickyThreshold(e.nativeEvent.layout.y)}
+                      style={[styles.sectionHeader, { paddingHorizontal: 16, marginTop: 16, marginBottom: 8 }]}
+                    >
+                      <Text style={[styles.sectionTitle, { color: appearanceChrome.primaryText }]}>قائمة الأصناف</Text>
+                    </View>
 
-                  <View style={styles.sectionBlock}>
-                    <ScrollView
-                      horizontal
-                      ref={(r) => { chipsScrollRef.current = r; }}
-                      onLayout={(e) => setChipsContainerWidth(e.nativeEvent.layout.width)}
+                   <View style={styles.sectionBlock}>
+                     <ScrollView
+                       horizontal
+                       ref={(r) => { chipsScrollRef.current = r; }}
+                       onScroll={(e) => syncHorizontalScroll(e.nativeEvent.contentOffset.x, 'main')}
+                       scrollEventThrottle={16}
+                       onLayout={(e) => setChipsContainerWidth(e.nativeEvent.layout.width)}
                       showsHorizontalScrollIndicator={false}
                       nestedScrollEnabled
                       decelerationRate="fast"
@@ -1648,6 +1666,81 @@ function DshStoreGetScreenContent({
                 </View>
               }
             />
+          </Animated.View>
+
+          {/* Sticky Categories Overlay */}
+          <Animated.View
+            style={[
+              styles.stickyCategoriesOverlay,
+              {
+                backgroundColor: appearanceChrome.screenBackground,
+                borderBottomColor: appearanceChrome.modalBorder,
+                transform: [{
+                  translateY: scrollY.interpolate({
+                    inputRange: [0, Math.max(1, stickyThreshold - (Platform.OS === 'ios' ? 100 : 70))],
+                    outputRange: [stickyThreshold, Platform.OS === 'ios' ? 100 : 70],
+                    extrapolate: 'clamp',
+                  })
+                }],
+                opacity: scrollY.interpolate({
+                  inputRange: [stickyThreshold - 150, stickyThreshold - 50],
+                  outputRange: [0, 1],
+                  extrapolate: 'clamp',
+                })
+              }
+            ]}
+            pointerEvents="box-none"
+          >
+            <View style={styles.stickyCategoriesContent}>
+              <View style={[styles.sectionHeader, { paddingHorizontal: 16, marginBottom: 8 }]}>
+                <Text style={[styles.sectionTitle, { color: appearanceChrome.primaryText, fontSize: 16 }]}>قائمة الأصناف</Text>
+              </View>
+              <View style={styles.sectionBlock}>
+                <ScrollView
+                  horizontal
+                  ref={(r) => { stickyChipsScrollRef.current = r; }}
+                  onScroll={(e) => syncHorizontalScroll(e.nativeEvent.contentOffset.x, 'sticky')}
+                  scrollEventThrottle={16}
+                  showsHorizontalScrollIndicator={false}
+                  nestedScrollEnabled
+                  decelerationRate="fast"
+                  contentContainerStyle={[styles.categoryRow, isRTL && styles.rowReverse]}
+                >
+                  {categories.map((category) => {
+                    const selected = selectedCategory === category.id;
+                    return (
+                      <View key={category.id}>
+                        <FilterChipItem
+                          label={normalizeDisplayText(category.label)}
+                          icon={
+                            CATEGORY_ICON[category.id] ? (
+                              <Text style={{ fontSize: 14 }}>{CATEGORY_ICON[category.id]}</Text>
+                            ) : (
+                              <Icon
+                                name={
+                                  category.id === 'all' ? 'reorder-three-outline' :
+                                  category.id === 'favorites' ? 'heart-outline' :
+                                  category.id === 'new' ? 'sparkles-outline' :
+                                  category.id === 'offers' ? 'pricetag-outline' :
+                                  'grid-outline'
+                                }
+                                size={16}
+                                color={selected ? (isDarkGlass ? colorPalette.brand : colorPalette.white) : (isDarkGlass ? 'rgba(255,255,255,0.7)' : '#717171')}
+                              />
+                            )
+                          }
+                          isActive={selected}
+                          isDarkGlass={isDarkGlass}
+                          theme={theme}
+                          isRTL={isRTL}
+                          onPress={() => changeCategory(category.id)}
+                        />
+                      </View>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            </View>
           </Animated.View>
         </View>
 
@@ -2005,12 +2098,10 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   heroTopActionsLeft: {
+    flex: 1,
     flexDirection: 'row',
-    gap: 12,
-  },
-  heroTopActionsRight: {
-    flexDirection: 'row',
-    gap: 12,
+    justifyContent: 'space-between',
+    paddingHorizontal: 4,
   },
   heroActionCircle: {
     width: 44,
@@ -2335,6 +2426,24 @@ const styles = StyleSheet.create({
   },
   feedList: {
     flex: 1,
+  },
+  stickyCategoriesOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 90,
+    paddingTop: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  stickyCategoriesContent: {
+    width: '100%',
   },
 
   menuActionBadge: {
