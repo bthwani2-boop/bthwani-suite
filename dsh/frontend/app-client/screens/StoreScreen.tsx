@@ -554,6 +554,22 @@ function DshStoreGetScreenContent({
     identityDockBorder: isDarkGlass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.3)',
     milkySurfaceWash: isDarkGlass ? 'rgba(28, 28, 30, 0.75)' : 'rgba(255, 255, 255, 0.88)',
     echoAmbientOpacity: isDarkGlass ? 0.45 : 0.65,
+    echoImageOpacity: isDarkGlass ? 0.28 : 0.88,
+    cbBands: (() => {
+      const N = 120;
+      const tgt0 = 0.05;
+      const tgtN = isDarkGlass ? 0.55 : 0.82;
+      const stp = (tgtN - tgt0) / N;
+      const rgb = isDarkGlass ? '22,22,28' : '255,252,247';
+      return Array.from({ length: N }, (_, i) => {
+        const prevRem = 1 - (tgt0 + i * stp);
+        const alpha = Math.max(0, Math.min(0.99, stp / prevRem));
+        return {
+          top: `${((i / N) * 100).toFixed(3)}%` as const,
+          color: `rgba(${rgb},${alpha.toFixed(5)})`,
+        };
+      });
+    })(),
   }), [isDarkGlass, theme, tokens]);
 
   const handleToggleFavorite = React.useCallback((id: string) => {
@@ -1328,6 +1344,22 @@ function DshStoreGetScreenContent({
         backgroundColor="transparent"
         translucent
       />
+      {storeCoverImageSource ? (
+        <View style={styles.cbContainer} pointerEvents="none">
+          <Image
+            source={storeCoverImageSource}
+            style={[styles.cbImage, { opacity: appearanceChrome.echoImageOpacity }]}
+            blurRadius={3}
+            resizeMode="cover"
+          />
+          {appearanceChrome.cbBands.map((band, i) => (
+            <View
+              key={i}
+              style={[styles.cbBandBase, { top: band.top, backgroundColor: band.color }]}
+            />
+          ))}
+        </View>
+      ) : null}
       {headerSearchVisible && (
         <SearchTopBar
           value={headerSearchQuery}
@@ -3407,28 +3439,18 @@ const styles = StyleSheet.create({
   footerNoteWrap: {
     paddingHorizontal: 12,
   },
-  echoBackgroundContainer: {
+  cbContainer: {
     ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
-    zIndex: -1,
   },
-  heavyEchoImage: {
-    width: '140%',
-    height: '140%',
-    opacity: 0.85,
-    top: -20,
-    left: -20,
+  cbImage: {
+    ...StyleSheet.absoluteFillObject,
   },
-  echoTransitionGradient: {
+  cbBandBase: {
     position: 'absolute',
-    top: 0,
     left: 0,
     right: 0,
-    height: 120,
-    zIndex: 1,
-  },
-  mainContentContainer: {
-    flex: 1,
+    bottom: 0,
   },
 });
 
