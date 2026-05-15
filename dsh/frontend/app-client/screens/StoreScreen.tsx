@@ -483,6 +483,7 @@ function DshStoreGetScreenContent({
     cbWashColor: isDarkGlass ? 'rgba(22, 22, 28, 0.82)' : 'rgba(255, 255, 255, 0.88)',
     heroFadeRGB: isDarkGlass ? '22, 22, 28' : '255, 255, 255',
     heroFadeMaxAlpha: isDarkGlass ? 0.82 : 0.88,
+    seamSoftenerColor: isDarkGlass ? 'rgba(22, 22, 28, 0.45)' : 'rgba(255, 255, 255, 0.65)',
   }), [isDarkGlass, tokens]);
 
   const handleToggleFavorite = React.useCallback((id: string) => {
@@ -1435,7 +1436,10 @@ function DshStoreGetScreenContent({
                       </View>
 
                       {/* ROW 2: Metrics Chips */}
-                      <View style={styles.heroLuxuryMetricsRow}>
+                      <View style={[styles.heroLuxuryMetricsRow, { position: 'relative' }]}>
+                        {/* Seam Softener Strip */}
+                        <View style={[styles.seamSoftenerStrip, { backgroundColor: appearanceChrome.seamSoftenerColor }]} pointerEvents="none" />
+
                         {store.hasBthwaniPro && (
                           <View style={[styles.heroFeatureChip, styles.heroBadgePro]}>
                             <Text style={styles.heroBadgeText}>برو</Text>
@@ -1985,6 +1989,15 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     gap: 8,
     flexWrap: 'wrap',
+  },
+  seamSoftenerStrip: {
+    position: 'absolute',
+    top: -6,
+    bottom: -10,
+    left: -20,
+    right: -20,
+    borderRadius: 16,
+    zIndex: -1,
   },
   heroLuxuryDeliveryRow: {
     flexDirection: 'row-reverse',
