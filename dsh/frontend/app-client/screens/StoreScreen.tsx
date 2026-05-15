@@ -17,7 +17,7 @@ import {
 
   TouchableOpacity,
   View,
-  type GestureResponderEvent,
+  type DimensionValue,
   type ImageSourcePropType,
 } from 'react-native';
 // Removed Ionicons import
@@ -43,7 +43,7 @@ import {
 import { dshCategoryMeasurementPolicies } from '../../shared/catalog';
 import { formatDshStoreFollowersLabel } from '../shared/store-profile';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
-import { getDshClientStateMeta, type DshClientState } from '../data/client-state.preview-data';
+import { getDshClientStateMeta } from '../data/client-state.preview-data';
 import { type DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 import { mapMenuItemToProductCard } from '../shared/map-menu-item-to-product-card';
 import { canRenderInClientSurface } from '../../shared/workflow';
@@ -137,16 +137,6 @@ const CATEGORY_ICON: Record<string, string> = {
   sweets: '🍰',
 };
 
-function getStatusLabel(statusLabel: string, storeText: ReturnType<typeof useUiText>['storeScreen']) {
-  const normalized = statusLabel.trim().toLowerCase();
-  if (normalized.includes('open') || normalized.includes('مفتوح')) return 'مفتوح';
-  if (normalized.includes('busy') || normalized.includes('مشغول')) return 'مشغول';
-  if (normalized.includes('closed') || normalized.includes('مغلق')) return 'مغلق';
-  if (normalized.includes('popular')) return 'الأكثر طلبًا';
-  if (normalized.includes('best seller')) return 'الأكثر مبيعًا';
-  if (normalized.includes('chef')) return 'اختيار الشيف';
-  return normalizeDisplayText(statusLabel) || storeText.get.platformDelivery;
-}
 
 function normalizeFollowersLabel(value: number | string | undefined, suffix: string) {
   if (typeof value === 'number') {
@@ -302,9 +292,6 @@ function resolveMeasurementOptions(item: DshStoreGetMenuItem) {
   return dshCategoryMeasurementPolicies[item.categoryId]?.options ?? ['حبة', '2 حبة'];
 }
 
-function resolveMeasurementLabel(item: DshStoreGetMenuItem) {
-  return dshCategoryMeasurementPolicies[item.categoryId]?.label ?? 'اختر الكمية المناسبة';
-}
 
 function extractPriceValue(priceLabel?: string) {
   const normalized = Number((priceLabel ?? '').replace(/[^\d.]/g, ''));
@@ -387,49 +374,6 @@ function renderNonReadyState(
   );
 }
 
-function IconActionButton({ icon, onPress }: { icon: string; onPress?: () => void }) {
-  return (
-    <TouchableOpacity
-      style={styles.iconButton}
-      onPress={onPress}
-      activeOpacity={0.8}
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-    >
-      <Icon name={icon as any} size={20} color={stylesTokens.dark} />
-    </TouchableOpacity>
-  );
-}
-
-function ModePill({
-  label,
-  icon,
-  active,
-  onPress,
-}: {
-  label: string;
-  icon: string;
-  active: boolean;
-  onPress?: () => void;
-}) {
-  return (
-    <TouchableOpacity
-      style={[styles.modePill, active && styles.modePillActive]}
-      onPress={onPress}
-      activeOpacity={0.85}
-    >
-      <View style={[styles.modePillInner, active && styles.modePillInnerActive]}>
-        <Text style={[styles.modePillLabel, active && styles.modePillLabelActive]} numberOfLines={1}>
-          {label}
-        </Text>
-        <Icon
-          name={icon as any}
-          size={18}
-          color={active ? stylesTokens.orange : stylesTokens.muted}
-        />
-      </View>
-    </TouchableOpacity>
-  );
-}
 
 function MenuItemCard({
   item,
@@ -481,11 +425,11 @@ function DshStoreGetScreenContent({
   store,
   menuItems = [],
   onOpenItems,
-  onOpenSearch,
+  onOpenSearch: _onOpenSearch,
   onOpenCart,
   onAddItemToCart,
   onOpenBenefits,
-  onBack,
+  onBack: _onBack,
   onRetry,
   onSupport,
 }: DshStoreGetScreenContentProps) {
@@ -513,8 +457,6 @@ function DshStoreGetScreenContent({
   const [cartDecisionVisible, setCartDecisionVisible] = React.useState(false);
   const [addedItemLabel, setAddedItemLabel] = React.useState('');
   const [previewItem, setPreviewItem] = React.useState<DshStoreGetMenuItem | null>(null);
-  const [isFollowingStore, setIsFollowingStore] = React.useState(false);
-
   const [favoriteIds, setFavoriteIds] = React.useState<Set<string>>(new Set());
 
   const appearanceChrome = React.useMemo(() => ({
@@ -672,7 +614,7 @@ function DshStoreGetScreenContent({
     const now = Date.now();
     if (!nextPreview) {
       previewPeekIdRef.current = null;
-      try { setPreviewPeekItem(null); setPreviewPeekType(null); setPreviewPeekSign(1); } catch {}
+      try { setPreviewPeekItem(null); setPreviewPeekType(null); setPreviewPeekSign(1); } catch { /* noop */ }
       return;
     }
 
@@ -693,11 +635,11 @@ function DshStoreGetScreenContent({
       // prefetch asynchronously then set the preview peek (don't await on main thread)
       Image.prefetch(uri).finally(() => {
         previewPeekIdRef.current = nextPreview.id;
-        try { setPreviewPeekItem(nextPreview); setPreviewPeekType(type); setPreviewPeekSign(sign); } catch {}
+        try { setPreviewPeekItem(nextPreview); setPreviewPeekType(type); setPreviewPeekSign(sign); } catch { /* noop */ }
       });
     } else {
       previewPeekIdRef.current = nextPreview.id;
-      try { setPreviewPeekItem(nextPreview); setPreviewPeekType(type); setPreviewPeekSign(sign); } catch {}
+      try { setPreviewPeekItem(nextPreview); setPreviewPeekType(type); setPreviewPeekSign(sign); } catch { /* noop */ }
     }
   }, [previewPeekType]);
 
@@ -772,10 +714,10 @@ function DshStoreGetScreenContent({
     ]).start(() => {
       setSelectedCategory(newId);
       // ensure list resets to top of new section
-      try { listRef.current?.scrollToOffset({ offset: 0, animated: false }); } catch {}
+      try { listRef.current?.scrollToOffset({ offset: 0, animated: false }); } catch { /* noop */ }
       Animated.timing(transitionAnim, { toValue: 1, duration: 260, useNativeDriver: false }).start();
       // subtle haptic
-      try { Vibration.vibrate(8); } catch {}
+      try { Vibration.vibrate(8); } catch { /* noop */ }
       scrollChipIntoView(newId);
     });
   }, [selectedCategory, transitionAnim, scrollChipIntoView]);
@@ -951,15 +893,15 @@ function DshStoreGetScreenContent({
           const outDuration = Math.max(120, Math.floor(base - speedAdj));
 
           Animated.timing(previewDrag.x, { toValue: offX, duration: outDuration, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start(() => {
-            try { movePreviewByCategoryOffset(dirOffset); } catch {}
+            try { movePreviewByCategoryOffset(dirOffset); } catch { /* noop */ }
             // place new card off-screen on opposite side and slide in quickly
             previewDrag.setValue({ x: -offX, y: 0 });
             Animated.parallel([
               Animated.timing(previewDrag.x, { toValue: 0, duration: Math.max(180, Math.floor(280 - speedAdj / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: false }),
               Animated.spring(previewScale, { toValue: 1, useNativeDriver: false, friction: 6, tension: 90 }),
               Animated.timing(previewRotate, { toValue: 0, duration: 180, useNativeDriver: false }),
-            ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch {} });
-            try { Vibration.vibrate(8); } catch {}
+            ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch { /* noop */ } });
+            try { Vibration.vibrate(8); } catch { /* noop */ }
           });
         };
 
@@ -975,8 +917,8 @@ function DshStoreGetScreenContent({
               Animated.timing(previewDrag.y, { toValue: 0, duration: Math.max(160, Math.floor(240 - speedAdjY / 1.5)), easing: Easing.out(Easing.cubic), useNativeDriver: false }),
               Animated.spring(previewScale, { toValue: 1, useNativeDriver: false, friction: 6, tension: 90 }),
               Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: false }),
-            ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch {} });
-            try { Vibration.vibrate(6); } catch {}
+            ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch { /* noop */ } });
+            try { Vibration.vibrate(6); } catch { /* noop */ }
           });
         };
 
@@ -1001,7 +943,7 @@ function DshStoreGetScreenContent({
             Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: false, friction: 7, tension: 90 }),
             Animated.spring(previewScale, { toValue: 1, useNativeDriver: false, friction: 8, tension: 90 }),
             Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: false }),
-          ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch {} });
+          ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch { /* noop */ } });
         }
       },
       onPanResponderTerminate: () => {
@@ -1009,7 +951,7 @@ function DshStoreGetScreenContent({
           Animated.spring(previewDrag, { toValue: { x: 0, y: 0 }, useNativeDriver: false, friction: 7, tension: 90 }),
           Animated.spring(previewScale, { toValue: 1, useNativeDriver: false, friction: 8, tension: 90 }),
           Animated.timing(previewRotate, { toValue: 0, duration: 160, useNativeDriver: false }),
-        ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch {} });
+        ]).start(() => { previewPeekIdRef.current = null; try { setPreviewPeekItem(null); setPreviewPeekType(null); } catch { /* noop */ } });
       },
       onPanResponderTerminationRequest: () => false,
       onShouldBlockNativeResponder: () => true,
@@ -1107,28 +1049,14 @@ function DshStoreGetScreenContent({
     setCartDecisionVisible(false);
   }, []);
 
-  if (state !== 'ready') {
-    return <View style={[styles.blockingState, { backgroundColor: appearanceChrome.screenBackground }]}>{renderNonReadyState(state, storeText, onRetry)}</View>;
-  }
-
-  if (!store) {
-    return (
-      <StateView
-        stateId="blockingError"
-        title={storeText.states.contextMissingTitle}
-        description={storeText.states.contextMissingDescription}
-      />
-    );
-  }
-
-  const normalizedFollowersLabel = normalizeFollowersLabel(store.followersCount ?? store.followersLabel, storeText.get.followersSuffix);
-  const normalizedPriceMatchLabel = isPriceMatchBlocked ? undefined : normalizePriceMatchLabel(store.priceMatchLabel, storeText.get.priceMatch);
-  const normalizedStoreName = normalizeDisplayText(store.name);
-  const normalizedStoreSubtitle = normalizeDisplayText(store.subtitle);
-  const normalizedEtaLabel = normalizeDisplayText(store.etaLabel);
+  const normalizedFollowersLabel = normalizeFollowersLabel(store?.followersCount ?? store?.followersLabel, storeText.get.followersSuffix);
+  const normalizedPriceMatchLabel = isPriceMatchBlocked ? undefined : normalizePriceMatchLabel(store?.priceMatchLabel, storeText.get.priceMatch);
+  const normalizedStoreName = normalizeDisplayText(store?.name);
+  const normalizedStoreSubtitle = normalizeDisplayText(store?.subtitle);
+  const normalizedEtaLabel = normalizeDisplayText(store?.etaLabel);
   const operationalState = React.useMemo(
-    () => resolveStoreOperationalState(store.statusLabel, store.deliveryLabel, store.serviceLabel),
-    [store.deliveryLabel, store.serviceLabel, store.statusLabel],
+    () => resolveStoreOperationalState(store?.statusLabel ?? '', store?.deliveryLabel, store?.serviceLabel),
+    [store?.deliveryLabel, store?.serviceLabel, store?.statusLabel],
   );
   const operationalStateMeta = React.useMemo(() => getDshClientStateMeta(operationalState), [operationalState]);
   const showOperationalNotice = operationalState !== 'store_open';
@@ -1147,10 +1075,10 @@ function DshStoreGetScreenContent({
   const benefitChips = Array.from(
     new Set(
       [
-        (isProBlocked ? false : store.hasBthwaniPro) ? 'بثواني برو' : null,
-        ...(store.subscriptionPackageChips ?? []),
-        store.deliveryLabel ?? null,
-        store.serviceLabel ?? null,
+        (isProBlocked ? false : store?.hasBthwaniPro) ? 'بثواني برو' : null,
+        ...(store?.subscriptionPackageChips ?? []),
+        store?.deliveryLabel ?? null,
+        store?.serviceLabel ?? null,
       ].filter(Boolean) as string[],
     ),
   )
@@ -1230,11 +1158,12 @@ function DshStoreGetScreenContent({
   const smartRailItems = React.useMemo<BannerCarouselItem[]>(() => {
     const featureImages = menuItems.map((item) => resolveDshStoreMenuItemImageSource(item));
     const pickFeatureImage = (index: number) => featureImages[index] ?? resolveDshStoreCoverImageSource(store);
+    const storeId = store?.id ?? '';
 
     const storeDriven = [
       firstVisibleItem
         ? {
-            id: `${store.id}-entry`,
+            id: `${storeId}-entry`,
             title: 'وصل حديثاً',
             subtitle: 'الأسعار مطابقة للمطعم',
             badge: 'معاينة',
@@ -1245,7 +1174,7 @@ function DshStoreGetScreenContent({
         : null,
       firstOfferItem
         ? {
-            id: `${store.id}-offers`,
+            id: `${storeId}-offers`,
             title: 'عروض حصرية',
             subtitle: 'خصومات تصل إلى 25%',
             badge: 'عرض',
@@ -1256,7 +1185,7 @@ function DshStoreGetScreenContent({
         : null,
       firstNewItem && firstNewItem.id !== firstVisibleItem?.id && firstNewItem.id !== firstOfferItem?.id
         ? {
-            id: `${store.id}-new`,
+            id: `${storeId}-new`,
             title: 'الجديد لدينا',
             subtitle: 'استعرض أحدث المنتجات',
             badge: 'جديد',
@@ -1266,7 +1195,7 @@ function DshStoreGetScreenContent({
           }
         : null,
       ...(benefitChips ?? []).slice(0, 3).map((chip, index) => ({
-        id: `${store.id}-benefit-${index}`,
+        id: `${storeId}-benefit-${index}`,
         title: normalizeTagLabel(chip, storeText),
         subtitle: 'ميزة مرتبطة بهذا المتجر',
         badge: chip.includes('برو') || chip.includes('أولوية') ? 'اشتراك' : chip.includes('كوبون') || chip.includes('خصم') || chip.includes('عرض') ? 'عرض' : 'ميزة',
@@ -1291,6 +1220,20 @@ function DshStoreGetScreenContent({
 
     return [...storeDriven, ...productDriven].slice(0, 15);
   }, [benefitChips, changeCategory, firstNewItem, firstOfferItem, firstVisibleItem, menuItems, normalizedFollowersLabel, normalizedPriceMatchLabel, openStoreItemPreview, resolveFeaturePress, store, storeText]);
+
+  if (state !== 'ready') {
+    return <View style={[styles.blockingState, { backgroundColor: appearanceChrome.screenBackground }]}>{renderNonReadyState(state, storeText, onRetry)}</View>;
+  }
+
+  if (!store) {
+    return (
+      <StateView
+        stateId="blockingError"
+        title={storeText.states.contextMissingTitle}
+        description={storeText.states.contextMissingDescription}
+      />
+    );
+  }
 
   return (
     <View style={[styles.screen, { backgroundColor: appearanceChrome.screenBackground }]}>
@@ -1375,7 +1318,7 @@ function DshStoreGetScreenContent({
                           const bg = isDarkGlass
                             ? `rgba(0,0,0,${alpha.toFixed(3)})`
                             : `rgba(248,248,248,${alpha.toFixed(3)})`;
-                          return <View key={i} style={[styles.heroCoverFadeBand, { top: `${(t * 100).toFixed(2)}%`, backgroundColor: bg }]} />;
+                          return <View key={i} style={[styles.heroCoverFadeBand, { top: `${(t * 100).toFixed(2)}%` as DimensionValue, backgroundColor: bg }]} />;
                         })}
                       </View>
 
@@ -1434,130 +1377,6 @@ function DshStoreGetScreenContent({
                       </Animated.View>
 
 
-                      <View style={styles.heroGridsLayer}>
-                        {/* Luxury Glass Store Card (Unified Identity, Stats & Delivery) */}
-                        <Animated.View
-                          style={[
-                            styles.heroLuxuryCard,
-                            {
-                              backgroundColor: appearanceChrome.identityDockBackground,
-                              borderColor: appearanceChrome.identityDockBorder,
-                              opacity: scrollY.interpolate({
-                                inputRange: [0, 180],
-                                outputRange: [1, 0],
-                                extrapolate: 'clamp',
-                              }),
-                              transform: [
-                                {
-                                  translateY: scrollY.interpolate({
-                                    inputRange: [0, 180],
-                                    outputRange: [0, 30],
-                                    extrapolate: 'clamp',
-                                  }),
-                                }
-                              ]
-                            }
-                          ]}
-                        >
-                          {/* ROW 1: Identity Cluster */}
-                          <View style={styles.heroLuxuryIdentityRow}>
-                            <View style={styles.heroLuxuryInfo}>
-                              <Text style={[styles.heroNameText, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{normalizedStoreName}</Text>
-                              <View style={styles.heroLocationRow}>
-                                <Icon name="location-sharp" size={14} color={ORANGE} />
-                                <Text style={[styles.heroLocationText, { color: appearanceChrome.secondaryText }]} numberOfLines={1}>{store.locationLabel || 'حي العليا · الرياض'}</Text>
-                              </View>
-
-                              <View style={[
-                                styles.heroStatusBadge,
-                                {
-                                  backgroundColor: operationalState === 'store_open' ? 'rgba(0, 200, 83, 0.12)' : 'rgba(255, 59, 48, 0.12)',
-                                  borderColor: operationalState === 'store_open' ? 'rgba(0, 200, 83, 0.25)' : 'rgba(255, 59, 48, 0.25)',
-                                }
-                              ]}>
-                                <View style={[styles.heroStatusDot, { backgroundColor: operationalState === 'store_open' ? '#00C853' : '#FF3B30' }]} />
-                                <Text style={[styles.heroStatusText, { color: operationalState === 'store_open' ? '#00C853' : '#FF3B30' }]}>
-                                  {operationalState === 'store_open' ? 'مفتوح الآن' : 'مغلق الآن'}
-                                </Text>
-                              </View>
-                            </View>
-
-                            <View
-                              style={[
-                                styles.heroLogoWrap,
-                                {
-                                  backgroundColor: stylesTokens.white,
-                                  borderColor: isDarkGlass ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-                                },
-                              ]}
-                            >
-                              <Image
-                                source={storeLogoImageSource || resolveDshImageSource('dsh.brand.logo.v1')}
-                                style={styles.heroLogoImage}
-                              />
-                            </View>
-                          </View>
-
-                          {/* ROW 2: Metrics Chips */}
-                          <View style={styles.heroLuxuryMetricsRow}>
-                            {/* Pro Badge */}
-                            {store.hasBthwaniPro && (
-                              <View style={[styles.heroFeatureChip, styles.heroBadgePro]}>
-                                <Text style={styles.heroBadgeText}>برو</Text>
-                              </View>
-                            )}
-
-                            {/* Distance */}
-                            <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)' }]}>
-                              <Icon name="navigate-outline" size={12} color={appearanceChrome.secondaryText} />
-                              <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.distanceLabel || '2.1 كم'}</Text>
-                            </View>
-
-                            {/* Time */}
-                            <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)' }]}>
-                              <Icon name="time-outline" size={12} color={appearanceChrome.secondaryText} />
-                              <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.deliveryTimeLabel || normalizedEtaLabel}</Text>
-                            </View>
-
-                            {/* Rating */}
-                            <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)' }]}>
-                              <Icon name="star" size={12} color={GOLD} />
-                              <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.rating?.toFixed(1) || '5.0'}</Text>
-                            </View>
-                          </View>
-
-                          {/* ROW 3: Delivery Options (Segmented) */}
-                          <View style={[styles.heroLuxuryDeliveryRow, { backgroundColor: isDarkGlass ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.04)' }]}>
-                            {deliveryModes.map((mode) => {
-                              const active = selectedMode === mode.id;
-                              let title = mode.label;
-
-                              if (mode.id === 'store_delivery') title = 'توصيل المتجر';
-                              else if (mode.id === 'pickup') title = 'استلم بنفسك';
-                              else if (mode.id === 'delivery') title = 'توصيل بثواني';
-
-                              return (
-                                <TouchableOpacity
-                                  key={mode.id}
-                                  style={[
-                                    styles.heroLuxuryDeliveryChip,
-                                    active && { backgroundColor: isDarkGlass ? 'rgba(255, 255, 255, 0.15)' : stylesTokens.white }
-                                  ]}
-                                  onPress={() => setSelectedMode(mode.id)}
-                                  activeOpacity={0.8}
-                                >
-                                  <View style={styles.heroLuxuryDeliveryContent}>
-                                    <Text style={[styles.heroLuxuryDeliveryTitle, { color: active ? ORANGE : appearanceChrome.secondaryText }]} numberOfLines={1}>
-                                      {title}
-                                    </Text>
-                                    <Icon name={mode.icon} size={14} color={active ? ORANGE : appearanceChrome.secondaryText} />
-                                  </View>
-                                </TouchableOpacity>
-                              );
-                            })}
-                          </View>
-                        </Animated.View>
-                      </View>
                     </View>
                   </View>
 
@@ -1592,6 +1411,73 @@ function DshStoreGetScreenContent({
                   ) : null}
 
 
+                  <View style={[styles.contentBlock, { backgroundColor: appearanceChrome.identityDockBackground }]}>
+                    {/* Luxury Store Card */}
+                    <View style={[styles.heroLuxuryCard, { backgroundColor: appearanceChrome.identityDockBackground }]}>
+                      {/* ROW 1: Identity Cluster */}
+                      <View style={styles.heroLuxuryIdentityRow}>
+                        <View style={styles.heroLuxuryInfo}>
+                          <Text style={[styles.heroNameText, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{normalizedStoreName}</Text>
+                          <View style={styles.heroLocationRow}>
+                            <Icon name="location-sharp" size={14} color={ORANGE} />
+                            <Text style={[styles.heroLocationText, { color: appearanceChrome.secondaryText }]} numberOfLines={1}>{store.locationLabel || 'حي العليا · الرياض'}</Text>
+                          </View>
+                          <View style={[styles.heroStatusBadge, { backgroundColor: operationalState === 'store_open' ? 'rgba(0, 200, 83, 0.12)' : 'rgba(255, 59, 48, 0.12)', borderColor: operationalState === 'store_open' ? 'rgba(0, 200, 83, 0.25)' : 'rgba(255, 59, 48, 0.25)' }]}>
+                            <View style={[styles.heroStatusDot, { backgroundColor: operationalState === 'store_open' ? '#00C853' : '#FF3B30' }]} />
+                            <Text style={[styles.heroStatusText, { color: operationalState === 'store_open' ? '#00C853' : '#FF3B30' }]}>
+                              {operationalState === 'store_open' ? 'مفتوح الآن' : 'مغلق الآن'}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={[styles.heroLogoWrap, { backgroundColor: stylesTokens.white, borderColor: isDarkGlass ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
+                          <Image source={storeLogoImageSource || resolveDshImageSource('dsh.brand.logo.v1')} style={styles.heroLogoImage} />
+                        </View>
+                      </View>
+
+                      {/* ROW 2: Metrics Chips */}
+                      <View style={styles.heroLuxuryMetricsRow}>
+                        {store.hasBthwaniPro && (
+                          <View style={[styles.heroFeatureChip, styles.heroBadgePro]}>
+                            <Text style={styles.heroBadgeText}>برو</Text>
+                          </View>
+                        )}
+                        <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)' }]}>
+                          <Icon name="navigate-outline" size={12} color={appearanceChrome.secondaryText} />
+                          <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.distanceLabel || '2.1 كم'}</Text>
+                        </View>
+                        <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)' }]}>
+                          <Icon name="time-outline" size={12} color={appearanceChrome.secondaryText} />
+                          <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.deliveryTimeLabel || normalizedEtaLabel}</Text>
+                        </View>
+                        <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)' }]}>
+                          <Icon name="star" size={12} color={GOLD} />
+                          <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.rating?.toFixed(1) || '5.0'}</Text>
+                        </View>
+                      </View>
+
+                      {/* ROW 3: Delivery Options */}
+                      <View style={[styles.heroLuxuryDeliveryRow, { backgroundColor: isDarkGlass ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.04)' }]}>
+                        {deliveryModes.map((mode) => {
+                          const active = selectedMode === mode.id;
+                          let title = mode.label;
+                          if (mode.id === 'store_delivery') title = 'توصيل المتجر';
+                          else if (mode.id === 'pickup') title = 'استلم بنفسك';
+                          else if (mode.id === 'delivery') title = 'توصيل بثواني';
+                          return (
+                            <TouchableOpacity key={mode.id} style={[styles.heroLuxuryDeliveryChip, active && { backgroundColor: isDarkGlass ? 'rgba(255,255,255,0.15)' : stylesTokens.white }]} onPress={() => setSelectedMode(mode.id)} activeOpacity={0.8}>
+                              <View style={styles.heroLuxuryDeliveryContent}>
+                                <Text style={[styles.heroLuxuryDeliveryTitle, { color: active ? ORANGE : appearanceChrome.secondaryText }]} numberOfLines={1}>{title}</Text>
+                                <Icon name={mode.icon} size={14} color={active ? ORANGE : appearanceChrome.secondaryText} />
+                              </View>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+                    </View>
+
+                    {/* Divider between card and carousel */}
+                    <View style={[styles.contentDivider, { backgroundColor: appearanceChrome.cardBorder }]} />
+
                     {smartRailItems.length ? (
                       <BannerCarousel
                         banners={smartRailItems}
@@ -1601,11 +1487,11 @@ function DshStoreGetScreenContent({
                         fullBleed
                         itemWidth={Math.round(viewportWidth * 0.58)}
                         itemGap={12}
-                        style={[styles.smartRailSection, { marginHorizontal: 12 }]}
+                        style={styles.smartRailSection}
                       />
                     ) : null}
 
-                   <View style={[styles.sectionHeader, { paddingHorizontal: 16, marginTop: 24, marginBottom: 12 }]}>
+                   <View style={[styles.sectionHeader, { paddingHorizontal: 16, marginTop: 16, marginBottom: 8 }]}>
                      <Text style={[styles.sectionTitle, { color: appearanceChrome.primaryText }]}>قائمة الأصناف</Text>
                    </View>
 
@@ -1641,6 +1527,7 @@ function DshStoreGetScreenContent({
                         );
                       })}
                     </ScrollView>
+                  </View>
                   </View>
                 </>
               }
@@ -2081,21 +1968,7 @@ const styles = StyleSheet.create({
   },
   heroLuxuryCard: {
     padding: 16,
-    borderRadius: 32,
-    borderWidth: 1.5,
     gap: 16,
-    marginBottom: 8,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-        shadowOffset: { width: 0, height: 12 },
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
   },
   heroLuxuryIdentityRow: {
     flexDirection: 'row-reverse',
@@ -2205,13 +2078,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     fontFamily: 'Outfit-Bold',
   },
-  heroGridsLayer: {
-    position: 'absolute',
-    bottom: 24,
-    left: 16,
-    right: 16,
-    gap: 12,
-  },
   heroFeatureChip: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
@@ -2250,25 +2116,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     fontFamily: 'Outfit-Bold',
   },
-  stickyHeaderContent: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 90,
-    paddingTop: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    zIndex: 100,
-  },
-  stickyHeaderTitle: {
-    fontSize: 17,
-    fontWeight: '800',
-    fontFamily: 'Outfit-Bold',
-  },
-
-
   storeStateNotice: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
@@ -2305,25 +2152,27 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit-Bold',
   },
   storeStateNoticeDescription: {
-    fontSize: 12,
-    lineHeight: 16,
+    color: stylesTokens.muted,
+    fontSize: 11.5,
+    lineHeight: 17,
     fontFamily: 'Outfit-Regular',
   },
   storeStateNoticeAction: {
     paddingHorizontal: 8,
+    alignSelf: 'stretch',
   },
   storeStateNoticeActionText: {
     fontSize: 13,
     fontWeight: '700',
     fontFamily: 'Outfit-Bold',
   },
-  storeStateNoticeDescription: {
-    color: stylesTokens.muted,
-    fontSize: 11.5,
-    lineHeight: 17,
+  contentBlock: {
+    width: '100%',
+    overflow: 'hidden',
   },
-  storeStateNoticeAction: {
-    alignSelf: 'stretch',
+  contentDivider: {
+    height: StyleSheet.hairlineWidth,
+    marginHorizontal: 16,
   },
   smartRailSection: {
     marginTop: 0,
