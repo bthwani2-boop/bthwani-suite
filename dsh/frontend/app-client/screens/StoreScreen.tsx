@@ -1431,30 +1431,37 @@ function DshStoreGetScreenContent({
                         <View style={styles.heroDeliveryGrid}>
                           {deliveryModes.map((mode) => {
                             const active = selectedMode === mode.id;
+
+                            let title = mode.label;
                             let subtitle = '';
-                            if (mode.id === 'store_delivery') subtitle = 'من أسطول المتجر';
-                            if (mode.id === 'pickup') subtitle = 'جاهز للاستلام';
-                            if (mode.id === 'delivery') subtitle = 'توصيل بثواني';
+
+                            if (mode.id === 'store_delivery') {
+                              title = 'توصيل المتجر';
+                              subtitle = 'من أسطول المتجر';
+                            } else if (mode.id === 'pickup') {
+                              title = 'استلم بنفسك';
+                              subtitle = 'جاهز للاستلام';
+                            } else if (mode.id === 'delivery') {
+                              title = 'توصيل بثواني';
+                              subtitle = 'أسرع توصيل';
+                            }
 
                             return (
                               <TouchableOpacity
                                 key={mode.id}
                                 style={[
                                   styles.heroDeliveryChip,
-                                  {
-                                    backgroundColor: active ? appearanceChrome.activeActionBackground : appearanceChrome.actionBackground,
-                                    borderColor: active ? appearanceChrome.activeActionBorder : appearanceChrome.actionBorder,
-                                  },
                                   active && styles.heroDeliveryChipActive,
+                                  { backgroundColor: active ? ORANGE : 'rgba(0, 0, 0, 0.55)', borderColor: active ? ORANGE : 'rgba(255, 255, 255, 0.2)' }
                                 ]}
                                 onPress={() => setSelectedMode(mode.id)}
                                 activeOpacity={0.8}
                               >
                                 <View style={styles.heroDeliveryChipTextContent}>
                                   <Text style={[styles.heroDeliveryChipTitle, { color: active ? appearanceChrome.activeActionIcon : appearanceChrome.primaryText }, active && styles.heroDeliveryChipTitleActive]} numberOfLines={1}>
-                                    {mode.label.replace('توصيل ', '').replace('استلم بنفسك', 'استلام')}
+                                    {title}
                                   </Text>
-                                  <Text style={[styles.heroDeliveryChipSubtitle, { color: active ? appearanceChrome.activeActionIcon : appearanceChrome.labelText }]} numberOfLines={1}>{subtitle.replace('من أسطول المتجر', 'المتجر').replace('جاهز للاستلام', 'استلام').replace('توصيل بثواني', 'بثواني')}</Text>
+                                  <Text style={[styles.heroDeliveryChipSubtitle, { color: active ? appearanceChrome.activeActionIcon : appearanceChrome.labelText }]} numberOfLines={1}>{subtitle}</Text>
                                 </View>
                                   <Icon name={mode.icon} size={18} color={active ? appearanceChrome.activeActionIcon : appearanceChrome.actionIcon} />
                                 </TouchableOpacity>
