@@ -132,7 +132,7 @@ export type {
 } from './providers';
 export {
 	MobileRoot,
-} from './mobile';
+} from './mobile.tsx';
 export type {
 	MobileRootProps,
 } from './mobile';
@@ -225,7 +225,6 @@ export {
 	AppErrorState,
 	AppLoadingState,
 	AppSuccessState,
-	CartSummary,
 	AttachmentPicker,
 	Avatar,
 	Banner,
@@ -308,7 +307,6 @@ export type {
 	AppErrorStateProps,
 	AppLoadingStateProps,
 	AppSuccessStateProps,
-	CartSummaryProps,
 	AttachmentPickerItem,
 	AttachmentPickerProps,
 	AttachmentPickerTone,
