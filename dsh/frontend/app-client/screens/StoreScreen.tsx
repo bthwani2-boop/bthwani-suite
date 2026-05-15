@@ -547,6 +547,11 @@ function DshStoreGetScreenContent({
     strongSurface: isDarkGlass ? tokens.glassSurfaceStrong : tokens.colors.surfacePrimary,
     subtleSurface: isDarkGlass ? tokens.glassSurface : tokens.colors.surfaceRaised,
     heroOverlay: tokens.components.overlays.heroOverlay,
+    identityGlassBackground: isDarkGlass ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.75)',
+    actionBackgroundGlass: isDarkGlass ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255, 255, 255, 0.9)',
+    actionBorderGlass: isDarkGlass ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.12)',
+    identityDockBackground: isDarkGlass ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.88)',
+    identityDockBorder: isDarkGlass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.3)',
   }), [isDarkGlass, theme, tokens]);
 
   const handleToggleFavorite = React.useCallback((id: string) => {
@@ -1378,91 +1383,39 @@ function DshStoreGetScreenContent({
                       )}
                       <GlassHeroOverlay strength={isDarkGlass ? 'strong' : 'default'} style={[styles.heroCoverOverlay, { backgroundColor: appearanceChrome.heroOverlay }]} />
 
-                      {/* Top Overlay Actions */}
                       <View style={styles.heroTopActions}>
                         <View style={styles.heroTopActionsLeft}>
-                          <TouchableOpacity style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackground, borderColor: appearanceChrome.actionBorder, borderWidth: 1 }]} activeOpacity={0.7} onPress={handleStoreShare}>
-                            <Icon name="share-outline" size={20} color={appearanceChrome.actionIcon} />
+                          <TouchableOpacity
+                            style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
+                            activeOpacity={0.7}
+                            onPress={handleStoreShare}
+                          >
+                            <Icon name="share-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
                           </TouchableOpacity>
-                          <TouchableOpacity style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackground, borderColor: appearanceChrome.actionBorder, borderWidth: 1 }]} activeOpacity={0.7} onPress={onOpenCart ?? onOpenItems}>
-                            <Icon name="cart-outline" size={20} color={appearanceChrome.actionIcon} />
+                          <TouchableOpacity
+                            style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
+                            activeOpacity={0.7}
+                            onPress={onOpenCart ?? onOpenItems}
+                          >
+                            <Icon name="cart-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
                           </TouchableOpacity>
-                          <TouchableOpacity style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackground, borderColor: appearanceChrome.actionBorder, borderWidth: 1 }]} activeOpacity={0.7} onPress={openInlineSearch}>
-                            <Icon name="search-outline" size={20} color={appearanceChrome.actionIcon} />
+                          <TouchableOpacity
+                            style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
+                            activeOpacity={0.7}
+                            onPress={openInlineSearch}
+                          >
+                            <Icon name="search-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
                           </TouchableOpacity>
                         </View>
                         <View style={styles.heroTopActionsRight}>
-                          <TouchableOpacity style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackground, borderColor: appearanceChrome.actionBorder, borderWidth: 1 }]} activeOpacity={0.7}>
-                            <Icon name="expand-outline" size={20} color={appearanceChrome.actionIcon} />
+                          <TouchableOpacity
+                            style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
+                            activeOpacity={0.7}
+                          >
+                            <Icon name="expand-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
                           </TouchableOpacity>
                         </View>
                       </View>
-
-                      {/* Identity Section (Logo + Info) */}
-                      {/* Identity Section (Logo + Info) */}
-                      <Animated.View
-                        style={[
-                          styles.heroIdentitySection,
-                          {
-                            opacity: scrollY.interpolate({
-                              inputRange: [0, 200],
-                              outputRange: [1, 0],
-                              extrapolate: 'clamp',
-                            }),
-                            transform: [
-                              {
-                                translateY: scrollY.interpolate({
-                                  inputRange: [0, 200],
-                                  outputRange: [0, -40],
-                                  extrapolate: 'clamp',
-                                }),
-                              }
-                            ]
-                          }
-                        ]}
-                      >
-                        <View
-                          style={[
-                            styles.heroLogoWrap,
-                            {
-                              backgroundColor: stylesTokens.white,
-                              borderColor: ORANGE,
-                            },
-                          ]}
-                        >
-                          <Image
-                            source={storeLogoImageSource || resolveDshImageSource('dsh.brand.logo.v1')}
-                            style={styles.heroLogoImage}
-                          />
-                        </View>
-                        <View style={styles.heroInfoCluster}>
-                          <Text style={styles.heroNameText} numberOfLines={1}>{normalizedStoreName}</Text>
-                          <View style={styles.heroLocationRow}>
-                            <Icon name="location-sharp" size={14} color={ORANGE} />
-                            <Text style={styles.heroLocationText} numberOfLines={1}>{store.locationLabel || 'حي العليا · الرياض'}</Text>
-                          </View>
-
-                          {/* Store Status Badge (Open/Closed) */}
-                          <View style={[
-                            styles.heroStatusBadge,
-                            {
-                              backgroundColor: operationalState === 'store_open' ? 'rgba(0, 200, 83, 0.15)' : 'rgba(255, 59, 48, 0.15)',
-                              borderColor: operationalState === 'store_open' ? 'rgba(0, 200, 83, 0.3)' : 'rgba(255, 59, 48, 0.3)',
-                            }
-                          ]}>
-                            <View style={[
-                              styles.heroStatusDot,
-                              { backgroundColor: operationalState === 'store_open' ? appearanceChrome.statusDot : appearanceChrome.statusDotClosed }
-                            ]} />
-                            <Text style={[
-                              styles.heroStatusText,
-                              { color: operationalState === 'store_open' ? '#00C853' : '#FF3B30' }
-                            ]}>
-                              {operationalState === 'store_open' ? 'مفتوح الآن' : 'مغلق الآن'}
-                            </Text>
-                          </View>
-                        </View>
-                      </Animated.View>
 
                       {/* Sticky Header Overlay */}
                       <Animated.View
@@ -1484,79 +1437,130 @@ function DshStoreGetScreenContent({
                         </Text>
                       </Animated.View>
 
+
                       <View style={styles.heroGridsLayer}>
-                        {/* ROW 1: Metrics & Badges (High Density 2026 Grid) */}
-                        <View style={styles.heroFeatureGrid}>
-                          {/* Rating */}
-                          <View style={styles.heroFeatureChip}>
-                            <Icon name="star" size={12} color={GOLD} />
-                            <Text style={styles.heroFeatureValue}>{store.rating?.toFixed(1) || '5.0'}</Text>
+                        {/* Luxury Glass Store Card (Unified Identity, Stats & Delivery) */}
+                        <Animated.View
+                          style={[
+                            styles.heroLuxuryCard,
+                            {
+                              backgroundColor: appearanceChrome.identityDockBackground,
+                              borderColor: appearanceChrome.identityDockBorder,
+                              opacity: scrollY.interpolate({
+                                inputRange: [0, 180],
+                                outputRange: [1, 0],
+                                extrapolate: 'clamp',
+                              }),
+                              transform: [
+                                {
+                                  translateY: scrollY.interpolate({
+                                    inputRange: [0, 180],
+                                    outputRange: [0, 30],
+                                    extrapolate: 'clamp',
+                                  }),
+                                }
+                              ]
+                            }
+                          ]}
+                        >
+                          {/* ROW 1: Identity Cluster */}
+                          <View style={styles.heroLuxuryIdentityRow}>
+                            <View style={styles.heroLuxuryInfo}>
+                              <Text style={[styles.heroNameText, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{normalizedStoreName}</Text>
+                              <View style={styles.heroLocationRow}>
+                                <Icon name="location-sharp" size={14} color={ORANGE} />
+                                <Text style={[styles.heroLocationText, { color: appearanceChrome.secondaryText }]} numberOfLines={1}>{store.locationLabel || 'حي العليا · الرياض'}</Text>
+                              </View>
+
+                              <View style={[
+                                styles.heroStatusBadge,
+                                {
+                                  backgroundColor: operationalState === 'store_open' ? 'rgba(0, 200, 83, 0.12)' : 'rgba(255, 59, 48, 0.12)',
+                                  borderColor: operationalState === 'store_open' ? 'rgba(0, 200, 83, 0.25)' : 'rgba(255, 59, 48, 0.25)',
+                                }
+                              ]}>
+                                <View style={[styles.heroStatusDot, { backgroundColor: operationalState === 'store_open' ? '#00C853' : '#FF3B30' }]} />
+                                <Text style={[styles.heroStatusText, { color: operationalState === 'store_open' ? '#00C853' : '#FF3B30' }]}>
+                                  {operationalState === 'store_open' ? 'مفتوح الآن' : 'مغلق الآن'}
+                                </Text>
+                              </View>
+                            </View>
+
+                            <View
+                              style={[
+                                styles.heroLogoWrap,
+                                {
+                                  backgroundColor: stylesTokens.white,
+                                  borderColor: isDarkGlass ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                                },
+                              ]}
+                            >
+                              <Image
+                                source={storeLogoImageSource || resolveDshImageSource('dsh.brand.logo.v1')}
+                                style={styles.heroLogoImage}
+                              />
+                            </View>
                           </View>
 
-                          {/* Time */}
-                          <View style={styles.heroFeatureChip}>
-                            <Icon name="time-outline" size={12} color="#FFF" />
-                            <Text style={styles.heroFeatureValue}>{store.deliveryTimeLabel || normalizedEtaLabel}</Text>
+                          {/* ROW 2: Metrics Chips */}
+                          <View style={styles.heroLuxuryMetricsRow}>
+                            {/* Pro Badge */}
+                            {store.hasBthwaniPro && (
+                              <View style={[styles.heroFeatureChip, styles.heroBadgePro]}>
+                                <Text style={styles.heroBadgeText}>برو</Text>
+                              </View>
+                            )}
+
+                            {/* Distance */}
+                            <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)' }]}>
+                              <Icon name="navigate-outline" size={12} color={appearanceChrome.secondaryText} />
+                              <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.distanceLabel || '2.1 كم'}</Text>
+                            </View>
+
+                            {/* Time */}
+                            <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)' }]}>
+                              <Icon name="time-outline" size={12} color={appearanceChrome.secondaryText} />
+                              <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.deliveryTimeLabel || normalizedEtaLabel}</Text>
+                            </View>
+
+                            {/* Rating */}
+                            <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)' }]}>
+                              <Icon name="star" size={12} color={GOLD} />
+                              <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.rating?.toFixed(1) || '5.0'}</Text>
+                            </View>
                           </View>
 
-                          {/* Distance */}
-                          <View style={styles.heroFeatureChip}>
-                            <Icon name="navigate-outline" size={12} color="#FFF" />
-                            <Text style={styles.heroFeatureValue}>{store.distanceLabel || '2.1 كم'}</Text>
+                          {/* ROW 3: Delivery Options (Segmented) */}
+                          <View style={[styles.heroLuxuryDeliveryRow, { backgroundColor: isDarkGlass ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.04)' }]}>
+                            {deliveryModes.map((mode) => {
+                              const active = selectedMode === mode.id;
+                              let title = mode.label;
+
+                              if (mode.id === 'store_delivery') title = 'توصيل المتجر';
+                              else if (mode.id === 'pickup') title = 'استلم بنفسك';
+                              else if (mode.id === 'delivery') title = 'توصيل بثواني';
+
+                              return (
+                                <TouchableOpacity
+                                  key={mode.id}
+                                  style={[
+                                    styles.heroLuxuryDeliveryChip,
+                                    active && { backgroundColor: isDarkGlass ? 'rgba(255, 255, 255, 0.15)' : stylesTokens.white }
+                                  ]}
+                                  onPress={() => setSelectedMode(mode.id)}
+                                  activeOpacity={0.8}
+                                >
+                                  <View style={styles.heroLuxuryDeliveryContent}>
+                                    <Text style={[styles.heroLuxuryDeliveryTitle, { color: active ? ORANGE : appearanceChrome.secondaryText }]} numberOfLines={1}>
+                                      {title}
+                                    </Text>
+                                    <Icon name={mode.icon} size={14} color={active ? ORANGE : appearanceChrome.secondaryText} />
+                                  </View>
+                                </TouchableOpacity>
+                              );
+                            })}
                           </View>
-
-                          {/* Pro Badge */}
-                          {store.hasBthwaniPro && (
-                            <View style={[styles.heroFeatureChip, styles.heroBadgePro]}>
-                              <Text style={styles.heroBadgeText}>برو</Text>
-                            </View>
-                          )}
-
-                          {/* Free Badge / Offer */}
-                          {(store.hasOffer || store.offerLabel) && (
-                            <View style={[styles.heroFeatureChip, styles.heroBadgeFree]}>
-                              <Text style={styles.heroBadgeText}>{store.offerLabel || 'مجاني'}</Text>
-                            </View>
-                          )}
-
-                          {/* Multiplier / 2x Points */}
-                          {(store.multiplierLabel) && (
-                            <View style={[styles.heroFeatureChip, styles.heroBadgePoints]}>
-                              <Text style={styles.heroBadgeText}>{store.multiplierLabel}</Text>
-                            </View>
-                          )}
-                        </View>
-
-                        {/* ROW 2: Delivery Mode Selectors (RTL Clustered) */}
-                        <View style={styles.heroDeliveryGrid}>
-                          {deliveryModes.map((mode) => {
-                            const active = selectedMode === mode.id;
-                            let title = mode.label;
-
-                            if (mode.id === 'store_delivery') title = 'توصيل المتجر';
-                            else if (mode.id === 'pickup') title = 'استلم بنفسك';
-                            else if (mode.id === 'delivery') title = 'توصيل بثواني';
-
-                            return (
-                              <TouchableOpacity
-                                key={mode.id}
-                                style={[
-                                  styles.heroDeliveryChip,
-                                  active ? styles.heroDeliveryChipActive : styles.heroDeliveryChipInactive
-                                ]}
-                                onPress={() => setSelectedMode(mode.id)}
-                                activeOpacity={0.8}
-                              >
-                                <View style={styles.heroDeliveryContent}>
-                                  <Text style={[styles.heroDeliveryTitle, { color: active ? ORANGE : '#FFF' }]} numberOfLines={1}>
-                                    {title}
-                                  </Text>
-                                  <Icon name={mode.icon} size={15} color={active ? ORANGE : 'rgba(255, 255, 255, 0.7)'} />
-                                </View>
-                              </TouchableOpacity>
-                            );
-                          })}
-                        </View>
+                        </Animated.View>
                       </View>
                     </View>
                   </View>
@@ -1567,20 +1571,27 @@ function DshStoreGetScreenContent({
                         styles.storeStateNotice,
                         operationalState === 'area_unserviceable' ? styles.storeStateNoticeDanger : styles.storeStateNoticeWarning,
                         { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.cardBorder },
-                        { marginHorizontal: 16, marginTop: 16, marginBottom: 8 }
+                        { marginHorizontal: 16, marginTop: 12, marginBottom: 8 }
                       ]}
                     >
+                      <View style={styles.storeStateNoticeIconWrap}>
+                        <Icon
+                          name={operationalState === 'area_unserviceable' ? 'alert-circle' : 'warning'}
+                          size={24}
+                          color={operationalState === 'area_unserviceable' ? '#FF3B30' : '#FF9500'}
+                        />
+                      </View>
                       <View style={styles.storeStateNoticeCopy}>
                         <Text style={[styles.storeStateNoticeTitle, { color: appearanceChrome.primaryText }, isRTL && styles.textAlignRight]}>{operationalStateMeta.title}</Text>
                         <Text style={[styles.storeStateNoticeDescription, { color: appearanceChrome.secondaryText }, isRTL && styles.textAlignRight]}>
                           {operationalStateMeta.description}
                         </Text>
                       </View>
-                      {onSupport ? (
-                        <View style={styles.storeStateNoticeAction}>
-                          <Button label={supportActionLabel} tone={isDarkGlass ? 'glass' : 'secondary'} onPress={onSupport} />
-                        </View>
-                      ) : null}
+                      {onSupport && (
+                        <TouchableOpacity style={styles.storeStateNoticeAction} onPress={onSupport}>
+                           <Text style={[styles.storeStateNoticeActionText, { color: ORANGE }]}>{supportActionLabel}</Text>
+                        </TouchableOpacity>
+                      )}
                     </View>
                   ) : null}
 
@@ -1597,6 +1608,10 @@ function DshStoreGetScreenContent({
                         style={[styles.smartRailSection, { marginHorizontal: 12 }]}
                       />
                     ) : null}
+
+                   <View style={[styles.sectionHeader, { paddingHorizontal: 16, marginTop: 24, marginBottom: 12 }]}>
+                     <Text style={[styles.sectionTitle, { color: appearanceChrome.primaryText }]}>قائمة الأصناف</Text>
+                   </View>
 
                   <View style={styles.sectionBlock}>
                     <ScrollView
@@ -1664,11 +1679,7 @@ function DshStoreGetScreenContent({
               showsVerticalScrollIndicator={false}
               snapToInterval={SNAP_INTERVAL}
               decelerationRate="fast"
-              onScroll={(event) => {
-                scrollY.setValue(event.nativeEvent.contentOffset.y);
-              }}
-              scrollEventThrottle={16}
-              contentContainerStyle={{ paddingBottom: 28 }}
+              contentContainerStyle={{ paddingBottom: 60 }}
               ListEmptyComponent={
                 <View style={styles.emptyFeed}>
                   <Text style={styles.emptyFeedEmoji}>{headerSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
@@ -2268,35 +2279,90 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: 1.5,
+  },
+  stickyHeaderContent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: Platform.OS === 'ios' ? 100 : 70,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    zIndex: 100,
+  },
+  stickyHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '900',
+    fontFamily: 'Outfit-Bold',
+  },
+  heroLuxuryCard: {
+    padding: 16,
+    borderRadius: 32,
+    borderWidth: 1.5,
+    gap: 16,
+    marginBottom: 8,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOpacity: 0.12,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.1,
+        shadowRadius: 20,
+        shadowOffset: { width: 0, height: 12 },
       },
       android: {
-        elevation: 3,
+        elevation: 6,
       },
     }),
   },
-  heroIdentitySection: {
-    position: 'absolute',
-    top: 110,
-    right: 20,
-    left: 20,
+  heroLuxuryIdentityRow: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: 16,
-    zIndex: 50,
+    gap: 12,
+  },
+  heroLuxuryInfo: {
+    flex: 1,
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  heroLuxuryMetricsRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  heroLuxuryDeliveryRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    padding: 4,
+    borderRadius: 16,
+    gap: 4,
+  },
+  heroLuxuryDeliveryChip: {
+    flex: 1,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  heroLuxuryDeliveryContent: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 6,
+  },
+  heroLuxuryDeliveryTitle: {
+    fontSize: 11,
+    fontWeight: '800',
+    fontFamily: 'Outfit-Bold',
   },
   heroLogoWrap: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
+    width: 68,
+    height: 68,
+    borderRadius: 20,
     backgroundColor: stylesTokens.white,
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: ORANGE,
     justifyContent: 'center',
     alignItems: 'center',
@@ -2304,12 +2370,12 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOpacity: 0.25,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
       },
       android: {
-        elevation: 10,
+        elevation: 6,
       },
     }),
   },
@@ -2321,18 +2387,16 @@ const styles = StyleSheet.create({
   heroInfoCluster: {
     flex: 1,
     alignItems: 'flex-end',
-    gap: 4,
+    gap: 2,
+    paddingRight: 4,
   },
   heroNameText: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: '900',
-    color: stylesTokens.white,
     fontFamily: 'Outfit-Bold',
     textAlign: 'right',
-    lineHeight: 34,
-    textShadowColor: 'rgba(0, 0, 0, 0.4)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
+    lineHeight: 28,
+    letterSpacing: -0.4,
   },
   heroLocationRow: {
     flexDirection: 'row-reverse',
@@ -2383,14 +2447,14 @@ const styles = StyleSheet.create({
   heroFeatureChip: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    borderWidth: 0.5,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    gap: 4,
-    minHeight: 28,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    gap: 6,
+    minHeight: 32,
   },
   heroFeatureValue: {
     fontSize: 12,
@@ -2421,21 +2485,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
+  sectionHeader: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    fontFamily: 'Outfit-Bold',
+  },
   heroDeliveryChip: {
     flex: 1,
-    height: 48,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
     overflow: 'hidden',
   },
   heroDeliveryChipActive: {
-    backgroundColor: 'rgba(255, 80, 13, 0.2)',
+    backgroundColor: 'rgba(255, 80, 13, 0.25)',
     borderColor: ORANGE,
   },
   heroDeliveryChipInactive: {
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   heroDeliveryContent: {
     flex: 1,
@@ -2622,29 +2697,52 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   storeStateNotice: {
-    borderRadius: 18,
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    gap: 10,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 24,
+    borderWidth: 1.5,
+    gap: 14,
+    marginTop: 4,
   },
   storeStateNoticeWarning: {
-    backgroundColor: stylesTokens.orangeSoft,
-    borderColor: colorPalette.borderSubtle,
+    backgroundColor: 'rgba(255, 149, 0, 0.12)',
+    borderColor: 'rgba(255, 149, 0, 0.25)',
   },
   storeStateNoticeDanger: {
-    backgroundColor: stylesTokens.orangeSoft,
-    borderColor: stylesTokens.warning,
+    backgroundColor: 'rgba(255, 59, 48, 0.12)',
+    borderColor: 'rgba(255, 59, 48, 0.25)',
+  },
+  storeStateNoticeIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   storeStateNoticeCopy: {
-    gap: 4,
+    flex: 1,
+    gap: 2,
     alignItems: 'flex-end',
   },
   storeStateNoticeTitle: {
-    color: stylesTokens.dark,
+    fontSize: 14,
+    fontWeight: '800',
+    fontFamily: 'Outfit-Bold',
+  },
+  storeStateNoticeDescription: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontFamily: 'Outfit-Regular',
+  },
+  storeStateNoticeAction: {
+    paddingHorizontal: 8,
+  },
+  storeStateNoticeActionText: {
     fontSize: 13,
-    fontWeight: '900',
-    lineHeight: 18,
+    fontWeight: '700',
+    fontFamily: 'Outfit-Bold',
   },
   storeStateNoticeDescription: {
     color: stylesTokens.muted,

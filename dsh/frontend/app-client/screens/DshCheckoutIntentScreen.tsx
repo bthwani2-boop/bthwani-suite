@@ -16,8 +16,9 @@ import {
 } from '@bthwani/ui-kit';
 
 export type DshCheckoutIntentScreenProps = {
-  // ML-006: added 'order-created' confirmation state
+  // ML-006: added 'order-created' confirmation state; ML-009: added payment-failed error state
   state?: 'ready' | 'loading' | 'error' | 'disabled' | 'blocked' | 'order-created';
+  paymentErrorMessage?: string;
   onViewOrder?: () => void;
   address?: string;
   subtotal?: string;
@@ -44,6 +45,7 @@ export function DshCheckoutIntentScreen({
     { id: 'card', label: 'بطاقة بنكية', icon: 'card-outline', isSelected: false },
     { id: 'cod', label: 'دفع عند الاستلام', icon: 'cash-outline', isSelected: false },
   ],
+  paymentErrorMessage = 'فشلت عملية الدفع. يُرجى التحقق من طريقة الدفع والمحاولة مرة أخرى.',
   onBack,
   onConfirm,
   onSelectPaymentMethod,
@@ -74,6 +76,21 @@ export function DshCheckoutIntentScreen({
           description="سيتم إعلامك عند قبول المتجر للطلب وبدء التحضير."
           actionLabel="تتبع الطلب"
           onActionPress={onViewOrder}
+        />
+      </Surface>
+    );
+  }
+
+  if (state === 'error') {
+    return (
+      <Surface style={styles.root}>
+        <TopBar title="فشل الدفع" onBack={onBack} />
+        <StateView
+          stateId="error"
+          title="تعذّر إتمام الدفع"
+          description={paymentErrorMessage}
+          actionLabel="إعادة المحاولة"
+          onActionPress={onRetry}
         />
       </Surface>
     );

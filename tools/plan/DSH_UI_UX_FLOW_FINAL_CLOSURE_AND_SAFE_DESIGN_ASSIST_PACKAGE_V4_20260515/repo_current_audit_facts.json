@@ -1,0 +1,233 @@
+{
+  "repo_zip": "bthwani-suite-ghb-0142-20260515-053913-verify-ui-kit-stability (1).zip",
+  "branch": "ghb/0142-20260515-053913-verify-ui-kit-stability",
+  "total_files": 1088,
+  "dsh_files": 287,
+  "dsh_frontend_files": 224,
+  "dsh_docs_files": 52,
+  "dsh_docs_closure_files": 28,
+  "dsh_docs_archive_files": 16,
+  "ui-kit_src_files": 36,
+  "wlt_frontend_files": 64,
+  "control-panel_files": 35,
+  "gap_rows": 54,
+  "gap_status_counts": {
+    "SKELETON_ADDED_NEEDS_VISUAL_REVIEW": 31,
+    "NEEDS_SKELETON": 11,
+    "NEEDS_DESIGN": 11,
+    "P2": 1
+  },
+  "gap_priority_counts": {
+    "P0": 13,
+    "P1": 36,
+    "P2": 4,
+    "order completion rates": 1
+  },
+  "invalid_gap_rows": [
+    "ML-039"
+  ],
+  "dsh_frontend_todo_markers": 21,
+  "todo_marker_sample": [
+    {
+      "path": "dsh/frontend/control-panel/finance/CaptainPayoutWorkspace.tsx",
+      "line": 2,
+      "text": "// TODO: implement when WLT exposes captain payout read bridge + CG-029 contract proven"
+    },
+    {
+      "path": "dsh/frontend/control-panel/finance/CommissionBreakdownWorkspace.tsx",
+      "line": 2,
+      "text": "// TODO: implement when WLT exposes commission breakdown read endpoint"
+    },
+    {
+      "path": "dsh/frontend/control-panel/finance/FieldCommissionWorkspace.tsx",
+      "line": 2,
+      "text": "// TODO: implement when WLT exposes field commission read endpoint"
+    },
+    {
+      "path": "dsh/frontend/control-panel/finance/PartnerSettlementWorkspace.tsx",
+      "line": 2,
+      "text": "// TODO: replace with dedicated workspace once WLT exposes settlement read endpoints"
+    },
+    {
+      "path": "dsh/frontend/control-panel/finance/PartnerSettlementWorkspace.tsx",
+      "line": 12,
+      "text": "// TODO: filter settlement rows by partnerId once CG-028 contract is proven"
+    },
+    {
+      "path": "dsh/frontend/control-panel/finance/PlatformFeeAuditWorkspace.tsx",
+      "line": 2,
+      "text": "// TODO: implement when WLT exposes platform fee audit read endpoint"
+    },
+    {
+      "path": "dsh/frontend/control-panel/finance/RefundQueueWorkspace.tsx",
+      "line": 12,
+      "text": "// TODO: surface refund-candidacy flag action once CG-030 (PATCH /dsh/ops/orders/:id/refund-candidacy) proven"
+    },
+    {
+      "path": "dsh/frontend/control-panel/operations/AuditTrailDetailWorkspace.tsx",
+      "line": 2,
+      "text": "// TODO: implement when audit detail API is proven"
+    },
+    {
+      "path": "dsh/frontend/control-panel/partners/PartnerDeactivationWorkspace.tsx",
+      "line": 2,
+      "text": "// TODO: implement when partner management API is proven"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/OpsCaptainMessagingWorkspace.tsx",
+      "line": 2,
+      "text": "// TODO: implement when CG-031 (GET/POST /dsh/ops/messaging/captain/:captainId) is proven"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/OpsClientMessagingWorkspace.tsx",
+      "line": 2,
+      "text": "// TODO: implement when CG-030 (GET/POST /dsh/ops/messaging/client/:clientId) is proven"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/OpsPartnerMessagingWorkspace.tsx",
+      "line": 2,
+      "text": "// TODO: implement when CG-030 (GET/POST /dsh/ops/messaging/partner/:partnerId) is proven"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/SupportEscalationQueueScreen.tsx",
+      "line": 2,
+      "text": "// TODO: implement dedicated escalation queue when CG-032 READ+STREAM proven"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/SupportSlaDashboardScreen.tsx",
+      "line": 2,
+      "text": "// TODO: populate with real SLA metrics once CG-032 READ+STREAM is proven"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/SupportTicketDetailWorkspace.tsx",
+      "line": 2,
+      "text": "// TODO: implement when CG-032 (GET/PATCH /dsh/ops/support/tickets/:ticketId) is ready"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/SupportTicketDetailWorkspace.tsx",
+      "line": 66,
+      "text": "<Text tone=\"muted\">TODO: عرض رسائل التذكرة وسجل التصعيد بعد ربط CG-032</Text>"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/SupportTicketListScreen.tsx",
+      "line": 7,
+      "text": "// TODO: replace with dedicated ticket-list implementation once CG-032 contract is proven"
+    },
+    {
+      "path": "dsh/frontend/app-partner/sheets/AcceptanceTimerSheet.tsx",
+      "line": 2,
+      "text": "// TODO: tie countdown to CG-021 (GET /dsh/partner/orders/:orderId) acceptance_window_seconds field"
+    },
+    {
+      "path": "dsh/frontend/app-field/sections/DocumentVerificationSection.tsx",
+      "line": 2,
+      "text": "// TODO: implement document capture and upload when contract is proven"
+    },
+    {
+      "path": "dsh/frontend/app-client/sheets/CancelOrderSheet.tsx",
+      "line": 2,
+      "text": "// TODO: wire to CG-009 (POST /dsh/orders/:orderId/cancel) once contract is proven"
+    }
+  ],
+  "unreferenced_candidate_skeletons": 17,
+  "unreferenced_candidate_skeletons_sample": [
+    {
+      "path": "dsh/frontend/control-panel/finance/CaptainPayoutWorkspace.tsx",
+      "stem": "CaptainPayoutWorkspace"
+    },
+    {
+      "path": "dsh/frontend/control-panel/finance/CommissionBreakdownWorkspace.tsx",
+      "stem": "CommissionBreakdownWorkspace"
+    },
+    {
+      "path": "dsh/frontend/control-panel/finance/FieldCommissionWorkspace.tsx",
+      "stem": "FieldCommissionWorkspace"
+    },
+    {
+      "path": "dsh/frontend/control-panel/finance/PartnerSettlementWorkspace.tsx",
+      "stem": "PartnerSettlementWorkspace"
+    },
+    {
+      "path": "dsh/frontend/control-panel/finance/PlatformFeeAuditWorkspace.tsx",
+      "stem": "PlatformFeeAuditWorkspace"
+    },
+    {
+      "path": "dsh/frontend/control-panel/finance/RefundQueueWorkspace.tsx",
+      "stem": "RefundQueueWorkspace"
+    },
+    {
+      "path": "dsh/frontend/control-panel/partners/PartnerDeactivationWorkspace.tsx",
+      "stem": "PartnerDeactivationWorkspace"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/OpsCaptainMessagingWorkspace.tsx",
+      "stem": "OpsCaptainMessagingWorkspace"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/OpsClientMessagingWorkspace.tsx",
+      "stem": "OpsClientMessagingWorkspace"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/OpsPartnerMessagingWorkspace.tsx",
+      "stem": "OpsPartnerMessagingWorkspace"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/SupportEscalationQueueScreen.tsx",
+      "stem": "SupportEscalationQueueScreen"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/SupportSlaDashboardScreen.tsx",
+      "stem": "SupportSlaDashboardScreen"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/SupportTicketDetailWorkspace.tsx",
+      "stem": "SupportTicketDetailWorkspace"
+    },
+    {
+      "path": "dsh/frontend/control-panel/support/SupportTicketListScreen.tsx",
+      "stem": "SupportTicketListScreen"
+    },
+    {
+      "path": "dsh/frontend/app-partner/sheets/AcceptanceTimerSheet.tsx",
+      "stem": "AcceptanceTimerSheet"
+    },
+    {
+      "path": "dsh/frontend/app-client/sheets/CancelOrderSheet.tsx",
+      "stem": "CancelOrderSheet"
+    },
+    {
+      "path": "dsh/frontend/app-captain/sheets/OfferDeclineSheet.tsx",
+      "stem": "OfferDeclineSheet"
+    }
+  ],
+  "closure_files": [
+    "DSH_ACTOR_JOURNEY_MATRIX.md",
+    "DSH_AGENT_CONTEXT.md",
+    "DSH_CLOSURE_RULES.md",
+    "DSH_CONTRACT_GAP_MAP.csv",
+    "DSH_CONTROL_PANEL_SECTION_MAP.csv",
+    "DSH_DOCS_NOISE_REDUCTION_PLAN.md",
+    "DSH_DO_NOT_TOUCH.md",
+    "DSH_DUPLICATE_DEAD_NOISE_CANDIDATES.csv",
+    "DSH_EXCEPTION_AND_SETTLEMENT_MATRIX.csv",
+    "DSH_EXISTING_COVERAGE_INVENTORY.csv",
+    "DSH_LOOP_0_EVIDENCE.md",
+    "DSH_LOOP_1_EVIDENCE.md",
+    "DSH_LOOP_2_EVIDENCE.md",
+    "DSH_LOOP_3_EVIDENCE.md",
+    "DSH_LOOP_4_EVIDENCE.md",
+    "DSH_LOOP_5_EVIDENCE.md",
+    "DSH_MISSING_LOGIC_AND_UI_GAPS.csv",
+    "DSH_MOBILE_APPS_SURFACE_MAP.csv",
+    "DSH_NEXT_APPLY_PLAN.md",
+    "DSH_NEXT_LOOP_PLAN.md",
+    "DSH_ORDER_LIFECYCLE_COVERAGE_MATRIX.csv",
+    "DSH_ORGANIZATION_CHANGELOG.md",
+    "DSH_ROUTE_STATE_CTA_MATRIX.csv",
+    "DSH_SCREEN_API_MATRIX.csv",
+    "DSH_SCREEN_INVENTORY.csv",
+    "DSH_SERVICE_FLOW_MODEL.md",
+    "DSH_UI_REVIEW_QUEUE.md",
+    "DSH_VISUAL_REVIEW_READINESS_CHECKLIST.md"
+  ]
+}

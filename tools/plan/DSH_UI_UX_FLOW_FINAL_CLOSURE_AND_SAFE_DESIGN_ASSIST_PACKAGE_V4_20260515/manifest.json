@@ -1,0 +1,23 @@
+{
+  "package": "DSH_UI_UX_FLOW_FINAL_CLOSURE_AND_SAFE_DESIGN_ASSIST_V4",
+  "branch": "ghb/0142-20260515-053913-verify-ui-kit-stability",
+  "generated": "2026-05-15",
+  "target_status": "READY_FOR_HUMAN_FINAL_VISUAL_REVIEW_WITH_EVIDENCE",
+  "files": [
+    "README.md",
+    "commands/00_EXECUTE_FULL_REMAINING_CLOSURE_AND_SAFE_DESIGN.md",
+    "gates/ACCEPTANCE_MATRIX.md",
+    "prompts/00_MASTER_NON_NEGOTIABLES.md",
+    "prompts/10_AUDIT_AND_RECOVER_PREVIOUS_LOOPS.md",
+    "prompts/20_CLOSE_WIRING_GAPS_AND_DEAD_NOISE.md",
+    "prompts/30_FRONTEND_TAXONOMY_REORGANIZATION_PLAN_AND_APPLY.md",
+    "prompts/40_SAFE_PRELIMINARY_DESIGN_BASELINE.md",
+    "prompts/50_FINAL_READY_FOR_HUMAN_REVIEW_GATE.md",
+    "repo_current_audit_facts.json",
+    "scripts/AUDIT_DSH_UI_UX_FLOW_CLOSURE_V4.ps1",
+    "templates/DSH_FINAL_SCREEN_REVIEW_QUEUE.headers.csv",
+    "templates/DSH_FRONTEND_DEAD_NOISE_CLEANUP_MATRIX.headers.csv",
+    "templates/DSH_SAFE_DESIGN_BASELINE_MATRIX.headers.csv",
+    "templates/DSH_SKELETON_WIRING_MATRIX.headers.csv"
+  ]
+}
