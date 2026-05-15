@@ -1,0 +1,37 @@
+{
+  "snapshot_name": "bthwani-suite-ghb-0142-20260515-053913-verify-ui-kit-stability.zip",
+  "branch": "ghb/0142-20260515-053913-verify-ui-kit-stability",
+  "scanned_files": 320,
+  "dsh_files": 240,
+  "dsh_frontend_files": 205,
+  "dsh_docs_files": 24,
+  "screen_candidates": 72,
+  "fixture_preview_files": 32,
+  "by_surface": {
+    "mounting-runtime": 53,
+    "other": 44,
+    "app-captain": 20,
+    "app-client": 46,
+    "app-field": 22,
+    "app-partner": 24,
+    "control-panel": 73,
+    "wlt-bridge": 38
+  },
+  "by_role": {
+    "INDEX_PUBLIC_OR_BARREL": 29,
+    "UNKNOWN": 110,
+    "REAL_SCREEN_CANDIDATE": 72,
+    "DOC": 24,
+    "ROUTE_META_OR_MAP": 23,
+    "BRIDGE_CONTRACT": 16,
+    "FIXTURE_PREVIEW_DATA": 32,
+    "SECTION_OR_PART_CANDIDATE": 13,
+    "WORKSPACE_CANDIDATE": 1
+  },
+  "risk_counts": {
+    "PREVIEW_OR_FIXTURE_WORD": 176,
+    "CONSOLE": 6,
+    "HEX_COLOR": 36,
+    "ANY": 24
+  }
+}
