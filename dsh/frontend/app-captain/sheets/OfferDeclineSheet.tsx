@@ -1,5 +1,5 @@
 // ML-024: Captain offer decline sheet skeleton — reason collection triggers reassignment signal
-// TODO: wire to CG-015 (POST /dsh/captain/offers/:offerId/decline) once contract proven
+// BLOCKED_BY_CONTRACT: wire to CG-015 (POST /dsh/captain/offers/:offerId/decline) once contract proven
 import React from 'react';
 import {
   Box,

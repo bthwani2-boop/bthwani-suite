@@ -1,5 +1,5 @@
 // ML-044: CP platform fee audit workspace skeleton (WLT bridge — view-only)
-// TODO: implement when WLT exposes platform fee audit read endpoint
+// BLOCKED_BY_WLT: implement when WLT exposes platform fee audit read endpoint
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';

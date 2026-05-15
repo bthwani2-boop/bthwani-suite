@@ -1,5 +1,5 @@
 // ML-007: Client order cancellation sheet skeleton
-// TODO: wire to CG-009 (POST /dsh/orders/:orderId/cancel) once contract is proven
+// BLOCKED_BY_CONTRACT: wire to CG-009 (POST /dsh/orders/:orderId/cancel) once contract is proven
 // NOTE: if refund applies, WLT owns the refund flow — DSH only triggers the cancellation
 import React from 'react';
 import {

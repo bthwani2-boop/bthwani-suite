@@ -18,7 +18,8 @@ import {
 } from '@bthwani/ui-kit';
 
 export type DshFieldReadinessEscalationScreenProps = {
-  state?: 'ready' | 'loading' | 'success' | 'error' | 'blocked';
+  // ML-004: added pending-response / approved / rejected states for ops response tracking
+  state?: 'ready' | 'loading' | 'success' | 'error' | 'blocked' | 'pending-response' | 'approved' | 'rejected';
   storeName: string;
   missingRequirements: string[];
   escalationTargets: Array<{ id: string; label: string; isSelected: boolean }>;
@@ -47,6 +48,46 @@ export function DshFieldReadinessEscalationScreen({
   onRetry,
 }: DshFieldReadinessEscalationScreenProps) {
   const [reason, setReason] = React.useState('');
+
+  if (state === 'pending-response') {
+    return (
+      <Surface style={styles.root}>
+        <StateView
+          stateId="loading"
+          title="بانتظار رد الفريق المختص"
+          description="تم إرسال بلاغ عدم الجاهزية. سيتم إعلامك عند صدور القرار."
+        />
+      </Surface>
+    );
+  }
+
+  if (state === 'approved') {
+    return (
+      <Surface style={styles.root}>
+        <StateView
+          stateId="success"
+          title="تمت الموافقة على التصعيد"
+          description="تمت مراجعة العائق من قِبل الفريق المختص والموافقة على معالجته."
+          actionLabel="العودة للمتاجر"
+          onActionPress={onBack}
+        />
+      </Surface>
+    );
+  }
+
+  if (state === 'rejected') {
+    return (
+      <Surface style={styles.root}>
+        <StateView
+          stateId="blocked"
+          title="تم رفض التصعيد"
+          description="لم يتم قبول بلاغ عدم الجاهزية. يُرجى مراجعة المتطلبات وإعادة المحاولة."
+          actionLabel="إعادة التصعيد"
+          onActionPress={onRetry}
+        />
+      </Surface>
+    );
+  }
 
   if (state === 'loading') {
     return <Surface style={styles.root}><StateView stateId="loading" /></Surface>;
@@ -131,9 +172,9 @@ export function DshFieldReadinessEscalationScreen({
       </Surface>
 
       <Box marginTop={spacing[2]} gap={2}>
-        <Button 
-          label="تصعيد العائق الآن" 
-          tone="primary" 
+        <Button
+          label="تصعيد العائق الآن"
+          tone="primary"
           onPress={() => onSubmit(reason)}
           disabled={!reason.trim()}
         />

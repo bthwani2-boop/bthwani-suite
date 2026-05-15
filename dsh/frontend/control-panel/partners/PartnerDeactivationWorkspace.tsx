@@ -1,5 +1,5 @@
 // ML-038: CP partner deactivation workspace skeleton
-// TODO: implement when partner management API is proven
+// BLOCKED_BY_CONTRACT: implement when partner management API is proven
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import {

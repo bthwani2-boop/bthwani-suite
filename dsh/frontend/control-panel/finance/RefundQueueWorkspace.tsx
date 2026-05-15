@@ -9,7 +9,7 @@ export type RefundQueueWorkspaceProps = {
 };
 
 export function RefundQueueWorkspace({ refundCandidacyEnabled: _enabled = false }: RefundQueueWorkspaceProps) {
-  // TODO: surface refund-candidacy flag action once CG-030 (PATCH /dsh/ops/orders/:id/refund-candidacy) proven
+  // BLOCKED_BY_CONTRACT: surface refund-candidacy flag action once CG-030 (PATCH /dsh/ops/orders/:id/refund-candidacy) proven
   // DO NOT add refund initiation or amount logic — WLT owns all money
   return <ControlPanelDshRefundQueueScreen />;
 }

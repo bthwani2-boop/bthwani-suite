@@ -1,0 +1,36 @@
+surface,subdirectory,file_pattern,type,count,status,notes
+app-client,screens/,*.tsx,SCREEN,~18,REGISTERED,All registered in screen registry; StoreScreen + DshCheckoutIntentScreen modified in V4/V6
+app-client,sheets/,*.tsx,SHEET,1,EXPORTED_NOT_MOUNTED,CancelOrderSheet — BLOCKED_BY_CONTRACT (CG-009)
+app-client,sheets/,index.ts,MODULE_INDEX,1,WIRED,Exports CancelOrderSheet
+app-client,parts/,*.tsx,PART,~8,REGISTERED,Reusable view parts; LoyaltyRewardsScreen + SubscriptionsScreen + ApprovedVideoReelsViewer in parts/ pending placement decision (ML-012/013/014)
+app-client,data/,*.ts,DATA,~3,STABLE,Preview data; no contract dependency
+app-client,contracts/,*.ts,CONTRACT,~2,STABLE,Client contract types
+app-client,shared/,*.ts,SHARED,~2,STABLE,Shared utilities
+app-partner,screens/,*.tsx,SCREEN,~8,REGISTERED,All registered; OrdersInboxScreen modified in V6 (captain_assigned/captain_arriving)
+app-partner,sheets/,*.tsx,SHEET,1,EXPORTED_NOT_MOUNTED,AcceptanceTimerSheet — BLOCKED_BY_CONTRACT (CG-021)
+app-partner,sheets/,index.ts,MODULE_INDEX,1,WIRED,Exports AcceptanceTimerSheet
+app-partner,parts/,*.tsx,PART,~5,STABLE,Reusable partner view parts
+app-partner,shared/,*.ts,SHARED,~2,STABLE,Shared utilities
+app-captain,screens/,*.tsx,SCREEN,~12,REGISTERED,DshCaptainMapScreen registered but not integrated into flow (ML-025); DshCaptainOrdersScreen modified in V6
+app-captain,sheets/,*.tsx,SHEET,1,EXPORTED_NOT_MOUNTED,OfferDeclineSheet — BLOCKED_BY_CONTRACT (CG-015)
+app-captain,sheets/,index.ts,MODULE_INDEX,1,WIRED,Exports OfferDeclineSheet
+app-captain,data/,*.ts,DATA,~3,MODIFIED,captain-orders.preview-data.ts modified in V6 (offer-accepting/offer-accepted states)
+app-captain,parts/,*.tsx,PART,~6,STABLE,Captain view parts; god-file risk in DshCaptainSurface.tsx
+app-captain,DshCaptainSurface.tsx,—,GOD_FILE,1,OWNER_DECISION_REQUIRED,7+ screens — split plan in DSH_V6_GOD_FILE_SPLIT_DECISIONS.md
+app-field,screens/,*.tsx,SCREEN,~6,REGISTERED,DshFieldReadinessEscalationScreen modified in V6 (pending-response/approved/rejected)
+app-field,sections/,*.tsx,SECTION,2,EXPORTED,DocumentVerificationSection (ML-002) + VisitEvidenceSection (ML-003) — both exported from sections/index.ts
+app-field,sections/,index.ts,MODULE_INDEX,1,NEW_V6,Created in V6 — exports both section components
+app-field,parts/,*.tsx,PART,~3,STABLE,Field view parts
+app-field,types/,*.ts,TYPE,~2,STABLE,DshFieldStoreVisitTypes etc.
+control-panel,operations/,*.tsx,SCREEN_OR_WORKSPACE,~12,STABLE_PLUS_MODIFIED,AuditTrailDetailWorkspace export added to index.ts in V6 (ML-035 wiring)
+control-panel,operations/,index.ts,MODULE_INDEX,1,MODIFIED_V6,Added AuditTrailDetailWorkspace export
+control-panel,finance/,*.tsx,WORKSPACE,~10,EXPORTED_NOT_MOUNTED,6 WLT bridge workspaces (ML-040..ML-045) BLOCKED_BY_WLT
+control-panel,catalogs/,*.tsx,SCREEN_OR_SECTION,~5,STABLE_PLUS_NEW,ItemApprovalSection + CatalogPublishingGateSection added in V6 (ML-053/054)
+control-panel,catalogs/,index.ts,MODULE_INDEX,1,MODIFIED_V6,Added ML-053/054 exports
+control-panel,partners/,*.tsx,WORKSPACE,~4,STABLE_PLUS_SKELETON,PartnerDeactivationWorkspace BLOCKED_BY_CONTRACT (ML-038)
+control-panel,support/,*.tsx,SCREEN_OR_WORKSPACE,~9,EXPORTED_NOT_MOUNTED,7 support skeletons (ML-046..ML-052) BLOCKED_BY_CONTRACT
+control-panel,marketing/,*.tsx,SCREEN,~4,STABLE,Marketing screens; no V6 changes
+control-panel,dashboard/,*.tsx,SCREEN,~2,STABLE,Dashboard screens; no V6 changes
+control-panel,control/,*.tsx,SCREEN,~3,STABLE,Control screens; no V6 changes
+control-panel,shared/,*.ts,SHARED,~5,STABLE,Shared catalog/workflow utilities
+shared,—,*.ts,SHARED,~8,STABLE,Cross-surface shared types and utilities

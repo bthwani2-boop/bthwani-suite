@@ -552,6 +552,8 @@ function DshStoreGetScreenContent({
     actionBorderGlass: isDarkGlass ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.12)',
     identityDockBackground: isDarkGlass ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.88)',
     identityDockBorder: isDarkGlass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.3)',
+    milkySurfaceWash: isDarkGlass ? 'rgba(28, 28, 30, 0.75)' : 'rgba(255, 255, 255, 0.88)',
+    echoAmbientOpacity: isDarkGlass ? 0.45 : 0.65,
   }), [isDarkGlass, theme, tokens]);
 
   const handleToggleFavorite = React.useCallback((id: string) => {
@@ -3403,8 +3405,30 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   footerNoteWrap: {
-    marginTop: 8,
     paddingHorizontal: 12,
+  },
+  echoBackgroundContainer: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+    zIndex: -1,
+  },
+  heavyEchoImage: {
+    width: '140%',
+    height: '140%',
+    opacity: 0.85,
+    top: -20,
+    left: -20,
+  },
+  echoTransitionGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 120,
+    zIndex: 1,
+  },
+  mainContentContainer: {
+    flex: 1,
   },
 });
 

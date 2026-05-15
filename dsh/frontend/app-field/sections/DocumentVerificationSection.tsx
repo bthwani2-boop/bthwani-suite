@@ -1,5 +1,5 @@
 // ML-002: Field document verification section skeleton — used within DshFieldStoreOnboardingScreen
-// TODO: implement document capture and upload when contract is proven
+// BLOCKED_BY_CONTRACT: implement document capture and upload when upload API contract is proven
 import React from 'react';
 import {
   Box,

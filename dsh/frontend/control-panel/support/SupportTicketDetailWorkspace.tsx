@@ -1,5 +1,5 @@
 // ML-047: CP support ticket detail workspace skeleton
-// TODO: implement when CG-032 (GET/PATCH /dsh/ops/support/tickets/:ticketId) is ready
+// BLOCKED_BY_CONTRACT: implement when CG-032 (GET/PATCH /dsh/ops/support/tickets/:ticketId) is ready
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import {
@@ -63,7 +63,7 @@ export function SupportTicketDetailWorkspace({
         </Box>
         <Box paddingY={2}>
           <Text role="titleSm" tone="muted">محتوى التذكرة</Text>
-          <Text tone="muted">TODO: عرض رسائل التذكرة وسجل التصعيد بعد ربط CG-032</Text>
+          <Text tone="muted">BLOCKED_BY_CONTRACT: عرض رسائل التذكرة وسجل التصعيد بعد ربط CG-032</Text>
         </Box>
         <WebControlPanelActionCluster
           primary={{ id: 'resolve', label: 'حل التذكرة', onAction: onResolve }}

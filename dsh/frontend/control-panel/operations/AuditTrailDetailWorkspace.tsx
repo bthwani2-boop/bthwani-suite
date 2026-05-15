@@ -1,5 +1,5 @@
 // ML-035: CP audit trail detail workspace skeleton — drill-down from AuditSupportSlaScreen
-// TODO: implement when audit detail API is proven
+// BLOCKED_BY_CONTRACT: implement when audit detail API is proven
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import {

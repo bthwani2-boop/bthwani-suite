@@ -1,5 +1,5 @@
 // ML-049: CP support escalation queue screen skeleton
-// TODO: implement dedicated escalation queue when CG-032 READ+STREAM proven
+// BLOCKED_BY_CONTRACT: implement dedicated escalation queue when CG-032 READ+STREAM proven
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import {

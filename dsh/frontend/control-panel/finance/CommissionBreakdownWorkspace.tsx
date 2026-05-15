@@ -1,5 +1,5 @@
 // ML-043: CP commission breakdown workspace skeleton (WLT bridge — view-only)
-// TODO: implement when WLT exposes commission breakdown read endpoint
+// BLOCKED_BY_WLT: implement when WLT exposes commission breakdown read endpoint
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';

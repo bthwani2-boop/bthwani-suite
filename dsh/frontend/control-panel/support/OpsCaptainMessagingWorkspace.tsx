@@ -1,5 +1,5 @@
 // ML-052: Ops↔captain messaging workspace skeleton (same as ML-034)
-// TODO: implement when CG-031 (GET/POST /dsh/ops/messaging/captain/:captainId) is proven
+// BLOCKED_BY_CONTRACT: implement when CG-031 (GET/POST /dsh/ops/messaging/captain/:captainId) is proven
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';

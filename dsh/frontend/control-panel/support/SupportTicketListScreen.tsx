@@ -4,7 +4,7 @@ import React from 'react';
 import { ControlPanelDshSupportQueueScreen } from './closure-workspaces';
 
 export function SupportTicketListScreen() {
-  // TODO: replace with dedicated ticket-list implementation once CG-032 contract is proven
+  // BLOCKED_BY_CONTRACT: replace with dedicated ticket-list implementation once CG-032 contract is proven
   return <ControlPanelDshSupportQueueScreen />;
 }
 

@@ -1,5 +1,5 @@
 // ML-051: Ops↔partner messaging workspace skeleton (same as ML-033)
-// TODO: implement when CG-030 (GET/POST /dsh/ops/messaging/partner/:partnerId) is proven
+// BLOCKED_BY_CONTRACT: implement when CG-030 (GET/POST /dsh/ops/messaging/partner/:partnerId) is proven
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';

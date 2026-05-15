@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import {
   Box,
+  Button,
   Surface,
   Text,
   TopBar,
@@ -16,8 +17,8 @@ import {
 } from '@bthwani/ui-kit';
 
 export type DshCheckoutIntentScreenProps = {
-  // ML-006: added 'order-created' confirmation state; ML-009: added payment-failed error state
-  state?: 'ready' | 'loading' | 'error' | 'disabled' | 'blocked' | 'order-created';
+  // ML-006: order-created; ML-009: payment error; ML-010: blocked+retry; ML-015: quote-loading
+  state?: 'ready' | 'loading' | 'quote-loading' | 'error' | 'disabled' | 'blocked' | 'order-created';
   paymentErrorMessage?: string;
   onViewOrder?: () => void;
   address?: string;
@@ -66,6 +67,16 @@ export function DshCheckoutIntentScreen({
     );
   }
 
+  // ML-015: explicit quote-loading state separate from generic loading
+  if (state === 'quote-loading') {
+    return (
+      <Surface style={styles.root}>
+        <TopBar title="تأكيد الطلب" onBack={onBack} />
+        <StateView stateId="loading" title="جاري حساب تكلفة التوصيل..." description="يُرجى الانتظار بينما نحسب التكلفة والوقت المتوقع." />
+      </Surface>
+    );
+  }
+
   if (state === 'order-created') {
     return (
       <Surface style={styles.root}>
@@ -96,6 +107,7 @@ export function DshCheckoutIntentScreen({
     );
   }
 
+  // ML-010: blocked state exposes onChangeAddress (primary) + onRetry (secondary)
   if (state === 'blocked') {
     return (
       <Surface style={styles.root}>
@@ -107,6 +119,11 @@ export function DshCheckoutIntentScreen({
           actionLabel="تغيير العنوان"
           onActionPress={onChangeAddress}
         />
+        {onRetry && (
+          <Box padding={4}>
+            <Button label="إعادة المحاولة" tone="secondary" onPress={onRetry} />
+          </Box>
+        )}
       </Surface>
     );
   }

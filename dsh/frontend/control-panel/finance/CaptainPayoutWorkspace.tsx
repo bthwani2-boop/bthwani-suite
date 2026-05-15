@@ -1,5 +1,5 @@
 // ML-041: CP captain payout workspace skeleton (WLT bridge — view-only)
-// TODO: implement when WLT exposes captain payout read bridge + CG-029 contract proven
+// BLOCKED_BY_WLT: implement when WLT exposes captain payout read bridge + CG-029 contract proven
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';

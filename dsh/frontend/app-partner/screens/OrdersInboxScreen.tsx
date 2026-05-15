@@ -19,7 +19,8 @@ import { DshPartnerOrderConversationPanel } from '../parts/PartnerOrderConversat
 import type { DshPartnerOrderConversationMode } from '../data/partner-order-conversation.preview-data';
 
 // ML-018: added preparation_started; ML-019: preparing already present — distinguishing start vs in-progress
-type PartnerOrderStatus = 'new' | 'needs_accept' | 'preparation_started' | 'preparing' | 'ready' | 'handoff' | 'delivering' | 'completed' | 'cancelled';
+// ML-021: added captain_assigned / captain_arriving so partner can track handoff event
+type PartnerOrderStatus = 'new' | 'needs_accept' | 'preparation_started' | 'preparing' | 'ready' | 'handoff' | 'captain_assigned' | 'captain_arriving' | 'delivering' | 'completed' | 'cancelled';
 type PartnerOrderPriority = 'high' | 'normal' | 'low';
 type OrderHubAction = 'accept' | 'details' | 'prepare' | 'ready' | 'handoff' | 'issue' | 'delivering';
 type SmartFilterId = 'all' | 'needs_accept' | 'preparing' | 'ready' | 'handoff' | 'delivering' | 'issues' | 'completed';
@@ -214,6 +215,8 @@ function resolveStatusLabel(status: PartnerOrderStatus) {
   if (status === 'preparing') return 'قيد التحضير';
   if (status === 'ready') return 'جاهزة';
   if (status === 'handoff') return 'تسليم للكابتن';
+  if (status === 'captain_assigned') return 'تم تعيين كابتن';
+  if (status === 'captain_arriving') return 'الكابتن في الطريق';
   if (status === 'delivering') return 'في الطريق';
   if (status === 'completed') return 'مكتملة';
   return 'مشكلة';
@@ -223,7 +226,7 @@ function resolveStatusTone(status: PartnerOrderStatus): 'default' | 'brand' | 's
   if (status === 'needs_accept' || status === 'new') return 'warning';
   if (status === 'preparation_started' || status === 'preparing' || status === 'delivering') return 'info';
   if (status === 'ready' || status === 'completed') return 'success';
-  if (status === 'handoff') return 'brand';
+  if (status === 'handoff' || status === 'captain_assigned' || status === 'captain_arriving') return 'brand';
   return 'danger';
 }
 
@@ -243,7 +246,7 @@ function resolveOrderAction(status: PartnerOrderStatus): OrderHubAction {
   if (status === 'new' || status === 'needs_accept') return 'accept';
   if (status === 'preparation_started' || status === 'preparing') return 'prepare';
   if (status === 'ready') return 'ready';
-  if (status === 'handoff') return 'handoff';
+  if (status === 'handoff' || status === 'captain_assigned' || status === 'captain_arriving') return 'handoff';
   if (status === 'delivering') return 'delivering';
   if (status === 'cancelled') return 'issue';
   return 'details';

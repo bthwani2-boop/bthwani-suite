@@ -1,5 +1,5 @@
 // ML-016: Partner acceptance timer/countdown sheet skeleton
-// TODO: tie countdown to CG-021 (GET /dsh/partner/orders/:orderId) acceptance_window_seconds field
+// BLOCKED_BY_CONTRACT: tie countdown to CG-021 (GET /dsh/partner/orders/:orderId) acceptance_window_seconds field
 import React from 'react';
 import {
   Box,

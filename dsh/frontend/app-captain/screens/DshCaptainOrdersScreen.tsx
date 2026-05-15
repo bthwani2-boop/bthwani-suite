@@ -105,6 +105,29 @@ const demoMessages: DshCaptainOrderMessage[] = [
 const demoState: DshCaptainOrdersScreenState = 'ready';
 
 function renderOrdersState(state: DshCaptainOrdersScreenState, onRetry?: () => void) {
+	// ML-027: offer-accepting and offer-accepted confirmation states
+	if (state === 'offer-accepting') {
+		return (
+			<StateView
+				stateId="loading"
+				title="جارٍ قبول العرض..."
+				description="يُرجى الانتظار بينما يتم تسجيل قبول الطلب."
+			/>
+		);
+	}
+
+	if (state === 'offer-accepted') {
+		return (
+			<StateView
+				stateId="success"
+				title="تم قبول الطلب بنجاح"
+				description="سيتم توجيهك إلى تفاصيل الطلب الآن."
+				actionLabel={onRetry ? 'عرض تفاصيل الطلب' : undefined}
+				onActionPress={onRetry}
+			/>
+		);
+	}
+
 	if (state === 'loading') {
 		return (
 			<StateView

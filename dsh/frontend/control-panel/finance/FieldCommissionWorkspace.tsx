@@ -1,5 +1,5 @@
 // ML-045: CP field agent commission workspace skeleton (WLT bridge — view-only)
-// TODO: implement when WLT exposes field commission read endpoint
+// BLOCKED_BY_WLT: implement when WLT exposes field commission read endpoint
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';

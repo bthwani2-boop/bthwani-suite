@@ -1,5 +1,5 @@
 // ML-048: CP support SLA dashboard screen skeleton
-// TODO: populate with real SLA metrics once CG-032 READ+STREAM is proven
+// BLOCKED_BY_CONTRACT: populate with real SLA metrics once CG-032 READ+STREAM is proven
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import { WebControlPanelKpiStrip } from '@bthwani/ui-kit/web';
