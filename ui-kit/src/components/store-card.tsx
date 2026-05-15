@@ -74,42 +74,42 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
       onPress={onPress}
       style={({ pressed }) => [styles.card, { backgroundColor: pc.backgroundColor, borderWidth: 1, borderColor: pc.rimLightColor, opacity: pressed ? 0.92 : 1 }]}
     >
-      {/* Top-Left Status Icon (Absolute) */}
+      {/* Top-Left Status Icon (Absolute Leaf Premium) */}
       <View style={styles.absoluteStatusBadge}>
-        <View style={{ width: 28, height: 28, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ width: 24, height: 24, justifyContent: 'center', alignItems: 'center' }}>
           <Icon
             name={item.isOpen ? 'lock-open' : 'lock-closed'}
-            size={24}
+            size={16}
             color={item.isOpen ? theme.success : theme.danger}
           />
           <View style={{
             position: 'absolute',
-            bottom: 0,
-            right: 0,
+            bottom: -3,
+            right: -3,
             backgroundColor: item.isOpen ? theme.success : theme.danger,
-            borderRadius: 6,
-            width: 12,
-            height: 12,
+            borderRadius: 4.5,
+            width: 9,
+            height: 9,
             alignItems: 'center',
             justifyContent: 'center',
-            borderWidth: 1.5,
+            borderWidth: 1,
             borderColor: theme.surface,
           }}>
-            <Icon name={item.isOpen ? 'checkmark' : 'remove'} size={7} color="#FFF" />
+            <Icon name={item.isOpen ? 'checkmark' : 'remove'} size={5} color="#FFF" />
           </View>
         </View>
       </View>
 
-      {/* Favorite Button (Absolute) */}
+      {/* Bottom-Left Favorite Button (Absolute Leaf Premium) */}
       <Pressable
         onPress={onFavoritePress}
-        hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+        hitSlop={8}
         style={styles.absoluteFavoriteButton}
       >
         <Icon
           name={item.isFavorite ? 'heart' : 'heart-outline'}
-          size={26}
-          color={item.isFavorite ? ORANGE : theme.textMuted}
+          size={16}
+          color={ORANGE}
         />
       </Pressable>
 
@@ -308,21 +308,43 @@ const styles = StyleSheet.create({
   },
   absoluteStatusBadge: {
     position: 'absolute',
-    top: 10,
-    left: 10,
+    top: 0,
+    left: 0,
     zIndex: 30,
-    width: 44,
+    width: 36,
+    height: 36,
+    backgroundColor: '#FFFFFF',
+    borderBottomRightRadius: 24,
+    borderTopLeftRadius: CARD_RADIUS,
+    justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 0.8,
+    borderColor: 'rgba(0,0,0,0.05)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   absoluteFavoriteButton: {
     position: 'absolute',
-    bottom: 12,
-    left: 10, // Aligned with status icon above
+    bottom: 0,
+    left: 0,
     zIndex: 30,
-    width: 44,
-    height: 44,
+    width: 36,
+    height: 36,
+    backgroundColor: '#FFFFFF',
+    borderTopRightRadius: 24,
+    borderBottomLeftRadius: CARD_RADIUS,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 0.8,
+    borderColor: ORANGE,
+    shadowColor: ORANGE,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   textContent: {
     flex: 1,

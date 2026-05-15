@@ -189,6 +189,7 @@ function createProductCardStyles(
       alignItems: 'stretch',
       height: 126,
       overflow: 'hidden',
+      marginBottom: 12,
       ...productColors.shadowSoft,
     },
     cardPressed: {
@@ -283,8 +284,13 @@ function createProductCardStyles(
       justifyContent: 'center',
       alignItems: 'center',
       borderWidth: 0.8,
-      borderColor: productColors.favoriteBorder,
+      borderColor: '#FF500D',
       zIndex: 3,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 4,
+      elevation: 2,
     },
     body: {
       flex: 1,
@@ -530,7 +536,7 @@ export const ProductCard = memo(function ProductCard({
               <Icon
                 name={isFavorited ? 'heart' : 'heart-outline'}
                 size={18}
-                color={isFavorited ? productColors.favoriteActive : '#0A2F5C'}
+                color="#FF500D"
               />
             </Pressable>
           ) : null}
