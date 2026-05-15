@@ -639,7 +639,6 @@ function DshStoreGetScreenContent({
 
   const listRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
   const scrollY = React.useRef(new Animated.Value(0)).current;
-  const transitionAnim = React.useRef(new Animated.Value(1)).current;
   const previewDrag = React.useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const previewScale = React.useRef(new Animated.Value(1)).current;
   const previewRotate = React.useRef(new Animated.Value(0)).current; // degrees-ish proxy
@@ -764,17 +763,11 @@ function DshStoreGetScreenContent({
 
   const changeCategory = React.useCallback((newId: string) => {
     if (newId === selectedCategory) return;
-    Animated.sequence([
-      Animated.timing(transitionAnim, { toValue: 0.8, duration: 100, useNativeDriver: false }),
-    ]).start(() => {
-      setSelectedCategory(newId);
-      // ensure list stays stable or handle smooth transitions only
-      Animated.timing(transitionAnim, { toValue: 1, duration: 200, useNativeDriver: false }).start();
-      // subtle haptic
-      try { Vibration.vibrate(8); } catch { /* noop */ }
-      scrollChipIntoView(newId);
-    });
-  }, [selectedCategory, transitionAnim, scrollChipIntoView]);
+    setSelectedCategory(newId);
+    // subtle haptic
+    try { Vibration.vibrate(8); } catch { /* noop */ }
+    scrollChipIntoView(newId);
+  }, [selectedCategory, scrollChipIntoView]);
 
   const panResponder = React.useMemo(() =>
     PanResponder.create({
@@ -1321,7 +1314,7 @@ function DshStoreGetScreenContent({
       )}
 
         <View style={styles.feedSection}>
-          <Animated.View style={[styles.feedList, { opacity: transitionAnim }]} {...panResponder.panHandlers}>
+          <Animated.View style={styles.feedList} {...panResponder.panHandlers}>
             <Animated.FlatList
               onScroll={Animated.event(
                 [{ nativeEvent: { contentOffset: { y: scrollY } } }],
