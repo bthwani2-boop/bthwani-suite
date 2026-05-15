@@ -124,11 +124,7 @@ const CATEGORY_EMOJI: Record<string, string> = {
 };
 
 const CATEGORY_ICON: Record<string, string> = {
-  all: '📋',
   popular: '🔥',
-  favorites: '❤️',
-  new: '🆕',
-  offers: '💸',
   fresh: '🥦',
   dairy: '🥛',
   bakery: '🥐',
@@ -265,6 +261,61 @@ function resolveStoreOperationalState(statusLabel: string, deliveryLabel?: strin
   }
 
   return 'store_open';
+}
+
+/**
+ * Internal helper for Filter Chips (Synced with HomeScreen design pattern)
+ */
+function FilterChipItem({
+  label,
+  icon,
+  onPress,
+  isActive,
+  isDarkGlass,
+  theme,
+  isRTL,
+}: {
+  label: string;
+  icon?: React.ReactNode;
+  onPress: () => void;
+  isActive: boolean;
+  isDarkGlass?: boolean;
+  theme: any;
+  isRTL: boolean;
+}) {
+  return (
+    <Pressable
+      style={[
+        styles.filterChip,
+        {
+          backgroundColor: isActive
+            ? (isDarkGlass ? 'rgba(255, 255, 255, 0.95)' : colorPalette.brand)
+            : (isDarkGlass ? 'rgba(255, 255, 255, 0.1)' : 'transparent'),
+          borderColor: isActive
+            ? (isDarkGlass ? colorPalette.white : colorPalette.brand)
+            : (isDarkGlass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0,0,0,0.08)'),
+        },
+      ]}
+      onPress={onPress}
+    >
+      <View style={[styles.filterChipContent, isRTL && styles.rowReverse]}>
+        {icon && <View style={styles.filterChipIconWrap}>{icon}</View>}
+        <Text
+          style={[
+            styles.filterChipLabel,
+            {
+              color: isActive
+                ? (isDarkGlass ? colorPalette.brand : colorPalette.white)
+                : (isDarkGlass ? 'rgba(255, 255, 255, 0.8)' : '#717171'),
+            }
+          ]}
+          numberOfLines={1}
+        >
+          {label}
+        </Text>
+      </View>
+    </Pressable>
+  );
 }
 
 function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType | undefined {
@@ -714,12 +765,11 @@ function DshStoreGetScreenContent({
   const changeCategory = React.useCallback((newId: string) => {
     if (newId === selectedCategory) return;
     Animated.sequence([
-      Animated.timing(transitionAnim, { toValue: 0.96, duration: 120, useNativeDriver: false }),
+      Animated.timing(transitionAnim, { toValue: 0.8, duration: 100, useNativeDriver: false }),
     ]).start(() => {
       setSelectedCategory(newId);
-      // ensure list resets to top of new section
-      try { listRef.current?.scrollToOffset({ offset: 0, animated: false }); } catch { /* noop */ }
-      Animated.timing(transitionAnim, { toValue: 1, duration: 260, useNativeDriver: false }).start();
+      // ensure list stays stable or handle smooth transitions only
+      Animated.timing(transitionAnim, { toValue: 1, duration: 200, useNativeDriver: false }).start();
       // subtle haptic
       try { Vibration.vibrate(8); } catch { /* noop */ }
       scrollChipIntoView(newId);
@@ -1271,7 +1321,7 @@ function DshStoreGetScreenContent({
       )}
 
         <View style={styles.feedSection}>
-          <Animated.View style={[styles.feedList, { opacity: transitionAnim, transform: [{ scale: transitionAnim }] }]} {...panResponder.panHandlers}>
+          <Animated.View style={[styles.feedList, { opacity: transitionAnim }]} {...panResponder.panHandlers}>
             <Animated.FlatList
               onScroll={Animated.event(
                 [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -1526,10 +1576,29 @@ function DshStoreGetScreenContent({
                               };
                             }}
                           >
-                            <Chip
-                              label={`${normalizeDisplayText(category.label)} ${CATEGORY_ICON[category.id] ?? '•'}`}
-                              selected={selected}
-                              tone={isDarkGlass ? (selected ? 'glassStrong' : 'glass') : 'brand'}
+                            <FilterChipItem
+                              label={normalizeDisplayText(category.label)}
+                              icon={
+                                CATEGORY_ICON[category.id] ? (
+                                  <Text style={{ fontSize: 14 }}>{CATEGORY_ICON[category.id]}</Text>
+                                ) : (
+                                  <Icon
+                                    name={
+                                      category.id === 'all' ? 'reorder-three-outline' :
+                                      category.id === 'favorites' ? 'heart-outline' :
+                                      category.id === 'new' ? 'sparkles-outline' :
+                                      category.id === 'offers' ? 'pricetag-outline' :
+                                      'grid-outline'
+                                    }
+                                    size={16}
+                                    color={selected ? (isDarkGlass ? colorPalette.brand : colorPalette.white) : (isDarkGlass ? 'rgba(255,255,255,0.7)' : '#717171')}
+                                  />
+                                )
+                              }
+                              isActive={selected}
+                              isDarkGlass={isDarkGlass}
+                              theme={theme}
+                              isRTL={isRTL}
                               onPress={() => changeCategory(category.id)}
                             />
                           </View>
@@ -2202,6 +2271,29 @@ const styles = StyleSheet.create({
   smartRailSection: {
     marginTop: 12,
     marginBottom: -6,
+  },
+  filterChip: {
+    height: 34,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  filterChipContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  filterChipIconWrap: {
+    width: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterChipLabel: {
+    fontSize: 12,
+    fontWeight: '700',
   },
   modePill: {
     flex: 1,
