@@ -14,7 +14,7 @@ import {
   Platform,
   Share,
   StyleSheet,
-  TextInput,
+
   TouchableOpacity,
   View,
   type GestureResponderEvent,
@@ -492,8 +492,6 @@ function DshStoreGetScreenContent({
   const sm = store?.commercialSourceMap;
   const isProBlocked = sm?.['hasBthwaniPro']?.conflictStatus === 'blocker';
   const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictStatus === 'blocker';
-  const isCouponBlocked = sm?.['hasCouponAvailable']?.conflictStatus === 'blocker';
-  const isOfferBlocked = sm?.['offerLabel']?.conflictStatus === 'blocker';
 
   const { tokens } = useBThwaniAppearance();
   const { direction } = useDirection();
@@ -521,42 +519,27 @@ function DshStoreGetScreenContent({
 
   const appearanceChrome = React.useMemo(() => ({
     accent: tokens.colors.accentOrange,
-    actionBackground: isDarkGlass ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.85)',
-    actionBorder: isDarkGlass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.05)',
-    actionIcon: isDarkGlass ? tokens.colors.white : tokens.colors.ink,
     activeActionBackground: tokens.actionSelectedBackground,
     activeActionBorder: tokens.components.commerce.deliverySelectedBorder,
-    activeActionIcon: tokens.components.commerce.deliverySelectedText,
     cardBackground: isDarkGlass ? tokens.colors.surfaceRaised : tokens.colors.surfacePrimary,
     cardBorder: isDarkGlass ? tokens.colors.glassBorder : tokens.colors.borderSubtle,
-    labelText: tokens.colors.textMuted,
     modalBorder: tokens.components.overlays.modalBorder,
     modalSurface: tokens.components.overlays.modalSurface,
     overlay: tokens.components.overlays.modalBackdrop,
     overlaySoft: isDarkGlass ? tokens.colors.overlaySoft : stylesTokens.overlaySoft,
     primaryText: tokens.colors.textPrimary,
-    promoBackground: isDarkGlass ? tokens.promoCardBackground : tokens.promoCardBackground,
     screenBackground: tokens.appBackground,
     secondaryText: tokens.colors.textSecondary,
-    selectionBackground: isDarkGlass ? tokens.components.commerce.deliverySelectedSurface : tokens.chipSelectedBackground,
-    selectionText: isDarkGlass ? tokens.components.commerce.deliverySelectedText : tokens.colors.accentOrange,
-    statusBadgeBackground: isDarkGlass ? tokens.glassSurfaceStrong : tokens.components.badges.success.backgroundColor,
-    statusBadgeBorder: isDarkGlass ? tokens.glassBorder : tokens.components.badges.success.borderColor,
-    statusDot: theme.success,
-    statusDotClosed: theme.danger,
     strongSurface: isDarkGlass ? tokens.glassSurfaceStrong : tokens.colors.surfacePrimary,
     subtleSurface: isDarkGlass ? tokens.glassSurface : tokens.colors.surfaceRaised,
     heroOverlay: tokens.components.overlays.heroOverlay,
-    identityGlassBackground: isDarkGlass ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.75)',
     actionBackgroundGlass: isDarkGlass ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255, 255, 255, 0.9)',
     actionBorderGlass: isDarkGlass ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.12)',
     identityDockBackground: isDarkGlass ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.88)',
     identityDockBorder: isDarkGlass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.3)',
-    milkySurfaceWash: isDarkGlass ? 'rgba(28, 28, 30, 0.75)' : 'rgba(255, 255, 255, 0.88)',
-    echoAmbientOpacity: isDarkGlass ? 0.45 : 0.65,
     echoImageOpacity: isDarkGlass ? 0.62 : 0.72,
     cbWashColor: isDarkGlass ? 'rgba(22,22,28,0.06)' : 'rgba(255,252,247,0.10)',
-  }), [isDarkGlass, theme, tokens]);
+  }), [isDarkGlass, tokens]);
 
   const handleToggleFavorite = React.useCallback((id: string) => {
     setFavoriteIds((prev) => {
@@ -665,19 +648,6 @@ function DshStoreGetScreenContent({
   const previewRotate = React.useRef(new Animated.Value(0)).current; // degrees-ish proxy
   // tighter rotation range for a premium subtle feel
   const previewRotateDeg = previewRotate.interpolate({ inputRange: [-200, 200], outputRange: ['-6deg', '6deg'], extrapolate: 'clamp' });
-
-  const [isFollowing, setIsFollowing] = React.useState(false);
-  const [followerCount, setFollowerCount] = React.useState(11200);
-
-  const toggleFollow = () => {
-    setIsFollowing(!isFollowing);
-    setFollowerCount(prev => isFollowing ? prev - 1 : prev + 1);
-  };
-
-  const formatFollowers = (count: number) => {
-    if (count >= 1000) return `${(count / 1000).toFixed(1)} ألف`;
-    return count.toString();
-  };
 
   // Preview peek (next card) shown while dragging
   const [previewPeekItem, setPreviewPeekItem] = React.useState<DshStoreGetMenuItem | null>(null);
@@ -2010,13 +1980,6 @@ const styles = StyleSheet.create({
     backgroundColor: colorPalette.pageBackground,
     justifyContent: 'center',
   },
-  scroll: {
-    flex: 1,
-    backgroundColor: colorPalette.pageBackground,
-  },
-  scrollContent: {
-    paddingBottom: 16,
-  },
   rowReverse: {
     flexDirection: 'row-reverse',
   },
@@ -2024,121 +1987,6 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
 
-  topChrome: {
-    backgroundColor: stylesTokens.white,
-    paddingTop: 0,
-    paddingHorizontal: 0,
-    paddingBottom: 2,
-  },
-  topChromeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    position: 'relative',
-    zIndex: 4,
-    minHeight: 76,
-    paddingHorizontal: 12,
-    paddingTop: 22,
-    paddingBottom: 4,
-    backgroundColor: stylesTokens.white,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    borderWidth: 1,
-    borderColor: colorPalette.brandSurface,
-    ...Platform.select({
-      ios: {
-        shadowColor: colorPalette.brandStrong,
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 3 },
-      },
-      android: {
-        elevation: 3,
-      },
-    }),
-  },
-  inlineSearchShell: {
-    minHeight: 68,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    backgroundColor: stylesTokens.white,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: colorPalette.brandSoft,
-    ...Platform.select({
-      ios: {
-        shadowColor: colorPalette.brandStrong,
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 3 },
-      },
-      android: {
-        elevation: 3,
-      },
-    }),
-  },
-  inlineSearchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  inlineSearchFieldWrap: {
-    flex: 1,
-    height: 44,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colorPalette.brandSoft,
-    backgroundColor: colorPalette.pageBackground,
-    paddingHorizontal: 12,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 8,
-  },
-  inlineSearchInput: {
-    flex: 1,
-    color: stylesTokens.dark,
-    fontSize: 14,
-    fontWeight: '700',
-    textAlign: 'right',
-    writingDirection: 'rtl',
-    paddingVertical: 0,
-  },
-  inlineSearchCloseButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: colorPalette.pageBackground,
-    borderWidth: 1,
-    borderColor: colorPalette.brandSurface,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  inlineSearchHint: {
-    marginTop: 8,
-    color: stylesTokens.muted,
-    fontSize: 11.5,
-    fontWeight: '600',
-    lineHeight: 16,
-  },
-  headerEdgeSlot: {
-    minWidth: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    zIndex: 6,
-    elevation: 6,
-  },
-  headerEdgeSlotEnd: {
-    justifyContent: 'flex-end',
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    zIndex: 8,
-    marginTop: 0,
-  },
   iconButton: {
     width: 42,
     height: 42,
@@ -2161,99 +2009,6 @@ const styles = StyleSheet.create({
         elevation: 5,
       },
     }),
-  },
-  topChromeSpacer: {
-    flex: 1,
-  },
-  titleBlock: {
-    flex: 1,
-    marginHorizontal: 10,
-    paddingHorizontal: 6,
-    alignItems: 'stretch',
-    justifyContent: 'center',
-    flexShrink: 1,
-    paddingTop: 0,
-  },
-  titleBlockRTL: {
-    alignItems: 'stretch',
-  },
-  storeName: {
-    color: stylesTokens.dark,
-    fontSize: 18,
-    fontWeight: '900',
-    lineHeight: 23,
-    textAlign: 'center',
-    writingDirection: 'rtl',
-  },
-  storeSubtitle: {
-    color: stylesTokens.muted,
-    fontSize: 11,
-    marginTop: 1,
-    lineHeight: 14,
-    textAlign: 'center',
-  },
-  backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colorPalette.brandSoft,
-    borderWidth: 1,
-    borderColor: colorPalette.brand,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 0,
-  },
-  headerMetaRow: {
-    marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap',
-  },
-  topMetaChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 1,
-    backgroundColor: colorPalette.brandSoft,
-    borderRadius: 999,
-    paddingHorizontal: 5,
-    paddingVertical: 0,
-    borderWidth: 1,
-    borderColor: colorPalette.brand,
-    minHeight: 18,
-  },
-  topMetaChipText: {
-    color: stylesTokens.dark,
-    fontSize: 8.5,
-    fontWeight: '700',
-    lineHeight: 10,
-  },
-  followMetaChipTextActive: {
-    color: stylesTokens.orange,
-  },
-  headerMetaText: {
-    color: stylesTokens.muted,
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  statusPill: {
-    backgroundColor: colorPalette.successSoft,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colorPalette.success,
-  },
-  statusPillText: {
-    color: stylesTokens.green,
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  ratingText: {
-    color: stylesTokens.dark,
-    fontSize: 12,
-    fontWeight: '800',
   },
 
   // PREMIUM HERO 2026
@@ -2410,12 +2165,6 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'contain',
   },
-  heroInfoCluster: {
-    flex: 1,
-    alignItems: 'flex-end',
-    gap: 2,
-    paddingRight: 4,
-  },
   heroNameText: {
     fontSize: 22,
     fontWeight: '900',
@@ -2463,13 +2212,6 @@ const styles = StyleSheet.create({
     right: 16,
     gap: 12,
   },
-  heroFeatureGrid: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    gap: 6,
-    flexWrap: 'wrap',
-  },
   heroFeatureChip: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
@@ -2492,24 +2234,11 @@ const styles = StyleSheet.create({
     backgroundColor: DARK_BLUE,
     borderColor: 'transparent',
   },
-  heroBadgeFree: {
-    backgroundColor: 'rgba(0, 200, 83, 0.85)', // Success Green
-    borderColor: 'transparent',
-  },
-  heroBadgePoints: {
-    backgroundColor: 'rgba(66, 153, 225, 0.85)', // Info Blue
-    borderColor: 'transparent',
-  },
   heroBadgeText: {
     fontSize: 11,
     fontWeight: '900',
     color: '#FFF',
     fontFamily: 'Outfit-Bold',
-  },
-  heroDeliveryGrid: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 8,
   },
   sectionHeader: {
     flexDirection: 'row-reverse',
@@ -2519,38 +2248,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '900',
-    fontFamily: 'Outfit-Bold',
-  },
-  heroDeliveryChip: {
-    flex: 1,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
-    overflow: 'hidden',
-  },
-  heroDeliveryChipActive: {
-    backgroundColor: 'rgba(255, 80, 13, 0.25)',
-    borderColor: ORANGE,
-  },
-  heroDeliveryChipInactive: {
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  heroDeliveryContent: {
-    flex: 1,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingHorizontal: 8,
-  },
-  heroDeliveryTitle: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#FFF',
-    textAlign: 'right',
     fontFamily: 'Outfit-Bold',
   },
   stickyHeaderContent: {
@@ -2571,157 +2268,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit-Bold',
   },
 
-  heroDeliveryChipSubtitle: {
-    fontSize: 9.5,
-    color: 'rgba(255, 255, 255, 0.6)',
-    textAlign: 'right',
-    fontWeight: '700',
-    fontFamily: 'Outfit-Medium',
-  },
 
-  heroIdentityRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-  },
-  heroAvatar: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    backgroundColor: stylesTokens.orangeSoft,
-    borderWidth: 1,
-    borderColor: colorPalette.borderSubtle,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  heroAvatarImage: {
-    position: 'absolute',
-    inset: 0,
-    width: '100%',
-    height: '100%',
-  },
-  heroAvatarText: {
-    color: stylesTokens.white,
-    fontSize: 20,
-    fontWeight: '900',
-  },
-  heroIdentityContent: {
-    flex: 1,
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    gap: 2,
-  },
-  heroIdentityContentRTL: {
-    alignItems: 'flex-end',
-  },
-  heroTopRow: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  heroTitleInfo: {
-    flex: 1,
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-  },
-  heroTitleInfoRTL: {
-    alignItems: 'flex-end',
-  },
-  heroInlineName: {
-    color: stylesTokens.dark,
-    fontSize: 15,
-    fontWeight: '900',
-    lineHeight: 18,
-  },
-  heroInlineSubtitle: {
-    marginTop: 0,
-    color: stylesTokens.muted,
-    fontSize: 10.5,
-    lineHeight: 14,
-  },
-  storeHeaderTitle: {
-    color: stylesTokens.dark,
-    fontSize: 17,
-    fontWeight: '900',
-    lineHeight: 20,
-    maxWidth: '100%',
-    flexShrink: 1,
-    minWidth: 0,
-    textAlign: 'center',
-  },
-  heroCompactMetaRow: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 1,
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-  },
-  heroBadgePrimary: {
-    backgroundColor: stylesTokens.infoSurface,
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderWidth: 1,
-    borderColor: stylesTokens.infoBorder,
-  },
-  heroBadgePrimaryText: {
-    color: stylesTokens.infoText,
-    fontSize: 10.5,
-    fontWeight: '800',
-  },
-  heroBadgeGhost: {
-    backgroundColor: stylesTokens.light,
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderWidth: 1,
-    borderColor: stylesTokens.line,
-  },
-  heroBadgeGhostText: {
-    color: stylesTokens.dark,
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  heroTitle: {
-    color: stylesTokens.white,
-    fontSize: 24,
-    fontWeight: '900',
-    lineHeight: 30,
-  },
-  heroSubtitle: {
-    color: stylesTokens.lineStrong,
-    fontSize: 13,
-    marginTop: 4,
-    lineHeight: 18,
-  },
-  heroMetaCaption: {
-    color: stylesTokens.muted,
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  heroStatsRow: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    gap: 8,
-    justifyContent: 'flex-start',
-    alignSelf: 'stretch',
-  },
-  heroStatLabel: {
-    color: stylesTokens.muted,
-    fontSize: 11,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginTop: 3,
-  },
-  deliveryControlCluster: {
-    marginTop: 2,
-    gap: 4,
-  },
   storeStateNotice: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
@@ -2782,53 +2329,6 @@ const styles = StyleSheet.create({
     marginTop: 0,
     marginBottom: -6,
   },
-  subscriptionBlock: {
-    marginTop: 1,
-    alignItems: 'flex-end',
-    alignSelf: 'stretch',
-  },
-  tagRow: {
-    marginTop: 0,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 1,
-    justifyContent: 'flex-end',
-  },
-  tagChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 1,
-    backgroundColor: stylesTokens.brandSoft,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colorPalette.borderSubtle,
-    paddingHorizontal: 5,
-    paddingVertical: 0,
-    minHeight: 18,
-  },
-  tagChipAccent: {
-    backgroundColor: stylesTokens.orangeSoft,
-    borderColor: colorPalette.borderSubtle,
-  },
-  tagChipText: {
-    color: stylesTokens.dark,
-    fontSize: 8.5,
-    fontWeight: '700',
-    lineHeight: 10,
-  },
-  tagChipTextAccent: {
-    color: stylesTokens.warningText,
-  },
-  modeStripWrapInline: {
-    marginTop: 0,
-  },
-  modeStrip: {
-    backgroundColor: colorPalette.surfaceInset,
-    borderRadius: 16,
-    padding: 4,
-    flexDirection: 'row',
-    height: 54,
-  },
   modePill: {
     flex: 1,
     borderRadius: 12,
@@ -2869,37 +2369,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     paddingVertical: 0,
   },
-  categoryPill: {
-    backgroundColor: stylesTokens.white,
-    borderWidth: 1,
-    borderColor: stylesTokens.line,
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  categoryPillSelected: {
-    backgroundColor: stylesTokens.orangeSoft,
-    borderColor: stylesTokens.orange,
-  },
-  categoryPillIcon: {
-    fontSize: 12,
-    color: stylesTokens.chipText,
-    fontWeight: '800',
-  },
-  categoryPillIconSelected: {
-    color: stylesTokens.orange,
-  },
-  categoryPillText: {
-    color: stylesTokens.chipText,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  categoryPillTextSelected: {
-    color: stylesTokens.orange,
-  },
 
   feedSection: {
     flex: 1,
@@ -2909,42 +2378,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  menuCard: {
-    backgroundColor: stylesTokens.white,
-    borderRadius: 18,
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    borderWidth: 1,
-    borderColor: stylesTokens.line,
-    flexDirection: 'row-reverse',
-    alignItems: 'stretch',
-    height: 126,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: stylesTokens.black,
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        shadowOffset: { width: 0, height: 2 },
-      },
-      android: {
-        elevation: 1,
-      },
-    }),
-  },
-  menuCardRTL: {
-    flexDirection: 'row-reverse',
-  },
-  menuActionRail: {
-    width: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 6,
-    paddingLeft: 8,
-  },
-  menuActionRailRTL: {
-    alignItems: 'center',
-  },
   menuActionBadge: {
     width: 36,
     height: 36,
@@ -3055,20 +2488,6 @@ const styles = StyleSheet.create({
     zIndex: 2,
     opacity: 0.18,
   },
-  previewFavoriteButton: {
-    position: 'absolute',
-    bottom: 18,
-    right: 18,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: stylesTokens.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colorPalette.borderSubtle,
-    zIndex: 5,
-  },
   previewDetailsBox: {
     position: 'absolute',
     left: 18,
@@ -3119,14 +2538,6 @@ const styles = StyleSheet.create({
     color: stylesTokens.dark,
     fontSize: 14,
     fontWeight: '900',
-  },
-  previewDetailsCartButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: stylesTokens.orange,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   previewDetailsFavoriteButton: {
     width: 42,
@@ -3213,12 +2624,6 @@ const styles = StyleSheet.create({
     color: stylesTokens.dark,
     fontSize: 15,
     fontWeight: '800',
-    textAlign: 'right',
-  },
-  measureSheetSubtitle: {
-    color: stylesTokens.muted,
-    fontSize: 11,
-    fontWeight: '600',
     textAlign: 'right',
   },
   measureOptionsGrid: {
@@ -3409,28 +2814,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  fullMenuLink: {
-    marginTop: 8,
-    marginHorizontal: 12,
-    alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: stylesTokens.orangeSoft,
-    borderWidth: 1,
-    borderColor: stylesTokens.orangeBorder,
-  },
-  fullMenuLinkText: {
-    color: stylesTokens.orange,
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  footerNoteWrap: {
-    paddingHorizontal: 12,
-  },
   cbContainer: {
     ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
