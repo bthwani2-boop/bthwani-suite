@@ -40,11 +40,11 @@ function ProviderSlot({
     let impact = 'لا يوجد أثر كبير';
 
     if (action === 'تفعيل كمزود افتراضي للمنصة') {
-      newStatus = 'نشط';
+      newStatus = 'نشط (تجريبي)';
       newTone = 'success';
       impact = `تحويل الحركة لتتم عبر المزود: ${currentProvider}`;
     } else if (action === 'إيقاف') {
-      newStatus = 'موقوف';
+      newStatus = 'موقوف (تجريبي)';
       newTone = 'danger';
       impact = `إيقاف المزود والاعتماد على البديل: ${fallbackProvider}`;
     } else if (action === 'اختبار الاتصال') {
@@ -162,8 +162,8 @@ export function DshPlatformProvidersWorkspace() {
             type="الخرائط (Maps)"
             currentProvider="Google Maps"
             fallbackProvider="Mapbox"
-            status="نشط"
-            env="إنتاج (Production)"
+            status="نشط (تجريبي)"
+            env="بيئة تجريبية (Demo)"
             lastTest="قبل ساعة"
             lastActivation="قبل شهر"
             tone="success"
@@ -172,8 +172,8 @@ export function DshPlatformProvidersWorkspace() {
             type="رسائل الجوال (SMS)"
             currentProvider="Twillio"
             fallbackProvider="Unifonic"
-            status="نشط"
-            env="إنتاج (Production)"
+            status="نشط (تجريبي)"
+            env="بيئة تجريبية (Demo)"
             lastTest="قبل 5 دقائق"
             lastActivation="قبل شهر"
             tone="success"
@@ -192,8 +192,8 @@ export function DshPlatformProvidersWorkspace() {
             type="الاستضافة (Hosting)"
             currentProvider="AWS"
             fallbackProvider="GCP"
-            status="نشط"
-            env="إنتاج (Production)"
+            status="نشط (تجريبي)"
+            env="بيئة تجريبية (Demo)"
             lastTest="قبل دقيقة"
             lastActivation="قبل سنة"
             tone="success"
@@ -202,8 +202,8 @@ export function DshPlatformProvidersWorkspace() {
             type="التخزين (Storage)"
             currentProvider="AWS S3"
             fallbackProvider="Cloudflare R2"
-            status="نشط"
-            env="إنتاج (Production)"
+            status="نشط (تجريبي)"
+            env="بيئة تجريبية (Demo)"
             lastTest="قبل 10 دقائق"
             lastActivation="قبل 6 أشهر"
             tone="success"
@@ -222,8 +222,8 @@ export function DshPlatformProvidersWorkspace() {
             type="الإشعارات (Push)"
             currentProvider="Firebase"
             fallbackProvider="OneSignal"
-            status="نشط"
-            env="إنتاج (Production)"
+            status="نشط (تجريبي)"
+            env="بيئة تجريبية (Demo)"
             lastTest="قبل 3 ساعات"
             lastActivation="قبل شهرين"
             tone="success"

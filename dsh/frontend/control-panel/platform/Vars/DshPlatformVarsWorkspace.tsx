@@ -30,8 +30,10 @@ function HumanVarCard({
   const [showAdvanced, setShowAdvanced] = React.useState(false);
   const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
   const [activeValue, setActiveValue] = React.useState(currentValue);
+  const [changeReason, setChangeReason] = React.useState('');
 
   const handleConfirm = (action: string) => {
+    const reason = changeReason.trim() || 'لم يُحدد سبب (محاكاة تجريبية)';
     if (action === 'محاكاة (Simulation)') {
       setActiveValue(proposedValue);
       addAuditEvent({
@@ -40,25 +42,26 @@ function HumanVarCard({
         status: 'success',
         oldValue: activeValue,
         newValue: proposedValue,
-        reason: 'تجربة التغيير محلياً',
+        reason,
         scope,
         impact,
         rollbackAvailable: true,
       });
     } else {
       addAuditEvent({
-        action: `طلب إجراء: ${action} - ${humanName}`,
+        action: `طلب إجراء: ${action} — ${humanName}`,
         operator: 'Demo Admin',
         status: 'warning',
         oldValue: activeValue,
         newValue: proposedValue,
-        reason: 'طلب تم حفظه كمسودة تجريبية',
+        reason,
         scope,
         impact,
         rollbackAvailable: true,
       });
     }
     setShowConfirm(null);
+    setChangeReason('');
   };
 
   return (
@@ -118,13 +121,82 @@ function HumanVarCard({
         </Box>
 
         {showConfirm && (
-          <Surface tone="warning" border padding={3} radiusToken="md" style={{ marginTop: 8 }}>
-            <Box gap={2}>
-              <Text role="titleSm">تأكيد الإجراء التجريبي: {showConfirm}</Text>
-              <Text role="bodySm">هل أنت متأكد من تنفيذ الإجراء التجريبي؟ سيتم محاكاة التحديث محلياً وتوثيقه في سجل التدقيق.</Text>
-              <Box layoutDirection="row" gap={2} style={{ marginTop: 8 }}>
+          <Surface tone="warning" border padding={4} radiusToken="xl" style={{ marginTop: 8 }}>
+            <Box gap={3}>
+              <Text role="titleSm">تأكيد الإجراء التجريبي — {showConfirm}</Text>
+
+              <Surface tone="default" border padding={3} radiusToken="md">
+                <Box gap={2}>
+                  <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
+                    <Box gap={1} style={{ flexGrow: 1 }}>
+                      <Text role="caption" tone="muted">الإجراء</Text>
+                      <Text role="bodySm" weight="bold">{showConfirm}</Text>
+                    </Box>
+                    <Box gap={1} style={{ flexGrow: 1 }}>
+                      <Text role="caption" tone="muted">العنصر المتأثر</Text>
+                      <Text role="bodySm" weight="bold">{humanName}</Text>
+                    </Box>
+                  </Box>
+                  <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
+                    <Box gap={1} style={{ flexGrow: 1 }}>
+                      <Text role="caption" tone="muted">قبل التغيير</Text>
+                      <Text role="bodySm">{activeValue}</Text>
+                    </Box>
+                    <Box gap={1} style={{ flexGrow: 1 }}>
+                      <Text role="caption" tone="muted">بعد التغيير</Text>
+                      <Text role="bodySm" tone="brand">{proposedValue}</Text>
+                    </Box>
+                  </Box>
+                  <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
+                    <Box gap={1} style={{ flexGrow: 1 }}>
+                      <Text role="caption" tone="muted">النطاق الجغرافي</Text>
+                      <Text role="bodySm">{scope}</Text>
+                    </Box>
+                    <Box gap={1} style={{ flexGrow: 1 }}>
+                      <Text role="caption" tone="muted">المخاطرة</Text>
+                      <Text role="bodySm">{risk}</Text>
+                    </Box>
+                  </Box>
+                  <Box gap={1}>
+                    <Text role="caption" tone="muted">الأثر المتوقع</Text>
+                    <Text role="bodySm">{impact}</Text>
+                  </Box>
+                  <Box gap={1}>
+                    <Text role="caption" tone="muted">الـ Rollback متاح؟</Text>
+                    <Text role="bodySm">نعم — سيُسجَّل في سجل التدقيق تلقائياً</Text>
+                  </Box>
+                </Box>
+              </Surface>
+
+              <Box gap={1}>
+                <Text role="caption" tone="muted">سبب التغيير (مطلوب للتوثيق)</Text>
+                <textarea
+                  value={changeReason}
+                  onChange={(e) => setChangeReason(e.target.value)}
+                  placeholder="اكتب سبب التغيير هنا — سيُدرج في سجل التدقيق التجريبي..."
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    border: '1px solid var(--color-border, #ccc)',
+                    fontFamily: 'inherit',
+                    fontSize: 14,
+                    resize: 'vertical',
+                    background: 'transparent',
+                    color: 'inherit',
+                    direction: 'rtl',
+                  }}
+                />
+              </Box>
+
+              <Text role="caption" tone="muted">
+                هذا إجراء تجريبي محلي فقط. لن يُطبَّق على المنصة الحقيقية ولن يتصل بأي خادم.
+              </Text>
+
+              <Box layoutDirection="row" gap={2} style={{ marginTop: 4 }}>
                 <Button variant="primary" onClick={() => handleConfirm(showConfirm)}>تأكيد المحاكاة</Button>
-                <Button variant="secondary" onClick={() => setShowConfirm(null)}>إلغاء</Button>
+                <Button variant="secondary" onClick={() => { setShowConfirm(null); setChangeReason(''); }}>إلغاء</Button>
               </Box>
             </Box>
           </Surface>

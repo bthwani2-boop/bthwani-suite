@@ -261,6 +261,14 @@ if (exists(platformDir)) {
       if (!/رصيد|محفظة|ريال|wallet[\s_-]?balance|threshold/i.test(txt)) {
         errors.push(`Captain eligibility mentioned without wallet balance wording (should reference رصيد/محفظة/ريال): ${rel(f)}`);
       }
+      // Star-rating units are prohibited in captain eligibility context
+      if (/نجوم|star-rating|\bستار\b|\d+\.\d+\s*(?:نجم|star)/i.test(txt)) {
+        errors.push(`Star-rating value (نجوم/star-rating) found alongside captain eligibility — must use ريال/رصيد/محفظة only: ${rel(f)}`);
+      }
+    }
+    // minRating field signals star-based eligibility and is prohibited everywhere in platform
+    if (/\bminRating\b|min_rating/i.test(txt)) {
+      errors.push(`Star-rating field (minRating/min_rating) detected in platform — captain eligibility must use wallet balance threshold: ${rel(f)}`);
     }
   }
 }
