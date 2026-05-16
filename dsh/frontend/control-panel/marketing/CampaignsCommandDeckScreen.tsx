@@ -20,7 +20,7 @@ import {
   type CampaignTargetType,
 } from '../../shared/campaign.preview-store';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
-import { CommercialParityPreview } from '../../shared/commercial-parity-preview';
+import { CommercialParityPreview } from './commercial-parity-preview';
 import type { Entitlement } from '../../shared/loyalty.preview-store';
 
 type EditorTab = 'plan' | 'audience' | 'channels' | 'schedule' | 'impact';

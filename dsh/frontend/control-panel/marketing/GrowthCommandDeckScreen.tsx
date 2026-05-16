@@ -9,7 +9,7 @@ import {
   type GrowthRecommendation,
 } from '../../shared/growth.preview-store';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
-import { CommercialParityPreview } from '../../shared/commercial-parity-preview';
+import { CommercialParityPreview } from './commercial-parity-preview';
 import type { PartnerOfferRecord } from '../../shared/partner-offer.preview-store';
 import type { SubscriptionPlan, Entitlement } from '../../shared/loyalty.preview-store';
 import type { CampaignRecord } from '../../shared/campaign.preview-store';

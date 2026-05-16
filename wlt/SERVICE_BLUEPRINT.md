@@ -414,7 +414,7 @@ NOT CLOSED
 | Control-panel finance preview component added | `wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
 | TSC result | pnpm -w exec tsc --noEmit | `PASS` |
 | OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
-| All amounts | integer halalas, no float | `ENFORCED` |
+| All amounts | integer minor units (amountMinorUnits), no float — currency: YER / ريال يمني | `ENFORCED` |
 
 Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
 
@@ -454,6 +454,36 @@ Classification: preview/fixture only. Not runtime truth. Not production-ready. N
 | TSC result | `pnpm -w exec tsc --noEmit` | `PASS` |
 | OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
 | Real finance blocked until | contract / backend / security / audit / idempotency / ledger | `BLOCKED` |
+
+Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
+
+### Phase F5 Evidence Record (2026-05-16)
+
+| Item | File | Status |
+| --- | --- | --- |
+| Currency: ALL `halalas`/`SAR`/`ar-SA`/`ر.س` removed from WLT/DSH finance scope | All files in scope | `CURRENCY_CLEAN` |
+| Renamed `amountHalalas` → `amountMinorUnits` throughout (halalas = Saudi subunit, not YER) | `wlt-dsh-client.adapter`, `useWltDshWalletPreview`, `dshFinancePreview.ts` | `FIXED` |
+| Central `formatYer(minorUnits)` with `ar-YE` locale + safe fallback replacing Saudi formatter | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `FIXED` |
+| `formatWltYer` alias exported for UI use | `wlt/frontend/shared/finance/index.ts` | `FIXED` |
+| Captain eligibility balance section: current balance, minimum, shortfall, recharge CTA | `wlt/frontend/app-captain/dsh/WltDshCaptainFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| COD reframed as ذمة مستحقة (liability) not balance | `wlt/frontend/app-captain/dsh/WltDshCaptainFinancePreview.tsx` | `FIXED` |
+| Captain finance sections: eligibility / cod-liability / earnings / settlement | `wlt/frontend/app-captain/dsh/wlt-dsh-captain.adapter.ts` | `FIXED` |
+| Partner finance: gross sales / platform commission / deductions / net settlement / cycle | `wlt/frontend/app-partner/dsh/wlt-dsh-partner.parts.tsx` | `UI_PREVIEW_FOUNDATION` |
+| Field commissions: approved / pending / rejected with holdReason and payout records | `wlt/frontend/app-field/dsh/WltDshFieldFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| Client payment preview: COD / wallet / mixed / official-wallets with balance states | `wlt/frontend/app-client/dsh/WltDshClientPaymentPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| DSH finance model converted to LEGACY_BRIDGE (re-exports WLT types only, no financial logic) | `dsh/frontend/shared/dshFinancePreviewModel.ts` | `BOUNDARY_FIXED` |
+| DSH control panel: captain-eligibility group added to finance registry and hub | `dsh/frontend/control-panel/finance/finance.registry.ts` | `UI_PREVIEW_FOUNDATION` |
+| DSH control panel: `FINANCE_ACTIVE_GROUPS` excludes tax-compliance (no Yemen policy) | `dsh/frontend/control-panel/finance/finance.registry.ts` | `FIXED` |
+| DSH control panel KPIs: live YER values from `getWltControlPanelFinancePreview()` | `dsh/frontend/control-panel/finance/FinanceHubScreen.tsx` | `FIXED` |
+| WLT control panel: CSS module replacing inline styles (no hardcoded colors) | `wlt/frontend/control-panel/finance/wlt-finance-control-panel.module.css` | `FIXED` |
+| WltCaptainFinanceSnapshot expanded: eligibility balance, minimum, shortfall, block reason | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| WltPartnerFinanceSnapshot expanded: full settlement cycle breakdown | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| WltFieldFinanceSnapshot expanded: pending/rejected records, payout date | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| SERVICE_BLUEPRINT halalas → amountMinorUnits / YER fix | `wlt/SERVICE_BLUEPRINT.md` | `FIXED` |
+| TSC result | `pnpm -w exec tsc --noEmit` | `PASS — EXIT 0` |
+| Currency scan | All WLT/DSH finance files | `CLEAN — 0 SAR/ر.س/ar-SA/halalas` |
+| Evidence session | `tools/registry/runs/DSH_WLT_YEMEN_FINANCE_CLOSURE-20260516-155044/` | `COMPLETE` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
 
 Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
 

@@ -36,8 +36,8 @@ export function useWltDshWalletPreview() {
 		void refresh();
 	}, [refresh]);
 
-	const requestPayment = React.useCallback(async (amountHalalas: number) => {
-		return WltAdapter.requestPayment(amountHalalas);
+	const requestPayment = React.useCallback(async (amountMinorUnits: number) => {
+		return WltAdapter.requestPayment(amountMinorUnits);
 	}, []);
 
 	const getBalance = React.useCallback(async () => {
@@ -50,8 +50,8 @@ export function useWltDshWalletPreview() {
 		return result;
 	}, [refresh]);
 
-	const topUp = React.useCallback(async (amountHalalas: number) => {
-		const result = await WltAdapter.topUp(amountHalalas);
+	const topUp = React.useCallback(async (amountMinorUnits: number) => {
+		const result = await WltAdapter.topUp(amountMinorUnits);
 		await refresh();
 		return result;
 	}, [refresh]);

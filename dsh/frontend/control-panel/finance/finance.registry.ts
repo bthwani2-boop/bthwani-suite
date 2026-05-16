@@ -9,37 +9,48 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
   {
     id: 'overview',
     label: 'النظرة العامة',
-    description: 'نظرة شاملة على التدفقات المالية والسيولة.',
+    description: 'نظرة شاملة على التدفقات المالية والسيولة. العملة: ر.ي',
     badge: 'Core',
     subGroups: [
       { id: 'all', label: 'الكل' },
       { id: 'inflow', label: 'الدخل' },
       { id: 'outflow', label: 'الصرف' },
       { id: 'net', label: 'الصافي' },
-    ]
+    ],
   },
   {
     id: 'settlements',
     label: 'التسويات',
-    description: 'إدارة تسويات الشركاء والكباتن.',
+    description: 'إدارة تسويات الشركاء والكباتن والميدانيين.',
     badge: 'Ops',
     subGroups: [
       { id: 'summary', label: 'ملخص' },
       { id: 'captains', label: 'كباتن' },
       { id: 'partners', label: 'متاجر' },
       { id: 'field', label: 'ميدانيين' },
-    ]
+    ],
   },
   {
     id: 'cod-reconciliation',
     label: 'تحصيل COD',
-    description: 'مطابقة النقد المحصل مع الطلبات المنفذة.',
+    description: 'مطابقة النقد المحصّل مع الطلبات المنفذة. COD ذمة على الكابتن حتى الإيداع.',
     badge: 'Cash',
     subGroups: [
       { id: 'pending', label: 'قيد التحصيل' },
       { id: 'collected', label: 'تم التحصيل' },
       { id: 'mismatch', label: 'فوارق' },
-    ]
+    ],
+  },
+  {
+    id: 'captain-eligibility',
+    label: 'أهلية الكابتن',
+    description: 'مراقبة رصيد الكابتن الضامن — من مؤهل ومن يحتاج شحن رصيد.',
+    badge: 'Cap',
+    subGroups: [
+      { id: 'eligible', label: 'مؤهلون' },
+      { id: 'needs-topup', label: 'يحتاج شحن' },
+      { id: 'blocked', label: 'محظورون' },
+    ],
   },
   {
     id: 'refunds',
@@ -50,7 +61,18 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
       { id: 'pending', label: 'طلبات جديدة' },
       { id: 'processed', label: 'تمت المعالجة' },
       { id: 'rejected', label: 'مرفوضة' },
-    ]
+    ],
+  },
+  {
+    id: 'payouts',
+    label: 'المدفوعات',
+    description: 'تحويل الأموال وتتبع الحوالات البنكية لجميع الأطراف.',
+    badge: 'Bank',
+    subGroups: [
+      { id: 'partner-payouts', label: 'مستحقات الشركاء' },
+      { id: 'captain-payouts', label: 'مستحقات الكباتن' },
+      { id: 'field-payouts', label: 'مستحقات الميدانيين' },
+    ],
   },
   {
     id: 'ledger',
@@ -60,28 +82,7 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
     subGroups: [
       { id: 'journal', label: 'قيود اليومية' },
       { id: 'trial-balance', label: 'ميزان المراجعة' },
-    ]
-  },
-  {
-    id: 'payouts',
-    label: 'المدفوعات',
-    description: 'تحويل الأموال وتتبع الحوالات البنكية.',
-    badge: 'Bank',
-    subGroups: [
-      { id: 'scheduled', label: 'مجدولة' },
-      { id: 'in-progress', label: 'جاري التحويل' },
-      { id: 'completed', label: 'مكتملة' },
-    ]
-  },
-  {
-    id: 'tax-compliance',
-    label: 'الضرائب والامتثال',
-    description: 'تقارير الضريبة المضافة والامتثال الزكوي.',
-    badge: 'Tax',
-    subGroups: [
-      { id: 'vat', label: 'الضريبة المضافة' },
-      { id: 'zakat', label: 'الزكاة' },
-    ]
+    ],
   },
   {
     id: 'risk-audit',
@@ -91,11 +92,24 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
     subGroups: [
       { id: 'suspicious', label: 'عمليات مشبوهة' },
       { id: 'audit-logs', label: 'سجلات التدقيق' },
-    ]
+    ],
+  },
+  // tax-compliance مخفي من القيادة النشطة — [TBD] لا سياسة ضريبية يمنية مثبتة بعد
+  {
+    id: 'tax-compliance',
+    label: 'الضرائب — [TBD]',
+    description: '[TBD] — لا سياسة ضريبية/زكوية يمنية مثبتة في DSH حتى الآن. هذا القسم غير نشط.',
+    badge: 'TBD',
+    subGroups: [],
   },
 ] as const;
 
 export const FINANCE_CANONICAL_GROUP_IDS = FINANCE_CANONICAL_GROUPS.map((group) => group.id) as readonly CanonicalFinanceGroupId[];
+
+// القسم النشط فعليًا — يستثني tax-compliance حتى تثبت السياسة
+export const FINANCE_ACTIVE_GROUPS = FINANCE_CANONICAL_GROUPS.filter(
+  (g) => g.id !== 'tax-compliance',
+);
 
 export function normalizeFinanceLocation(
   workspace?: string,
@@ -104,48 +118,24 @@ export function normalizeFinanceLocation(
   const resolvedPanel = panel as FinancePanelId | undefined;
 
   if (!workspace || workspace === 'overview') {
-    return {
-      kind: 'group',
-      group: 'overview',
-      sourceWorkspace: workspace,
-      panel: resolvedPanel,
-    };
+    return { kind: 'group', group: 'overview', sourceWorkspace: workspace, panel: resolvedPanel };
   }
 
   const directCanonical = FINANCE_CANONICAL_GROUP_IDS.find((groupId) => groupId === workspace);
   if (directCanonical) {
-    return {
-      kind: 'group',
-      group: directCanonical,
-      sourceWorkspace: directCanonical,
-      panel: resolvedPanel,
-    };
+    return { kind: 'group', group: directCanonical, sourceWorkspace: directCanonical, panel: resolvedPanel };
   }
 
-  return {
-    kind: 'group',
-    group: 'overview',
-    sourceWorkspace: workspace,
-    panel: resolvedPanel,
-  };
+  return { kind: 'group', group: 'overview', sourceWorkspace: workspace, panel: resolvedPanel };
 }
 
 export function buildFinanceHref(
   group: CanonicalFinanceGroupId = 'overview',
-  options?: {
-    panel?: FinancePanelId;
-  },
+  options?: { panel?: FinancePanelId },
 ) {
   const searchParams = new URLSearchParams();
-
-  if (group !== 'overview') {
-    searchParams.set('workspace', group);
-  }
-
-  if (options?.panel) {
-    searchParams.set('panel', options.panel);
-  }
-
+  if (group !== 'overview') searchParams.set('workspace', group);
+  if (options?.panel) searchParams.set('panel', options.panel);
   const query = searchParams.toString();
   return query ? `/finance?${query}` : '/finance';
 }

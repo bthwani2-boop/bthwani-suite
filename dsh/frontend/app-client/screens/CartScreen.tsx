@@ -25,6 +25,9 @@ import {
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../parts/CartDetails';
 import { getDshClientStateMeta, type DshClientState } from '../data/client-state.preview-data';
+import { getPartnerOfferItems } from '../../shared/partner-offer.preview-store';
+import { isClientVisibleStatus, type CommercialLifecycleStatus } from '../../shared/commercial.preview-contract';
+import { getEntitlements } from '../../shared/loyalty.preview-store';
 import {
   resolveWltDshFinanceEventKindForPaymentMethod,
   useWltDshWalletPreview,
@@ -272,7 +275,7 @@ function ExecutionSchedulePicker({ selectedDate, selectedTime, onConfirm }: { se
       <Pressable onPress={() => setVisible(true)}>
         <Surface tone="default" padding={3} gap={2} radiusToken="lg" style={{ backgroundColor: SURFACE_WARM, borderColor: SURFACE_WARM_BORDER, borderStyle: 'dashed', borderWidth: 1.5 }}>
           <Box layoutDirection="row" align="center" gap={3}>
-            <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: colorPalette.white, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+            <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: colorPalette.white, alignItems: 'center', justifyContent: 'center', shadowColor: colorPalette.black, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
               <Icon name="calendar-outline" size={22} color={ACCENT_ORANGE} />
             </View>
             <Box style={{ flex: 1 }} gap={0.5}>
@@ -1108,6 +1111,19 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     const trimmedValue = quickActionDraft.trim();
 
     if (quickActionKey === 'coupon') {
+      if (trimmedValue) {
+        const activeCouponOffers = getPartnerOfferItems().filter(
+          o => o.offerType === 'coupon' && isClientVisibleStatus(o.status as CommercialLifecycleStatus),
+        );
+        const entitlements = getEntitlements();
+        const hasCouponEntitlement = entitlements.some(
+          e => isClientVisibleStatus(e.status as CommercialLifecycleStatus),
+        );
+        if (activeCouponOffers.length === 0 && !hasCouponEntitlement) {
+          showNotice('لا توجد قسائم نشطة', 'لا يوجد عرض قسيمة نشط حالياً لهذا المتجر.', 'warning');
+          return;
+        }
+      }
       setCouponCode(trimmedValue);
       showNotice(
         trimmedValue ? 'تم حفظ القسيمة' : 'أزلت القسيمة المحلية',

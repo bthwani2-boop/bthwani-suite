@@ -56,15 +56,7 @@ export type LegacyOperationsWorkspaceId =
   | 'arrival-bell'
   | 'zone-set'
   | 'live-map-capacity'
-  | 'geo-heatmap'
-  | 'live-tracking'
-  | 'handoff'
-  | 'proof-review'
-  | 'capacity'
-  | 'dispatch'
-  | 'exceptions'
-  | 'sla'
-  | 'audit';
+  | 'geo-heatmap';
 
 export type LegacySectionRedirectId =
   | 'finance'

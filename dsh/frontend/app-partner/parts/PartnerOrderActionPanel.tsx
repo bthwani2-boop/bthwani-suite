@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Button, ListItem, SectionHeader, Surface, Text } from '@bthwani/ui-kit';
+import type { DshPartnerPreparationStage } from '../../shared/dsh-order-journey.model';
 
 export type PartnerOrderActionFlowId =
   | 'order-accept'
@@ -10,14 +11,7 @@ export type PartnerOrderActionFlowId =
   | 'order-out-for-delivery'
   | 'order-store-delivered';
 
-const ORDER_ACTION_ITEMS: Array<{
-  id: PartnerOrderActionFlowId;
-  title: string;
-  subtitle: string;
-  badgeLabel: string;
-  lifecycleStatus: string;
-  prerequisiteStatus?: string;
-}> = [
+const ORDER_ACTION_ITEMS: Array<DshPartnerPreparationStage & { id: PartnerOrderActionFlowId }> = [
   { id: 'order-accept', title: 'قبول الطلب', subtitle: 'ثبّت قبول الطلب ثم انقل الفريق إلى التحضير.', badgeLabel: 'قبول', lifecycleStatus: 'partner_accepted', prerequisiteStatus: 'operations_approved' },
   { id: 'order-get', title: 'استلام الطلب', subtitle: 'أكد استلام الطلب داخل الفرع قبل نقله إلى handoff أو المسار التالي.', badgeLabel: 'استلام', lifecycleStatus: 'partner_accepted', prerequisiteStatus: 'operations_approved' },
   { id: 'order-prepare', title: 'تحضير الطلب', subtitle: 'تابع التجهيز قبل الانتقال إلى الجاهزية.', badgeLabel: 'تحضير', lifecycleStatus: 'preparing', prerequisiteStatus: 'order_received' },
@@ -47,7 +41,7 @@ export function DshPartnerOrderActionPanel({ activeFlowId, onSelectFlow }: DshPa
             subtitle={`${item.subtitle} — الحالة: ${item.lifecycleStatus}${item.prerequisiteStatus ? ` — يبدأ بعد: ${item.prerequisiteStatus}` : ''}`}
             badgeLabel={item.badgeLabel}
             meta={activeFlowId === item.id ? 'المسار النشط' : 'افتح المسار'}
-            onPress={() => onSelectFlow?.(item.id)}
+            onPress={() => onSelectFlow?.(item.id as PartnerOrderActionFlowId)}
           />
         ))}
       </Box>

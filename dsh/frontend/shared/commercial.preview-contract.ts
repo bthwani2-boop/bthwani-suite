@@ -384,3 +384,250 @@ export function validatePartnerOfferForPublish(offer: Partial<PartnerOffer>): st
   if (offer.status !== 'marketing-ready') errors.push('يجب أن يكون العرض في حالة "جاهز للتسويق" قبل النشر');
   return errors;
 }
+
+// ---------------------------------------------------------------------------
+// Client Presentation Types (app-client adapter layer)
+// ---------------------------------------------------------------------------
+
+export type SubscriptionClientCard = {
+  id: 'weekly' | 'monthly' | 'family';
+  title: string;
+  price: string;
+  cadence: string;
+  note: string;
+  highlight: string;
+  current?: boolean;
+  featured?: boolean;
+};
+
+export type LoyaltyClientMetric = {
+  label: string;
+  value: string;
+  helperText: string;
+  tone: 'brand' | 'info' | 'warning' | 'success';
+};
+
+export type LoyaltyClientSectionItem = {
+  label: string;
+  value: string;
+  helperText?: string;
+  tone?: 'default' | 'muted' | 'soft' | 'inverse' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+};
+
+export type LoyaltyClientSection = {
+  title: string;
+  subtitle: string;
+  badgeLabel: string;
+  tone: 'brand' | 'info' | 'warning' | 'success';
+  items: LoyaltyClientSectionItem[];
+};
+
+export type LoyaltyClientBenefits = {
+  title: string;
+  subtitle: string;
+  note: string;
+  metrics: LoyaltyClientMetric[];
+  sections: LoyaltyClientSection[];
+};
+
+// ---------------------------------------------------------------------------
+// Status Normalization
+// ---------------------------------------------------------------------------
+
+const ALL_LIFECYCLE_STATUSES: CommercialLifecycleStatus[] = [
+  'draft', 'inbound', 'eligible', 'review', 'marketing-ready', 'scheduled',
+  'active', 'published', 'paused', 'exhausted', 'expired', 'archived', 'rejected', 'cancelled',
+];
+
+export function normalizeCommercialStatus(status: string): CommercialLifecycleStatus | undefined {
+  return ALL_LIFECYCLE_STATUSES.includes(status as CommercialLifecycleStatus)
+    ? (status as CommercialLifecycleStatus)
+    : undefined;
+}
+
+// ---------------------------------------------------------------------------
+// Eligibility Evaluation
+// ---------------------------------------------------------------------------
+
+export type CommercialEligibilityContext = {
+  userId?: string;
+  subscriptionId?: string;
+  loyaltyTierId?: string;
+  orderValue?: number;
+  isGuest?: boolean;
+};
+
+export function evaluateCommercialEligibility(
+  eligibility: CommercialEligibility | undefined,
+  context: CommercialEligibilityContext,
+): boolean {
+  if (!eligibility) return true;
+  const { audienceScope, requiresSubscriptionId, requiresLoyaltyTierId, minimumOrderValue } = eligibility;
+  if (audienceScope === 'guest' && !context.isGuest) return false;
+  if (audienceScope === 'subscriber' && !context.subscriptionId) return false;
+  if (audienceScope === 'premium' && !context.loyaltyTierId) return false;
+  if (requiresSubscriptionId && context.subscriptionId !== requiresSubscriptionId) return false;
+  if (requiresLoyaltyTierId && context.loyaltyTierId !== requiresLoyaltyTierId) return false;
+  if (minimumOrderValue !== undefined && (context.orderValue ?? 0) < minimumOrderValue) return false;
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// Conflict Evaluation
+// ---------------------------------------------------------------------------
+
+export function evaluateCommercialConflicts(sourceMap: CommercialSourceMap): CommercialConflict[] {
+  return Object.entries(sourceMap)
+    .filter(([, entry]) => entry.conflictSeverity !== 'none')
+    .map(([key, entry]) => ({
+      conflictId: key,
+      severity: entry.conflictSeverity,
+      reason: entry.conflictReason ?? key,
+      sourceA: entry.sourceRecordId,
+    }));
+}
+
+// ---------------------------------------------------------------------------
+// Projection Builder
+// ---------------------------------------------------------------------------
+
+export type CommercialProjectionInput = {
+  storeId?: string;
+  partnerOffers?: PartnerOffer[];
+  campaigns?: CommercialCampaign[];
+  subscriptionPlans?: SubscriptionPlan[];
+  entitlements?: CommercialEntitlement[];
+  sourceMap?: CommercialSourceMap;
+};
+
+export function buildCommercialProjection(input: CommercialProjectionInput): CommercialProjection {
+  const badges: CommercialBadge[] = [];
+  const sourceMap: CommercialSourceMap = input.sourceMap ?? {};
+
+  const visibleOffers = (input.partnerOffers ?? []).filter(o => isClientVisibleStatus(o.status));
+  visibleOffers.slice(0, 2).forEach(o => badges.push({ label: o.displayBadge, source: 'partner' }));
+
+  (input.campaigns ?? [])
+    .filter(c => isClientVisibleStatus(c.status) && c.placements?.includes('store-card'))
+    .slice(0, 1)
+    .forEach(c => badges.push({ label: `حملة: ${c.title}`, source: 'campaign' }));
+
+  const hasPro = (input.subscriptionPlans ?? []).some(s => s.id === 'sub-pro' && isClientVisibleStatus(s.status));
+  if (hasPro) badges.push({ label: '⚡ بثواني برو', source: 'subscription' });
+
+  const hasReward = (input.entitlements ?? []).some(e => e.type === 'loyalty-reward' && e.status === 'active');
+  if (hasReward) badges.push({ label: 'مكافأة ولاء', source: 'loyalty' });
+
+  const conflicts = evaluateCommercialConflicts(sourceMap);
+  const hasBlocker = conflicts.some(c => c.severity === 'blocker');
+
+  return {
+    storeId: input.storeId,
+    badges: hasBlocker ? [] : badges,
+    offerLabel: visibleOffers[0]?.displayBadge,
+    hasCouponAvailable: visibleOffers.some(o => o.offerKind === 'coupon'),
+    deliveryFeeLabel: visibleOffers.some(o => o.offerKind === 'free-delivery') ? 'توصيل مجاني' : undefined,
+    hasBthwaniPro: hasPro,
+    subscriptionChips: hasPro ? ['بثواني برو', 'توصيل سريع'] : [],
+    hasLoyaltyReward: hasReward,
+    sourceMap,
+    conflicts,
+    isClientVisible: !hasBlocker && badges.length > 0,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Client Card Mappers
+// ---------------------------------------------------------------------------
+
+export function mapSubscriptionPlansToClientCards(plans: SubscriptionPlan[]): SubscriptionClientCard[] {
+  const tierIdMap: Record<string, 'weekly' | 'monthly' | 'family'> = {
+    weekly: 'weekly',
+    monthly: 'monthly',
+    family: 'family',
+  };
+  return plans.map((plan) => {
+    const cardId = tierIdMap[plan.tier ?? ''] ?? (plan.id.includes('weekly') ? 'weekly' : plan.id.includes('family') ? 'family' : 'monthly');
+    return {
+      id: cardId,
+      title: plan.name,
+      price: String(plan.weeklyFee ?? plan.monthlyFee),
+      cadence: plan.weeklyFee ? 'ريال / أسبوع' : 'ريال / شهر',
+      note: plan.features.join(' • '),
+      highlight: cardId === 'family' ? 'الأكثر شمولاً' : cardId === 'monthly' ? 'الخيار المتوازن' : 'أسرع بداية',
+      featured: cardId === 'monthly',
+      current: cardId === 'weekly',
+    };
+  });
+}
+
+export function mapLoyaltyProgramToClientBenefits(
+  programName: string,
+  rewards: LoyaltyReward[],
+  tiers: LoyaltyTier[],
+): LoyaltyClientBenefits {
+  const activeTier = tiers[tiers.length - 1];
+  const tierLabel = activeTier?.name ?? 'فضي';
+  const activeRewards = rewards.filter(r => isClientVisibleStatus(r.status));
+
+  return {
+    title: 'الولاء والمكافآت',
+    subtitle: `برنامج ${programName} — ${tierLabel}`,
+    note: 'بيانات معاينة للولاء.',
+    metrics: [
+      { label: 'المستوى الحالي', value: tierLabel, helperText: `${activeTier?.minimumPoints ?? 0} نقطة للتأهل`, tone: 'brand' },
+      { label: 'مكافآت متاحة', value: String(activeRewards.length), helperText: 'قابلة للاسترداد', tone: 'info' },
+      { label: 'المزايا النشطة', value: String(activeTier?.benefits?.length ?? 0), helperText: 'مرتبطة بمستواك', tone: 'success' },
+    ],
+    sections: mapRewardsToClientSections(rewards, activeTier),
+  };
+}
+
+export function mapRewardsToClientSections(rewards: LoyaltyReward[], tier?: LoyaltyTier): LoyaltyClientSection[] {
+  const activeRewards = rewards.filter(r => isClientVisibleStatus(r.status));
+  if (activeRewards.length === 0) return [];
+  return [
+    {
+      title: 'المكافآت المتاحة',
+      subtitle: 'استبدل نقاطك بهذه المكافآت',
+      badgeLabel: 'متاح',
+      tone: 'info',
+      items: activeRewards.map(r => ({
+        label: r.title,
+        value: `${r.pointsCost} نقطة`,
+        helperText: r.description ?? 'يمكن الاسترداد الآن',
+        tone: 'info' as const,
+      })),
+    },
+    ...(tier?.benefits?.length
+      ? [{
+          title: 'مزايا المستوى',
+          subtitle: `المزايا المرتبطة بمستوى ${tier.name}`,
+          badgeLabel: tier.name,
+          tone: 'success' as const,
+          items: tier.benefits.map(b => ({
+            label: b.label,
+            value: 'مفعّل',
+            helperText: b.description,
+            tone: 'success' as const,
+          })),
+        }]
+      : []),
+  ];
+}
+
+export function mapPartnerOfferToCommercialOffer(
+  offer: { title: string; displayBadge: string; status: string },
+): CommercialBadge | null {
+  const status = normalizeCommercialStatus(offer.status);
+  if (!status || !isClientVisibleStatus(status)) return null;
+  return { label: offer.displayBadge || offer.title, source: 'partner' };
+}
+
+export function mapCampaignToCommercialProjection(campaign: CommercialCampaign): Partial<CommercialProjection> {
+  if (!isClientVisibleStatus(campaign.status)) return {};
+  const badges: CommercialBadge[] = campaign.placements.includes('store-card')
+    ? [{ label: `حملة: ${campaign.title}`, source: 'campaign' }]
+    : [];
+  return { badges, isClientVisible: badges.length > 0 };
+}

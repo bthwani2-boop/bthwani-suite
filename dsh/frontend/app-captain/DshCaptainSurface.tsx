@@ -17,6 +17,7 @@ try {
   // fallback is already a zero-insets function
 }
 import { AppearanceOptionCard, Badge, Box, Button, colorPalette, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
+import type { DshCaptainBellEvent } from '../../shared/dsh-order-journey.model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { wltDshCaptainUiCopy } from '../../../wlt/frontend/app-captain/dsh/wlt-dsh-captain.ui-copy';
 import { DshEntryScreen } from './screens/DshCaptainEntryScreen';
@@ -579,6 +580,15 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           onConfirm={() => setRoute('pod-submission')}
           onReportIssue={() => setRoute('inbox')}
           onBack={goBack}
+          onRingBell={() => {
+            const _bellEvent: DshCaptainBellEvent = {
+              orderId: activeOrderId,
+              captainId: 'captain-demo',
+              timestamp: new Date().toISOString(),
+              proximityState: 'bell_rang',
+            };
+            void _bellEvent;
+          }}
         />
       );
     }

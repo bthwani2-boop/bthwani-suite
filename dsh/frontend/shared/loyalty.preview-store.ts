@@ -1,4 +1,13 @@
 import { colorPalette } from '@bthwani/ui-kit';
+import type {
+  CommercialProgram,
+  LoyaltyTier,
+  LoyaltyReward,
+  SubscriptionPlan,
+  CommercialEntitlement,
+  CommercialEarningRule,
+  CommercialRedemptionRule,
+} from './commercial.preview-contract';
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
@@ -133,86 +142,64 @@ export function removeLoyaltyItem(id: string) {
   setMutableStore(getLoyaltyItems().filter((item) => item.id !== id));
 }
 
-// --- NEW COMMERCIAL OWNERSHIP MODELS (PHASE 1) ---
+// ---------------------------------------------------------------------------
+// Commercial domain types — sourced from commercial.preview-contract.ts
+// Aliases maintained for backward compatibility of consumer imports.
+// ---------------------------------------------------------------------------
 
-export type LoyaltyProgram = {
-  id: string;
-  name: string;
-  description: string;
-  currencyLabel: string;
-};
-
-export type LoyaltyTier = {
-  id: string;
-  programId: string;
-  name: string;
-  minimumPoints: number;
-  benefits: string[];
-};
-
-export type LoyaltyReward = {
-  id: string;
-  programId: string;
-  title: string;
-  pointsCost: number;
-};
-
-export type SubscriptionPlan = {
-  id: string;
-  name: string;
-  monthlyFee: number;
-  features: string[];
-};
-
-export type Entitlement = {
-  id: string;
-  userId?: string;
-  type: 'tier' | 'subscription' | 'reward';
-  referenceId: string;
-  status: 'active' | 'expired';
-};
-
-export type EarningRule = {
-  id: string;
-  description: string;
-  pointsMultiplier: number;
-};
-
-export type RedemptionRule = {
-  id: string;
-  description: string;
-  pointsValue: number;
-};
+export type LoyaltyProgram = CommercialProgram;
+export type { LoyaltyTier, LoyaltyReward, SubscriptionPlan };
+export type Entitlement = CommercialEntitlement;
+export type EarningRule = CommercialEarningRule;
+export type RedemptionRule = CommercialRedemptionRule;
 
 export function getLoyaltyPrograms(): LoyaltyProgram[] {
   return [
-    { id: 'prog-1', name: 'نقاط بثواني', description: 'برنامج الولاء العام للتطبيق', currencyLabel: 'نقطة' }
+    { id: 'prog-1', name: 'نقاط بثواني', type: 'loyalty', description: 'برنامج الولاء العام للتطبيق', currencyLabel: 'نقطة', status: 'active' },
   ];
 }
 
 export function getSubscriptionPlans(): SubscriptionPlan[] {
   return [
-    { id: 'sub-pro', name: 'بثواني برو', monthlyFee: 39, features: ['توصيل مجاني', 'عروض حصرية'] }
+    { id: 'sub-pro', name: 'بثواني برو', monthlyFee: 1000, weeklyFee: 500, features: ['توصيل مجاني', 'عروض حصرية'], status: 'active', tier: 'monthly' },
+    { id: 'sub-weekly', name: 'برو أسبوع', monthlyFee: 500, weeklyFee: 500, features: ['توصيل مجاني'], status: 'active', tier: 'weekly' },
+    { id: 'sub-family', name: 'برو عائلي', monthlyFee: 2000, features: ['توصيل مجاني', 'عروض حصرية', 'حزمة عائلية'], status: 'active', tier: 'family' },
   ];
 }
 
 export function getLoyaltyTiers(): LoyaltyTier[] {
   return [
     { id: 'tier-silver', programId: 'prog-1', name: 'فضي', minimumPoints: 0, benefits: [] },
-    { id: 'tier-gold', programId: 'prog-1', name: 'ذهبي', minimumPoints: 1000, benefits: ['دعم سريع'] }
+    { id: 'tier-gold', programId: 'prog-1', name: 'ذهبي', minimumPoints: 1000, benefits: [{ id: 'b-1', label: 'دعم سريع', description: 'استجابة أسرع من فريق الدعم' }] },
   ];
 }
 
 export function getLoyaltyRewards(): LoyaltyReward[] {
   return [
-    { id: 'rew-1', programId: 'prog-1', title: 'كوبون خصم 10 ريال', pointsCost: 1000 }
+    { id: 'rew-1', programId: 'prog-1', title: 'كوبون خصم 10 ريال', pointsCost: 1000, status: 'active', description: 'خصم مباشر على طلبك القادم' },
+    { id: 'rew-2', programId: 'prog-1', title: 'توصيل مجاني', pointsCost: 500, status: 'active', description: 'صالح لمدة 7 أيام' },
+    { id: 'rew-3', programId: 'prog-1', title: 'خصم 20%', pointsCost: 1500, status: 'active', description: 'الأكثر استخدامًا' },
   ];
 }
 
 export function getEntitlements(): Entitlement[] {
   return [
-    { id: 'ent-pro-active', type: 'subscription', referenceId: 'sub-pro', status: 'active' },
-    { id: 'ent-tier-gold', type: 'tier', referenceId: 'tier-gold', status: 'active' },
-    { id: 'ent-reward-1', type: 'reward', referenceId: 'rew-1', status: 'active' },
+    { id: 'ent-pro-active', type: 'subscription', referenceId: 'sub-pro', status: 'active', source: 'subscription' },
+    { id: 'ent-tier-gold', type: 'loyalty-tier', referenceId: 'tier-gold', status: 'active', source: 'loyalty' },
+    { id: 'ent-reward-1', type: 'loyalty-reward', referenceId: 'rew-1', status: 'active', source: 'loyalty' },
+  ];
+}
+
+export function getEarningRules(): EarningRule[] {
+  return [
+    { id: 'earn-1', programId: 'prog-1', description: 'نقاط على كل طلب', pointsMultiplier: 1, appliesTo: 'all' },
+    { id: 'earn-2', programId: 'prog-1', description: 'نقاط مضاعفة للشركاء المختارين', pointsMultiplier: 2, appliesTo: 'partner' },
+  ];
+}
+
+export function getRedemptionRules(): RedemptionRule[] {
+  return [
+    { id: 'redeem-1', programId: 'prog-1', description: 'استبدال نقاط بخصم ريال', pointsValue: 100, discountValue: 1, discountType: 'fixed' },
+    { id: 'redeem-2', programId: 'prog-1', description: 'استبدال نقاط بتوصيل مجاني', pointsValue: 500, discountType: 'free-delivery' },
   ];
 }

@@ -2,6 +2,7 @@ export type CanonicalFinanceGroupId =
   | 'overview'
   | 'settlements'
   | 'cod-reconciliation'
+  | 'captain-eligibility'
   | 'refunds'
   | 'ledger'
   | 'payouts'

@@ -8,7 +8,8 @@ import {
 import { LIVE_ORDERS_OPERATIONAL_PREVIEW } from './operations.preview-data';
 import { Box, useTheme } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
-import type { DshClientDeliveryLifecycleStatus, DshClientOperationsDecisionKind } from '../../app-client/contracts/dsh-client-binding.contracts';
+import type { DshOperationsDecisionKind, DshOrderLifecycleStatus, DshOperationsOrderDetail } from '../../shared/dsh-order-journey.model';
+import { mapOperationsDecisionToLifecycle } from '../../shared/dsh-order-journey.model';
 
 export type LiveOrdersScreenProps = {
   state?: 'ready' | 'loading' | 'error' | 'empty';
@@ -24,32 +25,9 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
   brand: 'neutral',
 };
 
-type OpsDecision = DshClientOperationsDecisionKind;
+type OpsDecision = DshOperationsDecisionKind;
 
-const OPS_DECISION_NEXT_LIFECYCLE: Record<OpsDecision, DshClientDeliveryLifecycleStatus> = {
-  approve: 'operations_approved',
-  request_edit: 'confirmed',
-  reject: 'cancelled',
-};
-
-type PendingApprovalOrder = {
-  id: string;
-  customerName: string;
-  customerPhone: string;
-  dropoffAddress: string;
-  pickupAddress: string;
-  storeName: string;
-  paymentMethod: string;
-  paymentStatus: string;
-  cartItems: Array<{ title: string; qty: number; priceLabel: string }>;
-  subtotalLabel: string;
-  deliveryLabel: string;
-  totalLabel: string;
-  customerNote: string;
-  customerInstructions: string;
-  couponCode: string;
-  eventLog: Array<{ status: string; actor: string; timestamp: string }>;
-};
+type PendingApprovalOrder = DshOperationsOrderDetail;
 
 const PENDING_APPROVAL_ORDERS: PendingApprovalOrder[] = [
   {
@@ -102,7 +80,7 @@ const PENDING_APPROVAL_ORDERS: PendingApprovalOrder[] = [
   },
 ];
 
-type DecisionState = Record<string, { decision: OpsDecision; note: string; submitted: boolean; nextLifecycleStatus: DshClientDeliveryLifecycleStatus }>;
+type DecisionState = Record<string, { decision: OpsDecision; note: string; submitted: boolean; nextLifecycleStatus: DshOrderLifecycleStatus }>;
 
 function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrder; onDecision: (id: string, decision: OpsDecision, note: string) => void }) {
   const { theme } = useTheme();
@@ -214,7 +192,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   const [decisions, setDecisions] = React.useState<DecisionState>({});
 
   const handleDecision = (orderId: string, decision: OpsDecision, note: string) => {
-    setDecisions((prev) => ({ ...prev, [orderId]: { decision, note, submitted: true, nextLifecycleStatus: OPS_DECISION_NEXT_LIFECYCLE[decision] } }));
+    setDecisions((prev) => ({ ...prev, [orderId]: { decision, note, submitted: true, nextLifecycleStatus: mapOperationsDecisionToLifecycle(decision) } }));
     setExpandedApprovalId(null);
   };
 

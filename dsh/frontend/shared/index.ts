@@ -25,6 +25,13 @@ export type {
   CommercialCampaign,
   CommercialBadge as CommercialContractBadge,
   CommercialProjection,
+  SubscriptionClientCard,
+  LoyaltyClientMetric,
+  LoyaltyClientSectionItem,
+  LoyaltyClientSection,
+  LoyaltyClientBenefits,
+  CommercialEligibilityContext,
+  CommercialProjectionInput,
 } from './commercial.preview-contract';
 export {
   commercialContractMeta,
@@ -38,9 +45,16 @@ export {
   PROMO_LIFECYCLE,
   SUBSCRIPTION_LIFECYCLE,
   LOYALTY_LIFECYCLE,
+  normalizeCommercialStatus,
+  evaluateCommercialEligibility,
+  evaluateCommercialConflicts,
+  buildCommercialProjection,
+  mapSubscriptionPlansToClientCards,
+  mapLoyaltyProgramToClientBenefits,
+  mapRewardsToClientSections,
+  mapPartnerOfferToCommercialOffer,
+  mapCampaignToCommercialProjection,
 } from './commercial.preview-contract';
-
-export { CommercialParityPreview } from './commercial-parity-preview';
 
 // --- Commercial Marketing Contract (UI_PREVIEW_ONLY) ---
 
@@ -305,3 +319,25 @@ export {
 	rejectFromCatalog,
 	returnToMarketing,
 } from './catalog-adoption.preview-store';
+
+// --- DSH Order Journey Shared Model ---
+export type {
+	DshOrderJourneyStageId,
+	DshOrderJourneyStage,
+	DshOrderJourneyActor,
+	DshOrderJourneyEvent,
+	DshOrderLifecycleStatus,
+	DshSmartProximityState,
+	DshSmartTrackingSnapshot,
+	DshCaptainHeartbeatSnapshot,
+	DshCaptainBellEvent,
+	DshOperationsDecisionKind,
+	DshOperationsDecisionPayload,
+	DshOperationsOrderDetail,
+	DshPartnerPreparationStage,
+} from './dsh-order-journey.model';
+export {
+	DSH_ORDER_JOURNEY_STEPS,
+	mapLifecycleToJourneyStage,
+	mapOperationsDecisionToLifecycle,
+} from './dsh-order-journey.model';

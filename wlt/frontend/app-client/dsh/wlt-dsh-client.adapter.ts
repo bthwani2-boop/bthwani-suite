@@ -110,26 +110,26 @@ export const unlink = async (): Promise<void> => {
 	writeAccountLocal(null);
 };
 
-export const requestPayment = async (amountHalalas: number): Promise<{ success: boolean; txId?: string; error?: string }> => {
+export const requestPayment = async (amountMinorUnits: number): Promise<{ success: boolean; txId?: string; error?: string }> => {
 	ensureBalanceLocal();
 	const balance = readBalanceLocal();
-	if (balance < amountHalalas) return { success: false, error: 'insufficient_balance' };
-	writeBalanceLocal(balance - amountHalalas);
+	if (balance < amountMinorUnits) return { success: false, error: 'insufficient_balance' };
+	writeBalanceLocal(balance - amountMinorUnits);
 	await new Promise((resolve) => setTimeout(resolve, 300));
 	return { success: true, txId: `tx-${Date.now()}` };
 };
 
-export const topUp = async (amountHalalas: number): Promise<{ success: boolean; balance: number }> => {
+export const topUp = async (amountMinorUnits: number): Promise<{ success: boolean; balance: number }> => {
 	ensureBalanceLocal();
 	const balance = readBalanceLocal();
-	const newBalance = balance + amountHalalas;
+	const newBalance = balance + amountMinorUnits;
 	writeBalanceLocal(newBalance);
 	await new Promise((resolve) => setTimeout(resolve, 200));
 	return { success: true, balance: newBalance };
 };
 
-export const createDeepLink = (orderId: string, amountHalalas: number): string => {
-	return `wlt://pay?order=${encodeURIComponent(orderId)}&amount=${amountHalalas}`;
+export const createDeepLink = (orderId: string, amountMinorUnits: number): string => {
+	return `wlt://pay?order=${encodeURIComponent(orderId)}&amount=${amountMinorUnits}`;
 };
 
 const WltDshClientAdapter = { isLinked, getBalance, link, unlink, requestPayment, topUp, createDeepLink };

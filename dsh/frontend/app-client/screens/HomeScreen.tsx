@@ -17,6 +17,7 @@ import {
   BottomNavBar,
   type NavItem,
   colorPalette,
+  withAlpha,
   radius,
   resolveRowDirection,
   resolveTextAlign,
@@ -1666,7 +1667,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       shadowRadius: 8,
       elevation: 4,
       borderBottomWidth: 1,
-      borderBottomColor: 'rgba(255,255,255,0.1)',
+      borderBottomColor: withAlpha(colorPalette.white, 0.1),
     },
     premiumBannerSection: {
       marginTop: spacing[0],
@@ -1683,13 +1684,13 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       overflow: 'hidden',
       backgroundColor: colorPalette.surfaceRaised,
       elevation: 6,
-      shadowColor: '#000',
+      shadowColor: colorPalette.black,
       shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.12,
       shadowRadius: 16,
     },
     premiumBannerCardActive: {
-      borderColor: 'rgba(255,255,255,0.2)',
+      borderColor: withAlpha(colorPalette.white, 0.2),
       borderWidth: 1,
       shadowOpacity: 0.18,
       shadowRadius: 20,
@@ -1715,7 +1716,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       left: 0,
       right: 0,
       height: '36%',
-      backgroundColor: 'rgba(255,255,255,0.08)',
+      backgroundColor: withAlpha(colorPalette.white, 0.08),
       zIndex: 3,
     },
     premiumBannerBottomShade: {
@@ -1724,7 +1725,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       right: 0,
       bottom: 0,
       height: '54%',
-      backgroundColor: 'rgba(2, 8, 18, 0.4)',
+      backgroundColor: withAlpha(colorPalette.black, 0.4),
       zIndex: 3,
     },
     premiumBannerLogoWrap: {
@@ -1916,7 +1917,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       justifyContent: 'center',
       overflow: 'hidden',
       elevation: 2,
-      shadowColor: '#000',
+      shadowColor: colorPalette.black,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.05,
       shadowRadius: 8,
@@ -1952,7 +1953,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       gap: 1, // Tight vertical spacing to prevent distortion
     },
     heroPromoTitle: {
-      color: '#0A2F5C',
+      color: colorPalette.brandStrong,
       fontWeight: '900',
       fontSize: 15, // Slightly larger for prominence
       lineHeight: 18,
@@ -1967,7 +1968,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       marginBottom: 2,
     },
     heroPromoCtaButton: {
-      backgroundColor: '#FF500D',
+      backgroundColor: colorPalette.brand,
       flexDirection: 'row-reverse',
       alignItems: 'center',
       justifyContent: 'center',

@@ -23,9 +23,22 @@ import type {
 	DshCaptainOrderMessage,
 	DshCaptainOrderMode,
 	DshCaptainOrderProofStatus,
+	DshCaptainOrderServiceType,
 	DshCaptainOrderStage,
 	DshCaptainOrdersScreenState,
 } from '../data/captain-orders.preview-data';
+
+type ServiceBadge = { badgeLabel: string; badgeTone: 'warning' | 'info' | 'brand' };
+
+function resolveServiceTypeBadge(serviceType: DshCaptainOrderServiceType): ServiceBadge {
+	if (serviceType === 'awnak') {
+		return { badgeLabel: 'عونك', badgeTone: 'info' };
+	}
+	if (serviceType === 'shein-final-mile') {
+		return { badgeLabel: 'SHEIN - تسليم نهائي', badgeTone: 'brand' };
+	}
+	return { badgeLabel: 'توصيل', badgeTone: 'warning' };
+}
 
 export type DshCaptainOrderDetailSummary = {
 	orderId: DshCaptainOrderId;
@@ -62,37 +75,31 @@ const demoSummary: DshCaptainOrderDetailSummary = {
 const demoBellItems: DshCaptainOrderBellItem[] = [
 	{
 		id: 'captain-order-9021',
+		serviceType: 'standard',
 		title: 'طلب جديد #9021',
 		subtitle: 'Burger Lab بانتظار كابتن يقبل المسار.',
 		meta: 'التالي: مراجعة ثم قبول',
-		badgeLabel: 'جديد',
-		tone: 'warning',
 	},
 	{
 		id: 'captain-order-9024',
+		serviceType: 'standard',
 		title: 'طلب جديد #9024',
 		subtitle: 'Green Bowl تحتاج مراجعة فورية قبل أن يكبر الصف.',
 		meta: 'التالي: فتح تفاصيل الطلب',
-		badgeLabel: 'عاجل',
-		tone: 'brand',
 	},
-	// عونك: local pickup/dropoff — captain is responsible for full pickup-to-dropoff
 	{
 		id: 'captain-order-awn-3104',
-		title: 'عونك #3104',
-		subtitle: 'نقل طعام — من شارع حدة إلى باب اليمن.',
-		meta: 'نوع: طعام · مجدول الآن',
-		badgeLabel: 'عونك',
-		tone: 'info',
+		serviceType: 'awnak',
+		title: 'طلب نقل محلي #3104',
+		subtitle: 'نقل طعام — من شارع حدة إلى باب اليمن. مجدول الآن.',
+		meta: 'التالي: استلام العنصر من المُرسِل وتوصيله مباشرة',
 	},
-	// SHEIN final-mile only: captain picks up from bthwani sorting point and delivers to customer
 	{
 		id: 'captain-order-spx-2078',
-		title: 'SHEIN - تسليم نهائي #2078',
-		subtitle: 'تسليم من نقطة بثواني إلى العميل لمى ناصر.',
-		meta: 'نوع: تسليم نهائي · ليس شراء',
-		badgeLabel: 'SHEIN - تسليم نهائي',
-		tone: 'brand',
+		serviceType: 'shein-final-mile',
+		title: 'تسليم نهائي SHEIN #2078',
+		subtitle: 'استلام من نقطة الفرز بثواني وتوصيل إلى العميل لمى ناصر.',
+		meta: 'التالي: استلام الطرد من نقطة الفرز فقط — لا شراء ولا استيراد',
 	},
 ];
 
@@ -243,21 +250,20 @@ function OrderInboxSection({
 					<Surface tone="raised" gap={3}>
 						<SectionHeader title="الطلبات في الصف" subtitle="الحد الأدنى للقائمة: الاستلام والتسليم والوقت والخطوة التالية." />
 						<Box gap={2}>
-							{items.map((item) => (
-								// TODO [ML-captain-service-type]: DshCaptainOrderBellItem.tone already carries
-								// service-level signal ('info'=awnak, 'brand'=shein-final-mile, 'warning'=standard).
-								// When DshCaptainOrderServiceType is wired to real order data, map it here to
-								// badgeTone/badgeVariant on ListItem so awnak and shein-final-mile render distinct
-								// visual treatments from standard delivery orders.
-								<ListItem
-									key={item.id}
-									title={item.title}
-									subtitle={item.subtitle}
-									meta={`${item.meta}`}
-									badgeLabel={item.badgeLabel}
-									onPress={() => onOpenOrder?.(item.id)}
-								/>
-							))}
+							{items.map((item) => {
+								const { badgeLabel, badgeTone } = resolveServiceTypeBadge(item.serviceType);
+								return (
+									<ListItem
+										key={item.id}
+										title={item.title}
+										subtitle={item.subtitle}
+										meta={`${item.meta}`}
+										badgeLabel={badgeLabel}
+										badgeTone={badgeTone}
+										onPress={() => onOpenOrder?.(item.id)}
+									/>
+								);
+							})}
 						</Box>
 					</Surface>
 				</Box>

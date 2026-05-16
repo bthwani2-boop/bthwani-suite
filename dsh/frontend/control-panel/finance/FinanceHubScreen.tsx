@@ -14,7 +14,7 @@ import {
 import {
   buildFinanceHref,
   getFinanceGroupMeta,
-  FINANCE_CANONICAL_GROUPS,
+  FINANCE_ACTIVE_GROUPS,
 } from './finance.registry';
 import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from './finance.types';
 import {
@@ -22,8 +22,11 @@ import {
   ControlPanelDshSettlementScreen,
   ControlPanelDshCodReconciliationScreen,
   ControlPanelDshRefundQueueScreen,
+  ControlPanelDshCaptainEligibilityScreen,
+  ControlPanelDshPayoutsScreen,
   ControlPanelDshRiskAuditScreen,
 } from './closure-workspaces';
+import { getWltControlPanelFinancePreview } from '../../../../wlt/frontend/shared/finance/dshFinancePreview';
 
 import styles from '../shared/control-panel-surface.module.css';
 
@@ -39,9 +42,10 @@ const SCREEN_RENDERERS: Record<CanonicalFinanceGroupId, React.ComponentType<{ hu
   overview: ControlPanelDshFinanceScreen,
   settlements: ControlPanelDshSettlementScreen,
   'cod-reconciliation': ControlPanelDshCodReconciliationScreen,
+  'captain-eligibility': ControlPanelDshCaptainEligibilityScreen,
   refunds: ControlPanelDshRefundQueueScreen,
   ledger: ControlPanelDshFinanceScreen,
-  payouts: ControlPanelDshFinanceScreen,
+  payouts: ControlPanelDshPayoutsScreen,
   'tax-compliance': ControlPanelDshFinanceScreen,
   'risk-audit': ControlPanelDshRiskAuditScreen,
 };
@@ -57,14 +61,10 @@ export function ControlPanelDshFinanceHubScreen({
   const [activeGroup, setActiveGroup] = React.useState<CanonicalFinanceGroupId>(group);
   const [activeSubGroup, setActiveSubGroup] = React.useState<string | undefined>(subGroup);
 
-  React.useEffect(() => {
-    setActiveGroup(group);
-  }, [group]);
+  React.useEffect(() => { setActiveGroup(group); }, [group]);
+  React.useEffect(() => { setActiveSubGroup(subGroup); }, [subGroup]);
 
-  React.useEffect(() => {
-    setActiveSubGroup(subGroup);
-  }, [subGroup]);
-
+  const financePreview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
   const activeGroupMeta = getFinanceGroupMeta(activeGroup);
   const hubHref = buildFinanceHref(activeGroup, { panel });
   const ActiveScreen = SCREEN_RENDERERS[activeGroup] || SCREEN_RENDERERS.overview;
@@ -73,10 +73,10 @@ export function ControlPanelDshFinanceHubScreen({
     return (
       <div className={`${styles.surfaceMainPanel} ${styles.surfaceStatePadding}`}>
         <StateView
-           stateId="loading"
-           title="جاري تحميل البيانات المالية"
-           description="يتم تجهيز غرفة القيادة المالية..."
-           onActionPress={() => router.push(fallbackHref)}
+          stateId="loading"
+          title="جاري تحميل البيانات المالية"
+          description="يتم تجهيز غرفة القيادة المالية..."
+          onActionPress={() => router.push(fallbackHref)}
         />
       </div>
     );
@@ -98,7 +98,7 @@ export function ControlPanelDshFinanceHubScreen({
                 <span className={styles.surfaceHeaderBadgeText}>غرفة قيادة</span>
               </Box>
             </div>
-            <p className={styles.surfaceHeaderSubtitle}>التسويات، مطابقة COD، الاستردادات، والرقابة المالية</p>
+            <p className={styles.surfaceHeaderSubtitle}>التسويات، مطابقة COD، أهلية الكابتن، الاستردادات، والرقابة المالية — العملة: ر.ي</p>
           </Box>
         </div>
 
@@ -106,14 +106,18 @@ export function ControlPanelDshFinanceHubScreen({
           <div className={styles.surfacePulseCompact}>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>إجمالي التدفقات</span>
-              <span className={styles.commandKpiValue}>١,٢٥٤,٠٠٠ ر.س</span>
+              <span className={styles.commandKpiValue}>{financePreview.totalInflowLabel}</span>
+            </div>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>إجمالي المصروفات</span>
+              <span className={styles.commandKpiValue}>{financePreview.totalOutflowLabel}</span>
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>عناصر معلقة</span>
               <span className={`${styles.commandKpiValue} ${styles.commandKpiValueAlert}`}>١٤</span>
             </div>
             <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>المخاطر</span>
+              <span className={styles.commandKpiLabel}>حالة المخاطر</span>
               <span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>منخفض</span>
             </div>
           </div>
@@ -122,7 +126,7 @@ export function ControlPanelDshFinanceHubScreen({
 
       <nav className={styles.navigationDock}>
         <WebControlPanelWorkspaceTabs
-          items={FINANCE_CANONICAL_GROUPS.map((item) => ({
+          items={FINANCE_ACTIVE_GROUPS.map((item) => ({
             id: item.id,
             label: item.label,
             active: item.id === activeGroup,
@@ -137,7 +141,7 @@ export function ControlPanelDshFinanceHubScreen({
         />
       </nav>
 
-      {activeGroupMeta.subGroups ? (
+      {activeGroupMeta.subGroups && activeGroupMeta.subGroups.length > 0 ? (
         <div className={`${styles.filterDock} ${styles.filterDockTint}`}>
           <WebControlPanelSubTabs
             items={activeGroupMeta.subGroups.map((sub) => ({

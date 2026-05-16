@@ -6,11 +6,12 @@
  * to simulate how commercial badges appear on store cards.
  *
  * UI_PREVIEW_ONLY. Not rendered in app-client or app-partner.
+ * Lives in control-panel/marketing/ because it is not a shared UI primitive.
  */
 import React from 'react';
 import { colorPalette } from '@bthwani/ui-kit';
-import type { mapStoreCommercialFeatures } from './store-card-commercial-map';
-import type { CommercialBadge } from './commercial.preview-contract';
+import type { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
+import type { CommercialBadge } from '../../shared/commercial.preview-contract';
 
 type CommercialParityPreviewProps = {
   features: ReturnType<typeof mapStoreCommercialFeatures>;
@@ -175,7 +176,7 @@ export function CommercialParityPreview({ features, storeName }: CommercialParit
             textAlign: 'center',
           },
         },
-        `تضارب نشط: ${features.conflicts[0].conflictReason}`
+        `تضارب نشط: ${features.conflicts[0].reason}`
       )
   );
 }

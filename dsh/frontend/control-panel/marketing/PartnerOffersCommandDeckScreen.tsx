@@ -19,7 +19,8 @@ import {
   type PartnerOfferSource,
 } from '../../shared/partner-offer.preview-store';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
-import { CommercialParityPreview } from '../../shared/commercial-parity-preview';
+import { validatePartnerOfferForPublish } from '../../shared/commercial.preview-contract';
+import { CommercialParityPreview } from './commercial-parity-preview';
 
 type PartnerOfferEditorSection = 'details' | 'governance' | 'preview';
 
@@ -172,16 +173,28 @@ export function PartnerOffersCommandDeckScreen() {
     }
   };
 
+  const handlePublish = (id: string) => {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    const errors = validatePartnerOfferForPublish(item);
+    if (errors.length > 0) {
+      console.warn('[PartnerOffers] Publish blocked:', errors);
+      return;
+    }
+    publishPartnerOfferItem(id);
+    refresh();
+  };
+
   const renderActionButtons = () => {
     if (!selected) return null;
     const s = selected.status;
     return (
       <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
         {s === 'inbound' && <Button label="قبول للمراجعة" tone="secondary" size="sm" onPress={() => setStatus(selected.id, 'review')} />}
-        {s === 'review' && <Button label="جاهز للتسويق" tone="secondary" size="sm" onPress={() => approvePartnerOfferItem(selected.id)} />}
-        {s === 'marketing-ready' && <Button label="نشر الآن" tone="success" size="sm" onPress={() => publishPartnerOfferItem(selected.id)} />}
-        {s === 'published' && <Button label="إيقاف" tone="danger" size="sm" onPress={() => pausePartnerOfferItem(selected.id)} />}
-        {s === 'paused' && <Button label="إعادة النشر" tone="success" size="sm" onPress={() => publishPartnerOfferItem(selected.id)} />}
+        {s === 'review' && <Button label="جاهز للتسويق" tone="secondary" size="sm" onPress={() => { approvePartnerOfferItem(selected.id); refresh(); }} />}
+        {s === 'marketing-ready' && <Button label="نشر الآن" tone="success" size="sm" onPress={() => handlePublish(selected.id)} />}
+        {s === 'published' && <Button label="إيقاف" tone="danger" size="sm" onPress={() => { pausePartnerOfferItem(selected.id); refresh(); }} />}
+        {s === 'paused' && <Button label="إعادة النشر" tone="success" size="sm" onPress={() => handlePublish(selected.id)} />}
 
         {(s === 'inbound' || s === 'review') && (
           <Button label="رفض" tone="danger" size="sm" onPress={() => {

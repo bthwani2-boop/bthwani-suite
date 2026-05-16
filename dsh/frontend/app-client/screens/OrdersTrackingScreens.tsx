@@ -41,6 +41,7 @@ import type {
   DshClientServiceabilityQuote,
   DshClientWalletImpactVisibility,
 } from '../contracts/dsh-client-binding.contracts';
+import type { DshSmartProximityState, DshSmartTrackingSnapshot } from '../../shared/dsh-order-journey.model';
 
 type CreateOrderValues = {
   pickupAddress: string;
@@ -764,8 +765,8 @@ function buildDefaultLifecycleStatus(clientState: DshClientState, phase: Journey
     return 'quote';
   }
 
-  if (clientState === 'order_created') return 'created';
-  if (clientState === 'order_confirmed') return 'confirmed';
+  if (clientState === 'order_created') return 'confirmed';
+  if (clientState === 'order_confirmed') return 'operations_approved';
   if (clientState === 'cancelled') return 'cancelled';
   if (clientState === 'failed') return 'failed';
   if (clientState === 'refund_pending') return 'returned';
@@ -932,19 +933,13 @@ function buildDefaultWalletImpact(clientState: DshClientState): DshClientWalletI
   return null;
 }
 
-type SmartProximityState = 'enroute' | 'near_customer' | 'at_door' | 'bell_rang';
+const SMART_TRACKING_SEQUENCE: DshSmartProximityState[] = ['enroute', 'near_customer', 'at_door', 'bell_rang'];
 
-type SmartTrackingState = {
-  lastUpdateMinutesAgo: number;
-  etaMinutes: number | null;
-  proximityState: SmartProximityState;
-  bellRang: boolean;
-};
-
-const SMART_TRACKING_SEQUENCE: SmartProximityState[] = ['enroute', 'near_customer', 'at_door', 'bell_rang'];
-
-function useSmartTrackingHeartbeat(phase: JourneyPhase): SmartTrackingState {
-  const [state, setState] = React.useState<SmartTrackingState>({
+function useSmartTrackingHeartbeat(phase: JourneyPhase): DshSmartTrackingSnapshot {
+  const [state, setState] = React.useState<DshSmartTrackingSnapshot>({
+    source: 'captain_heartbeat_demo',
+    cadenceMinutes: 3,
+    isLiveMap: false,
     lastUpdateMinutesAgo: 1,
     etaMinutes: 12,
     proximityState: 'enroute',
@@ -966,6 +961,9 @@ function useSmartTrackingHeartbeat(phase: JourneyPhase): SmartTrackingState {
         const etaDelta = prev.etaMinutes !== null ? Math.max(0, prev.etaMinutes - 3) : null;
 
         return {
+          source: 'captain_heartbeat_demo',
+          cadenceMinutes: 3,
+          isLiveMap: false,
           lastUpdateMinutesAgo: 0,
           etaMinutes: etaDelta,
           proximityState: nextProximity,
@@ -980,7 +978,7 @@ function useSmartTrackingHeartbeat(phase: JourneyPhase): SmartTrackingState {
   return state;
 }
 
-function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smartTracking: SmartTrackingState }) {
+function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smartTracking: DshSmartTrackingSnapshot }) {
   const { theme } = useTheme();
 
   const proximityAlert = smartTracking.proximityState === 'bell_rang'

@@ -29,11 +29,10 @@ export type DshCaptainOrderStage = 'offer' | 'accepted' | 'pickup' | 'delivery' 
 
 export type DshCaptainOrderBellItem = {
 	id: DshCaptainOrderId;
+	serviceType: DshCaptainOrderServiceType;
 	title: string;
 	subtitle: string;
 	meta: string;
-	badgeLabel: string;
-	tone?: 'brand' | 'success' | 'warning' | 'info';
 };
 
 export type DshCaptainOrderMessage = {

@@ -1,13 +1,16 @@
 import type { PartnerOfferRecord } from './partner-offer.preview-store';
 import type { SubscriptionPlan, Entitlement } from './loyalty.preview-store';
 import type { CampaignRecord } from './campaign.preview-store';
+import type { CommercialConflict } from './commercial.preview-contract';
 
+// Projection-local source tracking (not the same as CommercialSourceEntry from contract —
+// this tracks internal projection state including approvalStage and sourceType for map filtering).
 export type CommercialSource = {
   sourceOwner: string;
   sourceRecordId: string;
   sourceType: string;
   approvalStage?: string;
-  conflictStatus?: 'none' | 'warning' | 'blocker';
+  conflictSeverity?: 'none' | 'warning' | 'blocker';
   conflictReason?: string;
 };
 
@@ -55,14 +58,14 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
         sourceRecordId: offer.id,
         sourceType: 'offer',
         approvalStage: offer.status,
-        conflictStatus: 'blocker',
+        conflictSeverity: 'blocker',
         conflictReason: `العرض في حالة (${offer.status}) وغير مسموح بظهوره للعملاء.`
       };
     }
   });
 
   for (const offer of visibleOffers) {
-    const isOfferBlocked = sourceMap[`offer-${offer.id}`]?.conflictStatus === 'blocker' || sourceMap['offerLabel']?.conflictStatus === 'blocker';
+    const isOfferBlocked = sourceMap[`offer-${offer.id}`]?.conflictSeverity === 'blocker' || sourceMap['offerLabel']?.conflictSeverity === 'blocker';
 
     if (offer.displayBadge && !offerLabel && !isOfferBlocked) {
       offerLabel = offer.displayBadge;
@@ -72,11 +75,11 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
         sourceRecordId: offer.id,
         sourceType: 'offer',
         approvalStage: offer.status,
-        conflictStatus: 'none'
+        conflictSeverity: 'none'
       };
     }
 
-    const isCouponBlocked = sourceMap['hasCouponAvailable']?.conflictStatus === 'blocker';
+    const isCouponBlocked = sourceMap['hasCouponAvailable']?.conflictSeverity === 'blocker';
     if (offer.offerType === 'coupon' && !isCouponBlocked) {
       hasCouponAvailable = true;
       badges.push({ label: 'كوبون متاح', source: 'partner' });
@@ -85,11 +88,11 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
         sourceRecordId: offer.id,
         sourceType: 'coupon',
         approvalStage: offer.status,
-        conflictStatus: 'none'
+        conflictSeverity: 'none'
       };
     }
 
-    const isDeliveryBlocked = sourceMap['deliveryFeeLabel']?.conflictStatus === 'blocker';
+    const isDeliveryBlocked = sourceMap['deliveryFeeLabel']?.conflictSeverity === 'blocker';
     if (offer.offerType === 'free-delivery' && !deliveryFeeLabel && !isDeliveryBlocked) {
       deliveryFeeLabel = 'توصيل مجاني (شريك)';
       badges.push({ label: 'توصيل مجاني', source: 'partner' });
@@ -98,14 +101,14 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
         sourceRecordId: offer.id,
         sourceType: 'delivery',
         approvalStage: offer.status,
-        conflictStatus: 'none'
+        conflictSeverity: 'none'
       };
     }
   }
 
   // 2. Campaigns
   for (const camp of context.activeCampaigns) {
-    const isCampaignBlocked = sourceMap[`campaign-${camp.id}`]?.conflictStatus === 'blocker';
+    const isCampaignBlocked = sourceMap[`campaign-${camp.id}`]?.conflictSeverity === 'blocker';
     if (camp.channels?.includes('store-card') && !isCampaignBlocked) {
       const badgeLabel = `حملة: ${camp.title}`;
       badges.push({ label: badgeLabel, source: 'campaign' });
@@ -114,7 +117,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
         sourceRecordId: camp.id,
         sourceType: 'campaign',
         approvalStage: 'published',
-        conflictStatus: 'none'
+        conflictSeverity: 'none'
       };
     }
   }
@@ -123,27 +126,27 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
   let hasBthwaniPro = false;
   const subscriptionPackageChips: string[] = [];
 
-  const isProBlocked = sourceMap['hasBthwaniPro']?.conflictStatus === 'blocker';
+  const isProBlocked = sourceMap['hasBthwaniPro']?.conflictSeverity === 'blocker';
   if (context.activeSubscriptions.some(s => s.id === 'sub-pro') && !isProBlocked) {
     hasBthwaniPro = true;
     subscriptionPackageChips.push('بثواني برو', 'توصيل سريع');
     badges.push({ label: '⚡ بثواني برو', source: 'subscription' });
 
     // Conflict Detection: Pro subscription without entitlement
-    const hasProEntitlement = context.activeEntitlements.some(e => e.type === 'reward' || e.type === 'subscription');
+    const hasProEntitlement = context.activeEntitlements.some(e => e.type === 'loyalty-reward' || e.type === 'subscription');
     sourceMap['hasBthwaniPro'] = {
       sourceOwner: 'loyalty.preview-store',
       sourceRecordId: 'sub-pro',
       sourceType: 'subscription',
       approvalStage: 'active',
-      conflictStatus: hasProEntitlement ? 'none' : 'warning',
+      conflictSeverity: hasProEntitlement ? 'none' : 'warning',
       conflictReason: hasProEntitlement ? undefined : 'اشتراك برو فعال ولكن لا توجد استحقاقات (Entitlements) مرتبطة.'
     };
   }
 
   for (const e of context.activeEntitlements) {
-    const isEntitlementBlocked = sourceMap[`entitlement-${e.id}`]?.conflictStatus === 'blocker';
-    if (e.type === 'reward' && !isEntitlementBlocked) {
+    const isEntitlementBlocked = sourceMap[`entitlement-${e.id}`]?.conflictSeverity === 'blocker';
+    if (e.type === 'loyalty-reward' && !isEntitlementBlocked) {
       notes.push('يوجد استحقاق مكافأة متاح');
       badges.push({ label: 'مكافأة ولاء', source: 'loyalty' });
       sourceMap[`entitlement-${e.id}`] = {
@@ -151,14 +154,14 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
         sourceRecordId: e.id,
         sourceType: 'entitlement',
         approvalStage: 'active',
-        conflictStatus: 'none'
+        conflictSeverity: 'none'
       };
     }
   }
 
   // 4. Catalog & Features
   let priceMatchLabel: string | undefined = undefined;
-  const isPriceMatchBlocked = sourceMap['priceMatchLabel']?.conflictStatus === 'blocker';
+  const isPriceMatchBlocked = sourceMap['priceMatchLabel']?.conflictSeverity === 'blocker';
   if (context.catalogFeatures?.priceMatch && !isPriceMatchBlocked) {
     priceMatchLabel = 'الأسعار مطابقة للكتالوج';
     badges.push({ label: 'تطابق السعر', source: 'catalog' });
@@ -166,7 +169,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
       sourceOwner: 'catalog-sync',
       sourceRecordId: 'catalog-parity',
       sourceType: 'feature',
-      conflictStatus: 'none'
+      conflictSeverity: 'none'
     };
   }
 
@@ -176,7 +179,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
       sourceOwner: 'catalog-adoption',
       sourceRecordId: 'new-arrivals',
       sourceType: 'status',
-      conflictStatus: 'none'
+      conflictSeverity: 'none'
     };
   }
 
@@ -186,7 +189,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
       sourceOwner: 'catalog-gate',
       sourceRecordId: 'leak-detection',
       sourceType: 'security',
-      conflictStatus: 'blocker',
+      conflictSeverity: 'blocker',
       conflictReason: 'توجد منتجات جديدة معروضة في التطبيق قبل وصولها إلى مرحلة client-visible.'
     };
   }
@@ -196,26 +199,33 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
     sourceOwner: 'ops-settings',
     sourceRecordId: 'pickup-config',
     sourceType: 'service',
-    conflictStatus: 'none'
+    conflictSeverity: 'none'
   };
 
   sourceMap['supportsPartnerDelivery'] = {
     sourceOwner: 'ops-settings',
     sourceRecordId: 'partner-delivery-config',
     sourceType: 'service',
-    conflictStatus: 'none'
+    conflictSeverity: 'none'
   };
 
-  // Final Conflict Analysis
-  const detectedConflicts = Object.values(sourceMap).filter(s => s.conflictStatus && s.conflictStatus !== 'none');
+  // Final Conflict Analysis — typed as CommercialConflict[]
+  const detectedConflicts: CommercialConflict[] = Object.entries(sourceMap)
+    .filter(([, s]) => s.conflictSeverity && s.conflictSeverity !== 'none')
+    .map(([key, s]) => ({
+      conflictId: key,
+      severity: s.conflictSeverity as 'warning' | 'blocker',
+      reason: s.conflictReason ?? key,
+      sourceA: s.sourceRecordId,
+    }));
 
-  // Phase R3 Gate: Strictly filter commercialChips based on sourceMap blockers
+  // Blocker gate: strictly filter commercialChips
   const filteredCommercialChips = badges.filter(badge => {
     const sourceKeys = Object.keys(sourceMap).filter(k =>
       sourceMap[k].sourceType === badge.source ||
       (badge.source === 'partner' && (k.startsWith('offer') || k === 'hasCouponAvailable' || k === 'deliveryFeeLabel'))
     );
-    const isBlocked = sourceKeys.some(k => sourceMap[k].conflictStatus === 'blocker');
+    const isBlocked = sourceKeys.some(k => sourceMap[k].conflictSeverity === 'blocker');
     return !isBlocked;
   });
 

@@ -11,8 +11,10 @@ export function getWltDshFieldPreviewData(storeIds?: readonly string[]) {
       storeIds,
       snapshot,
       records: snapshot.records,
-      commissionRecords: snapshot.records.filter((record) => record.kind === 'field-commission'),
-      payoutRecords: snapshot.records.filter((record) => record.kind === 'field-payout'),
+      commissionRecords: snapshot.commissionRecords,
+      pendingRecords: snapshot.pendingRecords,
+      rejectedRecords: snapshot.rejectedRecords,
+      payoutRecords: snapshot.payoutRecords,
     },
   } as const satisfies WltDshFieldBridgeState & {
     contract: typeof wltDshFieldBridgeDataContract;

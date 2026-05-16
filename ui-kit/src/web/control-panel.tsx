@@ -3,6 +3,7 @@ import { Box, Surface, Text, Divider } from '../primitives';
 import { useDirection, useTheme } from '../providers';
 import { Icon, type IconName } from '../components/icons';
 import { Button } from '../components/button';
+import { colorPalette, withAlpha } from '../foundation';
 
 /**
  * WebControlPanelShell: The root container for a control panel interface.
@@ -76,7 +77,7 @@ export function WebControlPanelTopBar({ title, subtitle, leading, trailing, acti
       radiusToken="none"
       border={false}
       style={{
-        borderBottom: '1px solid rgba(10, 47, 92, 0.08)',
+        borderBottom: `1px solid ${withAlpha(colorPalette.brandStrong, 0.08)}`,
         zIndex: 10,
         height: 56,
         display: 'flex',
@@ -97,7 +98,7 @@ export function WebControlPanelTopBar({ title, subtitle, leading, trailing, acti
         {actions}
         {trailing && (
           <>
-            <Divider style={{ height: 24, width: 1, backgroundColor: 'rgba(10, 47, 92, 0.1)' }} />
+            <Divider style={{ height: 24, width: 1, backgroundColor: withAlpha(colorPalette.brandStrong, 0.1) }} />
             {trailing}
           </>
         )}
@@ -123,7 +124,7 @@ export function WebControlPanelRail({ children, collapsed, footer }: WebControlP
     <Box
       style={{
         width: collapsed ? 64 : 260,
-        backgroundColor: '#0A2F5C',
+        backgroundColor: colorPalette.brandStrong,
         height: '100%',
         minHeight: 0,
         transition: 'width 0.2s ease',
@@ -137,7 +138,7 @@ export function WebControlPanelRail({ children, collapsed, footer }: WebControlP
         {children}
       </Box>
       {footer && (
-        <Box padding={2} style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        <Box padding={2} style={{ borderTop: `1px solid ${withAlpha(colorPalette.white, 0.1)}` }}>
           {footer}
         </Box>
       )}
@@ -243,8 +244,8 @@ export function WebControlPanelKpiTile({ label, value, trend, icon }: WebControl
       style={{
         minWidth: 180,
         flex: 1,
-        border: '1px solid rgba(10, 47, 92, 0.05)',
-        background: '#FFFFFF'
+        border: `1px solid ${withAlpha(colorPalette.brandStrong, 0.05)}`,
+        background: colorPalette.white
       }}
     >
       <Box layoutDirection="row" justify="space-between" align="flex-start">
@@ -256,7 +257,7 @@ export function WebControlPanelKpiTile({ label, value, trend, icon }: WebControl
           <Box
             padding={2}
             radiusToken="md"
-            style={{ backgroundColor: 'rgba(10, 47, 92, 0.04)' }}
+            style={{ backgroundColor: withAlpha(colorPalette.brandStrong, 0.04) }}
           >
             <Icon name={icon} size={18} tone="brand" />
           </Box>
@@ -299,19 +300,19 @@ export function WebControlPanelCommandCard({ title, description, icon, onPress, 
         minWidth: 280,
         cursor: onPress ? 'pointer' : 'default',
         transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-        border: '1px solid rgba(10, 47, 92, 0.08)',
-        background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)'
+        border: `1px solid ${withAlpha(colorPalette.brandStrong, 0.08)}`,
+        background: `linear-gradient(180deg, ${colorPalette.white} 0%, #F8FAFC 100%)` /* #F8FAFC: NEEDS_PHASE_2 — slate-50, no canonical match */
       }}
       elevationToken="flat"
       // @ts-ignore
-      hoverStyle={{ transform: 'translateY(-2px)', boxShadow: '0 12px 24px rgba(10, 47, 92, 0.08)' }}
+      hoverStyle={{ transform: 'translateY(-2px)', boxShadow: `0 12px 24px ${withAlpha(colorPalette.brandStrong, 0.08)}` }}
       onPress={onPress}
     >
       <Box layoutDirection="row" justify="space-between" align="flex-start">
         <Box
           padding={3}
           radiusToken="lg"
-          style={{ backgroundColor: 'rgba(255, 80, 13, 0.08)' }}
+          style={{ backgroundColor: withAlpha(colorPalette.brand, 0.08) }}
         >
           <Icon name={icon} size={24} tone="accent" />
         </Box>
@@ -320,9 +321,9 @@ export function WebControlPanelCommandCard({ title, description, icon, onPress, 
             paddingX={2}
             paddingY={1}
             radiusToken="full"
-            style={{ backgroundColor: '#FF500D' }}
+            style={{ backgroundColor: colorPalette.brand }}
           >
-            <Text role="caption" weight="black" style={{ color: '#FFFFFF', fontSize: 10 }}>{badge}</Text>
+            <Text role="caption" weight="black" style={{ color: colorPalette.white, fontSize: 10 }}>{badge}</Text>
           </Box>
         )}
       </Box>
@@ -357,9 +358,9 @@ export function WebControlPanelDecisionQueue({ title, items }: WebControlPanelDe
     <Surface
       padding={0}
       radiusToken="xl"
-      style={{ width: '100%', overflow: 'hidden', border: '1px solid rgba(10, 47, 92, 0.08)' }}
+      style={{ width: '100%', overflow: 'hidden', border: `1px solid ${withAlpha(colorPalette.brandStrong, 0.08)}` }}
     >
-      <Box padding={4} style={{ backgroundColor: '#F1F5F9', borderBottom: '1px solid rgba(10, 47, 92, 0.05)' }}>
+      <Box padding={4} style={{ backgroundColor: '#F1F5F9' /* NEEDS_PHASE_2: slate-100 */, borderBottom: `1px solid ${withAlpha(colorPalette.brandStrong, 0.05)}` }}>
         <Text role="labelLg" weight="black">{title}</Text>
       </Box>
       <Box>
@@ -371,7 +372,7 @@ export function WebControlPanelDecisionQueue({ title, items }: WebControlPanelDe
               justify="space-between"
               align="center"
               style={{
-                backgroundColor: '#FFFFFF',
+                backgroundColor: colorPalette.white,
                 flexDirection: isRtl ? 'row-reverse' : 'row'
               }}
             >
@@ -414,7 +415,7 @@ export function WebControlPanelEmptyState({ title, description, icon, actionLabe
       <Box
         padding={6}
         radiusToken="full"
-        style={{ backgroundColor: 'rgba(10, 47, 92, 0.03)', marginBottom: 12 }}
+        style={{ backgroundColor: withAlpha(colorPalette.brandStrong, 0.03), marginBottom: 12 }}
       >
         <Icon name={icon} size={64} tone="soft" />
       </Box>

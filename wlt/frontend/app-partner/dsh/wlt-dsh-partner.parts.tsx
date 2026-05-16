@@ -425,27 +425,31 @@ export function PartnerDshWalletBridgeView({
 
       <Surface tone="raised" padding={3} gap={3}>
         <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-          ملخص مالي سريع
+          ملخص مالي سريع — ر.ي (ريال يمني)
         </Text>
         <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 10 }}>
-          <CompactMetric label="الرصيد المتاح" value={partnerPreview.summary.totalLabel} tone="success" />
-          <CompactMetric label="المستحقات" value={partnerPreview.nextSettlementLabel} tone="warning" />
-          <CompactMetric label="آخر تسوية" value={partnerPreview.records[0]?.timeLabel ?? 'اليوم'} tone="info" />
+          <CompactMetric label="إجمالي المبيعات" value={partnerPreview.grossSalesLabel} tone="info" />
+          <CompactMetric label="صافي التسوية" value={partnerPreview.netSettlementLabel} tone="success" />
+          <CompactMetric label="التسوية القادمة" value={partnerPreview.nextSettlementLabel} tone="warning" />
         </View>
       </Surface>
 
       <Surface tone="raised" padding={3} gap={3}>
         <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-          الحسابات والتسويات
+          تفصيل الدورة المالية
         </Text>
         <KeyValueList
           dense
           items={[
-            { label: 'الخطة المالية', value: 'نشطة', tone: 'success' },
-            { label: 'التحصيل القادم', value: 'خلال يومين', tone: 'warning' },
-            { label: 'مرجع التسوية', value: 'دفعة محلية' },
-            { label: 'النطاق المرتبط', value: linkedScopeLabel, tone: 'info' },
+            { label: 'إجمالي المبيعات', value: partnerPreview.grossSalesLabel, tone: 'info' },
+            { label: 'عمولة المنصة', value: partnerPreview.platformCommissionLabel, tone: 'warning' },
+            { label: 'خصومات واستردادات', value: partnerPreview.deductionsLabel, tone: 'warning' },
+            { label: 'صافي التسوية', value: partnerPreview.netSettlementLabel, tone: 'success' },
             { label: 'حالة الدورة', value: partnerPreview.cycleStatus, tone: 'success' },
+            { label: 'بداية الدورة', value: partnerPreview.cycleStartDate, tone: 'default' as const },
+            { label: 'نهاية الدورة', value: partnerPreview.cycleEndDate, tone: 'default' as const },
+            { label: 'موعد الصرف القادم', value: partnerPreview.nextPayoutDate, tone: 'info' },
+            { label: 'النطاق المرتبط', value: linkedScopeLabel, tone: 'info' },
           ]}
         />
       </Surface>
