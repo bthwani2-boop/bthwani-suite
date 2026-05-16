@@ -1223,8 +1223,8 @@ export function DshCaptainOrdersOffersListScreen(props: { onBack?: () => void; o
 			primaryLabel="تحديث العروض"
 			secondaryLabel="العودة إلى دليل الدعم"
 			listItems={[
-				{ title: 'عرض #440', subtitle: 'Bean House إلى النخيل', meta: 'الدفع المتوقع 22 SAR', badgeLabel: 'مفتوح' },
-				{ title: 'عرض #441', subtitle: 'Green Bowl إلى العليا', meta: 'الدفع المتوقع 19 SAR', badgeLabel: 'مفتوح' },
+				{ title: 'عرض #440', subtitle: 'Bean House إلى الوسط', meta: 'الدفع المتوقع 22 ر.ي', badgeLabel: 'مفتوح' },
+				{ title: 'عرض #441', subtitle: 'Green Bowl إلى الدائري', meta: 'الدفع المتوقع 19 ر.ي', badgeLabel: 'مفتوح' },
 			]}
 			onBack={props.onBack}
 			onSecondaryAction={props.onSecondaryAction}

@@ -76,8 +76,8 @@ type PaymentMethodKey = 'cod' | 'wallet' | 'mixed' | 'official-wallets';
 
 type PaymentSelection = {
   method: PaymentMethodKey;
-  walletAmountHalalas: number;
-  amountDueOnDeliveryHalalas: number;
+  walletAmountMinorUnits: number;
+  amountDueOnDeliveryMinorUnits: number;
   valid: boolean;
   isExperimental?: boolean;
   summary: string;
@@ -97,9 +97,9 @@ type CartItem = {
 
 type CheckoutActionPayload = {
   paymentMethod: PaymentMethodKey;
-  walletAmountHalalas: number;
-  amountDueOnDeliveryHalalas: number;
-  orderTotalHalalas: number;
+  walletAmountMinorUnits: number;
+  amountDueOnDeliveryMinorUnits: number;
+  orderTotalMinorUnits: number;
   summary: string;
   financeEventKind: WltDshFinanceEventKind;
 };
@@ -186,7 +186,7 @@ function formatAmount(value: number) {
   }
 }
 
-function formatHalalasAmount(value: number) {
+function formatMinorUnitsAmount(value: number) {
   return formatAmount(value / 100);
 }
 
@@ -587,23 +587,23 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const paymentPendingMeta = useMemo(() => getDshClientStateMeta('payment_pending'), []);
   const walletCreditMeta = useMemo(() => getDshClientStateMeta('wallet_credit_visible'), []);
 
-  const subtotalHalalas = useMemo(
+  const subtotalMinorUnits = useMemo(
     () => items.reduce((acc, item) => acc + Math.round(resolveCartItemPriceValue(item) * 100) * (item.qty ?? 1), 0),
     [items],
   );
-  const subtotalAmount = subtotalHalalas / 100;
+  const subtotalAmount = subtotalMinorUnits / 100;
   const deliveryAmount = 950;
   const grandTotalAmount = subtotalAmount + deliveryAmount;
-  const grandTotalHalalas = subtotalHalalas + Math.round(deliveryAmount * 100);
+  const grandTotalMinorUnits = subtotalMinorUnits + Math.round(deliveryAmount * 100);
   const walletBalance = walletBalanceRaw ?? 0;
-  const walletShortfallHalalas = Math.max(grandTotalHalalas - walletBalance, 0);
-  const canUseWalletFull = walletLinked && walletBalance >= grandTotalHalalas;
-  const canUseMixedPayment = walletLinked && walletBalance > 0 && walletBalance < grandTotalHalalas;
+  const walletShortfallMinorUnits = Math.max(grandTotalMinorUnits - walletBalance, 0);
+  const canUseWalletFull = walletLinked && walletBalance >= grandTotalMinorUnits;
+  const canUseMixedPayment = walletLinked && walletBalance > 0 && walletBalance < grandTotalMinorUnits;
   const formattedSubtotal = formatAmount(subtotalAmount);
   const formattedDelivery = formatAmount(deliveryAmount);
   const formattedGrandTotal = formatAmount(grandTotalAmount);
   const formattedWalletBalance = formatAmount(walletBalance / 100);
-  const formattedWalletShortfall = formatHalalasAmount(walletShortfallHalalas);
+  const formattedWalletShortfall = formatMinorUnitsAmount(walletShortfallMinorUnits);
   const canCheckout = items.length > 0;
   const androidSystemBottomInset = Platform.OS === 'android'
     ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
@@ -663,9 +663,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     }
   };
 
-  const topUpWalletInline = async (amountHalalas: number) => {
+  // PREVIEW_ONLY: in-memory simulation — no real ledger write
+  const topUpWalletInline = async (amountMinorUnits: number) => {
     try {
-      const normalizedAmount = Math.max(amountHalalas, 0);
+      const normalizedAmount = Math.max(amountMinorUnits, 0);
       if (!normalizedAmount) {
         showNotice('لا يوجد مبلغ مطلوب للشحن', 'الرصيد الحالي يغطي الطلب أو لا توجد بيانات كافية.', 'info');
         return;
@@ -673,7 +674,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
       await topUpWallet(normalizedAmount);
       await refreshWallet();
-      showNotice('تم شحن الرصيد', `تم شحن ${formatHalalasAmount(normalizedAmount)} في المحفظة.`, 'success');
+      showNotice('تم شحن الرصيد', `تم شحن ${formatMinorUnitsAmount(normalizedAmount)} في المحفظة.`, 'success');
     } catch {
       showNotice('تعذر شحن الرصيد', 'حدث خطأ أثناء تحديث رصيد المحفظة.', 'danger');
     }
@@ -684,8 +685,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       if (!walletHydrated || walletRefreshing) {
         return {
           method: 'wallet',
-          walletAmountHalalas: 0,
-          amountDueOnDeliveryHalalas: grandTotalHalalas,
+          walletAmountMinorUnits: 0,
+          amountDueOnDeliveryMinorUnits: grandTotalMinorUnits,
           valid: false,
           summary: 'جاري التحقق من حالة المحفظة.',
           blockingReason: 'انتظر اكتمال مزامنة حالة الربط والرصيد ثم أعد المحاولة.',
@@ -697,8 +698,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         if (EXPERIMENTAL_PAYMENT_ENABLED) {
           return {
             method: 'wallet',
-            walletAmountHalalas: grandTotalHalalas,
-            amountDueOnDeliveryHalalas: 0,
+            walletAmountMinorUnits: grandTotalMinorUnits,
+            amountDueOnDeliveryMinorUnits: 0,
             valid: true,
             isExperimental: true,
             summary: 'دفع تجريبي من المحفظة — سيُسجَّل محليًا فقط',
@@ -708,8 +709,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
         return {
           method: 'wallet',
-          walletAmountHalalas: 0,
-          amountDueOnDeliveryHalalas: grandTotalHalalas,
+          walletAmountMinorUnits: 0,
+          amountDueOnDeliveryMinorUnits: grandTotalMinorUnits,
           valid: false,
           summary: 'ادفع كامل الطلب من رصيد WLT الداخلي.',
           blockingReason: hasWltServiceRoute ? 'اربط المحفظة أو اشحنها عبر WLT أولًا ثم أعد الاختيار.' : 'مسار شحن المحفظة غير موصول بعد داخل المضيف الحالي.',
@@ -717,12 +718,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         };
       }
 
-      if (walletBalance < grandTotalHalalas) {
+      if (walletBalance < grandTotalMinorUnits) {
         if (EXPERIMENTAL_PAYMENT_ENABLED) {
           return {
             method: 'wallet',
-            walletAmountHalalas: walletBalance,
-            amountDueOnDeliveryHalalas: grandTotalHalalas - walletBalance,
+            walletAmountMinorUnits: walletBalance,
+            amountDueOnDeliveryMinorUnits: grandTotalMinorUnits - walletBalance,
             valid: true,
             isExperimental: true,
             summary: 'دفع تجريبي جزئي من المحفظة — سيُسجَّل محليًا فقط',
@@ -732,8 +733,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
         return {
           method: 'wallet',
-          walletAmountHalalas: walletBalance,
-          amountDueOnDeliveryHalalas: grandTotalHalalas - walletBalance,
+          walletAmountMinorUnits: walletBalance,
+          amountDueOnDeliveryMinorUnits: grandTotalMinorUnits - walletBalance,
           valid: false,
           summary: 'الرصيد الحالي أقل من إجمالي الطلب.',
           blockingReason: `تحتاج شحن ${formattedWalletShortfall} قبل اعتماد هذا الخيار.`,
@@ -743,8 +744,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
       return {
         method: 'wallet',
-        walletAmountHalalas: grandTotalHalalas,
-        amountDueOnDeliveryHalalas: 0,
+        walletAmountMinorUnits: grandTotalMinorUnits,
+        amountDueOnDeliveryMinorUnits: 0,
         valid: true,
         summary: 'الرصيد يكفي، سيتم الدفع كاملًا من المحفظة.',
         feedbackTone: 'success',
@@ -755,8 +756,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       if (!walletHydrated || walletRefreshing) {
         return {
           method: 'mixed',
-          walletAmountHalalas: 0,
-          amountDueOnDeliveryHalalas: grandTotalHalalas,
+          walletAmountMinorUnits: 0,
+          amountDueOnDeliveryMinorUnits: grandTotalMinorUnits,
           valid: false,
           summary: 'جاري التحقق من حالة المحفظة.',
           blockingReason: 'انتظر اكتمال المزامنة قبل تفعيل الدفع المدمج.',
@@ -768,8 +769,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         if (EXPERIMENTAL_PAYMENT_ENABLED) {
           return {
             method: 'mixed',
-            walletAmountHalalas: 0,
-            amountDueOnDeliveryHalalas: grandTotalHalalas,
+            walletAmountMinorUnits: 0,
+            amountDueOnDeliveryMinorUnits: grandTotalMinorUnits,
             valid: true,
             isExperimental: true,
             summary: 'دفع مدمج تجريبي — سيُسجَّل محليًا فقط',
@@ -779,8 +780,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
         return {
           method: 'mixed',
-          walletAmountHalalas: 0,
-          amountDueOnDeliveryHalalas: grandTotalHalalas,
+          walletAmountMinorUnits: 0,
+          amountDueOnDeliveryMinorUnits: grandTotalMinorUnits,
           valid: false,
           summary: 'الدفع المدمج يحتاج رصيدًا فعليًا في WLT.',
           blockingReason: 'لا يوجد رصيد لاستخدام الدفع المدمج الآن.',
@@ -788,11 +789,11 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         };
       }
 
-      if (walletBalance >= grandTotalHalalas) {
+      if (walletBalance >= grandTotalMinorUnits) {
         return {
           method: 'mixed',
-          walletAmountHalalas: grandTotalHalalas,
-          amountDueOnDeliveryHalalas: 0,
+          walletAmountMinorUnits: grandTotalMinorUnits,
+          amountDueOnDeliveryMinorUnits: 0,
           valid: false,
           summary: 'الرصيد يكفي للدفع الكامل من المحفظة.',
           blockingReason: 'الرصيد يكفي للدفع الكامل من المحفظة، لذلك الدفع المدمج غير ضروري.',
@@ -802,10 +803,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
       return {
         method: 'mixed',
-        walletAmountHalalas: walletBalance,
-        amountDueOnDeliveryHalalas: grandTotalHalalas - walletBalance,
+        walletAmountMinorUnits: walletBalance,
+        amountDueOnDeliveryMinorUnits: grandTotalMinorUnits - walletBalance,
         valid: true,
-        summary: `سيُخصم ${formattedWalletBalance} من المحفظة ويُدفع ${formatHalalasAmount(grandTotalHalalas - walletBalance)} عند الاستلام.`,
+        summary: `سيُخصم ${formattedWalletBalance} من المحفظة ويُدفع ${formatMinorUnitsAmount(grandTotalMinorUnits - walletBalance)} عند الاستلام.`,
         feedbackTone: 'info',
       };
     }
@@ -814,8 +815,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       if (!hasWltServiceRoute && EXPERIMENTAL_PAYMENT_ENABLED) {
         return {
           method: 'official-wallets',
-          walletAmountHalalas: 0,
-          amountDueOnDeliveryHalalas: 0,
+          walletAmountMinorUnits: 0,
+          amountDueOnDeliveryMinorUnits: 0,
           valid: true,
           isExperimental: true,
           summary: 'دفع تجريبي عبر محافظ رسمية — سيُسجَّل محليًا فقط',
@@ -825,8 +826,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
       return {
         method: 'official-wallets',
-        walletAmountHalalas: 0,
-        amountDueOnDeliveryHalalas: 0,
+        walletAmountMinorUnits: 0,
+        amountDueOnDeliveryMinorUnits: 0,
         valid: false,
         summary: hasWltServiceRoute
           ? 'سيتم تحويلك إلى WLT لاختيار محفظة رسمية وإكمال الدفع أو الشحن خارج هذه الشاشة.'
@@ -840,13 +841,13 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
     return {
       method: 'cod',
-      walletAmountHalalas: 0,
-      amountDueOnDeliveryHalalas: grandTotalHalalas,
+      walletAmountMinorUnits: 0,
+      amountDueOnDeliveryMinorUnits: grandTotalMinorUnits,
       valid: true,
       summary: 'ستدفع كامل المبلغ عند الاستلام.',
       feedbackTone: 'info',
     };
-  }, [formattedWalletBalance, formattedWalletShortfall, grandTotalHalalas, hasWltServiceRoute, paymentMethod, walletBalance, walletHydrated, walletLinked, walletRefreshing]);
+  }, [formattedWalletBalance, formattedWalletShortfall, grandTotalMinorUnits, hasWltServiceRoute, paymentMethod, walletBalance, walletHydrated, walletLinked, walletRefreshing]);
 
   React.useEffect(() => {
     if (EXPERIMENTAL_PAYMENT_ENABLED) return;
@@ -872,8 +873,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         statusLabel: paymentMethod === 'cod' ? 'محدد' : 'جاهز الآن',
         statusTone: paymentMethod === 'cod' ? 'brand' : 'info',
         amountRows: [
-          { label: 'من المحفظة', value: formatHalalasAmount(0), tone: 'muted' },
-          { label: 'عند الاستلام', value: formatHalalasAmount(grandTotalHalalas), tone: 'brand' },
+          { label: 'من المحفظة', value: formatMinorUnitsAmount(0), tone: 'muted' },
+          { label: 'عند الاستلام', value: formatMinorUnitsAmount(grandTotalMinorUnits), tone: 'brand' },
         ],
         helperText: paymentMethod === 'cod' ? 'لا يستخدم رصيد المحفظة.' : undefined,
         helperTone: 'info',
@@ -889,8 +890,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         statusTone: paymentMethod === 'wallet' ? 'brand' : walletPending ? 'info' : canUseWalletFull ? 'success' : EXPERIMENTAL_PAYMENT_ENABLED ? 'warning' : !walletLinked || walletBalance <= 0 ? 'warning' : 'warning',
         amountRows: canUseWalletFull
           ? [
-              { label: 'من المحفظة', value: formatHalalasAmount(grandTotalHalalas), tone: 'brand' },
-              { label: 'عند الاستلام', value: formatHalalasAmount(0), tone: 'muted' },
+              { label: 'من المحفظة', value: formatMinorUnitsAmount(grandTotalMinorUnits), tone: 'brand' },
+              { label: 'عند الاستلام', value: formatMinorUnitsAmount(0), tone: 'muted' },
             ]
           : walletLinked
             ? [
@@ -917,7 +918,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               label: walletLinked ? 'شحن الرصيد' : 'ربط المحفظة',
               tone: 'primary',
               onPress: walletLinked
-                ? (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void topUpWalletInline(walletShortfallHalalas))
+                ? (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void topUpWalletInline(walletShortfallMinorUnits))
                 : (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void linkWalletInline()),
               disabled: walletPending,
             },
@@ -934,14 +935,14 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         amountRows: canUseMixedPayment
           ? [
               { label: 'من المحفظة', value: formattedWalletBalance, tone: 'brand' },
-              { label: 'عند الاستلام', value: formatHalalasAmount(grandTotalHalalas - walletBalance), tone: 'brand' },
+              { label: 'عند الاستلام', value: formatMinorUnitsAmount(grandTotalMinorUnits - walletBalance), tone: 'brand' },
             ]
           : [
-              { label: 'من المحفظة', value: walletLinked ? formattedWalletBalance : formatHalalasAmount(0), tone: 'muted' },
+              { label: 'من المحفظة', value: walletLinked ? formattedWalletBalance : formatMinorUnitsAmount(0), tone: 'muted' },
               { label: 'عند الاستلام', value: formattedGrandTotal, tone: 'brand' },
             ],
         helperText: canUseMixedPayment
-          ? `من المحفظة ${formattedWalletBalance}، وعند الاستلام ${formatHalalasAmount(grandTotalHalalas - walletBalance)}.`
+          ? `من المحفظة ${formattedWalletBalance}، وعند الاستلام ${formatMinorUnitsAmount(grandTotalMinorUnits - walletBalance)}.`
           : walletPending
             ? 'جاري التحقق من رصيد المحفظة...'
           : !walletLinked
@@ -950,14 +951,14 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               ? 'لا يوجد رصيد للدفع المدمج.'
               : 'الرصيد يكفي للدفع الكامل من المحفظة.',
         helperTone: 'info',
-        action: canUseMixedPayment || walletBalance >= grandTotalHalalas
+        action: canUseMixedPayment || walletBalance >= grandTotalMinorUnits
           ? undefined
           : {
               label: !walletLinked ? 'فتح WLT' : 'شحن الرصيد',
               tone: 'secondary',
               onPress: !walletLinked
                 ? (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void linkWalletInline())
-                : (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void topUpWalletInline(walletShortfallHalalas)),
+                : (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void topUpWalletInline(walletShortfallMinorUnits)),
               disabled: walletPending,
             },
         onSelect: (canUseMixedPayment || EXPERIMENTAL_PAYMENT_ENABLED) ? () => setPaymentMethod('mixed') : undefined,
@@ -986,7 +987,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         onSelect: (hasWltServiceRoute || EXPERIMENTAL_PAYMENT_ENABLED) ? () => setPaymentMethod('official-wallets') : undefined,
       },
     ];
-  }, [canUseMixedPayment, canUseWalletFull, formattedGrandTotal, formattedWalletBalance, formattedWalletShortfall, grandTotalHalalas, hasWltServiceRoute, paymentMethod, topUpWalletInline, walletBalance, walletHydrated, walletLinked, walletRefreshing, walletShortfallHalalas]);
+  }, [canUseMixedPayment, canUseWalletFull, formattedGrandTotal, formattedWalletBalance, formattedWalletShortfall, grandTotalMinorUnits, hasWltServiceRoute, paymentMethod, topUpWalletInline, walletBalance, walletHydrated, walletLinked, walletRefreshing, walletShortfallMinorUnits]);
 
   const handleCheckoutPress = async () => {
     if (isOrderSubmitted) {
@@ -1014,9 +1015,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       showNotice('تم تسجيل الدفع التجريبي', paymentSelection.summary, 'success');
       await Promise.resolve(checkoutAction({
         paymentMethod: paymentSelection.method,
-        walletAmountHalalas: paymentSelection.walletAmountHalalas,
-        amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
-        orderTotalHalalas: grandTotalHalalas,
+        walletAmountMinorUnits: paymentSelection.walletAmountMinorUnits,
+        amountDueOnDeliveryMinorUnits: paymentSelection.amountDueOnDeliveryMinorUnits,
+        orderTotalMinorUnits: grandTotalMinorUnits,
         summary: paymentSelection.summary,
         financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
       }));
@@ -1026,7 +1027,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     if (paymentSelection.method === 'wallet') {
       setCheckoutLoading(true);
       try {
-        const paymentResult = await requestWalletPayment(paymentSelection.walletAmountHalalas);
+        const paymentResult = await requestWalletPayment(paymentSelection.walletAmountMinorUnits);
         await refreshWallet();
         if (!paymentResult.success) {
           showNotice('تعذر خصم مبلغ المحفظة', paymentResult.error === 'insufficient_balance' ? 'الرصيد لم يعد كافيًا بعد آخر تحديث.' : 'حدث خطأ أثناء تهيئة الدفع من المحفظة.', 'danger');
@@ -1035,9 +1036,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
         await Promise.resolve(checkoutAction({
           paymentMethod: paymentSelection.method,
-          walletAmountHalalas: paymentSelection.walletAmountHalalas,
-          amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
-          orderTotalHalalas: grandTotalHalalas,
+          walletAmountMinorUnits: paymentSelection.walletAmountMinorUnits,
+          amountDueOnDeliveryMinorUnits: paymentSelection.amountDueOnDeliveryMinorUnits,
+          orderTotalMinorUnits: grandTotalMinorUnits,
           summary: paymentSelection.summary,
           financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
         }));
@@ -1049,9 +1050,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
     await Promise.resolve(checkoutAction({
       paymentMethod: paymentSelection.method,
-      walletAmountHalalas: paymentSelection.walletAmountHalalas,
-      amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
-      orderTotalHalalas: grandTotalHalalas,
+      walletAmountMinorUnits: paymentSelection.walletAmountMinorUnits,
+      amountDueOnDeliveryMinorUnits: paymentSelection.amountDueOnDeliveryMinorUnits,
+      orderTotalMinorUnits: grandTotalMinorUnits,
       summary: paymentSelection.summary,
       financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
     }));
@@ -1070,9 +1071,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
     const editPayload: CheckoutActionPayload = {
       paymentMethod: paymentSelection.method,
-      walletAmountHalalas: paymentSelection.walletAmountHalalas,
-      amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
-      orderTotalHalalas: grandTotalHalalas,
+      walletAmountMinorUnits: paymentSelection.walletAmountMinorUnits,
+      amountDueOnDeliveryMinorUnits: paymentSelection.amountDueOnDeliveryMinorUnits,
+      orderTotalMinorUnits: grandTotalMinorUnits,
       summary: paymentSelection.summary,
       financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
     };

@@ -18,15 +18,15 @@ export function useDemoPlatformStateHook() {
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([
     {
       id: '1',
-      action: 'تعديل حد أهلية الكابتن',
+      action: 'تعديل حد رصيد محفظة الكابتن للأهلية (الحد الأدنى لاستقبال الطلبات)',
       operator: 'Admin-Ahmed',
       timestamp: 'قبل ساعتين',
       status: 'success',
-      oldValue: '4.5',
-      newValue: '4.2',
-      reason: 'زيادة عدد الكباتن المتاحين في أوقات الذروة بناءً على توجيهات الإدارة التشغيلية.',
+      oldValue: '1,500 ريال',
+      newValue: '1,200 ريال',
+      reason: 'زيادة عدد الكباتن المؤهلين لاستقبال الطلبات في أوقات الذروة — المالك المالي: WLT، المستهلك: DSH.',
       scope: 'محافظة صنعاء',
-      impact: 'زيادة +15% في القبول',
+      impact: 'زيادة +15% في عدد الكباتن المؤهلين لاستقبال الطلبات',
       rollbackAvailable: true,
     },
     {

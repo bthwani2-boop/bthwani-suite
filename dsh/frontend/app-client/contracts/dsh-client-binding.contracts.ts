@@ -200,15 +200,15 @@ export type DshClientCartLine = {
 
 export type DshClientCartSnapshot = {
   lines: DshClientCartLine[];
-  subtotalHalalas: number;
-  deliveryHalalas: number;
-  totalHalalas: number;
+  subtotalMinorUnits: number;
+  deliveryMinorUnits: number;
+  totalMinorUnits: number;
 };
 
 export type DshClientQuoteSnapshot = {
-  subtotalHalalas: number;
-  deliveryHalalas: number;
-  totalHalalas: number;
+  subtotalMinorUnits: number;
+  deliveryMinorUnits: number;
+  totalMinorUnits: number;
   etaLabel?: string;
   serviceabilityState: DshClientServiceabilityState;
   serviceabilityNote?: string;
@@ -227,8 +227,8 @@ export type DshClientCreateOrderRequest = {
   contactPhone: string;
   note: string;
   paymentMethod: 'cod' | 'wallet' | 'mixed' | 'official-wallets';
-  walletAmountHalalas?: number;
-  amountDueOnDeliveryHalalas?: number;
+  walletAmountMinorUnits?: number;
+  amountDueOnDeliveryMinorUnits?: number;
 };
 
 export type DshClientCreateOrderResponse = {
@@ -243,8 +243,8 @@ export type DshClientCheckoutSnapshot = {
   serviceability: DshClientServiceabilitySnapshot;
   cart: DshClientCartSnapshot;
   paymentMethod: DshClientCreateOrderRequest['paymentMethod'];
-  walletAmountHalalas?: number;
-  amountDueOnDeliveryHalalas?: number;
+  walletAmountMinorUnits?: number;
+  amountDueOnDeliveryMinorUnits?: number;
   note?: string;
 };
 
@@ -320,8 +320,8 @@ export type DshClientWalletVisibility = {
   state?: Extract<DshClientTrackingState, 'refund_pending' | 'refunded' | 'wallet_credit_visible' | 'wallet_refund_visible'>;
   walletCreditVisible: boolean;
   walletRefundVisible: boolean;
-  balanceHalalas?: number;
-  refundHalalas?: number;
+  balanceMinorUnits?: number;
+  refundMinorUnits?: number;
   note?: string;
 };
 
@@ -330,7 +330,7 @@ export type DshClientRefundVisibility = DshClientWalletVisibility;
 export type DshClientRefundSummary = {
   orderId: DshClientId;
   state: Extract<DshClientTrackingState, 'refund_pending' | 'refunded' | 'wallet_refund_visible'>;
-  refundHalalas?: number;
+  refundMinorUnits?: number;
   note?: string;
 };
 
@@ -369,11 +369,11 @@ export type DshClientOperationsOrderDetail = {
   paymentMethod: DshClientCreateOrderRequest['paymentMethod'];
   paymentStatusLabel: string;
   cartLines: DshClientCartLine[];
-  subtotalHalalas: number;
-  deliveryHalalas: number;
-  totalHalalas: number;
+  subtotalMinorUnits: number;
+  deliveryMinorUnits: number;
+  totalMinorUnits: number;
   couponCode?: string;
-  discountHalalas?: number;
+  discountMinorUnits?: number;
   customerNote?: string;
   customerInstructions?: string;
   eventTimeline: DshClientEventTimelineItem[];

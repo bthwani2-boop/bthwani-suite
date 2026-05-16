@@ -123,7 +123,7 @@ function resolveImageSource(source?: ImageSourcePropType | string | null): Image
 
 function formatCurrencyAmount(amount: number, currency: string) {
   try {
-    return new Intl.NumberFormat('ar-SA', { style: 'currency', currency }).format(amount);
+    return new Intl.NumberFormat('ar-YE', { style: 'currency', currency }).format(amount);
   } catch {
     return `${amount} ${currency}`;
   }
@@ -163,7 +163,7 @@ function formatPriceLabel(price?: ProductCardPrice) {
     return undefined;
   }
 
-  return formatCurrencyAmount(price.value, price.currency ?? 'SAR');
+  return formatCurrencyAmount(price.value, price.currency ?? 'YER');
 }
 
 type ProductCardStyles = ReturnType<typeof createProductCardStyles>;

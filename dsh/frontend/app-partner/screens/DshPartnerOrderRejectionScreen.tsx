@@ -33,7 +33,7 @@ export function DshPartnerOrderRejectionScreen({
   state = 'ready',
   orderCode = '#4401',
   customerName = 'نوف العتيبي',
-  amount = '92 ر.س',
+  amount = '92 ر.ي',
   items = [
     { id: '1', name: 'برجر كلاسيك', quantity: 2 },
     { id: '2', name: 'بطاطس مقلية', quantity: 1 },
@@ -107,18 +107,18 @@ export function DshPartnerOrderRejectionScreen({
       {!showRejectionPanel ? (
         <Box gap={3} marginTop={spacing[4]}>
           <Button label="قبول الطلب وبدء التحضير" tone="primary" onPress={onAccept} />
-          <Button 
-            label="رفض الطلب" 
-            tone="secondary" 
-            style={{ borderColor: colorPalette.danger, borderWidth: 1 }} 
+          <Button
+            label="رفض الطلب"
+            tone="secondary"
+            style={{ borderColor: colorPalette.danger, borderWidth: 1 }}
             onPress={() => setShowRejectionPanel(true)}
           />
         </Box>
       ) : (
         <Surface tone="default" gap={3}>
-          <SectionHeader 
-            title="سبب الرفض" 
-            subtitle="يساعدنا سبب الرفض في تحسين تجربة العميل وتعديل حالة المتجر." 
+          <SectionHeader
+            title="سبب الرفض"
+            subtitle="يساعدنا سبب الرفض في تحسين تجربة العميل وتعديل حالة المتجر."
           />
           <Box gap={2}>
             {rejectionReasons.map((reason) => (
@@ -141,12 +141,12 @@ export function DshPartnerOrderRejectionScreen({
             ))}
           </Box>
           <Box gap={2} marginTop={spacing[2]}>
-            <Button 
-              label="تأكيد الرفض" 
-              tone="primary" 
+            <Button
+              label="تأكيد الرفض"
+              tone="primary"
               style={{ backgroundColor: colorPalette.danger }}
               disabled={!selectedReasonId}
-              onPress={() => selectedReasonId && onReject(selectedReasonId)} 
+              onPress={() => selectedReasonId && onReject(selectedReasonId)}
             />
             <Button label="تراجع" tone="secondary" onPress={() => setShowRejectionPanel(false)} />
           </Box>

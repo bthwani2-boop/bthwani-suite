@@ -879,7 +879,7 @@ function OperationsPanel({
       <MobileStickyPrimaryAction
         label="حفظ إعدادات العمليات"
         helperText={lastSaveLabel ? `آخر حفظ: ${lastSaveLabel}` : 'التعديلات تحفظ من نفس الصفحة.'}
-        onPress={() => setLastSaveLabel(new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }))}
+        onPress={() => setLastSaveLabel(new Date().toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' }))}
       />
     </MobileScrollView>
   );

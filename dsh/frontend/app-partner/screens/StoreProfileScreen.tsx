@@ -126,7 +126,7 @@ export function StoreProfileScreen({
   const canonicalReferenceLabel = canonicalStoreId ? 'تم الربط بالمتجر الموحّد.' : undefined;
 
   const onSave = React.useCallback(() => {
-    setLastSavedLabel(new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }));
+    setLastSavedLabel(new Date().toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' }));
   }, []);
 
   return (

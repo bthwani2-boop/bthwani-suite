@@ -252,6 +252,42 @@ if (!exists(platformDir)) {
 }
 
 
+// ─── Captain eligibility must use wallet-balance language, not star ratings ────
+if (exists(platformDir)) {
+  const allPlatformFiles = walk(platformDir);
+  for (const f of allPlatformFiles) {
+    const txt = read(f);
+    if (/أهلية\s*الكابتن|captain[\s._-]?eligib/i.test(txt)) {
+      if (!/رصيد|محفظة|ريال|wallet[\s_-]?balance|threshold/i.test(txt)) {
+        errors.push(`Captain eligibility mentioned without wallet balance wording (should reference رصيد/محفظة/ريال): ${rel(f)}`);
+      }
+    }
+  }
+}
+
+// ─── Administration route must have a render branch in the shell ───────────────
+const administrationPageFile = path.join(repoRoot, 'control-panel', 'runtime', 'app', 'administration', 'page.tsx');
+const shellFile = path.join(repoRoot, 'control-panel', 'shell', 'ControlPanelSurfaceHost.tsx');
+const administrationScreenFile = path.join(repoRoot, 'dsh', 'frontend', 'control-panel', 'administration', 'ControlPanelDshAdministrationScreen.tsx');
+
+if (!exists(administrationScreenFile)) {
+  errors.push(`Missing Administration screen: ${rel(administrationScreenFile)}`);
+}
+
+if (exists(administrationPageFile)) {
+  if (!exists(shellFile)) {
+    warnings.push('Administration page exists but ControlPanelSurfaceHost.tsx not found');
+  } else {
+    const shellTxt = read(shellFile);
+    if (!shellTxt.includes("activeSectionId === 'administration'")) {
+      errors.push('Administration route exists in runtime but has no render branch (activeSectionId === \'administration\') in ControlPanelSurfaceHost');
+    }
+    if (!shellTxt.includes('ControlPanelDshAdministrationScreen')) {
+      errors.push('ControlPanelDshAdministrationScreen not imported/referenced in ControlPanelSurfaceHost');
+    }
+  }
+}
+
 // ui-kit modifications are checked indirectly through git status by the caller.
 // This guard only scans files content.
 if (errors.length) {

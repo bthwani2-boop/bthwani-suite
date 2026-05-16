@@ -152,7 +152,7 @@ export const fieldSectionLabels: Record<FieldOnboardingSectionId, string> = {
 
 function formatNowLabel() {
   try {
-    const time = new Intl.DateTimeFormat('ar-SA', { hour: 'numeric', minute: '2-digit' }).format(new Date());
+    const time = new Intl.DateTimeFormat('ar-YE', { hour: 'numeric', minute: '2-digit' }).format(new Date());
     return `اليوم ${time}`;
   } catch {
     return 'الآن';
@@ -180,7 +180,7 @@ function resolveFieldCanonicalPublishStage(store: FieldStoreFile): DshCanonicalP
 
 function formatFieldProductPriceLabel(price: string) {
   const trimmedPrice = price.trim();
-  return trimmedPrice ? `${trimmedPrice} ر.س` : 'غير محدد';
+  return trimmedPrice ? `${trimmedPrice} ر.ي` : 'غير محدد';
 }
 
 function parseFieldProductPriceValue(price: string) {
@@ -497,7 +497,7 @@ export function mapFieldStoreToCanonicalStoreCard(store: FieldStoreFile): DshCan
     etaLabel: operatingHoursLabel,
     deliveryLabel: deliveryReadinessLabel,
     serviceLabel: store.draft.offer.preliminaryOffer.trim() ? 'توصيل برو' : 'توصيل',
-    deliveryFeeLabel: featuredProductPrice ? `السعر الافتتاحي ${featuredProductPrice} ر.س` : undefined,
+    deliveryFeeLabel: featuredProductPrice ? `السعر الافتتاحي ${featuredProductPrice} ر.ي` : undefined,
     priceMatchLabel: featuredProductName ? `المنتج الافتتاحي ${featuredProductName}` : undefined,
     offerLabel: store.draft.offer.preliminaryOffer.trim() || undefined,
     followerCount: 4200,
@@ -556,7 +556,7 @@ function createSeedStore(overrides: Partial<FieldStoreFile>): FieldStoreFile {
     stageLabelOverride: overrides.stageLabelOverride,
     statusNoteOverride: overrides.statusNoteOverride,
     lifecycleNote: overrides.lifecycleNote,
-    financeLabel: overrides.financeLabel ?? '0 ر.س',
+    financeLabel: overrides.financeLabel ?? '0 ر.ي',
     reviewFeedback: overrides.reviewFeedback,
     draft: overrides.draft ?? createEmptyDraft(),
   });
@@ -797,7 +797,7 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       category: 'مواد غذائية',
       location: 'اليرموك',
       nextVisitLabel: 'مكتمل',
-      financeLabel: '420 ر.س',
+      financeLabel: '420 ر.ي',
       lockedStatus: 'offer-approved',
       stageLabelOverride: 'منتهٍ للميداني',
       lifecycleNote: 'اعتمد الملف داخل الشركاء وينتظر المراجعة التسويقية النهائية قبل الظهور للعملاء.',

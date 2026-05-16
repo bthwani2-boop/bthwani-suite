@@ -9,7 +9,10 @@ import {
   ControlPanelDshClosureDashboardScreen,
   ControlPanelDshFinanceHubScreen,
 } from '../composition';
-import { ControlPanelDshPlatformScreen } from '../../dsh/frontend/control-panel';
+import {
+  ControlPanelDshPlatformScreen,
+  ControlPanelDshAdministrationScreen,
+} from '../../dsh/frontend/control-panel';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useDirection, useUiText, type BThwaniAppearanceMode } from '@bthwani/ui-kit';
@@ -377,6 +380,10 @@ export function ControlPanelSurfaceHost({
 
         {activeSectionId === 'platform' ? (
           <ControlPanelDshPlatformScreen />
+        ) : null}
+
+        {activeSectionId === 'administration' ? (
+          <ControlPanelDshAdministrationScreen />
         ) : null}
 
         {activeSectionId === 'support' ? (

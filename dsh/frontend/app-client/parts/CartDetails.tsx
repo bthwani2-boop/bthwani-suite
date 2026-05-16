@@ -23,7 +23,7 @@ export type DshCartDetailsProps = {
 
 function formatAmount(value: number, currency: string) {
 	try {
-		return new Intl.NumberFormat('ar-SA', { style: 'currency', currency }).format(value);
+		return new Intl.NumberFormat('ar-YE', { style: 'currency', currency }).format(value);
 	} catch {
 		return `${value} ${currency}`;
 	}

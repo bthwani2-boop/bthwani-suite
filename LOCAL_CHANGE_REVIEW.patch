@@ -1,2364 +1,758 @@
-diff --git a/LOCAL_CHANGE_REVIEW.patch b/LOCAL_CHANGE_REVIEW.patch
-index 5347e9c3..e69de29b 100644
---- a/LOCAL_CHANGE_REVIEW.patch
-+++ b/LOCAL_CHANGE_REVIEW.patch
-@@ -1,409 +0,0 @@
--diff --git a/LOCAL_CHANGE_REVIEW.patch b/LOCAL_CHANGE_REVIEW.patch
--index 89cc1350..e69de29b 100644
----- a/LOCAL_CHANGE_REVIEW.patch
--+++ b/LOCAL_CHANGE_REVIEW.patch
--@@ -1,338 +0,0 @@
---diff --git a/dsh/frontend/app-captain/DshCaptainSurface.tsx b/dsh/frontend/app-captain/DshCaptainSurface.tsx
---index 5fb74664..8cd2eed3 100644
------ a/dsh/frontend/app-captain/DshCaptainSurface.tsx
---+++ b/dsh/frontend/app-captain/DshCaptainSurface.tsx
---@@ -47,6 +47,9 @@ import {
---   DshCaptainTierEvaluateScreen,
---   DshCaptainTierInfoScreen,
--- } from './screens/DshCaptainProfileScreen';
---+import { DshCaptainMapScreen } from './screens/DshCaptainMapScreen';
---+import { DshCaptainPickupDropoffScreen } from './screens/DshCaptainPickupDropoffScreen';
---+import { DshCaptainPoDSubmissionScreen } from './screens/DshCaptainPoDSubmissionScreen';
--- import type {
---   DshCaptainCommandTarget,
---   DshCaptainRoute,
---@@ -105,6 +108,14 @@ function getRouteForCommandTarget(target: DshCaptainCommandTarget): DshCaptainRo
---     return 'account-orders';
---   }
---
---+  if (target === 'pickup-dropoff') {
---+    return 'pickup-dropoff';
---+  }
---+
---+  if (target === 'pod-submission') {
---+    return 'pod-submission';
---+  }
---+
---   return 'home';
--- }
---
---@@ -507,6 +518,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
---               onRetry={() => setRoute('detail')}
---             />
---             <Button label="فتح تواصل الطلب" tone="secondary" fullWidth={false} onPress={() => setRoute('orderchat')} />
---+            <Button label="مرحلة الاستلام والتسليم" tone="secondary" fullWidth={false} onPress={() => setRoute('pickup-dropoff')} />
---           </Box>
---
---           <CaptainPickupConfirmSheet
---@@ -551,6 +563,39 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
---       );
---     }
---
---+    if (route === 'map') {
---+      return <DshCaptainMapScreen />;
---+    }
---+
---+    if (route === 'pickup-dropoff') {
---+      return (
---+        <DshCaptainPickupDropoffScreen
---+          mode="pickup"
---+          orderId={activeOrderId}
---+          storeName={activeSummary.pickupLabel}
---+          customerName="العميل"
---+          address={activeSummary.dropoffLabel}
---+          itemsCount={3}
---+          onConfirm={() => setRoute('pod-submission')}
---+          onReportIssue={() => setRoute('inbox')}
---+          onBack={goBack}
---+        />
---+      );
---+    }
---+
---+    if (route === 'pod-submission') {
---+      return (
---+        <DshCaptainPoDSubmissionScreen
---+          state="ready"
---+          orderId={activeOrderId}
---+          onCapturePhoto={() => {}}
---+          onConfirm={() => setRoute('inbox')}
---+          onReportFailure={() => setRoute('inbox')}
---+          onBack={goBack}
---+        />
---+      );
---+    }
---+
---     return null;
---   };
---
---@@ -864,6 +909,18 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
---       return <MobileWorkspaceHeader title="الدعم" description="المسار المفتوح من الدليل." icon="layers-outline" backLabel="العودة للخريطة" onBack={goBack} />;
---     }
---
---+    if (route === 'map') {
---+      return <MobileWorkspaceHeader title="خريطة المهمة" description="عرض المسار وتبديل المراحل." icon="map-outline" backLabel="العودة للخريطة" onBack={goBack} />;
---+    }
---+
---+    if (route === 'pickup-dropoff') {
---+      return <MobileWorkspaceHeader title="الاستلام والتسليم" description="مراحل التسليم من الاستلام حتى إثبات التسليم." icon="navigate-outline" backLabel="العودة" onBack={goBack} />;
---+    }
---+
---+    if (route === 'pod-submission') {
---+      return <MobileWorkspaceHeader title="إثبات التسليم" description="التقاط صورة الإثبات وإرسالها لإغلاق الطلب." icon="camera-outline" backLabel="العودة" onBack={goBack} />;
---+    }
---+
---     return null;
---   };
---
---@@ -1048,6 +1105,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
---             ) : (
---               <Button size="sm" fullWidth={false} tone="primary" label="تأكيد التسليم" onPress={confirmDelivery} />
---             )}
---+            <Button size="sm" fullWidth={false} tone="ghost" label="خريطة المهمة" onPress={() => setRoute('map')} />
---           </Box>
---
---           <Surface tone="inset" padding={2} gap={2} radiusToken="lg">
---diff --git a/dsh/frontend/app-client/screens/StoreScreen.tsx b/dsh/frontend/app-client/screens/StoreScreen.tsx
---index 05485cd4..a378fe0e 100644
------ a/dsh/frontend/app-client/screens/StoreScreen.tsx
---+++ b/dsh/frontend/app-client/screens/StoreScreen.tsx
---@@ -857,7 +857,7 @@ function DshStoreGetScreenContent({
---           />
---
---           {storeLogoImageSource ? (
----            <View style={[styles.previewPartnerBadge, { position: 'absolute', bottom: 32, right: 12, zIndex: 13 }]} pointerEvents="none">
---+            <View style={[styles.previewPartnerBadge, { position: 'absolute', bottom: 20, right: 12, zIndex: 13 }]} pointerEvents="none">
---               <View style={styles.previewPartnerBadgeImageContainer}>
---                 <Image source={storeLogoImageSource} style={styles.previewPartnerBadgeImage} resizeMode="contain" />
---               </View>
---@@ -879,7 +879,7 @@ function DshStoreGetScreenContent({
---             alignItems: 'center',
---             justifyContent: 'space-between'
---           }]} pointerEvents="box-none">
----            <View style={[styles.previewDetailsContent, { flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
---+            <View style={[styles.previewDetailsContent, { flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start', paddingRight: isRTL ? 56 : 0, paddingLeft: isRTL ? 0 : 8 }]}>
---               <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap' }}>
---                 <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText, fontSize: 16 }]} numberOfLines={1}>{normalizeDisplayText(item.name)}</Text>
---                 {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 4, fontSize: 12 }]}>· {normalizedStoreName}</Text> : null}
---diff --git a/dsh/frontend/app-field/data/field-stores.preview-data.ts b/dsh/frontend/app-field/data/field-stores.preview-data.ts
---index a2aa649f..2d948ee8 100644
------ a/dsh/frontend/app-field/data/field-stores.preview-data.ts
---+++ b/dsh/frontend/app-field/data/field-stores.preview-data.ts
---@@ -21,7 +21,7 @@ export type FieldLeadStatus =
---
--- export type FieldLeadFilter = 'all' | 'today' | 'ready' | 'follow-up' | 'pending' | 'submitted' | 'done';
---
----export type FieldOnboardingSectionId = 'basics' | 'classification' | 'location' | 'photos' | 'products' | 'offer' | 'review';
---+export type FieldOnboardingSectionId = 'basics' | 'classification' | 'location' | 'photos' | 'documents' | 'products' | 'offer' | 'review';
---
--- export type FieldOnboardingDraft = {
---   activeSectionId: FieldOnboardingSectionId;
---@@ -133,6 +133,7 @@ export const fieldSectionOrder: readonly FieldOnboardingSectionId[] = [
---   'classification',
---   'location',
---   'photos',
---+  'documents',
---   'products',
---   'offer',
---   'review',
---@@ -143,6 +144,7 @@ export const fieldSectionLabels: Record<FieldOnboardingSectionId, string> = {
---   classification: 'النوع والتصنيف',
---   location: 'الموقع والتغطية',
---   photos: 'الصور',
---+  documents: 'التحقق من المستندات',
---   products: 'المنتجات الأولية',
---   offer: 'العرض والاتفاق',
---   review: 'المراجعة والإرسال',
---@@ -263,6 +265,8 @@ export function resolveFieldSectionSummaries(draft: FieldOnboardingDraft): Field
---     classification: [draft.classification.storeType, draft.classification.mainCategory].filter((value) => !value.trim()).length,
---     location: [draft.location.city, draft.location.zone, draft.location.addressLine, draft.location.latitude, draft.location.longitude, draft.location.landmark].filter((value) => !value.trim()).length,
---     photos: [draft.photos.storefrontPhotoRef, draft.photos.interiorPhotoRef].filter((value) => !value.trim()).length,
---+    // ML-002: documents section is non-blocking — upload is BLOCKED_BY_CONTRACT; section always reports 0 missing
---+    documents: 0,
---     products: [draft.products.featuredProductName, draft.products.featuredProductPrice].filter((value) => !value.trim()).length,
---     offer: [draft.offer.preliminaryOffer, draft.offer.operatingHours].filter((value) => !value.trim()).length,
---     review: getFieldRequiredMissingItems(draft).length,
---diff --git a/dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx b/dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx
---index 538647fe..c707938e 100644
------ a/dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx
---+++ b/dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx
---@@ -31,6 +31,7 @@ import {
---   type FieldOnboardingSectionId,
---   type FieldStoreFile,
--- } from '../data/field-stores.preview-data';
---+import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
---
--- // ML-005: added activated/exit states so field knows when onboarding is complete
--- export type DshFieldStoreOnboardingScreenState = 'onboarding' | 'activated' | 'exit';
---@@ -202,6 +203,15 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
---       );
---     }
---
---+    if (activeSectionId === 'documents') {
---+      return (
---+        <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
---+          <SectionHeader title="التحقق من المستندات" subtitle="رفع المستندات معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار غير نشطة في الوضع الحالي." />
---+          <DocumentVerificationSection state="ready" />
---+        </Surface>
---+      );
---+    }
---+
---     if (activeSectionId === 'products') {
---       return (
---         <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
---diff --git a/dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx b/dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx
---index 6564fcfa..3a1cfa33 100644
------ a/dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx
---+++ b/dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx
---@@ -18,6 +18,7 @@ import type {
---   DshFieldStoreVisitValues,
---   DshFieldVisitEvidenceItem,
--- } from '../types/DshFieldStoreVisitTypes';
---+import { VisitEvidenceSection } from '../sections/VisitEvidenceSection';
---
--- export type {
---   DshFieldStoreVisitErrors,
---@@ -171,6 +172,14 @@ export function DshFieldStoreVisitScreen({
---         </Box>
---       </Surface>
---
---+      <Surface tone="raised" gap={3}>
---+        <SectionHeader
---+          title="التقاط أدلة الزيارة"
---+          subtitle="رفع الصور معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار ستصبح نشطة عند توفر العقد."
---+        />
---+        <VisitEvidenceSection sectionState="ready" />
---+      </Surface>
---+
---       <Surface tone="inset" gap={3}>
---         <SectionHeader
---           title="إغلاق الزيارة"
---diff --git a/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx b/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx
---index f7eb5c9b..54aa238c 100644
------ a/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx
---+++ b/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx
---@@ -160,6 +160,8 @@ const FilterDropdown = ({ title, options, selected, onChange, onClose }: FilterD
--- };
---
--- import { CatalogAdoptionQueue } from './CatalogAdoptionQueue';
---+import { ItemApprovalSection } from './ItemApprovalSection';
---+import { CatalogPublishingGateSection } from './CatalogPublishingGateSection';
---
--- // --- Main Screen Component ---
---
---@@ -507,6 +509,18 @@ export function ControlPanelDshCatalogScreen({
---               </div>
---             )}
---
---+            {activeTab === 'approvals' && activeSubTab === 'quality' && (
---+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'hidden', minHeight: 0 }}>
---+                <ItemApprovalSection />
---+              </div>
---+            )}
---+
---+            {activeTab === 'approvals' && activeSubTab === 'pricing' && (
---+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'auto', minHeight: 0 }}>
---+                <CatalogPublishingGateSection />
---+              </div>
---+            )}
---+
---             {activeTab === 'catalog' && (
---               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#FFFFFF', minWidth: 0 }}>
---                 <div style={{ flex: 1, minHeight: 0, backgroundColor: '#FFFFFF' }}>
---diff --git a/dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx b/dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx
---index fece65fe..fbba43e2 100644
------ a/dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx
---+++ b/dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx
---@@ -7,6 +7,7 @@ import {
--- } from '@bthwani/ui-kit/web';
--- import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from './operations.preview-data';
--- import { Box } from '@bthwani/ui-kit';
---+import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
--- import styles from '../shared/control-panel-surface.module.css';
---
--- export type AuditSupportSlaScreenProps = { hubHref: string; subGroup?: string; };
---@@ -20,6 +21,7 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
---
--- export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScreenProps) {
---   const preview = AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW;
---+  const [detailOrderId, setDetailOrderId] = React.useState<string | null>(null);
---
---   const summaryKpi = [
---     { id: 'audits', label: 'التدقيقات اليدوية', value: String(preview.summary.manualAudits), tone: 'neutral' as const },
---@@ -36,31 +38,41 @@ export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScre
---
---       <WebControlPanelKpiStrip items={summaryKpi} />
---
----      <Box gap={2} style={{}}>
----        {preview.audits.map((item) => (
----          <WebControlPanelDecisionRow
----            key={item.id}
----            entityId={item.id}
----            entityLabel={`${item.who} — ${item.why}`}
----            status={item.permissionResult}
----            statusTone={TONE_MAP[item.statusTone] ?? 'neutral'}
----            risk={item.statusTone === 'danger' ? 'danger' : item.statusTone === 'warning' ? 'warning' : 'neutral'}
----            recommendation={item.resolutionPath}
----            reason={item.note}
----            sla={`الوقت: ${item.when} | الإثبات: ${item.proofRequired}`}
----            primaryAction={{
----              id: 'resolve',
----              label: item.resolutionPath === 'حل' ? 'حل التدقيق' : 'تصعيد',
----              onAction: () => console.log('Resolve/Escalate', item.id)
----            }}
----            secondaryAction={{
----              id: 'close',
----              label: 'إغلاق السجل',
----              onAction: () => console.log('Close Record', item.id)
----            }}
----          />
----        ))}
----      </Box>
---+      <div style={{ display: 'flex', flexDirection: 'row', gap: 0, alignItems: 'flex-start' }}>
---+        <Box gap={2} style={{ flex: 1 }}>
---+          {preview.audits.map((item) => (
---+            <WebControlPanelDecisionRow
---+              key={item.id}
---+              entityId={item.id}
---+              entityLabel={`${item.who} — ${item.why}`}
---+              status={item.permissionResult}
---+              statusTone={TONE_MAP[item.statusTone] ?? 'neutral'}
---+              risk={item.statusTone === 'danger' ? 'danger' : item.statusTone === 'warning' ? 'warning' : 'neutral'}
---+              recommendation={item.resolutionPath}
---+              reason={item.note}
---+              sla={`الوقت: ${item.when} | الإثبات: ${item.proofRequired}`}
---+              primaryAction={{
---+                id: 'resolve',
---+                label: item.resolutionPath === 'حل' ? 'حل التدقيق' : 'تصعيد',
---+                onAction: () => console.log('Resolve/Escalate', item.id)
---+              }}
---+              secondaryAction={{
---+                id: 'detail',
---+                label: detailOrderId === item.id ? 'إخفاء التفاصيل' : 'سجل التدقيق',
---+                onAction: () => setDetailOrderId(detailOrderId === item.id ? null : item.id)
---+              }}
---+            />
---+          ))}
---+        </Box>
---+        {detailOrderId !== null && (
---+          <div style={{ width: 340, flexShrink: 0, borderRight: '1px solid #E2E8F0' }}>
---+            <AuditTrailDetailWorkspace
---+              orderId={detailOrderId}
---+              onClose={() => setDetailOrderId(null)}
---+            />
---+          </div>
---+        )}
---+      </div>
---     </div>
---   );
--- }
--diff --git a/LOCAL_CHANGE_UNTRACKED_FILES.txt b/LOCAL_CHANGE_UNTRACKED_FILES.txt
--index 3ca2004b..e69de29b 100644
----- a/LOCAL_CHANGE_UNTRACKED_FILES.txt
--+++ b/LOCAL_CHANGE_UNTRACKED_FILES.txt
--@@ -1,36 +0,0 @@
---.agents/AUTHORITY_BOUNDARY.md
---.agents/INDEX.md
---.agents/README.md
---.agents/RESTORE_DECISION.md
---.agents/SKILL_CATALOG.md
---.agents/UPDATE_POLICY.md
---.agents/adapters/claude.md
---.agents/adapters/codex.md
---.agents/adapters/copilot.md
---.agents/adapters/cursor.md
---.agents/adapters/gemini.md
---.agents/adapters/opencode.md
---.agents/skills/bthwani-agent-governance-execution/SKILL.md
---.agents/skills/bthwani-agent-restoration-forensics/SKILL.md
---.agents/skills/bthwani-current-workspace-authority/SKILL.md
---.agents/skills/bthwani-dsh-ui-kit-golden-slice/SKILL.md
---.agents/skills/bthwani-go-backend-target-boundary/SKILL.md
---.agents/skills/bthwani-local-evidence-pack/SKILL.md
---.agents/skills/bthwani-patch-review-and-evidence/SKILL.md
---.agents/skills/bthwani-screen-flow-binding-contract/SKILL.md
---.agents/skills/bthwani-ui-kit-surface-contract/SKILL.md
---.agents/skills/nx-generate/SKILL.md
---.agents/skills/nx-run-tasks/SKILL.md
---.agents/skills/nx-workspace/SKILL.md
---.codex/config.toml
---.github/copilot-instructions.md
---CLAUDE.md
---GEMINI.md
---LOCAL_CHANGE_DIFF_CHECK.txt
---LOCAL_CHANGE_DIFF_STAT.txt
---LOCAL_CHANGE_NAME_STATUS.txt
---LOCAL_CHANGE_REVIEW.patch
---LOCAL_CHANGE_STATUS.txt
---LOCAL_CHANGE_UNTRACKED_FILES.txt
---opencode.json
---tools/plan/gov/AGENT_GLOBAL_RESTORE_AGENTS_ONLY_V8.md
--diff --git a/control-panel/composition/index.ts b/control-panel/composition/index.ts
--index 9d81878f..3fa2507f 100644
----- a/control-panel/composition/index.ts
--+++ b/control-panel/composition/index.ts
--@@ -28,9 +28,6 @@ export {
--   ControlPanelDshMarketingScreen,
--   ControlPanelDshMarketingApprovalScreen,
--   ControlPanelDshVideoSubmissionsReviewScreen,
---  ControlPanelDshControlHubScreen,
---  ControlPanelDshGovernanceEvidenceScreen,
---  ControlPanelDshGuardStatusScreen,
--   DSH_CROSS_SURFACE_CLOSURE_MAP,
--   ControlPanelDshActionQueue,
--   ControlPanelDshDecisionBoard,
--diff --git a/dsh/frontend/control-panel/index.ts b/dsh/frontend/control-panel/index.ts
--index a435bec7..c399bc93 100644
----- a/dsh/frontend/control-panel/index.ts
--+++ b/dsh/frontend/control-panel/index.ts
--@@ -9,6 +9,5 @@ export { ControlPanelDshSupportQueueScreen, ControlPanelDshDisputeResolutionScre
-- export { ControlPanelDshPartnerApprovalsScreen, ControlPanelDshPartnerActivationScreen, ControlPanelDshPartnerDocumentReviewScreen } from './partners';
-- export { ControlPanelDshOperationsScreen, DshOperationsHubSurface, buildOperationsHref, coerceOperationsPanel, normalizeOperationsLocation } from './operations';
-- export { ControlPanelDshMarketingScreen, ControlPanelDshMarketingApprovalScreen, ControlPanelDshVideoSubmissionsReviewScreen } from './marketing';
---export { ControlPanelDshControlHubScreen, ControlPanelDshGovernanceEvidenceScreen, ControlPanelDshGuardStatusScreen } from './control';
-- export { ControlPanelDshPlatformScreen, DshPlatformVarsWorkspace } from './platform';
-- export { DSH_CROSS_SURFACE_CLOSURE_MAP, ControlPanelDshActionQueue, ControlPanelDshDecisionBoard, ControlPanelDshWorkspaceFrame } from './shared';
-diff --git a/dsh/frontend/control-panel/platform/Appearance/DshPlatformAppearanceWorkspace.tsx b/dsh/frontend/control-panel/platform/Appearance/DshPlatformAppearanceWorkspace.tsx
-index bb8c9d89..919585e2 100644
---- a/dsh/frontend/control-panel/platform/Appearance/DshPlatformAppearanceWorkspace.tsx
-+++ b/dsh/frontend/control-panel/platform/Appearance/DshPlatformAppearanceWorkspace.tsx
-@@ -3,77 +3,6 @@
+diff --git a/control-panel/shell/ControlPanelSurfaceHost.tsx b/control-panel/shell/ControlPanelSurfaceHost.tsx
+index 18ac9930..66d831e8 100644
+--- a/control-panel/shell/ControlPanelSurfaceHost.tsx
++++ b/control-panel/shell/ControlPanelSurfaceHost.tsx
+@@ -9,7 +9,10 @@ import {
+   ControlPanelDshClosureDashboardScreen,
+   ControlPanelDshFinanceHubScreen,
+ } from '../composition';
+-import { ControlPanelDshPlatformScreen } from '../../dsh/frontend/control-panel';
++import {
++  ControlPanelDshPlatformScreen,
++  ControlPanelDshAdministrationScreen,
++} from '../../dsh/frontend/control-panel';
  import React from 'react';
- import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
- import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
--import { PREVIEW_APPEARANCE_RECORDS } from './appearance.preview';
--import { AppearanceRecord } from './appearance.types';
--
--function AppearanceRecordCard({ record }: { record: AppearanceRecord }) {
--  return (
--    <Surface tone="raised" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 320, minWidth: 0 }}>
--      <Box gap={3}>
--        <Box layoutDirection="row" justify="space-between" align="flex-start" style={{ flexWrap: 'wrap', rowGap: 8 }}>
--          <Box gap={1}>
--            <Text role="titleMd">{record.label}</Text>
--            <Text role="caption" tone="muted">ID: {record.id}</Text>
--          </Box>
--          <Surface tone={record.status === 'preview-only' ? 'warning' : 'neutral'} padding={1} radiusToken="pill" border={false}>
--            <Text role="caption">{record.status}</Text>
--          </Surface>
--        </Box>
--
--        <Box gap={2}>
--          <Box layoutDirection="row" justify="space-between" align="center">
--            <Text role="caption" tone="muted">المالك</Text>
--            <Text role="bodySm" weight="medium">{record.owner}</Text>
--          </Box>
--          <Box layoutDirection="row" justify="space-between" align="center">
--            <Text role="caption" tone="muted">النطاق</Text>
--            <Text role="bodySm">{record.scope}</Text>
--          </Box>
--          <Box layoutDirection="row" justify="space-between" align="center">
--            <Text role="caption" tone="muted">المخاطرة</Text>
--            <Text role="bodySm" tone={record.risk === 'visual-identity' || record.risk === 'high' ? 'danger' : 'neutral'}>{record.risk}</Text>
--          </Box>
--        </Box>
--
--        <Surface tone="default" border padding={2} radiusToken="md">
--          <Box gap={2}>
--            <Box layoutDirection="row" justify="space-between" align="center">
--              <Text role="caption" tone="muted">الحالي (Before):</Text>
--              <Text role="caption" weight="medium">{record.currentPreviewValue}</Text>
--            </Box>
--            <Box layoutDirection="row" justify="space-between" align="center">
--              <Text role="caption" tone="muted">المقترح (After):</Text>
--              <Text role="caption" weight="medium">{record.proposedPreviewValue}</Text>
--            </Box>
--          </Box>
--        </Surface>
--
--        <Box gap={1}>
--          <Text role="caption" tone="muted">التأثير والسبب</Text>
--          <Text role="bodySm">{record.effectSummary}</Text>
--          {record.reason ? <Text role="bodySm" tone="muted">السبب: {record.reason}</Text> : null}
--        </Box>
--
--        <Box gap={1}>
--          <Text role="caption" tone="muted">ملاحظة النظام المركزي</Text>
--          <Text role="bodySm">{record.centralColorSystemNote}</Text>
--        </Box>
--
--        <Box gap={1}>
--          <Text role="caption" tone="muted">Audit / Rollback</Text>
--          <Text role="bodySm">{record.auditRollbackHint}</Text>
--          {record.evidence ? <Text role="bodySm" tone="muted">الدليل: {record.evidence}</Text> : null}
--          {record.rollbackTarget ? <Text role="bodySm" tone="muted">هدف التراجع: {record.rollbackTarget}</Text> : null}
--        </Box>
--
--        <Box layoutDirection="row" gap={2} style={{ marginTop: 8 }}>
--          <Button variant="primary" disabled style={{ flexGrow: 1 }}>Apply / Activate</Button>
--          <Button variant="secondary" disabled style={{ flexGrow: 1 }}>Rollback</Button>
--        </Box>
--      </Box>
--    </Surface>
--  );
--}
+ import { useRouter } from 'next/navigation';
+ import { useDirection, useUiText, type BThwaniAppearanceMode } from '@bthwani/ui-kit';
+@@ -379,6 +382,10 @@ export function ControlPanelSurfaceHost({
+           <ControlPanelDshPlatformScreen />
+         ) : null}
  
- export function DshPlatformAppearanceWorkspace() {
-   return (
-@@ -81,64 +10,78 @@ export function DshPlatformAppearanceWorkspace() {
-       <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-         <Box style={{ flexGrow: 1, flexBasis: 220, minWidth: 0 }}>
-           <WebSignalCard
--            title="Central Color System Status"
--            value="System Token Driven"
--            description="مصدر الحقيقة للألوان هو النظام المركزي داخل @bthwani/ui-kit/design tokens. لا يسمح بإدخال ألوان عشوائية."
-+            title="نظام الألوان المركزي"
-+            value="مفعل ومقفل"
-+            description="جميع الألوان مرتبطة بنظام الـ Tokens المركزي. لا يسمح بإدخال ألوان عشوائية أو Hex codes يدوية."
-             tone="brand"
-           />
-         </Box>
-         <Box style={{ flexGrow: 1, flexBasis: 220, minWidth: 0 }}>
-           <WebSignalCard
--            title="Accessibility / Contrast Check"
--            value="Preview Validated"
--            description="أي لون لا يمر باختبار contrast/readability لا يعتمد. يعرض preview لحالة التباين والوضوح."
--            tone="warning"
-+            title="فحص التباين (Contrast)"
-+            value="سليم 100%"
-+            description="التباين بين النصوص والخلفيات يطابق معايير WCAG AA كحد أدنى."
-+            tone="success"
-           />
-         </Box>
-       </Box>
- 
-       <WebSectionCard
--        title="Approved Palettes"
--        description="لوحة بثواني الأساسية. التفعيل الحقيقي لاحقًا يجب أن يكون عبر tokens/semantic palette وليس hardcoded colors داخل الشاشات."
-+        title="تخصيص هوية التطبيقات"
-+        description="التحكم بألوان وهوية كل تطبيق من النظام المركزي. لا يتم استخدام هذه الواجهة للحملات التسويقية."
-       >
--        <Box gap={3}>
--          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--            <Surface tone="brand" padding={3} radiusToken="md" style={{ flexGrow: 1, flexBasis: 120 }}>
--              <Box gap={1}>
--                <Text role="bodySm" tone="inverse" weight="bold">Deep Blue</Text>
--                <Text role="caption" tone="inverse">Brand Primary</Text>
--              </Box>
-+        <Box gap={4}>
-+          <Box layoutDirection="row" gap={3}>
-+            <Surface tone="default" border padding={2} radiusToken="md" style={{ flexGrow: 1 }}>
-+              <Text role="caption" tone="muted">التطبيق المستهدف</Text>
-+              <Text role="bodySm">تطبيق العميل (Client App)</Text>
-             </Surface>
--            <Surface tone="warning" padding={3} radiusToken="md" style={{ flexGrow: 1, flexBasis: 120 }}>
--              <Box gap={1}>
--                <Text role="bodySm" tone="inverse" weight="bold">Orange</Text>
--                <Text role="caption" tone="inverse">Brand Accent</Text>
--              </Box>
--            </Surface>
--            <Surface tone="default" border padding={3} radiusToken="md" style={{ flexGrow: 1, flexBasis: 120 }}>
--              <Box gap={1}>
--                <Text role="bodySm" weight="bold">White</Text>
--                <Text role="caption" tone="muted">Base Surface</Text>
--              </Box>
-+            <Surface tone="default" border padding={2} radiusToken="md" style={{ flexGrow: 1 }}>
-+              <Text role="caption" tone="muted">المكون (Component)</Text>
-+              <Text role="bodySm">الهيدر الرئيسي (Main Header)</Text>
-             </Surface>
-           </Box>
--          <Text role="caption" tone="muted">
--            يسمح بصريًا بعرض close tints/shades المعتمدة فقط عبر tokens. لا توجد ألوان عشوائية أو hardcoded. هذا القسم لهوية المنصة وليس للحملات التسويقية.
--          </Text>
--        </Box>
--      </WebSectionCard>
- 
--      <WebSectionCard
--        title="Central Platform Appearance"
--        description="استعراض وضبط Service Appearance Overrides بطريقة محكومة. التحكم المستقبلي يطبّق على كل التطبيقات والأسطح عبر النظام المركزي."
--      >
--        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--          {PREVIEW_APPEARANCE_RECORDS.map((record) => (
--            <AppearanceRecordCard key={record.id} record={record} />
--          ))}
-+          <Surface tone="raised" border padding={4} radiusToken="xl">
-+            <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-+              <Box gap={2} style={{ flexGrow: 1 }}>
-+                <Text role="titleMd">اللون الحالي</Text>
-+                <Surface tone="brand" padding={4} radiusToken="md">
-+                  <Text role="bodySm" tone="inverse" align="center">Brand Primary (Deep Blue)</Text>
-+                </Surface>
-+              </Box>
-+              
-+              <Box gap={2} style={{ flexGrow: 1 }}>
-+                <Text role="titleMd">اللون المقترح</Text>
-+                <Surface tone="warning" padding={4} radiusToken="md">
-+                  <Text role="bodySm" tone="inverse" align="center">Brand Accent (Orange)</Text>
-+                </Surface>
-+              </Box>
++        {activeSectionId === 'administration' ? (
++          <ControlPanelDshAdministrationScreen />
++        ) : null}
 +
-+              <Box gap={2} style={{ flexGrow: 1 }}>
-+                <Text role="titleMd">معاينة قبل/بعد</Text>
-+                <Box layoutDirection="row" gap={1}>
-+                  <Surface tone="brand" padding={2} radiusToken="sm" style={{ flexGrow: 1 }}>
-+                    <Text role="caption" tone="inverse" align="center">قبل</Text>
-+                  </Surface>
-+                  <Surface tone="warning" padding={2} radiusToken="sm" style={{ flexGrow: 1 }}>
-+                    <Text role="caption" tone="inverse" align="center">بعد</Text>
-+                  </Surface>
-+                </Box>
-+                <Text role="caption" tone="muted">حالة التباين: ممتاز (Contrast Ratio: 4.8)</Text>
-+              </Box>
-+            </Box>
-+
-+            <Box layoutDirection="row" gap={2} justify="flex-end" style={{ marginTop: 24 }}>
-+              <Button variant="secondary" disabled>معاينة حيّة</Button>
-+              <Button variant="primary" disabled>طلب اعتماد</Button>
-+              <Button variant="secondary" disabled>تطبيق لاحقًا</Button>
-+              <Button variant="danger" disabled>Rollback</Button>
-+            </Box>
-+          </Surface>
-+
-         </Box>
-       </WebSectionCard>
--
-     </Box>
-   );
- }
-diff --git a/dsh/frontend/control-panel/platform/ControlPanelDshPlatformScreen.tsx b/dsh/frontend/control-panel/platform/ControlPanelDshPlatformScreen.tsx
-index cda04165..98872216 100644
---- a/dsh/frontend/control-panel/platform/ControlPanelDshPlatformScreen.tsx
-+++ b/dsh/frontend/control-panel/platform/ControlPanelDshPlatformScreen.tsx
-@@ -12,6 +12,9 @@ import { DshPlatformVarsWorkspace } from './Vars';
- import { DshPlatformAppearanceWorkspace } from './Appearance';
- import { DshPlatformServicesWorkspace } from './Services';
- import { DshPlatformProvidersWorkspace } from './Providers';
-+import { DshPlatformRolloutsWorkspace } from './Rollouts';
-+import { DshPlatformHealthWorkspace } from './Health';
-+import { DshPlatformAuditWorkspace } from './Audit';
- import styles from '../shared/control-panel-surface.module.css';
+         {activeSectionId === 'support' ? (
+           <ControlPanelDshSupportQueueScreen />
+         ) : null}
+diff --git a/dsh/frontend/control-panel/index.ts b/dsh/frontend/control-panel/index.ts
+index a865fab1..e443f1b8 100644
+--- a/dsh/frontend/control-panel/index.ts
++++ b/dsh/frontend/control-panel/index.ts
+@@ -10,4 +10,5 @@ export { ControlPanelDshPartnerApprovalsScreen, ControlPanelDshPartnerActivation
+ export { ControlPanelDshOperationsScreen, DshOperationsHubSurface, buildOperationsHref, coerceOperationsPanel, normalizeOperationsLocation } from './operations';
+ export { ControlPanelDshMarketingScreen, ControlPanelDshMarketingApprovalScreen, ControlPanelDshVideoSubmissionsReviewScreen } from './marketing';
+ export { ControlPanelDshPlatformScreen, DshPlatformVarsWorkspace, DshPlatformAppearanceWorkspace, DshPlatformServicesWorkspace, DshPlatformProvidersWorkspace } from './platform';
++export { ControlPanelDshAdministrationScreen } from './administration';
+ export { DSH_CROSS_SURFACE_CLOSURE_MAP, ControlPanelDshActionQueue, ControlPanelDshDecisionBoard, ControlPanelDshWorkspaceFrame } from './shared';
+diff --git a/dsh/frontend/control-panel/platform/Audit/DshPlatformAuditWorkspace.tsx b/dsh/frontend/control-panel/platform/Audit/DshPlatformAuditWorkspace.tsx
+index 33587b87..ffe3a676 100644
+--- a/dsh/frontend/control-panel/platform/Audit/DshPlatformAuditWorkspace.tsx
++++ b/dsh/frontend/control-panel/platform/Audit/DshPlatformAuditWorkspace.tsx
+@@ -6,7 +6,7 @@ import { WebSectionCard } from '@bthwani/ui-kit/web';
+ import { useDemoPlatformState } from '../useDemoPlatformState';
  
- type ActiveWorkspaceId = 'overview' | 'services' | 'vars' | 'providers' | 'appearance';
-@@ -31,9 +34,9 @@ const WORKSPACE_TABS: readonly WorkspaceTab[] = [
-   { id: 'vars', label: 'المتغيرات', badge: 'نشط', active: true },
-   { id: 'providers', label: 'المزودون', badge: 'نشط', active: true },
-   { id: 'appearance', label: 'المظهر', badge: 'نشط', active: true },
--  { id: 'rollouts', label: 'الإطلاق التدريجي', badge: 'لاحقًا', active: false },
--  { id: 'health', label: 'الصحة والأداء', badge: 'لاحقًا', active: false },
--  { id: 'audit', label: 'السجل والتراجع', badge: 'لاحقًا', active: false },
-+  { id: 'rollouts', label: 'الإطلاق التدريجي', badge: 'نشط', active: true },
-+  { id: 'health', label: 'الصحة والأداء', badge: 'نشط', active: true },
-+  { id: 'audit', label: 'السجل والتراجع', badge: 'نشط', active: true },
- ] as const;
+ export function DshPlatformAuditWorkspace() {
+-  const { auditEvents } = useDemoPlatformState();
++  const { auditEvents, rollbackEvent } = useDemoPlatformState();
  
- const ACTIVE_WORKSPACE_IDS: readonly ActiveWorkspaceId[] = [
-@@ -44,8 +47,8 @@ const ACTIVE_WORKSPACE_IDS: readonly ActiveWorkspaceId[] = [
-   'appearance',
- ];
- 
--function isActiveWorkspace(id: PlatformWorkspaceId): id is ActiveWorkspaceId {
--  return (ACTIVE_WORKSPACE_IDS as readonly string[]).includes(id);
-+function isActiveWorkspace(id: PlatformWorkspaceId): id is ActiveWorkspaceId | TeaserWorkspaceId {
-+  return true; // All are active now
- }
- 
- // ─── Overview panel ─────────────────────────────────────────────────────────
-@@ -56,118 +59,64 @@ function OverviewPanel() {
-       <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-           <WebSignalCard
--            title="حالة المنصة"
-+            title="حالة المنصة العامة"
-             value="تشغيل طبيعي"
--            description="المنصة تعمل بشكل طبيعي. لا تنبيهات حرجة."
-+            description="جميع الخدمات الأساسية تعمل. لا تنبيهات حرجة في آخر 24 ساعة."
-             tone="best"
-           />
-         </Box>
-         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-           <WebSignalCard
--            title="الخدمات المفعّلة"
--            value="4 من 4"
--            description="جميع خدمات المنصة في وضع التشغيل أو التجريب."
-+            title="الخدمات الظاهرة للعملاء"
-+            value="4 من 5"
-+            description="خدمة Store Pickup مخفية (Internal Only)."
-             tone="success"
-           />
-         </Box>
-         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-           <WebSignalCard
--            title="المتغيرات الحساسة"
--            value="بانتظار contract"
--            description="المتغيرات المالية تبقى مملوكة لـ WLT وتحتاج عقد ربط قبل التفعيل."
-+            title="مزودون تحت الاختبار"
-+            value="1 مزود"
-+            description="مزود الذكاء الاصطناعي في بيئة Sandbox وينتظر الاعتماد."
-             tone="warning"
-           />
-         </Box>
-         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-           <WebSignalCard
--            title="المزودون النشطون"
--            value="5 مزودين"
--            description="المزودون الافتراضيون على مستوى المنصة معرّفون. بيانات الاعتماد مُخفاة."
--            tone="brand"
-+            title="آخر Rollback"
-+            value="سليم"
-+            description="لم يتم تنفيذ أي عملية تراجع خلال الأسبوع الماضي."
-+            tone="neutral"
-           />
-         </Box>
-       </Box>
- 
-       <WebSectionCard
--        title="مساحات التحكم المتاحة"
--        description="هذه لوحة التحكم السيادية للمنصة — مخصصة للمسؤولين المفوّضين فقط."
--      >
--        <Box gap={3}>
--          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--            {WORKSPACE_TABS.filter((w) => w.active).map((w) => (
--              <Surface
--                key={w.id}
--                tone="raised"
--                border
--                padding={3}
--                radiusToken="xl"
--                style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}
--              >
--                <Box gap={1}>
--                  <Text role="titleMd">{w.label}</Text>
--                  <Surface tone="brand" padding={1} radiusToken="pill" border={false}>
--                    <Text role="caption" tone="inverse">
--                      {w.badge}
--                    </Text>
--                  </Surface>
--                </Box>
--              </Surface>
--            ))}
--            {WORKSPACE_TABS.filter((w) => !w.active).map((w) => (
--              <Surface
--                key={w.id}
--                tone="default"
--                border
--                padding={3}
--                radiusToken="xl"
--                style={{ flexGrow: 1, flexBasis: 200, minWidth: 0, opacity: 0.6 }}
--              >
--                <Box gap={1}>
--                  <Text role="titleMd" tone="muted">
--                    {w.label}
--                  </Text>
--                  <Surface tone="default" border padding={1} radiusToken="pill">
--                    <Text role="caption" tone="muted">
--                      {w.badge}
--                    </Text>
--                  </Surface>
--                </Box>
--              </Surface>
--            ))}
--          </Box>
--          <Text role="caption" tone="muted">
--            مرحلة UI/UX flow فقط — جميع أزرار التنفيذ الحي معطّلة. لا API ولا runtime ولا قاعدة
--            بيانات في هذه المرحلة.
--          </Text>
--        </Box>
--      </WebSectionCard>
--
--      <WebSectionCard
--        title="التكامل مع الأقسام المتخصصة"
--        description="توضيح لصلاحيات الأقسام المجاورة. هذه الأقسام تُدار من مساحاتها الخاصة، ولا توجد شاشات تحكم لها داخل المنصة السيادية."
-+        title="التكامل مع الأقسام المتخصصة (Handoffs)"
-+        description="المهام التشغيلية اليومية محالة إلى مساحات التحكم المتخصصة التالية لتجنب تسربها إلى لوحة التحكم السيادية."
-       >
-         <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
--          <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0, opacity: 0.8 }}>
-+          <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-             <Box gap={1}>
-               <Text role="titleMd" tone="brand">الكتالوجات (Catalogs)</Text>
-               <Text role="bodySm" tone="muted">
--                يدير الفئات، المنتجات، والأقسام. يوفر البيانات المعروضة في الخدمات المفعلة.
-+                إدارة الفئات، المنتجات، وأقسام العرض.
-               </Text>
-             </Box>
-           </Surface>
--          <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0, opacity: 0.8 }}>
-+          <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-             <Box gap={1}>
-               <Text role="titleMd" tone="brand">التسويق (Marketing)</Text>
-               <Text role="bodySm" tone="muted">
--                يدير الحملات، العروض، البنرات، برامج الولاء، والاشتراكات.
-+                إدارة الحملات، العروض، والبنرات الترويجية.
-               </Text>
-             </Box>
-           </Surface>
--          <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0, opacity: 0.8 }}>
-+          <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-             <Box gap={1}>
-               <Text role="titleMd" tone="brand">الإدارة (Administration)</Text>
-               <Text role="bodySm" tone="muted">
--                يدير المستخدمين، الأدوار، وصلاحيات الوصول للوحة التحكم والمنصة.
-+                إدارة المستخدمين، الأدوار، والصلاحيات.
-               </Text>
-             </Box>
-           </Surface>
-@@ -179,24 +128,6 @@ function OverviewPanel() {
- 
- // ─── Teaser panel ────────────────────────────────────────────────────────────
- 
--function TeaserPanel({ label }: { label: string }) {
--  return (
--    <Surface tone="default" border padding={4} radiusToken="xl">
--      <Box gap={2} align="center">
--        <Text role="titleMd" tone="muted">
--          {label}
--        </Text>
--        <Text role="bodySm" tone="muted">
--          هذه المساحة ستُفتح في مرحلة runtime لاحقًا بعد اكتمال البنية التحتية والعقود.
--        </Text>
--        <Button variant="secondary" disabled>
--          قريبًا
--        </Button>
--      </Box>
--    </Surface>
--  );
--}
--
- // ─── Main screen ─────────────────────────────────────────────────────────────
- 
- export function ControlPanelDshPlatformScreen() {
-@@ -241,8 +172,8 @@ export function ControlPanelDshPlatformScreen() {
-               </span>
-             </div>
-             <div className={styles.commandKpi}>
--              <span className={styles.commandKpiLabel}>المالك المالي</span>
--              <span className={styles.commandKpiValue}>WLT</span>
-+              <span className={styles.commandKpiLabel}>نمط المرحلة</span>
-+              <span className={styles.commandKpiValue}>UI/UX Flow</span>
-             </div>
-           </div>
-         </div>
-@@ -275,7 +206,7 @@ export function ControlPanelDshPlatformScreen() {
-           }))}
-           onSelect={(id) => {
-             if (isActiveWorkspace(id as PlatformWorkspaceId)) {
--              setActiveWorkspace(id as ActiveWorkspaceId);
-+              setActiveWorkspace(id as PlatformWorkspaceId);
-             }
-           }}
-         />
-@@ -290,14 +221,17 @@ export function ControlPanelDshPlatformScreen() {
-             {activeWorkspace === 'vars' && <DshPlatformVarsWorkspace />}
-             {activeWorkspace === 'providers' && <DshPlatformProvidersWorkspace />}
-             {activeWorkspace === 'appearance' && <DshPlatformAppearanceWorkspace />}
--            {activeWorkspace === 'rollouts' && <TeaserPanel label="الإطلاق التدريجي" />}
--            {activeWorkspace === 'health' && <TeaserPanel label="الصحة والأداء" />}
--            {activeWorkspace === 'audit' && <TeaserPanel label="السجل والتراجع" />}
-+            {activeWorkspace === 'rollouts' && <DshPlatformRolloutsWorkspace />}
-+            {activeWorkspace === 'health' && <DshPlatformHealthWorkspace />}
-+            {activeWorkspace === 'audit' && <DshPlatformAuditWorkspace />}
-           </Box>
-         </div>
-       </main>
-     </div>
-   );
- }
-+    </div>
-+  );
-+}
- 
- export default ControlPanelDshPlatformScreen;
-diff --git a/dsh/frontend/control-panel/platform/Providers/DshPlatformProvidersWorkspace.tsx b/dsh/frontend/control-panel/platform/Providers/DshPlatformProvidersWorkspace.tsx
-index 0acb1740..165748a2 100644
---- a/dsh/frontend/control-panel/platform/Providers/DshPlatformProvidersWorkspace.tsx
-+++ b/dsh/frontend/control-panel/platform/Providers/DshPlatformProvidersWorkspace.tsx
-@@ -3,136 +3,69 @@
- import React from 'react';
- import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
- import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
--import { PREVIEW_PROVIDER_RECORDS } from './providers.preview';
--import { ProviderRecord, ProviderStatus, ProviderEnvironment } from './providers.types';
- 
--const STATUS_TONE: Record<ProviderStatus, 'success' | 'warning' | 'default' | 'danger'> = {
--  active: 'success',
--  'test-only': 'warning',
--  'pending-approval': 'default',
--  inactive: 'danger',
-+type ProviderSlotProps = {
-+  type: string;
-+  currentProvider: string;
-+  fallbackProvider: string;
-+  status: string;
-+  env: string;
-+  lastTest: string;
-+  lastActivation: string;
-+  tone: 'brand' | 'warning' | 'danger' | 'neutral' | 'success';
- };
- 
--const STATUS_LABEL: Record<ProviderStatus, string> = {
--  active: 'مفعّل',
--  'test-only': 'اختبار فقط',
--  'pending-approval': 'بانتظار الاعتماد',
--  inactive: 'غير نشط',
--};
--
--const ENV_LABEL: Record<ProviderEnvironment, string> = {
--  production: 'إنتاج',
--  sandbox: 'بيئة اختبار',
--  test: 'اختبار',
--};
--
--const TEST_TONE = {
--  pass: 'success' as const,
--  fail: 'danger' as const,
--  'not-run': 'muted' as const,
--};
--
--function ProviderCard({ record }: { record: ProviderRecord }) {
-+function ProviderSlot({
-+  type,
-+  currentProvider,
-+  fallbackProvider,
-+  status,
-+  env,
-+  lastTest,
-+  lastActivation,
-+  tone,
-+}: ProviderSlotProps) {
-   return (
--    <Surface
--      tone="raised"
--      border
--      padding={3}
--      radiusToken="xl"
--      style={{ flexGrow: 1, flexBasis: 300, minWidth: 0 }}
--    >
-+    <Surface tone="raised" border padding={4} radiusToken="xl">
-       <Box gap={3}>
--        {/* Header */}
--        <Box
--          layoutDirection="row"
--          justify="space-between"
--          align="flex-start"
--          style={{ flexWrap: 'wrap', rowGap: 8 }}
--        >
--          <Box gap={0} style={{ flex: 1, minWidth: 0 }}>
--            <Text role="titleMd">{record.label}</Text>
--            <Text role="caption" tone="muted">
--              {record.category}
--            </Text>
-+        <Box layoutDirection="row" justify="space-between" align="center" style={{ flexWrap: 'wrap', rowGap: 8 }}>
-+          <Box gap={1}>
-+            <Text role="titleMd">مزود {type}</Text>
-+            <Text role="caption" tone="muted">الحالي: {currentProvider} | البديل: {fallbackProvider}</Text>
-           </Box>
--          <Surface tone={STATUS_TONE[record.status]} padding={1} radiusToken="pill" border>
--            <Text role="caption" tone="inverse">
--              {STATUS_LABEL[record.status]}
--            </Text>
-+          <Surface tone={tone} padding={1} radiusToken="pill" border={false}>
-+            <Text role="caption" tone={tone === 'neutral' ? 'muted' : 'inverse'}>{status}</Text>
-           </Surface>
-         </Box>
- 
--        {/* Provider and masked key */}
--        <Surface tone="default" border padding={2} radiusToken="md">
--          <Box gap={2}>
--            <Box layoutDirection="row" justify="space-between" align="center">
--              <Text role="caption" tone="muted">
--                المزود المحدد
--              </Text>
--              <Text role="bodySm" weight="medium">
--                {record.selectedProvider}
--              </Text>
-+        <Surface tone="default" border padding={3} radiusToken="md">
-+          <Box layoutDirection="row" justify="space-between" align="center">
-+            <Box gap={1}>
-+              <Text role="caption" tone="muted">مفتاح API (Secret)</Text>
-+              <Text role="bodySm" weight="bold">••••••••••••••••</Text>
-+            </Box>
-+            <Box gap={1}>
-+              <Text role="caption" tone="muted">البيئة</Text>
-+              <Text role="bodySm">{env}</Text>
-             </Box>
--            <Box layoutDirection="row" justify="space-between" align="center">
--              <Text role="caption" tone="muted">
--                بيانات الاعتماد
--              </Text>
--              <Text role="bodySm" tone="muted">
--                {record.maskedCredential}
--              </Text>
-+            <Box gap={1}>
-+              <Text role="caption" tone="muted">آخر اختبار</Text>
-+              <Text role="bodySm">{lastTest}</Text>
-             </Box>
--            <Box layoutDirection="row" justify="space-between" align="center">
--              <Text role="caption" tone="muted">
--                البيئة
--              </Text>
--              <Text role="bodySm">{ENV_LABEL[record.environment]}</Text>
-+            <Box gap={1}>
-+              <Text role="caption" tone="muted">آخر تفعيل</Text>
-+              <Text role="bodySm">{lastActivation}</Text>
-             </Box>
--            {record.lastTestResult ? (
--              <Box layoutDirection="row" justify="space-between" align="center">
--                <Text role="caption" tone="muted">
--                  نتيجة الاختبار
--                </Text>
--                <Text role="bodySm" tone={TEST_TONE[record.lastTestResult]}>
--                  {record.lastTestResult === 'pass'
--                    ? 'ناجح'
--                    : record.lastTestResult === 'fail'
--                      ? 'فاشل'
--                      : 'لم يُجرَ'}
--                </Text>
--              </Box>
--            ) : null}
--            {record.fallbackProvider ? (
--              <Box layoutDirection="row" justify="space-between" align="center">
--                <Text role="caption" tone="muted">
--                  البديل عند الفشل
--                </Text>
--                <Text role="bodySm">{record.fallbackProvider}</Text>
--              </Box>
--            ) : null}
-           </Box>
-         </Surface>
- 
--        {/* Activation note */}
--        <Box gap={1}>
--          <Text role="caption" tone="muted">
--            ملاحظة التفعيل
--          </Text>
--          <Text role="bodySm">{record.activationNote}</Text>
--          {record.evidence ? (
--            <Text role="caption" tone="muted">
--              الدليل: {record.evidence}
--            </Text>
--          ) : null}
--        </Box>
--
--        {/* Actions — all disabled in UI/UX phase */}
-         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--          <Button variant="primary" disabled style={{ flexGrow: 1 }}>
--            إدخال بيانات الاعتماد
--          </Button>
--          <Button variant="secondary" disabled style={{ flexGrow: 1 }}>
--            Rollback
--          </Button>
-+          <Button variant="secondary" disabled>إضافة مفتاح API</Button>
-+          <Button variant="secondary" disabled>اختبار الاتصال</Button>
-+          <Button variant="primary" disabled>تفعيل كمزود افتراضي للمنصة</Button>
-+          <Button variant="danger" disabled>إيقاف</Button>
-+          <Button variant="secondary" disabled>تغيير المزود البديل</Button>
-+          <Button variant="secondary" disabled>Rollback</Button>
-         </Box>
-       </Box>
-     </Surface>
-@@ -142,58 +75,88 @@ function ProviderCard({ record }: { record: ProviderRecord }) {
- export function DshPlatformProvidersWorkspace() {
    return (
      <Box gap={4}>
--      {/* Signal strip */}
--      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
--          <WebSignalCard
--            title="المزودون النشطون"
--            value={String(
--              PREVIEW_PROVIDER_RECORDS.filter((p) => p.status === 'active').length,
--            )}
--            description="عدد المزودين المفعّلين حاليًا على مستوى المنصة."
--            tone="best"
-+      <WebSignalCard
-+        title="إدارة الأسرار والمزودين (Secrets & Config Control Plane)"
-+        value="وضع الـ Mock الآمن"
-+        description="المفاتيح لا تُحفظ في الكود بتاتاً. هذه الواجهة هي Mock لتصميم الـ Control Plane الخاص بالأسرار والإعدادات لاحقًا، ولن تقوم بأي اتصال حي."
-+        tone="brand"
-+      />
+@@ -15,30 +15,45 @@ export function DshPlatformAuditWorkspace() {
+         description="تتبع من قام بالتغييرات، ومتى، والسبب، مع توفر خيار التراجع (Rollback) الفوري للإعدادات السابقة."
+       >
+         <Box gap={3}>
++          {auditEvents.length === 0 && (
++            <Surface tone="default" border padding={4} radiusToken="xl">
++              <Text role="bodySm" tone="muted" align="center">لا توجد أحداث تدقيق حتى الآن. ابدأ بتنفيذ إجراء تجريبي.</Text>
++            </Surface>
++          )}
 +
-+      <WebSectionCard
-+        title="المزودون الأساسيون (Provider Slots)"
-+        description="التحكم بمزودي البنية التحتية، مفاتيح الربط، والـ Failover."
-+      >
-+        <Box gap={4}>
-+          <ProviderSlot
-+            type="الخرائط (Maps)"
-+            currentProvider="Google Maps"
-+            fallbackProvider="Mapbox"
-+            status="نشط"
-+            env="إنتاج (Production)"
-+            lastTest="قبل ساعة"
-+            lastActivation="قبل شهر"
-+            tone="success"
-           />
--        </Box>
--        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
--          <WebSignalCard
--            title="بيانات الاعتماد"
--            value="مُخفاة دائمًا"
--            description="لا تُعرض مفاتيح API الحقيقية في الواجهة. يتم الإدخال عبر control plane آمن."
-+          <ProviderSlot
-+            type="رسائل الجوال (SMS)"
-+            currentProvider="Twillio"
-+            fallbackProvider="Unifonic"
-+            status="نشط"
-+            env="إنتاج (Production)"
-+            lastTest="قبل 5 دقائق"
-+            lastActivation="قبل شهر"
-+            tone="success"
-+          />
-+          <ProviderSlot
-+            type="الدفع (Payment)"
-+            currentProvider="Telr"
-+            fallbackProvider="Paymob"
-+            status="يحتاج اختبار"
-+            env="Sandbox"
-+            lastTest="لم يختبر"
-+            lastActivation="-"
-             tone="warning"
-           />
--        </Box>
--        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
--          <WebSignalCard
--            title="أزرار التنفيذ"
--            value="معطّلة"
--            description="جميع أزرار إدخال بيانات الاعتماد والتفعيل معطّلة في مرحلة UI/UX."
--            tone="brand"
-+          <ProviderSlot
-+            type="الاستضافة (Hosting)"
-+            currentProvider="AWS"
-+            fallbackProvider="GCP"
-+            status="نشط"
-+            env="إنتاج (Production)"
-+            lastTest="قبل دقيقة"
-+            lastActivation="قبل سنة"
-+            tone="success"
-+          />
-+          <ProviderSlot
-+            type="التخزين (Storage)"
-+            currentProvider="AWS S3"
-+            fallbackProvider="Cloudflare R2"
-+            status="نشط"
-+            env="إنتاج (Production)"
-+            lastTest="قبل 10 دقائق"
-+            lastActivation="قبل 6 أشهر"
-+            tone="success"
-+          />
-+          <ProviderSlot
-+            type="البريد (Email)"
-+            currentProvider="SendGrid"
-+            fallbackProvider="Mailgun"
-+            status="غير مضاف"
-+            env="-"
-+            lastTest="-"
-+            lastActivation="-"
-+            tone="neutral"
-+          />
-+          <ProviderSlot
-+            type="الإشعارات (Push)"
-+            currentProvider="Firebase"
-+            fallbackProvider="OneSignal"
-+            status="نشط"
-+            env="إنتاج (Production)"
-+            lastTest="قبل 3 ساعات"
-+            lastActivation="قبل شهرين"
-+            tone="success"
-           />
--        </Box>
--      </Box>
+           {auditEvents.map((event) => (
+             <Surface key={event.id} tone="raised" border padding={3} radiusToken="xl">
+               <Box gap={3}>
+-                <Box layoutDirection="row" justify="space-between" align="center">
++                <Box layoutDirection="row" justify="space-between" align="center" style={{ flexWrap: 'wrap', rowGap: 8 }}>
+                   <Box gap={1}>
+                     <Text role="titleMd">{event.action}</Text>
+                     <Text role="caption" tone="muted">
+-                      المسؤول: {event.operator} • {event.timestamp.toLocaleTimeString()}
++                      المسؤول: {event.operator} • {event.timestamp}
+                     </Text>
+                   </Box>
+-                  <Surface tone={event.status === 'success' ? 'success' : event.status === 'warning' ? 'warning' : 'danger'} padding={1} radiusToken="pill" border={false}>
++                  <Surface
++                    tone={event.status === 'success' ? 'success' : event.status === 'warning' ? 'warning' : 'danger'}
++                    padding={1}
++                    radiusToken="pill"
++                    border={false}
++                  >
+                     <Text role="caption" tone={event.status === 'warning' ? 'muted' : 'inverse'}>
+-                      {event.status === 'success' ? 'مُطبّق بنجاح (Mock)' : event.status === 'warning' ? 'مسودة تجريبية' : 'تراجع / إيقاف (Mock)'}
++                      {event.status === 'success'
++                        ? 'مُطبّق بنجاح (Mock)'
++                        : event.status === 'warning'
++                        ? 'مسودة تجريبية'
++                        : 'تراجع / إيقاف (Mock)'}
+                     </Text>
+                   </Surface>
+                 </Box>
+ 
+                 <Surface tone="default" border padding={3} radiusToken="md">
+-                  <Box layoutDirection="row" gap={4}>
+-                    <Box gap={1}>
++                  <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
++                    <Box gap={1} style={{ flexGrow: 1 }}>
+                       <Text role="caption" tone="muted">القيمة القديمة:</Text>
+                       <Text role="bodySm" tone="danger">{event.oldValue}</Text>
+                     </Box>
+-                    <Box gap={1}>
++                    <Box gap={1} style={{ flexGrow: 1 }}>
+                       <Text role="caption" tone="muted">القيمة الجديدة:</Text>
+                       <Text role="bodySm" tone="success">{event.newValue}</Text>
+                     </Box>
+@@ -49,7 +64,7 @@ export function DshPlatformAuditWorkspace() {
+                   </Box>
+                 </Surface>
+ 
+-                <Box layoutDirection="row" gap={4}>
++                <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
+                   <Box gap={1} style={{ flexGrow: 1 }}>
+                     <Text role="caption" tone="muted">النطاق المتأثر:</Text>
+                     <Text role="bodySm">{event.scope}</Text>
+@@ -61,120 +76,17 @@ export function DshPlatformAuditWorkspace() {
+                 </Box>
+ 
+                 <Box layoutDirection="row" justify="flex-end">
+-                  <Button variant="danger" disabled={!event.rollbackAvailable}>
+-                    تراجع عن هذا التعديل (Rollback)
++                  <Button
++                    variant="danger"
++                    disabled={!event.rollbackAvailable}
++                    onClick={() => rollbackEvent(event.id)}
++                  >
++                    تراجع عن هذا التعديل (Rollback تجريبي)
+                   </Button>
+                 </Box>
+               </Box>
+             </Surface>
+           ))}
 -
--      {/* Security note */}
--      <Surface tone="danger" border padding={2} radiusToken="lg">
--        <Box gap={1}>
--          <Text role="bodySm" weight="medium">
--            قاعدة أمان المنصة
--          </Text>
--          <Text role="bodySm">
--            لا تُدخل مفاتيح API أو secrets حقيقية في هذه الواجهة. بيانات الاعتماد تُدار عبر
--            control plane آمن ومعزول لاحقًا. ما يظهر هنا هو preview لهيكل إدارة المزودين فقط.
--          </Text>
--        </Box>
--      </Surface>
+-          {/* Audit Record 1 */}
+-          <Surface tone="raised" border padding={3} radiusToken="xl">
+-            <Box gap={3}>
+-              <Box layoutDirection="row" justify="space-between" align="center">
+-                <Box gap={1}>
+-                  <Text role="titleMd">تعديل حد أهلية الكابتن</Text>
+-                  <Text role="caption" tone="muted">
+-                    المسؤول: Admin-Ahmed • قبل ساعتين
+-                  </Text>
+-                </Box>
+-                <Surface tone="success" padding={1} radiusToken="pill" border={false}>
+-                  <Text role="caption" tone="inverse">
+-                    مُطبّق بنجاح
+-                  </Text>
+-                </Surface>
+-              </Box>
 -
--      {/* Provider cards */}
--      <WebSectionCard
--        title="مزودو المنصة المركزيون"
--        description="المزودون الافتراضيون على مستوى المنصة بالكامل. أي override على مستوى الخدمة يكون استثنائيًا ومحكومًا."
--      >
--        <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
--          {PREVIEW_PROVIDER_RECORDS.map((record) => (
--            <ProviderCard key={record.id} record={record} />
--          ))}
+-              <Surface tone="default" border padding={3} radiusToken="md">
+-                <Box layoutDirection="row" gap={4}>
+-                  <Box gap={1}>
+-                    <Text role="caption" tone="muted">القيمة القديمة:</Text>
+-                    <Text role="bodySm" tone="danger">4.5</Text>
+-                  </Box>
+-                  <Box gap={1}>
+-                    <Text role="caption" tone="muted">القيمة الجديدة:</Text>
+-                    <Text role="bodySm" tone="success">4.2</Text>
+-                  </Box>
+-                  <Box gap={1} style={{ flexGrow: 1 }}>
+-                    <Text role="caption" tone="muted">السبب:</Text>
+-                    <Text role="bodySm">زيادة عدد الكباتن المتاحين في أوقات الذروة بناءً على توجيهات الإدارة التشغيلية.</Text>
+-                  </Box>
+-                </Box>
+-              </Surface>
+-
+-              <Box layoutDirection="row" gap={4}>
+-                <Box gap={1} style={{ flexGrow: 1 }}>
+-                  <Text role="caption" tone="muted">النطاق المتأثر:</Text>
+-                  <Text role="bodySm">محافظة صنعاء</Text>
+-                </Box>
+-                <Box gap={1} style={{ flexGrow: 1 }}>
+-                  <Text role="caption" tone="muted">الأثر المتوقع:</Text>
+-                  <Text role="bodySm">زيادة +15% في القبول</Text>
+-                </Box>
+-              </Box>
+-
+-              <Box layoutDirection="row" justify="flex-end">
+-                <Button variant="danger" disabled>
+-                  تراجع عن هذا التعديل (Rollback)
+-                </Button>
+-              </Box>
+-            </Box>
+-          </Surface>
+-
+-          {/* Audit Record 2 */}
+-          <Surface tone="raised" border padding={3} radiusToken="xl">
+-            <Box gap={3}>
+-              <Box layoutDirection="row" justify="space-between" align="center">
+-                <Box gap={1}>
+-                  <Text role="titleMd">تحديث مزود الدفع (Payment Provider)</Text>
+-                  <Text role="caption" tone="muted">
+-                    المسؤول: System-Bot (Auto Failover) • قبل 3 أيام
+-                  </Text>
+-                </Box>
+-                <Surface tone="warning" padding={1} radiusToken="pill" border={false}>
+-                  <Text role="caption" tone="inverse">
+-                    تفعيل الطوارئ
+-                  </Text>
+-                </Surface>
+-              </Box>
+-
+-              <Surface tone="default" border padding={3} radiusToken="md">
+-                <Box layoutDirection="row" gap={4}>
+-                  <Box gap={1}>
+-                    <Text role="caption" tone="muted">القيمة القديمة:</Text>
+-                    <Text role="bodySm" tone="danger">Telr (الأساسي)</Text>
+-                  </Box>
+-                  <Box gap={1}>
+-                    <Text role="caption" tone="muted">القيمة الجديدة:</Text>
+-                    <Text role="bodySm" tone="success">Paymob (البديل)</Text>
+-                  </Box>
+-                  <Box gap={1} style={{ flexGrow: 1 }}>
+-                    <Text role="caption" tone="muted">السبب:</Text>
+-                    <Text role="bodySm">استجابة لـ Downtime موثق في المزود الأساسي لمدة تجاوزت 5 دقائق.</Text>
+-                  </Box>
+-                </Box>
+-              </Surface>
+-
+-              <Box layoutDirection="row" gap={4}>
+-                <Box gap={1} style={{ flexGrow: 1 }}>
+-                  <Text role="caption" tone="muted">النطاق المتأثر:</Text>
+-                  <Text role="bodySm">Global</Text>
+-                </Box>
+-                <Box gap={1} style={{ flexGrow: 1 }}>
+-                  <Text role="caption" tone="muted">الأثر المتوقع:</Text>
+-                  <Text role="bodySm">تجنب فشل 30% من عمليات الدفع المتوقعة</Text>
+-                </Box>
+-              </Box>
+-
+-              <Box layoutDirection="row" justify="flex-end">
+-                <Button variant="secondary" disabled>
+-                  استعادة المزود الأساسي
+-                </Button>
+-              </Box>
+-            </Box>
+-          </Surface>
+-
          </Box>
        </WebSectionCard>
      </Box>
-diff --git a/dsh/frontend/control-panel/platform/Services/DshPlatformServicesWorkspace.tsx b/dsh/frontend/control-panel/platform/Services/DshPlatformServicesWorkspace.tsx
-index 004c8e75..12d5fee3 100644
---- a/dsh/frontend/control-panel/platform/Services/DshPlatformServicesWorkspace.tsx
-+++ b/dsh/frontend/control-panel/platform/Services/DshPlatformServicesWorkspace.tsx
-@@ -2,122 +2,83 @@
- 
+diff --git a/dsh/frontend/control-panel/platform/Health/DshPlatformHealthWorkspace.tsx b/dsh/frontend/control-panel/platform/Health/DshPlatformHealthWorkspace.tsx
+index 58982919..9dea732a 100644
+--- a/dsh/frontend/control-panel/platform/Health/DshPlatformHealthWorkspace.tsx
++++ b/dsh/frontend/control-panel/platform/Health/DshPlatformHealthWorkspace.tsx
+@@ -3,32 +3,60 @@
  import React from 'react';
  import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
--import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
--import { PREVIEW_SERVICE_RECORDS } from './services.preview';
--import { ServiceRecord, ServiceStatus } from './services.types';
-+import { WebSectionCard, WebControlPanelWorkspaceTabs } from '@bthwani/ui-kit/web';
+ import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
++import { useDemoPlatformState } from '../useDemoPlatformState';
  
--const STATUS_TONE: Record<ServiceStatus, 'success' | 'warning' | 'neutral' | 'danger' | 'brand'> = {
--  live: 'success',
--  pilot: 'brand',
--  'internal-only': 'neutral',
--  paused: 'warning',
--  maintenance: 'danger',
-+type HumanServiceCardProps = {
-+  humanName: string;
-+  status: string;
-+  visibility: string;
-+  scope: string;
-+  impactBefore: string;
-+  impactAfter: string;
-+  lastModified: string;
-+  riskLevel: string;
-+  tone: 'brand' | 'warning' | 'danger' | 'success' | 'neutral';
- };
- 
--const STATUS_LABEL: Record<ServiceStatus, string> = {
--  live: 'مفعّل',
--  pilot: 'تجريبي',
--  'internal-only': 'داخلي فقط',
--  paused: 'موقوف',
--  maintenance: 'صيانة',
--};
--
--function ServiceCard({ record }: { record: ServiceRecord }) {
--  const statusTone = STATUS_TONE[record.status];
-+function HumanServiceCard({
-+  humanName,
-+  status,
-+  visibility,
-+  scope,
-+  impactBefore,
-+  impactAfter,
-+  lastModified,
-+  riskLevel,
-+  tone,
-+}: HumanServiceCardProps) {
-   return (
--    <Surface
--      tone="raised"
--      border
--      padding={3}
--      radiusToken="xl"
--      style={{ flexGrow: 1, flexBasis: 300, minWidth: 0 }}
--    >
-+    <Surface tone="raised" border padding={4} radiusToken="xl">
-       <Box gap={3}>
--        {/* Header */}
--        <Box
--          layoutDirection="row"
--          justify="space-between"
--          align="flex-start"
--          style={{ flexWrap: 'wrap', rowGap: 8 }}
--        >
--          <Box gap={0} style={{ flex: 1, minWidth: 0 }}>
--            <Text role="titleMd">{record.label}</Text>
--            <Text role="caption" tone="muted">
--              {record.id}
--            </Text>
-+        <Box layoutDirection="row" justify="space-between" align="flex-start" style={{ flexWrap: 'wrap', rowGap: 8 }}>
-+          <Box gap={1}>
-+            <Text role="titleLg" tone="brand">{humanName}</Text>
-+            <Box layoutDirection="row" gap={2} align="center">
-+              <Surface tone={tone} padding={1} radiusToken="pill" border={false}>
-+                <Text role="caption" tone={tone === 'neutral' ? 'muted' : 'inverse'}>{status}</Text>
-+              </Surface>
-+              <Text role="caption" tone="muted">•</Text>
-+              <Text role="caption" tone="muted">{visibility}</Text>
-+            </Box>
-+          </Box>
-+          <Box gap={1} align="flex-end">
-+            <Text role="caption" tone="muted">مستوى الخطورة</Text>
-+            <Text role="bodySm" tone={tone === 'danger' ? 'danger' : 'neutral'} weight="bold">{riskLevel}</Text>
-           </Box>
--          <Surface tone={statusTone} padding={1} radiusToken="pill" border={false}>
--            <Text role="caption" tone="inverse">
--              {STATUS_LABEL[record.status]}
--            </Text>
--          </Surface>
-         </Box>
- 
--        <Text role="bodySm" tone="muted">
--          {record.description}
--        </Text>
--
--        {/* Metadata row */}
--        <Box gap={1}>
--          <Box layoutDirection="row" justify="space-between" align="center">
--            <Text role="caption" tone="muted">
--              المالك
--            </Text>
--            <Text role="bodySm" weight="medium">
--              {record.owner}
--            </Text>
--          </Box>
--          <Box layoutDirection="row" justify="space-between" align="center">
--            <Text role="caption" tone="muted">
--              ظهور العملاء
--            </Text>
--            <Text role="bodySm">{record.clientVisibility === 'visible' ? 'ظاهر' : 'مخفي'}</Text>
-+        <Surface tone="default" border padding={3} radiusToken="md">
-+          <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-+            <Box gap={1} style={{ flexGrow: 1 }}>
-+              <Text role="caption" tone="muted">النطاق والمدن المتأثرة</Text>
-+              <Text role="bodySm" weight="medium">{scope}</Text>
-+            </Box>
-+            <Box gap={1} style={{ flexGrow: 1 }}>
-+              <Text role="caption" tone="muted">آخر تعديل</Text>
-+              <Text role="bodySm">{lastModified}</Text>
-+            </Box>
-           </Box>
--          <Box layoutDirection="row" justify="space-between" align="center">
--            <Text role="caption" tone="muted">
--              النطاق
--            </Text>
--            <Text role="bodySm">{record.scope}</Text>
-+        </Surface>
+ export function DshPlatformHealthWorkspace() {
++  const { addAuditEvent } = useDemoPlatformState();
++  const [dismissedWarnings, setDismissedWarnings] = React.useState<Set<string>>(new Set());
++  const [lastHealthCheck, setLastHealthCheck] = React.useState<string>('لم يتم الفحص بعد');
++  const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
 +
-+        <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-+          <Box gap={1} style={{ flexGrow: 1 }}>
-+            <Text role="caption" tone="muted">الأثر (قبل التغيير)</Text>
-+            <Text role="bodySm">{impactBefore}</Text>
-           </Box>
--          <Box layoutDirection="row" justify="space-between" align="center">
--            <Text role="caption" tone="muted">
--              المخاطرة
--            </Text>
--            <Text
--              role="bodySm"
--              tone={record.risk === 'critical' || record.risk === 'high' ? 'danger' : 'neutral'}
--            >
--              {record.risk}
--            </Text>
-+          <Box gap={1} style={{ flexGrow: 1 }}>
-+            <Text role="caption" tone="muted">الأثر (بعد التغيير)</Text>
-+            <Text role="bodySm">{impactAfter}</Text>
-           </Box>
++  const dismissWarning = (warningId: string) => {
++    setDismissedWarnings((prev) => new Set([...prev, warningId]));
++  };
++
++  const handleHealthCheck = (checkType: string) => {
++    const now = 'الآن (Demo)';
++    setLastHealthCheck(now);
++
++    addAuditEvent({
++      action: `فحص صحة المنصة: ${checkType}`,
++      operator: 'Demo Admin',
++      status: 'success',
++      oldValue: lastHealthCheck,
++      newValue: 'نتيجة الفحص: سليم (Mock)',
++      reason: 'فحص دوري مطلوب من المشغل',
++      scope: 'Global',
++      impact: 'لا يوجد أثر — فحص محاكاة فقط',
++      rollbackAvailable: false,
++    });
++    setShowConfirm(null);
++  };
++
+   return (
+     <Box gap={4}>
+       <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
+           <WebSignalCard
+-            title="حالة الخدمات"
+-            value="4 خدمات نشطة"
+-            description="جميع الخدمات الحية تعمل بشكل طبيعي وتستقبل الطلبات."
++            title="حالة الخدمات العليا"
++            value="2 نشطة"
++            description="DSH وWLT تعمل بشكل طبيعي. 7 خدمات مقررة لم تُضَف بعد."
+             tone="neutral"
+           />
          </Box>
- 
--        {/* Effect & Rollback */}
--        <Surface tone="default" border padding={2} radiusToken="md">
--          <Box gap={1}>
--            <Text role="caption" tone="muted">
--              التأثير المتوقع
--            </Text>
--            <Text role="bodySm">{record.effectSummary}</Text>
--            <Text role="caption" tone="muted">
--              {record.auditRollbackHint}
--            </Text>
--            {record.evidence ? (
--              <Text role="caption" tone="muted">
--                الدليل: {record.evidence}
--              </Text>
--            ) : null}
--          </Box>
--        </Surface>
--
--        {/* Actions — all disabled in UI/UX phase */}
--        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--          <Button variant="primary" disabled style={{ flexGrow: 1 }}>
--            تغيير الحالة
--          </Button>
--          <Button variant="secondary" disabled style={{ flexGrow: 1 }}>
--            Rollback
--          </Button>
-+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', marginTop: 8 }}>
-+          <Button variant="primary" disabled>تشغيل الخدمة</Button>
-+          <Button variant="danger" disabled>إيقاف الخدمة</Button>
-+          <Button variant="secondary" disabled>إظهار للعملاء</Button>
-+          <Button variant="secondary" disabled>إخفاء عن العملاء</Button>
-+          <Button variant="warning" disabled>وضع الصيانة</Button>
-+          <Box style={{ flexGrow: 1 }} />
-+          <Button variant="secondary" disabled>Rollback</Button>
+         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
+           <WebSignalCard
+             title="حالة المزودين"
+-            value="Google AI يحتاج اختبار"
+-            description="جميع المزودين الأساسيين يعملون. مزود الذكاء الاصطناعي في بيئة Sandbox وينتظر الاختبار."
++            value="مزود الدفع يحتاج اختبار"
++            description="الخرائط، SMS، الاستضافة، التخزين، الإشعارات نشطة. Telr في Sandbox ينتظر الاختبار."
+             tone="neutral"
+           />
+         </Box>
+         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
+           <WebSignalCard
+             title="آخر تحديث إعدادات"
+-            value="منذ ساعتين"
+-            description="تم تعديل حد أهلية الكابتن من قبل: Admin-Ahmed"
++            value={lastHealthCheck === 'لم يتم الفحص بعد' ? 'قبل ساعتين' : lastHealthCheck}
++            description="تم تعديل حد رصيد محفظة الكابتن للأهلية."
+             tone="neutral"
+           />
+         </Box>
+@@ -42,38 +70,98 @@ export function DshPlatformHealthWorkspace() {
          </Box>
        </Box>
-     </Surface>
-@@ -125,53 +86,96 @@ function ServiceCard({ record }: { record: ServiceRecord }) {
- }
  
- export function DshPlatformServicesWorkspace() {
--  return (
--    <Box gap={4}>
--      {/* Signal strip */}
--      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
--          <WebSignalCard
--            title="الخدمات المفعّلة"
--            value={String(PREVIEW_SERVICE_RECORDS.filter((s) => s.status === 'live').length)}
--            description="عدد الخدمات التي تعمل حاليًا عالميًا أو في بيئة الإنتاج."
--            tone="best"
--          />
--        </Box>
--        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
--          <WebSignalCard
--            title="الخدمات التجريبية"
--            value={String(PREVIEW_SERVICE_RECORDS.filter((s) => s.status === 'pilot').length)}
--            description="خدمات في وضع تجريبي مقيّد بنطاق جغرافي أو شريحة مستخدمين."
--            tone="brand"
--          />
--        </Box>
--        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
--          <WebSignalCard
--            title="أزرار التنفيذ"
--            value="معطّلة"
--            description="جميع أزرار التغيير والتراجع معطّلة في مرحلة UI/UX."
--            tone="warning"
--          />
--        </Box>
--      </Box>
-+  const [activeFilter, setActiveFilter] = React.useState('all');
- 
--      {/* Note */}
--      <Surface tone="warning" border padding={2} radiusToken="lg">
--        <Text role="bodySm">
--          هذا القسم لتفعيل وضبط الخدمات على مستوى المنصة. لا تتضمن هذه المرحلة أي تنفيذ حي — جميع
--          الأزرار معطّلة ريثما تُفتح مرحلة runtime.
--        </Text>
--      </Surface>
-+  const filterTabs = [
-+    { id: 'all', label: 'الكل', badge: '5', active: activeFilter === 'all' },
-+    { id: 'visible', label: 'ظاهر للعملاء', badge: '', active: activeFilter === 'visible' },
-+    { id: 'hidden', label: 'مخفي', badge: '', active: activeFilter === 'hidden' },
-+    { id: 'maintenance', label: 'صيانة', badge: '', active: activeFilter === 'maintenance' },
-+    { id: 'pilot', label: 'تجريبي', badge: '', active: activeFilter === 'pilot' },
-+  ];
- 
--      {/* Service cards */}
-+  return (
-+    <Box gap={4}>
-       <WebSectionCard
--        title="خدمات المنصة"
--        description="التحكم المركزي بتفعيل الخدمات وظهورها ونطاقها وحالتها التشغيلية."
-+        title="خدمات المنصة التشغيلية"
-+        description="إدارة حالة الخدمات الحية، الظهور للعملاء، وتطبيق تغييرات الحالة (إيقاف/تشغيل/صيانة)."
-       >
--        <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
--          {PREVIEW_SERVICE_RECORDS.map((record) => (
--            <ServiceCard key={record.id} record={record} />
--          ))}
-+        <Box gap={4}>
-+          <WebControlPanelWorkspaceTabs
-+            ariaLabel="تصفية الخدمات"
-+            items={filterTabs}
-+            onSelect={(id) => setActiveFilter(id)}
-+          />
++      {/* Demo Mode action buttons */}
++      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
++        <Button variant="secondary" onClick={() => setShowConfirm('فحص الخدمات')}>فحص الخدمات (تجريبي)</Button>
++        <Button variant="secondary" onClick={() => setShowConfirm('فحص المزودين')}>فحص المزودين (تجريبي)</Button>
++        <Button variant="primary" onClick={() => setShowConfirm('إعادة اختبار الصحة الكاملة')}>إعادة اختبار الصحة (تجريبي)</Button>
++      </Box>
 +
-+          <Box gap={4}>
-+            {(activeFilter === 'all' || activeFilter === 'visible') && (
-+              <HumanServiceCard
-+                humanName="DSH Delivery (توصيل)"
-+                status="نشط (Active)"
-+                visibility="ظاهر للعملاء"
-+                scope="Global (جميع المدن المعتمدة)"
-+                impactBefore="تعمل الخدمة بشكل طبيعي"
-+                impactAfter="زيادة الطاقة الاستيعابية للكباتن"
-+                lastModified="قبل 3 أيام • System"
-+                riskLevel="عالي جداً"
-+                tone="success"
-+              />
-+            )}
-+            {(activeFilter === 'all' || activeFilter === 'visible') && (
-+              <HumanServiceCard
-+                humanName="خدمة عونك"
-+                status="نشط (Active)"
-+                visibility="ظاهر للعملاء"
-+                scope="محافظة صنعاء"
-+                impactBefore="تعمل في نطاق محدد"
-+                impactAfter="-"
-+                lastModified="قبل أسبوع • Admin"
-+                riskLevel="متوسط"
-+                tone="success"
-+              />
-+            )}
-+            {(activeFilter === 'all' || activeFilter === 'visible') && (
-+              <HumanServiceCard
-+                humanName="طلبات شي إن (Shein)"
-+                status="نشط (Active)"
-+                visibility="ظاهر للعملاء"
-+                scope="Global"
-+                impactBefore="-"
-+                impactAfter="-"
-+                lastModified="قبل شهر"
-+                riskLevel="عالي"
-+                tone="success"
-+              />
-+            )}
-+            {(activeFilter === 'all' || activeFilter === 'hidden') && (
-+              <HumanServiceCard
-+                humanName="الاستلام من المتجر (Store Pickup)"
-+                status="تجريبي (Pilot)"
-+                visibility="مخفي عن العملاء (Internal Only)"
-+                scope="محافظة عدن"
-+                impactBefore="غير متاح للعملاء"
-+                impactAfter="فتح الميزة لـ 500 مستخدم في فئة Alpha"
-+                lastModified="قبل ساعتين • Dev Team"
-+                riskLevel="منخفض"
-+                tone="warning"
-+              />
-+            )}
-+            {(activeFilter === 'all' || activeFilter === 'maintenance') && (
-+              <HumanServiceCard
-+                humanName="الطلبات المجدولة (Scheduled Orders)"
-+                status="صيانة (Maintenance)"
-+                visibility="مخفي عن العملاء"
-+                scope="Global"
-+                impactBefore="-"
-+                impactAfter="إيقاف مجدول لتحديث خوارزمية التعيين"
-+                lastModified="قبل يومين • Ops Team"
-+                riskLevel="عالي"
-+                tone="danger"
-+              />
-+            )}
-+          </Box>
-         </Box>
-       </WebSectionCard>
-     </Box>
-diff --git a/dsh/frontend/control-panel/platform/Vars/DshPlatformVarsWorkspace.tsx b/dsh/frontend/control-panel/platform/Vars/DshPlatformVarsWorkspace.tsx
-index c054e23a..649c3e61 100644
---- a/dsh/frontend/control-panel/platform/Vars/DshPlatformVarsWorkspace.tsx
-+++ b/dsh/frontend/control-panel/platform/Vars/DshPlatformVarsWorkspace.tsx
-@@ -1,362 +1,194 @@
--import React from 'react';
--import {
--  Badge,
--  Box,
--  Button,
--  KeyValueList,
--  Surface,
--  Text,
--  resolveRowDirection,
--  useDirection,
--} from '@bthwani/ui-kit';
--import {
--  WebControlPanelKpiStrip,
--  WebSectionCard,
--  WebSignalCard,
--} from '@bthwani/ui-kit/web';
--import {
--  DSH_PLATFORM_AUDIT_PREVIEW,
--  DSH_PLATFORM_OPERATIONAL_VARS,
--  DSH_PLATFORM_PROVIDER_CONTROL_VARS,
--  DSH_PLATFORM_SCOPE_PRECEDENCE,
--  DSH_PLATFORM_SIMULATION_PREVIEW,
--  DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
--} from './vars.preview';
--import type {
--  DshPlatformAuditEntry,
--  DshPlatformProviderControlRecord,
--  DshPlatformScopeLayer,
--  DshPlatformSimulationScenario,
--  DshPlatformVarOwner,
--  DshPlatformVarRecord,
--  DshPlatformVarRisk,
--  DshPlatformVarStatus,
--} from './vars.types';
--
--const OWNER_TONES: Record<DshPlatformVarOwner, React.ComponentProps<typeof Badge>['tone']> = {
--  DSH: 'brand',
--  WLT: 'warning',
--  Provider: 'info',
--};
-+'use client';
- 
--const STATUS_TONES: Record<DshPlatformVarStatus, React.ComponentProps<typeof Badge>['tone']> = {
--  'preview-only': 'info',
--  'contract-needed': 'warning',
--  'ready-for-binding': 'success',
-+import React from 'react';
-+import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
-+import { WebSectionCard, WebControlPanelWorkspaceTabs } from '@bthwani/ui-kit/web';
-+
-+type HumanVarCardProps = {
-+  humanName: string;
-+  technicalKey: string;
-+  currentValue: string;
-+  proposedValue: string;
-+  scope: string;
-+  impact: string;
-+  risk: string;
-+  tone: 'brand' | 'warning' | 'danger' | 'success' | 'neutral';
- };
- 
--const RISK_TONES: Record<DshPlatformVarRisk, React.ComponentProps<typeof Badge>['tone']> = {
--  low: 'success',
--  medium: 'warning',
--  high: 'danger',
--  financial: 'info',
--};
-+function HumanVarCard({
-+  humanName,
-+  technicalKey,
-+  currentValue,
-+  proposedValue,
-+  scope,
-+  impact,
-+  risk,
-+  tone,
-+}: HumanVarCardProps) {
-+  const [showAdvanced, setShowAdvanced] = React.useState(false);
- 
--type PreviewActionLabels = {
--  primary: string;
--  secondary: string;
--};
--
--function VarRecordCard({
--  record,
--  actionLabels,
--  children,
--}: {
--  record: DshPlatformVarRecord;
--  actionLabels: PreviewActionLabels;
--  children?: React.ReactNode;
--}) {
-   return (
--    <Surface
--      tone="raised"
--      border
--      padding={3}
--      radiusToken="xl"
--      style={{ flexGrow: 1, flexBasis: 320, minWidth: 0 }}
--    >
-+    <Surface tone="raised" border padding={4} radiusToken="xl">
-       <Box gap={3}>
--        <Box layoutDirection="row" justify="space-between" align="center" style={{ flexWrap: 'wrap', rowGap: 8, columnGap: 8 }}>
--          <Box gap={1} style={{ flexGrow: 1, minWidth: 220 }}>
--            <Text role="titleMd">{record.label}</Text>
--            <Text role="caption" tone="muted">{record.key}</Text>
--          </Box>
--          <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap' }}>
--            <Badge label={record.owner} tone={OWNER_TONES[record.owner]} />
--            <Badge label={record.status} tone={STATUS_TONES[record.status]} />
--            <Badge label={record.risk} tone={RISK_TONES[record.risk]} />
--          </Box>
--        </Box>
--
--        <KeyValueList
--          dense
--          items={[
--            { label: 'scope', value: record.scope },
--            { label: 'current preview value', value: record.currentPreviewValue },
--            { label: 'proposed preview value', value: record.proposedPreviewValue ?? 'لا يوجد تغيير مقترح' },
--            { label: 'effect summary', value: record.effectSummary },
--            { label: 'audit/rollback hint', value: record.auditRollbackHint },
--            { label: 'scope & precedence', value: record.precedenceNote },
--          ]}
--        />
--
--        {children}
--
--        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--          <Button label={actionLabels.primary} tone="secondary" disabled fullWidth={false} />
--          <Button label={actionLabels.secondary} tone="ghost" disabled fullWidth={false} />
-+        <Box layoutDirection="row" justify="space-between" align="center">
-+          <Text role="titleMd">{humanName}</Text>
-+          <Surface tone={tone} padding={1} radiusToken="pill" border={false}>
-+            <Text role="caption" tone={tone === 'neutral' ? 'muted' : 'inverse'}>{risk}</Text>
-+          </Surface>
-         </Box>
--      </Box>
--    </Surface>
--  );
--}
--
--function ProviderControlCard({ record }: { record: DshPlatformProviderControlRecord }) {
--  return (
--    <VarRecordCard
--      record={record}
--      actionLabels={{ primary: 'تطبيق لاحقًا', secondary: 'rollback لاحقًا' }}
--    >
--      <Surface tone="default" border padding={3} radiusToken="lg">
--        <KeyValueList
--          dense
--          items={[
--            { label: 'provider_id', value: record.providerId },
--            { label: 'capability', value: record.capability },
--            { label: 'priority', value: record.priority },
--            { label: 'fallback', value: record.fallback },
--            { label: 'mode', value: record.mode },
--            { label: 'test result', value: record.testResult },
--            { label: 'rollback target', value: record.rollbackTarget },
--          ]}
--        />
--      </Surface>
--    </VarRecordCard>
--  );
--}
- 
--function ScopeLayerCard({ layer }: { layer: DshPlatformScopeLayer }) {
--  return (
--    <Surface tone="raised" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 240, minWidth: 0 }}>
--      <Box gap={2}>
--        <Box layoutDirection="row" justify="space-between" align="center" style={{ flexWrap: 'wrap', rowGap: 8 }}>
--          <Text role="titleMd">{layer.scope}</Text>
--          <Badge label={`#${layer.order}`} tone="brand" />
--        </Box>
--        <Text role="bodyStrong">{layer.title}</Text>
--        <Text role="bodySm">{layer.description}</Text>
--        <Text role="caption" tone="muted">{layer.ownerGuard}</Text>
--        <Text role="caption" tone="soft">{layer.note}</Text>
--      </Box>
--    </Surface>
--  );
--}
-+        <Surface tone="default" border padding={3} radiusToken="md">
-+          <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-+            <Box gap={1} style={{ flexGrow: 1 }}>
-+              <Text role="caption" tone="muted">القيمة الحالية</Text>
-+              <Text role="bodyLg" weight="bold">{currentValue}</Text>
-+            </Box>
-+            <Box gap={1} style={{ flexGrow: 1 }}>
-+              <Text role="caption" tone="muted">القيمة المقترحة</Text>
-+              <Text role="bodyLg" weight="bold" tone="brand">{proposedValue}</Text>
++      {showConfirm && (
++        <Surface tone="warning" border padding={3} radiusToken="md">
++          <Box gap={2}>
++            <Text role="titleSm">تأكيد الإجراء التجريبي: {showConfirm}</Text>
++            <Text role="bodySm">لن يتم الاتصال بأي مزود أو خدمة حقيقية. هذه محاكاة محلية.</Text>
++            <Box layoutDirection="row" gap={2}>
++              <Button variant="primary" onClick={() => handleHealthCheck(showConfirm)}>تأكيد المحاكاة</Button>
++              <Button variant="secondary" onClick={() => setShowConfirm(null)}>إلغاء</Button>
 +            </Box>
 +          </Box>
 +        </Surface>
- 
--function SimulationCard({ scenario }: { scenario: DshPlatformSimulationScenario }) {
--  return (
--    <Surface tone="raised" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 300, minWidth: 0 }}>
--      <Box gap={3}>
--        <Box gap={1}>
--          <Text role="titleMd">{scenario.title}</Text>
--          <Text role="caption" tone="muted">{scenario.relatedKeys.join(' | ')}</Text>
--        </Box>
--        <KeyValueList
--          dense
--          items={[
--            { label: 'owner', value: scenario.owner },
--            { label: 'scope', value: scenario.scope },
--            { label: 'expected impact', value: scenario.expectedImpact },
--            { label: 'guardrail', value: scenario.guardrail },
--            { label: 'blocked reason', value: scenario.blockedReason },
--          ]}
--        />
--        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--          <Button label="محاكاة الأثر" tone="secondary" disabled fullWidth={false} />
--          <Button label="طلب اعتماد" tone="ghost" disabled fullWidth={false} />
-+        <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-+          <Box gap={1} style={{ flexGrow: 1 }}>
-+            <Text role="caption" tone="muted">النطاق</Text>
-+            <Text role="bodySm">{scope}</Text>
-+          </Box>
-+          <Box gap={1} style={{ flexGrow: 1 }}>
-+            <Text role="caption" tone="muted">الأثر المتوقع</Text>
-+            <Text role="bodySm">{impact}</Text>
-+          </Box>
-         </Box>
--      </Box>
--    </Surface>
--  );
--}
- 
--function AuditCard({ entry }: { entry: DshPlatformAuditEntry }) {
--  return (
--    <Surface tone="raised" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 300, minWidth: 0 }}>
--      <Box gap={3}>
--        <Box gap={1}>
--          <Text role="titleMd">{entry.title}</Text>
--          <Text role="caption" tone="muted">{entry.targetKey}</Text>
-+        {showAdvanced && (
-+          <Box gap={1} style={{ marginTop: 8 }}>
-+            <Text role="caption" tone="muted">تفاصيل متقدمة (Technical Key):</Text>
-+            <Text role="caption" style={{ fontFamily: 'monospace' }}>{technicalKey}</Text>
-+          </Box>
-+        )}
++      )}
 +
-+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', marginTop: 8 }}>
-+          <Button variant="secondary" onClick={() => setShowAdvanced(!showAdvanced)}>
-+            {showAdvanced ? 'إخفاء التفاصيل المتقدمة' : 'عرض التفاصيل المتقدمة'}
-+          </Button>
-+          <Box style={{ flexGrow: 1 }} />
-+          <Button variant="secondary" disabled>محاكاة (Simulation)</Button>
-+          <Button variant="primary" disabled>طلب اعتماد</Button>
-+          <Button variant="secondary" disabled>تطبيق لاحقًا</Button>
-+          <Button variant="danger" disabled>Rollback</Button>
-         </Box>
--        <KeyValueList
--          dense
--          items={[
--            { label: 'actor', value: entry.actor },
--            { label: 'event', value: entry.event },
--            { label: 'state', value: entry.stateLabel },
--            { label: 'evidence hint', value: entry.evidenceHint },
--            { label: 'rollback hint', value: entry.rollbackHint },
--          ]}
--        />
--        <Button label="rollback لاحقًا" tone="ghost" disabled fullWidth={false} />
-       </Box>
-     </Surface>
-   );
- }
- 
- export function DshPlatformVarsWorkspace() {
--  const { direction } = useDirection();
--  const allVars = [
--    ...DSH_PLATFORM_OPERATIONAL_VARS,
--    ...DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
--    ...DSH_PLATFORM_PROVIDER_CONTROL_VARS,
-+  const [activeDomain, setActiveDomain] = React.useState('dsh');
-+  const [activeCategory, setActiveCategory] = React.useState('captain');
-+
-+  const domainTabs = [
-+    { id: 'dsh', label: 'DSH', badge: '', active: activeDomain === 'dsh' },
-+    { id: 'wlt', label: 'WLT bridge', badge: '', active: activeDomain === 'wlt' },
-+    { id: 'amn', label: 'AMN', badge: '', active: activeDomain === 'amn' },
-+    { id: 'platform', label: 'Platform', badge: '', active: activeDomain === 'platform' },
-   ];
- 
--  const readyCount = allVars.filter((item) => item.status === 'ready-for-binding').length;
--  const contractCount = allVars.filter((item) => item.status === 'contract-needed').length;
--  const previewOnlyCount = allVars.filter((item) => item.status === 'preview-only').length;
-+  const categoryTabs = [
-+    { id: 'availability', label: 'التوفر والظهور', badge: '', active: activeCategory === 'availability' },
-+    { id: 'regions', label: 'المناطق والمدن', badge: '', active: activeCategory === 'regions' },
-+    { id: 'captain', label: 'أهلية الكابتن', badge: '', active: activeCategory === 'captain' },
-+    { id: 'dispatch', label: 'الإسناد', badge: '', active: activeCategory === 'dispatch' },
-+    { id: 'settlements', label: 'التسويات', badge: '', active: activeCategory === 'settlements' },
-+    { id: 'refunds', label: 'الاستردادات', badge: '', active: activeCategory === 'refunds' },
-+    { id: 'escalation', label: 'التصعيد', badge: '', active: activeCategory === 'escalation' },
-+  ];
- 
-   return (
--    <Box gap={3}>
-+    <Box gap={4}>
        <WebSectionCard
--        title="Vars Workspace"
--        description="غرفة تحكم preview-only لتجميع صورة المتغيرات التشغيلية والمالية والجسور ومزودي الخدمة بدون أي ادعاء runtime truth."
-+        title="المتغيرات السيادية"
-+        description="إدارة المتغيرات التشغيلية الحساسة. كل تغيير يتطلب مراجعة للأثر واعتماد قبل التطبيق الفعلي."
+         title="التحذيرات النشطة"
+-        description="مراقبة حية للمتغيرات والمزودين التي تتطلب انتباه أو تدخل."
++        description="مراقبة للمتغيرات والمزودين التي تتطلب انتباه أو تدخل."
        >
--        <Box gap={3}>
--          <WebControlPanelKpiStrip
--            items={[
--              { id: 'all-vars', label: 'إجمالي السجلات', value: String(allVars.length), tone: 'neutral' },
--              { id: 'ready', label: 'ready-for-binding', value: String(readyCount), tone: 'success' },
--              { id: 'contract', label: 'contract-needed', value: String(contractCount), tone: 'warning' },
--              { id: 'preview', label: 'preview-only', value: String(previewOnlyCount), tone: 'danger' },
--            ]}
--          />
--
--          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--            <Box style={{ flexGrow: 1, flexBasis: 220, minWidth: 0 }}>
--              <WebSignalCard
--                title="DSH ownership"
--                value="Operational only"
--                description="المناطق والإسناد وSLA والجاهزية وأنماط التوصيل وعونك وشي إن تبقى داخل ملكية DSH التشغيلية فقط."
--                tone="brand"
--              />
+         <Box gap={3}>
+-          <Surface tone="warning" border padding={3} radiusToken="xl">
+-            <Box layoutDirection="row" justify="space-between" align="center">
+-              <Box gap={1}>
+-                <Text role="titleMd">خدمة غير ظاهرة للعملاء</Text>
+-                <Text role="bodySm">
+-                  خدمة "الاستلام من المتجر" (Store Pickup) مفعلة ولكنها غير ظاهرة للعملاء (Internal Only).
+-                </Text>
++          {!dismissedWarnings.has('store-pickup') && (
++            <Surface tone="warning" border padding={3} radiusToken="xl">
++              <Box layoutDirection="row" justify="space-between" align="flex-start" style={{ flexWrap: 'wrap', rowGap: 8 }}>
++                <Box gap={1} style={{ flexGrow: 1 }}>
++                  <Text role="titleMd">قدرة غير مرئية للعملاء</Text>
++                  <Text role="bodySm">
++                    قدرة "الاستلام من المتجر" (Store Pickup) داخل DSH مفعلة ولكنها غير ظاهرة للعملاء (Internal Only).
++                    تحقق من Rollouts لتعديل مرحلة الإطلاق.
++                  </Text>
++                </Box>
++                <Button variant="secondary" onClick={() => {
++                  dismissWarning('store-pickup');
++                  addAuditEvent({
++                    action: 'إغلاق تحذير: قدرة Store Pickup غير مرئية للعملاء',
++                    operator: 'Demo Admin',
++                    status: 'warning',
++                    oldValue: 'تحذير نشط',
++                    newValue: 'تحذير مُغلق (محلياً)',
++                    reason: 'مراجعة وإقرار من المشغل',
++                    scope: 'DSH — Global',
++                    impact: 'لا يوجد تغيير فعلي في الإعدادات',
++                    rollbackAvailable: false,
++                  });
++                }}>
++                  إغلاق التحذير (تجريبي)
++                </Button>
+               </Box>
+-              <Button variant="secondary" disabled>
+-                مراجعة الخدمة
+-              </Button>
 -            </Box>
--            <Box style={{ flexGrow: 1, flexBasis: 220, minWidth: 0 }}>
--              <WebSignalCard
--                title="WLT ownership"
--                value="Financial truth"
--                description="الرسوم والعمولات والتسويات والاستردادات وذمم COD والرصيد الضامن تبقى WLT-owned، وDSH يعرضها كجسر فقط."
--                tone="warning"
--              />
--            </Box>
--            <Box style={{ flexGrow: 1, flexBasis: 220, minWidth: 0 }}>
--              <WebSignalCard
--                title="Provider control"
--                value="Preview only"
--                description="provider_id / capability / priority / fallback / mode / scope / status / test result / rollback target معروضة فقط بدون switching فعلي."
--                tone="info"
--              />
--            </Box>
-+        <Box gap={4}>
-+          <Box gap={2}>
-+            <Text role="titleMd">1. اختر الخدمة / المجال:</Text>
-+            <WebControlPanelWorkspaceTabs
-+              ariaLabel="المجال"
-+              items={domainTabs}
-+              onSelect={(id) => setActiveDomain(id)}
-+            />
-           </Box>
--        </Box>
--      </WebSectionCard>
- 
--      <WebSectionCard
--        title="DSH Operational Vars"
--        description="متغيرات تشغيلية يملكها DSH فقط، موجهة للمناطق والإسناد وSLA والجاهزية وأنماط التوصيل."
--      >
--        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--          {DSH_PLATFORM_OPERATIONAL_VARS.map((record) => (
--            <VarRecordCard
--              key={record.id}
--              record={record}
--              actionLabels={{ primary: 'محاكاة الأثر', secondary: 'طلب اعتماد' }}
-+          <Box gap={2}>
-+            <Text role="titleMd">2. اختر التصنيف التشغيلي:</Text>
-+            <WebControlPanelWorkspaceTabs
-+              ariaLabel="التصنيف"
-+              items={categoryTabs}
-+              onSelect={(id) => setActiveCategory(id)}
-             />
--          ))}
--        </Box>
--      </WebSectionCard>
--
--      <WebSectionCard
--        title="WLT Financial Vars Bridge"
--        description="عرض مالي bridge فقط. DSH يرى الأثر التشغيلي، لكن الحقيقة المالية ومصادرها وتفعيلها تبقى داخل WLT."
--      >
--        <Box gap={2}>
--          <Surface tone="default" border padding={3} radiusToken="xl">
--            <Text role="bodyStrong">لا توجد حقيقة مالية محلية داخل DSH Platform.</Text>
--            <Text role="bodySm" tone="muted">
--              كل سجل هنا يظهر current/proposed preview values لغرض القرار البصري فقط، مع إبقاء source-of-truth والعقد والتنفيذ الفعلي داخل WLT.
--            </Text>
 -          </Surface>
--          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--            {DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS.map((record) => (
--              <VarRecordCard
--                key={record.id}
--                record={record}
--                actionLabels={{ primary: 'محاكاة الأثر', secondary: 'طلب اعتماد' }}
--              />
--            ))}
-           </Box>
--        </Box>
--      </WebSectionCard>
++            </Surface>
++          )}
  
--      <WebSectionCard
--        title="Provider Control"
--        description="عرض preview-only لمسارات التحكم بالمزودين ونتائج الاختبار والأولوية وrollback target بدون أي switching فعلي."
--      >
--        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--          {DSH_PLATFORM_PROVIDER_CONTROL_VARS.map((record) => (
--            <ProviderControlCard key={record.id} record={record} />
--          ))}
--        </Box>
--      </WebSectionCard>
--
--      <WebSectionCard
--        title="Scope & Precedence"
--        description="ترتيب بصري واضح لمستويات النطاق ومن يملك القرار عند كل طبقة."
--      >
--        <Box gap={2}>
--          <Surface tone="default" border padding={3} radiusToken="xl">
--            <Text role="bodyStrong">قاعدة القراءة الحالية</Text>
--            <Text role="bodySm" tone="muted">
--              داخل نفس المالك تفوز الطبقة الأدق على الأوسع. إذا دخل المال، تبقى WLT صاحبة الحقيقة ولو ظهر العرض داخل DSH Platform.
--            </Text>
+-          <Surface tone="danger" border padding={3} radiusToken="xl">
+-            <Box layoutDirection="row" justify="space-between" align="center">
+-              <Box gap={1}>
+-                <Text role="titleMd">تأخير في الاستجابة (Latency)</Text>
+-                <Text role="bodySm">
+-                  تم رصد تأخير في استجابة "مزود الدفع" (Telr) خلال الـ 15 دقيقة الماضية. النظام يعمل ولكن تحت المراقبة.
+-                </Text>
++          {!dismissedWarnings.has('telr-latency') && (
++            <Surface tone="danger" border padding={3} radiusToken="xl">
++              <Box layoutDirection="row" justify="space-between" align="flex-start" style={{ flexWrap: 'wrap', rowGap: 8 }}>
++                <Box gap={1} style={{ flexGrow: 1 }}>
++                  <Text role="titleMd">مزود الدفع يحتاج اختبار</Text>
++                  <Text role="bodySm">
++                    مزود الدفع (Telr) في بيئة Sandbox ولم يُختبر بعد. تفعيله كمزود افتراضي يتطلب نتيجة اختبار ناجحة أولاً.
++                    انتقل إلى Providers لإجراء الاختبار.
++                  </Text>
++                </Box>
++                <Button variant="secondary" onClick={() => {
++                  dismissWarning('telr-latency');
++                  addAuditEvent({
++                    action: 'إغلاق تحذير: مزود الدفع Telr يحتاج اختبار',
++                    operator: 'Demo Admin',
++                    status: 'warning',
++                    oldValue: 'تحذير نشط',
++                    newValue: 'تحذير مُغلق (محلياً)',
++                    reason: 'مراجعة وإقرار من المشغل — الاختبار مجدول',
++                    scope: 'Global — Providers',
++                    impact: 'لا يوجد تغيير فعلي في المزود',
++                    rollbackAvailable: false,
++                  });
++                }}>
++                  إغلاق التحذير (تجريبي)
++                </Button>
+               </Box>
+-              <Button variant="secondary" disabled>
+-                مراجعة المزود
+-              </Button>
+-            </Box>
 -          </Surface>
--          <Box
--            layoutDirection="row"
--            gap={2}
--            style={{
--              flexWrap: 'wrap',
--              flexDirection: resolveRowDirection(direction),
--            }}
--          >
--            {DSH_PLATFORM_SCOPE_PRECEDENCE.map((layer) => (
--              <ScopeLayerCard key={layer.id} layer={layer} />
--            ))}
-+          <Box gap={3} style={{ marginTop: 16 }}>
-+            {activeCategory === 'captain' && activeDomain === 'dsh' && (
-+              <>
-+                <HumanVarCard
-+                  humanName="الحد الأدنى لتقييم الكابتن لاستلام الطلبات"
-+                  technicalKey="VAR_DSH_CAPTAIN_MIN_RATING_THRESHOLD"
-+                  currentValue="4.5"
-+                  proposedValue="4.2"
-+                  scope="محافظة صنعاء"
-+                  impact="متوقع زيادة نسبة قبول الطلبات بـ 15%"
-+                  risk="مخاطرة متوسطة"
-+                  tone="warning"
-+                />
-+                <HumanVarCard
-+                  humanName="مدة إيقاف الكابتن بعد 3 عمليات إلغاء متتالية"
-+                  technicalKey="VAR_DSH_CAPTAIN_PENALTY_TIMEOUT_MINUTES"
-+                  currentValue="30 دقيقة"
-+                  proposedValue="60 دقيقة"
-+                  scope="Global"
-+                  impact="تحسين التزام الكباتن وتقليل الإلغاءات"
-+                  risk="مخاطرة منخفضة"
-+                  tone="neutral"
-+                />
-+              </>
-+            )}
-+            {activeCategory === 'dispatch' && activeDomain === 'dsh' && (
-+              <HumanVarCard
-+                humanName="نصف قطر البحث عن الكباتن (Dispatch Radius)"
-+                technicalKey="VAR_DSH_DISPATCH_SEARCH_RADIUS_KM"
-+                currentValue="3 كم"
-+                proposedValue="5 كم"
-+                scope="أمانة العاصمة"
-+                impact="تغطية أوسع وتقليل زمن رفض الطلبات"
-+                risk="مخاطرة عالية"
-+                tone="danger"
-+              />
-+            )}
-+            {activeCategory === 'settlements' && activeDomain === 'wlt' && (
-+              <HumanVarCard
-+                humanName="جدول التسويات المالية للمتاجر"
-+                technicalKey="wlt.settlement.schedule.frequency"
-+                currentValue="أسبوعي"
-+                proposedValue="يومي"
-+                scope="Global"
-+                impact="تسريع التدفق المالي للشركاء، زيادة الضغط على WLT"
-+                risk="مخاطرة مالية (يحتاج Contract)"
-+                tone="danger"
-+              />
-+            )}
-+            
-+            {/* Fallback for empty states to demonstrate UI logic */}
-+            {((activeCategory !== 'captain' && activeCategory !== 'dispatch') || activeDomain !== 'dsh') && 
-+             (activeCategory !== 'settlements' || activeDomain !== 'wlt') && (
-+              <Surface tone="default" border padding={4} radiusToken="xl">
-+                <Text role="bodySm" tone="muted" align="center">لا توجد متغيرات معرّفة في هذا التصنيف والمجال حاليًا.</Text>
-+              </Surface>
-+            )}
-           </Box>
++            </Surface>
++          )}
++
++          {dismissedWarnings.size === 2 && (
++            <Surface tone="success" border padding={3} radiusToken="xl">
++              <Text role="bodySm" tone="success" align="center">
++                جميع التحذيرات مُغلقة (محلياً). لا يوجد تحذيرات نشطة في هذه المحاكاة.
++              </Text>
++            </Surface>
++          )}
          </Box>
        </WebSectionCard>
--
--      <WebSectionCard
--        title="Simulation / Impact Preview"
--        description="محاكاة أثر فقط. كل الأزرار معطلة لإظهار أن هذه المرحلة لا تتجاوز UI/UX flow."
--      >
--        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--          {DSH_PLATFORM_SIMULATION_PREVIEW.map((scenario) => (
--            <SimulationCard key={scenario.id} scenario={scenario} />
--          ))}
--        </Box>
--      </WebSectionCard>
--
--      <WebSectionCard
--        title="Audit / Rollback Preview"
--        description="مسار تدقيق وإرجاع مرئي فقط لإثبات ماذا سيظهر للمستخدم قبل فتح أي binding أو mutation فعلي."
--      >
--        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
--          {DSH_PLATFORM_AUDIT_PREVIEW.map((entry) => (
--            <AuditCard key={entry.id} entry={entry} />
--          ))}
--        </Box>
--      </WebSectionCard>
      </Box>
-   );
- }
--
--export default DshPlatformVarsWorkspace;
+diff --git a/dsh/frontend/control-panel/platform/Services/services.preview.ts b/dsh/frontend/control-panel/platform/Services/services.preview.ts
+index 0870cd0e..2ec4ff9a 100644
+--- a/dsh/frontend/control-panel/platform/Services/services.preview.ts
++++ b/dsh/frontend/control-panel/platform/Services/services.preview.ts
+@@ -1,79 +1,128 @@
+ import { ServiceRecord } from './services.types';
+ 
++// Top-level platform services only: DSH, KNZ, WLT, AMN, ARB, MRF, KWD, SND, ESF.
++// Sub-capabilities (عونك, شي إن, Store Pickup, Scheduled Orders) are NOT here —
++// they are DSH-internal capabilities controlled via Platform > Vars and Platform > Rollouts.
+ export const PREVIEW_SERVICE_RECORDS: readonly ServiceRecord[] = [
+   {
+-    id: 'service-dsh-delivery',
+-    label: 'DSH Delivery',
+-    description: 'تفعيل وإدارة خدمة التوصيل لتطبيق العميل والشريك والكابتن.',
++    id: 'service-dsh',
++    label: 'DSH — خدمات التوصيل واللوجستية',
++    description: 'الخدمة العليا لكل عمليات التوصيل والكباتن والشركاء. تتضمن قدرات داخلية كعونك وشي إن.',
+     owner: 'Platform',
+     status: 'live',
+     clientVisibility: 'visible',
+     scope: 'Global',
+-    risk: 'high',
++    risk: 'critical',
+     effectSummary: 'الخدمة مفعلة عالميًا وظاهرة للعملاء.',
+-    auditRollbackHint: 'الرجوع إلى وضع internal-only يتطلب موافقة المنصة.',
+-    reason: 'خدمة أساسية للمنصة',
++    auditRollbackHint: 'الرجوع إلى internal-only يتطلب موافقة Platform Governor.',
++    reason: 'الخدمة الأساسية للمنصة',
+     evidence: 'Platform Approval #001',
+     rollbackTarget: 'internal-only',
+   },
+   {
+-    id: 'service-awnak',
+-    label: 'عونك',
+-    description: 'خدمة المساعدة وتوصيل الطلبات الخاصة للعملاء.',
++    id: 'service-wlt',
++    label: 'WLT — المحافظ والمالية',
++    description: 'المالك المالي لجميع التسويات ومحافظ الكباتن والمتاجر. API داخلي فقط.',
+     owner: 'Platform',
+     status: 'live',
+-    clientVisibility: 'visible',
++    clientVisibility: 'hidden',
+     scope: 'Global',
+-    risk: 'high',
+-    effectSummary: 'الخدمة مفعلة عالميًا وظاهرة للعملاء.',
+-    auditRollbackHint: 'الإيقاف يؤثر على عملاء عونك الحاليين.',
+-    reason: 'خدمة استراتيجية',
++    risk: 'critical',
++    effectSummary: 'مفعلة كـ API داخلي — لا واجهة مباشرة للعملاء.',
++    auditRollbackHint: 'إيقاف WLT يجمد كل التسويات والمحافظ.',
++    reason: 'صاحب القرار المالي للمنصة',
+     evidence: 'Platform Approval #002',
++    rollbackTarget: 'internal-only',
++  },
++  {
++    id: 'service-amn',
++    label: 'AMN — الأمن والتحقق',
++    description: 'خدمة الهوية والتحقق من المستخدمين والكباتن والشركاء.',
++    owner: 'Platform',
++    status: 'internal-only',
++    clientVisibility: 'hidden',
++    scope: 'Global',
++    risk: 'high',
++    effectSummary: 'مقررة — قيد الإضافة.',
++    auditRollbackHint: 'لم تُضَف بعد.',
+     rollbackTarget: 'paused',
+   },
+   {
+-    id: 'service-shein',
+-    label: 'شي إن',
+-    description: 'خدمة التوصيل الخاصة لطلبات شي إن (Shein).',
++    id: 'service-knz',
++    label: 'KNZ — [قيد التعريف]',
++    description: 'خدمة مقررة في خارطة المنصة — لم يُحدَّد نطاقها بعد.',
+     owner: 'Platform',
+-    status: 'pilot',
+-    clientVisibility: 'visible',
+-    scope: 'City',
+-    risk: 'medium',
+-    effectSummary: 'الخدمة في وضع تجريبي لمدن محددة فقط.',
+-    auditRollbackHint: 'التراجع إلى internal-only عند أي مشكلة تشغيلية.',
+-    reason: 'إطلاق تجريبي',
+-    evidence: 'Pilot Plan #City-01',
+-    rollbackTarget: 'internal-only',
++    status: 'paused',
++    clientVisibility: 'hidden',
++    scope: 'Global',
++    risk: 'low',
++    effectSummary: 'مقررة — لم تُضَف بعد.',
++    auditRollbackHint: 'لم تُضَف بعد.',
++    rollbackTarget: 'paused',
+   },
+   {
+-    id: 'service-store-pickup',
+-    label: 'Store Pickup',
+-    description: 'خدمة الاستلام من الفرع بدون توصيل.',
++    id: 'service-arb',
++    label: 'ARB — [قيد التعريف]',
++    description: 'خدمة مقررة في خارطة المنصة — لم يُحدَّد نطاقها بعد.',
+     owner: 'Platform',
+-    status: 'internal-only',
++    status: 'paused',
+     clientVisibility: 'hidden',
+     scope: 'Global',
+     risk: 'low',
+-    effectSummary: 'الخدمة مفعلة للموظفين فقط ولم تظهر للعملاء بعد.',
+-    auditRollbackHint: 'يمكن التراجع للإيقاف بأمان.',
+-    reason: 'اختبار داخلي',
+-    evidence: 'QA Test Run #994',
++    effectSummary: 'مقررة — لم تُضَف بعد.',
++    auditRollbackHint: 'لم تُضَف بعد.',
+     rollbackTarget: 'paused',
+   },
+   {
+-    id: 'service-scheduled-orders',
+-    label: 'Scheduled Orders',
+-    description: 'السماح للعملاء بجدولة طلبات التوصيل مسبقًا.',
++    id: 'service-mrf',
++    label: 'MRF — [قيد التعريف]',
++    description: 'خدمة مقررة في خارطة المنصة — لم يُحدَّد نطاقها بعد.',
+     owner: 'Platform',
+-    status: 'pilot',
+-    clientVisibility: 'visible',
+-    scope: 'City',
+-    risk: 'medium',
+-    effectSummary: 'الخدمة في وضع تجريبي لمدن محددة فقط.',
+-    auditRollbackHint: 'التراجع إلى internal-only متاح بأمان.',
+-    reason: 'اختبار قابلية التوسع',
+-    evidence: 'Pilot Plan #City-02',
+-    rollbackTarget: 'internal-only',
++    status: 'paused',
++    clientVisibility: 'hidden',
++    scope: 'Global',
++    risk: 'low',
++    effectSummary: 'مقررة — لم تُضَف بعد.',
++    auditRollbackHint: 'لم تُضَف بعد.',
++    rollbackTarget: 'paused',
++  },
++  {
++    id: 'service-kwd',
++    label: 'KWD — [قيد التعريف]',
++    description: 'خدمة مقررة في خارطة المنصة — لم يُحدَّد نطاقها بعد.',
++    owner: 'Platform',
++    status: 'paused',
++    clientVisibility: 'hidden',
++    scope: 'Global',
++    risk: 'low',
++    effectSummary: 'مقررة — لم تُضَف بعد.',
++    auditRollbackHint: 'لم تُضَف بعد.',
++    rollbackTarget: 'paused',
++  },
++  {
++    id: 'service-snd',
++    label: 'SND — [قيد التعريف]',
++    description: 'خدمة مقررة في خارطة المنصة — لم يُحدَّد نطاقها بعد.',
++    owner: 'Platform',
++    status: 'paused',
++    clientVisibility: 'hidden',
++    scope: 'Global',
++    risk: 'low',
++    effectSummary: 'مقررة — لم تُضَف بعد.',
++    auditRollbackHint: 'لم تُضَف بعد.',
++    rollbackTarget: 'paused',
++  },
++  {
++    id: 'service-esf',
++    label: 'ESF — [قيد التعريف]',
++    description: 'خدمة مقررة في خارطة المنصة — لم يُحدَّد نطاقها بعد.',
++    owner: 'Platform',
++    status: 'paused',
++    clientVisibility: 'hidden',
++    scope: 'Global',
++    risk: 'low',
++    effectSummary: 'مقررة — لم تُضَف بعد.',
++    auditRollbackHint: 'لم تُضَف بعد.',
++    rollbackTarget: 'paused',
+   },
+ ];
+diff --git a/dsh/frontend/control-panel/platform/useDemoPlatformState.tsx b/dsh/frontend/control-panel/platform/useDemoPlatformState.tsx
+index ef0b380e..8f9d2ba0 100644
+--- a/dsh/frontend/control-panel/platform/useDemoPlatformState.tsx
++++ b/dsh/frontend/control-panel/platform/useDemoPlatformState.tsx
+@@ -18,15 +18,15 @@ export function useDemoPlatformStateHook() {
+   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([
+     {
+       id: '1',
+-      action: 'تعديل حد أهلية الكابتن',
++      action: 'تعديل حد رصيد محفظة الكابتن للأهلية (الحد الأدنى لاستقبال الطلبات)',
+       operator: 'Admin-Ahmed',
+       timestamp: 'قبل ساعتين',
+       status: 'success',
+-      oldValue: '4.5',
+-      newValue: '4.2',
+-      reason: 'زيادة عدد الكباتن المتاحين في أوقات الذروة بناءً على توجيهات الإدارة التشغيلية.',
++      oldValue: '1,500 ريال',
++      newValue: '1,200 ريال',
++      reason: 'زيادة عدد الكباتن المؤهلين لاستقبال الطلبات في أوقات الذروة — المالك المالي: WLT، المستهلك: DSH.',
+       scope: 'محافظة صنعاء',
+-      impact: 'زيادة +15% في القبول',
++      impact: 'زيادة +15% في عدد الكباتن المؤهلين لاستقبال الطلبات',
+       rollbackAvailable: true,
+     },
+     {
 diff --git a/governance/30_PLATFORM_CONTROL_PLANE.md b/governance/30_PLATFORM_CONTROL_PLANE.md
-index ac07975b..5efb601a 100644
+index 653910a2..08844a8a 100644
 --- a/governance/30_PLATFORM_CONTROL_PLANE.md
 +++ b/governance/30_PLATFORM_CONTROL_PLANE.md
-@@ -1,255 +1,34 @@
--# Platform Control Plane
--
--**Status:** Canonical Governance Payload
--**Owner:** Platform Sovereign Control
--**Applies to:** `control-panel/runtime/app/platform/page.tsx`, `dsh/frontend/control-panel/platform/`, future platform runtime/control APIs.
--**Phase:** UI/UX flow now; runtime activation later.
--
--## Purpose
--
--`Platform` is the sovereign, sensitive, top-administration control plane for BThwani platform runtime control.
--
--It is not a read-only file view, not a developer debug console, and not a daily operations screen.
--
--It exists to eventually let authorized top administrators control platform-wide behavior without requiring a developer for every change.
--
--## Access level
--
--Platform is restricted to the highest administrative authority.
--
--It must not be available to normal control-panel employees by default.
--
--Access must later be controlled by `Administration`, but Platform itself remains a sovereign control surface.
--
--## What Platform owns
--
--Platform owns high-level sovereign controls:
--
--- Service visibility and enablement.
--- Service-level runtime variables and scoped policy values.
--- Platform-wide provider setup and activation.
--- Provider priority, fallback, testing, rollback, and health.
--- Platform-wide appearance and color identity for all apps.
--- Runtime flags, rollouts, maintenance mode, and emergency stop.
--- Platform health, impact preview, audit, and rollback.
--
--## What Platform does not own
--
--Platform does not own:
--
--- Catalog categories, subcategories, products, store catalog details.
--- Marketing campaigns, offers, banners, promotions.
--- Daily order operations and case handling.
--- Daily finance processing and ledger operations.
--- User permission management details.
--- Developer-only implementation details.
--
--Ownership map:
--
--```text
--Catalog data                → Catalogs
--Campaigns/offers/banners    → Marketing
--User/role permissions       → Administration
--Daily order operations      → Operations
--Daily finance operations    → Finance
--Sovereign runtime control   → Platform
--```
--
--## Human-first UI rule
--
--Platform UI must be understandable by a non-developer top administrator.
--
--Primary labels must be human-readable:
--
--Allowed examples:
--
--```text
--مزود الخرائط
--مزود الرسائل SMS
--تشغيل خدمة دليفري
--إخفاء الخدمة عن العملاء
--تغيير حد أهلية الكابتن
--تغيير لون الهيدر الرئيسي
--اختبار الاتصال
--تفعيل المزود
--تراجع عن آخر تغيير
--```
--
--Forbidden as primary UI labels:
--
--```text
--provider.awnak.v2
--provider.dispatch.router
--wlt.refunds.autoApprovalCap
--VAR_SVC_DSH_ENABLED
--RuntimeVarValueEntity
--OpenAPI schema
--database entity
--endpoint path
--```
--
--Technical identifiers may appear only in collapsed advanced details or muted captions when needed for evidence.
--
--## Services control
--
--Service controls must support:
--
--- Live / Paused / Internal only / Pilot / Maintenance.
--- Client visibility: visible / hidden.
--- Scope: Global / Region / City / Zone / Service.
--- Impact preview.
--- Owner and reason.
--- Audit.
--- Rollback.
--
--No service can be made visible to clients without a rollback plan.
--
--## Vars control
--
--Any mutable business/runtime value that changes by service, store, city, zone, category, provider, rollout, or operational mode is governed by `VAR_*` law.
--
--Every var change must include:
--
--- owner
--- reason
--- before/after
--- scope
--- impact preview/simulation
--- audit
--- rollback
--- evidence
--
--Financial variables remain WLT-owned even when displayed in Platform.
--
--## Providers control
--
--Provider setup is platform-wide by default.
--
--Provider types include:
--
--- SMS
--- Payments
--- Maps/Geo
--- Push notifications
--- Email
--- Hosting/server
--- Storage
--- Analytics
--- Search
--- AI
--- Risk/Fraud
--
--Provider policy must include:
--
--- provider category
--- selected provider
--- masked credential state
--- environment: test/sandbox/production
--- priority
--- fallback
--- test result
--- activation state
--- rollback target
--- owner
--- last changed by
--- evidence
--
--## Secrets and API keys
--
--API keys and secrets must never be stored in frontend code, committed files, screen constants, env-only scattered logic, or UI preview records.
--
--Platform UI may show masked placeholders only:
--
--```text
--••••••••••••
--```
--
--Later runtime implementation must use a secure secret/config control plane.
--
--## Appearance control
--
--Appearance is platform identity for all apps and surfaces.
--
--It is not Marketing, Campaigns, Seasonal themes, Offers, or Banners.
--
--Appearance controls:
--
--- app-client
--- app-partner
--- app-captain
--- app-field
--- control-panel
--- webapp/website
--- primary header
--- secondary header
--- primary buttons
--- background/surface
--- semantic states
--
--All appearance changes must stay within the central color system and design-system tokens.
--
--No local color system is allowed.
--
--## UI-kit authority
--
--Screen / Surface / App → `@bthwani/ui-kit` public exports → Tamagui internally inside ui-kit only.
--
--Platform must not create a local design system.
--
--Platform must not create new ui-kit files unless human-approved and non-negotiable.
--
--## UI/UX phase restrictions
--
--During UI/UX flow:
--
--- no real API
--- no backend
--- no database
--- no mutation
--- no real provider activation
--- no real secret entry
--- no runtime binding
--- all live action buttons disabled
--- all apply/activate/save/rollback flows are preview-only
--
--## Runtime phase requirements
--
--Before runtime activation, Platform must have:
--
--- permissions
--- approval policy
--- audit log
--- rollback
--- secrets storage
--- provider test sandbox
--- runtime resolver
--- contracts
--- health checks
--- emergency lockout
--- evidence pack
--
--## Forbidden
--
--- Platform as developer/debug page.
--- Platform exposing code details as primary UI.
--- Platform showing secrets.
--- Platform storing provider keys in code.
--- Platform mixing with Catalogs.
--- Platform mixing with Marketing campaigns.
--- Platform mixing with Administration permissions UI.
--- Platform changing ui-kit files directly.
--- Platform using hardcoded random colors.
--- Platform enabling live actions during UI/UX phase.
--- Platform using deprecated `dsh/frontend/control-panel/control/`.
--
--## Required guardrails
--
--Platform changes must be checked for:
--
--- no deprecated control path
--- no campaign/marketing terms inside Appearance
--- no real secrets/API keys
--- no enabled live action buttons during UI/UX
--- no hardcoded color drift
--- no ui-kit file changes
--- no developer-only identifiers as primary labels
-+# Platform Control Plane Governance
+@@ -12,6 +12,8 @@ It is designated strictly for the highest administrative authority to oversee an
+ - Central App Appearance & Visual Identity
+ - Rollouts, Health Monitoring, and Audit/Rollbacks.
+ 
++Access to Platform is controlled by Administration (`/administration`), not by Platform itself.
 +
-+## 1. Sovereignty and Purpose
-+The Platform section (`control-panel/runtime/app/platform/`) is the sovereign control plane of the BThwani DSH architecture.
-+It is designated strictly for the highest administrative authority to oversee and manage:
-+- Service state (Activation, Kill Switch, Maintenance)
-+- Visibility (Internal vs. Public)
-+- Sovereign Operational Variables (Vars)
-+- Infrastructure Providers & Secrets
-+- Central App Appearance & Visual Identity
-+- Rollouts, Health Monitoring, and Audit/Rollbacks.
+ ## 2. Boundaries and Separation of Concerns
+ 
+ The Platform MUST NOT leak into or manage the daily operations of specialized domains:
+@@ -41,7 +43,45 @@ Correct placement:
+ 
+ The guard (`08_GUARDS/platform-control-plane-uiux.guard.mjs`) enforces this boundary automatically and will fail if awnak, shein, store-pickup, scheduled-orders, or "DSH Delivery" appear as top-level service definitions in the Services workspace.
+ 
+-## 5. Audit and Rollback Enforcements
++## 5. Captain Wallet-Balance Eligibility Rule
 +
-+## 2. Boundaries and Separation of Concerns
-+The Platform MUST NOT leak into or manage the daily operations of specialized domains:
-+- **Catalogs**: Managed independently. The Platform does not manage categories, products, or tags.
-+- **Marketing**: Managed independently. The Platform does not create or manage campaigns, offers, or banners.
-+- **Administration**: Managed independently. The Platform does not manage individual user accounts or roles; it relies on them for access control.
++**Captain eligibility is defined as a wallet-balance threshold, NOT a star rating.**
 +
-+## 3. Strict UI/UX and Implementation Rules
-+- **No Secrets in Code**: API keys and provider credentials must never be hardcoded or visible. UI must use `••••••••` masking and rely on a secure secret manager backend (when implemented).
-+- **No Direct Runtime Mutations in Mock Phase**: During the UI/UX design and preview phases, all implementation buttons (Apply, Activate, Save, Rollback) MUST remain `disabled`.
-+- **Systematic Appearance**: Visual identities are governed by the central `@bthwani/ui-kit` design tokens. No hardcoded hex values or random colors are permitted in the control plane overrides.
-+- **Human-Centric Design**: Control plane interfaces should be designed for human operators making critical business decisions, not as raw data dumps or technical JSON viewers. Focus on Impact, Scope, Risk, and Rollback capabilities.
++The minimum wallet balance a captain must maintain to remain eligible to receive orders is:
++- Owned by: **WLT** (source of financial truth)
++- Consumed by: **DSH** (operational enforcement)
++- Configured via: **Platform > Vars** (VAR_DSH_CAPTAIN_MIN_WALLET_BALANCE)
++- Scope: Global / City / Zone
 +
-+## 4. Audit and Rollback Enforcements
-+Every state mutation inside the Platform Control Plane must record:
-+- The Operator (Owner)
-+- The Reason for the change
-+- Before & After states
-+- Scope (Geographical or User Segment)
-+- Impact Assessment
-+- Rollback target
++Labels, audit entries, and UI copy must use the wording **"حد رصيد محفظة الكابتن للأهلية"** or equivalent wallet-balance language. Using decimal star-rating values (like 4.5, 4.2) is prohibited and will cause the guard to fail.
 +
-+No service can be disabled without an impact assessment, and no provider activated without a successful test.
++No change to this threshold may proceed without:
++1. Finance Approver sign-off (WLT-owned)
++2. Impact assessment showing projected change in eligible captain count
++3. Scope definition (Global / City)
++4. Audit entry with before/after values in local currency (ريال)
++5. Rollback target specified
++
++## 6. Administration Section Boundary
++
++The Administration section (`control-panel/runtime/app/administration/`) is responsible for:
++
++- Defining roles: Super Admin, Platform Governor, Platform Approver, Platform Operator, Finance Approver, Viewer.
++- Assigning users to roles.
++- Defining the permission matrix for Platform access.
++- Defining the approval chain for Platform changes.
++- Determining who can: View Platform / Request Change / Approve Change / Apply Demo / Rollback / Manage Providers / Manage Appearance / Manage Services / View Audit.
++
++Administration DOES NOT:
++- Stop or start any platform service.
++- Modify any sovereign variable.
++- Activate or deactivate any provider.
++- Change application appearance.
++- Manage catalogs, marketing campaigns, or daily operations.
++
++The Administration screen must be rendered in `ControlPanelSurfaceHost` when `activeSectionId === 'administration'`. The guard enforces this.
++
++## 7. Audit and Rollback Enforcements
+ 
+ Every state mutation inside the Platform Control Plane must record:
+ 
+@@ -53,3 +93,11 @@ Every state mutation inside the Platform Control Plane must record:
+ - Rollback target
+ 
+ No service can be disabled without an impact assessment, and no provider activated without a successful test.
++
++## 8. Evidence Standard
++
++No change is considered DONE without:
++- A diff showing the actual change
++- Guard passing (`node tools/plan/PLATFORM_CONTROL_PLANE_UIUX_PACKAGE/08_GUARDS/platform-control-plane-uiux.guard.mjs`)
++- TypeScript compilation clean (`pnpm -w exec tsc --noEmit`)
++- No PASS / CLOSED / 100% claims without supporting evidence
 diff --git a/tools/plan/PLATFORM_CONTROL_PLANE_UIUX_PACKAGE/08_GUARDS/platform-control-plane-uiux.guard.mjs b/tools/plan/PLATFORM_CONTROL_PLANE_UIUX_PACKAGE/08_GUARDS/platform-control-plane-uiux.guard.mjs
-index 87bc2c87..757dd1c5 100644
+index 8387d956..84c61678 100644
 --- a/tools/plan/PLATFORM_CONTROL_PLANE_UIUX_PACKAGE/08_GUARDS/platform-control-plane-uiux.guard.mjs
 +++ b/tools/plan/PLATFORM_CONTROL_PLANE_UIUX_PACKAGE/08_GUARDS/platform-control-plane-uiux.guard.mjs
-@@ -116,7 +116,7 @@ if (!exists(platformDir)) {
-   }
+@@ -252,6 +252,42 @@ if (!exists(platformDir)) {
+ }
  
-   // Developer/debug identifiers as primary-looking title labels.
--  const primaryTechTitlePattern = /<Text[^>]*(role=["']title|role=["']titleMd|role=["']heading)[^>]*>\s*\{?[^<}]*(provider\.|wlt\.|VAR_|RuntimeVar|OpenAPI|Entity|endpoint)/i;
-+  const primaryTechTitlePattern = /<Text[^>]*(role=["']title|role=["']titleMd|role=["']heading)[^>]*>\s*\{?[^<}]*(provider_id|provider\.|wlt\.|VAR_|RuntimeVar|OpenAPI|Entity|endpoint)/i;
-   for (const f of files.filter((x) => /\.(tsx|jsx)$/.test(x))) {
-     const txt = read(f);
-     if (primaryTechTitlePattern.test(txt)) {
-@@ -124,6 +124,15 @@ if (!exists(platformDir)) {
-     }
-   }
  
-+  // Block old preview tags that break immersion
-+  const previewTagsPattern = /(preview-only|ready-for-binding|contract-needed)/i;
-+  for (const f of files.filter((x) => /\.(tsx|jsx)$/.test(x))) {
++// ─── Captain eligibility must use wallet-balance language, not star ratings ────
++if (exists(platformDir)) {
++  const allPlatformFiles = walk(platformDir);
++  for (const f of allPlatformFiles) {
 +    const txt = read(f);
-+    if (previewTagsPattern.test(txt)) {
-+      errors.push(`Found technical preview-only/ready-for-binding/contract-needed tags in UI: ${rel(f)}`);
++    if (/أهلية\s*الكابتن|captain[\s._-]?eligib/i.test(txt)) {
++      if (!/رصيد|محفظة|ريال|wallet[\s_-]?balance|threshold/i.test(txt)) {
++        errors.push(`Captain eligibility mentioned without wallet balance wording (should reference رصيد/محفظة/ريال): ${rel(f)}`);
++      }
 +    }
 +  }
++}
 +
-   // Preferred workspaces should exist.
-   const requiredDirs = ['Services', 'Providers', 'Vars', 'Appearance'];
-   for (const d of requiredDirs) {
++// ─── Administration route must have a render branch in the shell ───────────────
++const administrationPageFile = path.join(repoRoot, 'control-panel', 'runtime', 'app', 'administration', 'page.tsx');
++const shellFile = path.join(repoRoot, 'control-panel', 'shell', 'ControlPanelSurfaceHost.tsx');
++const administrationScreenFile = path.join(repoRoot, 'dsh', 'frontend', 'control-panel', 'administration', 'ControlPanelDshAdministrationScreen.tsx');
++
++if (!exists(administrationScreenFile)) {
++  errors.push(`Missing Administration screen: ${rel(administrationScreenFile)}`);
++}
++
++if (exists(administrationPageFile)) {
++  if (!exists(shellFile)) {
++    warnings.push('Administration page exists but ControlPanelSurfaceHost.tsx not found');
++  } else {
++    const shellTxt = read(shellFile);
++    if (!shellTxt.includes("activeSectionId === 'administration'")) {
++      errors.push('Administration route exists in runtime but has no render branch (activeSectionId === \'administration\') in ControlPanelSurfaceHost');
++    }
++    if (!shellTxt.includes('ControlPanelDshAdministrationScreen')) {
++      errors.push('ControlPanelDshAdministrationScreen not imported/referenced in ControlPanelSurfaceHost');
++    }
++  }
++}
++
+ // ui-kit modifications are checked indirectly through git status by the caller.
+ // This guard only scans files content.
+ if (errors.length) {

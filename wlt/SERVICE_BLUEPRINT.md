@@ -487,6 +487,64 @@ Classification: preview/fixture only. Not runtime truth. Not production-ready. N
 
 Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
 
+---
+
+## Phase F6 — Yemen Context + Contract Scaffold + Boundary Lock
+
+**Session:** DSH_WLT_FINANCE_REMAINING_CLOSURE-20260516-234559
+**Date:** 2026-05-16
+**Scope:** DSH/WLT/UI-kit visible context cleanup, WLT OpenAPI scaffold, WLT-only boundary
+
+### Phase F6 Summary
+
+This phase closes the remaining gaps left after Phase F5 preview closure:
+
+1. Saudi currency/context tokens removed from all DSH frontend files (previously missed by F5 scope)
+2. Minor-unit naming violations renamed in dsh-client-binding contracts and CartScreen
+3. WLT OpenAPI scaffold built with paths, schemas, and idempotency documentation
+4. WLT-only financial ownership boundary locked in contract
+5. ui-kit card.tsx default currency/locale corrected to Yemen context
+
+**NOT CLOSED in this phase:**
+
+- Runtime backend/ledger: NOT IMPLEMENTED
+- Idempotency enforcement: NOT IMPLEMENTED
+- Security/auth: NOT IMPLEMENTED
+- Reconciliation engine: NOT IMPLEMENTED
+- Production financial closure: NOT CLOSED
+
+### Phase F6 Classification
+
+| Item | Status |
+| --- | --- |
+| Saudi currency/context tokens in DSH frontend | CLOSED — scan zero |
+| Minor-unit naming cleanup (contracts + CartScreen) | CLOSED — scan zero |
+| WLT OpenAPI scaffold (paths + schemas) | CLOSED — scaffold present |
+| WLT-only financial ownership boundary | CLOSED — contract + blueprint locked |
+| ui-kit card default currency/locale | CLOSED — ar-YE / YER |
+| Runtime/backend ledger | NOT IMPLEMENTED |
+| Idempotency enforcement | NOT IMPLEMENTED |
+| Security/auth layer | NOT IMPLEMENTED |
+| Reconciliation engine | NOT IMPLEMENTED |
+| Production financial closure | NOT CLOSED |
+
+### Phase F6 Evidence Record
+
+| Item | File | Status |
+| --- | --- | --- |
+| Saudi currency/context tokens removed from 9 DSH frontend files | dsh/frontend/** | `CLEAN` |
+| Saudi locale (ar-SA) replaced with ar-YE in DSH partner/field/client files | dsh/frontend/** | `FIXED` |
+| Minor-unit naming renamed in dsh-client-binding.contracts.ts (17 fields) | dsh/frontend/app-client/contracts/ | `FIXED` |
+| Minor-unit naming renamed in CartScreen.tsx (types + local vars + function) | dsh/frontend/app-client/screens/ | `FIXED` |
+| topUpWalletInline marked PREVIEW_ONLY explicitly | dsh/frontend/app-client/screens/CartScreen.tsx | `FIXED` |
+| ui-kit card.tsx: ar-SA → ar-YE, SAR default → YER default | ui-kit/src/components/card.tsx | `FIXED` |
+| CartDetails.tsx: ar-SA → ar-YE | dsh/frontend/app-client/parts/CartDetails.tsx | `FIXED` |
+| WLT OpenAPI scaffold: 14 paths + 13 schemas + idempotency param | wlt/wlt.openapi.yaml | `SCAFFOLD` |
+| WLT contract state: CONTRACT_SCAFFOLD_PREVIEW_ONLY | wlt/wlt.openapi.yaml | `FIXED` |
+| WLT currency default: YER | wlt/wlt.openapi.yaml | `FIXED` |
+| WLT ownership declaration in OpenAPI | wlt/wlt.openapi.yaml | `FIXED` |
+| Evidence session | tools/registry/runs/DSH_WLT_FINANCE_REMAINING_CLOSURE-20260516-234559/ | `COMPLETE` |
+
 ### Single Next Action
 
 Create/verify WLT contract truth and WLT-only financial boundary before enabling money-related behavior in any other service.

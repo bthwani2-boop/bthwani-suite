@@ -133,7 +133,7 @@ function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
       available: true,
       lowStock: false,
       stockCount: 42,
-      priceLabel: '18.00 ر.س',
+      priceLabel: '18.00 ر.ي',
     },
     {
       id: 'prod-2',
@@ -148,7 +148,7 @@ function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
       available: true,
       lowStock: true,
       stockCount: 3,
-      priceLabel: '24.50 ر.س',
+      priceLabel: '24.50 ر.ي',
     },
     {
       id: 'prod-3',
@@ -163,7 +163,7 @@ function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
       available: true,
       lowStock: false,
       stockCount: 18,
-      priceLabel: '8.00 ر.س',
+      priceLabel: '8.00 ر.ي',
     },
     {
       id: 'prod-4',
@@ -178,7 +178,7 @@ function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
       available: true,
       lowStock: true,
       stockCount: 2,
-      priceLabel: '9.50 ر.س',
+      priceLabel: '9.50 ر.ي',
     },
     {
       id: 'prod-5',
@@ -193,7 +193,7 @@ function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
       available: true,
       lowStock: false,
       stockCount: 9,
-      priceLabel: '2.50 ر.س',
+      priceLabel: '2.50 ر.ي',
     },
     {
       id: 'prod-6',
@@ -208,7 +208,7 @@ function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
       available: false,
       lowStock: false,
       stockCount: 0,
-      priceLabel: '14.75 ر.س',
+      priceLabel: '14.75 ر.ي',
     },
     {
       id: 'prod-fix-me',
@@ -223,7 +223,7 @@ function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
       available: true,
       lowStock: false,
       stockCount: 12,
-      priceLabel: '9.00 ر.س',
+      priceLabel: '9.00 ر.ي',
       publishStage: 'needs-fix',
     },
     {
@@ -239,7 +239,7 @@ function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
       available: false,
       lowStock: false,
       stockCount: 0,
-      priceLabel: '120.00 ر.س',
+      priceLabel: '120.00 ر.ي',
       publishStage: 'rejected',
     },
     {
@@ -255,7 +255,7 @@ function buildInitialProducts(canonicalStoreId?: string): InventoryProduct[] {
       available: true,
       lowStock: false,
       stockCount: 25,
-      priceLabel: '15.00 ر.س',
+      priceLabel: '15.00 ر.ي',
       publishStage: 'marketing-review',
     },
     ...scopedCanonicalProducts,
@@ -442,7 +442,7 @@ function InventoryCatalogContent({ storeName, branchLabel, activeZoneLabel, toda
   const publishLabel = reviewCount > 0 || lowStockCount > 0 ? 'مراجعة ونشر التغييرات' : 'حفظ تحديثات المخزون';
 
   const onSave = React.useCallback(() => {
-    setLastSavedLabel(new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }));
+    setLastSavedLabel(new Date().toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' }));
   }, []);
 
   const applyDraft = React.useCallback(() => {
@@ -450,7 +450,7 @@ function InventoryCatalogContent({ storeName, branchLabel, activeZoneLabel, toda
 
     const parsedStock = Number(draftStock.replace(/[^0-9]/g, ''));
     const cleanedPrice = draftPrice.replace(/[^0-9.]/g, '').trim();
-    const resolvedPrice = cleanedPrice.length > 0 ? `${Number(cleanedPrice).toFixed(2)} ر.س` : selectedProduct.priceLabel;
+    const resolvedPrice = cleanedPrice.length > 0 ? `${Number(cleanedPrice).toFixed(2)} ر.ي` : selectedProduct.priceLabel;
     const normalizedStock = Number.isFinite(parsedStock) ? parsedStock : selectedProduct.stockCount;
 
     setProducts((current) =>
@@ -467,7 +467,7 @@ function InventoryCatalogContent({ storeName, branchLabel, activeZoneLabel, toda
           : product,
       ),
     );
-    setLastSavedLabel(new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }));
+    setLastSavedLabel(new Date().toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' }));
     setToolMessage(`تم تحديث ${selectedProduct.name} محليًا.`);
   }, [draftAvailable, draftPrice, draftStock, selectedProduct]);
 
