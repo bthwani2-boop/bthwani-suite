@@ -1,338 +1,409 @@
-diff --git a/dsh/frontend/app-captain/DshCaptainSurface.tsx b/dsh/frontend/app-captain/DshCaptainSurface.tsx
-index 5fb74664..8cd2eed3 100644
---- a/dsh/frontend/app-captain/DshCaptainSurface.tsx
-+++ b/dsh/frontend/app-captain/DshCaptainSurface.tsx
-@@ -47,6 +47,9 @@ import {
-   DshCaptainTierEvaluateScreen,
-   DshCaptainTierInfoScreen,
- } from './screens/DshCaptainProfileScreen';
-+import { DshCaptainMapScreen } from './screens/DshCaptainMapScreen';
-+import { DshCaptainPickupDropoffScreen } from './screens/DshCaptainPickupDropoffScreen';
-+import { DshCaptainPoDSubmissionScreen } from './screens/DshCaptainPoDSubmissionScreen';
- import type {
-   DshCaptainCommandTarget,
-   DshCaptainRoute,
-@@ -105,6 +108,14 @@ function getRouteForCommandTarget(target: DshCaptainCommandTarget): DshCaptainRo
-     return 'account-orders';
-   }
-
-+  if (target === 'pickup-dropoff') {
-+    return 'pickup-dropoff';
-+  }
-+
-+  if (target === 'pod-submission') {
-+    return 'pod-submission';
-+  }
-+
-   return 'home';
- }
-
-@@ -507,6 +518,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
-               onRetry={() => setRoute('detail')}
-             />
-             <Button label="فتح تواصل الطلب" tone="secondary" fullWidth={false} onPress={() => setRoute('orderchat')} />
-+            <Button label="مرحلة الاستلام والتسليم" tone="secondary" fullWidth={false} onPress={() => setRoute('pickup-dropoff')} />
-           </Box>
-
-           <CaptainPickupConfirmSheet
-@@ -551,6 +563,39 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
-       );
-     }
-
-+    if (route === 'map') {
-+      return <DshCaptainMapScreen />;
-+    }
-+
-+    if (route === 'pickup-dropoff') {
-+      return (
-+        <DshCaptainPickupDropoffScreen
-+          mode="pickup"
-+          orderId={activeOrderId}
-+          storeName={activeSummary.pickupLabel}
-+          customerName="العميل"
-+          address={activeSummary.dropoffLabel}
-+          itemsCount={3}
-+          onConfirm={() => setRoute('pod-submission')}
-+          onReportIssue={() => setRoute('inbox')}
-+          onBack={goBack}
-+        />
-+      );
-+    }
-+
-+    if (route === 'pod-submission') {
-+      return (
-+        <DshCaptainPoDSubmissionScreen
-+          state="ready"
-+          orderId={activeOrderId}
-+          onCapturePhoto={() => {}}
-+          onConfirm={() => setRoute('inbox')}
-+          onReportFailure={() => setRoute('inbox')}
-+          onBack={goBack}
-+        />
-+      );
-+    }
-+
-     return null;
-   };
-
-@@ -864,6 +909,18 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
-       return <MobileWorkspaceHeader title="الدعم" description="المسار المفتوح من الدليل." icon="layers-outline" backLabel="العودة للخريطة" onBack={goBack} />;
-     }
-
-+    if (route === 'map') {
-+      return <MobileWorkspaceHeader title="خريطة المهمة" description="عرض المسار وتبديل المراحل." icon="map-outline" backLabel="العودة للخريطة" onBack={goBack} />;
-+    }
-+
-+    if (route === 'pickup-dropoff') {
-+      return <MobileWorkspaceHeader title="الاستلام والتسليم" description="مراحل التسليم من الاستلام حتى إثبات التسليم." icon="navigate-outline" backLabel="العودة" onBack={goBack} />;
-+    }
-+
-+    if (route === 'pod-submission') {
-+      return <MobileWorkspaceHeader title="إثبات التسليم" description="التقاط صورة الإثبات وإرسالها لإغلاق الطلب." icon="camera-outline" backLabel="العودة" onBack={goBack} />;
-+    }
-+
-     return null;
-   };
-
-@@ -1048,6 +1105,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
-             ) : (
-               <Button size="sm" fullWidth={false} tone="primary" label="تأكيد التسليم" onPress={confirmDelivery} />
-             )}
-+            <Button size="sm" fullWidth={false} tone="ghost" label="خريطة المهمة" onPress={() => setRoute('map')} />
-           </Box>
-
-           <Surface tone="inset" padding={2} gap={2} radiusToken="lg">
-diff --git a/dsh/frontend/app-client/screens/StoreScreen.tsx b/dsh/frontend/app-client/screens/StoreScreen.tsx
-index 05485cd4..a378fe0e 100644
---- a/dsh/frontend/app-client/screens/StoreScreen.tsx
-+++ b/dsh/frontend/app-client/screens/StoreScreen.tsx
-@@ -857,7 +857,7 @@ function DshStoreGetScreenContent({
-           />
-
-           {storeLogoImageSource ? (
--            <View style={[styles.previewPartnerBadge, { position: 'absolute', bottom: 32, right: 12, zIndex: 13 }]} pointerEvents="none">
-+            <View style={[styles.previewPartnerBadge, { position: 'absolute', bottom: 20, right: 12, zIndex: 13 }]} pointerEvents="none">
-               <View style={styles.previewPartnerBadgeImageContainer}>
-                 <Image source={storeLogoImageSource} style={styles.previewPartnerBadgeImage} resizeMode="contain" />
-               </View>
-@@ -879,7 +879,7 @@ function DshStoreGetScreenContent({
-             alignItems: 'center',
-             justifyContent: 'space-between'
-           }]} pointerEvents="box-none">
--            <View style={[styles.previewDetailsContent, { flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
-+            <View style={[styles.previewDetailsContent, { flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start', paddingRight: isRTL ? 56 : 0, paddingLeft: isRTL ? 0 : 8 }]}>
-               <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap' }}>
-                 <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText, fontSize: 16 }]} numberOfLines={1}>{normalizeDisplayText(item.name)}</Text>
-                 {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 4, fontSize: 12 }]}>· {normalizedStoreName}</Text> : null}
-diff --git a/dsh/frontend/app-field/data/field-stores.preview-data.ts b/dsh/frontend/app-field/data/field-stores.preview-data.ts
-index a2aa649f..2d948ee8 100644
---- a/dsh/frontend/app-field/data/field-stores.preview-data.ts
-+++ b/dsh/frontend/app-field/data/field-stores.preview-data.ts
-@@ -21,7 +21,7 @@ export type FieldLeadStatus =
-
- export type FieldLeadFilter = 'all' | 'today' | 'ready' | 'follow-up' | 'pending' | 'submitted' | 'done';
-
--export type FieldOnboardingSectionId = 'basics' | 'classification' | 'location' | 'photos' | 'products' | 'offer' | 'review';
-+export type FieldOnboardingSectionId = 'basics' | 'classification' | 'location' | 'photos' | 'documents' | 'products' | 'offer' | 'review';
-
- export type FieldOnboardingDraft = {
-   activeSectionId: FieldOnboardingSectionId;
-@@ -133,6 +133,7 @@ export const fieldSectionOrder: readonly FieldOnboardingSectionId[] = [
-   'classification',
-   'location',
-   'photos',
-+  'documents',
-   'products',
-   'offer',
-   'review',
-@@ -143,6 +144,7 @@ export const fieldSectionLabels: Record<FieldOnboardingSectionId, string> = {
-   classification: 'النوع والتصنيف',
-   location: 'الموقع والتغطية',
-   photos: 'الصور',
-+  documents: 'التحقق من المستندات',
-   products: 'المنتجات الأولية',
-   offer: 'العرض والاتفاق',
-   review: 'المراجعة والإرسال',
-@@ -263,6 +265,8 @@ export function resolveFieldSectionSummaries(draft: FieldOnboardingDraft): Field
-     classification: [draft.classification.storeType, draft.classification.mainCategory].filter((value) => !value.trim()).length,
-     location: [draft.location.city, draft.location.zone, draft.location.addressLine, draft.location.latitude, draft.location.longitude, draft.location.landmark].filter((value) => !value.trim()).length,
-     photos: [draft.photos.storefrontPhotoRef, draft.photos.interiorPhotoRef].filter((value) => !value.trim()).length,
-+    // ML-002: documents section is non-blocking — upload is BLOCKED_BY_CONTRACT; section always reports 0 missing
-+    documents: 0,
-     products: [draft.products.featuredProductName, draft.products.featuredProductPrice].filter((value) => !value.trim()).length,
-     offer: [draft.offer.preliminaryOffer, draft.offer.operatingHours].filter((value) => !value.trim()).length,
-     review: getFieldRequiredMissingItems(draft).length,
-diff --git a/dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx b/dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx
-index 538647fe..c707938e 100644
---- a/dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx
-+++ b/dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx
-@@ -31,6 +31,7 @@ import {
-   type FieldOnboardingSectionId,
-   type FieldStoreFile,
- } from '../data/field-stores.preview-data';
-+import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
-
- // ML-005: added activated/exit states so field knows when onboarding is complete
- export type DshFieldStoreOnboardingScreenState = 'onboarding' | 'activated' | 'exit';
-@@ -202,6 +203,15 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
-       );
-     }
-
-+    if (activeSectionId === 'documents') {
-+      return (
-+        <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-+          <SectionHeader title="التحقق من المستندات" subtitle="رفع المستندات معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار غير نشطة في الوضع الحالي." />
-+          <DocumentVerificationSection state="ready" />
-+        </Surface>
-+      );
-+    }
-+
-     if (activeSectionId === 'products') {
-       return (
-         <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-diff --git a/dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx b/dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx
-index 6564fcfa..3a1cfa33 100644
---- a/dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx
-+++ b/dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx
-@@ -18,6 +18,7 @@ import type {
-   DshFieldStoreVisitValues,
-   DshFieldVisitEvidenceItem,
- } from '../types/DshFieldStoreVisitTypes';
-+import { VisitEvidenceSection } from '../sections/VisitEvidenceSection';
-
- export type {
-   DshFieldStoreVisitErrors,
-@@ -171,6 +172,14 @@ export function DshFieldStoreVisitScreen({
-         </Box>
-       </Surface>
-
-+      <Surface tone="raised" gap={3}>
-+        <SectionHeader
-+          title="التقاط أدلة الزيارة"
-+          subtitle="رفع الصور معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار ستصبح نشطة عند توفر العقد."
-+        />
-+        <VisitEvidenceSection sectionState="ready" />
-+      </Surface>
-+
-       <Surface tone="inset" gap={3}>
-         <SectionHeader
-           title="إغلاق الزيارة"
-diff --git a/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx b/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx
-index f7eb5c9b..54aa238c 100644
---- a/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx
-+++ b/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx
-@@ -160,6 +160,8 @@ const FilterDropdown = ({ title, options, selected, onChange, onClose }: FilterD
- };
-
- import { CatalogAdoptionQueue } from './CatalogAdoptionQueue';
-+import { ItemApprovalSection } from './ItemApprovalSection';
-+import { CatalogPublishingGateSection } from './CatalogPublishingGateSection';
-
- // --- Main Screen Component ---
-
-@@ -507,6 +509,18 @@ export function ControlPanelDshCatalogScreen({
-               </div>
-             )}
-
-+            {activeTab === 'approvals' && activeSubTab === 'quality' && (
-+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'hidden', minHeight: 0 }}>
-+                <ItemApprovalSection />
-+              </div>
-+            )}
-+
-+            {activeTab === 'approvals' && activeSubTab === 'pricing' && (
-+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'auto', minHeight: 0 }}>
-+                <CatalogPublishingGateSection />
-+              </div>
-+            )}
-+
-             {activeTab === 'catalog' && (
-               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#FFFFFF', minWidth: 0 }}>
-                 <div style={{ flex: 1, minHeight: 0, backgroundColor: '#FFFFFF' }}>
-diff --git a/dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx b/dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx
-index fece65fe..fbba43e2 100644
---- a/dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx
-+++ b/dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx
-@@ -7,6 +7,7 @@ import {
- } from '@bthwani/ui-kit/web';
- import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from './operations.preview-data';
- import { Box } from '@bthwani/ui-kit';
-+import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
- import styles from '../shared/control-panel-surface.module.css';
-
- export type AuditSupportSlaScreenProps = { hubHref: string; subGroup?: string; };
-@@ -20,6 +21,7 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
-
- export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScreenProps) {
-   const preview = AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW;
-+  const [detailOrderId, setDetailOrderId] = React.useState<string | null>(null);
-
-   const summaryKpi = [
-     { id: 'audits', label: 'التدقيقات اليدوية', value: String(preview.summary.manualAudits), tone: 'neutral' as const },
-@@ -36,31 +38,41 @@ export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScre
-
-       <WebControlPanelKpiStrip items={summaryKpi} />
-
--      <Box gap={2} style={{}}>
--        {preview.audits.map((item) => (
--          <WebControlPanelDecisionRow
--            key={item.id}
--            entityId={item.id}
--            entityLabel={`${item.who} — ${item.why}`}
--            status={item.permissionResult}
--            statusTone={TONE_MAP[item.statusTone] ?? 'neutral'}
--            risk={item.statusTone === 'danger' ? 'danger' : item.statusTone === 'warning' ? 'warning' : 'neutral'}
--            recommendation={item.resolutionPath}
--            reason={item.note}
--            sla={`الوقت: ${item.when} | الإثبات: ${item.proofRequired}`}
--            primaryAction={{
--              id: 'resolve',
--              label: item.resolutionPath === 'حل' ? 'حل التدقيق' : 'تصعيد',
--              onAction: () => console.log('Resolve/Escalate', item.id)
--            }}
--            secondaryAction={{
--              id: 'close',
--              label: 'إغلاق السجل',
--              onAction: () => console.log('Close Record', item.id)
--            }}
--          />
--        ))}
--      </Box>
-+      <div style={{ display: 'flex', flexDirection: 'row', gap: 0, alignItems: 'flex-start' }}>
-+        <Box gap={2} style={{ flex: 1 }}>
-+          {preview.audits.map((item) => (
-+            <WebControlPanelDecisionRow
-+              key={item.id}
-+              entityId={item.id}
-+              entityLabel={`${item.who} — ${item.why}`}
-+              status={item.permissionResult}
-+              statusTone={TONE_MAP[item.statusTone] ?? 'neutral'}
-+              risk={item.statusTone === 'danger' ? 'danger' : item.statusTone === 'warning' ? 'warning' : 'neutral'}
-+              recommendation={item.resolutionPath}
-+              reason={item.note}
-+              sla={`الوقت: ${item.when} | الإثبات: ${item.proofRequired}`}
-+              primaryAction={{
-+                id: 'resolve',
-+                label: item.resolutionPath === 'حل' ? 'حل التدقيق' : 'تصعيد',
-+                onAction: () => console.log('Resolve/Escalate', item.id)
-+              }}
-+              secondaryAction={{
-+                id: 'detail',
-+                label: detailOrderId === item.id ? 'إخفاء التفاصيل' : 'سجل التدقيق',
-+                onAction: () => setDetailOrderId(detailOrderId === item.id ? null : item.id)
-+              }}
-+            />
-+          ))}
-+        </Box>
-+        {detailOrderId !== null && (
-+          <div style={{ width: 340, flexShrink: 0, borderRight: '1px solid #E2E8F0' }}>
-+            <AuditTrailDetailWorkspace
-+              orderId={detailOrderId}
-+              onClose={() => setDetailOrderId(null)}
-+            />
-+          </div>
-+        )}
-+      </div>
-     </div>
-   );
- }
+diff --git a/LOCAL_CHANGE_REVIEW.patch b/LOCAL_CHANGE_REVIEW.patch
+index 89cc1350..e69de29b 100644
+--- a/LOCAL_CHANGE_REVIEW.patch
++++ b/LOCAL_CHANGE_REVIEW.patch
+@@ -1,338 +0,0 @@
+-diff --git a/dsh/frontend/app-captain/DshCaptainSurface.tsx b/dsh/frontend/app-captain/DshCaptainSurface.tsx
+-index 5fb74664..8cd2eed3 100644
+---- a/dsh/frontend/app-captain/DshCaptainSurface.tsx
+-+++ b/dsh/frontend/app-captain/DshCaptainSurface.tsx
+-@@ -47,6 +47,9 @@ import {
+-   DshCaptainTierEvaluateScreen,
+-   DshCaptainTierInfoScreen,
+- } from './screens/DshCaptainProfileScreen';
+-+import { DshCaptainMapScreen } from './screens/DshCaptainMapScreen';
+-+import { DshCaptainPickupDropoffScreen } from './screens/DshCaptainPickupDropoffScreen';
+-+import { DshCaptainPoDSubmissionScreen } from './screens/DshCaptainPoDSubmissionScreen';
+- import type {
+-   DshCaptainCommandTarget,
+-   DshCaptainRoute,
+-@@ -105,6 +108,14 @@ function getRouteForCommandTarget(target: DshCaptainCommandTarget): DshCaptainRo
+-     return 'account-orders';
+-   }
+-
+-+  if (target === 'pickup-dropoff') {
+-+    return 'pickup-dropoff';
+-+  }
+-+
+-+  if (target === 'pod-submission') {
+-+    return 'pod-submission';
+-+  }
+-+
+-   return 'home';
+- }
+-
+-@@ -507,6 +518,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
+-               onRetry={() => setRoute('detail')}
+-             />
+-             <Button label="فتح تواصل الطلب" tone="secondary" fullWidth={false} onPress={() => setRoute('orderchat')} />
+-+            <Button label="مرحلة الاستلام والتسليم" tone="secondary" fullWidth={false} onPress={() => setRoute('pickup-dropoff')} />
+-           </Box>
+-
+-           <CaptainPickupConfirmSheet
+-@@ -551,6 +563,39 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
+-       );
+-     }
+-
+-+    if (route === 'map') {
+-+      return <DshCaptainMapScreen />;
+-+    }
+-+
+-+    if (route === 'pickup-dropoff') {
+-+      return (
+-+        <DshCaptainPickupDropoffScreen
+-+          mode="pickup"
+-+          orderId={activeOrderId}
+-+          storeName={activeSummary.pickupLabel}
+-+          customerName="العميل"
+-+          address={activeSummary.dropoffLabel}
+-+          itemsCount={3}
+-+          onConfirm={() => setRoute('pod-submission')}
+-+          onReportIssue={() => setRoute('inbox')}
+-+          onBack={goBack}
+-+        />
+-+      );
+-+    }
+-+
+-+    if (route === 'pod-submission') {
+-+      return (
+-+        <DshCaptainPoDSubmissionScreen
+-+          state="ready"
+-+          orderId={activeOrderId}
+-+          onCapturePhoto={() => {}}
+-+          onConfirm={() => setRoute('inbox')}
+-+          onReportFailure={() => setRoute('inbox')}
+-+          onBack={goBack}
+-+        />
+-+      );
+-+    }
+-+
+-     return null;
+-   };
+-
+-@@ -864,6 +909,18 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
+-       return <MobileWorkspaceHeader title="الدعم" description="المسار المفتوح من الدليل." icon="layers-outline" backLabel="العودة للخريطة" onBack={goBack} />;
+-     }
+-
+-+    if (route === 'map') {
+-+      return <MobileWorkspaceHeader title="خريطة المهمة" description="عرض المسار وتبديل المراحل." icon="map-outline" backLabel="العودة للخريطة" onBack={goBack} />;
+-+    }
+-+
+-+    if (route === 'pickup-dropoff') {
+-+      return <MobileWorkspaceHeader title="الاستلام والتسليم" description="مراحل التسليم من الاستلام حتى إثبات التسليم." icon="navigate-outline" backLabel="العودة" onBack={goBack} />;
+-+    }
+-+
+-+    if (route === 'pod-submission') {
+-+      return <MobileWorkspaceHeader title="إثبات التسليم" description="التقاط صورة الإثبات وإرسالها لإغلاق الطلب." icon="camera-outline" backLabel="العودة" onBack={goBack} />;
+-+    }
+-+
+-     return null;
+-   };
+-
+-@@ -1048,6 +1105,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
+-             ) : (
+-               <Button size="sm" fullWidth={false} tone="primary" label="تأكيد التسليم" onPress={confirmDelivery} />
+-             )}
+-+            <Button size="sm" fullWidth={false} tone="ghost" label="خريطة المهمة" onPress={() => setRoute('map')} />
+-           </Box>
+-
+-           <Surface tone="inset" padding={2} gap={2} radiusToken="lg">
+-diff --git a/dsh/frontend/app-client/screens/StoreScreen.tsx b/dsh/frontend/app-client/screens/StoreScreen.tsx
+-index 05485cd4..a378fe0e 100644
+---- a/dsh/frontend/app-client/screens/StoreScreen.tsx
+-+++ b/dsh/frontend/app-client/screens/StoreScreen.tsx
+-@@ -857,7 +857,7 @@ function DshStoreGetScreenContent({
+-           />
+-
+-           {storeLogoImageSource ? (
+--            <View style={[styles.previewPartnerBadge, { position: 'absolute', bottom: 32, right: 12, zIndex: 13 }]} pointerEvents="none">
+-+            <View style={[styles.previewPartnerBadge, { position: 'absolute', bottom: 20, right: 12, zIndex: 13 }]} pointerEvents="none">
+-               <View style={styles.previewPartnerBadgeImageContainer}>
+-                 <Image source={storeLogoImageSource} style={styles.previewPartnerBadgeImage} resizeMode="contain" />
+-               </View>
+-@@ -879,7 +879,7 @@ function DshStoreGetScreenContent({
+-             alignItems: 'center',
+-             justifyContent: 'space-between'
+-           }]} pointerEvents="box-none">
+--            <View style={[styles.previewDetailsContent, { flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
+-+            <View style={[styles.previewDetailsContent, { flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start', paddingRight: isRTL ? 56 : 0, paddingLeft: isRTL ? 0 : 8 }]}>
+-               <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap' }}>
+-                 <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText, fontSize: 16 }]} numberOfLines={1}>{normalizeDisplayText(item.name)}</Text>
+-                 {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 4, fontSize: 12 }]}>· {normalizedStoreName}</Text> : null}
+-diff --git a/dsh/frontend/app-field/data/field-stores.preview-data.ts b/dsh/frontend/app-field/data/field-stores.preview-data.ts
+-index a2aa649f..2d948ee8 100644
+---- a/dsh/frontend/app-field/data/field-stores.preview-data.ts
+-+++ b/dsh/frontend/app-field/data/field-stores.preview-data.ts
+-@@ -21,7 +21,7 @@ export type FieldLeadStatus =
+-
+- export type FieldLeadFilter = 'all' | 'today' | 'ready' | 'follow-up' | 'pending' | 'submitted' | 'done';
+-
+--export type FieldOnboardingSectionId = 'basics' | 'classification' | 'location' | 'photos' | 'products' | 'offer' | 'review';
+-+export type FieldOnboardingSectionId = 'basics' | 'classification' | 'location' | 'photos' | 'documents' | 'products' | 'offer' | 'review';
+-
+- export type FieldOnboardingDraft = {
+-   activeSectionId: FieldOnboardingSectionId;
+-@@ -133,6 +133,7 @@ export const fieldSectionOrder: readonly FieldOnboardingSectionId[] = [
+-   'classification',
+-   'location',
+-   'photos',
+-+  'documents',
+-   'products',
+-   'offer',
+-   'review',
+-@@ -143,6 +144,7 @@ export const fieldSectionLabels: Record<FieldOnboardingSectionId, string> = {
+-   classification: 'النوع والتصنيف',
+-   location: 'الموقع والتغطية',
+-   photos: 'الصور',
+-+  documents: 'التحقق من المستندات',
+-   products: 'المنتجات الأولية',
+-   offer: 'العرض والاتفاق',
+-   review: 'المراجعة والإرسال',
+-@@ -263,6 +265,8 @@ export function resolveFieldSectionSummaries(draft: FieldOnboardingDraft): Field
+-     classification: [draft.classification.storeType, draft.classification.mainCategory].filter((value) => !value.trim()).length,
+-     location: [draft.location.city, draft.location.zone, draft.location.addressLine, draft.location.latitude, draft.location.longitude, draft.location.landmark].filter((value) => !value.trim()).length,
+-     photos: [draft.photos.storefrontPhotoRef, draft.photos.interiorPhotoRef].filter((value) => !value.trim()).length,
+-+    // ML-002: documents section is non-blocking — upload is BLOCKED_BY_CONTRACT; section always reports 0 missing
+-+    documents: 0,
+-     products: [draft.products.featuredProductName, draft.products.featuredProductPrice].filter((value) => !value.trim()).length,
+-     offer: [draft.offer.preliminaryOffer, draft.offer.operatingHours].filter((value) => !value.trim()).length,
+-     review: getFieldRequiredMissingItems(draft).length,
+-diff --git a/dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx b/dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx
+-index 538647fe..c707938e 100644
+---- a/dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx
+-+++ b/dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx
+-@@ -31,6 +31,7 @@ import {
+-   type FieldOnboardingSectionId,
+-   type FieldStoreFile,
+- } from '../data/field-stores.preview-data';
+-+import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
+-
+- // ML-005: added activated/exit states so field knows when onboarding is complete
+- export type DshFieldStoreOnboardingScreenState = 'onboarding' | 'activated' | 'exit';
+-@@ -202,6 +203,15 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
+-       );
+-     }
+-
+-+    if (activeSectionId === 'documents') {
+-+      return (
+-+        <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+-+          <SectionHeader title="التحقق من المستندات" subtitle="رفع المستندات معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار غير نشطة في الوضع الحالي." />
+-+          <DocumentVerificationSection state="ready" />
+-+        </Surface>
+-+      );
+-+    }
+-+
+-     if (activeSectionId === 'products') {
+-       return (
+-         <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+-diff --git a/dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx b/dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx
+-index 6564fcfa..3a1cfa33 100644
+---- a/dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx
+-+++ b/dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx
+-@@ -18,6 +18,7 @@ import type {
+-   DshFieldStoreVisitValues,
+-   DshFieldVisitEvidenceItem,
+- } from '../types/DshFieldStoreVisitTypes';
+-+import { VisitEvidenceSection } from '../sections/VisitEvidenceSection';
+-
+- export type {
+-   DshFieldStoreVisitErrors,
+-@@ -171,6 +172,14 @@ export function DshFieldStoreVisitScreen({
+-         </Box>
+-       </Surface>
+-
+-+      <Surface tone="raised" gap={3}>
+-+        <SectionHeader
+-+          title="التقاط أدلة الزيارة"
+-+          subtitle="رفع الصور معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار ستصبح نشطة عند توفر العقد."
+-+        />
+-+        <VisitEvidenceSection sectionState="ready" />
+-+      </Surface>
+-+
+-       <Surface tone="inset" gap={3}>
+-         <SectionHeader
+-           title="إغلاق الزيارة"
+-diff --git a/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx b/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx
+-index f7eb5c9b..54aa238c 100644
+---- a/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx
+-+++ b/dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx
+-@@ -160,6 +160,8 @@ const FilterDropdown = ({ title, options, selected, onChange, onClose }: FilterD
+- };
+-
+- import { CatalogAdoptionQueue } from './CatalogAdoptionQueue';
+-+import { ItemApprovalSection } from './ItemApprovalSection';
+-+import { CatalogPublishingGateSection } from './CatalogPublishingGateSection';
+-
+- // --- Main Screen Component ---
+-
+-@@ -507,6 +509,18 @@ export function ControlPanelDshCatalogScreen({
+-               </div>
+-             )}
+-
+-+            {activeTab === 'approvals' && activeSubTab === 'quality' && (
+-+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'hidden', minHeight: 0 }}>
+-+                <ItemApprovalSection />
+-+              </div>
+-+            )}
+-+
+-+            {activeTab === 'approvals' && activeSubTab === 'pricing' && (
+-+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'auto', minHeight: 0 }}>
+-+                <CatalogPublishingGateSection />
+-+              </div>
+-+            )}
+-+
+-             {activeTab === 'catalog' && (
+-               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#FFFFFF', minWidth: 0 }}>
+-                 <div style={{ flex: 1, minHeight: 0, backgroundColor: '#FFFFFF' }}>
+-diff --git a/dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx b/dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx
+-index fece65fe..fbba43e2 100644
+---- a/dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx
+-+++ b/dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx
+-@@ -7,6 +7,7 @@ import {
+- } from '@bthwani/ui-kit/web';
+- import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from './operations.preview-data';
+- import { Box } from '@bthwani/ui-kit';
+-+import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
+- import styles from '../shared/control-panel-surface.module.css';
+-
+- export type AuditSupportSlaScreenProps = { hubHref: string; subGroup?: string; };
+-@@ -20,6 +21,7 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
+-
+- export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScreenProps) {
+-   const preview = AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW;
+-+  const [detailOrderId, setDetailOrderId] = React.useState<string | null>(null);
+-
+-   const summaryKpi = [
+-     { id: 'audits', label: 'التدقيقات اليدوية', value: String(preview.summary.manualAudits), tone: 'neutral' as const },
+-@@ -36,31 +38,41 @@ export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScre
+-
+-       <WebControlPanelKpiStrip items={summaryKpi} />
+-
+--      <Box gap={2} style={{}}>
+--        {preview.audits.map((item) => (
+--          <WebControlPanelDecisionRow
+--            key={item.id}
+--            entityId={item.id}
+--            entityLabel={`${item.who} — ${item.why}`}
+--            status={item.permissionResult}
+--            statusTone={TONE_MAP[item.statusTone] ?? 'neutral'}
+--            risk={item.statusTone === 'danger' ? 'danger' : item.statusTone === 'warning' ? 'warning' : 'neutral'}
+--            recommendation={item.resolutionPath}
+--            reason={item.note}
+--            sla={`الوقت: ${item.when} | الإثبات: ${item.proofRequired}`}
+--            primaryAction={{
+--              id: 'resolve',
+--              label: item.resolutionPath === 'حل' ? 'حل التدقيق' : 'تصعيد',
+--              onAction: () => console.log('Resolve/Escalate', item.id)
+--            }}
+--            secondaryAction={{
+--              id: 'close',
+--              label: 'إغلاق السجل',
+--              onAction: () => console.log('Close Record', item.id)
+--            }}
+--          />
+--        ))}
+--      </Box>
+-+      <div style={{ display: 'flex', flexDirection: 'row', gap: 0, alignItems: 'flex-start' }}>
+-+        <Box gap={2} style={{ flex: 1 }}>
+-+          {preview.audits.map((item) => (
+-+            <WebControlPanelDecisionRow
+-+              key={item.id}
+-+              entityId={item.id}
+-+              entityLabel={`${item.who} — ${item.why}`}
+-+              status={item.permissionResult}
+-+              statusTone={TONE_MAP[item.statusTone] ?? 'neutral'}
+-+              risk={item.statusTone === 'danger' ? 'danger' : item.statusTone === 'warning' ? 'warning' : 'neutral'}
+-+              recommendation={item.resolutionPath}
+-+              reason={item.note}
+-+              sla={`الوقت: ${item.when} | الإثبات: ${item.proofRequired}`}
+-+              primaryAction={{
+-+                id: 'resolve',
+-+                label: item.resolutionPath === 'حل' ? 'حل التدقيق' : 'تصعيد',
+-+                onAction: () => console.log('Resolve/Escalate', item.id)
+-+              }}
+-+              secondaryAction={{
+-+                id: 'detail',
+-+                label: detailOrderId === item.id ? 'إخفاء التفاصيل' : 'سجل التدقيق',
+-+                onAction: () => setDetailOrderId(detailOrderId === item.id ? null : item.id)
+-+              }}
+-+            />
+-+          ))}
+-+        </Box>
+-+        {detailOrderId !== null && (
+-+          <div style={{ width: 340, flexShrink: 0, borderRight: '1px solid #E2E8F0' }}>
+-+            <AuditTrailDetailWorkspace
+-+              orderId={detailOrderId}
+-+              onClose={() => setDetailOrderId(null)}
+-+            />
+-+          </div>
+-+        )}
+-+      </div>
+-     </div>
+-   );
+- }
+diff --git a/LOCAL_CHANGE_UNTRACKED_FILES.txt b/LOCAL_CHANGE_UNTRACKED_FILES.txt
+index 3ca2004b..e69de29b 100644
+--- a/LOCAL_CHANGE_UNTRACKED_FILES.txt
++++ b/LOCAL_CHANGE_UNTRACKED_FILES.txt
+@@ -1,36 +0,0 @@
+-.agents/AUTHORITY_BOUNDARY.md
+-.agents/INDEX.md
+-.agents/README.md
+-.agents/RESTORE_DECISION.md
+-.agents/SKILL_CATALOG.md
+-.agents/UPDATE_POLICY.md
+-.agents/adapters/claude.md
+-.agents/adapters/codex.md
+-.agents/adapters/copilot.md
+-.agents/adapters/cursor.md
+-.agents/adapters/gemini.md
+-.agents/adapters/opencode.md
+-.agents/skills/bthwani-agent-governance-execution/SKILL.md
+-.agents/skills/bthwani-agent-restoration-forensics/SKILL.md
+-.agents/skills/bthwani-current-workspace-authority/SKILL.md
+-.agents/skills/bthwani-dsh-ui-kit-golden-slice/SKILL.md
+-.agents/skills/bthwani-go-backend-target-boundary/SKILL.md
+-.agents/skills/bthwani-local-evidence-pack/SKILL.md
+-.agents/skills/bthwani-patch-review-and-evidence/SKILL.md
+-.agents/skills/bthwani-screen-flow-binding-contract/SKILL.md
+-.agents/skills/bthwani-ui-kit-surface-contract/SKILL.md
+-.agents/skills/nx-generate/SKILL.md
+-.agents/skills/nx-run-tasks/SKILL.md
+-.agents/skills/nx-workspace/SKILL.md
+-.codex/config.toml
+-.github/copilot-instructions.md
+-CLAUDE.md
+-GEMINI.md
+-LOCAL_CHANGE_DIFF_CHECK.txt
+-LOCAL_CHANGE_DIFF_STAT.txt
+-LOCAL_CHANGE_NAME_STATUS.txt
+-LOCAL_CHANGE_REVIEW.patch
+-LOCAL_CHANGE_STATUS.txt
+-LOCAL_CHANGE_UNTRACKED_FILES.txt
+-opencode.json
+-tools/plan/gov/AGENT_GLOBAL_RESTORE_AGENTS_ONLY_V8.md
+diff --git a/control-panel/composition/index.ts b/control-panel/composition/index.ts
+index 9d81878f..3fa2507f 100644
+--- a/control-panel/composition/index.ts
++++ b/control-panel/composition/index.ts
+@@ -28,9 +28,6 @@ export {
+   ControlPanelDshMarketingScreen,
+   ControlPanelDshMarketingApprovalScreen,
+   ControlPanelDshVideoSubmissionsReviewScreen,
+-  ControlPanelDshControlHubScreen,
+-  ControlPanelDshGovernanceEvidenceScreen,
+-  ControlPanelDshGuardStatusScreen,
+   DSH_CROSS_SURFACE_CLOSURE_MAP,
+   ControlPanelDshActionQueue,
+   ControlPanelDshDecisionBoard,
+diff --git a/dsh/frontend/control-panel/index.ts b/dsh/frontend/control-panel/index.ts
+index a435bec7..c399bc93 100644
+--- a/dsh/frontend/control-panel/index.ts
++++ b/dsh/frontend/control-panel/index.ts
+@@ -9,6 +9,5 @@ export { ControlPanelDshSupportQueueScreen, ControlPanelDshDisputeResolutionScre
+ export { ControlPanelDshPartnerApprovalsScreen, ControlPanelDshPartnerActivationScreen, ControlPanelDshPartnerDocumentReviewScreen } from './partners';
+ export { ControlPanelDshOperationsScreen, DshOperationsHubSurface, buildOperationsHref, coerceOperationsPanel, normalizeOperationsLocation } from './operations';
+ export { ControlPanelDshMarketingScreen, ControlPanelDshMarketingApprovalScreen, ControlPanelDshVideoSubmissionsReviewScreen } from './marketing';
+-export { ControlPanelDshControlHubScreen, ControlPanelDshGovernanceEvidenceScreen, ControlPanelDshGuardStatusScreen } from './control';
+ export { ControlPanelDshPlatformScreen, DshPlatformVarsWorkspace } from './platform';
+ export { DSH_CROSS_SURFACE_CLOSURE_MAP, ControlPanelDshActionQueue, ControlPanelDshDecisionBoard, ControlPanelDshWorkspaceFrame } from './shared';
