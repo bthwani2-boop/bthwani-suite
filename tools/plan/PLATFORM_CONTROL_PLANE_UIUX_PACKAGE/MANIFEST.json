@@ -1,12 +1,15 @@
 {
   "package": "PLATFORM_CONTROL_PLANE_UIUX_PACKAGE",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "created_at_utc": "2026-05-16T19:02:19.329191Z",
+  "updated_at_utc": "2026-05-16T19:28:00Z",
   "target_repo": "C:\\bthwani-suite",
   "target_folder": "C:\\bthwani-suite\\tools\\plan\\PLATFORM_CONTROL_PLANE_UIUX_PACKAGE",
   "active_branch_context": "ghb/0145-20260516-155044-control-panel-dsh-ui-kit",
-  "purpose": "UI/UX execution package for sovereign Platform Control Plane",
+  "purpose": "UI/UX execution package for sovereign Platform Control Plane — includes full mock/preview design for all 8 workspaces",
   "phase": "UI/UX only; no runtime/API/backend/secrets",
+  "includes_mock_design": true,
+  "adjacent_boundaries_defined": true,
   "files": [
     {
       "path": "00_AGENT_MASTER_PROMPT.md",
@@ -67,6 +70,14 @@
     {
       "path": "README.md",
       "sha256": "2e108740084f486494b5f256388e3ea901e9e34ba726be7e7a9a3ad1dee14b2c"
+    },
+    {
+      "path": "13_ADJACENT_CONTROL_PANEL_BOUNDARIES.md",
+      "sha256": "pending"
+    },
+    {
+      "path": "14_HANDOFF_FLOWS_CATALOG_MARKETING_ADMIN.md",
+      "sha256": "pending"
     }
   ]
 }

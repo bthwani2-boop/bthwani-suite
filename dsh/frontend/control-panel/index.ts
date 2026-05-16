@@ -9,5 +9,5 @@ export { ControlPanelDshSupportQueueScreen, ControlPanelDshDisputeResolutionScre
 export { ControlPanelDshPartnerApprovalsScreen, ControlPanelDshPartnerActivationScreen, ControlPanelDshPartnerDocumentReviewScreen } from './partners';
 export { ControlPanelDshOperationsScreen, DshOperationsHubSurface, buildOperationsHref, coerceOperationsPanel, normalizeOperationsLocation } from './operations';
 export { ControlPanelDshMarketingScreen, ControlPanelDshMarketingApprovalScreen, ControlPanelDshVideoSubmissionsReviewScreen } from './marketing';
-export { ControlPanelDshPlatformScreen, DshPlatformVarsWorkspace } from './platform';
+export { ControlPanelDshPlatformScreen, DshPlatformVarsWorkspace, DshPlatformAppearanceWorkspace, DshPlatformServicesWorkspace, DshPlatformProvidersWorkspace } from './platform';
 export { DSH_CROSS_SURFACE_CLOSURE_MAP, ControlPanelDshActionQueue, ControlPanelDshDecisionBoard, ControlPanelDshWorkspaceFrame } from './shared';

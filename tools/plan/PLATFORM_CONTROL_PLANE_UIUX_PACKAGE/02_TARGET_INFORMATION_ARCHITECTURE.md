@@ -169,3 +169,42 @@ Fields:
 - الأثر
 - نتيجة الاختبار
 - هدف التراجع
+
+## Adjacent Sections (Separate from Platform)
+
+See 13_ADJACENT_CONTROL_PANEL_BOUNDARIES.md for full ownership matrix.
+
+Catalogs: categories, subcategories, products, listings
+Marketing: campaigns, offers, banners, loyalty, subscriptions
+Administration: users, roles, permissions, Platform access gates
+
+## Target UI Structure (Confirmed)
+
+`
+Platform (sovereign control plane — top-admin only)
+├─ Overview           sovereign dashboard + handoff indicators
+├─ Services           service state control (live/paused/internal/pilot/maintenance)
+├─ Vars               human-friendly runtime variable editor
+├─ Providers          provider config (masked credentials, environment, fallback)
+├─ Appearance         platform identity, design token control
+├─ Rollouts           (teaser) staged rollout / kill switch / geographic scope
+├─ Health             (teaser) provider health, service status, last rollback
+└─ Audit & Rollback   (teaser) who changed / what / before-after / rollback
+
+Adjacent (separate sections — NOT implemented inside Platform):
+├─ Catalogs     categories / subcategories / products / listings
+├─ Marketing    campaigns / offers / banners / loyalty / subscriptions
+└─ Administration  users / roles / permissions / Platform access gates
+`
+
+### Tab navigation rule
+
+Active tabs: Overview, Services, Vars, Providers, Appearance
+Teaser tabs: Rollouts, Health, Audit & Rollback (visible but disabled/preview)
+
+### Handoff cards in Overview (informational only)
+
+Three non-actionable cards at the bottom of Overview:
+- Catalogs manages categories and content for enabled services.
+- Marketing manages campaigns and offers on enabled services.
+- Administration manages who can access and approve changes in Platform.

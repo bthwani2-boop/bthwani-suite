@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$RepoRoot = "C:\bthwani-suite"
 )
 
@@ -31,7 +31,8 @@ Run-And-Save "git-diff-name-status.txt" { git --no-pager diff --name-status }
 Run-And-Save "git-diff-check.txt" { git --no-pager diff --check }
 Run-And-Save "tsc-noemit.txt" { pnpm -w exec tsc --noEmit }
 Run-And-Save "untracked-files.txt" { git ls-files --others --exclude-standard }
-Run-And-Save "platform-control-plane-uiux.guard.txt" { node tools/guards/platform-control-plane-uiux.guard.mjs }
+Run-And-Save "platform-control-plane-uiux.guard.txt" { node "tools/plan/PLATFORM_CONTROL_PLANE_UIUX_PACKAGE/08_GUARDS/platform-control-plane-uiux.guard.mjs" }
+Run-And-Save "platform-control-plane-uiux.guard-tools.txt" { node "tools/guards/platform-control-plane-uiux.guard.mjs" }
 
 git --no-pager diff -- . > "$RUN_DIR\LOCAL_CHANGE_REVIEW.patch"
 git ls-files --others --exclude-standard > "$RUN_DIR\LOCAL_CHANGE_UNTRACKED_FILES.txt"

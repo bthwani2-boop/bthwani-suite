@@ -90,3 +90,42 @@ screenshot from /platform
 - Technical identifiers are secondary/caption only.
 - Main actions are visible but disabled.
 - Low-noise, premium, cohesive, central color system.
+
+## Adjacent Section Boundary Acceptance
+
+- Platform does not display category management UI.
+- Platform does not display campaign or offer management UI.
+- Platform does not display user or role management UI.
+- Platform Overview may show non-actionable handoff indicators only (informational text, no mutations).
+- A service hidden by Platform must not be implicitly marketable or listable in Catalogs.
+- No Catalog category can override Platform service visibility.
+- No Marketing campaign can override Platform kill switch or service availability.
+- No user can access Platform without Administration-granted role.
+- Handoff indicators in Overview are text/cards only -- no new tabs, no management flows.
+
+## UI Mock Design Acceptance Criteria
+
+- [ ] Overview workspace is a sovereign dashboard (not a list of technical records)
+- [ ] Overview contains three informational handoff cards for Catalogs, Marketing, Administration
+- [ ] Services workspace exists with >= 5 mock service records
+- [ ] Services mock records use human Arabic labels as primary headings
+- [ ] Services cards show disabled buttons: تشغيل / إيقاف / إظهار / إخفاء / صيانة / rollback
+- [ ] Providers workspace exists with >= 5 mock provider records
+- [ ] Provider credentials are always masked (never real keys)
+- [ ] Provider cards show disabled buttons: إضافة مفتاح / اختبار الاتصال / تفعيل / إيقاف / rollback
+- [ ] Vars workspace uses human-readable labels (not raw VAR_ keys) as primary headings
+- [ ] Vars workspace shows >= 5 human-labeled variable records
+- [ ] Appearance workspace is scoped to platform identity only (no campaigns, no marketing)
+- [ ] Appearance workspace shows >= 5 token-mapped color records
+- [ ] Rollouts workspace renders as a teaser (preview, all controls disabled)
+- [ ] Health workspace renders as a teaser (preview, all controls disabled)
+- [ ] Audit & Rollback workspace renders as a teaser (preview, all controls disabled)
+- [ ] No Catalogs category management UI exists inside Platform
+- [ ] No Marketing campaign management UI exists inside Platform
+- [ ] No Administration user management UI exists inside Platform
+- [ ] No real API keys or secrets exist anywhere in Platform UI files
+- [ ] No runtime mutations or API calls are triggered from Platform UI
+- [ ] No enabled Apply/Activate/Save/Rollback buttons (all are disabled)
+- [ ] All labels are RTL correct
+- [ ] No horizontal overflow or clipping
+- [ ] Administrative user understands what can be controlled here in a future runtime phase

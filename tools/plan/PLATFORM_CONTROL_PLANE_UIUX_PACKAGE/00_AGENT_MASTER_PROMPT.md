@@ -373,3 +373,80 @@ Compress-Archive -Path "$RUN_DIR\*" -DestinationPath "$RUN_DIR\$SESSION_ID.zip" 
 - مسار evidence zip
 - ما الذي بقي BLOCKED إن وجد
 - طلب screenshot من `/platform` إذا لم يرفقها
+
+## Adjacent Sections Boundary Contract
+
+This section defines how Platform relates to Catalogs, Marketing, and Administration. These are **separate sections** -- do not implement their UI inside Platform.
+
+### Do not implement now
+
+- Do **not** implement Catalogs category/product management inside Platform.
+- Do **not** implement Marketing campaign/offer management inside Platform.
+- Do **not** implement Administration user/role management inside Platform.
+
+### Design principle
+
+Platform is designed to **integrate with** adjacent sections, not replace them. Platform Overview may include non-actionable handoff indicators only:
+
+- Catalogs controls categories and content for enabled services.
+- Marketing controls campaigns and offers on top of available services.
+- Administration controls access to this control plane.
+
+### Handoff indicators rule
+
+- These indicators are **informational text blocks only**.
+- They are **not tabs**, not new workspaces, not management UIs.
+- They must not trigger any mutation, API call, or navigation into Catalogs/Marketing/Administration.
+
+### Ownership summary
+
+- Platform: service state, runtime vars, providers, platform identity, rollouts, health, audit.
+- Catalogs: categories, subcategories, products, listings.
+- Marketing: campaigns, offers, banners, loyalty, subscriptions.
+- Administration: users, roles, permissions, access gates for Platform.
+
+See 13_ADJACENT_CONTROL_PANEL_BOUNDARIES.md and 14_HANDOFF_FLOWS_CATALOG_MARKETING_ADMIN.md for full detail.
+
+## UI/UX Mock Design Requirement (Active Phase)
+
+The agent must implement FULL mock UI screens for every Platform workspace listed below.
+Documentation and governance files are not sufficient. The UI must be built and visible.
+
+### Required workspaces
+
+| # | Workspace | Status |
+|---|---|---|
+| 1 | Overview | active — sovereign dashboard |
+| 2 | Services | active — service control room |
+| 3 | Vars | active — human-friendly variable editor |
+| 4 | Providers | active — provider management |
+| 5 | Appearance | active — platform identity / design tokens |
+| 6 | Rollouts | teaser — preview only, disabled |
+| 7 | Health | teaser — preview only, disabled |
+| 8 | Audit & Rollback | teaser — preview only, disabled |
+
+### Mock data requirements
+
+Every active workspace must include realistic preview/mock records (not Lorem Ipsum).
+See 03_EXECUTION_PLAN.md Phase 3 for the required data per workspace.
+
+### UI rules for all workspaces
+
+- Interface target is a senior administrator, not a developer.
+- Do NOT surface raw API keys, provider IDs, DB entity names, or TypeScript types as primary headings.
+- Technical detail may appear only inside a collapsible "Advanced details" section.
+- All live-action buttons (Apply, Activate, Save, Rollback) must be disabled. This is UI/UX phase only.
+- RTL layout must be 100% correct.
+- Use @bthwani/ui-kit public exports only. Do not import Tamagui directly.
+- No hardcoded hex colors. Use design system tokens via Surface tones.
+- No real secrets, no API calls, no runtime mutations.
+- Design language: control room, premium 2026, low noise, clear hierarchy.
+
+### Overview handoff indicators (non-actionable)
+
+Platform Overview must include three informational cards (not tabs, not management UIs) that state:
+- Catalogs manages categories, subcategories, products, and listings.
+- Marketing manages campaigns, offers, banners, loyalty, and subscriptions.
+- Administration manages users, roles, permissions, and access gates for Platform.
+
+These are read-only. No navigation into those sections. No management forms.

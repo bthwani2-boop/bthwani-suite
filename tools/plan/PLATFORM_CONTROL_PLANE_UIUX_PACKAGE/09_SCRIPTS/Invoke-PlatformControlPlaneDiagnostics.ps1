@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$RepoRoot = "C:\bthwani-suite"
 )
 
@@ -32,6 +32,10 @@ Save-Cmd "appearance-forbidden-terms.txt" { git grep -n "Campaign\|Seasonal\|Mar
 Save-Cmd "platform-secret-like.txt" { git grep -n "apiKey\|api_key\|secret\|token\|sk-\|AIza\|AKIA\|BEGIN PRIVATE KEY" -- dsh/frontend/control-panel/platform }
 Save-Cmd "platform-hardcoded-colors.txt" { git grep -n "backgroundColor: '#\|color: '#\|borderColor: '#" -- dsh/frontend/control-panel/platform }
 Save-Cmd "governance-existing.txt" { git ls-files "governance/*" }
+Save-Cmd "platform-adjacent-boundary-terms.txt" { git grep -n "Catalogs\|Marketing\|Administration\|catalog\|campaign\|campaign\|role\|permission" -- dsh/frontend/control-panel/platform }
+Save-Cmd "platform-forbidden-catalog-management.txt" { git grep -n "createCategory\|updateCategory\|deleteCategory\|addProduct\|editProduct\|deleteProduct\|categoryMutation\|productMutation\|CatalogManagement\|CategoryManagement\|ProductManagement" -- dsh/frontend/control-panel/platform }
+Save-Cmd "platform-forbidden-marketing-management.txt" { git grep -n "createCampaign\|updateCampaign\|deleteCampaign\|createOffer\|deleteOffer\|createBanner\|deleteBanner\|loyaltyMutation\|CampaignManagement\|OfferManagement\|BannerManagement" -- dsh/frontend/control-panel/platform }
+Save-Cmd "platform-forbidden-admin-management.txt" { git grep -n "createUser\|updateUser\|deleteUser\|assignRole\|revokeRole\|createRole\|deleteRole\|permissionMutation\|UserManagement\|RoleManagement\|PermissionManagement" -- dsh/frontend/control-panel/platform }
 
 @"
 # Diagnosis Summary Template
