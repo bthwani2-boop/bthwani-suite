@@ -11,7 +11,6 @@ import {
   PaymentDecisionList,
   safeArea,
   SegmentedControl,
-  SheetFrame,
   sizes,
   spacing,
   SummaryCard,
@@ -41,6 +40,8 @@ const CTA_PRIMARY = colorPalette.accentOrange;
 const CTA_SECONDARY = colorPalette.ctaSecondary;
 const SURFACE_WARM = colorPalette.brandSoft;
 const SURFACE_WARM_BORDER = colorPalette.brandSurface;
+const DANGER = colorPalette.danger;
+const DANGER_SOFT = colorPalette.dangerSoft;
 
 type ScreenNotice = {
   title: string;
@@ -56,6 +57,7 @@ type QuickActionMeta = {
   helper?: string;
   saveLabel: string;
   multiline?: boolean;
+  icon?: string;
 };
 
 type RecommendationProduct = {
@@ -129,6 +131,7 @@ const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
     placeholder: 'أدخل رمز التخفيض',
     helper: 'سيتم حفظ القسيمة داخل هذه الجلسة فقط حتى يكتمل الربط الخلفي.',
     saveLabel: 'حفظ القسيمة',
+    icon: 'pricetag-outline',
   },
   address: {
     title: 'تحديث عنوان التوصيل',
@@ -136,6 +139,7 @@ const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
     helper: 'العنوان المحلي سيظهر مباشرة في ملخص الطلب الحالي.',
     saveLabel: 'حفظ العنوان',
     multiline: true,
+    icon: 'location-outline',
   },
   note: {
     title: 'ملاحظات الطلب',
@@ -143,6 +147,7 @@ const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
     helper: 'يمكن ترك الملاحظة فارغة إذا لم تكن هناك تعليمات إضافية.',
     saveLabel: 'حفظ الملاحظة',
     multiline: true,
+    icon: 'document-text-outline',
   },
   extra: {
     title: 'طلب إضافي على الطريق',
@@ -150,6 +155,7 @@ const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
     helper: 'سيظهر الطلب الإضافي داخل نفس الشاشة كإضافة جاهزة للمراجعة.',
     saveLabel: 'حفظ الطلب',
     multiline: true,
+    icon: 'add-circle-outline',
   },
 };
 
@@ -472,38 +478,66 @@ function ItemsTable({ items, onOpenDetails }: ItemsTableProps) {
   );
 }
 
-type QuickActionSheetProps = {
-  visible: boolean;
-  meta: QuickActionMeta | null;
+type InlineActionEditorProps = {
+  meta: QuickActionMeta;
   value: string;
-  submitDisabled?: boolean;
   onChangeValue: (value: string) => void;
-  onClose: () => void;
   onSubmit: () => void;
+  onClose: () => void;
+  submitDisabled?: boolean;
 };
 
-function QuickActionSheet({ visible, meta, value, submitDisabled = false, onChangeValue, onClose, onSubmit }: QuickActionSheetProps) {
-  if (!meta) {
-    return null;
-  }
-
+function InlineActionEditor({ meta, value, onChangeValue, onSubmit, onClose, submitDisabled = false }: InlineActionEditorProps) {
   return (
-    <SheetFrame visible={visible} onClose={onClose} title={meta.title}>
-      <View style={{ gap: spacing[2] }}>
-        <TextField
-          value={value}
-          onChangeText={onChangeValue}
-          placeholder={meta.placeholder}
-          multiline={meta.multiline}
-          style={meta.multiline ? { minHeight: 112, textAlignVertical: 'top' } : undefined}
-        />
-        {meta.helper ? <Text role="caption" style={{ color: TEXT_SECONDARY }}>{meta.helper}</Text> : null}
-        <View style={{ flexDirection: 'row-reverse', gap: spacing[2] }}>
-          <Button label={meta.saveLabel} fullWidth={false} disabled={submitDisabled} onPress={onSubmit} style={{ flex: 1, backgroundColor: ACCENT_ORANGE, borderColor: ACCENT_ORANGE }} />
-          <Button label="إلغاء" tone="secondary" fullWidth={false} onPress={onClose} style={{ flex: 1 }} />
-        </View>
+    <Surface
+      tone="default"
+      padding={2}
+      gap={1}
+      style={{
+        backgroundColor: colorPalette.surfacePrimary,
+        borderWidth: 1,
+        borderColor: colorPalette.borderStrong,
+        borderRadius: 14,
+      }}
+    >
+      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1] }}>
+        {meta.icon ? <Icon name={meta.icon} size={15} color={ACCENT_ORANGE} /> : null}
+        <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right', flex: 1 }}>
+          {meta.title}
+        </Text>
       </View>
-    </SheetFrame>
+
+      <TextField
+        value={value}
+        onChangeText={onChangeValue}
+        placeholder={meta.placeholder}
+        multiline={meta.multiline}
+        style={meta.multiline ? { minHeight: 88, textAlignVertical: 'top' } : undefined}
+      />
+
+      {meta.helper ? (
+        <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+          {meta.helper}
+        </Text>
+      ) : null}
+
+      <View style={{ flexDirection: 'row-reverse', gap: spacing[2] }}>
+        <Button
+          label={meta.saveLabel}
+          fullWidth={false}
+          disabled={submitDisabled}
+          onPress={onSubmit}
+          style={{ flex: 1, backgroundColor: ACCENT_ORANGE, borderColor: ACCENT_ORANGE }}
+        />
+        <Button
+          label="إلغاء"
+          tone="secondary"
+          fullWidth={false}
+          onPress={onClose}
+          style={{ flex: 1 }}
+        />
+      </View>
+    </Surface>
   );
 }
 
@@ -546,7 +580,6 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   const checkoutAction = props.onContinue ?? props.onOpenOrder;
   const canEditOrder = Boolean(props.onOpenStore ?? props.onOpenOrder ?? props.onContinue);
-  const backAction = props.onOpenStore ?? props.onRetry ?? props.onExit;
   const isRTL = I18nManager.isRTL;
   const quickActionMeta = quickActionKey ? QUICK_ACTION_META[quickActionKey] : null;
   const hasWltServiceRoute = typeof props.onOpenService === 'function';
@@ -909,15 +942,6 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     ];
   }, [canUseMixedPayment, canUseWalletFull, formattedGrandTotal, formattedWalletBalance, formattedWalletShortfall, grandTotalHalalas, hasWltServiceRoute, paymentMethod, topUpWalletInline, walletBalance, walletHydrated, walletLinked, walletRefreshing, walletShortfallHalalas]);
 
-  const handleBackPress = () => {
-    if (backAction) {
-      backAction();
-      return;
-    }
-
-    showNotice('الرجوع غير متاح الآن', 'لا يوجد مسار رجوع موصول في هذا العرض الحالي.', 'info');
-  };
-
   const handleCheckoutPress = async () => {
     if (!canCheckout) {
       showNotice(clientStateMeta.label, clientStateMeta.description, 'info');
@@ -998,6 +1022,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   };
 
   const openQuickAction = (actionKey: QuickActionKey) => {
+    if (quickActionKey === actionKey) {
+      setQuickActionKey(null);
+      setQuickActionDraft('');
+      return;
+    }
+
     const initialValue = {
       coupon: couponCode,
       address: pickupAddr,
@@ -1083,7 +1113,11 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         actions={[
           {
             id: 'clear-cart',
-            icon: <Icon name="trash-outline" size={20} color={ACCENT_BLUE} />,
+            icon: (
+              <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: DANGER_SOFT, borderWidth: 1, borderColor: DANGER_SOFT, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="trash-outline" size={18} color={DANGER} />
+              </View>
+            ),
             accessibilityLabel: 'تفريغ السلة',
             disabled: !items.length,
             onPress: () => {
@@ -1092,13 +1126,6 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             },
           },
         ]}
-        trailingAction={{
-          id: 'exit-checkout',
-          icon: <Icon name="arrow-back" size={24} color={ACCENT_ORANGE} />,
-          mirrorInRtl: true,
-          accessibilityLabel: 'الرجوع',
-          onPress: handleBackPress,
-        }}
       />
 
       <MobileScrollView fill padding={1} gap={1} contentContainerStyle={{ paddingBottom: spacing[2] }}>
@@ -1113,6 +1140,16 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               onAction={() => openQuickAction('coupon')}
               style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
             />
+            {quickActionKey === 'coupon' && quickActionMeta && (
+              <InlineActionEditor
+                meta={quickActionMeta}
+                value={quickActionDraft}
+                submitDisabled={quickActionDraft.trim().length === 0}
+                onChangeValue={setQuickActionDraft}
+                onSubmit={applyQuickAction}
+                onClose={() => { setQuickActionKey(null); setQuickActionDraft(''); }}
+              />
+            )}
             <OptionRow
               title="عنوان التوصيل"
               subtitle={pickupAddr}
@@ -1120,6 +1157,15 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               onAction={() => openQuickAction('address')}
               style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
             />
+            {quickActionKey === 'address' && quickActionMeta && (
+              <InlineActionEditor
+                meta={quickActionMeta}
+                value={quickActionDraft}
+                onChangeValue={setQuickActionDraft}
+                onSubmit={applyQuickAction}
+                onClose={() => { setQuickActionKey(null); setQuickActionDraft(''); }}
+              />
+            )}
             <OptionRow
               title="ملاحظات الطلب"
               subtitle={note}
@@ -1127,6 +1173,15 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               onAction={() => openQuickAction('note')}
               style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
             />
+            {quickActionKey === 'note' && quickActionMeta && (
+              <InlineActionEditor
+                meta={quickActionMeta}
+                value={quickActionDraft}
+                onChangeValue={setQuickActionDraft}
+                onSubmit={applyQuickAction}
+                onClose={() => { setQuickActionKey(null); setQuickActionDraft(''); }}
+              />
+            )}
             <OptionRow
               title="طلب إضافي على الطريق"
               subtitle={extraRequest || 'مثال: بسبس أو ماء من أي ماركت على طريق الكابتن'}
@@ -1134,6 +1189,15 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               onAction={() => openQuickAction('extra')}
               style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
             />
+            {quickActionKey === 'extra' && quickActionMeta && (
+              <InlineActionEditor
+                meta={quickActionMeta}
+                value={quickActionDraft}
+                onChangeValue={setQuickActionDraft}
+                onSubmit={applyQuickAction}
+                onClose={() => { setQuickActionKey(null); setQuickActionDraft(''); }}
+              />
+            )}
           </View>
         </Card>
 
@@ -1206,19 +1270,6 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           <Button label="تعديل الطلب" tone="secondary" size="md" fullWidth={false} disabled={!canEditOrder} onPress={handleEditPress} style={{ flex: 1, minHeight: 46, backgroundColor: CTA_SECONDARY, borderColor: BORDER_SOFT, borderRadius: 16 }} />
         </View>
       </View>
-
-      <QuickActionSheet
-        visible={Boolean(quickActionMeta)}
-        meta={quickActionMeta}
-        value={quickActionDraft}
-        submitDisabled={quickActionKey === 'coupon' ? quickActionDraft.trim().length === 0 : false}
-        onChangeValue={setQuickActionDraft}
-        onClose={() => {
-          setQuickActionKey(null);
-          setQuickActionDraft('');
-        }}
-        onSubmit={applyQuickAction}
-      />
 
       <Toast
         visible={Boolean(notice)}

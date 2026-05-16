@@ -175,8 +175,8 @@ const webCommandCenterCss = `
 }
 
 .ui-web-command-center-root[dir="rtl"] .ui-web-command-center__workspace {
-  grid-template-columns: minmax(0, 1fr) var(--rail-width);
-  grid-template-areas: "stage rail";
+  grid-template-columns: var(--rail-width) minmax(0, 1fr);
+  grid-template-areas: "rail stage";
 }
 
 .ui-web-command-center__rail {
@@ -355,7 +355,8 @@ const webCommandCenterCss = `
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .ui-web-command-strip__alert-badge {
