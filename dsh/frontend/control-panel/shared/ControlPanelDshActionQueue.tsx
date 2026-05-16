@@ -44,17 +44,17 @@ const QUEUE_HEADER_STYLE: React.CSSProperties = {
   alignItems: 'center',
   padding: '8px 0 10px',
   marginBottom: '8px',
-  borderBottom: '1px solid rgba(10,47,92,0.06)',
+  borderBottom: '1px solid var(--bthwani-control-panel-border)',
 };
 
 const EMPTY_STYLE: React.CSSProperties = {
   padding: '32px',
   textAlign: 'center',
-  backgroundColor: '#fff',
+  backgroundColor: 'var(--bthwani-control-panel-surface)',
   borderRadius: '10px',
-  border: '1px solid rgba(0,0,0,0.05)',
+  border: '1px solid var(--bthwani-control-panel-border)',
   fontSize: '13px',
-  color: '#64748B',
+  color: 'var(--bthwani-control-panel-text-muted)',
 };
 
 export function ControlPanelDshActionQueue({
@@ -72,12 +72,21 @@ export function ControlPanelDshActionQueue({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0 }}>
       <div style={QUEUE_HEADER_STYLE}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <span style={{ fontSize: '14px', fontWeight: 800, color: '#0A2F5C' }}>{title}</span>
-          <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>{purpose}</span>
+          <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--bthwani-control-panel-text)' }}>{title}</span>
+          <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)', fontWeight: 600 }}>{purpose}</span>
         </div>
         <button
           onClick={() => window.location.reload()}
-          style={{ padding: '4px 10px', border: '1px solid rgba(10,47,92,0.1)', background: '#fff', borderRadius: '6px', fontSize: '11px', fontWeight: 600, color: '#0A2F5C', cursor: 'pointer' }}
+          style={{
+            padding: '4px 10px',
+            border: '1px solid var(--bthwani-control-panel-border-strong)',
+            background: 'var(--bthwani-control-panel-surface)',
+            borderRadius: '6px',
+            fontSize: '11px',
+            fontWeight: 600,
+            color: 'var(--bthwani-control-panel-text)',
+            cursor: 'pointer',
+          }}
         >
           تحديث
         </button>
@@ -96,7 +105,7 @@ export function ControlPanelDshActionQueue({
                 onClick={() => onSelect(item.id)}
                 style={{
                   cursor: 'pointer',
-                  outline: isSelected ? '2px solid rgba(10,47,92,0.18)' : 'none',
+                  outline: isSelected ? '2px solid var(--bthwani-control-panel-border-strong)' : 'none',
                   borderRadius: '10px',
                   display: 'flex',
                   flexDirection: 'column',

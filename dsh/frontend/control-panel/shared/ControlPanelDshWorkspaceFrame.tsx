@@ -77,18 +77,18 @@ export function ControlPanelDshWorkspaceFrame({
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
-            <div style={{ width: 18, height: 18, border: '2px solid #FFFFFF', borderRadius: 4, position: 'relative' }}>
-              <span style={{ position: 'absolute', top: '50%', left: '50%', width: 8, height: 2, backgroundColor: '#FFFFFF', transform: 'translate(-50%, -50%)' }} />
+            <div className={styles.surfaceHeaderGlyph}>
+              <span className={styles.surfaceHeaderGlyphMinus} />
             </div>
           </div>
           <Box gap={0}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>{title}</h1>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle}>{title}</h1>
               <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
-                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: 9 }}>{badges[0] ?? 'DSH'}</Text>
+                <Text role="caption" className={styles.surfaceHeaderBadgeText}>{badges[0] ?? 'DSH'}</Text>
               </Box>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>{description}</p>
+            <p className={styles.surfaceHeaderSubtitle}>{description}</p>
           </Box>
         </div>
 
@@ -121,7 +121,7 @@ export function ControlPanelDshWorkspaceFrame({
       {metaItems.length ? (
         <div className={styles.filterDock}>
           {metaItems.map((item) => (
-            <span key={item} style={{ fontSize: '11px', fontWeight: 700, color: '#0A2F5C', padding: '6px 10px', backgroundColor: '#F8FAFC', borderRadius: '999px', border: '1px solid rgba(10, 47, 92, 0.08)' }}>
+            <span key={item} className={styles.surfaceMetaChip}>
               {item}
             </span>
           ))}

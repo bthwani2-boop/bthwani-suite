@@ -1,18 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text, useTheme } from '@bthwani/ui-kit';
 
 export type OperationsConfidenceLevel = 'high' | 'medium' | 'low';
 
-const CONFIDENCE_STYLES: Record<OperationsConfidenceLevel, { label: string; backgroundColor: string; color: string }> = {
-  high: { label: 'ثقة عالية', backgroundColor: '#DCFCE7', color: '#16A34A' },
-  medium: { label: 'ثقة متوسطة', backgroundColor: '#FEF3C7', color: '#D97706' },
-  low: { label: 'ثقة منخفضة', backgroundColor: '#FEF2F2', color: '#DC2626' },
-};
-
 export function ConfidenceBadge({ level }: { level: OperationsConfidenceLevel }) {
-  const { label, backgroundColor, color } = CONFIDENCE_STYLES[level];
+  const { theme } = useTheme();
+  const confidenceStyles: Record<OperationsConfidenceLevel, { label: string; backgroundColor: string; color: string }> = {
+    high: { label: 'ثقة عالية', backgroundColor: theme.successSurface, color: theme.success },
+    medium: { label: 'ثقة متوسطة', backgroundColor: theme.warningSurface, color: theme.warning },
+    low: { label: 'ثقة منخفضة', backgroundColor: theme.dangerSurface, color: theme.danger },
+  };
+  const { label, backgroundColor, color } = confidenceStyles[level];
 
   return (
     <span
@@ -51,14 +51,15 @@ export function OperationsSuggestionCard({
   children,
   actions,
 }: OperationsSuggestionCardProps) {
+  const { theme } = useTheme();
   return (
     <Box
       gap={2}
       style={{
         marginTop: '4px',
         padding: '12px',
-        backgroundColor: 'rgba(10,47,92,0.03)',
-        border: '1px solid rgba(10,47,92,0.08)',
+        backgroundColor: theme.surfaceInset,
+        border: `1px solid ${theme.lineStrong}`,
         borderRadius: '12px',
         flex: 1,
         minWidth: 0,
@@ -66,8 +67,8 @@ export function OperationsSuggestionCard({
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-          <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C', whiteSpace: 'nowrap' }}>{title}:</Text>
-          <Text role="bodyStrong" style={{ color: '#0A2F5C', flex: 1, minWidth: 0 }}>{label}</Text>
+          <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground, whiteSpace: 'nowrap' }}>{title}:</Text>
+          <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, flex: 1, minWidth: 0 }}>{label}</Text>
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <ConfidenceBadge level={confidence} />

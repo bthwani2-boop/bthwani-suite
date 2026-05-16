@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Text, ListItem } from '@bthwani/ui-kit';
+import { Box, Button, Text, ListItem, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader, WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getCatalogAdoptionItems,
@@ -12,6 +12,7 @@ import {
 import { ApprovalRecord, ApprovalStage, translateStage, translateEntityType, translateOwner } from '../../shared/workflow';
 
 export function CatalogAdoptionQueue() {
+  const { theme } = useTheme();
   const [items, setItems] = React.useState<ApprovalRecord[]>([]);
   const [page, setPage] = React.useState(1);
 
@@ -88,7 +89,7 @@ export function CatalogAdoptionQueue() {
         description="اعتماد العناصر النهائية لتصبح جزءًا من الكتالوج. لا يظهر للعميل إلا بعد التفعيل النهائي."
         metrics={[{ id: 'pending', title: 'بانتظار الاعتماد', value: String(pendingCount) }]}
       />
-      <Box gap={2} style={{ flex: 1, minHeight: 0, paddingVertical: 12, paddingHorizontal: 14, backgroundColor: '#F8FAFC' }}>
+      <Box gap={2} style={{ flex: 1, minHeight: 0, paddingVertical: 12, paddingHorizontal: 14, backgroundColor: theme.surfaceInset }}>
         {visibleItems.map(item => {
           const sStyle = getStageStyle(item.stage);
 

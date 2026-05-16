@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { WebSignalCard } from '@bthwani/ui-kit/web';
 
 export type ControlPanelDshMarketingScreenProps = {
@@ -13,7 +13,8 @@ export function ControlPanelDshMarketingScreen({
 	hubHref = '/',
 	operationsHref = '/operations',
 }: ControlPanelDshMarketingScreenProps) {
-	const navigateTo = React.useCallback((href: string) => {
+  const { theme } = useTheme();
+  const navigateTo = React.useCallback((href: string) => {
 		if (typeof window !== 'undefined') {
 			window.location.assign(href);
 		}
@@ -21,21 +22,21 @@ export function ControlPanelDshMarketingScreen({
 
 	return (
 		<Box gap={4}>
-			<Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16, borderWidth: 1, borderColor: 'rgba(10,47,92,0.08)' }}>
+			<Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16, borderWidth: 1, borderColor: theme.lineStrong }}>
 				<Box gap={1}>
 					<Text role="caption" tone="muted" style={{ fontWeight: '900' }}>غرفة قيادة الإشارات الذكية</Text>
-					<Text role="titleMd" style={{ color: '#0A2F5C', fontWeight: '900' }}>لوحة الإشارات التسويقية</Text>
+					<Text role="titleMd" style={{ color: theme.brandHeaderBackground, fontWeight: '900' }}>لوحة الإشارات التسويقية</Text>
 					<Text role="bodySm" tone="muted">طبقة مضغوطة لمراقبة الوصول والتحويل وصحة الحملات من دون بطاقات هبوط أو hero تسويقية.</Text>
 				</Box>
 
 				<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
 					<Surface tone="inset" padding={2} style={{ borderRadius: 10 }}>
 						<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>التحديث</Text>
-						<Text role="bodySm" style={{ color: '#0A2F5C', fontWeight: '900' }}>محلي داخل سطح التحكم</Text>
+						<Text role="bodySm" style={{ color: theme.brandHeaderBackground, fontWeight: '900' }}>محلي داخل سطح التحكم</Text>
 					</Surface>
 					<Surface tone="inset" padding={2} style={{ borderRadius: 10 }}>
 						<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>التركيز الحالي</Text>
-						<Text role="bodySm" style={{ color: '#0A2F5C', fontWeight: '900' }}>إشارات الأداء والتوصيات</Text>
+						<Text role="bodySm" style={{ color: theme.brandHeaderBackground, fontWeight: '900' }}>إشارات الأداء والتوصيات</Text>
 					</Surface>
 				</Box>
 
@@ -52,18 +53,18 @@ export function ControlPanelDshMarketingScreen({
 				<WebSignalCard title="صحة الحملات" value="98%" description="مؤشر استقرار العروض" tone="neutral" />
 			</Box>
 
-			<Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16, borderWidth: 1, borderColor: 'rgba(10,47,92,0.08)' }}>
-				<Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '900' }}>ملخص التحليلات والتوصيات</Text>
+			<Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16, borderWidth: 1, borderColor: theme.lineStrong }}>
+				<Text role="titleSm" style={{ color: theme.brandHeaderBackground, fontWeight: '900' }}>ملخص التحليلات والتوصيات</Text>
 				<Text role="bodySm" tone="muted">هذه الطبقة تعرض القراءة التشغيلية المجمعة للبنرات، عروض الشركاء، والشريط الذكي من دون تكرار شاشات التحرير نفسها.</Text>
 
 				<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
 					<Surface tone="inset" padding={3} style={{ borderRadius: 12, minWidth: 180 }}>
 						<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>الأثر المتوقع</Text>
-						<Text role="bodySm" style={{ color: '#0A2F5C', fontWeight: '900' }}>تركيز قرارات التسويق على الإشارات الأعلى تأثيرًا</Text>
+						<Text role="bodySm" style={{ color: theme.brandHeaderBackground, fontWeight: '900' }}>تركيز قرارات التسويق على الإشارات الأعلى تأثيرًا</Text>
 					</Surface>
 					<Surface tone="inset" padding={3} style={{ borderRadius: 12, minWidth: 180 }}>
 						<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>الخطوة التالية</Text>
-						<Text role="bodySm" style={{ color: '#0A2F5C', fontWeight: '900' }}>راجع الحملة أو العرض الذي يحتاج قرارًا فوريًا</Text>
+						<Text role="bodySm" style={{ color: theme.brandHeaderBackground, fontWeight: '900' }}>راجع الحملة أو العرض الذي يحتاج قرارًا فوريًا</Text>
 					</Surface>
 				</Box>
 			</Surface>

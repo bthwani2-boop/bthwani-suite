@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
-import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, Tabs, ListItem, Divider } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, Tabs, ListItem, Divider, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager, WebControlPanelRecommendation, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import {
   dshCatalogMetrics,
@@ -73,28 +73,41 @@ function FilterToken({ label, onRemove }: { label: string, onRemove: () => void 
 }
 
 function PolicyBadge({ mediaPolicy }: { mediaPolicy: string }) {
+  const { theme } = useTheme();
   const isCentral = mediaPolicy === 'catalog-owned-media';
   return (
-    <Text role="caption" numberOfLines={1} style={{ fontWeight: '700', color: isCentral ? '#16A34A' : '#D97706' }}>
+    <Text role="caption" numberOfLines={1} style={{ fontWeight: '700', color: isCentral ? theme.success : theme.warning }}>
       {isCentral ? 'مركزي' : 'شريك'}
     </Text>
   );
 }
 
 function InspectorTile({ title, children, dashed = false, warning = false }: { title: string, children: React.ReactNode, dashed?: boolean, warning?: boolean }) {
+  const { theme } = useTheme();
   return (
-    <Box gap={2} style={{ padding: 12, backgroundColor: warning ? '#FEF2F2' : dashed ? '#FFFFFF' : '#F8FAFC', borderRadius: 8, borderWidth: 1, borderColor: warning ? '#FECACA' : dashed ? '#CBD5E1' : '#E2E8F0', borderStyle: dashed ? 'dashed' : 'solid' }}>
-       <Text role="caption" style={{ fontWeight: '800', color: warning ? '#DC2626' : '#0A2F5C' }}>{title}</Text>
+    <Box
+      gap={2}
+      style={{
+        padding: 12,
+        backgroundColor: warning ? theme.dangerSurface : dashed ? theme.surface : theme.surfaceInset,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: warning ? theme.danger : dashed ? theme.lineStrong : theme.line,
+        borderStyle: dashed ? 'dashed' : 'solid',
+      }}
+    >
+       <Text role="caption" style={{ fontWeight: '800', color: warning ? theme.danger : theme.brandHeaderBackground }}>{title}</Text>
        {children}
     </Box>
   );
 }
 
 function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: { label: string, value: string | React.ReactNode, valueColor?: string, isBoldValue?: boolean }) {
+  const { theme } = useTheme();
   return (
     <Box gap={0}>
       <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right' }}>{label}</Text>
-      <Text role="caption" style={{ color: valueColor || '#0A2F5C', fontWeight: isBoldValue ? '800' : '600', textAlign: 'right' }}>{value}</Text>
+      <Text role="caption" style={{ color: valueColor || theme.brandHeaderBackground, fontWeight: isBoldValue ? '800' : '600', textAlign: 'right' }}>{value}</Text>
     </Box>
   );
 }
@@ -102,6 +115,7 @@ function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: { label:
 const WATERMARK_URL = '/dsh/media-fixtures/assets/seed/dsh/logo.png';
 
 function WatermarkedImage({ src, fallback, size = 32 }: { src?: string, fallback?: string, size?: number }) {
+  const { theme } = useTheme();
   const fallbackLabel = 'ص';
 
   return (
@@ -111,7 +125,7 @@ function WatermarkedImage({ src, fallback, size = 32 }: { src?: string, fallback
       ) : (
         <Text style={{ fontSize: size / 2 }}>{fallbackLabel}</Text>
       )}
-      <Box style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', alignItems: 'center', justifyContent: 'center', opacity: 0.4, backgroundColor: 'rgba(255,255,255,0.15)' }}>
+      <Box style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', alignItems: 'center', justifyContent: 'center', opacity: 0.4, backgroundColor: theme.brandHeaderSurface }}>
         <Image src={WATERMARK_URL} width={size * 0.8} height={size * 0.8} style={{ objectFit: 'contain' }} alt="شعار المنصة" />
       </Box>
     </Surface>
@@ -119,12 +133,13 @@ function WatermarkedImage({ src, fallback, size = 32 }: { src?: string, fallback
 }
 
 const FilterDropdown = ({ title, options, selected, onChange, onClose }: FilterDropdownProps) => {
+  const { theme } = useTheme();
   const [search, setSearch] = useState('');
   const filteredOptions = options.filter((option) => option.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <Surface tone="raised" padding={2} gap={2} style={{ position: 'absolute', top: '100%', right: 0, zIndex: 50, width: 200, marginTop: 4 }}>
-      <Box padding={1} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }}>
+      <Box padding={1} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
         <SearchField
           placeholder={`بحث في ${title}...`}
           value={search}
@@ -145,13 +160,13 @@ const FilterDropdown = ({ title, options, selected, onChange, onClose }: FilterD
                 if (e.target.checked) onChange([...selected, opt]);
                 else onChange(selected.filter((selectedOption) => selectedOption !== opt));
               }}
-              style={{ accentColor: '#0A2F5C' }}
+              style={{ accentColor: theme.brandHeaderBackground }}
             />
             <Text role="caption" style={{ flex: 1, textAlign: 'right' }}>{opt}</Text>
           </Box>
         ))}
       </Box>
-      <Box layoutDirection="row" justify="space-between" style={{ borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.05)', paddingTop: 8 }}>
+      <Box layoutDirection="row" justify="space-between" style={{ borderTopWidth: 1, borderTopColor: theme.line, paddingTop: 8 }}>
          <Button label="تطبيق" tone="brand" size="sm" onPress={onClose} />
          <Button label="مسح" tone="secondary" size="sm" onPress={() => { onChange([]); onClose(); }} />
       </Box>
@@ -171,6 +186,7 @@ export function ControlPanelDshCatalogScreen({
   partnersHref = '/partners',
   marketingHref = '/marketing',
 }: ControlPanelDshCatalogScreenProps) {
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<string>('catalog');
   const [activeSubTab, setActiveSubTab] = useState<string>('');
   const [showBulkOps, setShowBulkOps] = useState(false);
@@ -341,14 +357,14 @@ export function ControlPanelDshCatalogScreen({
   }, [catalogTotalPages]);
 
   const renderColHeader = (colId: CatalogFilterColumnId, title: string, width?: string) => (
-    <th style={{ padding: '6px 12px', fontSize: '11px', color: '#64748B', textAlign: 'right', width, position: 'relative' }}>
+    <th style={{ padding: '6px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width, position: 'relative' }}>
        <button
           type="button"
           style={{ appearance: 'none', border: 'none', background: 'transparent', padding: 0, font: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '4px', cursor: 'pointer' }}
           onClick={(e) => { e.stopPropagation(); setOpenFilterCol(openFilterCol === colId ? null : colId); }}
        >
-          <span style={{ color: '#64748B' }}>{title}</span>
-          <span style={{ color: colFilters[colId]?.length > 0 ? '#FF500D' : '#CBD5E1', fontSize: 10 }}>▼</span>
+          <span style={{ color: theme.textMuted }}>{title}</span>
+          <span style={{ color: colFilters[colId]?.length > 0 ? theme.brand : theme.lineStrong, fontSize: 10 }}>▼</span>
        </button>
        {openFilterCol === colId && (
          <FilterDropdown
@@ -372,18 +388,18 @@ export function ControlPanelDshCatalogScreen({
             elevationToken="raised"
             align="center"
             justify="center"
-            style={{ width: 32, height: 32, backgroundColor: '#0A2F5C' }}
+            style={{ width: 32, height: 32, backgroundColor: theme.brandHeaderBackground }}
           >
-            <Text style={{ color: '#FFFFFF', fontSize: 16 }}>⌗</Text>
+            <Text style={{ color: theme.textInverse, fontSize: 16 }}>⌗</Text>
           </Box>
           <Box gap={0}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: 18, letterSpacing: -0.18, color: '#0A2F5C', fontWeight: '800' }}>كتالوج DSH</h1>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle} style={{ letterSpacing: -0.18 }}>كتالوج DSH</h1>
               <Box paddingX={1} paddingY={1} background="brandSurface" radiusToken="xs">
-                 <Text role="caption" style={{ color: '#FF500D', fontWeight: '800', fontSize: 9 }}>حوكمة الماستر</Text>
+                 <Text role="caption" className={styles.surfaceHeaderBadgeText}>حوكمة الماستر</Text>
               </Box>
             </div>
-            <p style={{ fontSize: 10, fontWeight: '600', color: '#64748B' }}>إدارة المنتجات والفئات ومخاطر التبني عبر الأسطح</p>
+            <p className={styles.surfaceHeaderSubtitle}>إدارة المنتجات والفئات ومخاطر التبني عبر الأسطح</p>
           </Box>
         </div>
 
@@ -396,7 +412,7 @@ export function ControlPanelDshCatalogScreen({
             ].map((m) => (
               <div key={m.label} className={styles.commandKpi}>
                 <span className={styles.commandKpiLabel}>{m.label}</span>
-                <span className={styles.commandKpiValue} style={m.tone === 'danger' ? { color: '#FF500D' } : { color: '#0A2F5C' }}>{m.value}</span>
+                <span className={m.tone === 'danger' ? `${styles.commandKpiValue} ${styles.commandKpiValueAlert}` : styles.commandKpiValue}>{m.value}</span>
               </div>
             ))}
           </div>
@@ -424,7 +440,7 @@ export function ControlPanelDshCatalogScreen({
 
       {/* 3. Secondary Tabs - Sub-Navigation Dock */}
       {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
-        <div className={styles.filterDock} style={{ padding: '4px 14px', minHeight: '36px', backgroundColor: '#F8FAFC' }}>
+        <div className={`${styles.filterDock} ${styles.filterDockTint}`} style={{ padding: '4px 14px', minHeight: '36px' }}>
           {SECONDARY_TABS[activeTab].map((sub) => {
             const isSelected = sub.id === activeSubTab;
             return (
@@ -435,9 +451,9 @@ export function ControlPanelDshCatalogScreen({
                 style={{
                   padding: '4px 12px',
                   fontSize: '12px',
-                  backgroundColor: isSelected ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
-                  color: isSelected ? '#FF500D' : '#64748B',
-                  borderColor: isSelected ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
+                  backgroundColor: isSelected ? theme.brandSurface : 'transparent',
+                  color: isSelected ? theme.brand : theme.textMuted,
+                  borderColor: isSelected ? theme.lineStrong : 'transparent',
                 }}
               >
                 {sub.label}
@@ -455,7 +471,7 @@ export function ControlPanelDshCatalogScreen({
 
         {workspaceMode === 'catalog' && (
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <Text role="caption" style={{ fontWeight: 800, color: '#64748B' }}>الفئة:</Text>
+            <Text role="caption" style={{ fontWeight: 800, color: theme.textMuted }}>الفئة:</Text>
             <Chip label="الكل" tone={!activeMainCategory ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(null)} selected={!activeMainCategory} />
             {dshCatalogCategories.map(cat => (
               <Chip key={cat.id} label={cat.label} tone={activeMainCategory?.id === cat.id ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(cat)} selected={activeMainCategory?.id === cat.id} />
@@ -470,7 +486,7 @@ export function ControlPanelDshCatalogScreen({
 
       {/* 5. Sub-filters & Active Tags */}
       {workspaceMode === 'catalog' && (
-        <div className={styles.filterDock} style={{ backgroundColor: '#F8FAFC', padding: '4px 14px' }}>
+        <div className={`${styles.filterDock} ${styles.filterDockTint}`} style={{ padding: '4px 14px' }}>
           {(['all', 'master', 'partner-exception', 'partner-review', 'marketing-review', 'price-conflict'] as FilterType[]).map(f => {
               const labels: Record<string, string> = {
                 all: 'الكل', 'master': 'مركزية', 'partner-exception': 'استثناء صورة', 'partner-review': 'مراجعة شريك', 'marketing-review': 'مراجعة تسويق', 'price-conflict': 'تعارض سعر'
@@ -504,29 +520,29 @@ export function ControlPanelDshCatalogScreen({
         <div className={styles.surfaceInnerScroll}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden', height: '100%' }}>
             {activeTab === 'approvals' && activeSubTab === 'marketing' && (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'hidden', minHeight: 0 }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: theme.surface, overflow: 'hidden', minHeight: 0 }}>
                 <CatalogAdoptionQueue />
               </div>
             )}
 
             {activeTab === 'approvals' && activeSubTab === 'quality' && (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'hidden', minHeight: 0 }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: theme.surface, overflow: 'hidden', minHeight: 0 }}>
                 <ItemApprovalSection />
               </div>
             )}
 
             {activeTab === 'approvals' && activeSubTab === 'pricing' && (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'auto', minHeight: 0 }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: theme.surface, overflow: 'auto', minHeight: 0 }}>
                 <CatalogPublishingGateSection />
               </div>
             )}
 
             {activeTab === 'catalog' && (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#FFFFFF', minWidth: 0 }}>
-                <div style={{ flex: 1, minHeight: 0, backgroundColor: '#FFFFFF' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: theme.surface, minWidth: 0 }}>
+                <div style={{ flex: 1, minHeight: 0, backgroundColor: theme.surface }}>
                    {isManualOrderCategory ? (
                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '48px', opacity: 0.7 }}>
-                       <Text role="titleMd" style={{ color: '#0A2F5C' }}>فئة الطلب اليدوي</Text>
+                       <Text role="titleMd" style={{ color: theme.brandHeaderBackground }}>فئة الطلب اليدوي</Text>
                        <Text role="bodySm" tone="muted" style={{ textAlign: 'center', maxWidth: 400, marginTop: 8 }}>
                          المنتجات في هذه الفئة (مثل شي إن، عونك) تُعامل كطلبات مرنة ولا تحتوي على منتجات كتالوج قياسية محددة مسبقاً.
                        </Text>
@@ -535,7 +551,7 @@ export function ControlPanelDshCatalogScreen({
                      <div style={{ overflow: 'auto', height: '100%' }}>
                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                           <thead>
-                            <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
+                            <tr style={{ backgroundColor: theme.surfaceInset, borderBottom: `1px solid ${theme.line}` }}>
                               {showBulkOps && <th style={{ width: '36px' }}></th>}
                               <th style={{ width: '48px' }}>صورة</th>
                               {renderColHeader('name', 'المنتج', '20%')}
@@ -556,18 +572,18 @@ export function ControlPanelDshCatalogScreen({
                                 <tr
                                   key={p.id}
                                   onClick={() => setSelectedProductId(p.id)}
-                                  style={{ borderBottom: '1px solid #F1F5F9', cursor: 'pointer', backgroundColor: selectedProductId === p.id ? 'rgba(10,47,92,0.02)' : 'transparent' }}
+                                  style={{ borderBottom: `1px solid ${theme.line}`, cursor: 'pointer', backgroundColor: selectedProductId === p.id ? theme.overlaySoft : 'transparent' }}
                                 >
                                   {showBulkOps && (
                                     <td onClick={e => e.stopPropagation()} style={{ padding: '8px' }}>
-                                      <input type="checkbox" style={{ accentColor: '#0A2F5C' }} />
+                                      <input type="checkbox" style={{ accentColor: theme.brandHeaderBackground }} />
                                     </td>
                                   )}
                                   <td style={{ padding: '8px' }}>
                                      <WatermarkedImage src={p.imageUri} size={32} />
                                   </td>
                                   <td style={{ padding: '8px' }}>
-                                     <Text role="caption" style={{ fontWeight: 800, color: '#0A2F5C' }}>{p.name}</Text>
+                                     <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground }}>{p.name}</Text>
                                   </td>
                                   <td style={{ padding: '8px' }}>
                                     <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{cat?.label}</Text>
@@ -579,7 +595,7 @@ export function ControlPanelDshCatalogScreen({
                                     <Text role="caption" tone="muted" style={{ fontFamily: 'monospace', fontSize: 10 }}>{p.sku}</Text>
                                   </td>
                                   <td style={{ padding: '8px' }}>
-                                    <Text role="caption" style={{ color: '#0A2F5C', fontWeight: 700 }}>{p.price}</Text>
+                                    <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: 700 }}>{p.price}</Text>
                                   </td>
                                   <td style={{ padding: '8px' }}>
                                     <PolicyBadge mediaPolicy={p.mediaPolicy} />
@@ -600,7 +616,7 @@ export function ControlPanelDshCatalogScreen({
                 </div>
 
                 {!isManualOrderCategory ? (
-                  <div style={{ padding: '10px 16px 12px', borderTop: '1px solid #E2E8F0', backgroundColor: '#FFFFFF' }}>
+                  <div style={{ padding: '10px 16px 12px', borderTop: `1px solid ${theme.line}`, backgroundColor: theme.surface }}>
                     <WebControlPanelCompactPager
                       page={catalogPage}
                       totalPages={catalogTotalPages}
@@ -614,8 +630,8 @@ export function ControlPanelDshCatalogScreen({
 
             {/* Inspector Panel */}
             {activeTab === 'catalog' && selectedProductId && selectedProduct && (
-              <div style={{ width: 320, borderRight: '1px solid #E2E8F0', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
-                 <Box padding={3} background="surfaceRaised" style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }} layoutDirection="row" justify="space-between" align="center">
+              <div style={{ width: 320, borderRight: `1px solid ${theme.line}`, backgroundColor: theme.surfaceInset, display: 'flex', flexDirection: 'column' }}>
+                 <Box padding={3} background="surfaceRaised" style={{ borderBottomWidth: 1, borderBottomColor: theme.line }} layoutDirection="row" justify="space-between" align="center">
                     <Text role="bodyStrong" style={{ fontSize: 14 }}>تفاصيل المنتج</Text>
                     <Button label="✕" accessibilityLabel="إغلاق" tone="secondary" size="sm" onPress={() => setSelectedProductId(null)} />
                  </Box>
@@ -629,7 +645,7 @@ export function ControlPanelDshCatalogScreen({
                     </Box>
 
                     <InspectorTile title="تسلسل الفئة (Path)">
-                       <Text role="caption" style={{ fontSize: 10, color: '#64748B', lineHeight: 14, textAlign: 'right' }}>
+                       <Text role="caption" style={{ fontSize: 10, color: theme.textMuted, lineHeight: 14, textAlign: 'right' }}>
                          {dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main)?.label || 'غير معروف'}
                          {selectedProduct.categoryPath.sub && ` > ${dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main)?.subcategories.find(s => s.id === selectedProduct.categoryPath.sub)?.label}`}
                        </Text>
@@ -637,14 +653,14 @@ export function ControlPanelDshCatalogScreen({
 
                     <InspectorTile title="الحالة">
                        <div style={{  gridTemplateColumns: '1fr', gap: '4px' }}>
-                          <MiniInfoBox label="العميل" value={selectedProduct.approvalStage === 'client-visible' ? 'مرئي' : 'مخفي'} valueColor={selectedProduct.approvalStage === 'client-visible' ? '#16A34A' : '#64748B'} isBoldValue />
+                          <MiniInfoBox label="العميل" value={selectedProduct.approvalStage === 'client-visible' ? 'مرئي' : 'مخفي'} valueColor={selectedProduct.approvalStage === 'client-visible' ? theme.success : theme.textMuted} isBoldValue />
                           <MiniInfoBox label="الشريك" value="متاح" />
                        </div>
                     </InspectorTile>
 
                     {selectedProduct.conflictReason && (
                        <InspectorTile title="تعارض" warning>
-                          <Text role="caption" style={{ color: '#DC2626', fontSize: 10 }}>{selectedProduct.conflictReason}</Text>
+                          <Text role="caption" style={{ color: theme.danger, fontSize: 10 }}>{selectedProduct.conflictReason}</Text>
                        </InspectorTile>
                     )}
 

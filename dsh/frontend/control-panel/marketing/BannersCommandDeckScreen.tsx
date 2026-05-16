@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Pressable, StyleSheet, View, Image, type ImageStyle, type ViewStyle } from 'react-native';
-import { Box, Button, SearchField, SelectField, Surface, Tabs, Text, TextField, useDirection, colorPalette } from '@bthwani/ui-kit';
+import { Box, Button, SearchField, SelectField, Surface, Tabs, Text, TextField, useDirection, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   computeMarketingBannerQuality,
@@ -302,14 +302,17 @@ function resolveSmartTargetSummary(
   };
 }
 
-function createDraft(item?: MarketingBannerRecord | null): BannerDraft {
+function createDraft(
+  item: MarketingBannerRecord | null | undefined,
+  defaults: { accentColor: string; offerBadgeColor: string },
+): BannerDraft {
   const targetType = deriveSmartTargetType(item);
   return {
     id: item?.id,
     title: item?.title ?? '',
     subtitle: item?.subtitle ?? '',
     mediaKey: item?.mediaKey ?? '',
-    accentColor: item?.accentColor ?? '#0A2F5C',
+    accentColor: item?.accentColor ?? defaults.accentColor,
     audience: item?.audience ?? 'all',
     status: item?.status ?? 'draft',
     actionType: item?.actionType ?? 'store',
@@ -321,7 +324,7 @@ function createDraft(item?: MarketingBannerRecord | null): BannerDraft {
     position: String(item?.position ?? ''),
     templateId: item?.templateId ?? 'default',
     offerBadgeText: item?.offerBadgeText ?? '',
-    offerBadgeColor: item?.offerBadgeColor ?? '#FF500D',
+    offerBadgeColor: item?.offerBadgeColor ?? defaults.offerBadgeColor,
     offerBadgePosition: item?.offerBadgePosition ?? 'top-right',
     partnerLogoUrl: item?.partnerLogoUrl ?? '',
     partnerLogoPosition: item?.partnerLogoPosition ?? 'top-left',
@@ -359,6 +362,7 @@ function bannerActionTypeLabel(item: MarketingBannerRecord) {
 
 export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) {
   const { direction } = useDirection();
+  const { theme } = useTheme();
   const isRtl = direction === 'rtl';
   const [items, setItems] = React.useState<MarketingBannerRecord[]>(() => getMarketingBannerItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getMarketingBannerItems()[0]?.id ?? null);
@@ -367,7 +371,11 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     () => (selectedId ? (items.find((item) => item.id === selectedId) ?? null) : null),
     [items, selectedId],
   );
-  const [draft, setDraft] = React.useState<BannerDraft>(() => createDraft(selected));
+  const bannerDefaults = React.useMemo(() => ({
+    accentColor: theme.brandHeaderBackground,
+    offerBadgeColor: theme.brand,
+  }), [theme]);
+  const [draft, setDraft] = React.useState<BannerDraft>(() => createDraft(selected, bannerDefaults));
   const [storeSearch, setStoreSearch] = React.useState('');
   const [storeFilter, setStoreFilter] = React.useState<SmartTargetStoreFilter>('all');
   const [categorySearch, setCategorySearch] = React.useState('');
@@ -382,9 +390,9 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
 
   React.useEffect(() => {
     if (selected) {
-      setDraft(createDraft(selected));
+      setDraft(createDraft(selected, bannerDefaults));
     }
-  }, [selected]);
+  }, [bannerDefaults, selected]);
 
   const kpis = React.useMemo(() => getMarketingBannerKpis(), [items]);
   const quality = React.useMemo(
@@ -421,7 +429,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
 
   function handleCreateNew() {
     setSelectedId(null);
-    setDraft(createDraft(null));
+    setDraft(createDraft(null, bannerDefaults));
   }
 
   function handleSave() {
@@ -455,12 +463,12 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     setSelectedId(nextItems[0]?.id ?? null);
   }
 
-  const templates = [
-    { id: 'restaurant', label: 'مطعم', accent: '#E11D48', badge: 'خصم 20%', cta: 'اطلب الآن', icon: '' },
-    { id: 'fashion', label: 'متجر أزياء', accent: '#2563EB', badge: 'وصل حديثاً', cta: 'تسوق الآن', icon: '' },
-    { id: 'tech', label: 'إلكترونيات', accent: '#0F172A', badge: 'الأكثر مبيعاً', cta: 'اشترِ الآن', icon: '' },
-    { id: 'pro', label: 'اشتراك برو', accent: '#7C3AED', badge: 'شهر مجاني', cta: 'اشترك الآن', icon: '' },
-  ];
+  const templates = React.useMemo(() => ([
+    { id: 'restaurant', label: 'مطعم', accent: theme.danger, badge: 'خصم 20%', cta: 'اطلب الآن', icon: '' },
+    { id: 'fashion', label: 'متجر أزياء', accent: theme.info, badge: 'وصل حديثاً', cta: 'تسوق الآن', icon: '' },
+    { id: 'tech', label: 'إلكترونيات', accent: theme.brandHeaderBackground, badge: 'الأكثر مبيعاً', cta: 'اشترِ الآن', icon: '' },
+    { id: 'pro', label: 'اشتراك برو', accent: theme.warning, badge: 'شهر مجاني', cta: 'اشترك الآن', icon: '' },
+  ]), [theme]);
 
   const applyTemplate = (tpl: typeof templates[0]) => {
     setDraft(c => ({
@@ -746,9 +754,326 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     [draft.motionStyle],
   );
 
+  const styles = React.useMemo(() => StyleSheet.create({
+    workspaceRoot: {
+      height: '100%',
+      maxHeight: '100%',
+      overflow: 'hidden',
+    },
+    headerPanel: {
+      borderRadius: 24,
+      padding: 18,
+      backgroundColor: theme.surface,
+      elevation: 2,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    rowReverse: {
+      flexDirection: 'row-reverse',
+    },
+    kpiGrid: {
+      flexDirection: 'row',
+      gap: 10,
+      marginTop: 4,
+    },
+    kpiCard: {
+      flex: 1,
+      padding: 12,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: theme.line,
+    },
+    studioBody: {
+      flexDirection: 'row',
+      gap: 12,
+      flex: 1,
+      minHeight: 0,
+    },
+    previewColumn: {
+      width: 328,
+      borderRadius: 24,
+      padding: 14,
+      backgroundColor: theme.surface,
+      minHeight: 0,
+    },
+    editorColumn: {
+      flex: 1,
+      borderRadius: 24,
+      padding: 14,
+      backgroundColor: theme.surface,
+      minHeight: 0,
+    },
+    sidebarColumn: {
+      width: 248,
+      borderRadius: 24,
+      padding: 14,
+      backgroundColor: theme.surface,
+      minHeight: 0,
+    },
+    columnBody: {
+      flex: 1,
+      minHeight: 0,
+      gap: 12,
+      paddingBottom: 4,
+    },
+    sidebarBody: {
+      flex: 1,
+      minHeight: 0,
+      gap: 10,
+      paddingTop: 4,
+      paddingBottom: 4,
+    },
+    listCard: {
+      padding: 12,
+      borderRadius: 16,
+      backgroundColor: theme.surfaceInset,
+      borderWidth: 1.5,
+      borderColor: 'transparent',
+    },
+    listCardSelected: {
+      borderColor: theme.brand,
+      backgroundColor: theme.surface,
+      elevation: 4,
+      shadowColor: theme.brand,
+      shadowOpacity: 0.1,
+      shadowRadius: 10,
+    },
+    statusDot: {
+      width: 7,
+      height: 7,
+      borderRadius: 999,
+    },
+    templateRow: {
+      flexDirection: 'row',
+      gap: 10,
+      flexWrap: 'wrap',
+    },
+    templateBtn: {
+      flex: 1,
+      minWidth: 82,
+      padding: 10,
+      borderRadius: 14,
+      borderWidth: 2,
+      borderColor: theme.line,
+      alignItems: 'center',
+      gap: 6,
+      backgroundColor: theme.surface,
+    },
+    templateBtnText: {
+      fontSize: 10,
+      fontWeight: '900',
+      color: theme.textMuted,
+    },
+    editorCard: {
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: theme.line,
+      backgroundColor: theme.surfaceInset,
+      padding: 14,
+    },
+    previewContainer: {
+      width: 288,
+      alignSelf: 'center',
+    },
+    bannerBase: {
+      width: 288,
+      height: 300,
+      borderRadius: 24,
+      overflow: 'hidden',
+      position: 'relative',
+      elevation: 8,
+      shadowColor: theme.overlay,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.16,
+      shadowRadius: 14,
+    },
+    bannerImage: {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+    } as ImageStyle,
+    bannerImageLayer: {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+    } as ViewStyle,
+    bannerOverlay: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    bannerShadeTop: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: '46%',
+      backgroundColor: theme.brandHeaderSurfaceStrong,
+    },
+    bannerShadeBottom: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      height: '58%',
+      backgroundColor: theme.overlaySoft,
+    },
+    bannerContent: {
+      flex: 1,
+      padding: 18,
+      justifyContent: 'flex-end',
+    },
+    bannerPartner: {
+      color: theme.brandContrast,
+      fontSize: 11,
+      fontWeight: '900',
+      opacity: 0.9,
+      textShadowColor: theme.overlay,
+      textShadowOffset: { width: 0, height: 1 },
+      shadowRadius: 2,
+    },
+    bannerTitle: {
+      color: theme.brandContrast,
+      fontSize: 22,
+      fontWeight: '900',
+      textShadowColor: theme.overlay,
+      textShadowOffset: { width: 0, height: 2 },
+      shadowRadius: 4,
+    },
+    bannerSubtitle: {
+      color: theme.brandContrast,
+      fontSize: 12,
+      fontWeight: '700',
+      marginTop: 4,
+    },
+    bannerCta: {
+      marginTop: 14,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 999,
+      alignSelf: 'flex-start',
+      elevation: 4,
+    },
+    bannerCtaText: {
+      fontSize: 11,
+      fontWeight: '900',
+    },
+    previewMetaRow: {
+      flexDirection: 'row',
+      gap: 8,
+      justifyContent: 'center',
+      marginTop: 12,
+      flexWrap: 'wrap',
+    },
+    previewMetaPill: {
+      borderRadius: 999,
+      backgroundColor: theme.infoSurface,
+      borderWidth: 1,
+      borderColor: theme.info,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+    },
+    previewMetaText: {
+      color: theme.brandHeaderBackground,
+      fontWeight: '800',
+    },
+    motionPanel: {
+      backgroundColor: theme.warningSurface,
+      padding: 12,
+      borderRadius: 16,
+      gap: 12,
+      borderWidth: 1,
+      borderColor: theme.warning,
+    },
+    motionInlineGrid: {
+      gap: 10,
+    },
+    smartTargetPanel: {
+      backgroundColor: theme.surfaceInset,
+      padding: 12,
+      borderRadius: 16,
+      gap: 12,
+      borderWidth: 1,
+      borderColor: theme.line,
+    },
+    smartSummaryCard: {
+      padding: 12,
+      backgroundColor: theme.infoSurface,
+      borderRadius: 12,
+      borderLeftWidth: 4,
+      borderLeftColor: theme.info,
+    },
+    bannerBadge: {
+      position: 'absolute',
+      top: 16,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 999,
+      elevation: 5,
+    },
+    bannerBadgeText: {
+      color: theme.brandContrast,
+      fontSize: 10,
+      fontWeight: '900',
+    },
+    partnerLogoWrap: {
+      position: 'absolute',
+      width: 38,
+      height: 38,
+      borderRadius: 999,
+      backgroundColor: theme.surface,
+      padding: 5,
+      elevation: 6,
+      shadowColor: theme.overlay,
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+    },
+    partnerLogo: {
+      width: '100%',
+      height: '100%',
+    },
+    qualityPanel: {
+      padding: 12,
+      backgroundColor: theme.surfaceInset,
+      borderRadius: 14,
+    },
+    qualityTrack: {
+      height: 8,
+      backgroundColor: theme.line,
+      borderRadius: 4,
+      overflow: 'hidden',
+      marginTop: 8,
+    },
+    qualityFill: {
+      height: '100%',
+    },
+    divider: {
+      height: 1,
+      backgroundColor: theme.surfaceInset,
+      marginVertical: 8,
+    },
+    actionBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      padding: 12,
+      borderRadius: 18,
+      backgroundColor: theme.surfaceInset,
+      borderWidth: 1,
+      borderColor: theme.line,
+    },
+    actionButtonsRow: {
+      flexDirection: 'row',
+      gap: 8,
+      flexWrap: 'wrap',
+      justifyContent: 'flex-end',
+    },
+  }), [theme]);
+
   const BannerPreview = () => (
     <View style={styles.previewContainer}>
-      <View style={StyleSheet.flatten([styles.bannerBase, { backgroundColor: draft.accentColor || '#0A2F5C' }])}>
+      <View style={StyleSheet.flatten([styles.bannerBase, { backgroundColor: draft.accentColor || theme.brandHeaderBackground }])}>
         {draft.imageUrl || draft.mediaKey ? (
           <Image
             source={resolveDshImageSource(draft.imageUrl || draft.mediaKey)}
@@ -756,7 +1081,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             resizeMode={draft.imageFit}
           />
         ) : (
-          <View style={[styles.bannerImageLayer as ViewStyle, { backgroundColor: draft.accentColor || '#0A2F5C', justifyContent: 'center', alignItems: 'center' }]}>
+          <View style={[styles.bannerImageLayer as ViewStyle, { backgroundColor: draft.accentColor || theme.brandHeaderBackground, justifyContent: 'center', alignItems: 'center' }]}>
              <Text style={{ fontSize: 40 }}>{templates.find(t => t.id === draft.templateId)?.label.slice(0, 1) || 'ب'}</Text>
           </View>
         )}
@@ -766,9 +1091,9 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             {
               backgroundColor:
                 draft.motionStyle === 'subtle-fade'
-                  ? 'rgba(10, 47, 92, 0.28)'
+                  ? theme.overlay
                   : draft.motionStyle === 'soft-parallax'
-                    ? 'rgba(10, 47, 92, 0.22)'
+                    ? theme.overlaySoft
                     : `${draft.accentColor}44`,
             },
           ]}
@@ -784,14 +1109,14 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             <Text style={styles.bannerSubtitle} numberOfLines={2}>{draft.subtitle || 'أضف وصفاً جذاباً هنا'}</Text>
           </Box>
 
-          <View style={StyleSheet.flatten([styles.bannerCta, { backgroundColor: '#fff' }])}>
-            <Text style={StyleSheet.flatten([styles.bannerCtaText, { color: draft.accentColor || '#0A2F5C' }])}>{draft.ctaLabel}</Text>
+          <View style={StyleSheet.flatten([styles.bannerCta, { backgroundColor: theme.surface }])}>
+            <Text style={StyleSheet.flatten([styles.bannerCtaText, { color: draft.accentColor || theme.brandHeaderBackground }])}>{draft.ctaLabel}</Text>
           </View>
         </View>
 
         {/* Badge */}
         {draft.offerBadgeText ? (
-          <View style={StyleSheet.flatten([styles.bannerBadge, { backgroundColor: draft.offerBadgeColor || '#FF500D' }, draft.offerBadgePosition === 'top-left' ? { left: 20, top: 20 } : { right: 20, top: 20 }])}>
+          <View style={StyleSheet.flatten([styles.bannerBadge, { backgroundColor: draft.offerBadgeColor || theme.brand }, draft.offerBadgePosition === 'top-left' ? { left: 20, top: 20 } : { right: 20, top: 20 }])}>
             <Text style={styles.bannerBadgeText}>{draft.offerBadgeText}</Text>
           </View>
         ) : null}
@@ -823,7 +1148,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
   const EditorSection = () => (
     <Box gap={4}>
       <Box gap={2}>
-        <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>القالب الذكي</Text>
+        <Text role="titleSm" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>القالب الذكي</Text>
         <View style={styles.templateRow}>
           {templates.map(tpl => (
             <Pressable
@@ -839,7 +1164,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
       </Box>
 
       <Box gap={2}>
-        <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>لوحة التحرير</Text>
+        <Text role="titleSm" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>لوحة التحرير</Text>
         <Tabs<EditorWorkspaceTab>
           items={[
             { value: 'content', label: 'المحتوى' },
@@ -875,7 +1200,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             <div style={{  gridTemplateColumns: '1.6fr 1fr', gap: 12 }}>
               <TextField label="صورة الخلفية" value={draft.imageUrl} onChangeText={(v) => setDraft(c => ({ ...c, imageUrl: v }))} />
               <Box gap={1}>
-                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>احتواء الصورة</label>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: theme.textMuted }}>احتواء الصورة</label>
                 <Tabs<BannerImageFit> items={IMAGE_FIT_TAB_ITEMS} value={draft.imageFit} onValueChange={(v) => setDraft(c => ({ ...c, imageFit: v }))} variant="pill" />
               </Box>
             </div>
@@ -885,7 +1210,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             </div>
             <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Box gap={1}>
-                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>موقع الشعار</label>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: theme.textMuted }}>موقع الشعار</label>
                 <Tabs<BannerLogoPosition>
                   items={LOGO_POSITION_TAB_ITEMS}
                   value={draft.partnerLogoPosition}
@@ -904,7 +1229,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
           <Box gap={4}>
             <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Box gap={1}>
-                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>نطاق العرض</label>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: theme.textMuted }}>نطاق العرض</label>
                 <Tabs<MarketingBannerAudience>
                   items={[{ value: 'all', label: 'الجميع' }, { value: 'home', label: 'الرئيسية' }, { value: 'stores', label: 'المتاجر' }]}
                   value={draft.audience}
@@ -913,7 +1238,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
                 />
               </Box>
               <Box gap={1}>
-                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>نوع الوجهة الذكي</label>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: theme.textMuted }}>نوع الوجهة الذكي</label>
                 <SelectField<SmartBannerTargetType>
                   options={targetTypeOptions}
                   value={draft.targetType}
@@ -926,7 +1251,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
               <Box gap={2}>
                 <SearchField label="ابحث في المتاجر" value={storeSearch} onChangeText={setStoreSearch} />
                 <Box gap={1}>
-                  <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>فلترة الحالة</label>
+                  <label style={{ fontSize: '12px', fontWeight: '800', color: theme.textMuted }}>فلترة الحالة</label>
                   <Tabs<SmartTargetStoreFilter>
                     items={[
                       { value: 'all', label: 'الكل' },
@@ -1018,7 +1343,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
                 <Box gap={2}>
                   <SearchField label="ابحث في المنتجات" value={productSearch} onChangeText={setProductSearch} />
                   <Box gap={1}>
-                    <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>فلترة الفئة</label>
+                    <label style={{ fontSize: '12px', fontWeight: '800', color: theme.textMuted }}>فلترة الفئة</label>
                     <Tabs<string>
                       items={productCategoryOptions}
                       value={productCategoryFilter}
@@ -1073,10 +1398,10 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             ) : null}
 
             <View style={styles.smartSummaryCard}>
-              <Text role="caption" style={{ fontWeight: '900', color: '#1E40AF' }}>ملخص الربط النهائي</Text>
-              <Text role="caption" style={{ color: '#1E40AF', marginTop: 4 }}>الوجهة: {smartTargetSummary.label}</Text>
-              <Text role="caption" style={{ color: '#1E40AF', marginTop: 4 }}>المعرف: {smartTargetSummary.targetId}</Text>
-              <Text role="caption" style={{ color: '#1E40AF', marginTop: 4 }}>الاسم: {smartTargetSummary.targetLabel}</Text>
+              <Text role="caption" style={{ fontWeight: '900', color: theme.info }}>ملخص الربط النهائي</Text>
+              <Text role="caption" style={{ color: theme.info, marginTop: 4 }}>الوجهة: {smartTargetSummary.label}</Text>
+              <Text role="caption" style={{ color: theme.info, marginTop: 4 }}>المعرف: {smartTargetSummary.targetId}</Text>
+              <Text role="caption" style={{ color: theme.info, marginTop: 4 }}>الاسم: {smartTargetSummary.targetLabel}</Text>
               <Text role="caption" tone="muted" style={{ fontSize: 10, marginTop: 4 }}>المسار النهائي: {smartTargetSummary.finalRoute}</Text>
             </View>
           </View>
@@ -1110,21 +1435,21 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
       <Surface tone="raised" gap={3} style={styles.headerPanel}>
         <View style={StyleSheet.flatten([styles.headerRow, isRtl && styles.rowReverse])}>
           <Box gap={0}>
-            <Text role="caption" style={{ color: colorPalette.brand, fontWeight: '900', letterSpacing: 0.5 }}>لوحة إدارة المحتوى الإعلاني</Text>
-            <Text role="titleLg" style={{ fontWeight: '900', color: '#0A2F5C', fontSize: 24 }}>استوديو البنرات</Text>
+            <Text role="caption" style={{ color: theme.brand, fontWeight: '900', letterSpacing: 0.5 }}>لوحة إدارة المحتوى الإعلاني</Text>
+            <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground, fontSize: 24 }}>استوديو البنرات</Text>
           </Box>
-          <Button label="إضافة بنر جديد" tone="primary" fullWidth={false} onPress={handleCreateNew} style={{ backgroundColor: colorPalette.brandStrong, borderRadius: 10, height: 38 }} />
+          <Button label="إضافة بنر جديد" tone="primary" fullWidth={false} onPress={handleCreateNew} style={{ backgroundColor: theme.brandHeaderBackground, borderRadius: 10, height: 38 }} />
         </View>
 
         <View style={styles.kpiGrid}>
           {[
-            { label: 'إجمالي البنرات', value: kpis.total, color: '#0A2F5C', bg: '#fff' },
-            { label: 'البنرات النشطة', value: kpis.live, color: '#16A34A', bg: '#fff' },
-            { label: 'مشاهدات اليوم', value: kpis.impressions, color: '#0A2F5C', bg: '#fff' },
-            { label: 'نسبة التفاعل', value: `${((kpis.clicks / (kpis.impressions || 1)) * 100).toFixed(1)}%`, color: '#FF500D', bg: '#fff' },
+            { label: 'إجمالي البنرات', value: kpis.total, color: theme.brandHeaderBackground, bg: theme.surface },
+            { label: 'البنرات النشطة', value: kpis.live, color: theme.success, bg: theme.surface },
+            { label: 'مشاهدات اليوم', value: kpis.impressions, color: theme.brandHeaderBackground, bg: theme.surface },
+            { label: 'نسبة التفاعل', value: `${((kpis.clicks / (kpis.impressions || 1)) * 100).toFixed(1)}%`, color: theme.brand, bg: theme.surface },
           ].map(k => (
             <View key={k.label} style={StyleSheet.flatten([styles.kpiCard, { backgroundColor: k.bg }])}>
-              <Text role="caption" style={{ fontWeight: '800', color: '#64748B' }}>{k.label}</Text>
+              <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted }}>{k.label}</Text>
               <Text role="titleSm" style={{ color: k.color, fontWeight: '900', marginTop: 4, fontSize: 18 }}>{k.value}</Text>
             </View>
           ))}
@@ -1134,17 +1459,17 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
       <View style={styles.studioBody}>
         <Surface tone="raised" gap={3} style={styles.previewColumn}>
           <Box gap={3} style={styles.columnBody}>
-            <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>المعاينة والحركة</Text>
+            <Text role="titleSm" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>المعاينة والحركة</Text>
             <BannerPreview />
             <Box gap={2} style={styles.qualityPanel}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Text role="caption" style={{ fontWeight: '900' }}>جودة المحتوى</Text>
-                <Text role="caption" style={{ fontWeight: '900', color: quality > 70 ? '#16A34A' : '#F97316' }}>{quality}%</Text>
+                <Text role="caption" style={{ fontWeight: '900', color: quality > 70 ? theme.success : theme.warning }}>{quality}%</Text>
               </View>
-              <View style={styles.qualityTrack}><View style={StyleSheet.flatten([styles.qualityFill, { width: `${quality}%`, backgroundColor: quality > 70 ? '#16A34A' : '#F97316' }])} /></View>
+              <View style={styles.qualityTrack}><View style={StyleSheet.flatten([styles.qualityFill, { width: `${quality}%`, backgroundColor: quality > 70 ? theme.success : theme.warning }])} /></View>
             </Box>
             <View style={styles.motionPanel}>
-              <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C' }}>حركة البنر</Text>
+              <Text role="titleSm" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>حركة البنر</Text>
               <SelectField<MarketingBannerMotionStyle>
                 label="نمط الحركة"
                 value={draft.motionStyle}
@@ -1153,7 +1478,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
               />
               <View style={styles.motionInlineGrid}>
                 <Box gap={1}>
-                  <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>التشغيل التلقائي</label>
+                  <label style={{ fontSize: '12px', fontWeight: '800', color: theme.textMuted }}>التشغيل التلقائي</label>
                   <Tabs
                     items={[{ value: 'true', label: 'مفعل' }, { value: 'false', label: 'متوقف' }]}
                     value={draft.autoplayEnabled ? 'true' : 'false'}
@@ -1168,7 +1493,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
                 />
               </View>
               <Box gap={1}>
-                <label style={{ fontSize: '12px', fontWeight: '800', color: '#64748B' }}>الإيقاف عند التفاعل</label>
+                <label style={{ fontSize: '12px', fontWeight: '800', color: theme.textMuted }}>الإيقاف عند التفاعل</label>
                 <Tabs
                   items={[{ value: 'true', label: 'نعم' }, { value: 'false', label: 'لا' }]}
                   value={draft.pauseOnInteraction ? 'true' : 'false'}
@@ -1187,7 +1512,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
         </Surface>
 
         <Surface tone="raised" gap={3} style={styles.sidebarColumn}>
-          <Text role="titleSm" style={{ fontWeight: '900', color: '#0A2F5C', paddingHorizontal: 4 }}>جميع الحملات</Text>
+          <Text role="titleSm" style={{ fontWeight: '900', color: theme.brandHeaderBackground, paddingHorizontal: 4 }}>جميع الحملات</Text>
           <Box gap={3} style={styles.sidebarBody}>
             {visibleItems.map(item => (
               <Pressable
@@ -1196,9 +1521,9 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
                 style={StyleSheet.flatten([styles.listCard, selectedId === item.id && styles.listCardSelected])}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <View style={[styles.statusDot, { backgroundColor: item.status === 'published' ? '#16A34A' : '#94A3B8' }]} />
+                  <View style={[styles.statusDot, { backgroundColor: item.status === 'published' ? theme.success : theme.disabledText }]} />
                   <Box gap={0} style={{ flex: 1 }}>
-                    <Text role="bodySm" style={{ fontWeight: '900', color: selectedId === item.id ? colorPalette.brandStrong : '#1E293B' }} numberOfLines={1}>{item.title}</Text>
+                    <Text role="bodySm" style={{ fontWeight: '900', color: selectedId === item.id ? theme.brandHeaderBackground : theme.text }} numberOfLines={1}>{item.title}</Text>
                     <Text role="caption" tone="muted">{bannerActionTypeLabel(item)}</Text>
                   </Box>
                 </View>
@@ -1217,322 +1542,5 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  workspaceRoot: {
-    height: '100%',
-    maxHeight: '100%',
-    overflow: 'hidden',
-  },
-  headerPanel: {
-    borderRadius: 24,
-    padding: 18,
-    backgroundColor: '#fff',
-    elevation: 2,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  rowReverse: {
-    flexDirection: 'row-reverse',
-  },
-  kpiGrid: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 4,
-  },
-  kpiCard: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.03)',
-  },
-  studioBody: {
-    flexDirection: 'row',
-    gap: 12,
-    flex: 1,
-    minHeight: 0,
-  },
-  previewColumn: {
-    width: 328,
-    borderRadius: 24,
-    padding: 14,
-    backgroundColor: '#fff',
-    minHeight: 0,
-  },
-  editorColumn: {
-    flex: 1,
-    borderRadius: 24,
-    padding: 14,
-    backgroundColor: '#fff',
-    minHeight: 0,
-  },
-  sidebarColumn: {
-    width: 248,
-    borderRadius: 24,
-    padding: 14,
-    backgroundColor: '#fff',
-    minHeight: 0,
-  },
-  columnBody: {
-    flex: 1,
-    minHeight: 0,
-    gap: 12,
-    paddingBottom: 4,
-  },
-  sidebarBody: {
-    flex: 1,
-    minHeight: 0,
-    gap: 10,
-    paddingTop: 4,
-    paddingBottom: 4,
-  },
-  listCard: {
-    padding: 12,
-    borderRadius: 16,
-    backgroundColor: '#F8FAFC',
-    borderWidth: 1.5,
-    borderColor: 'transparent',
-  },
-  listCardSelected: {
-    borderColor: colorPalette.brand,
-    backgroundColor: '#fff',
-    elevation: 4,
-    shadowColor: colorPalette.brand,
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-  },
-  statusDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 999,
-  },
-  templateRow: {
-    flexDirection: 'row',
-    gap: 10,
-    flexWrap: 'wrap',
-  },
-  templateBtn: {
-    flex: 1,
-    minWidth: 82,
-    padding: 10,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: '#E2E8F0',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#fff',
-  },
-  templateBtnText: {
-    fontSize: 10,
-    fontWeight: '900',
-    color: '#64748B',
-  },
-  editorCard: {
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#F8FAFC',
-    padding: 14,
-  },
-  previewContainer: {
-    width: 288,
-    alignSelf: 'center',
-  },
-  bannerBase: {
-    width: 288,
-    height: 300,
-    borderRadius: 24,
-    overflow: 'hidden',
-    position: 'relative',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.16,
-    shadowRadius: 14,
-  },
-  bannerImage: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-  } as ImageStyle,
-  bannerImageLayer: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-  } as ViewStyle,
-  bannerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  bannerShadeTop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '46%',
-    backgroundColor: 'rgba(255,255,255,0.08)',
-  },
-  bannerShadeBottom: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: '58%',
-    backgroundColor: 'rgba(3,12,24,0.34)',
-  },
-  bannerContent: {
-    flex: 1,
-    padding: 18,
-    justifyContent: 'flex-end',
-  },
-  bannerPartner: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '900',
-    opacity: 0.9,
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    shadowRadius: 2,
-  },
-  bannerTitle: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: '900',
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-  },
-  bannerSubtitle: {
-    color: 'rgba(255,255,255,0.95)',
-    fontSize: 12,
-    fontWeight: '700',
-    marginTop: 4,
-  },
-  bannerCta: {
-    marginTop: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    alignSelf: 'flex-start',
-    elevation: 4,
-  },
-  bannerCtaText: {
-    fontSize: 11,
-    fontWeight: '900',
-  },
-  previewMetaRow: {
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'center',
-    marginTop: 12,
-    flexWrap: 'wrap',
-  },
-  previewMetaPill: {
-    borderRadius: 999,
-    backgroundColor: '#EFF6FF',
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  previewMetaText: {
-    color: '#0A2F5C',
-    fontWeight: '800',
-  },
-  motionPanel: {
-    backgroundColor: '#FFF7ED',
-    padding: 12,
-    borderRadius: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: '#FED7AA',
-  },
-  motionInlineGrid: {
-    gap: 10,
-  },
-  smartTargetPanel: {
-    backgroundColor: '#F8FAFC',
-    padding: 12,
-    borderRadius: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-  },
-  smartSummaryCard: {
-    padding: 12,
-    backgroundColor: '#EFF6FF',
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#3B82F6',
-  },
-  bannerBadge: {
-    position: 'absolute',
-    top: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 999,
-    elevation: 5,
-  },
-  bannerBadgeText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: '900',
-  },
-  partnerLogoWrap: {
-    position: 'absolute',
-    width: 38,
-    height: 38,
-    borderRadius: 999,
-    backgroundColor: '#fff',
-    padding: 5,
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-  },
-  partnerLogo: {
-    width: '100%',
-    height: '100%',
-  },
-  qualityPanel: {
-    padding: 12,
-    backgroundColor: '#F1F5F9',
-    borderRadius: 14,
-  },
-  qualityTrack: {
-    height: 8,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 4,
-    overflow: 'hidden',
-    marginTop: 8,
-  },
-  qualityFill: {
-    height: '100%',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#F1F5F9',
-    marginVertical: 8,
-  },
-  actionBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: 12,
-    borderRadius: 18,
-    backgroundColor: '#F8FAFC',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-  },
-  actionButtonsRow: {
-    flexDirection: 'row',
-    gap: 8,
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end',
-  },
-});
 
 export default BannersCommandDeckScreen;

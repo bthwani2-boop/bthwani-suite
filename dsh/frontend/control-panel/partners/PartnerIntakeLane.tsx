@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text, useTheme } from '@bthwani/ui-kit';
 import {
   WebControlPanelDecisionRow,
   WebControlPanelKpiStrip,
@@ -15,6 +15,7 @@ export type PartnerIntakeLaneProps = {
 };
 
 export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry }: PartnerIntakeLaneProps) {
+  const { theme } = useTheme();
   if (state === 'loading') {
     return (
       <Box padding={10} align="center">
@@ -26,8 +27,8 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry }: Partner
   if (state === 'error') {
     return (
       <Box padding={10} align="center" gap={4}>
-        <Text role="titleSm" style={{ color: '#DC2626' }}>تعذر تحميل طلبات الشركاء</Text>
-        <button onClick={onRetry} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #DC2626', color: '#DC2626', background: 'transparent', cursor: 'pointer' }}>
+        <Text role="titleSm" style={{ color: theme.danger }}>تعذر تحميل طلبات الشركاء</Text>
+        <button onClick={onRetry} style={{ padding: '8px 16px', borderRadius: '8px', border: `1px solid ${theme.danger}`, color: theme.danger, background: 'transparent', cursor: 'pointer' }}>
           إعادة المحاولة
         </button>
       </Box>
@@ -38,8 +39,8 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry }: Partner
     <Box gap={6} style={{ direction: 'rtl' }}>
       <Box layoutDirection="row" justify="space-between" align="center">
         <Box gap={1}>
-          <Text role="caption" style={{ color: '#f97316', fontWeight: '800' }}>مسار استقبال الشركاء</Text>
-          <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', color: '#0A2F5C' }}>طلبات الميدان والشركاء</Text>
+          <Text role="caption" style={{ color: theme.brand, fontWeight: '800' }}>مسار استقبال الشركاء</Text>
+          <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', color: theme.brandHeaderBackground }}>طلبات الميدان والشركاء</Text>
         </Box>
       </Box>
 

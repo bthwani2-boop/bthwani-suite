@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, ListItem } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, ListItem, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getMediaReviewItems,
@@ -102,6 +102,7 @@ function applyFilter(items: MediaReviewRecord[], filter: FilterKind): MediaRevie
 // ─────────────────────────────────────────────
 
 export function MarketingMediaReviewCommandDeckScreen() {
+  const { theme } = useTheme();
   const [items, setItems] = React.useState<MediaReviewRecord[]>(() => getMediaReviewItems());
   const [filter, setFilter] = React.useState<FilterKind>('all');
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getMediaReviewItems()[0]?.id ?? null);
@@ -169,11 +170,11 @@ export function MarketingMediaReviewCommandDeckScreen() {
         <Box gap={3}>
           <Surface padding={4} gap={3}>
             <Text role="caption" tone="muted" style={{ fontWeight: 700, textAlign: 'right' }}>معاينة الوسيط</Text>
-            <Surface tone="inset" style={{ height: 160, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', backgroundColor: '#F8FAFC' }}>
+            <Surface tone="inset" style={{ height: 160, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', backgroundColor: theme.surfaceInset }}>
               <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>معاينة المحتوى</Text>
             </Surface>
             {selected.mediaKey ? (
-              <Box padding={2} style={{ direction: 'ltr', backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: 6 }}>
+              <Box padding={2} style={{ direction: 'ltr', backgroundColor: theme.overlaySoft, borderRadius: 6 }}>
                 <Text style={{ fontSize: 10, fontFamily: 'monospace' }}>
                   {selected.mediaKey}
                 </Text>
@@ -208,8 +209,8 @@ export function MarketingMediaReviewCommandDeckScreen() {
             ) : null}
           </Surface>
 
-          <Box padding={3} style={{ backgroundColor: 'rgba(3,105,161,0.05)', borderRadius: 12, borderLeftWidth: 4, borderLeftColor: '#0369A1' }}>
-            <Text role="caption" style={{ color: '#0369A1', lineHeight: 1.6 }}>
+          <Box padding={3} style={{ backgroundColor: theme.infoSurface, borderRadius: 12, borderLeftWidth: 4, borderLeftColor: theme.info }}>
+            <Text role="caption" style={{ color: theme.infoText, lineHeight: 1.6 }}>
               ملاحظة: الاعتماد التسويقي هو خطوة وسيطة. النشر الفعلي يتم عبر فريق الكتالوج لضمان الجودة المركزية.
             </Text>
           </Box>
@@ -270,14 +271,14 @@ export function MarketingMediaReviewCommandDeckScreen() {
       {/* ── KPI Strip ─────────────────────── */}
       <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
         {[
-          { label: 'قيد المراجعة', value: kpis.pending, color: '#D97706' },
-          { label: 'معتمد تسويقياً', value: kpis.approved, color: '#0A2F5C' },
-          { label: 'يتطلب تعديل', value: kpis.needsFix, color: '#DC2626' },
-          { label: 'جاهز للكتالوج', value: kpis.catalogReady, color: '#16A34A' },
-          { label: 'تعارضات', value: kpis.conflicts, color: '#D97706' },
+          { label: 'قيد المراجعة', value: kpis.pending, color: theme.warning },
+          { label: 'معتمد تسويقياً', value: kpis.approved, color: theme.brandHeaderBackground },
+          { label: 'يتطلب تعديل', value: kpis.needsFix, color: theme.danger },
+          { label: 'جاهز للكتالوج', value: kpis.catalogReady, color: theme.success },
+          { label: 'تعارضات', value: kpis.conflicts, color: theme.warning },
         ].map(k => (
           <Surface key={k.label} tone="raised" padding={3} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 120, borderRadius: 10, borderLeftWidth: 3, borderLeftColor: k.color }}>
-            <Text role="caption" style={{ fontWeight: 800, textAlign: 'right', color: '#64748B' }}>{k.label}</Text>
+            <Text role="caption" style={{ fontWeight: 800, textAlign: 'right', color: theme.textMuted }}>{k.label}</Text>
             <Text role="titleSm" style={{ fontWeight: 900, textAlign: 'right', color: k.color, marginTop: 4, fontSize: 18 }}>{k.value}</Text>
           </Surface>
         ))}
@@ -310,7 +311,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
 
         {/* Left: Review List */}
         <Surface tone="raised" padding={0} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Box padding={3} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }} layoutDirection="row" justify="space-between" align="center">
+          <Box padding={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }} layoutDirection="row" justify="space-between" align="center">
             <Text role="bodyStrong" style={{ textAlign: 'right' }}>قائمة المراجعة ({filteredItems.length})</Text>
             <Text role="caption" tone="muted" style={{ textAlign: 'left' }}>مراجعة الصور والمنتجات</Text>
           </Box>

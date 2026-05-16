@@ -2,7 +2,7 @@
 .surfaceCockpit {
   width: 100%;
   min-height: 0;
-  background-color: var(--bth-background);
+  background-color: var(--bthwani-control-panel-background);
   direction: rtl;
   text-align: right;
   font-family: 'Outfit', 'Inter', sans-serif;
@@ -16,8 +16,8 @@
   align-items: center;
   gap: 12px;
   padding: 8px 20px;
-  background-color: var(--bth-surface);
-  border-bottom: 1px solid var(--bth-line);
+  background-color: var(--bthwani-control-panel-surface);
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
   flex-shrink: 0;
 }
 
@@ -35,7 +35,7 @@
   margin: 0;
   font-size: 20px;
   font-weight: 800;
-  color: var(--bth-text);
+  color: var(--bthwani-control-panel-text);
   letter-spacing: -0.01em;
 }
 
@@ -43,13 +43,13 @@
   margin: 0;
   font-size: 12px;
   font-weight: 600;
-  color: var(--bth-text-muted);
+  color: var(--bthwani-control-panel-text-muted);
 }
 
 .surfaceHeaderIconBox {
   width: 40px;
   height: 40px;
-  background-color: var(--bth-brand-header-background);
+  background-color: var(--bthwani-control-panel-brand);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -60,7 +60,7 @@
 .surfaceHeaderGlyph {
   width: 18px;
   height: 18px;
-  border: 2px solid var(--bth-text-inverse);
+  border: 2px solid var(--bthwani-text-inverse);
   border-radius: 4px;
   position: relative;
 }
@@ -71,7 +71,7 @@
   left: 50%;
   width: 10px;
   height: 2px;
-  background-color: var(--bth-text-inverse);
+  background-color: var(--bthwani-text-inverse);
   transform: translate(-50%, -50%);
 }
 
@@ -81,8 +81,15 @@
   left: 4px;
   width: 6px;
   height: 6px;
-  background-color: var(--bth-text-inverse);
+  background-color: var(--bthwani-text-inverse);
   border-radius: 1px;
+}
+
+.surfaceHeaderGlyphLabel {
+  color: var(--bthwani-text-inverse);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .surfaceHeaderTextRow {
@@ -95,7 +102,7 @@
   margin: 0;
   font-size: 18px;
   letter-spacing: -0.01em;
-  color: var(--bth-text);
+  color: var(--bthwani-control-panel-text);
   font-weight: 800;
 }
 
@@ -103,17 +110,17 @@
   margin: 0;
   font-size: 10px;
   font-weight: 600;
-  color: var(--bth-text-muted);
+  color: var(--bthwani-control-panel-text-muted);
 }
 
 .surfaceHeaderBadgeText {
-  color: var(--bth-brand);
+  color: var(--bthwani-brand);
   font-size: 9px;
   font-weight: 800;
 }
 
 .surfaceHeaderBadgeTextInverse {
-  color: var(--bth-text-inverse);
+  color: var(--bthwani-text-inverse);
   font-size: 9px;
   font-weight: 800;
 }
@@ -127,7 +134,7 @@
   flex: 1;
   min-height: 0;
   position: relative;
-  background-color: var(--bth-background-alt);
+  background-color: var(--bthwani-control-panel-stage);
 }
 
 .surfaceInnerScroll {
@@ -151,8 +158,8 @@
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  background-color: var(--bth-surface);
-  border-bottom: 1px solid var(--bth-line);
+  background-color: var(--bthwani-control-panel-surface);
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -162,14 +169,14 @@
   flex-wrap: wrap;
   gap: 8px;
   padding: 10px 14px;
-  background: var(--bth-surface);
-  border-bottom: 1px solid var(--bth-line);
+  background: var(--bthwani-control-panel-surface);
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
   align-items: center;
   flex-shrink: 0;
 }
 
 .filterDockTint {
-  background-color: var(--bth-surface-inset);
+  background-color: var(--bthwani-control-panel-surface-inset);
 }
 
 .surfaceTab {
@@ -178,7 +185,7 @@
   border-radius: 8px;
   font-size: 12px;
   font-weight: 700;
-  color: var(--bth-text-muted);
+  color: var(--bthwani-control-panel-text-muted);
   background: transparent;
   border: 1px solid transparent;
   cursor: pointer;
@@ -190,22 +197,22 @@
 }
 
 .surfaceTab:hover {
-  background-color: var(--bth-surface-inset);
-  color: var(--bth-text);
+  background-color: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text);
 }
 
 .surfaceTabActive {
-  background-color: var(--bth-brand-header-background);
-  color: var(--bth-text-inverse);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  background-color: var(--bthwani-control-panel-brand);
+  color: var(--bthwani-text-inverse);
+  box-shadow: 0 10px 24px var(--bthwani-overlay);
 }
 
 .commandKpi {
   display: flex;
   flex-direction: column;
   padding: 6px 10px;
-  background: var(--bth-surface);
-  border: 1px solid var(--bth-line);
+  background: var(--bthwani-control-panel-surface);
+  border: 1px solid var(--bthwani-control-panel-border);
   border-radius: 8px;
   min-width: 100px;
 }
@@ -213,27 +220,27 @@
 .commandKpiLabel {
   font-size: 10px;
   font-weight: 800;
-  color: var(--bth-text-muted);
+  color: var(--bthwani-control-panel-text-muted);
   margin-bottom: 2px;
 }
 
 .commandKpiValue {
   font-size: 16px;
   font-weight: 900;
-  color: var(--bth-text);
+  color: var(--bthwani-control-panel-text);
   line-height: 1;
 }
 
 .commandKpiValueAlert {
-  color: #FF500D;
+  color: var(--bthwani-brand);
 }
 
 .commandKpiValueSuccess {
-  color: #16A34A;
+  color: var(--bthwani-success);
 }
 
 .commandKpiValueDanger {
-  color: #DC2626;
+  color: var(--bthwani-danger);
 }
 
 .commandKpiTrend {
@@ -248,11 +255,11 @@
 }
 
 .commandKpiTrendSuccess {
-  color: #16A34A;
+  color: var(--bthwani-success);
 }
 
 .commandKpiTrendWarning {
-  color: #D97706;
+  color: var(--bthwani-warning);
 }
 
 .surfacePulseCompact {
@@ -271,13 +278,13 @@
   margin: 0;
   font-size: 18px;
   font-weight: 800;
-  color: var(--bth-text);
+  color: var(--bthwani-control-panel-text);
 }
 
 .surfaceSectionSubtitle {
   margin: 2px 0 0;
   font-size: 12px;
-  color: var(--bth-text-muted);
+  color: var(--bthwani-control-panel-text-muted);
 }
 
 .surfaceGridTwoCol {
@@ -300,8 +307,8 @@
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  background-color: var(--bth-surface);
-  border: 1px solid var(--bth-line);
+  background-color: var(--bthwani-control-panel-surface);
+  border: 1px solid var(--bthwani-control-panel-border);
   border-radius: 12px;
   min-height: 0;
   max-height: 100%;
@@ -311,7 +318,7 @@
   margin: 0;
   font-size: 14px;
   font-weight: 800;
-  color: var(--bth-text);
+  color: var(--bthwani-control-panel-text);
   flex-shrink: 0;
 }
 
@@ -337,8 +344,8 @@
 }
 
 .surfaceInspectorPanel {
-  background-color: var(--bth-surface);
-  border-right: 1px solid var(--bth-line);
+  background-color: var(--bthwani-control-panel-surface);
+  border-right: 1px solid var(--bthwani-control-panel-border);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -347,8 +354,46 @@
 
 .surfaceInspectorMeta {
   padding: 8px;
-  background-color: var(--bth-surface-inset);
+  background-color: var(--bthwani-control-panel-surface-inset);
   border-radius: 6px;
+}
+
+.surfaceMetaChip {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bthwani-control-panel-text);
+  padding: 6px 10px;
+  background-color: var(--bthwani-control-panel-surface-inset);
+  border-radius: 999px;
+  border: 1px solid var(--bthwani-control-panel-border);
+}
+
+.surfaceInfoCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background-color: var(--bthwani-control-panel-surface);
+  border: 1px solid var(--bthwani-control-panel-border);
+  border-radius: 10px;
+  gap: 12px;
+}
+
+.surfaceInfoCardTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--bthwani-control-panel-text);
+}
+
+.surfaceInfoCardDescription {
+  font-size: 11px;
+  color: var(--bthwani-control-panel-text-muted);
+  line-height: 1.35;
+}
+
+.surfaceFootnote {
+  font-size: 11px;
+  color: var(--bthwani-control-panel-text-soft);
 }
 
 @media (max-width: 1024px) {

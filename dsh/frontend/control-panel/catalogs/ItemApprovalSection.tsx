@@ -1,7 +1,7 @@
 // ML-053: Item approval section — used within ControlPanelDshCatalogScreen
 // BLOCKED_BY_CONTRACT: catalog item approval API not proven
 import React from 'react';
-import { Box, Button, ListItem, Text } from '@bthwani/ui-kit';
+import { Box, Button, ListItem, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 
 type ItemApprovalStatus = 'pending' | 'approved' | 'rejected' | 'needs-revision';
@@ -48,6 +48,7 @@ export function ItemApprovalSection({
   onReject,
   onRequestRevision,
 }: ItemApprovalSectionProps) {
+  const { theme } = useTheme();
   const pendingCount = items.filter((i) => i.status === 'pending').length;
 
   return (
@@ -57,7 +58,7 @@ export function ItemApprovalSection({
         description="مراجعة واعتماد العناصر المقدَّمة من الشركاء قبل نشرها."
         metrics={[{ id: 'pending', title: 'بانتظار الاعتماد', value: String(pendingCount) }]}
       />
-      <Box gap={2} style={{ flex: 1, minHeight: 0, paddingVertical: 12, paddingHorizontal: 14, backgroundColor: '#F8FAFC' }}>
+      <Box gap={2} style={{ flex: 1, minHeight: 0, paddingVertical: 12, paddingHorizontal: 14, backgroundColor: theme.surfaceInset }}>
         {items.map((item) => (
           <ListItem
             key={item.id}

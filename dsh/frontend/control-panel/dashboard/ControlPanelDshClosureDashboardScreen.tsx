@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text, useTheme } from '@bthwani/ui-kit';
 import {
   WebControlDisclosureItem,
   WebControlPanelKpiStrip,
@@ -12,6 +12,7 @@ import { ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, DSH_CROSS
 import styles from '../shared/control-panel-surface.module.css';
 
 export function ControlPanelDshClosureHubScreen() {
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = React.useState<string>('readiness');
   const [activeSubTab, setActiveSubTab] = React.useState<string>('all');
 
@@ -72,29 +73,18 @@ export function ControlPanelDshClosureHubScreen() {
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
-            <div style={{
-              width: '18px',
-              height: '18px',
-              border: '2px solid #FFFFFF',
-              borderRadius: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 900,
-              fontSize: '12px',
-              color: '#FFFFFF'
-            }}>
-              إ
+            <div className={styles.surfaceHeaderGlyph}>
+              <span className={styles.surfaceHeaderGlyphLabel}>إ</span>
             </div>
           </div>
           <Box gap={0}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>إغلاق DSH</h1>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle}>إغلاق DSH</h1>
               <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
-                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: 9 }}>مرحلة الجاهزية</Text>
+                <Text role="caption" className={styles.surfaceHeaderBadgeText}>مرحلة الجاهزية</Text>
               </Box>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>حوكمة الإغلاق النهائي ومصفوفة الجاهزية العابرة للأسطح</p>
+            <p className={styles.surfaceHeaderSubtitle}>حوكمة الإغلاق النهائي ومصفوفة الجاهزية العابرة للأسطح</p>
           </Box>
         </div>
 
@@ -107,7 +97,7 @@ export function ControlPanelDshClosureHubScreen() {
             ].map((m) => (
               <div key={m.label} className={styles.commandKpi}>
                 <span className={styles.commandKpiLabel}>{m.label}</span>
-                <span className={styles.commandKpiValue} style={{ color: '#16A34A' }}>{m.value}</span>
+                <span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>{m.value}</span>
               </div>
             ))}
           </div>
@@ -129,16 +119,16 @@ export function ControlPanelDshClosureHubScreen() {
 
       {/* 3. Secondary Tabs */}
       {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
-        <div className={styles.filterDock} style={{ backgroundColor: '#F8FAFC' }}>
+        <div className={`${styles.filterDock} ${styles.filterDockTint}`}>
           {SECONDARY_TABS[activeTab].map((sub) => (
             <button
               key={sub.id}
               onClick={() => setActiveSubTab(sub.id)}
               className={styles.surfaceTab}
               style={{
-                backgroundColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
-                color: sub.id === activeSubTab ? '#FF500D' : '#64748B',
-                borderColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
+                backgroundColor: sub.id === activeSubTab ? theme.brandSurface : 'transparent',
+                color: sub.id === activeSubTab ? theme.brand : theme.textMuted,
+                borderColor: sub.id === activeSubTab ? theme.lineStrong : 'transparent',
               }}
             >
               {sub.label}
@@ -190,10 +180,10 @@ export function ControlPanelDshClosureDashboardScreen() {
         { id: 'surface-control', label: 'لوحة التحكم', value: String(surfaceCounts['control-panel']), tone: 'success' },
       ]} />
       <div style={{ padding: '0 14px 8px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', backgroundColor: '#FFFFFF', border: '1px solid rgba(10,47,92,0.08)', borderRadius: '10px', gap: '12px' }}>
+        <div className={styles.surfaceInfoCard}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
-            <span style={{ fontSize: '13px', fontWeight: 800, color: '#0A2F5C' }}>مصفوفة جاهزية DSH</span>
-            <span style={{ fontSize: '11px', color: '#64748B', lineHeight: 1.35 }}>لقطة واحدة توضح ما هو مغلق، وما يحتاج أدلة، وما يحتاج مسارات واجهة قبل الخروج النهائي.</span>
+            <span className={styles.surfaceInfoCardTitle}>مصفوفة جاهزية DSH</span>
+            <span className={styles.surfaceInfoCardDescription}>لقطة واحدة توضح ما هو مغلق، وما يحتاج أدلة، وما يحتاج مسارات واجهة قبل الخروج النهائي.</span>
           </div>
           <WebControlPanelActionCluster
             primary={{ id: 'evidence', label: 'فتح الأدلة' }}
@@ -240,7 +230,7 @@ export function ControlPanelDshClosureEvidenceStream() {
           />
         ))}
       </div>
-      <div style={{ padding: '0 14px 8px', fontSize: '11px', color: '#94A3B8' }}>
+      <div className={styles.surfaceFootnote} style={{ padding: '0 14px 8px' }}>
         هذه اللوحة للعرض فقط ولا تقوم بتغيير حالة النظام الفعلية.
       </div>
     </div>

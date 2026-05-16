@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelSubTabs, WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
 import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame, getDshClosureItemsByStatus } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';
@@ -7,6 +7,7 @@ import styles from '../shared/control-panel-surface.module.css';
 type GuardFilter = 'pass' | 'warn' | 'blocked';
 
 export function ControlPanelDshControlHubScreen() {
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = React.useState<string>('governance');
   const [activeSubTab, setActiveSubTab] = React.useState<string>('all');
 
@@ -66,29 +67,18 @@ export function ControlPanelDshControlHubScreen() {
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
-            <div style={{
-              width: '18px',
-              height: '18px',
-              border: '2px solid #FFFFFF',
-              borderRadius: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 900,
-              fontSize: '12px',
-              color: '#FFFFFF'
-            }}>
-              ح
+            <div className={styles.surfaceHeaderGlyph}>
+              <span className={styles.surfaceHeaderGlyphLabel}>ح</span>
             </div>
           </div>
           <Box gap={0}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', letterSpacing: '-0.01em', color: '#0A2F5C', fontWeight: 800 }}>حوكمة DSH</h1>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle}>حوكمة DSH</h1>
               <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
-                 <Text role="caption" style={{ color: '#FF500D', fontWeight: 800, fontSize: 9 }}>مستوى الأمان: عالٍ</Text>
+                <Text role="caption" className={styles.surfaceHeaderBadgeText}>مستوى الأمان: عالٍ</Text>
               </Box>
             </div>
-            <p style={{ fontSize: '10px', fontWeight: 600, color: '#64748B' }}>إدارة معايير الحماية، الحوكمة، وسجلات التدقيق المركزية</p>
+            <p className={styles.surfaceHeaderSubtitle}>إدارة معايير الحماية، الحوكمة، وسجلات التدقيق المركزية</p>
           </Box>
         </div>
 
@@ -101,7 +91,7 @@ export function ControlPanelDshControlHubScreen() {
             ].map((m) => (
               <div key={m.label} className={styles.commandKpi}>
                 <span className={styles.commandKpiLabel}>{m.label}</span>
-                <span className={styles.commandKpiValue} style={m.tone === 'success' ? { color: '#16A34A' } : {}}>{m.value}</span>
+                <span className={m.tone === 'success' ? `${styles.commandKpiValue} ${styles.commandKpiValueSuccess}` : styles.commandKpiValue}>{m.value}</span>
               </div>
             ))}
           </div>
@@ -123,16 +113,16 @@ export function ControlPanelDshControlHubScreen() {
 
       {/* 3. Secondary Tabs */}
       {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
-        <div className={styles.filterDock} style={{ backgroundColor: '#F8FAFC' }}>
+        <div className={`${styles.filterDock} ${styles.filterDockTint}`}>
           {SECONDARY_TABS[activeTab].map((sub) => (
             <button
               key={sub.id}
               onClick={() => setActiveSubTab(sub.id)}
               className={styles.surfaceTab}
               style={{
-                backgroundColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.1)' : 'transparent',
-                color: sub.id === activeSubTab ? '#FF500D' : '#64748B',
-                borderColor: sub.id === activeSubTab ? 'rgba(255, 80, 13, 0.2)' : 'transparent',
+                backgroundColor: sub.id === activeSubTab ? theme.brandSurface : 'transparent',
+                color: sub.id === activeSubTab ? theme.brand : theme.textMuted,
+                borderColor: sub.id === activeSubTab ? theme.lineStrong : 'transparent',
               }}
             >
               {sub.label}

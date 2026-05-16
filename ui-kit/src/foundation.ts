@@ -56,6 +56,53 @@ export const rawColorPalettes = {
 	}
 } as const;
 
+export const appearanceModeRawPalettes = {
+	lightPremium: {
+		deepBlue: '#0A2F5C',
+		deepBlueElevated: '#183D6B',
+		orange: '#FF500D',
+		orangeSoft: '#F48C54',
+		orangePeach: '#FFF0E7',
+		white: '#FFFFFF',
+		offWhite: '#F7F5F1',
+		warmWhite: '#FFFCF8',
+		warmSurface: '#F4EFE8',
+		warmSurfaceElevated: '#FBF7F2',
+		navyNight: '#0A2F5C',
+		navyNightElevated: '#183D6B',
+		navySurface: '#24476F',
+		navySurfaceRaised: '#33567C',
+		inkMuted: '#667A95',
+		inkSoft: '#91A0B3',
+		success: '#1F8B4C',
+		warning: '#B96A06',
+		danger: '#C43B35',
+		info: '#295FAA',
+	},
+	darkGlass: {
+		deepBlue: '#0A2F5C',
+		deepBlueElevated: '#264A76',
+		orange: '#FF500D',
+		orangeSoft: '#FF7A45',
+		orangePeach: '#402218',
+		white: '#FFFFFF',
+		offWhite: '#F4F7FB',
+		warmWhite: '#FBFCFE',
+		warmSurface: '#13233B',
+		warmSurfaceElevated: '#182B46',
+		navyNight: '#08111E',
+		navyNightElevated: '#0E1A2A',
+		navySurface: '#13233B',
+		navySurfaceRaised: '#182B46',
+		inkMuted: '#A4B4C8',
+		inkSoft: '#7E90A7',
+		success: '#4ADE80',
+		warning: '#F5C04E',
+		danger: '#F2877A',
+		info: '#8BB4E8',
+	},
+} as const;
+
 export const brandColorRoles = {
 	brand: rawColorPalettes.brand[500],
 	brandStrong: rawColorPalettes.brand[600],
@@ -457,18 +504,39 @@ function appendVariables(target: CssVariableMap, entries: Record<string, string>
 	}
 }
 
+function createPrefixedAliasVariables(
+	variables: CssVariableMap,
+	canonicalPrefix: string,
+	aliasPrefix: string,
+) {
+	const aliases: CssVariableMap = {};
+
+	for (const name of Object.keys(variables)) {
+		if (!name.startsWith(canonicalPrefix)) {
+			continue;
+		}
+
+		aliases[name.replace(canonicalPrefix, aliasPrefix)] = `var(${name})`;
+	}
+
+	return aliases;
+}
+
 function createPaletteCssVariables() {
 	const variables: CssVariableMap = {};
 
 	for (const [paletteName, paletteValues] of Object.entries(rawColorPalettes)) {
 		for (const [tokenName, tokenValue] of Object.entries(paletteValues)) {
-			variables[`--bth-palette-${toKebabCase(paletteName)}-${tokenName}`] = tokenValue;
+			variables[`--bthwani-palette-${toKebabCase(paletteName)}-${tokenName}`] = tokenValue;
 		}
 	}
 
 	for (const [semanticRole, tokenValue] of Object.entries(semanticColorRoles)) {
-		variables[`--bth-color-${toKebabCase(semanticRole)}`] = tokenValue;
+		variables[`--bthwani-color-${toKebabCase(semanticRole)}`] = tokenValue;
 	}
+
+	appendVariables(variables, createPrefixedAliasVariables(variables, '--bthwani-', '--bth-'));
+	appendVariables(variables, createPrefixedAliasVariables(variables, '--bthwani-', '--ui-'));
 
 	return variables;
 }
@@ -782,6 +850,54 @@ function resolveColorScheme(mode: ThemeMode) {
 	return mode === 'dark' || mode === 'high-contrast' ? 'dark' : 'light';
 }
 
+const platformThemeAliasMap = {
+	'app-background': 'background',
+	'app-surface': 'surface',
+	'app-surface-raised': 'surfaceRaised',
+	'app-surface-inset': 'surfaceInset',
+	'app-border': 'line',
+	'app-border-strong': 'lineStrong',
+	'app-text': 'text',
+	'app-text-muted': 'textMuted',
+	'app-text-soft': 'textSoft',
+	'app-brand': 'brand',
+	'app-brand-surface': 'brandSurface',
+	'app-field': 'fieldBackground',
+	'app-field-border': 'fieldBorder',
+	'app-focus-ring': 'focusRing',
+} as const satisfies Record<string, keyof Omit<SemanticTheme, 'mode'>>;
+
+const controlPanelThemeAliasMap = {
+	'control-panel-background': 'background',
+	'control-panel-stage': 'surfaceSecondary',
+	'control-panel-surface': 'surface',
+	'control-panel-surface-raised': 'surfaceRaised',
+	'control-panel-surface-inset': 'surfaceInset',
+	'control-panel-border': 'line',
+	'control-panel-border-strong': 'lineStrong',
+	'control-panel-text': 'text',
+	'control-panel-text-muted': 'textMuted',
+	'control-panel-text-soft': 'textSoft',
+	'control-panel-brand': 'brandHeaderBackground',
+	'control-panel-brand-surface': 'brandHeaderSurface',
+	'control-panel-field': 'fieldBackground',
+	'control-panel-field-border': 'fieldBorder',
+	'control-panel-focus-ring': 'focusRing',
+} as const satisfies Record<string, keyof Omit<SemanticTheme, 'mode'>>;
+
+function createDerivedThemeAliasVariables(
+	canonicalPrefix: string,
+	aliasMap: Record<string, keyof Omit<SemanticTheme, 'mode'>>,
+) {
+	const variables: ThemeCssVariableMap = {};
+
+	for (const [aliasName, sourceThemeKey] of Object.entries(aliasMap)) {
+		variables[`${canonicalPrefix}${aliasName}`] = `var(${canonicalPrefix}${toThemeKebabCase(sourceThemeKey)})`;
+	}
+
+	return variables;
+}
+
 export function createThemeCssVariables(theme: SemanticTheme) {
 	const variables: ThemeCssVariableMap = {};
 
@@ -790,17 +906,16 @@ export function createThemeCssVariables(theme: SemanticTheme) {
 			continue;
 		}
 
-		variables[`--bth-${toThemeKebabCase(themeKey)}`] = themeValue;
+		variables[`--bthwani-${toThemeKebabCase(themeKey)}`] = themeValue;
 	}
 
-	variables['--bth-color-scheme'] = resolveColorScheme(theme.mode);
+	appendVariables(variables, createDerivedThemeAliasVariables('--bthwani-', platformThemeAliasMap));
+	appendVariables(variables, createDerivedThemeAliasVariables('--bthwani-', controlPanelThemeAliasMap));
 
-	// Add UI-prefixed aliases for theme variables to ease staged migration.
-	for (const [name, value] of Object.entries(variables)) {
-		if (name.startsWith('--bth-')) {
-			variables[name.replace('--bth-', '--ui-')] = `var(${name})` as string;
-		}
-	}
+	variables['--bthwani-color-scheme'] = resolveColorScheme(theme.mode);
+
+	appendVariables(variables, createPrefixedAliasVariables(variables, '--bthwani-', '--bth-'));
+	appendVariables(variables, createPrefixedAliasVariables(variables, '--bthwani-', '--ui-'));
 
 	return variables;
 }

@@ -6,7 +6,7 @@ import {
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
 import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from './operations.preview-data';
-import { Box } from '@bthwani/ui-kit';
+import { Box, useTheme } from '@bthwani/ui-kit';
 import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
 import styles from '../shared/control-panel-surface.module.css';
 
@@ -20,6 +20,7 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
 };
 
 export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScreenProps) {
+  const { theme } = useTheme();
   const preview = AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW;
   const [detailOrderId, setDetailOrderId] = React.useState<string | null>(null);
 
@@ -65,7 +66,7 @@ export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScre
           ))}
         </Box>
         {detailOrderId !== null && (
-          <div style={{ width: 340, flexShrink: 0, borderRight: '1px solid #E2E8F0' }}>
+          <div style={{ width: 340, flexShrink: 0, borderRight: `1px solid ${theme.line}` }}>
             <AuditTrailDetailWorkspace
               orderId={detailOrderId}
               onClose={() => setDetailOrderId(null)}

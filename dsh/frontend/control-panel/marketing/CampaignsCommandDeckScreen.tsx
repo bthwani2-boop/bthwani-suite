@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { StyleSheet, View, Pressable } from 'react-native';
-import { Box, Button, Surface, Tabs, Text, TextField } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Tabs, Text, TextField, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getCampaignItems,
@@ -27,6 +27,7 @@ type EditorTab = 'plan' | 'audience' | 'channels' | 'schedule' | 'impact';
 const campaignsPageSize = 5;
 
 export function CampaignsCommandDeckScreen() {
+  const { theme } = useTheme();
   const [items, setItems] = React.useState<CampaignRecord[]>(() => getCampaignItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getCampaignItems()[0]?.id ?? null);
   const selected = React.useMemo(() => items.find(i => i.id === selectedId) ?? null, [items, selectedId]);
@@ -82,6 +83,173 @@ export function CampaignsCommandDeckScreen() {
     setSelectedId(items[0].id);
   }, [items, selectedId]);
 
+  const inlineStyles = React.useMemo(() => ({
+    selectInput: {
+      padding: '8px 12px',
+      borderRadius: '8px',
+      border: `1px solid ${theme.lineStrong}`,
+      backgroundColor: theme.surface,
+      color: theme.brandHeaderBackground,
+      fontSize: '13px',
+      fontWeight: '600',
+      fontFamily: 'inherit',
+      outline: 'none',
+      textAlign: 'right',
+    } as React.CSSProperties,
+    impactBox: {
+      backgroundColor: theme.surfaceInset,
+      borderRadius: '12px',
+      padding: '16px',
+      border: `1px solid ${theme.line}`,
+      marginBottom: '16px'
+    } as React.CSSProperties,
+    impactTitle: {
+      color: theme.brandHeaderBackground,
+      margin: '0 0 12px 0',
+      fontSize: '13px',
+      fontWeight: '800',
+      textAlign: 'right' as const,
+    } as React.CSSProperties,
+    impactList: {
+      margin: 0,
+      paddingInlineStart: '20px',
+      color: theme.text,
+      fontSize: '12px',
+      lineHeight: '1.8',
+      textAlign: 'right' as const,
+    } as React.CSSProperties,
+  }), [theme]);
+
+  const styles = React.useMemo(() => StyleSheet.create({
+    kpiRow: {
+      flexDirection: 'row',
+      gap: 12,
+      flexWrap: 'wrap',
+    },
+    kpiCard: {
+      flex: 1,
+      minWidth: 140,
+      backgroundColor: theme.surface,
+      borderRadius: 12,
+      padding: 12,
+      borderWidth: 1,
+      borderColor: theme.line,
+      alignItems: 'flex-start',
+    },
+    mainLayout: {
+      flex: 1,
+      flexDirection: 'row',
+      gap: 16,
+      alignItems: 'stretch',
+    },
+    listPanel: {
+      flex: 1,
+      minWidth: 300,
+      borderRadius: 16,
+      borderColor: theme.line,
+      borderWidth: 1,
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    panelHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.surfaceInset,
+      backgroundColor: theme.surface,
+    },
+    rowItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: 12,
+      borderRadius: 12,
+      backgroundColor: theme.surfaceInset,
+      borderWidth: 1,
+      borderColor: 'transparent',
+    },
+    rowItemSelected: {
+      backgroundColor: theme.surface,
+      borderColor: theme.brand,
+    },
+    statusBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 6,
+      backgroundColor: theme.surfaceInset,
+    },
+    statusBadgeActive: {
+      backgroundColor: theme.successSurface,
+    },
+    statusText: {
+      fontSize: 10,
+      fontWeight: '800',
+      color: theme.textMuted,
+    },
+    statusTextActive: {
+      color: theme.successText,
+    },
+    editorPanel: {
+      flex: 2,
+      minWidth: 400,
+      borderRadius: 16,
+      borderColor: theme.line,
+      borderWidth: 1,
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    chipsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    chip: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: theme.lineStrong,
+      backgroundColor: theme.surfaceInset,
+    },
+    chipActive: {
+      borderColor: theme.brandHeaderBackground,
+      backgroundColor: theme.brandHeaderBackground,
+    },
+    chipText: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: theme.textMuted,
+    },
+    chipTextActive: {
+      color: theme.brandContrast,
+    },
+    labelTitle: {
+      fontWeight: '800',
+      textAlign: 'right',
+    },
+    smallButton: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      minHeight: 0,
+    },
+    smallButtonTextRed: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      minHeight: 0,
+      color: theme.dangerText,
+    },
+    smallButtonPrimary: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      minHeight: 0,
+      backgroundColor: theme.brandHeaderBackground,
+    }
+  }), [theme]);
+
   const handleCreateNew = () => {
     setSelectedId(null);
     setEditorTab('plan');
@@ -123,7 +291,7 @@ export function CampaignsCommandDeckScreen() {
             value={draft.targetId}
             onChange={(e) => setDraft({ ...draft, targetId: e.target.value })}
             style={inlineStyles.selectInput}
-           
+
           >
             <option value="">(تلقائي)</option>
           </select>
@@ -215,7 +383,7 @@ export function CampaignsCommandDeckScreen() {
                 value={draft.targetType}
                 onChange={(e) => setDraft({ ...draft, targetType: e.target.value as CampaignTargetType, targetId: '' })}
                 style={inlineStyles.selectInput}
-               
+
               >
                 <option value="home">الرئيسية</option>
                 <option value="stores">متاجر</option>
@@ -283,7 +451,7 @@ export function CampaignsCommandDeckScreen() {
                 value={draft.status}
                 onChange={(e) => setDraft({ ...draft, status: e.target.value as CampaignStatus })}
                 style={inlineStyles.selectInput}
-               
+
               >
                 <option value="draft">مسودة</option>
                 <option value="pending">بانتظار الموافقة</option>
@@ -309,7 +477,7 @@ export function CampaignsCommandDeckScreen() {
             <div style={inlineStyles.impactBox}>
               <h4 style={inlineStyles.impactTitle}>مخرجات التأثير</h4>
               <ul style={inlineStyles.impactList}>
-                <li><strong>الظهور:</strong> ستظهر هذه الحملة في <span style={{ color: '#FF500D' }}>{draft.targetType || 'غير محدد'}</span>.</li>
+                <li><strong>الظهور:</strong> ستظهر هذه الحملة في <span style={{ color: theme.brand }}>{draft.targetType || 'غير محدد'}</span>.</li>
                 <li><strong>الولاء:</strong> {draft.linkedLoyaltyBenefitId ? 'مرتبط بميزة ولاء فعالة.' : 'غير مرتبط بالولاء.'}</li>
                 <li><strong>الشركاء:</strong> {draft.linkedOfferId ? 'مرتبط بعرض شريك.' : 'غير مرتبط.'}</li>
               </ul>
@@ -339,20 +507,20 @@ export function CampaignsCommandDeckScreen() {
       {/* KPIs Header */}
       <View style={styles.kpiRow}>
         <View style={styles.kpiCard}>
-          <Text role="caption" style={{ fontWeight: '800', color: '#64748B', textAlign: 'right', width: '100%' }}>إجمالي الحملات</Text>
-          <Text role="titleLg" style={{ color: '#0A2F5C', textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.total}</Text>
+          <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>إجمالي الحملات</Text>
+          <Text role="titleLg" style={{ color: theme.brandHeaderBackground, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.total}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" style={{ fontWeight: '800', color: '#64748B', textAlign: 'right', width: '100%' }}>حي الآن</Text>
-          <Text role="titleLg" style={{ color: '#16A34A', textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.live}</Text>
+          <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>حي الآن</Text>
+          <Text role="titleLg" style={{ color: theme.success, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.live}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" style={{ fontWeight: '800', color: '#64748B', textAlign: 'right', width: '100%' }}>قيد المراجعة</Text>
-          <Text role="titleLg" style={{ color: '#D97706', textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{items.filter(i => i.status === 'pending').length}</Text>
+          <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>قيد المراجعة</Text>
+          <Text role="titleLg" style={{ color: theme.warning, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{items.filter(i => i.status === 'pending').length}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" style={{ fontWeight: '800', color: '#64748B', textAlign: 'right', width: '100%' }}>وصول تجريبي</Text>
-          <Text role="titleLg" style={{ color: '#FF500D', textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.impressions}</Text>
+          <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>وصول تجريبي</Text>
+          <Text role="titleLg" style={{ color: theme.brand, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.impressions}</Text>
         </View>
       </View>
 
@@ -360,7 +528,7 @@ export function CampaignsCommandDeckScreen() {
         {/* List Panel */}
         <Surface tone="raised" style={styles.listPanel}>
           <View style={styles.panelHeader}>
-            <Text role="titleSm" style={{ color: '#0A2F5C' }}>الحملات ({items.length})</Text>
+            <Text role="titleSm" style={{ color: theme.brandHeaderBackground }}>الحملات ({items.length})</Text>
             <Button label="+ حملة جديدة" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={styles.smallButton} />
           </View>
           <Box gap={2} style={{ flex: 1, minHeight: 0, padding: 12 }}>
@@ -371,7 +539,7 @@ export function CampaignsCommandDeckScreen() {
                 onPress={() => setSelectedId(item.id)}
               >
                 <View style={{ flex: 1, alignItems: 'flex-start' }}>
-                  <Text role="bodyStrong" style={{ fontSize: 13, color: '#0A2F5C', textAlign: 'right' }}>{item.title}</Text>
+                  <Text role="bodyStrong" style={{ fontSize: 13, color: theme.brandHeaderBackground, textAlign: 'right' }}>{item.title}</Text>
                   <Text role="caption" tone="muted" style={{ fontSize: 11, textAlign: 'right' }}>
                     {item.goal} · {item.priority} · {item.channels.length} قنوات
                   </Text>
@@ -394,7 +562,7 @@ export function CampaignsCommandDeckScreen() {
         {/* Editor Panel */}
         <Surface tone="raised" style={styles.editorPanel}>
           <View style={styles.panelHeader}>
-            <Text role="titleSm" style={{ color: '#0A2F5C' }}>{selected ? 'تعديل الحملة' : 'حملة جديدة'}</Text>
+            <Text role="titleSm" style={{ color: theme.brandHeaderBackground }}>{selected ? 'تعديل الحملة' : 'حملة جديدة'}</Text>
             <View style={{ flexDirection: 'row', gap: 8 }}>
               {selected ? <Button label="نسخ" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(selected.id)} style={styles.smallButton} /> : null}
               {selected ? <Button label={selected.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" fullWidth={false} onPress={() => handleToggle(selected.id)} style={styles.smallButton} /> : null}
@@ -424,172 +592,5 @@ export function CampaignsCommandDeckScreen() {
     </div>
   );
 }
-
-const inlineStyles = {
-  selectInput: {
-    padding: '8px 12px',
-    borderRadius: '8px',
-    border: '1px solid #CBD5E1',
-    backgroundColor: '#fff',
-    color: '#0A2F5C',
-    fontSize: '13px',
-    fontWeight: '600',
-    fontFamily: 'inherit',
-    outline: 'none',
-    textAlign: 'right',
-  } as React.CSSProperties,
-  impactBox: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: '12px',
-    padding: '16px',
-    border: '1px solid #E2E8F0',
-    marginBottom: '16px'
-  },
-  impactTitle: {
-    color: '#0A2F5C',
-    margin: '0 0 12px 0',
-    fontSize: '13px',
-    fontWeight: '800',
-    textAlign: 'right' as const,
-  },
-  impactList: {
-    margin: 0,
-    paddingInlineStart: '20px',
-    color: '#475569',
-    fontSize: '12px',
-    lineHeight: '1.8',
-    textAlign: 'right' as const,
-  }
-};
-
-const styles = StyleSheet.create({
-  kpiRow: {
-    flexDirection: 'row',
-    gap: 12,
-    flexWrap: 'wrap',
-  },
-  kpiCard: {
-    flex: 1,
-    minWidth: 140,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(10,47,92,0.06)',
-    alignItems: 'flex-start',
-  },
-  mainLayout: {
-    flex: 1,
-    flexDirection: 'row',
-    gap: 16,
-    alignItems: 'stretch',
-  },
-  listPanel: {
-    flex: 1,
-    minWidth: 300,
-    borderRadius: 16,
-    borderColor: 'rgba(10,47,92,0.06)',
-    borderWidth: 1,
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  panelHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-    backgroundColor: '#fff',
-  },
-  rowItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: '#F8FAFC',
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  rowItemSelected: {
-    backgroundColor: '#fff',
-    borderColor: '#FF500D',
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    backgroundColor: '#F1F5F9',
-  },
-  statusBadgeActive: {
-    backgroundColor: '#DCFCE7',
-  },
-  statusText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#64748B',
-  },
-  statusTextActive: {
-    color: '#16A34A',
-  },
-  editorPanel: {
-    flex: 2,
-    minWidth: 400,
-    borderRadius: 16,
-    borderColor: 'rgba(10,47,92,0.06)',
-    borderWidth: 1,
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  chipsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-    backgroundColor: '#F8FAFC',
-  },
-  chipActive: {
-    borderColor: '#0A2F5C',
-    backgroundColor: '#0A2F5C',
-  },
-  chipText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#64748B',
-  },
-  chipTextActive: {
-    color: '#fff',
-  },
-  labelTitle: {
-    fontWeight: '800',
-    textAlign: 'right',
-  },
-  smallButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    minHeight: 0,
-  },
-  smallButtonTextRed: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    minHeight: 0,
-    color: '#DC2626',
-  },
-  smallButtonPrimary: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    minHeight: 0,
-    backgroundColor: '#0A2F5C',
-  }
-});
 
 export default CampaignsCommandDeckScreen;

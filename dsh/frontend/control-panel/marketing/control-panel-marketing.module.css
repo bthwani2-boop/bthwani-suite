@@ -6,22 +6,22 @@
 }
 
 .surfaceCard {
-  background-color: #FFFFFF;
+  background-color: var(--bthwani-control-panel-surface);
   border-radius: 12px;
-  border: 1px solid rgba(10, 47, 92, 0.08);
+  border: 1px solid var(--bthwani-control-panel-border);
   padding: 16px;
 }
 
 .surfaceCardTitle {
   margin: 0 0 12px 0;
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-size: 14px;
   font-weight: 800;
 }
 
 .surfaceCardTitleCompact {
   margin: 0 0 8px 0;
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-size: 13px;
   font-weight: 800;
 }
@@ -45,53 +45,53 @@
 .actionButton {
   padding: 6px 12px;
   border-radius: 6px;
-  border: 1px solid #CBD5E1;
-  background-color: #FFFFFF;
-  color: #0A2F5C;
+  border: 1px solid var(--bthwani-control-panel-border-strong);
+  background-color: var(--bthwani-control-panel-surface);
+  color: var(--bthwani-control-panel-brand);
   font-size: 11px;
   font-weight: 800;
   cursor: pointer;
 }
 
 .actionButtonPrimary {
-  background-color: #FF500D;
-  border-color: #FF500D;
-  color: #FFFFFF;
+  background-color: var(--bthwani-brand);
+  border-color: var(--bthwani-brand);
+  color: var(--bthwani-brand-contrast);
 }
 
 .actionButtonDanger {
-  background-color: #FEF2F2;
-  border-color: #FECACA;
-  color: #DC2626;
+  background-color: var(--bthwani-danger-surface);
+  border-color: var(--bthwani-danger);
+  color: var(--bthwani-danger-text);
 }
 
 .actionButtonSuccess {
-  background-color: #DCFCE7;
-  border-color: #BBF7D0;
-  color: #166534;
+  background-color: var(--bthwani-success-surface);
+  border-color: var(--bthwani-success);
+  color: var(--bthwani-success-text);
 }
 
 .actionButtonDisabled {
-  background-color: #F1F5F9;
-  border-color: #E2E8F0;
-  color: #94A3B8;
+  background-color: var(--bthwani-disabled-surface);
+  border-color: var(--bthwani-control-panel-border);
+  color: var(--bthwani-disabled-text);
   cursor: not-allowed;
 }
 
 .statusNote {
   padding: 4px 12px;
   border-radius: 6px;
-  background-color: #F1F5F9;
-  color: #64748B;
+  background-color: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 11px;
   font-weight: 700;
 }
 
 .activeTickerCard {
   padding: 12px;
-  background-color: #F8FAFC;
+  background-color: var(--bthwani-control-panel-surface-inset);
   border-radius: 8px;
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--bthwani-control-panel-border);
 }
 
 .cardMetaRow {
@@ -103,15 +103,15 @@
 .liveBadge {
   padding: 2px 6px;
   border-radius: 4px;
-  background-color: #DCFCE7;
-  color: #166534;
+  background-color: var(--bthwani-success-surface);
+  color: var(--bthwani-success-text);
   font-size: 11px;
   font-weight: 800;
 }
 
 .messageText {
   margin: 0 0 8px 0;
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-size: 14px;
   font-weight: 800;
   line-height: 1.4;
@@ -121,15 +121,15 @@
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-  color: #64748B;
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 11px;
 }
 
 .planNote {
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid #E2E8F0;
-  color: #0A2F5C;
+  border-top: 1px solid var(--bthwani-control-panel-border);
+  color: var(--bthwani-control-panel-brand);
   font-size: 11px;
   font-weight: 600;
 }
@@ -137,14 +137,14 @@
 .emptyState {
   padding: 20px;
   text-align: center;
-  background-color: #F8FAFC;
+  background-color: var(--bthwani-control-panel-surface-inset);
   border-radius: 8px;
-  border: 1px dashed #CBD5E1;
+  border: 1px dashed var(--bthwani-control-panel-border-strong);
 }
 
 .emptyStateText {
   margin: 0;
-  color: #64748B;
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 13px;
   font-weight: 600;
 }
@@ -155,14 +155,14 @@
   gap: 12px;
   padding: 12px;
   border-radius: 8px;
-  background-color: #FF500D;
+  background-color: var(--bthwani-brand);
 }
 
 .previewStatus {
   padding: 4px 8px;
   border-radius: 4px;
-  background-color: #FFFFFF;
-  color: #FF500D;
+  background-color: var(--bthwani-control-panel-surface);
+  color: var(--bthwani-brand);
   font-size: 10px;
   font-weight: 900;
 }
@@ -174,7 +174,7 @@
 
 .previewMessage {
   margin: 0;
-  color: #FFFFFF;
+  color: var(--bthwani-brand-contrast);
   font-size: 13px;
   font-weight: 800;
   white-space: nowrap;
@@ -183,7 +183,7 @@
 }
 
 .previewTarget {
-  color: #FFFFFF;
+  color: var(--bthwani-brand-contrast);
   font-size: 10px;
   opacity: 0.8;
 }
@@ -195,12 +195,12 @@
   height: 40px;
   padding: 0 12px;
   border-radius: 8px;
-  background-color: #F1F5F9;
+  background-color: var(--bthwani-control-panel-surface-inset);
 }
 
 .previewPlaceholderText {
   margin: 0;
-  color: #94A3B8;
+  color: var(--bthwani-disabled-text);
   font-size: 12px;
   font-weight: 700;
 }
@@ -228,12 +228,12 @@
   gap: 12px;
   padding: 12px;
   border-radius: 8px;
-  border: 1px solid #E2E8F0;
-  background-color: #F8FAFC;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background-color: var(--bthwani-control-panel-surface-inset);
 }
 
 .tickerRowActive {
-  border-color: #FF500D;
+  border-color: var(--bthwani-brand);
 }
 
 .tickerRowBody {
@@ -256,20 +256,20 @@
 }
 
 .statusChipSuccess {
-  background-color: #DCFCE7;
-  color: #166534;
+  background-color: var(--bthwani-success-surface);
+  color: var(--bthwani-success-text);
 }
 
 .statusChipNeutral {
-  background-color: #F1F5F9;
-  color: #64748B;
+  background-color: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text-muted);
 }
 
 .metaChipRow {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  color: #64748B;
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 10px;
   font-weight: 600;
 }
@@ -281,8 +281,8 @@
 .suppressedChip {
   padding: 2px 6px;
   border-radius: 4px;
-  background-color: #FEF2F2;
-  color: #DC2626;
+  background-color: var(--bthwani-danger-surface);
+  color: var(--bthwani-danger-text);
   font-size: 10px;
   font-weight: 800;
 }
@@ -295,7 +295,7 @@
 }
 
 .editorCardAccent {
-  border-color: #FF500D;
+  border-color: var(--bthwani-brand);
 }
 
 .editorHeader {
@@ -308,7 +308,7 @@
 
 .editorTitle {
   margin: 0;
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-weight: 800;
 }
 
@@ -316,7 +316,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: #64748B;
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 12px;
   cursor: pointer;
 }
@@ -334,7 +334,7 @@
 }
 
 .fieldLabel {
-  color: #64748B;
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 10px;
   font-weight: 800;
 }
@@ -346,9 +346,9 @@
 .fieldControl {
   padding: 8px;
   border-radius: 6px;
-  border: 1px solid #E2E8F0;
-  background-color: #FFFFFF;
-  color: #0A2F5C;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background-color: var(--bthwani-control-panel-surface);
+  color: var(--bthwani-control-panel-brand);
   font-size: 12px;
   font-family: inherit;
 }
@@ -364,7 +364,7 @@
 }
 
 .fieldError {
-  color: #DC2626;
+  color: var(--bthwani-danger-text);
   font-size: 10px;
 }
 
@@ -381,16 +381,16 @@
 .ruleChip {
   padding: 4px 8px;
   border-radius: 12px;
-  border: 1px solid #E2E8F0;
-  background-color: #F8FAFC;
-  color: #475569;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background-color: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text);
   font-size: 11px;
 }
 
 .ruleChipDanger {
-  border-color: #FECACA;
-  background-color: #FEF2F2;
-  color: #DC2626;
+  border-color: var(--bthwani-danger);
+  background-color: var(--bthwani-danger-surface);
+  color: var(--bthwani-danger-text);
 }
 
 .mappingChip {
@@ -398,7 +398,7 @@
 }
 
 .headerLetter {
-  color: #FFFFFF;
+  color: var(--bthwani-brand-contrast);
   font-size: 14px;
   font-weight: 900;
 }
@@ -414,17 +414,17 @@
 }
 
 .selectedSubTab {
-  background-color: rgba(255, 80, 13, 0.1);
-  color: #FF500D;
-  border-color: rgba(255, 80, 13, 0.2);
+  background-color: var(--bthwani-brand-surface);
+  color: var(--bthwani-brand);
+  border-color: var(--bthwani-brand);
 }
 
 .metricToneSuccess {
-  color: #16A34A;
+  color: var(--bthwani-success-text);
 }
 
 .metricToneWarning {
-  color: #D97706;
+  color: var(--bthwani-warning-text);
 }
 
 @media (max-width: 960px) {

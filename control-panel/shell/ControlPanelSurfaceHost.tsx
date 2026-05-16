@@ -11,7 +11,7 @@ import {
 } from '../composition';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { useDirection, useUiText } from '@bthwani/ui-kit';
+import { useDirection, useUiText, type BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import {
   WebCommandCenterFrame,
   WebSignalCard,
@@ -26,6 +26,7 @@ import type {
 } from '../../dsh/frontend/control-panel/finance/finance.types';
 import { controlPanelRuntimeData } from './runtime.data';
 import { ControlPanelAppearanceScreen } from './ControlPanelAppearanceScreen';
+import { useControlPanelAppearance } from './appearance';
 import styles from './control-panel-shell.module.css';
 
 const phaseOneSectionIds = ['dashboard', 'operations', 'finance', 'community-services', 'support'] as const;
@@ -70,6 +71,23 @@ const compactSectionDescriptions: Record<PhaseOneSectionId, string> = {
   'community-services': 'خدمات المجتمع',
   support: 'دعم قابل للتصعيد',
 };
+
+const appearanceOptions: ReadonlyArray<{
+  mode: BThwaniAppearanceMode;
+  title: string;
+  description: string;
+}> = [
+  {
+    mode: 'lightPremium',
+    title: 'فاتح أبيض',
+    description: 'سطح واضح بإضاءة هادئة وحقول عالية القراءة.',
+  },
+  {
+    mode: 'darkGlass',
+    title: 'داكن زجاجي',
+    description: 'سطح داكن بطبقات أعمق وتباين مريح للمتابعة.',
+  },
+] as const;
 
 function isPhaseOneSection(sectionId: ControlPanelSectionId): sectionId is PhaseOneSectionId {
   return (phaseOneSectionIds as readonly string[]).includes(sectionId);
@@ -143,12 +161,15 @@ export function ControlPanelSurfaceHost({
   const router = useRouter();
   const { direction } = useDirection();
   const uiText = useUiText();
+  const { hydrated, mode, setMode } = useControlPanelAppearance();
   const panelText = uiText.controlPanel;
   const [alertCount, setAlertCount] = React.useState(1);
   const [selectedServiceId, setSelectedServiceId] = React.useState<string>(allServiceTabId);
   const [activeSectionHref, setActiveSectionHref] = React.useState<PrimarySectionHref>(() => (
     section ? (`/${section}` as PrimarySectionHref) : '/dashboard'
   ));
+  const [isAppearanceMenuOpen, setIsAppearanceMenuOpen] = React.useState(false);
+  const appearanceMenuRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
     setActiveSectionHref(section ? (`/${section}` as PrimarySectionHref) : '/dashboard');
@@ -186,10 +207,29 @@ export function ControlPanelSurfaceHost({
       }
     }
   }, [selectedServiceId, isAllFilterActive, activeSectionId, router]);
+
+  React.useEffect(() => {
+    if (!isAppearanceMenuOpen) {
+      return;
+    }
+
+    function handlePointerDown(event: PointerEvent) {
+      if (!appearanceMenuRef.current?.contains(event.target as Node)) {
+        setIsAppearanceMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+    };
+  }, [isAppearanceMenuOpen]);
+
   const selectedServiceMeta = isAllFilterActive
     ? undefined
     : controlPanelRuntimeData.services.find((service) => service.id === selectedServiceId);
   const selectedServiceLabel = selectedServiceMeta ? getServiceLabel(uiText, selectedServiceMeta.id) : panelText.filters.allServices;
+  const activeAppearance = appearanceOptions.find((option) => option.mode === mode) ?? appearanceOptions[0];
 
   const handleBrandClick = React.useCallback(() => {
     setSelectedServiceId(allServiceTabId);
@@ -208,6 +248,57 @@ export function ControlPanelSurfaceHost({
     setAlertCount(0);
   }, []);
 
+  const profileControl = (
+    <div className={styles.appearanceMenu} ref={appearanceMenuRef}>
+      <button
+        type="button"
+        className={styles.appearanceMenuTrigger}
+        aria-expanded={isAppearanceMenuOpen}
+        aria-haspopup="menu"
+        aria-label={`المظهر الحالي: ${activeAppearance.title}`}
+        title={`المظهر الحالي: ${activeAppearance.title}`}
+        onClick={() => setIsAppearanceMenuOpen((current) => !current)}
+      >
+        <span className={styles.appearanceMenuTriggerAvatar} aria-hidden="true">
+          {mode === 'darkGlass' ? '◐' : '◌'}
+        </span>
+      </button>
+
+      {isAppearanceMenuOpen ? (
+        <div className={styles.appearanceMenuPopover} role="menu" aria-label="اختيار مظهر لوحة التحكم">
+          <div className={styles.appearanceMenuHeader}>
+            <span className={styles.appearanceMenuEyebrow}>مظهر الشل</span>
+            <strong className={styles.appearanceMenuCurrent}>
+              {hydrated ? activeAppearance.title : 'جارٍ استعادة التفضيل...'}
+            </strong>
+          </div>
+
+          <div className={styles.appearanceMenuOptions}>
+            {appearanceOptions.map((option) => (
+              <button
+                key={option.mode}
+                type="button"
+                role="menuitemradio"
+                aria-checked={mode === option.mode}
+                className={[
+                  styles.appearanceMenuOption,
+                  mode === option.mode ? styles.appearanceMenuOptionActive : '',
+                ].join(' ')}
+                onClick={() => {
+                  setMode(option.mode);
+                  setIsAppearanceMenuOpen(false);
+                }}
+              >
+                <span className={styles.appearanceMenuOptionTitle}>{option.title}</span>
+                <span className={styles.appearanceMenuOptionDescription}>{option.description}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+
   return (
     <>
       <div className={styles.controlPanelRailOverrides}>
@@ -216,6 +307,7 @@ export function ControlPanelSurfaceHost({
       surfaceTitle="لوحة القيادة"
       surfaceSubtitle={shellCopy.title}
       showHero={false}
+      profileControl={profileControl}
       topFilters={[
         {
           id: allServiceTabId,

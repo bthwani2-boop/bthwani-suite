@@ -22,6 +22,112 @@
   gap: 16px;
 }
 
+.appearanceMenu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appearanceMenuTrigger {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--bthwani-control-panel-border-strong);
+  background: linear-gradient(135deg, var(--bthwani-control-panel-brand) 0%, var(--bthwani-brand) 100%);
+  color: var(--bthwani-brand-contrast);
+  cursor: pointer;
+  box-shadow: 0 8px 18px var(--bthwani-overlay-soft);
+}
+
+.appearanceMenuTriggerAvatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.appearanceMenuPopover {
+  position: absolute;
+  top: calc(100% + 10px);
+  inset-inline-end: 0;
+  z-index: 120;
+  width: 280px;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: linear-gradient(180deg, var(--bthwani-control-panel-surface) 0%, var(--bthwani-control-panel-surface-raised) 100%);
+  box-shadow: 0 18px 40px var(--bthwani-overlay);
+}
+
+.appearanceMenuHeader {
+  display: grid;
+  gap: 4px;
+}
+
+.appearanceMenuEyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+.appearanceMenuCurrent {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--bthwani-control-panel-brand);
+}
+
+.appearanceMenuOptions {
+  display: grid;
+  gap: 8px;
+}
+
+.appearanceMenuOption {
+  appearance: none;
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface);
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.appearanceMenuOption:hover {
+  transform: translateY(-1px);
+  border-color: var(--bthwani-brand);
+  box-shadow: 0 10px 20px var(--bthwani-overlay-soft);
+}
+
+.appearanceMenuOptionActive {
+  border-color: var(--bthwani-brand);
+  background: linear-gradient(180deg, var(--bthwani-brand-surface) 0%, var(--bthwani-control-panel-surface) 100%);
+}
+
+.appearanceMenuOptionTitle {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--bthwani-control-panel-brand);
+}
+
+.appearanceMenuOptionDescription {
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--bthwani-control-panel-text-muted);
+}
+
 .sectionLink:hover {
   transform: translateY(-1px);
 }
@@ -46,16 +152,16 @@
   gap: 12px;
   padding: 18px;
   border-radius: 16px;
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  box-shadow: 0 10px 24px rgba(10, 47, 92, 0.05);
+  border: 1px solid var(--bthwani-control-panel-border);
+  box-shadow: 0 10px 24px var(--bthwani-overlay-soft);
 }
 
 .dashboardHeroCard {
   --gradient-side: right;
   background:
-    radial-gradient(circle at top var(--gradient-side), rgba(255, 80, 13, 0.12), transparent 26%),
-    linear-gradient(135deg, rgba(10, 47, 92, 0.96) 0%, rgba(12, 48, 93, 0.98) 62%, rgba(21, 73, 136, 0.94) 100%);
-  color: #ffffff;
+    radial-gradient(circle at top var(--gradient-side), var(--bthwani-brand-surface), transparent 26%),
+    linear-gradient(135deg, var(--bthwani-control-panel-brand) 0%, var(--bthwani-control-panel-brand) 62%, var(--bthwani-brand) 100%);
+  color: var(--bthwani-brand-contrast);
 }
 
 :global([dir="rtl"]) .dashboardHeroCard {
@@ -70,7 +176,7 @@
   width: 240px;
   height: 240px;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--bthwani-control-panel-brand-surface) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -78,8 +184,8 @@
   --gradient-side: left;
   align-content: start;
   background:
-    radial-gradient(circle at top var(--gradient-side), rgba(10, 47, 92, 0.08), transparent 22%),
-    linear-gradient(180deg, rgba(255, 244, 237, 0.96) 0%, rgba(255, 255, 255, 0.98) 100%);
+    radial-gradient(circle at top var(--gradient-side), var(--bthwani-control-panel-brand-surface), transparent 22%),
+    linear-gradient(180deg, var(--bthwani-brand-surface) 0%, var(--bthwani-control-panel-surface) 100%);
 }
 
 :global([dir="rtl"]) .dashboardSpotlightCard {
@@ -95,11 +201,11 @@
 }
 
 .dashboardHeroEyebrow {
-  color: rgba(255, 255, 255, 0.74);
+  color: var(--bthwani-text-muted);
 }
 
 .dashboardSpotlightEyebrow {
-  color: #FF500D;
+  color: var(--bthwani-brand);
 }
 
 .dashboardHeroTitle {
@@ -120,7 +226,7 @@
 
 .dashboardHeroDescription {
   max-width: 62ch;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--bthwani-text-muted);
 }
 
 .dashboardSpotlightHeader {
@@ -131,7 +237,7 @@
 }
 
 .dashboardSpotlightValue {
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-size: 28px;
   line-height: 1;
   letter-spacing: 0;
@@ -139,14 +245,14 @@
 
 .dashboardSpotlightTitle {
   margin: 0;
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-size: 20px;
   line-height: 1.2;
   font-weight: 900;
 }
 
 .dashboardSpotlightDescription {
-  color: #51667d;
+  color: var(--bthwani-control-panel-text-muted);
 }
 
 .dashboardHeroMeta,
@@ -164,9 +270,9 @@
   min-height: 34px;
   padding: 0 12px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
+  border: 1px solid var(--bthwani-control-panel-brand-surface);
+  background: var(--bthwani-control-panel-brand-surface);
+  color: var(--bthwani-brand-contrast);
   font-size: 12px;
   font-weight: 800;
 }
@@ -186,15 +292,15 @@
 }
 
 .dashboardHeroPrimaryAction {
-  background: linear-gradient(135deg, #ff6a2f 0%, #FF500D 58%, #e94900 100%);
-  color: #ffffff;
-  box-shadow: 0 16px 30px rgba(255, 80, 13, 0.22);
+  background: linear-gradient(135deg, var(--bthwani-control-panel-brand) 0%, var(--bthwani-brand) 58%, var(--bthwani-brand) 100%);
+  color: var(--bthwani-brand-contrast);
+  box-shadow: 0 16px 30px var(--bthwani-overlay);
 }
 
 .dashboardHeroSecondaryAction {
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
+  border: 1px solid var(--bthwani-control-panel-brand-surface);
+  background: var(--bthwani-control-panel-brand-surface);
+  color: var(--bthwani-brand-contrast);
 }
 
 .dashboardHeroPrimaryAction:hover,
@@ -208,18 +314,18 @@
   min-width: 84px;
   padding: 10px;
   border-radius: 12px;
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface);
 }
 
 .dashboardSpotlightStatLabel {
-  color: #64748b;
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 11px;
   font-weight: 800;
 }
 
 .dashboardSpotlightStatValue {
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-size: 15px;
   font-weight: 900;
 }
@@ -364,13 +470,13 @@
 }
 
 .controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-item:hover) {
-  background: rgba(10, 47, 92, 0.04);
+  background: var(--bthwani-control-panel-surface-inset);
 }
 
 .controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-item--active) {
-  background: rgba(10, 47, 92, 0.08);
-  color: #0A2F5C;
-  border-color: rgba(10, 47, 92, 0.14);
+  background: var(--bthwani-control-panel-brand-surface);
+  color: var(--bthwani-control-panel-brand);
+  border-color: var(--bthwani-control-panel-border-strong);
 }
 
 .controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-item-icon) {
@@ -405,8 +511,8 @@
   gap: 12px;
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 248, 252, 0.96) 100%);
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: linear-gradient(180deg, var(--bthwani-control-panel-surface) 0%, var(--bthwani-control-panel-surface-raised) 100%);
   text-decoration: none;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -422,8 +528,8 @@
 .dashboardSectionRow:hover,
 .dashboardPriorityItem:hover {
   transform: translateY(-1px);
-  border-color: rgba(255, 80, 13, 0.24);
-  box-shadow: 0 8px 18px rgba(10, 47, 92, 0.05);
+  border-color: var(--bthwani-brand);
+  box-shadow: 0 8px 18px var(--bthwani-overlay-soft);
 }
 
 .dashboardSectionRowMain,
@@ -435,14 +541,14 @@
 
 .dashboardSectionRowTitle,
 .dashboardPriorityLabel {
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-size: 15px;
   font-weight: 900;
 }
 
 .dashboardSectionRowDescription,
 .dashboardPriorityNote {
-  color: #64748b;
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 12px;
   line-height: 1.7;
 }
@@ -469,15 +575,15 @@
 
 .dashboardSectionRowStat,
 .dashboardPriorityMetric {
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  background: rgba(10, 47, 92, 0.04);
-  color: #0A2F5C;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-brand);
 }
 
 .dashboardSectionRowBadge {
-  border: 1px solid rgba(255, 80, 13, 0.14);
-  background: rgba(255, 80, 13, 0.08);
-  color: #FF500D;
+  border: 1px solid var(--bthwani-brand);
+  background: var(--bthwani-brand-surface);
+  color: var(--bthwani-brand);
 }
 
 .dashboardPriorityIndex {
@@ -487,8 +593,8 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(180deg, rgba(10, 47, 92, 0.08) 0%, rgba(10, 47, 92, 0.02) 100%);
-  color: #0A2F5C;
+  background: linear-gradient(180deg, var(--bthwani-control-panel-brand-surface) 0%, var(--bthwani-control-panel-surface) 100%);
+  color: var(--bthwani-control-panel-brand);
   font-size: 13px;
   font-weight: 900;
 }
@@ -504,8 +610,8 @@
   gap: 6px;
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 248, 252, 0.95) 100%);
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: linear-gradient(180deg, var(--bthwani-control-panel-surface) 0%, var(--bthwani-control-panel-surface-raised) 100%);
   text-align: start;
   cursor: pointer;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
@@ -513,12 +619,12 @@
 
 .constellationCard:hover {
   transform: translateY(-1px);
-  border-color: rgba(255, 80, 13, 0.22);
-  box-shadow: 0 8px 18px rgba(10, 47, 92, 0.05);
+  border-color: var(--bthwani-brand);
+  box-shadow: 0 8px 18px var(--bthwani-overlay-soft);
 }
 
 .constellationCardLive {
-  background: linear-gradient(180deg, rgba(255, 244, 237, 0.88) 0%, rgba(255, 255, 255, 0.98) 100%);
+  background: linear-gradient(180deg, var(--bthwani-brand-surface) 0%, var(--bthwani-control-panel-surface) 100%);
 }
 
 .constellationCardReference {
@@ -526,21 +632,21 @@
 }
 
 .constellationCardCode {
-  color: #64748b;
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
 }
 
 .constellationCardValue {
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-size: 24px;
   line-height: 1;
   letter-spacing: 0;
 }
 
 .constellationCardLabel {
-  color: #64748b;
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 12px;
   line-height: 1.6;
 }
@@ -553,8 +659,8 @@
   min-height: 28px;
   padding: 0 10px;
   border-radius: 8px;
-  background: rgba(10, 47, 92, 0.05);
-  color: #0A2F5C;
+  background: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-brand);
   font-size: 11px;
   font-weight: 900;
 }
@@ -567,7 +673,7 @@
 }
 
 .disclosure {
-  border-top: 1px solid rgba(10, 47, 92, 0.08);
+  border-top: 1px solid var(--bthwani-control-panel-border);
   padding-top: 12px;
 }
 
@@ -578,7 +684,7 @@
   justify-content: space-between;
   gap: 12px;
   cursor: pointer;
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-size: 13px;
   font-weight: 900;
 }
@@ -588,7 +694,7 @@
 }
 
 .disclosureHint {
-  color: #64748b;
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 12px;
   font-weight: 600;
 }
@@ -604,13 +710,13 @@
   gap: 8px;
   padding: 14px 16px;
   border-radius: 18px;
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface);
 }
 
 .contextTitle {
   margin: 0;
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-size: 13px;
   font-weight: 800;
 }
@@ -629,18 +735,18 @@
   justify-content: center;
   padding: 5px 9px;
   border-radius: 999px;
-  border: 1px solid rgba(10, 47, 92, 0.09);
-  background: rgba(10, 47, 92, 0.03);
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface-inset);
   font-size: 12px;
   font-weight: 700;
 }
 
 .contextChip {
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
 }
 
 .contextChipMuted {
-  color: #64748b;
+  color: var(--bthwani-control-panel-text-muted);
 }
 
 .statePanel {
@@ -648,20 +754,20 @@
   gap: 12px;
   padding: 18px;
   border-radius: 14px;
-  border: 1px dashed rgba(255, 80, 13, 0.28);
-  background: linear-gradient(180deg, rgba(255, 244, 237, 0.75) 0%, #ffffff 100%);
+  border: 1px dashed var(--bthwani-brand);
+  background: linear-gradient(180deg, var(--bthwani-brand-surface) 0%, var(--bthwani-control-panel-surface) 100%);
 }
 
 .stateTitle {
   margin: 0;
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-size: 18px;
   font-weight: 900;
 }
 
 .stateDescription {
   margin: 0;
-  color: #64748b;
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 13px;
   line-height: 1.7;
 }
@@ -681,25 +787,25 @@
   gap: 4px;
   padding: 12px;
   border-radius: 16px;
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  background: linear-gradient(180deg, #ffffff 0%, rgba(10, 47, 92, 0.02) 100%);
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: linear-gradient(180deg, var(--bthwani-control-panel-surface) 0%, var(--bthwani-control-panel-surface-raised) 100%);
   text-decoration: none;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .sectionLinkActive {
-  border-color: rgba(255, 80, 13, 0.22);
-  background: linear-gradient(180deg, rgba(255, 244, 237, 0.95) 0%, #ffffff 100%);
+  border-color: var(--bthwani-brand);
+  background: linear-gradient(180deg, var(--bthwani-brand-surface) 0%, var(--bthwani-control-panel-surface) 100%);
 }
 
 .sectionLinkLabel {
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   font-size: 15px;
   font-weight: 800;
 }
 
 .sectionLinkDescription {
-  color: #64748b;
+  color: var(--bthwani-control-panel-text-muted);
   font-size: 12px;
   line-height: 1.6;
 }

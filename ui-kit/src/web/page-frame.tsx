@@ -42,7 +42,7 @@ const webPageFrameCss = `
   font-size: 12px;
   letter-spacing: 0;
   text-transform: uppercase;
-  color: #FF500D;
+  color: var(--bthwani-brand);
   font-weight: 800;
 }
 
@@ -60,7 +60,7 @@ const webPageFrameCss = `
   margin: 0;
   font-size: 32px;
   line-height: 1.12;
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   letter-spacing: 0;
 }
 
@@ -68,7 +68,7 @@ const webPageFrameCss = `
   margin: 0;
   font-size: 16px;
   line-height: 1.75;
-  color: #51677e;
+  color: var(--bthwani-control-panel-text-muted);
 }
 
 .ui-web-mission-hero-card {
@@ -76,11 +76,11 @@ const webPageFrameCss = `
   gap: 12px;
   padding: 18px;
   border-radius: 16px;
-  border: 1px solid rgba(10, 47, 92, 0.08);
+  border: 1px solid var(--bthwani-control-panel-border);
   background:
-    radial-gradient(circle at top right, rgba(255, 80, 13, 0.08), transparent 25%),
-    linear-gradient(180deg, rgba(255, 244, 237, 0.92) 0%, rgba(255, 255, 255, 0.98) 68%);
-  box-shadow: 0 10px 24px rgba(10, 47, 92, 0.05);
+    radial-gradient(circle at top right, var(--bthwani-brand-surface), transparent 25%),
+    linear-gradient(180deg, var(--bthwani-control-panel-surface-inset) 0%, var(--bthwani-control-panel-surface) 68%);
+  box-shadow: 0 10px 24px var(--bthwani-overlay-soft);
 }
 
 .ui-web-mission-hero-card--dense {
@@ -107,7 +107,7 @@ const webPageFrameCss = `
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  color: #FF500D;
+  color: var(--bthwani-brand);
   font-weight: 800;
 }
 
@@ -115,7 +115,7 @@ const webPageFrameCss = `
   margin: 0;
   font-size: 32px;
   line-height: 1.1;
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   letter-spacing: 0;
 }
 
@@ -131,7 +131,7 @@ const webPageFrameCss = `
   margin: 0;
   font-size: 16px;
   line-height: 1.78;
-  color: #405468;
+  color: var(--bthwani-control-panel-text);
 }
 
 .ui-web-mission-hero-card__badge,
@@ -143,16 +143,16 @@ const webPageFrameCss = `
 
 .ui-web-mission-hero-card__badge {
   padding: 5px 10px;
-  background: linear-gradient(180deg, #ffefe5 0%, #ffe1d0 100%);
-  color: #0A2F5C;
-  border: 1px solid rgba(255, 80, 13, 0.08);
+  background: linear-gradient(180deg, var(--bthwani-brand-surface) 0%, var(--bthwani-control-panel-surface) 100%);
+  color: var(--bthwani-control-panel-brand);
+  border: 1px solid var(--bthwani-brand);
 }
 
 .ui-web-mission-hero-card__meta-chip {
   padding: 7px 11px;
-  border: 1px solid rgba(10, 47, 92, 0.12);
-  background: rgba(255, 255, 255, 0.82);
-  color: #334155;
+  border: 1px solid var(--bthwani-control-panel-border-strong);
+  background: var(--bthwani-control-panel-surface);
+  color: var(--bthwani-control-panel-text);
 }
 
 .ui-web-mission-hero-card__cta {
@@ -169,19 +169,19 @@ const webPageFrameCss = `
 
 .ui-web-mission-hero-card__cta:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(10, 47, 92, 0.12);
+  box-shadow: 0 8px 20px var(--bthwani-overlay-soft);
 }
 
 .ui-web-mission-hero-card__cta--secondary {
-  border: 1px solid rgba(10, 47, 92, 0.18);
-  color: #0A2F5C;
-  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid var(--bthwani-control-panel-border-strong);
+  color: var(--bthwani-control-panel-brand);
+  background: var(--bthwani-control-panel-surface);
 }
 
 .ui-web-mission-hero-card__cta--primary {
-  background: linear-gradient(135deg, #ff6a2f 0%, #FF500D 58%, #e94900 100%);
-  color: #ffffff;
-  box-shadow: 0 8px 18px rgba(255, 80, 13, 0.2);
+  background: linear-gradient(135deg, var(--bthwani-control-panel-brand) 0%, var(--bthwani-brand) 58%, var(--bthwani-brand) 100%);
+  color: var(--bthwani-brand-contrast);
+  box-shadow: 0 8px 18px var(--bthwani-overlay-soft);
 }
 
 .ui-web-section-card {
@@ -189,9 +189,9 @@ const webPageFrameCss = `
   gap: 12px;
   padding: 14px;
   border-radius: 14px;
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 249, 252, 0.96) 100%);
-  box-shadow: 0 8px 20px rgba(10, 47, 92, 0.04);
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: linear-gradient(180deg, var(--bthwani-control-panel-surface) 0%, var(--bthwani-control-panel-surface-raised) 100%);
+  box-shadow: 0 8px 20px var(--bthwani-overlay-soft);
 }
 
 .ui-web-section-card__header {
@@ -202,7 +202,7 @@ const webPageFrameCss = `
 .ui-web-section-card__title {
   margin: 0;
   font-size: 20px;
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   letter-spacing: 0;
 }
 
@@ -210,7 +210,7 @@ const webPageFrameCss = `
   margin: 0;
   font-size: 15px;
   line-height: 1.72;
-  color: #556a80;
+  color: var(--bthwani-control-panel-text-muted);
 }
 
 .ui-web-signal-card {
@@ -218,46 +218,46 @@ const webPageFrameCss = `
   gap: 8px;
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 249, 252, 0.94) 100%);
-  box-shadow: 0 6px 16px rgba(10, 47, 92, 0.04);
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: linear-gradient(180deg, var(--bthwani-control-panel-surface) 0%, var(--bthwani-control-panel-surface-raised) 100%);
+  box-shadow: 0 6px 16px var(--bthwani-overlay-soft);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .ui-web-signal-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(10, 47, 92, 0.08);
+  box-shadow: 0 8px 18px var(--bthwani-overlay-soft);
 }
 
 .ui-web-signal-card--best {
-  border-color: rgba(74, 222, 128, 0.22);
-  background: linear-gradient(180deg, #eefcf4 0%, #ffffff 100%);
+  border-color: var(--bthwani-success);
+  background: linear-gradient(180deg, var(--bthwani-success-surface) 0%, var(--bthwani-control-panel-surface) 100%);
 }
 
 .ui-web-signal-card--danger {
-  border-color: rgba(248, 113, 113, 0.24);
-  background: linear-gradient(180deg, #fff4f4 0%, #ffffff 100%);
+  border-color: var(--bthwani-danger);
+  background: linear-gradient(180deg, var(--bthwani-danger-surface) 0%, var(--bthwani-control-panel-surface) 100%);
 }
 
 .ui-web-signal-card--warning {
-  border-color: rgba(251, 191, 36, 0.22);
-  background: linear-gradient(180deg, #fffbef 0%, #ffffff 100%);
+  border-color: var(--bthwani-warning);
+  background: linear-gradient(180deg, var(--bthwani-warning-surface) 0%, var(--bthwani-control-panel-surface) 100%);
 }
 
 .ui-web-signal-card--info {
-  border-color: rgba(96, 165, 250, 0.24);
-  background: linear-gradient(180deg, #f2f8ff 0%, #ffffff 100%);
+  border-color: var(--bthwani-info);
+  background: linear-gradient(180deg, var(--bthwani-info-surface) 0%, var(--bthwani-control-panel-surface) 100%);
 }
 
 .ui-web-signal-card--brand {
-  border-color: rgba(255, 80, 13, 0.18);
-  background: linear-gradient(180deg, #fff5ee 0%, #ffffff 100%);
+  border-color: var(--bthwani-brand);
+  background: linear-gradient(180deg, var(--bthwani-brand-surface) 0%, var(--bthwani-control-panel-surface) 100%);
 }
 
 .ui-web-signal-card__title {
   margin: 0;
   font-size: 13px;
-  color: #52687f;
+  color: var(--bthwani-control-panel-text-muted);
   font-weight: 800;
 }
 
@@ -266,7 +266,7 @@ const webPageFrameCss = `
   font-size: 26px;
   line-height: 1;
   font-weight: 900;
-  color: #0A2F5C;
+  color: var(--bthwani-control-panel-brand);
   letter-spacing: 0;
 }
 
@@ -274,7 +274,7 @@ const webPageFrameCss = `
   margin: 0;
   font-size: 14px;
   line-height: 1.72;
-  color: #566c82;
+  color: var(--bthwani-control-panel-text-muted);
 }
 
 @media (max-width: 640px) {

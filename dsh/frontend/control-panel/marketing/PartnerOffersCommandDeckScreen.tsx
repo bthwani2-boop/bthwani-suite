@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, KeyValueList } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, KeyValueList, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getPartnerOfferItems,
@@ -23,6 +23,7 @@ type PartnerOfferEditorSection = 'details' | 'governance' | 'preview';
 const partnerOffersPageSize = 5;
 
 export function PartnerOffersCommandDeckScreen() {
+  const { theme } = useTheme();
   const [items, setItems] = React.useState<PartnerOfferRecord[]>(() => getPartnerOfferItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getPartnerOfferItems()[0]?.id ?? null);
   const selected = React.useMemo(() => items.find(i => i.id === selectedId) ?? null, [items, selectedId]);
@@ -291,14 +292,14 @@ export function PartnerOffersCommandDeckScreen() {
       {/* Header & KPIs */}
       <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
         {[
-          { label: 'واردة', value: kpis.inbound, color: '#0A2F5C' },
-          { label: 'مراجعة', value: kpis.review, color: '#D97706' },
-          { label: 'جاهز للتسويق', value: kpis.marketingReady, color: '#0A2F5C' },
-          { label: 'منشور', value: kpis.published, color: '#16A34A' },
-          { label: 'مرفوض', value: kpis.rejected, color: '#64748B' },
+          { label: 'واردة', value: kpis.inbound, color: theme.brandHeaderBackground },
+          { label: 'مراجعة', value: kpis.review, color: theme.warning },
+          { label: 'جاهز للتسويق', value: kpis.marketingReady, color: theme.brandHeaderBackground },
+          { label: 'منشور', value: kpis.published, color: theme.success },
+          { label: 'مرفوض', value: kpis.rejected, color: theme.textMuted },
         ].map(k => (
           <Surface key={k.label} tone="raised" padding={3} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 120, borderRadius: 10, borderLeftWidth: 3, borderLeftColor: k.color }}>
-            <Text role="caption" style={{ fontWeight: 800, color: '#64748B' }}>{k.label}</Text>
+            <Text role="caption" style={{ fontWeight: 800, color: theme.textMuted }}>{k.label}</Text>
             <Text role="titleSm" style={{ fontWeight: 900, color: k.color, marginTop: 4, fontSize: 18 }}>{k.value}</Text>
           </Surface>
         ))}
@@ -323,7 +324,7 @@ export function PartnerOffersCommandDeckScreen() {
       <Box layoutDirection="row" gap={4} style={{ flex: 1, minHeight: 0 }}>
         {/* Offers Table / List */}
         <Surface tone="raised" padding={0} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Box padding={4} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }} layoutDirection="row" justify="space-between" align="center">
+          <Box padding={4} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }} layoutDirection="row" justify="space-between" align="center">
             <Text role="bodyStrong">العروض ({filteredItems.length})</Text>
             <Button label="+ عرض جديد" tone="brand" size="sm" onPress={handleCreateNew} />
           </Box>
@@ -369,7 +370,7 @@ export function PartnerOffersCommandDeckScreen() {
 
         {/* Inspector / Editor Panel */}
         <Surface tone="raised" padding={0} style={{ flex: 2, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Box padding={4} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' }} layoutDirection="row" justify="space-between" align="center">
+          <Box padding={4} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }} layoutDirection="row" justify="space-between" align="center">
             <Text role="bodyStrong">{selected ? 'مفتش العرض' : 'إنشاء عرض جديد'}</Text>
             {renderActionButtons()}
           </Box>

@@ -5,9 +5,29 @@ import { useDirection, useUiLanguage, useUiText } from '../providers';
 const webCommandCenterCss = `
 .ui-web-command-center-root {
   --rail-width: 240px;
-  --bth-shell-line: rgba(10, 47, 92, 0.06);
-  --bth-deep-blue: #0A2F5C;
-  --bth-orange: #FF500D;
+  --bth-shell-background: var(--bthwani-control-panel-background);
+  --bth-shell-stage: var(--bthwani-control-panel-stage);
+  --bth-shell-surface: var(--bthwani-control-panel-surface);
+  --bth-shell-surface-raised: var(--bthwani-control-panel-surface-raised);
+  --bth-shell-surface-inset: var(--bthwani-control-panel-surface-inset);
+  --bth-shell-line: var(--bthwani-control-panel-border);
+  --bth-shell-line-strong: var(--bthwani-control-panel-border-strong);
+  --bth-shell-brand: var(--bthwani-control-panel-brand);
+  --bth-shell-brand-surface: var(--bthwani-control-panel-brand-surface);
+  --bth-shell-accent: var(--bthwani-brand);
+  --bth-shell-accent-surface: var(--bthwani-brand-surface);
+  --bth-shell-text: var(--bthwani-control-panel-text);
+  --bth-shell-text-muted: var(--bthwani-control-panel-text-muted);
+  --bth-shell-text-soft: var(--bthwani-control-panel-text-soft);
+  --bth-shell-field: var(--bthwani-control-panel-field);
+  --bth-shell-field-border: var(--bthwani-control-panel-field-border);
+  --bth-shell-focus-ring: var(--bthwani-control-panel-focus-ring);
+  --bth-shell-success: var(--bthwani-success);
+  --bth-shell-warning: var(--bthwani-warning);
+  --bth-shell-danger: var(--bthwani-danger);
+  --bth-shell-success-surface: var(--bthwani-success-surface);
+  --bth-shell-warning-surface: var(--bthwani-warning-surface);
+  --bth-shell-danger-surface: var(--bthwani-danger-surface);
   display: grid;
   grid-template-rows: 56px minmax(0, 1fr);
   gap: 0;
@@ -20,8 +40,8 @@ const webCommandCenterCss = `
   width: 100%;
   margin: 0;
   padding: 0;
-  background: #f8fafc;
-  color: var(--bth-text);
+  background: var(--bth-shell-background);
+  color: var(--bth-shell-text);
   overflow: hidden;
   overflow-x: hidden;
 }
@@ -33,7 +53,7 @@ const webCommandCenterCss = `
   gap: 20px;
   padding: 0 24px;
   min-width: 0;
-  background: #ffffff;
+  background: var(--bth-shell-surface);
   border-bottom: 1px solid var(--bth-shell-line);
   position: relative;
   z-index: 100;
@@ -56,7 +76,7 @@ const webCommandCenterCss = `
   font-family: inherit;
   font-size: 18px;
   font-weight: 800;
-  color: var(--bth-deep-blue);
+  color: var(--bth-shell-brand);
   letter-spacing: -0.02em;
   cursor: pointer;
 }
@@ -73,18 +93,18 @@ const webCommandCenterCss = `
   height: 42px;
   padding: 0 44px;
   border-radius: 12px;
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  background: rgba(10, 47, 92, 0.03);
+  border: 1px solid var(--bth-shell-field-border);
+  background: var(--bth-shell-field);
   font-size: 14px;
-  color: var(--bth-deep-blue);
+  color: var(--bth-shell-text);
   transition: all 0.2s ease;
 }
 
 .ui-web-command-strip__search-input:focus {
   outline: none;
-  background: #fff;
-  border-color: var(--bth-orange);
-  box-shadow: 0 0 0 4px rgba(255, 80, 13, 0.08);
+  background: var(--bth-shell-surface);
+  border-color: var(--bthwani-field-border-active);
+  box-shadow: 0 0 0 4px var(--bth-shell-focus-ring);
 }
 
 .ui-web-command-strip__search-icon {
@@ -92,7 +112,7 @@ const webCommandCenterCss = `
   top: 50%;
   inset-inline-start: 14px;
   transform: translateY(-50%);
-  color: #64748b;
+  color: var(--bth-shell-text-muted);
   font-size: 18px;
 }
 
@@ -100,7 +120,7 @@ const webCommandCenterCss = `
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  background: rgba(10, 47, 92, 0.04);
+  background: var(--bth-shell-surface-inset);
   padding: 4px;
   border-radius: 10px;
 }
@@ -111,7 +131,7 @@ const webCommandCenterCss = `
   border-radius: 7px;
   border: none;
   background: transparent;
-  color: #64748b;
+  color: var(--bth-shell-text-muted);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -122,9 +142,9 @@ const webCommandCenterCss = `
 }
 
 .ui-web-command-strip__filter-chip--active {
-  background: #fff;
-  color: var(--bth-deep-blue);
-  box-shadow: 0 2px 8px rgba(10, 47, 92, 0.08);
+  background: var(--bth-shell-surface);
+  color: var(--bth-shell-brand);
+  box-shadow: 0 0 0 1px var(--bth-shell-line);
 }
 
 .ui-web-command-strip__actions {
@@ -143,24 +163,24 @@ const webCommandCenterCss = `
   border-radius: 10px;
   border: 1px solid transparent;
   background: transparent;
-  color: #64748b;
+  color: var(--bth-shell-text-muted);
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 18px;
 }
 
 .ui-web-command-strip__action-btn:hover {
-  background: rgba(10, 47, 92, 0.05);
-  color: var(--bth-deep-blue);
+  background: var(--bth-shell-surface-inset);
+  color: var(--bth-shell-brand);
 }
 
 .ui-web-command-strip__user-profile {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--bth-deep-blue), #1e4b8a);
-  border: 2px solid #fff;
-  box-shadow: 0 4px 10px rgba(10, 47, 92, 0.15);
+  background: linear-gradient(135deg, var(--bth-shell-brand), var(--bth-shell-accent));
+  border: 2px solid var(--bth-shell-surface);
+  box-shadow: 0 4px 10px var(--bthwani-overlay-soft);
   cursor: pointer;
 }
 
@@ -181,7 +201,7 @@ const webCommandCenterCss = `
 
 .ui-web-command-center__rail {
   grid-area: rail;
-  background: #fff;
+  background: var(--bth-shell-surface);
   border-inline-end: 1px solid var(--bth-shell-line);
   padding: 14px 10px;
   display: flex;
@@ -208,7 +228,7 @@ const webCommandCenterCss = `
 }
 
 .ui-web-command-center__rail-navigation-label {
-  color: #64748b;
+  color: var(--bth-shell-text-muted);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -221,17 +241,17 @@ const webCommandCenterCss = `
   width: fit-content;
   padding: 4px 8px;
   border-radius: 999px;
-  background: rgba(10, 47, 92, 0.06);
-  color: var(--bth-deep-blue);
+  background: var(--bth-shell-brand-surface);
+  color: var(--bth-shell-brand);
   font-size: 11px;
   font-weight: 800;
 }
 
 .ui-web-command-center__rail-toggle {
   appearance: none;
-  border: 1px solid rgba(10, 47, 92, 0.08);
-  background: linear-gradient(180deg, #ffffff 0%, #f4f8fb 100%);
-  color: var(--bth-deep-blue);
+  border: 1px solid var(--bth-shell-line-strong);
+  background: linear-gradient(180deg, var(--bth-shell-surface) 0%, var(--bth-shell-surface-raised) 100%);
+  color: var(--bth-shell-brand);
   width: 32px;
   height: 32px;
   border-radius: 10px;
@@ -241,7 +261,7 @@ const webCommandCenterCss = `
   cursor: pointer;
   font-size: 16px;
   font-weight: 900;
-  box-shadow: 0 4px 12px rgba(10, 47, 92, 0.06);
+  box-shadow: 0 4px 12px var(--bthwani-overlay-soft);
 }
 
 .ui-web-command-center__rail-nav {
@@ -262,7 +282,7 @@ const webCommandCenterCss = `
   border-radius: 14px;
   border: 1px solid transparent;
   background: transparent;
-  color: #64748b;
+  color: var(--bth-shell-text-muted);
   text-decoration: none;
   font-size: 14px;
   font-weight: 700;
@@ -273,15 +293,15 @@ const webCommandCenterCss = `
 }
 
 .ui-web-command-center__rail-item:hover {
-  background: rgba(10, 47, 92, 0.04);
-  color: var(--bth-deep-blue);
+  background: var(--bth-shell-surface-inset);
+  color: var(--bth-shell-brand);
 }
 
 .ui-web-command-center__rail-item--active {
-  background: rgba(255, 80, 13, 0.1);
-  color: var(--bth-orange);
-  border-color: rgba(255, 80, 13, 0.18);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  background: var(--bth-shell-accent-surface);
+  color: var(--bth-shell-accent);
+  border-color: var(--bth-shell-accent);
+  box-shadow: inset 0 0 0 1px var(--bth-shell-surface);
 }
 
 .ui-web-command-center__rail-item-icon {
@@ -306,8 +326,8 @@ const webCommandCenterCss = `
   flex: 0 0 auto;
   padding: 3px 7px;
   border-radius: 999px;
-  background: rgba(10, 47, 92, 0.08);
-  color: #64748b;
+  background: var(--bth-shell-surface-inset);
+  color: var(--bth-shell-text-muted);
   font-size: 10px;
   font-weight: 800;
   white-space: nowrap;
@@ -321,7 +341,7 @@ const webCommandCenterCss = `
   margin-bottom: 8px;
   border: none;
   background: transparent;
-  color: var(--bth-orange);
+  color: var(--bth-shell-accent);
   font-weight: 800;
   font-size: 13px;
   cursor: pointer;
@@ -332,7 +352,7 @@ const webCommandCenterCss = `
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: var(--bth-shell-text-soft);
   letter-spacing: 0.05em;
 }
 
@@ -342,7 +362,7 @@ const webCommandCenterCss = `
   flex-direction: column;
   gap: 16px;
   padding: 18px 20px;
-  background: #f8fafc;
+  background: var(--bth-shell-stage);
   height: 100%;
   min-width: 0;
   min-height: 0;
@@ -365,9 +385,9 @@ const webCommandCenterCss = `
   inset-inline-end: 8px;
   width: 8px;
   height: 8px;
-  background: var(--bth-orange);
+  background: var(--bth-shell-accent);
   border-radius: 50%;
-  border: 2px solid #fff;
+  border: 2px solid var(--bth-shell-surface);
 }
 
 .ui-web-command-center-root[data-rail-collapsed="true"] {
@@ -423,16 +443,16 @@ const webCommandCenterCss = `
   gap: 8px;
   align-items: center;
   padding: 8px 14px;
-  background: #FFFFFF;
-  border-bottom: 1px solid rgba(10,47,92,0.06);
+  background: var(--bth-shell-surface);
+  border-bottom: 1px solid var(--bth-shell-line);
   overflow: hidden;
 }
 .ui-web-cp-kpi-item {
   display: flex;
   flex-direction: column;
   padding: 8px 12px;
-  background: #FFFFFF;
-  border: 1px solid rgba(10,47,92,0.08);
+  background: var(--bth-shell-surface);
+  border: 1px solid var(--bth-shell-line-strong);
   border-radius: 12px;
   min-width: 110px;
   flex-shrink: 0;
@@ -440,18 +460,18 @@ const webCommandCenterCss = `
 .ui-web-cp-kpi-item__label {
   font-size: 11px;
   font-weight: 800;
-  color: #64748B;
+  color: var(--bth-shell-text-muted);
   letter-spacing: 0;
 }
 .ui-web-cp-kpi-item__value {
   font-size: 16px;
   font-weight: 900;
-  color: #0A2F5C;
+  color: var(--bth-shell-brand);
   line-height: 1.2;
 }
-.ui-web-cp-kpi-item--danger .ui-web-cp-kpi-item__value { color: #DC2626; }
-.ui-web-cp-kpi-item--warning .ui-web-cp-kpi-item__value { color: #D97706; }
-.ui-web-cp-kpi-item--success .ui-web-cp-kpi-item__value { color: #16A34A; }
+.ui-web-cp-kpi-item--danger .ui-web-cp-kpi-item__value { color: var(--bth-shell-danger); }
+.ui-web-cp-kpi-item--warning .ui-web-cp-kpi-item__value { color: var(--bth-shell-warning); }
+.ui-web-cp-kpi-item--success .ui-web-cp-kpi-item__value { color: var(--bth-shell-success); }
 
 /* === ControlPanel: WorkspaceTabs === */
 .ui-web-cp-workspace-tabs {
@@ -460,8 +480,8 @@ const webCommandCenterCss = `
   align-items: center;
   gap: 8px;
   padding: 10px 14px 8px;
-  background: #FFFFFF;
-  border-bottom: 1px solid rgba(10,47,92,0.08);
+  background: var(--bth-shell-surface);
+  border-bottom: 1px solid var(--bth-shell-line-strong);
   overflow: hidden;
 }
 .ui-web-cp-workspace-tab {
@@ -470,9 +490,9 @@ const webCommandCenterCss = `
   border-radius: 999px;
   font-size: 13px;
   font-weight: 700;
-  color: #64748B;
-  background: #FFFFFF;
-  border: 1px solid rgba(10,47,92,0.12);
+  color: var(--bth-shell-text-muted);
+  background: var(--bth-shell-surface);
+  border: 1px solid var(--bth-shell-line-strong);
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
@@ -480,9 +500,9 @@ const webCommandCenterCss = `
   align-items: center;
   gap: 6px;
 }
-.ui-web-cp-workspace-tab:hover { background: rgba(10,47,92,0.03); color: #0A2F5C; }
-.ui-web-cp-workspace-tab--active { background: #FF500D; color: #FFFFFF; border-color: #FF500D; box-shadow: 0 8px 18px rgba(255, 80, 13, 0.18); }
-.ui-web-cp-workspace-tab--active:hover { background: #e94900; }
+.ui-web-cp-workspace-tab:hover { background: var(--bth-shell-surface-inset); color: var(--bth-shell-brand); }
+.ui-web-cp-workspace-tab--active { background: var(--bth-shell-accent); color: var(--bthwani-brand-contrast); border-color: var(--bth-shell-accent); box-shadow: 0 8px 18px var(--bthwani-overlay-soft); }
+.ui-web-cp-workspace-tab--active:hover { background: var(--bth-shell-brand); }
 
 /* === ControlPanel: SubTabs === */
 .ui-web-cp-sub-tabs {
@@ -491,8 +511,8 @@ const webCommandCenterCss = `
   align-items: center;
   gap: 8px;
   padding: 8px 14px 10px;
-  background: #F8FAFC;
-  border-bottom: 1px solid rgba(10,47,92,0.06);
+  background: var(--bth-shell-stage);
+  border-bottom: 1px solid var(--bth-shell-line);
   overflow: hidden;
 }
 .ui-web-cp-sub-tab {
@@ -500,25 +520,25 @@ const webCommandCenterCss = `
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
-  color: #64748B;
-  background: #FFFFFF;
-  border: 1px solid rgba(10,47,92,0.08);
+  color: var(--bth-shell-text-muted);
+  background: var(--bth-shell-surface);
+  border: 1px solid var(--bth-shell-line);
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
 }
-.ui-web-cp-sub-tab:hover { background: rgba(10,47,92,0.03); color: #0A2F5C; }
-.ui-web-cp-sub-tab--active { background: rgba(255, 80, 13, 0.1); color: #FF500D; border-color: rgba(255, 80, 13, 0.22); }
+.ui-web-cp-sub-tab:hover { background: var(--bth-shell-surface-inset); color: var(--bth-shell-brand); }
+.ui-web-cp-sub-tab--active { background: var(--bth-shell-accent-surface); color: var(--bth-shell-accent); border-color: var(--bth-shell-accent); }
 
 .ui-web-command-center__hero { margin-bottom: 16px; }
 .ui-web-command-center__hero-title {
   font-size: 32px;
   font-weight: 900;
-  color: #0A2F5C;
+  color: var(--bth-shell-brand);
   margin: 0;
 }
 .ui-web-command-center__hero-subtitle {
-  color: #64748b;
+  color: var(--bth-shell-text-muted);
   font-size: 16px;
   margin: 8px 0 0;
 }
@@ -557,6 +577,7 @@ export type WebCommandStripProps = {
   languageLabel?: string;
   alertCountLabel?: string;
   refreshLabel?: string;
+  profileControl?: ReactNode;
   filters?: ReadonlyArray<WebCommandStripFilter>;
   onFilterSelect?: (filterId: string) => void;
   onBrandClick?: () => void;
@@ -573,6 +594,7 @@ export function WebCommandStrip({
   languageLabel,
   alertCountLabel = '1',
   filters = [],
+  profileControl,
   onFilterSelect,
   onBrandClick,
   onSearchClick,
@@ -635,7 +657,7 @@ export function WebCommandStrip({
           <button type="button" className="ui-web-command-strip__action-btn" onClick={resolvedLanguageClick}>
             {resolvedLanguageLabel}
           </button>
-          <div className="ui-web-command-strip__user-profile" title="ملف المستخدم" />
+          {profileControl ?? <div className="ui-web-command-strip__user-profile" title={brandLabel} />}
         </div>
       </header>
     </>
@@ -651,6 +673,7 @@ export type WebCommandCenterFrameProps = {
   languageLabel?: string;
   alertCountLabel?: string;
   refreshLabel?: string;
+  profileControl?: ReactNode;
   topFilters?: ReadonlyArray<WebCommandCenterFilter>;
   onTopFilterSelect?: (filterId: string) => void;
   onBrandClick?: () => void;
@@ -675,6 +698,7 @@ export function WebCommandCenterFrame({
   languageLabel,
   alertCountLabel = '1',
   refreshLabel,
+  profileControl,
   topFilters = [],
   onTopFilterSelect,
   onBrandClick,
@@ -714,6 +738,7 @@ export function WebCommandCenterFrame({
           languageLabel={languageLabel}
           alertCountLabel={alertCountLabel}
           refreshLabel={refreshLabel}
+          profileControl={profileControl}
           filters={topFilters}
           onFilterSelect={onTopFilterSelect}
           onBrandClick={onBrandClick}

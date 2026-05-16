@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getGrowthRecommendations,
@@ -22,6 +22,7 @@ export type GrowthCommandDeckScreenProps = {
 const growthRecommendationsPageSize = 5;
 
 export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab }: GrowthCommandDeckScreenProps) {
+  const { theme } = useTheme();
   const recommendations = React.useMemo(() => getGrowthRecommendations(), []);
   const [selectedRecId, setSelectedRecId] = React.useState<string | null>(recommendations[0]?.id || null);
   const [recommendationsPage, setRecommendationsPage] = React.useState(1);
@@ -68,10 +69,10 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return '#DC2626';
-      case 'high': return '#D97706';
-      case 'medium': return '#0284C7';
-      default: return '#0A2F5C';
+      case 'critical': return theme.danger;
+      case 'high': return theme.warning;
+      case 'medium': return theme.info;
+      default: return theme.brandHeaderBackground;
     }
   };
 
@@ -137,20 +138,55 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
   }), []);
 
   const parityFeatures = React.useMemo(() => mapStoreCommercialFeatures(parityContext), [parityContext]);
+  const styles = React.useMemo(() => StyleSheet.create({
+    columnSurface: {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      borderRadius: 16,
+      padding: 16,
+    },
+    queueBody: {
+      flex: 1,
+      minHeight: 0,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 12,
+      marginBottom: 8,
+    },
+    detailRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingVertical: 4,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.line,
+    },
+    detailLabel: {
+      color: theme.textMuted,
+      fontWeight: '700',
+    },
+    detailValue: {
+      color: theme.brandHeaderBackground,
+      fontWeight: '800',
+    }
+  }), [theme]);
 
   return (
     <Box gap={4} padding={4} style={{ flex: 1 }}>
-      <Surface tone="raised" gap={2} style={{ borderRadius: 16, borderWidth: 1, borderColor: 'rgba(10,47,92,0.05)', padding: 16 }}>
+      <Surface tone="raised" gap={2} style={{ borderRadius: 16, borderWidth: 1, borderColor: theme.line, padding: 16 }}>
         <Box gap={1}>
-          <Text role="caption" style={{ color: '#0A2F5C', fontWeight: '800', letterSpacing: 0.5, textAlign: 'right' }}>مركز ذكاء النمو</Text>
+          <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: '800', letterSpacing: 0.5, textAlign: 'right' }}>مركز ذكاء النمو</Text>
           <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', textAlign: 'right' }}>التوصيات والفرص الذكية</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>يتم استنتاج هذه التوصيات بناءً على تحليل فجوات الكتالوج، الحملات، والولاء.</Text>
         </Box>
       </Surface>
 
-      <Surface tone="inset" gap={3} style={{ borderRadius: 16, padding: 16, backgroundColor: '#F8FAFC' }}>
+      <Surface tone="inset" gap={3} style={{ borderRadius: 16, padding: 16, backgroundColor: theme.surfaceInset }}>
         <Box gap={1}>
-          <Text role="titleSm" style={{ color: '#0A2F5C', fontWeight: '800' }}>معاينة التوافق التجاري</Text>
+          <Text role="titleSm" style={{ color: theme.brandHeaderBackground, fontWeight: '800' }}>معاينة التوافق التجاري</Text>
           <Text role="caption" tone="muted">يتم فحص مصادر البيانات لضمان عدم ظهور شارات بدون تصريح أو تضارب بين الحملات.</Text>
         </Box>
         <CommercialParityPreview features={parityFeatures} storeName="متجر النخبة (معاينة)" />
@@ -161,7 +197,7 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
         <Box style={{ flex: 1, minWidth: 320 }}>
           <Surface tone="inset" gap={3} style={styles.columnSurface}>
             <View style={styles.headerRow}>
-              <Text role="titleSm" style={{ color: '#0A2F5C' }}>طابور الفرص والتوصيات</Text>
+              <Text role="titleSm" style={{ color: theme.brandHeaderBackground }}>طابور الفرص والتوصيات</Text>
               <Text role="caption" tone="muted">{recommendations.length} توصية</Text>
             </View>
 
@@ -173,8 +209,8 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
                       flexDirection: 'row',
                       borderRadius: 12,
                       borderWidth: 1,
-                      borderColor: selectedRecId === rec.id ? '#FF500D' : '#e5e7eb',
-                      backgroundColor: '#ffffff',
+                      borderColor: selectedRecId === rec.id ? theme.brand : theme.line,
+                      backgroundColor: theme.surface,
                       padding: 14,
                       gap: 12,
                       alignItems: 'flex-start',
@@ -184,7 +220,7 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
                       <Text style={{ fontSize: 20 }}>{renderRecommendationIcon(rec.type)}</Text>
                     </View>
                     <Box style={{ flex: 1 }}>
-                      <Text role="bodyStrong" style={{ color: '#0A2F5C', textAlign: 'right' }}>{rec.title}</Text>
+                      <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, textAlign: 'right' }}>{rec.title}</Text>
                       <Text role="caption" style={{ color: getSeverityColor(rec.severity), fontWeight: '800', marginTop: 2, textAlign: 'right' }}>
                         الأهمية: {getSeverityLabel(rec.severity)}
                       </Text>
@@ -209,12 +245,12 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
             <Box gap={3} style={{ flex: 1 }}>
               <Surface tone="raised" gap={4} style={styles.columnSurface}>
                 <View style={styles.headerRow}>
-                  <Text role="titleSm" style={{ color: '#0A2F5C' }}>تفاصيل التوصية</Text>
-                  <Text role="caption" style={{ backgroundColor: '#F1F5F9', paddingVertical: 2, paddingHorizontal: 8, borderRadius: 4, fontWeight: '800' }}>{selectedRec.id}</Text>
+                  <Text role="titleSm" style={{ color: theme.brandHeaderBackground }}>تفاصيل التوصية</Text>
+                  <Text role="caption" style={{ backgroundColor: theme.surfaceInset, paddingVertical: 2, paddingHorizontal: 8, borderRadius: 4, fontWeight: '800' }}>{selectedRec.id}</Text>
                 </View>
 
                 <Box gap={2}>
-                  <Text role="titleMd" style={{ color: '#0A2F5C', fontWeight: '900', textAlign: 'right' }}>{selectedRec.title}</Text>
+                  <Text role="titleMd" style={{ color: theme.brandHeaderBackground, fontWeight: '900', textAlign: 'right' }}>{selectedRec.title}</Text>
                   <Text role="bodyMd" tone="muted" style={{ lineHeight: 22, textAlign: 'right' }}>{selectedRec.description}</Text>
                 </Box>
 
@@ -235,7 +271,7 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
                     </View>
                     <View style={styles.detailRow}>
                       <Text role="caption" style={styles.detailLabel}>الموثوقية:</Text>
-                      <Text role="caption" style={{ ...styles.detailValue, color: '#16A34A' }}>{getConfidenceLabel(selectedRec.confidence)}</Text>
+                      <Text role="caption" style={{ ...styles.detailValue, color: theme.success }}>{getConfidenceLabel(selectedRec.confidence)}</Text>
                     </View>
                   </Box>
                 </Surface>
@@ -265,41 +301,5 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
     </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  columnSurface: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    borderRadius: 16,
-    padding: 16,
-  },
-  queueBody: {
-    flex: 1,
-    minHeight: 0,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginBottom: 8,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.03)',
-  },
-  detailLabel: {
-    color: '#64748B',
-    fontWeight: '700',
-  },
-  detailValue: {
-    color: '#0A2F5C',
-    fontWeight: '800',
-  }
-});
 
 export default GrowthCommandDeckScreen;

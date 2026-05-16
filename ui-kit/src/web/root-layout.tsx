@@ -10,8 +10,8 @@ import {
 
 const webRootBodyCss = `
 html {
-  color-scheme: var(--bth-color-scheme, light);
-  background: var(--bth-background);
+  color-scheme: var(--bthwani-color-scheme, light);
+  background: var(--bthwani-background);
   height: 100%;
   min-height: 100vh;
 }
@@ -21,8 +21,8 @@ body.bth-web-root-body, body.ui-web-root-body, html, #__next {
   margin: 0;
   height: 100%;
   min-height: 100vh;
-  background: var(--bth-background);
-  color: var(--bth-text);
+  background: var(--bthwani-background);
+  color: var(--bthwani-text);
   font-family: var(--bth-font-family-latin), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   overflow-x: hidden;
 }
