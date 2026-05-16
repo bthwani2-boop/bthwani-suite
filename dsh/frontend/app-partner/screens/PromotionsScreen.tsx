@@ -3,36 +3,25 @@ import {
   Box,
   Button,
   Chip,
-  KeyValueList,
   ListItem,
   MobileStickyPrimaryAction,
   StateView,
   Surface,
   Text,
+  TextField,
+  SelectField,
   useDirection,
+  useTheme,
 } from '@bthwani/ui-kit';
+import {
+  getPartnerOfferItems,
+  upsertPartnerOfferItem,
+  type PartnerOfferRecord,
+  type PartnerOfferStatus,
+  type PartnerOfferType,
+} from '../../shared/partner-offer.preview-store';
 
 type AnalyticsWorkspaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-analytics' | 'no-campaigns';
-
-type MetricTone = 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
-
-type MetricTileProps = {
-  label: string;
-  value: string;
-  tone?: MetricTone;
-};
-
-type RecommendationCardProps = {
-  title: string;
-  reason: string;
-  actionLabel: string;
-};
-
-type OfferLineProps = {
-  label: string;
-  value: string;
-  tone?: MetricTone;
-};
 
 export type PromotionsScreenProps = {
   storeName: string;
@@ -42,147 +31,57 @@ export type PromotionsScreenProps = {
   state?: AnalyticsWorkspaceState;
 };
 
-const summaryMetrics = [
-  { label: 'مبيعات اليوم', value: '1,280 ر.س', tone: 'brand' as const },
-  { label: 'معدل الإكمال', value: '84%', tone: 'success' as const },
-  { label: 'أفضل فئة', value: 'برغر مميز', tone: 'info' as const },
-  { label: 'فرصة النمو', value: '12% رفع محتمل', tone: 'warning' as const },
-] as const;
+type IntakeFormState = {
+  open: boolean;
+  title: string;
+  offerType: PartnerOfferType;
+  valueLabel: string;
+  eligibility: string;
+};
 
-const recommendations = [
-  {
-    title: 'فعّل عرضًا على المنتجات الأكثر طلبًا',
-    reason: 'البرغر والوجبات العائلية تسحب معظم الطلب هذا الأسبوع.',
-    actionLabel: 'إنشاء عرض',
-  },
-  {
-    title: 'راقب الصنف منخفض التوفر',
-    reason: 'أحد المنتجات القريبة من النفاد يحتاج إشارة دعم قبل الذروة.',
-    actionLabel: 'مراجعة',
-  },
-  {
-    title: 'حسّن زمن التجهيز في وقت الذروة',
-    reason: 'التحضير يطول قليلًا بعد 7 مساءً مقارنة ببداية النوبة.',
-    actionLabel: 'لاحقًا',
-  },
-] as const;
+const INITIAL_FORM: IntakeFormState = {
+  open: false,
+  title: '',
+  offerType: 'discount',
+  valueLabel: '',
+  eligibility: 'الكل',
+};
 
-const activeOffers = [
-  {
-    label: 'الحالة الحالية',
-    value: 'عرض نهاية الأسبوع نشط',
-    tone: 'success' as const,
-  },
-  {
-    label: 'خصم مقترح',
-    value: '10% على الوجبات الأعلى طلبًا',
-    tone: 'brand' as const,
-  },
-  {
-    label: 'حملة مقترحة',
-    value: 'اشترِ أكثر ووفّر',
-    tone: 'warning' as const,
-  },
-] as const;
-
-const growthItems = [
-  {
-    title: 'برغر كلاسيك',
-    subtitle: 'أفضل منتج في اليوم الحالي.',
-    meta: '1,280 ر.س مبيعات',
-    badgeLabel: 'Top',
-  },
-  {
-    title: 'حلويات',
-    subtitle: 'فئة ترتفع بسرعة مع الطلبات المسائية.',
-    meta: '+18% هذا الأسبوع',
-    badgeLabel: 'Rise',
-  },
-  {
-    title: 'بطاطس حارة',
-    subtitle: 'يستفيد من عرض محدود لرفع التحويل.',
-    meta: 'يحتاج دعمًا تسويقيًا',
-    badgeLabel: 'Promo',
-  },
-  {
-    title: 'عصير ليمون',
-    subtitle: 'أداء أضعف بعد الذروة ويحتاج مراجعة.',
-    meta: 'راجع التسعير',
-    badgeLabel: 'Watch',
-  },
-] as const;
-
-const planItems = [
-  { label: 'الخطة الحالية', value: 'Growth Plus', tone: 'brand' as const },
-  { label: 'حالة الاشتراك', value: 'نشط حتى 14 يومًا', tone: 'success' as const },
-  { label: 'ميزة مقترحة', value: 'عروض موجهة حسب السلة', tone: 'info' as const },
-  { label: 'إيقاع المراجعة', value: 'أسبوعي', tone: 'default' as const },
-] as const;
-
-function MetricTile({ label, value, tone = 'default' }: MetricTileProps) {
-  return (
-    <Surface tone="default" padding={3} gap={1} style={{ flex: 1, minWidth: 118, borderWidth: 1 }}>
-      <Text role="caption" tone="muted" numberOfLines={1}>
-        {label}
-      </Text>
-      <Text role="bodyStrong" tone={tone} numberOfLines={2}>
-        {value}
-      </Text>
-    </Surface>
-  );
+function translateStatus(status: PartnerOfferStatus): { label: string; tone: 'default' | 'warning' | 'brand' | 'success' | 'danger' } {
+  switch (status) {
+    case 'inbound': return { label: 'في الانتظار', tone: 'default' };
+    case 'review': return { label: 'قيد المراجعة', tone: 'warning' };
+    case 'marketing-ready': return { label: 'جاهز للنشر', tone: 'brand' };
+    case 'published': return { label: 'نشط', tone: 'success' };
+    case 'paused': return { label: 'موقوف', tone: 'warning' };
+    case 'rejected': return { label: 'مرفوض', tone: 'danger' };
+    case 'archived': return { label: 'مؤرشف', tone: 'default' };
+    default: return { label: status, tone: 'default' };
+  }
 }
 
-function RecommendationCard({ title, reason, actionLabel }: RecommendationCardProps) {
-  return (
-    <Surface tone="default" padding={3} gap={2}>
-      <Box gap={1}>
-        <Text role="bodyStrong" numberOfLines={2}>
-          {title}
-        </Text>
-        <Text role="bodySm" tone="muted" numberOfLines={2}>
-          {reason}
-        </Text>
-      </Box>
-      <Button label={actionLabel} size="sm" tone="secondary" fullWidth={false} />
-    </Surface>
-  );
-}
-
-function OfferLine({ label, value, tone = 'default' }: OfferLineProps) {
-  return (
-    <Box gap={1} style={{ flex: 1, minWidth: 128 }}>
-      <Text role="caption" tone="muted">
-        {label}
-      </Text>
-      <Text role="bodyMd" tone={tone} numberOfLines={2}>
-        {value}
-      </Text>
-    </Box>
-  );
+function translateOfferType(type: PartnerOfferType): string {
+  switch (type) {
+    case 'discount': return 'خصم مباشر';
+    case 'free-delivery': return 'توصيل مجاني';
+    case 'bundle': return 'حزمة';
+    case 'buy-x-get-y': return 'اشتر واحصل على';
+    case 'coupon': return 'كوبون';
+    default: return type;
+  }
 }
 
 function renderState(state: Exclude<AnalyticsWorkspaceState, 'ready'>) {
   if (state === 'loading') {
-    return <StateView stateId="loading" title="جارٍ تجهيز التحليلات" description="نستعرض الآن مؤشرات النمو والعروض داخل نفس المساحة." />;
+    return <StateView stateId="loading" title="جارٍ تجهيز العروض" description="يتم الآن تحميل بيانات عروضك." />;
   }
-
   if (state === 'empty') {
-    return <StateView stateId="empty" title="لا توجد بيانات بعد" description="ستظهر ملخصات الأداء عندما تتوفر أول مجموعة بيانات محلية." />;
+    return <StateView stateId="empty" title="لا توجد عروض بعد" description="يمكنك تقديم أول عرض مقترح الآن." />;
   }
-
   if (state === 'offline') {
-    return <StateView stateId="offline" title="التحليلات غير متصلة" description="أعد المحاولة عند عودة الاتصال أو اعتمد على الملخص المحلي الحالي." />;
+    return <StateView stateId="offline" title="غير متصل" description="أعد المحاولة عند عودة الاتصال." />;
   }
-
-  if (state === 'no-analytics') {
-    return <StateView stateId="empty" title="لا توجد بيانات تحليلية كافية" description="أكمل النشاط اليومي أولًا ثم أعد فتح مساحة النمو." actionLabel="مراجعة الخطة" />;
-  }
-
-  if (state === 'no-campaigns') {
-    return <StateView stateId="empty" title="لا توجد حملات تسويقية مفعلة" description="يمكنك إنشاء أول عرض سريع من نفس الصفحة دون مغادرة السطح." actionLabel="إنشاء عرض سريع" />;
-  }
-
-  return <StateView stateId="recoverableError" title="تعذر فتح التحليلات" description="حدث خلل مؤقت. أعد المحاولة من دون فقدان السياق." />;
+  return <StateView stateId="recoverableError" title="تعذر فتح العروض" description="حدث خلل مؤقت. أعد المحاولة." />;
 }
 
 export function PromotionsScreen({
@@ -193,118 +92,216 @@ export function PromotionsScreen({
   state = 'ready',
 }: PromotionsScreenProps) {
   const { direction } = useDirection();
-  const [toolMessage, setToolMessage] = React.useState('التوصيات محلية وتُحدث قرار التسويق داخل الصفحة فقط.');
-  const [marketingView, setMarketingView] = React.useState<'active' | 'suggested'>('active');
+  const { theme } = useTheme();
+  const [offers, setOffers] = React.useState<PartnerOfferRecord[]>([]);
+  const [form, setForm] = React.useState<IntakeFormState>(INITIAL_FORM);
+  const [submitMessage, setSubmitMessage] = React.useState('');
+
+  React.useEffect(() => {
+    const all = getPartnerOfferItems();
+    setOffers(all.filter(o => o.partnerName === storeName || o.storeLabel === storeName || o.source === 'partner'));
+  }, [storeName]);
 
   if (state !== 'ready') {
     return renderState(state);
   }
 
+  const handleSubmitOffer = () => {
+    if (!form.title.trim() || !form.valueLabel.trim()) {
+      setSubmitMessage('يرجى ملء عنوان العرض وقيمته قبل الإرسال.');
+      return;
+    }
+    upsertPartnerOfferItem({
+      title: form.title.trim(),
+      partnerName: storeName,
+      storeLabel: storeName,
+      storeId: '',
+      productId: '',
+      productLabel: '',
+      category: '',
+      offerType: form.offerType,
+      status: 'inbound',
+      source: 'partner',
+      valueLabel: form.valueLabel.trim(),
+      eligibility: form.eligibility.trim() || 'الكل',
+      displayBadge: form.valueLabel.trim(),
+    });
+    const updated = getPartnerOfferItems();
+    setOffers(updated.filter(o => o.partnerName === storeName || o.storeLabel === storeName || o.source === 'partner'));
+    setForm(INITIAL_FORM);
+    setSubmitMessage('تم إرسال العرض للمراجعة. سيتم إخطارك عند اتخاذ قرار.');
+  };
+
+  const activeOffers = offers.filter(o => o.status === 'published');
+  const pendingOffers = offers.filter(o => o.status === 'inbound' || o.status === 'review' || o.status === 'marketing-ready');
+  const rejectedOffers = offers.filter(o => o.status === 'rejected');
+
   return (
     <Box gap={4}>
-      <Surface tone="raised" padding={3} gap={3}>
-        <Text role="label" tone="muted">
-          نظرة سريعة
+      {/* Partner + Context */}
+      <Surface tone="raised" padding={3} gap={2}>
+        <Text role="titleSm">{storeName}</Text>
+        <Text role="caption" tone="muted">
+          {branchLabel} · {activeZoneLabel} · {todayHoursLabel}
         </Text>
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap' }} gap={2}>
-          {summaryMetrics.map((metric) => (
-            <MetricTile key={metric.label} label={metric.label} value={metric.value} tone={metric.tone} />
-          ))}
+      </Surface>
+
+      {/* Active Offers */}
+      <Surface tone="raised" padding={3} gap={3}>
+        <Box gap={1}>
+          <Text role="titleSm">العروض النشطة</Text>
+          <Text role="bodySm" tone="muted">
+            العروض التي اجتازت المراجعة وهي مرئية حالياً للعملاء.
+          </Text>
         </Box>
+        {activeOffers.length === 0 ? (
+          <Text role="bodySm" tone="muted">لا توجد عروض نشطة حالياً.</Text>
+        ) : (
+          <Box gap={2}>
+            {activeOffers.map(offer => {
+              const statusMeta = translateStatus(offer.status);
+              return (
+                <ListItem
+                  key={offer.id}
+                  title={offer.title}
+                  subtitle={`${translateOfferType(offer.offerType)} · ${offer.valueLabel}`}
+                  meta={offer.activeFromDate && offer.activeToDate ? `${offer.activeFromDate} → ${offer.activeToDate}` : undefined}
+                  badgeLabel={statusMeta.label}
+                  badgeTone={statusMeta.tone}
+                />
+              );
+            })}
+          </Box>
+        )}
+      </Surface>
+
+      {/* Pending / In-Review Offers */}
+      {pendingOffers.length > 0 && (
+        <Surface tone="raised" padding={3} gap={3}>
+          <Box gap={1}>
+            <Text role="titleSm">العروض قيد المراجعة</Text>
+            <Text role="bodySm" tone="muted">
+              هذه العروض وصلت للفريق التسويقي ويتم دراستها. لا يمكنك نشرها مباشرة.
+            </Text>
+          </Box>
+          <Box gap={2}>
+            {pendingOffers.map(offer => {
+              const statusMeta = translateStatus(offer.status);
+              return (
+                <ListItem
+                  key={offer.id}
+                  title={offer.title}
+                  subtitle={`${translateOfferType(offer.offerType)} · ${offer.valueLabel}`}
+                  badgeLabel={statusMeta.label}
+                  badgeTone={statusMeta.tone}
+                />
+              );
+            })}
+          </Box>
+        </Surface>
+      )}
+
+      {/* Rejected Offers with reason */}
+      {rejectedOffers.length > 0 && (
+        <Surface tone="raised" padding={3} gap={3}>
+          <Box gap={1}>
+            <Text role="titleSm">العروض المرفوضة</Text>
+            <Text role="bodySm" tone="muted">
+              يمكنك مراجعة سبب الرفض وتعديل العرض وإعادة تقديمه.
+            </Text>
+          </Box>
+          <Box gap={2}>
+            {rejectedOffers.map(offer => (
+              <Surface key={offer.id} tone="inset" padding={3} gap={2}>
+                <Text role="bodyStrong">{offer.title}</Text>
+                <Text role="bodySm" tone="muted">{translateOfferType(offer.offerType)} · {offer.valueLabel}</Text>
+                {offer.rejectionReason ? (
+                  <Surface tone="raised" padding={2} gap={1} style={{ borderWidth: 1, borderColor: theme.line }}>
+                    <Text role="caption" style={{ fontWeight: '800', color: theme.danger }}>سبب الرفض:</Text>
+                    <Text role="caption" tone="muted">{offer.rejectionReason}</Text>
+                  </Surface>
+                ) : (
+                  <Text role="caption" tone="muted">لم يُذكر سبب. تواصل مع الفريق التسويقي للاستيضاح.</Text>
+                )}
+              </Surface>
+            ))}
+          </Box>
+        </Surface>
+      )}
+
+      {/* Submit Intake Offer */}
+      <Surface tone="raised" padding={3} gap={3}>
+        <Box gap={1}>
+          <Text role="titleSm">تقديم عرض مقترح</Text>
+          <Text role="bodySm" tone="muted">
+            يمكنك تقديم عرض مقترح للفريق التسويقي. العرض سيمر بمرحلة المراجعة قبل النشر.
+          </Text>
+        </Box>
+
+        {!form.open ? (
+          <Button
+            label="تقديم عرض مقترح جديد"
+            tone="secondary"
+            fullWidth={false}
+            onPress={() => setForm({ ...INITIAL_FORM, open: true })}
+          />
+        ) : (
+          <Box gap={3}>
+            <TextField
+              label="عنوان العرض"
+              value={form.title}
+              onChangeText={v => setForm(f => ({ ...f, title: v }))}
+              placeholder="مثال: خصم 20% على القهوة"
+            />
+            <SelectField
+              label="نوع العرض"
+              value={form.offerType}
+              onValueChange={v => setForm(f => ({ ...f, offerType: v as PartnerOfferType }))}
+              options={[
+                { value: 'discount', label: 'خصم مباشر' },
+                { value: 'free-delivery', label: 'توصيل مجاني' },
+                { value: 'bundle', label: 'حزمة' },
+                { value: 'buy-x-get-y', label: 'اشتر واحصل على' },
+                { value: 'coupon', label: 'كوبون' },
+              ]}
+            />
+            <TextField
+              label="قيمة العرض"
+              value={form.valueLabel}
+              onChangeText={v => setForm(f => ({ ...f, valueLabel: v }))}
+              placeholder="مثال: 20% أو توصيل مجاني"
+            />
+            <TextField
+              label="شروط الأهلية"
+              value={form.eligibility}
+              onChangeText={v => setForm(f => ({ ...f, eligibility: v }))}
+              placeholder="مثال: للطلبات فوق 50 ريال"
+            />
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+              <Button label="إرسال للمراجعة" tone="brand" onPress={handleSubmitOffer} />
+              <Button label="إلغاء" tone="ghost" onPress={() => setForm(INITIAL_FORM)} />
+            </Box>
+            {submitMessage ? (
+              <Text role="caption" tone="muted">{submitMessage}</Text>
+            ) : null}
+          </Box>
+        )}
+      </Surface>
+
+      {/* Info: no direct publish */}
+      <Surface tone="inset" padding={3} gap={2}>
+        <Text role="caption" tone="muted">
+          ملاحظة: جميع العروض المقدمة تمر عبر مرحلة المراجعة التسويقية قبل أن تصبح مرئية للعملاء. لا يمكن النشر المباشر.
+        </Text>
         <Text role="caption" tone="muted">
           {storeName} · {branchLabel} · {activeZoneLabel}
         </Text>
       </Surface>
 
-      <Surface tone="raised" padding={3} gap={3}>
-        <Box gap={1}>
-          <Text role="titleSm">توصيات اليوم</Text>
-          <Text role="bodySm" tone="muted">
-            خطوات قصيرة قابلة للتنفيذ دون فتح لوحة خارجية.
-          </Text>
-        </Box>
-        <Box gap={2}>
-          {recommendations.map((recommendation) => (
-            <RecommendationCard key={recommendation.title} {...recommendation} />
-          ))}
-        </Box>
-      </Surface>
-
-      <Surface tone="raised" padding={3} gap={3}>
-        <Box gap={1}>
-          <Text role="titleSm">العروض والتسويق</Text>
-          <Text role="bodySm" tone="muted">
-            حالة العروض الحالية وما يمكن إطلاقه بسرعة لرفع الطلب.
-          </Text>
-        </Box>
-
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap' }} gap={2}>
-          <Chip label={marketingView === 'active' ? 'الحملات النشطة' : 'الحملات المقترحة'} selected tone={marketingView === 'active' ? 'success' : 'brand'} onPress={() => setMarketingView((current) => (current === 'active' ? 'suggested' : 'active'))} />
-          <Chip label="خصومات محدودة" tone="warning" />
-          <Chip label="عروض موسمية" tone="info" />
-        </Box>
-
-        <KeyValueList dense items={activeOffers.map((item) => ({ label: item.label, value: item.value, tone: item.tone }))} />
-
-        <Surface tone="inset" padding={3} gap={2}>
-          <Text role="bodyStrong">
-            {marketingView === 'active' ? 'العرض الحالي' : 'الحملة المقترحة'}
-          </Text>
-          <Text role="bodySm" tone="muted">
-            {marketingView === 'active'
-              ? 'العرض الحالي يركز على المنتجات الأعلى طلبًا مع خصم محدود وزمن واضح.'
-              : 'الحملة المقترحة تربط الخصم بالمنتجات التي تظهر فيها فرصة تحويل أعلى.'}
-          </Text>
-          <Button
-            label={marketingView === 'active' ? 'مراجعة فرص التسويق' : 'إنشاء عرض سريع'}
-            tone="secondary"
-            fullWidth={false}
-            onPress={() => setToolMessage('تم فتح مسار التسويق المحلي داخل الصفحة فقط.')}
-          />
-        </Surface>
-      </Surface>
-
-      <Surface tone="raised" padding={3} gap={3}>
-        <Box gap={1}>
-          <Text role="titleSm">فرص المنتجات والفئات</Text>
-          <Text role="bodySm" tone="muted">
-            أفضل المنتجات، الفئات الصاعدة، وما يحتاج دعمًا أو عرضًا.
-          </Text>
-        </Box>
-        <Box gap={2}>
-          {growthItems.map((item) => (
-            <ListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
-          ))}
-        </Box>
-      </Surface>
-
-      <Surface tone="raised" padding={3} gap={3}>
-        <Box gap={1}>
-          <Text role="titleSm">الخطة والاشتراك</Text>
-          <Text role="bodySm" tone="muted">
-            الخطة الحالية وما الذي يدعم النمو القادم.
-          </Text>
-        </Box>
-        <KeyValueList dense items={planItems.map((item) => ({ label: item.label, value: item.value, tone: item.tone }))} />
-        <Surface tone="inset" padding={3} gap={1}>
-          <Text role="bodyStrong">ميزة مقترحة للنمو</Text>
-          <Text role="bodySm" tone="muted">
-            خصّص عروضًا ذكية حسب السلة والوقت اليومي، ثم راقب أثرها قبل التوسع.
-          </Text>
-          <Button label="مراجعة الخطة" tone="secondary" fullWidth={false} onPress={() => setToolMessage('تم فتح مراجعة الخطة محليًا.')} />
-        </Surface>
-      </Surface>
-
-      <Surface tone="inset" padding={3} gap={2}>
-        <OfferLine label="الفرع" value={branchLabel} tone="default" />
-        <OfferLine label="ساعات اليوم" value={todayHoursLabel} tone="default" />
-        <OfferLine label="الرسالة المحلية" value={toolMessage} tone="brand" />
-      </Surface>
-
       <MobileStickyPrimaryAction
-        label="إنشاء عرض سريع"
-        helperText="المقترحات محلية وتعمل داخل الصفحة فقط."
-        onPress={() => setToolMessage('تم فتح إنشاء عرض سريع محليًا.')}
+        label="تقديم عرض مقترح"
+        helperText="يمر عبر المراجعة التسويقية قبل النشر."
+        onPress={() => setForm(f => ({ ...f, open: true }))}
       />
     </Box>
   );

@@ -10,6 +10,8 @@ import {
   approvePartnerOfferItem,
   publishPartnerOfferItem,
   pausePartnerOfferItem,
+  rejectPartnerOfferItem,
+  archivePartnerOfferItem,
   removePartnerOfferItem,
   type PartnerOfferRecord,
   type PartnerOfferStatus,
@@ -143,6 +145,7 @@ export function PartnerOffersCommandDeckScreen() {
       case 'published': return { label: 'منشور', tone: 'success' };
       case 'paused': return { label: 'موقوف', tone: 'danger' };
       case 'rejected': return { label: 'مرفوض', tone: 'default' };
+      case 'archived': return { label: 'مؤرشف', tone: 'default' };
       default: return { label: status, tone: 'default' };
     }
   };
@@ -179,7 +182,15 @@ export function PartnerOffersCommandDeckScreen() {
         {s === 'published' && <Button label="إيقاف" tone="danger" size="sm" onPress={() => pausePartnerOfferItem(selected.id)} />}
         {s === 'paused' && <Button label="إعادة النشر" tone="success" size="sm" onPress={() => publishPartnerOfferItem(selected.id)} />}
 
-        {(s === 'inbound' || s === 'review') && <Button label="رفض" tone="danger" size="sm" onPress={() => setStatus(selected.id, 'rejected')} />}
+        {(s === 'inbound' || s === 'review') && (
+          <Button label="رفض" tone="danger" size="sm" onPress={() => {
+            rejectPartnerOfferItem(selected.id, 'لا يستوفي معايير السياسة التجارية.');
+            refresh();
+          }} />
+        )}
+        {(s === 'published' || s === 'paused' || s === 'rejected') && (
+          <Button label="أرشفة" tone="ghost" size="sm" onPress={() => { archivePartnerOfferItem(selected.id); refresh(); }} />
+        )}
 
         <Button label="نسخ" tone="ghost" size="sm" onPress={handleDuplicate} />
         <Button label="حذف" tone="danger" size="sm" onPress={() => { removePartnerOfferItem(selected.id); setSelectedId(null); }} />
@@ -298,7 +309,7 @@ export function PartnerOffersCommandDeckScreen() {
           { label: 'منشور', value: kpis.published, color: theme.success },
           { label: 'مرفوض', value: kpis.rejected, color: theme.textMuted },
         ].map(k => (
-          <Surface key={k.label} tone="raised" padding={3} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 120, borderRadius: 10, borderLeftWidth: 3, borderLeftColor: k.color }}>
+          <Surface key={k.label} tone="raised" padding={3} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 120, borderRadius: 10, borderStartWidth: 3, borderStartColor: k.color }}>
             <Text role="caption" style={{ fontWeight: 800, color: theme.textMuted }}>{k.label}</Text>
             <Text role="titleSm" style={{ fontWeight: 900, color: k.color, marginTop: 4, fontSize: 18 }}>{k.value}</Text>
           </Surface>
@@ -314,6 +325,7 @@ export function PartnerOffersCommandDeckScreen() {
             { value: 'review', label: 'مراجعة' },
             { value: 'marketing-ready', label: 'جاهز للتسويق' },
             { value: 'published', label: 'منشور' },
+            { value: 'archived', label: 'مؤرشف' },
           ]}
           value={pipelineFilter}
           onValueChange={setPipelineFilter}

@@ -1,3 +1,9 @@
+/**
+ * DEAD CODE: Zero imports anywhere in the codebase.
+ * Loyalty lane concepts are owned by dsh/frontend/shared/loyalty.preview-store.ts.
+ * Do not use or extend this file — add to loyalty.preview-store.ts instead.
+ */
+
 export type LoyaltyCommercialSignal = {
   lane: 'subscription' | 'loyalty' | 'coupon';
   title: string;
