@@ -135,7 +135,7 @@ const defaultCreateOrderValues: CreateOrderValues = {
 };
 
 const deliveryJourneySteps: JourneyStep[] = [
-  { id: 'route', title: 'في الطريق', detail: 'الطلب متجه إلى العميل ويظهر المسار الآن.' },
+  { id: 'route', title: 'في الطريق', detail: 'الطلب في الطريق إلى العميل.' },
   { id: 'arrived', title: 'وصل للعميل', detail: 'وصل الطلب إلى العميل وأصبح بانتظار الاستلام.' },
   { id: 'received', title: 'استلم العميل الطلب', detail: 'بعد الاستلام تظهر التقييمات في نفس الشاشة.' },
 ];
@@ -580,6 +580,9 @@ function formatDeliveryLifecycleStatus(status: DshClientDeliveryLifecycleStatus)
     arrived_at_pickup: 'وصل إلى نقطة الاستلام',
     picked_up: 'تم الاستلام من المتجر',
     enroute_to_dropoff: 'في الطريق إلى العميل',
+    near_customer: 'الطلب قريب منك',
+    at_door: 'الطلب عند بابك',
+    bell_rang: 'الكابتن ضغط زر الجرس',
     arrived_at_dropoff: 'وصل إلى العميل',
     delivered: 'تم التسليم',
     cancelled: 'تم الإلغاء',
@@ -734,7 +737,7 @@ function buildDefaultLifecycleStatus(clientState: DshClientState, phase: Journey
   if (clientState === 'delivered') return 'delivered';
 
   if (phase === 'received') return 'delivered';
-  if (phase === 'arrived') return 'arrived_at_dropoff';
+  if (phase === 'arrived') return 'at_door';
   return 'enroute_to_dropoff';
 }
 
@@ -761,11 +764,11 @@ function buildDefaultEventTimeline(clientState: DshClientState, timeline: DshTra
 
   const statusByStepId: Record<string, DshClientDeliveryLifecycleStatus> = {
     route: 'enroute_to_dropoff',
-    arrived: 'arrived_at_dropoff',
+    arrived: 'at_door',
     received: 'delivered',
   };
 
-  const fallbackStatuses: DshClientDeliveryLifecycleStatus[] = ['enroute_to_dropoff', 'arrived_at_dropoff', 'delivered'];
+  const fallbackStatuses: DshClientDeliveryLifecycleStatus[] = ['enroute_to_dropoff', 'at_door', 'delivered'];
 
   return timeline.map((item, index) => {
     const toStatus = statusByStepId[item.id] ?? fallbackStatuses[Math.min(index, fallbackStatuses.length - 1)] ?? fallbackLifecycle;
@@ -893,6 +896,109 @@ function buildDefaultWalletImpact(clientState: DshClientState): DshClientWalletI
   return null;
 }
 
+type SmartProximityState = 'enroute' | 'near_customer' | 'at_door' | 'bell_rang';
+
+type SmartTrackingState = {
+  lastUpdateMinutesAgo: number;
+  etaMinutes: number | null;
+  proximityState: SmartProximityState;
+  bellRang: boolean;
+};
+
+const SMART_TRACKING_SEQUENCE: SmartProximityState[] = ['enroute', 'near_customer', 'at_door', 'bell_rang'];
+
+function useSmartTrackingHeartbeat(phase: JourneyPhase): SmartTrackingState {
+  const [state, setState] = React.useState<SmartTrackingState>({
+    lastUpdateMinutesAgo: 1,
+    etaMinutes: 12,
+    proximityState: 'enroute',
+    bellRang: false,
+  });
+
+  React.useEffect(() => {
+    if (phase === 'received') return;
+
+    const HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000;
+
+    const timer = setInterval(() => {
+      setState((prev) => {
+        const currentIndex = SMART_TRACKING_SEQUENCE.indexOf(prev.proximityState);
+        const nextIndex = phase === 'arrived'
+          ? Math.min(currentIndex + 1, SMART_TRACKING_SEQUENCE.length - 1)
+          : Math.min(currentIndex, 1);
+        const nextProximity = SMART_TRACKING_SEQUENCE[nextIndex] ?? 'enroute';
+        const etaDelta = prev.etaMinutes !== null ? Math.max(0, prev.etaMinutes - 3) : null;
+
+        return {
+          lastUpdateMinutesAgo: 0,
+          etaMinutes: etaDelta,
+          proximityState: nextProximity,
+          bellRang: nextProximity === 'bell_rang',
+        };
+      });
+    }, HEARTBEAT_INTERVAL_MS);
+
+    return () => clearInterval(timer);
+  }, [phase]);
+
+  return state;
+}
+
+function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smartTracking: SmartTrackingState }) {
+  const { theme } = useTheme();
+
+  const proximityAlert = smartTracking.proximityState === 'bell_rang'
+    ? { label: 'الكابتن ضغط زر الجرس', tone: 'brand' as const, icon: 'notifications' as const }
+    : smartTracking.proximityState === 'at_door'
+      ? { label: 'الطلب عند بابك', tone: 'success' as const, icon: 'home-outline' as const }
+      : smartTracking.proximityState === 'near_customer'
+        ? { label: 'الطلب قريب منك', tone: 'warning' as const, icon: 'navigate-circle-outline' as const }
+        : null;
+
+  const etaText = phase === 'received'
+    ? 'تم التسليم'
+    : smartTracking.etaMinutes !== null && smartTracking.etaMinutes > 0
+      ? `تقريباً ${smartTracking.etaMinutes} دقيقة`
+      : smartTracking.etaMinutes === 0
+        ? 'وصل الآن'
+        : null;
+
+  return (
+    <Surface tone="raised" radiusToken="xl" gap={3} padding={3} style={{ borderWidth: 1, borderColor: theme.line }}>
+      <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
+        <Box gap={0.5} style={{ alignItems: 'flex-end', flex: 1 }}>
+          <Badge label="متابعة ذكية" tone="brand" />
+          <Text role="bodyStrong" style={{ textAlign: 'right' }}>
+            {phase === 'received' ? 'تم التسليم بنجاح' : 'متابعة حالة الطلب'}
+          </Text>
+        </Box>
+        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: theme.brandSurface, alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="pulse-outline" size={22} color={theme.brand} />
+        </View>
+      </Box>
+
+      {proximityAlert ? (
+        <Surface tone={proximityAlert.tone as any} gap={2} padding={2} style={{ borderRadius: 16, borderWidth: 1, borderColor: theme.line }}>
+          <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
+            <Icon name={proximityAlert.icon} size={20} color={theme.brand} />
+            <Text role="bodyStrong" style={{ textAlign: 'right', flex: 1 }}>
+              {proximityAlert.label}
+            </Text>
+          </Box>
+        </Surface>
+      ) : null}
+
+      <KeyValueList
+        items={[
+          ...(etaText ? [{ label: 'الوقت التقريبي للوصول', value: etaText, tone: 'success' as const }] : []),
+          { label: 'آخر تحديث', value: smartTracking.lastUpdateMinutesAgo === 0 ? 'الآن' : `منذ ${smartTracking.lastUpdateMinutesAgo} دقيقة` },
+          { label: 'آلية التحديث', value: 'كل 3 دقائق — بدون خريطة حية' },
+        ]}
+      />
+    </Surface>
+  );
+}
+
 type CreateOrderJourneyScreenProps = {
   values: CreateOrderValues;
   timeline: DshTrackingTimelineItem[];
@@ -916,6 +1022,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const [draftAttachments, setDraftAttachments] = React.useState<OrderChatAttachmentKind[]>([]);
   const [actionBarHeight, setActionBarHeight] = React.useState(0);
   const effectiveClientState = normalizeClientFacingOrderState(clientState);
+  const smartTracking = useSmartTrackingHeartbeat(phase);
   const [lastChatMessage, setLastChatMessage] = React.useState<OrderChatMessage>({
     id: 'chat-captain-1',
     senderLabel: 'الكابتن المكلّف',
@@ -1161,7 +1268,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     : phase === 'received' && onSupport
         ? { label: 'الدعم أو الإبلاغ عن مشكلة', onPress: onSupport, tone: 'secondary' as const }
         : onBack
-          ? { label: phase === 'route' ? 'تعديل الطلب' : 'العودة', onPress: onBack, tone: 'secondary' as const }
+          ? { label: phase === 'route' ? 'طلب تعديل عبر العمليات' : 'العودة', onPress: onBack, tone: 'secondary' as const }
           : undefined;
 
   return (
@@ -1182,25 +1289,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           </Box>
         </Surface>
 
-        <Surface tone="raised" radiusToken="xl" style={{ overflow: 'hidden', height: 220, borderWidth: 1, borderColor: theme.line }}>
-          <View style={{ flex: 1, backgroundColor: theme.surfaceInset, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="map-outline" size={48} tone="soft" />
-            <Text role="caption" tone="muted">خريطة المسار الحي (Premium 2026)</Text>
-          </View>
-          <Box
-            style={{
-              position: 'absolute',
-              bottom: 12,
-              right: 12,
-              backgroundColor: theme.brand,
-              paddingHorizontal: 12,
-              paddingVertical: 6,
-              borderRadius: 12,
-            }}
-          >
-            <Text role="caption" tone="inverse">تتبع مباشر</Text>
-          </Box>
-        </Surface>
+        <SmartTrackingCard phase={phase} smartTracking={smartTracking} />
 
         <OperationalStatusHero
           statusLabel={deliveryStatusLabel}
@@ -1215,8 +1304,8 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
         <Surface tone="raised" padding={4} radiusToken="xl" gap={4}>
           <SectionHeader
-            title="المسار الحي"
-            subtitle="نظام تتبع مباشر وفوري لجميع محطات الطلب."
+            title="مراحل الطلب"
+            subtitle="المراحل الرئيسية من الاستلام حتى التسليم، تتحدث بشكل ذكي كل 3 دقائق."
           />
           <StageRail activeStepId={phase} steps={deliveryJourneySteps} />
         </Surface>
@@ -1464,7 +1553,7 @@ function renderTracking(
       </Surface>
 
       <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <SectionHeader title="المسار المباشر" subtitle="يظهر كل انتقال بوضوح حتى يبقى السياق بسيطًا." />
+        <SectionHeader title="مراحل الطلب" subtitle="يظهر كل انتقال بوضوح دون خريطة حية أو GPS." />
         <Box gap={2}>
           {timeline.map((step, index) => {
             const isActive = !step.done && index === activeTimelineIndex;

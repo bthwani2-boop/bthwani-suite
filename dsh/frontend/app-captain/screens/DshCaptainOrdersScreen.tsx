@@ -76,6 +76,24 @@ const demoBellItems: DshCaptainOrderBellItem[] = [
 		badgeLabel: 'عاجل',
 		tone: 'brand',
 	},
+	// عونك: local pickup/dropoff — captain is responsible for full pickup-to-dropoff
+	{
+		id: 'captain-order-awn-3104',
+		title: 'عونك #3104',
+		subtitle: 'نقل طعام — من شارع حدة إلى باب اليمن.',
+		meta: 'نوع: طعام · مجدول الآن',
+		badgeLabel: 'عونك',
+		tone: 'info',
+	},
+	// SHEIN final-mile only: captain picks up from bthwani sorting point and delivers to customer
+	{
+		id: 'captain-order-spx-2078',
+		title: 'SHEIN - تسليم نهائي #2078',
+		subtitle: 'تسليم من نقطة بثواني إلى العميل لمى ناصر.',
+		meta: 'نوع: تسليم نهائي · ليس شراء',
+		badgeLabel: 'SHEIN - تسليم نهائي',
+		tone: 'brand',
+	},
 ];
 
 const demoMessages: DshCaptainOrderMessage[] = [

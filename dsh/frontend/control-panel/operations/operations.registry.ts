@@ -76,13 +76,20 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     ]
   },
   {
-    id: 'proxy-shein-awnak',
+    id: 'awnak-operations',
     label: 'عونك',
-    description: 'مسار عونك التشغيلي للدفعات اليدوية ومتابعة الطلبات.',
+    description: 'مسار عونك التشغيلي: استلام الطلبات، المراجعة، الإسناد، التنفيذ، ومراجعة الإثبات.',
     badge: 'يدوي',
     subGroups: [
-      { id: 'active', label: 'نشط' },
+      { id: 'intake', label: 'الاستلام' },
+      { id: 'quote-review', label: 'مراجعة السعر' },
+      { id: 'dispatch-pending', label: 'قيد الإسناد' },
+      { id: 'assigned', label: 'تم الإسناد' },
+      { id: 'in-progress', label: 'قيد التنفيذ' },
+      { id: 'proof-review', label: 'مراجعة الإثبات' },
       { id: 'completed', label: 'مكتمل' },
+      { id: 'cancelled', label: 'ملغى' },
+      { id: 'escalated', label: 'مصعّد' },
     ]
   },
   {
@@ -194,7 +201,7 @@ const LEGACY_OPERATIONAL_TO_CANONICAL_GROUP: Record<Exclude<LegacyOperationsWork
   'zone-set': 'area-capacity',
   'live-map-capacity': 'geo-heatmap',
   'geo-heatmap': 'geo-heatmap',
-  'proxy-shein-awnak': 'proxy-shein-awnak',
+  'proxy-shein-awnak': 'awnak-operations', // legacy alias → canonical awnak-operations
 };
 
 const LEGACY_SECTION_REDIRECTS: Record<LegacySectionRedirectId, NonOperationsSectionRootId> = {

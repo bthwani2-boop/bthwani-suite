@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   deliveryToText: {
-    color: 'rgba(255,255,255,0.7)',
+    color: withAlpha(colorPalette.white, 0.7),
     fontSize: 9,
     fontWeight: '700',
     marginBottom: 0,
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     width: 34, // Slightly smaller to fit 3
     height: 34,
     borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: withAlpha(colorPalette.white, 0.12),
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -407,14 +407,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: withAlpha(colorPalette.white, 0.3),
   },
   searchBarWrapper: {
     // Hidden by default in ModernPremiumHeader but kept styles for expand logic if needed
     display: 'none',
   },
   searchText: {
-    color: 'rgba(255,255,255,0.6)',
+    color: withAlpha(colorPalette.white, 0.6),
     fontSize: 12,
     fontWeight: '600',
     flex: 1,
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tickerStatusBadge: {
-    backgroundColor: '#FF500D',
+    backgroundColor: colorPalette.brand,
     paddingHorizontal: 5,
     paddingVertical: 1,
     borderRadius: 5,
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     backgroundColor: colorPalette.white,
     ...Platform.select({
       ios: {
-        shadowColor: '#0A2F5C',
+        shadowColor: colorPalette.brandStrong,
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.1,
         shadowRadius: 12,
@@ -529,9 +529,9 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0A2F5C',
+    backgroundColor: colorPalette.brandStrong,
     padding: 3,
-    shadowColor: '#0A2F5C',
+    shadowColor: colorPalette.brandStrong,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -541,10 +541,10 @@ const styles = StyleSheet.create({
   launcherInner: {
     flex: 1,
     borderRadius: 25,
-    backgroundColor: '#FF500D',
+    backgroundColor: colorPalette.brand,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: withAlpha(colorPalette.white, 0.3),
   },
 });

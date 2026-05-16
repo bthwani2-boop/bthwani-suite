@@ -571,7 +571,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   } = useWltDshWalletPreview();
 
   const checkoutAction = props.onContinue ?? props.onOpenOrder;
-  const canEditOrder = Boolean(props.onOpenStore ?? props.onOpenOrder ?? props.onContinue);
+  const isOrderSubmitted = clientState === 'order_created' || clientState === 'order_confirmed';
+  const canEditOrder = !isOrderSubmitted && Boolean(props.onOpenStore ?? props.onOpenOrder ?? props.onContinue);
   const isRTL = I18nManager.isRTL;
   const quickActionMeta = quickActionKey ? QUICK_ACTION_META[quickActionKey] : null;
   const hasWltServiceRoute = typeof props.onOpenService === 'function';
@@ -985,6 +986,11 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   }, [canUseMixedPayment, canUseWalletFull, formattedGrandTotal, formattedWalletBalance, formattedWalletShortfall, grandTotalHalalas, hasWltServiceRoute, paymentMethod, topUpWalletInline, walletBalance, walletHydrated, walletLinked, walletRefreshing, walletShortfallHalalas]);
 
   const handleCheckoutPress = async () => {
+    if (isOrderSubmitted) {
+      showNotice('الطلب قيد التنفيذ', 'تم إرسال الطلب بالفعل. التعديل يتم عبر فريق العمليات فقط.', 'info');
+      return;
+    }
+
     if (!canCheckout) {
       showNotice(clientStateMeta.label, clientStateMeta.description, 'info');
       return;
@@ -1363,21 +1369,21 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         ) : null}
         <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[2] }}>
           <Button
-            label="تنفيذ الطلب"
+            label={isOrderSubmitted ? 'الطلب قيد التنفيذ' : 'تنفيذ الطلب'}
             size="md"
             fullWidth={false}
-            disabled={!canCheckout || checkoutLoading}
+            disabled={isOrderSubmitted || !canCheckout || checkoutLoading}
             loading={checkoutLoading}
             onPress={handleCheckoutPress}
-            style={{ flex: 2, minHeight: 52, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY, borderRadius: 18 }}
+            style={{ flex: 2, minHeight: 52, backgroundColor: isOrderSubmitted ? CTA_PRIMARY : CTA_PRIMARY, borderColor: CTA_PRIMARY, borderRadius: 18, opacity: isOrderSubmitted ? 0.6 : 1 }}
           />
           <Button
-            label="تعديل"
+            label={isOrderSubmitted ? 'طلب تعديل عبر العمليات' : 'تعديل'}
             tone="secondary"
             size="md"
             fullWidth={false}
             disabled={!canEditOrder}
-            onPress={handleEditPress}
+            onPress={isOrderSubmitted ? undefined : handleEditPress}
             style={{ flex: 1, minHeight: 52, borderRadius: 18 }}
           />
         </View>

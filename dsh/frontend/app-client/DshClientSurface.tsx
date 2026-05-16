@@ -370,6 +370,17 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     }
 
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Priority 1: close transient inline panels before any route navigation.
+      if (sheinInlineOpen) {
+        setSheinInlineOpen(false);
+        return true;
+      }
+      if (awnakInlineOpen) {
+        setAwnakInlineOpen(false);
+        return true;
+      }
+
+      // Priority 2: navigate back through route history if available.
       if (routeHistoryRef.current.length > 1) {
         routeTransitionFromBackRef.current = true;
         routeHistoryRef.current.pop();
@@ -378,6 +389,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         return true;
       }
 
+      // Priority 3: at home with no open panels — delegate to host exit handler.
       if (onExit) {
         onExit();
         return true;
@@ -387,7 +399,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     });
 
     return () => subscription.remove();
-  }, [onExit]);
+  }, [onExit, sheinInlineOpen, awnakInlineOpen]);
 
   const filteredOrders = React.useMemo(() => {
     const query = ordersQuery.trim().toLowerCase();

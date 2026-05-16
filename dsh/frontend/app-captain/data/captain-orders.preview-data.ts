@@ -1,5 +1,14 @@
 export type DshCaptainOrderId = string;
 
+/**
+ * Distinguishes order service type so the captain UI can show correct labels/badges.
+ * - 'standard': regular store delivery
+ * - 'awnak': local pickup/dropoff request (direct or scheduled)
+ * - 'shein-final-mile': SHEIN final-mile delivery ONLY — from bthwani sorting point to customer
+ *   (captain is NOT responsible for purchasing or importing)
+ */
+export type DshCaptainOrderServiceType = 'standard' | 'awnak' | 'shein-final-mile';
+
 export type DshCaptainOrderMode =
 	| 'full'
 	| 'inbox'

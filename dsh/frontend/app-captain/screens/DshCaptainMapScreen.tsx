@@ -4,109 +4,152 @@ import React from 'react';
 import { Badge, Box, Button, KeyValueList, SectionHeader, Surface, Text } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 
+type CaptainFieldStage = 'to-store' | 'to-customer' | 'near-customer' | 'at-door' | 'bell-rang' | 'proof';
+type CaptainHeartbeatState = { lastUpdateMinutesAgo: number; etaMinutes: number | null };
+
+const HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000;
+
+function useCaptainHeartbeat(stage: CaptainFieldStage): CaptainHeartbeatState {
+  const [state, setState] = React.useState<CaptainHeartbeatState>({
+    lastUpdateMinutesAgo: 0,
+    etaMinutes: stage === 'to-store' ? 8 : stage === 'to-customer' ? 12 : stage === 'near-customer' ? 4 : 1,
+  });
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setState((prev) => ({
+        lastUpdateMinutesAgo: prev.lastUpdateMinutesAgo + 3,
+        etaMinutes: prev.etaMinutes !== null ? Math.max(0, prev.etaMinutes - 3) : null,
+      }));
+    }, HEARTBEAT_INTERVAL_MS);
+
+    return () => clearInterval(timer);
+  }, [stage]);
+
+  return state;
+}
+
+const STAGE_CONFIG: Record<CaptainFieldStage, { title: string; description: string; nextStage: CaptainFieldStage | null; action: string; proximityLabel: string | null; lifecycleStatus: string }> = {
+  'to-store': {
+    title: 'التوجه للمتجر',
+    description: 'في الطريق لاستلام الطلب من المتجر.',
+    nextStage: 'to-customer',
+    action: 'تأكيد الاستلام من المتجر',
+    proximityLabel: null,
+    lifecycleStatus: 'enroute_to_pickup',
+  },
+  'to-customer': {
+    title: 'التوصيل للعميل',
+    description: 'الطلب معك وأنت في الطريق للعميل.',
+    nextStage: 'near-customer',
+    action: 'تأكيد الاقتراب من العميل',
+    proximityLabel: null,
+    lifecycleStatus: 'enroute_to_dropoff',
+  },
+  'near-customer': {
+    title: 'قريب من العميل',
+    description: 'أنت على مقربة من موقع التسليم.',
+    nextStage: 'at-door',
+    action: 'تأكيد الوصول للموقع',
+    proximityLabel: 'near_customer',
+    lifecycleStatus: 'near_customer',
+  },
+  'at-door': {
+    title: 'عند باب العميل',
+    description: 'وصلت لموقع التسليم. أخطر العميل بوصولك.',
+    nextStage: 'bell-rang',
+    action: 'قرع الجرس',
+    proximityLabel: 'at_door',
+    lifecycleStatus: 'at_door',
+  },
+  'bell-rang': {
+    title: 'تم قرع الجرس',
+    description: 'أُرسل إشعار الوصول. انتظر العميل أو انتقل لإثبات التسليم.',
+    nextStage: 'proof',
+    action: 'انتقل لإثبات التسليم',
+    proximityLabel: 'bell_rang',
+    lifecycleStatus: 'bell_rang',
+  },
+  'proof': {
+    title: 'إثبات التسليم',
+    description: 'ثبّت استلام العميل للطلب وأغلق المهمة.',
+    nextStage: null,
+    action: 'رفع الإثبات الآن',
+    proximityLabel: null,
+    lifecycleStatus: 'arrived_at_dropoff',
+  },
+};
+
 export function DshCaptainMapScreen() {
-	const [taskStage, setTaskStage] = React.useState<'to-store' | 'to-customer' | 'proof'>('to-store');
+  const [taskStage, setTaskStage] = React.useState<CaptainFieldStage>('to-store');
+  const heartbeat = useCaptainHeartbeat(taskStage);
+  const config = STAGE_CONFIG[taskStage];
 
-	const taskData = {
-		'to-store': {
-			title: 'التوجه للمتجر',
-			description: 'استلم الطلب من بيك إن بريستو (فرع التحلية)',
-			pins: [
-				{ id: 'store', label: 'المتجر (نقطة الاستلام)', tone: 'brand' as const, pos: { top: '30%', right: '40%' } },
-				{ id: 'captain', label: 'موقعك الحالي', tone: 'info' as const, pos: { top: '70%', right: '60%' } },
-			],
-			route: '60,70 50,50 40,30',
-			action: 'تأكيد الوصول للمتجر',
-		},
-		'to-customer': {
-			title: 'التوصيل للعميل',
-			description: 'سلم الطلب في فيلا ١٢، شارع التحلية',
-			pins: [
-				{ id: 'customer', label: 'العميل (نقطة التسليم)', tone: 'success' as const, pos: { top: '20%', right: '20%' } },
-				{ id: 'captain', label: 'موقعك الحالي', tone: 'info' as const, pos: { top: '30%', right: '40%' } },
-			],
-			route: '40,30 30,25 20,20',
-			action: 'تأكيد الوصول للعميل',
-		},
-		'proof': {
-			title: 'إثبات التسليم',
-			description: 'يرجى رفع صورة إثبات التسليم لإغلاق الطلب',
-			pins: [
-				{ id: 'customer', label: 'موقع العميل', tone: 'success' as const, pos: { top: '20%', right: '20%' } },
-				{ id: 'captain', label: 'موقعك (عند العميل)', tone: 'info' as const, pos: { top: '22%', right: '22%' } },
-			],
-			route: '',
-			action: 'رفع الإثبات الآن',
-		},
-	};
+  const advanceStage = () => {
+    if (config.nextStage) {
+      setTaskStage(config.nextStage);
+    }
+  };
 
-	const currentTask = taskData[taskStage];
+  const proximityTone = config.proximityLabel === 'bell_rang'
+    ? 'brand' as const
+    : config.proximityLabel === 'at_door'
+      ? 'success' as const
+      : config.proximityLabel === 'near_customer'
+        ? 'warning' as const
+        : 'info' as const;
 
-	const advanceStage = () => {
-		if (taskStage === 'to-store') {
-			setTaskStage('to-customer');
-			return;
-		}
+  return (
+    <DshOperationScreen
+      title="التنفيذ الميداني"
+      subtitle="شاشة داخلية للكابتن — لا تُعرض للعميل. تحديث الموقع كل 3 دقائق بدون خريطة حية."
+      content={
+        <Box gap={3}>
+          <Surface tone="brand" gap={3}>
+            <Box layoutDirection="row" justify="space-between" align="center" gap={2}>
+              <Text role="bodyStrong">{config.title}</Text>
+              <Badge label="مهمة نشطة" tone="brand" />
+            </Box>
+            <Text role="bodySm" tone="muted">{config.description}</Text>
+            {config.proximityLabel && (
+              <Badge label={config.proximityLabel === 'near_customer' ? 'قريب من العميل' : config.proximityLabel === 'at_door' ? 'عند الباب' : 'تم قرع الجرس'} tone={proximityTone} />
+            )}
+          </Surface>
 
-		if (taskStage === 'to-customer') {
-			setTaskStage('proof');
-			return;
-		}
+          <Surface tone="raised" gap={3}>
+            <SectionHeader title="حالة التحديث" subtitle="تحديث الموقع داخلي كل 3 دقائق — لا GPS live للعميل." />
+            <KeyValueList
+              items={[
+                { label: 'آخر تحديث', value: heartbeat.lastUpdateMinutesAgo === 0 ? 'الآن' : `منذ ${heartbeat.lastUpdateMinutesAgo} دقيقة` },
+                { label: 'الوقت التقريبي', value: heartbeat.etaMinutes !== null ? `${heartbeat.etaMinutes} دقيقة` : 'وصلت' },
+                { label: 'حالة المرحلة', value: config.lifecycleStatus, tone: 'brand' },
+              ]}
+            />
+          </Surface>
 
-		setTaskStage('to-store');
-	};
-
-	return (
-		<DshOperationScreen
-			title="خريطة المهمة"
-			subtitle="عرض مرحلي مبسط للمسار والوجهة القادمة بنفس نغمة العرض الميداني المعتمدة في تطبيق العميل."
-			content={
-				<Box gap={3}>
-					<Surface tone="brand" gap={3}>
-						<Box layoutDirection="row" justify="space-between" align="center" gap={2}>
-							<Text role="bodyStrong">{currentTask.title}</Text>
-							<Badge label="مهمة نشطة" tone="brand" />
-						</Box>
-						<Text role="bodySm" tone="muted">{currentTask.description}</Text>
-						<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-							<Badge label="موقعك" tone="info" />
-							<Badge label="الوجهة" tone="brand" />
-							<Badge label="العميل" tone="success" />
-						</Box>
-					</Surface>
-
-					<Surface tone="raised" gap={3}>
-						<SectionHeader title="المسار الحالي" subtitle="يبقى المسار مختصرًا إلى نقاط قرار واضحة بدل واجهة تحكم مكتبية." />
-						<KeyValueList
-							items={currentTask.pins.map((pin, index) => ({
-								label: index === 0 ? 'المحطة التالية' : `النقطة ${index + 1}`,
-								value: pin.label,
-								tone: pin.tone,
-							}))}
-						/>
-						<Text role="caption" tone="muted">
-							{currentTask.route ? `المسار التقريبي: ${currentTask.route}` : 'لا يوجد مسار مرسوم لأن المهمة في مرحلة إثبات التسليم.'}
-						</Text>
-					</Surface>
-
-					<Surface tone="inset" gap={3}>
-						<SectionHeader title="التنقل بين المراحل" subtitle="بدّل المرحلة من نفس الشاشة مع الحفاظ على نفس تراتبية العميل: محتوى أولًا ثم إجراء واضح." />
-						<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-							<Button label="إلى المتجر" tone={taskStage === 'to-store' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setTaskStage('to-store')} />
-							<Button label="إلى العميل" tone={taskStage === 'to-customer' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setTaskStage('to-customer')} />
-							<Button label="الإثبات" tone={taskStage === 'proof' ? 'primary' : 'secondary'} fullWidth={false} onPress={() => setTaskStage('proof')} />
-						</Box>
-					</Surface>
-				</Box>
-			}
-			primaryActionLabel={currentTask.action}
-			secondaryActionLabel="المرحلة التالية"
-			tertiaryActionLabel="إعادة ضبط المسار"
-			onPrimaryAction={advanceStage}
-			onSecondaryAction={advanceStage}
-			onTertiaryAction={() => setTaskStage('to-store')}
-		/>
-	);
+          <Surface tone="inset" gap={3}>
+            <SectionHeader title="محطات التنفيذ" subtitle="انتقل بين المحطات عند اكتمال كل مرحلة." />
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+              {(Object.keys(STAGE_CONFIG) as CaptainFieldStage[]).map((stage) => (
+                <Button
+                  key={stage}
+                  label={STAGE_CONFIG[stage].title}
+                  tone={taskStage === stage ? 'primary' : 'secondary'}
+                  size="sm"
+                  fullWidth={false}
+                  onPress={() => setTaskStage(stage)}
+                />
+              ))}
+            </Box>
+          </Surface>
+        </Box>
+      }
+      primaryActionLabel={config.action}
+      secondaryActionLabel={config.nextStage ? 'المرحلة التالية' : undefined}
+      onPrimaryAction={advanceStage}
+      onSecondaryAction={config.nextStage ? advanceStage : undefined}
+    />
+  );
 }
 
 export default DshCaptainMapScreen;

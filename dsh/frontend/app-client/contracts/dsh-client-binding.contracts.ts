@@ -23,6 +23,9 @@ export type DshClientDeliveryLifecycleStatus =
   | 'arrived_at_pickup'
   | 'picked_up'
   | 'enroute_to_dropoff'
+  | 'near_customer'
+  | 'at_door'
+  | 'bell_rang'
   | 'arrived_at_dropoff'
   | 'delivered'
   | 'cancelled'
@@ -334,4 +337,42 @@ export type DshClientRatingPayload = {
   productRating: 1 | 2 | 3 | 4 | 5;
   captainRating: 1 | 2 | 3 | 4 | 5;
   note?: string;
+};
+
+export type DshClientSmartProximityState = 'enroute' | 'near_customer' | 'at_door' | 'bell_rang';
+
+export type DshClientSmartTrackingUpdate = {
+  lastLocationUpdateMinutesAgo: number;
+  etaMinutes: number | null;
+  proximityState: DshClientSmartProximityState;
+  bellRang: boolean;
+};
+
+export type DshClientOperationsDecisionKind = 'approve' | 'reject' | 'request_edit';
+
+export type DshClientOperationsDecisionPayload = {
+  orderId: DshClientId;
+  decision: DshClientOperationsDecisionKind;
+  note?: string;
+};
+
+export type DshClientOperationsOrderDetail = {
+  orderId: DshClientId;
+  customerName: string;
+  customerPhone: string;
+  dropoffAddress: string;
+  pickupAddress: string;
+  storeName: string;
+  paymentMethod: DshClientCreateOrderRequest['paymentMethod'];
+  paymentStatusLabel: string;
+  cartLines: DshClientCartLine[];
+  subtotalHalalas: number;
+  deliveryHalalas: number;
+  totalHalalas: number;
+  couponCode?: string;
+  discountHalalas?: number;
+  customerNote?: string;
+  customerInstructions?: string;
+  eventTimeline: DshClientEventTimelineItem[];
+  currentLifecycleStatus: DshClientDeliveryLifecycleStatus;
 };

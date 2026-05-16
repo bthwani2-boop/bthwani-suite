@@ -10,6 +10,7 @@ import {
   SectionHeader,
   Surface,
   Text,
+  TextField,
   useTheme,
   colorPalette,
   spacing,
@@ -25,6 +26,7 @@ export type DshCaptainPickupDropoffScreenProps = {
   customerName: string;
   address: string;
   itemsCount: number;
+  dropoffOtp?: string;
   onConfirm: () => void;
   onReportIssue: () => void;
   onBack?: () => void;
@@ -37,11 +39,33 @@ export function DshCaptainPickupDropoffScreen({
   customerName = 'أحمد محمد',
   address = 'حي العليا، الرياض',
   itemsCount = 3,
+  dropoffOtp,
   onConfirm,
   onReportIssue,
   onBack,
 }: DshCaptainPickupDropoffScreenProps) {
   const { theme } = useTheme();
+  const [bellRung, setBellRung] = React.useState(false);
+  const [otpInput, setOtpInput] = React.useState('');
+  const [otpVerified, setOtpVerified] = React.useState(false);
+  const [otpError, setOtpError] = React.useState(false);
+
+  const handleRingBell = () => {
+    setBellRung(true);
+  };
+
+  const handleVerifyOtp = () => {
+    if (!dropoffOtp) {
+      setOtpVerified(true);
+      return;
+    }
+    if (otpInput.trim() === dropoffOtp) {
+      setOtpVerified(true);
+      setOtpError(false);
+    } else {
+      setOtpError(true);
+    }
+  };
 
   const config = {
     pickup: {
@@ -122,7 +146,7 @@ export function DshCaptainPickupDropoffScreen({
               <Badge label={config.badge} tone="warning" />
               <Text role="caption" tone="soft">#{orderId}</Text>
             </Box>
-            
+
             <KeyValueList
               items={[
                 { label: config.targetLabel, value: config.targetValue, tone: 'brand' },
@@ -133,9 +157,9 @@ export function DshCaptainPickupDropoffScreen({
           </Surface>
 
           <Surface tone="raised" gap={3}>
-            <SectionHeader 
-              title="قائمة التحقق" 
-              subtitle="يرجى مراجعة النقاط التالية لضمان جودة الخدمة." 
+            <SectionHeader
+              title="قائمة التحقق"
+              subtitle="يرجى مراجعة النقاط التالية لضمان جودة الخدمة."
             />
             <Box gap={2}>
               {config.checklist.map((item, index) => (
@@ -150,16 +174,71 @@ export function DshCaptainPickupDropoffScreen({
           </Surface>
 
           {mode === 'arrival' && (
-            <Surface tone="inset" padding={3} radiusToken="lg">
-              <Box layoutDirection="row" align="center" gap={3}>
-                <Icon name="call-outline" size={20} tone="brand" />
-                <View style={{ flex: 1 }}>
-                  <Text role="bodyStrong">اتصال بالعميل</Text>
-                  <Text role="caption" tone="muted">يمكنك الاتصال بالعميل لتنسيق الاستلام.</Text>
-                </View>
-                <Button label="اتصل" size="sm" tone="primary" />
-              </Box>
-            </Surface>
+            <>
+              <Surface tone="inset" padding={3} radiusToken="lg">
+                <Box layoutDirection="row" align="center" gap={3}>
+                  <Icon name="call-outline" size={20} tone="brand" />
+                  <View style={{ flex: 1 }}>
+                    <Text role="bodyStrong">اتصال بالعميل</Text>
+                    <Text role="caption" tone="muted">يمكنك الاتصال بالعميل لتنسيق الاستلام.</Text>
+                  </View>
+                  <Button label="اتصل" size="sm" tone="primary" />
+                </Box>
+              </Surface>
+
+              <Surface tone={bellRung ? 'success' : 'brand'} gap={2} padding={3} radiusToken="lg" style={{ borderWidth: 1, borderColor: bellRung ? theme.success : theme.brand }}>
+                <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
+                  <Badge label={bellRung ? 'تم قرع الجرس' : 'جرس الوصول'} tone={bellRung ? 'success' : 'warning'} />
+                  <Icon name="notifications-outline" size={20} tone={bellRung ? 'success' : 'brand'} />
+                </Box>
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                  {bellRung
+                    ? 'تم إرسال إشعار الوصول للعميل. انتظر رده أو انتقل إلى تثبيت التسليم.'
+                    : 'اضغط على الجرس لإعلام العميل بوصولك. سيظهر تنبيه الوصول في تطبيقه.'}
+                </Text>
+                {!bellRung && (
+                  <Button label="قرع الجرس" tone="primary" size="sm" fullWidth={false} onPress={handleRingBell} />
+                )}
+              </Surface>
+
+              {dropoffOtp ? (
+                <Surface tone={otpVerified ? 'success' : 'raised'} gap={2} padding={3} radiusToken="lg" style={{ borderWidth: 1, borderColor: otpVerified ? theme.success : theme.line }}>
+                  <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
+                    <Badge label={otpVerified ? 'تم التحقق' : 'OTP التسليم'} tone={otpVerified ? 'success' : 'warning'} />
+                    <Icon name="shield-checkmark-outline" size={18} tone={otpVerified ? 'success' : 'default'} />
+                  </Box>
+                  {otpVerified ? (
+                    <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.success }}>
+                      تم التحقق من رمز التسليم. يمكنك تأكيد التسليم الآن.
+                    </Text>
+                  ) : (
+                    <>
+                      <TextField
+                        label="رمز التسليم (OTP)"
+                        value={otpInput}
+                        onChangeText={(v) => { setOtpInput(v); setOtpError(false); }}
+                        placeholder="أدخل الرمز المرسل للعميل"
+                        keyboardType="number-pad"
+                        maxLength={6}
+                      />
+                      {otpError && (
+                        <Text role="caption" style={{ color: theme.danger, textAlign: 'right' }}>
+                          الرمز غير صحيح. تحقق من العميل وأعد المحاولة.
+                        </Text>
+                      )}
+                      <Button
+                        label="تحقق من الرمز"
+                        tone="primary"
+                        size="sm"
+                        fullWidth={false}
+                        disabled={otpInput.trim().length === 0}
+                        onPress={handleVerifyOtp}
+                      />
+                    </>
+                  )}
+                </Surface>
+              ) : null}
+            </>
           )}
 
           <Box paddingVertical={spacing[2]}>

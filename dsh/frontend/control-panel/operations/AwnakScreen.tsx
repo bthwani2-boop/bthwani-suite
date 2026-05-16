@@ -6,7 +6,7 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
-import { AWNAK_OPERATIONAL_PREVIEW } from './operations.preview-data';
+import { AWNAK_OPERATIONAL_PREVIEW, AWNAK_STAGE_LABELS } from './operations.preview-data';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 
@@ -22,21 +22,26 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
   brand: 'neutral',
 };
 
+const STAGE_ORDER = Object.keys(AWNAK_STAGE_LABELS) as Array<keyof typeof AWNAK_STAGE_LABELS>;
+
 export function AwnakScreen({ hubHref = '/operations', subGroup }: AwnakScreenProps) {
   const router = useRouter();
   const preview = AWNAK_OPERATIONAL_PREVIEW;
 
-  const summaryKpi = [
-    { id: 'review', label: 'جاهز للمراجعة', value: String(preview.summary.underReview), tone: 'neutral' as const },
-    { id: 'confirmed', label: 'قيد التأكيد', value: String(preview.summary.confirmed), tone: 'danger' as const },
-    { id: 'follow-up', label: 'في المتابعة', value: String(preview.summary.inFollowUp), tone: 'neutral' as const },
-    { id: 'escalation', label: 'يحتاج تصعيداً', value: String(preview.summary.escalationNeeded), tone: 'danger' as const },
-  ];
+  const summaryKpi = STAGE_ORDER.map((stage) => ({
+    id: stage,
+    label: AWNAK_STAGE_LABELS[stage],
+    value: String(preview.summary[stage]),
+    tone: stage === 'escalated' || stage === 'dispatch_pending' ? ('danger' as const)
+      : stage === 'quote_review' || stage === 'proof_review' ? ('neutral' as const)
+      : stage === 'completed' ? ('success' as const)
+      : ('neutral' as const),
+  }));
 
   return (
     <div className={styles.surfaceCockpitContent}>
       <div className={styles.surfaceSectionHeader}>
-        <h2 className={styles.surfaceSectionTitle}>عونك</h2>
+        <h2 className={styles.surfaceSectionTitle}>عونك — العمليات</h2>
       </div>
 
       <WebControlPanelKpiStrip items={summaryKpi} />
@@ -46,22 +51,22 @@ export function AwnakScreen({ hubHref = '/operations', subGroup }: AwnakScreenPr
           <WebControlPanelDecisionRow
             key={item.requestId}
             entityId={item.requestId}
-            entityLabel={`${item.type} — العميل: ${item.customer}`}
+            entityLabel={`${item.type} — ${item.customer}`}
             status={item.status}
             statusTone={TONE_MAP[item.statusTone] ?? 'neutral'}
             risk={item.risk === 'مرتفع' ? 'danger' : item.risk === 'متوسط' ? 'warning' : 'neutral'}
             recommendation={item.nextAction}
             reason={item.note}
-            sla={`المالك: ${item.owner} | الحالة: ${item.workflowState}`}
+            sla={`المالك: ${item.owner} | SLA: ${item.sla}${item.captainId ? ` | الكابتن: ${item.captainId}` : ' | غير مسند'}`}
             primaryAction={{
               id: 'approve',
               label: item.nextAction,
-              onAction: () => router.push(`${hubHref}?workspace=proxy-shein-awnak`)
+              onAction: () => router.push(`${hubHref}?workspace=awnak-operations&requestId=${item.requestId}`)
             }}
             secondaryAction={{
               id: 'details',
               label: 'عرض التفاصيل',
-              onAction: () => router.push(`${hubHref}?workspace=sheinproxy`)
+              onAction: () => router.push(`${hubHref}?workspace=awnak-operations&panel=detail&requestId=${item.requestId}`)
             }}
           />
         ))}

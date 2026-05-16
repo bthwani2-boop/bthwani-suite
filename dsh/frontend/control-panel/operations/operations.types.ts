@@ -6,7 +6,8 @@ export type CanonicalOperationsGroupId =
   | 'dispatch-assignment'
   | 'geo-heatmap'
   | 'sheinproxy'
-  | 'proxy-shein-awnak'
+  // 'proxy-shein-awnak' is a LEGACY alias — canonical is 'awnak-operations'
+  | 'awnak-operations'
   | 'captain-operations'
   | 'partner-stores'
   | 'area-capacity'
@@ -21,7 +22,7 @@ export type LegacyOperationsWorkspaceId =
   | 'tracking-handoff'
   | 'exceptions-sla'
   | 'partner-readiness'
-  | 'proxy-shein-awnak'
+  | 'proxy-shein-awnak' // legacy alias → awnak-operations
   | 'audit-evidence'
   | 'captain-ops'
   | 'field-ops'
