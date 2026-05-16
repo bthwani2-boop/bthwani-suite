@@ -21,7 +21,7 @@ export type FieldLeadStatus =
 
 export type FieldLeadFilter = 'all' | 'today' | 'ready' | 'follow-up' | 'pending' | 'submitted' | 'done';
 
-export type FieldOnboardingSectionId = 'basics' | 'classification' | 'location' | 'photos' | 'products' | 'offer' | 'review';
+export type FieldOnboardingSectionId = 'basics' | 'classification' | 'location' | 'photos' | 'documents' | 'products' | 'offer' | 'review';
 
 export type FieldOnboardingDraft = {
   activeSectionId: FieldOnboardingSectionId;
@@ -133,6 +133,7 @@ export const fieldSectionOrder: readonly FieldOnboardingSectionId[] = [
   'classification',
   'location',
   'photos',
+  'documents',
   'products',
   'offer',
   'review',
@@ -143,6 +144,7 @@ export const fieldSectionLabels: Record<FieldOnboardingSectionId, string> = {
   classification: 'النوع والتصنيف',
   location: 'الموقع والتغطية',
   photos: 'الصور',
+  documents: 'التحقق من المستندات',
   products: 'المنتجات الأولية',
   offer: 'العرض والاتفاق',
   review: 'المراجعة والإرسال',
@@ -263,6 +265,8 @@ export function resolveFieldSectionSummaries(draft: FieldOnboardingDraft): Field
     classification: [draft.classification.storeType, draft.classification.mainCategory].filter((value) => !value.trim()).length,
     location: [draft.location.city, draft.location.zone, draft.location.addressLine, draft.location.latitude, draft.location.longitude, draft.location.landmark].filter((value) => !value.trim()).length,
     photos: [draft.photos.storefrontPhotoRef, draft.photos.interiorPhotoRef].filter((value) => !value.trim()).length,
+    // ML-002: documents section is non-blocking — upload is BLOCKED_BY_CONTRACT; section always reports 0 missing
+    documents: 0,
     products: [draft.products.featuredProductName, draft.products.featuredProductPrice].filter((value) => !value.trim()).length,
     offer: [draft.offer.preliminaryOffer, draft.offer.operatingHours].filter((value) => !value.trim()).length,
     review: getFieldRequiredMissingItems(draft).length,

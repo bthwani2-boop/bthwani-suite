@@ -857,7 +857,7 @@ function DshStoreGetScreenContent({
           />
 
           {storeLogoImageSource ? (
-            <View style={[styles.previewPartnerBadge, { position: 'absolute', bottom: 32, right: 12, zIndex: 13 }]} pointerEvents="none">
+            <View style={[styles.previewPartnerBadge, { position: 'absolute', bottom: 20, right: 12, zIndex: 13 }]} pointerEvents="none">
               <View style={styles.previewPartnerBadgeImageContainer}>
                 <Image source={storeLogoImageSource} style={styles.previewPartnerBadgeImage} resizeMode="contain" />
               </View>
@@ -879,7 +879,7 @@ function DshStoreGetScreenContent({
             alignItems: 'center',
             justifyContent: 'space-between'
           }]} pointerEvents="box-none">
-            <View style={[styles.previewDetailsContent, { flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
+            <View style={[styles.previewDetailsContent, { flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start', paddingRight: isRTL ? 56 : 0, paddingLeft: isRTL ? 0 : 8 }]}>
               <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap' }}>
                 <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText, fontSize: 16 }]} numberOfLines={1}>{normalizeDisplayText(item.name)}</Text>
                 {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 4, fontSize: 12 }]}>· {normalizedStoreName}</Text> : null}

@@ -160,6 +160,8 @@ const FilterDropdown = ({ title, options, selected, onChange, onClose }: FilterD
 };
 
 import { CatalogAdoptionQueue } from './CatalogAdoptionQueue';
+import { ItemApprovalSection } from './ItemApprovalSection';
+import { CatalogPublishingGateSection } from './CatalogPublishingGateSection';
 
 // --- Main Screen Component ---
 
@@ -504,6 +506,18 @@ export function ControlPanelDshCatalogScreen({
             {activeTab === 'approvals' && activeSubTab === 'marketing' && (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'hidden', minHeight: 0 }}>
                 <CatalogAdoptionQueue />
+              </div>
+            )}
+
+            {activeTab === 'approvals' && activeSubTab === 'quality' && (
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'hidden', minHeight: 0 }}>
+                <ItemApprovalSection />
+              </div>
+            )}
+
+            {activeTab === 'approvals' && activeSubTab === 'pricing' && (
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF', overflow: 'auto', minHeight: 0 }}>
+                <CatalogPublishingGateSection />
               </div>
             )}
 

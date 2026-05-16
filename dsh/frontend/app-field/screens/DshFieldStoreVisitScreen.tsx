@@ -18,6 +18,7 @@ import type {
   DshFieldStoreVisitValues,
   DshFieldVisitEvidenceItem,
 } from '../types/DshFieldStoreVisitTypes';
+import { VisitEvidenceSection } from '../sections/VisitEvidenceSection';
 
 export type {
   DshFieldStoreVisitErrors,
@@ -169,6 +170,14 @@ export function DshFieldStoreVisitScreen({
             />
           ))}
         </Box>
+      </Surface>
+
+      <Surface tone="raised" gap={3}>
+        <SectionHeader
+          title="التقاط أدلة الزيارة"
+          subtitle="رفع الصور معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار ستصبح نشطة عند توفر العقد."
+        />
+        <VisitEvidenceSection sectionState="ready" />
       </Surface>
 
       <Surface tone="inset" gap={3}>

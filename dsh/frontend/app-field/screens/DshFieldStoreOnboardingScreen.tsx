@@ -31,6 +31,7 @@ import {
   type FieldOnboardingSectionId,
   type FieldStoreFile,
 } from '../data/field-stores.preview-data';
+import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
 
 // ML-005: added activated/exit states so field knows when onboarding is complete
 export type DshFieldStoreOnboardingScreenState = 'onboarding' | 'activated' | 'exit';
@@ -198,6 +199,15 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
           <TextField label="مرجع صورة الواجهة" value={draft.photos.storefrontPhotoRef} editable={!readOnly} onChangeText={(value) => updateNestedField('photos', 'storefrontPhotoRef', value)} />
           <TextField label="مرجع صورة الداخل" value={draft.photos.interiorPhotoRef} editable={!readOnly} onChangeText={(value) => updateNestedField('photos', 'interiorPhotoRef', value)} />
           <TextField label="مرجع صورة اللوحة" value={draft.photos.signagePhotoRef} editable={!readOnly} onChangeText={(value) => updateNestedField('photos', 'signagePhotoRef', value)} />
+        </Surface>
+      );
+    }
+
+    if (activeSectionId === 'documents') {
+      return (
+        <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+          <SectionHeader title="التحقق من المستندات" subtitle="رفع المستندات معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار غير نشطة في الوضع الحالي." />
+          <DocumentVerificationSection state="ready" />
         </Surface>
       );
     }

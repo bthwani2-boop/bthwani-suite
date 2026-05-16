@@ -47,6 +47,9 @@ import {
   DshCaptainTierEvaluateScreen,
   DshCaptainTierInfoScreen,
 } from './screens/DshCaptainProfileScreen';
+import { DshCaptainMapScreen } from './screens/DshCaptainMapScreen';
+import { DshCaptainPickupDropoffScreen } from './screens/DshCaptainPickupDropoffScreen';
+import { DshCaptainPoDSubmissionScreen } from './screens/DshCaptainPoDSubmissionScreen';
 import type {
   DshCaptainCommandTarget,
   DshCaptainRoute,
@@ -103,6 +106,14 @@ function getRouteForCommandTarget(target: DshCaptainCommandTarget): DshCaptainRo
 
   if (target === 'account-orders') {
     return 'account-orders';
+  }
+
+  if (target === 'pickup-dropoff') {
+    return 'pickup-dropoff';
+  }
+
+  if (target === 'pod-submission') {
+    return 'pod-submission';
   }
 
   return 'home';
@@ -507,6 +518,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
               onRetry={() => setRoute('detail')}
             />
             <Button label="فتح تواصل الطلب" tone="secondary" fullWidth={false} onPress={() => setRoute('orderchat')} />
+            <Button label="مرحلة الاستلام والتسليم" tone="secondary" fullWidth={false} onPress={() => setRoute('pickup-dropoff')} />
           </Box>
 
           <CaptainPickupConfirmSheet
@@ -547,6 +559,39 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           pickupLabel={activeSummary.pickupLabel}
           dropoffLabel={activeSummary.dropoffLabel}
           state={orderChatState}
+        />
+      );
+    }
+
+    if (route === 'map') {
+      return <DshCaptainMapScreen />;
+    }
+
+    if (route === 'pickup-dropoff') {
+      return (
+        <DshCaptainPickupDropoffScreen
+          mode="pickup"
+          orderId={activeOrderId}
+          storeName={activeSummary.pickupLabel}
+          customerName="العميل"
+          address={activeSummary.dropoffLabel}
+          itemsCount={3}
+          onConfirm={() => setRoute('pod-submission')}
+          onReportIssue={() => setRoute('inbox')}
+          onBack={goBack}
+        />
+      );
+    }
+
+    if (route === 'pod-submission') {
+      return (
+        <DshCaptainPoDSubmissionScreen
+          state="ready"
+          orderId={activeOrderId}
+          onCapturePhoto={() => {}}
+          onConfirm={() => setRoute('inbox')}
+          onReportFailure={() => setRoute('inbox')}
+          onBack={goBack}
         />
       );
     }
@@ -864,6 +909,18 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       return <MobileWorkspaceHeader title="الدعم" description="المسار المفتوح من الدليل." icon="layers-outline" backLabel="العودة للخريطة" onBack={goBack} />;
     }
 
+    if (route === 'map') {
+      return <MobileWorkspaceHeader title="خريطة المهمة" description="عرض المسار وتبديل المراحل." icon="map-outline" backLabel="العودة للخريطة" onBack={goBack} />;
+    }
+
+    if (route === 'pickup-dropoff') {
+      return <MobileWorkspaceHeader title="الاستلام والتسليم" description="مراحل التسليم من الاستلام حتى إثبات التسليم." icon="navigate-outline" backLabel="العودة" onBack={goBack} />;
+    }
+
+    if (route === 'pod-submission') {
+      return <MobileWorkspaceHeader title="إثبات التسليم" description="التقاط صورة الإثبات وإرسالها لإغلاق الطلب." icon="camera-outline" backLabel="العودة" onBack={goBack} />;
+    }
+
     return null;
   };
 
@@ -1048,6 +1105,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
             ) : (
               <Button size="sm" fullWidth={false} tone="primary" label="تأكيد التسليم" onPress={confirmDelivery} />
             )}
+            <Button size="sm" fullWidth={false} tone="ghost" label="خريطة المهمة" onPress={() => setRoute('map')} />
           </Box>
 
           <Surface tone="inset" padding={2} gap={2} radiusToken="lg">
