@@ -301,6 +301,7 @@ export {
 	SummaryCard,
 	stateIds,
 	getStateDefinition,
+	CartConfirmationBlock,
 } from './components';
 export type {
 	AmountInputProps,
@@ -411,4 +412,5 @@ export type {
 	ScreenWrapperProps,
 	SummaryCardProps,
 	SummaryItem,
+	CartConfirmationBlockProps,
 } from './components';

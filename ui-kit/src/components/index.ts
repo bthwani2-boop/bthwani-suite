@@ -34,3 +34,6 @@ export { ModernPremiumHeader, BottomNavBar } from './navigation';
 export type { ModernPremiumHeaderProps, NavItem, BottomNavBarProps } from './navigation';
 export { DateTimePicker } from './date-time-picker';
 export type { DateTimePickerProps } from './date-time-picker';
+
+export { CartConfirmationBlock } from './cart-confirmation-block';
+export type { CartConfirmationBlockProps } from './cart-confirmation-block';

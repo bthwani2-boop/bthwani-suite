@@ -32,6 +32,7 @@ import {
   StateView,
   Text,
   Toast,
+  CartConfirmationBlock,
   colorPalette,
   useBThwaniAppearance,
   useDirection,
@@ -504,11 +505,10 @@ function DshStoreGetScreenContent({
   const [pickerAnchor, setPickerAnchor] = React.useState({ x: 32, y: 360 });
   const [headerSearchVisible, setHeaderSearchVisible] = React.useState(false);
   const [headerSearchQuery, setHeaderSearchQuery] = React.useState('');
-  const [cartToastVisible, setCartToastVisible] = React.useState(false);
-  const [cartDecisionVisible, setCartDecisionVisible] = React.useState(false);
   const [addedItemLabel, setAddedItemLabel] = React.useState('');
   const [previewItem, setPreviewItem] = React.useState<DshStoreGetMenuItem | null>(null);
   const [favoriteIds, setFavoriteIds] = React.useState<Set<string>>(new Set());
+  const [isAddedToCart, setIsAddedToCart] = React.useState(false);
 
   const appearanceChrome = React.useMemo(() => ({
     accent: tokens.colors.accentOrange,
@@ -963,6 +963,7 @@ function DshStoreGetScreenContent({
     setPickerItem(null);
     setSelectedMeasureOption(null);
     setSelectedMeasureQty(1);
+    setIsAddedToCart(false);
   }, []);
 
   const openInlineSearch = React.useCallback(() => {
@@ -986,20 +987,19 @@ function DshStoreGetScreenContent({
     });
 
     setAddedItemLabel(normalizeDisplayText(pickerItem!.name));
-    closeMeasurementPicker();
-    setCartToastVisible(true);
-    setCartDecisionVisible(true);
-  }, [pickerItem, closeMeasurementPicker, onAddItemToCart, selectedMeasureOption, selectedMeasureQty, selectedMode]);
+    setIsAddedToCart(true);
+  }, [pickerItem, onAddItemToCart, selectedMeasureOption, selectedMeasureQty, selectedMode]);
 
   const handleGoToCart = React.useCallback(() => {
-    setCartDecisionVisible(false);
-    setCartToastVisible(false);
+    setIsAddedToCart(false);
+    closeMeasurementPicker();
     onOpenCart?.();
-  }, [onOpenCart]);
+  }, [onOpenCart, closeMeasurementPicker]);
 
   const handleContinueShopping = React.useCallback(() => {
-    setCartDecisionVisible(false);
-  }, []);
+    setIsAddedToCart(false);
+    closeMeasurementPicker();
+  }, [closeMeasurementPicker]);
 
   const normalizedFollowersLabel = normalizeFollowersLabel(store?.followersCount ?? store?.followersLabel, storeText.get.followersSuffix);
   const normalizedPriceMatchLabel = isPriceMatchBlocked ? undefined : normalizePriceMatchLabel(store?.priceMatchLabel, storeText.get.priceMatch);
@@ -1636,28 +1636,7 @@ function DshStoreGetScreenContent({
           </Animated.View>
         </View>
 
-      <Toast
-        visible={cartToastVisible}
-        title="تمت الإضافة إلى السلة"
-        description={addedItemLabel ? `${addedItemLabel} أضيفت بنجاح.` : 'تمت الإضافة إلى السلة.'}
-        tone="success"
-        actionLabel="عرض السلة"
-        onActionPress={handleGoToCart}
-        onDismiss={() => setCartToastVisible(false)}
-      />
-
-      <Modal visible={cartDecisionVisible} transparent animationType="fade" onRequestClose={handleContinueShopping}>
-        <Pressable style={styles.cartDecisionOverlay} onPress={handleContinueShopping}>
-          <View style={[styles.cartDecisionCard, { backgroundColor: appearanceChrome.modalSurface, borderColor: appearanceChrome.modalBorder }]} pointerEvents="box-none">
-            <Text style={[styles.cartDecisionTitle, { color: appearanceChrome.primaryText }]}>تمت الإضافة للسلة</Text>
-            <Text style={[styles.cartDecisionSubtitle, { color: appearanceChrome.secondaryText }]}>{addedItemLabel ? `${addedItemLabel} أضيفت بنجاح إلى السلة.` : 'تمت الإضافة إلى السلة بنجاح.'}</Text>
-            <View style={styles.cartDecisionActions}>
-              <Button label="انتقال للسلة" tone={isDarkGlass ? 'glassStrong' : 'primary'} fullWidth onPress={handleGoToCart} />
-              <Button label="متابعة التسوق" tone={isDarkGlass ? 'glass' : 'secondary'} fullWidth onPress={handleContinueShopping} />
-            </View>
-          </View>
-        </Pressable>
-      </Modal>
+      {/* Removed detached Cart Decision Modal and Toast */}
       <Modal visible={Boolean(previewItem)} transparent animationType="fade" onRequestClose={closeImagePreview}>
         <View style={[styles.previewOverlay, { backgroundColor: appearanceChrome.overlay }]}>
           <Pressable style={styles.previewBackdrop} onPress={closeImagePreview} />
@@ -1724,65 +1703,77 @@ function DshStoreGetScreenContent({
                       <Text style={[styles.measureSheetTitle, { color: appearanceChrome.primaryText }]}>{normalizeDisplayText(pickerItem!.name)}</Text>
                     </View>
 
-                    <View style={styles.measureOptionsGrid}>
-                      {activeMeasurementOptions.map((option) => {
-                        const selected = selectedMeasureOption === option;
-                        const optionPrice = formatCurrencyValue(resolveMeasurementUnitPrice(pickerItem!, option));
-                        return (
+                    {isAddedToCart ? (
+                      <CartConfirmationBlock
+                        title="تمت إضافة المنتج للسلة"
+                        subtitle={addedItemLabel ? `${addedItemLabel}${selectedMeasureOption ? ` (${selectedMeasureOption})` : ''}` : undefined}
+                        onGoToCart={handleGoToCart}
+                        onContinueShopping={handleContinueShopping}
+                        isDarkGlass={isDarkGlass}
+                      />
+                    ) : (
+                      <>
+                        <View style={styles.measureOptionsGrid}>
+                          {activeMeasurementOptions.map((option) => {
+                            const selected = selectedMeasureOption === option;
+                            const optionPrice = formatCurrencyValue(resolveMeasurementUnitPrice(pickerItem!, option));
+                            return (
+                              <TouchableOpacity
+                                key={option}
+                                style={[
+                                  styles.measureOptionChip,
+                                  { backgroundColor: appearanceChrome.modalSurface, borderColor: appearanceChrome.modalBorder },
+                                  selected && styles.measureOptionChipActive,
+                                  selected ? { backgroundColor: appearanceChrome.activeActionBackground, borderColor: appearanceChrome.activeActionBorder } : null,
+                                ]}
+                                activeOpacity={0.88}
+                                onPress={() => setSelectedMeasureOption(option)}
+                              >
+                                <Text style={[styles.measureOptionText, { color: selected ? (isDarkGlass ? theme.brandContrast : stylesTokens.white) : appearanceChrome.primaryText }, selected && styles.measureOptionTextActive]}>{option}</Text>
+                                <Text style={[styles.measureOptionPriceText, { color: selected ? (isDarkGlass ? tokens.glassMutedText : stylesTokens.orangeSoft) : appearanceChrome.secondaryText }, selected && styles.measureOptionPriceTextActive]}>{optionPrice}</Text>
+                              </TouchableOpacity>
+                            );
+                          })}
+                        </View>
+
+                        <View style={styles.measureQtyRow}>
                           <TouchableOpacity
-                            key={option}
-                            style={[
-                              styles.measureOptionChip,
-                              { backgroundColor: appearanceChrome.modalSurface, borderColor: appearanceChrome.modalBorder },
-                              selected && styles.measureOptionChipActive,
-                              selected ? { backgroundColor: appearanceChrome.activeActionBackground, borderColor: appearanceChrome.activeActionBorder } : null,
-                            ]}
-                            activeOpacity={0.88}
-                            onPress={() => setSelectedMeasureOption(option)}
+                            style={[styles.measureQtyGhostButton, { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.modalBorder }]}
+                            activeOpacity={0.85}
+                            onPress={() => setSelectedMeasureQty((current) => Math.max(1, current - 1))}
                           >
-                            <Text style={[styles.measureOptionText, { color: selected ? (isDarkGlass ? theme.brandContrast : stylesTokens.white) : appearanceChrome.primaryText }, selected && styles.measureOptionTextActive]}>{option}</Text>
-                            <Text style={[styles.measureOptionPriceText, { color: selected ? (isDarkGlass ? tokens.glassMutedText : stylesTokens.orangeSoft) : appearanceChrome.secondaryText }, selected && styles.measureOptionPriceTextActive]}>{optionPrice}</Text>
+                            <Icon name="remove" size={18} color={appearanceChrome.secondaryText} />
                           </TouchableOpacity>
-                        );
-                      })}
-                    </View>
 
-                    <View style={styles.measureQtyRow}>
-                      <TouchableOpacity
-                        style={[styles.measureQtyGhostButton, { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.modalBorder }]}
-                        activeOpacity={0.85}
-                        onPress={() => setSelectedMeasureQty((current) => Math.max(1, current - 1))}
-                      >
-                        <Icon name="remove" size={18} color={appearanceChrome.secondaryText} />
-                      </TouchableOpacity>
+                          <View style={[styles.measureQtyValuePill, { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.modalBorder }]}>
+                            <Text style={[styles.measureQtyValueText, { color: appearanceChrome.primaryText }]}>{selectedMeasureQty}</Text>
+                          </View>
 
-                      <View style={[styles.measureQtyValuePill, { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.modalBorder }]}>
-                        <Text style={[styles.measureQtyValueText, { color: appearanceChrome.primaryText }]}>{selectedMeasureQty}</Text>
-                      </View>
+                          <TouchableOpacity
+                            style={[styles.measureQtyPrimaryButton, { backgroundColor: appearanceChrome.activeActionBackground, borderColor: appearanceChrome.activeActionBorder }]}
+                            activeOpacity={0.9}
+                            onPress={() => setSelectedMeasureQty((current) => current + 1)}
+                          >
+                            <Icon name="add" size={18} color={isDarkGlass ? theme.brandContrast : stylesTokens.white} />
+                          </TouchableOpacity>
+                        </View>
 
-                      <TouchableOpacity
-                        style={[styles.measureQtyPrimaryButton, { backgroundColor: appearanceChrome.activeActionBackground, borderColor: appearanceChrome.activeActionBorder }]}
-                        activeOpacity={0.9}
-                        onPress={() => setSelectedMeasureQty((current) => current + 1)}
-                      >
-                        <Icon name="add" size={18} color={isDarkGlass ? theme.brandContrast : stylesTokens.white} />
-                      </TouchableOpacity>
-                    </View>
+                        <View style={[styles.measureFooterBar, { borderColor: appearanceChrome.modalBorder }]}>
+                          <View style={[styles.measurePriceValueBox, { backgroundColor: appearanceChrome.modalSurface }]}>
+                            <Text style={[styles.measurePriceValueText, { color: appearanceChrome.primaryText }]}>{formatCurrencyValue(selectedMeasureTotalPrice || selectedMeasureUnitPrice)}</Text>
+                          </View>
 
-                    <View style={[styles.measureFooterBar, { borderColor: appearanceChrome.modalBorder }]}>
-                      <View style={[styles.measurePriceValueBox, { backgroundColor: appearanceChrome.modalSurface }]}>
-                        <Text style={[styles.measurePriceValueText, { color: appearanceChrome.primaryText }]}>{formatCurrencyValue(selectedMeasureTotalPrice || selectedMeasureUnitPrice)}</Text>
-                      </View>
-
-                      <TouchableOpacity
-                        style={[styles.measureConfirmButton, { backgroundColor: appearanceChrome.activeActionBackground }]}
-                        activeOpacity={0.9}
-                        onPress={handleAddToCart}
-                      >
-                        <Text style={[styles.measureConfirmText, { color: isDarkGlass ? theme.brandContrast : stylesTokens.white }]}>أضف للسلة</Text>
-                        <Icon name="cart-outline" size={16} color={isDarkGlass ? theme.brandContrast : stylesTokens.white} />
-                      </TouchableOpacity>
-                    </View>
+                          <TouchableOpacity
+                            style={[styles.measureConfirmButton, { backgroundColor: appearanceChrome.activeActionBackground }]}
+                            activeOpacity={0.9}
+                            onPress={handleAddToCart}
+                          >
+                            <Text style={[styles.measureConfirmText, { color: isDarkGlass ? theme.brandContrast : stylesTokens.white }]}>أضف للسلة</Text>
+                            <Icon name="cart-outline" size={16} color={isDarkGlass ? theme.brandContrast : stylesTokens.white} />
+                          </TouchableOpacity>
+                        </View>
+                      </>
+                    )}
                   </>
                 ) : null}
               </Pressable>
@@ -2653,50 +2644,6 @@ const styles = StyleSheet.create({
     color: stylesTokens.white,
     fontSize: 13.5,
     fontWeight: '900',
-  },
-  cartDecisionOverlay: {
-    flex: 1,
-    backgroundColor: stylesTokens.overlayDense,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  cartDecisionCard: {
-    width: '100%',
-    maxWidth: 380,
-    backgroundColor: stylesTokens.white,
-    borderRadius: 24,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: stylesTokens.line,
-    gap: 14,
-    ...Platform.select({
-      ios: {
-        shadowColor: stylesTokens.black,
-        shadowOpacity: 0.06,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 6 },
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
-  },
-  cartDecisionTitle: {
-    color: stylesTokens.dark,
-    fontSize: 17,
-    fontWeight: '900',
-    textAlign: 'center',
-  },
-  cartDecisionSubtitle: {
-    color: stylesTokens.muted,
-    fontSize: 13,
-    fontWeight: '600',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  cartDecisionActions: {
-    gap: 10,
   },
   emptyFeed: {
     paddingVertical: 36,
