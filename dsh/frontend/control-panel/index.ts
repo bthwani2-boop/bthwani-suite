@@ -10,4 +10,5 @@ export { ControlPanelDshPartnerApprovalsScreen, ControlPanelDshPartnerActivation
 export { ControlPanelDshOperationsScreen, DshOperationsHubSurface, buildOperationsHref, coerceOperationsPanel, normalizeOperationsLocation } from './operations';
 export { ControlPanelDshMarketingScreen, ControlPanelDshMarketingApprovalScreen, ControlPanelDshVideoSubmissionsReviewScreen } from './marketing';
 export { ControlPanelDshControlHubScreen, ControlPanelDshGovernanceEvidenceScreen, ControlPanelDshGuardStatusScreen } from './control';
+export { ControlPanelDshPlatformScreen, DshPlatformVarsWorkspace } from './platform';
 export { DSH_CROSS_SURFACE_CLOSURE_MAP, ControlPanelDshActionQueue, ControlPanelDshDecisionBoard, ControlPanelDshWorkspaceFrame } from './shared';
