@@ -1,4 +1,5 @@
 import React from 'react';
+import { colorPalette } from '@bthwani/ui-kit';
 import type { PartnerOfferRecord } from './partner-offer.preview-store';
 import type { SubscriptionPlan, Entitlement } from './loyalty.preview-store';
 import type { CampaignRecord } from './campaign.preview-store';
@@ -240,12 +241,12 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
 export function CommercialParityPreview({ features, storeName }: { features: ReturnType<typeof mapStoreCommercialFeatures>; storeName?: string }) {
   const getBadgeColor = (source: CommercialBadge['source']) => {
     switch (source) {
-      case 'partner': return { bg: '#FEF3C7', fg: '#D97706' };
-      case 'loyalty': return { bg: '#F3E8FF', fg: '#7E22CE' };
-      case 'subscription': return { bg: '#DBEAFE', fg: '#1D4ED8' };
-      case 'campaign': return { bg: '#FFEDD5', fg: '#FF500D' };
-      case 'catalog': return { bg: '#F1F5F9', fg: '#475569' };
-      default: return { bg: '#F1F5F9', fg: '#475569' };
+      case 'partner': return { bg: colorPalette.warningSoft, fg: colorPalette.warningStrong };
+      case 'loyalty': return { bg: colorPalette.infoSoft, fg: colorPalette.infoStrong };
+      case 'subscription': return { bg: colorPalette.brandSurface, fg: colorPalette.brandStrong };
+      case 'campaign': return { bg: colorPalette.brandSoft, fg: colorPalette.brand };
+      case 'catalog': return { bg: colorPalette.surfaceInset, fg: colorPalette.inkMuted };
+      default: return { bg: colorPalette.surfaceInset, fg: colorPalette.inkMuted };
     }
   };
 
@@ -267,10 +268,10 @@ export function CommercialParityPreview({ features, storeName }: { features: Ret
     'div',
     {
       style: {
-        backgroundColor: '#fff',
+        backgroundColor: colorPalette.surface,
         borderRadius: '12px',
         padding: '12px',
-        border: '1px solid #E2E8F0',
+        border: `1px solid ${colorPalette.line}`,
         display: 'flex',
         flexDirection: 'row-reverse', // RTL Layout
         gap: '12px',
@@ -287,7 +288,7 @@ export function CommercialParityPreview({ features, storeName }: { features: Ret
           width: '74px',
           height: '74px',
           borderRadius: '8px',
-          backgroundColor: '#F1F5F9',
+          backgroundColor: colorPalette.surfaceInset,
           position: 'relative',
           flexShrink: 0
         }
@@ -300,14 +301,13 @@ export function CommercialParityPreview({ features, storeName }: { features: Ret
             position: 'absolute',
             top: '-4px',
             right: '-4px',
-            backgroundColor: '#FF500D',
-            color: '#fff',
+            backgroundColor: colorPalette.brand,
+            color: colorPalette.white,
             padding: '2px 6px',
             borderRadius: '4px',
             fontSize: '9px',
             fontWeight: '900',
             zIndex: 10,
-            boxShadow: '0 2px 4px rgba(255, 80, 13, 0.2)'
           }
         },
         features.offerLabel
@@ -320,15 +320,15 @@ export function CommercialParityPreview({ features, storeName }: { features: Ret
     React.createElement(
       'div',
       { style: { flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'right' } },
-      React.createElement('div', { style: { fontSize: '13px', fontWeight: '800', color: '#0A2F5C' } }, storeName || 'اسم المتجر'),
-      React.createElement('div', { style: { fontSize: '10px', color: '#64748B', fontWeight: '600' } }, 'توصيل سريع • بثواني برو'),
+      React.createElement('div', { style: { fontSize: '13px', fontWeight: '800', color: colorPalette.brandStrong } }, storeName || 'اسم المتجر'),
+      React.createElement('div', { style: { fontSize: '10px', color: colorPalette.inkMuted, fontWeight: '600' } }, 'توصيل سريع • بثواني برو'),
 
       // Metadata Row (Rating / ETA)
       React.createElement(
         'div',
         { style: { display: 'flex', flexDirection: 'row-reverse', gap: '8px', marginTop: '2px' } },
-        React.createElement('span', { style: { fontSize: '9px', fontWeight: '800', color: '#D97706' } }, '★ 4.9'),
-        React.createElement('span', { style: { fontSize: '9px', color: '#64748B' } }, '18 دقيقة')
+        React.createElement('span', { style: { fontSize: '9px', fontWeight: '800', color: colorPalette.warning } }, '★ 4.9'),
+        React.createElement('span', { style: { fontSize: '9px', color: colorPalette.inkMuted } }, '18 دقيقة')
       ),
 
       // Commercial Chips (Max 2)
@@ -359,16 +359,16 @@ export function CommercialParityPreview({ features, storeName }: { features: Ret
           bottom: 0,
           left: 0,
           right: 0,
-          backgroundColor: 'rgba(254, 242, 242, 0.95)',
+          backgroundColor: colorPalette.dangerSoft,
           padding: '4px 8px',
-          borderTop: '1px solid #FECACA',
+          borderTop: `1px solid ${colorPalette.danger}`,
           fontSize: '8px',
-          color: '#DC2626',
+          color: colorPalette.dangerStrong,
           fontWeight: '700',
           textAlign: 'center'
         }
       },
-      `⚠️ تضارب نشط: ${features.conflicts[0].conflictReason}`
+      `تضارب نشط: ${features.conflicts[0].conflictReason}`
     )
   );
 }

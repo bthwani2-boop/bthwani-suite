@@ -1,3 +1,5 @@
+import { colorPalette } from '@bthwani/ui-kit';
+
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
  */
@@ -44,7 +46,7 @@ const seededLoyaltyItems: LoyaltyRecord[] = [
     ctaLabel: 'مراجعة الاشتراك',
     highlight: 'مرتبط بمسار الاشتراك الحقيقي',
     metricValue: '٢,٨٤٠ عضو نشط',
-    accentColor: '#dc2626',
+    accentColor: colorPalette.danger,
     impressions: 33000,
     clicks: 1910,
   },
@@ -59,7 +61,7 @@ const seededLoyaltyItems: LoyaltyRecord[] = [
     ctaLabel: 'عرض النقاط',
     highlight: 'عرض محدود',
     metricValue: '١٥,٠٠٠ مستفيد',
-    accentColor: '#0A2F5C',
+    accentColor: colorPalette.brandStrong,
     impressions: 45000,
     clicks: 5200,
   }
@@ -114,7 +116,7 @@ export function upsertLoyaltyItem(item: Partial<LoyaltyRecord>) {
     ctaLabel: item.ctaLabel?.trim() || existing?.ctaLabel || 'فتح',
     highlight: item.highlight?.trim() || existing?.highlight || '',
     metricValue: item.metricValue?.trim() || existing?.metricValue || '0',
-    accentColor: item.accentColor?.trim() || existing?.accentColor || '#0A2F5C',
+    accentColor: item.accentColor?.trim() || existing?.accentColor || colorPalette.brandStrong,
     impressions: item.impressions ?? existing?.impressions ?? 0,
     clicks: item.clicks ?? existing?.clicks ?? 0,
   };

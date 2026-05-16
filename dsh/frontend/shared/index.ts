@@ -1,3 +1,98 @@
+// --- Commercial Marketing Contract (UI_PREVIEW_ONLY) ---
+
+export type {
+  LoyaltyStatus,
+  LoyaltyAudience,
+  LoyaltyLane,
+  LoyaltyRecord,
+  LoyaltyProgram,
+  LoyaltyTier,
+  LoyaltyReward,
+  SubscriptionPlan,
+  Entitlement,
+  EarningRule,
+  RedemptionRule,
+} from './loyalty.preview-store';
+export {
+  loyaltyStoreDataContract,
+  getLoyaltyItems,
+  getLoyaltyKpis,
+  upsertLoyaltyItem,
+  removeLoyaltyItem,
+  getLoyaltyPrograms,
+  getSubscriptionPlans,
+  getLoyaltyTiers,
+  getLoyaltyRewards,
+  getEntitlements,
+} from './loyalty.preview-store';
+
+export type {
+  PartnerOfferType,
+  PartnerOfferStatus,
+  PartnerOfferSource,
+  PartnerOfferTarget,
+  PartnerOfferRecord,
+} from './partner-offer.preview-store';
+export {
+  partnerOfferStoreDataContract,
+  getPartnerOfferItems,
+  getPartnerOfferKpis,
+  upsertPartnerOfferItem,
+  approvePartnerOfferItem,
+  publishPartnerOfferItem,
+  pausePartnerOfferItem,
+  rejectPartnerOfferItem,
+  archivePartnerOfferItem,
+  removePartnerOfferItem,
+  isPartnerOfferClientVisible,
+} from './partner-offer.preview-store';
+
+export type {
+  CampaignStatus,
+  CampaignGoal,
+  CampaignAudience,
+  CampaignChannel,
+  CampaignPlacement,
+  CampaignPriority,
+  CampaignTargetType,
+  CampaignRecord,
+} from './campaign.preview-store';
+export {
+  campaignStoreDataContract,
+  getCampaignItems,
+  getCampaignKpis,
+  upsertCampaignItem,
+  toggleCampaignStatus,
+  duplicateCampaignItem,
+  removeCampaignItem,
+} from './campaign.preview-store';
+
+export type {
+  HomePromoStatus,
+  HomePromoRecord,
+} from './promo.preview-store';
+export {
+  promoStoreDataContract,
+  getHomePromoItems,
+  getPublishedHomePromos,
+  isPromoClientVisible,
+  upsertHomePromoItem,
+  removeHomePromoItem,
+  toggleHomePromoStatus,
+} from './promo.preview-store';
+
+export type {
+  CommercialSource,
+  CommercialSourceMap,
+  StoreCommercialContext,
+  CommercialBadge,
+} from './store-card-commercial-map';
+export {
+  mapStoreCommercialFeatures,
+  CommercialParityPreview,
+  conflictList,
+} from './store-card-commercial-map';
+
 export type {
 	DshCatalogApprovalStage,
 	DshCatalogMeasurementKind,

@@ -11,7 +11,7 @@ export const partnerOfferStoreDataContract = {
 } as const;
 
 export type PartnerOfferType = 'discount' | 'free-delivery' | 'bundle' | 'buy-x-get-y' | 'coupon';
-export type PartnerOfferStatus = 'inbound' | 'review' | 'marketing-ready' | 'published' | 'rejected' | 'paused';
+export type PartnerOfferStatus = 'inbound' | 'review' | 'marketing-ready' | 'published' | 'rejected' | 'paused' | 'archived';
 export type PartnerOfferSource = 'partner' | 'field' | 'marketing' | 'catalog';
 export type PartnerOfferTarget = 'store' | 'product' | 'category';
 
@@ -31,6 +31,7 @@ export type PartnerOfferRecord = {
   eligibility: string;
   displayBadge: string;
   marginRiskNote?: string;
+  rejectionReason?: string;
   linkedCampaignId?: string;
   activeFromDate?: string;
   activeToDate?: string;
@@ -128,6 +129,7 @@ export function upsertPartnerOfferItem(item: Partial<PartnerOfferRecord>) {
     eligibility: item.eligibility ?? existing?.eligibility ?? 'الكل',
     displayBadge: item.displayBadge ?? existing?.displayBadge ?? 'عرض جديد',
     marginRiskNote: item.marginRiskNote ?? existing?.marginRiskNote,
+    rejectionReason: item.rejectionReason ?? existing?.rejectionReason,
     linkedCampaignId: item.linkedCampaignId ?? existing?.linkedCampaignId,
     activeFromDate: item.activeFromDate ?? existing?.activeFromDate,
     activeToDate: item.activeToDate ?? existing?.activeToDate,
@@ -154,6 +156,20 @@ export function publishPartnerOfferItem(id: string) {
 export function pausePartnerOfferItem(id: string) {
   const current = getPartnerOfferItems();
   setMutableStore(current.map(item => item.id === id ? { ...item, status: 'paused' } : item));
+}
+
+export function rejectPartnerOfferItem(id: string, reason: string) {
+  const current = getPartnerOfferItems();
+  setMutableStore(current.map(item => item.id === id ? { ...item, status: 'rejected', rejectionReason: reason } : item));
+}
+
+export function archivePartnerOfferItem(id: string) {
+  const current = getPartnerOfferItems();
+  setMutableStore(current.map(item => item.id === id ? { ...item, status: 'archived' } : item));
+}
+
+export function isPartnerOfferClientVisible(status: PartnerOfferStatus): boolean {
+  return status === 'published';
 }
 
 export function removePartnerOfferItem(id: string) {

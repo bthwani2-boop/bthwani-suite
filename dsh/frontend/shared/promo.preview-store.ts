@@ -13,6 +13,20 @@ export const promoStoreDataContract = {
   moneySemantics: 'not_applicable',
 } as const;
 
+/**
+ * Full lifecycle: draft → eligible → active → exhausted/expired/paused/archived
+ * `published` is kept as a deprecated alias for `active` (backward compat).
+ */
+export type HomePromoStatus =
+  | 'draft'
+  | 'eligible'
+  | 'active'
+  | 'exhausted'
+  | 'expired'
+  | 'paused'
+  | 'archived'
+  | 'published'; // @deprecated — use 'active'
+
 export type HomePromoRecord = {
   id: string;
   title: string;
@@ -25,7 +39,7 @@ export type HomePromoRecord = {
   targetType: string;
   targetId: string;
   targetLabel: string;
-  status: 'draft' | 'published';
+  status: HomePromoStatus;
   order: number;
   audienceScope?: 'all' | 'guest' | 'customer' | 'premium';
   placement: 'home-promo';
@@ -94,7 +108,11 @@ export function getHomePromoItems(): HomePromoRecord[] {
 }
 
 export function getPublishedHomePromos(): HomePromoRecord[] {
-  return getHomePromoItems().filter((item) => item.status === 'published');
+  return getHomePromoItems().filter((item) => item.status === 'active' || item.status === 'published');
+}
+
+export function isPromoClientVisible(status: HomePromoStatus): boolean {
+  return status === 'active' || status === 'published';
 }
 
 export function upsertHomePromoItem(item: Partial<HomePromoRecord>) {
@@ -114,7 +132,7 @@ export function upsertHomePromoItem(item: Partial<HomePromoRecord>) {
     targetType: item.targetType || existing?.targetType || 'custom',
     targetId: item.targetId || existing?.targetId || '',
     targetLabel: item.targetLabel || existing?.targetLabel || 'وجهة مخصصة',
-    status: item.status || existing?.status || 'draft',
+    status: item.status || existing?.status || 'draft' as HomePromoStatus,
     order: typeof item.order === 'number' ? item.order : existing?.order || current.length + 1,
     audienceScope: item.audienceScope || existing?.audienceScope || 'all',
     placement: 'home-promo',
@@ -137,7 +155,12 @@ export function toggleHomePromoStatus(id: string) {
   const current = getHomePromoItems();
   const next = current.map((item) => {
     if (item.id !== id) return item;
-    return { ...item, status: (item.status === 'published' ? 'draft' : 'published') as HomePromoRecord['status'], updatedAt: new Date().toISOString() };
+    const nextStatus: HomePromoStatus =
+      item.status === 'active' || item.status === 'published' ? 'paused'
+      : item.status === 'paused' ? 'active'
+      : item.status === 'eligible' ? 'active'
+      : 'active';
+    return { ...item, status: nextStatus, updatedAt: new Date().toISOString() };
   });
   setMutableStore(next);
 }
