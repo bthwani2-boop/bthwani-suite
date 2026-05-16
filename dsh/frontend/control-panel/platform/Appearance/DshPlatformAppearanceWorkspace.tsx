@@ -103,34 +103,34 @@ export function DshPlatformAppearanceWorkspace() {
       >
         <Box gap={3}>
           <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <Box padding={3} radiusToken="md" style={{ flexGrow: 1, flexBasis: 120, backgroundColor: '#0A2F5C' }}>
+            <Surface tone="brand" padding={3} radiusToken="md" style={{ flexGrow: 1, flexBasis: 120 }}>
               <Box gap={1}>
-                <Text role="bodySm" style={{ color: '#FFFFFF' }} weight="bold">Deep Blue</Text>
-                <Text role="caption" style={{ color: 'rgba(255,255,255,0.7)' }}>#0A2F5C</Text>
+                <Text role="bodySm" tone="inverse" weight="bold">Deep Blue</Text>
+                <Text role="caption" tone="inverse">Brand Primary</Text>
               </Box>
-            </Box>
-            <Box padding={3} radiusToken="md" style={{ flexGrow: 1, flexBasis: 120, backgroundColor: '#FF500D' }}>
+            </Surface>
+            <Surface tone="warning" padding={3} radiusToken="md" style={{ flexGrow: 1, flexBasis: 120 }}>
               <Box gap={1}>
-                <Text role="bodySm" style={{ color: '#FFFFFF' }} weight="bold">Orange</Text>
-                <Text role="caption" style={{ color: 'rgba(255,255,255,0.7)' }}>#FF500D</Text>
+                <Text role="bodySm" tone="inverse" weight="bold">Orange</Text>
+                <Text role="caption" tone="inverse">Brand Accent</Text>
               </Box>
-            </Box>
+            </Surface>
             <Surface tone="default" border padding={3} radiusToken="md" style={{ flexGrow: 1, flexBasis: 120 }}>
               <Box gap={1}>
                 <Text role="bodySm" weight="bold">White</Text>
-                <Text role="caption" tone="muted">#FFFFFF</Text>
+                <Text role="caption" tone="muted">Base Surface</Text>
               </Box>
             </Surface>
           </Box>
           <Text role="caption" tone="muted">
-            يسمح بصريًا بعرض close tints/shades المعتمدة فقط، لكن كـ preview. لا توجد ألوان عشوائية.
+            يسمح بصريًا بعرض close tints/shades المعتمدة فقط عبر tokens. لا توجد ألوان عشوائية أو hardcoded. هذا القسم لهوية المنصة وليس للحملات التسويقية.
           </Text>
         </Box>
       </WebSectionCard>
 
       <WebSectionCard
-        title="Appearance Overrides & Campaigns"
-        description="استعراض وضبط Service Appearance Overrides و Campaign / Seasonal Theme بطريقة محكومة."
+        title="Central Platform Appearance"
+        description="استعراض وضبط Service Appearance Overrides بطريقة محكومة. التحكم المستقبلي يطبّق على كل التطبيقات والأسطح عبر النظام المركزي."
       >
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           {PREVIEW_APPEARANCE_RECORDS.map((record) => (

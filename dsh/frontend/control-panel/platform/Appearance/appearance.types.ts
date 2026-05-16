@@ -1,7 +1,7 @@
 export type AppearanceStatus = 'preview-only' | 'contract-needed' | 'ready-for-binding';
-export type AppearanceScope = 'Global' | 'Platform' | 'Service' | 'Surface' | 'Campaign';
+export type AppearanceScope = 'Global' | 'Platform' | 'App' | 'Surface' | 'Service';
 export type AppearanceRisk = 'low' | 'medium' | 'high' | 'visual-identity';
-export type AppearanceOwner = 'Platform' | 'DesignSystem' | 'DSH' | 'Marketing';
+export type AppearanceOwner = 'Platform' | 'DesignSystem' | 'AppShell' | 'ServiceOwner';
 
 export interface AppearanceRecord {
   id: string;
