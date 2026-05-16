@@ -4,6 +4,8 @@
  * PREVIEW ONLY — no real COD settlement, no real payout, no API.
  * Composable: mount inside any captain finance surface.
  * Contract state: CONTRACT_TBD — real finance flows blocked.
+ *
+ * Currency: YER / ر.ي — no SAR / ر.س
  */
 
 import React from 'react';
@@ -28,7 +30,7 @@ import type {
 import { useWltDshCaptainFinancePreview } from './useWltDshCaptainFinancePreview';
 
 const PREVIEW_NOTICE =
-  'هذا عرض تجريبي فقط — لا يوجد تسوية حقيقية ولا صرف فعلي حتى يُرفع وضع CONTRACT_TBD.';
+  'هذا عرض تجريبي فقط — لا يوجد تسوية حقيقية ولا صرف فعلي حتى يُرفع وضع CONTRACT_TBD. العملة: ر.ي (ريال يمني).';
 
 function PreviewBanner() {
   return (
@@ -61,6 +63,11 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
           <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
             {record.timeLabel}
           </Text>
+          {record.holdReason ? (
+            <Text role="caption" tone="warning" style={{ textAlign: 'right' }}>
+              {record.holdReason}
+            </Text>
+          ) : null}
         </View>
         <View style={{ alignItems: 'flex-start', gap: 5, flexShrink: 0 }}>
           <Text role="bodyStrong" tone={amountTone} style={{ textAlign: 'left' }}>
@@ -73,19 +80,84 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
   );
 }
 
-function CodBalanceSection({ snapshot, records }: { snapshot: WltCaptainFinanceSnapshot; records: readonly WltDshFinancePreviewRecord[] }) {
+function EligibilitySection({ snapshot }: { snapshot: WltCaptainFinanceSnapshot }) {
+  const eligibilityTone = snapshot.isEligible ? 'success' : 'warning';
+
   return (
     <Surface tone="raised" padding={3} gap={3}>
       <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-        رصيد الدفع عند الاستلام (COD)
+        أهلية استقبال الطلبات
       </Text>
       <KeyValueList
         dense
         items={[
-          { label: 'المحصّل الحالي', value: snapshot.codBalanceLabel, tone: 'info' },
+          {
+            label: 'الرصيد الضامن الحالي',
+            value: snapshot.eligibilityBalanceLabel,
+            tone: snapshot.isEligible ? 'success' : 'warning',
+          },
+          {
+            label: 'الحد الأدنى المطلوب',
+            value: snapshot.minimumEligibilityLabel,
+            tone: 'info',
+          },
+          {
+            label: 'الحالة',
+            value: snapshot.isEligible ? 'مؤهل لاستقبال الطلبات' : 'غير مؤهل — رصيد غير كافٍ',
+            tone: eligibilityTone,
+          },
+          ...(snapshot.hasEligibilityBlock
+            ? [{
+                label: 'النقص المطلوب',
+                value: snapshot.eligibilityShortfallLabel,
+                tone: 'warning' as const,
+              }]
+            : []),
+          { label: 'العقد', value: snapshot.contractState, tone: 'warning' as const },
+        ]}
+      />
+
+      {snapshot.hasEligibilityBlock ? (
+        <StateView
+          kind="warning"
+          title="غير مؤهل لاستقبال الطلبات"
+          description={snapshot.eligibilityBlockReason}
+        />
+      ) : null}
+
+      <Surface tone="inset" padding={3} gap={2}>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+          شحن الرصيد الضامن — CONTRACT_TBD
+        </Text>
+        <Button
+          label={snapshot.hasEligibilityBlock
+            ? `اشحن ${snapshot.eligibilityShortfallLabel} للتأهل`
+            : 'شحن رصيد إضافي'}
+          tone={snapshot.hasEligibilityBlock ? 'primary' : 'ghost'}
+          fullWidth
+          onPress={() => {}}
+        />
+        <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
+          الشحن الحقيقي يتطلب ربط WLT API — CONTRACT_TBD.
+        </Text>
+      </Surface>
+    </Surface>
+  );
+}
+
+function CodLiabilitySection({ snapshot, records }: { snapshot: WltCaptainFinanceSnapshot; records: readonly WltDshFinancePreviewRecord[] }) {
+  return (
+    <Surface tone="raised" padding={3} gap={3}>
+      <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+        تحصيل الدفع عند الاستلام — ذمة مستحقة
+      </Text>
+      <KeyValueList
+        dense
+        items={[
+          { label: 'المبلغ المحصّل — ذمة قائمة', value: snapshot.codLiabilityLabel, tone: 'warning' },
           { label: 'الإيداع المعلّق', value: snapshot.settlementLabel, tone: 'warning' },
-          { label: 'دورة التسوية', value: snapshot.cycleLabel, tone: 'default' },
-          { label: 'العقد', value: snapshot.contractState, tone: 'warning' },
+          { label: 'دورة التسوية', value: snapshot.cycleLabel, tone: 'default' as const },
+          { label: 'العقد', value: snapshot.contractState, tone: 'warning' as const },
         ]}
       />
       {records.length > 0 ? (
@@ -96,7 +168,7 @@ function CodBalanceSection({ snapshot, records }: { snapshot: WltCaptainFinanceS
       <StateView
         kind="warning"
         title="تسوية COD مقفلة — CONTRACT_TBD"
-        description="لا يمكن تحويل رصيد COD حتى يُربط الـ API المالي."
+        description="الرصيد المحصّل يُعتبر ذمة مستحقة على الكابتن حتى يتم الإيداع والمطابقة عبر WLT API."
       />
     </Surface>
   );
@@ -113,8 +185,8 @@ function EarningsSection({ snapshot, records }: { snapshot: WltCaptainFinanceSna
         items={[
           { label: 'إجمالي الأرباح', value: snapshot.earningsLabel, tone: 'success' },
           { label: 'المدفوعات المتوقعة', value: snapshot.pendingPayoutLabel, tone: 'warning' },
-          { label: 'دورة الأرباح', value: snapshot.cycleLabel },
-          { label: 'العقد', value: snapshot.contractState, tone: 'warning' },
+          { label: 'دورة الأرباح', value: snapshot.cycleLabel, tone: 'default' as const },
+          { label: 'العقد', value: snapshot.contractState, tone: 'warning' as const },
         ]}
       />
       {records.length > 0 ? (
@@ -136,14 +208,14 @@ function SettlementSection({ snapshot }: { snapshot: WltCaptainFinanceSnapshot }
         dense
         items={[
           { label: 'مبلغ التسوية', value: snapshot.settlementLabel, tone: 'info' },
-          { label: 'الدورة', value: snapshot.cycleLabel },
-          { label: 'العقد', value: snapshot.contractState, tone: 'warning' },
+          { label: 'الدورة', value: snapshot.cycleLabel, tone: 'default' as const },
+          { label: 'العقد', value: snapshot.contractState, tone: 'warning' as const },
         ]}
       />
       <StateView
         kind="warning"
         title="الإغلاق المالي مقفل — CONTRACT_TBD"
-        description="تسوية الكابتن تتطلب API مالي لم يُعرَّف بعد."
+        description="تسوية الكابتن تتطلب WLT API مالي لم يُعرَّف بعد."
       />
     </Surface>
   );
@@ -154,8 +226,15 @@ export type WltDshCaptainFinancePreviewProps = {
   onBack?: () => void;
 };
 
+const SECTION_LABELS: Record<WltCaptainFinanceSection, string> = {
+  eligibility: 'الأهلية والشحن',
+  'cod-liability': 'ذمة COD',
+  earnings: 'الأرباح',
+  settlement: 'التسوية',
+};
+
 export function WltDshCaptainFinancePreview({
-  section = 'cod-balance',
+  section = 'eligibility',
   onBack,
 }: WltDshCaptainFinancePreviewProps) {
   const {
@@ -195,7 +274,7 @@ export function WltDshCaptainFinancePreview({
           {availableSections.map((s) => (
             <Button
               key={s}
-              label={s === 'cod-balance' ? 'رصيد COD' : s === 'earnings' ? 'الأرباح' : 'التسوية'}
+              label={SECTION_LABELS[s]}
               tone={activeSection === s ? 'primary' : 'ghost'}
               size="sm"
               fullWidth={false}
@@ -205,7 +284,8 @@ export function WltDshCaptainFinancePreview({
         </View>
       </Surface>
 
-      {activeSection === 'cod-balance' && <CodBalanceSection snapshot={snapshot} records={records} />}
+      {activeSection === 'eligibility' && <EligibilitySection snapshot={snapshot} />}
+      {activeSection === 'cod-liability' && <CodLiabilitySection snapshot={snapshot} records={records} />}
       {activeSection === 'earnings' && <EarningsSection snapshot={snapshot} records={records} />}
       {activeSection === 'settlement' && <SettlementSection snapshot={snapshot} />}
 

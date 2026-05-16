@@ -12,6 +12,8 @@ export function useWltDshFieldFinancePreview(storeIds?: readonly string[]) {
   const snapshot = React.useMemo(() => WltFieldAdapter.getSnapshot(storeIds), [storeIdsKey]);
   const records = React.useMemo(() => WltFieldAdapter.getRecords(storeIds), [storeIdsKey]);
   const commissionRecords = React.useMemo(() => WltFieldAdapter.getCommissionRecords(storeIds), [storeIdsKey]);
+  const pendingRecords = React.useMemo(() => WltFieldAdapter.getPendingCommissionRecords(storeIds), [storeIdsKey]);
+  const rejectedRecords = React.useMemo(() => WltFieldAdapter.getRejectedCommissionRecords(storeIds), [storeIdsKey]);
   const payoutRecords = React.useMemo(() => WltFieldAdapter.getPayoutRecords(storeIds), [storeIdsKey]);
 
   return {
@@ -19,6 +21,8 @@ export function useWltDshFieldFinancePreview(storeIds?: readonly string[]) {
     snapshot,
     records,
     commissionRecords,
+    pendingRecords,
+    rejectedRecords,
     payoutRecords,
   } as const;
 }

@@ -286,7 +286,7 @@ function createProductCardStyles(
       borderWidth: 0,
       borderColor: 'transparent',
       zIndex: 3,
-      shadowColor: '#000',
+      shadowColor: colorPalette.black,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.08,
       shadowRadius: 4,

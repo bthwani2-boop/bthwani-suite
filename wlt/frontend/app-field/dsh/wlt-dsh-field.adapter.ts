@@ -15,6 +15,14 @@ export function getCommissionRecords(storeIds?: readonly string[]): WltDshFinanc
   return getRecords(storeIds).filter((record) => record.kind === 'field-commission');
 }
 
+export function getPendingCommissionRecords(storeIds?: readonly string[]): WltDshFinancePreviewRecord[] {
+  return getRecords(storeIds).filter((record) => record.kind === 'field-commission-pending');
+}
+
+export function getRejectedCommissionRecords(storeIds?: readonly string[]): WltDshFinancePreviewRecord[] {
+  return getRecords(storeIds).filter((record) => record.kind === 'field-commission-rejected');
+}
+
 export function getPayoutRecords(storeIds?: readonly string[]): WltDshFinancePreviewRecord[] {
   return getRecords(storeIds).filter((record) => record.kind === 'field-payout');
 }
@@ -23,6 +31,8 @@ const WltDshFieldAdapter = {
   getSnapshot,
   getRecords,
   getCommissionRecords,
+  getPendingCommissionRecords,
+  getRejectedCommissionRecords,
   getPayoutRecords,
 };
 

@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   storeName: {
     fontSize: 19, // Primary: Prominent & Dominant
     fontWeight: '800',
-    color: '#0A2F5C',
+    color: colorPalette.brandStrong,
     textAlign: 'right',
     fontFamily: 'Outfit-Bold',
     marginBottom: 0,

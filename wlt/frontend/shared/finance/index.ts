@@ -16,6 +16,7 @@ export type {
 	WltPartnerFinanceSnapshot,
 } from './dshFinancePreview';
 export {
+	formatWltYer,
 	getWltCaptainFinancePreview,
 	getWltCaptainFinanceSnapshot,
 	getWltControlPanelFinancePreview,

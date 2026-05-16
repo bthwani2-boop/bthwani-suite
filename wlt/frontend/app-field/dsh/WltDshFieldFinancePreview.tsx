@@ -2,7 +2,7 @@
  * WLT-owned field agent finance preview component.
  *
  * PREVIEW ONLY — no real commission payout, no real transfer, no API.
- * Composable: mount inside any field finance surface.
+ * Currency: YER / ر.ي — no SAR / ر.س
  * Contract state: CONTRACT_TBD — real finance flows blocked.
  */
 
@@ -26,7 +26,7 @@ import {
 import { useWltDshFieldFinancePreview } from './useWltDshFieldFinancePreview';
 
 const PREVIEW_NOTICE =
-  'هذا عرض تجريبي فقط — لا يوجد صرف عمولة حقيقي ولا تحويل فعلي حتى يُرفع وضع CONTRACT_TBD.';
+  'هذا عرض تجريبي فقط — لا يوجد صرف عمولة حقيقي ولا تحويل فعلي حتى يُرفع وضع CONTRACT_TBD. العملة: ر.ي (ريال يمني).';
 
 function PreviewBanner() {
   return (
@@ -59,6 +59,11 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
           <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
             {record.timeLabel}
           </Text>
+          {record.holdReason ? (
+            <Text role="caption" tone="warning" style={{ textAlign: 'right' }}>
+              {record.holdReason}
+            </Text>
+          ) : null}
         </View>
         <View style={{ alignItems: 'flex-start', gap: 5, flexShrink: 0 }}>
           <Text role="bodyStrong" tone={amountTone} style={{ textAlign: 'left' }}>
@@ -80,48 +85,17 @@ function CommissionSummary({ snapshot }: { snapshot: WltFieldFinanceSnapshot }) 
       <KeyValueList
         dense
         items={[
-          { label: 'إجمالي العمولات', value: snapshot.totalCommissionLabel, tone: 'success' },
-          { label: 'الملفات المؤهلة', value: String(snapshot.eligibleFilesCount) },
+          { label: 'عمولات معتمدة', value: snapshot.totalCommissionLabel, tone: 'success' },
+          { label: 'عمولات معلقة', value: snapshot.pendingCommissionsLabel, tone: 'warning' },
+          { label: 'عمولات مرفوضة', value: snapshot.rejectedCommissionsLabel, tone: 'error' },
+          { label: 'الملفات المؤهلة', value: String(snapshot.eligibleFilesCount), tone: 'default' as const },
           { label: 'آخر صرف', value: snapshot.lastPayoutLabel, tone: 'info' },
-          { label: 'تاريخ الصرف', value: snapshot.lastPayoutDate },
-          { label: 'العقد', value: snapshot.contractState, tone: 'warning' },
+          { label: 'تاريخ آخر صرف', value: snapshot.lastPayoutDate, tone: 'default' as const },
+          { label: 'الصرف القادم', value: snapshot.nextPayoutDate, tone: 'default' as const },
+          { label: 'العقد', value: snapshot.contractState, tone: 'warning' as const },
         ]}
       />
     </Surface>
-  );
-}
-
-function CommissionRecords({
-  commissionRecords,
-  payoutRecords,
-}: {
-  commissionRecords: readonly WltDshFinancePreviewRecord[];
-  payoutRecords: readonly WltDshFinancePreviewRecord[];
-}) {
-  return (
-    <>
-      {commissionRecords.length > 0 && (
-        <Surface tone="raised" padding={3} gap={3}>
-          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-            عمولات الاستقطاب
-          </Text>
-          <Box gap={2}>
-            {commissionRecords.map((r) => <RecordRow key={r.id} record={r} />)}
-          </Box>
-        </Surface>
-      )}
-
-      {payoutRecords.length > 0 && (
-        <Surface tone="raised" padding={3} gap={3}>
-          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-            سجل الصرف
-          </Text>
-          <Box gap={2}>
-            {payoutRecords.map((r) => <RecordRow key={r.id} record={r} />)}
-          </Box>
-        </Surface>
-      )}
-    </>
   );
 }
 
@@ -137,6 +111,8 @@ export function WltDshFieldFinancePreview({
   const {
     snapshot,
     commissionRecords,
+    pendingRecords,
+    rejectedRecords,
     payoutRecords,
   } = useWltDshFieldFinancePreview(storeIds);
 
@@ -163,7 +139,54 @@ export function WltDshFieldFinancePreview({
 
       <CommissionSummary snapshot={snapshot} />
 
-      <CommissionRecords commissionRecords={commissionRecords} payoutRecords={payoutRecords} />
+      {commissionRecords.length > 0 && (
+        <Surface tone="raised" padding={3} gap={3}>
+          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+            عمولات الاستقطاب المعتمدة
+          </Text>
+          <Box gap={2}>
+            {commissionRecords.map((r) => <RecordRow key={r.id} record={r} />)}
+          </Box>
+        </Surface>
+      )}
+
+      {pendingRecords.length > 0 && (
+        <Surface tone="raised" padding={3} gap={3}>
+          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+            عمولات قيد المراجعة
+          </Text>
+          <Box gap={2}>
+            {pendingRecords.map((r) => <RecordRow key={r.id} record={r} />)}
+          </Box>
+          <StateView
+            kind="warning"
+            title="في انتظار الاعتماد"
+            description="هذه العمولات مرتبطة بمتاجر لم يكتمل اعتماد عروضها بعد. ستُحتسب عند إتمام الاعتماد."
+          />
+        </Surface>
+      )}
+
+      {rejectedRecords.length > 0 && (
+        <Surface tone="raised" padding={3} gap={3}>
+          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+            عمولات مرفوضة / موقوفة
+          </Text>
+          <Box gap={2}>
+            {rejectedRecords.map((r) => <RecordRow key={r.id} record={r} />)}
+          </Box>
+        </Surface>
+      )}
+
+      {payoutRecords.length > 0 && (
+        <Surface tone="raised" padding={3} gap={3}>
+          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+            سجل الصرف
+          </Text>
+          <Box gap={2}>
+            {payoutRecords.map((r) => <RecordRow key={r.id} record={r} />)}
+          </Box>
+        </Surface>
+      )}
 
       <Surface tone="inset" padding={3} gap={2}>
         <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
@@ -172,7 +195,7 @@ export function WltDshFieldFinancePreview({
         <StateView
           kind="warning"
           title="الصرف والتحويل مقفلان — CONTRACT_TBD"
-          description="لا يمكن تنفيذ صرف أو تحويل حتى يُربط الـ API المالي المعتمد."
+          description="لا يمكن تنفيذ صرف أو تحويل حتى يُربط الـ WLT API المالي المعتمد."
         />
       </Surface>
 

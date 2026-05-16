@@ -7,7 +7,8 @@ import { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
 import type { WltDshCaptainBridgeState } from './wlt-dsh-captain.types';
 
 export const wltDshCaptainFinanceSections = [
-  'cod-balance',
+  'eligibility',
+  'cod-liability',
   'earnings',
   'settlement',
 ] as const satisfies readonly WltCaptainFinanceSection[];
@@ -18,7 +19,7 @@ export const wltDshCaptainPreviewData = {
     snapshot: getWltCaptainFinanceSnapshot(),
     records: getWltDshFinanceRecordsForActor('captain'),
     sections: wltDshCaptainFinanceSections,
-    defaultSection: 'cod-balance',
+    defaultSection: 'eligibility' as WltCaptainFinanceSection,
   },
 } as const satisfies WltDshCaptainBridgeState & {
   contract: typeof wltDshCaptainBridgeDataContract;

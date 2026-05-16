@@ -4,6 +4,8 @@
  * PREVIEW ONLY — no real payment, no API, no backend.
  * Composable: mount inside any DSH checkout surface.
  * Contract state: CONTRACT_TBD — real payment flow blocked.
+ *
+ * Currency: YER / ر.ي — no SAR / ر.س / ar-SA
  */
 
 import React from 'react';
@@ -20,6 +22,7 @@ import {
   useTheme,
 } from '@bthwani/ui-kit';
 import {
+  formatWltYer,
   getWltDshPaymentOptionsPreview,
   resolveWltDshPaymentPreviewState,
   type WltDshPaymentMethod,
@@ -27,7 +30,7 @@ import {
 } from '../../shared/finance/dshFinancePreview';
 
 const CONTRACT_TBD_NOTICE =
-  'هذه الواجهة عرض تجريبي فقط. لا يتم تنفيذ أي دفع حقيقي حتى يُرفع وضع CONTRACT_TBD ويُربط الـ API المالي.';
+  'هذه الواجهة عرض تجريبي فقط. لا يتم تنفيذ أي دفع حقيقي حتى يُرفع وضع CONTRACT_TBD ويُربط الـ API المالي. العملة: ر.ي (ريال يمني).';
 
 function PreviewBanner() {
   return (
@@ -105,6 +108,10 @@ function PaymentStateSummary({ state }: { state: WltDshPaymentPreviewState }) {
     : state.feedbackTone === 'error' ? 'danger'
     : 'info';
 
+  const orderTotalLabel = state.orderTotalMinorUnits > 0
+    ? formatWltYer(state.orderTotalMinorUnits)
+    : '— غير محدد —';
+
   return (
     <Surface tone="inset" padding={3} gap={3}>
       <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
@@ -113,15 +120,12 @@ function PaymentStateSummary({ state }: { state: WltDshPaymentPreviewState }) {
       <KeyValueList
         dense
         items={[
-          { label: 'إجمالي الطلب', value: state.orderTotalHalalas > 0
-              ? `${(state.orderTotalHalalas / 100).toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س`
-              : '— غير محدد —',
-            tone: 'info' },
-          { label: 'من المحفظة', value: `${(state.walletAmountHalalas / 100).toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س`, tone: state.walletAmountHalalas > 0 ? 'success' : 'default' },
-          { label: 'عند الاستلام', value: `${(state.amountDueOnDeliveryHalalas / 100).toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س`, tone: state.amountDueOnDeliveryHalalas > 0 ? 'brand' : 'default' },
+          { label: 'إجمالي الطلب', value: orderTotalLabel, tone: 'info' },
+          { label: 'من المحفظة', value: formatWltYer(state.walletAmountMinorUnits), tone: state.walletAmountMinorUnits > 0 ? 'success' : 'default' },
+          { label: 'عند الاستلام', value: formatWltYer(state.amountDueOnDeliveryMinorUnits), tone: state.amountDueOnDeliveryMinorUnits > 0 ? 'brand' : 'default' },
           { label: 'حالة الربط', value: state.walletLinked ? 'مرتبطة' : 'غير مرتبطة', tone: state.walletLinked ? 'success' : 'warning' },
-          { label: 'نوع الحدث المالي', value: state.financeEventKind, tone: 'default' },
-          { label: 'العقد', value: state.contractState, tone: 'warning' },
+          { label: 'نوع الحدث المالي', value: state.financeEventKind, tone: 'default' as const },
+          { label: 'العقد', value: state.contractState, tone: 'warning' as const },
         ]}
       />
       {state.blockingLabel ? (
@@ -132,26 +136,27 @@ function PaymentStateSummary({ state }: { state: WltDshPaymentPreviewState }) {
         />
       ) : (
         <Surface tone="default" padding={2}>
-          <Text role="bodySm" style={{ textAlign: 'right', color: statusTone === 'success' ? undefined : undefined }}>
+          <Text role="bodySm" style={{ textAlign: 'right' }}>
             {state.summaryLabel}
           </Text>
         </Surface>
       )}
+      {statusTone ? null : null}
     </Surface>
   );
 }
 
 export type WltDshClientPaymentPreviewProps = {
-  orderTotalHalalas?: number;
-  walletBalanceHalalas?: number;
+  orderTotalMinorUnits?: number;
+  walletBalanceMinorUnits?: number;
   walletLinked?: boolean;
   selectedMethod?: WltDshPaymentMethod;
   onSelectMethod?: (method: WltDshPaymentMethod) => void;
 };
 
 export function WltDshClientPaymentPreview({
-  orderTotalHalalas = 0,
-  walletBalanceHalalas = 0,
+  orderTotalMinorUnits = 0,
+  walletBalanceMinorUnits = 0,
   walletLinked = false,
   selectedMethod = 'cod',
   onSelectMethod,
@@ -168,8 +173,8 @@ export function WltDshClientPaymentPreview({
   );
 
   const previewState = React.useMemo(
-    () => resolveWltDshPaymentPreviewState(method, orderTotalHalalas, walletBalanceHalalas, walletLinked),
-    [method, orderTotalHalalas, walletBalanceHalalas, walletLinked],
+    () => resolveWltDshPaymentPreviewState(method, orderTotalMinorUnits, walletBalanceMinorUnits, walletLinked),
+    [method, orderTotalMinorUnits, walletBalanceMinorUnits, walletLinked],
   );
 
   return (
@@ -207,7 +212,7 @@ export function WltDshClientPaymentPreview({
             {
               label: 'الرصيد الحالي',
               value: walletLinked
-                ? `${(walletBalanceHalalas / 100).toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س`
+                ? formatWltYer(walletBalanceMinorUnits)
                 : '— غير مرتبطة —',
               tone: walletLinked ? 'success' : 'warning',
             },
@@ -219,6 +224,13 @@ export function WltDshClientPaymentPreview({
             kind="warning"
             title="المحفظة غير مرتبطة"
             description="اربط محفظة WLT لتفعيل خيارات الدفع من الرصيد. الربط الحالي تجريبي — CONTRACT_TBD."
+          />
+        )}
+        {walletLinked && walletBalanceMinorUnits === 0 && (
+          <StateView
+            kind="warning"
+            title="رصيد المحفظة صفر"
+            description="اشحن المحفظة لتفعيل خيارات الدفع منها. CONTRACT_TBD."
           />
         )}
       </Surface>

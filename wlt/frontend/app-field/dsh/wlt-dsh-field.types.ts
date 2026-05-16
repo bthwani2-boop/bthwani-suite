@@ -8,6 +8,8 @@ export type WltDshFieldFinancePreviewState = {
   snapshot: WltFieldFinanceSnapshot;
   records: readonly WltDshFinancePreviewRecord[];
   commissionRecords: readonly WltDshFinancePreviewRecord[];
+  pendingRecords: readonly WltDshFinancePreviewRecord[];
+  rejectedRecords: readonly WltDshFinancePreviewRecord[];
   payoutRecords: readonly WltDshFinancePreviewRecord[];
 };
 

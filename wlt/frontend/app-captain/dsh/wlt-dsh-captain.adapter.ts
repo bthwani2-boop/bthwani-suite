@@ -14,14 +14,18 @@ export function getRecords() {
 }
 
 export function getSections() {
-  return ['cod-balance', 'earnings', 'settlement'] as const satisfies readonly WltCaptainFinanceSection[];
+  return ['eligibility', 'cod-liability', 'earnings', 'settlement'] as const satisfies readonly WltCaptainFinanceSection[];
 }
 
 export function getRecordsForSection(section: WltCaptainFinanceSection): WltDshFinancePreviewRecord[] {
   const records = getRecords();
 
-  if (section === 'cod-balance') {
-    return records.filter((record) => record.kind === 'cash-on-delivery');
+  if (section === 'eligibility') {
+    return [];
+  }
+
+  if (section === 'cod-liability') {
+    return records.filter((record) => record.kind === 'captain-cod-liability');
   }
 
   if (section === 'earnings') {

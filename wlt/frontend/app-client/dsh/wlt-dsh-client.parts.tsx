@@ -27,7 +27,7 @@ export function WltDshBalancePreview({ balance }: WltDshBalancePreviewProps) {
 		return null;
 	}
 
-	return <Chip label={`الرصيد ${((balance ?? 0) / 100).toFixed(2)} SAR`} selected />;
+	return <Chip label={`الرصيد ${((balance ?? 0) / 100).toLocaleString('ar-YE', { maximumFractionDigits: 0 })} ر.ي`} selected />;
 }
 
 // --- Connector Panel ---

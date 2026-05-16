@@ -3,7 +3,7 @@ import type { WltCaptainFinanceSection } from '../../shared/finance/dshFinancePr
 import { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
 import * as WltCaptainAdapter from './wlt-dsh-captain.adapter';
 
-export function useWltDshCaptainFinancePreview(initialSection: WltCaptainFinanceSection = 'cod-balance') {
+export function useWltDshCaptainFinancePreview(initialSection: WltCaptainFinanceSection = 'eligibility') {
   const [activeSection, setActiveSection] = React.useState<WltCaptainFinanceSection>(initialSection);
 
   React.useEffect(() => {

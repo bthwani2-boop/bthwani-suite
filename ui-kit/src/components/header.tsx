@@ -594,7 +594,7 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
 
     return (
       <Pressable key={action.id} accessibilityRole="button" accessibilityLabel={action.accessibilityLabel} disabled={action.disabled} hitSlop={8} onPress={action.onPress} style={({ pressed }) => [{ padding: 0, opacity: action.disabled ? 0.56 : pressed ? 0.92 : 1 }]}>
-        <View style={{ position: 'relative', width: actionBoxSize, height: actionBoxSize, alignItems: 'center', justifyContent: 'center', borderRadius: actionBoxSize / 2, backgroundColor: actionBackgroundColor, borderWidth: 1, borderColor: actionBorderColor, shadowColor: '#020617', shadowOpacity: isMain ? 0 : 0.08, shadowRadius: isMain ? 0 : 10, shadowOffset: { width: 0, height: isMain ? 0 : 2 }, elevation: isMain ? 0 : 2 }}>
+        <View style={{ position: 'relative', width: actionBoxSize, height: actionBoxSize, alignItems: 'center', justifyContent: 'center', borderRadius: actionBoxSize / 2, backgroundColor: actionBackgroundColor, borderWidth: 1, borderColor: actionBorderColor, shadowColor: colorPalette.black, shadowOpacity: isMain ? 0 : 0.08, shadowRadius: isMain ? 0 : 10, shadowOffset: { width: 0, height: isMain ? 0 : 2 }, elevation: isMain ? 0 : 2 }}>
           {showBadge ? (
             <View style={[{ position: 'absolute', top: -spacing[1], zIndex: 1 }, badgeAnchorStyle]}>
               <Badge label={String(action.badgeCount)} tone={isMain ? 'info' : 'danger'} />

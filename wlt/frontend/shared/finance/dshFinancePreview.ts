@@ -2,8 +2,11 @@
  * WLT-owned DSH Finance Preview Model.
  *
  * PREVIEW ONLY — not a real ledger, not a real payment, not a real settlement.
- * All amounts are in halalas (integer, never float). Currency: YER unless noted.
+ * All amounts are in minor units (integer, never float). Currency: YER / ريال يمني.
  * WLT owns all financial artifacts. DSH owns order/delivery context only.
+ *
+ * Currency: YER  Label: ر.ي  Locale: ar-YE (with safe fallback)
+ * Naming: amountMinorUnits — NOT halalas (halalas are Saudi subunits, not applicable here)
  */
 
 export type WltDshFinanceActor = 'client' | 'partner' | 'captain' | 'field' | 'control-panel';
@@ -14,8 +17,11 @@ export type WltDshFinanceEventKind =
   | 'cash-on-delivery'
   | 'partner-settlement'
   | 'captain-earning'
-  | 'captain-cod-balance'
+  | 'captain-cod-liability'
+  | 'captain-eligibility-topup'
   | 'field-commission'
+  | 'field-commission-pending'
+  | 'field-commission-rejected'
   | 'field-payout'
   | 'refund-adjustment'
   | 'platform-commission'
@@ -29,7 +35,7 @@ export interface WltDshFinancePreviewRecord {
   actor: WltDshFinanceActor;
   kind: WltDshFinanceEventKind;
   currencyCode: string;
-  amountHalalas: number;
+  amountMinorUnits: number;
   amountLabel: string;
   tone: WltDshFinanceTone;
   title: string;
@@ -42,12 +48,21 @@ export interface WltDshFinancePreviewRecord {
   sourceCaptainId?: string;
   sourceFieldAgentId?: string;
   settlementCycleId?: string;
+  holdReason?: string;
   isPreview: true;
 }
 
-function halalasToLabel(halalas: number, currency = 'ر.س'): string {
-  const major = Math.trunc(Math.abs(halalas)) / 100;
-  return `${major.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ${currency}`;
+// ─── Currency formatter ───────────────────────────────────────────
+// Uses ar-YE locale with a safe fallback to ar if runtime does not support ar-YE.
+// Currency: YER (Yemeni Rial). Label suffix: ر.ي
+
+function formatYer(minorUnits: number, currency = 'ر.ي'): string {
+  const major = Math.abs(minorUnits) / 100;
+  try {
+    return `${major.toLocaleString('ar-YE', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ${currency}`;
+  } catch {
+    return `${major.toLocaleString('ar', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ${currency}`;
+  }
 }
 
 const PREVIEW_SEEDS: WltDshFinancePreviewRecord[] = [
@@ -57,8 +72,8 @@ const PREVIEW_SEEDS: WltDshFinancePreviewRecord[] = [
     actor: 'client',
     kind: 'client-payment',
     currencyCode: 'YER',
-    amountHalalas: 15000,
-    amountLabel: halalasToLabel(15000),
+    amountMinorUnits: 1500000,
+    amountLabel: formatYer(1500000),
     tone: 'negative',
     title: 'دفع طلب',
     subtitle: 'طلب رقم #ORD-2026-X1',
@@ -74,8 +89,8 @@ const PREVIEW_SEEDS: WltDshFinancePreviewRecord[] = [
     actor: 'client',
     kind: 'wallet-payment',
     currencyCode: 'YER',
-    amountHalalas: 8500,
-    amountLabel: halalasToLabel(8500),
+    amountMinorUnits: 850000,
+    amountLabel: formatYer(850000),
     tone: 'negative',
     title: 'دفع بالمحفظة',
     subtitle: 'طلب رقم #ORD-2026-X3',
@@ -85,14 +100,31 @@ const PREVIEW_SEEDS: WltDshFinancePreviewRecord[] = [
     sourceOrderId: 'ORD-2026-X3',
     isPreview: true,
   },
+  // ─── Client Refund ────────────────────────────────────────────
+  {
+    id: 'WLT-REF-401',
+    actor: 'client',
+    kind: 'refund-adjustment',
+    currencyCode: 'YER',
+    amountMinorUnits: 300000,
+    amountLabel: formatYer(300000),
+    tone: 'positive',
+    title: 'استرداد جزئي',
+    subtitle: 'طلب رقم #ORD-2026-X1',
+    statusLabel: 'تمت المعالجة',
+    statusTone: 'info',
+    timeLabel: 'اليوم، 11:00 ص',
+    sourceOrderId: 'ORD-2026-X1',
+    isPreview: true,
+  },
   // ─── Partner Settlement ───────────────────────────────────────
   {
     id: 'WLT-STL-101',
     actor: 'partner',
     kind: 'partner-settlement',
     currencyCode: 'YER',
-    amountHalalas: 425000,
-    amountLabel: halalasToLabel(425000),
+    amountMinorUnits: 42500000,
+    amountLabel: formatYer(42500000),
     tone: 'positive',
     title: 'تسوية أسبوعية',
     subtitle: 'دورة رقم #CYC-05-01',
@@ -103,19 +135,19 @@ const PREVIEW_SEEDS: WltDshFinancePreviewRecord[] = [
     sourceStoreId: 'STORE-99',
     isPreview: true,
   },
-  // ─── Captain COD Balance ──────────────────────────────────────
+  // ─── Captain COD Liability ────────────────────────────────────
   {
     id: 'WLT-COD-201',
     actor: 'captain',
-    kind: 'cash-on-delivery',
+    kind: 'captain-cod-liability',
     currencyCode: 'YER',
-    amountHalalas: 21000,
-    amountLabel: halalasToLabel(21000),
+    amountMinorUnits: 2100000,
+    amountLabel: formatYer(2100000),
     tone: 'neutral',
-    title: 'تحصيل كاش',
-    subtitle: 'طلب رقم #ORD-2026-X2',
-    statusLabel: 'في المحفظة',
-    statusTone: 'info',
+    title: 'تحصيل كاش — ذمة مستحقة',
+    subtitle: 'طلب رقم #ORD-2026-X2 — يجب الإيداع',
+    statusLabel: 'ذمة معلقة',
+    statusTone: 'warning',
     timeLabel: 'منذ ساعتين',
     sourceOrderId: 'ORD-2026-X2',
     sourceCaptainId: 'CAP-77',
@@ -127,8 +159,8 @@ const PREVIEW_SEEDS: WltDshFinancePreviewRecord[] = [
     actor: 'captain',
     kind: 'captain-earning',
     currencyCode: 'YER',
-    amountHalalas: 1500,
-    amountLabel: halalasToLabel(1500),
+    amountMinorUnits: 150000,
+    amountLabel: formatYer(150000),
     tone: 'positive',
     title: 'رسوم توصيل',
     subtitle: 'طلب رقم #ORD-2026-X2',
@@ -139,16 +171,16 @@ const PREVIEW_SEEDS: WltDshFinancePreviewRecord[] = [
     sourceCaptainId: 'CAP-77',
     isPreview: true,
   },
-  // ─── Field Commission ─────────────────────────────────────────
+  // ─── Field Commission (approved) ──────────────────────────────
   {
     id: 'WLT-FLD-301',
     actor: 'field',
     kind: 'field-commission',
     currencyCode: 'YER',
-    amountHalalas: 5000,
-    amountLabel: halalasToLabel(5000),
+    amountMinorUnits: 500000,
+    amountLabel: formatYer(500000),
     tone: 'positive',
-    title: 'عمولة استقطاب',
+    title: 'عمولة استقطاب — معتمدة',
     subtitle: 'متجر #STORE-102',
     statusLabel: 'تم التحقق',
     statusTone: 'success',
@@ -157,14 +189,51 @@ const PREVIEW_SEEDS: WltDshFinancePreviewRecord[] = [
     sourceFieldAgentId: 'FLD-88',
     isPreview: true,
   },
+  // ─── Field Commission (pending) ───────────────────────────────
+  {
+    id: 'WLT-FLD-303',
+    actor: 'field',
+    kind: 'field-commission-pending',
+    currencyCode: 'YER',
+    amountMinorUnits: 350000,
+    amountLabel: formatYer(350000),
+    tone: 'neutral',
+    title: 'عمولة استقطاب — قيد المراجعة',
+    subtitle: 'متجر #STORE-108 — بانتظار اعتماد العرض',
+    statusLabel: 'معلقة',
+    statusTone: 'warning',
+    timeLabel: 'الأحد',
+    sourceStoreId: 'STORE-108',
+    sourceFieldAgentId: 'FLD-88',
+    isPreview: true,
+  },
+  // ─── Field Commission (rejected) ──────────────────────────────
+  {
+    id: 'WLT-FLD-304',
+    actor: 'field',
+    kind: 'field-commission-rejected',
+    currencyCode: 'YER',
+    amountMinorUnits: 200000,
+    amountLabel: formatYer(200000),
+    tone: 'negative',
+    title: 'عمولة استقطاب — مرفوضة',
+    subtitle: 'متجر #STORE-110 — لم يُستوفَ شرط الاعتماد',
+    statusLabel: 'مرفوضة',
+    statusTone: 'error',
+    timeLabel: 'الخميس',
+    sourceStoreId: 'STORE-110',
+    sourceFieldAgentId: 'FLD-88',
+    holdReason: 'المتجر لم يكمل متطلبات التفعيل خلال المهلة المحددة',
+    isPreview: true,
+  },
   // ─── Field Payout ─────────────────────────────────────────────
   {
     id: 'WLT-FLD-302',
     actor: 'field',
     kind: 'field-payout',
     currencyCode: 'YER',
-    amountHalalas: 120000,
-    amountLabel: halalasToLabel(120000),
+    amountMinorUnits: 12000000,
+    amountLabel: formatYer(12000000),
     tone: 'negative',
     title: 'صرف شهري',
     subtitle: 'أبريل 2026',
@@ -174,31 +243,14 @@ const PREVIEW_SEEDS: WltDshFinancePreviewRecord[] = [
     sourceFieldAgentId: 'FLD-88',
     isPreview: true,
   },
-  // ─── Refund Adjustment ────────────────────────────────────────
-  {
-    id: 'WLT-REF-401',
-    actor: 'client',
-    kind: 'refund-adjustment',
-    currencyCode: 'YER',
-    amountHalalas: 3000,
-    amountLabel: halalasToLabel(3000),
-    tone: 'positive',
-    title: 'استرداد جزئي',
-    subtitle: 'طلب رقم #ORD-2026-X1',
-    statusLabel: 'تمت المعالجة',
-    statusTone: 'info',
-    timeLabel: 'اليوم، 11:00 ص',
-    sourceOrderId: 'ORD-2026-X1',
-    isPreview: true,
-  },
   // ─── Platform Commission ──────────────────────────────────────
   {
     id: 'WLT-COM-501',
     actor: 'control-panel',
     kind: 'platform-commission',
     currencyCode: 'YER',
-    amountHalalas: 63750,
-    amountLabel: halalasToLabel(63750),
+    amountMinorUnits: 6375000,
+    amountLabel: formatYer(6375000),
     tone: 'positive',
     title: 'عمولة المنصة',
     subtitle: 'دورة #CYC-05-01',
@@ -214,7 +266,7 @@ const PREVIEW_SEEDS: WltDshFinancePreviewRecord[] = [
     actor: 'control-panel',
     kind: 'reconciliation-export',
     currencyCode: 'YER',
-    amountHalalas: 0,
+    amountMinorUnits: 0,
     amountLabel: '— جار المطابقة —',
     tone: 'neutral',
     title: 'تسوية المطابقة',
@@ -235,21 +287,21 @@ export function getWltDshFinanceRecordsForActor(
   return PREVIEW_SEEDS.filter((r) => r.actor === actor);
 }
 
-function sumPositiveHalalas(records: WltDshFinancePreviewRecord[]): number {
+function sumMinorUnits(records: WltDshFinancePreviewRecord[]): number {
   return records.reduce((acc, r) => {
-    if (r.tone === 'positive') return acc + r.amountHalalas;
-    if (r.tone === 'negative') return acc - r.amountHalalas;
+    if (r.tone === 'positive') return acc + r.amountMinorUnits;
+    if (r.tone === 'negative') return acc - r.amountMinorUnits;
     return acc;
   }, 0);
 }
 
 export function getWltDshFinanceSummaryForActor(actor: WltDshFinanceActor) {
   const records = getWltDshFinanceRecordsForActor(actor);
-  const totalHalalas = sumPositiveHalalas(records);
+  const totalMinorUnits = sumMinorUnits(records);
   return {
     count: records.length,
-    totalHalalas,
-    totalLabel: halalasToLabel(Math.abs(totalHalalas)),
+    totalMinorUnits,
+    totalLabel: formatYer(Math.abs(totalMinorUnits)),
   };
 }
 
@@ -258,35 +310,60 @@ export function getWltDshFinanceSummaryForActor(actor: WltDshFinanceActor) {
 export function getWltPartnerSettlementPreview() {
   const records = getWltDshFinanceRecordsForActor('partner');
   const summary = getWltDshFinanceSummaryForActor('partner');
+  const grossSalesMinorUnits = 50000000;
+  const platformCommissionMinorUnits = 7500000;
+  const deductionsMinorUnits = 2000000;
+  const netSettlementMinorUnits = grossSalesMinorUnits - platformCommissionMinorUnits - deductionsMinorUnits;
   return {
     records,
     summary,
-    nextSettlementHalalas: 85025,
-    nextSettlementLabel: halalasToLabel(85025),
+    grossSalesMinorUnits,
+    grossSalesLabel: formatYer(grossSalesMinorUnits),
+    platformCommissionMinorUnits,
+    platformCommissionLabel: formatYer(platformCommissionMinorUnits),
+    deductionsMinorUnits,
+    deductionsLabel: formatYer(deductionsMinorUnits),
+    netSettlementMinorUnits,
+    netSettlementLabel: formatYer(netSettlementMinorUnits),
+    nextSettlementMinorUnits: 8502500,
+    nextSettlementLabel: formatYer(8502500),
     cycleStatus: 'نشطة',
+    cycleStartDate: '2026-05-01',
+    cycleEndDate: '2026-05-07',
+    nextPayoutDate: '2026-05-14',
     isPreview: true as const,
   };
 }
 
 export function getWltCaptainFinancePreview() {
   const records = getWltDshFinanceRecordsForActor('captain');
-  const codHalalas = records
-    .filter((r) => r.kind === 'cash-on-delivery')
-    .reduce((acc, r) => acc + r.amountHalalas, 0);
-  const earningHalalas = records
+  const codMinorUnits = records
+    .filter((r) => r.kind === 'captain-cod-liability')
+    .reduce((acc, r) => acc + r.amountMinorUnits, 0);
+  const earningMinorUnits = records
     .filter((r) => r.kind === 'captain-earning')
-    .reduce((acc, r) => acc + r.amountHalalas, 0);
+    .reduce((acc, r) => acc + r.amountMinorUnits, 0);
   return {
     records,
-    codBalanceHalalas: codHalalas,
-    codBalanceLabel: halalasToLabel(codHalalas),
-    earningsHalalas: earningHalalas,
-    earningsLabel: halalasToLabel(earningHalalas),
-    settlementHalalas: 0,
-    settlementLabel: halalasToLabel(0),
-    pendingPayoutHalalas: 1500,
-    pendingPayoutLabel: halalasToLabel(1500),
+    codLiabilityMinorUnits: codMinorUnits,
+    codLiabilityLabel: formatYer(codMinorUnits),
+    earningsMinorUnits: earningMinorUnits,
+    earningsLabel: formatYer(earningMinorUnits),
+    settlementMinorUnits: 0,
+    settlementLabel: formatYer(0),
+    pendingPayoutMinorUnits: 150000,
+    pendingPayoutLabel: formatYer(150000),
     cycleLabel: 'الأسبوع الحالي',
+    // Eligibility fields
+    eligibilityBalanceMinorUnits: 800000,
+    eligibilityBalanceLabel: formatYer(800000),
+    minimumEligibilityMinorUnits: 1000000,
+    minimumEligibilityLabel: formatYer(1000000),
+    isEligible: false,
+    eligibilityShortfallMinorUnits: 200000,
+    eligibilityShortfallLabel: formatYer(200000),
+    hasEligibilityBlock: true,
+    eligibilityBlockReason: 'الرصيد الضامن أقل من الحد الأدنى المطلوب — شحن 2,000 ر.ي إضافية للتأهل',
     isPreview: true as const,
   };
 }
@@ -296,17 +373,32 @@ export function getWltFieldFinancePreview(stores?: string[]) {
   const filtered = stores
     ? records.filter((r) => !r.sourceStoreId || stores.includes(r.sourceStoreId))
     : records;
-  const totalCommissionHalalas = filtered
+  const totalCommissionMinorUnits = filtered
     .filter((r) => r.kind === 'field-commission')
-    .reduce((acc, r) => acc + r.amountHalalas, 0);
+    .reduce((acc, r) => acc + r.amountMinorUnits, 0);
+  const pendingCommissionsMinorUnits = filtered
+    .filter((r) => r.kind === 'field-commission-pending')
+    .reduce((acc, r) => acc + r.amountMinorUnits, 0);
+  const rejectedCommissionsMinorUnits = filtered
+    .filter((r) => r.kind === 'field-commission-rejected')
+    .reduce((acc, r) => acc + r.amountMinorUnits, 0);
   return {
     records: filtered,
-    totalCommissionHalalas,
-    totalCommissionLabel: halalasToLabel(totalCommissionHalalas),
+    commissionRecords: filtered.filter((r) => r.kind === 'field-commission'),
+    pendingRecords: filtered.filter((r) => r.kind === 'field-commission-pending'),
+    rejectedRecords: filtered.filter((r) => r.kind === 'field-commission-rejected'),
+    payoutRecords: filtered.filter((r) => r.kind === 'field-payout'),
+    totalCommissionMinorUnits,
+    totalCommissionLabel: formatYer(totalCommissionMinorUnits),
+    pendingCommissionsMinorUnits,
+    pendingCommissionsLabel: formatYer(pendingCommissionsMinorUnits),
+    rejectedCommissionsMinorUnits,
+    rejectedCommissionsLabel: formatYer(rejectedCommissionsMinorUnits),
     eligibleFilesCount: stores?.length ?? 12,
-    lastPayoutHalalas: 120000,
-    lastPayoutLabel: halalasToLabel(120000),
+    lastPayoutMinorUnits: 12000000,
+    lastPayoutLabel: formatYer(12000000),
     lastPayoutDate: '2026-05-01',
+    nextPayoutDate: '2026-06-01',
     isPreview: true as const,
   };
 }
@@ -318,12 +410,12 @@ export function getWltControlPanelFinancePreview() {
   const partnerRecords = getWltDshFinanceRecordsForActor('partner');
   const captainRecords = getWltDshFinanceRecordsForActor('captain');
   const fieldRecords = getWltDshFinanceRecordsForActor('field');
-  const totalInflowHalalas = allRecords
+  const totalInflowMinorUnits = allRecords
     .filter((r) => r.tone === 'positive')
-    .reduce((acc, r) => acc + r.amountHalalas, 0);
-  const totalOutflowHalalas = allRecords
+    .reduce((acc, r) => acc + r.amountMinorUnits, 0);
+  const totalOutflowMinorUnits = allRecords
     .filter((r) => r.tone === 'negative')
-    .reduce((acc, r) => acc + r.amountHalalas, 0);
+    .reduce((acc, r) => acc + r.amountMinorUnits, 0);
   return {
     allRecords,
     platformRecords,
@@ -331,12 +423,12 @@ export function getWltControlPanelFinancePreview() {
     partnerRecords,
     captainRecords,
     fieldRecords,
-    totalInflowHalalas,
-    totalInflowLabel: halalasToLabel(totalInflowHalalas),
-    totalOutflowHalalas,
-    totalOutflowLabel: halalasToLabel(totalOutflowHalalas),
-    netHalalas: totalInflowHalalas - totalOutflowHalalas,
-    netLabel: halalasToLabel(Math.abs(totalInflowHalalas - totalOutflowHalalas)),
+    totalInflowMinorUnits,
+    totalInflowLabel: formatYer(totalInflowMinorUnits),
+    totalOutflowMinorUnits,
+    totalOutflowLabel: formatYer(totalOutflowMinorUnits),
+    netMinorUnits: totalInflowMinorUnits - totalOutflowMinorUnits,
+    netLabel: formatYer(Math.abs(totalInflowMinorUnits - totalOutflowMinorUnits)),
     contractState: 'CONTRACT_TBD' as const,
     isPreview: true as const,
   };
@@ -352,43 +444,71 @@ export function resolveWltDshFinanceEventKindForPaymentMethod(
   return 'client-payment';
 }
 
-// ─── F3: Partner / Captain / Field Finance Preview ───────────────
-// PREVIEW ONLY. No real settlement, no real payout, no API.
+// ─── F3: Typed snapshots ──────────────────────────────────────────
 
-export type WltCaptainFinanceSection = 'cod-balance' | 'earnings' | 'settlement';
+export type WltCaptainFinanceSection = 'eligibility' | 'cod-liability' | 'earnings' | 'settlement';
 
 export type WltCaptainFinanceSnapshot = {
-  codBalanceHalalas: number;
-  codBalanceLabel: string;
-  earningsHalalas: number;
+  codLiabilityMinorUnits: number;
+  codLiabilityLabel: string;
+  earningsMinorUnits: number;
   earningsLabel: string;
-  settlementHalalas: number;
+  settlementMinorUnits: number;
   settlementLabel: string;
-  pendingPayoutHalalas: number;
+  pendingPayoutMinorUnits: number;
   pendingPayoutLabel: string;
   cycleLabel: string;
+  eligibilityBalanceMinorUnits: number;
+  eligibilityBalanceLabel: string;
+  minimumEligibilityMinorUnits: number;
+  minimumEligibilityLabel: string;
+  isEligible: boolean;
+  eligibilityShortfallMinorUnits: number;
+  eligibilityShortfallLabel: string;
+  hasEligibilityBlock: boolean;
+  eligibilityBlockReason: string;
   contractState: 'CONTRACT_TBD';
   isPreview: true;
 };
 
 export type WltPartnerFinanceSnapshot = {
   settlementRecords: WltDshFinancePreviewRecord[];
-  nextSettlementHalalas: number;
+  grossSalesMinorUnits: number;
+  grossSalesLabel: string;
+  platformCommissionMinorUnits: number;
+  platformCommissionLabel: string;
+  deductionsMinorUnits: number;
+  deductionsLabel: string;
+  netSettlementMinorUnits: number;
+  netSettlementLabel: string;
+  nextSettlementMinorUnits: number;
   nextSettlementLabel: string;
   totalLabel: string;
   cycleStatus: string;
+  cycleStartDate: string;
+  cycleEndDate: string;
+  nextPayoutDate: string;
   contractState: 'CONTRACT_TBD';
   isPreview: true;
 };
 
 export type WltFieldFinanceSnapshot = {
   records: WltDshFinancePreviewRecord[];
-  totalCommissionHalalas: number;
+  commissionRecords: WltDshFinancePreviewRecord[];
+  pendingRecords: WltDshFinancePreviewRecord[];
+  rejectedRecords: WltDshFinancePreviewRecord[];
+  payoutRecords: WltDshFinancePreviewRecord[];
+  totalCommissionMinorUnits: number;
   totalCommissionLabel: string;
+  pendingCommissionsMinorUnits: number;
+  pendingCommissionsLabel: string;
+  rejectedCommissionsMinorUnits: number;
+  rejectedCommissionsLabel: string;
   eligibleFilesCount: number;
-  lastPayoutHalalas: number;
+  lastPayoutMinorUnits: number;
   lastPayoutLabel: string;
   lastPayoutDate: string;
+  nextPayoutDate: string;
   contractState: 'CONTRACT_TBD';
   isPreview: true;
 };
@@ -396,15 +516,24 @@ export type WltFieldFinanceSnapshot = {
 export function getWltCaptainFinanceSnapshot(): WltCaptainFinanceSnapshot {
   const p = getWltCaptainFinancePreview();
   return {
-    codBalanceHalalas: p.codBalanceHalalas,
-    codBalanceLabel: p.codBalanceLabel,
-    earningsHalalas: p.earningsHalalas,
+    codLiabilityMinorUnits: p.codLiabilityMinorUnits,
+    codLiabilityLabel: p.codLiabilityLabel,
+    earningsMinorUnits: p.earningsMinorUnits,
     earningsLabel: p.earningsLabel,
-    settlementHalalas: p.settlementHalalas,
+    settlementMinorUnits: p.settlementMinorUnits,
     settlementLabel: p.settlementLabel,
-    pendingPayoutHalalas: p.pendingPayoutHalalas,
+    pendingPayoutMinorUnits: p.pendingPayoutMinorUnits,
     pendingPayoutLabel: p.pendingPayoutLabel,
     cycleLabel: p.cycleLabel,
+    eligibilityBalanceMinorUnits: p.eligibilityBalanceMinorUnits,
+    eligibilityBalanceLabel: p.eligibilityBalanceLabel,
+    minimumEligibilityMinorUnits: p.minimumEligibilityMinorUnits,
+    minimumEligibilityLabel: p.minimumEligibilityLabel,
+    isEligible: p.isEligible,
+    eligibilityShortfallMinorUnits: p.eligibilityShortfallMinorUnits,
+    eligibilityShortfallLabel: p.eligibilityShortfallLabel,
+    hasEligibilityBlock: p.hasEligibilityBlock,
+    eligibilityBlockReason: p.eligibilityBlockReason,
     contractState: 'CONTRACT_TBD',
     isPreview: true,
   };
@@ -414,10 +543,21 @@ export function getWltPartnerFinanceSnapshot(): WltPartnerFinanceSnapshot {
   const p = getWltPartnerSettlementPreview();
   return {
     settlementRecords: p.records,
-    nextSettlementHalalas: p.nextSettlementHalalas,
+    grossSalesMinorUnits: p.grossSalesMinorUnits,
+    grossSalesLabel: p.grossSalesLabel,
+    platformCommissionMinorUnits: p.platformCommissionMinorUnits,
+    platformCommissionLabel: p.platformCommissionLabel,
+    deductionsMinorUnits: p.deductionsMinorUnits,
+    deductionsLabel: p.deductionsLabel,
+    netSettlementMinorUnits: p.netSettlementMinorUnits,
+    netSettlementLabel: p.netSettlementLabel,
+    nextSettlementMinorUnits: p.nextSettlementMinorUnits,
     nextSettlementLabel: p.nextSettlementLabel,
     totalLabel: p.summary.totalLabel,
     cycleStatus: p.cycleStatus,
+    cycleStartDate: p.cycleStartDate,
+    cycleEndDate: p.cycleEndDate,
+    nextPayoutDate: p.nextPayoutDate,
     contractState: 'CONTRACT_TBD',
     isPreview: true,
   };
@@ -427,19 +567,27 @@ export function getWltFieldFinanceSnapshot(stores?: string[]): WltFieldFinanceSn
   const p = getWltFieldFinancePreview(stores);
   return {
     records: p.records,
-    totalCommissionHalalas: p.totalCommissionHalalas,
+    commissionRecords: p.commissionRecords,
+    pendingRecords: p.pendingRecords,
+    rejectedRecords: p.rejectedRecords,
+    payoutRecords: p.payoutRecords,
+    totalCommissionMinorUnits: p.totalCommissionMinorUnits,
     totalCommissionLabel: p.totalCommissionLabel,
+    pendingCommissionsMinorUnits: p.pendingCommissionsMinorUnits,
+    pendingCommissionsLabel: p.pendingCommissionsLabel,
+    rejectedCommissionsMinorUnits: p.rejectedCommissionsMinorUnits,
+    rejectedCommissionsLabel: p.rejectedCommissionsLabel,
     eligibleFilesCount: p.eligibleFilesCount,
-    lastPayoutHalalas: p.lastPayoutHalalas,
+    lastPayoutMinorUnits: p.lastPayoutMinorUnits,
     lastPayoutLabel: p.lastPayoutLabel,
     lastPayoutDate: p.lastPayoutDate,
+    nextPayoutDate: p.nextPayoutDate,
     contractState: 'CONTRACT_TBD',
     isPreview: true,
   };
 }
 
-// ─── F2: Client Payment Preview Binding ──────────────────────────
-// PREVIEW ONLY — no real payment, no real balance mutation, no API.
+// ─── F2: Client Payment Preview ───────────────────────────────────
 
 export type WltDshPaymentMethod = 'cod' | 'wallet' | 'mixed' | 'official-wallets';
 
@@ -455,11 +603,11 @@ export type WltDshPaymentOptionPreview = {
 
 export type WltDshPaymentPreviewState = {
   method: WltDshPaymentMethod;
-  orderTotalHalalas: number;
-  walletBalanceHalalas: number;
+  orderTotalMinorUnits: number;
+  walletBalanceMinorUnits: number;
   walletLinked: boolean;
-  walletAmountHalalas: number;
-  amountDueOnDeliveryHalalas: number;
+  walletAmountMinorUnits: number;
+  amountDueOnDeliveryMinorUnits: number;
   valid: boolean;
   summaryLabel: string;
   blockingLabel?: string;
@@ -526,14 +674,14 @@ export function getWltDshPaymentOptionsPreview(): WltDshPaymentOptionPreview[] {
 
 export function resolveWltDshPaymentPreviewState(
   method: WltDshPaymentMethod,
-  orderTotalHalalas: number,
-  walletBalanceHalalas: number,
+  orderTotalMinorUnits: number,
+  walletBalanceMinorUnits: number,
   walletLinked: boolean,
 ): WltDshPaymentPreviewState {
   const base = {
     method,
-    orderTotalHalalas,
-    walletBalanceHalalas,
+    orderTotalMinorUnits,
+    walletBalanceMinorUnits,
     walletLinked,
     contractState: 'CONTRACT_TBD' as const,
     financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(method),
@@ -543,10 +691,10 @@ export function resolveWltDshPaymentPreviewState(
   if (method === 'cod') {
     return {
       ...base,
-      walletAmountHalalas: 0,
-      amountDueOnDeliveryHalalas: orderTotalHalalas,
+      walletAmountMinorUnits: 0,
+      amountDueOnDeliveryMinorUnits: orderTotalMinorUnits,
       valid: true,
-      summaryLabel: `ستدفع ${halalasToLabel(orderTotalHalalas)} عند الاستلام.`,
+      summaryLabel: `ستدفع ${formatYer(orderTotalMinorUnits)} عند الاستلام.`,
       feedbackTone: 'info',
     };
   }
@@ -555,52 +703,52 @@ export function resolveWltDshPaymentPreviewState(
     if (!walletLinked) {
       return {
         ...base,
-        walletAmountHalalas: 0,
-        amountDueOnDeliveryHalalas: orderTotalHalalas,
+        walletAmountMinorUnits: 0,
+        amountDueOnDeliveryMinorUnits: orderTotalMinorUnits,
         valid: false,
         summaryLabel: 'المحفظة غير مرتبطة.',
         blockingLabel: 'اربط محفظة WLT أولًا لتفعيل هذا الخيار.',
         feedbackTone: 'warning',
       };
     }
-    if (walletBalanceHalalas < orderTotalHalalas) {
+    if (walletBalanceMinorUnits < orderTotalMinorUnits) {
       return {
         ...base,
-        walletAmountHalalas: walletBalanceHalalas,
-        amountDueOnDeliveryHalalas: orderTotalHalalas - walletBalanceHalalas,
+        walletAmountMinorUnits: walletBalanceMinorUnits,
+        amountDueOnDeliveryMinorUnits: orderTotalMinorUnits - walletBalanceMinorUnits,
         valid: false,
-        summaryLabel: `الرصيد ${halalasToLabel(walletBalanceHalalas)} أقل من إجمالي الطلب.`,
-        blockingLabel: `تحتاج شحن ${halalasToLabel(orderTotalHalalas - walletBalanceHalalas)} إضافيًا.`,
+        summaryLabel: `الرصيد ${formatYer(walletBalanceMinorUnits)} أقل من إجمالي الطلب.`,
+        blockingLabel: `تحتاج شحن ${formatYer(orderTotalMinorUnits - walletBalanceMinorUnits)} إضافيًا.`,
         feedbackTone: 'warning',
       };
     }
     return {
       ...base,
-      walletAmountHalalas: orderTotalHalalas,
-      amountDueOnDeliveryHalalas: 0,
+      walletAmountMinorUnits: orderTotalMinorUnits,
+      amountDueOnDeliveryMinorUnits: 0,
       valid: true,
-      summaryLabel: `الرصيد يكفي — سيُخصم ${halalasToLabel(orderTotalHalalas)} من المحفظة.`,
+      summaryLabel: `الرصيد يكفي — سيُخصم ${formatYer(orderTotalMinorUnits)} من المحفظة.`,
       feedbackTone: 'success',
     };
   }
 
   if (method === 'mixed') {
-    if (!walletLinked || walletBalanceHalalas <= 0) {
+    if (!walletLinked || walletBalanceMinorUnits <= 0) {
       return {
         ...base,
-        walletAmountHalalas: 0,
-        amountDueOnDeliveryHalalas: orderTotalHalalas,
+        walletAmountMinorUnits: 0,
+        amountDueOnDeliveryMinorUnits: orderTotalMinorUnits,
         valid: false,
         summaryLabel: 'الدفع المدمج يحتاج رصيدًا في المحفظة.',
         blockingLabel: 'لا يوجد رصيد متاح لتفعيل الدفع المدمج.',
         feedbackTone: 'warning',
       };
     }
-    if (walletBalanceHalalas >= orderTotalHalalas) {
+    if (walletBalanceMinorUnits >= orderTotalMinorUnits) {
       return {
         ...base,
-        walletAmountHalalas: orderTotalHalalas,
-        amountDueOnDeliveryHalalas: 0,
+        walletAmountMinorUnits: orderTotalMinorUnits,
+        amountDueOnDeliveryMinorUnits: 0,
         valid: false,
         summaryLabel: 'الرصيد يكفي للدفع الكامل من المحفظة.',
         blockingLabel: 'استخدم خيار "رصيد المحفظة" بدلًا من الدفع المدمج.',
@@ -609,10 +757,10 @@ export function resolveWltDshPaymentPreviewState(
     }
     return {
       ...base,
-      walletAmountHalalas: walletBalanceHalalas,
-      amountDueOnDeliveryHalalas: orderTotalHalalas - walletBalanceHalalas,
+      walletAmountMinorUnits: walletBalanceMinorUnits,
+      amountDueOnDeliveryMinorUnits: orderTotalMinorUnits - walletBalanceMinorUnits,
       valid: true,
-      summaryLabel: `${halalasToLabel(walletBalanceHalalas)} من المحفظة + ${halalasToLabel(orderTotalHalalas - walletBalanceHalalas)} عند الاستلام.`,
+      summaryLabel: `${formatYer(walletBalanceMinorUnits)} من المحفظة + ${formatYer(orderTotalMinorUnits - walletBalanceMinorUnits)} عند الاستلام.`,
       feedbackTone: 'info',
     };
   }
@@ -620,11 +768,14 @@ export function resolveWltDshPaymentPreviewState(
   // official-wallets — always CONTRACT_TBD blocked
   return {
     ...base,
-    walletAmountHalalas: 0,
-    amountDueOnDeliveryHalalas: 0,
+    walletAmountMinorUnits: 0,
+    amountDueOnDeliveryMinorUnits: 0,
     valid: false,
     summaryLabel: 'المحافظ الرسمية غير مفعّلة — CONTRACT_TBD.',
     blockingLabel: 'يتطلب ربطًا بـ API لم يُعرَّف بعد.',
     feedbackTone: 'warning',
   };
 }
+
+// ─── Public label helper (for use in UI components) ───────────────
+export { formatYer as formatWltYer };
