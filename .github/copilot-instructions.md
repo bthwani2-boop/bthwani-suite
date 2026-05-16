@@ -23,4 +23,3 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ".\tools\GHB_COMMIT_PUSH_CUR
 ```
 
 Keep Copilot guidance thin. Use `.agents/skills/*` for workflow rules. No `PASS`, `CLOSED`, `FINAL`, or `100%` without diff, verification, and evidence.
-

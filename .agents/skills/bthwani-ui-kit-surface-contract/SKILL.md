@@ -34,7 +34,7 @@ Keep UI work anchored to `@bthwani/ui-kit` and BThwani design governance.
 - Active local repo: `C:\bthwani-suite`.
 - GitHub is read-only unless the user explicitly requests write actions.
 - Use PowerShell for local commands.
-- Use `pnpm`, `pnpm exec`, `pnpm dlx`, or `pnpm nx`; do not use npm/npx shims for local execution.
+- Use `pnpm`, `pnpm exec`, `pnpm dlx`, or `pnpm nx`; use the safest documented launcher; npx is allowed when documented or safest and justified in evidence.
 - Read `pnpm-workspace.yaml` before choosing active roots.
 - `.agents` is operational guidance; `governance/` is project truth and service/application specialization.
 - Do not create mirrors, bridges, long copied donor docs, or duplicate skills.

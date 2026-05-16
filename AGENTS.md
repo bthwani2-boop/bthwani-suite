@@ -47,7 +47,7 @@ Core laws:
 
 - GitHub is read-only unless the user explicitly requests write actions.
 - Use PowerShell for local execution.
-- Do not use npm/npx shims for local tool execution; prefer `pnpm`, `pnpm exec`, `pnpm dlx`, or `pnpm nx`.
+- Do not use unsafe or unjustified launchers for local tool execution; prefer `pnpm`, `pnpm exec`, `pnpm dlx`, or `pnpm nx`.
 - Evidence root is `tools/registry/runs/{SESSION_ID}`.
 - New registry ZIPs must be named `{SESSION_ID}.zip`.
 - Backend target is Go unless current repo evidence explicitly says otherwise.
