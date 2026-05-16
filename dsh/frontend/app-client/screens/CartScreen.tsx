@@ -37,11 +37,11 @@ const TEXT_SECONDARY = colorPalette.textSecondary;
 const ACCENT_BLUE = colorPalette.accentBlue;
 const ACCENT_ORANGE = colorPalette.accentOrange;
 const CTA_PRIMARY = colorPalette.accentOrange;
-const CTA_SECONDARY = colorPalette.ctaSecondary;
 const SURFACE_WARM = colorPalette.brandSoft;
 const SURFACE_WARM_BORDER = colorPalette.brandSurface;
 const DANGER = colorPalette.danger;
 const DANGER_SOFT = colorPalette.dangerSoft;
+const EXPERIMENTAL_PAYMENT_ENABLED = true;
 
 type ScreenNotice = {
   title: string;
@@ -74,6 +74,7 @@ type PaymentSelection = {
   walletAmountHalalas: number;
   amountDueOnDeliveryHalalas: number;
   valid: boolean;
+  isExperimental?: boolean;
   summary: string;
   blockingReason?: string;
   feedbackTone: NonNullable<ScreenNotice['tone']>;
@@ -390,20 +391,20 @@ function RecommendedSection({ onShowAll, onAddProduct }: { onShowAll: () => void
   const isRTL = I18nManager.isRTL;
 
   return (
-    <Surface tone="default" padding={2} gap={1} style={{ backgroundColor: SURFACE_SOFT, borderColor: BORDER_SOFT }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+    <View style={{ gap: spacing[1] }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[1] }}>
         <Button label="عرض الكل" tone="ghost" size="sm" fullWidth={false} onPress={onShowAll} />
         <Text role="bodyMd" style={{ color: TEXT_PRIMARY, fontWeight: '600' }}>
           قد تعجبك هذه المنتجات أيضاً
         </Text>
       </View>
 
-      <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[1], overflow: 'hidden', paddingTop: spacing[0] }}>
+      <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[1], overflow: 'hidden', paddingHorizontal: spacing[1] }}>
         {RECOMMENDED_PRODUCTS.map((product) => (
           <RecommendationCard key={product.id} title={product.title} price={product.priceLabel} onPress={() => onAddProduct(product)} />
         ))}
       </View>
-    </Surface>
+    </View>
   );
 }
 
@@ -698,6 +699,18 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       }
 
       if (!walletLinked) {
+        if (EXPERIMENTAL_PAYMENT_ENABLED) {
+          return {
+            method: 'wallet',
+            walletAmountHalalas: grandTotalHalalas,
+            amountDueOnDeliveryHalalas: 0,
+            valid: true,
+            isExperimental: true,
+            summary: 'دفع تجريبي من المحفظة — سيُسجَّل محليًا فقط',
+            feedbackTone: 'info',
+          };
+        }
+
         return {
           method: 'wallet',
           walletAmountHalalas: 0,
@@ -710,6 +723,18 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       }
 
       if (walletBalance < grandTotalHalalas) {
+        if (EXPERIMENTAL_PAYMENT_ENABLED) {
+          return {
+            method: 'wallet',
+            walletAmountHalalas: walletBalance,
+            amountDueOnDeliveryHalalas: grandTotalHalalas - walletBalance,
+            valid: true,
+            isExperimental: true,
+            summary: 'دفع تجريبي جزئي من المحفظة — سيُسجَّل محليًا فقط',
+            feedbackTone: 'info',
+          };
+        }
+
         return {
           method: 'wallet',
           walletAmountHalalas: walletBalance,
@@ -745,6 +770,18 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       }
 
       if (!walletLinked || walletBalance <= 0) {
+        if (EXPERIMENTAL_PAYMENT_ENABLED) {
+          return {
+            method: 'mixed',
+            walletAmountHalalas: 0,
+            amountDueOnDeliveryHalalas: grandTotalHalalas,
+            valid: true,
+            isExperimental: true,
+            summary: 'دفع مدمج تجريبي — سيُسجَّل محليًا فقط',
+            feedbackTone: 'info',
+          };
+        }
+
         return {
           method: 'mixed',
           walletAmountHalalas: 0,
@@ -779,6 +816,18 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     }
 
     if (paymentMethod === 'official-wallets') {
+      if (!hasWltServiceRoute && EXPERIMENTAL_PAYMENT_ENABLED) {
+        return {
+          method: 'official-wallets',
+          walletAmountHalalas: 0,
+          amountDueOnDeliveryHalalas: 0,
+          valid: true,
+          isExperimental: true,
+          summary: 'دفع تجريبي عبر محافظ رسمية — سيُسجَّل محليًا فقط',
+          feedbackTone: 'info',
+        };
+      }
+
       return {
         method: 'official-wallets',
         walletAmountHalalas: 0,
@@ -805,6 +854,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   }, [formattedWalletBalance, formattedWalletShortfall, grandTotalHalalas, hasWltServiceRoute, paymentMethod, walletBalance, walletHydrated, walletLinked, walletRefreshing]);
 
   React.useEffect(() => {
+    if (EXPERIMENTAL_PAYMENT_ENABLED) return;
+
     if (paymentMethod === 'wallet' && !canUseWalletFull) {
       setPaymentMethod(canUseMixedPayment ? 'mixed' : 'cod');
     }
@@ -838,9 +889,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         title: 'من رصيد المحفظة',
         description: 'ادفع كامل الطلب من رصيد WLT الداخلي.',
         selected: paymentMethod === 'wallet',
-        disabled: walletPending || !canUseWalletFull,
-        statusLabel: paymentMethod === 'wallet' ? 'محدد' : walletPending ? 'قيد التحقق' : !walletLinked ? 'يتطلب إجراء' : walletBalance <= 0 ? 'يتطلب إجراء' : canUseWalletFull ? 'جاهز الآن' : 'يتطلب إجراء',
-        statusTone: paymentMethod === 'wallet' ? 'brand' : walletPending ? 'info' : !walletLinked || walletBalance <= 0 ? 'warning' : canUseWalletFull ? 'success' : 'warning',
+        disabled: walletPending || (!canUseWalletFull && !EXPERIMENTAL_PAYMENT_ENABLED),
+        statusLabel: paymentMethod === 'wallet' ? 'محدد' : walletPending ? 'قيد التحقق' : canUseWalletFull ? 'جاهز الآن' : EXPERIMENTAL_PAYMENT_ENABLED ? 'تجريبي' : !walletLinked ? 'يتطلب إجراء' : walletBalance <= 0 ? 'يتطلب إجراء' : 'يتطلب إجراء',
+        statusTone: paymentMethod === 'wallet' ? 'brand' : walletPending ? 'info' : canUseWalletFull ? 'success' : EXPERIMENTAL_PAYMENT_ENABLED ? 'warning' : !walletLinked || walletBalance <= 0 ? 'warning' : 'warning',
         amountRows: canUseWalletFull
           ? [
               { label: 'من المحفظة', value: formatHalalasAmount(grandTotalHalalas), tone: 'brand' },
@@ -875,16 +926,16 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                 : (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void linkWalletInline()),
               disabled: walletPending,
             },
-        onSelect: canUseWalletFull ? () => setPaymentMethod('wallet') : undefined,
+        onSelect: (canUseWalletFull || EXPERIMENTAL_PAYMENT_ENABLED) ? () => setPaymentMethod('wallet') : undefined,
       },
       {
         id: 'mixed',
         title: 'محفظة + عند الاستلام',
         description: 'استخدم الرصيد المتاح وادفع المتبقي عند الاستلام.',
         selected: paymentMethod === 'mixed',
-        disabled: walletPending || !canUseMixedPayment,
-        statusLabel: paymentMethod === 'mixed' ? 'محدد' : walletPending ? 'قيد التحقق' : canUseMixedPayment ? 'جاهز الآن' : !walletLinked ? 'يتطلب إجراء' : walletBalance <= 0 ? 'يتطلب إجراء' : 'غير ضروري',
-        statusTone: walletPending ? 'info' : canUseMixedPayment ? (paymentMethod === 'mixed' ? 'brand' : 'info') : !walletLinked || walletBalance <= 0 ? 'warning' : 'info',
+        disabled: walletPending || (!canUseMixedPayment && !EXPERIMENTAL_PAYMENT_ENABLED),
+        statusLabel: paymentMethod === 'mixed' ? 'محدد' : walletPending ? 'قيد التحقق' : canUseMixedPayment ? 'جاهز الآن' : EXPERIMENTAL_PAYMENT_ENABLED ? 'تجريبي' : !walletLinked ? 'يتطلب إجراء' : walletBalance <= 0 ? 'يتطلب إجراء' : 'غير ضروري',
+        statusTone: walletPending ? 'info' : canUseMixedPayment ? (paymentMethod === 'mixed' ? 'brand' : 'info') : EXPERIMENTAL_PAYMENT_ENABLED ? 'warning' : !walletLinked || walletBalance <= 0 ? 'warning' : 'info',
         amountRows: canUseMixedPayment
           ? [
               { label: 'من المحفظة', value: formattedWalletBalance, tone: 'brand' },
@@ -914,16 +965,16 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                 : (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void topUpWalletInline(walletShortfallHalalas)),
               disabled: walletPending,
             },
-        onSelect: canUseMixedPayment ? () => setPaymentMethod('mixed') : undefined,
+        onSelect: (canUseMixedPayment || EXPERIMENTAL_PAYMENT_ENABLED) ? () => setPaymentMethod('mixed') : undefined,
       },
       {
         id: 'official-wallets',
         title: 'الدفع عبر المحافظ الرسمية',
         description: 'اختر محفظة رسمية وأكمل عبر WLT.',
         selected: paymentMethod === 'official-wallets',
-        disabled: !hasWltServiceRoute,
-        statusLabel: hasWltServiceRoute ? (paymentMethod === 'official-wallets' ? 'محدد' : 'مسار خارجي') : 'غير موصول',
-        statusTone: paymentMethod === 'official-wallets' ? 'brand' : 'info',
+        disabled: !hasWltServiceRoute && !EXPERIMENTAL_PAYMENT_ENABLED,
+        statusLabel: paymentMethod === 'official-wallets' ? 'محدد' : hasWltServiceRoute ? 'مسار خارجي' : EXPERIMENTAL_PAYMENT_ENABLED ? 'تجريبي' : 'غير موصول',
+        statusTone: paymentMethod === 'official-wallets' ? 'brand' : EXPERIMENTAL_PAYMENT_ENABLED ? 'warning' : 'info',
         amountRows: [
           { label: 'إجمالي الطلب', value: formattedGrandTotal, tone: 'brand' },
         ],
@@ -937,7 +988,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           onPress: hasWltServiceRoute ? () => openWltService('official-wallets') : undefined,
           disabled: !hasWltServiceRoute,
         },
-        onSelect: hasWltServiceRoute ? () => setPaymentMethod('official-wallets') : undefined,
+        onSelect: (hasWltServiceRoute || EXPERIMENTAL_PAYMENT_ENABLED) ? () => setPaymentMethod('official-wallets') : undefined,
       },
     ];
   }, [canUseMixedPayment, canUseWalletFull, formattedGrandTotal, formattedWalletBalance, formattedWalletShortfall, grandTotalHalalas, hasWltServiceRoute, paymentMethod, topUpWalletInline, walletBalance, walletHydrated, walletLinked, walletRefreshing, walletShortfallHalalas]);
@@ -956,6 +1007,19 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     if (!paymentSelection.valid) {
       const blockedStateMeta = paymentSelection.method === 'official-wallets' ? walletCreditMeta : paymentPendingMeta;
       showNotice(blockedStateMeta.label, paymentSelection.blockingReason ?? blockedStateMeta.description, paymentSelection.feedbackTone);
+      return;
+    }
+
+    if (paymentSelection.isExperimental) {
+      showNotice('تم تسجيل الدفع التجريبي', paymentSelection.summary, 'success');
+      await Promise.resolve(checkoutAction({
+        paymentMethod: paymentSelection.method,
+        walletAmountHalalas: paymentSelection.walletAmountHalalas,
+        amountDueOnDeliveryHalalas: paymentSelection.amountDueOnDeliveryHalalas,
+        orderTotalHalalas: grandTotalHalalas,
+        summary: paymentSelection.summary,
+        financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
+      }));
       return;
     }
 
@@ -1131,16 +1195,20 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       <MobileScrollView fill padding={1} gap={1} contentContainerStyle={{ paddingBottom: spacing[2] }}>
         <PromoBanner onPress={handleSubscribePress} />
 
-        <Card title="الخيارات السريعة" subtitle="القسيمة والعنوان والملاحظات" padding={2} gap={1}>
-          <View style={{ gap: spacing[1] }}>
-            <OptionRow
-              title="هل لديك قسيمة تخفيض؟"
-              subtitle={couponCode ? `القسيمة الحالية: ${couponCode}` : 'أدخل رمز التخفيض إن وجد'}
-              actionLabel={couponCode ? 'تعديل' : 'إضافة'}
-              onAction={() => openQuickAction('coupon')}
-              style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
-            />
-            {quickActionKey === 'coupon' && quickActionMeta && (
+        <Surface tone="default" gap={0} style={{ backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, borderRadius: 16, overflow: 'hidden' }}>
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: spacing[3], paddingVertical: spacing[2], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
+            <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right', flex: 1 }}>الخيارات السريعة</Text>
+            <Text role="caption" style={{ color: TEXT_SECONDARY }}>القسيمة والعنوان والملاحظات</Text>
+          </View>
+          <OptionRow
+            title="هل لديك قسيمة تخفيض؟"
+            subtitle={couponCode ? `القسيمة الحالية: ${couponCode}` : 'أدخل رمز التخفيض إن وجد'}
+            actionLabel={couponCode ? 'تعديل' : 'إضافة'}
+            onAction={() => openQuickAction('coupon')}
+            style={{ borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
+          />
+          {quickActionKey === 'coupon' && quickActionMeta && (
+            <View style={{ paddingHorizontal: spacing[2], paddingBottom: spacing[2] }}>
               <InlineActionEditor
                 meta={quickActionMeta}
                 value={quickActionDraft}
@@ -1149,15 +1217,17 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                 onSubmit={applyQuickAction}
                 onClose={() => { setQuickActionKey(null); setQuickActionDraft(''); }}
               />
-            )}
-            <OptionRow
-              title="عنوان التوصيل"
-              subtitle={pickupAddr}
-              actionLabel="تغيير"
-              onAction={() => openQuickAction('address')}
-              style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
-            />
-            {quickActionKey === 'address' && quickActionMeta && (
+            </View>
+          )}
+          <OptionRow
+            title="عنوان التوصيل"
+            subtitle={pickupAddr}
+            actionLabel="تغيير"
+            onAction={() => openQuickAction('address')}
+            style={{ borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
+          />
+          {quickActionKey === 'address' && quickActionMeta && (
+            <View style={{ paddingHorizontal: spacing[2], paddingBottom: spacing[2] }}>
               <InlineActionEditor
                 meta={quickActionMeta}
                 value={quickActionDraft}
@@ -1165,15 +1235,17 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                 onSubmit={applyQuickAction}
                 onClose={() => { setQuickActionKey(null); setQuickActionDraft(''); }}
               />
-            )}
-            <OptionRow
-              title="ملاحظات الطلب"
-              subtitle={note}
-              actionLabel={note === 'لا يوجد ملاحظة' ? 'إضافة' : 'تعديل'}
-              onAction={() => openQuickAction('note')}
-              style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
-            />
-            {quickActionKey === 'note' && quickActionMeta && (
+            </View>
+          )}
+          <OptionRow
+            title="ملاحظات الطلب"
+            subtitle={note}
+            actionLabel={note === 'لا يوجد ملاحظة' ? 'إضافة' : 'تعديل'}
+            onAction={() => openQuickAction('note')}
+            style={{ borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
+          />
+          {quickActionKey === 'note' && quickActionMeta && (
+            <View style={{ paddingHorizontal: spacing[2], paddingBottom: spacing[2] }}>
               <InlineActionEditor
                 meta={quickActionMeta}
                 value={quickActionDraft}
@@ -1181,15 +1253,17 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                 onSubmit={applyQuickAction}
                 onClose={() => { setQuickActionKey(null); setQuickActionDraft(''); }}
               />
-            )}
-            <OptionRow
-              title="طلب إضافي على الطريق"
-              subtitle={extraRequest || 'مثال: بسبس أو ماء من أي ماركت على طريق الكابتن'}
-              actionLabel={extraRequest ? 'تعديل' : 'إضافة'}
-              onAction={() => openQuickAction('extra')}
-              style={{ backgroundColor: SURFACE_SOFT, borderWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[0], paddingHorizontal: spacing[2] }}
-            />
-            {quickActionKey === 'extra' && quickActionMeta && (
+            </View>
+          )}
+          <OptionRow
+            title="طلب إضافي على الطريق"
+            subtitle={extraRequest || 'مثال: بسبس أو ماء من أي ماركت على طريق الكابتن'}
+            actionLabel={extraRequest ? 'تعديل' : 'إضافة'}
+            onAction={() => openQuickAction('extra')}
+            style={{ paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
+          />
+          {quickActionKey === 'extra' && quickActionMeta && (
+            <View style={{ paddingHorizontal: spacing[2], paddingBottom: spacing[2] }}>
               <InlineActionEditor
                 meta={quickActionMeta}
                 value={quickActionDraft}
@@ -1197,9 +1271,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                 onSubmit={applyQuickAction}
                 onClose={() => { setQuickActionKey(null); setQuickActionDraft(''); }}
               />
-            )}
-          </View>
-        </Card>
+            </View>
+          )}
+        </Surface>
 
         <Card title="وقت التنفيذ" subtitle="اختر وقت تنفيذ الطلب" padding={2} gap={1}>
           <View style={{ gap: spacing[1] }}>
@@ -1236,9 +1310,17 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           </View>
         </Card>
 
-        <Card title="قرار الدفع" subtitle="اختر ما سيحدث ماليًا" padding={1} gap={1}>
+        <View style={{ gap: spacing[2] }}>
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[1] }}>
+            <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', flex: 1, textAlign: 'right' }}>قرار الدفع</Text>
+            {EXPERIMENTAL_PAYMENT_ENABLED ? (
+              <View style={{ backgroundColor: colorPalette.warningSoft, borderRadius: 8, paddingHorizontal: spacing[2], paddingVertical: 2 }}>
+                <Text role="caption" style={{ color: colorPalette.warning, fontWeight: '700' }}>تجريبي</Text>
+              </View>
+            ) : null}
+          </View>
           <PaymentDecisionList items={paymentDecisionOptions} />
-        </Card>
+        </View>
 
         <RecommendedSection onShowAll={handleShowAllRecommendations} onAddProduct={handleAddRecommendedProduct} />
 
@@ -1263,11 +1345,49 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
       <View
         onLayout={(event) => setFooterHeight(event.nativeEvent.layout.height)}
-        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing[2], paddingTop: spacing[1], paddingBottom: footerSafePadding, backgroundColor: colorPalette.surfacePrimary, borderTopWidth: 1, borderColor: BORDER_SOFT, zIndex: 5, elevation: 8 }}
+        style={{
+          position: 'absolute', left: 0, right: 0, bottom: 0,
+          paddingHorizontal: spacing[3],
+          paddingTop: spacing[2],
+          paddingBottom: footerSafePadding,
+          backgroundColor: colorPalette.surfacePrimary,
+          borderTopWidth: 1,
+          borderColor: BORDER_SOFT,
+          zIndex: 5,
+          elevation: 12,
+          shadowColor: colorPalette.black,
+          shadowOpacity: 0.1,
+          shadowRadius: 20,
+          shadowOffset: { width: 0, height: -4 },
+        }}
       >
-        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[1] }}>
-          <Button label="تنفيذ الطلب" size="md" fullWidth={false} disabled={!canCheckout || checkoutLoading} loading={checkoutLoading} onPress={handleCheckoutPress} style={{ flex: 1, minHeight: 46, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY, borderRadius: 16 }} />
-          <Button label="تعديل الطلب" tone="secondary" size="md" fullWidth={false} disabled={!canEditOrder} onPress={handleEditPress} style={{ flex: 1, minHeight: 46, backgroundColor: CTA_SECONDARY, borderColor: BORDER_SOFT, borderRadius: 16 }} />
+        {!canCheckout ? (
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1], paddingBottom: spacing[1] }}>
+            <Icon name="cart-outline" size={13} color={TEXT_SECONDARY} />
+            <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right', flex: 1 }}>
+              {clientStateMeta.label}
+            </Text>
+          </View>
+        ) : null}
+        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[2] }}>
+          <Button
+            label="تنفيذ الطلب"
+            size="md"
+            fullWidth={false}
+            disabled={!canCheckout || checkoutLoading}
+            loading={checkoutLoading}
+            onPress={handleCheckoutPress}
+            style={{ flex: 2, minHeight: 52, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY, borderRadius: 18 }}
+          />
+          <Button
+            label="تعديل"
+            tone="secondary"
+            size="md"
+            fullWidth={false}
+            disabled={!canEditOrder}
+            onPress={handleEditPress}
+            style={{ flex: 1, minHeight: 52, borderRadius: 18 }}
+          />
         </View>
       </View>
 
