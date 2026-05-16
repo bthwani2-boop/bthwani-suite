@@ -9,9 +9,10 @@ import {
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { DshPlatformVarsWorkspace } from './Vars';
+import { DshPlatformAppearanceWorkspace } from './Appearance';
 import styles from '../shared/control-panel-surface.module.css';
 
-type PlatformWorkspaceId = 'vars' | 'contracts' | 'release-gates' | 'provider-topology';
+type PlatformWorkspaceId = 'vars' | 'appearance' | 'contracts' | 'release-gates' | 'provider-topology';
 
 type PlatformWorkspaceCard = {
   id: PlatformWorkspaceId;
@@ -29,6 +30,14 @@ const PLATFORM_WORKSPACES: readonly PlatformWorkspaceCard[] = [
     badge: 'نشط الآن',
     description: 'غرفة تحكم preview لملكية المتغيرات التشغيلية والمالية والجسور ومزودي الخدمة.',
     note: 'هذه هي الـ workspace الوحيدة المفعلة في هذه المرحلة.',
+    active: true,
+  },
+  {
+    id: 'appearance',
+    label: 'Appearance',
+    badge: 'نشط الآن',
+    description: 'غرفة تحكم preview للمظهر والهوية البصرية والنظام المركزي للألوان.',
+    note: 'مساحة لإدارة appearance overrides بشكل محكوم بدون drift.',
     active: true,
   },
   {
@@ -106,7 +115,7 @@ export function ControlPanelDshPlatformScreen() {
                 <span className={styles.surfaceHeaderBadgeText}>UI/UX Preview</span>
               </Box>
             </div>
-            <p className={styles.surfaceHeaderSubtitle}>مساحة عامة قابلة للتوسع. المفعّل الآن فقط: Vars.</p>
+            <p className={styles.surfaceHeaderSubtitle}>مساحة عامة قابلة للتوسع. المفعّل الآن: Vars و Appearance.</p>
           </Box>
         </div>
 
@@ -118,7 +127,7 @@ export function ControlPanelDshPlatformScreen() {
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>النشطة</span>
-              <span className={styles.commandKpiValue}>1</span>
+              <span className={styles.commandKpiValue}>2</span>
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>الحقيقة المالية</span>
@@ -130,7 +139,7 @@ export function ControlPanelDshPlatformScreen() {
 
       <WebControlPanelKpiStrip
         items={[
-          { id: 'active-workspace', label: 'المجال الحالي', value: 'Vars', tone: 'success' },
+          { id: 'active-workspace', label: 'المجال الحالي', value: activeWorkspace === 'appearance' ? 'Appearance' : 'Vars', tone: 'success' },
           { id: 'platform-mode', label: 'نمط المرحلة', value: 'UI/UX flow', tone: 'neutral' },
           { id: 'financial-owner', label: 'المالي المالك', value: 'WLT only', tone: 'warning' },
           { id: 'mutations', label: 'الأزرار الحية', value: 'Disabled', tone: 'danger' },
@@ -147,8 +156,8 @@ export function ControlPanelDshPlatformScreen() {
             active: workspace.id === activeWorkspace,
           }))}
           onSelect={(workspaceId) => {
-            if (workspaceId === ACTIVE_WORKSPACE_ID) {
-              setActiveWorkspace(ACTIVE_WORKSPACE_ID);
+            if (workspaceId === 'vars' || workspaceId === 'appearance') {
+              setActiveWorkspace(workspaceId as PlatformWorkspaceId);
             }
           }}
         />
@@ -161,7 +170,7 @@ export function ControlPanelDshPlatformScreen() {
               <Box style={{ flexGrow: 1, flexBasis: 220, minWidth: 0 }}>
                 <WebSignalCard
                   title="Workspace فعالة"
-                  value="Vars فقط"
+                  value="Vars & Appearance"
                   description="كل الشاشات التالية preview control room بدون binding أو runtime truth."
                   tone="best"
                 />
@@ -186,7 +195,7 @@ export function ControlPanelDshPlatformScreen() {
 
             <WebSectionCard
               title="خريطة مساحات Platform"
-              description="Platform مساحة عامة للتوسع لاحقًا، وVars هي الـ workspace الوحيدة المفعّلة الآن."
+              description="Platform مساحة عامة للتوسع لاحقًا، والمساحات المفعّلة الآن هي Vars و Appearance."
             >
               <Box gap={2}>
                 <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
@@ -200,7 +209,8 @@ export function ControlPanelDshPlatformScreen() {
               </Box>
             </WebSectionCard>
 
-            {activeWorkspace === ACTIVE_WORKSPACE_ID ? <DshPlatformVarsWorkspace /> : null}
+            {activeWorkspace === 'vars' ? <DshPlatformVarsWorkspace /> : null}
+            {activeWorkspace === 'appearance' ? <DshPlatformAppearanceWorkspace /> : null}
           </Box>
         </div>
       </main>

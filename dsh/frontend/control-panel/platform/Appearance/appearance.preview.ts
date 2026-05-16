@@ -1,0 +1,36 @@
+import { AppearanceRecord } from './appearance.types';
+
+export const PREVIEW_APPEARANCE_RECORDS: readonly AppearanceRecord[] = [
+  {
+    id: 'campaign-eid-2026',
+    label: 'Campaign / Seasonal Theme Preview',
+    owner: 'Marketing',
+    status: 'preview-only',
+    scope: 'Campaign',
+    risk: 'medium',
+    currentPreviewValue: 'Default Central Theme',
+    proposedPreviewValue: 'Eid Campaign Skin',
+    effectSummary: 'يعرض كيف يمكن لاحقًا تفعيل campaign skin بطريقة محكومة. مرتبطة بفترة.',
+    auditRollbackHint: 'Rollback to Default Central Theme. Previous owner: Platform.',
+    centralColorSystemNote: 'لا تُفعّل أي شيء فعليًا. التزام بنظام الألوان المركزي.',
+    reason: 'Eid 2026 Season',
+    evidence: 'Marketing Board Approval #124',
+    rollbackTarget: 'Default Central Theme',
+  },
+  {
+    id: 'service-override-ops',
+    label: 'Service Appearance Overrides',
+    owner: 'DSH',
+    status: 'contract-needed',
+    scope: 'Service',
+    risk: 'visual-identity',
+    currentPreviewValue: 'Platform Global',
+    proposedPreviewValue: 'DSH Operations Deep Blue',
+    effectSummary: 'يوضح كيف يمكن ضبط مظهر الخدمة بدون كسر الهوية المركزية. النطاق محدد ومراقب.',
+    auditRollbackHint: 'Requires DesignSystem approval. Rollback to Platform Global.',
+    centralColorSystemNote: 'أي override لا يعني نظام ألوان محلي.',
+    reason: 'High Contrast Operations Requirement',
+    evidence: 'Design System Ticket #401',
+    rollbackTarget: 'Platform Global',
+  },
+];
