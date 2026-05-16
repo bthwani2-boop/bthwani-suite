@@ -230,8 +230,6 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
 				sourceOwner: 'marketing-hard-gate',
 				sourceRecordId: 'conflict-001',
 				sourceType: 'offer',
-				conflictStatus: 'blocker',
-				conflictReason: 'تعارض مع سياسة العروض الحالية.'
 			}
 		}
 	},

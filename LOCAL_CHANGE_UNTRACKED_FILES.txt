@@ -1,1 +1,6 @@
-
+dsh/frontend/control-panel/platform/Audit/DshPlatformAuditWorkspace.tsx
+dsh/frontend/control-panel/platform/Audit/index.ts
+dsh/frontend/control-panel/platform/Health/DshPlatformHealthWorkspace.tsx
+dsh/frontend/control-panel/platform/Health/index.ts
+dsh/frontend/control-panel/platform/Rollouts/DshPlatformRolloutsWorkspace.tsx
+dsh/frontend/control-panel/platform/Rollouts/index.ts

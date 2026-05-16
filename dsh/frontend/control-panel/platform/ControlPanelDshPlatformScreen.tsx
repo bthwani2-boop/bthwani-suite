@@ -12,11 +12,15 @@ import { DshPlatformVarsWorkspace } from './Vars';
 import { DshPlatformAppearanceWorkspace } from './Appearance';
 import { DshPlatformServicesWorkspace } from './Services';
 import { DshPlatformProvidersWorkspace } from './Providers';
+import { DshPlatformRolloutsWorkspace } from './Rollouts';
+import { DshPlatformHealthWorkspace } from './Health';
+import { DshPlatformAuditWorkspace } from './Audit';
+import { DemoPlatformProvider } from './useDemoPlatformState';
 import styles from '../shared/control-panel-surface.module.css';
 
 type ActiveWorkspaceId = 'overview' | 'services' | 'vars' | 'providers' | 'appearance';
-type TeaserWorkspaceId = 'rollouts' | 'health' | 'audit';
-type PlatformWorkspaceId = ActiveWorkspaceId | TeaserWorkspaceId;
+type SimulationWorkspaceId = 'rollouts' | 'health' | 'audit';
+type PlatformWorkspaceId = ActiveWorkspaceId | SimulationWorkspaceId;
 
 type WorkspaceTab = {
   id: PlatformWorkspaceId;
@@ -26,14 +30,14 @@ type WorkspaceTab = {
 };
 
 const WORKSPACE_TABS: readonly WorkspaceTab[] = [
-  { id: 'overview', label: 'نظرة عامة', badge: 'نشط', active: true },
-  { id: 'services', label: 'الخدمات', badge: 'نشط', active: true },
-  { id: 'vars', label: 'المتغيرات', badge: 'نشط', active: true },
-  { id: 'providers', label: 'المزودون', badge: 'نشط', active: true },
-  { id: 'appearance', label: 'المظهر', badge: 'نشط', active: true },
-  { id: 'rollouts', label: 'الإطلاق التدريجي', badge: 'لاحقًا', active: false },
-  { id: 'health', label: 'الصحة والأداء', badge: 'لاحقًا', active: false },
-  { id: 'audit', label: 'السجل والتراجع', badge: 'لاحقًا', active: false },
+  { id: 'overview', label: 'نظرة عامة', badge: '', active: true },
+  { id: 'services', label: 'الخدمات', badge: '', active: true },
+  { id: 'vars', label: 'المتغيرات', badge: '', active: true },
+  { id: 'providers', label: 'المزودون', badge: '', active: true },
+  { id: 'appearance', label: 'المظهر', badge: '', active: true },
+  { id: 'rollouts', label: 'الإطلاق التدريجي', badge: '', active: true },
+  { id: 'health', label: 'الصحة والأداء', badge: '', active: true },
+  { id: 'audit', label: 'السجل والتراجع', badge: '', active: true },
 ] as const;
 
 const ACTIVE_WORKSPACE_IDS: readonly ActiveWorkspaceId[] = [
@@ -44,8 +48,8 @@ const ACTIVE_WORKSPACE_IDS: readonly ActiveWorkspaceId[] = [
   'appearance',
 ];
 
-function isActiveWorkspace(id: PlatformWorkspaceId): id is ActiveWorkspaceId {
-  return (ACTIVE_WORKSPACE_IDS as readonly string[]).includes(id);
+function isActiveWorkspace(id: PlatformWorkspaceId): id is ActiveWorkspaceId | SimulationWorkspaceId {
+  return true; // All are active now
 }
 
 // ─── Overview panel ─────────────────────────────────────────────────────────
@@ -56,144 +60,70 @@ function OverviewPanel() {
       <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
           <WebSignalCard
-            title="حالة المنصة"
-            value="تشغيل طبيعي"
-            description="المنصة تعمل بشكل طبيعي. لا تنبيهات حرجة."
-            tone="best"
+            title="الخدمات العليا"
+            value="9"
+            description="DSH، KNZ، WLT، AMN، ARB، MRF، KWD، SND، ESF — خارطة المنصة الكاملة."
+            tone="neutral"
           />
         </Box>
         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
           <WebSignalCard
-            title="الخدمات المفعّلة"
-            value="4 من 4"
-            description="جميع خدمات المنصة في وضع التشغيل أو التجريب."
-            tone="success"
+            title="المفعلة حالياً"
+            value="2"
+            description="DSH (ظاهر للعملاء) و WLT (API داخلي). 7 خدمات مقررة ولم تُضَف بعد."
+            tone="neutral"
           />
         </Box>
         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
           <WebSignalCard
-            title="المتغيرات الحساسة"
-            value="بانتظار contract"
-            description="المتغيرات المالية تبقى مملوكة لـ WLT وتحتاج عقد ربط قبل التفعيل."
-            tone="warning"
+            title="مخفية عن العملاء"
+            value="1"
+            description="WLT: API داخلي للمحافظ والتسويات — لا واجهة مباشرة للعملاء."
+            tone="neutral"
           />
         </Box>
         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
           <WebSignalCard
-            title="المزودون النشطون"
-            value="5 مزودين"
-            description="المزودون الافتراضيون على مستوى المنصة معرّفون. بيانات الاعتماد مُخفاة."
-            tone="brand"
+            title="تحتاج مراجعة"
+            value="7"
+            description="خدمات مقررة في خارطة المنصة ولم يُحدَّد وقت إضافتها بعد."
+            tone="neutral"
           />
         </Box>
       </Box>
 
       <WebSectionCard
-        title="مساحات التحكم المتاحة"
-        description="هذه لوحة التحكم السيادية للمنصة — مخصصة للمسؤولين المفوّضين فقط."
-      >
-        <Box gap={3}>
-          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            {WORKSPACE_TABS.filter((w) => w.active).map((w) => (
-              <Surface
-                key={w.id}
-                tone="raised"
-                border
-                padding={3}
-                radiusToken="xl"
-                style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}
-              >
-                <Box gap={1}>
-                  <Text role="titleMd">{w.label}</Text>
-                  <Surface tone="brand" padding={1} radiusToken="pill" border={false}>
-                    <Text role="caption" tone="inverse">
-                      {w.badge}
-                    </Text>
-                  </Surface>
-                </Box>
-              </Surface>
-            ))}
-            {WORKSPACE_TABS.filter((w) => !w.active).map((w) => (
-              <Surface
-                key={w.id}
-                tone="default"
-                border
-                padding={3}
-                radiusToken="xl"
-                style={{ flexGrow: 1, flexBasis: 200, minWidth: 0, opacity: 0.6 }}
-              >
-                <Box gap={1}>
-                  <Text role="titleMd" tone="muted">
-                    {w.label}
-                  </Text>
-                  <Surface tone="default" border padding={1} radiusToken="pill">
-                    <Text role="caption" tone="muted">
-                      {w.badge}
-                    </Text>
-                  </Surface>
-                </Box>
-              </Surface>
-            ))}
-          </Box>
-          <Text role="caption" tone="muted">
-            مرحلة UI/UX flow فقط — جميع أزرار التنفيذ الحي معطّلة. لا API ولا runtime ولا قاعدة
-            بيانات في هذه المرحلة.
-          </Text>
-        </Box>
-      </WebSectionCard>
-
-      <WebSectionCard
-        title="التكامل مع الأقسام المتخصصة"
-        description="توضيح لصلاحيات الأقسام المجاورة. هذه الأقسام تُدار من مساحاتها الخاصة، ولا توجد شاشات تحكم لها داخل المنصة السيادية."
+        title="التكامل مع الأقسام المتخصصة (Handoffs)"
+        description="المهام التشغيلية اليومية محالة إلى مساحات التحكم المتخصصة التالية لتجنب تسربها إلى لوحة التحكم السيادية."
       >
         <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
-          <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0, opacity: 0.8 }}>
+          <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
             <Box gap={1}>
               <Text role="titleMd" tone="brand">الكتالوجات (Catalogs)</Text>
               <Text role="bodySm" tone="muted">
-                يدير الفئات، المنتجات، والأقسام. يوفر البيانات المعروضة في الخدمات المفعلة.
+                إدارة الفئات، المنتجات، وأقسام العرض.
               </Text>
             </Box>
           </Surface>
-          <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0, opacity: 0.8 }}>
+          <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
             <Box gap={1}>
               <Text role="titleMd" tone="brand">التسويق (Marketing)</Text>
               <Text role="bodySm" tone="muted">
-                يدير الحملات، العروض، البنرات، برامج الولاء، والاشتراكات.
+                إدارة الحملات، العروض، والبنرات الترويجية.
               </Text>
             </Box>
           </Surface>
-          <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0, opacity: 0.8 }}>
+          <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
             <Box gap={1}>
               <Text role="titleMd" tone="brand">الإدارة (Administration)</Text>
               <Text role="bodySm" tone="muted">
-                يدير المستخدمين، الأدوار، وصلاحيات الوصول للوحة التحكم والمنصة.
+                إدارة المستخدمين، الأدوار، والصلاحيات.
               </Text>
             </Box>
           </Surface>
         </Box>
       </WebSectionCard>
     </Box>
-  );
-}
-
-// ─── Teaser panel ────────────────────────────────────────────────────────────
-
-function TeaserPanel({ label }: { label: string }) {
-  return (
-    <Surface tone="default" border padding={4} radiusToken="xl">
-      <Box gap={2} align="center">
-        <Text role="titleMd" tone="muted">
-          {label}
-        </Text>
-        <Text role="bodySm" tone="muted">
-          هذه المساحة ستُفتح في مرحلة runtime لاحقًا بعد اكتمال البنية التحتية والعقود.
-        </Text>
-        <Button variant="secondary" disabled>
-          قريبًا
-        </Button>
-      </Box>
-    </Surface>
   );
 }
 
@@ -206,7 +136,8 @@ export function ControlPanelDshPlatformScreen() {
   const activeTab = WORKSPACE_TABS.find((w) => w.id === activeWorkspace);
 
   return (
-    <div className={styles.surfaceCockpit}>
+    <DemoPlatformProvider>
+      <div className={styles.surfaceCockpit}>
       {/* Top bar */}
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
@@ -241,12 +172,21 @@ export function ControlPanelDshPlatformScreen() {
               </span>
             </div>
             <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>المالك المالي</span>
-              <span className={styles.commandKpiValue}>WLT</span>
+              <span className={styles.commandKpiLabel}>نمط المرحلة</span>
+              <span className={styles.commandKpiValue}>وضع تجريبي (محاكاة محلية)</span>
             </div>
           </div>
         </div>
       </header>
+
+      {/* Demo Warning Banner */}
+      <Box paddingX={4} paddingY={3}>
+        <Surface tone="warning" border padding={3} radiusToken="md">
+          <Text role="bodySm" tone="warning" align="center">
+            وضع تجريبي: جميع الإجراءات تحاكي التغيير محلياً فقط ولا يتم تعديل أي إعدادات حقيقية في المنصة (لا يتم استخدام API أو حفظ أسرار).
+          </Text>
+        </Surface>
+      </Box>
 
       {/* KPI strip */}
       <WebControlPanelKpiStrip
@@ -257,9 +197,9 @@ export function ControlPanelDshPlatformScreen() {
             value: activeTab?.label ?? '—',
             tone: 'success',
           },
-          { id: 'platform-mode', label: 'نمط المرحلة', value: 'UI/UX flow', tone: 'neutral' },
+          { id: 'platform-mode', label: 'نمط المرحلة', value: 'محاكاة محلية (Demo)', tone: 'neutral' },
           { id: 'financial-owner', label: 'المالك المالي', value: 'WLT bridge', tone: 'warning' },
-          { id: 'mutations', label: 'أزرار التنفيذ', value: 'معطّلة', tone: 'danger' },
+          { id: 'mutations', label: 'أزرار التنفيذ', value: 'تعمل كطراز (Mock)', tone: 'danger' },
         ]}
       />
 
@@ -275,7 +215,7 @@ export function ControlPanelDshPlatformScreen() {
           }))}
           onSelect={(id) => {
             if (isActiveWorkspace(id as PlatformWorkspaceId)) {
-              setActiveWorkspace(id as ActiveWorkspaceId);
+              setActiveWorkspace(id as PlatformWorkspaceId);
             }
           }}
         />
@@ -290,13 +230,14 @@ export function ControlPanelDshPlatformScreen() {
             {activeWorkspace === 'vars' && <DshPlatformVarsWorkspace />}
             {activeWorkspace === 'providers' && <DshPlatformProvidersWorkspace />}
             {activeWorkspace === 'appearance' && <DshPlatformAppearanceWorkspace />}
-            {activeWorkspace === 'rollouts' && <TeaserPanel label="الإطلاق التدريجي" />}
-            {activeWorkspace === 'health' && <TeaserPanel label="الصحة والأداء" />}
-            {activeWorkspace === 'audit' && <TeaserPanel label="السجل والتراجع" />}
+            {activeWorkspace === 'rollouts' && <DshPlatformRolloutsWorkspace />}
+            {activeWorkspace === 'health' && <DshPlatformHealthWorkspace />}
+            {activeWorkspace === 'audit' && <DshPlatformAuditWorkspace />}
           </Box>
         </div>
       </main>
-    </div>
+      </div>
+    </DemoPlatformProvider>
   );
 }
 

@@ -93,16 +93,43 @@ if (!exists(platformDir)) {
   }
 
   // Guard enabled action buttons for live operations in UI/UX phase.
-  // This is intentionally conservative: any Apply/Activate/Save/Rollback style Button must include disabled nearby.
+  // In Demo Mode, buttons can be enabled, but must be marked as Demo/Mock/تجريبي or exist in a file marked as Demo.
   const liveActionWords = /(Apply|Activate|Save|Rollback|تفعيل|تطبيق|حفظ|إيقاف|تشغيل|تراجع|إظهار|إخفاء|اختبار الاتصال|إضافة مفتاح)/;
   for (const f of files.filter((x) => /\.(tsx|jsx)$/.test(x))) {
     const txt = read(f);
     const buttonMatches = [...txt.matchAll(/<Button[\s\S]{0,300}?>/g)];
     for (const m of buttonMatches) {
       const snippet = m[0];
-      if (liveActionWords.test(snippet) && !/\sdisabled(\s|=|>)/.test(snippet)) {
-        errors.push(`Potential enabled live-action Button in UI/UX phase: ${rel(f)} :: ${snippet.slice(0, 160).replace(/\s+/g, ' ')}`);
+      const hasDemoLabel = /(demo|mock|تجريبي|محاكاة)/i.test(snippet) || /(demo|mock|تجريبي|محاكاة)/i.test(txt);
+      if (liveActionWords.test(snippet) && !/\sdisabled(\s|=|>)/.test(snippet) && !hasDemoLabel) {
+        errors.push(`Enabled action Button without Demo label: ${rel(f)} :: ${snippet.slice(0, 160).replace(/\s+/g, ' ')}`);
       }
+    }
+  }
+
+  // Prevent API/backend calls
+  const apiCallPattern = /\b(fetch|axios|XMLHttpRequest|useQuery|useMutation)\b|['"]use server['"]/;
+  for (const f of files.filter((x) => /\.(tsx|jsx|ts|js)$/.test(x))) {
+    const txt = read(f);
+    if (apiCallPattern.test(txt)) {
+      errors.push(`API call or server action detected in UI/UX Demo Mode: ${rel(f)}`);
+    }
+  }
+
+  // Prevent old "disabled buttons" message
+  for (const f of files) {
+    const txt = read(f);
+    if (/كل الأزرار معطلة/.test(txt)) {
+      errors.push(`Found forbidden legacy text 'كل الأزرار معطلة' in ${rel(f)}`);
+    }
+  }
+
+  // Prevent teaser-only Workspaces
+  const teaserPattern = /(teaser|سيتم توفير هذه الواجهة قريباً|واجهة مقترحة)/i;
+  for (const f of files) {
+    const txt = read(f);
+    if (teaserPattern.test(txt)) {
+      errors.push(`Found teaser content instead of actual interactive Demo Mode in ${rel(f)}`);
     }
   }
 
@@ -116,11 +143,20 @@ if (!exists(platformDir)) {
   }
 
   // Developer/debug identifiers as primary-looking title labels.
-  const primaryTechTitlePattern = /<Text[^>]*(role=["']title|role=["']titleMd|role=["']heading)[^>]*>\s*\{?[^<}]*(provider\.|wlt\.|VAR_|RuntimeVar|OpenAPI|Entity|endpoint)/i;
+  const primaryTechTitlePattern = /<Text[^>]*(role=["']title|role=["']titleMd|role=["']heading)[^>]*>\s*\{?[^<}]*(provider_id|provider\.|wlt\.|VAR_|RuntimeVar|OpenAPI|Entity|endpoint)/i;
   for (const f of files.filter((x) => /\.(tsx|jsx)$/.test(x))) {
     const txt = read(f);
     if (primaryTechTitlePattern.test(txt)) {
       errors.push(`Technical identifier appears as primary title in ${rel(f)}`);
+    }
+  }
+
+  // Block old preview tags that break immersion
+  const previewTagsPattern = /(preview-only|ready-for-binding|contract-needed)/i;
+  for (const f of files.filter((x) => /\.(tsx|jsx)$/.test(x))) {
+    const txt = read(f);
+    if (previewTagsPattern.test(txt)) {
+      errors.push(`Found technical preview-only/ready-for-binding/contract-needed tags in UI: ${rel(f)}`);
     }
   }
 
@@ -173,6 +209,44 @@ if (!exists(platformDir)) {
     const txt = read(f);
     if (appearanceMarketingOwnership.test(txt)) {
       errors.push(`Appearance contains marketing-ownership language (Appearance belongs to Platform + DesignSystem): ${rel(f)}`);
+    }
+  }
+
+  // ─── Platform > Services top-level boundary enforcement ──────────────────────
+  // Only dsh/knz/wlt/amn/arb/mrf/kwd/snd/esf are valid top-level platform services.
+  // Sub-capabilities (awnak/عونك, shein/شي إن, store-pickup, scheduled-orders) belong
+  // in Vars/Rollouts and must NOT appear as top-level service definitions in Services/.
+  const servicesFiles = files.filter((f) => rel(f).includes('/Services/'));
+  const prohibitedServiceDefinitions = [
+    {
+      // Matches code: 'awnak' / name: '...عونك...' / humanName="...عونك..." (JSX legacy)
+      pattern: /(?:code|name|humanName)\s*[:=]\s*['"][^'"]*(?:awnak|عونك)[^'"]*['"]/i,
+      label: 'awnak (service-awnak / عونك) as top-level service code or name',
+    },
+    {
+      pattern: /(?:code|name|humanName)\s*[:=]\s*['"][^'"]*(?:shein|شي.?إن)[^'"]*['"]/i,
+      label: 'shein (service-shein / شي إن) as top-level service code or name',
+    },
+    {
+      pattern: /(?:code|name|humanName)\s*[:=]\s*['"][^'"]*(?:store.?pickup|store_pickup|الاستلام\s*من\s*المتجر)[^'"]*['"]/i,
+      label: 'store-pickup as top-level service code or name',
+    },
+    {
+      pattern: /(?:code|name|humanName)\s*[:=]\s*['"][^'"]*(?:scheduled.?orders|scheduled_orders|الطلبات\s*المجدولة)[^'"]*['"]/i,
+      label: 'scheduled-orders as top-level service code or name',
+    },
+    {
+      // "DSH Delivery" must not be a separate service — DSH is the service, Delivery is its function
+      pattern: /(?:code|name|humanName)\s*[:=]\s*['"]DSH\s+Delivery['"]/i,
+      label: 'DSH Delivery as separate top-level service (should be: code: DSH)',
+    },
+  ];
+  for (const { pattern, label } of prohibitedServiceDefinitions) {
+    for (const f of servicesFiles) {
+      const txt = read(f);
+      if (pattern.test(txt)) {
+        errors.push(`Prohibited sub-capability as top-level service in Services workspace ${rel(f)}: ${label}`);
+      }
     }
   }
 }

@@ -1,255 +1,55 @@
-# Platform Control Plane
+# Platform Control Plane Governance
 
-**Status:** Canonical Governance Payload
-**Owner:** Platform Sovereign Control
-**Applies to:** `control-panel/runtime/app/platform/page.tsx`, `dsh/frontend/control-panel/platform/`, future platform runtime/control APIs.
-**Phase:** UI/UX flow now; runtime activation later.
+## 1. Sovereignty and Purpose
 
-## Purpose
+The Platform section (`control-panel/runtime/app/platform/`) is the sovereign control plane of the BThwani DSH architecture.
+It is designated strictly for the highest administrative authority to oversee and manage:
 
-`Platform` is the sovereign, sensitive, top-administration control plane for BThwani platform runtime control.
+- Service state (Activation, Kill Switch, Maintenance)
+- Visibility (Internal vs. Public)
+- Sovereign Operational Variables (Vars)
+- Infrastructure Providers & Secrets
+- Central App Appearance & Visual Identity
+- Rollouts, Health Monitoring, and Audit/Rollbacks.
 
-It is not a read-only file view, not a developer debug console, and not a daily operations screen.
+## 2. Boundaries and Separation of Concerns
 
-It exists to eventually let authorized top administrators control platform-wide behavior without requiring a developer for every change.
+The Platform MUST NOT leak into or manage the daily operations of specialized domains:
 
-## Access level
+- **Catalogs**: Managed independently. The Platform does not manage categories, products, or tags.
+- **Marketing**: Managed independently. The Platform does not create or manage campaigns, offers, or banners.
+- **Administration**: Managed independently. The Platform does not manage individual user accounts or roles; it relies on them for access control.
 
-Platform is restricted to the highest administrative authority.
+## 3. Strict UI/UX and Implementation Rules
 
-It must not be available to normal control-panel employees by default.
+- **No Secrets in Code**: API keys and provider credentials must never be hardcoded or visible. UI must use `••••••••` masking and rely on a secure secret manager backend (when implemented).
+- **Demo Mode Rule**: During the UI/UX design and preview phases, the interface operates exclusively in Demo Mode. Interaction is strictly local (React state simulation) with NO runtime mutations, NO real API calls, NO secrets handling, and NO real database or env writes. Every sensitive action requires a confirmation modal displaying impact and a mock audit entry. Local rollback must be supported. No demo results should be interpreted as operational truths.
+- **Systematic Appearance**: Visual identities are governed by the central `@bthwani/ui-kit` design tokens. No hardcoded hex values or random colors are permitted in the control plane overrides.
+- **Human-Centric Design**: Control plane interfaces should be designed for human operators making critical business decisions, not as raw data dumps or technical JSON viewers. Focus on Impact, Scope, Risk, and Rollback capabilities.
 
-Access must later be controlled by `Administration`, but Platform itself remains a sovereign control surface.
+## 4. Platform > Services Boundary
 
-## What Platform owns
+**Platform > Services controls top-level platform services only: DSH, KNZ, WLT, AMN, ARB, MRF, KWD, SND, ESF.**
 
-Platform owns high-level sovereign controls:
+Sub-capabilities inside a service — such as Awnak (عونك), Shein (شي إن), Store Pickup, or Scheduled Orders under DSH — are controlled through service vars, rollouts, or future service-specific capability controls. They must NOT appear as top-level platform services.
 
-- Service visibility and enablement.
-- Service-level runtime variables and scoped policy values.
-- Platform-wide provider setup and activation.
-- Provider priority, fallback, testing, rollback, and health.
-- Platform-wide appearance and color identity for all apps.
-- Runtime flags, rollouts, maintenance mode, and emergency stop.
-- Platform health, impact preview, audit, and rollback.
+Correct placement:
 
-## What Platform does not own
+- `Platform > Vars` — configure capability feature flags (e.g. `DSH_CAPABILITY_AWNAK_ENABLED`)
+- `Platform > Rollouts` — gradual activation of a capability within a service (labeled as "capability-level rollout")
+- `DSH-specific controls` — future deep-dive panels per service
 
-Platform does not own:
+The guard (`08_GUARDS/platform-control-plane-uiux.guard.mjs`) enforces this boundary automatically and will fail if awnak, shein, store-pickup, scheduled-orders, or "DSH Delivery" appear as top-level service definitions in the Services workspace.
 
-- Catalog categories, subcategories, products, store catalog details.
-- Marketing campaigns, offers, banners, promotions.
-- Daily order operations and case handling.
-- Daily finance processing and ledger operations.
-- User permission management details.
-- Developer-only implementation details.
+## 5. Audit and Rollback Enforcements
 
-Ownership map:
+Every state mutation inside the Platform Control Plane must record:
 
-```text
-Catalog data                → Catalogs
-Campaigns/offers/banners    → Marketing
-User/role permissions       → Administration
-Daily order operations      → Operations
-Daily finance operations    → Finance
-Sovereign runtime control   → Platform
-```
+- The Operator (Owner)
+- The Reason for the change
+- Before & After states
+- Scope (Geographical or User Segment)
+- Impact Assessment
+- Rollback target
 
-## Human-first UI rule
-
-Platform UI must be understandable by a non-developer top administrator.
-
-Primary labels must be human-readable:
-
-Allowed examples:
-
-```text
-مزود الخرائط
-مزود الرسائل SMS
-تشغيل خدمة دليفري
-إخفاء الخدمة عن العملاء
-تغيير حد أهلية الكابتن
-تغيير لون الهيدر الرئيسي
-اختبار الاتصال
-تفعيل المزود
-تراجع عن آخر تغيير
-```
-
-Forbidden as primary UI labels:
-
-```text
-provider.awnak.v2
-provider.dispatch.router
-wlt.refunds.autoApprovalCap
-VAR_SVC_DSH_ENABLED
-RuntimeVarValueEntity
-OpenAPI schema
-database entity
-endpoint path
-```
-
-Technical identifiers may appear only in collapsed advanced details or muted captions when needed for evidence.
-
-## Services control
-
-Service controls must support:
-
-- Live / Paused / Internal only / Pilot / Maintenance.
-- Client visibility: visible / hidden.
-- Scope: Global / Region / City / Zone / Service.
-- Impact preview.
-- Owner and reason.
-- Audit.
-- Rollback.
-
-No service can be made visible to clients without a rollback plan.
-
-## Vars control
-
-Any mutable business/runtime value that changes by service, store, city, zone, category, provider, rollout, or operational mode is governed by `VAR_*` law.
-
-Every var change must include:
-
-- owner
-- reason
-- before/after
-- scope
-- impact preview/simulation
-- audit
-- rollback
-- evidence
-
-Financial variables remain WLT-owned even when displayed in Platform.
-
-## Providers control
-
-Provider setup is platform-wide by default.
-
-Provider types include:
-
-- SMS
-- Payments
-- Maps/Geo
-- Push notifications
-- Email
-- Hosting/server
-- Storage
-- Analytics
-- Search
-- AI
-- Risk/Fraud
-
-Provider policy must include:
-
-- provider category
-- selected provider
-- masked credential state
-- environment: test/sandbox/production
-- priority
-- fallback
-- test result
-- activation state
-- rollback target
-- owner
-- last changed by
-- evidence
-
-## Secrets and API keys
-
-API keys and secrets must never be stored in frontend code, committed files, screen constants, env-only scattered logic, or UI preview records.
-
-Platform UI may show masked placeholders only:
-
-```text
-••••••••••••
-```
-
-Later runtime implementation must use a secure secret/config control plane.
-
-## Appearance control
-
-Appearance is platform identity for all apps and surfaces.
-
-It is not Marketing, Campaigns, Seasonal themes, Offers, or Banners.
-
-Appearance controls:
-
-- app-client
-- app-partner
-- app-captain
-- app-field
-- control-panel
-- webapp/website
-- primary header
-- secondary header
-- primary buttons
-- background/surface
-- semantic states
-
-All appearance changes must stay within the central color system and design-system tokens.
-
-No local color system is allowed.
-
-## UI-kit authority
-
-Screen / Surface / App → `@bthwani/ui-kit` public exports → Tamagui internally inside ui-kit only.
-
-Platform must not create a local design system.
-
-Platform must not create new ui-kit files unless human-approved and non-negotiable.
-
-## UI/UX phase restrictions
-
-During UI/UX flow:
-
-- no real API
-- no backend
-- no database
-- no mutation
-- no real provider activation
-- no real secret entry
-- no runtime binding
-- all live action buttons disabled
-- all apply/activate/save/rollback flows are preview-only
-
-## Runtime phase requirements
-
-Before runtime activation, Platform must have:
-
-- permissions
-- approval policy
-- audit log
-- rollback
-- secrets storage
-- provider test sandbox
-- runtime resolver
-- contracts
-- health checks
-- emergency lockout
-- evidence pack
-
-## Forbidden
-
-- Platform as developer/debug page.
-- Platform exposing code details as primary UI.
-- Platform showing secrets.
-- Platform storing provider keys in code.
-- Platform mixing with Catalogs.
-- Platform mixing with Marketing campaigns.
-- Platform mixing with Administration permissions UI.
-- Platform changing ui-kit files directly.
-- Platform using hardcoded random colors.
-- Platform enabling live actions during UI/UX phase.
-- Platform using deprecated `dsh/frontend/control-panel/control/`.
-
-## Required guardrails
-
-Platform changes must be checked for:
-
-- no deprecated control path
-- no campaign/marketing terms inside Appearance
-- no real secrets/API keys
-- no enabled live action buttons during UI/UX
-- no hardcoded color drift
-- no ui-kit file changes
-- no developer-only identifiers as primary labels
+No service can be disabled without an impact assessment, and no provider activated without a successful test.

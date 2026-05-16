@@ -3,137 +3,141 @@
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
-import { PREVIEW_PROVIDER_RECORDS } from './providers.preview';
-import { ProviderRecord, ProviderStatus, ProviderEnvironment } from './providers.types';
+import { useDemoPlatformState } from '../useDemoPlatformState';
 
-const STATUS_TONE: Record<ProviderStatus, 'success' | 'warning' | 'default' | 'danger'> = {
-  active: 'success',
-  'test-only': 'warning',
-  'pending-approval': 'default',
-  inactive: 'danger',
+type ProviderSlotProps = {
+  type: string;
+  currentProvider: string;
+  fallbackProvider: string;
+  status: string;
+  env: string;
+  lastTest: string;
+  lastActivation: string;
+  tone: 'brand' | 'warning' | 'danger' | 'default' | 'success';
 };
 
-const STATUS_LABEL: Record<ProviderStatus, string> = {
-  active: 'مفعّل',
-  'test-only': 'اختبار فقط',
-  'pending-approval': 'بانتظار الاعتماد',
-  inactive: 'غير نشط',
-};
+function ProviderSlot({
+  type,
+  currentProvider,
+  fallbackProvider,
+  status,
+  env,
+  lastTest,
+  lastActivation,
+  tone,
+}: ProviderSlotProps) {
+  const { addAuditEvent } = useDemoPlatformState();
+  const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
+  const [currentStatus, setCurrentStatus] = React.useState(status);
+  const [currentTone, setCurrentTone] = React.useState(tone);
+  const [lastTestTime, setLastTestTime] = React.useState(lastTest);
+  const [isMaskedKey, setIsMaskedKey] = React.useState(true);
 
-const ENV_LABEL: Record<ProviderEnvironment, string> = {
-  production: 'إنتاج',
-  sandbox: 'بيئة اختبار',
-  test: 'اختبار',
-};
+  const handleConfirm = (action: string) => {
+    let newStatus = currentStatus;
+    let newTone = currentTone;
+    let newTest = lastTestTime;
+    let impact = 'لا يوجد أثر كبير';
 
-const TEST_TONE = {
-  pass: 'success' as const,
-  fail: 'danger' as const,
-  'not-run': 'muted' as const,
-};
+    if (action === 'تفعيل كمزود افتراضي للمنصة') {
+      newStatus = 'نشط';
+      newTone = 'success';
+      impact = `تحويل الحركة لتتم عبر المزود: ${currentProvider}`;
+    } else if (action === 'إيقاف') {
+      newStatus = 'موقوف';
+      newTone = 'danger';
+      impact = `إيقاف المزود والاعتماد على البديل: ${fallbackProvider}`;
+    } else if (action === 'اختبار الاتصال') {
+      newTest = 'الآن (Pass)';
+      impact = 'تحديث حالة الاتصال محلياً';
+    } else if (action === 'إضافة مفتاح API') {
+      impact = 'تم تحديث المفتاح محلياً (محاكاة فقط)';
+      setIsMaskedKey(true); // reset mock input
+    }
 
-function ProviderCard({ record }: { record: ProviderRecord }) {
+    setCurrentStatus(newStatus);
+    setCurrentTone(newTone);
+    setLastTestTime(newTest);
+    setShowConfirm(null);
+
+    addAuditEvent({
+      action: `إجراء مزود ${type}: ${action}`,
+      operator: 'Demo Admin',
+      status: 'success',
+      oldValue: `${currentStatus}`,
+      newValue: `${newStatus}`,
+      reason: 'محاكاة محلية',
+      scope: 'Global',
+      impact,
+      rollbackAvailable: true,
+    });
+  };
   return (
-    <Surface
-      tone="raised"
-      border
-      padding={3}
-      radiusToken="xl"
-      style={{ flexGrow: 1, flexBasis: 300, minWidth: 0 }}
-    >
+    <Surface tone="raised" border padding={4} radiusToken="xl">
       <Box gap={3}>
-        {/* Header */}
-        <Box
-          layoutDirection="row"
-          justify="space-between"
-          align="flex-start"
-          style={{ flexWrap: 'wrap', rowGap: 8 }}
-        >
-          <Box gap={0} style={{ flex: 1, minWidth: 0 }}>
-            <Text role="titleMd">{record.label}</Text>
-            <Text role="caption" tone="muted">
-              {record.category}
-            </Text>
+        <Box layoutDirection="row" justify="space-between" align="center" style={{ flexWrap: 'wrap', rowGap: 8 }}>
+          <Box gap={1}>
+            <Text role="titleMd">مزود {type}</Text>
+            <Text role="caption" tone="muted">الحالي: {currentProvider} | البديل: {fallbackProvider}</Text>
           </Box>
-          <Surface tone={STATUS_TONE[record.status]} padding={1} radiusToken="pill" border>
-            <Text role="caption" tone="inverse">
-              {STATUS_LABEL[record.status]}
-            </Text>
+          <Surface tone={currentTone} padding={1} radiusToken="pill" border={false}>
+            <Text role="caption" tone={currentTone === 'default' ? 'muted' : 'inverse'}>{currentStatus}</Text>
           </Surface>
         </Box>
 
-        {/* Provider and masked key */}
-        <Surface tone="default" border padding={2} radiusToken="md">
-          <Box gap={2}>
-            <Box layoutDirection="row" justify="space-between" align="center">
-              <Text role="caption" tone="muted">
-                المزود المحدد
-              </Text>
-              <Text role="bodySm" weight="medium">
-                {record.selectedProvider}
-              </Text>
+        <Surface tone="default" border padding={3} radiusToken="md">
+          <Box layoutDirection="row" justify="space-between" align="center">
+            <Box gap={1}>
+              <Text role="caption" tone="muted">مفتاح API (Secret)</Text>
+              <Text role="bodySm" weight="bold">••••••••••••••••</Text>
             </Box>
-            <Box layoutDirection="row" justify="space-between" align="center">
-              <Text role="caption" tone="muted">
-                بيانات الاعتماد
-              </Text>
-              <Text role="bodySm" tone="muted">
-                {record.maskedCredential}
-              </Text>
+            <Box gap={1}>
+              <Text role="caption" tone="muted">البيئة</Text>
+              <Text role="bodySm">{env}</Text>
             </Box>
-            <Box layoutDirection="row" justify="space-between" align="center">
-              <Text role="caption" tone="muted">
-                البيئة
-              </Text>
-              <Text role="bodySm">{ENV_LABEL[record.environment]}</Text>
+            <Box gap={1}>
+              <Text role="caption" tone="muted">آخر اختبار</Text>
+              <Text role="bodySm">{lastTestTime}</Text>
             </Box>
-            {record.lastTestResult ? (
-              <Box layoutDirection="row" justify="space-between" align="center">
-                <Text role="caption" tone="muted">
-                  نتيجة الاختبار
-                </Text>
-                <Text role="bodySm" tone={TEST_TONE[record.lastTestResult]}>
-                  {record.lastTestResult === 'pass'
-                    ? 'ناجح'
-                    : record.lastTestResult === 'fail'
-                      ? 'فاشل'
-                      : 'لم يُجرَ'}
-                </Text>
-              </Box>
-            ) : null}
-            {record.fallbackProvider ? (
-              <Box layoutDirection="row" justify="space-between" align="center">
-                <Text role="caption" tone="muted">
-                  البديل عند الفشل
-                </Text>
-                <Text role="bodySm">{record.fallbackProvider}</Text>
-              </Box>
-            ) : null}
+            <Box gap={1}>
+              <Text role="caption" tone="muted">آخر تفعيل</Text>
+              <Text role="bodySm">{lastActivation}</Text>
+            </Box>
           </Box>
         </Surface>
 
-        {/* Activation note */}
-        <Box gap={1}>
-          <Text role="caption" tone="muted">
-            ملاحظة التفعيل
-          </Text>
-          <Text role="bodySm">{record.activationNote}</Text>
-          {record.evidence ? (
-            <Text role="caption" tone="muted">
-              الدليل: {record.evidence}
-            </Text>
-          ) : null}
-        </Box>
+        {!showConfirm ? (
+          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+            <Button variant="secondary" onClick={() => setShowConfirm('إضافة مفتاح API')}>إضافة مفتاح API (Mock)</Button>
+            <Button variant="secondary" onClick={() => setShowConfirm('اختبار الاتصال')}>اختبار الاتصال</Button>
+            <Button variant="primary" onClick={() => setShowConfirm('تفعيل كمزود افتراضي للمنصة')}>تفعيل</Button>
+            <Button variant="danger" onClick={() => setShowConfirm('إيقاف')}>إيقاف</Button>
+            <Button variant="secondary" onClick={() => setShowConfirm('تغيير المزود البديل')}>تغيير البديل (Demo)</Button>
+            <Button variant="secondary" onClick={() => setShowConfirm('Rollback')}>Rollback (Demo)</Button>
+          </Box>
+        ) : (
+          <Surface tone="warning" border padding={3} radiusToken="md">
+            <Box gap={2}>
+              <Text role="titleSm">تأكيد الإجراء التجريبي: {showConfirm}</Text>
+              <Text role="bodySm">
+                {showConfirm === 'إضافة مفتاح API'
+                  ? 'هذا إدخال تجريبي فقط. لا يتم حفظ مفاتيح حقيقية ولا الاتصال بأي مزود.'
+                  : 'محاكاة محلية. لن يتم تغيير إعدادات المنصة الحقيقية.'}
+              </Text>
 
-        {/* Actions — all disabled in UI/UX phase */}
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <Button variant="primary" disabled style={{ flexGrow: 1 }}>
-            إدخال بيانات الاعتماد
-          </Button>
-          <Button variant="secondary" disabled style={{ flexGrow: 1 }}>
-            Rollback
-          </Button>
-        </Box>
+              {showConfirm === 'إضافة مفتاح API' && (
+                <Surface tone="default" border padding={2} radiusToken="md">
+                  <Text role="bodySm" tone="muted">••••••••••••• (Mock Input)</Text>
+                </Surface>
+              )}
+
+              <Box layoutDirection="row" gap={2} style={{ marginTop: 8 }}>
+                <Button variant="primary" onClick={() => handleConfirm(showConfirm)}>تأكيد المحاكاة</Button>
+                <Button variant="secondary" onClick={() => setShowConfirm(null)}>إلغاء</Button>
+              </Box>
+            </Box>
+          </Surface>
+        )}
       </Box>
     </Surface>
   );
@@ -142,58 +146,88 @@ function ProviderCard({ record }: { record: ProviderRecord }) {
 export function DshPlatformProvidersWorkspace() {
   return (
     <Box gap={4}>
-      {/* Signal strip */}
-      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-          <WebSignalCard
-            title="المزودون النشطون"
-            value={String(
-              PREVIEW_PROVIDER_RECORDS.filter((p) => p.status === 'active').length,
-            )}
-            description="عدد المزودين المفعّلين حاليًا على مستوى المنصة."
-            tone="best"
+      <WebSignalCard
+        title="إدارة الأسرار والمزودين (Secrets & Config Control Plane)"
+        value="وضع الـ Mock الآمن"
+        description="المفاتيح لا تُحفظ في الكود بتاتاً. هذه الواجهة هي Mock لتصميم الـ Control Plane الخاص بالأسرار والإعدادات لاحقًا، ولن تقوم بأي اتصال حي."
+        tone="brand"
+      />
+
+      <WebSectionCard
+        title="المزودون الأساسيون (Provider Slots)"
+        description="التحكم بمزودي البنية التحتية، مفاتيح الربط، والـ Failover."
+      >
+        <Box gap={4}>
+          <ProviderSlot
+            type="الخرائط (Maps)"
+            currentProvider="Google Maps"
+            fallbackProvider="Mapbox"
+            status="نشط"
+            env="إنتاج (Production)"
+            lastTest="قبل ساعة"
+            lastActivation="قبل شهر"
+            tone="success"
           />
-        </Box>
-        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-          <WebSignalCard
-            title="بيانات الاعتماد"
-            value="مُخفاة دائمًا"
-            description="لا تُعرض مفاتيح API الحقيقية في الواجهة. يتم الإدخال عبر control plane آمن."
+          <ProviderSlot
+            type="رسائل الجوال (SMS)"
+            currentProvider="Twillio"
+            fallbackProvider="Unifonic"
+            status="نشط"
+            env="إنتاج (Production)"
+            lastTest="قبل 5 دقائق"
+            lastActivation="قبل شهر"
+            tone="success"
+          />
+          <ProviderSlot
+            type="الدفع (Payment)"
+            currentProvider="Telr"
+            fallbackProvider="Paymob"
+            status="يحتاج اختبار"
+            env="Sandbox"
+            lastTest="لم يختبر"
+            lastActivation="-"
             tone="warning"
           />
-        </Box>
-        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-          <WebSignalCard
-            title="أزرار التنفيذ"
-            value="معطّلة"
-            description="جميع أزرار إدخال بيانات الاعتماد والتفعيل معطّلة في مرحلة UI/UX."
-            tone="brand"
+          <ProviderSlot
+            type="الاستضافة (Hosting)"
+            currentProvider="AWS"
+            fallbackProvider="GCP"
+            status="نشط"
+            env="إنتاج (Production)"
+            lastTest="قبل دقيقة"
+            lastActivation="قبل سنة"
+            tone="success"
           />
-        </Box>
-      </Box>
-
-      {/* Security note */}
-      <Surface tone="danger" border padding={2} radiusToken="lg">
-        <Box gap={1}>
-          <Text role="bodySm" weight="medium">
-            قاعدة أمان المنصة
-          </Text>
-          <Text role="bodySm">
-            لا تُدخل مفاتيح API أو secrets حقيقية في هذه الواجهة. بيانات الاعتماد تُدار عبر
-            control plane آمن ومعزول لاحقًا. ما يظهر هنا هو preview لهيكل إدارة المزودين فقط.
-          </Text>
-        </Box>
-      </Surface>
-
-      {/* Provider cards */}
-      <WebSectionCard
-        title="مزودو المنصة المركزيون"
-        description="المزودون الافتراضيون على مستوى المنصة بالكامل. أي override على مستوى الخدمة يكون استثنائيًا ومحكومًا."
-      >
-        <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
-          {PREVIEW_PROVIDER_RECORDS.map((record) => (
-            <ProviderCard key={record.id} record={record} />
-          ))}
+          <ProviderSlot
+            type="التخزين (Storage)"
+            currentProvider="AWS S3"
+            fallbackProvider="Cloudflare R2"
+            status="نشط"
+            env="إنتاج (Production)"
+            lastTest="قبل 10 دقائق"
+            lastActivation="قبل 6 أشهر"
+            tone="success"
+          />
+          <ProviderSlot
+            type="البريد (Email)"
+            currentProvider="SendGrid"
+            fallbackProvider="Mailgun"
+            status="غير مضاف"
+            env="-"
+            lastTest="-"
+            lastActivation="-"
+            tone="default"
+          />
+          <ProviderSlot
+            type="الإشعارات (Push)"
+            currentProvider="Firebase"
+            fallbackProvider="OneSignal"
+            status="نشط"
+            env="إنتاج (Production)"
+            lastTest="قبل 3 ساعات"
+            lastActivation="قبل شهرين"
+            tone="success"
+          />
         </Box>
       </WebSectionCard>
     </Box>
