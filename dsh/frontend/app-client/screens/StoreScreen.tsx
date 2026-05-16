@@ -495,7 +495,7 @@ function DshStoreGetScreenContent({
   const storeText = uiText.storeScreen;
   const isDarkGlass = appearanceMode === 'darkGlass' || themeMode === 'dark';
   const isRTL = direction === 'rtl';
-  const { width: viewportWidth } = Dimensions.get('window');
+  const { width: viewportWidth, height: viewportHeight } = Dimensions.get('window');
   const [selectedMode, setSelectedMode] = React.useState<DeliveryMode>('store_delivery');
   const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
   const [pickerItem, setPickerItem] = React.useState<DshStoreGetMenuItem | null>(null);
@@ -642,7 +642,7 @@ function DshStoreGetScreenContent({
   // Preview carousel state
   const previewListRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
   const [previewActiveIndex, setPreviewActiveIndex] = React.useState(-1);
-  const previewScrollX = React.useRef(new Animated.Value(0)).current;
+  const previewScrollY = React.useRef(new Animated.Value(0)).current;
   const previewAnim = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
@@ -658,9 +658,10 @@ function DshStoreGetScreenContent({
     }
   }, [previewItem, previewAnim]);
 
-  const PREVIEW_ITEM_WIDTH = viewportWidth * 0.82;
-  const PREVIEW_ITEM_GAP = 12;
-  const PREVIEW_SNAP_INTERVAL = PREVIEW_ITEM_WIDTH + PREVIEW_ITEM_GAP;
+  const PREVIEW_ITEM_WIDTH = viewportWidth * 0.92;
+  const PREVIEW_ITEM_HEIGHT = viewportHeight * 0.54;
+  const PREVIEW_ITEM_GAP = 16;
+  const PREVIEW_SNAP_INTERVAL = PREVIEW_ITEM_HEIGHT + PREVIEW_ITEM_GAP;
 
   const openImagePreview = React.useCallback((item: DshStoreGetMenuItem) => {
     const index = previewItems.findIndex((i) => i.id === item.id);
@@ -679,12 +680,8 @@ function DshStoreGetScreenContent({
     if (!layout || !chipsContainerWidth || !chipsScrollRef.current) return;
     const centerOffset = chipsContainerWidth / 2 - layout.width / 2;
     const targetX = Math.max(0, layout.x - centerOffset);
-    try {
-      chipsScrollRef.current.scrollTo({ x: targetX, animated: true });
-      stickyChipsScrollRef.current?.scrollTo({ x: targetX, animated: true });
-    } catch {
-      // ignore
-    }
+    chipsScrollRef.current.scrollTo({ x: targetX, animated: true });
+    stickyChipsScrollRef.current?.scrollTo({ x: targetX, animated: true });
   }, [chipsContainerWidth]);
 
   const stickyChipsScrollRef = React.useRef<ScrollView | null>(null);
@@ -754,12 +751,41 @@ function DshStoreGetScreenContent({
   const changeCategory = React.useCallback((newId: string) => {
     if (newId === selectedCategory) return;
     setSelectedCategory(newId);
-    // subtle haptic
     try { Vibration.vibrate(8); } catch { /* noop */ }
     scrollChipIntoView(newId);
   }, [selectedCategory, scrollChipIntoView]);
 
-  const panResponder = React.useMemo(() =>
+  // Dual-Axis Navigation PanResponder for Preview
+  // Wide hit area covering the entire wrap
+  const previewPanResponder = React.useMemo(() =>
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_evt, gestureState) => {
+        const { dx, dy } = gestureState;
+        // Intercept only for clear horizontal swipes. Vertical moves are passed to the FlatList.
+        return Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) > 20;
+      },
+      onPanResponderRelease: (_evt, gestureState) => {
+        const { dx } = gestureState;
+        const threshold = 40;
+
+        if (Math.abs(dx) > threshold) {
+          const direction = dx > 0 ? -1 : 1;
+          const adjustedDirection = isRTL ? -direction : direction;
+          const nextIndex = previewActiveIndex + adjustedDirection;
+
+          if (nextIndex >= 0 && nextIndex < previewItems.length) {
+            setPreviewActiveIndex(nextIndex);
+            setPreviewItem(previewItems[nextIndex]);
+            previewListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+          }
+        }
+      },
+    }),
+    [previewActiveIndex, previewItems, isRTL]
+  );
+
+  const mainPanResponder = React.useMemo(() =>
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_evt, gestureState) => {
@@ -768,24 +794,13 @@ function DshStoreGetScreenContent({
       },
       onPanResponderRelease: (_evt, gestureState) => {
         const { dx } = gestureState;
-        const threshold = Math.max(60, Dimensions.get('window').width * 0.08);
+        const threshold = 60;
         const currentIndex = categories.findIndex((c) => c.id === selectedCategory);
         if (currentIndex === -1) return;
-        const nextIndex = Math.min(currentIndex + 1, categories.length - 1);
-        const prevIndex = Math.max(currentIndex - 1, 0);
+        const nextIndex = currentIndex + (isRTL ? (dx < -threshold ? -1 : 1) : (dx < -threshold ? 1 : -1));
 
-        if (isRTL) {
-          if (dx < -threshold && prevIndex !== currentIndex) {
-            changeCategory(categories[prevIndex].id);
-          } else if (dx > threshold && nextIndex !== currentIndex) {
-            changeCategory(categories[nextIndex].id);
-          }
-        } else {
-          if (dx < -threshold && nextIndex !== currentIndex) {
-            changeCategory(categories[nextIndex].id);
-          } else if (dx > threshold && prevIndex !== currentIndex) {
-            changeCategory(categories[prevIndex].id);
-          }
+        if (nextIndex >= 0 && nextIndex < categories.length && nextIndex !== currentIndex) {
+          changeCategory(categories[nextIndex].id);
         }
       },
     }),
@@ -799,13 +814,13 @@ function DshStoreGetScreenContent({
       (index + 1) * PREVIEW_SNAP_INTERVAL,
     ];
 
-    const scale = previewScrollX.interpolate({
+    const scale = previewScrollY.interpolate({
       inputRange,
       outputRange: [0.94, 1, 0.94],
       extrapolate: 'clamp',
     });
 
-    const opacity = previewScrollX.interpolate({
+    const opacity = previewScrollY.interpolate({
       inputRange,
       outputRange: [0.7, 1, 0.7],
       extrapolate: 'clamp',
@@ -816,7 +831,8 @@ function DshStoreGetScreenContent({
         styles.previewCard,
         {
           width: PREVIEW_ITEM_WIDTH,
-          marginHorizontal: PREVIEW_ITEM_GAP / 2,
+          height: PREVIEW_ITEM_HEIGHT,
+          marginVertical: PREVIEW_ITEM_GAP / 2,
           backgroundColor: appearanceChrome.modalSurface,
           borderColor: appearanceChrome.modalBorder,
           borderWidth: 1,
@@ -825,60 +841,75 @@ function DshStoreGetScreenContent({
         }
       ]}>
         <View style={styles.previewImageWrap} pointerEvents="box-none">
+          <TouchableOpacity
+            style={[styles.previewDetailsFavoriteButton, { position: 'absolute', top: 12, right: 12, zIndex: 12 }]}
+            onPress={() => handleToggleFavorite(item.id)}
+          >
+            <View style={styles.previewFavoriteCircle}>
+              <Icon name={favoriteIds.has(item.id) ? 'heart' : 'heart-outline'} size={20} color="#FF500D" />
+            </View>
+          </TouchableOpacity>
+
+          <Image
+            source={resolveDshStoreMenuItemImageSource(item)}
+            style={styles.previewImage}
+            resizeMode="cover"
+          />
+
           {storeLogoImageSource ? (
-            <View style={styles.previewPartnerBadge} pointerEvents="none">
+            <View style={[styles.previewPartnerBadge, { position: 'absolute', bottom: 32, right: 12, zIndex: 13 }]} pointerEvents="none">
               <View style={styles.previewPartnerBadgeImageContainer}>
                 <Image source={storeLogoImageSource} style={styles.previewPartnerBadgeImage} resizeMode="contain" />
               </View>
             </View>
           ) : null}
 
-          <TouchableOpacity
-            style={[styles.previewDetailsFavoriteButton, { position: 'absolute', top: 0, right: 0, zIndex: 12 }]}
-            onPress={() => handleToggleFavorite(item.id)}
-          >
-            <Icon name={favoriteIds.has(item.id) ? 'heart' : 'heart-outline'} size={18} color="#FF500D" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.previewActionButton, { position: 'absolute', bottom: 0, left: 0, zIndex: 12 }]}
-            onPress={() => {
-              openMeasurementPicker(item, { x: 200, y: 420 });
-              closeImagePreview();
-            }}
-          >
-            <View style={{ position: 'relative' }}>
-              <Icon name="cart-outline" size={19} color="#FFFFFF" />
-              <View style={styles.previewActionPlusBadge}>
-                <Icon name="add" size={8} color="#FF500D" />
-              </View>
-            </View>
-          </TouchableOpacity>
-
-          <Text style={styles.previewEmoji}>{getItemEmoji(item)}</Text>
-
-          <Image
-            source={resolveDshStoreMenuItemImageSource(item)}
-            style={styles.previewImage}
-          />
-
-          <View style={[styles.previewDetailsBox, { backgroundColor: 'rgba(255, 255, 255, 0.85)', borderColor: 'rgba(255, 255, 255, 0.3)', borderTopWidth: 1, flexDirection: isRTL ? 'row-reverse' : 'row' }]} pointerEvents="box-none">
-            <View style={[styles.previewDetailsContent, isRTL ? styles.previewDetailsContentRTL : null]}>
+          <View style={[styles.previewDetailsBox, {
+            backgroundColor: 'rgba(255, 255, 255, 0.88)',
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            borderWidth: 1,
+            borderRadius: 24,
+            margin: 12,
+            padding: 12,
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            flexDirection: isRTL ? 'row-reverse' : 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }]} pointerEvents="box-none">
+            <View style={[styles.previewDetailsContent, { flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start' }]}>
               <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap' }}>
-                <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{normalizeDisplayText(item.name)}</Text>
-                {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>· {normalizedStoreName}</Text> : null}
+                <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText, fontSize: 16 }]} numberOfLines={1}>{normalizeDisplayText(item.name)}</Text>
+                {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 4, fontSize: 12 }]}>· {normalizedStoreName}</Text> : null}
               </View>
               <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap', marginTop: 2 }}>
-                {item.priceLabel ? <Text style={[styles.previewDetailsPrice, { color: appearanceChrome.primaryText }]}>{normalizeDisplayText(item.priceLabel)}</Text> : null}
-                {item.discountLabel ? <Text style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>{normalizeDisplayText(item.discountLabel)}</Text> : null}
-                {item.subtitle ? <Text style={[styles.previewDetailsSubtitle, { color: appearanceChrome.secondaryText }]}>· {normalizeDisplayText(item.subtitle)}</Text> : null}
+                {item.priceLabel ? <Text style={[styles.previewDetailsPrice, { color: appearanceChrome.primaryText, fontSize: 18, fontWeight: '900' }]}>{normalizeDisplayText(item.priceLabel)}</Text> : null}
+                {item.discountLabel ? <Text style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent, marginHorizontal: 6, fontSize: 12, fontWeight: '700' }]}>{normalizeDisplayText(item.discountLabel)}</Text> : null}
+                {item.subtitle ? <Text style={[styles.previewDetailsSubtitle, { color: appearanceChrome.secondaryText, fontSize: 12 }]}>· {normalizeDisplayText(item.subtitle)}</Text> : null}
               </View>
             </View>
+
+            <TouchableOpacity
+              style={[styles.previewActionButton, { backgroundColor: '#FF500D', padding: 10, borderRadius: 16 }]}
+              onPress={() => {
+                openMeasurementPicker(item, { x: viewportWidth / 2, y: viewportHeight / 2 });
+                closeImagePreview();
+              }}
+            >
+              <View style={{ position: 'relative' }}>
+                <Icon name="cart-outline" size={20} color="#FFFFFF" />
+                <View style={[styles.previewActionPlusBadge, { backgroundColor: '#FFFFFF', borderColor: '#FF500D' }]}>
+                  <Icon name="add" size={8} color="#FF500D" />
+                </View>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </Animated.View>
     );
-  }, [previewScrollX, PREVIEW_SNAP_INTERVAL, PREVIEW_ITEM_WIDTH, PREVIEW_ITEM_GAP, appearanceChrome, storeLogoImageSource, favoriteIds, isRTL, store, normalizedStoreName, handleToggleFavorite, openMeasurementPicker, closeImagePreview]);
+  }, [previewScrollY, PREVIEW_SNAP_INTERVAL, PREVIEW_ITEM_WIDTH, PREVIEW_ITEM_HEIGHT, PREVIEW_ITEM_GAP, appearanceChrome, storeLogoImageSource, favoriteIds, isRTL, store, normalizedStoreName, handleToggleFavorite, openMeasurementPicker, closeImagePreview, viewportWidth, viewportHeight]);
 
   const activeMeasurementOptions = React.useMemo(
     () => (pickerItem ? resolveMeasurementOptions(pickerItem) : []),
@@ -1188,7 +1219,7 @@ function DshStoreGetScreenContent({
       )}
 
         <View style={styles.feedSection}>
-          <Animated.View style={styles.feedList} {...panResponder.panHandlers}>
+          <Animated.View style={styles.feedList} {...mainPanResponder.panHandlers}>
             <Animated.FlatList
               onScroll={Animated.event(
                 [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -1638,25 +1669,24 @@ function DshStoreGetScreenContent({
                 transform: [{ scale: previewAnim.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1] }) }]
               }
             ]}
-            pointerEvents="box-none"
+            {...previewPanResponder.panHandlers}
           >
             <Animated.FlatList
               ref={previewListRef}
               data={previewItems}
               renderItem={renderPreviewItem}
               keyExtractor={(item) => `preview-${item.id}`}
-              horizontal
-              inverted={isRTL}
-              showsHorizontalScrollIndicator={false}
+              horizontal={false}
+              showsVerticalScrollIndicator={false}
               snapToInterval={PREVIEW_SNAP_INTERVAL}
               snapToAlignment="center"
               decelerationRate="fast"
               onScroll={Animated.event(
-                [{ nativeEvent: { contentOffset: { x: previewScrollX } } }],
+                [{ nativeEvent: { contentOffset: { y: previewScrollY } } }],
                 { useNativeDriver: true }
               )}
               contentContainerStyle={{
-                paddingHorizontal: (viewportWidth - PREVIEW_ITEM_WIDTH) / 2 - PREVIEW_ITEM_GAP / 2,
+                paddingVertical: (viewportHeight - PREVIEW_ITEM_HEIGHT) / 2 - PREVIEW_ITEM_GAP / 2,
               }}
               initialScrollIndex={previewActiveIndex !== -1 ? previewActiveIndex : 0}
               getItemLayout={(_, index) => ({
@@ -1665,7 +1695,7 @@ function DshStoreGetScreenContent({
                 index,
               })}
               onMomentumScrollEnd={(e) => {
-                const index = Math.round(e.nativeEvent.contentOffset.x / PREVIEW_SNAP_INTERVAL);
+                const index = Math.round(e.nativeEvent.contentOffset.y / PREVIEW_SNAP_INTERVAL);
                 if (index >= 0 && index < previewItems.length) {
                   setPreviewActiveIndex(index);
                   setPreviewItem(previewItems[index]);
@@ -2260,28 +2290,35 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   previewWrap: {
+    flex: 1,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
     zIndex: 1,
-    height: 480,
   },
   previewCard: {
-    maxWidth: 760,
-    borderRadius: 16,
-    position: 'relative',
-    zIndex: 2,
+    borderRadius: 24,
     overflow: 'hidden',
+    alignSelf: 'center',
     backgroundColor: stylesTokens.white,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.2,
+        shadowRadius: 16,
+      },
+      android: {
+        elevation: 10,
+      },
+    }),
   },
   previewImageWrap: {
-    width: '100%',
-    height: 420,
-    backgroundColor: stylesTokens.light,
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,
     position: 'relative',
+    overflow: 'hidden',
+    backgroundColor: '#F7F7F7',
   },
   previewSwipeLayer: {
     ...StyleSheet.absoluteFillObject,
@@ -2296,27 +2333,26 @@ const styles = StyleSheet.create({
   },
   previewPartnerBadge: {
     position: 'absolute',
-    bottom: -10,
-    right: -10,
-    width: 66,
-    height: 66,
-    borderRadius: 33,
+    bottom: -8,
+    right: -8,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: '#FF500D',
     borderWidth: 2,
     borderColor: '#FFFFFF',
     zIndex: 10,
-    overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOpacity: 0.25,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 3 },
       },
       android: {
-        elevation: 6,
+        elevation: 5,
       },
     }),
   },
@@ -2342,26 +2378,16 @@ const styles = StyleSheet.create({
     opacity: 0.18,
   },
   previewDetailsBox: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingLeft: 48,
-    paddingRight: 62,
-    paddingTop: 10,
-    paddingBottom: 12,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
     zIndex: 1,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.12,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 6 },
       },
       android: {
-        elevation: 10,
+        elevation: 8,
       },
     }),
   },
@@ -2400,35 +2426,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '900',
   },
-  previewDetailsFavoriteButton: {
-    width: 36,
-    height: 36,
-    borderBottomLeftRadius: 24,
-    borderTopRightRadius: 18,
-    backgroundColor: stylesTokens.white,
+  previewFavoriteCircle: {
+    width: 44,
+    height: 44,
+    borderTopLeftRadius: 18,
+    borderBottomRightRadius: 18,
+    borderTopRightRadius: 4,
+    borderBottomLeftRadius: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 3,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
+    borderWidth: 1.5,
+    borderColor: '#FF500D',
+  },
+  previewDetailsFavoriteButton: {
+    zIndex: 12,
   },
   previewActionButton: {
     width: 44,
-    height: 36,
-    borderTopRightRadius: 24,
-    borderBottomLeftRadius: 18,
+    height: 44,
+    borderTopLeftRadius: 18,
+    borderBottomRightRadius: 18,
+    borderTopRightRadius: 4,
+    borderBottomLeftRadius: 4,
     backgroundColor: '#FF500D',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 3,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
   },
   previewActionPlusBadge: {
     position: 'absolute',
