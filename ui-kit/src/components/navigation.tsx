@@ -178,7 +178,7 @@ export function ModernPremiumHeader({
 
         <Pressable
           onPress={onLocationPress}
-          hitSlop={16}
+          hitSlop={4}
           style={styles.locationContainer}
         >
           <Text style={styles.brandText}>بثواني</Text>
@@ -357,6 +357,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 8,
+    zIndex: 1,
   },
   deliveryToText: {
     color: 'rgba(255,255,255,0.7)',
@@ -376,6 +377,7 @@ const styles = StyleSheet.create({
   actionCluster: {
     alignItems: 'center',
     gap: 4, // Slightly tighter for 3 icons
+    zIndex: 10,
   },
   headerIconButton: {
     width: 34, // Slightly smaller to fit 3

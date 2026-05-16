@@ -15,13 +15,18 @@ export function DshBenefitsHubScreen({
   onRetry,
 }: DshBenefitsHubScreenProps) {
   const isLoyaltyScreen = screenId === 'entitlements-get' || screenId?.startsWith('loyalty-') === true;
+  const isSubscriptionScreen =
+    screenId === 'subscription' ||
+    screenId === 'subscriptions' ||
+    screenId === 'subscription-family-get' ||
+    screenId?.startsWith('subscription') === true;
 
   if (state !== 'ready') {
     return (
       <DshOperationScreen
         state={state}
-        title={isLoyaltyScreen ? 'الولاء والمكافآت' : 'الاشتراكات'}
-        subtitle={isLoyaltyScreen ? 'صفحة الولاء والمكافآت الخاصة برصيد النقاط والعروض.' : 'صفحة تحكم واحدة لإدارة الباقة والدفع والعائلة من نفس المسار.'}
+        title={isLoyaltyScreen ? 'الولاء والمكافآت' : isSubscriptionScreen ? 'الاشتراكات' : 'مركز الخدمات'}
+        subtitle={isLoyaltyScreen ? 'صفحة الولاء والمكافآت الخاصة برصيد النقاط والعروض.' : isSubscriptionScreen ? 'صفحة تحكم واحدة لإدارة الباقة والدفع والعائلة من نفس المسار.' : 'يرجى الانتظار بينما نقوم بتجهيز المسار المطلوب.'}
         onRetry={onRetry}
       />
     );
@@ -31,7 +36,19 @@ export function DshBenefitsHubScreen({
     return <DshLoyaltyRewardsScreen />;
   }
 
-  return <DshSubscriptionsScreen />;
+  if (isSubscriptionScreen) {
+    return <DshSubscriptionsScreen />;
+  }
+
+  return (
+    <DshOperationScreen
+      state="empty"
+      title="المسار غير معروف"
+      subtitle="المسار المطلوب غير متوفر حالياً أو لم يتم تحديده بشكل صحيح."
+      onRetry={onRetry}
+      onPrimaryAction={onPrimaryAction}
+    />
+  );
 }
 
 export default DshBenefitsHubScreen;

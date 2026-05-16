@@ -2,9 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Dimensions, I18nManager, Platform, Pressable, View } from 'react-native';
 import {
   Button,
+  Box,
   Card,
   Chip,
   colorPalette,
+  DateTimePicker,
   Icon,
   MobileScrollView,
   OptionRow,
@@ -255,55 +257,44 @@ type ExecutionSchedulePickerProps = {
   onTimeChange: (value: string) => void;
 };
 
-function ExecutionSchedulePicker({ dateOptions, timeOptions, selectedDate, selectedTime, onDateChange, onTimeChange }: ExecutionSchedulePickerProps) {
-  const isRTL = I18nManager.isRTL;
-  const resolvedDate = dateOptions.find((option) => option.value === selectedDate) ?? dateOptions[0];
-  const resolvedTime = timeOptions.find((option) => option.value === selectedTime) ?? timeOptions[0];
+function ExecutionSchedulePicker({ selectedDate, selectedTime, onConfirm }: { selectedDate: string, selectedTime: string, onConfirm: (date: Date, time: string) => void }) {
+  const [visible, setVisible] = useState(false);
+
+  // Format display labels
+  const dateObj = new Date(selectedDate);
+  const dateLabel = new Intl.DateTimeFormat('ar-YE', { weekday: 'long', day: 'numeric', month: 'long' }).format(dateObj);
+
+  const [h, m] = selectedTime.split(':');
+  const timeLabel = new Intl.DateTimeFormat('ar-YE', { hour: 'numeric', minute: '2-digit' }).format(new Date(2026, 0, 1, parseInt(h), parseInt(m)));
 
   return (
-    <Surface tone="default" padding={2} gap={1} style={{ backgroundColor: SURFACE_SOFT, borderColor: BORDER_SOFT }}>
-      <View style={{ gap: spacing[1] }}>
-        <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700' }}>
-          التاريخ
-        </Text>
-        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: spacing[1] }}>
-          {dateOptions.map((option) => (
-            <Chip
-              key={option.value}
-              label={option.label}
-              selected={option.value === resolvedDate?.value}
-              tone="brand"
-              onPress={() => onDateChange(option.value)}
-            />
-          ))}
-        </View>
-      </View>
-
-      <View style={{ gap: spacing[1] }}>
-        <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700' }}>
-          الوقت
-        </Text>
-        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: spacing[1] }}>
-          {timeOptions.map((option) => (
-            <Chip
-              key={option.value}
-              label={option.label}
-              selected={option.value === resolvedTime?.value}
-              tone="brand"
-              onPress={() => onTimeChange(option.value)}
-            />
-          ))}
-        </View>
-      </View>
-
-      {resolvedDate && resolvedTime ? (
-        <Surface tone="default" padding={1} gap={0} style={{ backgroundColor: SURFACE_WARM, borderColor: SURFACE_WARM_BORDER }}>
-          <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '600' }}>
-            موعد تنفيذ الطلب: {resolvedDate.fullLabel} عند {resolvedTime.fullLabel}
-          </Text>
+    <>
+      <Pressable onPress={() => setVisible(true)}>
+        <Surface tone="default" padding={3} gap={2} radiusToken="lg" style={{ backgroundColor: SURFACE_WARM, borderColor: SURFACE_WARM_BORDER, borderStyle: 'dashed', borderWidth: 1.5 }}>
+          <Box layoutDirection="row" align="center" gap={3}>
+            <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: colorPalette.white, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+              <Icon name="calendar-outline" size={22} color={ACCENT_ORANGE} />
+            </View>
+            <Box style={{ flex: 1 }} gap={0.5}>
+              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY }}>{dateLabel}</Text>
+              <Text role="caption" style={{ color: TEXT_SECONDARY }}>الساعة {timeLabel}</Text>
+            </Box>
+            <Icon name="chevron-forward" size={18} color={colorPalette.textMuted} />
+          </Box>
         </Surface>
-      ) : null}
-    </Surface>
+      </Pressable>
+
+      <DateTimePicker
+        visible={visible}
+        onClose={() => setVisible(false)}
+        initialDate={dateObj}
+        initialTime={selectedTime}
+        onConfirm={(date, time) => {
+          onConfirm(date, time);
+          setVisible(false);
+        }}
+      />
+    </>
   );
 }
 
@@ -1299,12 +1290,13 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               </Text>
             ) : (
               <ExecutionSchedulePicker
-                dateOptions={executionScheduleOptions.dateOptions}
-                timeOptions={executionScheduleOptions.timeOptions}
                 selectedDate={scheduledDate}
                 selectedTime={scheduledTime}
-                onDateChange={setScheduledDate}
-                onTimeChange={setScheduledTime}
+                onConfirm={(date, time) => {
+                  const val = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                  setScheduledDate(val);
+                  setScheduledTime(time);
+                }}
               />
             )}
           </View>

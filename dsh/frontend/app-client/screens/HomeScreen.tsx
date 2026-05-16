@@ -643,6 +643,10 @@ export function DshHomeGetScreen({
     onOpenEntry?.();
   }, [onOpenEntry, onOpenMySpace]);
 
+  const handleOpenCartFromHeader = React.useCallback(() => {
+    onOpenCart?.();
+  }, [onOpenCart]);
+
   const resolvedCategories = categories ?? [];
   const resolvedPromos = promos ?? [];
   const resolvedHomePromos = (homePromos ?? getPublishedHomePromos()).filter((promo) => (
@@ -1203,7 +1207,7 @@ return (
           title={uiText.topBar.brandName}
           locationLabel={uiText.topBar.location}
           onSearchPress={openInlineSearch}
-          onCartPress={onOpenCart}
+          onCartPress={handleOpenCartFromHeader}
           onNotificationsPress={onOpenNotifications}
           onProfilePress={handleOpenMySpace}
           onLauncherPress={openServiceDial}
@@ -1212,7 +1216,7 @@ return (
           searchPlaceholder="ماذا تريد أن تطلب اليوم؟"
           tickerMessage={tickerState?.message ?? ''}
           onTickerPress={handleTickerAction}
-          onLocationPress={() => onOpenBenefits?.('address-picker')}
+          onLocationPress={undefined}
           direction={isRtl ? 'rtl' : 'ltr'}
         />
       )}
