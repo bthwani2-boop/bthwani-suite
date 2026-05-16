@@ -8,6 +8,7 @@ import {
 import { LIVE_ORDERS_OPERATIONAL_PREVIEW } from './operations.preview-data';
 import { Box, useTheme } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
+import type { DshClientDeliveryLifecycleStatus, DshClientOperationsDecisionKind } from '../../app-client/contracts/dsh-client-binding.contracts';
 
 export type LiveOrdersScreenProps = {
   state?: 'ready' | 'loading' | 'error' | 'empty';
@@ -23,7 +24,13 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
   brand: 'neutral',
 };
 
-type OpsDecision = 'approve' | 'reject' | 'request_edit';
+type OpsDecision = DshClientOperationsDecisionKind;
+
+const OPS_DECISION_NEXT_LIFECYCLE: Record<OpsDecision, DshClientDeliveryLifecycleStatus> = {
+  approve: 'operations_approved',
+  request_edit: 'confirmed',
+  reject: 'cancelled',
+};
 
 type PendingApprovalOrder = {
   id: string;
@@ -95,7 +102,7 @@ const PENDING_APPROVAL_ORDERS: PendingApprovalOrder[] = [
   },
 ];
 
-type DecisionState = Record<string, { decision: OpsDecision; note: string; submitted: boolean }>;
+type DecisionState = Record<string, { decision: OpsDecision; note: string; submitted: boolean; nextLifecycleStatus: DshClientDeliveryLifecycleStatus }>;
 
 function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrder; onDecision: (id: string, decision: OpsDecision, note: string) => void }) {
   const { theme } = useTheme();
@@ -207,7 +214,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   const [decisions, setDecisions] = React.useState<DecisionState>({});
 
   const handleDecision = (orderId: string, decision: OpsDecision, note: string) => {
-    setDecisions((prev) => ({ ...prev, [orderId]: { decision, note, submitted: true } }));
+    setDecisions((prev) => ({ ...prev, [orderId]: { decision, note, submitted: true, nextLifecycleStatus: OPS_DECISION_NEXT_LIFECYCLE[decision] } }));
     setExpandedApprovalId(null);
   };
 
@@ -260,7 +267,8 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
               const decisionColor = submitted.decision === 'approve' ? theme.success : submitted.decision === 'reject' ? theme.danger : theme.warning;
 
               return (
-                <div key={order.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', border: `1px solid ${theme.line}`, borderRadius: '10px', background: theme.surfaceRaised, direction: 'rtl' }}>
+                <div key={order.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', border: `1px solid ${theme.line}`, borderRadius: '10px', background: theme.surfaceRaised, direction: 'rtl', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '11px', color: theme.textMuted }}>الحالة التالية: <strong style={{ color: theme.text }}>{submitted.nextLifecycleStatus}</strong></span>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: decisionColor }}>{decisionLabel}</span>
                   <span style={{ fontSize: '13px', color: theme.text }}>#{order.id} — {order.customerName}</span>
                 </div>

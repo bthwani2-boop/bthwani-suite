@@ -73,7 +73,7 @@ export const dshClientRoutes = [
   { routeId: 'dsh-service-settings', legacyRoute: 'service-settings', screenId: 'client.dsh.service.settings', ownerPath: 'dsh/frontend/app-client/screens/OperationScreens.tsx' },
   { routeId: 'dsh-zone-set', legacyRoute: 'zone-set', screenId: 'client.dsh.zone.set', ownerPath: 'dsh/frontend/app-client/screens/OperationScreens.tsx' },
   { routeId: 'dsh-orders', legacyRoute: 'orders-list', screenId: 'client.dsh.orders.history', ownerPath: 'dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx' },
-  { routeId: 'dsh-tracking', legacyRoute: 'tracking', screenId: 'client.dsh.order.tracking.live', ownerPath: 'dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx' },
+  { routeId: 'dsh-tracking', legacyRoute: 'tracking', screenId: 'client.dsh.order.smart-followup', ownerPath: 'dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx' },
   { routeId: 'dsh-order-rating', legacyRoute: 'order-rating', screenId: 'client.dsh.order.rating', ownerPath: 'dsh/frontend/app-client/screens/DshRatingScreen.tsx' },
   { routeId: 'dsh-checkout-intent', legacyRoute: 'checkout-intent', screenId: 'client.dsh.checkout.intent', ownerPath: 'dsh/frontend/app-client/screens/DshCheckoutIntentScreen.tsx' },
 ] as const satisfies readonly DshClientRouteRecord[];

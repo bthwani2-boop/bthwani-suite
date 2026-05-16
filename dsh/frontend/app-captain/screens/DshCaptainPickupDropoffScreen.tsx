@@ -30,6 +30,8 @@ export type DshCaptainPickupDropoffScreenProps = {
   onConfirm: () => void;
   onReportIssue: () => void;
   onBack?: () => void;
+  // Called when captain rings doorbell — caller updates client SmartTrackingCard to bell_rang proximity state
+  onRingBell?: () => void;
 };
 
 export function DshCaptainPickupDropoffScreen({
@@ -43,6 +45,7 @@ export function DshCaptainPickupDropoffScreen({
   onConfirm,
   onReportIssue,
   onBack,
+  onRingBell,
 }: DshCaptainPickupDropoffScreenProps) {
   const { theme } = useTheme();
   const [bellRung, setBellRung] = React.useState(false);
@@ -52,6 +55,7 @@ export function DshCaptainPickupDropoffScreen({
 
   const handleRingBell = () => {
     setBellRung(true);
+    onRingBell?.();
   };
 
   const handleVerifyOtp = () => {

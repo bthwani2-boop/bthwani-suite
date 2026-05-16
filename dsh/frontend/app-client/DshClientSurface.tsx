@@ -340,6 +340,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const [selectedOperationScreen, setSelectedOperationScreen] = React.useState<ClientOperationScreenId>('entitlements-get');
   const routeHistoryRef = React.useRef<DshRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
+  const homeBackResolverRef = React.useRef<(() => boolean) | null>(null);
 
   React.useEffect(() => {
     const nextRoute = commandTargetToRoute(command.target);
@@ -370,17 +371,14 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     }
 
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      // Priority 1: close transient inline panels before any route navigation.
-      if (sheinInlineOpen) {
-        setSheinInlineOpen(false);
-        return true;
-      }
-      if (awnakInlineOpen) {
-        setAwnakInlineOpen(false);
-        return true;
-      }
+      // Priority 1: dismiss transient modal overlays inside HomeScreen (categories, shorts, search, service dial).
+      if (homeBackResolverRef.current?.()) return true;
 
-      // Priority 2: navigate back through route history if available.
+      // Priority 2: close inline order forms (shein/awnak proxy).
+      if (sheinInlineOpen) { setSheinInlineOpen(false); return true; }
+      if (awnakInlineOpen) { setAwnakInlineOpen(false); return true; }
+
+      // Priority 3: navigate back through route history.
       if (routeHistoryRef.current.length > 1) {
         routeTransitionFromBackRef.current = true;
         routeHistoryRef.current.pop();
@@ -389,11 +387,8 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         return true;
       }
 
-      // Priority 3: at home with no open panels — delegate to host exit handler.
-      if (onExit) {
-        onExit();
-        return true;
-      }
+      // Priority 4: at root with no open panels — delegate to host exit handler.
+      if (onExit) { onExit(); return true; }
 
       return false;
     });
@@ -990,6 +985,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       onCloseSheinInline={() => setSheinInlineOpen(false)}
       awnakInlineVisible={awnakInlineOpen}
       onCloseAwnakInline={() => setAwnakInlineOpen(false)}
+      homeBackResolverRef={homeBackResolverRef}
       renderApprovedVideoReelsViewer={renderApprovedVideoReelsViewer}
       onRetry={() => setRoute('home')}
     />

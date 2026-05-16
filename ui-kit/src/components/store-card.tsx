@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { Icon } from './icons';
+import { colorPalette, withAlpha } from '../foundation';
 import { useBThwaniAppearance, useTheme } from '../providers';
 
 /**
@@ -21,8 +22,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const IMAGE_SIZE = 114; // Slightly increased to prevent text clipping
 const LOGO_SIZE = 54;
 const CARD_RADIUS = 16;
-const DARK_BLUE = '#0A2F5C';
-const ORANGE = '#FF500D';
 const GOLD = '#FFD700';
 
 export interface ServiceToken {
@@ -95,7 +94,7 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
             borderWidth: 1,
             borderColor: theme.surface,
           }}>
-            <Icon name={item.isOpen ? 'checkmark' : 'remove'} size={5} color="#FFF" />
+            <Icon name={item.isOpen ? 'checkmark' : 'remove'} size={5} color={colorPalette.white} />
           </View>
         </View>
       </View>
@@ -109,7 +108,7 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
         <Icon
           name={item.isFavorite ? 'heart' : 'heart-outline'}
           size={16}
-          color={ORANGE}
+          color={colorPalette.brand}
         />
       </Pressable>
 
@@ -125,7 +124,7 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
           </View>
           <View style={styles.imageMetricDivider} />
           <View style={styles.imageMetricItem}>
-            <Icon name="people" size={10} color="#FFF" />
+            <Icon name="people" size={10} color={colorPalette.white} />
             <Text style={styles.imageMetricText}>
               {item.followersCount ? `${(item.followersCount / 1000).toFixed(0)}k` : '11k'}
             </Text>
@@ -152,7 +151,7 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
 
           <View style={styles.locationBadgeRow}>
             <View style={styles.locationCluster}>
-              <Icon name="location-sharp" size={11} color={ORANGE} />
+              <Icon name="location-sharp" size={11} color={colorPalette.brand} />
               <Text style={[styles.addressText, { color: tokens.textSecondary }]} numberOfLines={1}>
                 {item.locationLabel || item.subtitle || 'الرياض'}
               </Text>
@@ -197,16 +196,16 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
             </View>
           )}
           <View style={styles.serviceIconWrap}>
-            <Icon name="flash-outline" size={14} color={ORANGE} />
-            <Text style={[styles.serviceMiniText, { color: ORANGE }]}>ثواني</Text>
+            <Icon name="flash-outline" size={14} color={colorPalette.brand} />
+            <Text style={[styles.serviceMiniText, { color: colorPalette.brand }]}>ثواني</Text>
           </View>
         </View>
 
         {/* Row 5: Promo Chips */}
         <View style={styles.promoRow}>
           {item.hasBthwaniPro && (
-            <View style={[styles.promoChip, { backgroundColor: isDark ? tokens.glassSurfaceStrong : '#0A2F5C', borderWidth: isDark ? 1 : 0, borderColor: isDark ? tokens.glassBorder : 'transparent' }]}>
-              <Text style={[styles.promoChipTextPro, { color: isDark ? tokens.textPrimary : '#FFF' }]}>برو</Text>
+            <View style={[styles.promoChip, { backgroundColor: isDark ? tokens.glassSurfaceStrong : colorPalette.brandStrong, borderWidth: isDark ? 1 : 0, borderColor: isDark ? tokens.glassBorder : 'transparent' }]}>
+              <Text style={[styles.promoChipTextPro, { color: isDark ? tokens.textPrimary : colorPalette.white }]}>برو</Text>
             </View>
           )}
           {item.hasOffer && (
@@ -238,7 +237,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     overflow: 'hidden',
     alignSelf: 'center',
-    shadowColor: '#000',
+    shadowColor: colorPalette.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
@@ -262,12 +261,12 @@ const styles = StyleSheet.create({
     left: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(10, 47, 92, 0.85)',
+    backgroundColor: withAlpha(colorPalette.brandStrong, 0.85),
     borderRadius: 6,
     paddingHorizontal: 5,
     paddingVertical: 2,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: withAlpha(colorPalette.white, 0.2),
     gap: 4,
     maxWidth: 66, // Prevents overlap with the logo circle on the right while staying clear of the left corner curve
   },
@@ -279,13 +278,13 @@ const styles = StyleSheet.create({
   imageMetricText: {
     fontSize: 9,
     fontWeight: '800',
-    color: '#FFF',
+    color: colorPalette.white,
     fontFamily: 'Outfit-Bold',
   },
   imageMetricDivider: {
     width: 1,
     height: 8,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: withAlpha(colorPalette.white, 0.3),
   },
   logoTemplateContainer: {
     position: 'absolute',
@@ -294,17 +293,17 @@ const styles = StyleSheet.create({
     width: LOGO_SIZE + 12,
     height: LOGO_SIZE + 12,
     borderRadius: (LOGO_SIZE + 12) / 2,
-    backgroundColor: ORANGE,
+    backgroundColor: colorPalette.brand,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 20,
-    shadowColor: '#000',
+    shadowColor: colorPalette.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 3,
     elevation: 5,
     borderWidth: 2,
-    borderColor: '#FFF',
+    borderColor: colorPalette.white,
   },
   absoluteStatusBadge: {
     position: 'absolute',
@@ -313,14 +312,14 @@ const styles = StyleSheet.create({
     zIndex: 30,
     width: 36,
     height: 36,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colorPalette.white,
     borderBottomRightRadius: 24,
     borderTopLeftRadius: CARD_RADIUS,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 0.8,
-    borderColor: 'rgba(0,0,0,0.05)',
-    shadowColor: '#000',
+    borderColor: withAlpha(colorPalette.black, 0.05),
+    shadowColor: colorPalette.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -333,14 +332,14 @@ const styles = StyleSheet.create({
     zIndex: 30,
     width: 36,
     height: 36,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colorPalette.white,
     borderTopRightRadius: 24,
     borderBottomLeftRadius: CARD_RADIUS,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 0,
     borderColor: 'transparent',
-    shadowColor: '#000',
+    shadowColor: colorPalette.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -356,7 +355,7 @@ const styles = StyleSheet.create({
     borderRadius: LOGO_SIZE / 2,
     borderWidth: 1, // Slimmer internal border
     overflow: 'hidden',
-    backgroundColor: '#FFF',
+    backgroundColor: colorPalette.white,
   },
   logoImage: {
     width: '100%',
@@ -441,7 +440,7 @@ const styles = StyleSheet.create({
   },
   deliveryBadgeText: {
     fontSize: 13,
-    color: ORANGE,
+    color: colorPalette.brand,
     fontWeight: '700',
     fontFamily: 'Outfit-Bold',
   },
@@ -466,12 +465,12 @@ const styles = StyleSheet.create({
   metricText: {
     fontSize: 12,
     fontWeight: '700',
-    color: DARK_BLUE,
+    color: colorPalette.brandStrong,
   },
   metricDivider: {
     width: 1,
     height: 10,
-    backgroundColor: 'rgba(0,0,0,0.05)',
+    backgroundColor: withAlpha(colorPalette.black, 0.05),
   },
   servicesRow: {
     flexDirection: 'row-reverse',
@@ -486,7 +485,7 @@ const styles = StyleSheet.create({
   serviceMiniText: {
     fontSize: 9,
     fontWeight: '600',
-    color: DARK_BLUE,
+    color: colorPalette.brandStrong,
   },
   promoRow: {
     flexDirection: 'row-reverse',
@@ -500,12 +499,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   promoChipPro: {
-    backgroundColor: DARK_BLUE,
+    backgroundColor: colorPalette.brandStrong,
   },
   promoChipTextPro: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#FFF',
+    color: colorPalette.white,
   },
   promoChipText: {
     fontSize: 10,

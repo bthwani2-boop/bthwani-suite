@@ -12,6 +12,7 @@ import {
   colorPalette,
   spacing,
   radius,
+  withAlpha,
   StateView,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 48,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: withAlpha(colorPalette.black, 0.5),
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',

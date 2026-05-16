@@ -15,6 +15,8 @@ export type DshClientDeliveryLifecycleStatus =
   | 'quote'
   | 'created'
   | 'confirmed'
+  | 'operations_approved'
+  | 'order_received'
   | 'partner_accepted'
   | 'preparing'
   | 'ready_for_pickup'
@@ -354,6 +356,7 @@ export type DshClientOperationsDecisionPayload = {
   orderId: DshClientId;
   decision: DshClientOperationsDecisionKind;
   note?: string;
+  nextLifecycleStatus: DshClientDeliveryLifecycleStatus;
 };
 
 export type DshClientOperationsOrderDetail = {

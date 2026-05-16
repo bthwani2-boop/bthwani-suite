@@ -10,7 +10,8 @@ import {
   getLoyaltyRewards,
   getEntitlements,
 } from '../../shared/loyalty.preview-store';
-import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
+import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
+import { CommercialParityPreview } from '../../shared/commercial-parity-preview';
 
 type LoyaltyTab = 'programs' | 'tiers' | 'rewards' | 'subscriptions' | 'entitlements' | 'earning' | 'redemption';
 

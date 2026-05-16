@@ -10,6 +10,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import {
+  colorPalette,
   radius,
   resolveRowDirection,
   safeArea,
@@ -551,7 +552,7 @@ export function StickyActionBar({ primaryAction, secondaryAction, note, onHeight
           backgroundColor: theme.surface,
           borderTopWidth: 1,
           borderColor: theme.line,
-          shadowColor: '#020617',
+          shadowColor: colorPalette.black,
           shadowOpacity: 0.08,
           shadowRadius: 14,
           shadowOffset: { width: 0, height: -4 },

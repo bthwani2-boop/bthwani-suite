@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { colorPalette, radius, resolveTextAlign, spacing } from '../foundation';
+import { colorPalette, radius, resolveTextAlign, spacing, withAlpha } from '../foundation';
 import { useDirection } from '../providers';
 import { Text } from '../primitives';
 
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(10, 47, 92, 0.36)',
+    backgroundColor: withAlpha(colorPalette.brandStrong, 0.36),
   },
   hubContainer: {
     backgroundColor: colorPalette.white,

@@ -352,7 +352,7 @@ export const dshClientScreenRegistry = [
     status: 'VERIFIED',
   },
   {
-    screenId: 'client.dsh.order.tracking.live',
+    screenId: 'client.dsh.order.smart-followup',
     routeId: 'dsh-tracking',
     surfaceId: 'app-client',
     ownerKind: 'service',
@@ -363,8 +363,7 @@ export const dshClientScreenRegistry = [
     screenKind: 'FLOW_STEP',
     flowId: 'dsh.tracking',
     requiredStates: ['loading', 'error', 'success', 'offline', 'retry', 'blocked'],
-    requiredPermissions: ['location'],
-    analytics: { screenView: 'client_dsh_order_tracking_live_view' },
+    analytics: { screenView: 'client_dsh_order_smart_followup_view' },
     deepLinkPath: '/dsh/orders/:orderId/tracking',
     fallbackRouteId: 'dsh-orders',
     releaseCriticality: 'P0',

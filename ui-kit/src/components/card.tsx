@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from 'react'; // Re-built
 import { Image, Pressable, ScrollView, StyleSheet, View, type GestureResponderEvent, type ImageSourcePropType, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
-import { radius, resolveRowDirection, resolveTextAlign, spacing, type SpacingToken } from '../foundation';
+import { colorPalette, radius, resolveRowDirection, resolveTextAlign, spacing, withAlpha, type SpacingToken } from '../foundation';
 import { useBThwaniAppearance, useDirection, useTheme } from '../providers';
 import { Badge, Button } from './button';
 import { Icon } from './icons';
@@ -231,10 +231,10 @@ function createProductCardStyles(
       right: -10,
       width: 66,
       height: 66,
-      backgroundColor: '#FF500D',
+      backgroundColor: colorPalette.brand,
       borderRadius: 33,
       borderWidth: 2,
-      borderColor: '#FFFFFF',
+      borderColor: colorPalette.white,
       zIndex: 6,
       overflow: 'hidden',
       justifyContent: 'center',
@@ -245,7 +245,7 @@ function createProductCardStyles(
       width: 54,
       height: 54,
       borderRadius: 27,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: colorPalette.white,
       overflow: 'hidden',
       justifyContent: 'center',
       alignItems: 'center',
@@ -439,7 +439,7 @@ function createProductCardStyles(
       height: 36,
       borderTopRightRadius: 24,
       borderBottomLeftRadius: 18,
-      backgroundColor: '#FF500D',
+      backgroundColor: colorPalette.brand,
       justifyContent: 'center',
       alignItems: 'center',
       position: 'relative',
@@ -539,7 +539,7 @@ export const ProductCard = memo(function ProductCard({
               <Icon
                 name={isFavorited ? 'heart' : 'heart-outline'}
                 size={18}
-                color="#FF500D"
+                color={colorPalette.brand}
               />
             </Pressable>
           ) : null}
@@ -638,9 +638,9 @@ export const ProductCard = memo(function ProductCard({
             style={styles.actionBadge}
           >
             <View style={{ position: 'relative' }}>
-              <Icon name="cart-outline" size={19} color="#FFFFFF" />
-              <View style={{ position: 'absolute', top: -3, left: -5, backgroundColor: '#FFFFFF', borderRadius: 5, width: 10, height: 10, alignItems: 'center', justifyContent: 'center' }}>
-                <Icon name="add" size={8} color="#FF500D" />
+              <Icon name="cart-outline" size={19} color={colorPalette.white} />
+              <View style={{ position: 'absolute', top: -3, left: -5, backgroundColor: colorPalette.white, borderRadius: 5, width: 10, height: 10, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="add" size={8} color={colorPalette.brand} />
               </View>
             </View>
           </Pressable>

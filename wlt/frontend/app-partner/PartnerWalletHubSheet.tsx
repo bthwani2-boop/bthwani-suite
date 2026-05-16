@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Icon, SheetFrame, Text } from '@bthwani/ui-kit';
+import { Box, Button, colorPalette, Icon, SheetFrame, Text } from '@bthwani/ui-kit';
 
 export type PartnerWalletHubDestination =
   | 'wlt_sudad_home'
@@ -90,10 +90,10 @@ export function PartnerWalletHubSheet({ visible, onClose, onNavigate }: PartnerW
             label={action.label}
             tone={action.enabled ? 'secondary' : 'ghost'}
             disabled={!action.enabled}
-            leadingAccessory={<Icon name={action.icon as any} size={16} color={action.enabled ? '#0A2F5C' : '#9ca3af'} />}
+            leadingAccessory={<Icon name={action.icon as any} size={16} color={action.enabled ? colorPalette.brandStrong : '#9ca3af'} />}
             trailingAccessory={
               action.enabled ? (
-                <Icon name="chevron-back" size={16} color="#0A2F5C" />
+                <Icon name="chevron-back" size={16} color={colorPalette.brandStrong} />
               ) : (
                 <Text role="caption" tone="muted">
                   قريبًا

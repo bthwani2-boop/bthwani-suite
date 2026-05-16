@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Chip,
+  colorPalette,
   Icon,
   KeyValueList,
   ListItem,
@@ -287,7 +288,7 @@ function PromotionCandidateRow({
     'default';
 
   return (
-    <Surface tone="default" padding={3} gap={2} style={{ borderWidth: 1, borderColor: selected ? '#FF500D' : undefined }}>
+    <Surface tone="default" padding={3} gap={2} style={{ borderWidth: 1, borderColor: selected ? colorPalette.brand : undefined }}>
       <Box gap={1}>
         <Text role="bodyStrong">{item.title}</Text>
         <Text role="bodySm" tone="muted">{item.subtitle}</Text>

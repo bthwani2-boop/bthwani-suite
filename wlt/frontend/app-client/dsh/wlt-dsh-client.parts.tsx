@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
 	Button,
 	Chip,
+	colorPalette,
 	ListItem,
 	Text,
 	radius,
@@ -93,7 +94,7 @@ function PaymentOptionItem({ opt, selected, onPress }: { opt: Opt; selected: boo
 			transform: pressed ? [{ scale: 0.995 }] : selected ? [{ translateY: -4 }, { scale: 1.01 }] : undefined,
 			...(selected
 				? {
-						shadowColor: '#000',
+						shadowColor: colorPalette.black,
 						shadowOpacity: 0.06,
 						shadowRadius: 8,
 						shadowOffset: { width: 0, height: 4 },
@@ -124,7 +125,7 @@ function PaymentOptionItem({ opt, selected, onPress }: { opt: Opt; selected: boo
 					{opt.icon ? (
 						<View style={{ alignItems: 'center', justifyContent: 'center' }}>{opt.icon}</View>
 					) : (
-						<Text role="bodyStrong" style={{ fontSize: 16, color: selected ? '#fff' : undefined }}>
+						<Text role="bodyStrong" style={{ fontSize: 16, color: selected ? colorPalette.white : undefined }}>
 							{getGlyph(opt.id)}
 						</Text>
 					)}

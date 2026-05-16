@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Animated, FlatList, Pressable, StyleSheet, View, useWindowDimensions, type ImageSourcePropType, type NativeScrollEvent, type NativeSyntheticEvent, type StyleProp, type ViewStyle } from 'react-native';
-import { radius, resolveRowDirection, spacing } from '../foundation';
+import { colorPalette, neutralPalette, radius, resolveRowDirection, spacing, withAlpha } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Text } from '../primitives';
 
@@ -462,7 +462,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
       borderRadius: 28,
       overflow: 'hidden',
       backgroundColor: theme.surface,
-      shadowColor: '#000000',
+      shadowColor: colorPalette.black,
       shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.1,
       shadowRadius: 24,
@@ -510,17 +510,17 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
       padding: secondaryOverlayPadding,
       justifyContent: 'space-between',
       alignItems: 'stretch',
-      backgroundColor: 'rgba(2,6,23,0.22)',
+      backgroundColor: withAlpha(colorPalette.black, 0.22),
     },
     fallbackTitle: {
-      color: '#ffffff',
+      color: colorPalette.white,
       fontSize: isCompactSecondary ? 18 : 25,
       fontWeight: '800',
       lineHeight: isCompactSecondary ? 22 : 30,
       textAlign: 'center',
     },
     fallbackSubtitle: {
-      color: 'rgba(255,255,255,0.96)',
+      color: withAlpha(colorPalette.white, 0.96),
       fontSize: isCompactSecondary ? 11 : 15,
       fontWeight: '600',
       lineHeight: isCompactSecondary ? 14 : 19,
@@ -530,7 +530,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
       ...StyleSheet.absoluteFillObject,
       justifyContent: 'center',
       padding: isCompactSecondary ? 14 : 22,
-      backgroundColor: 'rgba(2,6,23,0.22)',
+      backgroundColor: withAlpha(colorPalette.black, 0.22),
       gap: isCompactSecondary ? 4 : 6,
       alignItems: 'center',
     },
@@ -538,7 +538,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
       ...StyleSheet.absoluteFillObject,
       justifyContent: 'space-between',
       padding: secondaryOverlayPadding,
-      backgroundColor: 'rgba(2,6,23,0.26)',
+      backgroundColor: withAlpha(colorPalette.black, 0.26),
       gap: secondaryOverlayGap,
     },
     secondaryTopRow: {
@@ -553,28 +553,28 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
       paddingHorizontal: 4,
     },
     overlayTitle: {
-      color: '#ffffff',
+      color: colorPalette.white,
       fontSize: isCompactSecondary ? 18 : 23,
       fontWeight: '800',
       lineHeight: isCompactSecondary ? 22 : 28,
       textAlign: 'center',
     },
     overlaySubtitle: {
-      color: 'rgba(255,255,255,0.96)',
+      color: withAlpha(colorPalette.white, 0.96),
       fontSize: isCompactSecondary ? 11 : 14,
       fontWeight: '600',
       lineHeight: isCompactSecondary ? 14 : 18,
       textAlign: 'center',
     },
     secondaryOverlayTitle: {
-      color: '#ffffff',
+      color: colorPalette.white,
       fontSize: isCompactSecondary ? 15 : 20,
       fontWeight: '800',
       lineHeight: isCompactSecondary ? 18 : 24,
       textAlign: 'center',
     },
     secondaryOverlaySubtitle: {
-      color: 'rgba(255,255,255,0.92)',
+      color: withAlpha(colorPalette.white, 0.92),
       fontSize: isCompactSecondary ? 11 : 13,
       fontWeight: '600',
       lineHeight: isCompactSecondary ? 14 : 17,
@@ -582,15 +582,15 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
     },
     secondaryBadgePill: {
       alignSelf: 'flex-start',
-      backgroundColor: 'rgba(255,255,255,0.92)',
+      backgroundColor: withAlpha(colorPalette.white, 0.92),
       borderRadius: radius.pill,
       paddingHorizontal: secondaryBadgePaddingHorizontal,
       paddingVertical: secondaryBadgePaddingVertical,
       borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.24)',
+      borderColor: withAlpha(colorPalette.white, 0.24),
     },
     secondaryBadgeText: {
-      color: '#0f172a',
+      color: neutralPalette[900],
       fontSize: isCompactSecondary ? 10 : 11,
       fontWeight: '800',
       lineHeight: isCompactSecondary ? 12 : 14,
@@ -602,7 +602,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
       paddingVertical: secondaryCtaPaddingVertical,
     },
     secondaryCtaText: {
-      color: '#ffffff',
+      color: colorPalette.white,
       fontSize: isCompactSecondary ? 10 : 11,
       fontWeight: '800',
       lineHeight: isCompactSecondary ? 12 : 14,

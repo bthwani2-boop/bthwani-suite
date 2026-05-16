@@ -44,7 +44,7 @@ const SCREEN_RENDERERS: Record<CanonicalOperationsGroupId, React.ComponentType<{
   'dispatch-assignment': DispatchAssignmentScreen,
   'geo-heatmap': GeoHeatmapScreen,
   sheinproxy: ControlPanelDshSheinProxyScreen,
-  'proxy-shein-awnak': AwnakScreen,
+  'awnak-operations': AwnakScreen,
   'captain-operations': CaptainOperationsScreen,
   'partner-stores': PartnerStoresScreen,
   'area-capacity': AreaCapacityScreen,

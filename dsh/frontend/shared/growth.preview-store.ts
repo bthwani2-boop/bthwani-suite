@@ -1,3 +1,5 @@
+import { colorPalette } from '@bthwani/ui-kit';
+
 /**
  * LEGACY COMPATIBILITY:
  * 'promotion', 'subscription', 'shorts' are marked for migration.
@@ -125,7 +127,7 @@ export function upsertMarketingGrowthItem(item: Partial<MarketingGrowthRecord>) 
     ctaLabel: item.ctaLabel?.trim() || existing?.ctaLabel || 'فتح الآن',
     highlight: item.highlight?.trim() || existing?.highlight || 'مهيأ للنشر',
     metricValue: item.metricValue?.trim() || existing?.metricValue || 'بدون بيانات',
-    accentColor: item.accentColor?.trim() || existing?.accentColor || '#f97316',
+    accentColor: item.accentColor?.trim() || existing?.accentColor || colorPalette.brand,
     impressions: item.impressions ?? existing?.impressions ?? 0,
     clicks: item.clicks ?? existing?.clicks ?? 0,
   };

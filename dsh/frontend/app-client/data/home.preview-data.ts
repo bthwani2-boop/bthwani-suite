@@ -803,7 +803,19 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 	},
 ];
 
-export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = [
+function assertNoManualOrderStoreLeakage(stores: DshHomeGetFixtureStore[]): DshHomeGetFixtureStore[] {
+	const leaked = stores.filter((s) => s.categoryId === 'awnak' || s.categoryId === 'shein');
+	if (leaked.length > 0) {
+		throw new Error(
+			`[DSH] Domain invariant violated: store fixtures may not use categoryId 'awnak' or 'shein'. ` +
+			`These are manual-order services rendered by DshAwnakOrderCreateScreen / DshSheinOrderCreateScreen, ` +
+			`not store cards. Found: ${leaked.map((s) => `${s.id}(${s.categoryId})`).join(', ')}.`
+		);
+	}
+	return stores;
+}
+
+export const dshHomeGetFixtureStores: DshHomeGetFixtureStore[] = assertNoManualOrderStoreLeakage([
 	...dshDiscoveryStores.map(toDshHomeGetFixtureStore),
 	...dshHomeGetFixtureStoresRaw.map(ensureFixtureStorePublishStage),
-];
+]);

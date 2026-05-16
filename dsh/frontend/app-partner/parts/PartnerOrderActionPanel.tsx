@@ -16,10 +16,11 @@ const ORDER_ACTION_ITEMS: Array<{
   subtitle: string;
   badgeLabel: string;
   lifecycleStatus: string;
+  prerequisiteStatus?: string;
 }> = [
-  { id: 'order-accept', title: 'قبول الطلب', subtitle: 'ثبّت قبول الطلب ثم انقل الفريق إلى التحضير.', badgeLabel: 'قبول', lifecycleStatus: 'partner_accepted' },
-  { id: 'order-get', title: 'استلام الطلب', subtitle: 'أكد استلام الطلب داخل الفرع قبل نقله إلى handoff أو المسار التالي.', badgeLabel: 'استلام', lifecycleStatus: 'partner_accepted' },
-  { id: 'order-prepare', title: 'تحضير الطلب', subtitle: 'تابع التجهيز قبل الانتقال إلى الجاهزية.', badgeLabel: 'تحضير', lifecycleStatus: 'preparing' },
+  { id: 'order-accept', title: 'قبول الطلب', subtitle: 'ثبّت قبول الطلب ثم انقل الفريق إلى التحضير.', badgeLabel: 'قبول', lifecycleStatus: 'partner_accepted', prerequisiteStatus: 'operations_approved' },
+  { id: 'order-get', title: 'استلام الطلب', subtitle: 'أكد استلام الطلب داخل الفرع قبل نقله إلى handoff أو المسار التالي.', badgeLabel: 'استلام', lifecycleStatus: 'partner_accepted', prerequisiteStatus: 'operations_approved' },
+  { id: 'order-prepare', title: 'تحضير الطلب', subtitle: 'تابع التجهيز قبل الانتقال إلى الجاهزية.', badgeLabel: 'تحضير', lifecycleStatus: 'preparing', prerequisiteStatus: 'order_received' },
   { id: 'order-ready', title: 'تأكيد الجاهزية', subtitle: 'أعلن أن الطلب جاهز للتسليم من الفرع.', badgeLabel: 'جاهز', lifecycleStatus: 'ready_for_pickup' },
   { id: 'order-handoff', title: 'تسليم للمندوب', subtitle: 'ثبّت التسليم عند اكتمال التغليف والتحقق.', badgeLabel: 'تسليم', lifecycleStatus: 'picked_up' },
   { id: 'order-out-for-delivery', title: 'خرج للتوصيل', subtitle: 'تابع الحالة بعد مغادرة الطلب من الفرع.', badgeLabel: 'مسار', lifecycleStatus: 'enroute_to_dropoff' },
@@ -43,7 +44,7 @@ export function DshPartnerOrderActionPanel({ activeFlowId, onSelectFlow }: DshPa
           <ListItem
             key={item.id}
             title={item.title}
-            subtitle={`${item.subtitle} — الحالة: ${item.lifecycleStatus}`}
+            subtitle={`${item.subtitle} — الحالة: ${item.lifecycleStatus}${item.prerequisiteStatus ? ` — يبدأ بعد: ${item.prerequisiteStatus}` : ''}`}
             badgeLabel={item.badgeLabel}
             meta={activeFlowId === item.id ? 'المسار النشط' : 'افتح المسار'}
             onPress={() => onSelectFlow?.(item.id)}

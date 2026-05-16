@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, type ReactNode } from 'react';
 import { Modal as RNModal, Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
-import { radius, spacing } from '../foundation';
+import { colorPalette, radius, spacing, withAlpha } from '../foundation';
 import { PortalLayer, useTheme } from '../providers';
 import { Button } from './button';
 import { Box, Surface, Text } from '../primitives';
@@ -160,7 +160,7 @@ export function Modal({ visible, children, onClose }: ModalProps) {
   if (!visible) return null;
   return (
     <RNModal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.32)' }}>{children}</View>
+      <View style={{ flex: 1, backgroundColor: withAlpha(colorPalette.black, 0.32) }}>{children}</View>
     </RNModal>
   );
 }

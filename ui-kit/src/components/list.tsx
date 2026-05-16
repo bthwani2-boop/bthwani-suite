@@ -13,7 +13,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { colorPalette, radius, resolveRowDirection, spacing } from '../foundation';
+import { colorPalette, radius, resolveRowDirection, spacing, withAlpha } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Badge } from './button';
 import { EmptyState } from './state';
@@ -149,7 +149,7 @@ export function HighlightsRail({ items, maxItems = 5, variant = 'default', style
           </View>
           {imageSource ? <Image source={imageSource} style={{ position: 'absolute', inset: 0 }} /> : null}
           <View style={{ position: 'absolute', inset: 0, backgroundColor: colorPalette.overlaySoft }} />
-          <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: spacing[3], backgroundColor: 'rgba(255,255,255,0.12)' }}>
+          <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: spacing[3], backgroundColor: withAlpha(colorPalette.white, 0.12) }}>
             <Text role="label" tone="inverse" numberOfLines={2} align="center">
               {item.title}
             </Text>

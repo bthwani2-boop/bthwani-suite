@@ -210,5 +210,9 @@ export function getLoyaltyRewards(): LoyaltyReward[] {
 }
 
 export function getEntitlements(): Entitlement[] {
-  return [];
+  return [
+    { id: 'ent-pro-active', type: 'subscription', referenceId: 'sub-pro', status: 'active' },
+    { id: 'ent-tier-gold', type: 'tier', referenceId: 'tier-gold', status: 'active' },
+    { id: 'ent-reward-1', type: 'reward', referenceId: 'rew-1', status: 'active' },
+  ];
 }

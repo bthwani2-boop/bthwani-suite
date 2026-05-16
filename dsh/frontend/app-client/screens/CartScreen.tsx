@@ -571,8 +571,6 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   } = useWltDshWalletPreview();
 
   const checkoutAction = props.onContinue ?? props.onOpenOrder;
-  const isOrderSubmitted = clientState === 'order_created' || clientState === 'order_confirmed';
-  const canEditOrder = !isOrderSubmitted && Boolean(props.onOpenStore ?? props.onOpenOrder ?? props.onContinue);
   const isRTL = I18nManager.isRTL;
   const quickActionMeta = quickActionKey ? QUICK_ACTION_META[quickActionKey] : null;
   const hasWltServiceRoute = typeof props.onOpenService === 'function';
@@ -580,6 +578,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     () => props.clientState ?? (items.length > 0 ? 'cart_ready' : 'cart_empty'),
     [items.length, props.clientState],
   );
+  const isOrderSubmitted = clientState === 'order_created' || clientState === 'order_confirmed';
+  const canEditOrder = !isOrderSubmitted && Boolean(props.onOpenStore ?? props.onOpenOrder ?? props.onContinue);
   const clientStateMeta = useMemo(() => getDshClientStateMeta(clientState), [clientState]);
   const paymentPendingMeta = useMemo(() => getDshClientStateMeta('payment_pending'), []);
   const walletCreditMeta = useMemo(() => getDshClientStateMeta('wallet_credit_visible'), []);

@@ -134,11 +134,45 @@ const defaultCreateOrderValues: CreateOrderValues = {
   note: 'لا توجد ملاحظات',
 };
 
-const deliveryJourneySteps: JourneyStep[] = [
-  { id: 'route', title: 'في الطريق', detail: 'الطلب في الطريق إلى العميل.' },
-  { id: 'arrived', title: 'وصل للعميل', detail: 'وصل الطلب إلى العميل وأصبح بانتظار الاستلام.' },
-  { id: 'received', title: 'استلم العميل الطلب', detail: 'بعد الاستلام تظهر التقييمات في نفس الشاشة.' },
+const FULL_JOURNEY_STEPS: JourneyStep[] = [
+  { id: 'order_submitted', title: 'تم تقديم الطلب', detail: 'الطلب بانتظار مراجعة فريق العمليات.' },
+  { id: 'operations_review', title: 'مراجعة العمليات', detail: 'يراجع فريق العمليات الطلب قبل التأكيد.' },
+  { id: 'operations_approved', title: 'اعتماد العمليات', detail: 'تمت الموافقة على الطلب.' },
+  { id: 'order_received', title: 'استلم المتجر', detail: 'استلم المتجر الطلب وبدأ التجهيز.' },
+  { id: 'preparing', title: 'قيد التجهيز', detail: 'يجهّز المتجر الطلب.' },
+  { id: 'ready_for_pickup', title: 'جاهز للاستلام', detail: 'الطلب جاهز، الكابتن في الطريق.' },
+  { id: 'captain_assigned', title: 'تم تعيين الكابتن', detail: 'كابتن مكلّف وهو في طريقه للاستلام.' },
+  { id: 'picked_up', title: 'استلم الكابتن الطلب', detail: 'الطلب مع الكابتن متجهًا نحوك.' },
+  { id: 'enroute_to_customer', title: 'في الطريق إليك', detail: 'الطلب في الطريق. تحديث كل 3 دقائق بدون خريطة حية.' },
+  { id: 'near_customer', title: 'الطلب قريب منك', detail: 'الكابتن على مقربة من موقعك.' },
+  { id: 'at_door', title: 'الكابتن عند بابك', detail: 'وصل الكابتن إلى موقع التسليم.' },
+  { id: 'bell_rang', title: 'تم قرع الجرس', detail: 'أُرسل إشعار الوصول. استعد لاستلام طلبك.' },
+  { id: 'delivered', title: 'تم التسليم', detail: 'استلمت طلبك. شكرًا لاستخدام بثواني.' },
 ];
+
+function lifecycleToStepId(status: DshClientDeliveryLifecycleStatus): string {
+  switch (status) {
+    case 'quote':
+    case 'created': return 'order_submitted';
+    case 'confirmed': return 'operations_review';
+    case 'operations_approved': return 'operations_approved';
+    case 'order_received':
+    case 'partner_accepted': return 'order_received';
+    case 'preparing': return 'preparing';
+    case 'ready_for_pickup': return 'ready_for_pickup';
+    case 'captain_assigned':
+    case 'enroute_to_pickup':
+    case 'arrived_at_pickup': return 'captain_assigned';
+    case 'picked_up': return 'picked_up';
+    case 'enroute_to_dropoff': return 'enroute_to_customer';
+    case 'near_customer': return 'near_customer';
+    case 'at_door': return 'at_door';
+    case 'bell_rang': return 'bell_rang';
+    case 'arrived_at_dropoff':
+    case 'delivered': return 'delivered';
+    default: return 'order_submitted';
+  }
+}
 
 const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttachment> = {
   camera: {
@@ -177,7 +211,7 @@ const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttac
 
 const fallbackOrderListItems: DshOrderListItem[] = [
   { id: 'order-review', title: 'طلب قيد المراجعة', subtitle: 'العنوان والتواصل تحت التدقيق قبل التحريك', statusLabel: 'قيد المراجعة', meta: 'جاهز للتتبع' },
-  { id: 'order-route', title: 'طلب في الطريق', subtitle: 'تم التعيين ويظهر المسار الحي الآن', statusLabel: 'في الطريق', meta: 'مباشر' },
+  { id: 'order-route', title: 'طلب في الطريق', subtitle: 'تم التعيين والمتابعة الذكية نشطة الآن', statusLabel: 'في الطريق', meta: 'متابعة ذكية' },
   { id: 'order-done', title: 'طلب مكتمل', subtitle: 'تم التسليم ويمكن الرجوع إليه لاحقًا', statusLabel: 'تم التسليم', meta: 'أرشيف' },
 ];
 
@@ -571,7 +605,9 @@ function formatDeliveryLifecycleStatus(status: DshClientDeliveryLifecycleStatus)
   const labels: Record<DshClientDeliveryLifecycleStatus, string> = {
     quote: 'التسعير والجاهزية',
     created: 'تم إنشاء الطلب',
-    confirmed: 'تم تأكيد الطلب',
+    confirmed: 'قيد مراجعة العمليات',
+    operations_approved: 'تمت الموافقة من العمليات',
+    order_received: 'استلم المتجر الطلب',
     partner_accepted: 'قبول الشريك',
     preparing: 'قيد التجهيز',
     ready_for_pickup: 'جاهز للاستلام',
@@ -1041,7 +1077,6 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const isOrderCreationState = effectiveClientState === 'order_created' || effectiveClientState === 'order_confirmed';
   const isCheckoutSequenceState = !isTrackingJourneyState && !isOrderCreationState;
   const note = normalizeText(values.note).length ? values.note : 'لا توجد ملاحظات';
-  const phaseIndex = phase === 'route' ? 0 : phase === 'arrived' ? 1 : 2;
   const deliveryStatusLabel = isTrackingJourneyState
     ? phase === 'route'
       ? currentStatusLabel ?? clientStateMeta.label
@@ -1078,11 +1113,14 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           ? 'اكتمل التسليم ويمكنك تقييم المنتج والكابتن أو طلب الدعم من نفس الشاشة.'
           : 'اكتمل الاستلام ويمكنك تقييم التجربة من نفس الصفحة.'
     : clientStateMeta.description;
+  const lifecycleStatusForSteps = buildDefaultLifecycleStatus(effectiveClientState, phase);
+  const activeStepId = lifecycleToStepId(lifecycleStatusForSteps);
+  const activeStepIndex = Math.max(0, FULL_JOURNEY_STEPS.findIndex((s) => s.id === activeStepId));
   const journeySteps = isTrackingJourneyState
-    ? deliveryJourneySteps.map((step, index) => ({
+    ? FULL_JOURNEY_STEPS.map((step, index) => ({
         id: step.id,
         title: step.title,
-        state: index < phaseIndex ? 'done' : index === phaseIndex ? 'current' : 'next',
+        state: index < activeStepIndex ? 'done' : index === activeStepIndex ? 'current' : 'next',
       }))
     : [
         { id: 'order-created', title: orderCreatedMeta.label, state: effectiveClientState === 'order_created' ? 'current' as const : 'done' as const },
@@ -1307,7 +1345,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
             title="مراحل الطلب"
             subtitle="المراحل الرئيسية من الاستلام حتى التسليم، تتحدث بشكل ذكي كل 3 دقائق."
           />
-          <StageRail activeStepId={phase} steps={deliveryJourneySteps} />
+          <StageRail activeStepId={activeStepId} steps={FULL_JOURNEY_STEPS} />
         </Surface>
 
         <KeyValueDetails

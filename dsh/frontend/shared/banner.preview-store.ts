@@ -1,3 +1,5 @@
+import { colorPalette } from '@bthwani/ui-kit';
+
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
  */
@@ -492,9 +494,9 @@ export function upsertMarketingBannerItem(item: Partial<MarketingBannerRecord>) 
     id: nextId,
     title: item.title?.trim() || existing?.title || 'بنر جديد',
     subtitle: item.subtitle?.trim() || existing?.subtitle || 'أضف نصًا مختصرًا وواضحًا هنا',
-    imageUrl: item.imageUrl?.trim() || existing?.imageUrl || existing?.mediaKey || createBannerDataUrl(item.accentColor?.trim() || '#f97316', '#ea580c', item.title?.trim() || 'بنر جديد', item.subtitle?.trim() || 'أضف النص هنا'),
+    imageUrl: item.imageUrl?.trim() || existing?.imageUrl || existing?.mediaKey || createBannerDataUrl(item.accentColor?.trim() || colorPalette.brand, colorPalette.brandStrong, item.title?.trim() || 'بنر جديد', item.subtitle?.trim() || 'أضف النص هنا'),
     mediaKey: item.mediaKey?.trim() || existing?.mediaKey,
-    accentColor: item.accentColor?.trim() || existing?.accentColor || '#f97316',
+    accentColor: item.accentColor?.trim() || existing?.accentColor || colorPalette.brand,
     audience: item.audience || existing?.audience || 'all',
     status: item.status || existing?.status || 'draft',
     actionType: item.actionType || existing?.actionType || 'external',

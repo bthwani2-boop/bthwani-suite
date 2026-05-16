@@ -64,9 +64,9 @@ export function ControlPanelDshSheinProxyScreen({ hubHref = '/operations', subGr
               onAction: () => router.push(`${hubHref}?workspace=sheinproxy&requestId=${request.id}`)
             }}
             secondaryAction={{
-              id: 'awnak',
-              label: 'عرض عونك',
-              onAction: () => router.push(`${hubHref}?workspace=awnak-operations`)
+              id: 'batches',
+              label: 'إدارة الدُفعة',
+              onAction: () => router.push(`${hubHref}?workspace=sheinproxy&panel=batches&requestId=${request.id}`)
             }}
           />
         ))}

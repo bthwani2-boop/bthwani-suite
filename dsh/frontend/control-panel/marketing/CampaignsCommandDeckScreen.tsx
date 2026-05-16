@@ -19,7 +19,8 @@ import {
   type CampaignPriority,
   type CampaignTargetType,
 } from '../../shared/campaign.preview-store';
-import { mapStoreCommercialFeatures, CommercialParityPreview } from '../../shared/store-card-commercial-map';
+import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
+import { CommercialParityPreview } from '../../shared/commercial-parity-preview';
 import type { Entitlement } from '../../shared/loyalty.preview-store';
 
 type EditorTab = 'plan' | 'audience' | 'channels' | 'schedule' | 'impact';

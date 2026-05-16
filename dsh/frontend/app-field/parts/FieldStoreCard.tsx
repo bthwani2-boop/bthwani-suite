@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Badge, Box, Card, Icon, Surface, Text, useDirection } from '@bthwani/ui-kit';
+import { Badge, Box, Card, colorPalette, Icon, Surface, Text, useDirection, withAlpha } from '@bthwani/ui-kit';
 import {
   resolveFieldCompletionPercent,
   resolveFieldStoreLifecycleLabel,
@@ -25,7 +25,7 @@ export function FieldStoreCard({ store, onPress }: FieldStoreCardProps) {
       padding={4}
       gap={3}
       onPress={onPress}
-      style={{ borderWidth: 1, borderColor: 'rgba(255, 80, 13, 0.16)' }}
+      style={{ borderWidth: 1, borderColor: withAlpha(colorPalette.brand, 0.16) }}
     >
       <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <Box gap={2} style={{ flex: 1, alignItems: 'flex-end' }}>
@@ -38,7 +38,7 @@ export function FieldStoreCard({ store, onPress }: FieldStoreCardProps) {
         </Box>
 
         <Surface tone="brand" padding={2} radiusToken="pill" border={false}>
-          <Icon name="arrow-forward" size={20} color="#FFFFFF" />
+          <Icon name="arrow-forward" size={20} color={colorPalette.white} />
         </Surface>
       </View>
 

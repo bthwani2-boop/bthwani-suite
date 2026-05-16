@@ -81,6 +81,7 @@ export {
 	textRoles,
 	tokenSourceMetadata,
 	warningPalette,
+	withAlpha,
 	type ThemeCssVariableMap,
 	type BorderToken,
 	type BreakpointToken,

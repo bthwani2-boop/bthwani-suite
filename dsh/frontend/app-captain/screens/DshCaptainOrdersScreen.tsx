@@ -244,6 +244,11 @@ function OrderInboxSection({
 						<SectionHeader title="الطلبات في الصف" subtitle="الحد الأدنى للقائمة: الاستلام والتسليم والوقت والخطوة التالية." />
 						<Box gap={2}>
 							{items.map((item) => (
+								// TODO [ML-captain-service-type]: DshCaptainOrderBellItem.tone already carries
+								// service-level signal ('info'=awnak, 'brand'=shein-final-mile, 'warning'=standard).
+								// When DshCaptainOrderServiceType is wired to real order data, map it here to
+								// badgeTone/badgeVariant on ListItem so awnak and shein-final-mile render distinct
+								// visual treatments from standard delivery orders.
 								<ListItem
 									key={item.id}
 									title={item.title}

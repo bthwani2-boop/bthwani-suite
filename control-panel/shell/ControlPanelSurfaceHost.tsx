@@ -25,7 +25,6 @@ import type {
   FinancePanelId,
 } from '../../dsh/frontend/control-panel/finance/finance.types';
 import { controlPanelRuntimeData } from './runtime.data';
-import { ControlPanelAppearanceScreen } from './ControlPanelAppearanceScreen';
 import { useControlPanelAppearance } from './appearance';
 import styles from './control-panel-shell.module.css';
 
@@ -379,9 +378,6 @@ export function ControlPanelSurfaceHost({
           <ControlPanelDshSupportQueueScreen />
         ) : null}
 
-        {activeSectionId === 'platform' ? (
-          <ControlPanelAppearanceScreen />
-        ) : null}
       </div>
     </WebCommandCenterFrame>
     </div>

@@ -16,7 +16,7 @@ try {
 } catch (err) {
   // fallback is already a zero-insets function
 }
-import { AppearanceOptionCard, Badge, Box, Button, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme } from '@bthwani/ui-kit';
+import { AppearanceOptionCard, Badge, Box, Button, colorPalette, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { wltDshCaptainUiCopy } from '../../../wlt/frontend/app-captain/dsh/wlt-dsh-captain.ui-copy';
 import { DshEntryScreen } from './screens/DshCaptainEntryScreen';
@@ -266,14 +266,14 @@ type MapHeatZone = {
 };
 
 const demandHeatZones: readonly MapHeatZone[] = [
-  { id: 'demand-1', top: 58, right: 34, size: 164, color: 'rgba(255, 80, 13, 0.20)', label: 'طلب مرتفع' },
-  { id: 'demand-2', top: 188, left: 26, size: 118, color: 'rgba(255, 80, 13, 0.14)', label: 'ذروة قريبة' },
+  { id: 'demand-1', top: 58, right: 34, size: 164, color: withAlpha(colorPalette.brand, 0.20), label: 'طلب مرتفع' },
+  { id: 'demand-2', top: 188, left: 26, size: 118, color: withAlpha(colorPalette.brand, 0.14), label: 'ذروة قريبة' },
   { id: 'demand-3', bottom: 108, right: 96, size: 146, color: 'rgba(255, 133, 75, 0.16)', label: 'متاجر نشطة' },
 ] satisfies readonly MapHeatZone[];
 
 const captainHeatZones: readonly MapHeatZone[] = [
-  { id: 'captain-1', top: 128, left: 112, size: 132, color: 'rgba(10, 47, 92, 0.14)', label: 'كباتن أكثر' },
-  { id: 'captain-2', bottom: 138, left: 154, size: 104, color: 'rgba(10, 47, 92, 0.10)', label: 'تغطية قريبة' },
+  { id: 'captain-1', top: 128, left: 112, size: 132, color: withAlpha(colorPalette.brandStrong, 0.14), label: 'كباتن أكثر' },
+  { id: 'captain-2', bottom: 138, left: 154, size: 104, color: withAlpha(colorPalette.brandStrong, 0.10), label: 'تغطية قريبة' },
 ] satisfies readonly MapHeatZone[];
 
 function CompactOrderChatBubble({ message }: { message: CompactOrderChatMessage }) {
@@ -938,7 +938,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           padding={panelPadding}
           gap={3}
           radiusToken="xl"
-          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
+          style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
         >
           <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} />
           <Box gap={1}>
@@ -962,7 +962,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           padding={3}
           gap={3}
           radiusToken="xl"
-          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
+          style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
           <Badge label="تحميل" tone="info" />
           <Box gap={1}>
@@ -982,7 +982,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           padding={3}
           gap={3}
           radiusToken="xl"
-          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
+          style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
           <Badge label="تنبيه" tone="danger" />
           <Box gap={1}>
@@ -1006,7 +1006,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           padding={3}
           gap={3}
           radiusToken="xl"
-          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
+          style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
           <Badge label="انتظار" tone="warning" />
           <Box gap={1}>
@@ -1030,7 +1030,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           padding={3}
           gap={2}
           radiusToken="xl"
-          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
+          style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
           <Badge label="مغلق" tone="default" />
           <Box gap={1}>
@@ -1054,7 +1054,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           padding={panelPadding}
           gap={3}
           radiusToken="xl"
-          style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
+          style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
         >
           <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
             <Box gap={1} style={{ flex: 1 }}>
@@ -1149,7 +1149,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
             padding={panelPadding}
             gap={2}
             radiusToken="xl"
-            style={{ shadowColor: '#020617', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
+            style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
           >
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
               <Box gap={1} style={{ flex: 1 }}>
@@ -1184,11 +1184,11 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       {/* Map area - occupies remaining screen space */}
       <Surface tone="inset" padding={0} gap={0} radiusToken="xl" style={{ flex: 1, overflow: 'hidden', borderColor: theme.lineStrong }}>
         <Box style={{ flex: 1, backgroundColor: '#EFF5FA', overflow: 'hidden' }}>
-          <Box style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(255,255,255,0.12)' }} />
-          <Box style={{ position: 'absolute', top: 78, left: 40, width: 7, height: 222, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.10)' }} />
-          <Box style={{ position: 'absolute', top: 136, left: 40, right: 74, height: 7, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.08)' }} />
-          <Box style={{ position: 'absolute', top: 214, right: 58, width: 148, height: 7, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.08)', transform: [{ rotate: '-18deg' }] }} />
-          <Box style={{ position: 'absolute', bottom: 122, left: 92, right: 42, height: 7, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.06)', transform: [{ rotate: '14deg' }] }} />
+          <Box style={{ position: 'absolute', inset: 0, backgroundColor: withAlpha(colorPalette.white, 0.12) }} />
+          <Box style={{ position: 'absolute', top: 78, left: 40, width: 7, height: 222, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.10) }} />
+          <Box style={{ position: 'absolute', top: 136, left: 40, right: 74, height: 7, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.08) }} />
+          <Box style={{ position: 'absolute', top: 214, right: 58, width: 148, height: 7, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.08), transform: [{ rotate: '-18deg' }] }} />
+          <Box style={{ position: 'absolute', bottom: 122, left: 92, right: 42, height: 7, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.06), transform: [{ rotate: '14deg' }] }} />
 
           {demandHeatZones.map((zone) => (
             <Box
@@ -1200,7 +1200,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
                 borderRadius: zone.size / 2,
                 backgroundColor: zone.color,
                 borderWidth: 1,
-                borderColor: 'rgba(255, 80, 13, 0.12)',
+                borderColor: withAlpha(colorPalette.brand, 0.12),
                 ...(zone.top != null ? { top: zone.top } : {}),
                 ...(zone.bottom != null ? { bottom: zone.bottom } : {}),
                 ...(zone.left != null ? { left: zone.left } : {}),
@@ -1219,7 +1219,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
                 borderRadius: zone.size / 2,
                 backgroundColor: zone.color,
                 borderWidth: 1,
-                borderColor: 'rgba(10, 47, 92, 0.12)',
+                borderColor: withAlpha(colorPalette.brandStrong, 0.12),
                 ...(zone.top != null ? { top: zone.top } : {}),
                 ...(zone.bottom != null ? { bottom: zone.bottom } : {}),
                 ...(zone.left != null ? { left: zone.left } : {}),
@@ -1230,7 +1230,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
 
           {/* Map marker remains a visual point inside the map. */}
           <Box style={{ position: 'absolute', top: 182, left: 148, alignItems: 'center', gap: 6 }}>
-            <Box style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0A2F5C', borderWidth: 4, borderColor: '#FFFFFF' }} />
+            <Box style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: colorPalette.brandStrong, borderWidth: 4, borderColor: colorPalette.white }} />
           </Box>
 
           {/* Soft map-edge controls overlay for availability, GPS, and map keys. */}
@@ -1242,7 +1242,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
               radiusToken="xl"
               style={{
                 alignSelf: 'stretch',
-                shadowColor: '#020617',
+                shadowColor: colorPalette.black,
                 shadowOpacity: 0.05,
                 shadowRadius: 14,
                 shadowOffset: { width: 0, height: 5 },
@@ -1278,13 +1278,13 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
 
                 <Box layoutDirection="row" align="center" gap={1} paddingX={1} paddingY={1} radiusToken="pill" background="surfaceRaised" border borderTone="line">
                   <Box layoutDirection="row" align="center" gap={1}>
-                    <Box style={{ width: 8, height: 8, borderRadius: 999, backgroundColor: 'rgba(255, 80, 13, 0.95)' }} />
+                    <Box style={{ width: 8, height: 8, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brand, 0.95) }} />
                     <Text role="caption" tone="muted" weight="semibold" numberOfLines={1}>
                       فرص طلبات
                     </Text>
                   </Box>
                   <Box layoutDirection="row" align="center" gap={1}>
-                    <Box style={{ width: 8, height: 8, borderRadius: 999, backgroundColor: 'rgba(10, 47, 92, 0.95)' }} />
+                    <Box style={{ width: 8, height: 8, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.95) }} />
                     <Text role="caption" tone="muted" weight="semibold" numberOfLines={1}>
                       تجمع كباتن
                     </Text>

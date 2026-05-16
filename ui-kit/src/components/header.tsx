@@ -2,7 +2,7 @@ import React from 'react';
 import { SearchField } from './field';
 import { Icon } from './icons';
 import { AccessibilityInfo, Animated, Easing, Pressable, ScrollView, StatusBar, View, type StyleProp, type ViewStyle } from 'react-native';
-import { radius, resolveRowDirection, spacing } from '../foundation';
+import { colorPalette, radius, resolveRowDirection, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Badge, Button } from './button';
 import { Surface, Text } from '../primitives';
@@ -36,7 +36,7 @@ export function SearchTopBar({ value, onChangeText, onClose, placeholder, hint, 
         overflow: 'hidden',
         paddingTop: spacing[0],
         paddingBottom: spacing[0],
-        shadowColor: '#020617',
+        shadowColor: colorPalette.black,
         shadowOpacity: 0.14,
         shadowRadius: 14,
         shadowOffset: { width: 0, height: 8 },
@@ -48,7 +48,7 @@ export function SearchTopBar({ value, onChangeText, onClose, placeholder, hint, 
         overflow: 'hidden',
         paddingTop: spacing[1],
         paddingBottom: spacing[1],
-        shadowColor: '#020617',
+        shadowColor: colorPalette.black,
         shadowOpacity: 0.06,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 3 },
@@ -151,7 +151,7 @@ export function MobileWorkspaceHeader({
             backgroundColor: action.id === 'back' ? theme.brandSurface : theme.surface,
             borderWidth: 1,
             borderColor: action.id === 'back' ? theme.brand : theme.line,
-            shadowColor: '#020617',
+            shadowColor: colorPalette.black,
             shadowOpacity: 0.08,
             shadowRadius: 10,
             shadowOffset: { width: 0, height: 2 },
@@ -188,7 +188,7 @@ export function MobileWorkspaceHeader({
       style={[
         {
           borderRadius: radius.xl,
-          shadowColor: '#020617',
+          shadowColor: colorPalette.black,
           shadowOpacity: 0.06,
           shadowRadius: 10,
           shadowOffset: { width: 0, height: 3 },
@@ -613,7 +613,7 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
         overflow: 'visible',
         paddingTop: isLuxury ? spacing[10] : (useRelaxedMain ? spacing[10] : spacing[8]),
         paddingBottom: isLuxury ? spacing[2] : (useRelaxedMain ? spacing[2] : spacing[1]),
-        shadowColor: '#020617',
+        shadowColor: colorPalette.black,
         shadowOpacity: 0.14,
         shadowRadius: 14,
         shadowOffset: { width: 0, height: 8 },
@@ -625,7 +625,7 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
         overflow: 'hidden',
         paddingTop: spacing[1],
         paddingBottom: spacing[1],
-        shadowColor: '#020617',
+        shadowColor: colorPalette.black,
         shadowOpacity: 0.08,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 4 },

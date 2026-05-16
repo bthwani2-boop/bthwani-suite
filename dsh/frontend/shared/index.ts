@@ -1,3 +1,47 @@
+// --- Commercial Preview Contract (UI_PREVIEW_ONLY) — unified type contract ---
+export type {
+  CommercialLifecycleStatus,
+  CommercialAudience,
+  CommercialPlacement,
+  CommercialEligibility,
+  CommercialEarningRule,
+  CommercialRedemptionRule,
+  CommercialConflictSeverity,
+  CommercialConflict,
+  CommercialSourceEntry,
+  CommercialSourceMap as CommercialContractSourceMap,
+  CommercialMeasurement,
+  CommercialProgram,
+  LoyaltyTierBenefit,
+  LoyaltyTier as CommercialLoyaltyTier,
+  LoyaltyReward as CommercialLoyaltyReward,
+  SubscriptionPlan as CommercialSubscriptionPlan,
+  CommercialEntitlement,
+  PartnerOffer,
+  PartnerOfferKind,
+  PartnerOfferSource as CommercialPartnerOfferSource,
+  PartnerOfferTarget,
+  CommercialCoupon,
+  CommercialCampaign,
+  CommercialBadge as CommercialContractBadge,
+  CommercialProjection,
+} from './commercial.preview-contract';
+export {
+  commercialContractMeta,
+  isClientVisibleStatus,
+  isReviewableStatus,
+  isTerminalStatus,
+  buildEmptyProjection,
+  validatePartnerOfferForPublish,
+  PARTNER_OFFER_LIFECYCLE,
+  CAMPAIGN_LIFECYCLE,
+  PROMO_LIFECYCLE,
+  SUBSCRIPTION_LIFECYCLE,
+  LOYALTY_LIFECYCLE,
+} from './commercial.preview-contract';
+
+export { CommercialParityPreview } from './commercial-parity-preview';
+
 // --- Commercial Marketing Contract (UI_PREVIEW_ONLY) ---
 
 export type {
@@ -89,7 +133,6 @@ export type {
 } from './store-card-commercial-map';
 export {
   mapStoreCommercialFeatures,
-  CommercialParityPreview,
   conflictList,
 } from './store-card-commercial-map';
 

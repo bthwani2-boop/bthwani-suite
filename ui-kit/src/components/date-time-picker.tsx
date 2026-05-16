@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo } from 'react';
 import { View, Pressable, StyleSheet, ScrollView, Animated, Dimensions } from 'react-native';
-import { colorPalette, spacing, radius, type Direction } from '../foundation';
+import { colorPalette, spacing, radius, withAlpha, type Direction } from '../foundation';
 import { useTheme } from '../providers';
 import { Box, Surface, Text } from '../primitives';
 import { Icon } from './icons';
@@ -269,7 +269,7 @@ export function DateTimePicker({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: withAlpha(colorPalette.black, 0.5),
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing[4],
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
   },
   periodButtonActive: {
     backgroundColor: colorPalette.white,
-    shadowColor: '#000',
+    shadowColor: colorPalette.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
